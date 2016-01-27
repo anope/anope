@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-30 15:56-0400\n"
+"POT-Creation-Date: 2016-01-27 14:22-0500\n"
 "PO-Revision-Date: 2010-09-19 20:12-0400\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Catalan\n"
@@ -26,17 +26,17 @@ msgstr ""
 msgid "%d nickname(s) dropped."
 msgstr "El teu nickname ha estat expulsat."
 
-#: modules/commands/cs_xop.cpp:219
+#: modules/commands/cs_xop.cpp:223
 #, fuzzy, c-format
 msgid "%s added to %s %s list."
 msgstr "%s afegit a la llista de AKILLs."
 
-#: modules/commands/cs_access.cpp:220
+#: modules/commands/cs_access.cpp:225
 #, c-format
 msgid "%s added to %s access list at level %d."
 msgstr "%s afegit a la llista d'accés de %s amb nivel %d."
 
-#: modules/commands/cs_access.cpp:218
+#: modules/commands/cs_access.cpp:223
 #, fuzzy, c-format
 msgid "%s added to %s access list at privilege %s (level %d)"
 msgstr "%s afegit a la llista d'accés de %s amb nivel %d."
@@ -46,7 +46,7 @@ msgstr "%s afegit a la llista d'accés de %s amb nivel %d."
 msgid "%s added to %s autokick list."
 msgstr "%s afegit a la llista de kicks automàtics en el canal %s."
 
-#: modules/commands/bs_badwords.cpp:306
+#: modules/commands/bs_badwords.cpp:307
 #, c-format
 msgid "%s added to %s bad words list."
 msgstr "%s afegida a  la llista de paraules malsonants de  %s."
@@ -61,17 +61,17 @@ msgstr "%s afegit a la teva lllista d'accés."
 msgid "%s added to %s's certificate list."
 msgstr "%s afegit a la teva lllista d'accés."
 
-#: modules/commands/ms_ignore.cpp:56
+#: modules/commands/ms_ignore.cpp:62
 #, fuzzy, c-format
 msgid "%s added to ignore list."
 msgstr "%s afegit a la teva lllista d'accés."
 
-#: modules/commands/os_sxline.cpp:408 modules/commands/os_sxline.cpp:641
+#: modules/commands/os_sxline.cpp:415 modules/commands/os_sxline.cpp:649
 #, fuzzy, c-format
 msgid "%s added to the %s list."
 msgstr "%s afegit a la llista de AKILLs."
 
-#: modules/commands/os_akill.cpp:202
+#: modules/commands/os_akill.cpp:203
 #, c-format
 msgid "%s added to the AKILL list."
 msgstr "%s afegit a la llista de AKILLs."
@@ -107,7 +107,7 @@ msgstr ""
 "informació sobre un comanda especifica, escriu  \n"
 "/msg %s HELP comanda."
 
-#: modules/pseudoclients/nickserv.cpp:437
+#: modules/pseudoclients/nickserv.cpp:466
 #, fuzzy, c-format
 msgid ""
 "%s allows you to register a nickname and\n"
@@ -124,7 +124,7 @@ msgstr ""
 "per més informació sobre una comanda especifica\n"
 "escriu /msg %s HELP comanda."
 
-#: modules/pseudoclients/nickserv.cpp:444
+#: modules/pseudoclients/nickserv.cpp:473
 #, fuzzy, c-format
 msgid ""
 "%s allows you to register an account.\n"
@@ -140,7 +140,7 @@ msgstr ""
 "per més informació sobre una comanda especifica\n"
 "escriu /msg %s HELP comanda."
 
-#: modules/pseudoclients/chanserv.cpp:248
+#: modules/pseudoclients/chanserv.cpp:255
 #, fuzzy, c-format
 msgid ""
 "%s allows you to register and control various\n"
@@ -161,7 +161,7 @@ msgstr ""
 "escriu /msg %s HELP comanda.\n"
 " "
 
-#: modules/commands/bs_badwords.cpp:297
+#: modules/commands/bs_badwords.cpp:298
 #, c-format
 msgid "%s already exists in %s bad words list."
 msgstr "%s ja existeix a la llista de paraules malsonants de %s."
@@ -182,7 +182,7 @@ msgstr "%s already exists on the EXCEPTION list."
 msgid "%s cannot be taken as times to ban."
 msgstr "%s no pot ser pres com vegades a banegar"
 
-#: modules/commands/os_mode.cpp:157
+#: modules/commands/os_mode.cpp:163
 #, fuzzy, c-format
 msgid "%s changed your usermodes to %s."
 msgstr "%s changed your usermodes."
@@ -192,12 +192,12 @@ msgstr "%s changed your usermodes."
 msgid "%s channel list:"
 msgstr "Fi de la llista de canals."
 
-#: modules/commands/cs_xop.cpp:347
+#: modules/commands/cs_xop.cpp:351
 #, fuzzy, c-format
 msgid "%s deleted from %s %s list."
 msgstr "%s esborrat de la llista AOP de %s."
 
-#: modules/commands/cs_access.cpp:321
+#: modules/commands/cs_access.cpp:326
 #, c-format
 msgid "%s deleted from %s access list."
 msgstr "%s esborrat de la llista d'accés de %s."
@@ -207,7 +207,7 @@ msgstr "%s esborrat de la llista d'accés de %s."
 msgid "%s deleted from %s autokick list."
 msgstr "%s esborrat de la llista de kicks automàtics del canal %s."
 
-#: modules/commands/bs_badwords.cpp:347
+#: modules/commands/bs_badwords.cpp:348
 #, c-format
 msgid "%s deleted from %s bad words list."
 msgstr "%s esborrada de la llista de paraules malsonants de %s."
@@ -233,12 +233,12 @@ msgstr ""
 msgid "%s deleted from the %s list."
 msgstr "%s esborrat de la llista AOP de %s."
 
-#: modules/commands/os_akill.cpp:245
+#: modules/commands/os_akill.cpp:246
 #, c-format
 msgid "%s deleted from the AKILL list."
 msgstr "%s esborrat de la llista de AKILLs."
 
-#: modules/commands/cs_access.cpp:678
+#: modules/commands/cs_access.cpp:685
 #, c-format
 msgid "%s disabled on channel %s."
 msgstr "%s inhabilitat(s) en el canal %s."
@@ -311,7 +311,7 @@ msgstr "You are already in %s! "
 msgid "%s is already in %s."
 msgstr "You are already in %s! "
 
-#: modules/commands/ms_ignore.cpp:59
+#: modules/commands/ms_ignore.cpp:65
 #, fuzzy, c-format
 msgid "%s is already on the ignore list."
 msgstr "%s afegit a la teva lllista d'accés."
@@ -321,7 +321,7 @@ msgstr "%s afegit a la teva lllista d'accés."
 msgid "%s is already suspended."
 msgstr "You are already in %s! "
 
-#: modules/commands/ms_rsend.cpp:56 modules/commands/ms_send.cpp:46
+#: modules/commands/ms_send.cpp:55 modules/commands/ms_rsend.cpp:56
 #, fuzzy, c-format
 msgid "%s is not a registered unforbidden nick or channel."
 msgstr "%s no és un bot valid o un canal registrat."
@@ -351,7 +351,7 @@ msgstr "%s inhabilitat(s) en el canal %s."
 msgid "%s is not in %s."
 msgstr "You are already in %s! "
 
-#: modules/commands/ms_ignore.cpp:71
+#: modules/commands/ms_ignore.cpp:77
 #, fuzzy, c-format
 msgid "%s is not on the ignore list."
 msgstr "%s not found on ignore list."
@@ -383,12 +383,12 @@ msgstr ""
 msgid "%s matches auto kick entry %s on %s (%s)."
 msgstr "%s afegit a la llista de kicks automàtics en el canal %s."
 
-#: modules/commands/cs_xop.cpp:357
+#: modules/commands/cs_xop.cpp:361
 #, fuzzy, c-format
 msgid "%s not found on %s %s list."
 msgstr "%s no trobat a la llista AOP de %s."
 
-#: modules/commands/cs_access.cpp:333 modules/commands/cs_flags.cpp:254
+#: modules/commands/cs_flags.cpp:255 modules/commands/cs_access.cpp:338
 #, c-format
 msgid "%s not found on %s access list."
 msgstr "%s no trobat a la llista d'accés de %s."
@@ -398,7 +398,7 @@ msgstr "%s no trobat a la llista d'accés de %s."
 msgid "%s not found on %s autokick list."
 msgstr "%s no trobat a la llista de kicks automàtics en el canal %s."
 
-#: modules/commands/bs_badwords.cpp:340
+#: modules/commands/bs_badwords.cpp:341
 #, c-format
 msgid "%s not found on %s bad words list."
 msgstr "%s no trobada a la llista de paraules malsonants de %s."
@@ -435,17 +435,17 @@ msgstr "%s no trobat a a la llista d'excepcions al límit de sessions."
 msgid "%s not found on the %s list."
 msgstr "%s no trobat a la llista AOP de %s."
 
-#: modules/commands/os_akill.cpp:236
+#: modules/commands/os_akill.cpp:237
 #, c-format
 msgid "%s not found on the AKILL list."
 msgstr "%s no trobat a la llista de AKILLs."
 
-#: modules/commands/cs_flags.cpp:250
+#: modules/commands/cs_flags.cpp:251
 #, fuzzy, c-format
 msgid "%s removed from the %s access list."
 msgstr "%s esborrat de la llista d'accés de %s."
 
-#: modules/commands/ms_ignore.cpp:68
+#: modules/commands/ms_ignore.cpp:74
 #, fuzzy, c-format
 msgid "%s removed from the ignore list."
 msgstr "%s esborrat de la teva lllista d'accés."
@@ -477,11 +477,11 @@ msgstr ""
 "Escriu /msg %s HELP opció per més informació\n"
 "sobre una opció en particular."
 
-#: modules/commands/bs_bot.cpp:254
+#: modules/commands/bs_bot.cpp:270
 msgid "ADD nick user host real"
 msgstr ""
 
-#: modules/commands/bs_bot.cpp:255
+#: modules/commands/bs_bot.cpp:271
 #, fuzzy
 msgid "CHANGE oldnick newnick [user [host [real]]]"
 msgstr ""
@@ -489,12 +489,12 @@ msgstr ""
 "BOT CHANGE nick-antic nick-nou [usuari [host [nom-real]]]\n"
 "BOT DEL nick"
 
-#: modules/commands/bs_bot.cpp:256
+#: modules/commands/bs_bot.cpp:272
 #, fuzzy
 msgid "DEL nick"
 msgstr "DEL <nick>."
 
-#: modules/commands/os_session.cpp:601
+#: modules/commands/os_session.cpp:560
 #, fuzzy
 msgid ""
 "EXCEPTION ADD adds the given host mask to the exception list.\n"
@@ -508,9 +508,6 @@ msgid ""
 "the format of the optional expiry parameter.\n"
 " \n"
 "EXCEPTION DEL removes the given mask from the exception list.\n"
-" \n"
-"EXCEPTION MOVE moves exception num to position. The\n"
-"sessions inbetween will be shifted up or down to fill the gap.\n"
 " \n"
 "EXCEPTION LIST and EXCEPTION VIEW show all current\n"
 "sessions if the optional mask is given, the list is limited\n"
@@ -574,7 +571,7 @@ msgid ""
 "restriction."
 msgstr ""
 
-#: modules/commands/cs_access.cpp:604
+#: modules/commands/cs_access.cpp:611
 #, c-format
 msgid ""
 "User access levels can be seen by using the\n"
@@ -592,18 +589,18 @@ msgstr "[auto-memo] The memo you sent to %s has been viewed."
 msgid "[target] [password]"
 msgstr "GROUP grup clau"
 
-#: modules/commands/ns_set.cpp:435
+#: modules/commands/ns_set.cpp:442
 msgid "address"
 msgstr ""
 
-#: modules/commands/bs_set.cpp:150
+#: modules/commands/bs_set.cpp:159
 #, fuzzy
 msgid "botname {ON|OFF}"
 msgstr "SASET nickname AUTOOP {ON | OFF}"
 
-#: modules/commands/cs_suspend.cpp:152 modules/commands/cs_sync.cpp:20
-#: modules/commands/bs_assign.cpp:91 modules/commands/cs_log.cpp:106
-#: modules/commands/cs_getkey.cpp:20 modules/commands/cs_info.cpp:20
+#: modules/commands/bs_assign.cpp:91 modules/commands/cs_info.cpp:20
+#: modules/commands/cs_suspend.cpp:152 modules/commands/cs_getkey.cpp:20
+#: modules/commands/cs_log.cpp:106 modules/commands/cs_sync.cpp:20
 #: modules/extra/stats/cs_fantasy_top.cpp:39
 #: modules/extra/stats/cs_fantasy_top.cpp:51
 #, fuzzy
@@ -646,7 +643,7 @@ msgstr "UNBAN canal [nick]"
 msgid "channel nick [reason]"
 msgstr "BAN #channel nick [reason]"
 
-#: modules/commands/cs_clone.cpp:21
+#: modules/commands/cs_clone.cpp:115
 #, fuzzy
 msgid "channel target [what]"
 msgstr "CLEAR canal Modes-a-netegar"
@@ -656,7 +653,7 @@ msgstr "CLEAR canal Modes-a-netegar"
 msgid "channel text"
 msgstr "ACT canal text"
 
-#: modules/commands/bs_set.cpp:79
+#: modules/commands/bs_set.cpp:88
 #, fuzzy
 msgid "channel time"
 msgstr "ACT canal text"
@@ -671,12 +668,12 @@ msgstr "KICK canal usuari raó"
 msgid "channel what"
 msgstr "TOPIC canal [tòpic]"
 
-#: modules/commands/cs_xop.cpp:485
+#: modules/commands/cs_xop.cpp:489
 #, fuzzy
 msgid "channel ADD mask"
 msgstr "MODE canal Modes"
 
-#: modules/commands/cs_access.cpp:494
+#: modules/commands/cs_access.cpp:499
 msgid "channel ADD mask level"
 msgstr ""
 
@@ -685,7 +682,7 @@ msgstr ""
 msgid "channel ADD message"
 msgstr "MODE canal Modes"
 
-#: modules/commands/bs_badwords.cpp:370
+#: modules/commands/bs_badwords.cpp:371
 msgid "channel ADD word [SINGLE | START | END]"
 msgstr ""
 
@@ -694,19 +691,19 @@ msgstr ""
 msgid "channel ADD {nick | mask} [reason]"
 msgstr "BAN #channel nick [reason]"
 
-#: modules/commands/cs_topic.cpp:158
+#: modules/commands/cs_topic.cpp:151
 #, fuzzy
 msgid "channel APPEND topic"
 msgstr "TOPIC canal [tòpic]"
 
-#: modules/commands/cs_access.cpp:498 modules/commands/bs_badwords.cpp:373
-#: modules/commands/cs_xop.cpp:488 modules/commands/cs_flags.cpp:375
-#: modules/commands/cs_akick.cpp:428 modules/commands/cs_entrymsg.cpp:197
+#: modules/commands/bs_badwords.cpp:374 modules/commands/cs_xop.cpp:492
+#: modules/commands/cs_entrymsg.cpp:197 modules/commands/cs_flags.cpp:376
+#: modules/commands/cs_akick.cpp:428 modules/commands/cs_access.cpp:503
 #, fuzzy
 msgid "channel CLEAR"
 msgstr "DROP canal"
 
-#: modules/commands/cs_mode.cpp:681
+#: modules/commands/cs_mode.cpp:679
 #, fuzzy
 msgid "channel CLEAR [what]"
 msgstr "TOPIC canal [tòpic]"
@@ -721,7 +718,7 @@ msgstr "DROP canal"
 msgid "channel DEL num"
 msgstr "MODE canal Modes"
 
-#: modules/commands/cs_access.cpp:495 modules/commands/cs_xop.cpp:486
+#: modules/commands/cs_xop.cpp:490 modules/commands/cs_access.cpp:500
 #, fuzzy
 msgid "channel DEL {mask | entry-num | list}"
 msgstr "DEL [canal] {numero | llista | ALL}"
@@ -731,7 +728,7 @@ msgstr "DEL [canal] {numero | llista | ALL}"
 msgid "channel DEL {nick | mask | entry-num | list}"
 msgstr "AOP canal {ADD|DEL|LIST|CLEAR} [nick | instància]"
 
-#: modules/commands/bs_badwords.cpp:371
+#: modules/commands/bs_badwords.cpp:372
 #, fuzzy
 msgid "channel DEL {word | entry-num | list}"
 msgstr "DEL [canal] {numero | llista | ALL}"
@@ -740,7 +737,7 @@ msgstr "DEL [canal] {numero | llista | ALL}"
 msgid "channel ENFORCE"
 msgstr ""
 
-#: modules/commands/cs_access.cpp:737 modules/commands/cs_entrymsg.cpp:196
+#: modules/commands/cs_entrymsg.cpp:196 modules/commands/cs_access.cpp:744
 #, fuzzy
 msgid "channel LIST"
 msgstr "DROP canal"
@@ -750,50 +747,41 @@ msgstr "DROP canal"
 msgid "channel LIST [mask | entry-num | list]"
 msgstr "AOP canal {ADD|DEL|LIST|CLEAR} [nick | instància]"
 
-#: modules/commands/cs_access.cpp:496 modules/commands/bs_badwords.cpp:372
-#: modules/commands/cs_xop.cpp:487
+#: modules/commands/bs_badwords.cpp:373 modules/commands/cs_xop.cpp:491
+#: modules/commands/cs_access.cpp:501
 #, fuzzy
 msgid "channel LIST [mask | list]"
 msgstr "AOP canal {ADD|DEL|LIST|CLEAR} [nick | instància]"
 
-#: modules/commands/cs_flags.cpp:374
+#: modules/commands/cs_flags.cpp:375
 msgid "channel LIST [mask | +flags]"
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:679
+#: modules/commands/cs_mode.cpp:677
 #, fuzzy
 msgid "channel LOCK {ADD|DEL|SET|LIST} [what]"
 msgstr "AOP canal {ADD|DEL|LIST|CLEAR} [nick | instància]"
 
-#: modules/commands/cs_flags.cpp:373
-msgid "channel MODIFY mask changes"
-msgstr ""
-
-#: modules/commands/cs_access.cpp:738
+#: modules/commands/cs_access.cpp:745
 #, fuzzy
 msgid "channel RESET"
 msgstr "SET canal GREET {ON|OFF}"
 
-#: modules/commands/cs_mode.cpp:680
+#: modules/commands/cs_mode.cpp:678
 #, fuzzy
 msgid "channel SET modes"
 msgstr "MODE canal Modes"
 
-#: modules/commands/cs_access.cpp:735
+#: modules/commands/cs_access.cpp:742
 msgid "channel SET type level"
 msgstr ""
-
-#: modules/commands/cs_topic.cpp:157
-#, fuzzy
-msgid "channel SET [topic]"
-msgstr "TOPIC canal [tòpic]"
 
 #: modules/commands/cs_akick.cpp:426
 #, fuzzy
 msgid "channel VIEW [mask | entry-num | list]"
 msgstr "AOP canal {ADD|DEL|LIST|CLEAR} [nick | instància]"
 
-#: modules/commands/cs_access.cpp:497
+#: modules/commands/cs_access.cpp:502
 #, fuzzy
 msgid "channel VIEW [mask | list]"
 msgstr "DEL [canal] {numero | llista | ALL}"
@@ -803,7 +791,7 @@ msgstr "DEL [canal] {numero | llista | ALL}"
 msgid "channel [description]"
 msgstr "REGISTER canal descripció"
 
-#: modules/commands/cs_invite.cpp:20 modules/commands/cs_unban.cpp:20
+#: modules/commands/cs_unban.cpp:20 modules/commands/cs_invite.cpp:20
 #, fuzzy
 msgid "channel [nick]"
 msgstr "UNBAN canal [nick]"
@@ -813,7 +801,7 @@ msgstr "UNBAN canal [nick]"
 msgid "channel [parameters]"
 msgstr "CLEAR canal Modes-a-netegar"
 
-#: modules/commands/cs_status.cpp:20 modules/commands/cs_mode.cpp:752
+#: modules/commands/cs_status.cpp:20 modules/commands/cs_mode.cpp:750
 #, fuzzy
 msgid "channel [user]"
 msgstr "UNBAN canal [nick]"
@@ -828,13 +816,23 @@ msgstr "BAN #channel nick [reason]"
 msgid "channel [+expiry] {nick | mask} [reason]"
 msgstr "BAN #channel nick [reason]"
 
-#: modules/commands/cs_topic.cpp:159
+#: modules/commands/cs_flags.cpp:374
+#, fuzzy
+msgid "channel [MODIFY] mask changes"
+msgstr "BAN #channel nick [reason]"
+
+#: modules/commands/cs_topic.cpp:150
+#, fuzzy
+msgid "channel [SET] [topic]"
+msgstr "TOPIC canal [tòpic]"
+
+#: modules/commands/cs_topic.cpp:152
 #, fuzzy
 msgid "channel [UNLOCK|LOCK]"
 msgstr "DROP canal"
 
-#: modules/fantasy.cpp:20 modules/commands/greet.cpp:20
-#: modules/commands/bs_assign.cpp:154
+#: modules/commands/bs_assign.cpp:154 modules/commands/greet.cpp:20
+#: modules/fantasy.cpp:20
 #, fuzzy
 msgid "channel {ON|OFF}"
 msgstr "SET canal XOP {ON | OFF}"
@@ -862,7 +860,7 @@ msgstr "KICK canal opció {ON|OFF} [establiments]"
 msgid "channel {ON|OFF} [ttb]"
 msgstr "SET canal XOP {ON | OFF}"
 
-#: modules/commands/cs_access.cpp:736
+#: modules/commands/cs_access.cpp:743
 msgid "channel {DIS | DISABLE} type"
 msgstr ""
 
@@ -886,27 +884,27 @@ msgstr "SET canal XOP {ON | OFF}"
 msgid "email"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:773
+#: modules/commands/ns_set.cpp:780
 #, fuzzy
 msgid "language"
 msgstr "SET LANGUAGE numero"
 
-#: modules/commands/ms_sendall.cpp:25 modules/commands/ms_staff.cpp:25
+#: modules/commands/ms_staff.cpp:25 modules/commands/ms_sendall.cpp:25
 #, fuzzy
 msgid "memo-text"
 msgstr "STAFF memo-text"
 
-#: modules/commands/gl_global.cpp:22 modules/commands/greet.cpp:84
+#: modules/commands/greet.cpp:84 modules/commands/gl_global.cpp:22
 #, fuzzy
 msgid "message"
 msgstr "GLOBAL missatge"
 
-#: modules/commands/os_module.cpp:20 modules/commands/os_module.cpp:57
-#: modules/commands/os_module.cpp:129 modules/commands/os_modinfo.cpp:20
+#: modules/commands/os_modinfo.cpp:20 modules/commands/os_module.cpp:20
+#: modules/commands/os_module.cpp:57 modules/commands/os_module.cpp:129
 msgid "modname"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:322
+#: modules/commands/ns_set.cpp:327
 msgid "new-display"
 msgstr ""
 
@@ -916,9 +914,8 @@ msgid "new-password"
 msgstr "GROUP grup clau"
 
 #: modules/commands/cs_seen.cpp:258 modules/commands/hs_del.cpp:20
-#: modules/commands/hs_del.cpp:60 modules/commands/ms_check.cpp:20
-#: modules/commands/hs_request.cpp:187
-#: modules/extra/stats/cs_fantasy_stats.cpp:52
+#: modules/commands/hs_del.cpp:60 modules/commands/hs_request.cpp:193
+#: modules/commands/ms_check.cpp:20 modules/extra/stats/cs_fantasy_stats.cpp:52
 #, fuzzy
 msgid "nick"
 msgstr "INFO nick"
@@ -948,18 +945,18 @@ msgstr "SET <nick> <hostmask>."
 msgid "nick newnick"
 msgstr "SVSNICK nick newnick "
 
-#: modules/commands/hs_request.cpp:236
+#: modules/commands/hs_request.cpp:242
 #, fuzzy
 msgid "nick [reason]"
 msgstr "BAN #channel nick [reason]"
 
-#: modules/commands/ns_drop.cpp:19 modules/commands/ns_getpass.cpp:20
-#: modules/commands/ns_suspend.cpp:161
+#: modules/commands/ns_getpass.cpp:20 modules/commands/ns_suspend.cpp:161
+#: modules/commands/ns_drop.cpp:19
 #, fuzzy
 msgid "nickname"
 msgstr "CHECK nickname"
 
-#: modules/commands/ns_set.cpp:525
+#: modules/commands/ns_set.cpp:532
 #, fuzzy
 msgid "nickname address"
 msgstr "FORBID nickname rao"
@@ -969,7 +966,7 @@ msgstr "FORBID nickname rao"
 msgid "nickname email"
 msgstr "FORBID nickname rao"
 
-#: modules/commands/ns_set.cpp:848
+#: modules/commands/ns_set.cpp:858
 #, fuzzy
 msgid "nickname language"
 msgstr "FORBID nickname rao"
@@ -979,12 +976,12 @@ msgstr "FORBID nickname rao"
 msgid "nickname message"
 msgstr "FORBID nickname rao"
 
-#: modules/commands/ns_set.cpp:385
+#: modules/commands/ns_set.cpp:390
 #, fuzzy
 msgid "nickname new-display"
 msgstr "FORBID nickname rao"
 
-#: modules/commands/ns_set.cpp:168
+#: modules/commands/ns_set.cpp:170
 #, fuzzy
 msgid "nickname new-password"
 msgstr "GHOST nickname [clau]"
@@ -994,7 +991,7 @@ msgstr "GHOST nickname [clau]"
 msgid "nickname [parameter]"
 msgstr "GHOST nickname [clau]"
 
-#: modules/commands/ns_recover.cpp:130
+#: modules/commands/ns_recover.cpp:150
 #, fuzzy
 msgid "nickname [password]"
 msgstr "GHOST nickname [clau]"
@@ -1009,15 +1006,15 @@ msgstr "FORBID nickname rao"
 msgid "nickname {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"
 msgstr "SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"
 
-#: modules/commands/ns_set.cpp:294 modules/commands/ns_set.cpp:610
-#: modules/commands/ns_set.cpp:961 modules/commands/ns_set.cpp:1052
-#: modules/commands/ns_set.cpp:1081 modules/commands/ns_list.cpp:252
+#: modules/commands/ns_set.cpp:299 modules/commands/ns_set.cpp:617
+#: modules/commands/ns_set.cpp:971 modules/commands/ns_set.cpp:1062
+#: modules/commands/ns_set.cpp:1091 modules/commands/ns_list.cpp:252
 #: modules/extra/stats/m_chanstats.cpp:122
 #, fuzzy
 msgid "nickname {ON | OFF}"
 msgstr "SASET nickname AUTOOP {ON | OFF}"
 
-#: modules/commands/ns_set.cpp:739
+#: modules/commands/ns_set.cpp:746
 #, fuzzy
 msgid "nickname {ON | QUICK | IMMED | OFF}"
 msgstr "SASET nickname KILL {ON | QUICK | IMMED | OFF}"
@@ -1061,12 +1058,12 @@ msgstr "REGISTER clau email"
 msgid "password"
 msgstr "GROUP grup clau"
 
-#: modules/commands/ns_register.cpp:108
+#: modules/commands/ns_register.cpp:110
 #, fuzzy
 msgid "password [email]"
 msgstr "REGISTER clau email"
 
-#: modules/commands/ns_register.cpp:106
+#: modules/commands/ns_register.cpp:108
 #, fuzzy
 msgid "password email"
 msgstr "REGISTER clau email"
@@ -1086,7 +1083,7 @@ msgstr "LIST patro [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"
 msgid "server [reason]"
 msgstr "JUPE nom-del-servidor [raó]"
 
-#: modules/commands/os_mode.cpp:141
+#: modules/commands/os_mode.cpp:147
 #, fuzzy
 msgid "user modes"
 msgstr "MODE canal Modes"
@@ -1096,7 +1093,7 @@ msgstr "MODE canal Modes"
 msgid "user [reason]"
 msgstr "JUPE nom-del-servidor [raó]"
 
-#: modules/pseudoclients/nickserv.cpp:467
+#: modules/pseudoclients/nickserv.cpp:496
 #, fuzzy, c-format
 msgid ""
 " \n"
@@ -1113,7 +1110,7 @@ msgstr ""
 "o un altre acció maliciosa. L'abus de %s resultara, com a\n"
 "mínim, en la perdua del nickname esmentat."
 
-#: modules/commands/os_sxline.cpp:433
+#: modules/commands/os_sxline.cpp:440
 #, fuzzy
 msgid ""
 " \n"
@@ -1179,7 +1176,7 @@ msgstr ""
 "\n"
 "Limitat a operadors de serveis."
 
-#: modules/commands/os_sxline.cpp:668
+#: modules/commands/os_sxline.cpp:678
 #, fuzzy
 msgid ""
 " \n"
@@ -1242,7 +1239,7 @@ msgstr ""
 "\n"
 "Limitat a operadors de serveis."
 
-#: modules/pseudoclients/nickserv.cpp:463
+#: modules/pseudoclients/nickserv.cpp:492
 #, fuzzy, c-format
 msgid ""
 " \n"
@@ -1359,7 +1356,7 @@ msgid ""
 "first registered your nickname."
 msgstr ""
 
-#: modules/pseudoclients/chanserv.cpp:265
+#: modules/pseudoclients/chanserv.cpp:272
 #, fuzzy, c-format
 msgid ""
 " \n"
@@ -1381,7 +1378,7 @@ msgid ""
 "other channel users.\n"
 msgstr ""
 
-#: modules/pseudoclients/nickserv.cpp:457
+#: modules/pseudoclients/nickserv.cpp:486
 #, fuzzy
 msgid ""
 " \n"
@@ -1394,7 +1391,7 @@ msgstr ""
 "veure la llista d'accés per qualsevol nickname\n"
 "(/msg %s ACCESS LIST nick)."
 
-#: modules/pseudoclients/chanserv.cpp:270
+#: modules/pseudoclients/chanserv.cpp:277
 #, fuzzy
 msgid ""
 " \n"
@@ -1416,7 +1413,7 @@ msgstr ""
 "Veure l'accés, AKICK, i paràmetres de les llistes de nivells per a\n"
 "qualsevol canal."
 
-#: modules/commands/bs_set.cpp:135
+#: modules/commands/bs_set.cpp:144
 msgid ""
 " \n"
 "Sets the time bot bans expire in. If enabled, any bans placed by\n"
@@ -1425,17 +1422,7 @@ msgid ""
 "automatically expiring."
 msgstr ""
 
-#: modules/commands/cs_xop.cpp:565
-#, c-format
-msgid ""
-" \n"
-"The %s commands are limited to founders\n"
-"(unless SECUREOPS is off). However, any user on the\n"
-"VOP list or above may use the %s LIST command.\n"
-" \n"
-msgstr ""
-
-#: modules/commands/cs_xop.cpp:546
+#: modules/commands/cs_xop.cpp:550
 #, fuzzy, c-format
 msgid ""
 " \n"
@@ -1497,7 +1484,7 @@ msgstr ""
 "d'accés i /msg %s HELP SET XOP per a saber com canviar\n"
 "entre la llista d'accés i el sistema de llistes xOP."
 
-#: modules/commands/cs_akick.cpp:488
+#: modules/commands/cs_akick.cpp:496
 #, c-format
 msgid ""
 " \n"
@@ -1521,7 +1508,7 @@ msgid ""
 "akick list."
 msgstr ""
 
-#: modules/commands/os_akill.cpp:442
+#: modules/commands/os_akill.cpp:448
 #, fuzzy
 msgid ""
 " \n"
@@ -1584,7 +1571,7 @@ msgstr ""
 "d'accés i /msg %s HELP SET XOP per a saber com canviar\n"
 "entre la llista d'accés i el sistema de llistes xOP."
 
-#: modules/commands/os_sxline.cpp:455
+#: modules/commands/os_sxline.cpp:462
 #, fuzzy
 msgid ""
 " \n"
@@ -1647,7 +1634,7 @@ msgstr ""
 "d'accés i /msg %s HELP SET XOP per a saber com canviar\n"
 "entre la llista d'accés i el sistema de llistes xOP."
 
-#: modules/commands/os_sxline.cpp:687
+#: modules/commands/os_sxline.cpp:697
 #, fuzzy
 msgid ""
 " \n"
@@ -1714,9 +1701,9 @@ msgstr ""
 #, fuzzy
 msgid ""
 " \n"
-"This option makes a channel be unassignable. If a bot\n"
+"This option makes a channel unassignable. If a bot\n"
 "is already assigned to the channel, it is unassigned\n"
-"automatically when you enable the option."
+"automatically when you enable it."
 msgstr ""
 "Sintaxi: SET canal NOBOT {ON|OFF}\n"
 "\n"
@@ -1726,7 +1713,7 @@ msgstr ""
 "\n"
 "Limitat a administradors de serveis."
 
-#: modules/commands/bs_set.cpp:187
+#: modules/commands/bs_set.cpp:196
 #, fuzzy
 msgid ""
 " \n"
@@ -1749,7 +1736,7 @@ msgid ""
 "above commands."
 msgstr ""
 
-#: modules/commands/os_oper.cpp:153
+#: modules/commands/os_oper.cpp:168
 #, c-format
 msgid "   %s is online using this oper block."
 msgstr ""
@@ -1764,7 +1751,7 @@ msgstr ""
 msgid "   Providing service: %s"
 msgstr "Providing command: /msg %s %s"
 
-#: modules/commands/os_oper.cpp:149
+#: modules/commands/os_oper.cpp:164
 msgid "   This oper is configured in the configuration file."
 msgstr ""
 
@@ -1778,7 +1765,7 @@ msgstr ""
 msgid " but %s mysteriously dematerialized."
 msgstr ""
 
-#: src/messages.cpp:335
+#: src/messages.cpp:340
 #, c-format
 msgid ""
 "\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."
@@ -1790,7 +1777,7 @@ msgstr ""
 msgid "\"Jupiter\" a server"
 msgstr "    JUPE        \"Jupiter\" (Mart,Saturn....) un servidor"
 
-#: modules/commands/os_oper.cpp:147
+#: modules/commands/os_oper.cpp:162
 #, fuzzy, c-format
 msgid "%-8s %s"
 msgstr "%-20s %s@%s"
@@ -1809,17 +1796,17 @@ msgstr ""
 msgid "%c is an unknown status mode."
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:413
+#: modules/commands/cs_mode.cpp:416
 #, fuzzy, c-format
 msgid "%c%c is not locked on %s."
 msgstr "%s no es notificat per memos nous."
 
-#: modules/commands/cs_mode.cpp:409
+#: modules/commands/cs_mode.cpp:412
 #, fuzzy, c-format
 msgid "%c%c%s has been unlocked from %s."
 msgstr "Nick %s has been ungrouped from %s."
 
-#: modules/commands/cs_clone.cpp:140
+#: modules/commands/cs_clone.cpp:56
 #, fuzzy, c-format
 msgid "%d access entries from %s have been cloned to %s."
 msgstr "All vhost's in the group %s have been set to %s"
@@ -1844,8 +1831,8 @@ msgstr "%d nicknames en el grup."
 msgid "%lu nicks are stored in the database, using %.2Lf kB of memory."
 msgstr ""
 
-#: modules/commands/cs_xop.cpp:241 modules/commands/cs_xop.cpp:376
-#: modules/commands/cs_xop.cpp:454
+#: modules/commands/cs_xop.cpp:245 modules/commands/cs_xop.cpp:380
+#: modules/commands/cs_xop.cpp:458
 #, fuzzy, c-format
 msgid "%s %s list is empty."
 msgstr "La llista AOP de %s esta buida."
@@ -1937,9 +1924,9 @@ msgstr ""
 msgid "%s (minimum %d/%d%%)"
 msgstr "            Caps kicker : %s (mínim %d/%d%%)"
 
-#: modules/commands/cs_access.cpp:240 modules/commands/cs_access.cpp:344
-#: modules/commands/cs_access.cpp:449 modules/commands/cs_access.cpp:462
-#: modules/commands/cs_flags.cpp:294
+#: modules/commands/cs_flags.cpp:295 modules/commands/cs_access.cpp:245
+#: modules/commands/cs_access.cpp:349 modules/commands/cs_access.cpp:454
+#: modules/commands/cs_access.cpp:467
 #, c-format
 msgid "%s access list is empty."
 msgstr "La llista d'accés de %s esta buida."
@@ -1949,7 +1936,7 @@ msgstr "La llista d'accés de %s esta buida."
 msgid "%s added to %s's auto join list."
 msgstr "%s afegit a la llista de kicks automàtics en el canal %s."
 
-#: src/xline.cpp:360
+#: src/xline.cpp:390
 #, fuzzy, c-format
 msgid "%s already exists."
 msgstr "El bot %s ja existeix."
@@ -1960,7 +1947,7 @@ msgstr "El bot %s ja existeix."
 msgid "%s autokick list is empty."
 msgstr "La llista de kicks automàtics del canal %s esta buida."
 
-#: modules/commands/bs_badwords.cpp:197 modules/commands/bs_badwords.cpp:315
+#: modules/commands/bs_badwords.cpp:198 modules/commands/bs_badwords.cpp:316
 #, c-format
 msgid "%s bad words list is empty."
 msgstr "La llista de paraules malsonants de %s esta buida."
@@ -1970,8 +1957,8 @@ msgstr "La llista de paraules malsonants de %s esta buida."
 msgid "%s cannot be the successor on channel %s as they are the founder."
 msgstr "%s no pot ser el sucessor en el canal %s ja que n'es el fundador."
 
-#: modules/pseudoclients/operserv.cpp:272
-#: modules/pseudoclients/hostserv.cpp:78 modules/pseudoclients/global.cpp:90
+#: modules/pseudoclients/global.cpp:90 modules/pseudoclients/operserv.cpp:282
+#: modules/pseudoclients/hostserv.cpp:78
 #, c-format
 msgid "%s commands:"
 msgstr "%s commands:"
@@ -2071,7 +2058,7 @@ msgstr "%s Esta actualment online."
 msgid "%s is a network service."
 msgstr "%s Esta actualment online."
 
-#: src/xline.cpp:378
+#: src/xline.cpp:408
 #, fuzzy, c-format
 msgid "%s is already covered by %s."
 msgstr "%s ja esta cobert per %s."
@@ -2086,7 +2073,7 @@ msgstr "%s afegit a la teva lllista d'accés."
 msgid "%s is an unconfirmed nickname."
 msgstr "Aquest nickname no caducara."
 
-#: modules/commands/cs_flags.cpp:417
+#: modules/commands/cs_flags.cpp:432
 #, c-format
 msgid ""
 "%s is another way to modify the channel access list, similar to\n"
@@ -2110,7 +2097,7 @@ msgstr "%s is disabled"
 msgid "%s is enabled"
 msgstr "%s is enable"
 
-#: modules/commands/os_dns.cpp:505
+#: modules/commands/os_dns.cpp:506
 #, fuzzy, c-format
 msgid "%s is not a valid IP address."
 msgstr "%s no es un tipus de ban valid."
@@ -2156,7 +2143,7 @@ msgstr ""
 msgid "%s is on the channel right now!"
 msgstr "%s inhabilitat(s) en el canal %s."
 
-#: modules/commands/cs_xop.cpp:438
+#: modules/commands/cs_xop.cpp:442
 #, fuzzy, c-format
 msgid "%s list for %s"
 msgstr "Lllista d'accés per %s:"
@@ -2166,7 +2153,7 @@ msgstr "Lllista d'accés per %s:"
 msgid "%s list is empty."
 msgstr "La llista AOP de %s esta buida."
 
-#: modules/commands/cs_mode.cpp:358
+#: modules/commands/cs_mode.cpp:361
 #, fuzzy, c-format
 msgid "%s locked on %s."
 msgstr "%s no es notificat per memos nous."
@@ -2222,7 +2209,7 @@ msgstr ""
 "%s ara et notificara dels teus memos quant et conectis o treguis el teu /"
 "AWAY."
 
-#: modules/commands/bs_bot.cpp:82
+#: modules/commands/bs_bot.cpp:89
 #, c-format
 msgid "%s!%s@%s (%s) added to the bot list."
 msgstr "%s!%s@%s (%s) afegit a la llista de bots."
@@ -2276,12 +2263,12 @@ msgstr ""
 msgid "(by %s on %s) %s"
 msgstr ""
 
-#: modules/commands/cs_access.cpp:703
+#: modules/commands/cs_access.cpp:710
 #, fuzzy
 msgid "(disabled)"
 msgstr "%s is enable"
 
-#: modules/commands/cs_access.cpp:705
+#: modules/commands/cs_access.cpp:712
 msgid "(founder only)"
 msgstr ""
 
@@ -2348,7 +2335,7 @@ msgstr "%s Esta actualment online."
 msgid "<unknown>"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:484
+#: modules/commands/ns_set.cpp:491
 #, fuzzy, c-format
 msgid ""
 "A confirmation e-mail has been sent to %s. Follow the instructions in it to "
@@ -2361,13 +2348,13 @@ msgstr ""
 msgid "A massmemo has been sent to all registered users."
 msgstr "A massmemo has been sent to all registered users."
 
-#: modules/commands/hs_request.cpp:280
+#: modules/commands/hs_request.cpp:286
 msgid ""
 "A memo informing the user will also be sent, which includes the reason for "
 "the rejection if supplied."
 msgstr ""
 
-#: modules/commands/hs_request.cpp:224
+#: modules/commands/hs_request.cpp:230
 msgid "A memo informing the user will also be sent."
 msgstr ""
 
@@ -2406,7 +2393,7 @@ msgstr "GROUP grup clau"
 msgid "ADD text"
 msgstr ""
 
-#: modules/commands/os_session.cpp:561
+#: modules/commands/os_session.cpp:523
 #, fuzzy
 msgid "ADD [+expiry] mask limit reason"
 msgstr "CHANKILL [+expiry] {#channel} [reason]"
@@ -2426,12 +2413,12 @@ msgstr "CHANKILL [+expiry] {#channel} [reason]"
 msgid "ADD [nickname] [fingerprint]"
 msgstr "FORBID nickname rao"
 
-#: modules/commands/os_akill.cpp:380 modules/commands/os_sxline.cpp:651
+#: modules/commands/os_akill.cpp:386 modules/commands/os_sxline.cpp:659
 #, fuzzy
 msgid "ADD [+expiry] mask reason"
 msgstr "CHANKILL [+expiry] {#channel} [reason]"
 
-#: modules/commands/os_sxline.cpp:418
+#: modules/commands/os_sxline.cpp:425
 #, fuzzy
 msgid "ADD [+expiry] mask:reason"
 msgstr "CHANKILL [+expiry] {#channel} [reason]"
@@ -2441,15 +2428,15 @@ msgstr "CHANKILL [+expiry] {#channel} [reason]"
 msgid "ADD {NICK|CHAN|EMAIL|REGISTER} [+expiry] entry reason"
 msgstr "CHANKILL [+expiry] {#channel} [reason]"
 
-#: modules/commands/os_dns.cpp:663
+#: modules/commands/os_dns.cpp:664
 msgid "ADDIP server.name ip"
 msgstr ""
 
-#: modules/commands/os_dns.cpp:661
+#: modules/commands/os_dns.cpp:662
 msgid "ADDSERVER server.name [zone.name]"
 msgstr ""
 
-#: modules/commands/os_dns.cpp:659
+#: modules/commands/os_dns.cpp:660
 msgid "ADDZONE zone.name"
 msgstr ""
 
@@ -2463,8 +2450,8 @@ msgstr "AKICK ENFORCE en %s completa; %d usuaris afectats."
 msgid "AKILL all users on a specific channel"
 msgstr "    CHANKILL    AKILL all users on a specific channel"
 
-#: modules/commands/os_akill.cpp:221 modules/commands/os_akill.cpp:336
-#: modules/commands/os_akill.cpp:350
+#: modules/commands/os_akill.cpp:222 modules/commands/os_akill.cpp:339
+#: modules/commands/os_akill.cpp:353
 msgid "AKILL list is empty."
 msgstr "La llista de AKILLS esta buida."
 
@@ -2498,17 +2485,17 @@ msgstr "El nivell ha d'estar entre %d i %d inclosos."
 msgid "Access level must be non-zero."
 msgstr "El nivell de accés no pot ser zero."
 
-#: modules/commands/cs_access.cpp:687
+#: modules/commands/cs_access.cpp:694
 #, c-format
 msgid "Access level settings for channel %s:"
 msgstr "Opcions del nivell d'accés pel canal %s:"
 
-#: modules/commands/cs_access.cpp:727
+#: modules/commands/cs_access.cpp:734
 #, c-format
 msgid "Access levels for %s reset to defaults."
 msgstr "Nivells d'accés per a %s canviats als valors originals."
 
-#: modules/commands/cs_access.cpp:434 modules/commands/ns_access.cpp:87
+#: modules/commands/ns_access.cpp:87 modules/commands/cs_access.cpp:439
 #, fuzzy, c-format
 msgid "Access list for %s:"
 msgstr "Lllista d'accés per %s:"
@@ -2522,16 +2509,24 @@ msgstr ""
 "Access to this command requires the permission %s to be present in your "
 "opertype."
 
+#: modules/commands/ns_identify.cpp:94 modules/commands/ns_cert.cpp:368
+#: modules/commands/ns_cert.cpp:392
+#, c-format
+msgid ""
+"Account %s has already reached the maximum number of simultaneous logins "
+"(%u)."
+msgstr ""
+
 #: modules/commands/cs_set.cpp:694
 #, fuzzy
 msgid "Activate security features"
 msgstr "    SECURE        Activa les opcions de seguretat de %s"
 
-#: modules/commands/hs_request.cpp:222
+#: modules/commands/hs_request.cpp:228
 msgid "Activate the requested vHost for the given nick."
 msgstr ""
 
-#: modules/commands/hs_on.cpp:53
+#: modules/commands/hs_on.cpp:55
 #, fuzzy
 msgid ""
 "Activates the vhost currently assigned to the nick in use.\n"
@@ -2555,7 +2550,7 @@ msgid ""
 "the nick or channel."
 msgstr ""
 
-#: modules/commands/os_dns.cpp:513
+#: modules/commands/os_dns.cpp:514
 #, c-format
 msgid "Added IP %s to %s."
 msgstr ""
@@ -2595,7 +2590,13 @@ msgstr "Uplink server: %s"
 msgid "Added zone %s."
 msgstr ""
 
-#: modules/commands/ns_register.cpp:88
+#: modules/commands/cs_entrymsg.cpp:257
+msgid ""
+"Adding, deleting, or clearing entry messages requires the\n"
+"SET permission."
+msgstr ""
+
+#: modules/commands/ns_register.cpp:90
 msgid ""
 "Additionally, Services Operators with the nickserv/confirm permission can\n"
 "replace passcode with a users nick to force validate them."
@@ -2616,7 +2617,7 @@ msgstr ""
 msgid "All O:lines of %s have been reset."
 msgstr "Totes les linees O de %s han estat esborrades."
 
-#: modules/commands/cs_clone.cpp:154
+#: modules/commands/cs_clone.cpp:71
 #, fuzzy, c-format
 msgid "All akick entries from %s have been cloned to %s."
 msgstr "All vhost's in the group %s have been set to %s"
@@ -2626,9 +2627,14 @@ msgstr "All vhost's in the group %s have been set to %s"
 msgid "All available commands for %s:"
 msgstr "No existeix ajuda per %s."
 
-#: modules/commands/cs_clone.cpp:178
+#: modules/commands/cs_clone.cpp:96
 #, fuzzy, c-format
 msgid "All badword entries from %s have been cloned to %s."
+msgstr "All vhost's in the group %s have been set to %s"
+
+#: modules/commands/cs_clone.cpp:108
+#, fuzzy, c-format
+msgid "All level entries from %s have been cloned into %s."
 msgstr "All vhost's in the group %s have been set to %s"
 
 #: modules/commands/os_news.cpp:38
@@ -2640,12 +2646,12 @@ msgstr "Totes les notícies d'entrada esborrades."
 msgid "All memos for channel %s have been deleted."
 msgstr "All memos for channel %s have been deleted."
 
-#: modules/commands/os_mode.cpp:55
+#: modules/commands/os_mode.cpp:61
 #, c-format
 msgid "All modes cleared on %s."
 msgstr ""
 
-#: modules/commands/ns_register.cpp:358
+#: modules/commands/ns_register.cpp:368
 msgid ""
 "All new accounts must be validated by an administrator. Please wait for your "
 "registration to be confirmed."
@@ -2668,7 +2674,7 @@ msgstr "Totes les linees O de %s han estat esborrades."
 msgid "All random news items deleted."
 msgstr "Totes les notícies al azar esborrades."
 
-#: modules/commands/cs_clone.cpp:105
+#: modules/commands/cs_clone.cpp:210
 #, fuzzy, c-format
 msgid "All settings from %s have been cloned to %s."
 msgstr "All vhost's in the group %s have been set to %s"
@@ -2680,12 +2686,12 @@ msgstr "Totes les linees O de %s han estat esborrades."
 
 #: modules/commands/hs_group.cpp:60
 #, fuzzy, c-format
-msgid "All vhost's in the group %s have been set to %s."
+msgid "All vhosts in the group %s have been set to %s."
 msgstr "All vhost's in the group %s have been set to %s"
 
 #: modules/commands/hs_group.cpp:58
 #, fuzzy, c-format
-msgid "All vhost's in the group %s have been set to %s@%s."
+msgid "All vhosts in the group %s have been set to %s@%s."
 msgstr "All vhost's in the group %s have been set to %s@%s"
 
 #: src/access.cpp:41
@@ -2819,7 +2825,7 @@ msgstr ""
 "Permet als Administrators a enviar missatges als usuaris de\n"
 "la xarxa. El missatge sera enviat desde el nick %s."
 
-#: modules/commands/os_mode.cpp:127
+#: modules/commands/os_mode.cpp:133
 #, fuzzy
 msgid ""
 "Allows Services Operators to change modes for any channel.\n"
@@ -2835,7 +2841,7 @@ msgstr ""
 "\n"
 "Limitat a operadors de serveis."
 
-#: modules/commands/os_mode.cpp:167
+#: modules/commands/os_mode.cpp:173
 #, fuzzy
 msgid ""
 "Allows Services Operators to change modes for any user.\n"
@@ -2849,7 +2855,7 @@ msgstr ""
 "\n"
 "Limitat a operadors de serveis."
 
-#: modules/commands/bs_bot.cpp:336
+#: modules/commands/bs_bot.cpp:352
 #, fuzzy
 msgid ""
 "Allows Services Operators to create, modify, and delete\n"
@@ -2860,13 +2866,13 @@ msgid ""
 "hostname and realname. Since no integrity checks are done\n"
 "for these settings, be really careful.\n"
 " \n"
-"BOT CHANGE allows to change the nickname, username, hostname\n"
-"or realname of a bot without actually having to delete it (and\n"
+"BOT CHANGE allows you to change the nickname, username, hostname\n"
+"or realname of a bot without deleting it (and\n"
 "all the data associated with it).\n"
 " \n"
 "BOT DEL removes the given bot from the bot list.\n"
 " \n"
-"Note: you cannot create a bot that has a nick that is\n"
+"Note: You cannot create a bot with a nick that is\n"
 "currently registered. If an unregistered user is currently\n"
 "using the nick, they will be killed."
 msgstr ""
@@ -2933,7 +2939,7 @@ msgstr ""
 "\n"
 "Ignores will not be enforced on IRC Operators."
 
-#: modules/commands/os_akill.cpp:414
+#: modules/commands/os_akill.cpp:420
 #, fuzzy
 msgid ""
 "Allows Services Operators to manipulate the AKILL list. If\n"
@@ -3004,7 +3010,7 @@ msgstr ""
 "\n"
 "Limitat a operadors de serveis."
 
-#: modules/commands/os_sxline.cpp:429
+#: modules/commands/os_sxline.cpp:436
 msgid ""
 "Allows Services Operators to manipulate the SNLINE list.  If\n"
 "a user with a realname matching an SNLINE mask attempts to\n"
@@ -3012,17 +3018,19 @@ msgid ""
 "session."
 msgstr ""
 
-#: modules/commands/os_sxline.cpp:662
+#: modules/commands/os_sxline.cpp:670
 msgid ""
 "Allows Services Operators to manipulate the SQLINE list.  If\n"
 "a user with a nick matching an SQLINE mask attempts to\n"
 "connect, Services will not allow it to pursue his IRC\n"
 "session.\n"
 "If the first character of the mask is #, services will\n"
-"prevent the use of matching channels."
+"prevent the use of matching channels. If the mask is a\n"
+"regular expression, the expression will be matched against\n"
+"channels too."
 msgstr ""
 
-#: modules/commands/os_session.cpp:592
+#: modules/commands/os_session.cpp:551
 msgid ""
 "Allows Services Operators to manipulate the list of hosts that\n"
 "have specific session limits - allowing certain machines,\n"
@@ -3071,7 +3079,7 @@ msgstr ""
 "\n"
 "Limitat a administradors de serveis."
 
-#: modules/commands/cs_topic.cpp:189
+#: modules/commands/cs_topic.cpp:193
 msgid ""
 "Allows manipulating the topic of the specified channel.\n"
 "The SET command changes the topic of the channel to the given topic\n"
@@ -3079,11 +3087,12 @@ msgid ""
 "the given topic to the existing topic.\n"
 " \n"
 "LOCK and UNLOCK may be used to enable and disable topic lock. When\n"
-"topic lock is set, the channel topic will be unchangeable except via this "
-"command."
+"topic lock is set, the channel topic will be unchangeable by users who do "
+"not have\n"
+"the TOPIC privilege."
 msgstr ""
 
-#: modules/commands/os_kick.cpp:56
+#: modules/commands/os_kick.cpp:62
 #, fuzzy, c-format
 msgid ""
 "Allows staff to kick a user from any channel.\n"
@@ -3119,7 +3128,7 @@ msgstr ""
 "\n"
 "Opcions disponibles:"
 
-#: modules/commands/os_oper.cpp:225
+#: modules/commands/os_oper.cpp:251
 msgid ""
 "Allows you to change and view Services Operators.\n"
 "Note that operators removed by this command but are still set in\n"
@@ -3137,7 +3146,7 @@ msgid ""
 "     MODIFY nickserv forcemail no"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:968
+#: modules/commands/ns_set.cpp:978
 #, fuzzy
 msgid ""
 "Allows you to choose the way Services are communicating with\n"
@@ -3150,7 +3159,7 @@ msgstr ""
 "the given user. With MSG set, Services will use messages,\n"
 "else they'll use notices."
 
-#: modules/commands/ns_set.cpp:942
+#: modules/commands/ns_set.cpp:952
 #, fuzzy, c-format
 msgid ""
 "Allows you to choose the way Services are communicating with\n"
@@ -3163,7 +3172,7 @@ msgstr ""
 "comunicaran amb tu. Amb MSG establert, els serveis\n"
 "utilitzaran msgs, de l'altra forma utilitzaran notícies. "
 
-#: modules/commands/ms_ignore.cpp:107
+#: modules/commands/ms_ignore.cpp:113
 msgid ""
 "Allows you to ignore users by nick or host from memoing\n"
 "you or a channel. If someone on the memo ignore list tries\n"
@@ -3244,13 +3253,13 @@ msgstr ""
 "rebràs informació sobre el bot, així com temps\n"
 "de creació o nom de canals en els que aquest estigui."
 
-#: modules/commands/cs_xop.cpp:576
+#: modules/commands/cs_xop.cpp:575
 msgid ""
 "Alternative methods of modifying channel access lists are\n"
 "available. "
 msgstr ""
 
-#: modules/commands/hs_request.cpp:186
+#: modules/commands/hs_request.cpp:192
 #, fuzzy
 msgid "Approve the requested vHost of a user"
 msgstr "    DEL         Delete the vhost of another user"
@@ -3260,10 +3269,15 @@ msgstr "    DEL         Delete the vhost of another user"
 msgid "As a Services Operator, you may drop any nick."
 msgstr "%s is a services operator of type %s."
 
+#: modules/commands/bs_assign.cpp:19
+#, fuzzy
+msgid "Assigns a bot to a channel"
+msgstr "ASSIGN             Assigna un bot a un canal"
+
 #: modules/commands/bs_assign.cpp:78
 #, fuzzy
 msgid ""
-"Assigns a bot pointed out by nick to a channel. You\n"
+"Assigns the specified bot to a channel. You\n"
 "can then configure the bot for the channel so it fits\n"
 "your needs."
 msgstr ""
@@ -3273,21 +3287,16 @@ msgstr ""
 "Desprès d'això pots configurar el bot segons\n"
 "les teves necessitats."
 
-#: modules/commands/bs_assign.cpp:19
-#, fuzzy
-msgid "Assigns a bot to a channel"
-msgstr "ASSIGN             Assigna un bot a un canal"
-
-#: data/chanserv.example.conf:1186
+#: data/chanserv.example.conf:1200
 #, fuzzy
 msgid "Associate a URL with the channel"
 msgstr "ASSIGN             Assigna un bot a un canal"
 
-#: data/nickserv.example.conf:584
+#: data/nickserv.example.conf:593
 msgid "Associate a URL with this account"
 msgstr ""
 
-#: data/nickserv.example.conf:583
+#: data/nickserv.example.conf:592
 #, fuzzy
 msgid "Associate a URL with your account"
 msgstr "    GREET      Associa un salutació amb el teu nickname"
@@ -3297,12 +3306,12 @@ msgstr "    GREET      Associa un salutació amb el teu nickname"
 msgid "Associate a greet message with your nickname"
 msgstr "    GREET      Associa un salutació amb el teu nickname"
 
-#: data/chanserv.example.conf:1187
+#: data/chanserv.example.conf:1201
 #, fuzzy
 msgid "Associate an E-mail address with the channel"
 msgstr "    EMAIL      Associa un E-mail amb el teu nickname"
 
-#: modules/commands/ns_set.cpp:434
+#: modules/commands/ns_set.cpp:441
 #, fuzzy
 msgid "Associate an E-mail address with your nickname"
 msgstr "    EMAIL      Associa un E-mail amb el teu nickname"
@@ -3312,12 +3321,12 @@ msgstr "    EMAIL      Associa un E-mail amb el teu nickname"
 msgid "Associate oper info with a nick or channel"
 msgstr "ASSIGN             Assigna un bot a un canal"
 
-#: modules/commands/ns_set.cpp:537
+#: modules/commands/ns_set.cpp:544
 #, fuzzy
 msgid "Associates the given E-mail address with the nickname."
 msgstr "    EMAIL      Associa un E-mail amb el teu nickname"
 
-#: modules/commands/ns_set.cpp:512
+#: modules/commands/ns_set.cpp:519
 #, fuzzy
 msgid ""
 "Associates the given E-mail address with your nickname.\n"
@@ -3330,7 +3339,7 @@ msgstr ""
 "sera mostrat quant algu demani informació\n"
 "sobre el teu nick amb la comanda INFO."
 
-#: modules/commands/ns_set.cpp:1290
+#: modules/commands/ns_set.cpp:1300
 msgid "Auto-op"
 msgstr "Auto-op"
 
@@ -3359,12 +3368,17 @@ msgstr ""
 msgid "Automatic voice on join"
 msgstr ""
 
-#: modules/commands/os_oper.cpp:171
+#: modules/commands/os_oper.cpp:197
 #, fuzzy, c-format
 msgid "Available commands for %s:"
 msgstr "No existeix ajuda per %s."
 
-#: modules/commands/os_oper.cpp:193
+#: modules/commands/os_oper.cpp:176
+#, fuzzy
+msgid "Available opertypes:"
+msgstr "No existeix ajuda per %s."
+
+#: modules/commands/os_oper.cpp:219
 #, c-format
 msgid "Available privileges for %s:"
 msgstr ""
@@ -3379,20 +3393,20 @@ msgstr ""
 msgid "Bad words kicker"
 msgstr "   Kicker per paraules malsonants : %s"
 
-#: modules/commands/bs_badwords.cpp:251
+#: modules/commands/bs_badwords.cpp:252
 #, fuzzy, c-format
 msgid "Bad words list for %s:"
 msgstr "Lllista d'accés per %s:"
 
-#: modules/commands/bs_badwords.cpp:363
+#: modules/commands/bs_badwords.cpp:364
 msgid "Bad words list is now empty."
 msgstr "La llista de paraules malsonants esta ara buida."
 
-#: modules/commands/bs_set.cpp:117
+#: modules/commands/bs_set.cpp:126
 msgid "Ban expiry may not be longer than 1 day."
 msgstr ""
 
-#: modules/commands/cs_ban.cpp:138 modules/commands/cs_ban.cpp:167
+#: modules/commands/cs_ban.cpp:141 modules/commands/cs_ban.cpp:176
 #, fuzzy, c-format
 msgid "Ban on %s expires in %s."
 msgstr "El bot %s ja existeix."
@@ -3411,7 +3425,7 @@ msgstr "Tipus de ban pel canal %s es ara #%d."
 msgid "Bans a given nick or mask on a channel"
 msgstr "    BAN        Bans a selected nick on a channel"
 
-#: modules/commands/cs_ban.cpp:214
+#: modules/commands/cs_ban.cpp:228
 #, fuzzy
 msgid ""
 "Bans a given nick or mask on a channel. An optional expiry may\n"
@@ -3439,7 +3453,7 @@ msgstr "%s no es notificat per memos nous."
 msgid "Bolds kicker"
 msgstr "    Kicker per negretes : %s"
 
-#: modules/commands/bs_bot.cpp:26 modules/commands/bs_bot.cpp:166
+#: modules/commands/bs_bot.cpp:26 modules/commands/bs_bot.cpp:175
 #, c-format
 msgid "Bot %s already exists."
 msgstr "El bot %s ja existeix."
@@ -3454,12 +3468,12 @@ msgstr "El bot %s ja existeix."
 msgid "Bot %s has been assigned to %s."
 msgstr "El bot %s ha estat assignat al canal %s."
 
-#: modules/commands/bs_bot.cpp:212
+#: modules/commands/bs_bot.cpp:228
 #, fuzzy, c-format
 msgid "Bot %s has been changed to %s!%s@%s (%s)."
 msgstr "El bot %s ha estat canviat a %s!%s@%s (%s)"
 
-#: modules/commands/bs_bot.cpp:246
+#: modules/commands/bs_bot.cpp:262
 #, c-format
 msgid "Bot %s has been deleted."
 msgstr "El bot %s ha estat esborrat."
@@ -3489,42 +3503,42 @@ msgstr "Bot no kickejara ops en el canal %s."
 msgid "Bot won't kick voices on channel %s."
 msgstr "Bot no kickejara voices en el canal %s."
 
-#: modules/commands/bs_bot.cpp:111
+#: modules/commands/bs_bot.cpp:118
 #, fuzzy, c-format
 msgid "Bot %s is not changeable."
 msgstr "Mode no bot ara activat en el canal %s."
 
-#: modules/commands/bs_bot.cpp:238
+#: modules/commands/bs_bot.cpp:254
 #, fuzzy, c-format
 msgid "Bot %s is not deletable."
 msgstr "El bot %s ha estat esborrat."
 
-#: modules/commands/bs_set.cpp:129
+#: modules/commands/bs_set.cpp:138
 #, c-format
 msgid "Bot bans will automatically expire after %s."
 msgstr ""
 
-#: modules/commands/bs_set.cpp:127
+#: modules/commands/bs_set.cpp:136
 #, fuzzy
 msgid "Bot bans will no longer automatically expire."
 msgstr "Services will no longer autoop %s in channels."
 
-#: modules/commands/bs_bot.cpp:46 modules/commands/bs_bot.cpp:131
+#: modules/commands/bs_bot.cpp:46 modules/commands/bs_bot.cpp:138
 #, fuzzy, c-format
 msgid "Bot hosts may only be %d characters long."
 msgstr "Bot Hosts may only contain %d characters."
 
-#: modules/commands/bs_bot.cpp:64 modules/commands/bs_bot.cpp:160
+#: modules/commands/bs_bot.cpp:64 modules/commands/bs_bot.cpp:167
 #, fuzzy
 msgid "Bot hosts may only contain valid host characters."
 msgstr "Bot Hosts may only contain valid host characters."
 
-#: modules/commands/bs_bot.cpp:40 modules/commands/bs_bot.cpp:125
+#: modules/commands/bs_bot.cpp:40 modules/commands/bs_bot.cpp:132
 #, fuzzy, c-format
 msgid "Bot idents may only be %d characters long."
 msgstr "Bot Idents may only contain %d characters."
 
-#: modules/commands/bs_bot.cpp:58 modules/commands/bs_bot.cpp:154
+#: modules/commands/bs_bot.cpp:58 modules/commands/bs_bot.cpp:161
 #, fuzzy
 msgid "Bot idents may only contain valid ident characters."
 msgstr "Bot Idents may only contain valid characters."
@@ -3542,12 +3556,12 @@ msgstr "Llista de bots:"
 msgid "Bot nick"
 msgstr ""
 
-#: modules/commands/bs_bot.cpp:34 modules/commands/bs_bot.cpp:119
+#: modules/commands/bs_bot.cpp:34 modules/commands/bs_bot.cpp:126
 #, fuzzy, c-format
 msgid "Bot nicks may only be %d characters long."
 msgstr "Bot Idents may only contain %d characters."
 
-#: modules/commands/bs_bot.cpp:52 modules/commands/bs_bot.cpp:148
+#: modules/commands/bs_bot.cpp:52 modules/commands/bs_bot.cpp:155
 #, fuzzy
 msgid "Bot nicks may only contain valid nick characters."
 msgstr "Bot Nicks may only contain valid nick characters."
@@ -3640,8 +3654,8 @@ msgstr "El bot ja no kickejara flood."
 msgid "Bot won't kick for repeats anymore."
 msgstr "El bot ja no kickejara repeticions."
 
-#: modules/commands/cs_access.cpp:467 modules/commands/os_session.cpp:552
-#: modules/commands/os_sxline.cpp:199
+#: modules/commands/os_session.cpp:514 modules/commands/os_sxline.cpp:201
+#: modules/commands/cs_access.cpp:472
 msgid "By"
 msgstr ""
 
@@ -3680,12 +3694,12 @@ msgstr ""
 "sempre i quan no hagi sigut llegit al moment en el que\n"
 "vas fer servir la comanda."
 
-#: modules/commands/cs_clone.cpp:55
+#: modules/commands/cs_clone.cpp:149
 #, fuzzy, c-format
 msgid "Cannot clone channel %s to itself!"
 msgstr "Bot kickejara ops en el canal %s."
 
-#: modules/commands/ns_register.cpp:301
+#: modules/commands/ns_register.cpp:311
 msgid "Cannot send mail now; please retry a little later."
 msgstr "Imposible enviar email ara; per favor intenta en uns instants."
 
@@ -3784,24 +3798,24 @@ msgstr ""
 msgid "Change channel modes"
 msgstr "%s changed your usermodes."
 
-#: modules/commands/ns_set.cpp:881
+#: modules/commands/ns_set.cpp:891
 #, fuzzy
 msgid "Change the communication method of Services"
 msgstr ""
 "    MSG        canvia el metode de comunicació amb els\n"
 "                    serveis"
 
-#: modules/commands/os_mode.cpp:140
+#: modules/commands/os_mode.cpp:146
 #, fuzzy
 msgid "Change user modes"
 msgstr "%s changed your usermodes."
 
-#: modules/commands/os_mode.cpp:155
+#: modules/commands/os_mode.cpp:161
 #, fuzzy, c-format
 msgid "Changed usermodes of %s to %s."
 msgstr "Changed usermodes of %s."
 
-#: modules/commands/ns_set.cpp:397
+#: modules/commands/ns_set.cpp:402
 #, fuzzy
 msgid ""
 "Changes the display used to refer to the nickname group in\n"
@@ -3813,7 +3827,7 @@ msgstr ""
 "nicks en serveis. El nou display HA DE SER un nick\n"
 "del teu grup."
 
-#: modules/commands/ns_set.cpp:373
+#: modules/commands/ns_set.cpp:378
 #, fuzzy
 msgid ""
 "Changes the display used to refer to your nickname group in\n"
@@ -3836,7 +3850,7 @@ msgstr ""
 "Canvia el fundador d'un canal. El nou nickname ha de\n"
 "ser un d'enregistrat."
 
-#: modules/commands/ns_set.cpp:860
+#: modules/commands/ns_set.cpp:870
 #, fuzzy
 msgid ""
 "Changes the language Services uses when sending messages to\n"
@@ -3851,7 +3865,7 @@ msgstr ""
 "numero ha de ser escollit de la llista de llenguatges\n"
 "soportats:"
 
-#: modules/commands/ns_set.cpp:824
+#: modules/commands/ns_set.cpp:834
 #, fuzzy
 msgid ""
 "Changes the language Services uses when sending messages to\n"
@@ -3866,7 +3880,7 @@ msgstr ""
 "numero ha de ser escollit de la llista de llenguatges\n"
 "soportats:"
 
-#: modules/commands/ns_set.cpp:219
+#: modules/commands/ns_set.cpp:224
 #, fuzzy
 msgid "Changes the password used to identify as the nick's owner."
 msgstr ""
@@ -3875,7 +3889,7 @@ msgstr ""
 "Canvia la clau utilitzada per identificar-te com el\n"
 "propietari del nick."
 
-#: modules/commands/ns_set.cpp:156
+#: modules/commands/ns_set.cpp:158
 #, fuzzy
 msgid ""
 "Changes the password used to identify you as the nick's\n"
@@ -3904,7 +3918,7 @@ msgstr ""
 "si no hi haguès un successor. El nou nickname ha de ser un\n"
 "d'enregistrat."
 
-#: modules/commands/ns_ajoin.cpp:100 modules/commands/ns_alist.cpp:48
+#: modules/commands/ns_alist.cpp:48 modules/commands/ns_ajoin.cpp:100
 #, fuzzy
 msgid "Channel"
 msgstr "DROP canal"
@@ -3984,12 +3998,12 @@ msgstr "El canal %s caducara."
 msgid "Channel %s will not expire."
 msgstr "El canal %s no caducara."
 
-#: modules/commands/cs_xop.cpp:479
+#: modules/commands/cs_xop.cpp:483
 #, fuzzy, c-format
 msgid "Channel %s %s list has been cleared."
 msgstr "La llista AOP de canals %s ha estat netegada."
 
-#: modules/commands/cs_access.cpp:481 modules/commands/cs_flags.cpp:360
+#: modules/commands/cs_flags.cpp:361 modules/commands/cs_access.cpp:486
 #, c-format
 msgid "Channel %s access list has been cleared."
 msgstr "La llista d'accés pel canal %s ha estat netegada."
@@ -3999,7 +4013,7 @@ msgstr "La llista d'accés pel canal %s ha estat netegada."
 msgid "Channel %s akick list has been cleared."
 msgstr "La llista de kicks automàtics en canal %s ha estat netegada."
 
-#: modules/commands/cs_mode.cpp:426
+#: modules/commands/cs_mode.cpp:429
 #, fuzzy, c-format
 msgid "Channel %s has no mode locks."
 msgstr "Channel %s is now released."
@@ -4026,8 +4040,8 @@ msgstr ""
 "Channels that %s has access on:\n"
 "  Num  Channel              Level    Description "
 
-#: modules/commands/cs_access.cpp:141 modules/commands/cs_xop.cpp:142
-#: modules/commands/cs_flags.cpp:99
+#: modules/commands/cs_xop.cpp:143 modules/commands/cs_flags.cpp:97
+#: modules/commands/cs_access.cpp:142
 #, fuzzy
 msgid "Channels may not be on access lists."
 msgstr "%s no trobat a la llista d'accés de %s."
@@ -4093,7 +4107,7 @@ msgstr "    CHECK  Checks if last memo to a nick was read"
 #, fuzzy
 msgid ""
 "Checks whether the _last_ memo you sent to nick has been read\n"
-"or not. Note that this does only work with nicks, not with channels."
+"or not. Note that this only works with nicks, not with channels."
 msgstr ""
 "Syntax: CHECK nick\n"
 "\n"
@@ -4193,7 +4207,7 @@ msgstr "KICK               Configura kickers"
 msgid "Configures reverses kicker"
 msgstr "KICK               Configura kickers"
 
-#: modules/commands/bs_set.cpp:78
+#: modules/commands/bs_set.cpp:87
 #, fuzzy
 msgid "Configures the time bot bans expire in"
 msgstr "SET                Configura opcions de bots"
@@ -4208,7 +4222,7 @@ msgstr "KICK               Configura kickers"
 msgid "Confirm a passcode"
 msgstr "    CONFIRM    Confirm a nickserv auth code"
 
-#: modules/commands/cs_mode.cpp:678
+#: modules/commands/cs_mode.cpp:676
 #, fuzzy
 msgid "Control modes and mode locks on a channel"
 msgstr "    CLEARMODES  neteja els Modes d'un canal"
@@ -4218,50 +4232,50 @@ msgid ""
 "Controls what messages will be sent to users when they join the channel."
 msgstr ""
 
-#: modules/commands/cs_clone.cpp:193
+#: modules/commands/cs_clone.cpp:241
 msgid ""
 "Copies all settings, access, akicks, etc from channel to the\n"
-"target channel. If what is ACCESS, AKICK, or BADWORDS\n"
-"then only the respective settings are cloned.\n"
+"target channel. If what is ACCESS, AKICK, BADWORDS,\n"
+"or LEVELS then only the respective settings are cloned.\n"
 "You must be the founder of channel and target."
 msgstr ""
 
-#: modules/commands/cs_clone.cpp:20
+#: modules/commands/cs_clone.cpp:114
 #, fuzzy
 msgid "Copy all settings from one channel to another"
 msgstr ""
 "    UNBAN      Remove all bans preventing a user from entering a channel"
 
+#: modules/commands/os_akill.cpp:358 modules/commands/hs_list.cpp:58
 #: modules/commands/os_news.cpp:156 modules/commands/bs_info.cpp:58
-#: modules/commands/os_session.cpp:552 modules/commands/os_akill.cpp:355
-#: modules/commands/os_sxline.cpp:199 modules/commands/hs_list.cpp:58
-#: modules/commands/cs_flags.cpp:300 modules/commands/cs_akick.cpp:380
-#: modules/commands/cs_entrymsg.cpp:116 modules/commands/cs_mode.cpp:431
-#: modules/commands/hs_request.cpp:300
+#: modules/commands/cs_mode.cpp:434 modules/commands/os_session.cpp:514
+#: modules/commands/cs_entrymsg.cpp:116 modules/commands/os_sxline.cpp:201
+#: modules/commands/cs_flags.cpp:301 modules/commands/cs_akick.cpp:380
+#: modules/commands/hs_request.cpp:306
 #, fuzzy
 msgid "Created"
 msgstr "    Creat : %s"
 
-#: modules/commands/os_news.cpp:156 modules/commands/os_forbid.cpp:346
-#: modules/commands/os_akill.cpp:355 modules/commands/hs_list.cpp:58
-#: modules/commands/os_ignore.cpp:266 modules/commands/cs_flags.cpp:300
-#: modules/commands/cs_akick.cpp:380 modules/commands/cs_entrymsg.cpp:116
-#: modules/commands/cs_mode.cpp:431
+#: modules/commands/os_akill.cpp:358 modules/commands/hs_list.cpp:58
+#: modules/commands/os_news.cpp:156 modules/commands/cs_mode.cpp:434
+#: modules/commands/cs_entrymsg.cpp:116 modules/commands/os_forbid.cpp:346
+#: modules/commands/cs_flags.cpp:301 modules/commands/cs_akick.cpp:380
+#: modules/commands/os_ignore.cpp:266
 #, fuzzy
 msgid "Creator"
 msgstr "    Creat : %s"
 
-#: modules/commands/os_sxline.cpp:178
+#: modules/commands/os_sxline.cpp:180
 #, fuzzy, c-format
 msgid "Current %s list:"
 msgstr "Llista actual de AKILLs:"
 
-#: modules/commands/os_akill.cpp:320
+#: modules/commands/os_akill.cpp:323
 #, fuzzy
 msgid "Current AKILL list:"
 msgstr "Llista actual de AKILLs:"
 
-#: modules/commands/os_session.cpp:531
+#: modules/commands/os_session.cpp:493
 msgid "Current Session Limit Exception list:"
 msgstr "llista d'excepcions al límit de sessions actual:"
 
@@ -4315,13 +4329,13 @@ msgstr "FORBID nickname rao"
 msgid "DEL [nickname] mask"
 msgstr "MODE canal Modes"
 
-#: modules/commands/os_akill.cpp:381 modules/commands/os_sxline.cpp:419
-#: modules/commands/os_sxline.cpp:652
+#: modules/commands/os_akill.cpp:387 modules/commands/os_sxline.cpp:426
+#: modules/commands/os_sxline.cpp:660
 #, fuzzy
 msgid "DEL {mask | entry-num | list | id}"
 msgstr "DEL [canal] {numero | llista | ALL}"
 
-#: modules/commands/os_session.cpp:562
+#: modules/commands/os_session.cpp:524
 #, fuzzy
 msgid "DEL {mask | entry-num | list}"
 msgstr "DEL [canal] {numero | llista | ALL}"
@@ -4340,19 +4354,19 @@ msgstr "Sintaxis: OPERNEWS DEL {numero | ALL}"
 msgid "DEL {NICK|CHAN|EMAIL|REGISTER} entry"
 msgstr ""
 
-#: modules/commands/os_dns.cpp:664
+#: modules/commands/os_dns.cpp:665
 msgid "DELIP server.name ip"
 msgstr ""
 
-#: modules/commands/os_dns.cpp:662
+#: modules/commands/os_dns.cpp:663
 msgid "DELSERVER server.name [zone.name]"
 msgstr ""
 
-#: modules/commands/os_dns.cpp:660
+#: modules/commands/os_dns.cpp:661
 msgid "DELZONE zone.name"
 msgstr ""
 
-#: modules/commands/os_dns.cpp:667
+#: modules/commands/os_dns.cpp:668
 #, fuzzy
 msgid "DEPOOL server.name"
 msgstr "NOOP {SET|REVOKE} servidor"
@@ -4366,7 +4380,7 @@ msgstr ""
 msgid "Date/Time"
 msgstr ""
 
-#: modules/commands/hs_off.cpp:44
+#: modules/commands/hs_off.cpp:49
 #, fuzzy
 msgid ""
 "Deactivates the vhost currently assigned to the nick in use.\n"
@@ -4502,22 +4516,17 @@ msgstr ""
 msgid "Delete a memo or memos"
 msgstr "    DEL    Esborra un o més memos"
 
-#: modules/commands/hs_del.cpp:59
-#, fuzzy
-msgid "Delete the vhost for all nicks in a group"
-msgstr "    DELALL      Delete the vhost for all nicks in a group"
-
 #: modules/commands/hs_del.cpp:19
 #, fuzzy
 msgid "Delete the vhost of another user"
 msgstr "    DEL         Delete the vhost of another user"
 
-#: modules/commands/cs_xop.cpp:306
+#: modules/commands/cs_xop.cpp:310
 #, fuzzy, c-format
 msgid "Deleted %d entries from %s %s list."
 msgstr "%d instàncies esborrades de la llista AOP de %s."
 
-#: modules/commands/cs_access.cpp:272
+#: modules/commands/cs_access.cpp:277
 #, c-format
 msgid "Deleted %d entries from %s access list."
 msgstr "%d instàncies esborrades de la llista d'accés de %s."
@@ -4528,7 +4537,7 @@ msgid "Deleted %d entries from %s autokick list."
 msgstr ""
 "%d instàncies esborrades de la llista de kicks automàtics del canal %s."
 
-#: modules/commands/bs_badwords.cpp:169
+#: modules/commands/bs_badwords.cpp:170
 #, c-format
 msgid "Deleted %d entries from %s bad words list."
 msgstr "%d paraules esborrades de la llista de paraules malsonants de %s."
@@ -4549,7 +4558,7 @@ msgstr "%d instàncies esborrades de la llista AOP de %s."
 msgid "Deleted %d entries from the AKILL list."
 msgstr "%d instàncies esborrades de la llista de AKILLs."
 
-#: modules/commands/cs_access.cpp:270
+#: modules/commands/cs_access.cpp:275
 #, c-format
 msgid "Deleted 1 entry from %s access list."
 msgstr "1 instància esborrada de la llista d'accés de %s."
@@ -4559,7 +4568,7 @@ msgstr "1 instància esborrada de la llista d'accés de %s."
 msgid "Deleted 1 entry from %s autokick list."
 msgstr "1 instància esborrada de la llista de kicks automàtics del canal %s."
 
-#: modules/commands/bs_badwords.cpp:167
+#: modules/commands/bs_badwords.cpp:168
 #, c-format
 msgid "Deleted 1 entry from %s bad words list."
 msgstr "1 paraula esborrada de la llista de paraules malsonants de %s."
@@ -4582,7 +4591,7 @@ msgstr "1 instància esborrada de la llista de AKILLs."
 msgid "Deleted info from %s."
 msgstr "1 instància esborrada de la llista de AKILLs."
 
-#: modules/commands/cs_xop.cpp:304
+#: modules/commands/cs_xop.cpp:308
 #, fuzzy, c-format
 msgid "Deleted one entry from %s %s list."
 msgstr "1 instància esborrada de la llista AOP de %s."
@@ -4633,6 +4642,11 @@ msgstr ""
 "database.\n"
 "Limited to Services operators."
 
+#: modules/commands/hs_del.cpp:59
+#, fuzzy
+msgid "Deletes the vhost for all nicks in a group"
+msgstr "    DELALL      Delete the vhost for all nicks in a group"
+
 #: modules/commands/hs_del.cpp:93
 #, fuzzy
 msgid ""
@@ -4644,13 +4658,13 @@ msgstr ""
 "that of the given nick.\n"
 "Limited to Host Removers."
 
-#: modules/commands/os_dns.cpp:651
+#: modules/commands/os_dns.cpp:652
 #, c-format
 msgid "Depooled %s."
 msgstr ""
 
-#: modules/commands/cs_access.cpp:784 modules/commands/cs_list.cpp:75
-#: modules/commands/cs_info.cpp:53 modules/commands/ns_alist.cpp:48
+#: modules/commands/cs_list.cpp:75 modules/commands/cs_info.cpp:53
+#: modules/commands/ns_alist.cpp:48 modules/commands/cs_access.cpp:799
 #, fuzzy
 msgid "Description"
 msgstr "La descripció de %s canviada a%s."
@@ -4665,7 +4679,7 @@ msgstr "La descripció de %s canviada a%s."
 msgid "Description of %s unset."
 msgstr "La descripció de %s canviada a%s."
 
-#: modules/commands/bs_info.cpp:91 modules/commands/bs_kick.cpp:1104
+#: modules/commands/bs_kick.cpp:1104 modules/commands/bs_info.cpp:91
 #, fuzzy
 msgid "Disabled"
 msgstr "%s is enable"
@@ -4690,7 +4704,7 @@ msgstr ""
 "\n"
 "Reason may be required on certain networks."
 
-#: modules/commands/hs_request.cpp:332
+#: modules/commands/hs_request.cpp:338
 #, fuzzy, c-format
 msgid "Displayed %d records (%d total)."
 msgstr "Displayed all records (Count: %d)"
@@ -4808,12 +4822,12 @@ msgid ""
 "this nick."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:492
+#: modules/commands/ns_set.cpp:499
 #, c-format
 msgid "E-mail address for %s changed to %s."
 msgstr "E-mail address for %s changed to %s."
 
-#: modules/commands/ns_set.cpp:498
+#: modules/commands/ns_set.cpp:505
 #, c-format
 msgid "E-mail address for %s unset."
 msgstr "E-mail address for %s unset."
@@ -4891,7 +4905,7 @@ msgstr "      \t\tAdreça E-mail: %s"
 
 #: modules/commands/ns_getemail.cpp:41
 #, fuzzy, c-format
-msgid "Email matched: %s to %s."
+msgid "Email matched: %s (%s) to %s."
 msgstr "Emails Match %s to %s."
 
 #: modules/fantasy.cpp:19
@@ -4902,11 +4916,11 @@ msgstr ""
 msgid "Enable greet messages"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:547
+#: modules/commands/ns_set.cpp:554
 msgid "Enable or disable keep modes"
 msgstr ""
 
-#: modules/commands/bs_info.cpp:90 modules/commands/bs_kick.cpp:1103
+#: modules/commands/bs_kick.cpp:1103 modules/commands/bs_info.cpp:90
 #, fuzzy
 msgid "Enabled"
 msgstr "%s is enable"
@@ -4941,14 +4955,14 @@ msgstr ""
 "sorti del canal, i sigui restaurat la pròxima vegada que\n"
 "el canal sigui creat."
 
-#: modules/commands/ns_set.cpp:622
+#: modules/commands/ns_set.cpp:629
 msgid ""
 "Enables or disables keepmodes for the given nick. If keep\n"
 "modes is enabled, services will remember users' usermodes\n"
 "and attempt to re-set them the next time they authenticate."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:597
+#: modules/commands/ns_set.cpp:604
 msgid ""
 "Enables or disables keepmodes for your nick. If keep\n"
 "modes is enabled, services will remember your usermodes\n"
@@ -5050,8 +5064,8 @@ msgstr ""
 #, fuzzy
 msgid ""
 "Enables or disables the secure ops option for a channel.\n"
-"When secure ops is set, users who are not on the userlist\n"
-"will not be allowed chanop status."
+"When secure ops is set, users who are not on the access list\n"
+"will not be allowed channel operator status."
 msgstr ""
 "Sintàxi: %s canal SECUREOPS {ON | OFF}\n"
 "\n"
@@ -5097,7 +5111,7 @@ msgid ""
 " \n"
 "If your IRCd has a permanent (persistent) channel mode\n"
 "and it is set or unset (for any reason, including MODE LOCK),\n"
-"persist is automatically set and unset for the channel aswell.\n"
+"persist is automatically set and unset for the channel as well.\n"
 "Additionally, services will set or unset this mode when you\n"
 "set persist on or off."
 msgstr ""
@@ -5122,22 +5136,22 @@ msgstr ""
 "Additionally, services will set or unset this mode when you\n"
 "set persist on or off."
 
-#: modules/commands/os_akill.cpp:328
+#: modules/commands/os_akill.cpp:331
 #, fuzzy
 msgid "End of AKILL list."
 msgstr "Fi de la llista d'usuaris."
 
-#: modules/commands/cs_access.cpp:439
+#: modules/commands/cs_access.cpp:444
 #, fuzzy
 msgid "End of access list"
 msgstr "fi de llista d'accés."
 
-#: modules/commands/cs_flags.cpp:346
+#: modules/commands/cs_flags.cpp:347
 #, fuzzy, c-format
 msgid "End of access list - %d/%d entries shown."
 msgstr "Fi de la lllista - %d/%d resultat(s) mostrat(s)."
 
-#: modules/commands/cs_flags.cpp:344
+#: modules/commands/cs_flags.cpp:345
 msgid "End of access list."
 msgstr "fi de llista d'accés."
 
@@ -5146,7 +5160,7 @@ msgstr "fi de llista d'accés."
 msgid "End of autokick list"
 msgstr "fi de llista d'accés."
 
-#: modules/commands/bs_badwords.cpp:256
+#: modules/commands/bs_badwords.cpp:257
 #, fuzzy
 msgid "End of bad words list."
 msgstr "Fi de la llista d'usuaris."
@@ -5179,7 +5193,7 @@ msgstr "Fi de la llista d'usuaris."
 msgid "End of list - %d channels shown."
 msgstr "Fi de la lllista - %d/%d resultat(s) mostrat(s)."
 
-#: modules/commands/ns_list.cpp:131 modules/commands/cs_list.cpp:130
+#: modules/commands/cs_list.cpp:130 modules/commands/ns_list.cpp:131
 #, c-format
 msgid "End of list - %d/%d matches shown."
 msgstr "Fi de la lllista - %d/%d resultat(s) mostrat(s)."
@@ -5214,8 +5228,8 @@ msgid ""
 "user count drops below the channel limit, if one is set."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:832 modules/commands/ns_set.cpp:867
-#: src/language.cpp:44
+#: modules/commands/ns_set.cpp:822 modules/commands/ns_set.cpp:842
+#: modules/commands/ns_set.cpp:877 src/language.cpp:44
 msgid "English"
 msgstr "Catala"
 
@@ -5272,49 +5286,44 @@ msgstr ""
 msgid ""
 "Examples:\n"
 " \n"
-"    CERT ADD <fingerprint>\n"
-"        Adds this fingerprint to the certificate list and\n"
+"    CERT ADD\n"
+"        Adds your current fingerprint to the certificate list and\n"
 "        automatically identifies you when you connect to IRC\n"
-"        using this certificate.\n"
+"        using this fingerprint.\n"
 " \n"
 "    CERT DEL <fingerprint>\n"
-"        Reverses the previous command.\n"
+"        Removes the fingerprint <fingerprint> from your certificate list.\n"
 " \n"
 "    CERT LIST\n"
 "        Displays the current certificate list."
 msgstr ""
-
-#: modules/commands/os_session.cpp:454
-#, c-format
-msgid "Exception for %s (#%d) moved to position %d."
-msgstr "Excepció per a %s (#%d) moguda a la posició %d."
 
 #: modules/commands/os_session.cpp:358
 #, c-format
 msgid "Exception for %s has been updated to %d."
 msgstr "Exception for %s has been updated to %d."
 
-#: modules/pseudoclients/nickserv.cpp:535
-#: modules/pseudoclients/nickserv.cpp:540
-#: modules/pseudoclients/chanserv.cpp:460 modules/commands/os_forbid.cpp:346
-#: modules/commands/os_session.cpp:552 modules/commands/os_akill.cpp:355
-#: modules/commands/os_sxline.cpp:199 modules/commands/os_ignore.cpp:266
-#: modules/commands/ns_group.cpp:315
+#: modules/commands/os_akill.cpp:358 modules/commands/os_session.cpp:514
+#: modules/commands/os_sxline.cpp:201 modules/commands/os_forbid.cpp:346
+#: modules/commands/ns_group.cpp:315 modules/commands/os_ignore.cpp:266
+#: modules/pseudoclients/chanserv.cpp:463
+#: modules/pseudoclients/nickserv.cpp:564
+#: modules/pseudoclients/nickserv.cpp:569
 #, fuzzy
 msgid "Expires"
 msgstr "Expires in: %s"
 
-#: src/xline.cpp:368
+#: src/xline.cpp:398
 #, fuzzy, c-format
 msgid "Expiry and reason updated for %s."
 msgstr "Exception for %s has been updated to %d."
 
-#: src/xline.cpp:371
+#: src/xline.cpp:401
 #, fuzzy, c-format
 msgid "Expiry for %s updated."
 msgstr "Temps d'expiració per a %s canviat."
 
-#: modules/fantasy.cpp:198
+#: modules/fantasy.cpp:214
 msgid "Fantasy"
 msgstr "Fantasia"
 
@@ -5343,16 +5352,16 @@ msgstr "La mascara %s ja esta present a la teva lllista d'accés."
 msgid "Fingerprint %s is already in use."
 msgstr "You are already in %s! "
 
-#: modules/commands/cs_flags.cpp:300
+#: modules/commands/cs_flags.cpp:301
 msgid "Flags"
 msgstr ""
 
-#: modules/commands/cs_flags.cpp:285
+#: modules/commands/cs_flags.cpp:286
 #, fuzzy, c-format
 msgid "Flags for %s on %s set to +%s"
 msgstr "Nivell d'accés per a %s en %s cambiada a %d."
 
-#: modules/commands/cs_flags.cpp:340
+#: modules/commands/cs_flags.cpp:341
 #, fuzzy, c-format
 msgid "Flags list for %s"
 msgstr "Lllista d'accés per %s:"
@@ -5442,7 +5451,7 @@ msgstr "El Fundador de %s cambiat a %s."
 msgid "GETPASS command unavailable because encryption is in use."
 msgstr "La comanda GETPASS no esta disponible per l'us d'encriptació."
 
-#: modules/commands/ns_recover.cpp:77
+#: modules/commands/ns_recover.cpp:84
 msgid "Ghost with your nick has been killed."
 msgstr "El ghost amb el teu nick ha estat expulsat."
 
@@ -5451,14 +5460,14 @@ msgstr "El ghost amb el teu nick ha estat expulsat."
 msgid "Give Operflags to a certain user"
 msgstr "    OLINE       Give Operflags to a certain user"
 
-#: modules/commands/cs_mode.cpp:850
+#: modules/commands/cs_mode.cpp:848
 #, c-format
 msgid ""
 "Gives %s status to the selected nick on a channel. If nick is\n"
 "not given, it will %s you."
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:833
+#: modules/commands/cs_mode.cpp:831
 #, fuzzy, c-format
 msgid "Gives you or the specified nick %s status on a channel"
 msgstr "    OWNER      Gives you owner status on channel"
@@ -5534,20 +5543,24 @@ msgstr ""
 msgid "I've never seen %s on this channel."
 msgstr "No utilitzis reversos en aquest canal!"
 
+#: modules/commands/os_akill.cpp:360 modules/commands/os_sxline.cpp:203
+msgid "ID"
+msgstr ""
+
 #: modules/commands/os_oper.cpp:72
-msgid "INFO type"
+msgid "INFO [type]"
 msgstr ""
 
 #: modules/commands/os_dns.cpp:217
 msgid "IP"
 msgstr ""
 
-#: modules/commands/os_dns.cpp:498
+#: modules/commands/os_dns.cpp:499
 #, fuzzy, c-format
 msgid "IP %s already exists for %s."
 msgstr "El bot %s ja existeix."
 
-#: modules/commands/os_dns.cpp:560
+#: modules/commands/os_dns.cpp:561
 #, fuzzy, c-format
 msgid "IP %s does not exist for %s."
 msgstr "El bot %s ja existeix."
@@ -5557,8 +5570,8 @@ msgstr "El bot %s ja existeix."
 msgid "Identify yourself with your password"
 msgstr "    IDENTIFY   Per identificar-te amb la teva clau"
 
-#: modules/pseudoclients/nickserv.cpp:186
-#: modules/pseudoclients/nickserv.cpp:192
+#: modules/pseudoclients/nickserv.cpp:205
+#: modules/pseudoclients/nickserv.cpp:211
 #, fuzzy, c-format
 msgid "If you do not change within %s, I will change your nick."
 msgstr "Si no canvies el teu nick en 20 segons, el canviare jo."
@@ -5571,12 +5584,12 @@ msgstr "Ignore list has been cleared."
 msgid "Ignore list is empty."
 msgstr "La llista ignore esta buida."
 
-#: modules/commands/ms_ignore.cpp:88
+#: modules/commands/ms_ignore.cpp:94
 #, fuzzy
 msgid "Ignore list:"
 msgstr "Llista de bots:"
 
-#: modules/commands/ns_set.cpp:1280
+#: modules/commands/ns_set.cpp:1290
 #, fuzzy
 msgid "Immediate protection"
 msgstr "Protecció de Voices"
@@ -5633,7 +5646,7 @@ msgid ""
 "Invalid passcode has been entered, please check the e-mail again, and retry."
 msgstr ""
 
-#: modules/commands/ns_register.cpp:67 modules/commands/ns_register.cpp:70
+#: modules/commands/ns_register.cpp:69 modules/commands/ns_register.cpp:72
 msgid "Invalid passcode."
 msgstr ""
 
@@ -5650,7 +5663,7 @@ msgstr ""
 msgid "Invalid threshold value. It must be a valid integer greater than 1."
 msgstr "Valor de umbral invàlid. Ha de ser un sencer vàlid més gran a 1."
 
-#: modules/commands/os_dns.cpp:589
+#: modules/commands/os_dns.cpp:590
 msgid "Invalid value for LIMIT. Must be numerical."
 msgstr ""
 
@@ -5670,17 +5683,17 @@ msgstr "         Italics kicker : %s"
 msgid "Join a group"
 msgstr "    GROUP      Ingresa en un grup"
 
-#: modules/commands/ns_set.cpp:1294 modules/commands/cs_set.cpp:1358
+#: modules/commands/ns_set.cpp:1304 modules/commands/cs_set.cpp:1351
 #, fuzzy
 msgid "Keep modes"
 msgstr "Mode de missatge"
 
-#: modules/commands/ns_set.cpp:582 modules/commands/cs_set.cpp:374
+#: modules/commands/ns_set.cpp:589 modules/commands/cs_set.cpp:374
 #, fuzzy, c-format
 msgid "Keep modes for %s is now off."
 msgstr "Peace option for %s is now ON."
 
-#: modules/commands/ns_set.cpp:576 modules/commands/cs_set.cpp:366
+#: modules/commands/ns_set.cpp:583 modules/commands/cs_set.cpp:366
 #, fuzzy, c-format
 msgid "Keep modes for %s is now on."
 msgstr "Peace option for %s is now ON."
@@ -5699,7 +5712,7 @@ msgstr "Key for channel %s is %s."
 msgid "Kick a user from a channel"
 msgstr "    KICK        Kickeja un usuari d'un canal"
 
-#: modules/commands/cs_ban.cpp:204 modules/commands/cs_kick.cpp:103
+#: modules/commands/cs_kick.cpp:116 modules/commands/cs_ban.cpp:218
 #, c-format
 msgid "Kicked %d/%d users matching %s from %s."
 msgstr ""
@@ -5709,13 +5722,13 @@ msgstr ""
 msgid "Kicks a specified nick from a channel"
 msgstr "    KICK       Kicks a selected nick from a channel"
 
-#: modules/commands/cs_kick.cpp:115
+#: modules/commands/cs_kick.cpp:128
 #, fuzzy
 msgid ""
 "Kicks a specified nick from a channel.\n"
 " \n"
 "By default, limited to AOPs or those with level 5 access\n"
-"and above on the channel. Channel founders may use masks too."
+"and above on the channel. Channel founders can also specify masks."
 msgstr ""
 "Sintàxi: KICK #canal nick [raó]\n"
 "\n"
@@ -5741,19 +5754,19 @@ msgstr ""
 msgid "LIST threshold"
 msgstr ""
 
-#: modules/commands/os_akill.cpp:382 modules/commands/os_sxline.cpp:420
-#: modules/commands/os_sxline.cpp:653
+#: modules/commands/os_akill.cpp:388 modules/commands/os_sxline.cpp:427
+#: modules/commands/os_sxline.cpp:661
 #, fuzzy
 msgid "LIST [mask | list | id]"
 msgstr "LIST [canal] [llista | NEW]"
 
-#: modules/commands/os_session.cpp:564
+#: modules/commands/os_session.cpp:525
 #, fuzzy
 msgid "LIST [mask | list]"
 msgstr "LIST [canal] [llista | NEW]"
 
-#: modules/commands/ns_ajoin.cpp:233 modules/commands/ns_cert.cpp:260
-#: modules/commands/ns_access.cpp:104
+#: modules/commands/ns_access.cpp:104 modules/commands/ns_cert.cpp:260
+#: modules/commands/ns_ajoin.cpp:233
 #, fuzzy
 msgid "LIST [nickname]"
 msgstr "CHECK nickname"
@@ -5762,9 +5775,14 @@ msgstr "CHECK nickname"
 msgid "LOGONNEWS {ADD|DEL|LIST} [text|num]"
 msgstr "LOGONNEWS {ADD|DEL|LIST} [text|numero]"
 
-#: modules/commands/ns_set.cpp:812
+#: modules/commands/ns_set.cpp:820
 msgid "Language changed to English."
 msgstr "Llenguatge canviat a Català."
+
+#: modules/commands/ns_set.cpp:822
+#, fuzzy, c-format
+msgid "Language for %s changed to %s."
+msgstr "Sucessor de %s cambiat a %s."
 
 #: modules/commands/ms_cancel.cpp:51
 #, c-format
@@ -5776,7 +5794,7 @@ msgstr "Ultim memo enviat a %s va ser cancel.lat."
 msgid "Last quit message"
 msgstr "   Ùltim missatge quit: %s"
 
-#: modules/commands/cs_access.cpp:467 modules/commands/ns_info.cpp:92
+#: modules/commands/ns_info.cpp:92 modules/commands/cs_access.cpp:472
 #, fuzzy
 msgid "Last seen"
 msgstr "      Ultima vegada vist: %s"
@@ -5786,11 +5804,11 @@ msgstr "      Ultima vegada vist: %s"
 msgid "Last seen address"
 msgstr "Ultima adreça vista: %s"
 
-#: modules/commands/cs_topic.cpp:259
+#: modules/commands/cs_topic.cpp:264
 msgid "Last topic"
 msgstr ""
 
-#: modules/commands/cs_akick.cpp:380 modules/commands/cs_info.cpp:56
+#: modules/commands/cs_info.cpp:56 modules/commands/cs_akick.cpp:380
 #, fuzzy
 msgid "Last used"
 msgstr "      Ultima vegada vist: %s"
@@ -5800,27 +5818,27 @@ msgstr "      Ultima vegada vist: %s"
 msgid "Last usermask"
 msgstr "      Ultima vegada vist: %s"
 
-#: modules/commands/cs_access.cpp:454 modules/commands/cs_access.cpp:467
-#: modules/commands/cs_access.cpp:690
+#: modules/commands/cs_access.cpp:459 modules/commands/cs_access.cpp:472
+#: modules/commands/cs_access.cpp:697
 msgid "Level"
 msgstr ""
 
-#: modules/commands/cs_access.cpp:653
+#: modules/commands/cs_access.cpp:660
 #, c-format
 msgid "Level for %s on channel %s changed to %d."
 msgstr "Nivell per a %s en el canal %s cambiat a %d."
 
-#: modules/commands/cs_access.cpp:651
+#: modules/commands/cs_access.cpp:658
 #, c-format
 msgid "Level for %s on channel %s changed to founder only."
 msgstr "Level for %s on channel %s changed to founder only."
 
-#: modules/commands/cs_access.cpp:636
+#: modules/commands/cs_access.cpp:643
 #, c-format
 msgid "Level must be between %d and %d inclusive."
 msgstr "El nivell ha d'estar entre %d i %d inclosos."
 
-#: modules/commands/os_session.cpp:544 modules/commands/os_session.cpp:552
+#: modules/commands/os_session.cpp:506 modules/commands/os_session.cpp:514
 #: modules/commands/os_dns.cpp:217
 msgid "Limit"
 msgstr ""
@@ -5836,7 +5854,7 @@ msgstr ""
 msgid "List channels you have access on"
 msgstr "    ALIST      List channels you have access on"
 
-#: modules/commands/cs_mode.cpp:329
+#: modules/commands/cs_mode.cpp:330
 #, c-format
 msgid "List for mode %c is full."
 msgstr ""
@@ -5846,7 +5864,7 @@ msgstr ""
 msgid "List loaded modules"
 msgstr "    MODLIST     List loaded modules"
 
-#: modules/commands/ns_list.cpp:123 modules/commands/cs_list.cpp:72
+#: modules/commands/cs_list.cpp:72 modules/commands/ns_list.cpp:123
 #, fuzzy, c-format
 msgid "List of entries matching %s:"
 msgstr "Lllista de nicknames en el grup de %s:"
@@ -6107,18 +6125,18 @@ msgstr "    MODLIST     List loaded modules"
 
 #: modules/commands/cs_info.cpp:19
 #, fuzzy
-msgid "Lists information about the named registered channel"
+msgid "Lists information about the specified registered channel"
 msgstr "    INFO       Lists information about the named registered channel"
 
 #: modules/commands/cs_info.cpp:76
 #, fuzzy
 msgid ""
-"Lists information about the named registered channel,\n"
-"including its founder, time of registration, and last\n"
-"time used. If the user issuing the command has the\n"
-"appropriate access for it, then the description, successor,\n"
-"last topic set, settings and expiration time will also\n"
-"be displayed when applicable."
+"Lists information about the specified registered channel,\n"
+"including its founder, time of registration, last\n"
+"time used, and description. If the user issuing the\n"
+"command has the appropriate access for it, then the\n"
+"successor, last topic set, settings and expiration\n"
+"time will also be displayed when applicable."
 msgstr ""
 "Sintàxi: INFO canal\n"
 "\n"
@@ -6202,11 +6220,7 @@ msgstr ""
 msgid "Looking for yourself, eh %s?"
 msgstr ""
 
-#: modules/commands/os_session.cpp:563
-msgid "MOVE num position"
-msgstr ""
-
-#: modules/commands/cs_mode.cpp:718
+#: modules/commands/cs_mode.cpp:716
 #, c-format
 msgid ""
 "Mainly controls mode locks and mode access (which is different from channel "
@@ -6245,12 +6259,12 @@ msgstr ""
 msgid "Maintain the AutoKick list"
 msgstr "    AKICK      Manté la llista d'AutoKick"
 
-#: modules/commands/bs_bot.cpp:253
+#: modules/commands/bs_bot.cpp:269
 #, fuzzy
 msgid "Maintains network bot list"
 msgstr "BOT                Manté la llista de bots de la xarxa"
 
-#: modules/commands/cs_xop.cpp:526
+#: modules/commands/cs_xop.cpp:530
 #, c-format
 msgid ""
 "Maintains the %s list for a channel. Users who match an access entry\n"
@@ -6258,7 +6272,7 @@ msgid ""
 " "
 msgstr ""
 
-#: modules/commands/cs_akick.cpp:473
+#: modules/commands/cs_akick.cpp:481
 #, c-format
 msgid ""
 "Maintains the AutoKick list for a channel.  If a user\n"
@@ -6276,7 +6290,7 @@ msgid ""
 "All users within that nickgroup will then be akicked.\n"
 msgstr ""
 
-#: modules/commands/cs_access.cpp:561
+#: modules/commands/cs_access.cpp:568
 #, c-format
 msgid ""
 "Maintains the access list for a channel.  The access\n"
@@ -6288,7 +6302,7 @@ msgid ""
 "of -1."
 msgstr ""
 
-#: modules/commands/bs_badwords.cpp:423
+#: modules/commands/bs_badwords.cpp:424
 #, fuzzy, c-format
 msgid ""
 "Maintains the bad words list for a channel. The bad\n"
@@ -6344,7 +6358,7 @@ msgstr ""
 "La comanda BADWORDS CLEAR neteja totes les instàncies\n"
 "de la llista de paraules malsonants."
 
-#: modules/commands/bs_badwords.cpp:369
+#: modules/commands/bs_badwords.cpp:370
 #, fuzzy
 msgid "Maintains the bad words list"
 msgstr "BADWORDS           Manté una llista de paraules malsonants"
@@ -6359,7 +6373,7 @@ msgstr ""
 #, fuzzy
 msgid ""
 "Makes the bot do the equivalent of a \"/me\" command\n"
-"on the given channel using the given text."
+"on the specified channel using the specified text."
 msgstr ""
 "Sintàxi: ACT canal text\n"
 "\n"
@@ -6368,13 +6382,13 @@ msgstr ""
 
 #: modules/commands/bs_control.cpp:19
 #, fuzzy
-msgid "Makes the bot say the given text on the given channel"
+msgid "Makes the bot say the specified text on the specified channel"
 msgstr ""
 "SAY                Makes the bot say the given text on the given channel"
 
 #: modules/commands/bs_control.cpp:69
 #, fuzzy
-msgid "Makes the bot say the given text on the given channel."
+msgid "Makes the bot say the specified text on the specified channel."
 msgstr ""
 "SAY                Makes the bot say the given text on the given channel"
 
@@ -6408,7 +6422,7 @@ msgstr ""
 "opció GREET habilitada, sempre i quant tinguis \n"
 "l'accés necessari."
 
-#: modules/commands/os_dns.cpp:658
+#: modules/commands/os_dns.cpp:659
 #, fuzzy
 msgid "Manage DNS zones for this network"
 msgstr "No pots establir la teva adreça e-mail en aquesta xarxa."
@@ -6428,12 +6442,12 @@ msgstr "    IGNORE      Modify the Services ignore list"
 msgid "Manage your auto join list"
 msgstr "    AKICK      Manté la llista d'AutoKick"
 
-#: modules/commands/os_sxline.cpp:227
+#: modules/commands/os_sxline.cpp:233
 #, fuzzy, c-format
 msgid "Manipulate the %s list"
 msgstr "    AKILL       Manipula la llista AKILL"
 
-#: modules/commands/os_akill.cpp:379
+#: modules/commands/os_akill.cpp:385
 #, fuzzy
 msgid "Manipulate the AKILL list"
 msgstr "    AKILL       Manipula la llista AKILL"
@@ -6443,20 +6457,20 @@ msgstr "    AKILL       Manipula la llista AKILL"
 msgid "Manipulate the DefCon system"
 msgstr "    DEFCON      Manipulate the DefCon system"
 
-#: modules/commands/cs_topic.cpp:156
+#: modules/commands/cs_topic.cpp:149
 #, fuzzy
 msgid "Manipulate the topic of the specified channel"
 msgstr "    TOPIC      Manipulate the topic of the specified channel"
 
-#: modules/commands/cs_access.cpp:454 modules/commands/cs_access.cpp:467
-#: modules/commands/os_forbid.cpp:346 modules/commands/bs_botlist.cpp:27
-#: modules/commands/bs_info.cpp:56 modules/commands/os_list.cpp:147
-#: modules/commands/cs_xop.cpp:381 modules/commands/ms_ignore.cpp:80
-#: modules/commands/os_session.cpp:544 modules/commands/os_session.cpp:552
-#: modules/commands/os_akill.cpp:341 modules/commands/os_akill.cpp:355
-#: modules/commands/os_sxline.cpp:191 modules/commands/os_sxline.cpp:199
-#: modules/commands/os_ignore.cpp:266 modules/commands/cs_flags.cpp:300
+#: modules/commands/os_list.cpp:147 modules/commands/cs_xop.cpp:385
+#: modules/commands/os_akill.cpp:344 modules/commands/os_akill.cpp:358
+#: modules/commands/bs_info.cpp:56 modules/commands/os_session.cpp:506
+#: modules/commands/os_session.cpp:514 modules/commands/os_sxline.cpp:193
+#: modules/commands/os_sxline.cpp:201 modules/commands/os_forbid.cpp:346
+#: modules/commands/cs_flags.cpp:301 modules/commands/ms_ignore.cpp:86
 #: modules/commands/cs_akick.cpp:367 modules/commands/cs_akick.cpp:380
+#: modules/commands/bs_botlist.cpp:27 modules/commands/cs_access.cpp:459
+#: modules/commands/cs_access.cpp:472 modules/commands/os_ignore.cpp:266
 msgid "Mask"
 msgstr ""
 
@@ -6469,8 +6483,8 @@ msgstr "La mascara %s ja esta present a la teva lllista d'accés."
 msgid "Mask must be in the form user@host."
 msgstr ""
 
-#: modules/commands/cs_access.cpp:164 modules/commands/cs_xop.cpp:165
-#: modules/commands/cs_flags.cpp:122
+#: modules/commands/cs_xop.cpp:166 modules/commands/cs_flags.cpp:120
+#: modules/commands/cs_access.cpp:166
 #, fuzzy
 msgid "Masks and unregistered users may not be on access lists."
 msgstr "La mascara %s ja esta present a la teva lllista d'accés."
@@ -6502,7 +6516,7 @@ msgstr "      Mode de lock: %s"
 msgid "Memo %d has been deleted."
 msgstr "Memo %d ha estat esborrat."
 
-#: modules/commands/ms_ignore.cpp:76
+#: modules/commands/ms_ignore.cpp:82
 #, fuzzy
 msgid "Memo ignore list is empty."
 msgstr "La llista ignore esta buida."
@@ -6522,7 +6536,7 @@ msgstr "Límite de memos per a %s establert a %d."
 msgid "Memo limit for %s set to 0."
 msgstr "Límit de memos per a %s establert a 0."
 
-#: modules/commands/ms_rsend.cpp:63 modules/commands/ms_send.cpp:44
+#: modules/commands/ms_send.cpp:51 modules/commands/ms_rsend.cpp:63
 #, c-format
 msgid "Memo sent to %s."
 msgstr "Memo enviat a %s."
@@ -6537,7 +6551,7 @@ msgstr "      Mode de lock: %s"
 msgid "Message"
 msgstr "GLOBAL missatge"
 
-#: modules/commands/ns_set.cpp:1288
+#: modules/commands/ns_set.cpp:1298
 msgid "Message mode"
 msgstr "Mode de missatge"
 
@@ -6545,32 +6559,37 @@ msgstr "Mode de missatge"
 msgid "Method"
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:327 modules/commands/cs_mode.cpp:402
+#: modules/commands/cs_mode.cpp:328 modules/commands/cs_mode.cpp:405
 #, c-format
 msgid "Missing parameter for mode %c."
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:431
+#: modules/commands/cs_mode.cpp:434
 msgid "Mode"
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:663
+#: modules/commands/cs_mode.cpp:661
 #, fuzzy, c-format
 msgid "Mode %s is not a status or list mode."
 msgstr "%s not found on ignore list."
 
-#: modules/commands/cs_mode.cpp:986
+#: modules/commands/cs_mode.cpp:1008
 #, fuzzy
 msgid "Mode lock"
 msgstr "      Mode de lock: %s"
 
-#: modules/commands/cs_mode.cpp:448
+#: modules/commands/cs_mode.cpp:451
 #, fuzzy, c-format
 msgid "Mode locks for %s:"
 msgstr "      Mode de lock: %s"
 
 #: modules/commands/os_list.cpp:42
 msgid "Modes"
+msgstr ""
+
+#: modules/commands/os_mode.cpp:44
+#, c-format
+msgid "Modes cleared on %s and the channel destroyed."
 msgstr ""
 
 #: modules/commands/ns_access.cpp:166
@@ -6623,7 +6642,7 @@ msgstr ""
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
 "If you connect to IRC and provide a client certificate with a\n"
-"matching fingerprint in the cert list, your nick will be\n"
+"matching fingerprint in the cert list, you will be\n"
 "automatically identified to services. Services Operators\n"
 "may provide a nick to modify other users' certificate lists.\n"
 " \n"
@@ -6634,7 +6653,7 @@ msgstr ""
 msgid "Modify the Services ignore list"
 msgstr "    IGNORE      Modify the Services ignore list"
 
-#: modules/commands/cs_xop.cpp:493
+#: modules/commands/cs_xop.cpp:497
 #, fuzzy, c-format
 msgid "Modify the list of %s users"
 msgstr "    AOP        Modifica la llista d'usuaris AOP"
@@ -6644,7 +6663,7 @@ msgstr "    AOP        Modifica la llista d'usuaris AOP"
 msgid "Modify the list of authorized addresses"
 msgstr "    ACCESS     Modifica la llista d'adreçes autoritzades"
 
-#: modules/commands/cs_access.cpp:493 modules/commands/cs_flags.cpp:372
+#: modules/commands/cs_flags.cpp:373 modules/commands/cs_access.cpp:498
 #, fuzzy
 msgid "Modify the list of privileged users"
 msgstr "    ACCESS     Modifica la llista d'usuaris privilegiats"
@@ -6654,7 +6673,7 @@ msgstr "    ACCESS     Modifica la llista d'usuaris privilegiats"
 msgid "Modify the nickname client certificate list"
 msgstr "    IGNORE      Modify the Services ignore list"
 
-#: modules/commands/os_session.cpp:560
+#: modules/commands/os_session.cpp:522
 #, fuzzy
 msgid "Modify the session-limit exception list"
 msgstr "    EXCEPTION   Modifica la llista de límit de sessió"
@@ -6703,14 +6722,14 @@ msgstr "Module: %s Version: %s Author: %s loaded: %s"
 msgid "Module: %s [%s] [%s]"
 msgstr "Module: %s [%s] [%s]"
 
-#: modules/commands/cs_access.cpp:690 modules/commands/cs_access.cpp:784
 #: modules/commands/os_list.cpp:42 modules/commands/os_list.cpp:147
-#: modules/commands/os_config.cpp:66 modules/commands/os_config.cpp:88
-#: modules/commands/cs_list.cpp:75
+#: modules/commands/cs_list.cpp:75 modules/commands/cs_access.cpp:697
+#: modules/commands/cs_access.cpp:799 modules/commands/os_config.cpp:66
+#: modules/commands/os_config.cpp:88
 msgid "Name"
 msgstr ""
 
-#: modules/commands/os_oper.cpp:139
+#: modules/commands/os_oper.cpp:154
 msgid "Name     Type"
 msgstr ""
 
@@ -6723,19 +6742,19 @@ msgstr "Lllista d'accés per %s:"
 msgid "Never"
 msgstr ""
 
+#: modules/commands/hs_list.cpp:58 modules/commands/ns_group.cpp:315
 #: modules/commands/bs_botlist.cpp:27 modules/commands/ns_list.cpp:75
-#: modules/commands/hs_list.cpp:58 modules/commands/hs_request.cpp:300
-#: modules/commands/ns_group.cpp:315
+#: modules/commands/hs_request.cpp:306
 #, fuzzy
 msgid "Nick"
 msgstr "INFO nick"
 
-#: modules/commands/ns_register.cpp:41
+#: modules/commands/ns_register.cpp:42
 #, fuzzy, c-format
 msgid "Nick %s has been confirmed."
 msgstr "Nickname %s ha estat expulsat."
 
-#: modules/commands/os_oper.cpp:89
+#: modules/commands/os_oper.cpp:95
 #, fuzzy, c-format
 msgid "Nick %s is already an operator."
 msgstr "El nickname %s ja esta registrat!"
@@ -6750,6 +6769,7 @@ msgstr "El nickname %s ja esta registrat!"
 msgid "Nick %s is an illegal nickname and cannot be used."
 msgstr "Nick %s is an illegal nickname and cannot be used."
 
+#: modules/commands/bs_bot.cpp:81 modules/commands/bs_bot.cpp:181
 #: modules/commands/os_svs.cpp:54
 #, c-format
 msgid "Nick %s is currently in use."
@@ -6765,7 +6785,7 @@ msgstr "Nick %s is currently in use."
 msgid "Nick %s is forbidden."
 msgstr "El nick %s no esta sent utilitzat."
 
-#: modules/commands/os_oper.cpp:122
+#: modules/commands/os_oper.cpp:135
 #, fuzzy, c-format
 msgid "Nick %s is not a Services Operator."
 msgstr "%s is a services operator of type %s."
@@ -6790,12 +6810,12 @@ msgstr "Nickname %s registered."
 msgid "Nick %s was truncated to %d characters."
 msgstr "Nick %s was truncated to %d characters."
 
-#: modules/commands/ns_set.cpp:1111
+#: modules/commands/ns_set.cpp:1121
 #, c-format
 msgid "Nick %s will expire."
 msgstr "Nick %s will expire."
 
-#: modules/commands/ns_set.cpp:1105
+#: modules/commands/ns_set.cpp:1115
 #, c-format
 msgid "Nick %s will not expire."
 msgstr "Nick %s will not expire."
@@ -6860,17 +6880,17 @@ msgstr "El canal %s ja esta enregistrat!"
 msgid "Nickname %s may not be registered."
 msgstr "El canal %s no pot ser enregistrat."
 
-#: modules/commands/ns_register.cpp:204
+#: modules/commands/ns_register.cpp:212
 #, fuzzy, c-format
 msgid "Nickname %s registered under your user@host-mask: %s"
 msgstr "El nickname %s ja esta registrat sota el teu compte: %s"
 
-#: modules/commands/ns_register.cpp:206
+#: modules/commands/ns_register.cpp:214
 #, fuzzy, c-format
 msgid "Nickname %s registered."
 msgstr "Nickname %s registered."
 
-#: modules/commands/cs_set.cpp:1360
+#: modules/commands/cs_set.cpp:1353
 #, fuzzy
 msgid "No auto-op"
 msgstr "Auto-op"
@@ -6879,7 +6899,7 @@ msgstr "Auto-op"
 msgid "No bot"
 msgstr "Sense bot"
 
-#: modules/commands/ns_set.cpp:1292 modules/commands/cs_set.cpp:1356
+#: modules/commands/ns_set.cpp:1302 modules/commands/cs_set.cpp:1349
 #, fuzzy
 msgid "No expire"
 msgstr "no expira"
@@ -6908,13 +6928,13 @@ msgstr "No hi ha notícies d'entrada per a esborrar!"
 msgid "No matches for %s found."
 msgstr "No Emails listed for %s."
 
-#: modules/commands/cs_xop.cpp:298
+#: modules/commands/cs_xop.cpp:302
 #, fuzzy, c-format
 msgid "No matching entries on %s %s list."
 msgstr "No existeixen instàncies coincidents a la llista AOP de %s."
 
-#: modules/commands/cs_access.cpp:264 modules/commands/cs_access.cpp:428
-#: modules/commands/cs_xop.cpp:432 modules/commands/cs_flags.cpp:334
+#: modules/commands/cs_xop.cpp:436 modules/commands/cs_flags.cpp:335
+#: modules/commands/cs_access.cpp:269 modules/commands/cs_access.cpp:433
 #, c-format
 msgid "No matching entries on %s access list."
 msgstr "No hi ha instàncies que concordin a la llista d'accés de %s ."
@@ -6926,25 +6946,25 @@ msgstr ""
 "No existeixen instàncies que concordin a la llista de kicks automàtics en el "
 "canal %s."
 
-#: modules/commands/bs_badwords.cpp:165 modules/commands/bs_badwords.cpp:245
+#: modules/commands/bs_badwords.cpp:166 modules/commands/bs_badwords.cpp:246
 #, c-format
 msgid "No matching entries on %s bad words list."
 msgstr ""
 "No existeixen paraules que concordin a la llista de paraules malsonants de "
 "%s."
 
-#: modules/commands/os_session.cpp:145 modules/commands/os_session.cpp:528
+#: modules/commands/os_session.cpp:145 modules/commands/os_session.cpp:490
 msgid "No matching entries on session-limit exception list."
 msgstr ""
 "No existeixen instàncies similars a la llista d'excepcions al límit de "
 "sessions."
 
-#: modules/commands/os_sxline.cpp:28 modules/commands/os_sxline.cpp:175
+#: modules/commands/os_sxline.cpp:28 modules/commands/os_sxline.cpp:177
 #, fuzzy, c-format
 msgid "No matching entries on the %s list."
 msgstr "No existeixen instàncies coincidents a la llista AOP de %s."
 
-#: modules/commands/os_akill.cpp:29 modules/commands/os_akill.cpp:317
+#: modules/commands/os_akill.cpp:29 modules/commands/os_akill.cpp:320
 msgid "No matching entries on the AKILL list."
 msgstr "No existeixen instàncies similars a la llista de AKILLs."
 
@@ -6957,12 +6977,7 @@ msgstr "Cap memo pot ser cancelat."
 msgid "No modules currently loaded matching that criteria."
 msgstr "No modules currently loaded"
 
-#: modules/commands/ns_getemail.cpp:47
-#, fuzzy, c-format
-msgid "No nick registrations matching %s found."
-msgstr "* No new nick registrations"
-
-#: modules/commands/ns_recover.cpp:48
+#: modules/commands/ns_recover.cpp:55
 msgid "No one is using your nick, and services are not holding it."
 msgstr ""
 
@@ -6982,7 +6997,12 @@ msgstr "No hi ha notícies a l'atzar per esborrar!"
 msgid "No records to display."
 msgstr ""
 
-#: modules/commands/hs_request.cpp:215 modules/commands/hs_request.cpp:271
+#: modules/commands/ns_getemail.cpp:47
+#, fuzzy, c-format
+msgid "No registrations matching %s were found."
+msgstr "* No new nick registrations"
+
+#: modules/commands/hs_request.cpp:221 modules/commands/hs_request.cpp:277
 #, c-format
 msgid "No request for nick %s found."
 msgstr ""
@@ -6991,8 +7011,8 @@ msgstr ""
 msgid "No signed kick when SIGNKICK LEVEL is used"
 msgstr ""
 
-#: modules/extra/stats/cs_fantasy_top.cpp:159
 #: modules/extra/stats/cs_fantasy_stats.cpp:156
+#: modules/extra/stats/cs_fantasy_top.cpp:159
 #, fuzzy, c-format
 msgid "No stats for %s."
 msgstr "Lllista d'accés per %s:"
@@ -7002,7 +7022,7 @@ msgstr "Lllista d'accés per %s:"
 msgid "No such info \"%s\" on %s."
 msgstr "%s has been invited to %s."
 
-#: modules/commands/cs_ban.cpp:206 modules/commands/cs_kick.cpp:105
+#: modules/commands/cs_kick.cpp:118 modules/commands/cs_ban.cpp:220
 #, fuzzy, c-format
 msgid "No users on %s match %s."
 msgstr "Changed usermodes of %s."
@@ -7017,7 +7037,7 @@ msgstr "Mode no bot ara activat en el canal %s."
 msgid "No-bot mode is now on on channel %s."
 msgstr "Mode no bot ara activat en el canal %s."
 
-#: modules/commands/os_mode.cpp:58
+#: modules/commands/os_mode.cpp:64
 #, c-format
 msgid "Non-status modes cleared on %s."
 msgstr ""
@@ -7026,21 +7046,21 @@ msgstr ""
 msgid "None"
 msgstr "Cap"
 
-#: modules/commands/cs_mode.cpp:362 modules/commands/cs_mode.cpp:419
+#: modules/commands/cs_mode.cpp:365 modules/commands/cs_mode.cpp:422
 msgid "Nothing to do."
 msgstr ""
 
-#: modules/commands/os_news.cpp:156 modules/commands/cs_access.cpp:454
-#: modules/commands/cs_access.cpp:467 modules/commands/bs_badwords.cpp:193
-#: modules/commands/cs_xop.cpp:381 modules/commands/os_session.cpp:544
-#: modules/commands/os_session.cpp:552 modules/commands/os_akill.cpp:341
-#: modules/commands/os_akill.cpp:355 modules/commands/os_sxline.cpp:191
-#: modules/commands/os_sxline.cpp:199 modules/commands/cs_log.cpp:127
-#: modules/commands/ns_ajoin.cpp:100 modules/commands/hs_list.cpp:58
-#: modules/commands/cs_flags.cpp:300 modules/commands/ms_list.cpp:64
-#: modules/commands/cs_akick.cpp:367 modules/commands/cs_akick.cpp:380
-#: modules/commands/cs_entrymsg.cpp:116 modules/commands/hs_request.cpp:300
-#: modules/commands/ns_alist.cpp:48
+#: modules/commands/bs_badwords.cpp:194 modules/commands/cs_xop.cpp:385
+#: modules/commands/os_akill.cpp:344 modules/commands/os_akill.cpp:358
+#: modules/commands/hs_list.cpp:58 modules/commands/os_news.cpp:156
+#: modules/commands/os_session.cpp:506 modules/commands/os_session.cpp:514
+#: modules/commands/cs_entrymsg.cpp:116 modules/commands/os_sxline.cpp:193
+#: modules/commands/os_sxline.cpp:201 modules/commands/ns_alist.cpp:48
+#: modules/commands/cs_flags.cpp:301 modules/commands/ns_ajoin.cpp:100
+#: modules/commands/cs_log.cpp:127 modules/commands/cs_akick.cpp:367
+#: modules/commands/cs_akick.cpp:380 modules/commands/ms_list.cpp:64
+#: modules/commands/hs_request.cpp:306 modules/commands/cs_access.cpp:459
+#: modules/commands/cs_access.cpp:472
 msgid "Number"
 msgstr ""
 
@@ -7048,14 +7068,17 @@ msgstr ""
 msgid "OPERNEWS {ADD|DEL|LIST} [text|num]"
 msgstr "OPERNEWS {ADD|DEL|LIST} [texto|numero]"
 
-#: modules/commands/bs_bot.cpp:142
-msgid "Old info is equal to the new one."
-msgstr "La informació antiga es igual a la nova."
-
 #: modules/commands/ns_info.cpp:68 modules/commands/ns_info.cpp:72
 #, fuzzy
 msgid "Online from"
 msgstr "   Esta en linea desde: %s"
+
+#: modules/commands/os_oper.cpp:139
+#, c-format
+msgid ""
+"Oper %s is configured in the configuration file(s) and can not be removed by "
+"this command."
+msgstr ""
 
 #: modules/commands/os_info.cpp:268
 msgid "Oper Info"
@@ -7080,12 +7103,12 @@ msgstr "Noticia de oper #%d no trobada!"
 msgid "Oper news items:"
 msgstr "notícies de oper:"
 
-#: modules/commands/os_oper.cpp:134
+#: modules/commands/os_oper.cpp:149
 #, c-format
 msgid "Oper privileges removed from %s (%s)."
 msgstr ""
 
-#: modules/commands/os_oper.cpp:95 modules/commands/os_oper.cpp:164
+#: modules/commands/os_oper.cpp:101 modules/commands/os_oper.cpp:190
 #, fuzzy, c-format
 msgid "Oper type %s has not been configured."
 msgstr "Nickname %s ha estat expulsat."
@@ -7100,17 +7123,17 @@ msgstr "An O:Line with the flags %s has been added for %s."
 msgid "Operflags %s have been removed from %s."
 msgstr "An O:Line with the flags %s has been added for %s."
 
-#: modules/commands/os_oper.cpp:168
+#: modules/commands/os_oper.cpp:194
 #, c-format
 msgid "Opertype %s has no allowed commands."
 msgstr ""
 
-#: modules/commands/os_oper.cpp:190
+#: modules/commands/os_oper.cpp:216
 #, c-format
 msgid "Opertype %s has no allowed privileges."
 msgstr ""
 
-#: modules/commands/os_oper.cpp:212
+#: modules/commands/os_oper.cpp:238
 #, c-format
 msgid "Opertype %s receives modes %s once identified."
 msgstr ""
@@ -7124,12 +7147,12 @@ msgstr "Protecció de Ops"
 msgid "Options"
 msgstr "    Opcions : %s"
 
-#: modules/commands/os_dns.cpp:666
+#: modules/commands/os_dns.cpp:667
 #, fuzzy
 msgid "POOL server.name"
 msgstr "NOOP {SET|REVOKE} servidor"
 
-#: modules/commands/cs_mode.cpp:431
+#: modules/commands/cs_mode.cpp:434
 msgid "Param"
 msgstr ""
 
@@ -7146,12 +7169,12 @@ msgstr "Clau incorrecta."
 msgid "Password authentication required for that command."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:147 modules/commands/ns_set.cpp:210
+#: modules/commands/ns_set.cpp:149 modules/commands/ns_set.cpp:215
 #, fuzzy, c-format
 msgid "Password for %s changed to %s."
 msgstr "Sucessor de %s cambiat a %s."
 
-#: modules/commands/ns_set.cpp:149 modules/commands/ns_set.cpp:212
+#: modules/commands/ns_set.cpp:151 modules/commands/ns_set.cpp:217
 #, fuzzy, c-format
 msgid "Password for %s changed."
 msgstr "La clau de %s ha estat enviada."
@@ -7171,7 +7194,7 @@ msgstr "Clau incorrecta."
 msgid "Password reset email for %s has been sent."
 msgstr "Password reset email for %s has been sent."
 
-#: modules/commands/cs_set.cpp:1342
+#: modules/commands/cs_set.cpp:1335
 msgid "Peace"
 msgstr "Pau"
 
@@ -7185,7 +7208,7 @@ msgstr "Peace option for %s is now ON."
 msgid "Peace option for %s is now on."
 msgstr "Peace option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:1354
+#: modules/commands/cs_set.cpp:1347
 #, fuzzy
 msgid "Persistent"
 msgstr "Persistant"
@@ -7216,13 +7239,13 @@ msgstr ""
 msgid "Please wait %d seconds and retry."
 msgstr "Per favor espera %d segons i intenta un altre cop."
 
-#: modules/commands/hs_request.cpp:153
+#: modules/commands/hs_request.cpp:159
 #, fuzzy, c-format
 msgid "Please wait %d seconds before requesting a new vHost."
 msgstr ""
 "Per favor espera %d segons abans d'utilizar la comanda SEND un altre cop."
 
-#: modules/commands/ms_rsend.cpp:58 modules/commands/ms_send.cpp:48
+#: modules/commands/ms_send.cpp:57 modules/commands/ms_rsend.cpp:58
 #, fuzzy, c-format
 msgid "Please wait %d seconds before using the %s command again."
 msgstr ""
@@ -7234,13 +7257,13 @@ msgid "Please wait %d seconds before using the GROUP command again."
 msgstr ""
 "Per favor espera %d segons abans d'utilitzar la comanda GROUP novament."
 
-#: modules/commands/ns_register.cpp:174
+#: modules/commands/ns_register.cpp:184
 #, c-format
 msgid "Please wait %d seconds before using the REGISTER command again."
 msgstr ""
 "Per favor espera %d segons abans d'utilitzar la comanda REGISTER novament."
 
-#: modules/commands/os_dns.cpp:626
+#: modules/commands/os_dns.cpp:627
 #, c-format
 msgid "Pooled %s."
 msgstr ""
@@ -7253,7 +7276,7 @@ msgstr ""
 msgid "Pooled/Not Active"
 msgstr ""
 
-#: modules/commands/bs_set.cpp:149
+#: modules/commands/bs_set.cpp:158
 msgid "Prevent a bot from being assigned by non IRC operators"
 msgstr ""
 
@@ -7283,7 +7306,7 @@ msgstr ""
 "    PRIVATE    Prevent the nickname from appearing in a\n"
 "                   /msg %s LIST"
 
-#: modules/commands/ns_set.cpp:1080
+#: modules/commands/ns_set.cpp:1090
 #, fuzzy
 msgid "Prevent the nickname from expiring"
 msgstr "    NOEXPIRE   Prevent the nickname from expiring"
@@ -7292,17 +7315,17 @@ msgstr "    NOEXPIRE   Prevent the nickname from expiring"
 msgid "Prevents users being kicked by Services"
 msgstr ""
 
-#: modules/commands/bs_info.cpp:59 modules/commands/ns_list.cpp:297
-#: modules/commands/cs_list.cpp:262
+#: modules/commands/cs_list.cpp:262 modules/commands/bs_info.cpp:59
+#: modules/commands/ns_list.cpp:297
 msgid "Private"
 msgstr "Privat"
 
-#: modules/commands/bs_set.cpp:178
+#: modules/commands/bs_set.cpp:187
 #, fuzzy, c-format
 msgid "Private mode of bot %s is now off."
 msgstr "Mode privado del bot %s esta ara activat."
 
-#: modules/commands/bs_set.cpp:173
+#: modules/commands/bs_set.cpp:182
 #, fuzzy, c-format
 msgid "Private mode of bot %s is now on."
 msgstr "Mode privado del bot %s esta ara activat."
@@ -7327,36 +7350,36 @@ msgstr "Private option is now ON for %s."
 msgid "Private option is now on for %s."
 msgstr "Private option is now ON for %s."
 
-#: modules/commands/cs_flags.cpp:280
+#: modules/commands/cs_flags.cpp:281
 #, c-format
 msgid "Privilege %s added to %s on %s, new flags are +%s"
 msgstr ""
 
-#: modules/commands/cs_flags.cpp:282
+#: modules/commands/cs_flags.cpp:283
 #, c-format
 msgid "Privilege %s removed from %s on %s, new flags are +%s"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:1284
+#: modules/commands/ns_set.cpp:1294
 msgid "Protection"
 msgstr "Protecció"
 
-#: modules/commands/ns_set.cpp:700
+#: modules/commands/ns_set.cpp:707
 #, fuzzy, c-format
 msgid "Protection is now off for %s."
 msgstr "Protection is now ON for %s."
 
-#: modules/commands/ns_set.cpp:679
+#: modules/commands/ns_set.cpp:686
 #, fuzzy, c-format
 msgid "Protection is now on for %s, with a reduced delay."
 msgstr "Protection is now ON for %s, with a reduced delay."
 
-#: modules/commands/ns_set.cpp:689
+#: modules/commands/ns_set.cpp:696
 #, fuzzy, c-format
 msgid "Protection is now on for %s, with no delay."
 msgstr "Protection is now ON for %s, with no delay."
 
-#: modules/commands/ns_set.cpp:671
+#: modules/commands/ns_set.cpp:678
 #, fuzzy, c-format
 msgid "Protection is now on for %s."
 msgstr "Protection is now ON for %s."
@@ -7373,7 +7396,7 @@ msgstr ""
 "uses the entire and complete real ident@host for every nick,\n"
 "then enforces the AKILL. "
 
-#: modules/commands/ns_set.cpp:1282
+#: modules/commands/ns_set.cpp:1292
 #, fuzzy
 msgid "Quick protection"
 msgstr "Protecció de Voices"
@@ -7419,20 +7442,20 @@ msgstr "    READ   Llegeix un o més memos"
 msgid "Real name"
 msgstr "  Nom real : %s"
 
-#: modules/commands/os_forbid.cpp:346 modules/commands/os_session.cpp:552
-#: modules/commands/os_akill.cpp:341 modules/commands/os_akill.cpp:355
-#: modules/commands/os_sxline.cpp:191 modules/commands/os_sxline.cpp:199
-#: modules/commands/os_ignore.cpp:266 modules/commands/cs_akick.cpp:367
-#: modules/commands/cs_akick.cpp:380
+#: modules/commands/os_akill.cpp:344 modules/commands/os_akill.cpp:361
+#: modules/commands/os_session.cpp:514 modules/commands/os_sxline.cpp:193
+#: modules/commands/os_sxline.cpp:204 modules/commands/os_forbid.cpp:346
+#: modules/commands/cs_akick.cpp:367 modules/commands/cs_akick.cpp:380
+#: modules/commands/os_ignore.cpp:266
 msgid "Reason"
 msgstr ""
 
-#: src/xline.cpp:357
+#: src/xline.cpp:387
 #, fuzzy, c-format
 msgid "Reason for %s updated."
 msgstr "Sucessor de %s desabilitat."
 
-#: modules/commands/ns_recover.cpp:191
+#: modules/commands/ns_recover.cpp:211
 msgid ""
 "Recovers your nick from another user or from services.\n"
 "If services are currently holding your nick, the hold\n"
@@ -7442,33 +7465,33 @@ msgid ""
 "forced off of the nick."
 msgstr ""
 
-#: modules/commands/cs_access.cpp:734
+#: modules/commands/cs_access.cpp:741
 #, fuzzy
 msgid "Redefine the meanings of access levels"
 msgstr "    LEVELS     Redefine el significat de nivells d'accés"
 
-#: modules/commands/ns_recover.cpp:129
+#: modules/commands/ns_recover.cpp:149
 #, fuzzy
 msgid "Regains control of your nick"
 msgstr "    RELEASE    Repren possesió del teu nick després de RECOVER"
 
-#: modules/commands/os_akill.cpp:129 modules/commands/os_sxline.cpp:324
-#: modules/commands/os_sxline.cpp:538
+#: modules/commands/os_akill.cpp:129 modules/commands/os_sxline.cpp:330
+#: modules/commands/os_sxline.cpp:545
 #, fuzzy
 msgid "Regex is disabled."
 msgstr "%s is enable"
 
-#: modules/commands/os_akill.cpp:438 modules/commands/os_sxline.cpp:452
-#: modules/commands/os_sxline.cpp:684
+#: modules/commands/os_akill.cpp:444 modules/commands/os_sxline.cpp:459
+#: modules/commands/os_sxline.cpp:694
 #, c-format
 msgid ""
 "Regex matches are also supported using the %s engine.\n"
 "Enclose your mask in // if this is desired."
 msgstr ""
 
-#: modules/commands/os_forbid.cpp:416 modules/commands/os_list.cpp:114
-#: modules/commands/os_list.cpp:225 modules/commands/ns_list.cpp:172
-#: modules/commands/cs_list.cpp:167 modules/commands/os_ignore.cpp:386
+#: modules/commands/os_list.cpp:114 modules/commands/os_list.cpp:225
+#: modules/commands/cs_list.cpp:167 modules/commands/os_forbid.cpp:416
+#: modules/commands/ns_list.cpp:172 modules/commands/os_ignore.cpp:386
 #, c-format
 msgid ""
 "Regex matches are also supported using the %s engine.\n"
@@ -7480,12 +7503,12 @@ msgstr ""
 msgid "Register a channel"
 msgstr "    REGISTER   Registra un nickname"
 
-#: modules/commands/ns_register.cpp:104
+#: modules/commands/ns_register.cpp:106
 #, fuzzy
 msgid "Register a nickname"
 msgstr "    REGISTER   Registra un nickname"
 
-#: modules/commands/cs_info.cpp:55 modules/commands/ns_info.cpp:89
+#: modules/commands/ns_info.cpp:89 modules/commands/cs_info.cpp:55
 #, fuzzy
 msgid "Registered"
 msgstr "     Temps registrat: %s"
@@ -7544,7 +7567,7 @@ msgstr ""
 "first registered your nickname.  If you haven't,\n"
 "/msg %s HELP for information on how to do so."
 
-#: modules/commands/ns_register.cpp:238
+#: modules/commands/ns_register.cpp:248
 #, fuzzy, c-format
 msgid ""
 "Registers your nickname in the %s database. Once\n"
@@ -7597,7 +7620,7 @@ msgstr ""
 "informació sobre aquesta característica, escriu /msg %s\n"
 "HELP GROUP."
 
-#: modules/commands/ns_register.cpp:129
+#: modules/commands/ns_register.cpp:131
 #, fuzzy
 msgid "Registration is currently disabled."
 msgstr "Ho sento, el registre de canals esta temporalment inhabilitat."
@@ -7607,12 +7630,12 @@ msgstr "Ho sento, el registre de canals esta temporalment inhabilitat."
 msgid "Regulate the use of critical commands"
 msgstr "    PEACE         Regula l'ús de comandes critiques"
 
-#: modules/commands/hs_request.cpp:278
+#: modules/commands/hs_request.cpp:284
 #, fuzzy
 msgid "Reject the requested vHost for the given nick."
 msgstr "    STATUS     Returns the owner status of the given nickname"
 
-#: modules/commands/hs_request.cpp:235
+#: modules/commands/hs_request.cpp:241
 #, fuzzy
 msgid "Reject the requested vHost of a user"
 msgstr "    DEL         Delete the vhost of another user"
@@ -7661,46 +7684,46 @@ msgstr ""
 "    NOOP        Temporalment elimina totes les linees O:\n"
 "                d'un servidor remotamente"
 
-#: modules/commands/os_dns.cpp:541
+#: modules/commands/os_dns.cpp:542
 #, fuzzy, c-format
 msgid "Removed IP %s from %s."
 msgstr "      Mode de lock: %s"
 
-#: modules/commands/os_dns.cpp:458
+#: modules/commands/os_dns.cpp:459
 #, c-format
 msgid "Removed server %s from zone %s."
 msgstr ""
 
-#: modules/commands/os_dns.cpp:481
+#: modules/commands/os_dns.cpp:482
 #, c-format
 msgid "Removed server %s."
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:854
+#: modules/commands/cs_mode.cpp:852
 #, c-format
 msgid ""
 "Removes %s status from the selected nick on a channel. If nick is\n"
 "not given, it will de%s you."
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:835
+#: modules/commands/cs_mode.cpp:833
 #, fuzzy, c-format
 msgid "Removes %s status from you or the specified nick on a channel"
 msgstr "    OP         Gives Op status to a selected nick on a channel"
 
-#: modules/commands/cs_updown.cpp:140
+#: modules/commands/cs_updown.cpp:146
 #, fuzzy
 msgid "Removes a selected nicks status from a channel"
 msgstr "    KICK       Kicks a selected nick from a channel"
 
-#: modules/commands/cs_updown.cpp:211
+#: modules/commands/cs_updown.cpp:223
 msgid ""
 "Removes a selected nicks status modes on a channel. If nick is\n"
-"ommited then your status is removed. If channel is ommited then\n"
+"omitted then your status is removed. If channel is omitted then\n"
 "your channel status is removed on every channel you are in."
 msgstr ""
 
-#: src/xline.cpp:383
+#: src/xline.cpp:413
 #, c-format
 msgid "Removing %s because %s covers it."
 msgstr ""
@@ -7716,14 +7739,14 @@ msgstr "  Kicker per repetició : %s"
 msgid "Request a vHost for your nick"
 msgstr "There's no email address set for your nick."
 
-#: modules/commands/hs_request.cpp:174
+#: modules/commands/hs_request.cpp:180
 msgid ""
-"Request the given vHost to be actived for your nick by the\n"
+"Request the given vHost to be activated for your nick by the\n"
 "network administrators. Please be patient while your request\n"
 "is being considered."
 msgstr ""
 
-#: modules/commands/ns_register.cpp:281
+#: modules/commands/ns_register.cpp:291
 #, fuzzy
 msgid "Resend registration confirmation email"
 msgstr "    RELOAD      Recarrega la configuració dels serveis"
@@ -7733,7 +7756,7 @@ msgstr "    RELOAD      Recarrega la configuració dels serveis"
 msgid "Restrict access to the channel"
 msgstr "    RESTRICTED    Restringeix l'accés al canal"
 
-#: modules/commands/cs_set.cpp:1344
+#: modules/commands/cs_set.cpp:1337
 #, fuzzy
 msgid "Restricted access"
 msgstr "accés restringit"
@@ -7774,7 +7797,7 @@ msgstr ""
 "    GETPASS    Recupera la clau per un nickname\n"
 "               (sols si encriptació esta deshabilitada)"
 
-#: modules/commands/hs_request.cpp:291
+#: modules/commands/hs_request.cpp:297
 msgid "Retrieves the vhost requests"
 msgstr ""
 
@@ -7790,17 +7813,8 @@ msgstr "    GETKEY     Returns the key of the given channel"
 
 #: modules/commands/ns_getemail.cpp:58
 #, fuzzy
-msgid ""
-"Returns the matching nicks that used given email. Note that\n"
-"you can not use wildcards. Whenever this command is used, a message\n"
-"including the person who issued the command and the email it was used\n"
-"on will be logged."
-msgstr ""
-"Syntax: GETEMAIL user@emailhost\n"
-"Returns the matching nicks that used given email. Note that\n"
-"you can not use wildcards for either user or emailhost. Whenever\n"
-"this command is used, a message including the person who issued\n"
-"the command and the email it was used on will be logged."
+msgid "Returns the matching accounts that used given email."
+msgstr "    GETKEY     Returns the key of the given channel"
 
 #: modules/commands/ns_status.cpp:19
 #, fuzzy
@@ -7883,16 +7897,16 @@ msgstr "    LOGOUT     Reverses the effect of the IDENTIFY command"
 msgid "SET server"
 msgstr "NOOP {SET|REVOKE} servidor"
 
-#: modules/commands/os_dns.cpp:665
+#: modules/commands/os_dns.cpp:666
 msgid "SET server.name option value"
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:371
+#: modules/commands/ns_cert.cpp:378
 #, fuzzy, c-format
 msgid "SSL certificate fingerprint accepted, you are now identified to %s."
 msgstr "Clau aceptada - Has estat reconegut."
 
-#: modules/commands/ns_cert.cpp:382
+#: modules/commands/ns_cert.cpp:398
 #, fuzzy
 msgid "SSL certificate fingerprint accepted, you are now identified."
 msgstr "Clau aceptada - Has estat reconegut."
@@ -7917,7 +7931,7 @@ msgstr ""
 msgid "Searches logs for a matching pattern"
 msgstr ""
 
-#: modules/commands/cs_set.cpp:1348
+#: modules/commands/cs_set.cpp:1341
 #, fuzzy
 msgid "Secure founder"
 msgstr "Fundador Segur"
@@ -7932,7 +7946,7 @@ msgstr "Secure founder option for %s is now ON."
 msgid "Secure founder option for %s is now on."
 msgstr "Secure founder option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:1350
+#: modules/commands/cs_set.cpp:1343
 #, fuzzy
 msgid "Secure ops"
 msgstr "Ops Segurs"
@@ -7957,12 +7971,12 @@ msgstr "Secure option for %s is now ON."
 msgid "Secure option for %s is now on."
 msgstr "Secure option for %s is now ON."
 
-#: modules/commands/ns_set.cpp:1020
+#: modules/commands/ns_set.cpp:1030
 #, fuzzy, c-format
 msgid "Secure option is now off for %s."
 msgstr "Secure option is now ON for %s."
 
-#: modules/commands/ns_set.cpp:1014
+#: modules/commands/ns_set.cpp:1024
 #, fuzzy, c-format
 msgid "Secure option is now on for %s."
 msgstr "Secure option is now ON for %s."
@@ -7972,11 +7986,11 @@ msgstr "Secure option is now ON for %s."
 msgid "Secureops enforced on %s."
 msgstr "Secure option is now ON for %s."
 
-#: modules/commands/ns_set.cpp:1286 modules/commands/cs_set.cpp:1346
+#: modules/commands/ns_set.cpp:1296 modules/commands/cs_set.cpp:1339
 msgid "Security"
 msgstr "Segur"
 
-#: modules/commands/cs_xop.cpp:579
+#: modules/commands/cs_xop.cpp:578
 #, fuzzy, c-format
 msgid ""
 "See %s%s HELP %s for more information\n"
@@ -7985,7 +7999,7 @@ msgstr ""
 "Escriu /msg %s HELP opció per més informació\n"
 "sobre una opció en particular."
 
-#: modules/commands/cs_xop.cpp:582
+#: modules/commands/cs_xop.cpp:581
 #, fuzzy, c-format
 msgid ""
 "See %s%s HELP %s for more information\n"
@@ -8050,7 +8064,7 @@ msgstr ""
 "Syntax: STAFF memo-text\n"
 "Sends all services staff a memo containing memo-text."
 
-#: modules/commands/ms_send.cpp:57
+#: modules/commands/ms_send.cpp:66
 #, fuzzy
 msgid ""
 "Sends the named nick or channel a memo containing\n"
@@ -8125,14 +8139,14 @@ msgid "Server %s already exists."
 msgstr "El bot %s ja existeix."
 
 #: modules/commands/os_noop.cpp:31 modules/commands/os_dns.cpp:429
-#: modules/commands/os_dns.cpp:491 modules/commands/os_dns.cpp:530
-#: modules/commands/os_dns.cpp:569 modules/commands/os_dns.cpp:602
-#: modules/commands/os_dns.cpp:637
+#: modules/commands/os_dns.cpp:492 modules/commands/os_dns.cpp:531
+#: modules/commands/os_dns.cpp:570 modules/commands/os_dns.cpp:603
+#: modules/commands/os_dns.cpp:638
 #, fuzzy, c-format
 msgid "Server %s does not exist."
 msgstr "   %s (does not expire)"
 
-#: modules/commands/os_dns.cpp:617
+#: modules/commands/os_dns.cpp:618
 #, fuzzy, c-format
 msgid "Server %s has no configured IPs."
 msgstr "Nickname %s ha estat expulsat."
@@ -8142,12 +8156,12 @@ msgstr "Nickname %s ha estat expulsat."
 msgid "Server %s is already in zone %s."
 msgstr "You are already in %s! "
 
-#: modules/commands/os_dns.cpp:612
+#: modules/commands/os_dns.cpp:613
 #, fuzzy, c-format
 msgid "Server %s is already pooled."
 msgstr "Module %s is already loaded."
 
-#: modules/commands/os_dns.cpp:607
+#: modules/commands/os_dns.cpp:608
 #, fuzzy, c-format
 msgid "Server %s is not currently linked."
 msgstr "%s Esta actualment online."
@@ -8162,12 +8176,12 @@ msgstr "   %s (does not expire)"
 msgid "Server %s is not linked to the network."
 msgstr "Ja no hi ha un bot assignat a %s."
 
-#: modules/commands/os_dns.cpp:642
+#: modules/commands/os_dns.cpp:643
 #, fuzzy, c-format
 msgid "Server %s is not pooled."
 msgstr "   %s (does not expire)"
 
-#: modules/commands/os_dns.cpp:463
+#: modules/commands/os_dns.cpp:464
 #, c-format
 msgid "Server %s must be quit before it can be deleted."
 msgstr ""
@@ -8187,18 +8201,19 @@ msgstr "Servers found: %d"
 msgid "Service"
 msgstr "Servers found: %d"
 
-#: modules/commands/ns_recover.cpp:44
+#: modules/commands/ns_recover.cpp:51
 #, fuzzy, c-format
 msgid "Service's hold on %s has been released."
 msgstr "El teu nick ha estat alliberat pels serveis."
 
-#: data/nickserv.example.conf:234 data/chanserv.example.conf:820
+#: data/chanserv.example.conf:827 data/nickserv.example.conf:235
 #, fuzzy
 msgid "Services Operator commands"
 msgstr "%s is a services operator of type %s."
 
-#: modules/commands/os_defcon.cpp:446 modules/commands/os_defcon.cpp:454
-#: modules/commands/os_defcon.cpp:462 modules/commands/os_defcon.cpp:470
+#: modules/commands/os_defcon.cpp:444 modules/commands/os_defcon.cpp:455
+#: modules/commands/os_defcon.cpp:463 modules/commands/os_defcon.cpp:471
+#: modules/commands/os_defcon.cpp:479
 #, fuzzy
 msgid "Services are in DefCon mode, please try again later."
 msgstr "This service is temporarly disabled, please try again later"
@@ -8253,7 +8268,7 @@ msgstr "Els serveis han estat configurats per no enviar email"
 msgid "Services ignore list:"
 msgstr "    IGNORE      Modify the Services ignore list"
 
-#: modules/commands/os_kick.cpp:38 modules/commands/os_mode.cpp:33
+#: modules/commands/os_mode.cpp:33 modules/commands/os_kick.cpp:39
 #, fuzzy
 msgid ""
 "Services is unable to change modes. Are your servers' U:lines configured "
@@ -8267,7 +8282,7 @@ msgstr ""
 msgid "Services up %s."
 msgstr "Servers found: %d"
 
-#: modules/commands/ns_set.cpp:258
+#: modules/commands/ns_set.cpp:263
 #, fuzzy, c-format
 msgid "Services will from now on set status modes on %s in channels."
 msgstr "Services will no longer autoop %s in channels."
@@ -8277,7 +8292,7 @@ msgstr "Services will no longer autoop %s in channels."
 msgid "Services will no longer automatically give modes to users in %s."
 msgstr "Services will no longer autoop %s in channels."
 
-#: modules/commands/ns_set.cpp:264
+#: modules/commands/ns_set.cpp:269
 #, fuzzy, c-format
 msgid "Services will no longer set status modes on %s in channels."
 msgstr "Services will no longer autoop %s in channels."
@@ -8287,12 +8302,12 @@ msgstr "Services will no longer autoop %s in channels."
 msgid "Services will now automatically give modes to users in %s."
 msgstr "Services will now autoop %s in channels."
 
-#: modules/commands/ns_set.cpp:916
+#: modules/commands/ns_set.cpp:926
 #, c-format
 msgid "Services will now reply to %s with messages."
 msgstr "Services will now reply to %s with messages."
 
-#: modules/commands/ns_set.cpp:922
+#: modules/commands/ns_set.cpp:932
 #, c-format
 msgid "Services will now reply to %s with notices."
 msgstr "Services will now reply to %s with notices."
@@ -8311,7 +8326,7 @@ msgstr ""
 msgid "Session limit for %s set to %d."
 msgstr "Límit de sessió per a %s establert a %d."
 
-#: modules/commands/os_session.cpp:257 modules/commands/os_session.cpp:573
+#: modules/commands/os_session.cpp:257 modules/commands/os_session.cpp:534
 msgid "Session limiting is disabled."
 msgstr "Límits de sessions no disponibles."
 
@@ -8357,7 +8372,7 @@ msgstr "    PERSIST       Set the channel as permanent"
 msgid "Set the channel description"
 msgstr "    DESC          Estableix la descripció del canal"
 
-#: modules/commands/ns_set.cpp:321
+#: modules/commands/ns_set.cpp:326
 #, fuzzy
 msgid "Set the display of your group in Services"
 msgstr "    DISPLAY    Estableix el display del teu grup amb serveis"
@@ -8367,14 +8382,14 @@ msgstr "    DISPLAY    Estableix el display del teu grup amb serveis"
 msgid "Set the founder of a channel"
 msgstr "    FOUNDER       Estableix el fundador d'un canal"
 
-#: modules/commands/ns_set.cpp:772
+#: modules/commands/ns_set.cpp:779
 #, fuzzy
 msgid "Set the language Services will use when messaging you"
 msgstr ""
 "    LANGUAGE   Estableix el llenguatge amb el que els serveis\n"
 "                   t'enviaran missatges"
 
-#: modules/commands/ns_set.cpp:167
+#: modules/commands/ns_set.cpp:169
 #, fuzzy
 msgid "Set the nickname password"
 msgstr "    PASSWORD   Set the nickname password"
@@ -8750,7 +8765,7 @@ msgstr ""
 "Estableix varies opcions per a nicknames. Opció pot ser\n"
 "una de:"
 
-#: modules/commands/ns_set.cpp:229
+#: modules/commands/ns_set.cpp:234
 msgid ""
 "Sets whether services should set channel status modes on you automatically."
 msgstr ""
@@ -8768,7 +8783,7 @@ msgstr ""
 "\n"
 "limitat a administradors de serveis."
 
-#: modules/commands/ns_set.cpp:307
+#: modules/commands/ns_set.cpp:312
 #, fuzzy, c-format
 msgid ""
 "Sets whether the given nickname will be given its status modes\n"
@@ -8783,7 +8798,7 @@ msgstr ""
 "Set to ON to allow ChanServ to op the given nickname \n"
 "automatically when joining channels."
 
-#: modules/commands/ns_set.cpp:1121
+#: modules/commands/ns_set.cpp:1131
 #, fuzzy
 msgid ""
 "Sets whether the given nickname will expire.  Setting this\n"
@@ -8794,7 +8809,7 @@ msgstr ""
 "Sets whether the given nickname will expire.  Setting this\n"
 "to ON prevents the nickname from expiring."
 
-#: modules/commands/ns_set.cpp:280
+#: modules/commands/ns_set.cpp:285
 #, fuzzy, c-format
 msgid ""
 "Sets whether you will be given your channel status modes automatically.\n"
@@ -8807,7 +8822,7 @@ msgstr ""
 "Sets whether you will be opped automatically. Set to ON to \n"
 "allow ChanServ to op you automatically when entering channels."
 
-#: modules/commands/cs_access.cpp:641 modules/commands/cs_access.cpp:682
+#: modules/commands/cs_access.cpp:648 modules/commands/cs_access.cpp:689
 #, fuzzy, c-format
 msgid ""
 "Setting %s not known.  Type %s%s HELP LEVELS for a list of valid settings."
@@ -8874,11 +8889,11 @@ msgstr ""
 msgid "Signed kick option for %s is now on."
 msgstr "Signed kick option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:1352
+#: modules/commands/cs_set.cpp:1345
 msgid "Signed kicks"
 msgstr "Kicks Signats"
 
-#: modules/commands/ms_rsend.cpp:60 modules/commands/ms_send.cpp:50
+#: modules/commands/ms_send.cpp:59 modules/commands/ms_rsend.cpp:60
 #, fuzzy, c-format
 msgid "Sorry, %s currently has too many memos and cannot receive more."
 msgstr "%s actualment te molts memos i no pot rebre'n mes."
@@ -8888,45 +8903,52 @@ msgstr "%s actualment te molts memos i no pot rebre'n mes."
 msgid "Sorry, I have not seen %s."
 msgstr ""
 
+#: modules/commands/bs_badwords.cpp:404
+#, fuzzy
+msgid "Sorry, bad words list modification is temporarily disabled."
+msgstr ""
+"Ho sento, la llista de  paraules malsonants per a canals esta temporalment "
+"inabilitada."
+
 #: modules/commands/bs_assign.cpp:30 modules/commands/bs_assign.cpp:98
 #, fuzzy
 msgid "Sorry, bot assignment is temporarily disabled."
 msgstr ""
 "Ho sento, l'establiment d'opcions per a bot esta temporalment inhabilitat"
 
-#: modules/commands/bs_bot.cpp:265 modules/commands/bs_assign.cpp:164
+#: modules/commands/bs_assign.cpp:164 modules/commands/bs_bot.cpp:281
 msgid "Sorry, bot modification is temporarily disabled."
 msgstr "Ho sento, la modificació de bots esta temporalment inabilitada."
 
-#: modules/fantasy.cpp:42 modules/commands/bs_kick.cpp:802
-#: modules/commands/bs_kick.cpp:867 modules/commands/bs_set.cpp:103
+#: modules/commands/bs_kick.cpp:802 modules/commands/bs_kick.cpp:867
+#: modules/fantasy.cpp:42
 msgid "Sorry, bot option setting is temporarily disabled."
 msgstr ""
 "Ho sento, l'establiment d'opcions per a bot esta temporalment inhabilitat"
 
-#: modules/commands/cs_xop.cpp:112 modules/commands/cs_xop.cpp:235
-#: modules/commands/cs_xop.cpp:448
+#: modules/commands/bs_set.cpp:112
+#, fuzzy
+msgid "Sorry, changing bot options is temporarily disabled."
+msgstr ""
+"Ho sento, l'establiment d'opcions per a bot esta temporalment inhabilitat"
+
+#: modules/commands/cs_xop.cpp:112 modules/commands/cs_xop.cpp:239
+#: modules/commands/cs_xop.cpp:452
 #, fuzzy, c-format
 msgid "Sorry, channel %s list modification is temporarily disabled."
 msgstr ""
 "Ho sento, la modificació de la llista AOP de canals esta\n"
 "temporalment deshabilitada."
 
-#: modules/commands/cs_access.cpp:540 modules/commands/cs_flags.cpp:402
+#: modules/commands/cs_flags.cpp:405 modules/commands/cs_access.cpp:547
 msgid "Sorry, channel access list modification is temporarily disabled."
 msgstr ""
 "Ho sento, la modificació d'accés a canals esta temporalment inabilitada."
 
-#: modules/commands/cs_akick.cpp:449
+#: modules/commands/cs_akick.cpp:457
 msgid "Sorry, channel autokick list modification is temporarily disabled."
 msgstr ""
 "Ho sento, la modificació de kicks automàtics a canals esta temporalment "
-"inabilitada."
-
-#: modules/commands/bs_badwords.cpp:403
-msgid "Sorry, channel bad words list modification is temporarily disabled."
-msgstr ""
-"Ho sento, la llista de  paraules malsonants per a canals esta temporalment "
 "inabilitada."
 
 #: modules/commands/cs_drop.cpp:29
@@ -8961,7 +8983,7 @@ msgstr "Ho sento, desenregistrament de nickname esta temporalment inhabilitat."
 msgid "Sorry, nickname grouping is temporarily disabled."
 msgstr "Ho sento, La agrupació de nicks esta temporalment inabilitada."
 
-#: modules/commands/ns_register.cpp:123
+#: modules/commands/ns_register.cpp:125
 msgid "Sorry, nickname registration is temporarily disabled."
 msgstr "Ho sento, el registre de nicknames esta temporalment deshabilitat."
 
@@ -8983,8 +9005,13 @@ msgstr ""
 "Ho sento, sols pots tenir %d instàncies a la teva lllista d'accés per "
 "nickname."
 
-#: modules/commands/cs_access.cpp:199 modules/commands/cs_xop.cpp:201
-#: modules/commands/cs_flags.cpp:173
+#: modules/commands/ms_ignore.cpp:55
+#, fuzzy, c-format
+msgid "Sorry, the memo ignore list for %s is full."
+msgstr "Greet message for %s unset."
+
+#: modules/commands/cs_xop.cpp:205 modules/commands/cs_flags.cpp:174
+#: modules/commands/cs_access.cpp:204
 #, fuzzy, c-format
 msgid ""
 "Sorry, you can only have %d access entries on a channel, including access "
@@ -8998,7 +9025,7 @@ msgid "Sorry, you can only have %d autokick masks on a channel."
 msgstr ""
 "Ho sento, sols pots tenir %d mascaras per a kicks automàtics a un canal."
 
-#: modules/commands/bs_badwords.cpp:285
+#: modules/commands/bs_badwords.cpp:286
 #, c-format
 msgid "Sorry, you can only have %d bad words entries on a channel."
 msgstr "Ho sento, sols pots tenir %d paraules malsonants en un canal."
@@ -9289,7 +9316,7 @@ msgid ""
 "               on or when you unset /AWAY.\n"
 "    NEW     You will only be notified of memos when they\n"
 "               are sent to you.\n"
-"    MAIL    You will be notified of memos by email aswell as\n"
+"    MAIL    You will be notified of memos by email as well as\n"
 "               any other settings you have.\n"
 "    NOMAIL  You will not be notified of memos by email.\n"
 "    OFF     You will not receive any notification of memos.\n"
@@ -9364,7 +9391,7 @@ msgstr ""
 "This opion is _NOT_ persistant, and should only be used when\n"
 "needed, and set back to OFF when no longer needed."
 
-#: modules/commands/ns_identify.cpp:96
+#: modules/commands/ns_identify.cpp:107
 #, fuzzy, c-format
 msgid ""
 "Tells %s that you are really the owner of this\n"
@@ -9386,7 +9413,7 @@ msgid ""
 "Tells %s to invite you or an optionally specified\n"
 "nick into the given channel.\n"
 " \n"
-"By default, limited to AOPs or those with level 5 and above\n"
+"By default, limited to AOPs or those with level 5 access and above\n"
 "on the channel."
 msgstr ""
 "Sintàxi: INVITE canal\n"
@@ -9404,7 +9431,7 @@ msgid ""
 "given, all bans affecting you in channels you have access\n"
 "in are removed.\n"
 " \n"
-"By default, limited to AOPs or those with level 5 and above\n"
+"By default, limited to AOPs or those with level 5 access and above\n"
 "on the channel."
 msgstr ""
 "Sintàxi: UNBAN canal [nick]\n"
@@ -9463,7 +9490,7 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
-#: modules/commands/cs_access.cpp:569
+#: modules/commands/cs_access.cpp:576
 msgid ""
 "The ACCESS ADD command adds the given mask to the\n"
 "access list with the given user level; if the mask is\n"
@@ -9474,7 +9501,7 @@ msgid ""
 "highest level entry in the access list."
 msgstr ""
 
-#: modules/commands/cs_access.cpp:580
+#: modules/commands/cs_access.cpp:587
 msgid ""
 "The ACCESS DEL command removes the given nick from the\n"
 "access list.  If a list of entry numbers is given, those\n"
@@ -9483,7 +9510,7 @@ msgid ""
 "do not have access to modify that list otherwise."
 msgstr ""
 
-#: modules/commands/cs_access.cpp:586
+#: modules/commands/cs_access.cpp:593
 msgid ""
 "The ACCESS LIST command displays the access list.  If\n"
 "a wildcard mask is given, only those entries matching the\n"
@@ -9500,10 +9527,10 @@ msgid ""
 "access list."
 msgstr ""
 
-#: modules/commands/cs_flags.cpp:432
+#: modules/commands/cs_flags.cpp:447
 msgid ""
-"The CLEAR command clears the channel access list, which requires channel "
-"founder."
+"The CLEAR command clears the channel access list. This requires channel "
+"founder access."
 msgstr ""
 
 #: modules/commands/cs_seen.cpp:174
@@ -9511,14 +9538,14 @@ msgstr ""
 msgid ""
 "The CLEAR command lets you clean the database by removing all entries from "
 "the\n"
-"entries from the database that were added within time.\n"
+"database that were added within time.\n"
 " \n"
 "Example:\n"
 " %s CLEAR 30m\n"
 " Will remove all entries that were added within the last 30 minutes."
 msgstr ""
 
-#: modules/commands/bs_badwords.cpp:437
+#: modules/commands/bs_badwords.cpp:438
 #, fuzzy
 msgid ""
 "The DEL command removes the given word from the\n"
@@ -9533,7 +9560,7 @@ msgid ""
 "      Lists bad words entries numbered 2 through 5 and\n"
 "      7 through 9.\n"
 " \n"
-"The CLEAR command clears all entries of the\n"
+"The CLEAR command clears all entries from the\n"
 "bad words list."
 msgstr ""
 "Sintàxi: HOP canal ADD nick\n"
@@ -9579,36 +9606,36 @@ msgstr ""
 #: modules/commands/cs_entrymsg.cpp:241
 msgid ""
 "The ENTRYMSG ADD command adds the given message to\n"
-"the list of messages to be shown to users when they join\n"
+"the list of messages shown to users when they join\n"
 "the channel."
 msgstr ""
 
 #: modules/commands/cs_entrymsg.cpp:253
 msgid ""
 "The ENTRYMSG CLEAR command clears all entries from\n"
-"the list of messages to be shown to users when they join\n"
+"the list of messages shown to users when they join\n"
 "the channel, effectively disabling entry messages."
 msgstr ""
 
 #: modules/commands/cs_entrymsg.cpp:245
 msgid ""
-"The ENTRYMSG DEL command removes the given message from\n"
-"the list of messages to be shown to users when they join\n"
-"the channel. You can remove the message by specifying its number\n"
+"The ENTRYMSG DEL command removes the specified message from\n"
+"the list of messages shown to users when they join\n"
+"the channel. You can remove a message by specifying its number\n"
 "which you can get by listing the messages as explained below."
 msgstr ""
 
 #: modules/commands/cs_entrymsg.cpp:250
 msgid ""
 "The ENTRYMSG LIST command displays a listing of messages\n"
-"to be shown to users when they join the channel."
+"shown to users when they join the channel."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:692
+#: modules/commands/ns_set.cpp:699
 msgid "The IMMED option is not available on this network."
 msgstr "The IMMED option is not available on this network."
 
-#: modules/commands/cs_access.cpp:806
+#: modules/commands/cs_access.cpp:821
 #, fuzzy, c-format
 msgid ""
 "The LEVELS command allows fine control over the meaning of\n"
@@ -9656,7 +9683,7 @@ msgstr ""
 "For a list of the features and functions whose levels can be\n"
 "set, see HELP LEVELS DESC."
 
-#: modules/commands/cs_flags.cpp:427
+#: modules/commands/cs_flags.cpp:442
 msgid ""
 "The LIST command allows you to list existing entries on the channel access "
 "list.\n"
@@ -9667,18 +9694,18 @@ msgid ""
 "on the access list with the specified flags are returned."
 msgstr ""
 
-#: modules/commands/cs_flags.cpp:420
+#: modules/commands/cs_flags.cpp:435
 msgid ""
-"The MODIFY command allows you to modify the access list. If mask is\n"
-"not already on the access list is it added, then the changes are applied.\n"
+"The MODIFY command allows you to modify the access list. If the mask is\n"
+"not already on the access list it is added, then the changes are applied.\n"
 "If the mask has no more flags, then the mask is removed from the access "
 "list.\n"
 "Additionally, you may use +* or -* to add or remove all flags, respectively. "
 "You are\n"
 "only able to modify the access list if you have the proper permission on the "
 "channel,\n"
-"and even then you can only give other people access to up what you already "
-"have."
+"and even then you can only give other people access to the equivalent of "
+"what your access is."
 msgstr ""
 
 #: modules/commands/cs_seen.cpp:173
@@ -9686,7 +9713,7 @@ msgid ""
 "The STATS command prints out statistics about stored nicks and memory usage."
 msgstr ""
 
-#: modules/commands/ns_register.cpp:260
+#: modules/commands/ns_register.cpp:270
 #, fuzzy
 msgid ""
 "The email parameter is optional and will set the email\n"
@@ -9700,6 +9727,7 @@ msgstr ""
 "a cap persona."
 
 #: modules/commands/cs_log.cpp:258
+#, c-format
 msgid ""
 "The %s command allows users to configure logging settings\n"
 "for their channel. If no parameters are given this command\n"
@@ -9717,7 +9745,7 @@ msgid ""
 "To remove a logging method use the same syntax as you would to add it.\n"
 " \n"
 "Example:\n"
-" %s #anope chanserv/access MESSAGE @%\n"
+" %s #anope chanserv/access MESSAGE @\n"
 " Would message any channel operators whenever someone used the\n"
 " ACCESS command on ChanServ on the channel."
 msgstr ""
@@ -9727,12 +9755,12 @@ msgstr ""
 msgid "The %s list for %s is full."
 msgstr "Greet message for %s unset."
 
-#: modules/commands/os_sxline.cpp:214
+#: modules/commands/os_sxline.cpp:220
 #, fuzzy, c-format
 msgid "The %s list has been cleared."
 msgstr "La llista de AKILLs ha estat netegada."
 
-#: modules/commands/os_akill.cpp:371
+#: modules/commands/os_akill.cpp:377
 msgid "The AKILL list has been cleared."
 msgstr "La llista de AKILLs ha estat netegada."
 
@@ -9751,7 +9779,7 @@ msgstr "The E-mail address of %s will now be hidden from %s INFO displays."
 msgid "The E-mail address of %s will now be shown in %s INFO displays."
 msgstr "The E-mail address of %s will now be shown in %s INFO displays."
 
-#: modules/commands/cs_flags.cpp:434
+#: modules/commands/cs_flags.cpp:449
 msgid "The available flags are:"
 msgstr ""
 
@@ -9782,11 +9810,11 @@ msgstr ""
 msgid "The entry message list for %s is full."
 msgstr "Greet message for %s unset."
 
-#: modules/commands/cs_access.cpp:781
+#: modules/commands/cs_access.cpp:796
 msgid "The following feature/function names are available:"
 msgstr ""
 
-#: modules/commands/cs_access.cpp:577
+#: modules/commands/cs_access.cpp:584
 msgid ""
 "The given mask may also be a channel, which will use the\n"
 "access list from the other channel up to the given level."
@@ -9847,7 +9875,12 @@ msgstr ""
 msgid "The memo limit for %s may not be changed."
 msgstr "El límit de memos per a %s no pot ser canviat."
 
-#: modules/commands/ns_set.cpp:347
+#: modules/commands/cs_mode.cpp:332
+#, fuzzy, c-format
+msgid "The mode lock list of %s is full."
+msgstr "Greet message for %s unset."
+
+#: modules/commands/ns_set.cpp:352
 #, c-format
 msgid "The new display MUST be a nickname of the nickname group %s."
 msgstr ""
@@ -9861,6 +9894,10 @@ msgstr "The Defcon Level is now at Level: %d"
 #, c-format
 msgid "The nick %s is now being changed to %s."
 msgstr "The nick %s is now being changed to %s."
+
+#: modules/commands/bs_bot.cpp:149
+msgid "The old information is the same as the new information specified."
+msgstr ""
 
 #: modules/commands/os_info.cpp:157
 #, fuzzy, c-format
@@ -9885,12 +9922,12 @@ msgid "The services access status of %s will now be shown in %s INFO displays.
 msgstr ""
 "The services access status of %s will now be shown in %s INFO displays."
 
-#: modules/commands/os_session.cpp:471
+#: modules/commands/os_session.cpp:433
 #, fuzzy
 msgid "The session exception list is empty."
 msgstr "    EXCEPTION   Modifica la llista de límit de sessió"
 
-#: modules/commands/ns_recover.cpp:102
+#: modules/commands/ns_recover.cpp:121
 msgid ""
 "The user with your nick has been removed. Use this command again\n"
 "to release services's hold on your nick."
@@ -9962,7 +9999,7 @@ msgstr "No hi ha notícies al azar."
 msgid "There is no such configuration block %s."
 msgstr "    RELOAD      Recarrega la configuració dels serveis"
 
-#: modules/commands/cs_mode.cpp:657
+#: modules/commands/cs_mode.cpp:655
 #, fuzzy, c-format
 msgid "There is no such mode %s."
 msgstr "No hay notícies de oper."
@@ -9990,7 +10027,7 @@ msgstr "Aquest canal esta prohibit."
 msgid "This channel may not be used."
 msgstr "Aquest canal esta prohibit."
 
-#: modules/commands/os_dns.cpp:700
+#: modules/commands/os_dns.cpp:701
 msgid ""
 "This command allows managing DNS zones used for controlling what servers "
 "users\n"
@@ -10027,7 +10064,7 @@ msgstr ""
 "CURRENT nick to be the vhost for all nicks in the same\n"
 "group."
 
-#: modules/commands/ns_register.cpp:268
+#: modules/commands/ns_register.cpp:278
 msgid ""
 "This command also creates a new group for your nickname,\n"
 "that will allow you to register other nicks later sharing\n"
@@ -10040,7 +10077,7 @@ msgstr ""
 msgid "This command is an alias to the command %s."
 msgstr ""
 
-#: modules/commands/ns_register.cpp:79
+#: modules/commands/ns_register.cpp:81
 #, fuzzy
 msgid ""
 "This command is used by several commands as a way to confirm\n"
@@ -10074,8 +10111,8 @@ msgstr ""
 #: modules/commands/hs_list.cpp:136
 #, fuzzy
 msgid ""
-"This command lists registered vhosts to the operator\n"
-"if a key is specified, only entries whos nick or vhost match\n"
+"This command lists registered vhosts to the operator.\n"
+"If a key is specified, only entries whose nick or vhost match\n"
 "the pattern given in key are displayed e.g. Rob* for all\n"
 "entries beginning with \"Rob\"\n"
 "If a #X-Y style is used, only entries between the range of X\n"
@@ -10173,7 +10210,7 @@ msgid ""
 "auto join lists."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:337 modules/commands/ns_set.cpp:648
+#: modules/commands/ns_set.cpp:342 modules/commands/ns_set.cpp:655
 msgid ""
 "This command may not be used on this network because nickname ownership is "
 "disabled."
@@ -10187,7 +10224,7 @@ msgstr ""
 "This command loads the module named FileName from the modules\n"
 "directory."
 
-#: modules/commands/hs_request.cpp:339
+#: modules/commands/hs_request.cpp:345
 msgid "This command retrieves the vhost requests."
 msgstr ""
 
@@ -10239,7 +10276,7 @@ msgstr ""
 "This command loads the module named FileName from the modules\n"
 "directory."
 
-#: modules/commands/ns_register.cpp:322
+#: modules/commands/ns_register.cpp:332
 msgid "This command will resend you the registration confirmation email."
 msgstr ""
 
@@ -10255,12 +10292,12 @@ msgstr ""
 msgid "This nickname has been forbidden: %s"
 msgstr "This nickname is currently suspended, reason: %s"
 
-#: modules/commands/ns_recover.cpp:91
+#: modules/commands/ns_recover.cpp:99
 #, fuzzy, c-format
 msgid "This nickname has been recovered by %s."
 msgstr "This nickname is currently suspended, reason: %s"
 
-#: modules/commands/ns_recover.cpp:70
+#: modules/commands/ns_recover.cpp:77
 #, c-format
 msgid ""
 "This nickname has been recovered by %s. If you did not do\n"
@@ -10321,7 +10358,7 @@ msgstr ""
 msgid "Topic"
 msgstr "Lock de tòpic"
 
-#: modules/commands/cs_topic.cpp:253
+#: modules/commands/cs_topic.cpp:258
 #, fuzzy
 msgid "Topic lock"
 msgstr "Lock de tòpic"
@@ -10336,7 +10373,7 @@ msgstr "Topic lock option for %s is now ON."
 msgid "Topic lock option for %s is now on."
 msgstr "Topic lock option for %s is now ON."
 
-#: modules/commands/cs_topic.cpp:251
+#: modules/commands/cs_topic.cpp:256
 #, fuzzy
 msgid "Topic retention"
 msgstr "Retenció de tòpic"
@@ -10351,7 +10388,7 @@ msgstr "Topic retention option for %s is now ON."
 msgid "Topic retention option for %s is now on."
 msgstr "Topic retention option for %s is now ON."
 
-#: modules/commands/cs_topic.cpp:260
+#: modules/commands/cs_topic.cpp:265
 msgid "Topic set by"
 msgstr ""
 
@@ -10359,18 +10396,17 @@ msgstr ""
 msgid "Turn caps lock OFF!"
 msgstr "Desactiva les majuscules!"
 
-#: modules/extra/stats/m_chanstats.cpp:9
-#: modules/extra/stats/m_chanstats.cpp:63
+#: modules/extra/stats/m_chanstats.cpp:9 modules/extra/stats/m_chanstats.cpp:63
 #, fuzzy
 msgid "Turn chanstats statistics on or off"
 msgstr "    SECURE     Activa o desactiva la seguretat de nickname"
 
-#: modules/commands/ns_set.cpp:985
+#: modules/commands/ns_set.cpp:995
 #, fuzzy
 msgid "Turn nickname security on or off"
 msgstr "    SECURE     Activa o desactiva la seguretat de nickname"
 
-#: modules/commands/ns_set.cpp:634
+#: modules/commands/ns_set.cpp:641
 #, fuzzy
 msgid "Turn protection on or off"
 msgstr "    KILL       Activa o desactiva la protecció"
@@ -10409,7 +10445,7 @@ msgstr ""
 "(D'altra banda, qualsevol persona que sapigue el teu nick podra comprobar\n"
 "la teva informació utilitzant la comanda INFO.)"
 
-#: modules/commands/ns_set.cpp:1035 modules/commands/ns_set.cpp:1064
+#: modules/commands/ns_set.cpp:1045 modules/commands/ns_set.cpp:1074
 #, fuzzy, c-format
 msgid ""
 "Turns %s's security features on or off for your\n"
@@ -10439,7 +10475,7 @@ msgstr "    SECURE     Activa o desactiva la seguretat de nickname"
 msgid "Turns chanstats channel statistics ON or OFF for this user."
 msgstr "    SECURE     Activa o desactiva la seguretat de nickname"
 
-#: modules/commands/ns_set.cpp:751
+#: modules/commands/ns_set.cpp:758
 #, fuzzy, c-format
 msgid ""
 "Turns the automatic protection option for the nick\n"
@@ -10470,7 +10506,7 @@ msgstr ""
 "do not use this option unless necessary.  Also, your\n"
 "network's administrators may have disabled this option."
 
-#: modules/commands/ns_set.cpp:717
+#: modules/commands/ns_set.cpp:724
 #, fuzzy, c-format
 msgid ""
 "Turns the automatic protection option for your nick\n"
@@ -10501,7 +10537,7 @@ msgstr ""
 "necessari. A mes, els administradors de la xarxa poden haber\n"
 "deshabilitat aquesta opció."
 
-#: modules/commands/os_forbid.cpp:346 modules/commands/bs_badwords.cpp:193
+#: modules/commands/bs_badwords.cpp:194 modules/commands/os_forbid.cpp:346
 msgid "Type"
 msgstr ""
 
@@ -10538,7 +10574,7 @@ msgstr ""
 "on a specific option. The options will be set on the given\n"
 "nickname. "
 
-#: modules/commands/bs_set.cpp:50 modules/commands/cs_set.cpp:60
+#: modules/commands/cs_set.cpp:60 modules/commands/bs_set.cpp:59
 #, fuzzy, c-format
 msgid ""
 "Type %s%s HELP %s option for more information on a\n"
@@ -10547,7 +10583,7 @@ msgstr ""
 "Escriu /msg %s HELP opció per més informació\n"
 "sobre una opció en particular."
 
-#: modules/pseudoclients/nickserv.cpp:342
+#: modules/pseudoclients/nickserv.cpp:361
 #, fuzzy, c-format
 msgid ""
 "Type %s%s SET EMAIL e-mail in order to set your e-mail.\n"
@@ -10563,8 +10599,8 @@ msgstr ""
 msgid "Un-Load a module"
 msgstr "    MODUNLOAD   Un-Load a module"
 
-#: modules/commands/os_akill.cpp:136 modules/commands/os_sxline.cpp:331
-#: modules/commands/os_sxline.cpp:545
+#: modules/commands/os_akill.cpp:136 modules/commands/os_sxline.cpp:337
+#: modules/commands/os_sxline.cpp:552
 #, fuzzy, c-format
 msgid "Unable to find regex engine %s."
 msgstr "Unable to remove module %s"
@@ -10607,7 +10643,7 @@ msgstr ""
 msgid "Underlines kicker"
 msgstr "  Kicker per subrallats : %s"
 
-#: modules/commands/os_dns.cpp:593
+#: modules/commands/os_dns.cpp:594
 #, fuzzy
 msgid "Unknown SET option."
 msgstr "Unknown SASET option %s."
@@ -10627,7 +10663,7 @@ msgstr "Opció %s desconeguda."
 msgid "Unknown command %s. \"%s%s HELP\" for help."
 msgstr "Comanda no coneguda %s. \"%s%s HELP\" per ajuda."
 
-#: modules/commands/cs_mode.cpp:316 modules/commands/cs_mode.cpp:391
+#: modules/commands/cs_mode.cpp:317 modules/commands/cs_mode.cpp:394
 #, fuzzy, c-format
 msgid "Unknown mode character %c ignored."
 msgstr "Caràcter de Mode %c desconegut i ignorat."
@@ -10655,8 +10691,8 @@ msgstr ""
 #: modules/commands/cs_drop.cpp:74
 #, fuzzy
 msgid ""
-"Unregisters the named channel.  Only Services Operators\n"
-"can drop a channel of which they are not the founder."
+"Unregisters the specified channel.  Only Services Operators\n"
+"can drop a channel of which they are not the founder of."
 msgstr ""
 "Sintàxi: DROP canal\n"
 "\n"
@@ -10673,10 +10709,10 @@ msgstr "    UNSUSPEND  Unsuspend a given nick"
 msgid "Unsuspends a nickname which allows it to be used again."
 msgstr ""
 
-#: modules/commands/cs_updown.cpp:120
+#: modules/commands/cs_updown.cpp:126
 msgid ""
 "Updates a selected nicks status modes on a channel. If nick is\n"
-"ommited then your status is updated. If channel is ommited then\n"
+"omitted then your status is updated. If channel is omitted then\n"
 "your channel status is updated on every channel you are in."
 msgstr ""
 
@@ -10726,31 +10762,31 @@ msgstr ""
 msgid "Used on"
 msgstr ""
 
-#: data/chanserv.example.conf:814
+#: data/chanserv.example.conf:821
 #, fuzzy
 msgid "Used to manage channels"
 msgstr "%s changed your usermodes."
 
-#: data/chanserv.example.conf:802
+#: data/chanserv.example.conf:809
 #, fuzzy
 msgid "Used to manage the list of privileged users"
 msgstr "    ACCESS     Modifica la llista d'usuaris privilegiats"
 
-#: data/chanserv.example.conf:808
+#: data/chanserv.example.conf:815
 msgid "Used to modify the channel status of you or other users"
 msgstr ""
 
-#: modules/commands/cs_akick.cpp:551
+#: modules/commands/cs_akick.cpp:563
 #, fuzzy
 msgid "User has been banned from the channel"
 msgstr "Has estat desbanegat de %s."
 
-#: modules/commands/os_dns.cpp:585
+#: modules/commands/os_dns.cpp:586
 #, fuzzy, c-format
 msgid "User limit for %s removed."
 msgstr "vhost for %s removed."
 
-#: modules/commands/os_dns.cpp:583
+#: modules/commands/os_dns.cpp:584
 #, fuzzy, c-format
 msgid "User limit for %s set to %d."
 msgstr "Límite de memos per a %s establert a %d."
@@ -10803,13 +10839,13 @@ msgstr "vhost for group %s set to %s@%s."
 msgid "VIEW host"
 msgstr ""
 
-#: modules/commands/os_akill.cpp:383 modules/commands/os_sxline.cpp:421
-#: modules/commands/os_sxline.cpp:654
+#: modules/commands/os_akill.cpp:389 modules/commands/os_sxline.cpp:428
+#: modules/commands/os_sxline.cpp:662
 #, fuzzy
 msgid "VIEW [mask | list | id]"
 msgstr "LIST [canal] [llista | NEW]"
 
-#: modules/commands/os_session.cpp:565
+#: modules/commands/os_session.cpp:526
 msgid "VIEW [mask | list]"
 msgstr ""
 
@@ -10822,7 +10858,7 @@ msgstr ""
 msgid "Value of %s:%s changed to %s"
 msgstr "El Fundador de %s cambiat a %s."
 
-#: modules/commands/hs_list.cpp:58 modules/commands/hs_request.cpp:300
+#: modules/commands/hs_list.cpp:58 modules/commands/hs_request.cpp:306
 msgid "Vhost"
 msgstr ""
 
@@ -10860,7 +10896,7 @@ msgid ""
 "%s's %s command."
 msgstr ""
 
-#: modules/commands/ms_info.cpp:187
+#: modules/commands/ms_info.cpp:204
 #, fuzzy
 msgid ""
 "Without a parameter, displays information on the number of\n"
@@ -10949,7 +10985,7 @@ msgstr ""
 "L'opció RESET estableix el nombre màxim d'usuaris\n"
 "al nombre d'usuaris actualment presents en la xarxa."
 
-#: modules/commands/bs_badwords.cpp:193
+#: modules/commands/bs_badwords.cpp:194
 msgid "Word"
 msgstr ""
 
@@ -10958,7 +10994,7 @@ msgstr ""
 msgid "You are already a member of the group of %s."
 msgstr "Ja ets membre del grup de %s."
 
-#: modules/commands/os_login.cpp:35 modules/commands/ns_identify.cpp:82
+#: modules/commands/ns_identify.cpp:87 modules/commands/os_login.cpp:35
 msgid "You are already identified."
 msgstr "You are already identified."
 
@@ -11023,7 +11059,7 @@ msgstr ""
 msgid "You can not NOOP Services."
 msgstr ""
 
-#: modules/commands/cs_access.cpp:665
+#: modules/commands/cs_access.cpp:672
 msgid ""
 "You can not disable the founder privilege because it would be impossible to "
 "reenable it at a later time."
@@ -11048,22 +11084,13 @@ msgstr ""
 msgid "You can not request a receipt when sending a memo to yourself."
 msgstr "You can not request a receipt when sending a memo to yourself."
 
-#: modules/commands/cs_flags.cpp:230
-#, fuzzy, c-format
-msgid "You can not set the %c flag."
-msgstr "You cannot use this command."
-
-#: modules/commands/bs_assign.cpp:124
-msgid "You can not unassign bots while persist is set on the channel."
-msgstr "You can not unassign bots while persist is set on the channel."
-
-#: modules/commands/ns_recover.cpp:143
+#: modules/commands/ns_recover.cpp:163
 #, fuzzy, c-format
 msgid "You can't %s yourself!"
 msgstr "No pots fer GHOST a tu mateix!"
 
-#: modules/commands/cs_access.cpp:153 modules/commands/cs_xop.cpp:154
-#: modules/commands/cs_flags.cpp:111
+#: modules/commands/cs_xop.cpp:155 modules/commands/cs_flags.cpp:109
+#: modules/commands/cs_access.cpp:154
 #, fuzzy
 msgid "You can't add a channel to its own access list."
 msgstr "No hi ha instàncies que concordin a la llista d'accés de %s ."
@@ -11073,10 +11100,15 @@ msgstr "No hi ha instàncies que concordin a la llista d'accés de %s ."
 msgid "You can't logout %s, they are a Services Operator."
 msgstr "Can't logout %s because he's a services operator."
 
-#: modules/commands/ns_set.cpp:903
+#: modules/commands/ns_set.cpp:913
 #, fuzzy, c-format
 msgid "You cannot %s on this network."
 msgstr "No pots establir la teva adreça e-mail en aquesta xarxa."
+
+#: modules/commands/cs_flags.cpp:231
+#, fuzzy, c-format
+msgid "You cannot set the %c flag."
+msgstr "You cannot use this command."
 
 #: modules/commands/ms_set.cpp:173
 #, c-format
@@ -11088,7 +11120,12 @@ msgstr "No pots establir el límite de memos per %s mes de %d."
 msgid "You cannot set your memo limit higher than %d."
 msgstr "No pots establir el teu límit de memos a mes de %d."
 
-#: modules/commands/ns_set.cpp:462
+#: modules/commands/bs_assign.cpp:124
+#, fuzzy
+msgid "You cannot unassign bots while persist is set on the channel."
+msgstr "You can not unassign bots while persist is set on the channel."
+
+#: modules/commands/ns_set.cpp:469
 msgid "You cannot unset the e-mail on this network."
 msgstr "No pots establir la teva adreça e-mail en aquesta xarxa."
 
@@ -11128,12 +11165,12 @@ msgstr "Tens 1 memo."
 msgid "You currently have no memos."
 msgstr "No tens memos."
 
-#: modules/commands/cs_mode.cpp:541 modules/commands/cs_mode.cpp:578
+#: modules/commands/cs_mode.cpp:544 modules/commands/cs_mode.cpp:581
 #, c-format
 msgid "You do not have access to set mode %c."
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:554 modules/commands/cs_mode.cpp:587
+#: modules/commands/cs_mode.cpp:557 modules/commands/cs_mode.cpp:590
 #, c-format
 msgid "You do not have the access to change %s's modes."
 msgstr ""
@@ -11169,7 +11206,7 @@ msgstr "You have been invited to %s."
 msgid "You have been invited to %s."
 msgstr "You have been invited to %s."
 
-#: modules/protocol/ratbox.cpp:137
+#: modules/commands/ns_recover.cpp:96 modules/protocol/ratbox.cpp:137
 #, fuzzy, c-format
 msgid "You have been logged in as %s."
 msgstr "El teu nick ha estat desconnectat."
@@ -11212,27 +11249,32 @@ msgstr ""
 "Advertència: Has assolit el màxim numero de memos (%d). No podras rebre mes "
 "memos fins que esborris alguns dels existents."
 
+#: modules/commands/ns_recover.cpp:117
+#, fuzzy, c-format
+msgid "You have regained control of %s."
+msgstr "You have been invited to %s."
+
 #: modules/commands/ns_drop.cpp:66
 #, fuzzy
 msgid "You may drop any nick within your group."
 msgstr "    DELALL      Delete the vhost for all nicks in a group"
 
-#: modules/commands/cs_mode.cpp:321 modules/commands/cs_mode.cpp:396
+#: modules/commands/cs_mode.cpp:322 modules/commands/cs_mode.cpp:399
 #, c-format
 msgid "You may not (un)lock mode %c."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:467
+#: modules/commands/ns_set.cpp:474
 #, fuzzy
 msgid "You may not change the e-mail of other Services Operators."
 msgstr "No pots establir la teva adreça e-mail en aquesta xarxa."
 
-#: modules/commands/ns_set.cpp:456
+#: modules/commands/ns_set.cpp:463
 #, fuzzy
 msgid "You may not change the email of an unconfirmed account."
 msgstr "No pots establir la teva adreça e-mail en aquesta xarxa."
 
-#: modules/commands/ns_set.cpp:191
+#: modules/commands/ns_set.cpp:193
 #, fuzzy
 msgid "You may not change the password of other Services Operators."
 msgstr "Can't logout %s because he's a services operator."
@@ -11277,9 +11319,24 @@ msgstr ""
 msgid "You must be a channel operator to register the channel."
 msgstr "Has de ser un operador de canal per registrar el canal."
 
+#: modules/commands/cs_updown.cpp:94 modules/commands/cs_updown.cpp:192
+#, fuzzy, c-format
+msgid "You must be in %s to use this command."
+msgstr "You need to be identified to use this command."
+
 #: modules/commands/cs_register.cpp:37
 #, fuzzy
 msgid "You must confirm your account before you can register a channel."
+msgstr "Has de ser un operador de canal per registrar el canal."
+
+#: modules/commands/hs_request.cpp:101
+#, fuzzy
+msgid "You must confirm your account before you may request a vhost."
+msgstr "Has de ser un operador de canal per registrar el canal."
+
+#: modules/commands/ms_send.cpp:44
+#, fuzzy
+msgid "You must confirm your account before you may send a memo."
 msgstr "Has de ser un operador de canal per registrar el canal."
 
 #: modules/commands/cs_drop.cpp:42
@@ -11289,17 +11346,17 @@ msgid ""
 " %s."
 msgstr ""
 
-#: modules/commands/ns_register.cpp:137
+#: modules/commands/ns_register.cpp:139
 #, c-format
 msgid "You must have been using this nick for at least %d seconds to register."
 msgstr "You have to be connected longer than %d seconds to register your nick."
 
-#: modules/commands/cs_mode.cpp:858
+#: modules/commands/cs_mode.cpp:856
 #, fuzzy, c-format
 msgid "You must have the %s(ME) privilege on the channel to use this command."
 msgstr "You need to be identified to use this command."
 
-#: modules/pseudoclients/nickserv.cpp:339
+#: modules/pseudoclients/nickserv.cpp:358
 msgid ""
 "You must now supply an e-mail for your nick.\n"
 "This e-mail will allow you to retrieve your password in\n"
@@ -11313,15 +11370,33 @@ msgstr ""
 msgid "You need to be identified to use this command."
 msgstr "You need to be identified to use this command."
 
-#: modules/commands/ms_info.cpp:173
-msgid "You will be notified of new memos at logon and when they arrive."
+#: modules/commands/ms_info.cpp:182
+#, fuzzy
+msgid "You will be notified by message and by mail when new memos arrive."
+msgstr "Seràs notificat quan els memos nous se t'enviin."
+
+#: modules/commands/ms_info.cpp:175
+#, fuzzy
+msgid ""
+"You will be notified of new memos at logon and when they arrive, and by mail "
+"when they arrive."
 msgstr "Seràs notificat per nous memos quant et conectis i quant se t'enviin."
 
 #: modules/commands/ms_info.cpp:177
+msgid "You will be notified of new memos at logon and when they arrive."
+msgstr "Seràs notificat per nous memos quant et conectis i quant se t'enviin."
+
+#: modules/commands/ms_info.cpp:189
+#, fuzzy
+msgid ""
+"You will be notified of new memos at logon, and by mail when they arrive."
+msgstr "Seràs notificat per nous memos quant et conectis i quant se t'enviin."
+
+#: modules/commands/ms_info.cpp:191
 msgid "You will be notified of new memos at logon."
 msgstr "Seràs notificat per memos nous quant et conectis."
 
-#: modules/commands/ms_info.cpp:175
+#: modules/commands/ms_info.cpp:184
 msgid "You will be notified when new memos arrive."
 msgstr "Seràs notificat quan els memos nous se t'enviin."
 
@@ -11333,7 +11408,7 @@ msgstr "No et sera possible rebre més memos."
 msgid "You will no longer be informed via email."
 msgstr "You will no longer be informed via email."
 
-#: modules/commands/ms_info.cpp:179
+#: modules/commands/ms_info.cpp:195
 msgid "You will not be notified of new memos."
 msgstr "No seràs notificat per memos nous."
 
@@ -11359,23 +11434,23 @@ msgid ""
 "this as a possible bug"
 msgstr ""
 
-#: modules/extra/m_ldap_authentication.cpp:110
+#: modules/extra/m_ldap_authentication.cpp:102
 #: modules/extra/m_sql_authentication.cpp:47
 #, fuzzy, c-format
 msgid "Your account %s has been successfully created."
 msgstr "El bot %s ha estat esborrat."
 
-#: modules/commands/ns_register.cpp:297
+#: modules/commands/ns_register.cpp:307
 #, fuzzy
 msgid "Your account is already confirmed."
 msgstr "You are already identified."
 
-#: modules/commands/ns_register.cpp:365
+#: modules/commands/ns_register.cpp:375
 #, fuzzy, c-format
 msgid "Your account will expire, if not confirmed, in %s."
 msgstr "You are already identified."
 
-#: modules/commands/ns_set.cpp:1249
+#: modules/commands/ns_set.cpp:1259
 #, fuzzy, c-format
 msgid "Your email address has been changed to %s."
 msgstr "E-mail address for %s changed to %s."
@@ -11385,18 +11460,18 @@ msgstr "E-mail address for %s changed to %s."
 msgid "Your email address is not allowed, choose a different one."
 msgstr "Totes les linees O de %s han estat esborrades."
 
-#: modules/commands/ns_register.cpp:360
+#: modules/commands/ns_register.cpp:370
 msgid ""
 "Your email address is not confirmed. To confirm it, follow the instructions "
 "that were emailed to you."
 msgstr ""
 
-#: modules/commands/ns_register.cpp:52
+#: modules/commands/ns_register.cpp:53
 #, fuzzy, c-format
 msgid "Your email address of %s has been confirmed."
 msgstr "Totes les linees O de %s han estat esborrades."
 
-#: modules/extra/m_ldap_authentication.cpp:171
+#: modules/extra/m_ldap_authentication.cpp:151
 #, fuzzy, c-format
 msgid "Your email has been updated to %s"
 msgstr "E-mail address for %s changed to %s."
@@ -11456,7 +11531,7 @@ msgstr "Your nick is not grouped to anything, you can't ungroup it."
 msgid "Your nick isn't registered."
 msgstr "Nickname %s registered."
 
-#: modules/pseudoclients/nickserv.cpp:236
+#: modules/pseudoclients/nickserv.cpp:254
 #, c-format
 msgid "Your nickname is now being changed to %s"
 msgstr "El teu nickname s'esta canviant a %s"
@@ -11465,42 +11540,43 @@ msgstr "El teu nickname s'esta canviant a %s"
 msgid "Your oper block doesn't require logging in."
 msgstr ""
 
-#: modules/commands/ns_register.cpp:305
+#: modules/commands/ns_register.cpp:315
 #, c-format
 msgid "Your passcode has been re-sent to %s."
 msgstr "Your passcode has been re-sent to %s."
 
-#: modules/commands/ns_register.cpp:210
+#: modules/commands/ns_register.cpp:218
 #, c-format
 msgid "Your password is %s - remember this for later use."
 msgstr "La teva clau es %s - Recordala per un us futur."
 
 #: include/language.h:77
-msgid "Your password is too long. Please try again with a shorter password."
+#, c-format
+msgid "Your password is too long. It must not exceed %u characters."
 msgstr ""
 
 #: modules/commands/ns_resetpass.cpp:96
 msgid "Your password reset request has expired."
 msgstr "Your password reset request has expired."
 
-#: modules/commands/hs_request.cpp:165
+#: modules/commands/hs_request.cpp:171
 #, fuzzy
 msgid "Your vHost has been requested."
 msgstr "El bot %s ha estat esborrat."
 
-#: modules/pseudoclients/hostserv.cpp:64
-#: modules/pseudoclients/hostserv.cpp:103 modules/commands/hs_on.cpp:35
+#: modules/commands/hs_on.cpp:37 modules/pseudoclients/hostserv.cpp:64
+#: modules/pseudoclients/hostserv.cpp:103
 #, c-format
 msgid "Your vhost of %s is now activated."
 msgstr "Your vhost of %s is now activated."
 
-#: modules/pseudoclients/hostserv.cpp:62
-#: modules/pseudoclients/hostserv.cpp:101 modules/commands/hs_on.cpp:33
+#: modules/commands/hs_on.cpp:35 modules/pseudoclients/hostserv.cpp:62
+#: modules/pseudoclients/hostserv.cpp:101
 #, c-format
 msgid "Your vhost of %s@%s is now activated."
 msgstr "Your vhost of %s@%s is now activated."
 
-#: modules/commands/hs_off.cpp:34
+#: modules/commands/hs_off.cpp:39
 msgid "Your vhost was removed and the normal cloaking restored."
 msgstr "Your vhost was removed and the normal cloaking restored."
 
@@ -11550,7 +11626,7 @@ msgstr "[Notícies al Atzar - %s] %s"
 msgid "[account] password"
 msgstr "IDENTIFY clau"
 
-#: modules/commands/cs_updown.cpp:49 modules/commands/cs_updown.cpp:141
+#: modules/commands/cs_updown.cpp:49 modules/commands/cs_updown.cpp:147
 #, fuzzy
 msgid "[channel [nick]]"
 msgstr "OP #channel [nick]"
@@ -11608,8 +11684,8 @@ msgstr "INFO nick"
 msgid "[nickname [REVALIDATE]]"
 msgstr ""
 
-#: modules/commands/ns_status.cpp:20 modules/commands/ns_alist.cpp:25
-#: modules/commands/ns_info.cpp:20
+#: modules/commands/ns_info.cpp:20 modules/commands/ns_status.cpp:20
+#: modules/commands/ns_alist.cpp:25
 #, fuzzy
 msgid "[nickname]"
 msgstr "CHECK nickname"
@@ -11631,7 +11707,7 @@ msgstr "CHANKILL [+expiry] {#channel} [reason]"
 msgid "[Hostname hidden]"
 msgstr ""
 
-#: modules/commands/ns_list.cpp:112 modules/commands/cs_list.cpp:115
+#: modules/commands/cs_list.cpp:115 modules/commands/ns_list.cpp:112
 msgid "[Suspended]"
 msgstr ""
 
@@ -11639,22 +11715,22 @@ msgstr ""
 msgid "[Unconfirmed]"
 msgstr ""
 
-#: modules/commands/hs_request.cpp:208
+#: modules/commands/hs_request.cpp:214
 #, fuzzy
 msgid "[auto memo] Your requested vHost has been approved."
 msgstr "[auto-memo] The memo you sent to %s has been viewed."
 
-#: modules/commands/hs_request.cpp:262
+#: modules/commands/hs_request.cpp:268
 #, fuzzy
 msgid "[auto memo] Your requested vHost has been rejected."
 msgstr "[auto-memo] The memo you sent to %s has been viewed."
 
-#: modules/commands/hs_request.cpp:260
+#: modules/commands/hs_request.cpp:266
 #, c-format
 msgid "[auto memo] Your requested vHost has been rejected. Reason: %s"
 msgstr ""
 
-#: modules/commands/hs_request.cpp:384
+#: modules/commands/hs_request.cpp:389
 #, fuzzy, c-format
 msgid "[auto memo] vHost %s has been requested by %s."
 msgstr "Ultim memo enviat a %s va ser cancel.lat."
@@ -11759,12 +11835,12 @@ msgstr ""
 msgid "seconds"
 msgstr "%s commands:"
 
-#: modules/commands/hs_request.cpp:210
+#: modules/commands/hs_request.cpp:216
 #, fuzzy, c-format
 msgid "vHost for %s has been activated."
 msgstr "Your vhost of %s is now activated."
 
-#: modules/commands/hs_request.cpp:267
+#: modules/commands/hs_request.cpp:273
 #, fuzzy, c-format
 msgid "vHost for %s has been rejected."
 msgstr "El bot %s ha estat esborrat."
@@ -11800,7 +11876,26 @@ msgstr "UNBAN canal [nick]"
 msgid "{nick | channel}"
 msgstr "CANCEL {nick | canal}"
 
-#: modules/commands/ms_rsend.cpp:25 modules/commands/ms_send.cpp:25
+#: modules/commands/ms_send.cpp:25 modules/commands/ms_rsend.cpp:25
 #, fuzzy
 msgid "{nick | channel} memo-text"
 msgstr "SEND {nick | canal} text"
+
+#~ msgid "Exception for %s (#%d) moved to position %d."
+#~ msgstr "Excepció per a %s (#%d) moguda a la posició %d."
+
+#~ msgid "Old info is equal to the new one."
+#~ msgstr "La informació antiga es igual a la nova."
+
+#, fuzzy
+#~ msgid ""
+#~ "Returns the matching nicks that used given email. Note that\n"
+#~ "you can not use wildcards. Whenever this command is used, a message\n"
+#~ "including the person who issued the command and the email it was used\n"
+#~ "on will be logged."
+#~ msgstr ""
+#~ "Syntax: GETEMAIL user@emailhost\n"
+#~ "Returns the matching nicks that used given email. Note that\n"
+#~ "you can not use wildcards for either user or emailhost. Whenever\n"
+#~ "this command is used, a message including the person who issued\n"
+#~ "the command and the email it was used on will be logged."

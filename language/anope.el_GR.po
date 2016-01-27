@@ -1,16 +1,15 @@
 # Anope IRC Services language file
-# Copyright (C) 2016
+# Copyright (C) 2011
 # This file is distributed under the same license as the Anope IRC Services package.
 # VisioN <vision@myirc.us>, 2011.
-# westor <westor7@gmail.com), 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
-"Report-Msgid-Bugs-To: westor7@gmail.com\n"
-"POT-Creation-Date: 24-01-2016 19:00\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-01-23 10:36-0500\n"
 "PO-Revision-Date: 2010-09-19 20:34-0400\n"
-"Last-Translator: westor <westor7@gmail.com> or <http://westor.ucoz.com/contact>\n"
+"Last-Translator: VisioN <vision@myirc.us>\n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
 "MIME-Version: 1.0\n"
@@ -21,256 +20,252 @@ msgstr ""
 #: include/language.h:87
 #, fuzzy, c-format
 msgid "%s is not a valid e-mail address."
-msgstr "%s δεν είναι έγκυρος τύπος διεύθυνσης email"
+msgstr "#%s# δεν είναι σωστός τύπος ban"
 
 #: include/language.h:81
 #, fuzzy, c-format
 msgid "%s is not currently on channel %s."
-msgstr "%s δεν βρίσκετε στο κανάλι %s."
+msgstr "Τα #%s# απενεργοποιήθηκαν στο κανάλι %s."
 
 #: include/language.h:110
 #, c-format
 msgid ""
 "%s matches an except on %s and cannot be banned until the except has been "
 "removed."
-msgstr "%s δημιουργεί μια εξαίρεση στο %s κανάλι και δεν γίνεται να απομακρυνθεί "
-"από το κανάλι μέχρι να αφαιρεθεί το ban."
+msgstr ""
 
 #: include/language.h:67
 #, fuzzy, c-format
 msgid "%s%s HELP %s for more information."
-msgstr "%s%s HELP %s για περισσότερη βοήθεια."
+msgstr "’γνωστη εντολή #%s#.  \"/msg %s HELP\" για βοήθεια."
 
 #: include/language.h:70
 #, c-format
 msgid "%s coverage is too wide; Please use a more specific mask."
-msgstr "%s κάλυψη είναι πολύ μεγάλη: Παρακαλούμε χρησιμοποιήστε μια πιο συγκεκριμένη μάσκα."
+msgstr ""
 
 #: cs_jail.cpp:240
 #, fuzzy, c-format
 msgid "%s deleted from the jail list."
-msgstr "Ό/η %s διαγράφτηκε από την λίστα φυλακής."
+msgstr "Ο/η #%s# διαγράφηκε επιτυχώς από την AOP λίστα του %s."
 
 #: include/language.h:106
 #, fuzzy, c-format
 msgid "%s for %s set to %s."
-msgstr "%s για το %s έχει οριστεί σε %s."
+msgstr "Η vhost για τον #%s# έγινε #%s#."
 
 #: include/language.h:107
 #, fuzzy, c-format
 msgid "%s for %s unset."
-msgstr "%s για το %s έχει απενεργοποιηθεί."
+msgstr "Ο Successor του #%s# δεν έχει οριστεί."
 
 #: include/language.h:116
 #, c-format
 msgid "%s has no memos."
-msgstr "%s δεν έχετε κάποιο μήνυμα."
+msgstr "%s δεν έχεις όριο μηνυμάτων."
 
 #: include/language.h:119
 #, c-format
 msgid "%s has no new memos."
-msgstr "%s δεν έχετε κάποιο νέο μήνυμα."
+msgstr "%s δεν έχεις όριο μηνυμάτων."
 
 #: include/language.h:88
 msgid "<unknown>"
-msgstr "<άγνωστο>"
+msgstr ""
 
 #: include/language.h:124
 msgid "A vHost ident must be in the format of a valid ident."
-msgstr "Το vHost ident θα πρέπει να είναι μια έγκυρη μορφής ident."
+msgstr ""
 
 #: include/language.h:123
 msgid "A vHost must be in the format of a valid hostname."
-msgstr "Το vHost θα πρέπει να είναι μια έγκυρη μορφής μάσκας hostname."
+msgstr ""
 
 #: cs_jail.cpp:151
 #, fuzzy
 msgid "ADD [+expiry] mask [+akill expiry] reason"
-msgstr "ADD [+Λήξη] Μάσκα [+Λήξη akill] Λόγος"
+msgstr "BAN ##channel# #nick# [#reason#]"
 
 #: include/language.h:73
 msgid "Access denied."
-msgstr "Δεν επιτρέπεται η πρόσβαση."
+msgstr "Λίστα πρόσβασης:"
 
 #: include/language.h:108
 #, c-format
 msgid "Access level must be between %d and %d inclusive."
-msgstr "Ο βαθμός της access θα πρέπει να είναι μεταξύ %d και %d."
+msgstr "Ο βαθμός πρέπει να είναι μεταξύ %d και %d."
 
 #: cs_jail.cpp:230
 #, c-format
 msgid "Added a jail on %s for %s, expires in %s, akills last %s"
-msgstr "Προσθέθηκε στην λίστα φυλακής στο %s για %s, λήγει στίς %s, τελευταίο akills %s"
+msgstr ""
 
 #
 #: data/chanserv.example.conf:1200
 #, fuzzy
 msgid "Associate a URL with the channel"
-msgstr "Συσχετίζει ένα URL με το κανάλι"
+msgstr "Ζητάτε από το bot να έρθει στο κανάλι σας"
 
 #: data/nickserv.example.conf:593
 msgid "Associate a URL with this account"
-msgstr "Συσχετίζει ένα URL με αυτόν τον λογαριασμό"
+msgstr ""
 
 #
 #: data/nickserv.example.conf:592
 #, fuzzy
 msgid "Associate a URL with your account"
-msgstr "Συσχετίζει ένα URL με τον λογαριασμό σας"
+msgstr "Συσχετίζει ένα μήνυμα χαιρετισμού με το ψευδώνυμό σας"
 
 #
 #: data/chanserv.example.conf:1201
 #, fuzzy
 msgid "Associate an E-mail address with the channel"
-msgstr "Συσχετίζει μία διεύθυνση e-mail με τον λογαριασμό σας"
+msgstr "Συσχετίζει μία διεύθυνση e-mail με το ψευδώνυμό σας"
 
 #: include/language.h:120
 #, fuzzy, c-format
 msgid "Bot %s does not exist."
-msgstr "Το Bot %s δεν υπάρχει."
+msgstr "   %s (δεν λήγει ποτέ)"
 
 #: include/language.h:122
 #, fuzzy, c-format
 msgid "Bot is not on channel %s."
-msgstr "Το Bot δεν βρίσκεται στο κανάλι %s."
+msgstr "Το Bot #θα κάνει kick τους ops# του καναλιού %s."
 
 #: include/language.h:85
 #, c-format
 msgid "Channel %s doesn't exist."
-msgstr "Το κανάλι %s δεν υπάρχει."
+msgstr "Το κανάλι #%s# είναι πλέον μόνιμο."
 
 #: include/language.h:84
 #, c-format
 msgid "Channel %s isn't registered."
-msgstr "Το κανάλι %s δεν έχει κατοχυρωθεί."
+msgstr "Το κανάλι #%s# δεν μπορεί να κατοχυρωθεί."
 
 #: include/language.h:83
 #, c-format
 msgid "Channel %s is currently suspended."
-msgstr "Το κανάλι %s έχει ανασταλεί."
+msgstr "Το κανάλι #%s# έγινε suspend."
 
 #: include/language.h:102
 #, c-format
 msgid "Channel %s is not a valid channel."
-msgstr "Το κανάλι %s δεν είναι ένα έγκυρο κανάλι."
+msgstr "#%s# δεν είναι σωστός τύπος ban"
 
 #: cs_jail.cpp:152
 #, fuzzy
 msgid "DEL mask"
-msgstr "DEL Μάσκα"
+msgstr "DEL #<nick>#."
 
 #: cs_jail.cpp:289
 #, fuzzy
 msgid "End of jail list."
-msgstr "Τέλος της λίστας φυλακής."
+msgstr "Τέλος λίστας καναλιού."
 
 #: include/language.h:126
 #, c-format
 msgid ""
 "Error! The vHost ident is too long, please use an ident shorter than %d "
 "characters."
-msgstr "Σφάλμα! Το vHost ident είναι πολύ μεγάλο, παρακαλούμε χρησιμοποιήστε"
-"ένα μικρότερο από %d χαρακτήρες."
+msgstr ""
 
 #: include/language.h:125
 #, c-format
 msgid ""
 "Error! The vHost is too long, please use a hostname shorter than %d "
 "characters."
-msgstr "Σφάλμα! Η vHost είναι πολύ μεγάλη, παρακαλούμε χρησιμοποιήστε"
-"μία μικρότερη από %d χαρακτήρες."
+msgstr ""
 
 #: include/language.h:90
 msgid "Incorrect range specified. The correct syntax is #from-to."
-msgstr "Λανθασμένη κλίμακα τιμών που ορίζεται. Η σωστή σύνταξη είναι #από-σε."
+msgstr ""
 
 #: include/language.h:109
 #, c-format
 msgid "Information for channel %s:"
-msgstr "Πληροφορίες για το κανάλι %s:"
+msgstr "Πληροφορίες για το bot #%s#:"
 
 #: include/language.h:69
 msgid "Invalid expiry time."
-msgstr "Μη έγκυρη ώρα λήξης."
+msgstr ""
 
 #: include/language.h:100
 msgid ""
 "Invalid passcode has been entered, please check the e-mail again, and retry."
-msgstr "Μη έγκυρος κωδικός, παρακαλούμε ελέγξτε το e-mail σας ξανά, και ξαναπροσπαθήστε."
+msgstr ""
 
 #: cs_jail.cpp:324
 msgid ""
 "JAIL allows staff to set certain channels so that\n"
 "users are AKILLed when they join."
-msgstr "H φυλακή σας δίνει την δυνατότητα να προσθέσετε ένα συγκεκριμένο κανάλι\n"
-"στο οποίο όταν θα εισέρχεται κάποιος χρήστης θα γίνεται AKILL."
+msgstr ""
 
 #: cs_jail.cpp:150
 msgid "JAIL channels so users are AKILLed when they join"
-msgstr "Φυλακίστε κανάλια έτσι ώστε οι χρήστες που θα εισέρχονται στο κανάλι, θα μπαίνουν στην AKILL"
+msgstr ""
 
 #: cs_jail.cpp:251
 #, fuzzy
 msgid "Jail list is empty."
-msgstr "Η λίστα φυλακής είναι άδεια."
+msgstr "Η %s %s λίστα είναι άδεια."
 
 #
 #: cs_jail.cpp:281
 #, fuzzy
 msgid "Jail list:"
-msgstr "Λίστα Φυλακής:"
+msgstr "Bot λίστα:"
 
 #: cs_jail.cpp:244
 #, fuzzy, c-format
 msgid "Jail on %s was not found."
-msgstr "Η φυλακή στον/στην %s δεν βρέθηκε."
+msgstr "Ο/η #%s# δεν βρέθηκε η θέση στην AOP λίστα του %s."
 
 #: cs_jail.cpp:153
 #, fuzzy
 msgid "LIST [mask]"
-msgstr "LIST [Μάσκα]"
+msgstr "CHECK #nickname#"
 
 #: include/language.h:68
 msgid "Mask must be in the form user@host."
-msgstr "Η μάσκα θα πρέπει να είναι σε μορφή Χρήστη@Μάσκα."
+msgstr ""
 
 #: include/language.h:80
 #, c-format
 msgid "Nick %s isn't currently in use."
-msgstr "Το ψευδώνυμο %s δεν χρησιμοποιείται αυτή τη στιγμή."
+msgstr "Το Nick #%s# δεν χρησιμοποιείται αυτή τη στιγμή."
 
 #: include/language.h:79
 #, c-format
 msgid "Nick %s isn't registered."
-msgstr "Το ψευδώνυμο %s δεν έχει κατοχυρωθεί."
+msgstr "Το Nickname %s κατωχυρώθηκε."
 
 #: include/language.h:82
 #, c-format
 msgid "Nick %s is currently suspended."
-msgstr "Το ψευδώνυμο %s έχει ανασταλεί."
+msgstr "Το Nick %s έγινε suspended."
 
 #: include/language.h:98
 #, c-format
 msgid "Nickname %s is already registered!"
-msgstr "Το ψευδώνυμο %s είναι ήδη κατοχυρωμένο!"
+msgstr "Το κανάλι #%s# είναι ήδη κατοχυρωμένο!"
 
 #: include/language.h:97
 #, c-format
 msgid "Nickname %s may not be registered."
-msgstr "Το ψευδώνυμο %s δεν μπορεί να κατοχυρωθεί."
+msgstr "Το κανάλι #%s# δεν μπορεί να κατοχυρωθεί."
 
 #: include/language.h:86
 msgid "Password authentication required for that command."
-msgstr "Η ταυτοποίηση κωδικού πρόσβασης απαιτείται για αυτήν την εντολή."
+msgstr ""
 
 #
 #: include/language.h:72
 msgid "Password incorrect."
-msgstr "Ο κωδικός πρόσβασης είναι λάθος."
+msgstr "Λάθος κωδικός."
 
 #: include/language.h:127
 msgid "Please contact an Operator to get a vHost assigned to this nick."
-msgstr "Παρακαλούμε επικοινωνήστε με κάποιο Διαχειριστή για να λάβετε μία vHost στο ψευδώνυμό σας. "
+msgstr ""
 
 #: include/language.h:74
 msgid ""
@@ -278,62 +273,57 @@ msgid ""
 "five characters long, should not be something easily guessed\n"
 "(e.g. your real name or your nick), and cannot contain the space or tab "
 "characters."
-msgstr "Παρακαλούμε προσπαθήστε ξανά με έναν πιο ισχυρό κωδικό πρόσβασης. Οι κωδικοί πρόσβασης\n"
-"θα πρέπει να είναι το λιγότερο πέντε χαρακτήρες, δεν θα πρέπει να είναι κάτι εύκολο\n"
-"(π.χ: το ονοματεπώνυμό σας η το ψευδωνυμό σας), και δεν θα πρέπει να συμπεριλαμβάνονται κενά η μόνο χαρακτήρες. "
+msgstr ""
 
 #: include/language.h:105
 msgid "Please use the symbol of # when attempting to register."
-msgstr "Παρακαλούμε χρησιμοποιήστε το σύμβολο # καθώς κάνετε μία εγγραφή."
+msgstr ""
 
 #: data/chanserv.example.conf:827 data/nickserv.example.conf:235
 #, fuzzy
 msgid "Services Operator commands"
-msgstr "Services Operator εντολές"
+msgstr "%s είναι services operator τού τύπου %s."
 
 #: include/language.h:71
 msgid "Services are in read-only mode!"
-msgstr "Τα Services βρίσκονται τώρα σε κατάσταση μόνο ανάγνωσης!"
+msgstr "Τα Services είναι τώρα #μόνο ανάγνωσης#."
 
 #: include/language.h:117
 msgid "Sorry, memo sending is temporarily disabled."
-msgstr "Συγνώμη, η εντολή μήνυματων είναι προσωρινά απενεργοποιημένη."
+msgstr "Συγνώμη, η εντολή setting είναι απενεργοποιημένη."
 
 #: include/language.h:104
 #, c-format
 msgid "Sorry, you have already exceeded your limit of %d channels."
-msgstr "Συγνώμη, έχεις ήδη υπερβεί το όριο των %d καναλιών."
+msgstr "Συγνώμη, μπορείς μόνο να έχεις %d κακές λέξεις για ένα κανάλι."
 
 #: include/language.h:103
 #, c-format
 msgid "Sorry, you have already reached your limit of %d channels."
-msgstr "Συγνώμη, έχεις ήδη φτάσει στο όριο των %d καναλιών."
+msgstr "Συγνώμη, μπορείς μόνο να έχεις %d κακές λέξεις για ένα κανάλι."
 
 #: include/language.h:99
 #, fuzzy, c-format
 msgid "The new display is now %s."
-msgstr "Η νέα εμφάνιση είναι τώρα %s."
+msgstr "Το defcon επίπεδο είναι τώρα: #%d#"
 
 #: include/language.h:111
 #, fuzzy, c-format
 msgid ""
 "There is a new memo on channel %s.\n"
 "Type %s%s READ %s %d to read it."
-msgstr "Υπάρχει ένα νέο μήνυμα στο %s κανάλι.\n"
-"Γράψτε τώρα την εντολή %s%s READ %s %d για να το διαβάσετε."
+msgstr "Γράψε #/msg %s READ %d# για να διαβάσεις."
 
 #: include/language.h:91
 #, c-format
 msgid ""
 "This nick is owned by someone else.  Please choose another.\n"
 "(If this is your nick, type %s%s IDENTIFY password.)"
-msgstr "Αυτό το ψευδώνυμο είναι κατοχυρωμένο από κάποιον άλλο χρήστη.\n"
-"Παρακαλούμε επιλέξτε ένα άλλο.\n"
-"(Εάν αυτό το ψευδώνυμο σας ανήκει, πληκτρολογήστε %s%s IDENTIFY Κωδικός Πρόσβασης.)"
+msgstr ""
 
 #: include/language.h:96
 msgid "This nickname has been registered; you may not use it."
-msgstr "Αυτό το κανάλι έχει κατοχυρωθεί: δεν μπορείτε να το χρησιμοποιήσετε."
+msgstr "Αυτό το κανάλι έχει κατοχυρωθεί με τον %s."
 
 #: include/language.h:93
 #, c-format
@@ -341,73 +331,70 @@ msgid ""
 "This nickname is registered and protected.  If it is your\n"
 "nick, type %s%s IDENTIFY password.  Otherwise,\n"
 "please choose a different nick."
-msgstr "Αυτό το ψευδώνυμο έχει ήδη κατοχυρωθεί και προστατεύετε. Εάν σας ανήκει\n"
-"πληκτρολογήστε %s%s IDENTIFY password. Ειδάλλως,\n"
-"παρακαλούμε χρησιμοποιήστε ένα άλλο."
+msgstr ""
 
 #
 #: data/chanserv.example.conf:821
 #, fuzzy
 msgid "Used to manage channels"
-msgstr "Χρησιμοποιείται για την διαχείριση των καναλιών"
+msgstr "Ο/η #%s# άλλαξε τα usermodes σας."
 
 #
 #: data/chanserv.example.conf:809
 #, fuzzy
 msgid "Used to manage the list of privileged users"
-msgstr "Χρησιμοποιείται για την διαχείριση των προνομιούχων χρηστών"
+msgstr "Αλλάζει τη λίστα των εξουσιοδοτημένων χρηστών"
 
 #: data/chanserv.example.conf:815
 msgid "Used to modify the channel status of you or other users"
-msgstr "Χρησιμοποιείται για την αλλαγή κατάστασης ενός καναλιού από εσάς η άλλους χρήστες"
+msgstr ""
 
 #: cs_jail.cpp:154
 msgid "VIEW [mask]"
-msgstr "VIEW [Μάσκα]"
+msgstr ""
 
 #: include/language.h:101
 msgid "You are not permitted to be on this channel."
-msgstr "Δεν έχετε άδεια για να βρίσκεστε σε αυτό το κανάλι."
+msgstr ""
+"Δεν έχεις το δικαίωμα να αλλάξεις το όριο των μηνυμάτων που θα λαμβάνεις."
 
 #: include/language.h:113
 #, fuzzy, c-format
 msgid ""
 "You have a new memo from %s.\n"
 "Type %s%s READ %d to read it."
-msgstr "Έχετε ένα νέο μήνυμα από τον/την %s.\n"
-"Πληκτρολογήστε %s%s READ %d για να το διαβάσετε."
+msgstr "Γράψε #/msg %s READ %d# για να διαβάσεις."
 
 #: include/language.h:115
 msgid "You have no memos."
-msgstr "Δεν έχετε μηνύματα."
+msgstr "Έχεις %d νέα μηνύματα."
 
 #: include/language.h:118
 msgid "You have no new memos."
-msgstr "Δεν έχετε νέα μηνύματα."
+msgstr "Έχεις %d νέα μηνύματα."
 
 #: include/language.h:121
 msgid "You must assign a bot to the channel before using this command."
-msgstr "Θα πρέπει να προσκαλέσετε κάποιο bot στο κανάλι προτού χρησιμοποιήσετε αυτήν την εντολή."
+msgstr ""
 
 #: include/language.h:128
 msgid ""
 "Your IRCd does not support vIdent's, if this is incorrect, please report "
 "this as a possible bug"
-msgstr "Το IRCd σας δεν υποστηρίζει τα vIdent's, εάν αυτό το θεωρείτε λάθος, "
-"παρακαλούμε να το αναφέρετε για τυχόν σφάλμα"
+msgstr ""
 
 #: include/language.h:78
 msgid "Your nick isn't registered."
-msgstr "Το ψευδώνυμό σας δεν είναι κατοχυρωμένο."
+msgstr "Το Nickname %s κατωχυρώθηκε."
 
 #: include/language.h:77
 #, c-format
 msgid "Your password is too long. It must not exceed %u characters."
-msgstr "Ο κωδικός πρόσβασης σας είναι μεγάλος. Δεν θα πρέπει να ξεπερνά τους %u χαρακτήρες."
+msgstr ""
 
 #: include/language.h:89
 msgid "does not expire"
-msgstr "δεν λήγει ποτέ"
+msgstr "   %s (δεν λήγει ποτέ)"
 
 #, fuzzy
 #~ msgid "%d nickname(s) dropped."

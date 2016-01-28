@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2012-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 #ifndef ANOPE_HTTPD_H
 #define ANOPE_HTTPD_H
 

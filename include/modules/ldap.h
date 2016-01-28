@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2011-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 #ifndef ANOPE_LDAP_H
 #define ANOPE_LDAP_H
 

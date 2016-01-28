@@ -1,6 +1,6 @@
 /* Unreal IRCD 3.2.x functions
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.

@@ -1,4 +1,9 @@
 /*
+ *
+ * Modified for Anope.
+ * (C) 2006-2016 Anope Team
+ * Contact us at team@anope.org
+
 SHA-1 in C
 By Steve Reid <steve@edmweb.com>
 100% Public Domain

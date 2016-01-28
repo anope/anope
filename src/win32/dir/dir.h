@@ -1,6 +1,7 @@
- /* POSIX emulation layer for Windows.
+/* POSIX emulation layer for Windows.
  *
- * Copyright (C) 2008-2014 Anope Team <team@anope.org>
+ * (C) 2008-2016 Anope Team
+ * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */

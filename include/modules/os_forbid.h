@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2011-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 #ifndef OS_FORBID_H
 #define OS_FORBID_H
 
@@ -43,4 +51,3 @@ class ForbidService : public Service
 static ServiceReference<ForbidService> forbid_service("ForbidService", "forbid");
 
 #endif
-

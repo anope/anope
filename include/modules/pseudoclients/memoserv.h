@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2011-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 #ifndef MEMOSERV_H
 #define MEMOSERV_H
 
@@ -31,4 +39,3 @@ class MemoServService : public Service
 };
 
 #endif // MEMOSERV_H
-

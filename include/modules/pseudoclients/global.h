@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2011-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
@@ -17,4 +25,3 @@ class GlobalService : public Service
 };
 
 #endif // GLOBAL_H
-

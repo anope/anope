@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2011-2015 Anope Team
+ * (C) 2011-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.

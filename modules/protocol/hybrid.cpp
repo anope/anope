@@ -1,13 +1,12 @@
 /* ircd-hybrid-8 protocol module
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team <team@anope.org>
  * (C) 2012-2016 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
  */
 
 #include "module.h"

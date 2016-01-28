@@ -54,7 +54,7 @@ BEGIN
             VALUE "FileDescription", "Anope IRC Services"
             VALUE "FileVersion", "@VERSION_FULL@"
             VALUE "InternalName", "Anope"
-            VALUE "LegalCopyright", "Copyright (C) 2003-2014 Anope Team"
+            VALUE "LegalCopyright", "Copyright (C) 2003-2016 Anope Team"
             VALUE "OriginalFilename", "anope.exe"
             VALUE "ProductName", "Anope"
             VALUE "ProductVersion", "@VERSION_DOTTED@"

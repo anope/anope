@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2011-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 #ifndef OS_SESSION_H
 #define OS_SESSION_H
 
@@ -84,4 +92,3 @@ Serializable* Exception::Unserialize(Serializable *obj, Serialize::Data &data)
 }
 
 #endif
-

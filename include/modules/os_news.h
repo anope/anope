@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2011-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 #ifndef OS_NEWS
 #define OS_NEWS
 
@@ -42,4 +50,3 @@ class NewsService : public Service
 static ServiceReference<NewsService> news_service("NewsService", "news");
 
 #endif // OS_NEWS
-

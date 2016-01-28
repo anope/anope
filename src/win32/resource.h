@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2005-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
 // Used by Win32GUI.rc

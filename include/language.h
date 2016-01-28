@@ -1,10 +1,9 @@
 /*
  *
- * (C) 2008-2014 Anope Team
+ * (C) 2008-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
  */
 
 #include "anope.h"
@@ -126,4 +125,3 @@ namespace Language
 #define HOST_SET_IDENTTOOLONG		_("Error! The vHost ident is too long, please use an ident shorter than %d characters.")
 #define HOST_NOT_ASSIGNED		_("Please contact an Operator to get a vHost assigned to this nick.")
 #define HOST_NO_VIDENT			_("Your IRCd does not support vIdent's, if this is incorrect, please report this as a possible bug")
-

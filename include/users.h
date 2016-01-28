@@ -1,14 +1,12 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2003-2014 Anope Team
- * Contact us at team@anope.org
+ * (C) 2003-2016 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
  */
 
 #ifndef USERS_H

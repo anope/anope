@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2011-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 #ifndef NICKSERV_H
 #define NICKSERV_H
 
@@ -14,4 +22,3 @@ class NickServService : public Service
 };
 
 #endif // NICKSERV_H
-

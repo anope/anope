@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2010-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 #include "httpd.h"
 
 class XMLRPCRequest
@@ -37,4 +45,3 @@ class XMLRPCServiceInterface : public Service
 
 	virtual void Reply(XMLRPCRequest &request) = 0;
 };
-

@@ -1,7 +1,7 @@
 /* ns_maxemail.cpp - Limit the amount of times an email address
  *                   can be used for a NickServ account.
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Included in the Anope module pack since Anope 1.7.9

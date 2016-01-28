@@ -1,3 +1,10 @@
+/*
+ *
+ * (C) 2010-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
 
 class SSLService : public Service
 {
@@ -6,4 +13,3 @@ class SSLService : public Service
 	
 	virtual void Init(Socket *s) = 0;
 };
-

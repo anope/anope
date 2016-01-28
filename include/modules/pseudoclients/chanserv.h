@@ -1,3 +1,11 @@
+/*
+ *
+ * (C) 2011-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 #ifndef CHANSERV_H
 #define CHANSERV_H
 
@@ -15,4 +23,3 @@ class ChanServService : public Service
 };
 
 #endif // CHANSERV_H
-

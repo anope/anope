@@ -1,3 +1,12 @@
+/*
+ *
+ * (C) 2014 Daniel Vassdal <shutter@canternet.org>
+ * (C) 2011-2016 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ */
+
 /* RequiredLibraries: ssl,crypto */
 /* RequiredWindowsLibraries: ssleay32,libeay32 */
 

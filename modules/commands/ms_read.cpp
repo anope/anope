@@ -52,9 +52,17 @@ class MemoListCallback : public NumberList
 	CommandSource &source;
 	MemoInfo *mi;
 	const ChannelInfo *ci;
+	bool found;
  public:
 	MemoListCallback(CommandSource &_source, MemoInfo *_mi, const ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi), ci(_ci)
 	{
+		found = false;
+	}
+
+	~MemoListCallback()
+	{
+		if (!found)
+			source.Reply(_("No memos to display."));
 	}
 
 	void HandleNumber(unsigned number) anope_override
@@ -63,6 +71,7 @@ class MemoListCallback : public NumberList
 			return;
 
 		MemoListCallback::DoRead(source, mi, ci, number - 1);
+		found = true;
 	}
 
 	static void DoRead(CommandSource &source, MemoInfo *mi, const ChannelInfo *ci, unsigned index)
@@ -70,7 +79,7 @@ class MemoListCallback : public NumberList
 		Memo *m = mi->GetMemo(index);
 		if (!m)
 			return;
-			
+
 		if (ci)
 			source.Reply(_("Memo %d from %s (%s)."), index + 1, m->sender.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
 		else
@@ -132,7 +141,7 @@ class CommandMSRead : public Command
 		else
 			mi = &source.nc->memos;
 
-		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.is_number_only()))
+		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && numstr.find_first_not_of("0123456789.,-") != Anope::string::npos))
 			this->OnSyntaxError(source, numstr);
 		else if (mi->memos->empty())
 		{

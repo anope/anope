@@ -16,7 +16,7 @@ Fix crash from unloading regex modules when regex xlines exist
 Fix irc2sql to store away messages
 Add notice method to m_xmlrpc_main
 Fix numerics on InspIRCd from being sent to user UID
-Fix +I on InspIRCd to be considered oper only
+Fix usermode +I on UnrealIRCd to be considered oper only
 Fix crash in webcpanel when deleting your own access on a channel
 Fix webcpanel allowing suspended users to login
 Fix hs_off on InspIRCd to not desync active user host

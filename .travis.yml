@@ -12,6 +12,15 @@ before_script:
 script:
   - make
 
+addons:
+  apt:
+    sources:
+    - george-edison55-precise-backports
+    - debian-sid
+    packages:
+    - cmake
+    - cmake-data
+
 notifications:
   irc:
-    - "irc.anope.org#anope-devel"
+    - "irc.cleverpun#irc"

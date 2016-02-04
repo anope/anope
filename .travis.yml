@@ -20,6 +20,13 @@ addons:
     packages:
     - cmake
     - cmake-data
+    - gcc-4.8-base
+    - gcc-4.8
+    - libstdc++-4.8-dev
+    - libcloog-isl4
+    - libisl15
+    - libmpc3
+    - libmpfr4
 
 notifications:
   irc:

@@ -11,7 +11,7 @@
 
 #if 0
 #include "module.h"
-#include "modules/cs_mode.h"
+#include "modules/chanserv/mode.h"
 #include "modules/sasl.h"
 
 static Anope::string UplinkSID;

@@ -12,7 +12,7 @@
 namespace Language
 {
 
-	/* Languages we support as configured in services.conf. They are
+	/* Languages we support as configured in anope.conf. They are
 	 * added to this list if we detect a language exists in the correct
 	 * location for each language.
 	 */

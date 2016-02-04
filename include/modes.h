@@ -216,7 +216,7 @@ class CoreExport ChannelModeVirtual : public T
 
 	ChannelMode *Wrap(Anope::string &param) override;
 
-	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) anope_abstract;
+	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) override anope_abstract;
 };
 
 /* The status a user has on a channel (+v, +h, +o) etc */

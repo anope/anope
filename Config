@@ -44,7 +44,7 @@ Run_Build_System () {
 	EXTRA_LIBS=""
 
 	if [ "$INSTDIR" != "" ] ; then
-		WITH_INST="-DINSTDIR:STRING=$INSTDIR"
+		WITH_INST="-DCMAKE_INSTALL_PREFIX:STRING=$INSTDIR"
 	fi
 
 	if [ "$RUNGROUP" != "" ] ; then
@@ -56,9 +56,9 @@ Run_Build_System () {
 	fi
 
 	if [ "$DEBUG" = "yes" ] ; then
-		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=DEBUG"
+		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=DEBUG -Wdev"
 	else
-		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=RELEASE"
+		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=RELEASE -Wno-dev"
 	fi
 
 	if [ "$EXTRA_INCLUDE_DIRS" != "" ] ; then
@@ -108,7 +108,7 @@ export ECHO2 ECHO2SUF
 # Init values
 ###########################################################################
 
-INSTDIR=$HOME/services
+INSTDIR=$HOME/anope
 RUNGROUP=
 UMASK=
 DEBUG="no"

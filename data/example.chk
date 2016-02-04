@@ -9,16 +9,16 @@
 ###############################################################
 
 # Anope binary directory
-ANOPATH=/home/ircd/services/bin
+ANOPATH=/home/ircd/anope/bin
 
 # Anope data directory
-ANODATA=/home/ircd/services/data
+ANODATA=/home/ircd/anope/data
 
 # Name of the pid file
-ANOPIDF=services.pid
+ANOPIDF=anope.pid
 
 # Name of the executable
-ANOPROG=services
+ANOPROG=anope
 
 # Parameters to pass to the executable
 ANOARGS=""

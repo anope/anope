@@ -475,7 +475,7 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 		this->ext.Set(s, value);
 	}
 
-	void UnsetField(TypeImpl *s)
+	void UnsetField(TypeImpl *s) override
 	{
 		Event::OnSerialize(&Event::SerializeEvents::OnSerializeUnset, s, this);
 
@@ -598,7 +598,7 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 			s->AddEdge(value, this);
 	}
 
-	void UnsetField(TypeImpl *s)
+	void UnsetField(TypeImpl *s) override
 	{
 		Event::OnSerialize(&Event::SerializeEvents::OnSerializeUnsetSerializable, s, this);
 

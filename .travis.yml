@@ -16,9 +16,12 @@ addons:
     sources:
     - george-edison55-precise-backports
     - debian-sid
+    - ubuntu-toolchain-r-test
     packages:
     - cmake
     - cmake-data
+    - gcc-4.8
+    - g++-4.8
 
 notifications:
   irc:

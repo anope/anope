@@ -3,26 +3,22 @@ language: cpp
 before_script:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
-  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-  - mkdir build
-  - cd build
-  - cmake -DINSTDIR:STRING=~/services -DDEFUMASK:STRING=077 -DCMAKE_BUILD_TYPE:STRING=DEBUG -DUSE_RUN_CC_PL:BOOLEAN=ON ..
-
-script:
-  - make
 
 addons:
   apt:
     sources:
-    - george-edison55-precise-backports
-    - debian-sid
     - ubuntu-toolchain-r-test
     packages:
+    - g++-4.8
+    - gcc-4.8
     - cmake
     - cmake-data
-    - gcc-4.8
-    - g++-4.8
+
+script:
+  - make
+  - mkdir build
+  - cd build
+  - cmake -DINSTDIR:STRING=~/services -DDEFUMASK:STRING=077 -DCMAKE_BUILD_TYPE:STRING=DEBUG -DUSE_RUN_CC_PL:BOOLEAN=ON ..
 
 notifications:
   irc:

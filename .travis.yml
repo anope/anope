@@ -3,6 +3,9 @@ language: cpp
 before_script:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
+    - mkdir build
+  - cd build
+  - cmake -DINSTDIR:STRING=~/services -DDEFUMASK:STRING=077 -DCMAKE_BUILD_TYPE:STRING=DEBUG -DUSE_RUN_CC_PL:BOOLEAN=ON ..
 
 addons:
   apt:
@@ -16,9 +19,6 @@ addons:
 
 script:
   - make
-  - mkdir build
-  - cd build
-  - cmake -DINSTDIR:STRING=~/services -DDEFUMASK:STRING=077 -DCMAKE_BUILD_TYPE:STRING=DEBUG -DUSE_RUN_CC_PL:BOOLEAN=ON ..
 
 notifications:
   irc:

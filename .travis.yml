@@ -2,6 +2,7 @@ language: cpp
 
 before_script:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo add-apt-repository -y ppa:george-edison55/precise-backports
   - sudo apt-get update -qq
   - mkdir build
   - cd build

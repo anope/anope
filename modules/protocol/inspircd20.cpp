@@ -77,6 +77,21 @@ class InspIRCd20Proto : public IRCDProto
 	bool IsIdentValid(const Anope::string &ident) anope_override { return insp12->IsIdentValid(ident); }
 };
 
+class InspIRCdAutoOpMode : public ChannelModeList
+{
+ public:
+	InspIRCdAutoOpMode(char mode) : ChannelModeList("AUTOOP", mode)
+	{
+	}
+
+	bool IsValid(Anope::string &mask) const anope_override
+	{
+		// We can not validate this because we don't know about the
+		// privileges of the setter so just reject attempts to set it.
+		return false;
+	}
+};
+
 class InspIRCdExtBan : public ChannelModeVirtual<ChannelModeList>
 {
 	char ext;
@@ -395,6 +410,8 @@ struct IRCDMessageCapab : Message::Capab
 				}
 				else if (modename.equals_cs("auditorium"))
 					cm = new ChannelMode("AUDITORIUM", modechar[0]);
+				else if (modename.equals_cs("autoop"))
+					cm = new InspIRCdAutoOpMode(modechar[0]);
 				else if (modename.equals_cs("ban"))
 					cm = new ChannelModeList("BAN", modechar[0]);
 				else if (modename.equals_cs("banexception"))

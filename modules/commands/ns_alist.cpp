@@ -88,7 +88,7 @@ class CommandNSAList : public Command
 			entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 			for (unsigned j = 0; j < access.paths.size(); ++j)
 			{
-				ChanAccess::Path &p = access.paths[i];
+				ChanAccess::Path &p = access.paths[j];
 
 				// not interested in indirect access
 				if (p.size() != 1)

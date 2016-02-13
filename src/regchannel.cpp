@@ -394,7 +394,7 @@ static void FindMatchesRecurse(ChannelInfo *ci, const User *u, const NickCore *a
 		ChanAccess *a = ci->GetAccess(i);
 		ChannelInfo *next = NULL;
 
-		if (a->Matches(u, u->Account(), next))
+		if (a->Matches(u, account, next))
 		{
 			ChanAccess::Path next_path = path;
 			next_path.push_back(a);

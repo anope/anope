@@ -384,6 +384,39 @@ ChanAccess *ChannelInfo::GetAccess(unsigned index) const
 	return acc;
 }
 
+static void FindMatchesRecurse(ChannelInfo *ci, const User *u, const NickCore *account, unsigned int depth, std::vector<ChanAccess::Path> &paths, ChanAccess::Path &path)
+{
+	if (depth > ChanAccess::MAX_DEPTH)
+		return;
+
+	for (unsigned int i = 0; i < ci->GetAccessCount(); ++i)
+	{
+		ChanAccess *a = ci->GetAccess(i);
+		ChannelInfo *next = NULL;
+
+		if (a->Matches(u, u->Account(), next))
+		{
+			ChanAccess::Path next_path = path;
+			next_path.push_back(a);
+
+			paths.push_back(next_path);
+		}
+		else if (next)
+		{
+			ChanAccess::Path next_path = path;
+			next_path.push_back(a);
+
+			FindMatchesRecurse(next, u, account, depth + 1, paths, next_path);
+		}
+	}
+}
+
+static void FindMatches(AccessGroup &group, ChannelInfo *ci, const User *u, const NickCore *account)
+{
+	ChanAccess::Path path;
+	FindMatchesRecurse(ci, u, account, 0, group.paths, path);
+}
+
 AccessGroup ChannelInfo::AccessFor(const User *u, bool updateLastUsed)
 {
 	AccessGroup group;
@@ -404,20 +437,20 @@ AccessGroup ChannelInfo::AccessFor(const User *u, bool updateLastUsed)
 	group.ci = this;
 	group.nc = nc;
 
-	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
-	{
-		ChanAccess *a = this->GetAccess(i);
-		if (a->Matches(u, u->Account(), group.path))
-			group.push_back(a);
-	}
+	FindMatches(group, this, u, u->Account());
 
-	if (group.founder || !group.empty())
+	if (group.founder || !group.paths.empty())
 	{
 		if (updateLastUsed)
 			this->last_used = Anope::CurTime;
 
-		for (unsigned i = 0; i < group.size(); ++i)
-			group[i]->last_seen = Anope::CurTime;
+		for (unsigned i = 0; i < group.paths.size(); ++i)
+		{
+			ChanAccess::Path &p = group.paths[i];
+
+			for (unsigned int j = 0; j < p.size(); ++j)
+				p[j]->last_seen = Anope::CurTime;
+		}
 	}
 
 	return group;
@@ -431,14 +464,9 @@ AccessGroup ChannelInfo::AccessFor(const NickCore *nc, bool updateLastUsed)
 	group.ci = this;
 	group.nc = nc;
 
-	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
-	{
-		ChanAccess *a = this->GetAccess(i);
-		if (a->Matches(NULL, nc, group.path))
-			group.push_back(a);
-	}
+	FindMatches(group, this, NULL, nc);
 
-	if (group.founder || !group.empty())
+	if (group.founder || !group.paths.empty())
 		if (updateLastUsed)
 			this->last_used = Anope::CurTime;
 
@@ -452,28 +480,34 @@ unsigned ChannelInfo::GetAccessCount() const
 	return this->access->size();
 }
 
-unsigned ChannelInfo::GetDeepAccessCount() const
+static unsigned int GetDeepAccessCount(const ChannelInfo *ci, std::set<const ChannelInfo *> &seen, unsigned int depth)
 {
-	ChanAccess::Path path;
-	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
+	if (depth > ChanAccess::MAX_DEPTH || seen.count(ci))
+		return 0;
+	seen.insert(ci);
+
+	unsigned int total = 0;
+
+	for (unsigned int i = 0; i < ci->GetAccessCount(); ++i)
 	{
-		ChanAccess *a = this->GetAccess(i);
-		a->Matches(NULL, NULL, path);
+		ChanAccess::Path path;
+		ChanAccess *a = ci->GetAccess(i);
+		ChannelInfo *next = NULL;
+
+		a->Matches(NULL, NULL, next);
+		++total;
+
+		if (next)
+			total += GetDeepAccessCount(ci, seen, depth + 1);
 	}
 
-	unsigned count = this->GetAccessCount();
-	std::set<const ChannelInfo *> channels;
-	channels.insert(this);
-	for (ChanAccess::Set::iterator it = path.first.begin(); it != path.first.end(); ++it)
-	{
-		const ChannelInfo *ci = it->first->ci;
-		if (!channels.count(ci))
-		{
-			channels.count(ci);
-			count += ci->GetAccessCount();
-		}
-	}
-	return count;
+	return total;
+}
+
+unsigned ChannelInfo::GetDeepAccessCount() const
+{
+	std::set<const ChannelInfo *> seen;
+	return ::GetDeepAccessCount(this, seen, 0);
 }
 
 ChanAccess *ChannelInfo::EraseAccess(unsigned index)

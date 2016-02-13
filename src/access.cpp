@@ -250,8 +250,10 @@ Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 	return access;
 }
 
-bool ChanAccess::Matches(const User *u, const NickCore *acc, Path &p) const
+bool ChanAccess::Matches(const User *u, const NickCore *acc, ChannelInfo* &next) const
 {
+	next = NULL;
+
 	if (this->nc)
 		return this->nc == acc;
 
@@ -276,28 +278,7 @@ bool ChanAccess::Matches(const User *u, const NickCore *acc, Path &p) const
 	
 	if (IRCD->IsChannelValid(this->mask))
 	{
-		ChannelInfo *tci = ChannelInfo::Find(this->mask);
-		if (tci)
-		{
-			for (unsigned i = 0; i < tci->GetAccessCount(); ++i)
-			{
-				ChanAccess *a = tci->GetAccess(i);
-				std::pair<const ChanAccess *, const ChanAccess *> pair = std::make_pair(this, a);
-
-				std::pair<Set::iterator, Set::iterator> range = p.first.equal_range(this);
-				for (; range.first != range.second; ++range.first)
-					if (range.first->first == pair.first && range.first->second == pair.second)
-						goto cont;
-
-				p.first.insert(pair);
-				if (a->Matches(u, acc, p))
-					p.second.insert(pair);
-
-				cont:;
-			}
-
-			return p.second.count(this) > 0;
-		}
+		next = ChannelInfo::Find(this->mask);
 	}
 	
 	return false;
@@ -347,37 +328,30 @@ bool ChanAccess::operator<=(const ChanAccess &other) const
 	return !(*this > other);
 }
 
-AccessGroup::AccessGroup() : std::vector<ChanAccess *>()
+AccessGroup::AccessGroup()
 {
 	this->ci = NULL;
 	this->nc = NULL;
 	this->super_admin = this->founder = false;
 }
 
-static bool HasPriv(const AccessGroup &ag, const ChanAccess *access, const Anope::string &name)
+static bool HasPriv(const ChanAccess::Path &path, const Anope::string &name)
 {
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnCheckPriv, MOD_RESULT, (access, name));
-	if (MOD_RESULT == EVENT_ALLOW || access->HasPriv(name))
+	if (path.empty())
+		return false;
+
+	for (unsigned int i = 0; i < path.size(); ++i)
 	{
-		typedef std::multimap<const ChanAccess *, const ChanAccess *> path;
-		std::pair<path::const_iterator, path::const_iterator> it = ag.path.second.equal_range(access);
-		if (it.first != it.second)
-			/* check all of the paths for this entry */
-			for (; it.first != it.second; ++it.first)
-			{
-				const ChanAccess *a = it.first->second;
-				/* if only one path fully matches then we are ok */
-				if (HasPriv(ag, a, name))
-					return true;
-			}
-		else
-			/* entry is the end of a chain, all entries match, ok */
-			return true;
+		ChanAccess *access = path[i];
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnCheckPriv, MOD_RESULT, (access, name));
+
+		if (MOD_RESULT != EVENT_ALLOW && !access->HasPriv(name))
+			return false;
 	}
 
-	/* entry does not match or none of the chains fully match */
-	return false;
+	return true;
 }
 
 bool AccessGroup::HasPriv(const Anope::string &name) const
@@ -393,7 +367,7 @@ bool AccessGroup::HasPriv(const Anope::string &name) const
 	bool auto_mode = !name.find("AUTO");
 
 	/* Only grant founder privilege if this isn't an auto mode or if they don't match any entries in this group */
-	if ((!auto_mode || this->empty()) && this->founder)
+	if ((!auto_mode || paths.empty()) && this->founder)
 		return true;
 
 	EventReturn MOD_RESULT;
@@ -401,23 +375,40 @@ bool AccessGroup::HasPriv(const Anope::string &name) const
 	if (MOD_RESULT != EVENT_CONTINUE)
 		return MOD_RESULT == EVENT_ALLOW;
 
-	for (unsigned i = this->size(); i > 0; --i)
+	for (unsigned int i = paths.size(); i > 0; --i)
 	{
-		ChanAccess *access = this->at(i - 1);
+		const ChanAccess::Path &path = paths[i - 1];
 
-		if (::HasPriv(*this, access, name))
+		if (::HasPriv(path, name))
 			return true;
 	}
 
 	return false;
 }
 
+static ChanAccess *HighestInPath(const ChanAccess::Path &path)
+{
+	ChanAccess *highest = NULL;
+
+	for (unsigned int i = 0; i < path.size(); ++i)
+		if (highest == NULL || *path[i] > *highest)
+			highest = path[i];
+
+	return highest;
+}
+
 const ChanAccess *AccessGroup::Highest() const
 {
 	ChanAccess *highest = NULL;
-	for (unsigned i = 0; i < this->size(); ++i)
-		if (highest == NULL || *this->at(i) > *highest)
-			highest = this->at(i);
+
+	for (unsigned int i = 0; i < paths.size(); ++i)
+	{
+		ChanAccess *hip = HighestInPath(paths[i]);
+
+		if (highest == NULL || *hip > *highest)
+			highest = hip;
+	}
+
 	return highest;
 }
 

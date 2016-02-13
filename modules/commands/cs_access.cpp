@@ -370,7 +370,7 @@ class CommandCSAccess : public Command
 					if (ci->c)
 						for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
 						{
-							ChanAccess::Path p;
+							ChannelInfo *p;
 							if (access->Matches(cit->second->user, cit->second->user->Account(), p))
 								timebuf = "Now";
 						}
@@ -407,7 +407,7 @@ class CommandCSAccess : public Command
 				if (ci->c)
 					for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
 					{
-						ChanAccess::Path p;
+						ChannelInfo *p;
 						if (access->Matches(cit->second->user, cit->second->user->Account(), p))
 							timebuf = "Now";
 					}

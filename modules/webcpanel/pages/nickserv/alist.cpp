@@ -46,10 +46,9 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 
 		replacements["NUMBERS"] = stringify(chan_count);
 		replacements["CHANNELS"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
-		Anope::string access_str;
-		for (unsigned i = 0; i < access.size(); ++i)
-			access_str += ", " + access[i]->AccessSerialize();
-		replacements["ACCESSES"] = access_str.substr(2);
+
+		const ChanAccess *highest = access.Highest();
+		replacements["ACCESSES"] = highest ? highest->AccessSerialize() : "";
 	}
 
 	TemplateFileServer page("nickserv/alist.html");

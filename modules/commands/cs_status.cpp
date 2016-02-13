@@ -57,11 +57,26 @@ public:
 			{
 				source.Reply(_("Access for \002%s\002 on \002%s\002:"), nick.c_str(), ci->name.c_str());
 
-				for (unsigned i = 0; i < ag.size(); ++i)
+				for (unsigned i = 0; i < ag.paths.size(); ++i)
 				{
-					ChanAccess *acc = ag[i];
+					ChanAccess::Path &p = ag.paths[i];
 
-					source.Reply(_("\002%s\002 matches access entry %s, which has privilege %s."), nick.c_str(), acc->Mask().c_str(), acc->AccessSerialize().c_str());
+					if (p.empty())
+						continue;
+
+					if (p.size() == 1)
+					{
+						ChanAccess *acc = p[0];
+
+						source.Reply(_("\002%s\002 matches access entry %s, which has privilege %s."), nick.c_str(), acc->Mask().c_str(), acc->AccessSerialize().c_str());
+					}
+					else
+					{
+						ChanAccess *first = p[0];
+						ChanAccess *acc = p[p.size() - 1];
+
+						source.Reply(_("\002%s\002 matches access entry %s (from entry %s), which has privilege %s."), nick.c_str(), acc->Mask().c_str(), first->Mask().c_str(), acc->AccessSerialize().c_str());
+					}
 				}
 			}
 

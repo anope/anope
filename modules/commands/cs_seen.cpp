@@ -236,9 +236,14 @@ class CommandSeen : public Command
 
 		AccessGroup ag = source.c->ci->AccessFor(na->nc);
 		time_t last = 0;
-		for (unsigned i = 0; i < ag.size(); ++i)
+		for (unsigned int i = 0; i < ag.paths.size(); ++i)
 		{
-			ChanAccess *a = ag[i];
+			ChanAccess::Path &p = ag.paths[i];
+
+			if (p.empty())
+				continue;
+
+			ChanAccess *a = p[p.size() - 1];
 
 			if (a->GetAccount() == na->nc && a->last_seen > last)
 				last = a->last_seen;

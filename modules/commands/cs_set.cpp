@@ -742,10 +742,9 @@ class CommandCSSetSecure : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Enables or disables security features for a\n"
-			"channel. When \002%s\002 is set, only users who have\n"
-			"registered their nicknames and IDENTIFY'd\n"
-			"with their password will be given access to the channel\n"
-			"as controlled by the access list."), this->name.c_str());
+			"channel. When \002SECURE\002 is set, only users who have\n"
+			"identified to services, and are not only recognized, will be\n"
+			"given access to channels from account-based access entries."));
 		return true;
 	}
 };

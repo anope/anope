@@ -97,7 +97,7 @@ class External : public Mechanism
 		}
 		else if (m.type == "C")
 		{
-			if (!certs)
+			if (!certs || mysess->cert.empty())
 			{
 				sasl->Fail(sess);
 				delete sess;

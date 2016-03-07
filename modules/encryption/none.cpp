@@ -30,7 +30,8 @@ class ENone : public Module
 		, EventHook<Event::Decrypt>(this)
 		, EventHook<Event::CheckAuthentication>(this)
 	{
-
+		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			throw ModuleException("enc_none is deprecated and can not be used as a primary encryption method");
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override

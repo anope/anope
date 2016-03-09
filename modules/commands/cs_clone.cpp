@@ -169,6 +169,7 @@ public:
 			delete target_ci;
 			target_ci = new ChannelInfo(*ci);
 			target_ci->name = target;
+			target_ci->time_registered = Anope::CurTime;
 			(*RegisteredChannelList)[target_ci->name] = target_ci;
 			target_ci->c = Channel::Find(target_ci->name);
 

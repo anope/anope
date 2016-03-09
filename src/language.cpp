@@ -75,6 +75,10 @@ const char *Language::Translate(const NickCore *nc, const char *string)
 
 #if GETTEXT_FOUND
 
+#ifdef __USE_GNU_GETTEXT
+extern "C" int _nl_msg_cat_cntr;
+#endif
+
 const char *Language::Translate(const char *lang, const char *string)
 {
 	if (!string || !*string)
@@ -82,6 +86,10 @@ const char *Language::Translate(const char *lang, const char *string)
 
 	if (!lang || !*lang)
 		lang = Config->DefLanguage.c_str();
+
+#ifdef __USE_GNU_GETTEXT
+	++_nl_msg_cat_cntr;
+#endif
 
 #ifdef _WIN32
 	SetThreadLocale(MAKELCID(MAKELANGID(WindowsGetLanguage(lang), SUBLANG_DEFAULT), SORT_DEFAULT));

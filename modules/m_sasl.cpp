@@ -223,7 +223,17 @@ class SASLService : public SASL::Service, public Timer
 
 	void Succeed(Session *session, NickCore *nc) anope_override
 	{
-		IRCD->SendSVSLogin(session->uid, nc->display);
+		// If the user is already introduced then we log them in now.
+		// Otherwise, we send an SVSLOGIN to log them in later.
+		User *user = User::Find(session->uid);
+		if (user)
+		{
+			user->Login(nc);
+		}
+		else
+		{
+			IRCD->SendSVSLogin(session->uid, nc->display);
+		}
 		this->SendMessage(session, "D", "S");
 	}
 

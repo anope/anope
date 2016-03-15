@@ -227,6 +227,7 @@ class CoreExport IRCDProto : public Service
 	 */
 	virtual void SendOper(User *u);
 
+	virtual void SendSASLMechanisms(std::vector<Anope::string> &) { }
 	virtual void SendSASLMessage(const SASL::Message &) { }
 	virtual void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) { }
 

@@ -276,6 +276,21 @@ class ModuleSASL : public Module
 	Plain plain;
 	External *external;
 
+	std::vector<Anope::string> mechs;
+
+	void CheckMechs()
+	{
+		std::vector<Anope::string> newmechs = ::Service::GetServiceKeys("SASL::Mechanism");
+		if (newmechs == mechs)
+			return;
+
+		mechs = newmechs;
+
+		// If we are connected to the network then broadcast the mechlist.
+		if (Me && Me->IsSynced())
+			IRCD->SendSASLMechanisms(mechs);
+	}
+
  public:
 	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		sasl(this), plain(this), external(NULL)
@@ -283,6 +298,7 @@ class ModuleSASL : public Module
 		try
 		{
 			external = new External(this);
+			CheckMechs();
 		}
 		catch (ModuleException &) { }
 	}
@@ -290,6 +306,22 @@ class ModuleSASL : public Module
 	~ModuleSASL()
 	{
 		delete external;
+	}
+
+	void OnModuleLoad(User *, Module *) anope_override
+	{
+		CheckMechs();
+	}
+
+	void OnModuleUnload(User *, Module *) anope_override
+	{
+		CheckMechs();
+	}
+
+	void OnPreUplinkSync(Server *) anope_override
+	{
+		// We have not yet sent a mechanism list so always do it here.
+		IRCD->SendSASLMechanisms(mechs);
 	}
 };
 

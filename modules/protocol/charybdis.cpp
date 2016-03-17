@@ -63,6 +63,18 @@ class CharybdisProto : public IRCDProto
 	void SendLogin(User *u, NickAlias *na) anope_override { ratbox->SendLogin(u, na); }
 	void SendLogout(User *u) anope_override { ratbox->SendLogout(u); }
 
+	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) anope_override
+	{
+		Anope::string mechlist;
+		
+		for (unsigned i = 0; i < mechanisms.size(); ++i)
+		{
+			mechlist += "," + mechanisms[i];
+		}
+		
+		UplinkSocket::Message(Me) << "ENCAP * MECHLIST :" << (mechanisms.empty() ? "" : mechlist.substr(1));
+	}
+
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
 		UplinkSocket::Message(Me) << "RESV * " << x->mask << " :" << x->GetReason();

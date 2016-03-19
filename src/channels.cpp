@@ -168,8 +168,7 @@ void Channel::DeleteUser(User *user)
 		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete non-existent channel " << this->name << " from " << user->nick << "'s channel list";
 	delete cu;
 
-	if (std::find(deleting.begin(), deleting.end(), this) == deleting.end())
-		deleting.push_back(this);
+	QueueForDeletion();
 }
 
 ChanUserContainer *Channel::FindUser(User *u) const
@@ -936,6 +935,12 @@ Channel *Channel::FindOrCreate(const Anope::string &name, bool &created, time_t 
 	if (!chan)
 		chan = new Channel(name, ts);
 	return chan;
+}
+
+void Channel::QueueForDeletion()
+{
+	if (std::find(deleting.begin(), deleting.end(), this) == deleting.end())
+		deleting.push_back(this);
 }
 
 void Channel::DeleteChannels()

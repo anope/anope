@@ -302,6 +302,8 @@ class CoreExport Channel : public Base, public Extensible
 	 */
 	static Channel *FindOrCreate(const Anope::string &name, bool &created, time_t ts = Anope::CurTime);
 
+	void QueueForDeletion();
+
 	static void DeleteChannels();
 };
 

@@ -406,7 +406,7 @@ class InspIRCd12Proto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENCAP " << message.target.substr(0, 3) << " SASL " << message.source << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : (" " + message.ext));
 	}
 
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) anope_override
+	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
 	{
 		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << acc;
 

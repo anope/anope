@@ -111,13 +111,6 @@ endif()
 
 # If we are not using Visual Studio, we'll run the following checks
 if(NOT MSVC)
-  # Check if the C++ compiler can accept the -pipe flag, and add it to the compile flags if it works
-  check_cxx_compiler_flag(-pipe HAVE_PIPE_FLAG)
-  # If the flag was accepted, add it to the list of flags
-  if(HAVE_PIPE_FLAG)
-    set(CXXFLAGS "${CXXFLAGS} -pipe")
-  endif()
-
   # The following are additional library checks, they are not required for Windows
   if(NOT WIN32)
     # Check if socket is within the socket library (if the library exists), and add it to the linker flags if needed

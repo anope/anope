@@ -374,7 +374,7 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message(BotInfo::Find(message.source)) << "SASL " << message.target.substr(0, p) << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : " " + message.ext);
 	}
 
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) anope_override
+	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
 	{
 		size_t p = uid.find('!');
 		if (p == Anope::string::npos)

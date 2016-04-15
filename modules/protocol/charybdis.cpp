@@ -237,7 +237,7 @@ struct IRCDMessageEUID : IRCDMessage
 		if (params[9] != "*")
 			na = NickAlias::Find(params[9]);
 
-		User::OnIntroduce(params[0], params[4], params[8], params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? *na->nc : NULL);
+		User::OnIntroduce(params[0], params[4], (params[8] != "*" ? params[8] : params[5]), params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? *na->nc : NULL);
 	}
 };
 

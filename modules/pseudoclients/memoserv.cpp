@@ -67,6 +67,7 @@ class MemoServCore : public Module, public MemoServService
 			sender->lastmemosend = Anope::CurTime;
 
 		Memo *m = new Memo();
+		m->mi = mi;
 		mi->memos->push_back(m);
 		m->owner = target;
 		m->sender = source;

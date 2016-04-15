@@ -18,6 +18,7 @@
 class CoreExport Memo : public Serializable
 {
  public:
+	MemoInfo *mi;
  	bool unread;
 	bool receipt;
  	Memo();

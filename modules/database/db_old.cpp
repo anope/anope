@@ -590,6 +590,7 @@ static void LoadNicks()
 				READ(read_string(m->text, f));
 				m->owner = nc->display;
 				nc->memos.memos->push_back(m);
+				m->mi = &nc->memos;
 			}
 			READ(read_uint16(&u16, f));
 			READ(read_int16(&i16, f));
@@ -956,6 +957,7 @@ static void LoadChannels()
 				READ(read_string(m->text, f));
 				m->owner = ci->name;
 				ci->memos.memos->push_back(m);
+				m->mi = &ci->memos;
 			}
 
 			READ(read_string(buffer, f));

@@ -19,13 +19,12 @@
 
 Memo::Memo() : Serializable("Memo")
 {
+	mi = NULL;
 	unread = receipt = false;
 }
 
 Memo::~Memo()
 {
-	bool ischan;
-	MemoInfo *mi = MemoInfo::GetMemoInfo(this->owner, ischan);
 	if (mi)
 	{
 		std::vector<Memo *>::iterator it = std::find(mi->memos->begin(), mi->memos->end(), this);
@@ -60,7 +59,10 @@ Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 	if (obj)
 		m = anope_dynamic_static_cast<Memo *>(obj);
 	else
+	{
 		m = new Memo();
+		m->mi = mi;
+	}
 
 	m->owner = owner;
 	data["time"] >> m->time;
@@ -99,7 +101,14 @@ void MemoInfo::Del(unsigned index)
 {
 	if (index >= this->memos->size())
 		return;
-	delete this->GetMemo(index);
+
+	Memo *m = this->GetMemo(index);
+
+	std::vector<Memo *>::iterator it = std::find(memos->begin(), memos->end(), m);
+	if (it != memos->end())
+		memos->erase(it);
+
+	delete m;
 }
 
 bool MemoInfo::HasIgnore(User *u)

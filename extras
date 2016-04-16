@@ -148,12 +148,7 @@ while (1)
 
 	if ($input eq "q") {
 		if (-e "build/CMakeFiles") {
-			if (-e "cmake-bin") {
-				my $cmake_path = `find cmake-bin -name cmake -print0`;
-				system($cmake_path, "build/.");
-			} else {
-				system("cmake", "build/.");
-			}
+			system("cmake", "build/.");
 			print "\nNow cd build, then run make to build Anope.\n\n";
 		} else {
 			print "\nBuild directory not found. You should run ./Config now.\n\n"

@@ -226,10 +226,10 @@ class SASLService : public SASL::Service, public Timer
 		// If the user is already introduced then we log them in now.
 		// Otherwise, we send an SVSLOGIN to log them in later.
 		User *user = User::Find(session->uid);
-		const NickAlias *na = NickAlias::Find(nc->display);
+		NickAlias *na = NickAlias::Find(nc->display);
 		if (user)
 		{
-			user->Login(nc);
+			user->Identify(na);
 		}
 		else
 		{

@@ -239,6 +239,11 @@ option(USE_PCH "Use precompiled headers" OFF)
 # source include directory so the precompiled headers work correctly.
 include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/language ${Anope_SOURCE_DIR}/modules/pseudoclients)
 
+# Pass on REPRODUCIBLE_BUILD
+if(REPRODUCIBLE_BUILD)
+  add_definitions(-DREPRODUCIBLE_BUILD)
+endif(REPRODUCIBLE_BUILD)
+
 # If using Windows, always add the _WIN32 define
 if(WIN32)
   add_definitions(-D_WIN32)

@@ -350,7 +350,9 @@ namespace Anope
 	template<typename T> using hash_map = std::unordered_map<string, T, hash_ci, compare_ci>;
 	template<typename T> using locale_hash_map = std::unordered_map<string, T, hash_locale, compare_locale>;
 
+#ifndef REPRODUCIBLE_BUILD
 	static const char *const compiled = __TIME__ " " __DATE__;
+#endif
 
 	/** The time Anope started.
 	 */

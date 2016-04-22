@@ -405,7 +405,7 @@ class OSNews : public Module
 
 		int start = 0;
 	       
-		if (type != NEWS_RANDOM)
+		if (Type != NEWS_RANDOM)
 		{
 			start = newsList.size() - news_count;
 			if (start < 0)

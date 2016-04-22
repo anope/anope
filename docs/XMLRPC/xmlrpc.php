@@ -113,6 +113,21 @@ class AnopeXMLRPC
     {
         return $this->run("channel", [$channel]);
     }
+    
+    /**
+     * Sent a notice to a user.
+     * Returns an array containing channel information, or an array of size one
+     * (just containing the name) if the channel does not exist
+     *
+     * @param $source
+     * @param $target
+     * @param $message
+     * @return array|null
+     */
+    public function notice($source, $target, $message)
+    {
+        return $this->run("notice", [$source, $target, $message]);
+    }
 
     /**
      * Like channel(), but different.

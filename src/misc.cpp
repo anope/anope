@@ -632,7 +632,11 @@ Anope::string Anope::VersionShort()
 
 Anope::string Anope::VersionBuildString()
 {
+#ifdef REPRODUCIBLE_BUILD
+	Anope::string s = "build #" + stringify(BUILD);
+#else
 	Anope::string s = "build #" + stringify(BUILD) + ", compiled " + Anope::compiled;
+#endif
 	Anope::string flags;
 
 #ifdef DEBUG_BUILD

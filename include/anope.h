@@ -336,7 +336,9 @@ namespace Anope
 	template<typename T> class multimap : public std::multimap<string, T, ci::less> { };
 	template<typename T> class hash_map : public TR1NS::unordered_map<string, T, hash_ci, compare> { };
 
+#ifndef REPRODUCIBLE_BUILD
 	static const char *const compiled = __TIME__ " " __DATE__;
+#endif
 
 	/** The time Anope started.
 	 */

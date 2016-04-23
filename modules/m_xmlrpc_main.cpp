@@ -273,6 +273,10 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			return;
 
 		u->SendMessage(bi, message);
+		
+		/* This is cheap and nasty, but it stops a 404 error from occurring. */
+		if (!message.empty())
+			request.reply("return", 200);
 	}
 };
 

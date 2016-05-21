@@ -1279,7 +1279,7 @@ struct IRCDMessageUID : IRCDMessage
 
 		User *u = User::OnIntroduce(nickname, username, hostname, vhost, ip, source.GetServer(), info, user_ts, umodes, uid, na ? *na->nc : NULL);
 
-		if (!chost.empty() && chost != u->GetCloakedHost())
+		if (u && !chost.empty() && chost != u->GetCloakedHost())
 			u->SetCloakedHost(chost);
 	}
 };

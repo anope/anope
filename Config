@@ -166,7 +166,7 @@ done
 # Check for CMake and (optionally) install it
 ###########################################################################
 
-which cmake > /dev/null
+cmake --version 2>&1 > /dev/null
 if [ $? -ne 0 ] ; then
 	clear
 	echo "Anope requires CMake 2.4 or newer, which can be downloaded at http://cmake.org or through your system's package manager."

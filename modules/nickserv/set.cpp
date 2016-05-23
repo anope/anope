@@ -160,10 +160,7 @@ class CommandNSSetPassword : public Command
 		Anope::Encrypt(param, tmp_pass);
 		source.nc->SetPassword(tmp_pass);
 
-		if (Anope::Decrypt(source.nc->GetPassword(), tmp_pass))
-			source.Reply(_("Password for \002{0}\002 changed to \002{1]\002."), source.nc->GetDisplay(), tmp_pass);
-		else
-			source.Reply(_("Password for \002{0}\002 changed."), source.nc->GetDisplay());
+		source.Reply(_("Password for \002{0}\002 changed."), source.nc->GetDisplay());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -223,10 +220,7 @@ class CommandNSSASetPassword : public Command
 		Anope::string tmp_pass;
 		Anope::Encrypt(params[1], tmp_pass);
 		nc->SetPassword(tmp_pass);
-		if (Anope::Decrypt(nc->GetPassword(), tmp_pass) == 1)
-			source.Reply(_("Password for \002{0}\002 changed to \002{1}\002."), nc->GetDisplay(), tmp_pass);
-		else
-			source.Reply(_("Password for \002{0}\002 changed."), nc->GetDisplay());
+		source.Reply(_("Password for \002{0}\002 changed."), nc->GetDisplay());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

@@ -244,10 +244,6 @@ class CommandNSRegister : public Command
 
 		source.Reply(_("\002{0}\002 has been registered."), u_nick);
 
-		Anope::string tmp_pass;
-		if (Anope::Decrypt(na->GetAccount()->GetPassword(), tmp_pass))
-			source.Reply(_("Your password is \002{0}\002 - remember this for later use."), tmp_pass);
-
 		if (nsregister.equals_ci("admin"))
 		{
 			nc->SetS<bool>("UNCONFIRMED", true);

@@ -474,14 +474,6 @@ namespace Anope
 	 */
 	extern CoreExport void Encrypt(const Anope::string &src, Anope::string &dest);
 
-	/** Decrypts what is in 'src' to 'dest'.
-	 * @param src The source string to decrypt
-	 * @param dest The destination where the decrypted string is placed
-	 * @return true if decryption was successful. This is usually not the case
-	 * as most encryption methods we use are one way.
-	 */
-	extern CoreExport bool Decrypt(const Anope::string &src, Anope::string &dest);
-
 	/** Returns a sequence of data formatted as the format argument specifies.
 	 ** After the format parameter, the function expects at least as many
 	 ** additional arguments as specified in format.

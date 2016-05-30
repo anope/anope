@@ -139,6 +139,25 @@ struct IRCDMessageEncap : IRCDMessage
 	}
 };
 
+struct IRCDMessageJoin : Message::Join
+{
+	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		if (params.size() == 1 && params[0] == "0")
+			return Message::Join::Run(source, params);
+
+		if (params.size() < 2)
+			return;
+
+		std::vector<Anope::string> p = params;
+		p.erase(p.begin());
+
+		return Message::Join::Run(source, p);
+	}
+};
+
 struct IRCDMessagePass : IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -229,11 +248,12 @@ class ProtoRatbox : public Module
 	Message::Whois message_whois;
 
 	/* Hybrid message handlers */
-	ServiceAlias message_bmask, message_join, message_nick, message_pong, message_sid,
+	ServiceAlias message_bmask, message_nick, message_pong, message_sid,
 			message_sjoin, message_tmode;
 
 	/* Our message handlers */
 	IRCDMessageEncap message_encap;
+	IRCDMessageJoin message_join;
 	IRCDMessagePass message_pass;
 	IRCDMessageServer message_server;
 	IRCDMessageTBurst message_tburst;
@@ -296,12 +316,11 @@ class ProtoRatbox : public Module
 		message_ping(this), message_privmsg(this), message_quit(this), message_squit(this), message_stats(this),
 		message_time(this), message_topic(this), message_version(this), message_whois(this),
 
-		message_bmask("IRCDMessage", "ratbox/bmask", "hybrid/bmask"), message_join("IRCDMessage", "ratbox/join", "hybrid/join"),
-		message_nick("IRCDMessage", "ratbox/nick", "hybrid/nick"), message_pong("IRCDMessage", "ratbox/pong", "hybrid/pong"),
-		message_sid("IRCDMessage", "ratbox/sid", "hybrid/sid"), message_sjoin("IRCDMessage", "ratbox/sjoin", "hybrid/sjoin"),
-		message_tmode("IRCDMessage", "ratbox/tmode", "hybrid/tmode"),
+		message_bmask("IRCDMessage", "ratbox/bmask", "hybrid/bmask"), message_nick("IRCDMessage", "ratbox/nick", "hybrid/nick"),
+		message_pong("IRCDMessage", "ratbox/pong", "hybrid/pong"), message_sid("IRCDMessage", "ratbox/sid", "hybrid/sid"),
+		message_sjoin("IRCDMessage", "ratbox/sjoin", "hybrid/sjoin"), message_tmode("IRCDMessage", "ratbox/tmode", "hybrid/tmode"),
 
-		message_encap(this), message_pass(this), message_server(this), message_tburst(this), message_uid(this)
+		message_encap(this), message_join(this), message_pass(this), message_server(this), message_tburst(this), message_uid(this)
 	{
 
 		if (ModuleManager::LoadModule("hybrid", User::Find(creator)) != MOD_ERR_OK)

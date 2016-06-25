@@ -663,17 +663,30 @@ class CommandBSKickRepeat : public CommandBSKickBase
 				kd->repeattimes = convertTo<int16_t>(times);
 			}
 			catch (const ConvertException &) { }
-			if (kd->repeattimes < 2)
+			if (kd->repeattimes < 1)
 				kd->repeattimes = 3;
 
 			kd->repeat = true;
 			if (kd->ttb[TTB_REPEAT])
-				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
-						"same thing %d times), and will place a ban after %d\n"
-						"kicks for the same user."), kd->repeattimes + 1, kd->ttb[TTB_REPEAT]);
+			{
+				if (kd->repeattimes != 1)
+					source.Reply(_("Bot will now kick for \002repeats\002 (users that repeat the\n"
+							"same message %d times), and will place a ban after %d\n"
+							"kicks for the same user."), kd->repeattimes, kd->ttb[TTB_REPEAT]);
+				else
+					source.Reply(_("Bot will now kick for \002repeats\002 (users that repeat the\n"
+							"same message %d time), and will place a ban after %d\n"
+							"kicks for the same user."), kd->repeattimes, kd->ttb[TTB_REPEAT]);
+			}
 			else
-				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
-					"same thing %d times)."), kd->repeattimes + 1);
+			{
+				if (kd->repeattimes != 1)
+					source.Reply(_("Bot will now kick for \002repeats\002 (users that repeat the\n"
+						"same message %d times)."), kd->repeattimes);
+				else
+					source.Reply(_("Bot will now kick for \002repeats\002 (users that repeat the\n"
+						"same message %d time)."), kd->repeattimes);
+			}
 		}
 		else if (params[1].equals_ci("OFF"))
 		{

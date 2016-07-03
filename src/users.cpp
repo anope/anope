@@ -507,6 +507,8 @@ void User::UpdateHost()
 		Anope::string last_realhost = this->GetIdent() + "@" + this->host;
 		na->last_usermask = last_usermask;
 		na->last_realhost = last_realhost;
+		// This is called on signon, and if users are introduced with an account it won't update
+		na->last_realname = this->realname;
 	}
 }
 

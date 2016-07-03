@@ -320,7 +320,7 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc)
 	time_t minutes = (t / 60) % 60;
 	time_t seconds = (t) % 60;
 
-	if (!days && !hours && !minutes)
+	if (!years && !days && !hours && !minutes)
 		return stringify(seconds) + " " + (seconds != 1 ? Language::Translate(nc, _("seconds")) : Language::Translate(nc, _("second")));
 	else
 	{

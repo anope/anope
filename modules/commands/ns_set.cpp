@@ -361,8 +361,14 @@ class CommandNSSetDisplay : public Command
 		Log(user_na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the display of " << user_na->nc->display << " to " << na->nick;
 
 		user_na->nc->SetDisplay(na);
-		if (source.GetUser())
-			IRCD->SendLogin(source.GetUser(), na);
+
+		/* Send updated account name */
+		for (std::list<User *>::iterator it = user_na->nc->users.begin(); it != user_na->nc->users.end(); ++it)
+		{
+			User *u = *it;
+			IRCD->SendLogin(u, user_na);
+		}
+
 		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
 	}
 

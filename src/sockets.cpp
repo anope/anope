@@ -39,6 +39,11 @@ void sockaddrs::clear()
 	memset(this, 0, sizeof(*this));
 }
 
+int sockaddrs::family() const
+{
+	return sa.sa_family;
+}
+
 size_t sockaddrs::size() const
 {
 	switch (sa.sa_family)

@@ -38,6 +38,10 @@ union CoreExport sockaddrs
 	 */
 	void clear();
 
+	/** Get address family.
+	 */
+	int family() const;
+
 	/** Get the size of the sockaddr we represent
 	 * @return The size
 	 */

@@ -273,6 +273,8 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			return;
 
 		u->SendMessage(bi, message);
+
+		request.reply("result", "Success");
 	}
 };
 

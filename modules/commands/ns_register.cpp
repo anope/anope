@@ -40,6 +40,20 @@ class CommandNSConfirm : public Command
 				FOREACH_MOD(OnNickConfirm, (source.GetUser(), na->nc));
 				Log(LOG_ADMIN, source, this) << "to confirm nick " << na->nick << " (" << na->nc->display << ")";
 				source.Reply(_("Nick \002%s\002 has been confirmed."), na->nick.c_str());
+
+				/* Login the users online already */
+				for (std::list<User *>::iterator it = na->nc->users.begin(); it != na->nc->users.end(); ++it)
+				{
+					User *u = *it;
+
+					IRCD->SendLogin(u, na);
+
+					NickAlias *u_na = NickAlias::Find(u->nick);
+
+					/* Set +r if they're on a nick in the group */
+					if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && u_na && *u_na->nc == *na->nc)
+						u->SetMode(source.service, "REGISTERED");
+				}
 			}
 		}
 		else if (source.nc)

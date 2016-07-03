@@ -97,7 +97,12 @@ class SQLineManager : public XLineManager
 				u->Kill(Config->GetClient("OperServ"), "Q-Lined: " + x->reason);
 		}
 		else if (x->mask[0] != '#' || IRCD->CanSQLineChannel)
+		{
 			IRCD->SendSQLine(u, x);
+			/* If it is an oper, assume they're walking it, otherwise kill for good measure */
+			if (u && !u->HasMode("OPER"))
+				u->Kill(Config->GetClient("OperServ"), "Q-Lined: " + x->reason);
+		}
 	}
 
 	void SendDel(XLine *x) anope_override

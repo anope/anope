@@ -354,8 +354,7 @@ class OSDefcon : public Module
 		dconfig.message = block->Get<const Anope::string>("message");
 		dconfig.offmessage = block->Get<const Anope::string>("offmessage");
 
-		Module *session = ModuleManager::FindModule("os_session");
-		block = conf->GetModule(session);
+		block = conf->GetModule("os_session");
 
 		dconfig.max_session_kill = block->Get<int>("maxsessionkill");
 		dconfig.session_autokill_expiry = block->Get<time_t>("sessionautokillexpiry");

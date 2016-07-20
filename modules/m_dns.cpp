@@ -103,8 +103,7 @@ class Packet : public Query
 		/* +1 pos either to one byte after the compression pointer or one byte after the ending \0 */
 		++pos;
 
-		if (name.empty())
-			throw SocketException("Unable to unpack name - no name");
+		/* Empty names are valid (root domain) */
 
 		Log(LOG_DEBUG_2) << "Resolver: UnpackName successfully unpacked " << name;
 
@@ -253,11 +252,18 @@ class Packet : public Query
 		for (unsigned i = 0; i < ancount; ++i)
 			this->answers.push_back(this->UnpackResourceRecord(input, len, packet_pos));
 
-		for (unsigned i = 0; i < nscount; ++i)
-			this->authorities.push_back(this->UnpackResourceRecord(input, len, packet_pos));
+		try
+		{
+			for (unsigned i = 0; i < nscount; ++i)
+				this->authorities.push_back(this->UnpackResourceRecord(input, len, packet_pos));
 
-		for (unsigned i = 0; i < arcount; ++i)
-			this->additional.push_back(this->UnpackResourceRecord(input, len, packet_pos));
+			for (unsigned i = 0; i < arcount; ++i)
+				this->additional.push_back(this->UnpackResourceRecord(input, len, packet_pos));
+		}
+		catch (const SocketException &ex)
+		{
+			Log(LOG_DEBUG_2) << "Unable to parse ns/ar records: " << ex.GetReason();
+		}
 	}
 
 	unsigned short Pack(unsigned char *output, unsigned short output_size)

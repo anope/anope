@@ -48,5 +48,5 @@ endif(NOT WIN32)
 
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the tools directory
 if(NOT WIN32 AND RUNGROUP)
-  install(CODE "execute_process(COMMAND ${CHMOD} 2770 \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin\")")
+  install(CODE "execute_process(COMMAND ${CHMOD} 2770 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin\")")
 endif(NOT WIN32 AND RUNGROUP)

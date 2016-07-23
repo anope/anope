@@ -1,4 +1,4 @@
-Anope Version 2.0.4-git
+Anope Version 2.0.4
 -------------------
 Add notice rpc method to XMLRPC
 Fix access check in cs_updown to not allow actions on users with equal access

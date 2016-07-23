@@ -31,13 +31,29 @@ class ChannelModeLargeBan : public ChannelMode
 
 class CharybdisProto : public IRCDProto
 {
+	BotInfo *FindIntroduced()
+	{
+		BotInfo *bi = Config->GetClient("OperServ");
+		
+		if (bi && bi->introduced)
+			return bi;
+		
+		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+			if (it->second->introduced)
+				return it->second;
+			
+		return NULL;
+	}
+
  public:
+	
 	CharybdisProto(Module *creator) : IRCDProto(creator, "Charybdis 3.4+")
 	{
 		DefaultPseudoclientModes = "+oiS";
 		CanCertFP = true;
 		CanSNLine = true;
 		CanSQLine = true;
+		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanSVSNick = true;
 		CanSVSHold = true;
@@ -54,7 +70,6 @@ class CharybdisProto : public IRCDProto
 	void SendSGLineDel(const XLine *x) anope_override { ratbox->SendSGLineDel(x); }
 	void SendAkill(User *u, XLine *x) anope_override { ratbox->SendAkill(u, x); }
 	void SendAkillDel(const XLine *x) anope_override { ratbox->SendAkillDel(x); }
-	void SendSQLineDel(const XLine *x) anope_override { ratbox->SendSQLineDel(x); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { ratbox->SendJoin(user, c, status); }
 	void SendServer(const Server *server) anope_override { ratbox->SendServer(server); }
 	void SendChannel(Channel *c) anope_override { ratbox->SendChannel(c); }
@@ -77,7 +92,18 @@ class CharybdisProto : public IRCDProto
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Me) << "RESV * " << x->mask << " :" << x->GetReason();
+		/* Calculate the time left before this would expire, capping it at 2 days */
+		time_t timeleft = x->expires - Anope::CurTime;
+		
+		if (timeleft > 172800 || !x->expires)
+			timeleft = 172800;
+		
+		UplinkSocket::Message(FindIntroduced()) << "ENCAP * RESV " << timeleft << " " << x->mask << " 0 :" << x->GetReason();
+	}
+	
+	void SendSQLineDel(const XLine *x) anope_override
+	{
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "ENCAP * UNRESV " << x->mask;
 	}
 
 	void SendConnect() anope_override

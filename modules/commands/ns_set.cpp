@@ -1211,6 +1211,7 @@ class NSSet : public Module
 			NickCore *nc = anope_dynamic_static_cast<NickCore *>(s);
 			Anope::string modes;
 			data["last_modes"] >> modes;
+			nc->last_modes.clear();
 			for (spacesepstream sep(modes); sep.GetToken(modes);)
 			{
 				size_t c = modes.find(',');

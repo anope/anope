@@ -15,6 +15,7 @@ Fix reported expiry time when the time is divisible by 1 year
 Clearify botserv repeat kicker help and allow setting repeat times to 1
 Send vident/vhost with SASL login
 Add support for SASL reauth
+Fix log and database backup directories to be properly created by the installer
 
 Anope Version 2.0.3
 -------------------

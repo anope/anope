@@ -386,7 +386,12 @@ struct IRCDMessageNick : IRCDMessage
 			User::OnIntroduce(params[0], params[4], params[5], "", params[8], s, params[9], signon, params[3], "", na ? *na->nc : NULL);
 		}
 		else
-			source.GetUser()->ChangeNick(params[0]);
+		{
+			User *u = source.GetUser();
+
+			if (u)
+				u->ChangeNick(params[0]);
+		}
 	}
 };
 

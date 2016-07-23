@@ -280,7 +280,7 @@ struct IRCDMessageChaninfo : IRCDMessage
 
 struct IRCDMessageJoin : Message::Join
 {
-	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { }
+	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	/*
 	 * <@po||ux> DukeP: RFC 2813, 4.2.1: the JOIN command on server-server links
@@ -440,8 +440,11 @@ struct IRCDMessageNick : IRCDMessage
 	{
 		if (params.size() == 1)
 		{
+			User *u = source.GetUser();
+
 			// we have a nickchange
-			source.GetUser()->ChangeNick(params[0]);
+			if (u)
+				u->ChangeNick(params[0]);
 		}
 		else if (params.size() == 7)
 		{

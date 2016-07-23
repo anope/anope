@@ -1135,6 +1135,7 @@ class CSSet : public Module
 			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(s);
 			Anope::string modes;
 			data["last_modes"] >> modes;
+			ci->last_modes.clear();
 			for (spacesepstream sep(modes); sep.GetToken(modes);)
 			{
 				size_t c = modes.find(',');

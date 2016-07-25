@@ -30,7 +30,7 @@ else \
 
 #define getc_db(f) (fgetc((f)->fp))
 #define read_db(f, buf, len) (fread((buf), 1, (len), (f)->fp))
-#define read_buffer(buf, f) (read_db((f), (buf), sizeof(buf)) == sizeof(buf))
+#define read_buffer(buf, f) ((read_db((f), (buf), sizeof(buf)) == sizeof(buf)) ? 0 : -1)
 
 #define OLD_BI_PRIVATE	0x0001
 

@@ -113,10 +113,6 @@ class CommandCSXOP : public Command
 			return;
 		}
 
-		XOPChanAccess tmp_access(NULL);
-		tmp_access.ci = ci;
-		tmp_access.type = source.command.upper();
-
 		AccessGroup access = source.AccessFor(ci);
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
@@ -245,10 +241,6 @@ class CommandCSXOP : public Command
 			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
 			return;
 		}
-
-		XOPChanAccess tmp_access(NULL);
-		tmp_access.ci = ci;
-		tmp_access.type = source.command.upper();
 
 		AccessGroup access = source.AccessFor(ci);
 		const ChanAccess *highest = access.Highest();

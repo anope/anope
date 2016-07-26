@@ -198,25 +198,30 @@ struct IRCDMessageEncap : IRCDMessage
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 3)
 	{
 		SetFlag(IRCDMESSAGE_SOFT_LIMIT);
-		SetFlag(IRCDMESSAGE_REQUIRE_USER);
 	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.GetUser();
-
 		// In a burst, states that the source user is logged in as the account.
 		if (params[1] == "LOGIN" || params[1] == "SU")
 		{
+			User *u = source.GetUser();
 			NickCore *nc = NickCore::Find(params[2]);
-			if (!nc)
+
+			if (!u || !nc)
 				return;
+
 			u->Login(nc);
 		}
 		// Received: :42XAAAAAE ENCAP * CERTFP :3f122a9cc7811dbad3566bf2cec3009007c0868f
-		if (params[1] == "CERTFP")
+		else if (params[1] == "CERTFP")
 		{
+			User *u = source.GetUser();
+			if (!u)
+				return;
+
 			u->fingerprint = params[2];
+
 			FOREACH_MOD(OnFingerprint, (u));
 		}
 		/*
@@ -230,7 +235,7 @@ struct IRCDMessageEncap : IRCDMessage
 		 *
 		 * Charybdis only accepts messages from SASL agents; these must have umode +S
 		 */
-		if (params[1] == "SASL" && SASL::sasl && params.size() >= 6)
+		else if (params[1] == "SASL" && SASL::sasl && params.size() >= 6)
 		{
 			SASL::Message m;
 			m.source = params[2];

@@ -696,7 +696,14 @@ Block *Conf::GetModule(const Anope::string &mname)
 		}
 	}
 
-	return GetModule(mname);
+	if (block == nullptr)
+	{
+		/* not found, create new block */
+		auto it2 = blocks.emplace(mname, mname);
+		block = &it2->second;
+	}
+
+	return block;
 }
 
 ServiceBot *Conf::GetClient(const Anope::string &cname)

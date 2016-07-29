@@ -38,47 +38,37 @@ const Anope::string &Block::GetName() const
 
 int Block::CountBlock(const Anope::string &bname)
 {
-	if (!this)
-		return 0;
-
 	return blocks.count(bname);
+}
+
+Block* Block::GetBlock(const Anope::string &bname)
+{
+	auto it = blocks.find(bname);
+
+	if (it != blocks.end())
+		return &it->second;
+
+	blocks.emplace(bname, bname);
+	return GetBlock(bname);
 }
 
 Block* Block::GetBlock(const Anope::string &bname, int num)
 {
-	if (!this)
-		return NULL;
-
 	std::pair<block_map::iterator, block_map::iterator> it = blocks.equal_range(bname);
 
 	for (int i = 0; it.first != it.second; ++it.first, ++i)
 		if (i == num)
 			return &it.first->second;
-	return NULL;
-}
-
-bool Block::Set(const Anope::string &tag, const Anope::string &value)
-{
-	if (!this)
-		return false;
-
-	items[tag] = value;
-	return true;
+	return nullptr;
 }
 
 const Block::item_map* Block::GetItems() const
 {
-	if (this)
-		return &items;
-	else
-		return NULL;
+	return &items;
 }
 
 template<> Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const
 {
-	if (!this)
-		return def;
-
 	Anope::map<Anope::string>::const_iterator it = items.find(tag);
 	if (it != items.end())
 		return it->second;
@@ -116,6 +106,11 @@ template<> unsigned int Block::Get(const Anope::string &tag, const Anope::string
 		return 0;
 
 	return l;
+}
+
+template<> void Block::Set(const Anope::string &tag, const Anope::string &value)
+{
+	items[tag] = value;
 }
 
 static void ValidateNotEmpty(const Anope::string &block, const Anope::string &name, const Anope::string &value)

@@ -35,7 +35,8 @@ namespace Configuration
 	 	Block(const Anope::string &);
 		const Anope::string &GetName() const;
 		int CountBlock(const Anope::string &name);
-		Block* GetBlock(const Anope::string &name, int num = 0);
+		Block* GetBlock(const Anope::string &name);
+		Block* GetBlock(const Anope::string &name, int num);
 
 		template<typename T> inline T Get(const Anope::string &tag)
 		{
@@ -56,7 +57,11 @@ namespace Configuration
 			return T();
 		}
 
-		bool Set(const Anope::string &tag, const Anope::string &value);
+		template<typename T> void Set(const Anope::string &tag, const T &value)
+		{
+			Set(tag, stringify(value));
+		}
+
 		const item_map* GetItems() const;
 	};
 

@@ -50,7 +50,6 @@ class ChanServCore : public Module
 	std::vector<ChanServ::Privilege> Privileges;
 	ChanServ::registered_channel_map registered_channels;
 	ChannelType channel_type;
-//	ChanAccessType chanaccess_type;
 	LevelType level_type;
 	CSModeType mode_type;
 
@@ -78,7 +77,6 @@ class ChanServCore : public Module
 		, inhabit(this, "inhabit")
 		, always_lower(false)
 		, channel_type(this)
-//		, chanaccess_type(this)
 		, level_type(this)
 		, mode_type(this)
 	{

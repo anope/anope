@@ -24,11 +24,11 @@ class StatsImpl : public Stats
 
 	using Stats::Stats;
 
-	unsigned int GetMaxUserCount();
-	void SetMaxUserCount(unsigned int i);
+	unsigned int GetMaxUserCount() override;
+	void SetMaxUserCount(unsigned int i) override;
 
-	time_t GetMaxUserTime();
-	void SetMaxUserTime(time_t t);
+	time_t GetMaxUserTime() override;
+	void SetMaxUserTime(time_t t) override;
 };
 
 class StatsType : public Serialize::Type<StatsImpl>

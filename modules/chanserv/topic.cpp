@@ -42,7 +42,7 @@ class CommandCSSetKeepTopic : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -90,7 +90,7 @@ class CommandCSTopic : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, "topiclock on");
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, "topiclock on");
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -107,7 +107,7 @@ class CommandCSTopic : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, "topiclock off");
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, "topiclock off");
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -211,10 +211,15 @@ class CSTopic : public Module
 	CommandCSTopic commandcstopic;
 	CommandCSSetKeepTopic commandcssetkeeptopic;
 
-	/*Serializable*/ExtensibleItem<bool> topiclock, keeptopic;
+	Serialize::Field<ChanServ::Channel, bool> topiclock, keeptopic;
+
+	ServiceReference<ModeLocks> mlocks;
 
  public:
 	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChannelSync>(this)
+		, EventHook<Event::TopicUpdated>(this)
+		, EventHook<Event::ChanInfo>(this)
 		, commandcstopic(this)
 		, commandcssetkeeptopic(this)
 		, topiclock(this, "TOPICLOCK")

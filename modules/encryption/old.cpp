@@ -12,12 +12,15 @@
 #include "module.h"
 #include "modules/encryption.h"
 
-static ServiceReference<Encryption::Provider> md5("Encryption::Provider", "md5");
-
 class OldMD5Provider : public Encryption::Provider
 {
+	ServiceReference<Encryption::Provider> md5;
+	
  public:
- 	OldMD5Provider(Module *creator) : Encryption::Provider(creator, "oldmd5") { }
+ 	OldMD5Provider(Module *creator) : Encryption::Provider(creator, "oldmd5")
+		, md5("md5")
+	{
+	}
 
 	Encryption::Context *CreateContext(Encryption::IV *iv) override
 	{
@@ -39,12 +42,16 @@ class EOld : public Module
 	, public EventHook<Event::CheckAuthentication>
 {
 	OldMD5Provider oldmd5provider;
+	ServiceReference<Encryption::Provider> md5;
 
 	inline static char XTOI(char c) { return c > 9 ? c - 'A' + 10 : c - '0'; }
 
  public:
 	EOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
+		, EventHook<Event::Encrypt>(this)
+		, EventHook<Event::CheckAuthentication>(this)
 		, oldmd5provider(this)
+		, md5("md5")
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
 			throw ModuleException("enc_old is deprecated and can not be used as a primary encryption method");

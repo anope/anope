@@ -1,5 +1,6 @@
 #include "module.h"
 #include "modules/xmlrpc.h"
+#include "modules/operserv/stats.h"
 
 static Module *me;
 
@@ -117,7 +118,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		else
 		{
 			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new XMLRPCIdentifyRequest(request, client, iface), me, username, password);
-			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
+			EventManager::Get()->Dispatch(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
 			req->Dispatch();
 			return false;
 		}
@@ -127,6 +128,8 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 	void DoStats(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
+		Stats *stats = Serialize::GetObject<Stats *>();
+
 		request.reply("uptime", stringify(Anope::CurTime - Anope::StartTime));
 		request.reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
@@ -138,7 +141,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			request.reply("uplinkcapab", buf);
 		}
 		request.reply("usercount", stringify(UserListByNick.size()));
-		request.reply("maxusercount", stringify(MaxUserCount));
+		request.reply("maxusercount", stringify(stats ? stats->GetMaxUserCount() : 0));
 		request.reply("channelcount", stringify(ChannelList.size()));
 	}
 
@@ -258,7 +261,7 @@ class ModuleXMLRPCMain : public Module
 	MyXMLRPCEvent stats;
 
  public:
-	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), xmlrpc("XMLRPCServiceInterface", "xmlrpc")
+	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 		me = this;
 

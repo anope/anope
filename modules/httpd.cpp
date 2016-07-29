@@ -340,7 +340,7 @@ class HTTPD : public Module
 	std::map<Anope::string, MyHTTPProvider *> providers;
  public:
 	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-	, sslref("SSLService", "ssl")
+		, EventHook<Event::ModuleLoad>(this)
 	{
 
 	}
@@ -445,10 +445,10 @@ class HTTPD : public Module
 			HTTPProvider *p = it->second;
 			++it;
 
-			if (existing.count(p->name) == 0)
+			if (existing.count(p->GetName()) == 0)
 			{
-				Log(this) << "Removing HTTP server " << p->name;
-				this->providers.erase(p->name);
+				Log(this) << "Removing HTTP server " << p->GetName();
+				this->providers.erase(p->GetName());
 				delete p;
 			}
 		}

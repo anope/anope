@@ -1,6 +1,11 @@
 
 class ModeImpl : public ChanServ::Mode
 {
+	friend class CSModeType;
+
+	ChanServ::Channel *channel = nullptr;
+	Anope::string mode, param;
+
  public:
 	ModeImpl(Serialize::TypeBase *type) : ChanServ::Mode(type) { }
 	ModeImpl(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::Mode(type, id) { }

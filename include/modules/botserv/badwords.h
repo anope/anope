@@ -31,6 +31,8 @@ class BadWord : public Serialize::Object
  protected:
 	using Serialize::Object::Object;
  public:
+	static constexpr const char *NAME = "badword";
+	 
 	virtual ~BadWord() = default;
 
 	virtual ChanServ::Channel *GetChannel() anope_abstract;
@@ -43,11 +45,12 @@ class BadWord : public Serialize::Object
 	virtual void SetType(const BadWordType &) anope_abstract;
 };
 
-static Serialize::TypeReference<BadWord> badword("BadWord");
-
-struct BadWords : public Service
+class BadWords : public Service
 {
-	BadWords(Module *me) : Service(me, "BadWords", "badwords") { }
+ public:
+	static constexpr const char *NAME = "badwords";
+	
+	BadWords(Module *me) : Service(me, NAME) { }
 
 	/** Add a badword to the badword list
 	 * @param word The badword
@@ -79,12 +82,14 @@ struct BadWords : public Service
 	virtual void ClearBadWords(ChanServ::Channel *) anope_abstract;
 };
 
-static ServiceReference<BadWords> badwords("BadWords", "badwords");
-
 namespace Event
 {
 	struct CoreExport BadWordEvents : Events
 	{
+		static constexpr const char *NAME = "badwords";
+
+		using Events::Events;
+
 		/** Called before a badword is added to the badword list
 		 * @param ci The channel
 		 * @param bw The badword
@@ -99,4 +104,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::BadWordEvents> { static constexpr const char *const name = "Badwords"; };

@@ -89,15 +89,15 @@ class CommandNSIdentify : public Command
 			return;
 		}
 
-		unsigned int maxlogins = Config->GetModule(this->owner)->Get<unsigned int>("maxlogins");
+		unsigned int maxlogins = Config->GetModule(this->GetOwner())->Get<unsigned int>("maxlogins");
 		if (na && maxlogins && na->GetAccount()->users.size() >= maxlogins)
 		{
 			source.Reply(_("Account \002{0}\002 has already reached the maximum number of simultaneous logins ({1})."), na->GetAccount()->GetDisplay(), maxlogins);
 			return;
 		}
 
-		NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSIdentifyRequestListener(source, this), owner, na ? na->GetAccount()->GetDisplay() : nick, pass);
-		Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, u, req);
+		NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSIdentifyRequestListener(source, this), this->GetOwner(), na ? na->GetAccount()->GetDisplay() : nick, pass);
+		EventManager::Get()->Dispatch(&Event::CheckAuthentication::OnCheckAuthentication, u, req);
 
 		req->Dispatch();
 	}

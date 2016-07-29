@@ -835,7 +835,7 @@ class MyManager : public Manager, public Timer
 				}
 			}
 
-			Event::OnDnsRequest(&Event::DnsRequest::OnDnsRequest, recv_packet, packet);
+			EventManager::Get()->Dispatch(&Event::DnsRequest::OnDnsRequest, recv_packet, packet);
 
 			for (unsigned i = 0; i < recv_packet.questions.size(); ++i)
 			{
@@ -1028,6 +1028,7 @@ class ModuleDNS : public Module
 
  public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::ModuleUnload>(this)
 		, manager(this)
 	{
 

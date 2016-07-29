@@ -31,7 +31,7 @@ class CommandNSList : public Command
 		bool is_servadmin = source.HasCommand("nickserv/list");
 		int count = 0, from = 0, to = 0;
 		bool suspended, nsnoexpire, unconfirmed;
-		unsigned listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
+		unsigned listmax = Config->GetModule(this->GetOwner())->Get<unsigned>("listmax", "50");
 
 		suspended = nsnoexpire = unconfirmed = false;
 
@@ -200,7 +200,7 @@ class CommandNSSetPrivate : public Command
 		}
 		NickServ::Account *nc = na->GetAccount();
 
-		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -270,10 +270,11 @@ class NSList : public Module
 
  public:
 	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::NickInfo>(this)
 		, commandnslist(this)
 		, commandnssetprivate(this)
 		, commandnssasetprivate(this)
-		, priv(this, NickServ::account, "NS_PRIVATE")
+		, priv(this, "NS_PRIVATE")
 	{
 	}
 

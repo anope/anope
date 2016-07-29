@@ -67,9 +67,9 @@ OperType *Oper::GetType()
 	return OperType::Find(Get(&OperBlockType::type));
 }
 
-void Oper::SetType(OperType *type)
+void Oper::SetType(OperType *t)
 {
-	Set(&OperBlockType::type, type->GetName());
+	Set(&OperBlockType::type, t->GetName());
 }
 
 bool Oper::GetRequireOper()
@@ -84,7 +84,7 @@ void Oper::SetRequireOper(const bool &b)
 
 Oper *Oper::Find(const Anope::string &name)
 {
-	for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
+	for (Oper *o : Serialize::GetObjects<Oper *>())
 		if (o->GetName() == name)
 			return o;
 

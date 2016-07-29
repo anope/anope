@@ -10,4 +10,5 @@ class IdentifyRequestImpl : public NickServ::IdentifyRequest
 	void Release(Module *m) override;
 	void Success(Module *m) override;
 	void Dispatch() override;
+	void Unload(Module *);
 };

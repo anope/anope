@@ -105,7 +105,7 @@ void CommandSource::Reply(const Anope::string &message)
 		this->reply->SendMessage(*this->service, tok);
 }
 
-Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(owner)
+Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(o)
 {
 	allow_unregistered = require_user = false;
 }
@@ -205,20 +205,20 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	if (it == source.service->commands.end())
 	{
 		if (has_help)
-			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			source.Reply(_("Unknown command \002{0}\002. \"{1}{2} HELP\" for help."), message, Config->StrictPrivmsg, source.service->nick);
 		else
-			source.Reply(_("Unknown command \002%s\002."), message.c_str());
+			source.Reply(_("Unknown command \002{0}\002."), message);
 		return;
 	}
 
 	const CommandInfo &info = it->second;
-	ServiceReference<Command> c("Command", info.name);
+	ServiceReference<Command> c(info.name);
 	if (!c)
 	{
 		if (has_help)
-			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			source.Reply(_("Unknown command \002{0}\002. \"{1}{2} HELP\" for help."), message, Config->StrictPrivmsg, source.service->nick);
 		else
-			source.Reply(_("Unknown command \002%s\002."), message.c_str());
+			source.Reply(_("Unknown command \002{0}\002."), message);
 		Log(source.service) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";
 		return;
 	}
@@ -252,8 +252,7 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 	source.command = cmdname;
 	source.permission = info.permission;
 
-	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnPreCommand(&Event::PreCommand::OnPreCommand, source, this, params);
+	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::PreCommand::OnPreCommand, source, this, params);
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -276,7 +275,7 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 	}
 
 	this->Execute(source, params);
-	Event::OnPostCommand(&Event::PostCommand::OnPostCommand, source, this, params);
+	EventManager::Get()->Dispatch(&Event::PostCommand::OnPostCommand, source, this, params);
 }
 
 bool Command::FindCommandFromService(const Anope::string &command_service, ServiceBot* &bot, Anope::string &name)

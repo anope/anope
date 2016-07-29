@@ -40,7 +40,7 @@ class CommandBSSet : public Command
 			const CommandInfo &info = it->second;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				ServiceReference<Command> command("Command", info.name);
+				ServiceReference<Command> command(info.name);
 				if (command)
 				{
 					// XXX dup
@@ -203,6 +203,7 @@ class BSSet : public Module
 
  public:
 	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::BotBan>(this)
 		, commandbsset(this)
 		, commandbssetbanexpire(this)
 		, commandbssetprivate(this)

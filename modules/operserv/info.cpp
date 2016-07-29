@@ -13,6 +13,12 @@
 
 class OperInfoImpl : public OperInfo
 {
+	friend class OperInfoType;
+
+	Serialize::Object *target = nullptr;
+	Anope::string info, creator;
+	time_t created = 0;
+
  public:
 	OperInfoImpl(Serialize::TypeBase *type) : OperInfo(type) { }
 	OperInfoImpl(Serialize::TypeBase *type, Serialize::ID id) : OperInfo(type, id) { }
@@ -37,11 +43,11 @@ class OperInfoType : public Serialize::Type<OperInfoImpl>
 	Serialize::Field<OperInfoImpl, Anope::string> info, creator;
 	Serialize::Field<OperInfoImpl, time_t> created;
 
-	OperInfoType(Module *c) : Serialize::Type<OperInfoImpl>(c, "OperInfo")
-		, target(this, "target", true)
-		, info(this, "info")
-		, creator(this, "adder")
-		, created(this, "created")
+	OperInfoType(Module *c) : Serialize::Type<OperInfoImpl>(c)
+		, target(this, "target", &OperInfoImpl::target, true)
+		, info(this, "info", &OperInfoImpl::info)
+		, creator(this, "adder", &OperInfoImpl::creator)
+		, created(this, "created", &OperInfoImpl::created)
 	{
 	}
 };
@@ -133,7 +139,7 @@ class CommandOSInfo : public Command
 				return;
 			}
 
-			std::vector<OperInfo *> oinfos = e->GetRefs<OperInfo *>(operinfo);
+			std::vector<OperInfo *> oinfos = e->GetRefs<OperInfo *>();
 			if (oinfos.size() >= Config->GetModule(this->module)->Get<unsigned int>("max", "10"))
 			{
 				source.Reply(_("The oper info list for \002{0}\002 is full."), target);
@@ -147,7 +153,7 @@ class CommandOSInfo : public Command
 					return;
 				}
 
-			OperInfo *o = operinfo.Create();
+			OperInfo *o = Serialize::New<OperInfo *>();
 			o->SetTarget(e);
 			o->SetInfo(info);
 			o->SetCreator(source.GetNick());
@@ -167,7 +173,7 @@ class CommandOSInfo : public Command
 				return;
 			}
 
-			std::vector<OperInfo *> oinfos = e->GetRefs<OperInfo *>(operinfo);
+			std::vector<OperInfo *> oinfos = e->GetRefs<OperInfo *>();
 			if (oinfos.empty())
 			{
 				source.Reply(_("Oper info list for \002{0}\002 is empty."), target);
@@ -193,7 +199,7 @@ class CommandOSInfo : public Command
 		}
 		else if (cmd.equals_ci("CLEAR"))
 		{
-			std::vector<OperInfo *> oinfos = e->GetRefs<OperInfo *>(operinfo);
+			std::vector<OperInfo *> oinfos = e->GetRefs<OperInfo *>();
 
 			if (oinfos.empty())
 			{
@@ -235,12 +241,14 @@ class OSInfo : public Module
 		if (!source.IsOper())
 			return;
 
-		for (OperInfo *o : e->GetRefs<OperInfo *>(operinfo))
+		for (OperInfo *o : e->GetRefs<OperInfo *>())
 			info[_("Oper Info")] = Anope::printf(_("(by %s on %s) %s"), o->GetCreator().c_str(), Anope::strftime(o->GetCreated(), source.GetAccount(), true).c_str(), o->GetInfo().c_str());
 	}
 
  public:
 	OSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::NickInfo>(this)
+		, EventHook<Event::ChanInfo>(this)
 		, commandosinfo(this)
 		, oinfotype(this)
 	{

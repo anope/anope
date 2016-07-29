@@ -36,7 +36,7 @@ class CommandCSUnban : public Command
 
 			unsigned count = 0;
 
-			for (ChanServ::Channel *ci : source.GetAccount()->GetRefs<ChanServ::Channel *>(ChanServ::channel))
+			for (ChanServ::Channel *ci : source.GetAccount()->GetRefs<ChanServ::Channel *>())
 			{
 				if (!ci->c || !source.AccessFor(ci).HasPriv("UNBAN"))
 					continue;

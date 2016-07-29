@@ -1,21 +1,18 @@
 /* OperServ core functions
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
  */
 
 #include "module.h"
 
-static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
-
 class CommandOSAKill : public Command
 {
- private:
+	ServiceReference<XLineManager> akills;
+	
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string expiry, mask;
@@ -120,7 +117,12 @@ class CommandOSAKill : public Command
 			return;
 		}
 
-		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
+		XLine *x = Serialize::New<XLine *>();
+		x->SetMask(mask);
+		x->SetBy(source.GetNick());
+		x->SetExpires(expires);
+		x->SetReason(reason);
+
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
 			x->SetID(XLineManager::GenerateUID());
 
@@ -139,7 +141,7 @@ class CommandOSAKill : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnAddXLine(&Event::AddXLine::OnAddXLine, source, x, akills);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::AddXLine::OnAddXLine, source, x, akills);
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			delete x;
@@ -212,7 +214,7 @@ class CommandOSAKill : public Command
 
 			do
 			{
-				Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, akills);
+				EventManager::Get()->Dispatch(&Event::DelXLine::OnDelXLine, source, x, akills);
 
 				Log(LOG_ADMIN, source, this) << "to remove " << x->GetMask() << " from the list";
 				source.Reply(_("\002{0}\002 deleted from the akill list."), x->GetMask());
@@ -256,7 +258,7 @@ class CommandOSAKill : public Command
 			unsigned int i = 0;
 			for (XLine *x : akills->GetXLines())
 			{
-				if (mask.empty() || mask.equals_ci(x->GetMask()) || mask == x->id || Anope::Match(x->GetMask(), mask, false, true))
+				if (mask.empty() || mask.equals_ci(x->GetMask()) || mask == x->GetID() || Anope::Match(x->GetMask(), mask, false, true))
 				{
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(++i);
@@ -319,7 +321,7 @@ class CommandOSAKill : public Command
 	{
 		for (XLine *x : akills->GetXLines())
 		{
-			Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, akills);
+			EventManager::Get()->Dispatch(&Event::DelXLine::OnDelXLine, source, x, akills);
 			x->Delete();
 		}
 
@@ -331,6 +333,7 @@ class CommandOSAKill : public Command
 	}
  public:
 	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 2)
+		, akills("xlinemanager/sgline")
 	{
 		this->SetDesc(_("Manipulate the AKILL list"));
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037 \037reason\037"));

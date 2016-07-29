@@ -357,7 +357,7 @@ struct IRCDMessageMetadata : IRCDMessage
 		else if (params[1].equals_cs("certfp"))
 		{
 			u->fingerprint = params[2];
-			Event::OnFingerprint(&Event::Fingerprint::OnFingerprint, u);
+			EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
 		}
 		else if (params[1].equals_cs("cloakhost"))
 		{
@@ -634,6 +634,7 @@ class ProtongIRCd : public Module
 
  public:
 	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, EventHook<Event::UserNickChange>(this)
 		, ircd_proto(this)
 		, message_capab(this)
 		, message_error(this)

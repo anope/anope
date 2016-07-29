@@ -47,7 +47,7 @@ class CommandNSAList : public Command
 
 		list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Access")).AddColumn(_("Description"));
 
-		std::vector<ChanServ::Channel *> chans = nc->GetRefs<ChanServ::Channel *>(ChanServ::channel);
+		std::vector<ChanServ::Channel *> chans = nc->GetRefs<ChanServ::Channel *>();
 		std::sort(chans.begin(), chans.end(), ChannelSort);
 		for (ChanServ::Channel *ci : chans)
 		{

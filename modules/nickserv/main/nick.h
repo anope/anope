@@ -1,6 +1,14 @@
 
 class NickImpl : public NickServ::Nick
 {
+	friend class NickType;
+
+	NickServ::Account *account = nullptr;
+	Anope::string nick, last_quit, last_realname, last_usermask, last_realhost;
+	time_t time_registered = 0, last_seen = 0;
+	Anope::string vhost_ident, vhost_host, vhost_creator;
+	time_t vhost_created = 0;
+
  public:
 	NickImpl(Serialize::TypeBase *type) : NickServ::Nick(type) { }
 	NickImpl(Serialize::TypeBase *type, Serialize::ID id) : NickServ::Nick(type, id) { }

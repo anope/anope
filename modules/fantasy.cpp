@@ -77,7 +77,7 @@ class CommandBSSetFantasy : public Command
 				"Note that users wanting to use fantaisist\n"
 				"commands MUST have enough access for both\n"
 				"the FANTASIA and the command they are executing."),
-				Config->GetModule(this->owner)->Get<Anope::string>("fantasycharacter", "!").c_str());
+				Config->GetModule(this->GetOwner())->Get<Anope::string>("fantasycharacter", "!").c_str());
 		return true;
 	}
 };
@@ -90,15 +90,12 @@ class Fantasy : public Module
 
 	CommandBSSetFantasy commandbssetfantasy;
 
-	EventHandlers<Event::BotFantasy> OnBotFantasy;
-	EventHandlers<Event::BotNoFantasyAccess> OnBotNoFantasyAccess;
-
  public:
 	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, fantasy(this, ChanServ::channel, "BS_FANTASY")
+		, EventHook<Event::Privmsg>(this)
+		, EventHook<Event::ServiceBotEvent>(this)
+		, fantasy(this, "BS_FANTASY")
 		, commandbssetfantasy(this)
-		, OnBotFantasy(this)
-		, OnBotNoFantasyAccess(this)
 	{
 	}
 
@@ -156,7 +153,7 @@ class Fantasy : public Module
 			return;
 
 		const CommandInfo &info = it->second;
-		ServiceReference<Command> cmd("Command", info.name);
+		ServiceReference<Command> cmd(info.name);
 		if (!cmd)
 		{
 			Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for non-existent service " << info.name << "!";
@@ -194,11 +191,11 @@ class Fantasy : public Module
 		EventReturn MOD_RESULT;
 		if (has_fantasia)
 		{
-			MOD_RESULT = this->OnBotFantasy(&Event::BotFantasy::OnBotFantasy, source, cmd, c->ci, params);
+			MOD_RESULT = EventManager::Get()->Dispatch(&Event::BotFantasy::OnBotFantasy, source, cmd, c->ci, params);
 		}
 		else
 		{
-			MOD_RESULT = this->OnBotNoFantasyAccess(&Event::BotNoFantasyAccess::OnBotNoFantasyAccess, source, cmd, c->ci, params);
+			MOD_RESULT = EventManager::Get()->Dispatch(&Event::BotNoFantasyAccess::OnBotNoFantasyAccess, source, cmd, c->ci, params);
 		}
 
 		if (MOD_RESULT == EVENT_STOP || !has_fantasia)
@@ -207,7 +204,7 @@ class Fantasy : public Module
 		if (MOD_RESULT != EVENT_ALLOW && !info.permission.empty() && !source.HasCommand(info.permission))
 			return;
 
-		MOD_RESULT = Event::OnPreCommand(&Event::PreCommand::OnPreCommand, source, cmd, params);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::PreCommand::OnPreCommand, source, cmd, params);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -215,7 +212,7 @@ class Fantasy : public Module
 		cmd->Execute(source, params);
 		if (!nc_reference)
 			source.nc = NULL;
-		Event::OnPostCommand(&Event::PostCommand::OnPostCommand, source, cmd, params);
+		EventManager::Get()->Dispatch(&Event::PostCommand::OnPostCommand, source, cmd, params);
 	}
 
 	void OnServiceBot(CommandSource &source, ServiceBot *bi, ChanServ::Channel *ci, InfoFormatter &info) override

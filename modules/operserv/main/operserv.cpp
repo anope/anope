@@ -13,15 +13,6 @@
 #include "modules/help.h"
 #include "modules/nickserv.h"
 
-class SGlineType : public XLineType
-{
- public:
-	SGlineType(Module *creator) : XLineType(creator, "SGLine")
-	{
-		SetParent(xline);
-	}
-};
-
 class SGLineManager : public XLineManager
 {
  public:
@@ -71,15 +62,6 @@ class SGLineManager : public XLineManager
 			return true;
 
 		return false;
-	}
-};
-
-class SQlineType : public XLineType
-{
- public:
-	SQlineType(Module *creator) : XLineType(creator, "SQLine")
-	{
-		SetParent(xline);
 	}
 };
 
@@ -152,15 +134,6 @@ class SQLineManager : public XLineManager
 	}
 };
 
-class SNlineType : public XLineType
-{
- public:
-	SNlineType(Module *creator) : XLineType(creator, "SNLine")
-	{
-		SetParent(xline);
-	}
-};
-
 class SNLineManager : public XLineManager
 {
  public:
@@ -211,20 +184,23 @@ class OperServCore : public Module
 	, public EventHook<Event::Log>
 {
 	Reference<ServiceBot> OperServ;
-	SGlineType sgtype;
 	SGLineManager sglines;
-	SQlineType sqtype;
 	SQLineManager sqlines;
-	SNlineType sntype;
 	SNLineManager snlines;
 
  public:
 	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
-		, sgtype(this)
+		, EventHook<Event::BotPrivmsg>(this)
+		, EventHook<Event::ServerQuit>(this)
+		, EventHook<Event::UserModeSet>(this)
+		, EventHook<Event::UserModeUnset>(this)
+		, EventHook<Event::UserConnect>(this)
+		, EventHook<Event::UserNickChange>(this)
+		, EventHook<Event::CheckKick>(this)
+		, EventHook<Event::Help>(this)
+		, EventHook<Event::Log>(this)
 		, sglines(this)
-		, sqtype(this)
 		, sqlines(this)
-		, sntype(this)
 		, snlines(this)
 	{
 
@@ -250,11 +226,11 @@ class OperServCore : public Module
 		const Anope::string &osnick = conf->GetModule(this)->Get<Anope::string>("client");
 
 		if (osnick.empty())
-			throw ConfigException(this->name + ": <client> must be defined");
+			throw ConfigException(Module::name + ": <client> must be defined");
 
 		ServiceBot *bi = ServiceBot::Find(osnick, true);
 		if (!bi)
-			throw ConfigException(this->name + ": no bot named " + osnick);
+			throw ConfigException(Module::name + ": no bot named " + osnick);
 
 		OperServ = bi;
 	}

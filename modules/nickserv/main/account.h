@@ -2,6 +2,10 @@
 
 class AccountImpl : public NickServ::Account
 {
+	friend class AccountType;
+
+	Anope::string display, password, email, language;
+
  public:
 	AccountImpl(Serialize::TypeBase *type) : NickServ::Account(type) { }
 	AccountImpl(Serialize::TypeBase *type, Serialize::ID id) : NickServ::Account(type, id) { }

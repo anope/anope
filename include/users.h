@@ -25,8 +25,6 @@ typedef Anope::hash_map<User *> user_map;
 extern CoreExport user_map UserListByNick, UserListByUID;
 
 extern CoreExport int OperCount;
-extern CoreExport unsigned MaxUserCount;
-extern CoreExport time_t MaxUserTime;
 
 enum class UserType
 {

@@ -1,26 +1,30 @@
 /* ChanServ core functions
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
  */
 
+/* Dependencies: anope_chanserv.main */
 
 #include "module.h"
 #include "modules/chanserv.h"
-#include "modules/cs_access.h"
-#include "main/chanaccess.h"
+#include "modules/chanserv/access.h"
+#include "modules/chanserv/main/chanaccess.h"
 #include "main/chanaccesstype.h"
 
-class AccessChanAccess : public ChanAccessImpl
+class AccessChanAccessImpl : public AccessChanAccess
 {
+	friend class AccessChanAccessType;
+
+	int level = 0;
+
  public:
-	AccessChanAccess(Serialize::TypeBase *type) : ChanAccessImpl(type) { }
-	AccessChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanAccessImpl(type, id) { }
+	static constexpr const char *NAME = "accesschanaccess";
+
+	using AccessChanAccess::AccessChanAccess;
 
 	int GetLevel();
 	void SetLevel(const int &);
@@ -46,7 +50,6 @@ class AccessChanAccess : public ChanAccessImpl
 		}
 	}
 
-#if 0
 	bool operator>(ChanServ::ChanAccess &other) override
 	{
 		if (this->GetSerializableType() != other.GetSerializableType())
@@ -62,18 +65,17 @@ class AccessChanAccess : public ChanAccessImpl
 		else
 			return this->GetLevel() < anope_dynamic_static_cast<AccessChanAccess *>(&other)->GetLevel();
 	}
-#endif
 };
 
-class AccessChanAccessType : public Serialize::Type<AccessChanAccess, ChanAccessType>
+class AccessChanAccessType : public ChanAccessType<AccessChanAccessImpl>
 {
  public:
-	Serialize::Field<AccessChanAccess, int> level;
+	Serialize::Field<AccessChanAccessImpl, int> level;
 
-	AccessChanAccessType(Module *me) : Serialize::Type<AccessChanAccess, ChanAccessType>(me, "AccessChanAccess")
-		, level(this, "level")
+	AccessChanAccessType(Module *me) : ChanAccessType<AccessChanAccessImpl>(me)
+		, level(this, "level", &AccessChanAccessImpl::level)
 	{
-		SetParent(ChanServ::chanaccess);
+		Serialize::SetParent(AccessChanAccess::NAME, ChanServ::ChanAccess::NAME);
 	}
 };
 
@@ -121,74 +123,50 @@ class CommandCSAccess : public Command
 		ChanServ::AccessGroup u_access = source.AccessFor(ci);
 		ChanServ::ChanAccess *highest = u_access.Highest();
 
-		AccessChanAccess tmp_access(nullptr);
-		tmp_access.SetChannel(ci);
-		tmp_access.SetLevel(level);
+		AccessChanAccess *access = Serialize::New<AccessChanAccess *>();
+		access->SetChannel(ci);
+		access->SetLevel(level);
 
 		bool override = false;
 
-		if ((!highest || *highest <= tmp_access) && !u_access.founder)
+		if ((!highest || *highest <= *access) && !u_access.founder)
 		{
 			if (source.HasPriv("chanserv/access/modify"))
+			{
 				override = true;
+			}
 			else
 			{
 				source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to add someone at level \002{1}\002."), ci->GetName(), level);
+				access->Delete();
 				return;
 			}
 		}
 
-		NickServ::Nick *na = nullptr;
-		ChanServ::Channel *targ_ci = nullptr;
+		access->Delete();
 
-		if (IRCD->IsChannelValid(mask))
+		NickServ::Nick *na = NickServ::FindNick(mask);
+
+		if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 		{
-			if (Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
-			{
-				source.Reply(_("Channels may not be on access lists."));
-				return;
-			}
-
-			targ_ci = ChanServ::Find(mask);
-			if (targ_ci == NULL)
-			{
-				source.Reply(_("Channel \002{0}\002 isn't registered."), mask);
-				return;
-			}
-
-			if (ci == targ_ci)
-			{
-				source.Reply(_("You can't add a channel to its own access list."));
-				return;
-			}
-
-			mask = targ_ci->GetName();
+			source.Reply(_("Masks and unregistered users may not be on access lists."));
+			return;
 		}
-		else
+
+		if (mask.find_first_of("!*@") == Anope::string::npos && !na)
 		{
-			na = NickServ::FindNick(mask);
-
-			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+			User *targ = User::Find(mask, true);
+			if (targ != NULL)
+				mask = "*!*@" + targ->GetDisplayedHost();
+			else
 			{
-				source.Reply(_("Masks and unregistered users may not be on access lists."));
+				source.Reply(_("\002{0}\002 isn't registered."), mask);
 				return;
 			}
-
-			if (mask.find_first_of("!*@") == Anope::string::npos && !na)
-			{
-				User *targ = User::Find(mask, true);
-				if (targ != NULL)
-					mask = "*!*@" + targ->GetDisplayedHost();
-				else
-				{
-					source.Reply(_("\002{0}\002 isn't registered."), mask);
-					return;
-				}
-			}
-
-			if (na)
-				mask = na->GetNick();
 		}
+
+		if (na)
+			mask = na->GetNick();
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
@@ -207,17 +185,15 @@ class CommandCSAccess : public Command
 		}
 
 		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
-		if (access_max && ci->GetDeepAccessCount() >= access_max)
+		if (access_max && ci->GetAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
 			return;
 		}
 
-		AccessChanAccess *access = anope_dynamic_static_cast<AccessChanAccess *>(accesschanaccess.Create());
+		access = Serialize::New<AccessChanAccess *>();
 		if (na)
 			access->SetObj(na->GetAccount());
-		else if (targ_ci)
-			access->SetObj(targ_ci);
 		access->SetChannel(ci);
 		access->SetMask(mask);
 		access->SetCreator(source.GetNick());
@@ -225,7 +201,7 @@ class CommandCSAccess : public Command
 		access->SetLastSeen(0);
 		access->SetCreated(Anope::CurTime);
 
-		Event::OnAccessAdd(&Event::AccessAdd::OnAccessAdd, ci, source, access);
+		EventManager::Get()->Dispatch(&Event::AccessAdd::OnAccessAdd, ci, source, access);
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << " with level " << level;
 		if (p != NULL)
@@ -286,7 +262,7 @@ class CommandCSAccess : public Command
 					else
 						nicks = access->Mask();
 
-					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, access);
+					EventManager::Get()->Dispatch(&Event::AccessDel::OnAccessDel, ci, source, access);
 					delete access;
 				},
 				[&]()
@@ -324,7 +300,7 @@ class CommandCSAccess : public Command
 						bool override = !u_access.founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->Mask().equals_ci(source.nc->GetDisplay());
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->Mask();
 
-						Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, access);
+						EventManager::Get()->Dispatch(&Event::AccessDel::OnAccessDel, ci, source, access);
 						delete access;
 					}
 					return;
@@ -359,8 +335,7 @@ class CommandCSAccess : public Command
 					if (ci->c)
 						for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
 						{
-							ChanServ::ChanAccess::Path p;
-							if (access->Matches(cit->second->user, cit->second->user->Account(), p))
+							if (access->Matches(cit->second->user, cit->second->user->Account()))
 								timebuf = "Now";
 						}
 					if (timebuf.empty())
@@ -394,8 +369,7 @@ class CommandCSAccess : public Command
 				if (ci->c)
 					for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
 					{
-						ChanServ::ChanAccess::Path p;
-						if (access->Matches(cit->second->user, cit->second->user->Account(), p))
+						if (access->Matches(cit->second->user, cit->second->user->Account()))
 							timebuf = "Now";
 					}
 				if (timebuf.empty())
@@ -467,7 +441,7 @@ class CommandCSAccess : public Command
 			return;
 		}
 
-		Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
+		EventManager::Get()->Dispatch(&Event::AccessClear::OnAccessClear, ci, source);
 
 		ci->ClearAccess();
 
@@ -513,9 +487,9 @@ class CommandCSAccess : public Command
 			has_access = true;
 		else if (is_list && source.HasPriv("chanserv/access/list"))
 			has_access = true;
-		else if (is_list && source.AccessFor(ci).HasPriv("ACCESS_LIST"))
+		else if (is_list && access.HasPriv("ACCESS_LIST"))
 			has_access = true;
-		else if (source.AccessFor(ci).HasPriv("ACCESS_CHANGE"))
+		else if (access.HasPriv("ACCESS_CHANGE"))
 			has_access = true;
 		else if (is_del)
 		{
@@ -689,7 +663,7 @@ class CommandCSLevels : public Command
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << p->name << " to level " << level;
 
 				ci->SetLevel(p->name, level);
-				this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, p->name, level);
+				EventManager::Get()->Dispatch(&Event::LevelChange::OnLevelChange, source, ci, p->name, level);
 
 				if (level == ChanServ::ACCESS_FOUNDER)
 					source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002founder only\002."), p->name, ci->GetName());
@@ -717,7 +691,7 @@ class CommandCSLevels : public Command
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable " << p->name;
 
 			ci->SetLevel(p->name, ChanServ::ACCESS_INVALID);
-			this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, p->name, ChanServ::ACCESS_INVALID);
+			EventManager::Get()->Dispatch(&Event::LevelChange::OnLevelChange, source, ci, p->name, ChanServ::ACCESS_INVALID);
 
 			source.Reply(_("Privileged \002{0}\002 disabled on channel \002{1}\002."), p->name, ci->GetName());
 			return;
@@ -772,15 +746,13 @@ class CommandCSLevels : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to reset all levels";
 
 		ci->ClearLevels();
-		this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, "ALL", 0);
+		EventManager::Get()->Dispatch(&Event::LevelChange::OnLevelChange, source, ci, "ALL", 0);
 
 		source.Reply(_("Levels for \002{0}\002 reset to defaults."), ci->GetName());
 	}
 
-	EventHandlers<Event::LevelChange> &onlevelchange;
-
  public:
-	CommandCSLevels(Module *creator, EventHandlers<Event::LevelChange> &event) : Command(creator, "chanserv/levels", 2, 4), onlevelchange(event)
+	CommandCSLevels(Module *creator) : Command(creator, "chanserv/levels", 2, 4)
 	{
 		this->SetDesc(_("Redefine the meanings of access levels"));
 		this->SetSyntax(_("\037channel\037 SET \037privilege\037 \037level\037"));
@@ -905,14 +877,13 @@ class CSAccess : public Module
 {
 	CommandCSAccess commandcsaccess;
 	CommandCSLevels commandcslevels;
-	EventHandlers<Event::LevelChange> onlevelchange;
 	AccessChanAccessType accesschanaccesstype;
 
  public:
 	CSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::GroupCheckPriv>(this)
 		, commandcsaccess(this)
-		, commandcslevels(this, onlevelchange)
-		, onlevelchange(this)
+		, commandcslevels(this)
 		, accesschanaccesstype(this)
 	{
 		this->SetPermanent(true);

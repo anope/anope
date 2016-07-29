@@ -11,6 +11,10 @@ namespace Event
 {
 	struct BotFantasy : Events
 	{
+		static constexpr const char *NAME = "botfantasy";
+
+		using Events::Events;
+
 		/** Called on fantasy command
 		 * @param source The source of the command
 		 * @param c The command
@@ -23,6 +27,10 @@ namespace Event
 
 	struct CoreExport BotNoFantasyAccess : Events
 	{
+		static constexpr const char *NAME = "botnofantasyaccess";
+
+		using Events::Events;
+
 		/** Called on fantasy command without access
 		 * @param source The source of the command
 		 * @param c The command
@@ -34,5 +42,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::BotFantasy> { static constexpr const char *const name = "OnBotFantasy"; };
-template<> struct EventName<Event::BotNoFantasyAccess> { static constexpr const char *const name = "OnBotNoFantasyAccess"; };

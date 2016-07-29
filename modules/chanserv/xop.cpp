@@ -5,14 +5,14 @@
  *
  * Please read COPYING and README for further details.
  *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
  */
 
+/* Dependencies: anope_chanserv.main */
 
 #include "module.h"
-#include "modules/cs_access.h"
-#include "main/chanaccess.h"
+#include "modules/chanserv.h"
+#include "modules/chanserv/access.h"
+#include "modules/chanserv/main/chanaccess.h"
 #include "main/chanaccesstype.h"
 
 namespace
@@ -21,14 +21,17 @@ namespace
 	std::map<Anope::string, std::vector<Anope::string> > permissions;
 }
 
-class XOPChanAccess : public ChanAccessImpl
+class XOPChanAccessImpl : public XOPChanAccess
 {
- public:
-	XOPChanAccess(Serialize::TypeBase *type) : ChanAccessImpl(type) { }
-	XOPChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanAccessImpl(type, id) { }
+	friend class XOPChanAccessType;
 
-	Anope::string GetType();
-	void SetType(const Anope::string &);
+	Anope::string type;
+
+ public:
+	using XOPChanAccess::XOPChanAccess;
+
+	const Anope::string &GetType() override;
+	void SetType(const Anope::string &) override;
 
 	bool HasPriv(const Anope::string &priv) override
 	{
@@ -53,7 +56,7 @@ class XOPChanAccess : public ChanAccessImpl
 
 	static Anope::string DetermineLevel(ChanServ::ChanAccess *access)
 	{
-		if (access->GetSerializableType()->GetName() == "XOPChanAccess")
+		if (access->GetSerializableType()->GetName() == NAME)
 		{
 			XOPChanAccess *xaccess = anope_dynamic_static_cast<XOPChanAccess *>(access);
 			return xaccess->GetType();
@@ -84,19 +87,19 @@ class XOPChanAccess : public ChanAccessImpl
 
 };
 
-class XOPChanAccessType : public Serialize::Type<XOPChanAccess, ChanAccessType>
+class XOPChanAccessType : public ChanAccessType<XOPChanAccessImpl>
 {
  public:
-	Serialize::Field<XOPChanAccess, Anope::string> type;
+	Serialize::Field<XOPChanAccessImpl, Anope::string> type;
 
-	XOPChanAccessType(Module *me) : Serialize::Type<XOPChanAccess, ChanAccessType>(me, "XOPChanAccess")
-		, type(this, "type")
+	XOPChanAccessType(Module *me) : ChanAccessType<XOPChanAccessImpl>(me)
+		, type(this, "type", &XOPChanAccessImpl::type)
 	{
-		SetParent(ChanServ::chanaccess);
+		Serialize::SetParent(XOPChanAccess::NAME, ChanServ::ChanAccess::NAME);
 	}
 };
 
-Anope::string XOPChanAccess::GetType()
+const Anope::string &XOPChanAccess::GetType()
 {
 	return Get(&XOPChanAccessType::type);
 }
@@ -125,16 +128,12 @@ class CommandCSXOP : public Command
 			return;
 		}
 
-		XOPChanAccess tmp_access(NULL);
-		tmp_access.SetChannel(ci);
-		tmp_access.SetType(source.command.upper());
-
 		ChanServ::AccessGroup access = source.AccessFor(ci);
 		ChanServ::ChanAccess *highest = access.Highest();
 		bool override = false;
 
 		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
-			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccess::DetermineLevel(highest)) : order.end();
+			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccessImpl::DetermineLevel(highest)) : order.end();
 
 		if (!access.founder && (!access.HasPriv("ACCESS_CHANGE") || cmd_it <= access_it))
 		{
@@ -217,13 +216,13 @@ class CommandCSXOP : public Command
 		}
 
 		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
-		if (access_max && ci->GetDeepAccessCount() >= access_max)
+		if (access_max && ci->GetAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
 			return;
 		}
 
-		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(xopchanaccess.Create());
+		XOPChanAccess *acc = Serialize::New<XOPChanAccess *>();
 		if (na)
 			acc->SetObj(na->GetAccount());
 		else if (targ_ci)
@@ -237,7 +236,7 @@ class CommandCSXOP : public Command
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask;
 
-		Event::OnAccessAdd(&Event::AccessAdd::OnAccessAdd, ci, source, acc);
+		EventManager::Get()->Dispatch(&Event::AccessAdd::OnAccessAdd, ci, source, acc);
 		source.Reply(_("\002%s\002 added to %s %s list."), acc->Mask(), ci->GetName().c_str(), source.command.c_str());
 	}
 
@@ -281,7 +280,7 @@ class CommandCSXOP : public Command
 		}
 
 		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
-			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccess::DetermineLevel(highest)) : order.end();
+			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccessImpl::DetermineLevel(highest)) : order.end();
 
 		if (!mask.equals_ci(nc->GetDisplay()) && !access.founder && (!access.HasPriv("ACCESS_CHANGE") || cmd_it <= access_it))
 		{
@@ -317,7 +316,7 @@ class CommandCSXOP : public Command
 					else
 						nicks = caccess->Mask();
 
-					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, caccess);
+					EventManager::Get()->Dispatch(&Event::AccessDel::OnAccessDel, ci, source, caccess);
 					delete caccess;
 				},
 				[&]()
@@ -350,7 +349,7 @@ class CommandCSXOP : public Command
 
 					source.Reply(_("\002%s\002 deleted from %s %s list."), a->Mask().c_str(), ci->GetName().c_str(), source.command.c_str());
 
-					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, a);
+					EventManager::Get()->Dispatch(&Event::AccessDel::OnAccessDel, ci, source, a);
 					delete a;
 
 					return;
@@ -467,7 +466,7 @@ class CommandCSXOP : public Command
 			delete access;
 		}
 
-		Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
+		EventManager::Get()->Dispatch(&Event::AccessClear::OnAccessClear, ci, source);
 
 		source.Reply(_("Channel %s %s list has been cleared."), ci->GetName().c_str(), source.command.c_str());
 	}

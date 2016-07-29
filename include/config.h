@@ -129,7 +129,7 @@ namespace Configuration
 		unsigned int LineWrap;
 		std::vector<Usermode> Usermodes;
 		std::vector<Channelmode> Channelmodes;
-		unsigned char CaseMapUpper[256], CaseMapLower[256];
+		unsigned char CaseMapUpper[256] = { 0 }, CaseMapLower[256] = { 0 };
 
 		/* module configuration blocks */
 		std::map<Anope::string, Block *> modules;

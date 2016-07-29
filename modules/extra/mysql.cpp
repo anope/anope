@@ -182,6 +182,7 @@ class ModuleSQL : public Module
 	DispatcherThread *DThread;
 
 	ModuleSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::ModuleUnload>(this)
 	{
 		me = this;
 
@@ -526,9 +527,9 @@ void MySQLService::Connect()
 	bool connect = mysql_real_connect(this->sql, this->server.c_str(), this->user.c_str(), this->password.c_str(), this->database.c_str(), this->port, NULL, CLIENT_MULTI_RESULTS);
 
 	if (!connect)
-		throw SQL::Exception("Unable to connect to MySQL service " + this->name + ": " + mysql_error(this->sql));
+		throw SQL::Exception("Unable to connect to MySQL service " + this->GetName() + ": " + mysql_error(this->sql));
 
-	Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->name << " at " << this->server << ":" << this->port;
+	Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->GetName() << " at " << this->server << ":" << this->port;
 }
 
 

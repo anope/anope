@@ -14,10 +14,8 @@
 
 class CommandCSInfo : public Command
 {
-	EventHandlers<Event::ChanInfo> &eventonchaninfo;
-
  public:
-	CommandCSInfo(Module *creator, EventHandlers<Event::ChanInfo> &event) : Command(creator, "chanserv/info", 1, 2), eventonchaninfo(event)
+	CommandCSInfo(Module *creator) : Command(creator, "chanserv/info", 1, 2)
 	{
 		this->SetDesc(_("Lists information about the specified registered channel"));
 		this->SetSyntax(_("\037channel\037"));
@@ -63,7 +61,7 @@ class CommandCSInfo : public Command
 			info[_("Ban type")] = stringify(ci->GetBanType());
 		}
 
-		this->eventonchaninfo(&Event::ChanInfo::OnChanInfo, source, ci, info, show_all);
+		EventManager::Get()->Dispatch(&Event::ChanInfo::OnChanInfo, source, ci, info, show_all);
 
 		std::vector<Anope::string> replies;
 		info.Process(replies);
@@ -83,12 +81,10 @@ class CommandCSInfo : public Command
 class CSInfo : public Module
 {
 	CommandCSInfo commandcsinfo;
-	EventHandlers<Event::ChanInfo> eventonchaninfo;
 
  public:
 	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandcsinfo(this, eventonchaninfo)
-		, eventonchaninfo(this)
+		, commandcsinfo(this)
 	{
 
 	}

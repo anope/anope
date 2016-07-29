@@ -8,6 +8,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
+/* Dependencies: anope_chanserv.access */
+
 #include "module.h"
 #include "modules/operserv/session.h"
 #include "modules/botserv/kick.h"
@@ -159,6 +161,8 @@ enum
 
 static void process_mlock(ChanServ::Channel *ci, uint32_t lock, bool status, uint32_t *limit, Anope::string *key)
 {
+	ServiceReference<ModeLocks> mlocks;
+	
 	if (!mlocks)
 		return;
 
@@ -463,7 +467,7 @@ static void LoadNicks()
 
 			READ(read_string(buffer, f));
 
-			NickServ::Account *nc = NickServ::account.Create();
+			NickServ::Account *nc = Serialize::New<NickServ::Account *>();
 			nc->SetDisplay(buffer);
 
 			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_secure", "ns_private", "hide_email",
@@ -532,9 +536,9 @@ static void LoadNicks()
 				nc->SetS<bool>("HIDE_STATUS", true);
 			if (u32 & OLD_NI_SUSPENDED)
 			{
-				if (nssuspendinfo)
+				NSSuspendInfo *si = Serialize::New<NSSuspendInfo *>();
+				if (si)
 				{
-					NSSuspendInfo *si = nssuspendinfo.Create();
 					si->SetAccount(nc);
 				}
 			}
@@ -594,9 +598,9 @@ static void LoadNicks()
 			{
 				READ(read_string(buffer, f));
 
-				if (nsaccess)
+				NickAccess *a = Serialize::New<NickAccess *>();
+				if (a)
 				{
-					NickAccess *a = nsaccess.Create();
 					a->SetAccount(nc);
 					a->SetMask(buffer);
 				}
@@ -610,7 +614,7 @@ static void LoadNicks()
 				mi->SetMemoMax(i16);
 			for (int16_t j = 0; j < i16; ++j)
 			{
-				MemoServ::Memo *m = MemoServ::service ? MemoServ::service->CreateMemo() : nullptr;
+				MemoServ::Memo *m = Serialize::New<MemoServ::Memo *>();
 				READ(read_uint32(&u32, f));
 				uint16_t flags;
 				READ(read_uint16(&flags, f));
@@ -664,28 +668,26 @@ static void LoadNicks()
 
 			if (tmpu16 & OLD_NS_VERBOTEN)
 			{
-				if (!forbiddata)
-				{
-					delete nc;
-					continue;
-				}
-
 				if (nc->GetDisplay().find_first_of("?*") != Anope::string::npos)
 				{
 					delete nc;
 					continue;
 				}
 
-				ForbidData *d = forbiddata.Create();
-				d->SetMask(nc->GetDisplay());
-				d->SetCreator(last_usermask);
-				d->SetReason(last_realname);
-				d->SetType(FT_NICK);
+				ForbidData *d = Serialize::New<ForbidData *>();
+				if (d)
+				{
+					d->SetMask(nc->GetDisplay());
+					d->SetCreator(last_usermask);
+					d->SetReason(last_realname);
+					d->SetType(FT_NICK);
+				}
+				
 				delete nc;
 				continue;
 			}
 
-			NickServ::Nick *na = NickServ::nick.Create();
+			NickServ::Nick *na = Serialize::New<NickServ::Nick *>();
 			na->SetNick(nick);
 			na->SetAccount(nc);
 			na->SetLastUsermask(last_usermask);
@@ -756,9 +758,8 @@ static void LoadBots()
 		READ(read_int16(&chancount, f));
 
 		ServiceBot *bi = ServiceBot::Find(nick, true);
-		//XXX
-	//	if (!bi)
-	//		bi = new ServiceBot(nick, user, host, real);
+		if (!bi)
+			bi = new ServiceBot(nick, user, host, real);
 		bi->bi->SetCreated(created);
 
 		if (flags & OLD_BI_PRIVATE)
@@ -772,10 +773,13 @@ static void LoadBots()
 
 static void LoadChannels()
 {
-	if (!ChanServ::service)
+	ServiceReference<BadWords> badwords;
+	ServiceReference<ChanServ::ChanServService> chanserv;
+	
+	if (!chanserv)
 		return;
 
-	ServiceReference<ForbidService> forbid("ForbidService", "forbid");
+	ServiceReference<ForbidService> forbid;
 	dbFILE *f = open_db_read("ChanServ", "chan.db", 16);
 	if (f == NULL)
 		return;
@@ -786,7 +790,7 @@ static void LoadChannels()
 			Anope::string buffer;
 			char namebuf[64];
 			READ(read_buffer(namebuf, f));
-			ChanServ::Channel *ci = ChanServ::channel.Create();
+			ChanServ::Channel *ci = Serialize::New<ChanServ::Channel *>();
 			ci->SetName(namebuf);
 
 			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "cs_secure", "secureops", "securefounder",
@@ -860,9 +864,9 @@ static void LoadChannels()
 			READ(read_string(forbidreason, f));
 			if (tmpu32 & OLD_CI_SUSPENDED)
 			{
-				if (cssuspendinfo)
+				CSSuspendInfo *si = Serialize::New<CSSuspendInfo *>();
+				if (si)
 				{
-					CSSuspendInfo *si = cssuspendinfo.Create();
 					si->SetChannel(ci);
 					si->SetBy(forbidby);
 				}
@@ -903,13 +907,11 @@ static void LoadChannels()
 
 					if (xop)
 					{
-						if (xopchanaccess)
-							access = xopchanaccess.Create();
+						access = Serialize::New<XOPChanAccess *>();
 					}
 					else
 					{
-						if (accesschanaccess)
-							access = accesschanaccess.Create();
+						access = Serialize::New<AccessChanAccess *>();
 					}
 
 					if (access)
@@ -998,7 +1000,7 @@ static void LoadChannels()
 			{
 				READ(read_uint32(&tmpu32, f));
 				READ(read_uint16(&tmpu16, f));
-				MemoServ::Memo *m = MemoServ::service ? MemoServ::service->CreateMemo() : nullptr;
+				MemoServ::Memo *m = Serialize::New<MemoServ::Memo *>();
 				READ(read_int32(&tmp32, f));
 				if (m)
 					m->SetTime(tmp32);
@@ -1015,9 +1017,9 @@ static void LoadChannels()
 			READ(read_string(buffer, f));
 			if (!buffer.empty())
 			{
-				if (entrymsg)
+				EntryMsg *e = Serialize::New<EntryMsg *>();
+				if (e)
 				{
-					EntryMsg *e = entrymsg.Create();
 					e->SetChannel(ci);
 					e->SetCreator("Unknown");
 					e->SetMessage(buffer);
@@ -1129,23 +1131,21 @@ static void LoadChannels()
 
 			if (forbid_chan)
 			{
-				if (!forbiddata)
-				{
-					delete ci;
-					continue;
-				}
-
 				if (ci->GetName().find_first_of("?*") != Anope::string::npos)
 				{
 					delete ci;
 					continue;
 				}
 
-				ForbidData *d = forbiddata.Create();
-				d->SetMask(ci->GetName());
-				d->SetCreator(forbidby);
-				d->SetReason(forbidreason);
-				d->SetType(FT_CHAN);
+				ForbidData *d = Serialize::New<ForbidData *>();
+				if (d)
+				{
+					d->SetMask(ci->GetName());
+					d->SetCreator(forbidby);
+					d->SetReason(forbidreason);
+					d->SetType(FT_CHAN);
+				}
+				
 				delete ci;
 				continue;
 			}
@@ -1198,8 +1198,14 @@ static void LoadOper()
 		if (!akill)
 			continue;
 
-		XLine *x = new XLine(user + "@" + host, by, expires, reason, XLineManager::GenerateUID());
+		XLine *x = Serialize::New<XLine *>();
+		x->SetMask(user + "@" + host);
+		x->SetBy(by);
+		x->SetExpires(expires);
+		x->SetReason(reason);
+		x->SetID(XLineManager::GenerateUID());
 		x->SetCreated(seton);
+
 		akill->AddXLine(x);
 	}
 
@@ -1218,8 +1224,14 @@ static void LoadOper()
 		if (!snline)
 			continue;
 
-		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		XLine *x = Serialize::New<XLine *>();
+		x->SetMask(mask);
+		x->SetBy(by);
+		x->SetExpires(expires);
+		x->SetReason(reason);
+		x->SetID(XLineManager::GenerateUID());
 		x->SetCreated(seton);
+
 		snline->AddXLine(x);
 	}
 
@@ -1238,8 +1250,14 @@ static void LoadOper()
 		if (!sqline)
 			continue;
 
-		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		XLine *x = Serialize::New<XLine *>();
+		x->SetMask(mask);
+		x->SetBy(by);
+		x->SetExpires(expires);
+		x->SetReason(reason);
+		x->SetID(XLineManager::GenerateUID());
 		x->SetCreated(seton);
+
 		sqline->AddXLine(x);
 	}
 
@@ -1258,8 +1276,14 @@ static void LoadOper()
 		if (!szline)
 			continue;
 
-		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		XLine *x = Serialize::New<XLine *>();
+		x->SetMask(mask);
+		x->SetBy(by);
+		x->SetExpires(expires);
+		x->SetReason(reason);
+		x->SetID(XLineManager::GenerateUID());
 		x->SetCreated(seton);
+
 		szline->AddXLine(x);
 	}
 
@@ -1268,9 +1292,6 @@ static void LoadOper()
 
 static void LoadExceptions()
 {
-	if (!session_service)
-		return;
-
 	dbFILE *f = open_db_read("OperServ", "exception.db", 9);
 	if (f == NULL)
 		return;
@@ -1291,9 +1312,9 @@ static void LoadExceptions()
 		READ(read_int32(&time, f));
 		READ(read_int32(&expires, f));
 
-		if (exception && session_service)
+		Exception *e = Serialize::New<Exception *>();
+		if (e)
 		{
-			Exception *e = exception.Create();
 			e->SetMask(mask);
 			e->SetLimit(limit);
 			e->SetWho(who);
@@ -1308,9 +1329,6 @@ static void LoadExceptions()
 
 static void LoadNews()
 {
-	if (!newsitem)
-		return;
-
 	dbFILE *f = open_db_read("OperServ", "news.db", 9);
 
 	if (f == NULL)
@@ -1322,7 +1340,10 @@ static void LoadNews()
 	for (int16_t i = 0; i < n; i++)
 	{
 		int16_t type;
-		NewsItem *ni = newsitem.Create();
+		NewsItem *ni = Serialize::New<NewsItem *>();
+		
+		if (!ni)
+			break;
 
 		READ(read_int16(&type, f));
 
@@ -1362,11 +1383,13 @@ class DBOld : public Module
 	, public EventHook<Event::LoadDatabase>
 	, public EventHook<Event::UplinkSync>
 {
-	ExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit;
+	ExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit; // XXX these are no longer required because of confmodes
 	ExtensibleItem<Anope::string> mlock_key;
 
  public:
 	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+		, EventHook<Event::LoadDatabase>(this)
+		, EventHook<Event::UplinkSync>(this)
 		, mlock_on(this, "mlock_on")
 		, mlock_off(this, "mlock_off")
 		, mlock_limit(this, "mlock_limit")
@@ -1423,6 +1446,11 @@ class DBOld : public Module
 		}
 	}
 };
+
+template<> void ModuleInfo<DBOld>(ModuleDef *def)
+{
+	def->Depends("chanserv.access");
+}
 
 MODULE_INIT(DBOld)
 

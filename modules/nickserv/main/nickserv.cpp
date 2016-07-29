@@ -138,16 +138,12 @@ class NickServCore : public Module, public NickServ::NickServService
 	, public EventHook<Event::ExpireTick>
 	, public EventHook<Event::NickInfo>
 	, public EventHook<Event::ModuleUnload>
-	, public EventHook<Event::NickCoreCreate>
+	, public EventHook<NickServ::Event::NickRegister>
 	, public EventHook<Event::UserQuit>
 {
 	Reference<ServiceBot> NickServ;
 	std::vector<Anope::string> defaults;
 	ExtensibleItem<bool> held, collided;
-	EventHandlers<NickServ::Event::PreNickExpire> onprenickexpire;
-	EventHandlers<NickServ::Event::NickExpire> onnickexpire;
-	EventHandlers<NickServ::Event::NickRegister> onnickregister;
-	EventHandlers<NickServ::Event::NickValidate> onnickvalidate;
 	std::set<NickServ::IdentifyRequest *> identifyrequests;
 	NickServ::nickalias_map NickList;
 	NickServ::nickcore_map AccountList;
@@ -173,21 +169,41 @@ class NickServCore : public Module, public NickServ::NickServService
  public:
 	NickServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 		, NickServ::NickServService(this)
+
+		, EventHook<Event::Shutdown>(this)
+		, EventHook<Event::Restart>(this)
+		, EventHook<Event::UserLogin>(this)
+		, EventHook<Event::DelNick>(this)
+		, EventHook<Event::DelCore>(this)
+		, EventHook<Event::ChangeCoreDisplay>(this)
+		, EventHook<Event::NickIdentify>(this)
+		, EventHook<Event::NickGroup>(this)
+		, EventHook<Event::NickUpdate>(this)
+		, EventHook<Event::UserConnect>(this)
+		, EventHook<Event::PostUserLogoff>(this)
+		, EventHook<Event::ServerSync>(this)
+		, EventHook<Event::UserNickChange>(this)
+		, EventHook<Event::UserModeSet>(this)
+		, EventHook<Event::Help>(this)
+		, EventHook<Event::ExpireTick>(this)
+		, EventHook<Event::NickInfo>(this)
+		, EventHook<Event::ModuleUnload>(this)
+		, EventHook<NickServ::Event::NickRegister>(this)
+		, EventHook<Event::UserQuit>(this)
+
 		, held(this, "HELD")
 		, collided(this, "COLLIDED")
-		, onprenickexpire(this)
-		, onnickexpire(this)
-		, onnickregister(this)
-		, onnickvalidate(this)
 		, nick_type(this)
 		, account_type(this)
 		, mode_type(this)
 	{
+		NickServ::service = this;
 	}
 
 	~NickServCore()
 	{
 		OnShutdown();
+		NickServ::service = nullptr;
 	}
 
 	void OnShutdown() override
@@ -210,7 +226,7 @@ class NickServCore : public Module, public NickServ::NickServService
 		if (!na)
 			return;
 
-		EventReturn MOD_RESULT = this->onnickvalidate(&NickServ::Event::NickValidate::OnNickValidate, u, na);
+		EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&NickServ::Event::NickValidate::OnNickValidate, u, na);
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			this->Collide(u, na);
@@ -412,7 +428,7 @@ class NickServCore : public Module, public NickServ::NickServService
 			IRCD->SendLogout(user);
 			user->RemoveMode(NickServ, "REGISTERED");
 			user->Logout();
-			Event::OnNickLogout(&Event::NickLogout::OnNickLogout, user);
+			EventManager::Get()->Dispatch(&Event::NickLogout::OnNickLogout, user);
 		}
 	}
 
@@ -588,11 +604,11 @@ class NickServCore : public Module, public NickServ::NickServService
 			"nickname(s)."), NickServ->nick.c_str());
 	}
 
-	void OnNickCoreCreate(NickServ::Account *nc) override
+	void OnNickRegister(User *, NickServ::Nick *na, const Anope::string &) override
 	{
 		/* Set default flags */
 		for (unsigned i = 0; i < defaults.size(); ++i)
-			nc->SetS<bool>(defaults[i].upper(), true);
+			na->GetAccount()->SetS<bool>(defaults[i].upper(), true);
 	}
 
 	void OnUserQuit(User *u, const Anope::string &msg) override
@@ -627,12 +643,12 @@ class NickServCore : public Module, public NickServ::NickServService
 			if (nickserv_expire && Anope::CurTime - na->GetLastSeen() >= nickserv_expire)
 				expire = true;
 
-			this->onprenickexpire(&NickServ::Event::PreNickExpire::OnPreNickExpire, na, expire);
+			EventManager::Get()->Dispatch(&NickServ::Event::PreNickExpire::OnPreNickExpire, na, expire);
 
 			if (expire)
 			{
 				Log(LOG_NORMAL, "nickserv/expire", NickServ) << "Expiring nickname " << na->GetNick() << " (group: " << na->GetAccount()->GetDisplay() << ") (e-mail: " << (na->GetAccount()->GetEmail().empty() ? "none" : na->GetAccount()->GetEmail()) << ")";
-				this->onnickexpire(&NickServ::Event::NickExpire::OnNickExpire, na);
+				EventManager::Get()->Dispatch(&NickServ::Event::NickExpire::OnNickExpire, na);
 				delete na;
 			}
 		}
@@ -657,27 +673,10 @@ class NickServCore : public Module, public NickServ::NickServService
 	{
 		for (std::set<NickServ::IdentifyRequest *>::iterator it = identifyrequests.begin(), it_end = identifyrequests.end(); it != it_end;)
 		{
-			NickServ::IdentifyRequest *ir = *it;
+			IdentifyRequestImpl *ir = anope_dynamic_static_cast<IdentifyRequestImpl *>(*it);
 			++it;
 
-			ir->Release(m);
-#if 0
-			ir->holds.erase(m);
-			if (ir->holds.empty() && ir->dispatched)
-			{
-				if (!ir->success)
-					ir->OnFail();
-				delete ir;
-				continue;
-			}
-
-			if (ir->GetOwner() == m)
-			{
-				if (!ir->success)
-					ir->OnFail();
-				delete ir;
-			}
-#endif
+			ir->Unload(m);
 		}
 	}
 };

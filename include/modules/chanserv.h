@@ -90,6 +90,8 @@ namespace ChanServ
 	class Level : public Serialize::Object
 	{
 	 public:
+		static constexpr const char *const NAME = "level";
+		
 		using Serialize::Object::Object;
 
 		virtual Channel *GetChannel() anope_abstract;
@@ -102,11 +104,11 @@ namespace ChanServ
 		virtual void SetLevel(const int &) anope_abstract;
 	};
 
-	static Serialize::TypeReference<Level> level("Level");
-
 	class Mode : public Serialize::Object
 	{
 	 public:
+		static constexpr const char *const NAME = "mlockmode";
+		 
 		using Serialize::Object::Object;
 
 		virtual Channel *GetChannel() anope_abstract;
@@ -119,12 +121,12 @@ namespace ChanServ
 		virtual void SetParam(const Anope::string &) anope_abstract;
 	};
 
-	static Serialize::TypeReference<Mode> mode("CSKeepMode");
-
 	class ChanServService : public Service
 	{
 	 public:
-		ChanServService(Module *m) : Service(m, "ChanServService", "ChanServ")
+		static constexpr const char *NAME = "chanserv";
+		
+		ChanServService(Module *m) : Service(m, NAME)
 		{
 		}
 
@@ -142,7 +144,8 @@ namespace ChanServ
 		virtual std::vector<Privilege> &GetPrivileges() anope_abstract;
 		virtual void ClearPrivileges() anope_abstract;
 	};
-	static ServiceReference<ChanServService> service("ChanServService", "ChanServ");
+	
+	extern ChanServService *service;
 
 	inline Channel *Find(const Anope::string name)
 	{
@@ -153,22 +156,28 @@ namespace ChanServ
 	{
 		struct CoreExport PreChanExpire : Events
 		{
+			static constexpr const char *NAME = "prechanexpire";
+
+			using Events::Events;
+			
 			/** Called before a channel expires
 			 * @param ci The channel
 			 * @param expire Set to true to allow the chan to expire
 			 */
 			virtual void OnPreChanExpire(Channel *ci, bool &expire) anope_abstract;
 		};
-		static EventHandlersReference<PreChanExpire> OnPreChanExpire;
 
 		struct CoreExport ChanExpire : Events
 		{
+			static constexpr const char *NAME = "chanexpire";
+
+			using Events::Events;
+			
 			/** Called before a channel expires
 			 * @param ci The channel
 			 */
 			virtual void OnChanExpire(Channel *ci) anope_abstract;
 		};
-		static EventHandlersReference<ChanExpire> OnChanExpire;
 	}
 
 	/* It matters that Base is here before Extensible (it is inherited by Serializable)
@@ -182,6 +191,8 @@ namespace ChanServ
 		using Serialize::Object::Object;
 
 	 public:
+		static constexpr const char *const NAME = "channel";
+		
 		virtual Anope::string GetName() anope_abstract;
 		virtual void SetName(const Anope::string &) anope_abstract;
 
@@ -247,6 +258,7 @@ namespace ChanServ
 			if (ChanServ)
 				return ChanServ;
 
+#warning "if(this)"
 			//XXX
 //			if (!BotListByNick->empty())
 //				return BotListByNick->begin()->second;
@@ -273,11 +285,6 @@ namespace ChanServ
 		 * @return The access vector size
 		 */
 		virtual unsigned GetAccessCount() /*const*/ anope_abstract;
-
-		/** Get the number of access entries for this channel,
-		 * including those that are on other channels.
-		 */
-		virtual unsigned GetDeepAccessCount() const anope_abstract;
 
 		/** Clear the entire channel access list
 		 *
@@ -350,8 +357,6 @@ namespace ChanServ
 		virtual MemoServ::MemoInfo *GetMemos() anope_abstract;
 	};
 
-	static Serialize::TypeReference<Channel> channel("ChannelInfo");
-
 	enum
 	{
 		ACCESS_INVALID = -10000,
@@ -362,15 +367,14 @@ namespace ChanServ
 	class CoreExport ChanAccess : public Serialize::Object
 	{
 	 public:
-		typedef std::multimap<ChanAccess *, ChanAccess *> Set;
-		/* shows the 'path' taken to determine if an access entry matches a user
-		 * .first are access entries checked
-		 * .second are access entries which match
-		 */
-		typedef std::pair<Set, Set> Path;
+		static constexpr const char *const NAME = "access";
 
-		ChanAccess(Serialize::TypeBase *type) : Serialize::Object(type) { }
-		ChanAccess(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
+		Channel *channel = nullptr;
+		Serialize::Object *object = nullptr;
+		Anope::string creator, mask;
+		time_t last_seen = 0, created = 0;
+
+		using Serialize::Object::Object;
 
 		virtual Channel *GetChannel() anope_abstract;
 		virtual void SetChannel(Channel *ci) anope_abstract;
@@ -396,9 +400,8 @@ namespace ChanServ
 		/** Check if this access entry matches the given user or account
 		 * @param u The user
 		 * @param acc The account
-		 * @param p The path to the access object which matches will be put here
 		 */
-		virtual bool Matches(const User *u, NickServ::Account *acc, Path &p) anope_abstract;
+		virtual bool Matches(const User *u, NickServ::Account *acc) anope_abstract;
 
 		/** Check if this access entry has the given privilege.
 		 * @param name The privilege name
@@ -417,7 +420,7 @@ namespace ChanServ
 		virtual void AccessUnserialize(const Anope::string &data) anope_abstract;
 
 		/* Comparison operators to other Access entries */
-		bool operator>(ChanAccess &other)
+		virtual bool operator>(ChanAccess &other)
 		{
 			const std::vector<Privilege> &privs = service->GetPrivileges();
 			for (unsigned i = privs.size(); i > 0; --i)
@@ -434,7 +437,7 @@ namespace ChanServ
 			return false;
 		}
 
-		bool operator<(ChanAccess &other)
+		virtual bool operator<(ChanAccess &other)
 		{
 			const std::vector<Privilege> &privs = service->GetPrivileges();
 			for (unsigned i = privs.size(); i > 0; --i)
@@ -461,174 +464,5 @@ namespace ChanServ
 			return !(*this > other);
 		}
 	};
-
-	static Serialize::TypeReference<ChanAccess> chanaccess("ChanAccess");
-
-	/* A group of access entries. This is used commonly, for example with ChanServ::Channel::AccessFor,
-	 * to show what access a user has on a channel because users can match multiple access entries.
-	 */
-	class CoreExport AccessGroup : public std::vector<ChanAccess *>
-	{
-	 public:
-		/* Channel these access entries are on */
-		ChanServ::Channel *ci;
-		/* Path from these entries to other entries that they depend on */
-		ChanAccess::Path path;
-		/* Account these entries affect, if any */
-		const NickServ::Account *nc;
-		/* super_admin always gets all privs. founder is a special case where ci->founder == nc */
-		bool super_admin, founder;
-
-		AccessGroup()
-		{
-			this->ci = NULL;
-			this->nc = NULL;
-			this->super_admin = this->founder = false;
-		}
-
-	 private:
-		bool HasPriv(ChanAccess *access, const Anope::string &name)
-		{
-			EventReturn MOD_RESULT = ::Event::OnCheckPriv(&::Event::CheckPriv::OnCheckPriv, access, name);
-			if (MOD_RESULT == EVENT_ALLOW || access->HasPriv(name))
-			{
-				typedef std::multimap<ChanAccess *, ChanAccess *> P;
-				std::pair<P::const_iterator, P::const_iterator> it = this->path.second.equal_range(access);
-				if (it.first != it.second)
-					/* check all of the paths for this entry */
-					for (; it.first != it.second; ++it.first)
-					{
-						ChanAccess *a = it.first->second;
-						/* if only one path fully matches then we are ok */
-						if (HasPriv(a, name))
-							return true;
-					}
-				else
-					/* entry is the end of a chain, all entries match, ok */
-					return true;
-			}
-
-			/* entry does not match or none of the chains fully match */
-			return false;
-		}
-
-	 public:
-		/** Check if this access group has a certain privilege. Eg, it
-		 * will check every ChanAccess entry of this group for any that
-		 * has the given privilege.
-		 * @param priv The privilege
-		 * @return true if any entry has the given privilege
-		 */
-		bool HasPriv(const Anope::string &priv)
-		{
-			if (this->super_admin)
-				return true;
-			else if (!ci || ci->GetLevel(priv) == ACCESS_INVALID)
-				return false;
-
-			/* Privileges prefixed with auto are understood to be given
-			 * automatically. Sometimes founders want to not automatically
-			 * obtain privileges, so we will let them */
-			bool auto_mode = !priv.find("AUTO");
-
-			/* Only grant founder privilege if this isn't an auto mode or if they don't match any entries in this group */
-			if ((!auto_mode || this->empty()) && this->founder)
-				return true;
-
-			EventReturn MOD_RESULT;
-			MOD_RESULT = ::Event::OnGroupCheckPriv(&::Event::GroupCheckPriv::OnGroupCheckPriv, this, priv);
-			if (MOD_RESULT != EVENT_CONTINUE)
-				return MOD_RESULT == EVENT_ALLOW;
-
-			for (unsigned i = this->size(); i > 0; --i)
-			{
-				ChanAccess *access = this->at(i - 1);
-
-				if (HasPriv(access, priv))
-					return true;
-			}
-
-			return false;
-		}
-
-		/** Get the "highest" access entry from this group of entries.
-		 * The highest entry is determined by the entry that has the privilege
-		 * with the highest rank (see Privilege::rank).
-		 * @return The "highest" entry
-		 */
-		ChanAccess *Highest()
-		{
-			ChanAccess *highest = NULL;
-			for (unsigned i = 0; i < this->size(); ++i)
-				if (highest == NULL || *this->at(i) > *highest)
-					highest = this->at(i);
-			return highest;
-		}
-
-		/* Comparison operators to other AccessGroups */
-		bool operator>(AccessGroup &other)
-		{
-			if (other.super_admin)
-				return false;
-			else if (this->super_admin)
-				return true;
-			else if (other.founder)
-				return false;
-			else if (this->founder)
-				return true;
-
-			const std::vector<Privilege> &privs = service->GetPrivileges();
-			for (unsigned i = privs.size(); i > 0; --i)
-			{
-				bool this_p = this->HasPriv(privs[i - 1].name),
-					other_p = other.HasPriv(privs[i - 1].name);
-
-				if (!this_p && !other_p)
-					continue;
-
-				return this_p && !other_p;
-			}
-
-			return false;
-		}
-
-		bool operator<(AccessGroup &other)
-		{
-			if (this->super_admin)
-				return false;
-			else if (other.super_admin)
-				return true;
-			else if (this->founder)
-				return false;
-			else if (other.founder)
-				return true;
-
-			const std::vector<Privilege> &privs = service->GetPrivileges();
-			for (unsigned i = privs.size(); i > 0; --i)
-			{
-				bool this_p = this->HasPriv(privs[i - 1].name),
-					other_p = other.HasPriv(privs[i - 1].name);
-
-				if (!this_p && !other_p)
-					continue;
-
-				return !this_p && other_p;
-			}
-
-			return false;
-		}
-
-		bool operator>=(AccessGroup &other)
-		{
-			return !(*this < other);
-		}
-
-		bool operator<=(AccessGroup &other)
-		{
-			return !(*this > other);
-		}
-	};
 }
 
-template<> struct EventName<ChanServ::Event::PreChanExpire> { static constexpr const char *const name = "OnPreChanExpire"; };
-template<> struct EventName<ChanServ::Event::ChanExpire> { static constexpr const char *const name = "OnChanExpire"; };

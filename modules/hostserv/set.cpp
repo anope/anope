@@ -86,7 +86,7 @@ class CommandHSSet : public Command
 		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->GetNick() << " to " << (!user.empty() ? user + "@" : "") << host;
 
 		na->SetVhost(user, host, source.GetNick());
-		Event::OnSetVhost(&Event::SetVhost::OnSetVhost, na);
+		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, na);
 		if (!user.empty())
 			source.Reply(_("Vhost for \002{0}\002 set to \002{0}\002@\002{1}\002."), nick, user, host);
 		else
@@ -107,7 +107,7 @@ class CommandHSSetAll : public Command
 		if (!na || !na->HasVhost())
 			return;
 
-		for (NickServ::Nick *nick : na->GetAccount()->GetRefs<NickServ::Nick *>(NickServ::nick))
+		for (NickServ::Nick *nick : na->GetAccount()->GetRefs<NickServ::Nick *>())
 			nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 	}
 
@@ -184,7 +184,7 @@ class CommandHSSetAll : public Command
 
 		na->SetVhost(user, host, source.GetNick());
 		this->Sync(na);
-		Event::OnSetVhost(&Event::SetVhost::OnSetVhost, na);
+		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, na);
 		if (!user.empty())
 			source.Reply(_("Vhost for group \002{0}\002 set to \002{1}\002@\002{2}\002."), nick.c_str(), user.c_str(), host.c_str());
 		else

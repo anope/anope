@@ -14,7 +14,6 @@
 #include "modules/nickserv.h"
 
 static Anope::hash_map<NickServ::Account *> certmap;
-static EventHandlers<Event::NickCertEvents> *events;
 
 class CertServiceImpl : public CertService
 {
@@ -31,7 +30,7 @@ class CertServiceImpl : public CertService
 
 	bool Matches(User *u, NickServ::Account *nc) override
 	{
-		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>(certentry);
+		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>();
 		return !u->fingerprint.empty() && FindCert(cl, u->fingerprint);
 	}
 
@@ -46,6 +45,11 @@ class CertServiceImpl : public CertService
 
 class NSCertEntryImpl : public NSCertEntry
 {
+	friend class NSCertEntryType;
+
+	NickServ::Account *account = nullptr;
+	Anope::string cert;
+
  public:
 	NSCertEntryImpl(Serialize::TypeBase *type) : NSCertEntry(type) { }
 	NSCertEntryImpl(Serialize::TypeBase *type, Serialize::ID id) : NSCertEntry(type, id) { }
@@ -95,9 +99,9 @@ class NSCertEntryType : public Serialize::Type<NSCertEntryImpl>
 		}
 	} mask;
 
-	NSCertEntryType(Module *me) : Serialize::Type<NSCertEntryImpl>(me, "NSCertEntry")
-		, nc(this, "nc", true)
-		, mask(this, "mask")
+	NSCertEntryType(Module *me) : Serialize::Type<NSCertEntryImpl>(me)
+		, nc(this, "nc", &NSCertEntryImpl::account, true)
+		, mask(this, "mask", &NSCertEntryImpl::cert)
 	{
 	}
 };
@@ -141,8 +145,8 @@ class CommandNSCert : public Command
 
 	void DoAdd(CommandSource &source, NickServ::Account *nc, Anope::string certfp)
 	{
-		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>(certentry);
-		unsigned max = Config->GetModule(this->owner)->Get<unsigned>("max", "5");
+		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>();
+		unsigned max = Config->GetModule(this->GetOwner())->Get<unsigned>("max", "5");
 
 		if (cl.size() >= max)
 		{
@@ -175,9 +179,11 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		NSCertEntry *e = certentry.Create();
+		NSCertEntry *e = Serialize::New<NSCertEntry *>();
 		e->SetAccount(nc);
 		e->SetCert(certfp);
+		
+		// XXX fire events
 
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD certificate fingerprint " << certfp << " to " << nc->GetDisplay();
 		source.Reply(_("\002{0}\002 added to the certificate list of \002{1}\002."), certfp, nc->GetDisplay());
@@ -185,7 +191,7 @@ class CommandNSCert : public Command
 
 	void DoDel(CommandSource &source, NickServ::Account *nc, Anope::string certfp)
 	{
-		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>(certentry);
+		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>();
 
 		if (certfp.empty())
 		{
@@ -215,7 +221,7 @@ class CommandNSCert : public Command
 
 	void DoList(CommandSource &source, NickServ::Account *nc)
 	{
-		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>(certentry);
+		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>();
 
 		if (cl.empty())
 		{
@@ -309,18 +315,15 @@ class NSCert : public Module
 	CommandNSCert commandnscert;
 	CertServiceImpl cs;
 
-	EventHandlers<Event::NickCertEvents> onnickservevents;
-
  public:
 	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::Fingerprint>(this)
+		, EventHook<NickServ::Event::NickValidate>(this)
 		, commandnscert(this)
 		, cs(this)
-		, onnickservevents(this)
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
-
-		events = &onnickservevents;
 	}
 
 	void OnFingerprint(User *u) override

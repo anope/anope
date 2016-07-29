@@ -51,12 +51,9 @@ void Anope::Process(const Anope::string &buffer)
 
 	MessageSource src(source);
 
-	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnMessage(&Event::Message::OnMessage, src, command, params);
-	if (MOD_RESULT == EVENT_STOP)
-		return;
+	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::Message::OnMessage, src, command, params);
 
-	ServiceReference<IRCDMessage> m("IRCDMessage", proto_name + "/" + command.lower());
+	ServiceReference<IRCDMessage> m(proto_name + "/" + command.lower());
 	if (!m)
 	{
 		Log(LOG_DEBUG) << "unknown message from server (" << buffer << ")";

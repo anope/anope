@@ -1,5 +1,5 @@
 /*
- * (C) 2014 Anope Team
+ * (C) 2014-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -12,6 +12,8 @@ class CSSuspendInfo : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "cssuspendinfo";
+	 
 	virtual ChanServ::Channel *GetChannel() anope_abstract;
 	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
 
@@ -28,12 +30,14 @@ class CSSuspendInfo : public Serialize::Object
 	virtual void SetExpires(const time_t &) anope_abstract;
 };
 
-static Serialize::TypeReference<CSSuspendInfo> cssuspendinfo("CSSuspendInfo");
-
 namespace Event
 {
 	struct CoreExport ChanSuspend : Events
 	{
+		static constexpr const char *NAME = "chansuspend";
+
+		using Events::Events;
+		
 		/** Called when a channel is suspended
 		 * @param ci The channel
 		 */
@@ -41,13 +45,14 @@ namespace Event
 	};
 	struct CoreExport ChanUnsuspend : Events
 	{
+		static constexpr const char *NAME = "chanunsuspend";
+
+		using Events::Events;
+		
 		/** Called when a channel is unsuspended
 		 * @param ci The channel
 		 */
 		virtual void OnChanUnsuspend(ChanServ::Channel *ci) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ChanUnsuspend> OnChanUnsuspend;
 }
 
-template<> struct EventName<Event::ChanSuspend> { static constexpr const char *const name = "OnChanSuspend"; };
-template<> struct EventName<Event::ChanUnsuspend> { static constexpr const char *const name = "OnChanUnsuspend"; };

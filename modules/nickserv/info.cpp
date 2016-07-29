@@ -15,10 +15,8 @@
 
 class CommandNSInfo : public Command
 {
-	EventHandlers<Event::NickInfo> &onnickinfo;
-
  public:
-	CommandNSInfo(Module *creator, EventHandlers<Event::NickInfo> &event) : Command(creator, "nickserv/info", 0, 2), onnickinfo(event)
+	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 0, 2)
 	{
 		this->SetDesc(_("Displays information about a given nickname"));
 		this->SetSyntax(_("[\037nickname\037]"));
@@ -60,7 +58,7 @@ class CommandNSInfo : public Command
 			source.Reply(_("\002{0}\002 has not confirmed their account."), na->GetNick());
 
 		if (na->GetAccount()->IsServicesOper() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_STATUS")))
-			source.Reply(_("\002{0}\002 is a Services Operator of type \002{0}\002."), na->GetNick(), na->GetAccount()->o->GetType()->GetName());
+			source.Reply(_("\002{0}\002 is a Services Operator of type \002{1}\002."), na->GetNick(), na->GetAccount()->o->GetType()->GetName());
 
 		InfoFormatter info(source.nc);
 
@@ -112,7 +110,7 @@ class CommandNSInfo : public Command
 			}
 		}
 
-		this->onnickinfo(&Event::NickInfo::OnNickInfo, source, na, info, show_hidden);
+		EventManager::Get()->Dispatch(&Event::NickInfo::OnNickInfo, source, na, info, show_hidden);
 
 		std::vector<Anope::string> replies;
 		info.Process(replies);
@@ -161,7 +159,7 @@ class CommandNSSetHide : public Command
 		}
 		NickServ::Account *nc = na->GetAccount();
 
-		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -259,20 +257,17 @@ class NSInfo : public Module
 	CommandNSSetHide commandnssethide;
 	CommandNSSASetHide commandnssasethide;
 
-	EventHandlers<Event::NickInfo> onnickinfo;
-
 	Serialize::Field<NickServ::Account, bool> hide_email, hide_usermask, hide_status, hide_quit;
 
  public:
 	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandnsinfo(this, onnickinfo)
+		, commandnsinfo(this)
 		, commandnssethide(this)
 		, commandnssasethide(this)
-		, onnickinfo(this)
-		, hide_email(this, NickServ::account, "HIDE_EMAIL")
-		, hide_usermask(this, NickServ::account, "HIDE_MASK")
-		, hide_status(this, NickServ::account, "HIDE_STATUS")
-		, hide_quit(this, NickServ::account, "HIDE_QUIT")
+		, hide_email(this, "HIDE_EMAIL")
+		, hide_usermask(this, "HIDE_MASK")
+		, hide_status(this, "HIDE_STATUS")
+		, hide_quit(this, "HIDE_QUIT")
 	{
 
 	}

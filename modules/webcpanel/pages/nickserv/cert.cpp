@@ -1,8 +1,9 @@
 /*
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ * 
  */
 
 #include "../../webcpanel.h"
@@ -31,7 +32,7 @@ bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::str
 		WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "NickServ", "nickserv/cert", params, replacements);
 	}
 
-	std::vector<NSCertEntry *> cl = na->GetAccount()->GetRefs<NSCertEntry *>(certentry);
+	std::vector<NSCertEntry *> cl = na->GetAccount()->GetRefs<NSCertEntry *>();
 	for (NSCertEntry *e : cl)
 		replacements["CERTS"] = e->GetCert();
 

@@ -20,17 +20,25 @@ class BotServCore : public Module, public BotServ::BotServService
 	, public EventHook<Event::LeaveChannel>
 	, public EventHook<Event::Help>
 	, public EventHook<Event::ChannelModeSet>
-	, public EventHook<Event::CreateChan>
+	, public EventHook<Event::ChanRegistered>
 	, public EventHook<Event::UserKicked>
 	, public EventHook<Event::CreateBot>
 {
 	Reference<ServiceBot> BotServ;
-	ExtensibleRef<bool> persist, inhabit;//XXX?
+	ExtensibleRef<bool> inhabit;
 
  public:
 	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 		, BotServ::BotServService(this)
-		, persist("PERSIST")
+		, EventHook<Event::SetCorrectModes>(this)
+		, EventHook<Event::BotAssign>(this)
+		, EventHook<Event::JoinChannel>(this)
+		, EventHook<Event::LeaveChannel>(this)
+		, EventHook<Event::Help>(this)
+		, EventHook<Event::ChannelModeSet>(this)
+		, EventHook<Event::ChanRegistered>(this)
+		, EventHook<Event::UserKicked>(this)
+		, EventHook<Event::CreateBot>(this)
 		, inhabit("inhabit")
 	{
 	}
@@ -119,7 +127,7 @@ class BotServCore : public Module, public BotServ::BotServService
 	void OnLeaveChannel(User *u, Channel *c) override
 	{
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-		if (c->ci && persist && persist->HasExt(c->ci))
+		if (c->ci && c->ci->HasFieldS("PERSIST"))
 			return;
 	
 		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediately
@@ -132,9 +140,14 @@ class BotServCore : public Module, public BotServ::BotServService
 		if (inhabit && inhabit->HasExt(c))
 			return;
 
-		/* This is called prior to removing the user from the channnel, so c->users.size() - 1 should be safe */
-		if (c->ci && c->ci->GetBot() && u != c->ci->GetBot() && c->users.size() - 1 <= Config->GetModule(this)->Get<unsigned>("minusers") && c->FindUser(c->ci->GetBot()))
-			c->ci->GetBot()->Part(c->ci->c);
+		if (c->ci)
+		{
+			ServiceBot *bot = c->ci->GetBot();
+
+			/* This is called prior to removing the user from the channnel, so c->users.size() - 1 should be safe */
+			if (bot && u != bot && c->users.size() - 1 <= Config->GetModule(this)->Get<unsigned>("minusers") && c->FindUser(bot))
+				bot->Part(c);
+		}
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -201,7 +214,7 @@ class BotServCore : public Module, public BotServ::BotServService
 		return EVENT_CONTINUE;
 	}
 
-	void OnCreateChan(ChanServ::Channel *ci) override
+	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
 		/* Set default bot flags */
 		spacesepstream sep(Config->GetModule(this)->Get<Anope::string>("defaults", "greet fantasy"));

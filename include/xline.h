@@ -18,19 +18,24 @@ class CoreExport XLine : public Serialize::Object
 {
 	void Recache();
 	Anope::string nick, user, host, real;
+
+	friend class XLineType;
+
+	Anope::string type, mask, by, reason, id;
+	time_t created = 0, expires = 0;
+
  public:
+	static constexpr const char *const NAME = "xline";
+	
 	cidr *c = nullptr;
 	std::regex *regex = nullptr;
-	XLineManager *manager = nullptr;
 
-	XLine(const Anope::string &mask, const Anope::string &reason = "", const Anope::string &uid = "");
-
-	XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid = "");
-
-	XLine(Serialize::TypeBase *type) : Serialize::Object(type) { }
-	XLine(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
+	using Serialize::Object::Object;
 
 	~XLine();
+
+	void SetType(const Anope::string &);
+	Anope::string GetType();
 
 	void SetMask(const Anope::string &);
 	Anope::string GetMask();
@@ -59,23 +64,31 @@ class CoreExport XLine : public Serialize::Object
 
 	bool HasNickOrReal() const;
 	bool IsRegex();
+
+	XLineManager *GetManager();
 };
 
-static Serialize::TypeReference<XLine> xline("XLine");
-
-class XLineType : public Serialize::AbstractType
+class XLineType : public Serialize::Type<XLine>
 {
  public:
-	Serialize::Field<XLine, Anope::string> mask, by, reason, id;
+	Serialize::Field<XLine, Anope::string> type;
+	struct Mask : Serialize::Field<XLine, Anope::string>
+	{
+		using Serialize::Field<XLine, Anope::string>::Field;
+
+		void SetField(XLine *s, const Anope::string &value) override;
+	} mask;
+	Serialize::Field<XLine, Anope::string> by, reason, id;
 	Serialize::Field<XLine, time_t> created, expires;
 
-	XLineType(Module *m, const Anope::string &n) : Serialize::AbstractType(m, n)
-		, mask(this, "mask")
-		, by(this, "by")
-		, reason(this, "reason")
-		, id(this, "id")
-		, created(this, "created")
-		, expires(this, "expires")
+	XLineType(Module *m) : Serialize::Type<XLine>(m)
+		, type(this, "type", &XLine::type)
+		, mask(this, "mask", &XLine::mask)
+		, by(this, "by", &XLine::by)
+		, reason(this, "reason", &XLine::reason)
+		, id(this, "id", &XLine::id)
+		, created(this, "created", &XLine::created)
+		, expires(this, "expires", &XLine::expires)
 	{
 	}
 };
@@ -85,6 +98,8 @@ class CoreExport XLineManager : public Service
 {
 	char type;
  public:
+	static constexpr const char *NAME = "xlinemanager";
+	 
 	/* List of XLine managers we check users against in XLineManager::CheckAll */
 	static std::vector<XLineManager *> XLineManagers;
 
@@ -129,6 +144,8 @@ class CoreExport XLineManager : public Service
 	 * @return The vector
 	 */
 	std::vector<XLine *> GetXLines() const;
+
+	inline unsigned int GetCount() const { return GetXLines().size(); }
 
 	/** Add an entry to this XLineManager
 	 * @param x The entry

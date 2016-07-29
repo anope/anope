@@ -29,8 +29,6 @@
 user_map UserListByNick, UserListByUID;
 
 int OperCount = 0;
-unsigned MaxUserCount = 0;
-time_t MaxUserTime = 0;
 
 std::list<User *> User::quitting_users;
 
@@ -74,18 +72,10 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 			Log(this, "connect") << (!vhost.empty() && vhost != host ? "(" + vhost + ") " : "") << "(" << srealname << ") " << (!uip.empty() && uip != host ? "[" + uip + "] " : "") << "connected to the network (" << sserver->GetName() << ")";
 	}
 
-	if (UserListByNick.size() > MaxUserCount)
-	{
-		MaxUserCount = UserListByNick.size();
-		MaxUserTime = Anope::CurTime;
-		if (sserver && sserver->IsSynced())
-			Log(this, "maxusers") << "connected - new maximum user count: " << UserListByNick.size();
-	}
-
 	bool exempt = false;
 	if (server && server->IsULined())
 		exempt = true;
-	Event::OnUserConnect(&Event::UserConnect::OnUserConnect, this, exempt);
+	EventManager::Get()->Dispatch(&Event::UserConnect::OnUserConnect, this, exempt);
 }
 
 static void CollideKill(User *target, const Anope::string &reason)
@@ -154,12 +144,9 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		this->nick = newnick;
 	else
 	{
-		if (NickServ::service)
-		{
-			NickServ::Nick *old_na = NickServ::service->FindNick(this->nick);
-			if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
-				old_na->SetLastSeen(Anope::CurTime);
-		}
+		NickServ::Nick *old_na = NickServ::FindNick(this->nick);
+		if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
+			old_na->SetLastSeen(Anope::CurTime);
 
 		UserListByNick.erase(this->nick);
 
@@ -191,7 +178,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		}
 	}
 
-	Event::OnUserNickChange(&Event::UserNickChange::OnUserNickChange, this, old);
+	EventManager::Get()->Dispatch(&Event::UserNickChange::OnUserNickChange, this, old);
 }
 
 void User::SetDisplayedHost(const Anope::string &shost)
@@ -203,7 +190,7 @@ void User::SetDisplayedHost(const Anope::string &shost)
 
 	Log(this, "host") << "changed vhost to " << shost;
 
-	Event::OnSetDisplayedHost(&Event::SetDisplayedHost::OnSetDisplayedHost, this);
+	EventManager::Get()->Dispatch(&Event::SetDisplayedHost::OnSetDisplayedHost, this);
 
 	this->UpdateHost();
 }
@@ -290,14 +277,12 @@ void User::SetRealname(const Anope::string &srealname)
 		throw CoreException("realname empty in SetRealname");
 
 	this->realname = srealname;
-	if (NickServ::service)
-	{
-		//XXX event
-		NickServ::Nick *na = NickServ::service->FindNick(this->nick);
 
-		if (na && (this->IsIdentified(true) || this->IsRecognized()))
-			na->SetLastRealname(srealname);
-	}
+	//XXX event
+	NickServ::Nick *na = NickServ::FindNick(this->nick);
+
+	if (na && (this->IsIdentified(true) || this->IsRecognized()))
+		na->SetLastRealname(srealname);
 
 	Log(this, "realname") << "changed realname to " << srealname;
 }
@@ -311,7 +296,7 @@ User::~User()
 		--this->server->users;
 	}
 
-	Event::OnPreUserLogoff(&Event::PreUserLogoff::OnPreUserLogoff, this);
+	EventManager::Get()->Dispatch(&Event::PreUserLogoff::OnPreUserLogoff, this);
 
 	ModeManager::StackerDel(this);
 	this->Logout();
@@ -326,7 +311,7 @@ User::~User()
 	if (!this->uid.empty())
 		UserListByUID.erase(this->uid);
 
-	Event::OnPostUserLogoff(&Event::PostUserLogoff::OnPostUserLogoff, this);
+	EventManager::Get()->Dispatch(&Event::PostUserLogoff::OnPostUserLogoff, this);
 }
 
 void User::SendMessage(const MessageSource &source, const Anope::string &msg)
@@ -348,8 +333,6 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 		Anope::string buf;
 		for (Anope::string word; ssep.GetToken(word);)
 		{
-			if (word.empty())
-				word = " ";
 			Anope::string add = buf.empty() ? word : " " + word;
 			if (buf.length() + add.length() > Config->LineWrap)
 			{
@@ -387,7 +370,7 @@ void User::Identify(NickServ::Nick *na)
 
 	this->Login(na->GetAccount());
 
-	Event::OnNickIdentify(&Event::NickIdentify::OnNickIdentify, this);
+	EventManager::Get()->Dispatch(&Event::NickIdentify::OnNickIdentify, this);
 
 	if (this->IsServicesOper())
 	{
@@ -424,7 +407,7 @@ void User::Login(NickServ::Account *core)
 	if (this->server->IsSynced())
 		Log(this, "account") << "is now identified as " << this->nc->GetDisplay();
 
-	Event::OnUserLogin(&Event::UserLogin::OnUserLogin, this);
+	EventManager::Get()->Dispatch(&Event::UserLogin::OnUserLogin, this);
 }
 
 void User::Logout()
@@ -495,7 +478,7 @@ bool User::IsServicesOper()
 	}
 
 	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnIsServicesOper(&Event::IsServicesOperEvent::IsServicesOper, this);
+	MOD_RESULT = EventManager::Get()->Dispatch(&Event::IsServicesOperEvent::IsServicesOper, this);
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
@@ -522,7 +505,7 @@ void User::UpdateHost()
 		return;
 
 	//XXX event
-	NickServ::Nick *na = NickServ::service ? NickServ::service->FindNick(this->nick) : nullptr;
+	NickServ::Nick *na = NickServ::FindNick(this->nick);
 	on_access = false;
 	if (na)
 		on_access = na->GetAccount()->IsOnAccess(this);
@@ -575,7 +558,7 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 	if (um->name == "CLOAK" || um->name == "VHOST")
 		this->UpdateHost();
 
-	Event::OnUserModeSet(&Event::UserModeSet::OnUserModeSet, source, this, um->name);
+	EventManager::Get()->Dispatch(&Event::UserModeSet::OnUserModeSet, source, this, um->name);
 }
 
 void User::RemoveModeInternal(const MessageSource &source, UserMode *um)
@@ -594,7 +577,7 @@ void User::RemoveModeInternal(const MessageSource &source, UserMode *um)
 		this->UpdateHost();
 	}
 
-	Event::OnUserModeUnset(&Event::UserModeUnset::OnUserModeUnset, source, this, um->name);
+	EventManager::Get()->Dispatch(&Event::UserModeUnset::OnUserModeUnset, source, this, um->name);
 }
 
 void User::SetMode(ServiceBot *bi, UserMode *um, const Anope::string &param)
@@ -781,7 +764,7 @@ void User::Quit(const Anope::string &reason)
 		return;
 	}
 
-	Event::OnUserQuit(&Event::UserQuit::OnUserQuit, this, reason);
+	EventManager::Get()->Dispatch(&Event::UserQuit::OnUserQuit, this, reason);
 
 	this->quit = true;
 	quitting_users.push_back(this);

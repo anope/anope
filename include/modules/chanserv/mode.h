@@ -1,12 +1,10 @@
 /* ChanServ core functions
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
+ * 
  */
 
 class ModeLock : public Serialize::Object
@@ -15,6 +13,8 @@ class ModeLock : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "modelock";
+	 
 	virtual ChanServ::Channel *GetChannel() anope_abstract;
 	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
 
@@ -34,12 +34,12 @@ class ModeLock : public Serialize::Object
 	virtual void SetCreated(const time_t &) anope_abstract;
 };
 
-static Serialize::TypeReference<ModeLock> modelock("ModeLock");
-
 class ModeLocks : public Service
 {
  public:
-	ModeLocks(Module *me) : Service(me, "ModeLocks", "mlocks") { }
+	static constexpr const char *NAME = "mlocks";
+	
+	ModeLocks(Module *me) : Service(me, NAME) { }
 
 	typedef std::vector<ModeLock *> ModeList;
 
@@ -98,12 +98,14 @@ class ModeLocks : public Service
 	virtual Anope::string GetMLockAsString(ChanServ::Channel *, bool complete) const anope_abstract;
 };
 
-static ServiceReference<ModeLocks> mlocks("ModeLocks", "mlocks");
-
 namespace Event
 {
 	struct CoreExport MLockEvents : Events
 	{
+		static constexpr const char *NAME = "mlockevents";
+
+		using Events::Events;
+
 		/** Called when a mode is about to be mlocked
 		 * @param ci The channel the mode is being locked on
 		 * @param lock The mode lock
@@ -119,5 +121,3 @@ namespace Event
 		virtual EventReturn OnUnMLock(ChanServ::Channel *ci, ModeLock *lock) anope_abstract;
 	};
 }
-
-template<> struct EventName<Event::MLockEvents> { static constexpr const char *const name = "MLock"; };

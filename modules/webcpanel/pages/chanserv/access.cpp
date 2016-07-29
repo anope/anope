@@ -105,11 +105,11 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		replacements["CREATORS"] = HTTPUtils::Escape(access->GetCreator());
 	}
 
-	if (Service::FindService("Command", "chanserv/access"))
+	if (ServiceManager::Get()->FindService("Command", "chanserv/access"))
 		replacements["PROVIDERS"] = "chanserv/access";
-	if (Service::FindService("Command", "chanserv/xop"))
+	if (ServiceManager::Get()->FindService("Command", "chanserv/xop"))
 		replacements["PROVIDERS"] = "chanserv/xop";
-	if (Service::FindService("Command", "chanserv/flags"))
+	if (ServiceManager::Get()->FindService("Command", "chanserv/flags"))
 		replacements["PROVIDERS"] = "chanserv/flags";
 
 	Page.Serve(server, page_name, client, message, reply, replacements);

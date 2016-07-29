@@ -31,16 +31,15 @@ class CommandOSModInfo : public Command
 		{
 			source.Reply(_("Module: \002{0}\002 Version: \002{1}\002 Author: \002{2}\002 Loaded: \002{3}\002"), m->name, !m->version.empty() ? m->version : "?", !m->author.empty() ? m->author : "Unknown", Anope::strftime(m->created, source.GetAccount()));
 			if (Anope::Debug)
-				source.Reply(_(" Loaded at: {0}"), Anope::printf("%o", m->handle));
+				source.Reply(_(" Loaded at: {0}"), Anope::printf("0x%x", m->handle));
 
-			std::vector<Anope::string> servicekeys = Service::GetServiceKeys("Command");
-			for (unsigned i = 0; i < servicekeys.size(); ++i)
+			std::vector<Command *> commands = ServiceManager::Get()->FindServices<Command *>();
+			for (Command *c : commands)
 			{
-				ServiceReference<Command> c("Command", servicekeys[i]);
-				if (!c || c->owner != m)
+				if (c->GetOwner() != m)
 					continue;
 
-				source.Reply(_("   Providing service: \002{0}\002"), c->name);
+				source.Reply(_("   Providing service: \002{0}\002"), c->GetName());
 
 				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 				{
@@ -55,9 +54,9 @@ class CommandOSModInfo : public Command
 					{
 						const Anope::string &c_name = cit->first;
 						const CommandInfo &info = cit->second;
-						if (info.name != c->name)
+						if (info.name != c->GetName())
 							continue;
-						source.Reply(_("   Command \002{0}\002 on \002{1}\002 is linked to \002{2}\002"), c_name, bi->nick, c->name);
+						source.Reply(_("   Command \002{0}\002 on \002{1}\002 is linked to \002{2}\002"), c_name, bi->nick, c->GetName());
 					}
 				}
 			}

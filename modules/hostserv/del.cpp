@@ -14,10 +14,8 @@
 
 class CommandHSDel : public Command
 {
-	EventHandlers<Event::DeleteVhost> &OnDeleteVhost;
-
  public:
-	CommandHSDel(Module *creator, EventHandlers<Event::DeleteVhost> &onDeleteVhost) : Command(creator, "hostserv/del", 1, 1), OnDeleteVhost(onDeleteVhost)
+	CommandHSDel(Module *creator) : Command(creator, "hostserv/del", 1, 1)
 	{
 		this->SetDesc(_("Delete the vhost of another user"));
 		this->SetSyntax(_("\037user\037"));
@@ -37,7 +35,7 @@ class CommandHSDel : public Command
 		}
 
 		Log(LOG_ADMIN, source, this) << "for user " << na->GetNick();
-		this->OnDeleteVhost(&Event::DeleteVhost::OnDeleteVhost, na);
+		EventManager::Get()->Dispatch(&Event::DeleteVhost::OnDeleteVhost, na);
 		na->RemoveVhost();
 		source.Reply(_("Vhost for \002{0}\002 has been removed."), na->GetNick());
 	}
@@ -51,10 +49,8 @@ class CommandHSDel : public Command
 
 class CommandHSDelAll : public Command
 {
-	EventHandlers<Event::DeleteVhost> &ondeletevhost;
-
  public:
-	CommandHSDelAll(Module *creator, EventHandlers<Event::DeleteVhost> &event) : Command(creator, "hostserv/delall", 1, 1), ondeletevhost(event)
+	CommandHSDelAll(Module *creator) : Command(creator, "hostserv/delall", 1, 1)
 	{
 		this->SetDesc(_("Delete the vhost for all nicks in a group"));
 		this->SetSyntax(_("\037group\037"));
@@ -73,10 +69,10 @@ class CommandHSDelAll : public Command
 			return;
 		}
 
-		this->ondeletevhost(&Event::DeleteVhost::OnDeleteVhost, na);
+		EventManager::Get()->Dispatch(&Event::DeleteVhost::OnDeleteVhost, na);
 
 		NickServ::Account *nc = na->GetAccount();
-		for (NickServ::Nick *na2 : nc->GetRefs<NickServ::Nick *>(NickServ::nick))
+		for (NickServ::Nick *na2 : nc->GetRefs<NickServ::Nick *>())
 			na2->RemoveVhost();
 		Log(LOG_ADMIN, source, this) << "for all nicks in group " << nc->GetDisplay();
 		source.Reply(_("Vhosts for group \002{0}\002 have been removed."), nc->GetDisplay());
@@ -93,13 +89,11 @@ class HSDel : public Module
 {
 	CommandHSDel commandhsdel;
 	CommandHSDelAll commandhsdelall;
-	EventHandlers<Event::DeleteVhost> ondeletevhost;
 
  public:
 	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandhsdel(this, ondeletevhost)
-		, commandhsdelall(this, ondeletevhost)
-		, ondeletevhost(this)
+		, commandhsdel(this)
+		, commandhsdelall(this)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");

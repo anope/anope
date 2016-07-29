@@ -11,12 +11,13 @@
 
 #include "module.h"
 
-static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
-
 class CommandOSChanKill : public Command
 {
+	ServiceReference<XLineManager> akills;
+	
  public:
 	CommandOSChanKill(Module *creator) : Command(creator, "operserv/chankill", 2, 3)
+		, akills("xlinemanager/sgline")
 	{
 		this->SetDesc(_("AKILL all users on a specific channel"));
 		this->SetSyntax(_("[+\037expiry\037] \037channel\037 \037reason\037"));
@@ -83,7 +84,13 @@ class CommandOSChanKill : public Command
 			if (uc->user->server == Me || uc->user->HasMode("OPER"))
 				continue;
 
-			XLine *x = new XLine("*@" + uc->user->host, source.GetNick(), expires, realreason, XLineManager::GenerateUID());
+			XLine *x = Serialize::New<XLine *>();
+			x->SetMask("*@" + uc->user->host);
+			x->SetBy(source.GetNick());
+			x->SetExpires(expires);
+			x->SetReason(realreason);
+			x->SetID(XLineManager::GenerateUID());
+
 			akills->AddXLine(x);
 			akills->OnMatch(uc->user, x);
 		}

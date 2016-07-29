@@ -56,7 +56,7 @@ void Uplink::Connect()
 	new UplinkSocket();
 	if (!Config->GetBlock("serverinfo")->Get<Anope::string>("localhost").empty())
 		UplinkSock->Bind(Config->GetBlock("serverinfo")->Get<Anope::string>("localhost"));
-	Event::OnPreServerConnect(&Event::PreServerConnect::OnPreServerConnect);
+	EventManager::Get()->Dispatch(&Event::PreServerConnect::OnPreServerConnect);
 	Anope::string ip = Anope::Resolve(u.host, u.ipv6 ? AF_INET6 : AF_INET);
 	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u.host << " (" << ip << "), port " << u.port;
 	UplinkSock->Connect(ip, u.port);
@@ -82,7 +82,7 @@ UplinkSocket::~UplinkSocket()
 
 	if (IRCD && Servers::GetUplink() && Servers::GetUplink()->IsSynced())
 	{
-		Event::OnServerDisconnect(&Event::ServerDisconnect::OnServerDisconnect);
+		EventManager::Get()->Dispatch(&Event::ServerDisconnect::OnServerDisconnect);
 
 		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 		{
@@ -149,7 +149,7 @@ void UplinkSocket::OnConnect()
 {
 	Log(LOG_TERMINAL) << "Successfully connected to uplink #" << (Anope::CurrentUplink + 1) << " " << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port;
 	IRCD->SendConnect();
-	Event::OnServerConnect(&Event::ServerConnect::OnServerConnect);
+	EventManager::Get()->Dispatch(&Event::ServerConnect::OnServerConnect);
 }
 
 void UplinkSocket::OnError(const Anope::string &err)

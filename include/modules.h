@@ -79,7 +79,7 @@ template<class ModuleClass> void ModuleInfo(ModuleDef *moddef) { }
 	{ \
 		delete def; \
 	} \
-	static ModuleVersionC ModuleVersion() \
+	static ModuleVersionC AnopeModuleVersion() \
 	{ \
 		ModuleVersionC ver; \
 		ver.version_major = VERSION_MAJOR; \
@@ -87,12 +87,13 @@ template<class ModuleClass> void ModuleInfo(ModuleDef *moddef) { }
 		ver.version_patch = VERSION_PATCH; \
 		return ver; \
 	} \
-	extern "C" DllExport struct AnopeModule AnopeMod = \
+	extern "C" DllExport struct AnopeModule AnopeMod; \
+	struct AnopeModule AnopeMod = \
 	{ \
 		ANOPE_MODAPI_VER, \
 		CreateModuleDef, \
 		DeleteModuleDef, \
-		ModuleVersion \
+		AnopeModuleVersion \
 	};
 
 enum ModuleReturn

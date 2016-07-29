@@ -14,6 +14,7 @@ class BSAutoAssign : public Module
 {
  public:
 	BSAutoAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChanRegistered>(this)
 	{
 	}
 

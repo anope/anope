@@ -140,14 +140,15 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 	unsigned length = 0;
 	for (std::map<Anope::string, size_t>::iterator it = lenghts.begin(), it_end = lenghts.end(); it != it_end; ++it)
 	{
-		/* Break lines at 80 chars */
-		if (length > 80)
+		if (length > Config->LineWrap)
 		{
 			breaks.insert(it->first);
 			length = 0;
 		}
 		else
+		{
 			length += it->second;
+		}
 	}
 
 	/* Only put a list header if more than 1 column */
@@ -480,8 +481,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 
 void Anope::Encrypt(const Anope::string &src, Anope::string &dest)
 {
-	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnEncrypt(&Event::Encrypt::OnEncrypt, src, dest);
+	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::Encrypt::OnEncrypt, src, dest);
 	static_cast<void>(MOD_RESULT);
 }
 
@@ -495,8 +495,7 @@ bool Anope::Decrypt(const Anope::string &src, Anope::string &dest)
 	}
 	Anope::string hashm(src.begin(), src.begin() + pos);
 
-	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnDecrypt(&Event::Decrypt::OnDecrypt, hashm, src, dest);
+	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::Decrypt::OnDecrypt, hashm, src, dest);
 	if (MOD_RESULT == EVENT_ALLOW)
 		return true;
 

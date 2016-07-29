@@ -14,6 +14,12 @@
 
 class EntryMsgImpl : public EntryMsg
 {
+	friend class EntryMsgType;
+
+	ChanServ::Channel *channel = nullptr;
+	Anope::string creator, message;
+	time_t when = 0;
+
  public:
 	EntryMsgImpl(Serialize::TypeBase *type) : EntryMsg(type) { }
 	EntryMsgImpl(Serialize::TypeBase *type, Serialize::ID id) : EntryMsg(type, id) { }
@@ -38,11 +44,11 @@ class EntryMsgType : public Serialize::Type<EntryMsgImpl>
 	Serialize::Field<EntryMsgImpl, Anope::string> creator, message;
 	Serialize::Field<EntryMsgImpl, time_t> when;
 
-	EntryMsgType(Module *me) : Serialize::Type<EntryMsgImpl>(me, "EntryMsg")
-		, chan(this, "chan", true)
-		, creator(this, "creator")
-		, message(this, "message")
-		, when(this, "when")
+	EntryMsgType(Module *me) : Serialize::Type<EntryMsgImpl>(me)
+		, chan(this, "chan", &EntryMsgImpl::channel, true)
+		, creator(this, "creator", &EntryMsgImpl::creator)
+		, message(this, "message", &EntryMsgImpl::message)
+		, when(this, "when", &EntryMsgImpl::when)
 	{
 	}
 };
@@ -92,7 +98,7 @@ class CommandEntryMessage : public Command
  private:
 	void DoList(CommandSource &source, ChanServ::Channel *ci)
 	{
-		std::vector<EntryMsg *> messages = ci->GetRefs<EntryMsg *>(entrymsg);
+		std::vector<EntryMsg *> messages = ci->GetRefs<EntryMsg *>();
 
 		if (messages.empty())
 		{
@@ -126,15 +132,15 @@ class CommandEntryMessage : public Command
 
 	void DoAdd(CommandSource &source, ChanServ::Channel *ci, const Anope::string &message)
 	{
-		std::vector<EntryMsg *> messages = ci->GetRefs<EntryMsg *>(entrymsg);
+		std::vector<EntryMsg *> messages = ci->GetRefs<EntryMsg *>();
 
-		if (messages.size() >= Config->GetModule(this->owner)->Get<unsigned>("maxentries"))
+		if (messages.size() >= Config->GetModule(this->GetOwner())->Get<unsigned>("maxentries"))
 		{
 			source.Reply(_("The entry message list for \002{0}\002 is full."), ci->GetName());
 			return;
 		}
 
-		EntryMsg *msg = entrymsg.Create();
+		EntryMsg *msg = Serialize::New<EntryMsg *>();
 		msg->SetChannel(ci);
 		msg->SetCreator(source.GetNick());
 		msg->SetMessage(message);
@@ -144,7 +150,7 @@ class CommandEntryMessage : public Command
 
 	void DoDel(CommandSource &source, ChanServ::Channel *ci, const Anope::string &message)
 	{
-		std::vector<EntryMsg *> messages = ci->GetRefs<EntryMsg *>(entrymsg);
+		std::vector<EntryMsg *> messages = ci->GetRefs<EntryMsg *>();
 
 		if (!message.is_pos_number_only())
 			source.Reply(("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->GetName());
@@ -173,7 +179,7 @@ class CommandEntryMessage : public Command
 
 	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
-		for (EntryMsg *e : ci->GetRefs<EntryMsg *>(entrymsg))
+		for (EntryMsg *e : ci->GetRefs<EntryMsg *>())
 			delete e;
 
 		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
@@ -254,6 +260,7 @@ class CSEntryMessage : public Module
 
  public:
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::JoinChannel>(this)
 		, commandentrymsg(this)
 		, entrymsg_type(this)
 	{
@@ -262,7 +269,7 @@ class CSEntryMessage : public Module
 	void OnJoinChannel(User *u, Channel *c) override
 	{
 		if (u && c && c->ci && u->server->IsSynced())
-			for (EntryMsg *msg : c->ci->GetRefs<EntryMsg *>(entrymsg))
+			for (EntryMsg *msg : c->ci->GetRefs<EntryMsg *>())
 				u->SendMessage(c->ci->WhoSends(), "[{0}] {1}", c->ci->GetName(), msg->GetMessage());
 	}
 };

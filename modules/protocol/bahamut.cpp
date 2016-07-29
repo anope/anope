@@ -192,24 +192,24 @@ class BahamutIRCdProto : public IRCDProto
 			{
 				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
 				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (x->manager->Check(it->second, x))
+					if (x->GetManager()->Check(it->second, x))
 						this->SendAkill(it->second, x);
 				return;
 			}
 
 			XLine *old = x;
 
-			if (old->manager->HasEntry("*@" + u->host))
+			if (old->GetManager()->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			x = new XLine(xline);
+			x = Serialize::New<XLine *>();
 			x->SetMask("*@" + u->host);
 			x->SetBy(old->GetBy());
 			x->SetExpires(old->GetExpires());
 			x->SetReason(old->GetReason());
 			x->SetID(old->GetID());
-			old->manager->AddXLine(x);
+			old->GetManager()->AddXLine(x);
 
 			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
 		}
@@ -509,6 +509,7 @@ class ProtoBahamut : public Module
 
  public:
 	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, EventHook<Event::UserNickChange>(this)
 		, ircd_proto(this)
 		, message_away(this)
 		, message_capab(this)

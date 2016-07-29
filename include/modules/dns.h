@@ -118,7 +118,9 @@ namespace DNS
 	class Manager : public Service
 	{
 	 public:
-		Manager(Module *creator) : Service(creator, "DNS::Manager", "dns/manager") { }
+		static constexpr const char *NAME = "dns/manager";
+
+		Manager(Module *creator) : Service(creator, NAME) { }
 		virtual ~Manager() { }
 
 		virtual void Process(Request *req) anope_abstract;
@@ -130,8 +132,6 @@ namespace DNS
 		virtual void Notify(const Anope::string &zone) anope_abstract;
 		virtual uint32_t GetSerial() const anope_abstract;
 	};
-
-	static ServiceReference<DNS::Manager> manager("DNS::Manager", "dns/manager");
 
 	/** A DNS query.
 	 */
@@ -182,16 +182,17 @@ namespace Event
 {
 	struct CoreExport DnsRequest : Events
 	{
+		static constexpr const char *NAME = "dnsrequest";
+
+		using Events::Events;
+
 		/** Called when a DNS request (question) is recieved.
 		 * @param req The dns request
 		 * @param reply The reply that will be sent
 		 */
 		virtual void OnDnsRequest(DNS::Query &req, DNS::Query *reply) anope_abstract;
 	};
-	static EventHandlersReference<DnsRequest> OnDnsRequest;
 }
-
-template<> struct EventName<Event::DnsRequest> { static constexpr const char *const name = "OnDnsRequest"; };
 
 #endif // DNS_H
 

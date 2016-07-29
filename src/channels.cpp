@@ -43,12 +43,12 @@ Channel::Channel(const Anope::string &nname, time_t ts)
 	if (Me && Me->IsSynced())
 		Log(NULL, this, "create");
 
-	Event::OnChannelCreate(&Event::ChannelCreate::OnChannelCreate, this);
+	EventManager::Get()->Dispatch(&Event::ChannelCreate::OnChannelCreate, this);
 }
 
 Channel::~Channel()
 {
-	Event::OnChannelDelete(&Event::ChannelDelete::OnChannelDelete, this);
+	EventManager::Get()->Dispatch(&Event::ChannelDelete::OnChannelDelete, this);
 
 	ModeManager::StackerDel(this);
 
@@ -94,7 +94,7 @@ void Channel::Reset()
 void Channel::Sync()
 {
 	syncing = false;
-	Event::OnChannelSync(&Event::ChannelSync::OnChannelSync, this);
+	EventManager::Get()->Dispatch(&Event::ChannelSync::OnChannelSync, this);
 	CheckModes();
 }
 
@@ -112,7 +112,7 @@ void Channel::CheckModes()
 	}
 
 	Reference<Channel> ref = this;
-	Event::OnCheckModes(&Event::CheckModes::OnCheckModes, ref);
+	EventManager::Get()->Dispatch(&Event::CheckModes::OnCheckModes, ref);
 }
 
 bool Channel::CheckDelete()
@@ -128,7 +128,7 @@ bool Channel::CheckDelete()
 		return false;
 
 	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnCheckDelete(&Event::CheckDelete::OnCheckDelete, this);
+	MOD_RESULT = EventManager::Get()->Dispatch(&Event::CheckDelete::OnCheckDelete, this);
 
 	return MOD_RESULT != EVENT_STOP && this->users.empty();
 }
@@ -152,7 +152,7 @@ void Channel::DeleteUser(User *user)
 	if (user->server && user->server->IsSynced() && !user->Quitting())
 		Log(user, this, "leave");
 
-	Event::OnLeaveChannel(&Event::LeaveChannel::OnLeaveChannel, user, this);
+	EventManager::Get()->Dispatch(&Event::LeaveChannel::OnLeaveChannel, user, this);
 
 	ChanUserContainer *cu = user->FindChannel(this);
 	if (!this->users.erase(user))
@@ -286,7 +286,7 @@ void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *ocm, con
 		if (cc)
 			cc->status.AddMode(cm->mchar);
 
-		MOD_RESULT = Event::OnChannelModeSet(&Event::ChannelModeSet::OnChannelModeSet, this, setter, cm, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::ChannelModeSet::OnChannelModeSet, this, setter, cm, param);
 
 		/* Enforce secureops, etc */
 		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
@@ -307,7 +307,7 @@ void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *ocm, con
 		return;
 	}
 
-	MOD_RESULT = Event::OnChannelModeSet(&Event::ChannelModeSet::OnChannelModeSet, this, setter, cm, param);
+	MOD_RESULT = EventManager::Get()->Dispatch(&Event::ChannelModeSet::OnChannelModeSet, this, setter, cm, param);
 
 	/* Check if we should enforce mlock */
 	if (!enforce_mlock || MOD_RESULT == EVENT_STOP)
@@ -350,7 +350,7 @@ void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *ocm, 
 		if (cc)
 			cc->status.DelMode(cm->mchar);
 
-		MOD_RESULT = Event::OnChannelModeUnset(&Event::ChannelModeUnset::OnChannelModeUnset, this, setter, cm, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::ChannelModeUnset::OnChannelModeUnset, this, setter, cm, param);
 
 		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
 			this->SetCorrectModes(u, false);
@@ -370,7 +370,7 @@ void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *ocm, 
 	else
 		this->modes.erase(cm->name);
 
-	MOD_RESULT = Event::OnChannelModeUnset(&Event::ChannelModeUnset::OnChannelModeUnset, this, setter, cm, param);
+	MOD_RESULT = EventManager::Get()->Dispatch(&Event::ChannelModeUnset::OnChannelModeUnset, this, setter, cm, param);
 
 	if (cm->name == "PERM")
 	{
@@ -740,13 +740,13 @@ bool Channel::KickInternal(const MessageSource &source, const Anope::string &nic
 
 	ChannelStatus status = cu->status;
 
-	EventReturn MOD_RESULT = Event::OnPreUserKicked(&Event::PreUserKicked::OnPreUserKicked, source, cu, reason);
+	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::PreUserKicked::OnPreUserKicked, source, cu, reason);
 	if ((sender && sender->server == Me) || source.GetServer() == Me)
 		if (MOD_RESULT == EVENT_STOP)
 			return false;
 
 	this->DeleteUser(target);
-	Event::OnUserKicked(&Event::UserKicked::OnUserKicked, source, target, this->name, status, reason);
+	EventManager::Get()->Dispatch(&Event::UserKicked::OnUserKicked, source, target, this->name, status, reason);
 	return true;
 }
 
@@ -780,7 +780,7 @@ void Channel::ChangeTopicInternal(User *u, const Anope::string &user, const Anop
 
 	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << this->topic_setter << " to " << newtopic;
 
-	Event::OnTopicUpdated(&Event::TopicUpdated::OnTopicUpdated, u, this, user, this->topic);
+	EventManager::Get()->Dispatch(&Event::TopicUpdated::OnTopicUpdated, u, this, user, this->topic);
 }
 
 void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts)
@@ -794,7 +794,7 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	/* Now that the topic is set update the time set. This is *after* we set it so the protocol modules are able to tell the old last set time */
 	this->topic_time = Anope::CurTime;
 
-	Event::OnTopicUpdated(&Event::TopicUpdated::OnTopicUpdated, nullptr, this, user, this->topic);
+	EventManager::Get()->Dispatch(&Event::TopicUpdated::OnTopicUpdated, nullptr, this, user, this->topic);
 }
 
 void Channel::SetCorrectModes(User *user, bool give_modes)
@@ -812,7 +812,7 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 	/* Initially only take modes if the channel is being created by a non netmerge */
 	bool take_modes = this->syncing && user->server->IsSynced();
 
-	Event::OnSetCorrectModes(&Event::SetCorrectModes::OnSetCorrectModes, user, this, u_access, give_modes, take_modes);
+	EventManager::Get()->Dispatch(&Event::SetCorrectModes::OnSetCorrectModes, user, this, u_access, give_modes, take_modes);
 
 	/* Never take modes from ulines */
 	if (user->server->IsULined())
@@ -883,8 +883,7 @@ bool Channel::CheckKick(User *user)
 
 	Anope::string mask, reason;
 
-	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnCheckKick(&Event::CheckKick::OnCheckKick, user, this, mask, reason);
+	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::CheckKick::OnCheckKick, user, this, mask, reason);
 	if (MOD_RESULT != EVENT_STOP)
 		return false;
 

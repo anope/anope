@@ -12,6 +12,7 @@
 #include "module.h"
 #include "modules/chanserv/mode.h"
 #include "modules/sasl.h"
+#include "modules/operserv/stats.h"
 
 class UnrealIRCdProto : public IRCDProto
 {
@@ -89,19 +90,25 @@ class UnrealIRCdProto : public IRCDProto
 			{
 				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
 				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (x->manager->Check(it->second, x))
+					if (x->GetManager()->Check(it->second, x))
 						this->SendAkill(it->second, x);
 				return;
 			}
 
 			XLine *old = x;
 
-			if (old->manager->HasEntry("*@" + u->host))
+			if (old->GetManager()->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			XLine *xl = new XLine("*@" + u->host, old->GetBy(), old->GetExpires(), old->GetReason(), old->GetID());
-			old->manager->AddXLine(xl);
+			XLine *xl = Serialize::New<XLine *>();
+			xl->SetMask("*@" + u->host);
+			xl->SetBy(old->GetBy());
+			xl->SetExpires(old->GetExpires());
+			xl->SetReason(old->GetReason());
+			xl->SetID(old->GetID());
+
+			old->GetManager()->AddXLine(xl);
 			x = xl;
 
 			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
@@ -693,7 +700,8 @@ struct IRCDMessageNetInfo : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
-		UplinkSocket::Message() << "NETINFO " << MaxUserCount << " " << Anope::CurTime << " " << convertTo<int>(params[2]) << " " << params[3] << " 0 0 0 :" << params[7];
+		Stats *stats = Serialize::GetObject<Stats *>();
+		UplinkSocket::Message() << "NETINFO " << (stats ? stats->GetMaxUserCount() : 0) << " " << Anope::CurTime << " " << convertTo<int>(params[2]) << " " << params[3] << " 0 0 0 :" << params[7];
 	}
 };
 
@@ -792,12 +800,14 @@ struct IRCDMessagePong : IRCDMessage
 
 struct IRCDMessageSASL : IRCDMessage
 {
+	ServiceReference<SASL::Service> sasl;
+	
 	IRCDMessageSASL(Module *creator) : IRCDMessage(creator, "SASL", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		size_t p = params[1].find('!');
-		if (!SASL::sasl || p == Anope::string::npos)
+		if (!sasl || p == Anope::string::npos)
 			return;
 
 		SASL::Message m;
@@ -807,7 +817,7 @@ struct IRCDMessageSASL : IRCDMessage
 		m.data = params[3];
 		m.ext = params.size() > 4 ? params[4] : "";
 
-		SASL::sasl->ProcessMessage(m);
+		sasl->ProcessMessage(m);
 	}
 };
 
@@ -1006,6 +1016,7 @@ class ProtoUnreal : public Module
 	, public EventHook<Event::MLockEvents>
 {
 	UnrealIRCdProto ircd_proto;
+	ServiceReference<ModeLocks> mlocks;
 
 	/* Core message handlers */
 	Message::Away message_away;
@@ -1049,11 +1060,11 @@ class ProtoUnreal : public Module
 
  public:
 	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
-		, EventHook<Event::UserNickChange>(EventHook<Event::UserNickChange>::Priority::FIRST)
-		, EventHook<Event::ChannelSync>(EventHook<Event::ChannelSync>::Priority::FIRST)
-		, EventHook<Event::ChanRegistered>(EventHook<Event::ChanRegistered>::Priority::FIRST)
-		, EventHook<Event::DelChan>(EventHook<Event::DelChan>::Priority::FIRST)
-		, EventHook<Event::MLockEvents>(EventHook<Event::MLockEvents>::Priority::FIRST)
+		, EventHook<Event::UserNickChange>(this, EventHook<Event::UserNickChange>::Priority::FIRST)
+		, EventHook<Event::ChannelSync>(this, EventHook<Event::ChannelSync>::Priority::FIRST)
+		, EventHook<Event::ChanRegistered>(this, EventHook<Event::ChanRegistered>::Priority::FIRST)
+		, EventHook<Event::DelChan>(this, EventHook<Event::DelChan>::Priority::FIRST)
+		, EventHook<Event::MLockEvents>(this, EventHook<Event::MLockEvents>::Priority::FIRST)
 		, ircd_proto(this)
 		, message_away(this)
 		, message_capab(this, "PROTOCTL")

@@ -15,6 +15,12 @@
 
 class LogSettingImpl : public LogSetting
 {
+	friend class LogSettingType;
+
+	ChanServ::Channel *channel = nullptr;
+	Anope::string service_name, command_service, command_name, method, extra, creator;
+	time_t created = 0;
+
  public:
 	LogSettingImpl(Serialize::TypeBase *type) : LogSetting(type) { }
 	LogSettingImpl(Serialize::TypeBase *type, Serialize::ID id) : LogSetting(type, id) { }
@@ -51,15 +57,15 @@ class LogSettingType : public Serialize::Type<LogSettingImpl>
 	Serialize::Field<LogSettingImpl, Anope::string> service_name, command_service, command_name, method, extra, creator;
 	Serialize::Field<LogSettingImpl, time_t> created;
 
-	LogSettingType(Module *me) : Serialize::Type<LogSettingImpl>(me, "LogSetting")
-		, ci(this, "ci", true)
-		, service_name(this, "service_name")
-		, command_service(this, "command_service")
-		, command_name(this, "command_name")
-		, method(this, "method")
-		, extra(this, "extra")
-		, creator(this, "creator")
-		, created(this, "created")
+	LogSettingType(Module *me) : Serialize::Type<LogSettingImpl>(me)
+		, ci(this, "ci", &LogSettingImpl::channel, true)
+		, service_name(this, "service_name", &LogSettingImpl::service_name)
+		, command_service(this, "command_service", &LogSettingImpl::command_service)
+		, command_name(this, "command_name", &LogSettingImpl::command_name)
+		, method(this, "method", &LogSettingImpl::method)
+		, extra(this, "extra", &LogSettingImpl::extra)
+		, creator(this, "creator", &LogSettingImpl::creator)
+		, created(this, "created", &LogSettingImpl::created)
 	{
 	}
 };
@@ -173,7 +179,7 @@ public:
 
 		if (params.size() == 1)
 		{
-			std::vector<LogSetting *> ls = ci->GetRefs<LogSetting *>(logsetting);
+			std::vector<LogSetting *> ls = ci->GetRefs<LogSetting *>();
 			if (ls.empty())
 			{
 				source.Reply(_("There currently are no logging configurations for \002{0}\002."), ci->GetName());
@@ -235,7 +241,7 @@ public:
 				/* Get service name from command */
 				service_name = bi->commands[command_name].name;
 			}
-			else if (ServiceReference<Command>("Command", command.lower()))
+			else if (ServiceReference<Command>(command.lower()))
 			{
 				/* This is the service name, don't use any specific command */
 				service_name = command;
@@ -263,7 +269,7 @@ public:
 
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 
-			std::vector<LogSetting *> ls = ci->GetRefs<LogSetting *>(logsetting);
+			std::vector<LogSetting *> ls = ci->GetRefs<LogSetting *>();
 			for (unsigned i = ls.size(); i > 0; --i)
 			{
 				LogSetting *log = ls[i - 1];
@@ -286,7 +292,7 @@ public:
 				}
 			}
 
-			LogSetting *log = logsetting.Create();
+			LogSetting *log = Serialize::New<LogSetting *>();
 			log->SetChannel(ci);
 			log->SetServiceName(service_name);
 			if (bi)
@@ -335,6 +341,7 @@ class CSLog : public Module
 {
 	CommandCSLog commandcslog;
 	LogSettingType logtype;
+	ServiceReference<MemoServ::MemoServService> memoserv;
 
 	struct LogDefault
 	{
@@ -345,6 +352,8 @@ class CSLog : public Module
 
  public:
 	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChanRegistered>(this)
+		, EventHook<Event::Log>(this)
 		, commandcslog(this)
 		, logtype(this)
 	{
@@ -379,7 +388,7 @@ class CSLog : public Module
 		{
 			LogDefault &d = defaults[i];
 
-			LogSetting *log = logsetting.Create();
+			LogSetting *log = Serialize::New<LogSetting *>();
 			log->SetChannel(ci);
 
 			if (!d.service.empty())
@@ -408,13 +417,13 @@ class CSLog : public Module
 		if (l->type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
 			return;
 
-		std::vector<LogSetting *> ls = l->ci->GetRefs<LogSetting *>(logsetting);
+		std::vector<LogSetting *> ls = l->ci->GetRefs<LogSetting *>();
 		for (unsigned i = 0; i < ls.size(); ++i)
 		{
 			LogSetting *log = ls[i];
 
 			/* wrong command */
-			if (log->GetServiceName() != l->c->name)
+			if (log->GetServiceName() != l->c->GetName())
 				continue;
 
 			/* if a command name is given check the service and the command */
@@ -430,14 +439,15 @@ class CSLog : public Module
 
 			Anope::string buffer = l->u->nick + " used " + l->source->command.upper() + " " + l->buf.str();
 
-			if (log->GetMethod().equals_ci("MEMO") && MemoServ::service && l->ci->WhoSends() != NULL)
-				MemoServ::service->Send(l->ci->WhoSends()->nick, l->ci->GetName(), buffer, true);
+			if (log->GetMethod().equals_ci("MEMO") && memoserv && l->ci->WhoSends() != NULL)
+				memoserv->Send(l->ci->WhoSends()->nick, l->ci->GetName(), buffer, true);
 			else if (l->source->c)
 				/* Sending a channel message or notice in response to a fantasy command */;
 			else if (log->GetMethod().equals_ci("MESSAGE") && l->ci->c)
 			{
 				IRCD->SendPrivmsg(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, "%s", buffer.c_str());
-				//l->ci->WhoSends()->lastmsg = Anope::CurTime; XXX
+#warning "fix idletimes"
+				//l->ci->WhoSends()->lastmsg = Anope::CurTime;
 			}
 			else if (log->GetMethod().equals_ci("NOTICE") && l->ci->c)
 				IRCD->SendNotice(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, "%s", buffer.c_str());

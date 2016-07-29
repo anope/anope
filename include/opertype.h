@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * Copyright (C) 2008-2014 Anope Team <team@anope.org>
+ * Copyright (C) 2008-2016 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *
@@ -13,11 +13,17 @@
 
 class Oper : public Serialize::Object
 {
+	friend class OperBlockType;
+
+	Anope::string name, password, certfp, host, vhost, type;
+	bool require_oper = false;
+
  public:
+	static constexpr const char *const NAME = "oper";
+
 	Configuration::Conf *conf = nullptr;
 
-	Oper(Serialize::TypeBase *type) : Serialize::Object(type) { }
-	Oper(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
+	using Serialize::Object::Object;
 
 	Anope::string GetName();
 	void SetName(const Anope::string &);
@@ -53,19 +59,17 @@ class OperBlockType : public Serialize::Type<Oper>
 	Serialize::Field<Oper, Anope::string> name, password, certfp, host, vhost, type;
 	Serialize::Field<Oper, bool> require_oper;
 
-	OperBlockType() : Serialize::Type<Oper>(nullptr, "Oper")
-		, name(this, "name")
-		, password(this, "password")
-		, certfp(this, "certfp")
-		, host(this, "host")
-		, vhost(this, "vhost")
-		, type(this, "type")
-		, require_oper(this, "require_oper")
+	OperBlockType() : Serialize::Type<Oper>(nullptr)
+		, name(this, "name", &Oper::name)
+		, password(this, "password", &Oper::password)
+		, certfp(this, "certfp", &Oper::certfp)
+		, host(this, "host", &Oper::host)
+		, vhost(this, "vhost", &Oper::vhost)
+		, type(this, "type", &Oper::type)
+		, require_oper(this, "require_oper", &Oper::require_oper)
 	{
 	}
 };
-
-static Serialize::TypeReference<Oper> operblock("Oper");
 
 class CoreExport OperType
 {

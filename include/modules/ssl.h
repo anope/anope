@@ -2,7 +2,9 @@
 class SSLService : public Service
 {
  public:
-	SSLService(Module *o, const Anope::string &n) : Service(o, "SSLService", n) { }
+	static constexpr const char *NAME = "ssl";
+	
+	SSLService(Module *o, const Anope::string &n) : Service(o, NAME, n) { }
 
 	virtual void Init(Socket *s) anope_abstract;
 };

@@ -2,6 +2,11 @@
 
 class MemoInfoImpl : public MemoServ::MemoInfo
 {
+	friend class MemoInfoType;
+
+	Serialize::Object *owner = nullptr;
+	int16_t memomax = 0;
+
  public:
 	MemoInfoImpl(Serialize::TypeBase *type) : MemoServ::MemoInfo(type) { }
 	MemoInfoImpl(Serialize::TypeBase *type, Serialize::ID id) : MemoServ::MemoInfo(type, id) { }

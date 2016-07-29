@@ -31,7 +31,7 @@ bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "NickServ", "nickserv/access", params, replacements);
 	}
 
-	for (NickAccess *a : na->GetAccount()->GetRefs<NickAccess *>(nsaccess))
+	for (NickAccess *a : na->GetAccount()->GetRefs<NickAccess *>())
 		replacements["ACCESS"] = a->GetMask();
 
 	TemplateFileServer page("nickserv/access.html");

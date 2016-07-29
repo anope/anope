@@ -67,6 +67,7 @@ class NSResetPass : public Module
 
  public:
 	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::PreCommand>(this)
 		, commandnsresetpass(this), reset(this, "reset")
 	{
 		if (!Config->GetBlock("mail")->Get<bool>("usemail"))
@@ -75,7 +76,7 @@ class NSResetPass : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
-		if (command->name == "nickserv/confirm" && params.size() > 1)
+		if (command->GetName() == "nickserv/confirm" && params.size() > 1)
 		{
 			if (Anope::ReadOnly)
 			{

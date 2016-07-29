@@ -24,6 +24,8 @@ class CoreExport IRCDProto : public Service
  protected:
  	IRCDProto(Module *creator, const Anope::string &proto_name);
  public:
+	static constexpr const char *NAME = "ircdproto";
+	
 	virtual ~IRCDProto();
 
 	virtual void SendSVSKillInternal(const MessageSource &, User *, const Anope::string &);
@@ -274,6 +276,8 @@ class CoreExport IRCDMessage : public Service
 	unsigned param_count;
 	std::set<IRCDMessageFlag> flags;
  public:
+	static constexpr const char *NAME = "IRCDMessage";
+	
 	IRCDMessage(Module *owner, const Anope::string &n, unsigned p = 0);
 	unsigned GetParamCount() const;
 	virtual void Run(MessageSource &, const std::vector<Anope::string> &params) anope_abstract;

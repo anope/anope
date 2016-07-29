@@ -11,6 +11,10 @@ namespace Event
 {
 	struct CoreExport NickUpdate : Events
 	{
+		static constexpr const char *NAME = "nickupdate";
+
+		using Events::Events;
+
 		/** Called when a user does /ns update
 		 * @param u The user
 		 */
@@ -18,4 +22,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::NickUpdate> { static constexpr const char *const name = "OnNickUpdate"; };

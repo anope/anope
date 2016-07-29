@@ -16,10 +16,8 @@
 
 class CommandBSInfo : public Command
 {
-	EventHandlers<Event::ServiceBotEvent> &onbotinfo;
-
  public:
-	CommandBSInfo(Module *creator, EventHandlers<Event::ServiceBotEvent> &event) : Command(creator, "botserv/info", 1, 1), onbotinfo(event)
+	CommandBSInfo(Module *creator) : Command(creator, "botserv/info", 1, 1)
 	{
 		this->SetSyntax(_("{\037channel\037 | \037nickname\037}"));
 	}
@@ -41,7 +39,7 @@ class CommandBSInfo : public Command
 			info[_("Options")] = bi->bi->GetOperOnly() ? _("Private") : _("None");
 			info[_("Used on")] = stringify(bi->GetChannelCount()) + " channel(s)";
 
-			this->onbotinfo(&Event::ServiceBotEvent::OnServiceBot, source, bi, ci, info);
+			EventManager::Get()->Dispatch(&Event::ServiceBotEvent::OnServiceBot, source, bi, ci, info);
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);
@@ -72,7 +70,7 @@ class CommandBSInfo : public Command
 			Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
 			Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
 
-			this->onbotinfo(&Event::ServiceBotEvent::OnServiceBot, source, bi, ci, info);
+			EventManager::Get()->Dispatch(&Event::ServiceBotEvent::OnServiceBot, source, bi, ci, info);
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);
@@ -102,12 +100,10 @@ class CommandBSInfo : public Command
 class BSInfo : public Module
 {
 	CommandBSInfo commandbsinfo;
-	EventHandlers<Event::ServiceBotEvent> onbotinfo;
 
  public:
 	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandbsinfo(this, onbotinfo)
-		, onbotinfo(this)
+		, commandbsinfo(this)
 	{
 
 	}

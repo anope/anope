@@ -14,6 +14,13 @@
 
 class AutoKickImpl : public AutoKick
 {
+	friend class AutoKickType;
+
+	ChanServ::Channel *channel = nullptr;
+	NickServ::Account *account = nullptr;
+	Anope::string mask, reason, creator;
+	time_t addtime = 0, last_time = 0;
+
  public:
 	AutoKickImpl(Serialize::TypeBase *type) : AutoKick(type) { }
         AutoKickImpl(Serialize::TypeBase *type, Serialize::ID id) : AutoKick(type, id) { }
@@ -54,14 +61,14 @@ class AutoKickType : public Serialize::Type<AutoKickImpl>
 	Serialize::Field<AutoKickImpl, time_t> last_time;
 
  	AutoKickType(Module *me)
-		: Serialize::Type<AutoKickImpl>(me, "AutoKick")
-		, ci(this, "ci", true)
-		, mask(this, "mask")
-		, nc(this, "nc", true)
-		, reason(this, "reason")
-		, creator(this, "creator")
-		, addtime(this, "addtime")
-		, last_time(this, "last_time")
+		: Serialize::Type<AutoKickImpl>(me)
+		, ci(this, "ci", &AutoKickImpl::channel, true)
+		, mask(this, "mask", &AutoKickImpl::mask)
+		, nc(this, "nc", &AutoKickImpl::account, true)
+		, reason(this, "reason", &AutoKickImpl::reason)
+		, creator(this, "creator", &AutoKickImpl::creator)
+		, addtime(this, "addtime", &AutoKickImpl::addtime)
+		, last_time(this, "last_time", &AutoKickImpl::last_time)
 	{
 	}
 };
@@ -226,6 +233,7 @@ class CommandCSAKick : public Command
 		}
 		else if (ci->HasFieldS("PEACE"))
 		{
+#warning "peace"
 #if 0
 			/* Match against all currently online users with equal or
 			 * higher access. - Viper */
@@ -273,9 +281,9 @@ class CommandCSAKick : public Command
 			}
 		}
 
-		if (ci->GetAkickCount() >= Config->GetModule(this->owner)->Get<unsigned>("autokickmax"))
+		if (ci->GetAkickCount() >= Config->GetModule(this->GetOwner())->Get<unsigned>("autokickmax"))
 		{
-			source.Reply(_("Sorry, you can only have \002{0}\002 autokick masks on a channel."), Config->GetModule(this->owner)->Get<unsigned>("autokickmax"));
+			source.Reply(_("Sorry, you can only have \002{0}\002 autokick masks on a channel."), Config->GetModule(this->GetOwner())->Get<unsigned>("autokickmax"));
 			return;
 		}
 
@@ -287,7 +295,7 @@ class CommandCSAKick : public Command
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << (reason == "" ? "" : ": ") << reason;
 
-		this->akickevents(&Event::Akick::OnAkickAdd, source, ci, ak);
+		EventManager::Get()->Dispatch(&Event::Akick::OnAkickAdd, source, ci, ak);
 
 		source.Reply(_("\002{0}\002 added to \002{1}\002 autokick list."), mask, ci->GetName());
 
@@ -318,7 +326,7 @@ class CommandCSAKick : public Command
 
 					AutoKick *ak = ci->GetAkick(number - 1);
 
-					this->akickevents(&Event::Akick::OnAkickDel, source, ci, ak);
+					EventManager::Get()->Dispatch(&Event::Akick::OnAkickDel, source, ci, ak);
 
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << (ak->GetAccount() ? ak->GetAccount()->GetDisplay() : ak->GetMask());
 
@@ -358,7 +366,7 @@ class CommandCSAKick : public Command
 
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 
-			this->akickevents(&Event::Akick::OnAkickDel, source, ci, ci->GetAkick(i));
+			EventManager::Get()->Dispatch(&Event::Akick::OnAkickDel, source, ci, ci->GetAkick(i));
 
 			delete ci->GetAkick(i);
 
@@ -520,10 +528,8 @@ class CommandCSAKick : public Command
 		source.Reply(_("The autokick list of \002{0}\002 has been cleared."), ci->GetName());
 	}
 
-	EventHandlers<Event::Akick> &akickevents;
-
  public:
-	CommandCSAKick(Module *creator, EventHandlers<Event::Akick> &events) : Command(creator, "chanserv/akick", 2, 4), akickevents(events)
+	CommandCSAKick(Module *creator) : Command(creator, "chanserv/akick", 2, 4)
 	{
 		this->SetDesc(_("Maintain the AutoKick list"));
 		this->SetSyntax(_("\037channel\037 ADD {\037nick\037 | \037mask\037} [\037reason\037]"));
@@ -665,13 +671,12 @@ class CSAKick : public Module
 	, public EventHook<Event::CheckKick>
 {
 	CommandCSAKick commandcsakick;
-	EventHandlers<Event::Akick> akickevents;
 	AutoKickType akick_type;
 
  public:
 	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandcsakick(this, akickevents)
-		, akickevents(this)
+		, EventHook<Event::CheckKick>(this)
+		, commandcsakick(this)
 		, akick_type(this)
 	{
 	}

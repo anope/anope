@@ -124,6 +124,8 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 
 class CommandNSRecover : public Command
 {
+	ServiceReference<CertService> certservice;
+	
  public:
 	CommandNSRecover(Module *creator) : Command(creator, "nickserv/recover", 1, 2)
 	{
@@ -170,8 +172,8 @@ class CommandNSRecover : public Command
 
 		if (ok == false && !pass.empty())
 		{
-			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSRecoverRequestListener(source, this, na->GetNick(), pass), owner, na->GetNick(), pass);
-			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
+			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSRecoverRequestListener(source, this, na->GetNick(), pass), GetOwner(), na->GetNick(), pass);
+			EventManager::Get()->Dispatch(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
 			req->Dispatch();
 		}
 		else
@@ -204,6 +206,8 @@ class NSRecover : public Module
 
  public:
 	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserNickChange>(this)
+		, EventHook<Event::JoinChannel>(this)
 		, commandnsrecover(this)
 		, recover(this, "recover")
 	{

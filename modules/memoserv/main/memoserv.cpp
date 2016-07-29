@@ -14,16 +14,13 @@
 #include "modules/help.h"
 #include "modules/botserv/bot.h"
 #include "modules/memoserv.h"
-//#include "memoinfo.h"
-//#include "memo.h"
-//#include "ignore.h"
 #include "memotype.h"
 #include "memoinfotype.h"
 #include "ignoretype.h"
 
 class MemoServCore : public Module, public MemoServ::MemoServService
-	, public EventHook<Event::NickCoreCreate>
-	, public EventHook<Event::CreateChan>
+	, public EventHook<NickServ::Event::NickRegister>
+	, public EventHook<Event::ChanRegistered>
 	, public EventHook<Event::BotDelete>
 	, public EventHook<Event::NickIdentify>
 	, public EventHook<Event::JoinChannel>
@@ -32,8 +29,6 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 	, public EventHook<Event::Help>
 {
 	Reference<ServiceBot> MemoServ;
-	EventHandlers<MemoServ::Event::MemoSend> onmemosend;
-	EventHandlers<MemoServ::Event::MemoDel> onmemodel;
 
 	MemoInfoType memoinfo_type;
 	MemoType memo_type;
@@ -62,8 +57,16 @@ class MemoServCore : public Module, public MemoServ::MemoServService
  public:
 	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 		, MemoServ::MemoServService(this)
-		, onmemosend(this)
-		, onmemodel(this)
+
+		, EventHook<NickServ::Event::NickRegister>(this)
+		, EventHook<Event::ChanRegistered>(this)
+		, EventHook<Event::BotDelete>(this)
+		, EventHook<Event::NickIdentify>(this)
+		, EventHook<Event::JoinChannel>(this)
+		, EventHook<Event::UserAway>(this)
+		, EventHook<Event::NickUpdate>(this)
+		, EventHook<Event::Help>(this)
+
 		, memoinfo_type(this)
 		, memo_type(this)
 		, ignore_type(this)
@@ -95,14 +98,14 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		if (sender != NULL)
 			sender->lastmemosend = Anope::CurTime;
 
-		MemoServ::Memo *m = new MemoImpl(&memo_type);
+		MemoServ::Memo *m = Serialize::New<MemoServ::Memo *>();
 		m->SetMemoInfo(mi);
 		m->SetSender(source);
 		m->SetTime(Anope::CurTime);
 		m->SetText(message);
 		m->SetUnread(true);
 
-		this->onmemosend(&MemoServ::Event::MemoSend::OnMemoSend, source, target, mi, m);
+		EventManager::Get()->Dispatch(&MemoServ::Event::MemoSend::OnMemoSend, source, target, mi, m);
 
 		if (ischan)
 		{
@@ -160,16 +163,6 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		}
 	}
 
-	MemoServ::Memo *CreateMemo() override
-	{
-		return new MemoImpl(&memo_type);
-	}
-
-	MemoServ::Ignore *CreateIgnore() override
-	{
-		return new IgnoreImpl(&ignore_type);
-	}
-
 	MemoServ::MemoInfo *GetMemoInfo(const Anope::string &target, bool &is_registered, bool &ischan, bool create) override
 	{
 		if (!target.empty() && target[0] == '#')
@@ -181,7 +174,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 				is_registered = true;
 				if (create && !ci->GetMemos())
 				{
-					MemoServ::MemoInfo *mi = new MemoInfoImpl(&memoinfo_type);
+					MemoServ::MemoInfo *mi = Serialize::New<MemoServ::MemoInfo *>();
 					mi->SetOwner(ci);
 				}
 				return ci->GetMemos();
@@ -198,7 +191,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 				is_registered = true;
 				if (create && !na->GetAccount()->GetMemos())
 				{
-					MemoServ::MemoInfo *mi = new MemoInfoImpl(&memoinfo_type);
+					MemoServ::MemoInfo *mi = Serialize::New<MemoServ::MemoInfo *>();
 					mi->SetOwner(na->GetAccount());
 				}
 				return na->GetAccount()->GetMemos();
@@ -224,16 +217,16 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		MemoServ = bi;
 	}
 
-	void OnNickCoreCreate(NickServ::Account *nc) override
+	void OnNickRegister(User *, NickServ::Nick *na, const Anope::string &) override
 	{
-		MemoServ::MemoInfo *mi = new MemoInfoImpl(&memoinfo_type);
-		mi->SetOwner(mi);
+		MemoServ::MemoInfo *mi = Serialize::New<MemoServ::MemoInfo *>();
+		mi->SetOwner(na->GetAccount());
 		mi->SetMemoMax(Config->GetModule(this)->Get<int>("maxmemos"));
 	}
 
-	void OnCreateChan(ChanServ::Channel *ci) override
+	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
-		MemoServ::MemoInfo *mi = new MemoInfoImpl(&memoinfo_type);
+		MemoServ::MemoInfo *mi = Serialize::New<MemoServ::MemoInfo *>();
 		mi->SetOwner(ci);
 		mi->SetMemoMax(Config->GetModule(this)->Get<int>("maxmemos"));
 	}

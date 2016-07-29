@@ -18,12 +18,10 @@ ExtensibleBase::ExtensibleBase(Module *m, const Anope::string &t, const Anope::s
 {
 }
 
-ExtensibleBase::~ExtensibleBase()
-{
-}
-
 Extensible::~Extensible()
 {
+	while (!extension_items.empty())
+		(*extension_items.begin())->Unset(this);
 }
 
 bool Extensible::HasExtOK(const Anope::string &name)

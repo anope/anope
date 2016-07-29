@@ -14,6 +14,11 @@
 
 class IgnoreImpl : public Ignore
 {
+	friend class IgnoreType;
+
+	Anope::string mask, creator, reason;
+	time_t time = 0;
+
  public:
 	IgnoreImpl(Serialize::TypeBase *type) : Ignore(type) { }
         IgnoreImpl(Serialize::TypeBase *type, Serialize::ID id) : Ignore(type, id) { }
@@ -37,11 +42,11 @@ class IgnoreType : public Serialize::Type<IgnoreImpl>
  	Serialize::Field<IgnoreImpl, Anope::string> mask, creator, reason;
  	Serialize::Field<IgnoreImpl, time_t> time;
 
- 	IgnoreType(Module *me) : Serialize::Type<IgnoreImpl>(me, "IgnoreData")
- 		, mask(this, "mask")
- 		, creator(this, "creator")
- 		, reason(this, "reason")
- 		, time(this, "time")
+	IgnoreType(Module *me) : Serialize::Type<IgnoreImpl>(me)
+ 		, mask(this, "mask", &IgnoreImpl::mask)
+ 		, creator(this, "creator", &IgnoreImpl::creator)
+ 		, reason(this, "reason", &IgnoreImpl::reason)
+ 		, time(this, "time", &IgnoreImpl::time)
  	{
  	}
 };
@@ -96,7 +101,7 @@ class OSIgnoreService : public IgnoreService
 	Ignore *Find(const Anope::string &mask) override
 	{
 		User *u = User::Find(mask, true);
-		std::vector<Ignore *> ignores = Serialize::GetObjects<Ignore *>(ignoretype);
+		std::vector<Ignore *> ignores = Serialize::GetObjects<Ignore *>();
 		std::vector<Ignore *>::iterator ign = ignores.begin(), ign_end = ignores.end();
 
 		if (u)
@@ -155,6 +160,8 @@ class OSIgnoreService : public IgnoreService
 
 class CommandOSIgnore : public Command
 {
+	ServiceReference<IgnoreService> ignore_service;
+	
  private:
 	Anope::string RealMask(const Anope::string &mask)
 	{
@@ -216,7 +223,7 @@ class CommandOSIgnore : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		Ignore *ign = ignoretype.Create();
+		Ignore *ign = Serialize::New<Ignore *>();
 		ign->SetMask(mask);
 		ign->SetCreator(source.GetNick());
 		ign->SetReason(reason);
@@ -236,7 +243,7 @@ class CommandOSIgnore : public Command
 
 	void DoList(CommandSource &source)
 	{
-		std::vector<Ignore *> ignores = Serialize::GetObjects<Ignore *>(ignoretype);
+		std::vector<Ignore *> ignores = Serialize::GetObjects<Ignore *>();
 
 		for (Ignore *id : ignores)
 		{
@@ -247,7 +254,7 @@ class CommandOSIgnore : public Command
 			}
 		}
 
-		ignores = Serialize::GetObjects<Ignore *>(ignoretype);
+		ignores = Serialize::GetObjects<Ignore *>();
 		if (ignores.empty())
 		{
 			source.Reply(_("Ignore list is empty."));
@@ -312,7 +319,7 @@ class CommandOSIgnore : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		for (Ignore *ign : Serialize::GetObjects<Ignore *>(ignoretype))
+		for (Ignore *ign : Serialize::GetObjects<Ignore *>())
 			ign->Delete();
 
 		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
@@ -374,6 +381,7 @@ class OSIgnore : public Module
 
  public:
 	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::BotPrivmsg>(this)
 		, ignoretype(this)
 		, osignoreservice(this)
 		, commandosignore(this)

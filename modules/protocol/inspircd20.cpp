@@ -174,19 +174,23 @@ class InspIRCd20Proto : public IRCDProto
 			{
 				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
 				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (x->manager->Check(it->second, x))
+					if (x->GetManager()->Check(it->second, x))
 						this->SendAkill(it->second, x);
 				return;
 			}
 
 			XLine *old = x;
 
-			if (old->manager->HasEntry("*@" + u->host))
+			if (old->GetManager()->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			x = new XLine("*@" + u->host, old->GetBy(), old->GetExpires(), old->GetReason(), old->GetID());
-			old->manager->AddXLine(x);
+			x = Serialize::New<XLine *>();
+			x->SetMask("*@" + u->host);
+			x->SetBy(old->GetBy());
+			x->SetExpires(old->GetExpires());
+			x->SetReason(old->GetReason());
+			old->GetManager()->AddXLine(x);
 
 			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
 		}
@@ -645,14 +649,14 @@ struct IRCDMessageCapab : Message::Capab
 				ChannelMode *cm = ModeManager::FindChannelModeByChar(modechar[0]);
 				if (cm == nullptr)
 				{
-					Log(owner) << "Warning: Uplink has unknown channel mode " << modename << "=" << modechar;
+					Log(this->GetOwner()) << "Warning: Uplink has unknown channel mode " << modename << "=" << modechar;
 					continue;
 				}
 
 				char modesymbol = cm->type == MODE_STATUS ? (anope_dynamic_static_cast<ChannelModeStatus *>(cm))->symbol : 0;
 				if (symbol != modesymbol)
 				{
-					Log(owner) << "Warning: Channel mode " << modename << " has a misconfigured status character";
+					Log(this->GetOwner()) << "Warning: Channel mode " << modename << " has a misconfigured status character";
 					continue;
 				}
 			}
@@ -676,7 +680,7 @@ struct IRCDMessageCapab : Message::Capab
 				UserMode *um = ModeManager::FindUserModeByChar(modechar[0]);
 				if (um == nullptr)
 				{
-					Log(owner) << "Warning: Uplink has unknown user mode " << modename << "=" << modechar;
+					Log(this->GetOwner()) << "Warning: Uplink has unknown user mode " << modename << "=" << modechar;
 					continue;
 				}
 			}
@@ -992,7 +996,7 @@ struct IRCDMessageMetadata : IRCDMessage
 				{
 					u->fingerprint = data.substr(pos1, pos2 - pos1);
 				}
-				Event::OnFingerprint(&Event::Fingerprint::OnFingerprint, u);
+				EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
 			}
 		}
 		// We deliberately ignore non-bursting servers to avoid pseudoserver fights
@@ -1246,6 +1250,8 @@ struct IRCDMessageTime : IRCDMessage
 
 struct IRCDMessageUID : IRCDMessage
 {
+	ServiceReference<SASL::Service> sasl;
+	
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 8) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	/*
@@ -1270,7 +1276,7 @@ struct IRCDMessageUID : IRCDMessage
 			modes += " " + params[i];
 
 		NickServ::Nick *na = NULL;
-		if (SASL::sasl)
+		if (sasl)
 			for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
 			{
 				SASLUser &u = *it;
@@ -1302,6 +1308,7 @@ class ProtoInspIRCd20 : public Module
 {
 	InspIRCd20Proto ircd_proto;
 	ExtensibleItem<bool> ssl;
+	ServiceReference<ModeLocks> mlocks;
 
 	/* Core message handlers */
 	Message::Away message_away;
@@ -1349,6 +1356,13 @@ class ProtoInspIRCd20 : public Module
 
  public:
 	ProtoInspIRCd20(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, EventHook<Event::UserNickChange>(this)
+		, EventHook<Event::ChannelSync>(this)
+		, EventHook<Event::ChanRegistered>(this)
+		, EventHook<Event::DelChan>(this)
+		, EventHook<Event::MLockEvents>(this)
+		, EventHook<Event::SetChannelOption>(this)
+
 		, ircd_proto(this)
 		, ssl(this, "ssl")
 		, message_away(this)
@@ -1489,7 +1503,7 @@ class ProtoInspIRCd20 : public Module
 
 	EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChanServ::Channel *ci, const Anope::string &setting) override
 	{
-		if (cmd->name == "chanserv/topic" && ci->c)
+		if (cmd->GetName() == "chanserv/topic" && ci->c)
 		{
 			if (setting == "topiclock on")
 				SendChannelMetadata(ci->c, "topiclock", "1");

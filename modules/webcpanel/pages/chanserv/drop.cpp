@@ -31,7 +31,7 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 			replacements["MESSAGES"] = "Invalid Confirmation";
 	}
 
-	for (::ChanServ::Channel *ci : na->GetAccount()->GetRefs<::ChanServ::Channel *>(::ChanServ::channel))
+	for (::ChanServ::Channel *ci : na->GetAccount()->GetRefs<::ChanServ::Channel *>())
 		if ((ci->HasFieldS("SECUREFOUNDER") ? ci->AccessFor(na->GetAccount()).founder : ci->AccessFor(na->GetAccount()).HasPriv("FOUNDER")) || (na->GetAccount()->IsServicesOper() && na->GetAccount()->o->GetType()->HasCommand("chanserv/drop")))
 		{
 			replacements["CHANNEL_NAMES"] = ci->GetName();

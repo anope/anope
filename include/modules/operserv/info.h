@@ -1,9 +1,10 @@
 /*
  *
- * (C) 2014 Anope Team
+ * (C) 2014-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ * 
  */
 
 class OperInfo : public Serialize::Object
@@ -12,6 +13,8 @@ class OperInfo : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "operinfo";
+	 
 	virtual Serialize::Object *GetTarget() anope_abstract;
 	virtual void SetTarget(Serialize::Object *) anope_abstract;
 
@@ -24,6 +27,3 @@ class OperInfo : public Serialize::Object
 	virtual time_t GetCreated() anope_abstract;
 	virtual void SetCreated(const time_t &) anope_abstract;
 };
-
-static Serialize::TypeReference<OperInfo> operinfo("OperInfo");
-

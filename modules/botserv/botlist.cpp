@@ -26,7 +26,7 @@ class CommandBSBotList : public Command
 
 		list.AddColumn(_("Nick")).AddColumn(_("Mask"));
 
-		for (BotInfo *bi : Serialize::GetObjects<BotInfo *>(botinfo))
+		for (BotInfo *bi : Serialize::GetObjects<BotInfo *>())
 		{
 			if (source.HasPriv("botserv/administration") || !bi->GetOperOnly())
 			{

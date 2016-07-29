@@ -2,10 +2,20 @@
 
 class ChannelImpl : public ChanServ::Channel
 {
+	friend class ChannelType;
+
+	NickServ::Account *founder = nullptr, *successor = nullptr;
+	Anope::string name, desc;
+	time_t time_registered = 0, last_used = 0;
+	Anope::string last_topic, last_topic_setter;
+	time_t last_topic_time = 0;
+	int16_t bantype = 0;
+	time_t banexpire = 0;
+	BotInfo *bi = nullptr;
+
  public:
 	ChannelImpl(Serialize::TypeBase *type) : ChanServ::Channel(type) { }
 	ChannelImpl(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::Channel(type, id) { }
-	ChannelImpl(Serialize::TypeBase *type, const Anope::string &chname);
 	~ChannelImpl();
 	void Delete() override;
 
@@ -44,16 +54,17 @@ class ChannelImpl : public ChanServ::Channel
 
 	MemoServ::MemoInfo *GetMemos() override;
 
-	bool IsFounder(const User *user) override;
 	void SetFounder(NickServ::Account *nc) override;
 	NickServ::Account *GetFounder() override;
+
 	void SetSuccessor(NickServ::Account *nc) override;
 	NickServ::Account *GetSuccessor() override;
+
+	bool IsFounder(const User *user) override;
 	ChanServ::ChanAccess *GetAccess(unsigned index) /*const*/ override;
 	ChanServ::AccessGroup AccessFor(const User *u, bool = true) override;
 	ChanServ::AccessGroup AccessFor(NickServ::Account *nc, bool = true) override;
 	unsigned GetAccessCount()/* const*/ override;
-	unsigned GetDeepAccessCount() const override;
 	void ClearAccess() override;
 	AutoKick* AddAkick(const Anope::string &user, NickServ::Account *akicknc, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0) override;
 	AutoKick* AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0) override;

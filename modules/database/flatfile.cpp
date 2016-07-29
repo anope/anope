@@ -80,6 +80,8 @@ class DBFlatFile : public Module
 
  public:
 	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+		, EventHook<Event::LoadDatabase>(this)
+		, EventHook<Event::SaveDatabase>(this)
 		, last_day(0)
 		, loaded(false)
 	{
@@ -182,8 +184,9 @@ class DBFlatFile : public Module
 
 				f << "OBJECT " << s_type->GetName() << "\n";
 				f << "ID " << object->id << "\n";
-				for (Serialize::FieldBase *field : s_type->fields)
-					f << "DATA " << field->GetName() << " " << field->SerializeToString(object) << "\n";
+				for (Serialize::FieldBase *field : s_type->GetFields())
+					if (field->HasFieldS(object)) // for ext
+						f << "DATA " << field->serialize_name << " " << field->SerializeToString(object) << "\n";
 				f << "END\n";
 			}
 		}

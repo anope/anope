@@ -94,7 +94,7 @@ bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 		// XXX Rate limit check.
 
 		::NickServ::IdentifyRequest *req = ::NickServ::service->CreateIdentifyRequest(new WebpanelRequest(reply, message, server, page_name, client, replacements), me, user, pass);
-		Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
+		EventManager::Get()->Dispatch(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
 		req->Dispatch();
 		return false;
 	}

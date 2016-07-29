@@ -20,7 +20,7 @@
 #include "leveltype.h"
 #include "modetype.h"
 #include "chanaccesstype.h"
-#include "chanaccess.h"
+#include "modules/chanserv/main/chanaccess.h"
 
 class ChanServCore : public Module
 	, public ChanServ::ChanServService
@@ -31,7 +31,6 @@ class ChanServCore : public Module
 	, public EventHook<Event::DelChan>
 	, public EventHook<Event::Help>
 	, public EventHook<Event::CheckModes>
-	, public EventHook<Event::CreateChan>
 	, public EventHook<Event::CanSet>
 	, public EventHook<Event::ChannelSync>
 	, public EventHook<Event::Log>
@@ -47,30 +46,48 @@ class ChanServCore : public Module
 	Reference<ServiceBot> ChanServ;
 	std::vector<Anope::string> defaults;
 	ExtensibleItem<bool> inhabit;
-	ExtensibleRef<bool> persist;//XXX?
 	bool always_lower;
-	EventHandlers<ChanServ::Event::PreChanExpire> OnPreChanExpire;
-	EventHandlers<ChanServ::Event::ChanExpire> OnChanExpire;
 	std::vector<ChanServ::Privilege> Privileges;
 	ChanServ::registered_channel_map registered_channels;
 	ChannelType channel_type;
-	ChanAccessType chanaccess_type;
+//	ChanAccessType chanaccess_type;
 	LevelType level_type;
 	CSModeType mode_type;
 
  public:
 	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 		, ChanServService(this)
+		, EventHook<Event::ChannelCreate>(this)
+		, EventHook<Event::BotDelete>(this)
+		, EventHook<Event::BotPrivmsg>(this)
+		, EventHook<Event::DelCore>(this)
+		, EventHook<Event::DelChan>(this)
+		, EventHook<Event::Help>(this)
+		, EventHook<Event::CheckModes>(this)
+		, EventHook<Event::CanSet>(this)
+		, EventHook<Event::ChannelSync>(this)
+		, EventHook<Event::Log>(this)
+		, EventHook<Event::ExpireTick>(this)
+		, EventHook<Event::CheckDelete>(this)
+		, EventHook<Event::PreUplinkSync>(this)
+		, EventHook<Event::ChanRegistered>(this)
+		, EventHook<Event::JoinChannel>(this)
+		, EventHook<Event::ChannelModeSet>(this)
+		, EventHook<Event::ChanInfo>(this)
+		, EventHook<Event::SetCorrectModes>(this)
 		, inhabit(this, "inhabit")
-		, persist("PERSIST")
 		, always_lower(false)
-		, OnPreChanExpire(this)
-		, OnChanExpire(this)
 		, channel_type(this)
-		, chanaccess_type(this, "ChanAccess")
+//		, chanaccess_type(this)
 		, level_type(this)
 		, mode_type(this)
 	{
+		ChanServ::service = this;
+	}
+
+	~ChanServCore()
+	{
+		ChanServ::service = nullptr;
 	}
 
 	ChanServ::Channel *Find(const Anope::string &name) override
@@ -143,7 +160,7 @@ class ChanServCore : public Module
 		if (inhabit.HasExt(c))
 			return;
 
-		new ChanServTimer(ChanServ, inhabit, this->owner, c);
+		new ChanServTimer(ChanServ, inhabit, this, c);
 	}
 
 	void AddPrivilege(ChanServ::Privilege p) override
@@ -265,7 +282,7 @@ class ChanServCore : public Module
 	void OnDelCore(NickServ::Account *nc) override
 	{
 		unsigned int max_reg = Config->GetModule(this)->Get<unsigned int>("maxregistered");
-		for (ChanServ::Channel *ci : nc->GetRefs<ChanServ::Channel *>(ChanServ::channel))
+		for (ChanServ::Channel *ci : nc->GetRefs<ChanServ::Channel *>())
 		{
 			if (ci->GetFounder() == nc)
 			{
@@ -336,7 +353,7 @@ class ChanServCore : public Module
 	{
 		/* remove access entries that are this channel */
 
-		for (ChanServ::Channel *c : ci->GetRefs<ChanServ::Channel *>(ChanServ::channel))
+		for (ChanServ::Channel *c : ci->GetRefs<ChanServ::Channel *>())
 		{
 			for (unsigned j = 0; j < c->GetAccessCount(); ++j)
 			{
@@ -412,13 +429,6 @@ class ChanServCore : public Module
 		}
 	}
 
-	void OnCreateChan(ChanServ::Channel *ci) override
-	{
-		/* Set default chan flags */
-		for (unsigned i = 0; i < defaults.size(); ++i)
-			ci->SetS<bool>(defaults[i].upper(), true);
-	}
-
 	EventReturn OnCanSet(User *u, const ChannelMode *cm) override
 	{
 		if (Config->GetModule(this)->Get<Anope::string>("nomlock").find(cm->mchar) != Anope::string::npos
@@ -429,7 +439,7 @@ class ChanServCore : public Module
 
 	void OnChannelSync(Channel *c) override
 	{
-		bool perm = c->HasMode("PERM") || (c->ci && persist && persist->HasExt(c->ci));
+		bool perm = c->HasMode("PERM") || (c->ci && c->ci->HasFieldS("PERSIST"));
 		if (!perm && !c->botchannel && (c->users.empty() || (c->users.size() == 1 && c->users.begin()->second->user->server == Me)))
 		{
 			this->Hold(c);
@@ -466,12 +476,12 @@ class ChanServCore : public Module
 					expire = true;
 			}
 
-			this->OnPreChanExpire(&ChanServ::Event::PreChanExpire::OnPreChanExpire, ci, expire);
+			EventManager::Get()->Dispatch(&ChanServ::Event::PreChanExpire::OnPreChanExpire, ci, expire);
 
 			if (expire)
 			{
 				::Log(LOG_NORMAL, "chanserv/expire", ChanServ) << "Expiring channel " << ci->GetName() << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "(none)") << ")";
-				this->OnChanExpire(&ChanServ::Event::ChanExpire::OnChanExpire, ci);
+				EventManager::Get()->Dispatch(&ChanServ::Event::ChanExpire::OnChanExpire, ci);
 				delete ci;
 			}
 		}
@@ -488,12 +498,10 @@ class ChanServCore : public Module
 
 	void OnPreUplinkSync(Server *serv) override
 	{
-		if (!persist)
-			return;
 		/* Find all persistent channels and create them, as we are about to finish burst to our uplink */
 		for (ChanServ::Channel *ci : channel_type.List<ChanServ::Channel *>())
 		{
-			if (persist->HasExt(ci))
+			if (ci->HasFieldS("PERSIST"))
 			{
 				bool c;
 				ci->c = Channel::FindOrCreate(ci->GetName(), c, ci->GetTimeRegistered());
@@ -521,13 +529,17 @@ class ChanServCore : public Module
 
 	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
-		if (!persist || !ci->c)
+		/* Set default chan flags */
+		for (unsigned i = 0; i < defaults.size(); ++i)
+			ci->SetS<bool>(defaults[i].upper(), true);
+
+		if (!ci->c)
 			return;
 		/* Mark the channel as persistent */
 		if (ci->c->HasMode("PERM"))
-			persist->Set(ci, true);
+			ci->SetS("PERSIST", true);
 		/* Persist may be in def cflags, set it here */
-		else if (persist->HasExt(ci))
+		else if (ci->HasFieldS("PERSIST"))
 			ci->c->SetMode(NULL, "PERM");
 	}
 

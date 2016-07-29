@@ -13,6 +13,8 @@ class StatusUpdate : public Module
 {
  public:
 	StatusUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::AccessAdd>(this)
+		, EventHook<Event::AccessDel>(this)
 	{
 
 	}
@@ -24,8 +26,7 @@ class StatusUpdate : public Module
 			{
 				User *user = it->second->user;
 
-				ChanServ::ChanAccess::Path p;
-				if (user->server != Me && access->Matches(user, user->Account(), p))
+				if (user->server != Me && access->Matches(user, user->Account()))
 				{
 					ChanServ::AccessGroup ag = ci->AccessFor(user);
 
@@ -48,8 +49,7 @@ class StatusUpdate : public Module
 			{
 				User *user = it->second->user;
 
-				ChanServ::ChanAccess::Path p;
-				if (user->server != Me && access->Matches(user, user->Account(), p))
+				if (user->server != Me && access->Matches(user, user->Account()))
 				{
 					ChanServ::AccessGroup ag = ci->AccessFor(user);
 

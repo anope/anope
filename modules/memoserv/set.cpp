@@ -301,11 +301,11 @@ class MSSet : public Module
  public:
 	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandmsset(this)
-		, memo_signon(this, NickServ::account, "MEMO_SIGNON")
-		, memo_receive(this, NickServ::account, "MEMO_RECEIVE")
-		, memo_mail(this, NickServ::account, "MEMO_MAIL")
-		, memo_hardmax_nick(this, NickServ::account, "MEMO_HARDMAX")
-		, memo_hardmax_channel(this, ChanServ::channel, "MEMO_HARDMAX")
+		, memo_signon(this, "MEMO_SIGNON")
+		, memo_receive(this, "MEMO_RECEIVE")
+		, memo_mail(this, "MEMO_MAIL")
+		, memo_hardmax_nick(this, "MEMO_HARDMAX")
+		, memo_hardmax_channel(this, "MEMO_HARDMAX")
 	{
 
 	}

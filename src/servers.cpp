@@ -51,7 +51,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 			Burst();
 	}
 
-	Event::OnNewServer(&Event::NewServer::OnNewServer, this);
+	EventManager::Get()->Dispatch(&Event::NewServer::OnNewServer, this);
 }
 
 Server::~Server()
@@ -86,7 +86,7 @@ void Server::Delete(const Anope::string &reason)
 {
 	this->quit_reason = reason;
 	this->quitting = true;
-	Event::OnServerQuit(&Event::ServerQuit::OnServerQuit, this);
+	EventManager::Get()->Dispatch(&Event::ServerQuit::OnServerQuit, this);
 	delete this;
 }
 
@@ -228,7 +228,7 @@ void Server::Sync(bool sync_links)
 
 	Log(this, "sync") << "is done syncing";
 
-	Event::OnServerSync(&Event::ServerSync::OnServerSync, this);
+	EventManager::Get()->Dispatch(&Event::ServerSync::OnServerSync, this);
 
 	if (sync_links && !this->links.empty())
 	{
@@ -240,7 +240,7 @@ void Server::Sync(bool sync_links)
 
 	if (me)
 	{
-		Event::OnPreUplinkSync(&Event::PreUplinkSync::OnPreUplinkSync, this);
+		EventManager::Get()->Dispatch(&Event::PreUplinkSync::OnPreUplinkSync, this);
 	}
 
 	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end;)
@@ -257,7 +257,7 @@ void Server::Sync(bool sync_links)
 		IRCD->SendEOB();
 		Me->Sync(false);
 
-		Event::OnUplinkSync(&Event::UplinkSync::OnUplinkSync, this);
+		EventManager::Get()->Dispatch(&Event::UplinkSync::OnUplinkSync, this);
 
 		if (!Anope::NoFork)
 		{

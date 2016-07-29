@@ -68,7 +68,9 @@ namespace Redis
 	class Provider : public Service
 	{
 	 public:
-		Provider(Module *c, const Anope::string &n) : Service(c, "Redis::Provider", n) { }
+		static constexpr const char *NAME = "redis";
+		
+		Provider(Module *c, const Anope::string &n) : Service(c, NAME, n) { }
 
 		virtual void SendCommand(Interface *i, const std::vector<Anope::string> &cmds) anope_abstract;
 		virtual void SendCommand(Interface *i, const Anope::string &str) anope_abstract;

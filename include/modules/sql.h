@@ -71,6 +71,14 @@ namespace SQL
 			qd.escape = false;
 			qd.null = true;
 		}
+
+		Anope::string Unsafe() const
+		{
+			Anope::string q = query;
+			for (auto it = parameters.begin(); it != parameters.end(); ++it)
+				q = q.replace_all_cs("@" + it->first + "@", it->second.data);
+			return q;
+		}
 	};
 
 	/** A result from a SQL query
@@ -172,7 +180,9 @@ namespace SQL
 	class Provider : public Service
 	{
 	 public:
-		Provider(Module *c, const Anope::string &n) : Service(c, "SQL::Provider", n) { }
+		static constexpr const char *NAME = "sql";
+		
+		Provider(Module *c, const Anope::string &n) : Service(c, NAME, n) { }
 
 		virtual void Run(Interface *i, const Query &query) anope_abstract;
 

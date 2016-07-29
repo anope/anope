@@ -28,7 +28,7 @@ bool WebCPanel::HostServ::Request::OnRequest(HTTPProvider *server, const Anope::
 		else
 			replacements["VHOST"] = na->GetVhostHost();
 	}
-	if (ServiceReference<Command>("Command", "hostserv/request"))
+	if (ServiceReference<Command>("hostserv/request"))
 		replacements["CAN_REQUEST"] = "YES";
 	TemplateFileServer page("hostserv/request.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

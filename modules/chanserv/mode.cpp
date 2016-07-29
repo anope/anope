@@ -13,10 +13,15 @@
 #include "modules/chanserv/mode.h"
 #include "modules/chanserv/info.h"
 
-static EventHandlers<Event::MLockEvents> *events;
-
 class ModeLockImpl : public ModeLock
 {
+	friend class ModeLockType;
+
+	ChanServ::Channel *channel = nullptr;
+	bool set = false;
+	Anope::string name, param, setter;
+	time_t created = 0;
+
  public:
 	ModeLockImpl(Serialize::TypeBase *type) : ModeLock(type) { }
 	ModeLockImpl(Serialize::TypeBase *type, Serialize::ID id) : ModeLock(type, id) { }
@@ -48,13 +53,13 @@ class ModeLockType : public Serialize::Type<ModeLockImpl>
 	Serialize::Field<ModeLockImpl, Anope::string> name, param, setter;
 	Serialize::Field<ModeLockImpl, time_t> created;
 
-	ModeLockType(Module *me) : Serialize::Type<ModeLockImpl>(me, "ModeLock")
-		, ci(this, "ci", true)
-		, set(this, "set")
-		, name(this, "name")
-		, param(this, "param")
-		, setter(this, "setter")
-		, created(this, "created")
+	ModeLockType(Module *me) : Serialize::Type<ModeLockImpl>(me)
+		, ci(this, "ci", &ModeLockImpl::channel, true)
+		, set(this, "set", &ModeLockImpl::set)
+		, name(this, "name", &ModeLockImpl::name)
+		, param(this, "param", &ModeLockImpl::param)
+		, setter(this, "setter", &ModeLockImpl::setter)
+		, created(this, "created", &ModeLockImpl::created)
 	{
 	}
 };
@@ -129,14 +134,14 @@ class ModeLocksImpl : public ModeLocks
 		if (!mode)
 			return false;
 
-		for (ModeLock *ml : ci->GetRefs<ModeLock *>(modelock))
+		for (ModeLock *ml : ci->GetRefs<ModeLock *>())
 			if (ml->GetName() == mode->name && ml->GetSet() == status && ml->GetParam() == param)
 				return true;
 
 		return false;
 	}
 
-	bool SetMLock(ChanServ::Channel *ci, ChannelMode *mode, bool status, const Anope::string &param, Anope::string setter, time_t created = Anope::CurTime) override
+	bool SetMLock(ChanServ::Channel *ci, ChannelMode *mode, bool status, const Anope::string &param = "", Anope::string setter = "", time_t created = Anope::CurTime) override
 	{
 		if (!mode)
 			return false;
@@ -146,16 +151,15 @@ class ModeLocksImpl : public ModeLocks
 		if (setter.empty())
 			setter = ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "Unknown";
 
-		ModeLock *ml = modelock.Create();
+		ModeLock *ml = Serialize::New<ModeLock *>();
 		ml->SetChannel(ci);
 		ml->SetSet(status);
-		ml->SetName(name);
+		ml->SetName(mode->name);
 		ml->SetParam(param);
 		ml->SetSetter(setter);
 		ml->SetCreated(created);
 
-		EventReturn MOD_RESULT;
-		MOD_RESULT = (*events)(&Event::MLockEvents::OnMLock, ci, ml);
+		EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::MLockEvents::OnMLock, ci, ml);
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			delete ml;
@@ -170,7 +174,7 @@ class ModeLocksImpl : public ModeLocks
 		if (!mode)
 			return false;
 
-		for (ModeLock *m : ci->GetRefs<ModeLockImpl *>(modelock))
+		for (ModeLock *m : ci->GetRefs<ModeLockImpl *>())
 			if (m->GetName() == mode->name)
 			{
 				// For list or status modes, we must check the parameter
@@ -178,8 +182,7 @@ class ModeLocksImpl : public ModeLocks
 					if (m->GetParam() != param)
 						continue;
 
-				EventReturn MOD_RESULT;
-				MOD_RESULT = (*events)(&Event::MLockEvents::OnUnMLock, ci, m);
+				EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::MLockEvents::OnUnMLock, ci, m);
 				if (MOD_RESULT == EVENT_STOP)
 					break;
 
@@ -192,19 +195,19 @@ class ModeLocksImpl : public ModeLocks
 
 	void ClearMLock(ChanServ::Channel *ci) override
 	{
-		for (ModeLock *m : ci->GetRefs<ModeLock *>(modelock))
+		for (ModeLock *m : ci->GetRefs<ModeLock *>())
 			delete m;
 	}
 
 	ModeList GetMLock(ChanServ::Channel *ci) const override
 	{
-		return ci->GetRefs<ModeLock *>(modelock);
+		return ci->GetRefs<ModeLock *>();
 	}
 
 	std::list<ModeLock *> GetModeLockList(ChanServ::Channel *ci, const Anope::string &name) override
 	{
 		std::list<ModeLock *> mlist;
-		for (ModeLock *m : ci->GetRefs<ModeLock *>(modelock))
+		for (ModeLock *m : ci->GetRefs<ModeLock *>())
 			if (m->GetName() == name)
 				mlist.push_back(m);
 		return mlist;
@@ -212,7 +215,7 @@ class ModeLocksImpl : public ModeLocks
 
 	ModeLock *GetMLock(ChanServ::Channel *ci, const Anope::string &mname, const Anope::string &param = "") override
 	{
-		for (ModeLock *m : ci->GetRefs<ModeLock *>(modelock))
+		for (ModeLock *m : ci->GetRefs<ModeLock *>())
 			if (m->GetName() == mname && m->GetParam() == param)
 				return m;
 
@@ -223,7 +226,7 @@ class ModeLocksImpl : public ModeLocks
 	{
 		Anope::string pos = "+", neg = "-", params;
 
-		for (ModeLock *ml : ci->GetRefs<ModeLock *>(modelock))
+		for (ModeLock *ml : ci->GetRefs<ModeLock *>())
 		{
 			ChannelMode *cm = ModeManager::FindChannelModeByName(ml->GetName());
 
@@ -250,6 +253,8 @@ class ModeLocksImpl : public ModeLocks
 
 class CommandCSMode : public Command
 {
+	ServiceReference<ModeLocks> mlocks;
+	
 	bool CanSet(CommandSource &source, ChanServ::Channel *ci, ChannelMode *cm, bool self)
 	{
 		if (!ci || !cm || cm->type != MODE_STATUS)
@@ -321,7 +326,7 @@ class CommandCSMode : public Command
 							source.Reply(_("Missing parameter for mode \002{0}\002."), cm->mchar);
 						else if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
 							source.Reply(_("List for mode \002{0}\002 is full."), cm->mchar);
-						else if (ci->GetRefs<ModeLock *>(modelock).size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "32"))
+						else if (ci->GetRefs<ModeLock *>().size() >= Config->GetModule(this->GetOwner())->Get<unsigned>("max", "32"))
 							source.Reply(_("The mode lock list of \002{0}\002 is full."), ci->GetName());
 						else
 						{
@@ -854,17 +859,16 @@ class CSMode : public Module
 	ModeLocksImpl modelock;
 	ModeLockType modelock_type;
 
-	EventHandlers<Event::MLockEvents> modelockevents;
-
  public:
 	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::CheckModes>(this)
+		, EventHook<Event::ChanRegistered>(this)
+		, EventHook<Event::ChanInfo>(this)
 		, commandcsmode(this)
 		, commandcsmodes(this)
 		, modelock(this)
 		, modelock_type(this)
-		, modelockevents(this)
 	{
-		events = &modelockevents;
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -896,7 +900,7 @@ class CSMode : public Module
 		if (!c || !c->ci)
 			return;
 
-		ModeLocks::ModeList locks = mlocks->GetMLock(c->ci);
+		ModeLocks::ModeList locks = modelock.GetMLock(c->ci);
 		for (ModeLock *ml : locks)
 		{
 			ChannelMode *cm = ModeManager::FindChannelModeByName(ml->GetName());
@@ -980,7 +984,7 @@ class CSMode : public Module
 						continue;
 				}
 
-				mlocks->SetMLock(ci, cm, add, param);
+				modelock.SetMLock(ci, cm, add, param);
 			}
 		}
 	}
@@ -990,7 +994,7 @@ class CSMode : public Module
 		if (!show_hidden)
 			return;
 
-		const Anope::string &m = mlocks->GetMLockAsString(ci, true);
+		const Anope::string &m = modelock.GetMLockAsString(ci, true);
 		if (!m.empty())
 			info[_("Mode lock")] = m;
 	}

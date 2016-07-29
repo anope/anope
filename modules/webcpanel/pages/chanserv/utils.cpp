@@ -23,7 +23,7 @@ namespace ChanServ
 
 void BuildChanList(::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
-	std::vector<::ChanServ::Channel *> chans = na->GetAccount()->GetRefs<::ChanServ::Channel *>(::ChanServ::channel);
+	std::vector<::ChanServ::Channel *> chans = na->GetAccount()->GetRefs<::ChanServ::Channel *>();
 	std::sort(chans.begin(), chans.end(), ChannelSort);
 
 	for (::ChanServ::Channel *ci : chans)

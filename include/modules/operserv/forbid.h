@@ -1,9 +1,10 @@
 /*
  *
- * (C) 2013-2014 Anope Team
+ * (C) 2013-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ * 
  */
 
 enum ForbidType
@@ -21,6 +22,8 @@ class ForbidData : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *NAME = "forbid";
+
 	virtual Anope::string GetMask() anope_abstract;
 	virtual void SetMask(const Anope::string &) anope_abstract;
 
@@ -43,14 +46,13 @@ class ForbidData : public Serialize::Object
 class ForbidService : public Service
 {
  public:
-	ForbidService(Module *m) : Service(m, "ForbidService", "forbid") { }
+	static constexpr const char *NAME = "forbid";
+	
+	ForbidService(Module *m) : Service(m, NAME) { }
 
 	virtual ForbidData *FindForbid(const Anope::string &mask, ForbidType type) anope_abstract;
 
 	virtual std::vector<ForbidData *> GetForbids() anope_abstract;
 };
 
-static ServiceReference<ForbidService> forbid_service("ForbidService", "forbid");
-
-static Serialize::TypeReference<ForbidData> forbiddata("ForbidData");
 

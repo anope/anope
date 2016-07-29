@@ -49,3 +49,14 @@ void IdentifyRequestImpl::Dispatch()
 	else
 		dispatched = true;
 }
+
+void IdentifyRequestImpl::Unload(Module *m)
+{
+	if (this->GetOwner() != m)
+		return;
+
+	if (!success)
+		l->OnFail(this);
+	delete this;
+}
+

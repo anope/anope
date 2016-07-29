@@ -33,12 +33,16 @@ namespace
 	/* Number of bits to use when comparing session IPs */
 	unsigned ipv4_cidr;
 	unsigned ipv6_cidr;
-
-	EventHandlers<Event::Exception> *events;
 }
 
 class ExceptionImpl : public Exception
 {
+	friend class ExceptionType;
+
+	Anope::string mask, who, reason;
+	unsigned int limit = 0;
+	time_t time = 0, expires = 0;
+
  public:
 	ExceptionImpl(Serialize::TypeBase *type) : Exception(type) { }
 	ExceptionImpl(Serialize::TypeBase *type, Serialize::ID id) : Exception(type, id) { }
@@ -69,13 +73,13 @@ class ExceptionType : public Serialize::Type<ExceptionImpl>
 	Serialize::Field<ExceptionImpl, unsigned int> limit;
 	Serialize::Field<ExceptionImpl, time_t> time, expires;
 
-	ExceptionType(Module *me) : Serialize::Type<ExceptionImpl>(me, "Exception")
-			, mask(this, "mask")
-			, who(this, "who")
-			, reason(this, "reason")
-			, limit(this, "limit")
-			, time(this, "time")
-			, expires(this, "expires")
+	ExceptionType(Module *me) : Serialize::Type<ExceptionImpl>(me)
+			, mask(this, "mask", &ExceptionImpl::mask)
+			, who(this, "who", &ExceptionImpl::who)
+			, reason(this, "reason", &ExceptionImpl::reason)
+			, limit(this, "limit", &ExceptionImpl::limit)
+			, time(this, "time", &ExceptionImpl::time)
+			, expires(this, "expires", &ExceptionImpl::expires)
 	{
 	}
 };
@@ -149,7 +153,7 @@ class MySessionService : public SessionService
 
 	Exception *FindException(User *u) override
 	{
-		for (Exception *e : Serialize::GetObjects<Exception *>(exception))
+		for (Exception *e : Serialize::GetObjects<Exception *>())
 		{
 			if (Anope::Match(u->host, e->GetMask()) || Anope::Match(u->ip.addr(), e->GetMask()))
 				return e;
@@ -162,7 +166,7 @@ class MySessionService : public SessionService
 
 	Exception *FindException(const Anope::string &host) override
 	{
-		for (Exception *e : Serialize::GetObjects<Exception *>(exception))
+		for (Exception *e : Serialize::GetObjects<Exception *>())
 		{
 			if (Anope::Match(host, e->GetMask()))
 				return e;
@@ -211,6 +215,8 @@ class MySessionService : public SessionService
 
 class CommandOSSession : public Command
 {
+	ServiceReference<SessionService> session_service;
+		
  private:
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
@@ -319,7 +325,7 @@ class CommandOSException : public Command
 {
 	static void DoDel(CommandSource &source, Exception *e)
 	{
-		(*events)(&Event::Exception::OnExceptionDel, source, e);
+		EventManager::Get()->Dispatch(&Event::Exception::OnExceptionDel, source, e);
 		e->Delete();
 	}
 
@@ -382,7 +388,7 @@ class CommandOSException : public Command
 				return;
 			}
 
-			for (Exception *e : Serialize::GetObjects<Exception *>(exception))
+			for (Exception *e : Serialize::GetObjects<Exception *>())
 				if (e->GetMask().equals_ci(mask))
 				{
 					if (e->GetLimit() != limit)
@@ -395,7 +401,7 @@ class CommandOSException : public Command
 					return;
 				}
 
-			Exception *e = exception.Create();
+			Exception *e = Serialize::New<Exception *>();
 			e->SetMask(mask);
 			e->SetLimit(limit);
 			e->SetReason(reason);
@@ -404,7 +410,7 @@ class CommandOSException : public Command
 			e->SetExpires(expires);
 
 			EventReturn MOD_RESULT;
-			MOD_RESULT = (*events)(&Event::Exception::OnExceptionAdd, e);
+			MOD_RESULT = EventManager::Get()->Dispatch(&Event::Exception::OnExceptionAdd, e);
 			if (MOD_RESULT == EVENT_STOP) 
 				return;
 
@@ -432,7 +438,7 @@ class CommandOSException : public Command
 			NumberList(mask, true,
 				[&](unsigned int number)
 				{
-					std::vector<Exception *> exceptions = Serialize::GetObjects<Exception *>(exception);
+					std::vector<Exception *> exceptions = Serialize::GetObjects<Exception *>();
 					if (!number || number > exceptions.size())
 						return;
 
@@ -456,7 +462,7 @@ class CommandOSException : public Command
 		else
 		{
 			bool found = false;
-			for (Exception *e : Serialize::GetObjects<Exception *>(exception))
+			for (Exception *e : Serialize::GetObjects<Exception *>())
 				if (mask.equals_ci(e->GetMask()))
 				{
 					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << mask;
@@ -476,7 +482,7 @@ class CommandOSException : public Command
 	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
 	{
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
-		std::vector<Exception *> exceptions = Serialize::GetObjects<Exception *>(exception);
+		std::vector<Exception *> exceptions = Serialize::GetObjects<Exception *>();
 
 		if (exceptions.empty())
 		{
@@ -621,24 +627,20 @@ class OSSession : public Module
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
 	ServiceReference<XLineManager> akills;
-	EventHandlers<Event::Exception> exceptionevents;
 	ExceptionType etype;
 
  public:
 	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::UserConnect>(EventHook<Event::UserConnect>::Priority::FIRST)
-		, EventHook<Event::UserQuit>(EventHook<Event::UserQuit>::Priority::FIRST)
-		, EventHook<Event::ExpireTick>(EventHook<Event::ExpireTick>::Priority::FIRST)
+		, EventHook<Event::UserConnect>(this, EventHook<Event::UserConnect>::Priority::FIRST)
+		, EventHook<Event::UserQuit>(this, EventHook<Event::UserQuit>::Priority::FIRST)
+		, EventHook<Event::ExpireTick>(this, EventHook<Event::ExpireTick>::Priority::FIRST)
 		, ss(this)
 		, commandossession(this)
 		, commandosexception(this)
-		, akills("XLineManager", "xlinemanager/sgline")
-		, exceptionevents(this)
+		, akills("xlinemanager/sgline")
 		, etype(this)
 	{
 		this->SetPermanent(true);
-
-		events = &exceptionevents;
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -658,7 +660,7 @@ class OSSession : public Module
 		ipv6_cidr = block->Get<unsigned>("session_ipv6_cidr", "128");
 
 		if (ipv4_cidr > 32 || ipv6_cidr > 128)
-			throw ConfigException(this->name + ": session CIDR value out of range");
+			throw ConfigException(Module::name + ": session CIDR value out of range");
 	}
 
 	void OnUserConnect(User *u, bool &exempt) override
@@ -708,9 +710,16 @@ class OSSession : public Module
 				const Anope::string &akillmask = "*@" + session->addr.mask();
 				if (max_session_kill && session->hits >= max_session_kill && akills && !akills->HasEntry(akillmask))
 				{
-					XLine *x = new XLine(akillmask, OperServ ? OperServ->nick : "", Anope::CurTime + session_autokill_expiry, "Session limit exceeded", XLineManager::GenerateUID());
+					XLine *x = Serialize::New<XLine *>();
+					x->SetMask(akillmask);
+					x->SetBy(OperServ ? OperServ->nick : "");
+					x->SetExpires(Anope::CurTime + session_autokill_expiry);
+					x->SetReason("Session limit exceeded");
+					x->SetID(XLineManager::GenerateUID());
+
 					akills->AddXLine(x);
 					akills->Send(NULL, x);
+
 					Log(OperServ, "akill/session") << "Added a temporary AKILL for \002" << akillmask << "\002 due to excessive connections";
 				}
 				else
@@ -753,7 +762,7 @@ class OSSession : public Module
 		if (Anope::NoExpire)
 			return;
 
-		for (Exception *e : Serialize::GetObjects<Exception *>(exception))
+		for (Exception *e : Serialize::GetObjects<Exception *>())
 		{
 			if (!e->GetExpires() || e->GetExpires() > Anope::CurTime)
 				continue;

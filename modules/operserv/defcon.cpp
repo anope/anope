@@ -107,11 +107,11 @@ static Timer *timeout;
 
 class DefConTimeout : public Timer
 {
-	EventHandlers<Event::DefconLevel> &eventdefcon;
 	int level;
+	ServiceReference<Global::GlobalService> global;
 
  public:
-	DefConTimeout(EventHandlers<Event::DefconLevel> &ev, Module *mod, int newlevel) : Timer(mod, DConfig.timeout), eventdefcon(ev), level(newlevel)
+	DefConTimeout(Module *mod, int newlevel) : Timer(mod, DConfig.timeout), level(newlevel)
 	{
 		timeout = this;
 	}
@@ -126,18 +126,18 @@ class DefConTimeout : public Timer
 		if (DConfig.defaultlevel != level)
 		{
 			DConfig.defaultlevel = level;
-			this->eventdefcon(&Event::DefconLevel::OnDefconLevel, level);
+			EventManager::Get()->Dispatch(&Event::DefconLevel::OnDefconLevel, level);
 			Log(Config->GetClient("OperServ"), "operserv/defcon") << "Defcon level timeout, returning to level " << level;
 
-			if (DConfig.globalondefcon && Global::service)
+			if (DConfig.globalondefcon && global)
 			{
 				if (!DConfig.offmessage.empty())
-					Global::service->SendGlobal(NULL, "", DConfig.offmessage);
+					global->SendGlobal(NULL, "", DConfig.offmessage);
 				else
-					Global::service->SendGlobal(NULL, "", Anope::printf(Language::Translate(_("The Defcon level is now at: \002%d\002")), DConfig.defaultlevel));
+					global->SendGlobal(NULL, "", Anope::printf(Language::Translate(_("The Defcon level is now at: \002%d\002")), DConfig.defaultlevel));
 
 				if (!DConfig.message.empty())
-					Global::service->SendGlobal(NULL, "", DConfig.message);
+					global->SendGlobal(NULL, "", DConfig.message);
 			}
 
 			runDefCon();
@@ -147,6 +147,8 @@ class DefConTimeout : public Timer
 
 class CommandOSDefcon : public Command
 {
+	ServiceReference<Global::GlobalService> global;
+
 	void SendLevels(CommandSource &source)
 	{
 		if (DConfig.Check(DEFCON_NO_NEW_CHANNELS))
@@ -171,10 +173,8 @@ class CommandOSDefcon : public Command
 			source.Reply(_("* No new memos sent"));
 	}
 
-	EventHandlers<Event::DefconLevel> &ondefconlevel;
-
  public:
-	CommandOSDefcon(Module *creator, EventHandlers<Event::DefconLevel> &event) : Command(creator, "operserv/defcon", 1, 1), ondefconlevel(event)
+	CommandOSDefcon(Module *creator) : Command(creator, "operserv/defcon", 1, 1)
 	{
 		this->SetDesc(_("Manipulate the DefCon system"));
 		this->SetSyntax(_("[\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]"));
@@ -206,12 +206,12 @@ class CommandOSDefcon : public Command
 
 		DConfig.defaultlevel = newLevel;
 
-		this->ondefconlevel(&Event::DefconLevel::OnDefconLevel, newLevel);
+		EventManager::Get()->Dispatch(&Event::DefconLevel::OnDefconLevel, newLevel);
 
 		delete timeout;
 
 		if (DConfig.timeout)
-			timeout = new DefConTimeout(this->ondefconlevel, this->module, 5);
+			timeout = new DefConTimeout(this->module, 5);
 
 		source.Reply(_("Services are now at defcon \002{0}\002."), DConfig.defaultlevel);
 		this->SendLevels(source);
@@ -219,15 +219,15 @@ class CommandOSDefcon : public Command
 
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
-		if (DConfig.globalondefcon && Global::service)
+		if (DConfig.globalondefcon && global)
 		{
 			if (DConfig.defaultlevel == 5 && !DConfig.offmessage.empty())
-				Global::service->SendGlobal(NULL, "", DConfig.offmessage);
+				global->SendGlobal(NULL, "", DConfig.offmessage);
 			else if (DConfig.defaultlevel != 5)
 			{
-				Global::service->SendGlobal(NULL, "", Anope::printf(_("The defcon level is now at \002%d\002"), DConfig.defaultlevel));
+				global->SendGlobal(NULL, "", Anope::printf(_("The defcon level is now at \002%d\002"), DConfig.defaultlevel));
 				if (!DConfig.message.empty())
-					Global::service->SendGlobal(NULL, "", DConfig.message);
+					global->SendGlobal(NULL, "", DConfig.message);
 			}
 		}
 
@@ -254,7 +254,6 @@ class OSDefcon : public Module
 	ServiceReference<SessionService> session_service;
 	ServiceReference<XLineManager> akills;
 	CommandOSDefcon commandosdefcon;
-	EventHandlers<Event::DefconLevel> ondefconlevel;
 
 	void ParseModeString()
 	{
@@ -337,10 +336,14 @@ class OSDefcon : public Module
 
  public:
 	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, session_service("SessionService", "session")
-		, akills("XLineManager", "xlinemanager/sgline")
-		, commandosdefcon(this, ondefconlevel)
-		, ondefconlevel(this)
+		, EventHook<Event::ChannelModeSet>(this)
+		, EventHook<Event::ChannelModeUnset>(this)
+		, EventHook<Event::PreCommand>(this)
+		, EventHook<Event::UserConnect>(this)
+		, EventHook<Event::ChannelModeAdd>(this)
+		, EventHook<Event::ChannelSync>(this)
+		, akills("xlinemanager/sgline")
+		, commandosdefcon(this)
 	{
 
 	}
@@ -463,7 +466,7 @@ class OSDefcon : public Module
 		{
 			return EVENT_STOP;
 		}
-		else if (command->name == "nickserv/register" || command->name == "nickserv/group")
+		else if (command->GetName() == "nickserv/register" || command->GetName() == "nickserv/group")
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_NICKS))
 			{
@@ -471,7 +474,7 @@ class OSDefcon : public Module
 				return EVENT_STOP;
 			}
 		}
-		else if (command->name == "chanserv/mode" && params.size() > 1 && params[1].equals_ci("LOCK"))
+		else if (command->GetName() == "chanserv/mode" && params.size() > 1 && params[1].equals_ci("LOCK"))
 		{
 			if (DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
 			{
@@ -479,7 +482,7 @@ class OSDefcon : public Module
 				return EVENT_STOP;
 			}
 		}
-		else if (command->name == "chanserv/register")
+		else if (command->GetName() == "chanserv/register")
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_CHANNELS))
 			{
@@ -487,7 +490,7 @@ class OSDefcon : public Module
 				return EVENT_STOP;
 			}
 		}
-		else if (command->name == "memoserv/send")
+		else if (command->GetName() == "memoserv/send")
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_MEMOS))
 			{
@@ -508,8 +511,11 @@ class OSDefcon : public Module
 		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
 		{
 			Log(OperServ, "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
+#warning "xline allocated on stack"
+#if 0
 			XLine x("*@" + u->host, OperServ ? OperServ->nick : "defcon", Anope::CurTime + DConfig.akillexpire, DConfig.akillreason, XLineManager::GenerateUID());
 			akills->Send(NULL, &x);
+#endif
 		}
 
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
@@ -539,9 +545,12 @@ class OSDefcon : public Module
 				++session->hits;
 				if (akills && DConfig.max_session_kill && session->hits >= DConfig.max_session_kill)
 				{
+#warning "xline allocated on stack"
+#if 0
 					XLine x("*@" + session->addr.mask(), OperServ ? OperServ->nick : "", Anope::CurTime + DConfig.session_autokill_expiry, "Defcon session limit exceeded", XLineManager::GenerateUID());
 					akills->Send(NULL, &x);
 					Log(OperServ, "akill/defcon") << "[DEFCON] Added a temporary AKILL for \002*@" << session->addr.mask() << "\002 due to excessive connections";
+#endif
 				}
 				else
 				{

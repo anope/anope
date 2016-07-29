@@ -45,7 +45,8 @@ namespace NickServ
 		virtual Nick *FindNick(const Anope::string &nick) anope_abstract;
 		virtual Account *FindAccount(const Anope::string &acc) anope_abstract;
 	};
-	static ServiceReference<NickServService> service("NickServService", "NickServ");
+	
+	extern NickServService *service;
 
 	inline Nick *FindNick(const Anope::string &nick)
 	{
@@ -61,25 +62,35 @@ namespace NickServ
 	{
 		struct CoreExport PreNickExpire : Events
 		{
+			static constexpr const char *NAME = "prenickexpire";
+
+			using Events::Events;
+			
 			/** Called before a nick expires
 			 * @param na The nick
 			 * @param expire Set to true to allow the nick to expire
 			 */
 			virtual void OnPreNickExpire(Nick *na, bool &expire) anope_abstract;
 		};
-		static EventHandlersReference<PreNickExpire> OnPreNickExpire;
 
 		struct CoreExport NickExpire : Events
 		{
+			static constexpr const char *NAME = "nickexpire";
+
+			using Events::Events;
+			
 			/** Called when a nick drops
 			 * @param na The nick
 			 */
 			virtual void OnNickExpire(Nick *na) anope_abstract;
 		};
-		static EventHandlersReference<NickExpire> OnNickExpire;
 
 		struct CoreExport NickRegister : Events
 		{
+			static constexpr const char *NAME = "nickregister";
+
+			using Events::Events;
+			
 			/** Called when a nick is registered
 			 * @param user The user registering the nick, of any
 			 * @param The nick
@@ -87,16 +98,22 @@ namespace NickServ
 			 */
 			virtual void OnNickRegister(User *user, Nick *na, const Anope::string &password) anope_abstract;
 		};
-		static EventHandlersReference<NickRegister> OnNickRegister;
 
 		struct CoreExport NickConfirm : Events
 		{
+			static constexpr const char *NAME = "nickconfirm";
+
+			using Events::Events;
+			
 			virtual void OnNickConfirm(User *, Account *) anope_abstract;
 		};
-		static EventHandlersReference<NickConfirm> OnNickConfirm;
 
 		struct CoreExport NickValidate : Events
 		{
+			static constexpr const char *NAME = "nickvalidate";
+
+			using Events::Events;
+			
 			/** Called when a nick is validated. That is, to determine if a user is permissted
 			 * to be on the given nick.
 			 * @param u The user
@@ -105,7 +122,6 @@ namespace NickServ
 			 */
 			virtual EventReturn OnNickValidate(User *u, Nick *na) anope_abstract;
 		};
-		static EventHandlersReference<NickValidate> OnNickValidate;
 	}
 
 	/* A registered nickname.
@@ -117,6 +133,8 @@ namespace NickServ
 		using Serialize::Object::Object;
 
 	 public:
+		static constexpr const char *const NAME = "nick";
+
 		virtual Anope::string GetNick() anope_abstract;
 		virtual void SetNick(const Anope::string &) anope_abstract;
 
@@ -164,8 +182,6 @@ namespace NickServ
 		virtual void SetVhostCreated(const time_t &) anope_abstract;
 	};
 
-	static Serialize::TypeReference<Nick> nick("NickAlias");
-
 	/* A registered account. Each account must have a Nick with the same nick as the
 	 * account's display.
 	 * It matters that Base is here before Extensible (it is inherited by Serializable)
@@ -173,6 +189,8 @@ namespace NickServ
 	class CoreExport Account : public Serialize::Object
 	{
 	 public:
+		static constexpr const char *const NAME = "account";
+		
 		/* Set if this user is a services operattor. o->ot must exist. */
 		Serialize::Reference<Oper> o;
 
@@ -221,8 +239,6 @@ namespace NickServ
 
 		virtual unsigned int GetChannelCount() anope_abstract;
 	};
-
-	static Serialize::TypeReference<Account> account("NickCore");
 
 	/* A request to check if an account/password is valid. These can exist for
 	 * extended periods due to the time some authentication modules take.
@@ -287,6 +303,8 @@ namespace NickServ
 	class Mode : public Serialize::Object
 	{
 	 public:
+		static constexpr const char *const NAME = "mode";
+		 
 		using Serialize::Object::Object;
 
 		virtual Account *GetAccount() anope_abstract;
@@ -296,12 +314,4 @@ namespace NickServ
 		virtual void SetMode(const Anope::string &) anope_abstract;
 	};
 
-	static Serialize::TypeReference<Mode> mode("NSKeepMode");
-
 }
-
-template<> struct EventName<NickServ::Event::PreNickExpire> { static constexpr const char *const name = "OnPreNickExpire"; };
-template<> struct EventName<NickServ::Event::NickExpire> { static constexpr const char *const name = "OnNickExpire"; };
-template<> struct EventName<NickServ::Event::NickRegister> { static constexpr const char *const name = "OnNickRegister"; };
-template<> struct EventName<NickServ::Event::NickConfirm> { static constexpr const char *const name = "OnNickConfirm"; };
-template<> struct EventName<NickServ::Event::NickValidate> { static constexpr const char *const name = "OnNickValidate"; };

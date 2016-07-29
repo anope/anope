@@ -7,10 +7,10 @@ class LevelType : public Serialize::Type<LevelImpl>
 	Serialize::Field<LevelImpl, Anope::string> name;
 	Serialize::Field<LevelImpl, int> level;
 
-	LevelType(Module *creator) : Serialize::Type<LevelImpl>(creator, "Level")
-		, channel(this, "channel", true)
-		, name(this, "name")
-		, level(this, "level")
+	LevelType(Module *creator) : Serialize::Type<LevelImpl>(creator)
+		, channel(this, "channel", &LevelImpl::channel, true)
+		, name(this, "name", &LevelImpl::name)
+		, level(this, "level", &LevelImpl::level)
 	{
 	}
 };

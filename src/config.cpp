@@ -315,7 +315,7 @@ Conf::Conf() : Block("")
 		if (ot == NULL)
 			throw ConfigException("Oper block for " + nname + " has invalid oper type " + type);
 
-		Oper *o = operblock.Create();
+		Oper *o = Serialize::New<Oper *>();
 		o->conf = this;
 		o->SetName(nname);
 		o->SetType(ot);
@@ -326,7 +326,7 @@ Conf::Conf() : Block("")
 		o->SetVhost(vhost);
 	}
 
-	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>(botinfo))
+	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>())
 		bi->conf = nullptr;
 	for (int i = 0; i < this->CountBlock("service"); ++i)
 	{
@@ -502,7 +502,7 @@ Conf::Conf() : Block("")
 		if (status.length() > 1)
 			throw ConfigException("Channelmode status must be at most one character");
 
-		if (list || !param_regex.empty() || param_unset || !status.empty())
+		if (list || !param_regex.empty() || !status.empty())
 			param = true;
 
 		Channelmode cm;
@@ -552,20 +552,19 @@ Conf::Conf() : Block("")
 
 	/* Clear existing conf opers */
 	if (Config)
-		for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
+		for (Oper *o : Serialize::GetObjects<Oper *>())
 			if (o->conf == Config)
 				o->Delete();
 	/* Apply new opers */
-	if (NickServ::service)
-		for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
-		{
-			NickServ::Nick *na = NickServ::service->FindNick(o->GetName());
-			if (!na)
-				continue;
+	for (Oper *o : Serialize::GetObjects<Oper *>())
+	{
+		NickServ::Nick *na = NickServ::FindNick(o->GetName());
+		if (!na)
+			continue;
 
-			na->GetAccount()->o = o;
-			Log() << "Tied oper " << na->GetAccount()->GetDisplay() << " to type " << o->GetType()->GetName();
-		}
+		na->GetAccount()->o = o;
+		Log() << "Tied oper " << na->GetAccount()->GetDisplay() << " to type " << o->GetType()->GetName();
+	}
 
 	/* Check the user keys */
 	if (!options->Get<unsigned>("seed"))
@@ -613,7 +612,7 @@ void Conf::Post(Conf *old)
 	ModeManager::Apply(old);
 
 	/* Apply opertype changes, as non-conf opers still point to the old oper types */
-	for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
+	for (Oper *o : Serialize::GetObjects<Oper *>())
 	{
 		/* Oper's type is in the old config, so update it */
 		if (std::find(old->MyOperTypes.begin(), old->MyOperTypes.end(), o->GetType()) != old->MyOperTypes.end())
@@ -633,7 +632,7 @@ void Conf::Post(Conf *old)
 		}
 	}
 
-	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>(botinfo))
+	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>())
 	{
 		if (!bi->conf)
 		{

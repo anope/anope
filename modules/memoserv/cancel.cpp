@@ -32,7 +32,7 @@ class CommandMSCancel : public Command
 		const Anope::string &nname = params[0];
 
 		bool ischan, isregistered;
-		MemoServ::MemoInfo *mi = MemoServ::service->GetMemoInfo(name, ischan, isregistered, false);
+		MemoServ::MemoInfo *mi = MemoServ::service->GetMemoInfo(nname, ischan, isregistered, false);
 
 		if (!isregistered)
 		{
@@ -57,8 +57,7 @@ class CommandMSCancel : public Command
 					MemoServ::Memo *m = memos[i];
 					if (m->GetUnread() && source.nc->GetDisplay().equals_ci(m->GetSender()))
 					{
-						if (MemoServ::Event::OnMemoDel)
-							MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ischan ? ci->GetName() : na->GetAccount()->GetDisplay(), mi, m);
+						EventManager::Get()->Dispatch(&MemoServ::Event::MemoDel::OnMemoDel, ischan ? ci->GetName() : na->GetAccount()->GetDisplay(), mi, m);
 						mi->Del(i);
 						source.Reply(_("Your last memo to \002{0}\002 has been cancelled."), nname);
 						return;

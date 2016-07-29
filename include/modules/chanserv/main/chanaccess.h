@@ -1,3 +1,4 @@
+#pragma once
 
 class ChanAccessImpl : public ChanServ::ChanAccess
 {
@@ -26,5 +27,5 @@ class ChanAccessImpl : public ChanServ::ChanAccess
 	Anope::string Mask() override;
 	NickServ::Account *GetAccount() override;
 
-	bool Matches(const User *u, NickServ::Account *acc, Path &p) override;
+	bool Matches(const User *u, NickServ::Account *acc) override;
 };

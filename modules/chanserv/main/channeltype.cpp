@@ -1,29 +1,29 @@
 #include "module.h"
 #include "channeltype.h"
 
-ChannelType::ChannelType(Module *me) : Serialize::Type<ChannelImpl>(me, "ChannelInfo")
-	, name(this, "name")
-	, desc(this, "desc")
-	, time_registered(this, "time_registered")
-	, last_used(this, "last_used")
-	, last_topic(this, "last_topic")
-	, last_topic_setter(this, "last_topic_setter")
-	, last_topic_time(this, "last_topic_time")
-	, bantype(this, "bantype")
-	, banexpire(this, "banexpire")
-	, founder(this, "founder")
-	, successor(this, "successor")
-	, bi(this, "bi")
+ChannelType::ChannelType(Module *me) : Serialize::Type<ChannelImpl>(me)
+	, name(this, "name", &ChannelImpl::name)
+	, desc(this, "desc", &ChannelImpl::desc)
+	, time_registered(this, "time_registered", &ChannelImpl::time_registered)
+	, last_used(this, "last_used", &ChannelImpl::last_used)
+	, last_topic(this, "last_topic", &ChannelImpl::last_topic)
+	, last_topic_setter(this, "last_topic_setter", &ChannelImpl::last_topic_setter)
+	, last_topic_time(this, "last_topic_time", &ChannelImpl::last_topic_time)
+	, bantype(this, "bantype", &ChannelImpl::bantype)
+	, banexpire(this, "banexpire", &ChannelImpl::banexpire)
+	, founder(this, "founder", &ChannelImpl::founder)
+	, successor(this, "successor", &ChannelImpl::successor)
+	, bi(this, "bi", &ChannelImpl::bi)
 {
 
 }
 
-void ChannelType::Name::SetField(ChanServ::Channel *c, const Anope::string &value)
+void ChannelType::Name::SetField(ChannelImpl *c, const Anope::string &value)
 {
 	ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
 	map.erase(GetField(c));
 
-	Serialize::Field<ChanServ::Channel, Anope::string>::SetField(c, value);
+	Serialize::Field<ChannelImpl, Anope::string>::SetField(c, value);
 
 	map[value] = c;
 }
@@ -31,7 +31,7 @@ void ChannelType::Name::SetField(ChanServ::Channel *c, const Anope::string &valu
 ChanServ::Channel *ChannelType::FindChannel(const Anope::string &chan)
 {
 	Serialize::ID id;
-	EventReturn result = Event::OnSerialize(&Event::SerializeEvents::OnSerializeFind, this, &this->name, chan, id);
+	EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeFind, this, &this->name, chan, id);
 	if (result == EVENT_ALLOW)
 		return RequireID(id);
 

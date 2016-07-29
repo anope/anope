@@ -2,11 +2,16 @@
 
 class MemoImpl : public MemoServ::Memo
 {
+	friend class MemoType;
+
+	MemoServ::MemoInfo *memoinfo = nullptr;
+	Anope::string text, sender;
+	time_t time = 0;
+	bool unread = false, receipt = false;
+
  public:
 	MemoImpl(Serialize::TypeBase *type) : MemoServ::Memo(type) { }
 	MemoImpl(Serialize::TypeBase *type, Serialize::ID id) : MemoServ::Memo(type, id) { }
-	//using MemoServ::Memo::Memo;
-//	MemoImpl();
 	~MemoImpl();
 
 	MemoServ::MemoInfo *GetMemoInfo() override;

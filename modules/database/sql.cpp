@@ -11,11 +11,26 @@ class DBMySQL : public Module, public Pipe
 	bool inited = false;
 	Anope::string prefix;
 	ServiceReference<Provider> SQL;
+	std::unordered_multimap<Serialize::Object *, Serialize::FieldBase *> cache;
+
+	void CacheMiss(Serialize::Object *object, Serialize::FieldBase *field)
+	{
+		cache.insert(std::make_pair(object, field));
+	}
+
+	bool IsCacheMiss(Serialize::Object *object, Serialize::FieldBase *field)
+	{
+		auto range = cache.equal_range(object);
+		for (auto it = range.first; it != range.second; ++it)
+			if (it->second == field)
+				return true;
+		return false;
+	}
 
 	Result Run(const Query &query)
 	{
 		if (!SQL)
-			;//XXX
+			return Result();
 
 		if (!inited)
 		{
@@ -23,6 +38,8 @@ class DBMySQL : public Module, public Pipe
 			for (const Query &q : SQL->InitSchema(prefix))
 				SQL->RunQuery(q);
 		}
+
+		Log(LOG_DEBUG_2) << query.Unsafe();
 
 		return SQL->RunQuery(query);
 	}
@@ -50,6 +67,7 @@ class DBMySQL : public Module, public Pipe
 
  public:
 	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+		, EventHook<Event::SerializeEvents>(this)
 	{
 	}
 
@@ -57,12 +75,13 @@ class DBMySQL : public Module, public Pipe
 	{
 		Commit();
 		Serialize::Clear();
+		cache.clear();
 	}
 
 	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
-		this->SQL = ServiceReference<Provider>("SQL::Provider", block->Get<Anope::string>("engine"));
+		this->SQL = ServiceReference<Provider>(block->Get<Anope::string>("engine"));
 		this->prefix = block->Get<Anope::string>("prefix", "anope_db_");
 		inited = false;
 	}
@@ -94,13 +113,13 @@ class DBMySQL : public Module, public Pipe
 		for (Query &q : SQL->CreateTable(prefix, type->GetName()))
 			Run(q);
 
-		for (Query &q : SQL->AlterTable(prefix, type->GetName(), field->GetName(), false))
+		for (Query &q : SQL->AlterTable(prefix, type->GetName(), field->serialize_name, false))
 			Run(q);
 
-		for (const Query &q : SQL->CreateIndex(prefix + type->GetName(), field->GetName()))
+		for (const Query &q : SQL->CreateIndex(prefix + type->GetName(), field->serialize_name))
 			Run(q);
 
-		Query query("SELECT `id` FROM `" + prefix + type->GetName() + "` WHERE `" + field->GetName() + "` = @value@");
+		Query query("SELECT `id` FROM `" + prefix + type->GetName() + "` WHERE `" + field->serialize_name + "` = @value@");
 		query.SetValue("value", value);
 		Result res = Run(query);
 		if (res.Rows())
@@ -120,14 +139,14 @@ class DBMySQL : public Module, public Pipe
 	{
 		StartTransaction();
 
-		Query query = "SELECT `" + field->GetName() + "` FROM `" + prefix + object->GetSerializableType()->GetName() + "` WHERE `id` = @id@";
+		Query query = "SELECT `" + field->serialize_name + "` FROM `" + prefix + object->GetSerializableType()->GetName() + "` WHERE `id` = @id@";
 		query.SetValue("id", object->id);
 		Result res = Run(query);
 
 		if (res.Rows() == 0)
 			return false;
 
-		v = res.GetValue(0, field->GetName());
+		v = res.GetValue(0, field->serialize_name);
 		return true;
 	}
 
@@ -136,9 +155,12 @@ class DBMySQL : public Module, public Pipe
 	{
 		SQL::Result::Value v;
 
+		if (IsCacheMiss(object, field))
+			return EVENT_CONTINUE;
+
 		if (!GetValue(object, field, v))
 		{
-			field->CacheMiss(object);
+			CacheMiss(object, field);
 			return EVENT_CONTINUE;
 		}
 
@@ -175,7 +197,7 @@ class DBMySQL : public Module, public Pipe
 		Result res = Run(query);
 		for (int i = 0; i < res.Rows(); ++i)
 		{
-			Serialize::ID id = convertTo<Serialize::ID>(res.Get(i, "id"));
+			Serialize::ID id = convertTo<Serialize::ID>(res.Get(i, "id")); // object edge is on
 
 			if (id == object->id)
 			{
@@ -184,11 +206,26 @@ class DBMySQL : public Module, public Pipe
 				Anope::string f = res.Get(i, "field");
 				id = convertTo<Serialize::ID>(res.Get(i, "other_id"));
 
-				//XXX sanity checks
 				Serialize::FieldBase *obj_field = object->GetSerializableType()->GetField(f);
+				if (obj_field == nullptr)
+				{
+					Log(LOG_DEBUG) << "Unable to find field " << f << " on " << object->GetSerializableType()->GetName();
+					continue;
+				}
 
 				Serialize::TypeBase *obj_type = Serialize::TypeBase::Find(t);
+				if (obj_type == nullptr)
+				{
+					Log(LOG_DEBUG) << "Unable to find type " << t;
+					continue;
+				}
+
 				Serialize::Object *other = obj_type->Require(id);
+				if (other == nullptr)
+				{
+					Log(LOG_DEBUG) << "Unable to require id " << id << " type " << obj_type->GetName();
+					continue;
+				}
 
 				edges.emplace_back(other, obj_field, true);
 			}
@@ -198,10 +235,26 @@ class DBMySQL : public Module, public Pipe
 				Anope::string t = res.Get(i, "type");
 				Anope::string f = res.Get(i, "field");
 
-				//XXX sanity checks
 				Serialize::TypeBase *obj_type = Serialize::TypeBase::Find(t);
+				if (obj_type == nullptr)
+				{
+					Log(LOG_DEBUG) << "Unable to find type " << t;
+					continue;
+				}
+
 				Serialize::FieldBase *obj_field = obj_type->GetField(f);
+				if (obj_field == nullptr)
+				{
+					Log(LOG_DEBUG) << "Unable to find field " << f << " on " << obj_type->GetName();
+					continue;
+				}
+
 				Serialize::Object *other = obj_type->Require(id);
+				if (other == nullptr)
+				{
+					Log(LOG_DEBUG) << "Unable to require id " << id << " type " << obj_type->GetName();
+					continue;
+				}
 
 				// other type, other field,
 				edges.emplace_back(other, obj_field, false);
@@ -227,8 +280,8 @@ class DBMySQL : public Module, public Pipe
 	{
 		StartTransaction();
 
-		Query query = "SELECT `" + field->GetName() + "`,j1.type AS " + field->GetName() + "_type FROM `" + prefix + object->GetSerializableType()->GetName() + "` "
-			"JOIN `" + prefix + "objects` AS j1 ON " + prefix + object->GetSerializableType()->GetName() + "." + field->GetName() + " = j1.id "
+		Query query = "SELECT `" + field->serialize_name + "`,j1.type AS " + field->serialize_name + "_type FROM `" + prefix + object->GetSerializableType()->GetName() + "` "
+			"JOIN `" + prefix + "objects` AS j1 ON " + prefix + object->GetSerializableType()->GetName() + "." + field->serialize_name + " = j1.id "
 			"WHERE " + prefix + object->GetSerializableType()->GetName() + ".id = @id@";
 		query.SetValue("id", object->id);
 		Result res = Run(query);
@@ -236,10 +289,10 @@ class DBMySQL : public Module, public Pipe
 		if (res.Rows() == 0)
 			return EVENT_CONTINUE;
 
-		type = res.Get(0, field->GetName() + "_type");
+		type = res.Get(0, field->serialize_name + "_type");
 		try
 		{
-			value = convertTo<Serialize::ID>(res.Get(0, field->GetName()));
+			value = convertTo<Serialize::ID>(res.Get(0, field->serialize_name));
 		}
 		catch (const ConvertException &ex)
 		{
@@ -260,15 +313,15 @@ class DBMySQL : public Module, public Pipe
 		for (Query &q : SQL->CreateTable(prefix, object->GetSerializableType()->GetName()))
 			Run(q);
 
-		for (Query &q : SQL->AlterTable(prefix, object->GetSerializableType()->GetName(), field->GetName(), is_object))
+		for (Query &q : SQL->AlterTable(prefix, object->GetSerializableType()->GetName(), field->serialize_name, is_object))
 			Run(q);
 
 		Query q;
 		q.SetValue("id", object->id);
 		if (value)
-			q.SetValue(field->GetName(), *value);
+			q.SetValue(field->serialize_name, *value);
 		else
-			q.SetNull(field->GetName());
+			q.SetNull(field->serialize_name);
 
 		for (Query &q2 : SQL->Replace(prefix + object->GetSerializableType()->GetName(), q, { "id" }))
 			Run(q2);
@@ -294,7 +347,7 @@ class DBMySQL : public Module, public Pipe
 			DoSet(object, field, true, &v);
 
 			Query query;
-			query.SetValue("field", field->GetName());
+			query.SetValue("field", field->serialize_name);
 			query.SetValue("id", object->id);
 			query.SetValue("other_id", value->id);
 
@@ -307,7 +360,7 @@ class DBMySQL : public Module, public Pipe
 
 			Query query("DELETE FROM `" + prefix + "edges` WHERE `id` = @id@ AND `field` = @field@");
 			query.SetValue("id", object->id);
-			query.SetValue("field", field->GetName());
+			query.SetValue("field", field->serialize_name);
 			Run(query);
 		}
 
@@ -317,18 +370,16 @@ class DBMySQL : public Module, public Pipe
 	EventReturn OnSerializeUnset(Serialize::Object *object, Serialize::FieldBase *field) override
 	{
 		DoSet(object, field, false, nullptr);
-		field->CacheMiss(object);
 		return EVENT_STOP;
 	}
 
 	EventReturn OnSerializeUnsetSerializable(Serialize::Object *object, Serialize::FieldBase *field) override
 	{
 		DoSet(object, field, true, nullptr);
-		field->CacheMiss(object);
 
 		Query query("DELETE FROM `" + prefix + "edges` WHERE `id` = @id@ AND `field` = @field@");
 		query.SetValue("id", object->id);
-		query.SetValue("field", field->GetName());
+		query.SetValue("field", field->serialize_name);
 		Run(query);
 
 		return EVENT_STOP;
@@ -343,6 +394,9 @@ class DBMySQL : public Module, public Pipe
 
 	EventReturn OnSerializableGetId(Serialize::ID &id) override
 	{
+		if (!SQL)
+			return EVENT_CONTINUE;
+
 		StartTransaction();
 
 		id = SQL->GetID(prefix);

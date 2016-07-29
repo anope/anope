@@ -31,7 +31,9 @@ struct Section
 class Panel : public Section, public Service
 {
  public:
-	Panel(Module *c, const Anope::string &n) : Service(c, "Panel", n) { }
+	static constexpr const char *NAME = "panel";
+	
+	Panel(Module *c, const Anope::string &n) : Service(c, NAME, "") { }
 
 	std::vector<Section> sections;
 
@@ -74,6 +76,7 @@ class WebPanelPage : public HTTPPage
 class WebPanelProtectedPage : public WebPanelPage
 {
 	Anope::string category;
+	ServiceReference<Panel> panel;
 
  public:
 	WebPanelProtectedPage(const Anope::string &cat, const Anope::string &u, const Anope::string &ct = "text/html") : WebPanelPage(u, ct), category(cat)
@@ -82,7 +85,6 @@ class WebPanelProtectedPage : public WebPanelPage
 
 	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override final
 	{
-		ServiceReference<Panel> panel("Panel", "webcpanel");
 		NickServ::Nick *na;
 
 		if (!panel || !(na = panel->GetNickFromSession(client, message)))

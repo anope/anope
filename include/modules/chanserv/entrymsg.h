@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -12,6 +12,8 @@ class EntryMsg : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "entrymsg";
+	 
 	virtual ChanServ::Channel *GetChannel() anope_abstract;
 	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
 
@@ -25,5 +27,4 @@ class EntryMsg : public Serialize::Object
 	virtual void SetWhen(const time_t &) anope_abstract;
 };
 
-static Serialize::TypeReference<EntryMsg> entrymsg("EntryMsg");
 

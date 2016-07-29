@@ -15,14 +15,13 @@
 
 class NSGroupRequestListener : public NickServ::IdentifyRequestListener
 {
-	EventHandlers<Event::NickGroup> &onnickgroup;
 	CommandSource source;
 	Command *cmd;
 	Anope::string nick;
 	Reference<NickServ::Nick> target;
 
  public:
-	NSGroupRequestListener(EventHandlers<Event::NickGroup> &event, CommandSource &src, Command *c, const Anope::string &n, NickServ::Nick *targ) : onnickgroup(event), source(src), cmd(c), nick(n), target(targ) { }
+	NSGroupRequestListener(CommandSource &src, Command *c, const Anope::string &n, NickServ::Nick *targ) : source(src), cmd(c), nick(n), target(targ) { }
 
 	void OnSuccess(NickServ::IdentifyRequest *) override
 	{
@@ -34,11 +33,11 @@ class NSGroupRequestListener : public NickServ::IdentifyRequestListener
 		/* If the nick is already registered, drop it. */
 		if (na)
 		{
-			Event::OnChangeCoreDisplay(&Event::ChangeCoreDisplay::OnChangeCoreDisplay, na->GetAccount(), u->nick);
+			EventManager::Get()->Dispatch(&Event::ChangeCoreDisplay::OnChangeCoreDisplay, na->GetAccount(), u->nick);
 			delete na;
 		}
 
-		na = NickServ::nick.Create();
+		na = Serialize::New<NickServ::Nick *>();
 		na->SetNick(nick);
 		na->SetAccount(target->GetAccount());
 		na->SetLastUsermask(u->GetIdent() + "@" + u->GetDisplayedHost());
@@ -47,7 +46,7 @@ class NSGroupRequestListener : public NickServ::IdentifyRequestListener
 		na->SetTimeRegistered(Anope::CurTime);
 
 		u->Login(target->GetAccount());
-		this->onnickgroup(&Event::NickGroup::OnNickGroup, u, target);
+		EventManager::Get()->Dispatch(&Event::NickGroup::OnNickGroup, u, target);
 
 		Log(LOG_COMMAND, source, cmd) << "to make " << nick << " join group of " << target->GetNick() << " (" << target->GetAccount()->GetDisplay() << ") (email: " << (!target->GetAccount()->GetEmail().empty() ? target->GetAccount()->GetEmail() : "none") << ")";
 		source.Reply(_("You are now in the group of \002{0}\002."), target->GetNick());
@@ -69,10 +68,10 @@ class NSGroupRequestListener : public NickServ::IdentifyRequestListener
 
 class CommandNSGroup : public Command
 {
-	EventHandlers<Event::NickGroup> &onnickgroup;
-
+	ServiceReference<CertService> certservice;
+	
  public:
-	CommandNSGroup(Module *creator, EventHandlers<Event::NickGroup> &event) : Command(creator, "nickserv/group", 0, 2), onnickgroup(event)
+	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 0, 2)
 	{
 		this->SetDesc(_("Join a group"));
 		this->SetSyntax(_("\037[target]\037 \037[password]\037"));
@@ -115,7 +114,7 @@ class CommandNSGroup : public Command
 		}
 
 		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
-			for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
+			for (Oper *o : Serialize::GetObjects<Oper *>())
 			{
 				if (!u->HasMode("OPER") && u->nick.find_ci(o->GetName()) != Anope::string::npos)
 				{
@@ -127,7 +126,7 @@ class CommandNSGroup : public Command
 		NickServ::Nick *target, *na = NickServ::FindNick(u->nick);
 		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<Anope::string>("guestnickprefix", "Guest");
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
-		unsigned maxaliases = Config->GetModule(this->owner)->Get<unsigned>("maxaliases");
+		unsigned maxaliases = Config->GetModule(this->GetOwner())->Get<unsigned>("maxaliases");
 		if (!(target = NickServ::FindNick(nick)))
 		{
 			source.Reply(_("\002{0}\002 isn't registered."), nick);
@@ -147,7 +146,7 @@ class CommandNSGroup : public Command
 			return;
 		}
 
-		if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
+		if (na && Config->GetModule(this->GetOwner())->Get<bool>("nogroupchange"))
 		{
 			source.Reply(_("Your nick is already registered."));
 			return;
@@ -165,13 +164,13 @@ class CommandNSGroup : public Command
 			return;
 		}
 
-		if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
+		if (na && Config->GetModule(this->GetOwner())->Get<bool>("nogroupchange"))
 		{
 			source.Reply(_("You are already registered."));
 			return;
 		}
 
-		if (maxaliases && target->GetAccount()->GetRefs<NickServ::Nick *>(NickServ::nick).size() >= maxaliases && !target->GetAccount()->IsServicesOper())
+		if (maxaliases && target->GetAccount()->GetRefs<NickServ::Nick *>().size() >= maxaliases && !target->GetAccount()->IsServicesOper())
 		{
 			source.Reply(_("There are too many nicknames in your group."));
 			return;
@@ -194,13 +193,13 @@ class CommandNSGroup : public Command
 
 		if (ok == false && !pass.empty())
 		{
-			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSGroupRequestListener(onnickgroup, source, this, u->nick, target), owner, target->GetAccount()->GetDisplay(), pass);
-			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
+			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSGroupRequestListener(source, this, u->nick, target), this->GetOwner(), target->GetAccount()->GetDisplay(), pass);
+			EventManager::Get()->Dispatch(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
 			req->Dispatch();
 		}
 		else
 		{
-			NSGroupRequestListener req(onnickgroup, source, this, u->nick, target);
+			NSGroupRequestListener req(source, this, u->nick, target);
 
 			if (ok)
 				req.OnSuccess(nullptr);
@@ -238,7 +237,7 @@ class CommandNSUngroup : public Command
 		Anope::string nick = !params.empty() ? params[0] : "";
 		NickServ::Nick *na = NickServ::FindNick(!nick.empty() ? nick : u->nick);
 
-		if (u->Account()->GetRefs<NickServ::Nick *>(NickServ::nick).size() == 1)
+		if (u->Account()->GetRefs<NickServ::Nick *>().size() == 1)
 		{
 			source.Reply(_("Your nickname is not grouped to anything, so you can't ungroup it."));
 			return;
@@ -260,9 +259,9 @@ class CommandNSUngroup : public Command
 		NickServ::Account *oldcore = na->GetAccount();
 
 		if (na->GetNick().equals_ci(oldcore->GetDisplay()))
-			oldcore->SetDisplay(oldcore->GetRef<NickServ::Nick *>(NickServ::nick));
+			oldcore->SetDisplay(oldcore->GetRef<NickServ::Nick *>());
 
-		NickServ::Account *nc = NickServ::account.Create();
+		NickServ::Account *nc = Serialize::New<NickServ::Account *>();
 		nc->SetDisplay(na->GetNick());
 		na->SetAccount(nc);
 
@@ -319,7 +318,7 @@ class CommandNSGList : public Command
 		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
 		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire", "21d"),
 		       unconfirmed_expire = Config->GetModule("nickserv")->Get<time_t>("unconfirmedexpire", "1d");
-		for (NickServ::Nick *na2 : nc->GetRefs<NickServ::Nick *>(NickServ::nick))
+		for (NickServ::Nick *na2 : nc->GetRefs<NickServ::Nick *>())
 		{
 			Anope::string expires;
 			if (na2->HasFieldS("NS_NO_EXPIRE"))
@@ -368,14 +367,11 @@ class NSGroup : public Module
 	CommandNSUngroup commandnsungroup;
 	CommandNSGList commandnsglist;
 
-	EventHandlers<Event::NickGroup> onnickgroup;
-
  public:
 	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandnsgroup(this, onnickgroup)
+		, commandnsgroup(this)
 		, commandnsungroup(this)
 		, commandnsglist(this)
-		, onnickgroup(this)
 	{
 		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");

@@ -20,7 +20,7 @@ class CommandCSSetChanstats : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -73,7 +73,7 @@ class CommandNSSetChanstats : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, na->GetAccount(), param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, na->GetAccount(), param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 

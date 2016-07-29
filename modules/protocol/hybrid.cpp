@@ -149,7 +149,7 @@ class HybridProto : public IRCDProto
 				 * Find users that match and ban them.
 				 */
 				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (x->manager->Check(it->second, x))
+					if (x->GetManager()->Check(it->second, x))
 						this->SendAkill(it->second, x);
 
 				return;
@@ -157,13 +157,18 @@ class HybridProto : public IRCDProto
 
 			XLine *old = x;
 
-			if (old->manager->HasEntry("*@" + u->host))
+			if (old->GetManager()->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			XLine *xl = new XLine("*@" + u->host, old->GetBy(), old->GetExpires(), old->GetReason(), old->id);
+			XLine *xl = Serialize::New<XLine *>();
+			xl->SetMask("*@" + u->host);
+			xl->SetBy(old->GetBy());
+			xl->SetExpires(old->GetExpires());
+			xl->SetReason(old->GetReason());
+			xl->SetID(old->GetID());
 
-			old->manager->AddXLine(xl);
+			old->GetManager()->AddXLine(xl);
 			x = xl;
 
 			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#"
@@ -277,14 +282,19 @@ class HybridProto : public IRCDProto
 
 	void SendSVSHold(const Anope::string &nick, time_t t) override
 	{
+#if 0
 		XLine x(nick, Me->GetName(), Anope::CurTime + t, "Being held for registered user");
 		this->SendSQLine(NULL, &x);
+#endif
 	}
+#warning "xline on stack"
 
 	void SendSVSHoldDel(const Anope::string &nick) override
 	{
+#if 0
 		XLine x(nick);
 		this->SendSQLineDel(&x);
+#endif
 	}
 
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
@@ -579,7 +589,7 @@ struct IRCDMessageCertFP: IRCDMessage
 		User *u = source.GetUser();
 
 		u->fingerprint = params[0];
-		Event::OnFingerprint(&Event::Fingerprint::OnFingerprint, u);
+		EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
 	}
 };
 
@@ -627,6 +637,7 @@ class ProtoHybrid : public Module
 
 public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, EventHook<Event::UserNickChange>(this)
 		, ircd_proto(this)
 		, message_away(this)
 		, message_capab(this)

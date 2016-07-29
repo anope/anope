@@ -65,6 +65,8 @@ class DatabaseRedis : public Module
 	ServiceReference<Provider> redis;
 
 	DatabaseRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+		, EventHook<Event::LoadDatabase>(this)
+		, EventHook<Event::SerializeEvents>(this)
 		, sl(this)
 	{
 		me = this;
@@ -73,7 +75,7 @@ class DatabaseRedis : public Module
 	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
-		this->redis = ServiceReference<Provider>("Redis::Provider", block->Get<Anope::string>("engine", "redis/main"));
+		this->redis = ServiceReference<Provider>(block->Get<Anope::string>("engine", "redis/main"));
 	}
 
 	EventReturn OnLoadDatabase() override
@@ -136,7 +138,7 @@ class DatabaseRedis : public Module
 		redis->StartTransaction();
 
 		const Anope::string &old = field->SerializeToString(object);
-		args = { "SREM", "lookup:" + object->GetSerializableType()->GetName() + ":" + field->GetName() + ":" + old, stringify(object->id) };
+		args = { "SREM", "lookup:" + object->GetSerializableType()->GetName() + ":" + field->serialize_name + ":" + old, stringify(object->id) };
 		redis->SendCommand(nullptr, args);
 
 		// add object to type set
@@ -144,15 +146,15 @@ class DatabaseRedis : public Module
 		redis->SendCommand(nullptr, args);
 
 		// add key to key set
-		args = { "SADD", "keys:" + stringify(object->id), field->GetName() };
+		args = { "SADD", "keys:" + stringify(object->id), field->serialize_name };
 		redis->SendCommand(nullptr, args);
 
 		// set value
-		args = { "SET", "values:" + stringify(object->id) + ":" + field->GetName(), value };
+		args = { "SET", "values:" + stringify(object->id) + ":" + field->serialize_name, value };
 		redis->SendCommand(nullptr, args);
 
 		// lookup
-		args = { "SADD", "lookup:" + object->GetSerializableType()->GetName() + ":" + field->GetName() + ":" + value, stringify(object->id) };
+		args = { "SADD", "lookup:" + object->GetSerializableType()->GetName() + ":" + field->serialize_name + ":" + value, stringify(object->id) };
 		redis->SendCommand(nullptr, args);
 
 		redis->CommitTransaction();
@@ -172,11 +174,11 @@ class DatabaseRedis : public Module
 		redis->StartTransaction();
 
 		const Anope::string &old = field->SerializeToString(object);
-		args = { "SREM", "lookup:" + object->GetSerializableType()->GetName() + ":" + field->GetName() + ":" + old, stringify(object->id) };
+		args = { "SREM", "lookup:" + object->GetSerializableType()->GetName() + ":" + field->serialize_name + ":" + old, stringify(object->id) };
 		redis->SendCommand(nullptr, args);
 
 		// remove field from set
-		args = { "SREM", "keys:" + stringify(object->id), field->GetName() };
+		args = { "SREM", "keys:" + stringify(object->id), field->serialize_name };
 		redis->SendCommand(nullptr, args);
 
 		redis->CommitTransaction();
@@ -219,17 +221,17 @@ class DatabaseRedis : public Module
 
 		redis->StartTransaction();
 
-		for (Serialize::FieldBase *field : obj->GetSerializableType()->fields)
+		for (Serialize::FieldBase *field : obj->GetSerializableType()->GetFields())
 		{
 			Anope::string value = field->SerializeToString(obj);
 
-			args = { "SREM", "lookup:" + obj->GetSerializableType()->GetName() + ":" + field->GetName() + ":" + value, stringify(obj->id) };
+			args = { "SREM", "lookup:" + obj->GetSerializableType()->GetName() + ":" + field->serialize_name + ":" + value, stringify(obj->id) };
 			redis->SendCommand(nullptr, args);
 
-			args = { "DEL", "values:" + stringify(obj->id) + ":" + field->GetName() };
+			args = { "DEL", "values:" + stringify(obj->id) + ":" + field->serialize_name };
 			redis->SendCommand(nullptr, args);
 
-			args = { "SREM", "keys:" + stringify(obj->id), field->GetName() };
+			args = { "SREM", "keys:" + stringify(obj->id), field->serialize_name };
 			redis->SendCommand(nullptr, args);
 		}
 
@@ -308,7 +310,7 @@ void ObjectLoader::OnResult(const Reply &r)
 
 void FieldLoader::OnResult(const Reply &r)
 {
-	Log(LOG_DEBUG_2) << "redis: Setting field " << field->GetName() << " of object #" << obj->id << " of type " << obj->GetSerializableType()->GetName() << " to " << r.bulk;
+	Log(LOG_DEBUG_2) << "redis: Setting field " << field->serialize_name << " of object #" << obj->id << " of type " << obj->GetSerializableType()->GetName() << " to " << r.bulk;
 	field->UnserializeFromString(obj, r.bulk);
 
 	delete this;
@@ -366,7 +368,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 			return;
 		}
 
-		Log(LOG_DEBUG_2) << "redis: Setting field " << field->GetName() << " of object #" << obj->id << " of type " << obj->GetSerializableType()->GetName() << " to " << value;
+		Log(LOG_DEBUG_2) << "redis: Setting field " << field->serialize_name << " of object #" << obj->id << " of type " << obj->GetSerializableType()->GetName() << " to " << value;
 		field->UnserializeFromString(obj, value);
 	}
 	else if (command == "create")

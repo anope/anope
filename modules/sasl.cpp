@@ -15,13 +15,13 @@ using namespace SASL;
 class Plain : public Mechanism
 {
  public:
-	Plain(Module *o) : Mechanism(o, "PLAIN") { }
+	Plain(SASL::Service *s, Module *o) : Mechanism(s, o, "PLAIN") { }
 
 	void ProcessMessage(Session *sess, const SASL::Message &m) override
 	{
 		if (m.type == "S")
 		{
-			sasl->SendMessage(sess, "C", "+");
+			GetService()->SendMessage(sess, "C", "+");
 		}
 		else if (m.type == "C")
 		{
@@ -31,7 +31,7 @@ class Plain : public Mechanism
 			size_t p = decoded.find('\0');
 			if (p == Anope::string::npos)
 			{
-				sasl->Fail(sess);
+				GetService()->Fail(sess);
 				delete sess;
 				return;
 			}
@@ -40,7 +40,7 @@ class Plain : public Mechanism
 			p = decoded.find('\0');
 			if (p == Anope::string::npos)
 			{
-				sasl->Fail(sess);
+				GetService()->Fail(sess);
 				delete sess;
 				return;
 			}
@@ -50,13 +50,13 @@ class Plain : public Mechanism
 
 			if (!NickServ::service || acc.empty() || pass.empty() || !IRCD->IsNickValid(acc) || pass.find_first_of("\r\n") != Anope::string::npos)
 			{
-				sasl->Fail(sess);
+				GetService()->Fail(sess);
 				delete sess;
 				return;
 			}
 
-			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new IdentifyRequestListener(m.source), this->owner, acc, pass);
-			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
+			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new IdentifyRequestListener(GetService(), m.source), this->GetOwner(), acc, pass);
+			EventManager::Get()->Dispatch(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
 			req->Dispatch();
 		}
 	}
@@ -70,11 +70,12 @@ class External : public Mechanism
 	{
 		Anope::string cert;
 
-		Session(Mechanism *m, const Anope::string &u) : SASL::Session(m, u) { }
+		Session(SASL::Service *s, Mechanism *m, const Anope::string &u) : SASL::Session(s, m, u) { }
 	};
 
  public:
-	External(Module *o) : Mechanism(o, "EXTERNAL"), certs("CertService", "certs")
+	External(SASL::Service *s, Module *o) : Mechanism(s, o, "EXTERNAL")
+		, certs("certs")
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("No CertFP");
@@ -82,7 +83,7 @@ class External : public Mechanism
 
 	Session* CreateSession(const Anope::string &uid) override
 	{
-		return new Session(this, uid);
+		return new Session(this->GetService(), this, uid);
 	}
 
 	void ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
@@ -93,13 +94,13 @@ class External : public Mechanism
 		{
 			mysess->cert = m.ext;
 
-			sasl->SendMessage(sess, "C", "+");
+			GetService()->SendMessage(sess, "C", "+");
 		}
 		else if (m.type == "C")
 		{
 			if (!certs)
 			{
-				sasl->Fail(sess);
+				GetService()->Fail(sess);
 				delete sess;
 				return;
 			}
@@ -107,13 +108,13 @@ class External : public Mechanism
 			NickServ::Account *nc = certs->FindAccountFromCert(mysess->cert);
 			if (!nc || nc->HasFieldS("NS_SUSPENDED"))
 			{
-				sasl->Fail(sess);
+				GetService()->Fail(sess);
 				delete sess;
 				return;
 			}
 
 			Log(Config->GetClient("NickServ")) << "A user identified to account " << nc->GetDisplay() << " using SASL EXTERNAL";
-			sasl->Succeed(sess, nc);
+			GetService()->Succeed(sess, nc);
 			delete sess;
 		}
 	}
@@ -149,13 +150,13 @@ class SASLService : public SASL::Service, public Timer
 
 		if (m.type == "S")
 		{
-			ServiceReference<Mechanism> mech("SASL::Mechanism", m.data);
+			ServiceReference<Mechanism> mech(m.data);
 			if (!mech)
 			{
-				Session tmp(NULL, m.source);
+				Session tmp(this, NULL, m.source);
 
-				sasl->SendMechs(&tmp);
-				sasl->Fail(&tmp);
+				this->SendMechs(&tmp);
+				this->Fail(&tmp);
 				return;
 			}
 
@@ -175,7 +176,7 @@ class SASLService : public SASL::Service, public Timer
 
 	Anope::string GetAgent() override
 	{
-		Anope::string agent = Config->GetModule(Service::owner)->Get<Anope::string>("agent", "NickServ");
+		Anope::string agent = Config->GetModule(Service::GetOwner())->Get<Anope::string>("agent", "NickServ");
 		ServiceBot *bi = Config->GetClient(agent);
 		if (bi)
 			agent = bi->GetUID();
@@ -233,10 +234,11 @@ class SASLService : public SASL::Service, public Timer
 
 	void SendMechs(Session *session) override
 	{
-		std::vector<Anope::string> mechs = Service::GetServiceKeys("SASL::Mechanism");
+		std::vector<Mechanism *> mechs = ServiceManager::Get()->FindServices<Mechanism *>();
+
 		Anope::string buf;
 		for (unsigned j = 0; j < mechs.size(); ++j)
-			buf += "," + mechs[j];
+			buf += "," + mechs[j]->GetName();
 
 		this->SendMessage(session, "M", buf.empty() ? "" : buf.substr(1));
 	}
@@ -258,22 +260,55 @@ class SASLService : public SASL::Service, public Timer
 	}
 };
 
+void IdentifyRequestListener::OnSuccess(NickServ::IdentifyRequest *req)
+{
+	NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
+	if (!na || na->GetAccount()->HasFieldS("NS_SUSPENDED"))
+		return OnFail(req);
+
+	Session *s = service->GetSession(uid);
+	if (s)
+	{
+		Log(Config->GetClient("NickServ")) << "A user identified to account " << req->GetAccount() << " using SASL";
+		service->Succeed(s, na->GetAccount());
+		delete s;
+	}
+}
+
+void IdentifyRequestListener::OnFail(NickServ::IdentifyRequest *req)
+{
+	Session *s = service->GetSession(uid);
+	if (s)
+	{
+		service->Fail(s);
+		delete s;
+	}
+
+	Anope::string accountstatus;
+	NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
+	if (!na)
+		accountstatus = "nonexistent ";
+	else if (na->GetAccount()->HasFieldS("NS_SUSPENDED"))
+		accountstatus = "suspended ";
+
+	Log(Config->GetClient("NickServ")) << "A user failed to identify for " << accountstatus << "account " << req->GetAccount() << " using SASL";
+}
+
 class ModuleSASL : public Module
 {
 	SASLService sasl;
 
 	Plain plain;
-	External *external;
+	External *external = nullptr;
 
  public:
 	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, sasl(this)
-		, plain(this)
-		, external(NULL)
+		, plain(&sasl, this)
 	{
 		try
 		{
-			external = new External(this);
+			external = new External(&sasl, this);
 		}
 		catch (ModuleException &) { }
 	}

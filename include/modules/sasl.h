@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2014 Anope Team
+ * (C) 2014-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -23,7 +23,9 @@ namespace SASL
 	class Service : public ::Service
 	{
 	 public:
-		Service(Module *o) : ::Service(o, "SASL::Service", "sasl") { }
+		static constexpr const char *NAME = "sasl";
+		
+		Service(Module *o) : ::Service(o, NAME) { }
 
 		virtual void ProcessMessage(const Message &) anope_abstract;
 
@@ -40,84 +42,55 @@ namespace SASL
 		virtual void RemoveSession(Session *) anope_abstract;
 	};
 
-	static ServiceReference<SASL::Service> sasl("SASL::Service", "sasl");
-
-	struct Session
+	class Session
 	{
+		SASL::Service *service;
+		
+	 public:
 		time_t created;
 		Anope::string uid;
 		Reference<Mechanism> mech;
 
-		Session(Mechanism *m, const Anope::string &u) : created(Anope::CurTime), uid(u), mech(m) { }
+		Session(SASL::Service *s, Mechanism *m, const Anope::string &u) : service(s), created(Anope::CurTime), uid(u), mech(m) { }
+		
 		virtual ~Session()
 		{
-			if (sasl)
-				sasl->RemoveSession(this);
+			service->RemoveSession(this);
 		}
 	};
 
 	/* PLAIN, EXTERNAL, etc */
 	class Mechanism : public ::Service
 	{
+		SASL::Service *service;
+		
 	 public:
-		Mechanism(Module *o, const Anope::string &sname) : Service(o, "SASL::Mechanism", sname) { }
+		static constexpr const char *NAME = "sasl/mechanism";
+		
+		Mechanism(SASL::Service *s, Module *o, const Anope::string &sname) : Service(o, NAME, sname), service(s) { }
+		
+		SASL::Service *GetService() const { return service; }
 
-		virtual Session* CreateSession(const Anope::string &uid) { return new Session(this, uid); }
+		virtual Session* CreateSession(const Anope::string &uid) { return new Session(service, this, uid); }
 
 		virtual void ProcessMessage(Session *session, const Message &) anope_abstract;
 
 		virtual ~Mechanism()
 		{
-			if (sasl)
-				sasl->DeleteSessions(this, true);
+			service->DeleteSessions(this, true);
 		}
 	};
 
 	class IdentifyRequestListener : public NickServ::IdentifyRequestListener
 	{
+		SASL::Service *service = nullptr;
 		Anope::string uid;
 
 	 public:
-		IdentifyRequestListener(const Anope::string &id) : uid(id) { }
+		IdentifyRequestListener(SASL::Service *s, const Anope::string &id) : service(s), uid(id) { }
 
-		void OnSuccess(NickServ::IdentifyRequest *req) override
-		{
-			if (!sasl)
-				return;
+		void OnSuccess(NickServ::IdentifyRequest *req) override;
 
-			NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
-			if (!na || na->GetAccount()->HasFieldS("NS_SUSPENDED"))
-				return OnFail(req);
-
-			Session *s = sasl->GetSession(uid);
-			if (s)
-			{
-				Log(Config->GetClient("NickServ")) << "A user identified to account " << req->GetAccount() << " using SASL";
-				sasl->Succeed(s, na->GetAccount());
-				delete s;
-			}
-		}
-
-		void OnFail(NickServ::IdentifyRequest *req) override
-		{
-			if (!sasl)
-				return;
-
-			Session *s = sasl->GetSession(uid);
-			if (s)
-			{
-				sasl->Fail(s);
-				delete s;
-			}
-
-			Anope::string accountstatus;
-			NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
-			if (!na)
-				accountstatus = "nonexistent ";
-			else if (na->GetAccount()->HasFieldS("NS_SUSPENDED"))
-				accountstatus = "suspended ";
-
-			Log(Config->GetClient("NickServ")) << "A user failed to identify for " << accountstatus << "account " << req->GetAccount() << " using SASL";
-		}
+		void OnFail(NickServ::IdentifyRequest *req) override;
 	};
 }

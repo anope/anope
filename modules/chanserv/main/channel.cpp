@@ -14,13 +14,6 @@
 #include "channeltype.h"
 #include "modules/chanserv/akick.h"
 
-ChannelImpl::ChannelImpl(Serialize::TypeBase *type, const Anope::string &chname) : ChanServ::Channel(type)
-{
-	SetName(chname);
-	SetTimeRegistered(Anope::CurTime);
-	SetLastUsed(Anope::CurTime);
-}
-
 ChannelImpl::~ChannelImpl()
 {
 	ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
@@ -29,7 +22,7 @@ ChannelImpl::~ChannelImpl()
 
 void ChannelImpl::Delete()
 {
-	Event::OnDelChan(&Event::DelChan::OnDelChan, this);
+	EventManager::Get()->Dispatch(&Event::DelChan::OnDelChan, this);
 
 	Log(LOG_DEBUG) << "Deleting channel " << this->GetName();
 
@@ -165,7 +158,7 @@ void ChannelImpl::SetBot(ServiceBot *bi)
 
 MemoServ::MemoInfo *ChannelImpl::GetMemos()
 {
-	return GetRef<MemoServ::MemoInfo *>(MemoServ::memoinfo);
+	return GetRef<MemoServ::MemoInfo *>();
 }
 
 void ChannelImpl::SetFounder(NickServ::Account *nc)
@@ -190,7 +183,7 @@ NickServ::Account *ChannelImpl::GetSuccessor()
 
 ChanServ::ChanAccess *ChannelImpl::GetAccess(unsigned index)
 {
-	std::vector<ChanServ::ChanAccess *> a = GetRefs<ChanServ::ChanAccess *>(ChanServ::chanaccess);
+	std::vector<ChanServ::ChanAccess *> a = GetRefs<ChanServ::ChanAccess *>();
 	return a.size() > index ? a[index] : nullptr;
 }
 
@@ -217,7 +210,7 @@ ChanServ::AccessGroup ChannelImpl::AccessFor(const User *u, bool updateLastUsed)
 	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
 	{
 		ChanServ::ChanAccess *a = this->GetAccess(i);
-		if (a->Matches(u, u->Account(), group.path))
+		if (a->Matches(u, u->Account()))
 			group.push_back(a);
 	}
 
@@ -244,7 +237,7 @@ ChanServ::AccessGroup ChannelImpl::AccessFor(NickServ::Account *nc, bool updateL
 	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
 	{
 		ChanServ::ChanAccess *a = this->GetAccess(i);
-		if (a->Matches(NULL, nc, group.path))
+		if (a->Matches(NULL, nc))
 			group.push_back(a);
 	}
 
@@ -259,45 +252,18 @@ ChanServ::AccessGroup ChannelImpl::AccessFor(NickServ::Account *nc, bool updateL
 
 unsigned ChannelImpl::GetAccessCount()
 {
-	return GetRefs<ChanServ::ChanAccess *>(ChanServ::chanaccess).size();
-}
-
-unsigned ChannelImpl::GetDeepAccessCount() const
-{
-	return 0;
-#if 0
-	ChanServ::ChanAccess::Path path;
-	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
-	{
-		ChanServ::ChanAccess *a = this->GetAccess(i);
-		a->Matches(NULL, NULL, path);
-	}
-
-	unsigned count = this->GetAccessCount();
-	std::set<const ChanServ::Channel *> channels;
-	channels.insert(this);
-	for (ChanServ::ChanAccess::Set::iterator it = path.first.begin(); it != path.first.end(); ++it)
-	{
-		const ChanServ::Channel *ci = it->first->GetChannel();
-		if (!channels.count(ci))
-		{
-			channels.count(ci);
-			count += ci->GetAccessCount();
-		}
-	}
-	return count;
-#endif
+	return GetRefs<ChanServ::ChanAccess *>().size();
 }
 
 void ChannelImpl::ClearAccess()
 {
-	for (ChanServ::ChanAccess *a : GetRefs<ChanServ::ChanAccess *>(ChanServ::chanaccess))
+	for (ChanServ::ChanAccess *a : GetRefs<ChanServ::ChanAccess *>())
 		a->Delete();
 }
 
 AutoKick *ChannelImpl::AddAkick(const Anope::string &user, NickServ::Account *akicknc, const Anope::string &reason, time_t t, time_t lu)
 {
-	AutoKick *ak = ::autokick.Create();
+	AutoKick *ak = Serialize::New<AutoKick *>();
 	ak->SetChannel(this);
 	ak->SetAccount(akicknc);
 	ak->SetReason(reason);
@@ -310,7 +276,7 @@ AutoKick *ChannelImpl::AddAkick(const Anope::string &user, NickServ::Account *ak
 
 AutoKick *ChannelImpl::AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t, time_t lu)
 {
-	AutoKick *ak = ::autokick.Create();
+	AutoKick *ak = Serialize::New<AutoKick *>();
 	ak->SetChannel(this);
 	ak->SetMask(mask);
 	ak->SetReason(reason);
@@ -323,25 +289,25 @@ AutoKick *ChannelImpl::AddAkick(const Anope::string &user, const Anope::string &
 
 AutoKick *ChannelImpl::GetAkick(unsigned index)
 {
-	std::vector<AutoKick *> a = GetRefs<AutoKick *>(autokick);
+	std::vector<AutoKick *> a = GetRefs<AutoKick *>();
 	return a.size() > index ? a[index] : nullptr;
 }
 
 unsigned ChannelImpl::GetAkickCount()
 {
-	std::vector<AutoKick *> t = GetRefs<AutoKick *>(autokick);
+	std::vector<AutoKick *> t = GetRefs<AutoKick *>();
 	return t.size();
 }
 
 void ChannelImpl::ClearAkick()
 {
-	for (AutoKick *ak : GetRefs<AutoKick *>(autokick))
+	for (AutoKick *ak : GetRefs<AutoKick *>())
 		ak->Delete();
 }
 
 int16_t ChannelImpl::GetLevel(const Anope::string &priv)
 {
-	for (ChanServ::Level *l : this->GetRefs<ChanServ::Level *>(ChanServ::level))
+	for (ChanServ::Level *l : this->GetRefs<ChanServ::Level *>())
 		if (l->GetName() == priv)
 			return l->GetLevel();
 
@@ -357,7 +323,7 @@ int16_t ChannelImpl::GetLevel(const Anope::string &priv)
 
 void ChannelImpl::SetLevel(const Anope::string &priv, int16_t level)
 {
-	for (ChanServ::Level *l : this->GetRefs<ChanServ::Level *>(ChanServ::level))
+	for (ChanServ::Level *l : this->GetRefs<ChanServ::Level *>())
 		if (l->GetName() == priv)
 		{
 			l->SetLevel(level);
@@ -371,7 +337,7 @@ void ChannelImpl::SetLevel(const Anope::string &priv, int16_t level)
 		return;
 	}
 
-	ChanServ::Level *l = ChanServ::level.Create();
+	ChanServ::Level *l = Serialize::New<ChanServ::Level *>();
 	l->SetChannel(this);
 	l->SetName(priv);
 	l->SetLevel(level);
@@ -379,7 +345,7 @@ void ChannelImpl::SetLevel(const Anope::string &priv, int16_t level)
 
 void ChannelImpl::RemoveLevel(const Anope::string &priv)
 {
-	for (ChanServ::Level *l : this->GetRefs<ChanServ::Level *>(ChanServ::level))
+	for (ChanServ::Level *l : this->GetRefs<ChanServ::Level *>())
 		if (l->GetName() == priv)
 		{
 			l->Delete();
@@ -389,7 +355,7 @@ void ChannelImpl::RemoveLevel(const Anope::string &priv)
 
 void ChannelImpl::ClearLevels()
 {
-	for (ChanServ::Level *l : this->GetRefs<ChanServ::Level *>(ChanServ::level))
+	for (ChanServ::Level *l : this->GetRefs<ChanServ::Level *>())
 		l->Delete();
 }
 

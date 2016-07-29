@@ -17,6 +17,12 @@
 
 class CSSuspendInfoImpl : public CSSuspendInfo
 {
+	friend class CSSuspendType;
+
+	ChanServ::Channel *channel = nullptr;
+	Anope::string by, reason;
+	time_t when = 0, expires = 0;
+
  public:
 	CSSuspendInfoImpl(Serialize::TypeBase *type) : CSSuspendInfo(type) { }
 	CSSuspendInfoImpl(Serialize::TypeBase *type, Serialize::ID id) : CSSuspendInfo(type, id) { }
@@ -44,12 +50,12 @@ class CSSuspendType : public Serialize::Type<CSSuspendInfoImpl>
 	Serialize::Field<CSSuspendInfoImpl, Anope::string> by, reason;
 	Serialize::Field<CSSuspendInfoImpl, time_t> when, expires;
 
-	CSSuspendType(Module *me) : Serialize::Type<CSSuspendInfoImpl>(me, "CSSuspendInfo")
-		, channel(this, "chan", true)
-		, by(this, "by")
-		, reason(this, "reason")
-		, when(this, "time")
-		, expires(this, "expires")
+	CSSuspendType(Module *me) : Serialize::Type<CSSuspendInfoImpl>(me)
+		, channel(this, "chan", &CSSuspendInfoImpl::channel, true)
+		, by(this, "by", &CSSuspendInfoImpl::by)
+		, reason(this, "reason", &CSSuspendInfoImpl::reason)
+		, when(this, "time", &CSSuspendInfoImpl::when)
+		, expires(this, "expires", &CSSuspendInfoImpl::expires)
 	{
 	}
 };
@@ -106,9 +112,8 @@ void CSSuspendInfoImpl::SetExpires(const time_t &e)
 
 class CommandCSSuspend : public Command
 {
-	EventHandlers<Event::ChanSuspend> &onchansuspend;
  public:
-	CommandCSSuspend(Module *creator, EventHandlers<Event::ChanSuspend> &event) : Command(creator, "chanserv/suspend", 2, 3), onchansuspend(event)
+	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 2, 3)
 	{
 		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
 		this->SetSyntax(_("\037channel\037 [+\037expiry\037] [\037reason\037]"));
@@ -119,7 +124,7 @@ class CommandCSSuspend : public Command
 		const Anope::string &chan = params[0];
 		Anope::string expiry = params[1];
 		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("expire");
+		time_t expiry_secs = Config->GetModule(this->GetOwner())->Get<time_t>("expire");
 
 		if (!expiry.empty() && expiry[0] != '+')
 		{
@@ -147,14 +152,14 @@ class CommandCSSuspend : public Command
 			return;
 		}
 
-		CSSuspendInfo *si = ci->GetRef<CSSuspendInfo *>(cssuspendinfo);
+		CSSuspendInfo *si = ci->GetRef<CSSuspendInfo *>();
 		if (si)
 		{
 			source.Reply(_("\002{0}\002 is already suspended."), ci->GetName());
 			return;
 		}
 
-		si = cssuspendinfo.Create();
+		si = Serialize::New<CSSuspendInfo *>();
 		si->SetChannel(ci);
 		si->SetBy(source.GetNick());
 		si->SetReason(reason);
@@ -180,7 +185,7 @@ class CommandCSSuspend : public Command
 		Log(LOG_ADMIN, source, this, ci) << "(" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Channel \002{0}\002 is now suspended."), ci->GetName());
 
-		this->onchansuspend(&Event::ChanSuspend::OnChanSuspend, ci);
+		EventManager::Get()->Dispatch(&Event::ChanSuspend::OnChanSuspend, ci);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -194,10 +199,8 @@ class CommandCSSuspend : public Command
 
 class CommandCSUnSuspend : public Command
 {
-	EventHandlers<Event::ChanUnsuspend> &onchanunsuspend;
-
  public:
-	CommandCSUnSuspend(Module *creator, EventHandlers<Event::ChanUnsuspend> &event) : Command(creator, "chanserv/unsuspend", 1, 1), onchanunsuspend(event)
+	CommandCSUnSuspend(Module *creator) : Command(creator, "chanserv/unsuspend", 1, 1)
 	{
 		this->SetDesc(_("Releases a suspended channel"));
 		this->SetSyntax(_("\037channel\037"));
@@ -217,7 +220,7 @@ class CommandCSUnSuspend : public Command
 			return;
 		}
 
-		CSSuspendInfo *si = ci->GetRef<CSSuspendInfo *>(cssuspendinfo);
+		CSSuspendInfo *si = ci->GetRef<CSSuspendInfo *>();
 		if (!si)
 		{
 			source.Reply(_("Channel \002{0}\002 isn't suspended."), ci->GetName());
@@ -230,7 +233,7 @@ class CommandCSUnSuspend : public Command
 
 		source.Reply(_("Channel \002%s\002 is now released."), ci->GetName().c_str());
 
-		this->onchanunsuspend(&Event::ChanUnsuspend::OnChanUnsuspend, ci);
+		EventManager::Get()->Dispatch(&Event::ChanUnsuspend::OnChanUnsuspend, ci);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -248,8 +251,6 @@ class CSSuspend : public Module
 {
 	CommandCSSuspend commandcssuspend;
 	CommandCSUnSuspend commandcsunsuspend;
-	EventHandlers<Event::ChanSuspend> onchansuspend;
-	EventHandlers<Event::ChanUnsuspend> onchanunsuspend;
 	std::vector<Anope::string> show;
 	CSSuspendType cst;
 
@@ -268,17 +269,19 @@ class CSSuspend : public Module
 
  public:
 	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandcssuspend(this, onchansuspend)
-		, commandcsunsuspend(this, onchanunsuspend)
-		, onchansuspend(this)
-		, onchanunsuspend(this)
+		, EventHook<Event::ChanInfo>(this)
+		, EventHook<ChanServ::Event::PreChanExpire>(this)
+		, EventHook<Event::CheckKick>(this)
+		, EventHook<Event::ChanDrop>(this)
+		, commandcssuspend(this)
+		, commandcsunsuspend(this)
 		, cst(this)
 	{
 	}
 
 	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_hidden) override
 	{
-		CSSuspendInfo *si = ci->GetRef<CSSuspendInfo *>(cssuspendinfo);
+		CSSuspendInfo *si = ci->GetRef<CSSuspendInfo *>();
 		if (!si)
 			return;
 
@@ -296,7 +299,7 @@ class CSSuspend : public Module
 
 	void OnPreChanExpire(ChanServ::Channel *ci, bool &expire) override
 	{
-		CSSuspendInfo *si = ci->GetRef<CSSuspendInfo *>(cssuspendinfo);
+		CSSuspendInfo *si = ci->GetRef<CSSuspendInfo *>();
 		if (!si)
 			return;
 
@@ -316,7 +319,7 @@ class CSSuspend : public Module
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
-		if (u->HasMode("OPER") || !c->ci || !c->ci->GetRef<CSSuspendInfo *>(cssuspendinfo))
+		if (u->HasMode("OPER") || !c->ci || !c->ci->GetRef<CSSuspendInfo *>())
 			return EVENT_CONTINUE;
 
 		reason = Language::Translate(u, _("This channel may not be used."));
@@ -325,7 +328,7 @@ class CSSuspend : public Module
 
 	EventReturn OnChanDrop(CommandSource &source, ChanServ::Channel *ci) override
 	{
-		CSSuspendInfo *si = ci->GetRef<CSSuspendInfo *>(cssuspendinfo);
+		CSSuspendInfo *si = ci->GetRef<CSSuspendInfo *>();
 		if (si && !source.HasCommand("chanserv/drop"))
 		{
 			source.Reply(_("Channel \002{0}\002 is currently suspended."), ci->GetName());

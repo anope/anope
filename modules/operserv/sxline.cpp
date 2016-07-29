@@ -71,7 +71,7 @@ class CommandOSSXLineBase : public Command
 				return;
 			}
 
-			Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, this->xlm());
+			EventManager::Get()->Dispatch(&Event::DelXLine::OnDelXLine, source, x, this->xlm());
 
 			x->Delete();
 			source.Reply(_("\002{0}\002 deleted from the {1} list."), mask, source.command);
@@ -118,7 +118,7 @@ class CommandOSSXLineBase : public Command
 			unsigned int i = 0;
 			for (XLine *x : this->xlm()->GetXLines())
 			{
-				if (mask.empty() || mask.equals_ci(x->GetMask()) || mask == x->id || Anope::Match(x->GetMask(), mask, false, true))
+				if (mask.empty() || mask.equals_ci(x->GetMask()) || mask == x->GetID() || Anope::Match(x->GetMask(), mask, false, true))
 				{
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(i + 1);
@@ -163,7 +163,7 @@ class CommandOSSXLineBase : public Command
 
 	void OnClear(CommandSource &source)
 	{
-		Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, nullptr, this->xlm());
+		EventManager::Get()->Dispatch(&Event::DelXLine::OnDelXLine, source, nullptr, this->xlm());
 
 		for (XLine *x : this->xlm()->GetXLines())
 			x->Delete();
@@ -307,7 +307,12 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			return;
 		}
 
-		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
+		XLine *x = Serialize::New<XLine *>();
+		x->SetMask(mask);
+		x->SetBy(source.GetNick());
+		x->SetExpires(expires);
+		x->SetReason(reason);
+
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
 			x->SetID(XLineManager::GenerateUID());
 
@@ -326,7 +331,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnAddXLine(&Event::AddXLine::OnAddXLine, source, x, this->xlm());
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::AddXLine::OnAddXLine, source, x, this->xlm());
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			delete x;
@@ -358,7 +363,8 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 	ServiceReference<XLineManager> snlines;
  public:
- 	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline"), snlines("XLineManager", "xlinemanager/snline")
+ 	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline")
+		, snlines("xlinemanager/snline")
 	{
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037:\037reason\037"));
 		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));
@@ -512,7 +518,12 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			return;
 		}
 
-		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
+		XLine *x = Serialize::New<XLine *>();
+		x->SetMask(mask);
+		x->SetBy(source.GetNick());
+		x->SetExpires(expires);
+		x->SetReason(reason);
+
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
 			x->SetID(XLineManager::GenerateUID());
 
@@ -531,7 +542,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnAddXLine(&Event::AddXLine::OnAddXLine, source, x, this->xlm());
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::AddXLine::OnAddXLine, source, x, this->xlm());
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			delete x;
@@ -589,7 +600,8 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
  	ServiceReference<XLineManager> sqlines;
  public:
-	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/sqline"), sqlines("XLineManager", "xlinemanager/sqline")
+	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/sqline")
+		, sqlines("xlinemanager/sqline")
 	{
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037 \037reason\037"));
 		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));

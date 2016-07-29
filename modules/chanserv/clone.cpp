@@ -15,6 +15,9 @@
 
 class CommandCSClone : public Command
 {
+	ServiceReference<BadWords> badwords;
+
+#warning "levels hasnt been merged"
 #if 0
 	void CopyLevels(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
 	{
@@ -88,7 +91,7 @@ public:
 		if (what.empty())
 		{
 			target_ci->Delete();
-			target_ci = ChanServ::channel.Create();
+			target_ci = Serialize::New<ChanServ::Channel *>();
 			target_ci->SetName(target);
 			ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
 			map[target_ci->GetName()] = target_ci;
@@ -115,9 +118,11 @@ public:
 				target_ci->SetLastTopicTime(target_ci->c->topic_time);
 			}
 			else
+			{
 				target_ci->SetLastTopicSetter(source.service->nick);
+			}
 
-			Event::OnChanRegistered(&Event::ChanRegistered::OnChanRegistered, target_ci);
+			EventManager::Get()->Dispatch(&Event::ChanRegistered::OnChanRegistered, target_ci);
 
 			source.Reply(_("All settings from \002{0}\002 have been cloned to \002{0}\002."), channel, target);
 		}
@@ -134,7 +139,7 @@ public:
 			{
 				ChanServ::ChanAccess *taccess = ci->GetAccess(i);
 
-				if (access_max && target_ci->GetDeepAccessCount() >= access_max)
+				if (access_max && target_ci->GetAccessCount() >= access_max)
 					break;
 
 				if (masks.count(taccess->Mask()))

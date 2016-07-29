@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2014 Anope Team
+ * (C) 2014-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,6 +15,8 @@ class CoreExport AutoKick : public Serialize::Object
  protected:
 	using Serialize::Object::Object;
  public:
+	static constexpr const char *const NAME = "akick";
+	 
 	virtual ~AutoKick() = default;
 
 	virtual ChanServ::Channel *GetChannel() anope_abstract;
@@ -39,12 +41,14 @@ class CoreExport AutoKick : public Serialize::Object
 	virtual void SetLastUsed(const time_t &) anope_abstract;
 };
 
-static Serialize::TypeReference<AutoKick> autokick("AutoKick");
-
 namespace Event
 {
 	struct CoreExport Akick : Events
 	{
+		static constexpr const char *NAME = "akick";
+
+		using Events::Events;
+
 		/** Called after adding an akick to a channel
 		 * @param source The source of the command
 		 * @param ci The channel
@@ -61,4 +65,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::Akick> { static constexpr const char *const name = "Akick"; };

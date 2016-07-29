@@ -1,14 +1,9 @@
 /* BotServ core functions
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "module.h"
@@ -35,6 +30,41 @@ enum TTBType
 
 class KickerDataImpl : public KickerData
 {
+	friend class KickerDataType;
+
+	ChanServ::Channel *channel = nullptr;
+
+	bool amsgs = false,
+	     badwords = false,
+	     bolds = false,
+	     caps = false,
+	     colors = false,
+	     flood = false,
+	     italics = false,
+	     repeat = false,
+	     reverses = false,
+	     underlines = false;
+
+	int16_t ttb_bolds = 0,
+	        ttb_colors = 0,
+	        ttb_reverses = 0,
+	        ttb_underlines = 0,
+	        ttb_badwords = 0,
+	        ttb_caps = 0,
+	        ttb_flood = 0,
+	        ttb_repeat = 0,
+	        ttb_italics = 0,
+ 	        ttb_amsgs = 0;
+
+	int16_t capsmin = 0,
+	        capspercent = 0,
+	        floodlines = 0,
+	        floodsecs = 0,
+	        repeattimes = 0;
+
+	bool dontkickops = false,
+	     dontkickvoices = false;
+
  public:
 	KickerDataImpl(Serialize::TypeBase *type) : KickerData(type) { }
 	KickerDataImpl(Serialize::TypeBase *type, Serialize::ID id) : KickerData(type, id) { }
@@ -128,42 +158,66 @@ class KickerDataType : public Serialize::Type<KickerDataImpl>
 {
  public:
 	Serialize::ObjectField<KickerDataImpl, ChanServ::Channel *> channel;
-	Serialize::Field<KickerDataImpl, bool> amsgs, badwords, bolds, caps, colors, flood, italics, repeat, reverses, underlines;
-	Serialize::Field<KickerDataImpl, int16_t> ttb_bolds, ttb_colors, ttb_reverses, ttb_underlines, ttb_badwords, ttb_caps, ttb_flood, ttb_repeat, ttb_italics, ttb_amsgs,
-								capsmin, capspercent,
-								floodlines, floodsecs,
-								repeattimes;
-	Serialize::Field<KickerDataImpl, bool> dontkickops, dontkickvoices;
 
-	KickerDataType(Module *owner) : Serialize::Type<KickerDataImpl>(owner, "KickerData")
-		, channel(this, "channel", true)
-		, amsgs(this, "amsgs")
-		, badwords(this, "badwords")
-		, bolds(this, "bolds")
-		, caps(this, "caps")
-		, colors(this, "colors")
-		, flood(this, "flood")
-		, italics(this, "italics")
-		, repeat(this, "repeat")
-		, reverses(this, "reverses")
-		, underlines(this, "underlines")
-		, ttb_bolds(this, "ttb_bolds")
-		, ttb_colors(this, "ttb_colors")
-		, ttb_reverses(this, "ttb_reverses")
-		, ttb_underlines(this, "ttb_underlines")
-		, ttb_badwords(this, "ttb_badwords")
-		, ttb_caps(this, "ttb_caps")
-		, ttb_flood(this, "ttb_flood")
-		, ttb_repeat(this, "ttb_repeat")
-		, ttb_italics(this, "ttb_italics")
-		, ttb_amsgs(this, "ttb_amsgs")
-		, capsmin(this, "capsmin")
-		, capspercent(this, "capspercent")
-		, floodlines(this, "floodlines")
-		, floodsecs(this, "floodsecs")
-		, repeattimes(this, "repeattimes")
-		, dontkickops(this, "dontkickops")
-		, dontkickvoices(this, "dontkickvoices")
+	Serialize::Field<KickerDataImpl, bool> amsgs,
+	                                       badwords,
+	                                       bolds,
+	                                       caps,
+	                                       colors,
+	                                       flood,
+	                                       italics,
+	                                       repeat,
+	                                       reverses,
+	                                       underlines;
+
+	Serialize::Field<KickerDataImpl, int16_t> ttb_bolds,
+	                                          ttb_colors,
+	                                          ttb_reverses,
+	                                          ttb_underlines,
+	                                          ttb_badwords,
+	                                          ttb_caps,
+	                                          ttb_flood,
+	                                          ttb_repeat,
+	                                          ttb_italics,
+	                                          ttb_amsgs,
+	                                          capsmin,
+	                                          capspercent,
+	                                          floodlines,
+	                                          floodsecs,
+	                                          repeattimes;
+
+	Serialize::Field<KickerDataImpl, bool> dontkickops,
+	                                       dontkickvoices;
+
+	KickerDataType(Module *owner) : Serialize::Type<KickerDataImpl>(owner)
+		, channel(this, "channel", &KickerDataImpl::channel, true)
+		, amsgs(this, "amsgs", &KickerDataImpl::amsgs)
+		, badwords(this, "badwords", &KickerDataImpl::badwords)
+		, bolds(this, "bolds", &KickerDataImpl::bolds)
+		, caps(this, "caps", &KickerDataImpl::caps)
+		, colors(this, "colors", &KickerDataImpl::colors)
+		, flood(this, "flood", &KickerDataImpl::flood)
+		, italics(this, "italics", &KickerDataImpl::italics)
+		, repeat(this, "repeat", &KickerDataImpl::repeat)
+		, reverses(this, "reverses", &KickerDataImpl::reverses)
+		, underlines(this, "underlines", &KickerDataImpl::underlines)
+		, ttb_bolds(this, "ttb_bolds", &KickerDataImpl::ttb_bolds)
+		, ttb_colors(this, "ttb_colors", &KickerDataImpl::ttb_colors)
+		, ttb_reverses(this, "ttb_reverses", &KickerDataImpl::ttb_reverses)
+		, ttb_underlines(this, "ttb_underlines", &KickerDataImpl::ttb_underlines)
+		, ttb_badwords(this, "ttb_badwords", &KickerDataImpl::ttb_badwords)
+		, ttb_caps(this, "ttb_caps", &KickerDataImpl::ttb_caps)
+		, ttb_flood(this, "ttb_flood", &KickerDataImpl::ttb_flood)
+		, ttb_repeat(this, "ttb_repeat", &KickerDataImpl::ttb_repeat)
+		, ttb_italics(this, "ttb_italics", &KickerDataImpl::ttb_italics)
+		, ttb_amsgs(this, "ttb_amsgs", &KickerDataImpl::ttb_amsgs)
+		, capsmin(this, "capsmin", &KickerDataImpl::capsmin)
+		, capspercent(this, "capspercent", &KickerDataImpl::capspercent)
+		, floodlines(this, "floodlines", &KickerDataImpl::floodlines)
+		, floodsecs(this, "floodsecs", &KickerDataImpl::floodsecs)
+		, repeattimes(this, "repeattimes", &KickerDataImpl::repeattimes)
+		, dontkickops(this, "dontkickops", &KickerDataImpl::dontkickops)
+		, dontkickvoices(this, "dontkickvoices", &KickerDataImpl::dontkickvoices)
 	{
 	}
 };
@@ -477,7 +531,7 @@ class CommandBSKick : public Command
 
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				ServiceReference<Command> command("Command", info.name);
+				ServiceReference<Command> command(info.name);
 				if (command)
 				{
 					source.command = c_name;
@@ -556,7 +610,7 @@ class CommandBSKickBase : public Command
 
 	void Process(CommandSource &source, ChanServ::Channel *ci, const Anope::string &param, const Anope::string &ttb, void (KickerData::*setter)(const bool &), void (KickerData::*ttbsetter)(const int16_t &), const Anope::string &optname)
 	{
-		KickerData *kd = ci->GetRef<KickerData *>(kickerdata);
+		KickerData *kd = ci->GetRef<KickerData *>();
 
 		if (param.equals_ci("ON"))
 		{
@@ -1195,7 +1249,7 @@ class BanDataPurger : public Timer
 			{
 				bd->purge();
 				if (bd->empty())
-					c->ShrinkOK<BanData>("bandata");
+					c->Shrink<BanData>("bandata");
 			}
 		}
 	}
@@ -1226,8 +1280,8 @@ class BSKick : public Module
 	CommandBSSetDontKickVoices commandbssetdontkickvoices;
 
 	BanDataPurger purger;
-
-	EventHandlers<Event::BotBan> onbotban;
+	
+	ServiceReference<BadWords> badwords;
 
 	BanData::Data &GetBanData(User *u, Channel *c)
 	{
@@ -1260,7 +1314,7 @@ class BSKick : public Module
 			Anope::string mask = ci->GetIdealBan(u);
 
 			ci->c->SetMode(NULL, "BAN", mask);
-			this->onbotban(&Event::BotBan::OnBotBan, u, ci, mask);
+			EventManager::Get()->Dispatch(&Event::BotBan::OnBotBan, u, ci, mask);
 		}
 
 		if (!ci->c->FindUser(u))
@@ -1279,6 +1333,9 @@ class BSKick : public Module
 
  public:
 	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ServiceBotEvent>(this)
+		, EventHook<Event::Privmsg>(this)
+
 		, bandata(this, "bandata")
 		, userdata(this, "userdata")
 
@@ -1300,8 +1357,6 @@ class BSKick : public Module
 		, commandbssetdontkickvoices(this)
 
 		, purger(this)
-
-		, onbotban(this)
 	{
 		me = this;
 	}
@@ -1313,7 +1368,7 @@ class BSKick : public Module
 
 		Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
 		Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
-		KickerData *kd = ci->GetRef<KickerData *>(&kdtype);
+		KickerData *kd = ci->GetRef<KickerData *>();
 
 		if (kd && kd->GetBadwords())
 		{
@@ -1434,7 +1489,7 @@ class BSKick : public Module
 		ChanServ::Channel *ci = c->ci;
 		if (ci == NULL)
 			return;
-		KickerData *kd = c->ci->GetRef<KickerData *>(&kdtype);
+		KickerData *kd = c->ci->GetRef<KickerData *>();
 		if (kd == NULL)
 			return;
 

@@ -46,6 +46,7 @@ class CommandNSLogout : public Command
 			return;
 		}
 
+#warning "revalidate"
 #if 0
 		if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServ::service)
 			NickServ::service->Validate(u2);
@@ -64,7 +65,7 @@ class CommandNSLogout : public Command
 		u2->Logout();
 
 		/* Send out an event */
-		Event::OnNickLogout(&Event::NickLogout::OnNickLogout, u2);
+		EventManager::Get()->Dispatch(&Event::NickLogout::OnNickLogout, u2);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

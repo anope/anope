@@ -481,8 +481,11 @@ void Anope::Init(int ac, char **av)
 	/* Initialize the socket engine. Note that some engines can not survive a fork(), so this must be here. */
 	SocketEngine::Init();
 
+	ServiceManager::Init();
+	EventManager::Init();
+
 	new BotInfoType();
-	new XLineType(nullptr, "XLine");
+	new XLineType(nullptr);
 	new OperBlockType();
 
 	/* Read configuration file; exit if there are problems. */
@@ -567,14 +570,11 @@ void Anope::Init(int ac, char **av)
 
 	/* Load up databases */
 	Log() << "Loading databases...";
-	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnLoadDatabase(&Event::LoadDatabase::OnLoadDatabase);
+	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::LoadDatabase::OnLoadDatabase);;
 	static_cast<void>(MOD_RESULT);
 	Log() << "Databases loaded";
 
 	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 		it->second->Sync();
-
-	//Serialize::CheckTypes();
 }
 

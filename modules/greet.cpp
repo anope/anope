@@ -101,7 +101,7 @@ class CommandNSSetGreet : public Command
 		}
 		NickServ::Account *nc = na->GetAccount();
 
-		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -170,8 +170,11 @@ class Greet : public Module
 
  public:
 	Greet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, bs_greet(this, ChanServ::channel, "BS_GREET")
-		, ns_greet(this, NickServ::account, "greet")
+		, EventHook<Event::JoinChannel>(this)
+		, EventHook<Event::NickInfo>(this)
+		, EventHook<Event::ServiceBotEvent>(this)
+		, bs_greet(this, "BS_GREET")
+		, ns_greet(this, "greet")
 		, commandbssetgreet(this)
 		, commandnssetgreet(this)
 		, commandnssasetgreet(this)

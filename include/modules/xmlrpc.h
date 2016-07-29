@@ -27,7 +27,9 @@ class XMLRPCEvent
 class XMLRPCServiceInterface : public Service
 {
  public:
-	XMLRPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, "XMLRPCServiceInterface", sname) { }
+	static constexpr const char *NAME = "XMLRPCServiceInterface";
+	
+	XMLRPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, NAME) { }
 
 	virtual void Register(XMLRPCEvent *event) anope_abstract;
 

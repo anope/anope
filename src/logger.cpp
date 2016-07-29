@@ -90,11 +90,11 @@ Log::Log(LogType t, CommandSource &src, Command *_c, ChanServ::Channel *_ci) : u
 	if (type != LOG_COMMAND && type != LOG_OVERRIDE && type != LOG_ADMIN)
 		throw CoreException("This constructor does not support this log type");
 
-	size_t sl = c->name.find('/');
+	size_t sl = c->GetName().find('/');
 	this->bi = NULL;
 	if (sl != Anope::string::npos)
-		this->bi = ServiceBot::Find(c->name.substr(0, sl), true);
-	this->category = c->name;
+		this->bi = ServiceBot::Find(c->GetName().substr(0, sl), true);
+	this->category = c->GetName();
 }
 
 Log::Log(User *_u, Channel *ch, const Anope::string &cat) : bi(NULL), u(_u), nc(NULL), c(NULL), source(NULL), chan(ch), ci(chan ? *chan->ci : NULL), s(NULL), m(NULL), type(LOG_CHANNEL), category(cat)
@@ -132,7 +132,15 @@ Log::~Log()
 	else if (this->type == LOG_TERMINAL)
 		std::cout << this->BuildPrefix() << this->buf.str() << std::endl;
 
-	Event::OnLog(&Event::Log::OnLog, this);
+	/* Some of the higher debug messages are in the event/service system which manages event dispatch,
+	 * so firing off the log event here can cause them to be in weird states
+	 */
+	if (this->type <= LOG_NORMAL)
+	{
+		EventManager *em = EventManager::Get();
+		if (em != nullptr)
+			em->Dispatch(&Event::Log::OnLog, this);
+	}
 
 	if (Config)
 		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
@@ -154,7 +162,7 @@ Anope::string Log::FormatSource() const
 
 Anope::string Log::FormatCommand() const
 {
-	Anope::string buffer = FormatSource() + " used " + (source != NULL && !source->command.empty() ? source->command : this->c->name) + " ";
+	Anope::string buffer = FormatSource() + " used " + (source != NULL && !source->command.empty() ? source->command : this->c->GetName()) + " ";
 	if (this->ci)
 		buffer += "on " + this->ci->GetName() + " ";
 
@@ -348,7 +356,7 @@ void LogInfo::ProcessMessage(const Log *l)
 
 	const Anope::string &buffer = l->BuildPrefix() + l->buf.str();
 
-	Event::OnLogMessage(&Event::LogMessage::OnLogMessage, this, l, buffer);
+	EventManager::Get()->Dispatch(&Event::LogMessage::OnLogMessage, this, l, buffer);
 
 	for (unsigned i = 0; i < this->targets.size(); ++i)
 	{

@@ -17,6 +17,11 @@ static Anope::map<Anope::string> descriptions;
 
 class CSMiscDataImpl : public CSMiscData
 {
+	friend class CSMiscDataType;
+
+	ChanServ::Channel *channel = nullptr;
+	Anope::string name, data;
+
  public:
 	CSMiscDataImpl(Serialize::TypeBase *type) : CSMiscData(type) { }
 	CSMiscDataImpl(Serialize::TypeBase *type, Serialize::ID id) : CSMiscData(type, id) { }
@@ -37,10 +42,10 @@ class CSMiscDataType : public Serialize::Type<CSMiscDataImpl>
 	Serialize::ObjectField<CSMiscDataImpl, ChanServ::Channel *> owner;
 	Serialize::Field<CSMiscDataImpl, Anope::string> name, data;
 
-	CSMiscDataType(Module *me) : Serialize::Type<CSMiscDataImpl>(me, "CSMiscData")
-		, owner(this, "owner", true)
-		, name(this, "name")
-		, data(this, "data")
+	CSMiscDataType(Module *me) : Serialize::Type<CSMiscDataImpl>(me)
+		, owner(this, "owner", &CSMiscDataImpl::channel, true)
+		, name(this, "name", &CSMiscDataImpl::name)
+		, data(this, "data", &CSMiscDataImpl::data)
 	{
 	}
 };
@@ -110,7 +115,7 @@ class CommandCSSetMisc : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -123,7 +128,7 @@ class CommandCSSetMisc : public Command
 		Anope::string scommand = GetAttribute(source.command);
 
 		/* remove existing */
-		for (CSMiscData *data : ci->GetRefs<CSMiscData *>(csmiscdata))
+		for (CSMiscData *data : ci->GetRefs<CSMiscData *>())
 			if (data->GetName() == scommand)
 			{
 				data->Delete();
@@ -132,7 +137,7 @@ class CommandCSSetMisc : public Command
 
 		if (!param.empty())
 		{
-			CSMiscData *data = csmiscdata.Create();
+			CSMiscData *data = Serialize::New<CSMiscData *>();
 			data->SetChannel(ci);
 			data->SetName(scommand);
 			data->SetData(param);
@@ -175,6 +180,7 @@ class CSSetMisc : public Module
 
  public:
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChanInfo>(this)
 		, commandcssetmisc(this)
 		, type(this)
 	{
@@ -203,7 +209,7 @@ class CSSetMisc : public Module
 
 	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool) override
 	{
-		for (CSMiscData *data : ci->GetRefs<CSMiscData *>(csmiscdata))
+		for (CSMiscData *data : ci->GetRefs<CSMiscData *>())
 			info[data->GetName()] = data->GetData();
 	}
 };

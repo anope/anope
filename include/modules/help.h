@@ -11,6 +11,10 @@ namespace Event
 {
 	struct CoreExport Help : Events
 	{
+		static constexpr const char *NAME = "help";
+
+		using Events::Events;
+
 		/** Called when someone uses the generic/help command
 		 * @param source Command source
 		 * @param params Params
@@ -26,4 +30,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::Help> { static constexpr const char *const name = "Help"; };

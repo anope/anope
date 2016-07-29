@@ -12,6 +12,8 @@ class NSSuspendInfo : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "nssuspendinfo";
+
 	virtual NickServ::Account *GetAccount() anope_abstract;
 	virtual void SetAccount(NickServ::Account *) anope_abstract;
 
@@ -28,12 +30,14 @@ class NSSuspendInfo : public Serialize::Object
 	virtual void SetExpires(const time_t &) anope_abstract;
 };
 
-static Serialize::TypeReference<NSSuspendInfo> nssuspendinfo("NSSuspendInfo");
-
 namespace Event
 {
 	struct CoreExport NickSuspend : Events
 	{
+		static constexpr const char *NAME = "nicksuspend";
+
+		using Events::Events;
+		
 		/** Called when a nick is suspended
 		 * @param na The nick alias
 		 */
@@ -42,12 +46,13 @@ namespace Event
 
 	struct CoreExport NickUnsuspend : Events
 	{
+		static constexpr const char *NAME = "nickunsuspend";
+
+		using Events::Events;
+		
 		/** Called when a nick is unsuspneded
 		 * @param na The nick alias
 		 */
 		virtual void OnNickUnsuspend(NickServ::Nick *na) anope_abstract;
 	};
 }
-
-template<> struct EventName<Event::NickSuspend> { static constexpr const char *const name = "OnNickSuspend"; };
-template<> struct EventName<Event::NickUnsuspend> { static constexpr const char *const name = "OnNickUnsuspend"; };

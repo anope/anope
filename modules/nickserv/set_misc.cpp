@@ -18,6 +18,11 @@ static Anope::map<Anope::string> descriptions;
 
 class NSMiscDataImpl : public NSMiscData
 {
+	friend class NSMiscDataType;
+
+	NickServ::Account *account = nullptr;
+	Anope::string name, data;
+
  public:
 	NSMiscDataImpl(Serialize::TypeBase *type) : NSMiscData(type) { }
 	NSMiscDataImpl(Serialize::TypeBase *type, Serialize::ID id) : NSMiscData(type, id) { }
@@ -38,10 +43,10 @@ class NSMiscDataType : public Serialize::Type<NSMiscDataImpl>
 	Serialize::ObjectField<NSMiscDataImpl, NickServ::Account *> owner;
 	Serialize::Field<NSMiscDataImpl, Anope::string> name, data;
 
-	NSMiscDataType(Module *me) : Serialize::Type<NSMiscDataImpl>(me, "NSMiscData")
-		, owner(this, "nc", true)
-		, name(this, "name")
-		, data(this, "data")
+	NSMiscDataType(Module *me) : Serialize::Type<NSMiscDataImpl>(me)
+		, owner(this, "nc", &NSMiscDataImpl::account, true)
+		, name(this, "name", &NSMiscDataImpl::name)
+		, data(this, "data", &NSMiscDataImpl::data)
 	{
 	}
 };
@@ -108,14 +113,14 @@ class CommandNSSetMisc : public Command
 		}
 		NickServ::Account *nc = na->GetAccount();
 
-		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		Anope::string scommand = GetAttribute(source.command);
 
 		/* remove existing */
-		for (NSMiscData *data : nc->GetRefs<NSMiscData *>(nsmiscdata))
+		for (NSMiscData *data : nc->GetRefs<NSMiscData *>())
 			if (data->GetName() == scommand)
 			{
 				data->Delete();
@@ -124,7 +129,7 @@ class CommandNSSetMisc : public Command
 
 		if (!param.empty())
 		{
-			NSMiscData *data = nsmiscdata.Create();
+			NSMiscData *data = Serialize::New<NSMiscData *>();
 			data->SetAccount(nc);
 			data->SetName(scommand);
 			data->SetData(param);
@@ -186,6 +191,7 @@ class NSSetMisc : public Module
 
  public:
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::NickInfo>(this)
 		, commandnssetmisc(this)
 		, commandnssasetmisc(this)
 		, type(this)
@@ -217,7 +223,7 @@ class NSSetMisc : public Module
 
 	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool) override
 	{
-		for (NSMiscData *data : na->GetAccount()->GetRefs<NSMiscData *>(nsmiscdata))
+		for (NSMiscData *data : na->GetAccount()->GetRefs<NSMiscData *>())
 			info[data->GetName()] = data->GetData();
 	}
 };

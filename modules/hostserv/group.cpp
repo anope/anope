@@ -26,10 +26,10 @@ class CommandHSGroup : public Command
 			return;
 
 		setting = true;
-		for (NickServ::Nick *nick : na->GetAccount()->GetRefs<NickServ::Nick *>(NickServ::nick))
+		for (NickServ::Nick *nick : na->GetAccount()->GetRefs<NickServ::Nick *>())
 		{
 			nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
-			Event::OnSetVhost(&Event::SetVhost::OnSetVhost, nick);
+			EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, nick);
 		}
 		setting = false;
 	}
@@ -84,6 +84,8 @@ class HSGroup : public Module
 
  public:
 	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::SetVhost>(this)
+		, EventHook<Event::NickGroup>(this)
 		, commandhsgroup(this)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)

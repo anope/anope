@@ -11,6 +11,10 @@ namespace Event
 {
 	struct CoreExport NickGroup : Events
 	{
+		static constexpr const char *NAME = "nickgroup";
+
+		using Events::Events;
+
 		/** Called when a user groups their nick
 		 * @param u The user grouping
 		 * @param target The target they're grouping to
@@ -19,4 +23,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::NickGroup> { static constexpr const char *const name = "OnNickGroup"; };

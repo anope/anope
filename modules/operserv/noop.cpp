@@ -52,7 +52,7 @@ class CommandOSNOOP : public Command
 		}
 		else if (cmd.equals_ci("REVOKE"))
 		{
-			s->ShrinkOK<Anope::string>("noop");
+			s->Shrink<Anope::string>("noop");
 			IRCD->SendSVSNOOP(s, false);
 			Log(LOG_ADMIN, source, this) << "REVOKE on " << s->GetName();
 			source.Reply(_("All O:lines of \002{0}\002 have been reset."), s->GetName());
@@ -77,6 +77,7 @@ class OSNOOP : public Module
 
  public:
 	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserModeSet>(this)
 		, commandosnoop(this)
 		, noop(this, "noop")
 	{

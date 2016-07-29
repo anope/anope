@@ -22,7 +22,7 @@ AccountImpl::~AccountImpl()
 
 void AccountImpl::Delete()
 {
-	Event::OnDelCore(&Event::DelCore::OnDelCore, this);
+	EventManager::Get()->Dispatch(&Event::DelCore::OnDelCore, this);
 
 	for (unsigned i = users.size(); i > 0; --i)
 		users[i - 1]->Logout();
@@ -72,7 +72,7 @@ void AccountImpl::SetLanguage(const Anope::string &lang)
 
 MemoServ::MemoInfo *AccountImpl::GetMemos()
 {
-	return GetRef<MemoServ::MemoInfo *>(MemoServ::memoinfo);
+	return GetRef<MemoServ::MemoInfo *>();
 }
 
 void AccountImpl::SetDisplay(NickServ::Nick *na)
@@ -80,7 +80,7 @@ void AccountImpl::SetDisplay(NickServ::Nick *na)
 	if (na->GetAccount() != this || na->GetNick() == this->GetDisplay())
 		return;
 
-	Event::OnChangeCoreDisplay(&Event::ChangeCoreDisplay::OnChangeCoreDisplay, this, na->GetNick());
+	EventManager::Get()->Dispatch(&Event::ChangeCoreDisplay::OnChangeCoreDisplay, this, na->GetNick());
 
 	NickServ::nickcore_map& map = NickServ::service->GetAccountMap();
 
@@ -109,7 +109,7 @@ bool AccountImpl::IsOnAccess(User *u)
 	if (!u->GetCloakedHost().empty())
 		buf3 = u->GetIdent() + "@" + u->GetCloakedHost();
 
-	for (NickAccess *access : GetRefs<NickAccess *>(nsaccess))
+	for (NickAccess *access : GetRefs<NickAccess *>())
 	{
 		Anope::string a = access->GetMask();
 		if (Anope::Match(buf, a) || (!buf2.empty() && Anope::Match(buf2, a)) || (!buf3.empty() && Anope::Match(buf3, a)))
@@ -121,7 +121,7 @@ bool AccountImpl::IsOnAccess(User *u)
 unsigned int AccountImpl::GetChannelCount()
 {
 	unsigned int i = 0;
-	for (ChanServ::Channel *c : GetRefs<ChanServ::Channel *>(ChanServ::channel))
+	for (ChanServ::Channel *c : GetRefs<ChanServ::Channel *>())
 		if (c->GetFounder() == this)
 			++i;
 	return i;

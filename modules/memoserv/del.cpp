@@ -81,8 +81,7 @@ class CommandMSDel : public Command
 					if (!number || number > memos.size())
 						return;
 
-					if (MemoServ::Event::OnMemoDel)
-						MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->GetName() : source.nc->GetDisplay(), mi, mi->GetMemo(number - 1));
+					EventManager::Get()->Dispatch(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->GetName() : source.nc->GetDisplay(), mi, mi->GetMemo(number - 1));
 
 					mi->Del(number - 1);
 					source.Reply(_("Memo \002{0}\002 has been deleted."), number);
@@ -92,8 +91,7 @@ class CommandMSDel : public Command
 		else if (numstr.equals_ci("LAST"))
 		{
 			/* Delete last memo. */
-			if (MemoServ::Event::OnMemoDel)
-				MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->GetName() : source.nc->GetDisplay(), mi, mi->GetMemo(memos.size() - 1));
+			EventManager::Get()->Dispatch(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->GetName() : source.nc->GetDisplay(), mi, mi->GetMemo(memos.size() - 1));
 			mi->Del(memos.size() - 1);
 			source.Reply(_("Memo \002{0}\002 has been deleted."), memos.size() + 1);
 		}
@@ -103,8 +101,7 @@ class CommandMSDel : public Command
 			std::for_each(memos.begin(), memos.end(),
 			[&](MemoServ::Memo *m)
 			{
-				if (MemoServ::Event::OnMemoDel)
-					MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->GetName() : source.nc->GetDisplay(), mi, m);
+				EventManager::Get()->Dispatch(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->GetName() : source.nc->GetDisplay(), mi, m);
 				delete m;
 			});
 			if (!chan.empty())

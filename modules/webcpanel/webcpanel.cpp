@@ -78,7 +78,7 @@ class ModuleWebCPanel : public Module
 		template_base = Anope::DataDir + "/modules/webcpanel/templates/" + template_name;
 		page_title = block->Get<Anope::string>("title", "Anope IRC Services");
 
-		provider = ServiceReference<HTTPProvider>("HTTPProvider", provider_name);
+		provider = ServiceReference<HTTPProvider>(provider_name);
 		if (!provider)
 			throw ModuleException("Unable to find HTTPD provider. Is m_httpd loaded?");
 
@@ -250,7 +250,7 @@ namespace WebPanel
 {
 	void RunCommand(const Anope::string &user, NickServ::Account *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
-		ServiceReference<Command> cmd("Command", c);
+		ServiceReference<Command> cmd(c);
 		if (!cmd)
 		{
 			r[key] = "Unable to find command " + c;
@@ -286,7 +286,7 @@ namespace WebPanel
 
 	void RunCommandWithName(NickServ::Account *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
-		ServiceReference<Command> cmd("Command", c);
+		ServiceReference<Command> cmd(c);
 		if (!cmd)
 		{
 			r[key] = "Unable to find command " + c;

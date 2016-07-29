@@ -15,6 +15,11 @@
 
 class NickAccessImpl : public NickAccess
 {
+	friend class NickAccessType;
+
+	NickServ::Account *account = nullptr;
+	Anope::string mask;
+
  public:
 	NickAccessImpl(Serialize::TypeBase *type) : NickAccess(type) { }
 	NickAccessImpl(Serialize::TypeBase *type, Serialize::ID id) : NickAccess(type, id) { }
@@ -32,9 +37,9 @@ class NickAccessType : public Serialize::Type<NickAccessImpl>
 	Serialize::ObjectField<NickAccessImpl, NickServ::Account *> account;
 	Serialize::Field<NickAccessImpl, Anope::string> mask;
 
-	NickAccessType(Module *creator) : Serialize::Type<NickAccessImpl>(creator, "NSAccess")
-		, account(this, "account", true)
-		, mask(this, "mask")
+	NickAccessType(Module *creator) : Serialize::Type<NickAccessImpl>(creator)
+		, account(this, "account", &NickAccessImpl::account, true)
+		, mask(this, "mask", &NickAccessImpl::mask)
 	{
 	}
 };
@@ -76,11 +81,11 @@ class CommandNSAccess : public Command
 			return;
 		}
 
-		std::vector<NickAccess *> access = nc->GetRefs<NickAccess *>(nsaccess);
+		std::vector<NickAccess *> access = nc->GetRefs<NickAccess *>();
 
-		if (access.size() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax", "32"))
+		if (access.size() >= Config->GetModule(this->GetOwner())->Get<unsigned>("accessmax", "32"))
 		{
-			source.Reply(_("Sorry, the maximum of \002{0}\002 access entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
+			source.Reply(_("Sorry, the maximum of \002{0}\002 access entries has been reached."), Config->GetModule(this->GetOwner())->Get<unsigned>("accessmax"));
 			return;
 		}
 
@@ -91,7 +96,7 @@ class CommandNSAccess : public Command
 				return;
 			}
 
-		NickAccess *a = nsaccess.Create();
+		NickAccess *a = Serialize::New<NickAccess *>();
 		a->SetAccount(nc);
 		a->SetMask(mask);
 
@@ -113,7 +118,7 @@ class CommandNSAccess : public Command
 			return;
 		}
 
-		for (NickAccess *a : nc->GetRefs<NickAccess *>(nsaccess))
+		for (NickAccess *a : nc->GetRefs<NickAccess *>())
 			if (a->GetMask().equals_ci(mask))
 			{
 				a->Delete();
@@ -128,7 +133,7 @@ class CommandNSAccess : public Command
 
 	void DoList(CommandSource &source, NickServ::Account *nc, const Anope::string &mask)
 	{
-		std::vector<NickAccess *> access = nc->GetRefs<NickAccess *>(nsaccess);
+		std::vector<NickAccess *> access = nc->GetRefs<NickAccess *>();
 		if (access.empty())
 		{
 			source.Reply(_("The access list of \002{0}\002 is empty."), nc->GetDisplay());
@@ -236,6 +241,7 @@ class NSAccess : public Module
 
  public:
 	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<NickServ::Event::NickRegister>(this)
 		, commandnsaccess(this)
 		, nick_type(this)
 	{
@@ -245,11 +251,12 @@ class NSAccess : public Module
 	{
 		if (u && Config->GetModule(this)->Get<bool>("addaccessonreg"))
 		{
-			NickAccess *a = nsaccess.Create();
+			NickAccess *a = Serialize::New<NickAccess *>();
 			a->SetAccount(na->GetAccount());
 			a->SetMask(u->Mask());
-			//XXX?
-//			source.Reply(_("\002{0}\002 has been registered under your hostmask: \002{1}\002"), u_nick, na->GetAccount()->GetAccess(0));
+
+			u->SendMessage(Config->GetClient("NickServ"),
+					_("\002{0}\002 has been registered under your hostmask: \002{1}\002"), na->GetNick(), a->GetMask());
 		}
 	}
 };

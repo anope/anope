@@ -116,6 +116,8 @@ class CoreExport Command : public Service
 	/* Module which owns us */
 	Module *module;
 
+	static constexpr const char *NAME = "Command";
+
  protected:
 	/** Create a new command.
 	 * @param owner The owner of the command

@@ -79,7 +79,7 @@ class CommandOSOper : public Command
 				na->GetAccount()->o = nullptr;
 			}
 
-			Oper *o = operblock.Create();
+			Oper *o = Serialize::New<Oper *>();
 			o->SetName(na->GetAccount()->GetDisplay());
 			o->SetType(ot);
 			o->SetRequireOper(true);

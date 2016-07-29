@@ -57,5 +57,10 @@
 # include "anope_windows.h"
 #endif
 
+#ifndef DEBUG_BUILD
+# define NDEBUG
+#endif
+#include <assert.h>
+
 #define anope_abstract = 0
 

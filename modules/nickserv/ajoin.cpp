@@ -14,6 +14,11 @@
 
 class AutoJoinImpl : public AutoJoin
 {
+	friend class AutoJoinType;
+
+	NickServ::Account *account = nullptr;
+	Anope::string channel, key;
+
  public:
 	AutoJoinImpl(Serialize::TypeBase *type) : AutoJoin(type) { }
 	AutoJoinImpl(Serialize::TypeBase *type, Serialize::ID id) : AutoJoin(type, id) { }
@@ -34,10 +39,10 @@ class AutoJoinType : public Serialize::Type<AutoJoinImpl>
 	Serialize::ObjectField<AutoJoinImpl, NickServ::Account *> owner;
 	Serialize::Field<AutoJoinImpl, Anope::string> channel, key;
 
-	AutoJoinType(Module *me) : Serialize::Type<AutoJoinImpl>(me, "AutoJoin")
-		, owner(this, "owner", true)
-		, channel(this, "channel")
-		, key(this, "key")
+	AutoJoinType(Module *me) : Serialize::Type<AutoJoinImpl>(me)
+		, owner(this, "owner", &AutoJoinImpl::account, true)
+		, channel(this, "channel", &AutoJoinImpl::channel)
+		, key(this, "key", &AutoJoinImpl::key)
 	{
 	}
 };
@@ -76,7 +81,7 @@ class CommandNSAJoin : public Command
 {
 	void DoList(CommandSource &source, NickServ::Account *nc)
 	{
-		std::vector<AutoJoin *> channels = nc->GetRefs<AutoJoin *>(autojoin);
+		std::vector<AutoJoin *> channels = nc->GetRefs<AutoJoin *>();
 
 		if (channels.empty())
 		{
@@ -107,7 +112,7 @@ class CommandNSAJoin : public Command
 
 	void DoAdd(CommandSource &source, NickServ::Account *nc, const Anope::string &chans, const Anope::string &keys)
 	{
-		std::vector<AutoJoin *> channels = nc->GetRefs<AutoJoin *>(autojoin);
+		std::vector<AutoJoin *> channels = nc->GetRefs<AutoJoin *>();
 
 		Anope::string addedchans;
 		Anope::string alreadyadded;
@@ -123,9 +128,9 @@ class CommandNSAJoin : public Command
 				if (channels[i]->GetChannel().equals_ci(chan))
 					break;
 
-			if (channels.size() >= Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"))
+			if (channels.size() >= Config->GetModule(this->GetOwner())->Get<unsigned>("ajoinmax"))
 			{
-				source.Reply(_("Sorry, the maximum of \002{0}\002 auto join entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"));
+				source.Reply(_("Sorry, the maximum of \002{0}\002 auto join entries has been reached."), Config->GetModule(this->GetOwner())->Get<unsigned>("ajoinmax"));
 				return;
 			}
 
@@ -143,7 +148,7 @@ class CommandNSAJoin : public Command
 					continue;
 				}
 
-				AutoJoin *entry = autojoin.Create();
+				AutoJoin *entry = Serialize::New<AutoJoin *>();
 				entry->SetOwner(nc);
 				entry->SetChannel(chan);
 				entry->SetKey(key);
@@ -174,7 +179,7 @@ class CommandNSAJoin : public Command
 
 	void DoDel(CommandSource &source, NickServ::Account *nc, const Anope::string &chans)
 	{
-		std::vector<AutoJoin *> channels = nc->GetRefs<AutoJoin *>(autojoin);
+		std::vector<AutoJoin *> channels = nc->GetRefs<AutoJoin *>();
 		Anope::string delchans;
 		Anope::string notfoundchans;
 		commasepstream sep(chans);
@@ -282,6 +287,7 @@ class NSAJoin : public Module
 
  public:
 	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserLogin>(this)
 		, commandnsajoin(this)
 		, ajtype(this)
 	{
@@ -297,7 +303,7 @@ class NSAJoin : public Module
 		if (!NickServ)
 			return;
 
-		std::vector<AutoJoin *> channels = u->Account()->GetRefs<AutoJoin *>(autojoin);
+		std::vector<AutoJoin *> channels = u->Account()->GetRefs<AutoJoin *>();
 		if (channels.empty())
 			return;
 

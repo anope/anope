@@ -26,7 +26,7 @@ ServiceBot::ServiceBot(const Anope::string &nnick, const Anope::string &nuser, c
 	this->lastmsg = Anope::CurTime;
 	this->introduced = false;
 
-	bi = botinfo.Create();
+	bi = Serialize::New<BotInfo *>();
 	bi->bot = this;
 
 	bi->SetNick(nnick);
@@ -35,7 +35,7 @@ ServiceBot::ServiceBot(const Anope::string &nnick, const Anope::string &nuser, c
 	bi->SetRealName(nreal);
 	bi->SetCreated(Anope::CurTime);
 
-	Event::OnCreateBot(&Event::CreateBot::OnCreateBot, this);
+	EventManager::Get()->Dispatch(&Event::CreateBot::OnCreateBot, this);
 
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
@@ -57,13 +57,13 @@ ServiceBot::~ServiceBot()
 	bi->bot = nullptr;
 	bi->Delete();
 
-	Event::OnDelBot(&Event::DelBot::OnDelBot, this);
+	EventManager::Get()->Dispatch(&Event::DelBot::OnDelBot, this);
 
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{
 		IRCD->SendQuit(this, "");
-		Event::OnUserQuit(&Event::UserQuit::OnUserQuit, this, "");
+		EventManager::Get()->Dispatch(&Event::UserQuit::OnUserQuit, this, "");
 		this->introduced = false;
 		// XXX ?
 		//XLine x(this->nick);
@@ -106,13 +106,13 @@ void ServiceBot::SetNewNick(const Anope::string &newnick)
 
 std::vector<ChanServ::Channel *> ServiceBot::GetChannels() const
 {
-	return bi->GetRefs<ChanServ::Channel *>(ChanServ::channel);
+	return bi->GetRefs<ChanServ::Channel *>();
 }
 
 void ServiceBot::Assign(User *u, ChanServ::Channel *ci)
 {
 	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnPreBotAssign(&Event::PreBotAssign::OnPreBotAssign, u, ci, this);
+	MOD_RESULT = EventManager::Get()->Dispatch(&Event::PreBotAssign::OnPreBotAssign, u, ci, this);
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -121,13 +121,13 @@ void ServiceBot::Assign(User *u, ChanServ::Channel *ci)
 
 	ci->SetBot(this);
 
-	Event::OnBotAssign(&Event::BotAssign::OnBotAssign, u, ci, this);
+	EventManager::Get()->Dispatch(&Event::BotAssign::OnBotAssign, u, ci, this);
 }
 
 void ServiceBot::UnAssign(User *u, ChanServ::Channel *ci)
 {
 	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnBotUnAssign(&Event::BotUnAssign::OnBotUnAssign, u, ci);
+	MOD_RESULT = EventManager::Get()->Dispatch(&Event::BotUnAssign::OnBotUnAssign, u, ci);
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -156,7 +156,7 @@ void ServiceBot::Join(Channel *c, ChannelStatus *status)
 	if (IRCD)
 		IRCD->SendJoin(this, c, status);
 
-	Event::OnJoinChannel(&Event::JoinChannel::OnJoinChannel, this, c);
+	EventManager::Get()->Dispatch(&Event::JoinChannel::OnJoinChannel, this, c);
 }
 
 void ServiceBot::Join(const Anope::string &chname, ChannelStatus *status)
@@ -170,13 +170,13 @@ void ServiceBot::Part(Channel *c, const Anope::string &reason)
 	if (c->FindUser(this) == NULL)
 		return;
 
-	Event::OnPrePartChannel(&Event::PrePartChannel::OnPrePartChannel, this, c);
+	EventManager::Get()->Dispatch(&Event::PrePartChannel::OnPrePartChannel, this, c);
 
 	IRCD->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
 
 	c->DeleteUser(this);
 
-	Event::OnPartChannel(&Event::PartChannel::OnPartChannel, this, c, c->name, reason);
+	EventManager::Get()->Dispatch(&Event::PartChannel::OnPartChannel, this, c, c->name, reason);
 }
 
 void ServiceBot::OnMessage(User *u, const Anope::string &message)
@@ -259,9 +259,9 @@ bool BotInfo::GetOperOnly()
 	return Get(&BotInfoType::operonly);
 }
 
-void BotInfo::SetNick(const Anope::string &nick)
+void BotInfo::SetNick(const Anope::string &n)
 {
-	Set(&BotInfoType::nick, nick);
+	Set(&BotInfoType::nick, n);
 }
 
 Anope::string BotInfo::GetNick()
@@ -269,9 +269,9 @@ Anope::string BotInfo::GetNick()
 	return Get(&BotInfoType::nick);
 }
 
-void BotInfo::SetUser(const Anope::string &user)
+void BotInfo::SetUser(const Anope::string &u)
 {
-	Set(&BotInfoType::user, user);
+	Set(&BotInfoType::user, u);
 }
 
 Anope::string BotInfo::GetUser()
@@ -279,9 +279,9 @@ Anope::string BotInfo::GetUser()
 	return Get(&BotInfoType::user);
 }
 
-void BotInfo::SetHost(const Anope::string &host)
+void BotInfo::SetHost(const Anope::string &h)
 {
-	Set(&BotInfoType::host, host);
+	Set(&BotInfoType::host, h);
 }
 
 Anope::string BotInfo::GetHost()
@@ -289,9 +289,9 @@ Anope::string BotInfo::GetHost()
 	return Get(&BotInfoType::host);
 }
 
-void BotInfo::SetRealName(const Anope::string &realname)
+void BotInfo::SetRealName(const Anope::string &r)
 {
-	Set(&BotInfoType::realname, realname);
+	Set(&BotInfoType::realname, r);
 }
 
 Anope::string BotInfo::GetRealName()

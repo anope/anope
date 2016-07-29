@@ -44,8 +44,7 @@ class CommandNSConfirm : public Command
 			}
 
 			na->GetAccount()->UnsetS<bool>("UNCONFIRMED");
-			if (NickServ::Event::OnNickConfirm)
-				NickServ::Event::OnNickConfirm(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), na->GetAccount());
+			EventManager::Get()->Dispatch(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), na->GetAccount());
 			Log(LOG_ADMIN, source, this) << "to confirm nick " << na->GetNick() << " (" << na->GetAccount()->GetDisplay() << ")";
 			source.Reply(_("\002{0}\002 has been confirmed."), na->GetNick());
 		}
@@ -59,12 +58,12 @@ class CommandNSConfirm : public Command
 			}
 
 			NickServ::Account *nc = source.nc;
-			nc->ShrinkOK<Anope::string>("passcode");
+			nc->Shrink<Anope::string>("passcode");
 			Log(LOG_COMMAND, source, this) << "to confirm their email";
 			source.Reply(_("Your email address of \002{0}\002 has been confirmed."), source.nc->GetEmail());
 			nc->UnsetS<bool>("UNCONFIRMED");
-			if (NickServ::Event::OnNickConfirm)
-				NickServ::Event::OnNickConfirm(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), nc);
+
+			EventManager::Get()->Dispatch(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), nc);
 
 			if (source.GetUser())
 			{
@@ -115,7 +114,7 @@ class CommandNSRegister : public Command
 		size_t nicklen = u_nick.length();
 		Anope::string pass = params[0];
 		Anope::string email = params.size() > 1 ? params[1] : "";
-		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<Anope::string>("registration");
+		const Anope::string &nsregister = Config->GetModule(this->GetOwner())->Get<Anope::string>("registration");
 
 		if (Anope::ReadOnly)
 		{
@@ -129,7 +128,7 @@ class CommandNSRegister : public Command
 			return;
 		}
 
-		time_t nickregdelay = Config->GetModule(this->owner)->Get<time_t>("nickregdelay");
+		time_t nickregdelay = Config->GetModule(this->GetOwner())->Get<time_t>("nickregdelay");
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		if (u && !u->HasMode("OPER") && nickregdelay && Anope::CurTime - u->timestamp < nickregdelay)
 		{
@@ -162,11 +161,11 @@ class CommandNSRegister : public Command
 		}
 
 		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
-			for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
+			for (Oper *o : Serialize::GetObjects<Oper *>())
 			{
 				if (!source.IsOper() && u_nick.find_ci(o->GetName()) != Anope::string::npos)
 				{
-					source.Reply(_("\002{0}\002 may not be registered."), u_nick);
+					source.Reply(_("\002{0}\002 may not be registered because it is too similar to an operator nick."), u_nick);
 					return;
 				}
 			}
@@ -210,12 +209,15 @@ class CommandNSRegister : public Command
 			return;
 		}
 
-		NickServ::Account *nc = NickServ::account.Create();
+		NickServ::Account *nc = Serialize::New<NickServ::Account *>();
 		nc->SetDisplay(u_nick);
 
-		NickServ::Nick *na = NickServ::nick.Create();
+		NickServ::Nick *na = Serialize::New<NickServ::Nick *>();
 		na->SetNick(u_nick);
 		na->SetAccount(nc);
+		na->SetTimeRegistered(Anope::CurTime);
+		na->SetLastSeen(Anope::CurTime);
+
 		Anope::string epass;
 		Anope::Encrypt(pass, epass);
 		nc->SetPassword(epass);
@@ -252,8 +254,7 @@ class CommandNSRegister : public Command
 			}
 		}
 
-		if (NickServ::Event::OnNickRegister)
-			NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, source.GetUser(), na, pass);
+		EventManager::Get()->Dispatch(&NickServ::Event::NickRegister::OnNickRegister, source.GetUser(), na, pass);
 
 		if (u)
 		{
@@ -296,7 +297,7 @@ class CommandNSResend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (!Config->GetModule(this->owner)->Get<Anope::string>("registration").equals_ci("mail"))
+		if (!Config->GetModule(this->GetOwner())->Get<Anope::string>("registration").equals_ci("mail"))
 		{
 			source.Reply(_("Access denied."));
 			return;
@@ -316,7 +317,7 @@ class CommandNSResend : public Command
 			return;
 		}
 
-		if (Anope::CurTime < source.nc->lastmail + Config->GetModule(this->owner)->Get<time_t>("resenddelay"))
+		if (Anope::CurTime < source.nc->lastmail + Config->GetModule(this->GetOwner())->Get<time_t>("resenddelay"))
 		{
 			source.Reply(_("Cannot send mail now; please retry a little later."));
 			return;
@@ -324,7 +325,7 @@ class CommandNSResend : public Command
 
 		if (!SendRegmail(source.GetUser(), na, source.service))
 		{
-			Log(this->owner) << "Unable to resend registration verification code for " << source.GetNick();
+			Log(this->GetOwner()) << "Unable to resend registration verification code for " << source.GetNick();
 			return;
 		}
 
@@ -335,7 +336,7 @@ class CommandNSResend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		if (!Config->GetModule(this->owner)->Get<Anope::string>("registration").equals_ci("mail"))
+		if (!Config->GetModule(this->GetOwner())->Get<Anope::string>("registration").equals_ci("mail"))
 			return false;
 
 		source.Reply(_("This command will resend you the registration confirmation email."));
@@ -344,7 +345,7 @@ class CommandNSResend : public Command
 
 	void OnServHelp(CommandSource &source) override
 	{
-		if (Config->GetModule(this->owner)->Get<Anope::string>("registration").equals_ci("mail"))
+		if (Config->GetModule(this->GetOwner())->Get<Anope::string>("registration").equals_ci("mail"))
 			Command::OnServHelp(source);
 	}
 };
@@ -362,14 +363,16 @@ class NSRegister : public Module
 
  public:
 	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::NickIdentify>(this)
+		, EventHook<NickServ::Event::PreNickExpire>(this)
 		, commandnsregister(this)
 		, commandnsconfirm(this)
 		, commandnsrsend(this)
-		, unconfirmed(this, NickServ::account, "UNCONFIRMED")
-		, passcode(this, NickServ::account, "passcode")
+		, unconfirmed(this, "UNCONFIRMED")
+		, passcode(this, "passcode")
 	{
 		if (Config->GetModule(this)->Get<Anope::string>("registration").equals_ci("disable"))
-			throw ModuleException("Module " + this->name + " will not load with registration disabled.");
+			throw ModuleException("Module " + Module::name + " will not load with registration disabled.");
 	}
 
 	void OnNickIdentify(User *u) override

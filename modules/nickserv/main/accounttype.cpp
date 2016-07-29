@@ -1,12 +1,11 @@
 #include "module.h"
 #include "accounttype.h"
-//#include "account.h"
 
-AccountType::AccountType(Module *me) : Serialize::Type<AccountImpl>(me, "NickCore")
-	, display(this, "display")
-	, pass(this, "pass")
-	, email(this, "email")
-	, language(this, "language")
+AccountType::AccountType(Module *me) : Serialize::Type<AccountImpl>(me)
+	, display(this, "display", &AccountImpl::display)
+	, pass(this, "pass", &AccountImpl::password)
+	, email(this, "email", &AccountImpl::email)
+	, language(this, "language", &AccountImpl::language)
 {
 
 }
@@ -29,7 +28,7 @@ void AccountType::Display::SetField(AccountImpl *acc, const Anope::string &disp)
 NickServ::Account *AccountType::FindAccount(const Anope::string &acc)
 {
 	Serialize::ID id;
-	EventReturn result = Event::OnSerialize(&Event::SerializeEvents::OnSerializeFind, this, &this->display, acc, id);
+	EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeFind, this, &this->display, acc, id);
 	if (result == EVENT_ALLOW)
 		return RequireID(id);
 

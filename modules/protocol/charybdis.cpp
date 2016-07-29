@@ -176,7 +176,7 @@ struct IRCDMessageEncap : IRCDMessage
 		if (params[1] == "CERTFP")
 		{
 			u->fingerprint = params[2];
-			Event::OnFingerprint(&Event::Fingerprint::OnFingerprint, u);
+			EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
 		}
 		/*
 		 * Received: :42X ENCAP * SASL 42XAAAAAH * S PLAIN

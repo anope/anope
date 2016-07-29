@@ -16,6 +16,7 @@ class Exception : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *NAME = "exception";
 
 	virtual Anope::string GetMask() anope_abstract;
 	virtual void SetMask(const Anope::string &) anope_abstract;
@@ -36,14 +37,14 @@ class Exception : public Serialize::Object
 	virtual void SetExpires(const time_t &) anope_abstract;
 };
 
-static Serialize::TypeReference<Exception> exception("Exception");
-
 class SessionService : public Service
 {
  public:
+	static constexpr const char *NAME = "session";
+	
  	typedef std::unordered_map<cidr, Session *, cidr::hash> SessionMap;
 
-	SessionService(Module *m) : Service(m, "SessionService", "session") { }
+	SessionService(Module *m) : Service(m, NAME) { }
 
 	virtual Exception *FindException(User *u) anope_abstract;
 
@@ -54,12 +55,14 @@ class SessionService : public Service
 	virtual SessionMap &GetSessions() anope_abstract;
 };
 
-static ServiceReference<SessionService> session_service("SessionService", "session");
-
 namespace Event
 {
 	struct CoreExport Exception : Events
 	{
+		static constexpr const char *NAME = "exception";
+
+		using Events::Events;
+
 		/** Called after an exception has been added
 		 * @param ex The exception
 		 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
@@ -74,4 +77,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::Exception> { static constexpr const char *const name = "Exception"; };

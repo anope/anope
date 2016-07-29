@@ -13,12 +13,12 @@
 
 static Anope::string UplinkSID;
 
-static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
-
 class RatboxProto : public IRCDProto
 {
+	ServiceReference<IRCDProto> hybrid; // XXX
  public:
 	RatboxProto(Module *creator) : IRCDProto(creator, "Ratbox 3.0+")
+		, hybrid("hybrid")
 	{
 		DefaultPseudoclientModes = "+oiS";
 		CanSNLine = true;
@@ -282,8 +282,8 @@ class ProtoRatbox : public Module
 		m_hybrid = ModuleManager::FindModule("hybrid");
 		if (!m_hybrid)
 			throw ModuleException("Unable to find hybrid");
-		if (!hybrid)
-			throw ModuleException("No protocol interface for hybrid");
+//		if (!hybrid)
+//			throw ModuleException("No protocol interface for hybrid");
 	}
 
 	~ProtoRatbox()

@@ -10,13 +10,15 @@ namespace Event
 {
 	struct CoreExport NickDrop : Events
 	{
+		static constexpr const char *NAME = "nickdrop";
+
+		using Events::Events;
+		
 		/** Called when a nick is dropped
 		 * @param source The source of the command
 		 * @param na The nick
 		 */
 		virtual void OnNickDrop(CommandSource &source, NickServ::Nick *na) anope_abstract;
 	};
-	extern CoreExport EventHandlers<NickDrop> OnNickDrop;
 }
 
-template<> struct EventName<Event::NickDrop> { static constexpr const char *const name = "OnNickDrop"; };

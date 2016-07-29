@@ -1,6 +1,8 @@
 /*
  *
- * (C) 2014 Anope Team
+ * (C) 2014-2016 Anope Team
+ * (C) 2016 Adam <Adam@anope.org>
+ *
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,6 +12,7 @@
 #pragma once
 
 #include "service.h"
+#include "base.h"
 
 /** Possible return types from events.
  */
@@ -20,9 +23,10 @@ enum EventReturn
 	EVENT_ALLOW
 };
 
-struct Events
+class Events : public Service
 {
-	virtual ~Events() = default;
+ public:
+	Events(Module *o, const Anope::string &ename) : Service(o, ename) { }
 };
 
 /* uninstantiated */
@@ -59,72 +63,31 @@ struct Caller<EventHandler, Func, EventReturn, Args...>
 	}
 };
 
-template<typename T>
-struct EventName;
-
 template<typename EventHandler>
 class EventHook;
 
 template<typename EventHandler>
-class EventHandlers : public Service
+class EventDispatcher
 {
-	std::vector<EventHandler *> handlers;
-	friend class EventHook<EventHandler>;
+	static_assert(std::is_base_of<Events, EventHandler>::value, "");
+
+	ServiceReferenceList<EventHandler> handlers;
 
  public:
-	EventHandlers(Module *o) : Service(o, "EventHandlers", EventName<EventHandler>::name)
-	{
-	}
+	EventDispatcher(const Anope::string &name) : handlers(name) { }
 
 	template<typename Func, typename... Args>
-	auto operator()(Func func, Args&&... args) -> decltype(((static_cast<EventHandler*>(nullptr))->*func)(args...))
+	auto Dispatch(Func func, Args&&... args) -> decltype(((static_cast<EventHandler*>(nullptr))->*func)(args...))
 	{
-		return Caller<EventHandler, Func, decltype(((static_cast<EventHandler*>(nullptr))->*func)(args...)), Args...>()(this->handlers, func, std::forward<Args>(args)...);
-	}
-};
-
-template<typename EventHandler>
-class EventHandlersReference
-{
-	ServiceReference<EventHandlers<EventHandler>> ref;
- public:
-	EventHandlersReference() : ref("EventHandlers", EventName<EventHandler>::name) { }
-
-	explicit operator bool()
-	{
-		return !!ref;
-	}
-
-	template<typename Func, typename... Args>
-	auto operator()(Func func, Args&&... args) -> decltype(((static_cast<EventHandler*>(nullptr))->*func)(args...))
-	{
-		return (**ref)(func, std::forward<Args>(args)...);
+		const std::vector<EventHandler *> h = this->handlers.GetServices();
+		return Caller<EventHandler, Func, decltype(((static_cast<EventHandler*>(nullptr))->*func)(args...)), Args...>()(h, func, std::forward<Args>(args)...);
 	}
 };
 
 template<typename EventHandler>
 class EventHook : public EventHandler
 {
-
-	struct ServiceReferenceListener : ServiceReference<EventHandlers<EventHandler>>
-	{
-		EventHook<EventHandler> *eh;
-
-		ServiceReferenceListener(EventHook<EventHandler> *t, const Anope::string &sname) : ServiceReference<EventHandlers<EventHandler>>("EventHandlers", sname), eh(t)
-		{
-		}
-
-		void OnAcquire() override
-		{
-			if (std::find((*this)->handlers.begin(), (*this)->handlers.end(), eh) == (*this)->handlers.end())
-			{
-				if (eh->priority == Priority::LAST)
-					(*this)->handlers.push_back(eh);
-				else
-					(*this)->handlers.insert((*this)->handlers.begin(), eh);
-			}
-		}
-	} handlers;
+	static_assert(std::is_base_of<Events, EventHandler>::value, "");
 
  public:
 	enum class Priority
@@ -134,26 +97,60 @@ class EventHook : public EventHandler
 	}
 	priority;
 
-	EventHook(Priority p = Priority::LAST) : handlers(this, EventName<EventHandler>::name), priority(p)
+	EventHook(Module *creator) : EventHook(creator, Priority::LAST) { }
+
+	EventHook(Module *creator, Priority p)
+		: EventHandler(creator, EventHandler::NAME)
+		, priority(p)
 	{
-		handlers.Check();
+#warning "priority doesnt work"
+	}
+};
+
+class EventManager
+{
+	Anope::hash_map<EventDispatcher<Events> *> cache;
+
+	template<typename T>
+	EventDispatcher<T> *GetDispatcher(const Anope::string &name)
+	{
+		auto it = cache.find(name);
+		if (it != cache.end())
+			return reinterpret_cast<EventDispatcher<T> *>(it->second);
+
+		auto dispatcher = new EventDispatcher<T>(name);
+		cache[name] = reinterpret_cast<EventDispatcher<Events> *>(dispatcher);
+		return dispatcher;
 	}
 
-	~EventHook()
-	{
-		if (!handlers)
-			return;
+	static EventManager *eventManager;
 
-		auto it = std::find(handlers->handlers.begin(), handlers->handlers.end(), this);
-		if (it != handlers->handlers.end())
-			handlers->handlers.erase(it);
+ public:
+	template<
+		typename Type,
+		typename Function,
+		typename... Args
+	>
+	auto Dispatch(Function Type::*func, Args&&... args) -> decltype(((static_cast<Type*>(nullptr))->*func)(args...))
+	{
+		static_assert(std::is_base_of<Events, Type>::value, "");
+
+		EventDispatcher<Type> *dispatcher = GetDispatcher<Type>(Type::NAME);
+		return dispatcher->Dispatch(func, std::forward<Args>(args)...);
 	}
+
+	static void Init();
+	static EventManager *Get();
 };
 
 namespace Event
 {
 	struct CoreExport PreUserKicked : Events
 	{
+		static constexpr const char *NAME = "preuserkicked";
+
+		using Events::Events;
+		
 		/** Called before a user has been kicked from a channel.
 		 * @param source The kicker
 		 * @param cu The user, channel, and status of the user being kicked
@@ -162,10 +159,13 @@ namespace Event
 		 */
 		virtual EventReturn OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_abstract;
 	};
-	extern CoreExport EventHandlers<PreUserKicked> OnPreUserKicked;
 
 	struct CoreExport UserKicked : Events
 	{
+		static constexpr const char *NAME = "userkicked";
+
+		using Events::Events;
+
 		/** Called when a user has been kicked from a channel.
 		 * @param source The kicker
 		 * @param target The user being kicked
@@ -175,10 +175,13 @@ namespace Event
 		 */
 		virtual void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) anope_abstract;
 	};
-	extern CoreExport EventHandlers<UserKicked> OnUserKicked;
 
 	struct CoreExport PreBotAssign : Events
 	{
+		static constexpr const char *NAME = "prebotassign";
+
+		using Events::Events;
+
 		/** Called before a bot is assigned to a channel.
 		 * @param sender The user assigning the bot
 		 * @param ci The channel the bot is to be assigned to.
@@ -187,18 +190,24 @@ namespace Event
 		 */
 		virtual EventReturn OnPreBotAssign(User *sender, ChanServ::Channel *ci, ServiceBot *bi) anope_abstract;
 	};
-	extern CoreExport EventHandlers<PreBotAssign> OnPreBotAssign;
 
 	struct CoreExport BotAssign : Events
 	{
+		static constexpr const char *NAME = "botassign";
+
+		using Events::Events;
+
 		/** Called when a bot is assigned ot a channel
 		 */
 		virtual void OnBotAssign(User *sender, ChanServ::Channel *ci, ServiceBot *bi) anope_abstract;
 	};
-	extern CoreExport EventHandlers<BotAssign> OnBotAssign;
 
 	struct CoreExport BotUnAssign : Events
 	{
+		static constexpr const char *NAME = "botunassign";
+
+		using Events::Events;
+
 		/** Called before a bot is unassigned from a channel.
 		 * @param sender The user unassigning the bot
 		 * @param ci The channel the bot is being removed from
@@ -206,40 +215,51 @@ namespace Event
 		 */
 		virtual EventReturn OnBotUnAssign(User *sender, ChanServ::Channel *ci) anope_abstract;
 	};
-	extern CoreExport EventHandlers<BotUnAssign> OnBotUnAssign;
 
 	struct CoreExport UserConnect : Events
 	{
+		static constexpr const char *NAME = "userconnect";
+
+		using Events::Events;
+
 		/** Called when a new user connects to the network.
 		 * @param u The connecting user.
 		 * @param exempt set to true/is true if the user should be excepted from bans etc
 		 */
 		virtual void OnUserConnect(User *u, bool &exempt) anope_abstract;
 	};
-	extern CoreExport EventHandlers<UserConnect> OnUserConnect;
 
 	struct CoreExport NewServer : Events
 	{
+		static constexpr const char *NAME = "newserver";
+
+		using Events::Events;
+
 		/** Called when a new server connects to the network.
 		 * @param s The server that has connected to the network
 		 */
 		virtual void OnNewServer(Server *s) anope_abstract;
 	};
-	extern CoreExport EventHandlers<NewServer> OnNewServer;
 
 	struct CoreExport UserNickChange : Events
 	{
+		static constexpr const char *NAME = "usernickchange";
+
+		using Events::Events;
+
 		/** Called after a user changed the nick
 		 * @param u The user.
 		 * @param oldnick The old nick of the user
 		 */
 		virtual void OnUserNickChange(User *u, const Anope::string &oldnick) anope_abstract;
 	};
-	extern CoreExport EventHandlers<UserNickChange> OnUserNickChange;
-
 
 	struct CoreExport PreCommand : Events
 	{
+		static constexpr const char *NAME = "precommand";
+
+		using Events::Events;
+
 		/** Called before a command is due to be executed.
 		 * @param source The source of the command
 		 * @param command The command the user is executing
@@ -248,10 +268,13 @@ namespace Event
 		 */
 		virtual EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_abstract;
 	};
-	extern CoreExport EventHandlers<PreCommand> OnPreCommand;
 
 	struct CoreExport PostCommand : Events
 	{
+		static constexpr const char *NAME = "postcommand";
+
+		using Events::Events;
+
 		/** Called after a command has been executed.
 		 * @param source The source of the command
 		 * @param command The command the user executed
@@ -259,68 +282,90 @@ namespace Event
 		 */
 		virtual void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params) anope_abstract;
 	};
-	extern CoreExport EventHandlers<PostCommand> OnPostCommand;
 
 	struct CoreExport SaveDatabase : Events
 	{
+		static constexpr const char *NAME = "savedatabase";
+
+		using Events::Events;
+
 		/** Called when the databases are saved
 		 */
 		virtual void OnSaveDatabase() anope_abstract;
 	};
-	extern CoreExport EventHandlers<SaveDatabase> OnSaveDatabase;
 
 	struct CoreExport LoadDatabase : Events
 	{
+		static constexpr const char *NAME = "loaddatabase";
+
+		using Events::Events;
+
 		/** Called when the databases are loaded
 		 * @return EVENT_CONTINUE to let other modules continue loading, EVENT_STOP to stop
 		 */
 		virtual EventReturn OnLoadDatabase() anope_abstract;
 	};
-	extern CoreExport EventHandlers<LoadDatabase> OnLoadDatabase;
 
 	struct CoreExport Encrypt : Events
 	{
+		static constexpr const char *NAME = "encrypt";
+
+		using Events::Events;
+
 		/** Called when anope needs to check passwords against encryption
 		 *  see src/encrypt.c for detailed informations
 		 */
 		virtual EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_abstract;
 	};
-	extern CoreExport EventHandlers<Encrypt> OnEncrypt;
 
 	struct CoreExport Decrypt : Events
 	{
+		static constexpr const char *NAME = "decrypt";
+
+		using Events::Events;
+
 		virtual EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest) anope_abstract;
 	};
-	extern CoreExport EventHandlers<Decrypt> OnDecrypt;
-
-
 
 	struct CoreExport CreateBot : Events
 	{
+		static constexpr const char *NAME = "createbot";
+
+		using Events::Events;
+
 		/** Called when a bot is created or destroyed
 		 */
 		virtual void OnCreateBot(ServiceBot *bi) anope_abstract;
 	};
-	extern CoreExport EventHandlers<CreateBot> OnCreateBot;
 
 	struct CoreExport DelBot : Events
 	{
+		static constexpr const char *NAME = "delbot";
+
+		using Events::Events;
+		
 		virtual void OnDelBot(ServiceBot *bi) anope_abstract;
 	};
-	extern CoreExport EventHandlers<DelBot> OnDelBot;
 
 	struct CoreExport PrePartChannel : Events
 	{
+		static constexpr const char *NAME = "prepartchannel";
+
+		using Events::Events;
+
 		/** Called before a user parts a channel
 		 * @param u The user
 		 * @param c The channel
 		 */
 		virtual void OnPrePartChannel(User *u, Channel *c) anope_abstract;
 	};
-	extern CoreExport EventHandlers<PrePartChannel> OnPrePartChannel;
 
 	struct CoreExport PartChannel : Events
 	{
+		static constexpr const char *NAME = "partchannel";
+
+		using Events::Events;
+
 		/** Called when a user parts a channel
 		 * @param u The user
 		 * @param c The channel, may be NULL if the channel no longer exists
@@ -329,10 +374,13 @@ namespace Event
 		 */
 		virtual void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg) anope_abstract;
 	};
-	extern CoreExport EventHandlers<PartChannel> OnPartChannel;
 
 	struct CoreExport LeaveChannel : Events
 	{
+		static constexpr const char *NAME = "leavechannel";
+
+		using Events::Events;
+
 		/** Called when a user leaves a channel.
 		 * From either parting, being kicked, or quitting/killed!
 		 * @param u The user
@@ -340,10 +388,13 @@ namespace Event
 		 */
 		virtual void OnLeaveChannel(User *u, Channel *c) anope_abstract;
 	};
-	extern CoreExport EventHandlers<LeaveChannel> OnLeaveChannel;
 
 	struct CoreExport JoinChannel : Events
 	{
+		static constexpr const char *NAME = "joinchannel";
+
+		using Events::Events;
+
 		/** Called after a user joins a channel
 		 * If this event triggers the user is allowed to be in the channel, and will
 		 * not be kicked for restricted/akick/forbidden, etc. If you want to kick the user,
@@ -353,10 +404,13 @@ namespace Event
 		 */
 		virtual void OnJoinChannel(User *u, Channel *c) anope_abstract;
 	};
-	extern CoreExport EventHandlers<JoinChannel> OnJoinChannel;
 
 	struct CoreExport TopicUpdated : Events
 	{
+		static constexpr const char *NAME = "topicupdated";
+
+		using Events::Events;
+
 		/** Called when a new topic is set
 		 * @param source
 		 * @param c The channel
@@ -365,58 +419,79 @@ namespace Event
 		 */
 		virtual void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) anope_abstract;
 	};
-	extern CoreExport EventHandlers<TopicUpdated> OnTopicUpdated;
 
 	struct CoreExport PreServerConnect : Events
 	{
+		static constexpr const char *NAME = "preserverconnect";
+
+		using Events::Events;
+
 		/** Called before Anope connecs to its uplink
 		 */
 		virtual void OnPreServerConnect() anope_abstract;
 	};
-	extern CoreExport EventHandlers<PreServerConnect> OnPreServerConnect;
 
 	struct CoreExport ServerConnect : Events
 	{
+		static constexpr const char *NAME = "serverconnect";
+
+		using Events::Events;
+
 		/** Called when Anope connects to its uplink
 		 */
 		virtual void OnServerConnect() anope_abstract;
 	};
-	extern CoreExport EventHandlers<ServerConnect> OnServerConnect;
 
 	struct CoreExport PreUplinkSync : Events
 	{
+		static constexpr const char *NAME = "preuplinksync";
+
+		using Events::Events;
+
 		/** Called when we are almost done synching with the uplink, just before we send the EOB
 		 */
 		virtual void OnPreUplinkSync(Server *serv) anope_abstract;
 	};
-	extern CoreExport EventHandlers<PreUplinkSync> OnPreUplinkSync;
 
 	struct CoreExport ServerDisconnect : Events
 	{
+		static constexpr const char *NAME = "serverdisconnect";
+
+		using Events::Events;
+
 		/** Called when Anope disconnects from its uplink, before it tries to reconnect
 		 */
 		virtual void OnServerDisconnect() anope_abstract;
 	};
-	extern CoreExport EventHandlers<ServerDisconnect> OnServerDisconnect;
 
 	struct CoreExport Restart : Events
 	{
+		static constexpr const char *NAME = "restart";
+
+		using Events::Events;
+
 		/** Called when services restart
 		*/
 		virtual void OnRestart() anope_abstract;
 	};
-	extern CoreExport EventHandlers<Restart> OnRestart;
 
 	struct CoreExport Shutdown : Events
 	{
+		static constexpr const char *NAME = "shutdown";
+
+		using Events::Events;
+
 		/** Called when services shutdown
 		 */
 		virtual void OnShutdown() anope_abstract;
 	};
-	extern CoreExport EventHandlers<Shutdown> OnShutdown;
 
 	struct CoreExport AddXLine : Events
 	{
+		static constexpr const char *NAME = "addxline";
+
+		using Events::Events;
+
 		/** Called before a XLine is added
 		 * @param source The source of the XLine
 		 * @param x The XLine
@@ -425,10 +500,13 @@ namespace Event
 		 */
 		virtual EventReturn OnAddXLine(CommandSource &source, const XLine *x, XLineManager *xlm) anope_abstract;
 	};
-	extern CoreExport EventHandlers<AddXLine> OnAddXLine;
 
 	struct CoreExport DelXLine : Events
 	{
+		static constexpr const char *NAME = "delxline";
+
+		using Events::Events;
+
 		/** Called before a XLine is deleted
 		 * @param source The source of the XLine
 		 * @param x The XLine
@@ -436,39 +514,51 @@ namespace Event
 		 */
 		virtual void OnDelXLine(CommandSource &source, const XLine *x, XLineManager *xlm) anope_abstract;
 	};
-	extern CoreExport EventHandlers<DelXLine> OnDelXLine;
 
 	struct CoreExport IsServicesOperEvent : Events
 	{
+		static constexpr const char *NAME = "isservicesoper";
+
+		using Events::Events;
+
 		/** Called when a user is checked for whether they are a services oper
 		 * @param u The user
 		 * @return EVENT_ALLOW to allow, anything else to deny
 		 */
 		virtual EventReturn IsServicesOper(User *u) anope_abstract;
 	};
-	extern CoreExport EventHandlers<IsServicesOperEvent> OnIsServicesOper;
 
 	struct CoreExport ServerQuit : Events
 	{
+		static constexpr const char *NAME = "serverquit";
+
+		using Events::Events;
+
 		/** Called when a server quits
 		 * @param server The server
 		 */
 		virtual void OnServerQuit(Server *server) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ServerQuit> OnServerQuit;
 
 	struct CoreExport UserQuit : Events
 	{
+		static constexpr const char *NAME = "userquit";
+
+		using Events::Events;
+
 		/** Called when a user quits, or is killed
 		 * @param u The user
 		 * @param msg The quit message
 		 */
 		virtual void OnUserQuit(User *u, const Anope::string &msg) anope_abstract;
 	};
-	extern CoreExport EventHandlers<UserQuit> OnUserQuit;
 
 	struct CoreExport PreUserLogoff : Events
 	{
+		static constexpr const char *NAME = "preuserlogoff";
+
+		using Events::Events;
+
 		/** Called when a user is quit, before and after being internally removed from
 		 * This is different from OnUserQuit, which takes place at the time of the quit.
 		 * This happens shortly after when all message processing is finished.
@@ -477,16 +567,22 @@ namespace Event
 		 */
 		virtual void OnPreUserLogoff(User *u) anope_abstract;
 	};
-	extern CoreExport EventHandlers<PreUserLogoff> OnPreUserLogoff;
 
 	struct CoreExport PostUserLogoff : Events
 	{
+		static constexpr const char *NAME = "postuserlogoff";
+
+		using Events::Events;
+
 		virtual void OnPostUserLogoff(User *u) anope_abstract;
 	};
-	extern CoreExport EventHandlers<PostUserLogoff> OnPostUserLogoff;
 
 	struct CoreExport AccessDel : Events
 	{
+		static constexpr const char *NAME = "accessdel";
+
+		using Events::Events;
+
 		/** Called after an access entry is deleted from a channel
 		 * @param ci The channel
 		 * @param source The source of the command
@@ -494,10 +590,13 @@ namespace Event
 		 */
 		virtual void OnAccessDel(ChanServ::Channel *ci, CommandSource &source, ChanServ::ChanAccess *access) anope_abstract;
 	};
-	extern CoreExport EventHandlers<AccessDel> OnAccessDel;
 
 	struct CoreExport AccessAdd : Events
 	{
+		static constexpr const char *NAME = "accessadd";
+
+		using Events::Events;
+
 		/** Called when access is added
 		 * @param ci The channel
 		 * @param source The source of the command
@@ -505,68 +604,75 @@ namespace Event
 		 */
 		virtual void OnAccessAdd(ChanServ::Channel *ci, CommandSource &source, ChanServ::ChanAccess *access) anope_abstract;
 	};
-	extern CoreExport EventHandlers<AccessAdd> OnAccessAdd;
 
 	struct CoreExport AccessClear : Events
 	{
+		static constexpr const char *NAME = "accessclear";
+
+		using Events::Events;
+		
 		/** Called when the access list is cleared
 		 * @param ci The channel
 		 * @param u The user who cleared the access
 		 */
 		virtual void OnAccessClear(ChanServ::Channel *ci, CommandSource &source) anope_abstract;
 	};
-	extern CoreExport EventHandlers<AccessClear> OnAccessClear;
 
 	struct CoreExport ChanRegistered : Events
 	{
+		static constexpr const char *NAME = "chanregistered";
+
+		using Events::Events;
+
 		/** Called when a channel is registered
 		 * @param ci The channel
 		 */
 		virtual void OnChanRegistered(ChanServ::Channel *ci) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ChanRegistered> OnChanRegistered;
-
-
-	struct CoreExport CreateChan : Events
-	{
-		/** Called when a channel is being created, for any reason
-		 * @param ci The channel
-		 */
-		virtual void OnCreateChan(ChanServ::Channel *ci) anope_abstract;
-	};
-	extern CoreExport EventHandlers<CreateChan> OnCreateChan;
 
 	struct CoreExport DelChan : Events
 	{
+		static constexpr const char *NAME = "delchan";
+
+		using Events::Events;
+
 		/** Called when a channel is being deleted, for any reason
 		 * @param ci The channel
 		 */
 		virtual void OnDelChan(ChanServ::Channel *ci) anope_abstract;
 	};
-	extern CoreExport EventHandlers<DelChan> OnDelChan;
 
 	struct CoreExport ChannelCreate : Events
 	{
+		static constexpr const char *NAME = "channelcreate";
+
+		using Events::Events;
+
 		/** Called when a new channel is created
 		 * Note that this channel may not be introduced to the uplink at this point.
 		 * @param c The channel
 		 */
 		virtual void OnChannelCreate(Channel *c) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ChannelCreate> OnChannelCreate;
 
 	struct CoreExport ChannelDelete : Events
 	{
+		static constexpr const char *NAME = "channeldelete";
+
+		using Events::Events;
+
 		/** Called when a channel is deleted
 		 * @param c The channel
 		 */
 		virtual void OnChannelDelete(Channel *c) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ChannelDelete> OnChannelDelete;
-
 
 	struct CoreExport CheckKick : Events
 	{
+		static constexpr const char *NAME = "checkkick";
+
+		using Events::Events;
+
 		/** Called after a user join a channel when we decide whether to kick them or not
 		 * @param u The user
 		 * @param c The channel
@@ -577,10 +683,13 @@ namespace Event
 		 */
 		virtual EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_abstract;
 	};
-	extern CoreExport EventHandlers<CheckKick> OnCheckKick;
 
 	struct CoreExport CheckPriv : Events
 	{
+		static constexpr const char *NAME = "checkpriv";
+
+		using Events::Events;
+
 		/** Checks if access has the channel privilege 'priv'.
 		 * @param access THe access struct
 		 * @param priv The privilege being checked for
@@ -588,10 +697,13 @@ namespace Event
 		 */
 		virtual EventReturn OnCheckPriv(const ChanServ::ChanAccess *access, const Anope::string &priv) anope_abstract;
 	};
-	extern CoreExport EventHandlers<CheckPriv> OnCheckPriv;
 
 	struct CoreExport GroupCheckPriv : Events
 	{
+		static constexpr const char *NAME = "groupcheckpriv";
+
+		using Events::Events;
+
 		/** Check whether an access group has a privilege
 		 * @param group The group
 		 * @param priv The privilege
@@ -599,134 +711,162 @@ namespace Event
 		 */
 		virtual EventReturn OnGroupCheckPriv(const ChanServ::AccessGroup *group, const Anope::string &priv) anope_abstract;
 	};
-	extern CoreExport EventHandlers<GroupCheckPriv> OnGroupCheckPriv;
 
 	struct CoreExport NickIdentify : Events
 	{
+		static constexpr const char *NAME = "nickidentify";
+
+		using Events::Events;
+
 		/** Called when a user identifies to a nick
 		 * @param u The user
 		 */
 		virtual void OnNickIdentify(User *u) anope_abstract;
 	};
-	extern CoreExport EventHandlers<NickIdentify> OnNickIdentify;
 
 	struct CoreExport UserLogin : Events
 	{
+		static constexpr const char *NAME = "userlogin";
+
+		using Events::Events;
+
 		/** Called when a user is logged into an account
 		 * @param u The user
 		 */
 		virtual void OnUserLogin(User *u) anope_abstract;
 	};
-	extern CoreExport EventHandlers<UserLogin> OnUserLogin;
 
 	struct CoreExport NickLogout : Events
 	{
+		static constexpr const char *NAME = "nicklogout";
+
+		using Events::Events;
+
 		/** Called when a nick logs out
 		 * @param u The nick
 		 */
 		virtual void OnNickLogout(User *u) anope_abstract;
 	};
-	extern CoreExport EventHandlers<NickLogout> OnNickLogout;
 
 	struct CoreExport DelNick : Events
 	{
+		static constexpr const char *NAME = "delnick";
+
+		using Events::Events;
+
 		/** Called on delnick()
-		 * @ param na pointer to the nickalias
+		 * @param na pointer to the nickalias
 		 */
 		virtual void OnDelNick(NickServ::Nick *na) anope_abstract;
 	};
-	extern CoreExport EventHandlers<DelNick> OnDelNick;
-
-	struct CoreExport NickCoreCreate : Events
-	{
-		/** Called when a nickcore is created
-		 * @param nc The nickcore
-		 */
-		virtual void OnNickCoreCreate(NickServ::Account *nc) anope_abstract;
-	};
-	extern CoreExport EventHandlers<NickCoreCreate> OnNickCoreCreate;
 
 	struct CoreExport DelCore : Events
 	{
+		static constexpr const char *NAME = "delcore";
+
+		using Events::Events;
+
 		/** Called on delcore()
 		 * @param nc pointer to the NickServ::Account
 		 */
 		virtual void OnDelCore(NickServ::Account *nc) anope_abstract;
 	};
-	extern CoreExport EventHandlers<DelCore> OnDelCore;
 
 	struct CoreExport ChangeCoreDisplay : Events
 	{
+		static constexpr const char *NAME = "changecoredisplay";
+
+		using Events::Events;
+
 		/** Called on change_core_display()
 		 * @param nc pointer to the NickServ::Account
 		 * @param newdisplay the new display
 		 */
 		virtual void OnChangeCoreDisplay(NickServ::Account *nc, const Anope::string &newdisplay) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ChangeCoreDisplay> OnChangeCoreDisplay;
 
 	struct CoreExport NickClearAccess : Events
 	{
+		static constexpr const char *NAME = "nickclearaccess";
+
+		using Events::Events;
+
 		/** called from NickServ::Account::ClearAccess()
 		 * @param nc pointer to the NickServ::Account
 		 */
 		virtual void OnNickClearAccess(NickServ::Account *nc) anope_abstract;
 	};
-	extern CoreExport EventHandlers<NickClearAccess> OnNickClearAccess;
 
 	struct CoreExport NickAddAccess : Events
 	{
+		static constexpr const char *NAME = "nickaddaccess";
+
+		using Events::Events;
+
 		/** Called when a user adds an entry to their access list
 		 * @param nc The nick
 		 * @param entry The entry
 		 */
 		virtual void OnNickAddAccess(NickServ::Account *nc, const Anope::string &entry) anope_abstract;
 	};
-	extern CoreExport EventHandlers<NickAddAccess> OnNickAddAccess;
 
 	struct CoreExport NickEraseAccess : Events
 	{
+		static constexpr const char *NAME = "nickeraseaccess";
+
+		using Events::Events;
+
 		/** Called from NickServ::Account::EraseAccess()
 		 * @param nc pointer to the NickServ::Account
 		 * @param entry The access mask
 		 */
 		virtual void OnNickEraseAccess(NickServ::Account *nc, const Anope::string &entry) anope_abstract;
 	};
-	extern CoreExport EventHandlers<NickEraseAccess> OnNickEraseAccess;
-
-
 
 	struct CoreExport CheckAuthentication : Events
 	{
+		static constexpr const char *NAME = "checkauthentication";
+
+		using Events::Events;
+
 		/** Check whether a username and password is correct
 		 * @param u The user trying to identify, if applicable.
 		 * @param req The login request
 		 */
 		virtual void OnCheckAuthentication(User *u, NickServ::IdentifyRequest *req) anope_abstract;
 	};
-	extern CoreExport EventHandlers<CheckAuthentication> OnCheckAuthentication;
 
 	struct CoreExport Fingerprint : Events
 	{
+		static constexpr const char *NAME = "fingerprint";
+
+		using Events::Events;
+
 		/** Called when we get informed about a users SSL fingerprint
 		 *  when we call this, the fingerprint should already be stored in the user struct
 		 * @param u pointer to the user
 		 */
 		virtual void OnFingerprint(User *u) anope_abstract;
 	};
-	extern CoreExport EventHandlers<Fingerprint> OnFingerprint;
 
 	struct CoreExport UserAway : Events
 	{
+		static constexpr const char *NAME = "useraway";
+
+		using Events::Events;
+
 		/** Called when a user becomes (un)away
 		 * @param message The message, is .empty() if unaway
 		 */
 		virtual void OnUserAway(User *u, const Anope::string &message) anope_abstract;
 	};
-	extern CoreExport EventHandlers<UserAway> OnUserAway;
 
 	struct CoreExport Invite : Events
 	{
+		static constexpr const char *NAME = "invite";
+
+		using Events::Events;
+
 		/** Called when a user invites one of our users to a channel
 		 * @param source The user doing the inviting
 		 * @param c The channel the user is inviting to
@@ -734,28 +874,37 @@ namespace Event
 		 */
 		virtual void OnInvite(User *source, Channel *c, User *targ) anope_abstract;
 	};
-	extern CoreExport EventHandlers<Invite> OnInvite;
 
 	struct CoreExport SetVhost : Events
 	{
+		static constexpr const char *NAME = "setvhost";
+
+		using Events::Events;
+
 		/** Called when a vhost is set
 		 * @param na The nickalias of the vhost
 		 */
 		virtual void OnSetVhost(NickServ::Nick *na) anope_abstract;
 	};
-	extern CoreExport EventHandlers<SetVhost> OnSetVhost;
 
 	struct CoreExport SetDisplayedHost : Events
 	{
+		static constexpr const char *NAME = "setdisplayedhost";
+
+		using Events::Events;
+
 		/** Called when a users host changes
 		 * @param u The user
 		 */
 		virtual void OnSetDisplayedHost(User *) anope_abstract;
 	};
-	extern CoreExport EventHandlers<SetDisplayedHost> OnSetDisplayedHost;
 
 	struct CoreExport ChannelModeSet : Events
 	{
+		static constexpr const char *NAME = "channelmodeset";
+
+		using Events::Events;
+
 		/** Called when a mode is set on a channel
 		 * @param c The channel
 		 * @param setter The user or server that is setting the mode
@@ -765,10 +914,13 @@ namespace Event
 		 */
 		virtual EventReturn OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ChannelModeSet> OnChannelModeSet;
 
 	struct CoreExport ChannelModeUnset : Events
 	{
+		static constexpr const char *NAME = "channelmodeunset";
+
+		using Events::Events;
+
 		/** Called when a mode is unset on a channel
 		 * @param c The channel
 		 * @param setter The user or server that is unsetting the mode
@@ -778,10 +930,13 @@ namespace Event
 		 */
 		virtual EventReturn OnChannelModeUnset(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ChannelModeUnset> OnChannelModeUnset;
 
 	struct CoreExport UserModeSet : Events
 	{
+		static constexpr const char *NAME = "usermodeset";
+
+		using Events::Events;
+
 		/** Called when a mode is set on a user
 		 * @param setter who/what is setting the mode
 		 * @param u The user
@@ -789,10 +944,13 @@ namespace Event
 		 */
 		virtual void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_abstract;
 	};
-	extern CoreExport EventHandlers<UserModeSet> OnUserModeSet;
 
 	struct CoreExport UserModeUnset : Events
 	{
+		static constexpr const char *NAME = "usermodeunset";
+
+		using Events::Events;
+
 		/** Called when a mode is unset from a user
 		 * @param setter who/what is setting the mode
 		 * @param u The user
@@ -800,66 +958,87 @@ namespace Event
 		 */
 		virtual void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) anope_abstract;
 	};
-	extern CoreExport EventHandlers<UserModeUnset> OnUserModeUnset;
 
 	struct CoreExport ChannelModeAdd : Events
 	{
+		static constexpr const char *NAME = "channelmodeadd";
+
+		using Events::Events;
+
 		/** Called when a channel mode is introducted into Anope
 		 * @param cm The mode
 		 */
 		virtual void OnChannelModeAdd(ChannelMode *cm) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ChannelModeAdd> OnChannelModeAdd;
 
 	struct CoreExport UserModeAdd : Events
 	{
+		static constexpr const char *NAME = "usermodeadd";
+
+		using Events::Events;
+
 		/** Called when a user mode is introducted into Anope
 		 * @param um The mode
 		 */
 		virtual void OnUserModeAdd(UserMode *um) anope_abstract;
 	};
-	extern CoreExport EventHandlers<UserModeAdd> OnUserModeAdd;
 
 	struct CoreExport ModuleLoad : Events
 	{
+		static constexpr const char *NAME = "moduleload";
+
+		using Events::Events;
+
 		/** Called after a module is loaded
 		 * @param u The user loading the module, can be NULL
 		 * @param m The module
 		 */
 		virtual void OnModuleLoad(User *u, Module *m) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ModuleLoad> OnModuleLoad;
 
 	struct CoreExport ModuleUnload : Events
 	{
+		static constexpr const char *NAME = "moduleunload";
+
+		using Events::Events;
+
 		/** Called before a module is unloaded
 		 * @param u The user, can be NULL
 		 * @param m The module
 		 */
 		virtual void OnModuleUnload(User *u, Module *m) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ModuleUnload> OnModuleUnload;
 
 	struct CoreExport ServerSync : Events
 	{
+		static constexpr const char *NAME = "serversync";
+
+		using Events::Events;
+
 		/** Called when a server is synced
 		 * @param s The server, can be our uplink server
 		 */
 		virtual void OnServerSync(Server *s) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ServerSync> OnServerSync;
 
 	struct CoreExport UplinkSync : Events
 	{
+		static constexpr const char *NAME = "uplinksync";
+
+		using Events::Events;
+
 		/** Called when we sync with our uplink
 		 * @param s Our uplink
 		 */
 		virtual void OnUplinkSync(Server *s) anope_abstract;
 	};
-	extern CoreExport EventHandlers<UplinkSync> OnUplinkSync;
 
 	struct CoreExport BotPrivmsg : Events
 	{
+		static constexpr const char *NAME = "botprivmsg";
+
+		using Events::Events;
+
 		/** Called when we receive a PRIVMSG for one of our clients
 		 * @param u The user sending the PRIVMSG
 		 * @param bi The target of the PRIVMSG
@@ -868,10 +1047,13 @@ namespace Event
 		 */
 		virtual EventReturn OnBotPrivmsg(User *u, ServiceBot *bi, Anope::string &message) anope_abstract;
 	};
-	extern CoreExport EventHandlers<BotPrivmsg> OnBotPrivmsg;
 
 	struct CoreExport BotNotice : Events
 	{
+		static constexpr const char *NAME = "botnotice";
+
+		using Events::Events;
+
 		/** Called when we receive a NOTICE for one of our clients
 		 * @param u The user sending the NOTICE
 		 * @param bi The target of the NOTICE
@@ -879,10 +1061,13 @@ namespace Event
 		 */
 		virtual void OnBotNotice(User *u, ServiceBot *bi, Anope::string &message) anope_abstract;
 	};
-	extern CoreExport EventHandlers<BotNotice> OnBotNotice;
 
 	struct CoreExport Privmsg : Events
 	{
+		static constexpr const char *NAME = "privmsg";
+
+		using Events::Events;
+
 		/** Called when we receive a PRIVMSG for a registered channel we are in
 		 * @param u The source of the message
 		 * @param c The channel
@@ -890,19 +1075,25 @@ namespace Event
 		 */
 		virtual void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_abstract;
 	};
-	extern CoreExport EventHandlers<Privmsg> OnPrivmsg;
 
 	struct CoreExport Log : Events
 	{
+		static constexpr const char *NAME = "log";
+
+		using Events::Events;
+
 		/** Called when a message is logged
 		 * @param l The log message
 		 */
 		virtual void OnLog(::Log *l) anope_abstract;
 	};
-	extern CoreExport EventHandlers<Log> OnLog;
 
 	struct CoreExport LogMessage : Events
 	{
+		static constexpr const char *NAME = "logmessage";
+
+		using Events::Events;
+
 		/** Called when a log message is actually logged to a given log info
 		 * The message has already passed validation checks by the LogInfo
 		 * @param li The loginfo whee the message is being logged
@@ -911,20 +1102,26 @@ namespace Event
 		 */
 		virtual void OnLogMessage(LogInfo *li, const ::Log *l, const Anope::string &msg) anope_abstract;
 	};
-	extern CoreExport EventHandlers<LogMessage> OnLogMessage;
 
 	struct CoreExport CheckModes : Events
 	{
+		static constexpr const char *NAME = "checkmodes";
+
+		using Events::Events;
+
 		/** Called when a channels modes are being checked to see if they are allowed,
 		 * mostly to ensure mlock/+r are set.
 		 * @param c The channel
 		 */
 		virtual void OnCheckModes(Reference<Channel> &c) anope_abstract;
 	};
-	extern CoreExport EventHandlers<CheckModes> OnCheckModes;
 
 	struct CoreExport ChannelSync : Events
 	{
+		static constexpr const char *NAME = "channelsync";
+
+		using Events::Events;
+
 		/** Called when a channel is synced.
 		 * Channels are synced after a sjoin is finished processing
 		 * for a newly created channel to set the correct modes, topic,
@@ -932,10 +1129,13 @@ namespace Event
 		 */
 		virtual void OnChannelSync(Channel *c) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ChannelSync> OnChannelSync;
 
 	struct CoreExport SetCorrectModes : Events
 	{
+		static constexpr const char *NAME = "setcorrectmodes";
+
+		using Events::Events;
+
 		/** Called to set the correct modes on the user on the given channel
 		 * @param user The user
 		 * @param chan The channel
@@ -945,10 +1145,13 @@ namespace Event
 		 */
 		virtual void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) anope_abstract;
 	};
-	extern CoreExport EventHandlers<SetCorrectModes> OnSetCorrectModes;
 
 	struct CoreExport Message : Events
 	{
+		static constexpr const char *NAME = "message";
+
+		using Events::Events;
+
 		/** Called whenever a message is received from the uplink
 		 * @param source The source of the message
 		 * @param command The command being executed
@@ -957,35 +1160,47 @@ namespace Event
 		 */
 		virtual EventReturn OnMessage(MessageSource &source, Anope::string &command, std::vector<Anope::string> &param) anope_abstract;
 	};
-	extern CoreExport EventHandlers<Message> OnMessage;
 
 	struct CoreExport CanSet : Events
 	{
+		static constexpr const char *NAME = "canset";
+
+		using Events::Events;
+
 		/** Called to determine if a chnanel mode can be set by a user
 		 * @param u The user
 		 * @param cm The mode
 		 */
 		virtual EventReturn OnCanSet(User *u, const ChannelMode *cm) anope_abstract;
 	};
-	extern CoreExport EventHandlers<CanSet> OnCanSet;
 
 	struct CoreExport CheckDelete : Events
 	{
+		static constexpr const char *NAME = "checkdelete";
+
+		using Events::Events;
+
 		virtual EventReturn OnCheckDelete(Channel *) anope_abstract;
 	};
-	extern CoreExport EventHandlers<CheckDelete> OnCheckDelete;
 
 	struct CoreExport ExpireTick : Events
 	{
+		static constexpr const char *NAME = "expiretick";
+
+		using Events::Events;
+
 		/** Called every options:expiretimeout seconds. Should be used to expire nicks,
 		 * channels, etc.
 		 */
 		virtual void OnExpireTick() anope_abstract;
 	};
-	extern CoreExport EventHandlers<ExpireTick> OnExpireTick;
 
 	struct CoreExport SerializeEvents : Events
 	{
+		static constexpr const char *NAME = "serialize";
+
+		using Events::Events;
+		
 		virtual EventReturn OnSerializeList(Serialize::TypeBase *type, std::vector<Serialize::ID> &ids) anope_abstract;
 
 		virtual EventReturn OnSerializeFind(Serialize::TypeBase *type, Serialize::FieldBase *field, const Anope::string &value, Serialize::ID &id) anope_abstract;
@@ -1014,91 +1229,4 @@ namespace Event
 
 		virtual void OnSerializableCreate(Serialize::Object *) anope_abstract;
 	};
-	extern CoreExport EventHandlers<SerializeEvents> OnSerialize;
 }
-
-template<> struct EventName<Event::PreUserKicked> { static constexpr const char *const name = "OnPreUserKicked"; };
-template<> struct EventName<Event::UserKicked> { static constexpr const char *const name = "OnUserKicked"; };
-template<> struct EventName<Event::PreBotAssign> { static constexpr const char *const name = "OnPreBotAssign"; };
-template<> struct EventName<Event::BotAssign> { static constexpr const char *const name = "OnBotAssign"; };
-template<> struct EventName<Event::BotUnAssign> { static constexpr const char *const name = "OnBotUnAssign"; };
-template<> struct EventName<Event::UserConnect> { static constexpr const char *const name = "OnUserConnect"; };
-template<> struct EventName<Event::NewServer> { static constexpr const char *const name = "OnNewServer"; };
-template<> struct EventName<Event::UserNickChange> { static constexpr const char *const name = "OnUserNickChange"; };
-template<> struct EventName<Event::PreCommand> { static constexpr const char *const name = "OnPreCommand"; };
-template<> struct EventName<Event::PostCommand> { static constexpr const char *const name = "OnPostCommand"; };
-template<> struct EventName<Event::SaveDatabase> { static constexpr const char *const name = "OnSaveDatabase"; };
-template<> struct EventName<Event::LoadDatabase> { static constexpr const char *const name = "OnLoadDatabase"; };
-template<> struct EventName<Event::Encrypt> { static constexpr const char *const name = "OnEncrypt"; };
-template<> struct EventName<Event::Decrypt> { static constexpr const char *const name = "OnDecrypt"; };
-template<> struct EventName<Event::CreateBot> { static constexpr const char *const name = "OnCreateBot"; };
-template<> struct EventName<Event::DelBot> { static constexpr const char *const name = "OnDelBot"; };
-template<> struct EventName<Event::PrePartChannel> { static constexpr const char *const name = "OnPrePartChannel"; };
-template<> struct EventName<Event::PartChannel> { static constexpr const char *const name = "OnPartChannel"; };
-template<> struct EventName<Event::LeaveChannel> { static constexpr const char *const name = "OnLeaveChannel"; };
-template<> struct EventName<Event::JoinChannel> { static constexpr const char *const name = "OnJoinChannel"; };
-template<> struct EventName<Event::TopicUpdated> { static constexpr const char *const name = "OnTopicUpdated"; };
-template<> struct EventName<Event::PreServerConnect> { static constexpr const char *const name = "OnPreServerConnect"; };
-template<> struct EventName<Event::ServerConnect> { static constexpr const char *const name = "OnServerConnect"; };
-template<> struct EventName<Event::PreUplinkSync> { static constexpr const char *const name = "OnPreUplinkSync"; };
-template<> struct EventName<Event::ServerDisconnect> { static constexpr const char *const name = "OnServerDisconnect"; };
-template<> struct EventName<Event::Restart> { static constexpr const char *const name = "OnRestart"; };
-template<> struct EventName<Event::Shutdown> { static constexpr const char *const name = "OnShutdown"; };
-template<> struct EventName<Event::AddXLine> { static constexpr const char *const name = "OnAddXLine"; };
-template<> struct EventName<Event::DelXLine> { static constexpr const char *const name = "OnDelXLine"; };
-template<> struct EventName<Event::IsServicesOperEvent> { static constexpr const char *const name = "OnIsServicesOper"; };
-template<> struct EventName<Event::ServerQuit> { static constexpr const char *const name = "OnServerQuit"; };
-template<> struct EventName<Event::UserQuit> { static constexpr const char *const name = "OnUserQuit"; };
-template<> struct EventName<Event::PreUserLogoff> { static constexpr const char *const name = "OnPreUserLogoff"; };
-template<> struct EventName<Event::PostUserLogoff> { static constexpr const char *const name = "OnPostUserLogoff"; };
-template<> struct EventName<Event::AccessDel> { static constexpr const char *const name = "OnAccessDel"; };
-template<> struct EventName<Event::AccessAdd> { static constexpr const char *const name = "OnAccessAdd"; };
-template<> struct EventName<Event::AccessClear> { static constexpr const char *const name = "OnAccessClear"; };
-template<> struct EventName<Event::ChanRegistered> { static constexpr const char *const name = "OnChanRegistered"; };
-template<> struct EventName<Event::CreateChan> { static constexpr const char *const name = "OnCreateChan"; };
-template<> struct EventName<Event::DelChan> { static constexpr const char *const name = "OnDelChan"; };
-template<> struct EventName<Event::ChannelCreate> { static constexpr const char *const name = "OnChannelCreate"; };
-template<> struct EventName<Event::ChannelDelete> { static constexpr const char *const name = "OnChannelDelete"; };
-template<> struct EventName<Event::CheckKick> { static constexpr const char *const name = "OnCheckKick"; };
-template<> struct EventName<Event::CheckPriv> { static constexpr const char *const name = "OnCheckPriv"; };
-template<> struct EventName<Event::GroupCheckPriv> { static constexpr const char *const name = "OnGroupCheckPriv"; };
-template<> struct EventName<Event::NickIdentify> { static constexpr const char *const name = "OnNickIdentify"; };
-template<> struct EventName<Event::UserLogin> { static constexpr const char *const name = "OnUserLogin"; };
-template<> struct EventName<Event::NickLogout> { static constexpr const char *const name = "OnNickLogout"; };
-template<> struct EventName<Event::DelNick> { static constexpr const char *const name = "OnDelNick"; };
-template<> struct EventName<Event::NickCoreCreate> { static constexpr const char *const name = "OnNickCoreCreate"; };
-template<> struct EventName<Event::DelCore> { static constexpr const char *const name = "OnDelCore"; };
-template<> struct EventName<Event::ChangeCoreDisplay> { static constexpr const char *const name = "OnChangeCoreDisplay"; };
-template<> struct EventName<Event::NickClearAccess> { static constexpr const char *const name = "OnNickClearAccess"; };
-template<> struct EventName<Event::NickAddAccess> { static constexpr const char *const name = "OnNickAddAccess"; };
-template<> struct EventName<Event::NickEraseAccess> { static constexpr const char *const name = "OnNickEraseAccess"; };
-template<> struct EventName<Event::CheckAuthentication> { static constexpr const char *const name = "OnCheckAuthentication"; };
-template<> struct EventName<Event::Fingerprint> { static constexpr const char *const name = "OnFingerprint"; };
-template<> struct EventName<Event::UserAway> { static constexpr const char *const name = "OnUserAway"; };
-template<> struct EventName<Event::Invite> { static constexpr const char *const name = "OnInvite"; };
-template<> struct EventName<Event::SetVhost> { static constexpr const char *const name = "OnSetVhost"; };
-template<> struct EventName<Event::SetDisplayedHost> { static constexpr const char *const name = "OnSetDisplayedHost"; };
-template<> struct EventName<Event::ChannelModeSet> { static constexpr const char *const name = "OnChannelModeSet"; };
-template<> struct EventName<Event::ChannelModeUnset> { static constexpr const char *const name = "OnChannelModeUnset"; };
-template<> struct EventName<Event::UserModeSet> { static constexpr const char *const name = "OnUserModeSet"; };
-template<> struct EventName<Event::UserModeUnset> { static constexpr const char *const name = "OnUserModeUnset"; };
-template<> struct EventName<Event::ChannelModeAdd> { static constexpr const char *const name = "OnChannelModeAdd"; };
-template<> struct EventName<Event::UserModeAdd> { static constexpr const char *const name = "OnUserModeAdd"; };
-template<> struct EventName<Event::ModuleLoad> { static constexpr const char *const name = "OnModuleLoad"; };
-template<> struct EventName<Event::ModuleUnload> { static constexpr const char *const name = "OnModuleUnload"; };
-template<> struct EventName<Event::ServerSync> { static constexpr const char *const name = "OnServerSync"; };
-template<> struct EventName<Event::UplinkSync> { static constexpr const char *const name = "OnUplinkSync"; };
-template<> struct EventName<Event::BotPrivmsg> { static constexpr const char *const name = "OnBotPrivmsg"; };
-template<> struct EventName<Event::BotNotice> { static constexpr const char *const name = "OnBotNotice"; };
-template<> struct EventName<Event::Privmsg> { static constexpr const char *const name = "OnPrivmsg"; };
-template<> struct EventName<Event::Log> { static constexpr const char *const name = "OnLog"; };
-template<> struct EventName<Event::LogMessage> { static constexpr const char *const name = "OnLogMessage"; };
-template<> struct EventName<Event::CheckModes> { static constexpr const char *const name = "OnCheckModes"; };
-template<> struct EventName<Event::ChannelSync> { static constexpr const char *const name = "OnChannelSync"; };
-template<> struct EventName<Event::SetCorrectModes> { static constexpr const char *const name = "OnSetCorrectModes"; };
-template<> struct EventName<Event::Message> { static constexpr const char *const name = "OnMessage"; };
-template<> struct EventName<Event::CanSet> { static constexpr const char *const name = "OnCanSet"; };
-template<> struct EventName<Event::CheckDelete> { static constexpr const char *const name = "OnCheckDelete"; };
-template<> struct EventName<Event::ExpireTick> { static constexpr const char *const name = "OnExpireTick"; };
-template<> struct EventName<Event::SerializeEvents> { static constexpr const char *const name = "OnSerialize"; };
-

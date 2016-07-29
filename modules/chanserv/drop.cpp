@@ -14,10 +14,8 @@
 
 class CommandCSDrop : public Command
 {
-	EventHandlers<Event::ChanDrop> &onchandrop;
-
  public:
-	CommandCSDrop(Module *creator, EventHandlers<Event::ChanDrop> &event) : Command(creator, "chanserv/drop", 1, 2), onchandrop(event)
+	CommandCSDrop(Module *creator) : Command(creator, "chanserv/drop", 1, 2)
 	{
 		this->SetDesc(_("Cancel the registration of a channel"));
 		this->SetSyntax(_("\037channel\037 \037channel\037"));
@@ -52,7 +50,7 @@ class CommandCSDrop : public Command
 			return;
 		}
 
-		EventReturn MOD_RESULT = this->onchandrop(&Event::ChanDrop::OnChanDrop, source, ci);
+		EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::ChanDrop::OnChanDrop, source, ci);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -87,12 +85,10 @@ class CommandCSDrop : public Command
 class CSDrop : public Module
 {
 	CommandCSDrop commandcsdrop;
-	EventHandlers<Event::ChanDrop> onchandrop;
 
  public:
 	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandcsdrop(this, onchandrop)
-		, onchandrop(this)
+		, commandcsdrop(this)
 	{
 
 	}

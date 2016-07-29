@@ -11,6 +11,10 @@ namespace Event
 {
 	struct CoreExport ChanInfo : Events
 	{
+		static constexpr const char *NAME = "chaninfo";
+
+		using Events::Events;
+
 		/** Called when a user requests info for a channel
 		 * @param source The user requesting info
 		 * @param ci The channel the user is requesting info for
@@ -21,4 +25,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::ChanInfo> { static constexpr const char *const name = "OnChanInfo"; };

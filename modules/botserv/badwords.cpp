@@ -12,24 +12,25 @@
 #include "module.h"
 #include "modules/botserv/badwords.h"
 
-static EventHandlers<Event::BadWordEvents> *bwevents;
-
 class BadWordImpl : public BadWord
 {
+	friend class BadWordsType;
+
+	ChanServ::Channel *channel = nullptr;
+	Anope::string word;
+	BadWordType type;
+
  public:
 	BadWordImpl(Serialize::TypeBase *type) : BadWord(type) { }
         BadWordImpl(Serialize::TypeBase *type, Serialize::ID id) : BadWord(type, id) { }
 
 	ChanServ::Channel *GetChannel() override;
-
 	void SetChannel(ChanServ::Channel *c) override;
 
 	Anope::string GetWord() override;
-
 	void SetWord(const Anope::string &w) override;
 
 	BadWordType GetType() override;
-
 	void SetType(const BadWordType &t) override;
 };
 
@@ -40,10 +41,10 @@ class BadWordsType : public Serialize::Type<BadWordImpl>
 	Serialize::Field<BadWordImpl, Anope::string> word;
 	Serialize::Field<BadWordImpl, BadWordType> type;
 
-	BadWordsType(Module *me) : Serialize::Type<BadWordImpl>(me, "BadWord")
-		, channel(this, "ci", true)
-		, word(this, "word")
-		, type(this, "type")
+	BadWordsType(Module *me) : Serialize::Type<BadWordImpl>(me)
+		, channel(this, "ci", &BadWordImpl::channel, true)
+		, word(this, "word", &BadWordImpl::word)
+		, type(this, "type", &BadWordImpl::type)
 	{
 	}
 };
@@ -84,19 +85,19 @@ struct BadWordsImpl : BadWords
 
 	BadWord* AddBadWord(ChanServ::Channel *ci, const Anope::string &word, BadWordType type) override
 	{
-		BadWord *bw = badword.Create();
+		BadWord *bw = Serialize::New<BadWord *>();
 		bw->SetChannel(ci);
 		bw->SetWord(word);
 		bw->SetType(type);
 
-		(*bwevents)(&Event::BadWordEvents::OnBadWordAdd, ci, bw);
+		EventManager::Get()->Dispatch(&Event::BadWordEvents::OnBadWordAdd, ci, bw);
 
 		return bw;
 	}
 
 	std::vector<BadWord *> GetBadWords(ChanServ::Channel *ci) override
 	{
-		return ci->GetRefs<BadWord *>(badword);
+		return ci->GetRefs<BadWord *>();
 	}
 
 	BadWord* GetBadWord(ChanServ::Channel *ci, unsigned index) override
@@ -117,7 +118,7 @@ struct BadWordsImpl : BadWords
 			return;
 
 		BadWord *bw = bws[index];
-		(*bwevents)(&Event::BadWordEvents::OnBadWordDel, ci, bw);
+		EventManager::Get()->Dispatch(&Event::BadWordEvents::OnBadWordDel, ci, bw);
 
 		delete bw;
 	}
@@ -131,7 +132,8 @@ struct BadWordsImpl : BadWords
 
 class CommandBSBadwords : public Command
 {
- private:
+	ServiceReference<BadWords> badwords;
+	
 	void DoList(CommandSource &source, ChanServ::Channel *ci, const Anope::string &word)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
@@ -448,17 +450,14 @@ class BSBadwords : public Module
 {
 	CommandBSBadwords commandbsbadwords;
 	BadWordsImpl badwords;
-	EventHandlers<Event::BadWordEvents> events;
 	BadWordsType bwtype;
 
  public:
 	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandbsbadwords(this)
 		, badwords(this)
-		, events(this)
 		, bwtype(this)
 	{
-		bwevents = &events;
 	}
 };
 

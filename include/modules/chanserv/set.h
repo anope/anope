@@ -11,6 +11,10 @@ namespace Event
 {
 	struct CoreExport SetChannelOption : Events
 	{
+		static constexpr const char *NAME = "setchanneloption";
+
+		using Events::Events;
+
 		/** Called when a chanserv/set command is used
 		 * @param source The source of the command
 		 * @param cmd The command
@@ -20,7 +24,5 @@ namespace Event
 		 */
 		virtual EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChanServ::Channel *ci, const Anope::string &setting) anope_abstract;
 	};
-	static EventHandlersReference<SetChannelOption> OnSetChannelOption;
 }
 
-template<> struct EventName<Event::SetChannelOption> { static constexpr const char *const name = "OnSetChannelOption"; };

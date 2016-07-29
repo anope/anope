@@ -88,36 +88,30 @@ void XLine::Recache()
 	}
 }
 
-XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid) : Serialize::Object(xline)
-{
-	SetMask(ma);
-	SetReason(r);
-	SetID(id);
-}
-
-XLine::XLine(const Anope::string &ma, const Anope::string &b, const time_t ex, const Anope::string &r, const Anope::string &uid) : Serialize::Object(xline)
-{
-	SetMask(ma);
-	SetBy(b);
-	SetReason(r);
-	SetID(id);
-}
-
 XLine::~XLine()
 {
 	delete regex;
 	delete c;
 }
 
+void XLine::SetType(const Anope::string &t)
+{
+	Set(&XLineType::type, t);
+}
+
+Anope::string XLine::GetType()
+{
+	return Get(&XLineType::type);
+}
+
 void XLine::SetMask(const Anope::string &m)
 {
 	Set(&XLineType::mask, m);
-	Recache();
 }
 
 Anope::string XLine::GetMask()
 {
-	return Get(&XLineType::mask);
+	return Get<Anope::string>(&XLineType::mask);
 }
 
 void XLine::SetBy(const Anope::string &b)
@@ -209,6 +203,17 @@ bool XLine::IsRegex()
 	return mask.length() > 2 && mask[0] == '/' && mask[mask.length() - 1] == '/';
 }
 
+XLineManager *XLine::GetManager()
+{
+	return ServiceManager::Get()->FindService<XLineManager *>(GetType());
+}
+
+void XLineType::Mask::SetField(XLine *s, const Anope::string &value)
+{
+	Serialize::Field<XLine, Anope::string>::SetField(s, value);
+	s->Recache();
+}
+
 void XLineManager::RegisterXLineManager(XLineManager *xlm)
 {
 	XLineManagers.push_back(xlm);
@@ -231,32 +236,20 @@ void XLineManager::CheckAll(User *u)
 Anope::string XLineManager::GenerateUID()
 {
 	Anope::string id;
-	int count = 0;
-	do
+
+	for (int i = 0; i < 10; ++i)
 	{
-		id.clear();
-
-		if (++count > 10)
-		{
-			Log(LOG_DEBUG) << "Unable to generate XLine UID";
-			break;
-		}
-
-		for (int i = 0; i < 10; ++i)
-		{
-			char c;
-			do
-				c = (rand() % 75) + 48;
-			while (!isupper(c) && !isdigit(c));
-			id += c;
-		}
+		char c;
+		do
+			c = (rand() % 75) + 48;
+		while (!isupper(c) && !isdigit(c));
+		id += c;
 	}
-	while (0);//XLinesByUID.count(id) > 0);
 
 	return id;
 }
 
-XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service(creator, "XLineManager", xname), type(t)
+XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service(creator, NAME, xname), type(t)
 {
 }
 
@@ -274,8 +267,8 @@ std::vector<XLine *> XLineManager::GetXLines() const
 {
 	std::vector<XLine *> xlines;
 
-	for (XLine *x : Serialize::GetObjects<XLine *>(xline))
-		if (x->manager == this)
+	for (XLine *x : Serialize::GetObjects<XLine *>())
+		if (x->GetType() == this->GetName())
 			xlines.push_back(x);
 
 	return xlines;
@@ -283,8 +276,7 @@ std::vector<XLine *> XLineManager::GetXLines() const
 
 void XLineManager::AddXLine(XLine *x)
 {
-	// XXX this needs to always be set
-	x->manager = this;
+	x->SetType(this->GetName());
 }
 
 XLine* XLineManager::GetEntry(unsigned index)
@@ -359,7 +351,7 @@ XLine* XLineManager::HasEntry(const Anope::string &mask)
 
 XLine *XLineManager::CheckAllXLines(User *u)
 {
-	for (XLine *x : Serialize::GetObjects<XLine *>(xline))
+	for (XLine *x : Serialize::GetObjects<XLine *>())
 	{
 		if (x->GetExpires() && x->GetExpires() < Anope::CurTime)
 		{

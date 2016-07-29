@@ -45,3 +45,4 @@
 #include "modules/nickserv.h"
 #include "modules/botserv.h"
 #include "modules/memoserv.h"
+#include "accessgroup.h"

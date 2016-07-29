@@ -16,6 +16,12 @@
 
 class NSSuspendInfoImpl : public NSSuspendInfo
 {
+	friend class NSSuspendType;
+
+	NickServ::Account *account = nullptr;
+	Anope::string by, reason;
+	time_t when = 0, expires =0;
+
  public:
 	NSSuspendInfoImpl(Serialize::TypeBase *type) : NSSuspendInfo(type) { }
 	NSSuspendInfoImpl(Serialize::TypeBase *type, Serialize::ID id) : NSSuspendInfo(type, id) { }
@@ -43,12 +49,12 @@ class NSSuspendType : public Serialize::Type<NSSuspendInfoImpl>
 	Serialize::Field<NSSuspendInfoImpl, Anope::string> by, reason;
 	Serialize::Field<NSSuspendInfoImpl, time_t> when, expires;
 
-	NSSuspendType(Module *me) : Serialize::Type<NSSuspendInfoImpl>(me, "NSSuspendInfo")
-		, account(this, "nick", true)
-		, by(this, "by")
-		, reason(this, "reason")
-		, when(this, "time")
-		, expires(this, "expires")
+	NSSuspendType(Module *me) : Serialize::Type<NSSuspendInfoImpl>(me)
+		, account(this, "nick", &NSSuspendInfoImpl::account, true)
+		, by(this, "by", &NSSuspendInfoImpl::by)
+		, reason(this, "reason", &NSSuspendInfoImpl::reason)
+		, when(this, "when", &NSSuspendInfoImpl::when)
+		, expires(this, "expires", &NSSuspendInfoImpl::expires)
 	{
 	}
 };
@@ -105,10 +111,8 @@ void NSSuspendInfoImpl::SetExpires(const time_t &e)
 
 class CommandNSSuspend : public Command
 {
-	EventHandlers<Event::NickSuspend> &onnicksuspend;
-
  public:
-	CommandNSSuspend(Module *creator, EventHandlers<Event::NickSuspend> &event) : Command(creator, "nickserv/suspend", 2, 3), onnicksuspend(event)
+	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 3)
 	{
 		this->SetDesc(_("Suspend a given nick"));
 		this->SetSyntax(_("\037account\037 [+\037expiry\037] [\037reason\037]"));
@@ -120,7 +124,7 @@ class CommandNSSuspend : public Command
 		const Anope::string &nick = params[0];
 		Anope::string expiry = params[1];
 		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("suspendexpire");
+		time_t expiry_secs = Config->GetModule(this->GetOwner())->Get<time_t>("suspendexpire");
 
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
@@ -154,7 +158,7 @@ class CommandNSSuspend : public Command
 			return;
 		}
 
-		NSSuspendInfo *si = na->GetAccount()->GetRef<NSSuspendInfo *>(nssuspendinfo);
+		NSSuspendInfo *si = na->GetAccount()->GetRef<NSSuspendInfo *>();
 		if (!si)
 		{
 			source.Reply(_("\002%s\002 is already suspended."), na->GetAccount()->GetDisplay().c_str());
@@ -163,14 +167,14 @@ class CommandNSSuspend : public Command
 
 		NickServ::Account *nc = na->GetAccount();
 
-		si = nssuspendinfo.Create();
+		si = Serialize::New<NSSuspendInfo *>();
 		si->SetAccount(nc);
 		si->SetBy(source.GetNick());
 		si->SetReason(reason);
 		si->SetWhen(Anope::CurTime);
 		si->SetExpires(expiry_secs ? expiry_secs + Anope::CurTime : 0);
 
-		for (NickServ::Nick *na2 : nc->GetRefs<NickServ::Nick *>(NickServ::nick))
+		for (NickServ::Nick *na2 : nc->GetRefs<NickServ::Nick *>())
 		{
 			na2->SetLastQuit(reason);
 
@@ -186,7 +190,7 @@ class CommandNSSuspend : public Command
 		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("\002{0}\002 is now suspended."), na->GetNick());
 
-		this->onnicksuspend(&Event::NickSuspend::OnNickSuspend, na);
+		EventManager::Get()->Dispatch(&Event::NickSuspend::OnNickSuspend, na);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -199,10 +203,8 @@ class CommandNSSuspend : public Command
 
 class CommandNSUnSuspend : public Command
 {
-	EventHandlers<Event::NickUnsuspend> &onnickunsuspend;
-
  public:
-	CommandNSUnSuspend(Module *creator, EventHandlers<Event::NickUnsuspend> &event) : Command(creator, "nickserv/unsuspend", 1, 1), onnickunsuspend(event)
+	CommandNSUnSuspend(Module *creator) : Command(creator, "nickserv/unsuspend", 1, 1)
 	{
 		this->SetDesc(_("Unsuspend a given nick"));
 		this->SetSyntax(_("\037account\037"));
@@ -222,7 +224,7 @@ class CommandNSUnSuspend : public Command
 			return;
 		}
 
-		NSSuspendInfo *si = na->GetAccount()->GetRef<NSSuspendInfo *>(nssuspendinfo);
+		NSSuspendInfo *si = na->GetAccount()->GetRef<NSSuspendInfo *>();
 		if (!si)
 		{
 			source.Reply(_("\002{0}\002 is not suspended."), na->GetNick());
@@ -235,7 +237,7 @@ class CommandNSUnSuspend : public Command
 
 		source.Reply(_("\002{0}\002 is now released."), na->GetNick());
 
-		this->onnickunsuspend(&Event::NickUnsuspend::OnNickUnsuspend, na);
+		EventManager::Get()->Dispatch(&Event::NickUnsuspend::OnNickUnsuspend, na);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -252,8 +254,6 @@ class NSSuspend : public Module
 {
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;
-	EventHandlers<Event::NickSuspend> onnicksuspend;
-	EventHandlers<Event::NickUnsuspend> onnickunsuspend;
 	std::vector<Anope::string> show;
 	NSSuspendType nst;
 
@@ -272,10 +272,11 @@ class NSSuspend : public Module
 
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandnssuspend(this, onnicksuspend)
-		, commandnsunsuspend(this, onnickunsuspend)
-		, onnicksuspend(this)
-		, onnickunsuspend(this)
+		, EventHook<Event::NickInfo>(this)
+		, EventHook<NickServ::Event::PreNickExpire>(this)
+		, EventHook<NickServ::Event::NickValidate>(this)
+		, commandnssuspend(this)
+		, commandnsunsuspend(this)
 		, nst(this)
 	{
 	}
@@ -289,7 +290,7 @@ class NSSuspend : public Module
 
 	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override
 	{
-		NSSuspendInfo *s = na->GetAccount()->GetRef<NSSuspendInfo *>(nssuspendinfo);
+		NSSuspendInfo *s = na->GetAccount()->GetRef<NSSuspendInfo *>();
 		if (!s)
 			return;
 
@@ -307,7 +308,7 @@ class NSSuspend : public Module
 
 	void OnPreNickExpire(NickServ::Nick *na, bool &expire) override
 	{
-		NSSuspendInfo *s = na->GetAccount()->GetRef<NSSuspendInfo *>(nssuspendinfo);
+		NSSuspendInfo *s = na->GetAccount()->GetRef<NSSuspendInfo *>();
 		if (!s)
 			return;
 
@@ -327,7 +328,7 @@ class NSSuspend : public Module
 
 	EventReturn OnNickValidate(User *u, NickServ::Nick *na) override
 	{
-		NSSuspendInfo *s = na->GetAccount()->GetRef<NSSuspendInfo *>(nssuspendinfo);
+		NSSuspendInfo *s = na->GetAccount()->GetRef<NSSuspendInfo *>();
 		if (!s)
 			return EVENT_CONTINUE;
 

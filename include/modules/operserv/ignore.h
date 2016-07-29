@@ -13,6 +13,8 @@
 class Ignore : public Serialize::Object
 {
  public:
+	static constexpr const char *NAME = "ignore";
+
 	using Serialize::Object::Object;
 
 	virtual Anope::string GetMask() anope_abstract;
@@ -28,16 +30,13 @@ class Ignore : public Serialize::Object
 	virtual void SetTime(const time_t &) anope_abstract;
 };
 
-static Serialize::TypeReference<Ignore> ignoretype("IgnoreData");
-
 class IgnoreService : public Service
 {
- protected:
-	IgnoreService(Module *c) : Service(c, "IgnoreService", "ignore") { }
-
  public:
+	static constexpr const char *NAME = "ignore";
+	
+	IgnoreService(Module *c) : Service(c, NAME) { }
+
 	virtual Ignore *Find(const Anope::string &mask) anope_abstract;
 };
-
-static ServiceReference<IgnoreService> ignore_service("IgnoreService", "ignore");
 

@@ -14,6 +14,8 @@
 
 class CommandGLGlobal : public Command
 {
+	ServiceReference<Global::GlobalService> service;
+
  public:
 	CommandGLGlobal(Module *creator) : Command(creator, "global/global", 1, 1)
 	{
@@ -25,14 +27,14 @@ class CommandGLGlobal : public Command
 	{
 		const Anope::string &msg = params[0];
 
-		if (!Global::service)
+		if (!service)
 		{
 			source.Reply("No global reference, is global loaded?");
 			return;
 		}
 
 		Log(LOG_ADMIN, source, this);
-		Global::service->SendGlobal(NULL, source.GetNick(), msg);
+		service->SendGlobal(NULL, source.GetNick(), msg);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

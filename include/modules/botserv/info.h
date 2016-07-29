@@ -11,11 +11,13 @@ namespace Event
 {
 	struct CoreExport ServiceBotEvent : Events
 	{
+		static constexpr const char *NAME = "servicebotevent";
+
+		using Events::Events;
+
 		/** Called when a user uses botserv/info on a bot or channel.
 		 */
 		virtual void OnServiceBot(CommandSource &source, ServiceBot *bi, ChanServ::Channel *ci, InfoFormatter &info) anope_abstract;
 	};
-	extern CoreExport EventHandlers<ServiceBotEvent> OnServiceBot;
 }
 
-template<> struct EventName<Event::ServiceBotEvent> { static constexpr const char *const name = "OnServiceBot"; };

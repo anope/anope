@@ -191,6 +191,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 class ModuleXMLRPC : public Module
 {
 	ServiceReference<HTTPProvider> httpref;
+	
  public:
 	MyXMLRPCServiceInterface xmlrpcinterface;
 
@@ -210,9 +211,12 @@ class ModuleXMLRPC : public Module
 	{
 		if (httpref)
 			httpref->UnregisterPage(&xmlrpcinterface);
-		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf->GetModule(this)->Get<Anope::string>("server", "httpd/main"));
+
+		this->httpref = ServiceReference<HTTPProvider>(conf->GetModule(this)->Get<Anope::string>("server", "httpd/main"));
+
 		if (!httpref)
 			throw ConfigException("Unable to find http reference, is m_httpd loaded?");
+
 		httpref->RegisterPage(&xmlrpcinterface);
 	}
 };

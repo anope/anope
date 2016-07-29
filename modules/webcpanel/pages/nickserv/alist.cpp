@@ -18,7 +18,7 @@ WebCPanel::NickServ::Alist::Alist(const Anope::string &cat, const Anope::string 
 
 bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
-	std::vector<::ChanServ::Channel *> chans = na->GetAccount()->GetRefs<::ChanServ::Channel *>(::ChanServ::channel);
+	std::vector<::ChanServ::Channel *> chans = na->GetAccount()->GetRefs<::ChanServ::Channel *>();
 	std::sort(chans.begin(), chans.end(), ChannelSort);
 
 	int chan_count = 0;

@@ -16,6 +16,8 @@
 
 class CommandCSList : public Command
 {
+	ServiceReference<ModeLocks> mlocks;
+	
  public:
 	CommandCSList(Module *creator) : Command(creator, "chanserv/list", 1, 2)
 	{
@@ -68,7 +70,7 @@ class CommandCSList : public Command
 		}
 
 		Anope::string spattern = "#" + pattern;
-		unsigned listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
+		unsigned listmax = Config->GetModule(this->GetOwner())->Get<unsigned>("listmax", "50");
 
 		source.Reply(_("List of entries matching \002{0}\002:"), pattern);
 
@@ -194,7 +196,7 @@ class CommandCSSetPrivate : public Command
 			return;
 		}
 
-		EventReturn MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -240,10 +242,11 @@ class CSList : public Module
 	CommandCSList commandcslist;
 	CommandCSSetPrivate commandcssetprivate;
 
-	ExtensibleItem<bool> priv; // XXX
+	Serialize::Field<ChanServ::Channel, bool> priv;
 
  public:
 	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChanInfo>(this)
 		, commandcslist(this)
 		, commandcssetprivate(this)
 		, priv(this, "CS_PRIVATE")

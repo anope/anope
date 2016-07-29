@@ -62,7 +62,7 @@ class ExpireTimer : public Timer
 
 	void Tick(time_t) override
 	{
-		Event::OnExpireTick(&Event::ExpireTick::OnExpireTick);
+		EventManager::Get()->Dispatch(&Event::ExpireTick::OnExpireTick);
 	}
 };
 
@@ -72,7 +72,7 @@ void Anope::SaveDatabases()
 		return;
 
 	Log(LOG_DEBUG) << "Saving databases";
-	Event::OnSaveDatabase(&Event::SaveDatabase::OnSaveDatabase);
+	EventManager::Get()->Dispatch(&Event::SaveDatabase::OnSaveDatabase);
 }
 
 /** The following comes from InspIRCd to get the full path of the Anope executable
@@ -180,11 +180,11 @@ int main(int ac, char **av, char **envp)
 
 	if (Anope::Restarting)
 	{
-		Event::OnRestart(&Event::Restart::OnRestart);
+		EventManager::Get()->Dispatch(&Event::Restart::OnRestart);
 	}
 	else
 	{
-		Event::OnShutdown(&Event::Shutdown::OnShutdown);
+		EventManager::Get()->Dispatch(&Event::Shutdown::OnShutdown);
 	}
 
 	if (Anope::QuitReason.empty())

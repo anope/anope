@@ -88,12 +88,19 @@ class CommandCSRegister : public Command
 			return;
 		}
 
-		if (!ChanServ::service)
+		ci = Serialize::New<ChanServ::Channel *>();
+		if (ci == nullptr)
 			return;
-		ci = ChanServ::channel.Create();
+
 		ci->SetName(chan);
 		ci->SetFounder(nc);
 		ci->SetDesc(chdesc);
+		ci->SetTimeRegistered(Anope::CurTime);
+		ci->SetLastUsed(Anope::CurTime);
+		ci->SetBanType(2);
+
+		ci->c = c; // XXX? this isnt set on reconstrubted objects?
+		c->ci = ci;
 
 		if (c && !c->topic.empty())
 		{
@@ -102,7 +109,9 @@ class CommandCSRegister : public Command
 			ci->SetLastTopicTime(c->topic_time);
 		}
 		else
+		{
 			ci->SetLastTopicSetter(source.service->nick);
+		}
 
 		Log(LOG_COMMAND, source, this, ci);
 		source.Reply(_("Channel \002{0}\002 registered under your account: \002{1}\002"), chan, nc->GetDisplay());
@@ -114,7 +123,7 @@ class CommandCSRegister : public Command
 			if (u)
 				c->SetCorrectModes(u, true);
 
-			Event::OnChanRegistered(&Event::ChanRegistered::OnChanRegistered, ci);
+			EventManager::Get()->Dispatch(&Event::ChanRegistered::OnChanRegistered, ci);
 		}
 	}
 

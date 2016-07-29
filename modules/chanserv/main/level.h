@@ -1,6 +1,12 @@
 
 class LevelImpl : public ChanServ::Level
 {
+	friend class LevelType;
+
+	ChanServ::Channel *channel = nullptr;
+	Anope::string name;
+	int level = 0;
+
  public:
 	LevelImpl(Serialize::TypeBase *type) : ChanServ::Level(type) { }
 	LevelImpl(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::Level(type, id) { }

@@ -17,6 +17,8 @@
 
 class CommandCSSet : public Command
 {
+	ServiceReference<ModeLocks> mlocks;
+	
  public:
 	CommandCSSet(Module *creator) : Command(creator, "chanserv/set", 2, 3)
 	{
@@ -45,7 +47,7 @@ class CommandCSSet : public Command
 			const CommandInfo &info = it->second;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				ServiceReference<Command> c("Command", info.name);
+				ServiceReference<Command> c(info.name);
 
 				// XXX dup
 				if (!c)
@@ -95,7 +97,7 @@ class CommandCSSetAutoOp : public Command
 			return;
 		}
 
-		EventReturn MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -155,7 +157,7 @@ class CommandCSSetBanType : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -222,7 +224,7 @@ class CommandCSSetDescription : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -280,7 +282,7 @@ class CommandCSSetFounder : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -349,7 +351,7 @@ class CommandCSSetKeepModes : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -367,7 +369,7 @@ class CommandCSSetKeepModes : public Command
 			if (ci->c)
 				for (const std::pair<Anope::string, Anope::string> &p : ci->c->GetModes())
 				{
-					ChanServ::Mode *mode = ChanServ::mode.Create();
+					ChanServ::Mode *mode = Serialize::New<ChanServ::Mode *>();
 					mode->SetChannel(ci);
 					mode->SetMode(p.first);
 					mode->SetParam(p.second);
@@ -378,7 +380,7 @@ class CommandCSSetKeepModes : public Command
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keep modes";
 			ci->UnsetS<bool>("CS_KEEP_MODES");
 			source.Reply(_("Keep modes for \002{0}\002 is now \002off\002."), ci->GetName());
-			for (ChanServ::Mode *m : ci->GetRefs<ChanServ::Mode *>(ChanServ::mode))
+			for (ChanServ::Mode *m : ci->GetRefs<ChanServ::Mode *>())
 				m->Delete();
 		}
 		else
@@ -420,7 +422,7 @@ class CommandCSSetPeace : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -464,6 +466,8 @@ inline static Anope::string BotModes()
 
 class CommandCSSetPersist : public Command
 {
+	ServiceReference<ModeLocks> mlocks;
+	
  public:
 	CommandCSSetPersist(Module *creator, const Anope::string &cname = "chanserv/set/persist") : Command(creator, cname, 2, 2)
 	{
@@ -490,7 +494,7 @@ class CommandCSSetPersist : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -632,7 +636,7 @@ class CommandCSSetRestricted : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -693,7 +697,7 @@ class CommandCSSetSecure : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -755,7 +759,7 @@ class CommandCSSetSecureFounder : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -821,7 +825,7 @@ class CommandCSSetSecureOps : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -883,7 +887,7 @@ class CommandCSSetSignKick : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -956,7 +960,7 @@ class CommandCSSetSuccessor : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -1065,7 +1069,7 @@ class CommandCSSetNoexpire : public Command
 };
 
 class CSSet : public Module
-	, public EventHook<Event::CreateChan>
+	, public EventHook<Event::ChanRegistered>
 	, public EventHook<Event::ChannelSync>
 	, public EventHook<Event::CheckKick>
 	, public EventHook<Event::DelChan>
@@ -1101,18 +1105,28 @@ class CSSet : public Module
 
  public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChanRegistered>(this)
+		, EventHook<Event::ChannelSync>(this)
+		, EventHook<Event::CheckKick>(this)
+		, EventHook<Event::DelChan>(this)
+		, EventHook<Event::ChannelModeSet>(this)
+		, EventHook<Event::ChannelModeUnset>(this)
+		, EventHook<Event::JoinChannel>(this)
+		, EventHook<Event::SetCorrectModes>(this)
+		, EventHook<ChanServ::Event::PreChanExpire>(this)
+		, EventHook<Event::ChanInfo>(this)
 
-		, noautoop(this, ChanServ::channel, "NOAUTOOP")
-		, peace(this, ChanServ::channel, "PEACE")
-		, securefounder(this, ChanServ::channel, "SECUREFOUNDER")
-		, restricted(this, ChanServ::channel, "RESTRICTED")
-		, secure(this, ChanServ::channel, "CS_SECURE")
-		, secureops(this, ChanServ::channel, "SECUREOPS")
-		, signkick(this, ChanServ::channel, "SIGNKICK")
-		, signkick_level(this, ChanServ::channel, "SIGNKICK_LEVEL")
-		, noexpire(this, ChanServ::channel, "CS_NO_EXPIRE")
-		, keep_modes(this, ChanServ::channel, "CS_KEEP_MODES")
-		, persist(this, ChanServ::channel, "PERSIST")
+		, noautoop(this, "NOAUTOOP")
+		, peace(this, "PEACE")
+		, securefounder(this, "SECUREFOUNDER")
+		, restricted(this, "RESTRICTED")
+		, secure(this, "CS_SECURE")
+		, secureops(this, "SECUREOPS")
+		, signkick(this, "SIGNKICK")
+		, signkick_level(this, "SIGNKICK_LEVEL")
+		, noexpire(this, "CS_NO_EXPIRE")
+		, keep_modes(this, "CS_KEEP_MODES")
+		, persist(this, "PERSIST")
 
 		, commandcsset(this)
 		, commandcssetautoop(this)
@@ -1139,7 +1153,7 @@ class CSSet : public Module
 		persist_lower_ts = conf->GetModule(this)->Get<bool>("persist_lower_ts");
 	}
 
-	void OnCreateChan(ChanServ::Channel *ci) override
+	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
 		ci->SetBanType(Config->GetModule(this)->Get<int>("defbantype", "2"));
 	}
@@ -1147,7 +1161,7 @@ class CSSet : public Module
 	void OnChannelSync(Channel *c) override
 	{
 		if (c->ci && keep_modes.HasExt(c->ci))
-			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>(ChanServ::mode))
+			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>())
 				c->SetMode(c->ci->WhoSends(), m->GetMode(), m->GetParam());
 	}
 
@@ -1177,12 +1191,15 @@ class CSSet : public Module
 			if (mode->name == "PERM")
 				persist.Set(c->ci, true);
 
-			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && ChanServ::mode && (!inhabit || !inhabit->HasExt(c)))
+			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
 			{
-				ChanServ::Mode *m = ChanServ::mode.Create();
-				m->SetChannel(c->ci);
-				m->SetMode(mode->name);
-				m->SetParam(param);
+				ChanServ::Mode *m = Serialize::New<ChanServ::Mode *>();
+				if (m != nullptr)
+				{
+					m->SetChannel(c->ci);
+					m->SetMode(mode->name);
+					m->SetParam(param);
+				}
 			}
 		}
 
@@ -1198,7 +1215,7 @@ class CSSet : public Module
 		}
 
 		if (c->ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
-			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>(ChanServ::mode))
+			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>())
 				if (m->GetMode() == mode->name && m->GetParam().equals_ci(param))
 					m->Delete();
 

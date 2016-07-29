@@ -14,10 +14,6 @@
 
 class CommandBSBot : public Command
 {
-	EventHandlers<Event::BotCreate> OnBotCreate;
-	EventHandlers<Event::BotChange> OnBotChange;
-	EventHandlers<Event::BotDelete> OnBotDelete;
-
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &nick = params[1];
@@ -93,7 +89,7 @@ class CommandBSBot : public Command
 
 		source.Reply(_("\002{0}!{1}@{2}\002 (\002{3}\002) added to the bot list."), bi->nick, bi->GetIdent(), bi->host, bi->realname);
 
-		this->OnBotCreate(&Event::BotCreate::OnBotCreate, bi);
+		EventManager::Get()->Dispatch(&Event::BotCreate::OnBotCreate, bi);
 	}
 
 	void DoChange(CommandSource &source, const std::vector<Anope::string> &params)
@@ -247,7 +243,7 @@ class CommandBSBot : public Command
 		source.Reply(_("Bot \002{0}\002 has been changed to \002{1}!{2}@{3}\002 (\002{4}\002)."), oldnick, bi->nick, bi->GetIdent(), bi->host, bi->realname);
 		Log(LOG_ADMIN, source, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
 
-		this->OnBotChange(&Event::BotChange::OnBotChange, bi);
+		EventManager::Get()->Dispatch(&Event::BotChange::OnBotChange, bi);
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
@@ -273,7 +269,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		this->OnBotDelete(&Event::BotDelete::OnBotDelete, bi);
+		EventManager::Get()->Dispatch(&Event::BotDelete::OnBotDelete, bi);
 
 		Log(LOG_ADMIN, source, this) << "DEL " << bi->nick;
 
@@ -283,9 +279,6 @@ class CommandBSBot : public Command
 
  public:
 	CommandBSBot(Module *creator) : Command(creator, "botserv/bot", 1, 6)
-		, OnBotCreate(creator)
-		, OnBotChange(creator)
-		, OnBotDelete(creator)
 	{
 		this->SetDesc(_("Maintains network bot list"));
 		this->SetSyntax(_("\002ADD \037nicknae\037 \037username\037 \037hostname\037 \037realname\037\002"));

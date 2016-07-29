@@ -227,8 +227,10 @@ class BSAssign : public Module
 
  public:
 	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::Invite>(this)
+		, EventHook<Event::ServiceBotEvent>(this)
 
-		, nobot(this, botinfo, "BS_NOBOT")
+		, nobot(this, "BS_NOBOT")
 
 		, commandbsassign(this)
 		, commandbsunassign(this)

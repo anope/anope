@@ -11,6 +11,10 @@ namespace Event
 {
 	struct CoreExport SetNickOption : Events
 	{
+		static constexpr const char *NAME = "setnickoption";
+
+		using Events::Events;
+
 		/** Called when a nickserv/set command is used.
 		 * @param source The source of the command
 		 * @param cmd The command
@@ -20,7 +24,5 @@ namespace Event
 		 */
 		virtual EventReturn OnSetNickOption(CommandSource &source, Command *cmd, NickServ::Account *nc, const Anope::string &setting) anope_abstract;
 	};
-	static EventHandlersReference<SetNickOption> OnSetNickOption;
 }
 
-template<> struct EventName<Event::SetNickOption> { static constexpr const char *const name = "OnSetNickOption"; };

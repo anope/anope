@@ -1,12 +1,10 @@
 /* ChanServ core functions
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
+ * 
  */
 
 class LogSetting : public Serialize::Object
@@ -15,6 +13,8 @@ class LogSetting : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "logsetting";
+
 	virtual ChanServ::Channel *GetChannel() anope_abstract;
 	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
 
@@ -39,6 +39,3 @@ class LogSetting : public Serialize::Object
 	virtual time_t GetCreated() anope_abstract;
 	virtual void SetCreated(const time_t &) anope_abstract;
 };
-
-static Serialize::TypeReference<LogSetting> logsetting("LogSetting");
-

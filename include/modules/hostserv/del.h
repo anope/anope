@@ -10,6 +10,10 @@ namespace Event
 {
 	struct CoreExport DeleteVhost : Events
 	{
+		static constexpr const char *NAME = "deletevhost";
+
+		using Events::Events;
+
 		/** Called when a vhost is deleted
 		 * @param na The nickalias of the vhost
 		 */
@@ -17,4 +21,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::DeleteVhost> { static constexpr const char *const name = "OnDeleteVhost"; };

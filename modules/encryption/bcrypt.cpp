@@ -877,6 +877,8 @@ class EBCRYPT : public Module
 
  public:
 	EBCRYPT(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
+		, EventHook<Event::Encrypt>(this)
+		, EventHook<Event::CheckAuthentication>(this)
 		, rounds(10)
 	{
 		// Test a pre-calculated hash

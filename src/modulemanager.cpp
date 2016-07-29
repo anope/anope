@@ -133,7 +133,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 #ifdef _WIN32
 	/* Generate the filename for the temporary copy of the module */
-	Anope::string pbuf = Anope::DataDir + "/runtime/" + modname + ".so.XXXXXX";
+	Anope::string pbuf = Anope::DataDir + "/runtime/" + modname.replace_all_cs("/", "_") + ".so.XXXXXX";
 
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);
@@ -146,7 +146,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		return ret;
 	}
 #else
-	Anope::string pbuf = Anope::ModuleDir + "/modules/" + modname + ".so";
+	Anope::string pbuf = Anope::ModuleDir + "/modules/" + modname.replace_all_cs("/", "_") + ".so";
 #endif
 
 	dlerror();
@@ -267,7 +267,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 	Log(LOG_DEBUG) << "Module " << modname << " loaded.";
 
-	Event::OnModuleLoad(&Event::ModuleLoad::OnModuleLoad, u, m);
+	EventManager::Get()->Dispatch(&Event::ModuleLoad::OnModuleLoad, u, m);
 
 	return MOD_ERR_OK;
 }
@@ -277,7 +277,7 @@ ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)
 	if (!m)
 		return MOD_ERR_PARAMS;
 
-	Event::OnModuleUnload(&Event::ModuleUnload::OnModuleUnload, u, m);
+	EventManager::Get()->Dispatch(&Event::ModuleUnload::OnModuleUnload, u, m);
 
 	return DeleteModule(m);
 }

@@ -120,12 +120,19 @@ class CoreExport ServiceBot : public LocalUser
 
 class BotInfo : public Serialize::Object
 {
+	friend class BotInfoType;
+
+	Anope::string nick, user, host, realname;
+	time_t created = 0;
+	bool operonly = false;
+
  public:
+	static constexpr const char *const NAME = "botinfo";
+
 	ServiceBot *bot;
 	Configuration::Block *conf = nullptr;
 
-	BotInfo(Serialize::TypeBase *type) : Serialize::Object(type) { }
-	BotInfo(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
+	using Serialize::Object::Object;
 
 	void Delete() override;
 
@@ -155,16 +162,14 @@ class BotInfoType : public Serialize::Type<BotInfo>
 	Serialize::Field<BotInfo, time_t> created;
 	Serialize::Field<BotInfo, bool> operonly;
 
-	BotInfoType() : Serialize::Type<BotInfo>(nullptr, "BotInfo")
-		, nick(this, "nick")
-		, user(this, "user")
-		, host(this, "host")
-		, realname(this, "realname")
-		, created(this, "created")
-		, operonly(this, "operonly")
+	BotInfoType() : Serialize::Type<BotInfo>(nullptr)
+		, nick(this, "nick", &BotInfo::nick)
+		, user(this, "user", &BotInfo::user)
+		, host(this, "host", &BotInfo::host)
+		, realname(this, "realname", &BotInfo::realname)
+		, created(this, "created", &BotInfo::created)
+		, operonly(this, "operonly", &BotInfo::operonly)
 	{
 	}
 };
-
-static Serialize::TypeReference<BotInfo> botinfo("BotInfo");
 

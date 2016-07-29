@@ -53,11 +53,11 @@ void MemoInfoImpl::SetMemoMax(const int16_t &i)
 
 std::vector<MemoServ::Memo *> MemoInfoImpl::GetMemos()
 {
-	return GetRefs<MemoServ::Memo *>(MemoServ::memo);
+	return GetRefs<MemoServ::Memo *>();
 }
 
 std::vector<MemoServ::Ignore *> MemoInfoImpl::GetIgnores()
 {
-	return GetRefs<MemoServ::Ignore *>(MemoServ::ignore);
+	return GetRefs<MemoServ::Ignore *>();
 }
 

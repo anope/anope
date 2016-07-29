@@ -1,19 +1,19 @@
 #include "module.h"
 #include "nicktype.h"
 
-NickType::NickType(Module *me) : Serialize::Type<NickImpl>(me, "NickAlias")
-	, nick(this, "nick")
-	, last_quit(this, "last_quit")
-	, last_realname(this, "last_realname")
-	, last_usermask(this, "last_usermask")
-	, last_realhost(this, "last_realhost")
-	, time_registered(this, "time_registered")
-	, last_seen(this, "last_seen")
-	, vhost_ident(this, "vhost_ident")
-	, vhost_host(this, "vhost_host")
-	, vhost_creator(this, "vhost_creator")
-	, vhost_created(this, "vhost_created")
-	, nc(this, "nc")
+NickType::NickType(Module *me) : Serialize::Type<NickImpl>(me)
+	, nick(this, "nick", &NickImpl::nick)
+	, last_quit(this, "last_quit", &NickImpl::last_quit)
+	, last_realname(this, "last_realname", &NickImpl::last_realname)
+	, last_usermask(this, "last_usermask", &NickImpl::last_usermask)
+	, last_realhost(this, "last_realhost", &NickImpl::last_realhost)
+	, time_registered(this, "time_registered", &NickImpl::time_registered)
+	, last_seen(this, "last_seen", &NickImpl::last_seen)
+	, vhost_ident(this, "vhost_ident", &NickImpl::vhost_ident)
+	, vhost_host(this, "vhost_host", &NickImpl::vhost_host)
+	, vhost_creator(this, "vhost_creator", &NickImpl::vhost_creator)
+	, vhost_created(this, "vhost_created", &NickImpl::vhost_created)
+	, nc(this, "nc", &NickImpl::account)
 {
 
 }
@@ -32,7 +32,7 @@ void NickType::Nick::SetField(NickImpl *na, const Anope::string &value)
 NickServ::Nick *NickType::FindNick(const Anope::string &n)
 {
 	Serialize::ID id;
-	EventReturn result = Event::OnSerialize(&Event::SerializeEvents::OnSerializeFind, this, &this->nick, n, id);
+	EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeFind, this, &this->nick, n, id);
 	if (result == EVENT_ALLOW)
 		return RequireID(id);
 

@@ -1,65 +1,65 @@
 #include "module.h"
-#include "chanaccess.h"
+#include "modules/chanserv/main/chanaccess.h"
 #include "chanaccesstype.h"
 
 ChanServ::Channel *ChanAccessImpl::GetChannel()
 {
-	return Get(&ChanAccessType::ci);
+	return Get(&ChanAccessType<ChanServ::ChanAccess>::ci);
 }
 
 void ChanAccessImpl::SetChannel(ChanServ::Channel *ci)
 {
-	Object::Set(&ChanAccessType::ci, ci);
+	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::ci, ci);
 }
 
 Anope::string ChanAccessImpl::GetCreator()
 {
-	return Get(&ChanAccessType::creator);
+	return Get(&ChanAccessType<ChanServ::ChanAccess>::creator);
 }
 
 void ChanAccessImpl::SetCreator(const Anope::string &c)
 {
-	Object::Set(&ChanAccessType::creator, c);
+	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::creator, c);
 }
 
 time_t ChanAccessImpl::GetLastSeen()
 {
-	return Get(&ChanAccessType::last_seen);
+	return Get(&ChanAccessType<ChanServ::ChanAccess>::last_seen);
 }
 
 void ChanAccessImpl::SetLastSeen(const time_t &t)
 {
-	Object::Set(&ChanAccessType::last_seen, t);
+	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::last_seen, t);
 }
 
 time_t ChanAccessImpl::GetCreated()
 {
-	return Get(&ChanAccessType::created);
+	return Get(&ChanAccessType<ChanServ::ChanAccess>::created);
 }
 
 void ChanAccessImpl::SetCreated(const time_t &t)
 {
-	Object::Set(&ChanAccessType::created, t);
+	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::created, t);
 }
 
 Anope::string ChanAccessImpl::GetMask()
 {
-	return Get(&ChanAccessType::mask);
+	return Get(&ChanAccessType<ChanServ::ChanAccess>::mask);
 }
 
 void ChanAccessImpl::SetMask(const Anope::string &n)
 {
-	Object::Set(&ChanAccessType::mask, n);
+	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::mask, n);
 }
 
 Serialize::Object *ChanAccessImpl::GetObj()
 {
-	return Get(&ChanAccessType::obj);
+	return Get(&ChanAccessType<ChanServ::ChanAccess>::obj);
 }
 
 void ChanAccessImpl::SetObj(Serialize::Object *o)
 {
-	Object::Set(&ChanAccessType::obj, o);
+	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::obj, o);
 }
 
 Anope::string ChanAccessImpl::Mask()
@@ -72,13 +72,13 @@ Anope::string ChanAccessImpl::Mask()
 
 NickServ::Account *ChanAccessImpl::GetAccount()
 {
-	if (!GetObj() || GetObj()->GetSerializableType() != NickServ::account)
+	if (!GetObj() || GetObj()->GetSerializableType()->GetName() != NickServ::Account::NAME)
 		return nullptr;
 
 	return anope_dynamic_static_cast<NickServ::Account *>(GetObj());
 }
 
-bool ChanAccessImpl::Matches(const User *u, NickServ::Account *acc, Path &p)
+bool ChanAccessImpl::Matches(const User *u, NickServ::Account *acc)
 {
 	if (this->GetAccount())
 		return this->GetAccount() == acc;
@@ -93,35 +93,9 @@ bool ChanAccessImpl::Matches(const User *u, NickServ::Account *acc, Path &p)
 	}
 
 	if (acc)
-		for (NickServ::Nick *na : acc->GetRefs<NickServ::Nick *>(NickServ::nick))
+		for (NickServ::Nick *na : acc->GetRefs<NickServ::Nick *>())
 			if (Anope::Match(na->GetNick(), this->Mask()))
 				return true;
-
-	if (IRCD->IsChannelValid(this->Mask()))
-	{
-		ChanServ::Channel *tci = ChanServ::Find(this->Mask());
-		if (tci)
-		{
-			for (unsigned i = 0; i < tci->GetAccessCount(); ++i)
-			{
-				ChanServ::ChanAccess *a = tci->GetAccess(i);
-				std::pair<ChanServ::ChanAccess *, ChanServ::ChanAccess *> pair = std::make_pair(this, a);
-
-				std::pair<Set::iterator, Set::iterator> range = p.first.equal_range(this);
-				for (; range.first != range.second; ++range.first)
-					if (range.first->first == pair.first && range.first->second == pair.second)
-						goto cont;
-
-				p.first.insert(pair);
-				if (a->Matches(u, acc, p))
-					p.second.insert(pair);
-
-				cont:;
-			}
-
-			return p.second.count(this) > 0;
-		}
-	}
 
 	return false;
 }

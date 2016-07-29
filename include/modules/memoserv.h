@@ -17,6 +17,8 @@ namespace MemoServ
 	class MemoServService : public Service
 	{
 	 public:
+		static constexpr const char *NAME = "memoserv";
+		 
 		enum MemoResult
 		{
 			MEMO_SUCCESS,
@@ -25,7 +27,7 @@ namespace MemoServ
 			MEMO_TARGET_FULL
 		};
 
-		MemoServService(Module *m) : Service(m, "MemoServService", "MemoServ")
+		MemoServService(Module *m) : Service(m, "MemoServService", NAME)
 		{
 		}
 
@@ -42,17 +44,19 @@ namespace MemoServ
 		 */
 		virtual void Check(User *u) anope_abstract;
 
-		virtual Memo *CreateMemo() anope_abstract;
 		virtual MemoInfo *GetMemoInfo(const Anope::string &targ, bool &is_registered, bool &is_chan, bool create) anope_abstract;
-
-		virtual Ignore *CreateIgnore() anope_abstract;
 	};
-	static ServiceReference<MemoServService> service("MemoServService", "MemoServ");
+	
+	extern MemoServService *service;
 
 	namespace Event
 	{
 		struct CoreExport MemoSend : Events
 		{
+			static constexpr const char *NAME = "memosend";
+
+			using Events::Events;
+			
 			/** Called when a memo is sent
 			 * @param source The source of the memo
 			 * @param target The target of the memo
@@ -61,10 +65,13 @@ namespace MemoServ
 			 */
 			virtual void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m) anope_abstract;
 		};
-		static EventHandlersReference<MemoSend> OnMemoSend;
 
 		struct CoreExport MemoDel : Events
 		{
+			static constexpr const char *NAME = "memodel";
+
+			using Events::Events;
+			
 			/** Called when a memo is deleted
 			 * @param target The target the memo is being deleted from (nick or channel)
 			 * @param mi The memo info
@@ -72,7 +79,6 @@ namespace MemoServ
 			 */
 			virtual void OnMemoDel(const Anope::string &target, MemoInfo *mi, const Memo *m) anope_abstract;
 		};
-		static EventHandlersReference<MemoDel> OnMemoDel;
 	}
 
 	class Memo : public Serialize::Object
@@ -81,6 +87,8 @@ namespace MemoServ
 		using Serialize::Object::Object;
 
 	 public:
+		static constexpr const char *const NAME = "memo";
+
 		virtual MemoInfo *GetMemoInfo() anope_abstract;
 		virtual void SetMemoInfo(MemoInfo *) anope_abstract;
 
@@ -100,8 +108,6 @@ namespace MemoServ
 		virtual void SetReceipt(const bool &) anope_abstract;
 	};
 
-	static Serialize::TypeReference<Memo> memo("Memo");
-
 	/* Memo info structures.  Since both nicknames and channels can have memos,
 	 * we encapsulate memo data in a MemoInfo to make it easier to handle.
 	 */
@@ -111,6 +117,7 @@ namespace MemoServ
 		using Serialize::Object::Object;
 
 	 public:
+		static constexpr const char *const NAME = "memoinfo";
 
 		virtual Memo *GetMemo(unsigned index) anope_abstract;
 
@@ -130,23 +137,18 @@ namespace MemoServ
 		virtual std::vector<Ignore *> GetIgnores() anope_abstract;
 	};
 
-	static Serialize::TypeReference<MemoInfo> memoinfo("MemoInfo");
-
 	class Ignore : public Serialize::Object
 	{
 	 protected:
 		using Serialize::Object::Object;
 
 	 public:
+		static constexpr const char *const NAME = "memoignore";
+
 		virtual MemoInfo *GetMemoInfo() anope_abstract;
 		virtual void SetMemoInfo(MemoInfo *) anope_abstract;
 
 		virtual Anope::string GetMask() anope_abstract;
 		virtual void SetMask(const Anope::string &mask) anope_abstract;
 	};
-
-	static Serialize::TypeReference<Ignore> ignore("MemoIgnore");
 }
-
-template<> struct EventName<MemoServ::Event::MemoSend> { static constexpr const char *const name = "OnMemoSend"; };
-template<> struct EventName<MemoServ::Event::MemoDel> { static constexpr const char *const name = "OnMemoDel"; };

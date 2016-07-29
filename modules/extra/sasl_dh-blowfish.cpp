@@ -171,7 +171,7 @@ class DHBS : public Mechanism
 				return Err(sess, pubkey);
 
 			SASL::IdentifyRequest* req = new SASL::IdentifyRequest(this->owner, m.source, username, password);
-			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
+			EventManager::Get()->Dispatch(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
 			req->Dispatch();
 
 			BN_free(pubkey);

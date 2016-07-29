@@ -5,25 +5,29 @@
  *
  * Please read COPYING and README for further details.
  *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
  */
 
+/* Dependencies: anope_chanserv.main */
+
 #include "module.h"
-#include "modules/cs_access.h"
-#include "main/chanaccess.h"
+#include "modules/chanserv.h"
+#include "modules/chanserv/access.h"
+#include "modules/chanserv/main/chanaccess.h"
 #include "main/chanaccesstype.h"
 
 static std::map<Anope::string, char> defaultFlags;
 
-class FlagsChanAccess : public ChanAccessImpl
+class FlagsChanAccessImpl : public FlagsChanAccess
 {
- public:
-	FlagsChanAccess(Serialize::TypeBase *type) : ChanAccessImpl(type) { }
-	FlagsChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanAccessImpl(type, id) { }
+	friend class FlagsChanAccessType;
 
-	Anope::string GetFlags();
-	void SetFlags(const Anope::string &);
+	Anope::string flags;
+
+ public:
+	using FlagsChanAccess::FlagsChanAccess;
+
+	const Anope::string &GetFlags() override;
+	void SetFlags(const Anope::string &) override;
 
 	bool HasPriv(const Anope::string &priv) override
 	{
@@ -43,7 +47,7 @@ class FlagsChanAccess : public ChanAccessImpl
 
 	static Anope::string DetermineFlags(ChanServ::ChanAccess *access)
 	{
-		if (access->GetSerializableType()->GetName() != "FlagsChanAccess")
+		if (access->GetSerializableType()->GetName() != NAME)
 			return access->AccessSerialize();
 
 		std::set<char> buffer;
@@ -59,20 +63,19 @@ class FlagsChanAccess : public ChanAccessImpl
 	}
 };
 
-class FlagsChanAccessType : public Serialize::Type<FlagsChanAccess, ChanAccessType>
+class FlagsChanAccessType : public ChanAccessType<FlagsChanAccessImpl>
 {
  public:
-	Serialize::Field<FlagsChanAccess, Anope::string> flags;
-	//Serialize::Field<FlagsChanAccess, std::set<char>>> flags; XXX?
+	Serialize::Field<FlagsChanAccessImpl, Anope::string> flags;
 
-	FlagsChanAccessType(Module *me) : Serialize::Type<FlagsChanAccess, ChanAccessType>(me, "FlagsChanAccess")
-		, flags(this, "flags")
+	FlagsChanAccessType(Module *me) : ChanAccessType<FlagsChanAccessImpl>(me)
+		, flags(this, "flags", &FlagsChanAccessImpl::flags)
 	{
-		SetParent(ChanServ::chanaccess);
+		Serialize::SetParent(FlagsChanAccess::NAME, ChanServ::ChanAccess::NAME);
 	}
 };
 
-Anope::string FlagsChanAccess::GetFlags()
+const Anope::string &FlagsChanAccess::GetFlags()
 {
 	return Get(&FlagsChanAccessType::flags);
 }
@@ -169,7 +172,7 @@ class CommandCSFlags : public Command
 					}
 
 				current = access;
-				Anope::string cur_flags = FlagsChanAccess::DetermineFlags(access);
+				Anope::string cur_flags = FlagsChanAccessImpl::DetermineFlags(access);
 				for (unsigned j = cur_flags.length(); j > 0; --j)
 					current_flags.insert(cur_flags[j - 1]);
 				break;
@@ -177,7 +180,7 @@ class CommandCSFlags : public Command
 		}
 
 		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
-		if (access_max && ci->GetDeepAccessCount() >= access_max)
+		if (access_max && ci->GetAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have \002{0}\002 access entries on a channel, including access entries from other channels."), access_max);
 			return;
@@ -252,7 +255,7 @@ class CommandCSFlags : public Command
 		{
 			if (current != NULL)
 			{
-				Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, current);
+				EventManager::Get()->Dispatch(&Event::AccessDel::OnAccessDel, ci, source, current);
 				delete current;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 				source.Reply(_("\002{0}\002 removed from the access list of \002{1}\002."), mask, ci->GetName());
@@ -264,7 +267,7 @@ class CommandCSFlags : public Command
 			return;
 		}
 
-		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(flagschanaccess.Create());
+		FlagsChanAccess *access = Serialize::New<FlagsChanAccess *>();
 		if (na)
 			access->SetObj(na->GetAccount());
 		else if (targ_ci)
@@ -279,7 +282,7 @@ class CommandCSFlags : public Command
 		if (current != NULL)
 			delete current;
 
-		Event::OnAccessAdd(&Event::AccessAdd::OnAccessAdd, ci, source, access);
+		EventManager::Get()->Dispatch(&Event::AccessAdd::OnAccessAdd, ci, source, access);
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to modify " << mask << "'s flags to " << access->AccessSerialize();
 		if (p != NULL)
@@ -311,7 +314,7 @@ class CommandCSFlags : public Command
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 		{
 			ChanServ::ChanAccess *access = ci->GetAccess(i);
-			const Anope::string &flags = FlagsChanAccess::DetermineFlags(access);
+			const Anope::string &flags = FlagsChanAccessImpl::DetermineFlags(access);
 
 			if (!arg.empty())
 			{
@@ -365,7 +368,7 @@ class CommandCSFlags : public Command
 
 		ci->ClearAccess();
 
-		Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
+		EventManager::Get()->Dispatch(&Event::AccessClear::OnAccessClear, ci, source);
 
 		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->GetName());
 

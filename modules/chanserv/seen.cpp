@@ -10,6 +10,7 @@
  */
 
 
+#warning "this is disabled"
 #if 0
 #include "module.h"
 

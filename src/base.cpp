@@ -10,9 +10,8 @@
 #include "services.h"
 #include "anope.h"
 #include "service.h"
+#include "base.h"
 
-std::map<Anope::string, std::map<Anope::string, Service *> > *Service::Services = NULL;
-std::map<Anope::string, std::map<Anope::string, Anope::string> > *Service::Aliases = NULL;
 std::set<ReferenceBase *> *ReferenceBase::references = NULL;
 
 ReferenceBase::ReferenceBase()

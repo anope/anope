@@ -10,6 +10,10 @@ namespace Event
 {
 	struct CoreExport BotCreate : Events
 	{
+		static constexpr const char *NAME = "botcreate";
+
+		using Events::Events;
+		
 		/** Called when a new bot is made
 		 * @param bi The bot
 		 */
@@ -18,6 +22,10 @@ namespace Event
 
 	struct CoreExport BotChange : Events
 	{
+		static constexpr const char *NAME = "botchange";
+
+		using Events::Events;
+		
 		/** Called when a bot is changed
 		 * @param bi The bot
 		 */
@@ -26,6 +34,10 @@ namespace Event
 
 	struct CoreExport BotDelete : Events
 	{
+		static constexpr const char *NAME = "botdelete";
+
+		using Events::Events;
+		
 		/** Called when a bot is deleted
 		 * @param bi The bot
 		 */
@@ -33,6 +45,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::BotCreate> { static constexpr const char *const name = "OnBotCreate"; };
-template<> struct EventName<Event::BotChange> { static constexpr const char *const name = "OnBotChange"; };
-template<> struct EventName<Event::BotDelete> { static constexpr const char *const name = "OnBotDelete"; };

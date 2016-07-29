@@ -26,10 +26,8 @@ class CommandHelp : public Command
 		return NULL;
 	}
 
-	EventHandlers<Event::Help> &onhelp;
-
  public:
-	CommandHelp(Module *creator, EventHandlers<Event::Help> &event) : Command(creator, "generic/help", 0), onhelp(event)
+	CommandHelp(Module *creator) : Command(creator, "generic/help", 0)
 	{
 		this->SetDesc(_("Displays this list and give information about commands"));
 		this->AllowUnregistered(true);
@@ -37,7 +35,7 @@ class CommandHelp : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		EventReturn MOD_RESULT = this->onhelp(&Event::Help::OnPreHelp, source, params);
+		EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::Help::OnPreHelp, source, params);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -70,7 +68,7 @@ class CommandHelp : public Command
 				if (cmd != it->first && map.count(cmd))
 					continue;
 
-				ServiceReference<Command> c("Command", info.name);
+				ServiceReference<Command> c(info.name);
 				if (!c)
 					continue;
 
@@ -133,7 +131,7 @@ class CommandHelp : public Command
 
 				const CommandInfo &info = it->second;
 
-				ServiceReference<Command> c("Command", info.name);
+				ServiceReference<Command> c(info.name);
 				if (!c)
 					continue;
 
@@ -176,19 +174,17 @@ class CommandHelp : public Command
 				source.Reply(_("No help available for \002{0}\002."), params[0]);
 		}
 
-		this->onhelp(&Event::Help::OnPostHelp, source, params);
+		EventManager::Get()->Dispatch(&Event::Help::OnPostHelp, source, params);
 	}
 };
 
 class Help : public Module
 {
 	CommandHelp commandhelp;
-	EventHandlers<Event::Help> onhelp;
 
  public:
 	Help(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandhelp(this, onhelp)
-		, onhelp(this)
+		, commandhelp(this)
 	{
 
 	}

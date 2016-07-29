@@ -1,12 +1,11 @@
 /*
  *
  * (C) 2003-2014 Anope Team
+ * (C) 2016 Adam <Adam@anope.org>
+ *
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
  *
  */
 
@@ -23,86 +22,150 @@
  */
 class CoreExport Service : public virtual Base
 {
-	static std::map<Anope::string, std::map<Anope::string, Service *> > *Services;
-	static std::map<Anope::string, std::map<Anope::string, Anope::string> > *Aliases;
-
-	static void check();
-
-	static Service *FindService(const std::map<Anope::string, Service *> &services, const std::map<Anope::string, Anope::string> *aliases, const Anope::string &n);
-
- public:
- 	static Service *FindService(const Anope::string &t, const Anope::string &n);
-
-	static std::vector<Anope::string> GetServiceKeys(const Anope::string &t);
-
-	static void AddAlias(const Anope::string &t, const Anope::string &n, const Anope::string &v);
-
-	static void DelAlias(const Anope::string &t, const Anope::string &n);
-
 	Module *owner;
 	/* Service type, which should be the class name (eg "Command") */
 	Anope::string type;
 	/* Service name, commands are usually named service/command */
 	Anope::string name;
 
+ public:
 	Service(Module *o, const Anope::string &t, const Anope::string &n);
-
-	Service(const Service &) = delete;
+	
+	Service(Module *o, const Anope::string &t) : Service(o, t, "") { }
 
 	virtual ~Service();
 
-	void Register();
+	Module *GetOwner() const { return owner; }
 
-	void Unregister();
+	const Anope::string &GetType() const { return type; }
+
+	const Anope::string &GetName() const { return name; }
 };
 
-/** Like Reference, but used to refer to Services.
- */
-template<typename T>
-class ServiceReference : public Reference<T>
+class ServiceReferenceBase
 {
-	Anope::string type;
-	Anope::string name;
-	bool need_check = true;
+	Anope::string type, name;
+
+ protected:
+	std::vector<Service *> services;
 
  public:
- 	ServiceReference() { }
 
-	ServiceReference(const Anope::string &t, const Anope::string &n) : type(t), name(n)
+	ServiceReferenceBase() = default;
+
+	ServiceReferenceBase(const Anope::string &_type, const Anope::string &_name);
+	ServiceReferenceBase(const Anope::string &_type);
+	
+	virtual ~ServiceReferenceBase();
+	
+	explicit operator bool() const
 	{
+		return !this->services.empty();
 	}
 
-	const Anope::string &GetName() const
+	const Anope::string &GetType() const { return type; }
+	const Anope::string &GetName() const { return name; }
+
+	Service *GetService() const { return services.empty() ? nullptr : services[0]; }
+	const std::vector<Service *> &GetServices() const { return services; }
+	void SetService(Service *service);
+	void SetServices(const std::vector<Service *> &s);
+};
+
+template<typename T>
+class ServiceReference : public ServiceReferenceBase
+{
+	static_assert(std::is_base_of<Service, T>::value, "");
+
+ public:
+	ServiceReference() : ServiceReferenceBase(T::NAME) { }
+	ServiceReference(const Anope::string &n) : ServiceReferenceBase(T::NAME, n) { }
+
+	operator T*() const
 	{
-		return name;
+		return static_cast<T*>(GetService());
 	}
 
-	void operator=(const Anope::string &n)
+	T* operator->() const
 	{
-		this->name = n;
+		return static_cast<T*>(GetService());
 	}
 
-	void Check() override
+	T* operator*() const
 	{
-		if (need_check)
-		{
-			need_check = false;
+		return static_cast<T*>(GetService());
+	}
+};
 
-			this->ref = static_cast<T *>(Service::FindService(this->type, this->name));
-			if (this->ref)
-			{
-				this->ref->AddReference(this);
-				this->OnAcquire();
-			}
-		}
+template<typename T>
+class ServiceReferenceList : public ServiceReferenceBase
+{
+	static_assert(std::is_base_of<Service, T>::value, "");
+
+ public:
+	using ServiceReferenceBase::ServiceReferenceBase;
+
+	std::vector<T *> GetServices() const
+	{
+		std::vector<T *> out;
+		std::transform(services.begin(), services.end(), std::back_inserter(out), [](Service *e) { return static_cast<T *>(e); });
+		return out;
+	}
+};
+
+class ServiceManager
+{
+	std::vector<ServiceReferenceBase *> references; // managed references
+	std::vector<Service *> services; // all registered services
+
+	/* Lookup services for a reference */
+	void Lookup(ServiceReferenceBase *reference);
+
+	/* Lookup services for all managed references */
+	void LookupAll();
+
+	std::vector<Service *> FindServices(const Anope::string &type);
+
+	static ServiceManager *manager;
+
+ public:
+	Service *FindService(const Anope::string &name);
+	Service *FindService(const Anope::string &type, const Anope::string &name);
+
+	template<typename T>
+	std::vector<T> FindServices()
+	{
+		static_assert(std::is_base_of<Service, typename std::remove_pointer<T>::type>::value, "");
+		const char *type = std::remove_pointer<T>::type::NAME;
+		std::vector<Service *> s = FindServices(type);
+		std::vector<T> out;
+		std::transform(s.begin(), s.end(), std::back_inserter(out), [](Service *e) { return static_cast<T>(e); });
+		return out;
 	}
 
-	void Reset() override
+	template<typename T>
+	T FindService(const Anope::string &name)
 	{
-		need_check = true;
+		static_assert(std::is_base_of<Service, typename std::remove_pointer<T>::type>::value, "");
+		const char *type = std::remove_pointer<T>::type::NAME;
+		return static_cast<T>(FindService(type, name));
 	}
 
-	virtual void OnAcquire() { }
+	void AddAlias(const Anope::string &t, const Anope::string &n, const Anope::string &v);
+
+	void DelAlias(const Anope::string &t, const Anope::string &n);
+
+	void Register(Service *service);
+
+	void Unregister(Service *service);
+
+	void RegisterReference(ServiceReferenceBase *reference);
+
+	void UnregisterReference(ServiceReferenceBase *reference);
+
+	static void Init();
+	static ServiceManager *Get();
+	static void Destroy();
 };
 
 class ServiceAlias
@@ -112,4 +175,3 @@ class ServiceAlias
 	ServiceAlias(const Anope::string &type, const Anope::string &from, const Anope::string &to);
 	~ServiceAlias();
 };
-

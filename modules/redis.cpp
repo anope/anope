@@ -265,7 +265,7 @@ RedisSocket::~RedisSocket()
 
 void RedisSocket::OnConnect()
 {
-	Log() << "redis: Successfully connected to " << provider->name << (this == this->provider->sub ? " (sub)" : "");
+	Log() << "redis: Successfully connected to " << provider->GetName() << (this == this->provider->sub ? " (sub)" : "");
 
 	this->provider->SendCommand(NULL, "CLIENT SETNAME Anope");
 	this->provider->SendCommand(NULL, "SELECT " + stringify(provider->db));
@@ -273,7 +273,7 @@ void RedisSocket::OnConnect()
 
 void RedisSocket::OnError(const Anope::string &error)
 {
-	Log() << "redis: Error on " << provider->name << (this == this->provider->sub ? " (sub)" : "") << ": " << error;
+	Log() << "redis: Error on " << provider->GetName() << (this == this->provider->sub ? " (sub)" : "") << ": " << error;
 }
 
 size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
@@ -504,6 +504,7 @@ class ModuleRedis : public Module
 
  public:
 	ModuleRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::ModuleUnload>(this)
 	{
 	}
 
@@ -546,7 +547,7 @@ class ModuleRedis : public Module
 			Provider *p = it->second;
 			++it;
 
-			if (std::find(new_services.begin(), new_services.end(), p->name) == new_services.end())
+			if (std::find(new_services.begin(), new_services.end(), p->GetName()) == new_services.end())
 				delete it->second;
 		}
 	}

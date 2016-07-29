@@ -34,7 +34,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 			const Anope::string &post_greet = HTTPUtils::URLDecode(message.post_data["greet"].replace_all_cs("+", " "));
 
 			if (post_greet.empty())
-				na->GetAccount()->ShrinkOK<Anope::string>("greet");
+				na->GetAccount()->Shrink<Anope::string>("greet");
 			else if (!greet || post_greet != *greet)
 				na->GetAccount()->Extend<Anope::string>("greet", post_greet);
 

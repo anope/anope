@@ -22,6 +22,7 @@
 #include "channels.h"
 #include "event.h"
 #include "bots.h"
+#include "modules/operserv/stats.h"
 
 using namespace Message;
 
@@ -29,7 +30,7 @@ void Away::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	const Anope::string &msg = !params.empty() ? params[0] : "";
 
-	Event::OnUserAway(&Event::UserAway::OnUserAway, source.GetUser(), msg);
+	EventManager::Get()->Dispatch(&Event::UserAway::OnUserAway, source.GetUser(), msg);
 
 	if (!msg.empty())
 		Log(source.GetUser(), "away") << "is now away: " << msg;
@@ -66,7 +67,7 @@ void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params
 	if (!targ || targ->server != Me || !c || c->FindUser(targ))
 		return;
 
-	Event::OnInvite(&Event::Invite::OnInvite, source.GetUser(), c, targ);
+	EventManager::Get()->Dispatch(&Event::Invite::OnInvite, source.GetUser(), c, targ);
 }
 
 void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -88,9 +89,9 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 				Channel *c = cc->chan;
 				++it;
 
-				Event::OnPrePartChannel(&Event::PrePartChannel::OnPrePartChannel, user, c);
+				EventManager::Get()->Dispatch(&Event::PrePartChannel::OnPrePartChannel, user, c);
 				cc->chan->DeleteUser(user);
-				Event::OnPartChannel(&Event::PartChannel::OnPartChannel, user, c, c->name,  "");
+				EventManager::Get()->Dispatch(&Event::PartChannel::OnPartChannel, user, c, c->name,  "");
 			}
 			continue;
 		}
@@ -152,7 +153,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		 */
 		c->SetCorrectModes(u, true);
 
-		Event::OnJoinChannel(&Event::JoinChannel::OnJoinChannel, u, c);
+		EventManager::Get()->Dispatch(&Event::JoinChannel::OnJoinChannel, u, c);
 	}
 
 	/* Channel is done syncing */
@@ -273,7 +274,7 @@ void Notice::Run(MessageSource &source, const std::vector<Anope::string> &params
 		ServiceBot *bi = ServiceBot::Find(params[0]);
 		if (!bi)
 			return;
-		Event::OnBotNotice(&Event::BotNotice::OnBotNotice, u, bi, message);
+		EventManager::Get()->Dispatch(&Event::BotNotice::OnBotNotice, u, bi, message);
 	}
 }
 
@@ -294,9 +295,9 @@ void Part::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 		Log(u, c, "part") << "Reason: " << (!reason.empty() ? reason : "No reason");
 
-		Event::OnPrePartChannel(&Event::PrePartChannel::OnPrePartChannel, u, c);
+		EventManager::Get()->Dispatch(&Event::PrePartChannel::OnPrePartChannel, u, c);
 		c->DeleteUser(u);
-		Event::OnPartChannel(&Event::PartChannel::OnPartChannel, u, c, c->name, !reason.empty() ? reason : "");
+		EventManager::Get()->Dispatch(&Event::PartChannel::OnPartChannel, u, c, c->name, reason);
 	}
 }
 
@@ -317,7 +318,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 		Channel *c = Channel::Find(receiver);
 		if (c)
 		{
-			Event::OnPrivmsg(&Event::Privmsg::OnPrivmsg, u, c, message);
+			EventManager::Get()->Dispatch(&Event::Privmsg::OnPrivmsg, u, c, message);
 		}
 	}
 	else
@@ -366,8 +367,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 				return;
 			}
 
-			EventReturn MOD_RESULT;
-			MOD_RESULT = Event::OnBotPrivmsg(&Event::BotPrivmsg::OnBotPrivmsg, u, bi, message);
+			EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::BotPrivmsg::OnBotPrivmsg, u, bi, message);
 			if (MOD_RESULT == EVENT_STOP)
 				return;
 
@@ -409,7 +409,7 @@ void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
 }
 
-void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
+void Message::Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *u = source.GetUser();
 
@@ -431,7 +431,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			else
 			{
-				for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
+				for (Oper *o : Serialize::GetObjects<Oper *>())
 					IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->GetName().c_str(), o->GetType()->GetName().replace_all_cs(" ", "_").c_str());
 
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
@@ -440,9 +440,11 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 			break;
 		case 'u':
 		{
+			::Stats *s = Serialize::GetObject<::Stats *>();
 			long uptime = static_cast<long>(Anope::CurTime - Anope::StartTime);
+
 			IRCD->SendNumeric(242, source.GetSource(), ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
-			IRCD->SendNumeric(250, source.GetSource(), ":Current users: %d (%d ops); maximum %d", UserListByNick.size(), OperCount, MaxUserCount);
+			IRCD->SendNumeric(250, source.GetSource(), ":Current users: %d (%d ops); maximum %d", UserListByNick.size(), OperCount, s ? s->GetMaxUserCount() : 0);
 			IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			break;
 		} /* case 'u' */

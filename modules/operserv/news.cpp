@@ -1,12 +1,10 @@
 /* OperServ core functions
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for further details.
  *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
  */
 
 #include "module.h"
@@ -67,6 +65,12 @@ static struct NewsMessages
 
 class NewsItemImpl : public NewsItem
 {
+	friend class NewsItemType;
+
+	NewsType type;
+	Anope::string text, who;
+	time_t time = 0;
+
  public:
 	NewsItemImpl(Serialize::TypeBase *type) : NewsItem(type) { }
         NewsItemImpl(Serialize::TypeBase *type, Serialize::ID id) : NewsItem(type, id) { }
@@ -92,11 +96,11 @@ class NewsItemType : public Serialize::Type<NewsItemImpl>
 	Serialize::Field<NewsItemImpl, Anope::string> who;
 	Serialize::Field<NewsItemImpl, time_t> time;
 
-	NewsItemType(Module *me) : Serialize::Type<NewsItemImpl>(me, "NewsItem")
-		, type(this, "type")
-		, text(this, "text")
-		, who(this, "who")
-		, time(this, "time")
+	NewsItemType(Module *me) : Serialize::Type<NewsItemImpl>(me)
+		, type(this, "type", &NewsItemImpl::type)
+		, text(this, "text", &NewsItemImpl::text)
+		, who(this, "who", &NewsItemImpl::who)
+		, time(this, "time", &NewsItemImpl::time)
 	{
 	}
 };
@@ -154,7 +158,7 @@ class NewsBase : public Command
  protected:
 	void DoList(CommandSource &source, NewsType ntype, const char **msgs)
 	{
-		std::vector<NewsItem *> list = Serialize::GetObjects<NewsItem *>(newsitem);
+		std::vector<NewsItem *> list = Serialize::GetObjects<NewsItem *>();
 
 		if (list.empty())
 		{
@@ -200,7 +204,7 @@ class NewsBase : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		NewsItem *ni = newsitem.Create();
+		NewsItem *ni = Serialize::New<NewsItem *>();
 		ni->SetNewsType(ntype);
 		ni->SetText(text);
 		ni->SetTime(Anope::CurTime);
@@ -213,7 +217,7 @@ class NewsBase : public Command
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
 	{
 		const Anope::string &text = params.size() > 1 ? params[1] : "";
-		std::vector<NewsItem *> list = Serialize::GetObjects<NewsItem *>(newsitem);
+		std::vector<NewsItem *> list = Serialize::GetObjects<NewsItem *>();
 
 		if (text.empty())
 		{
@@ -304,7 +308,7 @@ class CommandOSLogonNews : public NewsBase
 		source.Reply(_("Edits or displays the list of logon news messages.  When a user connects to the network, these messages will be sent to them."
 		               " However, no more than \002{0}\002 messages will be sent in order to avoid flooding the user."
 		               " If there are more news messages, only the most recent will be sent."),
-		               Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
+		               Config->GetModule(this->GetOwner())->Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };
@@ -328,7 +332,7 @@ class CommandOSOperNews : public NewsBase
 		               " When a user opers up (with the /OPER command), these messages will be sent to them."
 		               " However, no more than \002{0}\002 messages will be sent in order to avoid flooding the user."
 		               " If there are more news messages, only the most recent will be sent."),
-		               Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
+		               Config->GetModule(this->GetOwner())->Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };
@@ -369,7 +373,7 @@ class OSNews : public Module
 
 	void DisplayNews(User *u, NewsType Type)
 	{
-		std::vector<NewsItem *> list = Serialize::GetObjects<NewsItem *>(newsitem);
+		std::vector<NewsItem *> list = Serialize::GetObjects<NewsItem *>();
 		if (list.empty())
 			return;
 
@@ -426,6 +430,8 @@ class OSNews : public Module
 
  public:
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserModeSet>(this)
+		, EventHook<Event::UserConnect>(this)
 		, newsitemtype(this)
 		, commandoslogonnews(this)
 		, commandosopernews(this)

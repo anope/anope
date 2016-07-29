@@ -13,12 +13,13 @@
 
 static Anope::string UplinkSID;
 
-static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
-
 class PlexusProto : public IRCDProto
 {
+	ServiceReference<IRCDProto> hybrid; // XXX use moddeps + inheritance here
+	
  public:
 	PlexusProto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
+		, hybrid("hybrid")
 	{
 		DefaultPseudoclientModes = "+oiU";
 		CanSVSNick = true;
@@ -204,7 +205,7 @@ struct IRCDMessageEncap : IRCDMessage
 			if (u)
 			{
 				u->fingerprint = params[3];
-				Event::OnFingerprint(&Event::Fingerprint::OnFingerprint, u);
+				EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
 			}
 		}
 		return;
@@ -366,8 +367,8 @@ class ProtoPlexus : public Module
 		m_hybrid = ModuleManager::FindModule("hybrid");
 		if (!m_hybrid)
 			throw ModuleException("Unable to find hybrid");
-		if (!hybrid)
-			throw ModuleException("No protocol interface for hybrid");
+//		if (!hybrid)
+//			throw ModuleException("No protocol interface for hybrid");
 	}
 
 	~ProtoPlexus()

@@ -23,6 +23,7 @@ class CommandMSRSend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+#warning "this is completely disabled"
 #if 0
 		if (!MemoServ::service)
 			return;
@@ -44,7 +45,7 @@ class CommandMSRSend : public Command
 			return;
 		}
 
-		if (Config->GetModule(this->owner)->Get<bool>("operonly") && !source.IsServicesOper())
+		if (Config->GetModule(this->GetOwner())->Get<bool>("operonly") && !source.IsServicesOper())
 			source.Reply(_("Access denied. This command is for operators only."));
 		else
 		{

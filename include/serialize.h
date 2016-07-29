@@ -1,12 +1,9 @@
 /*
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
  *
  */
 
@@ -22,7 +19,6 @@ namespace Serialize
 	class Object;
 
 	class TypeBase;
-	class AbstractType;
 	
 	class FieldBase;
 	template<typename> class FieldTypeBase;
@@ -32,9 +28,7 @@ namespace Serialize
 
 	template<typename T, typename> class Type;
 	template<typename T> class Reference;
-	template<typename T> class TypeReference;
 
-	extern std::map<Anope::string, Serialize::TypeBase *> Types;
 	// by id
 	extern std::unordered_map<ID, Object *> objects;
 	extern std::vector<FieldBase *> serializableFields;
@@ -42,7 +36,16 @@ namespace Serialize
 	extern Object *GetID(ID id);
 
 	template<typename T>
-	inline std::vector<T> GetObjects(Serialize::TypeBase *type);
+	inline T GetObject();
+
+	template<typename T>
+	inline std::vector<T> GetObjects(const Anope::string &name);
+
+	template<typename T>
+	inline std::vector<T> GetObjects();
+
+	template<typename T>
+	inline T New();
 
 	extern void Clear();
 
@@ -61,6 +64,12 @@ namespace Serialize
 			return other == e.other && field == e.field && direction == e.direction;
 		}
 	};
+
+	extern std::multimap<Anope::string, Anope::string> child_types;
+
+	extern void SetParent(const Anope::string &child, const Anope::string &parent);
+
+	extern std::vector<Serialize::TypeBase *> GetTypes(const Anope::string &name);
 }
 
 class CoreExport Serialize::Object : public Extensible, public virtual Base
@@ -73,13 +82,12 @@ class CoreExport Serialize::Object : public Extensible, public virtual Base
 
 	std::map<TypeBase *, std::vector<Edge>> edges;
 
-	std::vector<Serialize::Edge> GetRefs(TypeBase *);
+	std::vector<Edge> GetRefs(TypeBase *);
 
- protected:
+ public:
 	Object(TypeBase *type);
 	Object(TypeBase *type, ID);
 
- public:
 	virtual ~Object();
 
 	virtual void Delete();
@@ -91,38 +99,58 @@ class CoreExport Serialize::Object : public Extensible, public virtual Base
 
 	void RemoveEdge(Object *other, FieldBase *field);
 
+	/**
+	 * Get an object of type T that this object references.
+	 */
 	template<typename T>
-	T GetRef(TypeBase *type)
+	T GetRef()
 	{
-		std::vector<T> t = GetRefs<T>(type);
+		std::vector<T> t = GetRefs<T>();
 		return !t.empty() ? t[0] : nullptr;
 	}
-
+	
+	/**
+	 * Gets all objects of type T that this object references
+	 */
 	template<typename T>
-	std::vector<T> GetRefs(TypeBase *type);
+	std::vector<T> GetRefs();
 
+	/**
+	 * Get the value of a field on this object.
+	 */
 	template<
-		typename Type, // inherits from Serialize::Type
-		template<typename, typename> class Field,
-		typename TypeImpl, // implementation of Type
+		typename Type,
+		template<typename, typename> class Field, // Field type being read
+		typename TypeImpl,
 		typename T // type of the Extensible
 	>
 	T Get(Field<TypeImpl, T> Type::*field)
 	{
+		static_assert(std::is_base_of<Object, TypeImpl>::value, "");
+		static_assert(std::is_base_of<Serialize::TypeBase, Type>::value, "");
+
 		Type *t = static_cast<Type *>(s_type);
 		Field<TypeImpl, T>& f = t->*field;
 		return f.GetField(f.Upcast(this));
 	}
 
-	/* the return value can't be inferred by the compiler so we supply this function to allow us to specify it */
+	/**
+	 * Get the value of a field on this object. Allows specifying return
+	 * type if the return type can't be inferred.
+	 */
 	template<typename Ret, typename Field, typename Type>
 	Ret Get(Field Type::*field)
 	{
+		static_assert(std::is_base_of<Serialize::TypeBase, Type>::value, "");
+
 		Type *t = static_cast<Type *>(s_type);
 		Field& f = t->*field;
 		return f.GetField(f.Upcast(this));
 	}
 
+	/**
+	 * Set the value of a field on this object
+	 */
 	template<
 		typename Type,
 		template<typename, typename> class Field,
@@ -131,14 +159,22 @@ class CoreExport Serialize::Object : public Extensible, public virtual Base
 	>
 	void Set(Field<TypeImpl, T> Type::*field, const T& value)
 	{
+		static_assert(std::is_base_of<Object, TypeImpl>::value, "");
+		static_assert(std::is_base_of<Serialize::TypeBase, Type>::value, "");
+
 		Type *t = static_cast<Type *>(s_type);
 		Field<TypeImpl, T>& f = t->*field;
 		f.SetField(f.Upcast(this), value);
 	}
 
+	/**
+	 * Set the value of a field on this object
+	 */
 	template<typename Field, typename Type, typename T>
 	void Set(Field Type::*field, const T& value)
 	{
+		static_assert(std::is_base_of<Serialize::TypeBase, Type>::value, "");
+
 		Type *t = static_cast<Type *>(s_type);
 		Field& f = t->*field;
 		f.SetField(f.Upcast(this), value);
@@ -149,12 +185,19 @@ class CoreExport Serialize::Object : public Extensible, public virtual Base
 	 */
 	TypeBase* GetSerializableType() const { return this->s_type; }
 
+	/** Set the value of a field on this object, by field name
+	 */
 	template<typename T>
 	void SetS(const Anope::string &name, const T &what);
 
+	/** Unset a field on this object, by field name
+	 */
 	template<typename T>
 	void UnsetS(const Anope::string &name);
 
+	/** Test if a field is set. Only useful with extensible fields,
+	 * which can unset (vs set to the default value)
+	 */
 	bool HasFieldS(const Anope::string &name);
 };
 
@@ -162,16 +205,14 @@ class CoreExport Serialize::TypeBase : public Service
 {
 	Anope::string name;
 
-	TypeBase *parent = nullptr;
-	std::vector<TypeBase *> children;
-
 	/* Owner of this type. Used for placing objects of this type in separate databases
 	 * based on what module, if any, owns it.
 	 */
 	Module *owner;
 
  public:
-	std::vector<FieldBase *> fields;
+	static constexpr const char *NAME = "typebase";
+	
 	std::set<Object *> objects;
 
 	TypeBase(Module *owner, const Anope::string &n);
@@ -179,20 +220,19 @@ class CoreExport Serialize::TypeBase : public Service
 
 	void Unregister();
 
- protected:
-	void SetParent(TypeBase *other);
-
- public:
 	/** Gets the name for this type
 	 * @return The name, eg "NickAlias"
 	 */
 	const Anope::string &GetName() { return this->name; }
 
+	/**
+	 * Get all objects of the given type
+	 */
 	template<typename T>
 	std::vector<T> List()
 	{
 		std::vector<ID> ids;
-		EventReturn result = Event::OnSerialize(&Event::SerializeEvents::OnSerializeList, this, ids);
+		EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeList, this, ids);
 		if (result == EVENT_ALLOW)
 		{
 			std::vector<T> o;
@@ -205,44 +245,39 @@ class CoreExport Serialize::TypeBase : public Service
 			return o;
 		}
 
-		return GetObjects<T>(this);
+		return GetObjects<T>();
 	}
 
+	/** Create a new object of this type.
+	 */
 	virtual Object *Create() anope_abstract;
+
+	/** Get or otherwise create an object of this type
+	 * with the given ID.
+	 */
 	virtual Object *Require(Serialize::ID) anope_abstract;
 
+	/** Find a field on this type
+	 */
 	FieldBase *GetField(const Anope::string &name);
 
-	Module* GetOwner() const { return this->owner; }
+	/** Get all fields of this type
+	 */
+	std::vector<FieldBase *> GetFields();
 
-	std::vector<TypeBase *> GetSubTypes();
+	Module* GetOwner() const { return this->owner; }
 
 	static TypeBase *Find(const Anope::string &name);
 
 	static const std::map<Anope::string, TypeBase *>& GetTypes();
 };
 
-class Serialize::AbstractType : public Serialize::TypeBase
-{
- public:
-	using Serialize::TypeBase::TypeBase;
-
-	Object *Create() override
-	{
-		return nullptr;
-	}
-
-	Object *Require(ID id) override
-	{
-		return nullptr;
-	}
-};
-
 template<typename T, typename Base = Serialize::TypeBase>
 class Serialize::Type : public Base
 {
  public:
-	using Base::Base;
+	Type(Module *module) : Base(module, T::NAME) { }
+	Type(Module *module, const Anope::string &name) : Base(module, name) { }
 
 	Object *Create() override
 	{
@@ -267,25 +302,12 @@ class Serialize::Type : public Base
 	}
 };
 
-template<typename T>
-class Serialize::TypeReference : public ServiceReference<Serialize::TypeBase>
-{
- public:
-	TypeReference(const Anope::string &name) : ServiceReference<Serialize::TypeBase>("Serialize::Type", name) { }
-
-	T* Create()
-	{
-		TypeBase *t = *this;
-		return static_cast<T *>(t->Create());
-	}
-
-	TypeBase *ToType()
-	{
-		TypeBase *t = *this;
-		return t;
-	}
-};
-
+/** A reference to a serializable object. Serializable objects may not always
+ * exist in memory at all times, like if they exist in an external database,
+ * so you can't hold pointers to them. Instead, hold a Serialize::Reference
+ * which will properly fetch the object on demand from the underlying database
+ * system.
+ */
 template<typename T>
 class Serialize::Reference
 {
@@ -331,7 +353,7 @@ class Serialize::Reference
 		if (targ != nullptr && targ->GetSerializableType() == type)
 			return anope_dynamic_static_cast<T*>(targ);
 
-		EventReturn result = Event::OnSerialize(&Event::SerializeEvents::OnSerializeDeref, id, type);
+		EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeDeref, id, type);
 		if (result == EVENT_ALLOW)
 			return anope_dynamic_static_cast<T *>(type->Require(id));
 
@@ -339,33 +361,40 @@ class Serialize::Reference
 	}
 };
 
-class Serialize::FieldBase
+/** A field, associated with a type.
+ */
+class Serialize::FieldBase : public Service
 {
  public:
-	struct Listener : ServiceReference<TypeBase>
-	{
-		FieldBase *base;
+	static constexpr const char *NAME = "fieldbase";
 
-		Listener(FieldBase *b, const ServiceReference<TypeBase> &t) : ServiceReference<TypeBase>(t), base(b) { }
+	Anope::string serialize_type; // type the field is on
+	Anope::string serialize_name; // field name
 
-		void OnAcquire() override;
-	} type;
-
-	Module *creator;
-	Anope::string name;
+	/** For fields which reference other Objects. If true, when
+	 * the object the field references gets deleted, this object
+	 * gets deleted too.
+	 */
 	bool depends;
-	bool unregister = false;
 
-	FieldBase(Module *, const Anope::string &, const ServiceReference<Serialize::TypeBase> &, bool);
+	FieldBase(Module *, const Anope::string &, const Anope::string &, bool);
 	virtual ~FieldBase();
 	void Unregister();
 
-	const Anope::string &GetName() { return name; }
+	/** Serialize value of this field on the given object to string form
+	 */
 	virtual Anope::string SerializeToString(Object *s) anope_abstract;
-	virtual void UnserializeFromString(Object *s, const Anope::string &) anope_abstract;
-	virtual void CacheMiss(Object *) anope_abstract;
 
+	/** Unserialize value of this field on the given object from string form
+	 */
+	virtual void UnserializeFromString(Object *s, const Anope::string &) anope_abstract;
+
+	/** Test if the given object has the given field, only usefil for extensible fields
+	 */
 	virtual bool HasFieldS(Object *) anope_abstract;
+
+	/** Unset this field on the given object
+	 */
 	virtual void UnsetS(Object *) anope_abstract;
 };
 
@@ -375,33 +404,115 @@ class Serialize::FieldTypeBase : public FieldBase
  public:
 	using FieldBase::FieldBase;
 
+	/** Set this field to the given value on the given object.
+	 */
 	virtual void SetFieldS(Object *, const T &) anope_abstract;
 };
 
-template<typename TypeImpl, typename T>
+/** Base class for serializable fields and serializable object fields.
+ */
+template<
+	typename TypeImpl, // Serializable type
+	typename T // actual type of field
+>
 class Serialize::CommonFieldBase : public FieldTypeBase<T>
 {
+	static_assert(std::is_base_of<Object, TypeImpl>::value, "");
+
+	/** Extensible storage for value of fields. Only used if field
+	 * isn't set. Note extensible fields can be "unset", where field 
+	 * pointers are never unset, but are T().
+	 */
+	ExtensibleItem<T> *ext = nullptr;
+
+	/** Field pointer to storage in the TypeImpl object for
+	 * this field.
+	 */
+	T TypeImpl::*field = nullptr;
+
  protected:
-	ExtensibleItem<T> ext;
+	/** Set the value of a field in storage
+	 */
+	void Set_(TypeImpl *object, const T &value)
+	{
+		if (field != nullptr)
+			object->*field = value;
+		else if (ext != nullptr)
+			ext->Set(object, value);
+		else
+			throw CoreException("No field or ext");
+	}
+
+	/* Get the value of a field from storage
+	 */
+	T* Get_(TypeImpl *object)
+	{
+		if (field != nullptr)
+			return &(object->*field);
+		else if (ext != nullptr)
+			return ext->Get(object);
+		else
+			throw CoreException("No field or ext");
+	}
+
+	/** Unset a field from storage
+	 */
+	void Unset_(TypeImpl *object)
+	{
+		if (field != nullptr)
+			object->*field = T();
+		else if (ext != nullptr)
+			ext->Unset(object);
+		else
+			throw CoreException("No field or ext");
+	}
+
+	/** Check is a field is set. Only useful for
+	 * extensible storage. Returns true for field storage.
+	 */
+	bool HasField_(TypeImpl *object)
+	{
+		if (field != nullptr)
+			return true;
+		else if (ext != nullptr)
+			return ext->HasExt(object);
+		else
+			throw CoreException("No field or ext");
+	}
 
  public:
-	CommonFieldBase(Serialize::TypeBase *t, const Anope::string &n, bool depends)
-		: FieldTypeBase<T>(t->GetOwner(), n, ServiceReference<Serialize::TypeBase>("Serialize::Type", t->GetName()), depends)
-		, ext(t->GetOwner(), t->GetName(), n)
+	CommonFieldBase(Serialize::TypeBase *t, const Anope::string &n, bool d)
+		: FieldTypeBase<T>(t->GetOwner(), n, t->GetName(), d)
+	{
+		ext = new ExtensibleItem<T>(t->GetOwner(), t->GetName(), n);
+	}
+
+	CommonFieldBase(Module *creator, const Anope::string &n, bool d)
+		: FieldTypeBase<T>(creator, n, TypeImpl::NAME, d)
+	{
+		ext = new ExtensibleItem<T>(creator, TypeImpl::NAME, n);
+	}
+
+	CommonFieldBase(Serialize::TypeBase *t,
+			const Anope::string &n,
+			T TypeImpl::*f,
+			bool d)
+		: FieldTypeBase<T>(t->GetOwner(), n, t->GetName(), d)
+		, field(f)
 	{
 	}
 
-	CommonFieldBase(Module *creator, Serialize::TypeReference<TypeImpl> &typeref, const Anope::string &n, bool depends)
-		: FieldTypeBase<T>(creator, n, typeref, depends)
-		, ext(creator, typeref.GetName(), n)
+	~CommonFieldBase()
 	{
+		delete ext;
 	}
 
-	void CacheMiss(Object *s) override
-	{
-		ext.Set(s, T());
-	}
+	/** Get the value of this field on the given object
+	 */
+	virtual T GetField(TypeImpl *) anope_abstract;
 
+	/** Unset this field on the given object
+	 */
 	virtual void UnsetField(TypeImpl *) anope_abstract;
 
 	void UnsetS(Object *s) override
@@ -409,26 +520,36 @@ class Serialize::CommonFieldBase : public FieldTypeBase<T>
 		UnsetField(Upcast(s));
 	}
 
-	TypeImpl* Upcast(Object *s)
-	{
-		if (this->type != s->GetSerializableType())
-			return nullptr;
-
-		return anope_dynamic_static_cast<TypeImpl *>(s);
-	}
-
 	bool HasFieldS(Object *s) override
 	{
 		return HasField(Upcast(s));
 	}
 
+	/** Cast a serializable object of type Object to type TypeImpl,
+	 * if appropriate
+	 */
+	TypeImpl* Upcast(Object *s)
+	{
+		if (this->serialize_type != s->GetSerializableType()->GetName())
+		{
+			return nullptr;
+		}
+
+		return anope_dynamic_static_cast<TypeImpl *>(s);
+	}
+
 	bool HasField(TypeImpl *s)
 	{
-		EventReturn result = Event::OnSerialize(&Event::SerializeEvents::OnSerializeHasField, s, this);
-		return result != EVENT_CONTINUE;
+		EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeHasField, s, this);
+		if (result != EVENT_CONTINUE)
+			return true;
+
+		return this->HasField_(s);
 	}
 };
 
+/** Class for all fields that aren't to other serializable objects
+ */
 template<typename TypeImpl, typename T>
 class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 {
@@ -437,27 +558,38 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 	{
 	}
 
-	Field(Module *creator, TypeReference<TypeImpl> &typeref, const Anope::string &n) : CommonFieldBase<TypeImpl, T>(creator, typeref, n, false)
+	Field(Module *creator, const Anope::string &n) : CommonFieldBase<TypeImpl, T>(creator, n, false)
+	{
+	}
+
+	Field(TypeBase *t, const Anope::string &n, T TypeImpl::*f) : CommonFieldBase<TypeImpl, T>(t, n, f, false)
 	{
 	}
 
 	T GetField(TypeImpl *s)
 	{
-		T* t = this->ext.Get(s);
-		if (t)
+		T* t = this->Get_(s);
+
+		// If we have a non-default value for this field it is up to date and cached
+		if (t && *t != T())
 			return *t;
 
+		// Query modules
 		Anope::string value;
-		EventReturn result = Event::OnSerialize(&Event::SerializeEvents::OnSerializeGet, s, this, value);
+		EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeGet, s, this, value);
 		if (result == EVENT_ALLOW)
 		{
 			// module returned us data, so we unserialize it
 			T t2 = this->Unserialize(value);
 
-			this->ext.Set(s, t2);
+			// Cache
+			this->Set_(s, t2);
 
 			return t2;
 		}
+
+		if (t)
+			return *t;
 
 		return T();
 	}
@@ -470,16 +602,16 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 	virtual void SetField(TypeImpl *s, const T &value)
 	{
 		Anope::string strvalue = this->Serialize(value);
-		Event::OnSerialize(&Event::SerializeEvents::OnSerializeSet, s, this, strvalue);
+		EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeSet, s, this, strvalue);
 
-		this->ext.Set(s, value);
+		this->Set_(s, value);
 	}
 
 	void UnsetField(TypeImpl *s) override
 	{
-		Event::OnSerialize(&Event::SerializeEvents::OnSerializeUnset, s, this);
+		EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeUnset, s, this);
 
-		this->ext.Unset(s);
+		this->Unset_(s);
 	}
 
 	Anope::string Serialize(const T& t)
@@ -490,13 +622,14 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 		}
 		catch (const ConvertException &)
 		{
+			Log(LOG_DEBUG) << "Unable to stringify " << t;
 			return "";
 		}
 	}
 
 	T Unserialize(const Anope::string &str)
 	{
-		if (str.empty()) // for caching not set
+		if (str.empty())
 			return T();
 
 		try
@@ -546,6 +679,8 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 	}
 };
 
+/** Class for all fields that contain a reference to another serializable object.
+ */
 template<typename TypeImpl, typename T>
 class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 {
@@ -554,27 +689,37 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 	{
 	}
 
+	ObjectField(TypeBase *t, const Anope::string &n, T TypeImpl::*field, bool d = false) : CommonFieldBase<TypeImpl, T>(t, n, field, d)
+	{
+	}
+
 	T GetField(TypeImpl *s)
 	{
-		T *t = this->ext.Get(s);
-		if (t)
+		T *t = this->Get_(s);
+		if (t && *t != nullptr)
 			return *t;
 
 		Anope::string type;
 		ID sid;
-		EventReturn result = Event::OnSerialize(&Event::SerializeEvents::OnSerializeGetSerializable, s, this, type, sid);
+		EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeGetSerializable, s, this, type, sid);
 		if (result != EVENT_CONTINUE)
 		{
 			Serialize::TypeBase *base = Serialize::TypeBase::Find(type);
 			if (base == nullptr)
+			{
+				Log(LOG_DEBUG_2) << "OnSerializeGetSerializable returned unknown type " << type;
 				return nullptr;
+			}
 
 			T t2 = result == EVENT_ALLOW ? static_cast<T>(base->Require(sid)) : nullptr;
 
-			this->ext.Set(s, t2);
+			this->Set_(s, t2);
 
 			return t2;
 		}
+
+		if (t)
+			return *t;
 
 		return T();
 	}
@@ -586,13 +731,13 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 
 	virtual void SetField(TypeImpl *s, T value)
 	{
-		Event::OnSerialize(&Event::SerializeEvents::OnSerializeSetSerializable, s, this, value);
+		EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeSetSerializable, s, this, value);
 
-		T *old = this->ext.Get(s);
+		T *old = this->Get_(s);
 		if (old != nullptr && *old != nullptr)
 			s->RemoveEdge(*old, this);
 
-		this->ext.Set(s, value);
+		this->Set_(s, value);
 
 		if (value != nullptr)
 			s->AddEdge(value, this);
@@ -600,9 +745,9 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 
 	void UnsetField(TypeImpl *s) override
 	{
-		Event::OnSerialize(&Event::SerializeEvents::OnSerializeUnsetSerializable, s, this);
+		EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeUnsetSerializable, s, this);
 
-		this->ext.Unset(s);
+		this->Unset_(s);
 	}
 
 	Anope::string SerializeToString(Object *s) override
@@ -650,11 +795,18 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 };
 
 template<typename T>
-std::vector<T> Serialize::GetObjects(Serialize::TypeBase *type)
+T Serialize::GetObject()
+{
+	std::vector<T> v = GetObjects<T>();
+	return v.empty() ? nullptr : v[0];
+}
+
+template<typename T>
+std::vector<T> Serialize::GetObjects(const Anope::string &name)
 {
 	std::vector<T> objs;
 
-	for (TypeBase *t : type->GetSubTypes())
+	for (TypeBase *t : GetTypes(name))
 		for (Object *s : t->objects)
 			objs.push_back(anope_dynamic_static_cast<T>(s));
 
@@ -662,17 +814,41 @@ std::vector<T> Serialize::GetObjects(Serialize::TypeBase *type)
 }
 
 template<typename T>
-std::vector<T> Serialize::Object::GetRefs(Serialize::TypeBase *type)
+std::vector<T> Serialize::GetObjects()
 {
-	std::vector<T> objs;
+	const char* const name = std::remove_pointer<T>::type::NAME;
+	return GetObjects<T>(name);
+}
+
+template<typename T>
+T Serialize::New()
+{
+	const char* const name = std::remove_pointer<T>::type::NAME;
+	Serialize::TypeBase *type = TypeBase::Find(name);
 
 	if (type == nullptr)
 	{
-		Log(LOG_DEBUG) << "GetRefs for unknown type on #" << this->id << " type " << s_type->GetName();
+		Log(LOG_DEBUG) << "Serialize::New with unknown type " << name;
+		return nullptr;
+	}
+
+	return static_cast<T>(type->Create());
+}
+
+template<typename T>
+std::vector<T> Serialize::Object::GetRefs()
+{
+	const char* const name = std::remove_pointer<T>::type::NAME;
+	std::vector<Serialize::TypeBase *> types = GetTypes(name);
+	std::vector<T> objs;
+
+	if (types.empty())
+	{
+		Log(LOG_DEBUG) << "GetRefs for unknown type on #" << this->id << " type " << s_type->GetName() << " named " << name;
 		return objs;
 	}
 
-	for (Serialize::TypeBase *t : type->GetSubTypes())
+	for (Serialize::TypeBase *t : types)
 		for (const Serialize::Edge &edge : GetRefs(t))
 			if (!edge.direction)
 				objs.push_back(anope_dynamic_static_cast<T>(edge.other));

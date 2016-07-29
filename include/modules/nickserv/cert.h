@@ -14,7 +14,9 @@ class NSCertEntry;
 class CertService : public Service
 {
  public:
-	CertService(Module *c) : Service(c, "CertService", "certs") { }
+	static constexpr const char *NAME = "certs";
+	
+	CertService(Module *c) : Service(c, NAME) { }
 
 	virtual NickServ::Account* FindAccountFromCert(const Anope::string &cert) anope_abstract;
 
@@ -23,11 +25,11 @@ class CertService : public Service
 	virtual NSCertEntry *FindCert(const std::vector<NSCertEntry *> &cl, const Anope::string &certfp) anope_abstract;
 };
 
-static ServiceReference<CertService> certservice("CertService", "certs");
-
 class NSCertEntry : public Serialize::Object
 {
  public:
+	static constexpr const char *NAME = "nscert";
+
 	using Serialize::Object::Object;
 
 	virtual NickServ::Account *GetAccount() anope_abstract;
@@ -37,12 +39,14 @@ class NSCertEntry : public Serialize::Object
 	virtual void SetCert(const Anope::string &) anope_abstract;
 };
 
-static Serialize::TypeReference<NSCertEntry> certentry("NSCertEntry");
-
 namespace Event
 {
 	struct CoreExport NickCertEvents : Events
 	{
+		static constexpr const char *NAME = "nickcertevents";
+
+		using Events::Events;
+
 		/** Called when a user adds an entry to their cert list
 		 * @param nc The nick
 		 * @param entry The entry
@@ -62,5 +66,3 @@ namespace Event
 	};
 }
 
-
-template<> struct EventName<Event::NickCertEvents> { static constexpr const char *const name = "OnNickCert"; };

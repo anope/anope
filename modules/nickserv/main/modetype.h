@@ -6,9 +6,9 @@ class NSModeType : public Serialize::Type<ModeImpl>
 	Serialize::ObjectField<ModeImpl, NickServ::Account *> account;
 	Serialize::Field<ModeImpl, Anope::string> mode;
 
-	NSModeType(Module *creator) : Serialize::Type<ModeImpl>(creator, "NSKeepMode")
-		, account(this, "account", true)
-		, mode(this, "mode")
+	NSModeType(Module *creator) : Serialize::Type<ModeImpl>(creator)
+		, account(this, "account", &ModeImpl::account, true)
+		, mode(this, "mode", &ModeImpl::mode)
 	{
 	}
 };

@@ -7,15 +7,12 @@
 
 #include "../../webcpanel.h"
 
-WebCPanel::OperServ::Akill::Akill(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
+WebCPanel::OperServ::Akill::Akill(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u), akills("xlinemanager/sgline")
 {
 }
 
 bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
-
-	static ServiceReference<XLineManager> akills("XLineManager","xlinemanager/sgline");
-
 	if (!na->GetAccount()->o || !na->GetAccount()->o->GetType()->HasCommand("operserv/akill"))
 	{
 		replacements["NOACCESS"];

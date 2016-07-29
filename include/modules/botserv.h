@@ -18,5 +18,4 @@ namespace BotServ
 		}
 
 	};
-	static ServiceReference<BotServService> service("BotServService", "BotServ");
 }

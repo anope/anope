@@ -100,7 +100,7 @@ class CommandOSLogout : public Command
 		}
 
 		Log(LOG_ADMIN, source, this);
-		u->ShrinkOK<bool>("os_login");
+		u->Shrink<bool>("os_login");
 		source.Reply(_("You have been logged out."));
 	}
 
@@ -125,6 +125,7 @@ class OSLogin : public Module
 
  public:
 	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::IsServicesOperEvent>(this)
 		, commandoslogin(this)
 		, commandoslogout(this)
 		, os_login(this, "os_login")

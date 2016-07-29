@@ -1,12 +1,10 @@
 /*
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
  *
  */
 
@@ -22,12 +20,12 @@ NickImpl::~NickImpl()
 
 void NickImpl::Delete()
 {
-	Event::OnDelNick(&Event::DelNick::OnDelNick, this);
+	EventManager::Get()->Dispatch(&Event::DelNick::OnDelNick, this);
 
 	if (this->GetAccount())
 	{
 		/* Next: see if our core is still useful. */
-		std::vector<NickServ::Nick *> aliases = this->GetAccount()->GetRefs<NickServ::Nick *>(NickServ::nick);
+		std::vector<NickServ::Nick *> aliases = this->GetAccount()->GetRefs<NickServ::Nick *>();
 
 		auto it = std::find(aliases.begin(), aliases.end(), this);
 		if (it != aliases.end())

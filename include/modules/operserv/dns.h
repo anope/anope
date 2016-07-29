@@ -13,11 +13,11 @@ class DNSZone : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "dnszone";
+
 	virtual Anope::string GetName() anope_abstract;
 	virtual void SetName(const Anope::string &) anope_abstract;
 };
-
-static Serialize::TypeReference<DNSZone> dnszone("DNSZone");
 
 class DNSServer : public Serialize::Object
 {
@@ -25,6 +25,8 @@ class DNSServer : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "dnsserver";
+
 	virtual DNSZone *GetZone() anope_abstract;
 	virtual void SetZone(DNSZone *) anope_abstract;
 
@@ -38,14 +40,14 @@ class DNSServer : public Serialize::Object
 	virtual void SetPool(const bool &) anope_abstract;
 };
 
-static Serialize::TypeReference<DNSServer> dnsserver("DNSServer");
-
 class DNSZoneMembership : public Serialize::Object
 {
  protected:
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "dnszonemembership";
+
 	virtual DNSServer *GetServer() anope_abstract;
 	virtual void SetServer(DNSServer *) anope_abstract;
 
@@ -53,14 +55,14 @@ class DNSZoneMembership : public Serialize::Object
 	virtual void SetZone(DNSZone *) anope_abstract;
 };
 
-static Serialize::TypeReference<DNSZoneMembership> dnszonemembership("DNSZoneMembership");
-
 class DNSIP : public Serialize::Object
 {
  protected:
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "dnsip";
+
 	virtual DNSServer *GetServer() anope_abstract;
 	virtual void SetServer(DNSServer *) anope_abstract;
 
@@ -68,5 +70,4 @@ class DNSIP : public Serialize::Object
 	virtual void SetIP(const Anope::string &) anope_abstract;
 };
 
-static Serialize::TypeReference<DNSIP> dnsip("DNSIP");
 

@@ -14,10 +14,8 @@
 
 class CommandNSDrop : public Command
 {
-	EventHandlers<Event::NickDrop> &onnickdrop;
-
  public:
-	CommandNSDrop(Module *creator, EventHandlers<Event::NickDrop> &event) : Command(creator, "nickserv/drop", 1, 1), onnickdrop(event)
+	CommandNSDrop(Module *creator) : Command(creator, "nickserv/drop", 1, 1)
 	{
 		this->SetSyntax(_("\037nickname\037"));
 		this->SetDesc(_("Cancel the registration of a nickname"));
@@ -54,7 +52,7 @@ class CommandNSDrop : public Command
 			return;
 		}
 
-		this->onnickdrop(&Event::NickDrop::OnNickDrop, source, na);
+		EventManager::Get()->Dispatch(&Event::NickDrop::OnNickDrop, source, na);
 
 		Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->GetNick() << " (group: " << na->GetAccount()->GetDisplay() << ") (email: " << (!na->GetAccount()->GetEmail().empty() ? na->GetAccount()->GetEmail() : "none") << ")";
 		na->Delete();
@@ -77,12 +75,10 @@ class CommandNSDrop : public Command
 class NSDrop : public Module
 {
 	CommandNSDrop commandnsdrop;
-	EventHandlers<Event::NickDrop> onnickdrop;
 
  public:
 	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandnsdrop(this, onnickdrop)
-		, onnickdrop(this)
+		, commandnsdrop(this)
 	{
 
 	}

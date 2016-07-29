@@ -11,32 +11,58 @@
 
 #include "module.h"
 #include "modules/operserv/session.h"
+#include "modules/operserv/stats.h"
 
-#if 0
-struct Stats : Serialize::Object
+class StatsImpl : public Stats
 {
-	static Stats *me;
+	friend class StatsType;
 
-	Stats() : Serialize::Object("Stats")
-	{
-		me = this;
-	}
+	unsigned int maxusercnt = 0;
+	time_t maxusertime = 0;
 
-	void Serialize(Serialize::Data &data) const override
-	{
-		data["maxusercnt"] << MaxUserCount;
-		data["maxusertime"] << MaxUserTime;
-	}
+ public:
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	using Stats::Stats;
+
+	unsigned int GetMaxUserCount();
+	void SetMaxUserCount(unsigned int i);
+
+	time_t GetMaxUserTime();
+	void SetMaxUserTime(time_t t);
+};
+
+class StatsType : public Serialize::Type<StatsImpl>
+{
+ public:
+	Serialize::Field<StatsImpl, unsigned int> maxusercount;
+	Serialize::Field<StatsImpl, time_t> maxusertime;
+
+	StatsType(Module *me) : Serialize::Type<StatsImpl>(me)
+		, maxusercount(this, "maxusercount", &StatsImpl::maxusercnt)
+		, maxusertime(this, "maxusertime", &StatsImpl::maxusertime)
 	{
-		data["maxusercnt"] >> MaxUserCount;
-		data["maxusertime"] >> MaxUserTime;
-		return me;
 	}
 };
 
-Stats *Stats::me;
+unsigned int StatsImpl::GetMaxUserCount()
+{
+	return Get(&StatsType::maxusercount);
+}
+
+void StatsImpl::SetMaxUserCount(unsigned int i)
+{
+	Set(&StatsType::maxusercount, i);
+}
+
+time_t StatsImpl::GetMaxUserTime()
+{
+	return Get(&StatsType::maxusertime);
+}
+
+void StatsImpl::SetMaxUserTime(time_t t)
+{
+	Set(&StatsType::maxusertime, t);
+}
 
 /**
  * Count servers connected to server s
@@ -60,6 +86,8 @@ static int stats_count_servers(Server *s)
 class CommandOSStats : public Command
 {
 	ServiceReference<XLineManager> akills, snlines, sqlines;
+	ServiceReference<SessionService> session_service;
+
  private:
 	void DoStatsAkill(CommandSource &source)
 	{
@@ -128,16 +156,19 @@ class CommandOSStats : public Command
 
 	void DoStatsReset(CommandSource &source)
 	{
-		MaxUserCount = UserListByNick.size();
+		Stats *stats = Serialize::GetObject<Stats *>();
+		stats->SetMaxUserCount(UserListByNick.size());
 		source.Reply(_("Statistics reset."));
 		return;
 	}
 
 	void DoStatsUptime(CommandSource &source)
 	{
+		Stats *stats = Serialize::GetObject<Stats *>();
 		time_t uptime = Anope::CurTime - Anope::StartTime;
+		
 		source.Reply(_("Current users: \002{0}\002 (\002{1}\002 ops)"), UserListByNick.size(), OperCount);
-		source.Reply(_("Maximum users: \002{0}\002 ({1})"), MaxUserCount, Anope::strftime(MaxUserTime, source.GetAccount()));
+		source.Reply(_("Maximum users: \002{0}\002 ({1})"), stats->GetMaxUserCount(), Anope::strftime(stats->GetMaxUserTime(), source.GetAccount()));
 		source.Reply(_("Services up \002{0}\002."), Anope::Duration(uptime, source.GetAccount()));
 	}
 
@@ -195,8 +226,10 @@ class CommandOSStats : public Command
 	}
 
  public:
-	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1),
-		akills("XLineManager", "xlinemanager/sgline"), snlines("XLineManager", "xlinemanager/snline"), sqlines("XLineManager", "xlinemanager/sqline")
+	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1)
+		, akills("sgline")
+		, snlines("snline")
+		, sqlines("sqline")
 	{
 		this->SetDesc(_("Show status of Services and network"));
 		this->SetSyntax("[AKILL | HASH | UPLINK | UPTIME | ALL | RESET]");
@@ -245,27 +278,42 @@ class CommandOSStats : public Command
 };
 
 class OSStats : public Module
+	, public EventHook<Event::UserConnect>
 {
 	CommandOSStats commandosstats;
-	//Serialize::TypeBase stats_type;
-	Stats stats_saver;
+	StatsType stats_type;
+
+	Stats *GetStats()
+	{
+		Stats *stats = Serialize::GetObject<Stats *>();
+		if (stats)
+			return stats;
+		else
+			return Serialize::New<Stats *>();
+	}
 
  public:
 	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserConnect>(this)
 		, commandosstats(this)
-//		, stats_type("Stats", Stats::Unserialize)
+		, stats_type(this)
 	{
-
 	}
 
-#if 0
 	void OnUserConnect(User *u, bool &exempt) override
 	{
-		if (UserListByNick.size() == MaxUserCount && Anope::CurTime == MaxUserTime)
-			stats_saver.QueueUpdate();
+		Stats *stats = GetStats();
+
+		if (stats && UserListByNick.size() > stats->GetMaxUserCount())
+		{
+			stats->SetMaxUserCount(UserListByNick.size());
+			stats->SetMaxUserTime(Anope::CurTime);
+
+			Server *sserver = u->server;
+			if (sserver && sserver->IsSynced())
+				Log(this, "maxusers") << "connected - new maximum user count: " << UserListByNick.size();
+		}
 	}
-#endif
 };
 
 MODULE_INIT(OSStats)
-#endif

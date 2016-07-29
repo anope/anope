@@ -49,6 +49,7 @@ class NSMaxEmail : public Module
 
  public:
 	NSMaxEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::PreCommand>(this)
 	{
 	}
 
@@ -57,17 +58,17 @@ class NSMaxEmail : public Module
 		if (source.IsOper())
 			return EVENT_CONTINUE;
 
-		if (command->name == "nickserv/register")
+		if (command->GetName() == "nickserv/register")
 		{
 			if (this->CheckLimitReached(source, params.size() > 1 ? params[1] : ""))
 				return EVENT_STOP;
 		}
-		else if (command->name == "nickserv/set/email")
+		else if (command->GetName() == "nickserv/set/email")
 		{
 			if (this->CheckLimitReached(source, params.size() > 0 ? params[0] : ""))
 				return EVENT_STOP;
 		}
-		else if (command->name == "nickserv/ungroup" && source.GetAccount())
+		else if (command->GetName() == "nickserv/ungroup" && source.GetAccount())
 		{
 			if (this->CheckLimitReached(source, source.GetAccount()->GetEmail()))
 				return EVENT_STOP;

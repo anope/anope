@@ -11,6 +11,10 @@ namespace Event
 {
 	struct CoreExport DefconLevel : Events
 	{
+		static constexpr const char *NAME = "defconlevel";
+
+		using Events::Events;
+
 		/** Called when defcon level changes
 		 * @param level The level
 		 */
@@ -18,4 +22,3 @@ namespace Event
 	};
 }
 
-template<> struct EventName<Event::DefconLevel> { static constexpr const char *const name = "OnDefconLevel"; };

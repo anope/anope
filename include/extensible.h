@@ -22,10 +22,11 @@ class CoreExport ExtensibleBase : public Service
 
 	ExtensibleBase(Module *m, const Anope::string &n);
 	ExtensibleBase(Module *m, const Anope::string &t, const Anope::string &n);
-	~ExtensibleBase();
 
  public:
 	virtual void Unset(Extensible *obj) anope_abstract;
+	
+	static constexpr const char *NAME = "Extensible";
 };
 
 class CoreExport Extensible
@@ -40,7 +41,7 @@ class CoreExport Extensible
 
 	template<typename T> T* Extend(const Anope::string &name, const T &what);
 
-	template<typename T> void ShrinkOK(const Anope::string &name);
+	template<typename T> void Shrink(const Anope::string &name);
 };
 
 template<typename T>
@@ -116,8 +117,7 @@ class ExtensibleItem : public ExtensibleBase
 template<typename T>
 struct ExtensibleRef : ServiceReference<ExtensibleItem<T>>
 {
-	ExtensibleRef(const Anope::string &n) : ServiceReference<ExtensibleItem<T>>("Extensible", n) { }
-	ExtensibleRef(const Anope::string &t, const Anope::string &n) : ServiceReference<ExtensibleItem<T>>(t, n) { }
+	ExtensibleRef(const Anope::string &n) : ServiceReference<ExtensibleItem<T>>(n) { }
 };
 
 template<typename T>
@@ -146,8 +146,7 @@ T* Extensible::Extend(const Anope::string &name, const T &what)
 }
 
 template<typename T>
-//XXX
-void Extensible::ShrinkOK(const Anope::string &name)
+void Extensible::Shrink(const Anope::string &name)
 {
 	ExtensibleRef<T> ref(name);
 	if (ref)

@@ -97,7 +97,7 @@ class IdentifyInterface : public LDAPInterface
 					{
 						na = new NickServ::Nick(ii->req->GetAccount(), new NickServ::Account(ii->req->GetAccount()));
 						na->SetLastRealname(ii->user ? ii->user->realname : ii->req->GetAccount());
-						NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, ii->user, na, ii->req->GetPassword());;
+						NickServ::EventManager::Get()->Dispatch(&NickServ::Event::NickRegister::OnNickRegister, ii->user, na, ii->req->GetPassword());;
 						ServiceBot *NickServ = Config->GetClient("NickServ");
 						if (ii->user && NickServ)
 							ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->GetNick().c_str());

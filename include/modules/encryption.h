@@ -27,7 +27,9 @@ namespace Encryption
 	class Provider : public Service
 	{
 	 public:
-		Provider(Module *creator, const Anope::string &sname) : Service(creator, "Encryption::Provider", sname) { }
+		static constexpr const char *NAME = "hash";
+		
+		Provider(Module *creator, const Anope::string &sname) : Service(creator, NAME, sname) { }
 		virtual ~Provider() { }
 
 		virtual Context *CreateContext(IV * = NULL) anope_abstract;

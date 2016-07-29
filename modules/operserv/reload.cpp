@@ -35,7 +35,7 @@ class CommandOSReload : public Command
 		}
 		catch (const ConfigException &ex)
 		{
-			Log(this->owner) << "Error reloading configuration file: " << ex.GetReason();
+			Log(this->GetOwner()) << "Error reloading configuration file: " << ex.GetReason();
 			source.Reply(_("Error reloading configuration file: {0}"), ex.GetReason());
 		}
 	}

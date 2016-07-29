@@ -1,13 +1,9 @@
 /* BotServ core functions
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
- *
  *
  */
 
@@ -17,6 +13,8 @@ class KickerData : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "kickerdata";
+
 	virtual ChanServ::Channel *GetChannel() anope_abstract;
 	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
 
@@ -102,15 +100,16 @@ class KickerData : public Serialize::Object
 	virtual void SetDontKickVoices(const bool &) anope_abstract;
 };
 
-static Serialize::TypeReference<KickerData> kickerdata("KickerData");
-
 inline KickerData *GetKickerData(ChanServ::Channel *ci)
 {
-	KickerData *kd = ci->GetRef<KickerData *>(kickerdata);
-	if (!kd && kickerdata)
+	KickerData *kd = ci->GetRef<KickerData *>();
+	if (!kd)
 	{
-		kd = kickerdata.Create();
-		kd->SetChannel(ci);
+		kd = Serialize::New<KickerData *>();
+		if (kd != nullptr)
+		{
+			kd->SetChannel(ci);
+		}
 	}
 	return kd;
 }
@@ -119,6 +118,10 @@ namespace Event
 {
 	struct CoreExport BotBan : Events
 	{
+		static constexpr const char *NAME = "botban";
+
+		using Events::Events;
+		
 		/** Called when a bot places a ban
 		 * @param u User being banned
 		 * @param ci Channel the ban is placed on
@@ -127,6 +130,3 @@ namespace Event
 		virtual void OnBotBan(User *u, ChanServ::Channel *ci, const Anope::string &mask) anope_abstract;
 	};
 }
-
-template<> struct EventName<Event::BotBan> { static constexpr const char *const name = "OnBotBan"; };
-

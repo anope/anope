@@ -13,6 +13,8 @@ namespace OperServ
 
 class Akill : public WebPanelProtectedPage
 {
+	ServiceReference<XLineManager> akills;
+	
  public:
 	Akill(const Anope::string &cat, const Anope::string &u);
 

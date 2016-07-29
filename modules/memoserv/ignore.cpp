@@ -66,7 +66,7 @@ class CommandMSIgnore : public Command
 
 		if (command.equals_ci("ADD") && !param.empty())
 		{
-			if (ignores.size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "32"))
+			if (ignores.size() >= Config->GetModule(this->GetOwner())->Get<unsigned>("max", "32"))
 			{
 				source.Reply(_("Sorry, the memo ignore list for \002{0}\002 is full."), channel);
 				return;
@@ -79,7 +79,7 @@ class CommandMSIgnore : public Command
 					return;
 				}
 
-			MemoServ::Ignore *ign = MemoServ::service->CreateIgnore();
+			MemoServ::Ignore *ign = Serialize::New<MemoServ::Ignore *>();
 			ign->SetMemoInfo(mi);
 			ign->SetMask(param);
 

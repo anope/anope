@@ -12,7 +12,9 @@ namespace Global
 	class GlobalService : public Service
 	{
 	 public:
-		GlobalService(Module *m) : Service(m, "GlobalService", "Global")
+		static constexpr const char *NAME = "global";
+		
+		GlobalService(Module *m) : Service(m, NAME)
 		{
 		}
 
@@ -23,7 +25,6 @@ namespace Global
 		 */
 		virtual void SendGlobal(ServiceBot *sender, const Anope::string &source, const Anope::string &message) anope_abstract;
 	};
-	static ServiceReference<GlobalService> service("GlobalService", "Global");
 }
 
 

@@ -1,12 +1,10 @@
 /* NickServ core functions
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
  */
 
 #include "module.h"
@@ -44,7 +42,7 @@ class CommandNSSet : public Command
 
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				ServiceReference<Command> c("Command", info.name);
+				ServiceReference<Command> c(info.name);
 				// XXX dup
 				if (!c)
 					continue;
@@ -96,7 +94,7 @@ class CommandNSSASet : public Command
 
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				ServiceReference<Command> command("Command", info.name);
+				ServiceReference<Command> command(info.name);
 				if (command)
 				{
 					source.command = c_name;
@@ -254,7 +252,7 @@ class CommandNSSetAutoOp : public Command
 		NickServ::Account *nc = na->GetAccount();
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -347,7 +345,7 @@ class CommandNSSetDisplay : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, user_na->GetAccount(), param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, user_na->GetAccount(), param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -468,7 +466,7 @@ class CommandNSSetEmail : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -550,7 +548,7 @@ class CommandNSSetKeepModes : public Command
 		NickServ::Account *nc = na->GetAccount();
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -635,7 +633,7 @@ class CommandNSSetKill : public Command
 		NickServ::Account *nc = na->GetAccount();
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -657,7 +655,7 @@ class CommandNSSetKill : public Command
 		}
 		else if (param.equals_ci("IMMED"))
 		{
-			if (Config->GetModule(this->owner)->Get<bool>("allowkillimmed"))
+			if (Config->GetModule(this->GetOwner())->Get<bool>("allowkillimmed"))
 			{
 				nc->SetS<bool>("KILLPROTECT",true);
 				nc->UnsetS<bool>("KILL_QUICK");
@@ -749,7 +747,7 @@ class CommandNSSetLanguage : public Command
 		NickServ::Account *nc = na->GetAccount();
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -854,7 +852,7 @@ class CommandNSSetMessage : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -949,7 +947,7 @@ class CommandNSSetSecure : public Command
 		NickServ::Account *nc = na->GetAccount();
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
+		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -1105,10 +1103,16 @@ class NSSet : public Module
 	/* email, passcode */
 	ExtensibleItem<std::pair<Anope::string, Anope::string > > ns_set_email;
 
-	EventHandlers<Event::SetNickOption> onsetnickoption;
-
  public:
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::PreCommand>(this)
+		, EventHook<Event::SetCorrectModes>(this)
+		, EventHook<NickServ::Event::PreNickExpire>(this)
+		, EventHook<Event::NickInfo>(this)
+		, EventHook<Event::UserModeSet>(this)
+		, EventHook<Event::UserModeUnset>(this)
+		, EventHook<Event::UserLogin>(this)
+
 		, commandnsset(this)
 		, commandnssaset(this)
 		, commandnssetautoop(this)
@@ -1131,18 +1135,16 @@ class NSSet : public Module
 		, commandnssasetsecure(this)
 		, commandnssasetnoexpire(this)
 
-		, autoop(this, NickServ::account, "AUTOOP")
-		, keep_modes(this, NickServ::account, "NS_KEEP_MODES")
-		, killprotect(this, NickServ::account, "KILLPROTECT")
-		, kill_quick(this, NickServ::account, "KILL_QUICK")
-		, kill_immed(this, NickServ::account, "KILL_IMMED")
-		, message(this, NickServ::account, "MSG")
-		, secure(this, NickServ::account, "NS_SECURE")
-		, noexpire(this, NickServ::nick, "NS_NO_EXPIRE")
+		, autoop(this, "AUTOOP")
+		, keep_modes(this, "NS_KEEP_MODES")
+		, killprotect(this, "KILLPROTECT")
+		, kill_quick(this, "KILL_QUICK")
+		, kill_immed(this, "KILL_IMMED")
+		, message(this, "MSG")
+		, secure(this, "NS_SECURE")
+		, noexpire(this, "NS_NO_EXPIRE")
 
 		, ns_set_email(this, "ns_set_email")
-
-		, onsetnickoption(this)
 	{
 
 	}
@@ -1151,7 +1153,7 @@ class NSSet : public Module
 	{
 		NickServ::Account *uac = source.nc;
 
-		if (command->name == "nickserv/confirm" && !params.empty() && uac)
+		if (command->GetName() == "nickserv/confirm" && !params.empty() && uac)
 		{
 			std::pair<Anope::string, Anope::string> *n = ns_set_email.Get(uac);
 			if (n)
@@ -1210,11 +1212,14 @@ class NSSet : public Module
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
-		if (u->Account() && setter.GetUser() == u && NickServ::mode)
+		if (u->Account() && setter.GetUser() == u)
 		{
-			NickServ::Mode *m = NickServ::mode.Create();
-			m->SetAccount(u->Account());
-			m->SetMode(mname);
+			NickServ::Mode *m = Serialize::New<NickServ::Mode *>();
+			if (m != nullptr)
+			{
+				m->SetAccount(u->Account());
+				m->SetMode(mname);
+			}
 		}
 	}
 
@@ -1222,7 +1227,7 @@ class NSSet : public Module
 	{
 		if (u->Account() && setter.GetUser() == u)
 		{
-			for (NickServ::Mode *m : u->Account()->GetRefs<NickServ::Mode *>(NickServ::mode))
+			for (NickServ::Mode *m : u->Account()->GetRefs<NickServ::Mode *>())
 				if (m->GetMode() == mname)
 					m->Delete();
 		}
@@ -1231,7 +1236,7 @@ class NSSet : public Module
 	void OnUserLogin(User *u) override
 	{
 		if (keep_modes.HasExt(u->Account()))
-			for (NickServ::Mode *mode : u->Account()->GetRefs<NickServ::Mode *>(NickServ::mode))
+			for (NickServ::Mode *mode : u->Account()->GetRefs<NickServ::Mode *>())
 			{
 				UserMode *um = ModeManager::FindUserModeByName(mode->GetMode());
 				/* if the null user can set the mode, then it's probably safe */

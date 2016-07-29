@@ -1,9 +1,10 @@
 /*
  *
- * (C) 2013-2014 Anope Team
+ * (C) 2013-2016 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ * 
  */
 
 class AutoJoin : public Serialize::Object
@@ -12,6 +13,8 @@ class AutoJoin : public Serialize::Object
 	using Serialize::Object::Object;
 
  public:
+	static constexpr const char *const NAME = "autojoin";
+
 	virtual NickServ::Account *GetOwner() anope_abstract;
 	virtual void SetOwner(NickServ::Account *acc) anope_abstract;
 
@@ -22,4 +25,3 @@ class AutoJoin : public Serialize::Object
 	virtual void SetKey(const Anope::string &k) anope_abstract;
 };
 
-static Serialize::TypeReference<AutoJoin> autojoin("AutoJoin");

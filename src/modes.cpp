@@ -148,8 +148,7 @@ ChannelMode::ChannelMode(const Anope::string &cm, char mch) : Mode(cm, MC_CHANNE
 
 bool ChannelMode::CanSet(User *u) const
 {
-	EventReturn MOD_RESULT;
-	MOD_RESULT = Event::OnCanSet(&Event::CanSet::OnCanSet, u, this);
+	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::CanSet::OnCanSet, u, this);
 	return MOD_RESULT != EVENT_STOP;
 }
 
@@ -391,7 +390,7 @@ bool ModeManager::AddUserMode(UserMode *um)
 
 	UserModes.push_back(um);
 
-	Event::OnUserModeAdd(&Event::UserModeAdd::OnUserModeAdd, um);
+	EventManager::Get()->Dispatch(&Event::UserModeAdd::OnUserModeAdd, um);
 
 	return true;
 }
@@ -426,7 +425,7 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 
 	ChannelModes.push_back(cm);
 
-	Event::OnChannelModeAdd(&Event::ChannelModeAdd::OnChannelModeAdd, cm);
+	EventManager::Get()->Dispatch(&Event::ChannelModeAdd::OnChannelModeAdd, cm);
 
 	for (unsigned int i = 0; i < ChannelModes.size(); ++i)
 		ChannelModes[i]->Check();
@@ -716,16 +715,20 @@ void ModeManager::StackerDel(Mode *m)
 
 void ModeManager::Apply(Configuration::Conf *old)
 {
-	/* XXX remove old modes */
+#warning "remove old modes"
 
 	for (Configuration::Channelmode &cm : Config->Channelmodes)
 	{
 		ChannelMode *mode;
 
-		if (cm.character)
-			Log(LOG_DEBUG) << "Creating channelmode " << cm.name << " (" << cm.character << ")";
+		if (cm.list)
+			Log(LOG_DEBUG) << "Creating channelmode list " << cm.name << " (" << cm.character << ")";
+		else if (cm.status)
+			Log(LOG_DEBUG) << "Creating channelmode status " << cm.name << " (" << cm.character << ")";
+		else if (cm.param)
+			Log(LOG_DEBUG) << "Creating channelmode param " << cm.name << " (" << cm.character << ")";
 		else
-			Log(LOG_DEBUG) << "Creating channelmode " << cm.name;
+			Log(LOG_DEBUG) << "Creating channelmode " << cm.name << " (" << cm.character << ")";
 
 		if (cm.list)
 			mode = new ChannelModeList(cm.name, cm.character);

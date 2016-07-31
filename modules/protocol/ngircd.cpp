@@ -1,14 +1,21 @@
 /*
- * ngIRCd Protocol module for Anope IRC Services
+ * Anope IRC Services
  *
- * (C) 2012 Anope Team <team@anope.org>
- * (C) 2011-2012, 2014 Alexander Barton <alex@barton.de>
- * (C) 2011 Anope Team <team@anope.org>
+ * Copyright (C) 2011-2016 Anope Team <team@anope.org>
+ * Copyright (C) 2011-2012, 2014 Alexander Barton <alex@barton.de>
  *
- * Please read COPYING and README for further details.
+ * This file is part of Anope. Anope is free software; you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software
+ * Foundation, version 2.
  *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
 #include "module.h"

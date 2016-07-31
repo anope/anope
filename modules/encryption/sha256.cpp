@@ -1,18 +1,20 @@
-/* This module generates and compares password hashes using SHA256 algorithms.
+/*
+ * Anope IRC Services
  *
- * If an intruder gets access to your system or uses a brute force attack,
- * salt will not provide much value.
- * IMPORTANT: DATA HASHES CANNOT BE "DECRYPTED" BACK TO PLAIN TEXT.
+ * Copyright (C) 2010-2016 Anope Team <team@anope.org>
  *
- * Modified for Anope.
- * (C) 2003-2014 Anope Team
- * Contact us at team@anope.org
+ * This file is part of Anope. Anope is free software; you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software
+ * Foundation, version 2.
  *
- * Taken from InspIRCd ( www.inspircd.org )
- *  see http://wiki.inspircd.org/Credits
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * This program is free but copyrighted software; see
- * the file COPYING for details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
 /* FIPS 180-2 SHA-224/256/384/512 implementation

@@ -1,14 +1,26 @@
-/* Module for encryption using MD5.
+/*
+ * Anope IRC Services
  *
- * Modified for Anope.
- * (C) 2003-2014 Anope Team
- * Contact us at team@anope.org
+ * Copyright (C) 2006-2016 Anope Team <team@anope.org>
  *
+ * This file is part of Anope. Anope is free software; you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software
+ * Foundation, version 2.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see see <http://www.gnu.org/licenses/>.
+ */
+
+/*
  * Taken from IRC Services and is copyright (c) 1996-2002 Andrew Church.
  *	 E-mail: <achurch@achurch.org>
  * Parts written by Andrew Kempe and others.
- * This program is free but copyrighted software; see the file COPYING for
- * details.
  */
 
 #include "module.h"

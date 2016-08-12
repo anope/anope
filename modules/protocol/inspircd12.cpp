@@ -409,6 +409,11 @@ class InspIRCd12Proto : public IRCDProto
 	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
 	{
 		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << acc;
+		
+		if (!vident.empty())
+			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGIDENT " << uid << " " << vident;
+		if (!vhost.empty())
+			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGHOST " << uid << " " << vhost;
 
 		SASLUser su;
 		su.uid = uid;

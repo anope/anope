@@ -152,3 +152,17 @@ inline bool operator!=(const std::string &leftval, const ci::string &rightval)
 	return !(leftval.c_str() == rightval);
 }
 
+namespace Anope {
+namespace locale {
+
+#ifdef Boost_FOUND
+
+extern std::locale generate(const std::string &);
+extern int compare(const std::string &, const std::string &);
+extern long hash(const std::string &);
+
+#endif
+
+}
+}
+

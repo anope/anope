@@ -27,9 +27,11 @@
 #include "commands.h"
 #include "sockets.h"
 
-typedef Anope::hash_map<User *> user_map;
+using user_map = Anope::locale_hash_map<User *>;
+using uid_map = std::unordered_map<Anope::string, User *, Anope::hash, Anope::compare>;
 
-extern CoreExport user_map UserListByNick, UserListByUID;
+extern CoreExport user_map UserListByNick;
+extern CoreExport uid_map UserListByUID;
 
 extern CoreExport int OperCount;
 

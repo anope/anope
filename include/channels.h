@@ -24,7 +24,7 @@
 #include "modes.h"
 #include "serialize.h"
 
-typedef Anope::hash_map<Channel *> channel_map;
+using channel_map = Anope::locale_hash_map<Channel *>;
 
 extern CoreExport channel_map ChannelList;
 

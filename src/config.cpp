@@ -178,6 +178,7 @@ Conf::Conf() : Block("")
 			{"networkinfo", "userlen"},
 			{"networkinfo", "hostlen"},
 			{"networkinfo", "chanlen"},
+			{"options", "casemap"},
 		};
 
 		for (unsigned i = 0; i < sizeof(noreload) / sizeof(noreload[0]); ++i)
@@ -222,6 +223,27 @@ Conf::Conf() : Block("")
 	this->DefLanguage = options->Get<Anope::string>("defaultlanguage");
 	this->TimeoutCheck = options->Get<time_t>("timeoutcheck");
 	this->NickChars = networkinfo->Get<Anope::string>("nick_chars");
+
+	Anope::string locale = options->Get<Anope::string>("locale");
+	Anope::string casemap = options->Get<Anope::string>("casemap");
+
+	if (locale.empty() == casemap.empty())
+		throw ConfigException("One of options:locale and options:casemap must be set");
+
+	if (locale.empty())
+	{
+		// load locale conf
+		File f(casemap + ".conf", false);
+		this->LoadConf(f);
+	}
+	else
+	{
+#if Boost_FOUND
+		this->locale = new std::locale(Anope::locale::generate(locale.str()));
+#else
+		throw ConfigException("Boost.Locale is not enabled, cannot use locale " + locale);
+#endif
+	}
 
 	for (int i = 0; i < this->CountBlock("uplink"); ++i)
 	{
@@ -599,6 +621,8 @@ Conf::~Conf()
 {
 	for (unsigned i = 0; i < MyOperTypes.size(); ++i)
 		delete MyOperTypes[i];
+
+	delete locale;
 }
 
 void Conf::Post(Conf *old)

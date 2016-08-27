@@ -49,10 +49,10 @@ add_executable(${PROGRAM_NAME} ${SRC_SRCS})
 set_target_properties(${PROGRAM_NAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS} ${EXTRA_LDFLAGS}" ENABLE_EXPORTS ON INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
 # On Windows, also link Anope to the wsock32 and Ws2_32 library, as well as set the version
 if(WIN32)
-  target_link_libraries(${PROGRAM_NAME} wsock32 Ws2_32 ${LINK_LIBS} ${GETTEXT_LIBRARIES} ${WIN32_MEMORY})
+  target_link_libraries(${PROGRAM_NAME} wsock32 Ws2_32 ${LINK_LIBS} ${GETTEXT_LIBRARIES} ${Boost_LIBRARIES} ${WIN32_MEMORY})
   set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
 else()
-  target_link_libraries(${PROGRAM_NAME} ${LINK_LIBS} ${GETTEXT_LIBRARIES})
+  target_link_libraries(${PROGRAM_NAME} ${LINK_LIBS} ${GETTEXT_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 # Building the Anope executable requires the version.h header to be generated
 add_dependencies(${PROGRAM_NAME} headers)

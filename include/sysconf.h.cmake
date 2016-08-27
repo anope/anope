@@ -24,4 +24,5 @@
 #cmakedefine DEFUMASK @DEFUMASK@
 #cmakedefine HAVE_UMASK 1
 #cmakedefine GETTEXT_FOUND 1
+#cmakedefine Boost_FOUND 1
 

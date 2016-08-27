@@ -142,6 +142,7 @@ namespace Configuration
 		std::vector<Usermode> Usermodes;
 		std::vector<Channelmode> Channelmodes;
 		unsigned char CaseMapUpper[256] = { 0 }, CaseMapLower[256] = { 0 };
+		std::locale *locale = nullptr;
 
 		/* module configuration blocks */
 		std::map<Anope::string, Block *> modules;

@@ -32,7 +32,8 @@
 #include "event.h"
 #include "modules/nickserv.h"
 
-user_map UserListByNick, UserListByUID;
+user_map UserListByNick;
+uid_map UserListByUID;
 
 int OperCount = 0;
 
@@ -832,7 +833,7 @@ User* User::Find(const Anope::string &name, bool nick_only)
 {
 	if (!nick_only && IRCD->RequiresID)
 	{
-		user_map::iterator it = UserListByUID.find(name);
+		uid_map::iterator it = UserListByUID.find(name);
 		if (it != UserListByUID.end())
 			return it->second;
 

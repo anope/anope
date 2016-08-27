@@ -29,8 +29,8 @@ namespace NickServ
 	class Account;
 	class IdentifyRequestListener;
 
-	typedef Anope::hash_map<Nick *> nickalias_map;
-	typedef Anope::hash_map<Account *> nickcore_map;
+	using nickalias_map = Anope::locale_hash_map<Nick *>;
+	using nickcore_map = Anope::locale_hash_map<Account *>;
 
 	class NickServService : public Service
 	{

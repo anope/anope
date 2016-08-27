@@ -315,33 +315,40 @@ namespace Anope
 	inline const string operator+(const char *_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 	inline const string operator+(const std::string &_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 
-	struct hash_ci
+	struct hash
 	{
-		inline size_t operator()(const string &s) const
-		{
-			return std::hash<std::string>()(s.lower().str());
-		}
-	};
-
-	struct hash_cs
-	{
-		inline size_t operator()(const string &s) const
-		{
-			return std::hash<std::string>()(s.str());
-		}
+		size_t operator()(const string &s) const;
 	};
 
 	struct compare
 	{
-		inline bool operator()(const string &s1, const string &s2) const
-		{
-			return s1.equals_ci(s2);
-		}
+		bool operator()(const string &s1, const string &s2) const;
 	};
 
-	template<typename T> class map : public std::map<string, T, ci::less> { };
-	template<typename T> class multimap : public std::multimap<string, T, ci::less> { };
-	template<typename T> class hash_map : public std::unordered_map<string, T, hash_ci, compare> { };
+	struct hash_ci
+	{
+		size_t operator()(const string &s) const;
+	};
+
+	struct compare_ci
+	{
+		bool operator()(const string &s1, const string &s2) const;
+	};
+
+	struct hash_locale
+	{
+		size_t operator()(const string &s) const;
+	};
+
+	struct compare_locale
+	{
+		bool operator()(const string &s1, const string &s2) const;
+	};
+
+	template<typename T> using map = std::map<string, T, ci::less>;
+	template<typename T> using multimap = std::multimap<string, T, ci::less>;
+	template<typename T> using hash_map = std::unordered_map<string, T, hash_ci, compare_ci>;
+	template<typename T> using locale_hash_map = std::unordered_map<string, T, hash_locale, compare_locale>;
 
 	static const char *const compiled = __TIME__ " " __DATE__;
 

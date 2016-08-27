@@ -54,6 +54,15 @@ endif()
 
 # Find gettext
 find_package(Gettext)
+# FindBoost.cmake warns even if you specify QUIET, so
+find_path(BOOST_LOCALE_HEADER_FILE NAMES boost/locale.hpp)
+if(BOOST_LOCALE_HEADER_FILE)
+  find_package(Boost COMPONENTS locale)
+endif()
+
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 # Use the following directories as includes
 include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include)

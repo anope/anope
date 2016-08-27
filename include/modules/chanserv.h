@@ -96,7 +96,7 @@ namespace ChanServ
 	};
 
 	class Channel;
-	using registered_channel_map = Anope::hash_map<Channel *>;
+	using registered_channel_map = Anope::locale_hash_map<Channel *>;
 
 	class Level : public Serialize::Object
 	{

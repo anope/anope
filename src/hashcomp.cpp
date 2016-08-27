@@ -23,6 +23,10 @@
 #include "anope.h"
 #include "config.h"
 
+#ifdef Boost_FOUND
+#include <boost/locale.hpp>
+#endif
+
 unsigned char Anope::tolower(unsigned char c)
 {
 	if (!Config || !Config->CaseMapLower[c])
@@ -163,4 +167,78 @@ bool sepstream::StreamEnd()
 {
 	return this->pos > this->tokens.length();
 }
+
+size_t Anope::hash::operator()(const Anope::string &s) const
+{
+	return std::hash<std::string>()(s.str());
+}
+
+bool Anope::compare::operator()(const Anope::string &s1, const Anope::string &s2) const
+{
+	return s1.equals_cs(s2);
+}
+
+size_t Anope::hash_ci::operator()(const Anope::string &s) const
+{
+	return std::hash<std::string>()(s.lower().str());
+}
+
+bool Anope::compare_ci::operator()(const Anope::string &s1, const Anope::string &s2) const
+{
+	return s1.equals_ci(s2);
+}
+
+size_t Anope::hash_locale::operator()(const Anope::string &s) const
+{
+#ifdef Boost_FOUND
+	if (Config != nullptr && Config->locale != nullptr)
+	{
+		return Anope::locale::hash(s.str());
+	}
+#endif
+
+	return Anope::hash_ci()(s);
+}
+
+bool Anope::compare_locale::operator()(const Anope::string &s1, const Anope::string &s2) const
+{
+#ifdef Boost_FOUND
+	if (Config != nullptr && Config->locale != nullptr)
+	{
+		return Anope::locale::compare(s1.str(), s2.str()) == 0;
+	}
+#endif
+
+	return Anope::compare_ci()(s1, s2);
+}
+
+#ifdef Boost_FOUND
+
+std::locale Anope::locale::generate(const std::string &name)
+{
+	boost::locale::generator gen;
+	return gen.generate(name);
+}
+
+int Anope::locale::compare(const std::string &s1, const std::string &s2)
+{
+	std::string c1 = boost::locale::conv::between(s1.data(), s1.data() + s1.length(),
+		Config->locale->name(),
+		"");
+
+	std::string c2 = boost::locale::conv::between(s2.data(), s2.data() + s2.length(),
+		Config->locale->name(),
+		"");
+
+	const boost::locale::collator<char> &ct = std::use_facet<boost::locale::collator<char>>(*Config->locale);
+	return ct.compare(boost::locale::collator_base::secondary, c1, c2);
+}
+
+long Anope::locale::hash(const std::string &s)
+{
+	const boost::locale::collator<char> &ct = std::use_facet<boost::locale::collator<char>>(*Config->locale);
+	return ct.hash(boost::locale::collator_base::secondary, s.data(), s.data() + s.length());
+}
+
+#endif
 

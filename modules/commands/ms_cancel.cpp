@@ -34,27 +34,47 @@ class CommandMSCancel : public Command
 		MemoInfo *mi = MemoInfo::GetMemoInfo(nname, ischan);
 
 		if (mi == NULL)
-			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nname.c_str());
+		{
+			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nname.c_str());
+			return;
+		}
+
+		ChannelInfo *ci = NULL;
+		NickAlias *na = NULL;
+		if (ischan)
+		{
+			ci = ChannelInfo::Find(nname);
+
+			if (ci == NULL)
+				return; // can't happen
+		}
 		else
 		{
-			ChannelInfo *ci = NULL;
-			NickAlias *na = NULL;
-			if (ischan)
-				ci = ChannelInfo::Find(nname);
-			else
-				na = NickAlias::Find(nname);
-			for (int i = mi->memos->size() - 1; i >= 0; --i)
-				if (mi->GetMemo(i)->unread && source.nc->display.equals_ci(mi->GetMemo(i)->sender))
-				{
-					FOREACH_MOD(OnMemoDel, (ischan ? ci->name : na->nc->display, mi, mi->GetMemo(i)));
-					mi->Del(i);
-					source.Reply(_("Last memo to \002%s\002 has been cancelled."), nname.c_str());
-					return;
-				}
+			na = NickAlias::Find(nname);
 
-			source.Reply(_("No memo was cancelable."));
+			if (na == NULL)
+				return; // can't happen
 		}
-		return;
+
+		for (int i = mi->memos->size() - 1; i >= 0; --i)
+		{
+			Memo *m = mi->GetMemo(i);
+
+			if (!m->unread)
+				continue;
+
+			NickAlias *sender = NickAlias::Find(m->sender);
+
+			if (sender && sender->nc == source.GetAccount())
+			{
+				FOREACH_MOD(OnMemoDel, (ischan ? ci->name : na->nc->display, mi, m));
+				mi->Del(i);
+				source.Reply(_("Last memo to \002%s\002 has been cancelled."), (ischan ? ci->name : na->nc->display).c_str());
+				return;
+			}
+		}
+
+		source.Reply(_("No memo was cancelable."));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

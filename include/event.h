@@ -327,15 +327,6 @@ namespace Event
 		virtual EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_abstract;
 	};
 
-	struct CoreExport Decrypt : Events
-	{
-		static constexpr const char *NAME = "decrypt";
-
-		using Events::Events;
-
-		virtual EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest) anope_abstract;
-	};
-
 	struct CoreExport CreateBot : Events
 	{
 		static constexpr const char *NAME = "createbot";

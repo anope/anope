@@ -492,23 +492,6 @@ void Anope::Encrypt(const Anope::string &src, Anope::string &dest)
 	static_cast<void>(MOD_RESULT);
 }
 
-bool Anope::Decrypt(const Anope::string &src, Anope::string &dest)
-{
-	size_t pos = src.find(':');
-	if (pos == Anope::string::npos)
-	{
-		Log() << "Error: Anope::Decrypt() called with invalid password string (" << src << ")";
-		return false;
-	}
-	Anope::string hashm(src.begin(), src.begin() + pos);
-
-	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::Decrypt::OnDecrypt, hashm, src, dest);
-	if (MOD_RESULT == EVENT_ALLOW)
-		return true;
-
-	return false;
-}
-
 Anope::string Anope::printf(const char *fmt, ...)
 {
 	va_list args;

@@ -260,6 +260,7 @@ class CommandSeen : public Command
 	{
 		this->SetDesc(_("Tells you about the last time a user was seen"));
 		this->SetSyntax(_("\037nick\037"));
+		this->AllowUnregistered(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

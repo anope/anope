@@ -45,7 +45,7 @@ class CommandMSSend : public Command
 			return;
 		}
 
-		MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
+		MemoServService::MemoResult result = memoserv->Send(source.GetAccount()->display, nick, text);
 		if (result == MemoServService::MEMO_SUCCESS)
 		{
 			source.Reply(_("Memo sent to \002%s\002."), nick.c_str());

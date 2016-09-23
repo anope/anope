@@ -45,29 +45,29 @@ class ngIRCdProto : public IRCDProto
 		time_t timeleft = x->GetExpires() - Anope::CurTime;
 		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
-		UplinkSocket::Message(Me) << "GLINE " << x->GetMask() << " " << timeleft << " :" << x->GetReason() << " (" << x->GetBy() << ")";
+		Uplink::Send(Me, "GLINE", x->GetMask(), timeleft, x->GetReason() + " (" + x->GetBy() + ")");
 	}
 
 	void SendAkillDel(XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "GLINE " << x->GetMask();
+		Uplink::Send(Me, "GLINE", x->GetMask());
 	}
 
 	void SendChannel(Channel *c) override
 	{
-		UplinkSocket::Message(Me) << "CHANINFO " << c->name << " +" << c->GetModes(true, true);
+		Uplink::Send(Me, "CHANINFO", c->name, "+" + c->GetModes(true, true));
 	}
 
 	// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
 	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me) << "NICK " << u->nick << " 1 " << u->GetIdent() << " " << u->host << " 1 " << modes << " :" << u->realname;
+		Uplink::Send(Me, "NICK", u->nick, 1, u->GetIdent(), u->host, 1, modes, u->realname);
 	}
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " 0210-IRC+ Anope|" << Anope::VersionShort() << ":CLHMSo P";
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "0210-IRC+", "Anope|" + Anope::VersionShort(), "CLHMSo P");
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
 		/* finish the enhanced server handshake and register the connection */
@@ -76,27 +76,27 @@ class ngIRCdProto : public IRCDProto
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
-		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick;
+		Uplink::Send(Me, "SVSNICK", u->nick, newnick);
 	}
 
 	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
 	}
 
 	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
 
 	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "WALLOPS :" << buf;
+		Uplink::Send(source, "WALLOPS", buf);
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		UplinkSocket::Message(user) << "JOIN " << c->name;
+		Uplink::Send(user, "JOIN", c->name);
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -120,51 +120,53 @@ class ngIRCdProto : public IRCDProto
 	void SendKickInternal(const MessageSource &source, const Channel *chan, User *user, const Anope::string &buf) override
 	{
 		if (!buf.empty())
-			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick << " :" << buf;
+			Uplink::Send(source, "KICK", chan->name, user->nick, buf);
 		else
-			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick;
+			Uplink::Send(source, "KICK", chan->name, user->nick);
 	}
 
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->GetAccount()->GetDisplay();
+		Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", na->GetAccount()->GetDisplay());
 	}
 
 	void SendLogout(User *u) override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
+		Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", "");
 	}
 
 	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "MODE " << dest->name << " " << buf;
+		IRCMessage message(source, "MODE", dest->name);
+		message.TokenizeAndPush(buf);
+		Uplink::SendMessage(message);
 	}
 
 	void SendPartInternal(User *u, const Channel *chan, const Anope::string &buf) override
 	{
 		if (!buf.empty())
-			UplinkSocket::Message(u) << "PART " << chan->name << " :" << buf;
+			Uplink::Send(u, "PART", chan->name, buf);
 		else
-			UplinkSocket::Message(u) << "PART " << chan->name;
+			Uplink::Send(u, "PART", chan->name);
 	}
 
 	/* SERVER name hop descript */
 	void SendServer(const Server *server) override
 	{
-		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
+		Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		UplinkSocket::Message(source) << "TOPIC " << c->name << " :" << c->topic;
+		Uplink::Send(source, "TOPIC", c->name, c->topic);
 	}
 
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
 	{
 		if (!vIdent.empty())
-			UplinkSocket::Message(Me) << "METADATA " << u->nick << " user :" << vIdent;
+			Uplink::Send(Me, "METADATA", u->nick, "user", vIdent);
 
-		UplinkSocket::Message(Me) << "METADATA " << u->nick << " cloakhost :" << vhost;
+		Uplink::Send(Me, "METADATA", u->nick, "cloakhost", vhost);
 		if (!u->HasMode("CLOAK"))
 		{
 			u->SetMode(Config->GetClient("HostServ"), "CLOAK");
@@ -177,9 +179,11 @@ class ngIRCdProto : public IRCDProto
 		this->SendVhost(u, u->GetIdent(), "");
 	}
 
-	Anope::string Format(const Anope::string &source, const Anope::string &message) override
+	Anope::string Format(IRCMessage &message)
 	{
-		return IRCDProto::Format(source.empty() ? Me->GetSID() : source, message);
+		if (message.GetSource().GetSource().empty())
+			message.SetSource(Me);
+		return IRCDProto::Format(message);
 	}
 };
 

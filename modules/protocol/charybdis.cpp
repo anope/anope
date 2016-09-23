@@ -17,14 +17,11 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
-#if 0
 #include "module.h"
 #include "modules/chanserv/mode.h"
 #include "modules/sasl.h"
 
 static Anope::string UplinkSID;
-
-static ServiceReference<IRCDProto> ratbox("IRCDProto", "ratbox");
 
 class ChannelModeLargeBan : public ChannelMode
 {
@@ -40,8 +37,10 @@ class ChannelModeLargeBan : public ChannelMode
 
 class CharybdisProto : public IRCDProto
 {
+	ServiceReference<IRCDProto> ratbox; // XXX
  public:
 	CharybdisProto(Module *creator) : IRCDProto(creator, "Charybdis 3.4+")
+		, ratbox("ratbox")
 	{
 		DefaultPseudoclientModes = "+oiS";
 		CanCertFP = true;
@@ -74,12 +73,13 @@ class CharybdisProto : public IRCDProto
 
 	void SendSQLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "RESV * " << x->GetMask() << " :" << x->GetReason();
+		Uplink::Send(Me, "RESV", "*", x->GetMask(), x->GetReason());
 	}
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
+
 		/*
 		 * Received: CAPAB :BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN
 		 *           KNOCK MLOCK QS RSFNC SAVE SERVICES TB UNKLN
@@ -103,7 +103,7 @@ class CharybdisProto : public IRCDProto
 		 * UNKLN    - Can do UNKLINE (encap only)
 		 * QS       - Can handle quit storm removal
 		*/
-		UplinkSocket::Message() << "CAPAB :BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN";
+		Uplink::Send("CAPAB", "BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN");
 
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
@@ -115,34 +115,34 @@ class CharybdisProto : public IRCDProto
 		 *  arg[2] = '0'
 		 *  arg[3] = server's idea of UTC time
 		 */
-		UplinkSocket::Message() << "SVINFO 6 6 0 :" << Anope::CurTime;
+		Uplink::Send("SVINFO", 6, 6, Anope::CurTime);
 	}
 
 	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me) << "EUID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " * * :" << u->realname;
+		Uplink::Send(Me, "EUID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, 0, u->GetUID(), "*", "*", u->realname);
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP " << u->server->GetName() << " RSFNC " << u->GetUID()
-						<< " " << newnick << " " << when << " " << u->timestamp;
+		Uplink::Send(Me, "ENCAP", u->server->GetName(), "RSFNC", u->GetUID(),
+				newnick, when, u->timestamp);
 	}
 
 	void SendSVSHold(const Anope::string &nick, time_t delay) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * NICKDELAY " << delay << " " << nick;
+		Uplink::Send(Me, "ENCAP", "*", "NICKDELAY", delay, nick);
 	}
 
 	void SendSVSHoldDel(const Anope::string &nick) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * NICKDELAY 0 " << nick;
+		Uplink::Send(Me, "ENCAP", "*", "NICKDELAY", 0, nick);
 	}
 
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * CHGHOST " << u->GetUID() << " :" << host;
+		Uplink::Send(Me, "ENCAP", "*", "CHGHOST", u->GetUID(), host);
 	}
 
 	void SendVhostDel(User *u) override
@@ -153,19 +153,21 @@ class CharybdisProto : public IRCDProto
 	void SendSASLMessage(const SASL::Message &message) override
 	{
 		Server *s = Server::Find(message.target.substr(0, 3));
-		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : message.target.substr(0, 3)) << " SASL " << message.source << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : (" " + message.ext));
+		Uplink::Send(Me, "ENCAP", s ? s->GetName() : message.target.substr(0, 3), "SASL", message.source, message.target, message.type, message.data, message.ext.empty() ? "" : message.ext);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) override
 	{
 		Server *s = Server::Find(uid.substr(0, 3));
-		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : uid.substr(0, 3)) << " SVSLOGIN " << uid << " * * * " << acc;
+		Uplink::Send(Me, "ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, "*", "*", "*", acc);
 	}
 };
 
 
 struct IRCDMessageEncap : IRCDMessage
 {
+	ServiceReference<SASL::Service> sasl;
+
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT);}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
@@ -197,7 +199,7 @@ struct IRCDMessageEncap : IRCDMessage
 		 *
 		 * Charybdis only accepts messages from SASL agents; these must have umode +S
 		 */
-		if (params[1] == "SASL" && SASL::sasl && params.size() >= 6)
+		if (params[1] == "SASL" && sasl && params.size() >= 6)
 		{
 			SASL::Message m;
 			m.source = params[2];
@@ -206,7 +208,7 @@ struct IRCDMessageEncap : IRCDMessage
 			m.data = params[5];
 			m.ext = params.size() > 6 ? params[6] : "";
 
-			SASL::sasl->ProcessMessage(m);
+			sasl->ProcessMessage(m);
 		}
 	}
 };
@@ -271,6 +273,7 @@ class ProtoCharybdis : public Module
 	, public EventHook<Event::MLockEvents>
 {
 	Module *m_ratbox;
+	ServiceReference<ModeLocks> mlocks;
 
 	CharybdisProto ircd_proto;
 
@@ -307,32 +310,10 @@ class ProtoCharybdis : public Module
 
 	bool use_server_side_mlock;
 
-	void AddModes()
-	{
-		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode("NOFORWARD", 'Q'));
-		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
-		ModeManager::AddUserMode(new UserModeNoone("SSL", 'Z'));
-
-		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeList("QUIET", 'q'));
-
-		/* Add channel modes */
-		ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
-		ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
-		ModeManager::AddChannelMode(new ChannelModeParam("REDIRECT", 'f'));
-		ModeManager::AddChannelMode(new ChannelMode("ALLOWFORWARD", 'F'));
-		ModeManager::AddChannelMode(new ChannelMode("ALLINVITE", 'g'));
-		ModeManager::AddChannelMode(new ChannelModeParam("JOINFLOOD", 'j'));
-		ModeManager::AddChannelMode(new ChannelModeLargeBan("LBAN", 'L'));
-		ModeManager::AddChannelMode(new ChannelMode("PERM", 'P'));
-		ModeManager::AddChannelMode(new ChannelMode("NOFORWARD", 'Q'));
-		ModeManager::AddChannelMode(new ChannelMode("OPMODERATED", 'z'));
-	}
-
  public:
 	ProtoCharybdis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, EventHook<Event::ChannelSync>(this)
+		, EventHook<Event::MLockEvents>(this)
 		, ircd_proto(this)
 		, message_away(this)
 		, message_capab(this)
@@ -377,10 +358,9 @@ class ProtoCharybdis : public Module
 		m_ratbox = ModuleManager::FindModule("ratbox");
 		if (!m_ratbox)
 			throw ModuleException("Unable to find ratbox");
-		if (!ratbox)
-			throw ModuleException("No protocol interface for ratbox");
-
-		this->AddModes();
+#warning ""
+//		if (!ratbox)
+//			throw ModuleException("No protocol interface for ratbox");
 	}
 
 	~ProtoCharybdis()
@@ -402,7 +382,7 @@ class ProtoCharybdis : public Module
 		if (use_server_side_mlock && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = mlocks->GetMLockAsString(c->ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(c->creation_time) << " " << c->ci->GetName() << " " << modes;
+			Uplink::Send(Me, "MLOCK", c->creation_time, c->ci->GetName(), modes);
 		}
 	}
 
@@ -415,7 +395,7 @@ class ProtoCharybdis : public Module
 		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->GetName() << " " << modes;
+			Uplink::Send(Me, "MLOCK", ci->c->creation_time, ci->GetName(), modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -430,7 +410,7 @@ class ProtoCharybdis : public Module
 		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->GetName() << " " << modes;
+			Uplink::Send(Me, "MLOCK", ci->c->creation_time, ci->GetName(), modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -438,4 +418,3 @@ class ProtoCharybdis : public Module
 };
 
 MODULE_INIT(ProtoCharybdis)
-#endif

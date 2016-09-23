@@ -53,12 +53,13 @@ class RatboxProto : public IRCDProto
 
 	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "OPERWALL :" << buf;
+		Uplink::Send(source, "OPERWALL", buf);
 	}
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
+		
 		/*
 		  QS     - Can handle quit storm removal
 		  EX     - Can do channel +e exemptions
@@ -69,9 +70,11 @@ class RatboxProto : public IRCDProto
 		  TB     - supports topic burst
 		  ENCAP  - supports ENCAP
 		*/
-		UplinkSocket::Message() << "CAPAB :QS EX CHW IE GLN TB ENCAP";
+		Uplink::Send("CAPAB", "QS EX CHW IE GLN TB ENCAP");
+		
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
+		
 		/*
 		 * SVINFO
 		 *	  parv[0] = sender prefix
@@ -80,13 +83,13 @@ class RatboxProto : public IRCDProto
 		 *	  parv[3] = server is standalone or connected to non-TS only
 		 *	  parv[4] = server's idea of UTC time
 		 */
-		UplinkSocket::Message() << "SVINFO 6 3 0 :" << Anope::CurTime;
+		Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
 	}
 
 	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " :" << u->realname;
+		Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, 0, u->GetUID(), u->realname);
 	}
 
 	void SendLogin(User *u, NickServ::Nick *na) override
@@ -94,12 +97,12 @@ class RatboxProto : public IRCDProto
 		if (na->GetAccount()->HasFieldS("UNCONFIRMED"))
 			return;
 
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->GetAccount()->GetDisplay();
+		Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), na->GetAccount()->GetDisplay());
 	}
 
 	void SendLogout(User *u) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
+		Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID());
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override
@@ -290,6 +293,7 @@ class ProtoRatbox : public Module
 		m_hybrid = ModuleManager::FindModule("hybrid");
 		if (!m_hybrid)
 			throw ModuleException("Unable to find hybrid");
+#warning ""
 //		if (!hybrid)
 //			throw ModuleException("No protocol interface for hybrid");
 	}

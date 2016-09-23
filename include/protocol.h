@@ -23,6 +23,8 @@
 #include "anope.h"
 #include "service.h"
 
+class IRCMessage;
+
 /* Encapsultes the IRCd protocol we are speaking. */
 class CoreExport IRCDProto : public Service
 {
@@ -49,7 +51,7 @@ class CoreExport IRCDProto : public Service
 
 	const Anope::string &GetProtocolName();
 	virtual void Parse(const Anope::string &, Anope::string &, Anope::string &, std::vector<Anope::string> &);
-	virtual Anope::string Format(const Anope::string &source, const Anope::string &message);
+	virtual Anope::string Format(IRCMessage &);
 
 	/* Modes used by default by our clients */
 	Anope::string DefaultPseudoclientModes;
@@ -157,6 +159,13 @@ class CoreExport IRCDProto : public Service
 
 	virtual void SendQuit(User *u, const char *fmt, ...);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
+
+	/**
+	 * Send a PONG reply to a received PING.
+	 * servname should be left empty to send a one param reply.
+	 * @param servname Daemon or client that is responding to the PING.
+	 * @param who Origin of the PING and destination of the PONG message.
+	 **/
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
 
 	/** Joins one of our users to a channel.
@@ -264,6 +273,7 @@ class CoreExport MessageSource
 	MessageSource(User *u);
 	MessageSource(Server *s);
 	const Anope::string &GetName() const;
+	const Anope::string &GetUID() const;
 	const Anope::string &GetSource() const;
 	User *GetUser() const;
 	ServiceBot *GetBot() const;
@@ -295,3 +305,58 @@ class CoreExport IRCDMessage : public Service
 
 extern CoreExport IRCDProto *IRCD;
 
+class IRCMessage
+{
+	MessageSource source;
+	Anope::string command;
+	std::vector<Anope::string> parameters;
+	
+	void Push() { }
+	
+ public:
+	template<typename... Args>
+	IRCMessage(const MessageSource &_source, const Anope::string &_command, Args&&... args)
+		: source(_source)
+		, command(_command)
+	{
+		parameters.reserve(sizeof...(args));
+		
+		Push(std::forward<Args>(args)...);
+	}
+		
+	template<typename T, typename... Args>
+	void Push(const T& t, Args&&... args)
+	{
+		parameters.push_back(stringify(t));
+		
+		Push(std::forward<Args>(args)...);
+	}
+	
+	void TokenizeAndPush(const Anope::string &buf, char sepToken = ' ')
+	{
+		sepstream sep(buf, sepToken);
+		Anope::string token;
+		while (sep.GetToken(token))
+			Push(token);
+	}
+		
+	const MessageSource &GetSource() const
+	{
+		return source;
+	}
+
+	void SetSource(const MessageSource &source)
+	{
+		this->source = source;
+	}
+	
+	const Anope::string &GetCommand() const
+	{
+		return command;
+	}
+	
+	const std::vector<Anope::string> &GetParameters() const
+	{
+		return parameters;
+	}
+};

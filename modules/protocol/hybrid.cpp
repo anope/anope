@@ -68,37 +68,37 @@ class HybridProto : public IRCDProto
 
 	void SendInvite(const MessageSource &source, const Channel *c, User *u) override
 	{
-		UplinkSocket::Message(source) << "INVITE " << u->GetUID() << " " << c->name << " " << c->creation_time;
+		Uplink::Send(source, "INVITE", u->GetUID(), c->name, c->creation_time);
 	}
 
 	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "NOTICE $$" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "NOTICE", "$$" + dest->GetName(), msg);
 	}
 
 	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "PRIVMSG $$" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "PRIVMSG", "$$" + dest->GetName(), msg);
 	}
 
 	void SendSQLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message(FindIntroduced()) << "ENCAP * RESV " << (x->GetExpires() ? x->GetExpires() - Anope::CurTime : 0) << " " << x->GetMask() << " 0 :" << x->GetReason();
+		Uplink::Send(FindIntroduced(), "ENCAP", "*", "RESV", x->GetExpires() ? x->GetExpires() - Anope::CurTime : 0, x->GetMask(), "0", x->GetReason());
 	}
 
 	void SendSGLineDel(XLine *x) override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNXLINE * " << x->GetMask();
+		Uplink::Send(Config->GetClient("OperServ"), "UNXLINE", "*", x->GetMask());
 	}
 
 	void SendSGLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "XLINE * " << x->GetMask() << " 0 :" << x->GetReason();
+		Uplink::Send(Config->GetClient("OperServ"), "XLINE", "*", x->GetMask(), "0", x->GetReason());
 	}
 
 	void SendSZLineDel(XLine *x) override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNDLINE * " << x->GetHost();
+		Uplink::Send(Config->GetClient("OperServ"), "UNDLINE", "*", x->GetHost());
 	}
 
 	void SendSZLine(User *, XLine *x) override
@@ -109,7 +109,7 @@ class HybridProto : public IRCDProto
 		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
 
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "DLINE * " << timeleft << " " << x->GetHost() << " :" << x->GetReason();
+		Uplink::Send(Config->GetClient("OperServ"), "DLINE", "*", timeleft, x->GetHost(), x->GetReason());
 	}
 
 	void SendAkillDel(XLine *x) override
@@ -117,12 +117,12 @@ class HybridProto : public IRCDProto
 		if (x->IsRegex() || x->HasNickOrReal())
 			return;
 
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
+		Uplink::Send(Config->GetClient("OperServ"), "UNKLINE", "*", x->GetUser(), x->GetHost());
 	}
 
 	void SendSQLineDel(XLine *x) override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNRESV * " << x->GetMask();
+		Uplink::Send(Config->GetClient("OperServ"), "UNRESV", "*", x->GetMask());
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
@@ -132,9 +132,7 @@ class HybridProto : public IRCDProto
 		 * can not add them to the mode stacker because ircd-hybrid
 		 * does not allow *any* client to op itself
 		 */
-		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " +"
-					<< c->GetModes(true, true) << " :"
-					<< (status != NULL ? status->BuildModePrefixList() : "") << user->GetUID();
+		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), (status != NULL ? status->BuildModePrefixList() : "") + user->GetUID());
 
 		/* And update our internal status for this user since this is not going through our mode handling system */
 		if (status != NULL)
@@ -189,23 +187,23 @@ class HybridProto : public IRCDProto
 		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
 
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
+		Uplink::Send(Config->GetClient("OperServ"), "KLINE", timeleft, x->GetUser(), x->GetHost(), x->GetReason());
 	}
 
 	void SendServer(const Server *server) override
 	{
 		if (server == Me)
-			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() + 1 << " :" << server->GetDescription();
+			Uplink::Send("SERVER", server->GetName(), server->GetHops() + 1, server->GetDescription());
 		else
-			UplinkSocket::Message(Me) << "SID " << server->GetName() << " " << server->GetHops() + 1 << " " << server->GetSID() << " :" << server->GetDescription();
+			Uplink::Send(Me, "SID", server->GetName(), server->GetHops() + 1, server->GetSID(), server->GetDescription());
 	}
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
 
 		/*
-		 * As of October 13, 2012, ircd-hybrid-8 does support the following capabilities
+		 * As of October 13, 2012, ircd-hybrid-8 supports the following capabilities
 		 * which are required to work with IRC-services:
 		 *
 		 * QS     - Can handle quit storm removal
@@ -220,29 +218,30 @@ class HybridProto : public IRCDProto
 		 * EOB    - Supports End Of Burst message
 		 * TS6    - Capable of TS6 support
 		 */
-		UplinkSocket::Message() << "CAPAB :QS EX CHW IE ENCAP TBURST SVS HOPS EOB TS6";
+		Uplink::Send("CAPAB", "QS EX CHW IE ENCAP TBURST SVS HOPS EOB TS6");
 
 		SendServer(Me);
 
-		UplinkSocket::Message() << "SVINFO 6 6 0 :" << Anope::CurTime;
+		Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
 	}
 
 	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
 
-		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " "
-					 << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " * :" << u->realname;
+		Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, 0, u->GetUID(), "*", u->realname);
 	}
 
 	void SendEOB() override
 	{
-		UplinkSocket::Message(Me) << "EOB";
+		Uplink::Send(Me, "EOB");
 	}
 
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
+		IRCMessage message(source, "SVSMODE", u->GetUID(), u->timestamp);
+		message.TokenizeAndPush(buf);
+		Uplink::SendMessage(message);
 	}
 
 	void SendLogin(User *u, NickServ::Nick *na) override
@@ -262,30 +261,30 @@ class HybridProto : public IRCDProto
 		if (modes.empty())
 			modes = "+";
 
-		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
+		Uplink::Send("SJOIN", c->creation_time, c->name, modes, "");
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		UplinkSocket::Message(source) << "TBURST " << c->creation_time << " " << c->name << " " << c->topic_ts << " " << c->topic_setter << " :" << c->topic;
+		Uplink::Send(source, "TBURST", c->creation_time, c->name, c->topic_ts, c->topic_setter, c->topic);
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
-		UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << newnick << " " << when;
+		Uplink::Send(Me, "SVSNICK", u->GetUID(), newnick, when);
 	}
 
 	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) override
 	{
-		UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
+		Uplink::Send(source, "SVSJOIN", u->GetUID(), chan);
 	}
 
 	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) override
 	{
 		if (!param.empty())
-			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan << " :" << param;
+			Uplink::Send(source, "SVSPART", u->GetUID(), chan, param);
 		else
-			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan;
+			Uplink::Send(source, "SVSPART", u->GetUID(), chan);
 	}
 
 	void SendSVSHold(const Anope::string &nick, time_t t) override

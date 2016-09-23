@@ -166,60 +166,45 @@ void UplinkSocket::OnError(const Anope::string &err)
 	error |= !err.empty();
 }
 
-UplinkSocket::Message::Message() : source(Me)
+void Uplink::SendMessage(IRCMessage &message)
 {
-}
+	const MessageSource &source = message.GetSource();
+	Anope::string buffer = IRCD->Format(message);
 
-UplinkSocket::Message::Message(const MessageSource &src) : source(src)
-{
-}
-
-UplinkSocket::Message::~Message()
-{
-	Anope::string message_source;
-
-	if (this->source.GetServer() != NULL)
+	if (source.GetServer() != NULL)
 	{
-		const Server *s = this->source.GetServer();
+		const Server *s = source.GetServer();
 
 		if (s != Me && !s->IsJuped())
 		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << s->GetName() << " who is not from me?";
+			Log(LOG_DEBUG) << "Attempted to send \"" << buffer << "\" from " << s->GetName() << " who is not from me?";
 			return;
 		}
-
-		message_source = s->GetSID();
 	}
-	else if (this->source.GetUser() != NULL)
+	else if (source.GetUser() != NULL)
 	{
-		const User *u = this->source.GetUser();
+		const User *u = source.GetUser();
 
 		if (u->server != Me && !u->server->IsJuped())
 		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << u->nick << " who is not from me?";
+			Log(LOG_DEBUG) << "Attempted to send \"" << buffer << "\" from " << u->nick << " who is not from me?";
 			return;
 		}
 
-		const ServiceBot *bi = this->source.GetBot();
+		const ServiceBot *bi = source.GetBot();
 		if (bi != NULL && bi->introduced == false)
 		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << bi->nick << " when not introduced";
+			Log(LOG_DEBUG) << "Attempted to send \"" << buffer << "\" from " << bi->nick << " when not introduced";
 			return;
 		}
-
-		message_source = u->GetUID();
 	}
 
 	if (!UplinkSock)
 	{
-		if (!message_source.empty())
-			Log(LOG_DEBUG) << "Attempted to send \"" << message_source << " " << this->buffer.str() << "\" with UplinkSock NULL";
-		else
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" with UplinkSock NULL";
+		Log(LOG_DEBUG) << "Attempted to send \"" << buffer << "\" with UplinkSock NULL";
 		return;
 	}
 
-	Anope::string sent = IRCD->Format(message_source, this->buffer.str());
-	UplinkSock->Write(sent);
-	Log(LOG_RAWIO) << "Sent: " << sent;
+	UplinkSock->Write(buffer);
+	Log(LOG_RAWIO) << "Sent: " << buffer;
 }

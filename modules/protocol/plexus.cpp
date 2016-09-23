@@ -59,12 +59,12 @@ class PlexusProto : public IRCDProto
 
 	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "OPERWALL :" << buf;
+		Uplink::Send(source, "OPERWALL", buf);
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << user->GetUID();
+		Uplink::Send(Me, "SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), user->GetUID());
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -87,14 +87,14 @@ class PlexusProto : public IRCDProto
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP " << u->server->GetName() << " SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
+		Uplink::Send(Me, "ENCAP", u->server->GetName(), "SVSNICK", u->GetUID(), u->timestamp, newnick, when);
 	}
 
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
 	{
 		if (!ident.empty())
-			UplinkSocket::Message(Me) << "ENCAP * CHGIDENT " << u->GetUID() << " " << ident;
-		UplinkSocket::Message(Me) << "ENCAP * CHGHOST " << u->GetUID() << " " << host;
+			Uplink::Send(Me, "ENCAP", "*", "CHGIDENT", u->GetUID(), ident);
+		Uplink::Send(Me, "ENCAP", "*", "CHGHOST", u->GetUID(), host);
 		u->SetMode(Config->GetClient("HostServ"), "CLOAK");
 	}
 
@@ -105,7 +105,8 @@ class PlexusProto : public IRCDProto
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
+		
 		/* CAPAB
 		 * QS     - Can handle quit storm removal
 		 * EX     - Can do channel +e exemptions
@@ -126,9 +127,11 @@ class PlexusProto : public IRCDProto
 		 * ENCAP  - Supports encapsulization of protocol messages
 		 * SVS    - Supports services protocol extensions
 		 */
-		UplinkSocket::Message() << "CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS";
+		Uplink::Send("CAPAB", "QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS");
+		
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
+		
 		/*
 		 * SVINFO
 		 *	  parv[0] = sender prefix
@@ -137,43 +140,43 @@ class PlexusProto : public IRCDProto
 		 *	  parv[3] = server is standalone or connected to non-TS only
 		 *	  parv[4] = server's idea of UTC time
 		 */
-		UplinkSocket::Message() << "SVINFO 6 5 0 :" << Anope::CurTime;
+		Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
 	}
 
 	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 255.255.255.255 " << u->GetUID() << " 0 " << u->host << " :" << u->realname;
+		Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, "255.255.255.255", u->GetUID(), 0, u->host, u->realname);
 	}
 
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "ENCAP * SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
+		Uplink::Send(source, "ENCAP", "*", "SVSMODE", u->GetUID(), u->timestamp, buf);
 	}
 
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->GetAccount()->GetDisplay();
+		Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), na->GetAccount()->GetDisplay());
 	}
 
 	void SendLogout(User *u) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
+		Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), "");
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		UplinkSocket::Message(source) << "ENCAP * TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
+		Uplink::Send(source, "ENCAP", "*", "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
 	}
 
 	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
 	{
-		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSJOIN " << user->GetUID() << " " << chan;
+		Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSJOIN", user->GetUID(), chan);
 	}
 
 	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
 	{
-		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSPART " << user->GetUID() << " " << chan;
+		Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSPART", user->GetUID(), chan);
 	}
 };
 
@@ -375,6 +378,7 @@ class ProtoPlexus : public Module
 		m_hybrid = ModuleManager::FindModule("hybrid");
 		if (!m_hybrid)
 			throw ModuleException("Unable to find hybrid");
+#warning ""
 //		if (!hybrid)
 //			throw ModuleException("No protocol interface for hybrid");
 	}

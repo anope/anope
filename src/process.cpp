@@ -105,11 +105,26 @@ void IRCDProto::Parse(const Anope::string &buffer, Anope::string &source, Anope:
 	}
 }
 
-Anope::string IRCDProto::Format(const Anope::string &source, const Anope::string &message)
+Anope::string IRCDProto::Format(IRCMessage &message)
 {
+	std::stringstream buffer;
+	
+	const Anope::string &source = message.GetSource().GetUID();
 	if (!source.empty())
-		return ":" + source + " " + message;
-	else
-		return message;
+		buffer << ":" << source << " ";
+	
+	buffer << message.GetCommand();
+
+	for (unsigned int i = 0; i < message.GetParameters().size(); ++i)
+	{
+		buffer << " ";
+
+		if (i + 1 == message.GetParameters().size())
+			buffer << ":";
+
+		buffer << message.GetParameters()[i];
+	}
+
+	return buffer.str();
 }
 

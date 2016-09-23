@@ -57,58 +57,64 @@ class BahamutIRCdProto : public IRCDProto
 	{
 		if (Servers::Capab.count("TSMODE") > 0)
 		{
-			UplinkSocket::Message(source) << "MODE " << dest->name << " " << dest->creation_time << " " << buf;
+			IRCMessage message(source, "MODE", dest->name, dest->creation_time);
+			message.TokenizeAndPush(buf);
+			Uplink::SendMessage(message);
 		}
 		else
+		{
 			IRCDProto::SendModeInternal(source, dest, buf);
+		}
 	}
 
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
+		IRCMessage message(source, "SVSMODE", u->nick, u->timestamp);
+		message.TokenizeAndPush(buf);
+		Uplink::SendMessage(message);
 	}
 
 	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
 	}
 
 	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
 
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick, time_t time) override
 	{
-		UplinkSocket::Message(Me) << "SVSHOLD " << nick << " " << time << " :Being held for registered user";
+		Uplink::Send(Me, "SVSHOLD", nick, time, "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick) override
 	{
-		UplinkSocket::Message(Me) << "SVSHOLD " << nick << " 0";
+		Uplink::Send(Me, "SVSHOLD", nick, 0);
 	}
 
 	/* SQLINE */
 	void SendSQLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message() << "SQLINE " << x->GetMask() << " :" << x->GetReason();
+		Uplink::Send(Me, "SQLINE", x->GetMask(), x->GetReason());
 	}
 
 	/* UNSLINE */
 	void SendSGLineDel(XLine *x) override
 	{
-		UplinkSocket::Message() << "UNSGLINE 0 :" << x->GetMask();
+		Uplink::Send("UNSGLINE", 0, x->GetMask());
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(XLine *x) override
 	{
 		/* this will likely fail so its only here for legacy */
-		UplinkSocket::Message() << "UNSZLINE 0 " << x->GetHost();
+		Uplink::Send("UNSZLINE", 0, x->GetHost());
 		/* this is how we are supposed to deal with it */
-		UplinkSocket::Message() << "RAKILL " << x->GetHost() << " *";
+		Uplink::Send("RAKILL", x->GetHost(), "*");
 	}
 
 	/* SZLINE */
@@ -119,21 +125,21 @@ class BahamutIRCdProto : public IRCDProto
 		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
 		/* this will likely fail so its only here for legacy */
-		UplinkSocket::Message() << "SZLINE " << x->GetHost() << " :" << x->GetReason();
+		Uplink::Send("SZLINE", x->GetHost(), x->GetReason());
 		/* this is how we are supposed to deal with it */
-		UplinkSocket::Message() << "AKILL " << x->GetHost() << " * " << timeleft << " " << x->GetBy() << " " << Anope::CurTime << " :" << x->GetReason();
+		Uplink::Send("AKILL", x->GetHost(), "*", timeleft, x->GetBy(), Anope::CurTime, x->GetReason());
 	}
 
 	/* SVSNOOP */
 	void SendSVSNOOP(const Server *server, bool set) override
 	{
-		UplinkSocket::Message() << "SVSNOOP " << server->GetName() << " " << (set ? "+" : "-");
+		Uplink::Send("SVSNOOP", server->GetName(), set ? "+" : "-");
 	}
 
 	/* SGLINE */
 	void SendSGLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message() << "SGLINE " << x->GetMask().length() << " :" << x->GetMask() << ":" << x->GetReason();
+		Uplink::Send("SGLINE", x->GetMask().length(), x->GetMask() + ":" + x->GetReason());
 	}
 
 	/* RAKILL */
@@ -153,25 +159,26 @@ class BahamutIRCdProto : public IRCDProto
 			}
 		}
 
-		UplinkSocket::Message() << "RAKILL " << x->GetHost() << " " << x->GetUser();
+		Uplink::Send("RAKKILL", x->GetHost(), x->GetUser());
 	}
 
 	/* TOPIC */
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		UplinkSocket::Message(source) << "TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
+		Uplink::Send(source, "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
 	}
 
 	/* UNSQLINE */
 	void SendSQLineDel(XLine *x) override
 	{
-		UplinkSocket::Message() << "UNSQLINE " << x->GetMask();
+		Uplink::Send("UNSQLINE", x->GetMask());
 	}
 
 	/* JOIN - SJOIN */
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		UplinkSocket::Message(user) << "SJOIN " << c->creation_time << " " << c->name;
+		Uplink::Send(user, "SJOIN", c->creation_time, c->name);
+
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -237,7 +244,8 @@ class BahamutIRCdProto : public IRCDProto
 		time_t timeleft = x->GetExpires() - Anope::CurTime;
 		if (timeleft > 172800)
 			timeleft = 172800;
-		UplinkSocket::Message() << "AKILL " << x->GetHost() << " " << x->GetUser() << " " << timeleft << " " << x->GetBy() << " " << Anope::CurTime << " :" << x->GetReason();
+		
+		Uplink::Send("AKILL", x->GetHost(), x->GetUser(), timeleft, x->GetBy(), Anope::CurTime, x->GetReason());
 	}
 
 	/*
@@ -245,35 +253,35 @@ class BahamutIRCdProto : public IRCDProto
 	*/
 	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "SVSKILL " << user->nick << " :" << buf;
+		Uplink::Send(source, "SVSKILL", user->nick, buf);
 	}
 
 	void SendBOB() override
 	{
-		UplinkSocket::Message() << "BURST";
+		Uplink::Send("BURST");
 	}
 
 	void SendEOB() override
 	{
-		UplinkSocket::Message() << "BURST 0";
+		Uplink::Send("BURST", 0);
 	}
 
 	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message() << "NICK " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " " << u->server->GetName() << " 0 0 :" << u->realname;
+		Uplink::Send("NICK", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, u->server->GetName(), 0, 0, u->realname);
 	}
 
 	/* SERVER */
 	void SendServer(const Server *server) override
 	{
-		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
+		Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
 	}
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " :TS";
-		UplinkSocket::Message() << "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3";
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS");
+		Uplink::Send("CAPAB", "SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
 		SendServer(Me);
 		/*
 		 * SVINFO
@@ -283,7 +291,7 @@ class BahamutIRCdProto : public IRCDProto
 		 *	   parv[3] = server is standalone or connected to non-TS only
 		 *	   parv[4] = server's idea of UTC time
 		 */
-		UplinkSocket::Message() << "SVINFO 3 1 0 :" << Anope::CurTime;
+		Uplink::Send("SVINFO", 3, 1, 0, Anope::CurTime);
 		this->SendBOB();
 	}
 
@@ -292,7 +300,7 @@ class BahamutIRCdProto : public IRCDProto
 		Anope::string modes = c->GetModes(true, true);
 		if (modes.empty())
 			modes = "+";
-		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
+		Uplink::Send("SJOIN", c->creation_time, c->name, modes, "");
 	}
 
 	void SendLogin(User *u, NickServ::Nick *) override

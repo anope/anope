@@ -25,6 +25,21 @@
 namespace Uplink
 {
 	extern void Connect();
+	extern void SendMessage(IRCMessage &);
+	
+	template<typename... Args>
+	void Send(const MessageSource &source, const Anope::string &command, Args&&... args)
+	{
+		IRCMessage message(source, command, std::forward<Args>(args)...);
+		SendMessage(message);
+	}
+	
+	template<typename... Args>
+	void Send(const Anope::string &command, Args&&... args)
+	{
+		IRCMessage message(MessageSource(""), command, std::forward<Args>(args)...);
+		SendMessage(message);
+	}
 }
 
 /* This is the socket to our uplink */
@@ -37,23 +52,7 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 	bool ProcessRead() override;
 	void OnConnect() override;
 	void OnError(const Anope::string &) override;
-
-	/* A message sent over the uplink socket */
-	class CoreExport Message
-	{
-		MessageSource source;
-		std::stringstream buffer;
-
-	 public:
-	 	Message();
-	 	Message(const MessageSource &);
-	 	~Message();
-		template<typename T> Message &operator<<(const T &val)
-		{
-			this->buffer << val;
-			return *this;
-		}
-	};
 };
+
 extern CoreExport UplinkSocket *UplinkSock;
 

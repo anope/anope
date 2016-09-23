@@ -77,6 +77,8 @@ namespace Configuration
 	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport unsigned int Block::Get(const Anope::string &tag, const Anope::string &def) const;
 
+	template<> void Block::Set(const Anope::string &tag, const Anope::string &value);
+
 	/** Represents a configuration file
 	 */
 	class File

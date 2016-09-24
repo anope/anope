@@ -36,10 +36,10 @@ class CommandNSGetEMail : public Command
 		Log(LOG_ADMIN, source, this) << "on " << email;
 
 		for (NickServ::Account *nc : NickServ::service->GetAccountList())
-			if (!nc->GetEmail().empty() && nc->GetEmail().equals_ci(email))
+			if (!nc->GetEmail().empty() && Anope::Match(nc->GetEmail(), email))
 			{
 				++j;
-				source.Reply(_("Email matched: \002{0}\002 to \002{1}\002."), nc->GetDisplay(), email);
+				source.Reply(_("Email matched: \002{0}\002 (\002{1}\002) to \002{2}\002."), nc->GetDisplay(), nc->GetEmail(), email);
 			}
 
 		if (j <= 0)

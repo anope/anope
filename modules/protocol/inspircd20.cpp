@@ -219,7 +219,8 @@ class InspIRCd20Proto : public IRCDProto
 
 	void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf) override
 	{
-		Uplink::Send("PUSH", dest, ":" + Me->GetName() + " " + numeric + " " + dest + " " + buf);
+		User *u = User::Find(dest);
+		Uplink::Send("PUSH", dest, ":" + Me->GetName() + " " + numeric + " " + (u ? u->nick : dest) + " " + buf);
 	}
 
 	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) override

@@ -69,6 +69,11 @@ const char *Language::Translate(const char *string)
 	return Translate("", string);
 }
 
+const char *Language::Translate(const Anope::string &string)
+{
+	return Translate("", string.c_str());
+}
+
 const char *Language::Translate(User *u, const char *string)
 {
 	if (u && u->Account())
@@ -77,9 +82,19 @@ const char *Language::Translate(User *u, const char *string)
 		return Translate("", string);
 }
 
+const char *Language::Translate(User *u, const Anope::string &string)
+{
+	return Translate(u, string.c_str());
+}
+
 const char *Language::Translate(NickServ::Account *nc, const char *string)
 {
 	return Translate(nc ? nc->GetLanguage().c_str() : "", string);
+}
+
+const char *Language::Translate(NickServ::Account *nc, const Anope::string &string)
+{
+	return Translate(nc, string.c_str());
 }
 
 #if GETTEXT_FOUND

@@ -49,6 +49,7 @@ namespace Language
 	 * @return The translated string if found, else the original string.
 	 */
 	extern CoreExport const char *Translate(const char *string);
+	extern CoreExport const char *Translate(const Anope::string &string);
 
 	/** Translates a string to the language of the given user.
 	 * @param u The user to transate the string for
@@ -56,6 +57,7 @@ namespace Language
 	 * @return The translated string if found, else the original string.
 	 */
 	extern CoreExport const char *Translate(User *u, const char *string);
+	extern CoreExport const char *Translate(User *u, const Anope::string &string);
 
 	/** Translates a string to the language of the given account.
 	 * @param nc The account to translate the string for
@@ -63,6 +65,7 @@ namespace Language
 	 * @return The translated string if count, else the original string
 	 */
 	extern CoreExport const char *Translate(NickServ::Account *nc, const char *string);
+	extern CoreExport const char *Translate(NickServ::Account *nc, const Anope::string &string);
 
 	/** Translatesa string to the given language.
 	 * @param lang The language to translate to

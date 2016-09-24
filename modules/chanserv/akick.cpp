@@ -717,7 +717,11 @@ class CSAKick : public Module
 					mask = ak->GetMask();
 				reason = ak->GetReason();
 				if (reason.empty())
-					reason = Language::Translate(u, Config->GetModule(this)->Get<Anope::string>("autokickreason").c_str());
+				{
+					reason = Language::Translate(u, Config->GetModule(this)->Get<Anope::string>("autokickreason"));
+					reason = reason.replace_all_cs("%n", u->nick);
+					reason = reason.replace_all_cs("%c", c->name);
+				}
 				if (reason.empty())
 					reason = Language::Translate(u, _("User has been banned from the channel"));
 				return EVENT_STOP;

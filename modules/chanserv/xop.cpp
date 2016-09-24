@@ -109,12 +109,12 @@ class XOPChanAccessType : public ChanAccessType<XOPChanAccessImpl>
 	}
 };
 
-const Anope::string &XOPChanAccess::GetType()
+const Anope::string &XOPChanAccessImpl::GetType()
 {
 	return Get(&XOPChanAccessType::type);
 }
 
-void XOPChanAccess::SetType(const Anope::string &i)
+void XOPChanAccessImpl::SetType(const Anope::string &i)
 {
 	Object::Set(&XOPChanAccessType::type, i);
 }

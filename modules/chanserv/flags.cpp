@@ -85,12 +85,12 @@ class FlagsChanAccessType : public ChanAccessType<FlagsChanAccessImpl>
 	}
 };
 
-const Anope::string &FlagsChanAccess::GetFlags()
+const Anope::string &FlagsChanAccessImpl::GetFlags()
 {
 	return Get(&FlagsChanAccessType::flags);
 }
 
-void FlagsChanAccess::SetFlags(const Anope::string &i)
+void FlagsChanAccessImpl::SetFlags(const Anope::string &i)
 {
 	Object::Set(&FlagsChanAccessType::flags, i);
 }

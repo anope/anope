@@ -89,12 +89,12 @@ class AccessChanAccessType : public ChanAccessType<AccessChanAccessImpl>
 	}
 };
 
-int AccessChanAccess::GetLevel()
+int AccessChanAccessImpl::GetLevel()
 {
 	return Get(&AccessChanAccessType::level);
 }
 
-void AccessChanAccess::SetLevel(const int &i)
+void AccessChanAccessImpl::SetLevel(const int &i)
 {
 	Object::Set(&AccessChanAccessType::level, i);
 }

@@ -79,6 +79,8 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			this->DoUser(iface, client, request);
 		else if (request.name == "opers")
 			this->DoOperType(iface, client, request);
+		else if (request.name == "notice")
+			this->DoNotice(iface, client, request);
 
 		return true;
 	}
@@ -270,6 +272,23 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				perms += " " + *it2;
 			request.reply(ot->GetName(), perms);
 		}
+	}
+
+	void DoNotice(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	{
+		Anope::string from = request.data.size() > 0 ? request.data[0] : "";
+		Anope::string to = request.data.size() > 1 ? request.data[1] : "";
+		Anope::string message = request.data.size() > 2 ? request.data[2] : "";
+
+		ServiceBot *bi = ServiceBot::Find(from, true);
+		User *u = User::Find(to, true);
+
+		if (!bi || !u || message.empty())
+			return;
+
+		u->SendMessage(bi, message);
+
+		request.reply("result", "Success");
 	}
 };
 

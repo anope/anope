@@ -79,6 +79,12 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		, memo_type(this)
 		, ignore_type(this)
 	{
+		MemoServ::service = this;
+	}
+
+	~MemoServCore()
+	{
+		MemoServ::service = nullptr;
 	}
 
 	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) override

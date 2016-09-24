@@ -378,8 +378,8 @@ class OSNews : public Module
 	CommandOSRandomNews commandosrandomnews;
 
 	Anope::string oper_announcer, announcer;
-	unsigned news_count;
-	unsigned cur_rand_news = 0;
+	unsigned int news_count;
+	unsigned int cur_rand_news = 0;
 
 	void DisplayNews(User *u, NewsType Type)
 	{
@@ -401,40 +401,43 @@ class OSNews : public Module
 		else if (Type == NEWS_OPER)
 			msg = _("[\002Oper News\002 - {0}] {1}");
 		else if (Type == NEWS_RANDOM)
-			msg = _("[\002Random News\002 - {0}] {1]");
+			msg = _("[\002Random News\002 - {0}] {1}");
 		else
 			return;
 
-		unsigned int randnews = 0;
-		for (NewsItem *n : list)
-			if (n->GetNewsType() == NEWS_RANDOM)
-				++randnews;
+		unsigned int start;
+		unsigned int end;
 
-		/* Reset to head of list to get first random news value */
-		if (Type == NEWS_RANDOM && cur_rand_news >= randnews)
-			cur_rand_news = 0;
-
-		unsigned i = 0, displayed = 0;
-		for (NewsItem *n : list)
+		if (Type == NEWS_RANDOM)
 		{
-			if (n->GetNewsType() != Type)
-				continue;
+			/* Reset to head of list to get first random news value */
+			if (cur_rand_news >= list.size())
+				cur_rand_news = 0;
 
-			if (Type == NEWS_RANDOM && i++ != cur_rand_news)
-				continue;
+			/* only show one news entry */
+			start = cur_rand_news;
+			end = cur_rand_news + 1;
+
+			++cur_rand_news;
+		}
+		else
+		{
+			if (list.size() < news_count)
+				start = 0;
+			else
+				start = list.size() - news_count;
+
+			end = start + news_count;
+
+			if (end > list.size())
+				end = list.size();
+		}
+
+		for (unsigned int i = start; i < end; ++i)
+		{
+			NewsItem *n = list[i];
 
 			u->SendMessage(bi, msg.c_str(), Anope::strftime(n->GetTime(), u->Account(), true), n->GetText());
-
-			++displayed;
-
-			if (Type == NEWS_RANDOM)
-			{
-				++cur_rand_news;
-				break;
-			}
-
-			if (displayed >= news_count)
-				break;
 		}
 	}
 

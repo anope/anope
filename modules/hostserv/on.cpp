@@ -36,6 +36,9 @@ class CommandHSOn : public Command
 		User *u = source.GetUser();
 		NickServ::Nick *na = NickServ::FindNick(u->nick);
 
+		if (!na || na->GetAccount() != u->Account() || !na->HasVhost())
+			na = NickServ::FindNick(u->Account()->GetDisplay());
+
 		if (!na || !na->HasVhost() || na->GetAccount() != u->Account())
 		{
 			source.Reply(_("There is no vhost assigned to this nickname."));

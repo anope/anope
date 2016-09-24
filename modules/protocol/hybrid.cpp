@@ -59,6 +59,7 @@ class HybridProto : public IRCDProto
 		CanSVSJoin = true;
 		CanSNLine = true;
 		CanSQLine = true;
+		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanCertFP = true;
 		CanSetVHost = true;

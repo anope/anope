@@ -160,10 +160,6 @@ class ServiceManager
 		return static_cast<T>(FindService(type, name));
 	}
 
-	void AddAlias(const Anope::string &t, const Anope::string &n, const Anope::string &v);
-
-	void DelAlias(const Anope::string &t, const Anope::string &n);
-
 	void Register(Service *service);
 
 	void Unregister(Service *service);
@@ -177,10 +173,3 @@ class ServiceManager
 	static void Destroy();
 };
 
-class ServiceAlias
-{
-	Anope::string t, f;
- public:
-	ServiceAlias(const Anope::string &type, const Anope::string &from, const Anope::string &to);
-	~ServiceAlias();
-};

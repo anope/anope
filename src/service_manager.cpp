@@ -68,21 +68,6 @@ std::vector<Service *> ServiceManager::FindServices(const Anope::string &type)
 	return v;
 }
 
-void ServiceManager::AddAlias(const Anope::string &t, const Anope::string &n, const Anope::string &v)
-{
-#warning "aliases dont work"
-//	std::map<Anope::string, Anope::string> &smap = aliases[t];
-//	smap[n] = v;
-}
-
-void ServiceManager::DelAlias(const Anope::string &t, const Anope::string &n)
-{
-//	std::map<Anope::string, Anope::string> &smap = aliases[t];
-//	smap.erase(n);
-//	if (smap.empty())
-//		aliases.erase(t);
-}
-
 void ServiceManager::Register(Service *service)
 {
 	// assert type

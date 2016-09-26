@@ -17,7 +17,11 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
+/* Dependencies: anope_protocol.hybrid */
+
 #include "module.h"
+#include "modules/protocol/plexus.h"
+#include "modules/protocol/hybrid.h"
 
 static Anope::string UplinkSID;
 
@@ -180,48 +184,43 @@ class PlexusProto : public IRCDProto
 	}
 };
 
-struct IRCDMessageEncap : IRCDMessage
+void plexus::Encap::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	/*
+	 * Received: :dev.anope.de ENCAP * SU DukePyrolator DukePyrolator
+	 * params[0] = *
+	 * params[1] = SU
+	 * params[2] = nickname
+	 * params[3] = account
+	 */
+	if (params[1].equals_cs("SU"))
 	{
-		/*
-		 * Received: :dev.anope.de ENCAP * SU DukePyrolator DukePyrolator
-		 * params[0] = *
-		 * params[1] = SU
-		 * params[2] = nickname
-		 * params[3] = account
-		 */
-		if (params[1].equals_cs("SU"))
+		User *u = User::Find(params[2]);
+		NickServ::Account *nc = NickServ::FindAccount(params[3]);
+		if (u && nc)
 		{
-			User *u = User::Find(params[2]);
-			NickServ::Account *nc = NickServ::FindAccount(params[3]);
-			if (u && nc)
-			{
-				u->Login(nc);
-			}
+			u->Login(nc);
 		}
-
-		/*
-		 * Received: :dev.anope.de ENCAP * CERTFP DukePyrolator :3F122A9CC7811DBAD3566BF2CEC3009007C0868F
-		 * params[0] = *
-		 * params[1] = CERTFP
-		 * params[2] = nickname
-		 * params[3] = fingerprint
-		 */
-		else if (params[1].equals_cs("CERTFP"))
-		{
-			User *u = User::Find(params[2]);
-			if (u)
-			{
-				u->fingerprint = params[3];
-				EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
-			}
-		}
-		return;
 	}
-};
+
+	/*
+	 * Received: :dev.anope.de ENCAP * CERTFP DukePyrolator :3F122A9CC7811DBAD3566BF2CEC3009007C0868F
+	 * params[0] = *
+	 * params[1] = CERTFP
+	 * params[2] = nickname
+	 * params[3] = fingerprint
+	 */
+	else if (params[1].equals_cs("CERTFP"))
+	{
+		User *u = User::Find(params[2]);
+		if (u)
+		{
+			u->fingerprint = params[3];
+			EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
+		}
+	}
+	return;
+}
 
 struct IRCDMessagePass : IRCDMessage
 {
@@ -233,70 +232,60 @@ struct IRCDMessagePass : IRCDMessage
 	}
 };
 
-struct IRCDMessageServer : IRCDMessage
+/*        0          1  2                       */
+/* SERVER hades.arpa 1 :ircd-hybrid test server */
+void plexus::Server::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	/* Servers other than our immediate uplink are introduced via SID */
+	if (params[1] != "1")
+		return;
 
-	/*        0          1  2                       */
-	/* SERVER hades.arpa 1 :ircd-hybrid test server */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		/* Servers other than our immediate uplink are introduced via SID */
-		if (params[1] != "1")
-			return;
+	new ::Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+}
 
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
-	}
-};
-
-struct IRCDMessageUID : IRCDMessage
+/*
+   params[0] = nick
+   params[1] = hop
+   params[2] = ts
+   params[3] = modes
+   params[4] = user
+   params[5] = host
+   params[6] = IP
+   params[7] = UID
+   params[8] = services stamp
+   params[9] = realhost
+   params[10] = info
+*/
+// :42X UID Adam 1 1348535644 +aow Adam 192.168.0.5 192.168.0.5 42XAAAAAB 0 192.168.0.5 :Adam
+void plexus::UID::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	/* An IP of 0 means the user is spoofed */
+	Anope::string ip = params[6];
+	if (ip == "0")
+		ip.clear();
 
-	/*
-	   params[0] = nick
-	   params[1] = hop
-	   params[2] = ts
-	   params[3] = modes
-	   params[4] = user
-	   params[5] = host
-	   params[6] = IP
-	   params[7] = UID
-	   params[8] = services stamp
-	   params[9] = realhost
-	   params[10] = info
-	*/
-	// :42X UID Adam 1 1348535644 +aow Adam 192.168.0.5 192.168.0.5 42XAAAAAB 0 192.168.0.5 :Adam
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	time_t ts;
+	try
 	{
-		/* An IP of 0 means the user is spoofed */
-		Anope::string ip = params[6];
-		if (ip == "0")
-			ip.clear();
-
-		time_t ts;
-		try
-		{
-			ts = convertTo<time_t>(params[2]);
-		}
-		catch (const ConvertException &)
-		{
-			ts = Anope::CurTime;
-		}
-
-		NickServ::Nick *na = NULL;
-		try
-		{
-			if (params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == ts)
-				na = NickServ::FindNick(params[0]);
-		}
-		catch (const ConvertException &) { }
-		if (params[8] != "0" && !na)
-			na = NickServ::FindNick(params[8]);
-
-		User::OnIntroduce(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7], na ? na->GetAccount() : NULL);
+		ts = convertTo<time_t>(params[2]);
 	}
-};
+	catch (const ConvertException &)
+	{
+		ts = Anope::CurTime;
+	}
+
+	NickServ::Nick *na = NULL;
+	try
+	{
+		if (params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == ts)
+			na = NickServ::FindNick(params[0]);
+	}
+	catch (const ConvertException &) { }
+	if (params[8] != "0" && !na)
+		na = NickServ::FindNick(params[8]);
+
+	User::OnIntroduce(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7], na ? na->GetAccount() : NULL);
+}
 
 class ProtoPlexus : public Module
 {
@@ -325,15 +314,19 @@ class ProtoPlexus : public Module
 	Message::Version message_version;
 	Message::Whois message_whois;
 
-	/* Hybrid message handlers */
-	ServiceAlias message_bmask, message_eob, message_join, message_nick, message_sid, message_sjoin,
-			message_tburst, message_tmode;
-
 	/* Our message handlers */
-	IRCDMessageEncap message_encap;
+	hybrid::BMask message_bmask;
+	hybrid::EOB message_eob;
+	plexus::Encap message_encap;
+	hybrid::Join message_join;
+	hybrid::Nick message_nick;
 	IRCDMessagePass message_pass;
-	IRCDMessageServer message_server;
-	IRCDMessageUID message_uid;
+	plexus::Server message_server;
+	hybrid::SID message_sid;
+	hybrid::SJoin message_sjoin;
+	hybrid::TBurst message_tburst;
+	hybrid::TMode message_tmode;
+	plexus::UID message_uid;
 
  public:
 	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
@@ -358,36 +351,25 @@ class ProtoPlexus : public Module
 		, message_version(this)
 		, message_whois(this)
 
-		, message_bmask("IRCDMessage", "plexus/bmask", "hybrid/bmask")
-		, message_eob("IRCDMessage", "plexus/eob", "hybrid/eob")
-		, message_join("IRCDMessage", "plexus/join", "hybrid/join")
-		, message_nick("IRCDMessage", "plexus/nick", "hybrid/nick")
-		, message_sid("IRCDMessage", "plexus/sid", "hybrid/sid")
-		, message_sjoin("IRCDMessage", "plexus/sjoin", "hybrid/sjoin")
-		, message_tburst("IRCDMessage", "plexus/tburst", "hybrid/tburst")
-		, message_tmode("IRCDMessage", "plexus/tmode", "hybrid/tmode")
-
+		, message_bmask(this)
+		, message_eob(this)
 		, message_encap(this)
+		, message_join(this)
+		, message_nick(this)
 		, message_pass(this)
 		, message_server(this)
+		, message_sid(this)
+		, message_sjoin(this)
+		, message_tburst(this)
+		, message_tmode(this)
 		, message_uid(this)
 	{
-
-		if (ModuleManager::LoadModule("hybrid", User::Find(creator)) != MOD_ERR_OK)
-			throw ModuleException("Unable to load hybrid");
-		m_hybrid = ModuleManager::FindModule("hybrid");
-		if (!m_hybrid)
-			throw ModuleException("Unable to find hybrid");
-#warning ""
-//		if (!hybrid)
-//			throw ModuleException("No protocol interface for hybrid");
-	}
-
-	~ProtoPlexus()
-	{
-		m_hybrid = ModuleManager::FindModule("hybrid");
-		ModuleManager::UnloadModule(m_hybrid, NULL);
 	}
 };
+
+template<> void ModuleInfo<ProtoPlexus>(ModuleDef *def)
+{
+	def->Depends("hybrid");
+}
 
 MODULE_INIT(ProtoPlexus)

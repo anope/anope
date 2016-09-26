@@ -65,14 +65,3 @@ Service::~Service()
 	ServiceManager::Get()->Unregister(this);
 }
 
-ServiceAlias::ServiceAlias(const Anope::string &type, const Anope::string &from, const Anope::string &to) : t(type), f(from)
-{
-	ServiceManager::Get()->AddAlias(type, from, to);
-}
-
-ServiceAlias::~ServiceAlias()
-{
-	ServiceManager::Get()->DelAlias(t, f);
-}
-
-

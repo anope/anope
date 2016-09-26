@@ -19,6 +19,7 @@
  */
 
 #include "module.h"
+#include "modules/protocol/hybrid.h"
 
 static Anope::string UplinkSID;
 
@@ -339,64 +340,44 @@ class HybridProto : public IRCDProto
 	}
 };
 
-struct IRCDMessageBMask : IRCDMessage
+/*            0          1        2  3              */
+/* :0MC BMASK 1350157102 #channel b :*!*@*.test.com */
+void hybrid::BMask::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageBMask(Module *creator) : IRCDMessage(creator, "BMASK", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	Channel *c = Channel::Find(params[1]);
+	ChannelMode *mode = ModeManager::FindChannelModeByChar(params[2][0]);
 
-	/*            0          1        2  3              */
-	/* :0MC BMASK 1350157102 #channel b :*!*@*.test.com */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	if (c && mode)
 	{
-		Channel *c = Channel::Find(params[1]);
-		ChannelMode *mode = ModeManager::FindChannelModeByChar(params[2][0]);
-
-		if (c && mode)
-		{
-			spacesepstream bans(params[3]);
-			Anope::string token;
-			while (bans.GetToken(token))
-				c->SetModeInternal(source, mode, token);
-		}
+		spacesepstream bans(params[3]);
+		Anope::string token;
+		while (bans.GetToken(token))
+			c->SetModeInternal(source, mode, token);
 	}
-};
+}
 
-struct IRCDMessageEOB : IRCDMessage
+void hybrid::EOB::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageEOB(Module *craetor) : IRCDMessage(craetor, "EOB", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	source.GetServer()->Sync(true);
+}
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		source.GetServer()->Sync(true);
-	}
-};
-
-struct IRCDMessageJoin : Message::Join
+void hybrid::Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { }
+	if (params.size() < 2)
+		return;
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		if (params.size() < 2)
-			return;
+	std::vector<Anope::string> p = params;
+	p.erase(p.begin());
 
-		std::vector<Anope::string> p = params;
-		p.erase(p.begin());
+	return Message::Join::Run(source, p);
+}
 
-		return Message::Join::Run(source, p);
-	}
-};
-
-struct IRCDMessageNick : IRCDMessage
+/*                 0       1          */
+/* :0MCAAAAAB NICK newnick 1350157102 */
+void hybrid::Nick::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	/*                 0       1          */
-	/* :0MCAAAAAB NICK newnick 1350157102 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		source.GetUser()->ChangeNick(params[0], convertTo<time_t>(params[1]));
-	}
-};
+	source.GetUser()->ChangeNick(params[0], convertTo<time_t>(params[1]));
+}
 
 struct IRCDMessagePass : IRCDMessage
 {
@@ -410,196 +391,149 @@ struct IRCDMessagePass : IRCDMessage
 	}
 };
 
-struct IRCDMessagePong : IRCDMessage
+void hybrid::Pong::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	source.GetServer()->Sync(false);
+}
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		source.GetServer()->Sync(false);
-	}
-};
-
-struct IRCDMessageServer : IRCDMessage
+/*        0          1  2                       */
+/* SERVER hades.arpa 1 :ircd-hybrid test server */
+void hybrid::Server::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	/* Servers other than our immediate uplink are introduced via SID */
+	if (params[1] != "1")
+		return;
 
-	/*        0          1  2                       */
-	/* SERVER hades.arpa 1 :ircd-hybrid test server */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		/* Servers other than our immediate uplink are introduced via SID */
-		if (params[1] != "1")
-			return;
+	new ::Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
 
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+	IRCD->SendPing(Me->GetName(), params[0]);
+}
 
-		IRCD->SendPing(Me->GetName(), params[0]);
-	}
-};
-
-struct IRCDMessageSID : IRCDMessage
+void hybrid::SID::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	unsigned int hops = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+	new ::Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[3], params[2]);
 
-	/*          0          1 2    3                       */
-	/* :0MC SID hades.arpa 2 4XY :ircd-hybrid test server */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		unsigned int hops = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[3], params[2]);
+	IRCD->SendPing(Me->GetName(), params[0]);
+}
 
-		IRCD->SendPing(Me->GetName(), params[0]);
-	}
-};
-
-struct IRCDMessageSJoin : IRCDMessage
+void hybrid::SJoin::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		Anope::string modes;
-		if (params.size() >= 3)
-			for (unsigned i = 2; i < params.size() - 1; ++i)
-				modes += " " + params[i];
-		if (!modes.empty())
-			modes.erase(modes.begin());
-
-		std::list<Message::Join::SJoinUser> users;
-
-		spacesepstream sep(params[params.size() - 1]);
-		Anope::string buf;
-
-		while (sep.GetToken(buf))
-		{
-			Message::Join::SJoinUser sju;
-
-			/* Get prefixes from the nick */
-			for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
-			{
-				buf.erase(buf.begin());
-				sju.first.AddMode(ch);
-			}
-
-			sju.second = User::Find(buf);
-			if (!sju.second)
-			{
-				Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
-				continue;
-			}
-
-			users.push_back(sju);
-		}
-
-		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
-		Message::Join::SJoin(source, params[1], ts, modes, users);
-	}
-};
-
-struct IRCDMessageSVSMode : IRCDMessage
-{
-	IRCDMessageSVSMode(Module *creator) : IRCDMessage(creator, "SVSMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	/*
-	 * parv[0] = nickname
-	 * parv[1] = TS
-	 * parv[2] = mode
-	 * parv[3] = optional argument (services id)
-	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = User::Find(params[0]);
-		if (!u)
-			return;
-
-		if (!params[1].is_pos_number_only() || convertTo<time_t>(params[1]) != u->timestamp)
-			return;
-
-		u->SetModesInternal(source, "%s", params[2].c_str());
-	}
-};
-
-struct IRCDMessageTBurst : IRCDMessage
-{
-	IRCDMessageTBurst(Module *creator) : IRCDMessage(creator, "TBURST", 5) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		Anope::string setter;
-		sepstream(params[3], '!').GetToken(setter, 0);
-		time_t topic_time = Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime;
-		Channel *c = Channel::Find(params[1]);
-
-		if (c)
-			c->ChangeTopicInternal(NULL, setter, params[4], topic_time);
-	}
-};
-
-struct IRCDMessageTMode : IRCDMessage
-{
-	IRCDMessageTMode(Module *creator) : IRCDMessage(creator, "TMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		time_t ts = 0;
-
-		try
-		{
-			ts = convertTo<time_t>(params[0]);
-		}
-		catch (const ConvertException &) { }
-
-		Channel *c = Channel::Find(params[1]);
-		Anope::string modes = params[2];
-
-		for (unsigned i = 3; i < params.size(); ++i)
+	Anope::string modes;
+	if (params.size() >= 3)
+		for (unsigned i = 2; i < params.size() - 1; ++i)
 			modes += " " + params[i];
+	if (!modes.empty())
+		modes.erase(modes.begin());
 
-		if (c)
-			c->SetModesInternal(source, modes, ts);
-	}
-};
+	std::list<Message::Join::SJoinUser> users;
 
-struct IRCDMessageUID : IRCDMessage
-{
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	spacesepstream sep(params[params.size() - 1]);
+	Anope::string buf;
 
-	/*          0     1 2          3   4      5             6        7         8           9                   */
-	/* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB Steve      :Mining all the time */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	while (sep.GetToken(buf))
 	{
-		Anope::string ip = params[6];
+		Message::Join::SJoinUser sju;
 
-		if (ip == "0") /* Can be 0 for spoofed clients */
-			ip.clear();
+		/* Get prefixes from the nick */
+		for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
+		{
+			buf.erase(buf.begin());
+			sju.first.AddMode(ch);
+		}
 
-		NickServ::Nick *na = NULL;
-		if (params[8] != "0" && params[8] != "*")
-			na = NickServ::FindNick(params[8]);
+		sju.second = User::Find(buf);
+		if (!sju.second)
+		{
+			Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
+			continue;
+		}
 
-		/* Source is always the server */
-		User::OnIntroduce(params[0], params[4], params[5], "",
-				ip, source.GetServer(),
-				params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
-				params[3], params[7], na ? na->GetAccount() : NULL);
+		users.push_back(sju);
 	}
-};
 
-struct IRCDMessageCertFP: IRCDMessage
+	time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
+	Message::Join::SJoin(source, params[1], ts, modes, users);
+}
+
+/*
+ * parv[0] = nickname
+ * parv[1] = TS
+ * parv[2] = mode
+ * parv[3] = optional argument (services id)
+ */
+void hybrid::SVSMode::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageCertFP(Module *creator) : IRCDMessage(creator, "CERTFP", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+	User *u = User::Find(params[0]);
+	if (!u)
+		return;
 
-	/*                   0                                                                */
-	/* :0MCAAAAAB CERTFP 4C62287BA6776A89CD4F8FF10A62FFB35E79319F51AF6C62C674984974FCCB1D */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	if (!params[1].is_pos_number_only() || convertTo<time_t>(params[1]) != u->timestamp)
+		return;
+
+	u->SetModesInternal(source, "%s", params[2].c_str());
+}
+
+void hybrid::TBurst::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	Anope::string setter;
+	sepstream(params[3], '!').GetToken(setter, 0);
+	time_t topic_time = Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime;
+	Channel *c = Channel::Find(params[1]);
+
+	if (c)
+		c->ChangeTopicInternal(NULL, setter, params[4], topic_time);
+}
+
+void hybrid::TMode::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	time_t ts = 0;
+
+	try
 	{
-		User *u = source.GetUser();
-
-		u->fingerprint = params[0];
-		EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
+		ts = convertTo<time_t>(params[0]);
 	}
-};
+	catch (const ConvertException &) { }
+
+	Channel *c = Channel::Find(params[1]);
+	Anope::string modes = params[2];
+
+	for (unsigned i = 3; i < params.size(); ++i)
+		modes += " " + params[i];
+
+	if (c)
+		c->SetModesInternal(source, modes, ts);
+}
+
+/*          0     1 2          3   4      5             6        7         8           9                   */
+/* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB Steve      :Mining all the time */
+void hybrid::UID::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	Anope::string ip = params[6];
+
+	if (ip == "0") /* Can be 0 for spoofed clients */
+		ip.clear();
+
+	NickServ::Nick *na = NULL;
+	if (params[8] != "0" && params[8] != "*")
+		na = NickServ::FindNick(params[8]);
+
+	/* Source is always the server */
+	User::OnIntroduce(params[0], params[4], params[5], "",
+			ip, source.GetServer(),
+			params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
+			params[3], params[7], na ? na->GetAccount() : NULL);
+}
+
+/*                   0                                                                */
+/* :0MCAAAAAB CERTFP 4C62287BA6776A89CD4F8FF10A62FFB35E79319F51AF6C62C674984974FCCB1D */
+void hybrid::CertFP::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *u = source.GetUser();
+
+	u->fingerprint = params[0];
+	EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
+}
 
 class ProtoHybrid : public Module
 	, public EventHook<Event::UserNickChange>
@@ -628,20 +562,20 @@ class ProtoHybrid : public Module
 	Message::Whois message_whois;
 
 	/* Our message handlers */
-	IRCDMessageBMask message_bmask;
-	IRCDMessageEOB message_eob;
-	IRCDMessageJoin message_join;
-	IRCDMessageNick message_nick;
+	hybrid::CertFP message_certfp;
+	hybrid::BMask message_bmask;
+	hybrid::EOB message_eob;
+	hybrid::Join message_join;
+	hybrid::Nick message_nick;
 	IRCDMessagePass message_pass;
-	IRCDMessagePong message_pong;
-	IRCDMessageServer message_server;
-	IRCDMessageSID message_sid;
-	IRCDMessageSJoin message_sjoin;
-	IRCDMessageSVSMode message_svsmode;
-	IRCDMessageTBurst message_tburst;
-	IRCDMessageTMode message_tmode;
-	IRCDMessageUID message_uid;
-	IRCDMessageCertFP message_certfp;
+	hybrid::Pong message_pong;
+	hybrid::Server message_server;
+	hybrid::SID message_sid;
+	hybrid::SJoin message_sjoin;
+	hybrid::SVSMode message_svsmode;
+	hybrid::TBurst message_tburst;
+	hybrid::TMode message_tmode;
+	hybrid::UID message_uid;
 
 public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)

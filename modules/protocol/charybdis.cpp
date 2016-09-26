@@ -17,9 +17,14 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
+/* Dependencies: anope_protocol.ratbox */
+
 #include "module.h"
-#include "modules/chanserv/mode.h"
 #include "modules/sasl.h"
+#include "modules/protocol/hybrid.h"
+#include "modules/protocol/charybdis.h"
+#include "modules/protocol/ratbox.h"
+#include "modules/chanserv/mode.h"
 
 static Anope::string UplinkSID;
 
@@ -164,115 +169,79 @@ class CharybdisProto : public IRCDProto
 };
 
 
-struct IRCDMessageEncap : IRCDMessage
+void charybdis::Encap::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	ServiceReference<SASL::Service> sasl;
+	User *u = source.GetUser();
 
-	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT);}
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	// In a burst, states that the source user is logged in as the account.
+	if (params[1] == "LOGIN" || params[1] == "SU")
 	{
-		User *u = source.GetUser();
-
-		// In a burst, states that the source user is logged in as the account.
-		if (params[1] == "LOGIN" || params[1] == "SU")
-		{
-			NickServ::Account *nc = NickServ::FindAccount(params[2]);
-			if (!nc)
-				return;
-			u->Login(nc);
-		}
-		// Received: :42XAAAAAE ENCAP * CERTFP :3f122a9cc7811dbad3566bf2cec3009007c0868f
-		if (params[1] == "CERTFP")
-		{
-			u->fingerprint = params[2];
-			EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
-		}
-		/*
-		 * Received: :42X ENCAP * SASL 42XAAAAAH * S PLAIN
-		 * Received: :42X ENCAP * SASL 42XAAAAAC * D A
-		 *
-		 * Part of a SASL authentication exchange. The mode is 'C' to send some data
-		 * (base64 encoded), or 'S' to end the exchange (data indicates type of
-		 * termination: 'A' for abort, 'F' for authentication failure, 'S' for
-		 * authentication success).
-		 *
-		 * Charybdis only accepts messages from SASL agents; these must have umode +S
-		 */
-		if (params[1] == "SASL" && sasl && params.size() >= 6)
-		{
-			SASL::Message m;
-			m.source = params[2];
-			m.target = params[3];
-			m.type = params[4];
-			m.data = params[5];
-			m.ext = params.size() > 6 ? params[6] : "";
-
-			sasl->ProcessMessage(m);
-		}
-	}
-};
-
-struct IRCDMessageEUID : IRCDMessage
-{
-	IRCDMessageEUID(Module *creator) : IRCDMessage(creator, "EUID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
-
-	/*
-	 * :42X EUID DukePyrolator 1 1353240577 +Zi ~jens erft-5d80b00b.pool.mediaWays.net 93.128.176.11 42XAAAAAD * * :jens
-	 * :<SID> EUID <NICK> <HOPS> <TS> +<UMODE> <USERNAME> <VHOST> <IP> <UID> <REALHOST> <ACCOUNT> :<GECOS>
-	 *               0      1     2      3         4         5     6     7       8         9         10
-	 *
-	 * Introduces a user. The hostname field is now always the visible host.
-	 * The realhost field is * if the real host is equal to the visible host.
-	 * The account field is * if the login is not set.
-	 * Note that even if both new fields are *, an EUID command still carries more
-	 * information than a UID command (namely that real host is visible host and the
-	 * user is not logged in with services). Hence a NICK or UID command received
-	 * from a remote server should not be sent in EUID form to other servers.
-	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		NickServ::Nick *na = NULL;
-		if (params[9] != "*")
-			na = NickServ::FindNick(params[9]);
-
-		User::OnIntroduce(params[0], params[4], params[8], params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? na->GetAccount() : NULL);
-	}
-};
-
-// we can't use this function from ratbox because we set a local variable here
-struct IRCDMessageServer : IRCDMessage
-{
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
-
-	// SERVER dev.anope.de 1 :charybdis test server
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		// Servers other then our immediate uplink are introduced via SID
-		if (params[1] != "1")
+		NickServ::Account *nc = NickServ::FindAccount(params[2]);
+		if (!nc)
 			return;
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
-		IRCD->SendPing(Me->GetName(), params[0]);
+		u->Login(nc);
 	}
-};
+	// Received: :42XAAAAAE ENCAP * CERTFP :3f122a9cc7811dbad3566bf2cec3009007c0868f
+	if (params[1] == "CERTFP")
+	{
+		u->fingerprint = params[2];
+		EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
+	}
+	/*
+	 * Received: :42X ENCAP * SASL 42XAAAAAH * S PLAIN
+	 * Received: :42X ENCAP * SASL 42XAAAAAC * D A
+	 *
+	 * Part of a SASL authentication exchange. The mode is 'C' to send some data
+	 * (base64 encoded), or 'S' to end the exchange (data indicates type of
+	 * termination: 'A' for abort, 'F' for authentication failure, 'S' for
+	 * authentication success).
+	 *
+	 * Charybdis only accepts messages from SASL agents; these must have umode +S
+	 */
+	if (params[1] == "SASL" && sasl && params.size() >= 6)
+	{
+		SASL::Message m;
+		m.source = params[2];
+		m.target = params[3];
+		m.type = params[4];
+		m.data = params[5];
+		m.ext = params.size() > 6 ? params[6] : "";
+
+		sasl->ProcessMessage(m);
+	}
+}
+
+void charybdis::EUID::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	NickServ::Nick *na = NULL;
+	if (params[9] != "*")
+		na = NickServ::FindNick(params[9]);
+
+	User::OnIntroduce(params[0], params[4], params[8], params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? na->GetAccount() : NULL);
+}
 
 // we can't use this function from ratbox because we set a local variable here
-struct IRCDMessagePass : IRCDMessage
+// SERVER dev.anope.de 1 :charybdis test server
+void charybdis::Server::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	// Servers other then our immediate uplink are introduced via SID
+	if (params[1] != "1")
+		return;
+	new ::Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+	IRCD->SendPing(Me->GetName(), params[0]);
+}
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		// UplinkSID is used in IRCDMessageServer
-		UplinkSID = params[3];
-	}
-};
+// we can't use this function from ratbox because we set a local variable here
+void charybdis::Pass::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	// UplinkSID is used in server handler
+	UplinkSID = params[3];
+}
 
 class ProtoCharybdis : public Module
 	, public EventHook<Event::ChannelSync>
 	, public EventHook<Event::MLockEvents>
 {
-	Module *m_ratbox;
 	ServiceReference<ModeLocks> mlocks;
 
 	CharybdisProto ircd_proto;
@@ -298,15 +267,20 @@ class ProtoCharybdis : public Module
 	Message::Version message_version;
 	Message::Whois message_whois;
 
-	/* Ratbox Message Handlers */
-	ServiceAlias message_bmask, message_join, message_nick, message_pong, message_sid, message_sjoin,
-		message_tb, message_tmode, message_uid;
-
 	/* Our message handlers */
-	IRCDMessageEncap message_encap;
-	IRCDMessageEUID message_euid;
-	IRCDMessagePass message_pass;
-	IRCDMessageServer message_server;
+	hybrid::BMask message_bmask;
+	charybdis::Encap message_encap;
+	charybdis::EUID message_euid;
+	hybrid::Join message_join;
+	hybrid::Nick message_nick;
+	charybdis::Pass message_pass;
+	hybrid::Pong message_pong;
+	charybdis::Server message_server;
+	hybrid::SID message_sid;
+	hybrid::SJoin message_sjoin;
+	ratbox::TB message_tb;
+	hybrid::TMode message_tmode;
+	ratbox::UID message_uid;
 
 	bool use_server_side_mlock;
 
@@ -335,38 +309,20 @@ class ProtoCharybdis : public Module
 		, message_version(this)
 		, message_whois(this)
 
-		, message_bmask("IRCDMessage", "charybdis/bmask", "ratbox/bmask")
-		, message_join("IRCDMessage", "charybdis/join", "ratbox/join")
-		, message_nick("IRCDMessage", "charybdis/nick", "ratbox/nick")
-		, message_pong("IRCDMessage", "charybdis/pong", "ratbox/pong")
-		, message_sid("IRCDMessage", "charybdis/sid", "ratbox/sid")
-		, message_sjoin("IRCDMessage", "charybdis/sjoin", "ratbox/sjoin")
-		, message_tb("IRCDMessage", "charybdis/tb", "ratbox/tb")
-		, message_tmode("IRCDMessage", "charybdis/tmode", "ratbox/tmode")
-		, message_uid("IRCDMessage", "charybdis/uid", "ratbox/uid")
-
+		, message_bmask(this)
 		, message_encap(this)
 		, message_euid(this)
+		, message_join(this)
+		, message_nick(this)
 		, message_pass(this)
+		, message_pong(this)
 		, message_server(this)
-
+		, message_sid(this)
+		, message_sjoin(this)
+		, message_tb(this)
+		, message_tmode(this)
+		, message_uid(this)
 	{
-
-
-		if (ModuleManager::LoadModule("ratbox", User::Find(creator)) != MOD_ERR_OK)
-			throw ModuleException("Unable to load ratbox");
-		m_ratbox = ModuleManager::FindModule("ratbox");
-		if (!m_ratbox)
-			throw ModuleException("Unable to find ratbox");
-#warning ""
-//		if (!ratbox)
-//			throw ModuleException("No protocol interface for ratbox");
-	}
-
-	~ProtoCharybdis()
-	{
-		m_ratbox = ModuleManager::FindModule("ratbox");
-		ModuleManager::UnloadModule(m_ratbox, NULL);
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -416,5 +372,10 @@ class ProtoCharybdis : public Module
 		return EVENT_CONTINUE;
 	}
 };
+
+template<> void ModuleInfo<ProtoCharybdis>(ModuleDef *def)
+{
+	def->Depends("ratbox");
+}
 
 MODULE_INIT(ProtoCharybdis)

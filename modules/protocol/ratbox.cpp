@@ -17,7 +17,11 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
+/* Dependencies: anope_protocol.hybrid */
+
 #include "module.h"
+#include "modules/protocol/hybrid.h"
+#include "modules/protocol/ratbox.h"
 
 static Anope::string UplinkSID;
 
@@ -125,30 +129,25 @@ class RatboxProto : public IRCDProto
 	}
 };
 
-struct IRCDMessageEncap : IRCDMessage
+// Debug: Received: :00BAAAAAB ENCAP * LOGIN Adam
+void ratbox::Encap::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 3) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	// Debug: Received: :00BAAAAAB ENCAP * LOGIN Adam
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	if (params[1] == "LOGIN" || params[1] == "SU")
 	{
-		if (params[1] == "LOGIN" || params[1] == "SU")
-		{
-			User *u = source.GetUser();
+		User *u = source.GetUser();
 
-			NickServ::Account *nc = NickServ::FindAccount(params[2]);
-			if (!nc)
-				return;
-			u->Login(nc);
+		NickServ::Account *nc = NickServ::FindAccount(params[2]);
+		if (!nc)
+			return;
+		u->Login(nc);
 
-			/* Sometimes a user connects, we send them the usual "this nickname is registered" mess (if
-			 * their server isn't syncing) and then we receive this.. so tell them about it.
-			 */
-			if (u->server->IsSynced())
-				u->SendMessage(Config->GetClient("NickServ"), _("You have been logged in as \002%s\002."), nc->GetDisplay().c_str());
-		}
+		/* Sometimes a user connects, we send them the usual "this nickname is registered" mess (if
+		 * their server isn't syncing) and then we receive this.. so tell them about it.
+		 */
+		if (u->server->IsSynced())
+			u->SendMessage(Config->GetClient("NickServ"), _("You have been logged in as \002%s\002."), nc->GetDisplay().c_str());
 	}
-};
+}
 
 struct IRCDMessagePass : IRCDMessage
 {
@@ -160,62 +159,45 @@ struct IRCDMessagePass : IRCDMessage
 	}
 };
 
-struct IRCDMessageServer : IRCDMessage
+// SERVER hades.arpa 1 :ircd-ratbox test server
+void ratbox::Server::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	// Servers other then our immediate uplink are introduced via SID
+	if (params[1] != "1")
+		return;
+	new ::Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+	IRCD->SendPing(Me->GetName(), params[0]);
+}
 
-	// SERVER hades.arpa 1 :ircd-ratbox test server
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		// Servers other then our immediate uplink are introduced via SID
-		if (params[1] != "1")
-			return;
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
-		IRCD->SendPing(Me->GetName(), params[0]);
-	}
-};
-
-struct IRCDMessageTBurst : IRCDMessage
+/*
+ * params[0] = channel
+ * params[1] = ts
+ * params[2] = topic OR who set the topic
+ * params[3] = topic if params[2] isn't the topic
+ */
+void ratbox::TB::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageTBurst(Module *creator) : IRCDMessage(creator, "TB", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	time_t topic_time = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
+	Channel *c = Channel::Find(params[0]);
 
-	/*
-	 * params[0] = channel
-	 * params[1] = ts
-	 * params[2] = topic OR who set the topic
-	 * params[3] = topic if params[2] isn't the topic
-	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		time_t topic_time = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
-		Channel *c = Channel::Find(params[0]);
+	if (!c)
+		return;
 
-		if (!c)
-			return;
+	const Anope::string &setter = params.size() == 4 ? params[2] : "",
+		topic = params.size() == 4 ? params[3] : params[2];
 
-		const Anope::string &setter = params.size() == 4 ? params[2] : "",
-			topic = params.size() == 4 ? params[3] : params[2];
+	c->ChangeTopicInternal(NULL, setter, topic, topic_time);
+}
 
-		c->ChangeTopicInternal(NULL, setter, topic, topic_time);
-	}
-};
-
-struct IRCDMessageUID : IRCDMessage
+// :42X UID Adam 1 1348535644 +aow Adam 192.168.0.5 192.168.0.5 42XAAAAAB :Adam
+void ratbox::UID::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 9) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
-
-	// :42X UID Adam 1 1348535644 +aow Adam 192.168.0.5 192.168.0.5 42XAAAAAB :Adam
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		/* Source is always the server */
-		User::OnIntroduce(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7], NULL);
-	}
-};
+	/* Source is always the server */
+	User::OnIntroduce(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7], NULL);
+}
 
 class ProtoRatbox : public Module
 {
-	Module *m_hybrid;
-
 	RatboxProto ircd_proto;
 
 	/* Core message handlers */
@@ -239,16 +221,19 @@ class ProtoRatbox : public Module
 	Message::Version message_version;
 	Message::Whois message_whois;
 
-	/* Hybrid message handlers */
-	ServiceAlias message_bmask, message_join, message_nick, message_pong, message_sid,
-			message_sjoin, message_tmode;
-
 	/* Our message handlers */
-	IRCDMessageEncap message_encap;
+	hybrid::BMask message_bmask;
+	ratbox::Encap message_encap;
+	hybrid::Join message_join;
+	hybrid::Nick message_nick;
 	IRCDMessagePass message_pass;
-	IRCDMessageServer message_server;
-	IRCDMessageTBurst message_tburst;
-	IRCDMessageUID message_uid;
+	hybrid::Pong message_pong;
+	ratbox::Server message_server;
+	hybrid::SID message_sid;
+	hybrid::SJoin message_sjoin;
+	ratbox::TB message_tb;
+	hybrid::TMode message_tmode;
+	ratbox::UID message_uid;
 
  public:
 	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
@@ -273,36 +258,25 @@ class ProtoRatbox : public Module
 		, message_version(this)
 		, message_whois(this)
 
-		, message_bmask("IRCDMessage", "ratbox/bmask", "hybrid/bmask")
-		, message_join("IRCDMessage", "ratbox/join", "hybrid/join")
-		, message_nick("IRCDMessage", "ratbox/nick", "hybrid/nick")
-		, message_pong("IRCDMessage", "ratbox/pong", "hybrid/pong")
-		, message_sid("IRCDMessage", "ratbox/sid", "hybrid/sid")
-		, message_sjoin("IRCDMessage", "ratbox/sjoin", "hybrid/sjoin")
-		, message_tmode("IRCDMessage", "ratbox/tmode", "hybrid/tmode")
-
+		, message_bmask(this)
 		, message_encap(this)
+		, message_join(this)
+		, message_nick(this)
 		, message_pass(this)
+		, message_pong(this)
 		, message_server(this)
-		, message_tburst(this)
+		, message_sid(this)
+		, message_sjoin(this)
+		, message_tb(this)
+		, message_tmode(this)
 		, message_uid(this)
 	{
-
-		if (ModuleManager::LoadModule("hybrid", User::Find(creator)) != MOD_ERR_OK)
-			throw ModuleException("Unable to load hybrid");
-		m_hybrid = ModuleManager::FindModule("hybrid");
-		if (!m_hybrid)
-			throw ModuleException("Unable to find hybrid");
-#warning ""
-//		if (!hybrid)
-//			throw ModuleException("No protocol interface for hybrid");
-	}
-
-	~ProtoRatbox()
-	{
-		m_hybrid = ModuleManager::FindModule("hybrid");
-		ModuleManager::UnloadModule(m_hybrid, NULL);
 	}
 };
+
+template<> void ModuleInfo<ProtoRatbox>(ModuleDef *def)
+{
+	def->Depends("hybrid");
+}
 
 MODULE_INIT(ProtoRatbox)

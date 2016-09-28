@@ -112,9 +112,6 @@ class CommandOSAKill : public Command
 		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
-		if (!akills->CanAdd(source, mask, expires, reason))
-			return;
-
 		if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; Please use a more specific mask."), mask);
@@ -126,6 +123,9 @@ class CommandOSAKill : public Command
 			source.Reply(_("Mask must be in the form \037user\037@\037host\037."));
 			return;
 		}
+
+		if (!akills->CanAdd(source, mask, expires, reason))
+			return;
 
 		XLine *x = Serialize::New<XLine *>();
 		x->SetMask(mask);

@@ -904,9 +904,9 @@ class CSAccess : public Module
 	{
 		if (group->ci == NULL)
 			return EVENT_CONTINUE;
-		/* Special case. Allows a level of < 0 to match anyone, and a level of 0 to match anyone identified. */
+		/* Special case. Allows a level of -1 to match anyone, and a level of 0 to match anyone identified. */
 		int16_t level = group->ci->GetLevel(priv);
-		if (level < 0)
+		if (level == -1)
 			return EVENT_ALLOW;
 		else if (level == 0 && group->nc)
 			return EVENT_ALLOW;

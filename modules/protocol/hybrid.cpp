@@ -231,7 +231,7 @@ class HybridProto : public IRCDProto
 	{
 		Anope::string modes = "+" + u->GetModes();
 
-		Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, 0, u->GetUID(), "*", u->realname);
+		Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, "0.0.0.0", u->GetUID(), "*", u->realname);
 	}
 
 	void SendEOB() override

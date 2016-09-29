@@ -863,8 +863,9 @@ const Anope::string Entry::GetNUHMask() const
 {
 	Anope::string n = nick.empty() ? "*" : nick,
 			u = user.empty() ? "*" : user,
-			h = host.empty() ? "*" : host;
-	return n + "!" + u + "@" + h;
+			h = host.empty() ? "*" : host,
+			r = real.empty() ? "" : "#" + real;
+	return n + "!" + u + "@" + h + r;
 }
 
 bool Entry::Matches(User *u, bool full) const

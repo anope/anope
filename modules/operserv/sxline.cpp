@@ -307,13 +307,14 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
-		if (!this->xlm()->CanAdd(source, mask, expires, reason))
-			return;
-		else if (mask.find_first_not_of("/.*?") == Anope::string::npos)
+		if (mask.find_first_not_of("/.*?") == Anope::string::npos)
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 			return;
 		}
+
+		if (!this->xlm()->CanAdd(source, mask, expires, reason))
+			return;
 
 		XLine *x = Serialize::New<XLine *>();
 		x->SetMask(mask);
@@ -518,13 +519,14 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
-		if (!this->sqlines->CanAdd(source, mask, expires, reason))
-			return;
-		else if (mask.find_first_not_of("./?*") == Anope::string::npos)
+		if (mask.find_first_not_of("./?*") == Anope::string::npos)
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 			return;
 		}
+
+		if (!this->sqlines->CanAdd(source, mask, expires, reason))
+			return;
 
 		XLine *x = Serialize::New<XLine *>();
 		x->SetMask(mask);

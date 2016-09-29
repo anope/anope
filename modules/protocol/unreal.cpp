@@ -22,10 +22,12 @@
 #include "modules/sasl.h"
 #include "modules/operserv/stats.h"
 
+static Anope::string UplinkSID;
+
 class UnrealIRCdProto : public IRCDProto
 {
  public:
-	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 3.2.x")
+	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4")
 	{
 		DefaultPseudoclientModes = "+Soiq";
 		CanSVSNick = true;
@@ -36,7 +38,8 @@ class UnrealIRCdProto : public IRCDProto
 		CanSQLine = true;
 		CanSZLine = true;
 		CanSVSHold = true;
-		CanSVSO = true;
+		CanCertFP = true;
+		RequiresID = true;
 		MaxModes = 12;
 	}
 
@@ -44,7 +47,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* SVSNOOP */
 	void SendSVSNOOP(const Server *server, bool set) override
 	{
-		Uplink::Send("SVSNOOP", server->GetName(), set ? "+" : "-");
+		Uplink::Send("SVSNOOP", server->GetSID(), set ? "+" : "-");
 	}
 
 	void SendAkillDel(XLine *x) override
@@ -142,13 +145,13 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
-		Uplink::Send(source, "SVSKILL", user->nick, buf);
+		Uplink::Send(source, "SVSKILL", user->GetUID(), buf);
 		user->KillInternal(source, buf);
 	}
 
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
-		IRCMessage message(source, "SVS2MODE", u->nick);
+		IRCMessage message(source, "SVS2MODE", u->GetUID());
 		message.TokenizeAndPush(buf);
 		Uplink::SendMessage(message);
 	}
@@ -156,7 +159,7 @@ class UnrealIRCdProto : public IRCDProto
 	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		Uplink::Send("NICK", u->nick, "1", u->timestamp, u->GetIdent(), u->host, u->server->GetName(), "0", modes, u->host, u->realname);
+		Uplink::Send("UID", u->nick, 1, u->timestamp, u->GetIdent(), u->host, u->GetUID(), "*", modes, !u->vhost.empty() ? u->vhost : "*", !u->chost.empty() ? u->chost : "*", "*", u->realname);
 	}
 
 	/* SERVER name hop descript */
@@ -164,15 +167,15 @@ class UnrealIRCdProto : public IRCDProto
 	void SendServer(const Server *server) override
 	{
 		if (!server->GetSID().empty() && server == Me)
-			Uplink::Send("SERVER", server->GetName(), server->GetHops(), "U0-*-" + server->GetSID() + " " + server->GetDescription());
+			Uplink::Send("SERVER", server->GetName(), server->GetHops() + 1, server->GetDescription());
 		else
-			Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
+			Uplink::Send("SID", server->GetName(), server->GetHops() + 1, server->GetSID(), server->GetDescription());
 	}
 
 	/* JOIN */
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		Uplink::Send(Me, "SJOIN", c->creation_time, c->name, user->nick);
+		Uplink::Send(Me, "SJOIN", c->creation_time, c->name, user->GetUID());
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -210,23 +213,12 @@ class UnrealIRCdProto : public IRCDProto
 		Uplink::Send("SQLINE", x->GetMask(), x->GetReason());
 	}
 
-	/*
-	** svso
-	**	  parv[0] = sender prefix
-	**	  parv[1] = nick
-	**	  parv[2] = options
-	*/
-	void SendSVSO(ServiceBot *source, const Anope::string &nick, const Anope::string &flag) override
-	{
-		Uplink::Send(source, "SVSO", nick, flag);
-	}
-
 	/* Functions that use serval cmd functions */
 
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
 	{
 		if (!vIdent.empty())
-			Uplink::Send(Me, "CHGIDENT", u->nick, vIdent);
+			Uplink::Send(Me, "CHGIDENT", u->GetUID(), vIdent);
 		if (!vhost.empty())
 			Uplink::Send(Me, "CHGHOST", u->nick, vhost);
 	}
@@ -238,18 +230,17 @@ class UnrealIRCdProto : public IRCDProto
 		   VHP    = Sends hidden host
 		   UMODE2 = sends UMODE2 on user modes
 		   NICKIP = Sends IP on NICK
-		   TOKEN  = Use tokens to talk
 		   SJ3    = Supports SJOIN
 		   NOQUIT = No Quit
 		   TKLEXT = Extended TKL we don't use it but best to have it
-		   SJB64  = Base64 encoded time stamps
-		   ESVID  = Allows storing account names as services stamp
 		   MLOCK  = Supports the MLOCK server command
 		   VL     = Version Info
-		   NS     = Numeric Server
+		   SID    = SID/UID mode
 		*/
-		Uplink::Send("PROTOCTL", "NICKv2", "VHP", "UMODE2", "NICKIP", "SJOIN", "SJOIN2", "SJ3", "NOQUIT", "TKLEXT", "ESVID", "MLOCK", "VL");
 		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password);
+		Uplink::Send("PROTOCTL", "NICKv2", "VHP", "UMODE2", "NICKIP", "SJOIN", "SJOIN2", "SJ3", "NOQUIT", "TKLEXT", "MLOCK", "SID");
+		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
+		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
 		SendServer(Me);
 	}
 
@@ -557,6 +548,21 @@ namespace UnrealExtban
 	 		return u->Account() && Anope::Match(u->Account()->GetDisplay(), real_mask);
 	 	}
 	};
+
+	class FingerprintMatcher : public UnrealExtBan
+	{
+	 public:
+		FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
+
+		bool Matches(User *u, const Entry *e) override
+		{
+			const Anope::string &mask = e->GetMask();
+			Anope::string real_mask = mask.substr(3);
+			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, real_mask);
+		}
+	};
 }
 
 class ChannelModeFlood : public ChannelModeParam
@@ -656,6 +662,34 @@ struct IRCDMessageChgName : IRCDMessage
 		User *u = User::Find(params[0]);
 		if (u)
 			u->SetRealname(params[1]);
+	}
+};
+
+struct IRCDMessageMD : IRCDMessage
+{
+	IRCDMessageMD(Module *creator) : IRCDMessage(creator, "MD", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	{
+		const Anope::string &mdtype = params[0],
+				    &obj = params[1],
+				    &var = params[2],
+				    &value = params.size() > 3 ? params[3] : "";
+
+		if (mdtype == "client")
+		{
+			User *u = User::Find(obj);
+
+			if (u == nullptr)
+				return;
+
+			if (var == "certfp" && !value.empty())
+			{
+				u->Extend<bool>("ssl", true);
+				u->fingerprint = value;
+				EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
+			}
+		}
 	}
 };
 
@@ -808,6 +842,26 @@ struct IRCDMessagePong : IRCDMessage
 	}
 };
 
+struct IRCDMessageProtoctl : Message::Capab
+{
+	IRCDMessageProtoctl(Module *creator) : Message::Capab(creator, "PROTOCTL") { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	{
+		for (unsigned int i = 0; i < params.size(); ++i)
+		{
+			Anope::string capab = params[i];
+
+			if (!capab.find("SID="))
+			{
+				UplinkSID = capab.substr(4);
+			}
+		}
+
+		Message::Capab::Run(source, params);
+	}
+};
+
 struct IRCDMessageSASL : IRCDMessage
 {
 	ServiceReference<SASL::Service> sasl;
@@ -892,10 +946,24 @@ struct IRCDMessageServer : IRCDMessage
 			Anope::string desc;
 			spacesepstream(params[2]).GetTokenRemainder(desc, 1);
 
-			new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, desc);
+			new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, desc, UplinkSID);
 		}
 		else
 			new Server(source.GetServer(), params[0], hops, params[2]);
+
+		IRCD->SendPing(Me->GetName(), params[0]);
+	}
+};
+
+struct IRCDMessageSID : IRCDMessage
+{
+	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	{
+		unsigned int hops = Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+
+		new Server(source.GetServer(), params[0], hops, params[3], params[2]);
 
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}
@@ -1007,6 +1075,88 @@ struct IRCDMessageTopic : IRCDMessage
 	}
 };
 
+/*
+ *      parv[0] = nickname
+ *      parv[1] = hopcount
+ *      parv[2] = timestamp
+ *      parv[3] = username
+ *      parv[4] = hostname
+ *      parv[5] = UID
+ *      parv[6] = servicestamp
+ *      parv[7] = umodes
+ *      parv[8] = virthost, * if none
+ *      parv[9] = cloaked host, * if none
+ *      parv[10] = ip
+ *      parv[11] = info
+ */
+struct IRCDMessageUID : IRCDMessage
+{
+	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 12) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	{
+		Anope::string
+			nickname  = params[0],
+			hopcount  = params[1],
+			timestamp = params[2],
+			username  = params[3],
+			hostname  = params[4],
+			uid       = params[5],
+			account   = params[6],
+			umodes    = params[7],
+			vhost     = params[8],
+			chost     = params[9],
+			ip        = params[10],
+			info      = params[11];
+
+		if (ip != "*")
+		{
+			Anope::string decoded_ip;
+			Anope::B64Decode(ip, decoded_ip);
+
+			sockaddrs ip_addr;
+			ip_addr.ntop(ip.length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
+			ip = ip_addr.addr();
+		}
+
+		if (vhost == "*")
+			vhost.clear();
+
+		if (chost == "*")
+			chost.clear();
+
+		time_t user_ts;
+		try
+		{
+			user_ts = convertTo<time_t>(timestamp);
+		}
+		catch (const ConvertException &)
+		{
+			user_ts = Anope::CurTime;
+		}
+
+		NickServ::Nick *na = NULL;
+
+		if (account == "0")
+		{
+			/* nothing */
+		}
+		else if (account.is_pos_number_only())
+		{
+			if (convertTo<time_t>(account) == user_ts)
+				na = NickServ::FindNick(nickname);
+		}
+		else
+		{
+			na = NickServ::FindNick(account);
+		}
+
+		User *u = User::OnIntroduce(nickname, username, hostname, vhost, ip, source.GetServer(), info, user_ts, umodes, uid, na ? na->GetAccount() : NULL);
+
+		if (u && !chost.empty() && chost != u->GetCloakedHost())
+			u->SetCloakedHost(chost);
+	}
+};
 
 struct IRCDMessageUmode2 : IRCDMessage
 {
@@ -1030,7 +1180,6 @@ class ProtoUnreal : public Module
 
 	/* Core message handlers */
 	Message::Away message_away;
-	Message::Capab message_capab;
 	Message::Error message_error;
 	Message::Invite message_invite;
 	Message::Join message_join;
@@ -1052,18 +1201,22 @@ class ProtoUnreal : public Module
 	IRCDMessageChgHost message_chghost;
 	IRCDMessageChgIdent message_chgident;
 	IRCDMessageChgName message_chgname;
+	IRCDMessageMD message_md;
 	IRCDMessageMode message_mode, message_svsmode, message_svs2mode;
 	IRCDMessageNetInfo message_netinfo;
 	IRCDMessageNick message_nick;
 	IRCDMessagePong message_pong;
+	IRCDMessageProtoctl message_protoctl;
 	IRCDMessageSASL message_sasl;
 	IRCDMessageSDesc message_sdesc;
 	IRCDMessageSetHost message_sethost;
 	IRCDMessageSetIdent message_setident;
 	IRCDMessageSetName message_setname;
 	IRCDMessageServer message_server;
+	IRCDMessageSID message_sid;
 	IRCDMessageSJoin message_sjoin;
 	IRCDMessageTopic message_topic;
+	IRCDMessageUID message_uid;
 	IRCDMessageUmode2 message_umode2;
 
 	bool use_server_side_mlock;
@@ -1077,7 +1230,6 @@ class ProtoUnreal : public Module
 		, EventHook<Event::MLockEvents>(this, EventHook<Event::MLockEvents>::Priority::FIRST)
 		, ircd_proto(this)
 		, message_away(this)
-		, message_capab(this, "PROTOCTL")
 		, message_error(this)
 		, message_invite(this)
 		, message_join(this)
@@ -1099,20 +1251,24 @@ class ProtoUnreal : public Module
 		, message_chghost(this)
 		, message_chgident(this)
 		, message_chgname(this)
+		, message_md(this)
 		, message_mode(this, "MODE")
 		, message_svsmode(this, "SVSMODE")
 		, message_svs2mode(this, "SVS2MODE")
 		, message_netinfo(this)
 		, message_nick(this)
 		, message_pong(this)
+		, message_protoctl(this)
 		, message_sasl(this)
 		, message_sdesc(this)
 		, message_sethost(this)
 		, message_setident(this)
 		, message_setname(this)
 		, message_server(this)
+		, message_sid(this)
 		, message_sjoin(this)
 		, message_topic(this)
+		, message_uid(this)
 		, message_umode2(this)
 	{
 	}
@@ -1144,6 +1300,8 @@ class ProtoUnreal : public Module
 				cm = new UnrealExtban::RegisteredMatcher(name, base, character[0]);
 			else if (type == "account")
 				cm = new UnrealExtban::AccountMatcher(name, base, character[0]);
+			else if (type == "fingerprint")
+				cm = new UnrealExtban::FingerprintMatcher(name, base, character[0]);
 			else
 				continue;
 

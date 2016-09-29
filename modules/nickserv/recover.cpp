@@ -23,6 +23,13 @@
 
 typedef std::map<Anope::string, ChannelStatus> NSRecoverInfo;
 
+class NSRecoverSvsnick
+{
+ public:
+	Reference<User> from;
+	Anope::string to;
+};
+
 class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 {
 	CommandSource source;
@@ -94,9 +101,21 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 			{
 				source.GetUser()->Login(na->GetAccount()); // Identify the user using the command if they arent identified
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->GetNick() << " (" << na->GetAccount()->GetDisplay() << ")";
+				source.Reply(_("You have been logged in as \002{0}\002."), na->GetAccount()->GetDisplay());
 			}
 
 			u->SendMessage(*source.service, _("This nickname has been recovered by \002{0}\002."), source.GetNick());
+
+			if (IRCD->CanSVSNick)
+			{
+				NSRecoverSvsnick svs;
+
+				svs.from = source.GetUser();
+				svs.to = u->nick;
+
+				u->Extend<NSRecoverSvsnick>("svsnick", svs);
+			}
+
 			if (NickServ::service)
 				NickServ::service->Collide(u, na);
 
@@ -105,8 +124,8 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 				/* If we can svsnick then release our hold and svsnick the user using the command */
 				if (NickServ::service)
 					NickServ::service->Release(na);
-				IRCD->SendForceNickChange(source.GetUser(), user, Anope::CurTime);
-				source.Reply(_("You have regained control of \002%s\002 and are now identified as \002%s\002."), user, na->GetAccount()->GetDisplay().c_str());
+
+				source.Reply(_("You have regained control of \002{0}\002."), u->nick);
 			}
 			else
 				source.Reply(_("The user with your nick has been removed. Use this command again to release services's hold on your nick."));
@@ -211,6 +230,7 @@ class NSRecover : public Module
 {
 	CommandNSRecover commandnsrecover;
 	ExtensibleItem<NSRecoverInfo> recover;
+	ExtensibleItem<NSRecoverSvsnick> svsnick;
 
  public:
 	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
@@ -218,6 +238,7 @@ class NSRecover : public Module
 		, EventHook<Event::JoinChannel>(this)
 		, commandnsrecover(this)
 		, recover(this, "recover")
+		, svsnick(this, "svsnick")
 	{
 
 		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
@@ -245,6 +266,18 @@ class NSRecover : public Module
 					else if (IRCD->CanSVSJoin)
 						IRCD->SendSVSJoin(NickServ, u, cname, "");
 				}
+		}
+
+		NSRecoverSvsnick *svs = svsnick.Get(u);
+		if (svs)
+		{
+			if (svs->from)
+			{
+				// svsnick from to to
+				IRCD->SendForceNickChange(svs->from, svs->to, Anope::CurTime);
+			}
+
+			svsnick.Unset(u);
 		}
 	}
 

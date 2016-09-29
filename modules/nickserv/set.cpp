@@ -770,7 +770,11 @@ class CommandNSSetLanguage : public Command
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the language of " << nc->GetDisplay() << " to " << param;
 
 		nc->SetLanguage(param);
-		source.Reply(_("Language changed to \002English\002."));
+
+		if (source.GetAccount() == nc)
+			source.Reply(_("Language changed to \002{0}\002."), Language::Translate(param.c_str(), _("English")));
+		else
+			source.Reply(_("Language for \002{0}\002 changed to \002{1}\002."), nc->GetDisplay(), Language::Translate(param.c_str(), _("English")));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &param) override

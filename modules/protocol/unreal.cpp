@@ -220,7 +220,7 @@ class UnrealIRCdProto : public IRCDProto
 		if (!vIdent.empty())
 			Uplink::Send(Me, "CHGIDENT", u->GetUID(), vIdent);
 		if (!vhost.empty())
-			Uplink::Send(Me, "CHGHOST", u->nick, vhost);
+			Uplink::Send(Me, "CHGHOST", u->GetUID(), vhost);
 	}
 
 	void SendConnect() override

@@ -100,7 +100,10 @@ class SQLineManager : public XLineManager
 				u->Kill(Config->GetClient("OperServ"), "Q-Lined: " + x->GetReason());
 		}
 		else if (x->IsRegex())
-			;
+		{
+			if (u)
+				u->Kill(Config->GetClient("OperServ"), "Q-Lined: " + x->GetReason());
+		}
 		else if (x->GetMask()[0] != '#' || IRCD->CanSQLineChannel)
 			IRCD->SendSQLine(u, x);
 	}

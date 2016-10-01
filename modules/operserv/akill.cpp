@@ -258,6 +258,7 @@ class CommandOSAKill : public Command
 					entry["Creator"] = x->GetBy();
 					entry["Created"] = Anope::strftime(x->GetCreated(), NULL, true);
 					entry["Expires"] = Anope::Expires(x->GetExpires(), source.nc);
+					entry["ID"] = x->GetID();
 					entry["Reason"] = x->GetReason();
 					list.AddEntry(entry);
 				},
@@ -276,6 +277,7 @@ class CommandOSAKill : public Command
 					entry["Creator"] = x->GetBy();
 					entry["Created"] = Anope::strftime(x->GetCreated(), NULL, true);
 					entry["Expires"] = Anope::Expires(x->GetExpires(), source.nc);
+					entry["ID"] = x->GetID();
 					entry["Reason"] = x->GetReason();
 					list.AddEntry(entry);
 				}
@@ -322,7 +324,10 @@ class CommandOSAKill : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Expires")).AddColumn(_("Reason"));
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Expires"));
+		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+			list.AddColumn(_("ID"));
+		list.AddColumn(_("Reason"));
 
 		this->ProcessList(source, params, list);
 	}

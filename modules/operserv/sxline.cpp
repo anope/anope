@@ -116,6 +116,7 @@ class CommandOSSXLineBase : public Command
 					entry["By"] = x->GetBy();
 					entry["Created"] = Anope::strftime(x->GetCreated(), NULL, true);
 					entry["Expires"] = Anope::Expires(x->GetExpires(), source.nc);
+					entry["ID"] = x->GetID();
 					entry["Reason"] = x->GetReason();
 					list.AddEntry(entry);
 				},
@@ -134,6 +135,7 @@ class CommandOSSXLineBase : public Command
 					entry["By"] = x->GetBy();
 					entry["Created"] = Anope::strftime(x->GetCreated(), NULL, true);
 					entry["Expires"] = Anope::Expires(x->GetExpires(), source.nc);
+					entry["ID"] = x->GetID();
 					entry["Reason"] = x->GetReason();
 					list.AddEntry(entry);
 				}
@@ -165,7 +167,11 @@ class CommandOSSXLineBase : public Command
 	void OnView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Created")).AddColumn(_("Expires")).AddColumn(_("Reason"));
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Created")).AddColumn(_("Expires"));
+		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+			list.AddColumn(_("ID"));
+		list.AddColumn(_("Reason"));
+
 		this->ProcessList(source, params, list);
 	}
 

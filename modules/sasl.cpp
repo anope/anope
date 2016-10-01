@@ -278,6 +278,10 @@ void IdentifyRequestListener::OnSuccess(NickServ::IdentifyRequest *req)
 	if (!na || na->GetAccount()->HasFieldS("NS_SUSPENDED"))
 		return OnFail(req);
 
+	unsigned int maxlogins = Config->GetModule("ns_identify")->Get<unsigned int>("maxlogins");
+	if (maxlogins && na->GetAccount()->users.size() >= maxlogins)
+		return OnFail(req);
+
 	Session *s = service->GetSession(uid);
 	if (s)
 	{

@@ -173,12 +173,28 @@ class CommandMSInfo : public Command
 			else
 				source.Reply(_("You have no limit on the number of memos you may keep."));
 
+			bool memo_mail = nc->HasFieldS("MEMO_MAIL");
 			if (nc->HasFieldS("MEMO_RECEIVE") && nc->HasFieldS("MEMO_SIGNON"))
-				source.Reply(_("You will be notified of new memos at logon and when they arrive."));
+			{
+				if (memo_mail)
+					source.Reply(_("You will be notified of new memos at logon and when they arrive, and by mail when they arrive."));
+				else
+					source.Reply(_("You will be notified of new memos at logon and when they arrive."));
+			}
 			else if (nc->HasFieldS("MEMO_RECEIVE"))
-				source.Reply(_("You will be notified when new memos arrive."));
+			{
+				if (memo_mail)
+					source.Reply(_("You will be notified by message and by mail when new memos arrive."));
+				else
+					source.Reply(_("You will be notified when new memos arrive."));
+			}
 			else if (nc->HasFieldS("MEMO_SIGNON"))
-				source.Reply(_("You will be notified of new memos at logon."));
+			{
+				if (memo_mail)
+					source.Reply(_("You will be notified of new memos at logon, and by mail when they arrive."));
+				else
+					source.Reply(_("You will be notified of new memos at logon."));
+			}
 			else
 				source.Reply(_("You will not be notified of new memos."));
 		}

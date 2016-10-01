@@ -31,6 +31,18 @@ class SQLOperResult : public SQL::Interface
 		~SQLOperResultDeleter() { delete res; }
 	};
 
+	void Deoper()
+	{
+		if (user->Account()->o && user->Account()->o->owner == this->owner)
+		{
+			user->Account()->o->Delete();
+			user->Account()->o = nullptr;
+
+			Log(this->owner) << "Removed services operator from " << user->nick << " (" << user->Account()->GetDisplay() << ")";
+			user->RemoveMode(Config->GetClient("OperServ"), "OPER"); // Probably not set, just incase
+		}
+	}
+
  public:
 	SQLOperResult(Module *m, User *u) : SQL::Interface(m), user(u) { }
 
@@ -38,8 +50,15 @@ class SQLOperResult : public SQL::Interface
 	{
 		SQLOperResultDeleter d(this);
 
-		if (!user || !user->Account() || r.Rows() == 0)
+		if (!user || !user->Account())
 			return;
+
+		if (r.Rows() == 0)
+		{
+			Log(LOG_DEBUG) << "m_sql_oper: Got 0 rows for " << user->nick;
+			Deoper();
+			return;
+		}
 
 		Anope::string opertype;
 		try
@@ -48,6 +67,7 @@ class SQLOperResult : public SQL::Interface
 		}
 		catch (const SQL::Exception &)
 		{
+			Log(this->owner) << "Expected column named \"opertype\" but one was not found";
 			return;
 		}
 
@@ -63,14 +83,7 @@ class SQLOperResult : public SQL::Interface
 		ServiceBot *OperServ = Config->GetClient("OperServ");
 		if (opertype.empty())
 		{
-			if (user->Account()->o && user->Account()->o->owner == this->owner)
-			{
-				user->Account()->o->Delete();
-				user->Account()->o = nullptr;
-
-				Log(this->owner) << "m_sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->GetDisplay() << ")";
-				user->RemoveMode(OperServ, "OPER"); // Probably not set, just incase
-			}
+			Deoper();
 			return;
 		}
 
@@ -81,9 +94,18 @@ class SQLOperResult : public SQL::Interface
 			return;
 		}
 
+		if (user->Account()->o && user->Account()->o->owner != this->owner)
+		{
+			Log(this->owner) << "Oper " << user->Account()->GetDisplay() << " has type " << ot->GetName() << ", but is already configured as an oper of type " << user->Account()->o->GetType()->GetName();
+			return;
+		}
+
 		if (!user->Account()->o || user->Account()->o->GetType() != ot)
 		{
 			Log(this->owner) << "m_sql_oper: Tieing oper " << user->nick << " to type " << opertype;
+
+			if (user->Account()->o)
+				user->Account()->o->Delete();
 
 			Oper *o = Serialize::New<Oper *>();
 			o->owner = this->owner;

@@ -95,7 +95,7 @@ class HybridProto : public IRCDProto
 
 	void SendSGLine(User *, XLine *x) override
 	{
-		Uplink::Send(Config->GetClient("OperServ"), "XLINE", "*", x->GetMask(), "0", x->GetReason());
+		Uplink::Send(Config->GetClient("OperServ"), "XLINE", "*", x->GetMask(), x->GetExpires() ? x->GetExpires() - Anope::CurTime : 0, x->GetReason());
 	}
 
 	void SendSZLineDel(XLine *x) override

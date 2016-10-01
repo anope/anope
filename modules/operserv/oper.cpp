@@ -111,21 +111,29 @@ class CommandOSOper : public Command
 			}
 
 			NickServ::Nick *na = NickServ::FindNick(oper);
-			if (na == NULL)
+			if (na == nullptr || na->GetAccount() == nullptr)
 			{
 				source.Reply(_("\002{0}\002 isn't registered."), oper);
 				return;
 			}
 
-			if (!na->GetAccount() || !na->GetAccount()->o)
+			Oper *o = na->GetAccount()->o;
+
+			if (o == nullptr)
 			{
 				source.Reply(_("Nick \002{0}\002 is not a Services Operator."), oper);
 				return;
 			}
 
-			if (!HasPrivs(source, na->GetAccount()->o->GetType()))
+			if (!HasPrivs(source, o->GetType()))
 			{
 				source.Reply(_("Access denied."));
+				return;
+			}
+
+			if (o->conf != nullptr)
+			{
+				source.Reply(_("Oper \002{0}\002 is configured in the configuration file(s) and can not be removed by this command."), na->GetNick());
 				return;
 			}
 

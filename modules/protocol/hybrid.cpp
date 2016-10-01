@@ -85,7 +85,7 @@ class HybridProto : public IRCDProto
 
 	void SendSQLine(User *, XLine *x) override
 	{
-		Uplink::Send(FindIntroduced(), "ENCAP", "*", "RESV", x->GetExpires() ? x->GetExpires() - Anope::CurTime : 0, x->GetMask(), "0", x->GetReason());
+		Uplink::Send(FindIntroduced(), "RESV", "*", x->GetExpires() ? x->GetExpires() - Anope::CurTime : 0, x->GetMask(), x->GetReason());
 	}
 
 	void SendSGLineDel(XLine *x) override

@@ -119,12 +119,13 @@ class External : public Mechanism
 			NickServ::Account *nc = certs->FindAccountFromCert(mysess->cert);
 			if (!nc || nc->HasFieldS("NS_SUSPENDED"))
 			{
+				Log(Config->GetClient("NickServ"), "sasl") << "A user failed to identify using certificate " << mysess->cert << " using SASL EXTERNAL";
 				GetService()->Fail(sess);
 				delete sess;
 				return;
 			}
 
-			Log(Config->GetClient("NickServ")) << "A user identified to account " << nc->GetDisplay() << " using SASL EXTERNAL";
+			Log(Config->GetClient("NickServ"), "sasl") << "A user identified to account " << nc->GetDisplay() << " using SASL EXTERNAL";
 			GetService()->Succeed(sess, nc);
 			delete sess;
 		}
@@ -280,7 +281,7 @@ void IdentifyRequestListener::OnSuccess(NickServ::IdentifyRequest *req)
 	Session *s = service->GetSession(uid);
 	if (s)
 	{
-		Log(Config->GetClient("NickServ")) << "A user identified to account " << req->GetAccount() << " using SASL";
+		Log(Config->GetClient("NickServ"), "sasl") << "A user identified to account " << req->GetAccount() << " using SASL";
 		service->Succeed(s, na->GetAccount());
 		delete s;
 	}
@@ -302,7 +303,7 @@ void IdentifyRequestListener::OnFail(NickServ::IdentifyRequest *req)
 	else if (na->GetAccount()->HasFieldS("NS_SUSPENDED"))
 		accountstatus = "suspended ";
 
-	Log(Config->GetClient("NickServ")) << "A user failed to identify for " << accountstatus << "account " << req->GetAccount() << " using SASL";
+	Log(Config->GetClient("NickServ"), "sasl") << "A user failed to identify for " << accountstatus << "account " << req->GetAccount() << " using SASL";
 }
 
 class ModuleSASL : public Module

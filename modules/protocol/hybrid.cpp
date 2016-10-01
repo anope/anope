@@ -2,7 +2,7 @@
  * Anope IRC Services
  *
  * Copyright (C) 2003-2016 Anope Team <team@anope.org>
- * Copyright (C) 2012-2015 ircd-hybrid development team
+ * Copyright (C) 2012-2016 ircd-hybrid development team
  *
  * This file is part of Anope. Anope is free software; you can
  * redistribute it and/or modify it under the terms of the GNU
@@ -45,10 +45,10 @@ class HybridProto : public IRCDProto
 		return NULL;
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
+	void SendSVSKillInternal(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
-		IRCDProto::SendSVSKillInternal(source, user, buf);
-		user->KillInternal(source, buf);
+		IRCDProto::SendSVSKillInternal(source, u, buf);
+		u->KillInternal(source, buf);
 	}
 
   public:
@@ -127,21 +127,20 @@ class HybridProto : public IRCDProto
 		Uplink::Send(Config->GetClient("OperServ"), "UNRESV", "*", x->GetMask());
 	}
 
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
+	void SendJoin(User *u, Channel *c, const ChannelStatus *status) override
 	{
 		/*
-		 * Note that we must send our modes with the SJOIN and
-		 * can not add them to the mode stacker because ircd-hybrid
-		 * does not allow *any* client to op itself
+		 * Note that we must send our modes with the SJOIN and can not add them to the
+		 * mode stacker because ircd-hybrid does not allow *any* client to op itself
 		 */
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), (status != NULL ? status->BuildModePrefixList() : "") + user->GetUID());
+		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), (status != NULL ? status->BuildModePrefixList() : "") + u->GetUID());
 
 		/* And update our internal status for this user since this is not going through our mode handling system */
-		if (status != NULL)
+		if (status)
 		{
-			ChanUserContainer *uc = c->FindUser(user);
+			ChanUserContainer *uc = c->FindUser(u);
 
-			if (uc != NULL)
+			if (uc)
 				uc->status = *status;
 		}
 	}
@@ -205,22 +204,20 @@ class HybridProto : public IRCDProto
 		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
 
 		/*
-		 * As of October 13, 2012, ircd-hybrid-8 supports the following capabilities
+		 * As of January 13, 2016, ircd-hybrid-8 supports the following capabilities
 		 * which are required to work with IRC-services:
 		 *
 		 * QS     - Can handle quit storm removal
 		 * EX     - Can do channel +e exemptions
-		 * CHW    - Can do channel wall @#
 		 * IE     - Can do invite exceptions
-		 * KNOCK  - Supports KNOCK
+		 * CHW    - Can do channel wall @#
 		 * TBURST - Supports topic burst
 		 * ENCAP  - Supports ENCAP
 		 * HOPS   - Supports HalfOps
 		 * SVS    - Supports services
 		 * EOB    - Supports End Of Burst message
-		 * TS6    - Capable of TS6 support
 		 */
-		Uplink::Send("CAPAB", "QS EX CHW IE ENCAP TBURST SVS HOPS EOB TS6");
+		Uplink::Send("CAPAB", "QS EX CHW IE ENCAP TBURST SVS HOPS EOB");
 
 		SendServer(Me);
 

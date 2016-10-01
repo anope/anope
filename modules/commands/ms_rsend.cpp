@@ -51,7 +51,7 @@ class CommandMSRSend : public Command
 			source.Reply(ACCESS_DENIED);
 		else
 		{
-			MemoServService::MemoResult result = memoserv->Send(source.GetAccount()->display, nick, text);
+			MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
 			if (result == MemoServService::MEMO_INVALID_TARGET)
 				source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
 			else if (result == MemoServService::MEMO_TOO_FAST)

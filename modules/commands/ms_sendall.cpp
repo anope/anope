@@ -39,7 +39,7 @@ class CommandMSSendAll : public Command
 			const NickCore *nc = it->second;
 
 			if (nc != source.nc)
-				memoserv->Send(source.GetAccount()->display, nc->display, text);
+				memoserv->Send(source.GetNick(), nc->display, text);
 		}
 
 		source.Reply(_("A massmemo has been sent to all registered users."));

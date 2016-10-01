@@ -95,7 +95,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		if (mi == NULL)
 			return MEMO_INVALID_TARGET;
 
-		User *sender = User::Find(source);
+		User *sender = User::Find(source, true);
 		if (sender != NULL && !sender->HasPriv("memoserv/no-limit") && !force)
 		{
 			time_t send_delay = Config->GetModule("memoserv")->Get<time_t>("senddelay");

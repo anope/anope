@@ -316,7 +316,7 @@ class NickServCore : public Module, public NickServ::NickServService
 				if (guestnick.length() > nicklen)
 					guestnick = guestnick.substr(0, nicklen);
 			}
-			while (User::Find(guestnick) && i++ < 10);
+			while (User::Find(guestnick, true) && i++ < 10);
 
 			if (i == 11)
 				u->Kill(*NickServ, "Services nickname-enforcer kill");
@@ -338,7 +338,7 @@ class NickServCore : public Module, public NickServ::NickServService
 				IRCD->SendSVSHoldDel(na->GetNick());
 			else
 			{
-				User *u = User::Find(na->GetNick());
+				User *u = User::Find(na->GetNick(), true);
 				if (u && u->server == Me)
 				{
 					u->Quit();
@@ -416,7 +416,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 	void OnDelNick(NickServ::Nick *na) override
 	{
-		User *u = User::Find(na->GetNick());
+		User *u = User::Find(na->GetNick(), true);
 		if (u && u->Account() == na->GetAccount())
 		{
 			IRCD->SendLogout(u);
@@ -642,7 +642,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 		for (NickServ::Nick *na : nick_type.List<NickServ::Nick *>())
 		{
-			User *u = User::Find(na->GetNick());
+			User *u = User::Find(na->GetNick(), true);
 			if (u && (u->IsIdentified(true) || u->IsRecognized()))
 				na->SetLastSeen(Anope::CurTime);
 

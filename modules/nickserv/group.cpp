@@ -280,7 +280,7 @@ class CommandNSUngroup : public Command
 
 		source.Reply(_("\002{0}\002 has been ungrouped from \002{1}\002."), na->GetNick(), oldcore->GetDisplay());
 
-		User *user = User::Find(na->GetNick());
+		User *user = User::Find(na->GetNick(), true);
 		if (user)
 			/* The user on the nick who was ungrouped may be identified to the old group, set -r */
 			user->RemoveMode(source.service, "REGISTERED");

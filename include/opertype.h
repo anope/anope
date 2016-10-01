@@ -34,6 +34,7 @@ class Oper : public Serialize::Object
 	static constexpr const char *const NAME = "oper";
 
 	Configuration::Conf *conf = nullptr;
+	Module *owner = nullptr;
 
 	using Serialize::Object::Object;
 

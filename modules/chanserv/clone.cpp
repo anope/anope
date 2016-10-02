@@ -101,6 +101,7 @@ public:
 			target_ci->Delete();
 			target_ci = Serialize::New<ChanServ::Channel *>();
 			target_ci->SetName(target);
+			target_ci->SetTimeRegistered(Anope::CurTime);
 			ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
 			map[target_ci->GetName()] = target_ci;
 			target_ci->c = Channel::Find(target_ci->GetName());

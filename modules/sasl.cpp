@@ -109,7 +109,7 @@ class External : public Mechanism
 		}
 		else if (m.type == "C")
 		{
-			if (!certs)
+			if (!certs || mysess->cert.empty())
 			{
 				GetService()->Fail(sess);
 				delete sess;

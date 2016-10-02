@@ -42,7 +42,7 @@ void ChannelImpl::Delete()
 		if (this->c)
 		{
 			if (this->c && this->c->CheckDelete())
-				delete this->c;
+				this->c->QueueForDeletion();
 
 			this->c = NULL;
 		}

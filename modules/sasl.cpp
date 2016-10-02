@@ -321,14 +321,38 @@ void IdentifyRequestListener::OnFail(NickServ::IdentifyRequest *req)
 }
 
 class ModuleSASL : public Module
+	, public EventHook<Event::ModuleLoad>
+	, public EventHook<Event::ModuleUnload>
+	, public EventHook<Event::PreUplinkSync>
 {
 	SASLService sasl;
 
 	Plain plain;
 	External *external = nullptr;
 
+	std::vector<Anope::string> mechs;
+
+	void CheckMechs()
+	{
+		std::vector<Anope::string> names;
+		for (Mechanism *mech : ServiceManager::Get()->FindServices<Mechanism *>())
+			names.push_back(mech->GetName());
+
+		if (mechs == names)
+			return;
+
+		mechs = names;
+
+		// If we are connected to the network then broadcast the mechlist.
+		if (Me && Me->IsSynced())
+			IRCD->SendSASLMechanisms(mechs);
+	}
+
  public:
 	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ModuleLoad>(this)
+		, EventHook<Event::ModuleUnload>(this)
+		, EventHook<Event::PreUplinkSync>(this)
 		, sasl(this)
 		, plain(&sasl, this)
 	{
@@ -337,11 +361,29 @@ class ModuleSASL : public Module
 			external = new External(&sasl, this);
 		}
 		catch (ModuleException &) { }
+
+		CheckMechs();
 	}
 
 	~ModuleSASL()
 	{
 		delete external;
+	}
+
+	void OnModuleLoad(User *, Module *) override
+	{
+		CheckMechs();
+	}
+
+	void OnModuleUnload(User *, Module *) override
+	{
+		CheckMechs();
+	}
+
+	void OnPreUplinkSync(Server *) override
+	{
+		// We have not yet sent a mechanism list so always do it here.
+		IRCD->SendSASLMechanisms(mechs);
 	}
 };
 

@@ -401,6 +401,15 @@ class InspIRCd20Proto : public IRCDProto
 		Uplink::Send(Me, "FJOIN", c->name, c->creation_time, "+" + c->GetModes(true, true), "");
 	}
 
+	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override
+	{
+		Anope::string mechlist;
+		for (unsigned i = 0; i < mechanisms.size(); ++i)
+			mechlist += "," + mechanisms[i];
+
+		Uplink::Send(Me, "METADATA", "*", "saslmechlist", mechlist.empty() ? "" : mechlist.substr(1));
+	}
+
 	void SendSASLMessage(const SASL::Message &message) override
 	{
 		if (!message.ext.empty())

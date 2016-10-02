@@ -121,7 +121,7 @@ class CommandMSRead : public Command
 		else
 			mi = source.nc->GetMemos();
 
-		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.is_number_only()))
+		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && numstr.find_first_not_of("0123456789.,-") != Anope::string::npos))
 		{
 			this->OnSyntaxError(source, numstr);
 			return;
@@ -167,15 +167,21 @@ class CommandMSRead : public Command
 		}
 		else /* number[s] */
 		{
+			bool shown = false;
+
 			NumberList(numstr, false,
 				[&](unsigned int number)
 				{
 					if (!number || number > memos.size())
 						return;
 
+					shown = true;
 					DoRead(source, mi, ci, number - 1);
 				},
 				[]{});
+
+			if (!shown)
+				source.Reply(_("No memos to display."));
 		}
 	}
 

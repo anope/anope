@@ -734,7 +734,8 @@ class CommandCSSetSecure : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		source.Reply(_("Enables or disables security features for a channel."
-		               " When \002secure\002 is set, only users who have logged in (eg. not recognized based on their hostmask) will be given access to the channel as controlled by the access list."));
+		               " When \002secure\002 is set, only users who have logged in (eg. not recognized based on their hostmask)"
+		               " will be given access to channels from account-based access entries"));
 		return true;
 	}
 };

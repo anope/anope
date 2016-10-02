@@ -173,10 +173,10 @@ class CharybdisProto : public IRCDProto
 		Uplink::Send(Me, "ENCAP", s ? s->GetName() : message.target.substr(0, 3), "SASL", message.source, message.target, message.type, message.data, message.ext.empty() ? "" : message.ext);
 	}
 
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) override
+	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override
 	{
 		Server *s = Server::Find(uid.substr(0, 3));
-		Uplink::Send(Me, "ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, "*", "*", "*", acc);
+		Uplink::Send(Me, "ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, "*", vident.empty() ? "*" : vident, vhost.empty() ? "*" : vhost, acc);
 	}
 };
 

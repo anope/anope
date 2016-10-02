@@ -422,7 +422,7 @@ class InspIRCd20Proto : public IRCDProto
 				message.type, message.data);
 	}
 
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) override
+	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override
 	{
 		Uplink::Send(Me, "METADATA", uid, "accountname", acc);
 

@@ -235,7 +235,17 @@ class SASLService : public SASL::Service, public Timer
 
 	void Succeed(Session *session, NickServ::Account *nc) override
 	{
-		IRCD->SendSVSLogin(session->uid, nc->GetDisplay());
+		// If the user is already introduced then we log them in now.
+		// Otherwise, we send an SVSLOGIN to log them in later.
+		User *user = User::Find(session->uid);
+		if (user)
+		{
+			user->Login(nc);
+		}
+		else
+		{
+			IRCD->SendSVSLogin(session->uid, nc->GetDisplay());
+		}
 		this->SendMessage(session, "D", "S");
 	}
 

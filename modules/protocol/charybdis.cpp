@@ -229,7 +229,7 @@ void charybdis::EUID::Run(MessageSource &source, const std::vector<Anope::string
 	if (params[9] != "*")
 		na = NickServ::FindNick(params[9]);
 
-	User::OnIntroduce(params[0], params[4], params[8], params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? na->GetAccount() : NULL);
+	User::OnIntroduce(params[0], params[4], (params[8] != "*" ? params[8] : params[5]), params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? na->GetAccount() : NULL);
 }
 
 // we can't use this function from ratbox because we set a local variable here

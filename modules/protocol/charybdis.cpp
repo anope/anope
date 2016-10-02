@@ -155,6 +155,18 @@ class CharybdisProto : public IRCDProto
 		this->SendVhost(u, "", u->host);
 	}
 
+	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override
+	{
+		Anope::string mechlist;
+
+		for (unsigned i = 0; i < mechanisms.size(); ++i)
+		{
+			mechlist += "," + mechanisms[i];
+		}
+
+		Uplink::Send(Me, "ENCAP", "*", "MECHLIST", mechlist.empty() ? "" : mechlist.substr(1));
+	}
+
 	void SendSASLMessage(const SASL::Message &message) override
 	{
 		Server *s = Server::Find(message.target.substr(0, 3));

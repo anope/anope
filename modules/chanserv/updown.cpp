@@ -119,7 +119,7 @@ class CommandCSUp : public Command
 
 			if (source.GetUser() && u != source.GetUser() && c->ci->HasFieldS("PEACE"))
 			{
-				if (c->ci->AccessFor(u) > c->ci->AccessFor(source.GetUser()))
+				if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
 				{
 					if (source.HasPriv("chanserv/administration"))
 						override = true;
@@ -226,7 +226,7 @@ class CommandCSDown : public Command
 
 			if (source.GetUser() && u != source.GetUser() && c->ci->HasFieldS("PEACE"))
 			{
-				if (c->ci->AccessFor(u) > c->ci->AccessFor(source.GetUser()))
+				if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
 				{
 					if (source.HasPriv("chanserv/administration"))
 						override = true;

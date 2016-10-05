@@ -325,27 +325,42 @@ class CommandCSMode : public Command
 
 						Anope::string mode_param;
 						if (((cm->type == MODE_STATUS || cm->type == MODE_LIST) && !sep.GetToken(mode_param)) || (cm->type == MODE_PARAM && adding && !sep.GetToken(mode_param)))
+						{
 							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
-						else if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
+							continue;
+						}
+
+						if (cm->type == MODE_STATUS && !CanSet(source, ci, cm, false))
+						{
+							source.Reply(ACCESS_DENIED);
+							continue;
+						}
+
+						if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
+						{
 							source.Reply(_("List for mode %c is full."), cm->mchar);
-						else if (modelocks->GetMLock().size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "32"))
+							continue;
+						}
+
+						if (modelocks->GetMLock().size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "32"))
+						{
 							source.Reply(_("The mode lock list of \002%s\002 is full."), ci->name.c_str());
+							continue;
+						}
+
+						modelocks->SetMLock(cm, adding, mode_param, source.GetNick());
+
+						if (adding)
+						{
+							pos += cm->mchar;
+							if (!mode_param.empty())
+								pos_params += " " + mode_param;
+						}
 						else
 						{
-							modelocks->SetMLock(cm, adding, mode_param, source.GetNick()); 
-
-							if (adding)
-							{
-								pos += cm->mchar;
-								if (!mode_param.empty())
-									pos_params += " " + mode_param;
-							}
-							else
-							{
-								neg += cm->mchar;
-								if (!mode_param.empty())
-									neg_params += " " + mode_param;
-							}
+							neg += cm->mchar;
+							if (!mode_param.empty())
+								neg_params += " " + mode_param;
 						}
 				}
 			}

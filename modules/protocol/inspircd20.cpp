@@ -493,10 +493,14 @@ struct IRCDMessageCapab : Message::Capab
 					cm = new ChannelMode("NONOTICE", modechar[0]);
 					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("NONOTICEBAN", "BAN", 'T'));
 				}
+				else if (modename.equals_cs("official-join"))
+					cm = new ChannelModeStatus("OFFICIALJOIN", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 2);
 				else if (modename.equals_cs("op"))
 					cm = new ChannelModeStatus("OP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 2);
 				else if (modename.equals_cs("operonly"))
 					cm = new ChannelModeOperOnly("OPERONLY", modechar[0]);
+				else if (modename.equals_cs("operprefix"))
+					cm = new ChannelModeStatus("OPERPREFIX", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 2);
 				else if (modename.equals_cs("permanent"))
 					cm = new ChannelMode("PERM", modechar[0]);
 				else if (modename.equals_cs("private"))

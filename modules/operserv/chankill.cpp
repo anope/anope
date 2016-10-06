@@ -93,8 +93,13 @@ class CommandOSChanKill : public Command
 			if (uc->user->server == Me || uc->user->HasMode("OPER"))
 				continue;
 
+			Anope::string akillmask = "*@" + uc->user->host;
+
+			if (akills->HasEntry(akillmask))
+				continue;
+
 			XLine *x = Serialize::New<XLine *>();
-			x->SetMask("*@" + uc->user->host);
+			x->SetMask(akillmask);
 			x->SetBy(source.GetNick());
 			x->SetExpires(expires);
 			x->SetReason(realreason);

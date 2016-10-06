@@ -283,7 +283,7 @@ class ProtoCharybdis : public Module
 	hybrid::BMask message_bmask;
 	charybdis::Encap message_encap;
 	charybdis::EUID message_euid;
-	hybrid::Join message_join;
+	ratbox::Join message_join;
 	hybrid::Nick message_nick;
 	charybdis::Pass message_pass;
 	hybrid::Pong message_pong;

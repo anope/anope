@@ -149,6 +149,20 @@ void ratbox::Encap::Run(MessageSource &source, const std::vector<Anope::string> 
 	}
 }
 
+void ratbox::Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	if (params.size() == 1 && params[0] == "0")
+		return Message::Join::Run(source, params);
+
+	if (params.size() < 2)
+		return;
+
+	std::vector<Anope::string> p = params;
+	p.erase(p.begin());
+
+	return Message::Join::Run(source, p);
+}
+
 struct IRCDMessagePass : IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -224,7 +238,7 @@ class ProtoRatbox : public Module
 	/* Our message handlers */
 	hybrid::BMask message_bmask;
 	ratbox::Encap message_encap;
-	hybrid::Join message_join;
+	ratbox::Join message_join;
 	hybrid::Nick message_nick;
 	IRCDMessagePass message_pass;
 	hybrid::Pong message_pong;

@@ -1,4 +1,22 @@
-Anope Version 2.0.3-git
+Anope Version 2.0.4-git
+-------------------
+Add notice rpc method to XMLRPC
+Fix access check in cs_updown to not allow actions on users with equal access
+Fix randomnews to work when there are more than 'newscount' random news
+Fix crash from handling nick introduction collisions on unreal4
+Add support for GCC6
+Fix handling /join 0 on ratbox
+Fix saset display to update the account of the proper user
+Fix nickserv/confirm to send account and +r when appropriate
+Fix chankill to not add duplicate akills
+Allow nickserv/maxemail to disregard gmail style aliases when comparing emails
+Fix chanserv/mode when setting listmodes with CIDR ranges
+Fix reported expiry time when the time is divisible by 1 year
+Clearify botserv repeat kicker help and allow setting repeat times to 1
+Send vident/vhost with SASL login
+Add support for SASL reauth
+
+Anope Version 2.0.3
 -------------------
 Add support for UnrealIRCd 4
 Fix cs_access to respect chanserv/access/list privilege

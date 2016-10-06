@@ -68,7 +68,7 @@ class NSMaxEmail : public Module
 
 			Anope::string cleannc = clean ? CleanMail(nc->email) : nc->email;
 
-			if (unc != nc && cleanemail == cleannc)
+			if (unc != nc && cleanemail.equals_ci(cleannc))
 				++count;
 		}
 

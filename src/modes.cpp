@@ -836,14 +836,11 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 				if (addr.valid() && cidr_range.is_pos_number_only())
 				{
 					this->cidr_len = convertTo<unsigned short>(cidr_range);
-					/* If we got here, cidr_len is a valid number.
-					 * If cidr_len is >32 (or 128) it is handled later in
-					 * cidr::match
-					 */
 
 					this->host = cidr_ip;
+					this->family = addr.family();
 
-					Log(LOG_DEBUG) << "Ban " << m << " has cidr " << this->cidr_len;
+					Log(LOG_DEBUG) << "Ban " << mask << " has cidr " << this->cidr_len;
 				}
 			}
 			catch (const ConvertException &) { }
@@ -864,8 +861,21 @@ const Anope::string Entry::GetNUHMask() const
 	Anope::string n = nick.empty() ? "*" : nick,
 			u = user.empty() ? "*" : user,
 			h = host.empty() ? "*" : host,
-			r = real.empty() ? "" : "#" + real;
-	return n + "!" + u + "@" + h + r;
+			r = real.empty() ? "" : "#" + real,
+			c;
+
+	switch (family)
+	{
+		case AF_INET:
+			if (cidr_len <= 32)
+				c = "/" + stringify(cidr_len);
+			break;
+		case AF_INET6:
+			if (cidr_len <= 128)
+				c = "/" + stringify(cidr_len);
+			break;
+	}
+	return n + "!" + u + "@" + h + r + c;
 }
 
 bool Entry::Matches(User *u, bool full) const

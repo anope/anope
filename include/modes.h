@@ -352,6 +352,7 @@ class CoreExport Entry
 	Anope::string mask;
  public:
 	unsigned short cidr_len;
+	int family = 0;
 	Anope::string nick, user, host, real;
 
 	/** Constructor

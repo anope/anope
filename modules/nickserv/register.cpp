@@ -55,6 +55,18 @@ class CommandNSConfirm : public Command
 			EventManager::Get()->Dispatch(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), na->GetAccount());
 			Log(LOG_ADMIN, source, this) << "to confirm nick " << na->GetNick() << " (" << na->GetAccount()->GetDisplay() << ")";
 			source.Reply(_("\002{0}\002 has been confirmed."), na->GetNick());
+
+			/* Login the users online already */
+			for (User *u : na->GetAccount()->users)
+			{
+				IRCD->SendLogin(u, na);
+
+				NickServ::Nick *u_na = NickServ::FindNick(u->nick);
+
+				/* Set +r if they're on a nick in the group */
+				if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && u_na && u_na->GetAccount() == na->GetAccount())
+					u->SetMode(source.service, "REGISTERED");
+			}
 		}
 		else if (source.nc)
 		{

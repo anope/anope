@@ -22,6 +22,27 @@
 class NSMaxEmail : public Module
 	, public EventHook<Event::PreCommand>
 {
+	bool clean = false;
+
+	/* strip dots from username, and remove anything after the first + */
+	Anope::string CleanMail(const Anope::string &email)
+	{
+		size_t host = email.find('@');
+		if (host == Anope::string::npos)
+			return email;
+
+		Anope::string username = email.substr(0, host);
+		username = username.replace_all_cs(".", "");
+
+		size_t sz = username.find('+');
+		if (sz != Anope::string::npos)
+			username = username.substr(0, sz);
+
+		Anope::string cleaned = username + email.substr(host);
+		Log(LOG_DEBUG) << "cleaned " << email << " to " << cleaned;
+		return cleaned;
+	}
+
 	bool CheckLimitReached(CommandSource &source, const Anope::string &email)
 	{
 		int NSEmailMax = Config->GetModule(this)->Get<int>("maxemails");
@@ -47,9 +68,15 @@ class NSMaxEmail : public Module
 		if (email.empty())
 			return 0;
 
+		Anope::string cleanemail = clean ? CleanMail(email) : email;
+
 		for (NickServ::Account *nc : NickServ::service->GetAccountList())
-			if (unc != nc && !nc->GetEmail().empty() && nc->GetEmail().equals_ci(email))
+		{
+			Anope::string cleannc = clean ? CleanMail(nc->GetEmail()) : nc->GetEmail();
+
+			if (unc != nc && cleanemail.equals_ci(cleannc))
 				++count;
+		}
 
 		return count;
 	}
@@ -58,6 +85,11 @@ class NSMaxEmail : public Module
 	NSMaxEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::PreCommand>(this)
 	{
+	}
+
+	void OnReload(Configuration::Conf *conf) override
+	{
+		clean = conf->GetModule(this)->Get<bool>("remove_aliases", "true");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override

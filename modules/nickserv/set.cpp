@@ -356,8 +356,12 @@ class CommandNSSetDisplay : public Command
 		Log(user_na->GetAccount() == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the display of " << user_na->GetAccount()->GetDisplay() << " to " << na->GetNick();
 
 		user_na->GetAccount()->SetDisplay(na);
-		if (source.GetUser())
-			IRCD->SendLogin(source.GetUser(), na);
+
+		for (User *u : user_na->GetAccount()->users)
+		{
+			IRCD->SendLogin(u, user_na);
+		}
+
 		source.Reply(_("The new display is now \002{0}\002."), user_na->GetAccount()->GetDisplay());
 	}
 

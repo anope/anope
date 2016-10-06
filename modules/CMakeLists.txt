@@ -47,16 +47,17 @@ macro(build_modules SRC)
           endif()
           # Generate the module and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
           add_library(${TARG} SHARED ${MODULE_SRC})
-          # Windows requires this because it's weird
           if(WIN32)
-            set(WIN32_NO_LIBS "/nodefaultlib:\"libcmt.lib\" /OPT:NOREF")
-          else()
-            set(WIN32_NO_LIBS)
+            # Windows requires this because it's weird
+            set(MOD_EXTRA_LDFLAGS "/nodefaultlib:\"libcmt.lib\" /OPT:NOREF")
+          elseif(APPLE)
+            # Mark undefined symbols as having to be looked up at runtime
+            set(MOD_EXTRA_LDFLAGS "-undefined dynamic_lookup")
           endif()
-          set_target_properties(${TARG} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" OUTPUT_NAME "${OUT_NAME}" LINK_FLAGS "${TEMP_LDFLAGS} ${WIN32_NO_LIBS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
+          set_target_properties(${TARG} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" OUTPUT_NAME "${OUT_NAME}" LINK_FLAGS "${TEMP_LDFLAGS} ${MOD_EXTRA_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
           add_dependencies(${TARG} ${PROGRAM_NAME})
           if(GETTEXT_FOUND)
-                  add_dependencies(${TARG} module_language)
+            add_dependencies(${TARG} module_language)
           endif()
           target_link_libraries(${TARG} ${TEMP_DEPENDENCIES})
           # For Windows only, have the module link to the export library of Anope as well as wsock32 and Ws2_32 libraries (most of the modules probably don't need this, but this is to be on the safe side), also set its version
@@ -151,9 +152,14 @@ macro(build_subdir)
     set(WIN32_MEMORY)
   endif()
 
+  if(APPLE)
+    # Mark undefined symbols as having to be looked up at runtime
+    set(MOD_EXTRA_LDFLAGS "-undefined dynamic_lookup")
+  endif(APPLE)
+
   # Generate the module and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_library(${SO} SHARED ${MODULES_SUBDIR_SRCS})
-  set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" LINK_FLAGS "${SUBDIR_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON OUTPUT_NAME "${DIR_NAME}_${FOLDER_NAME}")
+  set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" LINK_FLAGS "${SUBDIR_LDFLAGS} ${MOD_EXTRA_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON OUTPUT_NAME "${DIR_NAME}_${FOLDER_NAME}")
   add_dependencies(${SO} ${PROGRAM_NAME})
   if(GETTEXT_FOUND)
     add_dependencies(${SO} module_language)

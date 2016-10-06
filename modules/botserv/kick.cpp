@@ -969,13 +969,26 @@ class CommandBSKickRepeat : public CommandBSKickBase
 				kd->SetRepeatTimes(convertTo<int16_t>(times));
 			}
 			catch (const ConvertException &) { }
-			if (kd->GetRepeatTimes() < 2)
+			if (kd->GetRepeatTimes() < 1)
 				kd->SetRepeatTimes(3);
 
 			if (i)
-				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the same thing {0} times), and will place a ban after {1} kicks for the same user."), kd->GetRepeatTimes(), i);
+			{
+				if (kd->GetRepeatTimes() != 1)
+					source.Reply(_("Bot will now kick for \002repeats\002 (users that say the same thing {0} times),"
+							" and will place a ban after {1} kicks for the same user."), kd->GetRepeatTimes(), i);
+				else
+					source.Reply(_("Bot will now kick for \002repeats\002 (users that say the same thing {0} time),"
+							" and will place a ban after {1} kicks for the same user."), kd->GetRepeatTimes(), i);
+			}
 			else
-				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the same thing {0} times)."), kd->GetRepeatTimes() + 1);
+			{
+				if (kd->GetRepeatTimes() != 1)
+					source.Reply(_("Bot will now kick for \002repeats\002 (users that say the same thing {0} times)."), kd->GetRepeatTimes());
+				else
+					source.Reply(_("Bot will now kick for \002repeats\002 (users that say the same thing {0} time)."), kd->GetRepeatTimes());
+
+			}
 		}
 		else if (params[1].equals_ci("OFF"))
 		{

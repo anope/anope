@@ -43,6 +43,27 @@ class ChannelModeLargeBan : public ChannelMode
 class CharybdisProto : public IRCDProto
 {
 	ServiceReference<IRCDProto> ratbox; // XXX
+
+	ServiceBot *FindIntroduced()
+	{
+		ServiceBot *bi = Config->GetClient("OperServ");
+		if (bi && bi->introduced)
+			return bi;
+
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		{
+			User *u = it->second;
+			if (u->type == UserType::BOT)
+			{
+				bi = anope_dynamic_static_cast<ServiceBot *>(u);
+				if (bi->introduced)
+					return bi;
+			}
+		}
+
+		return NULL;
+	}
+
  public:
 	CharybdisProto(Module *creator) : IRCDProto(creator, "Charybdis 3.4+")
 		, ratbox("ratbox")
@@ -51,6 +72,7 @@ class CharybdisProto : public IRCDProto
 		CanCertFP = true;
 		CanSNLine = true;
 		CanSQLine = true;
+		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanSVSNick = true;
 		CanSVSHold = true;
@@ -67,7 +89,6 @@ class CharybdisProto : public IRCDProto
 	void SendSGLineDel(XLine *x) override { ratbox->SendSGLineDel(x); }
 	void SendAkill(User *u, XLine *x) override { ratbox->SendAkill(u, x); }
 	void SendAkillDel(XLine *x) override { ratbox->SendAkillDel(x); }
-	void SendSQLineDel(XLine *x) override { ratbox->SendSQLineDel(x); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { ratbox->SendJoin(user, c, status); }
 	void SendServer(const Server *server) override { ratbox->SendServer(server); }
 	void SendChannel(Channel *c) override { ratbox->SendChannel(c); }
@@ -78,7 +99,18 @@ class CharybdisProto : public IRCDProto
 
 	void SendSQLine(User *, XLine *x) override
 	{
-		Uplink::Send(Me, "RESV", "*", x->GetMask(), x->GetReason());
+		/* Calculate the time left before this would expire, capping it at 2 days */
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
+
+		if (timeleft > 172800 || !x->GetExpires())
+			timeleft = 172800;
+
+		Uplink::Send(FindIntroduced(), "ENCAP", "*", "RESV", timeleft, x->GetMask(), 0, x->GetReason());
+	}
+
+	void SendSQLineDel(XLine *x) override
+	{
+		Uplink::Send(Config->GetClient("OperServ"), "ENCAP", "*", "UNRESV", x->GetMask());
 	}
 
 	void SendConnect() override

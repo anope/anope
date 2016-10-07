@@ -48,33 +48,48 @@ class CommandMSCancel : public Command
 				source.Reply(_("Channel \002{0}\002 isn't registered."), nname);
 			else
 				source.Reply(_("\002{0}\002 isn't registered."), nname);
+
+			return;
+		}
+
+		if (mi == nullptr)
+			return;
+
+		ChanServ::Channel *ci = NULL;
+		NickServ::Nick *na = NULL;
+		if (ischan)
+		{
+			ci = ChanServ::Find(nname);
+			if (ci == nullptr)
+				return;
 		}
 		else
 		{
-			ChanServ::Channel *ci = NULL;
-			NickServ::Nick *na = NULL;
-			if (ischan)
-				ci = ChanServ::Find(nname);
-			else
-				na = NickServ::FindNick(nname);
-			if (mi)
-			{
-				auto memos = mi->GetMemos();
-				for (int i = memos.size() - 1; i >= 0; --i)
-				{
-					MemoServ::Memo *m = memos[i];
-					if (m->GetUnread() && source.nc->GetDisplay().equals_ci(m->GetSender()))
-					{
-						EventManager::Get()->Dispatch(&MemoServ::Event::MemoDel::OnMemoDel, ischan ? ci->GetName() : na->GetAccount()->GetDisplay(), mi, m);
-						mi->Del(i);
-						source.Reply(_("Your last memo to \002{0}\002 has been cancelled."), nname);
-						return;
-					}
-				}
-			}
-
-			source.Reply(_("No memo to \002{0}\002 was cancelable."), nname);
+			na = NickServ::FindNick(nname);
+			if (na == nullptr)
+				return;
 		}
+
+		auto memos = mi->GetMemos();
+		for (int i = memos.size() - 1; i >= 0; --i)
+		{
+			MemoServ::Memo *m = memos[i];
+
+			if (!m->GetUnread())
+				continue;
+
+			NickServ::Nick *sender = NickServ::FindNick(m->GetSender());
+
+			if (sender && sender->GetAccount() == source.GetAccount())
+			{
+				EventManager::Get()->Dispatch(&MemoServ::Event::MemoDel::OnMemoDel, ischan ? ci->GetName() : na->GetAccount()->GetDisplay(), mi, m);
+				mi->Del(i);
+				source.Reply(_("Your last memo to \002{0}\002 has been cancelled."), ischan ? ci->GetName() : na->GetAccount()->GetDisplay());
+				return;
+			}
+		}
+
+		source.Reply(_("No memo was cancelable."));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -160,7 +160,7 @@ class SSLModule : public Module
 
 		if (Anope::IsFile(this->certfile.c_str()))
 		{
-			if (!SSL_CTX_use_certificate_file(client_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_certificate_file(server_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM))
+			if (!SSL_CTX_use_certificate_chain_file(client_ctx, this->certfile.c_str()) || !SSL_CTX_use_certificate_chain_file(server_ctx, this->certfile.c_str()))
 				throw ConfigException("Error loading certificate");
 			else
 				Log(LOG_DEBUG) << "m_ssl_openssl: Successfully loaded certificate " << this->certfile;

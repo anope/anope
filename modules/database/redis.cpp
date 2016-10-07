@@ -92,9 +92,8 @@ class DatabaseRedis : public Module
 		if (!redis)
 			return EVENT_STOP;
 
-		const std::map<Anope::string, Serialize::TypeBase *> &types = Serialize::TypeBase::GetTypes();
-		for (const std::pair<Anope::string, Serialize::TypeBase *> &p : types)
-			this->OnSerializeTypeCreate(p.second);
+		for (Serialize::TypeBase *type : Serialize::TypeBase::GetTypes())
+			this->OnSerializeTypeCreate(type);
 
 		while (redis->BlockAndProcess());
 

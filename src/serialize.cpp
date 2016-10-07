@@ -255,6 +255,11 @@ TypeBase *TypeBase::Find(const Anope::string &name)
 	return ServiceManager::Get()->FindService<TypeBase *>(name);
 }
 
+const std::vector<TypeBase *>& TypeBase::GetTypes()
+{
+	return ServiceManager::Get()->FindServices<TypeBase *>();
+}
+
 FieldBase::FieldBase(Module *c, const Anope::string &n, const Anope::string &t, bool d)
 	: Service(c, FieldBase::NAME)
 	, serialize_type(t)

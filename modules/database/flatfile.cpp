@@ -37,15 +37,11 @@ class DBFlatFile : public Module
 		{
 			last_day = tm->tm_mday;
 
-			const std::map<Anope::string, Serialize::TypeBase *> &types = Serialize::TypeBase::GetTypes();
-
 			std::set<Anope::string> dbs;
 			dbs.insert(Config->GetModule(this)->Get<Anope::string>("database", "anope.db"));
 
-			for (const std::pair<Anope::string, Serialize::TypeBase *> &p : types)
+			for (Serialize::TypeBase *stype : Serialize::TypeBase::GetTypes())
 			{
-				Serialize::TypeBase *stype = p.second;
-
 				if (stype->GetOwner())
 					dbs.insert("module_" + stype->GetOwner()->name + ".db");
 			}

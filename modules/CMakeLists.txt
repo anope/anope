@@ -54,7 +54,7 @@ macro(build_modules SRC)
             # Mark undefined symbols as having to be looked up at runtime
             set(MOD_EXTRA_LDFLAGS "-undefined dynamic_lookup")
           endif()
-          set_target_properties(${TARG} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" OUTPUT_NAME "${OUT_NAME}" LINK_FLAGS "${TEMP_LDFLAGS} ${MOD_EXTRA_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
+	  set_target_properties(${TARG} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX ".so" OUTPUT_NAME "${OUT_NAME}" LINK_FLAGS "${TEMP_LDFLAGS} ${MOD_EXTRA_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
           add_dependencies(${TARG} ${PROGRAM_NAME})
           if(GETTEXT_FOUND)
             add_dependencies(${TARG} module_language)
@@ -159,7 +159,7 @@ macro(build_subdir)
 
   # Generate the module and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_library(${SO} SHARED ${MODULES_SUBDIR_SRCS})
-  set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" LINK_FLAGS "${SUBDIR_LDFLAGS} ${MOD_EXTRA_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON OUTPUT_NAME "${DIR_NAME}_${FOLDER_NAME}")
+  set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX ".so" LINK_FLAGS "${SUBDIR_LDFLAGS} ${MOD_EXTRA_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON OUTPUT_NAME "${DIR_NAME}_${FOLDER_NAME}")
   add_dependencies(${SO} ${PROGRAM_NAME})
   if(GETTEXT_FOUND)
     add_dependencies(${SO} module_language)

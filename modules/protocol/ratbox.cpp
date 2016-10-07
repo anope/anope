@@ -28,6 +28,27 @@ static Anope::string UplinkSID;
 class RatboxProto : public IRCDProto
 {
 	ServiceReference<IRCDProto> hybrid; // XXX
+
+	ServiceBot *FindIntroduced()
+	{
+		ServiceBot *bi = Config->GetClient("OperServ");
+		if (bi && bi->introduced)
+			return bi;
+
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		{
+			User *u = it->second;
+			if (u->type == UserType::BOT)
+			{
+				bi = anope_dynamic_static_cast<ServiceBot *>(u);
+				if (bi->introduced)
+					return bi;
+			}
+		}
+
+		return NULL;
+	}
+
  public:
 	RatboxProto(Module *creator) : IRCDProto(creator, "Ratbox 3.0+")
 		, hybrid("hybrid")
@@ -35,6 +56,7 @@ class RatboxProto : public IRCDProto
 		DefaultPseudoclientModes = "+oiS";
 		CanSNLine = true;
 		CanSQLine = true;
+		CanSQLineChannel = true;
 		CanSZLine = true;
 		RequiresID = true;
 		MaxModes = 4;
@@ -43,12 +65,10 @@ class RatboxProto : public IRCDProto
 	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKillInternal(source, targ, reason); }
 	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
 	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendSQLine(User *u, XLine *x) override { hybrid->SendSQLine(u, x); }
 	void SendSGLine(User *u, XLine *x) override { hybrid->SendSGLine(u, x); }
 	void SendSGLineDel(XLine *x) override { hybrid->SendSGLineDel(x); }
 	void SendAkill(User *u, XLine *x) override { hybrid->SendAkill(u, x); }
 	void SendAkillDel(XLine *x) override { hybrid->SendAkillDel(x); }
-	void SendSQLineDel(XLine *x) override { hybrid->SendSQLineDel(x); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { hybrid->SendJoin(user, c, status); }
 	void SendServer(const Server *server) override { hybrid->SendServer(server); }
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override { hybrid->SendModeInternal(source, u, buf); }
@@ -127,6 +147,23 @@ class RatboxProto : public IRCDProto
 		if (needjoin)
 			bi->Part(c);
 	}
+
+	void SendSQLine(User *, XLine *x) override
+	{
+		/* Calculate the time left before this would expire, capping it at 2 days */
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
+
+		if (timeleft > 172800 || !x->GetExpires())
+			timeleft = 172800;
+
+		Uplink::Send(FindIntroduced(), "ENCAP", "*", "RESV", timeleft, x->GetMask(), 0, x->GetReason());
+	}
+
+	void SendSQLineDel(XLine *x) override
+	{
+		Uplink::Send(Config->GetClient("OperServ"), "ENCAP", "*", "UNRESV", x->GetMask());
+	}
+
 };
 
 // Debug: Received: :00BAAAAAB ENCAP * LOGIN Adam

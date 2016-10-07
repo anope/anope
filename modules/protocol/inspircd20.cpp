@@ -17,10 +17,13 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
+/* Dependencies: anope_protocol.rfc1459 */
+
 #include "module.h"
 #include "modules/sasl.h"
 #include "modules/chanserv/mode.h"
 #include "modules/chanserv/set.h"
+#include "modules/protocol/rfc1459.h"
 
 struct SASLUser
 {
@@ -628,9 +631,9 @@ namespace InspIRCdExtban
 	};
 }
 
-struct IRCDMessageCapab : Message::Capab
+struct IRCDMessageCapab : rfc1459::Capab
 {
-	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageCapab(Module *creator) : rfc1459::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
@@ -790,7 +793,7 @@ struct IRCDMessageCapab : Message::Capab
 				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
 		}
 
-		Message::Capab::Run(source, params);
+		rfc1459::Capab::Run(source, params);
 	}
 };
 
@@ -885,13 +888,13 @@ struct IRCDMessageFJoin : IRCDMessage
 				modes.erase(modes.begin());
 		}
 
-		std::list<Message::Join::SJoinUser> users;
+		std::list<rfc1459::Join::SJoinUser> users;
 
 		spacesepstream sep(params[params.size() - 1]);
 		Anope::string buf;
 		while (sep.GetToken(buf))
 		{
-			Message::Join::SJoinUser sju;
+			rfc1459::Join::SJoinUser sju;
 
 			/* Loop through prefixes and find modes for them */
 			for (char c; (c = buf[0]) != ',' && c;)
@@ -914,7 +917,7 @@ struct IRCDMessageFJoin : IRCDMessage
 		}
 
 		time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
-		Message::Join::SJoin(source, params[0], ts, modes, users);
+		rfc1459::Join::SJoin(source, params[0], ts, modes, users);
 	}
 };
 
@@ -1249,9 +1252,9 @@ struct IRCDMessageServer : IRCDMessage
 	}
 };
 
-struct IRCDMessageSQuit : Message::SQuit
+struct IRCDMessageSQuit : rfc1459::SQuit
 {
-	IRCDMessageSQuit(Module *creator) : Message::SQuit(creator) { }
+	IRCDMessageSQuit(Module *creator) : rfc1459::SQuit(creator) { }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
@@ -1267,7 +1270,7 @@ struct IRCDMessageSQuit : Message::SQuit
 				IRCD->SendServer(s);
 		}
 		else
-			Message::SQuit::Run(source, params);
+			rfc1459::SQuit::Run(source, params);
 	}
 };
 
@@ -1344,20 +1347,20 @@ class ProtoInspIRCd20 : public Module
 	ServiceReference<ModeLocks> mlocks;
 
 	/* Core message handlers */
-	Message::Away message_away;
-	Message::Error message_error;
-	Message::Invite message_invite;
-	Message::Join message_join;
-	Message::Kick message_kick;
-	Message::Kill message_kill;
-	Message::MOTD message_motd;
-	Message::Notice message_notice;
-	Message::Part message_part;
-	Message::Ping message_ping;
-	Message::Privmsg message_privmsg;
-	Message::Quit message_quit;
-	Message::Stats message_stats;
-	Message::Topic message_topic;
+	rfc1459::Away message_away;
+	rfc1459::Error message_error;
+	rfc1459::Invite message_invite;
+	rfc1459::Join message_join;
+	rfc1459::Kick message_kick;
+	rfc1459::Kill message_kill;
+	rfc1459::MOTD message_motd;
+	rfc1459::Notice message_notice;
+	rfc1459::Part message_part;
+	rfc1459::Ping message_ping;
+	rfc1459::Privmsg message_privmsg;
+	rfc1459::Quit message_quit;
+	rfc1459::Stats message_stats;
+	rfc1459::Topic message_topic;
 
 	/* Our message handlers */
 	IRCDMessageCapab message_capab;

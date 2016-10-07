@@ -152,7 +152,7 @@ void ratbox::Encap::Run(MessageSource &source, const std::vector<Anope::string> 
 void ratbox::Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	if (params.size() == 1 && params[0] == "0")
-		return Message::Join::Run(source, params);
+		return rfc1459::Join::Run(source, params);
 
 	if (params.size() < 2)
 		return;
@@ -160,7 +160,7 @@ void ratbox::Join::Run(MessageSource &source, const std::vector<Anope::string> &
 	std::vector<Anope::string> p = params;
 	p.erase(p.begin());
 
-	return Message::Join::Run(source, p);
+	return rfc1459::Join::Run(source, p);
 }
 
 struct IRCDMessagePass : IRCDMessage
@@ -215,25 +215,25 @@ class ProtoRatbox : public Module
 	RatboxProto ircd_proto;
 
 	/* Core message handlers */
-	Message::Away message_away;
-	Message::Capab message_capab;
-	Message::Error message_error;
-	Message::Invite message_invite;
-	Message::Kick message_kick;
-	Message::Kill message_kill;
-	Message::Mode message_mode;
-	Message::MOTD message_motd;
-	Message::Notice message_notice;
-	Message::Part message_part;
-	Message::Ping message_ping;
-	Message::Privmsg message_privmsg;
-	Message::Quit message_quit;
-	Message::SQuit message_squit;
-	Message::Stats message_stats;
-	Message::Time message_time;
-	Message::Topic message_topic;
-	Message::Version message_version;
-	Message::Whois message_whois;
+	rfc1459::Away message_away;
+	rfc1459::Capab message_capab;
+	rfc1459::Error message_error;
+	rfc1459::Invite message_invite;
+	rfc1459::Kick message_kick;
+	rfc1459::Kill message_kill;
+	rfc1459::Mode message_mode;
+	rfc1459::MOTD message_motd;
+	rfc1459::Notice message_notice;
+	rfc1459::Part message_part;
+	rfc1459::Ping message_ping;
+	rfc1459::Privmsg message_privmsg;
+	rfc1459::Quit message_quit;
+	rfc1459::SQuit message_squit;
+	rfc1459::Stats message_stats;
+	rfc1459::Time message_time;
+	rfc1459::Topic message_topic;
+	rfc1459::Version message_version;
+	rfc1459::Whois message_whois;
 
 	/* Our message handlers */
 	hybrid::BMask message_bmask;

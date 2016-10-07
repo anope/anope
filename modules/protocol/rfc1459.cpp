@@ -1,7 +1,7 @@
 /*
  * Anope IRC Services
  *
- * Copyright (C) 2003-2016 Anope Team <team@anope.org>
+ * Copyright (C) 2005-2016 Anope Team <team@anope.org>
  *
  * This file is part of Anope. Anope is free software; you can
  * redistribute it and/or modify it under the terms of the GNU
@@ -17,21 +17,11 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
-#include "modules.h"
-#include "users.h"
-#include "protocol.h"
-#include "config.h"
-#include "uplink.h"
-#include "opertype.h"
-#include "messages.h"
-#include "servers.h"
-#include "channels.h"
-#include "event.h"
-#include "bots.h"
+#include "module.h"
+#include "modules/protocol/rfc1459.h"
 #include "modules/operserv/stats.h"
 
-using namespace Message;
+using namespace rfc1459;
 
 void Away::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
@@ -223,7 +213,7 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		u->KillInternal(source, params[1]);
 }
 
-void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> &params)
+void rfc1459::Mode::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	Anope::string buf;
 	for (unsigned i = 1; i < params.size(); ++i)
@@ -416,7 +406,7 @@ void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
 }
 
-void Message::Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
+void rfc1459::Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *u = source.GetUser();
 
@@ -508,3 +498,12 @@ void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		IRCD->SendNumeric(401, source.GetSource(), "%s :No such user.", params[0].c_str());
 }
 
+class ProtoRFC1459 : public Module
+{
+ public:
+	ProtoRFC1459(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+	{
+	}
+};
+
+MODULE_INIT(ProtoRFC1459)

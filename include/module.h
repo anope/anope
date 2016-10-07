@@ -32,7 +32,6 @@
 #include "lists.h"
 #include "logger.h"
 #include "mail.h"
-#include "messages.h"
 #include "modes.h"
 #include "modules.h"
 #include "opertype.h"

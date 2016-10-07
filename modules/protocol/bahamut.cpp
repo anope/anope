@@ -17,7 +17,10 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
+/* Dependencies: anope_protocol.rfc1459 */
+
 #include "module.h"
+#include "modules/protocol/rfc1459.h"
 
 class ChannelModeFlood : public ChannelModeParam
 {
@@ -435,14 +438,14 @@ struct IRCDMessageSJoin : IRCDMessage
 		if (!modes.empty())
 			modes.erase(modes.begin());
 
-		std::list<Message::Join::SJoinUser> users;
+		std::list<rfc1459::Join::SJoinUser> users;
 
 		/* For some reason, bahamut will send a SJOIN from the user joining a channel
 		 * if the channel already existed
 		 */
 		if (source.GetUser())
 		{
-			Message::Join::SJoinUser sju;
+			rfc1459::Join::SJoinUser sju;
 			sju.second = source.GetUser();
 			users.push_back(sju);
 		}
@@ -453,7 +456,7 @@ struct IRCDMessageSJoin : IRCDMessage
 
 			while (sep.GetToken(buf))
 			{
-				Message::Join::SJoinUser sju;
+				rfc1459::Join::SJoinUser sju;
 
 				/* Get prefixes from the nick */
 				for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
@@ -474,7 +477,7 @@ struct IRCDMessageSJoin : IRCDMessage
 		}
 
 		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
-		Message::Join::SJoin(source, params[1], ts, modes, users);
+		rfc1459::Join::SJoin(source, params[1], ts, modes, users);
 	}
 };
 
@@ -496,24 +499,24 @@ class ProtoBahamut : public Module
 	BahamutIRCdProto ircd_proto;
 
 	/* Core message handlers */
-	Message::Away message_away;
-	Message::Capab message_capab;
-	Message::Error message_error;
-	Message::Invite message_invite;
-	Message::Join message_join;
-	Message::Kick message_kick;
-	Message::Kill message_kill;
-	Message::MOTD message_motd;
-	Message::Notice message_notice;
-	Message::Part message_part;
-	Message::Ping message_ping;
-	Message::Privmsg message_privmsg;
-	Message::Quit message_quit;
-	Message::SQuit message_squit;
-	Message::Stats message_stats;
-	Message::Time message_time;
-	Message::Version message_version;
-	Message::Whois message_whois;
+	rfc1459::Away message_away;
+	rfc1459::Capab message_capab;
+	rfc1459::Error message_error;
+	rfc1459::Invite message_invite;
+	rfc1459::Join message_join;
+	rfc1459::Kick message_kick;
+	rfc1459::Kill message_kill;
+	rfc1459::MOTD message_motd;
+	rfc1459::Notice message_notice;
+	rfc1459::Part message_part;
+	rfc1459::Ping message_ping;
+	rfc1459::Privmsg message_privmsg;
+	rfc1459::Quit message_quit;
+	rfc1459::SQuit message_squit;
+	rfc1459::Stats message_stats;
+	rfc1459::Time message_time;
+	rfc1459::Version message_version;
+	rfc1459::Whois message_whois;
 
 	/* Our message handlers */
 	IRCDMessageBurst message_burst;

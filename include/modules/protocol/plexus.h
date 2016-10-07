@@ -46,5 +46,5 @@ class UID : public IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
 
-}
+} // namespace plexus
 

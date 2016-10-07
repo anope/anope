@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "modules/protocol/rfc1459.h"
+
 namespace hybrid
 {
 
@@ -38,10 +40,10 @@ class EOB : public IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
 
-class Join : public Message::Join
+class Join : public rfc1459::Join
 {
  public:
-	Join(Module *creator) : Message::Join(creator, "JOIN") { }
+	Join(Module *creator) : rfc1459::Join(creator, "JOIN") { }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };

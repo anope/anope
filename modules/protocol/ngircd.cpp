@@ -18,7 +18,10 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
+/* Dependencies: anope_protocol.rfc1459 */
+
 #include "module.h"
+#include "modules/protocol/rfc1459.h"
 
 class ngIRCdProto : public IRCDProto
 {
@@ -291,9 +294,9 @@ struct IRCDMessageChaninfo : IRCDMessage
 	}
 };
 
-struct IRCDMessageJoin : Message::Join
+struct IRCDMessageJoin : rfc1459::Join
 {
-	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { }
+	IRCDMessageJoin(Module *creator) : rfc1459::Join(creator, "JOIN") { }
 
 	/*
 	 * <@po||ux> DukeP: RFC 2813, 4.2.1: the JOIN command on server-server links
@@ -320,7 +323,7 @@ struct IRCDMessageJoin : Message::Join
 		std::vector<Anope::string> new_params;
 		new_params.push_back(channel);
 
-		Message::Join::Run(source, new_params);
+		rfc1459::Join::Run(source, new_params);
 
 		if (!modes.empty())
 		{
@@ -492,14 +495,14 @@ struct IRCDMessageNJoin : IRCDMessage
 	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
-		std::list<Message::Join::SJoinUser> users;
+		std::list<rfc1459::Join::SJoinUser> users;
 
 		commasepstream sep(params[1]);
 		Anope::string buf;
 		while (sep.GetToken(buf))
 		{
 
-			Message::Join::SJoinUser sju;
+			rfc1459::Join::SJoinUser sju;
 
 			/* Get prefixes from the nick */
 			for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
@@ -517,7 +520,7 @@ struct IRCDMessageNJoin : IRCDMessage
 			users.push_back(sju);
 		}
 
-		Message::Join::SJoin(source, params[0], 0, "", users);
+		rfc1459::Join::SJoin(source, params[0], 0, "", users);
 	}
 };
 
@@ -613,22 +616,22 @@ class ProtongIRCd : public Module
 	ngIRCdProto ircd_proto;
 
 	/* Core message handlers */
-	Message::Capab message_capab;
-	Message::Error message_error;
-	Message::Invite message_invite;
-	Message::Kick message_kick;
-	Message::Kill message_kill;
-	Message::MOTD message_motd;
-	Message::Notice message_notice;
-	Message::Part message_part;
-	Message::Ping message_ping;
-	Message::Privmsg message_privmsg, message_squery;
-	Message::Quit message_quit;
-	Message::SQuit message_squit;
-	Message::Stats message_stats;
-	Message::Time message_time;
-	Message::Version message_version;
-	Message::Whois message_whois;
+	rfc1459::Capab message_capab;
+	rfc1459::Error message_error;
+	rfc1459::Invite message_invite;
+	rfc1459::Kick message_kick;
+	rfc1459::Kill message_kill;
+	rfc1459::MOTD message_motd;
+	rfc1459::Notice message_notice;
+	rfc1459::Part message_part;
+	rfc1459::Ping message_ping;
+	rfc1459::Privmsg message_privmsg, message_squery;
+	rfc1459::Quit message_quit;
+	rfc1459::SQuit message_squit;
+	rfc1459::Stats message_stats;
+	rfc1459::Time message_time;
+	rfc1459::Version message_version;
+	rfc1459::Whois message_whois;
 
 	/* Our message handlers */
 	IRCDMessage005 message_005;

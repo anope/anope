@@ -457,7 +457,10 @@ struct IRCDMessageNick : IRCDMessage
 		if (params.size() == 1)
 		{
 			// we have a nickchange
-			source.GetUser()->ChangeNick(params[0]);
+			User *u = source.GetUser();
+
+			if (u)
+				u->ChangeNick(params[0]);
 		}
 		else if (params.size() == 7)
 		{

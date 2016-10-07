@@ -821,7 +821,12 @@ struct IRCDMessageNick : IRCDMessage
 			User::OnIntroduce(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7], "", na ? na->GetAccount() : NULL);
 		}
 		else
-			source.GetUser()->ChangeNick(params[0]);
+		{
+			User *u = source.GetUser();
+
+			if (u)
+				u->ChangeNick(params[0]);
+		}
 	}
 };
 

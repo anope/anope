@@ -29,7 +29,6 @@ NickType::NickType(Module *me) : Serialize::Type<NickImpl>(me)
 	, time_registered(this, "time_registered", &NickImpl::time_registered)
 	, last_seen(this, "last_seen", &NickImpl::last_seen)
 	, nc(this, "nc", &NickImpl::account)
-	, vhost(this, "vhost", &NickImpl::vhost)
 {
 
 }

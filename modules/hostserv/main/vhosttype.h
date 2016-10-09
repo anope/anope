@@ -27,6 +27,7 @@ class VHostType : public Serialize::Type<VHostImpl>
 	Serialize::Field<VHostImpl, Anope::string> vhost;
 	Serialize::Field<VHostImpl, Anope::string> creator;
 	Serialize::Field<VHostImpl, time_t> created;
+	Serialize::Field<VHostImpl, bool> default_;
 
 	VHostType(Module *);
 };

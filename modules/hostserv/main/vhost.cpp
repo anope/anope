@@ -1,7 +1,7 @@
 /*
  * Anope IRC Services
  *
- * Copyright (C) 2015-2016 Anope Team <team@anope.org>
+ * Copyright (C) 2016 Anope Team <team@anope.org>
  *
  * This file is part of Anope. Anope is free software; you can
  * redistribute it and/or modify it under the terms of the GNU
@@ -67,4 +67,14 @@ time_t VHostImpl::GetCreated()
 void VHostImpl::SetCreated(time_t created)
 {
 	Set(&VHostType::created, created);
+}
+
+bool VHostImpl::IsDefault()
+{
+	return Get(&VHostType::default_);
+}
+
+void VHostImpl::SetDefault(bool default_)
+{
+	Set(&VHostType::default_, default_);
 }

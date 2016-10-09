@@ -40,8 +40,6 @@ class NickType : public Serialize::Type<NickImpl>
 	/* Account this nick is tied to. Multiple nicks can be tied to a single account. */
 	Serialize::ObjectField<NickImpl, NickServ::Account *> nc;
 
-	Serialize::ObjectField<NickImpl, HostServ::VHost *> vhost;
-
  	NickType(Module *);
 
 	NickServ::Nick *FindNick(const Anope::string &nick);

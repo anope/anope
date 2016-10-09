@@ -26,6 +26,7 @@ VHostType::VHostType(Module *me) : Serialize::Type<VHostImpl>(me)
 	, vhost(this, "vhost", &VHostImpl::vhost)
 	, creator(this, "creator", &VHostImpl::creator)
 	, created(this, "created", &VHostImpl::created)
+	, default_(this, "default", &VHostImpl::default_)
 {
 
 }

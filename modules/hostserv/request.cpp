@@ -24,7 +24,7 @@ class HostRequest : public Serialize::Object
 {
 	friend class HostRequestType;
 
-	NickServ::Nick *na = nullptr;
+	NickServ::Account *acc = nullptr;
 	Anope::string ident, host;
 	time_t time = 0;
 
@@ -34,8 +34,8 @@ class HostRequest : public Serialize::Object
 	HostRequest(Serialize::TypeBase *type) : Serialize::Object(type) { }
         HostRequest(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
 
-	NickServ::Nick *GetNick();
-	void SetNick(NickServ::Nick *na);
+	NickServ::Account *GetAccount();
+	void SetAccount(NickServ::Account *);
 
 	Anope::string GetIdent();
 	void SetIdent(const Anope::string &i);
@@ -50,12 +50,12 @@ class HostRequest : public Serialize::Object
 class HostRequestType : public Serialize::Type<HostRequest>
 {
  public:
-	Serialize::ObjectField<HostRequest, NickServ::Nick *> na;
+	Serialize::ObjectField<HostRequest, NickServ::Account *> acc;
 	Serialize::Field<HostRequest, Anope::string> ident, host;
 	Serialize::Field<HostRequest, time_t> time;
 
 	HostRequestType(Module *me) : Serialize::Type<HostRequest>(me)
-		, na(this, "na", &HostRequest::na, true)
+		, acc(this, "acc", &HostRequest::acc, true)
 		, ident(this, "ident", &HostRequest::ident)
 		, host(this, "host", &HostRequest::host)
 		, time(this, "time", &HostRequest::time)
@@ -63,14 +63,14 @@ class HostRequestType : public Serialize::Type<HostRequest>
 	}
 };
 
-NickServ::Nick *HostRequest::GetNick()
+NickServ::Account *HostRequest::GetAccount()
 {
-	return Get(&HostRequestType::na);
+	return Get(&HostRequestType::acc);
 }
 
-void HostRequest::SetNick(NickServ::Nick *na)
+void HostRequest::SetAccount(NickServ::Account *acc)
 {
-	Set(&HostRequestType::na, na);
+	Set(&HostRequestType::acc, acc);
 }
 
 Anope::string HostRequest::GetIdent()
@@ -145,12 +145,6 @@ class CommandHSRequest : public Command
 		}
 
 		User *u = source.GetUser();
-		NickServ::Nick *na = NickServ::FindNick(source.GetNick());
-		if (!na || na->GetAccount() != source.GetAccount())
-		{
-			source.Reply(_("Access denied.")); //XXX with nonickownership this should be allowed.
-			return;
-		}
 
 		if (source.GetAccount()->HasFieldS("UNCONFIRMED"))
 		{
@@ -218,8 +212,12 @@ class CommandHSRequest : public Command
 			return;
 		}
 
-		HostRequest *req = Serialize::New<HostRequest *>();
-		req->SetNick(na);
+		HostRequest *req = u->Account()->GetRef<HostRequest *>();
+		if (req != nullptr)
+			req->Delete(); // delete old request
+
+		req = Serialize::New<HostRequest *>();
+		req->SetAccount(u->Account());
 		req->SetIdent(user);
 		req->SetHost(host);
 		req->SetTime(Anope::CurTime);
@@ -264,7 +262,7 @@ class CommandHSActivate : public Command
 			return;
 		}
 
-		HostRequest *req = na->GetExt<HostRequest>("hostrequest");
+		HostRequest *req = na->GetAccount()->GetRef<HostRequest *>();
 		if (!req)
 		{
 			source.Reply(_("\002{0}\002 does not have a pending vhost request."), na->GetNick());
@@ -278,13 +276,11 @@ class CommandHSActivate : public Command
 			return;
 		}
 
-		vhost->SetOwner(na);
+		vhost->SetOwner(na->GetAccount());
 		vhost->SetIdent(req->GetIdent());
 		vhost->SetHost(req->GetHost());
 		vhost->SetCreator(source.GetNick());
 		vhost->SetCreated(req->GetTime());
-
-		na->SetVHost(vhost);
 
 		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, na);
 
@@ -335,7 +331,7 @@ class CommandHSReject : public Command
 			return;
 		}
 
-		HostRequest *req = na->GetExt<HostRequest>("hostrequest");
+		HostRequest *req = na->GetAccount()->GetRef<HostRequest *>();
 		if (!req)
 		{
 			source.Reply(_("\002{0}\002 does not have a pending vhost request."), na->GetNick());
@@ -393,7 +389,7 @@ class CommandHSWaiting : public Command
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(display_counter);
-				entry["Nick"] = hr->GetNick()->GetNick();
+				entry["Nick"] = hr->GetAccount()->GetDisplay();
 				if (!hr->GetIdent().empty())
 					entry["Vhost"] = hr->GetIdent() + "@" + hr->GetHost();
 				else

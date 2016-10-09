@@ -22,9 +22,10 @@
 class CommandHSOn : public Command
 {
  public:
-	CommandHSOn(Module *creator) : Command(creator, "hostserv/on", 0, 0)
+	CommandHSOn(Module *creator) : Command(creator, "hostserv/on", 0, 1)
 	{
-		this->SetDesc(_("Activates your assigned vhost"));
+		this->SetDesc(_("Activates a vhost"));
+		this->SetSyntax(_("[\037vhost\037]"));
 		this->RequireUser(true);
 	}
 
@@ -34,27 +35,31 @@ class CommandHSOn : public Command
 			return; // HostServ wouldn't even be loaded at this point
 
 		User *u = source.GetUser();
-		NickServ::Nick *na = NickServ::FindNick(u->nick);
-		HostServ::VHost *vhost = nullptr;
+		const Anope::string &v = params.empty() ? "" : params[0];
+		HostServ::VHost *vhost;
 
-		if (na && na->GetAccount() == source.GetAccount())
-			vhost = na->GetVHost();
-
-		if (vhost == nullptr)
-			vhost = NickServ::FindNick(u->Account()->GetDisplay())->GetVHost();
-
-		if (vhost == nullptr)
+		if (!v.empty())
 		{
-			source.Reply(_("There is no vhost assigned to this nickname."));
-			return;
+			vhost = HostServ::FindVHost(u->Account(), v);
+			if (vhost == nullptr)
+			{
+				source.Reply(_("You do not have the vhost \002{0}\002."), v);
+				return;
+			}
+		}
+		else
+		{
+			vhost = HostServ::FindVHost(u->Account());
+			if (vhost == nullptr)
+			{
+				source.Reply(_("You do not have any vhosts associated with your account."), vhost);
+				return;
+			}
 		}
 
-		if (!vhost->GetIdent().empty())
-			source.Reply(_("Your vhost of \002{0}\002@\002{1}\002 is now activated."), vhost->GetIdent(), vhost->GetHost());
-		else
-			source.Reply(_("Your vhost of \002{0}\002 is now activated."), vhost->GetHost());
+		source.Reply(_("Your vhost of \002{0}\002 is now activated."), vhost->Mask());
 		
-		Log(LOG_COMMAND, source, this) << "to enable their vhost of " << (!vhost->GetIdent().empty() ? vhost->GetIdent() + "@" : "") << vhost->GetHost();
+		Log(LOG_COMMAND, source, this) << "to enable their vhost of " << vhost->Mask();
 		IRCD->SendVhost(u, vhost->GetIdent(), vhost->GetHost());
 		u->vhost = vhost->GetHost();
 		if (IRCD->CanSetVIdent && !vhost->GetIdent().empty())
@@ -64,7 +69,8 @@ class CommandHSOn : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		source.Reply(_("Activates your vhost."));
+		source.Reply(_("Activates a vhost. If \037vhost\037 is specified, it must be a vhost assigned to your account."
+		               " If \037vhost\037 is not specified, your default vhost will be activated."));
 		return true;
 	}
 };

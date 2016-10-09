@@ -107,15 +107,11 @@ class CommandNSInfo : public Command
 		if (!na->GetAccount()->GetEmail().empty() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_EMAIL")))
 			info[_("Email address")] = na->GetAccount()->GetEmail();
 
-		if (show_hidden)
+		if (source.HasPriv("hostserv/auspex"))
 		{
-			HostServ::VHost *vhost = na->GetVHost();
-			if (vhost != nullptr)
+			for (HostServ::VHost *vhost : na->GetAccount()->GetRefs<HostServ::VHost *>())
 			{
-				if (IRCD->CanSetVIdent && !vhost->GetIdent().empty())
-					info[_("VHost")] = vhost->GetIdent() + "@" + vhost->GetHost();
-				else
-					info[_("VHost")] = vhost->GetHost();
+				info[_("VHost")] = vhost->Mask() + (vhost->IsDefault() ? " (default)" : "");
 			}
 		}
 
@@ -132,10 +128,10 @@ class CommandNSInfo : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Displays information about the given nickname, such as\n"
-				"the nick's owner, last seen address and time, and nick\n"
-				"options. If no nick is given, and you are identified,\n"
-				"your account name is used, else your current nickname is\n"
+		source.Reply(_("Displays information about the given nickname, such as "
+				"the nick's owner, last seen address and time, and nick "
+				"options. If no nick is given, and you are identified, "
+				"your account name is used, else your current nickname is "
 				"used."));
 
 		return true;

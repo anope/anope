@@ -30,6 +30,7 @@ class VHostImpl : public HostServ::VHost
 	Anope::string vhost;
 	Anope::string creator;
 	time_t created = 0;
+	bool default_ = false;
 
  public:
 	using HostServ::VHost::VHost;
@@ -48,5 +49,8 @@ class VHostImpl : public HostServ::VHost
 
 	time_t GetCreated() override;
 	void SetCreated(time_t) override;
+
+	bool IsDefault() override;
+	void SetDefault(bool) override;
 };
 

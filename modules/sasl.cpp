@@ -20,6 +20,7 @@
 #include "module.h"
 #include "modules/sasl.h"
 #include "modules/nickserv/cert.h"
+#include "modules/hostserv.h"
 
 using namespace SASL;
 
@@ -245,7 +246,7 @@ class SASLService : public SASL::Service, public Timer
 		}
 		else
 		{
-			HostServ::VHost *vhost = na->GetVHost();
+			HostServ::VHost *vhost = HostServ::FindVHost(na->GetAccount());
 			IRCD->SendSVSLogin(session->uid, nc->GetDisplay(), vhost ? vhost->GetIdent() : "", vhost ? vhost->GetHost() : "");
 		}
 		this->SendMessage(session, "D", "S");

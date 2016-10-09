@@ -136,12 +136,3 @@ void NickImpl::SetAccount(NickServ::Account *acc)
 	Set(&NickType::nc, acc);
 }
 
-HostServ::VHost *NickImpl::GetVHost()
-{
-	return Get(&NickType::vhost);
-}
-
-void NickImpl::SetVHost(HostServ::VHost *vhost)
-{
-	Set(&NickType::vhost, vhost);
-}

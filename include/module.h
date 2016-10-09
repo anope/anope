@@ -52,4 +52,5 @@
 #include "modules/nickserv.h"
 #include "modules/botserv.h"
 #include "modules/memoserv.h"
+#include "modules/hostserv.h"
 #include "accessgroup.h"

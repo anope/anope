@@ -22,7 +22,6 @@
 #include "event.h"
 #include "service.h"
 #include "serialize.h"
-#include "hostserv.h"
 
 namespace NickServ
 {
@@ -169,9 +168,6 @@ namespace NickServ
 
 		virtual Account *GetAccount() anope_abstract;
 		virtual void SetAccount(Account *acc) anope_abstract;
-
-		virtual HostServ::VHost *GetVHost() anope_abstract;
-		virtual void SetVHost(HostServ::VHost *) anope_abstract;
 	};
 
 	/* A registered account. Each account must have a Nick with the same nick as the

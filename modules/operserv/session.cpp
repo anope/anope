@@ -161,6 +161,7 @@ class MySessionService : public SessionService
 
 	Exception *FindException(User *u) override
 	{
+#warning "these need weighting"
 		for (Exception *e : Serialize::GetObjects<Exception *>())
 		{
 			if (Anope::Match(u->host, e->GetMask()) || Anope::Match(u->ip.addr(), e->GetMask()))

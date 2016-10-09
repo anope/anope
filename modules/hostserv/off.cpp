@@ -31,14 +31,8 @@ class CommandHSOff : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
-		NickServ::Nick *na = NickServ::FindNick(u->nick);
-		HostServ::VHost *vhost = nullptr;
 
-		if (na && na->GetAccount() == source.GetAccount())
-			vhost = na->GetVHost();
-
-		if (vhost == nullptr)
-			vhost = NickServ::FindNick(u->Account()->GetDisplay())->GetVHost();
+		HostServ::VHost *vhost = HostServ::FindVHost(u->Account());
 
 		if (vhost == nullptr)
 		{

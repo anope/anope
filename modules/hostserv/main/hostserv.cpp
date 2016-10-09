@@ -66,14 +66,7 @@ class HostServCore : public Module
 		if (!IRCD->CanSetVHost)
 			return;
 
-		NickServ::Nick *na = NickServ::FindNick(u->nick);
-		HostServ::VHost *vhost = nullptr;
-
-		if (na && na->GetAccount() == u->Account())
-			vhost = na->GetVHost();
-
-		if (vhost == nullptr)
-			vhost = NickServ::FindNick(u->Account()->GetDisplay())->GetVHost();
+		HostServ::VHost *vhost = HostServ::FindVHost(u->Account());
 
 		if (vhost == nullptr)
 			return;
@@ -123,7 +116,10 @@ class HostServCore : public Module
 
 			if (u && u->Account() == na->GetAccount())
 			{
-				HostServ::VHost *vhost = na->GetVHost();
+				HostServ::VHost *vhost = HostServ::FindVHost(u->Account());
+
+				if (vhost == nullptr)
+					return;
 
 				IRCD->SendVhost(u, vhost->GetIdent(), vhost->GetHost());
 

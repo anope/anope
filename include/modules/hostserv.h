@@ -45,6 +45,54 @@ namespace HostServ
 
 		virtual time_t GetCreated() anope_abstract;
 		virtual void SetCreated(time_t) anope_abstract;
+
+		virtual bool IsDefault() anope_abstract;
+		virtual void SetDefault(bool) anope_abstract;
+
+		inline Anope::string Mask()
+		{
+			Anope::string ident = GetIdent(), host = GetHost();
+			if (!ident.empty())
+				return ident + "@" + host;
+			else
+				return host;
+		}
 	};
+
+	/** Find the default vhost for an object, or the first
+	 * if there is no default.
+	 * @return The object's vhost
+	 */
+	inline VHost *FindVHost(Serialize::Object *obj)
+	{
+		VHost *first = nullptr;
+
+		for (VHost *v : obj->GetRefs<VHost *>())
+		{
+			if (first == nullptr)
+				first = v;
+
+			if (v->IsDefault())
+			{
+				first = v;
+				break;
+			}
+		}
+
+		return first;
+	}
+
+	inline VHost *FindVHost(Serialize::Object *obj, const Anope::string &v)
+	{
+		for (VHost *vhost : obj->GetRefs<VHost *>())
+		{
+			if (vhost->Mask().equals_ci(v))
+			{
+				return vhost;
+			}
+		}
+
+		return nullptr;
+	}
 }
 

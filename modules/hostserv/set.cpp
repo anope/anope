@@ -1,7 +1,7 @@
 /*
  * Anope IRC Services
  *
- * Copyright (C) 2003-2016 Anope Team <team@anope.org>
+ * Copyright (C) 2016 Anope Team <team@anope.org>
  *
  * This file is part of Anope. Anope is free software; you can
  * redistribute it and/or modify it under the terms of the GNU
@@ -22,142 +22,63 @@
 class CommandHSSet : public Command
 {
  public:
-	CommandHSSet(Module *creator) : Command(creator, "hostserv/set", 2, 2)
+	CommandHSSet(Module *creator) : Command(creator, "hostserv/set", 2, 3)
 	{
-		this->SetDesc(_("Set the vhost of another user"));
-		this->SetSyntax(_("\037user\037 \037hostmask\037"));
+		this->SetDesc(_("Set vhost options"));
+		this->SetSyntax(_("\037option\037 \037parameters\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(_("Services are in read-only mode."));
-			return;
-		}
-
-		const Anope::string &nick = params[0];
-
-		NickServ::Nick *na = NickServ::FindNick(nick);
-		if (na == NULL)
-		{
-			source.Reply(_("\002{0}\002 isn't registered."), nick);
-			return;
-		}
-
-		Anope::string rawhostmask = params[1];
-
-		Anope::string user, host;
-		size_t a = rawhostmask.find('@');
-
-		if (a == Anope::string::npos)
-			host = rawhostmask;
-		else
-		{
-			user = rawhostmask.substr(0, a);
-			host = rawhostmask.substr(a + 1);
-		}
-
-		if (host.empty())
-		{
-			this->OnSyntaxError(source, "");
-			return;
-		}
-
-		if (!user.empty())
-		{
-			if (!IRCD->CanSetVIdent)
-			{
-				source.Reply(_("Vhosts may not contain a username."));
-				return;
-			}
-
-			if (!IRCD->IsIdentValid(user))
-			{
-				source.Reply(_("The requested username is not valid."));
-				return;
-			}
-		}
-
-		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
-		{
-			source.Reply(_("The requested vhost is too long, please use a hostname no longer than {0} characters."), Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
-			return;
-		}
-
-		if (!IRCD->IsHostValid(host))
-		{
-			source.Reply(_("The requested hostname is not valid."));
-			return;
-		}
-
-		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->GetNick() << " to " << (!user.empty() ? user + "@" : "") << host;
-
-		HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
-		if (vhost == nullptr)
-		{
-			source.Reply(_("Unable to create vhost, is hostserv enabled?"));
-			return;
-		}
-
-		vhost->SetOwner(na);
-		vhost->SetIdent(user);
-		vhost->SetHost(host);
-		vhost->SetCreator(source.GetNick());
-		vhost->SetCreated(Anope::CurTime);
-
-		na->SetVHost(vhost);
-
-		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, na);
-		if (!user.empty())
-			source.Reply(_("Vhost for \002{0}\002 set to \002{1}\002@\002{2}\002."), na->GetNick(), user, host);
-		else
-			source.Reply(_("Vhost for \002{0}\002 set to \002{1}\002."), na->GetNick(), host);
+		this->OnSyntaxError(source, "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		source.Reply(_("Sets the vhost of the given \037user\037 to the given \037hostmask\037."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Available options:"));
+		// XXX this entire thing is dup
+		Anope::string this_name = source.command;
+		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
+		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		{
+			const Anope::string &c_name = it->first;
+			const CommandInfo &info = it->second;
+			if (c_name.find_ci(this_name + " ") == 0)
+			{
+				ServiceReference<Command> c(info.name);
+
+				// XXX dup
+				if (!c)
+					continue;
+				else if (hide_registered_commands && !c->AllowUnregistered() && !source.GetAccount())
+					continue;
+				else if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
+					continue;
+
+				source.command = it->first;
+				c->OnServHelp(source);
+			}
+		}
+
+		CommandInfo *help = source.service->FindCommand("generic/help");
+		if (help)
+			source.Reply(_("Type \002{0}{1} {2} {3} \037option\037\002 for more information on a particular option."),
+			               Config->StrictPrivmsg, source.service->nick, help->cname, this_name);
+
 		return true;
 	}
 };
 
-class CommandHSSetAll : public Command
+class CommandHSSetDefault : public Command
 {
-	void Sync(NickServ::Nick *na)
-	{
-		if (!na)
-			return;
-
-		HostServ::VHost *v = na->GetVHost();
-
-		if (v == nullptr)
-			return;
-
-		for (NickServ::Nick *nick : na->GetAccount()->GetRefs<NickServ::Nick *>())
-		{
-			if (nick == na)
-				continue;
-
-			HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
-			if (vhost == nullptr)
-				continue;
-
-			vhost->SetOwner(nick);
-			vhost->SetIdent(v->GetIdent());
-			vhost->SetHost(v->GetHost());
-			vhost->SetCreator(v->GetCreator());
-			vhost->SetCreated(Anope::CurTime);
-
-			nick->SetVHost(vhost);
-		}
-	}
-
  public:
-	CommandHSSetAll(Module *creator) : Command(creator, "hostserv/setall", 2, 2)
+	CommandHSSetDefault(Module *creator, const Anope::string &cname = "hostserv/set/default") : Command(creator, cname, 1)
 	{
-		this->SetDesc(_("Set the vhost for all nicks in a group"));
-		this->SetSyntax(_("\037user\037 \037hostmask\037"));
+		this->SetDesc(_("Sets your default vhost"));
+		this->SetSyntax(_("\037vhost\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -168,88 +89,35 @@ class CommandHSSetAll : public Command
 			return;
 		}
 
-		const Anope::string &nick = params[0];
-		NickServ::Nick *na = NickServ::FindNick(nick);
-		if (na == NULL)
+		const Anope::string &mask = params[0];
+		std::vector<HostServ::VHost *> vhosts = source.GetAccount()->GetRefs<HostServ::VHost *>();
+
+		if (vhosts.empty())
 		{
-			source.Reply(_("\002{0}\002 isn't registered."), nick);
+			source.Reply(_("You do not have any vhosts associated with your account."));
 			return;
 		}
 
-		Anope::string rawhostmask = params[1];
-
-		Anope::string user, host;
-		size_t a = rawhostmask.find('@');
-
-		if (a == Anope::string::npos)
-			host = rawhostmask;
-		else
-		{
-			user = rawhostmask.substr(0, a);
-			host = rawhostmask.substr(a + 1);
-		}
-
-		if (host.empty())
-		{
-			this->OnSyntaxError(source, "");
-			return;
-		}
-
-		if (!user.empty())
-		{
-			if (!IRCD->CanSetVIdent)
-			{
-				source.Reply(_("Vhosts may not contain a username."));
-				return;
-			}
-
-			if (!IRCD->IsIdentValid(user))
-			{
-				source.Reply(_("The requested username is not valid."));
-				return;
-			}
-		}
-
-		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
-		{
-			source.Reply(_("The requested vhost is too long, please use a hostname no longer than {0} characters."), Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
-			return;
-		}
-
-		if (!IRCD->IsHostValid(host))
-		{
-			source.Reply(_("The requested hostname is not valid."));
-			return;
-		}
-
-		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->GetNick() << " to " << (!user.empty() ? user + "@" : "") << host;
-
-		HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
+		HostServ::VHost *vhost = HostServ::FindVHost(source.GetAccount(), mask);
 		if (vhost == nullptr)
 		{
-			source.Reply(_("Unable to create vhost, is hostserv enabled?"));
+			source.Reply(_("You do not have the vhost \002{0}\002."), mask);
 			return;
 		}
 
-		vhost->SetOwner(na);
-		vhost->SetIdent(user);
-		vhost->SetHost(host);
-		vhost->SetCreator(source.GetNick());
-		vhost->SetCreated(Anope::CurTime);
+		/* Disable default on all vhosts */
+		for (HostServ::VHost *v : vhosts)
+			v->SetDefault(false);
 
-		na->SetVHost(vhost);
+		/* Set default on chose vhost */
+		vhost->SetDefault(true);
 
-		this->Sync(na);
-		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, na);
-		if (!user.empty())
-			source.Reply(_("Vhost for group \002{0}\002 set to \002{1}\002@\002{2}\002."), na->GetAccount()->GetDisplay(), user, host);
-		else
-			source.Reply(_("host for group \002{0}\002 set to \002{1}\002."), na->GetAccount()->GetDisplay(), host);
+		source.Reply(_("Your default vhost is now \002{0}\002."), vhost->Mask());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		source.Reply(_("Sets the vhost for all nicknames in the group of \037user\037."));
+		source.Reply(_("Sets your default vhost. Your default vhost is the vhost which is applied when you first login."));
 		return true;
 	}
 };
@@ -257,15 +125,13 @@ class CommandHSSetAll : public Command
 class HSSet : public Module
 {
 	CommandHSSet commandhsset;
-	CommandHSSetAll commandhssetall;
+	CommandHSSetDefault commandhssetdefault;
 
  public:
 	HSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandhsset(this)
-		, commandhssetall(this)
+		, commandhssetdefault(this)
 	{
-		if (!IRCD || !IRCD->CanSetVHost)
-			throw ModuleException("Your IRCd does not support vhosts");
 	}
 };
 

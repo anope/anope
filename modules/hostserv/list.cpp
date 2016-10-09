@@ -21,6 +21,14 @@
 
 class CommandHSList : public Command
 {
+	bool VHostMatches(NickServ::Account *acc, const Anope::string &mask)
+	{
+		for (HostServ::VHost *vhost : acc->GetRefs<HostServ::VHost *>())
+			if (Anope::Match(vhost->GetHost(), mask))
+				return true;
+		return false;
+	}
+
  public:
 	CommandHSList(Module *creator) : Command(creator, "hostserv/list", 0, 1)
 	{
@@ -63,55 +71,46 @@ class CommandHSList : public Command
 
 		unsigned display_counter = 0, listmax = Config->GetModule(this->GetOwner())->Get<unsigned>("listmax", "50");
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Creator")).AddColumn(_("Created"));
+		list.AddColumn(_("Number")).AddColumn(_("Account")).AddColumn(_("Vhost")).AddColumn(_("Creator")).AddColumn(_("Created"));
 
-		for (NickServ::Nick *na : NickServ::service->GetNickList())
+		for (NickServ::Account *acc : NickServ::service->GetAccountList())
 		{
-			HostServ::VHost *vhost = na->GetVHost();
+			std::vector<HostServ::VHost *> vhosts = acc->GetRefs<HostServ::VHost *>();
 
-			if (vhost == nullptr)
+			if (vhosts.empty())
 				continue;
 
-			if (!key.empty() && key[0] != '#')
-			{
-				if ((Anope::Match(na->GetNick(), key) || Anope::Match(vhost->GetHost(), key)) && display_counter < listmax)
-				{
-					++display_counter;
-
-					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(display_counter);
-					entry["Nick"] = na->GetNick();
-					if (!vhost->GetIdent().empty())
-						entry["Vhost"] = vhost->GetIdent() + "@" + vhost->GetHost();
-					else
-						entry["Vhost"] = vhost->GetHost();
-					entry["Creator"] = vhost->GetCreator();
-					entry["Created"] = Anope::strftime(vhost->GetCreated(), NULL, true);
-					list.AddEntry(entry);
-				}
-			}
-			else
-			{
-				/**
-				 * List the host if its in the display range, and not more
-				 * than NSListMax records have been displayed...
-				 **/
-				if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < listmax)
-				{
-					++display_counter;
-					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(display_counter);
-					entry["Nick"] = na->GetNick();
-					if (!vhost->GetIdent().empty())
-						entry["Vhost"] = vhost->GetIdent() + "@" + vhost->GetHost();
-					else
-						entry["Vhost"] = vhost->GetHost();
-					entry["Creator"] = vhost->GetCreator();
-					entry["Created"] = Anope::strftime(vhost->GetCreated(), NULL, true);
-					list.AddEntry(entry);
-				}
-			}
 			++counter;
+
+			if (display_counter >= listmax)
+				continue;
+
+			if (from && to && (counter < from || counter > to))
+				continue;
+
+			if (!key.empty() && !Anope::Match(acc->GetDisplay(), key) && !VHostMatches(acc, key))
+				continue;
+
+			++display_counter;
+
+			bool first = true;
+			for (HostServ::VHost *vhost : vhosts)
+			{
+				ListFormatter::ListEntry entry;
+
+				if (first)
+				{
+					entry["Number"] = stringify(display_counter);
+					entry["Account"] = acc->GetDisplay();
+				}
+
+				entry["Vhost"] = vhost->Mask();
+				entry["Creator"] = vhost->GetCreator();
+				entry["Created"] = Anope::strftime(vhost->GetCreated(), NULL, true);
+				list.AddEntry(entry);
+
+				first = false;
+			}
 		}
 
 		if (!display_counter)
@@ -139,12 +138,12 @@ class CommandHSList : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		source.Reply(_("Lists all vhosts. If \037key\037 is specified, only entries whose nick or vhost match the pattern given in \037key\037 are displayed."
+		source.Reply(_("Lists all vhosts. If \037key\037 is specified, only entries whose account or vhost match the pattern given in \037key\037 are displayed."
 		               "If a \037#X-Y\037 style is used, only entries between the range of \002X\002 and \002Y\002 will be displayed.\n"
 		               "\n"
 		               "Examples:\n"
 		               "         {0} Rob*\n"
-		               "         Lists all entries with the nick or vhost beginning with \"Rob\"\n"
+		               "         Lists all entries with the account or vhost beginning with \"Rob\"\n"
 		               "\n"
 		               "         {0} #1-3\n"
 		               "         Lists the first three entries."),

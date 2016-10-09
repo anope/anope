@@ -742,13 +742,11 @@ static void LoadVHosts()
 		if (vhost == nullptr)
 			continue;
 
-		vhost->SetOwner(na);
+		vhost->SetOwner(na->GetAccount());
 		vhost->SetIdent(ident);
 		vhost->SetHost(host);
 		vhost->SetCreator(creator);
 		vhost->SetCreated(vtime);
-
-		na->SetVHost(vhost);
 
 		Log() << "Loaded vhost for " << na->GetNick();
 	}

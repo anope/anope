@@ -67,24 +67,26 @@ class CommandHSList : public Command
 
 		for (NickServ::Nick *na : NickServ::service->GetNickList())
 		{
-			if (!na->HasVhost())
+			HostServ::VHost *vhost = na->GetVHost();
+
+			if (vhost == nullptr)
 				continue;
 
 			if (!key.empty() && key[0] != '#')
 			{
-				if ((Anope::Match(na->GetNick(), key) || Anope::Match(na->GetVhostHost(), key)) && display_counter < listmax)
+				if ((Anope::Match(na->GetNick(), key) || Anope::Match(vhost->GetHost(), key)) && display_counter < listmax)
 				{
 					++display_counter;
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(display_counter);
 					entry["Nick"] = na->GetNick();
-					if (!na->GetVhostIdent().empty())
-						entry["Vhost"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
+					if (!vhost->GetIdent().empty())
+						entry["Vhost"] = vhost->GetIdent() + "@" + vhost->GetHost();
 					else
-						entry["Vhost"] = na->GetVhostHost();
-					entry["Creator"] = na->GetVhostCreator();
-					entry["Created"] = Anope::strftime(na->GetVhostCreated(), NULL, true);
+						entry["Vhost"] = vhost->GetHost();
+					entry["Creator"] = vhost->GetCreator();
+					entry["Created"] = Anope::strftime(vhost->GetCreated(), NULL, true);
 					list.AddEntry(entry);
 				}
 			}
@@ -100,12 +102,12 @@ class CommandHSList : public Command
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(display_counter);
 					entry["Nick"] = na->GetNick();
-					if (!na->GetVhostIdent().empty())
-						entry["Vhost"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
+					if (!vhost->GetIdent().empty())
+						entry["Vhost"] = vhost->GetIdent() + "@" + vhost->GetHost();
 					else
-						entry["Vhost"] = na->GetVhostHost();
-					entry["Creator"] = na->GetVhostCreator();
-					entry["Created"] = Anope::strftime(na->GetVhostCreated(), NULL, true);
+						entry["Vhost"] = vhost->GetHost();
+					entry["Creator"] = vhost->GetCreator();
+					entry["Created"] = Anope::strftime(vhost->GetCreated(), NULL, true);
 					list.AddEntry(entry);
 				}
 			}

@@ -28,11 +28,8 @@ NickType::NickType(Module *me) : Serialize::Type<NickImpl>(me)
 	, last_realhost(this, "last_realhost", &NickImpl::last_realhost)
 	, time_registered(this, "time_registered", &NickImpl::time_registered)
 	, last_seen(this, "last_seen", &NickImpl::last_seen)
-	, vhost_ident(this, "vhost_ident", &NickImpl::vhost_ident)
-	, vhost_host(this, "vhost_host", &NickImpl::vhost_host)
-	, vhost_creator(this, "vhost_creator", &NickImpl::vhost_creator)
-	, vhost_created(this, "vhost_created", &NickImpl::vhost_created)
 	, nc(this, "nc", &NickImpl::account)
+	, vhost(this, "vhost", &NickImpl::vhost)
 {
 
 }

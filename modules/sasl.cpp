@@ -245,7 +245,8 @@ class SASLService : public SASL::Service, public Timer
 		}
 		else
 		{
-			IRCD->SendSVSLogin(session->uid, nc->GetDisplay(), na->GetVhostIdent(), na->GetVhostHost());
+			HostServ::VHost *vhost = na->GetVHost();
+			IRCD->SendSVSLogin(session->uid, nc->GetDisplay(), vhost ? vhost->GetIdent() : "", vhost ? vhost->GetHost() : "");
 		}
 		this->SendMessage(session, "D", "S");
 	}

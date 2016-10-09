@@ -738,7 +738,17 @@ static void LoadVHosts()
 			continue;
 		}
 
-		na->SetVhost(ident, host, creator, vtime);
+		HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
+		if (vhost == nullptr)
+			continue;
+
+		vhost->SetOwner(na);
+		vhost->SetIdent(ident);
+		vhost->SetHost(host);
+		vhost->SetCreator(creator);
+		vhost->SetCreated(vtime);
+
+		na->SetVHost(vhost);
 
 		Log() << "Loaded vhost for " << na->GetNick();
 	}

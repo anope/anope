@@ -32,16 +32,21 @@ class CommandHSOff : public Command
 	{
 		User *u = source.GetUser();
 		NickServ::Nick *na = NickServ::FindNick(u->nick);
+		HostServ::VHost *vhost = nullptr;
 
-		if (!na || na->GetAccount() != u->Account() || !na->HasVhost())
-			na = NickServ::FindNick(u->Account()->GetDisplay());
+		if (na && na->GetAccount() == source.GetAccount())
+			vhost = na->GetVHost();
 
-		if (!na || !na->HasVhost() || na->GetAccount() != source.GetAccount())
+		if (vhost == nullptr)
+			vhost = NickServ::FindNick(u->Account()->GetDisplay())->GetVHost();
+
+		if (vhost == nullptr)
 		{
 			source.Reply(_("There is no vhost assigned to this nickname."));
 			return;
 		}
 
+		// XXX vident?
 		u->vhost.clear();
 		IRCD->SendVhostDel(u);
 		Log(LOG_COMMAND, source, this) << "to disable their vhost";

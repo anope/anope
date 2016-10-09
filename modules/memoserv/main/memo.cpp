@@ -19,10 +19,6 @@
 
 #include "memotype.h"
 
-MemoImpl::~MemoImpl()
-{
-}
-
 MemoServ::MemoInfo *MemoImpl::GetMemoInfo()
 {
 	return Get(&MemoType::mi);

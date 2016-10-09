@@ -31,7 +31,6 @@ class MemoImpl : public MemoServ::Memo
  public:
 	MemoImpl(Serialize::TypeBase *type) : MemoServ::Memo(type) { }
 	MemoImpl(Serialize::TypeBase *type, Serialize::ID id) : MemoServ::Memo(type, id) { }
-	~MemoImpl();
 
 	MemoServ::MemoInfo *GetMemoInfo() override;
 	void SetMemoInfo(MemoServ::MemoInfo *) override;

@@ -21,6 +21,7 @@
 #include "modules/nickserv/update.h"
 #include "modules/hostserv/del.h"
 #include "modules/help.h"
+#include "vhosttype.h"
 
 class HostServCore : public Module
 	, public EventHook<Event::UserLogin>
@@ -31,6 +32,8 @@ class HostServCore : public Module
 {
 	Reference<ServiceBot> HostServ;
 
+	VHostType vhost_type;
+
  public:
 	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 		, EventHook<Event::UserLogin>(this)
@@ -38,6 +41,7 @@ class HostServCore : public Module
 		, EventHook<Event::Help>(this)
 		, EventHook<Event::SetVhost>(this)
 		, EventHook<Event::DeleteVhost>(this)
+		, vhost_type(this)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
@@ -63,27 +67,33 @@ class HostServCore : public Module
 			return;
 
 		NickServ::Nick *na = NickServ::FindNick(u->nick);
-		if (!na || na->GetAccount() != u->Account() || !na->HasVhost())
-			na = NickServ::FindNick(u->Account()->GetDisplay());
-		if (!na || !na->HasVhost())
+		HostServ::VHost *vhost = nullptr;
+
+		if (na && na->GetAccount() == u->Account())
+			vhost = na->GetVHost();
+
+		if (vhost == nullptr)
+			vhost = NickServ::FindNick(u->Account()->GetDisplay())->GetVHost();
+
+		if (vhost == nullptr)
 			return;
 
-		if (u->vhost.empty() || !u->vhost.equals_cs(na->GetVhostHost()) || (!na->GetVhostIdent().empty() && !u->GetVIdent().equals_cs(na->GetVhostIdent())))
+		if (u->vhost.empty() || !u->vhost.equals_cs(vhost->GetHost()) || (!vhost->GetIdent().empty() && !u->GetVIdent().equals_cs(vhost->GetIdent())))
 		{
-			IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
+			IRCD->SendVhost(u, vhost->GetIdent(), vhost->GetHost());
 
-			u->vhost = na->GetVhostHost();
+			u->vhost = vhost->GetHost();
 			u->UpdateHost();
 
-			if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
-				u->SetVIdent(na->GetVhostIdent());
+			if (IRCD->CanSetVIdent && !vhost->GetIdent().empty())
+				u->SetVIdent(vhost->GetIdent());
 
 			if (HostServ)
 			{
-				if (!na->GetVhostIdent().empty())
-					u->SendMessage(*HostServ, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
+				if (!vhost->GetIdent().empty())
+					u->SendMessage(*HostServ, _("Your vhost of \002{0}\002@\002{1}\002 is now activated."), vhost->GetIdent(), vhost->GetHost());
 				else
-					u->SendMessage(*HostServ, _("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
+					u->SendMessage(*HostServ, _("Your vhost of \002{0}\002 is now activated."), vhost->GetHost());
 			}
 		}
 	}
@@ -97,7 +107,7 @@ class HostServCore : public Module
 	{
 		if (!params.empty() || source.c || source.service != *HostServ)
 			return EVENT_CONTINUE;
-		source.Reply(_("%s commands:"), HostServ->nick.c_str());
+		source.Reply(_("{0} commands:"), HostServ->nick);
 		return EVENT_CONTINUE;
 	}
 
@@ -113,20 +123,22 @@ class HostServCore : public Module
 
 			if (u && u->Account() == na->GetAccount())
 			{
-				IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
+				HostServ::VHost *vhost = na->GetVHost();
 
-				u->vhost = na->GetVhostHost();
+				IRCD->SendVhost(u, vhost->GetIdent(), vhost->GetHost());
+
+				u->vhost = vhost->GetHost();
 				u->UpdateHost();
 
-				if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
-					u->SetVIdent(na->GetVhostIdent());
+				if (IRCD->CanSetVIdent && !vhost->GetIdent().empty())
+					u->SetVIdent(vhost->GetIdent());
 
 				if (HostServ)
 				{
-					if (!na->GetVhostIdent().empty())
-						u->SendMessage(*HostServ, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
+					if (!vhost->GetIdent().empty())
+						u->SendMessage(*HostServ, _("Your vhost of \002{0}\002@\002{1}\002 is now activated."), vhost->GetIdent(), vhost->GetHost());
 					else
-						u->SendMessage(*HostServ, _("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
+						u->SendMessage(*HostServ, _("Your vhost of \002{0}\002 is now activated."), vhost->GetHost());
 				}
 			}
 		}

@@ -271,7 +271,21 @@ class CommandHSActivate : public Command
 			return;
 		}
 
-		na->SetVhost(req->GetIdent(), req->GetHost(), source.GetNick(), req->GetTime());
+		HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
+		if (vhost == nullptr)
+		{
+			source.Reply(_("Unable to create vhost, is hostserv enabled?"));
+			return;
+		}
+
+		vhost->SetOwner(na);
+		vhost->SetIdent(req->GetIdent());
+		vhost->SetHost(req->GetHost());
+		vhost->SetCreator(source.GetNick());
+		vhost->SetCreated(req->GetTime());
+
+		na->SetVHost(vhost);
+
 		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, na);
 
 		if (Config->GetModule(this->GetOwner())->Get<bool>("memouser") && memoserv)

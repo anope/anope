@@ -35,26 +35,30 @@ class CommandHSOn : public Command
 
 		User *u = source.GetUser();
 		NickServ::Nick *na = NickServ::FindNick(u->nick);
+		HostServ::VHost *vhost = nullptr;
 
-		if (!na || na->GetAccount() != u->Account() || !na->HasVhost())
-			na = NickServ::FindNick(u->Account()->GetDisplay());
+		if (na && na->GetAccount() == source.GetAccount())
+			vhost = na->GetVHost();
 
-		if (!na || !na->HasVhost() || na->GetAccount() != u->Account())
+		if (vhost == nullptr)
+			vhost = NickServ::FindNick(u->Account()->GetDisplay())->GetVHost();
+
+		if (vhost == nullptr)
 		{
 			source.Reply(_("There is no vhost assigned to this nickname."));
 			return;
 		}
 
-		if (!na->GetVhostIdent().empty())
-			source.Reply(_("Your vhost of \002{0}\002@\002{1}\002 is now activated."), na->GetVhostIdent(), na->GetVhostHost());
+		if (!vhost->GetIdent().empty())
+			source.Reply(_("Your vhost of \002{0}\002@\002{1}\002 is now activated."), vhost->GetIdent(), vhost->GetHost());
 		else
-			source.Reply(_("Your vhost of \002{0}\002 is now activated."), na->GetVhostHost());
+			source.Reply(_("Your vhost of \002{0}\002 is now activated."), vhost->GetHost());
 		
-		Log(LOG_COMMAND, source, this) << "to enable their vhost of " << (!na->GetVhostIdent().empty() ? na->GetVhostIdent() + "@" : "") << na->GetVhostHost();
-		IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
-		u->vhost = na->GetVhostHost();
-		if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
-			u->SetVIdent(na->GetVhostIdent());
+		Log(LOG_COMMAND, source, this) << "to enable their vhost of " << (!vhost->GetIdent().empty() ? vhost->GetIdent() + "@" : "") << vhost->GetHost();
+		IRCD->SendVhost(u, vhost->GetIdent(), vhost->GetHost());
+		u->vhost = vhost->GetHost();
+		if (IRCD->CanSetVIdent && !vhost->GetIdent().empty())
+			u->SetVIdent(vhost->GetIdent());
 		u->UpdateHost();
 	}
 

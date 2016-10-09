@@ -42,9 +42,16 @@ class CommandHSDel : public Command
 			return;
 		}
 
+		HostServ::VHost *vhost = na->GetVHost();
+		if (vhost == nullptr)
+		{
+			source.Reply(_("\002{0}\002 doesn't have a vhost."), na->GetNick());
+			return;
+		}
+
 		Log(LOG_ADMIN, source, this) << "for user " << na->GetNick();
 		EventManager::Get()->Dispatch(&Event::DeleteVhost::OnDeleteVhost, na);
-		na->RemoveVhost();
+		vhost->Delete();
 		source.Reply(_("Vhost for \002{0}\002 has been removed."), na->GetNick());
 	}
 
@@ -81,7 +88,14 @@ class CommandHSDelAll : public Command
 
 		NickServ::Account *nc = na->GetAccount();
 		for (NickServ::Nick *na2 : nc->GetRefs<NickServ::Nick *>())
-			na2->RemoveVhost();
+		{
+			HostServ::VHost *vhost = na2->GetVHost();
+			if (vhost != nullptr)
+			{
+				vhost->Delete();
+			}
+		}
+
 		Log(LOG_ADMIN, source, this) << "for all nicks in group " << nc->GetDisplay();
 		source.Reply(_("Vhosts for group \002{0}\002 have been removed."), nc->GetDisplay());
 	}

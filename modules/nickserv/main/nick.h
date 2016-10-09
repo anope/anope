@@ -24,8 +24,7 @@ class NickImpl : public NickServ::Nick
 	NickServ::Account *account = nullptr;
 	Anope::string nick, last_quit, last_realname, last_usermask, last_realhost;
 	time_t time_registered = 0, last_seen = 0;
-	Anope::string vhost_ident, vhost_host, vhost_creator;
-	time_t vhost_created = 0;
+	HostServ::VHost *vhost = nullptr;
 
  public:
 	NickImpl(Serialize::TypeBase *type) : NickServ::Nick(type) { }
@@ -57,16 +56,6 @@ class NickImpl : public NickServ::Nick
 	NickServ::Account *GetAccount() override;
 	void SetAccount(NickServ::Account *acc) override;
 
-	void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime) override;
-	void RemoveVhost() override;
-	bool HasVhost() override;
-
-	Anope::string GetVhostIdent() override;
-	void SetVhostIdent(const Anope::string &) override;
-	Anope::string GetVhostHost() override;
-	void SetVhostHost(const Anope::string &) override;
-	Anope::string GetVhostCreator() override;
-	void SetVhostCreator(const Anope::string &) override;
-	time_t GetVhostCreated() override;
-	void SetVhostCreated(const time_t &) override;
+	HostServ::VHost *GetVHost() override;
+	void SetVHost(HostServ::VHost *) override;
 };

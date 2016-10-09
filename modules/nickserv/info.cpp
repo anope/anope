@@ -109,12 +109,13 @@ class CommandNSInfo : public Command
 
 		if (show_hidden)
 		{
-			if (na->HasVhost())
+			HostServ::VHost *vhost = na->GetVHost();
+			if (vhost != nullptr)
 			{
-				if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
-					info[_("VHost")] = na->GetVhostIdent() + "@" + na->GetVhostHost();
+				if (IRCD->CanSetVIdent && !vhost->GetIdent().empty())
+					info[_("VHost")] = vhost->GetIdent() + "@" + vhost->GetHost();
 				else
-					info[_("VHost")] = na->GetVhostHost();
+					info[_("VHost")] = vhost->GetHost();
 			}
 		}
 

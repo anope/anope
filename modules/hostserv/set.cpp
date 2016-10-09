@@ -93,12 +93,26 @@ class CommandHSSet : public Command
 
 		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->GetNick() << " to " << (!user.empty() ? user + "@" : "") << host;
 
-		na->SetVhost(user, host, source.GetNick());
+		HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
+		if (vhost == nullptr)
+		{
+			source.Reply(_("Unable to create vhost, is hostserv enabled?"));
+			return;
+		}
+
+		vhost->SetOwner(na);
+		vhost->SetIdent(user);
+		vhost->SetHost(host);
+		vhost->SetCreator(source.GetNick());
+		vhost->SetCreated(Anope::CurTime);
+
+		na->SetVHost(vhost);
+
 		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, na);
 		if (!user.empty())
-			source.Reply(_("Vhost for \002{0}\002 set to \002{0}\002@\002{1}\002."), nick, user, host);
+			source.Reply(_("Vhost for \002{0}\002 set to \002{1}\002@\002{2}\002."), na->GetNick(), user, host);
 		else
-			source.Reply(_("Vhost for \002{0}\002 set to \002{0}\002."), nick, host);
+			source.Reply(_("Vhost for \002{0}\002 set to \002{1}\002."), na->GetNick(), host);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -112,11 +126,31 @@ class CommandHSSetAll : public Command
 {
 	void Sync(NickServ::Nick *na)
 	{
-		if (!na || !na->HasVhost())
+		if (!na)
+			return;
+
+		HostServ::VHost *v = na->GetVHost();
+
+		if (v == nullptr)
 			return;
 
 		for (NickServ::Nick *nick : na->GetAccount()->GetRefs<NickServ::Nick *>())
-			nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
+		{
+			if (nick == na)
+				continue;
+
+			HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
+			if (vhost == nullptr)
+				continue;
+
+			vhost->SetOwner(nick);
+			vhost->SetIdent(v->GetIdent());
+			vhost->SetHost(v->GetHost());
+			vhost->SetCreator(v->GetCreator());
+			vhost->SetCreated(Anope::CurTime);
+
+			nick->SetVHost(vhost);
+		}
 	}
 
  public:
@@ -190,13 +224,27 @@ class CommandHSSetAll : public Command
 
 		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->GetNick() << " to " << (!user.empty() ? user + "@" : "") << host;
 
-		na->SetVhost(user, host, source.GetNick());
+		HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
+		if (vhost == nullptr)
+		{
+			source.Reply(_("Unable to create vhost, is hostserv enabled?"));
+			return;
+		}
+
+		vhost->SetOwner(na);
+		vhost->SetIdent(user);
+		vhost->SetHost(host);
+		vhost->SetCreator(source.GetNick());
+		vhost->SetCreated(Anope::CurTime);
+
+		na->SetVHost(vhost);
+
 		this->Sync(na);
 		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, na);
 		if (!user.empty())
-			source.Reply(_("Vhost for group \002{0}\002 set to \002{1}\002@\002{2}\002."), nick.c_str(), user.c_str(), host.c_str());
+			source.Reply(_("Vhost for group \002{0}\002 set to \002{1}\002@\002{2}\002."), na->GetAccount()->GetDisplay(), user, host);
 		else
-			source.Reply(_("host for group \002{0}\002 set to \002{1}\002."), nick.c_str(), host.c_str());
+			source.Reply(_("host for group \002{0}\002 set to \002{1}\002."), na->GetAccount()->GetDisplay(), host);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -22,6 +22,7 @@
 #include "event.h"
 #include "service.h"
 #include "serialize.h"
+#include "hostserv.h"
 
 namespace NickServ
 {
@@ -169,27 +170,8 @@ namespace NickServ
 		virtual Account *GetAccount() anope_abstract;
 		virtual void SetAccount(Account *acc) anope_abstract;
 
-		/** Set a vhost for the user
-		 * @param ident The ident
-		 * @param host The host
-		 * @param creator Who created the vhost
-		 * @param time When the vhost was craated
-		 */
-		virtual void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime) anope_abstract;
-		virtual void RemoveVhost() anope_abstract;
-		virtual bool HasVhost() anope_abstract;
-
-		virtual Anope::string GetVhostIdent() anope_abstract;
-		virtual void SetVhostIdent(const Anope::string &) anope_abstract;
-
-		virtual Anope::string GetVhostHost() anope_abstract;
-		virtual void SetVhostHost(const Anope::string &) anope_abstract;
-
-		virtual Anope::string GetVhostCreator() anope_abstract;
-		virtual void SetVhostCreator(const Anope::string &) anope_abstract;
-
-		virtual time_t GetVhostCreated() anope_abstract;
-		virtual void SetVhostCreated(const time_t &) anope_abstract;
+		virtual HostServ::VHost *GetVHost() anope_abstract;
+		virtual void SetVHost(HostServ::VHost *) anope_abstract;
 	};
 
 	/* A registered account. Each account must have a Nick with the same nick as the

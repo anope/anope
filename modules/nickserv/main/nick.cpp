@@ -136,64 +136,12 @@ void NickImpl::SetAccount(NickServ::Account *acc)
 	Set(&NickType::nc, acc);
 }
 
-void NickImpl::SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created)
+HostServ::VHost *NickImpl::GetVHost()
 {
-	Set(&NickType::vhost_ident, ident);
-	Set(&NickType::vhost_host, host);
-	Set(&NickType::vhost_creator, creator);
-	Set(&NickType::vhost_created, created);
+	return Get(&NickType::vhost);
 }
 
-void NickImpl::RemoveVhost()
+void NickImpl::SetVHost(HostServ::VHost *vhost)
 {
-	Anope::string e;
-	Set(&NickType::vhost_ident, e);
-	Set(&NickType::vhost_host, e);
-	Set(&NickType::vhost_creator, e);
-	Set(&NickType::vhost_created, 0);
-}
-
-bool NickImpl::HasVhost()
-{
-	return !GetVhostHost().empty();
-}
-
-Anope::string NickImpl::GetVhostIdent()
-{
-	return Get(&NickType::vhost_ident);
-}
-
-void NickImpl::SetVhostIdent(const Anope::string &i)
-{
-	Set(&NickType::vhost_ident, i);
-}
-
-Anope::string NickImpl::GetVhostHost()
-{
-	return Get(&NickType::vhost_host);
-}
-
-void NickImpl::SetVhostHost(const Anope::string &h)
-{
-	Set(&NickType::vhost_host, h);
-}
-
-Anope::string NickImpl::GetVhostCreator()
-{
-	return Get(&NickType::vhost_creator);
-}
-
-void NickImpl::SetVhostCreator(const Anope::string &c)
-{
-	Set(&NickType::vhost_creator, c);
-}
-
-time_t NickImpl::GetVhostCreated()
-{
-	return Get(&NickType::vhost_created);
-}
-
-void NickImpl::SetVhostCreated(const time_t &cr)
-{
-	Set(&NickType::vhost_created, cr);
+	Set(&NickType::vhost, vhost);
 }

@@ -33,12 +33,13 @@ bool WebCPanel::HostServ::Request::OnRequest(HTTPProvider *server, const Anope::
 		WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "HostServ", "hostserv/request", params, replacements, "CMDR");
 	}
 
-	if (na->HasVhost())
+	::HostServ::VHost *vhost = na->GetVHost();
+	if (vhost != nullptr)
 	{
-		if (na->GetVhostIdent().empty() == false)
-			replacements["VHOST"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
+		if (vhost->GetIdent().empty() == false)
+			replacements["VHOST"] = vhost->GetIdent() + "@" + vhost->GetHost();
 		else
-			replacements["VHOST"] = na->GetVhostHost();
+			replacements["VHOST"] = vhost->GetHost();
 	}
 	if (ServiceReference<Command>("hostserv/request"))
 		replacements["CAN_REQUEST"] = "YES";

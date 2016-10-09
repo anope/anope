@@ -37,13 +37,10 @@ class NickType : public Serialize::Type<NickImpl>
 	Serialize::Field<NickImpl, time_t> time_registered;
 	Serialize::Field<NickImpl, time_t> last_seen;
 
-	Serialize::Field<NickImpl, Anope::string> vhost_ident;
-	Serialize::Field<NickImpl, Anope::string> vhost_host;
-	Serialize::Field<NickImpl, Anope::string> vhost_creator;
-	Serialize::Field<NickImpl, time_t> vhost_created;
-
 	/* Account this nick is tied to. Multiple nicks can be tied to a single account. */
 	Serialize::ObjectField<NickImpl, NickServ::Account *> nc;
+
+	Serialize::ObjectField<NickImpl, HostServ::VHost *> vhost;
 
  	NickType(Module *);
 

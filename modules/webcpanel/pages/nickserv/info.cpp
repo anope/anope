@@ -100,13 +100,16 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 	if (na->GetAccount()->GetEmail().empty() == false)
 		replacements["EMAIL"] = HTTPUtils::Escape(na->GetAccount()->GetEmail());
 	replacements["TIME_REGISTERED"] = Anope::strftime(na->GetTimeRegistered(), na->GetAccount());
-	if (na->HasVhost())
+
+	::HostServ::VHost *vhost = na->GetVHost();
+	if (vhost != nullptr)
 	{
-		if (na->GetVhostIdent().empty() == false)
-			replacements["VHOST"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
+		if (vhost->GetIdent().empty() == false)
+			replacements["VHOST"] = vhost->GetIdent() + "@" + vhost->GetHost();
 		else
-			replacements["VHOST"] = na->GetVhostHost();
+			replacements["VHOST"] = vhost->GetHost();
 	}
+
 	Anope::string *greet = na->GetAccount()->GetExt<Anope::string>("greet");
 	if (greet)
 		replacements["GREET"] = HTTPUtils::Escape(*greet);

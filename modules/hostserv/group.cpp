@@ -30,13 +30,29 @@ class CommandHSGroup : public Command
 		if (setting)
 			return;
 
-		if (!na || !na->HasVhost())
+		HostServ::VHost *v = na->GetVHost();
+
+		if (v == nullptr)
 			return;
 
 		setting = true;
 		for (NickServ::Nick *nick : na->GetAccount()->GetRefs<NickServ::Nick *>())
 		{
-			nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
+			if (nick == na)
+				continue;
+
+			HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
+			if (vhost == nullptr)
+				continue;
+
+			vhost->SetOwner(nick);
+			vhost->SetIdent(v->GetIdent());
+			vhost->SetHost(v->GetHost());
+			vhost->SetCreator(v->GetCreator());
+			vhost->SetCreated(Anope::CurTime);
+
+			nick->SetVHost(vhost);
+
 			EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, nick);
 		}
 		setting = false;
@@ -62,17 +78,18 @@ class CommandHSGroup : public Command
 			return;
 		}
 
-		if (!na->HasVhost())
+		HostServ::VHost *vhost = na->GetVHost();
+		if (vhost == nullptr)
 		{
 			source.Reply(_("There is no vhost assigned to this nickname."));
 			return;
 		}
 
 		this->Sync(na);
-		if (!na->GetVhostIdent().empty())
-			source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002@\002{2}\002."), source.nc->GetDisplay(), na->GetVhostIdent(), na->GetVhostHost());
+		if (!vhost->GetIdent().empty())
+			source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002@\002{2}\002."), source.nc->GetDisplay(), vhost->GetIdent(), vhost->GetHost());
 		else
-			source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002."), source.nc->GetDisplay(), na->GetVhostHost());
+			source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002."), source.nc->GetDisplay(), vhost->GetHost());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

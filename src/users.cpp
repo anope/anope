@@ -340,7 +340,15 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 		Anope::string buf;
 		for (Anope::string word; ssep.GetToken(word);)
 		{
-			Anope::string add = buf.empty() ? word : " " + word;
+			Anope::string add;
+			if (word.empty()) // was two spaces
+				word = " ";
+
+			if (buf.empty() || buf[buf.length() - 1] == ' ')
+				add = word;
+			else
+				add = " " + word;
+
 			if (buf.length() + add.length() > Config->LineWrap)
 			{
 				if (send_privmsg)
@@ -348,8 +356,10 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 				else
 					IRCD->SendNotice(source, this->GetUID(), "%s", buf.c_str());
 				buf.clear();
+
 				add = word;
 			}
+
 			buf.append(add);
 		}
 

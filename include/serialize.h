@@ -279,7 +279,7 @@ class CoreExport Serialize::TypeBase : public Service
 
 	static TypeBase *Find(const Anope::string &name);
 
-	static const std::vector<TypeBase *>& GetTypes();
+	static std::vector<TypeBase *> GetTypes();
 };
 
 template<typename T, typename Base = Serialize::TypeBase>

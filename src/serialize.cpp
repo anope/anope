@@ -255,7 +255,7 @@ TypeBase *TypeBase::Find(const Anope::string &name)
 	return ServiceManager::Get()->FindService<TypeBase *>(name);
 }
 
-const std::vector<TypeBase *>& TypeBase::GetTypes()
+std::vector<TypeBase *> TypeBase::GetTypes()
 {
 	return ServiceManager::Get()->FindServices<TypeBase *>();
 }

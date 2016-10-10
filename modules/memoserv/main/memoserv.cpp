@@ -98,7 +98,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		User *sender = User::Find(source, true);
 		if (sender != NULL && !sender->HasPriv("memoserv/no-limit") && !force)
 		{
-			time_t send_delay = Config->GetModule("memoserv")->Get<time_t>("senddelay");
+			time_t send_delay = Config->GetModule("memoserv/main")->Get<time_t>("senddelay");
 			if (send_delay > 0 && sender->lastmemosend + send_delay > Anope::CurTime)
 				return MEMO_TOO_FAST;
 			else if (!mi->GetMemoMax())

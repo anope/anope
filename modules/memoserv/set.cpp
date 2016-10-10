@@ -167,7 +167,7 @@ class CommandMSSet : public Command
 				source.Reply(_("You are not permitted to change your memo limit."));
 				return;
 			}
-			int max_memos = Config->GetModule("memoserv")->Get<int>("maxmemos");
+			int max_memos = Config->GetModule("memoserv/main")->Get<int>("maxmemos");
 			limit = -1;
 			try
 			{
@@ -272,7 +272,7 @@ class CommandMSSet : public Command
 			               "\002ON\002 is essentially \002LOGON\002 and \002NEW\002 combined."));
 		else if (subcommand.equals_ci("LIMIT"))
 		{
-			int max_memos = Config->GetModule("memoserv")->Get<int>("maxmemos");
+			int max_memos = Config->GetModule("memoserv/main")->Get<int>("maxmemos");
 			if (source.IsServicesOper())
 				source.Reply(_("Syntax: \002LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]\002\n"
 				               "\n"

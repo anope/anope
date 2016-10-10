@@ -58,7 +58,7 @@ class CommandMSSend : public Command
 		else if (result == MemoServ::MemoServService::MEMO_INVALID_TARGET)
 			source.Reply(_("\002{0}\002 is not a registered unforbidden nick or channel."), nick);
 		else if (result == MemoServ::MemoServService::MEMO_TOO_FAST)
-			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), Config->GetModule("memoserv")->Get<time_t>("senddelay"), source.command);
+			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), Config->GetModule("memoserv/main")->Get<time_t>("senddelay"), source.command);
 		else if (result == MemoServ::MemoServService::MEMO_TARGET_FULL)
 			source.Reply(_("Sorry, \002{0}\002 currently has too many memos and cannot receive more."), nick);
 	}

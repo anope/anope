@@ -204,7 +204,7 @@ class CommandHSRequest : public Command
 			return;
 		}
 
-		time_t send_delay = Config->GetModule("memoserv")->Get<time_t>("senddelay");
+		time_t send_delay = Config->GetModule("memoserv/main")->Get<time_t>("senddelay");
 		if (Config->GetModule(this->GetOwner())->Get<bool>("memooper") && send_delay > 0 && u && u->lastmemosend + send_delay > Anope::CurTime)
 		{
 			source.Reply(_("Please wait %d seconds before requesting a new vHost."), send_delay);

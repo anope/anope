@@ -215,7 +215,7 @@ class CommandHSRequest : public Command
 		unsigned int max_vhosts = Config->GetModule("hostserv/main")->Get<unsigned int>("max_vhosts");
 		if (max_vhosts && max_vhosts >= u->Account()->GetRefs<HostServ::VHost *>().size())
 		{
-			source.Reply(_("You already has the maximum number of vhosts allowed (\002{0}\002)."), max_vhosts);
+			source.Reply(_("You already have the maximum number of vhosts allowed (\002{0}\002)."), max_vhosts);
 			return;
 		}
 

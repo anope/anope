@@ -308,7 +308,7 @@ class CommandCSSetFounder : public Command
 		}
 
 		NickServ::Account *nc = na->GetAccount();
-		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
+		unsigned max_reg = Config->GetModule("chanserv/main")->Get<unsigned>("maxregistered");
 		if (max_reg && nc->GetChannelCount() >= max_reg && !source.HasPriv("chanserv/no-register-limit"))
 		{
 			source.Reply(_("\002{0}\002 has too many channels registered."), na->GetNick());
@@ -468,7 +468,7 @@ class CommandCSSetPeace : public Command
 inline static Anope::string BotModes()
 {
 	return Config->GetModule("botserv")->Get<Anope::string>("botmodes",
-		Config->GetModule("chanserv")->Get<Anope::string>("botmodes", "o")
+		Config->GetModule("chanserv/main")->Get<Anope::string>("botmodes", "o")
 	);
 }
 

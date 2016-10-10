@@ -159,7 +159,7 @@ class CommandCSAKick : public Command
 		Anope::string reason = params.size() > 3 ? params[3] : "";
 		NickServ::Nick *na = NickServ::FindNick(mask);
 		NickServ::Account *nc = NULL;
-		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		unsigned reasonmax = Config->GetModule("chanserv/main")->Get<unsigned>("reasonmax", "200");
 
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);

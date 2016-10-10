@@ -113,7 +113,7 @@ class CommandCSFlags : public Command
 
 		if (IRCD->IsChannelValid(mask))
 		{
-			if (Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
+			if (Config->GetModule("chanserv/main")->Get<bool>("disallow_channel_access"))
 			{
 				source.Reply(_("Channels may not be on access lists."));
 				return;
@@ -136,7 +136,7 @@ class CommandCSFlags : public Command
 		else
 		{
 			na = NickServ::FindNick(mask);
-			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+			if (!na && Config->GetModule("chanserv/main")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
@@ -189,7 +189,7 @@ class CommandCSFlags : public Command
 			}
 		}
 
-		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
+		unsigned access_max = Config->GetModule("chanserv/main")->Get<unsigned>("accessmax", "1024");
 		if (access_max && ci->GetAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have \002{0}\002 access entries on a channel, including access entries from other channels."), access_max);

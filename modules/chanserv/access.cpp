@@ -157,7 +157,7 @@ class CommandCSAccess : public Command
 
 		NickServ::Nick *na = NickServ::FindNick(mask);
 
-		if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+		if (!na && Config->GetModule("chanserv/main")->Get<bool>("disallow_hostmask_access"))
 		{
 			source.Reply(_("Masks and unregistered users may not be on access lists."));
 			return;
@@ -194,7 +194,7 @@ class CommandCSAccess : public Command
 			}
 		}
 
-		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
+		unsigned access_max = Config->GetModule("chanserv/main")->Get<unsigned>("accessmax", "1024");
 		if (access_max && ci->GetAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
@@ -554,7 +554,7 @@ class CommandCSAccess : public Command
 			               " Use of this command requires the \002{4}\002 privilege on \037channel\037."),
 			               source.command, ChanServ::ACCESS_INVALID + 1, ChanServ::ACCESS_FOUNDER - 1, "AUTOOP", "ACCESS_CHANGE");
 
-			if (!Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
+			if (!Config->GetModule("chanserv/main")->Get<bool>("disallow_channel_access"))
 				source.Reply(_("The given \037mask\037 may also be a channel, which will use the access list from the other channel up to the given \037level\037."));
 
 			//XXX show def levels

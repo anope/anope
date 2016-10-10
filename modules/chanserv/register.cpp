@@ -86,7 +86,7 @@ class CommandCSRegister : public Command
 			return;
 		}
 
-		unsigned maxregistered = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
+		unsigned maxregistered = Config->GetModule("chanserv/main")->Get<unsigned>("maxregistered");
 		if (maxregistered && nc->GetChannelCount() >= maxregistered && !source.HasPriv("chanserv/no-register-limit"))
 		{
 			if (nc->GetChannelCount() > maxregistered)

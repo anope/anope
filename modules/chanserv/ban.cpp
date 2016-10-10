@@ -105,11 +105,11 @@ class CommandCSBan : public Command
 				reason += " " + params[3];
 		}
 
-		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		unsigned reasonmax = Config->GetModule("chanserv/main")->Get<unsigned>("reasonmax", "200");
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 
-		Anope::string signkickformat = Config->GetModule("chanserv")->Get<Anope::string>("signkickformat", "%m (%n)");
+		Anope::string signkickformat = Config->GetModule("chanserv/main")->Get<Anope::string>("signkickformat", "%m (%n)");
 		signkickformat = signkickformat.replace_all_cs("%n", source.GetNick());
 
 		User *u = source.GetUser();

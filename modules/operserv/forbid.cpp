@@ -317,7 +317,7 @@ class CommandOSForbid : public Command
 						ServiceBot *OperServ = Config->GetClient("OperServ");
 						if (IRCD->CanSQLineChannel && OperServ)
 						{
-							time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "15s");
+							time_t inhabit = Config->GetModule("chanserv/main")->Get<time_t>("inhabit", "15s");
 #warning "xline allocated on stack"
 #if 0
 							XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->GetReason());
@@ -512,7 +512,7 @@ class OSForbid : public Module
 		{
 			if (IRCD->CanSQLineChannel)
 			{
-				time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "15s");
+				time_t inhabit = Config->GetModule("chanserv/main")->Get<time_t>("inhabit", "15s");
 #warning "xline allocated on stack"
 #if 0
 				XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->GetReason());

@@ -138,7 +138,7 @@ public:
 		else if (what.equals_ci("ACCESS"))
 		{
 			std::set<Anope::string> masks;
-			unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
+			unsigned access_max = Config->GetModule("chanserv/main")->Get<unsigned>("accessmax", "1024");
 			unsigned count = 0;
 
 			for (unsigned i = 0; i < target_ci->GetAccessCount(); ++i)

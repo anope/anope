@@ -72,7 +72,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->GetDisplay();
 			}
 
-			if (Config->GetModule("ns_recover")->Get<bool>("restoreonrecover"))
+			if (Config->GetModule("nickserv/recover")->Get<bool>("restoreonrecover"))
 			{
 				if (!u->chans.empty())
 				{

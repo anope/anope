@@ -380,7 +380,7 @@ class OSDefcon : public Module
 		dconfig.message = block->Get<Anope::string>("message");
 		dconfig.offmessage = block->Get<Anope::string>("offmessage");
 
-		block = conf->GetModule("os_session");
+		block = conf->GetModule("operserv/session");
 
 		dconfig.max_session_kill = block->Get<int>("maxsessionkill");
 		dconfig.session_autokill_expiry = block->Get<time_t>("sessionautokillexpiry");

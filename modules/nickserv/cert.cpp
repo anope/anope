@@ -345,7 +345,7 @@ class NSCert : public Module
 		if (!nc || nc->HasFieldS("NS_SUSPENDED"))
 			return;
 
-		unsigned int maxlogins = Config->GetModule("ns_identify")->Get<unsigned int>("maxlogins");
+		unsigned int maxlogins = Config->GetModule("nickserv/identify")->Get<unsigned int>("maxlogins");
 		if (maxlogins && nc->users.size() >= maxlogins)
 		{
 			u->SendMessage(NickServ, _("Account \002{0}\002 has already reached the maximum number of simultaneous logins ({1})."), nc->GetDisplay(), maxlogins);
@@ -371,7 +371,7 @@ class NSCert : public Module
 		{
 			ServiceBot *NickServ = Config->GetClient("NickServ");
 
-			unsigned int maxlogins = Config->GetModule("ns_identify")->Get<unsigned int>("maxlogins");
+			unsigned int maxlogins = Config->GetModule("nickserv/identify")->Get<unsigned int>("maxlogins");
 			if (maxlogins && na->GetAccount()->users.size() >= maxlogins)
 			{
 				u->SendMessage(NickServ, _("Account \002{0}\002 has already reached the maximum number of simultaneous logins ({1})."), na->GetAccount()->GetDisplay(), maxlogins);

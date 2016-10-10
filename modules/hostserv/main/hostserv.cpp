@@ -18,9 +18,10 @@
  */
 
 #include "module.h"
-#include "modules/nickserv/update.h"
-#include "modules/hostserv/del.h"
 #include "modules/help.h"
+#include "modules/nickserv/update.h"
+#include "modules/nickserv/info.h"
+#include "modules/hostserv/del.h"
 #include "vhosttype.h"
 
 class HostServCore : public Module
@@ -29,6 +30,7 @@ class HostServCore : public Module
 	, public EventHook<Event::Help>
 	, public EventHook<Event::SetVhost>
 	, public EventHook<Event::DeleteVhost>
+	, public EventHook<Event::NickInfo>
 {
 	Reference<ServiceBot> HostServ;
 
@@ -41,6 +43,7 @@ class HostServCore : public Module
 		, EventHook<Event::Help>(this)
 		, EventHook<Event::SetVhost>(this)
 		, EventHook<Event::DeleteVhost>(this)
+		, EventHook<Event::NickInfo>(this)
 		, vhost_type(this)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
@@ -148,6 +151,17 @@ class HostServCore : public Module
 
 			if (u && u->Account() == na->GetAccount())
 				IRCD->SendVhostDel(u);
+		}
+	}
+
+	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override
+	{
+		if (show_hidden || source.HasPriv("hostserv/auspex"))
+		{
+			for (HostServ::VHost *vhost : na->GetAccount()->GetRefs<HostServ::VHost *>())
+			{
+				info[_("VHost")] = vhost->Mask() + (vhost->IsDefault() ? " (default)" : "");
+			}
 		}
 	}
 };

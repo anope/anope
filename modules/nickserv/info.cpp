@@ -107,14 +107,6 @@ class CommandNSInfo : public Command
 		if (!na->GetAccount()->GetEmail().empty() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_EMAIL")))
 			info[_("Email address")] = na->GetAccount()->GetEmail();
 
-		if (source.HasPriv("hostserv/auspex"))
-		{
-			for (HostServ::VHost *vhost : na->GetAccount()->GetRefs<HostServ::VHost *>())
-			{
-				info[_("VHost")] = vhost->Mask() + (vhost->IsDefault() ? " (default)" : "");
-			}
-		}
-
 		EventManager::Get()->Dispatch(&Event::NickInfo::OnNickInfo, source, na, info, show_hidden);
 
 		std::vector<Anope::string> replies;

@@ -160,7 +160,7 @@ class CommandNSSuspend : public Command
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && na->GetAccount()->IsServicesOper())
+		if (Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && na->GetAccount()->IsServicesOper())
 		{
 			source.Reply(_("You may not suspend other Services Operators' nicknames."));
 			return;

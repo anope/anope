@@ -217,7 +217,7 @@ Conf::Conf() : Block("")
 	this->StrictPrivmsg = !UseStrictPrivmsg ? "/msg " : "/";
 	{
 		std::vector<Anope::string> defaults;
-		spacesepstream(this->GetModule("nickserv")->Get<Anope::string>("defaults")).GetTokens(defaults);
+		spacesepstream(this->GetModule("nickserv/main")->Get<Anope::string>("defaults")).GetTokens(defaults);
 		this->DefPrivmsg = std::find(defaults.begin(), defaults.end(), "msg") != defaults.end();
 	}
 	this->DefLanguage = options->Get<Anope::string>("defaultlanguage");

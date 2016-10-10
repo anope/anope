@@ -148,9 +148,9 @@ class CommandNSSetPassword : public Command
 			return;
 		}
 
-		if (len > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
+		if (len > Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32"))
 		{
-			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"));
+			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32"));
 			return;
 		}
 
@@ -197,7 +197,7 @@ class CommandNSSASetPassword : public Command
 
 		size_t len = params[1].length();
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
+		if (Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the password of other Services Operators."));
 			return;
@@ -209,9 +209,9 @@ class CommandNSSASetPassword : public Command
 			return;
 		}
 
-		if (len > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
+		if (len > Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32"))
 		{
-			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"));
+			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32"));
 			return;
 		}
 
@@ -330,7 +330,7 @@ class CommandNSSetDisplay : public Command
 
 		NickServ::Nick *user_na = NickServ::FindNick(user), *na = NickServ::FindNick(param);
 
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership"))
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;
@@ -455,13 +455,13 @@ class CommandNSSetEmail : public Command
 			return;
 		}
 
-		if (param.empty() && Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+		if (param.empty() && Config->GetModule("nickserv/main")->Get<bool>("forceemail", "yes"))
 		{
 			source.Reply(_("You cannot unset the e-mail on this network."));
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
+		if (Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the e-mail of other Services Operators."));
 			return;
@@ -484,7 +484,7 @@ class CommandNSSetEmail : public Command
 			nc->SetEmail("");
 			source.Reply(_("E-mail address for \002{0}\002 unset."), nc->GetDisplay());
 		}
-		else if (Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
+		else if (Config->GetModule("nickserv/main")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
 		{
 			if (SendConfirmMail(source.GetUser(), source.service, param))
 				source.Reply(_("A confirmation e-mail has been sent to \002{0}\002. Follow the instructions in it to change your e-mail address."), param);
@@ -626,7 +626,7 @@ class CommandNSSetKill : public Command
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership"))
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;

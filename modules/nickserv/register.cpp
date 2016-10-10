@@ -64,7 +64,7 @@ class CommandNSConfirm : public Command
 				NickServ::Nick *u_na = NickServ::FindNick(u->nick);
 
 				/* Set +r if they're on a nick in the group */
-				if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && u_na && u_na->GetAccount() == na->GetAccount())
+				if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && u_na && u_na->GetAccount() == na->GetAccount())
 					u->SetMode(source.service, "REGISTERED");
 			}
 		}
@@ -91,7 +91,7 @@ class CommandNSConfirm : public Command
 				if (na)
 				{
 					IRCD->SendLogin(source.GetUser(), na);
-					if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->GetAccount() == source.GetAccount() && !na->GetAccount()->HasFieldS("UNCONFIRMED"))
+					if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && na->GetAccount() == source.GetAccount() && !na->GetAccount()->HasFieldS("UNCONFIRMED"))
 						source.GetUser()->SetMode(source.service, "REGISTERED");
 				}
 			}
@@ -120,7 +120,7 @@ class CommandNSRegister : public Command
 	CommandNSRegister(Module *creator) : Command(creator, "nickserv/register", 1, 2)
 	{
 		this->SetDesc(_("Register a nickname"));
-		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+		if (Config->GetModule("nickserv/main")->Get<bool>("forceemail", "yes"))
 			this->SetSyntax(_("\037password\037 \037email\037"));
 		else
 			this->SetSyntax(_("\037password\037 \037[email]\037"));
@@ -149,7 +149,7 @@ class CommandNSRegister : public Command
 		}
 
 		time_t nickregdelay = Config->GetModule(this->GetOwner())->Get<time_t>("nickregdelay");
-		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
+		time_t reg_delay = Config->GetModule("nickserv/main")->Get<time_t>("regdelay");
 		if (u && !u->HasMode("OPER") && nickregdelay && Anope::CurTime - u->timestamp < nickregdelay)
 		{
 			source.Reply(_("You must have been using this nickname for at least {0} seconds to register."), nickregdelay);
@@ -161,7 +161,7 @@ class CommandNSRegister : public Command
 		/* Guest nick can now have a series of between 1 and 7 digits.
 		 *   --lara
 		 */
-		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<Anope::string>("guestnickprefix", "Guest");
+		const Anope::string &guestnick = Config->GetModule("nickserv/main")->Get<Anope::string>("guestnickprefix", "Guest");
 		if (nicklen <= guestnick.length() + 7 && nicklen >= guestnick.length() + 1 && !u_nick.find_ci(guestnick) && u_nick.substr(guestnick.length()).find_first_not_of("1234567890") == Anope::string::npos)
 		{
 			source.Reply(_("\002{0}\002 may not be registered."), u_nick);
@@ -180,7 +180,7 @@ class CommandNSRegister : public Command
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
+		if (Config->GetModule("nickserv/main")->Get<bool>("restrictopernicks"))
 			for (Oper *o : Serialize::GetObjects<Oper *>())
 			{
 				if (!source.IsOper() && u_nick.find_ci(o->GetName()) != Anope::string::npos)
@@ -190,9 +190,9 @@ class CommandNSRegister : public Command
 				}
 			}
 
-		unsigned int passlen = Config->GetModule("nickserv")->Get<unsigned>("passlen", "32");
+		unsigned int passlen = Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32");
 
-		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
+		if (Config->GetModule("nickserv/main")->Get<bool>("forceemail", "yes") && email.empty())
 		{
 			this->OnSyntaxError(source, "");
 			return;
@@ -217,9 +217,9 @@ class CommandNSRegister : public Command
 			return;
 		}
 
-		if (pass.length() > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
+		if (pass.length() > Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32"))
 		{
-			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"));
+			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32"));
 			return;
 		}
 
@@ -284,7 +284,7 @@ class CommandNSRegister : public Command
 		source.Reply(_("Registers your nickname. Once your nickname is registered, you will be able to use most features of services, including owning and managing channels."
 		               "Make sure you remember the password - you'll need it to identify yourself later. Your email address will only be used if you forget your password."));
 
-		if (!Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+		if (!Config->GetModule("nickserv/main")->Get<bool>("forceemail", "yes"))
 		{
 			source.Reply(" ");
 			source.Reply(_("The \037email\037 parameter is optional and will set the email\n"
@@ -294,7 +294,7 @@ class CommandNSRegister : public Command
 					"after registering if it isn't the default setting already."));
 		}
 
-		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership"))
 		{
 			source.Reply(" ");
 			source.Reply(_("This command also creates a new group for your nickname, which will allow you to group other nicknames later, which share the same configuration, the same set of memos and the same channel privileges."));

@@ -55,7 +55,7 @@ class CommandNSDrop : public Command
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->GetAccount()->IsServicesOper())
+		if (Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && !is_mine && na->GetAccount()->IsServicesOper())
 		{
 			source.Reply(_("You may not drop other Services Operators' nicknames."));
 			return;

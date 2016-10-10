@@ -25,7 +25,7 @@ bool WebCPanel::Register::OnRequest(HTTPProvider *server, const Anope::string &p
 
 	replacements["TITLE"] = page_title;
 
-	if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+	if (Config->GetModule("nickserv/main")->Get<bool>("forceemail", "yes"))
 		replacements["FORCE_EMAIL"] = "yes";
 
 	TemplateFileServer page("register.html");

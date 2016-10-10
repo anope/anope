@@ -121,7 +121,7 @@ class CommandNSGroup : public Command
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
+		if (Config->GetModule("nickserv/main")->Get<bool>("restrictopernicks"))
 			for (Oper *o : Serialize::GetObjects<Oper *>())
 			{
 				if (!u->HasMode("OPER") && u->nick.find_ci(o->GetName()) != Anope::string::npos)
@@ -132,8 +132,8 @@ class CommandNSGroup : public Command
 			}
 
 		NickServ::Nick *target, *na = NickServ::FindNick(u->nick);
-		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<Anope::string>("guestnickprefix", "Guest");
-		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
+		const Anope::string &guestnick = Config->GetModule("nickserv/main")->Get<Anope::string>("guestnickprefix", "Guest");
+		time_t reg_delay = Config->GetModule("nickserv/main")->Get<time_t>("regdelay");
 		unsigned maxaliases = Config->GetModule(this->GetOwner())->Get<unsigned>("maxaliases");
 		if (!(target = NickServ::FindNick(nick)))
 		{
@@ -324,8 +324,8 @@ class CommandNSGList : public Command
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
-		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire", "21d"),
-		       unconfirmed_expire = Config->GetModule("nickserv")->Get<time_t>("unconfirmedexpire", "1d");
+		time_t nickserv_expire = Config->GetModule("nickserv/main")->Get<time_t>("expire", "21d"),
+		       unconfirmed_expire = Config->GetModule("nickserv/main")->Get<time_t>("unconfirmedexpire", "1d");
 		for (NickServ::Nick *na2 : nc->GetRefs<NickServ::Nick *>())
 		{
 			Anope::string expires;
@@ -381,7 +381,7 @@ class NSGroup : public Module
 		, commandnsungroup(this)
 		, commandnsglist(this)
 	{
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 	}
 };

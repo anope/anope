@@ -91,6 +91,13 @@ class CommandHSAdd : public Command
 			return;
 		}
 
+		unsigned int max_vhosts = Config->GetModule("hostserv/main")->Get<unsigned int>("max_vhosts");
+		if (max_vhosts && max_vhosts >= na->GetAccount()->GetRefs<HostServ::VHost *>().size())
+		{
+			source.Reply(_("\002{0}\002 already has the maximum number of vhosts allowed (\002{1}\002)."), na->GetAccount()->GetDisplay(), max_vhosts);
+			return;
+		}
+
 		Anope::string mask = (!user.empty() ? user + "@" : "") + host;
 		Log(LOG_ADMIN, source, this) << "to add the vhost " << mask << " to " << na->GetAccount()->GetDisplay();
 

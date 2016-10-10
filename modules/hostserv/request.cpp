@@ -212,6 +212,13 @@ class CommandHSRequest : public Command
 			return;
 		}
 
+		unsigned int max_vhosts = Config->GetModule("hostserv/main")->Get<unsigned int>("max_vhosts");
+		if (max_vhosts && max_vhosts >= u->Account()->GetRefs<HostServ::VHost *>().size())
+		{
+			source.Reply(_("You already has the maximum number of vhosts allowed (\002{0}\002)."), max_vhosts);
+			return;
+		}
+
 		HostRequest *req = u->Account()->GetRef<HostRequest *>();
 		if (req != nullptr)
 			req->Delete(); // delete old request
@@ -265,7 +272,14 @@ class CommandHSActivate : public Command
 		HostRequest *req = na->GetAccount()->GetRef<HostRequest *>();
 		if (!req)
 		{
-			source.Reply(_("\002{0}\002 does not have a pending vhost request."), na->GetNick());
+			source.Reply(_("\002{0}\002 does not have a pending vhost request."), na->GetAccount()->GetDisplay());
+			return;
+		}
+
+		unsigned int max_vhosts = Config->GetModule("hostserv/main")->Get<unsigned int>("max_vhosts");
+		if (max_vhosts && max_vhosts >= na->GetAccount()->GetRefs<HostServ::VHost *>().size())
+		{
+			source.Reply(_("\002{0}\002 already has the maximum number of vhosts allowed (\002{1}\002)."), na->GetAccount()->GetDisplay(), max_vhosts);
 			return;
 		}
 

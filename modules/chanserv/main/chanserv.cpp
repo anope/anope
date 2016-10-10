@@ -524,7 +524,7 @@ class ChanServCore : public Module
 						ci->WhoSends()->Assign(NULL, ci);
 					if (ci->c->FindUser(ci->GetBot()) == NULL)
 					{
-						Anope::string botmodes = Config->GetModule("botserv")->Get<Anope::string>("botmodes",
+						Anope::string botmodes = Config->GetModule("botserv/main")->Get<Anope::string>("botmodes",
 								Config->GetModule("chanserv/main")->Get<Anope::string>("botmodes"));
 						ChannelStatus status(botmodes);
 						ci->GetBot()->Join(ci->c, &status);

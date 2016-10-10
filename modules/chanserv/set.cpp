@@ -467,7 +467,7 @@ class CommandCSSetPeace : public Command
 
 inline static Anope::string BotModes()
 {
-	return Config->GetModule("botserv")->Get<Anope::string>("botmodes",
+	return Config->GetModule("botserv/main")->Get<Anope::string>("botmodes",
 		Config->GetModule("chanserv/main")->Get<Anope::string>("botmodes", "o")
 	);
 }

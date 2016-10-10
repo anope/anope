@@ -1605,7 +1605,7 @@ class BSKick : public Module
 
 			/* Normalize the buffer */
 			Anope::string nbuf = Anope::NormalizeBuffer(realbuf);
-			bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
+			bool casesensitive = Config->GetModule("botserv/main")->Get<bool>("casesensitive");
 
 			/* Normalize can return an empty string if this only conains control codes etc */
 			if (badwords && !nbuf.empty())

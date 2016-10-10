@@ -48,7 +48,7 @@ class CommandOSChanKill : public Command
 			last_param = 2;
 		}
 
-		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d");
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv/main")->Get<time_t>("autokillexpiry", "30d");
 		if (!expiry.empty() && isdigit(expiry[expiry.length() - 1]))
 			expires *= 86400;
 
@@ -74,7 +74,7 @@ class CommandOSChanKill : public Command
 			reason += params[last_param + 1];
 
 		Anope::string realreason;
-		if (Config->GetModule("operserv")->Get<bool>("addakiller") && !source.GetNick().empty())
+		if (Config->GetModule("operserv/main")->Get<bool>("addakiller") && !source.GetNick().empty())
 			realreason = "[" + source.GetNick() + "] " + reason;
 		else
 			realreason = reason;

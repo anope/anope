@@ -168,7 +168,7 @@ class CommandOSSXLineBase : public Command
 	{
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Created")).AddColumn(_("Expires"));
-		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+		if (Config->GetModule("operserv/main")->Get<bool>("akillids"))
 			list.AddColumn(_("ID"));
 		list.AddColumn(_("Reason"));
 
@@ -241,7 +241,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			last_param = 3;
 		}
 
-		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("snlineexpiry", "30d");
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv/main")->Get<time_t>("snlineexpiry", "30d");
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -310,7 +310,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		if (mask[masklen - 1] == ' ')
 			mask.erase(masklen - 1);
 
-		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+		if (Config->GetModule("operserv/main")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
 		if (mask.find_first_not_of("/.*?") == Anope::string::npos)
@@ -328,7 +328,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		x->SetExpires(expires);
 		x->SetReason(reason);
 
-		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+		if (Config->GetModule("operserv/main")->Get<bool>("akillids"))
 			x->SetID(XLineManager::GenerateUID());
 
 		unsigned int affected = 0;
@@ -355,7 +355,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 		this->xlm()->AddXLine(x);
 
-		if (Config->GetModule("operserv")->Get<bool>("killonsnline", "yes"))
+		if (Config->GetModule("operserv/main")->Get<bool>("killonsnline", "yes"))
 		{
 			Anope::string rreason = "G-Lined: " + reason;
 
@@ -398,7 +398,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			               " To add a {0} which does not expire, use \037+0\037."
 			               " The default {0} expiry time is \002{1}\002."
 			               " Because the real name may contain spaces, the separator between it and the reason is a \002colon\002."),
-			               source.command, Anope::Duration(Config->GetModule("operserv")->Get<time_t>("snlineexpiry", "30d"), source.GetAccount()));
+			               source.command, Anope::Duration(Config->GetModule("operserv/main")->Get<time_t>("snlineexpiry", "30d"), source.GetAccount()));
 
 			const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 			if (!regexengine.empty())
@@ -471,7 +471,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			last_param = 3;
 		}
 
-		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("sqlineexpiry", "30d");
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv/main")->Get<time_t>("sqlineexpiry", "30d");
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -522,7 +522,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			}
 		}
 
-		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+		if (Config->GetModule("operserv/main")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
 		if (mask.find_first_not_of("./?*") == Anope::string::npos)
@@ -540,7 +540,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		x->SetExpires(expires);
 		x->SetReason(reason);
 
-		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+		if (Config->GetModule("operserv/main")->Get<bool>("akillids"))
 			x->SetID(XLineManager::GenerateUID());
 
 		unsigned int affected = 0;
@@ -567,7 +567,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 		this->xlm()->AddXLine(x);
 
-		if (Config->GetModule("operserv")->Get<bool>("killonsqline", "yes"))
+		if (Config->GetModule("operserv/main")->Get<bool>("killonsqline", "yes"))
 		{
 			Anope::string rreason = "Q-Lined: " + reason;
 
@@ -635,7 +635,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			               " If a unit specifier is not included, the default is days, so \037+30\037 by itself means 30 days."
 			               " To add a {0} which does not expire, use \037+0\037."
 			               " The default {0} expiry time is \002{1}\002."),
-			               source.command, Anope::Duration(Config->GetModule("operserv")->Get<time_t>("sqlineexpiry", "30d"), source.GetAccount()));
+			               source.command, Anope::Duration(Config->GetModule("operserv/main")->Get<time_t>("sqlineexpiry", "30d"), source.GetAccount()));
 
 			const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 			if (!regexengine.empty())

@@ -42,7 +42,7 @@ class CommandOSKill : public Command
 		{
 			if (reason.empty())
 				reason = "No reason specified";
-			if (Config->GetModule("operserv")->Get<bool>("addakiller"))
+			if (Config->GetModule("operserv/main")->Get<bool>("addakiller"))
 				reason = "(" + source.GetNick() + ") " + reason;
 			Log(LOG_ADMIN, source, this) << "on " << u2->nick << " for " << reason;
 			u2->Kill(*source.service, reason);

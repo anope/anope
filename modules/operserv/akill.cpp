@@ -42,7 +42,7 @@ class CommandOSAKill : public Command
 			sep.GetToken(mask);
 		}
 
-		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d");
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv/main")->Get<time_t>("autokillexpiry", "30d");
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -109,7 +109,7 @@ class CommandOSAKill : public Command
 		if (targ)
 			mask = "*@" + targ->host;
 
-		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+		if (Config->GetModule("operserv/main")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
 		if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
@@ -133,7 +133,7 @@ class CommandOSAKill : public Command
 		x->SetExpires(expires);
 		x->SetReason(reason);
 
-		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+		if (Config->GetModule("operserv/main")->Get<bool>("akillids"))
 			x->SetID(XLineManager::GenerateUID());
 
 		unsigned int affected = 0;
@@ -159,7 +159,7 @@ class CommandOSAKill : public Command
 		}
 
 		akills->AddXLine(x);
-		if (Config->GetModule("operserv")->Get<bool>("akillonadd"))
+		if (Config->GetModule("operserv/main")->Get<bool>("akillonadd"))
 			akills->Send(NULL, x);
 
 		source.Reply(_("\002{0}\002 added to the akill list."), mask);
@@ -325,7 +325,7 @@ class CommandOSAKill : public Command
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Expires"));
-		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+		if (Config->GetModule("operserv/main")->Get<bool>("akillids"))
 			list.AddColumn(_("ID"));
 		list.AddColumn(_("Reason"));
 
@@ -390,7 +390,7 @@ class CommandOSAKill : public Command
 			               " If a unit specifier is not included, the default is days, so \037+30\037 means 30 days."
 			               " To add an auto kill which does not expire, use \037+0\037. "
 			               " The default auto kill expiry time is \002{1}\002"),
-			               source.command, Anope::Duration(Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d"), source.GetAccount()));
+			               source.command, Anope::Duration(Config->GetModule("operserv/main")->Get<time_t>("autokillexpiry", "30d"), source.GetAccount()));
 
 			const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 			if (!regexengine.empty())

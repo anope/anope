@@ -37,15 +37,6 @@ ServiceBot::ServiceBot(const Anope::string &nnick, const Anope::string &nuser, c
 	this->lastmsg = Anope::CurTime;
 	this->introduced = false;
 
-	bi = Serialize::New<BotInfo *>();
-	bi->bot = this;
-
-	bi->SetNick(nnick);
-	bi->SetUser(nuser);
-	bi->SetHost(nhost);
-	bi->SetRealName(nreal);
-	bi->SetCreated(Anope::CurTime);
-
 	EventManager::Get()->Dispatch(&Event::CreateBot::OnCreateBot, this);
 
 	// If we're synchronised with the uplink already, send the bot.
@@ -65,8 +56,11 @@ ServiceBot::ServiceBot(const Anope::string &nnick, const Anope::string &nuser, c
 
 ServiceBot::~ServiceBot()
 {
-	bi->bot = nullptr;
-	bi->Delete();
+	if (bi != nullptr)
+	{
+		bi->bot = nullptr;
+		bi->Delete();
+	}
 
 	EventManager::Get()->Dispatch(&Event::DelBot::OnDelBot, this);
 
@@ -109,7 +103,8 @@ void ServiceBot::SetNewNick(const Anope::string &newnick)
 {
 	UserListByNick.erase(this->nick);
 
-	bi->SetNick(newnick);
+	if (bi != nullptr)
+		bi->SetNick(newnick);
 	this->nick = newnick;
 
 	UserListByNick[this->nick] = this;
@@ -117,7 +112,7 @@ void ServiceBot::SetNewNick(const Anope::string &newnick)
 
 std::vector<ChanServ::Channel *> ServiceBot::GetChannels() const
 {
-	return bi->GetRefs<ChanServ::Channel *>();
+	return bi != nullptr ? bi->GetRefs<ChanServ::Channel *>() : std::vector<ChanServ::Channel *>();
 }
 
 void ServiceBot::Assign(User *u, ChanServ::Channel *ci)

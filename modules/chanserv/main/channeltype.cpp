@@ -37,12 +37,12 @@ ChannelType::ChannelType(Module *me) : Serialize::Type<ChannelImpl>(me)
 
 }
 
-void ChannelType::Name::SetField(ChannelImpl *c, const Anope::string &value)
+void ChannelType::Name::OnSet(ChannelImpl *c, const Anope::string &value)
 {
 	ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
-	map.erase(GetField(c));
-
-	Serialize::Field<ChannelImpl, Anope::string>::SetField(c, value);
+	Anope::string *old = this->Get_(c);
+	if (old != nullptr)
+		map.erase(*old);
 
 	map[value] = c;
 }

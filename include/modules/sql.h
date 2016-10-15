@@ -202,8 +202,8 @@ namespace SQL
 
 		virtual std::vector<Query> InitSchema(const Anope::string &prefix) anope_abstract;
 		virtual std::vector<Query> Replace(const Anope::string &table, const Query &, const std::set<Anope::string> &) anope_abstract;
-		virtual std::vector<Query> CreateTable(const Anope::string &prefix, const Anope::string &table) anope_abstract;
-		virtual std::vector<Query> AlterTable(const Anope::string &, const Anope::string &table, const Anope::string &field, bool object) anope_abstract;
+		virtual std::vector<Query> CreateTable(const Anope::string &prefix, Serialize::TypeBase *) anope_abstract;
+		virtual std::vector<Query> AlterTable(const Anope::string &, Serialize::TypeBase *, Serialize::FieldBase *) anope_abstract;
 		virtual std::vector<Query> CreateIndex(const Anope::string &table, const Anope::string &field) anope_abstract;
 
 		virtual Query BeginTransaction() anope_abstract;

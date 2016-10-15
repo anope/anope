@@ -67,7 +67,7 @@ class CommandBSAssign : public Command
 			return;
 		}
 
-		if (bi->bi->GetOperOnly() && !source.HasPriv("botserv/administration"))
+		if (bi->bi && bi->bi->GetOperOnly() && !source.HasPriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. Bot \002{0}\002 is for operators only."), bi->nick);
 			return;
@@ -265,7 +265,7 @@ class BSAssign : public Module
 			return;
 		}
 
-		if (bi->bi->GetOperOnly() && !source->HasPriv("botserv/administration"))
+		if (bi->bi && bi->bi->GetOperOnly() && !source->HasPriv("botserv/administration"))
 		{
 			targ->SendMessage(bi, _("Access denied. Bot \002{0}\002 is for operators only."), bi->nick);
 			return;

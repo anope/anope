@@ -777,6 +777,10 @@ static void LoadBots()
 		ServiceBot *bi = ServiceBot::Find(nick, true);
 		if (!bi)
 			bi = new ServiceBot(nick, user, host, real);
+
+		if (bi->bi == nullptr)
+			bi->bi = Serialize::New<BotInfo *>();
+
 		bi->bi->SetCreated(created);
 
 		if (flags & OLD_BI_PRIVATE)

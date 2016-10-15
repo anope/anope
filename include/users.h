@@ -38,7 +38,6 @@ extern CoreExport int OperCount;
 enum class UserType
 {
 	USER,
-	//LOCAL_USER,
 	BOT
 };
 

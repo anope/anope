@@ -317,72 +317,7 @@ Conf::Conf() : Block("")
 		this->MyOperTypes.push_back(ot);
 	}
 
-	for (int i = 0; i < this->CountBlock("oper"); ++i)
-	{
-		Block *oper = this->GetBlock("oper", i);
-
-		const Anope::string &nname = oper->Get<Anope::string>("name"),
-					&type = oper->Get<Anope::string>("type"),
-					&password = oper->Get<Anope::string>("password"),
-					&certfp = oper->Get<Anope::string>("certfp"),
-					&host = oper->Get<Anope::string>("host"),
-					&vhost = oper->Get<Anope::string>("vhost");
-		bool require_oper = oper->Get<bool>("require_oper");
-
-		ValidateNotEmpty("oper", "name", nname);
-		ValidateNotEmpty("oper", "type", type);
-
-		OperType *ot = NULL;
-		for (unsigned j = 0; j < this->MyOperTypes.size(); ++j)
-			if (this->MyOperTypes[j]->GetName() == type)
-				ot = this->MyOperTypes[j];
-		if (ot == NULL)
-			throw ConfigException("Oper block for " + nname + " has invalid oper type " + type);
-
-		Oper *o = Serialize::New<Oper *>();
-		o->conf = this;
-		o->SetName(nname);
-		o->SetType(ot);
-		o->SetRequireOper(require_oper);
-		o->SetPassword(password);
-		o->SetCertFP(certfp);
-		o->SetHost(host);
-		o->SetVhost(vhost);
-	}
-
-	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>())
-		bi->conf = nullptr;
-	for (int i = 0; i < this->CountBlock("service"); ++i)
-	{
-		Block *service = this->GetBlock("service", i);
-
-		const Anope::string &nick = service->Get<Anope::string>("nick"),
-					&user = service->Get<Anope::string>("user"),
-					&host = service->Get<Anope::string>("host"),
-					&gecos = service->Get<Anope::string>("gecos"),
-					&modes = service->Get<Anope::string>("modes"),
-					&channels = service->Get<Anope::string>("channels");
-
-		ValidateNotEmpty("service", "nick", nick);
-		ValidateNotEmpty("service", "user", user);
-		ValidateNotEmpty("service", "host", host);
-		ValidateNotEmpty("service", "gecos", gecos);
-		ValidateNoSpaces("service", "channels", channels);
-
-		if (User *u = User::Find(nick, true))
-		{
-			if (u->type != UserType::BOT)
-			{
-				u->Kill(Me, "Nickname required by services");
-			}
-		}
-
-		ServiceBot *sb = ServiceBot::Find(nick, true);
-		if (!sb)
-			sb = new ServiceBot(nick, user, host, gecos, modes);
-
-		sb->bi->conf = service;
-	}
+	this->LoadBots();
 
 	for (int i = 0; i < this->CountBlock("log"); ++i)
 	{
@@ -635,6 +570,9 @@ void Conf::Post(Conf *old)
 		if (std::find(old->ModulesAutoLoad.begin(), old->ModulesAutoLoad.end(), this->ModulesAutoLoad[i]) == old->ModulesAutoLoad.end())
 			ModuleManager::LoadModule(this->ModulesAutoLoad[i], NULL);
 
+	LoadOpers();
+	ApplyBots();
+
 	ModeManager::Apply(old);
 
 	/* Apply opertype changes, as non-conf opers still point to the old oper types */
@@ -696,6 +634,105 @@ void Conf::Post(Conf *old)
 					c->SetMode(bi->bot, cm, bi->bot->GetUID());
 			}
 		}
+	}
+}
+
+void Conf::LoadBots()
+{
+	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>())
+		bi->conf = nullptr;
+	for (int i = 0; i < this->CountBlock("service"); ++i)
+	{
+		Block *service = this->GetBlock("service", i);
+
+		const Anope::string &nick = service->Get<Anope::string>("nick"),
+					&user = service->Get<Anope::string>("user"),
+					&host = service->Get<Anope::string>("host"),
+					&gecos = service->Get<Anope::string>("gecos"),
+					&modes = service->Get<Anope::string>("modes"),
+					&channels = service->Get<Anope::string>("channels");
+
+		ValidateNotEmpty("service", "nick", nick);
+		ValidateNotEmpty("service", "user", user);
+		ValidateNotEmpty("service", "host", host);
+		ValidateNotEmpty("service", "gecos", gecos);
+		ValidateNoSpaces("service", "channels", channels);
+
+		if (User *u = User::Find(nick, true))
+		{
+			if (u->type != UserType::BOT)
+			{
+				u->Kill(Me, "Nickname required by services");
+			}
+		}
+
+		ServiceBot *sb = ServiceBot::Find(nick, true);
+		if (!sb)
+			sb = new ServiceBot(nick, user, host, gecos, modes);
+	}
+}
+
+void Conf::ApplyBots()
+{
+	for (std::pair<Anope::string, User *> p : UserListByNick)
+	{
+		User *u = p.second;
+		if (u->type != UserType::BOT)
+			continue;
+
+		ServiceBot *sb = anope_dynamic_static_cast<ServiceBot *>(u);
+		if (sb->bi != nullptr)
+			continue;
+
+		sb->bi = Serialize::New<BotInfo *>();
+		sb->bi->bot = sb;
+
+		sb->bi->SetNick(sb->nick);
+		sb->bi->SetUser(sb->GetIdent());
+		sb->bi->SetHost(sb->host);
+		sb->bi->SetRealName(sb->realname);
+		sb->bi->SetCreated(Anope::CurTime);
+	}
+}
+
+void Conf::LoadOpers()
+{
+	for (int i = 0; i < this->CountBlock("oper"); ++i)
+	{
+		Block *oper = this->GetBlock("oper", i);
+
+		const Anope::string &nname = oper->Get<Anope::string>("name"),
+					&type = oper->Get<Anope::string>("type"),
+					&password = oper->Get<Anope::string>("password"),
+					&certfp = oper->Get<Anope::string>("certfp"),
+					&host = oper->Get<Anope::string>("host"),
+					&vhost = oper->Get<Anope::string>("vhost");
+		bool require_oper = oper->Get<bool>("require_oper");
+
+		ValidateNotEmpty("oper", "name", nname);
+		ValidateNotEmpty("oper", "type", type);
+
+		OperType *ot = NULL;
+		for (unsigned j = 0; j < this->MyOperTypes.size(); ++j)
+			if (this->MyOperTypes[j]->GetName() == type)
+				ot = this->MyOperTypes[j];
+		if (ot == NULL)
+		{
+			Log() << "Oper block for " << nname << " has invalid oper type " << type;
+			continue;
+		}
+
+		Oper *o = Serialize::New<Oper *>();
+		o->conf = this;
+		o->SetName(nname);
+		o->SetType(ot);
+		o->SetRequireOper(require_oper);
+		o->SetPassword(password);
+		o->SetCertFP(certfp);
+		o->SetHost(host);
+		o->SetVhost(vhost);
+
+		Log(LOG_DEBUG) << "Creating oper " << nname << " of type " << ot->GetName();
 	}
 }
 

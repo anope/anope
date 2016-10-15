@@ -543,6 +543,9 @@ void Anope::Init(int ac, char **av)
 	for (int i = 0; i < Config->CountBlock("module"); ++i)
 		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<Anope::string>("name"), NULL);
 
+	Config->LoadOpers();
+	Config->ApplyBots();
+
 #ifndef _WIN32
 	/* We won't background later, so we should setuid now */
 	if (Anope::NoFork)

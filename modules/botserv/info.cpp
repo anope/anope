@@ -41,8 +41,11 @@ class CommandBSInfo : public Command
 			source.Reply(_("Information for bot \002%s\002:"), bi->nick.c_str());
 			info[_("Mask")] = bi->GetIdent() + "@" + bi->host;
 			info[_("Real name")] = bi->realname;
-			info[_("Created")] = Anope::strftime(bi->bi->GetCreated(), source.GetAccount());
-			info[_("Options")] = bi->bi->GetOperOnly() ? _("Private") : _("None");
+			if (bi->bi)
+			{
+				info[_("Created")] = Anope::strftime(bi->bi->GetCreated(), source.GetAccount());
+				info[_("Options")] = bi->bi->GetOperOnly() ? _("Private") : _("None");
+			}
 			info[_("Used on")] = stringify(bi->GetChannelCount()) + " channel(s)";
 
 			EventManager::Get()->Dispatch(&Event::ServiceBotEvent::OnServiceBot, source, bi, ci, info);

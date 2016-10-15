@@ -174,7 +174,7 @@ class CommandBSSetPrivate : public Command
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		ServiceBot *bi = ServiceBot::Find(nick, true);
-		if (bi == NULL)
+		if (bi == NULL || !bi->bi)
 		{
 			source.Reply(_("Bot \002{0}\002 does not exist."), nick);
 			return;

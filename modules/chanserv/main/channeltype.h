@@ -27,7 +27,7 @@ class ChannelType : public Serialize::Type<ChannelImpl>
 	{
 		using Serialize::Field<ChannelImpl, Anope::string>::Field;
 
-		void SetField(ChannelImpl *c, const Anope::string &value) override;
+		void OnSet(ChannelImpl *c, const Anope::string &value) override;
 	} name;
 	Serialize::Field<ChannelImpl, Anope::string> desc;
 	Serialize::Field<ChannelImpl, time_t> time_registered;

@@ -29,18 +29,17 @@ AccountType::AccountType(Module *me) : Serialize::Type<AccountImpl>(me)
 
 }
 
-void AccountType::Display::SetField(AccountImpl *acc, const Anope::string &disp)
+void AccountType::Display::OnSet(AccountImpl *acc, const Anope::string &disp)
 {
 	NickServ::nickcore_map& map = NickServ::service->GetAccountMap();
 
-	if (!acc->GetDisplay().empty())
-		map.erase(acc->GetDisplay());
+	Anope::string *old = this->Get_(acc);
+	if (old != nullptr)
+		map.erase(*old);
 
-	Serialize::Field<AccountImpl, Anope::string>::SetField(acc, disp);
+	map[disp] = acc;
 
-	if (!disp.empty())
-		map[disp] = acc;
-
+#warning "this is all wrong"
 	acc->o = Oper::Find(disp);
 }
 

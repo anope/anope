@@ -215,9 +215,8 @@ XLineManager *XLine::GetManager()
 	return ServiceManager::Get()->FindService<XLineManager *>(GetType());
 }
 
-void XLineType::Mask::SetField(XLine *s, const Anope::string &value)
+void XLineType::Mask::OnSet(XLine *s, const Anope::string &value)
 {
-	Serialize::Field<XLine, Anope::string>::SetField(s, value);
 	s->Recache();
 }
 

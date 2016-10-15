@@ -31,6 +31,7 @@ class CertServiceImpl : public CertService
 
 	NickServ::Account* FindAccountFromCert(const Anope::string &cert) override
 	{
+#warning "use serialize find"
 		Anope::hash_map<NickServ::Account *>::iterator it = certmap.find(cert);
 		if (it != certmap.end())
 			return it->second;
@@ -78,15 +79,11 @@ class NSCertEntryType : public Serialize::Type<NSCertEntryImpl>
 	{
 		using Serialize::ObjectField<NSCertEntryImpl, NickServ::Account *>::ObjectField;
 
-		void SetField(NSCertEntryImpl *s, NickServ::Account *acc) override
+		void OnSet(NSCertEntryImpl *s, NickServ::Account *acc) override
 		{
 			const Anope::string &cert = s->GetCert();
+
 			if (!cert.empty())
-				certmap.erase(cert);
-
-			Serialize::ObjectField<NSCertEntryImpl, NickServ::Account *>::SetField(s, acc);
-
-			if (!cert.empty() && s->GetAccount())
 				certmap[cert] = acc;
 		}
 	} nc;
@@ -95,13 +92,11 @@ class NSCertEntryType : public Serialize::Type<NSCertEntryImpl>
 	{
 		using Serialize::Field<NSCertEntryImpl, Anope::string>::Field;
 
-		void SetField(NSCertEntryImpl *s, const Anope::string &m) override
+		void OnSet(NSCertEntryImpl *s, const Anope::string &m) override
 		{
-			const Anope::string &old = GetField(s);
-			if (!old.empty())
-				certmap.erase(old);
-
-			Serialize::Field<NSCertEntryImpl, Anope::string>::SetField(s, m);
+			Anope::string *old = this->Get_(s);
+			if (old != nullptr)
+				certmap.erase(*old);
 
 			if (!m.empty() && s->GetAccount())
 				certmap[m] = s->GetAccount();

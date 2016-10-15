@@ -91,8 +91,8 @@ class SQLiteService : public Provider
 
 	std::vector<Query> InitSchema(const Anope::string &prefix) override;
 	std::vector<Query> Replace(const Anope::string &table, const Query &, const std::set<Anope::string> &) override;
-	std::vector<Query> CreateTable(const Anope::string &, const Anope::string &table) override;
-	std::vector<Query> AlterTable(const Anope::string &, const Anope::string &table, const Anope::string &field, bool) override;
+	std::vector<Query> CreateTable(const Anope::string &, Serialize::TypeBase *) override;
+	std::vector<Query> AlterTable(const Anope::string &, Serialize::TypeBase *, Serialize::FieldBase *) override;
 	std::vector<Query> CreateIndex(const Anope::string &table, const Anope::string &field) override;
 
 	Query BeginTransaction() override;
@@ -210,13 +210,22 @@ Result SQLiteService::RunQuery(const Query &query)
 	int err = sqlite3_prepare_v2(this->sql, real_query.c_str(), real_query.length(), &stmt, NULL);
 	if (err != SQLITE_OK)
 	{
-		return SQLiteResult(query, real_query, sqlite3_errmsg(this->sql));
+		const char *msg = sqlite3_errmsg(this->sql);
+
+		Log(LOG_DEBUG) << "sqlite: error in query " << real_query << ": " << msg;
+
+		return SQLiteResult(query, real_query, msg);
 	}
 
 	int id = sqlite3_last_insert_rowid(this->sql);
 	SQLiteResult result(this->sql, id, query, real_query, stmt);
 
 	sqlite3_finalize(stmt);
+
+	if (!result.GetError().empty())
+		Log(LOG_DEBUG) << "sqlite: error executing query " << real_query << ": " << result.GetError();
+	else
+		Log(LOG_DEBUG) << "sqlite: executed: " << real_query;
 
 	return result;
 }
@@ -225,23 +234,9 @@ std::vector<Query> SQLiteService::InitSchema(const Anope::string &prefix)
 {
 	std::vector<Query> queries;
 
-	Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + "id` ("
-		"`id`"
-		")";
-	queries.push_back(t);
+	queries.push_back(Query("PRAGMA foreign_keys = ON"));
 
-	t = "CREATE TABLE IF NOT EXISTS `" + prefix + "objects` (`id` PRIMARY KEY, `type`)";
-	queries.push_back(t);
-
-	t = "CREATE TABLE IF NOT EXISTS `" + prefix + "edges` ("
-		"`id`,"
-		"`field`,"
-		"`other_id`,"
-		"PRIMARY KEY (`id`, `field`)"
-		")";
-	queries.push_back(t);
-
-	t = "CREATE INDEX IF NOT EXISTS idx_edge ON `" + prefix + "edges` (other_id)";
+	Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + "objects` (`id` PRIMARY KEY, `type`)";
 	queries.push_back(t);
 
 	return queries;
@@ -287,31 +282,77 @@ std::vector<Query> SQLiteService::Replace(const Anope::string &table, const Quer
 	return queries;
 }
 
-std::vector<Query> SQLiteService::CreateTable(const Anope::string &prefix, const Anope::string &table)
+std::vector<Query> SQLiteService::CreateTable(const Anope::string &prefix, Serialize::TypeBase *base)
 {
 	std::vector<Query> queries;
 
-	if (active_schema.find(prefix + table) == active_schema.end())
+	if (active_schema.find(prefix + base->GetName()) == active_schema.end())
 	{
-		Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + table + "` (`id` bigint(20) NOT NULL, PRIMARY KEY (`id`))";
-		queries.push_back(t);
+		Anope::string query = "CREATE TABLE IF NOT EXISTS `" + prefix + base->GetName() + "` (";
+		std::set<Anope::string> fields;
 
-		active_schema[prefix + table];
+		for (Serialize::FieldBase *field : base->GetFields())
+		{
+			query += "`" + field->serialize_name + "` COLLATE NOCASE";
+			fields.insert(field->serialize_name);
+
+			if (field->object)
+			{
+				query += " REFERENCES " + prefix + "objects(id) ON DELETE ";
+
+				if (field->depends)
+				{
+					query += "CASCADE";
+				}
+				else
+				{
+					query += "SET NULL";
+				}
+
+				query += " DEFERRABLE INITIALLY DEFERRED";
+			}
+
+			query += ",";
+		}
+
+		query += " `id` NOT NULL PRIMARY KEY, FOREIGN KEY (id) REFERENCES " + prefix + "objects(id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)";
+		queries.push_back(query);
+
+		active_schema[prefix + base->GetName()] = fields;
 	}
 
 	return queries;
 }
 
-std::vector<Query> SQLiteService::AlterTable(const Anope::string &prefix, const Anope::string &table, const Anope::string &field, bool)
+std::vector<Query> SQLiteService::AlterTable(const Anope::string &prefix, Serialize::TypeBase *type, Serialize::FieldBase *field)
 {
+	const Anope::string &table = type->GetName();
+
 	std::vector<Query> queries;
 	std::set<Anope::string> &s = active_schema[prefix + table];
 
-	if (!s.count(field))
+	if (!s.count(field->serialize_name))
 	{
-		Query t =  "ALTER TABLE `" + prefix + table + "` ADD `" + field + "` COLLATE NOCASE";
-		queries.push_back(t);
-		s.insert(field);
+		Anope::string buf = "ALTER TABLE `" + prefix + table + "` ADD `" + field->serialize_name + "` COLLATE NOCASE";
+
+		if (field->object)
+		{
+			buf += " REFERENCES " + prefix + "objects(id) ON DELETE ";
+
+			if (field->depends)
+			{
+				buf += "CASCADE";
+			}
+			else
+			{
+				buf += "SET NULL";
+			}
+
+			buf += " DEFERRABLE INITIALLY DEFERRED";
+		}
+
+		queries.push_back(Query(buf));
+		s.insert(field->serialize_name);
 	}
 
 	return queries;
@@ -344,27 +385,19 @@ Query SQLiteService::Commit()
 
 Serialize::ID SQLiteService::GetID(const Anope::string &prefix)
 {
-	/* must be in a deferred or reserved transaction here for atomic row update */
-
-	Query query("SELECT `id` FROM `" + prefix + "id`");
-	Serialize::ID id;
+	Query query = "SELECT `id` FROM `" + prefix + "objects` ORDER BY `id` DESC LIMIT 1";
+	Serialize::ID id = 0;
 
 	Result res = RunQuery(query);
 	if (res.Rows())
 	{
 		id = convertTo<Serialize::ID>(res.Get(0, "id"));
 
-		Query update_query("UPDATE `" + prefix + "id` SET `id` = `id` + 1");
-		RunQuery(update_query);
+		/* next id */
+		++id;
 	}
-	else
-	{
-		id = 0;
 
-		Query insert_query("INSERT INTO `" + prefix + "id` (id) VALUES(@id@)");
-		insert_query.SetValue("id", 1);
-		RunQuery(insert_query);
-	}
+	/* OnSerializableCreate is called immediately after this which does the insert */
 
 	return id;
 }
@@ -376,10 +409,9 @@ Query SQLiteService::GetTables(const Anope::string &prefix)
 
 Anope::string SQLiteService::Escape(const Anope::string &query)
 {
-	char *e = sqlite3_mprintf("%q", query.c_str());
-	Anope::string buffer = e;
-	sqlite3_free(e);
-	return buffer;
+	std::vector<char> buffer(query.length() * 2 + 1);
+	sqlite3_snprintf(buffer.size(), &buffer[0], "%q", query.c_str());
+	return &buffer[0];
 }
 
 Anope::string SQLiteService::BuildQuery(const Query &q)

@@ -28,18 +28,19 @@ NickType::NickType(Module *me) : Serialize::Type<NickImpl>(me)
 	, last_realhost(this, "last_realhost", &NickImpl::last_realhost)
 	, time_registered(this, "time_registered", &NickImpl::time_registered)
 	, last_seen(this, "last_seen", &NickImpl::last_seen)
+#warning "this should depend?"
 	, nc(this, "nc", &NickImpl::account)
 {
 
 }
 
-void NickType::Nick::SetField(NickImpl *na, const Anope::string &value)
+void NickType::Nick::OnSet(NickImpl *na, const Anope::string &value)
 {
 	/* Remove us from the aliases list */
 	NickServ::nickalias_map &map = NickServ::service->GetNickMap();
-	map.erase(GetField(na));
-
-	Serialize::Field<NickImpl, Anope::string>::SetField(na, value);
+	Anope::string *old = this->Get_(na);
+	if (old != nullptr)
+		map.erase(*old);
 
 	map[value] = na;
 }

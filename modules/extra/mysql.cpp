@@ -156,8 +156,8 @@ class MySQLService : public Provider
 
 	std::vector<Query> InitSchema(const Anope::string &prefix) override;
 	std::vector<Query> Replace(const Anope::string &table, const Query &, const std::set<Anope::string> &) override;
-	std::vector<Query> CreateTable(const Anope::string &prefix, const Anope::string &table) override;
-	std::vector<Query> AlterTable(const Anope::string &, const Anope::string &table, const Anope::string &field, bool) override;
+	std::vector<Query> CreateTable(const Anope::string &prefix, Serialize::TypeBase *) override;
+	std::vector<Query> AlterTable(const Anope::string &, Serialize::TypeBase *, Serialize::FieldBase *) override;
 	std::vector<Query> CreateIndex(const Anope::string &table, const Anope::string &field) override;
 
 	Query BeginTransaction() override;
@@ -393,24 +393,7 @@ std::vector<Query> MySQLService::InitSchema(const Anope::string &prefix)
 {
 	std::vector<Query> queries;
 
-	Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + "id` ("
-		"`id` bigint(20) NOT NULL"
-		") ENGINE=InnoDB";
-	queries.push_back(t);
-
-	t = "CREATE TABLE IF NOT EXISTS `" + prefix + "objects` (`id` bigint(20) NOT NULL PRIMARY KEY, `type` varchar(256)) ENGINE=InnoDB";
-	queries.push_back(t);
-
-	t = "CREATE TABLE IF NOT EXISTS `" + prefix + "edges` ("
-		"`id` bigint(20) NOT NULL,"
-		"`field` varchar(64) NOT NULL,"
-		"`other_id` bigint(20) NOT NULL,"
-		"PRIMARY KEY (`id`, `field`),"
-		"KEY `other` (`other_id`),"
-		"CONSTRAINT `edges_id_fk` FOREIGN KEY (`id`) REFERENCES `" + prefix + "objects` (`id`),"
-		"CONSTRAINT `edges_other_id_fk` FOREIGN KEY (`other_id`) REFERENCES `" + prefix + "objects` (`id`)"
-		") ENGINE=InnoDB";
-	queries.push_back(t);
+	queries.push_back(Query("CREATE TABLE IF NOT EXISTS `" + prefix + "objects` (`id` bigint(20) NOT NULL PRIMARY KEY, `type` TINYTEXT) ENGINE=InnoDB"));
 
 	return queries;
 }
@@ -441,41 +424,52 @@ std::vector<Query> MySQLService::Replace(const Anope::string &table, const Query
 	return queries;
 }
 
-std::vector<Query> MySQLService::CreateTable(const Anope::string &prefix, const Anope::string &table)
+std::vector<Query> MySQLService::CreateTable(const Anope::string &prefix, Serialize::TypeBase *base)
 {
 	std::vector<Query> queries;
 
-	if (active_schema.find(prefix + table) == active_schema.end())
+	if (active_schema.find(prefix + base->GetName()) == active_schema.end())
 	{
-		Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + table + "` (`id` bigint(20) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB";
+		Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + base->GetName() + "` (`id` bigint(20) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB";
 		queries.push_back(t);
 
-		t = "ALTER TABLE `" + prefix + table + "` "
-			"ADD CONSTRAINT `" + table + "_id_fk` FOREIGN KEY (`id`) REFERENCES `" + prefix + "objects` (`id`)";
+		t = "ALTER TABLE `" + prefix + base->GetName() + "` "
+			"ADD CONSTRAINT `" + base->GetName() + "_id_fk` FOREIGN KEY (`id`) REFERENCES `" + prefix + "objects` (`id`) ON DELETE CASCADE";
 		queries.push_back(t);
 
-		active_schema[prefix + table];
+		active_schema[prefix + base->GetName()];
 	}
 
 	return queries;
 }
 
-std::vector<Query> MySQLService::AlterTable(const Anope::string &prefix, const Anope::string &table, const Anope::string &field, bool object)
+std::vector<Query> MySQLService::AlterTable(const Anope::string &prefix, Serialize::TypeBase *type, Serialize::FieldBase *field)
 {
+	const Anope::string &table = type->GetName();
+
 	std::vector<Query> queries;
 	std::set<Anope::string> &s = active_schema[prefix + table];
 
-	if (!s.count(field))
+	if (!s.count(field->serialize_name))
 	{
-		Query column;
-		if (!object)
-			column = "ALTER TABLE `" + prefix + table + "` ADD COLUMN `" + field + "` TINYTEXT";
+		Anope::string buf = "ALTER TABLE `" + prefix + table + "` ADD COLUMN `" + field->serialize_name + "` ";
+
+		if (!field->object)
+		{
+			buf += "TINYTEXT";
+		}
 		else
-			column = "ALTER TABLE `" + prefix + table + "` "
-				"ADD COLUMN `" + field + "` bigint(20), "
-				"ADD CONSTRAINT `" + table + "_" + field + "_fk` FOREIGN KEY (`" + field + "`) REFERENCES `" + prefix + "objects` (`id`)";
-		queries.push_back(column);
-		s.insert(field);
+		{
+			buf += "bigint(20), ADD CONSTRAINT `" + table + "_" + field->serialize_name + "_fk` FOREIGN KEY (`" + field->serialize_name + "`) REFERENCES `" + prefix + "objects` (`id`) ON DELETE ";
+
+			if (field->depends)
+				buf += "CASCADE";
+			else
+				buf += "SET NULL";
+		}
+
+		queries.push_back(Query(buf));
+		s.insert(field->serialize_name);
 	}
 
 	return queries;
@@ -508,25 +502,19 @@ Query MySQLService::Commit()
 
 Serialize::ID MySQLService::GetID(const Anope::string &prefix)
 {
-	Query query("SELECT `id` FROM `" + prefix + "id` FOR UPDATE");
-	Serialize::ID id;
+	Query query = "SELECT `id` FROM `" + prefix + "objects` ORDER BY `id` DESC LIMIT 1";
+	Serialize::ID id = 0;
 
 	Result res = RunQuery(query);
 	if (res.Rows())
 	{
 		id = convertTo<Serialize::ID>(res.Get(0, "id"));
 
-		Query update_query("UPDATE `" + prefix + "id` SET `id` = `id` + 1");
-		RunQuery(update_query);
+		/* next id */
+		++id;
 	}
-	else
-	{
-		id = 0;
 
-		Query insert_query("INSERT INTO `" + prefix + "id` (id) VALUES(@id@)");
-		insert_query.SetValue("id", 1);
-		RunQuery(insert_query);
-	}
+	/* OnSerializableCreate is called immediately after this which does the insert */
 
 	return id;
 }

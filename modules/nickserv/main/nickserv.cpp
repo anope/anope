@@ -219,7 +219,7 @@ class NickServCore : public Module, public NickServ::NickServService
 		/* On shutdown, restart, or mod unload, remove all of our holds for nicks (svshold or qlines)
 		 * because some IRCds do not allow us to have these automatically expire
 		 */
-		for (NickServ::Nick *na : nick_type.List<NickServ::Nick *>())
+		for (NickServ::Nick *na : Serialize::GetObjects<NickServ::Nick *>())
 			this->Release(na);
 	}
 
@@ -362,7 +362,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 	std::vector<NickServ::Nick *> GetNickList() override
 	{
-		return nick_type.List<NickServ::Nick *>();
+		return Serialize::GetObjects<NickServ::Nick *>();
 	}
 
 	NickServ::nickalias_map& GetNickMap() override
@@ -372,7 +372,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 	std::vector<NickServ::Account *> GetAccountList() override
 	{
-		return account_type.List<NickServ::Account *>();
+		return Serialize::GetObjects<NickServ::Account *>();
 	}
 
 	NickServ::nickcore_map& GetAccountMap() override
@@ -532,6 +532,7 @@ class NickServCore : public Module, public NickServ::NickServService
 			{
 				if (u->HasMode("REGISTERED") && !u->IsIdentified(true))
 					u->RemoveMode(NickServ, "REGISTERED");
+
 				if (!u->IsIdentified())
 					this->Validate(u);
 			}
@@ -640,7 +641,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 		time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire", "21d");
 
-		for (NickServ::Nick *na : nick_type.List<NickServ::Nick *>())
+		for (NickServ::Nick *na : Serialize::GetObjects<NickServ::Nick *>())
 		{
 			User *u = User::Find(na->GetNick(), true);
 			if (u && (u->IsIdentified(true) || u->IsRecognized()))

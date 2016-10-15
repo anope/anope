@@ -49,6 +49,9 @@ namespace Serialize
 	inline T GetObject();
 
 	template<typename T>
+	inline std::vector<T> GetObjects_(TypeBase *);
+
+	template<typename T>
 	inline std::vector<T> GetObjects(const Anope::string &name);
 
 	template<typename T>
@@ -235,29 +238,6 @@ class CoreExport Serialize::TypeBase : public Service
 	 */
 	const Anope::string &GetName() { return this->name; }
 
-	/**
-	 * Get all objects of the given type
-	 */
-	template<typename T>
-	std::vector<T> List()
-	{
-		std::vector<ID> ids;
-		EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeList, this, ids);
-		if (result == EVENT_ALLOW)
-		{
-			std::vector<T> o;
-			for (ID id : ids)
-			{
-				Object *s = Require(id);
-				if (s)
-					o.push_back(anope_dynamic_static_cast<T>(s));
-			}
-			return o;
-		}
-
-		return GetObjects<T>();
-	}
-
 	/** Create a new object of this type.
 	 */
 	virtual Object *Create() anope_abstract;
@@ -306,7 +286,10 @@ class Serialize::Type : public Base
 			return new T(this, id);
 
 		if (s->GetSerializableType() != this)
+		{
+			Log(LOG_DEBUG) << "Mismatch for required id " << id << ", is of type " << s->GetSerializableType()->GetName() << " but wants " << this->GetName();
 			return nullptr;
+		}
 
 		return static_cast<T *>(s);
 	}
@@ -386,6 +369,8 @@ class Serialize::FieldBase : public Service
 	 * gets deleted too.
 	 */
 	bool depends;
+
+	bool object = false;
 
 	FieldBase(Module *, const Anope::string &, const Anope::string &, bool);
 	virtual ~FieldBase();
@@ -592,7 +577,10 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 			// module returned us data, so we unserialize it
 			T t2 = this->Unserialize(value);
 
+			// should cache the default value somehow, but can't differentiate not cached from cached and default
+
 			// Cache
+			OnSet(s, t2);
 			this->Set_(s, t2);
 
 			return t2;
@@ -609,11 +597,18 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 		SetField(this->Upcast(s), value);
 	}
 
-	virtual void SetField(TypeImpl *s, const T &value)
+	/**
+	 * Override to hook to changes in the internally
+	 * cached value
+	 */
+	virtual void OnSet(TypeImpl *s, const T &value) { }
+
+	void SetField(TypeImpl *s, const T &value)
 	{
 		Anope::string strvalue = this->Serialize(value);
 		EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeSet, s, this, strvalue);
 
+		OnSet(s, value);
 		this->Set_(s, value);
 	}
 
@@ -697,10 +692,12 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
  public:
 	ObjectField(TypeBase *t, const Anope::string &n, bool d = false) : CommonFieldBase<TypeImpl, T>(t, n, d)
 	{
+		this->object = true;
 	}
 
 	ObjectField(TypeBase *t, const Anope::string &n, T TypeImpl::*field, bool d = false) : CommonFieldBase<TypeImpl, T>(t, n, field, d)
 	{
+		this->object = true;
 	}
 
 	T GetField(TypeImpl *s)
@@ -723,6 +720,7 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 
 			T t2 = result == EVENT_ALLOW ? static_cast<T>(base->Require(sid)) : nullptr;
 
+			OnSet(s, t2);
 			this->Set_(s, t2);
 
 			return t2;
@@ -739,7 +737,9 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 		SetField(this->Upcast(s), value);
 	}
 
-	virtual void SetField(TypeImpl *s, T value)
+	virtual void OnSet(TypeImpl *s, T value) { }
+
+	void SetField(TypeImpl *s, T value)
 	{
 		EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeSetSerializable, s, this, value);
 
@@ -747,6 +747,7 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 		if (old != nullptr && *old != nullptr)
 			s->RemoveEdge(*old, this);
 
+		OnSet(s, value);
 		this->Set_(s, value);
 
 		if (value != nullptr)
@@ -812,13 +813,34 @@ T Serialize::GetObject()
 }
 
 template<typename T>
+std::vector<T> Serialize::GetObjects_(TypeBase *type)
+{
+	std::vector<T> o;
+	std::vector<ID> ids;
+	EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeList, type, ids);
+	if (result == EVENT_ALLOW)
+	{
+		for (ID id : ids)
+		{
+			Object *s = type->Require(id);
+			if (s)
+				o.push_back(anope_dynamic_static_cast<T>(s));
+		}
+		return o;
+	}
+
+	std::transform(type->objects.begin(), type->objects.end(), std::back_inserter(o), [](Object *e) { return anope_dynamic_static_cast<T>(e); });
+	return o;
+}
+
+template<typename T>
 std::vector<T> Serialize::GetObjects(const Anope::string &name)
 {
 	std::vector<T> objs;
 
 	for (TypeBase *t : GetTypes(name))
-		for (Object *s : t->objects)
-			objs.push_back(anope_dynamic_static_cast<T>(s));
+		for (T obj : GetObjects_<T>(t))
+			objs.push_back(obj);
 
 	return objs;
 }

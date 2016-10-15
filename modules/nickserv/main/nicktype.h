@@ -26,7 +26,7 @@ class NickType : public Serialize::Type<NickImpl>
 	{
 		using Serialize::Field<NickImpl, Anope::string>::Field;
 
-		void SetField(NickImpl *s, const Anope::string &value) override;
+		void OnSet(NickImpl *s, const Anope::string &value) override;
 	} nick;
 	Serialize::Field<NickImpl, Anope::string> last_quit;
 	Serialize::Field<NickImpl, Anope::string> last_realname;

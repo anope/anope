@@ -93,6 +93,16 @@ class CommandBSBot : public Command
 
 		ServiceBot *bi = new ServiceBot(nick, user, host, real);
 
+		BotInfo *botinfo = Serialize::New<BotInfo *>();
+		botinfo->SetNick(nick);
+		botinfo->SetUser(user);
+		botinfo->SetHost(host);
+		botinfo->SetRealName(real);
+		botinfo->SetCreated(Anope::CurTime);
+
+		bi->bi = botinfo;
+		botinfo->bot = bi;
+
 		Log(LOG_ADMIN, source, this) << "ADD " << bi->GetMask() << " " << bi->realname;
 
 		source.Reply(_("\002{0}!{1}@{2}\002 (\002{3}\002) added to the bot list."), bi->nick, bi->GetIdent(), bi->host, bi->realname);
@@ -121,7 +131,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (bi->bi->conf)
+		if (bi->bi && bi->bi->conf)
 		{
 			source.Reply(_("Bot \002{0}\002 is not changeable because it is configured in services configuration."), bi->nick.c_str());
 			return;
@@ -226,23 +236,27 @@ class CommandBSBot : public Command
 		if (!nick.equals_cs(bi->nick))
 		{
 			bi->SetNewNick(nick);
-			bi->bi->SetNick(nick);
+			if (bi->bi != nullptr)
+				bi->bi->SetNick(nick);
 		}
 
 		if (!user.equals_cs(bi->GetIdent()))
 		{
 			bi->SetIdent(user);
-			bi->bi->SetUser(user);
+			if (bi->bi != nullptr)
+				bi->bi->SetUser(user);
 		}
 		if (!host.equals_cs(bi->host))
 		{
 			bi->host = host;
-			bi->bi->SetHost(host);
+			if (bi->bi != nullptr)
+				bi->bi->SetHost(host);
 		}
 		if (real.equals_cs(bi->realname))
 		{
 			bi->realname = real;
-			bi->bi->SetRealName(real);
+			if (bi->bi != nullptr)
+				bi->bi->SetRealName(real);
 		}
 
 		if (!user.empty())
@@ -271,7 +285,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (bi->bi->conf)
+		if (bi->bi && bi->bi->conf)
 		{
 			source.Reply(_("Bot \002{0}\002 is can not be deleted because it is configured in services configuration."), bi->nick);
 			return;

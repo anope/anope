@@ -102,8 +102,9 @@ namespace Configuration
 	struct Usermode;
 	struct Channelmode;
 
-	struct CoreExport Conf : Block
+	class CoreExport Conf : public Block
 	{
+	 public:
 		/* options:readtimeout */
 		time_t ReadTimeout;
 		/* options:useprivmsg */
@@ -162,6 +163,11 @@ namespace Configuration
 		ServiceBot *GetClient(const Anope::string &name);
 
 		Block *GetCommand(CommandSource &);
+
+		void LoadBots();
+		void ApplyBots();
+
+		void LoadOpers();
 	};
 
 	struct Uplink

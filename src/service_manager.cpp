@@ -82,7 +82,7 @@ void ServiceManager::Register(Service *service)
 			throw ModuleException("Service of type " + service->GetType() + " with name " + service->GetName() + " already exists");
 	}
 
-	Log(LOG_DEBUG_2) << "Service registered: " << service->GetType() << " " << service->GetName() << " address " << static_cast<void *>(this) << " by " << service->GetOwner();
+	Log(LOG_DEBUG_3) << "Service registered: " << service->GetType() << " " << service->GetName() << " address " << static_cast<void *>(this) << " by " << service->GetOwner();
 
 	services.push_back(service);
 
@@ -91,7 +91,7 @@ void ServiceManager::Register(Service *service)
 
 void ServiceManager::Unregister(Service *service)
 {
-	Log(LOG_DEBUG_2) <<  "Service unregistered: " << service->GetType() << " " << service->GetName() << " address " << static_cast<void *>(service) << " by " << service->GetOwner();
+	Log(LOG_DEBUG_3) <<  "Service unregistered: " << service->GetType() << " " << service->GetName() << " address " << static_cast<void *>(service) << " by " << service->GetOwner();
 
 	auto it = std::find(services.begin(), services.end(), service);
 	if (it != services.end())
@@ -107,13 +107,13 @@ void ServiceManager::Lookup(ServiceReferenceBase *reference)
 	if (reference->GetName().empty())
 	{
 		std::vector<Service *> services = this->FindServices(reference->GetType());
-		Log(LOG_DEBUG_2) << "Service lookup " << static_cast<void *>(reference) << " type " << reference->GetType() << " name " << reference->GetName() << ": " << services.size() << " services";
+		Log(LOG_DEBUG_3) << "Service lookup " << static_cast<void *>(reference) << " type " << reference->GetType() << " name " << reference->GetName() << ": " << services.size() << " services";
 		reference->SetServices(services);
 	}
 	else
 	{
 		Service *service = this->FindService(reference->GetType(), reference->GetName());
-		Log(LOG_DEBUG_2) << "Service lookup " << static_cast<void *>(reference) << " type " << reference->GetType() << " name " << reference->GetName() << ": " << service;
+		Log(LOG_DEBUG_3) << "Service lookup " << static_cast<void *>(reference) << " type " << reference->GetType() << " name " << reference->GetName() << ": " << service;
 		reference->SetService(service);
 	}
 }

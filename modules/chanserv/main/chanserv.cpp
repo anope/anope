@@ -322,7 +322,7 @@ class ChanServCore : public Module
 				{
 					::Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Deleting channel " << ci->GetName() << " owned by deleted nick " << nc->GetDisplay();
 
-					delete ci;
+					ci->Delete();
 					continue;
 				}
 			}
@@ -330,6 +330,7 @@ class ChanServCore : public Module
 			if (ci->GetSuccessor() == nc)
 				ci->SetSuccessor(NULL);
 
+#warning "these arent necessary?"
 			/* are these necessary? */
 			for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 			{
@@ -338,7 +339,7 @@ class ChanServCore : public Module
 
 				if (anc && anc == nc)
 				{
-					delete ca;
+					ca->Delete();
 					break;
 				}
 			}
@@ -348,7 +349,7 @@ class ChanServCore : public Module
 				AutoKick *ak = ci->GetAkick(j);
 				if (ak->GetAccount() == nc)
 				{
-					delete ak;
+					ak->Delete();
 					break;
 				}
 			}
@@ -359,6 +360,7 @@ class ChanServCore : public Module
 	{
 		/* remove access entries that are this channel */
 
+#warning "also not necessary?"
 		for (ChanServ::Channel *c : ci->GetRefs<ChanServ::Channel *>())
 		{
 			for (unsigned j = 0; j < c->GetAccessCount(); ++j)
@@ -367,7 +369,7 @@ class ChanServCore : public Module
 
 				if (a->Mask().equals_ci(ci->GetName()))
 				{
-					delete a;
+					a->Delete();
 					break;
 				}
 			}
@@ -465,7 +467,7 @@ class ChanServCore : public Module
 		if (!chanserv_expire || Anope::NoExpire || Anope::ReadOnly)
 			return;
 
-		for (ChanServ::Channel *ci : channel_type.List<ChanServ::Channel *>())
+		for (ChanServ::Channel *ci : Serialize::GetObjects<ChanServ::Channel *>())
 		{
 			bool expire = false;
 
@@ -488,7 +490,7 @@ class ChanServCore : public Module
 			{
 				::Log(LOG_NORMAL, "chanserv/expire", ChanServ) << "Expiring channel " << ci->GetName() << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "(none)") << ")";
 				EventManager::Get()->Dispatch(&ChanServ::Event::ChanExpire::OnChanExpire, ci);
-				delete ci;
+				ci->Delete();
 			}
 		}
 	}
@@ -505,7 +507,7 @@ class ChanServCore : public Module
 	void OnPreUplinkSync(Server *serv) override
 	{
 		/* Find all persistent channels and create them, as we are about to finish burst to our uplink */
-		for (ChanServ::Channel *ci : channel_type.List<ChanServ::Channel *>())
+		for (ChanServ::Channel *ci : Serialize::GetObjects<ChanServ::Channel *>())
 		{
 			if (ci->HasFieldS("PERSIST"))
 			{

@@ -210,6 +210,8 @@ class DBSQL : public Module, public Pipe
 	{
 		if (this->shutting_down || obj->IsTSCached())
 			return;
+		if (obj->id == 0)
+			return; /* object is pending creation */
 		obj->UpdateTS();
 		this->updated_items.insert(obj);
 		this->Notify();

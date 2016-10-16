@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/sasl.h"
 
 static Anope::string UplinkSID;
 
@@ -20,7 +21,7 @@ class PlexusProto : public IRCDProto
  public:
 	PlexusProto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
 	{
-		DefaultPseudoclientModes = "+oiU";
+		DefaultPseudoclientModes = "+iU";
 		CanSVSNick = true;
 		CanSVSJoin = true;
 		CanSetVHost = true;
@@ -166,11 +167,28 @@ class PlexusProto : public IRCDProto
 	{
 		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSPART " << user->GetUID() << " " << chan;
 	}
+
+	void SendSASLMessage(const SASL::Message &message) anope_override
+	{
+		Server *s = Server::Find(message.target.substr(0, 3));
+		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : message.target.substr(0, 3)) << " SASL " << message.source << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : (" " + message.ext));
+	}
+
+	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) anope_override
+	{
+		Server *s = Server::Find(uid.substr(0, 3));
+		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : uid.substr(0, 3)) << " SVSLOGIN " << uid << " * * * " << acc;
+	}
+
+	void SendSVSNOOP(const Server *server, bool set) anope_override
+	{
+		UplinkSocket::Message() << "ENCAP " << server->GetName() << " SVSNOOP " << (set ? "+" : "-");
+	}
 };
 
 struct IRCDMessageEncap : IRCDMessage
 {
-	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -207,6 +225,19 @@ struct IRCDMessageEncap : IRCDMessage
 				FOREACH_MOD(OnFingerprint, (u));
 			}
 		}
+
+		else if (params[1] == "SASL" && SASL::sasl && params.size() >= 6)
+		{
+			SASL::Message m;
+			m.source = params[2];
+			m.target = params[3];
+			m.type = params[4];
+			m.data = params[5];
+			m.ext = params.size() > 6 ? params[6] : "";
+
+			SASL::sasl->ProcessMessage(m);
+		}
+
 		return;
 	}
 };

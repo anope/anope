@@ -345,6 +345,8 @@ namespace Anope
 		bool operator()(const string &s1, const string &s2) const;
 	};
 
+	extern Anope::string transform(const Anope::string &);
+
 	template<typename T> using map = std::map<string, T, ci::less>;
 	template<typename T> using multimap = std::multimap<string, T, ci::less>;
 	template<typename T> using hash_map = std::unordered_map<string, T, hash_ci, compare_ci>;

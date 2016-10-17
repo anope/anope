@@ -160,6 +160,7 @@ namespace locale {
 extern std::locale generate(const std::string &);
 extern int compare(const std::string &, const std::string &);
 extern long hash(const std::string &);
+extern std::string transform(const std::string &);
 
 #endif
 

@@ -94,6 +94,7 @@ class SQLiteService : public Provider
 	std::vector<Query> CreateTable(const Anope::string &, Serialize::TypeBase *) override;
 	std::vector<Query> AlterTable(const Anope::string &, Serialize::TypeBase *, Serialize::FieldBase *) override;
 	std::vector<Query> CreateIndex(const Anope::string &table, const Anope::string &field) override;
+	Query SelectFind(const Anope::string &table, const Anope::string &field) override;
 
 	Query BeginTransaction() override;
 	Query Commit() override;
@@ -103,6 +104,8 @@ class SQLiteService : public Provider
 	Query GetTables(const Anope::string &prefix);
 
 	Anope::string BuildQuery(const Query &q);
+
+	static void Canonicalize(sqlite3_context *context, int argc, sqlite3_value **argv);
 };
 
 class ModuleSQLite : public Module
@@ -186,6 +189,10 @@ SQLiteService::SQLiteService(Module *o, const Anope::string &n, const Anope::str
 		}
 		throw SQL::Exception(exstr);
 	}
+
+	int ret = sqlite3_create_function_v2(this->sql, "anope_canonicalize", 1, SQLITE_DETERMINISTIC, NULL, Canonicalize, NULL, NULL, NULL);
+	if (ret != SQLITE_OK)
+		Log(LOG_DEBUG) << "Unable to add anope_canonicalize function: " << sqlite3_errmsg(this->sql);
 }
 
 SQLiteService::~SQLiteService()
@@ -293,7 +300,7 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &prefix, Seria
 
 		for (Serialize::FieldBase *field : base->GetFields())
 		{
-			query += "`" + field->serialize_name + "` COLLATE NOCASE";
+			query += "`" + field->serialize_name + "`";
 			fields.insert(field->serialize_name);
 
 			if (field->object)
@@ -333,7 +340,7 @@ std::vector<Query> SQLiteService::AlterTable(const Anope::string &prefix, Serial
 
 	if (!s.count(field->serialize_name))
 	{
-		Anope::string buf = "ALTER TABLE `" + prefix + table + "` ADD `" + field->serialize_name + "` COLLATE NOCASE";
+		Anope::string buf = "ALTER TABLE `" + prefix + table + "` ADD `" + field->serialize_name + "`";
 
 		if (field->object)
 		{
@@ -365,12 +372,17 @@ std::vector<Query> SQLiteService::CreateIndex(const Anope::string &table, const 
 	if (indexes[table].count(field))
 		return queries;
 
-	Query t = "CREATE INDEX IF NOT EXISTS idx_" + field + " ON `" + table + "` (" + field + ")";
+	Query t = "CREATE INDEX IF NOT EXISTS idx_" + field + " ON `" + table + "` (anope_canonicalize(" + field + "))";
 	queries.push_back(t);
 
 	indexes[table].insert(field);
 
 	return queries;
+}
+
+Query SQLiteService::SelectFind(const Anope::string &table, const Anope::string &field)
+{
+	return Query("SELECT `id` FROM `" + table + "` WHERE anope_canonicalize(`" + field + "`) = anope_canonicalize(@value@)");
 }
 
 Query SQLiteService::BeginTransaction()
@@ -434,6 +446,19 @@ Anope::string SQLiteService::BuildQuery(const Query &q)
 	}
 
 	return real_query;
+}
+
+void SQLiteService::Canonicalize(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+	sqlite3_value *arg = argv[0];
+	const char *text = reinterpret_cast<const char *>(sqlite3_value_text(arg));
+
+	if (text == nullptr)
+		return;
+
+	const Anope::string &result = Anope::transform(text);
+
+	sqlite3_result_text(context, result.c_str(), -1, SQLITE_TRANSIENT);
 }
 
 MODULE_INIT(ModuleSQLite)

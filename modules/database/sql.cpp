@@ -136,7 +136,8 @@ class DBSQL : public Module, public Pipe
 		for (const Query &q : SQL->CreateIndex(prefix + type->GetName(), field->serialize_name))
 			Run(q);
 
-		Query query("SELECT `id` FROM `" + prefix + type->GetName() + "` WHERE `" + field->serialize_name + "` = @value@");
+		Query query = SQL->SelectFind(prefix + type->GetName(), field->serialize_name);
+
 		query.SetValue("value", value);
 		Result res = Run(query);
 		if (res.Rows())

@@ -212,6 +212,18 @@ bool Anope::compare_locale::operator()(const Anope::string &s1, const Anope::str
 	return Anope::compare_ci()(s1, s2);
 }
 
+Anope::string Anope::transform(const Anope::string &s)
+{
+#ifdef Boost_FOUND
+	if (Config != nullptr && Config->locale != nullptr)
+	{
+		return Anope::locale::transform(s.str());
+	}
+#endif
+
+	return s.lower();
+}
+
 #ifdef Boost_FOUND
 
 std::locale Anope::locale::generate(const std::string &name)
@@ -238,6 +250,12 @@ long Anope::locale::hash(const std::string &s)
 {
 	const boost::locale::collator<char> &ct = std::use_facet<boost::locale::collator<char>>(*Config->locale);
 	return ct.hash(boost::locale::collator_base::secondary, s.data(), s.data() + s.length());
+}
+
+std::string Anope::locale::transform(const std::string &s)
+{
+	const boost::locale::collator<char> &ct = std::use_facet<boost::locale::collator<char>>(*Config->locale);
+	return ct.transform(boost::locale::collator_base::secondary, s);
 }
 
 #endif

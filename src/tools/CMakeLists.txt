@@ -1,27 +1,16 @@
-# Find all the *.cpp files within the current source directory, and sort the list
-file(GLOB TOOLS_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
-list(SORT TOOLS_SRCS)
 
-# Set all the files to use C++ as well as set their compile flags
-set_source_files_properties(${TOOLS_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
-
-# Iterate through all the source files
-foreach(SRC ${TOOLS_SRCS})
-  # Convert the source file extension to have no extension
-  string(REGEX REPLACE "\\.cpp$" "" EXE ${SRC})
-  # Generate the executable and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
-  add_executable(${EXE} ${SRC})
-  set_target_properties(${EXE} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
-  add_dependencies(${EXE} ${PROGRAM_NAME})
-  # Set the executable to be installed to the bin directory under the main directory
-  install(TARGETS ${EXE}
-    DESTINATION ${BIN_DIR}
+function(build_sqlite LIBNAME)
+  add_library(tools_anope_sqlite_${LIBNAME} SHARED anope_sqlite.cpp)
+  set_source_files_properties(anope_sqlite.cpp PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
+  set_target_properties(tools_anope_sqlite_${LIBNAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}" OUTPUT_NAME "anope_sqlite_${LIBNAME}")
+  install(TARGETS tools_anope_sqlite_${LIBNAME}
+    DESTINATION ${LIB_DIR}
   )
-  # Add the executable to the list of files for CPack to ignore
-  get_target_property(EXE_BINARY ${EXE} LOCATION)
-  get_filename_component(EXE_BINARY ${EXE_BINARY} NAME)
-  add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
-endforeach()
+endfunction()
+
+build_sqlite(ascii)
+build_sqlite(rfc1459)
+build_sqlite(rfc1459_inspircd)
 
 # If not on Windows, generate anoperc and install it along with mydbgen
 if(NOT WIN32)

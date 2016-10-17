@@ -159,6 +159,7 @@ class MySQLService : public Provider
 	std::vector<Query> CreateTable(const Anope::string &prefix, Serialize::TypeBase *) override;
 	std::vector<Query> AlterTable(const Anope::string &, Serialize::TypeBase *, Serialize::FieldBase *) override;
 	std::vector<Query> CreateIndex(const Anope::string &table, const Anope::string &field) override;
+	Query SelectFind(const Anope::string &table, const Anope::string &field) override;
 
 	Query BeginTransaction() override;
 	Query Commit() override;
@@ -488,6 +489,11 @@ std::vector<Query> MySQLService::CreateIndex(const Anope::string &table, const A
 	indexes[table].insert(field);
 
 	return queries;
+}
+
+Query MySQLService::SelectFind(const Anope::string &table, const Anope::string &field)
+{
+	return Query("SELECT `id` FROM `" + table + "` WHERE `" + field + "` = @value@");
 }
 
 Query MySQLService::BeginTransaction()

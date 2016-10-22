@@ -45,6 +45,7 @@ class CommandMSInfo : public Command
 				source.Reply(_("\002{0}\002 isn't registered."), nname);
 				return;
 			}
+
 			mi = na->GetAccount()->GetMemos();
 			hardmax = na->GetAccount()->HasFieldS("MEMO_HARDMAX");
 		}
@@ -76,6 +77,7 @@ class CommandMSInfo : public Command
 			mi = nc->GetMemos();
 			hardmax = nc->HasFieldS("MEMO_HARDMAX");
 		}
+
 		if (!mi)
 			return;
 
@@ -115,7 +117,9 @@ class CommandMSInfo : public Command
 					source.Reply(_("The memo limit of \002{0}\002 is \002{1}\002."), nname, mi->GetMemoMax());
 			}
 			else
+			{
 				source.Reply(_("\002{0}\002 has no memo limit."), nname);
+			}
 
 			if (na)
 			{
@@ -132,7 +136,9 @@ class CommandMSInfo : public Command
 		else
 		{
 			if (memos.empty())
+			{
 				source.Reply(_("You currently have no memos."));
+			}
 			else if (memos.size() == 1)
 			{
 				if (mi->GetMemo(0)->GetUnread())
@@ -196,7 +202,9 @@ class CommandMSInfo : public Command
 					source.Reply(_("You will be notified of new memos at logon."));
 			}
 			else
+			{
 				source.Reply(_("You will not be notified of new memos."));
+			}
 		}
 	}
 

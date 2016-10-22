@@ -101,11 +101,11 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 			time_t send_delay = Config->GetModule("memoserv/main")->Get<time_t>("senddelay");
 			if (send_delay > 0 && sender->lastmemosend + send_delay > Anope::CurTime)
 				return MEMO_TOO_FAST;
-			else if (!mi->GetMemoMax())
+			if (!mi->GetMemoMax())
 				return MEMO_TARGET_FULL;
-			else if (mi->GetMemoMax() > 0 && mi->GetMemos().size() >= static_cast<unsigned>(mi->GetMemoMax()))
+			if (mi->GetMemoMax() > 0 && mi->GetMemos().size() >= static_cast<unsigned>(mi->GetMemoMax()))
 				return MEMO_TARGET_FULL;
-			else if (mi->HasIgnore(sender))
+			if (mi->HasIgnore(sender))
 				return MEMO_SUCCESS;
 		}
 
@@ -194,7 +194,9 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 				return ci->GetMemos();
 			}
 			else
+			{
 				is_registered = false;
+			}
 		}
 		else
 		{
@@ -211,7 +213,9 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 				return na->GetAccount()->GetMemos();
 			}
 			else
+			{
 				is_registered = false;
+			}
 		}
 
 		return NULL;

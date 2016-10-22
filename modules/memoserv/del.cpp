@@ -62,7 +62,9 @@ class CommandMSDel : public Command
 			mi = ci->GetMemos();
 		}
 		else
+		{
 			mi = source.nc->GetMemos();
+		}
 
 		if (numstr.empty() || (!isdigit(numstr[0]) && !numstr.equals_ci("ALL") && !numstr.equals_ci("LAST")))
 		{

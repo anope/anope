@@ -656,30 +656,31 @@ class CommandCSLevels : public Command
 		}
 
 		if (level <= ChanServ::ACCESS_INVALID || level > ChanServ::ACCESS_FOUNDER)
+		{
 			source.Reply(_("Level must be between \002{0}\002 and \002{1}\002 inclusive."), ChanServ::ACCESS_INVALID + 1, ChanServ::ACCESS_FOUNDER - 1);
+			return;
+		}
+
+		ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(what) : nullptr;
+		if (p == NULL)
+		{
+			CommandInfo *help = source.service->FindCommand("generic/help");
+			if (help)
+				source.Reply(_("There is no such privilege \002{0}\002. See \002{0}{1} {2} {3}\002 for a list of valid settings."),
+						what, Config->StrictPrivmsg, source.service->nick, help->cname, source.command);
+		}
 		else
 		{
-			ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(what) : nullptr;
-			if (p == NULL)
-			{
-				CommandInfo *help = source.service->FindCommand("generic/help");
-				if (help)
-					source.Reply(_("There is no such privilege \002{0}\002. See \002{0}{1} {2} {3}\002 for a list of valid settings."),
-					                what, Config->StrictPrivmsg, source.service->nick, help->cname, source.command);
-			}
+			bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << p->name << " to level " << level;
+
+			ci->SetLevel(p->name, level);
+			EventManager::Get()->Dispatch(&Event::LevelChange::OnLevelChange, source, ci, p->name, level);
+
+			if (level == ChanServ::ACCESS_FOUNDER)
+				source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002founder only\002."), p->name, ci->GetName());
 			else
-			{
-				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << p->name << " to level " << level;
-
-				ci->SetLevel(p->name, level);
-				EventManager::Get()->Dispatch(&Event::LevelChange::OnLevelChange, source, ci, p->name, level);
-
-				if (level == ChanServ::ACCESS_FOUNDER)
-					source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002founder only\002."), p->name, ci->GetName());
-				else
-					source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002{3}\002."), p->name, ci->GetName(), level);
-			}
+				source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002{3}\002."), p->name, ci->GetName(), level);
 		}
 	}
 

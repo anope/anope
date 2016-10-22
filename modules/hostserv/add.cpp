@@ -51,7 +51,9 @@ class CommandHSAdd : public Command
 		size_t a = rawhostmask.find('@');
 
 		if (a == Anope::string::npos)
+		{
 			host = rawhostmask;
+		}
 		else
 		{
 			user = rawhostmask.substr(0, a);

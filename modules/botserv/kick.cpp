@@ -898,7 +898,9 @@ class CommandBSKickFlood : public CommandBSKickBase
 			source.Reply(_("Bot won't kick for \002flood\002 anymore."));
 		}
 		else
+		{
 			this->OnSyntaxError(source, params[1]);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -998,7 +1000,9 @@ class CommandBSKickRepeat : public CommandBSKickBase
 			source.Reply(_("Bot won't kick for \002repeats\002 anymore."));
 		}
 		else
+		{
 			this->OnSyntaxError(source, params[1]);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -1110,7 +1114,9 @@ class CommandBSSetDontKickOps : public Command
 			source.Reply(_("Bot \002will kick ops\002 on channel \002{0}\002."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, source.command);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -1174,7 +1180,9 @@ class CommandBSSetDontKickVoices : public Command
 			source.Reply(_("Bot \002will kick voices\002 on channel %s."), ci->GetName().c_str());
 		}
 		else
+		{
 			this->OnSyntaxError(source, source.command);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -1402,7 +1410,9 @@ class BSKick : public Module
 				info[_("Bad words kicker")] = enabled;
 		}
 		else
+		{
 			info[_("Bad words kicker")] = disabled;
+		}
 
 		if (kd && kd->GetBolds())
 		{
@@ -1412,7 +1422,9 @@ class BSKick : public Module
 				info[_("Bolds kicker")] = enabled;
 		}
 		else
+		{
 			info[_("Bolds kicker")] = disabled;
+		}
 
 		if (kd && kd->GetCaps())
 		{
@@ -1422,7 +1434,9 @@ class BSKick : public Module
 				info[_("Caps kicker")] = Anope::printf(_("%s (minimum %d/%d%%)"), enabled.c_str(), kd->GetCapsMin(), kd->GetCapsPercent());
 		}
 		else
+		{
 			info[_("Caps kicker")] = disabled;
+		}
 
 		if (kd && kd->GetColors())
 		{
@@ -1432,7 +1446,9 @@ class BSKick : public Module
 				info[_("Colors kicker")] = enabled;
 		}
 		else
+		{
 			info[_("Colors kicker")] = disabled;
+		}
 
 		if (kd && kd->GetFlood())
 		{
@@ -1442,7 +1458,9 @@ class BSKick : public Module
 				info[_("Flood kicker")] = Anope::printf(_("%s (%d lines in %ds)"), enabled.c_str(), kd->GetFloodLines(), kd->GetFloodSecs());
 		}
 		else
+		{
 			info[_("Flood kicker")] = disabled;
+		}
 
 		if (kd && kd->GetRepeat())
 		{
@@ -1452,7 +1470,9 @@ class BSKick : public Module
 				info[_("Repeat kicker")] = Anope::printf(_("%s (%d times)"), enabled.c_str(), kd->GetRepeatTimes());
 		}
 		else
+		{
 			info[_("Repeat kicker")] = disabled;
+		}
 
 		if (kd && kd->GetReverses())
 		{
@@ -1462,7 +1482,9 @@ class BSKick : public Module
 				info[_("Reverses kicker")] = enabled;
 		}
 		else
+		{
 			info[_("Reverses kicker")] = disabled;
+		}
 
 		if (kd && kd->GetUnderlines())
 		{
@@ -1472,7 +1494,9 @@ class BSKick : public Module
 				info[_("Underlines kicker")] = enabled;
 		}
 		else
+		{
 			info[_("Underlines kicker")] = disabled;
+		}
 
 		if (kd && kd->GetItalics())
 		{
@@ -1482,7 +1506,9 @@ class BSKick : public Module
 				info[_("Italics kicker")] = enabled;
 		}
 		else
+		{
 			info[_("Italics kicker")] = disabled;
+		}
 
 		if (kd && kd->GetAmsgs())
 		{
@@ -1492,7 +1518,9 @@ class BSKick : public Module
 				info[_("AMSG kicker")] = enabled;
 		}
 		else
+		{
 			info[_("AMSG kicker")] = disabled;
+		}
 
 		if (kd && kd->GetDontKickOps())
 			info.AddOption(_("Ops protection"));

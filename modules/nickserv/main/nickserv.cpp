@@ -240,7 +240,8 @@ class NickServCore : public Module, public NickServ::NickServService
 			this->Collide(u, na);
 			return;
 		}
-		else if (MOD_RESULT == EVENT_ALLOW)
+
+		if (MOD_RESULT == EVENT_ALLOW)
 			return;
 
 		if (!na->GetAccount()->HasFieldS("NS_SECURE") && u->IsRecognized())
@@ -327,7 +328,9 @@ class NickServCore : public Module, public NickServ::NickServService
 			}
 		}
 		else
+		{
 			u->Kill(*NickServ, "Services nickname-enforcer kill");
+		}
 	}
 
 	void Release(NickServ::Nick *na) override

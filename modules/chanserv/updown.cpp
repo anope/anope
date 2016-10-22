@@ -69,72 +69,70 @@ class CommandCSUp : public Command
 				SetModes(source.GetUser(), c);
 			}
 			Log(LOG_COMMAND, source, this, NULL) << "on all channels to update their status modes";
+			return;
 		}
-		else
+
+		const Anope::string &chan = params[0];
+		const Anope::string &nick = params.size() > 1 ? params[1] : source.GetNick();
+
+		ChanServ::Channel *ci = ChanServ::Find(chan);
+		if (ci == NULL)
 		{
-			const Anope::string &chan = params[0];
-			const Anope::string &nick = params.size() > 1 ? params[1] : source.GetNick();
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
+			return;
+		}
 
-			ChanServ::Channel *ci = ChanServ::Find(chan);
-			if (ci == NULL)
+		if (ci->c == NULL)
+		{
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
+			return;
+		}
+
+		User *u = User::Find(nick, true);
+		User *srcu = source.GetUser();
+		Channel *c = ci->c;
+		bool override = false;
+
+		if (u == NULL)
+		{
+			source.Reply(_("User \002{0}\002 isn't currently online."), nick);
+			return;
+		}
+
+		if (srcu && !srcu->FindChannel(c))
+		{
+			source.Reply(_("You must be in \002%s\002 to use this command."), c->name.c_str());
+			return;
+		}
+
+		if (!u->FindChannel(c))
+		{
+			source.Reply(_("You must be on channel \002{0}\002 to use this command."), c->name);
+			return;
+		}
+
+		if (!u->FindChannel(c))
+		{
+			source.Reply(_("\002{0}\002 is not on channel \002{1}\002."), u->nick, c->name);
+			return;
+		}
+
+		if (source.GetUser() && u != source.GetUser() && c->ci->HasFieldS("PEACE"))
+		{
+			if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
 			{
-				source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
-				return;
-			}
-
-			if (ci->c == NULL)
-			{
-				source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
-				return;
-			}
-
-			User *u = User::Find(nick, true);
-			User *srcu = source.GetUser();
-			Channel *c = ci->c;
-			bool override = false;
-
-			if (u == NULL)
-			{
-				source.Reply(_("User \002{0}\002 isn't currently online."), nick);
-				return;
-			}
-
-			if (srcu && !srcu->FindChannel(c))
-			{
-				source.Reply(_("You must be in \002%s\002 to use this command."), c->name.c_str());
-				return;
-			}
-
-			if (!u->FindChannel(c))
-			{
-				source.Reply(_("You must be on channel \002{0}\002 to use this command."), c->name);
-				return;
-			}
-
-			if (!u->FindChannel(c))
-			{
-				source.Reply(_("\002{0}\002 is not on channel \002{1}\002."), u->nick, c->name);
-				return;
-			}
-
-			if (source.GetUser() && u != source.GetUser() && c->ci->HasFieldS("PEACE"))
-			{
-				if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
+				if (source.HasPriv("chanserv/administration"))
+					override = true;
+				else
 				{
-					if (source.HasPriv("chanserv/administration"))
-						override = true;
-					else
-					{
-						source.Reply(_("Access denied. \002{0}\002 has more privileges than you on \002{1}\002."), u->nick, ci->GetName());
-						return;
-					}
+					source.Reply(_("Access denied. \002{0}\002 has more privileges than you on \002{1}\002."), u->nick, ci->GetName());
+					return;
 				}
 			}
-
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci) << "to update the status modes of " << u->nick;
-			SetModes(u, c);
 		}
 
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci) << "to update the status modes of " << u->nick;
+		SetModes(u, c);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -175,72 +173,71 @@ class CommandCSDown : public Command
 				RemoveAll(source.GetUser(), c);
 			}
 			Log(LOG_COMMAND, source, this, NULL) << "on all channels to remove their status modes";
+			return;
 		}
-		else
+
+		const Anope::string &channel = params[0];
+		const Anope::string &nick = params.size() > 1 ? params[1] : source.GetNick();
+
+		ChanServ::Channel *ci = ChanServ::Find(channel);
+		if (ci == NULL)
 		{
-			const Anope::string &channel = params[0];
-			const Anope::string &nick = params.size() > 1 ? params[1] : source.GetNick();
+			source.Reply(_("Channel \002{0}\002 isn't registered."), channel);
+			return;
+		}
 
-			ChanServ::Channel *ci = ChanServ::Find(channel);
-			if (ci == NULL)
+		if (ci->c == NULL)
+		{
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
+			return;
+		}
+
+		User *u = User::Find(nick, true);
+		Channel *c = ci->c;
+
+		User *srcu = source.GetUser();
+		bool override = false;
+
+		if (u == NULL)
+		{
+			source.Reply(_("User \002{0}\002 isn't currently online."), nick);
+			return;
+		}
+
+		if (srcu && !srcu->FindChannel(c))
+		{
+			source.Reply(_("You must be on channel \002{0}\002 to use this command."), c->name);
+			return;
+		}
+
+		if (srcu && !srcu->FindChannel(c))
+		{
+			source.Reply(_("You must be in \002%s\002 to use this command."), c->name.c_str());
+			return;
+		}
+
+		if (!u->FindChannel(c))
+		{
+			source.Reply(_("\002%s\002 is not on channel %s."), u->nick, c->name);
+			return;
+		}
+
+		if (source.GetUser() && u != source.GetUser() && c->ci->HasFieldS("PEACE"))
+		{
+			if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
 			{
-				source.Reply(_("Channel \002{0}\002 isn't registered."), channel);
-				return;
-			}
-
-			if (ci->c == NULL)
-			{
-				source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
-				return;
-			}
-
-			User *u = User::Find(nick, true);
-			Channel *c = ci->c;
-
-			User *srcu = source.GetUser();
-			bool override = false;
-
-			if (u == NULL)
-			{
-				source.Reply(_("User \002{0}\002 isn't currently online."), nick);
-				return;
-			}
-
-			if (srcu && !srcu->FindChannel(c))
-			{
-				source.Reply(_("You must be on channel \002{0}\002 to use this command."), c->name);
-				return;
-			}
-
-			if (srcu && !srcu->FindChannel(c))
-			{
-				source.Reply(_("You must be in \002%s\002 to use this command."), c->name.c_str());
-				return;
-			}
-
-			if (!u->FindChannel(c))
-			{
-				source.Reply(_("\002%s\002 is not on channel %s."), u->nick, c->name);
-				return;
-			}
-
-			if (source.GetUser() && u != source.GetUser() && c->ci->HasFieldS("PEACE"))
-			{
-				if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
+				if (source.HasPriv("chanserv/administration"))
+					override = true;
+				else
 				{
-					if (source.HasPriv("chanserv/administration"))
-						override = true;
-					else
-					{
-						source.Reply(_("Access denied. \002{0}\002 has more privileges than you on \002{1}\002."), u->nick, ci->GetName());
-						return;
-					}
+					source.Reply(_("Access denied. \002{0}\002 has more privileges than you on \002{1}\002."), u->nick, ci->GetName());
+					return;
 				}
 			}
-
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci) << "to remove the status modes from " << u->nick;
-			RemoveAll(u, c);
 		}
+
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci) << "to remove the status modes from " << u->nick;
+		RemoveAll(u, c);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -96,6 +96,7 @@ class CommandCSUnban : public Command
 
 		for (unsigned i = 0; i < modes.size(); ++i)
 			ci->c->Unban(u2, modes[i]->name, source.GetUser() == u2);
+
 		if (u2 == source.GetUser())
 			source.Reply(_("You have been unbanned from \002{0}\002."), ci->c->name);
 		else

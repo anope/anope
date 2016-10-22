@@ -90,7 +90,9 @@ public:
 				return;
 			}
 			else
+			{
 				override = true;
+			}
 		}
 
 		if (what.equals_ci("ALL"))

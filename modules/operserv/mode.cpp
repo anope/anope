@@ -36,10 +36,18 @@ class CommandOSMode : public Command
 
 		Reference<Channel> c = Channel::Find(target);
 		if (!c)
+		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), target);
-		else if (c->bouncy_modes)
+			return;
+		}
+
+		if (c->bouncy_modes)
+		{
 			source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
-		else if (modes.equals_ci("CLEAR"))
+			return;
+		}
+
+		if (modes.equals_ci("CLEAR"))
 		{
 			bool all = params.size() > 2 && params[2].equals_ci("ALL");
 
@@ -69,7 +77,9 @@ class CommandOSMode : public Command
 				source.Reply(_("All modes cleared on \002{0}\002."), c->name);
 			}
 			else
+			{
 				source.Reply(_("Non-status modes cleared on \002{0}\002."), c->name);
+			}
 		}
 		else
 		{

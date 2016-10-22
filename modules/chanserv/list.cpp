@@ -227,7 +227,9 @@ class CommandCSSetPrivate : public Command
 			source.Reply(_("Private option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "PRIVATE");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

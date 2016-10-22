@@ -198,14 +198,18 @@ class CommandNSAccess : public Command
 			nc = na->GetAccount();
 		}
 		else
+		{
 			nc = source.nc;
+		}
 
 		if (!mask.empty() && (mask.find('@') == Anope::string::npos || mask.find('!') != Anope::string::npos))
 		{
 			source.Reply(_("Mask must be in the form \037user\037@\037host\037."));
 			source.Reply(_("\002%s%s HELP %s\002 for more information."), Config->StrictPrivmsg, source.service->nick, source.command); // XXX
+			return;
 		}
-		else if (cmd.equals_ci("LIST"))
+
+		if (cmd.equals_ci("LIST"))
 			return this->DoList(source, nc, mask);
 		else if (nc->HasFieldS("NS_SUSPENDED"))
 			source.Reply(_("\002{0}\002 is suspended."), nc->GetDisplay());

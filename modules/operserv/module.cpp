@@ -39,9 +39,13 @@ class CommandOSModLoad : public Command
 			source.Reply(_("Module \002{0}\002 loaded."), mname);
 		}
 		else if (status == MOD_ERR_EXISTS)
+		{
 			source.Reply(_("Module \002{0}\002 is already loaded."), mname);
+		}
 		else
+		{
 			source.Reply(_("Unable to load module \002{0}\002."), mname);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -108,7 +112,9 @@ class CommandOSModReLoad : public Command
 				Anope::Quitting = true;
 			}
 			else
+			{
 				source.Reply(_("Unable to load module \002{0}\002."), mname);
+			}
 		}
 	}
 
@@ -155,9 +161,9 @@ class CommandOSModUnLoad : public Command
 			source.Reply(_("Module \002{0}\002 unloaded."), mname);
 		}
 		else
+		{
 			source.Reply(_("Unable to remove module \002{0}\002."), mname);
-
-		return;
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

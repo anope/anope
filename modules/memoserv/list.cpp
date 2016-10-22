@@ -56,7 +56,9 @@ class CommandMSList : public Command
 			mi = ci->GetMemos();
 		}
 		else
+		{
 			mi = source.nc->GetMemos();
+		}
 
 		if (!param.empty() && !isdigit(param[0]) && !param.equals_ci("NEW"))
 		{

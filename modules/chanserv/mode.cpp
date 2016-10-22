@@ -323,7 +323,8 @@ class CommandCSMode : public Command
 							source.Reply(_("Unknown mode character \002{0}\002 ignored."), modes[i]);
 							break;
 						}
-						else if (u && !cm->CanSet(u))
+
+						if (u && !cm->CanSet(u))
 						{
 							source.Reply(_("You may not (un)lock mode \002{0}\002."), modes[i]);
 							break;
@@ -331,27 +332,36 @@ class CommandCSMode : public Command
 
 						Anope::string mode_param;
 						if (((cm->type == MODE_STATUS || cm->type == MODE_LIST) && !sep.GetToken(mode_param)) || (cm->type == MODE_PARAM && adding && !sep.GetToken(mode_param)))
+						{
 							source.Reply(_("Missing parameter for mode \002{0}\002."), cm->mchar);
-						else if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
+							break;
+						}
+
+						if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
+						{
 							source.Reply(_("List for mode \002{0}\002 is full."), cm->mchar);
-						else if (ci->GetRefs<ModeLock *>().size() >= Config->GetModule(this->GetOwner())->Get<unsigned>("max", "32"))
+							break;
+						}
+
+						if (ci->GetRefs<ModeLock *>().size() >= Config->GetModule(this->GetOwner())->Get<unsigned>("max", "32"))
+						{
 							source.Reply(_("The mode lock list of \002{0}\002 is full."), ci->GetName());
+							break;
+						}
+
+						mlocks->SetMLock(ci, cm, adding, mode_param, source.GetNick());
+
+						if (adding)
+						{
+							pos += cm->mchar;
+							if (!mode_param.empty())
+								pos_params += " " + mode_param;
+						}
 						else
 						{
-							mlocks->SetMLock(ci, cm, adding, mode_param, source.GetNick());
-
-							if (adding)
-							{
-								pos += cm->mchar;
-								if (!mode_param.empty())
-									pos_params += " " + mode_param;
-							}
-							else
-							{
-								neg += cm->mchar;
-								if (!mode_param.empty())
-									neg_params += " " + mode_param;
-							}
+							neg += cm->mchar;
+							if (!mode_param.empty())
+								neg_params += " " + mode_param;
 						}
 				}
 			}
@@ -368,7 +378,9 @@ class CommandCSMode : public Command
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << reply;
 			}
 			else if (needreply)
+			{
 				source.Reply(_("Nothing to do."));
+			}
 
 			if (ci->c)
 				ci->c->CheckModes();
@@ -400,7 +412,8 @@ class CommandCSMode : public Command
 							source.Reply(_("Unknown mode character \002{0}\002 ignored."), modes[i]);
 							break;
 						}
-						else if (u && !cm->CanSet(u))
+
+						if (u && !cm->CanSet(u))
 						{
 							source.Reply(_("You may not (un)lock mode \002{0}\002."), modes[i]);
 							break;
@@ -408,18 +421,21 @@ class CommandCSMode : public Command
 
 						Anope::string mode_param;
 						if (cm->type != MODE_REGULAR && !sep.GetToken(mode_param))
+						{
 							source.Reply(_("Missing parameter for mode \002{0}\002."), cm->mchar);
+							break;
+						}
+
+						if (mlocks->RemoveMLock(ci, cm, adding, mode_param))
+						{
+							if (!mode_param.empty())
+								mode_param = " " + mode_param;
+							source.Reply(_("\002{0}{1}{2}\002 has been unlocked from \002{3}\002."), adding == 1 ? '+' : '-', cm->mchar, mode_param, ci->GetName());
+							Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->mchar << mode_param;
+						}
 						else
 						{
-							if (mlocks->RemoveMLock(ci, cm, adding, mode_param))
-							{
-								if (!mode_param.empty())
-									mode_param = " " + mode_param;
-								source.Reply(_("\002{0}{1}{2}\002 has been unlocked from \002{3}\002."), adding == 1 ? '+' : '-', cm->mchar, mode_param, ci->GetName());
-								Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->mchar << mode_param;
-							}
-							else
-								source.Reply(_("\002{0}{1}\002 is not locked on \002{2}\002."), adding == 1 ? '+' : '-', cm->mchar, ci->GetName());
+							source.Reply(_("\002{0}{1}\002 is not locked on \002{2}\002."), adding == 1 ? '+' : '-', cm->mchar, ci->GetName());
 						}
 				}
 			}
@@ -462,7 +478,9 @@ class CommandCSMode : public Command
 				source.Reply(replies[i]);
 		}
 		else
+		{
 			this->OnSyntaxError(source, subcommand);
+		}
 	}
 
 	void DoSet(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -646,7 +664,9 @@ class CommandCSMode : public Command
 
 		ChannelMode *cm;
 		if (param.length() == 1)
+		{
 			cm = ModeManager::FindChannelModeByChar(param[0]);
+		}
 		else
 		{
 			cm = ModeManager::FindChannelModeByName(param.upper());
@@ -703,9 +723,13 @@ class CommandCSMode : public Command
 				this->DoLock(source, ci, params);
 		}
 		else if (!ci->c)
+		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
+		}
 		else if (subcommand.equals_ci("SET") && params.size() > 2)
+		{
 			this->DoSet(source, ci, params);
+		}
 		else if (subcommand.equals_ci("CLEAR"))
 		{
 			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/administration"))
@@ -714,7 +738,9 @@ class CommandCSMode : public Command
 				this->DoClear(source, ci, params);
 		}
 		else
+		{
 			this->OnSyntaxError(source, "");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -796,7 +822,9 @@ class CommandCSModes : public Command
 				return;
 			}
 			else
+			{
 				override = true;
+			}
 		}
 
 		if (!override && !m.first && u != targ && (targ->IsProtected() || (ci->HasFieldS("PEACE") && targ_access >= u_access)))
@@ -807,7 +835,9 @@ class CommandCSModes : public Command
 				return;
 			}
 			else
+			{
 				override = true;
+			}
 		}
 
 		if (!ci->c->FindUser(targ))
@@ -835,7 +865,9 @@ class CommandCSModes : public Command
 				return Anope::printf(Language::Translate(source.GetAccount(), _("Removes %s status from you or the specified nick on a channel")), m.second.c_str());
 		}
 		else
+		{
 			return "";
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

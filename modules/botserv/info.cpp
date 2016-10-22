@@ -76,9 +76,6 @@ class CommandBSInfo : public Command
 			source.Reply(_("Information for channel \002{0}\002:"), ci->GetName());
 			info[_("Bot nick")] = ci->GetBot() ? ci->GetBot()->nick : _("not assigned yet");
 
-			Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
-			Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
-
 			EventManager::Get()->Dispatch(&Event::ServiceBotEvent::OnServiceBot, source, bi, ci, info);
 
 			std::vector<Anope::string> replies;
@@ -88,7 +85,9 @@ class CommandBSInfo : public Command
 				source.Reply(replies[i]);
 		}
 		else
+		{
 			source.Reply(_("\002{0}\002 is not a valid bot or registered channel."), query);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

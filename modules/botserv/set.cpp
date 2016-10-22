@@ -191,7 +191,9 @@ class CommandBSSetPrivate : public Command
 			source.Reply(_("Private mode of bot \002{0}\002 is now \002off\002."), bi->nick);
 		}
 		else
+		{
 			this->OnSyntaxError(source, source.command);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

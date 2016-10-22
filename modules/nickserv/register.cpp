@@ -97,7 +97,9 @@ class CommandNSConfirm : public Command
 			}
 		}
 		else
+		{
 			source.Reply(_("Invalid passcode."));
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -250,7 +252,9 @@ class CommandNSRegister : public Command
 			na->SetLastRealname(u->realname);
 		}
 		else
+		{
 			na->SetLastRealname(source.GetNick());
+		}
 
 		Log(LOG_COMMAND, source, this) << "to register " << na->GetNick() << " (email: " << (!na->GetAccount()->GetEmail().empty() ? na->GetAccount()->GetEmail() : "none") << ")";
 

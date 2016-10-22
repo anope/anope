@@ -54,7 +54,9 @@ public:
 		User *u = User::Find(nick, true);
 		NickServ::Nick *na = NULL;
 		if (u != NULL)
+		{
 			ag = ci->AccessFor(u);
+		}
 		else
 		{
 			na = NickServ::FindNick(nick);
@@ -63,11 +65,17 @@ public:
 		}
 
 		if (ag.super_admin)
+		{
 			source.Reply(_("\002{0}\002 is a super administrator."), nick);
+		}
 		else if (ag.founder)
+		{
 			source.Reply(_("\002{0}\002 is the founder of \002{1}\002."), nick, ci->GetName());
+		}
 		else  if (ag.empty())
+		{
 			source.Reply(_("\002{0}\002 has no access on \002{1}\002."), nick, ci->GetName());
+		}
 		else
 		{
 			source.Reply(_("Access for \002{0}\002 on \002{1}\002:"), nick, ci->GetName());

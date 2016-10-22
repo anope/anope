@@ -160,7 +160,9 @@ class OSIgnoreService : public IgnoreService
 				id->Delete();
 			}
 			else
+			{
 				return id;
+			}
 		}
 
 		return NULL;
@@ -194,8 +196,10 @@ class CommandOSIgnore : public Command
 					return mask;
 			}
 			else
+			{
 				/* We have user@host. Add nick wildcard. */
 				return "*!" + mask;
+			}
 		}
 
 		/* We only got a nick.. */

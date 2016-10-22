@@ -118,7 +118,9 @@ class NSResetPass : public Module
 					}
 				}
 				else
+				{
 					return EVENT_CONTINUE;
+				}
 
 				return EVENT_STOP;
 			}

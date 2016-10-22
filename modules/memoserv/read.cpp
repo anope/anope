@@ -93,7 +93,6 @@ class CommandMSRead : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-
 		MemoServ::MemoInfo *mi;
 		ChanServ::Channel *ci = NULL;
 		Anope::string numstr = params[0], chan;
@@ -119,7 +118,9 @@ class CommandMSRead : public Command
 			mi = ci->GetMemos();
 		}
 		else
+		{
 			mi = source.nc->GetMemos();
+		}
 
 		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && numstr.find_first_not_of("0123456789.,-") != Anope::string::npos))
 		{

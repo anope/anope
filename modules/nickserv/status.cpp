@@ -36,6 +36,7 @@ class CommandNSStatus : public Command
 		spacesepstream sep(nick);
 		Anope::string nickbuf;
 
+#warning "this is all disabled"
 		while (sep.GetToken(nickbuf))
 		{
 			#if 0
@@ -89,7 +90,6 @@ class NSStatus : public Module
 	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandnsstatus(this)
 	{
-		throw ModuleException("Remind Adam to fix this");
 	}
 };
 

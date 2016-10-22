@@ -32,7 +32,6 @@ class CommandOSSVSNick : public Command
 	{
 		const Anope::string &nick = params[0];
 		Anope::string newnick = params[1];
-		User *u2;
 
 		if (!IRCD->CanSVSNick)
 		{
@@ -55,17 +54,22 @@ class CommandOSSVSNick : public Command
 			return;
 		}
 
-		/* Check for a nick in use or a forbidden/suspended nick */
-		if (!(u2 = User::Find(nick, true)))
-			source.Reply(_("\002{0}\002 isn't currently online."), nick);
-		else if (!nick.equals_ci(newnick) && User::Find(newnick))
-			source.Reply(_("\002{0}\002 is currently in use."), newnick);
-		else
+		User *u2 = User::Find(nick, true);
+		if (u2 == nullptr)
 		{
-			source.Reply(_("\002{0}\002 is now being changed to \002{1}\002."), nick, newnick);
-			Log(LOG_ADMIN, source, this) << "to change " << nick << " to " << newnick;
-			IRCD->SendForceNickChange(u2, newnick, Anope::CurTime);
+			source.Reply(_("\002{0}\002 isn't currently online."), nick);
+			return;
 		}
+
+		if (!nick.equals_ci(newnick) && User::Find(newnick, true))
+		{
+			source.Reply(_("\002{0}\002 is currently in use."), newnick);
+			return;
+		}
+
+		source.Reply(_("\002{0}\002 is now being changed to \002{1}\002."), nick, newnick);
+		Log(LOG_ADMIN, source, this) << "to change " << nick << " to " << newnick;
+		IRCD->SendForceNickChange(u2, newnick, Anope::CurTime);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -95,19 +99,32 @@ class CommandOSSVSJoin : public Command
 		User *target = User::Find(params[0], true);
 		Channel *c = Channel::Find(params[1]);
 		if (target == NULL)
-			source.Reply(_("\002{0}\002 isn't currently online."), params[0]);
-		else if (source.GetUser() != target && (target->IsProtected() || target->server == Me))
-			source.Reply(_("Access denied."));
-		else if (!c && !IRCD->IsChannelValid(params[1]))
-			source.Reply(_("\002{0}\002 isn't a valid channel."), params[1]);
-		else if (c && c->FindUser(target))
-			source.Reply(_("\002{0}\002 is already in \002{1}\002."), target->nick, c->name);
-		else
 		{
-			IRCD->SendSVSJoin(*source.service, target, params[1], "");
-			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to join " << params[1];
-			source.Reply(_("\002{0}\002 has been joined to \002{1}\002."), target->nick, params[1]);
+			source.Reply(_("\002{0}\002 isn't currently online."), params[0]);
+			return;
 		}
+
+		if (source.GetUser() != target && (target->IsProtected() || target->server == Me))
+		{
+			source.Reply(_("Access denied."));
+			return;
+		}
+
+		if (!c && !IRCD->IsChannelValid(params[1]))
+		{
+			source.Reply(_("\002{0}\002 isn't a valid channel."), params[1]);
+			return;
+		}
+
+		if (c && c->FindUser(target))
+		{
+			source.Reply(_("\002{0}\002 is already in \002{1}\002."), target->nick, c->name);
+			return;
+		}
+
+		IRCD->SendSVSJoin(*source.service, target, params[1], "");
+		Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to join " << params[1];
+		source.Reply(_("\002{0}\002 has been joined to \002{1}\002."), target->nick, params[1]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -135,25 +152,38 @@ class CommandOSSVSPart : public Command
 		}
 
 		User *target = User::Find(params[0], true);
-		Channel *c = Channel::Find(params[1]);
-		const Anope::string &reason = params.size() > 2 ? params[2] : "";
-		if (target == NULL)
-			source.Reply(_("\002{0}\002 isn't currently online."), params[0]);
-		else if (source.GetUser() != target && (target->IsProtected() || target->server == Me))
-			source.Reply(_("Access denied."));
-		else if (!c)
-			source.Reply(_("Channel \002{0}\002 doesn't exist."), params[1]);
-		else if (!c->FindUser(target))
-			source.Reply(_("\002{0}\002 is not in \002{1}\002."), target->nick, c->name);
-		else
+		if (target == nullptr)
 		{
-			IRCD->SendSVSPart(*source.service, target, params[1], reason);
-			if (!reason.empty())
-				Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name << " with reason " << reason;
-			else
-				Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name;
-			source.Reply(_("\002{0}\002 has been parted from \002{1}\002."), target->nick, c->name);
+			source.Reply(_("\002{0}\002 isn't currently online."), params[0]);
+			return;
 		}
+
+		if (source.GetUser() != target && (target->IsProtected() || target->server == Me))
+		{
+			source.Reply(_("Access denied."));
+			return;
+		}
+
+		Channel *c = Channel::Find(params[1]);
+		if (!c)
+		{
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), params[1]);
+			return;
+		}
+
+		if (!c->FindUser(target))
+		{
+			source.Reply(_("\002{0}\002 is not in \002{1}\002."), target->nick, c->name);
+			return;
+		}
+
+		const Anope::string &reason = params.size() > 2 ? params[2] : "";
+		IRCD->SendSVSPart(*source.service, target, params[1], reason);
+		if (!reason.empty())
+			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name << " with reason " << reason;
+		else
+			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name;
+		source.Reply(_("\002{0}\002 has been parted from \002{1}\002."), target->nick, c->name);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

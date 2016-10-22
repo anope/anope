@@ -128,7 +128,9 @@ class CommandCSSetAutoOp : public Command
 			source.Reply(_("Services will no longer automatically give modes to users in \002{0}\002."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "AUTOOP");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -392,7 +394,9 @@ class CommandCSSetKeepModes : public Command
 				m->Delete();
 		}
 		else
+		{
 			this->OnSyntaxError(source, "KEEPMODES");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -453,7 +457,9 @@ class CommandCSSetPeace : public Command
 			source.Reply(_("Peace option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "PEACE");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -605,7 +611,9 @@ class CommandCSSetPersist : public Command
 			source.Reply(_("Channel \002{0}\002 is no longer persistent."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "PERSIST");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -667,7 +675,9 @@ class CommandCSSetRestricted : public Command
 			source.Reply(_("Restricted access option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "RESTRICTED");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -728,7 +738,9 @@ class CommandCSSetSecure : public Command
 			source.Reply(_("Secure option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "SECURE");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -791,7 +803,9 @@ class CommandCSSetSecureFounder : public Command
 			source.Reply(_("Secure founder option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "SECUREFOUNDER");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -857,7 +871,9 @@ class CommandCSSetSecureOps : public Command
 			source.Reply(_("Secure ops option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "SECUREOPS");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -928,7 +944,9 @@ class CommandCSSetSignKick : public Command
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable sign kick";
 		}
 		else
+		{
 			this->OnSyntaxError(source, "SIGNKICK");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -979,7 +997,7 @@ class CommandCSSetSuccessor : public Command
 			return;
 		}
 
-		NickServ::Account *nc;
+		NickServ::Account *nc = nullptr;
 
 		if (!param.empty())
 		{
@@ -999,8 +1017,6 @@ class CommandCSSetSuccessor : public Command
 
 			nc = na->GetAccount();
 		}
-		else
-			nc = NULL;
 
 		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the successor from " << (ci->GetSuccessor() ? ci->GetSuccessor()->GetDisplay() : "(none)") << " to " << (nc ? nc->GetDisplay() : "(none)");
 
@@ -1067,7 +1083,9 @@ class CommandCSSetNoexpire : public Command
 			source.Reply(_("Channel \002{0} will\002 expire."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "NOEXPIRE");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

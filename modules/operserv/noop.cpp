@@ -36,10 +36,18 @@ class CommandOSNOOP : public Command
 
 		Server *s = Server::Find(server, true);
 		if (s == NULL)
+		{
 			source.Reply(_("Server \002{0}\002 does not exist."), server);
-		else if (s == Me || s->IsJuped() || s->IsULined())
+			return;
+		}
+
+		if (s == Me || s->IsJuped() || s->IsULined())
+		{
 			source.Reply(_("You can not NOOP Services."));
-		else if (cmd.equals_ci("SET"))
+			return;
+		}
+
+		if (cmd.equals_ci("SET"))
 		{
 			/* Remove the O:lines */
 			IRCD->SendSVSNOOP(s, true);
@@ -66,7 +74,9 @@ class CommandOSNOOP : public Command
 			source.Reply(_("All O:lines of \002{0}\002 have been reset."), s->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

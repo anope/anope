@@ -54,8 +54,11 @@ class CommandOSAKill : public Command
 			source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
 			return;
 		}
-		else if (expires > 0)
+
+		if (expires > 0)
+		{
 			expires += Anope::CurTime;
+		}
 
 		if (sep.StreamEnd())
 		{
@@ -83,7 +86,9 @@ class CommandOSAKill : public Command
 			mask.trim();
 		}
 		else
+		{
 			reason = sep.GetRemaining();
+		}
 
 		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
 		{

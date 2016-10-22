@@ -185,7 +185,9 @@ class CommandOSOper : public Command
 			}
 
 			if (ot->GetCommands().empty())
+			{
 				source.Reply(_("Opertype \002{0}\002 has no allowed commands."), ot->GetName());
+			}
 			else
 			{
 				source.Reply(_("Available commands for \002{0}\002:"), ot->GetName());
@@ -206,8 +208,11 @@ class CommandOSOper : public Command
 					buf.clear();
 				}
 			}
+
 			if (ot->GetPrivs().empty())
+			{
 				source.Reply(_("Opertype \002{0}\002 has no allowed privileges."), ot->GetName());
+			}
 			else
 			{
 				source.Reply(_("Available privileges for \002{0}\002:"), ot->GetName());
@@ -228,11 +233,14 @@ class CommandOSOper : public Command
 					buf.clear();
 				}
 			}
+
 			if (!ot->modes.empty())
 				source.Reply(_("Opertype \002{0}\002 receives modes \002{1}\002 once identified."), ot->GetName(), ot->modes);
 		}
 		else
+		{
 			this->OnSyntaxError(source, subcommand);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

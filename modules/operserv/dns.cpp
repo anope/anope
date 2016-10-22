@@ -689,7 +689,9 @@ class CommandOSDNS : public Command
 			}
 		}
 		else
+		{
 			source.Reply(_("Unknown SET option."));
+		}
 	}
 
 	void OnPool(CommandSource &source, const std::vector<Anope::string> &params)

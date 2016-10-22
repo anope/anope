@@ -205,7 +205,9 @@ class CommandCSAKick : public Command
 				mask += "#" + e.real;
 		}
 		else
+		{
 			nc = na->GetAccount();
+		}
 
 		/* Check excepts BEFORE we get this far */
 		if (ci->c)

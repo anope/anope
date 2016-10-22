@@ -26,16 +26,16 @@ class CommandOSSet : public Command
 	{
 		Log(LOG_ADMIN, source, this) << "LIST";
 
-		Anope::string index;
+		const char *str;
 
-		index = Anope::ReadOnly ? _("%s is enabled") : _("%s is disabled");
-		source.Reply(index.c_str(), "READONLY");
-		index = Anope::Debug ? _("%s is enabled") : _("%s is disabled");
-		source.Reply(index.c_str(), "DEBUG");
-		index = Anope::NoExpire ? _("%s is enabled") : _("%s is disabled");
-		source.Reply(index.c_str(), "NOEXPIRE");
+		str = Anope::ReadOnly ? _("{0} is enabled") : _("{0} is disabled");
+		source.Reply(str, "READONLY");
 
-		return;
+		str = Anope::Debug ? _("{0} is enabled") : _("{0} is disabled");
+		source.Reply(str, "DEBUG");
+
+		str = Anope::NoExpire ? _("{0} is enabled") : _("{0} is disabled");
+		source.Reply(str, "NOEXPIRE");
 	}
 
 	void DoSetReadOnly(CommandSource &source, const std::vector<Anope::string> &params)
@@ -61,7 +61,9 @@ class CommandOSSet : public Command
 			source.Reply(_("Services are now in \002read-write\002 mode."));
 		}
 		else
+		{
 			source.Reply(_("Setting for READONLY must be \002ON\002 or \002OFF\002."));
+		}
 	}
 
 	void DoSetSuperAdmin(CommandSource &source, const std::vector<Anope::string> &params)
@@ -84,8 +86,12 @@ class CommandOSSet : public Command
 		 **/
 		bool super_admin = Config->GetModule(this->GetOwner())->Get<bool>("superadmin");
 		if (!super_admin)
+		{
 			source.Reply(_("Super admin can not be set because it is not enabled in the configuration."));
-		else if (setting.equals_ci("ON"))
+			return;
+		}
+
+		if (setting.equals_ci("ON"))
 		{
 			source.GetUser()->super_admin = true;
 			source.Reply(_("You are now a super admin."));
@@ -98,7 +104,9 @@ class CommandOSSet : public Command
 			Log(LOG_ADMIN, source, this) << "SUPERADMIN OFF";
 		}
 		else
+		{
 			source.Reply(_("Setting for super admin must be \002ON\002 or \002OFF\002."));
+		}
 	}
 
 	void DoSetDebug(CommandSource &source, const std::vector<Anope::string> &params)
@@ -136,8 +144,6 @@ class CommandOSSet : public Command
 
 			source.Reply(_("Setting for DEBUG must be \002ON\002, \002OFF\002, or a positive number."));
 		}
-
-		return;
 	}
 
 	void DoSetNoExpire(CommandSource &source, const std::vector<Anope::string> &params)
@@ -163,7 +169,9 @@ class CommandOSSet : public Command
 			source.Reply(_("Services are now in \002expire\002 mode."));
 		}
 		else
+		{
 			source.Reply(_("Setting for NOEXPIRE must be \002ON\002 or \002OFF\002."));
+		}
 	}
  public:
 	CommandOSSet(Module *creator) : Command(creator, "operserv/set", 1, 2)
@@ -202,6 +210,7 @@ class CommandOSSet : public Command
 					"    LIST       List the options"));
 		}
 		else if (subcommand.equals_ci("LIST"))
+#warning "?"
 			//source.Reply(_("Syntax: \002LIST\002\n"
 			//		" \n"
 			source.Reply(("Display the various {0} settings."), source.service->nick);

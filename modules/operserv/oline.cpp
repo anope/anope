@@ -52,9 +52,9 @@ class CommandOSOLine : public Command
 			Log(LOG_ADMIN, source, this) << "for " << nick;
 		}
 		else
+		{
 			this->OnSyntaxError(source, "");
-
-		return;
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

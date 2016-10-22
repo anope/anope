@@ -130,7 +130,9 @@ class CommandMSIgnore : public Command
 				source.Reply(replies[i]);
 		}
 		else
+		{
 			this->OnSyntaxError(source, "");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -143,7 +143,9 @@ class CommandOSSXLineBase : public Command
 		}
 
 		if (list.IsEmpty())
+		{
 			source.Reply(_("No matching entries on the {0} list."), source.command);
+		}
 		else
 		{
 			source.Reply(_("{0} list:"), source.command);
@@ -408,9 +410,12 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			}
 		}
 		else if (subcommand.equals_ci("DEL"))
+		{
 			source.Reply(_("The \002{0} DEL\002 command removes the given \037mask\037 from the {0} list if it is present."
 			               " If a list of entry numbers is given, those entries are deleted."));
+		}
 		else if (subcommand.equals_ci("LIST") || subcommand.equals_ci("VIEW"))
+		{
 			source.Reply(_("The \002{0} LIST\002 and \002{0} VIEW\002 commands displays the {0} list.\n"
 			               "If a wildcard \037mask\037 is given, only those entries matching the \037mask\037 are displayed."
 			               " If a list of entry numbers is given, only those entries are shown."
@@ -421,9 +426,12 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			               "         {0} LIST 2-5,7-9\n"
 			               "         Lists {0} entries numbered 2 through 5 and 7 through 9.\n"),
 			               source.command);
+		}
 		else if (subcommand.equals_ci("CLEAR"))
+		{
 			source.Reply(_("\002{0} CLEAR\002 removes all entries from the {0} list."),
 			               source.command);
+		}
 		else
 		{
 			CommandInfo *help = source.service->FindCommand("generic/help");
@@ -645,9 +653,12 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			}
 		}
 		else if (subcommand.equals_ci("DEL"))
+		{
 			source.Reply(_("The \002{0} DEL\002 command removes the given \037mask\037 from the {0} list if it is present."
 			               " If a list of entry numbers is given, those entries are deleted."));
+		}
 		else if (subcommand.equals_ci("LIST") || subcommand.equals_ci("VIEW"))
+		{
 			source.Reply(_("The \002{0} LIST\002 and \002{0} VIEW\002 commands displays the {0} list.\n"
 			               "If a wildcard \037mask\037 is given, only those entries matching the \037mask\037 are displayed."
 			               " If a list of entry numbers is given, only those entries are shown."
@@ -658,9 +669,12 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			               "         {0} LIST 2-5,7-9\n"
 			               "         Lists {0} entries numbered 2 through 5 and 7 through 9.\n"),
 			               source.command);
+		}
 		else if (subcommand.equals_ci("CLEAR"))
+		{
 			source.Reply(_("\002{0} CLEAR\002 removes all entries from the {0} list."),
 			               source.command);
+		}
 		else
 		{
 			CommandInfo *help = source.service->FindCommand("generic/help");

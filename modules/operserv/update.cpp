@@ -32,7 +32,6 @@ class CommandOSUpdate : public Command
 		Log(LOG_ADMIN, source, this);
 		source.Reply(_("Updating databases."));
 		Anope::SaveDatabases();
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -207,7 +207,9 @@ class CommandBSSetNoBot : public Command
 			source.Reply(_("No-bot mode is now \002off\002 for \002{0}\002."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, source.command);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

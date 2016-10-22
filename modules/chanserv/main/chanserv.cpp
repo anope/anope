@@ -256,7 +256,9 @@ class ChanServCore : public Module
 			defaults.push_back("SIGNKICK");
 		}
 		else if (defaults[0].equals_ci("none"))
+		{
 			defaults.clear();
+		}
 
 		always_lower = conf->GetModule(this)->Get<bool>("always_lower_ts");
 	}

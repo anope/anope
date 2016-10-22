@@ -316,7 +316,9 @@ public:
 			source.Reply(_("Logging is now active for command \002{0}\002 on \002{1}\002, using log method \002{2}{3}{4}\002."), !command_name.empty() ? command_name : service_name, bi ? bi->nick : "any service", method, extra.empty() ? "" : " ", extra);
 		}
 		else
+		{
 			this->OnSyntaxError(source, "");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -406,7 +408,9 @@ class CSLog : public Module
 				log->SetCommandName(d.command);
 			}
 			else
+			{
 				log->SetServiceName(d.command);
+			}
 
 			spacesepstream sep(d.method);
 			Anope::string method, extra;

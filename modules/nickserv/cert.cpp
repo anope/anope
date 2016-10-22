@@ -279,7 +279,9 @@ class CommandNSCert : public Command
 			nc = na->GetAccount();
 		}
 		else
+		{
 			nc = source.nc;
+		}
 
 		if (cmd.equals_ci("LIST"))
 			return this->DoList(source, nc);

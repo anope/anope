@@ -145,7 +145,9 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 			}
 		}
 		else
+		{
 			source.Reply(_("\002{0}\002 isn't registered."), user);
+		}
 	}
 };
 

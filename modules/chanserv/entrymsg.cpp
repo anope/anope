@@ -161,27 +161,32 @@ class CommandEntryMessage : public Command
 		std::vector<EntryMsg *> messages = ci->GetRefs<EntryMsg *>();
 
 		if (!message.is_pos_number_only())
-			source.Reply(("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->GetName());
-		else if (messages.empty())
-			source.Reply(_("Entry message list for \002{0}\002 is empty."), ci->GetName());
-		else
 		{
-			try
+			source.Reply(("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->GetName());
+			return;
+		}
+
+		if (messages.empty())
+		{
+			source.Reply(_("Entry message list for \002{0}\002 is empty."), ci->GetName());
+			return;
+		}
+
+		try
+		{
+			unsigned i = convertTo<unsigned>(message);
+			if (i > 0 && i <= messages.size())
 			{
-				unsigned i = convertTo<unsigned>(message);
-				if (i > 0 && i <= messages.size())
-				{
-					messages[i - 1]->Delete();
-					Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
-					source.Reply(_("Entry message \002{0}\002 for \002{1]\002 deleted."), i, ci->GetName());
-				}
-				else
-					throw ConvertException();
+				messages[i - 1]->Delete();
+				Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
+				source.Reply(_("Entry message \002{0}\002 for \002{1]\002 deleted."), i, ci->GetName());
 			}
-			catch (const ConvertException &)
-			{
-				source.Reply(_("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->GetName());
-			}
+			else
+				throw ConvertException();
+		}
+		catch (const ConvertException &)
+		{
+			source.Reply(_("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->GetName());
 		}
 	}
 

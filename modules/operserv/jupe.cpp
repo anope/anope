@@ -35,26 +35,35 @@ class CommandOSJupe : public Command
 		Server *server = Server::Find(jserver, true);
 
 		if (!IRCD->IsHostValid(jserver) || jserver.find('.') == Anope::string::npos)
-			source.Reply(_("\002{0}\002 is not a valid server name."), jserver);
-		else if (server == Me || server == Servers::GetUplink() || server->IsULined())
-			source.Reply(_("You can not jupe Servoces or its uplink server."));
-		else if (server && server->IsJuped())
-			source.Reply(_("You can not jupe an already juped server."));
-		else
 		{
-			Anope::string rbuf = "Juped by " + source.GetNick() + (!reason.empty() ? ": " + reason : "");
-			/* Generate the new sid before quitting the old server, so they can't collide */
-			Anope::string sid = IRCD->SID_Retrieve();
-			if (server)
-			{
-				IRCD->SendSquit(server, rbuf);
-				server->Delete(rbuf);
-			}
-			Server *juped_server = new Server(Me, jserver, 1, rbuf, sid, true);
-			IRCD->SendServer(juped_server);
-
-			Log(LOG_ADMIN, source, this) << "on " << jserver << " (" << rbuf << ")";
+			source.Reply(_("\002{0}\002 is not a valid server name."), jserver);
+			return;
 		}
+
+		if (server == Me || server == Servers::GetUplink() || server->IsULined())
+		{
+			source.Reply(_("You can not jupe Servoces or its uplink server."));
+			return;
+		}
+
+		if (server && server->IsJuped())
+		{
+			source.Reply(_("You can not jupe an already juped server."));
+			return;
+		}
+
+		Anope::string rbuf = "Juped by " + source.GetNick() + (!reason.empty() ? ": " + reason : "");
+		/* Generate the new sid before quitting the old server, so they can't collide */
+		Anope::string sid = IRCD->SID_Retrieve();
+		if (server)
+		{
+			IRCD->SendSquit(server, rbuf);
+			server->Delete(rbuf);
+		}
+		Server *juped_server = new Server(Me, jserver, 1, rbuf, sid, true);
+		IRCD->SendServer(juped_server);
+
+		Log(LOG_ADMIN, source, this) << "on " << jserver << " (" << rbuf << ")";
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -125,7 +125,9 @@ class CommandOSConfig : public Command
 			source.Reply(_("End of configuration."));
 		}
 		else
+		{
 			this->OnSyntaxError(source, what);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

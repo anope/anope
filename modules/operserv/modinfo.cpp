@@ -35,42 +35,43 @@ class CommandOSModInfo : public Command
 		Log(LOG_ADMIN, source, this) << "on " << file;
 
 		Module *m = ModuleManager::FindModule(file);
-		if (m)
+		if (m == nullptr)
 		{
-			source.Reply(_("Module: \002{0}\002 Version: \002{1}\002 Author: \002{2}\002 Loaded: \002{3}\002"), m->name, !m->version.empty() ? m->version : "?", !m->author.empty() ? m->author : "Unknown", Anope::strftime(m->created, source.GetAccount()));
-			if (Anope::Debug)
-				source.Reply(_(" Loaded at: {0}"), Anope::printf("0x%x", m->handle));
+			source.Reply(_("No information about module \002{0}\002 is available."), file);
+			return;
+		}
 
-			std::vector<Command *> commands = ServiceManager::Get()->FindServices<Command *>();
-			for (Command *c : commands)
+		source.Reply(_("Module: \002{0}\002 Version: \002{1}\002 Author: \002{2}\002 Loaded: \002{3}\002"), m->name, !m->version.empty() ? m->version : "?", !m->author.empty() ? m->author : "Unknown", Anope::strftime(m->created, source.GetAccount()));
+		if (Anope::Debug)
+			source.Reply(_(" Loaded at: {0}"), Anope::printf("0x%x", m->handle));
+
+		std::vector<Command *> commands = ServiceManager::Get()->FindServices<Command *>();
+		for (Command *c : commands)
+		{
+			if (c->GetOwner() != m)
+				continue;
+
+			source.Reply(_("   Providing service: \002{0}\002"), c->GetName());
+
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			{
-				if (c->GetOwner() != m)
+				User *u = it->second;
+
+				if (u->type != UserType::BOT)
 					continue;
 
-				source.Reply(_("   Providing service: \002{0}\002"), c->GetName());
+				ServiceBot *bi = anope_dynamic_static_cast<ServiceBot *>(u);
 
-				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+				for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
 				{
-					User *u = it->second;
-
-					if (u->type != UserType::BOT)
+					const Anope::string &c_name = cit->first;
+					const CommandInfo &info = cit->second;
+					if (info.name != c->GetName())
 						continue;
-
-					ServiceBot *bi = anope_dynamic_static_cast<ServiceBot *>(u);
-
-					for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
-					{
-						const Anope::string &c_name = cit->first;
-						const CommandInfo &info = cit->second;
-						if (info.name != c->GetName())
-							continue;
-						source.Reply(_("   Command \002{0}\002 on \002{1}\002 is linked to \002{2}\002"), c_name, bi->nick, c->GetName());
-					}
+					source.Reply(_("   Command \002{0}\002 on \002{1}\002 is linked to \002{2}\002"), c_name, bi->nick, c->GetName());
 				}
 			}
 		}
-		else
-			source.Reply(_("No information about module \002{0}\002 is available."), file);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

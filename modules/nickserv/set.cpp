@@ -53,6 +53,7 @@ class CommandNSSet : public Command
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				ServiceReference<Command> c(info.name);
+#warning "set duplication"
 				// XXX dup
 				if (!c)
 					continue;
@@ -273,7 +274,9 @@ class CommandNSSetAutoOp : public Command
 			source.Reply(_("Services will no longer set status modes on \002{0}\002 in channels."), nc->GetDisplay());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "AUTOOP");
+		}
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -573,7 +576,9 @@ class CommandNSSetKeepModes : public Command
 			source.Reply(_("Keep modes for \002{0}\002 is now \002off\002."), nc->GetDisplay());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "");
+		}
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -683,7 +688,9 @@ class CommandNSSetKill : public Command
 			source.Reply(_("Protection is now \002off\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "KILL");
+		}
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -881,7 +888,9 @@ class CommandNSSetMessage : public Command
 			source.Reply(_("Services will now reply to \002{0}\002 with \002notices\002."), nc->GetDisplay());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "MSG");
+		}
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -976,7 +985,9 @@ class CommandNSSetSecure : public Command
 			source.Reply(_("Secure option is now \002off\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "SECURE");
+		}
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -1058,7 +1069,9 @@ class CommandNSSASetNoexpire : public Command
 			source.Reply(_("\002{0}\002 \002will\002 expire."), na->GetNick());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "NOEXPIRE");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

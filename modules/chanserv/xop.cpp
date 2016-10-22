@@ -431,7 +431,9 @@ class CommandCSXOP : public Command
 		}
 
 		if (list.IsEmpty())
+		{
 			source.Reply(_("No matching entries on %s access list."), ci->GetName().c_str());
+		}
 		else
 		{
 			std::vector<Anope::string> replies;

@@ -107,7 +107,7 @@ class CommandOSLogSearch : public Command
 			if (!fd.is_open())
 				continue;
 
-			for (Anope::string buf, token; std::getline(fd, buf.str());)
+			for (Anope::string buf; std::getline(fd, buf.str());)
 				if (Anope::Match(buf, "*" + search_string + "*"))
 					matches.push_back(buf);
 
@@ -126,8 +126,8 @@ class CommandOSLogSearch : public Command
 
 		source.Reply(_("Matches for \002{0}\002:"), search_string);
 		unsigned count = 0;
-		for (std::list<Anope::string>::iterator it = matches.begin(), it_end = matches.end(); it != it_end; ++it)
-			source.Reply("#%d: %s", ++count, it->c_str());
+		for (const Anope::string &str : matches)
+			source.Reply("#{0}: {1}", ++count, str);
 		source.Reply(_("Showed \002{0}/{1}\002 matches for \002{2}\002."), matches.size(), found, search_string);
 	}
 

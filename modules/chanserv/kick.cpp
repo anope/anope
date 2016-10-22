@@ -132,7 +132,9 @@ class CommandCSKick : public Command
 				source.Reply(_("No users on\002{0}\002 match \002{1}\002."), c->name, mask);
 		}
 		else
+		{
 			source.Reply(_("\002{0}\002 isn't currently in use."), target);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

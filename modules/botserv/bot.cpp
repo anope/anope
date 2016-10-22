@@ -216,6 +216,7 @@ class CommandBSBot : public Command
 				return;
 			}
 
+#warning "xline on the stack"
 			/* The new nick is really different, so we remove the Q line for the old nick. */
 			//XLine x_del(bi->nick);
 			//IRCD->SendSQLineDel(&x_del);
@@ -373,7 +374,9 @@ class CommandBSBot : public Command
 			this->DoDel(source, params);
 		}
 		else
+		{
 			this->OnSyntaxError(source, "");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

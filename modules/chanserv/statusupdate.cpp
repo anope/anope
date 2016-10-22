@@ -23,6 +23,32 @@ class StatusUpdate : public Module
 	, public EventHook<Event::AccessAdd>
 	, public EventHook<Event::AccessDel>
 {
+	void ApplyModes(ChanServ::Channel *ci, ChanServ::ChanAccess *access, bool set)
+	{
+		if (ci->c == nullptr)
+			return;
+
+		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		{
+			User *user = it->second->user;
+
+			if (user->server != Me && access->Matches(user, user->Account()))
+			{
+				ChanServ::AccessGroup ag = ci->AccessFor(user);
+
+				for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+				{
+					ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
+					if (!ag.HasPriv("AUTO" + cms->name))
+						ci->c->RemoveMode(NULL, cms, user->GetUID());
+				}
+
+				if (set)
+					ci->c->SetCorrectModes(user, true);
+			}
+		}
+	}
+
  public:
 	StatusUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::AccessAdd>(this)
@@ -33,46 +59,13 @@ class StatusUpdate : public Module
 
 	void OnAccessAdd(ChanServ::Channel *ci, CommandSource &, ChanServ::ChanAccess *access) override
 	{
-		if (ci->c)
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
-			{
-				User *user = it->second->user;
-
-				if (user->server != Me && access->Matches(user, user->Account()))
-				{
-					ChanServ::AccessGroup ag = ci->AccessFor(user);
-
-					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
-					{
-						ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
-						if (!ag.HasPriv("AUTO" + cms->name))
-							ci->c->RemoveMode(NULL, cms, user->GetUID());
-					}
-					ci->c->SetCorrectModes(user, true);
-				}
-			}
+		ApplyModes(ci, access, true);
 	}
 
 	// XXX this relies on the access entry already being removed from the list?
 	void OnAccessDel(ChanServ::Channel *ci, CommandSource &, ChanServ::ChanAccess *access) override
 	{
-		if (ci->c)
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
-			{
-				User *user = it->second->user;
-
-				if (user->server != Me && access->Matches(user, user->Account()))
-				{
-					ChanServ::AccessGroup ag = ci->AccessFor(user);
-
-					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
-					{
-						ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
-						if (!ag.HasPriv("AUTO" + cms->name))
-							ci->c->RemoveMode(NULL, cms, user->GetUID());
-					}
-				}
-			}
+		ApplyModes(ci, access, false);
 	}
 };
 

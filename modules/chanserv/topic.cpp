@@ -73,7 +73,9 @@ class CommandCSSetKeepTopic : public Command
 			source.Reply(_("Topic retention option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
+		{
 			this->OnSyntaxError(source, "KEEPTOPIC");
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -146,7 +148,9 @@ class CommandCSTopic : public Command
 			ci->SetLastTopic("");
 		}
 		else
+		{
 			new_topic = topic;
+		}
 
 		this->Set(source, ci, new_topic);
 	}
@@ -168,17 +172,33 @@ class CommandCSTopic : public Command
 
 		ChanServ::Channel *ci = ChanServ::Find(channel);
 		if (ci == NULL)
+		{
 			source.Reply(_("Channel \002{0}\002 isn't registered."), channel);
-		else if (!source.AccessFor(ci).HasPriv("TOPIC") && !source.HasCommand("chanserv/topic"))
+			return;
+		}
+
+		if (!source.AccessFor(ci).HasPriv("TOPIC") && !source.HasCommand("chanserv/topic"))
+		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "TOPIC", ci->GetName());
-		else if (subcmd.equals_ci("LOCK"))
+			return;
+		}
+
+		if (subcmd.equals_ci("LOCK"))
+		{
 			this->Lock(source, ci, params);
+		}
 		else if (subcmd.equals_ci("UNLOCK"))
+		{
 			this->Unlock(source, ci, params);
+		}
 		else if (!ci->c)
+		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
+		}
 		else if (subcmd.equals_ci("APPEND") && params.size() > 2)
+		{
 			this->Append(source, ci, params);
+		}
 		else
 		{
 			Anope::string topic;
@@ -192,6 +212,7 @@ class CommandCSTopic : public Command
 				if (params.size() > 2)
 					topic += " " + params[2];
 			}
+
 			this->Set(source, ci, topic);
 		}
 	}

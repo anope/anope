@@ -57,7 +57,9 @@ class CommandMSSet : public Command
 				source.Reply(_("You will now be informed about new memos via email."));
 			}
 			else
+			{
 				source.Reply(_("There's no email address set for your nick."));
+			}
 		}
 		else if (param.equals_ci("NOMAIL"))
 		{
@@ -72,7 +74,9 @@ class CommandMSSet : public Command
 			source.Reply(_("\002{0}\002 will not send you any notification of memos."), MemoServ->nick);
 		}
 		else
+		{
 			this->OnSyntaxError(source, "");
+		}
 	}
 
 	void DoLimit(CommandSource &source, const std::vector<Anope::string> &params, MemoServ::MemoInfo *mi)
@@ -106,8 +110,10 @@ class CommandMSSet : public Command
 				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->GetName());
 				return;
 			}
+
 			mi = ci->GetMemos();
 		}
+
 		if (is_servadmin)
 		{
 			if (!p2.empty() && !p2.equals_ci("HARD") && chan.empty())
@@ -185,7 +191,9 @@ class CommandMSSet : public Command
 				return;
 			}
 		}
+
 		mi->SetMemoMax(limit);
+
 		if (limit > 0)
 		{
 			if (chan.empty() && nc == source.nc)
@@ -248,6 +256,7 @@ class CommandMSSet : public Command
 			               Config->StrictPrivmsg, source.service->nick, help->cname, source.command);
 		}
 		else if (subcommand.equals_ci("NOTIFY"))
+		{
 			source.Reply(_("Syntax: \002NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"
 			               "\n"
 			               "Changes when you will be notified about new memos:\n"
@@ -270,6 +279,7 @@ class CommandMSSet : public Command
 			               "    OFF     You will not receive any notification of memos.\n"
 			               "\n"
 			               "\002ON\002 is essentially \002LOGON\002 and \002NEW\002 combined."));
+		}
 		else if (subcommand.equals_ci("LIMIT"))
 		{
 			int max_memos = Config->GetModule("memoserv/main")->Get<int>("maxmemos");
@@ -294,7 +304,9 @@ class CommandMSSet : public Command
 				              "However, you cannot set this any higher than {0}."), max_memos);
 		}
 		else
+		{
 			return false;
+		}
 
 		return true;
 	}

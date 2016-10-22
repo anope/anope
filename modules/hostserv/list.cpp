@@ -120,7 +120,9 @@ class CommandHSList : public Command
 		}
 
 		if (!key.empty())
+		{
 			source.Reply(_("Displayed records matching key \002{0}\002 (count: \002{1}\002)."), key, display_counter);
+		}
 		else
 		{
 			if (from)

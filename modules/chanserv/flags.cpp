@@ -431,9 +431,13 @@ class CommandCSFlags : public Command
 		}
 
 		if (is_list)
+		{
 			this->DoList(source, ci, params);
+		}
 		else if (cmd.equals_ci("CLEAR"))
+		{
 			this->DoClear(source, ci);
+		}
 		else
 		{
 			Anope::string mask, flags;

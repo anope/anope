@@ -35,18 +35,23 @@ class CommandOSKill : public Command
 
 		User *u2 = User::Find(nick, true);
 		if (u2 == NULL)
-			source.Reply(_("\002{0}\002 isn't currently online."), nick);
-		else if (u2->IsProtected() || u2->server == Me)
-			source.Reply(_("\002{0}\002 is protected and cannot be killed."), u2->nick);
-		else
 		{
-			if (reason.empty())
-				reason = "No reason specified";
-			if (Config->GetModule("operserv/main")->Get<bool>("addakiller"))
-				reason = "(" + source.GetNick() + ") " + reason;
-			Log(LOG_ADMIN, source, this) << "on " << u2->nick << " for " << reason;
-			u2->Kill(*source.service, reason);
+			source.Reply(_("\002{0}\002 isn't currently online."), nick);
+			return;
 		}
+
+		if (u2->IsProtected() || u2->server == Me)
+		{
+			source.Reply(_("\002{0}\002 is protected and cannot be killed."), u2->nick);
+			return;
+		}
+
+		if (reason.empty())
+			reason = "No reason specified";
+		if (Config->GetModule("operserv/main")->Get<bool>("addakiller"))
+			reason = "(" + source.GetNick() + ") " + reason;
+		Log(LOG_ADMIN, source, this) << "on " << u2->nick << " for " << reason;
+		u2->Kill(*source.service, reason);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

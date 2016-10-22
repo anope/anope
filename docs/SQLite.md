@@ -1,6 +1,6 @@
 # How to modify Anope sqlite databases
 
-Anope uses a custom SQLiite function (anope_canonicalize) for canonicalizing strings for case insensitivity comparisons.
+Anope uses a custom SQLiite function (anope_canonicalize) for canonicalizing strings for case insensitive comparisons.
 It does this by using SQLites support for having indexes on expressions https://www.sqlite.org/expridx.html.
 
 For example the account table could look like:

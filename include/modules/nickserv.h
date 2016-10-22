@@ -23,6 +23,9 @@
 #include "service.h"
 #include "serialize.h"
 
+#include "nickserv/nick.h"
+#include "nickserv/account.h"
+
 namespace NickServ
 {
 	class Nick;
@@ -133,100 +136,6 @@ namespace NickServ
 			virtual EventReturn OnNickValidate(User *u, Nick *na) anope_abstract;
 		};
 	}
-
-	/* A registered nickname.
-	 * It matters that Base is here before Extensible (it is inherited by Serializable)
-	 */
-	class CoreExport Nick : public Serialize::Object
-	{
-	 protected:
-		using Serialize::Object::Object;
-
-	 public:
-		static constexpr const char *const NAME = "nick";
-
-		virtual Anope::string GetNick() anope_abstract;
-		virtual void SetNick(const Anope::string &) anope_abstract;
-
-		virtual Anope::string GetLastQuit() anope_abstract;
-		virtual void SetLastQuit(const Anope::string &) anope_abstract;
-
-		virtual Anope::string GetLastRealname() anope_abstract;
-		virtual void SetLastRealname(const Anope::string &) anope_abstract;
-
-		virtual Anope::string GetLastUsermask() anope_abstract;
-		virtual void SetLastUsermask(const Anope::string &) anope_abstract;
-
-		virtual Anope::string GetLastRealhost() anope_abstract;
-		virtual void SetLastRealhost(const Anope::string &) anope_abstract;
-
-		virtual time_t GetTimeRegistered() anope_abstract;
-		virtual void SetTimeRegistered(const time_t &) anope_abstract;
-
-		virtual time_t GetLastSeen() anope_abstract;
-		virtual void SetLastSeen(const time_t &) anope_abstract;
-
-		virtual Account *GetAccount() anope_abstract;
-		virtual void SetAccount(Account *acc) anope_abstract;
-	};
-
-	/* A registered account. Each account must have a Nick with the same nick as the
-	 * account's display.
-	 * It matters that Base is here before Extensible (it is inherited by Serializable)
-	 */
-	class CoreExport Account : public Serialize::Object
-	{
-	 public:
-		static constexpr const char *const NAME = "account";
-		
-		/* Set if this user is a services operattor. o->ot must exist. */
-		Serialize::Reference<Oper> o;
-
-		/* Unsaved data */
-
-		/* Last time an email was sent to this user */
-		time_t lastmail = 0;
-		/* Users online now logged into this account */
-		std::vector<User *> users;
-
-	 protected:
-		using Serialize::Object::Object;
-
-	 public:
-		virtual Anope::string GetDisplay() anope_abstract;
-		virtual void SetDisplay(const Anope::string &) anope_abstract;
-
-		virtual Anope::string GetPassword() anope_abstract;
-		virtual void SetPassword(const Anope::string &) anope_abstract;
-
-		virtual Anope::string GetEmail() anope_abstract;
-		virtual void SetEmail(const Anope::string &) anope_abstract;
-
-		virtual Anope::string GetLanguage() anope_abstract;
-		virtual void SetLanguage(const Anope::string &) anope_abstract;
-
-		/** Changes the display for this account
-		 * @param na The new display, must be grouped to this account.
-		 */
-		virtual void SetDisplay(Nick *na) anope_abstract;
-
-		/** Checks whether this account is a services oper or not.
-		 * @return True if this account is a services oper, false otherwise.
-		 */
-		virtual bool IsServicesOper() const anope_abstract;
-
-		/** Is the given user on this accounts access list?
-		 *
-		 * @param u The user
-		 *
-		 * @return true if the user is on the access list
-		 */
-		virtual bool IsOnAccess(User *u) anope_abstract;
-
-		virtual MemoServ::MemoInfo *GetMemos() anope_abstract;
-
-		virtual unsigned int GetChannelCount() anope_abstract;
-	};
 
 	/* A request to check if an account/password is valid. These can exist for
 	 * extended periods due to the time some authentication modules take.

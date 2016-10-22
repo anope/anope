@@ -17,6 +17,8 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 class ModeLock : public Serialize::Object
 {
  protected:
@@ -107,6 +109,28 @@ class ModeLocks : public Service
 	 */
 	virtual Anope::string GetMLockAsString(ChanServ::Channel *, bool complete) const anope_abstract;
 };
+
+namespace ChanServ
+{
+
+class Mode : public Serialize::Object
+{
+ public:
+	static constexpr const char *const NAME = "mlockmode";
+
+	using Serialize::Object::Object;
+
+	virtual Channel *GetChannel() anope_abstract;
+	virtual void SetChannel(Channel *) anope_abstract;
+
+	virtual Anope::string GetMode() anope_abstract;
+	virtual void SetMode(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetParam() anope_abstract;
+	virtual void SetParam(const Anope::string &) anope_abstract;
+};
+
+} // namespace ChanServ
 
 namespace Event
 {

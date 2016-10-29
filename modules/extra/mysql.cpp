@@ -509,7 +509,7 @@ Query MySQLService::Commit()
 Serialize::ID MySQLService::GetID(const Anope::string &prefix)
 {
 	Query query = "SELECT `id` FROM `" + prefix + "objects` ORDER BY `id` DESC LIMIT 1";
-	Serialize::ID id = 0;
+	Serialize::ID id = 1;
 
 	Result res = RunQuery(query);
 	if (res.Rows())

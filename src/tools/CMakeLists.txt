@@ -1,11 +1,17 @@
+if(PREFER_EMBEDDED_SQLITE OR NOT SQLITE_FOUND)
+  include_directories(${Anope_SOURCE_DIR}/lib/sqlite)
+endif()
 
 function(build_sqlite LIBNAME)
   add_library(tools_anope_sqlite_${LIBNAME} SHARED anope_sqlite.cpp)
+  if(PREFER_EMBEDDED_SQLITE OR NOT SQLITE_FOUND)
+    target_link_libraries(tools_anope_sqlite_${LIBNAME} sqlite3)
+  else()
+    target_link_libraries(tools_anope_sqlite_${LIBNAME} ${SQLITE_LIBRARIES})
+  endif()
   set_source_files_properties(anope_sqlite.cpp PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
   set_target_properties(tools_anope_sqlite_${LIBNAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}" OUTPUT_NAME "anope_sqlite_${LIBNAME}")
-  install(TARGETS tools_anope_sqlite_${LIBNAME}
-    DESTINATION ${LIB_DIR}
-  )
+  install(TARGETS tools_anope_sqlite_${LIBNAME} DESTINATION ${LIB_DIR})
 endfunction()
 
 build_sqlite(ascii)

@@ -13,6 +13,8 @@ endif()
 project(Anope CXX)
 enable_language(C)
 
+option(PREFER_EMBEDDED_SQLITE OFF)
+
 # Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
 list(APPEND CMAKE_MODULE_PATH "${Anope_SOURCE_DIR}/cmake")
 
@@ -59,6 +61,7 @@ find_path(BOOST_LOCALE_HEADER_FILE NAMES boost/locale.hpp)
 if(BOOST_LOCALE_HEADER_FILE)
   find_package(Boost COMPONENTS locale)
 endif()
+find_package(Sqlite)
 
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
@@ -275,6 +278,7 @@ add_subdirectory(language)
 add_subdirectory(src)
 add_subdirectory(modules)
 add_subdirectory(include)
+add_subdirectory(lib)
 
 # Get the filename of the Anope binary, to use later
 get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)

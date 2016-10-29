@@ -1,6 +1,6 @@
 # How to modify Anope sqlite databases
 
-Anope uses a custom SQLiite function (anope_canonicalize) for canonicalizing strings for case insensitive comparisons.
+Anope uses a custom SQLite function (anope_canonicalize) for canonicalizing strings for case insensitive comparisons.
 It does this by using SQLites support for having indexes on expressions https://www.sqlite.org/expridx.html.
 
 For example the account table could look like:
@@ -29,4 +29,15 @@ or libanope_sqlite_rfc1459.so into SQLite, depending on your casemap configurati
 
 ```
 sqlite> .load lib/libanope_sqlite_ascii.so
+```
+
+## Example of adding a new operator via SQLite
+
+```
+BEGIN TRANSACTION;
+-- Allocate new ID and insert into objects table
+INSERT INTO anope_db_objects (id, type) SELECT MAX(id + 1), 'oper' FROM anope_db_objects;
+-- Insert new operator using previously allocated id
+INSERT INTO anope_db_oper (name, type, require_oper, id) VALUES ('Adam', 'Services Root', 1, last_insert_rowid());
+COMMIT;
 ```

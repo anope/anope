@@ -182,3 +182,13 @@ endmacro()
 build_modules(${CMAKE_CURRENT_SOURCE_DIR})
 build_modules_dependencies(${CMAKE_CURRENT_SOURCE_DIR})
 
+# link sqlite to system or included libsqlite
+if(TARGET anope_sqlite)
+  if(PREFER_EMBEDDED_SQLITE OR NOT SQLITE_FOUND)
+    include_directories(${Anope_SOURCE_DIR}/lib/sqlite)
+    target_link_libraries(anope_sqlite sqlite3)
+    set_target_properties(anope_sqlite PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_DIR}")
+  else()
+    target_link_libraries(anope_sqlite ${SQLITE_LIBRARIES})
+  endif()
+endif()

@@ -344,16 +344,32 @@ class DBSQL : public Module, public Pipe
 
 	EventReturn OnSerializeHasField(Serialize::Object *object, Serialize::FieldBase *field) override
 	{
-		SQL::Result::Value v;
+		if (field->object)
+		{
+			Anope::string type;
+			Serialize::ID id;
 
-		if (!GetValue(object, field, v))
-			return EVENT_CONTINUE;
+			EventReturn er = OnSerializeGetSerializable(object, field, type, id);
 
-		if (v.null)
-			return EVENT_CONTINUE;
+			if (er != EVENT_ALLOW)
+				return EVENT_CONTINUE;
 
-		field->UnserializeFromString(object, v.value);
-		return EVENT_STOP;
+			field->UnserializeFromString(object, type + ":" + stringify(id));
+			return EVENT_STOP;
+		}
+		else
+		{
+			SQL::Result::Value v;
+
+			if (!GetValue(object, field, v))
+				return EVENT_CONTINUE;
+
+			if (v.null)
+				return EVENT_CONTINUE;
+
+			field->UnserializeFromString(object, v.value);
+			return EVENT_STOP;
+		}
 	}
 
 	EventReturn OnSerializableGetId(Serialize::ID &id) override

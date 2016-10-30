@@ -22,11 +22,30 @@
 enum HTTPError
 {
 	HTTP_ERROR_OK = 200,
+	HTTP_CREATED = 201,
 	HTTP_FOUND = 302,
 	HTTP_BAD_REQUEST = 400,
 	HTTP_PAGE_NOT_FOUND = 404,
+	HTTP_INTERNAL_SERVER_ERROR = 500,
 	HTTP_NOT_SUPPORTED = 505
 };
+
+namespace httpd
+{
+
+enum class Method
+{
+	NONE,
+	GET,
+	POST,
+	PUT,
+	DELETE,
+	OPTIONS,
+	HEAD
+};
+
+} // namespace httpd
+
 
 /* A message to someone */
 struct HTTPReply
@@ -93,6 +112,7 @@ struct HTTPReply
 /* A message from soneone */
 struct HTTPMessage
 {
+	httpd::Method method = httpd::Method::NONE;
 	std::map<Anope::string, Anope::string> headers;
 	std::map<Anope::string, Anope::string> cookies;
 	std::map<Anope::string, Anope::string> get_data;

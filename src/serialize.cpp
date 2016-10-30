@@ -62,7 +62,7 @@ void Serialize::Unregister(Module *m)
 			field->Unregister();
 }
 
-std::vector<Edge> Object::GetRefs(TypeBase *type)
+std::vector<Edge> Object::GetEdges(TypeBase *type)
 {
 	std::vector<Edge> refs;
 	EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeGetRefs, this, type, refs);
@@ -151,7 +151,7 @@ void Object::Delete()
 	Log(LOG_DEBUG_2) << "Deleting object id #" << id << " type " << s_type->GetName();
 
 	/* Delete dependant objects */
-	for (const Edge &edge : GetRefs(nullptr))
+	for (const Edge &edge : GetEdges(nullptr))
 	{
 		Object *other = edge.other;
 		FieldBase *field = edge.field;

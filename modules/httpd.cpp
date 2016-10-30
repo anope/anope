@@ -35,12 +35,16 @@ static Anope::string GetStatusFromCode(HTTPError err)
 	{
 		case HTTP_ERROR_OK:
 			return "200 OK";
+		case HTTP_CREATED:
+			return "201 Created";
 		case HTTP_FOUND:
 			return "302 Found";
 		case HTTP_BAD_REQUEST:
 			return "400 Bad Request";
 		case HTTP_PAGE_NOT_FOUND:
 			return "404 Not Found";
+		case HTTP_INTERNAL_SERVER_ERROR:
+			return "500 Internal Server Error";
 		case HTTP_NOT_SUPPORTED:
 			return "505 HTTP Version Not Supported";
 	}
@@ -58,13 +62,6 @@ class MyHTTPClient : public HTTPClient
 	Anope::string ip;
 
 	unsigned content_length;
-
-	enum
-	{
-		ACTION_NONE,
-		ACTION_GET,
-		ACTION_POST
-	} action;
 
 	void Serve()
 	{
@@ -105,7 +102,7 @@ class MyHTTPClient : public HTTPClient
  public:
 	time_t created;
 
-	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), HTTPClient(l, f, a), provider(l), header_done(false), served(false), ip(a.addr()), content_length(0), action(ACTION_NONE), created(Anope::CurTime)
+	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), HTTPClient(l, f, a), provider(l), header_done(false), served(false), ip(a.addr()), content_length(0), created(Anope::CurTime)
 	{
 		Log(LOG_DEBUG, "httpd") << "Accepted connection " << f << " from " << a.addr();
 	}
@@ -168,12 +165,13 @@ class MyHTTPClient : public HTTPClient
 	{
 		Log(LOG_DEBUG_2) << "HTTP from " << this->clientaddr.addr() << ": " << buf;
 
-		if (this->action == ACTION_NONE)
+		if (message.method == httpd::Method::NONE)
 		{
 			std::vector<Anope::string> params;
 			spacesepstream(buf).GetTokens(params);
 
-			if (params.empty() || (params[0] != "GET" && params[0] != "POST"))
+			if (params.empty() || (params[0] != "GET" && params[0] != "POST" && params[0] != "PUT"
+				&& params[0] != "DELETE" && params[0] != "OPTIONS" && params[0] != "HEAD"))
 			{
 				this->SendError(HTTP_BAD_REQUEST, "Unknown operation");
 				return true;
@@ -186,9 +184,17 @@ class MyHTTPClient : public HTTPClient
 			}
 
 			if (params[0] == "GET")
-				this->action = ACTION_GET;
+				message.method = httpd::Method::GET;
 			else if (params[0] == "POST")
-				this->action = ACTION_POST;
+				message.method = httpd::Method::POST;
+			else if (params[0] == "PUT")
+				message.method = httpd::Method::PUT;
+			else if (params[0] == "DELETE")
+				message.method = httpd::Method::DELETE;
+			else if (params[0] == "OPTIONS")
+				message.method = httpd::Method::OPTIONS;
+			else if (params[0] == "HEAD")
+				message.method = httpd::Method::HEAD;
 
 			Anope::string targ = params[1];
 			size_t q = targ.find('?');
@@ -339,9 +345,19 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 
 	HTTPPage* FindPage(const Anope::string &pname) override
 	{
-		if (this->pages.count(pname) == 0)
-			return NULL;
-		return this->pages[pname];
+		Anope::string resource = pname;
+
+		while (this->pages.count(resource) == 0)
+		{
+			size_t s = resource.find_last_of('/');
+
+			if (s == Anope::string::npos)
+				return nullptr;
+
+			resource = resource.substr(0, s);
+		}
+
+		return this->pages[resource];
 	}
 };
 

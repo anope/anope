@@ -95,7 +95,7 @@ class CoreExport Serialize::Object : public Extensible, public virtual Base
 
 	std::map<TypeBase *, std::vector<Edge>> edges;
 
-	std::vector<Edge> GetRefs(TypeBase *);
+	std::vector<Edge> GetEdges(TypeBase *);
 
  public:
 	Object(TypeBase *type);
@@ -127,6 +127,8 @@ class CoreExport Serialize::Object : public Extensible, public virtual Base
 	 */
 	template<typename T>
 	std::vector<T> GetRefs();
+
+	std::vector<Object *> GetRefs(Serialize::TypeBase *);
 
 	/**
 	 * Get the value of a field on this object.
@@ -867,6 +869,25 @@ T Serialize::New()
 	return static_cast<T>(type->Create());
 }
 
+inline std::vector<Serialize::Object *> Serialize::Object::GetRefs(Serialize::TypeBase *type)
+{
+	std::vector<Serialize::TypeBase *> types = GetTypes(type->GetName());
+	std::vector<Object *> objs;
+
+	if (types.empty())
+	{
+		Log(LOG_DEBUG) << "GetRefs for unknown type on #" << this->id << " type " << s_type->GetName() << " named " << type->GetName();
+		return objs;
+	}
+
+	for (Serialize::TypeBase *t : types)
+		for (const Serialize::Edge &edge : GetEdges(t))
+			if (!edge.direction)
+				objs.push_back(edge.other);
+
+	return objs;
+}
+
 template<typename T>
 std::vector<T> Serialize::Object::GetRefs()
 {
@@ -881,7 +902,7 @@ std::vector<T> Serialize::Object::GetRefs()
 	}
 
 	for (Serialize::TypeBase *t : types)
-		for (const Serialize::Edge &edge : GetRefs(t))
+		for (const Serialize::Edge &edge : GetEdges(t))
 			if (!edge.direction)
 				objs.push_back(anope_dynamic_static_cast<T>(edge.other));
 

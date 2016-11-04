@@ -709,6 +709,9 @@ Anope::string File::Read()
 
 void Conf::LoadConf(File &file)
 {
+	if (file.GetName().empty())
+		return;
+
 	if (!file.Open())
 		throw ConfigException("File " + file.GetName() + " could not be opened.");
 

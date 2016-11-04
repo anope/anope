@@ -45,7 +45,7 @@ class EOld : public Module
 		oldmd5provider(this)
 	{
 
-		ModuleManager::LoadModule("enc_md5", User::Find(creator));
+		ModuleManager::LoadModule("enc_md5", User::Find(creator, true));
 		if (!md5)
 			throw ModuleException("Unable to find md5 reference");
 

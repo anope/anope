@@ -153,7 +153,7 @@ class CommandHelp : public Command
 				// Allow unregistered users to see help for commands that they explicitly request help for
 
 				const Anope::string &subcommand = params.size() > max ? params[max] : "";
-				source.command = full_command;
+				source.command = it->first;
 				if (!c->OnHelp(source, subcommand))
 					continue;
 

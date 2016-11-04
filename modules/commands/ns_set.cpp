@@ -413,31 +413,31 @@ class CommandNSSASetDisplay : public CommandNSSetDisplay
 
 class CommandNSSetEmail : public Command
 {
-	static bool SendConfirmMail(User *u, BotInfo *bi, const Anope::string &new_email)
+	static bool SendConfirmMail(User *u, NickCore *nc, BotInfo *bi, const Anope::string &new_email)
 	{
 		Anope::string code = Anope::Random(9);
 	
-		std::pair<Anope::string, Anope::string> *n = u->Account()->Extend<std::pair<Anope::string, Anope::string> >("ns_set_email");
+		std::pair<Anope::string, Anope::string> *n = nc->Extend<std::pair<Anope::string, Anope::string> >("ns_set_email");
 		n->first = new_email;
 		n->second = code;
 
 		Anope::string subject = Config->GetBlock("mail")->Get<const Anope::string>("emailchange_subject"),
 			message = Config->GetBlock("mail")->Get<const Anope::string>("emailchange_message");
 
-		subject = subject.replace_all_cs("%e", u->Account()->email);
+		subject = subject.replace_all_cs("%e", nc->email);
 		subject = subject.replace_all_cs("%E", new_email);
 		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 		subject = subject.replace_all_cs("%c", code);
 
-		message = message.replace_all_cs("%e", u->Account()->email);
+		message = message.replace_all_cs("%e", nc->email);
 		message = message.replace_all_cs("%E", new_email);
 		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 		message = message.replace_all_cs("%c", code);
 
-		Anope::string old = u->Account()->email;
-		u->Account()->email = new_email;
-		bool b = Mail::Send(u, u->Account(), bi, subject, message);
-		u->Account()->email = old;
+		Anope::string old = nc->email;
+		nc->email = new_email;
+		bool b = Mail::Send(u, nc, bi, subject, message);
+		nc->email = old;
 		return b;
 	}
 
@@ -493,7 +493,7 @@ class CommandNSSetEmail : public Command
 
 		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
 		{
-			if (SendConfirmMail(source.GetUser(), source.service, param))
+			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
 				source.Reply(_("A confirmation e-mail has been sent to \002%s\002. Follow the instructions in it to change your e-mail address."), param.c_str());
 		}
 		else

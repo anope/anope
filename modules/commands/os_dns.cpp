@@ -940,7 +940,6 @@ class ModuleDNS : public Module
 			if (packet->answers.size() == answer_size)
 			{
 				Log(this) << "Error! There are no servers with any IPs of type " << q.type;
-				/* Send back an empty answer anyway */
 			}
 		}
 	}

@@ -446,7 +446,15 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 	{
 		Anope::string buf;
 		*it->second >> buf;
-		query.SetValue(it->first, buf);
+
+		bool escape = true;
+		if (buf.empty())
+		{
+			buf = "NULL";
+			escape = false;
+		}
+
+		query.SetValue(it->first, buf, escape);
 	}
 	
 	return query;

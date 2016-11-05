@@ -674,6 +674,31 @@ void Conf::LoadBots()
 
 void Conf::ApplyBots()
 {
+	/* Associate conf bots with db bots */
+	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>())
+	{
+		ServiceBot *sb = ServiceBot::Find(bi->GetNick());
+
+		if (sb == nullptr)
+			continue;
+
+		bi->bot = sb;
+		sb->bi = bi;
+	}
+
+	/* Apply conf to conf bots */
+	for (int i = 0; i < this->CountBlock("service"); ++i)
+	{
+		Block *service = this->GetBlock("service", i);
+
+		const Anope::string &nick = service->Get<Anope::string>("nick");
+
+		for (BotInfo *bi : Serialize::GetObjects<BotInfo *>())
+			if (bi->GetNick().equals_ci(nick))
+				bi->conf = this;
+	}
+
+	/* Create new bots for new conf bots */
 	for (std::pair<Anope::string, User *> p : UserListByNick)
 	{
 		User *u = p.second;
@@ -686,6 +711,8 @@ void Conf::ApplyBots()
 
 		sb->bi = Serialize::New<BotInfo *>();
 		sb->bi->bot = sb;
+
+		sb->bi->conf = this;
 
 		sb->bi->SetNick(sb->nick);
 		sb->bi->SetUser(sb->GetIdent());
@@ -722,7 +749,10 @@ void Conf::LoadOpers()
 			continue;
 		}
 
-		Oper *o = Serialize::New<Oper *>();
+		Oper *o = Oper::Find(nname);
+		if (o == nullptr)
+			o = Serialize::New<Oper *>();
+
 		o->conf = this;
 		o->SetName(nname);
 		o->SetType(ot);

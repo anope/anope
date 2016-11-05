@@ -195,7 +195,10 @@ void IRC2SQL::OnChannelCreate(Channel *c)
 	query.SetValue("channel", c->name);
 	query.SetValue("topic", c->topic);
 	query.SetValue("topicauthor", c->topic_setter);
-	query.SetValue("topictime", c->topic_ts);
+	if (c->topic_ts > 0)
+		query.SetValue("topictime", c->topic_ts);
+	else
+		query.SetValue("topictime", "NULL", false);
 	query.SetValue("modes", c->GetModes(true,true));
 	this->RunQuery(query);
 }

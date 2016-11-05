@@ -87,7 +87,7 @@ void IRC2SQL::CheckTables()
 		query = "CREATE TABLE `" + prefix + "chan` ("
 			"`chanid` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,"
 			"`channel` varchar(255) NOT NULL,"
-			"`topic` varchar(255) DEFAULT NULL,"
+			"`topic` varchar(512) DEFAULT NULL,"
 			"`topicauthor` varchar(255) DEFAULT NULL,"
 			"`topictime` datetime DEFAULT NULL,"
 			"`modes` varchar(512) DEFAULT NULL,"

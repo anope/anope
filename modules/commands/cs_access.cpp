@@ -891,6 +891,19 @@ class CSAccess : public Module
 	{
 		if (group->ci == NULL)
 			return EVENT_CONTINUE;
+
+		const ChanAccess *highest = group->Highest();
+		if (highest && highest->provider == &accessprovider)
+		{
+			/* Access accessprovider is the only accessprovider with th concept of negative access,
+			 * so check they don't have negative access
+			 */
+			const AccessChanAccess *aca = anope_dynamic_static_cast<const AccessChanAccess *>(highest);
+
+			if (aca->level < 0)
+				return EVENT_CONTINUE;
+		}
+
 		/* Special case. Allows a level of -1 to match anyone, and a level of 0 to match anyone identified. */
 		int16_t level = group->ci->GetLevel(priv);
 		if (level == -1)

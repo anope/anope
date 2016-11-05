@@ -4,7 +4,8 @@ void IRC2SQL::OnShutdown()
 {
 	// TODO: test if we really have to use blocking query here
 	// (sometimes m_mysql get unloaded before the other thread executed all queries)
-	SQL::Result r = this->sql->RunQuery(SQL::Query("CALL " + prefix + "OnShutdown()"));
+	if (this->sql)
+		SQL::Result r = this->sql->RunQuery(SQL::Query("CALL " + prefix + "OnShutdown()"));
 	quitting = true;
 }
 

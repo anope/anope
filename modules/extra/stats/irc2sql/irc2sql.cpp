@@ -227,10 +227,32 @@ void IRC2SQL::OnJoinChannel(User *u, Channel *c)
 
 EventReturn IRC2SQL::OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param)
 {
-	query = "UPDATE `" + prefix + "chan` SET modes=@modes@ WHERE channel=@channel@";
-	query.SetValue("channel", c->name);
-	query.SetValue("modes", c->GetModes(true,true));
-	this->RunQuery(query);
+	if (mode->type == MODE_STATUS)
+	{
+		User *u = User::Find(param);
+		if (u == NULL)
+			return EVENT_CONTINUE;
+
+		ChanUserContainer *cc = u->FindChannel(c);
+		if (cc == NULL)
+			return EVENT_CONTINUE;
+
+		query = "UPDATE `" + prefix + "user` AS u, `" + prefix + "ison` AS i, `" + prefix + "chan` AS c"
+				" SET i.modes=@modes@"
+				" WHERE u.nick=@nick@ AND c.channel=@channel@"
+				" AND u.nickid = i.nickid AND c.chanid = i.chanid";
+		query.SetValue("nick", u->nick);
+		query.SetValue("modes", cc->status.Modes());
+		query.SetValue("channel", c->name);
+		this->RunQuery(query);
+	}
+	else
+	{
+		query = "UPDATE `" + prefix + "chan` SET modes=@modes@ WHERE channel=@channel@";
+		query.SetValue("channel", c->name);
+		query.SetValue("modes", c->GetModes(true,true));
+		this->RunQuery(query);
+	}
 	return EVENT_CONTINUE;
 }
 

@@ -28,8 +28,7 @@ NickType::NickType(Module *me) : Serialize::Type<NickImpl>(me)
 	, last_realhost(this, "last_realhost", &NickImpl::last_realhost)
 	, time_registered(this, "time_registered", &NickImpl::time_registered)
 	, last_seen(this, "last_seen", &NickImpl::last_seen)
-#warning "this should depend?"
-	, nc(this, "nc", &NickImpl::account)
+	, nc(this, "nc", &NickImpl::account, true)
 {
 
 }

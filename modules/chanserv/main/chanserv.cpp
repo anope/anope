@@ -316,43 +316,19 @@ class ChanServCore : public Module
 
 				if (newowner)
 				{
-					::Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Transferring foundership of " << ci->GetName() << " from deleted nick " << nc->GetDisplay() << " to " << newowner->GetDisplay();
+					::Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Transferring foundership of " << ci->GetName() << " from deleted account " << nc->GetDisplay() << " to " << newowner->GetDisplay();
 					ci->SetFounder(newowner);
-					ci->SetSuccessor(NULL);
+
+					// Can't be both founder and successor
+					if (ci->GetSuccessor() == newowner)
+						ci->SetSuccessor(nullptr);
 				}
 				else
 				{
-					::Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Deleting channel " << ci->GetName() << " owned by deleted nick " << nc->GetDisplay();
+					::Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Deleting channel " << ci->GetName() << " owned by deleted account " << nc->GetDisplay();
 
 					ci->Delete();
 					continue;
-				}
-			}
-
-			if (ci->GetSuccessor() == nc)
-				ci->SetSuccessor(NULL);
-
-#warning "these arent necessary?"
-			/* are these necessary? */
-			for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
-			{
-				ChanServ::ChanAccess *ca = ci->GetAccess(j);
-				NickServ::Account *anc = ca->GetAccount();
-
-				if (anc && anc == nc)
-				{
-					ca->Delete();
-					break;
-				}
-			}
-
-			for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
-			{
-				AutoKick *ak = ci->GetAkick(j);
-				if (ak->GetAccount() == nc)
-				{
-					ak->Delete();
-					break;
 				}
 			}
 		}
@@ -360,23 +336,6 @@ class ChanServCore : public Module
 
 	void OnDelChan(ChanServ::Channel *ci) override
 	{
-		/* remove access entries that are this channel */
-
-#warning "also not necessary?"
-		for (ChanServ::Channel *c : ci->GetRefs<ChanServ::Channel *>())
-		{
-			for (unsigned j = 0; j < c->GetAccessCount(); ++j)
-			{
-				ChanServ::ChanAccess *a = c->GetAccess(j);
-
-				if (a->Mask().equals_ci(ci->GetName()))
-				{
-					a->Delete();
-					break;
-				}
-			}
-		}
-
 		if (ci->c)
 		{
 			ci->c->RemoveMode(ci->WhoSends(), "REGISTERED", "", false);

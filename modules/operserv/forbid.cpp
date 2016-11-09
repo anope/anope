@@ -50,7 +50,7 @@ class ForbidDataImpl : public ForbidData
 	void SetExpires(const time_t &) override;
 
 	ForbidType GetType() override;
-	void SetType(const ForbidType &) override;
+	void SetType(ForbidType) override;
 };
 
 class ForbidDataType : public Serialize::Type<ForbidDataImpl>
@@ -126,7 +126,7 @@ ForbidType ForbidDataImpl::GetType()
 	return Get(&ForbidDataType::type);
 }
 
-void ForbidDataImpl::SetType(const ForbidType &t)
+void ForbidDataImpl::SetType(ForbidType t)
 {
 	Set(&ForbidDataType::type, t);
 }

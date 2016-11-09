@@ -187,7 +187,7 @@ class CommandNSCert : public Command
 		e->SetAccount(nc);
 		e->SetCert(certfp);
 		
-		// XXX fire events
+#warning "events?"
 
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD certificate fingerprint " << certfp << " to " << nc->GetDisplay();
 		source.Reply(_("\002{0}\002 added to the certificate list of \002{1}\002."), certfp, nc->GetDisplay());

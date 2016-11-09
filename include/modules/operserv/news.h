@@ -34,7 +34,7 @@ class NewsItem : public Serialize::Object
 	using Serialize::Object::Object;
 
 	virtual NewsType GetNewsType() anope_abstract;
-	virtual void SetNewsType(const NewsType &) anope_abstract;
+	virtual void SetNewsType(NewsType) anope_abstract;
 
 	virtual Anope::string GetText() anope_abstract;
 	virtual void SetText(const Anope::string &) anope_abstract;

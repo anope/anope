@@ -99,7 +99,7 @@ class DBSQL : public Module, public Pipe
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		this->SQL = ServiceReference<Provider>(block->Get<Anope::string>("engine"));
-		this->prefix = block->Get<Anope::string>("prefix", "anope_db_");
+		this->prefix = block->Get<Anope::string>("prefix", "anope_");
 		inited = false;
 	}
 

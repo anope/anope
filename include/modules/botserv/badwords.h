@@ -48,7 +48,7 @@ class BadWord : public Serialize::Object
 	virtual void SetWord(const Anope::string &) anope_abstract;
 
 	virtual BadWordType GetType() anope_abstract;
-	virtual void SetType(const BadWordType &) anope_abstract;
+	virtual void SetType(BadWordType) anope_abstract;
 };
 
 class BadWords : public Service

@@ -86,7 +86,7 @@ class NewsItemImpl : public NewsItem
         NewsItemImpl(Serialize::TypeBase *type, Serialize::ID id) : NewsItem(type, id) { }
 
 	NewsType GetNewsType() override;
-	void SetNewsType(const NewsType &) override;
+	void SetNewsType(NewsType) override;
 
 	Anope::string GetText() override;
 	void SetText(const Anope::string &) override;
@@ -120,7 +120,7 @@ NewsType NewsItemImpl::GetNewsType()
 	return Get(&NewsItemType::type);
 }
 
-void NewsItemImpl::SetNewsType(const NewsType &t)
+void NewsItemImpl::SetNewsType(NewsType t)
 {
 	Set(&NewsItemType::type, t);
 }

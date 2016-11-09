@@ -39,7 +39,7 @@ class BadWordImpl : public BadWord
 	void SetWord(const Anope::string &w) override;
 
 	BadWordType GetType() override;
-	void SetType(const BadWordType &t) override;
+	void SetType(BadWordType t) override;
 };
 
 class BadWordsType : public Serialize::Type<BadWordImpl>
@@ -82,7 +82,7 @@ BadWordType BadWordImpl::GetType()
 	return Get(&BadWordsType::type);
 }
 
-void BadWordImpl::SetType(const BadWordType &t)
+void BadWordImpl::SetType(BadWordType t)
 {
 	Set(&BadWordsType::type, t);
 }

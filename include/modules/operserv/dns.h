@@ -44,10 +44,10 @@ class DNSServer : public Serialize::Object
 	virtual void SetName(const Anope::string &) anope_abstract;
 
 	virtual unsigned int GetLimit() anope_abstract;
-	virtual void SetLimit(const unsigned int &) anope_abstract;
+	virtual void SetLimit(unsigned int) anope_abstract;
 
 	virtual bool GetPooled() anope_abstract;
-	virtual void SetPool(const bool &) anope_abstract;
+	virtual void SetPool(bool) anope_abstract;
 };
 
 class DNSZoneMembership : public Serialize::Object

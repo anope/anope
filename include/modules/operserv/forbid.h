@@ -50,7 +50,7 @@ class ForbidData : public Serialize::Object
 	virtual void SetExpires(const time_t &) anope_abstract;
 
 	virtual ForbidType GetType() anope_abstract;
-	virtual void SetType(const ForbidType &) anope_abstract;
+	virtual void SetType(ForbidType) anope_abstract;
 };
 
 class ForbidService : public Service

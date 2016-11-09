@@ -94,10 +94,10 @@ class DNSServerImpl : public DNSServer
 	void SetName(const Anope::string &) override;
 
 	unsigned int GetLimit() override;
-	void SetLimit(const unsigned int &) override;
+	void SetLimit(unsigned int) override;
 
 	bool GetPooled() override;
-	void SetPool(const bool &) override;
+	void SetPool(bool) override;
 
 	bool Active()
 	{
@@ -169,7 +169,7 @@ unsigned int DNSServerImpl::GetLimit()
 	return Get(&DNSServerType::limit);
 }
 
-void DNSServerImpl::SetLimit(const unsigned int &l)
+void DNSServerImpl::SetLimit(unsigned int l)
 {
 	Set(&DNSServerType::limit, l);
 }
@@ -179,7 +179,7 @@ bool DNSServerImpl::GetPooled()
 	return Get(&DNSServerType::pooled);
 }
 
-void DNSServerImpl::SetPool(const bool &p)
+void DNSServerImpl::SetPool(bool p)
 {
 	Set(&DNSServerType::pooled, p);
 }

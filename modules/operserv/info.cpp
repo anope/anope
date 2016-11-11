@@ -236,7 +236,7 @@ class CommandOSInfo : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		source.Reply(_("Add or delete oper information for a given account or channel. This informaition will show to opers in the respective info command for the account or channel."));
+		source.Reply(_("Add or delete oper information for a given account or channel. This information will show to opers in the respective info command for the account or channel."));
 		return true;
 	}
 };

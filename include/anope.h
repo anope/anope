@@ -434,10 +434,6 @@ namespace Anope
 	 */
 	extern void Init(int ac, char **av);
 
-	/** Calls the save database event
-	 */
-	extern CoreExport void SaveDatabases();
-
 	/** Check whether two strings match.
 	 * @param str The string to check against the pattern (e.g. foobar)
 	 * @param mask The pattern to check (e.g. foo*bar)

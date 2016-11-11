@@ -51,17 +51,6 @@ time_t Anope::CurTime = time(NULL);
 
 int Anope::CurrentUplink = -1;
 
-class UpdateTimer : public Timer
-{
- public:
-	UpdateTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
-
-	void Tick(time_t) override
-	{
-		Anope::SaveDatabases();
-	}
-};
-
 class ExpireTimer : public Timer
 {
  public:
@@ -72,15 +61,6 @@ class ExpireTimer : public Timer
 		EventManager::Get()->Dispatch(&Event::ExpireTick::OnExpireTick);
 	}
 };
-
-void Anope::SaveDatabases()
-{
-	if (Anope::ReadOnly)
-		return;
-
-	Log(LOG_DEBUG) << "Saving databases";
-	EventManager::Get()->Dispatch(&Event::SaveDatabase::OnSaveDatabase);
-}
 
 /** The following comes from InspIRCd to get the full path of the Anope executable
  */
@@ -163,7 +143,6 @@ int main(int ac, char **av, char **envp)
 
 	/* Set up timers */
 	time_t last_check = Anope::CurTime;
-	UpdateTimer updateTimer(Config->GetBlock("options")->Get<time_t>("updatetimeout", "5m"));
 	ExpireTimer expireTimer(Config->GetBlock("options")->Get<time_t>("expiretimeout", "30m"));
 
 	/*** Main loop. ***/

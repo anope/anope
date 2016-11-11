@@ -134,8 +134,6 @@ void Anope::HandleSignal()
 	{
 		case SIGHUP:
 		{
-			Anope::SaveDatabases();
-
 			try
 			{
 				Configuration::Conf *new_config = new Configuration::Conf();
@@ -160,7 +158,6 @@ void Anope::HandleSignal()
 			Anope::QuitReason = Anope::string("Services terminating via signal ") + stringify(Signal);
 #endif
 			Anope::Quitting = true;
-			Anope::SaveDatabases();
 			break;
 	}
 

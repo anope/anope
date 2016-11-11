@@ -292,17 +292,6 @@ namespace Event
 		virtual void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params) anope_abstract;
 	};
 
-	struct CoreExport SaveDatabase : Events
-	{
-		static constexpr const char *NAME = "savedatabase";
-
-		using Events::Events;
-
-		/** Called when the databases are saved
-		 */
-		virtual void OnSaveDatabase() anope_abstract;
-	};
-
 	struct CoreExport LoadDatabase : Events
 	{
 		static constexpr const char *NAME = "loaddatabase";

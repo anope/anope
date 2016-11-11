@@ -198,7 +198,7 @@ class CommandNSSASetPassword : public Command
 
 		size_t len = params[1].length();
 
-		if (Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
+		if (Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->GetOper())
 		{
 			source.Reply(_("You may not change the password of other Services Operators."));
 			return;
@@ -464,7 +464,7 @@ class CommandNSSetEmail : public Command
 			return;
 		}
 
-		if (Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
+		if (Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->GetOper())
 		{
 			source.Reply(_("You may not change the e-mail of other Services Operators."));
 			return;

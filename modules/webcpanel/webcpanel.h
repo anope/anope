@@ -112,7 +112,7 @@ class WebPanelProtectedPage : public WebPanelPage
 		replacements["ACCOUNT"] = na->GetAccount()->GetDisplay();
 		replacements["PAGE_NAME"] = page_name;
 		replacements["CATEGORY"] = category;
-		if (na->GetAccount()->IsServicesOper())
+		if (na->GetAccount()->GetOper() != nullptr)
 			replacements["IS_OPER"];
 
 		Anope::string sections, get;

@@ -25,6 +25,7 @@ AccountType::AccountType(Module *me) : Serialize::Type<AccountImpl>(me)
 	, pass(this, "pass", &AccountImpl::password)
 	, email(this, "email", &AccountImpl::email)
 	, language(this, "language", &AccountImpl::language)
+	, oper(this, "oper", &AccountImpl::oper)
 {
 
 }
@@ -38,9 +39,6 @@ void AccountType::Display::OnSet(AccountImpl *acc, const Anope::string &disp)
 		map.erase(*old);
 
 	map[disp] = acc;
-
-#warning "this is all wrong"
-	acc->o = Oper::Find(disp);
 }
 
 NickServ::Account *AccountType::FindAccount(const Anope::string &acc)

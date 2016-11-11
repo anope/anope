@@ -33,10 +33,10 @@ class SQLOperResult : public SQL::Interface
 
 	void Deoper()
 	{
-		if (user->Account()->o && user->Account()->o->owner == this->owner)
+		Oper *oper = user->Account()->GetOper();
+		if (oper != nullptr)
 		{
-			user->Account()->o->Delete();
-			user->Account()->o = nullptr;
+			oper->Delete();
 
 			Log(this->owner) << "Removed services operator from " << user->nick << " (" << user->Account()->GetDisplay() << ")";
 			user->RemoveMode(Config->GetClient("OperServ"), "OPER"); // Probably not set, just incase
@@ -94,25 +94,19 @@ class SQLOperResult : public SQL::Interface
 			return;
 		}
 
-		if (user->Account()->o && user->Account()->o->owner != this->owner)
-		{
-			Log(this->owner) << "Oper " << user->Account()->GetDisplay() << " has type " << ot->GetName() << ", but is already configured as an oper of type " << user->Account()->o->GetType()->GetName();
-			return;
-		}
-
-		if (!user->Account()->o || user->Account()->o->GetType() != ot)
+		Oper *oper = user->Account()->GetOper();
+		if (oper == nullptr || oper->GetType() != ot)
 		{
 			Log(this->owner) << "m_sql_oper: Tieing oper " << user->nick << " to type " << opertype;
 
-			if (user->Account()->o)
-				user->Account()->o->Delete();
+			if (oper)
+				oper->Delete();
 
-			Oper *o = Serialize::New<Oper *>();
-			o->owner = this->owner;
-			o->SetName(user->Account()->GetDisplay());
-			o->SetType(ot);
+			oper = Serialize::New<Oper *>();
+			oper->SetName(user->Account()->GetDisplay());
+			oper->SetType(ot);
 
-			user->Account()->o = o;
+			user->Account()->SetOper(oper);
 		}
 
 		if (!user->HasMode("OPER"))
@@ -143,24 +137,6 @@ class ModuleSQLOper : public Module
 	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 	       EventHook<Event::NickIdentify>(this)
 	{
-	}
-
-	~ModuleSQLOper()
-	{
-		if (NickServ::service == nullptr)
-			return;
-
-		NickServ::nickcore_map& map = NickServ::service->GetAccountMap();
-		for (NickServ::nickcore_map::const_iterator it = map.begin(); it != map.end(); ++it)
-		{
-			NickServ::Account *nc = it->second;
-
-			if (nc->o && nc->o->owner == this)
-			{
-				nc->o->Delete();
-				nc->o = nullptr;
-			}
-		}
 	}
 
 	void OnReload(Configuration::Conf *conf) override

@@ -295,7 +295,7 @@ class ChanServCore : public Module
 			if (ci->GetFounder() == nc)
 			{
 				NickServ::Account *newowner = NULL;
-				if (ci->GetSuccessor() && ci->GetSuccessor() != nc && (ci->GetSuccessor()->IsServicesOper() || !max_reg || ci->GetSuccessor()->GetChannelCount() < max_reg))
+				if (ci->GetSuccessor() && ci->GetSuccessor() != nc && (ci->GetSuccessor()->GetOper() || !max_reg || ci->GetSuccessor()->GetChannelCount() < max_reg))
 					newowner = ci->GetSuccessor();
 				else
 				{
@@ -305,7 +305,7 @@ class ChanServCore : public Module
 						ChanServ::ChanAccess *ca = ci->GetAccess(j);
 						NickServ::Account *anc = ca->GetAccount();
 
-						if (!anc || (!anc->IsServicesOper() && max_reg && anc->GetChannelCount() >= max_reg) || (anc == nc))
+						if (!anc || (!anc->GetOper() && max_reg && anc->GetChannelCount() >= max_reg) || (anc == nc))
 							continue;
 						if (!highest || *ca > *highest)
 							highest = ca;

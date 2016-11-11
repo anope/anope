@@ -47,7 +47,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 	}
 
 	::ChanServ::AccessGroup u_access = ci->AccessFor(na->GetAccount());
-	bool has_priv = na->GetAccount()->IsServicesOper() && na->GetAccount()->o->GetType()->HasPriv("chanserv/access/modify");
+	bool has_priv = na->GetAccount()->GetOper() && na->GetAccount()->GetOper()->HasPriv("chanserv/access/modify");
 
 	if (!u_access.HasPriv("ACCESS_LIST") && !has_priv)
 	{

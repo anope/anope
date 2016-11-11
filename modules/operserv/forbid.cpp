@@ -247,7 +247,7 @@ class CommandOSForbid : public Command
 			}
 
 			NickServ::Nick *target = NickServ::FindNick(entry);
-			if (target != NULL && Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && target->GetAccount()->IsServicesOper())
+			if (target != NULL && Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && target->GetAccount()->GetOper())
 			{
 				source.Reply(_("Access denied."));
 				return;

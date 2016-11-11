@@ -65,8 +65,8 @@ class CommandNSInfo : public Command
 		if (na->GetAccount()->HasFieldS("UNCONFIRMED"))
 			source.Reply(_("\002{0}\002 has not confirmed their account."), na->GetNick());
 
-		if (na->GetAccount()->IsServicesOper() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_STATUS")))
-			source.Reply(_("\002{0}\002 is a Services Operator of type \002{1}\002."), na->GetNick(), na->GetAccount()->o->GetType()->GetName());
+		if (na->GetAccount()->GetOper() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_STATUS")))
+			source.Reply(_("\002{0}\002 is a Services Operator of type \002{1}\002."), na->GetNick(), na->GetAccount()->GetOper()->GetType()->GetName());
 
 		InfoFormatter info(source.nc);
 

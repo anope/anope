@@ -178,7 +178,7 @@ class CommandNSGroup : public Command
 			return;
 		}
 
-		if (maxaliases && target->GetAccount()->GetRefs<NickServ::Nick *>().size() >= maxaliases && !target->GetAccount()->IsServicesOper())
+		if (maxaliases && target->GetAccount()->GetRefs<NickServ::Nick *>().size() >= maxaliases && !target->GetAccount()->GetOper())
 		{
 			source.Reply(_("There are too many nicknames in your group."));
 			return;

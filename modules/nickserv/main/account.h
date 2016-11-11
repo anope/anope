@@ -24,10 +24,10 @@ class AccountImpl : public NickServ::Account
 	friend class AccountType;
 
 	Anope::string display, password, email, language;
+	Oper *oper = nullptr;
 
  public:
-	AccountImpl(Serialize::TypeBase *type) : NickServ::Account(type) { }
-	AccountImpl(Serialize::TypeBase *type, Serialize::ID id) : NickServ::Account(type, id) { }
+	using NickServ::Account::Account;
 	~AccountImpl();
 	void Delete() override;
 
@@ -43,16 +43,12 @@ class AccountImpl : public NickServ::Account
 	Anope::string GetLanguage() override;
 	void SetLanguage(const Anope::string &) override;
 
+	Oper *GetOper() override;
+	void SetOper(Oper *) override;
+
 	MemoServ::MemoInfo *GetMemos() override;
 
 	void SetDisplay(NickServ::Nick *na) override;
-	bool IsServicesOper() const override;
-	/*void AddAccess(const Anope::string &entry) override;
-	Anope::string GetAccess(unsigned entry) const override;
-	unsigned GetAccessCount() const override;
-	bool FindAccess(const Anope::string &entry) override;
-	void EraseAccess(const Anope::string &entry) override;
-	void ClearAccess() override;*/
 	bool IsOnAccess(User *u) override;
 	unsigned int GetChannelCount() override;
 };

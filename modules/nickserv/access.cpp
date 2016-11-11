@@ -189,7 +189,7 @@ class CommandNSAccess : public Command
 				return;
 			}
 
-			if (Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->GetAccount() && na->GetAccount()->IsServicesOper() && !cmd.equals_ci("LIST"))
+			if (Config->GetModule("nickserv/main")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->GetAccount() && na->GetAccount()->GetOper() && !cmd.equals_ci("LIST"))
 			{
 				source.Reply(_("You may view but not modify the access list of other Services Operators."));
 				return;

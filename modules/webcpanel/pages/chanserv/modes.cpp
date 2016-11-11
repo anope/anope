@@ -57,7 +57,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	}
 
 	::ChanServ::AccessGroup u_access = ci->AccessFor(na->GetAccount());
-	bool has_priv = na->GetAccount()->IsServicesOper() && na->GetAccount()->o->GetType()->HasPriv("chanserv/administration");
+	bool has_priv = na->GetAccount()->GetOper() && na->GetAccount()->GetOper()->HasPriv("chanserv/administration");
 
 	if (!u_access.HasPriv("MODE") && !has_priv)
 	{

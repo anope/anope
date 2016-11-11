@@ -48,7 +48,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 	}
 
 	::ChanServ::AccessGroup u_access = ci->AccessFor(na->GetAccount());
-	bool has_priv = na->GetAccount()->IsServicesOper() && na->GetAccount()->o->GetType()->HasPriv("chanserv/access/modify");
+	bool has_priv = na->GetAccount()->GetOper() && na->GetAccount()->GetOper()->HasPriv("chanserv/access/modify");
 
 	if (!u_access.HasPriv("AKICK") && !has_priv)
 	{

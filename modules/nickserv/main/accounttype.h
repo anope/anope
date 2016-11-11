@@ -34,7 +34,7 @@ class AccountType : public Serialize::Type<AccountImpl>
 	Serialize::Field<AccountImpl, Anope::string> email;
 	/* Locale name of the language of the user. Empty means default language */
 	Serialize::Field<AccountImpl, Anope::string> language;
-
+	Serialize::ObjectField<AccountImpl, Oper *> oper;
 
  	AccountType(Module *);
 

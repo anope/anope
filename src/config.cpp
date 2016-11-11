@@ -511,18 +511,19 @@ Conf::Conf() : Block("")
 
 	/* Clear existing conf opers */
 	if (Config)
-		for (Oper *o : Serialize::GetObjects<Oper *>())
-			if (o->conf == Config)
-				o->Delete();
-	/* Apply new opers */
-	for (Oper *o : Serialize::GetObjects<Oper *>())
 	{
-		NickServ::Nick *na = NickServ::FindNick(o->GetName());
-		if (!na)
-			continue;
+		for (int i = 0; i < Config->CountBlock("oper"); ++i)
+		{
+			Block *oper = Config->GetBlock("oper", i);
 
-		na->GetAccount()->o = o;
-		Log() << "Tied oper " << na->GetAccount()->GetDisplay() << " to type " << o->GetType()->GetName();
+			const Anope::string &nname = oper->Get<Anope::string>("name");
+
+			Oper *o = Oper::Find(nname);
+			if (o != nullptr)
+			{
+				o->Delete();
+			}
+		}
 	}
 
 	/* Check the user keys */
@@ -574,27 +575,6 @@ void Conf::Post(Conf *old)
 	ApplyBots();
 
 	ModeManager::Apply(old);
-
-	/* Apply opertype changes, as non-conf opers still point to the old oper types */
-	for (Oper *o : Serialize::GetObjects<Oper *>())
-	{
-		/* Oper's type is in the old config, so update it */
-		if (std::find(old->MyOperTypes.begin(), old->MyOperTypes.end(), o->GetType()) != old->MyOperTypes.end())
-		{
-			OperType *ot = o->GetType();
-			o->SetType(nullptr);
-
-			for (unsigned j = 0; j < MyOperTypes.size(); ++j)
-				if (ot->GetName() == MyOperTypes[j]->GetName())
-					o->SetType(MyOperTypes[j]);
-
-			if (o->GetType() == NULL)
-			{
-				/* Oper block has lost type */
-				o->Delete();
-			}
-		}
-	}
 
 	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>())
 	{
@@ -753,7 +733,6 @@ void Conf::LoadOpers()
 		if (o == nullptr)
 			o = Serialize::New<Oper *>();
 
-		o->conf = this;
 		o->SetName(nname);
 		o->SetType(ot);
 		o->SetRequireOper(require_oper);
@@ -763,6 +742,17 @@ void Conf::LoadOpers()
 		o->SetVhost(vhost);
 
 		Log(LOG_DEBUG) << "Creating oper " << nname << " of type " << ot->GetName();
+	}
+
+	/* Apply new opers */
+	for (Oper *o : Serialize::GetObjects<Oper *>())
+	{
+		NickServ::Nick *na = NickServ::FindNick(o->GetName());
+		if (!na)
+			continue;
+
+		na->GetAccount()->SetOper(o);
+		Log() << "Tied oper " << na->GetAccount()->GetDisplay() << " to type " << o->GetType()->GetName();
 	}
 }
 

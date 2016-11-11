@@ -33,9 +33,6 @@ class Oper : public Serialize::Object
  public:
 	static constexpr const char *const NAME = "oper";
 
-	Configuration::Conf *conf = nullptr;
-	Module *owner = nullptr;
-
 	using Serialize::Object::Object;
 
 	Anope::string GetName();
@@ -58,6 +55,9 @@ class Oper : public Serialize::Object
 
 	bool GetRequireOper();
 	void SetRequireOper(const bool &);
+
+	bool HasCommand(const Anope::string &cmdstr);
+	bool HasPriv(const Anope::string &cmdstr);
 
 	/** Find an oper block by name
 	 * @param name The name

@@ -31,20 +31,13 @@ class CoreExport Account : public Serialize::Object
  public:
 	static constexpr const char *const NAME = "account";
 
-	/* Set if this user is a services operattor. o->ot must exist. */
-	Serialize::Reference<Oper> o;
-
-	/* Unsaved data */
-
 	/* Last time an email was sent to this user */
 	time_t lastmail = 0;
 	/* Users online now logged into this account */
 	std::vector<User *> users;
 
- protected:
 	using Serialize::Object::Object;
 
- public:
 	virtual Anope::string GetDisplay() anope_abstract;
 	virtual void SetDisplay(const Anope::string &) anope_abstract;
 
@@ -57,15 +50,13 @@ class CoreExport Account : public Serialize::Object
 	virtual Anope::string GetLanguage() anope_abstract;
 	virtual void SetLanguage(const Anope::string &) anope_abstract;
 
+	virtual Oper *GetOper() anope_abstract;
+	virtual void SetOper(Oper *) anope_abstract;
+
 	/** Changes the display for this account
 	 * @param na The new display, must be grouped to this account.
 	 */
 	virtual void SetDisplay(Nick *na) anope_abstract;
-
-	/** Checks whether this account is a services oper or not.
-	 * @return True if this account is a services oper, false otherwise.
-	 */
-	virtual bool IsServicesOper() const anope_abstract;
 
 	/** Is the given user on this accounts access list?
 	 *

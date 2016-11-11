@@ -33,7 +33,7 @@ class CommandOSLogin : public Command
 		const Anope::string &password = params[0];
 
 		User *u = source.GetUser();
-		Oper *o = source.nc->o;
+		Oper *o = source.nc->GetOper();
 		if (o == NULL)
 		{
 			source.Reply(_("No oper block for your nickname."));
@@ -87,7 +87,7 @@ class CommandOSLogout : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
-		Oper *o = source.nc->o;
+		Oper *o = source.nc->GetOper();
 		if (o == NULL)
 		{
 			source.Reply(_("No oper block for your nick."));
@@ -142,7 +142,7 @@ class OSLogin : public Module
 
 	EventReturn IsServicesOper(User *u) override
 	{
-		if (!u->Account()->o->GetPassword().empty())
+		if (!u->Account()->GetOper()->GetPassword().empty())
 		{
 			if (os_login.HasExt(u))
 				return EVENT_ALLOW;

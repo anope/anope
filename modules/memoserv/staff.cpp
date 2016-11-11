@@ -37,7 +37,7 @@ class CommandMSStaff : public Command
 		const Anope::string &text = params[0];
 
 		for (NickServ::Account *nc : NickServ::service->GetAccountList())
-			if (source.nc != nc && nc->IsServicesOper())
+			if (source.nc != nc && nc->GetOper())
 				MemoServ::service->Send(source.GetNick(), nc->GetDisplay(), text, true);
 	}
 

@@ -25,7 +25,7 @@ WebCPanel::OperServ::Akill::Akill(const Anope::string &cat, const Anope::string 
 
 bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
-	if (!na->GetAccount()->o || !na->GetAccount()->o->GetType()->HasCommand("operserv/akill"))
+	if (!na->GetAccount()->GetOper() || !na->GetAccount()->GetOper()->HasCommand("operserv/akill"))
 	{
 		replacements["NOACCESS"];
 	}

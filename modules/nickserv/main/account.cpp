@@ -77,6 +77,16 @@ void AccountImpl::SetLanguage(const Anope::string &lang)
 	Set(&AccountType::language, lang);
 }
 
+Oper *AccountImpl::GetOper()
+{
+	return Get(&AccountType::oper);
+}
+
+void AccountImpl::SetOper(Oper *oper)
+{
+	Set(&AccountType::oper, oper);
+}
+
 MemoServ::MemoInfo *AccountImpl::GetMemos()
 {
 	return GetRef<MemoServ::MemoInfo *>();
@@ -101,11 +111,6 @@ void AccountImpl::SetDisplay(NickServ::Nick *na)
 		Log(LOG_DEBUG) << "Duplicate account " << this->GetDisplay() << " in nickcore table?";
 
 	nc = this;
-}
-
-bool AccountImpl::IsServicesOper() const
-{
-	return this->o != NULL;
 }
 
 bool AccountImpl::IsOnAccess(User *u)

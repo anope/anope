@@ -233,6 +233,7 @@ class CommandNSRegister : public Command
 
 		NickServ::Account *nc = Serialize::New<NickServ::Account *>();
 		nc->SetDisplay(u_nick);
+		nc->SetOper(Oper::Find(u_nick));
 
 		NickServ::Nick *na = Serialize::New<NickServ::Nick *>();
 		na->SetNick(u_nick);

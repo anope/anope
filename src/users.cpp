@@ -389,9 +389,10 @@ void User::Identify(NickServ::Nick *na)
 
 	EventManager::Get()->Dispatch(&Event::NickIdentify::OnNickIdentify, this);
 
-	if (this->IsServicesOper())
+	Oper *oper = this->nc->GetOper();
+	if (oper != nullptr && oper->GetType() != nullptr)
 	{
-		Anope::string m = this->nc->o->GetType()->modes;
+		Anope::string m = oper->GetType()->modes;
 		if (!m.empty())
 		{
 			this->SetModes(NULL, "%s", m.c_str());
@@ -400,11 +401,11 @@ void User::Identify(NickServ::Nick *na)
 			if (um && !this->HasMode("OPER") && m.find(um->mchar) != Anope::string::npos)
 				IRCD->SendOper(this);
 		}
-		if (IRCD->CanSetVHost && !this->nc->o->GetVhost().empty())
+		if (IRCD->CanSetVHost && !oper->GetVhost().empty())
 		{
-			this->SendMessage(Me, "Changing your vhost to \002{0}\002", this->nc->o->GetVhost());
- 			this->SetDisplayedHost(this->nc->o->GetVhost());
-			IRCD->SendVhost(this, "", this->nc->o->GetVhost());
+			this->SendMessage(Me, "Changing your vhost to \002{0}\002", oper->GetVhost());
+			this->SetDisplayedHost(oper->GetVhost());
+			IRCD->SendVhost(this, "", oper->GetVhost());
 		}
 	}
 }
@@ -472,18 +473,26 @@ bool User::IsRecognized(bool check_secure) const
 
 bool User::IsServicesOper()
 {
-	if (!this->nc || !this->nc->IsServicesOper())
+	if (!this->nc || !this->nc->GetOper())
 		// No opertype.
 		return false;
-	else if (this->nc->o->GetRequireOper() && !this->HasMode("OPER"))
+
+	Oper *oper = this->nc->GetOper();
+
+	if (oper->GetType() == nullptr)
 		return false;
-	else if (!this->nc->o->GetCertFP().empty() && this->fingerprint != this->nc->o->GetCertFP())
+
+	if (oper->GetRequireOper() && !this->HasMode("OPER"))
+		return false;
+
+	if (!oper->GetCertFP().empty() && this->fingerprint != oper->GetCertFP())
 		// Certfp mismatch
 		return false;
-	else if (!this->nc->o->GetHost().empty())
+
+	if (!oper->GetHost().empty())
 	{
 		std::vector<Anope::string> hosts;
-		spacesepstream(this->nc->o->GetHost()).GetTokens(hosts);
+		spacesepstream(oper->GetHost()).GetTokens(hosts);
 
 		bool match = false;
 		Anope::string match_host = this->GetIdent() + "@" + this->host;
@@ -505,14 +514,14 @@ bool User::IsServicesOper()
 bool User::HasCommand(const Anope::string &command)
 {
 	if (this->IsServicesOper())
-		return this->nc->o->GetType()->HasCommand(command);
+		return this->nc->GetOper()->HasCommand(command);
 	return false;
 }
 
 bool User::HasPriv(const Anope::string &priv)
 {
 	if (this->IsServicesOper())
-		return this->nc->o->GetType()->HasPriv(priv);
+		return this->nc->GetOper()->HasPriv(priv);
 	return false;
 }
 
@@ -556,7 +565,8 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 
 		if (this->IsServicesOper())
 		{
-			Anope::string m = this->nc->o->GetType()->modes;
+			Oper *oper = this->nc->GetOper();
+			Anope::string m = oper->GetType()->modes;
 			if (!m.empty())
 			{
 				this->SetModes(NULL, "%s", m.c_str());
@@ -565,11 +575,11 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 				if (oper && !this->HasMode("OPER") && m.find(oper->mchar) != Anope::string::npos)
 					IRCD->SendOper(this);
 			}
-			if (IRCD->CanSetVHost && !this->nc->o->GetVhost().empty())
+			if (IRCD->CanSetVHost && !oper->GetVhost().empty())
 			{
-				this->SendMessage(Me, "Changing your vhost to \002{0}\002", this->nc->o->GetVhost());
-				this->SetDisplayedHost(this->nc->o->GetVhost());
-				IRCD->SendVhost(this, "", this->nc->o->GetVhost());
+				this->SendMessage(Me, "Changing your vhost to \002{0}\002", oper->GetVhost());
+				this->SetDisplayedHost(oper->GetVhost());
+				IRCD->SendVhost(this, "", oper->GetVhost());
 			}
 		}
 	}

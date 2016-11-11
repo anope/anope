@@ -47,6 +47,7 @@ class DBFlatFile : public Module
 		account->SetPassword(data["pass"]);
 		account->SetEmail(data["email"]);
 		account->SetLanguage(data["language"]);
+		account->SetOper(Oper::Find(account->GetDisplay()));
 
 		spacesepstream sep = data["access"];
 		for (Anope::string token; sep.GetToken(token);)

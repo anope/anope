@@ -93,6 +93,22 @@ void Oper::SetRequireOper(const bool &b)
 	Set(&OperBlockType::require_oper, b);
 }
 
+bool Oper::HasCommand(const Anope::string &cmdstr)
+{
+	OperType *type = GetType();
+	if (type != nullptr)
+		return type->HasCommand(cmdstr);
+	return false;
+}
+
+bool Oper::HasPriv(const Anope::string &cmdstr)
+{
+	OperType *type = GetType();
+	if (type != nullptr)
+		return type->HasPriv(cmdstr);
+	return false;
+}
+
 Oper *Oper::Find(const Anope::string &name)
 {
 	for (Oper *o : Serialize::GetObjects<Oper *>())

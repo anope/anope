@@ -74,8 +74,10 @@ bool CommandSource::HasCommand(const Anope::string &cmd)
 {
 	if (this->u)
 		return this->u->HasCommand(cmd);
-	else if (this->nc && this->nc->o)
-		return this->nc->o->GetType()->HasCommand(cmd);
+
+	if (this->nc && this->nc->GetOper())
+		return this->nc->GetOper()->HasCommand(cmd);
+
 	return false;
 }
 
@@ -83,8 +85,10 @@ bool CommandSource::HasPriv(const Anope::string &cmd)
 {
 	if (this->u)
 		return this->u->HasPriv(cmd);
-	else if (this->nc && this->nc->o)
-		return this->nc->o->GetType()->HasPriv(cmd);
+
+	if (this->nc && this->nc->GetOper())
+		return this->nc->GetOper()->HasPriv(cmd);
+
 	return false;
 }
 
@@ -93,7 +97,7 @@ bool CommandSource::IsServicesOper()
 	if (this->u)
 		return this->u->IsServicesOper();
 	else if (this->nc)
-		return this->nc->IsServicesOper();
+		return this->nc->GetOper() != nullptr;
 	return false;
 }
 
@@ -102,7 +106,7 @@ bool CommandSource::IsOper()
 	if (this->u)
 		return this->u->HasMode("OPER");
 	else if (this->nc)
-		return this->nc->IsServicesOper();
+		return this->nc->GetOper() != nullptr;
 	return false;
 }
 

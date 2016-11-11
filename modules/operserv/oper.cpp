@@ -81,18 +81,18 @@ class CommandOSOper : public Command
 				return;
 			}
 
-			if (na->GetAccount()->o)
+			Oper *o = na->GetAccount()->GetOper();
+			if (o != nullptr)
 			{
-				na->GetAccount()->o->Delete();
-				na->GetAccount()->o = nullptr;
+				o->Delete();
 			}
 
-			Oper *o = Serialize::New<Oper *>();
+			o = Serialize::New<Oper *>();
 			o->SetName(na->GetAccount()->GetDisplay());
 			o->SetType(ot);
 			o->SetRequireOper(true);
 
-			na->GetAccount()->o = o;
+			na->GetAccount()->SetOper(o);
 
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
@@ -117,7 +117,7 @@ class CommandOSOper : public Command
 				return;
 			}
 
-			Oper *o = na->GetAccount()->o;
+			Oper *o = na->GetAccount()->GetOper();
 
 			if (o == nullptr)
 			{
@@ -131,14 +131,8 @@ class CommandOSOper : public Command
 				return;
 			}
 
-			if (o->conf != nullptr)
-			{
-				source.Reply(_("Oper \002{0}\002 is configured in the configuration file(s) and can not be removed by this command."), na->GetNick());
-				return;
-			}
 
-			na->GetAccount()->o->Delete();
-			na->GetAccount()->o = NULL;
+			o->Delete();
 
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
@@ -151,12 +145,12 @@ class CommandOSOper : public Command
 			source.Reply(_("Name     Type"));
 			for (NickServ::Account *nc : NickServ::service->GetAccountList())
 			{
-				if (!nc->o)
+				Oper *oper = nc->GetOper();
+
+				if (oper == nullptr)
 					continue;
 
-				source.Reply(Anope::printf("%-8s %s", nc->o->GetName().c_str(), nc->o->GetType()->GetName().c_str()));
-				if (nc->o->conf)
-					source.Reply(_("   This oper is configured in the configuration file."));
+				source.Reply(Anope::printf("%-8s %s", oper->GetName().c_str(), oper->GetType()->GetName().c_str()));
 				for (User *u : nc->users)
 					source.Reply(_("   \002{0}\002 is online using this oper block."), u->nick);
 			}

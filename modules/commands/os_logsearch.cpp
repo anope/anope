@@ -91,6 +91,9 @@ class CommandOSLogSearch : public Command
 
 		Log(LOG_ADMIN, source, this) << "for " << search_string;
 
+		bool wildcard = search_string.find_first_of("?*") != Anope::string::npos;
+		bool regex = search_string.empty() == false && search_string[0] == '/' && search_string[search_string.length() - 1] == '/';
+
 		const Anope::string &logfile_name = Config->GetModule(this->owner)->Get<const Anope::string>("logname");
 		std::vector<Anope::string> matches;
 		for (int d = days - 1; d >= 0; --d)
@@ -102,13 +105,24 @@ class CommandOSLogSearch : public Command
 				continue;
 
 			for (Anope::string buf, token; std::getline(fd, buf.str());)
-				if (Anope::Match(buf, "*" + search_string + "*"))
+			{
+				bool match = false;
+
+				if (regex)
+					match = Anope::Match(buf, search_string, false, true);
+				else if (wildcard)
+					match = Anope::Match(buf, "*" + search_string + "*");
+				else
+					match = buf.find_first_of_ci(search_string) != Anope::string::npos;
+
+				if (match)
 				{
 					matches.push_back(buf);
 
 					if (matches.size() >= HARDMAX)
 						break;
 				}
+			}
 
 			fd.close();
 		}

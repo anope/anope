@@ -11,6 +11,8 @@
 
 #include "module.h"
 
+static unsigned int HARDMAX = 65536;
+
 class CommandOSLogSearch : public Command
 {
 	static inline Anope::string CreateLogName(const Anope::string &file, time_t t = Anope::CurTime)
@@ -90,7 +92,7 @@ class CommandOSLogSearch : public Command
 		Log(LOG_ADMIN, source, this) << "for " << search_string;
 
 		const Anope::string &logfile_name = Config->GetModule(this->owner)->Get<const Anope::string>("logname");
-		std::list<Anope::string> matches;
+		std::vector<Anope::string> matches;
 		for (int d = days - 1; d >= 0; --d)
 		{
 			Anope::string lf_name = CreateLogName(logfile_name, Anope::CurTime - (d * 86400));
@@ -101,24 +103,37 @@ class CommandOSLogSearch : public Command
 
 			for (Anope::string buf, token; std::getline(fd, buf.str());)
 				if (Anope::Match(buf, "*" + search_string + "*"))
+				{
 					matches.push_back(buf);
+
+					if (matches.size() >= HARDMAX)
+						break;
+				}
 
 			fd.close();
 		}
 
-		unsigned found = matches.size();
+		unsigned int found = matches.size();
 		if (!found)
 		{
 			source.Reply(_("No matches for \002%s\002 found."), search_string.c_str());
 			return;
 		}
 
-		while (matches.size() > static_cast<unsigned>(replies))
-			matches.pop_front();
+		if (matches.size() >= HARDMAX)
+		{
+			source.Reply(_("Too many results for \002%s\002."), search_string.c_str());
+			return;
+		}
+
+		if (matches.size() > static_cast<unsigned int>(replies))
+		{
+			matches.erase(matches.begin(), matches.begin() + (matches.size() - static_cast<unsigned int>(replies)));
+		}
 
 		source.Reply(_("Matches for \002%s\002:"), search_string.c_str());
-		unsigned count = 0;
-		for (std::list<Anope::string>::iterator it = matches.begin(), it_end = matches.end(); it != it_end; ++it)
+		unsigned int count = 0;
+		for (std::vector<Anope::string>::iterator it = matches.begin(), it_end = matches.end(); it != it_end; ++it)
 			source.Reply("#%d: %s", ++count, it->c_str());
 		source.Reply(_("Showed %d/%d matches for \002%s\002."), matches.size(), found, search_string.c_str());
 	}

@@ -98,6 +98,8 @@ class CoreExport Serialize::Object : public Extensible, public virtual Base
 	std::vector<Edge> GetEdges(TypeBase *);
 
  public:
+	static constexpr const char *NAME = "object";
+
 	Object(TypeBase *type);
 	Object(TypeBase *type, ID);
 
@@ -393,6 +395,8 @@ class Serialize::FieldBase : public Service
 	/** Unset this field on the given object
 	 */
 	virtual void UnsetS(Object *) anope_abstract;
+
+	virtual Anope::string GetTypeName() { return ""; }
 };
 
 template<typename T>
@@ -804,6 +808,12 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 		}
 
 		return anope_dynamic_static_cast<T>(t->Require(id));
+	}
+
+	Anope::string GetTypeName() override
+	{
+		const char* const name = std::remove_pointer<T>::type::NAME;
+		return name;
 	}
 };
 

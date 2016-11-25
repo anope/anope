@@ -303,7 +303,8 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &prefix, Seria
 
 			if (field->object)
 			{
-				query += " REFERENCES " + prefix + "objects(id) ON DELETE ";
+				Anope::string refname = field->GetTypeName() == Serialize::Object::NAME ? "objects" : field->GetTypeName();
+				query += " REFERENCES " + prefix + refname + "(id) ON DELETE ";
 
 				if (field->depends)
 				{

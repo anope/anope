@@ -24,13 +24,13 @@ namespace NickServ
 
 /* A registered account. Each account must have a Nick with the same nick as the
  * account's display.
- * It matters that Base is here before Extensible (it is inherited by Serializable)
  */
 class CoreExport Account : public Serialize::Object
 {
  public:
 	static constexpr const char *const NAME = "account";
 
+#warning "this gets lost"
 	/* Last time an email was sent to this user */
 	time_t lastmail = 0;
 	/* Users online now logged into this account */
@@ -52,6 +52,57 @@ class CoreExport Account : public Serialize::Object
 
 	virtual Oper *GetOper() anope_abstract;
 	virtual void SetOper(Oper *) anope_abstract;
+
+	virtual Anope::string GetGreet() anope_abstract;
+	virtual void SetGreet(const Anope::string &) anope_abstract;
+
+	virtual bool IsUnconfirmed() anope_abstract;
+	virtual void SetUnconfirmed(bool) anope_abstract;
+
+	virtual bool IsPrivate() anope_abstract;
+	virtual void SetPrivate(bool) anope_abstract;
+
+	virtual bool IsAutoOp() anope_abstract;
+	virtual void SetAutoOp(bool) anope_abstract;
+
+	virtual bool IsKeepModes() anope_abstract;
+	virtual void SetKeepModes(bool) anope_abstract;
+
+	virtual bool IsKillProtect() anope_abstract;
+	virtual void SetKillProtect(bool) anope_abstract;
+
+	virtual bool IsKillQuick() anope_abstract;
+	virtual void SetKillQuick(bool) anope_abstract;
+
+	virtual bool IsKillImmed() anope_abstract;
+	virtual void SetKillImmed(bool) anope_abstract;
+
+	virtual bool IsMsg() anope_abstract;
+	virtual void SetMsg(bool) anope_abstract;
+
+	virtual bool IsSecure() anope_abstract;
+	virtual void SetSecure(bool) anope_abstract;
+
+	virtual bool IsMemoSignon() anope_abstract;
+	virtual void SetMemoSignon(bool) anope_abstract;
+
+	virtual bool IsMemoReceive() anope_abstract;
+	virtual void SetMemoReceive(bool) anope_abstract;
+
+	virtual bool IsMemoMail() anope_abstract;
+	virtual void SetMemoMail(bool) anope_abstract;
+
+	virtual bool IsHideEmail() anope_abstract;
+	virtual void SetHideEmail(bool) anope_abstract;
+
+	virtual bool IsHideMask() anope_abstract;
+	virtual void SetHideMask(bool) anope_abstract;
+
+	virtual bool IsHideStatus() anope_abstract;
+	virtual void SetHideStatus(bool) anope_abstract;
+
+	virtual bool IsHideQuit() anope_abstract;
+	virtual void SetHideQuit(bool) anope_abstract;
 
 	/** Changes the display for this account
 	 * @param na The new display, must be grouped to this account.

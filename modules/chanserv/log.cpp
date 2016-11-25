@@ -61,12 +61,12 @@ class LogSettingImpl : public LogSetting
 class LogSettingType : public Serialize::Type<LogSettingImpl>
 {
  public:
-	Serialize::ObjectField<LogSettingImpl, ChanServ::Channel *> ci;
+	Serialize::ObjectField<LogSettingImpl, ChanServ::Channel *> channel;
 	Serialize::Field<LogSettingImpl, Anope::string> service_name, command_service, command_name, method, extra, creator;
 	Serialize::Field<LogSettingImpl, time_t> created;
 
 	LogSettingType(Module *me) : Serialize::Type<LogSettingImpl>(me)
-		, ci(this, "ci", &LogSettingImpl::channel, true)
+		, channel(this, "channel", &LogSettingImpl::channel, true)
 		, service_name(this, "service_name", &LogSettingImpl::service_name)
 		, command_service(this, "command_service", &LogSettingImpl::command_service)
 		, command_name(this, "command_name", &LogSettingImpl::command_name)
@@ -80,12 +80,12 @@ class LogSettingType : public Serialize::Type<LogSettingImpl>
 
 ChanServ::Channel *LogSettingImpl::GetChannel()
 {
-	return Get(&LogSettingType::ci);
+	return Get(&LogSettingType::channel);
 }
 
 void LogSettingImpl::SetChannel(ChanServ::Channel *ci)
 {
-	Set(&LogSettingType::ci, ci);
+	Set(&LogSettingType::channel, ci);
 }
 
 Anope::string LogSettingImpl::GetServiceName()

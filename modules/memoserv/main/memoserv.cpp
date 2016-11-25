@@ -133,7 +133,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
-						if (cu->user->Account() && cu->user->Account()->HasFieldS("MEMO_RECEIVE"))
+						if (cu->user->Account() && cu->user->Account()->IsMemoReceive())
 							cu->user->SendMessage(*MemoServ, _("There is a new memo on channel \002{0}\002. Type \002{1}{2} READ {3} {4}\002 to read it."), ci->GetName(), Config->StrictPrivmsg, MemoServ->nick, ci->GetName(), mi->GetMemos().size()); // XXX
 					}
 				}
@@ -143,12 +143,12 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		{
 			NickServ::Account *nc = NickServ::FindNick(target)->GetAccount();
 
-			if (nc->HasFieldS("MEMO_RECEIVE"))
+			if (nc->IsMemoReceive())
 				for (User *u : nc->users)
 					u->SendMessage(*MemoServ, _("You have a new memo from \002{0}\002. Type \002{1}{2} READ {3}\002 to read it."), source, Config->StrictPrivmsg, MemoServ->nick, mi->GetMemos().size());//XXX
 
 			/* let's get out the mail if set in the nickcore - certus */
-			if (nc->HasFieldS("MEMO_MAIL"))
+			if (nc->IsMemoMail())
 				SendMemoMail(nc, mi, m);
 		}
 

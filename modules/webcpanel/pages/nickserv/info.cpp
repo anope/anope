@@ -42,56 +42,43 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		}
 		if (message.post_data.count("greet") > 0)
 		{
-			Anope::string *greet = na->GetAccount()->GetExt<Anope::string>("greet");
 			const Anope::string &post_greet = HTTPUtils::URLDecode(message.post_data["greet"].replace_all_cs("+", " "));
 
-			if (post_greet.empty())
-				na->GetAccount()->Shrink<Anope::string>("greet");
-			else if (!greet || post_greet != *greet)
-				na->GetAccount()->Extend<Anope::string>("greet", post_greet);
+			na->GetAccount()->SetGreet(post_greet);
 
 			replacements["MESSAGES"] = "Greet updated";
 		}
-		if (na->GetAccount()->HasFieldS("AUTOOP") != message.post_data.count("autoop"))
+		if (na->GetAccount()->IsAutoOp() != message.post_data.count("autoop"))
 		{
-			if (!na->GetAccount()->HasFieldS("AUTOOP"))
-				na->GetAccount()->SetS<bool>("AUTOOP", true);
-			else
-				na->GetAccount()->UnsetS<bool>("AUTOOP");
+			na->GetAccount()->SetAutoOp(!na->GetAccount()->IsAutoOp());
 			replacements["MESSAGES"] = "Autoop updated";
 		}
-		if (na->GetAccount()->HasFieldS("NS_PRIVATE") != message.post_data.count("private"))
+		if (na->GetAccount()->IsPrivate() != message.post_data.count("private"))
 		{
-			if (!na->GetAccount()->HasFieldS("NS_PRIVATE"))
-				na->GetAccount()->SetS<bool>("NS_PRIVATE", true);
-			else
-				na->GetAccount()->UnsetS<bool>("NS_PRIVATE");
+			na->GetAccount()->SetPrivate(!na->GetAccount()->IsPrivate());
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (na->GetAccount()->HasFieldS("NS_SECURE") != message.post_data.count("secure"))
+		if (na->GetAccount()->IsSecure() != message.post_data.count("secure"))
 		{
-			if (!na->GetAccount()->HasFieldS("NS_SECURE"))
-				na->GetAccount()->SetS<bool>("NS_SECURE", true);
-			else
-				na->GetAccount()->UnsetS<bool>("NS_SECURE");
+			na->GetAccount()->SetSecure(!na->GetAccount()->IsSecure());
 			replacements["MESSAGES"] = "Secure updated";
 		}
-		if (message.post_data["kill"] == "on" && !na->GetAccount()->HasFieldS("KILLPROTECT"))
+		if (message.post_data["kill"] == "on" && !na->GetAccount()->IsKillProtect())
 		{
-			na->GetAccount()->SetS<bool>("KILLPROTECT", true);
-			na->GetAccount()->UnsetS<bool>("KILL_QUICK");
+			na->GetAccount()->SetKillProtect(true);
+			na->GetAccount()->SetKillQuick(false);
 			replacements["MESSAGES"] = "Kill updated";
 		}
-		else if (message.post_data["kill"] == "quick" && !na->GetAccount()->HasFieldS("KILL_QUICK"))
+		else if (message.post_data["kill"] == "quick" && !na->GetAccount()->IsKillQuick())
 		{
-			na->GetAccount()->UnsetS<bool>("KILLPROTECT");
-			na->GetAccount()->SetS<bool>("KILL_QUICK", true);
+			na->GetAccount()->SetKillProtect(false);
+			na->GetAccount()->SetKillQuick(true);
 			replacements["MESSAGES"] = "Kill updated";
 		}
-		else if (message.post_data["kill"] == "off" && (na->GetAccount()->HasFieldS("KILLPROTECT") || na->GetAccount()->HasFieldS("KILL_QUICK")))
+		else if (message.post_data["kill"] == "off" && (na->GetAccount()->IsKillProtect() || na->GetAccount()->IsKillQuick()))
 		{
-			na->GetAccount()->UnsetS<bool>("KILLPROTECT");
-			na->GetAccount()->UnsetS<bool>("KILL_QUICK");
+			na->GetAccount()->SetKillProtect(false);
+			na->GetAccount()->SetKillQuick(false);
 			replacements["MESSAGES"] = "Kill updated";
 		}
 	}
@@ -107,20 +94,20 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		replacements["VHOST"] = vhost->Mask();
 	}
 
-	Anope::string *greet = na->GetAccount()->GetExt<Anope::string>("greet");
-	if (greet)
-		replacements["GREET"] = HTTPUtils::Escape(*greet);
-	if (na->GetAccount()->HasFieldS("AUTOOP"))
+	Anope::string greet = na->GetAccount()->GetGreet();
+	if (greet.empty() == false)
+		replacements["GREET"] = HTTPUtils::Escape(greet);
+	if (na->GetAccount()->IsAutoOp())
 		replacements["AUTOOP"];
-	if (na->GetAccount()->HasFieldS("NS_PRIVATE"))
+	if (na->GetAccount()->IsPrivate())
 		replacements["PRIVATE"];
-	if (na->GetAccount()->HasFieldS("NS_SECURE"))
+	if (na->GetAccount()->IsSecure())
 		replacements["SECURE"];
-	if (na->GetAccount()->HasFieldS("KILLPROTECT"))
+	if (na->GetAccount()->IsKillProtect())
 		replacements["KILL_ON"];
-	if (na->GetAccount()->HasFieldS("KILL_QUICK"))
+	if (na->GetAccount()->IsKillQuick())
 		replacements["KILL_QUICK"];
-	if (!na->GetAccount()->HasFieldS("KILLPROTECT") && !na->GetAccount()->HasFieldS("KILL_QUICK"))
+	if (!na->GetAccount()->IsKillProtect() && !na->GetAccount()->IsKillQuick())
 		replacements["KILL_OFF"];
 
 	TemplateFileServer page("nickserv/info.html");

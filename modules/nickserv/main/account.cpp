@@ -92,6 +92,176 @@ MemoServ::MemoInfo *AccountImpl::GetMemos()
 	return GetRef<MemoServ::MemoInfo *>();
 }
 
+Anope::string AccountImpl::GetGreet()
+{
+	return Get(&AccountType::greet);
+}
+
+void AccountImpl::SetGreet(const Anope::string &greet)
+{
+	Set(&AccountType::greet, greet);
+}
+
+bool AccountImpl::IsUnconfirmed()
+{
+	return Get(&AccountType::unconfirmed);
+}
+
+void AccountImpl::SetUnconfirmed(bool unconfirmed)
+{
+	Set(&AccountType::greet, unconfirmed);
+}
+
+bool AccountImpl::IsPrivate()
+{
+	return Get(&AccountType::_private);
+}
+
+void AccountImpl::SetPrivate(bool _private)
+{
+	Set(&AccountType::_private, _private);
+}
+
+bool AccountImpl::IsAutoOp()
+{
+	return Get(&AccountType::autoop);
+}
+
+void AccountImpl::SetAutoOp(bool autoop)
+{
+	Set(&AccountType::autoop, autoop);
+}
+
+bool AccountImpl::IsKeepModes()
+{
+	return Get(&AccountType::keepmodes);
+}
+
+void AccountImpl::SetKeepModes(bool keepmodes)
+{
+	Set(&AccountType::keepmodes, keepmodes);
+}
+
+bool AccountImpl::IsKillProtect()
+{
+	return Get(&AccountType::killprotect);
+}
+
+void AccountImpl::SetKillProtect(bool killprotect)
+{
+	Set(&AccountType::killprotect, killprotect);
+}
+
+bool AccountImpl::IsKillQuick()
+{
+	return Get(&AccountType::killquick);
+}
+
+void AccountImpl::SetKillQuick(bool killquick)
+{
+	Set(&AccountType::killquick, killquick);
+}
+
+bool AccountImpl::IsKillImmed()
+{
+	return Get(&AccountType::killimmed);
+}
+
+void AccountImpl::SetKillImmed(bool killimmed)
+{
+	Set(&AccountType::killimmed, killimmed);
+}
+
+bool AccountImpl::IsMsg()
+{
+	return Get(&AccountType::msg);
+}
+
+void AccountImpl::SetMsg(bool msg)
+{
+	Set(&AccountType::msg, msg);
+}
+
+bool AccountImpl::IsSecure()
+{
+	return Get(&AccountType::secure);
+}
+
+void AccountImpl::SetSecure(bool secure)
+{
+	Set(&AccountType::secure, secure);
+}
+
+bool AccountImpl::IsMemoSignon()
+{
+	return Get(&AccountType::memosignon);
+}
+
+void AccountImpl::SetMemoSignon(bool memosignon)
+{
+	Set(&AccountType::memosignon, memosignon);
+}
+
+bool AccountImpl::IsMemoReceive()
+{
+	return Get(&AccountType::memoreceive);
+}
+
+void AccountImpl::SetMemoReceive(bool memoreceive)
+{
+	Set(&AccountType::memoreceive, memoreceive);
+}
+
+bool AccountImpl::IsMemoMail()
+{
+	return Get(&AccountType::memomail);
+}
+
+void AccountImpl::SetMemoMail(bool memomail)
+{
+	Set(&AccountType::memomail, memomail);
+}
+
+bool AccountImpl::IsHideEmail()
+{
+	return Get(&AccountType::hideemail);
+}
+
+void AccountImpl::SetHideEmail(bool hideemail)
+{
+	Set(&AccountType::hideemail, hideemail);
+}
+
+bool AccountImpl::IsHideMask()
+{
+	return Get(&AccountType::hidemask);
+}
+
+void AccountImpl::SetHideMask(bool hidemask)
+{
+	Set(&AccountType::hidemask, hidemask);
+}
+
+bool AccountImpl::IsHideStatus()
+{
+	return Get(&AccountType::hidestatus);
+}
+
+void AccountImpl::SetHideStatus(bool hidestatus)
+{
+	Set(&AccountType::hidestatus, hidestatus);
+}
+
+bool AccountImpl::IsHideQuit()
+{
+	return Get(&AccountType::hidequit);
+}
+
+void AccountImpl::SetHideQuit(bool hidequit)
+{
+	Set(&AccountType::hidequit, hidequit);
+}
+
 void AccountImpl::SetDisplay(NickServ::Nick *na)
 {
 	if (na->GetAccount() != this || na->GetNick() == this->GetDisplay())

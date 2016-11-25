@@ -23,12 +23,12 @@
 
 ChanServ::Channel *ChanAccessImpl::GetChannel()
 {
-	return Get(&ChanAccessType<ChanServ::ChanAccess>::ci);
+	return Get(&ChanAccessType<ChanServ::ChanAccess>::channel);
 }
 
-void ChanAccessImpl::SetChannel(ChanServ::Channel *ci)
+void ChanAccessImpl::SetChannel(ChanServ::Channel *channel)
 {
-	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::ci, ci);
+	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::channel, channel);
 }
 
 Anope::string ChanAccessImpl::GetCreator()

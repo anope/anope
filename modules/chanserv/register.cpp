@@ -42,7 +42,7 @@ class CommandCSRegister : public Command
 			return;
 		}
 
-		if (nc->HasFieldS("UNCONFIRMED"))
+		if (nc->IsUnconfirmed())
 		{
 			source.Reply(_("You must confirm your account before you can register a channel."));
 			return;

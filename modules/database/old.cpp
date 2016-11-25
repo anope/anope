@@ -479,10 +479,10 @@ static void LoadNicks()
 			NickServ::Account *nc = Serialize::New<NickServ::Account *>();
 			nc->SetDisplay(buffer);
 
-			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_secure", "ns_private", "hide_email",
-				"hide_mask", "hide_quit", "memo_signon", "memo_receive", "autoop", "msg", "ns_keepmodes" };
+			const Anope::string settings[] = { "killprotect", "kill_quick", "secure", "private", "hide_email",
+				"hide_mask", "hide_quit", "memo_signon", "memo_receive", "autoop", "msg", "keepmodes" };
 			for (unsigned j = 0; j < sizeof(settings) / sizeof(Anope::string); ++j)
-				nc->UnsetS<bool>(settings[j].upper());
+				nc->UnsetS<bool>(settings[j]);
 
 			char pwbuf[32];
 			READ(read_buffer(pwbuf, f));
@@ -505,7 +505,7 @@ static void LoadNicks()
 
 			READ(read_string(buffer, f));
 			if (!buffer.empty())
-				nc->Extend<Anope::string>("greet", buffer);
+				nc->SetGreet(buffer);
 
 			uint32_t u32;
 			READ(read_uint32(&u32, f));
@@ -516,33 +516,34 @@ static void LoadNicks()
 
 			READ(read_uint32(&u32, f));
 			if (u32 & OLD_NI_KILLPROTECT)
-				nc->SetS<bool>("KILLPROTECT", true);
+				nc->SetKillProtect(true);
 			if (u32 & OLD_NI_SECURE)
-				nc->SetS<bool>("NS_SECURE", true);
+				nc->SetSecure(true);
 			if (u32 & OLD_NI_MSG)
-				nc->SetS<bool>("MSG", true);
+				nc->SetMsg(true);
 			if (u32 & OLD_NI_MEMO_HARDMAX)
-				nc->SetS<bool>("MEMO_HARDMAX", true);
+				if (MemoServ::MemoInfo *mi = nc->GetMemos())
+					mi->SetHardMax(true);
 			if (u32 & OLD_NI_MEMO_SIGNON)
-				nc->SetS<bool>("MEMO_SIGNON", true);
+				nc->SetMemoSignon(true);
 			if (u32 & OLD_NI_MEMO_RECEIVE)
-				nc->SetS<bool>("MEMO_RECEIVE", true);
+				nc->SetMemoReceive(true);
 			if (u32 & OLD_NI_PRIVATE)
-				nc->SetS<bool>("NS_PRIVATE", true);
+				nc->SetPrivate(true);
 			if (u32 & OLD_NI_HIDE_EMAIL)
-				nc->SetS<bool>("HIDE_EMAIL", true);
+				nc->SetHideEmail(true);
 			if (u32 & OLD_NI_HIDE_MASK)
-				nc->SetS<bool>("HIDE_MASK", true);
+				nc->SetHideMask(true);
 			if (u32 & OLD_NI_HIDE_QUIT)
-				nc->SetS<bool>("HIDE_QUIT", true);
+				nc->SetHideQuit(true);
 			if (u32 & OLD_NI_KILL_QUICK)
-				nc->SetS<bool>("KILL_QUICK", true);
+				nc->SetKillQuick(true);
 			if (u32 & OLD_NI_KILL_IMMED)
-				nc->SetS<bool>("KILL_IMMED", true);
+				nc->SetKillImmed(true);
 			if (u32 & OLD_NI_MEMO_MAIL)
-				nc->SetS<bool>("MEMO_MAIL", true);
+				nc->SetMemoMail(true);
 			if (u32 & OLD_NI_HIDE_STATUS)
-				nc->SetS<bool>("HIDE_STATUS", true);
+				nc->SetHideStatus(true);
 			if (u32 & OLD_NI_SUSPENDED)
 			{
 				NSSuspendInfo *si = Serialize::New<NSSuspendInfo *>();
@@ -552,7 +553,7 @@ static void LoadNicks()
 				}
 			}
 			if (!(u32 & OLD_NI_AUTOOP))
-				nc->SetS<bool>("AUTOOP", true);
+				nc->SetAutoOp(true);
 
 			uint16_t u16;
 			READ(read_uint16(&u16, f));
@@ -706,7 +707,7 @@ static void LoadNicks()
 			na->SetLastSeen(last_seen);
 
 			if (tmpu16 & OLD_NS_NO_EXPIRE)
-				na->SetS<bool>("NS_NO_EXPIRE", true);
+				na->SetNoExpire(true);
 
 			Log(LOG_DEBUG) << "Loaded NickServ::Nick " << na->GetNick();
 		}
@@ -814,10 +815,10 @@ static void LoadChannels()
 			ChanServ::Channel *ci = Serialize::New<ChanServ::Channel *>();
 			ci->SetName(namebuf);
 
-			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "cs_secure", "secureops", "securefounder",
-				"signkick", "signkick_level", "topiclock", "persist", "noautoop", "cs_keepmodes" };
+			const Anope::string settings[] = { "keeptopic", "peace", "private", "restricted", "secure", "secureops", "securefounder",
+				"signkick", "signkick_level", "topiclock", "persist", "noautoop", "keepmodes" };
 			for (unsigned j = 0; j < sizeof(settings) / sizeof(Anope::string); ++j)
-				ci->UnsetS<bool>(settings[j].upper());
+				ci->UnsetS<bool>(settings[j]);
 
 			READ(read_string(buffer, f));
 			ci->SetFounder(NickServ::FindAccount(buffer));
@@ -856,29 +857,30 @@ static void LoadChannels()
 			// Temporary flags cleanup
 			tmpu32 &= ~0x80000000;
 			if (tmpu32 & OLD_CI_KEEPTOPIC)
-				ci->SetS<bool>("KEEPTOPIC", true);
+				ci->SetKeepTopic(true);
 			if (tmpu32 & OLD_CI_SECUREOPS)
-				ci->SetS<bool>("SECUREOPS", true);
+				ci->SetSecureOps(true);
 			if (tmpu32 & OLD_CI_PRIVATE)
-				ci->SetS<bool>("CS_PRIVATE", true);
+				ci->SetPrivate(true);
 			if (tmpu32 & OLD_CI_TOPICLOCK)
-				ci->SetS<bool>("TOPICLOCK", true);
+				ci->SetTopicLock(true);
 			if (tmpu32 & OLD_CI_RESTRICTED)
-				ci->SetS<bool>("RESTRICTED", true);
+				ci->SetRestricted(true);
 			if (tmpu32 & OLD_CI_PEACE)
-				ci->SetS<bool>("PEACE", true);
+				ci->SetPeace(true);
 			if (tmpu32 & OLD_CI_SECURE)
-				ci->SetS<bool>("CS_SECURE", true);
+				ci->SetSecure(true);
 			if (tmpu32 & OLD_CI_NO_EXPIRE)
-				ci->SetS<bool>("CS_NO_EXPIRE", true);
+				ci->SetNoExpire(true);
 			if (tmpu32 & OLD_CI_MEMO_HARDMAX)
-				ci->SetS<bool>("MEMO_HARDMAX", true);
+				if (MemoServ::MemoInfo *mi = ci->GetMemos())
+					mi->SetHardMax(true);
 			if (tmpu32 & OLD_CI_SECUREFOUNDER)
-				ci->SetS<bool>("SECUREFOUNDER", true);
+				ci->SetSecureFounder(true);
 			if (tmpu32 & OLD_CI_SIGNKICK)
-				ci->SetS<bool>("SIGNKICK", true);
+				ci->SetSignKick(true);
 			if (tmpu32 & OLD_CI_SIGNKICK_LEVEL)
-				ci->SetS<bool>("SIGNKICK_LEVEL", true);
+				ci->SetSignKickLevel(true);
 
 			Anope::string forbidby, forbidreason;
 			READ(read_string(forbidby, f));
@@ -910,7 +912,7 @@ static void LoadChannels()
 					level = ChanServ::ACCESS_FOUNDER;
 
 				if (j == 10 && level < 0) // NOJOIN
-					ci->UnsetS<bool>("RESTRICTED"); // If CSDefRestricted was enabled this can happen
+					ci->SetRestricted(false);
 
 				ci->SetLevel(GetLevelName(j), level);
 			}
@@ -1057,9 +1059,9 @@ static void LoadChannels()
 			if (tmp32 & OLD_BS_DONTKICKVOICES)
 				ci->SetS<bool>("BS_DONTKICKVOICES", true);
 			if (tmp32 & OLD_BS_FANTASY)
-				ci->SetS<bool>("BS_FANTASY", true);
+				ci->SetFantasy(true);
 			if (tmp32 & OLD_BS_GREET)
-				ci->SetS<bool>("BS_GREET", true);
+				ci->SetGreet(true);
 			if (tmp32 & OLD_BS_NOBOT)
 				ci->SetS<bool>("BS_NOBOT", true);
 

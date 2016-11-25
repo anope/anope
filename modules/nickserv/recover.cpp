@@ -66,7 +66,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 		// same person that is executing the command, so kill them off (old GHOST command).
 		else if (u->Account() == na->GetAccount())
 		{
-			if (!source.GetAccount() && na->GetAccount()->HasFieldS("NS_SECURE"))
+			if (!source.GetAccount() && na->GetAccount()->IsSecure())
 			{
 				source.GetUser()->Login(u->Account());
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->GetDisplay();
@@ -97,7 +97,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 		/* User is not identified or not identified to the same account as the person using this command */
 		else
 		{
-			if (!source.GetAccount() && na->GetAccount()->HasFieldS("NS_SECURE"))
+			if (!source.GetAccount() && na->GetAccount()->IsSecure())
 			{
 				source.GetUser()->Login(na->GetAccount()); // Identify the user using the command if they arent identified
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->GetNick() << " (" << na->GetAccount()->GetDisplay() << ")";
@@ -193,7 +193,7 @@ class CommandNSRecover : public Command
 		bool ok = false;
 		if (source.GetAccount() == na->GetAccount())
 			ok = true;
-		else if (!na->GetAccount()->HasFieldS("NS_SECURE") && source.GetUser() && na->GetAccount()->IsOnAccess(source.GetUser()))
+		else if (!na->GetAccount()->IsSecure() && source.GetUser() && na->GetAccount()->IsOnAccess(source.GetUser()))
 			ok = true;
 
 		if (certservice && source.GetUser() && certservice->Matches(source.GetUser(), na->GetAccount()))

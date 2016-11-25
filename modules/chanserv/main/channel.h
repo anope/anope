@@ -29,6 +29,22 @@ class ChannelImpl : public ChanServ::Channel
 	int16_t bantype = 0;
 	time_t banexpire = 0;
 	BotInfo *bi = nullptr;
+	bool greet = false;
+	bool fantasy = false;
+	bool noautoop = false;
+	bool peace = false;
+	bool securefounder = false;
+	bool restricted = false;
+	bool secure = false;
+	bool secureops = false;
+	bool signkick = false;
+	bool signkicklevel = false;
+	bool noexpire = false;
+	bool keepmodes = false;
+	bool persist = false;
+	bool topiclock = false;
+	bool keeptopic = false;
+	bool _private = false;
 
  public:
 	ChannelImpl(Serialize::TypeBase *type) : ChanServ::Channel(type) { }
@@ -43,10 +59,10 @@ class ChannelImpl : public ChanServ::Channel
 	void SetDesc(const Anope::string &) override;
 
 	time_t GetTimeRegistered() override;
-	void SetTimeRegistered(const time_t &) override;
+	void SetTimeRegistered(time_t) override;
 
 	time_t GetLastUsed() override;
-	void SetLastUsed(const time_t &) override;
+	void SetLastUsed(time_t) override;
 
 	Anope::string GetLastTopic() override;
 	void SetLastTopic(const Anope::string &) override;
@@ -55,13 +71,13 @@ class ChannelImpl : public ChanServ::Channel
 	void SetLastTopicSetter(const Anope::string &) override;
 
 	time_t GetLastTopicTime() override;
-	void SetLastTopicTime(const time_t &) override;
+	void SetLastTopicTime(time_t) override;
 
 	int16_t GetBanType() override;
-	void SetBanType(const int16_t &) override;
+	void SetBanType(int16_t) override;
 
 	time_t GetBanExpire() override;
-	void SetBanExpire(const time_t &) override;
+	void SetBanExpire(time_t) override;
 
 	BotInfo *GetBI() override;
 	void SetBI(BotInfo *) override;
@@ -77,11 +93,59 @@ class ChannelImpl : public ChanServ::Channel
 	void SetSuccessor(NickServ::Account *nc) override;
 	NickServ::Account *GetSuccessor() override;
 
+	bool IsGreet() override;
+	void SetGreet(bool) override;
+
+	bool IsFantasy() override;
+	void SetFantasy(bool) override;
+
+	bool IsNoAutoop() override;
+	void SetNoAutoop(bool) override;
+
+	bool IsPeace() override;
+	void SetPeace(bool) override;
+
+	bool IsSecureFounder() override;
+	void SetSecureFounder(bool) override;
+
+	bool IsRestricted() override;
+	void SetRestricted(bool) override;
+
+	bool IsSecure() override;
+	void SetSecure(bool) override;
+
+	bool IsSecureOps() override;
+	void SetSecureOps(bool) override;
+
+	bool IsSignKick() override;
+	void SetSignKick(bool) override;
+
+	bool IsSignKickLevel() override;
+	void SetSignKickLevel(bool) override;
+
+	bool IsNoExpire() override;
+	void SetNoExpire(bool) override;
+
+	bool IsKeepModes() override;
+	void SetKeepModes(bool) override;
+
+	bool IsPersist() override;
+	void SetPersist(bool) override;
+
+	bool IsTopicLock() override;
+	void SetTopicLock(bool) override;
+
+	bool IsKeepTopic() override;
+	void SetKeepTopic(bool) override;
+
+	bool IsPrivate() override;
+	void SetPrivate(bool) override;
+
 	bool IsFounder(const User *user) override;
-	ChanServ::ChanAccess *GetAccess(unsigned index) /*const*/ override;
+	ChanServ::ChanAccess *GetAccess(unsigned index) override;
 	ChanServ::AccessGroup AccessFor(const User *u, bool = true) override;
 	ChanServ::AccessGroup AccessFor(NickServ::Account *nc, bool = true) override;
-	unsigned GetAccessCount()/* const*/ override;
+	unsigned GetAccessCount() override;
 	void ClearAccess() override;
 	AutoKick* AddAkick(const Anope::string &user, NickServ::Account *akicknc, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0) override;
 	AutoKick* AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0) override;

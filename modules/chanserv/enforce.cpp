@@ -32,8 +32,8 @@ class CommandCSEnforce : public Command
 		 * part of the code. This way we can enforce SECUREOPS even
 		 * if it's off.
 		 */
-		bool hadsecureops = ci->HasFieldS("SECUREOPS");
-		ci->SetS<bool>("SECUREOPS", true);
+		bool hadsecureops = ci->IsSecureOps();
+		ci->SetSecureOps(true);
 
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
@@ -43,7 +43,7 @@ class CommandCSEnforce : public Command
 		}
 
 		if (!hadsecureops)
-			ci->UnsetS<bool>("SECUREOPS");
+			ci->SetSecureOps(false);
 
 		source.Reply(_("\002Secureops\002 enforced on \002{0}\002."), ci->GetName());
 	}

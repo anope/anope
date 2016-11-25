@@ -47,7 +47,7 @@ class CommandMSInfo : public Command
 			}
 
 			mi = na->GetAccount()->GetMemos();
-			hardmax = na->GetAccount()->HasFieldS("MEMO_HARDMAX");
+			hardmax = mi->IsHardMax();
 		}
 		else if (!nname.empty() && nname[0] == '#')
 		{
@@ -65,7 +65,7 @@ class CommandMSInfo : public Command
 			}
 
 			mi = ci->GetMemos();
-			hardmax = ci->HasFieldS("MEMO_HARDMAX");
+			hardmax = mi->IsHardMax();
 		}
 		else if (!nname.empty()) /* It's not a chan and we aren't an oper */
 		{
@@ -75,7 +75,7 @@ class CommandMSInfo : public Command
 		else
 		{
 			mi = nc->GetMemos();
-			hardmax = nc->HasFieldS("MEMO_HARDMAX");
+			hardmax = mi->IsHardMax();
 		}
 
 		if (!mi)
@@ -123,11 +123,11 @@ class CommandMSInfo : public Command
 
 			if (na)
 			{
-				if (na->GetAccount()->HasFieldS("MEMO_RECEIVE") && na->GetAccount()->HasFieldS("MEMO_SIGNON"))
+				if (na->GetAccount()->IsMemoReceive() && na->GetAccount()->IsMemoSignon())
 					source.Reply(_("\002{0}\002 is notified of new memos at logon and when they arrive."), nname);
-				else if (na->GetAccount()->HasFieldS("MEMO_RECEIVE"))
+				else if (na->GetAccount()->IsMemoReceive())
 					source.Reply(_("\002{0}\002 is notified when new memos arrive."), nname);
-				else if (na->GetAccount()->HasFieldS("MEMO_SIGNON"))
+				else if (na->GetAccount()->IsMemoSignon())
 					source.Reply(_("\002{0}\002 is notified of news memos at logon."), nname);
 				else
 					source.Reply(_("\002{0}\002 is not notified of new memos."), nname);
@@ -179,22 +179,22 @@ class CommandMSInfo : public Command
 			else
 				source.Reply(_("You have no limit on the number of memos you may keep."));
 
-			bool memo_mail = nc->HasFieldS("MEMO_MAIL");
-			if (nc->HasFieldS("MEMO_RECEIVE") && nc->HasFieldS("MEMO_SIGNON"))
+			bool memo_mail = nc->IsMemoMail();
+			if (nc->IsMemoReceive() && nc->IsMemoSignon())
 			{
 				if (memo_mail)
 					source.Reply(_("You will be notified of new memos at logon and when they arrive, and by mail when they arrive."));
 				else
 					source.Reply(_("You will be notified of new memos at logon and when they arrive."));
 			}
-			else if (nc->HasFieldS("MEMO_RECEIVE"))
+			else if (nc->IsMemoReceive())
 			{
 				if (memo_mail)
 					source.Reply(_("You will be notified by message and by mail when new memos arrive."));
 				else
 					source.Reply(_("You will be notified when new memos arrive."));
 			}
-			else if (nc->HasFieldS("MEMO_SIGNON"))
+			else if (nc->IsMemoSignon())
 			{
 				if (memo_mail)
 					source.Reply(_("You will be notified of new memos at logon, and by mail when they arrive."));

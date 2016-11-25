@@ -114,7 +114,7 @@ static bool ShouldHide(const Anope::string &channel, User *u)
 
 	if (targetchan && targetchan->HasMode("SECRET"))
 		return true;
-	else if (targetchan_ci && targetchan_ci->HasExt("CS_PRIVATE"))
+	else if (targetchan_ci && targetchan_ci->IsPrivate())
 		return true;
 	else if (u && u->HasMode("PRIV"))
 		return true;

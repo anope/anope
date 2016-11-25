@@ -25,8 +25,8 @@ class AutoJoin : public Serialize::Object
  public:
 	static constexpr const char *const NAME = "autojoin";
 
-	virtual NickServ::Account *GetOwner() anope_abstract;
-	virtual void SetOwner(NickServ::Account *acc) anope_abstract;
+	virtual NickServ::Account *GetAccount() anope_abstract;
+	virtual void SetAccount(NickServ::Account *acc) anope_abstract;
 
 	virtual Anope::string GetChannel() anope_abstract;
 	virtual void SetChannel(const Anope::string &c) anope_abstract;

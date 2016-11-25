@@ -66,7 +66,7 @@ class CommandNSAList : public Command
 			{
 				++chan_count;
 				entry["Number"] = stringify(chan_count);
-				entry["Channel"] = (ci->HasFieldS("CS_NO_EXPIRE") ? "!" : "") + ci->GetName();
+				entry["Channel"] = (ci->IsNoExpire() ? "!" : "") + ci->GetName();
 				entry["Access"] = Language::Translate(source.GetAccount(), _("Founder"));
 				entry["Description"] = ci->GetDesc();
 				list.AddEntry(entry);
@@ -77,7 +77,7 @@ class CommandNSAList : public Command
 			{
 				++chan_count;
 				entry["Number"] = stringify(chan_count);
-				entry["Channel"] = (ci->HasFieldS("CS_NO_EXPIRE") ? "!" : "") + ci->GetName();
+				entry["Channel"] = (ci->IsNoExpire() ? "!" : "") + ci->GetName();
 				entry["Access"] = Language::Translate(source.GetAccount(), _("Successor"));
 				entry["Description"] = ci->GetDesc();
 				list.AddEntry(entry);
@@ -91,7 +91,7 @@ class CommandNSAList : public Command
 			++chan_count;
 
 			entry["Number"] = stringify(chan_count);
-			entry["Channel"] = (ci->HasFieldS("CS_NO_EXPIRE") ? "!" : "") + ci->GetName();
+			entry["Channel"] = (ci->IsNoExpire() ? "!" : "") + ci->GetName();
 			for (unsigned j = 0; j < access.size(); ++j)
 				entry["Access"] = entry["Access"] + ", " + access[j]->AccessSerialize();
 			entry["Access"] = entry["Access"].substr(2);

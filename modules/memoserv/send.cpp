@@ -43,7 +43,7 @@ class CommandMSSend : public Command
 			return;
 		}
 
-		if (source.GetAccount()->HasFieldS("UNCONFIRMED"))
+		if (source.GetAccount()->IsUnconfirmed())
 		{
 			source.Reply(_("You must confirm your account before you may send a memo."));
 			return;

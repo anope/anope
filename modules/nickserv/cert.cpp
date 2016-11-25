@@ -86,7 +86,7 @@ class NSCertEntryType : public Serialize::Type<NSCertEntryImpl>
 			if (!cert.empty())
 				certmap[cert] = acc;
 		}
-	} nc;
+	} account;
 
 	struct Mask : Serialize::Field<NSCertEntryImpl, Anope::string>
 	{
@@ -104,7 +104,7 @@ class NSCertEntryType : public Serialize::Type<NSCertEntryImpl>
 	} mask;
 
 	NSCertEntryType(Module *me) : Serialize::Type<NSCertEntryImpl>(me)
-		, nc(this, "nc", &NSCertEntryImpl::account, true)
+		, account(this, "account", &NSCertEntryImpl::account, true)
 		, mask(this, "mask", &NSCertEntryImpl::cert)
 	{
 	}
@@ -119,12 +119,12 @@ NSCertEntryImpl::~NSCertEntryImpl()
 
 NickServ::Account *NSCertEntryImpl::GetAccount()
 {
-	return Get<NickServ::Account *>(&NSCertEntryType::nc);
+	return Get<NickServ::Account *>(&NSCertEntryType::account);
 }
 
 void NSCertEntryImpl::SetAccount(NickServ::Account *nc)
 {
-	Set(&NSCertEntryType::nc, nc);
+	Set(&NSCertEntryType::account, nc);
 }
 
 Anope::string NSCertEntryImpl::GetCert()

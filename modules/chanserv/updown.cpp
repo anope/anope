@@ -117,7 +117,7 @@ class CommandCSUp : public Command
 			return;
 		}
 
-		if (source.GetUser() && u != source.GetUser() && c->ci->HasFieldS("PEACE"))
+		if (source.GetUser() && u != source.GetUser() && c->ci->IsPeace())
 		{
 			if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
 			{
@@ -222,7 +222,7 @@ class CommandCSDown : public Command
 			return;
 		}
 
-		if (source.GetUser() && u != source.GetUser() && c->ci->HasFieldS("PEACE"))
+		if (source.GetUser() && u != source.GetUser() && c->ci->IsPeace())
 		{
 			if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
 			{

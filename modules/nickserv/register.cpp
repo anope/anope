@@ -36,7 +36,7 @@ class CommandNSConfirm : public Command
 	{
 		const Anope::string &passcode = params[0];
 
-		if (source.nc && !source.nc->HasFieldS("UNCONFIRMED") && source.HasPriv("nickserv/confirm"))
+		if (source.nc && !source.nc->IsUnconfirmed() && source.HasPriv("nickserv/confirm"))
 		{
 			NickServ::Nick *na = NickServ::FindNick(passcode);
 			if (na == NULL)
@@ -45,13 +45,13 @@ class CommandNSConfirm : public Command
 				return;
 			}
 
-			if (na->GetAccount()->HasFieldS("UNCONFIRMED") == false)
+			if (na->GetAccount()->IsUnconfirmed() == false)
 			{
 				source.Reply(_("\002{0}\002 is already confirmed."), na->GetNick());
 				return;
 			}
 
-			na->GetAccount()->UnsetS<bool>("UNCONFIRMED");
+			na->GetAccount()->SetUnconfirmed(false);
 			EventManager::Get()->Dispatch(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), na->GetAccount());
 			Log(LOG_ADMIN, source, this) << "to confirm nick " << na->GetNick() << " (" << na->GetAccount()->GetDisplay() << ")";
 			source.Reply(_("\002{0}\002 has been confirmed."), na->GetNick());
@@ -81,7 +81,7 @@ class CommandNSConfirm : public Command
 			nc->Shrink<Anope::string>("passcode");
 			Log(LOG_COMMAND, source, this) << "to confirm their email";
 			source.Reply(_("Your email address of \002{0}\002 has been confirmed."), source.nc->GetEmail());
-			nc->UnsetS<bool>("UNCONFIRMED");
+			nc->SetUnconfirmed(false);
 
 			EventManager::Get()->Dispatch(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), nc);
 
@@ -91,7 +91,7 @@ class CommandNSConfirm : public Command
 				if (na)
 				{
 					IRCD->SendLogin(source.GetUser(), na);
-					if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && na->GetAccount() == source.GetAccount() && !na->GetAccount()->HasFieldS("UNCONFIRMED"))
+					if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && na->GetAccount() == source.GetAccount() && !na->GetAccount()->IsUnconfirmed())
 						source.GetUser()->SetMode(source.service, "REGISTERED");
 				}
 			}
@@ -263,14 +263,14 @@ class CommandNSRegister : public Command
 
 		if (nsregister.equals_ci("admin"))
 		{
-			nc->SetS<bool>("UNCONFIRMED", true);
+			nc->SetUnconfirmed(true);
 			// User::Identify() called below will notify the user that their registration is pending
 		}
 		else if (nsregister.equals_ci("mail"))
 		{
 			if (!email.empty())
 			{
-				nc->SetS<bool>("UNCONFIRMED", true);
+				nc->SetUnconfirmed(true);
 				SendRegmail(NULL, na, source.service);
 			}
 		}
@@ -332,7 +332,7 @@ class CommandNSResend : public Command
 			return;
 		}
 
-		if (na->GetAccount() != source.GetAccount() || !source.nc->HasFieldS("UNCONFIRMED"))
+		if (na->GetAccount() != source.GetAccount() || !source.nc->IsUnconfirmed())
 		{
 			source.Reply(_("Your account is already confirmed."));
 			return;
@@ -379,7 +379,6 @@ class NSRegister : public Module
 	CommandNSConfirm commandnsconfirm;
 	CommandNSResend commandnsrsend;
 
-	Serialize::Field<NickServ::Account, bool> unconfirmed;
 	Serialize::Field<NickServ::Account, Anope::string> passcode;
 
  public:
@@ -389,7 +388,6 @@ class NSRegister : public Module
 		, commandnsregister(this)
 		, commandnsconfirm(this)
 		, commandnsrsend(this)
-		, unconfirmed(this, "UNCONFIRMED")
 		, passcode(this, "passcode")
 	{
 		if (Config->GetModule(this)->Get<Anope::string>("registration").equals_ci("disable"))
@@ -399,7 +397,7 @@ class NSRegister : public Module
 	void OnNickIdentify(User *u) override
 	{
 		ServiceBot *NickServ;
-		if (unconfirmed.HasExt(u->Account()) && (NickServ = Config->GetClient("NickServ")))
+		if (u->Account()->IsUnconfirmed() && (NickServ = Config->GetClient("NickServ")))
 		{
 			const Anope::string &nsregister = Config->GetModule(this)->Get<Anope::string>("registration");
 			if (nsregister.equals_ci("admin"))
@@ -416,7 +414,7 @@ class NSRegister : public Module
 
 	void OnPreNickExpire(NickServ::Nick *na, bool &expire) override
 	{
-		if (unconfirmed.HasExt(na->GetAccount()))
+		if (na->GetAccount()->IsUnconfirmed())
 		{
 			time_t unconfirmed_expire = Config->GetModule(this)->Get<time_t>("unconfirmedexpire", "1d");
 			if (unconfirmed_expire && Anope::CurTime - na->GetTimeRegistered() >= unconfirmed_expire)

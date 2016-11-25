@@ -249,16 +249,9 @@ class ChanServCore : public Module
 
 		spacesepstream(conf->GetModule(this)->Get<Anope::string>("defaults", "greet fantasy")).GetTokens(defaults);
 		if (defaults.empty())
-		{
-			defaults.push_back("KEEPTOPIC");
-			defaults.push_back("CS_SECURE");
-			defaults.push_back("SECUREFOUNDER");
-			defaults.push_back("SIGNKICK");
-		}
+			defaults = { "keeptopic", "secure", "securefounder", "signkick" };
 		else if (defaults[0].equals_ci("none"))
-		{
 			defaults.clear();
-		}
 
 		always_lower = conf->GetModule(this)->Get<bool>("always_lower_ts");
 	}
@@ -408,7 +401,7 @@ class ChanServCore : public Module
 
 	void OnChannelSync(Channel *c) override
 	{
-		bool perm = c->HasMode("PERM") || (c->ci && c->ci->HasFieldS("PERSIST"));
+		bool perm = c->HasMode("PERM") || (c->ci && c->ci->IsPersist());
 		if (!perm && !c->botchannel && (c->users.empty() || (c->users.size() == 1 && c->users.begin()->second->user->server == Me)))
 		{
 			this->Hold(c);
@@ -470,7 +463,7 @@ class ChanServCore : public Module
 		/* Find all persistent channels and create them, as we are about to finish burst to our uplink */
 		for (ChanServ::Channel *ci : Serialize::GetObjects<ChanServ::Channel *>())
 		{
-			if (ci->HasFieldS("PERSIST"))
+			if (ci->IsPersist())
 			{
 				bool c;
 				ci->c = Channel::FindOrCreate(ci->GetName(), c, ci->GetTimeRegistered());
@@ -508,9 +501,9 @@ class ChanServCore : public Module
 			return;
 		/* Mark the channel as persistent */
 		if (ci->c->HasMode("PERM"))
-			ci->SetS("PERSIST", true);
+			ci->SetPersist(true);
 		/* Persist may be in def cflags, set it here */
-		else if (ci->HasFieldS("PERSIST"))
+		else if (ci->IsPersist())
 			ci->c->SetMode(NULL, "PERM");
 	}
 
@@ -550,7 +543,7 @@ class ChanServCore : public Module
 			return;
 
 		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
-		if (!ci->HasFieldS("CS_NO_EXPIRE") && chanserv_expire && !Anope::NoExpire && ci->GetLastUsed() != Anope::CurTime)
+		if (!ci->IsNoExpire() && chanserv_expire && !Anope::NoExpire && ci->GetLastUsed() != Anope::CurTime)
 			info[_("Expires")] = Anope::strftime(ci->GetLastUsed() + chanserv_expire, source.GetAccount());
 	}
 

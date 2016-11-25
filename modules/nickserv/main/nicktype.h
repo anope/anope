@@ -38,7 +38,9 @@ class NickType : public Serialize::Type<NickImpl>
 	Serialize::Field<NickImpl, time_t> last_seen;
 
 	/* Account this nick is tied to. Multiple nicks can be tied to a single account. */
-	Serialize::ObjectField<NickImpl, NickServ::Account *> nc;
+	Serialize::ObjectField<NickImpl, NickServ::Account *> account;
+
+	Serialize::Field<NickImpl, bool> noexpire;
 
  	NickType(Module *);
 

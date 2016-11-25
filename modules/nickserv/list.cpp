@@ -84,7 +84,6 @@ class CommandNSList : public Command
 
 		list.AddColumn(_("Nick")).AddColumn(_("Last usermask"));
 
-		// XXX wtf
 		Anope::map<NickServ::Nick *> ordered_map;
 		for (NickServ::Nick *na : NickServ::service->GetNickList())
 			ordered_map[na->GetNick()] = na;
@@ -94,13 +93,13 @@ class CommandNSList : public Command
 			NickServ::Nick *na = it->second;
 
 			/* Don't show private nicks to non-services admins. */
-			if (na->GetAccount()->HasFieldS("NS_PRIVATE") && !is_servadmin && na->GetAccount() != mync)
+			if (na->GetAccount()->IsPrivate() && !is_servadmin && na->GetAccount() != mync)
 				continue;
-			else if (nsnoexpire && !na->HasFieldS("NS_NO_EXPIRE"))
+			else if (nsnoexpire && !na->IsNoExpire())
 				continue;
 			else if (suspended && !na->GetAccount()->HasFieldS("NS_SUSPENDED"))
 				continue;
-			else if (unconfirmed && !na->GetAccount()->HasFieldS("UNCONFIRMED"))
+			else if (unconfirmed && !na->GetAccount()->IsUnconfirmed())
 				continue;
 
 			/* We no longer compare the pattern against the output buffer.
@@ -112,16 +111,16 @@ class CommandNSList : public Command
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= listmax)
 				{
 					bool isnoexpire = false;
-					if (is_servadmin && na->HasFieldS("NS_NO_EXPIRE"))
+					if (is_servadmin && na->IsNoExpire())
 						isnoexpire = true;
 
 					ListFormatter::ListEntry entry;
 					entry["Nick"] = (isnoexpire ? "!" : "") + na->GetNick();
-					if (na->GetAccount()->HasFieldS("HIDE_MASK") && !is_servadmin && na->GetAccount() != mync)
+					if (na->GetAccount()->IsHideMask() && !is_servadmin && na->GetAccount() != mync)
 						entry["Last usermask"] = Language::Translate(source.GetAccount(), _("[Hostname hidden]"));
 					else if (na->GetAccount()->HasFieldS("NS_SUSPENDED"))
 						entry["Last usermask"] = Language::Translate(source.GetAccount(), _("[Suspended]"));
-					else if (na->GetAccount()->HasFieldS("UNCONFIRMED"))
+					else if (na->GetAccount()->IsUnconfirmed())
 						entry["Last usermask"] = Language::Translate(source.GetAccount(), _("[Unconfirmed]"));
 					else
 						entry["Last usermask"] = na->GetLastUsermask();
@@ -215,13 +214,13 @@ class CommandNSSetPrivate : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable private for " << nc->GetDisplay();
-			nc->SetS<bool>("NS_PRIVATE", true);
+			nc->SetPrivate(true);
 			source.Reply(_("Private option is now \002on\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable private for " << nc->GetDisplay();
-			nc->UnsetS<bool>("NS_PRIVATE");
+			nc->SetPrivate(true);
 			source.Reply(_("Private option is now \002off\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else
@@ -274,15 +273,12 @@ class NSList : public Module
 	CommandNSSetPrivate commandnssetprivate;
 	CommandNSSASetPrivate commandnssasetprivate;
 
-	Serialize::Field<NickServ::Account, bool> priv;
-
  public:
 	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::NickInfo>(this)
 		, commandnslist(this)
 		, commandnssetprivate(this)
 		, commandnssasetprivate(this)
-		, priv(this, "NS_PRIVATE")
 	{
 	}
 
@@ -291,7 +287,7 @@ class NSList : public Module
 		if (!show_all)
 			return;
 
-		if (priv.HasExt(na->GetAccount()))
+		if (na->GetAccount()->IsPrivate())
 			info.AddOption(_("Private"));
 	}
 };

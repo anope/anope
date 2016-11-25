@@ -42,7 +42,7 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 			++chan_count;
 
 			replacements["NUMBERS"] = stringify(chan_count);
-			replacements["CHANNELS"] = (ci->HasFieldS("CS_NO_EXPIRE") ? "!" : "") + ci->GetName();
+			replacements["CHANNELS"] = (ci->IsNoExpire() ? "!" : "") + ci->GetName();
 			replacements["ACCESSES"] = "Founder";
 			continue;
 		}
@@ -54,7 +54,7 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 		++chan_count;
 
 		replacements["NUMBERS"] = stringify(chan_count);
-		replacements["CHANNELS"] = (ci->HasFieldS("CS_NO_EXPIRE") ? "!" : "") + ci->GetName();
+		replacements["CHANNELS"] = (ci->IsNoExpire() ? "!" : "") + ci->GetName();
 		Anope::string access_str;
 		for (unsigned i = 0; i < access.size(); ++i)
 			access_str += ", " + access[i]->AccessSerialize();

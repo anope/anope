@@ -70,7 +70,7 @@ class CommandCSKick : public Command
 		if (u2)
 		{
 			ChanServ::AccessGroup u2_access = ci->AccessFor(u2);
-			if (u != u2 && ci->HasFieldS("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
+			if (u != u2 && ci->IsPeace() && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
 				source.Reply(_("Access denied. \002{0}\002 has the same or more privileges than you on \002{1}\002."), u2->nick, ci->GetName());
 			else if (u2->IsProtected())
 				source.Reply(_("Access denied. \002{0}\002 is protected and can not be kicked."), u2->nick);
@@ -78,16 +78,18 @@ class CommandCSKick : public Command
 				source.Reply(_("User \002{0}\002 is not on channel \002{1}\002."), u2->nick, c->name);
 			else
 			{
-				bool override = !u_access.HasPriv("KICK") || (u != u2 && ci->HasFieldS("PEACE") && u2_access >= u_access);
+				bool override = !u_access.HasPriv("KICK") || (u != u2 && ci->IsPeace() && u2_access >= u_access);
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << u2->nick;
 
-				if (ci->HasFieldS("SIGNKICK") || (ci->HasFieldS("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
+				if (ci->IsSignKick() || (ci->IsSignKickLevel() && !u_access.HasPriv("SIGNKICK")))
 				{
 					signkickformat = signkickformat.replace_all_cs("%m", reason);
 					c->Kick(ci->WhoSends(), u2, "%s", signkickformat.c_str());
 				}
 				else
+				{
 					c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
+				}
 			}
 		}
 		else if (u_access.HasPriv("FOUNDER"))
@@ -108,21 +110,23 @@ class CommandCSKick : public Command
 					++matched;
 
 					ChanServ::AccessGroup u2_access = ci->AccessFor(uc->user);
-					if (u != uc->user && ci->HasFieldS("PEACE") && u2_access >= u_access)
+					if (u != uc->user && ci->IsPeace() && u2_access >= u_access)
 						continue;
 					else if (uc->user->IsProtected())
 						continue;
 
 					++kicked;
 
-					if (ci->HasFieldS("SIGNKICK") || (ci->HasFieldS("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
+					if (ci->IsSignKick() || (ci->IsSignKickLevel() && !u_access.HasPriv("SIGNKICK")))
 					{
 						reason += " (Matches " + mask + ")";
 						signkickformat = signkickformat.replace_all_cs("%m", reason);
 						c->Kick(ci->WhoSends(), uc->user, "%s", signkickformat.c_str());
 					}
 					else
+					{
 						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), mask.c_str());
+					}
 				}
 			}
 

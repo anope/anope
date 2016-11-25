@@ -53,7 +53,7 @@ class CSMiscDataType : public Serialize::Type<CSMiscDataImpl>
 	Serialize::Field<CSMiscDataImpl, Anope::string> name, data;
 
 	CSMiscDataType(Module *me) : Serialize::Type<CSMiscDataImpl>(me)
-		, owner(this, "owner", &CSMiscDataImpl::channel, true)
+		, owner(this, "channel", &CSMiscDataImpl::channel, true)
 		, name(this, "name", &CSMiscDataImpl::name)
 		, data(this, "data", &CSMiscDataImpl::data)
 	{

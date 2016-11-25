@@ -85,7 +85,6 @@ class CommandCSList : public Command
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Description"));
 
-		// XXX wtf
 		Anope::map<ChanServ::Channel *> ordered_map;
 		if (ChanServ::service)
 			for (auto& it : ChanServ::service->GetChannels())
@@ -97,7 +96,7 @@ class CommandCSList : public Command
 
 			if (!is_servadmin)
 			{
-				if (ci->HasFieldS("CS_PRIVATE") || ci->HasFieldS("CS_SUSPENDED"))
+				if (ci->IsPrivate() || ci->HasFieldS("CS_SUSPENDED"))
 					continue;
 				if (ci->c && ci->c->HasMode("SECRET"))
 					continue;
@@ -113,7 +112,7 @@ class CommandCSList : public Command
 			if (suspended && !ci->HasFieldS("CS_SUSPENDED"))
 				continue;
 
-			if (channoexpire && !ci->HasFieldS("CS_NO_EXPIRE"))
+			if (channoexpire && !ci->IsNoExpire())
 				continue;
 
 			if (pattern.equals_ci(ci->GetName()) || ci->GetName().equals_ci(spattern) || Anope::Match(ci->GetName(), pattern, false, true) || Anope::Match(ci->GetName(), spattern, false, true) || Anope::Match(ci->GetDesc(), pattern, false, true) || Anope::Match(ci->GetLastTopic(), pattern, false, true))
@@ -121,7 +120,7 @@ class CommandCSList : public Command
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= listmax)
 				{
 					bool isnoexpire = false;
-					if (is_servadmin && (ci->HasFieldS("CS_NO_EXPIRE")))
+					if (is_servadmin && ci->IsNoExpire())
 						isnoexpire = true;
 
 					ListFormatter::ListEntry entry;
@@ -217,13 +216,13 @@ class CommandCSSetPrivate : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable private";
-			ci->SetS<bool>("CS_PRIVATE", true);
+			ci->SetPrivate(true);
 			source.Reply(_("Private option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable private";
-			ci->UnsetS<bool>("CS_PRIVATE");
+			ci->SetPrivate(false);
 			source.Reply(_("Private option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
@@ -252,14 +251,11 @@ class CSList : public Module
 	CommandCSList commandcslist;
 	CommandCSSetPrivate commandcssetprivate;
 
-	Serialize::Field<ChanServ::Channel, bool> priv;
-
  public:
 	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::ChanInfo>(this)
 		, commandcslist(this)
 		, commandcssetprivate(this)
-		, priv(this, "CS_PRIVATE")
 	{
 	}
 
@@ -268,7 +264,7 @@ class CSList : public Module
 		if (!show_all)
 			return;
 
-		if (priv.HasExt(ci))
+		if (ci->IsPrivate())
 			info.AddOption(_("Private"));
 	}
 };

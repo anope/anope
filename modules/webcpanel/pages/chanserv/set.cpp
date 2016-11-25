@@ -56,60 +56,39 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 
 	if (can_set && message.post_data.empty() == false)
 	{
-		if (ci->HasFieldS("KEEPTOPIC") != message.post_data.count("keeptopic"))
+		if (ci->IsKeepTopic() != message.post_data.count("keeptopic"))
 		{
-			if (!ci->HasFieldS("KEEPTOPIC"))
-				ci->SetS<bool>("KEEPTOPIC", true);
-			else
-				ci->UnsetS<bool>("KEEPTOPIC");
+			ci->SetKeepTopic(!ci->IsKeepTopic());
 			replacements["MESSAGES"] = "Secure updated";
 		}
-		if (ci->HasFieldS("PEACE") != message.post_data.count("peace"))
+		if (ci->IsPeace() != message.post_data.count("peace"))
 		{
-			if (!ci->HasFieldS("PEACE"))
-				ci->SetS<bool>("PEACE", true);
-			else
-				ci->UnsetS<bool>("PEACE");
+			ci->SetPeace(!ci->IsPeace());
 			replacements["MESSAGES"] = "Peace updated";
 		}
-		if (ci->HasFieldS("CS_PRIVATE") != message.post_data.count("private"))
+		if (ci->IsPrivate() != message.post_data.count("private"))
 		{
-			if (!ci->HasFieldS("CS_PRIVATE"))
-				ci->SetS<bool>("CS_PRIVATE", true);
-			else
-				ci->UnsetS<bool>("CS_PRIVATE");
+			ci->SetPrivate(!ci->IsPrivate());
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (ci->HasFieldS("RESTRICTED") != message.post_data.count("restricted"))
+		if (ci->IsRestricted() != message.post_data.count("restricted"))
 		{
-			if (!ci->HasFieldS("RESTRICTED"))
-				ci->SetS<bool>("RESTRICTED", true);
-			else
-				ci->UnsetS<bool>("RESTRICTED");
+			ci->SetRestricted(!ci->IsRestricted());
 			replacements["MESSAGES"] = "Restricted updated";
 		}
-		if (ci->HasFieldS("CS_SECURE") != message.post_data.count("secure"))
+		if (ci->IsSecure() != message.post_data.count("secure"))
 		{
-			if (!ci->HasFieldS("CS_SECURE"))
-				ci->SetS<bool>("CS_SECURE", true);
-			else
-				ci->UnsetS<bool>("CS_SECURE");
+			ci->SetSecure(!ci->IsSecure());
 			replacements["MESSAGES"] = "Secure updated";
 		}
-		if (ci->HasFieldS("SECUREOPS") != message.post_data.count("secureops"))
+		if (ci->IsSecureOps() != message.post_data.count("secureops"))
 		{
-			if (!ci->HasFieldS("SECUREOPS"))
-				ci->SetS<bool>("SECUREOPS", true);
-			else
-				ci->UnsetS<bool>("SECUREOPS");
+			ci->SetSecureOps(!ci->IsSecureOps());
 			replacements["MESSAGES"] = "Secureops updated";
 		}
-		if (ci->HasFieldS("TOPICLOCK") != message.post_data.count("topiclock"))
+		if (ci->IsTopicLock() != message.post_data.count("topiclock"))
 		{
-			if (!ci->HasFieldS("TOPICLOCK"))
-				ci->SetS<bool>("TOPICLOCK", true);
-			else
-				ci->UnsetS<bool>("TOPICLOCK");
+			ci->SetTopicLock(!ci->IsTopicLock());
 			replacements["MESSAGES"] = "Topiclock updated";
 		}
 	}
@@ -132,25 +111,25 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 
 	if (can_set)
 	{
-		if (ci->HasFieldS("KEEPTOPIC"))
+		if (ci->IsKeepTopic())
 			replacements["KEEPTOPIC"];
 
-		if (ci->HasFieldS("PEACE"))
+		if (ci->IsPeace())
 			replacements["PEACE"];
 
-		if (ci->HasFieldS("CS_PRIVATE"))
+		if (ci->IsPrivate())
 			replacements["PRIVATE"];
 
-		if (ci->HasFieldS("RESTRICTED"))
+		if (ci->IsRestricted())
 			replacements["RESTRICTED"];
 
-		if (ci->HasFieldS("CS_SECURE"))
+		if (ci->IsSecure())
 			replacements["SECURE"];
 
-		if (ci->HasFieldS("SECUREOPS"))
+		if (ci->IsSecureOps())
 			replacements["SECUREOPS"];
 
-		if (ci->HasFieldS("TOPICLOCK"))
+		if (ci->IsTopicLock())
 			replacements["TOPICLOCK"];
 	}
 

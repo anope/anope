@@ -388,7 +388,7 @@ class InspIRCd20Proto : public IRCDProto
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
 		/* InspIRCd uses an account to bypass chmode +R, not umode +r, so we can't send this here */
-		if (na->GetAccount()->HasFieldS("UNCONFIRMED"))
+		if (na->GetAccount()->IsUnconfirmed())
 			return;
 
 		Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", na->GetAccount()->GetDisplay());
@@ -1054,7 +1054,7 @@ struct IRCDMessageMetadata : IRCDMessage
 				}
 				else if ((do_topiclock) && (params[1] == "topiclock"))
 				{
-					bool mystate = c->ci->GetExt<bool>("TOPICLOCK");
+					bool mystate = c->ci->IsTopicLock();
 					bool serverstate = (params[2] == "1");
 					if (mystate != serverstate)
 						Uplink::Send(Me, "METADATA", c->name, "topiclock", mystate ? "1" : "");
@@ -1499,7 +1499,7 @@ class ProtoInspIRCd20 : public Module
 
 		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && ci->c)
 		{
-			if (ci->HasFieldS("TOPICLOCK"))
+			if (ci->IsTopicLock())
 				SendChannelMetadata(ci->c, "topiclock", "1");
 		}
 	}

@@ -127,7 +127,7 @@ class BotServCore : public Module, public BotServ::BotServService
 	void OnLeaveChannel(User *u, Channel *c) override
 	{
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-		if (c->ci && c->ci->HasFieldS("PERSIST"))
+		if (c->ci && c->ci->IsPersist())
 			return;
 	
 		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediately
@@ -219,7 +219,7 @@ class BotServCore : public Module, public BotServ::BotServService
 		/* Set default bot flags */
 		spacesepstream sep(Config->GetModule(this)->Get<Anope::string>("defaults", "greet fantasy"));
 		for (Anope::string token; sep.GetToken(token);)
-			ci->SetS<bool>("BS_" + token.upper(), true);
+			ci->SetS<bool>(token, true);
 	}
 
 	void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) override

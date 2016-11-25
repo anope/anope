@@ -128,11 +128,21 @@ void NickImpl::SetLastSeen(const time_t &ls)
 
 NickServ::Account *NickImpl::GetAccount()
 {
-	return Get(&NickType::nc);
+	return Get(&NickType::account);
 }
 
 void NickImpl::SetAccount(NickServ::Account *acc)
 {
-	Set(&NickType::nc, acc);
+	Set(&NickType::account, acc);
+}
+
+bool NickImpl::IsNoExpire()
+{
+	return Get(&NickType::noexpire);
+}
+
+void NickImpl::SetNoExpire(bool noexpire)
+{
+	Set(&NickType::noexpire, noexpire);
 }
 

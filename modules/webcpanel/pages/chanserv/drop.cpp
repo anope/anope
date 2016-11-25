@@ -44,7 +44,7 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 	}
 
 	for (::ChanServ::Channel *ci : na->GetAccount()->GetRefs<::ChanServ::Channel *>())
-		if ((ci->HasFieldS("SECUREFOUNDER") ? ci->AccessFor(na->GetAccount()).founder : ci->AccessFor(na->GetAccount()).HasPriv("FOUNDER")) || (na->GetAccount()->GetOper() && na->GetAccount()->GetOper()->HasCommand("chanserv/drop")))
+		if ((ci->IsSecureFounder() ? ci->AccessFor(na->GetAccount()).founder : ci->AccessFor(na->GetAccount()).HasPriv("FOUNDER")) || (na->GetAccount()->GetOper() && na->GetAccount()->GetOper()->HasCommand("chanserv/drop")))
 		{
 			replacements["CHANNEL_NAMES"] = ci->GetName();
 			replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->GetName());

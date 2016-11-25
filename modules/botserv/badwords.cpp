@@ -50,7 +50,7 @@ class BadWordsType : public Serialize::Type<BadWordImpl>
 	Serialize::Field<BadWordImpl, BadWordType> type;
 
 	BadWordsType(Module *me) : Serialize::Type<BadWordImpl>(me)
-		, channel(this, "ci", &BadWordImpl::channel, true)
+		, channel(this, "channel", &BadWordImpl::channel, true)
 		, word(this, "word", &BadWordImpl::word)
 		, type(this, "type", &BadWordImpl::type)
 	{

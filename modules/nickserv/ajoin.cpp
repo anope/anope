@@ -32,8 +32,8 @@ class AutoJoinImpl : public AutoJoin
 	AutoJoinImpl(Serialize::TypeBase *type) : AutoJoin(type) { }
 	AutoJoinImpl(Serialize::TypeBase *type, Serialize::ID id) : AutoJoin(type, id) { }
 
-	NickServ::Account *GetOwner() override;
-	void SetOwner(NickServ::Account *acc) override;
+	NickServ::Account *GetAccount() override;
+	void SetAccount(NickServ::Account *acc) override;
 
 	Anope::string GetChannel() override;
 	void SetChannel(const Anope::string &c) override;
@@ -49,19 +49,19 @@ class AutoJoinType : public Serialize::Type<AutoJoinImpl>
 	Serialize::Field<AutoJoinImpl, Anope::string> channel, key;
 
 	AutoJoinType(Module *me) : Serialize::Type<AutoJoinImpl>(me)
-		, owner(this, "owner", &AutoJoinImpl::account, true)
+		, owner(this, "account", &AutoJoinImpl::account, true)
 		, channel(this, "channel", &AutoJoinImpl::channel)
 		, key(this, "key", &AutoJoinImpl::key)
 	{
 	}
 };
 
-NickServ::Account *AutoJoinImpl::GetOwner()
+NickServ::Account *AutoJoinImpl::GetAccount()
 {
 	return Get(&AutoJoinType::owner);
 }
 
-void AutoJoinImpl::SetOwner(NickServ::Account *acc)
+void AutoJoinImpl::SetAccount(NickServ::Account *acc)
 {
 	Set(&AutoJoinType::owner, acc);
 }
@@ -158,7 +158,7 @@ class CommandNSAJoin : public Command
 				}
 
 				AutoJoin *entry = Serialize::New<AutoJoin *>();
-				entry->SetOwner(nc);
+				entry->SetAccount(nc);
 				entry->SetChannel(chan);
 				entry->SetKey(key);
 

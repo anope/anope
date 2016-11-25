@@ -45,7 +45,11 @@ class ChannelType : public Serialize::Type<ChannelImpl>
 	/* Who gets the channel if the founder nick is dropped or expires */
 	Serialize::ObjectField<ChannelImpl, NickServ::Account *> successor;
 
-	Serialize::ObjectField<ChannelImpl, BotInfo *> bi;
+	Serialize::ObjectField<ChannelImpl, BotInfo *> servicebot;
+
+	Serialize::Field<ChannelImpl, bool> greet, fantasy, noautoop, peace, securefounder,
+		restricted, secure, secureops, signkick, signkicklevel, noexpire, keepmodes,
+		persist, topiclock, keeptopic, _private;
 
  	ChannelType(Module *);
 

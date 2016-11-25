@@ -27,11 +27,9 @@ class CoreExport Channel : public Serialize::Object
  public:
 	::Channel *c = nullptr;                               /* Pointer to channel, if the channel exists */
 
- protected:
-	using Serialize::Object::Object;
-
- public:
 	static constexpr const char *const NAME = "channel";
+
+	using Serialize::Object::Object;
 
 	virtual Anope::string GetName() anope_abstract;
 	virtual void SetName(const Anope::string &) anope_abstract;
@@ -40,10 +38,10 @@ class CoreExport Channel : public Serialize::Object
 	virtual void SetDesc(const Anope::string &) anope_abstract;
 
 	virtual time_t GetTimeRegistered() anope_abstract;
-	virtual void SetTimeRegistered(const time_t &) anope_abstract;
+	virtual void SetTimeRegistered(time_t) anope_abstract;
 
 	virtual time_t GetLastUsed() anope_abstract;
-	virtual void SetLastUsed(const time_t &) anope_abstract;
+	virtual void SetLastUsed(time_t) anope_abstract;
 
 	virtual Anope::string GetLastTopic() anope_abstract;
 	virtual void SetLastTopic(const Anope::string &) anope_abstract;
@@ -52,19 +50,71 @@ class CoreExport Channel : public Serialize::Object
 	virtual void SetLastTopicSetter(const Anope::string &) anope_abstract;
 
 	virtual time_t GetLastTopicTime() anope_abstract;
-	virtual void SetLastTopicTime(const time_t &) anope_abstract;
+	virtual void SetLastTopicTime(time_t) anope_abstract;
 
 	virtual int16_t GetBanType() anope_abstract;
-	virtual void SetBanType(const int16_t &) anope_abstract;
+	virtual void SetBanType(int16_t) anope_abstract;
 
 	virtual time_t GetBanExpire() anope_abstract;
-	virtual void SetBanExpire(const time_t &) anope_abstract;
+	virtual void SetBanExpire(time_t) anope_abstract;
 
 	virtual BotInfo *GetBI() anope_abstract;
 	virtual void SetBI(BotInfo *) anope_abstract;
 
 	virtual ServiceBot *GetBot() anope_abstract;
 	virtual void SetBot(ServiceBot *) anope_abstract;
+
+	/** Whether or not greets are enabled.
+	 */
+	virtual bool IsGreet() anope_abstract;
+	virtual void SetGreet(bool) anope_abstract;
+
+	/** Whether or not fantasy is enabled.
+	 */
+	virtual bool IsFantasy() anope_abstract;
+	virtual void SetFantasy(bool) anope_abstract;
+
+	virtual bool IsNoAutoop() anope_abstract;
+	virtual void SetNoAutoop(bool) anope_abstract;
+
+	virtual bool IsPeace() anope_abstract;
+	virtual void SetPeace(bool) anope_abstract;
+
+	virtual bool IsSecureFounder() anope_abstract;
+	virtual void SetSecureFounder(bool) anope_abstract;
+
+	virtual bool IsRestricted() anope_abstract;
+	virtual void SetRestricted(bool) anope_abstract;
+
+	virtual bool IsSecure() anope_abstract;
+	virtual void SetSecure(bool) anope_abstract;
+
+	virtual bool IsSecureOps() anope_abstract;
+	virtual void SetSecureOps(bool) anope_abstract;
+
+	virtual bool IsSignKick() anope_abstract;
+	virtual void SetSignKick(bool) anope_abstract;
+
+	virtual bool IsSignKickLevel() anope_abstract;
+	virtual void SetSignKickLevel(bool) anope_abstract;
+
+	virtual bool IsNoExpire() anope_abstract;
+	virtual void SetNoExpire(bool) anope_abstract;
+
+	virtual bool IsKeepModes() anope_abstract;
+	virtual void SetKeepModes(bool) anope_abstract;
+
+	virtual bool IsPersist() anope_abstract;
+	virtual void SetPersist(bool) anope_abstract;
+
+	virtual bool IsTopicLock() anope_abstract;
+	virtual void SetTopicLock(bool) anope_abstract;
+
+	virtual bool IsKeepTopic() anope_abstract;
+	virtual void SetKeepTopic(bool) anope_abstract;
+
+	virtual bool IsPrivate() anope_abstract;
+	virtual void SetPrivate(bool) anope_abstract;
 
 	/** Is the user the real founder?
 	 * @param user The user

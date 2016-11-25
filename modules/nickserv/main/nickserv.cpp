@@ -244,7 +244,7 @@ class NickServCore : public Module, public NickServ::NickServService
 		if (MOD_RESULT == EVENT_ALLOW)
 			return;
 
-		if (!na->GetAccount()->HasFieldS("NS_SECURE") && u->IsRecognized())
+		if (!na->GetAccount()->IsSecure() && u->IsRecognized())
 		{
 			na->SetLastSeen(Anope::CurTime);
 			na->SetLastUsermask(u->GetIdent() + "@" + u->GetDisplayedHost());
@@ -257,21 +257,21 @@ class NickServCore : public Module, public NickServ::NickServService
 
 		bool on_access = u->IsRecognized(false);
 
-		if (on_access || !na->GetAccount()->HasFieldS("KILL_IMMED"))
+		if (on_access || !na->GetAccount()->IsKillImmed())
 		{
-			if (na->GetAccount()->HasFieldS("NS_SECURE"))
+			if (na->GetAccount()->IsSecure())
 				u->SendMessage(*NickServ, _("This nickname is registered and protected. If this is your nickname, type \002{0}{1} IDENTIFY \037password\037\002. Otherwise, please choose a different nickname."), Config->StrictPrivmsg, NickServ->nick); // XXX
 			else
 				u->SendMessage(*NickServ, _("This nickname is owned by someone else. If this is your nickname, type \002{0}{1} IDENTIFY \037password\037\002. Otherwise, please choose a different nickname."), Config->StrictPrivmsg, NickServ->nick); // XXX
 		}
-		if (na->GetAccount()->HasFieldS("KILLPROTECT") && !on_access)
+		if (na->GetAccount()->IsKillProtect() && !on_access)
 		{
-			if (na->GetAccount()->HasFieldS("KILL_IMMED"))
+			if (na->GetAccount()->IsKillImmed())
 			{
 				u->SendMessage(*NickServ, _("This nickname has been registered; you may not use it."));
 				this->Collide(u, na);
 			}
-			else if (na->GetAccount()->HasFieldS("KILL_QUICK"))
+			else if (na->GetAccount()->IsKillQuick())
 			{
 				time_t killquick = Config->GetModule("nickserv/main")->Get<time_t>("killquick", "20s");
 				u->SendMessage(*NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(killquick, u->Account()).c_str());
@@ -290,7 +290,7 @@ class NickServCore : public Module, public NickServ::NickServService
 	void OnUserLogin(User *u) override
 	{
 		NickServ::Nick *na = NickServ::FindNick(u->nick);
-		if (na && na->GetAccount() == u->Account() && !Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && !na->GetAccount()->HasFieldS("UNCONFIRMED"))
+		if (na && na->GetAccount() == u->Account() && !Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && !na->GetAccount()->IsUnconfirmed())
 			u->SetMode(NickServ, "REGISTERED");
 
 		const Anope::string &modesonid = Config->GetModule(this)->Get<Anope::string>("modesonid");
@@ -406,13 +406,9 @@ class NickServCore : public Module, public NickServ::NickServService
 
 		NickServ = bi;
 
-		spacesepstream(conf->GetModule(this)->Get<Anope::string>("defaults", "ns_secure memo_signon memo_receive")).GetTokens(defaults);
+		spacesepstream(conf->GetModule(this)->Get<Anope::string>("defaults", "secure memo_signon memo_receive")).GetTokens(defaults);
 		if (defaults.empty())
-		{
-			defaults.push_back("NS_SECURE");
-			defaults.push_back("MEMO_SIGNON");
-			defaults.push_back("MEMO_RECEIVE");
-		}
+			defaults = { "secure", "memo_signon", "memo_receive" };
 		else if (defaults[0].equals_ci("none"))
 			defaults.clear();
 	}
@@ -489,7 +485,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 	void OnNickGroup(User *u, NickServ::Nick *target) override
 	{
-		if (!target->GetAccount()->HasFieldS("UNCONFIRMED"))
+		if (!target->GetAccount()->IsUnconfirmed())
 			u->SetMode(NickServ, "REGISTERED");
 	}
 
@@ -557,7 +553,7 @@ class NickServCore : public Module, public NickServ::NickServService
 		{
 			/* Reset +r and re-send account (even though it really should be set at this point) */
 			IRCD->SendLogin(u, na);
-			if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && na->GetAccount() == u->Account() && !na->GetAccount()->HasFieldS("UNCONFIRMED"))
+			if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && na->GetAccount() == u->Account() && !na->GetAccount()->IsUnconfirmed())
 				u->SetMode(NickServ, "REGISTERED");
 			Log(u, "", NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->GetDisplay();
 		}
@@ -620,7 +616,7 @@ class NickServCore : public Module, public NickServ::NickServService
 	{
 		/* Set default flags */
 		for (unsigned i = 0; i < defaults.size(); ++i)
-			na->GetAccount()->SetS<bool>(defaults[i].upper(), true);
+			na->GetAccount()->SetS<bool>(defaults[i], true);
 	}
 
 	void OnUserQuit(User *u, const Anope::string &msg) override
@@ -668,10 +664,10 @@ class NickServCore : public Module, public NickServ::NickServService
 
 	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override
 	{
-		if (!na->GetAccount()->HasFieldS("UNCONFIRMED"))
+		if (!na->GetAccount()->IsUnconfirmed())
 		{
 			time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire", "21d");
-			if (!na->HasFieldS("NS_NO_EXPIRE") && nickserv_expire && !Anope::NoExpire && (source.HasPriv("nickserv/auspex") || na->GetLastSeen() != Anope::CurTime))
+			if (!na->IsNoExpire() && nickserv_expire && !Anope::NoExpire && (source.HasPriv("nickserv/auspex") || na->GetLastSeen() != Anope::CurTime))
 				info[_("Expires")] = Anope::strftime(na->GetLastSeen() + nickserv_expire, source.GetAccount());
 		}
 		else

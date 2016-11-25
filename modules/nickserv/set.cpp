@@ -264,13 +264,13 @@ class CommandNSSetAutoOp : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable autoop for " << na->GetAccount()->GetDisplay();
-			nc->SetS<bool>("AUTOOP", true);
+			nc->SetAutoOp(true);
 			source.Reply(_("Services will from now on set status modes on \002{0}\002 in channels."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable autoop for " << na->GetAccount()->GetDisplay();
-			nc->UnsetS<bool>("AUTOOP");
+			nc->SetAutoOp(false);
 			source.Reply(_("Services will no longer set status modes on \002{0}\002 in channels."), nc->GetDisplay());
 		}
 		else
@@ -452,7 +452,7 @@ class CommandNSSetEmail : public Command
 		}
 		NickServ::Account *nc = na->GetAccount();
 
-		if (nc->HasFieldS("UNCONFIRMED"))
+		if (nc->IsUnconfirmed())
 		{
 			source.Reply(_("You may not change the email of an unconfirmed account."));
 			return;
@@ -566,13 +566,13 @@ class CommandNSSetKeepModes : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable keepmodes for " << nc->GetDisplay();
-			nc->SetS<bool>("NS_KEEP_MODES", true);
+			nc->SetKeepModes(true);
 			source.Reply(_("Keep modes for \002{0}\002 is now \002on\002."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable keepmodes for " << nc->GetDisplay();
-			nc->UnsetS<bool>("NS_KEEP_MODES");
+			nc->SetKeepModes(false);
 			source.Reply(_("Keep modes for \002{0}\002 is now \002off\002."), nc->GetDisplay());
 		}
 		else
@@ -652,17 +652,17 @@ class CommandNSSetKill : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			nc->SetS<bool>("KILLPROTECT", true);
-			nc->UnsetS<bool>("KILL_QUICK");
-			nc->UnsetS<bool>("KILL_IMMED");
+			nc->SetKillProtect(true);
+			nc->SetKillQuick(false);
+			nc->SetKillImmed(false);
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill on for " << nc->GetDisplay();
 			source.Reply(_("Protection is now \002on\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("QUICK"))
 		{
-			nc->SetS<bool>("KILLPROTECT", true);
-			nc->SetS<bool>("KILL_QUICK", true);
-			nc->UnsetS<bool>("KILL_IMMED");
+			nc->SetKillProtect(true);
+			nc->SetKillQuick(true);
+			nc->SetKillImmed(false);
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill quick for " << nc->GetDisplay();
 			source.Reply(_("Protection is now \002on\002 for \002{0}\002, with a reduced delay."), nc->GetDisplay());
 		}
@@ -670,9 +670,9 @@ class CommandNSSetKill : public Command
 		{
 			if (Config->GetModule(this->GetOwner())->Get<bool>("allowkillimmed"))
 			{
-				nc->SetS<bool>("KILLPROTECT",true);
-				nc->UnsetS<bool>("KILL_QUICK");
-				nc->SetS<bool>("KILL_IMMED", true);
+				nc->SetKillProtect(true);
+				nc->SetKillQuick(false);
+				nc->SetKillImmed(true);
 				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill immed for " << nc->GetDisplay();
 				source.Reply(_("Protection is now \002on\002 for \002{0}\002, with no delay."), nc->GetDisplay());
 			}
@@ -681,9 +681,9 @@ class CommandNSSetKill : public Command
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			nc->UnsetS<bool>("KILLPROTECT");
-			nc->UnsetS<bool>("KILL_QUICK");
-			nc->UnsetS<bool>("KILL_IMMED");
+			nc->SetKillProtect(true);
+			nc->SetKillQuick(false);
+			nc->SetKillImmed(false);
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable kill for " << nc->GetDisplay();
 			source.Reply(_("Protection is now \002off\002 for \002{0}\002."), nc->GetDisplay());
 		}
@@ -878,13 +878,13 @@ class CommandNSSetMessage : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable " << source.command << " for " << nc->GetDisplay();
-			nc->SetS<bool>("MSG", true);
+			nc->SetMsg(true);
 			source.Reply(_("Services will now reply to \002{0}\002 with \002messages\002."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable " << source.command << " for " << nc->GetDisplay();
-			nc->UnsetS<bool>("MSG");
+			nc->SetMsg(false);
 			source.Reply(_("Services will now reply to \002{0}\002 with \002notices\002."), nc->GetDisplay());
 		}
 		else
@@ -975,13 +975,13 @@ class CommandNSSetSecure : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable secure for " << nc->GetDisplay();
-			nc->SetS<bool>("NS_SECURE", true);
+			nc->SetSecure(true);
 			source.Reply(_("Secure option is now \002on\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable secure for " << nc->GetDisplay();
-			nc->UnsetS<bool>("NS_SECURE");
+			nc->SetSecure(false);
 			source.Reply(_("Secure option is now \002off\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else
@@ -1059,13 +1059,13 @@ class CommandNSSASetNoexpire : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(LOG_ADMIN, source, this) << "to enable noexpire for " << na->GetAccount()->GetDisplay();
-			na->SetS<bool>("NS_NO_EXPIRE", true);
+			na->SetNoExpire(true);
 			source.Reply(_("\002{0}\002 \002will not\002 expire."), na->GetNick());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(LOG_ADMIN, source, this) << "to disable noexpire for " << na->GetAccount()->GetDisplay();
-			na->UnsetS<bool>("NS_NO_EXPIRE");
+			na->SetNoExpire(false);
 			source.Reply(_("\002{0}\002 \002will\002 expire."), na->GetNick());
 		}
 		else
@@ -1122,9 +1122,6 @@ class NSSet : public Module
 
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
-	Serialize::Field<NickServ::Account, bool> autoop, keep_modes, killprotect, kill_quick, kill_immed, message, secure;
-	Serialize::Field<NickServ::Nick, bool> noexpire;
-
 	/* email, passcode */
 	ExtensibleItem<std::pair<Anope::string, Anope::string > > ns_set_email;
 
@@ -1160,15 +1157,6 @@ class NSSet : public Module
 		, commandnssasetsecure(this)
 		, commandnssasetnoexpire(this)
 
-		, autoop(this, "AUTOOP")
-		, keep_modes(this, "NS_KEEP_MODES")
-		, killprotect(this, "KILLPROTECT")
-		, kill_quick(this, "KILL_QUICK")
-		, kill_immed(this, "KILL_IMMED")
-		, message(this, "MSG")
-		, secure(this, "NS_SECURE")
-		, noexpire(this, "NS_NO_EXPIRE")
-
 		, ns_set_email(this, "ns_set_email")
 	{
 
@@ -1202,13 +1190,13 @@ class NSSet : public Module
 		if (chan->ci)
 		{
 			/* Only give modes if autoop is set */
-			give_modes &= !user->Account() || autoop.HasExt(user->Account());
+			give_modes &= !user->Account() || user->Account()->IsAutoOp();
 		}
 	}
 
 	void OnPreNickExpire(NickServ::Nick *na, bool &expire) override
 	{
-		if (noexpire.HasExt(na))
+		if (na->IsNoExpire())
 			expire = false;
 	}
 
@@ -1217,21 +1205,21 @@ class NSSet : public Module
 		if (!show_hidden)
 			return;
 
-		if (kill_immed.HasExt(na->GetAccount()))
+		if (na->GetAccount()->IsKillImmed())
 			info.AddOption(_("Immediate protection"));
-		else if (kill_quick.HasExt(na->GetAccount()))
+		else if (na->GetAccount()->IsKillQuick())
 			info.AddOption(_("Quick protection"));
-		else if (killprotect.HasExt(na->GetAccount()))
+		else if (na->GetAccount()->IsKillProtect())
 			info.AddOption(_("Protection"));
-		if (secure.HasExt(na->GetAccount()))
+		if (na->GetAccount()->IsSecure())
 			info.AddOption(_("Security"));
-		if (message.HasExt(na->GetAccount()))
+		if (na->GetAccount()->IsMsg())
 			info.AddOption(_("Message mode"));
-		if (autoop.HasExt(na->GetAccount()))
+		if (na->GetAccount()->IsAutoOp())
 			info.AddOption(_("Auto-op"));
-		if (noexpire.HasExt(na))
+		if (na->IsNoExpire())
 			info.AddOption(_("No expire"));
-		if (keep_modes.HasExt(na->GetAccount()))
+		if (na->GetAccount()->IsKeepModes())
 			info.AddOption(_("Keep modes"));
 	}
 
@@ -1260,7 +1248,7 @@ class NSSet : public Module
 
 	void OnUserLogin(User *u) override
 	{
-		if (keep_modes.HasExt(u->Account()))
+		if (u->Account()->IsKeepModes())
 			for (NickServ::Mode *mode : u->Account()->GetRefs<NickServ::Mode *>())
 			{
 				UserMode *um = ModeManager::FindUserModeByName(mode->GetMode());

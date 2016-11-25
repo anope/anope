@@ -76,7 +76,7 @@ time_t ChannelImpl::GetTimeRegistered()
 	return Get(&ChannelType::time_registered);
 }
 
-void ChannelImpl::SetTimeRegistered(const time_t &t)
+void ChannelImpl::SetTimeRegistered(time_t t)
 {
 	Set(&ChannelType::time_registered, t);
 }
@@ -86,7 +86,7 @@ time_t ChannelImpl::GetLastUsed()
 	return Get(&ChannelType::last_used);
 }
 
-void ChannelImpl::SetLastUsed(const time_t &t)
+void ChannelImpl::SetLastUsed(time_t t)
 {
 	Set(&ChannelType::last_used, t);
 }
@@ -116,7 +116,7 @@ time_t ChannelImpl::GetLastTopicTime()
 	return Get(&ChannelType::last_topic_time);
 }
 
-void ChannelImpl::SetLastTopicTime(const time_t &t)
+void ChannelImpl::SetLastTopicTime(time_t t)
 {
 	Set(&ChannelType::last_topic_time, t);
 }
@@ -126,7 +126,7 @@ int16_t ChannelImpl::GetBanType()
 	return Get(&ChannelType::bantype);
 }
 
-void ChannelImpl::SetBanType(const int16_t &i)
+void ChannelImpl::SetBanType(int16_t i)
 {
 	Set(&ChannelType::bantype, i);
 }
@@ -136,19 +136,19 @@ time_t ChannelImpl::GetBanExpire()
 	return Get(&ChannelType::banexpire);
 }
 
-void ChannelImpl::SetBanExpire(const time_t &t)
+void ChannelImpl::SetBanExpire(time_t t)
 {
 	Set(&ChannelType::banexpire, t);
 }
 
 BotInfo *ChannelImpl::GetBI()
 {
-	return Get(&ChannelType::bi);
+	return Get(&ChannelType::servicebot);
 }
 
 void ChannelImpl::SetBI(BotInfo *bi)
 {
-	Set(&ChannelType::bi, bi);
+	Set(&ChannelType::servicebot, bi);
 }
 
 ServiceBot *ChannelImpl::GetBot()
@@ -187,6 +187,166 @@ NickServ::Account *ChannelImpl::GetSuccessor()
 	return Get(&ChannelType::successor);
 }
 
+bool ChannelImpl::IsGreet()
+{
+	return Get(&ChannelType::greet);
+}
+
+void ChannelImpl::SetGreet(bool greet)
+{
+	Set(&ChannelType::greet, greet);
+}
+
+bool ChannelImpl::IsFantasy()
+{
+	return Get(&ChannelType::fantasy);
+}
+
+void ChannelImpl::SetFantasy(bool fantasy)
+{
+	Set(&ChannelType::fantasy, fantasy);
+}
+
+bool ChannelImpl::IsNoAutoop()
+{
+	return Get(&ChannelType::noautoop);
+}
+
+void ChannelImpl::SetNoAutoop(bool noautoop)
+{
+	Set(&ChannelType::noautoop, noautoop);
+}
+
+bool ChannelImpl::IsPeace()
+{
+	return Get(&ChannelType::peace);
+}
+
+void ChannelImpl::SetPeace(bool peace)
+{
+	Set(&ChannelType::peace, peace);
+}
+
+bool ChannelImpl::IsSecureFounder()
+{
+	return Get(&ChannelType::securefounder);
+}
+
+void ChannelImpl::SetSecureFounder(bool securefounder)
+{
+	Set(&ChannelType::securefounder, securefounder);
+}
+
+bool ChannelImpl::IsRestricted()
+{
+	return Get(&ChannelType::restricted);
+}
+
+void ChannelImpl::SetRestricted(bool restricted)
+{
+	Set(&ChannelType::restricted, restricted);
+}
+
+bool ChannelImpl::IsSecure()
+{
+	return Get(&ChannelType::secure);
+}
+
+void ChannelImpl::SetSecure(bool secure)
+{
+	Set(&ChannelType::secure, secure);
+}
+
+bool ChannelImpl::IsSecureOps()
+{
+	return Get(&ChannelType::secureops);
+}
+
+void ChannelImpl::SetSecureOps(bool secureops)
+{
+	Set(&ChannelType::secureops, secureops);
+}
+
+bool ChannelImpl::IsSignKick()
+{
+	return Get(&ChannelType::signkick);
+}
+
+void ChannelImpl::SetSignKick(bool signkick)
+{
+	Set(&ChannelType::signkick, signkick);
+}
+
+bool ChannelImpl::IsSignKickLevel()
+{
+	return Get(&ChannelType::signkicklevel);
+}
+
+void ChannelImpl::SetSignKickLevel(bool signkicklevel)
+{
+	Set(&ChannelType::signkicklevel, signkicklevel);
+}
+
+bool ChannelImpl::IsNoExpire()
+{
+	return Get(&ChannelType::noexpire);
+}
+
+void ChannelImpl::SetNoExpire(bool noexpire)
+{
+	Set(&ChannelType::noexpire, noexpire);
+}
+
+bool ChannelImpl::IsKeepModes()
+{
+	return Get(&ChannelType::keepmodes);
+}
+
+void ChannelImpl::SetKeepModes(bool keepmodes)
+{
+	Set(&ChannelType::keepmodes, keepmodes);
+}
+
+bool ChannelImpl::IsPersist()
+{
+	return Get(&ChannelType::persist);
+}
+
+void ChannelImpl::SetPersist(bool persist)
+{
+	Set(&ChannelType::persist, persist);
+}
+
+bool ChannelImpl::IsTopicLock()
+{
+	return Get(&ChannelType::topiclock);
+}
+
+void ChannelImpl::SetTopicLock(bool topiclock)
+{
+	Set(&ChannelType::topiclock, topiclock);
+}
+
+bool ChannelImpl::IsKeepTopic()
+{
+	return Get(&ChannelType::keeptopic);
+}
+
+void ChannelImpl::SetKeepTopic(bool keeptopic)
+{
+	Set(&ChannelType::keeptopic, keeptopic);
+}
+
+bool ChannelImpl::IsPrivate()
+{
+	return Get(&ChannelType::_private);
+}
+
+void ChannelImpl::SetPrivate(bool _private)
+{
+	Set(&ChannelType::_private, _private);
+}
+
 ChanServ::ChanAccess *ChannelImpl::GetAccess(unsigned index)
 {
 	std::vector<ChanServ::ChanAccess *> a = GetRefs<ChanServ::ChanAccess *>();
@@ -200,8 +360,8 @@ ChanServ::AccessGroup ChannelImpl::AccessFor(const User *u, bool updateLastUsed)
 	if (u == NULL)
 		return group;
 
-	const NickServ::Account *nc = u->Account();
-	if (nc == NULL && !this->HasFieldS("NS_SECURE") && u->IsRecognized())
+	NickServ::Account *nc = u->Account();
+	if (nc == NULL && !nc->IsSecure() && u->IsRecognized())
 	{
 		NickServ::Nick *na = NickServ::FindNick(u->nick);
 		if (na != NULL)

@@ -28,7 +28,7 @@ class NSSuspendInfoImpl : public NSSuspendInfo
 
 	NickServ::Account *account = nullptr;
 	Anope::string by, reason;
-	time_t when = 0, expires =0;
+	time_t when = 0, expires = 0;
 
  public:
 	NSSuspendInfoImpl(Serialize::TypeBase *type) : NSSuspendInfo(type) { }
@@ -58,7 +58,7 @@ class NSSuspendType : public Serialize::Type<NSSuspendInfoImpl>
 	Serialize::Field<NSSuspendInfoImpl, time_t> when, expires;
 
 	NSSuspendType(Module *me) : Serialize::Type<NSSuspendInfoImpl>(me)
-		, account(this, "nick", &NSSuspendInfoImpl::account, true)
+		, account(this, "account", &NSSuspendInfoImpl::account, true)
 		, by(this, "by", &NSSuspendInfoImpl::by)
 		, reason(this, "reason", &NSSuspendInfoImpl::reason)
 		, when(this, "when", &NSSuspendInfoImpl::when)

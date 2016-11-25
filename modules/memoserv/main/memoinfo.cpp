@@ -31,6 +31,7 @@ unsigned MemoInfoImpl::GetIndex(MemoServ::Memo *m)
 	for (unsigned i = 0; i < memos.size(); ++i)
 		if (this->GetMemo(i) == m)
 			return i;
+#warning "-1 unsigned?"
 	return -1; // XXX wtf?
 }
 
@@ -68,6 +69,16 @@ int16_t MemoInfoImpl::GetMemoMax()
 void MemoInfoImpl::SetMemoMax(const int16_t &i)
 {
 	Set(&MemoInfoType::memomax, i);
+}
+
+bool MemoInfoImpl::IsHardMax()
+{
+	return Get(&MemoInfoType::hardmax);
+}
+
+void MemoInfoImpl::SetHardMax(bool hardmax)
+{
+	Set(&MemoInfoType::hardmax, hardmax);
 }
 
 std::vector<MemoServ::Memo *> MemoInfoImpl::GetMemos()

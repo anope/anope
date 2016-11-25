@@ -25,6 +25,18 @@ class AccountImpl : public NickServ::Account
 
 	Anope::string display, password, email, language;
 	Oper *oper = nullptr;
+	Anope::string greet;
+	bool unconfirmed = false;
+	bool _private = false;
+	bool autoop = false;
+	bool keepmodes = false;
+	bool killprotect = false;
+	bool killquick = false;
+	bool killimmed = false;
+	bool msg = false;
+	bool secure = false;
+	bool memosignon = false, memoreceive = false, memomail = false;
+	bool hideemail = false, hidemask = false, hidestatus = false, hidequit = false;
 
  public:
 	using NickServ::Account::Account;
@@ -45,6 +57,57 @@ class AccountImpl : public NickServ::Account
 
 	Oper *GetOper() override;
 	void SetOper(Oper *) override;
+
+	Anope::string GetGreet() override;
+	void SetGreet(const Anope::string &) override;
+
+	bool IsUnconfirmed() override;
+	void SetUnconfirmed(bool) override;
+
+	bool IsPrivate() override;
+	void SetPrivate(bool) override;
+
+	bool IsAutoOp() override;
+	void SetAutoOp(bool) override;
+
+	bool IsKeepModes() override;
+	void SetKeepModes(bool) override;
+
+	bool IsKillProtect() override;
+	void SetKillProtect(bool) override;
+
+	bool IsKillQuick() override;
+	void SetKillQuick(bool) override;
+
+	bool IsKillImmed() override;
+	void SetKillImmed(bool) override;
+
+	bool IsMsg() override;
+	void SetMsg(bool) override;
+
+	bool IsSecure() override;
+	void SetSecure(bool) override;
+
+	bool IsMemoSignon() override;
+	void SetMemoSignon(bool) override;
+
+	bool IsMemoReceive() override;
+	void SetMemoReceive(bool) override;
+
+	bool IsMemoMail() override;
+	void SetMemoMail(bool) override;
+
+	bool IsHideEmail() override;
+	void SetHideEmail(bool) override;
+
+	bool IsHideMask() override;
+	void SetHideMask(bool) override;
+
+	bool IsHideStatus() override;
+	void SetHideStatus(bool) override;
+
+	bool IsHideQuit() override;
+	void SetHideQuit(bool) override;
 
 	MemoServ::MemoInfo *GetMemos() override;
 

@@ -118,13 +118,13 @@ class CommandCSSetAutoOp : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable autoop";
-			ci->UnsetS<bool>("NOAUTOOP");
+			ci->SetNoAutoop(false);
 			source.Reply(_("Services will now automatically give modes to users in \002{0}\002."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable autoop";
-			ci->SetS<bool>("NOAUTOOP", true);
+			ci->SetNoAutoop(true);
 			source.Reply(_("Services will no longer automatically give modes to users in \002{0}\002."), ci->GetName());
 		}
 		else
@@ -296,7 +296,7 @@ class CommandCSSetFounder : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->HasFieldS("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
@@ -374,7 +374,7 @@ class CommandCSSetKeepModes : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keep modes";
-			ci->SetS<bool>("CS_KEEP_MODES", true);
+			ci->SetKeepModes(true);
 			source.Reply(_("Keep modes for \002{0}\002 is now \002on\002."), ci->GetName());
 			if (ci->c)
 				for (const std::pair<Anope::string, Anope::string> &p : ci->c->GetModes())
@@ -388,7 +388,7 @@ class CommandCSSetKeepModes : public Command
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keep modes";
-			ci->UnsetS<bool>("CS_KEEP_MODES");
+			ci->SetKeepModes(false);
 			source.Reply(_("Keep modes for \002{0}\002 is now \002off\002."), ci->GetName());
 			for (ChanServ::Mode *m : ci->GetRefs<ChanServ::Mode *>())
 				m->Delete();
@@ -447,13 +447,13 @@ class CommandCSSetPeace : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable peace";
-			ci->SetS<bool>("PEACE", true);
+			ci->SetPeace(true);
 			source.Reply(_("Peace option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable peace";
-			ci->UnsetS<bool>("PEACE");
+			ci->SetPeace(false);
 			source.Reply(_("Peace option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
@@ -522,9 +522,9 @@ class CommandCSSetPersist : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			if (!ci->HasFieldS("PERSIST"))
+			if (!ci->IsPersist())
 			{
-				ci->SetS<bool>("PERSIST", true);
+				ci->SetPersist(true);
 
 				/* Channel doesn't exist, create it */
 				if (!ci->c)
@@ -575,9 +575,9 @@ class CommandCSSetPersist : public Command
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			if (ci->HasFieldS("PERSIST"))
+			if (ci->IsPersist())
 			{
-				ci->UnsetS<bool>("PERSIST");
+				ci->SetPersist(false);
 
 				ServiceBot *ChanServ = Config->GetClient("ChanServ"),
 					*BotServ = Config->GetClient("BotServ");
@@ -665,13 +665,13 @@ class CommandCSSetRestricted : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable restricted";
-			ci->SetS<bool>("RESTRICTED", true);
+			ci->SetRestricted(true);
 			source.Reply(_("Restricted access option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable restricted";
-			ci->UnsetS<bool>("RESTRICTED");
+			ci->SetRestricted(false);
 			source.Reply(_("Restricted access option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
@@ -728,13 +728,13 @@ class CommandCSSetSecure : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure";
-			ci->SetS<bool>("CS_SECURE", true);
+			ci->SetSecure(true);
 			source.Reply(_("Secure option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure";
-			ci->UnsetS<bool>("CS_SECURE");
+			ci->SetSecure(false);
 			source.Reply(_("Secure option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
@@ -784,7 +784,7 @@ class CommandCSSetSecureFounder : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->HasFieldS("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
@@ -793,13 +793,13 @@ class CommandCSSetSecureFounder : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure founder";
-			ci->SetS<bool>("SECUREFOUNDER", true);
+			ci->SetSecureFounder(true);
 			source.Reply(_("Secure founder option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure founder";
-			ci->UnsetS<bool>("SECUREFOUNDER");
+			ci->SetSecureFounder(false);
 			source.Reply(_("Secure founder option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
@@ -861,13 +861,13 @@ class CommandCSSetSecureOps : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure ops";
-			ci->SetS<bool>("SECUREOPS", true);
+			ci->SetSecureOps(true);
 			source.Reply(_("Secure ops option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure ops";
-			ci->UnsetS<bool>("SECUREOPS");
+			ci->SetSecureOps(false);
 			source.Reply(_("Secure ops option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
@@ -924,22 +924,22 @@ class CommandCSSetSignKick : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			ci->SetS<bool>("SIGNKICK", true);
-			ci->UnsetS<bool>("SIGNKICK_LEVEL");
+			ci->SetSignKick(true);
+			ci->SetSignKickLevel(false);
 			source.Reply(_("Signed kick option for \002{0}\002 is now \002on\002."), ci->GetName());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick";
 		}
 		else if (param.equals_ci("LEVEL"))
 		{
-			ci->SetS<bool>("SIGNKICK_LEVEL", true);
-			ci->UnsetS<bool>("SIGNKICK");
+			ci->SetSignKick(false);
+			ci->SetSignKickLevel(true);
 			source.Reply(_("Signed kick option for \002{0}\002 is now \002on\002, but depends of the privileges of the user that is using the command."), ci->GetName());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick level";
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			ci->UnsetS<bool>("SIGNKICK");
-			ci->UnsetS<bool>("SIGNKICK_LEVEL");
+			ci->SetSignKick(false);
+			ci->SetSignKickLevel(false);
 			source.Reply(_("Signed kick option for \002{0}\002 is now \002off\002."), ci->GetName());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable sign kick";
 		}
@@ -991,7 +991,7 @@ class CommandCSSetSuccessor : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->HasFieldS("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
@@ -1073,13 +1073,13 @@ class CommandCSSetNoexpire : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(LOG_ADMIN, source, this, ci) << "to enable noexpire";
-			ci->SetS<bool>("CS_NO_EXPIRE", true);
+			ci->SetNoExpire(true);
 			source.Reply(_("Channel \002{0} will not\002 expire."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(LOG_ADMIN, source, this, ci) << "to disable noexpire";
-			ci->UnsetS<bool>("CS_NO_EXPIRE");
+			ci->SetNoExpire(false);
 			source.Reply(_("Channel \002{0} will\002 expire."), ci->GetName());
 		}
 		else
@@ -1107,9 +1107,6 @@ class CSSet : public Module
 	, public EventHook<ChanServ::Event::PreChanExpire>
 	, public EventHook<Event::ChanInfo>
 {
-	Serialize::Field<ChanServ::Channel, bool> noautoop, peace, securefounder,
-		restricted, secure, secureops, signkick, signkick_level, noexpire, keep_modes, persist;
-
 	CommandCSSet commandcsset;
 	CommandCSSetAutoOp commandcssetautoop;
 	CommandCSSetBanType commandcssetbantype;
@@ -1143,18 +1140,6 @@ class CSSet : public Module
 		, EventHook<ChanServ::Event::PreChanExpire>(this)
 		, EventHook<Event::ChanInfo>(this)
 
-		, noautoop(this, "NOAUTOOP")
-		, peace(this, "PEACE")
-		, securefounder(this, "SECUREFOUNDER")
-		, restricted(this, "RESTRICTED")
-		, secure(this, "CS_SECURE")
-		, secureops(this, "SECUREOPS")
-		, signkick(this, "SIGNKICK")
-		, signkick_level(this, "SIGNKICK_LEVEL")
-		, noexpire(this, "CS_NO_EXPIRE")
-		, keep_modes(this, "CS_KEEP_MODES")
-		, persist(this, "PERSIST")
-
 		, commandcsset(this)
 		, commandcssetautoop(this)
 		, commandcssetbantype(this)
@@ -1187,14 +1172,14 @@ class CSSet : public Module
 
 	void OnChannelSync(Channel *c) override
 	{
-		if (c->ci && keep_modes.HasExt(c->ci))
+		if (c->ci && c->ci->IsKeepModes())
 			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>())
 				c->SetMode(c->ci->WhoSends(), m->GetMode(), m->GetParam());
 	}
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
-		if (!c->ci || !restricted.HasExt(c->ci) || c->MatchesList(u, "EXCEPT"))
+		if (!c->ci || !c->ci->IsRestricted() || c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;
 
 		if (c->ci->AccessFor(u).empty() && (!c->ci->GetFounder() || u->Account() != c->ci->GetFounder()))
@@ -1205,9 +1190,11 @@ class CSSet : public Module
 
 	void OnDelChan(ChanServ::Channel *ci) override
 	{
-		if (ci->c && persist.HasExt(ci))
+		if (ci->c && ci->IsPersist())
+		{
 			ci->c->RemoveMode(ci->WhoSends(), "PERM", "", false);
-		persist.Unset(ci);
+			ci->SetPersist(false);
+		}
 	}
 
 	EventReturn OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
@@ -1216,7 +1203,7 @@ class CSSet : public Module
 		{
 			/* Channel mode +P or so was set, mark this channel as persistent */
 			if (mode->name == "PERM")
-				persist.Set(c->ci, true);
+				c->ci->SetPersist(true);
 
 			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
 			{
@@ -1238,7 +1225,7 @@ class CSSet : public Module
 		if (mode->name == "PERM")
 		{
 			if (c->ci)
-				persist.Unset(c->ci);
+				c->ci->SetPersist(false);
 		}
 
 		if (c->ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
@@ -1251,7 +1238,7 @@ class CSSet : public Module
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->GetTimeRegistered())
+		if (persist_lower_ts && c->ci && c->ci->IsPersist() && c->creation_time > c->ci->GetTimeRegistered())
 		{
 			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->GetTimeRegistered();
 			c->creation_time = c->ci->GetTimeRegistered();
@@ -1264,9 +1251,9 @@ class CSSet : public Module
 	{
 		if (chan->ci)
 		{
-			if (noautoop.HasExt(chan->ci))
+			if (chan->ci->IsNoAutoop())
 				give_modes = false;
-			if (secureops.HasExt(chan->ci))
+			if (chan->ci->IsSecureOps())
 				// This overrides what chanserv does because it is loaded after chanserv
 				take_modes = true;
 		}
@@ -1274,7 +1261,7 @@ class CSSet : public Module
 
 	void OnPreChanExpire(ChanServ::Channel *ci, bool &expire) override
 	{
-		if (noexpire.HasExt(ci))
+		if (ci->IsNoExpire())
 			expire = false;
 	}
 
@@ -1283,25 +1270,25 @@ class CSSet : public Module
 		if (!show_all)
 			return;
 
-		if (peace.HasExt(ci))
+		if (ci->IsPeace())
 			info.AddOption(_("Peace"));
-		if (restricted.HasExt(ci))
+		if (ci->IsRestricted())
 			info.AddOption(_("Restricted access"));
-		if (secure.HasExt(ci))
+		if (ci->IsSecure())
 			info.AddOption(_("Security"));
-		if (securefounder.HasExt(ci))
+		if (ci->IsSecureFounder())
 			info.AddOption(_("Secure founder"));
-		if (secureops.HasExt(ci))
+		if (ci->IsSecureOps())
 			info.AddOption(_("Secure ops"));
-		if (signkick.HasExt(ci) || signkick_level.HasExt(ci))
+		if (ci->IsSignKick() || ci->IsSignKickLevel())
 			info.AddOption(_("Signed kicks"));
-		if (persist.HasExt(ci))
+		if (ci->IsPersist())
 			info.AddOption(_("Persistent"));
-		if (noexpire.HasExt(ci))
+		if (ci->IsNoExpire())
 			info.AddOption(_("No expire"));
-		if (keep_modes.HasExt(ci))
+		if (ci->IsKeepModes())
 			info.AddOption(_("Keep modes"));
-		if (noautoop.HasExt(ci))
+		if (ci->IsNoAutoop())
 			info.AddOption(_("No auto-op"));
 	}
 };

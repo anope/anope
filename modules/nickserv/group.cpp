@@ -329,11 +329,11 @@ class CommandNSGList : public Command
 		for (NickServ::Nick *na2 : nc->GetRefs<NickServ::Nick *>())
 		{
 			Anope::string expires;
-			if (na2->HasFieldS("NS_NO_EXPIRE"))
+			if (na2->IsNoExpire())
 				expires = _("Does not expire");
 			else if (!nickserv_expire || Anope::NoExpire)
 				;
-			else if (na2->GetAccount()->HasFieldS("UNCONFIRMED") && unconfirmed_expire)
+			else if (na2->GetAccount()->IsUnconfirmed() && unconfirmed_expire)
 				expires = Anope::strftime(na2->GetTimeRegistered() + unconfirmed_expire, source.GetAccount());
 			else
 				expires = Anope::strftime(na2->GetLastSeen() + nickserv_expire, source.GetAccount());

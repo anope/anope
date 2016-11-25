@@ -35,6 +35,10 @@ class AccountType : public Serialize::Type<AccountImpl>
 	/* Locale name of the language of the user. Empty means default language */
 	Serialize::Field<AccountImpl, Anope::string> language;
 	Serialize::ObjectField<AccountImpl, Oper *> oper;
+	Serialize::Field<AccountImpl, Anope::string> greet;
+	Serialize::Field<AccountImpl, bool> unconfirmed, _private, autoop, keepmodes,
+		killprotect, killquick, killimmed, msg, secure, memosignon, memoreceive,
+		memomail, hideemail, hidemask, hidestatus, hidequit;
 
  	AccountType(Module *);
 

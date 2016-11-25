@@ -56,13 +56,13 @@ class ModeLockImpl : public ModeLock
 class ModeLockType : public Serialize::Type<ModeLockImpl>
 {
  public:
-	Serialize::ObjectField<ModeLockImpl, ChanServ::Channel *> ci;
+	Serialize::ObjectField<ModeLockImpl, ChanServ::Channel *> channel;
 	Serialize::Field<ModeLockImpl, bool> set;
 	Serialize::Field<ModeLockImpl, Anope::string> name, param, setter;
 	Serialize::Field<ModeLockImpl, time_t> created;
 
 	ModeLockType(Module *me) : Serialize::Type<ModeLockImpl>(me)
-		, ci(this, "ci", &ModeLockImpl::channel, true)
+		, channel(this, "channel", &ModeLockImpl::channel, true)
 		, set(this, "set", &ModeLockImpl::set)
 		, name(this, "name", &ModeLockImpl::name)
 		, param(this, "param", &ModeLockImpl::param)
@@ -74,12 +74,12 @@ class ModeLockType : public Serialize::Type<ModeLockImpl>
 
 ChanServ::Channel *ModeLockImpl::GetChannel()
 {
-	return Get(&ModeLockType::ci);
+	return Get(&ModeLockType::channel);
 }
 
 void ModeLockImpl::SetChannel(ChanServ::Channel *ci)
 {
-	Set(&ModeLockType::ci, ci);
+	Set(&ModeLockType::channel, ci);
 }
 
 bool ModeLockImpl::GetSet()
@@ -574,7 +574,7 @@ class CommandCSMode : public Command
 
 									ChanServ::AccessGroup targ_access = ci->AccessFor(uc->user);
 
-									if (uc->user->IsProtected() || (ci->HasFieldS("PEACE") && targ_access >= u_access && !can_override))
+									if (uc->user->IsProtected() || (ci->IsPeace() && targ_access >= u_access && !can_override))
 									{
 										source.Reply(_("You do not have the access to change the modes of \002{0}\002."), uc->user->nick.c_str());
 										continue;
@@ -607,7 +607,7 @@ class CommandCSMode : public Command
 								if (source.GetUser() != target)
 								{
 									ChanServ::AccessGroup targ_access = ci->AccessFor(target);
-									if (ci->HasFieldS("PEACE") && targ_access >= u_access && !can_override)
+									if (ci->IsPeace() && targ_access >= u_access && !can_override)
 									{
 										source.Reply(_("You do not have the access to change the modes of \002{0}\002"), target->nick);
 										break;
@@ -827,7 +827,7 @@ class CommandCSModes : public Command
 			}
 		}
 
-		if (!override && !m.first && u != targ && (targ->IsProtected() || (ci->HasFieldS("PEACE") && targ_access >= u_access)))
+		if (!override && !m.first && u != targ && (targ->IsProtected() || (ci->IsPeace() && targ_access >= u_access)))
 		{
 			if (!can_override)
 			{

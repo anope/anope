@@ -25,6 +25,7 @@ class MemoInfoImpl : public MemoServ::MemoInfo
 
 	Serialize::Object *owner = nullptr;
 	int16_t memomax = 0;
+	bool hardmax = false;
 
  public:
 	MemoInfoImpl(Serialize::TypeBase *type) : MemoServ::MemoInfo(type) { }
@@ -40,6 +41,9 @@ class MemoInfoImpl : public MemoServ::MemoInfo
 
 	int16_t GetMemoMax() override;
 	void SetMemoMax(const int16_t &) override;
+
+	bool IsHardMax() override;
+	void SetHardMax(bool) override;
 
 	std::vector<MemoServ::Memo *> GetMemos() override;
 	std::vector<MemoServ::Ignore *> GetIgnores() override;

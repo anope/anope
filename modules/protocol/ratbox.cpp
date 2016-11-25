@@ -118,7 +118,7 @@ class RatboxProto : public IRCDProto
 
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
-		if (na->GetAccount()->HasFieldS("UNCONFIRMED"))
+		if (na->GetAccount()->IsUnconfirmed())
 			return;
 
 		Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), na->GetAccount()->GetDisplay());

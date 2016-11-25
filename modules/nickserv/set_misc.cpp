@@ -52,7 +52,7 @@ class NSMiscDataType : public Serialize::Type<NSMiscDataImpl>
 	Serialize::Field<NSMiscDataImpl, Anope::string> name, data;
 
 	NSMiscDataType(Module *me) : Serialize::Type<NSMiscDataImpl>(me)
-		, owner(this, "nc", &NSMiscDataImpl::account, true)
+		, owner(this, "account", &NSMiscDataImpl::account, true)
 		, name(this, "name", &NSMiscDataImpl::name)
 		, data(this, "data", &NSMiscDataImpl::data)
 	{

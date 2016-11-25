@@ -140,7 +140,7 @@ class CommandBSUnassign : public Command
 			return;
 		}
 
-		if (ci->HasFieldS("PERSIST") && !ModeManager::FindChannelModeByName("PERM"))
+		if (ci->IsPersist() && !ModeManager::FindChannelModeByName("PERM"))
 		{
 			source.Reply(_("You cannot unassign bots while persist is set on the channel."));
 			return;

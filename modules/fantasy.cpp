@@ -58,7 +58,7 @@ class CommandBSSetFantasy : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable fantasy";
 
-			ci->SetS<bool>("BS_FANTASY", true);
+			ci->SetFantasy(true);
 			source.Reply(_("Fantasy mode is now \002on\002 on channel \002{0}\002."), ci->GetName());
 		}
 		else if (value.equals_ci("OFF"))
@@ -66,7 +66,7 @@ class CommandBSSetFantasy : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable fantasy";
 
-			ci->UnsetS<bool>("BS_FANTASY");
+			ci->SetFantasy(false);
 			source.Reply(_("Fantasy mode is now \002off\002 on channel \002{0}\002."), ci->GetName());
 		}
 		else
@@ -94,15 +94,12 @@ class Fantasy : public Module
 	, public EventHook<Event::Privmsg>
 	, public EventHook<Event::ServiceBotEvent>
 {
-	Serialize::Field<ChanServ::Channel, bool> fantasy;
-
 	CommandBSSetFantasy commandbssetfantasy;
 
  public:
 	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::Privmsg>(this)
 		, EventHook<Event::ServiceBotEvent>(this)
-		, fantasy(this, "BS_FANTASY")
 		, commandbssetfantasy(this)
 	{
 	}
@@ -112,7 +109,7 @@ class Fantasy : public Module
 		if (!u || !c || !c->ci || !c->ci->GetBot() || msg.empty() || msg[0] == '\1')
 			return;
 
-		if (Config->GetClient("BotServ") && !fantasy.HasExt(c->ci))
+		if (Config->GetClient("BotServ") && !c->ci->IsFantasy())
 			return;
 
 		std::vector<Anope::string> params;
@@ -225,7 +222,7 @@ class Fantasy : public Module
 
 	void OnServiceBot(CommandSource &source, ServiceBot *bi, ChanServ::Channel *ci, InfoFormatter &info) override
 	{
-		if (fantasy.HasExt(ci))
+		if (ci->IsFantasy())
 			info.AddOption(_("Fantasy"));
 	}
 };

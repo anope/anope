@@ -33,27 +33,27 @@ class CommandMSSet : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			nc->SetS<bool>("MEMO_SIGNON", true);
-			nc->SetS<bool>("MEMO_RECEIVE", true);
+			nc->SetMemoSignon(true);
+			nc->SetMemoReceive(true);
 			source.Reply(_("\002{0}\002 will now notify you of memos when you log on and when they are sent to you."), MemoServ->nick);
 		}
 		else if (param.equals_ci("LOGON"))
 		{
-			nc->SetS<bool>("MEMO_SIGNON", true);
-			nc->UnsetS<bool>("MEMO_RECEIVE");
+			nc->SetMemoSignon(true);
+			nc->SetMemoReceive(false);
 			source.Reply(_("\002{0}\002 will now notify you of memos when you log on or unset /AWAY."), MemoServ->nick);
 		}
 		else if (param.equals_ci("NEW"))
 		{
-			nc->UnsetS<bool>("MEMO_SIGNON");
-			nc->SetS<bool>("MEMO_RECEIVE", true);
+			nc->SetMemoSignon(false);
+			nc->SetMemoReceive(true);
 			source.Reply(_("\002{0}\002 will now notify you of memos when they are sent to you."), MemoServ->nick);
 		}
 		else if (param.equals_ci("MAIL"))
 		{
 			if (!nc->GetEmail().empty())
 			{
-				nc->SetS<bool>("MEMO_MAIL", true);
+				nc->SetMemoMail(true);
 				source.Reply(_("You will now be informed about new memos via email."));
 			}
 			else
@@ -63,14 +63,14 @@ class CommandMSSet : public Command
 		}
 		else if (param.equals_ci("NOMAIL"))
 		{
-			nc->UnsetS<bool>("MEMO_MAIL");
+			nc->SetMemoMail(false);
 			source.Reply(_("You will no longer be informed via email."));
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			nc->UnsetS<bool>("MEMO_SIGNON");
-			nc->UnsetS<bool>("MEMO_RECEIVE");
-			nc->UnsetS<bool>("MEMO_MAIL");
+			nc->SetMemoSignon(false);
+			nc->SetMemoReceive(false);
+			nc->SetMemoMail(false);
 			source.Reply(_("\002{0}\002 will not send you any notification of memos."), MemoServ->nick);
 		}
 		else
@@ -138,16 +138,16 @@ class CommandMSSet : public Command
 			if (!chan.empty())
 			{
 				if (!p2.empty())
-					ci->SetS<bool>("MEMO_HARDMAX", true);
+					mi->SetHardMax(true);
 				else
-					ci->UnsetS<bool>("MEMO_HARDMAX");
+					mi->SetHardMax(false);
 			}
 			else
 			{
 				if (!p2.empty())
-					nc->SetS<bool>("MEMO_HARDMAX", true);
+					mi->SetHardMax(true);
 				else
-					nc->UnsetS<bool>("MEMO_HARDMAX");
+					mi->SetHardMax(false);
 			}
 			limit = -1;
 			try
@@ -163,12 +163,12 @@ class CommandMSSet : public Command
 				this->OnSyntaxError(source, "");
 				return;
 			}
-			if (!chan.empty() && ci->HasFieldS("MEMO_HARDMAX"))
+			if (!chan.empty() && mi->IsHardMax())
 			{
 				source.Reply(_("The memo limit for \002{0}\002 may not be changed."), chan);
 				return;
 			}
-			if (chan.empty() && nc->HasFieldS("MEMO_HARDMAX"))
+			if (chan.empty() && mi->IsHardMax())
 			{
 				source.Reply(_("You are not permitted to change your memo limit."));
 				return;
@@ -315,17 +315,10 @@ class CommandMSSet : public Command
 class MSSet : public Module
 {
 	CommandMSSet commandmsset;
-	Serialize::Field<NickServ::Account, bool> memo_signon, memo_receive, memo_mail, memo_hardmax_nick;
-	Serialize::Field<ChanServ::Channel, bool> memo_hardmax_channel;
 
  public:
 	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandmsset(this)
-		, memo_signon(this, "MEMO_SIGNON")
-		, memo_receive(this, "MEMO_RECEIVE")
-		, memo_mail(this, "MEMO_MAIL")
-		, memo_hardmax_nick(this, "MEMO_HARDMAX")
-		, memo_hardmax_channel(this, "MEMO_HARDMAX")
 	{
 
 	}

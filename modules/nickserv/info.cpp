@@ -62,10 +62,10 @@ class CommandNSInfo : public Command
 
 		source.Reply(_("\002{0}\002 is \002{1}\002"), na->GetNick(), na->GetLastRealname());
 
-		if (na->GetAccount()->HasFieldS("UNCONFIRMED"))
+		if (na->GetAccount()->IsUnconfirmed())
 			source.Reply(_("\002{0}\002 has not confirmed their account."), na->GetNick());
 
-		if (na->GetAccount()->GetOper() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_STATUS")))
+		if (na->GetAccount()->GetOper() && (show_hidden || !na->GetAccount()->IsHideStatus()))
 			source.Reply(_("\002{0}\002 is a Services Operator of type \002{1}\002."), na->GetNick(), na->GetAccount()->GetOper()->GetType()->GetName());
 
 		InfoFormatter info(source.nc);
@@ -78,7 +78,7 @@ class CommandNSInfo : public Command
 				info[_("Online from")] = na->GetLastRealhost();
 				shown = true;
 			}
-			if ((show_hidden || !na->GetAccount()->HasFieldS("HIDE_MASK")) && (!shown || na->GetLastUsermask() != na->GetLastRealhost()))
+			if ((show_hidden || !na->GetAccount()->IsHideMask()) && (!shown || na->GetLastUsermask() != na->GetLastRealhost()))
 				info[_("Online from")] = na->GetLastUsermask();
 			else
 				source.Reply(_("\002{0}\002 is currently online."), na->GetNick());
@@ -86,7 +86,7 @@ class CommandNSInfo : public Command
 		else
 		{
 			Anope::string shown;
-			if (show_hidden || !na->GetAccount()->HasFieldS("HIDE_MASK"))
+			if (show_hidden || !na->GetAccount()->IsHideMask())
 			{
 				info[_("Last seen address")] = na->GetLastUsermask();
 				shown = na->GetLastUsermask();
@@ -101,10 +101,10 @@ class CommandNSInfo : public Command
 		if (!nick_online)
 			info[_("Last seen")] = Anope::strftime(na->GetLastSeen(), source.GetAccount());
 
-		if (!na->GetLastQuit().empty() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_QUIT")))
+		if (!na->GetLastQuit().empty() && (show_hidden || !na->GetAccount()->IsHideQuit()))
 			info[_("Last quit message")] = na->GetLastQuit();
 
-		if (!na->GetAccount()->GetEmail().empty() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_EMAIL")))
+		if (!na->GetAccount()->GetEmail().empty() && (show_hidden || !na->GetAccount()->IsHideEmail()))
 			info[_("Email address")] = na->GetAccount()->GetEmail();
 
 		EventManager::Get()->Dispatch(&Event::NickInfo::OnNickInfo, source, na, info, show_hidden);
@@ -164,25 +164,25 @@ class CommandNSSetHide : public Command
 
 		if (param.equals_ci("EMAIL"))
 		{
-			flag = "HIDE_EMAIL";
+			flag = "hide_email";
 			onmsg = _("The \002e-mail address\002 of \002{0}\002 will now be \002hidden\002.");
 			offmsg = _("The \002e-mail address\002 of \002{0}\002 will now be \002shown\002.");
 		}
 		else if (param.equals_ci("USERMASK"))
 		{
-			flag = "HIDE_MASK";
+			flag = "hide_mask";
 			onmsg = _("The \002last seen host mask\002 of \002{0}\002 will now be \002hidden\002.");
 			offmsg = _("The \002last seen host mask\002 of \002{0}\002 will now be \002shown\002.");
 		}
 		else if (param.equals_ci("STATUS"))
 		{
-			flag = "HIDE_STATUS";
+			flag = "hide_status";
 			onmsg = _("The \002services operator status\002 of \002{0}\002 will now be \002hidden\002.");
 			offmsg = _("The \002services operator status\002 of \002{0}\002 will now be \002shown\002.");
 		}
 		else if (param.equals_ci("QUIT"))
 		{
-			flag = "HIDE_QUIT";
+			flag = "hide_quit";
 			onmsg = _("The \002last quit message\002 of \002{0}\002 will now be \002hidden\002.");
 			offmsg = _("The \002last quit message\002 of \002{0}\002 will now be \002shown\002.");
 		}
@@ -254,17 +254,11 @@ class NSInfo : public Module
 	CommandNSSetHide commandnssethide;
 	CommandNSSASetHide commandnssasethide;
 
-	Serialize::Field<NickServ::Account, bool> hide_email, hide_usermask, hide_status, hide_quit;
-
  public:
 	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandnsinfo(this)
 		, commandnssethide(this)
 		, commandnssasethide(this)
-		, hide_email(this, "HIDE_EMAIL")
-		, hide_usermask(this, "HIDE_MASK")
-		, hide_status(this, "HIDE_STATUS")
-		, hide_quit(this, "HIDE_QUIT")
 	{
 
 	}

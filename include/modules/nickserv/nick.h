@@ -55,6 +55,9 @@ class CoreExport Nick : public Serialize::Object
 
 	virtual Account *GetAccount() anope_abstract;
 	virtual void SetAccount(Account *acc) anope_abstract;
+
+	virtual bool IsNoExpire() anope_abstract;
+	virtual void SetNoExpire(bool) anope_abstract;
 };
 
 } // namespace NickServ

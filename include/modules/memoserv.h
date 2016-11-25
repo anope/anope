@@ -144,6 +144,9 @@ namespace MemoServ
 		virtual int16_t GetMemoMax() anope_abstract;
 		virtual void SetMemoMax(const int16_t &) anope_abstract;
 
+		virtual bool IsHardMax() anope_abstract;
+		virtual void SetHardMax(bool) anope_abstract;
+
 		virtual std::vector<Memo *> GetMemos() anope_abstract;
 		virtual std::vector<Ignore *> GetIgnores() anope_abstract;
 	};

@@ -58,10 +58,10 @@ class AutoKickImpl : public AutoKick
 class AutoKickType : public Serialize::Type<AutoKickImpl>
 {
  public:
-	Serialize::ObjectField<AutoKickImpl, ChanServ::Channel *> ci;
+	Serialize::ObjectField<AutoKickImpl, ChanServ::Channel *> channel;
 
 	Serialize::Field<AutoKickImpl, Anope::string> mask;
-	Serialize::ObjectField<AutoKickImpl, NickServ::Account *> nc;
+	Serialize::ObjectField<AutoKickImpl, NickServ::Account *> account;
 
 	Serialize::Field<AutoKickImpl, Anope::string> reason;
 	Serialize::Field<AutoKickImpl, Anope::string> creator;
@@ -70,9 +70,9 @@ class AutoKickType : public Serialize::Type<AutoKickImpl>
 
  	AutoKickType(Module *me)
 		: Serialize::Type<AutoKickImpl>(me)
-		, ci(this, "ci", &AutoKickImpl::channel, true)
+		, channel(this, "channel", &AutoKickImpl::channel, true)
 		, mask(this, "mask", &AutoKickImpl::mask)
-		, nc(this, "nc", &AutoKickImpl::account, true)
+		, account(this, "account", &AutoKickImpl::account, true)
 		, reason(this, "reason", &AutoKickImpl::reason)
 		, creator(this, "creator", &AutoKickImpl::creator)
 		, addtime(this, "addtime", &AutoKickImpl::addtime)
@@ -83,12 +83,12 @@ class AutoKickType : public Serialize::Type<AutoKickImpl>
 
 ChanServ::Channel *AutoKickImpl::GetChannel()
 {
-	return Get(&AutoKickType::ci);
+	return Get(&AutoKickType::channel);
 }
 
 void AutoKickImpl::SetChannel(ChanServ::Channel *ci)
 {
-	Set(&AutoKickType::ci, ci);
+	Set(&AutoKickType::channel, ci);
 }
 
 Anope::string AutoKickImpl::GetMask()
@@ -103,12 +103,12 @@ void AutoKickImpl::SetMask(const Anope::string &mask)
 
 NickServ::Account *AutoKickImpl::GetAccount()
 {
-	return Get(&AutoKickType::nc);
+	return Get(&AutoKickType::account);
 }
 
 void AutoKickImpl::SetAccount(NickServ::Account *nc)
 {
-	Set(&AutoKickType::nc, nc);
+	Set(&AutoKickType::account, nc);
 }
 
 Anope::string AutoKickImpl::GetReason()
@@ -170,7 +170,7 @@ class CommandCSAKick : public Command
 		{
 			/* Also don't try to complete the mask if this is a channel */
 
-			if (mask.equals_ci(ci->GetName()) && ci->HasFieldS("PEACE"))
+			if (mask.equals_ci(ci->GetName()) && ci->IsPeace())
 			{
 				source.Reply(_("Access denied."));
 				return;
@@ -232,7 +232,7 @@ class CommandCSAKick : public Command
 			;
 		/* Check whether target nick has equal/higher access
 		* or whether the mask matches a user with higher/equal access - Viper */
-		else if (ci->HasFieldS("PEACE") && nc)
+		else if (ci->IsPeace() && nc)
 		{
 			ChanServ::AccessGroup nc_access = ci->AccessFor(nc), u_access = source.AccessFor(ci);
 			if (nc == ci->GetFounder() || nc_access >= u_access)
@@ -241,7 +241,7 @@ class CommandCSAKick : public Command
 				return;
 			}
 		}
-		else if (ci->HasFieldS("PEACE"))
+		else if (ci->IsPeace())
 		{
 #warning "peace"
 #if 0

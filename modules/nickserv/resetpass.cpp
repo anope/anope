@@ -107,7 +107,7 @@ class NSResetPass : public Module
 				else if (passcode.equals_cs(ri->code))
 				{
 					reset.Unset(nc);
-					nc->UnsetS<bool>("UNCONFIRMED");
+					nc->SetUnconfirmed(false);
 
 					Log(LOG_COMMAND, source, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify as " << na->GetNick();
 

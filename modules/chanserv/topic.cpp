@@ -63,13 +63,13 @@ class CommandCSSetKeepTopic : public Command
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keeptopic";
-			ci->SetS<bool>("KEEPTOPIC", true);
+			ci->SetKeepTopic(true);
 			source.Reply(_("Topic retention option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keeptopic";
-			ci->UnsetS<bool>("KEEPTOPIC");
+			ci->SetKeepTopic(false);
 			source.Reply(_("Topic retention option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
@@ -89,8 +89,6 @@ class CommandCSSetKeepTopic : public Command
 
 class CommandCSTopic : public Command
 {
-	ExtensibleRef<bool> topiclock;
-
 	void Lock(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		if (Anope::ReadOnly)
@@ -104,7 +102,7 @@ class CommandCSTopic : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		topiclock->Set(ci, true);
+		ci->SetTopicLock(true);
 		source.Reply(_("Topic lock option for \002{0}\002 is now \002on\002."), ci->GetName());
 	}
 
@@ -121,17 +119,17 @@ class CommandCSTopic : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		topiclock->Unset(ci);
+		ci->SetTopicLock(false);
 		source.Reply(_("Topic lock option for \002{0}\002 is now \002off\002."), ci->GetName());
 	}
 
 	void Set(CommandSource &source, ChanServ::Channel *ci, const Anope::string &topic)
 	{
-		bool has_topiclock = topiclock->HasExt(ci);
-		topiclock->Unset(ci);
+		bool has_topiclock = ci->IsTopicLock();
+		ci->SetTopicLock(false);
 		ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
 		if (has_topiclock)
-			topiclock->Set(ci, true);
+			ci->SetTopicLock(true);
 
 		bool override = !source.AccessFor(ci).HasPriv("TOPIC");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
@@ -156,8 +154,7 @@ class CommandCSTopic : public Command
 	}
 
  public:
-	CommandCSTopic(Module *creator) : Command(creator, "chanserv/topic", 2, 3),
-		topiclock("TOPICLOCK")
+	CommandCSTopic(Module *creator) : Command(creator, "chanserv/topic", 2, 3)
 	{
 		this->SetDesc(_("Manipulate the topic of the specified channel"));
 		this->SetSyntax(_("\037channel\037 [SET] [\037topic\037]"));
@@ -240,8 +237,6 @@ class CSTopic : public Module
 	CommandCSTopic commandcstopic;
 	CommandCSSetKeepTopic commandcssetkeeptopic;
 
-	Serialize::Field<ChanServ::Channel, bool> topiclock, keeptopic;
-
 	ServiceReference<ModeLocks> mlocks;
 
  public:
@@ -251,8 +246,6 @@ class CSTopic : public Module
 		, EventHook<Event::ChanInfo>(this)
 		, commandcstopic(this)
 		, commandcssetkeeptopic(this)
-		, topiclock(this, "TOPICLOCK")
-		, keeptopic(this, "KEEPTOPIC")
 	{
 
 	}
@@ -262,7 +255,7 @@ class CSTopic : public Module
 		if (c->ci)
 		{
 			/* Update channel topic */
-			if ((topiclock.HasExt(c->ci) || keeptopic.HasExt(c->ci)) && c->ci->GetLastTopic() != c->topic)
+			if ((c->ci->IsTopicLock() || c->ci->IsKeepTopic()) && c->ci->GetLastTopic() != c->topic)
 			{
 				c->ChangeTopic(!c->ci->GetLastTopicSetter().empty() ? c->ci->GetLastTopicSetter() : c->ci->WhoSends()->nick, c->ci->GetLastTopic(), c->ci->GetLastTopicTime() ? c->ci->GetLastTopicTime() : Anope::CurTime);
 			}
@@ -279,7 +272,7 @@ class CSTopic : public Module
 		 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
 		 * it is not required
 		 */
-		if (topiclock.HasExt(c->ci) && c->ci->GetLastTopic() != c->topic && (!source || !c->ci->AccessFor(source).HasPriv("TOPIC")))
+		if (c->ci->IsTopicLock() && c->ci->GetLastTopic() != c->topic && (!source || !c->ci->AccessFor(source).HasPriv("TOPIC")))
 		{
 			c->ChangeTopic(c->ci->GetLastTopicSetter(), c->ci->GetLastTopic(), c->ci->GetLastTopicTime());
 		}
@@ -293,9 +286,9 @@ class CSTopic : public Module
 
 	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_all) override
 	{
-		if (keeptopic.HasExt(ci))
+		if (ci->IsKeepTopic())
 			info.AddOption(_("Topic retention"));
-		if (topiclock.HasExt(ci))
+		if (ci->IsTopicLock())
 			info.AddOption(_("Topic lock"));
 
 		ModeLock *secret = mlocks ? mlocks->GetMLock(ci, "SECRET") : nullptr;

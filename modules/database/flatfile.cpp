@@ -179,7 +179,7 @@ class DBFlatFile : public Module
 		if (entry == nullptr)
 			return;
 
-		entry->SetOwner(nick->GetAccount());
+		entry->SetAccount(nick->GetAccount());
 		entry->SetChannel(data["channel"]);
 		entry->SetKey(data["key"]);
 	}

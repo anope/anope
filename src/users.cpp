@@ -330,7 +330,7 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 	* - The user is not registered and NSDefMsg is enabled
 	* - The user is registered and has set /ns set msg on
 	*/
-	bool send_privmsg = Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasFieldS("MSG")));
+	bool send_privmsg = Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->IsMsg()));
 	sepstream sep(translated_message, '\n', true);
 	for (Anope::string tok; sep.GetToken(tok);)
 	{
@@ -464,7 +464,7 @@ bool User::IsRecognized(bool check_secure) const
 	{
 		NickServ::Nick *na = NickServ::FindNick(nick);
 
-		if (!na || na->GetAccount()->HasFieldS("NS_SECURE"))
+		if (!na || na->GetAccount()->IsSecure())
 			return false;
 	}
 

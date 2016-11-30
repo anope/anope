@@ -173,7 +173,7 @@ class DBSQL : public Module, public Pipe
 	{
 		for (Serialize::FieldBase *field : type->GetFields())
 		{
-			if (field->object)
+			if (field->is_object)
 			{
 				Anope::string table = prefix + type->GetName();
 
@@ -344,7 +344,7 @@ class DBSQL : public Module, public Pipe
 
 	EventReturn OnSerializeHasField(Serialize::Object *object, Serialize::FieldBase *field) override
 	{
-		if (field->object)
+		if (field->is_object)
 		{
 			Anope::string type;
 			Serialize::ID id;

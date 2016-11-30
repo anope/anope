@@ -372,9 +372,9 @@ class Serialize::FieldBase : public Service
 	 * the object the field references gets deleted, this object
 	 * gets deleted too.
 	 */
-	bool depends;
+	bool depends = false;
 
-	bool object = false;
+	bool is_object = false;
 
 	FieldBase(Module *, const Anope::string &, const Anope::string &, bool);
 	virtual ~FieldBase();
@@ -698,12 +698,12 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
  public:
 	ObjectField(TypeBase *t, const Anope::string &n, bool d = false) : CommonFieldBase<TypeImpl, T>(t, n, d)
 	{
-		this->object = true;
+		this->is_object = true;
 	}
 
 	ObjectField(TypeBase *t, const Anope::string &n, T TypeImpl::*field, bool d = false) : CommonFieldBase<TypeImpl, T>(t, n, field, d)
 	{
-		this->object = true;
+		this->is_object = true;
 	}
 
 	T GetField(TypeImpl *s)

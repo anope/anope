@@ -340,9 +340,9 @@ class IRCMessage
 		return source;
 	}
 
-	void SetSource(const MessageSource &source)
+	void SetSource(const MessageSource &_source)
 	{
-		this->source = source;
+		this->source = _source;
 	}
 	
 	const Anope::string &GetCommand() const

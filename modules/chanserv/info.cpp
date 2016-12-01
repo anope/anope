@@ -66,7 +66,21 @@ class CommandCSInfo : public Command
 
 		if (show_all)
 		{
-			info[_("Ban type")] = stringify(ci->GetBanType());
+			switch (ci->GetBanType())
+			{
+				case 0:
+					info[_("Ban type")] = stringify("0: *!user@host");
+					break;
+				case 1:
+					info[_("Ban type")] = stringify("1: *!*user@host");
+					break;
+				case 2:
+					info[_("Ban type")] = stringify("2: *!*@host");
+					break;
+				case 3:
+					info[_("Ban type")] = stringify("3: *!*user@*.domain");
+					break;
+			}
 		}
 
 		EventManager::Get()->Dispatch(&Event::ChanInfo::OnChanInfo, source, ci, info, show_all);

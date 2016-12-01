@@ -21,12 +21,11 @@ class ModeImpl : public ChanServ::Mode
 {
 	friend class CSModeType;
 
-	ChanServ::Channel *channel = nullptr;
-	Anope::string mode, param;
+	Serialize::Storage<ChanServ::Channel *> channel;
+	Serialize::Storage<Anope::string> mode, param;
 
  public:
-	ModeImpl(Serialize::TypeBase *type) : ChanServ::Mode(type) { }
-	ModeImpl(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::Mode(type, id) { }
+	using ChanServ::Mode::Mode;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *) override;

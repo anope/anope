@@ -26,13 +26,12 @@ class ForbidDataImpl : public ForbidData
 {
 	friend class ForbidDataType;
 
-	Anope::string mask, creator, reason;
-	time_t created = 0, expires = 0;
-	ForbidType type = static_cast<ForbidType>(0);
+	Serialize::Storage<Anope::string> mask, creator, reason;
+	Serialize::Storage<time_t> created, expires;
+	Serialize::Storage<ForbidType> type;
 
  public:
-	ForbidDataImpl(Serialize::TypeBase *type) : ForbidData(type) { }
-	ForbidDataImpl(Serialize::TypeBase *type, Serialize::ID id) : ForbidData(type, id) { }
+	using ForbidData::ForbidData;
 
 	Anope::string GetMask() override;
 	void SetMask(const Anope::string &) override;

@@ -25,12 +25,12 @@ class VHostImpl : public HostServ::VHost
 {
 	friend class VHostType;
 
-	Serialize::Object *owner = nullptr;
-	Anope::string vident;
-	Anope::string vhost;
-	Anope::string creator;
-	time_t created = 0;
-	bool default_ = false;
+	Serialize::Storage<Serialize::Object *> owner;
+	Serialize::Storage<Anope::string> vident;
+	Serialize::Storage<Anope::string> vhost;
+	Serialize::Storage<Anope::string> creator;
+	Serialize::Storage<time_t> created;
+	Serialize::Storage<bool> default_;
 
  public:
 	using HostServ::VHost::VHost;

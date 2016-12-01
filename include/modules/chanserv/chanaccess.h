@@ -34,10 +34,10 @@ class CoreExport ChanAccess : public Serialize::Object
  public:
 	static constexpr const char *const NAME = "access";
 
-	Channel *channel = nullptr;
-	Serialize::Object *object = nullptr;
-	Anope::string creator, mask;
-	time_t last_seen = 0, created = 0;
+	Serialize::Storage<Channel *> channel;
+	Serialize::Storage<Serialize::Object *> object;
+	Serialize::Storage<Anope::string> creator, mask;
+	Serialize::Storage<time_t> last_seen, created;
 
 	using Serialize::Object::Object;
 

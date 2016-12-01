@@ -32,8 +32,8 @@ class CoreExport XLine : public Serialize::Object
 
 	friend class XLineType;
 
-	Anope::string type, mask, by, reason, id;
-	time_t created = 0, expires = 0;
+	Serialize::Storage<Anope::string> type, mask, by, reason, id;
+	Serialize::Storage<time_t> created, expires;
 
  public:
 	static constexpr const char *const NAME = "xline";

@@ -36,6 +36,8 @@ namespace Serialize
 	template<typename, typename> class Field;
 	template<typename, typename> class ObjectField;
 
+	template<typename> class Storage;
+
 	template<typename T, typename> class Type;
 	template<typename T> class Reference;
 
@@ -60,7 +62,7 @@ namespace Serialize
 	template<typename T>
 	inline T New();
 
-	extern void Clear();
+	extern void GC();
 
 	extern void Unregister(Module *);
 
@@ -216,16 +218,21 @@ class CoreExport Serialize::Object : public Extensible, public virtual Base
 	 * which can unset (vs set to the default value)
 	 */
 	bool HasFieldS(const Anope::string &name);
+
+	/** Whether or not the object can be garbage collected.
+	 * Should be true unless your object holds in-memory only
+	 * state.
+	 */
+	virtual bool CanGC() { return true; }
+
+	void Wipe();
 };
 
 class CoreExport Serialize::TypeBase : public Service
 {
 	Anope::string name;
 
-	/* Owner of this type. Used for placing objects of this type in separate databases
-	 * based on what module, if any, owns it.
-	 */
-	Module *owner;
+	Module *owner = nullptr;
 
  public:
 	static constexpr const char *NAME = "typebase";
@@ -396,6 +403,8 @@ class Serialize::FieldBase : public Service
 	 */
 	virtual void UnsetS(Object *) anope_abstract;
 
+	virtual void Uncache(Object *) anope_abstract;
+
 	virtual Anope::string GetTypeName() { return ""; }
 };
 
@@ -426,18 +435,21 @@ class Serialize::CommonFieldBase : public FieldTypeBase<T>
 	 */
 	ExtensibleItem<T> *ext = nullptr;
 
-	/** Field pointer to storage in the TypeImpl object for
-	 * this field.
+	/** Storage pointer in the TypeImpl object for this field.
 	 */
-	T TypeImpl::*field = nullptr;
+	Serialize::Storage<T> TypeImpl::*storage = nullptr;
 
  protected:
 	/** Set the value of a field in storage
 	 */
 	void Set_(TypeImpl *object, const T &value)
 	{
-		if (field != nullptr)
-			object->*field = value;
+		if (storage != nullptr)
+		{
+			Serialize::Storage<T> &s = object->*storage;
+			s.t = value;
+			s.cached = true;
+		}
 		else if (ext != nullptr)
 			ext->Set(object, value);
 		else
@@ -448,8 +460,8 @@ class Serialize::CommonFieldBase : public FieldTypeBase<T>
 	 */
 	T* Get_(TypeImpl *object)
 	{
-		if (field != nullptr)
-			return &(object->*field);
+		if (storage != nullptr)
+			return &(object->*storage).t;
 		else if (ext != nullptr)
 			return ext->Get(object);
 		else
@@ -460,8 +472,12 @@ class Serialize::CommonFieldBase : public FieldTypeBase<T>
 	 */
 	void Unset_(TypeImpl *object)
 	{
-		if (field != nullptr)
-			object->*field = T();
+		if (storage != nullptr)
+		{
+			Serialize::Storage<T> &s = object->*storage;
+			s.t = T();
+			s.cached = false;
+		}
 		else if (ext != nullptr)
 			ext->Unset(object);
 		else
@@ -473,7 +489,7 @@ class Serialize::CommonFieldBase : public FieldTypeBase<T>
 	 */
 	bool HasField_(TypeImpl *object)
 	{
-		if (field != nullptr)
+		if (storage != nullptr)
 			return true;
 		else if (ext != nullptr)
 			return ext->HasExt(object);
@@ -481,13 +497,17 @@ class Serialize::CommonFieldBase : public FieldTypeBase<T>
 			throw CoreException("No field or ext");
 	}
 
- public:
-	CommonFieldBase(Serialize::TypeBase *t, const Anope::string &n, bool d)
-		: FieldTypeBase<T>(t->GetOwner(), n, t->GetName(), d)
+	bool Cached_(TypeImpl *object)
 	{
-		ext = new ExtensibleItem<T>(t->GetOwner(), t->GetName(), n);
+		if (storage != nullptr)
+			return (object->*storage).cached;
+		else if (ext != nullptr)
+			return ext->HasExt(object);
+		else
+			throw CoreException("No field or ext");
 	}
 
+ public:
 	CommonFieldBase(Module *creator, const Anope::string &n, bool d)
 		: FieldTypeBase<T>(creator, n, TypeImpl::NAME, d)
 	{
@@ -496,10 +516,10 @@ class Serialize::CommonFieldBase : public FieldTypeBase<T>
 
 	CommonFieldBase(Serialize::TypeBase *t,
 			const Anope::string &n,
-			T TypeImpl::*f,
+			Serialize::Storage<T> TypeImpl::*s,
 			bool d)
 		: FieldTypeBase<T>(t->GetOwner(), n, t->GetName(), d)
-		, field(f)
+		, storage(s)
 	{
 	}
 
@@ -547,6 +567,11 @@ class Serialize::CommonFieldBase : public FieldTypeBase<T>
 
 		return this->HasField_(s);
 	}
+
+	void Uncache(Object *s)
+	{
+		Unset_(Upcast(s));
+	}
 };
 
 /** Class for all fields that aren't to other serializable objects
@@ -555,15 +580,11 @@ template<typename TypeImpl, typename T>
 class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 {
  public:
-	Field(TypeBase *t, const Anope::string &n) : CommonFieldBase<TypeImpl, T>(t, n, false)
-	{
-	}
-
 	Field(Module *creator, const Anope::string &n) : CommonFieldBase<TypeImpl, T>(creator, n, false)
 	{
 	}
 
-	Field(TypeBase *t, const Anope::string &n, T TypeImpl::*f) : CommonFieldBase<TypeImpl, T>(t, n, f, false)
+	Field(TypeBase *t, const Anope::string &n, Serialize::Storage<T> TypeImpl::*f) : CommonFieldBase<TypeImpl, T>(t, n, f, false)
 	{
 	}
 
@@ -571,8 +592,8 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 	{
 		T* t = this->Get_(s);
 
-		// If we have a non-default value for this field it is up to date and cached
-		if (t && *t != T())
+		// If this field is cached
+		if (t && this->Cached_(s))
 			return *t;
 
 		// Query modules
@@ -583,19 +604,14 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 			// module returned us data, so we unserialize it
 			T t2 = this->Unserialize(value);
 
-			// should cache the default value somehow, but can't differentiate not cached from cached and default
-
-			// Cache
+			// set & cache
 			OnSet(s, t2);
 			this->Set_(s, t2);
 
 			return t2;
 		}
 
-		if (t)
-			return *t;
-
-		return T();
+		return t ? *t : T();
 	}
 
 	void SetFieldS(Object *s, const T &value) override
@@ -696,12 +712,12 @@ template<typename TypeImpl, typename T>
 class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 {
  public:
-	ObjectField(TypeBase *t, const Anope::string &n, bool d = false) : CommonFieldBase<TypeImpl, T>(t, n, d)
+	ObjectField(Module *creator, const Anope::string &n) : CommonFieldBase<TypeImpl, T>(creator, n, false)
 	{
 		this->is_object = true;
 	}
 
-	ObjectField(TypeBase *t, const Anope::string &n, T TypeImpl::*field, bool d = false) : CommonFieldBase<TypeImpl, T>(t, n, field, d)
+	ObjectField(TypeBase *t, const Anope::string &n, Serialize::Storage<T> TypeImpl::*field, bool d = false) : CommonFieldBase<TypeImpl, T>(t, n, field, d)
 	{
 		this->is_object = true;
 	}
@@ -709,7 +725,8 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 	T GetField(TypeImpl *s)
 	{
 		T *t = this->Get_(s);
-		if (t && *t != nullptr)
+
+		if (t && this->Cached_(s))
 			return *t;
 
 		Anope::string type;
@@ -732,10 +749,7 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 			return t2;
 		}
 
-		if (t)
-			return *t;
-
-		return T();
+		return t ? *t : T();
 	}
 
 	void SetFieldS(Object *s, const T &value) override
@@ -815,6 +829,14 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 		const char* const name = std::remove_pointer<T>::type::NAME;
 		return name;
 	}
+};
+
+template<typename T>
+class Serialize::Storage
+{
+ public:
+	T t = T();
+	bool cached = false;
 };
 
 template<typename T>

@@ -23,13 +23,12 @@ class MemoInfoImpl : public MemoServ::MemoInfo
 {
 	friend class MemoInfoType;
 
-	Serialize::Object *owner = nullptr;
-	int16_t memomax = 0;
-	bool hardmax = false;
+	Serialize::Storage<Serialize::Object *> owner;
+	Serialize::Storage<int16_t> memomax;
+	Serialize::Storage<bool> hardmax;
 
  public:
-	MemoInfoImpl(Serialize::TypeBase *type) : MemoServ::MemoInfo(type) { }
-	MemoInfoImpl(Serialize::TypeBase *type, Serialize::ID id) : MemoServ::MemoInfo(type, id) { }
+	using MemoServ::MemoInfo::MemoInfo;
 
 	MemoServ::Memo *GetMemo(unsigned index) override;
 	unsigned GetIndex(MemoServ::Memo *m) override;

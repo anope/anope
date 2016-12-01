@@ -21,13 +21,12 @@ class LevelImpl : public ChanServ::Level
 {
 	friend class LevelType;
 
-	ChanServ::Channel *channel = nullptr;
-	Anope::string name;
-	int level = 0;
+	Serialize::Storage<ChanServ::Channel *> channel;
+	Serialize::Storage<Anope::string> name;
+	Serialize::Storage<int> level;
 
  public:
-	LevelImpl(Serialize::TypeBase *type) : ChanServ::Level(type) { }
-	LevelImpl(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::Level(type, id) { }
+	using ChanServ::Level::Level;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *) override;

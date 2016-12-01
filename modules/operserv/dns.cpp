@@ -27,11 +27,10 @@ class DNSZoneImpl : public DNSZone
 {
 	friend class DNSZoneType;
 
-	Anope::string name;
+	Serialize::Storage<Anope::string> name;
 
  public:
-	DNSZoneImpl(Serialize::TypeBase *type) : DNSZone(type) { }
-	DNSZoneImpl(Serialize::TypeBase *type, Serialize::ID id) : DNSZone(type, id) { }
+	using DNSZone::DNSZone;
 
 	Anope::string GetName() override;
 	void SetName(const Anope::string &) override;
@@ -72,10 +71,10 @@ class DNSServerImpl : public DNSServer
 
 	ServiceReference<DNS::Manager> manager;
 
-	DNSZone *zone = nullptr;
-	Anope::string name;
-	unsigned int limit = 0;
-	bool pooled = false;
+	Serialize::Storage<DNSZone *> zone;
+	Serialize::Storage<Anope::string> name;
+	Serialize::Storage<unsigned int> limit;
+	Serialize::Storage<bool> pooled;
 	
 	/* is actually in the pool */
 	bool active = false;
@@ -84,8 +83,7 @@ class DNSServerImpl : public DNSServer
  	std::set<Anope::string, ci::less> zones;
 	time_t repool = 0;
 
-	DNSServerImpl(Serialize::TypeBase *type) : DNSServer(type) { }
-	DNSServerImpl(Serialize::TypeBase *type, Serialize::ID id) : DNSServer(type, id) { }
+	using DNSServer::DNSServer;
 
 	DNSZone *GetZone() override;
 	void SetZone(DNSZone *) override;
@@ -188,12 +186,11 @@ class DNSZoneMembershipImpl : public DNSZoneMembership
 {
 	friend class DNSZoneMembershipType;
 
-	DNSServer *server = nullptr;
-	DNSZone *zone = nullptr;
+	Serialize::Storage<DNSServer *> server;
+	Serialize::Storage<DNSZone *> zone;
 
  public:
-	DNSZoneMembershipImpl(Serialize::TypeBase *type) : DNSZoneMembership(type) { }
-	DNSZoneMembershipImpl(Serialize::TypeBase *type, Serialize::ID id) : DNSZoneMembership(type, id) { }
+	using DNSZoneMembership::DNSZoneMembership;
 
 	DNSServer *GetServer() override;
 	void SetServer(DNSServer *) override;
@@ -247,8 +244,8 @@ class DNSIPImpl : public DNSIP
 {
 	friend class DNSIPType;
 
-	DNSServer *server = nullptr;
-	Anope::string ip;
+	Serialize::Storage<DNSServer *> server;
+	Serialize::Storage<Anope::string> ip;
 
  public:
 	DNSIPImpl(Serialize::TypeBase *type) : DNSIP(type) { }

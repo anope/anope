@@ -23,25 +23,27 @@ class AccountImpl : public NickServ::Account
 {
 	friend class AccountType;
 
-	Anope::string display, password, email, language;
-	Oper *oper = nullptr;
-	Anope::string greet;
-	bool unconfirmed = false;
-	bool _private = false;
-	bool autoop = false;
-	bool keepmodes = false;
-	bool killprotect = false;
-	bool killquick = false;
-	bool killimmed = false;
-	bool msg = false;
-	bool secure = false;
-	bool memosignon = false, memoreceive = false, memomail = false;
-	bool hideemail = false, hidemask = false, hidestatus = false, hidequit = false;
+	Serialize::Storage<Anope::string> display, password, email, language;
+	Serialize::Storage<Oper *> oper;
+	Serialize::Storage<Anope::string> greet;
+	Serialize::Storage<bool> unconfirmed;
+	Serialize::Storage<bool> _private;
+	Serialize::Storage<bool> autoop;
+	Serialize::Storage<bool> keepmodes;
+	Serialize::Storage<bool> killprotect;
+	Serialize::Storage<bool> killquick;
+	Serialize::Storage<bool> killimmed;
+	Serialize::Storage<bool> msg;
+	Serialize::Storage<bool> secure;
+	Serialize::Storage<bool> memosignon, memoreceive, memomail;
+	Serialize::Storage<bool> hideemail, hidemask, hidestatus, hidequit;
 
  public:
 	using NickServ::Account::Account;
 	~AccountImpl();
 	void Delete() override;
+
+	bool CanGC() override;
 
 	Anope::string GetDisplay() override;
 	void SetDisplay(const Anope::string &) override;

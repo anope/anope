@@ -21,34 +21,33 @@ class ChannelImpl : public ChanServ::Channel
 {
 	friend class ChannelType;
 
-	NickServ::Account *founder = nullptr, *successor = nullptr;
-	Anope::string name, desc;
-	time_t time_registered = 0, last_used = 0;
-	Anope::string last_topic, last_topic_setter;
-	time_t last_topic_time = 0;
-	int16_t bantype = 0;
-	time_t banexpire = 0;
-	BotInfo *bi = nullptr;
-	bool greet = false;
-	bool fantasy = false;
-	bool noautoop = false;
-	bool peace = false;
-	bool securefounder = false;
-	bool restricted = false;
-	bool secure = false;
-	bool secureops = false;
-	bool signkick = false;
-	bool signkicklevel = false;
-	bool noexpire = false;
-	bool keepmodes = false;
-	bool persist = false;
-	bool topiclock = false;
-	bool keeptopic = false;
-	bool _private = false;
+	Serialize::Storage<NickServ::Account *> founder, successor;
+	Serialize::Storage<Anope::string> name, desc;
+	Serialize::Storage<time_t> time_registered, last_used;
+	Serialize::Storage<Anope::string> last_topic, last_topic_setter;
+	Serialize::Storage<time_t> last_topic_time;
+	Serialize::Storage<int16_t> bantype;
+	Serialize::Storage<time_t> banexpire;
+	Serialize::Storage<BotInfo *> bi;
+	Serialize::Storage<bool> greet;
+	Serialize::Storage<bool> fantasy;
+	Serialize::Storage<bool> noautoop;
+	Serialize::Storage<bool> peace;
+	Serialize::Storage<bool> securefounder;
+	Serialize::Storage<bool> restricted;
+	Serialize::Storage<bool> secure;
+	Serialize::Storage<bool> secureops;
+	Serialize::Storage<bool> signkick;
+	Serialize::Storage<bool> signkicklevel;
+	Serialize::Storage<bool> noexpire;
+	Serialize::Storage<bool> keepmodes;
+	Serialize::Storage<bool> persist;
+	Serialize::Storage<bool> topiclock;
+	Serialize::Storage<bool> keeptopic;
+	Serialize::Storage<bool> _private;
 
  public:
-	ChannelImpl(Serialize::TypeBase *type) : ChanServ::Channel(type) { }
-	ChannelImpl(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::Channel(type, id) { }
+	using ChanServ::Channel::Channel;
 	~ChannelImpl();
 	void Delete() override;
 

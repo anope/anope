@@ -27,8 +27,8 @@ class Oper : public Serialize::Object
 {
 	friend class OperBlockType;
 
-	Anope::string name, password, certfp, host, vhost, type;
-	bool require_oper = false;
+	Serialize::Storage<Anope::string> name, password, certfp, host, vhost, type;
+	Serialize::Storage<bool> require_oper;
 
  public:
 	static constexpr const char *const NAME = "oper";

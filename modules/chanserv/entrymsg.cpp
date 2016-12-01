@@ -24,13 +24,12 @@ class EntryMsgImpl : public EntryMsg
 {
 	friend class EntryMsgType;
 
-	ChanServ::Channel *channel = nullptr;
-	Anope::string creator, message;
-	time_t when = 0;
+	Serialize::Storage<ChanServ::Channel *> channel;
+	Serialize::Storage<Anope::string> creator, message;
+	Serialize::Storage<time_t> when;
 
  public:
-	EntryMsgImpl(Serialize::TypeBase *type) : EntryMsg(type) { }
-	EntryMsgImpl(Serialize::TypeBase *type, Serialize::ID id) : EntryMsg(type, id) { }
+	using EntryMsg::EntryMsg;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *ci) override;

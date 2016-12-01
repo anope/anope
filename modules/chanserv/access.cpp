@@ -29,7 +29,7 @@ class AccessChanAccessImpl : public AccessChanAccess
 {
 	friend class AccessChanAccessType;
 
-	int level = 0;
+	Serialize::Storage<int> level;
 
  public:
 	static constexpr const char *NAME = "accesschanaccess";

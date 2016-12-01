@@ -35,7 +35,7 @@ class XOPChanAccessImpl : public XOPChanAccess
 {
 	friend class XOPChanAccessType;
 
-	Anope::string type;
+	Serialize::Storage<Anope::string> type;
 
  public:
 	using XOPChanAccess::XOPChanAccess;

@@ -37,6 +37,11 @@ void AccountImpl::Delete()
 	return Serialize::Object::Delete();
 }
 
+bool AccountImpl::CanGC()
+{
+	return users.empty();
+}
+
 Anope::string AccountImpl::GetDisplay()
 {
 	return Get<Anope::string>(&AccountType::display);

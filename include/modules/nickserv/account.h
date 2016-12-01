@@ -30,7 +30,7 @@ class CoreExport Account : public Serialize::Object
  public:
 	static constexpr const char *const NAME = "account";
 
-#warning "this gets lost"
+#warning "move lastmail to a field"
 	/* Last time an email was sent to this user */
 	time_t lastmail = 0;
 	/* Users online now logged into this account */

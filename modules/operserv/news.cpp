@@ -77,13 +77,12 @@ class NewsItemImpl : public NewsItem
 {
 	friend class NewsItemType;
 
-	NewsType type;
-	Anope::string text, who;
-	time_t time = 0;
+	Serialize::Storage<NewsType> type;
+	Serialize::Storage<Anope::string> text, who;
+	Serialize::Storage<time_t> time;
 
  public:
-	NewsItemImpl(Serialize::TypeBase *type) : NewsItem(type) { }
-        NewsItemImpl(Serialize::TypeBase *type, Serialize::ID id) : NewsItem(type, id) { }
+	using NewsItem::NewsItem;
 
 	NewsType GetNewsType() override;
 	void SetNewsType(NewsType) override;

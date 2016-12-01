@@ -25,12 +25,11 @@ class NickAccessImpl : public NickAccess
 {
 	friend class NickAccessType;
 
-	NickServ::Account *account = nullptr;
-	Anope::string mask;
+	Serialize::Storage<NickServ::Account *> account;
+	Serialize::Storage<Anope::string> mask;
 
  public:
-	NickAccessImpl(Serialize::TypeBase *type) : NickAccess(type) { }
-	NickAccessImpl(Serialize::TypeBase *type, Serialize::ID id) : NickAccess(type, id) { }
+	using NickAccess::NickAccess;
 
 	NickServ::Account *GetAccount() override;
 	void SetAccount(NickServ::Account *) override;

@@ -25,12 +25,11 @@ class IgnoreImpl : public Ignore
 {
 	friend class IgnoreType;
 
-	Anope::string mask, creator, reason;
-	time_t time = 0;
+	Serialize::Storage<Anope::string> mask, creator, reason;
+	Serialize::Storage<time_t> time;
 
  public:
-	IgnoreImpl(Serialize::TypeBase *type) : Ignore(type) { }
-        IgnoreImpl(Serialize::TypeBase *type, Serialize::ID id) : Ignore(type, id) { }
+	using Ignore::Ignore;
 
 	Anope::string GetMask() override;
 	void SetMask(const Anope::string &) override;

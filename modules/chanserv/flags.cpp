@@ -31,7 +31,7 @@ class FlagsChanAccessImpl : public FlagsChanAccess
 {
 	friend class FlagsChanAccessType;
 
-	Anope::string flags;
+	Serialize::Storage<Anope::string> flags;
 
  public:
 	using FlagsChanAccess::FlagsChanAccess;

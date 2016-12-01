@@ -26,13 +26,12 @@ class NSSuspendInfoImpl : public NSSuspendInfo
 {
 	friend class NSSuspendType;
 
-	NickServ::Account *account = nullptr;
-	Anope::string by, reason;
-	time_t when = 0, expires = 0;
+	Serialize::Storage<NickServ::Account *> account;
+	Serialize::Storage<Anope::string> by, reason;
+	Serialize::Storage<time_t> when, expires;
 
  public:
-	NSSuspendInfoImpl(Serialize::TypeBase *type) : NSSuspendInfo(type) { }
-	NSSuspendInfoImpl(Serialize::TypeBase *type, Serialize::ID id) : NSSuspendInfo(type, id) { }
+	using NSSuspendInfo::NSSuspendInfo;
 
 	NickServ::Account *GetAccount() override;
 	void SetAccount(NickServ::Account *) override;

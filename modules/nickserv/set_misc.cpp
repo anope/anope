@@ -28,12 +28,11 @@ class NSMiscDataImpl : public NSMiscData
 {
 	friend class NSMiscDataType;
 
-	NickServ::Account *account = nullptr;
-	Anope::string name, data;
+	Serialize::Storage<NickServ::Account *> account;
+	Serialize::Storage<Anope::string> name, data;
 
  public:
-	NSMiscDataImpl(Serialize::TypeBase *type) : NSMiscData(type) { }
-	NSMiscDataImpl(Serialize::TypeBase *type, Serialize::ID id) : NSMiscData(type, id) { }
+	using NSMiscData::NSMiscData;
 
 	NickServ::Account *GetAccount() override;
 	void SetAccount(NickServ::Account *s) override;

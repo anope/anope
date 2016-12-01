@@ -30,21 +30,6 @@ class DBSQL : public Module, public Pipe
 	bool inited = false;
 	Anope::string prefix;
 	ServiceReference<Provider> SQL;
-	std::unordered_multimap<Serialize::Object *, Serialize::FieldBase *> cache;
-
-	void CacheMiss(Serialize::Object *object, Serialize::FieldBase *field)
-	{
-		cache.insert(std::make_pair(object, field));
-	}
-
-	bool IsCacheMiss(Serialize::Object *object, Serialize::FieldBase *field)
-	{
-		auto range = cache.equal_range(object);
-		for (auto it = range.first; it != range.second; ++it)
-			if (it->second == field)
-				return true;
-		return false;
-	}
 
 	Result Run(const Query &query)
 	{
@@ -91,8 +76,7 @@ class DBSQL : public Module, public Pipe
 	void OnNotify() override
 	{
 		Commit();
-		Serialize::Clear();
-		cache.clear();
+		Serialize::GC();
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -208,14 +192,8 @@ class DBSQL : public Module, public Pipe
 	{
 		SQL::Result::Value v;
 
-		if (IsCacheMiss(object, field))
-			return EVENT_CONTINUE;
-
 		if (!GetValue(object, field, v))
-		{
-			CacheMiss(object, field);
 			return EVENT_CONTINUE;
-		}
 
 		value = v.value;
 		return EVENT_ALLOW;

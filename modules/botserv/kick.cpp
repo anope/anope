@@ -43,42 +43,41 @@ class KickerDataImpl : public KickerData
 {
 	friend class KickerDataType;
 
-	ChanServ::Channel *channel = nullptr;
+	Serialize::Storage<ChanServ::Channel *> channel;
 
-	bool amsgs = false,
-	     badwords = false,
-	     bolds = false,
-	     caps = false,
-	     colors = false,
-	     flood = false,
-	     italics = false,
-	     repeat = false,
-	     reverses = false,
-	     underlines = false;
+	Serialize::Storage<bool> amsgs,
+	     badwords,
+	     bolds,
+	     caps,
+	     colors,
+	     flood,
+	     italics,
+	     repeat,
+	     reverses,
+	     underlines;
 
-	int16_t ttb_bolds = 0,
-	        ttb_colors = 0,
-	        ttb_reverses = 0,
-	        ttb_underlines = 0,
-	        ttb_badwords = 0,
-	        ttb_caps = 0,
-	        ttb_flood = 0,
-	        ttb_repeat = 0,
-	        ttb_italics = 0,
- 	        ttb_amsgs = 0;
+	Serialize::Storage<int16_t> ttb_bolds,
+	        ttb_colors,
+	        ttb_reverses,
+	        ttb_underlines,
+	        ttb_badwords,
+	        ttb_caps,
+	        ttb_flood,
+	        ttb_repeat,
+	        ttb_italics,
+	        ttb_amsgs;
 
-	int16_t capsmin = 0,
-	        capspercent = 0,
-	        floodlines = 0,
-	        floodsecs = 0,
-	        repeattimes = 0;
+	Serialize::Storage<int16_t> capsmin,
+	        capspercent,
+	        floodlines,
+	        floodsecs,
+	        repeattimes;
 
-	bool dontkickops = false,
-	     dontkickvoices = false;
+	Serialize::Storage<bool> dontkickops,
+	     dontkickvoices;
 
  public:
-	KickerDataImpl(Serialize::TypeBase *type) : KickerData(type) { }
-	KickerDataImpl(Serialize::TypeBase *type, Serialize::ID id) : KickerData(type, id) { }
+	using KickerData::KickerData;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *) override;

@@ -27,13 +27,12 @@ class OperInfoImpl : public OperInfo
 {
 	friend class OperInfoType;
 
-	Serialize::Object *target = nullptr;
-	Anope::string info, creator;
-	time_t created = 0;
+	Serialize::Storage<Serialize::Object *> target;
+	Serialize::Storage<Anope::string> info, creator;
+	Serialize::Storage<time_t> created;
 
  public:
-	OperInfoImpl(Serialize::TypeBase *type) : OperInfo(type) { }
-	OperInfoImpl(Serialize::TypeBase *type, Serialize::ID id) : OperInfo(type, id) { }
+	using OperInfo::OperInfo;
 
 	Serialize::Object *GetTarget() override;
 	void SetTarget(Serialize::Object *) override;

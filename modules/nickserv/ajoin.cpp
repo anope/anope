@@ -25,12 +25,11 @@ class AutoJoinImpl : public AutoJoin
 {
 	friend class AutoJoinType;
 
-	NickServ::Account *account = nullptr;
-	Anope::string channel, key;
+	Serialize::Storage<NickServ::Account *> account;
+	Serialize::Storage<Anope::string> channel, key;
 
  public:
-	AutoJoinImpl(Serialize::TypeBase *type) : AutoJoin(type) { }
-	AutoJoinImpl(Serialize::TypeBase *type, Serialize::ID id) : AutoJoin(type, id) { }
+	using AutoJoin::AutoJoin;
 
 	NickServ::Account *GetAccount() override;
 	void SetAccount(NickServ::Account *acc) override;

@@ -24,13 +24,12 @@ class BadWordImpl : public BadWord
 {
 	friend class BadWordsType;
 
-	ChanServ::Channel *channel = nullptr;
-	Anope::string word;
-	BadWordType type;
+	Serialize::Storage<ChanServ::Channel *> channel;
+	Serialize::Storage<Anope::string> word;
+	Serialize::Storage<BadWordType> type;
 
  public:
-	BadWordImpl(Serialize::TypeBase *type) : BadWord(type) { }
-        BadWordImpl(Serialize::TypeBase *type, Serialize::ID id) : BadWord(type, id) { }
+	using BadWord::BadWord;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *c) override;

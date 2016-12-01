@@ -133,9 +133,9 @@ class BotInfo : public Serialize::Object
 {
 	friend class BotInfoType;
 
-	Anope::string nick, user, host, realname;
-	time_t created = 0;
-	bool operonly = false;
+	Serialize::Storage<Anope::string> nick, user, host, realname;
+	Serialize::Storage<time_t> created;
+	Serialize::Storage<bool> operonly;
 
  public:
 	static constexpr const char *const NAME = "botinfo";

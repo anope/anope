@@ -23,14 +23,13 @@ class MemoImpl : public MemoServ::Memo
 {
 	friend class MemoType;
 
-	MemoServ::MemoInfo *memoinfo = nullptr;
-	Anope::string text, sender;
-	time_t time = 0;
-	bool unread = false, receipt = false;
+	Serialize::Storage<MemoServ::MemoInfo *> memoinfo;
+	Serialize::Storage<Anope::string> text, sender;
+	Serialize::Storage<time_t> time;
+	Serialize::Storage<bool> unread, receipt;
 
  public:
-	MemoImpl(Serialize::TypeBase *type) : MemoServ::Memo(type) { }
-	MemoImpl(Serialize::TypeBase *type, Serialize::ID id) : MemoServ::Memo(type, id) { }
+	using MemoServ::Memo::Memo;
 
 	MemoServ::MemoInfo *GetMemoInfo() override;
 	void SetMemoInfo(MemoServ::MemoInfo *) override;

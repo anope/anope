@@ -25,11 +25,10 @@ class StatsImpl : public Stats
 {
 	friend class StatsType;
 
-	unsigned int maxusercnt = 0;
-	time_t maxusertime = 0;
+	Serialize::Storage<unsigned int> maxusercnt;
+	Serialize::Storage<time_t> maxusertime;
 
  public:
-
 	using Stats::Stats;
 
 	unsigned int GetMaxUserCount() override;

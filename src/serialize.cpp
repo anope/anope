@@ -42,13 +42,25 @@ Object *Serialize::GetID(ID id)
 	return nullptr;
 }
 
-void Serialize::Clear()
+void Serialize::GC()
 {
-	std::unordered_map<ID, Object *> o;
-	objects.swap(o);
+	for (auto it = objects.begin(); it != objects.end();)
+	{
+		Object *o = it->second;
 
-	for (const std::pair<ID, Object *> &p : o)
-		delete p.second;
+		if (!o->CanGC())
+		{
+			// Wipe internal storage to force refetch
+			o->Wipe();
+			++it;
+			continue;
+		}
+
+		Log(LOG_DEBUG_2) << "garbage collected object " << o->id;
+
+		it = objects.erase(it);
+		delete o;
+	}
 }
 
 void Serialize::Unregister(Module *m)
@@ -60,6 +72,14 @@ void Serialize::Unregister(Module *m)
 	for (FieldBase *field : serializableFields)
 		if (field->GetOwner() == m)
 			field->Unregister();
+}
+
+void Serialize::Object::Wipe()
+{
+	for (Serialize::FieldBase *base : s_type->GetFields())
+	{
+		base->Uncache(this);
+	}
 }
 
 std::vector<Edge> Object::GetEdges(TypeBase *type)
@@ -125,8 +145,8 @@ Object::~Object()
 	Log(LOG_DEBUG_2) << "Destructing object id #" << id << " address " << static_cast<void *>(this) << " type " << s_type->GetName();
 
 	/* Remove in memory edges */
- cont:
-	for (const std::pair<TypeBase *, std::vector<Edge>> &p : edges)
+	std::map<TypeBase *, std::vector<Edge>> copy = edges;
+	for (const std::pair<TypeBase *, std::vector<Edge>> &p : copy)
 		for (const Edge &edge : p.second)
 		{
 			if (!edge.direction)
@@ -139,7 +159,6 @@ Object::~Object()
 				Log(LOG_DEBUG_2) << "Removing edge to object id #" << edge.other->id << " type " << edge.other->GetSerializableType()->GetName() << " on field " << edge.field->serialize_name;
 				this->RemoveEdge(edge.other, edge.field);
 			}
-			goto cont;
 		}
 
 	objects.erase(id);
@@ -193,12 +212,18 @@ void Object::RemoveEdge(Object *other, FieldBase *field)
 	else
 		Log(LOG_DEBUG_2) << "Unable to locate edge for removal on #" << this->id << " type " << s_type->GetName() << " -> #" << other->id << " type " << other->GetSerializableType()->GetName();
 
+	if (myedges.empty())
+		this->edges.erase(other->GetSerializableType());
+
 	std::vector<Edge> &theiredges = other->edges[this->GetSerializableType()];
 	it = std::find(theiredges.begin(), theiredges.end(), Edge(this, field, false));
 	if (it != theiredges.end())
 		theiredges.erase(it);
 	else
 		Log(LOG_DEBUG_2) << "Unable to locate edge for removal on #" << this->id << " type " << s_type->GetName() << " <- #" << other->id << " type " << other->GetSerializableType()->GetName();
+
+	if (theiredges.empty())
+		other->edges.erase(this->GetSerializableType());
 }
 
 TypeBase::TypeBase(Module *o, const Anope::string &n) : Service(o, TypeBase::NAME, n), name(n), owner(o)

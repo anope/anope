@@ -27,13 +27,12 @@ class CSSuspendInfoImpl : public CSSuspendInfo
 {
 	friend class CSSuspendType;
 
-	ChanServ::Channel *channel = nullptr;
-	Anope::string by, reason;
-	time_t when = 0, expires = 0;
+	Serialize::Storage<ChanServ::Channel *> channel;
+	Serialize::Storage<Anope::string> by, reason;
+	Serialize::Storage<time_t> when, expires;
 
  public:
-	CSSuspendInfoImpl(Serialize::TypeBase *type) : CSSuspendInfo(type) { }
-	CSSuspendInfoImpl(Serialize::TypeBase *type, Serialize::ID id) : CSSuspendInfo(type, id) { }
+	using CSSuspendInfo::CSSuspendInfo;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *s) override;

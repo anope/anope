@@ -29,12 +29,11 @@ class CSMiscDataImpl : public CSMiscData
 {
 	friend class CSMiscDataType;
 
-	ChanServ::Channel *channel = nullptr;
-	Anope::string name, data;
+	Serialize::Storage<ChanServ::Channel *> channel;
+	Serialize::Storage<Anope::string> name, data;
 
  public:
-	CSMiscDataImpl(Serialize::TypeBase *type) : CSMiscData(type) { }
-	CSMiscDataImpl(Serialize::TypeBase *type, Serialize::ID id) : CSMiscData(type, id) { }
+	using CSMiscData::CSMiscData;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *s) override;

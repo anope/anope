@@ -24,14 +24,13 @@ class AutoKickImpl : public AutoKick
 {
 	friend class AutoKickType;
 
-	ChanServ::Channel *channel = nullptr;
-	NickServ::Account *account = nullptr;
-	Anope::string mask, reason, creator;
-	time_t addtime = 0, last_time = 0;
+	Serialize::Storage<ChanServ::Channel *> channel;
+	Serialize::Storage<NickServ::Account *> account;
+	Serialize::Storage<Anope::string> mask, reason, creator;
+	Serialize::Storage<time_t> addtime, last_time;
 
  public:
-	AutoKickImpl(Serialize::TypeBase *type) : AutoKick(type) { }
-        AutoKickImpl(Serialize::TypeBase *type, Serialize::ID id) : AutoKick(type, id) { }
+	using AutoKick::AutoKick;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *ci) override;

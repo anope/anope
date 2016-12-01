@@ -47,13 +47,12 @@ class ExceptionImpl : public Exception
 {
 	friend class ExceptionType;
 
-	Anope::string mask, who, reason;
-	unsigned int limit = 0;
-	time_t time = 0, expires = 0;
+	Serialize::Storage<Anope::string> mask, who, reason;
+	Serialize::Storage<unsigned int> limit;
+	Serialize::Storage<time_t> time, expires;
 
  public:
-	ExceptionImpl(Serialize::TypeBase *type) : Exception(type) { }
-	ExceptionImpl(Serialize::TypeBase *type, Serialize::ID id) : Exception(type, id) { }
+	using Exception::Exception;
 
 	Anope::string GetMask() override;
 	void SetMask(const Anope::string &) override;

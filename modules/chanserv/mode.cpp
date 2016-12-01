@@ -25,14 +25,13 @@ class ModeLockImpl : public ModeLock
 {
 	friend class ModeLockType;
 
-	ChanServ::Channel *channel = nullptr;
-	bool set = false;
-	Anope::string name, param, setter;
-	time_t created = 0;
+	Serialize::Storage<ChanServ::Channel *> channel;
+	Serialize::Storage<bool> set;
+	Serialize::Storage<Anope::string> name, param, setter;
+	Serialize::Storage<time_t> created;
 
  public:
-	ModeLockImpl(Serialize::TypeBase *type) : ModeLock(type) { }
-	ModeLockImpl(Serialize::TypeBase *type, Serialize::ID id) : ModeLock(type, id) { }
+	using ModeLock::ModeLock;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *ci) override;

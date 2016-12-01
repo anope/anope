@@ -24,15 +24,14 @@ class HostRequest : public Serialize::Object
 {
 	friend class HostRequestType;
 
-	NickServ::Account *acc = nullptr;
-	Anope::string ident, host;
-	time_t time = 0;
+	Serialize::Storage<NickServ::Account *> acc;
+	Serialize::Storage<Anope::string> ident, host;
+	Serialize::Storage<time_t> time;
 
  public:
 	static constexpr const char *const NAME = "hostrequest";
 	
-	HostRequest(Serialize::TypeBase *type) : Serialize::Object(type) { }
-        HostRequest(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
+	using Serialize::Object::Object;
 
 	NickServ::Account *GetAccount();
 	void SetAccount(NickServ::Account *);

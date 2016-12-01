@@ -21,12 +21,11 @@ class ModeImpl : public NickServ::Mode
 {
 	friend class NSModeType;
 
-	NickServ::Account *account = nullptr;
-	Anope::string mode;
+	Serialize::Storage<NickServ::Account *> account;
+	Serialize::Storage<Anope::string> mode;
 
  public:
-	ModeImpl(Serialize::TypeBase *type) : NickServ::Mode(type) { }
-	ModeImpl(Serialize::TypeBase *type, Serialize::ID id) : NickServ::Mode(type, id) { }
+	using NickServ::Mode::Mode;
 
 	NickServ::Account *GetAccount() override;
 	void SetAccount(NickServ::Account *) override;

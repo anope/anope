@@ -57,12 +57,11 @@ class NSCertEntryImpl : public NSCertEntry
 {
 	friend class NSCertEntryType;
 
-	NickServ::Account *account = nullptr;
-	Anope::string cert;
+	Serialize::Storage<NickServ::Account *> account;
+	Serialize::Storage<Anope::string> cert;
 
  public:
-	NSCertEntryImpl(Serialize::TypeBase *type) : NSCertEntry(type) { }
-	NSCertEntryImpl(Serialize::TypeBase *type, Serialize::ID id) : NSCertEntry(type, id) { }
+	using NSCertEntry::NSCertEntry;
 	~NSCertEntryImpl();
 
 	NickServ::Account *GetAccount() override;

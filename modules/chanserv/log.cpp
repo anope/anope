@@ -25,13 +25,12 @@ class LogSettingImpl : public LogSetting
 {
 	friend class LogSettingType;
 
-	ChanServ::Channel *channel = nullptr;
-	Anope::string service_name, command_service, command_name, method, extra, creator;
-	time_t created = 0;
+	Serialize::Storage<ChanServ::Channel *> channel;
+	Serialize::Storage<Anope::string> service_name, command_service, command_name, method, extra, creator;
+	Serialize::Storage<time_t> created;
 
  public:
-	LogSettingImpl(Serialize::TypeBase *type) : LogSetting(type) { }
-	LogSettingImpl(Serialize::TypeBase *type, Serialize::ID id) : LogSetting(type, id) { }
+	using LogSetting::LogSetting;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *) override;

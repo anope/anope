@@ -534,6 +534,7 @@ namespace Anope
 	 * @param Raw message from the uplink
 	 */
 	extern void Process(const Anope::string &);
+	extern void ProcessCommand(MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params);
 
 	/** Does a blocking dns query and returns the first IP.
 	 * @param host host to look up

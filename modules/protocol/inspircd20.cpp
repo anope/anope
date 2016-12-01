@@ -797,6 +797,51 @@ struct IRCDMessageCapab : rfc1459::Capab
 	}
 };
 
+struct IRCDMessageChgHost : IRCDMessage
+{
+	IRCDMessageChgHost(Module *creator) : IRCDMessage(creator, "CHGHOST", 2) { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	{
+		User *u = User::Find(params[0]);
+		if (!u || u->server != Me)
+			return;
+
+		u->SetDisplayedHost(params[1]);
+		Uplink::Send(u, "FHOST", params[1]);
+	}
+};
+
+struct IRCDMessageChgIdent : IRCDMessage
+{
+	IRCDMessageChgIdent(Module *creator) : IRCDMessage(creator, "CHGIDENT", 2) { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	{
+		User *u = User::Find(params[0]);
+		if (!u || u->server != Me)
+			return;
+
+		u->SetIdent(params[1]);
+		Uplink::Send(u, "FIDENT", params[1]);
+	}
+};
+
+struct IRCDMessageChgName : IRCDMessage
+{
+	IRCDMessageChgName(Module *creator) : IRCDMessage(creator, "CHGNAME", 2) { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	{
+		User *u = User::Find(params[0]);
+		if (!u || u->server != Me)
+			return;
+
+		u->SetRealname(params[1]);
+		Uplink::Send(u, "FNAME", params[1]);
+	}
+};
+
 struct IRCDMessageEncap : IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -806,33 +851,10 @@ struct IRCDMessageEncap : IRCDMessage
 		if (Anope::Match(Me->GetSID(), params[0]) == false)
 			return;
 
-		if (params[1] == "CHGIDENT")
-		{
-			User *u = User::Find(params[2]);
-			if (!u || u->server != Me)
-				return;
+		const Anope::string &command = params[1];
+		std::vector<Anope::string> encap_params(params.begin() + 2, params.end());
 
-			u->SetIdent(params[3]);
-			Uplink::Send(u, "FIDENT", params[3]);
-		}
-		else if (params[1] == "CHGHOST")
-		{
-			User *u = User::Find(params[2]);
-			if (!u || u->server != Me)
-				return;
-
-			u->SetDisplayedHost(params[3]);
-			Uplink::Send(u, "FHOST", params[3]);
-		}
-		else if (params[1] == "CHGNAME")
-		{
-			User *u = User::Find(params[2]);
-			if (!u || u->server != Me)
-				return;
-
-			u->SetRealname(params[3]);
-			Uplink::Send(u, "FNAME", params[3]);
-		}
+		Anope::ProcessCommand(source, command, encap_params);
 	}
 };
 
@@ -1364,6 +1386,9 @@ class ProtoInspIRCd20 : public Module
 
 	/* Our message handlers */
 	IRCDMessageCapab message_capab;
+	IRCDMessageChgHost message_chghost;
+	IRCDMessageChgIdent message_chgident;
+	IRCDMessageChgName message_chgname;
 	IRCDMessageEncap message_encap;
 	IRCDMessageEndburst message_endburst;
 	IRCDMessageFHost message_fhost;
@@ -1417,6 +1442,9 @@ class ProtoInspIRCd20 : public Module
 		, message_topic(this)
 
 		, message_capab(this)
+		, message_chghost(this)
+		, message_chgident(this)
+		, message_chgname(this)
 		, message_encap(this)
 		, message_endburst(this)
 		, message_fhost(this)

@@ -55,25 +55,38 @@ void Anope::Process(const Anope::string &buffer)
 		return;
 	}
 
-	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
-
 	MessageSource src(source);
 
 	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::Message::OnMessage, src, command, params);
 
+	ProcessCommand(src, command, params);
+}
+
+void Anope::ProcessCommand(MessageSource &src, const Anope::string &command, const std::vector<Anope::string> &params)
+{
+	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
+
 	ServiceReference<IRCDMessage> m(proto_name + "/" + command.lower());
 	if (!m)
 	{
-		Log(LOG_DEBUG) << "unknown message from server (" << buffer << ")";
+		Anope::string buffer = "[" + src.GetSource() + "] " + command;
+		if (!params.empty())
+		{
+			for (unsigned int i = 0; i < params.size() - 1; ++i)
+				buffer += " " + params[i];
+			buffer += " :" + params[params.size() - 1];
+		}
+
+		Log(LOG_DEBUG) << "unknown command from server (" << buffer << ")";
 		return;
 	}
 
 	if (m->HasFlag(IRCDMESSAGE_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
 		Log(LOG_DEBUG) << "invalid parameters for " << command << ": " << params.size() << " != " << m->GetParamCount();
 	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_USER) && !src.GetUser())
-		Log(LOG_DEBUG) << "unexpected non-user source " << source << " for " << command;
-	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
-		Log(LOG_DEBUG) << "unexpected non-server source " << source << " for " << command;
+		Log(LOG_DEBUG) << "unexpected non-user source " << src.GetSource() << " for " << command;
+	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !src.GetServer())
+		Log(LOG_DEBUG) << "unexpected non-server source " << src.GetSource() << " for " << command;
 	else
 		m->Run(src, params);
 }

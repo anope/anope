@@ -1147,12 +1147,7 @@ struct IRCDMessageMode : IRCDMessage
 			   users modes, we have to kludge this
 			   as it slightly breaks RFC1459
 			 */
-			User *u = source.GetUser();
-			// This can happen with server-origin modes.
-			if (!u)
-				u = User::Find(params[0]);
-			// if it's still null, drop it like fire.
-			// most likely situation was that server introduced a nick which we subsequently akilled
+			User *u = User::Find(params[0]);
 			if (u)
 				u->SetModesInternal(source, "%s", params[1].c_str());
 		}

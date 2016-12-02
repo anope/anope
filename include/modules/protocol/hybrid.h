@@ -64,10 +64,10 @@ class Pong : public IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
 
-class Server : public IRCDMessage
+class ServerMessage : public IRCDMessage
 {
  public:
-	Server(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	ServerMessage(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };

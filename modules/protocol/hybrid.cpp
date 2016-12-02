@@ -375,7 +375,15 @@ void hybrid::Join::Run(MessageSource &source, const std::vector<Anope::string> &
 /* :0MCAAAAAB NICK newnick 1350157102 */
 void hybrid::Nick::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	source.GetUser()->ChangeNick(params[0], convertTo<time_t>(params[1]));
+	time_t ts = Anope::CurTime;
+
+	try
+	{
+		ts = convertTo<time_t>(params[1]);
+	}
+	catch (const ConvertException &) { }
+
+	source.GetUser()->ChangeNick(params[0], ts);
 }
 
 struct IRCDMessagePass : IRCDMessage
@@ -397,21 +405,28 @@ void hybrid::Pong::Run(MessageSource &source, const std::vector<Anope::string> &
 
 /*        0          1  2                       */
 /* SERVER hades.arpa 1 :ircd-hybrid test server */
-void hybrid::Server::Run(MessageSource &source, const std::vector<Anope::string> &params)
+void hybrid::ServerMessage::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	/* Servers other than our immediate uplink are introduced via SID */
 	if (params[1] != "1")
 		return;
 
-	new ::Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+	new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
 
 	IRCD->SendPing(Me->GetName(), params[0]);
 }
 
 void hybrid::SID::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	unsigned int hops = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
-	new ::Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[3], params[2]);
+	unsigned int hops = 0;
+
+	try
+	{
+		hops = convertTo<unsigned int>(params[1]);
+	}
+	catch (const ConvertException &) { }
+
+	new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[3], params[2]);
 
 	IRCD->SendPing(Me->GetName(), params[0]);
 }
@@ -435,7 +450,7 @@ void hybrid::SJoin::Run(MessageSource &source, const std::vector<Anope::string> 
 		rfc1459::Join::SJoinUser sju;
 
 		/* Get prefixes from the nick */
-		for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
+		for (char ch; !buf.empty() && (ch = ModeManager::GetStatusChar(buf[0]));)
 		{
 			buf.erase(buf.begin());
 			sju.first.AddMode(ch);
@@ -451,7 +466,14 @@ void hybrid::SJoin::Run(MessageSource &source, const std::vector<Anope::string> 
 		users.push_back(sju);
 	}
 
-	time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
+	time_t ts = Anope::CurTime;
+
+	try
+	{
+		ts = convertTo<time_t>(params[0]);
+	}
+	catch (const ConvertException &) { }
+
 	rfc1459::Join::SJoin(source, params[1], ts, modes, users);
 }
 
@@ -467,7 +489,18 @@ void hybrid::SVSMode::Run(MessageSource &source, const std::vector<Anope::string
 	if (!u)
 		return;
 
-	if (!params[1].is_pos_number_only() || convertTo<time_t>(params[1]) != u->timestamp)
+	time_t ts;
+
+	try
+	{
+		ts = convertTo<time_t>(params[1]);
+	}
+	catch (const ConvertException &)
+	{
+		return;
+	}
+
+	if (ts != u->timestamp)
 		return;
 
 	u->SetModesInternal(source, "%s", params[2].c_str());
@@ -477,8 +510,15 @@ void hybrid::TBurst::Run(MessageSource &source, const std::vector<Anope::string>
 {
 	Anope::string setter;
 	sepstream(params[3], '!').GetToken(setter, 0);
-	time_t topic_time = Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime;
 	Channel *c = Channel::Find(params[1]);
+
+	time_t topic_time = Anope::CurTime;
+
+	try
+	{
+		topic_time = convertTo<time_t>(params[2]);
+	}
+	catch (const ConvertException &ex) { }
 
 	if (c)
 		c->ChangeTopicInternal(NULL, setter, params[4], topic_time);
@@ -517,10 +557,18 @@ void hybrid::UID::Run(MessageSource &source, const std::vector<Anope::string> &p
 	if (params[8] != "0" && params[8] != "*")
 		na = NickServ::FindNick(params[8]);
 
+	time_t ts = 0;
+
+	try
+	{
+		ts = convertTo<time_t>(params[2]);
+	}
+	catch (const ConvertException &) { }
+
 	/* Source is always the server */
 	User::OnIntroduce(params[0], params[4], params[5], "",
 			ip, source.GetServer(),
-			params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
+			params[9], ts,
 			params[3], params[7], na ? na->GetAccount() : NULL);
 }
 
@@ -568,7 +616,7 @@ class ProtoHybrid : public Module
 	hybrid::Nick message_nick;
 	IRCDMessagePass message_pass;
 	hybrid::Pong message_pong;
-	hybrid::Server message_server;
+	hybrid::ServerMessage message_server;
 	hybrid::SID message_sid;
 	hybrid::SJoin message_sjoin;
 	hybrid::SVSMode message_svsmode;

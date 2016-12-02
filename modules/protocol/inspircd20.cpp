@@ -24,6 +24,7 @@
 #include "modules/chanserv/mode.h"
 #include "modules/chanserv/set.h"
 #include "modules/protocol/rfc1459.h"
+#include "modules/protocol/inspircd20.h"
 
 struct SASLUser
 {
@@ -631,380 +632,328 @@ namespace InspIRCdExtban
 	};
 }
 
-struct IRCDMessageCapab : rfc1459::Capab
+void inspircd20::Capab::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageCapab(Module *creator) : rfc1459::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	if (params[0].equals_cs("START"))
 	{
-		if (params[0].equals_cs("START"))
+		if (params.size() >= 2)
+			spanningtree_proto_ver = (Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0);
+
+		if (spanningtree_proto_ver < 1202)
 		{
-			if (params.size() >= 2)
-				spanningtree_proto_ver = (Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0);
-
-			if (spanningtree_proto_ver < 1202)
-			{
-				Uplink::Send("ERROR", "Protocol mismatch, no or invalid protocol version given in CAPAB START");
-				Anope::QuitReason = "Protocol mismatch, no or invalid protocol version given in CAPAB START";
-				Anope::Quitting = true;
-				return;
-			}
-
-			/* reset CAPAB */
-			Servers::Capab.insert("SERVERS");
-			Servers::Capab.insert("CHGHOST");
-			Servers::Capab.insert("CHGIDENT");
-			Servers::Capab.insert("TOPICLOCK");
-			IRCD->CanSVSHold = false;
-		}
-		else if (params[0].equals_cs("CHANMODES") && params.size() > 1)
-		{
-			spacesepstream ssep(params[1]);
-			Anope::string capab;
-
-			while (ssep.GetToken(capab))
-			{
-				if (capab.find('=') == Anope::string::npos)
-					continue;
-
-				Anope::string modename = capab.substr(0, capab.find('='));
-				Anope::string modechar = capab.substr(capab.find('=') + 1);
-				char symbol = 0;
-
-				if (modechar.empty())
-					continue;
-
-				if (modechar.length() == 2)
-				{
-					symbol = modechar[0];
-					modechar = modechar.substr(1);
-				}
-
-				ChannelMode *cm = ModeManager::FindChannelModeByChar(modechar[0]);
-				if (cm == nullptr)
-				{
-					Log(this->GetOwner()) << "Warning: Uplink has unknown channel mode " << modename << "=" << modechar;
-					continue;
-				}
-
-				char modesymbol = cm->type == MODE_STATUS ? (anope_dynamic_static_cast<ChannelModeStatus *>(cm))->symbol : 0;
-				if (symbol != modesymbol)
-				{
-					Log(this->GetOwner()) << "Warning: Channel mode " << modename << " has a misconfigured status character";
-					continue;
-				}
-			}
-		}
-		if (params[0].equals_cs("USERMODES") && params.size() > 1)
-		{
-			spacesepstream ssep(params[1]);
-			Anope::string capab;
-
-			while (ssep.GetToken(capab))
-			{
-				if (capab.find('=') == Anope::string::npos)
-					continue;
-
-				Anope::string modename = capab.substr(0, capab.find('='));
-				Anope::string modechar = capab.substr(capab.find('=') + 1);
-
-				if (modechar.empty())
-					continue;
-
-				UserMode *um = ModeManager::FindUserModeByChar(modechar[0]);
-				if (um == nullptr)
-				{
-					Log(this->GetOwner()) << "Warning: Uplink has unknown user mode " << modename << "=" << modechar;
-					continue;
-				}
-			}
-		}
-		else if (params[0].equals_cs("MODULES") && params.size() > 1)
-		{
-			spacesepstream ssep(params[1]);
-			Anope::string module;
-
-			while (ssep.GetToken(module))
-			{
-				if (module.equals_cs("m_svshold.so"))
-					IRCD->CanSVSHold = true;
-				else if (module.find("m_rline.so") == 0)
-				{
-					Servers::Capab.insert("RLINE");
-					const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
-					if (!regexengine.empty() && module.length() > 11 && regexengine != module.substr(11))
-						Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << regexengine << ". This may cause inconsistencies.";
-				}
-				else if (module.equals_cs("m_topiclock.so"))
-					Servers::Capab.insert("TOPICLOCK");
-			}
-		}
-		else if (params[0].equals_cs("MODSUPPORT") && params.size() > 1)
-		{
-			spacesepstream ssep(params[1]);
-			Anope::string module;
-
-			while (ssep.GetToken(module))
-			{
-				if (module.equals_cs("m_services_account.so"))
-					Servers::Capab.insert("SERVICES");
-				else if (module.equals_cs("m_chghost.so"))
-					Servers::Capab.insert("CHGHOST");
-				else if (module.equals_cs("m_chgident.so"))
-					Servers::Capab.insert("CHGIDENT");
-			}
-		}
-		else if (params[0].equals_cs("CAPABILITIES") && params.size() > 1)
-		{
-			spacesepstream ssep(params[1]);
-			Anope::string capab;
-			while (ssep.GetToken(capab))
-			{
-				if (capab.find("MAXMODES=") != Anope::string::npos)
-				{
-					Anope::string maxmodes(capab.begin() + 9, capab.end());
-					IRCD->MaxModes = maxmodes.is_pos_number_only() ? convertTo<unsigned>(maxmodes) : 3;
-				}
-				else if (capab == "GLOBOPS=1")
-					Servers::Capab.insert("GLOBOPS");
-			}
-		}
-		else if (params[0].equals_cs("END"))
-		{
-			if (!Servers::Capab.count("SERVICES"))
-			{
-				Uplink::Send("ERROR", "m_services_account.so is not loaded. This is required by Anope");
-				Anope::QuitReason = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
-				Anope::Quitting = true;
-				return;
-			}
-			if (!ModeManager::FindUserModeByName("PRIV"))
-			{
-				Uplink::Send("ERROR", "m_hidechans.so is not loaded. This is required by Anope");
-				Anope::QuitReason = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
-				Anope::Quitting = true;
-				return;
-			}
-			if (!IRCD->CanSVSHold)
-				Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
-			if (!Servers::Capab.count("CHGHOST"))
-				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
-			if (!Servers::Capab.count("CHGIDENT"))
-				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
-		}
-
-		rfc1459::Capab::Run(source, params);
-	}
-};
-
-struct IRCDMessageChgHost : IRCDMessage
-{
-	IRCDMessageChgHost(Module *creator) : IRCDMessage(creator, "CHGHOST", 2) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = User::Find(params[0]);
-		if (!u || u->server != Me)
+			Uplink::Send("ERROR", "Protocol mismatch, no or invalid protocol version given in CAPAB START");
+			Anope::QuitReason = "Protocol mismatch, no or invalid protocol version given in CAPAB START";
+			Anope::Quitting = true;
 			return;
-
-		u->SetDisplayedHost(params[1]);
-		Uplink::Send(u, "FHOST", params[1]);
-	}
-};
-
-struct IRCDMessageChgIdent : IRCDMessage
-{
-	IRCDMessageChgIdent(Module *creator) : IRCDMessage(creator, "CHGIDENT", 2) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = User::Find(params[0]);
-		if (!u || u->server != Me)
-			return;
-
-		u->SetIdent(params[1]);
-		Uplink::Send(u, "FIDENT", params[1]);
-	}
-};
-
-struct IRCDMessageChgName : IRCDMessage
-{
-	IRCDMessageChgName(Module *creator) : IRCDMessage(creator, "CHGNAME", 2) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = User::Find(params[0]);
-		if (!u || u->server != Me)
-			return;
-
-		u->SetRealname(params[1]);
-		Uplink::Send(u, "FNAME", params[1]);
-	}
-};
-
-struct IRCDMessageEncap : IRCDMessage
-{
-	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		if (Anope::Match(Me->GetSID(), params[0]) == false)
-			return;
-
-		const Anope::string &command = params[1];
-		std::vector<Anope::string> encap_params(params.begin() + 2, params.end());
-
-		Anope::ProcessCommand(source, command, encap_params);
-	}
-};
-
-struct IRCDMessageEndburst : IRCDMessage
-{
-	IRCDMessageEndburst(Module *creator) : IRCDMessage(creator, "ENDBURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		Server *s = source.GetServer();
-
-		Log(LOG_DEBUG) << "Processed ENDBURST for " << s->GetName();
-
-		s->Sync(true);
-	}
-};
-
-struct IRCDMessageFHost : IRCDMessage
-{
-	IRCDMessageFHost(Module *creator) : IRCDMessage(creator, "FHOST", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = source.GetUser();
-		if (u->HasMode("CLOAK"))
-			u->RemoveModeInternal(source, ModeManager::FindUserModeByName("CLOAK"));
-		u->SetDisplayedHost(params[0]);
-	}
-};
-
-struct IRCDMessageFIdent : IRCDMessage
-{
-	IRCDMessageFIdent(Module *creator) : IRCDMessage(creator, "FIDENT", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		source.GetUser()->SetIdent(params[0]);
-	}
-};
-
-struct IRCDMessageFJoin : IRCDMessage
-{
-	IRCDMessageFJoin(Module *creator) : IRCDMessage(creator, "FJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		Anope::string modes;
-		if (params.size() >= 3)
-		{
-			for (unsigned i = 2; i < params.size() - 1; ++i)
-				modes += " " + params[i];
-			if (!modes.empty())
-				modes.erase(modes.begin());
 		}
 
-		std::list<rfc1459::Join::SJoinUser> users;
+		/* reset CAPAB */
+		Servers::Capab.insert("SERVERS");
+		Servers::Capab.insert("CHGHOST");
+		Servers::Capab.insert("CHGIDENT");
+		Servers::Capab.insert("TOPICLOCK");
+		IRCD->CanSVSHold = false;
+	}
+	else if (params[0].equals_cs("CHANMODES") && params.size() > 1)
+	{
+		spacesepstream ssep(params[1]);
+		Anope::string capab;
 
-		spacesepstream sep(params[params.size() - 1]);
-		Anope::string buf;
-		while (sep.GetToken(buf))
+		while (ssep.GetToken(capab))
 		{
-			rfc1459::Join::SJoinUser sju;
+			if (capab.find('=') == Anope::string::npos)
+				continue;
 
-			/* Loop through prefixes and find modes for them */
-			for (char c; (c = buf[0]) != ',' && c;)
+			Anope::string modename = capab.substr(0, capab.find('='));
+			Anope::string modechar = capab.substr(capab.find('=') + 1);
+			char symbol = 0;
+
+			if (modechar.empty())
+				continue;
+
+			if (modechar.length() == 2)
 			{
-				buf.erase(buf.begin());
-				sju.first.AddMode(c);
+				symbol = modechar[0];
+				modechar = modechar.substr(1);
 			}
-			/* Erase the , */
-			if (!buf.empty())
-				buf.erase(buf.begin());
 
-			sju.second = User::Find(buf);
-			if (!sju.second)
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(modechar[0]);
+			if (cm == nullptr)
 			{
-				Log(LOG_DEBUG) << "FJOIN for non-existent user " << buf << " on " << params[0];
+				Log(this->GetOwner()) << "Warning: Uplink has unknown channel mode " << modename << "=" << modechar;
 				continue;
 			}
 
-			users.push_back(sju);
+			char modesymbol = cm->type == MODE_STATUS ? (anope_dynamic_static_cast<ChannelModeStatus *>(cm))->symbol : 0;
+			if (symbol != modesymbol)
+			{
+				Log(this->GetOwner()) << "Warning: Channel mode " << modename << " has a misconfigured status character";
+				continue;
+			}
 		}
-
-		time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
-		rfc1459::Join::SJoin(source, params[0], ts, modes, users);
 	}
-};
-
-struct IRCDMessageFMode : IRCDMessage
-{
-	IRCDMessageFMode(Module *creator) : IRCDMessage(creator, "FMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	if (params[0].equals_cs("USERMODES") && params.size() > 1)
 	{
-		/* :source FMODE #test 12345678 +nto foo */
+		spacesepstream ssep(params[1]);
+		Anope::string capab;
 
-		Anope::string modes = params[2];
-		for (unsigned n = 3; n < params.size(); ++n)
-			modes += " " + params[n];
-
-		Channel *c = Channel::Find(params[0]);
-		time_t ts;
-
-		try
+		while (ssep.GetToken(capab))
 		{
-			ts = convertTo<time_t>(params[1]);
-		}
-		catch (const ConvertException &)
-		{
-			ts = 0;
-		}
+			if (capab.find('=') == Anope::string::npos)
+				continue;
 
-		if (c)
-			c->SetModesInternal(source, modes, ts);
+			Anope::string modename = capab.substr(0, capab.find('='));
+			Anope::string modechar = capab.substr(capab.find('=') + 1);
+
+			if (modechar.empty())
+				continue;
+
+			UserMode *um = ModeManager::FindUserModeByChar(modechar[0]);
+			if (um == nullptr)
+			{
+				Log(this->GetOwner()) << "Warning: Uplink has unknown user mode " << modename << "=" << modechar;
+				continue;
+			}
+		}
 	}
-};
-
-struct IRCDMessageFTopic : IRCDMessage
-{
-	IRCDMessageFTopic(Module *creator) : IRCDMessage(creator, "FTOPIC", 4) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	else if (params[0].equals_cs("MODULES") && params.size() > 1)
 	{
-		/* :source FTOPIC channel topicts setby :topic */
+		spacesepstream ssep(params[1]);
+		Anope::string module;
 
-		Channel *c = Channel::Find(params[0]);
-		if (c)
-			c->ChangeTopicInternal(NULL, params[2], params[3], Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime);
+		while (ssep.GetToken(module))
+		{
+			if (module.equals_cs("m_svshold.so"))
+				IRCD->CanSVSHold = true;
+			else if (module.find("m_rline.so") == 0)
+			{
+				Servers::Capab.insert("RLINE");
+				const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
+				if (!regexengine.empty() && module.length() > 11 && regexengine != module.substr(11))
+					Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << regexengine << ". This may cause inconsistencies.";
+			}
+			else if (module.equals_cs("m_topiclock.so"))
+				Servers::Capab.insert("TOPICLOCK");
+		}
 	}
-};
-
-struct IRCDMessageIdle : IRCDMessage
-{
-	IRCDMessageIdle(Module *creator) : IRCDMessage(creator, "IDLE", 1) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	else if (params[0].equals_cs("MODSUPPORT") && params.size() > 1)
 	{
-		ServiceBot *bi = ServiceBot::Find(params[0]);
-		if (bi)
+		spacesepstream ssep(params[1]);
+		Anope::string module;
+
+		while (ssep.GetToken(module))
 		{
-			Uplink::Send(bi, "IDLE", source.GetSource(), Anope::StartTime, Anope::CurTime - bi->lastmsg);
-		}
-		else
-		{
-			User *u = User::Find(params[0]);
-			if (u && u->server == Me)
-				Uplink::Send(u, "IDLE", source.GetSource(), Anope::StartTime, 0);
+			if (module.equals_cs("m_services_account.so"))
+				Servers::Capab.insert("SERVICES");
+			else if (module.equals_cs("m_chghost.so"))
+				Servers::Capab.insert("CHGHOST");
+			else if (module.equals_cs("m_chgident.so"))
+				Servers::Capab.insert("CHGIDENT");
 		}
 	}
-};
+	else if (params[0].equals_cs("CAPABILITIES") && params.size() > 1)
+	{
+		spacesepstream ssep(params[1]);
+		Anope::string capab;
+		while (ssep.GetToken(capab))
+		{
+			if (capab.find("MAXMODES=") != Anope::string::npos)
+			{
+				Anope::string maxmodes(capab.begin() + 9, capab.end());
+				IRCD->MaxModes = maxmodes.is_pos_number_only() ? convertTo<unsigned>(maxmodes) : 3;
+			}
+			else if (capab == "GLOBOPS=1")
+				Servers::Capab.insert("GLOBOPS");
+		}
+	}
+	else if (params[0].equals_cs("END"))
+	{
+		if (!Servers::Capab.count("SERVICES"))
+		{
+			Uplink::Send("ERROR", "m_services_account.so is not loaded. This is required by Anope");
+			Anope::QuitReason = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
+			Anope::Quitting = true;
+			return;
+		}
+		if (!ModeManager::FindUserModeByName("PRIV"))
+		{
+			Uplink::Send("ERROR", "m_hidechans.so is not loaded. This is required by Anope");
+			Anope::QuitReason = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
+			Anope::Quitting = true;
+			return;
+		}
+		if (!IRCD->CanSVSHold)
+			Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
+		if (!Servers::Capab.count("CHGHOST"))
+			Log() << "CHGHOST missing, Usage disabled until module is loaded.";
+		if (!Servers::Capab.count("CHGIDENT"))
+			Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
+	}
+
+	rfc1459::Capab::Run(source, params);
+}
+
+void inspircd20::ChgHost::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *u = User::Find(params[0]);
+	if (!u || u->server != Me)
+		return;
+
+	u->SetDisplayedHost(params[1]);
+	Uplink::Send(u, "FHOST", params[1]);
+}
+
+void inspircd20::ChgIdent::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *u = User::Find(params[0]);
+	if (!u || u->server != Me)
+		return;
+
+	u->SetIdent(params[1]);
+	Uplink::Send(u, "FIDENT", params[1]);
+}
+
+void inspircd20::ChgName::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *u = User::Find(params[0]);
+	if (!u || u->server != Me)
+		return;
+
+	u->SetRealname(params[1]);
+	Uplink::Send(u, "FNAME", params[1]);
+}
+
+void inspircd20::Encap::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	if (Anope::Match(Me->GetSID(), params[0]) == false)
+		return;
+
+	const Anope::string &command = params[1];
+	std::vector<Anope::string> encap_params(params.begin() + 2, params.end());
+
+	Anope::ProcessCommand(source, command, encap_params);
+}
+
+void inspircd20::Endburst::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	Server *s = source.GetServer();
+
+	Log(LOG_DEBUG) << "Processed ENDBURST for " << s->GetName();
+
+	s->Sync(true);
+}
+
+void inspircd20::FHost::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *u = source.GetUser();
+	if (u->HasMode("CLOAK"))
+		u->RemoveModeInternal(source, ModeManager::FindUserModeByName("CLOAK"));
+	u->SetDisplayedHost(params[0]);
+}
+
+void inspircd20::FIdent::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	source.GetUser()->SetIdent(params[0]);
+}
+
+void inspircd20::FJoin::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	Anope::string modes;
+	if (params.size() >= 3)
+	{
+		for (unsigned i = 2; i < params.size() - 1; ++i)
+			modes += " " + params[i];
+		if (!modes.empty())
+			modes.erase(modes.begin());
+	}
+
+	std::list<rfc1459::Join::SJoinUser> users;
+
+	spacesepstream sep(params[params.size() - 1]);
+	Anope::string buf;
+	while (sep.GetToken(buf))
+	{
+		rfc1459::Join::SJoinUser sju;
+
+		/* Loop through prefixes and find modes for them */
+		for (char c; !buf.empty() && (c = buf[0]) != ',';)
+		{
+			buf.erase(buf.begin());
+			sju.first.AddMode(c);
+		}
+		/* Erase the , */
+		if (!buf.empty())
+			buf.erase(buf.begin());
+
+		sju.second = User::Find(buf);
+		if (!sju.second)
+		{
+			Log(LOG_DEBUG) << "FJOIN for non-existent user " << buf << " on " << params[0];
+			continue;
+		}
+
+		users.push_back(sju);
+	}
+
+	time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
+	rfc1459::Join::SJoin(source, params[0], ts, modes, users);
+}
+
+void inspircd20::FMode::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	/* :source FMODE #test 12345678 +nto foo */
+
+	Anope::string modes = params[2];
+	for (unsigned n = 3; n < params.size(); ++n)
+		modes += " " + params[n];
+
+	Channel *c = Channel::Find(params[0]);
+	time_t ts;
+
+	try
+	{
+		ts = convertTo<time_t>(params[1]);
+	}
+	catch (const ConvertException &)
+	{
+		ts = 0;
+	}
+
+	if (c)
+		c->SetModesInternal(source, modes, ts);
+}
+
+void inspircd20::FTopic::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	/* :source FTOPIC channel topicts setby :topic */
+
+	Channel *c = Channel::Find(params[0]);
+	time_t ts = Anope::CurTime;
+
+	try
+	{
+		ts = convertTo<time_t>(params[1]);
+	}
+	catch (const ConvertException &) { }
+
+	if (c)
+		c->ChangeTopicInternal(NULL, params[2], params[3], ts);
+}
+
+void inspircd20::Idle::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	ServiceBot *bi = ServiceBot::Find(params[0]);
+	if (bi)
+	{
+		Uplink::Send(bi, "IDLE", source.GetSource(), Anope::StartTime, Anope::CurTime - bi->lastmsg);
+	}
+	else
+	{
+		User *u = User::Find(params[0]);
+		if (u && u->server == Me)
+			Uplink::Send(u, "IDLE", source.GetSource(), Anope::StartTime, 0);
+	}
+}
 
 /*
  *   source     = numeric of the sending server
@@ -1012,349 +961,304 @@ struct IRCDMessageIdle : IRCDMessage
  *   params[1]  = metadata name
  *   params[2]  = data
  */
-struct IRCDMessageMetadata : IRCDMessage
+void inspircd20::Metadata::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	const bool &do_topiclock, &do_mlock;
-
-	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock)
-		: IRCDMessage(creator, "METADATA", 3)
-		, do_topiclock(handle_topiclock)
-		, do_mlock(handle_mlock)
-       	{
-		SetFlag(IRCDMESSAGE_REQUIRE_SERVER);
-	}
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	if (isdigit(params[0][0]))
 	{
-		if (isdigit(params[0][0]))
+		if (params[1].equals_cs("accountname"))
 		{
-			if (params[1].equals_cs("accountname"))
-			{
-				User *u = User::Find(params[0]);
-				NickServ::Account *nc = NickServ::FindAccount(params[2]);
-				if (u && nc)
-					u->Login(nc);
-			}
-
-			/*
-			 *   possible incoming ssl_cert messages:
-			 *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
-			 *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
-			 */
-			else if (params[1].equals_cs("ssl_cert"))
-			{
-				User *u = User::Find(params[0]);
-				if (!u)
-					return;
-				u->Extend<bool>("ssl", true);
-				Anope::string data = params[2].c_str();
-				size_t pos1 = data.find(' ') + 1;
-				size_t pos2 = data.find(' ', pos1);
-				if ((pos2 - pos1) >= 32) // inspircd supports md5 and sha1 fingerprint hashes -> size 32 or 40 bytes.
-				{
-					u->fingerprint = data.substr(pos1, pos2 - pos1);
-				}
-				EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
-			}
+			User *u = User::Find(params[0]);
+			NickServ::Account *nc = NickServ::FindAccount(params[2]);
+			if (u && nc)
+				u->Login(nc);
 		}
-		// We deliberately ignore non-bursting servers to avoid pseudoserver fights
-		else if ((params[0][0] == '#') && (!source.GetServer()->IsSynced()))
+
+		/*
+		 *   possible incoming ssl_cert messages:
+		 *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
+		 *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
+		 */
+		else if (params[1].equals_cs("ssl_cert"))
 		{
-			Channel *c = Channel::Find(params[0]);
-			if (c && c->ci)
-			{
-				if ((do_mlock) && (params[1] == "mlock"))
-				{
-					ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
-					Anope::string modes;
-					if (modelocks)
-						modes = modelocks->GetMLockAsString(c->ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
-
-					// Mode lock string is not what we say it is?
-					if (modes != params[2])
-						Uplink::Send(Me, "METADATA", c->name, "mlock", modes);
-				}
-				else if ((do_topiclock) && (params[1] == "topiclock"))
-				{
-					bool mystate = c->ci->IsTopicLock();
-					bool serverstate = (params[2] == "1");
-					if (mystate != serverstate)
-						Uplink::Send(Me, "METADATA", c->name, "topiclock", mystate ? "1" : "");
-				}
-			}
-		}
-		else if (params[0] == "*")
-		{
-			// Wed Oct  3 15:40:27 2012: S[14] O :20D METADATA * modules :-m_svstopic.so
-
-			if (params[1].equals_cs("modules") && !params[2].empty())
-			{
-				// only interested when it comes from our uplink
-				Server* server = source.GetServer();
-				if (!server || server->GetUplink() != Me)
-					return;
-
-				bool plus = (params[2][0] == '+');
-				if (!plus && params[2][0] != '-')
-					return;
-
-				bool required = false;
-				Anope::string capab, module = params[2].substr(1);
-
-				if (module.equals_cs("m_services_account.so"))
-					required = true;
-				else if (module.equals_cs("m_hidechans.so"))
-					required = true;
-				else if (module.equals_cs("m_chghost.so"))
-					capab = "CHGHOST";
-				else if (module.equals_cs("m_chgident.so"))
-					capab = "CHGIDENT";
-				else if (module.equals_cs("m_svshold.so"))
-					capab = "SVSHOLD";
-				else if (module.equals_cs("m_rline.so"))
-					capab = "RLINE";
-				else if (module.equals_cs("m_topiclock.so"))
-					capab = "TOPICLOCK";
-				else
-					return;
-
-				if (required)
-				{
-					if (!plus)
-						Log() << "Warning: InspIRCd unloaded module " << module << ", Anope won't function correctly without it";
-				}
-				else
-				{
-					if (plus)
-						Servers::Capab.insert(capab);
-					else
-						Servers::Capab.erase(capab);
-
-					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " module " << module << ", adjusted functionality";
-				}
-
-			}
-		}
-	}
-};
-
-struct IRCDMessageMode : IRCDMessage
-{
-	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		if (IRCD->IsChannelValid(params[0]))
-		{
-			Channel *c = Channel::Find(params[0]);
-
-			Anope::string modes = params[1];
-			for (unsigned n = 2; n < params.size(); ++n)
-				modes += " " + params[n];
-
-			if (c)
-				c->SetModesInternal(source, modes);
-		}
-		else
-		{
-			/* InspIRCd lets opers change another
-			   users modes, we have to kludge this
-			   as it slightly breaks RFC1459
-			 */
-			User *u = source.GetUser();
-			// This can happen with server-origin modes.
+			User *u = User::Find(params[0]);
 			if (!u)
-				u = User::Find(params[0]);
-			// if it's still null, drop it like fire.
-			// most likely situation was that server introduced a nick which we subsequently akilled
-			if (u)
-				u->SetModesInternal(source, "%s", params[1].c_str());
+				return;
+			u->Extend<bool>("ssl", true);
+			Anope::string data = params[2].c_str();
+			size_t pos1 = data.find(' ') + 1;
+			size_t pos2 = data.find(' ', pos1);
+			if ((pos2 - pos1) >= 32) // inspircd supports md5 and sha1 fingerprint hashes -> size 32 or 40 bytes.
+			{
+				u->fingerprint = data.substr(pos1, pos2 - pos1);
+			}
+			EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
 		}
 	}
-};
-
-struct IRCDMessageNick : IRCDMessage
-{
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	// We deliberately ignore non-bursting servers to avoid pseudoserver fights
+	else if ((params[0][0] == '#') && (!source.GetServer()->IsSynced()))
 	{
-		source.GetUser()->ChangeNick(params[0]);
+		Channel *c = Channel::Find(params[0]);
+		if (c && c->ci)
+		{
+			if ((do_mlock) && (params[1] == "mlock"))
+			{
+				ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
+				Anope::string modes;
+				if (modelocks)
+					modes = modelocks->GetMLockAsString(c->ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
+
+				// Mode lock string is not what we say it is?
+				if (modes != params[2])
+					Uplink::Send(Me, "METADATA", c->name, "mlock", modes);
+			}
+			else if ((do_topiclock) && (params[1] == "topiclock"))
+			{
+				bool mystate = c->ci->IsTopicLock();
+				bool serverstate = (params[2] == "1");
+				if (mystate != serverstate)
+					Uplink::Send(Me, "METADATA", c->name, "topiclock", mystate ? "1" : "");
+			}
+		}
 	}
-};
-
-struct IRCDMessageOperType : IRCDMessage
-{
-	IRCDMessageOperType(Module *creator) : IRCDMessage(creator, "OPERTYPE", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	else if (params[0] == "*")
 	{
-		/* opertype is equivalent to mode +o because servers
-		   dont do this directly */
+		// Wed Oct  3 15:40:27 2012: S[14] O :20D METADATA * modules :-m_svstopic.so
+
+		if (params[1].equals_cs("modules") && !params[2].empty())
+		{
+			// only interested when it comes from our uplink
+			Server* server = source.GetServer();
+			if (!server || server->GetUplink() != Me)
+				return;
+
+			bool plus = (params[2][0] == '+');
+			if (!plus && params[2][0] != '-')
+				return;
+
+			bool required = false;
+			Anope::string capab, module = params[2].substr(1);
+
+			if (module.equals_cs("m_services_account.so"))
+				required = true;
+			else if (module.equals_cs("m_hidechans.so"))
+				required = true;
+			else if (module.equals_cs("m_chghost.so"))
+				capab = "CHGHOST";
+			else if (module.equals_cs("m_chgident.so"))
+				capab = "CHGIDENT";
+			else if (module.equals_cs("m_svshold.so"))
+				capab = "SVSHOLD";
+			else if (module.equals_cs("m_rline.so"))
+				capab = "RLINE";
+			else if (module.equals_cs("m_topiclock.so"))
+				capab = "TOPICLOCK";
+			else
+				return;
+
+			if (required)
+			{
+				if (!plus)
+					Log() << "Warning: InspIRCd unloaded module " << module << ", Anope won't function correctly without it";
+			}
+			else
+			{
+				if (plus)
+					Servers::Capab.insert(capab);
+				else
+					Servers::Capab.erase(capab);
+
+				Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " module " << module << ", adjusted functionality";
+			}
+
+		}
+	}
+}
+
+void inspircd20::Mode::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	if (IRCD->IsChannelValid(params[0]))
+	{
+		Channel *c = Channel::Find(params[0]);
+
+		Anope::string modes = params[1];
+		for (unsigned int n = 2; n < params.size(); ++n)
+			modes += " " + params[n];
+
+		if (c)
+			c->SetModesInternal(source, modes);
+	}
+	else
+	{
+		/* InspIRCd lets opers change another
+		   users modes, we have to kludge this
+		   as it slightly breaks RFC1459
+		 */
 		User *u = source.GetUser();
-		if (!u->HasMode("OPER"))
-			u->SetModesInternal(source, "+o");
+		// This can happen with server-origin modes.
+		if (!u)
+			u = User::Find(params[0]);
+		// if it's still null, drop it like fire.
+		// most likely situation was that server introduced a nick which we subsequently akilled
+		if (u)
+			u->SetModesInternal(source, "%s", params[1].c_str());
 	}
-};
+}
 
-struct IRCDMessageRSQuit : IRCDMessage
+void inspircd20::Nick::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageRSQuit(Module *creator) : IRCDMessage(creator, "RSQUIT", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	source.GetUser()->ChangeNick(params[0]);
+}
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+void inspircd20::OperType::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	/* opertype is equivalent to mode +o because servers
+	   dont do this directly */
+	User *u = source.GetUser();
+	if (!u->HasMode("OPER"))
+		u->SetModesInternal(source, "+o");
+}
+
+void inspircd20::RSQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	Server *s = Server::Find(params[0]);
+	const Anope::string &reason = params.size() > 1 ? params[1] : "";
+	if (!s)
+		return;
+
+	Uplink::Send(Me, "SQUIT", s->GetSID(), reason);
+	s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
+}
+
+void inspircd20::Save::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *targ = User::Find(params[0]);
+	time_t ts;
+
+	try
 	{
-		Server *s = Server::Find(params[0]);
-		const Anope::string &reason = params.size() > 1 ? params[1] : "";
-		if (!s)
+		ts = convertTo<time_t>(params[1]);
+	}
+	catch (const ConvertException &)
+	{
+		return;
+	}
+
+	if (!targ || targ->timestamp != ts)
+		return;
+
+	BotInfo *bi;
+	if (targ->server == Me && (bi = dynamic_cast<BotInfo *>(targ)))
+	{
+		if (last_collide == Anope::CurTime)
+		{
+			Anope::QuitReason = "Nick collision fight on " + targ->nick;
+			Anope::Quitting = true;
 			return;
+		}
 
-		Uplink::Send(Me, "SQUIT", s->GetSID(), reason);
-		s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
+		IRCD->SendKill(Me, targ->nick, "Nick collision");
+		IRCD->SendNickChange(targ, targ->nick);
+		last_collide = Anope::CurTime;
 	}
-};
+	else
+		targ->ChangeNick(targ->GetUID());
+}
 
-struct IRCDMessageSave : IRCDMessage
+/*
+ * [Nov 04 00:08:46.308435 2009] debug: Received: SERVER irc.inspircd.com pass 0 964 :Testnet Central!
+ * 0: name
+ * 1: pass
+ * 2: hops
+ * 3: numeric
+ * 4: desc
+ */
+void inspircd20::ServerMessage::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	time_t last_collide;
+	unsigned int hops = 0;
 
-	IRCDMessageSave(Module *creator) : IRCDMessage(creator, "SAVE", 2), last_collide(0) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	try
 	{
-		User *targ = User::Find(params[0]);
-		time_t ts;
+		hops = convertTo<unsigned int>(params[2]);
+	}
+	catch (const ConvertException &) { }
+
+	new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[4], params[3]);
+}
+
+void inspircd20::SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	if (params[0] == rsquit_id || params[0] == rsquit_server)
+	{
+		/* squit for a recently squit server, introduce the juped server now */
+		Server *s = Server::Find(rsquit_server);
+
+		rsquit_id.clear();
+		rsquit_server.clear();
+
+		if (s && s->IsJuped())
+			IRCD->SendServer(s);
+	}
+	else
+		rfc1459::SQuit::Run(source, params);
+}
+
+void inspircd20::Time::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	Uplink::Send(Me, "TIME", source.GetSource(), params[1], Anope::CurTime);
+}
+
+/*
+ * [Nov 03 22:09:58.176252 2009] debug: Received: :964 UID 964AAAAAC 1225746297 w00t2 localhost testnet.user w00t 127.0.0.1 1225746302 +iosw +ACGJKLNOQcdfgjklnoqtx :Robin Burchell <w00t@inspircd.org>
+ * 0: uid
+ * 1: ts
+ * 2: nick
+ * 3: host
+ * 4: dhost
+ * 5: ident
+ * 6: ip
+ * 7: signon
+ * 8+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
+ * last: realname
+ */
+void inspircd20::UID::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	time_t ts = convertTo<time_t>(params[1]);
+
+	Anope::string modes = params[8];
+	for (unsigned i = 9; i < params.size() - 1; ++i)
+		modes += " " + params[i];
+
+	NickServ::Nick *na = NULL;
+	if (sasl)
+		for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
+		{
+			SASLUser &u = *it;
+
+			if (u.created + 30 < Anope::CurTime)
+				it = saslusers.erase(it);
+			else if (u.uid == params[0])
+			{
+				na = NickServ::FindNick(u.acc);
+				it = saslusers.erase(it);
+			}
+			else
+				++it;
+		}
+
+	User *u = User::OnIntroduce(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? na->GetAccount() : NULL);
+	if (u)
+	{
+		time_t signon = Anope::CurTime;
 
 		try
 		{
-			ts = convertTo<time_t>(params[1]);
+			signon = convertTo<time_t>(params[7]);
 		}
-		catch (const ConvertException &)
-		{
-			return;
-		}
+		catch (const ConvertException &) { }
 
-		if (!targ || targ->timestamp != ts)
-			return;
-
-		BotInfo *bi;
-		if (targ->server == Me && (bi = dynamic_cast<BotInfo *>(targ)))
-		{
-			if (last_collide == Anope::CurTime)
-			{
-				Anope::QuitReason = "Nick collision fight on " + targ->nick;
-				Anope::Quitting = true;
-				return;
-			}
-
-			IRCD->SendKill(Me, targ->nick, "Nick collision");
-			IRCD->SendNickChange(targ, targ->nick);
-			last_collide = Anope::CurTime;
-		}
-		else
-			targ->ChangeNick(targ->GetUID());
+		u->signon = signon;
 	}
-};
-
-struct IRCDMessageServer : IRCDMessage
-{
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 5) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
-
-	/*
-	 * [Nov 04 00:08:46.308435 2009] debug: Received: SERVER irc.inspircd.com pass 0 964 :Testnet Central!
-	 * 0: name
-	 * 1: pass
-	 * 2: hops
-	 * 3: numeric
-	 * 4: desc
-	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		unsigned int hops = Anope::string(params[2]).is_pos_number_only() ? convertTo<unsigned>(params[2]) : 0;
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[4], params[3]);
-	}
-};
-
-struct IRCDMessageSQuit : rfc1459::SQuit
-{
-	IRCDMessageSQuit(Module *creator) : rfc1459::SQuit(creator) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		if (params[0] == rsquit_id || params[0] == rsquit_server)
-		{
-			/* squit for a recently squit server, introduce the juped server now */
-			Server *s = Server::Find(rsquit_server);
-
-			rsquit_id.clear();
-			rsquit_server.clear();
-
-			if (s && s->IsJuped())
-				IRCD->SendServer(s);
-		}
-		else
-			rfc1459::SQuit::Run(source, params);
-	}
-};
-
-struct IRCDMessageTime : IRCDMessage
-{
-	IRCDMessageTime(Module *creator) : IRCDMessage(creator, "TIME", 2) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		Uplink::Send(Me, "TIME", source.GetSource(), params[1], Anope::CurTime);
-	}
-};
-
-struct IRCDMessageUID : IRCDMessage
-{
-	ServiceReference<SASL::Service> sasl;
-	
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 8) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	/*
-	 * [Nov 03 22:09:58.176252 2009] debug: Received: :964 UID 964AAAAAC 1225746297 w00t2 localhost testnet.user w00t 127.0.0.1 1225746302 +iosw +ACGJKLNOQcdfgjklnoqtx :Robin Burchell <w00t@inspircd.org>
-	 * 0: uid
-	 * 1: ts
-	 * 2: nick
-	 * 3: host
-	 * 4: dhost
-	 * 5: ident
-	 * 6: ip
-	 * 7: signon
-	 * 8+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
-	 * last: realname
-	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		time_t ts = convertTo<time_t>(params[1]);
-
-		Anope::string modes = params[8];
-		for (unsigned i = 9; i < params.size() - 1; ++i)
-			modes += " " + params[i];
-
-		NickServ::Nick *na = NULL;
-		if (sasl)
-			for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
-			{
-				SASLUser &u = *it;
-
-				if (u.created + 30 < Anope::CurTime)
-					it = saslusers.erase(it);
-				else if (u.uid == params[0])
-				{
-					na = NickServ::FindNick(u.acc);
-					it = saslusers.erase(it);
-				}
-				else
-					++it;
-			}
-
-		User *u = User::OnIntroduce(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? na->GetAccount() : NULL);
-		if (u)
-			u->signon = convertTo<time_t>(params[7]);
-	}
-};
+}
 
 class ProtoInspIRCd20 : public Module
 	, public EventHook<Event::UserNickChange>
@@ -1385,28 +1289,28 @@ class ProtoInspIRCd20 : public Module
 	rfc1459::Topic message_topic;
 
 	/* Our message handlers */
-	IRCDMessageCapab message_capab;
-	IRCDMessageChgHost message_chghost;
-	IRCDMessageChgIdent message_chgident;
-	IRCDMessageChgName message_chgname;
-	IRCDMessageEncap message_encap;
-	IRCDMessageEndburst message_endburst;
-	IRCDMessageFHost message_fhost;
-	IRCDMessageFIdent message_fident;
-	IRCDMessageFJoin message_fjoin;
-	IRCDMessageFMode message_fmode;
-	IRCDMessageFTopic message_ftopic;
-	IRCDMessageIdle message_idle;
-	IRCDMessageMetadata message_metadata;
-	IRCDMessageMode message_mode;
-	IRCDMessageNick message_nick;
-	IRCDMessageOperType message_opertype;
-	IRCDMessageRSQuit message_rsquit;
-	IRCDMessageSave message_save;
-	IRCDMessageServer message_server;
-	IRCDMessageSQuit message_squit;
-	IRCDMessageTime message_time;
-	IRCDMessageUID message_uid;
+	inspircd20::Capab message_capab;
+	inspircd20::ChgHost message_chghost;
+	inspircd20::ChgIdent message_chgident;
+	inspircd20::ChgName message_chgname;
+	inspircd20::Encap message_encap;
+	inspircd20::Endburst message_endburst;
+	inspircd20::FHost message_fhost;
+	inspircd20::FIdent message_fident;
+	inspircd20::FJoin message_fjoin;
+	inspircd20::FMode message_fmode;
+	inspircd20::FTopic message_ftopic;
+	inspircd20::Idle message_idle;
+	inspircd20::Metadata message_metadata;
+	inspircd20::Mode message_mode;
+	inspircd20::Nick message_nick;
+	inspircd20::OperType message_opertype;
+	inspircd20::RSQuit message_rsquit;
+	inspircd20::Save message_save;
+	inspircd20::ServerMessage message_server;
+	inspircd20::SQuit message_squit;
+	inspircd20::Time message_time;
+	inspircd20::UID message_uid;
 
 	bool use_server_side_topiclock, use_server_side_mlock;
 

@@ -233,17 +233,25 @@ void charybdis::EUID::Run(MessageSource &source, const std::vector<Anope::string
 	if (params[9] != "*")
 		na = NickServ::FindNick(params[9]);
 
-	User::OnIntroduce(params[0], params[4], (params[8] != "*" ? params[8] : params[5]), params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? na->GetAccount() : NULL);
+	time_t ts = Anope::CurTime;
+
+	try
+	{
+		ts = convertTo<time_t>(params[2]);
+	}
+	catch (const ConvertException &) { }
+
+	User::OnIntroduce(params[0], params[4], (params[8] != "*" ? params[8] : params[5]), params[5], params[6], source.GetServer(), params[10], ts, params[3], params[7], na ? na->GetAccount() : NULL);
 }
 
 // we can't use this function from ratbox because we set a local variable here
 // SERVER dev.anope.de 1 :charybdis test server
-void charybdis::Server::Run(MessageSource &source, const std::vector<Anope::string> &params)
+void charybdis::ServerMessage::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	// Servers other then our immediate uplink are introduced via SID
 	if (params[1] != "1")
 		return;
-	new ::Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+	new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
 	IRCD->SendPing(Me->GetName(), params[0]);
 }
 
@@ -291,7 +299,7 @@ class ProtoCharybdis : public Module
 	hybrid::Nick message_nick;
 	charybdis::Pass message_pass;
 	hybrid::Pong message_pong;
-	charybdis::Server message_server;
+	charybdis::ServerMessage message_server;
 	hybrid::SID message_sid;
 	hybrid::SJoin message_sjoin;
 	ratbox::TB message_tb;

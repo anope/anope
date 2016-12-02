@@ -371,8 +371,6 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			bi->OnMessage(u, message);
 		}
 	}
-
-	return;
 }
 
 void Quit::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -449,8 +447,6 @@ void rfc1459::Stats::Run(MessageSource &source, const std::vector<Anope::string>
 		default:
 			IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 	}
-
-	return;
 }
 
 void Time::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -461,7 +457,6 @@ void Time::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	char buf[64];
 	strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
 	IRCD->SendNumeric(391, source.GetSource(), "%s :%s", Me->GetName().c_str(), buf);
-	return;
 }
 
 void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -469,8 +464,6 @@ void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	Channel *c = Channel::Find(params[0]);
 	if (c)
 		c->ChangeTopicInternal(source.GetUser(), source.GetSource(), params[1], Anope::CurTime);
-
-	return;
 }
 
 void Version::Run(MessageSource &source, const std::vector<Anope::string> &params)

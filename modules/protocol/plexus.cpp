@@ -234,13 +234,13 @@ struct IRCDMessagePass : IRCDMessage
 
 /*        0          1  2                       */
 /* SERVER hades.arpa 1 :ircd-hybrid test server */
-void plexus::Server::Run(MessageSource &source, const std::vector<Anope::string> &params)
+void plexus::ServerMessage::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	/* Servers other than our immediate uplink are introduced via SID */
 	if (params[1] != "1")
 		return;
 
-	new ::Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+	new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
 }
 
 /*
@@ -321,7 +321,7 @@ class ProtoPlexus : public Module
 	hybrid::Join message_join;
 	hybrid::Nick message_nick;
 	IRCDMessagePass message_pass;
-	plexus::Server message_server;
+	plexus::ServerMessage message_server;
 	hybrid::SID message_sid;
 	hybrid::SJoin message_sjoin;
 	hybrid::TBurst message_tburst;

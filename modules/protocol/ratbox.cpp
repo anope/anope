@@ -211,12 +211,12 @@ struct IRCDMessagePass : IRCDMessage
 };
 
 // SERVER hades.arpa 1 :ircd-ratbox test server
-void ratbox::Server::Run(MessageSource &source, const std::vector<Anope::string> &params)
+void ratbox::ServerMessage::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	// Servers other then our immediate uplink are introduced via SID
 	if (params[1] != "1")
 		return;
-	new ::Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+	new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
 	IRCD->SendPing(Me->GetName(), params[0]);
 }
 
@@ -228,14 +228,19 @@ void ratbox::Server::Run(MessageSource &source, const std::vector<Anope::string>
  */
 void ratbox::TB::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	time_t topic_time = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
 	Channel *c = Channel::Find(params[0]);
+	time_t topic_time = Anope::CurTime;
 
 	if (!c)
 		return;
+	try
+	{
+		topic_time = convertTo<time_t>(params[1]);
+	}
+	catch (const ConvertException &) { }
 
 	const Anope::string &setter = params.size() == 4 ? params[2] : "",
-		topic = params.size() == 4 ? params[3] : params[2];
+		&topic = params.size() == 4 ? params[3] : params[2];
 
 	c->ChangeTopicInternal(NULL, setter, topic, topic_time);
 }
@@ -243,8 +248,16 @@ void ratbox::TB::Run(MessageSource &source, const std::vector<Anope::string> &pa
 // :42X UID Adam 1 1348535644 +aow Adam 192.168.0.5 192.168.0.5 42XAAAAAB :Adam
 void ratbox::UID::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
+	time_t ts = 0;
+
+	try
+	{
+		ts = convertTo<time_t>(params[2]);
+	}
+	catch (const ConvertException &) { }
+
 	/* Source is always the server */
-	User::OnIntroduce(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7], NULL);
+	User::OnIntroduce(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], ts, params[3], params[7], NULL);
 }
 
 class ProtoRatbox : public Module
@@ -279,7 +292,7 @@ class ProtoRatbox : public Module
 	hybrid::Nick message_nick;
 	IRCDMessagePass message_pass;
 	hybrid::Pong message_pong;
-	ratbox::Server message_server;
+	ratbox::ServerMessage message_server;
 	hybrid::SID message_sid;
 	hybrid::SJoin message_sjoin;
 	ratbox::TB message_tb;

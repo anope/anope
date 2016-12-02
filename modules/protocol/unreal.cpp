@@ -24,6 +24,7 @@
 #include "modules/sasl.h"
 #include "modules/operserv/stats.h"
 #include "modules/protocol/rfc1459.h"
+#include "modules/protocol/unreal.h"
 
 static Anope::string UplinkSID;
 
@@ -632,104 +633,79 @@ class ChannelModeUnrealSSL : public ChannelMode
 	}
 };
 
-struct IRCDMessageChgHost : IRCDMessage
+void unreal::ChgHost::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageChgHost(Module *creator) : IRCDMessage(creator, "CHGHOST", 2) { }
+	User *u = User::Find(params[0]);
+	if (u)
+		u->SetDisplayedHost(params[1]);
+}
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+void unreal::ChgIdent::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *u = User::Find(params[0]);
+	if (u)
+		u->SetVIdent(params[1]);
+}
+
+void unreal::ChgName::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *u = User::Find(params[0]);
+	if (u)
+		u->SetRealname(params[1]);
+}
+
+void unreal::MD::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	const Anope::string &mdtype = params[0],
+			    &obj = params[1],
+			    &var = params[2],
+			    &value = params.size() > 3 ? params[3] : "";
+
+	if (mdtype == "client")
+	{
+		User *u = User::Find(obj);
+
+		if (u == nullptr)
+			return;
+
+		if (var == "certfp" && !value.empty())
+		{
+			u->Extend<bool>("ssl", true);
+			u->fingerprint = value;
+			EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
+		}
+	}
+}
+
+void unreal::Mode::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	bool server_source = source.GetServer() != NULL;
+	Anope::string modes = params[1];
+	for (unsigned i = 2; i < params.size() - (server_source ? 1 : 0); ++i)
+		modes += " " + params[i];
+
+	if (IRCD->IsChannelValid(params[0]))
+	{
+		Channel *c = Channel::Find(params[0]);
+		time_t ts = 0;
+
+		try
+		{
+			if (server_source)
+				ts = convertTo<time_t>(params[params.size() - 1]);
+		}
+		catch (const ConvertException &) { }
+
+		if (c)
+			c->SetModesInternal(source, modes, ts);
+	}
+	else
 	{
 		User *u = User::Find(params[0]);
 		if (u)
-			u->SetDisplayedHost(params[1]);
+			u->SetModesInternal(source, "%s", params[1].c_str());
 	}
-};
-
-struct IRCDMessageChgIdent : IRCDMessage
-{
-	IRCDMessageChgIdent(Module *creator) : IRCDMessage(creator, "CHGIDENT", 2) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = User::Find(params[0]);
-		if (u)
-			u->SetVIdent(params[1]);
-	}
-};
-
-struct IRCDMessageChgName : IRCDMessage
-{
-	IRCDMessageChgName(Module *creator) : IRCDMessage(creator, "CHGNAME", 2) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = User::Find(params[0]);
-		if (u)
-			u->SetRealname(params[1]);
-	}
-};
-
-struct IRCDMessageMD : IRCDMessage
-{
-	IRCDMessageMD(Module *creator) : IRCDMessage(creator, "MD", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		const Anope::string &mdtype = params[0],
-				    &obj = params[1],
-				    &var = params[2],
-				    &value = params.size() > 3 ? params[3] : "";
-
-		if (mdtype == "client")
-		{
-			User *u = User::Find(obj);
-
-			if (u == nullptr)
-				return;
-
-			if (var == "certfp" && !value.empty())
-			{
-				u->Extend<bool>("ssl", true);
-				u->fingerprint = value;
-				EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
-			}
-		}
-	}
-};
-
-struct IRCDMessageMode : IRCDMessage
-{
-	IRCDMessageMode(Module *creator, const Anope::string &mname) : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		bool server_source = source.GetServer() != NULL;
-		Anope::string modes = params[1];
-		for (unsigned i = 2; i < params.size() - (server_source ? 1 : 0); ++i)
-			modes += " " + params[i];
-
-		if (IRCD->IsChannelValid(params[0]))
-		{
-			Channel *c = Channel::Find(params[0]);
-			time_t ts = 0;
-
-			try
-			{
-				if (server_source)
-					ts = convertTo<time_t>(params[params.size() - 1]);
-			}
-			catch (const ConvertException &) { }
-
-			if (c)
-				c->SetModesInternal(source, modes, ts);
-		}
-		else
-		{
-			User *u = User::Find(params[0]);
-			if (u)
-				u->SetModesInternal(source, "%s", params[1].c_str());
-		}
-	}
-};
+}
 
 /* netinfo
  *  argv[0] = max global count
@@ -741,347 +717,314 @@ struct IRCDMessageMode : IRCDMessage
  *  argv[6] = free(**)
  *  argv[7] = ircnet
  */
-struct IRCDMessageNetInfo : IRCDMessage
+void unreal::NetInfo::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageNetInfo(Module *creator) : IRCDMessage(creator, "NETINFO", 8) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	Stats *stats = Serialize::GetObject<Stats *>();
+	Uplink::Send("NETINFO", stats ? stats->GetMaxUserCount() : 0, Anope::CurTime, params[2], params[3], "0", "0", "0", params[7]);
+}
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		Stats *stats = Serialize::GetObject<Stats *>();
-		Uplink::Send("NETINFO", stats ? stats->GetMaxUserCount() : 0, Anope::CurTime, params[2], params[3], "0", "0", "0", params[7]);
-	}
-};
-
-struct IRCDMessageNick : IRCDMessage
+/*
+** NICK - new
+**	  source  = NULL
+**	  parv[0] = nickname
+**	  parv[1] = hopcount
+**	  parv[2] = timestamp
+**	  parv[3] = username
+**	  parv[4] = hostname
+**	  parv[5] = servername
+**	  parv[6] = servicestamp
+**	  parv[7] = umodes
+**	  parv[8] = virthost, * if none
+**	  parv[9] = ip
+**	  parv[10] = info
+**
+** NICK - change
+**	  source  = oldnick
+**	  parv[0] = new nickname
+**	  parv[1] = hopcount
+*/
+void unreal::Nick::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	/*
-	** NICK - new
-	**	  source  = NULL
-	**	  parv[0] = nickname
-	**	  parv[1] = hopcount
-	**	  parv[2] = timestamp
-	**	  parv[3] = username
-	**	  parv[4] = hostname
-	**	  parv[5] = servername
-	**	  parv[6] = servicestamp
-	**	  parv[7] = umodes
-	**	  parv[8] = virthost, * if none
-	**	  parv[9] = ip
-	**	  parv[10] = info
-	**
-	** NICK - change
-	**	  source  = oldnick
-	**	  parv[0] = new nickname
-	**	  parv[1] = hopcount
-	*/
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	if (params.size() == 11)
 	{
-		if (params.size() == 11)
+		Anope::string ip;
+		if (params[9] != "*")
 		{
-			Anope::string ip;
-			if (params[9] != "*")
-			{
-				Anope::string decoded_ip;
-				Anope::B64Decode(params[9], decoded_ip);
+			Anope::string decoded_ip;
+			Anope::B64Decode(params[9], decoded_ip);
 
-				sockaddrs ip_addr;
-				ip_addr.ntop(params[9].length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
-				ip = ip_addr.addr();
-			}
+			sockaddrs ip_addr;
+			ip_addr.ntop(params[9].length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
+			ip = ip_addr.addr();
+		}
 
-			Anope::string vhost = params[8];
-			if (vhost.equals_cs("*"))
-				vhost.clear();
+		Anope::string vhost = params[8];
+		if (vhost.equals_cs("*"))
+			vhost.clear();
 
-			time_t user_ts = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime;
+		time_t user_ts = Anope::CurTime;
 
-			Server *s = Server::Find(params[5]);
-			if (s == NULL)
-			{
-				Log(LOG_DEBUG) << "User " << params[0] << " introduced from non-existent server " << params[5] << "?";
-				return;
-			}
+		try
+		{
+			user_ts = convertTo<time_t>(params[2]);
+		}
+		catch (const ConvertException &) { }
 
-			NickServ::Nick *na = NULL;
+		Server *s = Server::Find(params[5]);
+		if (s == NULL)
+		{
+			Log(LOG_DEBUG) << "User " << params[0] << " introduced from non-existent server " << params[5] << "?";
+			return;
+		}
 
-			if (params[6] == "0")
-				;
-			else if (params[6].is_pos_number_only())
+		NickServ::Nick *na = NULL;
+
+		if (params[6] == "0")
+			;
+		else if (params[6].is_pos_number_only())
+		{
+			try
 			{
 				if (convertTo<time_t>(params[6]) == user_ts)
 					na = NickServ::FindNick(params[0]);
 			}
-			else
-			{
-				na = NickServ::FindNick(params[6]);
-			}
-
-			User::OnIntroduce(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7], "", na ? na->GetAccount() : NULL);
+			catch (const ConvertException &) { }
 		}
 		else
 		{
-			User *u = source.GetUser();
-
-			if (u)
-				u->ChangeNick(params[0]);
+			na = NickServ::FindNick(params[6]);
 		}
-	}
-};
 
-/** This is here because:
- *
- * If we had three servers, A, B & C linked like so: A<->B<->C
- * If Anope is linked to A and B splits from A and then reconnects
- * B introduces itself, introduces C, sends EOS for C, introduces Bs clients
- * introduces Cs clients, sends EOS for B. This causes all of Cs clients to be introduced
- * with their server "not syncing". We now send a PING immediately when receiving a new server
- * and then finish sync once we get a pong back from that server.
+		User::OnIntroduce(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7], "", na ? na->GetAccount() : NULL);
+	}
+	else
+	{
+		User *u = source.GetUser();
+
+		if (u)
+			u->ChangeNick(params[0]);
+	}
+}
+
+/* We ping servers to detect EOB instead of handling the EOS message
+ * because Unreal sends EOS for servers on link prior to the majority
+ * of the burst.
  */
-struct IRCDMessagePong : IRCDMessage
+void unreal::Pong::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	if (!source.GetServer()->IsSynced())
+		source.GetServer()->Sync(false);
+}
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		if (!source.GetServer()->IsSynced())
-			source.GetServer()->Sync(false);
-	}
-};
-
-struct IRCDMessageProtoctl : rfc1459::Capab
+void unreal::Protoctl::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageProtoctl(Module *creator) : rfc1459::Capab(creator, "PROTOCTL") { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	for (unsigned int i = 0; i < params.size(); ++i)
 	{
-		for (unsigned int i = 0; i < params.size(); ++i)
+		Anope::string capab = params[i];
+
+		if (!capab.find("SID="))
 		{
-			Anope::string capab = params[i];
-
-			if (!capab.find("SID="))
-			{
-				UplinkSID = capab.substr(4);
-			}
+			UplinkSID = capab.substr(4);
 		}
-
-		rfc1459::Capab::Run(source, params);
 	}
-};
 
-struct IRCDMessageSASL : IRCDMessage
+	rfc1459::Capab::Run(source, params);
+}
+
+void unreal::SASL::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	ServiceReference<SASL::Service> sasl;
-	
-	IRCDMessageSASL(Module *creator) : IRCDMessage(creator, "SASL", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	size_t p = params[1].find('!');
+	if (!sasl || p == Anope::string::npos)
+		return;
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	::SASL::Message m;
+	m.source = params[1];
+	m.target = params[0];
+	m.type = params[2];
+	m.data = params[3];
+	m.ext = params.size() > 4 ? params[4] : "";
+
+	sasl->ProcessMessage(m);
+}
+
+void unreal::SDesc::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	source.GetServer()->SetDescription(params[0]);
+}
+
+void unreal::SetHost::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *u = source.GetUser();
+
+	/* When a user sets +x we receive the new host and then the mode change */
+	if (u->HasMode("CLOAK"))
+		u->SetDisplayedHost(params[0]);
+	else
+		u->SetCloakedHost(params[0]);
+}
+
+void unreal::SetIdent::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *u = source.GetUser();
+	u->SetVIdent(params[0]);
+}
+
+void unreal::SetName::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	User *u = source.GetUser();
+	u->SetRealname(params[0]);
+}
+
+void unreal::ServerMessage::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	unsigned int hops = 0;
+
+	try
 	{
-		size_t p = params[1].find('!');
-		if (!sasl || p == Anope::string::npos)
+		hops = convertTo<unsigned>(params[1]);
+	}
+	catch (const ConvertException &) { }
+
+	if (params[1].equals_cs("1"))
+	{
+		Anope::string desc;
+		spacesepstream(params[2]).GetTokenRemainder(desc, 1);
+
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, desc, UplinkSID);
+	}
+	else
+	{
+		new Server(source.GetServer(), params[0], hops, params[2]);
+	}
+
+	IRCD->SendPing(Me->GetName(), params[0]);
+}
+
+void unreal::SID::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	unsigned int hops = 0;
+
+	try
+	{
+		hops = convertTo<unsigned>(params[1]);
+	}
+	catch (const ConvertException &) { }
+
+	new Server(source.GetServer(), params[0], hops, params[3], params[2]);
+
+	IRCD->SendPing(Me->GetName(), params[0]);
+}
+
+void unreal::SJoin::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	Anope::string modes;
+	if (params.size() >= 4)
+		for (unsigned i = 2; i < params.size() - 1; ++i)
+			modes += " " + params[i];
+	if (!modes.empty())
+		modes.erase(modes.begin());
+
+	std::list<Anope::string> bans, excepts, invites;
+	std::list<rfc1459::Join::SJoinUser> users;
+
+	spacesepstream sep(params[params.size() - 1]);
+	Anope::string buf;
+	while (sep.GetToken(buf))
+	{
+		/* Ban */
+		if (buf[0] == '&')
+		{
+			buf.erase(buf.begin());
+			bans.push_back(buf);
+		}
+		/* Except */
+		else if (buf[0] == '"')
+		{
+			buf.erase(buf.begin());
+			excepts.push_back(buf);
+		}
+		/* Invex */
+		else if (buf[0] == '\'')
+		{
+			buf.erase(buf.begin());
+			invites.push_back(buf);
+		}
+		else
+		{
+			rfc1459::Join::SJoinUser sju;
+
+			/* Get prefixes from the nick */
+			for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
+			{
+				sju.first.AddMode(ch);
+				buf.erase(buf.begin());
+			}
+
+			sju.second = User::Find(buf);
+			if (!sju.second)
+			{
+				Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
+				continue;
+			}
+
+			users.push_back(sju);
+		}
+	}
+
+	time_t ts = Anope::CurTime;
+
+	try
+	{
+		ts = convertTo<time_t>(params[0]);
+	}
+	catch (const ConvertException &) { }
+
+	rfc1459::Join::SJoin(source, params[1], ts, modes, users);
+
+	if (!bans.empty() || !excepts.empty() || !invites.empty())
+	{
+		Channel *c = Channel::Find(params[1]);
+
+		if (!c || c->creation_time != ts)
 			return;
 
-		SASL::Message m;
-		m.source = params[1];
-		m.target = params[0];
-		m.type = params[2];
-		m.data = params[3];
-		m.ext = params.size() > 4 ? params[4] : "";
+		ChannelMode *ban = ModeManager::FindChannelModeByName("BAN"),
+			*except = ModeManager::FindChannelModeByName("EXCEPT"),
+			*invex = ModeManager::FindChannelModeByName("INVITEOVERRIDE");
 
-		sasl->ProcessMessage(m);
+		if (ban)
+			for (std::list<Anope::string>::iterator it = bans.begin(), it_end = bans.end(); it != it_end; ++it)
+				c->SetModeInternal(source, ban, *it);
+		if (except)
+			for (std::list<Anope::string>::iterator it = excepts.begin(), it_end = excepts.end(); it != it_end; ++it)
+				c->SetModeInternal(source, except, *it);
+		if (invex)
+			for (std::list<Anope::string>::iterator it = invites.begin(), it_end = invites.end(); it != it_end; ++it)
+				c->SetModeInternal(source, invex, *it);
 	}
-};
+}
 
-struct IRCDMessageSDesc : IRCDMessage
+/*
+**	source = sender prefix
+**	parv[0] = channel name
+**	parv[1] = topic nickname
+**	parv[2] = topic time
+**	parv[3] = topic text
+*/
+void unreal::Topic::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageSDesc(Module *creator) : IRCDMessage(creator, "SDESC", 1) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	Channel *c = Channel::Find(params[0]);
+	time_t ts = Anope::CurTime;
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	try
 	{
-		source.GetServer()->SetDescription(params[0]);
+		ts = convertTo<time_t>(params[2]);
 	}
-};
+	catch (const ConvertException &) { }
 
-struct IRCDMessageSetHost : IRCDMessage
-{
-	IRCDMessageSetHost(Module *creator) : IRCDMessage(creator, "SETHOST", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = source.GetUser();
-
-		/* When a user sets +x we receive the new host and then the mode change */
-		if (u->HasMode("CLOAK"))
-			u->SetDisplayedHost(params[0]);
-		else
-			u->SetCloakedHost(params[0]);
-	}
-};
-
-struct IRCDMessageSetIdent : IRCDMessage
-{
-	IRCDMessageSetIdent(Module *creator) : IRCDMessage(creator, "SETIDENT", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = source.GetUser();
-		u->SetVIdent(params[0]);
-	}
-};
-
-struct IRCDMessageSetName : IRCDMessage
-{
-	IRCDMessageSetName(Module *creator) : IRCDMessage(creator, "SETNAME", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = source.GetUser();
-		u->SetRealname(params[0]);
-	}
-};
-
-struct IRCDMessageServer : IRCDMessage
-{
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		unsigned int hops = Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
-
-		if (params[1].equals_cs("1"))
-		{
-			Anope::string desc;
-			spacesepstream(params[2]).GetTokenRemainder(desc, 1);
-
-			new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, desc, UplinkSID);
-		}
-		else
-			new Server(source.GetServer(), params[0], hops, params[2]);
-
-		IRCD->SendPing(Me->GetName(), params[0]);
-	}
-};
-
-struct IRCDMessageSID : IRCDMessage
-{
-	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		unsigned int hops = Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
-
-		new Server(source.GetServer(), params[0], hops, params[3], params[2]);
-
-		IRCD->SendPing(Me->GetName(), params[0]);
-	}
-};
-
-struct IRCDMessageSJoin : IRCDMessage
-{
-	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		Anope::string modes;
-		if (params.size() >= 4)
-			for (unsigned i = 2; i < params.size() - 1; ++i)
-				modes += " " + params[i];
-		if (!modes.empty())
-			modes.erase(modes.begin());
-
-		std::list<Anope::string> bans, excepts, invites;
-		std::list<rfc1459::Join::SJoinUser> users;
-
-		spacesepstream sep(params[params.size() - 1]);
-		Anope::string buf;
-		while (sep.GetToken(buf))
-		{
-			/* Ban */
-			if (buf[0] == '&')
-			{
-				buf.erase(buf.begin());
-				bans.push_back(buf);
-			}
-			/* Except */
-			else if (buf[0] == '"')
-			{
-				buf.erase(buf.begin());
-				excepts.push_back(buf);
-			}
-			/* Invex */
-			else if (buf[0] == '\'')
-			{
-				buf.erase(buf.begin());
-				invites.push_back(buf);
-			}
-			else
-			{
-				rfc1459::Join::SJoinUser sju;
-
-				/* Get prefixes from the nick */
-				for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
-				{
-					sju.first.AddMode(ch);
-					buf.erase(buf.begin());
-				}
-
-				sju.second = User::Find(buf);
-				if (!sju.second)
-				{
-					Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
-					continue;
-				}
-
-				users.push_back(sju);
-			}
-		}
-
-		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
-		rfc1459::Join::SJoin(source, params[1], ts, modes, users);
-
-		if (!bans.empty() || !excepts.empty() || !invites.empty())
-		{
-			Channel *c = Channel::Find(params[1]);
-
-			if (!c || c->creation_time != ts)
-				return;
-
-			ChannelMode *ban = ModeManager::FindChannelModeByName("BAN"),
-				*except = ModeManager::FindChannelModeByName("EXCEPT"),
-				*invex = ModeManager::FindChannelModeByName("INVITEOVERRIDE");
-
-			if (ban)
-				for (std::list<Anope::string>::iterator it = bans.begin(), it_end = bans.end(); it != it_end; ++it)
-					c->SetModeInternal(source, ban, *it);
-			if (except)
-				for (std::list<Anope::string>::iterator it = excepts.begin(), it_end = excepts.end(); it != it_end; ++it)
-					c->SetModeInternal(source, except, *it);
-			if (invex)
-				for (std::list<Anope::string>::iterator it = invites.begin(), it_end = invites.end(); it != it_end; ++it)
-					c->SetModeInternal(source, invex, *it);
-		}
-	}
-};
-
-struct IRCDMessageTopic : IRCDMessage
-{
-	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 4) { }
-
-	/*
-	**	source = sender prefix
-	**	parv[0] = channel name
-	**	parv[1] = topic nickname
-	**	parv[2] = topic time
-	**	parv[3] = topic text
-	*/
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		Channel *c = Channel::Find(params[0]);
-		if (c)
-			c->ChangeTopicInternal(source.GetUser(), params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
-	}
-};
+	if (c)
+		c->ChangeTopicInternal(source.GetUser(), params[1], params[3], ts);
+}
 
 /*
  *      parv[0] = nickname
@@ -1097,84 +1040,78 @@ struct IRCDMessageTopic : IRCDMessage
  *      parv[10] = ip
  *      parv[11] = info
  */
-struct IRCDMessageUID : IRCDMessage
+void unreal::UID::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 12) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	Anope::string
+		nickname  = params[0],
+		hopcount  = params[1],
+		timestamp = params[2],
+		username  = params[3],
+		hostname  = params[4],
+		uid       = params[5],
+		account   = params[6],
+		umodes    = params[7],
+		vhost     = params[8],
+		chost     = params[9],
+		ip        = params[10],
+		info      = params[11];
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	if (ip != "*")
 	{
-		Anope::string
-			nickname  = params[0],
-			hopcount  = params[1],
-			timestamp = params[2],
-			username  = params[3],
-			hostname  = params[4],
-			uid       = params[5],
-			account   = params[6],
-			umodes    = params[7],
-			vhost     = params[8],
-			chost     = params[9],
-			ip        = params[10],
-			info      = params[11];
+		Anope::string decoded_ip;
+		Anope::B64Decode(ip, decoded_ip);
 
-		if (ip != "*")
-		{
-			Anope::string decoded_ip;
-			Anope::B64Decode(ip, decoded_ip);
+		sockaddrs ip_addr;
+		ip_addr.ntop(ip.length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
+		ip = ip_addr.addr();
+	}
 
-			sockaddrs ip_addr;
-			ip_addr.ntop(ip.length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
-			ip = ip_addr.addr();
-		}
+	if (vhost == "*")
+		vhost.clear();
 
-		if (vhost == "*")
-			vhost.clear();
+	if (chost == "*")
+		chost.clear();
 
-		if (chost == "*")
-			chost.clear();
+	time_t user_ts;
+	try
+	{
+		user_ts = convertTo<time_t>(timestamp);
+	}
+	catch (const ConvertException &)
+	{
+		user_ts = Anope::CurTime;
+	}
 
-		time_t user_ts;
+	NickServ::Nick *na = NULL;
+
+	if (account == "0")
+	{
+		/* nothing */
+	}
+	else if (account.is_pos_number_only())
+	{
 		try
-		{
-			user_ts = convertTo<time_t>(timestamp);
-		}
-		catch (const ConvertException &)
-		{
-			user_ts = Anope::CurTime;
-		}
-
-		NickServ::Nick *na = NULL;
-
-		if (account == "0")
-		{
-			/* nothing */
-		}
-		else if (account.is_pos_number_only())
 		{
 			if (convertTo<time_t>(account) == user_ts)
 				na = NickServ::FindNick(nickname);
 		}
-		else
-		{
-			na = NickServ::FindNick(account);
-		}
-
-		User *u = User::OnIntroduce(nickname, username, hostname, vhost, ip, source.GetServer(), info, user_ts, umodes, uid, na ? na->GetAccount() : NULL);
-
-		if (u && !chost.empty() && chost != u->GetCloakedHost())
-			u->SetCloakedHost(chost);
+		catch (const ConvertException &) { }
 	}
-};
-
-struct IRCDMessageUmode2 : IRCDMessage
-{
-	IRCDMessageUmode2(Module *creator) : IRCDMessage(creator, "UMODE2", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	else
 	{
-		source.GetUser()->SetModesInternal(source, "%s", params[0].c_str());
+		na = NickServ::FindNick(account);
 	}
-};
+
+	User *u = User::OnIntroduce(nickname, username, hostname, vhost, ip, source.GetServer(), info, user_ts, umodes, uid, na ? na->GetAccount() : NULL);
+
+	if (u && !chost.empty() && chost != u->GetCloakedHost())
+		u->SetCloakedHost(chost);
+}
+
+void unreal::Umode2::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	source.GetUser()->SetModesInternal(source, "%s", params[0].c_str());
+}
 
 class ProtoUnreal : public Module
 	, public EventHook<Event::UserNickChange>
@@ -1206,26 +1143,26 @@ class ProtoUnreal : public Module
 	rfc1459::Whois message_whois;
 
 	/* Our message handlers */
-	IRCDMessageChgHost message_chghost;
-	IRCDMessageChgIdent message_chgident;
-	IRCDMessageChgName message_chgname;
-	IRCDMessageMD message_md;
-	IRCDMessageMode message_mode, message_svsmode, message_svs2mode;
-	IRCDMessageNetInfo message_netinfo;
-	IRCDMessageNick message_nick;
-	IRCDMessagePong message_pong;
-	IRCDMessageProtoctl message_protoctl;
-	IRCDMessageSASL message_sasl;
-	IRCDMessageSDesc message_sdesc;
-	IRCDMessageSetHost message_sethost;
-	IRCDMessageSetIdent message_setident;
-	IRCDMessageSetName message_setname;
-	IRCDMessageServer message_server;
-	IRCDMessageSID message_sid;
-	IRCDMessageSJoin message_sjoin;
-	IRCDMessageTopic message_topic;
-	IRCDMessageUID message_uid;
-	IRCDMessageUmode2 message_umode2;
+	unreal::ChgHost message_chghost;
+	unreal::ChgIdent message_chgident;
+	unreal::ChgName message_chgname;
+	unreal::MD message_md;
+	unreal::Mode message_mode, message_svsmode, message_svs2mode;
+	unreal::NetInfo message_netinfo;
+	unreal::Nick message_nick;
+	unreal::Pong message_pong;
+	unreal::Protoctl message_protoctl;
+	unreal::SASL message_sasl;
+	unreal::SDesc message_sdesc;
+	unreal::SetHost message_sethost;
+	unreal::SetIdent message_setident;
+	unreal::SetName message_setname;
+	unreal::ServerMessage message_server;
+	unreal::SID message_sid;
+	unreal::SJoin message_sjoin;
+	unreal::Topic message_topic;
+	unreal::UID message_uid;
+	unreal::Umode2 message_umode2;
 
 	bool use_server_side_mlock;
 

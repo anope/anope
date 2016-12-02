@@ -1,7 +1,7 @@
 /*
  * Anope IRC Services
  *
- * Copyright (C) 2016 Anope Team <team@anope.org>
+ * Copyright (C) 2003-2016 Anope Team <team@anope.org>
  *
  * This file is part of Anope. Anope is free software; you can
  * redistribute it and/or modify it under the terms of the GNU
@@ -19,24 +19,29 @@
 
 #pragma once
 
-#include "modules/protocol/rfc1459.h"
-
-namespace ratbox
+namespace bahamut
 {
 
-class Encap : public IRCDMessage
+class Burst : public IRCDMessage
 {
  public:
-	Encap(Module *creator) : IRCDMessage(creator, "ENCAP", 3) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+	Burst(Module *creator) : IRCDMessage(creator, "BURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	// Debug: Received: :00BAAAAAB ENCAP * LOGIN Adam
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
 
-class Join : public rfc1459::Join
+class Mode : public IRCDMessage
 {
  public:
-	Join(Module *creator) : rfc1459::Join(creator, "JOIN") { }
+	Mode(Module *creator, const Anope::string &sname) : IRCDMessage(creator, sname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
+};
+
+class Nick : public IRCDMessage
+{
+ public:
+	Nick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
@@ -49,20 +54,20 @@ class ServerMessage : public IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
 
-class TB : public IRCDMessage
+class SJoin : public IRCDMessage
 {
  public:
-	TB(Module *creator) : IRCDMessage(creator, "TB", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	SJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
 
-class UID : public IRCDMessage
+class Topic : public IRCDMessage
 {
  public:
-	UID(Module *creator) : IRCDMessage(creator, "UID", 9) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	Topic(Module *creator) : IRCDMessage(creator, "TOPIC", 4) { }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
 
-} // namespace ratbox
+} // namespace bahamut

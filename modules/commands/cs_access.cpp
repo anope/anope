@@ -895,7 +895,7 @@ class CSAccess : public Module
 		const ChanAccess *highest = group->Highest();
 		if (highest && highest->provider == &accessprovider)
 		{
-			/* Access accessprovider is the only accessprovider with th concept of negative access,
+			/* Access accessprovider is the only accessprovider with the concept of negative access,
 			 * so check they don't have negative access
 			 */
 			const AccessChanAccess *aca = anope_dynamic_static_cast<const AccessChanAccess *>(highest);

@@ -179,7 +179,7 @@ class Save : public IRCDMessage
 class ServerMessage : public IRCDMessage
 {
  public:
-	ServerMessage(Module *creator) : IRCDMessage(creator, "SERVER", 5) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	ServerMessage(Module *creator) : IRCDMessage(creator, "SERVER", 5) { }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };

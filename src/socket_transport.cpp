@@ -80,21 +80,6 @@ void BufferedSocket::Write(const char *buffer, size_t l)
 	SocketEngine::Change(this, true, SF_WRITABLE);
 }
 
-void BufferedSocket::Write(const char *message, ...)
-{
-	va_list vi;
-	char tbuffer[BUFSIZE];
-
-	if (!message)
-		return;
-
-	va_start(vi, message);
-	int len = vsnprintf(tbuffer, sizeof(tbuffer), message, vi);
-	va_end(vi);
-
-	this->Write(tbuffer, std::min(len, static_cast<int>(sizeof(tbuffer))));
-}
-
 void BufferedSocket::Write(const Anope::string &message)
 {
 	this->Write(message.c_str(), message.length());
@@ -178,21 +163,6 @@ void BinarySocket::Write(const char *buffer, size_t l)
 		return;
 	this->write_buffer.push_back(new DataBlock(buffer, l));
 	SocketEngine::Change(this, true, SF_WRITABLE);
-}
-
-void BinarySocket::Write(const char *message, ...)
-{
-	va_list vi;
-	char tbuffer[BUFSIZE];
-
-	if (!message)
-		return;
-
-	va_start(vi, message);
-	int len = vsnprintf(tbuffer, sizeof(tbuffer), message, vi);
-	va_end(vi);
-
-	this->Write(tbuffer, std::min(len, static_cast<int>(sizeof(tbuffer))));
 }
 
 void BinarySocket::Write(const Anope::string &message)

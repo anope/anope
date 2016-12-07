@@ -310,7 +310,6 @@ class CoreExport BufferedSocket : public virtual Socket
  protected:
 	virtual void Write(const char *buffer, size_t l);
  public:
-	void Write(const char *message, ...);
 	void Write(const Anope::string &message);
 
 	/** Get the length of the read buffer
@@ -359,7 +358,6 @@ class CoreExport BinarySocket : public virtual Socket
 	 * @param l The length of the data; if 0 then this function returns without doing anything
 	 */
 	virtual void Write(const char *buffer, size_t l);
-	void Write(const char *message, ...);
 	void Write(const Anope::string &message);
 
 	/** Called with data from the socket

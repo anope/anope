@@ -223,7 +223,18 @@ class InspIRCd20Proto : public IRCDProto
 
 	void SendNumeric(int numeric, User *dest, IRCMessage &message)
 	{
-		Uplink::Send("PUSH", dest->GetUID(), Format(message));
+		std::vector<Anope::string> params = message.GetParameters();
+		if (params.empty())
+			return;
+
+		/* First parameter is the UID, change it to nick because it is pushed */
+		params[0] = dest->nick;
+
+		IRCMessage m(message.GetSource(), message.GetCommand());
+		for (const Anope::string &s : params)
+			m.Push(s);
+
+		Uplink::Send("PUSH", dest->GetUID(), Format(m));
 	}
 
 	void SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf) override

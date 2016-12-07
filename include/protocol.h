@@ -414,7 +414,7 @@ void IRCDProto::SendNumeric(int numeric, User *dest, Args&&... args)
 	if (numeric < 100)
 		numstr.insert(numstr.begin(), '0');
 
-	IRCMessage message(Me, numstr, dest->nick);
+	IRCMessage message(Me, numstr, dest->GetUID());
 	message.Push(std::forward<Args>(args)...);
 	SendNumeric(numeric, dest, message);
 }

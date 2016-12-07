@@ -49,7 +49,7 @@ class UnrealIRCdProto : public IRCDProto
 
  private:
 	/* SVSNOOP */
-	void SendSVSNOOP(const Server *server, bool set) override
+	void SendSVSNOOP(Server *server, bool set) override
 	{
 		Uplink::Send("SVSNOOP", server->GetSID(), set ? "+" : "-");
 	}
@@ -78,12 +78,12 @@ class UnrealIRCdProto : public IRCDProto
 		Uplink::Send(source, "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
 	}
 
-	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
 	}
 
-	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
@@ -147,13 +147,13 @@ class UnrealIRCdProto : public IRCDProto
 		Uplink::Send("TKL", "+", "G", x->GetUser(), x->GetHost(), x->GetBy(), Anope::CurTime + timeleft, x->GetCreated(), x->GetReason());
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
 		Uplink::Send(source, "SVSKILL", user->GetUID(), buf);
 		user->KillInternal(source, buf);
 	}
 
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
+	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
 		IRCMessage message(source, "SVS2MODE", u->GetUID());
 		message.TokenizeAndPush(buf);
@@ -168,7 +168,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	/* SERVER name hop descript */
 	/* Unreal 3.2 actually sends some info about itself in the descript area */
-	void SendServer(const Server *server) override
+	void SendServer(Server *server) override
 	{
 		if (!server->GetSID().empty() && server == Me)
 			Uplink::Send("SERVER", server->GetName(), server->GetHops() + 1, server->GetDescription());
@@ -356,9 +356,9 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		/* 3.2.10.4+ treats users logged in with accounts as fully registered, even if -r, so we can not set this here. Just use the timestamp. */
 		if (Servers::Capab.count("ESVID") > 0 && !na->GetAccount()->IsUnconfirmed())
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->GetAccount()->GetDisplay().c_str());
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", na->GetAccount()->GetDisplay());
 		else
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %d", u->signon);
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", u->signon);
 	}
 
 	void SendLogout(User *u) override
@@ -582,7 +582,7 @@ class ChannelModeFlood : public ChannelModeParam
 		try
 		{
 			Anope::string rest;
-			if (value[0] != ':' && convertTo<unsigned>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<unsigned>(rest.substr(1), rest, false) > 0 && rest.empty())
+			if (value[0] != ':' && convertTo<unsigned int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<unsigned int>(rest.substr(1), rest, false) > 0 && rest.empty())
 				return true;
 		}
 		catch (const ConvertException &) { }

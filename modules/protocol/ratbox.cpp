@@ -62,20 +62,20 @@ class RatboxProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKillInternal(source, targ, reason); }
-	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendSVSKill(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKill(source, targ, reason); }
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
 	void SendSGLine(User *u, XLine *x) override { hybrid->SendSGLine(u, x); }
 	void SendSGLineDel(XLine *x) override { hybrid->SendSGLineDel(x); }
 	void SendAkill(User *u, XLine *x) override { hybrid->SendAkill(u, x); }
 	void SendAkillDel(XLine *x) override { hybrid->SendAkillDel(x); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { hybrid->SendJoin(user, c, status); }
-	void SendServer(const Server *server) override { hybrid->SendServer(server); }
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override { hybrid->SendModeInternal(source, u, buf); }
+	void SendServer(Server *server) override { hybrid->SendServer(server); }
+	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override { hybrid->SendMode(source, u, buf); }
 	void SendChannel(Channel *c) override { hybrid->SendChannel(c); }
 	bool IsIdentValid(const Anope::string &ident) override { return hybrid->IsIdentValid(ident); }
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
 	{
 		Uplink::Send(source, "OPERWALL", buf);
 	}

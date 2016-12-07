@@ -773,7 +773,7 @@ bool Channel::Kick(User *source, User *u, const char *reason, ...)
 
 	if (!this->KickInternal(source, u->nick, buf))
 		return false;
-	IRCD->SendKick(source, this, u, "%s", buf);
+	IRCD->SendKick(source, this, u, buf);
 	return true;
 }
 

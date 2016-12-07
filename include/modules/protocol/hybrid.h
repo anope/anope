@@ -67,7 +67,7 @@ class Pong : public IRCDMessage
 class ServerMessage : public IRCDMessage
 {
  public:
-	ServerMessage(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	ServerMessage(Module *creator) : IRCDMessage(creator, "SERVER", 3) { }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
@@ -75,7 +75,7 @@ class ServerMessage : public IRCDMessage
 class SID : public IRCDMessage
 {
  public:
-	SID(Module *creator) : IRCDMessage(creator, "SID", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	SID(Module *creator) : IRCDMessage(creator, "SID", 4) { }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };

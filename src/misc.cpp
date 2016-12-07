@@ -579,40 +579,44 @@ const Anope::string Anope::LastError()
 Anope::string Anope::Version()
 {
 #ifdef VERSION_GIT
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA + " (" + VERSION_GIT + ")";
+	return Anope::Format("{0}.{1}.{2}{3}-{4}", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_EXTRA, VERSION_GIT);
 #else
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA;
+	return Anope::Format("{0}.{1}.{2}{3}", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_EXTRA);
 #endif
 }
 
 Anope::string Anope::VersionShort()
 {
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH);
+	return Anope::Format("{0}.{1}.{2}", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 }
 
-Anope::string Anope::VersionBuildString()
+Anope::string Anope::VersionBuildTime()
 {
 #ifdef REPRODUCIBLE_BUILD
-	Anope::string s = "build #" + stringify(BUILD);
+	return "unknown";
 #else
-	Anope::string s = "build #" + stringify(BUILD) + ", compiled " + Anope::compiled;
+	return Anope::COMPILED;
 #endif
+}
+
+Anope::string Anope::VersionFlags()
+{
 	Anope::string flags;
 
 #ifdef DEBUG_BUILD
-	flags += "D";
+	flags.append('D');
 #endif
 #ifdef VERSION_GIT
-	flags += "G";
+	flags.append('G');
 #endif
 #ifdef _WIN32
-	flags += "W";
+	flags.append('W');
 #endif
 
-	if (!flags.empty())
-		s += ", flags " + flags;
+	if (flags.empty())
+		flags = "none";
 
-	return s;
+	return flags;
 }
 
 int Anope::VersionMajor() { return VERSION_MAJOR; }

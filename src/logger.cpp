@@ -383,14 +383,14 @@ void LogInfo::ProcessMessage(const Log *l)
 				if (!bi)
 					bi = c->ci->WhoSends();
 				if (bi)
-					IRCD->SendPrivmsg(bi, c->name, "%s", buffer.c_str());
+					IRCD->SendPrivmsg(bi, c->name, buffer);
 			}
 		}
 		else if (target == "globops")
 		{
 			if (UplinkSock && l->bi && l->type <= LOG_NORMAL && Me && Me->IsSynced())
 			{
-				IRCD->SendGlobops(l->bi, "%s", buffer.c_str());
+				IRCD->SendGlobops(l->bi, buffer);
 			}
 		}
 	}

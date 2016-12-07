@@ -101,7 +101,7 @@ class BotServCore : public Module, public BotServ::BotServService
 			{
 				ChannelMode *cm = ModeManager::FindChannelModeByName("OP");
 				char symbol = cm ? anope_dynamic_static_cast<ChannelModeStatus *>(cm)->symbol : 0;
-				IRCD->SendNotice(bi, (symbol ? Anope::string(symbol) : "") + c->name, "%s invited %s into the channel.", user->nick.c_str(), user->nick.c_str());
+				IRCD->SendNotice(bi, (symbol ? Anope::string(symbol) : "") + c->name, "{0} invited {1} into the channel.", user->nick, user->nick);
 			}
 
 			ModeManager::ProcessModes();

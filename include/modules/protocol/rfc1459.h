@@ -164,7 +164,7 @@ class Stats : public IRCDMessage
 class Time : public IRCDMessage
 {
  public:
-	Time(Module *creator, const Anope::string &mname = "TIME") : IRCDMessage(creator, mname, 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	Time(Module *creator, const Anope::string &mname = "TIME") : IRCDMessage(creator, mname, 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
@@ -180,7 +180,7 @@ class Topic : public IRCDMessage
 class Version : public IRCDMessage
 {
  public:
-	Version(Module *creator, const Anope::string &mname = "VERSION") : IRCDMessage(creator, mname, 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	Version(Module *creator, const Anope::string &mname = "VERSION") : IRCDMessage(creator, mname, 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
@@ -188,7 +188,7 @@ class Version : public IRCDMessage
 class Whois : public IRCDMessage
 {
  public:
- 	Whois(Module *creator, const Anope::string &mname = "WHOIS") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	Whois(Module *creator, const Anope::string &mname = "WHOIS") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };

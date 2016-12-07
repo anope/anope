@@ -303,13 +303,13 @@ void Anope::Init(int ac, char **av)
 
 	if (GetCommandLineArgument("version", 'v'))
 	{
-		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::VersionBuildString();
+		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- Built: " << Anope::VersionBuildTime() << " -- Flags: " << Anope::VersionFlags();
 		throw CoreException();
 	}
 
 	if (GetCommandLineArgument("help", 'h'))
 	{
-		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::VersionBuildString();
+		Log(LOG_TERMINAL) << "Anope-" << Anope::Version();
 		Log(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
 		Log(LOG_TERMINAL) << "Usage ./" << Anope::ServicesBin << " [options] ...";
 		Log(LOG_TERMINAL) << "-c, --config=filename.conf";
@@ -417,7 +417,7 @@ void Anope::Init(int ac, char **av)
 		throw CoreException("Unable to chdir to " + Anope::ServicesDir + ": " + Anope::LastError());
 	}
 
-	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::VersionBuildString();
+	Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- Built: " << Anope::VersionBuildTime() << " -- Flags: " << Anope::VersionFlags();
 
 #ifdef _WIN32
 	if (!SupportedWindowsVersion())

@@ -26,9 +26,9 @@
 
 class ngIRCdProto : public IRCDProto
 {
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
-		IRCDProto::SendSVSKillInternal(source, user, buf);
+		IRCDProto::SendSVSKill(source, user, buf);
 		user->KillInternal(source, buf);
 	}
 
@@ -75,7 +75,7 @@ class ngIRCdProto : public IRCDProto
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
 		/* finish the enhanced server handshake and register the connection */
-		this->SendNumeric(376, "*", ":End of MOTD command");
+		Uplink::Send("376", "*", "End of MOTD command");
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
@@ -83,17 +83,17 @@ class ngIRCdProto : public IRCDProto
 		Uplink::Send(Me, "SVSNICK", u->nick, newnick);
 	}
 
-	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
 	}
 
-	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
 	{
 		Uplink::Send(source, "WALLOPS", buf);
 	}
@@ -121,14 +121,6 @@ class ngIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendKickInternal(const MessageSource &source, const Channel *chan, User *user, const Anope::string &buf) override
-	{
-		if (!buf.empty())
-			Uplink::Send(source, "KICK", chan->name, user->nick, buf);
-		else
-			Uplink::Send(source, "KICK", chan->name, user->nick);
-	}
-
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
 		Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", na->GetAccount()->GetDisplay());
@@ -139,23 +131,8 @@ class ngIRCdProto : public IRCDProto
 		Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", "");
 	}
 
-	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) override
-	{
-		IRCMessage message(source, "MODE", dest->name);
-		message.TokenizeAndPush(buf);
-		Uplink::SendMessage(message);
-	}
-
-	void SendPartInternal(User *u, const Channel *chan, const Anope::string &buf) override
-	{
-		if (!buf.empty())
-			Uplink::Send(u, "PART", chan->name, buf);
-		else
-			Uplink::Send(u, "PART", chan->name);
-	}
-
 	/* SERVER name hop descript */
-	void SendServer(const Server *server) override
+	void SendServer(Server *server) override
 	{
 		Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
 	}

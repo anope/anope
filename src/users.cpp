@@ -92,7 +92,7 @@ static void CollideKill(User *target, const Anope::string &reason)
 	else
 	{
 		// Be sure my user is really dead
-		IRCD->SendQuit(target, "%s", reason.c_str());
+		IRCD->SendQuit(target, reason);
 
 		// Reintroduce my client
 		if (ServiceBot *bi = dynamic_cast<ServiceBot *>(target))
@@ -352,9 +352,9 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 			if (buf.length() + add.length() > Config->LineWrap)
 			{
 				if (send_privmsg)
-					IRCD->SendPrivmsg(source, this->GetUID(), "%s", buf.c_str());
+					IRCD->SendPrivmsg(source, this->GetUID(), buf);
 				else
-					IRCD->SendNotice(source, this->GetUID(), "%s", buf.c_str());
+					IRCD->SendNotice(source, this->GetUID(), buf);
 				buf.clear();
 
 				add = word;
@@ -366,9 +366,9 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 		if (!buf.empty())
 		{
 			if (send_privmsg)
-				IRCD->SendPrivmsg(source, this->GetUID(), "%s", buf.c_str());
+				IRCD->SendPrivmsg(source, this->GetUID(), buf);
 			else
-				IRCD->SendNotice(source, this->GetUID(), "%s", buf.c_str());
+				IRCD->SendNotice(source, this->GetUID(), buf);
 		}
 	}
 }
@@ -769,7 +769,7 @@ void User::Kill(const MessageSource &source, const Anope::string &reason)
 {
 	Anope::string real_reason = source.GetName() + " (" + reason + ")";
 
-	IRCD->SendSVSKill(source, this, "%s", real_reason.c_str());
+	IRCD->SendSVSKill(source, this, real_reason);
 }
 
 void User::KillInternal(const MessageSource &source, const Anope::string &reason)

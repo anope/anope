@@ -57,7 +57,7 @@ class BahamutIRCdProto : public IRCDProto
 		MaxModes = 60;
 	}
 
-	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) override
+	void SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf) override
 	{
 		if (Servers::Capab.count("TSMODE") > 0)
 		{
@@ -67,23 +67,23 @@ class BahamutIRCdProto : public IRCDProto
 		}
 		else
 		{
-			IRCDProto::SendModeInternal(source, dest, buf);
+			IRCDProto::SendMode(source, dest, buf);
 		}
 	}
 
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
+	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
 		IRCMessage message(source, "SVSMODE", u->nick, u->timestamp);
 		message.TokenizeAndPush(buf);
 		Uplink::SendMessage(message);
 	}
 
-	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
 	}
 
-	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
@@ -135,7 +135,7 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SVSNOOP */
-	void SendSVSNOOP(const Server *server, bool set) override
+	void SendSVSNOOP(Server *server, bool set) override
 	{
 		Uplink::Send("SVSNOOP", server->GetName(), set ? "+" : "-");
 	}
@@ -255,7 +255,7 @@ class BahamutIRCdProto : public IRCDProto
 	/*
 	  Note: if the stamp is null 0, the below usage is correct of Bahamut
 	*/
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
 		Uplink::Send(source, "SVSKILL", user->nick, buf);
 	}
@@ -277,7 +277,7 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SERVER */
-	void SendServer(const Server *server) override
+	void SendServer(Server *server) override
 	{
 		Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
 	}
@@ -309,7 +309,7 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendLogin(User *u, NickServ::Nick *) override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %d", u->signon);
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", u->signon);
 	}
 
 	void SendLogout(User *u) override

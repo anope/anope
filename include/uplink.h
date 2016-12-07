@@ -37,7 +37,7 @@ namespace Uplink
 	template<typename... Args>
 	void Send(const Anope::string &command, Args&&... args)
 	{
-		IRCMessage message(MessageSource(""), command, std::forward<Args>(args)...);
+		IRCMessage message(Me, command, std::forward<Args>(args)...);
 		SendMessage(message);
 	}
 }

@@ -47,9 +47,9 @@ class HybridProto : public IRCDProto
 		return NULL;
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *u, const Anope::string &buf) override
+	void SendSVSKill(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
-		IRCDProto::SendSVSKillInternal(source, u, buf);
+		IRCDProto::SendSVSKill(source, u, buf);
 		u->KillInternal(source, buf);
 	}
 
@@ -70,17 +70,17 @@ class HybridProto : public IRCDProto
 		MaxModes = 6;
 	}
 
-	void SendInvite(const MessageSource &source, const Channel *c, User *u) override
+	void SendInvite(const MessageSource &source, Channel *c, User *u) override
 	{
 		Uplink::Send(source, "INVITE", u->GetUID(), c->name, c->creation_time);
 	}
 
-	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "NOTICE", "$$" + dest->GetName(), msg);
 	}
 
-	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "PRIVMSG", "$$" + dest->GetName(), msg);
 	}
@@ -193,7 +193,7 @@ class HybridProto : public IRCDProto
 		Uplink::Send(Config->GetClient("OperServ"), "KLINE", timeleft, x->GetUser(), x->GetHost(), x->GetReason());
 	}
 
-	void SendServer(const Server *server) override
+	void SendServer(Server *server) override
 	{
 		if (server == Me)
 			Uplink::Send("SERVER", server->GetName(), server->GetHops() + 1, server->GetDescription());
@@ -238,7 +238,7 @@ class HybridProto : public IRCDProto
 		Uplink::Send(Me, "EOB");
 	}
 
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
+	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
 		IRCMessage message(source, "SVSMODE", u->GetUID(), u->timestamp);
 		message.TokenizeAndPush(buf);
@@ -247,7 +247,7 @@ class HybridProto : public IRCDProto
 
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->GetAccount()->GetDisplay().c_str());
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", na->GetAccount()->GetDisplay());
 	}
 
 	void SendLogout(User *u) override

@@ -40,9 +40,9 @@ static unsigned int spanningtree_proto_ver = 0;
 class InspIRCd20Proto : public IRCDProto
 {
  private:
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
-		IRCDProto::SendSVSKillInternal(source, user, buf);
+		IRCDProto::SendSVSKill(source, user, buf);
 		user->KillInternal(source, buf);
 	}
 
@@ -96,12 +96,12 @@ class InspIRCd20Proto : public IRCDProto
 		SendServer(Me);
 	}
 
-	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
 	}
 
-	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
@@ -221,13 +221,12 @@ class InspIRCd20Proto : public IRCDProto
 		SendAddLine("G", x->GetUser() + "@" + x->GetHost(), timeleft, x->GetBy(), x->GetReason());
 	}
 
-	void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf) override
+	void SendNumeric(int numeric, User *dest, IRCMessage &message)
 	{
-		User *u = User::Find(dest);
-		Uplink::Send("PUSH", dest, ":" + Me->GetName() + " " + numeric + " " + (u ? u->nick : dest) + " " + buf);
+		Uplink::Send("PUSH", dest->GetUID(), Format(message));
 	}
 
-	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) override
+	void SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf) override
 	{
 		IRCMessage message(source, "FMODE", dest->name, dest->creation_time);
 		message.TokenizeAndPush(buf);
@@ -243,7 +242,7 @@ class InspIRCd20Proto : public IRCDProto
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
-	void SendServer(const Server *server) override
+	void SendServer(Server *server) override
 	{
 		/* if rsquit is set then we are waiting on a squit */
 		if (rsquit_id.empty() && rsquit_server.empty())
@@ -370,7 +369,8 @@ class InspIRCd20Proto : public IRCDProto
 	{
 		Uplink::Send(Me, "BURST", Anope::CurTime);
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		Uplink::Send(Me, "VERSION", "Anope-" + Anope::Version() + " " + Me->GetName() + " :" + IRCD->GetProtocolName() + " - (" + (enc ? enc->name : "none") + ") -- " + Anope::VersionBuildString());
+		Uplink::Send(Me, "VERSION", Anope::Format("Anope-{0} {1} {2} - {3} - Built: {4} - Flags: {5}",
+			Anope::Version(), Me->GetName(), IRCD->GetProtocolName(), enc ? enc->name : "(none)", Anope::VersionBuildTime(), Anope::VersionFlags()));
 	}
 
 	void SendEOB() override
@@ -378,7 +378,7 @@ class InspIRCd20Proto : public IRCDProto
 		Uplink::Send(Me, "ENDBURST");
 	}
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
 	{
 		if (Servers::Capab.count("GLOBOPS"))
 			Uplink::Send(source, "SNONOTICE", "g", buf);

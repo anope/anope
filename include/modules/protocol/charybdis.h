@@ -43,7 +43,7 @@ class EUID : public IRCDMessage
 class ServerMessage : public IRCDMessage
 {
  public:
-	ServerMessage(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	ServerMessage(Module *creator) : IRCDMessage(creator, "SERVER", 3) { }
 
 	// SERVER dev.anope.de 1 :charybdis test server
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;

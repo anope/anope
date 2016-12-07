@@ -147,6 +147,8 @@ namespace Anope
 		 */
 		inline void push_back(char c) { return this->_string.push_back(c); }
 
+		inline string& insert(const_iterator p, char c) { this->_string.insert(p, c); return *this; }
+
 		inline string& append(const string &s) { this->_string.append(s.str()); return *this; }
 		inline string& append(const char *s, size_t n) { this->_string.append(s, n); return *this; }
 
@@ -353,7 +355,7 @@ namespace Anope
 	template<typename T> using locale_hash_map = std::unordered_map<string, T, hash_locale, compare_locale>;
 
 #ifndef REPRODUCIBLE_BUILD
-	static const char *const compiled = __TIME__ " " __DATE__;
+	static const char *const COMPILED = __DATE__ " " __TIME__;
 #endif
 
 	/** The time Anope started.
@@ -406,7 +408,8 @@ namespace Anope
 	 */
 	extern CoreExport string Version();
 	extern CoreExport string VersionShort();
-	extern CoreExport string VersionBuildString();
+	extern CoreExport string VersionBuildTime();
+	extern CoreExport string VersionFlags();
 	extern CoreExport int VersionMajor();
 	extern CoreExport int VersionMinor();
 	extern CoreExport int VersionPatch();

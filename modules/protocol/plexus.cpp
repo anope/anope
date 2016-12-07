@@ -47,21 +47,21 @@ class PlexusProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKillInternal(source, targ, reason); }
-	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendSVSKill(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKill(source, targ, reason); }
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
 	void SendSQLine(User *u, XLine *x) override { hybrid->SendSQLine(u, x); }
 	void SendSQLineDel(XLine *x) override { hybrid->SendSQLineDel(x); }
 	void SendSGLineDel(XLine *x) override { hybrid->SendSGLineDel(x); }
 	void SendSGLine(User *u, XLine *x) override { hybrid->SendSGLine(u, x); }
 	void SendAkillDel(XLine *x) override { hybrid->SendAkillDel(x); }
 	void SendAkill(User *u, XLine *x) override { hybrid->SendAkill(u, x); }
-	void SendServer(const Server *server) override { hybrid->SendServer(server); }
+	void SendServer(Server *server) override { hybrid->SendServer(server); }
 	void SendChannel(Channel *c) override { hybrid->SendChannel(c); }
 	void SendSVSHold(const Anope::string &nick, time_t t) override { hybrid->SendSVSHold(nick, t); }
 	void SendSVSHoldDel(const Anope::string &nick) override { hybrid->SendSVSHoldDel(nick); }
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
 	{
 		Uplink::Send(source, "OPERWALL", buf);
 	}
@@ -153,7 +153,7 @@ class PlexusProto : public IRCDProto
 		Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, "255.255.255.255", u->GetUID(), 0, u->host, u->realname);
 	}
 
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
+	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
 		Uplink::Send(source, "ENCAP", "*", "SVSMODE", u->GetUID(), u->timestamp, buf);
 	}

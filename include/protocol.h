@@ -22,6 +22,8 @@
 #include "services.h"
 #include "anope.h"
 #include "service.h"
+#include "servers.h"
+#include "users.h"
 
 class IRCMessage;
 
@@ -30,57 +32,62 @@ class CoreExport IRCDProto : public Service
 {
 	Anope::string proto_name;
 
- protected:
- 	IRCDProto(Module *creator, const Anope::string &proto_name);
- public:
+public:
 	static constexpr const char *NAME = "ircdproto";
-	
+
+	/* Modes used by default by our clients */
+	Anope::string DefaultPseudoclientModes = "+io";
+	/* Can we force change a users's nick? */
+	bool CanSVSNick = false;
+	/* Can we force join or part users? */
+	bool CanSVSJoin = false;
+	/* Can we set vhosts/vidents on users? */
+	bool CanSetVHost = false, CanSetVIdent = false;
+	/* Can we ban specific gecos from being used? */
+	bool CanSNLine = false;
+	/* Can we ban specific nicknames from being used? */
+	bool CanSQLine = false;
+	/* Can we ban sepcific channel names from being used? */
+	bool CanSQLineChannel = false;
+	/* Can we ban by IP? */
+	bool CanSZLine = false;
+	/* Can we place temporary holds on specific nicknames? */
+	bool CanSVSHold = false;
+	/* See ns_cert */
+	bool CanCertFP = false;
+	/* Whether this IRCd requires unique IDs for each user or server. See TS6/P10. */
+	bool RequiresID = false;
+	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */
+	bool AmbiguousID = false;
+	/* The maximum number of modes we are allowed to set with one MODE command */
+	unsigned int MaxModes = 3;
+	/* The maximum number of bytes a line may have */
+	unsigned int MaxLine = 512;
+
+	IRCDProto(Module *creator, const Anope::string &proto_name);
 	virtual ~IRCDProto();
 
-	virtual void SendSVSKillInternal(const MessageSource &, User *, const Anope::string &);
-	virtual void SendModeInternal(const MessageSource &, const Channel *, const Anope::string &);
-	virtual void SendModeInternal(const MessageSource &, User *, const Anope::string &);
-	virtual void SendKickInternal(const MessageSource &, const Channel *, User *, const Anope::string &);
-	virtual void SendNoticeInternal(const MessageSource &, const Anope::string &dest, const Anope::string &msg);
-	virtual void SendPrivmsgInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
-	virtual void SendQuitInternal(User *, const Anope::string &buf);
-	virtual void SendPartInternal(User *, const Channel *chan, const Anope::string &buf);
-	virtual void SendGlobopsInternal(const MessageSource &, const Anope::string &buf);
-	virtual void SendCTCPInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
-	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf);
+	const Anope::string &GetProtocolName() const;
 
-	const Anope::string &GetProtocolName();
 	virtual void Parse(const Anope::string &, Anope::string &, Anope::string &, std::vector<Anope::string> &);
 	virtual Anope::string Format(IRCMessage &);
 
-	/* Modes used by default by our clients */
-	Anope::string DefaultPseudoclientModes;
-	/* Can we force change a users's nick? */
-	bool CanSVSNick;
-	/* Can we force join or part users? */
-	bool CanSVSJoin;
-	/* Can we set vhosts/vidents on users? */
-	bool CanSetVHost, CanSetVIdent;
-	/* Can we ban specific gecos from being used? */
-	bool CanSNLine;
-	/* Can we ban specific nicknames from being used? */
-	bool CanSQLine;
-	/* Can we ban sepcific channel names from being used? */
-	bool CanSQLineChannel;
-	/* Can we ban by IP? */
-	bool CanSZLine;
-	/* Can we place temporary holds on specific nicknames? */
-	bool CanSVSHold;
-	/* See ns_cert */
-	bool CanCertFP;
-	/* Whether this IRCd requires unique IDs for each user or server. See TS6/P10. */
-	bool RequiresID;
-	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */
-	bool AmbiguousID;
-	/* The maximum number of modes we are allowed to set with one MODE command */
-	unsigned MaxModes;
-	/* The maximum number of bytes a line may have */
-	unsigned MaxLine;
+	/** Kills a user
+	 * @param source Who is doing the kill
+	 * @param user The target to be killed
+	 * @param reason Kill reason
+	 */
+	virtual void SendSVSKill(const MessageSource &source, User *user, const Anope::string &reason);
+	virtual void SendMode(const MessageSource &, Channel *, const Anope::string &);
+	virtual void SendMode(const MessageSource &, User *, const Anope::string &);
+	virtual void SendKick(const MessageSource &, Channel *, User *, const Anope::string &);
+	virtual void SendNotice(const MessageSource &, const Anope::string &dest, const Anope::string &msg);
+	virtual void SendPrivmsg(const MessageSource &, const Anope::string &dest, const Anope::string &msg);
+	virtual void SendQuit(User *, const Anope::string &reason);
+	virtual void SendPart(User *, Channel *chan, const Anope::string &reason);
+	virtual void SendGlobops(const MessageSource &, const Anope::string &buf);
+	virtual void SendCTCPReply(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendNumeric(int numeric, User *dest, IRCMessage &);
 
 	/* Retrieves the next free UID or SID */
 	virtual Anope::string UID_Retrieve();
@@ -91,7 +98,7 @@ class CoreExport IRCDProto : public Service
 	 * @param s The server
 	 * @param mode Whether to turn NOOP on or off
 	 */
-	virtual void SendSVSNOOP(const Server *s, bool mode) { }
+	virtual void SendSVSNOOP(Server *s, bool mode) { }
 
 	/** Sets the topic on a channel
 	 * @param bi The bot to set the topic from
@@ -130,32 +137,18 @@ class CoreExport IRCDProto : public Service
 
 	virtual void SendKill(const MessageSource &source, const Anope::string &target, const Anope::string &reason);
 
-	/** Kills a user
-	 * @param source Who is doing the kill
-	 * @param user The user to be killed
-	 * @param fmt Kill reason
-	 */
-	virtual void SendSVSKill(const MessageSource &source, User *user, const char *fmt, ...);
-
-	virtual void SendMode(const MessageSource &source, const Channel *dest, const char *fmt, ...);
-	virtual void SendMode(const MessageSource &source, User *u, const char *fmt, ...);
-
 	/** Introduces a client to the rest of the network
 	 * @param u The client to introduce
 	 */
 	virtual void SendClientIntroduction(User *u) anope_abstract;
 
-	virtual void SendKick(const MessageSource &source, const Channel *chan, User *user, const char *fmt, ...);
 
-	virtual void SendNotice(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendPrivmsg(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendAction(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendAction(const MessageSource &source, const Anope::string &dest, const Anope::string &message);
 
-	virtual void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) anope_abstract;
-	virtual void SendGlobalPrivmsg(ServiceBot *bi, const Server *desc, const Anope::string &msg) anope_abstract;
+	virtual void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) anope_abstract;
+	virtual void SendGlobalPrivmsg(ServiceBot *bi, Server *desc, const Anope::string &msg) anope_abstract;
 
-	virtual void SendQuit(User *u, const char *fmt, ...);
+
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 
 	/**
@@ -174,7 +167,6 @@ class CoreExport IRCDProto : public Service
 	 * stacker to be set "soon".
 	 */
 	virtual void SendJoin(User *u, Channel *c, const ChannelStatus *status) anope_abstract;
-	virtual void SendPart(User *u, const Channel *chan, const char *fmt, ...);
 
 	/** Force joins a user that isn't ours to a channel.
 	 * @param bi The source of the message
@@ -192,8 +184,8 @@ class CoreExport IRCDProto : public Service
 	 */
 	virtual void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) { }
 
-	virtual void SendInvite(const MessageSource &source, const Channel *c, User *u);
-	virtual void SendGlobops(const MessageSource &source, const char *fmt, ...);
+	virtual void SendInvite(const MessageSource &source, Channel *c, User *u);
+
 
 	/** Sends a nick change of one of our clients.
 	 */
@@ -221,10 +213,9 @@ class CoreExport IRCDProto : public Service
 
 	/** Introduces a server to the uplink
 	 */
-	virtual void SendServer(const Server *) anope_abstract;
+	virtual void SendServer(Server *) anope_abstract;
 	virtual void SendSquit(Server *, const Anope::string &message);
 
-	virtual void SendNumeric(int numeric, const Anope::string &dest, const char *fmt, ...);
 
 	virtual void SendLogin(User *u, NickServ::Nick *na) anope_abstract;
 	virtual void SendLogout(User *u) anope_abstract;
@@ -252,16 +243,74 @@ class CoreExport IRCDProto : public Service
 	/** Retrieve the maximum number of list modes settable on this channel
 	 * Defaults to Config->ListSize
 	 */
-	virtual unsigned GetMaxListFor(Channel *c);
+	virtual unsigned int GetMaxListFor(Channel *c);
 
 	virtual Anope::string NormalizeMask(const Anope::string &mask);
+
+	/* Templated functions which overload the normal functions to provide format strings */
+	template<typename... Args> void SendSVSKill(const MessageSource &source, User *user, const Anope::string &reason, Args&&... args)
+	{
+		SendSVSKill(source, user, Anope::Format(reason, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void SendMode(const MessageSource &source, Channel *chan, const Anope::string &modes, Args&&... args)
+	{
+		SendMode(source, chan, Anope::Format(modes, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void SendMode(const MessageSource &source, User *u, const Anope::string &modes, Args&&... args)
+	{
+		SendMode(source, u, Anope::Format(modes, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void SendKick(const MessageSource &source, const Channel *chan, User *user, const Anope::string &reason, Args&&... args)
+	{
+		SendKick(source, chan, user, Anope::Format(reason, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void SendNotice(const MessageSource &source, const Anope::string &dest, const Anope::string &message, Args&&... args)
+	{
+		SendNotice(source, dest, Anope::Format(message, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void SendPrivmsg(const MessageSource &source, const Anope::string &dest, const Anope::string &message, Args&&... args)
+	{
+		SendPrivmsg(source, dest, Anope::Format(message, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void SendAction(const MessageSource &source, const Anope::string &dest, const Anope::string &message, Args&&... args)
+	{
+		SendAction(source, dest, Anope::Format(message, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void SendCTCPReply(const MessageSource &source, const Anope::string &dest, const Anope::string &message, Args&&... args)
+	{
+		SendCTCPReply(source, dest, Anope::Format(message, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void SendGlobops(const MessageSource &source, const Anope::string &msg, Args&&... args)
+	{
+		SendGlobops(source, Anope::Format(msg, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void SendNumeric(int numeric, User *dest, Args&&... args);
+
+	template<typename... Args> void SendQuit(User *u, const Anope::string &reason, Args&&... args)
+	{
+		SendQuit(u, Anope::Format(reason, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void SendPart(User *u, Channel *chan, const Anope::string &reason, Args&&... args)
+	{
+		SendPart(u, chan, Anope::Format(reason, std::forward<Args>(args)...));
+	}
 };
 
 class CoreExport MessageSource
 {
 	Anope::string source;
-	User *u;
-	Server *s;
+	User *u = nullptr;
+	Server *s = nullptr;
 
  public:
 	MessageSource(const Anope::string &);
@@ -289,9 +338,9 @@ class CoreExport IRCDMessage : public Service
 	std::set<IRCDMessageFlag> flags;
  public:
 	static constexpr const char *NAME = "IRCDMessage";
-	
-	IRCDMessage(Module *owner, const Anope::string &n, unsigned p = 0);
-	unsigned GetParamCount() const;
+
+	IRCDMessage(Module *owner, const Anope::string &n, unsigned int p = 0);
+	unsigned int GetParamCount() const;
 	virtual void Run(MessageSource &, const std::vector<Anope::string> &params) anope_abstract;
 
 	void SetFlag(IRCDMessageFlag f) { flags.insert(f); }
@@ -305,9 +354,7 @@ class IRCMessage
 	MessageSource source;
 	Anope::string command;
 	std::vector<Anope::string> parameters;
-	
-	void Push() { }
-	
+
  public:
 	template<typename... Args>
 	IRCMessage(const MessageSource &_source, const Anope::string &_command, Args&&... args)
@@ -315,10 +362,10 @@ class IRCMessage
 		, command(_command)
 	{
 		parameters.reserve(sizeof...(args));
-		
+
 		Push(std::forward<Args>(args)...);
 	}
-		
+
 	template<typename T, typename... Args>
 	void Push(const T& t, Args&&... args)
 	{
@@ -326,7 +373,9 @@ class IRCMessage
 		
 		Push(std::forward<Args>(args)...);
 	}
-	
+
+	void Push() { }
+
 	void TokenizeAndPush(const Anope::string &buf, char sepToken = ' ')
 	{
 		sepstream sep(buf, sepToken);
@@ -334,7 +383,7 @@ class IRCMessage
 		while (sep.GetToken(token))
 			Push(token);
 	}
-		
+
 	const MessageSource &GetSource() const
 	{
 		return source;
@@ -344,14 +393,28 @@ class IRCMessage
 	{
 		this->source = _source;
 	}
-	
+
 	const Anope::string &GetCommand() const
 	{
 		return command;
 	}
-	
+
 	const std::vector<Anope::string> &GetParameters() const
 	{
 		return parameters;
 	}
 };
+
+template<typename... Args>
+void IRCDProto::SendNumeric(int numeric, User *dest, Args&&... args)
+{
+	Anope::string numstr = stringify(numeric);
+	if (numeric < 10)
+		numstr.insert(numstr.begin(), '0');
+	if (numeric < 100)
+		numstr.insert(numstr.begin(), '0');
+
+	IRCMessage message(Me, numstr, dest->nick);
+	message.Push(std::forward<Args>(args)...);
+	SendNumeric(numeric, dest, message);
+}

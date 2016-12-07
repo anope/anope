@@ -61,10 +61,10 @@ class CharybdisProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { ratbox->SendSVSKillInternal(source, targ, reason); }
-	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { ratbox->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override { ratbox->SendGlobopsInternal(source, buf); }
+	void SendSVSKill(const MessageSource &source, User *targ, const Anope::string &reason) override { ratbox->SendSVSKill(source, targ, reason); }
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override { ratbox->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override { ratbox->SendGlobops(source, buf); }
 	void SendSGLine(User *u, XLine *x) override { ratbox->SendSGLine(u, x); }
 	void SendSGLineDel(XLine *x) override { ratbox->SendSGLineDel(x); }
 	void SendAkill(User *u, XLine *x) override { ratbox->SendAkill(u, x); }
@@ -72,7 +72,7 @@ class CharybdisProto : public IRCDProto
 	void SendSQLine(User *u, XLine *x) override { ratbox->SendSQLine(u, x); }
 	void SendSQLineDel(XLine *x) override { ratbox->SendSQLineDel(x); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { ratbox->SendJoin(user, c, status); }
-	void SendServer(const Server *server) override { ratbox->SendServer(server); }
+	void SendServer(Server *server) override { ratbox->SendServer(server); }
 	void SendChannel(Channel *c) override { ratbox->SendChannel(c); }
 	void SendTopic(const MessageSource &source, Channel *c) override { ratbox->SendTopic(source, c); }
 	bool IsIdentValid(const Anope::string &ident) override { return ratbox->IsIdentValid(ident); }

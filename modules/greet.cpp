@@ -194,7 +194,7 @@ class Greet : public Module
 		Anope::string greet = user->Account()->GetGreet();
 		if (c->ci->IsGreet() && !greet.empty() && c->FindUser(c->ci->GetBot()) && c->ci->AccessFor(user).HasPriv("GREET"))
 		{
-			IRCD->SendPrivmsg(c->ci->GetBot(), c->name, "[%s] %s", user->Account()->GetDisplay().c_str(), greet.c_str());
+			IRCD->SendPrivmsg(c->ci->GetBot(), c->name, "[{0}] {1}", user->Account()->GetDisplay(), greet);
 			c->ci->GetBot()->lastmsg = Anope::CurTime;
 		}
 	}

@@ -34,6 +34,7 @@
 #include "mail.h"
 #include "modes.h"
 #include "modules.h"
+#include "numeric.h"
 #include "opertype.h"
 #include "protocol.h"
 #include "serialize.h"

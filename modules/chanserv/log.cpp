@@ -456,12 +456,12 @@ class CSLog : public Module
 				/* Sending a channel message or notice in response to a fantasy command */;
 			else if (log->GetMethod().equals_ci("MESSAGE") && l->ci->c)
 			{
-				IRCD->SendPrivmsg(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, "%s", buffer.c_str());
+				IRCD->SendPrivmsg(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, buffer);
 #warning "fix idletimes"
 				//l->ci->WhoSends()->lastmsg = Anope::CurTime;
 			}
 			else if (log->GetMethod().equals_ci("NOTICE") && l->ci->c)
-				IRCD->SendNotice(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, "%s", buffer.c_str());
+				IRCD->SendNotice(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, buffer);
 		}
 	}
 };

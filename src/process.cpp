@@ -86,7 +86,7 @@ void Anope::ProcessCommand(MessageSource &src, const Anope::string &command, con
 	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_USER) && !src.GetUser())
 		Log(LOG_DEBUG) << "unexpected non-user source " << src.GetSource() << " for " << command;
 	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !src.GetServer())
-		Log(LOG_DEBUG) << "unexpected non-server source " << src.GetSource() << " for " << command;
+		Log(LOG_DEBUG) << "unexpected non-server source " << (src.GetSource().empty() ? "(no source)" : src.GetSource()) << " for " << command;
 	else
 		m->Run(src, params);
 }

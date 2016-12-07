@@ -340,7 +340,7 @@ class CommandOSForbid : public Command
 
 							reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: \002%s\002")), d->GetReason().c_str());
 
-							c->Kick(source.service, u, "%s", reason.c_str());
+							c->Kick(source.service, u, reason);
 						}
 					}
 

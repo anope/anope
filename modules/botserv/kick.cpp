@@ -1329,7 +1329,8 @@ class BSKick : public Module
 		return userdata.Require(uc);
        }
 
-	void TakeAction(ChanServ::Channel *ci, User *u, int ttb, TTBType ttbtype, const char *message, ...)
+	template<typename... Args>
+	void TakeAction(ChanServ::Channel *ci, User *u, int ttb, TTBType ttbtype, const Anope::string &message, Args&&... args)
 	{
 		/* Don't ban ulines or protected users */
 		if (u->IsProtected())
@@ -1351,15 +1352,8 @@ class BSKick : public Module
 		if (!ci->c->FindUser(u))
 			return;
 
-		va_list args;
-		char buf[1024];
-
-		Anope::string fmt = Language::Translate(u, message);
-		va_start(args, message);
-		vsnprintf(buf, sizeof(buf), fmt.c_str(), args);
-		va_end(args);
-
-		ci->c->Kick(ci->GetBot(), u, "%s", buf);
+		Anope::string buf = Anope::Format(message, std::forward<Args>(args)...);
+		ci->c->Kick(ci->GetBot(), u, buf);
 	}
 
  public:
@@ -1703,7 +1697,7 @@ class BSKick : public Module
 						if (Config->GetModule(me)->Get<bool>("gentlebadwordreason"))
 							TakeAction(ci, u, kd->GetTTBBadwords(), TTB_BADWORDS, _("Watch your language!"));
 						else
-							TakeAction(ci, u, kd->GetTTBBadwords(), TTB_BADWORDS, _("Don't use the word \"%s\" on this channel!"), bw->GetWord().c_str());
+							TakeAction(ci, u, kd->GetTTBBadwords(), TTB_BADWORDS, _("Don't use the word \"{0}\" on this channel!"), bw->GetWord());
 
 						return;
 					}

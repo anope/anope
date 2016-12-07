@@ -599,7 +599,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 					}
 
 					for (unsigned i = 0; i < users.size(); ++i)
-						c->Kick(NULL, users[i], "%s", reason.c_str());
+						c->Kick(NULL, users[i], reason);
 				}
 			}
 			else

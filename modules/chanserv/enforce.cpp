@@ -73,7 +73,7 @@ class CommandCSEnforce : public Command
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("RESTRICTED enforced by ")) + source.GetNick();
 			ci->c->SetMode(NULL, "BAN", mask);
-			ci->c->Kick(NULL, user, "%s", reason.c_str());
+			ci->c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("\002Restricted\002 enforced on \002{0}\002."), ci->GetName());
@@ -105,7 +105,7 @@ class CommandCSEnforce : public Command
 			Anope::string reason = Language::Translate(user, _("REGONLY enforced by ")) + source.GetNick();
 			if (!ci->c->HasMode("REGISTEREDONLY"))
 				ci->c->SetMode(NULL, "BAN", mask);
-			ci->c->Kick(NULL, user, "%s", reason.c_str());
+			ci->c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("\002Registered only\002 enforced on \002{0}\002."), ci->GetName());
@@ -137,7 +137,7 @@ class CommandCSEnforce : public Command
 			Anope::string reason = Language::Translate(user, _("SSLONLY enforced by ")) + source.GetNick();
 			if (!ci->c->HasMode("SSL"))
 				ci->c->SetMode(NULL, "BAN", mask);
-			ci->c->Kick(NULL, user, "%s", reason.c_str());
+			ci->c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("\002SSL only\002 enforced on %s."), ci->GetName().c_str());
@@ -166,7 +166,7 @@ class CommandCSEnforce : public Command
 			User *user = users[i];
 
 			Anope::string reason = Language::Translate(user, _("BANS enforced by ")) + source.GetNick();
-			ci->c->Kick(NULL, user, "%s", reason.c_str());
+			ci->c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("\002Bans\002 enforced on %s."), ci->GetName().c_str());
@@ -221,7 +221,7 @@ class CommandCSEnforce : public Command
 			User *user = users[i];
 
 			Anope::string reason = Language::Translate(user, _("LIMIT enforced by ")) + source.GetNick();
-			ci->c->Kick(NULL, user, "%s", reason.c_str());
+			ci->c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("LIMIT enforced on \002{0}\002, \002{1]\002 users removed."), ci->GetName(), users.size());

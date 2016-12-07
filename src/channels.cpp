@@ -756,14 +756,8 @@ bool Channel::KickInternal(const MessageSource &source, const Anope::string &nic
 	return true;
 }
 
-bool Channel::Kick(User *source, User *u, const char *reason, ...)
+bool Channel::Kick(User *source, User *u, const Anope::string &reason)
 {
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, reason);
-	vsnprintf(buf, BUFSIZE - 1, reason, args);
-	va_end(args);
-
 	/* Do not kick protected clients or Ulines */
 	if (u->IsProtected())
 		return false;
@@ -771,9 +765,9 @@ bool Channel::Kick(User *source, User *u, const char *reason, ...)
 	if (source == NULL)
 		source = this->ci->WhoSends();
 
-	if (!this->KickInternal(source, u->nick, buf))
+	if (!this->KickInternal(source, u->nick, reason))
 		return false;
-	IRCD->SendKick(source, this, u, buf);
+	IRCD->SendKick(source, this, u, reason);
 	return true;
 }
 
@@ -901,7 +895,7 @@ bool Channel::CheckKick(User *user)
 	Log(LOG_DEBUG) << "Autokicking " << user->nick << " (" << mask << ") from " << this->name;
 
 	this->SetMode(NULL, "BAN", mask);
-	this->Kick(NULL, user, "%s", reason.c_str());
+	this->Kick(NULL, user, reason);
 
 	return true;
 }

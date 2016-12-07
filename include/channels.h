@@ -245,7 +245,12 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param reason The reason for the kick
 	 * @return true if the kick was scucessful, false if a module blocked the kick
 	 */
-	bool Kick(User *bi, User *u, const char *reason = NULL, ...);
+	bool Kick(User *bi, User *u, const Anope::string &reason);
+
+	template<typename... Args> bool Kick(User *bi, User *u, const Anope::string &reason, Args&&... args)
+	{
+		return Kick(bi, u, Anope::Format(reason, std::forward<Args>(args)...));
+	}
 
 	/** Get all modes set on this channel, excluding status modes.
 	 * @return a map of modes and their optional parameters.

@@ -186,7 +186,7 @@ class CommandCSSuspend : public Command
 			}
 
 			for (unsigned i = 0; i < users.size(); ++i)
-				ci->c->Kick(NULL, users[i], "%s", !reason.empty() ? reason.c_str() : Language::Translate(users[i], _("This channel has been suspended.")));
+				ci->c->Kick(NULL, users[i], !reason.empty() ? reason : Language::Translate(users[i], _("This channel has been suspended.")));
 		}
 
 		Log(LOG_ADMIN, source, this, ci) << "(" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");

@@ -42,281 +42,277 @@ class ChannelModeFlood : public ChannelModeParam
 	}
 };
 
-class BahamutIRCdProto : public IRCDProto
+bahamut::Proto::Proto(Module *creator) : IRCDProto(creator, "Bahamut 1.8.x")
 {
- public:
-	BahamutIRCdProto(Module *creator) : IRCDProto(creator, "Bahamut 1.8.x")
-	{
-		DefaultPseudoclientModes = "+";
-		CanSVSNick = true;
-		CanSNLine = true;
-		CanSQLine = true;
-		CanSQLineChannel = true;
-		CanSZLine = true;
-		CanSVSHold = true;
-		MaxModes = 60;
-	}
+	DefaultPseudoclientModes = "+";
+	CanSVSNick = true;
+	CanSNLine = true;
+	CanSQLine = true;
+	CanSQLineChannel = true;
+	CanSZLine = true;
+	CanSVSHold = true;
+	MaxModes = 60;
+}
 
-	void SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf) override
+void bahamut::Proto::SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf)
+{
+	if (Servers::Capab.count("TSMODE") > 0)
 	{
-		if (Servers::Capab.count("TSMODE") > 0)
-		{
-			IRCMessage message(source, "MODE", dest->name, dest->creation_time);
-			message.TokenizeAndPush(buf);
-			Uplink::SendMessage(message);
-		}
-		else
-		{
-			IRCDProto::SendMode(source, dest, buf);
-		}
-	}
-
-	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override
-	{
-		IRCMessage message(source, "SVSMODE", u->nick, u->timestamp);
+		IRCMessage message(source, "MODE", dest->name, dest->creation_time);
 		message.TokenizeAndPush(buf);
 		Uplink::SendMessage(message);
 	}
-
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override
+	else
 	{
-		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
+		IRCDProto::SendMode(source, dest, buf);
+	}
+}
+
+void bahamut::Proto::SendMode(const MessageSource &source, User *u, const Anope::string &buf)
+{
+	IRCMessage message(source, "SVSMODE", u->nick, u->timestamp);
+	message.TokenizeAndPush(buf);
+	Uplink::SendMessage(message);
+}
+
+void bahamut::Proto::SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg)
+{
+	Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
+}
+
+void bahamut::Proto::SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg)
+{
+	Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
+}
+
+/* SVSHOLD - set */
+void bahamut::Proto::SendSVSHold(const Anope::string &nick, time_t time)
+{
+	Uplink::Send(Me, "SVSHOLD", nick, time, "Being held for registered user");
+}
+
+/* SVSHOLD - release */
+void bahamut::Proto::SendSVSHoldDel(const Anope::string &nick)
+{
+	Uplink::Send(Me, "SVSHOLD", nick, 0);
+}
+
+/* SQLINE */
+void bahamut::Proto::SendSQLine(User *, XLine *x)
+{
+	Uplink::Send(Me, "SQLINE", x->GetMask(), x->GetReason());
+}
+
+/* UNSLINE */
+void bahamut::Proto::SendSGLineDel(XLine *x)
+{
+	Uplink::Send("UNSGLINE", 0, x->GetMask());
+}
+
+/* UNSZLINE */
+void bahamut::Proto::SendSZLineDel(XLine *x)
+{
+	/* this will likely fail so its only here for legacy */
+	Uplink::Send("UNSZLINE", 0, x->GetHost());
+	/* this is how we are supposed to deal with it */
+	Uplink::Send("RAKILL", x->GetHost(), "*");
+}
+
+/* SZLINE */
+void bahamut::Proto::SendSZLine(User *, XLine *x)
+{
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+	/* this will likely fail so its only here for legacy */
+	Uplink::Send("SZLINE", x->GetHost(), x->GetReason());
+	/* this is how we are supposed to deal with it */
+	Uplink::Send("AKILL", x->GetHost(), "*", timeleft, x->GetBy(), Anope::CurTime, x->GetReason());
+}
+
+/* SVSNOOP */
+void bahamut::Proto::SendSVSNOOP(Server *server, bool set)
+{
+	Uplink::Send("SVSNOOP", server->GetName(), set ? "+" : "-");
+}
+
+/* SGLINE */
+void bahamut::Proto::SendSGLine(User *, XLine *x)
+{
+	Uplink::Send("SGLINE", x->GetMask().length(), x->GetMask() + ":" + x->GetReason());
+}
+
+/* RAKILL */
+void bahamut::Proto::SendAkillDel(XLine *x)
+{
+	if (x->IsRegex() || x->HasNickOrReal())
+		return;
+
+	/* ZLine if we can instead */
+	if (x->GetUser() == "*")
+	{
+		cidr a(x->GetHost());
+		if (a.valid())
+		{
+			IRCD->SendSZLineDel(x);
+			return;
+		}
 	}
 
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override
-	{
-		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
-	}
+	Uplink::Send("RAKKILL", x->GetHost(), x->GetUser());
+}
 
-	/* SVSHOLD - set */
-	void SendSVSHold(const Anope::string &nick, time_t time) override
-	{
-		Uplink::Send(Me, "SVSHOLD", nick, time, "Being held for registered user");
-	}
+/* TOPIC */
+void bahamut::Proto::SendTopic(const MessageSource &source, Channel *c) 
+{
+	Uplink::Send(source, "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
+}
 
-	/* SVSHOLD - release */
-	void SendSVSHoldDel(const Anope::string &nick) override
-	{
-		Uplink::Send(Me, "SVSHOLD", nick, 0);
-	}
+/* UNSQLINE */
+void bahamut::Proto::SendSQLineDel(XLine *x)
+{
+	Uplink::Send("UNSQLINE", x->GetMask());
+}
 
-	/* SQLINE */
-	void SendSQLine(User *, XLine *x) override
-	{
-		Uplink::Send(Me, "SQLINE", x->GetMask(), x->GetReason());
-	}
+/* JOIN - SJOIN */
+void bahamut::Proto::SendJoin(User *user, Channel *c, const ChannelStatus *status)
+{
+	Uplink::Send(user, "SJOIN", c->creation_time, c->name);
 
-	/* UNSLINE */
-	void SendSGLineDel(XLine *x) override
+	if (status)
 	{
-		Uplink::Send("UNSGLINE", 0, x->GetMask());
-	}
+		/* First save the channel status incase uc->Status == status */
+		ChannelStatus cs = *status;
+		/* If the user is internally on the channel with flags, kill them so that
+		 * the stacker will allow this.
+		 */
+		ChanUserContainer *uc = c->FindUser(user);
+		if (uc != NULL)
+			uc->status.Clear();
 
-	/* UNSZLINE */
-	void SendSZLineDel(XLine *x) override
-	{
-		/* this will likely fail so its only here for legacy */
-		Uplink::Send("UNSZLINE", 0, x->GetHost());
-		/* this is how we are supposed to deal with it */
-		Uplink::Send("RAKILL", x->GetHost(), "*");
-	}
+		ServiceBot *setter = ServiceBot::Find(user->GetUID());
+		for (size_t i = 0; i < cs.Modes().length(); ++i)
+			c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 
-	/* SZLINE */
-	void SendSZLine(User *, XLine *x) override
-	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->GetExpires() - Anope::CurTime;
-		if (timeleft > 172800 || !x->GetExpires())
-			timeleft = 172800;
-		/* this will likely fail so its only here for legacy */
-		Uplink::Send("SZLINE", x->GetHost(), x->GetReason());
-		/* this is how we are supposed to deal with it */
-		Uplink::Send("AKILL", x->GetHost(), "*", timeleft, x->GetBy(), Anope::CurTime, x->GetReason());
+		if (uc != NULL)
+			uc->status = cs;
 	}
+}
 
-	/* SVSNOOP */
-	void SendSVSNOOP(Server *server, bool set) override
+void bahamut::Proto::SendAkill(User *u, XLine *x)
+{
+	if (x->IsRegex() || x->HasNickOrReal())
 	{
-		Uplink::Send("SVSNOOP", server->GetName(), set ? "+" : "-");
-	}
+		if (!u)
+		{
+			/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+				if (x->GetManager()->Check(it->second, x))
+					this->SendAkill(it->second, x);
+			return;
+		}
 
-	/* SGLINE */
-	void SendSGLine(User *, XLine *x) override
-	{
-		Uplink::Send("SGLINE", x->GetMask().length(), x->GetMask() + ":" + x->GetReason());
-	}
+		XLine *old = x;
 
-	/* RAKILL */
-	void SendAkillDel(XLine *x) override
-	{
-		if (x->IsRegex() || x->HasNickOrReal())
+		if (old->GetManager()->HasEntry("*@" + u->host))
 			return;
 
-		/* ZLine if we can instead */
-		if (x->GetUser() == "*")
+		/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
+		x = Serialize::New<XLine *>();
+		x->SetMask("*@" + u->host);
+		x->SetBy(old->GetBy());
+		x->SetExpires(old->GetExpires());
+		x->SetReason(old->GetReason());
+		x->SetID(old->GetID());
+		old->GetManager()->AddXLine(x);
+
+		Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
+	}
+
+	/* ZLine if we can instead */
+	if (x->GetUser() == "*")
+	{
+		cidr a(x->GetHost());
+		if (a.valid())
 		{
-			cidr a(x->GetHost());
-			if (a.valid())
-			{
-				IRCD->SendSZLineDel(x);
-				return;
-			}
-		}
-
-		Uplink::Send("RAKKILL", x->GetHost(), x->GetUser());
-	}
-
-	/* TOPIC */
-	void SendTopic(const MessageSource &source, Channel *c) override
-	{
-		Uplink::Send(source, "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
-	}
-
-	/* UNSQLINE */
-	void SendSQLineDel(XLine *x) override
-	{
-		Uplink::Send("UNSQLINE", x->GetMask());
-	}
-
-	/* JOIN - SJOIN */
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
-	{
-		Uplink::Send(user, "SJOIN", c->creation_time, c->name);
-
-		if (status)
-		{
-			/* First save the channel status incase uc->Status == status */
-			ChannelStatus cs = *status;
-			/* If the user is internally on the channel with flags, kill them so that
-			 * the stacker will allow this.
-			 */
-			ChanUserContainer *uc = c->FindUser(user);
-			if (uc != NULL)
-				uc->status.Clear();
-
-			ServiceBot *setter = ServiceBot::Find(user->GetUID());
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
-
-			if (uc != NULL)
-				uc->status = cs;
+			IRCD->SendSZLine(u, x);
+			return;
 		}
 	}
 
-	void SendAkill(User *u, XLine *x) override
-	{
-		if (x->IsRegex() || x->HasNickOrReal())
-		{
-			if (!u)
-			{
-				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
-				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (x->GetManager()->Check(it->second, x))
-						this->SendAkill(it->second, x);
-				return;
-			}
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (timeleft > 172800)
+		timeleft = 172800;
 
-			XLine *old = x;
+	Uplink::Send("AKILL", x->GetHost(), x->GetUser(), timeleft, x->GetBy(), Anope::CurTime, x->GetReason());
+}
 
-			if (old->GetManager()->HasEntry("*@" + u->host))
-				return;
+/*
+  Note: if the stamp is null 0, the below usage is correct of Bahamut
+*/
+void bahamut::Proto::SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf)
+{
+	Uplink::Send(source, "SVSKILL", user->nick, buf);
+}
 
-			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			x = Serialize::New<XLine *>();
-			x->SetMask("*@" + u->host);
-			x->SetBy(old->GetBy());
-			x->SetExpires(old->GetExpires());
-			x->SetReason(old->GetReason());
-			x->SetID(old->GetID());
-			old->GetManager()->AddXLine(x);
+void bahamut::Proto::SendBOB()
+{
+	Uplink::Send("BURST");
+}
 
-			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
-		}
+void bahamut::Proto::SendEOB()
+{
+	Uplink::Send("BURST", 0);
+}
 
-		/* ZLine if we can instead */
-		if (x->GetUser() == "*")
-		{
-			cidr a(x->GetHost());
-			if (a.valid())
-			{
-				IRCD->SendSZLine(u, x);
-				return;
-			}
-		}
+void bahamut::Proto::SendClientIntroduction(User *u)
+{
+	Anope::string modes = "+" + u->GetModes();
+	Uplink::Send("NICK", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, u->server->GetName(), 0, 0, u->realname);
+}
 
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->GetExpires() - Anope::CurTime;
-		if (timeleft > 172800)
-			timeleft = 172800;
-		
-		Uplink::Send("AKILL", x->GetHost(), x->GetUser(), timeleft, x->GetBy(), Anope::CurTime, x->GetReason());
-	}
+/* SERVER */
+void bahamut::Proto::SendServer(Server *server)
+{
+	Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
+}
 
+void bahamut::Proto::SendConnect()
+{
+	Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS");
+	Uplink::Send("CAPAB", "SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
+	SendServer(Me);
 	/*
-	  Note: if the stamp is null 0, the below usage is correct of Bahamut
-	*/
-	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
-	{
-		Uplink::Send(source, "SVSKILL", user->nick, buf);
-	}
+	 * SVINFO
+	 *	   parv[0] = sender prefix
+	 *	   parv[1] = TS_CURRENT for the server
+	 *	   parv[2] = TS_MIN for the server
+	 *	   parv[3] = server is standalone or connected to non-TS only
+	 *	   parv[4] = server's idea of UTC time
+	 */
+	Uplink::Send("SVINFO", 3, 1, 0, Anope::CurTime);
+	this->SendBOB();
+}
 
-	void SendBOB() override
-	{
-		Uplink::Send("BURST");
-	}
+void bahamut::Proto::SendChannel(Channel *c)
+{
+	Anope::string modes = c->GetModes(true, true);
+	if (modes.empty())
+		modes = "+";
+	Uplink::Send("SJOIN", c->creation_time, c->name, modes, "");
+}
 
-	void SendEOB() override
-	{
-		Uplink::Send("BURST", 0);
-	}
+void bahamut::Proto::SendLogin(User *u, NickServ::Nick *)
+{
+	IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", u->signon);
+}
 
-	void SendClientIntroduction(User *u) override
-	{
-		Anope::string modes = "+" + u->GetModes();
-		Uplink::Send("NICK", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, u->server->GetName(), 0, 0, u->realname);
-	}
-
-	/* SERVER */
-	void SendServer(Server *server) override
-	{
-		Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
-	}
-
-	void SendConnect() override
-	{
-		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS");
-		Uplink::Send("CAPAB", "SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
-		SendServer(Me);
-		/*
-		 * SVINFO
-		 *	   parv[0] = sender prefix
-		 *	   parv[1] = TS_CURRENT for the server
-		 *	   parv[2] = TS_MIN for the server
-		 *	   parv[3] = server is standalone or connected to non-TS only
-		 *	   parv[4] = server's idea of UTC time
-		 */
-		Uplink::Send("SVINFO", 3, 1, 0, Anope::CurTime);
-		this->SendBOB();
-	}
-
-	void SendChannel(Channel *c) override
-	{
-		Anope::string modes = c->GetModes(true, true);
-		if (modes.empty())
-			modes = "+";
-		Uplink::Send("SJOIN", c->creation_time, c->name, modes, "");
-	}
-
-	void SendLogin(User *u, NickServ::Nick *) override
-	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", u->signon);
-	}
-
-	void SendLogout(User *u) override
-	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 1");
-	}
-};
+void bahamut::Proto::SendLogout(User *u)
+{
+	IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 1");
+}
 
 void bahamut::Burst::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
@@ -496,7 +492,7 @@ void bahamut::Topic::Run(MessageSource &source, const std::vector<Anope::string>
 class ProtoBahamut : public Module
 	, public EventHook<Event::UserNickChange>
 {
-	BahamutIRCdProto ircd_proto;
+	bahamut::Proto ircd_proto;
 
 	/* Core message handlers */
 	rfc1459::Away message_away;

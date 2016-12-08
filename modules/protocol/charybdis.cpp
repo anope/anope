@@ -40,143 +40,119 @@ class ChannelModeLargeBan : public ChannelMode
 };
 
 
-class CharybdisProto : public IRCDProto
+charybdis::Proto::Proto(Module *creator) : IRCDProto(creator, "Charybdis 3.4+")
+	, ratbox("ratbox")
 {
-	ServiceReference<IRCDProto> ratbox; // XXX
+	DefaultPseudoclientModes = "+oiS";
+	CanCertFP = true;
+	CanSNLine = true;
+	CanSQLine = true;
+	CanSQLineChannel = true;
+	CanSZLine = true;
+	CanSVSNick = true;
+	CanSVSHold = true;
+	CanSetVHost = true;
+	RequiresID = true;
+	MaxModes = 4;
+}
 
- public:
-	CharybdisProto(Module *creator) : IRCDProto(creator, "Charybdis 3.4+")
-		, ratbox("ratbox")
+void charybdis::Proto::SendConnect()
+{
+	Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
+
+	/*
+	 * Received: CAPAB :BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN
+	 *           KNOCK MLOCK QS RSFNC SAVE SERVICES TB UNKLN
+	 *
+	 * BAN      - Can do BAN message
+	 * CHW      - Can do channel wall @#
+	 * CLUSTER  - Supports umode +l, can send LOCOPS (encap only)
+	 * ENCAP    - Can do ENCAP message
+	 * EOPMOD   - Can do channel wall =# (for cmode +z)
+	 * EUID     - Can do EUID (its similar to UID but includes the ENCAP REALHOST and ENCAP LOGIN information)
+	 * EX       - Can do channel +e exemptions
+	 * GLN      - Can set G:Lines
+	 * IE       - Can do invite exceptions
+	 * KLN      - Can set K:Lines (encap only)
+	 * KNOCK    - Supports KNOCK
+	 * MLOCK    - Supports MLOCK
+	 * RSFNC    - Forces a nickname change and propagates it (encap only)
+	 * SERVICES - Support channel mode +r (only registered users may join)
+	 * SAVE     - Resolve a nick collision by changing a nickname to the UID.
+	 * TB       - Supports topic burst
+	 * UNKLN    - Can do UNKLINE (encap only)
+	 * QS       - Can handle quit storm removal
+	*/
+	Uplink::Send("CAPAB", "BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN");
+
+	/* Make myself known to myself in the serverlist */
+	SendServer(Me);
+
+	/*
+	 * Received: SVINFO 6 6 0 :1353235537
+	 *  arg[0] = current TS version
+	 *  arg[1] = minimum required TS version
+	 *  arg[2] = '0'
+	 *  arg[3] = server's idea of UTC time
+	 */
+	Uplink::Send("SVINFO", 6, 6, Anope::CurTime);
+}
+
+void charybdis::Proto::SendClientIntroduction(User *u)
+{
+	Anope::string modes = "+" + u->GetModes();
+	Uplink::Send(Me, "EUID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, 0, u->GetUID(), "*", "*", u->realname);
+}
+
+void charybdis::Proto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
+{
+	Uplink::Send(Me, "ENCAP", u->server->GetName(), "RSFNC", u->GetUID(),
+			newnick, when, u->timestamp);
+}
+
+void charybdis::Proto::SendSVSHold(const Anope::string &nick, time_t delay)
+{
+	Uplink::Send(Me, "ENCAP", "*", "NICKDELAY", delay, nick);
+}
+
+void charybdis::Proto::SendSVSHoldDel(const Anope::string &nick)
+{
+	Uplink::Send(Me, "ENCAP", "*", "NICKDELAY", 0, nick);
+}
+
+void charybdis::Proto::SendVhost(User *u, const Anope::string &ident, const Anope::string &host)
+{
+	Uplink::Send(Me, "ENCAP", "*", "CHGHOST", u->GetUID(), host);
+}
+
+void charybdis::Proto::SendVhostDel(User *u)
+{
+	this->SendVhost(u, "", u->host);
+}
+
+void charybdis::Proto::SendSASLMechanisms(std::vector<Anope::string> &mechanisms)
+{
+	Anope::string mechlist;
+
+	for (unsigned i = 0; i < mechanisms.size(); ++i)
 	{
-		DefaultPseudoclientModes = "+oiS";
-		CanCertFP = true;
-		CanSNLine = true;
-		CanSQLine = true;
-		CanSQLineChannel = true;
-		CanSZLine = true;
-		CanSVSNick = true;
-		CanSVSHold = true;
-		CanSetVHost = true;
-		RequiresID = true;
-		MaxModes = 4;
+		mechlist += "," + mechanisms[i];
 	}
 
-	void SendSVSKill(const MessageSource &source, User *targ, const Anope::string &reason) override { ratbox->SendSVSKill(source, targ, reason); }
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override { ratbox->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendGlobops(const MessageSource &source, const Anope::string &buf) override { ratbox->SendGlobops(source, buf); }
-	void SendSGLine(User *u, XLine *x) override { ratbox->SendSGLine(u, x); }
-	void SendSGLineDel(XLine *x) override { ratbox->SendSGLineDel(x); }
-	void SendAkill(User *u, XLine *x) override { ratbox->SendAkill(u, x); }
-	void SendAkillDel(XLine *x) override { ratbox->SendAkillDel(x); }
-	void SendSQLine(User *u, XLine *x) override { ratbox->SendSQLine(u, x); }
-	void SendSQLineDel(XLine *x) override { ratbox->SendSQLineDel(x); }
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { ratbox->SendJoin(user, c, status); }
-	void SendServer(Server *server) override { ratbox->SendServer(server); }
-	void SendChannel(Channel *c) override { ratbox->SendChannel(c); }
-	void SendTopic(const MessageSource &source, Channel *c) override { ratbox->SendTopic(source, c); }
-	bool IsIdentValid(const Anope::string &ident) override { return ratbox->IsIdentValid(ident); }
-	void SendLogin(User *u, NickServ::Nick *na) override { ratbox->SendLogin(u, na); }
-	void SendLogout(User *u) override { ratbox->SendLogout(u); }
+	Uplink::Send(Me, "ENCAP", "*", "MECHLIST", mechlist.empty() ? "" : mechlist.substr(1));
+}
 
-	void SendConnect() override
-	{
-		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
+void charybdis::Proto::SendSASLMessage(const SASL::Message &message)
+{
+	Server *s = Server::Find(message.target.substr(0, 3));
+	Uplink::Send(Me, "ENCAP", s ? s->GetName() : message.target.substr(0, 3), "SASL", message.source, message.target, message.type, message.data, message.ext.empty() ? "" : message.ext);
+}
 
-		/*
-		 * Received: CAPAB :BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN
-		 *           KNOCK MLOCK QS RSFNC SAVE SERVICES TB UNKLN
-		 *
-		 * BAN      - Can do BAN message
-		 * CHW      - Can do channel wall @#
-		 * CLUSTER  - Supports umode +l, can send LOCOPS (encap only)
-		 * ENCAP    - Can do ENCAP message
-		 * EOPMOD   - Can do channel wall =# (for cmode +z)
-		 * EUID     - Can do EUID (its similar to UID but includes the ENCAP REALHOST and ENCAP LOGIN information)
-		 * EX       - Can do channel +e exemptions
-		 * GLN      - Can set G:Lines
-		 * IE       - Can do invite exceptions
-		 * KLN      - Can set K:Lines (encap only)
-		 * KNOCK    - Supports KNOCK
-		 * MLOCK    - Supports MLOCK
-		 * RSFNC    - Forces a nickname change and propagates it (encap only)
-		 * SERVICES - Support channel mode +r (only registered users may join)
-		 * SAVE     - Resolve a nick collision by changing a nickname to the UID.
-		 * TB       - Supports topic burst
-		 * UNKLN    - Can do UNKLINE (encap only)
-		 * QS       - Can handle quit storm removal
-		*/
-		Uplink::Send("CAPAB", "BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN");
-
-		/* Make myself known to myself in the serverlist */
-		SendServer(Me);
-
-		/*
-		 * Received: SVINFO 6 6 0 :1353235537
-		 *  arg[0] = current TS version
-		 *  arg[1] = minimum required TS version
-		 *  arg[2] = '0'
-		 *  arg[3] = server's idea of UTC time
-		 */
-		Uplink::Send("SVINFO", 6, 6, Anope::CurTime);
-	}
-
-	void SendClientIntroduction(User *u) override
-	{
-		Anope::string modes = "+" + u->GetModes();
-		Uplink::Send(Me, "EUID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, 0, u->GetUID(), "*", "*", u->realname);
-	}
-
-	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
-	{
-		Uplink::Send(Me, "ENCAP", u->server->GetName(), "RSFNC", u->GetUID(),
-				newnick, when, u->timestamp);
-	}
-
-	void SendSVSHold(const Anope::string &nick, time_t delay) override
-	{
-		Uplink::Send(Me, "ENCAP", "*", "NICKDELAY", delay, nick);
-	}
-
-	void SendSVSHoldDel(const Anope::string &nick) override
-	{
-		Uplink::Send(Me, "ENCAP", "*", "NICKDELAY", 0, nick);
-	}
-
-	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
-	{
-		Uplink::Send(Me, "ENCAP", "*", "CHGHOST", u->GetUID(), host);
-	}
-
-	void SendVhostDel(User *u) override
-	{
-		this->SendVhost(u, "", u->host);
-	}
-
-	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override
-	{
-		Anope::string mechlist;
-
-		for (unsigned i = 0; i < mechanisms.size(); ++i)
-		{
-			mechlist += "," + mechanisms[i];
-		}
-
-		Uplink::Send(Me, "ENCAP", "*", "MECHLIST", mechlist.empty() ? "" : mechlist.substr(1));
-	}
-
-	void SendSASLMessage(const SASL::Message &message) override
-	{
-		Server *s = Server::Find(message.target.substr(0, 3));
-		Uplink::Send(Me, "ENCAP", s ? s->GetName() : message.target.substr(0, 3), "SASL", message.source, message.target, message.type, message.data, message.ext.empty() ? "" : message.ext);
-	}
-
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override
-	{
-		Server *s = Server::Find(uid.substr(0, 3));
-		Uplink::Send(Me, "ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, "*", vident.empty() ? "*" : vident, vhost.empty() ? "*" : vhost, acc);
-	}
-};
+void charybdis::Proto::SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost)
+{
+	Server *s = Server::Find(uid.substr(0, 3));
+	Uplink::Send(Me, "ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, "*", vident.empty() ? "*" : vident, vhost.empty() ? "*" : vhost, acc);
+}
 
 
 void charybdis::Encap::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -268,7 +244,7 @@ class ProtoCharybdis : public Module
 {
 	ServiceReference<ModeLocks> mlocks;
 
-	CharybdisProto ircd_proto;
+	charybdis::Proto ircd_proto;
 
 	/* Core message handlers */
 	rfc1459::Away message_away;

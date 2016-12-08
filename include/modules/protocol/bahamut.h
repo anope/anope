@@ -22,6 +22,64 @@
 namespace bahamut
 {
 
+class Proto : public IRCDProto
+{
+ public:
+	Proto(Module *creator);
+
+	void SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf) override;
+
+	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override;
+
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
+
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
+
+	void SendSVSHold(const Anope::string &nick, time_t time) override;
+
+	void SendSVSHoldDel(const Anope::string &nick) override;
+
+	void SendSQLine(User *, XLine *x) override;
+
+	void SendSGLineDel(XLine *x) override;
+
+	void SendSZLineDel(XLine *x) override;
+
+	void SendSZLine(User *, XLine *x) override;
+
+	void SendSVSNOOP(Server *server, bool set) override;
+
+	void SendSGLine(User *, XLine *x) override;
+
+	void SendAkillDel(XLine *x) override;
+
+	void SendTopic(const MessageSource &source, Channel *c) override;
+
+	void SendSQLineDel(XLine *x) override;
+
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override;
+
+	void SendAkill(User *u, XLine *x) override;
+
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override;
+
+	void SendBOB() override;
+
+	void SendEOB() override;
+
+	void SendClientIntroduction(User *u) override;
+
+	void SendServer(Server *server) override;
+
+	void SendConnect() override;
+
+	void SendChannel(Channel *c) override;
+
+	void SendLogin(User *u, NickServ::Nick *) override;
+
+	void SendLogout(User *u) override;
+};
+
 class Burst : public IRCDMessage
 {
  public:

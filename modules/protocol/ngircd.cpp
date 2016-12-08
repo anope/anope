@@ -24,149 +24,145 @@
 #include "modules/protocol/rfc1459.h"
 #include "modules/protocol/ngircd.h"
 
-class ngIRCdProto : public IRCDProto
+void ngircd::Proto::SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf)
 {
-	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
+	IRCDProto::SendSVSKill(source, user, buf);
+	user->KillInternal(source, buf);
+}
+
+ngircd::Proto::Proto(Module *creator) : IRCDProto(creator, "ngIRCd")
+{
+	DefaultPseudoclientModes = "+oi";
+	CanCertFP = true;
+	CanSVSNick = true;
+	CanSetVHost = true;
+	CanSetVIdent = true;
+	MaxModes = 5;
+}
+
+void ngircd::Proto::SendAkill(User *u, XLine *x)
+{
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+	Uplink::Send(Me, "GLINE", x->GetMask(), timeleft, x->GetReason() + " (" + x->GetBy() + ")");
+}
+
+void ngircd::Proto::SendAkillDel(XLine *x)
+{
+	Uplink::Send(Me, "GLINE", x->GetMask());
+}
+
+void ngircd::Proto::SendChannel(Channel *c)
+{
+	Uplink::Send(Me, "CHANINFO", c->name, "+" + c->GetModes(true, true));
+}
+
+// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
+void ngircd::Proto::SendClientIntroduction(User *u)
+{
+	Anope::string modes = "+" + u->GetModes();
+	Uplink::Send(Me, "NICK", u->nick, 1, u->GetIdent(), u->host, 1, modes, u->realname);
+}
+
+void ngircd::Proto::SendConnect()
+{
+	Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "0210-IRC+", "Anope|" + Anope::VersionShort(), "CLHMSo P");
+	/* Make myself known to myself in the serverlist */
+	SendServer(Me);
+	/* finish the enhanced server handshake and register the connection */
+	Uplink::Send("376", "*", "End of MOTD command");
+}
+
+void ngircd::Proto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
+{
+	Uplink::Send(Me, "SVSNICK", u->nick, newnick);
+}
+
+void ngircd::Proto::SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg)
+{
+	Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
+}
+
+void ngircd::Proto::SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg)
+{
+	Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
+}
+
+void ngircd::Proto::SendGlobops(const MessageSource &source, const Anope::string &buf)
+{
+	Uplink::Send(source, "WALLOPS", buf);
+}
+
+void ngircd::Proto::SendJoin(User *user, Channel *c, const ChannelStatus *status)
+{
+	Uplink::Send(user, "JOIN", c->name);
+	if (status)
 	{
-		IRCDProto::SendSVSKill(source, user, buf);
-		user->KillInternal(source, buf);
-	}
+		/* First save the channel status incase uc->Status == status */
+		ChannelStatus cs = *status;
+		/* If the user is internally on the channel with flags, kill them so that
+		 * the stacker will allow this.
+		 */
+		ChanUserContainer *uc = c->FindUser(user);
+		if (uc != NULL)
+			uc->status.Clear();
 
- public:
-	ngIRCdProto(Module *creator) : IRCDProto(creator, "ngIRCd")
+		ServiceBot *setter = ServiceBot::Find(user->GetUID());
+		for (size_t i = 0; i < cs.Modes().length(); ++i)
+			c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+
+		if (uc != NULL)
+			uc->status = cs;
+	}
+}
+
+void ngircd::Proto::SendLogin(User *u, NickServ::Nick *na)
+{
+	Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", na->GetAccount()->GetDisplay());
+}
+
+void ngircd::Proto::SendLogout(User *u)
+{
+	Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", "");
+}
+
+/* SERVER name hop descript */
+void ngircd::Proto::SendServer(Server *server)
+{
+	Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
+}
+
+void ngircd::Proto::SendTopic(const MessageSource &source, Channel *c)
+{
+	Uplink::Send(source, "TOPIC", c->name, c->topic);
+}
+
+void ngircd::Proto::SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost)
+{
+	if (!vIdent.empty())
+		Uplink::Send(Me, "METADATA", u->nick, "user", vIdent);
+
+	Uplink::Send(Me, "METADATA", u->nick, "cloakhost", vhost);
+	if (!u->HasMode("CLOAK"))
 	{
-		DefaultPseudoclientModes = "+oi";
-		CanCertFP = true;
-		CanSVSNick = true;
-		CanSetVHost = true;
-		CanSetVIdent = true;
-		MaxModes = 5;
+		u->SetMode(Config->GetClient("HostServ"), "CLOAK");
+		ModeManager::ProcessModes();
 	}
+}
 
-	void SendAkill(User *u, XLine *x) override
-	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->GetExpires() - Anope::CurTime;
-		if (timeleft > 172800 || !x->GetExpires())
-			timeleft = 172800;
-		Uplink::Send(Me, "GLINE", x->GetMask(), timeleft, x->GetReason() + " (" + x->GetBy() + ")");
-	}
+void ngircd::Proto::SendVhostDel(User *u)
+{
+	this->SendVhost(u, u->GetIdent(), "");
+}
 
-	void SendAkillDel(XLine *x) override
-	{
-		Uplink::Send(Me, "GLINE", x->GetMask());
-	}
-
-	void SendChannel(Channel *c) override
-	{
-		Uplink::Send(Me, "CHANINFO", c->name, "+" + c->GetModes(true, true));
-	}
-
-	// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
-	void SendClientIntroduction(User *u) override
-	{
-		Anope::string modes = "+" + u->GetModes();
-		Uplink::Send(Me, "NICK", u->nick, 1, u->GetIdent(), u->host, 1, modes, u->realname);
-	}
-
-	void SendConnect() override
-	{
-		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "0210-IRC+", "Anope|" + Anope::VersionShort(), "CLHMSo P");
-		/* Make myself known to myself in the serverlist */
-		SendServer(Me);
-		/* finish the enhanced server handshake and register the connection */
-		Uplink::Send("376", "*", "End of MOTD command");
-	}
-
-	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
-	{
-		Uplink::Send(Me, "SVSNICK", u->nick, newnick);
-	}
-
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override
-	{
-		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
-	}
-
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override
-	{
-		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
-	}
-
-	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
-	{
-		Uplink::Send(source, "WALLOPS", buf);
-	}
-
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
-	{
-		Uplink::Send(user, "JOIN", c->name);
-		if (status)
-		{
-			/* First save the channel status incase uc->Status == status */
-			ChannelStatus cs = *status;
-			/* If the user is internally on the channel with flags, kill them so that
-			 * the stacker will allow this.
-			 */
-			ChanUserContainer *uc = c->FindUser(user);
-			if (uc != NULL)
-				uc->status.Clear();
-
-			ServiceBot *setter = ServiceBot::Find(user->GetUID());
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
-
-			if (uc != NULL)
-				uc->status = cs;
-		}
-	}
-
-	void SendLogin(User *u, NickServ::Nick *na) override
-	{
-		Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", na->GetAccount()->GetDisplay());
-	}
-
-	void SendLogout(User *u) override
-	{
-		Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", "");
-	}
-
-	/* SERVER name hop descript */
-	void SendServer(Server *server) override
-	{
-		Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
-	}
-
-	void SendTopic(const MessageSource &source, Channel *c) override
-	{
-		Uplink::Send(source, "TOPIC", c->name, c->topic);
-	}
-
-	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
-	{
-		if (!vIdent.empty())
-			Uplink::Send(Me, "METADATA", u->nick, "user", vIdent);
-
-		Uplink::Send(Me, "METADATA", u->nick, "cloakhost", vhost);
-		if (!u->HasMode("CLOAK"))
-		{
-			u->SetMode(Config->GetClient("HostServ"), "CLOAK");
-			ModeManager::ProcessModes();
-		}
-	}
-
-	void SendVhostDel(User *u) override
-	{
-		this->SendVhost(u, u->GetIdent(), "");
-	}
-
-	Anope::string Format(IRCMessage &message)
-	{
-		if (message.GetSource().GetSource().empty())
-			message.SetSource(Me);
-		return IRCDProto::Format(message);
-	}
-};
+Anope::string ngircd::Proto::Format(IRCMessage &message)
+{
+	if (message.GetSource().GetSource().empty())
+		message.SetSource(Me);
+	return IRCDProto::Format(message);
+}
 
 // Please see <http://www.irc.org/tech_docs/005.html> for details.
 void ngircd::Numeric005::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -518,7 +514,7 @@ void ngircd::ServerMessage::Run(MessageSource &source, const std::vector<Anope::
 class ProtongIRCd : public Module
 	, public EventHook<Event::UserNickChange>
 {
-	ngIRCdProto ircd_proto;
+	ngircd::Proto ircd_proto;
 
 	/* Core message handlers */
 	rfc1459::Capab message_capab;

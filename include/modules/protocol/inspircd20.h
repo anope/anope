@@ -22,6 +22,91 @@
 namespace inspircd20
 {
 
+class Proto : public IRCDProto
+{
+ private:
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override;
+
+	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent);
+
+	void SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost);
+
+	void SendAddLine(const Anope::string &xtype, const Anope::string &mask, time_t duration, const Anope::string &addedby, const Anope::string &reason);
+
+	void SendDelLine(const Anope::string &xtype, const Anope::string &mask);
+
+ public:
+	Proto(Module *creator);
+
+	void SendConnect() override;
+
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
+
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
+
+	void SendAkillDel(XLine *x) override;
+
+	void SendTopic(const MessageSource &source, Channel *c) override;
+
+	void SendVhostDel(User *u) override;
+
+	void SendAkill(User *u, XLine *x) override;
+
+	void SendNumeric(int numeric, User *dest, IRCMessage &message);
+
+	void SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf) override;
+
+	void SendClientIntroduction(User *u) override;
+
+	void SendServer(Server *server) override;
+
+	void SendSquit(Server *s, const Anope::string &message) override;
+
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override;
+
+	void SendSQLineDel(XLine *x) override;
+
+	void SendSQLine(User *, XLine *x) override;
+
+	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override;
+
+	void SendSVSHold(const Anope::string &nick, time_t t) override;
+
+	void SendSVSHoldDel(const Anope::string &nick) override;
+
+	void SendSZLineDel(XLine *x) override;
+
+	void SendSZLine(User *, XLine *x) override;
+
+	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) override;
+
+	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) override;
+
+	void SendSWhois(const MessageSource &, const Anope::string &who, const Anope::string &mask) override;
+
+	void SendBOB() override;
+
+	void SendEOB() override;
+
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override;
+
+	void SendLogin(User *u, NickServ::Nick *na) override;
+
+	void SendLogout(User *u) override;
+
+	void SendChannel(Channel *c) override;
+
+	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override;
+
+	void SendSASLMessage(const SASL::Message &message) override;
+
+	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override;
+
+	bool IsExtbanValid(const Anope::string &mask) override;
+
+	bool IsIdentValid(const Anope::string &ident) override;
+};
+
 class Capab : public rfc1459::Capab
 {
  public:

@@ -25,164 +25,144 @@
 
 static Anope::string UplinkSID;
 
-class PlexusProto : public IRCDProto
+plexus::Proto::Proto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
+	, hybrid("hybrid")
 {
-	ServiceReference<IRCDProto> hybrid; // XXX use moddeps + inheritance here
-	
- public:
-	PlexusProto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
-		, hybrid("hybrid")
+	DefaultPseudoclientModes = "+oiU";
+	CanSVSNick = true;
+	CanSVSJoin = true;
+	CanSetVHost = true;
+	CanSetVIdent = true;
+	CanSNLine = true;
+	CanSQLine = true;
+	CanSQLineChannel = true;
+	CanSVSHold = true;
+	CanCertFP = true;
+	RequiresID = true;
+	MaxModes = 4;
+}
+
+void plexus::Proto::SendGlobops(const MessageSource &source, const Anope::string &buf)
+{
+	Uplink::Send(source, "OPERWALL", buf);
+}
+
+void plexus::Proto::SendJoin(User *user, Channel *c, const ChannelStatus *status)
+{
+	Uplink::Send(Me, "SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), user->GetUID());
+	if (status)
 	{
-		DefaultPseudoclientModes = "+oiU";
-		CanSVSNick = true;
-		CanSVSJoin = true;
-		CanSetVHost = true;
-		CanSetVIdent = true;
-		CanSNLine = true;
-		CanSQLine = true;
-		CanSQLineChannel = true;
-		CanSVSHold = true;
-		CanCertFP = true;
-		RequiresID = true;
-		MaxModes = 4;
-	}
-
-	void SendSVSKill(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKill(source, targ, reason); }
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendSQLine(User *u, XLine *x) override { hybrid->SendSQLine(u, x); }
-	void SendSQLineDel(XLine *x) override { hybrid->SendSQLineDel(x); }
-	void SendSGLineDel(XLine *x) override { hybrid->SendSGLineDel(x); }
-	void SendSGLine(User *u, XLine *x) override { hybrid->SendSGLine(u, x); }
-	void SendAkillDel(XLine *x) override { hybrid->SendAkillDel(x); }
-	void SendAkill(User *u, XLine *x) override { hybrid->SendAkill(u, x); }
-	void SendServer(Server *server) override { hybrid->SendServer(server); }
-	void SendChannel(Channel *c) override { hybrid->SendChannel(c); }
-	void SendSVSHold(const Anope::string &nick, time_t t) override { hybrid->SendSVSHold(nick, t); }
-	void SendSVSHoldDel(const Anope::string &nick) override { hybrid->SendSVSHoldDel(nick); }
-
-	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
-	{
-		Uplink::Send(source, "OPERWALL", buf);
-	}
-
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
-	{
-		Uplink::Send(Me, "SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), user->GetUID());
-		if (status)
-		{
-			/* First save the channel status incase uc->Status == status */
-			ChannelStatus cs = *status;
-			/* If the user is internally on the channel with flags, kill them so that
-			 * the stacker will allow this.
-			 */
-			ChanUserContainer *uc = c->FindUser(user);
-			if (uc != NULL)
-				uc->status.Clear();
-
-			ServiceBot *setter = ServiceBot::Find(user->GetUID());
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
-
-			if (uc != NULL)
-				uc->status = cs;
-		}
-	}
-
-	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
-	{
-		Uplink::Send(Me, "ENCAP", u->server->GetName(), "SVSNICK", u->GetUID(), u->timestamp, newnick, when);
-	}
-
-	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
-	{
-		if (!ident.empty())
-			Uplink::Send(Me, "ENCAP", "*", "CHGIDENT", u->GetUID(), ident);
-		Uplink::Send(Me, "ENCAP", "*", "CHGHOST", u->GetUID(), host);
-		u->SetMode(Config->GetClient("HostServ"), "CLOAK");
-	}
-
-	void SendVhostDel(User *u) override
-	{
-		u->RemoveMode(Config->GetClient("HostServ"), "CLOAK");
-	}
-
-	void SendConnect() override
-	{
-		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
-		
-		/* CAPAB
-		 * QS     - Can handle quit storm removal
-		 * EX     - Can do channel +e exemptions
-		 * CHW    - Can do channel wall @#
-		 * LL     - Can do lazy links
-		 * IE     - Can do invite exceptions
-		 * EOB    - Can do EOB message
-		 * KLN    - Can do KLINE message
-		 * GLN    - Can do GLINE message
-		 * HUB    - This server is a HUB
-		 * AOPS   - Can do anon ops (+a)
-		 * UID    - Can do UIDs
-		 * ZIP    - Can do ZIPlinks
-		 * ENC    - Can do ENCrypted links
-		 * KNOCK  - Supports KNOCK
-		 * TBURST - Supports TBURST
-		 * PARA   - Supports invite broadcasting for +p
-		 * ENCAP  - Supports encapsulization of protocol messages
-		 * SVS    - Supports services protocol extensions
+		/* First save the channel status incase uc->Status == status */
+		ChannelStatus cs = *status;
+		/* If the user is internally on the channel with flags, kill them so that
+		 * the stacker will allow this.
 		 */
-		Uplink::Send("CAPAB", "QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS");
-		
-		/* Make myself known to myself in the serverlist */
-		SendServer(Me);
-		
-		/*
-		 * SVINFO
-		 *	  parv[0] = sender prefix
-		 *	  parv[1] = TS_CURRENT for the server
-		 *	  parv[2] = TS_MIN for the server
-		 *	  parv[3] = server is standalone or connected to non-TS only
-		 *	  parv[4] = server's idea of UTC time
-		 */
-		Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
-	}
+		ChanUserContainer *uc = c->FindUser(user);
+		if (uc != NULL)
+			uc->status.Clear();
 
-	void SendClientIntroduction(User *u) override
-	{
-		Anope::string modes = "+" + u->GetModes();
-		Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, "255.255.255.255", u->GetUID(), 0, u->host, u->realname);
-	}
+		ServiceBot *setter = ServiceBot::Find(user->GetUID());
+		for (size_t i = 0; i < cs.Modes().length(); ++i)
+			c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 
-	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override
-	{
-		Uplink::Send(source, "ENCAP", "*", "SVSMODE", u->GetUID(), u->timestamp, buf);
+		if (uc != NULL)
+			uc->status = cs;
 	}
+}
 
-	void SendLogin(User *u, NickServ::Nick *na) override
-	{
-		Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), na->GetAccount()->GetDisplay());
-	}
+void plexus::Proto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
+{
+	Uplink::Send(Me, "ENCAP", u->server->GetName(), "SVSNICK", u->GetUID(), u->timestamp, newnick, when);
+}
 
-	void SendLogout(User *u) override
-	{
-		Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), "");
-	}
+void plexus::Proto::SendVhost(User *u, const Anope::string &ident, const Anope::string &host)
+{
+	if (!ident.empty())
+		Uplink::Send(Me, "ENCAP", "*", "CHGIDENT", u->GetUID(), ident);
+	Uplink::Send(Me, "ENCAP", "*", "CHGHOST", u->GetUID(), host);
+	u->SetMode(Config->GetClient("HostServ"), "CLOAK");
+}
 
-	void SendTopic(const MessageSource &source, Channel *c) override
-	{
-		Uplink::Send(source, "ENCAP", "*", "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
-	}
+void plexus::Proto::SendVhostDel(User *u)
+{
+	u->RemoveMode(Config->GetClient("HostServ"), "CLOAK");
+}
 
-	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
-	{
-		Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSJOIN", user->GetUID(), chan);
-	}
+void plexus::Proto::SendConnect()
+{
+	Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
 
-	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
-	{
-		Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSPART", user->GetUID(), chan);
-	}
-};
+	/* CAPAB
+	 * QS     - Can handle quit storm removal
+	 * EX     - Can do channel +e exemptions
+	 * CHW    - Can do channel wall @#
+	 * LL     - Can do lazy links
+	 * IE     - Can do invite exceptions
+	 * EOB    - Can do EOB message
+	 * KLN    - Can do KLINE message
+	 * GLN    - Can do GLINE message
+	 * HUB    - This server is a HUB
+	 * AOPS   - Can do anon ops (+a)
+	 * UID    - Can do UIDs
+	 * ZIP    - Can do ZIPlinks
+	 * ENC    - Can do ENCrypted links
+	 * KNOCK  - Supports KNOCK
+	 * TBURST - Supports TBURST
+	 * PARA   - Supports invite broadcasting for +p
+	 * ENCAP  - Supports encapsulization of protocol messages
+	 * SVS    - Supports services protocol extensions
+	 */
+	Uplink::Send("CAPAB", "QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS");
+
+	/* Make myself known to myself in the serverlist */
+	SendServer(Me);
+
+	/*
+	 * SVINFO
+	 *	  parv[0] = sender prefix
+	 *	  parv[1] = TS_CURRENT for the server
+	 *	  parv[2] = TS_MIN for the server
+	 *	  parv[3] = server is standalone or connected to non-TS only
+	 *	  parv[4] = server's idea of UTC time
+	 */
+	Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
+}
+
+void plexus::Proto::SendClientIntroduction(User *u)
+{
+	Anope::string modes = "+" + u->GetModes();
+	Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, "255.255.255.255", u->GetUID(), 0, u->host, u->realname);
+}
+
+void plexus::Proto::SendMode(const MessageSource &source, User *u, const Anope::string &buf)
+{
+	Uplink::Send(source, "ENCAP", "*", "SVSMODE", u->GetUID(), u->timestamp, buf);
+}
+
+void plexus::Proto::SendLogin(User *u, NickServ::Nick *na)
+{
+	Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), na->GetAccount()->GetDisplay());
+}
+
+void plexus::Proto::SendLogout(User *u)
+{
+	Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), "");
+}
+
+void plexus::Proto::SendTopic(const MessageSource &source, Channel *c)
+{
+	Uplink::Send(source, "ENCAP", "*", "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
+}
+
+void plexus::Proto::SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param)
+{
+	Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSJOIN", user->GetUID(), chan);
+}
+
+void plexus::Proto::SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param)
+{
+	Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSPART", user->GetUID(), chan);
+}
 
 void plexus::Encap::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
@@ -291,7 +271,7 @@ class ProtoPlexus : public Module
 {
 	Module *m_hybrid;
 
-	PlexusProto ircd_proto;
+	plexus::Proto ircd_proto;
 
 	/* Core message handlers */
 	rfc1459::Away message_away;

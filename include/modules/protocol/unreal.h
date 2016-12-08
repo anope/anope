@@ -22,6 +22,83 @@
 namespace unreal
 {
 
+class Proto : public IRCDProto
+{
+ public:
+	Proto(Module *creator);
+
+ private:
+	void SendSVSNOOP(Server *server, bool set) override;
+
+	void SendAkillDel(XLine *x) override;
+
+	void SendTopic(const MessageSource &source, Channel *c) override;
+
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
+
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
+
+	void SendVhostDel(User *u) override;
+
+	void SendAkill(User *u, XLine *x) override;
+
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override;
+
+	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override;
+
+	void SendClientIntroduction(User *u) override;
+
+	void SendServer(Server *server) override;
+
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override;
+
+	void SendSQLineDel(XLine *x) override;
+
+	void SendSQLine(User *, XLine *x) override;
+
+	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override;
+
+	void SendConnect() override;
+
+	void SendSVSHold(const Anope::string &nick, time_t t) override;
+
+	void SendSVSHoldDel(const Anope::string &nick) override;
+
+	void SendSGLineDel(XLine *x) override;
+
+	void SendSZLineDel(XLine *x) override;
+
+	void SendSZLine(User *, XLine *x) override;
+
+	void SendSGLine(User *, XLine *x) override;
+
+	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override;
+
+	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override;
+
+	void SendSWhois(const MessageSource &source, const Anope::string &who, const Anope::string &mask) override;
+
+	void SendEOB() override;
+
+	bool IsNickValid(const Anope::string &nick) override;
+
+	bool IsChannelValid(const Anope::string &chan) override;
+
+	bool IsExtbanValid(const Anope::string &mask) override;
+
+	void SendLogin(User *u, NickServ::Nick *na) override;
+
+	void SendLogout(User *u) override;
+
+	void SendChannel(Channel *c) override;
+
+	void SendSASLMessage(const ::SASL::Message &message) override;
+
+	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override;
+
+	bool IsIdentValid(const Anope::string &ident) override;
+};
+
 class ChgHost : public IRCDMessage
 {
  public:

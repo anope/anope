@@ -37,454 +37,449 @@ static std::list<SASLUser> saslusers;
 static Anope::string rsquit_server, rsquit_id;
 static unsigned int spanningtree_proto_ver = 0;
 
-class InspIRCd20Proto : public IRCDProto
+void inspircd20::Proto::SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf)
 {
- private:
-	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
-	{
-		IRCDProto::SendSVSKill(source, user, buf);
-		user->KillInternal(source, buf);
-	}
+	IRCDProto::SendSVSKill(source, user, buf);
+	user->KillInternal(source, buf);
+}
 
-	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
-	{
-		if (!Servers::Capab.count("CHGIDENT"))
-			Log() << "CHGIDENT not loaded!";
-		else
-			Uplink::Send(Me, "CHGIDENT", nick, vIdent);
-	}
+void inspircd20::Proto::SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
+{
+	if (!Servers::Capab.count("CHGIDENT"))
+		Log() << "CHGIDENT not loaded!";
+	else
+		Uplink::Send(Me, "CHGIDENT", nick, vIdent);
+}
 
-	void SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
-	{
-		if (!Servers::Capab.count("CHGHOST"))
-			Log() << "CHGHOST not loaded!";
-		else
-			Uplink::Send(Me, "CHGHOST", nick, vhost);
-	}
+void inspircd20::Proto::SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
+{
+	if (!Servers::Capab.count("CHGHOST"))
+		Log() << "CHGHOST not loaded!";
+	else
+		Uplink::Send(Me, "CHGHOST", nick, vhost);
+}
 
-	void SendAddLine(const Anope::string &xtype, const Anope::string &mask, time_t duration, const Anope::string &addedby, const Anope::string &reason)
-	{
-		Uplink::Send(Me, "ADDLINE", xtype, mask, addedby, Anope::CurTime, duration, reason);
-	}
+void inspircd20::Proto::SendAddLine(const Anope::string &xtype, const Anope::string &mask, time_t duration, const Anope::string &addedby, const Anope::string &reason)
+{
+	Uplink::Send(Me, "ADDLINE", xtype, mask, addedby, Anope::CurTime, duration, reason);
+}
 
-	void SendDelLine(const Anope::string &xtype, const Anope::string &mask)
-	{
-		Uplink::Send(Me, "DELLINE", xtype, mask);
-	}
+void inspircd20::Proto::SendDelLine(const Anope::string &xtype, const Anope::string &mask)
+{
+	Uplink::Send(Me, "DELLINE", xtype, mask);
+}
 
- public:
-	InspIRCd20Proto(Module *creator) : IRCDProto(creator, "InspIRCd 2.0")
-	{
-		DefaultPseudoclientModes = "+I";
-		CanSVSNick = true;
-		CanSVSJoin = true;
-		CanSetVHost = true;
-		CanSetVIdent = true;
-		CanSQLine = true;
-		CanSZLine = true;
-		CanSVSHold = true;
-		CanCertFP = true;
-		RequiresID = true;
-		MaxModes = 20;
-	}
+inspircd20::Proto::Proto(Module *creator) : IRCDProto(creator, "InspIRCd 2.0")
+{
+	DefaultPseudoclientModes = "+I";
+	CanSVSNick = true;
+	CanSVSJoin = true;
+	CanSetVHost = true;
+	CanSetVIdent = true;
+	CanSQLine = true;
+	CanSZLine = true;
+	CanSVSHold = true;
+	CanCertFP = true;
+	RequiresID = true;
+	MaxModes = 20;
+}
 
-	void SendConnect() override
-	{
-		Uplink::Send("CAPAB START 1202");
-		Uplink::Send("CAPAB CAPABILITIES :PROTOCOL=1202");
-		Uplink::Send("CAPAB END");
-		SendServer(Me);
-	}
+void inspircd20::Proto::SendConnect()
+{
+	Uplink::Send("CAPAB START 1202");
+	Uplink::Send("CAPAB CAPABILITIES :PROTOCOL=1202");
+	Uplink::Send("CAPAB END");
+	SendServer(Me);
+}
 
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override
-	{
-		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
-	}
+void inspircd20::Proto::SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg)
+{
+	Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
+}
 
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override
-	{
-		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
-	}
+void inspircd20::Proto::SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg)
+{
+	Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
+}
 
-	void SendAkillDel(XLine *x) override
+void inspircd20::Proto::SendAkillDel(XLine *x)
+{
+	/* InspIRCd may support regex bans */
+	if (x->IsRegex() && Servers::Capab.count("RLINE"))
 	{
-		/* InspIRCd may support regex bans */
-		if (x->IsRegex() && Servers::Capab.count("RLINE"))
+		Anope::string mask = x->GetMask();
+		size_t h = mask.find('#');
+		if (h != Anope::string::npos)
+			mask = mask.replace(h, 1, ' ');
+		SendDelLine("R", mask);
+		return;
+	}
+	else if (x->IsRegex() || x->HasNickOrReal())
+		return;
+
+	/* ZLine if we can instead */
+	if (x->GetUser() == "*")
+	{
+		cidr addr(x->GetHost());
+		if (addr.valid())
 		{
-			Anope::string mask = x->GetMask();
-			size_t h = mask.find('#');
-			if (h != Anope::string::npos)
-				mask = mask.replace(h, 1, ' ');
-			SendDelLine("R", mask);
+			IRCD->SendSZLineDel(x);
 			return;
 		}
-		else if (x->IsRegex() || x->HasNickOrReal())
-			return;
-
-		/* ZLine if we can instead */
-		if (x->GetUser() == "*")
-		{
-			cidr addr(x->GetHost());
-			if (addr.valid())
-			{
-				IRCD->SendSZLineDel(x);
-				return;
-			}
-		}
-
-		SendDelLine("G", x->GetUser() + "@" + x->GetHost());
 	}
 
-	void SendTopic(const MessageSource &source, Channel *c) override
+	SendDelLine("G", x->GetUser() + "@" + x->GetHost());
+}
+
+void inspircd20::Proto::SendTopic(const MessageSource &source, Channel *c)
+{
+	if (Servers::Capab.count("SVSTOPIC"))
 	{
-		if (Servers::Capab.count("SVSTOPIC"))
-		{
-			Uplink::Send(c->ci->WhoSends(), "SVSTOPIC", c->name, c->topic_ts, c->topic_setter, c->topic);
-		}
-		else
-		{
-			/* If the last time a topic was set is after the TS we want for this topic we must bump this topic's timestamp to now */
-			time_t ts = c->topic_ts;
-			if (c->topic_time > ts)
-				ts = Anope::CurTime;
-			/* But don't modify c->topic_ts, it should remain set to the real TS we want as ci->last_topic_time pulls from it */
-			Uplink::Send(source, "FTOPIC", c->name, ts, c->topic_setter, c->topic);
-		}
+		Uplink::Send(c->ci->WhoSends(), "SVSTOPIC", c->name, c->topic_ts, c->topic_setter, c->topic);
 	}
-
-	void SendVhostDel(User *u) override
+	else
 	{
-		if (u->HasMode("CLOAK"))
-			this->SendChgHostInternal(u->nick, u->chost);
-		else
-			this->SendChgHostInternal(u->nick, u->host);
-
-		if (Servers::Capab.count("CHGIDENT") && u->GetIdent() != u->GetVIdent())
-			this->SendChgIdentInternal(u->nick, u->GetIdent());
+		/* If the last time a topic was set is after the TS we want for this topic we must bump this topic's timestamp to now */
+		time_t ts = c->topic_ts;
+		if (c->topic_time > ts)
+			ts = Anope::CurTime;
+		/* But don't modify c->topic_ts, it should remain set to the real TS we want as ci->last_topic_time pulls from it */
+		Uplink::Send(source, "FTOPIC", c->name, ts, c->topic_setter, c->topic);
 	}
+}
 
-	void SendAkill(User *u, XLine *x) override
+void inspircd20::Proto::SendVhostDel(User *u)
+{
+	if (u->HasMode("CLOAK"))
+		this->SendChgHostInternal(u->nick, u->chost);
+	else
+		this->SendChgHostInternal(u->nick, u->host);
+
+	if (Servers::Capab.count("CHGIDENT") && u->GetIdent() != u->GetVIdent())
+		this->SendChgIdentInternal(u->nick, u->GetIdent());
+}
+
+void inspircd20::Proto::SendAkill(User *u, XLine *x)
+{
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+
+	/* InspIRCd may support regex bans, if they do we can send this and forget about it */
+	if (x->IsRegex() && Servers::Capab.count("RLINE"))
 	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->GetExpires() - Anope::CurTime;
-		if (timeleft > 172800 || !x->GetExpires())
-			timeleft = 172800;
-
-		/* InspIRCd may support regex bans, if they do we can send this and forget about it */
-		if (x->IsRegex() && Servers::Capab.count("RLINE"))
+		Anope::string mask = x->GetMask();
+		size_t h = mask.find('#');
+		if (h != Anope::string::npos)
+			mask = mask.replace(h, 1, ' ');
+		SendAddLine("R", mask, timeleft, x->GetBy(), x->GetReason());
+		return;
+	}
+	else if (x->IsRegex() || x->HasNickOrReal())
+	{
+		if (!u)
 		{
-			Anope::string mask = x->GetMask();
-			size_t h = mask.find('#');
-			if (h != Anope::string::npos)
-				mask = mask.replace(h, 1, ' ');
-			SendAddLine("R", mask, timeleft, x->GetBy(), x->GetReason());
+			/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+				if (x->GetManager()->Check(it->second, x))
+					this->SendAkill(it->second, x);
 			return;
 		}
-		else if (x->IsRegex() || x->HasNickOrReal())
-		{
-			if (!u)
-			{
-				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
-				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (x->GetManager()->Check(it->second, x))
-						this->SendAkill(it->second, x);
-				return;
-			}
 
-			XLine *old = x;
+		XLine *old = x;
 
-			if (old->GetManager()->HasEntry("*@" + u->host))
-				return;
-
-			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			x = Serialize::New<XLine *>();
-			x->SetMask("*@" + u->host);
-			x->SetBy(old->GetBy());
-			x->SetExpires(old->GetExpires());
-			x->SetReason(old->GetReason());
-			old->GetManager()->AddXLine(x);
-
-			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
-		}
-
-		/* ZLine if we can instead */
-		if (x->GetUser() == "*")
-		{
-			cidr addr(x->GetHost());
-			if (addr.valid())
-			{
-				IRCD->SendSZLine(u, x);
-				return;
-			}
-		}
-
-		SendAddLine("G", x->GetUser() + "@" + x->GetHost(), timeleft, x->GetBy(), x->GetReason());
-	}
-
-	void SendNumeric(int numeric, User *dest, IRCMessage &message)
-	{
-		std::vector<Anope::string> params = message.GetParameters();
-		if (params.empty())
+		if (old->GetManager()->HasEntry("*@" + u->host))
 			return;
 
-		/* First parameter is the UID, change it to nick because it is pushed */
-		params[0] = dest->nick;
+		/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
+		x = Serialize::New<XLine *>();
+		x->SetMask("*@" + u->host);
+		x->SetBy(old->GetBy());
+		x->SetExpires(old->GetExpires());
+		x->SetReason(old->GetReason());
+		old->GetManager()->AddXLine(x);
 
-		IRCMessage m(message.GetSource(), message.GetCommand());
-		for (const Anope::string &s : params)
-			m.Push(s);
-
-		Uplink::Send("PUSH", dest->GetUID(), Format(m));
+		Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
 	}
 
-	void SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf) override
+	/* ZLine if we can instead */
+	if (x->GetUser() == "*")
 	{
-		IRCMessage message(source, "FMODE", dest->name, dest->creation_time);
-		message.TokenizeAndPush(buf);
-		Uplink::SendMessage(message);
-	}
-
-	void SendClientIntroduction(User *u) override
-	{
-		Anope::string modes = "+" + u->GetModes();
-		Uplink::Send(Me, "UID", u->GetUID(), u->timestamp, u->nick, u->host, u->host, u->GetIdent(), "0.0.0.0", u->timestamp, modes, u->realname);
-		if (modes.find('o') != Anope::string::npos)
-			Uplink::Send(u, "OPERTYPE", "services");
-	}
-
-	/* SERVER services-dev.chatspike.net password 0 :Description here */
-	void SendServer(Server *server) override
-	{
-		/* if rsquit is set then we are waiting on a squit */
-		if (rsquit_id.empty() && rsquit_server.empty())
-			Uplink::Send("SERVER", server->GetName(), Config->Uplinks[Anope::CurrentUplink].password, server->GetHops(), server->GetSID(), server->GetDescription());
-	}
-
-	void SendSquit(Server *s, const Anope::string &message) override
-	{
-		if (s != Me)
+		cidr addr(x->GetHost());
+		if (addr.valid())
 		{
-			rsquit_id = s->GetSID();
-			rsquit_server = s->GetName();
-			
-			Uplink::Send("RSQUIT", s->GetName(), message);
-		}
-		else
-		{
-			Uplink::Send("SQUIT", s->GetName(), message);
+			IRCD->SendSZLine(u, x);
+			return;
 		}
 	}
 
-	/* JOIN */
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
-	{
-		Uplink::Send(Me, "FJOIN", c->name, c->creation_time, "+" + c->GetModes(true, true), "," + user->GetUID());
+	SendAddLine("G", x->GetUser() + "@" + x->GetHost(), timeleft, x->GetBy(), x->GetReason());
+}
 
-		/* Note that we can send this with the FJOIN but choose not to
-		 * because the mode stacker will handle this and probably will
-		 * merge these modes with +nrt and other mlocked modes
+void inspircd20::Proto::SendNumeric(int numeric, User *dest, IRCMessage &message)
+{
+	std::vector<Anope::string> params = message.GetParameters();
+	if (params.empty())
+		return;
+
+	/* First parameter is the UID, change it to nick because it is pushed */
+	params[0] = dest->nick;
+
+	IRCMessage m(message.GetSource(), message.GetCommand());
+	for (const Anope::string &s : params)
+		m.Push(s);
+
+	Uplink::Send("PUSH", dest->GetUID(), Format(m));
+}
+
+void inspircd20::Proto::SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf)
+{
+	IRCMessage message(source, "FMODE", dest->name, dest->creation_time);
+	message.TokenizeAndPush(buf);
+	Uplink::SendMessage(message);
+}
+
+void inspircd20::Proto::SendClientIntroduction(User *u)
+{
+	Anope::string modes = "+" + u->GetModes();
+	Uplink::Send(Me, "UID", u->GetUID(), u->timestamp, u->nick, u->host, u->host, u->GetIdent(), "0.0.0.0", u->timestamp, modes, u->realname);
+	if (modes.find('o') != Anope::string::npos)
+		Uplink::Send(u, "OPERTYPE", "services");
+}
+
+/* SERVER services-dev.chatspike.net password 0 :Description here */
+void inspircd20::Proto::SendServer(Server *server)
+{
+	/* if rsquit is set then we are waiting on a squit */
+	if (rsquit_id.empty() && rsquit_server.empty())
+		Uplink::Send("SERVER", server->GetName(), Config->Uplinks[Anope::CurrentUplink].password, server->GetHops(), server->GetSID(), server->GetDescription());
+}
+
+void inspircd20::Proto::SendSquit(Server *s, const Anope::string &message)
+{
+	if (s != Me)
+	{
+		rsquit_id = s->GetSID();
+		rsquit_server = s->GetName();
+
+		Uplink::Send("RSQUIT", s->GetName(), message);
+	}
+	else
+	{
+		Uplink::Send("SQUIT", s->GetName(), message);
+	}
+}
+
+/* JOIN */
+void inspircd20::Proto::SendJoin(User *user, Channel *c, const ChannelStatus *status)
+{
+	Uplink::Send(Me, "FJOIN", c->name, c->creation_time, "+" + c->GetModes(true, true), "," + user->GetUID());
+
+	/* Note that we can send this with the FJOIN but choose not to
+	 * because the mode stacker will handle this and probably will
+	 * merge these modes with +nrt and other mlocked modes
+	 */
+	if (status)
+	{
+		/* First save the channel status incase uc->Status == status */
+		ChannelStatus cs = *status;
+		/* If the user is internally on the channel with flags, kill them so that
+		 * the stacker will allow this.
 		 */
-		if (status)
-		{
-			/* First save the channel status incase uc->Status == status */
-			ChannelStatus cs = *status;
-			/* If the user is internally on the channel with flags, kill them so that
-			 * the stacker will allow this.
-			 */
-			ChanUserContainer *uc = c->FindUser(user);
-			if (uc != NULL)
-				uc->status.Clear();
+		ChanUserContainer *uc = c->FindUser(user);
+		if (uc != NULL)
+			uc->status.Clear();
 
-			ServiceBot *setter = ServiceBot::Find(user->nick);
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+		ServiceBot *setter = ServiceBot::Find(user->nick);
+		for (size_t i = 0; i < cs.Modes().length(); ++i)
+			c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 
-			if (uc != NULL)
-				uc->status = cs;
-		}
+		if (uc != NULL)
+			uc->status = cs;
 	}
+}
 
-	/* UNSQLINE */
-	void SendSQLineDel(XLine *x) override
-	{
-		SendDelLine("Q", x->GetMask());
-	}
+/* UNSQLINE */
+void inspircd20::Proto::SendSQLineDel(XLine *x)
+{
+	SendDelLine("Q", x->GetMask());
+}
 
-	/* SQLINE */
-	void SendSQLine(User *, XLine *x) override
-	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->GetExpires() - Anope::CurTime;
-		if (timeleft > 172800 || !x->GetExpires())
-			timeleft = 172800;
-		SendAddLine("Q", x->GetMask(), timeleft, x->GetBy(), x->GetReason());
-	}
+/* SQLINE */
+void inspircd20::Proto::SendSQLine(User *, XLine *x)
+{
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+	SendAddLine("Q", x->GetMask(), timeleft, x->GetBy(), x->GetReason());
+}
 
-	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
-	{
-		if (!vIdent.empty())
-			this->SendChgIdentInternal(u->nick, vIdent);
-		if (!vhost.empty())
-			this->SendChgHostInternal(u->nick, vhost);
-	}
+void inspircd20::Proto::SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost)
+{
+	if (!vIdent.empty())
+		this->SendChgIdentInternal(u->nick, vIdent);
+	if (!vhost.empty())
+		this->SendChgHostInternal(u->nick, vhost);
+}
 
-	/* SVSHOLD - set */
-	void SendSVSHold(const Anope::string &nick, time_t t) override
-	{
-		Uplink::Send(Config->GetClient("NickServ"), "SVSHOLD", nick, t, "Being held for registered user");
-	}
+/* SVSHOLD - set */
+void inspircd20::Proto::SendSVSHold(const Anope::string &nick, time_t t)
+{
+	Uplink::Send(Config->GetClient("NickServ"), "SVSHOLD", nick, t, "Being held for registered user");
+}
 
-	/* SVSHOLD - release */
-	void SendSVSHoldDel(const Anope::string &nick) override
-	{
-		Uplink::Send(Config->GetClient("NickServ"), "SVSHOLD", nick);
-	}
+/* SVSHOLD - release */
+void inspircd20::Proto::SendSVSHoldDel(const Anope::string &nick)
+{
+	Uplink::Send(Config->GetClient("NickServ"), "SVSHOLD", nick);
+}
 
-	/* UNSZLINE */
-	void SendSZLineDel(XLine *x) override
-	{
-		SendDelLine("Z", x->GetHost());
-	}
+/* UNSZLINE */
+void inspircd20::Proto::SendSZLineDel(XLine *x)
+{
+	SendDelLine("Z", x->GetHost());
+}
 
-	/* SZLINE */
-	void SendSZLine(User *, XLine *x) override
-	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->GetExpires() - Anope::CurTime;
-		if (timeleft > 172800 || !x->GetExpires())
-			timeleft = 172800;
-		SendAddLine("Z", x->GetHost(), timeleft, x->GetBy(), x->GetReason());
-	}
+/* SZLINE */
+void inspircd20::Proto::SendSZLine(User *, XLine *x)
+{
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+	SendAddLine("Z", x->GetHost(), timeleft, x->GetBy(), x->GetReason());
+}
 
-	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) override
-	{
-		Uplink::Send(source, "SVSJOIN", u->GetUID(), chan);
-	}
+void inspircd20::Proto::SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &)
+{
+	Uplink::Send(source, "SVSJOIN", u->GetUID(), chan);
+}
 
-	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) override
+void inspircd20::Proto::SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param)
+{
+	if (!param.empty())
+		Uplink::Send(source, "SVSPART", u->GetUID(), chan, param);
+	else
+		Uplink::Send(source, "SVSPART", u->GetUID(), chan);
+}
+
+void inspircd20::Proto::SendSWhois(const MessageSource &, const Anope::string &who, const Anope::string &mask)
+{
+	User *u = User::Find(who);
+
+	Uplink::Send(Me, "METADATA", u->GetUID(), "swhois", mask);
+}
+
+void inspircd20::Proto::SendBOB()
+{
+	Uplink::Send(Me, "BURST", Anope::CurTime);
+	Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
+	Uplink::Send(Me, "VERSION", Anope::Format("Anope-{0} {1} {2} - {3} - Built: {4} - Flags: {5}",
+		Anope::Version(), Me->GetName(), IRCD->GetProtocolName(), enc ? enc->name : "(none)", Anope::VersionBuildTime(), Anope::VersionFlags()));
+}
+
+void inspircd20::Proto::SendEOB()
+{
+	Uplink::Send(Me, "ENDBURST");
+}
+
+void inspircd20::Proto::SendGlobops(const MessageSource &source, const Anope::string &buf)
+{
+	if (Servers::Capab.count("GLOBOPS"))
+		Uplink::Send(source, "SNONOTICE", "g", buf);
+	else
+		Uplink::Send(source, "SNONOTICE", "A", buf);
+}
+
+void inspircd20::Proto::SendLogin(User *u, NickServ::Nick *na)
+{
+	/* InspIRCd uses an account to bypass chmode +R, not umode +r, so we can't send this here */
+	if (na->GetAccount()->IsUnconfirmed())
+		return;
+
+	Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", na->GetAccount()->GetDisplay());
+}
+
+void inspircd20::Proto::SendLogout(User *u)
+{
+	Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", "");
+}
+
+void inspircd20::Proto::SendChannel(Channel *c)
+{
+	Uplink::Send(Me, "FJOIN", c->name, c->creation_time, "+" + c->GetModes(true, true), "");
+}
+
+void inspircd20::Proto::SendSASLMechanisms(std::vector<Anope::string> &mechanisms)
+{
+	Anope::string mechlist;
+	for (unsigned i = 0; i < mechanisms.size(); ++i)
+		mechlist += "," + mechanisms[i];
+
+	Uplink::Send(Me, "METADATA", "*", "saslmechlist", mechlist.empty() ? "" : mechlist.substr(1));
+}
+
+void inspircd20::Proto::SendSASLMessage(const SASL::Message &message)
+{
+	if (!message.ext.empty())
+		Uplink::Send(Me, "ENCAP", message.target.substr(0, 3), "SASL",
+			message.source, message.target,
+			message.type, message.data, message.ext);
+	else
+		Uplink::Send(Me, "ENCAP", message.target.substr(0, 3), "SASL",
+			message.source, message.target,
+			message.type, message.data);
+}
+
+void inspircd20::Proto::SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost)
+{
+	Uplink::Send(Me, "METADATA", uid, "accountname", acc);
+
+	SASLUser su;
+	su.uid = uid;
+	su.acc = acc;
+	su.created = Anope::CurTime;
+
+	for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
 	{
-		if (!param.empty())
-			Uplink::Send(source, "SVSPART", u->GetUID(), chan, param);
+		SASLUser &u = *it;
+
+		if (u.created + 30 < Anope::CurTime || u.uid == uid)
+			it = saslusers.erase(it);
 		else
-			Uplink::Send(source, "SVSPART", u->GetUID(), chan);
+			++it;
 	}
 
-	void SendSWhois(const MessageSource &, const Anope::string &who, const Anope::string &mask) override
+	saslusers.push_back(su);
+}
+
+bool inspircd20::Proto::IsExtbanValid(const Anope::string &mask)
+{
+	return mask.length() >= 3 && mask[1] == ':';
+}
+
+bool inspircd20::Proto::IsIdentValid(const Anope::string &ident)
+{
+	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned int>("userlen"))
+		return false;
+
+	for (unsigned i = 0; i < ident.length(); ++i)
 	{
-		User *u = User::Find(who);
+		const char &c = ident[i];
 
-		Uplink::Send(Me, "METADATA", u->GetUID(), "swhois", mask);
+		if (c >= 'A' && c <= '}')
+			continue;
+
+		if ((c >= '0' && c <= '9') || c == '-' || c == '.')
+			continue;
+
+		return false;
 	}
 
-	void SendBOB() override
-	{
-		Uplink::Send(Me, "BURST", Anope::CurTime);
-		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		Uplink::Send(Me, "VERSION", Anope::Format("Anope-{0} {1} {2} - {3} - Built: {4} - Flags: {5}",
-			Anope::Version(), Me->GetName(), IRCD->GetProtocolName(), enc ? enc->name : "(none)", Anope::VersionBuildTime(), Anope::VersionFlags()));
-	}
-
-	void SendEOB() override
-	{
-		Uplink::Send(Me, "ENDBURST");
-	}
-
-	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
-	{
-		if (Servers::Capab.count("GLOBOPS"))
-			Uplink::Send(source, "SNONOTICE", "g", buf);
-		else
-			Uplink::Send(source, "SNONOTICE", "A", buf);
-	}
-
-	void SendLogin(User *u, NickServ::Nick *na) override
-	{
-		/* InspIRCd uses an account to bypass chmode +R, not umode +r, so we can't send this here */
-		if (na->GetAccount()->IsUnconfirmed())
-			return;
-
-		Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", na->GetAccount()->GetDisplay());
-	}
-
-	void SendLogout(User *u) override
-	{
-		Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", "");
-	}
-
-	void SendChannel(Channel *c) override
-	{
-		Uplink::Send(Me, "FJOIN", c->name, c->creation_time, "+" + c->GetModes(true, true), "");
-	}
-
-	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override
-	{
-		Anope::string mechlist;
-		for (unsigned i = 0; i < mechanisms.size(); ++i)
-			mechlist += "," + mechanisms[i];
-
-		Uplink::Send(Me, "METADATA", "*", "saslmechlist", mechlist.empty() ? "" : mechlist.substr(1));
-	}
-
-	void SendSASLMessage(const SASL::Message &message) override
-	{
-		if (!message.ext.empty())
-			Uplink::Send(Me, "ENCAP", message.target.substr(0, 3), "SASL",
-				message.source, message.target,
-				message.type, message.data, message.ext);
-		else
-			Uplink::Send(Me, "ENCAP", message.target.substr(0, 3), "SASL",
-				message.source, message.target,
-				message.type, message.data);
-	}
-
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override
-	{
-		Uplink::Send(Me, "METADATA", uid, "accountname", acc);
-
-		SASLUser su;
-		su.uid = uid;
-		su.acc = acc;
-		su.created = Anope::CurTime;
-
-		for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
-		{
-			SASLUser &u = *it;
-
-			if (u.created + 30 < Anope::CurTime || u.uid == uid)
-				it = saslusers.erase(it);
-			else
-				++it;
-		}
-
-		saslusers.push_back(su);
-	}
-
-	bool IsExtbanValid(const Anope::string &mask) override
-	{
-		return mask.length() >= 3 && mask[1] == ':';
-	}
-
-	bool IsIdentValid(const Anope::string &ident) override
-	{
-		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
-			return false;
-
-		for (unsigned i = 0; i < ident.length(); ++i)
-		{
-			const char &c = ident[i];
-
-			if (c >= 'A' && c <= '}')
-				continue;
-
-			if ((c >= '0' && c <= '9') || c == '-' || c == '.')
-				continue;
-
-			return false;
-		}
-
-		return true;
-	}
-};
+	return true;
+}
 
 class InspIRCdExtBan : public ChannelModeVirtual<ChannelModeList>
 {
@@ -1279,7 +1274,7 @@ class ProtoInspIRCd20 : public Module
 	, public EventHook<Event::MLockEvents>
 	, public EventHook<Event::SetChannelOption>
 {
-	InspIRCd20Proto ircd_proto;
+	inspircd20::Proto ircd_proto;
 	ExtensibleItem<bool> ssl;
 	ServiceReference<ModeLocks> mlocks;
 

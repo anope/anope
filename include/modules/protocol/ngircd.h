@@ -23,6 +23,50 @@
 namespace ngircd
 {
 
+class Proto : public IRCDProto
+{
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override;
+
+ public:
+	Proto(Module *creator);
+
+	void SendAkill(User *u, XLine *x) override;
+
+	void SendAkillDel(XLine *x) override;
+
+	void SendChannel(Channel *c) override;
+
+	// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
+	void SendClientIntroduction(User *u) override;
+
+	void SendConnect() override;
+
+	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override;
+
+	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
+
+	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
+
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override;
+
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override;
+
+	void SendLogin(User *u, NickServ::Nick *na) override;
+
+	void SendLogout(User *u) override;
+
+	/* SERVER name hop descript */
+	void SendServer(Server *server) override;
+
+	void SendTopic(const MessageSource &source, Channel *c) override;
+
+	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override;
+
+	void SendVhostDel(User *u) override;
+
+	Anope::string Format(IRCMessage &message) override;
+};
+
 class Numeric005 : public IRCDMessage
 {
  public:
@@ -92,7 +136,7 @@ struct Nick : public IRCDMessage
 class NJoin : public IRCDMessage
 {
  public:
-	NJoin(Module *creator) : IRCDMessage(creator, "NJOIN",2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); };
+	NJoin(Module *creator) : IRCDMessage(creator, "NJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); };
 
 	/*
 	 * RFC 2813, 4.2.2: Njoin Message:

@@ -28,405 +28,397 @@
 
 static Anope::string UplinkSID;
 
-class UnrealIRCdProto : public IRCDProto
+unreal::Proto::Proto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4")
 {
- public:
-	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4")
+	DefaultPseudoclientModes = "+Soiq";
+	CanSVSNick = true;
+	CanSVSJoin = true;
+	CanSetVHost = true;
+	CanSetVIdent = true;
+	CanSNLine = true;
+	CanSQLine = true;
+	CanSZLine = true;
+	CanSVSHold = true;
+	CanCertFP = true;
+	RequiresID = true;
+	MaxModes = 12;
+}
+
+/* SVSNOOP */
+void unreal::Proto::SendSVSNOOP(Server *server, bool set)
+{
+	Uplink::Send("SVSNOOP", server->GetSID(), set ? "+" : "-");
+}
+
+void unreal::Proto::SendAkillDel(XLine *x)
+{
+	if (x->IsRegex() || x->HasNickOrReal())
+		return;
+
+	/* ZLine if we can instead */
+	if (x->GetUser() == "*")
 	{
-		DefaultPseudoclientModes = "+Soiq";
-		CanSVSNick = true;
-		CanSVSJoin = true;
-		CanSetVHost = true;
-		CanSetVIdent = true;
-		CanSNLine = true;
-		CanSQLine = true;
-		CanSZLine = true;
-		CanSVSHold = true;
-		CanCertFP = true;
-		RequiresID = true;
-		MaxModes = 12;
+		cidr a(x->GetHost());
+		if (a.valid())
+		{
+			IRCD->SendSZLineDel(x);
+			return;
+		}
 	}
 
- private:
-	/* SVSNOOP */
-	void SendSVSNOOP(Server *server, bool set) override
-	{
-		Uplink::Send("SVSNOOP", server->GetSID(), set ? "+" : "-");
-	}
+	Uplink::Send("TKL", "-", "G", x->GetUser(), x->GetHost(), x->GetBy());
+}
 
-	void SendAkillDel(XLine *x) override
+void unreal::Proto::SendTopic(const MessageSource &source, Channel *c)
+{
+	Uplink::Send(source, "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
+}
+
+void unreal::Proto::SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg)
+{
+	Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
+}
+
+void unreal::Proto::SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg)
+{
+	Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
+}
+
+void unreal::Proto::SendVhostDel(User *u)
+{
+	ServiceBot *HostServ = Config->GetClient("HostServ");
+	u->RemoveMode(HostServ, "CLOAK");
+	u->RemoveMode(HostServ, "VHOST");
+	ModeManager::ProcessModes();
+	u->SetMode(HostServ, "CLOAK");
+}
+
+void unreal::Proto::SendAkill(User *u, XLine *x)
+{
+	if (x->IsRegex() || x->HasNickOrReal())
 	{
-		if (x->IsRegex() || x->HasNickOrReal())
+		if (!u)
+		{
+			/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+				if (x->GetManager()->Check(it->second, x))
+					this->SendAkill(it->second, x);
+			return;
+		}
+
+		XLine *old = x;
+
+		if (old->GetManager()->HasEntry("*@" + u->host))
 			return;
 
-		/* ZLine if we can instead */
-		if (x->GetUser() == "*")
+		/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
+		XLine *xl = Serialize::New<XLine *>();
+		xl->SetMask("*@" + u->host);
+		xl->SetBy(old->GetBy());
+		xl->SetExpires(old->GetExpires());
+		xl->SetReason(old->GetReason());
+		xl->SetID(old->GetID());
+
+		old->GetManager()->AddXLine(xl);
+		x = xl;
+
+		Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
+	}
+
+	/* ZLine if we can instead */
+	if (x->GetUser() == "*")
+	{
+		cidr a(x->GetHost());
+		if (a.valid())
 		{
-			cidr a(x->GetHost());
-			if (a.valid())
-			{
-				IRCD->SendSZLineDel(x);
-				return;
-			}
-		}
-
-		Uplink::Send("TKL", "-", "G", x->GetUser(), x->GetHost(), x->GetBy());
-	}
-
-	void SendTopic(const MessageSource &source, Channel *c) override
-	{
-		Uplink::Send(source, "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
-	}
-
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override
-	{
-		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
-	}
-
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override
-	{
-		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
-	}
-
-	void SendVhostDel(User *u) override
-	{
-		ServiceBot *HostServ = Config->GetClient("HostServ");
-		u->RemoveMode(HostServ, "CLOAK");
-		u->RemoveMode(HostServ, "VHOST");
-		ModeManager::ProcessModes();
-		u->SetMode(HostServ, "CLOAK");
-	}
-
-	void SendAkill(User *u, XLine *x) override
-	{
-		if (x->IsRegex() || x->HasNickOrReal())
-		{
-			if (!u)
-			{
-				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
-				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (x->GetManager()->Check(it->second, x))
-						this->SendAkill(it->second, x);
-				return;
-			}
-
-			XLine *old = x;
-
-			if (old->GetManager()->HasEntry("*@" + u->host))
-				return;
-
-			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			XLine *xl = Serialize::New<XLine *>();
-			xl->SetMask("*@" + u->host);
-			xl->SetBy(old->GetBy());
-			xl->SetExpires(old->GetExpires());
-			xl->SetReason(old->GetReason());
-			xl->SetID(old->GetID());
-
-			old->GetManager()->AddXLine(xl);
-			x = xl;
-
-			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
-		}
-
-		/* ZLine if we can instead */
-		if (x->GetUser() == "*")
-		{
-			cidr a(x->GetHost());
-			if (a.valid())
-			{
-				IRCD->SendSZLine(u, x);
-				return;
-			}
-		}
-
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->GetExpires() - Anope::CurTime;
-		if (timeleft > 172800 || !x->GetExpires())
-			timeleft = 172800;
-		Uplink::Send("TKL", "+", "G", x->GetUser(), x->GetHost(), x->GetBy(), Anope::CurTime + timeleft, x->GetCreated(), x->GetReason());
-	}
-
-	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
-	{
-		Uplink::Send(source, "SVSKILL", user->GetUID(), buf);
-		user->KillInternal(source, buf);
-	}
-
-	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override
-	{
-		IRCMessage message(source, "SVS2MODE", u->GetUID());
-		message.TokenizeAndPush(buf);
-		Uplink::SendMessage(message);
-	}
-
-	void SendClientIntroduction(User *u) override
-	{
-		Anope::string modes = "+" + u->GetModes();
-		Uplink::Send("UID", u->nick, 1, u->timestamp, u->GetIdent(), u->host, u->GetUID(), "*", modes, !u->vhost.empty() ? u->vhost : "*", !u->chost.empty() ? u->chost : "*", "*", u->realname);
-	}
-
-	/* SERVER name hop descript */
-	/* Unreal 3.2 actually sends some info about itself in the descript area */
-	void SendServer(Server *server) override
-	{
-		if (!server->GetSID().empty() && server == Me)
-			Uplink::Send("SERVER", server->GetName(), server->GetHops() + 1, server->GetDescription());
-		else
-			Uplink::Send("SID", server->GetName(), server->GetHops() + 1, server->GetSID(), server->GetDescription());
-	}
-
-	/* JOIN */
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
-	{
-		Uplink::Send(Me, "SJOIN", c->creation_time, c->name, user->GetUID());
-		if (status)
-		{
-			/* First save the channel status incase uc->Status == status */
-			ChannelStatus cs = *status;
-			/* If the user is internally on the channel with flags, kill them so that
-			 * the stacker will allow this.
-			 */
-			ChanUserContainer *uc = c->FindUser(user);
-			if (uc != NULL)
-				uc->status.Clear();
-
-			ServiceBot *setter = ServiceBot::Find(user->GetUID());
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
-
-			if (uc != NULL)
-				uc->status = cs;
+			IRCD->SendSZLine(u, x);
+			return;
 		}
 	}
 
-	/* unsqline
-	*/
-	void SendSQLineDel(XLine *x) override
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+	Uplink::Send("TKL", "+", "G", x->GetUser(), x->GetHost(), x->GetBy(), Anope::CurTime + timeleft, x->GetCreated(), x->GetReason());
+}
+
+void unreal::Proto::SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf)
+{
+	Uplink::Send(source, "SVSKILL", user->GetUID(), buf);
+	user->KillInternal(source, buf);
+}
+
+void unreal::Proto::SendMode(const MessageSource &source, User *u, const Anope::string &buf)
+{
+	IRCMessage message(source, "SVS2MODE", u->GetUID());
+	message.TokenizeAndPush(buf);
+	Uplink::SendMessage(message);
+}
+
+void unreal::Proto::SendClientIntroduction(User *u)
+{
+	Anope::string modes = "+" + u->GetModes();
+	Uplink::Send("UID", u->nick, 1, u->timestamp, u->GetIdent(), u->host, u->GetUID(), "*", modes, !u->vhost.empty() ? u->vhost : "*", !u->chost.empty() ? u->chost : "*", "*", u->realname);
+}
+
+/* SERVER name hop descript */
+/* Unreal 3.2 actually sends some info about itself in the descript area */
+void unreal::Proto::SendServer(Server *server)
+{
+	if (!server->GetSID().empty() && server == Me)
+		Uplink::Send("SERVER", server->GetName(), server->GetHops() + 1, server->GetDescription());
+	else
+		Uplink::Send("SID", server->GetName(), server->GetHops() + 1, server->GetSID(), server->GetDescription());
+}
+
+/* JOIN */
+void unreal::Proto::SendJoin(User *user, Channel *c, const ChannelStatus *status)
+{
+	Uplink::Send(Me, "SJOIN", c->creation_time, c->name, user->GetUID());
+	if (status)
 	{
-		Uplink::Send("UNSQLINE", x->GetMask());
-	}
-
-	/* SQLINE */
-	/*
-	** - Unreal will translate this to TKL for us
-	**
-	*/
-	void SendSQLine(User *, XLine *x) override
-	{
-		Uplink::Send("SQLINE", x->GetMask(), x->GetReason());
-	}
-
-	/* Functions that use serval cmd functions */
-
-	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
-	{
-		if (!vIdent.empty())
-			Uplink::Send(Me, "CHGIDENT", u->GetUID(), vIdent);
-		if (!vhost.empty())
-			Uplink::Send(Me, "CHGHOST", u->GetUID(), vhost);
-	}
-
-	void SendConnect() override
-	{
-		/*
-		   NICKv2 = Nick Version 2
-		   VHP    = Sends hidden host
-		   UMODE2 = sends UMODE2 on user modes
-		   NICKIP = Sends IP on NICK
-		   SJ3    = Supports SJOIN
-		   NOQUIT = No Quit
-		   TKLEXT = Extended TKL we don't use it but best to have it
-		   MLOCK  = Supports the MLOCK server command
-		   VL     = Version Info
-		   SID    = SID/UID mode
-		*/
-		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password);
-		Uplink::Send("PROTOCTL", "NICKv2", "VHP", "UMODE2", "NICKIP", "SJOIN", "SJOIN2", "SJ3", "NOQUIT", "TKLEXT", "MLOCK", "SID");
-		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
-		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
-		SendServer(Me);
-	}
-
-	/* SVSHOLD - set */
-	void SendSVSHold(const Anope::string &nick, time_t t) override
-	{
-		Uplink::Send("TKL", "+", "Q", "H", nick, Me->GetName(), Anope::CurTime + t, Anope::CurTime, "Being held for registered user");
-	}
-
-	/* SVSHOLD - release */
-	void SendSVSHoldDel(const Anope::string &nick) override
-	{
-		Uplink::Send("TKL", "-", "Q", "*", nick, Me->GetName());
-	}
-
-	/* UNSGLINE */
-	/*
-	 * SVSNLINE - :realname mask
-	*/
-	void SendSGLineDel(XLine *x) override
-	{
-		Uplink::Send("SVSNLINE", "-", x->GetMask());
-	}
-
-	/* UNSZLINE */
-	void SendSZLineDel(XLine *x) override
-	{
-		Uplink::Send("TKL", "-", "Z", "*", x->GetHost(), x->GetBy());
-	}
-
-	/* SZLINE */
-	void SendSZLine(User *, XLine *x) override
-	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->GetExpires() - Anope::CurTime;
-		if (timeleft > 172800 || !x->GetExpires())
-			timeleft = 172800;
-		Uplink::Send("TKL", "+", "Z", "*", x->GetHost(), x->GetBy(), Anope::CurTime + timeleft, x->GetCreated(), x->GetReason());
-	}
-
-	/* SGLINE */
-	/*
-	 * SVSNLINE + reason_where_is_space :realname mask with spaces
-	*/
-	void SendSGLine(User *, XLine *x) override
-	{
-		Anope::string edited_reason = x->GetReason();
-		edited_reason = edited_reason.replace_all_cs(" ", "_");
-		Uplink::Send("SVSNLINE", "+", edited_reason, x->GetMask());
-	}
-
-	/* svsjoin
-		parv[0] - sender
-		parv[1] - nick to make join
-		parv[2] - channel to join
-		parv[3] - (optional) channel key(s)
-	*/
-	/* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
-	   when coming from a none TOKEN'd server
-	*/
-	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
-	{
-		if (!param.empty())
-			Uplink::Send(source, "SVSJOIN", user->GetUID(), chan, param);
-		else
-			Uplink::Send(source, "SVSJOIN", user->GetUID(), chan);
-	}
-
-	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
-	{
-		if (!param.empty())
-			Uplink::Send(source, "SVSPART", user->GetUID(), chan, param);
-		else
-			Uplink::Send(source, "SVSPART", user->GetUID(), chan);
-	}
-
-	void SendSWhois(const MessageSource &source, const Anope::string &who, const Anope::string &mask) override
-	{
-		Uplink::Send(source, "SWHOIS", who, mask);
-	}
-
-	void SendEOB() override
-	{
-		Uplink::Send(Me, "EOS");
-	}
-
-	bool IsNickValid(const Anope::string &nick) override
-	{
-		if (nick.equals_ci("ircd") || nick.equals_ci("irc"))
-			return false;
-
-		return IRCDProto::IsNickValid(nick);
-	}
-
-	bool IsChannelValid(const Anope::string &chan) override
-	{
-		if (chan.find(':') != Anope::string::npos)
-			return false;
-
-		return IRCDProto::IsChannelValid(chan);
-	}
-
-	bool IsExtbanValid(const Anope::string &mask) override
-	{
-		return mask.length() >= 4 && mask[0] == '~' && mask[2] == ':';
-	}
-
-	void SendLogin(User *u, NickServ::Nick *na) override
-	{
-		/* 3.2.10.4+ treats users logged in with accounts as fully registered, even if -r, so we can not set this here. Just use the timestamp. */
-		if (Servers::Capab.count("ESVID") > 0 && !na->GetAccount()->IsUnconfirmed())
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", na->GetAccount()->GetDisplay());
-		else
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", u->signon);
-	}
-
-	void SendLogout(User *u) override
-	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 0");
-	}
-
-	void SendChannel(Channel *c) override
-	{
-		/* Unreal does not support updating a channels TS without actually joining a user,
-		 * so we will join and part us now
+		/* First save the channel status incase uc->Status == status */
+		ChannelStatus cs = *status;
+		/* If the user is internally on the channel with flags, kill them so that
+		 * the stacker will allow this.
 		 */
-		ServiceBot *bi = c->ci->WhoSends();
-		if (!bi)
-			;
-		else if (c->FindUser(bi) == NULL)
-		{
-			bi->Join(c);
-			bi->Part(c);
-		}
-		else
-		{
-			bi->Part(c);
-			bi->Join(c);
-		}
-	}
+		ChanUserContainer *uc = c->FindUser(user);
+		if (uc != NULL)
+			uc->status.Clear();
 
-	void SendSASLMessage(const SASL::Message &message) override
+		ServiceBot *setter = ServiceBot::Find(user->GetUID());
+		for (size_t i = 0; i < cs.Modes().length(); ++i)
+			c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+
+		if (uc != NULL)
+			uc->status = cs;
+	}
+}
+
+/* unsqline
+*/
+void unreal::Proto::SendSQLineDel(XLine *x)
+{
+	Uplink::Send("UNSQLINE", x->GetMask());
+}
+
+/* SQLINE */
+/*
+** - Unreal will translate this to TKL for us
+**
+*/
+void unreal::Proto::SendSQLine(User *, XLine *x)
+{
+	Uplink::Send("SQLINE", x->GetMask(), x->GetReason());
+}
+
+/* Functions that use serval cmd functions */
+
+void unreal::Proto::SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost)
+{
+	if (!vIdent.empty())
+		Uplink::Send(Me, "CHGIDENT", u->GetUID(), vIdent);
+	if (!vhost.empty())
+		Uplink::Send(Me, "CHGHOST", u->GetUID(), vhost);
+}
+
+void unreal::Proto::SendConnect()
+{
+	/*
+	   NICKv2 = Nick Version 2
+	   VHP    = Sends hidden host
+	   UMODE2 = sends UMODE2 on user modes
+	   NICKIP = Sends IP on NICK
+	   SJ3    = Supports SJOIN
+	   NOQUIT = No Quit
+	   TKLEXT = Extended TKL we don't use it but best to have it
+	   MLOCK  = Supports the MLOCK server command
+	   VL     = Version Info
+	   SID    = SID/UID mode
+	*/
+	Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password);
+	Uplink::Send("PROTOCTL", "NICKv2", "VHP", "UMODE2", "NICKIP", "SJOIN", "SJOIN2", "SJ3", "NOQUIT", "TKLEXT", "MLOCK", "SID");
+	Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
+	Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
+	SendServer(Me);
+}
+
+/* SVSHOLD - set */
+void unreal::Proto::SendSVSHold(const Anope::string &nick, time_t t)
+{
+	Uplink::Send("TKL", "+", "Q", "H", nick, Me->GetName(), Anope::CurTime + t, Anope::CurTime, "Being held for registered user");
+}
+
+/* SVSHOLD - release */
+void unreal::Proto::SendSVSHoldDel(const Anope::string &nick)
+{
+	Uplink::Send("TKL", "-", "Q", "*", nick, Me->GetName());
+}
+
+/* UNSGLINE */
+/*
+ * SVSNLINE - :realname mask
+*/
+void unreal::Proto::SendSGLineDel(XLine *x)
+{
+	Uplink::Send("SVSNLINE", "-", x->GetMask());
+}
+
+/* UNSZLINE */
+void unreal::Proto::SendSZLineDel(XLine *x)
+{
+	Uplink::Send("TKL", "-", "Z", "*", x->GetHost(), x->GetBy());
+}
+
+/* SZLINE */
+void unreal::Proto::SendSZLine(User *, XLine *x)
+{
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+	Uplink::Send("TKL", "+", "Z", "*", x->GetHost(), x->GetBy(), Anope::CurTime + timeleft, x->GetCreated(), x->GetReason());
+}
+
+/* SGLINE */
+/*
+ * SVSNLINE + reason_where_is_space :realname mask with spaces
+*/
+void unreal::Proto::SendSGLine(User *, XLine *x)
+{
+	Anope::string edited_reason = x->GetReason();
+	edited_reason = edited_reason.replace_all_cs(" ", "_");
+	Uplink::Send("SVSNLINE", "+", edited_reason, x->GetMask());
+}
+
+/* svsjoin
+	parv[0] - sender
+	parv[1] - nick to make join
+	parv[2] - channel to join
+	parv[3] - (optional) channel key(s)
+*/
+void unreal::Proto::SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param)
+{
+	if (!param.empty())
+		Uplink::Send(source, "SVSJOIN", user->GetUID(), chan, param);
+	else
+		Uplink::Send(source, "SVSJOIN", user->GetUID(), chan);
+}
+
+void unreal::Proto::SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param)
+{
+	if (!param.empty())
+		Uplink::Send(source, "SVSPART", user->GetUID(), chan, param);
+	else
+		Uplink::Send(source, "SVSPART", user->GetUID(), chan);
+}
+
+void unreal::Proto::SendSWhois(const MessageSource &source, const Anope::string &who, const Anope::string &mask)
+{
+	Uplink::Send(source, "SWHOIS", who, mask);
+}
+
+void unreal::Proto::SendEOB()
+{
+	Uplink::Send(Me, "EOS");
+}
+
+bool unreal::Proto::IsNickValid(const Anope::string &nick)
+{
+	if (nick.equals_ci("ircd") || nick.equals_ci("irc"))
+		return false;
+
+	return IRCDProto::IsNickValid(nick);
+}
+
+bool unreal::Proto::IsChannelValid(const Anope::string &chan)
+{
+	if (chan.find(':') != Anope::string::npos)
+		return false;
+
+	return IRCDProto::IsChannelValid(chan);
+}
+
+bool unreal::Proto:: IsExtbanValid(const Anope::string &mask)
+{
+	return mask.length() >= 4 && mask[0] == '~' && mask[2] == ':';
+}
+
+void unreal::Proto::SendLogin(User *u, NickServ::Nick *na)
+{
+	/* 3.2.10.4+ treats users logged in with accounts as fully registered, even if -r, so we can not set this here. Just use the timestamp. */
+	if (Servers::Capab.count("ESVID") > 0 && !na->GetAccount()->IsUnconfirmed())
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", na->GetAccount()->GetDisplay());
+	else
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", u->signon);
+}
+
+void unreal::Proto::SendLogout(User *u)
+{
+	IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 0");
+}
+
+void unreal::Proto::SendChannel(Channel *c)
+{
+	/* Unreal does not support updating a channels TS without actually joining a user,
+	 * so we will join and part us now
+	 */
+	ServiceBot *bi = c->ci->WhoSends();
+	if (!bi)
+		;
+	else if (c->FindUser(bi) == NULL)
 	{
-		size_t p = message.target.find('!');
-		if (p == Anope::string::npos)
-			return;
-
-		if (!message.ext.empty())
-			Uplink::Send(ServiceBot::Find(message.source), "SASL", message.target.substr(0, p), message.target, message.type, message.data, message.ext);
-		else
-			Uplink::Send(ServiceBot::Find(message.source), "SASL", message.target.substr(0, p), message.target, message.type, message.data);
+		bi->Join(c);
+		bi->Part(c);
 	}
-
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override
+	else
 	{
-		size_t p = uid.find('!');
-		if (p == Anope::string::npos)
-			return;
-		Uplink::Send(Me, "SVSLOGIN", uid.substr(0, p), uid, acc);
+		bi->Part(c);
+		bi->Join(c);
 	}
+}
 
-	bool IsIdentValid(const Anope::string &ident) override
+void unreal::Proto::SendSASLMessage(const ::SASL::Message &message)
+{
+	size_t p = message.target.find('!');
+	if (p == Anope::string::npos)
+		return;
+
+	if (!message.ext.empty())
+		Uplink::Send(ServiceBot::Find(message.source), "SASL", message.target.substr(0, p), message.target, message.type, message.data, message.ext);
+	else
+		Uplink::Send(ServiceBot::Find(message.source), "SASL", message.target.substr(0, p), message.target, message.type, message.data);
+}
+
+void unreal::Proto::SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost)
+{
+	size_t p = uid.find('!');
+	if (p == Anope::string::npos)
+		return;
+	Uplink::Send(Me, "SVSLOGIN", uid.substr(0, p), uid, acc);
+}
+
+bool unreal::Proto::IsIdentValid(const Anope::string &ident)
+{
+	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
+		return false;
+
+	for (unsigned i = 0; i < ident.length(); ++i)
 	{
-		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
-			return false;
+		const char &c = ident[i];
 
-		for (unsigned i = 0; i < ident.length(); ++i)
-		{
-			const char &c = ident[i];
+		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
+			continue;
 
-			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
-				continue;
+		if (c == '-' || c == '.' || c == '_')
+			continue;
 
-			if (c == '-' || c == '.' || c == '_')
-				continue;
-
-			return false;
-		}
-
-		return true;
+		return false;
 	}
-};
+
+	return true;
+}
 
 class UnrealExtBan : public ChannelModeVirtual<ChannelModeList>
 {
@@ -1120,7 +1112,7 @@ class ProtoUnreal : public Module
 	, public EventHook<Event::DelChan>
 	, public EventHook<Event::MLockEvents>
 {
-	UnrealIRCdProto ircd_proto;
+	unreal::Proto ircd_proto;
 	ServiceReference<ModeLocks> mlocks;
 
 	/* Core message handlers */

@@ -60,7 +60,7 @@ class CoreExport Channel : public Base, public Extensible
 	Anope::string topic;
 	/* Who set the topic */
 	Anope::string topic_setter;
-	/* The timestamp associated with the topic. Not necessarually anywhere close to Anope::CurTime.
+	/* The timestamp associated with the topic. Not necessarily anywhere close to Anope::CurTime.
 	 * This is the time the topic was *originally set*. When we restore the topic we want to change the TS back
 	 * to this, but we can only do this on certain IRCds.
 	 */

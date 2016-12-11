@@ -108,14 +108,6 @@ class ngIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendKickInternal(const MessageSource &source, const Channel *chan, User *user, const Anope::string &buf) anope_override
-	{
-		if (!buf.empty())
-			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick << " :" << buf;
-		else
-			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick;
-	}
-
 	void SendLogin(User *u, NickAlias *na) anope_override
 	{
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
@@ -126,28 +118,10 @@ class ngIRCdProto : public IRCDProto
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
 	} 
 
-	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) anope_override
-	{
-		UplinkSocket::Message(source) << "MODE " << dest->name << " " << buf;
-	}
-
-	void SendPartInternal(User *u, const Channel *chan, const Anope::string &buf) anope_override
-	{
-		if (!buf.empty())
-			UplinkSocket::Message(u) << "PART " << chan->name << " :" << buf;
-		else
-			UplinkSocket::Message(u) << "PART " << chan->name;
-	}
-
 	/* SERVER name hop descript */
 	void SendServer(const Server *server) anope_override
 	{
 		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
-	}
-
-	void SendTopic(const MessageSource &source, Channel *c) anope_override
-	{
-		UplinkSocket::Message(source) << "TOPIC " << c->name << " :" << c->topic;
 	}
 
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) anope_override

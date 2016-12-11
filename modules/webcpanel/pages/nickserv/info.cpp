@@ -72,7 +72,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		}
 		else if (message.post_data["kill"] == "quick" && !na->nc->HasExt("KILL_QUICK"))
 		{
-			na->nc->Shrink<bool>("KILLPROTECT");
+			na->nc->Extend<bool>("KILLPROTECT");
 			na->nc->Extend<bool>("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}

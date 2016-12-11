@@ -27,7 +27,7 @@ class CommandNSConfirm : public Command
 	{
 		const Anope::string &passcode = params[0];
 
-		if (source.nc && !source.nc->HasExt("UNCONFIRMED") && source.HasPriv("nickserv/confirm"))
+		if (source.nc && (!source.nc->HasExt("UNCONFIRMED") || source.IsOper()) && source.HasPriv("nickserv/confirm"))
 		{
 			NickAlias *na = NickAlias::Find(passcode);
 			if (na == NULL)

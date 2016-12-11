@@ -394,8 +394,6 @@ struct IRCDMessageCapab : Message::Capab
 			chmodes.clear();
 			umodes.clear();
 			Servers::Capab.insert("SERVERS");
-			Servers::Capab.insert("CHGHOST");
-			Servers::Capab.insert("CHGIDENT");
 			Servers::Capab.insert("TOPICLOCK");
 			IRCD->CanSVSHold = false;
 		}

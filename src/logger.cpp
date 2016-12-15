@@ -145,7 +145,9 @@ Anope::string Log::FormatSource() const
 			return this->u->GetMask();
 	else if (nc)
 		return nc->display;
-	return "";
+	else if (source)
+		return source->GetNick();
+	return "<unknown>";
 }
 
 Anope::string Log::FormatCommand() const

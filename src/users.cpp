@@ -30,6 +30,7 @@
 #include "sockets.h"
 #include "uplink.h"
 #include "event.h"
+#include "messages.h"
 #include "modules/nickserv.h"
 
 user_map UserListByNick;
@@ -105,7 +106,7 @@ static void CollideKill(User *target, const Anope::string &reason)
 static void Collide(User *u, const Anope::string &id, const Anope::string &type)
 {
 	// Kill incoming user
-	IRCD->SendKill(Me, id, type);
+	IRCD->Send<messages::Kill>(Me, id, Me->GetName() + " (" + type + ")");
 	// Quit colliding user
 	CollideKill(u, type);
 }
@@ -383,7 +384,7 @@ void User::Identify(NickServ::Nick *na)
 		na->SetLastSeen(Anope::CurTime);
 	}
 
-	IRCD->SendLogin(this, na);
+	IRCD->Send<messages::Login>(this, na);
 
 	this->Login(na->GetAccount());
 
@@ -397,15 +398,12 @@ void User::Identify(NickServ::Nick *na)
 		{
 			this->SetModes(NULL, "%s", m.c_str());
 			this->SendMessage(Me, "Changing your usermodes to \002{0}\002", m.c_str());
-			UserMode *um = ModeManager::FindUserModeByName("OPER");
-			if (um && !this->HasMode("OPER") && m.find(um->mchar) != Anope::string::npos)
-				IRCD->SendOper(this);
 		}
 		if (IRCD->CanSetVHost && !oper->GetVhost().empty())
 		{
 			this->SendMessage(Me, "Changing your vhost to \002{0}\002", oper->GetVhost());
 			this->SetDisplayedHost(oper->GetVhost());
-			IRCD->SendVhost(this, "", oper->GetVhost());
+			IRCD->Send<messages::VhostSet>(this, "", oper->GetVhost());
 		}
 	}
 }
@@ -571,15 +569,12 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 			{
 				this->SetModes(NULL, "%s", m.c_str());
 				this->SendMessage(Me, "Changing your usermodes to \002{0}\002", m);
-				UserMode *oper = ModeManager::FindUserModeByName("OPER");
-				if (oper && !this->HasMode("OPER") && m.find(oper->mchar) != Anope::string::npos)
-					IRCD->SendOper(this);
 			}
 			if (IRCD->CanSetVHost && !oper->GetVhost().empty())
 			{
 				this->SendMessage(Me, "Changing your vhost to \002{0}\002", oper->GetVhost());
 				this->SetDisplayedHost(oper->GetVhost());
-				IRCD->SendVhost(this, "", oper->GetVhost());
+				IRCD->Send<messages::VhostSet>(this, "", oper->GetVhost());
 			}
 		}
 	}
@@ -769,7 +764,7 @@ void User::Kill(const MessageSource &source, const Anope::string &reason)
 {
 	Anope::string real_reason = source.GetName() + " (" + reason + ")";
 
-	IRCD->SendSVSKill(source, this, real_reason);
+	IRCD->SendKill(source, this, real_reason);
 }
 
 void User::KillInternal(const MessageSource &source, const Anope::string &reason)
@@ -853,7 +848,7 @@ bool User::BadPassword()
 
 User* User::Find(const Anope::string &name, bool nick_only)
 {
-	if (!nick_only && IRCD->RequiresID)
+	if (!nick_only && IRCD && IRCD->RequiresID)
 	{
 		uid_map::iterator it = UserListByUID.find(name);
 		if (it != UserListByUID.end())

@@ -60,7 +60,7 @@ class CommandHSOn : public Command
 		source.Reply(_("Your vhost of \002{0}\002 is now activated."), vhost->Mask());
 		
 		Log(LOG_COMMAND, source, this) << "to enable their vhost of " << vhost->Mask();
-		IRCD->SendVhost(u, vhost->GetIdent(), vhost->GetHost());
+		IRCD->Send<messages::VhostSet>(u, vhost->GetIdent(), vhost->GetHost());
 		u->vhost = vhost->GetHost();
 		if (IRCD->CanSetVIdent && !vhost->GetIdent().empty())
 			u->SetVIdent(vhost->GetIdent());

@@ -471,7 +471,7 @@ class ChanServCore : public Module
 				if (ModeManager::FindChannelModeByName("PERM") != NULL)
 				{
 					if (c)
-						IRCD->SendChannel(ci->c);
+						IRCD->Send<messages::MessageChannel>(ci->c);
 					ci->c->SetMode(NULL, "PERM");
 				}
 				else
@@ -513,7 +513,7 @@ class ChanServCore : public Module
 		{
 			::Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->GetTimeRegistered();
 			c->creation_time = c->ci->GetTimeRegistered();
-			IRCD->SendChannel(c);
+			IRCD->Send<messages::MessageChannel>(c);
 			c->Reset();
 		}
 	}

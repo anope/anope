@@ -371,7 +371,7 @@ class NSAJoin : public Module
 					{
 						try
 						{
-							unsigned limit = convertTo<unsigned>(l);
+							unsigned int limit = convertTo<unsigned int>(l);
 							if (c->users.size() >= limit)
 								need_invite = true;
 						}
@@ -384,10 +384,10 @@ class NSAJoin : public Module
 			{
 				if (!u_access.HasPriv("INVITE"))
 					continue;
-				IRCD->SendInvite(NickServ, c, u);
+				IRCD->Send<messages::Invite>(NickServ, c, u);
 			}
 
-			IRCD->SendSVSJoin(NickServ, u, entry->GetChannel(), key);
+			IRCD->Send<messages::SVSJoin>(NickServ, u, entry->GetChannel(), key);
 		}
 	}
 };

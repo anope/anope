@@ -24,10 +24,63 @@
 #include "modules/protocol/rfc1459.h"
 #include "modules/protocol/ngircd.h"
 
-void ngircd::Proto::SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf)
+void ngircd::senders::Akill::Send(User* u, XLine* x)
 {
-	IRCDProto::SendSVSKill(source, user, buf);
-	user->KillInternal(source, buf);
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+	Uplink::Send(Me, "GLINE", x->GetMask(), timeleft, x->GetReason() + " (" + x->GetBy() + ")");
+}
+
+void ngircd::senders::AkillDel::Send(XLine* x)
+{
+	Uplink::Send(Me, "GLINE", x->GetMask());
+}
+
+void ngircd::senders::MessageChannel::Send(Channel* c)
+{
+	Uplink::Send(Me, "CHANINFO", c->name, "+" + c->GetModes(true, true));
+}
+
+void ngircd::senders::Login::Send(User *u, NickServ::Nick *na)
+{
+	Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", na->GetAccount()->GetDisplay());
+}
+
+void ngircd::senders::Logout::Send(User *u)
+{
+	Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", "");
+}
+
+void ngircd::senders::SVSNick::Send(User* u, const Anope::string& newnick, time_t ts)
+{
+	Uplink::Send(Me, "SVSNICK", u->nick, newnick);
+}
+
+// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
+void ngircd::senders::NickIntroduction::Send(User *user)
+{
+	Anope::string modes = "+" + user->GetModes();
+	Uplink::Send(Me, "NICK", user->nick, 1, user->GetIdent(), user->host, 1, modes, user->realname);
+}
+
+void ngircd::senders::VhostDel::Send(User* u)
+{
+	IRCD->Send<messages::VhostSet>(u, u->GetIdent(), "");
+}
+
+void ngircd::senders::VhostSet::Send(User* u, const Anope::string& vident, const Anope::string& vhost)
+{
+	if (!vident.empty())
+		Uplink::Send(Me, "METADATA", u->nick, "user", vident);
+
+	Uplink::Send(Me, "METADATA", u->nick, "cloakhost", vhost);
+	if (!u->HasMode("CLOAK"))
+	{
+		u->SetMode(Config->GetClient("HostServ"), "CLOAK");
+		ModeManager::ProcessModes();
+	}
 }
 
 ngircd::Proto::Proto(Module *creator) : IRCDProto(creator, "ngIRCd")
@@ -40,121 +93,13 @@ ngircd::Proto::Proto(Module *creator) : IRCDProto(creator, "ngIRCd")
 	MaxModes = 5;
 }
 
-void ngircd::Proto::SendAkill(User *u, XLine *x)
-{
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
-	Uplink::Send(Me, "GLINE", x->GetMask(), timeleft, x->GetReason() + " (" + x->GetBy() + ")");
-}
-
-void ngircd::Proto::SendAkillDel(XLine *x)
-{
-	Uplink::Send(Me, "GLINE", x->GetMask());
-}
-
-void ngircd::Proto::SendChannel(Channel *c)
-{
-	Uplink::Send(Me, "CHANINFO", c->name, "+" + c->GetModes(true, true));
-}
-
-// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
-void ngircd::Proto::SendClientIntroduction(User *u)
-{
-	Anope::string modes = "+" + u->GetModes();
-	Uplink::Send(Me, "NICK", u->nick, 1, u->GetIdent(), u->host, 1, modes, u->realname);
-}
-
-void ngircd::Proto::SendConnect()
+void ngircd::Proto::Handshake()
 {
 	Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "0210-IRC+", "Anope|" + Anope::VersionShort(), "CLHMSo P");
 	/* Make myself known to myself in the serverlist */
-	SendServer(Me);
+	IRCD->Send<messages::MessageServer>(Me);
 	/* finish the enhanced server handshake and register the connection */
 	Uplink::Send("376", "*", "End of MOTD command");
-}
-
-void ngircd::Proto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
-{
-	Uplink::Send(Me, "SVSNICK", u->nick, newnick);
-}
-
-void ngircd::Proto::SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg)
-{
-	Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
-}
-
-void ngircd::Proto::SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg)
-{
-	Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
-}
-
-void ngircd::Proto::SendGlobops(const MessageSource &source, const Anope::string &buf)
-{
-	Uplink::Send(source, "WALLOPS", buf);
-}
-
-void ngircd::Proto::SendJoin(User *user, Channel *c, const ChannelStatus *status)
-{
-	Uplink::Send(user, "JOIN", c->name);
-	if (status)
-	{
-		/* First save the channel status incase uc->Status == status */
-		ChannelStatus cs = *status;
-		/* If the user is internally on the channel with flags, kill them so that
-		 * the stacker will allow this.
-		 */
-		ChanUserContainer *uc = c->FindUser(user);
-		if (uc != NULL)
-			uc->status.Clear();
-
-		ServiceBot *setter = ServiceBot::Find(user->GetUID());
-		for (size_t i = 0; i < cs.Modes().length(); ++i)
-			c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
-
-		if (uc != NULL)
-			uc->status = cs;
-	}
-}
-
-void ngircd::Proto::SendLogin(User *u, NickServ::Nick *na)
-{
-	Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", na->GetAccount()->GetDisplay());
-}
-
-void ngircd::Proto::SendLogout(User *u)
-{
-	Uplink::Send(Me, "METADATA", u->GetUID(), "accountname", "");
-}
-
-/* SERVER name hop descript */
-void ngircd::Proto::SendServer(Server *server)
-{
-	Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
-}
-
-void ngircd::Proto::SendTopic(const MessageSource &source, Channel *c)
-{
-	Uplink::Send(source, "TOPIC", c->name, c->topic);
-}
-
-void ngircd::Proto::SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost)
-{
-	if (!vIdent.empty())
-		Uplink::Send(Me, "METADATA", u->nick, "user", vIdent);
-
-	Uplink::Send(Me, "METADATA", u->nick, "cloakhost", vhost);
-	if (!u->HasMode("CLOAK"))
-	{
-		u->SetMode(Config->GetClient("HostServ"), "CLOAK");
-		ModeManager::ProcessModes();
-	}
-}
-
-void ngircd::Proto::SendVhostDel(User *u)
-{
-	this->SendVhost(u, u->GetIdent(), "");
 }
 
 Anope::string ngircd::Proto::Format(IRCMessage &message)
@@ -508,7 +453,7 @@ void ngircd::ServerMessage::Run(MessageSource &source, const std::vector<Anope::
 	 * when receiving a new server and then finish sync once we
 	 * get a pong back from that server.
 	 */
-	IRCD->SendPing(Me->GetName(), params[0]);
+	IRCD->Send<messages::Ping>(Me->GetName(), params[0]);
 }
 
 class ProtongIRCd : public Module
@@ -546,6 +491,36 @@ class ProtongIRCd : public Module
 	ngircd::Pong message_pong;
 	ngircd::ServerMessage message_server;
 
+	/* Core message senders */
+	rfc1459::senders::GlobalNotice sender_global_notice;
+	rfc1459::senders::GlobalPrivmsg sender_global_privmsg;
+	rfc1459::senders::Invite sender_invite;
+	rfc1459::senders::Join sender_join;
+	rfc1459::senders::Kick sender_kick;
+	rfc1459::senders::Kill sender_svskill;
+	rfc1459::senders::ModeChannel sender_mode_chan;
+	rfc1459::senders::ModeUser sender_mode_user;
+	rfc1459::senders::NickChange sender_nickchange;
+	rfc1459::senders::Notice sender_notice;
+	rfc1459::senders::Part sender_part;
+	rfc1459::senders::Ping sender_ping;
+	rfc1459::senders::Pong sender_pong;
+	rfc1459::senders::Privmsg sender_privmsg;
+	rfc1459::senders::Quit sender_quit;
+	rfc1459::senders::MessageServer sender_server;
+	rfc1459::senders::SQuit sender_squit;
+	rfc1459::senders::Topic sender_topic;
+	rfc1459::senders::Wallops sender_wallops;
+
+	ngircd::senders::Akill sender_akill;
+	ngircd::senders::AkillDel sender_akill_del;
+	ngircd::senders::MessageChannel sender_channel;
+	ngircd::senders::Login sender_login;
+	ngircd::senders::Logout sender_logout;
+	ngircd::senders::SVSNick sender_svsnick;
+	ngircd::senders::VhostDel sender_vhost_del;
+	ngircd::senders::VhostSet sender_vhost_set;
+
  public:
 	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
 		, EventHook<Event::UserNickChange>(this)
@@ -578,10 +553,43 @@ class ProtongIRCd : public Module
 		, message_pong(this)
 		, message_server(this)
 		, message_topic(this)
-	{
 
+		, sender_akill(this)
+		, sender_akill_del(this)
+		, sender_channel(this)
+		, sender_global_notice(this)
+		, sender_global_privmsg(this)
+		, sender_invite(this)
+		, sender_join(this)
+		, sender_kick(this)
+		, sender_svskill(this)
+		, sender_login(this)
+		, sender_logout(this)
+		, sender_mode_chan(this)
+		, sender_mode_user(this)
+		, sender_nickchange(this)
+		, sender_notice(this)
+		, sender_part(this)
+		, sender_ping(this)
+		, sender_pong(this)
+		, sender_privmsg(this)
+		, sender_quit(this)
+		, sender_server(this)
+		, sender_squit(this)
+		, sender_svsnick(this)
+		, sender_topic(this)
+		, sender_vhost_del(this)
+		, sender_vhost_set(this)
+		, sender_wallops(this)
+	{
 		Servers::Capab.insert("QS");
 
+		IRCD = &ircd_proto;
+	}
+
+	~ProtongIRCd()
+	{
+		IRCD = nullptr;
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) override

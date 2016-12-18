@@ -23,46 +23,89 @@
 namespace ngircd
 {
 
+namespace senders
+{
+
+class Akill : public messages::Akill
+{
+ public:
+	using messages::Akill::Akill;
+
+	void Send(User *, XLine *) override;
+};
+
+class AkillDel : public messages::AkillDel
+{
+ public:
+	using messages::AkillDel::AkillDel;
+
+	void Send(XLine *) override;
+};
+
+class MessageChannel : public messages::MessageChannel
+{
+ public:
+	using messages::MessageChannel::MessageChannel;
+
+	void Send(Channel *) override;
+};
+
+class NickIntroduction : public messages::NickIntroduction
+{
+ public:
+	using messages::NickIntroduction::NickIntroduction;
+
+	void Send(User *user) override;
+};
+
+class Login : public messages::Login
+{
+ public:
+	using messages::Login::Login;
+
+	void Send(User *u, NickServ::Nick *na) override;
+};
+
+class Logout : public messages::Logout
+{
+ public:
+	using messages::Logout::Logout;
+
+	void Send(User *u) override;
+};
+
+class SVSNick : public messages::SVSNick
+{
+ public:
+	using messages::SVSNick::SVSNick;
+
+	void Send(User *u, const Anope::string &newnick, time_t ts) override;
+};
+
+class VhostDel : public messages::VhostDel
+{
+ public:
+	using messages::VhostDel::VhostDel;
+
+	void Send(User *u) override;
+};
+
+class VhostSet : public messages::VhostSet
+{
+ public:
+	using messages::VhostSet::VhostSet;
+
+	void Send(User *u, const Anope::string &vident, const Anope::string &vhost) override;
+};
+
+}
+
 class Proto : public IRCDProto
 {
-	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override;
-
  public:
 	Proto(Module *creator);
 
-	void SendAkill(User *u, XLine *x) override;
-
-	void SendAkillDel(XLine *x) override;
-
-	void SendChannel(Channel *c) override;
-
-	// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
-	void SendClientIntroduction(User *u) override;
-
-	void SendConnect() override;
-
-	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override;
-
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
-
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
-
-	void SendGlobops(const MessageSource &source, const Anope::string &buf) override;
-
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override;
-
-	void SendLogin(User *u, NickServ::Nick *na) override;
-
-	void SendLogout(User *u) override;
-
-	/* SERVER name hop descript */
-	void SendServer(Server *server) override;
-
-	void SendTopic(const MessageSource &source, Channel *c) override;
-
-	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override;
-
-	void SendVhostDel(User *u) override;
+	void Handshake() override;
 
 	Anope::string Format(IRCMessage &message) override;
 };
@@ -72,7 +115,6 @@ class Numeric005 : public IRCDMessage
  public:
 	Numeric005(Module *creator) : IRCDMessage(creator, "005", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	// Please see <http://www.irc.org/tech_docs/005.html> for details.
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
 

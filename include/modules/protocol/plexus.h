@@ -19,55 +19,96 @@
 
 #pragma once
 
+#include "modules/protocol/ts6.h"
+
 namespace plexus
 {
 
-class Proto : public IRCDProto
+namespace senders
 {
-	ServiceReference<IRCDProto> hybrid; // XXX use moddeps + inheritance here
 
+class ModeUser : public messages::ModeUser
+{
+ public:
+	using messages::ModeUser::ModeUser;
+
+	void Send(const MessageSource &source, User *user, const Anope::string &modes) override;
+};
+
+class NickIntroduction : public messages::NickIntroduction
+{
+ public:
+	using messages::NickIntroduction::NickIntroduction;
+
+	void Send(User *user) override;
+};
+
+class NOOP : public messages::NOOP
+{
+ public:
+	static constexpr const char *NAME = "noop";
+
+	using messages::NOOP::NOOP;
+
+	void Send(Server *s, bool mode) override;
+};
+
+class Topic : public messages::Topic
+{
+ public:
+	using messages::Topic::Topic;
+
+	void Send(const MessageSource &source, Channel *channel, const Anope::string &topic, time_t topic_ts, const Anope::string &topic_setter) override;
+};
+
+class SVSJoin : public messages::SVSJoin
+{
+ public:
+	using messages::SVSJoin::SVSJoin;
+
+	void Send(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &key) override;
+};
+
+class SVSNick : public messages::SVSNick
+{
+ public:
+	using messages::SVSNick::SVSNick;
+
+	void Send(User *u, const Anope::string &newnick, time_t ts) override;
+};
+
+class SVSPart : public messages::SVSPart
+{
+ public:
+	using messages::SVSPart::SVSPart;
+
+	void Send(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &reason) override;
+};
+
+class VhostDel : public messages::VhostDel
+{
+ public:
+	using messages::VhostDel::VhostDel;
+
+	void Send(User *u) override;
+};
+
+class VhostSet : public messages::VhostSet
+{
+ public:
+	using messages::VhostSet::VhostSet;
+
+	void Send(User *u, const Anope::string &vident, const Anope::string &vhost) override;
+};
+
+} // namespace senders
+
+class Proto : public ts6::Proto
+{
  public:
 	Proto(Module *creator);
 
-	void SendSVSKill(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKill(source, targ, reason); }
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendSQLine(User *u, XLine *x) override { hybrid->SendSQLine(u, x); }
-	void SendSQLineDel(XLine *x) override { hybrid->SendSQLineDel(x); }
-	void SendSGLineDel(XLine *x) override { hybrid->SendSGLineDel(x); }
-	void SendSGLine(User *u, XLine *x) override { hybrid->SendSGLine(u, x); }
-	void SendAkillDel(XLine *x) override { hybrid->SendAkillDel(x); }
-	void SendAkill(User *u, XLine *x) override { hybrid->SendAkill(u, x); }
-	void SendServer(Server *server) override { hybrid->SendServer(server); }
-	void SendChannel(Channel *c) override { hybrid->SendChannel(c); }
-	void SendSVSHold(const Anope::string &nick, time_t t) override { hybrid->SendSVSHold(nick, t); }
-	void SendSVSHoldDel(const Anope::string &nick) override { hybrid->SendSVSHoldDel(nick); }
-
-	void SendGlobops(const MessageSource &source, const Anope::string &buf) override;
-
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override;
-
-	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override;
-
-	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override;
-
-	void SendVhostDel(User *u) override;
-
-	void SendConnect() override;
-
-	void SendClientIntroduction(User *u) override;
-
-	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override;
-
-	void SendLogin(User *u, NickServ::Nick *na) override;
-
-	void SendLogout(User *u) override;
-
-	void SendTopic(const MessageSource &source, Channel *c) override;
-
-	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override;
-
-	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override;
+	void Handshake() override;
 };
 
 class Encap : public IRCDMessage

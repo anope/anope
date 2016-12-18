@@ -232,7 +232,10 @@ class CommandBSBot : public Command
 			bi->introduced = false;
 		}
 		else
-			IRCD->SendNickChange(bi, nick);
+		{
+			IRCD->Send<messages::NickChange>(bi, nick, Anope::CurTime);
+			bi->timestamp = Anope::CurTime;
+		}
 
 		if (!nick.equals_cs(bi->nick))
 		{

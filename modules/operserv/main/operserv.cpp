@@ -38,12 +38,12 @@ class SGLineManager : public XLineManager
 
 	void Send(User *u, XLine *x) override
 	{
-		IRCD->SendAkill(u, x);
+		IRCD->Send<messages::Akill>(u, x);
 	}
 
 	void SendDel(XLine *x) override
 	{
-		IRCD->SendAkillDel(x);
+		IRCD->Send<messages::AkillDel>(x);
 	}
 
 	bool Check(User *u, XLine *x) override
@@ -106,7 +106,7 @@ class SQLineManager : public XLineManager
 		}
 		else if (x->GetMask()[0] != '#' || IRCD->CanSQLineChannel)
 		{
-			IRCD->SendSQLine(u, x);
+			IRCD->Send<messages::SQLine>(u, x);
 			/* If it is an oper, assume they're walking it, otherwise kill for good measure */
 			if (u && !u->HasMode("OPER"))
 				u->Kill(Config->GetClient("OperServ"), "Q-Lined: " + x->GetReason());
@@ -118,7 +118,7 @@ class SQLineManager : public XLineManager
 		if (!IRCD->CanSQLine || x->IsRegex())
 			;
 		else if (x->GetMask()[0] != '#' || IRCD->CanSQLineChannel)
-			IRCD->SendSQLineDel(x);
+			IRCD->Send<messages::SQLineDel>(x);
 	}
 
 	bool Check(User *u, XLine *x) override
@@ -168,7 +168,7 @@ class SNLineManager : public XLineManager
 	void Send(User *u, XLine *x) override
 	{
 		if (IRCD->CanSNLine && !x->IsRegex())
-			IRCD->SendSGLine(u, x);
+			IRCD->Send<messages::SGLine>(u, x);
 
 		if (u)
 			u->Kill(Config->GetClient("OperServ"), "SNLined: " + x->GetReason());
@@ -177,7 +177,7 @@ class SNLineManager : public XLineManager
 	void SendDel(XLine *x) override
 	{
 		if (IRCD->CanSNLine && !x->IsRegex())
-			IRCD->SendSGLineDel(x);
+			IRCD->Send<messages::SGLineDel>(x);
 	}
 
 	bool Check(User *u, XLine *x) override

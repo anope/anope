@@ -76,7 +76,7 @@ class HostServCore : public Module
 
 		if (u->vhost.empty() || !u->vhost.equals_cs(vhost->GetHost()) || (!vhost->GetIdent().empty() && !u->GetVIdent().equals_cs(vhost->GetIdent())))
 		{
-			IRCD->SendVhost(u, vhost->GetIdent(), vhost->GetHost());
+			IRCD->Send<messages::VhostSet>(u, vhost->GetIdent(), vhost->GetHost());
 
 			u->vhost = vhost->GetHost();
 			u->UpdateHost();
@@ -124,7 +124,7 @@ class HostServCore : public Module
 				if (vhost == nullptr)
 					return;
 
-				IRCD->SendVhost(u, vhost->GetIdent(), vhost->GetHost());
+				IRCD->Send<messages::VhostSet>(u, vhost->GetIdent(), vhost->GetHost());
 
 				u->vhost = vhost->GetHost();
 				u->UpdateHost();
@@ -150,7 +150,7 @@ class HostServCore : public Module
 			User *u = User::Find(na->GetNick());
 
 			if (u && u->Account() == na->GetAccount())
-				IRCD->SendVhostDel(u);
+				IRCD->Send<messages::VhostDel>(u);
 		}
 	}
 

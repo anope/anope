@@ -17,16 +17,67 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
-/* Dependencies: anope_protocol.hybrid */
+/* Dependencies: anope_protocol.ratbox */
 
 #include "module.h"
 #include "modules/protocol/plexus.h"
 #include "modules/protocol/hybrid.h"
+#include "modules/protocol/ratbox.h"
 
 static Anope::string UplinkSID;
 
-plexus::Proto::Proto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
-	, hybrid("hybrid")
+void plexus::senders::ModeUser::Send(const MessageSource &source, User *user, const Anope::string &modes)
+{
+	IRCMessage message(source, "ENCAP", "*", "SVSMODE", user->GetUID(), user->timestamp);
+	message.TokenizeAndPush(modes);
+	Uplink::SendMessage(message);
+}
+
+void plexus::senders::NickIntroduction::Send(User *user)
+{
+	Anope::string modes = "+" + user->GetModes();
+	Uplink::Send(Me, "UID", user->nick, 1, user->timestamp, modes, user->GetIdent(), user->host, "255.255.255.255", user->GetUID(), 0, user->host, user->realname);
+}
+
+void plexus::senders::NOOP::Send(Server* server, bool mode)
+{
+	Uplink::Send("ENCAP", server->GetName(), "SVSNOOP", (mode ? "+" : "-"));
+}
+
+void plexus::senders::Topic::Send(const MessageSource &source, Channel *channel, const Anope::string &topic, time_t topic_ts, const Anope::string &topic_setter)
+{
+	Uplink::Send(source, "ENCAP", "*", "TOPIC", channel->name, topic_setter, topic_ts, topic);
+}
+
+void plexus::senders::SVSJoin::Send(const MessageSource& source, User* user, const Anope::string& chan, const Anope::string& key)
+{
+	Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSJOIN", user->GetUID(), chan);
+}
+
+void plexus::senders::SVSNick::Send(User* u, const Anope::string& newnick, time_t ts)
+{
+	Uplink::Send(Me, "ENCAP", u->server->GetName(), "SVSNICK", u->GetUID(), u->timestamp, newnick, ts);
+}
+
+void plexus::senders::SVSPart::Send(const MessageSource& source, User* user, const Anope::string& chan, const Anope::string& reason)
+{
+	Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSPART", user->GetUID(), chan);
+}
+
+void plexus::senders::VhostDel::Send(User* u)
+{
+	u->RemoveMode(Config->GetClient("HostServ"), "CLOAK");
+}
+
+void plexus::senders::VhostSet::Send(User* u, const Anope::string& vident, const Anope::string& vhost)
+{
+	if (!vident.empty())
+		Uplink::Send(Me, "ENCAP", "*", "CHGIDENT", u->GetUID(), vident);
+	Uplink::Send(Me, "ENCAP", "*", "CHGHOST", u->GetUID(), vhost);
+	u->SetMode(Config->GetClient("HostServ"), "CLOAK");
+}
+
+plexus::Proto::Proto(Module *creator) : ts6::Proto(creator, "Plexus 4")
 {
 	DefaultPseudoclientModes = "+oiU";
 	CanSVSNick = true;
@@ -42,53 +93,7 @@ plexus::Proto::Proto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-
 	MaxModes = 4;
 }
 
-void plexus::Proto::SendGlobops(const MessageSource &source, const Anope::string &buf)
-{
-	Uplink::Send(source, "OPERWALL", buf);
-}
-
-void plexus::Proto::SendJoin(User *user, Channel *c, const ChannelStatus *status)
-{
-	Uplink::Send(Me, "SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), user->GetUID());
-	if (status)
-	{
-		/* First save the channel status incase uc->Status == status */
-		ChannelStatus cs = *status;
-		/* If the user is internally on the channel with flags, kill them so that
-		 * the stacker will allow this.
-		 */
-		ChanUserContainer *uc = c->FindUser(user);
-		if (uc != NULL)
-			uc->status.Clear();
-
-		ServiceBot *setter = ServiceBot::Find(user->GetUID());
-		for (size_t i = 0; i < cs.Modes().length(); ++i)
-			c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
-
-		if (uc != NULL)
-			uc->status = cs;
-	}
-}
-
-void plexus::Proto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
-{
-	Uplink::Send(Me, "ENCAP", u->server->GetName(), "SVSNICK", u->GetUID(), u->timestamp, newnick, when);
-}
-
-void plexus::Proto::SendVhost(User *u, const Anope::string &ident, const Anope::string &host)
-{
-	if (!ident.empty())
-		Uplink::Send(Me, "ENCAP", "*", "CHGIDENT", u->GetUID(), ident);
-	Uplink::Send(Me, "ENCAP", "*", "CHGHOST", u->GetUID(), host);
-	u->SetMode(Config->GetClient("HostServ"), "CLOAK");
-}
-
-void plexus::Proto::SendVhostDel(User *u)
-{
-	u->RemoveMode(Config->GetClient("HostServ"), "CLOAK");
-}
-
-void plexus::Proto::SendConnect()
+void plexus::Proto::Handshake()
 {
 	Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
 
@@ -115,7 +120,7 @@ void plexus::Proto::SendConnect()
 	Uplink::Send("CAPAB", "QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS");
 
 	/* Make myself known to myself in the serverlist */
-	SendServer(Me);
+	Uplink::Send("SERVER", Me->GetName(), Me->GetHops() + 1, Me->GetDescription());
 
 	/*
 	 * SVINFO
@@ -126,42 +131,6 @@ void plexus::Proto::SendConnect()
 	 *	  parv[4] = server's idea of UTC time
 	 */
 	Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
-}
-
-void plexus::Proto::SendClientIntroduction(User *u)
-{
-	Anope::string modes = "+" + u->GetModes();
-	Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, "255.255.255.255", u->GetUID(), 0, u->host, u->realname);
-}
-
-void plexus::Proto::SendMode(const MessageSource &source, User *u, const Anope::string &buf)
-{
-	Uplink::Send(source, "ENCAP", "*", "SVSMODE", u->GetUID(), u->timestamp, buf);
-}
-
-void plexus::Proto::SendLogin(User *u, NickServ::Nick *na)
-{
-	Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), na->GetAccount()->GetDisplay());
-}
-
-void plexus::Proto::SendLogout(User *u)
-{
-	Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), "");
-}
-
-void plexus::Proto::SendTopic(const MessageSource &source, Channel *c)
-{
-	Uplink::Send(source, "ENCAP", "*", "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
-}
-
-void plexus::Proto::SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param)
-{
-	Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSJOIN", user->GetUID(), chan);
-}
-
-void plexus::Proto::SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param)
-{
-	Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSPART", user->GetUID(), chan);
 }
 
 void plexus::Encap::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -269,8 +238,6 @@ void plexus::UID::Run(MessageSource &source, const std::vector<Anope::string> &p
 
 class ProtoPlexus : public Module
 {
-	Module *m_hybrid;
-
 	plexus::Proto ircd_proto;
 
 	/* Core message handlers */
@@ -308,6 +275,46 @@ class ProtoPlexus : public Module
 	hybrid::TMode message_tmode;
 	plexus::UID message_uid;
 
+	/* Core message senders */
+	rfc1459::senders::Invite sender_invite;
+	rfc1459::senders::Kick sender_kick;
+	rfc1459::senders::Kill sender_svskill;
+	rfc1459::senders::ModeChannel sender_mode_chan;
+	rfc1459::senders::NickChange sender_nickchange;
+	rfc1459::senders::Notice sender_notice;
+	rfc1459::senders::Part sender_part;
+	rfc1459::senders::Ping sender_ping;
+	rfc1459::senders::Pong sender_pong;
+	rfc1459::senders::Privmsg sender_privmsg;
+	rfc1459::senders::Quit sender_quit;
+	rfc1459::senders::SQuit sender_squit;
+
+	hybrid::senders::Akill sender_akill;
+	hybrid::senders::AkillDel sender_akill_del;
+	hybrid::senders::MessageChannel sender_channel;
+	hybrid::senders::GlobalNotice sender_global_notice;
+	hybrid::senders::GlobalPrivmsg sender_global_privmsg;
+	hybrid::senders::Join sender_join;
+	hybrid::senders::MessageServer sender_server;
+	hybrid::senders::SQLine sender_sqline;
+	hybrid::senders::SQLineDel sender_sqline_del;
+	hybrid::senders::SVSHold sender_svshold;
+	hybrid::senders::SVSHoldDel sender_svsholddel;
+
+	ratbox::senders::Login sender_login;
+	ratbox::senders::Logout sender_logout;
+	ratbox::senders::Wallops sender_wallops;
+
+	plexus::senders::ModeUser sender_mode_user;
+	plexus::senders::NickIntroduction sender_nickintroduction;
+	plexus::senders::NOOP sender_noop;
+	plexus::senders::SVSJoin sender_svsjoin;
+	plexus::senders::SVSNick sender_svsnick;
+	plexus::senders::SVSPart sender_svspart;
+	plexus::senders::Topic sender_topic;
+	plexus::senders::VhostDel sender_vhost_del;
+	plexus::senders::VhostSet sender_vhost_set;
+
  public:
 	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
 		, ircd_proto(this)
@@ -343,7 +350,49 @@ class ProtoPlexus : public Module
 		, message_tburst(this)
 		, message_tmode(this)
 		, message_uid(this)
+
+		, sender_akill(this)
+		, sender_akill_del(this)
+		, sender_channel(this)
+		, sender_global_notice(this)
+		, sender_global_privmsg(this)
+		, sender_invite(this)
+		, sender_join(this)
+		, sender_kick(this)
+		, sender_svskill(this)
+		, sender_login(this)
+		, sender_logout(this)
+		, sender_mode_chan(this)
+		, sender_mode_user(this)
+		, sender_nickchange(this)
+		, sender_nickintroduction(this)
+		, sender_noop(this)
+		, sender_notice(this)
+		, sender_part(this)
+		, sender_ping(this)
+		, sender_pong(this)
+		, sender_privmsg(this)
+		, sender_quit(this)
+		, sender_server(this)
+		, sender_sqline(this)
+		, sender_sqline_del(this)
+		, sender_squit(this)
+		, sender_svshold(this)
+		, sender_svsholddel(this)
+		, sender_svsjoin(this)
+		, sender_svsnick(this)
+		, sender_svspart(this)
+		, sender_topic(this)
+		, sender_vhost_del(this)
+		, sender_vhost_set(this)
+		, sender_wallops(this)
 	{
+		IRCD = &ircd_proto;
+	}
+
+	~ProtoPlexus()
+	{
+		IRCD = nullptr;
 	}
 };
 

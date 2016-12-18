@@ -321,7 +321,7 @@ void LogInfo::OpenLogFiles()
 	{
 		const Anope::string &target = this->targets[i];
 
-		if (target.empty() || target[0] == '#' || target == "globops" || target.find(":") != Anope::string::npos)
+		if (target.empty() || target[0] == '#' || target == "opers" || target.find(":") != Anope::string::npos)
 			continue;
 
 		LogFile *lf = new LogFile(CreateLogName(target));
@@ -386,11 +386,11 @@ void LogInfo::ProcessMessage(const Log *l)
 					IRCD->SendPrivmsg(bi, c->name, buffer);
 			}
 		}
-		else if (target == "globops")
+		else if (target == "opers")
 		{
 			if (UplinkSock && l->bi && l->type <= LOG_NORMAL && Me && Me->IsSynced())
 			{
-				IRCD->SendGlobops(l->bi, buffer);
+				IRCD->SendWallops(l->bi, buffer);
 			}
 		}
 	}
@@ -406,7 +406,7 @@ void LogInfo::ProcessMessage(const Log *l)
 			{
 				const Anope::string &target = this->targets[i];
 
-				if (target.empty() || target[0] == '#' || target == "globops" || target.find(":") != Anope::string::npos)
+				if (target.empty() || target[0] == '#' || target == "opers" || target.find(":") != Anope::string::npos)
 					continue;
 
 				Anope::string oldlog = CreateLogName(target, Anope::CurTime - 86400 * this->log_age);

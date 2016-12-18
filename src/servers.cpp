@@ -81,7 +81,7 @@ Server::~Server()
 	if (this->uplink)
 		this->uplink->DelLink(this);
 
-	for (unsigned i = this->links.size(); i > 0; --i)
+	for (unsigned int i = this->links.size(); i > 0; --i)
 		this->links[i - 1]->Delete(this->quit_reason);
 
 	Servers::ByName.erase(this->name);
@@ -101,12 +101,12 @@ void Server::Burst()
 {
 	IRCD->SendBOB();
 
-	for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
+	for (unsigned int i = 0; i < Me->GetLinks().size(); ++i)
 	{
 		Server *s = Me->GetLinks()[i];
 
 		if (s->juped)
-			IRCD->SendServer(s);
+			IRCD->Send<messages::MessageServer>(s);
 	}
 
 	/* We make the bots go online */
@@ -117,11 +117,12 @@ void Server::Burst()
 		ServiceBot *bi = ServiceBot::Find(u->GetUID());
 		if (bi)
 		{
+#warning "xline on stack"
 			//XLine x(bi->nick, "Reserved for services");
 			//IRCD->SendSQLine(NULL, &x);
 		}
 
-		IRCD->SendClientIntroduction(u);
+		IRCD->Send<messages::NickIntroduction>(u);
 		if (bi)
 			bi->introduced = true;
 	}
@@ -131,10 +132,10 @@ void Server::Burst()
 		Channel *c = it->second;
 
 		if (c->users.empty())
-			IRCD->SendChannel(c);
+			IRCD->Send<messages::MessageChannel>(c);
 		else
 			for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
-				IRCD->SendJoin(cit->second->user, c, &cit->second->status);
+				IRCD->Send<messages::Join>(cit->second->user, c, &cit->second->status);
 
 		for (Channel::ModeList::const_iterator it2 = c->GetModes().begin(); it2 != c->GetModes().end(); ++it2)
 		{
@@ -145,7 +146,7 @@ void Server::Burst()
 		}
 
 		if (!c->topic.empty() && !c->topic_setter.empty())
-			IRCD->SendTopic(c->ci->WhoSends(), c);
+			IRCD->Send<messages::Topic>(c->ci->WhoSends(), c, c->topic, c->topic_ts, c->topic_setter);
 
 		c->syncing = true;
 	}
@@ -308,9 +309,9 @@ bool Server::IsQuitting() const
 void Server::Notice(ServiceBot *source, const Anope::string &message)
 {
 	if (Config->UsePrivmsg && Config->DefPrivmsg)
-		IRCD->SendGlobalPrivmsg(source, this, message);
+		IRCD->Send<messages::GlobalPrivmsg>(source, this, message);
 	else
-		IRCD->SendGlobalNotice(source, this, message);
+		IRCD->Send<messages::GlobalNotice>(source, this, message);
 }
 
 Server *Server::Find(const Anope::string &name, bool name_only)

@@ -59,7 +59,7 @@ class CommandNSConfirm : public Command
 			/* Login the users online already */
 			for (User *u : na->GetAccount()->users)
 			{
-				IRCD->SendLogin(u, na);
+				IRCD->Send<messages::Login>(u, na);
 
 				NickServ::Nick *u_na = NickServ::FindNick(u->nick);
 
@@ -90,7 +90,7 @@ class CommandNSConfirm : public Command
 				NickServ::Nick *na = NickServ::FindNick(source.GetNick());
 				if (na)
 				{
-					IRCD->SendLogin(source.GetUser(), na);
+					IRCD->Send<messages::Login>(source.GetUser(), na);
 					if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && na->GetAccount() == source.GetAccount() && !na->GetAccount()->IsUnconfirmed())
 						source.GetUser()->SetMode(source.service, "REGISTERED");
 				}

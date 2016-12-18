@@ -115,7 +115,7 @@ class NickServRelease : public User, public Timer
 
 		NickServReleases.insert(std::make_pair(this->nick, this));
 
-		IRCD->SendClientIntroduction(this);
+		IRCD->Send<messages::NickIntroduction>(this);
 	}
 
 	~NickServRelease()
@@ -168,7 +168,7 @@ class NickServCore : public Module, public NickServ::NickServService
 			new NickServHeld(this, na, Config->GetModule("nickserv/main")->Get<time_t>("releasetimeout", "1m"));
 
 			if (IRCD->CanSVSHold)
-				IRCD->SendSVSHold(na->GetNick(), Config->GetModule("nickserv/main")->Get<time_t>("releasetimeout", "1m"));
+				IRCD->Send<messages::SVSHold>(na->GetNick(), Config->GetModule("nickserv/main")->Get<time_t>("releasetimeout", "1m"));
 			else
 				new NickServRelease(this, na, Config->GetModule("nickserv/main")->Get<time_t>("releasetimeout", "1m"));
 		}
@@ -324,7 +324,7 @@ class NickServCore : public Module, public NickServ::NickServService
 			else
 			{
 				u->SendMessage(*NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
-				IRCD->SendForceNickChange(u, guestnick, Anope::CurTime);
+				IRCD->Send<messages::SVSNick>(u, guestnick, Anope::CurTime);
 			}
 		}
 		else
@@ -338,7 +338,7 @@ class NickServCore : public Module, public NickServ::NickServService
 		if (held.HasExt(na))
 		{
 			if (IRCD->CanSVSHold)
-				IRCD->SendSVSHoldDel(na->GetNick());
+				IRCD->Send<messages::SVSHoldDel>(na->GetNick());
 			else
 			{
 				User *u = User::Find(na->GetNick(), true);
@@ -418,7 +418,7 @@ class NickServCore : public Module, public NickServ::NickServService
 		User *u = User::Find(na->GetNick(), true);
 		if (u && u->Account() == na->GetAccount())
 		{
-			IRCD->SendLogout(u);
+			IRCD->Send<messages::Logout>(u);
 			u->RemoveMode(NickServ, "REGISTERED");
 			u->Logout();
 		}
@@ -432,7 +432,7 @@ class NickServCore : public Module, public NickServ::NickServService
 		for (unsigned int i = nc->users.size(); i > 0; --i)
 		{
 			User *user = nc->users[i - 1];
-			IRCD->SendLogout(user);
+			IRCD->Send<messages::Logout>(user);
 			user->RemoveMode(NickServ, "REGISTERED");
 			user->Logout();
 			EventManager::Get()->Dispatch(&Event::NickLogout::OnNickLogout, user);
@@ -552,7 +552,7 @@ class NickServCore : public Module, public NickServ::NickServService
 		else
 		{
 			/* Reset +r and re-send account (even though it really should be set at this point) */
-			IRCD->SendLogin(u, na);
+			IRCD->Send<messages::Login>(u, na);
 			if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && na->GetAccount() == u->Account() && !na->GetAccount()->IsUnconfirmed())
 				u->SetMode(NickServ, "REGISTERED");
 			Log(u, "", NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->GetDisplay();

@@ -17,7 +17,7 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
-/* Dependencies: anope_protocol.rfc1459 */
+/* Dependencies: anope_protocol.rfc1459,anope_protocol.bahamut */
 
 #include "module.h"
 #include "modules/chanserv/mode.h"
@@ -25,75 +25,11 @@
 #include "modules/operserv/stats.h"
 #include "modules/protocol/rfc1459.h"
 #include "modules/protocol/unreal.h"
+#include "modules/protocol/bahamut.h"
 
 static Anope::string UplinkSID;
 
-unreal::Proto::Proto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4")
-{
-	DefaultPseudoclientModes = "+Soiq";
-	CanSVSNick = true;
-	CanSVSJoin = true;
-	CanSetVHost = true;
-	CanSetVIdent = true;
-	CanSNLine = true;
-	CanSQLine = true;
-	CanSZLine = true;
-	CanSVSHold = true;
-	CanCertFP = true;
-	RequiresID = true;
-	MaxModes = 12;
-}
-
-/* SVSNOOP */
-void unreal::Proto::SendSVSNOOP(Server *server, bool set)
-{
-	Uplink::Send("SVSNOOP", server->GetSID(), set ? "+" : "-");
-}
-
-void unreal::Proto::SendAkillDel(XLine *x)
-{
-	if (x->IsRegex() || x->HasNickOrReal())
-		return;
-
-	/* ZLine if we can instead */
-	if (x->GetUser() == "*")
-	{
-		cidr a(x->GetHost());
-		if (a.valid())
-		{
-			IRCD->SendSZLineDel(x);
-			return;
-		}
-	}
-
-	Uplink::Send("TKL", "-", "G", x->GetUser(), x->GetHost(), x->GetBy());
-}
-
-void unreal::Proto::SendTopic(const MessageSource &source, Channel *c)
-{
-	Uplink::Send(source, "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
-}
-
-void unreal::Proto::SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg)
-{
-	Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
-}
-
-void unreal::Proto::SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg)
-{
-	Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
-}
-
-void unreal::Proto::SendVhostDel(User *u)
-{
-	ServiceBot *HostServ = Config->GetClient("HostServ");
-	u->RemoveMode(HostServ, "CLOAK");
-	u->RemoveMode(HostServ, "VHOST");
-	ModeManager::ProcessModes();
-	u->SetMode(HostServ, "CLOAK");
-}
-
-void unreal::Proto::SendAkill(User *u, XLine *x)
+void unreal::senders::Akill::Send(User* u, XLine* x)
 {
 	if (x->IsRegex() || x->HasNickOrReal())
 	{
@@ -102,7 +38,7 @@ void unreal::Proto::SendAkill(User *u, XLine *x)
 			/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
 			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 				if (x->GetManager()->Check(it->second, x))
-					this->SendAkill(it->second, x);
+					this->Send(it->second, x);
 			return;
 		}
 
@@ -131,7 +67,7 @@ void unreal::Proto::SendAkill(User *u, XLine *x)
 		cidr a(x->GetHost());
 		if (a.valid())
 		{
-			IRCD->SendSZLine(u, x);
+			IRCD->Send<messages::SZLine>(u, x);
 			return;
 		}
 	}
@@ -143,37 +79,46 @@ void unreal::Proto::SendAkill(User *u, XLine *x)
 	Uplink::Send("TKL", "+", "G", x->GetUser(), x->GetHost(), x->GetBy(), Anope::CurTime + timeleft, x->GetCreated(), x->GetReason());
 }
 
-void unreal::Proto::SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf)
+void unreal::senders::AkillDel::Send(XLine* x)
 {
-	Uplink::Send(source, "SVSKILL", user->GetUID(), buf);
-	user->KillInternal(source, buf);
+	if (x->IsRegex() || x->HasNickOrReal())
+		return;
+
+	/* ZLine if we can instead */
+	if (x->GetUser() == "*")
+	{
+		cidr a(x->GetHost());
+		if (a.valid())
+		{
+			IRCD->Send<messages::SZLineDel>(x);
+			return;
+		}
+	}
+
+	Uplink::Send("TKL", "-", "G", x->GetUser(), x->GetHost(), x->GetBy());
 }
 
-void unreal::Proto::SendMode(const MessageSource &source, User *u, const Anope::string &buf)
+void unreal::senders::MessageChannel::Send(Channel* c)
 {
-	IRCMessage message(source, "SVS2MODE", u->GetUID());
-	message.TokenizeAndPush(buf);
-	Uplink::SendMessage(message);
-}
-
-void unreal::Proto::SendClientIntroduction(User *u)
-{
-	Anope::string modes = "+" + u->GetModes();
-	Uplink::Send("UID", u->nick, 1, u->timestamp, u->GetIdent(), u->host, u->GetUID(), "*", modes, !u->vhost.empty() ? u->vhost : "*", !u->chost.empty() ? u->chost : "*", "*", u->realname);
-}
-
-/* SERVER name hop descript */
-/* Unreal 3.2 actually sends some info about itself in the descript area */
-void unreal::Proto::SendServer(Server *server)
-{
-	if (!server->GetSID().empty() && server == Me)
-		Uplink::Send("SERVER", server->GetName(), server->GetHops() + 1, server->GetDescription());
+	/* Unreal does not support updating a channels TS without actually joining a user,
+	 * so we will join and part us now
+	 */
+	ServiceBot *bi = c->ci->WhoSends();
+	if (!bi)
+		;
+	else if (c->FindUser(bi) == NULL)
+	{
+		bi->Join(c);
+		bi->Part(c);
+	}
 	else
-		Uplink::Send("SID", server->GetName(), server->GetHops() + 1, server->GetSID(), server->GetDescription());
+	{
+		bi->Part(c);
+		bi->Join(c);
+	}
 }
 
-/* JOIN */
-void unreal::Proto::SendJoin(User *user, Channel *c, const ChannelStatus *status)
+void unreal::senders::Join::Send(User* user, Channel* c, const ChannelStatus* status)
 {
 	Uplink::Send(Me, "SJOIN", c->creation_time, c->name, user->GetUID());
 	if (status)
@@ -196,34 +141,184 @@ void unreal::Proto::SendJoin(User *user, Channel *c, const ChannelStatus *status
 	}
 }
 
-/* unsqline
-*/
-void unreal::Proto::SendSQLineDel(XLine *x)
+void unreal::senders::Kill::Send(const MessageSource &source, const Anope::string &target, const Anope::string &reason)
 {
-	Uplink::Send("UNSQLINE", x->GetMask());
+	Uplink::Send(source, "SVSKILL", target, reason);
 }
 
-/* SQLINE */
-/*
-** - Unreal will translate this to TKL for us
-**
-*/
-void unreal::Proto::SendSQLine(User *, XLine *x)
+void unreal::senders::Kill::Send(const MessageSource &source, User *user, const Anope::string &reason)
+{
+	Uplink::Send(source, "SVSKILL", user->GetUID(), reason);
+	user->KillInternal(source, reason);
+}
+
+void unreal::senders::Login::Send(User *u, NickServ::Nick *na)
+{
+	/* 3.2.10.4+ treats users logged in with accounts as fully registered, even if -r, so we can not set this here. Just use the timestamp. */
+	if (Servers::Capab.count("ESVID") > 0 && !na->GetAccount()->IsUnconfirmed())
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", na->GetAccount()->GetDisplay());
+	else
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", u->signon);
+}
+
+void unreal::senders::Logout::Send(User *u)
+{
+	IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 0");
+}
+
+void unreal::senders::ModeUser::Send(const MessageSource &source, User *user, const Anope::string &modes)
+{
+	IRCMessage message(source, "SVS2MODE", user->GetUID());
+	message.TokenizeAndPush(modes);
+	Uplink::SendMessage(message);
+}
+
+void unreal::senders::NickIntroduction::Send(User *user)
+{
+	Anope::string modes = "+" + user->GetModes();
+	Uplink::Send("UID", user->nick, 1, user->timestamp, user->GetIdent(), user->host, user->GetUID(), "*", modes, !user->vhost.empty() ? user->vhost : "*", !user->chost.empty() ? user->chost : "*", "*", user->realname);
+}
+
+void unreal::senders::SASL::Send(const ::SASL::Message& message)
+{
+	size_t p = message.target.find('!');
+	if (p == Anope::string::npos)
+		return;
+
+	if (!message.ext.empty())
+		Uplink::Send(ServiceBot::Find(message.source), "SASL", message.target.substr(0, p), message.target, message.type, message.data, message.ext);
+	else
+		Uplink::Send(ServiceBot::Find(message.source), "SASL", message.target.substr(0, p), message.target, message.type, message.data);
+}
+
+void unreal::senders::MessageServer::Send(Server* server)
+{
+	Uplink::Send(Me, "SID", server->GetName(), server->GetHops() + 1, server->GetSID(), server->GetDescription());
+}
+
+void unreal::senders::SGLine::Send(User*, XLine* x)
+{
+	/*
+	 * SVSNLINE + reason_where_is_space :realname mask with spaces
+	 */
+	Anope::string edited_reason = x->GetReason();
+	edited_reason = edited_reason.replace_all_cs(" ", "_");
+	Uplink::Send("SVSNLINE", "+", edited_reason, x->GetMask());
+}
+
+void unreal::senders::SGLineDel::Send(XLine* x)
+{
+	Uplink::Send("SVSNLINE", "-", x->GetMask());
+}
+
+void unreal::senders::SQLine::Send(User*, XLine* x)
 {
 	Uplink::Send("SQLINE", x->GetMask(), x->GetReason());
 }
 
-/* Functions that use serval cmd functions */
-
-void unreal::Proto::SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost)
+void unreal::senders::SQLineDel::Send(XLine* x)
 {
-	if (!vIdent.empty())
-		Uplink::Send(Me, "CHGIDENT", u->GetUID(), vIdent);
+	Uplink::Send("UNSQLINE", x->GetMask());
+}
+
+void unreal::senders::SZLine::Send(User*, XLine* x)
+{
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+	Uplink::Send("TKL", "+", "Z", "*", x->GetHost(), x->GetBy(), Anope::CurTime + timeleft, x->GetCreated(), x->GetReason());
+}
+
+void unreal::senders::SZLineDel::Send(XLine* x)
+{
+	Uplink::Send("TKL", "-", "Z", "*", x->GetHost(), x->GetBy());
+}
+
+void unreal::senders::SVSHold::Send(const Anope::string& nick, time_t t)
+{
+	Uplink::Send("TKL", "+", "Q", "H", nick, Me->GetName(), Anope::CurTime + t, Anope::CurTime, "Being held for registered user");
+}
+
+void unreal::senders::SVSHoldDel::Send(const Anope::string& nick)
+{
+	Uplink::Send("TKL", "-", "Q", "*", nick, Me->GetName());
+}
+
+/* svsjoin
+	parv[0] - sender
+	parv[1] - nick to make join
+	parv[2] - channel to join
+	parv[3] - (optional) channel key(s)
+*/
+void unreal::senders::SVSJoin::Send(const MessageSource& source, User* user, const Anope::string& chan, const Anope::string& key)
+{
+	if (!key.empty())
+		Uplink::Send(source, "SVSJOIN", user->GetUID(), chan, key);
+	else
+		Uplink::Send(source, "SVSJOIN", user->GetUID(), chan);
+}
+
+void unreal::senders::SVSLogin::Send(const Anope::string& uid, const Anope::string& acc, const Anope::string& vident, const Anope::string& vhost)
+{
+	size_t p = uid.find('!');
+	if (p == Anope::string::npos)
+		return;
+	Uplink::Send(Me, "SVSLOGIN", uid.substr(0, p), uid, acc);
+}
+
+void unreal::senders::SVSPart::Send(const MessageSource& source, User* user, const Anope::string& chan, const Anope::string& reason)
+{
+	if (!reason.empty())
+		Uplink::Send(source, "SVSPART", user->GetUID(), chan, reason);
+	else
+		Uplink::Send(source, "SVSPART", user->GetUID(), chan);
+}
+
+void unreal::senders::SWhois::Send(const MessageSource& source, User *user, const Anope::string& swhois)
+{
+	Uplink::Send(source, "SWHOIS", user->GetUID(), swhois);
+}
+
+void unreal::senders::Topic::Send(const MessageSource &source, Channel *channel, const Anope::string &topic, time_t topic_ts, const Anope::string &topic_setter)
+{
+	Uplink::Send(source, "TOPIC", channel->name, topic_setter, topic_ts, topic);
+}
+
+void unreal::senders::VhostDel::Send(User* u)
+{
+	ServiceBot *HostServ = Config->GetClient("HostServ");
+	u->RemoveMode(HostServ, "CLOAK");
+	u->RemoveMode(HostServ, "VHOST");
+	ModeManager::ProcessModes();
+	u->SetMode(HostServ, "CLOAK");
+}
+
+void unreal::senders::VhostSet::Send(User* u, const Anope::string& vident, const Anope::string& vhost)
+{
+	if (!vident.empty())
+		Uplink::Send(Me, "CHGIDENT", u->GetUID(), vident);
 	if (!vhost.empty())
 		Uplink::Send(Me, "CHGHOST", u->GetUID(), vhost);
 }
 
-void unreal::Proto::SendConnect()
+unreal::Proto::Proto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4")
+{
+	DefaultPseudoclientModes = "+Soiq";
+	CanSVSNick = true;
+	CanSVSJoin = true;
+	CanSetVHost = true;
+	CanSetVIdent = true;
+	CanSNLine = true;
+	CanSQLine = true;
+	CanSZLine = true;
+	CanSVSHold = true;
+	CanCertFP = true;
+	RequiresID = true;
+	MaxModes = 12;
+}
+
+void unreal::Proto::Handshake()
 {
 	/*
 	   NICKv2 = Nick Version 2
@@ -241,82 +336,7 @@ void unreal::Proto::SendConnect()
 	Uplink::Send("PROTOCTL", "NICKv2", "VHP", "UMODE2", "NICKIP", "SJOIN", "SJOIN2", "SJ3", "NOQUIT", "TKLEXT", "MLOCK", "SID");
 	Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
 	Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
-	SendServer(Me);
-}
-
-/* SVSHOLD - set */
-void unreal::Proto::SendSVSHold(const Anope::string &nick, time_t t)
-{
-	Uplink::Send("TKL", "+", "Q", "H", nick, Me->GetName(), Anope::CurTime + t, Anope::CurTime, "Being held for registered user");
-}
-
-/* SVSHOLD - release */
-void unreal::Proto::SendSVSHoldDel(const Anope::string &nick)
-{
-	Uplink::Send("TKL", "-", "Q", "*", nick, Me->GetName());
-}
-
-/* UNSGLINE */
-/*
- * SVSNLINE - :realname mask
-*/
-void unreal::Proto::SendSGLineDel(XLine *x)
-{
-	Uplink::Send("SVSNLINE", "-", x->GetMask());
-}
-
-/* UNSZLINE */
-void unreal::Proto::SendSZLineDel(XLine *x)
-{
-	Uplink::Send("TKL", "-", "Z", "*", x->GetHost(), x->GetBy());
-}
-
-/* SZLINE */
-void unreal::Proto::SendSZLine(User *, XLine *x)
-{
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
-	Uplink::Send("TKL", "+", "Z", "*", x->GetHost(), x->GetBy(), Anope::CurTime + timeleft, x->GetCreated(), x->GetReason());
-}
-
-/* SGLINE */
-/*
- * SVSNLINE + reason_where_is_space :realname mask with spaces
-*/
-void unreal::Proto::SendSGLine(User *, XLine *x)
-{
-	Anope::string edited_reason = x->GetReason();
-	edited_reason = edited_reason.replace_all_cs(" ", "_");
-	Uplink::Send("SVSNLINE", "+", edited_reason, x->GetMask());
-}
-
-/* svsjoin
-	parv[0] - sender
-	parv[1] - nick to make join
-	parv[2] - channel to join
-	parv[3] - (optional) channel key(s)
-*/
-void unreal::Proto::SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param)
-{
-	if (!param.empty())
-		Uplink::Send(source, "SVSJOIN", user->GetUID(), chan, param);
-	else
-		Uplink::Send(source, "SVSJOIN", user->GetUID(), chan);
-}
-
-void unreal::Proto::SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param)
-{
-	if (!param.empty())
-		Uplink::Send(source, "SVSPART", user->GetUID(), chan, param);
-	else
-		Uplink::Send(source, "SVSPART", user->GetUID(), chan);
-}
-
-void unreal::Proto::SendSWhois(const MessageSource &source, const Anope::string &who, const Anope::string &mask)
-{
-	Uplink::Send(source, "SWHOIS", who, mask);
+	Uplink::Send("SERVER", Me->GetName(), Me->GetHops() + 1, Me->GetDescription());
 }
 
 void unreal::Proto::SendEOB()
@@ -343,60 +363,6 @@ bool unreal::Proto::IsChannelValid(const Anope::string &chan)
 bool unreal::Proto:: IsExtbanValid(const Anope::string &mask)
 {
 	return mask.length() >= 4 && mask[0] == '~' && mask[2] == ':';
-}
-
-void unreal::Proto::SendLogin(User *u, NickServ::Nick *na)
-{
-	/* 3.2.10.4+ treats users logged in with accounts as fully registered, even if -r, so we can not set this here. Just use the timestamp. */
-	if (Servers::Capab.count("ESVID") > 0 && !na->GetAccount()->IsUnconfirmed())
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", na->GetAccount()->GetDisplay());
-	else
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", u->signon);
-}
-
-void unreal::Proto::SendLogout(User *u)
-{
-	IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 0");
-}
-
-void unreal::Proto::SendChannel(Channel *c)
-{
-	/* Unreal does not support updating a channels TS without actually joining a user,
-	 * so we will join and part us now
-	 */
-	ServiceBot *bi = c->ci->WhoSends();
-	if (!bi)
-		;
-	else if (c->FindUser(bi) == NULL)
-	{
-		bi->Join(c);
-		bi->Part(c);
-	}
-	else
-	{
-		bi->Part(c);
-		bi->Join(c);
-	}
-}
-
-void unreal::Proto::SendSASLMessage(const ::SASL::Message &message)
-{
-	size_t p = message.target.find('!');
-	if (p == Anope::string::npos)
-		return;
-
-	if (!message.ext.empty())
-		Uplink::Send(ServiceBot::Find(message.source), "SASL", message.target.substr(0, p), message.target, message.type, message.data, message.ext);
-	else
-		Uplink::Send(ServiceBot::Find(message.source), "SASL", message.target.substr(0, p), message.target, message.type, message.data);
-}
-
-void unreal::Proto::SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost)
-{
-	size_t p = uid.find('!');
-	if (p == Anope::string::npos)
-		return;
-	Uplink::Send(Me, "SVSLOGIN", uid.substr(0, p), uid, acc);
 }
 
 bool unreal::Proto::IsIdentValid(const Anope::string &ident)
@@ -889,7 +855,7 @@ void unreal::ServerMessage::Run(MessageSource &source, const std::vector<Anope::
 		new Server(source.GetServer(), params[0], hops, params[2]);
 	}
 
-	IRCD->SendPing(Me->GetName(), params[0]);
+	IRCD->Send<messages::Ping>(Me->GetName(), params[0]);
 }
 
 void unreal::SID::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -904,7 +870,7 @@ void unreal::SID::Run(MessageSource &source, const std::vector<Anope::string> &p
 
 	new Server(source.GetServer(), params[0], hops, params[3], params[2]);
 
-	IRCD->SendPing(Me->GetName(), params[0]);
+	IRCD->Send<messages::Ping>(Me->GetName(), params[0]);
 }
 
 void unreal::SJoin::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -1156,6 +1122,48 @@ class ProtoUnreal : public Module
 	unreal::UID message_uid;
 	unreal::Umode2 message_umode2;
 
+	rfc1459::senders::GlobalNotice sender_global_notice;
+	rfc1459::senders::GlobalPrivmsg sender_global_privmsg;
+	rfc1459::senders::Invite sender_invite;
+	rfc1459::senders::Kick sender_kick;
+	rfc1459::senders::ModeChannel sender_mode_chan;
+	rfc1459::senders::NickChange sender_nickchange;
+	rfc1459::senders::Notice sender_notice;
+	rfc1459::senders::Part sender_part;
+	rfc1459::senders::Ping sender_ping;
+	rfc1459::senders::Pong sender_pong;
+	rfc1459::senders::Privmsg sender_privmsg;
+	rfc1459::senders::Quit sender_quit;
+	rfc1459::senders::SQuit sender_squit;
+
+	bahamut::senders::NOOP sender_noop;
+	bahamut::senders::SVSNick sender_svsnick;
+	bahamut::senders::Wallops sender_wallops;
+
+	unreal::senders::Akill sender_akill;
+	unreal::senders::AkillDel sender_akill_del;
+	unreal::senders::MessageChannel sender_channel;
+	unreal::senders::Join sender_join;
+	unreal::senders::Kill sender_svskill;
+	unreal::senders::Login sender_login;
+	unreal::senders::Logout sender_logout;
+	unreal::senders::ModeUser sender_mode_user;
+	unreal::senders::NickIntroduction sender_nickintroduction;
+	unreal::senders::MessageServer sender_server;
+	unreal::senders::SASL sender_sasl;
+	unreal::senders::SGLine sender_sgline;
+	unreal::senders::SGLineDel sender_sgline_del;
+	unreal::senders::SQLine sender_sqline;
+	unreal::senders::SQLineDel sender_sqline_del;
+	unreal::senders::SVSHold sender_svshold;
+	unreal::senders::SVSHoldDel sender_svsholddel;
+	unreal::senders::SVSJoin sender_svsjoin;
+	unreal::senders::SVSPart sender_svspart;
+	unreal::senders::SWhois sender_swhois;
+	unreal::senders::Topic sender_topic;
+	unreal::senders::VhostDel sender_vhost_del;
+	unreal::senders::VhostSet sender_vhost_set;
+
 	bool use_server_side_mlock;
 
  public:
@@ -1207,7 +1215,53 @@ class ProtoUnreal : public Module
 		, message_topic(this)
 		, message_uid(this)
 		, message_umode2(this)
+
+		, sender_akill(this)
+		, sender_akill_del(this)
+		, sender_channel(this)
+		, sender_global_notice(this)
+		, sender_global_privmsg(this)
+		, sender_invite(this)
+		, sender_join(this)
+		, sender_kick(this)
+		, sender_svskill(this)
+		, sender_login(this)
+		, sender_logout(this)
+		, sender_mode_chan(this)
+		, sender_mode_user(this)
+		, sender_nickchange(this)
+		, sender_nickintroduction(this)
+		, sender_noop(this)
+		, sender_notice(this)
+		, sender_part(this)
+		, sender_ping(this)
+		, sender_pong(this)
+		, sender_privmsg(this)
+		, sender_quit(this)
+		, sender_server(this)
+		, sender_sasl(this)
+		, sender_sgline(this)
+		, sender_sgline_del(this)
+		, sender_sqline(this)
+		, sender_sqline_del(this)
+		, sender_squit(this)
+		, sender_svshold(this)
+		, sender_svsholddel(this)
+		, sender_svsjoin(this)
+		, sender_svsnick(this)
+		, sender_svspart(this)
+		, sender_swhois(this)
+		, sender_topic(this)
+		, sender_vhost_del(this)
+		, sender_vhost_set(this)
+		, sender_wallops(this)
 	{
+		IRCD = &ircd_proto;
+	}
+
+	~ProtoUnreal()
+	{
+		IRCD = nullptr;
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -1251,7 +1305,7 @@ class ProtoUnreal : public Module
 	{
 		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
 		if (Servers::Capab.count("ESVID") == 0)
-			IRCD->SendLogout(u);
+			sender_logout.Send(u);
 	}
 
 	void OnChannelSync(Channel *c) override

@@ -57,11 +57,11 @@ class CommandOSJupe : public Command
 		Anope::string sid = IRCD->SID_Retrieve();
 		if (server)
 		{
-			IRCD->SendSquit(server, rbuf);
+			IRCD->Send<messages::SQuit>(server, rbuf);
 			server->Delete(rbuf);
 		}
 		Server *juped_server = new Server(Me, jserver, 1, rbuf, sid, true);
-		IRCD->SendServer(juped_server);
+		IRCD->Send<messages::MessageServer>(juped_server);
 
 		Log(LOG_ADMIN, source, this) << "on " << jserver << " (" << rbuf << ")";
 	}

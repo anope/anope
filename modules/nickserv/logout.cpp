@@ -68,7 +68,7 @@ class CommandNSLogout : public Command
 		else
 			source.Reply(_("You have been logged out."));
 
-		IRCD->SendLogout(u2);
+		IRCD->Send<messages::Logout>(u2);
 		u2->RemoveMode(source.service, "REGISTERED");
 		u2->Logout();
 

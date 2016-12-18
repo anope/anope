@@ -22,62 +22,201 @@
 namespace bahamut
 {
 
+namespace senders
+{
+
+class Akill : public messages::Akill
+{
+ public:
+	using messages::Akill::Akill;
+
+	void Send(User *, XLine *) override;
+};
+
+class AkillDel : public messages::AkillDel
+{
+ public:
+	using messages::AkillDel::AkillDel;
+
+	void Send(XLine *) override;
+};
+
+class MessageChannel : public messages::MessageChannel
+{
+ public:
+	using messages::MessageChannel::MessageChannel;
+
+	void Send(Channel *) override;
+};
+
+class Join : public messages::Join
+{
+ public:
+	using messages::Join::Join;
+
+	void Send(User *u, Channel *c, const ChannelStatus *status) override;
+};
+
+class Kill : public messages::Kill
+{
+ public:
+	using messages::Kill::Kill;
+
+	void Send(const MessageSource &source, const Anope::string &target, const Anope::string &reason) override;
+
+	void Send(const MessageSource &source, User *user, const Anope::string &reason) override;
+};
+
+class Login : public messages::Login
+{
+ public:
+	using messages::Login::Login;
+
+	void Send(User *u, NickServ::Nick *na) override;
+};
+
+class Logout : public messages::Logout
+{
+ public:
+	using messages::Logout::Logout;
+
+	void Send(User *u) override;
+};
+
+class ModeChannel : public messages::ModeChannel
+{
+ public:
+	using messages::ModeChannel::ModeChannel;
+
+	void Send(const MessageSource &source, Channel *channel, const Anope::string &modes) override;
+};
+
+class ModeUser : public messages::ModeUser
+{
+ public:
+	using messages::ModeUser::ModeUser;
+
+	void Send(const MessageSource &source, User *user, const Anope::string &modes) override;
+};
+
+class NickIntroduction : public messages::NickIntroduction
+{
+ public:
+	using messages::NickIntroduction::NickIntroduction;
+
+	void Send(User *user) override;
+};
+
+class NOOP : public messages::NOOP
+{
+ public:
+	static constexpr const char *NAME = "noop";
+
+	using messages::NOOP::NOOP;
+
+	void Send(Server *s, bool mode) override;
+};
+
+class SGLine : public messages::SGLine
+{
+ public:
+	using messages::SGLine::SGLine;
+
+	void Send(User *, XLine *) override;
+};
+
+class SGLineDel : public messages::SGLineDel
+{
+ public:
+	using messages::SGLineDel::SGLineDel;
+
+	void Send(XLine *) override;
+};
+
+class SQLine : public messages::SQLine
+{
+ public:
+	using messages::SQLine::SQLine;
+
+	void Send(User *, XLine *) override;
+};
+
+class SQLineDel : public messages::SQLineDel
+{
+ public:
+	using messages::SQLineDel::SQLineDel;
+
+	void Send(XLine *) override;
+};
+
+class SZLine : public messages::SZLine
+{
+ public:
+	using messages::SZLine::SZLine;
+
+	void Send(User *, XLine *) override;
+};
+
+class SZLineDel : public messages::SZLineDel
+{
+ public:
+	using messages::SZLineDel::SZLineDel;
+
+	void Send(XLine *) override;
+};
+
+class SVSHold : public messages::SVSHold
+{
+ public:
+	using messages::SVSHold::SVSHold;
+
+	void Send(const Anope::string &, time_t) override;
+};
+
+class SVSHoldDel : public messages::SVSHoldDel
+{
+ public:
+	using messages::SVSHoldDel::SVSHoldDel;
+
+	void Send(const Anope::string &) override;
+};
+
+class SVSNick : public messages::SVSNick
+{
+ public:
+	using messages::SVSNick::SVSNick;
+
+	void Send(User *u, const Anope::string &newnick, time_t ts) override;
+};
+
+class Topic : public messages::Topic
+{
+ public:
+	using messages::Topic::Topic;
+
+	void Send(const MessageSource &source, Channel *channel, const Anope::string &topic, time_t topic_ts, const Anope::string &topic_setter) override;
+};
+
+class Wallops : public messages::Wallops
+{
+ public:
+	using messages::Wallops::Wallops;
+
+	void Send(const MessageSource &source, const Anope::string &msg) override;
+};
+
+} // namespace senders
+
 class Proto : public IRCDProto
 {
  public:
 	Proto(Module *creator);
 
-	void SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf) override;
-
-	void SendMode(const MessageSource &source, User *u, const Anope::string &buf) override;
-
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
-
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
-
-	void SendSVSHold(const Anope::string &nick, time_t time) override;
-
-	void SendSVSHoldDel(const Anope::string &nick) override;
-
-	void SendSQLine(User *, XLine *x) override;
-
-	void SendSGLineDel(XLine *x) override;
-
-	void SendSZLineDel(XLine *x) override;
-
-	void SendSZLine(User *, XLine *x) override;
-
-	void SendSVSNOOP(Server *server, bool set) override;
-
-	void SendSGLine(User *, XLine *x) override;
-
-	void SendAkillDel(XLine *x) override;
-
-	void SendTopic(const MessageSource &source, Channel *c) override;
-
-	void SendSQLineDel(XLine *x) override;
-
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override;
-
-	void SendAkill(User *u, XLine *x) override;
-
-	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override;
-
 	void SendBOB() override;
 
 	void SendEOB() override;
 
-	void SendClientIntroduction(User *u) override;
-
-	void SendServer(Server *server) override;
-
-	void SendConnect() override;
-
-	void SendChannel(Channel *c) override;
-
-	void SendLogin(User *u, NickServ::Nick *) override;
-
-	void SendLogout(User *u) override;
+	void Handshake() override;
 };
 
 class Burst : public IRCDMessage

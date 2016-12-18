@@ -23,7 +23,6 @@
 #include "modules/sasl.h"
 #include "modules/protocol/hybrid.h"
 #include "modules/protocol/charybdis.h"
-#include "modules/protocol/ratbox.h"
 #include "modules/chanserv/mode.h"
 
 static Anope::string UplinkSID;
@@ -39,9 +38,57 @@ class ChannelModeLargeBan : public ChannelMode
 	}
 };
 
+void charybdis::senders::NickIntroduction::Send(User *user)
+{
+	Anope::string modes = "+" + user->GetModes();
+	Uplink::Send(Me, "EUID", user->nick, 1, user->timestamp, modes, user->GetIdent(), user->host, 0, user->GetUID(), "*", "*", user->realname);
+}
+void charybdis::senders::SASL::Send(const ::SASL::Message& message)
+{
+	Server *s = Server::Find(message.target.substr(0, 3));
+	Uplink::Send(Me, "ENCAP", s ? s->GetName() : message.target.substr(0, 3), "SASL", message.source, message.target, message.type, message.data, message.ext.empty() ? "" : message.ext);
+}
 
-charybdis::Proto::Proto(Module *creator) : IRCDProto(creator, "Charybdis 3.4+")
-	, ratbox("ratbox")
+void charybdis::senders::SASLMechanisms::Send(const std::vector<Anope::string>& mechanisms)
+{
+	Anope::string mechlist;
+
+	for (unsigned int i = 0; i < mechanisms.size(); ++i)
+	{
+		mechlist += "," + mechanisms[i];
+	}
+
+	Uplink::Send(Me, "ENCAP", "*", "MECHLIST", mechlist.empty() ? "" : mechlist.substr(1));
+}
+
+void charybdis::senders::SVSHold::Send(const Anope::string& nick, time_t delay)
+{
+	Uplink::Send(Me, "ENCAP", "*", "NICKDELAY", delay, nick);
+}
+
+void charybdis::senders::SVSHoldDel::Send(const Anope::string& nick)
+{
+	Uplink::Send(Me, "ENCAP", "*", "NICKDELAY", 0, nick);
+}
+
+void charybdis::senders::SVSLogin::Send(const Anope::string& uid, const Anope::string& acc, const Anope::string& vident, const Anope::string& vhost)
+{
+	Server *s = Server::Find(uid.substr(0, 3));
+	Uplink::Send(Me, "ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, "*", vident.empty() ? "*" : vident, vhost.empty() ? "*" : vhost, acc);
+}
+
+void charybdis::senders::VhostDel::Send(User* u)
+{
+	IRCD->Send<messages::VhostSet>(u, "", u->host);
+}
+
+void charybdis::senders::VhostSet::Send(User* u, const Anope::string& vident, const Anope::string& vhost)
+{
+	Uplink::Send(Me, "ENCAP", "*", "CHGHOST", u->GetUID(), vhost);
+}
+
+charybdis::Proto::Proto(Module *creator) : ts6::Proto(creator, "Charybdis 3.4+")
+	, ratbox(creator)
 {
 	DefaultPseudoclientModes = "+oiS";
 	CanCertFP = true;
@@ -56,7 +103,7 @@ charybdis::Proto::Proto(Module *creator) : IRCDProto(creator, "Charybdis 3.4+")
 	MaxModes = 4;
 }
 
-void charybdis::Proto::SendConnect()
+void charybdis::Proto::Handshake()
 {
 	Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
 
@@ -86,7 +133,7 @@ void charybdis::Proto::SendConnect()
 	Uplink::Send("CAPAB", "BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN");
 
 	/* Make myself known to myself in the serverlist */
-	SendServer(Me);
+	Uplink::Send("SERVER", Me->GetName(), Me->GetHops() + 1, Me->GetDescription());
 
 	/*
 	 * Received: SVINFO 6 6 0 :1353235537
@@ -95,65 +142,8 @@ void charybdis::Proto::SendConnect()
 	 *  arg[2] = '0'
 	 *  arg[3] = server's idea of UTC time
 	 */
-	Uplink::Send("SVINFO", 6, 6, Anope::CurTime);
+	Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
 }
-
-void charybdis::Proto::SendClientIntroduction(User *u)
-{
-	Anope::string modes = "+" + u->GetModes();
-	Uplink::Send(Me, "EUID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, 0, u->GetUID(), "*", "*", u->realname);
-}
-
-void charybdis::Proto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
-{
-	Uplink::Send(Me, "ENCAP", u->server->GetName(), "RSFNC", u->GetUID(),
-			newnick, when, u->timestamp);
-}
-
-void charybdis::Proto::SendSVSHold(const Anope::string &nick, time_t delay)
-{
-	Uplink::Send(Me, "ENCAP", "*", "NICKDELAY", delay, nick);
-}
-
-void charybdis::Proto::SendSVSHoldDel(const Anope::string &nick)
-{
-	Uplink::Send(Me, "ENCAP", "*", "NICKDELAY", 0, nick);
-}
-
-void charybdis::Proto::SendVhost(User *u, const Anope::string &ident, const Anope::string &host)
-{
-	Uplink::Send(Me, "ENCAP", "*", "CHGHOST", u->GetUID(), host);
-}
-
-void charybdis::Proto::SendVhostDel(User *u)
-{
-	this->SendVhost(u, "", u->host);
-}
-
-void charybdis::Proto::SendSASLMechanisms(std::vector<Anope::string> &mechanisms)
-{
-	Anope::string mechlist;
-
-	for (unsigned i = 0; i < mechanisms.size(); ++i)
-	{
-		mechlist += "," + mechanisms[i];
-	}
-
-	Uplink::Send(Me, "ENCAP", "*", "MECHLIST", mechlist.empty() ? "" : mechlist.substr(1));
-}
-
-void charybdis::Proto::SendSASLMessage(const SASL::Message &message)
-{
-	Server *s = Server::Find(message.target.substr(0, 3));
-	Uplink::Send(Me, "ENCAP", s ? s->GetName() : message.target.substr(0, 3), "SASL", message.source, message.target, message.type, message.data, message.ext.empty() ? "" : message.ext);
-}
-
-void charybdis::Proto::SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost)
-{
-	Server *s = Server::Find(uid.substr(0, 3));
-	Uplink::Send(Me, "ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, "*", vident.empty() ? "*" : vident, vhost.empty() ? "*" : vhost, acc);
-}
-
 
 void charybdis::Encap::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
@@ -228,7 +218,7 @@ void charybdis::ServerMessage::Run(MessageSource &source, const std::vector<Anop
 	if (params[1] != "1")
 		return;
 	new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
-	IRCD->SendPing(Me->GetName(), params[0]);
+	IRCD->Send<messages::Ping>(Me->GetName(), params[0]);
 }
 
 // we can't use this function from ratbox because we set a local variable here
@@ -282,6 +272,48 @@ class ProtoCharybdis : public Module
 	hybrid::TMode message_tmode;
 	ratbox::UID message_uid;
 
+	/* Core message senders */
+	rfc1459::senders::Invite sender_invite;
+	rfc1459::senders::Kick sender_kick;
+	rfc1459::senders::Kill sender_svskill;
+	rfc1459::senders::ModeChannel sender_mode_chan;
+	rfc1459::senders::ModeUser sender_mode_user;
+	rfc1459::senders::NickChange sender_nickchange;
+	rfc1459::senders::Notice sender_notice;
+	rfc1459::senders::Part sender_part;
+	rfc1459::senders::Ping sender_ping;
+	rfc1459::senders::Pong sender_pong;
+	rfc1459::senders::Privmsg sender_privmsg;
+	rfc1459::senders::Quit sender_quit;
+	rfc1459::senders::SQuit sender_squit;
+
+	hybrid::senders::Akill sender_akill;
+	hybrid::senders::AkillDel sender_akill_del;
+	hybrid::senders::MessageChannel sender_channel;
+	hybrid::senders::GlobalNotice sender_global_notice;
+	hybrid::senders::GlobalPrivmsg sender_global_privmsg;
+	hybrid::senders::Join sender_join;
+	hybrid::senders::MessageServer sender_server;
+	hybrid::senders::SGLine sender_sgline;
+	hybrid::senders::SGLineDel sender_sgline_del;
+	hybrid::senders::SVSHold sender_svshold;
+	hybrid::senders::SVSHoldDel sender_svsholddel;
+
+	ratbox::senders::Login sender_login;
+	ratbox::senders::Logout sender_logout;
+	ratbox::senders::SQLine sender_sqline;
+	ratbox::senders::SQLineDel sender_sqline_del;
+	ratbox::senders::SVSNick sender_svsnick;
+	ratbox::senders::Topic sender_topic;
+	ratbox::senders::Wallops sender_wallops;
+
+	charybdis::senders::NickIntroduction sender_nickintroduction;
+	charybdis::senders::SASL sender_sasl;
+	charybdis::senders::SASLMechanisms sender_sasl_mechs;
+	charybdis::senders::SVSLogin sender_svslogin;
+	charybdis::senders::VhostDel sender_vhost_del;
+	charybdis::senders::VhostSet sender_vhost_set;
+
 	bool use_server_side_mlock;
 
  public:
@@ -322,7 +354,51 @@ class ProtoCharybdis : public Module
 		, message_tb(this)
 		, message_tmode(this)
 		, message_uid(this)
+
+		, sender_akill(this)
+		, sender_akill_del(this)
+		, sender_channel(this)
+		, sender_global_notice(this)
+		, sender_global_privmsg(this)
+		, sender_invite(this)
+		, sender_join(this)
+		, sender_kick(this)
+		, sender_svskill(this)
+		, sender_login(this)
+		, sender_logout(this)
+		, sender_mode_chan(this)
+		, sender_mode_user(this)
+		, sender_nickchange(this)
+		, sender_nickintroduction(this)
+		, sender_notice(this)
+		, sender_part(this)
+		, sender_ping(this)
+		, sender_pong(this)
+		, sender_privmsg(this)
+		, sender_quit(this)
+		, sender_server(this)
+		, sender_sasl(this)
+		, sender_sasl_mechs(this)
+		, sender_sgline(this)
+		, sender_sgline_del(this)
+		, sender_sqline(this)
+		, sender_sqline_del(this)
+		, sender_squit(this)
+		, sender_svshold(this)
+		, sender_svsholddel(this)
+		, sender_svslogin(this)
+		, sender_svsnick(this)
+		, sender_topic(this)
+		, sender_vhost_del(this)
+		, sender_vhost_set(this)
+		, sender_wallops(this)
 	{
+		IRCD = &ircd_proto;
+	}
+
+	~ProtoCharybdis()
+	{
+		IRCD = nullptr;
 	}
 
 	void OnReload(Configuration::Conf *conf) override

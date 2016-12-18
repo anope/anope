@@ -18,134 +18,14 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
-/* Dependencies: anope_protocol.rfc1459 */
+/* Dependencies: anope_protocol.rfc1459,anope_protocol.ts6 */
 
 #include "module.h"
 #include "modules/protocol/hybrid.h"
 
 static Anope::string UplinkSID;
 
-
-ServiceBot *hybrid::Proto::FindIntroduced()
-{
-	ServiceBot *bi = Config->GetClient("OperServ");
-	if (bi && bi->introduced)
-		return bi;
-
-	for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-	{
-		User *u = it->second;
-		if (u->type == UserType::BOT)
-		{
-			bi = anope_dynamic_static_cast<ServiceBot *>(u);
-			if (bi->introduced)
-				return bi;
-		}
-	}
-
-	return NULL;
-}
-
-void hybrid::Proto::SendSVSKill(const MessageSource &source, User *u, const Anope::string &buf)
-{
-	IRCDProto::SendSVSKill(source, u, buf);
-	u->KillInternal(source, buf);
-}
-
-hybrid::Proto::Proto(Module *creator) : IRCDProto(creator, "Hybrid 8.2.x")
-{
-	DefaultPseudoclientModes = "+oi";
-	CanSVSNick = true;
-	CanSVSHold = true;
-	CanSVSJoin = true;
-	CanSNLine = true;
-	CanSQLine = true;
-	CanSQLineChannel = true;
-	CanSZLine = true;
-	CanCertFP = true;
-	CanSetVHost = true;
-	RequiresID = true;
-	MaxModes = 6;
-}
-
-void hybrid::Proto::SendInvite(const MessageSource &source, Channel *c, User *u)
-{
-	Uplink::Send(source, "INVITE", u->GetUID(), c->name, c->creation_time);
-}
-
-void hybrid::Proto::SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg)
-{
-	Uplink::Send(bi, "NOTICE", "$$" + dest->GetName(), msg);
-}
-
-void hybrid::Proto::SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg)
-{
-	Uplink::Send(bi, "PRIVMSG", "$$" + dest->GetName(), msg);
-}
-
-void hybrid::Proto::SendSQLine(User *, XLine *x)
-{
-	Uplink::Send(FindIntroduced(), "RESV", "*", x->GetExpires() ? x->GetExpires() - Anope::CurTime : 0, x->GetMask(), x->GetReason());
-}
-
-void hybrid::Proto::SendSGLineDel(XLine *x)
-{
-	Uplink::Send(Config->GetClient("OperServ"), "UNXLINE", "*", x->GetMask());
-}
-
-void hybrid::Proto::SendSGLine(User *, XLine *x)
-{
-	Uplink::Send(Config->GetClient("OperServ"), "XLINE", "*", x->GetMask(), x->GetExpires() ? x->GetExpires() - Anope::CurTime : 0, x->GetReason());
-}
-
-void hybrid::Proto::SendSZLineDel(XLine *x)
-{
-	Uplink::Send(Config->GetClient("OperServ"), "UNDLINE", "*", x->GetHost());
-}
-
-void hybrid::Proto::SendSZLine(User *, XLine *x)
-{
-	/* Calculate the time left before this would expire, capping it at 2 days */
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
-
-	Uplink::Send(Config->GetClient("OperServ"), "DLINE", "*", timeleft, x->GetHost(), x->GetReason());
-}
-
-void hybrid::Proto::SendAkillDel(XLine *x)
-{
-	if (x->IsRegex() || x->HasNickOrReal())
-		return;
-
-	Uplink::Send(Config->GetClient("OperServ"), "UNKLINE", "*", x->GetUser(), x->GetHost());
-}
-
-void hybrid::Proto::SendSQLineDel(XLine *x)
-{
-	Uplink::Send(Config->GetClient("OperServ"), "UNRESV", "*", x->GetMask());
-}
-
-void hybrid::Proto::SendJoin(User *u, Channel *c, const ChannelStatus *status)
-{
-	/*
-	 * Note that we must send our modes with the SJOIN and can not add them to the
-	 * mode stacker because ircd-hybrid does not allow *any* client to op itself
-	 */
-	Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), (status != NULL ? status->BuildModePrefixList() : "") + u->GetUID());
-
-	/* And update our internal status for this user since this is not going through our mode handling system */
-	if (status)
-	{
-		ChanUserContainer *uc = c->FindUser(u);
-
-		if (uc)
-			uc->status = *status;
-	}
-}
-
-void hybrid::Proto::SendAkill(User *u, XLine *x)
+void hybrid::senders::Akill::Send(User* u, XLine* x)
 {
 	if (x->IsRegex() || x->HasNickOrReal())
 	{
@@ -157,7 +37,7 @@ void hybrid::Proto::SendAkill(User *u, XLine *x)
 			 */
 			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 				if (x->GetManager()->Check(it->second, x))
-					this->SendAkill(it->second, x);
+					this->Send(it->second, x);
 
 			return;
 		}
@@ -191,15 +71,214 @@ void hybrid::Proto::SendAkill(User *u, XLine *x)
 	Uplink::Send(Config->GetClient("OperServ"), "KLINE", timeleft, x->GetUser(), x->GetHost(), x->GetReason());
 }
 
-void hybrid::Proto::SendServer(Server *server)
+void hybrid::senders::AkillDel::Send(XLine* x)
 {
-	if (server == Me)
-		Uplink::Send("SERVER", server->GetName(), server->GetHops() + 1, server->GetDescription());
-	else
-		Uplink::Send(Me, "SID", server->GetName(), server->GetHops() + 1, server->GetSID(), server->GetDescription());
+	if (x->IsRegex() || x->HasNickOrReal())
+		return;
+
+	Uplink::Send(Config->GetClient("OperServ"), "UNKLINE", "*", x->GetUser(), x->GetHost());
 }
 
-void hybrid::Proto::SendConnect()
+void hybrid::senders::MessageChannel::Send(Channel* c)
+{
+	Anope::string modes = c->GetModes(true, true);
+
+	if (modes.empty())
+		modes = "+";
+
+	Uplink::Send("SJOIN", c->creation_time, c->name, modes, "");
+}
+
+void hybrid::senders::GlobalNotice::Send(const MessageSource &source, Server *dest, const Anope::string &msg)
+{
+	Uplink::Send(source, "NOTICE", "$$" + dest->GetName(), msg);
+}
+
+void hybrid::senders::GlobalPrivmsg::Send(const MessageSource& source, Server* dest, const Anope::string& msg)
+{
+	Uplink::Send(source, "PRIVMSG", "$$" + dest->GetName(), msg);
+}
+
+void hybrid::senders::Invite::Send(const MessageSource &source, Channel *chan, User *user)
+{
+	Uplink::Send(source, "INVITE", user->GetUID(), chan->name, chan->creation_time);
+}
+
+void hybrid::senders::Join::Send(User* u, Channel* c, const ChannelStatus* status)
+{
+	/*
+	 * Note that we must send our modes with the SJOIN and can not add them to the
+	 * mode stacker because ircd-hybrid does not allow *any* client to op itself
+	 */
+	Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), (status != NULL ? status->BuildModePrefixList() : "") + u->GetUID());
+
+	/* And update our internal status for this user since this is not going through our mode handling system */
+	if (status)
+	{
+		ChanUserContainer *uc = c->FindUser(u);
+
+		if (uc)
+			uc->status = *status;
+	}
+}
+
+void hybrid::senders::Login::Send(User *u, NickServ::Nick *na)
+{
+	IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", na->GetAccount()->GetDisplay());
+}
+
+void hybrid::senders::Logout::Send(User *u)
+{
+	IRCD->SendMode(Config->GetClient("NickServ"), u, "+d *");
+}
+
+void hybrid::senders::ModeUser::Send(const MessageSource &source, User *user, const Anope::string &modes)
+{
+	IRCMessage message(source, "SVSMODE", user->GetUID(), user->timestamp);
+	message.TokenizeAndPush(modes);
+	Uplink::SendMessage(message);
+}
+
+void hybrid::senders::NickIntroduction::Send(User *user)
+{
+	Anope::string modes = "+" + user->GetModes();
+	Uplink::Send(Me, "UID", user->nick, 1, user->timestamp, modes, user->GetIdent(), user->host, "0.0.0.0", user->GetUID(), "*", user->realname);
+}
+
+void hybrid::senders::MessageServer::Send(Server* server)
+{
+	Uplink::Send(Me, "SID", server->GetName(), server->GetHops() + 1, server->GetSID(), server->GetDescription());
+}
+
+void hybrid::senders::SGLine::Send(User*, XLine* x)
+{
+	Uplink::Send(Config->GetClient("OperServ"), "XLINE", "*", x->GetMask(), x->GetExpires() ? x->GetExpires() - Anope::CurTime : 0, x->GetReason());
+}
+
+void hybrid::senders::SGLineDel::Send(XLine* x)
+{
+	Uplink::Send(Config->GetClient("OperServ"), "UNXLINE", "*", x->GetMask());
+}
+
+void hybrid::senders::SQLine::Send(User*, XLine* x)
+{
+#warning "findintroduced"
+	//Uplink::Send(FindIntroduced(), "RESV", "*", x->GetExpires() ? x->GetExpires() - Anope::CurTime : 0, x->GetMask(), x->GetReason());
+}
+
+void hybrid::senders::SQLineDel::Send(XLine* x)
+{
+	Uplink::Send(Config->GetClient("OperServ"), "UNRESV", "*", x->GetMask());
+}
+
+void hybrid::senders::SZLine::Send(User*, XLine* x)
+{
+	/* Calculate the time left before this would expire, capping it at 2 days */
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+
+	Uplink::Send(Config->GetClient("OperServ"), "DLINE", "*", timeleft, x->GetHost(), x->GetReason());
+}
+
+void hybrid::senders::SZLineDel::Send(XLine* x)
+{
+	Uplink::Send(Config->GetClient("OperServ"), "UNDLINE", "*", x->GetHost());
+}
+
+void hybrid::senders::SVSHold::Send(const Anope::string&, time_t)
+{
+#if 0
+	XLine x(nick, Me->GetName(), Anope::CurTime + t, "Being held for registered user");
+	this->SendSQLine(NULL, &x);
+#endif
+}
+
+#warning "xline on stack"
+void hybrid::senders::SVSHoldDel::Send(const Anope::string&)
+{
+#if 0
+	XLine x(nick);
+	this->SendSQLineDel(&x);
+#endif
+}
+
+void hybrid::senders::SVSJoin::Send(const MessageSource& source, User* u, const Anope::string& chan, const Anope::string& key)
+{
+	Uplink::Send(source, "SVSJOIN", u->GetUID(), chan);
+}
+
+void hybrid::senders::SVSNick::Send(User* u, const Anope::string& newnick, time_t ts)
+{
+	Uplink::Send(Me, "SVSNICK", u->GetUID(), newnick, ts);
+}
+
+void hybrid::senders::SVSPart::Send(const MessageSource& source, User* u, const Anope::string& chan, const Anope::string& reason)
+{
+	if (!reason.empty())
+		Uplink::Send(source, "SVSPART", u->GetUID(), chan, reason);
+	else
+		Uplink::Send(source, "SVSPART", u->GetUID(), chan);
+}
+
+void hybrid::senders::Topic::Send(const MessageSource &source, Channel *channel, const Anope::string &topic, time_t topic_ts, const Anope::string &topic_setter)
+{
+	Uplink::Send(source, "TBURST", channel->creation_time, channel->name, topic_ts, topic_setter, topic);
+}
+
+void hybrid::senders::VhostDel::Send(User* u)
+{
+	u->RemoveMode(Config->GetClient("HostServ"), "CLOAK", u->host);
+}
+
+void hybrid::senders::VhostSet::Send(User* u, const Anope::string& vident, const Anope::string& vhost)
+{
+	u->SetMode(Config->GetClient("HostServ"), "CLOAK", vhost);
+}
+
+void hybrid::senders::Wallops::Send(const MessageSource &source, const Anope::string &msg)
+{
+	Uplink::Send(source, "GLOBOPS", msg);
+}
+
+ServiceBot *hybrid::Proto::FindIntroduced()
+{
+	ServiceBot *bi = Config->GetClient("OperServ");
+	if (bi && bi->introduced)
+		return bi;
+
+	for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+	{
+		User *u = it->second;
+		if (u->type == UserType::BOT)
+		{
+			bi = anope_dynamic_static_cast<ServiceBot *>(u);
+			if (bi->introduced)
+				return bi;
+		}
+	}
+
+	return NULL;
+}
+
+hybrid::Proto::Proto(Module *creator) : ts6::Proto(creator, "Hybrid 8.2.x")
+{
+	DefaultPseudoclientModes = "+oi";
+	CanSVSNick = true;
+	CanSVSHold = true;
+	CanSVSJoin = true;
+	CanSNLine = true;
+	CanSQLine = true;
+	CanSQLineChannel = true;
+	CanSZLine = true;
+	CanCertFP = true;
+	CanSetVHost = true;
+	RequiresID = true;
+	MaxModes = 6;
+}
+
+void hybrid::Proto::Handshake()
 {
 	Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
 
@@ -219,16 +298,9 @@ void hybrid::Proto::SendConnect()
 	 */
 	Uplink::Send("CAPAB", "QS EX CHW IE ENCAP TBURST SVS HOPS EOB");
 
-	SendServer(Me);
+	Uplink::Send("SERVER", Me->GetName(), Me->GetHops() + 1, Me->GetDescription());
 
 	Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
-}
-
-void hybrid::Proto::SendClientIntroduction(User *u)
-{
-	Anope::string modes = "+" + u->GetModes();
-
-	Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, "0.0.0.0", u->GetUID(), "*", u->realname);
 }
 
 void hybrid::Proto::SendEOB()
@@ -236,86 +308,9 @@ void hybrid::Proto::SendEOB()
 	Uplink::Send(Me, "EOB");
 }
 
-void hybrid::Proto::SendMode(const MessageSource &source, User *u, const Anope::string &buf)
-{
-	IRCMessage message(source, "SVSMODE", u->GetUID(), u->timestamp);
-	message.TokenizeAndPush(buf);
-	Uplink::SendMessage(message);
-}
-
-void hybrid::Proto::SendLogin(User *u, NickServ::Nick *na)
-{
-	IRCD->SendMode(Config->GetClient("NickServ"), u, "+d {0}", na->GetAccount()->GetDisplay());
-}
-
-void hybrid::Proto::SendLogout(User *u)
-{
-	IRCD->SendMode(Config->GetClient("NickServ"), u, "+d *");
-}
-
-void hybrid::Proto::SendChannel(Channel *c)
-{
-	Anope::string modes = c->GetModes(true, true);
-
-	if (modes.empty())
-		modes = "+";
-
-	Uplink::Send("SJOIN", c->creation_time, c->name, modes, "");
-}
-
-void hybrid::Proto::SendTopic(const MessageSource &source, Channel *c)
-{
-	Uplink::Send(source, "TBURST", c->creation_time, c->name, c->topic_ts, c->topic_setter, c->topic);
-}
-
-void hybrid::Proto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
-{
-	Uplink::Send(Me, "SVSNICK", u->GetUID(), newnick, when);
-}
-
-void hybrid::Proto::SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &)
-{
-	Uplink::Send(source, "SVSJOIN", u->GetUID(), chan);
-}
-
-void hybrid::Proto::SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param)
-{
-	if (!param.empty())
-		Uplink::Send(source, "SVSPART", u->GetUID(), chan, param);
-	else
-		Uplink::Send(source, "SVSPART", u->GetUID(), chan);
-}
-
-void hybrid::Proto::SendSVSHold(const Anope::string &nick, time_t t)
-{
-#if 0
-	XLine x(nick, Me->GetName(), Anope::CurTime + t, "Being held for registered user");
-	this->SendSQLine(NULL, &x);
-#endif
-}
-#warning "xline on stack"
-
-void hybrid::Proto::SendSVSHoldDel(const Anope::string &nick)
-{
-#if 0
-	XLine x(nick);
-	this->SendSQLineDel(&x);
-#endif
-}
-
-void hybrid::Proto::SendVhost(User *u, const Anope::string &ident, const Anope::string &host)
-{
-	u->SetMode(Config->GetClient("HostServ"), "CLOAK", host);
-}
-
-void hybrid::Proto::SendVhostDel(User *u)
-{
-	u->RemoveMode(Config->GetClient("HostServ"), "CLOAK", u->host);
-}
-
 bool hybrid::Proto::IsIdentValid(const Anope::string &ident)
 {
-	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
+	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned int>("userlen"))
 		return false;
 
 	Anope::string chars = "~}|{ `_^]\\[ .-$";
@@ -410,7 +405,7 @@ void hybrid::ServerMessage::Run(MessageSource &source, const std::vector<Anope::
 
 	new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
 
-	IRCD->SendPing(Me->GetName(), params[0]);
+	IRCD->Send<messages::Ping>(Me->GetName(), params[0]);
 }
 
 void hybrid::SID::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -425,7 +420,7 @@ void hybrid::SID::Run(MessageSource &source, const std::vector<Anope::string> &p
 
 	new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[3], params[2]);
 
-	IRCD->SendPing(Me->GetName(), params[0]);
+	IRCD->Send<messages::Ping>(Me->GetName(), params[0]);
 }
 
 void hybrid::SJoin::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -621,6 +616,45 @@ class ProtoHybrid : public Module
 	hybrid::TMode message_tmode;
 	hybrid::UID message_uid;
 
+	/* Core message senders */
+	rfc1459::senders::Kick sender_kick;
+	rfc1459::senders::Kill sender_svskill;
+	rfc1459::senders::ModeChannel sender_mode_chan;
+	rfc1459::senders::NickChange sender_nickchange;
+	rfc1459::senders::Notice sender_notice;
+	rfc1459::senders::Part sender_part;
+	rfc1459::senders::Ping sender_ping;
+	rfc1459::senders::Pong sender_pong;
+	rfc1459::senders::Privmsg sender_privmsg;
+	rfc1459::senders::Quit sender_quit;
+	rfc1459::senders::SQuit sender_squit;
+
+	hybrid::senders::Akill sender_akill;
+	hybrid::senders::AkillDel sender_akill_del;
+	hybrid::senders::MessageChannel sender_channel;
+	hybrid::senders::GlobalNotice sender_global_notice;
+	hybrid::senders::GlobalPrivmsg sender_global_privmsg;
+	hybrid::senders::Invite sender_invite;
+	hybrid::senders::Join sender_join;
+	hybrid::senders::Login sender_login;
+	hybrid::senders::Logout sender_logout;
+	hybrid::senders::ModeUser sender_mode_user;
+	hybrid::senders::NickIntroduction sender_nickintroduction;
+	hybrid::senders::MessageServer sender_server;
+	hybrid::senders::SGLine sender_sgline;
+	hybrid::senders::SGLineDel sender_sgline_del;
+	hybrid::senders::SQLine sender_sqline;
+	hybrid::senders::SQLineDel sender_sqline_del;
+	hybrid::senders::SZLine sender_szline;
+	hybrid::senders::SZLineDel sender_szline_del;
+	hybrid::senders::SVSHold sender_svshold;
+	hybrid::senders::SVSHoldDel sender_svsholddel;
+	hybrid::senders::SVSNick sender_svsnick;
+	hybrid::senders::Topic sender_topic;
+	hybrid::senders::VhostDel sender_vhost_del;
+	hybrid::senders::VhostSet sender_vhost_set;
+	hybrid::senders::Wallops sender_wallops;
+
 public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
 		, EventHook<Event::UserNickChange>(this)
@@ -658,7 +692,50 @@ public:
 		, message_tmode(this)
 		, message_uid(this)
 		, message_certfp(this)
+
+		, sender_akill(this)
+		, sender_akill_del(this)
+		, sender_channel(this)
+		, sender_global_notice(this)
+		, sender_global_privmsg(this)
+		, sender_invite(this)
+		, sender_join(this)
+		, sender_kick(this)
+		, sender_svskill(this)
+		, sender_login(this)
+		, sender_logout(this)
+		, sender_mode_chan(this)
+		, sender_mode_user(this)
+		, sender_nickchange(this)
+		, sender_nickintroduction(this)
+		, sender_notice(this)
+		, sender_part(this)
+		, sender_ping(this)
+		, sender_pong(this)
+		, sender_privmsg(this)
+		, sender_quit(this)
+		, sender_server(this)
+		, sender_sgline(this)
+		, sender_sgline_del(this)
+		, sender_sqline(this)
+		, sender_sqline_del(this)
+		, sender_szline(this)
+		, sender_szline_del(this)
+		, sender_squit(this)
+		, sender_svshold(this)
+		, sender_svsholddel(this)
+		, sender_svsnick(this)
+		, sender_topic(this)
+		, sender_vhost_del(this)
+		, sender_vhost_set(this)
+		, sender_wallops(this)
 	{
+		IRCD = &ircd_proto;
+	}
+
+	~ProtoHybrid()
+	{
+		IRCD = nullptr;
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) override

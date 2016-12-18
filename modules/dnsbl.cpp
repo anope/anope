@@ -107,7 +107,7 @@ class DNSBLResolver : public Request
 		}
 		else
 		{
-			IRCD->SendAkill(NULL, x);
+			IRCD->Send<messages::Akill>(nullptr, x);
 			delete x;
 		}
 	}

@@ -231,7 +231,7 @@ class SASLService : public SASL::Service, public Timer
 		msg.type = mtype;
 		msg.data = data;
 
-		IRCD->SendSASLMessage(msg);
+		IRCD->Send<messages::SASL>(msg);
 	}
 
 	void Succeed(Session *session, NickServ::Account *nc) override
@@ -246,8 +246,8 @@ class SASLService : public SASL::Service, public Timer
 		}
 		else
 		{
-			HostServ::VHost *vhost = HostServ::FindVHost(na->GetAccount());
-			IRCD->SendSVSLogin(session->uid, nc->GetDisplay(), vhost ? vhost->GetIdent() : "", vhost ? vhost->GetHost() : "");
+			HostServ::VHost *vhost = HostServ::FindVHost(nc);
+			IRCD->Send<messages::SVSLogin>(session->uid, nc->GetDisplay(), vhost ? vhost->GetIdent() : "", vhost ? vhost->GetHost() : "");
 		}
 		this->SendMessage(session, "D", "S");
 	}
@@ -348,7 +348,7 @@ class ModuleSASL : public Module
 
 		// If we are connected to the network then broadcast the mechlist.
 		if (Me && Me->IsSynced())
-			IRCD->SendSASLMechanisms(mechs);
+			IRCD->Send<messages::SASLMechanisms>(mechs);
 	}
 
  public:
@@ -386,7 +386,7 @@ class ModuleSASL : public Module
 	void OnPreUplinkSync(Server *) override
 	{
 		// We have not yet sent a mechanism list so always do it here.
-		IRCD->SendSASLMechanisms(mechs);
+		IRCD->Send<messages::SASLMechanisms>(mechs);
 	}
 };
 

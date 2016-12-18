@@ -50,7 +50,7 @@ class CommandOSNOOP : public Command
 		if (cmd.equals_ci("SET"))
 		{
 			/* Remove the O:lines */
-			IRCD->SendSVSNOOP(s, true);
+			IRCD->Send<messages::NOOP>(s, true);
 			s->Extend<Anope::string>("noop", source.GetNick());
 
 			Log(LOG_ADMIN, source, this) << "SET on " << s->GetName();
@@ -69,7 +69,7 @@ class CommandOSNOOP : public Command
 		else if (cmd.equals_ci("REVOKE"))
 		{
 			s->Shrink<Anope::string>("noop");
-			IRCD->SendSVSNOOP(s, false);
+			IRCD->Send<messages::NOOP>(s, false);
 			Log(LOG_ADMIN, source, this) << "REVOKE on " << s->GetName();
 			source.Reply(_("All O:lines of \002{0}\002 have been reset."), s->GetName());
 		}

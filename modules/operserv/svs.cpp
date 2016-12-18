@@ -69,7 +69,7 @@ class CommandOSSVSNick : public Command
 
 		source.Reply(_("\002{0}\002 is now being changed to \002{1}\002."), nick, newnick);
 		Log(LOG_ADMIN, source, this) << "to change " << nick << " to " << newnick;
-		IRCD->SendForceNickChange(u2, newnick, Anope::CurTime);
+		IRCD->Send<messages::SVSNick>(u2, newnick, Anope::CurTime);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -122,7 +122,7 @@ class CommandOSSVSJoin : public Command
 			return;
 		}
 
-		IRCD->SendSVSJoin(*source.service, target, params[1], "");
+		IRCD->Send<messages::SVSJoin>(*source.service, target, params[1], "");
 		Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to join " << params[1];
 		source.Reply(_("\002{0}\002 has been joined to \002{1}\002."), target->nick, params[1]);
 	}
@@ -178,7 +178,7 @@ class CommandOSSVSPart : public Command
 		}
 
 		const Anope::string &reason = params.size() > 2 ? params[2] : "";
-		IRCD->SendSVSPart(*source.service, target, params[1], reason);
+		IRCD->Send<messages::SVSPart>(*source.service, target, params[1], reason);
 		if (!reason.empty())
 			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name << " with reason " << reason;
 		else

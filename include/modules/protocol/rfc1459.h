@@ -22,6 +22,165 @@
 namespace rfc1459
 {
 
+namespace senders
+{
+
+class GlobalNotice : public messages::GlobalNotice
+{
+ public:
+	using messages::GlobalNotice::GlobalNotice;
+
+	void Send(const MessageSource &, Server *dest, const Anope::string &msg) override;
+};
+
+class GlobalPrivmsg : public messages::GlobalPrivmsg
+{
+ public:
+	using messages::GlobalPrivmsg::GlobalPrivmsg;
+
+	void Send(const MessageSource &, Server *dest, const Anope::string &msg) override;
+};
+
+class Invite : public messages::Invite
+{
+ public:
+	using messages::Invite::Invite;
+
+	void Send(const MessageSource &source, Channel *chan, User *user) override;
+};
+
+class Join : public messages::Join
+{
+ public:
+	using messages::Join::Join;
+
+	void Send(User *u, Channel *c, const ChannelStatus *status) override;
+};
+
+class Kick : public messages::Kick
+{
+ public:
+	using messages::Kick::Kick;
+
+	void Send(const MessageSource &source, Channel *chan, User *user, const Anope::string &reason) override;
+};
+
+class Kill : public messages::Kill
+{
+ public:
+	using messages::Kill::Kill;
+
+	void Send(const MessageSource &source, const Anope::string &target, const Anope::string &reason) override;
+
+	void Send(const MessageSource &source, User *user, const Anope::string &reason) override;
+};
+
+class ModeChannel : public messages::ModeChannel
+{
+ public:
+	using messages::ModeChannel::ModeChannel;
+
+	void Send(const MessageSource &source, Channel *channel, const Anope::string &modes) override;
+};
+
+class ModeUser : public messages::ModeUser
+{
+ public:
+	using messages::ModeUser::ModeUser;
+
+	void Send(const MessageSource &source, User *user, const Anope::string &modes) override;
+};
+
+class NickChange : public messages::NickChange
+{
+ public:
+	using messages::NickChange::NickChange;
+
+	void Send(User *u, const Anope::string &newnick, time_t ts) override;
+};
+
+class Notice : public messages::Notice
+{
+ public:
+	using messages::Notice::Notice;
+
+	void Send(const MessageSource &source, const Anope::string &dest, const Anope::string &msg) override;
+};
+
+class Part : public messages::Part
+{
+ public:
+	using messages::Part::Part;
+
+	void Send(User *, Channel *chan, const Anope::string &reason) override;
+};
+
+class Ping : public messages::Ping
+{
+ public:
+	using messages::Ping::Ping;
+
+	void Send(const Anope::string &servname, const Anope::string &who) override;
+};
+
+class Pong : public messages::Pong
+{
+ public:
+	using messages::Pong::Pong;
+
+	void Send(const Anope::string &servname, const Anope::string &who) override;
+};
+
+class Privmsg : public messages::Privmsg
+{
+ public:
+	using messages::Privmsg::Privmsg;
+
+	void Send(const MessageSource &source, const Anope::string &dest, const Anope::string &msg) override;
+};
+
+class Quit : public messages::Quit
+{
+ public:
+	using messages::Quit::Quit;
+
+	void Send(User *user, const Anope::string &reason) override;
+};
+
+class MessageServer : public messages::MessageServer
+{
+ public:
+	using messages::MessageServer::MessageServer;
+
+	void Send(Server *server) override;
+};
+
+class SQuit : public messages::SQuit
+{
+ public:
+	using messages::SQuit::SQuit;
+
+	void Send(Server *s, const Anope::string &message) override;
+};
+
+class Topic : public messages::Topic
+{
+ public:
+	using messages::Topic::Topic;
+
+	void Send(const MessageSource &source, Channel *channel, const Anope::string &topic, time_t topic_ts, const Anope::string &topic_setter) override;
+};
+
+class Wallops : public messages::Wallops
+{
+ public:
+	using messages::Wallops::Wallops;
+
+	void Send(const MessageSource &, const Anope::string &msg) override;
+};
+
+} // namespace senders
+
 class Away : public IRCDMessage
 {
  public:

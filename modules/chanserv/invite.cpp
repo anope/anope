@@ -78,7 +78,7 @@ class CommandCSInvite : public Command
 
 		bool override = !source.AccessFor(ci).HasPriv("INVITE");
 
-		IRCD->SendInvite(ci->WhoSends(), c, u2);
+		IRCD->Send<messages::Invite>(ci->WhoSends(), c, u2);
 		if (u2 != u)
 		{
 			source.Reply(_("\002{0}\002 has been invited to \002{1}\002."), u2->nick, c->name);

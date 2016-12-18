@@ -28,136 +28,20 @@
 #include "channels.h"
 #include "numeric.h"
 
-IRCDProto *IRCD = NULL;
+IRCDProto *IRCD = nullptr;
 
-IRCDProto::IRCDProto(Module *creator, const Anope::string &p) : Service(creator, "IRCDProto", creator->name), proto_name(p)
+IRCDProto::IRCDProto(Module *creator, const Anope::string &p) : Service(creator, NAME, p)
+	, proto_name(p)
 {
-	if (IRCD == NULL)
-		IRCD = this;
 }
 
 IRCDProto::~IRCDProto()
 {
-	if (IRCD == this)
-		IRCD = NULL;
 }
 
 const Anope::string &IRCDProto::GetProtocolName() const
 {
 	return this->proto_name;
-}
-
-static inline char nextID(int pos, Anope::string &buf)
-{
-	char &c = buf[pos];
-	if (c == 'Z')
-		c = '0';
-	else if (c != '9')
-		++c;
-	else if (pos)
-		c = 'A';
-	else
-		c = '0';
-	return c;
-}
-
-Anope::string IRCDProto::UID_Retrieve()
-{
-	if (!IRCD || !IRCD->RequiresID)
-		return "";
-
-	static Anope::string current_uid = "AAAAAA";
-
-	do
-	{
-		int current_len = current_uid.length() - 1;
-		while (current_len >= 0 && nextID(current_len--, current_uid) == 'A');
-	}
-	while (User::Find(Me->GetSID() + current_uid) != NULL);
-
-	return Me->GetSID() + current_uid;
-}
-
-Anope::string IRCDProto::SID_Retrieve()
-{
-	if (!IRCD || !IRCD->RequiresID)
-		return "";
-
-	static Anope::string current_sid = Config->GetBlock("serverinfo")->Get<Anope::string>("id");
-	if (current_sid.empty())
-		current_sid = "00A";
-
-	do
-	{
-		int current_len = current_sid.length() - 1;
-		while (current_len >= 0 && nextID(current_len--, current_sid) == 'A');
-	}
-	while (Server::Find(current_sid) != NULL);
-
-	return current_sid;
-}
-
-void IRCDProto::SendKill(const MessageSource &source, const Anope::string &target, const Anope::string &reason)
-{
-	Uplink::Send(source, "KILL", target, reason);
-}
-
-void IRCDProto::SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf)
-{
-	Uplink::Send(source, "KILL", user->GetUID(), buf);
-}
-
-void IRCDProto::SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf)
-{
-	IRCMessage message(source, "MODE", dest->name);
-	message.TokenizeAndPush(buf);
-	Uplink::SendMessage(message);
-}
-
-void IRCDProto::SendMode(const MessageSource &source, User *dest, const Anope::string &buf)
-{
-	IRCMessage message(source, "MODE", dest->GetUID());
-	message.TokenizeAndPush(buf);
-	Uplink::SendMessage(message);
-}
-
-void IRCDProto::SendKick(const MessageSource &source, Channel *c, User *u, const Anope::string &r)
-{
-	if (!r.empty())
-		Uplink::Send(source, "KICK", c->name, u->GetUID(), r);
-	else
-		Uplink::Send(source, "KICK", c->name, u->GetUID());
-}
-
-void IRCDProto::SendNotice(const MessageSource &source, const Anope::string &dest, const Anope::string &msg)
-{
-	Uplink::Send(source, "NOTICE", dest, msg);
-}
-
-void IRCDProto::SendPrivmsg(const MessageSource &source, const Anope::string &dest, const Anope::string &buf)
-{
-	Uplink::Send(source, "PRIVMSG", dest, buf);
-}
-
-void IRCDProto::SendQuit(User *u, const Anope::string &buf)
-{
-	if (!buf.empty())
-		Uplink::Send(u, "QUIT", buf);
-	else
-		Uplink::Send(u, "QUIT");
-}
-
-void IRCDProto::SendPart(User *u, Channel *chan, const Anope::string &buf)
-{
-	if (!buf.empty())
-		Uplink::Send(u, "PART", chan->name, buf);
-	else
-		Uplink::Send(u, "PART", chan->name);
-}
-
-void IRCDProto::SendGlobops(const MessageSource &source, const Anope::string &buf)
-{
-	Uplink::Send(source, "GLOBOPS", buf);
 }
 
 void IRCDProto::SendCTCPReply(const MessageSource &source, const Anope::string &dest, const Anope::string &buf)
@@ -171,11 +55,6 @@ void IRCDProto::SendNumeric(int numeric, User *dest, IRCMessage &message)
 	Uplink::SendMessage(message);
 }
 
-void IRCDProto::SendTopic(const MessageSource &source, Channel *c)
-{
-	Uplink::Send(source, "TOPIC", c->name, c->topic);
-}
-
 void IRCDProto::SendAction(const MessageSource &source, const Anope::string &dest, const Anope::string &message)
 {
 	Anope::string actionbuf = "\1ACTION ";
@@ -183,42 +62,6 @@ void IRCDProto::SendAction(const MessageSource &source, const Anope::string &des
 	actionbuf.append('\1');
 
 	SendPrivmsg(source, dest, actionbuf);
-}
-
-void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who)
-{
-	if (servname.empty())
-		Uplink::Send(Me, "PING", who);
-	else
-		Uplink::Send(Me, "PING", servname, who);
-}
-
-void IRCDProto::SendPong(const Anope::string &servname, const Anope::string &who)
-{
-	if (servname.empty())
-		Uplink::Send(Me, "PONG", who);
-	else
-		Uplink::Send(Me, "PONG", servname, who);
-}
-
-void IRCDProto::SendInvite(const MessageSource &source, Channel *c, User *u)
-{
-	Uplink::Send(source, "INVITE", u->GetUID(), c->name);
-}
-
-void IRCDProto::SendSquit(Server *s, const Anope::string &message)
-{
-	Uplink::Send("SQUIT", s->GetSID(), message);
-}
-
-void IRCDProto::SendNickChange(User *u, const Anope::string &newnick)
-{
-	Uplink::Send(u, "NICK", newnick, Anope::CurTime);
-}
-
-void IRCDProto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
-{
-	Uplink::Send(u, "SVSNICK", u->GetUID(), newnick, when);
 }
 
 bool IRCDProto::IsNickValid(const Anope::string &nick)
@@ -236,7 +79,7 @@ bool IRCDProto::IsNickValid(const Anope::string &nick)
 
 	Anope::string special = "[]\\`_^{|}";
 
-	for (unsigned i = 0; i < nick.length(); ++i)
+	for (unsigned int i = 0; i < nick.length(); ++i)
 		if (!(nick[i] >= 'A' && nick[i] <= 'Z') && !(nick[i] >= 'a' && nick[i] <= 'z')
 		  && special.find(nick[i]) == Anope::string::npos
 		  && (Config && Config->NickChars.find(nick[i]) == Anope::string::npos)
@@ -262,7 +105,7 @@ bool IRCDProto::IsIdentValid(const Anope::string &ident)
 	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
 		return false;
 
-	for (unsigned i = 0; i < ident.length(); ++i)
+	for (unsigned int i = 0; i < ident.length(); ++i)
 	{
 		const char &c = ident[i];
 
@@ -289,7 +132,7 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 		return false;
 
 	int dots = 0;
-	for (unsigned i = 0; i < host.length(); ++i)
+	for (unsigned int i = 0; i < host.length(); ++i)
 	{
 		if (host[i] == '.')
 			++dots;
@@ -298,12 +141,6 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 	}
 
 	return dots > 0 || Config->GetBlock("networkinfo")->Get<bool>("allow_undotted_vhosts");
-}
-
-void IRCDProto::SendOper(User *u)
-{
-	SendNumeric(RPL_YOUREOPER, u, "You are now an IRC operator (set by services)");
-	u->SetMode(NULL, "OPER");
 }
 
 unsigned int IRCDProto::GetMaxListFor(Channel *c)
@@ -376,7 +213,9 @@ Server *MessageSource::GetServer() const
 	return this->s;
 }
 
-IRCDMessage::IRCDMessage(Module *o, const Anope::string &n, unsigned int p) : Service(o, "IRCDMessage", o->name + "/" + n.lower()), name(n), param_count(p)
+IRCDMessage::IRCDMessage(Module *o, const Anope::string &n, unsigned int p) : Service(o, NAME, o->name + "/" + n.lower())
+	, name(n)
+	, param_count(p)
 {
 }
 

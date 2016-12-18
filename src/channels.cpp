@@ -789,7 +789,7 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	this->topic_setter = user;
 	this->topic_ts = ts;
 
-	IRCD->SendTopic(this->ci->WhoSends(), this);
+	IRCD->Send<messages::Topic>(this->ci->WhoSends(), this, newtopic, ts, user);
 
 	/* Now that the topic is set update the time set. This is *after* we set it so the protocol modules are able to tell the old last set time */
 	this->topic_time = Anope::CurTime;

@@ -105,7 +105,7 @@ UplinkSocket::~UplinkSocket()
 			}
 		}
 
-		IRCD->SendSquit(Me, Anope::QuitReason);
+		IRCD->Send<messages::SQuit>(Me, Anope::QuitReason);
 
 		this->ProcessWrite(); // Write out the last bit
 	}
@@ -155,7 +155,7 @@ bool UplinkSocket::ProcessRead()
 void UplinkSocket::OnConnect()
 {
 	Log(LOG_TERMINAL) << "Successfully connected to uplink #" << (Anope::CurrentUplink + 1) << " " << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port;
-	IRCD->SendConnect();
+	IRCD->Handshake();
 	EventManager::Get()->Dispatch(&Event::ServerConnect::OnServerConnect);
 }
 

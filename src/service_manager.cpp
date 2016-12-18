@@ -21,6 +21,7 @@
 #include "services.h"
 #include "service.h"
 #include "logger.h"
+#include "modules.h"
 
 ServiceManager *ServiceManager::manager = nullptr;
 
@@ -79,7 +80,7 @@ void ServiceManager::Register(Service *service)
 		Service *s = FindService(service->GetType(), service->GetName());
 
 		if (s != nullptr)
-			throw ModuleException("Service of type " + service->GetType() + " with name " + service->GetName() + " already exists");
+			throw ModuleException("Service of type " + service->GetType() + " with name " + service->GetName() + " already exists from " + service->GetOwner()->name);
 	}
 
 	Log(LOG_DEBUG_3) << "Service registered: " << service->GetType() << " " << service->GetName() << " address " << static_cast<void *>(this) << " by " << service->GetOwner();

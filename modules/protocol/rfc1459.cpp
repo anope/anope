@@ -23,6 +23,146 @@
 
 using namespace rfc1459;
 
+void senders::GlobalNotice::Send(const MessageSource &source, Server *dest, const Anope::string &msg)
+{
+	Uplink::Send(source, "NOTICE", "$" + dest->GetName(), msg);
+}
+
+void senders::GlobalPrivmsg::Send(const MessageSource& source, Server* dest, const Anope::string& msg)
+{
+	Uplink::Send(source, "PRIVMSG", "$" + dest->GetName(), msg);
+}
+
+void senders::Invite::Send(const MessageSource &source, Channel *chan, User *user)
+{
+	Uplink::Send(source, "INVITE", user->GetUID(), chan->name);
+}
+
+void senders::Join::Send(User* user, Channel* c, const ChannelStatus* status)
+{
+	Uplink::Send(user, "JOIN", c->name);
+
+	if (status)
+	{
+		/* First save the channel status incase uc->Status == status */
+		ChannelStatus cs = *status;
+		/* If the user is internally on the channel with flags, kill them so that
+		 * the stacker will allow this.
+		 */
+		ChanUserContainer *uc = c->FindUser(user);
+		if (uc != NULL)
+			uc->status.Clear();
+
+		ServiceBot *setter = ServiceBot::Find(user->GetUID());
+		for (size_t i = 0; i < cs.Modes().length(); ++i)
+			c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+
+		if (uc != NULL)
+			uc->status = cs;
+	}
+}
+
+void senders::Kick::Send(const MessageSource &source, Channel *chan, User *user, const Anope::string &reason)
+{
+	if (!reason.empty())
+		Uplink::Send(source, "KICK", chan->name, user->GetUID(), reason);
+	else
+		Uplink::Send(source, "KICK", chan->name, user->GetUID());
+}
+
+void senders::Kill::Send(const MessageSource &source, const Anope::string &target, const Anope::string &reason)
+{
+	Uplink::Send(source, "KILL", target, reason);
+}
+
+void senders::Kill::Send(const MessageSource &source, User *user, const Anope::string &reason)
+{
+	Uplink::Send(source, "KILL", user->GetUID(), reason);
+	user->KillInternal(source, reason);
+}
+
+void senders::ModeChannel::Send(const MessageSource &source, Channel *channel, const Anope::string &modes)
+{
+	IRCMessage message(source, "MODE", channel->name);
+	message.TokenizeAndPush(modes);
+	Uplink::SendMessage(message);
+}
+
+void senders::ModeUser::Send(const MessageSource &source, User *user, const Anope::string &modes)
+{
+	IRCMessage message(source, "MODE", user->GetUID());
+	message.TokenizeAndPush(modes);
+	Uplink::SendMessage(message);
+}
+
+void senders::NickChange::Send(User *u, const Anope::string &newnick, time_t ts)
+{
+	/* this actually isn't rfc1459 which says NICK <nickname> <hopcount> */
+	Uplink::Send(u, "NICK", newnick, ts);
+}
+
+void senders::Notice::Send(const MessageSource &source, const Anope::string &dest, const Anope::string &msg)
+{
+	Uplink::Send(source, "NOTICE", dest, msg);
+}
+
+void senders::Part::Send(User *u, Channel *chan, const Anope::string &reason)
+{
+	if (!reason.empty())
+		Uplink::Send(u, "PART", chan->name, reason);
+	else
+		Uplink::Send(u, "PART", chan->name);
+}
+
+void senders::Ping::Send(const Anope::string &servname, const Anope::string &who)
+{
+	if (servname.empty())
+		Uplink::Send(Me, "PING", who);
+	else
+		Uplink::Send(Me, "PING", servname, who);
+}
+
+void senders::Pong::Send(const Anope::string &servname, const Anope::string &who)
+{
+	if (servname.empty())
+		Uplink::Send(Me, "PONG", who);
+	else
+		Uplink::Send(Me, "PONG", servname, who);
+}
+
+void senders::Privmsg::Send(const MessageSource &source, const Anope::string &dest, const Anope::string &msg)
+{
+	Uplink::Send(source, "PRIVMSG", dest, msg);
+}
+
+void senders::Quit::Send(User *user, const Anope::string &reason)
+{
+	if (!reason.empty())
+		Uplink::Send(user, "QUIT", reason);
+	else
+		Uplink::Send(user, "QUIT");
+}
+
+void senders::MessageServer::Send(Server* server)
+{
+	Uplink::Send("SERVER", server->GetName(), server->GetHops() + 1, server->GetDescription());
+}
+
+void senders::SQuit::Send(Server *s, const Anope::string &message)
+{
+	Uplink::Send("SQUIT", s->GetSID(), message);
+}
+
+void senders::Topic::Send(const MessageSource &source, Channel *channel, const Anope::string &topic, time_t topic_ts, const Anope::string &topic_setter)
+{
+	Uplink::Send(source, "TOPIC", channel->name, topic);
+}
+
+void senders::Wallops::Send(const MessageSource &source, const Anope::string &msg)
+{
+	Uplink::Send(source, "WALLOPS", msg);
+}
+
 void Away::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	const Anope::string &msg = !params.empty() ? params[0] : "";
@@ -300,7 +440,7 @@ void Part::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 void Ping::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	IRCD->SendPong(params.size() > 1 ? params[1] : Me->GetSID(), params[0]);
+	IRCD->Send<messages::Pong>(params.size() > 1 ? params[1] : Me->GetSID(), params[0]);
 }
 
 void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &params)

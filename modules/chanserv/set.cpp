@@ -1242,7 +1242,7 @@ class CSSet : public Module
 		{
 			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->GetTimeRegistered();
 			c->creation_time = c->ci->GetTimeRegistered();
-			IRCD->SendChannel(c);
+			IRCD->Send<messages::MessageChannel>(c);
 			c->Reset();
 		}
 	}

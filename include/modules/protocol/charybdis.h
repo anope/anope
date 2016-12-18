@@ -19,53 +19,91 @@
 
 #pragma once
 
+#include "modules/protocol/ts6.h"
+#include "modules/protocol/ratbox.h"
+
 namespace charybdis
 {
 
-class Proto : public IRCDProto
+namespace senders
 {
-	ServiceReference<IRCDProto> ratbox; // XXX
+
+class NickIntroduction : public messages::NickIntroduction
+{
+ public:
+	using messages::NickIntroduction::NickIntroduction;
+
+	void Send(User *user) override;
+};
+
+class SASL : public messages::SASL
+{
+ public:
+	using messages::SASL::SASL;
+
+	 void Send(const ::SASL::Message &) override;
+};
+
+class SASLMechanisms : public messages::SASLMechanisms
+{
+ public:
+	using messages::SASLMechanisms::SASLMechanisms;
+
+	void Send(const std::vector<Anope::string> &mechanisms) override;
+};
+
+class SVSHold : public messages::SVSHold
+{
+ public:
+	using messages::SVSHold::SVSHold;
+
+	void Send(const Anope::string &, time_t) override;
+};
+
+class SVSHoldDel : public messages::SVSHoldDel
+{
+ public:
+	using messages::SVSHoldDel::SVSHoldDel;
+
+	void Send(const Anope::string &) override;
+};
+
+class SVSLogin : public messages::SVSLogin
+{
+ public:
+	using messages::SVSLogin::SVSLogin;
+
+	void Send(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override;
+};
+
+class VhostDel : public messages::VhostDel
+{
+ public:
+	using messages::VhostDel::VhostDel;
+
+	void Send(User *u) override;
+};
+
+class VhostSet : public messages::VhostSet
+{
+ public:
+	using messages::VhostSet::VhostSet;
+
+	void Send(User *u, const Anope::string &vident, const Anope::string &vhost) override;
+};
+
+} // namespace senders
+
+class Proto : public ts6::Proto
+{
+	ratbox::Proto ratbox;
 
  public:
 	Proto(Module *creator);
 
-	void SendSVSKill(const MessageSource &source, User *targ, const Anope::string &reason) override { ratbox->SendSVSKill(source, targ, reason); }
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override { ratbox->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendGlobops(const MessageSource &source, const Anope::string &buf) override { ratbox->SendGlobops(source, buf); }
-	void SendSGLine(User *u, XLine *x) override { ratbox->SendSGLine(u, x); }
-	void SendSGLineDel(XLine *x) override { ratbox->SendSGLineDel(x); }
-	void SendAkill(User *u, XLine *x) override { ratbox->SendAkill(u, x); }
-	void SendAkillDel(XLine *x) override { ratbox->SendAkillDel(x); }
-	void SendSQLine(User *u, XLine *x) override { ratbox->SendSQLine(u, x); }
-	void SendSQLineDel(XLine *x) override { ratbox->SendSQLineDel(x); }
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { ratbox->SendJoin(user, c, status); }
-	void SendServer(Server *server) override { ratbox->SendServer(server); }
-	void SendChannel(Channel *c) override { ratbox->SendChannel(c); }
-	void SendTopic(const MessageSource &source, Channel *c) override { ratbox->SendTopic(source, c); }
-	bool IsIdentValid(const Anope::string &ident) override { return ratbox->IsIdentValid(ident); }
-	void SendLogin(User *u, NickServ::Nick *na) override { ratbox->SendLogin(u, na); }
-	void SendLogout(User *u) override { ratbox->SendLogout(u); }
+	bool IsIdentValid(const Anope::string &ident) override { return ratbox.IsIdentValid(ident); }
 
-	void SendConnect() override;
-
-	void SendClientIntroduction(User *u) override;
-
-	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override;
-
-	void SendSVSHold(const Anope::string &nick, time_t delay) override;
-
-	void SendSVSHoldDel(const Anope::string &nick) override;
-
-	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override;
-
-	void SendVhostDel(User *u) override;
-
-	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override;
-
-	void SendSASLMessage(const SASL::Message &message) override;
-
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override;
+	void Handshake() override;
 };
 
 class Encap : public IRCDMessage

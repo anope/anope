@@ -120,7 +120,7 @@ void CommandSource::Reply(const Anope::string &message)
 		this->reply->SendMessage(*this->service, tok);
 }
 
-Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(o)
+Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, NAME, sname), max_params(maxparams), min_params(minparams), module(o)
 {
 	allow_unregistered = require_user = false;
 }

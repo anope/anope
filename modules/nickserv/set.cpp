@@ -362,7 +362,7 @@ class CommandNSSetDisplay : public Command
 
 		for (User *u : user_na->GetAccount()->users)
 		{
-			IRCD->SendLogin(u, user_na);
+			IRCD->Send<messages::Login>(u, user_na);
 		}
 
 		source.Reply(_("The new display is now \002{0}\002."), user_na->GetAccount()->GetDisplay());

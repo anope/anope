@@ -25,6 +25,72 @@
 
 static Anope::string UplinkSID;
 
+void ratbox::senders::NickIntroduction::Send(User *user)
+{
+	Anope::string modes = "+" + user->GetModes();
+	Uplink::Send(Me, "UID", user->nick, 1, user->timestamp, modes, user->GetIdent(), user->host, 0, user->GetUID(), user->realname);
+}
+
+void ratbox::senders::Login::Send(User *u, NickServ::Nick *na)
+{
+	if (na->GetAccount()->IsUnconfirmed())
+		return;
+
+	Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), na->GetAccount()->GetDisplay());
+}
+
+void ratbox::senders::Logout::Send(User *u)
+{
+	Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID());
+}
+
+void ratbox::senders::SQLine::Send(User*, XLine* x)
+{
+	/* Calculate the time left before this would expire, capping it at 2 days */
+	time_t timeleft = x->GetExpires() - Anope::CurTime;
+
+	if (timeleft > 172800 || !x->GetExpires())
+		timeleft = 172800;
+
+#warning "find introduced"
+//	Uplink::Send(FindIntroduced(), "ENCAP", "*", "RESV", timeleft, x->GetMask(), 0, x->GetReason());
+}
+
+void ratbox::senders::SQLineDel::Send(XLine* x)
+{
+	Uplink::Send(Config->GetClient("OperServ"), "ENCAP", "*", "UNRESV", x->GetMask());
+}
+
+void ratbox::senders::SVSNick::Send(User* u, const Anope::string& newnick, time_t ts)
+{
+	Uplink::Send(Me, "ENCAP", u->server->GetName(), "RSFNC", u->GetUID(),
+			newnick, ts, u->timestamp);
+}
+
+void ratbox::senders::Topic::Send(const MessageSource &source, Channel *channel, const Anope::string &topic, time_t topic_ts, const Anope::string &topic_setter)
+{
+	ServiceBot *bi = source.GetBot();
+	bool needjoin = channel->FindUser(bi) == NULL;
+
+	if (needjoin)
+	{
+		ChannelStatus status;
+
+		status.AddMode('o');
+		bi->Join(channel, &status);
+	}
+
+	rfc1459::senders::Topic::Send(source, channel, topic, topic_ts, topic_setter);
+
+	if (needjoin)
+		bi->Part(channel);
+}
+
+void ratbox::senders::Wallops::Send(const MessageSource &source, const Anope::string &msg)
+{
+	Uplink::Send(source, "OPERWALL", msg);
+}
+
 ServiceBot *ratbox::Proto::FindIntroduced()
 {
 	ServiceBot *bi = Config->GetClient("OperServ");
@@ -45,10 +111,11 @@ ServiceBot *ratbox::Proto::FindIntroduced()
 	return NULL;
 }
 
-ratbox::Proto::Proto(Module *creator) : IRCDProto(creator, "Ratbox 3.0+")
-	, hybrid("hybrid")
+ratbox::Proto::Proto(Module *creator) : ts6::Proto(creator, "Ratbox 3.0+")
+	, hybrid(creator)
 {
 	DefaultPseudoclientModes = "+oiS";
+	CanSVSNick = true;
 	CanSNLine = true;
 	CanSQLine = true;
 	CanSQLineChannel = true;
@@ -57,12 +124,7 @@ ratbox::Proto::Proto(Module *creator) : IRCDProto(creator, "Ratbox 3.0+")
 	MaxModes = 4;
 }
 
-void ratbox::Proto::SendGlobops(const MessageSource &source, const Anope::string &buf)
-{
-	Uplink::Send(source, "OPERWALL", buf);
-}
-
-void ratbox::Proto::SendConnect()
+void ratbox::Proto::Handshake()
 {
 	Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
 
@@ -79,7 +141,7 @@ void ratbox::Proto::SendConnect()
 	Uplink::Send("CAPAB", "QS EX CHW IE GLN TB ENCAP");
 
 	/* Make myself known to myself in the serverlist */
-	SendServer(Me);
+	Uplink::Send("SERVER", Me->GetName(), Me->GetHops() + 1, Me->GetDescription());
 
 	/*
 	 * SVINFO
@@ -90,60 +152,6 @@ void ratbox::Proto::SendConnect()
 	 *	  parv[4] = server's idea of UTC time
 	 */
 	Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
-}
-
-void ratbox::Proto::SendClientIntroduction(User *u)
-{
-	Anope::string modes = "+" + u->GetModes();
-	Uplink::Send(Me, "UID", u->nick, 1, u->timestamp, modes, u->GetIdent(), u->host, 0, u->GetUID(), u->realname);
-}
-
-void ratbox::Proto::SendLogin(User *u, NickServ::Nick *na)
-{
-	if (na->GetAccount()->IsUnconfirmed())
-		return;
-
-	Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID(), na->GetAccount()->GetDisplay());
-}
-
-void ratbox::Proto::SendLogout(User *u)
-{
-	Uplink::Send(Me, "ENCAP", "*", "SU", u->GetUID());
-}
-
-void ratbox::Proto::SendTopic(const MessageSource &source, Channel *c)
-{
-	ServiceBot *bi = source.GetBot();
-	bool needjoin = c->FindUser(bi) == NULL;
-
-	if (needjoin)
-	{
-		ChannelStatus status;
-
-		status.AddMode('o');
-		bi->Join(c, &status);
-	}
-
-	IRCDProto::SendTopic(source, c);
-
-	if (needjoin)
-		bi->Part(c);
-}
-
-void ratbox::Proto::SendSQLine(User *, XLine *x)
-{
-	/* Calculate the time left before this would expire, capping it at 2 days */
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
-
-	Uplink::Send(FindIntroduced(), "ENCAP", "*", "RESV", timeleft, x->GetMask(), 0, x->GetReason());
-}
-
-void ratbox::Proto::SendSQLineDel(XLine *x)
-{
-	Uplink::Send(Config->GetClient("OperServ"), "ENCAP", "*", "UNRESV", x->GetMask());
 }
 
 // Debug: Received: :00BAAAAAB ENCAP * LOGIN Adam
@@ -197,7 +205,7 @@ void ratbox::ServerMessage::Run(MessageSource &source, const std::vector<Anope::
 	if (params[1] != "1")
 		return;
 	new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
-	IRCD->SendPing(Me->GetName(), params[0]);
+	IRCD->Send<messages::Ping>(Me->GetName(), params[0]);
 }
 
 /*
@@ -279,6 +287,40 @@ class ProtoRatbox : public Module
 	hybrid::TMode message_tmode;
 	ratbox::UID message_uid;
 
+	/* Core message senders */
+	rfc1459::senders::Invite sender_invite;
+	rfc1459::senders::Kick sender_kick;
+	rfc1459::senders::Kill sender_svskill;
+	rfc1459::senders::ModeChannel sender_mode_chan;
+	rfc1459::senders::NickChange sender_nickchange;
+	rfc1459::senders::Notice sender_notice;
+	rfc1459::senders::Part sender_part;
+	rfc1459::senders::Ping sender_ping;
+	rfc1459::senders::Pong sender_pong;
+	rfc1459::senders::Privmsg sender_privmsg;
+	rfc1459::senders::Quit sender_quit;
+	rfc1459::senders::SQuit sender_squit;
+
+	hybrid::senders::Akill sender_akill;
+	hybrid::senders::AkillDel sender_akill_del;
+	hybrid::senders::MessageChannel sender_channel;
+	hybrid::senders::GlobalNotice sender_global_notice;
+	hybrid::senders::GlobalPrivmsg sender_global_privmsg;
+	hybrid::senders::Join sender_join;
+	hybrid::senders::ModeUser sender_mode_user;
+	hybrid::senders::MessageServer sender_server;
+	hybrid::senders::SGLine sender_sgline;
+	hybrid::senders::SGLineDel sender_sgline_del;
+
+	ratbox::senders::Login sender_login;
+	ratbox::senders::Logout sender_logout;
+	ratbox::senders::NickIntroduction sender_nickintroduction;
+	ratbox::senders::SQLine sender_sqline;
+	ratbox::senders::SQLineDel sender_sqline_del;
+	ratbox::senders::SVSNick sender_svsnick;
+	ratbox::senders::Topic sender_topic;
+	ratbox::senders::Wallops sender_wallops;
+
  public:
 	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
 		, ircd_proto(this)
@@ -314,7 +356,44 @@ class ProtoRatbox : public Module
 		, message_tb(this)
 		, message_tmode(this)
 		, message_uid(this)
+
+		, sender_akill(this)
+		, sender_akill_del(this)
+		, sender_channel(this)
+		, sender_global_notice(this)
+		, sender_global_privmsg(this)
+		, sender_invite(this)
+		, sender_join(this)
+		, sender_kick(this)
+		, sender_svskill(this)
+		, sender_login(this)
+		, sender_logout(this)
+		, sender_mode_chan(this)
+		, sender_mode_user(this)
+		, sender_nickchange(this)
+		, sender_nickintroduction(this)
+		, sender_notice(this)
+		, sender_part(this)
+		, sender_ping(this)
+		, sender_pong(this)
+		, sender_privmsg(this)
+		, sender_quit(this)
+		, sender_server(this)
+		, sender_sgline(this)
+		, sender_sgline_del(this)
+		, sender_sqline(this)
+		, sender_sqline_del(this)
+		, sender_squit(this)
+		, sender_svsnick(this)
+		, sender_topic(this)
+		, sender_wallops(this)
 	{
+		IRCD = &ircd_proto;
+	}
+
+	~ProtoRatbox()
+	{
+		IRCD = nullptr;
 	}
 };
 

@@ -49,7 +49,7 @@ ServiceBot::ServiceBot(const Anope::string &nnick, const Anope::string &nuser, c
 		//XXX
 		//XLine x(this->nick, "Reserved for services");
 		//IRCD->SendSQLine(NULL, &x);
-		IRCD->SendClientIntroduction(this);
+		IRCD->Send<messages::NickIntroduction>(this);
 		this->introduced = true;
 	}
 }
@@ -92,11 +92,11 @@ void ServiceBot::OnKill()
 {
 	this->introduced = false;
 	this->GenerateUID();
-	IRCD->SendClientIntroduction(this);
+	IRCD->Send<messages::NickIntroduction>(this);
 	this->introduced = true;
 
 	for (User::ChanUserList::const_iterator cit = this->chans.begin(), cit_end = this->chans.end(); cit != cit_end; ++cit)
-		IRCD->SendJoin(this, cit->second->chan, &cit->second->status);
+		IRCD->Send<messages::Join>(this, cit->second->chan, &cit->second->status);
 }
 
 void ServiceBot::SetNewNick(const Anope::string &newnick)
@@ -160,7 +160,7 @@ void ServiceBot::Join(Channel *c, ChannelStatus *status)
 
 	c->JoinUser(this, status);
 	if (IRCD)
-		IRCD->SendJoin(this, c, status);
+		IRCD->Send<messages::Join>(this, c, status);
 
 	EventManager::Get()->Dispatch(&Event::JoinChannel::OnJoinChannel, this, c);
 }

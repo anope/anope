@@ -62,6 +62,7 @@ class BotServCore : public Module, public BotServ::BotServService
 
 	void OnBotAssign(User *sender, ChanServ::Channel *ci, ServiceBot *bi) override
 	{
+		printf("on bot assign !\n");
 		if (ci->c && ci->c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
 		{
 			ChannelStatus status(Config->GetModule(this)->Get<Anope::string>("botmodes"));

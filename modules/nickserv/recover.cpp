@@ -92,7 +92,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 			source.Reply(_("Ghost with your nick has been killed."));
 
 			if (IRCD->CanSVSNick)
-				IRCD->SendForceNickChange(source.GetUser(), user, Anope::CurTime);
+				IRCD->Send<messages::SVSNick>(source.GetUser(), user, Anope::CurTime);
 		}
 		/* User is not identified or not identified to the same account as the person using this command */
 		else
@@ -266,7 +266,7 @@ class NSRecover : public Module
 					if (u->FindChannel(c))
 						this->OnJoinChannel(u, c);
 					else if (IRCD->CanSVSJoin)
-						IRCD->SendSVSJoin(NickServ, u, cname, "");
+						IRCD->Send<messages::SVSJoin>(NickServ, u, cname, "");
 				}
 		}
 
@@ -276,7 +276,7 @@ class NSRecover : public Module
 			if (svs->from)
 			{
 				// svsnick from to to
-				IRCD->SendForceNickChange(svs->from, svs->to, Anope::CurTime);
+				IRCD->Send<messages::SVSNick>(svs->from, svs->to, Anope::CurTime);
 			}
 
 			svsnick.Unset(u);

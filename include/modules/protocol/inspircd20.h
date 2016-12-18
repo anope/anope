@@ -19,13 +19,254 @@
 
 #pragma once
 
+#include "modules/protocol/ts6.h"
+
 namespace inspircd20
 {
 
-class Proto : public IRCDProto
+class Proto;
+
+namespace senders
 {
- private:
-	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override;
+
+class Akill : public messages::Akill
+{
+	Proto *proto = nullptr;
+
+ public:
+	Akill(Module *creator, Proto *p) : messages::Akill(creator),
+		proto(p)
+	{
+	}
+
+	void Send(User *, XLine *) override;
+};
+
+class AkillDel : public messages::AkillDel
+{
+	Proto *proto = nullptr;
+
+ public:
+	AkillDel(Module *creator, Proto *p) : messages::AkillDel(creator),
+		proto(p)
+	{
+	}
+
+	void Send(XLine *) override;
+};
+
+class MessageChannel : public messages::MessageChannel
+{
+ public:
+	using messages::MessageChannel::MessageChannel;
+
+	void Send(Channel *) override;
+};
+
+class Join : public messages::Join
+{
+ public:
+	using messages::Join::Join;
+
+	void Send(User *u, Channel *c, const ChannelStatus *status) override;
+};
+
+class Login : public messages::Login
+{
+ public:
+	using messages::Login::Login;
+
+	void Send(User *u, NickServ::Nick *na) override;
+};
+
+class Logout : public messages::Logout
+{
+ public:
+	using messages::Logout::Logout;
+
+	void Send(User *u) override;
+};
+
+class ModeChannel : public messages::ModeChannel
+{
+ public:
+	using messages::ModeChannel::ModeChannel;
+
+	void Send(const MessageSource &source, Channel *channel, const Anope::string &modes) override;
+};
+
+class NickIntroduction : public messages::NickIntroduction
+{
+ public:
+	using messages::NickIntroduction::NickIntroduction;
+
+	void Send(User *user) override;
+};
+
+class MessageServer : public messages::MessageServer
+{
+ public:
+	using messages::MessageServer::MessageServer;
+
+	void Send(Server *server) override;
+};
+
+class SASL : public messages::SASL
+{
+ public:
+	using messages::SASL::SASL;
+
+	 void Send(const ::SASL::Message &) override;
+};
+
+class SASLMechanisms : public messages::SASLMechanisms
+{
+ public:
+	using messages::SASLMechanisms::SASLMechanisms;
+
+	void Send(const std::vector<Anope::string> &mechanisms) override;
+};
+
+class SQLine : public messages::SQLine
+{
+	Proto *proto = nullptr;
+
+ public:
+	SQLine(Module *creator, Proto *p) : messages::SQLine(creator),
+		proto(p)
+	{
+	}
+
+	void Send(User *, XLine *) override;
+};
+
+class SQLineDel : public messages::SQLineDel
+{
+	Proto *proto = nullptr;
+
+ public:
+	SQLineDel(Module *creator, Proto *p) : messages::SQLineDel(creator),
+		proto(p)
+	{
+	}
+
+	void Send(XLine *) override;
+};
+
+class SQuit : public messages::SQuit
+{
+ public:
+	using messages::SQuit::SQuit;
+
+	void Send(Server *s, const Anope::string &message) override;
+};
+
+class SZLine : public messages::SZLine
+{
+	Proto *proto = nullptr;
+
+ public:
+	SZLine(Module *creator, Proto *p) : messages::SZLine(creator),
+		proto(p)
+	{
+	}
+
+	void Send(User *, XLine *) override;
+};
+
+class SZLineDel : public messages::SZLineDel
+{
+	Proto *proto = nullptr;
+
+ public:
+	SZLineDel(Module *creator, Proto *p) : messages::SZLineDel(creator),
+		proto(p)
+	{
+	}
+
+	void Send(XLine *) override;
+};
+
+class SVSHold : public messages::SVSHold
+{
+ public:
+	using messages::SVSHold::SVSHold;
+
+	void Send(const Anope::string &, time_t) override;
+};
+
+class SVSHoldDel : public messages::SVSHoldDel
+{
+ public:
+	using messages::SVSHoldDel::SVSHoldDel;
+
+	void Send(const Anope::string &) override;
+};
+
+class SVSLogin : public messages::SVSLogin
+{
+ public:
+	using messages::SVSLogin::SVSLogin;
+
+	void Send(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override;
+};
+
+class SWhois : public messages::SWhois
+{
+ public:
+	using messages::SWhois::SWhois;
+
+	void Send(const MessageSource &, User *user, const Anope::string &) override;
+};
+
+class Topic : public messages::Topic
+{
+ public:
+	using messages::Topic::Topic;
+
+	void Send(const MessageSource &source, Channel *channel, const Anope::string &topic, time_t topic_ts, const Anope::string &topic_setter) override;
+};
+
+class VhostDel : public messages::VhostDel
+{
+	Proto *proto = nullptr;
+
+ public:
+	VhostDel(Module *creator, Proto *p) : messages::VhostDel(creator),
+		proto(p)
+	{
+	}
+
+	void Send(User *u) override;
+};
+
+class VhostSet : public messages::VhostSet
+{
+	Proto *proto = nullptr;
+
+ public:
+	VhostSet(Module *creator, Proto *p) : messages::VhostSet(creator),
+		proto(p)
+	{
+	}
+
+	void Send(User *u, const Anope::string &vident, const Anope::string &vhost) override;
+};
+
+class Wallops : public messages::Wallops
+{
+ public:
+	using messages::Wallops::Wallops;
+
+	void Send(const MessageSource &source, const Anope::string &msg) override;
+};
+
+} // namespace senders
+
+class Proto : public ts6::Proto
+{
+ public:
+	Proto(Module *creator);
 
 	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent);
 
@@ -35,72 +276,13 @@ class Proto : public IRCDProto
 
 	void SendDelLine(const Anope::string &xtype, const Anope::string &mask);
 
- public:
-	Proto(Module *creator);
+	void Handshake() override;
 
-	void SendConnect() override;
-
-	void SendGlobalNotice(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
-
-	void SendGlobalPrivmsg(ServiceBot *bi, Server *dest, const Anope::string &msg) override;
-
-	void SendAkillDel(XLine *x) override;
-
-	void SendTopic(const MessageSource &source, Channel *c) override;
-
-	void SendVhostDel(User *u) override;
-
-	void SendAkill(User *u, XLine *x) override;
-
-	void SendNumeric(int numeric, User *dest, IRCMessage &message);
-
-	void SendMode(const MessageSource &source, Channel *dest, const Anope::string &buf) override;
-
-	void SendClientIntroduction(User *u) override;
-
-	void SendServer(Server *server) override;
-
-	void SendSquit(Server *s, const Anope::string &message) override;
-
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override;
-
-	void SendSQLineDel(XLine *x) override;
-
-	void SendSQLine(User *, XLine *x) override;
-
-	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override;
-
-	void SendSVSHold(const Anope::string &nick, time_t t) override;
-
-	void SendSVSHoldDel(const Anope::string &nick) override;
-
-	void SendSZLineDel(XLine *x) override;
-
-	void SendSZLine(User *, XLine *x) override;
-
-	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) override;
-
-	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) override;
-
-	void SendSWhois(const MessageSource &, const Anope::string &who, const Anope::string &mask) override;
+	void SendNumeric(int numeric, User *dest, IRCMessage &message) override;
 
 	void SendBOB() override;
 
 	void SendEOB() override;
-
-	void SendGlobops(const MessageSource &source, const Anope::string &buf) override;
-
-	void SendLogin(User *u, NickServ::Nick *na) override;
-
-	void SendLogout(User *u) override;
-
-	void SendChannel(Channel *c) override;
-
-	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override;
-
-	void SendSASLMessage(const SASL::Message &message) override;
-
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override;
 
 	bool IsExtbanValid(const Anope::string &mask) override;
 
@@ -272,7 +454,7 @@ class ServerMessage : public IRCDMessage
 class SQuit : public rfc1459::SQuit
 {
  public:
-	SQuit(Module *creator) : rfc1459::SQuit(creator) { }
+	using rfc1459::SQuit::SQuit;
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };

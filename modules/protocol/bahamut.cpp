@@ -88,7 +88,7 @@ void bahamut::senders::AkillDel::Send(XLine* x)
 		}
 	}
 
-	Uplink::Send("RAKKILL", x->GetHost(), x->GetUser());
+	Uplink::Send("RAKILL", x->GetHost(), x->GetUser());
 }
 
 void bahamut::senders::MessageChannel::Send(Channel* c)

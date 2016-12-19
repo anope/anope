@@ -203,12 +203,37 @@ class SVSHoldDel : public messages::SVSHoldDel
 	void Send(const Anope::string &) override;
 };
 
+class SVSJoin : public messages::SVSJoin
+{
+ public:
+	using messages::SVSJoin::SVSJoin;
+
+	void Send(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &key) override;
+};
+
 class SVSLogin : public messages::SVSLogin
 {
  public:
 	using messages::SVSLogin::SVSLogin;
 
 	void Send(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override;
+};
+
+
+class SVSNick : public messages::SVSNick
+{
+ public:
+	using messages::SVSNick::SVSNick;
+
+	void Send(User *u, const Anope::string &newnick, time_t ts) override;
+};
+
+class SVSPart : public messages::SVSPart
+{
+ public:
+	using messages::SVSPart::SVSPart;
+
+	void Send(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &reason) override;
 };
 
 class SWhois : public messages::SWhois

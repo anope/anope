@@ -17,7 +17,7 @@
  * along with this program; if not, see see <http://www.gnu.org/licenses/>.
  */
 
-/* Dependencies: anope_protocol.rfc1459,anope_protocol.ts6,anope_protocol.hybrid,anope_protocol.bahamut */
+/* Dependencies: anope_protocol.rfc1459,anope_protocol.ts6 */
 
 #include "module.h"
 #include "modules/sasl.h"
@@ -25,8 +25,6 @@
 #include "modules/chanserv/set.h"
 #include "modules/protocol/rfc1459.h"
 #include "modules/protocol/inspircd20.h"
-#include "modules/protocol/bahamut.h"
-#include "modules/protocol/hybrid.h"
 
 struct SASLUser
 {
@@ -270,6 +268,11 @@ void inspircd20::senders::SVSHoldDel::Send(const Anope::string& nick)
 	Uplink::Send(Config->GetClient("NickServ"), "SVSHOLD", nick);
 }
 
+void inspircd20::senders::SVSJoin::Send(const MessageSource& source, User* u, const Anope::string& chan, const Anope::string& key)
+{
+	Uplink::Send(source, "SVSJOIN", u->GetUID(), chan);
+}
+
 void inspircd20::senders::SVSLogin::Send(const Anope::string& uid, const Anope::string& acc, const Anope::string& vident, const Anope::string& vhost)
 {
 	Uplink::Send(Me, "METADATA", uid, "accountname", acc);
@@ -290,6 +293,19 @@ void inspircd20::senders::SVSLogin::Send(const Anope::string& uid, const Anope::
 	}
 
 	saslusers.push_back(su);
+}
+
+void inspircd20::senders::SVSNick::Send(User* u, const Anope::string& newnick, time_t ts)
+{
+	Uplink::Send("SVSNICK", u->GetUID(), newnick, ts);
+}
+
+void inspircd20::senders::SVSPart::Send(const MessageSource& source, User* u, const Anope::string& chan, const Anope::string& reason)
+{
+	if (!reason.empty())
+		Uplink::Send(source, "SVSPART", u->GetUID(), chan, reason);
+	else
+		Uplink::Send(source, "SVSPART", u->GetUID(), chan);
 }
 
 void inspircd20::senders::SWhois::Send(const MessageSource&, User *user, const Anope::string& swhois)
@@ -1298,11 +1314,6 @@ class ProtoInspIRCd20 : public Module
 	rfc1459::senders::Privmsg sender_privmsg;
 	rfc1459::senders::Quit sender_quit;
 
-	hybrid::senders::SVSJoin sender_svsjoin;
-	hybrid::senders::SVSPart sender_svspart;
-
-	bahamut::senders::SVSNick sender_svsnick;
-
 	inspircd20::senders::Akill sender_akill;
 	inspircd20::senders::AkillDel sender_akill_del;
 	inspircd20::senders::MessageChannel sender_channel;
@@ -1319,7 +1330,10 @@ class ProtoInspIRCd20 : public Module
 	inspircd20::senders::SZLineDel sender_szline_del;
 	inspircd20::senders::SVSHold sender_svshold;
 	inspircd20::senders::SVSHoldDel sender_svsholddel;
+	inspircd20::senders::SVSJoin sender_svsjoin;
 	inspircd20::senders::SVSLogin sender_svslogin;
+	inspircd20::senders::SVSNick sender_svsnick;
+	inspircd20::senders::SVSPart sender_svspart;
 	inspircd20::senders::SWhois sender_swhois;
 	inspircd20::senders::Topic sender_topic;
 	inspircd20::senders::VhostDel sender_vhost_del;
@@ -1413,8 +1427,8 @@ class ProtoInspIRCd20 : public Module
 		, sender_szline_del(this, &ircd_proto)
 		, sender_svshold(this)
 		, sender_svsholddel(this)
-		, sender_svslogin(this)
 		, sender_svsjoin(this)
+		, sender_svslogin(this)
 		, sender_svsnick(this)
 		, sender_svspart(this)
 		, sender_swhois(this)

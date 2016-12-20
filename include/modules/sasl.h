@@ -46,6 +46,7 @@ namespace SASL
 	{
 		time_t created;
 		Anope::string uid;
+		Anope::string hostname, ip;
 		Reference<Mechanism> mech;
 
 		Session(Mechanism *m, const Anope::string &u) : created(Anope::CurTime), uid(u), mech(m) { }
@@ -76,9 +77,10 @@ namespace SASL
 	class IdentifyRequest : public ::IdentifyRequest
 	{
 		Anope::string uid;
+		Anope::string hostname, ip;
 
 	 public:
-		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : ::IdentifyRequest(m, acc, pass), uid(id) { }
+		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass, const Anope::string &h, const Anope::string &i) : ::IdentifyRequest(m, acc, pass), uid(id), hostname(h), ip(i) { }
 
 		void OnSuccess() anope_override
 		{
@@ -96,7 +98,11 @@ namespace SASL
 			Session *s = sasl->GetSession(uid);
 			if (s)
 			{
-				Log(Config->GetClient("NickServ"), "sasl") << "A user identified to account " << this->GetAccount() << " using SASL";
+				Anope::string user = "A user";
+				if (!hostname.empty() && !ip.empty())
+					user = hostname + " (" + ip + ")";
+
+				Log(Config->GetClient("NickServ"), "sasl") << user << " identified to account " << this->GetAccount() << " using SASL";
 				sasl->Succeed(s, na->nc);
 				delete s;
 			}
@@ -121,7 +127,11 @@ namespace SASL
 			else if (na->nc->HasExt("NS_SUSPENDED"))
 				accountstatus = "suspended ";
 
-			Log(Config->GetClient("NickServ"), "sasl") << "A user failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
+			Anope::string user = "A user";
+			if (!hostname.empty() && !ip.empty())
+				user = hostname + " (" + ip + ")";
+
+			Log(Config->GetClient("NickServ"), "sasl") << user << " failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
 		}
 	};
 }

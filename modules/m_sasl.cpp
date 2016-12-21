@@ -150,7 +150,7 @@ class SASLService : public SASL::Service, public Timer
 			}
 		}
 
-		Session* &session = sessions[m.source];
+		Session* session = GetSession(m.source);
 
 		if (m.type == "S")
 		{
@@ -178,18 +178,22 @@ class SASLService : public SASL::Service, public Timer
 			{
 				session->hostname = hostname;
 				session->ip = ip;
+
+				sessions[m.source] = session;
 			}
 		}
 		else if (m.type == "D")
 		{
 			delete session;
-			sessions.erase(m.source);
 			return;
 		}
 		else if (m.type == "H")
 		{
 			if (!session)
+			{
 				session = new Session(NULL, m.source);
+				sessions[m.source] = session;
+			}
 			session->hostname = m.data;
 			session->ip = m.ext;
 		}

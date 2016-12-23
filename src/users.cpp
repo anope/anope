@@ -781,7 +781,7 @@ Anope::string User::Mask() const
 	sockaddrs addr(mhost);
 	if (addr.valid() && addr.sa.sa_family == AF_INET)
 	{
-		size_t dot = mhost.find('.');
+		size_t dot = mhost.rfind('.');
 		mask += mhost.substr(0, dot) + (dot == Anope::string::npos ? "" : ".*");
 	}
 	else

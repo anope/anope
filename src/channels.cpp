@@ -280,7 +280,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Ano
 
 		if (!u)
 		{
-			Log() << "MODE " << this->name << " +" << cm->mchar << " for non-existent user " << param;
+			Log(LOG_DEBUG) << "MODE " << this->name << " +" << cm->mchar << " for non-existent user " << param;
 			return;
 		}
 
@@ -351,7 +351,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 
 		if (!u)
 		{
-			Log() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->mchar << " for non-existent user " << param;
+			Log(LOG_DEBUG) << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->mchar << " for non-existent user " << param;
 			return;
 		}
 

@@ -317,7 +317,7 @@ struct IRCDMessageMetadata : IRCDMessage
 		User *u = User::Find(params[0]);
 		if (!u)
 		{
-			Log() << "received METADATA for non-existent user " << params[0];
+			Log(LOG_DEBUG) << "received METADATA for non-existent user " << params[0];
 			return;
 		}
 		if (params[1].equals_cs("accountname"))

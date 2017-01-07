@@ -134,6 +134,7 @@ class CommandOSUserList : public Command
 		const Anope::string &opt = params.size() > 1 ? params[1] : "";
 		Channel *c;
 		std::set<Anope::string> modes;
+		unsigned int count = 0;
 
 		if (!pattern.empty())
 			Log(LOG_ADMIN, source, this) << "for " << pattern;
@@ -144,7 +145,7 @@ class CommandOSUserList : public Command
 			modes.insert("INVIS");
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Name")).AddColumn(_("Mask"));
+		list.AddColumn(_("Name")).AddColumn(_("Mask")).AddColumn(_("Realname"));
 
 		if (!pattern.empty() && (c = Channel::Find(pattern)))
 		{
@@ -162,7 +163,10 @@ class CommandOSUserList : public Command
 				ListFormatter::ListEntry entry;
 				entry["Name"] = uc->user->nick;
 				entry["Mask"] = uc->user->GetIdent() + "@" + uc->user->GetDisplayedHost();
+				entry["Realname"] = uc->user->realname;
 				list.AddEntry(entry);
+
+				++count;
 			}
 		}
 		else
@@ -180,9 +184,27 @@ class CommandOSUserList : public Command
 
 				if (!pattern.empty())
 				{
-					Anope::string mask = u2->nick + "!" + u2->GetIdent() + "@" + u2->GetDisplayedHost(), mask2 = u2->nick + "!" + u2->GetIdent() + "@" + u2->host, mask3 = u2->nick + "!" + u2->GetIdent() + "@" + u2->ip.addr();
-					if (!Anope::Match(mask, pattern, false, true) && !Anope::Match(mask2, pattern, false, true) && !Anope::Match(mask3, pattern, false, true))
+					/* check displayed host, host, and ip */
+					Anope::string masks[] = {
+						u2->nick + "!" + u2->GetIdent() + "@" + u2->GetDisplayedHost(),
+						u2->nick + "!" + u2->GetIdent() + "@" + u2->host,
+						u2->nick + "!" + u2->GetIdent() + "@" + u2->ip.addr()
+					};
+
+					bool match = false;
+					for (unsigned int i = 0; i < sizeof(masks) / sizeof(*masks); ++i)
+					{
+						/* Check mask with realname included, too */
+						if (Anope::Match(masks[i], pattern, false, true) || Anope::Match(masks[i] + "#" + u2->realname, pattern, false, true))
+						{
+							match = true;
+							break;
+						}
+					}
+
+					if (!match)
 						continue;
+
 					if (!modes.empty())
 						for (std::set<Anope::string>::iterator mit = modes.begin(), mit_end = modes.end(); mit != mit_end; ++mit)
 							if (!u2->HasMode(*mit))
@@ -192,7 +214,10 @@ class CommandOSUserList : public Command
 				ListFormatter::ListEntry entry;
 				entry["Name"] = u2->nick;
 				entry["Mask"] = u2->GetIdent() + "@" + u2->GetDisplayedHost();
+				entry["Realname"] = u2->realname;
 				list.AddEntry(entry);
+
+				++count;
 			}
 		}
 
@@ -202,7 +227,7 @@ class CommandOSUserList : public Command
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 
-		source.Reply(_("End of users list."));
+		source.Reply(_("End of users list. \002%u\002 users shown."), count);
 		return;
 	}
 
@@ -214,8 +239,8 @@ class CommandOSUserList : public Command
 				"nick is registered or not.\n"
 				" \n"
 				"If \002pattern\002 is given, lists only users that match it (it must be in\n"
-				"the format nick!user@host). If \002channel\002 is given, lists only users\n"
-				"that are on the given channel. If INVISIBLE is specified, only users\n"
+				"the format nick!user@host[#realname]). If \002channel\002 is given, lists\n"
+				"only users that are on the given channel. If INVISIBLE is specified, only users\n"
 				"with the +i flag will be listed."));
 
 		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");

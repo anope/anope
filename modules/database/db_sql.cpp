@@ -123,14 +123,20 @@ class DBSQL : public Module, public Pipe
 					continue;
 
 				std::vector<Query> create = this->sql->CreateTable(this->prefix + s_type->GetName(), data);
-				for (unsigned i = 0; i < create.size(); ++i)
-					this->RunBackground(create[i]);
-
 				Query insert = this->sql->BuildInsert(this->prefix + s_type->GetName(), obj->id, data);
+
 				if (this->imported)
+				{
+					for (unsigned i = 0; i < create.size(); ++i)
+						this->RunBackground(create[i]);
+
 					this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
+				}
 				else
 				{
+					for (unsigned i = 0; i < create.size(); ++i)
+						this->sql->RunQuery(create[i]);
+
 					/* We are importing objects from another database module, so don't do asynchronous
 					 * queries in case the core has to shut down, it will cut short the import
 					 */

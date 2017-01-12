@@ -300,6 +300,11 @@ class UnrealIRCdProto : public IRCDProto
 			UplinkSocket::Message() << "SVSPART " << user->GetUID() << " " << chan;
 	}
 
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
+	{
+		UplinkSocket::Message(Me) << "SENDUMODE o :from " << source.GetName() << ": " << buf;
+	}
+
 	void SendSWhois(const MessageSource &source, const Anope::string &who, const Anope::string &mask) anope_override
 	{
 		UplinkSocket::Message(source) << "SWHOIS " << who << " :" << mask;

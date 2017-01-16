@@ -873,7 +873,7 @@ struct IRCDMessageEncap : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (Anope::Match(Me->GetSID(), params[0]) == false)
+		if (!Anope::Match(Me->GetSID(), params[0]) && !Anope::Match(Me->GetName(), params[0]))
 			return;
 
 		if (SASL::sasl && params[1] == "SASL" && params.size() >= 6)

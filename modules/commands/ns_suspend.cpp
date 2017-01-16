@@ -81,7 +81,7 @@ class CommandNSSuspend : public Command
 		else
 		{
 			expiry_secs = Anope::DoTime(expiry);
-			if (expiry_secs == -1)
+			if (expiry_secs < 0)
 			{
 				source.Reply(BAD_EXPIRY_TIME);
 				return;

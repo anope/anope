@@ -114,7 +114,7 @@ class CommandBSSetBanExpire : public Command
 		}
 
 		time_t t = Anope::DoTime(arg);
-		if (t == -1)
+		if (t < 0)
 		{
 			source.Reply(BAD_EXPIRY_TIME);
 			return;

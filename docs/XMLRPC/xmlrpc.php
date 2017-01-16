@@ -3,9 +3,10 @@
 /**
  * XMLRPC Functions
  *
- * (C) 2003-2016 Anope Team
+ * (C) 2003-2017 Anope Team
  * Contact us at team@anope.org
  */
+
 class AnopeXMLRPC
 {
     /**

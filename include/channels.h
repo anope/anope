@@ -1,6 +1,6 @@
 /* Channel support
  *
- * (C) 2008-2016 Anope Team
+ * (C) 2008-2017 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.

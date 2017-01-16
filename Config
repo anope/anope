@@ -94,6 +94,10 @@ Run_Build_System () {
 	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $PCH $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
 
 	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $PCH $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
+	if [ $? -ne 0 ]; then
+		echo "You should fix these issues and then run ./Config -quick to rerun CMake."
+		exit 1
+	fi
 
 	echo ""
 	if [ "$SOURCE_DIR" = "." ] ; then

@@ -1,5 +1,20 @@
 Anope Version 2.0.5-git
 -------------------
+Fix negative levels to not match users with negative access
+Fix memo sender to always be the account name of the sender
+Allow unregistered users to use the ChanServ seen command
+Fix secureops to not be enforced on operators with the chanserv/administration privilege
+Fix command name in HELP syntax messages to always be upper case
+Show unconfirmed nickname messages on registration in webcpanel
+Fix NickServ SET EMAIL to be executable via XMLRPC
+Fix OperServ USERLIST/CHANLIST to accept regexes
+Allow OperServ USERLIST to also match realname syntax (n!u@h#r)
+Fix db_old importing languages to use the UTF-8 version
+Fix m_dns to return REFUSED if no answers could be found
+Fix ns_maxemail to be case insensitive
+Add MemoServ READ ALL command
+Add support for NickServ GROUP to be executed via XMLRPC
+Add support for logging hostname/ip of SASL authentication attempts, if supported by IRCd
 
 Anope Version 2.0.4
 -------------------

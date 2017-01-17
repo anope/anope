@@ -266,4 +266,3 @@ class DBSQL : public Module, public Pipe
 };
 
 MODULE_INIT(DBSQL)
-

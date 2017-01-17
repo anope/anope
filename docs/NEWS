@@ -4,4 +4,3 @@ Highlighted News in Anope 1.9
 * Added in live updating SQL and the ability to execute commands through SQL
 * Re-designed configuration file
 * Code refresh / rewrite into C++
-

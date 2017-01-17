@@ -82,5 +82,3 @@ class IRC2SQL : public Module
 
 	void OnBotNotice(User *u, BotInfo *bi, Anope::string &message) anope_override;
 };
-
-

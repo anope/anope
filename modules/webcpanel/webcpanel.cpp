@@ -221,7 +221,7 @@ class ModuleWebCPanel : public Module
 			provider->UnregisterPage(&this->chanserv_drop);
 
 			provider->UnregisterPage(&this->memoserv_memos);
-			
+
 			provider->UnregisterPage(&this->hostserv_request);
 
 			provider->UnregisterPage(&this->operserv_akill);

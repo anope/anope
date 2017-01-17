@@ -37,4 +37,3 @@ bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 	page.Serve(server, page_name, client, message, reply, replacements);
 	return true;
 }
-

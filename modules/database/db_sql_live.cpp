@@ -157,7 +157,7 @@ class DBMySQL : public Module, public Pipe
 
 	void OnSerializableDestruct(Serializable *obj) anope_override
 	{
-		if (!this->CheckInit())	
+		if (!this->CheckInit())
 			return;
 		Serialize::Type *s_type = obj->GetSerializableType();
 		if (s_type)
@@ -262,4 +262,3 @@ class DBMySQL : public Module, public Pipe
 };
 
 MODULE_INIT(DBMySQL)
-

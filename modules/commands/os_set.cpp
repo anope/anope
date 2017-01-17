@@ -129,7 +129,7 @@ class CommandOSSet : public Command
 				return;
 			}
 			catch (const ConvertException &) { }
-			
+
 			source.Reply(_("Setting for DEBUG must be \002ON\002, \002OFF\002, or a positive number."));
 		}
 

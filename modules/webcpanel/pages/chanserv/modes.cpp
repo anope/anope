@@ -109,4 +109,3 @@ std::set<Anope::string> WebCPanel::ChanServ::Modes::GetData()
 	v.insert("channel");
 	return v;
 }
-

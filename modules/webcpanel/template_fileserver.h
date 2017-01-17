@@ -24,4 +24,3 @@ class TemplateFileServer
 
 	void Serve(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, Replacements &);
 };
-

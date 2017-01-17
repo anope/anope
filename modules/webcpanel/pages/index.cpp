@@ -56,7 +56,7 @@ class WebpanelRequest : public IdentifyRequest
 			reply.cookies.push_back(c);
 		}
 
-		{			
+		{
 			HTTPReply::cookie c;
 			c.push_back(std::make_pair("id", id));
 			c.push_back(std::make_pair("Path", "/"));
@@ -102,4 +102,3 @@ bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 	page.Serve(server, page_name, client, message, reply, replacements);
 	return true;
 }
-

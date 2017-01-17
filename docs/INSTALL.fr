@@ -12,7 +12,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
 1) Installation d'Anope
 
     NOTE IMPORTANTE : il est déconseillé d'utiliser (et même d'installer)
-                      Anope en tant que root. Utilisez un utilisateur non 
+                      Anope en tant que root. Utilisez un utilisateur non
                       privilégié. Celui que vous utilisez pour l'IRCd ou
 		              un utilisateur dédié suffira.
 
@@ -27,10 +27,10 @@ Note : Vous devrez également lire les fichiers README et FAQ !
         cmake --version
 
     Si CMake est installé, vous aurez une ligne qui dit quelque chose comme
-    "cmake version 2.8.12.2". Si la version est inférieure à 2.4 ou si vous 
+    "cmake version 2.8.12.2". Si la version est inférieure à 2.4 ou si vous
     obtenez une erreur disant que la commande n'a pas été trouvée, vous ne
     pourrez pas utiliser CMake à moins de l'installer vous-même dans votre
-    répertoire home. CMake peut être téléchargé ici : 
+    répertoire home. CMake peut être téléchargé ici :
 
         http://www.cmake.org/cmake/resources/software.html
 
@@ -50,7 +50,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     Ceci va installer tous les fichiers nécessaires dans les dossiers que
     vous avez indiqués avec le script Config et régler les permissions des
     fichiers. Vous devez vous assurer que le répertoire data n'est pas 
-    accessible par les autres utilisateurs, car des utilisateurs 
+    accessible par les autres utilisateurs, car des utilisateurs
     malveillants pourraient causer des problèmes sur votre réseau, si les
     mots de passe ne sont pas chiffrés, ou lire les mémos de tous les
     utilisateurs.
@@ -82,7 +82,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
 
 3) Configuration de l'IRCd
 
-    Les Services agissent comme un serveur IRC avec des pseudo-clients. 
+    Les Services agissent comme un serveur IRC avec des pseudo-clients.
     Pour les relier à votre réseau, vous aurez besoin de configurer votre
     IRCd pour permettre aux services de se connecter.
 
@@ -106,7 +106,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     Allez dans le répertoire où les fichiers binaires ont été installés
     (par défaut, ~/services/bin). Tapez ./services pour lancer Anope.
 
-    S'il y a des erreurs de syntaxe dans le fichier de configuration, elles 
+    S'il y a des erreurs de syntaxe dans le fichier de configuration, elles
     seront affichées à l'écran. Corrigez-les jusqu'à ce qu'il n'y en ait
     plus. Un démarrage réussi ne générera pas de message.
 

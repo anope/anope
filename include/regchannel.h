@@ -231,7 +231,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 */
 	Anope::string GetIdealBan(User *u) const;
 
-	/** Finds a ChannelInfo 
+	/** Finds a ChannelInfo
 	 * @param name channel name to lookup
 	 * @return the ChannelInfo associated with the channel
 	 */

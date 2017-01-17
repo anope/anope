@@ -456,7 +456,7 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 
 		query.SetValue(it->first, buf, escape);
 	}
-	
+
 	return query;
 }
 
@@ -476,7 +476,7 @@ void MySQLService::Connect()
 
 	if (!connect)
 		throw SQL::Exception("Unable to connect to MySQL service " + this->name + ": " + mysql_error(this->sql));
-	
+
 	Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->name << " at " << this->server << ":" << this->port;
 }
 
@@ -553,4 +553,3 @@ void DispatcherThread::Run()
 }
 
 MODULE_INIT(ModuleSQL)
-

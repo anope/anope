@@ -80,7 +80,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 			}
 
 			IRCD->SendBOB();
-	
+
 			for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
 			{
 				Server *s = Me->GetLinks()[i];
@@ -157,7 +157,7 @@ Server::~Server()
 
 	for (unsigned i = this->links.size(); i > 0; --i)
 		this->links[i - 1]->Delete(this->quit_reason);
-	
+
 	Servers::ByName.erase(this->name);
 	if (!this->sid.empty())
 		Servers::ByID.erase(this->sid);
@@ -336,18 +336,18 @@ void Server::Notice(BotInfo *source, const Anope::string &message)
 Server *Server::Find(const Anope::string &name, bool name_only)
 {
 	Anope::map<Server *>::iterator it;
-	
+
 	if (!name_only)
 	{
 		it = Servers::ByID.find(name);
 		if (it != Servers::ByID.end())
 			return it->second;
 	}
-	
+
 	it = Servers::ByName.find(name);
 	if (it != Servers::ByName.end())
 		return it->second;
-	
+
 	return NULL;
 }
 
@@ -358,4 +358,3 @@ Server* Servers::GetUplink()
 			return Me->GetLinks()[i];
 	return NULL;
 }
-

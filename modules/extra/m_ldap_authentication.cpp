@@ -29,7 +29,7 @@ struct IdentifyInfo
 	{
 		req->Hold(me);
 	}
-	
+
 	~IdentifyInfo()
 	{
 		req->Release(me);

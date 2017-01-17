@@ -545,7 +545,7 @@ class NickServCore : public Module, public NickServService
 				expire = true;
 
 			FOREACH_MOD(OnPreNickExpire, (na, expire));
-		
+
 			if (expire)
 			{
 				Log(LOG_NORMAL, "nickserv/expire", NickServ) << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
@@ -572,4 +572,3 @@ class NickServCore : public Module, public NickServService
 };
 
 MODULE_INIT(NickServCore)
-

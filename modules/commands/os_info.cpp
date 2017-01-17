@@ -18,7 +18,7 @@ struct OperInfo : Serializable
 	OperInfo() : Serializable("OperInfo"), created(0) { }
 	OperInfo(const Anope::string &t, const Anope::string &i, const Anope::string &a, time_t c) :
 		Serializable("OperInfo"), target(t), info(i), adder(a), created(c) { }
-	
+
 	~OperInfo();
 
 	void Serialize(Serialize::Data &data) const anope_override
@@ -74,7 +74,7 @@ Serializable *OperInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	Extensible *e = OperInfos::Find(starget);
 	if (!e)
 		return NULL;
-	
+
 	OperInfos *oi = e->Require<OperInfos>("operinfo");
 	OperInfo *o;
 	if (obj)

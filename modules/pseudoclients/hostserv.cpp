@@ -119,4 +119,3 @@ class HostServCore : public Module
 };
 
 MODULE_INIT(HostServCore)
-

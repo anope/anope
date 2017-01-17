@@ -19,4 +19,3 @@ class Index : public WebPanelPage
 };
 
 }
-

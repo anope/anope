@@ -60,7 +60,7 @@ Note: You should also read the README and FAQ files!
     most likely not work!
 
     If you need help, you should visit http://forum.anope.org/ or #anope on
-    irc.anope.org. Provide *complete* error output, along with other relevant 
+    irc.anope.org. Provide *complete* error output, along with other relevant
     information eg. OS, compiler and C++ library versions.
     See the README file for more information.
 
@@ -116,8 +116,8 @@ Note: You should also read the README and FAQ files!
     still running, and restart it if not.
 
     First rename the example.chk script that is in Anope path (by default,
-    this is ~/services/conf) to services.chk and edit it. You'll need to 
-    modify the CONFIGURATION part of the file. Then ensure that the file is 
+    this is ~/services/conf) to services.chk and edit it. You'll need to
+    modify the CONFIGURATION part of the file. Then ensure that the file is
     marked as executable by typing chmod +x services.chk, and try to launch the
     script to see if it works (Anope must not be running when you do this ;))
 

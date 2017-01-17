@@ -111,7 +111,7 @@ class CommandNSSetChanstats : public Command
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
-	
+
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
 		this->SendSyntax(source);
@@ -653,4 +653,3 @@ class MChanstats : public Module
 };
 
 MODULE_INIT(MChanstats)
-

@@ -166,7 +166,7 @@ class CommandCSDown : public Command
 			const Anope::string &nick = params.size() > 1 ? params[1] : source.GetNick();
 
 			Channel *c = Channel::Find(channel);
-			
+
 			if (c == NULL)
 			{
 				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());

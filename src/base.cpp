@@ -46,4 +46,3 @@ void Base::DelReference(ReferenceBase *r)
 		}
 	}
 }
-

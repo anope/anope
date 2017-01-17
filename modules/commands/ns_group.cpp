@@ -18,7 +18,7 @@ class NSGroupRequest : public IdentifyRequest
 	Command *cmd;
 	Anope::string nick;
 	Reference<NickAlias> target;
- 
+
  public:
 	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(o, targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
 
@@ -335,7 +335,7 @@ class CommandNSGList : public Command
 		source.Reply(!nick.empty() ? _("List of nicknames in the group of \002%s\002:") : _("List of nicknames in your group:"), nc->display.c_str());
 		std::vector<Anope::string> replies;
 		list.Process(replies);
-	
+
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 

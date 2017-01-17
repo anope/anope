@@ -53,7 +53,7 @@ class CommandOSConfig : public Command
 			const Anope::string show_blocks[] = { "serverinfo", "networkinfo", "options", "" };
 
 			Log(LOG_ADMIN, source, this) << "VIEW";
-			
+
 			for (unsigned i = 0; !show_blocks[i].empty(); ++i)
 			{
 				Configuration::Block *block = Config->GetBlock(show_blocks[i]);

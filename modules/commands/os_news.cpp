@@ -115,7 +115,7 @@ class MyNewsService : public NewsService
 	{
 		this->newsItems[n->type].push_back(n);
 	}
-	
+
 	void DelNewsItem(NewsItem *n)
 	{
 		std::vector<NewsItem *> &list = this->GetNewsList(n->type);
@@ -259,7 +259,7 @@ class NewsBase : public Command
 
 		const char **msgs = findmsgs(ntype);
 		if (!msgs)
-			throw CoreException("news: Invalid type to do_news()");
+			throw CoreException("news: Invalid type to DoNews()");
 
 		if (cmd.equals_ci("LIST"))
 			return this->DoList(source, ntype, msgs);
@@ -404,7 +404,7 @@ class OSNews : public Module
 			msg = _("[\002Random News\002 - %s] %s");
 
 		int start = 0;
-	       
+
 		if (Type != NEWS_RANDOM)
 		{
 			start = newsList.size() - news_count;

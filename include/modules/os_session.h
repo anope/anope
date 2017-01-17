@@ -48,7 +48,7 @@ class SessionService : public Service
 
 	virtual Exception *FindException(User *u) = 0;
 
-	virtual Exception *FindException(const Anope::string &host) = 0; 
+	virtual Exception *FindException(const Anope::string &host) = 0;
 
 	virtual ExceptionVector &GetExceptions() = 0;
 

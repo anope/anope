@@ -70,7 +70,7 @@ struct BadWordsImpl : BadWords
 	{
 		if (this->badwords->empty() || index >= this->badwords->size())
 			return;
-	
+
 		FOREACH_MOD(OnBadWordDel, (ci, (*this->badwords)[index]));
 
 		delete this->badwords->at(index);
@@ -127,7 +127,7 @@ Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	unsigned int n;
 	data["type"] >> n;
-	
+
 	BadWordImpl *bw;
 	if (obj)
 		bw = anope_dynamic_static_cast<BadWordImpl *>(obj);
@@ -140,7 +140,7 @@ Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 	BadWordsImpl *bws = ci->Require<BadWordsImpl>("badwords");
 	if (!obj)
 		bws->badwords->push_back(bw);
-	
+
 	return bw;
 }
 

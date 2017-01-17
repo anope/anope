@@ -230,7 +230,7 @@ class CommandCSSetPrivate : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Enables or disables the \002private\002 option for a channel."));
-		
+
 		BotInfo *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/list", bi, cmd))

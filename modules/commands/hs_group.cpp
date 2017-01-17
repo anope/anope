@@ -24,7 +24,7 @@ class CommandHSGroup : public Command
 		if (!na || !na->HasVhost())
 			return;
 
-		setting = true;	
+		setting = true;
 		for (unsigned i = 0; i < na->nc->aliases->size(); ++i)
 		{
 			NickAlias *nick = na->nc->aliases->at(i);

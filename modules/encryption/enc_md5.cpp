@@ -284,7 +284,7 @@ class MD5Context : public Encryption::Context
 
 	/* MD5 finalization. Ends an MD5 message-digest opera
 	 * the message digest and zeroizing the context.
-	 */  
+	 */
 	void Finalize() anope_override
 	{
 		unsigned char bits[8];

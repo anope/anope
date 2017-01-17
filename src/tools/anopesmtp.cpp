@@ -300,7 +300,7 @@ int smtp_send_email()
 
 	if (!smtp_send("HELO anope\r\n"))
 	{
-		alog("SMTP: error writting to socket");
+		alog("SMTP: error writing to socket");
 		return 0;
 	}
 
@@ -323,7 +323,7 @@ int smtp_send_email()
 
 	if (!smtp_send(buf))
 	{
-		alog("SMTP: error writting to socket");
+		alog("SMTP: error writing to socket");
 		return 0;
 	}
 
@@ -343,7 +343,7 @@ int smtp_send_email()
 
 	if (!smtp_send(buf))
 	{
-		alog("SMTP: error writting to socket");
+		alog("SMTP: error writing to socket");
 		return 0;
 	}
 
@@ -362,7 +362,7 @@ int smtp_send_email()
 
 	if (!smtp_send("DATA\r\n"))
 	{
-		alog("SMTP: error writting to socket");
+		alog("SMTP: error writing to socket");
 		return 0;
 	}
 
@@ -382,13 +382,13 @@ int smtp_send_email()
 	for (std::vector<std::string>::const_iterator it = smail.smtp_headers.begin(), it_end = smail.smtp_headers.end(); it != it_end; ++it)
 		if (!smtp_send(it->c_str()))
 		{
-			alog("SMTP: error writting to socket");
+			alog("SMTP: error writing to socket");
 			return 0;
 		}
 
 	if (!smtp_send("\r\n"))
 	{
-		alog("SMTP: error writting to socket");
+		alog("SMTP: error writing to socket");
 		return 0;
 	}
 
@@ -398,7 +398,7 @@ int smtp_send_email()
 		{
 			if (!smtp_send(it->c_str()))
 			{
-				alog("SMTP: error writting to socket");
+				alog("SMTP: error writing to socket");
 				return 0;
 			}
 		}
@@ -407,7 +407,7 @@ int smtp_send_email()
 
 	if (!smtp_send("\r\n.\r\n"))
 	{
-		alog("SMTP: error writting to socket");
+		alog("SMTP: error writing to socket");
 		return 0;
 	}
 

@@ -66,7 +66,6 @@ bool* Extensible::Extend(const Anope::string &name, const bool &what)
 	if (ref)
 		return ref->Set(this);
 
-	Log(LOG_DEBUG) << "Extend for non-existent type " << name << " on " << static_cast<void *>(this);
+	Log(LOG_DEBUG) << "Extend for nonexistent type " << name << " on " << static_cast<void *>(this);
 	return NULL;
 }
-

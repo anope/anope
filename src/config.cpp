@@ -35,7 +35,7 @@ int Block::CountBlock(const Anope::string &bname)
 {
 	if (!this)
 		return 0;
-	
+
 	return blocks.count(bname);
 }
 
@@ -43,7 +43,7 @@ Block* Block::GetBlock(const Anope::string &bname, int num)
 {
 	if (!this)
 		return NULL;
-	
+
 	std::pair<block_map::iterator, block_map::iterator> it = blocks.equal_range(bname);
 
 	for (int i = 0; it.first != it.second; ++it.first, ++i)
@@ -278,7 +278,7 @@ Conf::Conf() : Block("")
 
 		ValidateNotEmpty("oper", "name", nname);
 		ValidateNotEmpty("oper", "type", type);
-		
+
 		OperType *ot = NULL;
 		for (unsigned j = 0; j < this->MyOperTypes.size(); ++j)
 			if (this->MyOperTypes[j]->GetName() == type)
@@ -588,7 +588,7 @@ Block *Conf::GetModule(Module *m)
 {
 	if (!m)
 		return NULL;
-	
+
 	return GetModule(m->name);
 }
 
@@ -599,7 +599,7 @@ Block *Conf::GetModule(const Anope::string &mname)
 		return it->second;
 
 	Block* &block = modules[mname];
-	
+
 	/* Search for the block */
 	for (std::pair<block_map::iterator, block_map::iterator> iters = blocks.equal_range("module"); iters.first != iters.second; ++iters.first)
 	{
@@ -723,10 +723,10 @@ void Conf::LoadConf(File &file)
 	Log(LOG_DEBUG) << "Start to read conf " << file.GetName();
 	// Start reading characters...
 	while (!file.End())
-	{	
+	{
 		Anope::string line = file.Read();
 		++linenumber;
-		
+
 		/* If this line is completely empty and we are in a quote, just append a newline */
 		if (line.empty() && in_quote)
 			wordbuffer += "\n";
@@ -925,4 +925,3 @@ void Conf::LoadConf(File &file)
 	if (!block_stack.empty())
 		throw ConfigException("Unterminated block at end of file: " + file.GetName() + ". Block was opened on line " + stringify(block_stack.top()->linenum));
 }
-

@@ -201,7 +201,7 @@ class NSSetMisc : public Module
 		for (int i = 0; i < conf->CountBlock("command"); ++i)
 		{
 			Configuration::Block *block = conf->GetBlock("command", i);
-			
+
 			const Anope::string &cmd = block->Get<const Anope::string>("command");
 
 			if (cmd != "nickserv/set/misc" && cmd != "nickserv/saset/misc")

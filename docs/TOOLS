@@ -20,7 +20,6 @@ Anope Bundled Tools
     address. This should generate a log file of what happened when it tried
     to connect to the SMTP server.
 
-        Credits:
-    Originally written by  Dominick Meglio    <codemastr@unrealircd.com>
-    Ported to *nix by      Trystan Scott Lee  <trystan@nomadirc.net>
-
+    Credits:
+        Originally written by  Dominick Meglio    <codemastr@unrealircd.com>
+        Ported to *nix by      Trystan Scott Lee  <trystan@nomadirc.net>

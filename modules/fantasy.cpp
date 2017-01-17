@@ -46,7 +46,7 @@ class CommandBSSetFantasy : public Command
 		if (value.equals_ci("ON"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable fantasy"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable fantasy";
 
 			ci->Extend<bool>("BS_FANTASY");
 			source.Reply(_("Fantasy mode is now \002on\002 on channel %s."), ci->name.c_str());
@@ -54,7 +54,7 @@ class CommandBSSetFantasy : public Command
 		else if (value.equals_ci("OFF"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable fantasy"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable fantasy";
 
 			ci->Shrink<bool>("BS_FANTASY");
 			source.Reply(_("Fantasy mode is now \002off\002 on channel %s."), ci->name.c_str());
@@ -125,7 +125,7 @@ class Fantasy : public Module
 		{
 			return;
 		}
-		
+
 		if (params.empty())
 			return;
 
@@ -149,7 +149,7 @@ class Fantasy : public Module
 		ServiceReference<Command> cmd("Command", info.name);
 		if (!cmd)
 		{
-			Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for non-existent service " << info.name << "!";
+			Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for nonexistent service " << info.name << "!";
 			return;
 		}
 
@@ -216,4 +216,3 @@ class Fantasy : public Module
 };
 
 MODULE_INIT(Fantasy)
-

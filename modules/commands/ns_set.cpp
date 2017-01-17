@@ -416,7 +416,7 @@ class CommandNSSetEmail : public Command
 	static bool SendConfirmMail(User *u, NickCore *nc, BotInfo *bi, const Anope::string &new_email)
 	{
 		Anope::string code = Anope::Random(9);
-	
+
 		std::pair<Anope::string, Anope::string> *n = nc->Extend<std::pair<Anope::string, Anope::string> >("ns_set_email");
 		n->first = new_email;
 		n->second = code;
@@ -1176,7 +1176,7 @@ class NSSet : public Module
 
 	SerializableExtensibleItem<bool> autoop, killprotect, kill_quick, kill_immed,
 		message, secure, noexpire;
-	
+
 	struct KeepModes : SerializableExtensibleItem<bool>
 	{
 		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }

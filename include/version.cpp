@@ -28,7 +28,7 @@ static std::string get_git_hash(const std::string &git_dir)
 		fd.close();
 		return "";
 	}
-	
+
 	fd.close();
 
 	filebuf = filebuf.substr(5);

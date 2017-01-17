@@ -119,7 +119,7 @@ class CommandNSList : public Command
 				++count;
 			}
 		}
-			
+
 		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
 
 		std::vector<Anope::string> replies;

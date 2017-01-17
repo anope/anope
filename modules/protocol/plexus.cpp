@@ -343,7 +343,7 @@ class ProtoPlexus : public Module
 	Message::Topic message_topic;
 	Message::Version message_version;
 	Message::Whois message_whois;
-	
+
 	/* Hybrid message handlers */
 	ServiceAlias message_bmask, message_eob, message_join, message_nick, message_sid, message_sjoin,
 			message_tburst, message_tmode;

@@ -19,4 +19,3 @@ class Confirm : public WebPanelPage
 };
 
 }
-

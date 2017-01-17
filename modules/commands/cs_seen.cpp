@@ -57,7 +57,7 @@ struct SeenInfo : Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		Anope::string snick;
-		
+
 		data["nick"] >> snick;
 
 		SeenInfo *s;

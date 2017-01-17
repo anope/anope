@@ -397,7 +397,7 @@ bool ModeManager::AddUserMode(UserMode *um)
 		return false;
 	if (ModeManager::FindUserModeByName(um->name) != NULL)
 		return false;
-	
+
 	if (um->name.empty())
 	{
 		um->name = stringify(++GenericUserModes);
@@ -470,10 +470,10 @@ void ModeManager::RemoveUserMode(UserMode *um)
 	unsigned want = um->mchar;
 	if (want >= UserModesIdx.size())
 		return;
-	
+
 	if (UserModesIdx[want] != um)
 		return;
-	
+
 	UserModesIdx[want] = NULL;
 
 	UserModesByName.erase(um->name);
@@ -495,10 +495,10 @@ void ModeManager::RemoveChannelMode(ChannelMode *cm)
 		unsigned want = cm->mchar;
 		if (want >= ChannelModesIdx.size())
 			return;
-	
+
 		if (ChannelModesIdx[want] != cm)
 			return;
-	
+
 		ChannelModesIdx[want] = NULL;
 	}
 
@@ -532,7 +532,7 @@ ChannelMode *ModeManager::FindChannelModeByChar(char mode)
 	unsigned want = mode;
 	if (want >= ChannelModesIdx.size())
 		return NULL;
-	
+
 	return ChannelModesIdx[want];
 }
 
@@ -541,7 +541,7 @@ UserMode *ModeManager::FindUserModeByChar(char mode)
 	unsigned want = mode;
 	if (want >= UserModesIdx.size())
 		return NULL;
-	
+
 	return UserModesIdx[want];
 }
 
@@ -566,11 +566,11 @@ char ModeManager::GetStatusChar(char value)
 	unsigned want = value;
 	if (want >= ChannelModesIdx.size())
 		return 0;
-	
+
 	ChannelMode *cm = ChannelModesIdx[want];
 	if (cm == NULL || cm->type != MODE_STATUS || cm->mchar == value)
 		return 0;
-	
+
 	return cm->mchar;
 }
 
@@ -769,21 +769,21 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 		else
 			this->nick = fh;
 	}
-	
+
 	at = this->host.find('#');
 	if (at != Anope::string::npos)
 	{
 		this->real = this->host.substr(at + 1);
 		this->host = this->host.substr(0, at);
 	}
-	
+
 	/* If the mask is all *'s it will match anything, so just clear it */
 	if (this->nick.find_first_not_of("*") == Anope::string::npos)
 		this->nick.clear();
-	
+
 	if (this->user.find_first_not_of("*") == Anope::string::npos)
 		this->user.clear();
-	
+
 	if (this->host.find_first_not_of("*") == Anope::string::npos)
 		this->host.clear();
 	else
@@ -888,10 +888,9 @@ bool Entry::Matches(User *u, bool full) const
 	else if (!this->host.empty() && !Anope::Match(u->GetDisplayedHost(), this->host) && !Anope::Match(u->GetCloakedHost(), this->host) &&
 		(!full || (!Anope::Match(u->host, this->host) && !Anope::Match(u->ip.addr(), this->host))))
 		ret = false;
-	
+
 	if (!this->real.empty() && !Anope::Match(u->realname, this->real))
 		ret = false;
-	
+
 	return ret;
 }
-

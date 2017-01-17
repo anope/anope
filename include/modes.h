@@ -197,7 +197,7 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
-	 * @param msymbol The symbol for the mode, eg @ % 
+	 * @param msymbol The symbol for the mode, eg @ %
 	 * @param mlevel A level for the mode, which is usually determined by the PREFIX capab
 	 */
 	ChannelModeStatus(const Anope::string &name, char mc, char msymbol, short mlevel);

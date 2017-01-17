@@ -121,7 +121,7 @@ class CommandCSTopic : public Command
 		ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
 		if (has_topiclock)
 			topiclock->Set(ci);
-	
+
 		bool override = !source.AccessFor(ci).HasPriv("TOPIC");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
 	}

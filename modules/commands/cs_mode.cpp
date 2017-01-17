@@ -222,13 +222,13 @@ void ModeLockImpl::Serialize(Serialize::Data &data) const
 Serializable* ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sci;
-	
+
 	data["ci"] >> sci;
 
 	ChannelInfo *ci = ChannelInfo::Find(sci);
 	if (!ci)
 		return NULL;
-	
+
 	ModeLockImpl *ml;
 	if (obj)
 		ml = anope_dynamic_static_cast<ModeLockImpl *>(obj);
@@ -475,7 +475,7 @@ class CommandCSMode : public Command
 		else
 			this->OnSyntaxError(source, subcommand);
 	}
-	
+
 	void DoSet(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.GetUser();
@@ -832,7 +832,7 @@ class CommandCSModes : public Command
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
-		
+
 		if (u == targ ? !u_access.HasPriv(m.second + "ME") : !u_access.HasPriv(m.second))
 		{
 			if (!can_override)
@@ -929,7 +929,7 @@ class CSMode : public Module
 		for (int i = 0; i < conf->CountBlock("command"); ++i)
 		{
 			Configuration::Block *block = conf->GetBlock("command", i);
-			
+
 			const Anope::string &cname = block->Get<const Anope::string>("name"),
 					&cmd = block->Get<const Anope::string>("command");
 
@@ -938,7 +938,7 @@ class CSMode : public Module
 
 			const Anope::string &set = block->Get<const Anope::string>("set"),
 					&unset = block->Get<const Anope::string>("unset");
-			
+
 			if (set.empty() && unset.empty())
 				continue;
 
@@ -983,7 +983,7 @@ class CSMode : public Module
 						if (c->HasMode(cm->name))
 							c->RemoveMode(NULL, cm, "", false);
 					}
-		
+
 				}
 				else if (cm->type == MODE_LIST || cm->type == MODE_STATUS)
 				{

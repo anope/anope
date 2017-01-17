@@ -32,4 +32,3 @@ Anope Internal Events
 
     The "anope_override" identifier is for compatibility with C++11.
     Its usage is highly recommended.
-

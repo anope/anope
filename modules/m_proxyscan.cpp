@@ -117,7 +117,7 @@ class HTTPProxyConnect : public ProxyConnect, public BufferedSocket
 	void OnConnect() anope_override
 	{
 		this->Write("CONNECT %s:%d HTTP/1.0", target_ip.c_str(), target_port);
-		this->Write("Content-length: 0");
+		this->Write("Content-Length: 0");
 		this->Write("Connection: close");
 		this->Write("");
 	}
@@ -376,4 +376,3 @@ class ModuleProxyScan : public Module
 };
 
 MODULE_INIT(ModuleProxyScan)
-

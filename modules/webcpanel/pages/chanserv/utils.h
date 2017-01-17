@@ -16,4 +16,3 @@ extern void BuildChanList(NickAlias *, TemplateFileServer::Replacements &);
 }
 
 }
-

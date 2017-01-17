@@ -214,4 +214,3 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	return na;
 }
-

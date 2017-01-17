@@ -33,7 +33,7 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 
 	if (ModuleManager::FindModule(this->name))
 		throw CoreException("Module already exists!");
-	
+
 	if (Anope::NoThird && type & THIRD)
 		throw ModuleException("Third party modules may not be loaded");
 
@@ -127,4 +127,3 @@ int ModuleVersion::GetPatch() const
 {
 	return this->version_patch;
 }
-

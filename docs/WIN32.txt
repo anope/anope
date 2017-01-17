@@ -159,4 +159,3 @@ Anope for Windows
     Anope's Windows Installer was made using:
 
         * NSIS 2.20          <http://nsis.sourceforge.net>
-

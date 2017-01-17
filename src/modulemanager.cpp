@@ -28,7 +28,7 @@ void ModuleManager::CleanupRuntimeDirectory()
 {
 	Anope::string dirbuf = Anope::DataDir + "/runtime";
 
-	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
+	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment, please wait";
 
 	DIR *dirp = opendir(dirbuf.c_str());
 	if (!dirp)
@@ -36,7 +36,7 @@ void ModuleManager::CleanupRuntimeDirectory()
 		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << ")";
 		return;
 	}
-	
+
 	for (dirent *dp; (dp = readdir(dirp));)
 	{
 		if (!dp->d_ino)
@@ -62,17 +62,17 @@ void ModuleManager::CleanupRuntimeDirectory()
 static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
 	Anope::string input = Anope::ModuleDir + "/modules/" + name + ".so";
-	
+
 	struct stat s;
 	if (stat(input.c_str(), &s) == -1)
 		return MOD_ERR_NOEXIST;
 	else if (!S_ISREG(s.st_mode))
 		return MOD_ERR_NOEXIST;
-	
+
 	std::ifstream source(input.c_str(), std::ios_base::in | std::ios_base::binary);
 	if (!source.is_open())
 		return MOD_ERR_NOEXIST;
-	
+
 	char *tmp_output = strdup(output.c_str());
 	int target_fd = mkstemp(tmp_output);
 	if (target_fd == -1 || close(target_fd) == -1)
@@ -85,7 +85,7 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 	free(tmp_output);
 
 	Log(LOG_DEBUG_2) << "Runtime module location: " << output;
-	
+
 	std::ofstream target(output.c_str(), std::ios_base::in | std::ios_base::binary);
 	if (!target.is_open())
 	{
@@ -103,7 +103,7 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 		target.write(buffer, read_len);
 		want -= read_len;
 	}
-	
+
 	source.close();
 	target.close();
 
@@ -216,7 +216,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		dlclose(handle);
 		return MOD_ERR_NOLOAD;
 	}
-	
+
 	/* Create module. */
 	Anope::string nick;
 	if (u)
@@ -234,7 +234,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		Log() << "Error while loading " << modname << ": " << ex.GetReason();
 		moderr = MOD_ERR_EXCEPTION;
 	}
-	
+
 	if (moderr != MOD_ERR_OK)
 	{
 		if (dlclose(handle))
@@ -263,7 +263,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	catch (const NotImplementedException &ex)
 	{
 	}
-	
+
 	if (moderr != MOD_ERR_OK)
 	{
 		DeleteModule(m);
@@ -389,7 +389,7 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 	if (!filename.empty())
 		unlink(filename.c_str());
 #endif
-	
+
 	return MOD_ERR_OK;
 }
 
@@ -516,7 +516,7 @@ void ModuleManager::UnloadAll()
 			if ((m->type & j) == m->type)
 				modules.push_back(m->name);
 		}
-	
+
 	for (unsigned i = 0; i < modules.size(); ++i)
 	{
 		Module *m = FindModule(modules[i]);
@@ -524,4 +524,3 @@ void ModuleManager::UnloadAll()
 			UnloadModule(m, NULL);
 	}
 }
-

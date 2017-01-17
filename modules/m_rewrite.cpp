@@ -20,7 +20,7 @@ struct Rewrite
 		for (unsigned i = 0; i < sm.size(); ++i)
 			if (i >= message.size() || (sm[i] != "$" && !sm[i].equals_ci(message[i])))
 				return false;
-		
+
 		return true;
 	}
 
@@ -71,7 +71,7 @@ struct Rewrite
 	}
 
 	static std::vector<Rewrite> rewrites;
-	
+
 	static Rewrite *Find(const Anope::string &client, const Anope::string &cmd)
 	{
 		for (unsigned i = 0; i < rewrites.size(); ++i)

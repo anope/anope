@@ -20,4 +20,3 @@ bool WebCPanel::Logout::OnRequest(HTTPProvider *server, const Anope::string &pag
 	reply.headers["Location"] = Anope::string("http") + (server->IsSSL() ? "s" : "") + "://" + message.headers["Host"] + "/";
 	return true;
 }
-

@@ -321,7 +321,7 @@ class CommandOSAKill : public Command
 		else
 		{
 			source.Reply(_("Current AKILL list:"));
-		
+
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 

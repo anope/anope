@@ -133,7 +133,7 @@ class CommandEntryMessage : public Command
 
 		source.Reply(_("End of entry message list."));
 	}
-		
+
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");

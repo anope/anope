@@ -61,7 +61,7 @@ void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params
 
 	if (!targ || targ->server != Me || !c || c->FindUser(targ))
 		return;
-	
+
 	FOREACH_MOD(OnInvite, (source.GetUser(), c, targ));
 }
 
@@ -119,14 +119,14 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	/* Their TS is newer, don't accept any modes from them */
 	else if (ts > c->creation_time)
 		keep_their_modes = false;
-	
+
 	/* Update the modes for the channel */
 	if (keep_their_modes && !modes.empty())
 		/* If we are syncing, mlock is checked later in Channel::Sync. It is important to not check it here
 		 * so that Channel::SetCorrectModes can correctly detect the presence of channel mode +r.
 		 */
 		c->SetModesInternal(source, modes, ts, !c->syncing);
-	
+
 	for (std::list<SJoinUser>::const_iterator it = users.begin(), it_end = users.end(); it != it_end; ++it)
 	{
 		const ChannelStatus &status = it->first;
@@ -147,7 +147,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		 * they aren't allowed to have (secureops etc).
 		 */
 		c->SetCorrectModes(u, true);
-		
+
 		FOREACH_MOD(OnJoinChannel, (u, c));
 	}
 
@@ -365,7 +365,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			FOREACH_RESULT(OnBotPrivmsg, MOD_RESULT, (u, bi, message));
 			if (MOD_RESULT == EVENT_STOP)
 				return;
-			
+
 			bi->OnMessage(u, message);
 		}
 	}
@@ -499,4 +499,3 @@ void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	else
 		IRCD->SendNumeric(401, source.GetSource(), "%s :No such user.", params[0].c_str());
 }
-

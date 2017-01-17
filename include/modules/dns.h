@@ -78,11 +78,11 @@ namespace DNS
 
 		Question() : type(QUERY_NONE), qclass(0) { }
 		Question(const Anope::string &n, QueryType t, unsigned short c = 1) : name(n), type(t), qclass(c) { }
-		inline bool operator==(const Question & other) const { return name == other.name && type == other.type && qclass == other.qclass; } 
+		inline bool operator==(const Question & other) const { return name == other.name && type == other.type && qclass == other.qclass; }
 
 		struct hash
 		{
-			size_t operator()(const Question &q) const 
+			size_t operator()(const Question &q) const
 			{
 				return Anope::hash_ci()(q.name);
 			}
@@ -94,7 +94,7 @@ namespace DNS
 		unsigned int ttl;
 		Anope::string rdata;
 		time_t created;
-	
+
 		ResourceRecord(const Anope::string &n, QueryType t, unsigned short c = 1) : Question(n, t, c), ttl(0), created(Anope::CurTime) { }
 		ResourceRecord(const Question &q) : Question(q), ttl(0), created(Anope::CurTime) { }
 	};
@@ -104,7 +104,7 @@ namespace DNS
 		std::vector<Question> questions;
 		std::vector<ResourceRecord> answers, authorities, additional;
 		Error error;
-	
+
 		Query() : error(ERROR_NONE) { }
 		Query(const Question &q) : error(ERROR_NONE) { questions.push_back(q); }
 	};

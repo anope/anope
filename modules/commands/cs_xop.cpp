@@ -349,7 +349,7 @@ class CommandCSXOP : public Command
 					return;
 				}
 			}
-			
+
 			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), source.command.c_str());
 		}
 	}
@@ -466,7 +466,7 @@ class CommandCSXOP : public Command
 
 			if (access->provider->name != "access/xop" || source.command.upper() != access->AccessSerialize())
 				continue;
-	
+
 			delete ci->EraseAccess(i - 1);
 		}
 

@@ -110,9 +110,8 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		replacements["KILL_QUICK"];
 	if (!na->nc->HasExt("KILLPROTECT") && !na->nc->HasExt("KILL_QUICK"))
 		replacements["KILL_OFF"];
-	
+
 	TemplateFileServer page("nickserv/info.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
 	return true;
 }
-

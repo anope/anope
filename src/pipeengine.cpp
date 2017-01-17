@@ -78,4 +78,3 @@ void Pipe::Notify()
 {
 	this->Write("\0", 1);
 }
-

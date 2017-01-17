@@ -25,7 +25,7 @@ struct KickerDataImpl : KickerData
 		capsmin = capspercent = 0;
 		floodlines = floodsecs = 0;
 		repeattimes = 0;
-		
+
 		dontkickops = dontkickvoices = false;
 	}
 
@@ -33,7 +33,7 @@ struct KickerDataImpl : KickerData
 	{
 		if (amsgs || badwords || bolds || caps || colors || flood || italics || repeat || reverses || underlines)
 			return;
-		
+
 		ci->Shrink<KickerData>("kickerdata");
 	}
 
@@ -297,7 +297,7 @@ class CommandBSKickBadwords : public CommandBSKickBase
 			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_BADWORDS, "badwords", kd, kd->badwords);
 			kd->Check(ci);
 		}
-		
+
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -818,7 +818,7 @@ class CommandBSSetDontKickOps : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickops"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickops";
 
 			kd->dontkickops = true;
 			source.Reply(_("Bot \002won't kick ops\002 on channel %s."), ci->name.c_str());
@@ -826,7 +826,7 @@ class CommandBSSetDontKickOps : public Command
 		else if (params[1].equals_ci("OFF"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickops"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickops";
 
 			kd->dontkickops = false;
 			source.Reply(_("Bot \002will kick ops\002 on channel %s."), ci->name.c_str());
@@ -883,7 +883,7 @@ class CommandBSSetDontKickVoices : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickvoices"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickvoices";
 
 			kd->dontkickvoices = true;
 			source.Reply(_("Bot \002won't kick voices\002 on channel %s."), ci->name.c_str());
@@ -891,7 +891,7 @@ class CommandBSSetDontKickVoices : public Command
 		else if (params[1].equals_ci("OFF"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickvoices"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickvoices";
 
 			kd->dontkickvoices = false;
 			source.Reply(_("Bot \002will kick voices\002 on channel %s."), ci->name.c_str());
@@ -1364,7 +1364,7 @@ class BSKick : public Module
 							else
 							{
 								Anope::string wordbuf = " " + bw->word + " ";
-	
+
 								if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 									mustkick = true;
 							}

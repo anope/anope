@@ -131,7 +131,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			req->Dispatch();
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -303,4 +303,3 @@ class ModuleXMLRPCMain : public Module
 };
 
 MODULE_INIT(ModuleXMLRPCMain)
-

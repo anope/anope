@@ -282,7 +282,7 @@ bool cidr::operator<(const cidr &other) const
 {
 	if (this->addr.sa.sa_family != other.addr.sa.sa_family)
 		return this->addr.sa.sa_family < other.addr.sa.sa_family;
-	
+
 	switch (this->addr.sa.sa_family)
 	{
 		case AF_INET:
@@ -574,4 +574,3 @@ bool SocketEngine::IgnoreErrno()
 		|| GetLastError() == EINTR
 		|| GetLastError() == EINPROGRESS;
 }
-

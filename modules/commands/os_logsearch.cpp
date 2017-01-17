@@ -20,7 +20,7 @@ class CommandOSLogSearch : public Command
 		char timestamp[32];
 
 		tm *tm = localtime(&t);
-	
+
 		strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
 
 		return Anope::LogDir + "/" + file + "." + timestamp;

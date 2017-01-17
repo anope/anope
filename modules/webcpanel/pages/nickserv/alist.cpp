@@ -41,7 +41,7 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 		AccessGroup access = ci->AccessFor(na->nc);
 		if (access.empty())
 			continue;
-				
+
 		++chan_count;
 
 		replacements["NUMBERS"] = stringify(chan_count);
@@ -55,4 +55,3 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 	page.Serve(server, page_name, client, message, reply, replacements);
 	return true;
 }
-

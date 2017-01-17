@@ -91,4 +91,3 @@ std::set<Anope::string> WebCPanel::ChanServ::Akick::GetData()
 	v.insert("channel");
 	return v;
 }
-

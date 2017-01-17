@@ -112,4 +112,3 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 	page.Serve(server, page_name, client, message, reply, replacements);
 	return true;
 }
-

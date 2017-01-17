@@ -96,4 +96,3 @@ void ClientSocket::OnError(const Anope::string &error)
 {
 	Log(LOG_DEBUG) << "Socket error: " << error;
 }
-

@@ -174,4 +174,3 @@ void CommandCSGStats::Execute(CommandSource &source, const std::vector<Anope::st
 }
 
 MODULE_INIT(CSStats)
-

@@ -22,4 +22,3 @@ class Cert : public WebPanelProtectedPage
 }
 
 }
-

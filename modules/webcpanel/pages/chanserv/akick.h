@@ -24,4 +24,3 @@ class Akick : public WebPanelProtectedPage
 }
 
 }
-

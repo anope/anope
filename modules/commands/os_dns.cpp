@@ -424,7 +424,7 @@ class CommandOSDNS : public Command
 	{
 		DNSServer *s = DNSServer::Find(params[1]);
 		const Anope::string &zone = params.size() > 2 ? params[2] : "";
-		
+
 		if (!s)
 		{
 			source.Reply(_("Server %s does not exist."), params[1].c_str());
@@ -487,7 +487,7 @@ class CommandOSDNS : public Command
 	void AddIP(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		DNSServer *s = DNSServer::Find(params[1]);
-		
+
 		if (!s)
 		{
 			source.Reply(_("Server %s does not exist."), params[1].c_str());
@@ -522,11 +522,11 @@ class CommandOSDNS : public Command
 				dnsmanager->Notify(*it);
 		}
 	}
-	
+
 	void DelIP(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		DNSServer *s = DNSServer::Find(params[1]);
-		
+
 		if (!s)
 		{
 			source.Reply(_("Server %s does not exist."), params[1].c_str());
@@ -565,7 +565,7 @@ class CommandOSDNS : public Command
 	void OnSet(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		DNSServer *s = DNSServer::Find(params[1]);
-		
+
 		if (!s)
 		{
 			source.Reply(_("Server %s does not exist."), params[1].c_str());
@@ -598,7 +598,7 @@ class CommandOSDNS : public Command
 	void OnPool(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		DNSServer *s = DNSServer::Find(params[1]);
-		
+
 		if (!s)
 		{
 			source.Reply(_("Server %s does not exist."), params[1].c_str());
@@ -633,7 +633,7 @@ class CommandOSDNS : public Command
 	void OnDepool(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		DNSServer *s = DNSServer::Find(params[1]);
-		
+
 		if (!s)
 		{
 			source.Reply(_("Server %s does not exist."), params[1].c_str());

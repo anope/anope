@@ -17,7 +17,7 @@ class XMLRPCRequest
 	Anope::string id;
 	std::deque<Anope::string> data;
 	HTTPReply& r;
-	
+
 	XMLRPCRequest(HTTPReply &_r) : r(_r) { }
 	inline void reply(const Anope::string &dname, const Anope::string &ddata) { this->replies.insert(std::make_pair(dname, ddata)); }
 	inline const std::map<Anope::string, Anope::string> &get_replies() { return this->replies; }

@@ -20,14 +20,14 @@ class RatboxProto : public IRCDProto
 	BotInfo *FindIntroduced()
 	{
 		BotInfo *bi = Config->GetClient("OperServ");
-		
+
 		if (bi && bi->introduced)
 			return bi;
-		
+
 		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			if (it->second->introduced)
 				return it->second;
-			
+
 		return NULL;
 	}
 
@@ -65,18 +65,18 @@ class RatboxProto : public IRCDProto
 	{
 		/* Calculate the time left before this would expire, capping it at 2 days */
 		time_t timeleft = x->expires - Anope::CurTime;
-		
+
 		if (timeleft > 172800 || !x->expires)
 			timeleft = 172800;
-		
+
 		UplinkSocket::Message(FindIntroduced()) << "ENCAP * RESV " << timeleft << " " << x->mask << " 0 :" << x->GetReason();
 	}
-	
+
 	void SendSQLineDel(const XLine *x) anope_override
 	{
 		UplinkSocket::Message(Config->GetClient("OperServ")) << "ENCAP * UNRESV " << x->mask;
 	}
-	
+
 	void SendConnect() anope_override
 	{
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();

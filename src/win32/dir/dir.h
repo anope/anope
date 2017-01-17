@@ -21,7 +21,7 @@ struct DIR
 	WIN32_FIND_DATA data;
 	bool read_first;
 };
- 
+
 DIR *opendir(const char *);
 dirent *readdir(DIR *);
 int closedir(DIR *);

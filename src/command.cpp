@@ -309,7 +309,6 @@ bool Command::FindCommandFromService(const Anope::string &command_service, BotIn
 			return true;
 		}
 	}
-	
+
 	return false;
 }
-

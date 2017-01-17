@@ -56,7 +56,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 		return false;
 
 	Configuration::Block *b = Config->GetBlock("mail");
-	
+
 	if (!u)
 	{
 		if (!b->Get<bool>("usemail") || b->Get<const Anope::string>("sendfrom").empty())

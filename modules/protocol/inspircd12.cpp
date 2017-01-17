@@ -950,7 +950,7 @@ struct IRCDMessageFJoin : IRCDMessage
 			sju.second = User::Find(buf);
 			if (!sju.second)
 			{
-				Log(LOG_DEBUG) << "FJOIN for non-existent user " << buf << " on " << params[0];
+				Log(LOG_DEBUG) << "FJOIN for nonexistent user " << buf << " on " << params[0];
 				continue;
 			}
 
@@ -1226,7 +1226,7 @@ struct IRCDMessageServer : IRCDMessage
 struct IRCDMessageSQuit : Message::SQuit
 {
 	IRCDMessageSQuit(Module *creator) : Message::SQuit(creator) { }
-	
+
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params[0] == rsquit_id || params[0] == rsquit_server)

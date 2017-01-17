@@ -84,7 +84,7 @@ void PrivilegeManager::AddPrivilege(Privilege p)
 		if (priv.rank > p.rank)
 			break;
 	}
-	
+
 	Privileges.insert(Privileges.begin() + i, p);
 }
 
@@ -265,7 +265,7 @@ bool ChanAccess::Matches(const User *u, const NickCore *acc, ChannelInfo* &next)
 		else if (Anope::Match(u->GetDisplayedMask(), this->mask))
 			return true;
 	}
-	
+
 	if (acc)
 	{
 		for (unsigned i = 0; i < acc->aliases->size(); ++i)
@@ -275,12 +275,12 @@ bool ChanAccess::Matches(const User *u, const NickCore *acc, ChannelInfo* &next)
 				return true;
 		}
 	}
-	
+
 	if (IRCD->IsChannelValid(this->mask))
 	{
 		next = ChannelInfo::Find(this->mask);
 	}
-	
+
 	return false;
 }
 
@@ -313,7 +313,7 @@ bool ChanAccess::operator<(const ChanAccess &other) const
 			continue;
 
 		return !this_p && other_p;
-	}	
+	}
 
 	return false;
 }
@@ -473,4 +473,3 @@ bool AccessGroup::operator<=(const AccessGroup &other) const
 {
 	return !(*this > other);
 }
-

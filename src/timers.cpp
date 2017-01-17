@@ -124,4 +124,3 @@ void TimerManager::DeleteTimersFor(Module *m)
 			delete it->second;
 	}
 }
-

@@ -145,4 +145,3 @@ const std::list<Anope::string> OperType::GetPrivs() const
 	}
 	return priv_list;
 }
-

@@ -151,7 +151,7 @@ class CSTop : public Module
 				{
 					source.Reply(_("%2lu \002%-16s\002 letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"),
 						i+1, res.Get(i, "nick").c_str(), res.Get(i, "letters").c_str(),
-						res.Get(i, "words").c_str(), res.Get(i, "line").c_str(), 
+						res.Get(i, "words").c_str(), res.Get(i, "line").c_str(),
 						res.Get(i, "smileys").c_str(), res.Get(i, "actions").c_str());
 				}
 			}
@@ -184,6 +184,5 @@ void CommandCSGTop10::Execute(CommandSource &source, const std::vector<Anope::st
 {
 	me->DoTop(source, params, true, 10);
 }
-
 
 MODULE_INIT(CSTop)

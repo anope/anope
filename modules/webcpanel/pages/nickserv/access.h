@@ -22,4 +22,3 @@ class Access : public WebPanelProtectedPage
 }
 
 }
-

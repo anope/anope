@@ -269,7 +269,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 		ldap_unbind_ext(this->con, NULL, NULL);
 	}
-	
+
 	void BindAsAdmin(LDAPInterface *i) anope_override
 	{
 		this->Bind(i, this->admin_binddn, this->admin_pass);
@@ -575,7 +575,7 @@ class ModuleLDAP : public Module, public Pipe
 
 				delete req;
 			}
-		} 
+		}
 	}
 };
 
@@ -619,4 +619,3 @@ int LDAPModify::run()
 }
 
 MODULE_INIT(ModuleLDAP)
-

@@ -66,7 +66,7 @@ class MySessionService : public SessionService
 			Exception *e = *it;
 			if (Anope::Match(u->host, e->mask) || Anope::Match(u->ip.addr(), e->mask))
 				return e;
-			
+
 			if (cidr(e->mask).match(u->ip))
 				return e;
 		}
@@ -209,7 +209,7 @@ class CommandOSSession : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-	
+
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 		}
@@ -491,7 +491,7 @@ class CommandOSException : public Command
 		else
 		{
 			source.Reply(_("Current Session Limit Exception list:"));
-		
+
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 

@@ -467,4 +467,3 @@ XLine *XLineManager::CheckAllXLines(User *u)
 void XLineManager::OnExpire(const XLine *x)
 {
 }
-

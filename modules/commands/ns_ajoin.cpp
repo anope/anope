@@ -197,7 +197,7 @@ class CommandNSAJoin : public Command
 			for (; i < (*channels)->size(); ++i)
 				if ((*channels)->at(i)->channel.equals_ci(chan))
 					break;
-		
+
 			if (i == (*channels)->size())
 				notfoundchans += chan + ", ";
 			else
@@ -341,7 +341,7 @@ class NSAJoin : public Module
 			bool need_invite = false;
 			Anope::string key = entry->key;
 			AccessGroup u_access;
-			
+
 			if (ci != NULL)
 			{
 				if (ci->HasExt("CS_SUSPENDED"))
@@ -362,7 +362,7 @@ class NSAJoin : public Module
 					need_invite = true;
 				else if (c->HasMode("INVITE") && c->MatchesList(u, "INVITEOVERRIDE") == false)
 					need_invite = true;
-					
+
 				if (c->HasMode("KEY"))
 				{
 					Anope::string k;

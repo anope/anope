@@ -113,7 +113,7 @@ void SocketEngine::Process()
 	for (unsigned i = 0, processed = 0; i < events.size() && processed != static_cast<unsigned>(total); ++i)
 	{
 		pollfd *ev = &events[i];
-		
+
 		if (ev->revents != 0)
 			++processed;
 
@@ -146,4 +146,3 @@ void SocketEngine::Process()
 			delete s;
 	}
 }
-

@@ -56,6 +56,6 @@ int pipe(int fds[2])
 
 	fds[0] = cfd;
 	fds[1] = afd;
-	
+
 	return 0;
 }

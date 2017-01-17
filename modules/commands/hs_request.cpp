@@ -102,7 +102,7 @@ class CommandHSRequest : public Command
 		}
 
 		Anope::string rawhostmask = params[0];
-		
+
 		Anope::string user, host;
 		size_t a = rawhostmask.find('@');
 
@@ -380,7 +380,7 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 		for (unsigned i = 0; i < Oper::opers.size(); ++i)
 		{
 			Oper *o = Oper::opers[i];
-			
+
 			const NickAlias *na = NickAlias::Find(o->name);
 			if (!na)
 				continue;

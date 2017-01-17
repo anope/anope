@@ -689,7 +689,7 @@ static void LoadVHosts()
 		NickAlias *na = NickAlias::Find(nick);
 		if (na == NULL)
 		{
-			Log() << "Removing vhost for non-existent nick " << nick;
+			Log() << "Removing vhost for nonexistent nick " << nick;
 			continue;
 		}
 
@@ -858,7 +858,7 @@ static void LoadChannels()
 				if (in_use)
 				{
 					ChanAccess *access = NULL;
-					
+
 					if (xop)
 					{
 						if (provider_xop)
@@ -1214,7 +1214,7 @@ static void LoadExceptions()
 	dbFILE *f = open_db_read("OperServ", "exception.db", 9);
 	if (f == NULL)
 		return;
-	
+
 	int16_t num;
 	READ(read_int16(&num, f));
 	for (int i = 0; i < num; ++i)
@@ -1358,4 +1358,3 @@ class DBOld : public Module
 };
 
 MODULE_INIT(DBOld)
-

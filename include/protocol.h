@@ -195,7 +195,7 @@ class CoreExport IRCDProto : public Service
 	 * initial handshake requirements.
 	 */
 	virtual void SendConnect() = 0;
-	
+
 	/** Called right before we begin our burst, after we have handshaked successfully with the uplink.
 	 * At this point none of our servers, users, or channels exist on the uplink
 	 */

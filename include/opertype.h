@@ -33,7 +33,7 @@ struct CoreExport Oper
 	virtual ~Oper();
 
 	static std::vector<Oper *> opers;
-	
+
 	/** Find an oper block by name
 	 * @param name The name
 	 * @return the oper block

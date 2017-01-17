@@ -32,7 +32,7 @@ class ChannelModeLargeBan : public ChannelMode
 class CharybdisProto : public IRCDProto
 {
  public:
-	
+
 	CharybdisProto(Module *creator) : IRCDProto(creator, "Charybdis 3.4+")
 	{
 		DefaultPseudoclientModes = "+oiS";
@@ -69,12 +69,12 @@ class CharybdisProto : public IRCDProto
 	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) anope_override
 	{
 		Anope::string mechlist;
-		
+
 		for (unsigned i = 0; i < mechanisms.size(); ++i)
 		{
 			mechlist += "," + mechanisms[i];
 		}
-		
+
 		UplinkSocket::Message(Me) << "ENCAP * MECHLIST :" << (mechanisms.empty() ? "" : mechlist.substr(1));
 	}
 
@@ -321,7 +321,7 @@ class ProtoCharybdis : public Module
 		ModeManager::AddUserMode(new UserMode("NOFORWARD", 'Q'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
-		ModeManager::AddUserMode(new UserModeNoone("SSL", 'Z')); 
+		ModeManager::AddUserMode(new UserModeNoone("SSL", 'Z'));
 
 		/* b/e/I */
 		ModeManager::AddChannelMode(new ChannelModeList("QUIET", 'q'));

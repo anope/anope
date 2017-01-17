@@ -24,4 +24,3 @@ class Modes : public WebPanelProtectedPage
 }
 
 }
-

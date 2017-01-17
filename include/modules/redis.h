@@ -23,7 +23,7 @@ namespace Redis
 
 		Reply() { Clear(); }
 		~Reply() { Clear(); }
-		
+
 		void Clear()
 		{
 			type = NOT_PARSED;

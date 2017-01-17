@@ -410,7 +410,7 @@ class ChanServCore : public Module, public ChanServService
 		}
 
 	}
-	
+
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
 		if (!persist || !ci->c)
@@ -476,4 +476,3 @@ class ChanServCore : public Module, public ChanServService
 };
 
 MODULE_INIT(ChanServCore)
-

@@ -19,4 +19,3 @@ class Register : public WebPanelPage
 };
 
 }
-

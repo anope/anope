@@ -28,7 +28,7 @@ class NSRecoverRequest : public IdentifyRequest
 	CommandSource source;
 	Command *cmd;
 	Anope::string user;
- 
+
  public:
 	NSRecoverRequest(Module *o, CommandSource &src, Command *c, const Anope::string &nick, const Anope::string &pass) : IdentifyRequest(o, nick, pass), source(src), cmd(c), user(nick) { }
 

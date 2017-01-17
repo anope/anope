@@ -58,7 +58,7 @@ class CommandMSRSend : public Command
 				source.Reply(_("Please wait %d seconds before using the %s command again."), Config->GetModule("memoserv")->Get<time_t>("senddelay"), source.command.c_str());
 			else if (result == MemoServService::MEMO_TARGET_FULL)
 				source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
-			else	
+			else
 			{
 				source.Reply(_("Memo sent to \002%s\002."), nick.c_str());
 

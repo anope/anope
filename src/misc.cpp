@@ -651,7 +651,7 @@ Anope::string Anope::VersionBuildString()
 
 	if (!flags.empty())
 		s += ", flags " + flags;
-	
+
 	return s;
 }
 
@@ -763,4 +763,3 @@ Anope::string Anope::Random(size_t len)
 		buf.append(chars[rand() % sizeof(chars)]);
 	return buf;
 }
-

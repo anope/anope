@@ -299,7 +299,7 @@ Query SQLiteService::BuildInsert(const Anope::string &table, unsigned int id, Da
 		*it->second >> buf;
 		query.SetValue(it->first, buf);
 	}
-	
+
 	return query;
 }
 
@@ -332,4 +332,3 @@ Anope::string SQLiteService::FromUnixtime(time_t t)
 }
 
 MODULE_INIT(ModuleSQLite)
-

@@ -24,4 +24,3 @@ class Set : public WebPanelProtectedPage
 }
 
 }
-

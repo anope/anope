@@ -443,13 +443,13 @@ namespace Anope
 	 */
 	extern CoreExport void Unhex(const string &src, string &dest);
 	extern CoreExport void Unhex(const string &src, char *dest, size_t sz);
-	
+
 	/** Base 64 encode a string
 	 * @param src The string to encode
 	 * @param target Where the encoded string is placed
 	 */
 	extern CoreExport void B64Encode(const string &src, string &target);
-	
+
 	/** Base 64 decode a string
 	 * @param src The base64 encoded string
 	 * @param target The plain text result

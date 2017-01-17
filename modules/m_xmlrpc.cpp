@@ -225,4 +225,3 @@ class ModuleXMLRPC : public Module
 };
 
 MODULE_INIT(ModuleXMLRPC)
-

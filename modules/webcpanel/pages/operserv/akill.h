@@ -22,4 +22,3 @@ class Akill : public WebPanelProtectedPage
 }
 
 }
-

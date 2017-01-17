@@ -108,7 +108,7 @@ class BotServCore : public Module
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
 		if (c->ci && persist && persist->HasExt(c->ci))
 			return;
-	
+
 		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediately
 		 * We also don't part the bot here either, if necessary we will part it after the sync
 		 */
@@ -212,4 +212,3 @@ class BotServCore : public Module
 };
 
 MODULE_INIT(BotServCore)
-

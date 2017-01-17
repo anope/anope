@@ -79,7 +79,7 @@ static Anope::string FindReplacement(const TemplateFileServer::Replacements &r, 
 			}
 		}
 	}
-	
+
 	TemplateFileServer::Replacements::const_iterator it = r.find(key);
 	if (it != r.end())
 		return it->second;
@@ -110,7 +110,7 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 		buffer[i] = 0;
 		buf += buffer;
 	}
-	
+
 	close(fd);
 
 	Anope::string finished;
@@ -235,7 +235,7 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 				// If the if stack is empty or we are in a true statement
 				bool ifok = IfStack.empty() || IfStack.top();
 				bool forok = ForLoop::Stack.empty() || !ForLoop::Stack.back().finished(r);
-			
+
 				if (ifok && forok)
 				{
 					const Anope::string &replacement = FindReplacement(r, content.substr(0, f - 1));
@@ -252,7 +252,7 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 			// If the if stack is empty or we are in a true statement
 			bool ifok = IfStack.empty() || IfStack.top();
 			bool forok = ForLoop::Stack.empty() || !ForLoop::Stack.back().finished(r);
-			
+
 			if (ifok && forok)
 				finished += buf[j];
 		}
@@ -261,4 +261,3 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 	if (!finished.empty())
 		reply.Write(finished);
 }
-

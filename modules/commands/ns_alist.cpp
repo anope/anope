@@ -81,7 +81,7 @@ class CommandNSAList : public Command
 			AccessGroup access = ci->AccessFor(nc, false);
 			if (access.empty())
 				continue;
-				
+
 			++chan_count;
 
 			entry["Number"] = stringify(chan_count);

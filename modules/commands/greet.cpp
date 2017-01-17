@@ -46,7 +46,7 @@ class CommandBSSetGreet : public Command
 		if (value.equals_ci("ON"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable greets"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable greets";
 
 			ci->Extend<bool>("BS_GREET");
 			source.Reply(_("Greet mode is now \002on\002 on channel %s."), ci->name.c_str());
@@ -54,7 +54,7 @@ class CommandBSSetGreet : public Command
 		else if (value.equals_ci("OFF"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable greets"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable greets";
 
 			ci->Shrink<bool>("BS_GREET");
 			source.Reply(_("Greet mode is now \002off\002 on channel %s."), ci->name.c_str());

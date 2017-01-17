@@ -21,4 +21,3 @@ bool WebCPanel::Register::OnRequest(HTTPProvider *server, const Anope::string &p
 	page.Serve(server, page_name, client, message, reply, replacements);
 	return true;
 }
-

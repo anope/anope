@@ -437,7 +437,7 @@ class CommandCSAccess : public Command
 			list.Process(replies);
 
 			source.Reply(_("Access list for %s:"), ci->name.c_str());
-	
+
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 

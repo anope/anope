@@ -31,7 +31,7 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 	(*NickCoreList)[this->display] = this;
 	if (old == NickCoreList->size())
 		Log(LOG_DEBUG) << "Duplicate account " << coredisplay << " in nickcore table?";
-	
+
 	FOREACH_MOD(OnNickCoreCreate, (this));
 }
 
@@ -267,4 +267,3 @@ NickCore* NickCore::Find(const Anope::string &nick)
 
 	return NULL;
 }
-

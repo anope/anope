@@ -14,7 +14,7 @@ Table of Contents
 1) Data structure
 
     There are 4 key namespaces in Anope, they are:
-    
+
         id -    The keys in id are used to atomically create object ids for new
                 objects. For example, if I were to create a new BotInfo I would first:
 

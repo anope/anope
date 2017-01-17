@@ -231,4 +231,3 @@ class MemoServCore : public Module, public MemoServService
 };
 
 MODULE_INIT(MemoServCore)
-

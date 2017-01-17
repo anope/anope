@@ -25,7 +25,7 @@ class SGLineManager : public XLineManager
 	{
 		Log(Config->GetClient("OperServ"), "expire/akill") << "AKILL on \002" << x->mask << "\002 has expired";
 	}
-	
+
 	void Send(User *u, XLine *x) anope_override
 	{
 		IRCD->SendAkill(u, x);
@@ -296,4 +296,3 @@ class OperServCore : public Module
 };
 
 MODULE_INIT(OperServCore)
-

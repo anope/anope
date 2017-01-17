@@ -25,4 +25,3 @@ bool WebCPanel::ChanServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 	page.Serve(server, page_name, client, message, reply, replacements);
 	return true;
 }
-

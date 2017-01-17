@@ -22,4 +22,3 @@ class Memos : public WebPanelProtectedPage
 }
 
 }
-

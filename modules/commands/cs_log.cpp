@@ -53,7 +53,7 @@ struct LogSettingImpl : LogSetting, Serializable
 		ChannelInfo *ci = ChannelInfo::Find(sci);
 		if (ci == NULL)
 			return NULL;
-	
+
 		LogSettingImpl *ls;
 		if (obj)
 			ls = anope_dynamic_static_cast<LogSettingImpl *>(obj);

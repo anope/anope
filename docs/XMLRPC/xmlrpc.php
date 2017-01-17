@@ -114,7 +114,7 @@ class AnopeXMLRPC
     {
         return $this->run("channel", [$channel]);
     }
-    
+
     /**
      * Sent a notice to a user.
      * Returns an array containing channel information, or an array of size one

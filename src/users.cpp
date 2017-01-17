@@ -141,7 +141,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 	/* Sanity check to make sure we don't segfault */
 	if (newnick.empty())
 		throw CoreException("User::ChangeNick() got a bad argument");
-	
+
 	this->super_admin = false;
 	Log(this, "nick") << "(" << this->realname << ") changed nick to " << newnick;
 
@@ -155,7 +155,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		NickAlias *old_na = NickAlias::Find(this->nick);
 		if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
 			old_na->last_seen = Anope::CurTime;
-		
+
 		UserListByNick.erase(this->nick);
 
 		this->nick = newnick;
@@ -401,7 +401,7 @@ void User::Login(NickCore *core)
 
 	if (this->server->IsSynced())
 		Log(this, "account") << "is now identified as " << this->nc->display;
-	
+
 	FOREACH_MOD(OnUserLogin, (this));
 }
 
@@ -409,7 +409,7 @@ void User::Logout()
 {
 	if (!this->nc)
 		return;
-	
+
 	Log(this, "account") << "is no longer identified as " << this->nc->display;
 
 	std::list<User *>::iterator it = std::find(this->nc->users.begin(), this->nc->users.end(), this);
@@ -839,4 +839,3 @@ void User::QuitUsers()
 		delete *it;
 	quitting_users.clear();
 }
-

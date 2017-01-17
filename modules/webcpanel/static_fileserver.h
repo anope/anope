@@ -16,4 +16,3 @@ class StaticFileServer : public HTTPPage
 
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) anope_override;
 };
-

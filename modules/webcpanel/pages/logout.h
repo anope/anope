@@ -17,4 +17,3 @@ class Logout : public WebPanelProtectedPage
 };
 
 }
-

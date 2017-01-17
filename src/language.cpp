@@ -125,4 +125,3 @@ const char *Language::Translate(const char *lang, const char *string)
 	return string != NULL ? string : "";
 }
 #endif
-

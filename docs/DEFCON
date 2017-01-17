@@ -1,4 +1,4 @@
-Anope DefCon 
+Anope DefCon
 ------------
 
 1) Introduction
@@ -11,7 +11,7 @@ Anope DefCon
 1) Introduction
 
     Anope 1.6 onwards supports a unique protection mechanism based on the
-    military "Defense Readiness Condition" (DefCon) system. It is based on 
+    military "Defense Readiness Condition" (DefCon) system. It is based on
     5 levels of defense readiness defined as:
 
     DEFCON5 Normal peacetime readiness
@@ -23,9 +23,9 @@ Anope DefCon
     These are configurable levels that mandates what actions Anope should
     take in case of emergency and change in readiness status.
 
-    It is used to prevent abuse to both Services, and the ircd on which they 
+    It is used to prevent abuse to both Services, and the ircd on which they
     are running. Also to protect the users, primarily in the event of Clones
-    and/or FloodBOT attacks. 
+    and/or FloodBOT attacks.
 
 2) Installation
 
@@ -44,26 +44,26 @@ Anope DefCon
 
     Pre-defined DefCon actions:
 
-    No new channel registrations 
-    No New Nick Registrations 
+    No new channel registrations
+    No New Nick Registrations
     No Mode Lock changes
-    Force Chan Mode 
-    Use Reduced Session Limit 
-    KILL any new clients trying to connect 
-    Services will ignore everyone but opers 
-    Services will silently ignore everyone but opers 
-    AKILL all new clients trying to connect 
+    Force Chan Mode
+    Use Reduced Session Limit
+    KILL any new clients trying to connect
+    Services will ignore everyone but opers
+    Services will silently ignore everyone but opers
+    AKILL all new clients trying to connect
     No new memos sent to block MemoServ attacks
-    
+
     Information regarding how to enable this for specific defcon levels can
     be found in operserv.conf
 
 4) Usage
 
-    Anope starts up in DEFCON5 (normal readiness). To change the Defcon level 
-    in action use: 
-    
-    /msg OperServ DEFCON 1|2|3|4|5 
+    Anope starts up in DEFCON5 (normal readiness). To change the Defcon level
+    in action use:
+
+    /msg OperServ DEFCON 1|2|3|4|5
 
 5) Usage Example
 
@@ -89,6 +89,5 @@ Anope DefCon
 
 6) Support
 
-    You might get DefCon support by posting on our online forum, or maybe on 
+    You might get DefCon support by posting on our online forum, or maybe on
     our #anope channel at /server irc.anope.org.
-

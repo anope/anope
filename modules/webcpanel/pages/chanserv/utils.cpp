@@ -42,4 +42,3 @@ void BuildChanList(NickAlias *na, TemplateFileServer::Replacements &replacements
 }
 
 }
-

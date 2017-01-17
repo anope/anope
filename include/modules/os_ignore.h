@@ -25,7 +25,7 @@ class IgnoreService : public Service
 {
  protected:
 	IgnoreService(Module *c) : Service(c, "IgnoreService", "ignore") { }
-	
+
  public:
 	virtual void AddIgnore(IgnoreData *) = 0;
 

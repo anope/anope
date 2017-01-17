@@ -58,7 +58,7 @@ class CommandCSAKick : public Command
 			}
 
 			Entry e("", mask);
-		
+
 			mask = (e.nick.empty() ? "*" : e.nick) + "!"
 				+ (e.user.empty() ? "*" : e.user) + "@"
 				+ (e.host.empty() ? "*" : e.host);
@@ -272,7 +272,7 @@ class CommandCSAKick : public Command
 				{
 					if (!number || number > ci->GetAkickCount())
 						return;
-	
+
 					const AutoKick *akick = ci->GetAkick(number - 1);
 
 					Anope::string timebuf, lastused;
@@ -347,7 +347,7 @@ class CommandCSAKick : public Command
 			list.Process(replies);
 
 			source.Reply(_("Autokick list for %s:"), ci->name.c_str());
-	
+
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 
@@ -442,7 +442,7 @@ class CommandCSAKick : public Command
 		}
 
 		bool is_list = cmd.equals_ci("LIST") || cmd.equals_ci("VIEW");
-		
+
 		bool has_access = false;
 		if (source.AccessFor(ci).HasPriv("AKICK") || source.HasPriv("chanserv/access/modify"))
 			has_access = true;

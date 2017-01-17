@@ -49,7 +49,7 @@ Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 	Anope::string owner;
 
 	data["owner"] >> owner;
-	
+
 	bool ischan;
 	MemoInfo *mi = MemoInfo::GetMemoInfo(owner, ischan);
 	if (!mi)
@@ -138,4 +138,3 @@ MemoInfo *MemoInfo::GetMemoInfo(const Anope::string &target, bool &ischan)
 
 	return NULL;
 }
-

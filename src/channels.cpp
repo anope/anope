@@ -90,7 +90,7 @@ void Channel::Reset()
 
 	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 		this->SetCorrectModes(it->second->user, true);
-	
+
 	// If the channel is syncing now, do not force a sync due to Reset(), as we are probably iterating over users in Message::SJoin
 	// A sync will come soon
 	if (!syncing)
@@ -128,7 +128,7 @@ bool Channel::CheckDelete()
 	 */
 	if (this->syncing)
 		return false;
-	
+
 	/* Permanent channels never get deleted */
 	if (this->HasMode("PERM"))
 		return false;
@@ -162,10 +162,10 @@ void Channel::DeleteUser(User *user)
 
 	ChanUserContainer *cu = user->FindChannel(this);
 	if (!this->users.erase(user))
-		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete non-existent user " << user->nick << " from channel " << this->name;
+		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistent user " << user->nick << " from channel " << this->name;
 
 	if (!user->chans.erase(this))
-		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete non-existent channel " << this->name << " from " << user->nick << "'s channel list";
+		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistent channel " << this->name << " from " << user->nick << "'s channel list";
 	delete cu;
 
 	QueueForDeletion();
@@ -280,7 +280,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Ano
 
 		if (!u)
 		{
-			Log(LOG_DEBUG) << "MODE " << this->name << " +" << cm->mchar << " for non-existent user " << param;
+			Log(LOG_DEBUG) << "MODE " << this->name << " +" << cm->mchar << " for nonexistent user " << param;
 			return;
 		}
 
@@ -351,7 +351,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 
 		if (!u)
 		{
-			Log(LOG_DEBUG) << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->mchar << " for non-existent user " << param;
+			Log(LOG_DEBUG) << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->mchar << " for nonexistent user " << param;
 			return;
 		}
 
@@ -381,7 +381,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 	}
 	else
 		this->modes.erase(cm->name);
-	
+
 	if (cm->type == MODE_LIST)
 	{
 		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
@@ -713,7 +713,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 		Log(setter, this, "mode") << modestring << paramstring;
 	else
 		Log(LOG_DEBUG) << source.GetName() << " is setting " << this->name << " to " << modestring << paramstring;
-	
+
 	if (enforce_mlock)
 		this->CheckModes();
 }
@@ -776,7 +776,7 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	/* Do not kick protected clients or Ulines */
 	if (u->IsProtected())
 		return false;
-	
+
 	if (bi == NULL)
 		bi = this->ci->WhoSends();
 
@@ -819,7 +819,7 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 {
 	if (user == NULL)
 		return;
-	
+
 	if (!this->ci)
 		return;
 
@@ -905,7 +905,7 @@ bool Channel::CheckKick(User *user)
 	FOREACH_RESULT(OnCheckKick, MOD_RESULT, (user, this, mask, reason));
 	if (MOD_RESULT != EVENT_STOP)
 		return false;
-	
+
 	if (mask.empty())
 		mask = this->ci->GetIdealBan(user);
 	if (reason.empty())
@@ -954,4 +954,3 @@ void Channel::DeleteChannels()
 	}
 	deleting.clear();
 }
-

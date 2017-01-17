@@ -22,4 +22,3 @@ class Info : public WebPanelProtectedPage
 }
 
 }
-

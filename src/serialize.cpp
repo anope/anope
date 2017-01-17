@@ -175,4 +175,3 @@ const std::map<Anope::string, Serialize::Type *>& Type::GetTypes()
 {
 	return Types;
 }
-

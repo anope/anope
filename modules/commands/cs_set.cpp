@@ -1312,7 +1312,7 @@ class CSSet : public Module
 	{
 		if (chan->ci)
 		{
-			if (noautoop.HasExt(chan->ci))	
+			if (noautoop.HasExt(chan->ci))
 				give_modes = false;
 			if (secureops.HasExt(chan->ci) && !user->HasPriv("chanserv/administration"))
 				// This overrides what chanserv does because it is loaded after chanserv

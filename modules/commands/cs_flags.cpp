@@ -45,7 +45,7 @@ class FlagsChanAccess : public ChanAccess
 	{
 		if (access->provider->name == "access/flags")
 			return access->AccessSerialize();
-		
+
 		std::set<char> buffer;
 
 		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)

@@ -66,4 +66,3 @@ bool IRC2SQL::HasEvent(const Anope::string &table)
 			return true;
 	return false;
 }
-

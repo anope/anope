@@ -11777,32 +11777,3 @@ msgstr "CANCEL {nick | kanał}"
 #, fuzzy
 msgid "{nick | channel} memo-text"
 msgstr "SEND {nick | kanał} treść"
-
-#~ msgid "End of channel list."
-#~ msgstr "Koniec listy kanałów."
-
-#~ msgid "End of users list."
-#~ msgstr "Koniec listy użytkowników."
-
-#~ msgid "Exception for %s (#%d) moved to position %d."
-#~ msgstr "Wyjątek dla %s (#%d) przeniesiono na pozycję %d."
-
-#~ msgid "Old info is equal to the new one."
-#~ msgstr "Nic się nie zmieniło."
-
-#, fuzzy
-#~ msgid ""
-#~ "Returns the matching nicks that used given email. Note that\n"
-#~ "you can not use wildcards. Whenever this command is used, a message\n"
-#~ "including the person who issued the command and the email it was used\n"
-#~ "on will be logged."
-#~ msgstr ""
-#~ "Składnia: GETEMAIL uzytkownik@serwer.com\n"
-#~ "\n"
-#~ "Listuje nicki, które mają ustawiony podany adres e-mail.\n"
-#~ "Uwaga: nie można używać symboli wieloznacznych (* lub ?).\n"
-#~ "Każdy przypadek użycia tej komendy jest logowany."
-
-#, fuzzy
-#~ msgid "[channel] {num | list | LAST | NEW}"
-#~ msgstr "READ [kanał] {lista | LAST | NEW}"

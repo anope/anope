@@ -12093,33 +12093,3 @@ msgstr "CANCEL {ник | #канал}"
 #, fuzzy
 msgid "{nick | channel} memo-text"
 msgstr "SEND {ник | #канал} текст_сообщения"
-
-#~ msgid "End of channel list."
-#~ msgstr "Конец списка каналов."
-
-#~ msgid "End of users list."
-#~ msgstr "Конец списка пользователей."
-
-#~ msgid "Exception for %s (#%d) moved to position %d."
-#~ msgstr "Исключение для %s (#%d) перемещено в позицию %d."
-
-#~ msgid "Old info is equal to the new one."
-#~ msgstr "Старая информация о боте не отличается от новой."
-
-#, fuzzy
-#~ msgid ""
-#~ "Returns the matching nicks that used given email. Note that\n"
-#~ "you can not use wildcards. Whenever this command is used, a message\n"
-#~ "including the person who issued the command and the email it was used\n"
-#~ "on will be logged."
-#~ msgstr ""
-#~ "Синтаксис: GETEMAIL user@emailhost\n"
-#~ "Выводит список ников, в настройках у которых стоит указанный email.\n"
-#~ "Примечание: вы не можете использовать символьные маски ни для user,\n"
-#~ "ни для emailhost. Каждый раз, при использовании данной команды,\n"
-#~ "сообщение, включающее ник вызвавшего команду и указанный email,\n"
-#~ "будет записано в лог-файл сервисов."
-
-#, fuzzy
-#~ msgid "[channel] {num | list | LAST | NEW}"
-#~ msgstr "READ [#канал] {список_записей | LAST | NEW}"

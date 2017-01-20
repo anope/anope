@@ -11805,33 +11805,3 @@ msgstr "CANCEL {nick | canal}"
 #, fuzzy
 msgid "{nick | channel} memo-text"
 msgstr "SEND {nick | canal} texto"
-
-#~ msgid "End of channel list."
-#~ msgstr "Fim da listagem."
-
-#~ msgid "End of users list."
-#~ msgstr "Fim da listagem."
-
-#~ msgid "Exception for %s (#%d) moved to position %d."
-#~ msgstr "Sessão para %s (#%d) alterada para a posição %d."
-
-#~ msgid "Old info is equal to the new one."
-#~ msgstr "A informação antiga é igual a nova."
-
-#, fuzzy
-#~ msgid ""
-#~ "Returns the matching nicks that used given email. Note that\n"
-#~ "you can not use wildcards. Whenever this command is used, a message\n"
-#~ "including the person who issued the command and the email it was used\n"
-#~ "on will be logged."
-#~ msgstr ""
-#~ "Sintaxe: GETEMAIL usuário@emailhost\n"
-#~ "\n"
-#~ "Retorna os nicks que utilizam o email dado. Observe que\n"
-#~ "você não pode usar coringas para usuário nem para emailhost.\n"
-#~ "Sempre que este comando for usado, uma mensagem incluindo a pessoa\n"
-#~ "que emitiu o comando e o email no qual foi usado serão gravados."
-
-#, fuzzy
-#~ msgid "[channel] {num | list | LAST | NEW}"
-#~ msgstr "READ [canal] {list | LAST | NEW}"

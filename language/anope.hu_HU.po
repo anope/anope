@@ -11835,33 +11835,3 @@ msgstr "CANCEL {nick | #szoba}"
 #, fuzzy
 msgid "{nick | channel} memo-text"
 msgstr "SEND {nick | #szoba} memo-szöveg"
-
-#~ msgid "End of channel list."
-#~ msgstr "Vége a szoba listának."
-
-#~ msgid "End of users list."
-#~ msgstr "Vége a felhasználó listának."
-
-#~ msgid "Exception for %s (#%d) moved to position %d."
-#~ msgstr "%s kivétel (#%d) áthelyezve a %d pozicíóba."
-
-#~ msgid "Old info is equal to the new one."
-#~ msgstr "A régi info megegyezik az újjal."
-
-#, fuzzy
-#~ msgid ""
-#~ "Returns the matching nicks that used given email. Note that\n"
-#~ "you can not use wildcards. Whenever this command is used, a message\n"
-#~ "including the person who issued the command and the email it was used\n"
-#~ "on will be logged."
-#~ msgstr ""
-#~ "Syntax: GETEMAIL user@emailhoszt\n"
-#~ "Visszaadja a megadott emaillel regisztrált nickeket.\n"
-#~ "Megjegyzés: használhatsz * karaktert mind a user,\n"
-#~ "mind az emailhost esetében. A parancs kiadásakor a\n"
-#~ "lekért email cím és az azt lekérő személy naplózva lesz.\n"
-#~ "Korlátozva Szervíz adminra."
-
-#, fuzzy
-#~ msgid "[channel] {num | list | LAST | NEW}"
-#~ msgstr "READ [#szoba] {list | LAST | NEW }"

@@ -11331,34 +11331,3 @@ msgstr "{pseudo | canal}"
 #: modules/commands/ms_send.cpp:25 modules/commands/ms_rsend.cpp:25
 msgid "{nick | channel} memo-text"
 msgstr "{pseudo | canal} texte"
-
-#~ msgid "End of channel list."
-#~ msgstr "Fin de la liste des canaux."
-
-#~ msgid "End of users list."
-#~ msgstr "Fin de la liste des utilisateurs."
-
-#~ msgid "Exception for %s (#%d) moved to position %d."
-#~ msgstr "L'exception pour %s (#%d) a été déplacée à la position %d."
-
-#~ msgid "MOVE num position"
-#~ msgstr "MOVE num position"
-
-#~ msgid ""
-#~ "Returns the matching nicks that used given email. Note that\n"
-#~ "you can not use wildcards. Whenever this command is used, a message\n"
-#~ "including the person who issued the command and the email it was used\n"
-#~ "on will be logged."
-#~ msgstr ""
-#~ "Retourne la liste des pseudos enregistrés avec l'adresse email donnée.\n"
-#~ "Note : vous ne pouvez pas utiliser de caractères joker.\n"
-#~ "Lorsque cette commande est utilisée, un message indiquant\n"
-#~ "la personne qui a utilisé la commande et l'adresse email recherchée\n"
-#~ "est ajouté dans les logs."
-
-#~ msgid "You have regained control of %s and are now identified as %s."
-#~ msgstr ""
-#~ "Vous avez repris le contrôle de %s et êtes désormais identifié comme %s."
-
-#~ msgid "[channel] {num | list | LAST | NEW}"
-#~ msgstr "[canal] {num | liste | LAST | NEW}"

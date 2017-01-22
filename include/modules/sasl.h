@@ -88,7 +88,7 @@ namespace SASL
 				return;
 
 			NickAlias *na = NickAlias::Find(GetAccount());
-			if (!na || na->nc->HasExt("NS_SUSPENDED"))
+			if (!na || na->nc->HasExt("NS_SUSPENDED") || na->nc->HasExt("UNCONFIRMED"))
 				return OnFail();
 
 			unsigned int maxlogins = Config->GetModule("ns_identify")->Get<unsigned int>("maxlogins");
@@ -126,6 +126,8 @@ namespace SASL
 				accountstatus = "nonexistent ";
 			else if (na->nc->HasExt("NS_SUSPENDED"))
 				accountstatus = "suspended ";
+			else if (na->nc->HasExt("UNCONFIRMED"))
+				accountstatus = "unconfirmed ";
 
 			Anope::string user = "A user";
 			if (!hostname.empty() && !ip.empty())

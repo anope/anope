@@ -109,7 +109,7 @@ class External : public Mechanism
 				user = mysess->hostname + " (" + mysess->ip + ")";
 
 			NickCore *nc = certs->FindAccountFromCert(mysess->cert);
-			if (!nc || nc->HasExt("NS_SUSPENDED"))
+			if (!nc || nc->HasExt("NS_SUSPENDED") || nc->HasExt("UNCONFIRMED"))
 			{
 				Log(Config->GetClient("NickServ"), "sasl") << user << " failed to identify using certificate " << mysess->cert << " using SASL EXTERNAL";
 				sasl->Fail(sess);

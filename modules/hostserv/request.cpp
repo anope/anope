@@ -232,7 +232,7 @@ class CommandHSRequest : public Command
 
 		source.Reply(_("Your vhost has been requested."));
 		this->SendMemos(source, user, host);
-		Log(LOG_COMMAND, source, this) << "to request new vhost " << (!user.empty() ? user + "@" : "") << host;
+		logger.Command(LogType::COMMAND, source, _("{source} used {command} to request new vhost {0}"), (!user.empty() ? user + "@" : "") + host);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -303,7 +303,8 @@ class CommandHSActivate : public Command
 			memoserv->Send(source.service->nick, na->GetNick(), _("[auto memo] Your requested vHost has been approved."), true);
 
 		source.Reply(_("Vhost for \002{0}\002 has been activated."), na->GetNick());
-		Log(LOG_COMMAND, source, this) << "for " << na->GetNick() << " for vhost " << (!req->GetIdent().empty() ? req->GetIdent() + "@" : "") << req->GetHost();
+		logger.Command(LogType::COMMAND, source, _("{source} used {command} for {0} for vhost {1}"),
+				na->GetNick(), (!req->GetIdent().empty() ? req->GetIdent() + "@" : "") + req->GetHost());
 		req->Delete();
 	}
 
@@ -367,7 +368,8 @@ class CommandHSReject : public Command
 		}
 
 		source.Reply(_("Vhost for \002{0}\002 has been rejected."), na->GetNick());
-		Log(LOG_COMMAND, source, this) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "no reason") << ")";
+		logger.Command(LogType::COMMAND, source, _("{source} used {command} to reject vhost for {0} ({1})"),
+				na->GetNick(), !reason.empty() ? reason : "no reason");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

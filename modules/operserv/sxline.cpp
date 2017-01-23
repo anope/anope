@@ -54,7 +54,7 @@ class CommandOSSXLineBase : public Command
 					if (!x)
 						return;
 
-					Log(LOG_ADMIN, source, this) << "to remove " << x->GetMask() << " from the list";
+					logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove {0} from the list"), x->GetMask());
 
 					++deleted;
 					x->Delete();
@@ -81,9 +81,11 @@ class CommandOSSXLineBase : public Command
 
 			EventManager::Get()->Dispatch(&Event::DelXLine::OnDelXLine, source, x, this->xlm());
 
+			source.Reply(_("\002{0}\002 deleted from the {1} list."), x->GetMask(), source.command);
+
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove {0} from the list"), x->GetMask());
+
 			x->Delete();
-			source.Reply(_("\002{0}\002 deleted from the {1} list."), mask, source.command);
-			Log(LOG_ADMIN, source, this) << "to remove " << mask << " from the list";
 		}
 
 		if (Anope::ReadOnly)
@@ -184,7 +186,8 @@ class CommandOSSXLineBase : public Command
 		for (XLine *x : this->xlm()->GetXLines())
 			x->Delete();
 
-		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to CLEAR the list"));
+
 		source.Reply(_("The {0} list has been cleared."), source.command);
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
@@ -342,8 +345,11 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		if (percent > 95)
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
-			Log(LOG_ADMIN, source, this) << "tried to " << source.command << " " << percent << "% of the network (" << affected << " users)";
-			delete x;
+
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} and tried to {0} {1}% of the network ({2} users)"),
+				source.command, percent, affected);
+
+			x->Delete();
 			return;
 		}
 
@@ -351,7 +357,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		MOD_RESULT = EventManager::Get()->Dispatch(&Event::AddXLine::OnAddXLine, source, x, this->xlm());
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			delete x;
+			x->Delete();
 			return;
 		}
 
@@ -373,7 +379,11 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		}
 
 		source.Reply(_("\002{0}\002 added to the {1} list."), mask, source.command);
-		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
+				mask, reason, expires ? Anope::Duration(expires - Anope::CurTime) : "never",
+				affected, percent);
+
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
@@ -560,8 +570,10 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		if (percent > 95)
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
-			Log(LOG_ADMIN, source, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
-			delete x;
+
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} and tried to {0} {1}% of the network ({2} users)"), source.command, percent, affected);
+
+			x->Delete();
 			return;
 		}
 
@@ -569,7 +581,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		MOD_RESULT = EventManager::Get()->Dispatch(&Event::AddXLine::OnAddXLine, source, x, this->xlm());
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			delete x;
+			x->Delete();
 			return;
 		}
 
@@ -617,7 +629,10 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		}
 
 		source.Reply(_("\002{0}\002 added to the {1} list."), mask, source.command);
-		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
+				mask, x->GetReason(), expires ? Anope::Duration(expires - Anope::CurTime) : "never", affected, percent);
+
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}

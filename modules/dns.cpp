@@ -43,7 +43,7 @@ class Packet : public Query
 		if (pos + name.length() + 2 > output_size)
 			throw SocketException("Unable to pack name");
 
-		Log(LOG_DEBUG_2) << "Resolver: PackName packing " << name;
+		Anope::Logger.Debug2("resolver: PackName packing {0}", name);
 
 		sepstream sep(name, '.');
 		Anope::string token;
@@ -113,7 +113,7 @@ class Packet : public Query
 
 		/* Empty names are valid (root domain) */
 
-		Log(LOG_DEBUG_2) << "Resolver: UnpackName successfully unpacked " << name;
+		Anope::Logger.Debug2("resolver: UnpackName successfully unpacked {0}", name);
 
 		return name;
 	}
@@ -203,7 +203,7 @@ class Packet : public Query
 				break;
 		}
 
-		Log(LOG_DEBUG_2) << "Resolver: " << record.name << " -> " << record.rdata;
+		Anope::Logger.Debug2("resolver: {0} -> {1}", record.name, record.rdata);
 
 		return record;
 	}
@@ -252,7 +252,7 @@ class Packet : public Query
 		unsigned short arcount = (input[packet_pos] << 8) | input[packet_pos + 1];
 		packet_pos += 2;
 
-		Log(LOG_DEBUG_2) << "Resolver: qdcount: " << qdcount << " ancount: " << ancount << " nscount: " << nscount << " arcount: " << arcount;
+		Anope::Logger.Debug2("resolver: qdcount {0} ancount: {1} nscount: {2} arcount: {3}", qdcount, ancount, nscount, arcount);
 
 		for (unsigned i = 0; i < qdcount; ++i)
 			this->questions.push_back(this->UnpackQuestion(input, len, packet_pos));
@@ -270,7 +270,7 @@ class Packet : public Query
 		}
 		catch (const SocketException &ex)
 		{
-			Log(LOG_DEBUG_2) << "Unable to parse ns/ar records: " << ex.GetReason();
+			Anope::Logger.Debug2("Unable to parse ns/ar records: {0}", ex.GetReason());
 		}
 	}
 
@@ -500,12 +500,12 @@ class TCPSocket : public ListenSocket
 		Client(Manager *m, TCPSocket *l, int fd, const sockaddrs &addr) : Socket(fd, l->IsIPv6()), ClientSocket(l, addr), Timer(5),
 			manager(m), packet(NULL), length(0)
 		{
-			Log(LOG_DEBUG_2) << "Resolver: New client from " << addr.addr();
+			Anope::Logger.Debug2("resolver: New client from {0}", addr.addr());
 		}
 
 		~Client()
 		{
-			Log(LOG_DEBUG_2) << "Resolver: Exiting client from " << clientaddr.addr();
+			Anope::Logger.Debug2("resolver: Exiting client from {0}", clientaddr.addr());
 			delete packet;
 		}
 
@@ -521,7 +521,7 @@ class TCPSocket : public ListenSocket
 
 	 	bool ProcessRead() override
 		{
-			Log(LOG_DEBUG_2) << "Resolver: Reading from DNS TCP socket";
+			Anope::Logger.Debug2("resolver: reading from DNS TCP socket");
 
 			int i = recv(this->GetFD(), reinterpret_cast<char *>(packet_buffer) + length, sizeof(packet_buffer) - length, 0);
 			if (i <= 0)
@@ -541,7 +541,7 @@ class TCPSocket : public ListenSocket
 
 		bool ProcessWrite() override
 		{
-			Log(LOG_DEBUG_2) << "Resolver: Writing to DNS TCP socket";
+			Anope::Logger.Debug2("resolver: Writing to DNS TCP socket");
 
 			if (packet != NULL)
 			{
@@ -600,7 +600,7 @@ class UDPSocket : public ReplySocket
 
 	bool ProcessRead() override
 	{
-		Log(LOG_DEBUG_2) << "Resolver: Reading from DNS UDP socket";
+		Anope::Logger.Debug2("resolver: Reading from DNS UDP socket");
 
 		unsigned char packet_buffer[524];
 		sockaddrs from_server;
@@ -611,7 +611,7 @@ class UDPSocket : public ReplySocket
 
 	bool ProcessWrite() override
 	{
-		Log(LOG_DEBUG_2) << "Resolver: Writing to DNS UDP socket";
+		Anope::Logger.Debug2("resolver: Writing to DNS UDP socket");
 
 		Packet *r = !packets.empty() ? packets.front() : NULL;
 		if (r != NULL)
@@ -651,7 +651,7 @@ class NotifySocket : public Socket
 		if (!packet)
 			return false;
 
-		Log(LOG_DEBUG_2) << "Resolver: Notifying slave " << packet->addr.addr();
+		Anope::Logger.Debug2("resolver: Notifying slave {0}", packet->addr.addr());
 
 		try
 		{
@@ -735,7 +735,7 @@ class MyManager : public Manager, public Timer
 		}
 		catch (const SocketException &ex)
 		{
-			Log() << "Unable to bind dns to " << ip << ":" << port << ": " << ex.GetReason();
+			Anope::Logger.Log("Unable to bind dns to {0}:{1}: {2}", ip, port, ex.GetReason());
 		}
 
 		notify = n;
@@ -759,11 +759,11 @@ class MyManager : public Manager, public Timer
  public:
 	void Process(Request *req) override
 	{
-		Log(LOG_DEBUG_2) << "Resolver: Processing request to lookup " << req->name << ", of type " << req->type;
+		Anope::Logger.Debug2("resolver: Processing request to lookup {0}, of type {1}", req->name, req->type);
 
 		if (req->use_cache && this->CheckCache(req))
 		{
-			Log(LOG_DEBUG_2) << "Resolver: Using cached result";
+			Anope::Logger.Debug2("resolver: Using cached result");
 			delete req;
 			return;
 		}
@@ -802,7 +802,7 @@ class MyManager : public Manager, public Timer
 		}
 		catch (const SocketException &ex)
 		{
-			Log(LOG_DEBUG_2) << ex.GetReason();
+			Anope::Logger.Debug2(ex.GetReason());
 			return true;
 		}
 
@@ -812,7 +812,7 @@ class MyManager : public Manager, public Timer
 				return true;
 			else if (recv_packet.questions.empty())
 			{
-				Log(LOG_DEBUG_2) << "Resolver: Received a question with no questions?";
+				Anope::Logger.Debug2("resolver: Received a question with no questions?");
 				return true;
 			}
 
@@ -868,26 +868,26 @@ class MyManager : public Manager, public Timer
 
 		if (from == NULL)
 		{
-			Log(LOG_DEBUG_2) << "Resolver: Received an answer over TCP. This is not supported.";
+			Anope::Logger.Debug2("resolver: Received an answer over TCP. This is not supported.");
 			return true;
 		}
 		else if (this->addrs != *from)
 		{
-			Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->addrs.addr() << "' != '" << from->addr() << "'";
+			Anope::Logger.Debug2("resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '{0}' != '{1}'", this->addrs.addr(), from->addr());
 			return true;
 		}
 
 		std::map<unsigned short, Request *>::iterator it = this->requests.find(recv_packet.id);
 		if (it == this->requests.end())
 		{
-			Log(LOG_DEBUG_2) << "Resolver: Received an answer for something we didn't request";
+			Anope::Logger.Debug2("resolver: Received an answer for something we didn't request");
 			return true;
 		}
 		Request *request = it->second;
 
 		if (recv_packet.flags & QUERYFLAGS_OPCODE)
 		{
-			Log(LOG_DEBUG_2) << "Resolver: Received a nonstandard query";
+			Anope::Logger.Debug2("resolver: Received a nonstandard query");
 			recv_packet.error = ERROR_NONSTANDARD_QUERY;
 			request->OnError(&recv_packet);
 		}
@@ -898,23 +898,23 @@ class MyManager : public Manager, public Timer
 			switch (recv_packet.flags & QUERYFLAGS_RCODE)
 			{
 				case 1:
-					Log(LOG_DEBUG_2) << "Resolver: format error";
+					Anope::Logger.Debug2("resolver: format error");
 					error = ERROR_FORMAT_ERROR;
 					break;
 				case 2:
-					Log(LOG_DEBUG_2) << "Resolver: server error";
+					Anope::Logger.Debug2("resolver: server error");
 					error = ERROR_SERVER_FAILURE;
 					break;
 				case 3:
-					Log(LOG_DEBUG_2) << "Resolver: domain not found";
+					Anope::Logger.Debug2("resolver: domain not found");
 					error = ERROR_DOMAIN_NOT_FOUND;
 					break;
 				case 4:
-					Log(LOG_DEBUG_2) << "Resolver: not implemented";
+					Anope::Logger.Debug2("resolver: not implemented");
 					error = ERROR_NOT_IMPLEMENTED;
 					break;
 				case 5:
-					Log(LOG_DEBUG_2) << "Resolver: refused";
+					Anope::Logger.Debug2("resolver: refused");
 					error = ERROR_REFUSED;
 					break;
 				default:
@@ -926,13 +926,13 @@ class MyManager : public Manager, public Timer
 		}
 		else if (recv_packet.questions.empty() || recv_packet.answers.empty())
 		{
-			Log(LOG_DEBUG_2) << "Resolver: No resource records returned";
+			Anope::Logger.Debug2("resolver: no resource records returned");
 			recv_packet.error = ERROR_NO_RECORDS;
 			request->OnError(&recv_packet);
 		}
 		else
 		{
-			Log(LOG_DEBUG_2) << "Resolver: Lookup complete for " << request->name;
+			Anope::Logger.Debug2("resolver: lookup complete for {0}", request->name);
 			request->OnLookupComplete(&recv_packet);
 			this->AddCache(recv_packet);
 		}
@@ -984,7 +984,7 @@ class MyManager : public Manager, public Timer
 
 	void Tick(time_t now) override
 	{
-		Log(LOG_DEBUG_2) << "Resolver: Purging DNS cache";
+		Anope::Logger.Debug2("resolver: purging DNS cache");
 
 		for (cache_map::iterator it = this->cache.begin(), it_next; it != this->cache.end(); it = it_next)
 		{
@@ -1005,7 +1005,7 @@ class MyManager : public Manager, public Timer
 	void AddCache(Query &r)
 	{
 		const ResourceRecord &rr = r.answers[0];
-		Log(LOG_DEBUG_3) << "Resolver cache: added cache for " << rr.name << " -> " << rr.rdata << ", ttl: " << rr.ttl;
+		Anope::Logger.Debug3("resolver: cache: added cache for {0} -> {1}, ttl: {2}", rr.name, rr.rdata, rr.ttl);
 		this->cache[r.questions[0]] = r;
 	}
 
@@ -1018,7 +1018,7 @@ class MyManager : public Manager, public Timer
 		if (it != this->cache.end())
 		{
 			Query &record = it->second;
-			Log(LOG_DEBUG_3) << "Resolver: Using cached result for " << request->name;
+			Anope::Logger.Debug3("resolver: Using cached result for {0}", request->name);
 			request->OnLookupComplete(&record);
 			return true;
 		}
@@ -1097,7 +1097,7 @@ class ModuleDNS : public Module
 							if (server.substr(i).is_pos_number_only())
 							{
 								nameserver = server.substr(i);
-								Log(LOG_DEBUG) << "Nameserver set to " << nameserver;
+								Anope::Logger.Debug("resolver: nameserver set to {0}", nameserver);
 								success = true;
 								break;
 							}
@@ -1110,7 +1110,7 @@ class ModuleDNS : public Module
 
 			if (!success)
 			{
-				Log() << "Unable to find nameserver, defaulting to 127.0.0.1";
+				Anope::Logger.Log("resolver: unable to find nameserver, defaulting to 127.0.0.1");
 				nameserver = "127.0.0.1";
 			}
 		}

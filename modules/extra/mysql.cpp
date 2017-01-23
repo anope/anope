@@ -241,7 +241,7 @@ class ModuleSQL : public Module
 
 			if (i == config->CountBlock("mysql"))
 			{
-				Log(LOG_NORMAL, "mysql") << "MySQL: Removing server connection " << cname;
+				Log(LogType::NORMAL, "mysql") << "MySQL: Removing server connection " << cname;
 
 				delete s;
 				this->MySQLServices.erase(cname);
@@ -266,11 +266,11 @@ class ModuleSQL : public Module
 					MySQLService *ss = new MySQLService(this, connname, database, server, user, password, port);
 					this->MySQLServices.insert(std::make_pair(connname, ss));
 
-					Log(LOG_NORMAL, "mysql") << "MySQL: Successfully connected to server " << connname << " (" << server << ")";
+					Log(LogType::NORMAL, "mysql") << "MySQL: Successfully connected to server " << connname << " (" << server << ")";
 				}
 				catch (const SQL::Exception &ex)
 				{
-					Log(LOG_NORMAL, "mysql") << "MySQL: " << ex.GetReason();
+					Log(LogType::NORMAL, "mysql") << "MySQL: " << ex.GetReason();
 				}
 			}
 		}
@@ -542,7 +542,7 @@ void MySQLService::Connect()
 	if (!connect)
 		throw SQL::Exception("Unable to connect to MySQL service " + this->GetName() + ": " + mysql_error(this->sql));
 
-	Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->GetName() << " at " << this->server << ":" << this->port;
+	Log(LogType::DEBUG) << "Successfully connected to MySQL service " << this->GetName() << " at " << this->server << ":" << this->port;
 }
 
 

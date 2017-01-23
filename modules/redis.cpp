@@ -68,7 +68,7 @@ class Transaction : public Interface
 		 * in this transaction
 		 */
 
-		Log(LOG_DEBUG_2) << "redis: transaction complete with " << r.multi_bulk.size() << " results";
+		this->GetOwner()->logger.Debug2("transaction complete with {0} results", r.multi_bulk.size());
 
 		for (unsigned i = 0; i < r.multi_bulk.size(); ++i)
 		{
@@ -274,7 +274,7 @@ RedisSocket::~RedisSocket()
 
 void RedisSocket::OnConnect()
 {
-	Log() << "redis: Successfully connected to " << provider->GetName() << (this == this->provider->sub ? " (sub)" : "");
+	provider->GetOwner()->logger.Log(_("Successfully connected to {0}"), provider->GetName() + (this == this->provider->sub ? " (sub)" : ""));
 
 	this->provider->SendCommand(NULL, "CLIENT SETNAME Anope");
 	this->provider->SendCommand(NULL, "SELECT " + stringify(provider->db));
@@ -282,7 +282,7 @@ void RedisSocket::OnConnect()
 
 void RedisSocket::OnError(const Anope::string &error)
 {
-	Log() << "redis: Error on " << provider->GetName() << (this == this->provider->sub ? " (sub)" : "") << ": " << error;
+	provider->GetOwner()->logger.Log(_("Error on {0}: {1}"), provider->GetName() + (this == this->provider->sub ? " (sub)" : ""), error);
 }
 
 size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
@@ -301,7 +301,7 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 		{
 			Anope::string reason(buffer, 1, l - 1);
 			size_t nl = reason.find("\r\n");
-			Log(LOG_DEBUG_2) << "redis: status ok: " << reason.substr(0, nl);
+			provider->GetOwner()->logger.Debug2("status ok: {0}", reason.substr(0, nl));
 			if (nl != Anope::string::npos)
 			{
 				r.type = Reply::OK;
@@ -313,7 +313,7 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 		{
 			Anope::string reason(buffer, 1, l - 1);
 			size_t nl = reason.find("\r\n");
-			Log(LOG_DEBUG) << "redis: status error: " << reason.substr(0, nl);
+			provider->GetOwner()->logger.Debug2("status error: {0}", reason.substr(0, nl));
 			if (nl != Anope::string::npos)
 			{
 				r.type = Reply::NOT_OK;
@@ -404,7 +404,7 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 				size_t u = ParseReply(*reply, buffer + used, l - used);
 				if (!u)
 				{
-					Log(LOG_DEBUG) << "redis: ran out of data to parse";
+					provider->GetOwner()->logger.Debug("ran out of data to parse");
 					delete reply;
 					break;
 				}
@@ -414,7 +414,7 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 			break;
 		}
 		default:
-			Log(LOG_DEBUG) << "redis: unknown reply " << *buffer;
+			provider->GetOwner()->logger.Debug("unknown reply {0}", *buffer);
 	}
 
 	return used;
@@ -442,13 +442,13 @@ bool RedisSocket::Read(const char *buffer, size_t l)
 		size_t used = this->ParseReply(r, buffer, l);
 		if (!used)
 		{
-			Log(LOG_DEBUG) << "redis: used == 0 ?";
+			provider->GetOwner()->logger.Debug("used == 0 ?");
 			r.Clear();
 			break;
 		}
 		else if (used > l)
 		{
-			Log(LOG_DEBUG) << "redis: used > l ?";
+			provider->GetOwner()->logger.Debug("used > l ?");
 			r.Clear();
 			break;
 		}
@@ -471,7 +471,7 @@ bool RedisSocket::Read(const char *buffer, size_t l)
 		{
 			if (this->interfaces.empty())
 			{
-				Log(LOG_DEBUG) << "redis: no interfaces?";
+				provider->GetOwner()->logger.Debug("no interfaces?");
 			}
 			else
 			{
@@ -572,7 +572,7 @@ class ModuleRedis : public Module
 				{
 					Interface *inter = p->sock->interfaces[i - 1];
 
-					if (inter && inter->owner == m)
+					if (inter && inter->GetOwner() == m)
 					{
 						inter->OnError(m->name + " being unloaded");
 						p->sock->interfaces.erase(p->sock->interfaces.begin() + i - 1);
@@ -584,7 +584,7 @@ class ModuleRedis : public Module
 				{
 					Interface *inter = p->sub->interfaces[i - 1];
 
-					if (inter && inter->owner == m)
+					if (inter && inter->GetOwner() == m)
 					{
 						inter->OnError(m->name + " being unloaded");
 						p->sub->interfaces.erase(p->sub->interfaces.begin() + i - 1);
@@ -595,7 +595,7 @@ class ModuleRedis : public Module
 			{
 				Interface *inter = p->ti.interfaces[i - 1];
 
-				if (inter && inter->owner == m)
+				if (inter && inter->GetOwner() == m)
 				{
 					inter->OnError(m->name + " being unloaded");
 					p->ti.interfaces.erase(p->ti.interfaces.begin() + i - 1);

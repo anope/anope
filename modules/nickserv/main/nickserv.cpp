@@ -426,7 +426,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 	void OnDelCore(NickServ::Account *nc) override
 	{
-		Log(NickServ, "nick") << "Deleting nickname group " << nc->GetDisplay();
+		NickServ->logger.Category("nick").Log(_("Deleting nickname group {0}"), nc->GetDisplay());
 
 		/* Clean up this nick core from any users online */
 		for (unsigned int i = nc->users.size(); i > 0; --i)
@@ -441,7 +441,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 	void OnChangeCoreDisplay(NickServ::Account *nc, const Anope::string &newdisplay) override
 	{
-		Log(LOG_NORMAL, "nick", NickServ) << "Changing " << nc->GetDisplay() << " nickname group display to " << newdisplay;
+		Anope::Logger.Bot(NickServ).Category("nick").Log(_("Changing {0} nickname group display to {1}"), nc->GetDisplay(), newdisplay);
 	}
 
 	void OnNickIdentify(User *u) override
@@ -555,7 +555,7 @@ class NickServCore : public Module, public NickServ::NickServService
 			IRCD->Send<messages::Login>(u, na);
 			if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership") && na->GetAccount() == u->Account() && !na->GetAccount()->IsUnconfirmed())
 				u->SetMode(NickServ, "REGISTERED");
-			Log(u, "", NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->GetDisplay();
+			u->logger.Bot(NickServ).Log(_("{0} automatically identified for account {1}"), u->GetMask(), u->Account()->GetDisplay());
 		}
 
 		if (!u->nick.equals_ci(oldnick) && old_na)
@@ -655,9 +655,10 @@ class NickServCore : public Module, public NickServ::NickServService
 
 			if (expire)
 			{
-				Log(LOG_NORMAL, "nickserv/expire", NickServ) << "Expiring nickname " << na->GetNick() << " (group: " << na->GetAccount()->GetDisplay() << ") (e-mail: " << (na->GetAccount()->GetEmail().empty() ? "none" : na->GetAccount()->GetEmail()) << ")";
+				Anope::Logger.Bot(NickServ).Category("nickserv/expire").Log(_("Expiring nickname {0} (account: {1}) (e-mail: {2})"),
+						na->GetNick(), na->GetAccount()->GetDisplay(), na->GetAccount()->GetEmail().empty() ? "none" : na->GetAccount()->GetEmail());
 				EventManager::Get()->Dispatch(&NickServ::Event::NickExpire::OnNickExpire, na);
-				delete na;
+				na->Delete();
 			}
 		}
 	}

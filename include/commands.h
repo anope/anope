@@ -86,6 +86,9 @@ class CoreExport CommandSource
 	const Anope::string &GetNick() const;
 	User *GetUser();
 	NickServ::Account *GetAccount();
+	Anope::string GetSource();
+	const Anope::string &GetCommand() const;
+
 	ChanServ::AccessGroup AccessFor(ChanServ::Channel *ci);
 	bool IsFounder(ChanServ::Channel *ci);
 
@@ -111,11 +114,13 @@ class CoreExport Command : public Service
 	Anope::string desc;
 	std::vector<Anope::string> syntax;
 	/* Allow unregistered users to use this command */
-	bool allow_unregistered;
+	bool allow_unregistered = false;
 	/* Command requires that a user is executing it */
-	bool require_user;
+	bool require_user = false;
 
  public:
+	static constexpr const char *NAME = "Command";
+
  	/* Maximum paramaters accepted by this command */
 	size_t max_params;
 	/* Minimum parameters required to use this command */
@@ -124,9 +129,8 @@ class CoreExport Command : public Service
 	/* Module which owns us */
 	Module *module;
 
-	static constexpr const char *NAME = "Command";
+	Logger logger;
 
- protected:
 	/** Create a new command.
 	 * @param owner The owner of the command
 	 * @param sname The command name
@@ -136,10 +140,8 @@ class CoreExport Command : public Service
 	 */
 	Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params = 0);
 
- public:
 	virtual ~Command();
 
- protected:
 	void SetDesc(const Anope::string &d);
 
 	void ClearSyntax();
@@ -148,7 +150,6 @@ class CoreExport Command : public Service
 	void AllowUnregistered(bool b);
 	void RequireUser(bool b);
 
- public:
 	void SendSyntax(CommandSource &);
 	bool AllowUnregistered() const;
 	bool RequireUser() const;

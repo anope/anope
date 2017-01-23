@@ -107,7 +107,7 @@ class CommandNSAccess : public Command
 		a->SetAccount(nc);
 		a->SetMask(mask);
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD mask " << mask << " to " << nc->GetDisplay();
+		logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to add mask {0} to {1}"), mask, nc->GetDisplay());
 		source.Reply(_("\002{0}\002 added to the access list of \002{1}\002."), mask, nc->GetDisplay());
 	}
 
@@ -129,7 +129,9 @@ class CommandNSAccess : public Command
 			if (a->GetMask().equals_ci(mask))
 			{
 				a->Delete();
-				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE mask " << mask << " from " << nc->GetDisplay();
+				logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, 
+						_("{source} used {command} to delete mask {0} from {1}"),
+						mask, nc->GetDisplay());
 				source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), mask, nc->GetDisplay());
 				return;
 			}
@@ -264,7 +266,7 @@ class NSAccess : public Module
 		{
 			NickAccess *a = Serialize::New<NickAccess *>();
 			a->SetAccount(na->GetAccount());
-			a->SetMask(u->Mask());
+			a->SetMask(u->WildMask());
 
 			u->SendMessage(Config->GetClient("NickServ"),
 					_("\002{0}\002 has been registered under your hostmask: \002{1}\002"), na->GetNick(), a->GetMask());

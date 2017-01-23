@@ -376,7 +376,7 @@ class EMD5 : public Module
 
 		Anope::string buf = "md5:" + Anope::Hex(reinterpret_cast<const char *>(hash.first), hash.second);
 
-		Log(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << buf << "]";
+		logger.Debug2("hashed password from [{0}] to [{1}]", src, buf);
 		dest = buf;
 		return EVENT_ALLOW;
 	}

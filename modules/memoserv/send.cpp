@@ -53,7 +53,7 @@ class CommandMSSend : public Command
 		if (result == MemoServ::MemoServService::MEMO_SUCCESS)
 		{
 			source.Reply(_("Memo sent to \002%s\002."), nick.c_str());
-			Log(LOG_COMMAND, source, this) << "to send a memo to " << nick;
+			logger.Command(LogType::COMMAND, source, _("{source} used {command} to send a memo to {0}"), nick);
 		}
 		else if (result == MemoServ::MemoServService::MEMO_INVALID_TARGET)
 		{

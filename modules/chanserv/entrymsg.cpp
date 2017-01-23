@@ -151,7 +151,9 @@ class CommandEntryMessage : public Command
 		msg->SetChannel(ci);
 		msg->SetCreator(source.GetNick());
 		msg->SetMessage(message);
-		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to add a message";
+
+		logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to add a message"));
+
 		source.Reply(_("Entry message added to \002{0}\002"), ci->GetName());
 	}
 
@@ -177,7 +179,9 @@ class CommandEntryMessage : public Command
 			if (i > 0 && i <= messages.size())
 			{
 				messages[i - 1]->Delete();
-				Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
+
+				logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to remove a message"));
+
 				source.Reply(_("Entry message \002{0}\002 for \002{1]\002 deleted."), i, ci->GetName());
 			}
 			else
@@ -192,9 +196,10 @@ class CommandEntryMessage : public Command
 	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
 		for (EntryMsg *e : ci->GetRefs<EntryMsg *>())
-			delete e;
+			e->Delete();
 
-		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
+		logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to remove all messages"));
+
 		source.Reply(_("Entry messages for \002{0}\002 have been cleared."), ci->GetName());
 	}
 

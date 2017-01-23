@@ -34,14 +34,14 @@ std::vector<Anope::string> Language::Domains;
 void Language::InitLanguages()
 {
 #if GETTEXT_FOUND
-	Log(LOG_DEBUG) << "Initializing Languages...";
+	Anope::Logger.Debug("Initializing Languages...");
 
 	Languages.clear();
 
 	if (!bindtextdomain("anope", Anope::LocaleDir.c_str()))
-		Log() << "Error calling bindtextdomain, " << Anope::LastError();
+		Anope::Logger.Log("Error calling bindtextdomain, {0}", Anope::LastError());
 	else
-		Log(LOG_DEBUG) << "Successfully bound anope to " << Anope::LocaleDir;
+		Anope::Logger.Debug("Successfully bound anope to {0}", Anope::LocaleDir);
 
 	setlocale(LC_ALL, "");
 
@@ -52,15 +52,15 @@ void Language::InitLanguages()
 		const Anope::string &lang_name = Translate(language.c_str(), _("English"));
 		if (lang_name == "English")
 		{
-			Log() << "Unable to use language " << language;
+			Anope::Logger.Log("Unable to use language {0}", language);
 			continue;
 		}
 
-		Log(LOG_DEBUG) << "Found language " << language;
+		Anope::Logger.Debug("Found language {0}", language);
 		Languages.push_back(language);
 	}
 #else
-	Log() << "Unable to initialize languages, gettext is not installed";
+	Anope::Logger.Log("Unable to initialize languages, gettext is not installed");
 #endif
 }
 
@@ -109,7 +109,12 @@ const char *Language::Translate(const char *lang, const char *string)
 		return "";
 
 	if (!lang || !*lang)
+	{
+		if (Config == nullptr)
+			return string;
+
 		lang = Config->DefLanguage.c_str();
+	}
 
 #ifdef __USE_GNU_GETTEXT
 	++_nl_msg_cat_cntr;

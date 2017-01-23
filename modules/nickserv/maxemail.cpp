@@ -39,7 +39,7 @@ class NSMaxEmail : public Module
 			username = username.substr(0, sz);
 
 		Anope::string cleaned = username + email.substr(host);
-		Log(LOG_DEBUG) << "cleaned " << email << " to " << cleaned;
+		logger.Debug("cleaned {0} to {1}", email, cleaned);
 		return cleaned;
 	}
 

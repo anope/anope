@@ -209,7 +209,8 @@ public:
 			return;
 		}
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clone " << (what.empty() ? "everything from it" : what) << " to " << target_ci->GetName();
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to clone {0} to {1}"),
+				what.empty() ? "everything from it" : what, target_ci->GetName());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

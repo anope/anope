@@ -552,7 +552,7 @@ bool ListenSocket::ProcessRead()
 	}
 	catch (const SocketException &ex)
 	{
-		Log() << ex.GetReason();
+		Anope::Logger.Log(ex.GetReason());
 	}
 	return true;
 }

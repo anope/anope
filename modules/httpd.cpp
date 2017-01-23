@@ -84,13 +84,13 @@ class MyHTTPClient : public HTTPClient
 				if (this->message.headers.count(token))
 				{
 					this->ip = this->message.headers[token];
-					Log(LOG_DEBUG, "httpd") << "m_httpd: IP for connection " << this->GetFD() << " changed to " << this->ip;
+					Anope::Logger.Category("httpd").Debug("IP for connection {0} changed to {1}", this->GetFD(), this->ip);
 					break;
 				}
 			}
 		}
 
-		Log(LOG_DEBUG, "httpd") << "m_httpd: Serving page " << this->page_name << " to " << this->ip;
+		Anope::Logger.Category("httpd").Debug("Serving page {0} to {1}", this->page_name, this->ip);
 
 		HTTPReply reply;
 		reply.content_type = this->page->GetContentType();
@@ -104,12 +104,12 @@ class MyHTTPClient : public HTTPClient
 
 	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), HTTPClient(l, f, a), provider(l), header_done(false), served(false), ip(a.addr()), content_length(0), created(Anope::CurTime)
 	{
-		Log(LOG_DEBUG, "httpd") << "Accepted connection " << f << " from " << a.addr();
+		Anope::Logger.Category("httpd").Debug("Accepted connection {0} from {1}", f, a.addr());
 	}
 
 	~MyHTTPClient()
 	{
-		Log(LOG_DEBUG, "httpd") << "Closing connection " << this->GetFD() << " from " << this->ip;
+		Anope::Logger.Category("httpd").Debug("Closing connection {0} from {1}", this->GetFD(), this->ip);
 	}
 
 	/* Close connection once all data is written */
@@ -152,7 +152,7 @@ class MyHTTPClient : public HTTPClient
 				if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
 					continue;
 				this->message.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
-				Log(LOG_DEBUG_2) << "HTTP POST from " << this->clientaddr.addr() << ": " << token.substr(0, sz) << ": " << this->message.post_data[token.substr(0, sz)];
+				Anope::Logger.Debug2("HTTP POST from {0}: {1}: {2}", this->clientaddr.addr(), token.substr(0, sz), this->message.post_data[token.substr(0, sz)]);
 			}
 
 			this->Serve();
@@ -163,7 +163,7 @@ class MyHTTPClient : public HTTPClient
 
 	bool Read(const Anope::string &buf)
 	{
-		Log(LOG_DEBUG_2) << "HTTP from " << this->clientaddr.addr() << ": " << buf;
+		Anope::Logger.Debug2("HTTP from {0}: {1}", this->clientaddr.addr(), buf);
 
 		if (message.method == httpd::Method::NONE)
 		{
@@ -409,12 +409,12 @@ class HTTPD : public Module
 
 			if (ip.empty())
 			{
-				Log(this) << "You must configure a bind IP for HTTP server " << hname;
+				logger.Log("You must configure a bind IP for HTTP server {0}", hname);
 				continue;
 			}
 			else if (port <= 0 || port > 65535)
 			{
-				Log(this) << "You must configure a (valid) listen port for HTTP server " << hname;
+				logger.Log("You must configure a (valid) listen port for HTTP server {0}", hname);
 				continue;
 			}
 
@@ -429,12 +429,12 @@ class HTTPD : public Module
 				}
 				catch (const SocketException &ex)
 				{
-					Log(this) << "Unable to create HTTP server " << hname << ": " << ex.GetReason();
+					logger.Log("Unable to create HTTP server {0}: {1}", hname, ex.GetReason());
 					continue;
 				}
 				this->providers[hname] = p;
 
-				Log(this) << "Created HTTP server " << hname;
+				logger.Log("Created HTTP server {0}", hname);
 			}
 			else
 			{
@@ -445,7 +445,7 @@ class HTTPD : public Module
 					delete p;
 					this->providers.erase(hname);
 
-					Log(this) << "Changing HTTP server " << hname << " to " << ip << ":" << port;
+					logger.Log("Changing HTTP server {0} to {1}:{2}", hname, ip, port);
 
 					try
 					{
@@ -455,7 +455,7 @@ class HTTPD : public Module
 					}
 					catch (const SocketException &ex)
 					{
-						Log(this) << "Unable to create HTTP server " << hname << ": " << ex.GetReason();
+						logger.Log("Unable to create HTTP server {0}: {1}", hname, ex.GetReason());
 						continue;
 					}
 
@@ -475,7 +475,7 @@ class HTTPD : public Module
 
 			if (existing.count(p->GetName()) == 0)
 			{
-				Log(this) << "Removing HTTP server " << p->GetName();
+				logger.Log("Removing HTTP server {0}", p->GetName());
 				this->providers.erase(p->GetName());
 				delete p;
 			}

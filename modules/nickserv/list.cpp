@@ -213,13 +213,17 @@ class CommandNSSetPrivate : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable private for " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source,
+					_("{source} used {command} to enable private for {0}"), nc->GetDisplay());
+
 			nc->SetPrivate(true);
 			source.Reply(_("Private option is now \002on\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable private for " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source,
+					_("{source} used {command} to disable private for {0}"), nc->GetDisplay());
+
 			nc->SetPrivate(true);
 			source.Reply(_("Private option is now \002off\002 for \002{0}\002."), nc->GetDisplay());
 		}

@@ -374,7 +374,8 @@ class CommandCSMode : public Command
 			if (!reply.empty())
 			{
 				source.Reply(_("\002{0}\002 locked on \002{1}\002."), reply, ci->GetName());
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << reply;
+
+				logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to lock {0}"), reply);
 			}
 			else if (needreply)
 			{
@@ -430,7 +431,9 @@ class CommandCSMode : public Command
 							if (!mode_param.empty())
 								mode_param = " " + mode_param;
 							source.Reply(_("\002{0}{1}{2}\002 has been unlocked from \002{3}\002."), adding == 1 ? '+' : '-', cm->mchar, mode_param, ci->GetName());
-							Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->mchar << mode_param;
+
+							logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to unlock {0}"),
+									(adding ? '+' : '-') + cm->mchar + mode_param);
 						}
 						else
 						{
@@ -493,7 +496,8 @@ class CommandCSMode : public Command
 		Anope::string modes = params[2], param;
 
 		bool override = !source.AccessFor(ci).HasPriv("MODE") && source.HasPriv("chanserv/administration");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << params[2] << (params.size() > 3 ? " " + params[3] : "");
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to set {3}"),
+				params[2] + (params.size() > 3 ? " " + params[3] : ""));
 
 		int adding = -1;
 		for (size_t i = 0; i < modes.length(); ++i)
@@ -850,7 +854,7 @@ class CommandCSModes : public Command
 		else
 			ci->c->RemoveMode(NULL, m.second, targ->GetUID());
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "on " << targ->nick;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} on {3}"), targ->nick);
 	}
 
  	const Anope::string GetDesc(CommandSource &source) const override

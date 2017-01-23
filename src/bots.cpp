@@ -31,11 +31,13 @@
 #include "event.h"
 #include "modules/chanserv.h"
 
-ServiceBot::ServiceBot(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : LocalUser(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", IRCD ? IRCD->UID_Retrieve() : "", NULL), botmodes(bmodes)
+ServiceBot::ServiceBot(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes)
+	: LocalUser(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", IRCD ? IRCD->UID_Retrieve() : "", NULL)
+	, botmodes(bmodes)
+	, logger(this)
 {
 	this->type = UserType::BOT;
 	this->lastmsg = Anope::CurTime;
-	this->introduced = false;
 
 	EventManager::Get()->Dispatch(&Event::CreateBot::OnCreateBot, this);
 

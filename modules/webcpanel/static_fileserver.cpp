@@ -34,7 +34,7 @@ bool StaticFileServer::OnRequest(HTTPProvider *server, const Anope::string &page
 	int fd = open((template_base + "/" + this->file_name).c_str(), O_RDONLY);
 	if (fd < 0)
 	{
-		Log(LOG_NORMAL, "httpd") << "Error serving file " << page_name << " (" << (template_base + "/" + this->file_name) << "): " << strerror(errno);
+		Anope::Logger.Category("webcpanel").Log("Error serving file {0} ({1}/{2}): {3}", page_name, template_base, this->file_name, strerror(errno));
 
 		client->SendError(HTTP_PAGE_NOT_FOUND, "Page not found");
 		return true;

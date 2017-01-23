@@ -112,7 +112,8 @@ public:
 
 		if (!sender)
 		{
-			Log(LOG_DEBUG) << "No message sender for type " << T::NAME;
+			const char *const name = T::NAME;
+			Anope::Logger.Debug("No message sender for type {0}", name);
 			return;
 		}
 

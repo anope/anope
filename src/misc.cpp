@@ -411,7 +411,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 			}
 			catch (const std::regex_error &error)
 			{
-				Log(LOG_DEBUG) << error.what();
+				Anope::Logger.Debug(error.what());
 			}
 		}
 
@@ -697,7 +697,7 @@ Anope::string Anope::Resolve(const Anope::string &host, int type)
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = type;
 
-	Log(LOG_DEBUG_2) << "Resolver: BlockingQuery: Looking up " << host;
+	Anope::Logger.Debug2("Resolver: BlockingQuery: Looking up {0}", host);
 
 	addrinfo *addrresult = NULL;
 	if (getaddrinfo(host.c_str(), NULL, &hints, &addrresult) == 0)
@@ -705,7 +705,7 @@ Anope::string Anope::Resolve(const Anope::string &host, int type)
 		sockaddrs addr;
 		memcpy(&addr, addrresult->ai_addr, addrresult->ai_addrlen);
 		result = addr.addr();
-		Log(LOG_DEBUG_2) << "Resolver: " << host << " -> " << result;
+		Anope::Logger.Debug2("Resolver: {0} -> {1}", host, result);
 
 		freeaddrinfo(addrresult);
 	}
@@ -728,3 +728,40 @@ Anope::string Anope::Random(size_t len)
 	return buf;
 }
 
+const kwarg *FormatInfo::GetKwarg(const Anope::string &name) const
+{
+	for (const kwarg &kw : parameters)
+		if (kw.name == name)
+			return &kw;
+	return nullptr;
+}
+
+void FormatInfo::Format()
+{
+	size_t start = 0;
+	size_t s = format.find('{', start);
+
+	while (s != Anope::string::npos)
+	{
+		size_t e = format.find('}', s + 1);
+		if (e == Anope::string::npos)
+			break;
+
+		Anope::string key = format.substr(s + 1, e - s - 1);
+
+		// Find replacement for key
+		const kwarg *arg = GetKwarg(key);
+
+		format.erase(s, e - s + 1);
+		if (arg != nullptr)
+			format.insert(s, arg->value);
+
+		start = s + (arg != nullptr ? arg->value.length() : 0);
+		s = format.find('{', start);
+	}
+}
+
+const Anope::string &FormatInfo::GetFormat() const
+{
+	return format;
+}

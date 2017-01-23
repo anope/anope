@@ -187,8 +187,8 @@ class CommandNSCert : public Command
 		e->SetCert(certfp);
 		
 #warning "events?"
+		logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to add certificate fingerprint {0} to {1}"), certfp, nc->GetDisplay());
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD certificate fingerprint " << certfp << " to " << nc->GetDisplay();
 		source.Reply(_("\002{0}\002 added to the certificate list of \002{1}\002."), certfp, nc->GetDisplay());
 	}
 
@@ -218,7 +218,7 @@ class CommandNSCert : public Command
 
 		cert->Delete();
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE certificate fingerprint " << certfp << " from " << nc->GetDisplay();
+		logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to delete certificate fingerprint {0} from {1}"), certfp, nc->GetDisplay());
 		source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), certfp, nc->GetDisplay());
 	}
 
@@ -354,8 +354,9 @@ class NSCert : public Module
 		else
 			u->Login(nc);
 
-		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified to \002%s\002."), nc->GetDisplay().c_str());
-		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->GetDisplay() << " via SSL certificate fingerprint";
+		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified to \002{0}\002."), nc->GetDisplay());
+		NickServ->logger.Log(_("{0} automatically identified for account {1} via SSL certificate fingerprint"),
+				u->GetMask(), nc->GetDisplay());
 	}
 
 	EventReturn OnNickValidate(User *u, NickServ::Nick *na) override
@@ -376,7 +377,8 @@ class NSCert : public Module
 
 			u->Identify(na);
 			u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified."));
-			Log(NickServ) << u->GetMask() << " automatically identified for account " << na->GetAccount()->GetDisplay() << " via SSL certificate fingerprint";
+			NickServ->logger.Log(_("{0} automatically identified for account {1} via SSL certificate fingerprint"),
+					u->GetMask(), na->GetAccount()->GetDisplay());
 			return EVENT_ALLOW;
 		}
 

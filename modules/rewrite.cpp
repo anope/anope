@@ -126,14 +126,16 @@ class RewriteCommand : public Command
 		if (r != NULL)
 		{
 			Anope::string new_message = r->Process(source, full_params);
-			Log(LOG_DEBUG) << "m_rewrite: Rewrote '" << source.command << (!params.empty() ? " " + params[0] : "") << "' to '" << new_message << "' using '" << r->source_message << "'";
+			logger.Debug("Rewrote '{0}' to '{1}' using '{2}'", source.command + (!params.empty() ? " " + params[0] : ""), new_message, r->source_message);
 			source.service = ServiceBot::Find(r->client, true);
 			if (!source.service)
 				return;
 			Command::Run(source, new_message);
 		}
 		else
-			Log() << "m_rewrite: Unable to rewrite '" << source.command << (!params.empty() ? " " + params[0] : "") << "'";
+		{
+			logger.Log("Unable to rewrite '{0}'", source.command + (!params.empty() ? " " + params[0] : ""));
+		}
 	}
 
 	void OnServHelp(CommandSource &source) override

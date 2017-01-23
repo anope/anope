@@ -278,7 +278,7 @@ void TypeLoader::OnResult(const Reply &r)
 		Serialize::Object *obj = type->Require(id);
 		if (obj == nullptr)
 		{
-			Log(LOG_DEBUG) << "redis: Unable to require object #" << id << " of type " << type->GetName();
+			Anope::Logger.Debug("Unable to require object #{0} of type {1}", id, type->GetName());
 			continue;
 		}
 
@@ -318,7 +318,7 @@ void ObjectLoader::OnResult(const Reply &r)
 
 void FieldLoader::OnResult(const Reply &r)
 {
-	Log(LOG_DEBUG_2) << "redis: Setting field " << field->serialize_name << " of object #" << obj->id << " of type " << obj->GetSerializableType()->GetName() << " to " << r.bulk;
+	Anope::Logger.Debug2("Setting field {0} of object #{1} of type {2} to {3}", field->serialize_name, obj->id, obj->GetSerializableType()->GetName(), r.bulk);
 	field->UnserializeFromString(obj, r.bulk);
 
 	delete this;
@@ -358,25 +358,27 @@ void SubscriptionListener::OnResult(const Reply &r)
 		}
 		catch (const ConvertException &ex)
 		{
-			Log(LOG_DEBUG) << "redis: unable to get id for SL update key " << sid;
+			this->GetOwner()->logger.Debug("unable to get id for SL update key {0}", sid);
 			return;
 		}
 
 		Serialize::Object *obj = Serialize::GetID(id);
 		if (obj == nullptr)
 		{
-			Log(LOG_DEBUG) << "redis: pmessage for unknown object #" << id;
+			this->GetOwner()->logger.Debug("message for unknown object #{0}", id);
 			return;
 		}
 
 		Serialize::FieldBase *field = obj->GetSerializableType()->GetField(key);
 		if (field == nullptr)
 		{
-			Log(LOG_DEBUG) << "redis: pmessage for unknown field of object #" << id << ": " << key;
+			this->GetOwner()->logger.Debug("message for unknown field of object #{0}: {1}", id, key);
 			return;
 		}
 
-		Log(LOG_DEBUG_2) << "redis: Setting field " << field->serialize_name << " of object #" << obj->id << " of type " << obj->GetSerializableType()->GetName() << " to " << value;
+		this->GetOwner()->logger.Debug2("Setting field {0} of object #{1} of type {2} to {3}",
+				field->serialize_name, obj->id, obj->GetSerializableType()->GetName(), value);
+
 		field->UnserializeFromString(obj, value);
 	}
 	else if (command == "create")
@@ -393,21 +395,21 @@ void SubscriptionListener::OnResult(const Reply &r)
 		}
 		catch (const ConvertException &ex)
 		{
-			Log(LOG_DEBUG) << "redis: unable to get id for SL update key " << sid;
+			this->GetOwner()->logger.Debug("unable to get id for SL update key {0}", sid);
 			return;
 		}
 
 		Serialize::TypeBase *type = Serialize::TypeBase::Find(stype);
 		if (type == nullptr)
 		{
-			Log(LOG_DEBUG) << "redis: pmessage create for nonexistant type " << stype;
+			this->GetOwner()->logger.Debug("message create for nonexistant type {0}", stype);
 			return;
 		}
 
 		Serialize::Object *obj = type->Require(id);
 		if (obj == nullptr)
 		{
-			Log(LOG_DEBUG) << "redis: require for pmessage create type " << type->GetName() << " id #" << id << " returned nullptr";
+			this->GetOwner()->logger.Debug("require for message create type {0} id #{1} returned nullptr", type->GetName(), id);
 			return;
 		}
 	}
@@ -424,21 +426,23 @@ void SubscriptionListener::OnResult(const Reply &r)
 		}
 		catch (const ConvertException &ex)
 		{
-			Log(LOG_DEBUG) << "redis: unable to get id for SL update key " << sid;
+			this->GetOwner()->logger.Debug("unable to get id for SL update key {0}", sid);
 			return;
 		}
 
 		Serialize::Object *obj = Serialize::GetID(id);
 		if (obj == nullptr)
 		{
-			Log(LOG_DEBUG) << "redis: message for unknown object #" << id;
+			this->GetOwner()->logger.Debug("message for unknown object #{0}", id);
 			return;
 		}
 
 		obj->Delete();
 	}
 	else
-		Log(LOG_DEBUG) << "redis: unknown message: " << message;
+	{
+		this->GetOwner()->logger.Debug("unknown message: {0}", message);
+	}
 }
 
 MODULE_INIT(DatabaseRedis)

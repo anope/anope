@@ -58,7 +58,7 @@ class CommandBSSetGreet : public Command
 		if (value.equals_ci("ON"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable greets";
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable greets"));
 
 			ci->SetGreet(true);
 			source.Reply(_("Greet mode for \002{0}\002 is now \002on\002."), ci->GetName());
@@ -66,7 +66,7 @@ class CommandBSSetGreet : public Command
 		else if (value.equals_ci("OFF"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable greets";
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable greets"));
 
 			ci->SetGreet(false);
 			source.Reply(_("Greet mode for \002{0}\002 is now \002off\002."), ci->GetName());
@@ -115,13 +115,15 @@ class CommandNSSetGreet : public Command
 
 		if (!param.empty())
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the greet of " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to change the greet of {0}"), nc->GetDisplay());
+
 			nc->SetGreet(param);
 			source.Reply(_("Greet message for \002{0}\002 changed to \002{1}\002."), nc->GetDisplay(), param);
 		}
 		else
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the greet of " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to unset the greet of {0}"), nc->GetDisplay());
+
 			nc->SetGreet("");
 			source.Reply(_("Greet message for \002{0}\002 unset."), nc->GetDisplay());
 		}

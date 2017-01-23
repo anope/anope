@@ -50,7 +50,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 		if (!na)
 			return;
 
-		Log(LOG_COMMAND, source, cmd) << "for " << na->GetNick();
+		cmd->logger.Command(LogType::COMMAND, source, _("{source} used {command} for {0}"), na->GetNick());
 
 		/* Nick is being held by us, release it */
 		if (na->HasFieldS("HELD"))
@@ -69,7 +69,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 			if (!source.GetAccount() && na->GetAccount()->IsSecure())
 			{
 				source.GetUser()->Login(u->Account());
-				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->GetDisplay();
+				cmd->logger.Command(LogType::COMMAND, source, _("{source} used {command} and was automatically identified to {0}"), u->Account()->GetDisplay());
 			}
 
 			if (Config->GetModule("nickserv/recover")->Get<bool>("restoreonrecover"))
@@ -100,7 +100,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 			if (!source.GetAccount() && na->GetAccount()->IsSecure())
 			{
 				source.GetUser()->Login(na->GetAccount()); // Identify the user using the command if they arent identified
-				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->GetNick() << " (" << na->GetAccount()->GetDisplay() << ")";
+				cmd->logger.Command(LogType::COMMAND, source, _("{source} used {command} and was automatically identified to {0} ({1})"), na->GetNick(), na->GetAccount()->GetDisplay());
 				source.Reply(_("You have been logged in as \002{0}\002."), na->GetAccount()->GetDisplay());
 			}
 
@@ -139,7 +139,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 			source.Reply(_("Access denied."));
 			if (!pass.empty())
 			{
-				Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << user;
+				cmd->logger.Command(LogType::COMMAND, source, _("{source} used {command} with an invalid password for {0}"), user);
 				if (source.GetUser())
 					source.GetUser()->BadPassword();
 			}

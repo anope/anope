@@ -83,7 +83,7 @@ void ServiceManager::Register(Service *service)
 			throw ModuleException("Service of type " + service->GetType() + " with name " + service->GetName() + " already exists from " + service->GetOwner()->name);
 	}
 
-	Log(LOG_DEBUG_3) << "Service registered: " << service->GetType() << " " << service->GetName() << " address " << static_cast<void *>(this) << " by " << service->GetOwner();
+	Anope::Logger.Debug3("Service registered: {0} {1} address {2} by {3}", service->GetType(), service->GetName(), static_cast<void *>(this), service->GetOwner());
 
 	services.push_back(service);
 
@@ -92,7 +92,7 @@ void ServiceManager::Register(Service *service)
 
 void ServiceManager::Unregister(Service *service)
 {
-	Log(LOG_DEBUG_3) <<  "Service unregistered: " << service->GetType() << " " << service->GetName() << " address " << static_cast<void *>(service) << " by " << service->GetOwner();
+	Anope::Logger.Debug3("Service unregistered: {0} {1} address {2} by {3}", service->GetType(), service->GetName(), static_cast<void *>(service), service->GetOwner());
 
 	auto it = std::find(services.begin(), services.end(), service);
 	if (it != services.end())
@@ -108,13 +108,13 @@ void ServiceManager::Lookup(ServiceReferenceBase *reference)
 	if (reference->GetName().empty())
 	{
 		std::vector<Service *> services = this->FindServices(reference->GetType());
-		Log(LOG_DEBUG_3) << "Service lookup " << static_cast<void *>(reference) << " type " << reference->GetType() << " name " << reference->GetName() << ": " << services.size() << " services";
+		Anope::Logger.Debug3("Service lookup {0} type {1} name {2}: {3} services", static_cast<void *>(reference), reference->GetType(), reference->GetName(), services.size());
 		reference->SetServices(services);
 	}
 	else
 	{
 		Service *service = this->FindService(reference->GetType(), reference->GetName());
-		Log(LOG_DEBUG_3) << "Service lookup " << static_cast<void *>(reference) << " type " << reference->GetType() << " name " << reference->GetName() << ": " << service;
+		Anope::Logger.Debug3("Service lookup {0} type {1} name {2}: {3}", static_cast<void *>(reference), reference->GetType(), reference->GetName(), service);
 		reference->SetService(service);
 	}
 }

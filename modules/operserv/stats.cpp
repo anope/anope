@@ -246,7 +246,7 @@ class CommandOSStats : public Command
 	{
 		Anope::string extra = !params.empty() ? params[0] : "";
 
-		Log(LOG_ADMIN, source, this) << extra;
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} {0}"), extra);
 
 		if (extra.equals_ci("RESET"))
 			return this->DoStatsReset(source);
@@ -318,7 +318,7 @@ class OSStats : public Module
 
 			Server *sserver = u->server;
 			if (sserver && sserver->IsSynced())
-				Log(this, "maxusers") << "connected - new maximum user count: " << UserListByNick.size();
+				u->logger.Category("maxusers").Log(_("{0} connected - new maximum user count: {1}"), u->GetMask(), UserListByNick.size());
 		}
 	}
 };

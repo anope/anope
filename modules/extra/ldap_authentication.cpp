@@ -80,7 +80,7 @@ class IdentifyInterface : public LDAPInterface
 					{
 						const LDAPAttributes &attr = r.get(0);
 						ii->dn = attr.get("dn");
-						Log(LOG_DEBUG) << "m_ldap_authenticationn: binding as " << ii->dn;
+						Log(LogType::DEBUG) << "m_ldap_authenticationn: binding as " << ii->dn;
 
 						ii->lprov->Bind(new IdentifyInterface(this->owner, ii), ii->dn, ii->req->GetPassword());
 						ii = NULL;
@@ -99,7 +99,7 @@ class IdentifyInterface : public LDAPInterface
 					Anope::string sf = search_filter.replace_all_cs("%account", ii->req->GetAccount()).replace_all_cs("%object_class", object_class);
 					try
 					{
-						Log(LOG_DEBUG) << "m_ldap_authentication: searching for " << sf;
+						Log(LogType::DEBUG) << "m_ldap_authentication: searching for " << sf;
 						ii->lprov->Search(new IdentifyInterface(this->owner, ii), basedn, sf);
 						ii->admin_bind = false;
 						ii = NULL;

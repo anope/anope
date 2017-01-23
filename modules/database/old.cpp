@@ -355,7 +355,7 @@ static dbFILE *open_db_read(const char *service, const char *filename, int versi
 	fp = fopen(f->filename, "rb");
 	if (!fp)
 	{
-		Log() << "Can't read " << service << " database " << f->filename;
+		Anope::Logger.Log("Can't read {0} database {1}", service, f->filename);
 		delete f;
 		return NULL;
 	}
@@ -363,13 +363,13 @@ static dbFILE *open_db_read(const char *service, const char *filename, int versi
 	myversion = fgetc(fp) << 24 | fgetc(fp) << 16 | fgetc(fp) << 8 | fgetc(fp);
 	if (feof(fp))
 	{
-		Log() << "Error reading version number on " << f->filename << ": End of file detected.";
+		Anope::Logger.Log("Error reading version number on {0}: End of file detected.", f->filename);
 		delete f;
 		return NULL;
 	}
 	else if (myversion < version)
 	{
-		Log() << "Unsuported database version (" << myversion << ") on " << f->filename << ".";
+		Anope::Logger.Log("Unsuported database version ({0}) on {1}.", myversion, f->filename);
 		delete f;
 		return NULL;
 	}
@@ -644,7 +644,7 @@ static void LoadNicks()
 			READ(read_uint16(&u16, f));
 			READ(read_int16(&i16, f));
 
-			Log(LOG_DEBUG) << "Loaded NickServ::Account " << nc->GetDisplay();
+			Anope::Logger.Debug("Loaded nickserv account {0}", nc->GetDisplay());
 		}
 
 	for (int i = 0; i < 1024; ++i)
@@ -672,7 +672,7 @@ static void LoadNicks()
 			NickServ::Account *nc = NickServ::FindAccount(core);
 			if (nc == NULL)
 			{
-				Log() << "Skipping coreless nick " << nick << " with core " << core;
+				Anope::Logger.Debug("Skipping coreless nick {0} with core {1}", nick, core);
 				continue;
 			}
 
@@ -709,7 +709,7 @@ static void LoadNicks()
 			if (tmpu16 & OLD_NS_NO_EXPIRE)
 				na->SetNoExpire(true);
 
-			Log(LOG_DEBUG) << "Loaded NickServ::Nick " << na->GetNick();
+			Anope::Logger.Debug("Loaded nick {0}", na->GetNick());
 		}
 
 	close_db(f); /* End of section Ia */
@@ -735,7 +735,7 @@ static void LoadVHosts()
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na == NULL)
 		{
-			Log() << "Removing vhost for non-existent nick " << nick;
+			Anope::Logger.Log("Removing vhost for non-existent nick {0}", nick);
 			continue;
 		}
 
@@ -749,7 +749,7 @@ static void LoadVHosts()
 		vhost->SetCreator(creator);
 		vhost->SetCreated(vtime);
 
-		Log() << "Loaded vhost for " << na->GetNick();
+		Anope::Logger.Debug("Loaded vhost for {0}", na->GetNick());
 	}
 
 	close_db(f);
@@ -787,7 +787,7 @@ static void LoadBots()
 		if (flags & OLD_BI_PRIVATE)
 			bi->bi->SetOperOnly(true);
 
-		Log(LOG_DEBUG) << "Loaded bot " << bi->nick;
+		Anope::Logger.Debug("Loaded bot {0}", bi->nick);
 	}
 
 	close_db(f);
@@ -1173,7 +1173,7 @@ static void LoadChannels()
 				continue;
 			}
 
-			Log(LOG_DEBUG) << "Loaded channel " << ci->GetName();
+			Anope::Logger.Debug("Loaded channel {0}", ci->GetName());
 		}
 
 	close_db(f);

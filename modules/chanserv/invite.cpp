@@ -83,12 +83,12 @@ class CommandCSInvite : public Command
 		{
 			source.Reply(_("\002{0}\002 has been invited to \002{1}\002."), u2->nick, c->name);
 			u2->SendMessage(ci->WhoSends(), _("You have been invited to \002{0}\002 by \002{1}\002."), c->name, source.GetNick());
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << u2->nick;
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to invite {0}"), u2->nick);
 		}
 		else
 		{
 			u2->SendMessage(ci->WhoSends(), _("You have been invited to \002{0}\002."), c->name);
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel}"));
 		}
 	}
 

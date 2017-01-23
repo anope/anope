@@ -56,7 +56,10 @@ class NSGroupRequestListener : public NickServ::IdentifyRequestListener
 		u->Login(target->GetAccount());
 		EventManager::Get()->Dispatch(&Event::NickGroup::OnNickGroup, u, target);
 
-		Log(LOG_COMMAND, source, cmd) << "to make " << nick << " join group of " << target->GetNick() << " (" << target->GetAccount()->GetDisplay() << ") (email: " << (!target->GetAccount()->GetEmail().empty() ? target->GetAccount()->GetEmail() : "none") << ")";
+		cmd->logger.Command(LogType::COMMAND, source, _("{source} used {command} to make {2} join group of {3} ({4}) (email: {5})"),
+				source.GetSource(), source.GetCommand(), nick, target->GetNick(), target->GetAccount()->GetDisplay(),
+				!target->GetAccount()->GetEmail().empty() ? target->GetAccount()->GetEmail() : "none");
+
 		source.Reply(_("You are now in the group of \002{0}\002."), target->GetNick());
 
 		u->lastnickreg = Anope::CurTime;
@@ -68,7 +71,7 @@ class NSGroupRequestListener : public NickServ::IdentifyRequestListener
 		if (!source.GetUser())
 			return;
 
-		Log(LOG_COMMAND, source, cmd) << "and failed to group to " << target->GetNick();
+		cmd->logger.Command(LogType::COMMAND, source, _("{source} used {command} and failed to group to {0}"), target->GetNick());
 		source.Reply(_("Password incorrect."));
 		source.GetUser()->BadPassword();
 	}
@@ -149,7 +152,8 @@ class CommandNSGroup : public Command
 
 		if (target->GetAccount()->HasFieldS("NS_SUSPENDED"))
 		{
-			Log(LOG_COMMAND, source, this) << "and tried to group to suspended nick " << target->GetNick();
+			logger.Command(LogType::COMMAND, source, _("{source} used {command} and tried to group to suspended nickname {0}"), target->GetNick());
+
 			source.Reply(_("\002{0}\002 is suspended."), target->GetNick());
 			return;
 		}

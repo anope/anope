@@ -58,8 +58,8 @@ void hybrid::senders::Akill::Send(User* u, XLine* x)
 		old->GetManager()->AddXLine(xl);
 		x = xl;
 
-		Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#"
-				<< u->realname << " matches " << old->GetMask();
+		Anope::Logger.Bot("OperServ").Category("akill").Log(_("AKILL: Added an akill for {0} because {1}#{2} matches {3}"),
+				x->GetMask(), u->GetMask(), u->realname, old->GetMask());
 	}
 
 	/* Calculate the time left before this would expire, capping it at 2 days */
@@ -451,7 +451,7 @@ void hybrid::SJoin::Run(MessageSource &source, const std::vector<Anope::string> 
 		sju.second = User::Find(buf);
 		if (!sju.second)
 		{
-			Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
+			Anope::Logger.Debug("SJOIN for non-existent user {0} on {1}", buf, params[1]);
 			continue;
 		}
 

@@ -62,13 +62,15 @@ class CommandCSSetKeepTopic : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keeptopic";
+			logger.Command(!source.AccessFor(ci).HasPriv("SET") ? LogType::OVERRIDE : LogType::COMMAND, source, _("{source} used {command} on {channel} to enable keeptopic"));
+
 			ci->SetKeepTopic(true);
 			source.Reply(_("Topic retention option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keeptopic";
+			logger.Command(!source.AccessFor(ci).HasPriv("SET") ? LogType::OVERRIDE : LogType::COMMAND, source, _("{source} used {command} on {channel} to disable keeptopic"));
+
 			ci->SetKeepTopic(false);
 			source.Reply(_("Topic retention option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
@@ -132,7 +134,10 @@ class CommandCSTopic : public Command
 			ci->SetTopicLock(true);
 
 		bool override = !source.AccessFor(ci).HasPriv("TOPIC");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
+		if (!topic.empty())
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, _("{source} used {command} on {channel} to change the topic to: {0}"), topic);
+		else
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, _("{source} used {command} on {channel} to unset the topic"));
 	}
 
 	void Append(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)

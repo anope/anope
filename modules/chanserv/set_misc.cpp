@@ -151,12 +151,16 @@ class CommandCSSetMisc : public Command
 			data->SetName(scommand);
 			data->SetData(param);
 
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change it to " << param;
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci,
+					_("{source} used {command} on {channel} to change it to {0}"),
+					param);
+
 			source.Reply(_("\002{0}\002 for \002{1}\002 set to \002{2}\002."), scommand, ci->GetName(), param);
 		}
 		else
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to unset it";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to unset it"));
+
 			source.Reply(_("\002{0}\002 for \002{1}\002 unset."), scommand, ci->GetName());
 		}
 	}

@@ -30,7 +30,7 @@ void ChannelImpl::Delete()
 {
 	EventManager::Get()->Dispatch(&Event::DelChan::OnDelChan, this);
 
-	Log(LOG_DEBUG) << "Deleting channel " << this->GetName();
+	Anope::Logger.Debug("Deleting channel {0}", this->GetName());
 
 	if (this->c)
 	{
@@ -361,7 +361,7 @@ ChanServ::AccessGroup ChannelImpl::AccessFor(const User *u, bool updateLastUsed)
 		return group;
 
 	NickServ::Account *nc = u->Account();
-	if (nc == NULL && !nc->IsSecure() && u->IsRecognized())
+	if (nc == NULL && !this->IsSecure() && u->IsRecognized())
 	{
 		NickServ::Nick *na = NickServ::FindNick(u->nick);
 		if (na != NULL)
@@ -480,7 +480,7 @@ int16_t ChannelImpl::GetLevel(const Anope::string &priv)
 	ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(priv) : nullptr;
 	if (!p)
 	{
-		Log(LOG_DEBUG) << "Unknown privilege " + priv;
+		Anope::Logger.Debug("Unknown privilege {0}", priv);
 		return ChanServ::ACCESS_INVALID;
 	}
 
@@ -499,7 +499,7 @@ void ChannelImpl::SetLevel(const Anope::string &priv, int16_t level)
 	ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(priv) : nullptr;
 	if (!p)
 	{
-		Log(LOG_DEBUG) << "Unknown privilege " + priv;
+		Anope::Logger.Debug("Unknown privilege {0}", priv);
 		return;
 	}
 
@@ -538,7 +538,7 @@ Anope::string ChannelImpl::GetIdealBan(User *u)
 			else
 				return "*!" + u->GetVIdent() + "@" + u->GetDisplayedHost();
 		case 3:
-			return "*!" + u->Mask();
+			return "*!" + u->WildMask();
 		case 2:
 		default:
 			return "*!*@" + u->GetDisplayedHost();

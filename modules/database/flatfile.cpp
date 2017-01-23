@@ -765,7 +765,7 @@ class DBFlatFile : public Module
 		std::fstream fd(db_name.c_str(), std::ios_base::in | std::ios_base::binary);
 		if (!fd.is_open())
 		{
-			Log(this) << "Unable to open " << db_name << " for reading!";
+			logger.Log("Unable to open {0} for reading!", db_name);
 			return EVENT_STOP;
 		}
 

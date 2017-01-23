@@ -53,7 +53,8 @@ class CommandOSNOOP : public Command
 			IRCD->Send<messages::NOOP>(s, true);
 			s->Extend<Anope::string>("noop", source.GetNick());
 
-			Log(LOG_ADMIN, source, this) << "SET on " << s->GetName();
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0}"), s->GetName());
+
 			source.Reply(_("All operators from \002{0}\002 have been removed."), s->GetName());
 
 			Anope::string reason = "NOOP command used by " + source.GetNick();
@@ -70,7 +71,9 @@ class CommandOSNOOP : public Command
 		{
 			s->Shrink<Anope::string>("noop");
 			IRCD->Send<messages::NOOP>(s, false);
-			Log(LOG_ADMIN, source, this) << "REVOKE on " << s->GetName();
+
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} REVOKE on {0}"), s->GetName());
+
 			source.Reply(_("All O:lines of \002{0}\002 have been reset."), s->GetName());
 		}
 		else

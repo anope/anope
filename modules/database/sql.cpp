@@ -176,7 +176,7 @@ class DBSQL : public Module, public Pipe
 					Serialize::Object *other = type->Require(id);
 					if (other == nullptr)
 					{
-						Log(LOG_DEBUG) << "Unable to require id " << id << " type " << type->GetName();
+						Anope::Logger.Debug("Unable to require id {0} type {1}", id, type->GetName());
 						continue;
 					}
 

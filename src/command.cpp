@@ -31,8 +31,12 @@
 #include "modules/botserv.h"
 #include "modules/chanserv.h"
 
-CommandSource::CommandSource(const Anope::string &n, User *user, NickServ::Account *core, CommandReply *r, ServiceBot *bi) : nick(n), u(user), nc(core), reply(r),
-	c(NULL), service(bi)
+CommandSource::CommandSource(const Anope::string &n, User *user, NickServ::Account *core, CommandReply *r, ServiceBot *bi)
+	: nick(n)
+	, u(user)
+	, nc(core)
+	, reply(r)
+	, service(bi)
 {
 }
 
@@ -49,6 +53,24 @@ User *CommandSource::GetUser()
 NickServ::Account *CommandSource::GetAccount()
 {
 	return this->nc;
+}
+
+Anope::string CommandSource::GetSource()
+{
+	if (u)
+		if (nc)
+			return this->u->GetMask() + " (" + this->nc->GetDisplay() + ")";
+		else
+			return this->u->GetMask();
+	else if (nc)
+		return nc->GetDisplay();
+	else
+		return this->nick;
+}
+
+const Anope::string &CommandSource::GetCommand() const
+{
+	return this->command;
 }
 
 ChanServ::AccessGroup CommandSource::AccessFor(ChanServ::Channel *ci)
@@ -120,9 +142,12 @@ void CommandSource::Reply(const Anope::string &message)
 		this->reply->SendMessage(*this->service, tok);
 }
 
-Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, NAME, sname), max_params(maxparams), min_params(minparams), module(o)
+Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, NAME, sname)
+	, max_params(maxparams)
+	, min_params(minparams)
+	, module(o)
+	, logger(this)
 {
-	allow_unregistered = require_user = false;
 }
 
 Command::~Command()
@@ -234,7 +259,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 			source.Reply(_("Unknown command \002{0}\002. \"{1}{2} HELP\" for help."), message, Config->StrictPrivmsg, source.service->nick);
 		else
 			source.Reply(_("Unknown command \002{0}\002."), message);
-		Log(source.service) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";
+		source.service->logger.Log("Command {0} exists on me, but its service {1} was not found!", it->first, info.name);
 		return;
 	}
 
@@ -260,7 +285,7 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 	{
 		source.Reply(_("Password authentication required for that command."));
 		if (source.GetUser())
-			Log(LOG_NORMAL, "access_denied_unreg", source.service) << "Access denied for unregistered user " << source.GetUser()->GetMask() << " with command " << cmdname;
+			Anope::Logger.User(source.service).Category("access_denied_unreg").Log(_("Access denied for unregistered user {0} with command {1}"), source.GetUser()->GetMask(), cmdname);
 		return;
 	}
 
@@ -285,7 +310,7 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 		else
 			source.Reply(_("Access denied. You do not have access to command \002{0}\002."), info.permission);
 		if (source.GetUser())
-			Log(LOG_NORMAL, "access_denied", source.service) << "Access denied for user " << source.GetUser()->GetMask() << " with command " << cmdname;
+			Anope::Logger.User(source.service).Category("access_denied").Log(_("Access denied for user {0} with command {1}"), source.GetUser()->GetMask(), cmdname);
 		return;
 	}
 

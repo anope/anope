@@ -371,7 +371,7 @@ class GnuTLSModule : public Module
 				delete newcred;
 				throw;
 			}
-			Log(LOG_DEBUG) << "m_ssl_gnutls: Successfully loaded DH parameters from " << dhfile;
+			Log(LogType::DEBUG) << "m_ssl_gnutls: Successfully loaded DH parameters from " << dhfile;
 		}
 
 		if (cred)
@@ -379,7 +379,7 @@ class GnuTLSModule : public Module
 		cred = newcred;
 		cred->incrref();
 
-		Log(LOG_DEBUG) << "m_ssl_gnutls: Successfully loaded certificate " << certfile << " and private key " << keyfile;
+		Log(LogType::DEBUG) << "m_ssl_gnutls: Successfully loaded certificate " << certfile << " and private key " << keyfile;
 	}
 
 	void OnPreServerConnect() override

@@ -24,7 +24,7 @@ class CommandOSSet : public Command
  private:
 	void DoList(CommandSource &source)
 	{
-		Log(LOG_ADMIN, source, this) << "LIST";
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} LIST"));
 
 		const char *str;
 
@@ -51,13 +51,13 @@ class CommandOSSet : public Command
 		if (setting.equals_ci("ON"))
 		{
 			Anope::ReadOnly = true;
-			Log(LOG_ADMIN, source, this) << "READONLY ON";
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} READONLY ON"));
 			source.Reply(_("Services are now in \002read-only\002 mode."));
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			Anope::ReadOnly = false;
-			Log(LOG_ADMIN, source, this) << "READONLY OFF";
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} READONLY OFF"));
 			source.Reply(_("Services are now in \002read-write\002 mode."));
 		}
 		else
@@ -95,13 +95,15 @@ class CommandOSSet : public Command
 		{
 			source.GetUser()->super_admin = true;
 			source.Reply(_("You are now a super admin."));
-			Log(LOG_ADMIN, source, this) << "SUPERADMIN ON";
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} SUPERADMIN ON"),
+				source.GetSource(), source.GetCommand());
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			source.GetUser()->super_admin = false;
 			source.Reply(_("You are no longer a super admin."));
-			Log(LOG_ADMIN, source, this) << "SUPERADMIN OFF";
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} SUPERADMIN OFF"),
+				source.GetSource(), source.GetCommand());
 		}
 		else
 		{
@@ -122,12 +124,13 @@ class CommandOSSet : public Command
 		if (setting.equals_ci("ON"))
 		{
 			Anope::Debug = 1;
-			Log(LOG_ADMIN, source, this) << "DEBUG ON";
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} DEBUG ON"),
+				source.GetSource(), source.GetCommand());
 			source.Reply(_("Services are now in \002debug\002 mode."));
 		}
 		else if (setting.equals_ci("OFF") || setting == "0")
 		{
-			Log(LOG_ADMIN, source, this) << "DEBUG OFF";
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} DEBUG OFF"));
 			Anope::Debug = 0;
 			source.Reply(_("Services are now in \002non-debug\002 mode."));
 		}
@@ -136,7 +139,7 @@ class CommandOSSet : public Command
 			try
 			{
 				Anope::Debug = convertTo<int>(setting);
-				Log(LOG_ADMIN, source, this) << "DEBUG " << Anope::Debug;
+				logger.Command(LogType::ADMIN, source, _("{source} used {command} DEBUG {0}"), Anope::Debug);
 				source.Reply(_("Services are now in \002debug\002 mode (level %d)."), Anope::Debug);
 				return;
 			}
@@ -159,13 +162,13 @@ class CommandOSSet : public Command
 		if (setting.equals_ci("ON"))
 		{
 			Anope::NoExpire = true;
-			Log(LOG_ADMIN, source, this) << "NOEXPIRE ON";
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} NOEXPIRE ON"), Anope::Debug);
 			source.Reply(_("Services are now in \002no expire\002 mode."));
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			Anope::NoExpire = false;
-			Log(LOG_ADMIN, source, this) << "NOEXPIRE OFF";
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} NOEXPIRE OFF"), Anope::Debug);
 			source.Reply(_("Services are now in \002expire\002 mode."));
 		}
 		else

@@ -120,13 +120,13 @@ class External : public Mechanism
 			NickServ::Account *nc = certs->FindAccountFromCert(mysess->cert);
 			if (!nc || nc->HasFieldS("NS_SUSPENDED"))
 			{
-				Log(Config->GetClient("NickServ"), "sasl") << "A user failed to identify using certificate " << mysess->cert << " using SASL EXTERNAL";
+				Anope::Logger.Category("sasl").Bot("nickserv").Log(_("A user failed to identify using certificate {0} using SASL EXTERNAL"), mysess->cert);
 				GetService()->Fail(sess);
 				delete sess;
 				return;
 			}
 
-			Log(Config->GetClient("NickServ"), "sasl") << "A user identified to account " << nc->GetDisplay() << " using SASL EXTERNAL";
+			Anope::Logger.Category("sasl").Bot("nickserv").Log(_("A user identified to account {0} using using SASL EXTERNAL"), nc->GetDisplay());
 			GetService()->Succeed(sess, nc);
 			delete sess;
 		}
@@ -298,7 +298,7 @@ void IdentifyRequestListener::OnSuccess(NickServ::IdentifyRequest *req)
 	Session *s = service->GetSession(uid);
 	if (s)
 	{
-		Log(Config->GetClient("NickServ"), "sasl") << "A user identified to account " << req->GetAccount() << " using SASL";
+		Anope::Logger.Category("sasl").Bot("NickServ").Log(_("A user identified to account {0} using SASL"), req->GetAccount());
 		service->Succeed(s, na->GetAccount());
 		delete s;
 	}
@@ -320,7 +320,8 @@ void IdentifyRequestListener::OnFail(NickServ::IdentifyRequest *req)
 	else if (na->GetAccount()->HasFieldS("NS_SUSPENDED"))
 		accountstatus = "suspended ";
 
-	Log(Config->GetClient("NickServ"), "sasl") << "A user failed to identify for " << accountstatus << "account " << req->GetAccount() << " using SASL";
+	Anope::Logger.Category("sasl").Bot("NickServ").Log(_("A user failed to identify for {0}account {1} using SASL"),
+			accountstatus, req->GetAccount());
 }
 
 class ModuleSASL : public Module

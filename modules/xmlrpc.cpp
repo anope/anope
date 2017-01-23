@@ -162,7 +162,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 
 		while (GetData(content, tname, data))
 		{
-			Log(LOG_DEBUG) << "m_xmlrpc: Tag name: " << tname << ", data: " << data;
+			this->GetOwner()->logger.Debug("Tag name: {0}, data: {1}", tname, data);
 			if (tname == "methodName")
 				request.name = data;
 			else if (tname == "name" && data == "id")

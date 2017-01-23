@@ -33,7 +33,8 @@ class SGLineManager : public XLineManager
 
 	void OnExpire(XLine *x) override
 	{
-		::Log(Config->GetClient("OperServ"), "expire/akill") << "AKILL on \002" << x->GetMask() << "\002 has expired";
+		Anope::Logger.Bot("OperServ").Category("expire/akill").Log(_("AKILL on \002{0}\002 has expired"),
+			x->GetMask());
 	}
 
 	void Send(User *u, XLine *x) override
@@ -85,7 +86,7 @@ class SQLineManager : public XLineManager
 
 	void OnExpire(XLine *x) override
 	{
-		::Log(Config->GetClient("OperServ"), "expire/sqline") << "SQLINE on \002" << x->GetMask() << "\002 has expired";
+		Anope::Logger.Bot("OperServ").Category("expire/sqline").Log(_("SQLINE on \002{0}\002 has expired"), x->GetMask());
 	}
 
 	void Send(User *u, XLine *x) override
@@ -162,7 +163,7 @@ class SNLineManager : public XLineManager
 
 	void OnExpire(XLine *x) override
 	{
-		::Log(Config->GetClient("OperServ"), "expire/snline") << "SNLINE on \002" << x->GetMask() << "\002 has expired";
+		Anope::Logger.Bot("OperServ").Category("expire/snline").Log(_("SNLINE on \002{0}\002 has expired"), x->GetMask());
 	}
 
 	void Send(User *u, XLine *x) override
@@ -255,8 +256,8 @@ class OperServCore : public Module
 	{
 		if (bi == OperServ && !u->HasMode("OPER") && Config->GetModule(this)->Get<bool>("opersonly"))
 		{
-			u->SendMessage(bi, "Access denied.");
-			::Log(bi, "bados") << "Denied access to " << bi->nick << " from " << u->GetMask() << " (non-oper)";
+			u->SendMessage(bi, _("Access denied."));
+			logger.Bot(bi).Category("bados").Log(_("Denied access to {0} from {1} (non-oper)"), bi->nick, u->GetMask());
 			return EVENT_STOP;
 		}
 
@@ -266,19 +267,19 @@ class OperServCore : public Module
 	void OnServerQuit(Server *server) override
 	{
 		if (server->IsJuped())
-			::Log(server, "squit", OperServ) << "Received SQUIT for juped server " << server->GetName();
+			server->logger.Bot(OperServ).Category("squit").Log(_("Received SQUIT for juped server {0}"), server->GetName());
 	}
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (mname == "OPER")
-			::Log(u, "oper", OperServ) << "is now an IRC operator.";
+			u->logger.Bot(OperServ).Category("oper").Log(_("{0} is now an IRC operator."), u->GetMask());
 	}
 
 	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (mname == "OPER")
-			::Log(u, "oper", OperServ) << "is no longer an IRC operator";
+			u->logger.Bot(OperServ).Category("oper").Log(_("{0} is no longer an IRC operator"), u->GetMask());
 	}
 
 	void OnUserConnect(User *u, bool &exempt) override
@@ -310,7 +311,8 @@ class OperServCore : public Module
 	{
 		if (!params.empty() || source.c || source.service != *OperServ)
 			return EVENT_CONTINUE;
-		source.Reply(_("%s commands:"), OperServ->nick.c_str());
+
+		source.Reply(_("{0} commands:"), OperServ->nick);
 		return EVENT_CONTINUE;
 	}
 
@@ -318,10 +320,13 @@ class OperServCore : public Module
 	{
 	}
 
-	void OnLog(::Log *l) override
+	void OnLog(Logger *l) override
 	{
-		if (l->type == LOG_SERVER)
+#warning ""
+#if 0
+		if (l->type == LogType::SERVER)
 			l->bi = OperServ;
+#endif
 	}
 };
 

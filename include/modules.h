@@ -212,6 +212,8 @@ class CoreExport Module : public Extensible
 	 */
 	Anope::string author;
 
+	Logger logger;
+
 	/** Creates and initialises a new module.
 	 * @param modname The module name
 	 * @param loadernick The nickname of the user loading the module.
@@ -222,6 +224,8 @@ class CoreExport Module : public Extensible
 	/** Destroys a module, freeing resources it has allocated.
 	 */
 	virtual ~Module();
+
+	const Anope::string &GetName() const;
 
 	/** Toggles the permanent flag on a module. If a module is permanent,
 	 * then it may not be unloaded.

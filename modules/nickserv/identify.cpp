@@ -42,9 +42,10 @@ class NSIdentifyRequestListener : public NickServ::IdentifyRequestListener
 		}
 
 		if (u->IsIdentified())
-			Log(LOG_COMMAND, source, cmd) << "to log out of account " << u->Account()->GetDisplay();
+			cmd->logger.Command(LogType::COMMAND, source, _("{source} used {command} to log out of account {0}"), u->Account()->GetDisplay());
 
-		Log(LOG_COMMAND, source, cmd) << "and identified for account " << na->GetAccount()->GetDisplay();
+		cmd->logger.Command(LogType::COMMAND, source, _("{source} used {command} and identified for account {0}"), na->GetAccount()->GetDisplay());
+
 		source.Reply(_("Password accepted - you are now recognized as \002{0}\002."), na->GetAccount()->GetDisplay());
 		u->Identify(na);
 	}
@@ -55,14 +56,20 @@ class NSIdentifyRequestListener : public NickServ::IdentifyRequestListener
 			return;
 
 		bool accountexists = NickServ::FindNick(req->GetAccount()) != NULL;
-		Log(LOG_COMMAND, source, cmd) << "and failed to identify to" << (accountexists ? " " : " nonexistent ") << "account " << req->GetAccount();
+		if (!accountexists)
+			cmd->logger.Command(LogType::COMMAND, source, _("{source} used {command} and failed to identify to nonexistent account {0}"), req->GetAccount());
+		else
+			cmd->logger.Command(LogType::COMMAND, source, _("{source} used {command} and failed to identify to account {0}"), req->GetAccount());
+
 		if (accountexists)
 		{
 			source.Reply(_("Password incorrect."));
 			source.GetUser()->BadPassword();
 		}
 		else
+		{
 			source.Reply("\002{0}\002 isn't registered.", req->GetAccount());
+		}
 	}
 };
 

@@ -176,7 +176,7 @@ namespace DNS
 		 */
 		void Tick(time_t) override
 		{
-			Log(LOG_DEBUG_2) << "Resolver: timeout for query " << this->name;
+			Anope::Logger.Debug2("Resolver: timeout for query {0}", this->name);
 			Query rr(*this);
 			rr.error = ERROR_TIMEDOUT;
 			this->OnError(&rr);

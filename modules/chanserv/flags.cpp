@@ -266,9 +266,12 @@ class CommandCSFlags : public Command
 			if (current != NULL)
 			{
 				EventManager::Get()->Dispatch(&Event::AccessDel::OnAccessDel, ci, source, current);
-				delete current;
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
-				source.Reply(_("\002{0}\002 removed from the access list of \002{1}\002."), mask, ci->GetName());
+
+				logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"), current->Mask());
+
+				source.Reply(_("\002{0}\002 removed from the access list of \002{1}\002."), current->Mask(), ci->GetName());
+
+				current->Delete();
 			}
 			else
 			{
@@ -290,11 +293,12 @@ class CommandCSFlags : public Command
 		access->SetFlags(Anope::string(current_flags.begin(), current_flags.end()));
 
 		if (current != NULL)
-			delete current;
+			current->Delete();
 
 		EventManager::Get()->Dispatch(&Event::AccessAdd::OnAccessAdd, ci, source, access);
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to modify " << mask << "'s flags to " << access->AccessSerialize();
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to modify flags of {0} to {1}"), access->Mask(), access->AccessSerialize());
+
 		if (p != NULL)
 		{
 			if (add)
@@ -303,7 +307,9 @@ class CommandCSFlags : public Command
 				source.Reply(_("Privilege \002{0}\002 removed from \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->Mask(), ci->GetName(), access->AccessSerialize());
 		}
 		else
+		{
 			source.Reply(_("Flags for \002{0}\002 on \002{1}\002 set to +\002{2}\002"), access->Mask(), ci->GetName(), access->AccessSerialize());
+		}
 	}
 
 	void DoList(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -383,7 +389,7 @@ class CommandCSFlags : public Command
 		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->GetName());
 
 		bool override = !source.IsFounder(ci);
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to clear the access list"));
 	}
 
  public:

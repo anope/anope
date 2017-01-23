@@ -31,9 +31,9 @@ Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, con
 Mail::Message::~Message()
 {
 	if (success)
-		Log(LOG_NORMAL, "mail") << "Successfully delivered mail for " << mail_to << " (" << addr << ")";
+		Anope::Logger.Category("mail").Log(_("Successfully delivered mail for {0} ({1})"), mail_to, addr);
 	else
-		Log(LOG_NORMAL, "mail") << "Error delivering mail for " << mail_to << " (" << addr << ")";
+		Anope::Logger.Category("mail").Log(_("Error delivering mail for {0} ({1})"), mail_to, addr);
 }
 
 void Mail::Message::Run()

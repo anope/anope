@@ -152,7 +152,7 @@ class CommandCSBan : public Command
 			Anope::string mask = ci->GetIdealBan(u2);
 
 			bool override = !u_access.HasPriv("BAN") || (u != u2 && ci->IsPeace() && u2_access >= u_access);
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << mask;
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} for {0}"), mask);
 
 			if (!c->HasMode(mode, mask))
 			{
@@ -188,7 +188,7 @@ class CommandCSBan : public Command
 
 			Anope::string mask = IRCD->NormalizeMask(target);
 
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << mask;
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} for {0}"), mask);
 
 			if (!c->HasMode(mode, mask))
 			{

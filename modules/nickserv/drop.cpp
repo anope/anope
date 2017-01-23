@@ -63,7 +63,10 @@ class CommandNSDrop : public Command
 
 		EventManager::Get()->Dispatch(&Event::NickDrop::OnNickDrop, source, na);
 
-		Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->GetNick() << " (group: " << na->GetAccount()->GetDisplay() << ") (email: " << (!na->GetAccount()->GetEmail().empty() ? na->GetAccount()->GetEmail() : "none") << ")";
+		logger.Command(!is_mine ? LogType::ADMIN : LogType::COMMAND, source, _("{source} used {command} to drop nickname {0} (account: {1}) (e-mail: {2})"),
+				na->GetNick(), na->GetAccount()->GetDisplay(),
+				!na->GetAccount()->GetEmail().empty() ? na->GetAccount()->GetEmail() : "none");
+
 		na->Delete();
 
 		source.Reply(_("\002{0}\002 has been dropped."), nick);

@@ -31,7 +31,7 @@ class CommandOSReload : public Command
 	{
 		try
 		{
-			Log(LOG_ADMIN, source, this);
+			logger.Command(LogType::ADMIN, source, _("{source} used {command}"));
 
 			Configuration::Conf *new_config = new Configuration::Conf();
 			Configuration::Conf *old = Config;
@@ -43,7 +43,7 @@ class CommandOSReload : public Command
 		}
 		catch (const ConfigException &ex)
 		{
-			Log(this->GetOwner()) << "Error reloading configuration file: " << ex.GetReason();
+			this->GetOwner()->logger.Log(_("Error reloading configuration file: {0}"), ex.GetReason());
 			source.Reply(_("Error reloading configuration file: {0}"), ex.GetReason());
 		}
 	}

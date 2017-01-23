@@ -37,7 +37,7 @@ class BSAutoAssign : public Module
 		ServiceBot *bi = ServiceBot::Find(bot, true);
 		if (bi == NULL)
 		{
-			Log(this) << "bs_autoassign is configured to assign bot " << bot << ", but it does not exist?";
+			logger.Log("bs_autoassign is configured to assign bot {0}, but it does not exist?", bot);
 			return;
 		}
 

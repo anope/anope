@@ -194,13 +194,19 @@ class CommandNSSetHide : public Command
 
 		if (arg.equals_ci("ON"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param.upper() << " to " << arg.upper() << " for " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source,
+					_("{source} used {command} to change hide {0} to {1} for {2}"),
+					param.upper(), arg.upper(), nc->GetDisplay());
+
 			nc->SetS<bool>(flag, true);
 			source.Reply(onmsg, nc->GetDisplay(), source.service->nick);
 		}
 		else if (arg.equals_ci("OFF"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param.upper() << " to " << arg.upper() << " for " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source,
+					_("{source} used {command} to change hide {0} to {1} for {2}"),
+					param.upper(), arg.upper(), nc->GetDisplay());
+
 			nc->UnsetS<bool>(flag);
 			source.Reply(offmsg, nc->GetDisplay(), source.service->nick);
 		}

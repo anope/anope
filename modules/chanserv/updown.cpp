@@ -68,7 +68,8 @@ class CommandCSUp : public Command
 				Channel *c = it->second->chan;
 				SetModes(source.GetUser(), c);
 			}
-			Log(LOG_COMMAND, source, this, NULL) << "on all channels to update their status modes";
+
+			logger.Command(LogType::COMMAND, source, _("{source} used {command} on all channels to update their status modes"), source.GetSource(), source.GetCommand());
 			return;
 		}
 
@@ -131,7 +132,8 @@ class CommandCSUp : public Command
 			}
 		}
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci) << "to update the status modes of " << u->nick;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to update the status modes of {0}"), u->nick);
+
 		SetModes(u, c);
 	}
 
@@ -172,7 +174,7 @@ class CommandCSDown : public Command
 				Channel *c = it->second->chan;
 				RemoveAll(source.GetUser(), c);
 			}
-			Log(LOG_COMMAND, source, this, NULL) << "on all channels to remove their status modes";
+			logger.Command(LogType::COMMAND, source, _("{source} used {command} on all channels to remove their status modes"), source.GetSource(), source.GetCommand());
 			return;
 		}
 
@@ -236,7 +238,8 @@ class CommandCSDown : public Command
 			}
 		}
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci) << "to remove the status modes from " << u->nick;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to remove the status modes from {0}"), u->nick);
+
 		RemoveAll(u, c);
 	}
 

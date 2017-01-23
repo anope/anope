@@ -637,12 +637,12 @@ class CommandBSKickBase : public Command
 				source.Reply(_("Bot will now kick for \002{0}\002."), optname);
 
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable the " << optname << " kicker";
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable the {0} kicker"), optname);
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable the " << optname << " kicker";
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable the {0} kicker"), optname);
 
 			(kd->*setter)(false);
 			(kd->*ttbsetter)(0);
@@ -1099,7 +1099,7 @@ class CommandBSSetDontKickOps : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickops";
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable dontkickops"));
 
 			kd->SetDontKickOps(true);
 			source.Reply(_("Bot \002won't kick ops\002 on channel \002{0}\002."), ci->GetName());
@@ -1107,7 +1107,7 @@ class CommandBSSetDontKickOps : public Command
 		else if (params[1].equals_ci("OFF"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickops";
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable dontkickops"));
 
 			kd->SetDontKickOps(false);
 			source.Reply(_("Bot \002will kick ops\002 on channel \002{0}\002."), ci->GetName());
@@ -1165,7 +1165,7 @@ class CommandBSSetDontKickVoices : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickvoices";
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable dontkickvoices"));
 
 			kd->SetDontKickVoices(true);
 			source.Reply(_("Bot \002won't kick voices\002 on channel %s."), ci->GetName().c_str());
@@ -1173,7 +1173,7 @@ class CommandBSSetDontKickVoices : public Command
 		else if (params[1].equals_ci("OFF"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickvoices";
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable dontkickvoices"));
 
 			kd->SetDontKickVoices(false);
 			source.Reply(_("Bot \002will kick voices\002 on channel %s."), ci->GetName().c_str());
@@ -1200,15 +1200,8 @@ struct BanData
 	struct Data
 	{
 		Anope::string mask;
-		time_t last_use;
-		int16_t ttb[TTB_SIZE];
-
-		Data()
-		{
-			last_use = 0;
-			for (int i = 0; i < TTB_SIZE; ++i)
-				this->ttb[i] = 0;
-		}
+		time_t last_use = 0;
+		int16_t ttb[TTB_SIZE] = { 0 };
 	};
 
  private:
@@ -1269,7 +1262,7 @@ class BanDataPurger : public Timer
 
 	void Tick(time_t) override
 	{
-		Log(LOG_DEBUG) << "bs_main: Running bandata purger";
+		this->GetOwner()->logger.Debug("Running bandata purger");
 
 		for (channel_map::iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 		{

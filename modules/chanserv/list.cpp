@@ -215,13 +215,15 @@ class CommandCSSetPrivate : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable private";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable private"));
+
 			ci->SetPrivate(true);
 			source.Reply(_("Private option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable private";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable private"));
+
 			ci->SetPrivate(false);
 			source.Reply(_("Private option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}

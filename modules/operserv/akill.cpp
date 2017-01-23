@@ -147,11 +147,12 @@ class CommandOSAKill : public Command
 				++affected;
 		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
 
-		if (percent > 95)
+		if (percent > 95) // XXX make this configurable..
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; Please use a more specific mask."), mask);
-			Log(LOG_ADMIN, source, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
-			delete x;
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} and tried to akill {0}% of the network ({1} users)"),
+				95, affected);
+			x->Delete();
 			return;
 		}
 
@@ -159,7 +160,7 @@ class CommandOSAKill : public Command
 		MOD_RESULT = EventManager::Get()->Dispatch(&Event::AddXLine::OnAddXLine, source, x, akills);
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			delete x;
+			x->Delete();
 			return;
 		}
 
@@ -169,7 +170,8 @@ class CommandOSAKill : public Command
 
 		source.Reply(_("\002{0}\002 added to the akill list."), mask);
 
-		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << x->GetReason() << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
+			mask, x->GetReason(), expires ? Anope::Duration(expires - Anope::CurTime) : "never", affected, percent);
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
@@ -202,7 +204,7 @@ class CommandOSAKill : public Command
 					if (!x)
 						return;
 
-					Log(LOG_ADMIN, source, this) << "to remove " << x->GetMask() << " from the list";
+					logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove {0} from the akill list"), x->GetMask());
 
 					++deleted;
 					x->Delete();
@@ -231,7 +233,8 @@ class CommandOSAKill : public Command
 			{
 				EventManager::Get()->Dispatch(&Event::DelXLine::OnDelXLine, source, x, akills);
 
-				Log(LOG_ADMIN, source, this) << "to remove " << x->GetMask() << " from the list";
+				logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove {0} from the akill list"), x->GetMask());
+
 				source.Reply(_("\002{0}\002 deleted from the akill list."), x->GetMask());
 				x->Delete();
 			}
@@ -345,7 +348,8 @@ class CommandOSAKill : public Command
 			x->Delete();
 		}
 
-		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to CLEAR the akill list"));
+
 		source.Reply(_("The akill list has been cleared."));
 
 		if (Anope::ReadOnly)

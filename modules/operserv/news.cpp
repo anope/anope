@@ -220,7 +220,8 @@ class NewsBase : public Command
 		ni->SetWho(source.GetNick());
 
 		source.Reply(msgs[MSG_ADDED]);
-		Log(LOG_ADMIN, source, this) << "to add a news item";
+
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to add news item: {0}"), text);
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
@@ -250,9 +251,13 @@ class NewsBase : public Command
 				unsigned num = convertTo<unsigned>(text);
 				if (num > 0 && num <= list.size())
 				{
-					list[num - 1]->Delete();
+					NewsItem *item = list[num - 1];
 					source.Reply(msgs[MSG_DELETED], num);
-					Log(LOG_ADMIN, source, this) << "to delete a news item";
+
+					logger.Command(LogType::ADMIN, source, _("{source} used {command} to delete news item {0}"), item->GetText());
+
+					item->Delete();
+
 					return;
 				}
 			}
@@ -265,7 +270,8 @@ class NewsBase : public Command
 			for (NewsItem *n : list)
 				n->Delete();
 			source.Reply(msgs[MSG_DELETED_ALL]);
-			Log(LOG_ADMIN, source, this) << "to delete all news items";
+
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to delete all news items"));
 		}
 	}
 

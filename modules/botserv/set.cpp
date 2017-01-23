@@ -140,7 +140,7 @@ class CommandBSSetBanExpire : public Command
 		ci->SetBanExpire(t);
 
 		bool override = !access.HasPriv("SET");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change banexpire to " << arg;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to change banexpire to {0}"), arg);
 
 		if (!t)
 			source.Reply(_("Bot bans will no longer automatically expire."));

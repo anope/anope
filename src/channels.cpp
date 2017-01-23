@@ -36,19 +36,16 @@ channel_map ChannelList;
 std::vector<Channel *> Channel::deleting;
 
 Channel::Channel(const Anope::string &nname, time_t ts)
+	: logger(this)
 {
 	if (nname.empty())
 		throw CoreException("A channel without a name ?");
 
 	this->name = nname;
-
 	this->creation_time = ts;
-	this->syncing = this->botchannel = false;
-	this->server_modetime = this->chanserv_modetime = 0;
-	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_ts = this->topic_time = 0;
 
 	if (Me && Me->IsSynced())
-		Log(NULL, this, "create");
+		logger.Category("create").Log("Channel {0} was created", this->GetName());
 
 	EventManager::Get()->Dispatch(&Event::ChannelCreate::OnChannelCreate, this);
 }
@@ -60,12 +57,17 @@ Channel::~Channel()
 	ModeManager::StackerDel(this);
 
 	if (Me && Me->IsSynced())
-		Log(NULL, this, "destroy");
+		logger.Category("destroy").Log("Channel {0} was destroyed", this->GetName());
 
 	if (this->ci)
 		this->ci->c = NULL;
 
 	ChannelList.erase(this->name);
+}
+
+const Anope::string &Channel::GetName() const
+{
+	return name;
 }
 
 void Channel::Reset()
@@ -113,7 +115,7 @@ void Channel::CheckModes()
 	/* Check for mode bouncing */
 	if (this->chanserv_modetime == Anope::CurTime && this->server_modetime == Anope::CurTime && this->server_modecount >= 3 && this->chanserv_modecount >= 3)
 	{
-		Log() << "Warning: unable to set modes on channel " << this->name << ". Are your servers' U:lines configured correctly?";
+		Anope::Logger.Log("Warning: unable to set modes on channel {0}. Are your servers' U:lines configured correctly?", this->GetName());
 		this->bouncy_modes = 1;
 		return;
 	}
@@ -143,7 +145,7 @@ bool Channel::CheckDelete()
 ChanUserContainer* Channel::JoinUser(User *user, const ChannelStatus *status)
 {
 	if (user->server && user->server->IsSynced())
-		Log(user, this, "join");
+		logger.Category("join").Log(_("{0} joined {1}"), user->GetMask(), this->GetName());
 
 	ChanUserContainer *cuc = new ChanUserContainer(user, this);
 	user->chans[this] = cuc;
@@ -157,16 +159,16 @@ ChanUserContainer* Channel::JoinUser(User *user, const ChannelStatus *status)
 void Channel::DeleteUser(User *user)
 {
 	if (user->server && user->server->IsSynced() && !user->Quitting())
-		Log(user, this, "leave");
+		logger.Category("leave").Log(_("{0} left {1}"), user->GetMask(), this->GetName());
 
 	EventManager::Get()->Dispatch(&Event::LeaveChannel::OnLeaveChannel, user, this);
 
 	ChanUserContainer *cu = user->FindChannel(this);
 	if (!this->users.erase(user))
-		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete non-existent user " << user->nick << " from channel " << this->name;
+		logger.Debug("Channel::DeleteUser() tried to delete non-existent user {0} from channel {1}", user->GetMask(), this->GetName());
 
 	if (!user->chans.erase(this))
-		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete non-existent channel " << this->name << " from " << user->nick << "'s channel list";
+		logger.Debug("Channel::DeleteUser() tried to delete non-existent channel {0} from channel list of user {1}", this->GetName(), user->GetMask());
 	delete cu;
 
 	QueueForDeletion();
@@ -273,7 +275,7 @@ void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *ocm, con
 	{
 		if (param.empty())
 		{
-			Log() << "Channel::SetModeInternal() mode " << cm->mchar << " with no parameter for channel " << this->name;
+			Anope::Logger.Log("Channel::SetModeInternal() mode {} with no parameter for channel {}", cm->mchar, this->GetName());
 			return;
 		}
 
@@ -281,11 +283,11 @@ void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *ocm, con
 
 		if (!u)
 		{
-			Log() << "MODE " << this->name << " +" << cm->mchar << " for non-existent user " << param;
+			Anope::Logger.Debug("Mode +{0} for non-existent user {1} on channel {2}", cm->mchar, param, this->GetName());
 			return;
 		}
 
-		Log(LOG_DEBUG) << "Setting +" << cm->mchar << " on " << this->name << " for " << u->nick;
+		Anope::Logger.Debug("Setting +{0} on {1} for {2}", cm->mchar, this->GetName(), u->GetMask());
 
 		/* Set the status on the user */
 		ChanUserContainer *cc = u->FindChannel(this);
@@ -309,7 +311,7 @@ void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *ocm, con
 
 	if (param.empty() && cm->type != MODE_REGULAR)
 	{
-		Log() << "Channel::SetModeInternal() mode " << cm->mchar << " for " << this->name << " with no paramater, but is a param mode";
+		Anope::Logger.Log("Channel::SetModeInternal() mode {0} for {1} with no paramater, but is a param mode", cm->mchar, this->name);
 		return;
 	}
 
@@ -337,7 +339,7 @@ void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *ocm, 
 	{
 		if (param.empty())
 		{
-			Log() << "Channel::RemoveModeInternal() mode " << cm->mchar << " with no parameter for channel " << this->name;
+			Anope::Logger.Log("Channel::RemoveModeInternal() mode {0} with no parameter for channel {1}", cm->mchar, this->GetName());
 			return;
 		}
 
@@ -345,11 +347,11 @@ void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *ocm, 
 
 		if (!u)
 		{
-			Log() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->mchar << " for non-existent user " << param;
+			Anope::Logger.Debug("Mode -{0} for non-existent user {1} on channel {2}", cm->mchar, param, this->GetName());
 			return;
 		}
 
-		Log(LOG_DEBUG) << "Setting -" << cm->mchar << " on " << this->name << " for " << u->nick;
+		Anope::Logger.Debug("Setting -{0} on {1} for {2}", cm->mchar, this->GetName(), u->GetMask());
 
 		/* Remove the status on the user */
 		ChanUserContainer *cc = u->FindChannel(this);
@@ -592,12 +594,12 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 		;
 	else if (ts > this->creation_time)
 	{
-		Log(LOG_DEBUG) << "Dropping mode " << mode << " on " << this->name << ", " << ts << " > " << this->creation_time;
+		Anope::Logger.Debug("Dropping mode {0} on {1}, TS {2] > {3}", mode, this->GetName(), ts, this->creation_time);
 		return;
 	}
 	else if (ts < this->creation_time)
 	{
-		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << ts;
+		Anope::Logger.Debug("Changing TS of {0} from {1} to {2}", this->GetName(), this->creation_time, ts);
 		this->creation_time = ts;
 		this->Reset();
 	}
@@ -635,7 +637,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 				cm = ModeManager::FindChannelModeByChar(m[i]);
 				if (!cm)
 				{
-					Log(LOG_DEBUG) << "Channel::SetModeInternal: Unknown mode char " << m[i];
+					Anope::Logger.Debug("Channel::SetModeInternal: Unknown mode char {0}", m[i]);
 					continue;
 				}
 				modestring += cm->mchar;
@@ -678,7 +680,9 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 				this->RemoveModeInternal(source, cm, token, enforce_mlock);
 		}
 		else
-			Log() << "warning: Channel::SetModesInternal() received more modes requiring params than params, modes: " << mode;
+		{
+			Anope::Logger.Log("warning: Channel::SetModesInternal() received more modes requiring params than params, modes: {0}", mode);
+		}
 	}
 
 	if (!this_reference)
@@ -696,9 +700,9 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 	}
 
 	if (setter)
-		Log(setter, this, "mode") << modestring << paramstring;
+		logger.Category("mode").Log("{0} {1}", modestring, paramstring);
 	else
-		Log(LOG_DEBUG) << source.GetName() << " is setting " << this->name << " to " << modestring << paramstring;
+		logger.Debug("{0} is setting {1] to {2}{3}", source.GetName(), this->GetName(), modestring, paramstring);
 
 	if (enforce_mlock)
 		this->CheckModes();
@@ -724,23 +728,24 @@ bool Channel::KickInternal(const MessageSource &source, const Anope::string &nic
 {
 	User *sender = source.GetUser();
 	User *target = User::Find(nick);
+
 	if (!target)
 	{
-		Log(LOG_DEBUG) << "Channel::KickInternal got a nonexistent user " << nick << " on " << this->name << ": " << reason;
+		Anope::Logger.Debug("Channel::KickInternal got a nonexistent user {0} on {1}: {2}", nick, this->GetName(), reason);
 		return false;
 	}
 
 	if (sender)
-		Log(sender, this, "kick") << "kicked " << target->nick << " (" << reason << ")";
+		logger.User(sender).Category("kick").Log(_("{0} kicked {1} from {2} ({3})"), sender->GetMask(), target->GetMask(), this->GetName(), reason);
 	else
-		Log(target, this, "kick") << "was kicked by " << source.GetName() << " (" << reason << ")";
+		logger.Category("kick").Log(_("{0} kicked {1} from {2} ({3})"), source.GetName(), target->GetMask(), this->GetName(), reason);
 
 	Anope::string chname = this->name;
 
 	ChanUserContainer *cu = target->FindChannel(this);
 	if (cu == NULL)
 	{
-		Log(LOG_DEBUG) << "Channel::KickInternal got kick for user " << target->nick << " from " << source.GetSource() << " who isn't on channel " << this->name;
+		Anope::Logger.Debug("Kick for user {0} who is not in channel {1}", target->GetMask(), this->GetName());
 		return false;
 	}
 
@@ -778,7 +783,7 @@ void Channel::ChangeTopicInternal(User *u, const Anope::string &user, const Anop
 	this->topic_ts = ts;
 	this->topic_time = Anope::CurTime;
 
-	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << this->topic_setter << " to " << newtopic;
+	Anope::Logger.Debug("Topic of {0} changed by {1} to {2}", this->GetName(), this->topic_setter, newtopic);
 
 	EventManager::Get()->Dispatch(&Event::TopicUpdated::OnTopicUpdated, u, this, user, this->topic);
 }
@@ -805,7 +810,7 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 	if (!this->ci)
 		return;
 
-	Log(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << this->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
+	Anope::Logger.Debug("Setting correct user modes for {0} on {1} ({2}giving modes)", user->nick, this->name, give_modes ? "" : "not ");
 
 	ChanServ::AccessGroup u_access = ci->AccessFor(user);
 
@@ -892,7 +897,7 @@ bool Channel::CheckKick(User *user)
 	if (reason.empty())
 		reason = Language::Translate(user->Account(), _("You are not permitted to be on this channel."));
 
-	Log(LOG_DEBUG) << "Autokicking " << user->nick << " (" << mask << ") from " << this->name;
+	Anope::Logger.Debug("Autokicking {0} ({1}) from {2}", user->nick, mask, this->name);
 
 	this->SetMode(NULL, "BAN", mask);
 	this->Kick(NULL, user, reason);

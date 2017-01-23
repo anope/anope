@@ -53,7 +53,7 @@ class CommandNSConfirm : public Command
 
 			na->GetAccount()->SetUnconfirmed(false);
 			EventManager::Get()->Dispatch(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), na->GetAccount());
-			Log(LOG_ADMIN, source, this) << "to confirm nick " << na->GetNick() << " (" << na->GetAccount()->GetDisplay() << ")";
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to confirm nickname {0} ({1})"), na->GetNick(), na->GetAccount()->GetDisplay());
 			source.Reply(_("\002{0}\002 has been confirmed."), na->GetNick());
 
 			/* Login the users online already */
@@ -79,7 +79,7 @@ class CommandNSConfirm : public Command
 
 			NickServ::Account *nc = source.nc;
 			nc->Shrink<Anope::string>("passcode");
-			Log(LOG_COMMAND, source, this) << "to confirm their email";
+			logger.Command(LogType::COMMAND, source, _("{source} used {command} to confirm their email"), source.nc->GetEmail());
 			source.Reply(_("Your email address of \002{0}\002 has been confirmed."), source.nc->GetEmail());
 			nc->SetUnconfirmed(false);
 
@@ -257,7 +257,8 @@ class CommandNSRegister : public Command
 			na->SetLastRealname(source.GetNick());
 		}
 
-		Log(LOG_COMMAND, source, this) << "to register " << na->GetNick() << " (email: " << (!na->GetAccount()->GetEmail().empty() ? na->GetAccount()->GetEmail() : "none") << ")";
+		logger.Command(LogType::COMMAND, source, _("{source} used {command} to register {0} (email: {1})"),
+				na->GetNick(), !na->GetAccount()->GetEmail().empty() ? na->GetAccount()->GetEmail() : "none");
 
 		source.Reply(_("\002{0}\002 has been registered."), u_nick);
 
@@ -346,13 +347,13 @@ class CommandNSResend : public Command
 
 		if (!SendRegmail(source.GetUser(), na, source.service))
 		{
-			Log(this->GetOwner()) << "Unable to resend registration verification code for " << source.GetNick();
+			logger.Log("Unable to resend registration verificiation code for {0}", source.GetNick());
 			return;
 		}
 
 		na->GetAccount()->lastmail = Anope::CurTime;
 		source.Reply(_("Your passcode has been re-sent to \002{0}\002."), na->GetAccount()->GetEmail());
-		Log(LOG_COMMAND, source, this) << "to resend registration verification code";
+		logger.Command(LogType::COMMAND, source, _("{source} used {command} to resend registration verification code"));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -53,7 +53,7 @@ class CommandCSGetKey : public Command
 		}
 
 		bool override = !source.AccessFor(ci).HasPriv("GETKEY");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel}"));
 
 		source.Reply(_("Key for channel \002{0}\002 is \002{1}\002."), ci->GetName(), key);
 	}

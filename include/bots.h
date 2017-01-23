@@ -37,7 +37,8 @@ class CoreExport ServiceBot : public LocalUser
 	/* Modes the bot should have as configured in service:modes */
 	Anope::string botmodes;
 	/* Whether or not this bot is introduced to the network */
-	bool introduced;
+	bool introduced = false;
+	Logger logger;
 
 	/** Create a new bot.
 	 * @param nick The nickname to assign to the bot.
@@ -140,7 +141,7 @@ class BotInfo : public Serialize::Object
  public:
 	static constexpr const char *const NAME = "botinfo";
 
-	ServiceBot *bot;
+	ServiceBot *bot = nullptr;
 	Configuration::Block *conf = nullptr;
 
 	using Serialize::Object::Object;

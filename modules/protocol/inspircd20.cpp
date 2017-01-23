@@ -78,7 +78,8 @@ void inspircd20::senders::Akill::Send(User* u, XLine* x)
 		x->SetReason(old->GetReason());
 		old->GetManager()->AddXLine(x);
 
-		Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
+		Anope::Logger.Bot("OperServ").Category("akill").Log(_("AKILL: Added an akill for {0} because {1}#{2} matches {3}"),
+				x->GetMask(), u->GetMask(), u->realname, old->GetMask());
 	}
 
 	/* ZLine if we can instead */
@@ -360,7 +361,7 @@ void inspircd20::senders::Wallops::Send(const MessageSource &source, const Anope
 void inspircd20::Proto::SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
 {
 	if (!Servers::Capab.count("CHGIDENT"))
-		Log() << "CHGIDENT not loaded!";
+		Anope::Logger.Log("CHGIDENT not loaded!");
 	else
 		Uplink::Send(Me, "CHGIDENT", nick, vIdent);
 }
@@ -368,7 +369,7 @@ void inspircd20::Proto::SendChgIdentInternal(const Anope::string &nick, const An
 void inspircd20::Proto::SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
 {
 	if (!Servers::Capab.count("CHGHOST"))
-		Log() << "CHGHOST not loaded!";
+		Anope::Logger.Log("CHGHOST not loaded!");
 	else
 		Uplink::Send(Me, "CHGHOST", nick, vhost);
 }
@@ -666,14 +667,16 @@ void inspircd20::Capab::Run(MessageSource &source, const std::vector<Anope::stri
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(modechar[0]);
 			if (cm == nullptr)
 			{
-				Log(this->GetOwner()) << "Warning: Uplink has unknown channel mode " << modename << "=" << modechar;
+				this->GetOwner()->logger.Log("Warning: Uplink has unknown channel mode {0}={1}",
+						modename, modechar);
 				continue;
 			}
 
 			char modesymbol = cm->type == MODE_STATUS ? (anope_dynamic_static_cast<ChannelModeStatus *>(cm))->symbol : 0;
 			if (symbol != modesymbol)
 			{
-				Log(this->GetOwner()) << "Warning: Channel mode " << modename << " has a misconfigured status character";
+				this->GetOwner()->logger.Log("Warning: Channel mode {0} has a misconfigured status character",
+						modename);
 				continue;
 			}
 		}
@@ -697,7 +700,8 @@ void inspircd20::Capab::Run(MessageSource &source, const std::vector<Anope::stri
 			UserMode *um = ModeManager::FindUserModeByChar(modechar[0]);
 			if (um == nullptr)
 			{
-				Log(this->GetOwner()) << "Warning: Uplink has unknown user mode " << modename << "=" << modechar;
+				this->GetOwner()->logger.Log("Warning: Uplink has unknown user mode {0}={1}",
+						modename, modechar);
 				continue;
 			}
 		}
@@ -716,7 +720,9 @@ void inspircd20::Capab::Run(MessageSource &source, const std::vector<Anope::stri
 				Servers::Capab.insert("RLINE");
 				const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 				if (!regexengine.empty() && module.length() > 11 && regexengine != module.substr(11))
-					Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << regexengine << ". This may cause inconsistencies.";
+					this->GetOwner()->logger.Log("Warning: InspIRCd is using regex engine {0}, but we have {1}. "
+							"This may cause inconsistencies.",
+							module.substr(11), regexengine);
 			}
 			else if (module.equals_cs("m_topiclock.so"))
 				Servers::Capab.insert("TOPICLOCK");
@@ -769,11 +775,11 @@ void inspircd20::Capab::Run(MessageSource &source, const std::vector<Anope::stri
 			return;
 		}
 		if (!IRCD->CanSVSHold)
-			Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
+			this->GetOwner()->logger.Log("SVSHOLD missing, Usage disabled until module is loaded.");
 		if (!Servers::Capab.count("CHGHOST"))
-			Log() << "CHGHOST missing, Usage disabled until module is loaded.";
+			this->GetOwner()->logger.Log("CHGHOST missing, Usage disabled until module is loaded.");
 		if (!Servers::Capab.count("CHGIDENT"))
-			Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
+			this->GetOwner()->logger.Log("CHGIDENT missing, Usage disabled until module is loaded.");
 	}
 
 	rfc1459::Capab::Run(source, params);
@@ -824,7 +830,7 @@ void inspircd20::Endburst::Run(MessageSource &source, const std::vector<Anope::s
 {
 	Server *s = source.GetServer();
 
-	Log(LOG_DEBUG) << "Processed ENDBURST for " << s->GetName();
+	s->logger.Debug("Processed ENDBURST for {0}", s->GetName());
 
 	s->Sync(true);
 }
@@ -874,7 +880,7 @@ void inspircd20::FJoin::Run(MessageSource &source, const std::vector<Anope::stri
 		sju.second = User::Find(buf);
 		if (!sju.second)
 		{
-			Log(LOG_DEBUG) << "FJOIN for non-existent user " << buf << " on " << params[0];
+			this->GetOwner()->logger.Debug("FJOIN for non-existent user {0} on {1}", buf, params[0]);
 			continue;
 		}
 
@@ -1044,7 +1050,7 @@ void inspircd20::Metadata::Run(MessageSource &source, const std::vector<Anope::s
 			if (required)
 			{
 				if (!plus)
-					Log() << "Warning: InspIRCd unloaded module " << module << ", Anope won't function correctly without it";
+					this->GetOwner()->logger.Log("Warning: InspIRCd unloaded module {0}, Anope won't function correctly without it");
 			}
 			else
 			{
@@ -1053,7 +1059,7 @@ void inspircd20::Metadata::Run(MessageSource &source, const std::vector<Anope::s
 				else
 					Servers::Capab.erase(capab);
 
-				Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " module " << module << ", adjusted functionality";
+				this->GetOwner()->logger.Log("InspIRCd {0} module {1}, adjusted functionality", plus ? "loaded" : "unloaded", module);
 			}
 
 		}

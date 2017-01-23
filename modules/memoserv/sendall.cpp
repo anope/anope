@@ -36,7 +36,7 @@ class CommandMSSendAll : public Command
 
 		const Anope::string &text = params[0];
 
-		Log(LOG_ADMIN, source, this) << "to send " << text;
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to send {0}"), text);
 
 		for (NickServ::Account *nc : NickServ::service->GetAccountList())
 			if (nc != source.nc)

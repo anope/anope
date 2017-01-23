@@ -50,7 +50,8 @@ void bahamut::senders::Akill::Send(User* u, XLine* x)
 		x->SetID(old->GetID());
 		old->GetManager()->AddXLine(x);
 
-		Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
+		Anope::Logger.Bot("OperServ").Category("akill").Log(_("AKILL: Added an akill for {0} because {1}#{2} matches {3}"),
+				x->GetMask(), u->GetMask(), u->realname, old->GetMask());
 	}
 
 	/* ZLine if we can instead */
@@ -354,7 +355,7 @@ void bahamut::Nick::Run(MessageSource &source, const std::vector<Anope::string> 
 		Server *s = Server::Find(params[6]);
 		if (s == nullptr)
 		{
-			Log(LOG_DEBUG) << "User " << params[0] << " introduced from non-existent server " << params[6] << "?";
+			Anope::Logger.Debug("User {0} introduced from non-existent server {1}", params[0], params[6]);
 			return;
 		}
 
@@ -436,7 +437,7 @@ void bahamut::SJoin::Run(MessageSource &source, const std::vector<Anope::string>
 			sju.second = User::Find(buf);
 			if (!sju.second)
 			{
-				Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
+				Anope::Logger.Log("SJOIN for non-existent user {0} on {1}", buf, params[1]);
 				continue;
 			}
 

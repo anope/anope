@@ -155,7 +155,7 @@ class CommandNSSetPassword : public Command
 			return;
 		}
 
-		Log(LOG_COMMAND, source, this) << "to change their password";
+		logger.Command(LogType::COMMAND, source, _("{source} used {command} to change their password"));
 
 		Anope::string tmp_pass;
 		Anope::Encrypt(param, tmp_pass);
@@ -216,7 +216,7 @@ class CommandNSSASetPassword : public Command
 			return;
 		}
 
-		Log(LOG_ADMIN, source, this) << "to change the password of " << nc->GetDisplay();
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to change the password of {0}"), nc->GetDisplay());
 
 		Anope::string tmp_pass;
 		Anope::Encrypt(params[1], tmp_pass);
@@ -263,13 +263,13 @@ class CommandNSSetAutoOp : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable autoop for " << na->GetAccount()->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to enable autoop for {0}"), na->GetAccount()->GetDisplay());
 			nc->SetAutoOp(true);
 			source.Reply(_("Services will from now on set status modes on \002{0}\002 in channels."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable autoop for " << na->GetAccount()->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to disable autoop for {0}"), na->GetAccount()->GetDisplay());
 			nc->SetAutoOp(false);
 			source.Reply(_("Services will no longer set status modes on \002{0}\002 in channels."), nc->GetDisplay());
 		}
@@ -356,7 +356,9 @@ class CommandNSSetDisplay : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		Log(user_na->GetAccount() == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the display of " << user_na->GetAccount()->GetDisplay() << " to " << na->GetNick();
+		logger.Command(user_na->GetAccount() == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source,
+				_("{source} used {command} to change the display of {0} to {1}"),
+				user_na->GetAccount()->GetDisplay(), na->GetNick());
 
 		user_na->GetAccount()->SetDisplay(na);
 
@@ -483,7 +485,7 @@ class CommandNSSetEmail : public Command
 
 		if (param.empty())
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the email of " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to unset the email of {0}"), nc->GetDisplay());
 			nc->SetEmail("");
 			source.Reply(_("E-mail address for \002{0}\002 unset."), nc->GetDisplay());
 		}
@@ -494,7 +496,8 @@ class CommandNSSetEmail : public Command
 		}
 		else
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email of " << nc->GetDisplay() << " to " << param;
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to change the email of {0} to {1}"),
+					nc->GetDisplay(), param);
 			nc->SetEmail(param);
 			source.Reply(_("E-mail address for \002{0}\002 changed to \002{1}\002."), nc->GetDisplay(), param);
 		}
@@ -565,13 +568,13 @@ class CommandNSSetKeepModes : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable keepmodes for " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to enable keepmodes for {0}"), nc->GetDisplay());
 			nc->SetKeepModes(true);
 			source.Reply(_("Keep modes for \002{0}\002 is now \002on\002."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable keepmodes for " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to disable keepmodes for {2}"), nc->GetDisplay());
 			nc->SetKeepModes(false);
 			source.Reply(_("Keep modes for \002{0}\002 is now \002off\002."), nc->GetDisplay());
 		}
@@ -655,7 +658,10 @@ class CommandNSSetKill : public Command
 			nc->SetKillProtect(true);
 			nc->SetKillQuick(false);
 			nc->SetKillImmed(false);
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill on for " << nc->GetDisplay();
+
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to set kill to {0} for {1}"),
+					"ON", nc->GetDisplay());
+
 			source.Reply(_("Protection is now \002on\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("QUICK"))
@@ -663,7 +669,10 @@ class CommandNSSetKill : public Command
 			nc->SetKillProtect(true);
 			nc->SetKillQuick(true);
 			nc->SetKillImmed(false);
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill quick for " << nc->GetDisplay();
+
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to set kill to {0} for {1}"),
+					"QUICK", nc->GetDisplay());
+
 			source.Reply(_("Protection is now \002on\002 for \002{0}\002, with a reduced delay."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("IMMED"))
@@ -673,7 +682,10 @@ class CommandNSSetKill : public Command
 				nc->SetKillProtect(true);
 				nc->SetKillQuick(false);
 				nc->SetKillImmed(true);
-				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill immed for " << nc->GetDisplay();
+
+				logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to set kill to {0} for {1}"),
+						"IMMED", nc->GetDisplay());
+
 				source.Reply(_("Protection is now \002on\002 for \002{0}\002, with no delay."), nc->GetDisplay());
 			}
 			else
@@ -684,7 +696,9 @@ class CommandNSSetKill : public Command
 			nc->SetKillProtect(true);
 			nc->SetKillQuick(false);
 			nc->SetKillImmed(false);
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable kill for " << nc->GetDisplay();
+
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to disable kill for {0}"), nc->GetDisplay());
+
 			source.Reply(_("Protection is now \002off\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else
@@ -778,7 +792,8 @@ class CommandNSSetLanguage : public Command
 				}
 			}
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the language of " << nc->GetDisplay() << " to " << param;
+		logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to change the language of {0} to {1}"),
+				nc->GetDisplay(), param);
 
 		nc->SetLanguage(param);
 
@@ -877,13 +892,17 @@ class CommandNSSetMessage : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable " << source.command << " for " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to enable {0} for {1}"),
+					"MSG", nc->GetDisplay());
+
 			nc->SetMsg(true);
 			source.Reply(_("Services will now reply to \002{0}\002 with \002messages\002."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable " << source.command << " for " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to disable {0} for {1}"),
+					"MSG", nc->GetDisplay());
+
 			nc->SetMsg(false);
 			source.Reply(_("Services will now reply to \002{0}\002 with \002notices\002."), nc->GetDisplay());
 		}
@@ -974,13 +993,15 @@ class CommandNSSetSecure : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable secure for " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to enable {0} for {1}"),
+					"SECURE", nc->GetDisplay());
 			nc->SetSecure(true);
 			source.Reply(_("Secure option is now \002on\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable secure for " << nc->GetDisplay();
+			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to disable {0} for {1}"),
+					"SECURE", nc->GetDisplay());
 			nc->SetSecure(false);
 			source.Reply(_("Secure option is now \002off\002 for \002{0}\002."), nc->GetDisplay());
 		}
@@ -1058,13 +1079,17 @@ class CommandNSSASetNoexpire : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(LOG_ADMIN, source, this) << "to enable noexpire for " << na->GetAccount()->GetDisplay();
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to enable {0} for {1}"),
+					"NOEXPIRE", na->GetAccount()->GetDisplay());
+
 			na->SetNoExpire(true);
 			source.Reply(_("\002{0}\002 \002will not\002 expire."), na->GetNick());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(LOG_ADMIN, source, this) << "to disable noexpire for " << na->GetAccount()->GetDisplay();
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to disable {0} for {1}"),
+					"NOEXPIRE", na->GetAccount()->GetDisplay());
+
 			na->SetNoExpire(false);
 			source.Reply(_("\002{0}\002 \002will\002 expire."), na->GetNick());
 		}
@@ -1174,7 +1199,7 @@ class NSSet : public Module
 				if (params[0] == n->second)
 				{
 					uac->SetEmail(n->first);
-					Log(LOG_COMMAND, source, command) << "to confirm their email address change to " << uac->GetEmail();
+					command->logger.Command(LogType::COMMAND, source, _("{source} used {command} to confirm their email address change to {0}"), uac->GetEmail());
 					source.Reply(_("Your email address has been changed to \002%s\002."), uac->GetEmail().c_str());
 					ns_set_email.Unset(uac);
 					return EVENT_STOP;

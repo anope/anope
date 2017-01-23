@@ -134,7 +134,7 @@ class CommandCSXOP : public Command
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
+			source.Reply(_("Sorry, channel {0} list modification is temporarily disabled."), source.command);
 			return;
 		}
 
@@ -244,10 +244,10 @@ class CommandCSXOP : public Command
 		acc->SetLastSeen(0);
 		acc->SetCreated(Anope::CurTime);
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to add {0}"), mask);
 
 		EventManager::Get()->Dispatch(&Event::AccessAdd::OnAccessAdd, ci, source, acc);
-		source.Reply(_("\002%s\002 added to %s %s list."), acc->Mask(), ci->GetName().c_str(), source.command.c_str());
+		source.Reply(_("\002{0}\002 added to {1} {2} list."), acc->Mask(), ci->GetName(), source.command);
 	}
 
 	void DoDel(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -263,13 +263,13 @@ class CommandCSXOP : public Command
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
+			source.Reply(_("Sorry, channel {0} list modification is temporarily disabled."), source.command);
 			return;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->GetName().c_str(), source.command.c_str());
+			source.Reply(_("{0} {1} list is empty."), ci->GetName(), source.command);
 			return;
 		}
 
@@ -327,20 +327,20 @@ class CommandCSXOP : public Command
 						nicks = caccess->Mask();
 
 					EventManager::Get()->Dispatch(&Event::AccessDel::OnAccessDel, ci, source, caccess);
-					delete caccess;
+					caccess->Delete();
 				},
 				[&]()
 				{
 					if (!deleted)
-						 source.Reply(_("No matching entries on %s %s list."), ci->GetName().c_str(), source.command.c_str());
+						 source.Reply(_("No matching entries on {0} {1} list."), ci->GetName(), source.command);
 					else
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << nicks;
+						logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"), nicks);
 
 						if (deleted == 1)
-							source.Reply(_("Deleted one entry from %s %s list."), ci->GetName().c_str(), source.command.c_str());
+							source.Reply(_("Deleted one entry from {0} {1} list."), ci->GetName(), source.command);
 						else
-							source.Reply(_("Deleted %d entries from %s %s list."), deleted, ci->GetName().c_str(), source.command.c_str());
+							source.Reply(_("Deleted {0} entries from {1} {2} list."), deleted, ci->GetName(), source.command);
 					}
 				});
 		}
@@ -355,18 +355,18 @@ class CommandCSXOP : public Command
 
 				if (a->Mask().equals_ci(mask))
 				{
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << a->Mask();
+					logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"), a->GetMask());
 
-					source.Reply(_("\002%s\002 deleted from %s %s list."), a->Mask().c_str(), ci->GetName().c_str(), source.command.c_str());
+					source.Reply(_("\002{0}\002 deleted from {1} {2} list."), a->Mask(), ci->GetName(), source.command);
 
 					EventManager::Get()->Dispatch(&Event::AccessDel::OnAccessDel, ci, source, a);
-					delete a;
+					a->Delete();
 
 					return;
 				}
 			}
 
-			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->GetName().c_str(), source.command.c_str());
+			source.Reply(_("\002{0}\002 not found on {1} {2} list."), mask, ci->GetName(), source.command);
 		}
 	}
 
@@ -385,7 +385,7 @@ class CommandCSXOP : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->GetName().c_str(), source.command.c_str());
+			source.Reply(_("{0} {1} list is empty."), ci->GetName(), source.command);
 			return;
 		}
 
@@ -432,14 +432,14 @@ class CommandCSXOP : public Command
 
 		if (list.IsEmpty())
 		{
-			source.Reply(_("No matching entries on %s access list."), ci->GetName().c_str());
+			source.Reply(_("No matching entries on {0} access list."), ci->GetName());
 		}
 		else
 		{
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("%s list for %s"), source.command.c_str(), ci->GetName().c_str());
+			source.Reply(_("{0} list for {1}"), source.command, ci->GetName());
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 		}
@@ -449,13 +449,13 @@ class CommandCSXOP : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
+			source.Reply(_("Sorry, channel {0} list modification is temporarily disabled."), source.command);
 			return;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->GetName().c_str(), source.command.c_str());
+			source.Reply(_("{0} {1} list is empty."), ci->GetName(), source.command);
 			return;
 		}
 
@@ -466,7 +466,7 @@ class CommandCSXOP : public Command
 		}
 
 		bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to clear the access list"));
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
@@ -475,12 +475,12 @@ class CommandCSXOP : public Command
 			if (access->GetSerializableType()->GetName() != "XOPChanAccess" || source.command.upper() != access->AccessSerialize())
 				continue;
 
-			delete access;
+			access->Delete();
 		}
 
 		EventManager::Get()->Dispatch(&Event::AccessClear::OnAccessClear, ci, source);
 
-		source.Reply(_("Channel %s %s list has been cleared."), ci->GetName().c_str(), source.command.c_str());
+		source.Reply(_("Channel {0} {1} list has been cleared."), ci->GetName(), source.command);
 	}
 
  public:
@@ -494,7 +494,7 @@ class CommandCSXOP : public Command
 
  	const Anope::string GetDesc(CommandSource &source) const override
 	{
-		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.upper().c_str());
+		return Anope::Format(Language::Translate(source.GetAccount(), _("Modify the list of {0} users")), source.command.upper());
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override

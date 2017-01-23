@@ -165,14 +165,15 @@ void senders::Wallops::Send(const MessageSource &source, const Anope::string &ms
 
 void Away::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
+	User *u = source.GetUser();
 	const Anope::string &msg = !params.empty() ? params[0] : "";
 
-	EventManager::Get()->Dispatch(&Event::UserAway::OnUserAway, source.GetUser(), msg);
+	EventManager::Get()->Dispatch(&Event::UserAway::OnUserAway, u, msg);
 
 	if (!msg.empty())
-		Log(source.GetUser(), "away") << "is now away: " << msg;
+		u->logger.Category("away").Log(_("{0} is now away: {1}"), u->GetMask(), msg);
 	else
-		Log(source.GetUser(), "away") << "is no longer away";
+		u->logger.Category("away").Log(_("{0} is no longer away"), u->GetMask());
 }
 
 void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -191,7 +192,7 @@ void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 void Error::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	Log(LOG_TERMINAL) << "ERROR: " << params[0];
+	Anope::Logger.Terminal("ERROR: {0}", params[0]);
 	Anope::QuitReason = "Received ERROR from uplink: " + params[0];
 	Anope::Quitting = true;
 }
@@ -430,7 +431,7 @@ void Part::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		if (!c || !u->FindChannel(c))
 			continue;
 
-		Log(u, c, "part") << "Reason: " << (!reason.empty() ? reason : "No reason");
+		c->logger.User(u).Category("part").Log(_("{0} parted {1}: {2}"), u->GetMask(), c->GetName(), !reason.empty() ? reason : "No reason");
 
 		EventManager::Get()->Dispatch(&Event::PrePartChannel::OnPrePartChannel, u, c);
 		c->DeleteUser(u);
@@ -478,7 +479,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			ServiceBot *bi = ServiceBot::Find(receiver);
 			if (!bi)
 				return;
-			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << u->nick;
+			bi->logger.Debug("Ignored PRIVMSG without @ from {0}", u->nick);
 			u->SendMessage(bi, _("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."), bi->nick.c_str(), bi->nick.c_str(), Me->GetName().c_str(), bi->nick.c_str());
 			return;
 		}
@@ -518,7 +519,7 @@ void Quit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	const Anope::string &reason = params[0];
 	User *user = source.GetUser();
 
-	Log(user, "quit") << "quit (Reason: " << (!reason.empty() ? reason : "no reason") << ")";
+	user->logger.Category("quit").Log(_("{0} quit: {1}"), user->GetMask(), (!reason.empty() ? reason : "no reason"));
 
 	user->Quit(reason);
 }
@@ -529,7 +530,7 @@ void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 	if (!s)
 	{
-		Log(LOG_DEBUG) << "SQUIT for nonexistent server " << params[0];
+		Anope::Logger.Debug("SQUIT for nonexistent server {0}", params[0]);
 		return;
 	}
 

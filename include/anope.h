@@ -148,6 +148,7 @@ namespace Anope
 		inline void push_back(char c) { return this->_string.push_back(c); }
 
 		inline string& insert(const_iterator p, char c) { this->_string.insert(p, c); return *this; }
+		inline string& insert(size_t pos, const string& str) { this->_string.insert(pos, str._string); return *this; }
 
 		inline string& append(const string &s) { this->_string.append(s.str()); return *this; }
 		inline string& append(const char *s, size_t n) { this->_string.append(s, n); return *this; }
@@ -550,6 +551,8 @@ namespace Anope
 	 * @param len The length of the string returned
 	 */
 	extern CoreExport Anope::string Random(size_t len);
+
+	extern Logger Logger;
 }
 
 /** sepstream allows for splitting token separated lists.
@@ -732,7 +735,8 @@ operator>>(std::istream &is, T& t)
 
 /** Convert something to a string
  */
-template<typename T> inline Anope::string stringify(const T &x)
+template<typename T>
+inline Anope::string stringify(const T &x)
 {
 	std::ostringstream stream;
 
@@ -740,6 +744,12 @@ template<typename T> inline Anope::string stringify(const T &x)
 		throw ConvertException("Stringify fail");
 
 	return stream.str();
+}
+
+template<>
+inline Anope::string stringify(const Anope::string &str)
+{
+	return str;
 }
 
 template<typename T> inline void convert(const Anope::string &s, T &x, Anope::string &leftover, bool failIfLeftoverChars = true)
@@ -819,39 +829,47 @@ inline kwarg operator"" _kw(const char *literal, size_t n)
 	return { literal };
 }
 
-struct FormatInfo
+class FormatInfo
 {
 	Anope::string format;
 	std::vector<kwarg> parameters;
 	unsigned int pos = 0;
 
+ public:
 	FormatInfo(const Anope::string &fmt, size_t size) : format(fmt), parameters(size) { }
 
 	template<typename T>
-	void Add(T& arg)
+	void Add(const T& arg)
 	{
-		parameters[pos] = kwarg{ stringify(pos).c_str() } = stringify(arg);
-		++pos;
+		kwarg k = kwarg{ stringify(pos), stringify(arg) };
+		Add(k);
 	}
+
+	void AddArgs() { }
 
 	template<typename Arg, typename... Args>
-	void Format(Arg &&arg, Args&&... args)
+	void AddArgs(Arg &&arg, Args&&... args)
 	{
 		Add(arg);
-		Format(std::forward<Args>(args)...);
+		AddArgs(std::forward<Args>(args)...);
 	}
 
-	void Format()
-	{	
-		for (kwarg& arg : parameters)
-			format = format.replace_all_cs("{" + arg.name + "}", arg.value);
-	}
+	const kwarg *GetKwarg(const Anope::string &name) const;
+
+	void Format();
+
+	const Anope::string &GetFormat() const;
 };
 
 template<>
-inline void FormatInfo::Add(kwarg &arg)
+inline void FormatInfo::Add(const kwarg &arg)
 {
-	parameters[pos++] = arg;
+	unsigned int p = pos++;
+
+	if (p >= parameters.size())
+		parameters.resize(p + 1);
+
+	parameters[p] = arg;
 }
 
 namespace Anope
@@ -860,8 +878,9 @@ namespace Anope
 	inline Anope::string Format(const Anope::string &format, Args&&... args)
 	{
 		FormatInfo fi(format, sizeof...(Args));
-		fi.Format(std::forward<Args>(args)...);
-		return fi.format;
+		fi.AddArgs(std::forward<Args>(args)...);
+		fi.Format();
+		return fi.GetFormat();
 	}
 }
 

@@ -171,7 +171,8 @@ class CommandOSInfo : public Command
 			o->SetCreated(Anope::CurTime);
 
 			source.Reply(_("Added info to \002{0}\002."), target);
-			Log(LOG_ADMIN, source, this) << "to add information to " << target;
+
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add oper information to {0}: {1}"), target, info);
 
                 	if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
@@ -198,7 +199,8 @@ class CommandOSInfo : public Command
 					o->Delete();
 
 					source.Reply(_("Deleted info from \002{0}\002."), target);
-					Log(LOG_ADMIN, source, this) << "to remove information from " << target;
+
+					logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove oper information from {0}: {1}"), target, info);
 
 	        	        	if (Anope::ReadOnly)
 						source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
@@ -222,7 +224,8 @@ class CommandOSInfo : public Command
 				o->Delete();
 
 			source.Reply(_("Cleared info from \002{0}\002."), target);
-			Log(LOG_ADMIN, source, this) << "to clear information for " << target;
+
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to clear oper information for {0}"), target);
 
                 	if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));

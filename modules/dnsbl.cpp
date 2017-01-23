@@ -90,7 +90,7 @@ class DNSBLResolver : public Request
 		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<Anope::string>("networkname"));
 
 		ServiceBot *OperServ = Config->GetClient("OperServ");
-		Log(creator, "dnsbl", OperServ) << user->GetMask() << " (" << addr << ") appears in " << this->blacklist.name;
+		creator->logger.Category("dnsbl").Bot(OperServ).Log(_("{0} ({1}) appears in {2}"), user->GetMask(), addr, this->blacklist.name);
 
 		XLine *x = Serialize::New<XLine *>();
 		x->SetMask("*@" + addr);
@@ -207,7 +207,7 @@ class ModuleDNSBL : public Module
 			catch (const SocketException &ex)
 			{
 				delete res;
-				Log(this) << ex.GetReason();
+				logger.Log(ex.GetReason());
 			}
 		}
 	}

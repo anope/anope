@@ -43,12 +43,12 @@ class SQLAuthenticationResult : public SQL::Interface
 	{
 		if (r.Rows() == 0)
 		{
-			Log(LOG_DEBUG) << "m_sql_authentication: Unsuccessful authentication for " << req->GetAccount();
+			Log(LogType::DEBUG) << "m_sql_authentication: Unsuccessful authentication for " << req->GetAccount();
 			delete this;
 			return;
 		}
 
-		Log(LOG_DEBUG) << "m_sql_authentication: Successful authentication for " << req->GetAccount();
+		Log(LogType::DEBUG) << "m_sql_authentication: Successful authentication for " << req->GetAccount();
 
 		Anope::string email;
 		try
@@ -155,7 +155,7 @@ class ModuleSQLAuthentication : public Module
 
 		this->SQL->Run(new SQLAuthenticationResult(u, req), q);
 
-		Log(LOG_DEBUG) << "m_sql_authentication: Checking authentication for " << req->GetAccount();
+		Log(LogType::DEBUG) << "m_sql_authentication: Checking authentication for " << req->GetAccount();
 	}
 };
 

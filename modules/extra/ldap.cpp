@@ -479,7 +479,7 @@ class ModuleLDAP : public Module, public Pipe
 
 			if (i == conf->CountBlock("ldap"))
 			{
-				Log(LOG_NORMAL, "ldap") << "LDAP: Removing server connection " << cname;
+				Log(LogType::NORMAL, "ldap") << "LDAP: Removing server connection " << cname;
 
 				s->SetExitState();
 				s->Wakeup();
@@ -507,11 +507,11 @@ class ModuleLDAP : public Module, public Pipe
 					ss->Start();
 					this->LDAPServices.insert(std::make_pair(connname, ss));
 
-					Log(LOG_NORMAL, "ldap") << "LDAP: Successfully initialized server " << connname << " (" << server << ")";
+					Log(LogType::NORMAL, "ldap") << "LDAP: Successfully initialized server " << connname << " (" << server << ")";
 				}
 				catch (const LDAPException &ex)
 				{
-					Log(LOG_NORMAL, "ldap") << "LDAP: " << ex.GetReason();
+					Log(LogType::NORMAL, "ldap") << "LDAP: " << ex.GetReason();
 				}
 			}
 		}

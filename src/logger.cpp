@@ -29,6 +29,7 @@
 #include "uplink.h"
 #include "protocol.h"
 #include "event.h"
+#include "anope.h"
 #include "modules/nickserv.h"
 #include "modules/chanserv.h"
 
@@ -57,7 +58,9 @@ static Anope::string GetTimeStamp()
 		strftime(s, sizeof(tbuf) - (s - tbuf) - 1, " %Y]", &tm);
 	}
 	else
+	{
 		strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S %Y]", &tm);
+	}
 
 	return tbuf;
 }
@@ -85,161 +88,7 @@ const Anope::string &LogFile::GetName() const
 	return this->filename;
 }
 
-Log::Log(LogType t, const Anope::string &cat, ServiceBot *b) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(t), category(cat)
-{
-}
-
-Log::Log(LogType t, CommandSource &src, Command *_c, ChanServ::Channel *_ci) : u(src.GetUser()), nc(src.nc), c(_c), source(&src), chan(NULL), ci(_ci), s(NULL), m(NULL), type(t)
-{
-	if (!c)
-		throw CoreException("Invalid pointers passed to Log::Log");
-
-	if (type != LOG_COMMAND && type != LOG_OVERRIDE && type != LOG_ADMIN)
-		throw CoreException("This constructor does not support this log type");
-
-	size_t sl = c->GetName().find('/');
-	this->bi = NULL;
-	if (sl != Anope::string::npos)
-		this->bi = ServiceBot::Find(c->GetName().substr(0, sl), true);
-	this->category = c->GetName();
-}
-
-Log::Log(User *_u, Channel *ch, const Anope::string &cat) : bi(NULL), u(_u), nc(NULL), c(NULL), source(NULL), chan(ch), ci(chan ? *chan->ci : NULL), s(NULL), m(NULL), type(LOG_CHANNEL), category(cat)
-{
-	if (!chan)
-		throw CoreException("Invalid pointers passed to Log::Log");
-}
-
-Log::Log(User *_u, const Anope::string &cat, ServiceBot *_bi) : bi(_bi), u(_u), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_USER), category(cat)
-{
-	if (!u)
-		throw CoreException("Invalid pointers passed to Log::Log");
-}
-
-Log::Log(Server *serv, const Anope::string &cat, ServiceBot *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(serv), m(NULL), type(LOG_SERVER), category(cat)
-{
-	if (!s)
-		throw CoreException("Invalid pointer passed to Log::Log");
-}
-
-Log::Log(ServiceBot *b, const Anope::string &cat) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_NORMAL), category(cat)
-{
-}
-
-Log::Log(Module *mod, const Anope::string &cat, ServiceBot *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
-{
-}
-
-Log::~Log()
-{
-	if (Anope::NoFork && Anope::Debug && this->type >= LOG_NORMAL && this->type <= LOG_DEBUG + Anope::Debug - 1)
-		std::cout << GetTimeStamp() << " Debug: " << this->BuildPrefix() << this->buf.str() << std::endl;
-	else if (Anope::NoFork && this->type <= LOG_TERMINAL)
-		std::cout << GetTimeStamp() << " " << this->BuildPrefix() << this->buf.str() << std::endl;
-	else if (this->type == LOG_TERMINAL)
-		std::cout << this->BuildPrefix() << this->buf.str() << std::endl;
-
-	/* Some of the higher debug messages are in the event/service system which manages event dispatch,
-	 * so firing off the log event here can cause them to be in weird states
-	 */
-	if (this->type <= LOG_NORMAL)
-	{
-		EventManager *em = EventManager::Get();
-		if (em != nullptr)
-			em->Dispatch(&Event::Log::OnLog, this);
-	}
-
-	if (Config)
-		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
-			if (Config->LogInfos[i].HasType(this->type, this->category))
-				Config->LogInfos[i].ProcessMessage(this);
-}
-
-Anope::string Log::FormatSource() const
-{
-	if (u)
-		if (nc)
-			return this->u->GetMask() + " (" + this->nc->GetDisplay() + ")";
-		else
-			return this->u->GetMask();
-	else if (nc)
-		return nc->GetDisplay();
-	return "";
-}
-
-Anope::string Log::FormatCommand() const
-{
-	Anope::string buffer = FormatSource() + " used " + (source != NULL && !source->command.empty() ? source->command : this->c->GetName()) + " ";
-	if (this->ci)
-		buffer += "on " + this->ci->GetName() + " ";
-
-	return buffer;
-}
-
-Anope::string Log::BuildPrefix() const
-{
-	Anope::string buffer;
-
-	switch (this->type)
-	{
-		case LOG_ADMIN:
-		{
-			if (!this->c)
-				break;
-			buffer += "ADMIN: " + FormatCommand();
-			break;
-		}
-		case LOG_OVERRIDE:
-		{
-			if (!this->c)
-				break;
-			buffer += "OVERRIDE: " + FormatCommand();
-			break;
-		}
-		case LOG_COMMAND:
-		{
-			if (!this->c)
-				break;
-			buffer += "COMMAND: " + FormatCommand();
-			break;
-		}
-		case LOG_CHANNEL:
-		{
-			if (!this->chan)
-				break;
-			buffer += "CHANNEL: ";
-			Anope::string src = FormatSource();
-			if (!src.empty())
-				buffer += src + " ";
-			buffer += this->category + " " + this->chan->name + " ";
-			break;
-		}
-		case LOG_USER:
-		{
-			if (this->u)
-				buffer += "USERS: " + FormatSource() + " ";
-			break;
-		}
-		case LOG_SERVER:
-		{
-			if (this->s)
-				buffer += "SERVER: " + this->s->GetName() + " (" + this->s->GetDescription() + ") ";
-			break;
-		}
-		case LOG_MODULE:
-		{
-			if (this->m)
-				buffer += this->m->name.upper() + ": ";
-			break;
-		}
-		default:
-			break;
-	}
-
-	return buffer;
-}
-
-LogInfo::LogInfo(int la, bool rio, bool ldebug) : bot(NULL), last_day(0), log_age(la), raw_io(rio), debug(ldebug)
+LogInfo::LogInfo(int la, bool rio, bool ldebug) : log_age(la), raw_io(rio), debug(ldebug)
 {
 }
 
@@ -250,41 +99,44 @@ LogInfo::~LogInfo()
 	this->logfiles.clear();
 }
 
-bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
+bool LogInfo::HasType(LogType ltype, LogLevel level, const Anope::string &type) const
 {
+	switch (level)
+	{
+		case LogLevel::TERMINAL:
+			return true;
+		case LogLevel::RAWIO:
+			return (Anope::Debug || this->debug) ? true : this->raw_io;
+		case LogLevel::DEBUG:
+			return Anope::Debug ? true : this->debug;
+		case LogLevel::DEBUG_2:
+		case LogLevel::DEBUG_3:
+			return;
+	}
+
 	const std::vector<Anope::string> *list = NULL;
 	switch (ltype)
 	{
-		case LOG_ADMIN:
+		case LogType::ADMIN:
 			list = &this->admin;
 			break;
-		case LOG_OVERRIDE:
+		case LogType::OVERRIDE:
 			list = &this->override;
 			break;
-		case LOG_COMMAND:
+		case LogType::COMMAND:
 			list = &this->commands;
 			break;
-		case LOG_SERVER:
+		case LogType::SERVER:
 			list = &this->servers;
 			break;
-		case LOG_CHANNEL:
+		case LogType::CHANNEL:
 			list = &this->channels;
 			break;
-		case LOG_USER:
+		case LogType::USER:
 			list = &this->users;
 			break;
-		case LOG_TERMINAL:
-			return true;
-		case LOG_RAWIO:
-			return (Anope::Debug || this->debug) ? true : this->raw_io;
-		case LOG_DEBUG:
-			return Anope::Debug ? true : this->debug;
-		case LOG_DEBUG_2:
-		case LOG_DEBUG_3:
-		case LOG_DEBUG_4:
-			break;
-		case LOG_MODULE:
-		case LOG_NORMAL:
+		case LogType::MODULE:
+		case LogType::NORMAL:
 		default:
 			list = &this->normal;
 			break;
@@ -293,7 +145,7 @@ bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 	if (list == NULL)
 		return false;
 
-	for (unsigned i = 0; i < list->size(); ++i)
+	for (unsigned int i = 0; i < list->size(); ++i)
 	{
 		Anope::string cat = list->at(i);
 		bool inverse = false;
@@ -327,7 +179,7 @@ void LogInfo::OpenLogFiles()
 		LogFile *lf = new LogFile(CreateLogName(target));
 		if (!lf->stream.is_open())
 		{
-			Log() << "Unable to open logfile " << lf->GetName();
+			Anope::Logger.Log("Unable to open logfile {0}", lf->GetName());
 			delete lf;
 		}
 		else
@@ -335,7 +187,7 @@ void LogInfo::OpenLogFiles()
 	}
 }
 
-void LogInfo::ProcessMessage(const Log *l)
+void LogInfo::ProcessMessage(const Logger *l, const Anope::string &message)
 {
 	if (!this->sources.empty())
 	{
@@ -344,26 +196,29 @@ void LogInfo::ProcessMessage(const Log *l)
 		{
 			const Anope::string &src = this->sources[i];
 
-			if (l->bi && src == l->bi->nick)
+			if (l->GetBot() && src == l->GetBot()->nick)
 				log = true;
-			else if (l->u && src == l->u->nick)
+			else if (l->GetUser() && src == l->GetUser()->nick)
 				log = true;
-			else if (l->nc && src == l->nc->GetDisplay())
+			else if (l->GetAccount() && src == l->GetAccount()->GetDisplay())
 				log = true;
-			else if (l->ci && src == l->ci->GetName())
+			else if (l->GetCi() && src == l->GetCi()->GetName())
 				log = true;
-			else if (l->m && src == l->m->name)
+			else if (l->GetModule() && src == l->GetModule()->name)
 				log = true;
-			else if (l->s && src == l->s->GetName())
+			else if (l->GetServer() && src == l->GetServer()->GetName())
 				log = true;
 		}
 		if (!log)
 			return;
 	}
 
-	const Anope::string &buffer = l->BuildPrefix() + l->buf.str();
+	const Anope::string &buffer = l->BuildPrefix() + message;
 
-	EventManager::Get()->Dispatch(&Event::LogMessage::OnLogMessage, this, l, buffer);
+	if (l->GetLevel() <= LogLevel::NORMAL)
+	{
+		EventManager::Get()->Dispatch(&Event::LogMessage::OnLogMessage, this, l, buffer);
+	}
 
 	for (unsigned i = 0; i < this->targets.size(); ++i)
 	{
@@ -371,13 +226,13 @@ void LogInfo::ProcessMessage(const Log *l)
 
 		if (!target.empty() && target[0] == '#')
 		{
-			if (UplinkSock && l->type <= LOG_NORMAL && Me && Me->IsSynced())
+			if (UplinkSock && l->type == LogType::NORMAL && Me && Me->IsSynced())
 			{
 				Channel *c = Channel::Find(target);
 				if (!c)
 					continue;
 
-				User *bi = l->bi;
+				User *bi = l->GetBot();
 				if (!bi)
 					bi = this->bot;
 				if (!bi)
@@ -388,9 +243,9 @@ void LogInfo::ProcessMessage(const Log *l)
 		}
 		else if (target == "opers")
 		{
-			if (UplinkSock && l->bi && l->type <= LOG_NORMAL && Me && Me->IsSynced())
+			if (UplinkSock && l->GetBot() && l->type == LogType::NORMAL && Me && Me->IsSynced())
 			{
-				IRCD->SendWallops(l->bi, buffer);
+				IRCD->SendWallops(l->GetBot(), buffer);
 			}
 		}
 	}
@@ -413,7 +268,7 @@ void LogInfo::ProcessMessage(const Log *l)
 				if (IsFile(oldlog))
 				{
 					unlink(oldlog.c_str());
-					Log(LOG_DEBUG) << "Deleted old logfile " << oldlog;
+					Anope::Logger.Debug("Deleted old logfile {0}", oldlog);
 				}
 			}
 	}
@@ -423,5 +278,215 @@ void LogInfo::ProcessMessage(const Log *l)
 		LogFile *lf = this->logfiles[i];
 		lf->stream << GetTimeStamp() << " " << buffer << std::endl;
 	}
+}
+
+void Logger::InsertVariables(FormatInfo &fi)
+{
+	if (user != nullptr)
+		fi.Add("user"_kw = user->GetMask());
+
+	if (ci != nullptr)
+		fi.Add("channel"_kw = ci->GetName());
+	else if (channel != nullptr)
+		fi.Add("channel"_kw = channel->GetName());
+
+	fi.Add("source"_kw = this->FormatSource());
+
+	if (source != nullptr && !source->GetCommand().empty())
+		fi.Add("command"_kw = source->GetCommand());
+	else if (command != nullptr)
+		fi.Add("command"_kw = command->GetName());
+}
+
+Anope::string Logger::FormatSource() const
+{
+	if (user)
+		if (account)
+			return user->GetMask() + " (" + account->GetDisplay() + ")";
+		else
+			return user->GetMask();
+	else if (account)
+		return account->GetDisplay();
+	else if (source)
+		return source->GetNick();
+	return "";
+}
+
+Anope::string Logger::BuildPrefix() const
+{
+	switch (this->type)
+	{
+		case LogType::ADMIN:
+			return "ADMIN: ";
+		case LogType::OVERRIDE:
+			return "OVERRIDE: ";
+		case LogType::COMMAND:
+			return "COMMAND: ";
+		case LogType::SERVER:
+			return "SERVER: ";
+		case LogType::CHANNEL:
+			return "CHANNEL: ";
+		case LogType::USER:
+			return "USER: ";
+		case LogType::MODULE:
+			return this->module != nullptr ? (this->module->name.upper() + ": ") : "";
+	}
+
+	return "";
+}
+
+void Logger::LogMessage(const Anope::string &message)
+{
+	if (Anope::NoFork && Anope::Debug && level >= LogLevel::NORMAL && static_cast<int>(level) <= static_cast<int>(LogLevel::DEBUG) + Anope::Debug - 1)
+		std::cout << GetTimeStamp() << " Debug: " << this->BuildPrefix() << message << std::endl;
+	else if (Anope::NoFork && level <= LogLevel::TERMINAL)
+		std::cout << GetTimeStamp() << " " << this->BuildPrefix() << message << std::endl;
+	else if (level == LogLevel::TERMINAL)
+		std::cout << this->BuildPrefix() << message << std::endl;
+
+	if (level <= LogLevel::NORMAL)
+	{
+		EventManager *em = EventManager::Get();
+		if (em != nullptr)
+			em->Dispatch(&Event::Log::OnLog, this);
+	}
+
+	if (Config != nullptr)
+		for (LogInfo &info : Config->LogInfos)
+			if (info.HasType(this->type, this->level, this->category))
+				info.ProcessMessage(this, message);
+}
+
+LogType Logger::GetType() const
+{
+	return type;
+}
+
+LogLevel Logger::GetLevel() const
+{
+	return level;
+}
+
+Module *Logger::GetModule() const
+{
+	return module;
+}
+
+Command *Logger::GetCommand() const
+{
+	return command;
+}
+
+ServiceBot *Logger::GetBot() const
+{
+	return bot;
+}
+
+Server *Logger::GetServer() const
+{
+	return server;
+}
+
+User *Logger::GetUser() const
+{
+	return user;
+}
+
+void Logger::SetUser(class User *u)
+{
+	user = u;
+}
+
+NickServ::Account *Logger::GetAccount() const
+{
+	return account;
+}
+
+void Logger::SetAccount(NickServ::Account *acc)
+{
+	account = acc;
+}
+
+Channel *Logger::GetChannel() const
+{
+	return channel;
+}
+
+void Logger::SetChannel(class Channel *c)
+{
+	channel = c;
+}
+
+ChanServ::Channel *Logger::GetCi() const
+{
+	return ci;
+}
+
+void Logger::SetCi(ChanServ::Channel *c)
+{
+	ci = c;
+}
+
+CommandSource *Logger::GetSource() const
+{
+	return source;
+}
+
+void Logger::SetSource(CommandSource *s)
+{
+	source = s;
+	if (s != nullptr)
+	{
+		SetUser(s->GetUser());
+		SetAccount(s->GetAccount());
+		SetChannel(s->c);
+	}
+}
+
+Logger Logger::Category(const Anope::string &c) const
+{
+	Logger l = *this;
+	l.category = c;
+	return l;
+}
+
+Logger Logger::User(class User *u) const
+{
+	Logger l = *this;
+	l.user = u;
+	return l;
+}
+
+Logger Logger::Channel(class Channel *c) const
+{
+	Logger l = *this;
+	l.channel = c;
+	return l;
+}
+
+Logger Logger::Channel(ChanServ::Channel *c) const
+{
+	Logger l = *this;
+	l.ci = c;
+	return l;
+}
+
+Logger Logger::Source(CommandSource *s) const
+{
+	Logger l = *this;
+	l.source = s;
+	return l;
+}
+
+Logger Logger::Bot(ServiceBot *bot) const
+{
+	Logger l = *this;
+	l.bot = bot;
+	return l;
+}
+
+Logger Logger::Bot(const Anope::string &bot) const
+{
+	return Bot(Config ? Config->GetClient(bot) : nullptr);
 }
 

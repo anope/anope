@@ -34,11 +34,11 @@ class CommandCSSetChanstats : public Command
 		{
 			ci->Extend<bool>("CS_STATS");
 			source.Reply(_("Chanstats statistics are now enabled for this channel."));
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable chanstats";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, this, ci) << "to enable chanstats";
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable chanstats";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, this, ci) << "to disable chanstats";
 			ci->Shrink<bool>("CS_STATS");
 			source.Reply(_("Chanstats statistics are now disabled for this channel."));
 		}
@@ -79,7 +79,7 @@ class CommandNSSetChanstats : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(na->GetAccount() == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable chanstats for " << na->GetAccount()->GetDisplay();
+			Log(na->GetAccount() == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, this) << "to enable chanstats for " << na->GetAccount()->GetDisplay();
 			na->GetAccount()->Extend<bool>("NS_STATS");
 			if (saset)
 				source.Reply(_("Chanstats statistics are now enabled for %s"), na->GetAccount()->GetDisplay().c_str());
@@ -88,7 +88,7 @@ class CommandNSSetChanstats : public Command
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(na->GetAccount() == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable chanstats for " << na->GetAccount()->GetDisplay();
+			Log(na->GetAccount() == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, this) << "to disable chanstats for " << na->GetAccount()->GetDisplay();
 			na->GetAccount()->Shrink<bool>("NS_STATS");
 			if (saset)
 				source.Reply(_("Chanstats statistics are now disabled for %s"), na->GetAccount()->GetDisplay().c_str());
@@ -148,9 +148,9 @@ class MySQLInterface : public SQL::Interface
 	void OnError(const SQL::Result &r) override
 	{
 		if (!r.GetQuery().query.empty())
-			Log(LOG_DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
+			Log(LogType::DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
 		else
-			Log(LOG_DEBUG) << "Chanstats: Error executing query: " << r.GetError();
+			Log(LogType::DEBUG) << "Chanstats: Error executing query: " << r.GetError();
 	}
 };
 

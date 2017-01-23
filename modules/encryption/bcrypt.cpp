@@ -906,7 +906,7 @@ class EBCRYPT : public Module
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		dest = "bcrypt:" + Generate(src, Salt());
-		Log(LOG_DEBUG_2) << "(enc_bcrypt) hashed password from [" << src << "] to [" << dest << "]";
+		logger.Debug2("hashed password from {0} to {1}", src, dest);
 		return EVENT_ALLOW;
 	}
 
@@ -941,7 +941,7 @@ class EBCRYPT : public Module
 			}
 			catch (const ConvertException &)
 			{
-				Log(this) << "Could not get the round size of a hash. This is probably a bug. Hash: " << nc->GetPassword();
+				logger.Log("Could not get the round size of a hash. This is probably a bug. Hash: {0}", nc->GetPassword());
 			}
 
 			if (ModuleManager::FindFirstOf(ENCRYPTION) != this || (hashrounds && hashrounds != rounds))
@@ -962,20 +962,20 @@ class EBCRYPT : public Module
 		if (rounds == 0)
 		{
 			rounds = 10;
-			Log(this) << "Rounds can't be 0! Setting ignored.";
+			logger.Log("Rounds can't be 0! Setting ignored.");
 		}
 		else if (rounds < 10)
 		{
-			Log(this) << "10 to 12 rounds is recommended.";
+			logger.Log("10 to 12 rounds is recommended.");
 		}
 		else if (rounds >= 32)
 		{
 			rounds = 10;
-			Log(this) << "The maximum number of rounds supported is 31. Ignoring setting and using 10.";
+			logger.Log("The maximum number of rounds supported is 31. Ignoring setting and using 10.");
 		}
 		else if (rounds >= 14)
 		{
-			Log(this) << "Are you sure you want to use " << stringify(rounds) << " in your bcrypt settings? This is very CPU intensive! Recommended rounds is 10-12.";
+			logger.Log("Are you sure you want to use {0} in your bcrypt settings? This is very CPU intensive! Recommended rounds is 10-12.", rounds);
 		}
 	}
 };

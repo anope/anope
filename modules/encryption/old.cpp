@@ -92,7 +92,8 @@ class EOld : public Module
 
 		Anope::string buf = "oldmd5:" + Anope::Hex(digest2, sizeof(digest2));
 
-		Log(LOG_DEBUG_2) << "(enc_old) hashed password from [" << src << "] to [" << buf << "]";
+		logger.Debug2("hashed password from [{0}] to [{1}]", src, buf);
+
 		dest = buf;
 		delete context;
 		return EVENT_ALLOW;

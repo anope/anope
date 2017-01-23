@@ -52,7 +52,7 @@ class CommandCSSync : public Command
 		}
 
 		bool override = !source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/administration");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel}"));
 
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 			ci->c->SetCorrectModes(it->second->user, true);

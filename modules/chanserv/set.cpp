@@ -26,7 +26,7 @@
 class CommandCSSet : public Command
 {
 	ServiceReference<ModeLocks> mlocks;
-	
+
  public:
 	CommandCSSet(Module *creator) : Command(creator, "chanserv/set", 2, 3)
 	{
@@ -117,13 +117,15 @@ class CommandCSSetAutoOp : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable autoop";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to enable autoop"));
+
 			ci->SetNoAutoop(false);
 			source.Reply(_("Services will now automatically give modes to users in \002{0}\002."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable autoop";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to disable autoop"));
+
 			ci->SetNoAutoop(true);
 			source.Reply(_("Services will no longer automatically give modes to users in \002{0}\002."), ci->GetName());
 		}
@@ -182,7 +184,9 @@ class CommandCSSetBanType : public Command
 			int16_t new_type = convertTo<int16_t>(params[1]);
 			if (new_type < 0 || new_type > 3)
 				throw ConvertException("Invalid range");
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the ban type to " << new_type;
+
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to change the ban type to {0}"), new_type);
+
 			ci->SetBanType(new_type);
 			source.Reply(_("Ban type for channel \002{0}\002 is now \002#{1}\002."), ci->GetName(), new_type);
 		}
@@ -247,12 +251,14 @@ class CommandCSSetDescription : public Command
 		ci->SetDesc(param);
 		if (!param.empty())
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the description to " << ci->GetDesc();
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to change the description to {0}"), ci->GetDesc());
+
 			source.Reply(_("Description of \002{0}\002 changed to \002{1}\002."), ci->GetName(), ci->GetDesc());
 		}
 		else
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to unset the description";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to unset the description"));
+
 			source.Reply(_("Description of \002{0}\002 unset."), ci->GetName());
 		}
 	}
@@ -317,7 +323,8 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the founder from " << (ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "(none)") << " to " << nc->GetDisplay();
+		logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to change the founder from {0} to {1}"),
+				ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "(none)", nc->GetDisplay());
 
 		ci->SetFounder(nc);
 
@@ -373,7 +380,8 @@ class CommandCSSetKeepModes : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keep modes";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to enable keep modes"));
+
 			ci->SetKeepModes(true);
 			source.Reply(_("Keep modes for \002{0}\002 is now \002on\002."), ci->GetName());
 			if (ci->c)
@@ -387,7 +395,8 @@ class CommandCSSetKeepModes : public Command
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keep modes";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to disable keep modes"));
+
 			ci->SetKeepModes(false);
 			source.Reply(_("Keep modes for \002{0}\002 is now \002off\002."), ci->GetName());
 			for (ChanServ::Mode *m : ci->GetRefs<ChanServ::Mode *>())
@@ -446,13 +455,15 @@ class CommandCSSetPeace : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable peace";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to enable peace"));
+
 			ci->SetPeace(true);
 			source.Reply(_("Peace option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable peace";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to disable peace"));
+
 			ci->SetPeace(false);
 			source.Reply(_("Peace option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
@@ -481,7 +492,7 @@ inline static Anope::string BotModes()
 class CommandCSSetPersist : public Command
 {
 	ServiceReference<ModeLocks> mlocks;
-	
+
  public:
 	CommandCSSetPersist(Module *creator, const Anope::string &cname = "chanserv/set/persist") : Command(creator, cname, 2, 2)
 	{
@@ -570,7 +581,8 @@ class CommandCSSetPersist : public Command
 				}
 			}
 
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable persist";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to enable persist"));
+
 			source.Reply(_("Channel \002{0}\002 is now persistent."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
@@ -607,7 +619,8 @@ class CommandCSSetPersist : public Command
 				}
 			}
 
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable persist";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to disable persist"));
+
 			source.Reply(_("Channel \002{0}\002 is no longer persistent."), ci->GetName());
 		}
 		else
@@ -664,13 +677,15 @@ class CommandCSSetRestricted : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable restricted";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to enable restricted"));
+
 			ci->SetRestricted(true);
 			source.Reply(_("Restricted access option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable restricted";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to disabled restricted"));
+
 			ci->SetRestricted(false);
 			source.Reply(_("Restricted access option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
@@ -727,13 +742,15 @@ class CommandCSSetSecure : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to enable secure"));
+
 			ci->SetSecure(true);
 			source.Reply(_("Secure option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to disable secure"));
+
 			ci->SetSecure(false);
 			source.Reply(_("Secure option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
@@ -792,13 +809,15 @@ class CommandCSSetSecureFounder : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure founder";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to enable secure founder"));
+
 			ci->SetSecureFounder(true);
 			source.Reply(_("Secure founder option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure founder";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to disable secure founder"));
+
 			ci->SetSecureFounder(false);
 			source.Reply(_("Secure founder option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
@@ -860,13 +879,15 @@ class CommandCSSetSecureOps : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure ops";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to enable secure ops"));
+
 			ci->SetSecureOps(true);
 			source.Reply(_("Secure ops option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure ops";
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to disable secure ops"));
+
 			ci->SetSecureOps(false);
 			source.Reply(_("Secure ops option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
@@ -927,21 +948,24 @@ class CommandCSSetSignKick : public Command
 			ci->SetSignKick(true);
 			ci->SetSignKickLevel(false);
 			source.Reply(_("Signed kick option for \002{0}\002 is now \002on\002."), ci->GetName());
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick";
+
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to enable sign kick"));
 		}
 		else if (param.equals_ci("LEVEL"))
 		{
 			ci->SetSignKick(false);
 			ci->SetSignKickLevel(true);
 			source.Reply(_("Signed kick option for \002{0}\002 is now \002on\002, but depends of the privileges of the user that is using the command."), ci->GetName());
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick level";
+
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to enable sign kick level"));
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			ci->SetSignKick(false);
 			ci->SetSignKickLevel(false);
 			source.Reply(_("Signed kick option for \002{0}\002 is now \002off\002."), ci->GetName());
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable sign kick";
+
+			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to disable sign kick"));
 		}
 		else
 		{
@@ -1018,7 +1042,8 @@ class CommandCSSetSuccessor : public Command
 			nc = na->GetAccount();
 		}
 
-		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the successor from " << (ci->GetSuccessor() ? ci->GetSuccessor()->GetDisplay() : "(none)") << " to " << (nc ? nc->GetDisplay() : "(none)");
+		logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to change the successor from {0} to {1}"),
+				ci->GetSuccessor() ? ci->GetSuccessor()->GetDisplay() : "(none)", nc ? nc->GetDisplay() : "(none)");
 
 		ci->SetSuccessor(nc);
 
@@ -1072,13 +1097,15 @@ class CommandCSSetNoexpire : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(LOG_ADMIN, source, this, ci) << "to enable noexpire";
+			logger.Command(LogType::ADMIN, source, ci, _("{source} used {command} on {channel} to enable noexpire"));
+
 			ci->SetNoExpire(true);
 			source.Reply(_("Channel \002{0} will not\002 expire."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(LOG_ADMIN, source, this, ci) << "to disable noexpire";
+			logger.Command(LogType::ADMIN, source, ci, _("{source} used {command} on {channel} to disable noexpire"));
+
 			ci->SetNoExpire(false);
 			source.Reply(_("Channel \002{0} will\002 expire."), ci->GetName());
 		}
@@ -1240,7 +1267,7 @@ class CSSet : public Module
 	{
 		if (persist_lower_ts && c->ci && c->ci->IsPersist() && c->creation_time > c->ci->GetTimeRegistered())
 		{
-			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->GetTimeRegistered();
+			logger.Debug("Changing TS of {0} from {1} to {2}", c->name, c->creation_time, c->ci->GetTimeRegistered());
 			c->creation_time = c->ci->GetTimeRegistered();
 			IRCD->Send<messages::MessageChannel>(c);
 			c->Reset();

@@ -107,7 +107,7 @@ void SocketEngine::Process()
 
 	if (sresult == -1)
 	{
-		Log() << "SockEngine::Process(): error: " << Anope::LastError();
+		Anope::Logger.Log("SocketEngine::Process(): error: {0}", Anope::LastError());
 	}
 	else if (sresult)
 	{

@@ -36,7 +36,7 @@ Anope::map<Server *> Servers::ByID;
 
 std::set<Anope::string> Servers::Capab;
 
-Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Anope::string &desc, const Anope::string &ssid, bool jupe) : name(sname), hops(shops), description(desc), sid(ssid), uplink(up), users(0)
+Server::Server(Server *up, const Anope::string &sname, unsigned int shops, const Anope::string &desc, const Anope::string &ssid, bool jupe) : name(sname), hops(shops), description(desc), sid(ssid), uplink(up), users(0)
 {
 	syncing = true;
 	juped = jupe;
@@ -46,7 +46,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 	if (!ssid.empty())
 		Servers::ByID[ssid] = this;
 
-	Log(this, "connect") << "has connected to the network (uplinked to " << (this->uplink ? this->uplink->GetName() : "no uplink") << ")";
+	this->logger.Category("connect").Log(_("{0} has connected to the network (uplinked to {1})"), this->GetName(), this->uplink ? this->uplink->GetName() : "no uplink");
 
 	/* Add this server to our uplinks leaf list */
 	if (this->uplink)
@@ -63,7 +63,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 
 Server::~Server()
 {
-	Log(this, "quit") << "quit from " << (this->uplink ? this->uplink->GetName() : "no uplink") << " for " << this->quit_reason;
+	this->logger.Category("quit").Log(_("{0} quit from {1} for {2}"), this->GetName(), this->uplink ? this->uplink->GetName() : "no uplink", this->quit_reason);
 
 	for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 	{
@@ -76,7 +76,7 @@ Server::~Server()
 		}
 	}
 
-	Log(LOG_DEBUG) << "Finished removing all users for " << this->GetName();
+	this->logger.Debug("Finished removing all users for {0}", this->GetName());
 
 	if (this->uplink)
 		this->uplink->DelLink(this);
@@ -207,7 +207,7 @@ void Server::AddLink(Server *s)
 {
 	this->links.push_back(s);
 
-	Log(this, "connect") << "introduced " << s->GetName();
+	this->logger.Category("connect").Log(_("{0} introduced {1}"), this->GetName(), s->GetName());
 }
 
 void Server::DelLink(Server *s)
@@ -224,7 +224,7 @@ void Server::DelLink(Server *s)
 		}
 	}
 
-	Log(this, "quit") << "quit " << s->GetName();
+	this->logger.Category("quit").Log(_("{0} quit {1}"), this->GetName(), s->GetName());
 }
 
 void Server::Sync(bool sync_links)
@@ -234,7 +234,7 @@ void Server::Sync(bool sync_links)
 
 	syncing = false;
 
-	Log(this, "sync") << "is done syncing";
+	this->logger.Category("sync").Log(_("{0} is done syncing"), this->GetName());
 
 	EventManager::Get()->Dispatch(&Event::ServerSync::OnServerSync, this);
 
@@ -269,7 +269,7 @@ void Server::Sync(bool sync_links)
 
 		if (!Anope::NoFork)
 		{
-			Log(LOG_TERMINAL) << "Successfully linked, launching into background...";
+			Anope::Logger.Terminal(_("Successfully linked, launching into background..."));
 			Anope::Fork();
 		}
 	}

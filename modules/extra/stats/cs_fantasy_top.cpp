@@ -24,9 +24,9 @@ class MySQLInterface : public SQL::Interface
 	void OnError(const SQL::Result &r) override
 	{
 		if (!r.GetQuery().query.empty())
-			Log(LOG_DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
+			Log(LogType::DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
 		else
-			Log(LOG_DEBUG) << "Chanstats: Error executing query: " << r.GetError();
+			Log(LogType::DEBUG) << "Chanstats: Error executing query: " << r.GetError();
 	}
 };
 
@@ -160,7 +160,7 @@ class CSTop : public Module
 		}
 		catch (const SQL::Exception &ex)
 		{
-			Log(LOG_DEBUG) << ex.GetReason();
+			Log(LogType::DEBUG) << ex.GetReason();
 		}
 	}
 };

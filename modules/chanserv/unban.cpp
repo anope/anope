@@ -42,20 +42,20 @@ class CommandCSUnban : public Command
 			if (!source.GetUser())
 				return;
 
-			unsigned count = 0;
+			unsigned int count = 0;
 
 			for (ChanServ::Channel *ci : source.GetAccount()->GetRefs<ChanServ::Channel *>())
 			{
 				if (!ci->c || !source.AccessFor(ci).HasPriv("UNBAN"))
 					continue;
 
-				for (unsigned j = 0; j < modes.size(); ++j)
+				for (unsigned int j = 0; j < modes.size(); ++j)
 					if (ci->c->Unban(source.GetUser(), modes[j]->name, true))
 						++count;
 			}
 
-			Log(LOG_COMMAND, source, this, NULL) << "on all channels";
-			source.Reply(_("You have been unbanned from %d channels."), count);
+			logger.Command(LogType::COMMAND, source, _("{source} used {command} on all channels"));
+			source.Reply(_("You have been unbanned from \002{0}\002 channels."), count);
 
 			return;
 		}
@@ -92,7 +92,7 @@ class CommandCSUnban : public Command
 		}
 
 		bool override = !source.AccessFor(ci).HasPriv("UNBAN") && source.HasPriv("chanserv/kick");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unban " << u2->nick;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, _("{source} used {command} on {channel} to unban {0}"), u2->nick);
 
 		for (unsigned i = 0; i < modes.size(); ++i)
 			ci->c->Unban(u2, modes[i]->name, source.GetUser() == u2);

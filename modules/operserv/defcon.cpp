@@ -108,7 +108,7 @@ struct DefconConfig
 
 static DefconConfig DConfig;
 
-static void runDefCon();
+static void runDefCon(Module *module);
 static Anope::string defconReverseModes(const Anope::string &modes);
 
 static Timer *timeout;
@@ -135,7 +135,8 @@ class DefConTimeout : public Timer
 		{
 			DConfig.defaultlevel = level;
 			EventManager::Get()->Dispatch(&Event::DefconLevel::OnDefconLevel, level);
-			Log(Config->GetClient("OperServ"), "operserv/defcon") << "Defcon level timeout, returning to level " << level;
+
+			this->GetOwner()->logger.Bot("OperServ").Category("operserv/defcon").Log(_("Defcon level timeout, returning to level {0}"), level);
 
 			if (DConfig.globalondefcon && global)
 			{
@@ -148,7 +149,7 @@ class DefConTimeout : public Timer
 					global->SendGlobal(NULL, "", DConfig.message);
 			}
 
-			runDefCon();
+			runDefCon(this->GetOwner());
 		}
 	}
 };
@@ -223,7 +224,8 @@ class CommandOSDefcon : public Command
 
 		source.Reply(_("Services are now at defcon \002{0}\002."), DConfig.defaultlevel);
 		this->SendLevels(source);
-		Log(LOG_ADMIN, source, this) << "to change defcon level to " << newLevel;
+
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to change defcon level to {0}"), newLevel);
 
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
@@ -240,7 +242,7 @@ class CommandOSDefcon : public Command
 		}
 
 		/* Run any defcon functions, e.g. FORCE CHAN MODE */
-		runDefCon();
+		runDefCon(this->GetOwner());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -299,7 +301,7 @@ class OSDefcon : public Module
 			{
 				if (cm->type == MODE_STATUS || cm->type == MODE_LIST)
 				{
-					Log(this) << "DefConChanModes mode character '" << mode << "' cannot be locked";
+					logger.Log("DefConChanModes mode character '{0}' cannot be locked", mode);
 					continue;
 				}
 				else if (add)
@@ -313,7 +315,7 @@ class OSDefcon : public Module
 
 						if (!ss.GetToken(param))
 						{
-							Log(this) << "DefConChanModes mode character '" << mode << "' has no parameter while one is expected";
+							logger.Log("DefConChanModes mode character '{0]' has no parameter while one is expected", mode);
 							continue;
 						}
 
@@ -338,7 +340,7 @@ class OSDefcon : public Module
 		{
 			DConfig.DefConModesOn.erase("REDIRECT");
 
-			Log(this) << "DefConChanModes must lock mode +l as well to lock mode +L";
+			logger.Log("DefConChanModes must lock mode +l as well to lock mode +L");
 		}
 	}
 
@@ -517,7 +519,7 @@ class OSDefcon : public Module
 		ServiceBot *OperServ = Config->GetClient("OperServ");
 		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
 		{
-			Log(OperServ, "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
+			logger.Bot(OperServ).Category("operserv/defcon").Log("Adding akill for *@{0}", u->host);
 #warning "xline allocated on stack"
 #if 0
 			XLine x("*@" + u->host, OperServ ? OperServ->nick : "defcon", Anope::CurTime + DConfig.akillexpire, DConfig.akillreason, XLineManager::GenerateUID());
@@ -580,7 +582,7 @@ class OSDefcon : public Module
 	}
 };
 
-static void runDefCon()
+static void runDefCon(Module *module)
 {
 	ServiceBot *OperServ = Config->GetClient("OperServ");
 	if (DConfig.Check(DEFCON_FORCE_CHAN_MODES))
@@ -589,7 +591,7 @@ static void runDefCon()
 		{
 			if (DConfig.chanmodes[0] == '+' || DConfig.chanmodes[0] == '-')
 			{
-				Log(OperServ, "operserv/defcon") << "DEFCON: setting " << DConfig.chanmodes << " on all channels";
+				module->logger.Bot(OperServ).Category("operserv/defcon").Log(_("Setting {0} on all channels"), DConfig.chanmodes);
 				DefConModesSet = true;
 				for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 					it->second->SetModes(OperServ, false, "%s", DConfig.chanmodes.c_str());
@@ -606,7 +608,7 @@ static void runDefCon()
 				Anope::string newmodes = defconReverseModes(DConfig.chanmodes);
 				if (!newmodes.empty())
 				{
-					Log(OperServ, "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
+					module->logger.Bot(OperServ).Category("operserv/defcon").Log(_("SSetting {0} on all channels"), newmodes);
 					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 						it->second->SetModes(OperServ, true, "%s", newmodes.c_str());
 				}

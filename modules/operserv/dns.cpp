@@ -383,7 +383,7 @@ class CommandOSDNS : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		Log(LOG_ADMIN, source, this) << "to add zone " << zone;
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to add zone {0}"), zone);
 
 		DNSZone *z = Serialize::New<DNSZone *>();
 		z->SetName(zone);
@@ -404,7 +404,7 @@ class CommandOSDNS : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		Log(LOG_ADMIN, source, this) << "to delete zone " << z->GetName();
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to delete zone {0}"), z->GetName());
 
 		for (DNSZoneMembership *mem : z->GetRefs<DNSZoneMembership *>())
 			mem->Delete();
@@ -459,7 +459,7 @@ class CommandOSDNS : public Command
 					manager->Notify(zone);
 				}
 
-				Log(LOG_ADMIN, source, this) << "to add server " << s->GetName() << " to zone " << z->GetName();
+				logger.Command(LogType::ADMIN, source, _("{source} used {command} to add server {0} to zone {1}"), s->GetName(), z->GetName());
 
 				source.Reply(_("Server \002{0}\002 added to zone \002{1}\002."), s->GetName(), z->GetName());
 			}
@@ -481,7 +481,8 @@ class CommandOSDNS : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			Log(LOG_ADMIN, source, this) << "to add server " << s->GetName();
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add server {2}"), s->GetName());
+
 			source.Reply(_("Added server \002{0}\002."), s->GetName());
 		}
 		else
@@ -497,7 +498,7 @@ class CommandOSDNS : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			Log(LOG_ADMIN, source, this) << "to add server " << s->GetName() << " to zone " << zone;
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add server {0} to zone {1}"), s->GetName(), z->GetName());
 
 			DNSZoneMembership *mem = Serialize::New<DNSZoneMembership *>();
 			mem->SetServer(s);
@@ -541,7 +542,7 @@ class CommandOSDNS : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			Log(LOG_ADMIN, source, this) << "to remove server " << s->GetName() << " from zone " << z->GetName();
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove server {0} to zone {1}"), s->GetName(), z->GetName());
 
 			if (manager)
 			{
@@ -569,7 +570,8 @@ class CommandOSDNS : public Command
 		if (manager)
 			manager->UpdateSerial();
 
-		Log(LOG_ADMIN, source, this) << "to delete server " << s->GetName();
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to delete server {0}"), s->GetName());
+
 		source.Reply(_("Removed server \002{0}\002."), s->GetName());
 		s->Delete();
 	}
@@ -606,7 +608,8 @@ class CommandOSDNS : public Command
 		ip->SetIP(params[2]);
 
 		source.Reply(_("Added IP \002{0}\002 to \002{1}\002."), params[2], s->GetName());
-		Log(LOG_ADMIN, source, this) << "to add IP " << params[2] << " to " << s->GetName();
+
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to add IP {0} to {1}"), params[2], s->GetName());
 
 		if (s->Active() && manager)
 		{
@@ -635,7 +638,8 @@ class CommandOSDNS : public Command
 				ip->Delete();
 
 				source.Reply(_("Removed IP \002{0}\002 from \002{1}\002."), params[2], s->GetName());
-				Log(LOG_ADMIN, source, this) << "to remove IP " << params[2] << " from " << s->GetName();
+
+				logger.Command(LogType::ADMIN, source, _("{source} used {command} to add IP {0} to {1}"), params[2], s->GetName());
 
 				if (s->GetRefs<DNSIP *>().empty())
 				{
@@ -725,7 +729,8 @@ class CommandOSDNS : public Command
 		s->SetActive(true);
 
 		source.Reply(_("Pooled \002{0}\002."), s->GetName());
-		Log(LOG_ADMIN, source, this) << "to pool " << s->GetName();
+
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to pool {0}"), s->GetName());
 	}
 
 
@@ -751,7 +756,8 @@ class CommandOSDNS : public Command
 		s->SetPool(false);
 
 		source.Reply(_("Depooled \002{0}\002."), s->GetName());
-		Log(LOG_ADMIN, source, this) << "to depool " << s->GetName();
+
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to depool {0}"), s->GetName());
 	}
 
  public:
@@ -882,7 +888,7 @@ class ModuleDNS : public Module
 			if (dns && dns->GetPooled() && !dns->Active() && !dns->GetRefs<DNSIP *>().empty())
 			{
 				dns->SetActive(true);
-				Log(this) << "Pooling server " << s->GetName();
+				logger.Log(_("Pooling server {0}"), s->GetName());
 			}
 		}
 	}
@@ -896,7 +902,7 @@ class ModuleDNS : public Module
 				dns->SetActive(false); // Will be reactivated when it comes back
 			else
 				dns->SetPool(false); // Otherwise permanently pull this
-			Log(this) << "Depooling delinked server " << s->GetName();
+			logger.Log(_("Depooling delinked server {0}"), s->GetName());
 		}
 	}
 
@@ -908,7 +914,7 @@ class ModuleDNS : public Module
 			/* Check for user limit reached */
 			if (s && s->GetPooled() && s->Active() && s->GetLimit() && u->server->users >= s->GetLimit())
 			{
-				Log(this) << "Depooling full server " << s->GetName() << ": " << u->server->users << " users";
+				logger.Log(_("Depooling full server {0}: {1} users"), s->GetName(), u->server->users);
 				s->SetActive(false);
 			}
 		}
@@ -925,7 +931,7 @@ class ModuleDNS : public Module
 			/* Check for dropping under userlimit */
 			if (s->GetLimit() && !s->Active() && s->GetLimit() > u->server->users)
 			{
-				Log(this) << "Pooling server " << s->GetName();
+				logger.Log(_("Pooling server {0}"), s->GetName());
 				s->SetActive(true);
 			}
 
@@ -943,7 +949,7 @@ class ModuleDNS : public Module
 					/* Check for very fast user drops */
 					if (s->Active() && diff <= this->user_drop_time)
 					{
-						Log(this) << "Depooling server " << s->GetName() << ": dropped " << this->user_drop_mark << " users in " << diff << " seconds";
+						logger.Log(_("Depooling server {0}: dropped {1} users in {2} seconds"), s->GetName(), this->user_drop_mark, diff);
 						s->repool = Anope::CurTime + this->user_drop_readd_time;
 						s->SetActive(false);
 					}
@@ -952,7 +958,7 @@ class ModuleDNS : public Module
 					{
 						s->SetActive(true);
 						s->repool = 0;
-						Log(this) << "Pooling server " << s->GetName();
+						logger.Log(_("Pooling server {0}"), s->GetName());
 					}
 				}
 			}
@@ -1020,7 +1026,7 @@ class ModuleDNS : public Module
 			if (last_warn + 60 < Anope::CurTime)
 			{
 				last_warn = Anope::CurTime;
-				Log(this) << "Warning! There are no pooled servers!";
+				logger.Log("Warning! There are no pooled servers!");
 			}
 
 			/* Something messed up, just return them all and hope one is available */
@@ -1040,7 +1046,7 @@ class ModuleDNS : public Module
 
 			if (packet->answers.size() == answer_size)
 			{
-				Log(this) << "Error! There are no servers with any IPs of type " << q.type;
+				logger.Log("Error! There are no servers with any IPs of type {0}", q.type);
 				/* Send back an empty answer anyway */
 			}
 		}

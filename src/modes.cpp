@@ -733,13 +733,13 @@ void ModeManager::Apply(Configuration::Conf *old)
 		ChannelMode *mode;
 
 		if (cm.list)
-			Log(LOG_DEBUG) << "Creating channelmode list " << cm.name << " (" << cm.character << ")";
+			Anope::Logger.Log("Creating channelmode list {0} ({1})", cm.name, cm.character);
 		else if (cm.status)
-			Log(LOG_DEBUG) << "Creating channelmode status " << cm.name << " (" << cm.character << ")";
+			Anope::Logger.Log("Creating channelmode status {0} ({1})", cm.name, cm.character);
 		else if (cm.param)
-			Log(LOG_DEBUG) << "Creating channelmode param " << cm.name << " (" << cm.character << ")";
+			Anope::Logger.Log("Creating channelmode param {0} ({1})", cm.name, cm.character);
 		else
-			Log(LOG_DEBUG) << "Creating channelmode " << cm.name << " (" << cm.character << ")";
+			Anope::Logger.Log("Creating channelmode {0} ({1})", cm.name, cm.character);
 
 		if (cm.list)
 			mode = new ChannelModeList(cm.name, cm.character);
@@ -761,7 +761,7 @@ void ModeManager::Apply(Configuration::Conf *old)
 	{
 		UserMode *mode;
 
-		Log(LOG_DEBUG) << "Creating usermode " << um.name << " (" << um.character << ")";
+		Anope::Logger.Log("Creating usermode {0} ({1})", um.name, um.character);
 
 		if (um.param)
 			mode = new UserModeParam(um.name, um.character);
@@ -840,7 +840,7 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 					this->host = cidr_ip;
 					this->family = addr.family();
 
-					Log(LOG_DEBUG) << "Ban " << mask << " has cidr " << this->cidr_len;
+					Anope::Logger.Log("Ban {0} has cidr {1}", mask, this->cidr_len);
 				}
 			}
 			catch (const ConvertException &) { }

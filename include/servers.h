@@ -78,7 +78,7 @@ class CoreExport Server : public Extensible
 	 * @param sid Server sid/numeric
 	 * @param jupe If the server is juped
 	 */
-	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid = "", bool jupe = false);
+	Server(Server *uplink, const Anope::string &name, unsigned int hops, const Anope::string &description, const Anope::string &sid = "", bool jupe = false);
 
  private:
 	/** Destructor
@@ -87,7 +87,9 @@ class CoreExport Server : public Extensible
 
  public:
  	/* Number of users on the server */
- 	unsigned users;
+	unsigned int users;
+
+	Logger logger;
 
 	void Burst();
 

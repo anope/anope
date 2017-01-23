@@ -158,7 +158,7 @@ class MyForbidService : public ForbidService
 				else if (d->GetType() == FT_EMAIL)
 					ftype = "email";
 
-				Log(LOG_NORMAL, "expire/forbid", Config->GetClient("OperServ")) << "Expiring forbid for " << d->GetMask() << " type " << ftype;
+				this->GetOwner()->logger.Bot("OperServ").Category("expire/forbid").Log(_("Expiring forbid for {0} type {1}"), d->GetMask(), ftype);
 				d->Delete();
 			}
 		return Serialize::GetObjects<ForbidData *>();
@@ -270,7 +270,8 @@ class CommandOSForbid : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add a forbid on {0} of type {1}"), entry, subcommand);
+
 			source.Reply(_("Added a forbid on \002{0}\002 of type \002{1}\002 to expire on \002{2}\002."), entry, subcommand.lower(), expiryt ? Anope::strftime(expiryt, source.GetAccount()) : "never");
 
 			/* apply forbid */
@@ -381,7 +382,8 @@ class CommandOSForbid : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			Log(LOG_ADMIN, source, this) << "to remove forbid on " << d->GetMask() << " of type " << subcommand;
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove forbid on {0} of type {1}"), d->GetMask(), subcommand);
+
 			source.Reply(_("\002{0}\002 deleted from the \002{1}\002 forbid list."), d->GetMask(), subcommand);
 			d->Delete();
 		}

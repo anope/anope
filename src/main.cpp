@@ -43,6 +43,7 @@ sig_atomic_t Anope::Signal = 0;
 bool Anope::Quitting = false;
 bool Anope::Restarting = false;
 Anope::string Anope::QuitReason;
+Logger Anope::Logger;
 
 static Anope::string BinaryDir;       /* Full path to services bin directory */
 
@@ -128,7 +129,7 @@ int main(int ac, char **av, char **envp)
 	}
 	catch (const CoreException &ex)
 	{
-		Log() << ex.GetReason();
+		Anope::Logger.Log(ex.GetReason());
 		return -1;
 	}
 
@@ -138,7 +139,7 @@ int main(int ac, char **av, char **envp)
 	}
 	catch (const SocketException &ex)
 	{
-		Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << "): " << ex.GetReason();
+		Anope::Logger.Terminal(_("Unable to connect to uplink #{0} ({1}:{2}): {3}"), Anope::CurrentUplink + 1, Config->Uplinks[Anope::CurrentUplink].host, Config->Uplinks[Anope::CurrentUplink].port, ex.GetReason());
 	}
 
 	/* Set up timers */
@@ -148,7 +149,7 @@ int main(int ac, char **av, char **envp)
 	/*** Main loop. ***/
 	while (!Anope::Quitting)
 	{
-		Log(LOG_DEBUG_2) << "Top of main loop";
+		Anope::Logger.Debug2("Top of main loop");
 
 		/* Process timers */
 		if (Anope::CurTime - last_check >= Config->TimeoutCheck)
@@ -175,7 +176,7 @@ int main(int ac, char **av, char **envp)
 
 	if (Anope::QuitReason.empty())
 		Anope::QuitReason = "Terminating, reason unknown";
-	Log() << Anope::QuitReason;
+	Anope::Logger.Log(Anope::QuitReason);
 
 	delete UplinkSock;
 
@@ -196,7 +197,7 @@ int main(int ac, char **av, char **envp)
 		Anope::string sbin = "./" + Anope::ServicesBin;
 		av[0] = const_cast<char *>(sbin.c_str());
 		execve(Anope::ServicesBin.c_str(), av, envp);
-		Log() << "Restart failed";
+		Anope::Logger.Log("Restart failed");
 		Anope::ReturnValue = -1;
 	}
 

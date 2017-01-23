@@ -21,28 +21,33 @@
 
 #include "anope.h"
 #include "defs.h"
+#include "language.h"
 
-enum LogType
+enum class LogType
 {
+	NORMAL,
 	/* Used whenever an administrator uses an administrative comand */
-	LOG_ADMIN,
+	ADMIN,
 	/* Used whenever an administrator overides something, such as adding
 	 * access to a channel where they don't have permission to.
 	 */
-	LOG_OVERRIDE,
+	OVERRIDE,
 	/* Any other command usage */
-	LOG_COMMAND,
-	LOG_SERVER,
-	LOG_CHANNEL,
-	LOG_USER,
-	LOG_MODULE,
-	LOG_NORMAL,
-	LOG_TERMINAL,
-	LOG_RAWIO,
-	LOG_DEBUG,
-	LOG_DEBUG_2,
-	LOG_DEBUG_3,
-	LOG_DEBUG_4
+	COMMAND,
+	SERVER,
+	CHANNEL,
+	USER,
+	MODULE
+};
+
+enum class LogLevel
+{
+	NORMAL,
+	TERMINAL,
+	RAWIO,
+	DEBUG,
+	DEBUG_2,
+	DEBUG_3
 };
 
 struct LogFile
@@ -55,77 +60,16 @@ struct LogFile
 	const Anope::string &GetName() const;
 };
 
-/* Represents a single log message */
-class CoreExport Log
-{
- public:
- 	/* Bot that should log this message */
-	ServiceBot *bi;
-	/* For commands, the user executing the command, but might not always exist */
-	User *u;
-	/* For commands, the account executing the command, but will not always exist */
-	NickServ::Account *nc;
-	/* For commands, the command being executed */
-	Command *c;
-	/* For commands, the command source */
-	CommandSource *source;
-	/* Used for LOG_CHANNEL */
-	Channel *chan;
-	/* For commands, the channel the command was executed on, will not always exist */
-	ChanServ::Channel *ci;
-	/* For LOG_SERVER */
-	Server *s;
-	/* For LOG_MODULE */
-	Module *m;
-	LogType type;
-	Anope::string category;
-
-	std::stringstream buf;
-
-	Log(LogType type = LOG_NORMAL, const Anope::string &category = "", ServiceBot *bi = NULL);
-
-	/* LOG_COMMAND/OVERRIDE/ADMIN */
-	Log(LogType type, CommandSource &source, Command *c, ChanServ::Channel *ci = NULL);
-
-	/* LOG_CHANNEL */
-	Log(User *u, Channel *c, const Anope::string &category = "");
-
-	/* LOG_USER */
-	Log(User *u, const Anope::string &category = "", ServiceBot *bi = NULL);
-
-	/* LOG_SERVER */
-	Log(Server *s, const Anope::string &category = "", ServiceBot *bi = NULL);
-
-	Log(ServiceBot *b, const Anope::string &category = "");
-
-	Log(Module *m, const Anope::string &category = "", ServiceBot *bi = NULL);
-
-	~Log();
-
- private:
-	Anope::string FormatSource() const;
-	Anope::string FormatCommand() const;
-
- public:
-	Anope::string BuildPrefix() const;
-
-	template<typename T> Log &operator<<(T val)
-	{
-		this->buf << val;
-		return *this;
-	}
-};
-
 /* Configured in the configuration file, actually does the message logging */
 class CoreExport LogInfo
 {
  public:
- 	ServiceBot *bot;
+	ServiceBot *bot = nullptr;
 	std::vector<Anope::string> targets;
 	std::vector<LogFile *> logfiles;
-	int last_day;
+	int last_day = 0;
 	std::vector<Anope::string> sources;
-	int log_age;
+	int log_age = 0;
 	std::vector<Anope::string> admin;
 	std::vector<Anope::string> override;
 	std::vector<Anope::string> commands;
@@ -133,8 +77,8 @@ class CoreExport LogInfo
 	std::vector<Anope::string> users;
 	std::vector<Anope::string> channels;
 	std::vector<Anope::string> normal;
-	bool raw_io;
-	bool debug;
+	bool raw_io = false;
+	bool debug = false;
 
 	LogInfo(int logage, bool rawio, bool debug);
 
@@ -142,9 +86,144 @@ class CoreExport LogInfo
 
 	void OpenLogFiles();
 
-	bool HasType(LogType ltype, const Anope::string &type) const;
+	bool HasType(LogType ltype, LogLevel level, const Anope::string &type) const;
 
-	/* Logs the message l if configured to */
-	void ProcessMessage(const Log *l);
+	void ProcessMessage(const Logger *l, const Anope::string &message);
+};
+
+class Logger
+{
+	friend class LogInfo;
+
+	LogType type = LogType::NORMAL;
+	LogLevel level = LogLevel::NORMAL;
+
+	/* Object logger is attached to */
+	Module *module = nullptr;
+	Command *command = nullptr;
+	ServiceBot *bot = nullptr;
+	Server *server = nullptr;
+
+	/* Logger category */
+	Anope::string category;
+	/* Non formatted message */
+	Anope::string raw_message;
+
+	/* Sources */
+	User *user = nullptr;
+	NickServ::Account *account = nullptr;
+	Channel *channel = nullptr;
+	ChanServ::Channel *ci = nullptr;
+	CommandSource *source = nullptr;
+
+	Anope::string FormatSource() const;
+	Anope::string BuildPrefix() const;
+	void LogMessage(const Anope::string &message);
+	void InsertVariables(FormatInfo &fi);
+
+	template<typename... Args>
+	Anope::string Format(const Anope::string &message, Args&&... args)
+	{
+		FormatInfo fi(message, sizeof...(Args));
+		fi.AddArgs(std::forward<Args>(args)...);
+		InsertVariables(fi);
+		fi.Format();
+		return fi.GetFormat();
+	}
+
+ public:
+	Logger() = default;
+	Logger(Module *m) : type(LogType::MODULE), module(m) { }
+	Logger(Command *c) : type(LogType::COMMAND), command(c) { }
+	Logger(ServiceBot *b) : bot(b) { }
+	Logger(Channel *c) : type(LogType::CHANNEL), channel(c) { }
+	Logger(User *u) : type(LogType::USER), user(u) { }
+	Logger(Server *s) : type(LogType::SERVER), server(s) { }
+
+	LogType GetType() const;
+	LogLevel GetLevel() const;
+
+	Module *GetModule() const;
+	Command *GetCommand() const;
+	ServiceBot *GetBot() const;
+	Server *GetServer() const;
+
+	User *GetUser() const;
+	void SetUser(User *);
+
+	NickServ::Account *GetAccount() const;
+	void SetAccount(NickServ::Account *);
+
+	Channel *GetChannel() const;
+	void SetChannel(Channel *);
+
+	ChanServ::Channel *GetCi() const;
+	void SetCi(ChanServ::Channel *);
+
+	CommandSource *GetSource() const;
+	void SetSource(CommandSource *);
+
+	Logger Category(const Anope::string &c) const;
+	Logger User(class User *u) const;
+	Logger Channel(class Channel *c) const;
+	Logger Channel(ChanServ::Channel *c) const;
+	Logger Source(CommandSource *s) const;
+	Logger Bot(ServiceBot *bot) const;
+	Logger Bot(const Anope::string &name) const;
+
+	template<typename... Args> void Log(LogLevel level, const Anope::string &message, Args&&... args)
+	{
+		Logger l = *this;
+		l.raw_message = message;
+		l.level = level;
+
+		Anope::string translated = Language::Translate(message);
+		l.LogMessage(l.Format(translated, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void Command(LogType type, CommandSource &source, ChanServ::Channel *ci, const Anope::string &message, Args&&... args)
+	{
+		Logger l = *this;
+		l.SetSource(&source);
+		l.SetCi(ci);
+
+		Anope::string translated = Language::Translate(message);
+		l.LogMessage(l.Format(translated, std::forward<Args>(args)...));
+	}
+
+	template<typename... Args> void Command(LogType type, CommandSource &source, const Anope::string &message, Args&&... args)
+	{
+		Command(type, source, nullptr, message, std::forward<Args>(args)...);
+	}
+
+	template<typename... Args> void Log(const Anope::string &message, Args&&... args)
+	{
+		Log(LogLevel::NORMAL, message, std::forward<Args>(args)...);
+	}
+
+	template<typename... Args> void Terminal(const Anope::string &message, Args&&... args)
+	{
+		Log(LogLevel::TERMINAL, message, std::forward<Args>(args)...);
+	}
+
+	template<typename... Args> void RawIO(const Anope::string &message, Args&&... args)
+	{
+		Log(LogLevel::RAWIO, message, std::forward<Args>(args)...);
+	}
+
+	template<typename... Args> void Debug(const Anope::string &message, Args&&... args)
+	{
+		Log(LogLevel::DEBUG, message, std::forward<Args>(args)...);
+	}
+
+	template<typename... Args> void Debug2(const Anope::string &message, Args&&... args)
+	{
+		Log(LogLevel::DEBUG_2, message, std::forward<Args>(args)...);
+	}
+
+	template<typename... Args> void Debug3(const Anope::string &message, Args&&... args)
+	{
+		Log(LogLevel::DEBUG_3, message, std::forward<Args>(args)...);
+	}
 };
 

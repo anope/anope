@@ -165,12 +165,12 @@ class CommandOSSeen : public Command
 				++it;
 				if (time < buf->second->last)
 				{
-					Log(LOG_DEBUG) << buf->first << " was last seen " << Anope::strftime(buf->second->last) << ", deleting entry";
+					Log(LogType::DEBUG) << buf->first << " was last seen " << Anope::strftime(buf->second->last) << ", deleting entry";
 					delete buf->second;
 					counter++;
 				}
 			}
-			Log(LOG_ADMIN, source, this) << "CLEAR and removed " << counter << " nicks that were added after " << Anope::strftime(time, NULL, true);
+			Log(LogType::ADMIN, source, this) << "CLEAR and removed " << counter << " nicks that were added after " << Anope::strftime(time, NULL, true);
 			source.Reply(_("Database cleared, removed %lu nicks that were added after %s."), counter, Anope::strftime(time, source.nc, true).c_str());
 		}
 		else
@@ -423,11 +423,11 @@ class CSSeen : public Module
 
 			if ((Anope::CurTime - cur->second->last) > purgetime)
 			{
-				Log(LOG_DEBUG) << cur->first << " was last seen " << Anope::strftime(cur->second->last) << ", purging entries";
+				Log(LogType::DEBUG) << cur->first << " was last seen " << Anope::strftime(cur->second->last) << ", purging entries";
 				delete cur->second;
 			}
 		}
-		Log(LOG_DEBUG) << "cs_seen: Purged database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";
+		Log(LogType::DEBUG) << "cs_seen: Purged database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";
 	}
 
 	void OnUserConnect(User *u, bool &exempt) override

@@ -131,7 +131,7 @@ void ngircd::Numeric005::Run(MessageSource &source, const std::vector<Anope::str
 				unsigned newlen = convertTo<unsigned>(data), len = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
 				if (len != newlen)
 				{
-					Log() << "Warning: NICKLEN is " << newlen << " but networkinfo:nicklen is " << len;
+					Anope::Logger.Log("Warning: NICKLEN is {0} but networkinfo:nicklen is {1}", newlen, len);
 				}
 			}
 		}
@@ -240,10 +240,8 @@ void ngircd::Metadata::Run(MessageSource &source, const std::vector<Anope::strin
 {
 	User *u = User::Find(params[0]);
 	if (!u)
-	{
-		Log() << "received METADATA for non-existent user " << params[0];
 		return;
-	}
+
 	if (params[1].equals_cs("accountname"))
 	{
 		NickServ::Account *nc = NickServ::FindAccount(params[2]);
@@ -339,15 +337,10 @@ void ngircd::Nick::Run(MessageSource &source, const std::vector<Anope::string> &
 		Server *s = Server::Find(params[4]);
 		if (s == nullptr)
 		{
-			Log(LOG_DEBUG) << "User " << params[0] << " introduced from non-existent server " << params[4] << "?";
+			Anope::Logger.Debug("User {0} introduced from non-existent server {1}", params[0], params[4]);
 			return;
 		}
 		User::OnIntroduce(params[0], params[2], params[3], "", "", s, params[6], Anope::CurTime, params[5], "", NULL);
-		Log(LOG_DEBUG) << "Registered nick \"" << params[0] << "\" on server " << s->GetName() << ".";
-	}
-	else
-	{
-		Log(LOG_DEBUG) << "Received NICK with invalid number of parameters. source = " << source.GetName() << "params[0] = " << params[0] << "params.size() = " << params.size();
 	}
 }
 
@@ -374,7 +367,7 @@ void ngircd::NJoin::Run(MessageSource &source, const std::vector<Anope::string> 
 		rfc1459::Join::SJoinUser sju;
 
 		/* Get prefixes from the nick */
-		for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
+		for (char ch; !buf.empty() && (ch = ModeManager::GetStatusChar(buf[0]));)
 		{
 			buf.erase(buf.begin());
 			sju.first.AddMode(ch);
@@ -383,7 +376,7 @@ void ngircd::NJoin::Run(MessageSource &source, const std::vector<Anope::string> 
 		sju.second = User::Find(buf);
 		if (!sju.second)
 		{
-			Log(LOG_DEBUG) << "NJOIN for non-existent user " << buf << " on " << params[0];
+			Anope::Logger.Debug("NJOIN for non-existent user {0} on {1}", buf, params[0]);
 			continue;
 		}
 		users.push_back(sju);

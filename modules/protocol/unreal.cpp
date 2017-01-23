@@ -58,7 +58,8 @@ void unreal::senders::Akill::Send(User* u, XLine* x)
 		old->GetManager()->AddXLine(xl);
 		x = xl;
 
-		Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
+		Anope::Logger.Bot("OperServ").Category("akill").Log(_("AKILL: Added an akill for {0} because {1}#{2} matches {3}"),
+				x->GetMask(), u->GetMask(), u->realname, old->GetMask());
 	}
 
 	/* ZLine if we can instead */
@@ -731,7 +732,7 @@ void unreal::Nick::Run(MessageSource &source, const std::vector<Anope::string> &
 		Server *s = Server::Find(params[5]);
 		if (s == NULL)
 		{
-			Log(LOG_DEBUG) << "User " << params[0] << " introduced from non-existent server " << params[5] << "?";
+			Anope::Logger.Debug("User {0} introduced from non-existent server {1}", params[0], params[5]);
 			return;
 		}
 
@@ -912,7 +913,7 @@ void unreal::SJoin::Run(MessageSource &source, const std::vector<Anope::string> 
 			rfc1459::Join::SJoinUser sju;
 
 			/* Get prefixes from the nick */
-			for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
+			for (char ch; !buf.empty() && (ch = ModeManager::GetStatusChar(buf[0]));)
 			{
 				sju.first.AddMode(ch);
 				buf.erase(buf.begin());
@@ -921,7 +922,7 @@ void unreal::SJoin::Run(MessageSource &source, const std::vector<Anope::string> 
 			sju.second = User::Find(buf);
 			if (!sju.second)
 			{
-				Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
+				Anope::Logger.Debug("SJOIN for non-existent user {0} on {1}", buf, params[1]);
 				continue;
 			}
 

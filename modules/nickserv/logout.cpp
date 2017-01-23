@@ -61,7 +61,9 @@ class CommandNSLogout : public Command
 #endif
 
 		u2->super_admin = false; /* Dont let people logout and remain a SuperAdmin */
-		Log(LOG_COMMAND, source, this) << "to logout " << u2->nick;
+
+		// XXX show account name here?
+		logger.Command(LogType::COMMAND, source, _("{source} used {command} to logout {0}"), u2->nick);
 
 		if (!nick.empty())
 			source.Reply(_("\002{0}\002 has been logged out."), nick);

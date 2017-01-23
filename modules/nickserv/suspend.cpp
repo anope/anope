@@ -194,7 +194,8 @@ class CommandNSSuspend : public Command
 			}
 		}
 
-		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} for {0} ({1}), expires on {2}"),
+				nick, !reason.empty() ? reason : "No reason", expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("\002{0}\002 is now suspended."), na->GetNick());
 
 		EventManager::Get()->Dispatch(&Event::NickSuspend::OnNickSuspend, na);
@@ -202,8 +203,9 @@ class CommandNSSuspend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
+#warning "show expiry"
 		source.Reply(_("Suspends \037account\037, which prevents it from being used while keeping all the data for it."
-		               " If an expiry is given the account will be unsuspended after that period of time, otherwise the default expiry from the configuration is used.")); // XXX
+		               " If an expiry is given the account will be unsuspended after that period of time, otherwise the default expiry from the configuration is used."));
 		return true;
 	}
 };
@@ -238,7 +240,8 @@ class CommandNSUnSuspend : public Command
 			return;
 		}
 
-		Log(LOG_ADMIN, source, this) << "for " << na->GetNick() << " which was suspended by " << (!si->GetBy().empty() ? si->GetBy() : "(none)") << " for: " << (!si->GetReason().empty() ? si->GetReason() : "No reason");
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} for {0}, which was suspended by {1} for: {2}"),
+				!si->GetBy().empty() ? si->GetBy() : "(noone)", !si->GetReason().empty() ? si->GetReason() : "no reason");
 
 		si->Delete();
 
@@ -329,7 +332,7 @@ class NSSuspend : public Module
 			na->SetLastSeen(Anope::CurTime);
 			s->Delete();
 
-			Log(LOG_NORMAL, "nickserv/expire", Config->GetClient("NickServ")) << "Expiring suspend for " << na->GetNick();
+			logger.Category("nickserv/expire").Bot("NickServ").Log(_("Expiring suspend for {0}"), na->GetNick());
 		}
 	}
 

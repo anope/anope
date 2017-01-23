@@ -121,7 +121,8 @@ class CommandCSRegister : public Command
 			ci->SetLastTopicSetter(source.service->nick);
 		}
 
-		Log(LOG_COMMAND, source, this, ci);
+		logger.Command(LogType::COMMAND, source, ci, _("{source} used {command} on {channel}"));
+
 		source.Reply(_("Channel \002{0}\002 registered under your account: \002{1}\002"), chan, nc->GetDisplay());
 
 		/* Implement new mode lock */

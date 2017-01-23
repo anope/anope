@@ -283,7 +283,7 @@ void AccountImpl::SetDisplay(NickServ::Nick *na)
 
 	NickServ::Account* &nc = map[this->GetDisplay()];
 	if (nc)
-		Log(LOG_DEBUG) << "Duplicate account " << this->GetDisplay() << " in nickcore table?";
+		Anope::Logger.Debug("Duplicate account {0} in nickcore table?", this->GetDisplay());
 
 	nc = this;
 }

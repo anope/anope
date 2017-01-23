@@ -27,7 +27,7 @@
 void Anope::Process(const Anope::string &buffer)
 {
 	/* If debugging, log the buffer */
-	Log(LOG_RAWIO) << "Received: " << buffer;
+	Anope::Logger.RawIO("Received: {0}", buffer);
 
 	if (buffer.empty())
 		return;
@@ -39,19 +39,19 @@ void Anope::Process(const Anope::string &buffer)
 
 	if (Anope::ProtocolDebug)
 	{
-		Log() << "Source : " << (source.empty() ? "No source" : source);
-		Log() << "Command: " << command;
+		Anope::Logger.Log("Source : {0}", source.empty() ? "No source" : source);
+		Anope::Logger.Log("Command: {0}", command);
 
 		if (params.empty())
-			Log() << "No params";
+			Anope::Logger.Log("No params");
 		else
-			for (unsigned i = 0; i < params.size(); ++i)
-				Log() << "params " << i << ": " << params[i];
+			for (unsigned int i = 0; i < params.size(); ++i)
+				Anope::Logger.Log("params {0}: {1}", i, params[i]);
 	}
 
 	if (command.empty())
 	{
-		Log(LOG_DEBUG) << "No command? " << buffer;
+		Anope::Logger.Debug("No command? {0}", buffer);
 		return;
 	}
 
@@ -77,16 +77,16 @@ void Anope::ProcessCommand(MessageSource &src, const Anope::string &command, con
 			buffer += " :" + params[params.size() - 1];
 		}
 
-		Log(LOG_DEBUG) << "unknown command from server (" << buffer << ")";
+		Anope::Logger.Debug("unknown command from server ({0})", buffer);
 		return;
 	}
 
 	if (m->HasFlag(IRCDMESSAGE_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
-		Log(LOG_DEBUG) << "invalid parameters for " << command << ": " << params.size() << " != " << m->GetParamCount();
+		Anope::Logger.Debug("invalid parameters for {0}: {1} != {2}", command, params.size(), m->GetParamCount());
 	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_USER) && !src.GetUser())
-		Log(LOG_DEBUG) << "unexpected non-user source " << src.GetSource() << " for " << command;
+		Anope::Logger.Debug("unexpected non-user source {0} for {1}", src.GetSource(), command);
 	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !src.GetServer())
-		Log(LOG_DEBUG) << "unexpected non-server source " << (src.GetSource().empty() ? "(no source)" : src.GetSource()) << " for " << command;
+		Anope::Logger.Debug("unexpected non-server source {0} for {1}", src.GetSource().empty() ? "(no source)" : src.GetSource(), command);
 	else
 		m->Run(src, params);
 }

@@ -55,7 +55,7 @@ class SQLOperResult : public SQL::Interface
 
 		if (r.Rows() == 0)
 		{
-			Log(LOG_DEBUG) << "m_sql_oper: Got 0 rows for " << user->nick;
+			Log(LogType::DEBUG) << "m_sql_oper: Got 0 rows for " << user->nick;
 			Deoper();
 			return;
 		}
@@ -71,7 +71,7 @@ class SQLOperResult : public SQL::Interface
 			return;
 		}
 
-		Log(LOG_DEBUG) << "m_sql_oper: Got result for " << user->nick << ", opertype " << opertype;
+		Log(LogType::DEBUG) << "m_sql_oper: Got result for " << user->nick << ", opertype " << opertype;
 
 		Anope::string modes;
 		try
@@ -163,7 +163,7 @@ class ModuleSQLOper : public Module
 
 		this->SQL->Run(new SQLOperResult(this, u), q);
 
-		Log(LOG_DEBUG) << "m_sql_oper: Checking authentication for " << u->Account()->GetDisplay();
+		Log(LogType::DEBUG) << "m_sql_oper: Checking authentication for " << u->Account()->GetDisplay();
 	}
 };
 

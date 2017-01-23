@@ -97,7 +97,8 @@ class CommandOSOper : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			Log(LOG_ADMIN, source, this) << "ADD " << na->GetNick() << " as type " << ot->GetName();
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add {0} as an oper of type {1}"), na->GetNick(), ot->GetName());
+
 			source.Reply("\002{0}\002 (\002{1}\002) added to the \002{2}\002 list.", na->GetNick(), na->GetAccount()->GetDisplay(), ot->GetName());
 		}
 		else if (subcommand.equals_ci("DEL") && params.size() > 1)
@@ -137,7 +138,8 @@ class CommandOSOper : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			Log(LOG_ADMIN, source, this) << "DEL " << na->GetNick();
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove {0}"), na->GetNick());
+
 			source.Reply(_("Oper privileges removed from \002{0}\002 (\002{1}\002)."), na->GetNick(), na->GetAccount()->GetDisplay());
 		}
 		else if (subcommand.equals_ci("LIST"))

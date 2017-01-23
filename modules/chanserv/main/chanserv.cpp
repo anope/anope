@@ -309,7 +309,9 @@ class ChanServCore : public Module
 
 				if (newowner)
 				{
-					::Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Transferring foundership of " << ci->GetName() << " from deleted account " << nc->GetDisplay() << " to " << newowner->GetDisplay();
+					ChanServ->logger.Category("chanserv/drop").Log(_("Transferring foundership of {0} from deleted account {1} to {2}"),
+							ci->GetName(), nc->GetDisplay(), newowner->GetDisplay());
+
 					ci->SetFounder(newowner);
 
 					// Can't be both founder and successor
@@ -318,7 +320,8 @@ class ChanServCore : public Module
 				}
 				else
 				{
-					::Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Deleting channel " << ci->GetName() << " owned by deleted account " << nc->GetDisplay();
+					ChanServ->logger.Category("chanserv/drop").Log(_("Deleting channel {0} owned by deleted account {1}"),
+							ci->GetName(), nc->GetDisplay());
 
 					ci->Delete();
 					continue;
@@ -408,10 +411,13 @@ class ChanServCore : public Module
 		}
 	}
 
-	void OnLog(::Log *l) override
+	void OnLog(Logger *l) override
 	{
-		if (l->type == LOG_CHANNEL)
+#warning ""
+#if 0
+		if (l->type == LogType::CHANNEL)
 			l->bi = ChanServ;
+#endif
 	}
 
 	void OnExpireTick() override
@@ -442,7 +448,9 @@ class ChanServCore : public Module
 
 			if (expire)
 			{
-				::Log(LOG_NORMAL, "chanserv/expire", ChanServ) << "Expiring channel " << ci->GetName() << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "(none)") << ")";
+				ChanServ->logger.Category("chanserv/expire").Log(_("Expiring channel {0} (founder: {1})"),
+						ci->GetName(), ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "(none)");
+
 				EventManager::Get()->Dispatch(&ChanServ::Event::ChanExpire::OnChanExpire, ci);
 				ci->Delete();
 			}
@@ -511,7 +519,7 @@ class ChanServCore : public Module
 	{
 		if (always_lower && c->ci && c->creation_time > c->ci->GetTimeRegistered())
 		{
-			::Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->GetTimeRegistered();
+			logger.Debug("Changing TS of {0} from {1} to {2}", c->name, c->creation_time, c->ci->GetTimeRegistered());
 			c->creation_time = c->ci->GetTimeRegistered();
 			IRCD->Send<messages::MessageChannel>(c);
 			c->Reset();

@@ -75,7 +75,7 @@ class CommandBSSay : public Command
 		ci->GetBot()->lastmsg = Anope::CurTime;
 
 		bool override = !source.AccessFor(ci).HasPriv("SAY");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to say: " << text;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to say: {0}"), text);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -145,7 +145,7 @@ class CommandBSAct : public Command
 		ci->GetBot()->lastmsg = Anope::CurTime;
 
 		bool override = !source.AccessFor(ci).HasPriv("SAY");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to say: " << message;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} to say: {0}"), message);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -48,7 +48,7 @@ void XLine::Recache()
 		}
 		catch (const std::regex_error &ex)
 		{
-			Log(LOG_DEBUG) << ex.what();
+			Anope::Logger.Debug(ex.what());
 		}
 	}
 

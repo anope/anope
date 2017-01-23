@@ -101,7 +101,7 @@ class CommandHSAdd : public Command
 		}
 
 		Anope::string mask = (!user.empty() ? user + "@" : "") + host;
-		Log(LOG_ADMIN, source, this) << "to add the vhost " << mask << " to " << na->GetAccount()->GetDisplay();
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to add the vhost {0} to {1}"), mask, na->GetAccount()->GetDisplay());
 
 		HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
 		if (vhost == nullptr)

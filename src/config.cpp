@@ -307,7 +307,7 @@ Conf::Conf() : Block("")
 
 				if (ot2->GetName().equals_ci(str))
 				{
-					Log() << "Inheriting commands and privs from " << ot2->GetName() << " to " << ot->GetName();
+					Anope::Logger.Log(_("Inheriting commands and privs from {0} to {1}"), ot2->GetName(), ot->GetName());
 					ot->Inherits(ot2);
 					break;
 				}
@@ -528,7 +528,7 @@ Conf::Conf() : Block("")
 
 	/* Check the user keys */
 	if (!options->Get<unsigned>("seed"))
-		Log() << "Configuration option options:seed should be set. It's for YOUR safety! Remember that!";
+		Anope::Logger.Log(_("Configuration option options:seed should be set. It's for YOUR safety! Remember that!"));
 
 	/* check regexengine */
 	const Anope::string &regex_engine = options->Get<Anope::string>("regexengine");
@@ -725,7 +725,7 @@ void Conf::LoadOpers()
 				ot = this->MyOperTypes[j];
 		if (ot == NULL)
 		{
-			Log() << "Oper block for " << nname << " has invalid oper type " << type;
+			Anope::Logger.Log(_("Oper block for {0} has invalid oper type {1}"), nname, type);
 			continue;
 		}
 
@@ -741,7 +741,7 @@ void Conf::LoadOpers()
 		o->SetHost(host);
 		o->SetVhost(vhost);
 
-		Log(LOG_DEBUG) << "Creating oper " << nname << " of type " << ot->GetName();
+		Anope::Logger.Debug(_("Creating oper {0} of type {1}"), nname, ot->GetName());
 	}
 
 	/* Apply new opers */
@@ -752,7 +752,7 @@ void Conf::LoadOpers()
 			continue;
 
 		na->GetAccount()->SetOper(o);
-		Log() << "Tied oper " << na->GetAccount()->GetDisplay() << " to type " << o->GetType()->GetName();
+		Anope::Logger.Log(_("Tied oper {0} to type {1}"), na->GetAccount()->GetDisplay(), o->GetType()->GetName());
 	}
 }
 
@@ -896,7 +896,7 @@ void Conf::LoadConf(File &file)
 	int linenumber = 0;
 	bool in_word = false, in_quote = false, in_comment = false;
 
-	Log(LOG_DEBUG) << "Start to read conf " << file.GetName();
+	Anope::Logger.Debug("Start to read conf {0}", file.GetName());
 	// Start reading characters...
 	while (!file.End())
 	{
@@ -907,7 +907,7 @@ void Conf::LoadConf(File &file)
 		if (line.empty() && in_quote)
 			wordbuffer += "\n";
 
-		for (unsigned c = 0, len = line.length(); c < len; ++c)
+		for (unsigned int c = 0, len = line.length(); c < len; ++c)
 		{
 			char ch = line[c];
 			if (in_quote)
@@ -1056,7 +1056,7 @@ void Conf::LoadConf(File &file)
 					Block *b = block_stack.top();
 
 					if (b)
-						Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << b->name << "' '" << itemname << "' set to '" << wordbuffer << "'";
+						Anope::Logger.Debug("ln {0} EOL: s='{1}' '{2}' set to '{3}'", linenumber, b->name, itemname, wordbuffer);
 
 					/* Check defines */
 					for (int i = 0; i < this->CountBlock("define"); ++i)

@@ -58,9 +58,9 @@ class CoreExport Channel : public Base, public Extensible
 	/* When the channel was created */
 	time_t creation_time;
 	/* If the channel has just been created in a netjoin */
-	bool syncing;
+	bool syncing = false;
 	/* Is configured in the conf as a channel bots should be in */
-	bool botchannel;
+	bool botchannel = false;
 
 	/* Users in the channel */
 	typedef std::map<User *, ChanUserContainer *> ChanUserList;
@@ -74,15 +74,17 @@ class CoreExport Channel : public Base, public Extensible
 	 * This is the time the topic was *originally set*. When we restore the topic we want to change the TS back
 	 * to this, but we can only do this on certain IRCds.
 	 */
-	time_t topic_ts;
+	time_t topic_ts = 0;
 	/* The actual time the topic was set, probably close to Anope::CurTime */
-	time_t topic_time;
+	time_t topic_time = 0;
 
-	time_t server_modetime;		/* Time of last server MODE */
-	time_t chanserv_modetime;	/* Time of last check_modes() */
-	int16_t server_modecount;	/* Number of server MODEs this second */
-	int16_t chanserv_modecount;	/* Number of check_mode()'s this sec */
-	int16_t bouncy_modes;		/* Did we fail to set modes here? */
+	time_t server_modetime = 0;	/* Time of last server MODE */
+	time_t chanserv_modetime = 0;	/* Time of last check_modes() */
+	int16_t server_modecount = 0;	/* Number of server MODEs this second */
+	int16_t chanserv_modecount = 0;	/* Number of check_mode()'s this sec */
+	int16_t bouncy_modes = 0;		/* Did we fail to set modes here? */
+
+	Logger logger;
 
  private:
 	/** Constructor
@@ -95,6 +97,11 @@ class CoreExport Channel : public Base, public Extensible
 	/** Destructor
 	 */
 	~Channel();
+
+	/** Gets the channels name
+	 * @return the channel name
+	 */
+	const Anope::string &GetName() const;
 
 	/** Call if we need to unset all modes and clear all user status (internally).
 	 * Only useful if we get a SJOIN with a TS older than what we have here

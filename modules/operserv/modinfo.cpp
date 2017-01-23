@@ -32,7 +32,7 @@ class CommandOSModInfo : public Command
 	{
 		const Anope::string &file = params[0];
 
-		Log(LOG_ADMIN, source, this) << "on " << file;
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0}"), file);
 
 		Module *m = ModuleManager::FindModule(file);
 		if (m == nullptr)
@@ -95,9 +95,10 @@ class CommandOSModList : public Command
 		const Anope::string &param = !params.empty() ? params[0] : "";
 
 		if (!param.empty())
-			Log(LOG_ADMIN, source, this) << "for " << param;
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} for {0}"), param);
 		else
-			Log(LOG_ADMIN, source, this);
+			logger.Command(LogType::ADMIN, source, _("{source} used {command}"),
+		source.GetSource(), source.GetCommand());
 
 		bool third = false, vendor = false, extra = false, database = false, encryption = false, pseudoclient = false, protocol = false;
 

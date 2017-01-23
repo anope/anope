@@ -68,7 +68,9 @@ class CommandOSSVSNick : public Command
 		}
 
 		source.Reply(_("\002{0}\002 is now being changed to \002{1}\002."), nick, newnick);
-		Log(LOG_ADMIN, source, this) << "to change " << nick << " to " << newnick;
+
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to change {0} to {1}"), u2->nick, newnick);
+
 		IRCD->Send<messages::SVSNick>(u2, newnick, Anope::CurTime);
 	}
 
@@ -123,7 +125,9 @@ class CommandOSSVSJoin : public Command
 		}
 
 		IRCD->Send<messages::SVSJoin>(*source.service, target, params[1], "");
-		Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to join " << params[1];
+
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to force {0} to join {1}"), target->nick, params[1]);
+
 		source.Reply(_("\002{0}\002 has been joined to \002{1}\002."), target->nick, params[1]);
 	}
 
@@ -178,11 +182,16 @@ class CommandOSSVSPart : public Command
 		}
 
 		const Anope::string &reason = params.size() > 2 ? params[2] : "";
+
 		IRCD->Send<messages::SVSPart>(*source.service, target, params[1], reason);
+
 		if (!reason.empty())
-			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name << " with reason " << reason;
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to force {0} to part {1} with reason {2}"),
+					target->nick, c->name, reason);
 		else
-			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name;
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to force {0} to part {1}"),
+					target->nick, c->name);
+
 		source.Reply(_("\002{0}\002 has been parted from \002{1}\002."), target->nick, c->name);
 	}
 

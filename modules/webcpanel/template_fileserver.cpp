@@ -107,7 +107,7 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 	int fd = open((template_base + "/" + this->file_name).c_str(), O_RDONLY);
 	if (fd < 0)
 	{
-		Log(LOG_NORMAL, "httpd") << "Error serving file " << page_name << " (" << (template_base + "/" + this->file_name) << "): " << strerror(errno);
+		Anope::Logger.Category("webcpanel").Log("Error serving file {0} ({1}/{2}): {3}", page_name, template_base, this->file_name, strerror(errno));
 
 		client->SendError(HTTP_PAGE_NOT_FOUND, "Page not found");
 		return;
@@ -161,12 +161,16 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 					IfStack.push(stackok && r.count(tokens[2]) > 0);
 				}
 				else
-					Log() << "Invalid IF in web template " << this->file_name;
+				{
+					Anope::Logger.Log("Invalid IF in web template {0}", this->file_name);
+				}
 			}
 			else if (content == "ELSE")
 			{
 				if (IfStack.empty())
-					Log() << "Invalid ELSE with no stack in web template" << this->file_name;
+				{
+					Anope::Logger.Log("Invalid ELSE with no stack in web template {0}", this->file_name);
+				}
 				else
 				{
 					bool old = IfStack.top();
@@ -178,7 +182,7 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 			else if (content == "END IF")
 			{
 				if (IfStack.empty())
-					Log() << "END IF with empty stack?";
+					Anope::Logger.Log("END IF with empty stack?");
 				else
 					IfStack.pop();
 			}
@@ -188,7 +192,9 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 				spacesepstream(content).GetTokens(tokens);
 
 				if (tokens.size() != 4 || tokens[2] != "IN")
-					Log() << "Invalid FOR in web template " << this->file_name;
+				{
+					Anope::Logger.Log("Invalid FOR in web template {0}", this->file_name);
+				}
 				else
 				{
 					std::vector<Anope::string> temp_variables, real_variables;
@@ -196,7 +202,7 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 					commasepstream(tokens[3]).GetTokens(real_variables);
 
 					if (temp_variables.size() != real_variables.size())
-						Log() << "Invalid FOR in web template " << this->file_name << " variable mismatch";
+						Anope::Logger.Log("Invalid FOR in web template {0} variable mismatch", this->file_name);
 					else
 						ForLoop::Stack.push_back(ForLoop(j + f, r, temp_variables, real_variables));
 				}
@@ -204,7 +210,9 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 			else if (content == "END FOR")
 			{
 				if (ForLoop::Stack.empty())
-					Log() << "END FOR with empty stack?";
+				{
+					Anope::Logger.Log("END FOR with empty stack?");
+				}
 				else
 				{
 					ForLoop &fl = ForLoop::Stack.back();
@@ -229,7 +237,9 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 				spacesepstream(content).GetTokens(tokens);
 
 				if (tokens.size() != 2)
-					Log() << "Invalid INCLUDE in web template " << this->file_name;
+				{
+					Anope::Logger.Log("Invalid INCLUDE in web template {0}", this->file_name);
+				}
 				else
 				{
 					if (!finished.empty())

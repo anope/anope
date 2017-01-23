@@ -103,7 +103,7 @@ class CommandBSBot : public Command
 		bi->bi = botinfo;
 		botinfo->bot = bi;
 
-		Log(LOG_ADMIN, source, this) << "ADD " << bi->GetMask() << " " << bi->realname;
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to add bot {0} {1}"), bi->GetMask(), bi->realname);
 
 		source.Reply(_("\002{0}!{1}@{2}\002 (\002{3}\002) added to the bot list."), bi->nick, bi->GetIdent(), bi->host, bi->realname);
 
@@ -266,8 +266,10 @@ class CommandBSBot : public Command
 		if (!user.empty())
 			bi->OnKill();
 
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to change bot {0} to {1} {2}"),
+				oldnick, bi->GetMask(), bi->realname);
+
 		source.Reply(_("Bot \002{0}\002 has been changed to \002{1}!{2}@{3}\002 (\002{4}\002)."), oldnick, bi->nick, bi->GetIdent(), bi->host, bi->realname);
-		Log(LOG_ADMIN, source, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
 
 		EventManager::Get()->Dispatch(&Event::BotChange::OnBotChange, bi);
 	}
@@ -297,7 +299,7 @@ class CommandBSBot : public Command
 
 		EventManager::Get()->Dispatch(&Event::BotDelete::OnBotDelete, bi);
 
-		Log(LOG_ADMIN, source, this) << "DEL " << bi->nick;
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to delete bot {0}"), bi->nick);
 
 		source.Reply(_("Bot \002{0}\002 has been deleted."), bi->nick);
 		delete bi;

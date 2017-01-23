@@ -39,7 +39,7 @@ bool Extensible::HasExtOK(const Anope::string &name)
 	if (ref)
 		return ref->HasExt(this);
 
-	Log(LOG_DEBUG) << "HasExt for nonexistent type " << name << " on " << static_cast<const void *>(this);
+	Anope::Logger.Debug("HasExt for nonexistent type {0} on {1}", name, static_cast<const void *>(this));
 	return false;
 }
 

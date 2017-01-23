@@ -106,7 +106,7 @@ void SocketEngine::Process()
 	if (total < 0)
 	{
 		if (errno != EINTR)
-			Log() << "SockEngine::Process(): error: " << Anope::LastError();
+			Anope::Logger.Log("SocketEngine::Process(): error: {0}", Anope::LastError());
 		return;
 	}
 

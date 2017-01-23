@@ -1074,7 +1074,7 @@ namespace Event
 		/** Called when a message is logged
 		 * @param l The log message
 		 */
-		virtual void OnLog(::Log *l) anope_abstract;
+		virtual void OnLog(Logger *l) anope_abstract;
 	};
 
 	struct CoreExport LogMessage : Events
@@ -1089,7 +1089,7 @@ namespace Event
 		 * @param l The log message
 		 * @param msg The final formatted message, derived from 'l'
 		 */
-		virtual void OnLogMessage(LogInfo *li, const ::Log *l, const Anope::string &msg) anope_abstract;
+		virtual void OnLogMessage(LogInfo *li, const Logger *l, const Anope::string &msg) anope_abstract;
 	};
 
 	struct CoreExport CheckModes : Events

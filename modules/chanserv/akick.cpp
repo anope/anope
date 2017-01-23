@@ -302,7 +302,10 @@ class CommandCSAKick : public Command
 		else
 			ak = ci->AddAkick(source.GetNick(), mask, reason);
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << (reason == "" ? "" : ": ") << reason;
+		if (reason.empty())
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to add {0}"), mask);
+		else
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to add {0} ({1})"), mask, reason);
 
 		EventManager::Get()->Dispatch(&Event::Akick::OnAkickAdd, source, ci, ak);
 
@@ -337,10 +340,11 @@ class CommandCSAKick : public Command
 
 					EventManager::Get()->Dispatch(&Event::Akick::OnAkickDel, source, ci, ak);
 
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << (ak->GetAccount() ? ak->GetAccount()->GetDisplay() : ak->GetMask());
+					logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"),
+							ak->GetAccount() ? ak->GetAccount()->GetDisplay() : ak->GetMask());
 
 					++deleted;
-					delete ak;
+					ak->Delete();
 				},
 				[&]()
 				{
@@ -357,29 +361,33 @@ class CommandCSAKick : public Command
 		{
 			NickServ::Nick *na = NickServ::FindNick(mask);
 			NickServ::Account *nc = na ? na->GetAccount() : nullptr;
+			AutoKick *match = nullptr;
 
-			unsigned int i, end;
-			for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
+			for (unsigned int i = 0; i < ci->GetAkickCount(); ++i)
 			{
 				AutoKick *ak = ci->GetAkick(i);
 
 				if (ak->GetAccount() ? ak->GetAccount() == nc : mask.equals_ci(ak->GetMask()))
+				{
+					match = ak;
 					break;
+				}
 			}
 
-			if (i == ci->GetAkickCount())
+			if (match == nullptr)
 			{
 				source.Reply(_("\002{0}\002 was not found on the auto kick list of \002{1}\002."), mask, ci->GetName());
 				return;
 			}
 
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"),
+					match->GetAccount() ? match->GetAccount()->GetDisplay() : match->GetMask());
 
-			EventManager::Get()->Dispatch(&Event::Akick::OnAkickDel, source, ci, ci->GetAkick(i));
+			EventManager::Get()->Dispatch(&Event::Akick::OnAkickDel, source, ci, match);
 
-			delete ci->GetAkick(i);
+			source.Reply(_("\002{0}\002 deleted from the auto kick list of \002{1}\002."), match->GetAccount() ? match->GetAccount()->GetDisplay() : match->GetMask(), ci->GetName());
 
-			source.Reply(_("\002{0}\002 deleted from the auto kick list of \002{1}\002."), mask, ci->GetName());
+			match->Delete();
 		}
 	}
 
@@ -523,7 +531,8 @@ class CommandCSAKick : public Command
 		}
 
 		bool override = !source.AccessFor(ci).HasPriv("AKICK");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "ENFORCE, affects " << count << " users";
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci,
+				_("{source} used {command} on {channel} to enforce the akick list, affects {0} users"), count);
 
 		source.Reply(_("Autokick enforce for \002{0}\002 complete; \002{1}\002 users were affected."), ci->GetName(), count);
 	}
@@ -531,7 +540,7 @@ class CommandCSAKick : public Command
 	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("AKICK");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the akick list";
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to clear the akick list"));
 
 		ci->ClearAkick();
 		source.Reply(_("The autokick list of \002{0}\002 has been cleared."), ci->GetName());
@@ -712,7 +721,8 @@ class CSAKick : public Module
 
 			if (kick)
 			{
-				Log(LOG_DEBUG_2) << u->nick << " matched akick " << (ak->GetAccount() ? ak->GetAccount()->GetDisplay() : ak->GetMask());
+				logger.Debug2("{0} matched akick {1}", u->nick, ak->GetAccount() ? ak->GetAccount()->GetDisplay() : ak->GetMask());
+
 				ak->SetLastUsed(Anope::CurTime);
 				if (!ak->GetAccount() && ak->GetMask().find('#') == Anope::string::npos)
 					mask = ak->GetMask();

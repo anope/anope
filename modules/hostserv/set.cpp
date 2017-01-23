@@ -113,6 +113,8 @@ class CommandHSSetDefault : public Command
 		vhost->SetDefault(true);
 
 		source.Reply(_("Your default vhost is now \002{0}\002."), vhost->Mask());
+
+		logger.Command(LogType::COMMAND, source, _("{source} used {command} set their default vhost to {0}"), vhost->Mask());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

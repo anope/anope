@@ -49,7 +49,8 @@ class CommandNSResetPass : public Command
 
 		if (SendResetEmail(source.GetUser(), na, source.service))
 		{
-			Log(LOG_COMMAND, source, this) << "for " << na->GetNick() << " (group: " << na->GetAccount()->GetDisplay() << ")";
+			logger.Command(LogType::COMMAND, source, _("{source} used {command} for {0} (account: {1})"), na->GetNick(), na->GetAccount()->GetDisplay());
+
 			source.Reply(_("Password reset email for \002{0}\002 has been sent."), na->GetNick());
 		}
 	}
@@ -109,7 +110,7 @@ class NSResetPass : public Module
 					reset.Unset(nc);
 					nc->SetUnconfirmed(false);
 
-					Log(LOG_COMMAND, source, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify as " << na->GetNick();
+					command->logger.Command(LogType::COMMAND, source, _("{source} used {command} and confirmed password reset to forcefully identify as {0}"), na->GetNick());
 
 					if (source.GetUser())
 					{

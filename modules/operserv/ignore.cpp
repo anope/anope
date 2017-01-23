@@ -155,7 +155,7 @@ class OSIgnoreService : public IgnoreService
 
 			if (id->GetTime() && !Anope::NoExpire && id->GetTime() <= Anope::CurTime)
 			{
-				Log(LOG_NORMAL, "expire/ignore", Config->GetClient("OperServ")) << "Expiring ignore entry " << id->GetMask();
+				this->GetOwner()->logger.Bot("OperServ").Category("expire/ignore").Log(_("Expiring ignore for {0}"), id->GetMask());
 				id->Delete();
 			}
 			else
@@ -244,12 +244,14 @@ class CommandOSIgnore : public Command
 		if (!t)
 		{
 			source.Reply(_("\002{0}\002 will now permanently be ignored."), mask);
-			Log(LOG_ADMIN, source, this) << "to add a permanent ignore for " << mask;
+
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add a permanent ignore for {0}"), mask);
 		}
 		else
 		{
 			source.Reply(_("\002{0}\002 will now be ignored for \002{1}\002."), mask, Anope::Duration(t, source.GetAccount()));
-			Log(LOG_ADMIN, source, this) << "to add an ignore on " << mask << " for " << Anope::Duration(t);
+
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add an ignore on {0} for {1}"), mask, Anope::Duration(t));
 		}
 	}
 
@@ -261,7 +263,7 @@ class CommandOSIgnore : public Command
 		{
 			if (id->GetTime() && !Anope::NoExpire && id->GetTime() <= Anope::CurTime)
 			{
-				Log(LOG_NORMAL, "expire/ignore", Config->GetClient("OperServ")) << "Expiring ignore entry " << id->GetMask();
+				this->GetOwner()->logger.Bot("OperServ").Category("expire/ignore").Log(_("Expiring ignore entry {0}"), id->GetMask());
 				id->Delete();
 			}
 		}
@@ -321,7 +323,8 @@ class CommandOSIgnore : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		Log(LOG_ADMIN, source, this) << "to remove an ignore on " << mask;
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove an ignore on {0}"), mask);
+
 		source.Reply(_("\002{0}\002 will no longer be ignored."), mask);
 		ign->Delete();
 	}
@@ -334,7 +337,8 @@ class CommandOSIgnore : public Command
 		for (Ignore *ign : Serialize::GetObjects<Ignore *>())
 			ign->Delete();
 
-		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to CLEAR the ignore list"));
+
 		source.Reply(_("Ignore list has been cleared."));
 	}
 

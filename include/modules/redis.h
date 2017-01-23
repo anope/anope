@@ -54,14 +54,16 @@ namespace Redis
 
 	class Interface
 	{
-	 public:
 		Module *owner;
 
+	 public:
 		Interface(Module *m) : owner(m) { }
 		virtual ~Interface() = default;
 
+		Module *GetOwner() const { return owner; }
+
 		virtual void OnResult(const Reply &r) anope_abstract;
-		virtual void OnError(const Anope::string &error) { Log(owner) << error; }
+		virtual void OnError(const Anope::string &error) { owner->logger.Log(error); }
 	};
 
 	class FInterface : public Interface

@@ -40,7 +40,7 @@ int OperCount = 0;
 
 std::list<User *> User::quitting_users;
 
-User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &uip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickServ::Account *account) : ip(uip)
+User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &uip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickServ::Account *account) : ip(uip), logger(this)
 {
 	if (snick.empty() || sident.empty() || shost.empty())
 		throw CoreException("Bad args passed to User::User");
@@ -68,7 +68,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	if (!suid.empty())
 		UserListByUID[suid] = this;
 	if (old == UserListByNick.size())
-		Log(LOG_DEBUG) << "Duplicate user " << snick << " in user table?";
+		Anope::Logger.Debug("Duplicate user {0} in user table?", snick);
 
 	this->Login(account);
 	this->UpdateHost();
@@ -77,7 +77,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	{
 		++sserver->users;
 		if (server->IsSynced())
-			Log(this, "connect") << (!vhost.empty() && vhost != host ? "(" + vhost + ") " : "") << "(" << srealname << ") " << (!uip.empty() && uip != host ? "[" + uip + "] " : "") << "connected to the network (" << sserver->GetName() << ")";
+			logger.Category("connect").Log(_("{0} ({1}) ({2}) [{3}] connected to the network ({4})"), this->GetMask(), vhost.empty() ? host : vhost, srealname, uip.empty() ? host : uip, sserver->GetName());
 	}
 
 	bool exempt = false;
@@ -143,7 +143,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		throw CoreException("User::ChangeNick() got a bad argument");
 
 	this->super_admin = false;
-	Log(this, "nick") << "(" << this->realname << ") changed nick to " << newnick;
+	logger.Category("nick").Log(_("{0} ({1}) changed nick to {2}"), this->GetMask(), this->realname, newnick);
 
 	Anope::string old = this->nick;
 	this->timestamp = ts;
@@ -196,7 +196,7 @@ void User::SetDisplayedHost(const Anope::string &shost)
 
 	this->vhost = shost;
 
-	Log(this, "host") << "changed vhost to " << shost;
+	logger.Category("host").Log(_("{0} changed vhost to {1}"), this->GetMask(), shost);
 
 	EventManager::Get()->Dispatch(&Event::SetDisplayedHost::OnSetDisplayedHost, this);
 
@@ -220,7 +220,7 @@ void User::SetCloakedHost(const Anope::string &newhost)
 
 	chost = newhost;
 
-	Log(this, "host") << "changed cloaked host to " << newhost;
+	logger.Category("host").Log(_("{0} changed cloaked host to {1}"), this->GetMask(), newhost);
 
 	this->UpdateHost();
 }
@@ -242,7 +242,7 @@ void User::SetVIdent(const Anope::string &sident)
 {
 	this->vident = sident;
 
-	Log(this, "ident") << "changed vident to " << sident;
+	logger.Category("ident").Log(_("{0} changed vident to {1}"), this->GetMask(), sident);
 
 	this->UpdateHost();
 }
@@ -259,7 +259,7 @@ void User::SetIdent(const Anope::string &sident)
 {
 	this->ident = sident;
 
-	Log(this, "ident") << "changed real ident to " << sident;
+	logger.Category("ident").Log(_("{0} changed real ident to {1}"), this->GetMask(), sident);
 
 	this->UpdateHost();
 }
@@ -292,7 +292,7 @@ void User::SetRealname(const Anope::string &srealname)
 	if (na && (this->IsIdentified(true) || this->IsRecognized()))
 		na->SetLastRealname(srealname);
 
-	Log(this, "realname") << "changed realname to " << srealname;
+	logger.Category("realname").Log(_("{0} changed realname to {1}"), this->GetMask(), srealname);
 }
 
 User::~User()
@@ -300,7 +300,7 @@ User::~User()
 	if (this->server != NULL)
 	{
 		if (this->server->IsSynced())
-			Log(this, "disconnect") << "(" << this->realname << ") disconnected from the network (" << this->server->GetName() << ")";
+			logger.Category("disconnect").Log(_("{0} ({1}) disconnected from the network ({2})"), this->GetMask(), this->realname, this->server->GetName());
 		--this->server->users;
 	}
 
@@ -421,7 +421,7 @@ void User::Login(NickServ::Account *core)
 	this->UpdateHost();
 
 	if (this->server->IsSynced())
-		Log(this, "account") << "is now identified as " << this->nc->GetDisplay();
+		logger.Category("account").Log(_("{0} is now identified as {1}"), this->GetMask(), this->nc->GetDisplay());
 
 	EventManager::Get()->Dispatch(&Event::UserLogin::OnUserLogin, this);
 }
@@ -431,7 +431,7 @@ void User::Logout()
 	if (!this->nc)
 		return;
 
-	Log(this, "account") << "is no longer identified as " << this->nc->GetDisplay();
+	logger.Category("account").Log(_("{0} is no longer identified as {1}"), this->GetMask(), this->nc->GetDisplay());
 
 	auto it = std::find(this->nc->users.begin(), this->nc->users.end(), this);
 	if (it != this->nc->users.end())
@@ -687,7 +687,7 @@ void User::SetModesInternal(const MessageSource &source, const char *umodes, ...
 	va_end(args);
 
 	if (this->server && this->server->IsSynced() && Anope::string(buf) != "+")
-		Log(this, "mode") << "changes modes to " << buf;
+		logger.Category("mode").Log(_("{0} changes mode to {1}"), this->GetMask(), buf);
 
 	spacesepstream sep(buf);
 	sep.GetToken(modebuf);
@@ -771,11 +771,11 @@ void User::KillInternal(const MessageSource &source, const Anope::string &reason
 {
 	if (this->quit)
 	{
-		Log(LOG_DEBUG) << "Duplicate quit for " << this->nick;
+		Anope::Logger.Debug("Duplicate quit for {0}", this->nick);
 		return;
 	}
 
-	Log(this, "killed") << "was killed by " << source.GetName() << " (Reason: " << reason << ")";
+	logger.Category("killed").Log(_("{0} was killed by {1} (Reason: {2})"), this->GetMask(), source.GetName(), reason);
 
 	this->Quit(reason);
 }
@@ -784,7 +784,7 @@ void User::Quit(const Anope::string &reason)
 {
 	if (this->quit)
 	{
-		Log(LOG_DEBUG) << "Duplicate quit for " << this->nick;
+		Anope::Logger.Debug("Duplicate quit for {0}", this->nick);
 		return;
 	}
 
@@ -799,7 +799,7 @@ bool User::Quitting() const
 	return this->quit;
 }
 
-Anope::string User::Mask() const
+Anope::string User::WildMask() const
 {
 	Anope::string mask;
 	const Anope::string &mident = this->GetIdent();
@@ -813,7 +813,7 @@ Anope::string User::Mask() const
 	sockaddrs addr(mhost);
 	if (addr.valid() && addr.sa.sa_family == AF_INET)
 	{
-		size_t dot = mhost.find('.');
+		size_t dot = mhost.rfind('.');
 		mask += mhost.substr(0, dot) + (dot == Anope::string::npos ? "" : ".*");
 	}
 	else

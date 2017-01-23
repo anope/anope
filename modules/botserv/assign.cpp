@@ -80,7 +80,7 @@ class CommandBSAssign : public Command
 		}
 
 		bool override = !access.HasPriv("ASSIGN");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << bi->nick;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to assign {0}"), bi->nick);
 
 		bi->Assign(source.GetUser(), ci);
 		source.Reply(_("Bot \002{0}\002 has been assigned to \002{1}\002."), bi->nick, ci->GetName());
@@ -147,7 +147,7 @@ class CommandBSUnassign : public Command
 		}
 
 		bool override = !access.HasPriv("ASSIGN");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << ci->GetBot()->nick;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to unassign {0}"), ci->GetBot()->nick);
 
 		ServiceBot *bi = ci->GetBot();
 		bi->UnAssign(source.GetUser(), ci);
@@ -192,7 +192,7 @@ class CommandBSSetNoBot : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			Log(LOG_ADMIN, source, this, ci) << "to enable nobot";
+			logger.Command(LogType::ADMIN, source, ci, _("{source} used {command} on {channel} to enable nobot"));
 
 			ci->SetS<bool>("BS_NOBOT", true);
 			if (ci->GetBot())
@@ -201,7 +201,7 @@ class CommandBSSetNoBot : public Command
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			Log(LOG_ADMIN, source, this, ci) << "to disable nobot";
+			logger.Command(LogType::ADMIN, source, ci, _("{source} used {command} on {channel} to disable nobot"));
 
 			ci->UnsetS<bool>("BS_NOBOT");
 			source.Reply(_("No-bot mode is now \002off\002 for \002{0}\002."), ci->GetName());

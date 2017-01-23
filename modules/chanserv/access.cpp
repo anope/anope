@@ -213,7 +213,8 @@ class CommandCSAccess : public Command
 
 		EventManager::Get()->Dispatch(&Event::AccessAdd::OnAccessAdd, ci, source, access);
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << " with level " << level;
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to add {0} with level {1}"), mask, level);
+
 		if (p != NULL)
 			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 with privilege \002{2}\002 (level \002{3}\002)."), access->Mask(), ci->GetName(), p->name, level);
 		else
@@ -283,7 +284,7 @@ class CommandCSAccess : public Command
 						source.Reply(_("There are no entries matching \002{0}\002 on the access list of \002{1}\002."), mask, ci->GetName());
 					else
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << nicks;
+						logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"), mask);
 
 						if (deleted == 1)
 							source.Reply(_("Deleted \0021\002 entry from the access list of \002{0}\002."), ci->GetName());
@@ -308,7 +309,7 @@ class CommandCSAccess : public Command
 					{
 						source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), access->Mask(), ci->GetName());
 						bool override = !u_access.founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->Mask().equals_ci(source.nc->GetDisplay());
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->Mask();
+						logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {3}"), access->Mask());
 
 						EventManager::Get()->Dispatch(&Event::AccessDel::OnAccessDel, ci, source, access);
 						delete access;
@@ -458,7 +459,7 @@ class CommandCSAccess : public Command
 		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->GetName());
 
 		bool override = !source.IsFounder(ci);
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to clear the access list"));
 	}
 
  public:
@@ -672,7 +673,7 @@ class CommandCSLevels : public Command
 		else
 		{
 			bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << p->name << " to level " << level;
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to set {0} to level {1}"), p->name, level);
 
 			ci->SetLevel(p->name, level);
 			EventManager::Get()->Dispatch(&Event::LevelChange::OnLevelChange, source, ci, p->name, level);
@@ -699,7 +700,7 @@ class CommandCSLevels : public Command
 		if (p != NULL)
 		{
 			bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable " << p->name;
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable {0}"), p->name);
 
 			ci->SetLevel(p->name, ChanServ::ACCESS_INVALID);
 			EventManager::Get()->Dispatch(&Event::LevelChange::OnLevelChange, source, ci, p->name, ChanServ::ACCESS_INVALID);
@@ -754,7 +755,7 @@ class CommandCSLevels : public Command
 	void DoReset(CommandSource &source, ChanServ::Channel *ci)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to reset all levels";
+		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to reset all levels"));
 
 		ci->ClearLevels();
 		EventManager::Get()->Dispatch(&Event::LevelChange::OnLevelChange, source, ci, "ALL", 0);

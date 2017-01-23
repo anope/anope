@@ -181,7 +181,7 @@ class CommandNSAJoin : public Command
 			return;
 
 		addedchans = addedchans.substr(0, addedchans.length() - 2);
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD channel " << addedchans << " to " << nc->GetDisplay();
+		logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to add channel {2} from {3}"), addedchans, nc->GetDisplay());
 		source.Reply(_("\002{0}\002 added to the auto join list of \002{1}\002."), addedchans, nc->GetDisplay());
 	}
 
@@ -218,7 +218,7 @@ class CommandNSAJoin : public Command
 			return;
 
 		delchans = delchans.substr(0, delchans.length() - 2);
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE channel " << delchans << " from " << nc->GetDisplay();
+		logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to delete channel {2} from {3}"), delchans, nc->GetDisplay());
 		source.Reply(_("\002{0}\002 was removed from the auto join list of \002{1}\002."), delchans, nc->GetDisplay());
 	}
 

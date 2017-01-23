@@ -302,7 +302,7 @@ class ESHA256 : public Module
 
 		std::stringstream buf;
 		buf << "sha256:" << Anope::Hex(reinterpret_cast<const char *>(hash.first), hash.second) << ":" << GetIVString();
-		Log(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
+		logger.Debug2("hashed password from [{0}] to [{1}]", src, buf.str());
 		dest = buf.str();
 		return EVENT_ALLOW;
 	}

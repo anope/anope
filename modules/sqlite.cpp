@@ -139,7 +139,7 @@ class ModuleSQLite : public Module
 
 			if (i == num)
 			{
-				Log(LOG_NORMAL, "sqlite") << "SQLite: Removing server connection " << cname;
+				logger.Log("Removing server connection {0}", cname);
 
 				delete s;
 				this->SQLiteServices.erase(cname);
@@ -160,11 +160,11 @@ class ModuleSQLite : public Module
 					SQLiteService *ss = new SQLiteService(this, connname, database);
 					this->SQLiteServices[connname] = ss;
 
-					Log(LOG_NORMAL, "sqlite") << "SQLite: Successfully added database " << database;
+					logger.Log(_("Successfully added database {0}"), database);
 				}
 				catch (const SQL::Exception &ex)
 				{
-					Log(LOG_NORMAL, "sqlite") << "SQLite: " << ex.GetReason();
+					logger.Log(ex.GetReason());
 				}
 			}
 		}
@@ -189,7 +189,7 @@ SQLiteService::SQLiteService(Module *o, const Anope::string &n, const Anope::str
 
 	int ret = sqlite3_create_function_v2(this->sql, "anope_canonicalize", 1, SQLITE_DETERMINISTIC, NULL, Canonicalize, NULL, NULL, NULL);
 	if (ret != SQLITE_OK)
-		Log(LOG_DEBUG) << "Unable to add anope_canonicalize function: " << sqlite3_errmsg(this->sql);
+		o->logger.Debug("Unable to add anope_canonicalize function: {0}", sqlite3_errmsg(this->sql));
 }
 
 SQLiteService::~SQLiteService()
@@ -216,7 +216,7 @@ Result SQLiteService::RunQuery(const Query &query)
 	{
 		const char *msg = sqlite3_errmsg(this->sql);
 
-		Log(LOG_DEBUG) << "sqlite: error in query " << real_query << ": " << msg;
+		this->GetOwner()->logger.Debug("error in query {0}: {1}", real_query, msg);
 
 		return SQLiteResult(query, real_query, msg);
 	}
@@ -227,9 +227,9 @@ Result SQLiteService::RunQuery(const Query &query)
 	sqlite3_finalize(stmt);
 
 	if (!result.GetError().empty())
-		Log(LOG_DEBUG) << "sqlite: error executing query " << real_query << ": " << result.GetError();
+		this->GetOwner()->logger.Debug("error executing query {0}: {1}", real_query, result.GetError());
 	else
-		Log(LOG_DEBUG) << "sqlite: executed: " << real_query;
+		this->GetOwner()->logger.Debug("executed: {0}", real_query);
 
 	return result;
 }

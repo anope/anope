@@ -42,7 +42,7 @@ bool ConnectionSocket::Process()
 	}
 	catch (const SocketException &ex)
 	{
-		Log() << ex.GetReason();
+		Anope::Logger.Log(ex.GetReason());
 	}
 	return false;
 }
@@ -62,7 +62,7 @@ void ConnectionSocket::OnConnect()
 
 void ConnectionSocket::OnError(const Anope::string &error)
 {
-	Log(LOG_DEBUG) << "Socket error: " << error;
+	Anope::Logger.Debug("Socket error: {0}", error);
 }
 
 ClientSocket::ClientSocket(ListenSocket *l, const sockaddrs &addr) : ls(l), clientaddr(addr)
@@ -82,7 +82,7 @@ bool ClientSocket::Process()
 	}
 	catch (const SocketException &ex)
 	{
-		Log() << ex.GetReason();
+		Anope::Logger.Log(ex.GetReason());
 	}
 	return false;
 }
@@ -102,6 +102,6 @@ void ClientSocket::OnAccept()
 
 void ClientSocket::OnError(const Anope::string &error)
 {
-	Log(LOG_DEBUG) << "Socket error: " << error;
+	Anope::Logger.Debug("Socket error: {0}", error);
 }
 

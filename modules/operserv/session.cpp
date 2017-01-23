@@ -303,7 +303,7 @@ class CommandOSSession : public Command
 	{
 		const Anope::string &cmd = params[0];
 
-		Log(LOG_ADMIN, source, this) << cmd << " " << params[1];
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} {0} {1}"), cmd, params[1]);
 
 		if (!session_limit)
 			source.Reply(_("Session limiting is disabled."));
@@ -422,7 +422,8 @@ class CommandOSException : public Command
 			if (MOD_RESULT == EVENT_STOP) 
 				return;
 
-			Log(LOG_ADMIN, source, this) << "to set the session limit for " << mask << " to " << limit;
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} to set the session limit for {0} to {1}"), mask, limit);
+
 			source.Reply(_("Session limit for \002{0}\002 set to \002{1}\002."), mask, limit);
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
@@ -452,7 +453,7 @@ class CommandOSException : public Command
 
 					Exception *e = exceptions[number - 1];
 
-					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << e->GetMask();
+					logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove the session limit exception for {0}"), e->GetMask());
 
 					++deleted;
 					DoDel(source, e);
@@ -473,7 +474,8 @@ class CommandOSException : public Command
 			for (Exception *e : Serialize::GetObjects<Exception *>())
 				if (mask.equals_ci(e->GetMask()))
 				{
-					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << mask;
+					logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove the session limit exception for {0}"), e->GetMask());
+
 					DoDel(source, e);
 					source.Reply(_("\002{0}\002 deleted from session-limit exception list."), mask);
 					found = true;
@@ -728,7 +730,7 @@ class OSSession : public Module
 					akills->AddXLine(x);
 					akills->Send(NULL, x);
 
-					Log(OperServ, "akill/session") << "Added a temporary AKILL for \002" << akillmask << "\002 due to excessive connections";
+					logger.Bot(OperServ).Category("akill/session").Log(_("Added a temporary AKILL for \002{0}\002 due to excessive connections"), akillmask);
 				}
 				else
 				{
@@ -776,7 +778,7 @@ class OSSession : public Module
 				continue;
 
 			ServiceBot *OperServ = Config->GetClient("OperServ");
-			Log(OperServ, "expire/exception") << "Session exception for " << e->GetMask() << " has expired.";
+			logger.Bot(OperServ).Category("expire/exception").Log(_("Session exception for {0} has expired."), e->GetMask());
 			e->Delete();
 		}
 	}

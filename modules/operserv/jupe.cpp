@@ -42,7 +42,7 @@ class CommandOSJupe : public Command
 
 		if (server == Me || server == Servers::GetUplink() || server->IsULined())
 		{
-			source.Reply(_("You can not jupe Servoces or its uplink server."));
+			source.Reply(_("You can not jupe services, it's uplink, or any U:lined servers."));
 			return;
 		}
 
@@ -63,7 +63,7 @@ class CommandOSJupe : public Command
 		Server *juped_server = new Server(Me, jserver, 1, rbuf, sid, true);
 		IRCD->Send<messages::MessageServer>(juped_server);
 
-		Log(LOG_ADMIN, source, this) << "on " << jserver << " (" << rbuf << ")";
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} ({1}"), jserver, rbuf);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

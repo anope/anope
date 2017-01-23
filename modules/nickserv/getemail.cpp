@@ -33,7 +33,7 @@ class CommandNSGetEMail : public Command
 		const Anope::string &email = params[0];
 		int j = 0;
 
-		Log(LOG_ADMIN, source, this) << "on " << email;
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0}"), email);
 
 		for (NickServ::Account *nc : NickServ::service->GetAccountList())
 			if (!nc->GetEmail().empty() && Anope::Match(nc->GetEmail(), email))

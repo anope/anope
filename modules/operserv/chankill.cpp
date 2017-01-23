@@ -109,7 +109,7 @@ class CommandOSChanKill : public Command
 			akills->OnMatch(uc->user, x);
 		}
 
-		Log(LOG_ADMIN, source, this) << "on " << c->name << " (" << realreason << ")";
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} to {0} ({1})"), c->name, realreason);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

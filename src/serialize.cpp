@@ -56,7 +56,7 @@ void Serialize::GC()
 			continue;
 		}
 
-		Log(LOG_DEBUG_2) << "garbage collected object " << o->id;
+		Anope::Logger.Debug2("garbage collected object {0}", o->id);
 
 		it = objects.erase(it);
 		delete o;
@@ -123,7 +123,7 @@ Object::Object(TypeBase *type)
 
 	type->objects.insert(this);
 
-	Log(LOG_DEBUG_2) << "Creating object id #" << id << " address " << static_cast<void *>(this) << " type " << type->GetName();
+	Anope::Logger.Debug2("Creating object id #{0} address {1} type {2}", id, static_cast<void *>(this), type->GetName());
 
 	EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializableCreate, this);
 }
@@ -137,12 +137,12 @@ Object::Object(TypeBase *type, ID i)
 
 	type->objects.insert(this);
 
-	Log(LOG_DEBUG_2) << "Creating object from id #" << id << " address " << static_cast<void *>(this) << " type " << type->GetName();
+	Anope::Logger.Debug2("Creating object from id #{0} address {1} type {2}", id, static_cast<void *>(this), type->GetName());
 }
 
 Object::~Object()
 {
-	Log(LOG_DEBUG_2) << "Destructing object id #" << id << " address " << static_cast<void *>(this) << " type " << s_type->GetName();
+	Anope::Logger.Debug2("Destructing object id #{0} address {2} type {3}", id, static_cast<void *>(this), s_type->GetName());
 
 	/* Remove in memory edges */
 	std::map<TypeBase *, std::vector<Edge>> copy = edges;
@@ -151,12 +151,12 @@ Object::~Object()
 		{
 			if (!edge.direction)
 			{
-				Log(LOG_DEBUG_2) << "Removing edge from object id #" << edge.other->id << " type " << edge.other->GetSerializableType()->GetName() << " on field " << edge.field->serialize_name;
+				Anope::Logger.Debug2("Removing edge from object id #{0} type {1} on field {2}", edge.other->id, edge.other->GetSerializableType()->GetName(), edge.field->serialize_name);
 				edge.other->RemoveEdge(this, edge.field);
 			}
 			else
 			{
-				Log(LOG_DEBUG_2) << "Removing edge to object id #" << edge.other->id << " type " << edge.other->GetSerializableType()->GetName() << " on field " << edge.field->serialize_name;
+				Anope::Logger.Debug2("Removing edge to object id #{0} type {1} on field {2}", edge.other->id, edge.other->GetSerializableType()->GetName(), edge.field->serialize_name);
 				this->RemoveEdge(edge.other, edge.field);
 			}
 		}
@@ -167,7 +167,7 @@ Object::~Object()
 
 void Object::Delete()
 {
-	Log(LOG_DEBUG_2) << "Deleting object id #" << id << " type " << s_type->GetName();
+	Anope::Logger.Debug2("Deleting object id #{0} type {1}", id, s_type->GetName());
 
 	/* Delete dependant objects */
 	for (const Edge &edge : GetEdges(nullptr))
@@ -180,12 +180,12 @@ void Object::Delete()
 
 		if (field->depends)
 		{
-			Log(LOG_DEBUG_2) << "Deleting dependent object #" << other->id << " type " << other->GetSerializableType()->GetName() << " due to edge on " << field->serialize_name;
+			Anope::Logger.Debug2("Deleting dependent object #{0} type {1} due to edge on {2}", other->id, other->GetSerializableType()->GetName(), field->serialize_name);
 			other->Delete();
 		}
 		else
 		{
-			Log(LOG_DEBUG_2) << "Unsetting field " << field->serialize_name << " on object #" << other->id << " type " << other->GetSerializableType()->GetName();
+			Anope::Logger.Debug2("Unsetting field {0} on object #{1} type {2}", field->serialize_name, other->id, other->GetSerializableType()->GetName());
 			field->UnsetS(other);
 		}
 	}
@@ -210,7 +210,7 @@ void Object::RemoveEdge(Object *other, FieldBase *field)
 	if (it != myedges.end())
 		myedges.erase(it);
 	else
-		Log(LOG_DEBUG_2) << "Unable to locate edge for removal on #" << this->id << " type " << s_type->GetName() << " -> #" << other->id << " type " << other->GetSerializableType()->GetName();
+		Anope::Logger.Debug2("Unable to locate edge for removal on #{0} type {1} -> #{2} type {3}", this->id, s_type->GetName(), other->id, other->GetSerializableType()->GetName());
 
 	if (myedges.empty())
 		this->edges.erase(other->GetSerializableType());
@@ -220,7 +220,7 @@ void Object::RemoveEdge(Object *other, FieldBase *field)
 	if (it != theiredges.end())
 		theiredges.erase(it);
 	else
-		Log(LOG_DEBUG_2) << "Unable to locate edge for removal on #" << this->id << " type " << s_type->GetName() << " <- #" << other->id << " type " << other->GetSerializableType()->GetName();
+		Anope::Logger.Debug2("Unable to locate edge for removal on #{0} type {1} <- #{2} type {3}", this->id, s_type->GetName(), other->id, other->GetSerializableType()->GetName());
 
 	if (theiredges.empty())
 		other->edges.erase(this->GetSerializableType());
@@ -238,7 +238,7 @@ TypeBase::~TypeBase()
 
 void TypeBase::Unregister()
 {
-	Log(LOG_DEBUG_2) << "Unregistering type " << this->GetName();
+	Anope::Logger.Debug2("Unregistering type {0}", this->GetName());
 
 	for (Object *obj : GetObjects<Object *>(this->GetName()))
 		obj->Delete();
@@ -259,7 +259,7 @@ Serialize::FieldBase *TypeBase::GetField(const Anope::string &fname)
 		if (fb->serialize_type == this->GetName() && fb->serialize_name == fname)
 			return fb;
 
-	Log(LOG_DEBUG_2) << "GetField() for unknown field " << fname << " on " << this->GetName();
+	Anope::Logger.Debug2("GetField() for unknown field {0} on {1}", fname, this->GetName());
 
 	return nullptr;
 }
@@ -303,7 +303,7 @@ FieldBase::~FieldBase()
 
 void FieldBase::Unregister()
 {
-	Log(LOG_DEBUG_2) << "Unregistering field " << serialize_name << " on " << serialize_type;
+	Anope::Logger.Debug2("Unregistering field {0} on {1}", serialize_name, serialize_type);
 
 	/* find edges on this field */
 	for (Object *s : Serialize::GetObjects<Object *>(serialize_type))
@@ -312,7 +312,7 @@ void FieldBase::Unregister()
 			for (const Edge &edge : p.second)
 				if (edge.direction && edge.field == this)
 				{
-					Log(LOG_DEBUG_2) << "Removing edge on #" << s->id << " type " << s->GetSerializableType()->GetName() << " -> #" << edge.other->id << " type " << edge.other->GetSerializableType()->GetName();
+					Anope::Logger.Debug2("Removing edge on #{0} type {1} -> #{2} type {3}", s->id, s->GetSerializableType()->GetName(), edge.other->id, edge.other->GetSerializableType()->GetName());
 					s->RemoveEdge(edge.other, edge.field);
 
 					goto cont;
@@ -334,7 +334,7 @@ std::vector<Serialize::TypeBase *> Serialize::GetTypes(const Anope::string &name
 	if (t != nullptr)
 		v.push_back(t);
 	else
-		Log(LOG_DEBUG_2) << "GetTypes for unknown type " << name;
+		Anope::Logger.Debug2("GetTypes for unknown type {0}", name);
 
 	auto its = child_types.equal_range(name);
 	for (; its.first != its.second; ++its.first)

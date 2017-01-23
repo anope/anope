@@ -60,7 +60,7 @@ class CommandOSKick : public Command
 			return;
 		}
 
-		Log(LOG_ADMIN, source, this) << "on " << u2->nick << " in " << c->name << " (" << s << ")";
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} in {1} ({2})"), u2->nick, c->name, s);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

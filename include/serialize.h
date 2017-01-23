@@ -298,7 +298,7 @@ class Serialize::Type : public Base
 
 		if (s->GetSerializableType() != this)
 		{
-			Log(LOG_DEBUG) << "Mismatch for required id " << id << ", is of type " << s->GetSerializableType()->GetName() << " but wants " << this->GetName();
+			Anope::Logger.Debug("Mismatch for required id {0}, is of type {1} but wants {2}", id, s->GetSerializableType()->GetName(), this->GetName());
 			return nullptr;
 		}
 
@@ -649,7 +649,6 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 		}
 		catch (const ConvertException &)
 		{
-			Log(LOG_DEBUG) << "Unable to stringify " << t;
 			return "";
 		}
 	}
@@ -737,7 +736,7 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 			Serialize::TypeBase *base = Serialize::TypeBase::Find(type);
 			if (base == nullptr)
 			{
-				Log(LOG_DEBUG_2) << "OnSerializeGetSerializable returned unknown type " << type;
+				Anope::Logger.Debug2("OnSerializeGetSerializable returned unknown type {0}", type);
 				return nullptr;
 			}
 
@@ -894,7 +893,7 @@ T Serialize::New()
 
 	if (type == nullptr)
 	{
-		Log(LOG_DEBUG) << "Serialize::New with unknown type " << name;
+		Anope::Logger.Debug("Serialize::New with unknown type {0}", name);
 		return nullptr;
 	}
 
@@ -908,7 +907,7 @@ inline std::vector<Serialize::Object *> Serialize::Object::GetRefs(Serialize::Ty
 
 	if (types.empty())
 	{
-		Log(LOG_DEBUG) << "GetRefs for unknown type on #" << this->id << " type " << s_type->GetName() << " named " << type->GetName();
+		Anope::Logger.Debug("GetRefs for unknown type on #{0} type {1} named {2}", this->id, s_type->GetName(), type->GetName());
 		return objs;
 	}
 
@@ -929,7 +928,7 @@ std::vector<T> Serialize::Object::GetRefs()
 
 	if (types.empty())
 	{
-		Log(LOG_DEBUG) << "GetRefs for unknown type on #" << this->id << " type " << s_type->GetName() << " named " << name;
+		Anope::Logger.Debug("GetRefs for unknown type on #{0} type {1} named {2}", this->id, s_type->GetName(), name);
 		return objs;
 	}
 
@@ -947,7 +946,7 @@ void Serialize::Object::SetS(const Anope::string &name, const T &what)
 	FieldBase *field = s_type->GetField(name);
 	if (field == nullptr)
 	{
-		Log(LOG_DEBUG) << "Set for unknown field " << name << " on " << s_type->GetName();
+		Anope::Logger.Debug("Set for unknown field {0} on {1}", name, s_type->GetName());
 		return;
 	}
 
@@ -961,7 +960,7 @@ void Serialize::Object::UnsetS(const Anope::string &name)
 	FieldBase *field = s_type->GetField(name);
 	if (field == nullptr)
 	{
-		Log(LOG_DEBUG) << "Unset for unknown field " << name << " on " << s_type->GetName();
+		Anope::Logger.Debug("Unset for unknown field {0} on {1}", name, s_type->GetName());
 		return;
 	}
 
@@ -974,7 +973,7 @@ inline bool Serialize::Object::HasFieldS(const Anope::string &name)
 	FieldBase *field = s_type->GetField(name);
 	if (field == nullptr)
 	{
-		Log(LOG_DEBUG) << "HasField for unknown field " << name << " on " << s_type->GetName();
+		Anope::Logger.Debug("HasField for unknown field {0} on {1}", name, s_type->GetName());
 		return false;
 	}
 

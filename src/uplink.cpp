@@ -42,7 +42,7 @@ class ReconnectTimer : public Timer
 		}
 		catch (const SocketException &ex)
 		{
-			Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << "): " << ex.GetReason();
+			Anope::Logger.Terminal(_("Unable to connect to uplink #{0} ({1}:{2}): {3}"), Anope::CurrentUplink + 1, Config->Uplinks[Anope::CurrentUplink].host, Config->Uplinks[Anope::CurrentUplink].port, ex.GetReason());
 		}
 	}
 };
@@ -51,7 +51,7 @@ void Uplink::Connect()
 {
 	if (Config->Uplinks.empty())
 	{
-		Log() << "Warning: There are no configured uplinks.";
+		Anope::Logger.Log(_("Warning: There are no configured uplinks."));
 		return;
 	}
 
@@ -65,7 +65,7 @@ void Uplink::Connect()
 		UplinkSock->Bind(Config->GetBlock("serverinfo")->Get<Anope::string>("localhost"));
 	EventManager::Get()->Dispatch(&Event::PreServerConnect::OnPreServerConnect);
 	Anope::string ip = Anope::Resolve(u.host, u.ipv6 ? AF_INET6 : AF_INET);
-	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u.host << " (" << ip << "), port " << u.port;
+	Anope::Logger.Terminal(_("Attempting to connect to uplink #{0} {1} ({2}), port {3}"), Anope::CurrentUplink + 1, u.host, ip, u.port);
 	UplinkSock->Connect(ip, u.port);
 }
 
@@ -82,9 +82,9 @@ UplinkSocket::~UplinkSocket()
 		this->OnError("");
 		Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 		if (protocol && !protocol->name.find("inspircd"))
-			Log(LOG_TERMINAL) << "Check that you have loaded m_spanningtree.so on InspIRCd, and are not connecting Anope to an SSL enabled port without configuring SSL in Anope (or vice versa)";
+			Anope::Logger.Terminal(_("Check that you have loaded m_spanningtree.so on InspIRCd, and are not connecting Anope to an SSL enabled port without configuring SSL in Anope (or vice versa)"));
 		else
-			Log(LOG_TERMINAL) << "Check that you are not connecting Anope to an SSL enabled port without configuring SSL in Anope (or vice versa)";
+			Anope::Logger.Terminal(_("Check that you are not connecting Anope to an SSL enabled port without configuring SSL in Anope (or vice versa)"));
 	}
 
 	if (IRCD && Servers::GetUplink() && Servers::GetUplink()->IsSynced())
@@ -135,7 +135,7 @@ UplinkSocket::~UplinkSocket()
 	{
 		time_t retry = Config->GetBlock("options")->Get<time_t>("retrywait");
 
-		Log() << "Disconnected, retrying in " << retry << " seconds";
+		Anope::Logger.Log(_("Disconnected, retrying in {0} seconds"), retry);
 		new ReconnectTimer(retry);
 	}
 }
@@ -154,15 +154,17 @@ bool UplinkSocket::ProcessRead()
 
 void UplinkSocket::OnConnect()
 {
-	Log(LOG_TERMINAL) << "Successfully connected to uplink #" << (Anope::CurrentUplink + 1) << " " << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port;
+	Anope::Logger.Terminal(_("Successfully connected to uplink #{0} {1}:{2}"), Anope::CurrentUplink + 1, Config->Uplinks[Anope::CurrentUplink].host, Config->Uplinks[Anope::CurrentUplink].port);
 	IRCD->Handshake();
 	EventManager::Get()->Dispatch(&Event::ServerConnect::OnServerConnect);
 }
 
 void UplinkSocket::OnError(const Anope::string &err)
 {
-	Anope::string what = !this->flags[SF_CONNECTED] ? "Unable to connect to" : "Lost connection from";
-	Log(LOG_TERMINAL) << what << " uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << ")" << (!err.empty() ? (": " + err) : "");
+	if (!this->flags[SF_CONNECTED])
+		Anope::Logger.Terminal(_("Unable to connect to uplink #{0} ({1}:{2}): {3}{4}"), Anope::CurrentUplink + 1, Config->Uplinks[Anope::CurrentUplink].host, Config->Uplinks[Anope::CurrentUplink].port, !err.empty() ? (": " + err) : "");
+	else
+		Anope::Logger.Terminal(_("Lost connection from uplink #{0} ({1}:{2}): {3}{4}"), Anope::CurrentUplink + 1, Config->Uplinks[Anope::CurrentUplink].host, Config->Uplinks[Anope::CurrentUplink].port, !err.empty() ? (": " + err) : "");
 	error |= !err.empty();
 }
 
@@ -177,7 +179,7 @@ void Uplink::SendMessage(IRCMessage &message)
 
 		if (s != Me && !s->IsJuped())
 		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << buffer << "\" from " << s->GetName() << " who is not from me?";
+			Anope::Logger.Debug("Attempted to send \"{0}\" from {1} who is not from me?", buffer, s->GetName());
 			return;
 		}
 	}
@@ -187,24 +189,24 @@ void Uplink::SendMessage(IRCMessage &message)
 
 		if (u->server != Me && !u->server->IsJuped())
 		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << buffer << "\" from " << u->nick << " who is not from me?";
+			Anope::Logger.Debug("Attempted to send \"{0}\" from {1} who is not from me?", buffer, u->nick);
 			return;
 		}
 
 		const ServiceBot *bi = source.GetBot();
 		if (bi != NULL && bi->introduced == false)
 		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << buffer << "\" from " << bi->nick << " when not introduced";
+			Anope::Logger.Debug("Attempted to send \"{0}\" from {1} when not introduced", buffer, bi->nick);
 			return;
 		}
 	}
 
 	if (!UplinkSock)
 	{
-		Log(LOG_DEBUG) << "Attempted to send \"" << buffer << "\" with UplinkSock NULL";
+		Anope::Logger.Debug("Attempted to send \"{0}\" when not connected", buffer);
 		return;
 	}
 
 	UplinkSock->Write(buffer);
-	Log(LOG_RAWIO) << "Sent: " << buffer;
+	Anope::Logger.RawIO("Sent: {0}", buffer);
 }

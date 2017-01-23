@@ -140,7 +140,7 @@ class CommandOSMode : public Command
 			}
 
 			if (!log_modes.replace_all_cs("+", "").replace_all_cs("-", "").empty())
-				Log(LOG_ADMIN, source, this) << log_modes << log_params << " on " << (c ? c->name : target);
+				logger.Command(LogType::ADMIN, source, _("{source} used {command} {0} on {1}"), log_modes + log_params, c ? c->name : target);
 		}
 	}
 
@@ -169,16 +169,17 @@ class CommandOSUMode : public Command
 
 		User *u2 = User::Find(target, true);
 		if (!u2)
-			source.Reply(_("\002{0}\002 isn't currently online."), target);
-		else
 		{
-			u2->SetModes(source.service, "%s", modes.c_str());
-			source.Reply(_("Changed usermodes of \002{0}\002 to \002{1}\002."), u2->nick.c_str(), modes.c_str());
-
-			u2->SendMessage(*source.service, _("\002{0}\002 changed your usermodes to \002{1}\002."), source.GetNick(), modes);
-
-			Log(LOG_ADMIN, source, this) << modes << " on " << target;
+			source.Reply(_("\002{0}\002 isn't currently online."), target);
+			return;
 		}
+
+		u2->SetModes(source.service, "%s", modes.c_str());
+		source.Reply(_("Changed usermodes of \002{0}\002 to \002{1}\002."), u2->nick.c_str(), modes.c_str());
+
+		u2->SendMessage(*source.service, _("\002{0}\002 changed your usermodes to \002{1}\002."), source.GetNick(), modes);
+
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0}"), target);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

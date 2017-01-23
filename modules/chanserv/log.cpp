@@ -285,15 +285,24 @@ public:
 				{
 					if (log->GetExtra() == extra)
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to remove logging for " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
-						source.Reply(_("Logging for command \002{0}\002 on \002{1}\002 with log method \002{2}{3}{4}\002 has been removed."), !log->GetCommandName().empty() ? log->GetCommandName() : log->GetServiceName(), !log->GetCommandService().empty() ? log->GetCommandService() : "any service", method, extra.empty() ? "" : " ", extra);
-						delete log;
+						logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to remove logging for {0} with method {1}"),
+							command, method + (extra.empty() ? "" : (" " + extra)));
+
+						source.Reply(_("Logging for command \002{0}\002 on \002{1}\002 with log method \002{2}{3}{4}\002 has been removed."),
+								!log->GetCommandName().empty() ? log->GetCommandName() : log->GetServiceName(),
+								!log->GetCommandService().empty() ? log->GetCommandService() : "any service", method, extra.empty() ? "" : " ", extra);
+						log->Delete();
 					}
 					else
 					{
 						log->SetExtra(extra);
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change logging for " << command << " to method " << method << (extra == "" ? "" : " ") << extra;
-						source.Reply(_("Logging changed for command \002{0}\002 on \002{1}\002, now using log method \002{2}{3}{4]\002."), !log->GetCommandName().empty() ? log->GetCommandName() : log->GetServiceName(), !log->GetCommandService().empty() ? log->GetCommandService() : "any service", method, extra.empty() ? "" : " ", extra);
+
+						logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to change logging for {0} to method {1}"),
+							command, method + (extra.empty() ? "" : (" " + extra)));
+
+						source.Reply(_("Logging changed for command \002{0}\002 on \002{1}\002, now using log method \002{2}{3}{4]\002."),
+								!log->GetCommandName().empty() ? log->GetCommandName() : log->GetServiceName(),
+								!log->GetCommandService().empty() ? log->GetCommandService() : "any service", method, extra.empty() ? "" : " ", extra);
 					}
 					return;
 				}
@@ -310,9 +319,11 @@ public:
 			log->SetCreated(Anope::CurTime);
 			log->SetCreator(source.GetNick());
 
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to log " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
+			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci,
+					_("{source} used {command} on {channel} to log {0} to method {1}"), command, method + (extra.empty() ? "" : (" " + extra)));
 
-			source.Reply(_("Logging is now active for command \002{0}\002 on \002{1}\002, using log method \002{2}{3}{4}\002."), !command_name.empty() ? command_name : service_name, bi ? bi->nick : "any service", method, extra.empty() ? "" : " ", extra);
+			source.Reply(_("Logging is now active for command \002{0}\002 on \002{1}\002, using log method \002{2}{3}{4}\002."),
+					!command_name.empty() ? command_name : service_name, bi ? bi->nick : "any service", method, extra.empty() ? "" : " ", extra);
 		}
 		else
 		{
@@ -423,9 +434,11 @@ class CSLog : public Module
 		}
 	}
 
-	void OnLog(::Log *l) override
+	void OnLog(Logger *l) override
 	{
-		if (l->type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
+#warning "fix log"
+#if 0
+		if (l->type != LogType::COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
 			return;
 
 		std::vector<LogSetting *> ls = l->ci->GetRefs<LogSetting *>();
@@ -463,6 +476,7 @@ class CSLog : public Module
 			else if (log->GetMethod().equals_ci("NOTICE") && l->ci->c)
 				IRCD->SendNotice(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, buffer);
 		}
+#endif
 	}
 };
 

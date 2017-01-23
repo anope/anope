@@ -144,18 +144,18 @@ void Anope::HandleSignal()
 			}
 			catch (const ConfigException &ex)
 			{
-				Log() << "Error reloading configuration file: " << ex.GetReason();
+				Anope::Logger.Log("Error reloading configuration file: {0}", ex.GetReason());
 			}
 			break;
 		}
 		case SIGTERM:
 		case SIGINT:
 #ifndef _WIN32
-			Log() << "Received " << strsignal(Signal) << " signal (" << Signal << "), exiting.";
+			Anope::Logger.Log(_("Received {0} signal ({1}), exiting"), strsignal(Signal), Signal);
 			Anope::QuitReason = Anope::string("Services terminating via signal ") + strsignal(Signal) + " (" + stringify(Signal) + ")";
 #else
-			Log() << "Received signal " << Signal << ", exiting.";
-			Anope::QuitReason = Anope::string("Services terminating via signal ") + stringify(Signal);
+			Anope::Logger.Log(_("Received signal {0}, exiting"), Signal);
+			Anope::QuitReason = "Services terminating via signal " + stringify(Signal);
 #endif
 			Anope::Quitting = true;
 			break;
@@ -248,7 +248,7 @@ static void setuidgid()
 		errno = 0;
 		struct passwd *u = getpwnam(options->Get<Anope::string>("user").c_str());
 		if (u == NULL)
-			Log() << "Unable to setuid to " << options->Get<Anope::string>("user") << ": " << Anope::LastError();
+			Anope::Logger.Log(_("Unable to setuid to {0}: {1}"), options->Get<Anope::string>("user"), Anope::LastError());
 		else
 			uid = u->pw_uid;
 	}
@@ -257,7 +257,7 @@ static void setuidgid()
 		errno = 0;
 		struct group *g = getgrnam(options->Get<Anope::string>("group").c_str());
 		if (g == NULL)
-			Log() << "Unable to setgid to " << options->Get<Anope::string>("group") << ": " << Anope::LastError();
+			Anope::Logger.Log(_("Unable to setgid to {0}: {1}"), options->Get<Anope::string>("group"), Anope::LastError());
 		else
 			gid = g->gr_gid;
 	}
@@ -277,16 +277,16 @@ static void setuidgid()
 	if (static_cast<int>(gid) != -1)
 	{
 		if (setgid(gid) == -1)
-			Log() << "Unable to setgid to " << options->Get<Anope::string>("group") << ": " << Anope::LastError();
+			Anope::Logger.Log(_("Unable to setgid to {0}: {1}"), options->Get<Anope::string>("group"), Anope::LastError());
 		else
-			Log() << "Successfully set group to " << options->Get<Anope::string>("group");
+			Anope::Logger.Log(_("Successfully set group to {0"), options->Get<Anope::string>("group"));
 	}
 	if (static_cast<int>(uid) != -1)
 	{
 		if (setuid(uid) == -1)
-			Log() << "Unable to setuid to " << options->Get<Anope::string>("user") << ": " << Anope::LastError();
+			Anope::Logger.Log(_("Unable to setuid to {0}: {1}"), options->Get<Anope::string>("user"), Anope::LastError());
 		else
-			Log() << "Successfully set user to " << options->Get<Anope::string>("user");
+			Anope::Logger.Log(_("Successfully set user to {0}"), options->Get<Anope::string>("user"));
 	}
 #endif
 }
@@ -303,33 +303,33 @@ void Anope::Init(int ac, char **av)
 
 	if (GetCommandLineArgument("version", 'v'))
 	{
-		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- Built: " << Anope::VersionBuildTime() << " -- Flags: " << Anope::VersionFlags();
+		Anope::Logger.Terminal(_("Anope-{0} -- Built: {1} -- Flags: {2}"), Anope::Version(), Anope::VersionBuildTime(), Anope::VersionFlags());
 		exit(EXIT_SUCCESS);
 	}
 
 	if (GetCommandLineArgument("help", 'h'))
 	{
-		Log(LOG_TERMINAL) << "Anope-" << Anope::Version();
-		Log(LOG_TERMINAL) << "Anope IRC Services (https://anope.org)";
-		Log(LOG_TERMINAL) << "Usage ./" << Anope::ServicesBin << " [options] ...";
-		Log(LOG_TERMINAL) << "-c, --config=filename.conf";
-		Log(LOG_TERMINAL) << "    --confdir=conf file direcory";
-		Log(LOG_TERMINAL) << "    --dbdir=database directory";
-		Log(LOG_TERMINAL) << "-d, --debug[=level]";
-		Log(LOG_TERMINAL) << "-h, --help";
-		Log(LOG_TERMINAL) << "    --localedir=locale directory";
-		Log(LOG_TERMINAL) << "    --logdir=logs directory";
-		Log(LOG_TERMINAL) << "    --modulesdir=modules directory";
-		Log(LOG_TERMINAL) << "-e, --noexpire";
-		Log(LOG_TERMINAL) << "-n, --nofork";
-		Log(LOG_TERMINAL) << "    --nothird";
-		Log(LOG_TERMINAL) << "    --protocoldebug";
-		Log(LOG_TERMINAL) << "-r, --readonly";
-		Log(LOG_TERMINAL) << "-s, --support";
-		Log(LOG_TERMINAL) << "-v, --version";
-		Log(LOG_TERMINAL) << "";
-		Log(LOG_TERMINAL) << "Further support is available from https://anope.org";
-		Log(LOG_TERMINAL) << "Or visit us on IRC at irc.anope.org #anope";
+		Anope::Logger.Terminal(_("Anope-{0}"), Anope::Version());
+		Anope::Logger.Terminal(_("Anope IRC Services (https://anope.org)"));
+		Anope::Logger.Terminal(_("Usage ./{0} [options] ..."), Anope::ServicesBin);
+		Anope::Logger.Terminal(_("-c, --config=filename.conf"));
+		Anope::Logger.Terminal(_("    --confdir=conf file direcory"));
+		Anope::Logger.Terminal(_("    --dbdir=database directory"));
+		Anope::Logger.Terminal(_("-d, --debug[=level]"));
+		Anope::Logger.Terminal(_("-h, --help"));
+		Anope::Logger.Terminal(_("    --localedir=locale directory"));
+		Anope::Logger.Terminal(_("    --logdir=logs directory"));
+		Anope::Logger.Terminal(_("    --modulesdir=modules directory"));
+		Anope::Logger.Terminal(_("-e, --noexpire"));
+		Anope::Logger.Terminal(_("-n, --nofork"));
+		Anope::Logger.Terminal(_("    --nothird"));
+		Anope::Logger.Terminal(_("    --protocoldebug"));
+		Anope::Logger.Terminal(_("-r, --readonly"));
+		Anope::Logger.Terminal(_("-s, --support"));
+		Anope::Logger.Terminal(_("-v, --version"));
+		Anope::Logger.Terminal("");
+		Anope::Logger.Terminal(_("Further support is available from https://anope.org"));
+		Anope::Logger.Terminal(_("Or visit us on IRC at irc.anope.org #anope"));
 		exit(EXIT_SUCCESS);
 	}
 
@@ -417,7 +417,7 @@ void Anope::Init(int ac, char **av)
 		throw CoreException("Unable to chdir to " + Anope::ServicesDir + ": " + Anope::LastError());
 	}
 
-	Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- Built: " << Anope::VersionBuildTime() << " -- Flags: " << Anope::VersionFlags();
+	Anope::Logger.Terminal("Anope-{0} -- Built: {1} -- Flags: {2}", Anope::Version(), Anope::VersionBuildTime(), Anope::VersionFlags());
 
 #ifdef _WIN32
 	if (!SupportedWindowsVersion())
@@ -439,9 +439,9 @@ void Anope::Init(int ac, char **av)
 #endif
 
 #ifdef _WIN32
-	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "\\" << ServicesConf.GetName();
+	Anope::Logger.Terminal("Using configuration file {0}\\{1}", Anope::ConfigDir, ServicesConf.GetName());
 #else
-	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "/" << ServicesConf.GetName();
+	Anope::Logger.Terminal("Using configuration file {0}/{1}", Anope::ConfigDir, ServicesConf.GetName());
 
 	/* Fork to background */
 	if (!Anope::NoFork)
@@ -471,7 +471,7 @@ void Anope::Init(int ac, char **av)
 		}
 		else if (i == -1)
 		{
-			Log() << "Error, unable to fork: " << Anope::LastError();
+			Anope::Logger.Terminal("Error, unable to fork: {0}", Anope::LastError());
 			Anope::NoFork = true;
 		}
 
@@ -499,11 +499,11 @@ void Anope::Init(int ac, char **av)
 	}
 	catch (const ConfigException &ex)
 	{
-		Log(LOG_TERMINAL) << ex.GetReason();
-		Log(LOG_TERMINAL) << "*** Support resources: Read through the anope.conf self-contained";
-		Log(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
-		Log(LOG_TERMINAL) << "*** folder. Visit our portal located at https://anope.org/. Join";
-		Log(LOG_TERMINAL) << "*** our support channel on irc.anope.org #anope.";
+		Anope::Logger.Terminal(ex.GetReason());
+		Anope::Logger.Terminal("*** Support resources: Read through the anope.conf self-contained");
+		Anope::Logger.Terminal("*** documentation. Read the documentation files found in the 'docs'");
+		Anope::Logger.Terminal("*** folder. Visit our portal located at https://anope.org/. Join");
+		Anope::Logger.Terminal("*** our support channel on irc.anope.org #anope.");
 		throw CoreException("Configuration file failed to validate");
 	}
 
@@ -522,7 +522,12 @@ void Anope::Init(int ac, char **av)
 	}
 
 	/* Announce ourselves to the logfile. */
-	Log() << "Anope " << Anope::Version() << " starting up" << (Anope::Debug || Anope::ReadOnly ? " (options:" : "") << (Anope::Debug ? " debug" : "") << (Anope::ReadOnly ? " readonly" : "") << (Anope::Debug || Anope::ReadOnly ? ")" : "");
+	if (Anope::Debug || Anope::ReadOnly)
+		Anope::Logger.Log("Anope {0} starting up ({1})",
+			Anope::Version(),
+			Anope::Format("options:{0}{1}", Anope::Debug ? " debug" : "", Anope::ReadOnly ? " readonly" : ""));
+	else
+		Anope::Logger.Log("Anope {0} starting up", Anope::Version());
 
 	InitSignals();
 
@@ -536,7 +541,7 @@ void Anope::Init(int ac, char **av)
 	ModeManager::Apply(nullptr);
 
 	/* load modules */
-	Log() << "Loading modules...";
+	Anope::Logger.Log("Loading modules...");
 	for (int i = 0; i < Config->CountBlock("module"); ++i)
 		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<Anope::string>("name"), NULL);
 
@@ -556,7 +561,7 @@ void Anope::Init(int ac, char **av)
 	/* Write our PID to the PID file. */
 	write_pidfile();
 
-	Log() << "Using IRCd protocol " << protocol->name;
+	Anope::Logger.Log("Using IRCd protocol {0}", protocol->GetName());
 
 	/* Auto assign sid if applicable */
 	if (IRCD->RequiresID)
@@ -576,10 +581,9 @@ void Anope::Init(int ac, char **av)
 	}
 
 	/* Load up databases */
-	Log() << "Loading databases...";
-	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::LoadDatabase::OnLoadDatabase);;
-	static_cast<void>(MOD_RESULT);
-	Log() << "Databases loaded";
+	Anope::Logger.Log("Loading databases...");
+	EventManager::Get()->Dispatch(&Event::LoadDatabase::OnLoadDatabase);;
+	Anope::Logger.Log("Databases loaded");
 
 	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 		it->second->Sync();

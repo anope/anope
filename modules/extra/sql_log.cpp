@@ -79,28 +79,28 @@ class SQLLog : public Module
 
 		switch (l->type)
 		{
-			case LOG_ADMIN:
+			case LogType::ADMIN:
 				insert.SetValue("type", "ADMIN");
 				break;
-			case LOG_OVERRIDE:
+			case LogType::OVERRIDE:
 				insert.SetValue("type", "OVERRIDE");
 				break;
-			case LOG_COMMAND:
+			case LogType::COMMAND:
 				insert.SetValue("type", "COMMAND");
 				break;
-			case LOG_SERVER:
+			case LogType::SERVER:
 				insert.SetValue("type", "SERVER");
 				break;
-			case LOG_CHANNEL:
+			case LogType::CHANNEL:
 				insert.SetValue("type", "CHANNEL");
 				break;
-			case LOG_USER:
+			case LogType::USER:
 				insert.SetValue("type", "USER");
 				break;
-			case LOG_MODULE:
+			case LogType::MODULE:
 				insert.SetValue("type", "MODULE");
 				break;
-			case LOG_NORMAL:
+			case LogType::NORMAL:
 				insert.SetValue("type", "NORMAL");
 				break;
 			default:

@@ -137,7 +137,7 @@ T* Extensible::GetExt(const Anope::string &name)
 	if (ref)
 		return ref->Get(this);
 
-	Log(LOG_DEBUG) << "GetExt for nonexistent type " << name << " on " << static_cast<const void *>(this);
+	Anope::Logger.Debug("GetExt for nonexistent type {0} on {1}", name, static_cast<void *>(this));
 	return NULL;
 }
 
@@ -151,7 +151,7 @@ T* Extensible::Extend(const Anope::string &name, const T &what)
 		return ref->Get(this);
 	}
 
-	Log(LOG_DEBUG) << "Extend for nonexistent type " << name << " on " << static_cast<void *>(this);
+	Anope::Logger.Debug("Extend for nonexistent type {0} on {1}", name, static_cast<void *>(this));
 	return NULL;
 }
 
@@ -162,6 +162,6 @@ void Extensible::Shrink(const Anope::string &name)
 	if (ref)
 		ref->Unset(this);
 	else
-		Log(LOG_DEBUG) << "Shrink for nonexistent type " << name << " on " << static_cast<void *>(this);
+		Anope::Logger.Debug("Shrink for nonexistent type {0} on {1}", name, static_cast<void *>(this));
 }
 

@@ -79,7 +79,7 @@ class CommandCSKick : public Command
 			else
 			{
 				bool override = !u_access.HasPriv("KICK") || (u != u2 && ci->IsPeace() && u2_access >= u_access);
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << u2->nick;
+				logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} for {0}"), u2->nick);
 
 				if (ci->IsSignKick() || (ci->IsSignKickLevel() && !u_access.HasPriv("SIGNKICK")))
 				{
@@ -96,7 +96,7 @@ class CommandCSKick : public Command
 		{
 			Anope::string mask = IRCD->NormalizeMask(target);
 
-			Log(LOG_COMMAND, source, this, ci) << "for " << mask;
+			logger.Command(LogType::COMMAND, source, ci, _("{source} used {command} on {channel} for {0}"), mask);
 
 			int matched = 0, kicked = 0;
 			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end;)

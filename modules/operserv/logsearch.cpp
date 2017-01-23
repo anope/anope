@@ -95,14 +95,16 @@ class CommandOSLogSearch : public Command
 		for (; i < params.size(); ++i)
 			search_string += " " + params[i];
 
-		Log(LOG_ADMIN, source, this) << "for " << search_string;
+		logger.Command(LogType::ADMIN, source, _("{source} used {command} for {2}"), search_string);
 
 		const Anope::string &logfile_name = Config->GetModule(this->GetOwner())->Get<Anope::string>("logname");
 		std::list<Anope::string> matches;
 		for (int d = days - 1; d >= 0; --d)
 		{
 			Anope::string lf_name = CreateLogName(logfile_name, Anope::CurTime - (d * 86400));
-			Log(LOG_DEBUG) << "Searching " << lf_name;
+
+			this->logger.Debug("Searching {0}", lf_name);
+
 			std::fstream fd(lf_name.c_str(), std::ios_base::in);
 			if (!fd.is_open())
 				continue;

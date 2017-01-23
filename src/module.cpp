@@ -25,7 +25,10 @@
 # include <libintl.h>
 #endif
 
-Module::Module(const Anope::string &modname, const Anope::string &, ModType modtype) : name(modname), type(modtype)
+Module::Module(const Anope::string &modname, const Anope::string &, ModType modtype)
+	: name(modname)
+	, type(modtype)
+	, logger(this)
 {
 	this->handle = NULL;
 	this->permanent = false;
@@ -33,7 +36,9 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 	this->SetVersion(Anope::Version());
 
 	if (type & VENDOR)
+	{
 		this->SetAuthor("Anope");
+	}
 	else
 	{
 		/* Not vendor implies third */
@@ -50,7 +55,7 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 	ModuleManager::Modules.push_back(this);
 
 #if GETTEXT_FOUND
-	for (unsigned i = 0; i < Language::Languages.size(); ++i)
+	for (unsigned int i = 0; i < Language::Languages.size(); ++i)
 	{
 		/* Remove .UTF-8 or any other suffix */
 		Anope::string lang;
@@ -59,10 +64,12 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 		if (Anope::IsFile(Anope::LocaleDir + "/" + lang + "/LC_MESSAGES/" + modname + ".mo"))
 		{
 			if (!bindtextdomain(this->name.c_str(), Anope::LocaleDir.c_str()))
-				Log() << "Error calling bindtextdomain, " << Anope::LastError();
+			{
+				Anope::Logger.Log("Error calling bindtextdomain, {0}", Anope::LastError());
+			}
 			else
 			{
-				Log() << "Found language file " << lang << " for " << modname;
+				Anope::Logger.Log("Found language file {0} for {1}", lang, modname);
 				Language::Domains.push_back(modname);
 			}
 			break;
@@ -85,6 +92,11 @@ Module::~Module()
 	if (dit != Language::Domains.end())
 		Language::Domains.erase(dit);
 #endif
+}
+
+const Anope::string &Module::GetName() const
+{
+	return this->name;
 }
 
 void Module::SetPermanent(bool state)

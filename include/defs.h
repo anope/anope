@@ -42,6 +42,7 @@ class IRCDProto;
 class ListenSocket;
 class Log;
 class LogInfo;
+class Logger;
 namespace NickServ
 {
 	class Account;

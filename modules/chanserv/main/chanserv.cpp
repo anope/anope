@@ -346,14 +346,14 @@ class ChanServCore : public Module
 	{
 		if (!params.empty() || source.c || source.service != *ChanServ)
 			return EVENT_CONTINUE;
-		source.Reply(_("\002%s\002 allows you to register and control various\n"
-			"aspects of channels. %s can often prevent\n"
+		source.Reply(_("\002{0}\002 allows you to register and control various\n"
+			"aspects of channels. {1} can often prevent\n"
 			"malicious users from \"taking over\" channels by limiting\n"
 			"who is allowed channel operator privileges. Available\n"
 			"commands are listed below; to use them, type\n"
-			"\002%s%s \037command\037\002. For more information on a\n"
-			"specific command, type \002%s%s HELP \037command\037\002.\n"),
-			ChanServ->nick.c_str(), ChanServ->nick.c_str(), Config->StrictPrivmsg.c_str(), ChanServ->nick.c_str(), Config->StrictPrivmsg.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str(), source.command.c_str());
+			"\002{2}{3} \037command\037\002. For more information on a\n"
+			"specific command, type \002{4}{5} HELP \037command\037\002.\n"),
+			ChanServ->nick, ChanServ->nick, Config->StrictPrivmsg, ChanServ->nick, Config->StrictPrivmsg, ChanServ->nick, ChanServ->nick, source.GetCommand());
 		return EVENT_CONTINUE;
 	}
 

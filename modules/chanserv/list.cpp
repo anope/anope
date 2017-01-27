@@ -207,7 +207,7 @@ class CommandCSSetPrivate : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;

@@ -394,7 +394,7 @@ class CommandBSBot : public Command
 			               "Example:\n"
 			               "         {command} ADD Botox Botox services.anope.org Botox\n"
 			               "         Adds a service bot with nickname \"Botox\", username \"Botox\", hostname \"services.anope.org\", and realname \"Botox\" to the bot list."),
-			               "botserv/bot/add", "command"_kw = source.command);
+			               "botserv/bot/add", "command"_kw = source.GetCommand());
 		else if (subcommand.equals_ci("CHANGE"))
 			source.Reply(_("\002{command} CHANGE\002 allows changing the \037nickname\037, \037username\037, \037hostname\037 and \037realname\037 of bot \037oldnickname\037."
 			               " If a new username, hostname, or realname is specified, then the bot \037nickname\037 will quit and rejoin all of its channels using the new mask."
@@ -404,7 +404,7 @@ class CommandBSBot : public Command
 			               "Example:\n"
 			               "         {command} CHANGE Botox peer connection reset.by peer\n"
 			               "          Renames the bot \"Botox\" to \"peer\" with the given username, hostname, and realname."),
-			               "botserv/bot/change", "command"_kw = source.command);
+			               "botserv/bot/change", "command"_kw = source.GetCommand());
 		else if (subcommand.equals_ci("DEL"))
 			source.Reply(_("\002{command} DEL\002 removes the bot \037nickname\037 from the bot list. The bot will quit from any channels it is in, and will not be replaced."
 			               " This command requires the operator privilege for command \002{0}\002.\n"
@@ -412,7 +412,7 @@ class CommandBSBot : public Command
 			               "Example:\n"
 			               "         {command} DEL peer\n"
 			               "         Removes the bot \"peer\" from the bot list."),
-			               "botserv/bot/del", "command"_kw = source.command);
+			               "botserv/bot/del", "command"_kw = source.GetCommand());
 		else
 		{
 			source.Reply(_("Allows Services Operators to create, modify, and delete bots that users will be able to use on their channels."));
@@ -428,7 +428,7 @@ class CommandBSBot : public Command
 			                       "\n"
 			                       "The \002{command} DEL\002 removes the bot \037nickname\037 from the bot list.\n"
 			                       "\002{msg}{service} {help} {command} DEL\002 for more information."),
-			                       "msg"_kw = Config->StrictPrivmsg, "help"_kw = help->cname, "command"_kw = source.command);
+			                       "msg"_kw = Config->StrictPrivmsg, "help"_kw = help->cname, "command"_kw = source.GetCommand());
 		}
 		return true;
 	}

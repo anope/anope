@@ -120,13 +120,13 @@ class RewriteCommand : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		std::vector<Anope::string> full_params = params;
-		full_params.insert(full_params.begin(), source.command);
+		full_params.insert(full_params.begin(), source.GetCommand());
 
 		Rewrite *r = Rewrite::Match(!source.c ? source.service->nick : "", full_params);
 		if (r != NULL)
 		{
 			Anope::string new_message = r->Process(source, full_params);
-			logger.Debug("Rewrote '{0}' to '{1}' using '{2}'", source.command + (!params.empty() ? " " + params[0] : ""), new_message, r->source_message);
+			logger.Debug("Rewrote '{0}' to '{1}' using '{2}'", source.GetCommand() + (!params.empty() ? " " + params[0] : ""), new_message, r->source_message);
 			source.service = ServiceBot::Find(r->client, true);
 			if (!source.service)
 				return;
@@ -134,13 +134,13 @@ class RewriteCommand : public Command
 		}
 		else
 		{
-			logger.Log("Unable to rewrite '{0}'", source.command + (!params.empty() ? " " + params[0] : ""));
+			logger.Log("Unable to rewrite '{0}'", source.GetCommand() + (!params.empty() ? " " + params[0] : ""));
 		}
 	}
 
 	void OnServHelp(CommandSource &source) override
 	{
-		Rewrite *r = Rewrite::Find(!source.c ? source.service->nick : "", source.command);
+		Rewrite *r = Rewrite::Find(!source.c ? source.service->nick : "", source.GetCommand());
 		if (r != NULL && !r->desc.empty())
 		{
 			this->SetDesc(r->desc);
@@ -150,7 +150,7 @@ class RewriteCommand : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		Rewrite *r = Rewrite::Find(!source.c ? source.service->nick : "", source.command);
+		Rewrite *r = Rewrite::Find(!source.c ? source.service->nick : "", source.GetCommand());
 		if (r != NULL && !r->desc.empty())
 		{
 			source.Reply(r->desc);

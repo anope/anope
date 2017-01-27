@@ -620,7 +620,7 @@ class CommandCSAKick : public Command
 			               "\n"
 			               "         {command} #anope ADD Guest*!*@*\n"
 			               "         Adds the mask \"Guest*!*@*\" to the auto kick list of \"#anope\"."),
-			               source.command);
+			               source.GetCommand());
 		else if (subcommand.equals_ci("DEL"))
 			source.Reply(_("The \002{0} DEL\002 command removes \037mask\037 from the auto kick list."
 			               " It does not, however, remove any bans placed by an auto kick; those must be removed manually.\n"
@@ -628,7 +628,7 @@ class CommandCSAKick : public Command
 			               "Example:\n"
 			               "         {command} #anope DEL Cronus!\n"
 			               "         Removes the auto kick for \"Cronus\" from the auto kick list of \"#anope\".\n"),
-			               source.command);
+			               source.GetCommand());
 		else if (subcommand.equals_ci("LIST") || subcommand.equals_ci("VIEW"))
 			source.Reply(_("The \002{0} LIST\002 and \002{0} VIEW\002 command displays the auto kick list of \037channel\037."
 			               " If a wildcard mask is given, only those entries matching the mask are displayed."
@@ -638,7 +638,7 @@ class CommandCSAKick : public Command
 			               "Example:\n"
 			               "         \002{0} #anope LIST 2-5,7-9\002\n"
 			               "         Lists auto kick entries numbered 2 through 5 and 7 through 9 on #anope."),
-			               source.command);
+			               source.GetCommand());
 		else if (subcommand.equals_ci("ENFORCE"))
 			source.Reply(_("The \002{0} ENFORCE\002 command enforces the auto kick list by forcibly removing users who match an entry on the auto kick list."
 			               "This can be useful if someone does not authenticate or change their host mask until after joining.\n"
@@ -646,14 +646,14 @@ class CommandCSAKick : public Command
 			               "Example:\n"
 			               "         \002{0} #anope ENFORCE\002\n"
 			               "         Enforces the auto kick list of #anope."),
-			               source.command);
+			               source.GetCommand());
 		else if (subcommand.equals_ci("CLEAR"))
 			source.Reply(_("The \002{0} CLEAR\002 command clears the auto kick list of \037channel\37. As with the \002DEL\002 command, existing bans placed by auto kick will not be removed.\n"
 			               "\n"
 			               "Example:\n"
 			               "         \002{0} #anope CLEAR\002\n"
 			               "         Clears the auto kick list of #anope."),
-			               source.command);
+			               source.GetCommand());
 		else
 		{
 			source.Reply(_("Maintains the auto kick list for \037channel\037."
@@ -678,7 +678,7 @@ class CommandCSAKick : public Command
 				               ""
 				               "The \002CLEAR\002 clears the auto kick list of \037channel\037."
 				               "\002{msg}{service} {help} {command} CLEAR\002 for more information.\n"),
-				               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.command);
+				               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.GetCommand());
 		}
 
 		return true;

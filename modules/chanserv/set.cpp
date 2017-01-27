@@ -46,7 +46,7 @@ class CommandCSSet : public Command
 		source.Reply(_("Allows the channel founder to set various channel options and other information.\n"
 		               "\n"
 		               "Available options:"));
-		Anope::string this_name = source.command;
+		Anope::string this_name = source.GetCommand();
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
@@ -65,7 +65,7 @@ class CommandCSSet : public Command
 				else if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 
-				source.command = it->first;
+				source.SetCommand(it->first);
 				c->OnServHelp(source);
 			}
 		}
@@ -109,7 +109,7 @@ class CommandCSSetAutoOp : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -173,7 +173,7 @@ class CommandCSSetBanType : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -242,7 +242,7 @@ class CommandCSSetDescription : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -302,7 +302,7 @@ class CommandCSSetFounder : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
@@ -372,7 +372,7 @@ class CommandCSSetKeepModes : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -447,7 +447,7 @@ class CommandCSSetPeace : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -523,7 +523,7 @@ class CommandCSSetPersist : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -669,7 +669,7 @@ class CommandCSSetRestricted : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -734,7 +734,7 @@ class CommandCSSetSecure : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -801,7 +801,7 @@ class CommandCSSetSecureFounder : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
@@ -871,7 +871,7 @@ class CommandCSSetSecureOps : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -937,7 +937,7 @@ class CommandCSSetSignKick : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -1015,7 +1015,7 @@ class CommandCSSetSuccessor : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
@@ -1089,7 +1089,7 @@ class CommandCSSetNoexpire : public Command
 			return;
 		}
 
-		if (source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (source.GetPermission().empty() && !source.AccessFor(ci).HasPriv("SET"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;

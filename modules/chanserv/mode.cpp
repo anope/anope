@@ -767,7 +767,7 @@ class CommandCSMode : public Command
 		               "\n"
 		               "The \002{0} CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices."
 		               " If \037what\037 is not given then all basic modes are removed."),
-		               source.command.upper());
+		               source.GetCommand().upper());
 		return true;
 	}
 };
@@ -808,7 +808,7 @@ class CommandCSModes : public Command
 		}
 
 		ChanServ::AccessGroup u_access = source.AccessFor(ci), targ_access = ci->AccessFor(targ);
-		const std::pair<bool, Anope::string> &m = modes[source.command];
+		const std::pair<bool, Anope::string> &m = modes[source.GetCommand()];
 
 		bool can_override = source.HasPriv("chanserv/administration");
 		bool override = false;
@@ -859,7 +859,7 @@ class CommandCSModes : public Command
 
  	const Anope::string GetDesc(CommandSource &source) const override
 	{
-		const std::pair<bool, Anope::string> &m = modes[source.command];
+		const std::pair<bool, Anope::string> &m = modes[source.GetCommand()];
 		if (!m.second.empty())
 		{
 			if (m.first)
@@ -875,7 +875,7 @@ class CommandCSModes : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		const std::pair<bool, Anope::string> &m = modes[source.command];
+		const std::pair<bool, Anope::string> &m = modes[source.GetCommand()];
 		if (m.second.empty())
 			return false;
 

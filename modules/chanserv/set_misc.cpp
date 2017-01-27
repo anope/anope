@@ -128,13 +128,13 @@ class CommandCSSetMisc : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
-		Anope::string scommand = GetAttribute(source.command);
+		Anope::string scommand = GetAttribute(source.GetCommand());
 
 		/* remove existing */
 		for (CSMiscData *data : ci->GetRefs<CSMiscData *>())
@@ -167,18 +167,18 @@ class CommandCSSetMisc : public Command
 
 	void OnServHelp(CommandSource &source) override
 	{
-		if (descriptions.count(source.command))
+		if (descriptions.count(source.GetCommand()))
 		{
-			this->SetDesc(descriptions[source.command]);
+			this->SetDesc(descriptions[source.GetCommand()]);
 			Command::OnServHelp(source);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		if (descriptions.count(source.command))
+		if (descriptions.count(source.GetCommand()))
 		{
-			source.Reply("%s", Language::Translate(source.nc, descriptions[source.command].c_str()));
+			source.Reply(Language::Translate(source.nc, descriptions[source.GetCommand()]));
 			return true;
 		}
 		return false;

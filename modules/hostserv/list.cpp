@@ -149,7 +149,7 @@ class CommandHSList : public Command
 		               "\n"
 		               "         {0} #1-3\n"
 		               "         Lists the first three entries."),
-		               source.command);
+		               source.GetCommand());
 		return true;
 	}
 };

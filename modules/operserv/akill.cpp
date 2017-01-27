@@ -399,7 +399,7 @@ class CommandOSAKill : public Command
 			               " If a unit specifier is not included, the default is days, so \037+30\037 means 30 days."
 			               " To add an auto kill which does not expire, use \037+0\037. "
 			               " The default auto kill expiry time is \002{1}\002"),
-			               source.command, Anope::Duration(Config->GetModule("operserv/main")->Get<time_t>("autokillexpiry", "30d"), source.GetAccount()));
+			               source.GetCommand(), Anope::Duration(Config->GetModule("operserv/main")->Get<time_t>("autokillexpiry", "30d"), source.GetAccount()));
 
 			const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 			if (!regexengine.empty())
@@ -411,7 +411,7 @@ class CommandOSAKill : public Command
 		else if (subcommand.equals_ci("DEL"))
 			source.Reply(_("The \002{0} DEL\002 command removes the given \037mask\037 from the auto kill list, if present."
 			               " If a list of entry numbers is given, those entries are deleted."),
-			               source.command);
+			               source.GetCommand());
 		else if (subcommand.equals_ci("LIST") || subcommand.equals_ci("VIEW"))
 			source.Reply(_("The \002{0} LIST\002 and \002{0} VIEW\002 commands display the auto kill list."
 			               " If a wildcard \037mask\037 is given, only those entries matching the mask are displayed."
@@ -422,10 +422,10 @@ class CommandOSAKill : public Command
 			               "\n"
 			               "         {0} LIST 2-5,7-9\n"
 			               "         Lists auto kill entries numbered 2 through 5 and 7 through 9."),
-			               source.command);
+			               source.GetCommand());
 		else if (subcommand.equals_ci("CLEAR"))
 			source.Reply(_("The \002{0} CLEAR\002 command removes all auto kills from the auto kill list."),
-			               source.command);
+			               source.GetCommand());
 		else
 		{
 			CommandInfo *help = source.service->FindCommand("generic/help");
@@ -443,7 +443,7 @@ class CommandOSAKill : public Command
 			               "\n"
 			               "The \002CLEAR\002 command clears th auto kill list."
 			               "\002{msg}{service} {help} {command} CLEAR\002 for more information.\n"),
-			               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.command);
+			               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.GetCommand());
 		}
 		return true;
 	}

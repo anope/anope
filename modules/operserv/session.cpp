@@ -324,7 +324,7 @@ class CommandOSSession : public Command
 		               "\002{0} VIEW\002 displays detailed information about a specific host - including the current session count and session limit.\n"
 		               "\n"
 		               "See the \002EXCEPTION\002 help for more information about session limiting and how to set session limits specific to certain hosts and groups thereof."), // XXX
-		               source.command);
+		               source.GetCommand());
 		return true;
 	}
 };
@@ -611,7 +611,7 @@ class CommandOSException : public Command
 			               " This determines how many sessions this host may carry at a time."
 			               " A value of zero means the host has an unlimited session limit."
 			               " If more than one entry matches a client, the first matching enty will be used."),
-			               source.command);
+			               source.GetCommand());
 		else
 			source.Reply(_("Allows you to manipulate the list of hosts that have specific session limits - allowing certain machines, such as shell servers, to carry more than the default number of clients at a time."
 			               " Once a host reaches its session limit, all clients attempting to connect from that host will be killed."

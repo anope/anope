@@ -214,7 +214,7 @@ class CommandMSInfo : public Command
 		               " With a parameter, displays the same information for the given \037user\037 or \037channel\037, if you have the appropriate privilege.\n"
 			       "\n"
 			       "Use of this command on a channel requires the \002{0}\002 privilege on \037channel\037."),
-		               source.command);
+		               source.GetCommand());
 
 		return true;
 	}

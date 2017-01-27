@@ -80,7 +80,7 @@ class CommandBSBotList : public Command
 		source.Reply(_("\n"
 		               "Example:\n"
 		               "         {command} BOTLIST"),
-		               "command"_kw = source.command);
+		               "command"_kw = source.GetCommand());
 		return true;
 	}
 };

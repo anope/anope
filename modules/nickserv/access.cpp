@@ -206,7 +206,7 @@ class CommandNSAccess : public Command
 		if (!mask.empty() && (mask.find('@') == Anope::string::npos || mask.find('!') != Anope::string::npos))
 		{
 			source.Reply(_("Mask must be in the form \037user\037@\037host\037."));
-			source.Reply(_("\002%s%s HELP %s\002 for more information."), Config->StrictPrivmsg, source.service->nick, source.command); // XXX
+			source.Reply(_("\002%s%s HELP %s\002 for more information."), Config->StrictPrivmsg, source.service->nick, source.GetCommand()); // XXX
 			return;
 		}
 
@@ -241,7 +241,7 @@ class CommandNSAccess : public Command
 		               "\n"
 		               "         {command} LIST\n"
 		               "         Displays the current access list."),
-		               source.command, source.service->nick);
+		               source.GetCommand(), source.service->nick);
 		return true;
 	}
 };

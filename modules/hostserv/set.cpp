@@ -39,7 +39,7 @@ class CommandHSSet : public Command
 		source.Reply(" ");
 		source.Reply(_("Available options:"));
 		// XXX this entire thing is dup
-		Anope::string this_name = source.command;
+		Anope::string this_name = source.GetCommand();
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
@@ -58,7 +58,7 @@ class CommandHSSet : public Command
 				else if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 
-				source.command = it->first;
+				source.SetCommand(it->first);
 				c->OnServHelp(source);
 			}
 		}

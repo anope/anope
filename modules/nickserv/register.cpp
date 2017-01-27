@@ -202,7 +202,7 @@ class CommandNSRegister : public Command
 
 		if (u && Anope::CurTime < u->lastnickreg + reg_delay)
 		{
-			source.Reply(_("Please wait \002{0}\002 seconds before using the {1} command again."), (u->lastnickreg + reg_delay) - Anope::CurTime, source.command);
+			source.Reply(_("Please wait \002{0}\002 seconds before using the {1} command again."), (u->lastnickreg + reg_delay) - Anope::CurTime, source.GetCommand());
 			return;
 		}
 

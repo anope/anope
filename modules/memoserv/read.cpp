@@ -198,7 +198,7 @@ class CommandMSRead : public Command
 		               "\n"
 		               "         {0} 2-5,7-9\n"
 		               "         Displays memos numbered 2 through 5 and 7 through 9."),
-		               source.command);
+		               source.GetCommand());
 		return true;
 	}
 };

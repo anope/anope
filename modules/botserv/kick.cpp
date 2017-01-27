@@ -533,7 +533,7 @@ class CommandBSKick : public Command
 		               "\n"
 		               "Available kickers:"));
 
-		Anope::string this_name = source.command;
+		Anope::string this_name = source.GetCommand();
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
@@ -544,7 +544,7 @@ class CommandBSKick : public Command
 				ServiceReference<Command> command(info.name);
 				if (command)
 				{
-					source.command = c_name;
+					source.SetCommand(c_name);
 					command->OnServHelp(source);
 				}
 			}
@@ -1114,7 +1114,7 @@ class CommandBSSetDontKickOps : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, source.command);
+			this->OnSyntaxError(source, source.GetCommand());
 		}
 	}
 
@@ -1180,7 +1180,7 @@ class CommandBSSetDontKickVoices : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, source.command);
+			this->OnSyntaxError(source, source.GetCommand());
 		}
 	}
 

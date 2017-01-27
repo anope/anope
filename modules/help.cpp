@@ -47,7 +47,7 @@ class CommandHelp : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		Anope::string source_command = source.command;
+		Anope::string source_command = source.GetCommand();
 		const ServiceBot *bi = source.service;
 		const CommandInfo::map &map = source.c ? Config->Fantasy : bi->commands;
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
@@ -96,7 +96,7 @@ class CommandHelp : public Command
 					}
 				}
 
-				source.command = c_name;
+				source.SetCommand(c_name);
 				c->OnServHelp(source);
 
 			}
@@ -149,7 +149,7 @@ class CommandHelp : public Command
 				// Allow unregistered users to see help for commands that they explicitly request help for
 
 				const Anope::string &subcommand = params.size() > max ? params[max] : "";
-				source.command = it->first;
+				source.SetCommand(it->first);
 
 				c->SendSyntax(source);
 				if (!c->OnHelp(source, subcommand))

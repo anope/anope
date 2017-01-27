@@ -70,7 +70,9 @@ class CommandBSSetFantasy : public Command
 			source.Reply(_("Fantasy mode is now \002off\002 on channel \002{0}\002."), ci->GetName());
 		}
 		else
-			this->OnSyntaxError(source, source.command);
+		{
+			this->OnSyntaxError(source, source.GetCommand());
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -187,8 +189,7 @@ class Fantasy : public Module
 
 		CommandSource source(u->nick, u, u->Account(), u, c->ci->GetBot());
 		source.c = c;
-		source.command = it->first;
-		source.permission = info.permission;
+		source.SetCommandInfo(info);
 
 		ChanServ::AccessGroup ag = c->ci->AccessFor(u);
 		bool has_fantasia = ag.HasPriv("FANTASIA") || source.HasPriv("botserv/fantasy");

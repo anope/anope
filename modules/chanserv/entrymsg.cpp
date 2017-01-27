@@ -264,7 +264,7 @@ class CommandEntryMessage : public Command
 		               "The \002{0} CLEAR\002 command clears the entry message list.\n"
 		               "\n"
 		               "Use of this command requires the \002SET\002 privilege on \037channel\037."),
-		               source.command);
+		               source.GetCommand());
 		return true;
 	}
 };

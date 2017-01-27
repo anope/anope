@@ -471,7 +471,7 @@ class CommandCSFlags : public Command
 		               " If the mask has no more flags, then the mask is removed from the access list."
 		               " Additionally, you may use +* or -* to add or remove all flags, respectively."
 		               " You are only able to modify the access list if you have the \002{1}\002 privilege on the channel, and can only give privileges to up what you have."),
-		               source.command, "ACCESS_CHANGE");
+		               source.GetCommand(), "ACCESS_CHANGE");
 		source.Reply(" ");
 		source.Reply(_("The \002LIST\002 command allows you to list existing entries on the channel access list."
 		               " If \037mask\037 is given, the \037mask\037 is wildcard matched against all existing entries on the access list, and only those entries are returned."

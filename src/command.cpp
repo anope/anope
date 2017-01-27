@@ -70,7 +70,27 @@ Anope::string CommandSource::GetSource()
 
 const Anope::string &CommandSource::GetCommand() const
 {
+	return this->command.cname;
+}
+
+void CommandSource::SetCommand(const Anope::string &command)
+{
+	this->command.cname = command;
+}
+
+const Anope::string &CommandSource::GetPermission() const
+{
+	return this->command.permission;
+}
+
+const CommandInfo &CommandSource::GetCommandInfo() const
+{
 	return this->command;
+}
+
+void CommandSource::SetCommandInfo(const CommandInfo &ci)
+{
+	this->command = ci;
 }
 
 ChanServ::AccessGroup CommandSource::AccessFor(ChanServ::Channel *ci)
@@ -174,13 +194,13 @@ void Command::SendSyntax(CommandSource &source)
 	Anope::string s = Language::Translate(source.GetAccount(), _("Syntax"));
 	if (!this->syntax.empty())
 	{
-		source.Reply("{0}: \002{1} {2}\002", s, source.command, Language::Translate(source.GetAccount(), this->syntax[0].c_str()));
+		source.Reply("{0}: \002{1} {2}\002", s, source.GetCommand(), Language::Translate(source.GetAccount(), this->syntax[0].c_str()));
 		Anope::string spaces(s.length(), ' ');
 		for (unsigned i = 1, j = this->syntax.size(); i < j; ++i)
-			source.Reply("{0}  \002{1} {2}\002", spaces, source.command, Language::Translate(source.GetAccount(), this->syntax[i].c_str()));
+			source.Reply("{0}  \002{1} {2}\002", spaces, source.GetCommand(), Language::Translate(source.GetAccount(), this->syntax[i].c_str()));
 	}
 	else
-		source.Reply("{0}: \002{1}\002", s, source.command);
+		source.Reply("{0}: \002{1}\002", s, source.GetCommand());
 }
 
 bool Command::AllowUnregistered() const
@@ -210,7 +230,7 @@ const Anope::string Command::GetDesc(CommandSource &) const
 
 void Command::OnServHelp(CommandSource &source)
 {
-	source.Reply(Anope::printf("    %-14s %s", source.command.c_str(), Language::Translate(source.nc, this->GetDesc(source).c_str())));
+	source.Reply(Anope::printf("    %-14s %s", source.GetCommand().c_str(), Language::Translate(source.nc, this->GetDesc(source).c_str())));
 }
 
 bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }
@@ -220,7 +240,7 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 	this->SendSyntax(source);
 	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 	if (has_help)
-		source.Reply(_("\002{0}{1} HELP {2}\002 for more information."), Config->StrictPrivmsg, source.service->nick, source.command);
+		source.Reply(_("\002{0}{1} HELP {2}\002 for more information."), Config->StrictPrivmsg, source.service->nick, source.GetCommand());
 }
 
 void Command::Run(CommandSource &source, const Anope::string &message)
@@ -289,8 +309,7 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 		return;
 	}
 
-	source.command = cmdname;
-	source.permission = info.permission;
+	source.SetCommandInfo(info);
 
 	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::PreCommand::OnPreCommand, source, this, params);
 	if (MOD_RESULT == EVENT_STOP)

@@ -35,8 +35,6 @@ struct CommandInfo
 {
 	typedef Anope::map<CommandInfo> map;
 
-	CommandInfo() : hide(false), prepend_channel(false) { }
-
 	/* Service name of the command */
 	Anope::string name;
 	/* User visible name */
@@ -46,9 +44,9 @@ struct CommandInfo
 	/* Group this command is in */
 	Anope::string group;
 	/* whether or not to hide this command in help output */
-	bool hide;
+	bool hide = false;
 	/* Only used with fantasy */
-	bool prepend_channel;
+	bool prepend_channel = false;
 };
 
 /* Where the replies from commands go to. User inheits from this and is the normal
@@ -67,6 +65,8 @@ class CoreExport CommandSource
 	Anope::string nick;
 	/* User executing the command, may be NULL */
 	Reference<User> u;
+	/* Command info being executed */
+	CommandInfo command;
  public:
 	/* The account executing the command */
 	Reference<NickServ::Account> nc;
@@ -76,10 +76,6 @@ class CoreExport CommandSource
 	Reference<Channel> c;
 	/* The service this command is on */
 	Reference<ServiceBot> service;
-	/* The actual name of the command being executed */
-	Anope::string command;
-	/* The permission of the command being executed */
-	Anope::string permission;
 
 	CommandSource(const Anope::string &n, User *user, NickServ::Account *core, CommandReply *reply, ServiceBot *bi);
 
@@ -87,7 +83,14 @@ class CoreExport CommandSource
 	User *GetUser();
 	NickServ::Account *GetAccount();
 	Anope::string GetSource();
+
 	const Anope::string &GetCommand() const;
+	void SetCommand(const Anope::string &);
+
+	const Anope::string &GetPermission() const;
+
+	const CommandInfo &GetCommandInfo() const;
+	void SetCommandInfo(const CommandInfo &);
 
 	ChanServ::AccessGroup AccessFor(ChanServ::Channel *ci);
 	bool IsFounder(ChanServ::Channel *ci);

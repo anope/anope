@@ -96,7 +96,7 @@ class CommandBSAssign : public Command
 		               "Example:\n"
 			       "         {command} #anope Botox\n"
 			       "         Assigns the bot Botox to #anope.\n"),
-		               "ASSIGN", "command"_kw = source.command);
+		               "ASSIGN", "command"_kw = source.GetCommand());
 		return true;
 	}
 };
@@ -164,7 +164,7 @@ class CommandBSUnassign : public Command
 		               "Example:\n"
 			       "         {command} #anope\n"
 			       "         Unassigns the current bot from #anope.\n"),
-		               "ASSIGN", "command"_kw = source.command);
+		               "ASSIGN", "command"_kw = source.GetCommand());
 		return true;
 	}
 };
@@ -208,7 +208,7 @@ class CommandBSSetNoBot : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, source.command);
+			this->OnSyntaxError(source, source.GetCommand());
 		}
 	}
 
@@ -220,7 +220,7 @@ class CommandBSSetNoBot : public Command
 		               "Example:\n"
 			       "         {command} #anope on\n"
 			       "         Prevents a service bot from being assigned to #anope.\n"),
-		               "command"_kw = source.command);
+		               "command"_kw = source.GetCommand());
 		return true;
 	}
 };

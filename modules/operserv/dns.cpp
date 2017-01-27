@@ -815,7 +815,7 @@ class CommandOSDNS : public Command
 		               "The \002{0} ADDIP\002 command associates an IP with a server.\n"
 		               " \n"
 		               "The \002{0} POOL\002 and \002{0} DEPOOL\002 commands actually add and remove servers to their given zones."),
-		               source.command);
+		               source.GetCommand());
 		return true;
 	}
 };

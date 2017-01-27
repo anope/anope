@@ -350,7 +350,7 @@ public:
 		               "Example:\n"
 		               "         {command} #anope chanserv/access MESSAGE @\n"
 		               "         Would message any channel operators of \"#anope\" whenever someone used the \"ACCESS\" command on ChanServ for \"#anope\"."),
-		               source.command, "SET");
+		               source.GetCommand(), "SET");
 		return true;
 	}
 };

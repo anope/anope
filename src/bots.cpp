@@ -198,12 +198,11 @@ void ServiceBot::OnMessage(User *u, const Anope::string &message)
 
 CommandInfo& ServiceBot::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
 {
-	CommandInfo ci;
+	CommandInfo &ci = this->commands[cname];
 	ci.name = sname;
 	ci.cname = cname;
 	ci.permission = permission;
-	this->commands[cname] = ci;
-	return this->commands[cname];
+	return ci;
 }
 
 CommandInfo *ServiceBot::GetCommand(const Anope::string &cname)

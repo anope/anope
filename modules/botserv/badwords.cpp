@@ -388,7 +388,7 @@ class CommandBSBadwords : public Command
 			               "Examples:\n"
 			               "         {command} #anope ADD raw SINGLE\n"
 			               "         Adds the bad word \"raw\" to the bad word list of #anope."),
-			               "command"_kw = source.command);
+			               "command"_kw = source.GetCommand());
 		}
 		else if (subcommand.equals_ci("DEL"))
 		{
@@ -400,7 +400,7 @@ class CommandBSBadwords : public Command
 			               "\n"
 			               "         {command} #anope DEL 2-5,7-9\n"
 			               "         Removes bad words entries numbered 2 through 5 and 7 through 9 on #anope."),
-			               "command"_kw = source.command);
+			               "command"_kw = source.GetCommand());
 
 		}
 		else if (subcommand.equals_ci("LIST"))
@@ -415,7 +415,7 @@ class CommandBSBadwords : public Command
 			               "\n"
 			               "         {command} #anope LIST 2-5,7-9\n"
 			               "         Lists bad words entries numbered 2 thorough 5 and 7 through 9 on #anope."),
-			               "command"_kw = source.command);
+			               "command"_kw = source.GetCommand());
 		}
 		else if (subcommand.equals_ci("CLEAR"))
 		{
@@ -425,7 +425,7 @@ class CommandBSBadwords : public Command
 			               "Example:\n"
 			               "         {command} #anope CLEAR\n"
 			               "         Clears the bad word list for #anope."),
-			               "command"_kw = source.command);
+			               "command"_kw = source.GetCommand());
 		}
 		else
 		{
@@ -448,7 +448,7 @@ class CommandBSBadwords : public Command
 				               "\n"
 				               "The \002LIST\002 and \002CLEAR\002 commands show and clear the bad words list, respectively.\n"
 				               "\002{msg}{service} {help} {command} LIST\002 and \002{msg}{service} {help} {command} CLEAR\002 for more information.\n"),
-				               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "command"_kw = source.command, "help"_kw = help->cname);
+				               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "command"_kw = source.GetCommand(), "help"_kw = help->cname);
 		}
 		return true;
 	}

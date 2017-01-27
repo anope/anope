@@ -142,7 +142,7 @@ class CommandOSLogSearch : public Command
 		               "Example:\n"
 		               "         {0} +21d +500l Anope\n"
 		               "         Searches the last 21 days worth of logs for messages containing \"Anope\" and lists the most recent 500 of them."),
-		               source.command);
+		               source.GetCommand());
 		return true;
 	}
 };

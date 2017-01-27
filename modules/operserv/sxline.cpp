@@ -30,7 +30,7 @@ class CommandOSSXLineBase : public Command
 	{
 		if (!this->xlm() || this->xlm()->GetXLines().empty())
 		{
-			source.Reply(_("{0} list is empty."), source.command);
+			source.Reply(_("{0} list is empty."), source.GetCommand());
 			return;
 		}
 
@@ -62,11 +62,11 @@ class CommandOSSXLineBase : public Command
 				[&]()
 				{
 					if (!deleted)
-						source.Reply(_("No matching entries on the {0} list."), source.command);
+						source.Reply(_("No matching entries on the {0} list."), source.GetCommand());
 					else if (deleted == 1)
-						source.Reply(_("Deleted \0021\002 entry from the {0} list."), source.command);
+						source.Reply(_("Deleted \0021\002 entry from the {0} list."), source.GetCommand());
 					else
-						source.Reply(_("Deleted \002{0}\002 entries from the {1} list."), deleted, source.command);
+						source.Reply(_("Deleted \002{0}\002 entries from the {1} list."), deleted, source.GetCommand());
 				});
 		}
 		else
@@ -75,13 +75,13 @@ class CommandOSSXLineBase : public Command
 
 			if (!x)
 			{
-				source.Reply(_("\002{0}\002 not found on the {1] list."), mask, source.command);
+				source.Reply(_("\002{0}\002 not found on the {1] list."), mask, source.GetCommand());
 				return;
 			}
 
 			EventManager::Get()->Dispatch(&Event::DelXLine::OnDelXLine, source, x, this->xlm());
 
-			source.Reply(_("\002{0}\002 deleted from the {1} list."), x->GetMask(), source.command);
+			source.Reply(_("\002{0}\002 deleted from the {1} list."), x->GetMask(), source.GetCommand());
 
 			logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove {0} from the list"), x->GetMask());
 
@@ -96,7 +96,7 @@ class CommandOSSXLineBase : public Command
 	{
 		if (!this->xlm() || this->xlm()->GetXLines().empty())
 		{
-			source.Reply(_("{0} list is empty."), source.command);
+			source.Reply(_("{0} list is empty."), source.GetCommand());
 			return;
 		}
 
@@ -146,11 +146,11 @@ class CommandOSSXLineBase : public Command
 
 		if (list.IsEmpty())
 		{
-			source.Reply(_("No matching entries on the {0} list."), source.command);
+			source.Reply(_("No matching entries on the {0} list."), source.GetCommand());
 		}
 		else
 		{
-			source.Reply(_("{0} list:"), source.command);
+			source.Reply(_("{0} list:"), source.GetCommand());
 
 			std::vector<Anope::string> replies;
 			list.Process(replies);
@@ -188,7 +188,7 @@ class CommandOSSXLineBase : public Command
 
 		logger.Command(LogType::ADMIN, source, _("{source} used {command} to CLEAR the list"));
 
-		source.Reply(_("The {0} list has been cleared."), source.command);
+		source.Reply(_("The {0} list has been cleared."), source.GetCommand());
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
@@ -199,7 +199,7 @@ class CommandOSSXLineBase : public Command
 
 	const Anope::string GetDesc(CommandSource &source) const override
 	{
-		return Anope::printf(Language::Translate(source.GetAccount(), _("Manipulate the %s list")), source.command.upper().c_str());
+		return Anope::Format(Language::Translate(source.GetAccount(), _("Manipulate the {0} list")), source.GetCommand().upper());
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -347,7 +347,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 
 			logger.Command(LogType::ADMIN, source, _("{source} used {command} and tried to {0} {1}% of the network ({2} users)"),
-				source.command, percent, affected);
+				source.GetCommand(), percent, affected);
 
 			x->Delete();
 			return;
@@ -378,7 +378,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			this->xlm()->Send(NULL, x);
 		}
 
-		source.Reply(_("\002{0}\002 added to the {1} list."), mask, source.command);
+		source.Reply(_("\002{0}\002 added to the {1} list."), mask, source.GetCommand());
 
 		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
 				mask, reason, expires ? Anope::Duration(expires - Anope::CurTime) : "never",
@@ -410,7 +410,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			               " To add a {0} which does not expire, use \037+0\037."
 			               " The default {0} expiry time is \002{1}\002."
 			               " Because the real name may contain spaces, the separator between it and the reason is a \002colon\002."),
-			               source.command, Anope::Duration(Config->GetModule("operserv/main")->Get<time_t>("snlineexpiry", "30d"), source.GetAccount()));
+			               source.GetCommand(), Anope::Duration(Config->GetModule("operserv/main")->Get<time_t>("snlineexpiry", "30d"), source.GetAccount()));
 
 			const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 			if (!regexengine.empty())
@@ -435,12 +435,12 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			               "\n"
 			               "         {0} LIST 2-5,7-9\n"
 			               "         Lists {0} entries numbered 2 through 5 and 7 through 9.\n"),
-			               source.command);
+			               source.GetCommand());
 		}
 		else if (subcommand.equals_ci("CLEAR"))
 		{
 			source.Reply(_("\002{0} CLEAR\002 removes all entries from the {0} list."),
-			               source.command);
+			               source.GetCommand());
 		}
 		else
 		{
@@ -460,7 +460,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			               "\n"
 			               "The \002CLEAR\002 command clears th auto kill list."
 			               "\002{msg}{service} {help} {command} CLEAR\002 for more information.\n"),
-			               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.command);
+			               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.GetCommand());
 		}
 		return true;
 	}
@@ -571,7 +571,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} and tried to {0} {1}% of the network ({2} users)"), source.command, percent, affected);
+			logger.Command(LogType::ADMIN, source, _("{source} used {command} and tried to {0} {1}% of the network ({2} users)"), source.GetCommand(), percent, affected);
 
 			x->Delete();
 			return;
@@ -628,7 +628,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			this->xlm()->Send(NULL, x);
 		}
 
-		source.Reply(_("\002{0}\002 added to the {1} list."), mask, source.command);
+		source.Reply(_("\002{0}\002 added to the {1} list."), mask, source.GetCommand());
 
 		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
 				mask, x->GetReason(), expires ? Anope::Duration(expires - Anope::CurTime) : "never", affected, percent);
@@ -658,7 +658,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			               " If a unit specifier is not included, the default is days, so \037+30\037 by itself means 30 days."
 			               " To add a {0} which does not expire, use \037+0\037."
 			               " The default {0} expiry time is \002{1}\002."),
-			               source.command, Anope::Duration(Config->GetModule("operserv/main")->Get<time_t>("sqlineexpiry", "30d"), source.GetAccount()));
+			               source.GetCommand(), Anope::Duration(Config->GetModule("operserv/main")->Get<time_t>("sqlineexpiry", "30d"), source.GetAccount()));
 
 			const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 			if (!regexengine.empty())
@@ -683,12 +683,12 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			               "\n"
 			               "         {0} LIST 2-5,7-9\n"
 			               "         Lists {0} entries numbered 2 through 5 and 7 through 9.\n"),
-			               source.command);
+			               source.GetCommand());
 		}
 		else if (subcommand.equals_ci("CLEAR"))
 		{
 			source.Reply(_("\002{0} CLEAR\002 removes all entries from the {0} list."),
-			               source.command);
+			               source.GetCommand());
 		}
 		else
 		{
@@ -709,7 +709,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			               "\n"
 			               "The \002CLEAR\002 command clears th auto kill list."
 			               "\002{msg}{service} {help} {command} CLEAR\002 for more information.\n"),
-			               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.command);
+			               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.GetCommand());
 		}
 		return true;
 	}

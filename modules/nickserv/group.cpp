@@ -146,7 +146,7 @@ class CommandNSGroup : public Command
 
 		if (Anope::CurTime < u->lastnickreg + reg_delay)
 		{
-			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), (reg_delay + u->lastnickreg) - Anope::CurTime, source.command);
+			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), (reg_delay + u->lastnickreg) - Anope::CurTime, source.GetCommand());
 			return;
 		}
 
@@ -365,7 +365,7 @@ class CommandNSGList : public Command
 					"\n"
 					"With a parameter, lists all nicknames that are in the group of the given nick.\n"
 					"Specifying a nick is limited to \002Services Operators\002."),
-					source.command);
+					source.GetCommand());
 		else
 			source.Reply(_("Lists all nicknames in your group."));
 

@@ -158,29 +158,29 @@ class BotServCore : public Module, public BotServ::BotServService
 
 		if (source.c)
 		{
-			source.Reply(_("\002%s\002 allows you to execute \"fantasy\" commands in the channel.\n"
+			source.Reply(_("\002{0}\002 allows you to execute \"fantasy\" commands in the channel.\n"
 					"Fantasy commands are commands that can be executed from messaging a\n"
 					"channel, and provide a more convenient way to execute commands. Commands that\n"
 					"require a channel as a parameter will automatically have that parameter\n"
-					"given.\n"), source.service->nick.c_str());
+					"given.\n"), source.service->nick);
 			const Anope::string &fantasycharacters = Config->GetModule("fantasy")->Get<Anope::string>("fantasycharacter", "!");
 			if (!fantasycharacters.empty())
 				source.Reply(_(" \n"
-						"Fantasy commands may be prefixed with one of the following characters: %s\n"), fantasycharacters.c_str());
+						"Fantasy commands may be prefixed with one of the following characters: {0}\n"), fantasycharacters);
 			source.Reply(_(" \n"
 					"Available commands are:"));
 		}
 		else if (*source.service == BotServ)
 		{
-			source.Reply(_("\002%s\002 allows you to have a bot on your own channel.\n"
+			source.Reply(_("\002{0}\002 allows you to have a bot on your own channel.\n"
 				"It has been created for users that can't host or\n"
 				"configure a bot, or for use on networks that don't\n"
 				"allow user bots. Available commands are listed\n"
-				"below; to use them, type \002%s%s \037command\037\002. For\n"
+				"below; to use them, type \002{1}{2} \037command\037\002. For\n"
 				"more information on a specific command, type\n"
-				"\002%s%s %s \037command\037\002.\n"),
-				BotServ->nick.c_str(), Config->StrictPrivmsg.c_str(), BotServ->nick.c_str(),
-				Config->StrictPrivmsg.c_str(), BotServ->nick.c_str(), source.command.c_str());
+				"\002{3}{4} {5} \037command\037\002.\n"),
+				BotServ->nick, Config->StrictPrivmsg, BotServ->nick,
+				Config->StrictPrivmsg, BotServ->nick, source.GetCommand());
 		}
 
 		return EVENT_CONTINUE;

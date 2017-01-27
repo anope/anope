@@ -573,18 +573,18 @@ class NickServCore : public Module, public NickServ::NickServService
 		if (!params.empty() || source.c || source.service != *NickServ)
 			return EVENT_CONTINUE;
 		if (!Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership"))
-			source.Reply(_("\002%s\002 allows you to register a nickname and\n"
+			source.Reply(_("\002{0}\002 allows you to register a nickname and\n"
 				"prevent others from using it. The following\n"
 				"commands allow for registration and maintenance of\n"
-				"nicknames; to use them, type \002%s%s \037command\037\002.\n"
+				"nicknames; to use them, type \002{1}{2} \037command\037\002.\n"
 				"For more information on a specific command, type\n"
-				"\002%s%s %s \037command\037\002.\n"), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), source.command.c_str());
+				"\002{3}{4} {5} \037command\037\002.\n"), NickServ->nick, Config->StrictPrivmsg, NickServ->nick, Config->StrictPrivmsg, NickServ->nick, source.GetCommand());
 		else
-			source.Reply(_("\002%s\002 allows you to register an account.\n"
+			source.Reply(_("\002{0}\002 allows you to register an account.\n"
 				"The following commands allow for registration and maintenance of\n"
-				"accounts; to use them, type \002%s%s \037command\037\002.\n"
+				"accounts; to use them, type \002{1}{2} \037command\037\002.\n"
 				"For more information on a specific command, type\n"
-				"\002%s%s %s \037command\037\002.\n"), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), source.command.c_str());
+				"\002{3}{4} {5} \037command\037\002.\n"), NickServ->nick, Config->StrictPrivmsg, NickServ->nick, Config->StrictPrivmsg, NickServ->nick, source.GetCommand());
 		return EVENT_CONTINUE;
 	}
 

@@ -61,7 +61,7 @@ class CommandMSSend : public Command
 		}
 		else if (result == MemoServ::MemoServService::MEMO_TOO_FAST)
 		{
-			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), Config->GetModule("memoserv/main")->Get<time_t>("senddelay"), source.command);
+			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), Config->GetModule("memoserv/main")->Get<time_t>("senddelay"), source.GetCommand());
 		}
 		else if (result == MemoServ::MemoServService::MEMO_TARGET_FULL)
 		{

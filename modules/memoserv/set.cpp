@@ -253,7 +253,7 @@ class CommandMSSet : public Command
 			               "                receive\n"
 			               "\n"
 			               "Type \002{0}{1} {2} {3} \037option\037\002 for more information on a specific option."),
-			               Config->StrictPrivmsg, source.service->nick, help->cname, source.command);
+			               Config->StrictPrivmsg, source.service->nick, help->cname, source.GetCommand());
 		}
 		else if (subcommand.equals_ci("NOTIFY"))
 		{
@@ -295,7 +295,7 @@ class CommandMSSet : public Command
 				               " \n"
 				               "This use of the \002{0} LIMIT\002 command is limited to \002Services Operators\002."
 				               " Other users may only enter a limit for themselves or a channel on which they have the \002MEMO\002 privilege on, may not remove their limit, may not set a limit above {1}, and may not set a hard limit."),
-				               source.command, max_memos);
+				               source.GetCommand(), max_memos);
 			else
 				source.Reply(_("Syntax: \002LIMIT [\037channel\037] \037limit\037\002\n"
 				               "\n"

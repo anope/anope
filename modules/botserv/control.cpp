@@ -155,7 +155,7 @@ class CommandBSAct : public Command
 		                "Example:\n"
 		                "         {command} #anope slaps Cronus\n"
 		                "         Shows the assigned service bot \"slapping\" Cronus."),
-		                "command"_kw = source.command);
+		                "command"_kw = source.GetCommand());
 		return true;
 	}
 };

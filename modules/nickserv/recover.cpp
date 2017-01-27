@@ -86,7 +86,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 			u->SendMessage(*source.service, _("This nickname has been recovered by \002{0}\002. If you did not do this, then \002{0}\002 may have your password, and you should change it."),
 							source.GetNick());
 
-			Anope::string buf = source.command.upper() + " command used by " + source.GetNick();
+			Anope::string buf = source.GetCommand().upper() + " command used by " + source.GetNick();
 			u->Kill(*source.service, buf);
 
 			source.Reply(_("Ghost with your nick has been killed."));
@@ -172,7 +172,7 @@ class CommandNSRecover : public Command
 
 		if (user && source.GetUser() == user)
 		{
-			source.Reply(_("You can't %s yourself!"), source.command.lower().c_str());
+			source.Reply(_("You can't {0} yourself!"), source.GetCommand().lower());
 			return;
 		}
 

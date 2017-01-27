@@ -72,7 +72,9 @@ class CommandBSSetGreet : public Command
 			source.Reply(_("Greet mode for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
-			this->OnSyntaxError(source, source.command);
+		{
+			this->OnSyntaxError(source, source.GetCommand());
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

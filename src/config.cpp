@@ -814,7 +814,7 @@ Block *Conf::GetCommand(CommandSource &source)
 	{
 		Block *b = &iters.first->second;
 
-		if (b->Get<Anope::string>("name") == source.command)
+		if (b->Get<Anope::string>("name") == source.GetCommand())
 			return b;
 	}
 

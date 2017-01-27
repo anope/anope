@@ -42,7 +42,7 @@ class CommandNSSet : public Command
 		               "\n"
 		               "Available options:"));
 
-		Anope::string this_name = source.command;
+		Anope::string this_name = source.GetCommand();
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
@@ -62,7 +62,7 @@ class CommandNSSet : public Command
 				else if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 
-				source.command = c_name;
+				source.SetCommand(c_name);
 				c->OnServHelp(source);
 			}
 		}
@@ -97,7 +97,7 @@ class CommandNSSASet : public Command
 		               "\n"
 		               "Available options:"));
 
-		Anope::string this_name = source.command;
+		Anope::string this_name = source.GetCommand();
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
@@ -108,7 +108,7 @@ class CommandNSSASet : public Command
 				ServiceReference<Command> command(info.name);
 				if (command)
 				{
-					source.command = c_name;
+					source.SetCommand(c_name);
 					command->OnServHelp(source);
 				}
 			}
@@ -881,7 +881,7 @@ class CommandNSSetMessage : public Command
 
 		if (!Config->GetBlock("options")->Get<bool>("useprivmsg"))
 		{
-			source.Reply(_("You cannot %s on this network."), source.command);
+			source.Reply(_("You cannot {0} on this network."), source.GetCommand());
 			return;
 		}
 
@@ -919,7 +919,7 @@ class CommandNSSetMessage : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		Anope::string cmd = source.command;
+		Anope::string cmd = source.GetCommand();
 		size_t i = cmd.find_last_of(' ');
 		if (i != Anope::string::npos)
 			cmd = cmd.substr(i + 1);
@@ -946,7 +946,7 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		Anope::string cmd = source.command;
+		Anope::string cmd = source.GetCommand();
 		size_t i = cmd.find_last_of(' ');
 		if (i != Anope::string::npos)
 			cmd = cmd.substr(i + 1);

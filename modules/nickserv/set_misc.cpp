@@ -124,7 +124,7 @@ class CommandNSSetMisc : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		Anope::string scommand = GetAttribute(source.command);
+		Anope::string scommand = GetAttribute(source.GetCommand());
 
 		/* remove existing */
 		for (NSMiscData *data : nc->GetRefs<NSMiscData *>())
@@ -156,18 +156,18 @@ class CommandNSSetMisc : public Command
 
 	void OnServHelp(CommandSource &source) override
 	{
-		if (descriptions.count(source.command))
+		if (descriptions.count(source.GetCommand()))
 		{
-			this->SetDesc(descriptions[source.command]);
+			this->SetDesc(descriptions[source.GetCommand()]);
 			Command::OnServHelp(source);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		if (descriptions.count(source.command))
+		if (descriptions.count(source.GetCommand()))
 		{
-			source.Reply(Language::Translate(source.nc, descriptions[source.command].c_str()));
+			source.Reply(Language::Translate(source.nc, descriptions[source.GetCommand()]));
 			return true;
 		}
 		return false;

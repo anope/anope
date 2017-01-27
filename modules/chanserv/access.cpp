@@ -553,7 +553,7 @@ class CommandCSAccess : public Command
 			               " The \037level\037 may be a numerical level between \002{1}\002 and \002{2}\002 or the name of a privilege (eg. \002{3}\002)."
 			               " The privilege set granted to a given user is the union of the privileges of access entries that match the user."
 			               " Use of this command requires the \002{4}\002 privilege on \037channel\037."),
-			               source.command, ChanServ::ACCESS_INVALID + 1, ChanServ::ACCESS_FOUNDER - 1, "AUTOOP", "ACCESS_CHANGE");
+			               source.GetCommand(), ChanServ::ACCESS_INVALID + 1, ChanServ::ACCESS_FOUNDER - 1, "AUTOOP", "ACCESS_CHANGE");
 
 			if (!Config->GetModule("chanserv/main")->Get<bool>("disallow_channel_access"))
 				source.Reply(_("The given \037mask\037 may also be a channel, which will use the access list from the other channel up to the given \037level\037."));
@@ -577,7 +577,7 @@ class CommandCSAccess : public Command
 			               "Example:\n"
 			               "         {command} #anope del DukePyrolator\n"
 			               "         Removes the access of \"DukePyrolator\" from \"#anope\"."),
-			               source.command, "ACCESS_CHANGE");
+			               source.GetCommand(), "ACCESS_CHANGE");
 		else if (subcommand.equals_ci("LIST") || subcommand.equals_ci("VIEW"))
 			source.Reply(_("The \002{0} LIST\002 and \002{0} VIEW\002 command displays the access list of \037channel\037."
 			               " If a wildcard mask is given, only those entries matching the mask are displayed."
@@ -588,11 +588,11 @@ class CommandCSAccess : public Command
 			               "Example:\n"
 					"         {0} #anope LIST 2-5,7-9\n"
 					"         Lists access entries numbered 2 through 5 and 7 through 9 on #anope."),
-			                source.command, "ACCESS_LIST");
+			                source.GetCommand(), "ACCESS_LIST");
 		else if (subcommand.equals_ci("CLEAR"))
 			source.Reply(_("The \002{0} CLEAR\002 command clears the access list of \037channel\037."
 				       " Use of this command requires the \002{1}\002 privilege on \037channel\037."),
-			               source.command, "FOUNDER");
+			               source.GetCommand(), "FOUNDER");
 
 		else
 		{
@@ -624,7 +624,7 @@ class CommandCSAccess : public Command
 				               "The \002CLEAR\002 command clears the access list."
 				               "Use of this command requires the \002{founder}\002 privilege on \037channel\037.\n"
 				               "\002{msg}{service} {help} {command} CLEAR\002 for more information."),
-				               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "command"_kw = source.command,
+				               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "command"_kw = source.GetCommand(),
 				               "help"_kw = help->cname, "change"_kw = "ACCESS_CHANGE", "list"_kw = "ACCESS_LIST", "founder"_kw = "FOUNDER");
 		}
 
@@ -668,7 +668,7 @@ class CommandCSLevels : public Command
 			CommandInfo *help = source.service->FindCommand("generic/help");
 			if (help)
 				source.Reply(_("There is no such privilege \002{0}\002. See \002{0}{1} {2} {3}\002 for a list of valid settings."),
-						what, Config->StrictPrivmsg, source.service->nick, help->cname, source.command);
+						what, Config->StrictPrivmsg, source.service->nick, help->cname, source.GetCommand());
 		}
 		else
 		{
@@ -712,7 +712,7 @@ class CommandCSLevels : public Command
 		CommandInfo *help = source.service->FindCommand("generic/help");
 		if (help)
 			source.Reply(_("There is no such privilege \002{0}\002. See \002{0}{1} {2} {3}\002 for a list of valid settings."),
-			               what, Config->StrictPrivmsg, source.service->nick, help->cname, source.command);
+			               what, Config->StrictPrivmsg, source.service->nick, help->cname, source.GetCommand());
 	}
 
 	void DoList(CommandSource &source, ChanServ::Channel *ci)
@@ -878,7 +878,7 @@ class CommandCSLevels : public Command
 			               "\002{0} RESET\002 resets the levels to the default levels for newly registered channels.\n"
 			               "\n"
 			               "For the list of privileges and their descriptions, see \002{3} {4} DESC\002."),
-				       source.command, name, "FOUNDER", help->cname, source.command);
+				       source.GetCommand(), name, "FOUNDER", help->cname, source.GetCommand());
 		}
 		return true;
 	}

@@ -375,7 +375,7 @@ class CommandOSIgnore : public Command
 		               " If a unit specifier is not included, the default is seconds."
 		               " To make services permanently ignore the user, use 0 as the expiry time."
 		               " When adding a \037mask\037, it should be in the format nick!user@host, everything else will be considered a nicknames. Wildcards are permitted."),
-		               source.command);
+		               source.GetCommand());
 
 		const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 		if (!regexengine.empty())

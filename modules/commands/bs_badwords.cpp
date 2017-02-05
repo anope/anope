@@ -393,7 +393,7 @@ class CommandBSBadwords : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("BADWORDS") && (!need_args || !source.HasPriv("botserv/administration")))
+		if (!source.AccessFor(ci).HasPriv("BADWORDS") && !source.HasPriv("botserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

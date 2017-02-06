@@ -153,6 +153,7 @@ class CommandNSSetMisc : public Command
 	{
 		if (descriptions.count(source.command))
 		{
+			this->SendSyntax(source);
 			source.Reply("%s", Language::Translate(source.nc, descriptions[source.command].c_str()));
 			return true;
 		}

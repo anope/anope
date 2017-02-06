@@ -178,7 +178,7 @@ public:
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/administration"))
+		if (!source.AccessFor(ci).HasPriv("SET") && !source.HasOverridePriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -285,7 +285,7 @@ public:
 				{
 					if (log->GetExtra() == extra)
 					{
-						logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to remove logging for {0} with method {1}"),
+						logger.Command(source, ci, _("{source} used {command} on {channel} to remove logging for {0} with method {1}"),
 							command, method + (extra.empty() ? "" : (" " + extra)));
 
 						source.Reply(_("Logging for command \002{0}\002 on \002{1}\002 with log method \002{2}{3}{4}\002 has been removed."),
@@ -297,7 +297,7 @@ public:
 					{
 						log->SetExtra(extra);
 
-						logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to change logging for {0} to method {1}"),
+						logger.Command(source, ci, _("{source} used {command} on {channel} to change logging for {0} to method {1}"),
 							command, method + (extra.empty() ? "" : (" " + extra)));
 
 						source.Reply(_("Logging changed for command \002{0}\002 on \002{1}\002, now using log method \002{2}{3}{4]\002."),
@@ -319,7 +319,7 @@ public:
 			log->SetCreated(Anope::CurTime);
 			log->SetCreator(source.GetNick());
 
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci,
+			logger.Command(source, ci,
 					_("{source} used {command} on {channel} to log {0} to method {1}"), command, method + (extra.empty() ? "" : (" " + extra)));
 
 			source.Reply(_("Logging is now active for command \002{0}\002 on \002{1}\002, using log method \002{2}{3}{4}\002."),

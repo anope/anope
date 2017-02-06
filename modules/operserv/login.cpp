@@ -59,7 +59,7 @@ class CommandOSLogin : public Command
 			return;
 		}
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} and successfully identified to {0}"), source.service->nick);
+		logger.Admin(source, _("{source} used {command} and successfully identified to {0}"), source.service->nick);
 
 		u->Extend<bool>("os_login", true);
 		source.Reply(_("Password accepted."));
@@ -107,7 +107,7 @@ class CommandOSLogout : public Command
 			return;
 		}
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command}"));
+		logger.Admin(source, _("{source} used {command}"));
 
 		u->Shrink<bool>("os_login");
 		source.Reply(_("You have been logged out."));

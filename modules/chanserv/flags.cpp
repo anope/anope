@@ -160,7 +160,6 @@ class CommandCSFlags : public Command
 		ChanServ::ChanAccess *current = NULL;
 		unsigned current_idx;
 		std::set<char> current_flags;
-		bool override = false;
 		for (current_idx = ci->GetAccessCount(); current_idx > 0; --current_idx)
 		{
 			ChanServ::ChanAccess *access = ci->GetAccess(current_idx - 1);
@@ -172,9 +171,7 @@ class CommandCSFlags : public Command
 					// operator<= on the non-me entry!
 					if (*highest <= *access)
 					{
-						if (source.HasPriv("chanserv/access/modify"))
-							override = true;
-						else
+						if (!source.HasOverridePriv("chanserv/access/modify"))
 						{
 							source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to modify the access of \002{1}\002."), ci->GetName(), access->Mask());
 							return;
@@ -219,9 +216,7 @@ class CommandCSFlags : public Command
 
 						if (!u_access.HasPriv(it->first) && !u_access.founder)
 						{
-							if (source.HasPriv("chanserv/access/modify"))
-								override = true;
-							else
+							if (!source.HasOverridePriv("chanserv/access/modify"))
 								continue;
 						}
 
@@ -245,9 +240,7 @@ class CommandCSFlags : public Command
 							continue;
 						else if (!u_access.HasPriv(it->first) && !u_access.founder)
 						{
-							if (source.HasPriv("chanserv/access/modify"))
-								override = true;
-							else
+							if (!source.HasOverridePriv("chanserv/access/modify"))
 							{
 								source.Reply(_("You can not set the \002{0}\002 flag."), f);
 								break;
@@ -267,7 +260,7 @@ class CommandCSFlags : public Command
 			{
 				EventManager::Get()->Dispatch(&Event::AccessDel::OnAccessDel, ci, source, current);
 
-				logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"), current->Mask());
+				logger.Command(source, ci, _("{source} used {command} on {channel} to delete {0}"), current->Mask());
 
 				source.Reply(_("\002{0}\002 removed from the access list of \002{1}\002."), current->Mask(), ci->GetName());
 
@@ -297,7 +290,7 @@ class CommandCSFlags : public Command
 
 		EventManager::Get()->Dispatch(&Event::AccessAdd::OnAccessAdd, ci, source, access);
 
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to modify flags of {0} to {1}"), access->Mask(), access->AccessSerialize());
+		logger.Command(source, ci, _("{source} used {command} on {channel} to modify flags of {0} to {1}"), access->Mask(), access->AccessSerialize());
 
 		if (p != NULL)
 		{
@@ -376,7 +369,7 @@ class CommandCSFlags : public Command
 
 	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
-		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/access/modify"))
+		if (!source.IsFounder(ci) && !source.HasOverridePriv("chanserv/access/modify"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
@@ -388,8 +381,7 @@ class CommandCSFlags : public Command
 
 		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->GetName());
 
-		bool override = !source.IsFounder(ci);
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to clear the access list"));
+		logger.Command(source, ci, _("{source} used {command} on {channel} to clear the access list"));
 	}
 
  public:

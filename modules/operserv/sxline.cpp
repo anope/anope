@@ -54,7 +54,7 @@ class CommandOSSXLineBase : public Command
 					if (!x)
 						return;
 
-					logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove {0} from the list"), x->GetMask());
+					logger.Admin(source, _("{source} used {command} to remove {0} from the list"), x->GetMask());
 
 					++deleted;
 					x->Delete();
@@ -83,7 +83,7 @@ class CommandOSSXLineBase : public Command
 
 			source.Reply(_("\002{0}\002 deleted from the {1} list."), x->GetMask(), source.GetCommand());
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove {0} from the list"), x->GetMask());
+			logger.Admin(source, _("{source} used {command} to remove {0} from the list"), x->GetMask());
 
 			x->Delete();
 		}
@@ -186,7 +186,7 @@ class CommandOSSXLineBase : public Command
 		for (XLine *x : this->xlm()->GetXLines())
 			x->Delete();
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to CLEAR the list"));
+		logger.Admin(source, _("{source} used {command} to CLEAR the list"));
 
 		source.Reply(_("The {0} list has been cleared."), source.GetCommand());
 		if (Anope::ReadOnly)
@@ -346,7 +346,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} and tried to {0} {1}% of the network ({2} users)"),
+			logger.Admin(source, _("{source} used {command} and tried to {0} {1}% of the network ({2} users)"),
 				source.GetCommand(), percent, affected);
 
 			x->Delete();
@@ -380,7 +380,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 		source.Reply(_("\002{0}\002 added to the {1} list."), mask, source.GetCommand());
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
+		logger.Admin(source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
 				mask, reason, expires ? Anope::Duration(expires - Anope::CurTime) : "never",
 				affected, percent);
 
@@ -571,7 +571,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} and tried to {0} {1}% of the network ({2} users)"), source.GetCommand(), percent, affected);
+			logger.Admin(source, _("{source} used {command} and tried to {0} {1}% of the network ({2} users)"), source.GetCommand(), percent, affected);
 
 			x->Delete();
 			return;
@@ -630,7 +630,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 		source.Reply(_("\002{0}\002 added to the {1} list."), mask, source.GetCommand());
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
+		logger.Admin(source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
 				mask, x->GetReason(), expires ? Anope::Duration(expires - Anope::CurTime) : "never", affected, percent);
 
 		if (Anope::ReadOnly)

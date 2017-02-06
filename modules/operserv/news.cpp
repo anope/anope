@@ -221,7 +221,7 @@ class NewsBase : public Command
 
 		source.Reply(msgs[MSG_ADDED]);
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to add news item: {0}"), text);
+		logger.Admin(source, _("{source} used {command} to add news item: {0}"), text);
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
@@ -254,7 +254,7 @@ class NewsBase : public Command
 					NewsItem *item = list[num - 1];
 					source.Reply(msgs[MSG_DELETED], num);
 
-					logger.Command(LogType::ADMIN, source, _("{source} used {command} to delete news item {0}"), item->GetText());
+					logger.Admin(source, _("{source} used {command} to delete news item {0}"), item->GetText());
 
 					item->Delete();
 
@@ -271,7 +271,7 @@ class NewsBase : public Command
 				n->Delete();
 			source.Reply(msgs[MSG_DELETED_ALL]);
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to delete all news items"));
+			logger.Admin(source, _("{source} used {command} to delete all news items"));
 		}
 	}
 

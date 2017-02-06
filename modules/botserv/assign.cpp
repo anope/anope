@@ -55,7 +55,7 @@ class CommandBSAssign : public Command
 		}
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
- 		if (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration"))
+		if (!access.HasPriv("ASSIGN") && !source.HasOverridePriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "ASSIGN", ci->GetName());
 			return;
@@ -79,8 +79,7 @@ class CommandBSAssign : public Command
 			return;
 		}
 
-		bool override = !access.HasPriv("ASSIGN");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to assign {0}"), bi->nick);
+		logger.Command(source, ci, _("{source} used {command} on {channel} to assign {0}"), bi->nick);
 
 		bi->Assign(source.GetUser(), ci);
 		source.Reply(_("Bot \002{0}\002 has been assigned to \002{1}\002."), bi->nick, ci->GetName());
@@ -128,7 +127,7 @@ class CommandBSUnassign : public Command
 		}
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
-		if (!source.HasPriv("botserv/administration") && !access.HasPriv("ASSIGN"))
+		if (!access.HasPriv("ASSIGN") && !source.HasOverridePriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "ASSIGN", ci->GetName());
 			return;
@@ -146,8 +145,7 @@ class CommandBSUnassign : public Command
 			return;
 		}
 
-		bool override = !access.HasPriv("ASSIGN");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to unassign {0}"), ci->GetBot()->nick);
+		logger.Command(source, ci, _("{source} used {command} on {channel} to unassign {0}"), ci->GetBot()->nick);
 
 		ServiceBot *bi = ci->GetBot();
 		bi->UnAssign(source.GetUser(), ci);
@@ -192,7 +190,7 @@ class CommandBSSetNoBot : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			logger.Command(LogType::ADMIN, source, ci, _("{source} used {command} on {channel} to enable nobot"));
+			logger.Admin(source, ci, _("{source} used {command} on {channel} to enable nobot"));
 
 			ci->SetS<bool>("BS_NOBOT", true);
 			if (ci->GetBot())
@@ -201,7 +199,7 @@ class CommandBSSetNoBot : public Command
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			logger.Command(LogType::ADMIN, source, ci, _("{source} used {command} on {channel} to disable nobot"));
+			logger.Admin(source, ci, _("{source} used {command} on {channel} to disable nobot"));
 
 			ci->UnsetS<bool>("BS_NOBOT");
 			source.Reply(_("No-bot mode is now \002off\002 for \002{0}\002."), ci->GetName());

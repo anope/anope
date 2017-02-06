@@ -41,7 +41,7 @@ class CommandGLGlobal : public Command
 			return;
 		}
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to send {0}"), msg);
+		logger.Admin(source, _("{source} used {command} to send {0}"), msg);
 
 		service->SendGlobal(NULL, source.GetNick(), msg);
 	}

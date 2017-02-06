@@ -92,7 +92,6 @@ class CommandCSUp : public Command
 		User *u = User::Find(nick, true);
 		User *srcu = source.GetUser();
 		Channel *c = ci->c;
-		bool override = false;
 
 		if (u == NULL)
 		{
@@ -101,12 +100,6 @@ class CommandCSUp : public Command
 		}
 
 		if (srcu && !srcu->FindChannel(c))
-		{
-			source.Reply(_("You must be in \002%s\002 to use this command."), c->name.c_str());
-			return;
-		}
-
-		if (!u->FindChannel(c))
 		{
 			source.Reply(_("You must be on channel \002{0}\002 to use this command."), c->name);
 			return;
@@ -122,9 +115,7 @@ class CommandCSUp : public Command
 		{
 			if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
 			{
-				if (source.HasPriv("chanserv/administration"))
-					override = true;
-				else
+				if (!source.HasOverridePriv("chanserv/administration"))
 				{
 					source.Reply(_("Access denied. \002{0}\002 has more privileges than you on \002{1}\002."), u->nick, ci->GetName());
 					return;
@@ -132,7 +123,7 @@ class CommandCSUp : public Command
 			}
 		}
 
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to update the status modes of {0}"), u->nick);
+		logger.Command(source, ci, _("{source} used {command} on {channel} to update the status modes of {0}"), u->nick);
 
 		SetModes(u, c);
 	}
@@ -198,7 +189,6 @@ class CommandCSDown : public Command
 		Channel *c = ci->c;
 
 		User *srcu = source.GetUser();
-		bool override = false;
 
 		if (u == NULL)
 		{
@@ -212,12 +202,6 @@ class CommandCSDown : public Command
 			return;
 		}
 
-		if (srcu && !srcu->FindChannel(c))
-		{
-			source.Reply(_("You must be in \002%s\002 to use this command."), c->name.c_str());
-			return;
-		}
-
 		if (!u->FindChannel(c))
 		{
 			source.Reply(_("\002%s\002 is not on channel %s."), u->nick, c->name);
@@ -228,9 +212,7 @@ class CommandCSDown : public Command
 		{
 			if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
 			{
-				if (source.HasPriv("chanserv/administration"))
-					override = true;
-				else
+				if (!source.HasPriv("chanserv/administration"))
 				{
 					source.Reply(_("Access denied. \002{0}\002 has more privileges than you on \002{1}\002."), u->nick, ci->GetName());
 					return;
@@ -238,7 +220,7 @@ class CommandCSDown : public Command
 			}
 		}
 
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to remove the status modes from {0}"), u->nick);
+		logger.Command(source, ci, _("{source} used {command} on {channel} to remove the status modes from {0}"), u->nick);
 
 		RemoveAll(u, c);
 	}

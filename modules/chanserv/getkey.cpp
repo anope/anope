@@ -39,7 +39,7 @@ class CommandCSGetKey : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("GETKEY") && !source.HasCommand("chanserv/getkey"))
+		if (!source.AccessFor(ci).HasPriv("GETKEY") && !source.HasOverrideCommand("chanserv/getkey"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "GETKEY", ci->GetName());
 			return;
@@ -52,8 +52,7 @@ class CommandCSGetKey : public Command
 			return;
 		}
 
-		bool override = !source.AccessFor(ci).HasPriv("GETKEY");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel}"));
+		logger.Command(source, ci, _("{source} used {command} on {channel}"));
 
 		source.Reply(_("Key for channel \002{0}\002 is \002{1}\002."), ci->GetName(), key);
 	}

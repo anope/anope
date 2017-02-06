@@ -63,7 +63,7 @@ class CommandOSJupe : public Command
 		Server *juped_server = new Server(Me, jserver, 1, rbuf, sid, true);
 		IRCD->Send<messages::MessageServer>(juped_server);
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} ({1}"), jserver, rbuf);
+		logger.Admin(source, _("{source} used {command} on {0} ({1}"), jserver, rbuf);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

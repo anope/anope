@@ -298,6 +298,12 @@ void Logger::InsertVariables(FormatInfo &fi)
 		fi.Add("command"_kw = command->GetName());
 }
 
+void Logger::CheckOverride()
+{
+	if (type == LogType::COMMAND && source != nullptr && source->IsOverride())
+		type = LogType::OVERRIDE;
+}
+
 Anope::string Logger::FormatSource() const
 {
 	if (user)

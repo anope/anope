@@ -67,6 +67,8 @@ class CoreExport CommandSource
 	Reference<User> u;
 	/* Command info being executed */
 	CommandInfo command;
+	/* whether or not this is an override as determined by the command */
+	bool override = false;
  public:
 	/* The account executing the command */
 	Reference<NickServ::Account> nc;
@@ -108,6 +110,10 @@ class CoreExport CommandSource
 	bool HasPriv(const Anope::string &cmd);
 	bool IsServicesOper();
 	bool IsOper();
+
+	bool HasOverridePriv(const Anope::string &priv);
+	bool HasOverrideCommand(const Anope::string &priv);
+	bool IsOverride() const;
 };
 
 /** Every services command is a class, inheriting from Command.
@@ -142,8 +148,6 @@ class CoreExport Command : public Service
 	 * NOTE: If max_params is not set (default), there is no limit to the max number of params.
 	 */
 	Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params = 0);
-
-	virtual ~Command();
 
 	void SetDesc(const Anope::string &d);
 

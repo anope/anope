@@ -74,7 +74,7 @@ class CommandCSUnban : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("UNBAN") && !source.HasPriv("chanserv/kick"))
+		if (!source.AccessFor(ci).HasPriv("UNBAN") && !source.HasOverridePriv("chanserv/kick"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "UNBAN", ci->GetName());
 			return;
@@ -91,8 +91,7 @@ class CommandCSUnban : public Command
 			return;
 		}
 
-		bool override = !source.AccessFor(ci).HasPriv("UNBAN") && source.HasPriv("chanserv/kick");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, _("{source} used {command} on {channel} to unban {0}"), u2->nick);
+		logger.Command(source, _("{source} used {command} on {channel} to unban {0}"), u2->nick);
 
 		for (unsigned i = 0; i < modes.size(); ++i)
 			ci->c->Unban(u2, modes[i]->name, source.GetUser() == u2);

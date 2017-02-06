@@ -222,9 +222,8 @@ class CommandCSAKick : public Command
 			}
 		}
 
-		bool override = !source.AccessFor(ci).HasPriv("AKICK");
 		/* Opers overriding get to bypass PEACE */
-		if (override)
+		if (source.IsOverride())
 			;
 		/* These peace checks are only for masks */
 		else if (IRCD->IsChannelValid(mask))
@@ -303,9 +302,9 @@ class CommandCSAKick : public Command
 			ak = ci->AddAkick(source.GetNick(), mask, reason);
 
 		if (reason.empty())
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to add {0}"), mask);
+			logger.Command(source, ci, _("{source} used {command} on {channel} to add {0}"), mask);
 		else
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to add {0} ({1})"), mask, reason);
+			logger.Command(source, ci, _("{source} used {command} on {channel} to add {0} ({1})"), mask, reason);
 
 		EventManager::Get()->Dispatch(&Event::Akick::OnAkickAdd, source, ci, ak);
 
@@ -317,7 +316,6 @@ class CommandCSAKick : public Command
 	void DoDel(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &mask = params[2];
-		bool override = !source.AccessFor(ci).HasPriv("AKICK");
 
 		if (!ci->GetAkickCount())
 		{
@@ -340,7 +338,7 @@ class CommandCSAKick : public Command
 
 					EventManager::Get()->Dispatch(&Event::Akick::OnAkickDel, source, ci, ak);
 
-					logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"),
+					logger.Command(source, ci, _("{source} used {command} on {channel} to delete {0}"),
 							ak->GetAccount() ? ak->GetAccount()->GetDisplay() : ak->GetMask());
 
 					++deleted;
@@ -380,7 +378,7 @@ class CommandCSAKick : public Command
 				return;
 			}
 
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"),
+			logger.Command(source, ci, _("{source} used {command} on {channel} to delete {0}"),
 					match->GetAccount() ? match->GetAccount()->GetDisplay() : match->GetMask());
 
 			EventManager::Get()->Dispatch(&Event::Akick::OnAkickDel, source, ci, match);
@@ -530,17 +528,14 @@ class CommandCSAKick : public Command
 				++count;
 		}
 
-		bool override = !source.AccessFor(ci).HasPriv("AKICK");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci,
-				_("{source} used {command} on {channel} to enforce the akick list, affects {0} users"), count);
+		logger.Command(source, ci, _("{source} used {command} on {channel} to enforce the akick list, affects {0} users"), count);
 
 		source.Reply(_("Autokick enforce for \002{0}\002 complete; \002{1}\002 users were affected."), ci->GetName(), count);
 	}
 
 	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
-		bool override = !source.AccessFor(ci).HasPriv("AKICK");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to clear the akick list"));
+		logger.Command(source, ci, _("{source} used {command} on {channel} to clear the akick list"));
 
 		ci->ClearAkick();
 		source.Reply(_("The autokick list of \002{0}\002 has been cleared."), ci->GetName());
@@ -579,7 +574,7 @@ class CommandCSAKick : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify") && (!is_list || source.HasPriv("chanserv/access/list")))
+		if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasOverridePriv("chanserv/access/modify") && (!is_list || source.HasOverridePriv("chanserv/access/list")))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "AKICK", ci->GetName());
 			return;

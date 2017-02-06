@@ -95,7 +95,7 @@ class CommandOSLogSearch : public Command
 		for (; i < params.size(); ++i)
 			search_string += " " + params[i];
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} for {2}"), search_string);
+		logger.Admin(source, _("{source} used {command} for {2}"), search_string);
 
 		const Anope::string &logfile_name = Config->GetModule(this->GetOwner())->Get<Anope::string>("logname");
 		std::list<Anope::string> matches;

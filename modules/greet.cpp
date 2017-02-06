@@ -49,7 +49,7 @@ class CommandBSSetGreet : public Command
 			return;
 		}
 
-		if (!source.HasPriv("botserv/administration") && !source.AccessFor(ci).HasPriv("SET"))
+		if (!source.AccessFor(ci).HasPriv("SET") && !source.HasOverridePriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -57,16 +57,14 @@ class CommandBSSetGreet : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			bool override = !source.AccessFor(ci).HasPriv("SET");
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable greets"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to enable greets"));
 
 			ci->SetGreet(true);
 			source.Reply(_("Greet mode for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			bool override = !source.AccessFor(ci).HasPriv("SET");
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable greets"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to disable greets"));
 
 			ci->SetGreet(false);
 			source.Reply(_("Greet mode for \002{0}\002 is now \002off\002."), ci->GetName());

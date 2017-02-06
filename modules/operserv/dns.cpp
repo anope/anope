@@ -383,7 +383,7 @@ class CommandOSDNS : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to add zone {0}"), zone);
+		logger.Admin(source, _("{source} used {command} to add zone {0}"), zone);
 
 		DNSZone *z = Serialize::New<DNSZone *>();
 		z->SetName(zone);
@@ -404,7 +404,7 @@ class CommandOSDNS : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to delete zone {0}"), z->GetName());
+		logger.Admin(source, _("{source} used {command} to delete zone {0}"), z->GetName());
 
 		for (DNSZoneMembership *mem : z->GetRefs<DNSZoneMembership *>())
 			mem->Delete();
@@ -459,7 +459,7 @@ class CommandOSDNS : public Command
 					manager->Notify(zone);
 				}
 
-				logger.Command(LogType::ADMIN, source, _("{source} used {command} to add server {0} to zone {1}"), s->GetName(), z->GetName());
+				logger.Admin(source, _("{source} used {command} to add server {0} to zone {1}"), s->GetName(), z->GetName());
 
 				source.Reply(_("Server \002{0}\002 added to zone \002{1}\002."), s->GetName(), z->GetName());
 			}
@@ -481,7 +481,7 @@ class CommandOSDNS : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add server {2}"), s->GetName());
+			logger.Admin(source, _("{source} used {command} to add server {2}"), s->GetName());
 
 			source.Reply(_("Added server \002{0}\002."), s->GetName());
 		}
@@ -498,7 +498,7 @@ class CommandOSDNS : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add server {0} to zone {1}"), s->GetName(), z->GetName());
+			logger.Admin(source, _("{source} used {command} to add server {0} to zone {1}"), s->GetName(), z->GetName());
 
 			DNSZoneMembership *mem = Serialize::New<DNSZoneMembership *>();
 			mem->SetServer(s);
@@ -542,7 +542,7 @@ class CommandOSDNS : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove server {0} to zone {1}"), s->GetName(), z->GetName());
+			logger.Admin(source, _("{source} used {command} to remove server {0} to zone {1}"), s->GetName(), z->GetName());
 
 			if (manager)
 			{
@@ -570,7 +570,7 @@ class CommandOSDNS : public Command
 		if (manager)
 			manager->UpdateSerial();
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to delete server {0}"), s->GetName());
+		logger.Admin(source, _("{source} used {command} to delete server {0}"), s->GetName());
 
 		source.Reply(_("Removed server \002{0}\002."), s->GetName());
 		s->Delete();
@@ -609,7 +609,7 @@ class CommandOSDNS : public Command
 
 		source.Reply(_("Added IP \002{0}\002 to \002{1}\002."), params[2], s->GetName());
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to add IP {0} to {1}"), params[2], s->GetName());
+		logger.Admin(source, _("{source} used {command} to add IP {0} to {1}"), params[2], s->GetName());
 
 		if (s->Active() && manager)
 		{
@@ -639,7 +639,7 @@ class CommandOSDNS : public Command
 
 				source.Reply(_("Removed IP \002{0}\002 from \002{1}\002."), params[2], s->GetName());
 
-				logger.Command(LogType::ADMIN, source, _("{source} used {command} to add IP {0} to {1}"), params[2], s->GetName());
+				logger.Admin(source, _("{source} used {command} to add IP {0} to {1}"), params[2], s->GetName());
 
 				if (s->GetRefs<DNSIP *>().empty())
 				{
@@ -730,7 +730,7 @@ class CommandOSDNS : public Command
 
 		source.Reply(_("Pooled \002{0}\002."), s->GetName());
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to pool {0}"), s->GetName());
+		logger.Admin(source, _("{source} used {command} to pool {0}"), s->GetName());
 	}
 
 
@@ -757,7 +757,7 @@ class CommandOSDNS : public Command
 
 		source.Reply(_("Depooled \002{0}\002."), s->GetName());
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to depool {0}"), s->GetName());
+		logger.Admin(source, _("{source} used {command} to depool {0}"), s->GetName());
 	}
 
  public:

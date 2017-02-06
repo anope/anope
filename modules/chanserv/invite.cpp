@@ -48,7 +48,7 @@ class CommandCSInvite : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("INVITE") && !source.HasCommand("chanserv/invite"))
+		if (!source.AccessFor(ci).HasPriv("INVITE") && !source.HasOverrideCommand("chanserv/invite"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "INVITE", ci->GetName());
 			return;
@@ -76,19 +76,17 @@ class CommandCSInvite : public Command
 			return;
 		}
 
-		bool override = !source.AccessFor(ci).HasPriv("INVITE");
-
 		IRCD->Send<messages::Invite>(ci->WhoSends(), c, u2);
 		if (u2 != u)
 		{
 			source.Reply(_("\002{0}\002 has been invited to \002{1}\002."), u2->nick, c->name);
 			u2->SendMessage(ci->WhoSends(), _("You have been invited to \002{0}\002 by \002{1}\002."), c->name, source.GetNick());
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to invite {0}"), u2->nick);
+			logger.Command(source, ci, _("{source} used {command} on {channel} to invite {0}"), u2->nick);
 		}
 		else
 		{
 			u2->SendMessage(ci->WhoSends(), _("You have been invited to \002{0}\002."), c->name);
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel}"));
+			logger.Command(source, ci, _("{source} used {command} on {channel}"));
 		}
 	}
 

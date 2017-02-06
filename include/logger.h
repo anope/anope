@@ -120,6 +120,7 @@ class Logger
 	Anope::string BuildPrefix() const;
 	void LogMessage(const Anope::string &message);
 	void InsertVariables(FormatInfo &fi);
+	void CheckOverride();
 
 	template<typename... Args>
 	Anope::string Format(const Anope::string &message, Args&&... args)
@@ -184,8 +185,12 @@ class Logger
 	template<typename... Args> void Command(LogType type, CommandSource &source, ChanServ::Channel *ci, const Anope::string &message, Args&&... args)
 	{
 		Logger l = *this;
+		l.type = type;
 		l.SetSource(&source);
 		l.SetCi(ci);
+
+		// Override if the source is marked override
+		l.CheckOverride();
 
 		Anope::string translated = Language::Translate(message);
 		l.LogMessage(l.Format(translated, std::forward<Args>(args)...));
@@ -194,6 +199,30 @@ class Logger
 	template<typename... Args> void Command(LogType type, CommandSource &source, const Anope::string &message, Args&&... args)
 	{
 		Command(type, source, nullptr, message, std::forward<Args>(args)...);
+	}
+
+	// LOG_COMMAND
+
+	template<typename... Args> void Command(CommandSource &source, ChanServ::Channel *ci, const Anope::string &message, Args&&... args)
+	{
+		Command(LogType::COMMAND, source, ci, message, std::forward<Args>(args)...);
+	}
+
+	template<typename... Args> void Command(CommandSource &source, const Anope::string &message, Args&&... args)
+	{
+		Command(LogType::COMMAND, source, nullptr, message, std::forward<Args>(args)...);
+	}
+
+	// LOG_ADMIN
+
+	template<typename... Args> void Admin(CommandSource &source, ChanServ::Channel *ci, const Anope::string &message, Args&&... args)
+	{
+		Command(LogType::ADMIN, source, ci, message, std::forward<Args>(args)...);
+	}
+
+	template<typename... Args> void Admin(CommandSource &source, const Anope::string &message, Args&&... args)
+	{
+		Command(LogType::ADMIN, source, nullptr, message, std::forward<Args>(args)...);
 	}
 
 	template<typename... Args> void Log(const Anope::string &message, Args&&... args)

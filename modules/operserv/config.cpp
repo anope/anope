@@ -52,7 +52,7 @@ class CommandOSConfig : public Command
 
 			block->Set(params[2], params[3]);
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to change the configuration value of {0}:{1} to {2}"),
+			logger.Admin(source, _("{source} used {command} to change the configuration value of {0}:{1} to {2}"),
 					params[1], params[2], params[3]);
 			source.Reply(_("Value of \002{0}:{1}\002 changed to \002{2}\002."), params[1], params[2], params[3]);
 		}
@@ -61,7 +61,7 @@ class CommandOSConfig : public Command
 			/* Blocks we should show */
 			const Anope::string show_blocks[] = { "serverinfo", "networkinfo", "options", "" };
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to view the configuration"));
+			logger.Admin(source, _("{source} used {command} to view the configuration"));
 
 			for (unsigned i = 0; !show_blocks[i].empty(); ++i)
 			{

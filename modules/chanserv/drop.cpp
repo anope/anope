@@ -52,7 +52,7 @@ class CommandCSDrop : public Command
 			return;
 		}
 
-		if ((ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && !source.HasCommand("chanserv/drop"))
+		if ((ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && !source.HasOverrideCommand("chanserv/drop"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
@@ -62,8 +62,7 @@ class CommandCSDrop : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		bool override = (ci->IsSecureFounder() ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"));
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} (founder was: {0})"),
+		logger.Command(source, ci, _("{source} used {command} on {channel} (founder was: {0})"),
 				ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "none");
 
 		Reference<Channel> c = ci->c;

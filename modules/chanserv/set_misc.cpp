@@ -128,7 +128,7 @@ class CommandCSSetMisc : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasOverridePriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -151,7 +151,7 @@ class CommandCSSetMisc : public Command
 			data->SetName(scommand);
 			data->SetData(param);
 
-			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci,
+			logger.Command(source, ci,
 					_("{source} used {command} on {channel} to change it to {0}"),
 					param);
 
@@ -159,7 +159,7 @@ class CommandCSSetMisc : public Command
 		}
 		else
 		{
-			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to unset it"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to unset it"));
 
 			source.Reply(_("\002{0}\002 for \002{1}\002 unset."), scommand, ci->GetName());
 		}

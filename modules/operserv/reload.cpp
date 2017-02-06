@@ -31,7 +31,7 @@ class CommandOSReload : public Command
 	{
 		try
 		{
-			logger.Command(LogType::ADMIN, source, _("{source} used {command}"));
+			logger.Admin(source, _("{source} used {command}"));
 
 			Configuration::Conf *new_config = new Configuration::Conf();
 			Configuration::Conf *old = Config;

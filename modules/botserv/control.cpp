@@ -40,7 +40,7 @@ class CommandBSSay : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("SAY") && !source.HasPriv("botserv/administration"))
+		if (!source.AccessFor(ci).HasPriv("SAY") && !source.HasOverridePriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SAY", ci->GetName());
 			return;
@@ -74,8 +74,7 @@ class CommandBSSay : public Command
 		IRCD->SendPrivmsg(ci->GetBot(), ci->GetName(), text);
 		ci->GetBot()->lastmsg = Anope::CurTime;
 
-		bool override = !source.AccessFor(ci).HasPriv("SAY");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to say: {0}"), text);
+		logger.Command(source, ci, _("{source} used {command} on {channel} to say: {0}"), text);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -112,7 +111,7 @@ class CommandBSAct : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("SAY") && !source.HasPriv("botserv/administration"))
+		if (!source.AccessFor(ci).HasPriv("SAY") && !source.HasOverridePriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SAY", ci->GetName());
 			return;
@@ -144,8 +143,7 @@ class CommandBSAct : public Command
 		IRCD->SendAction(ci->GetBot(), ci->GetName(), message);
 		ci->GetBot()->lastmsg = Anope::CurTime;
 
-		bool override = !source.AccessFor(ci).HasPriv("SAY");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} to say: {0}"), message);
+		logger.Command(source, ci, _("{source} used {command} to say: {0}"), message);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -143,8 +143,7 @@ class CommandBSBadwords : public Command
 	
 	void DoList(CommandSource &source, ChanServ::Channel *ci, const Anope::string &word)
 	{
-		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to list badwords"));
+		logger.Command(source, ci, _("{source} used {command} on {channel} to list badwords"));
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Word")).AddColumn(_("Type"));
@@ -243,8 +242,7 @@ class CommandBSBadwords : public Command
 				return;
 			}
 
-		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to add {0}"), realword);
+		logger.Command(source, ci, _("{source} used {command} on {channel} to add {0}"), realword);
 		badwords->AddBadWord(ci, realword, bwtype);
 
 		source.Reply(_("\002{0}\002 added to \002{1}\002 bad words list."), realword, ci->GetName());
@@ -271,7 +269,7 @@ class CommandBSBadwords : public Command
 					if (!num || num > badwords->GetBadWordCount(ci))
 						return;
 
-					logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to remove {0}"), badwords->GetBadWord(ci, num - 1)->GetWord());
+					logger.Command(source, ci, _("{source} used {command} on {channel} to remove {0}"), badwords->GetBadWord(ci, num - 1)->GetWord());
 
 					++deleted;
 					badwords->EraseBadWord(ci, num - 1);
@@ -305,7 +303,7 @@ class CommandBSBadwords : public Command
 				return;
 			}
 
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to remove {3}"), bw->GetWord());
+			logger.Command(source, ci, _("{source} used {command} on {channel} to remove {3}"), bw->GetWord());
 
 			source.Reply(_("\002{0}\002 deleted from \002{1}\002 bad words list."), bw->GetWord(), ci->GetName());
 
@@ -315,8 +313,7 @@ class CommandBSBadwords : public Command
 
 	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
-		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to clear the badwords list"));
+		logger.Command(source, ci, _("{source} used {command} on {channel} to clear the badwords list"));
 
 		badwords->ClearBadWords(ci);
 		source.Reply(_("Bad words list is now empty."));
@@ -352,7 +349,7 @@ class CommandBSBadwords : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("BADWORDS") && (!need_args || !source.HasPriv("botserv/administration")))
+		if (!source.AccessFor(ci).HasPriv("BADWORDS") && !source.HasOverridePriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "BADWORDS", ci->GetName());
 			return;

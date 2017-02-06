@@ -270,7 +270,7 @@ class CommandOSForbid : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add a forbid on {0} of type {1}"), entry, subcommand);
+			logger.Admin(source, _("{source} used {command} to add a forbid on {0} of type {1}"), entry, subcommand);
 
 			source.Reply(_("Added a forbid on \002{0}\002 of type \002{1}\002 to expire on \002{2}\002."), entry, subcommand.lower(), expiryt ? Anope::strftime(expiryt, source.GetAccount()) : "never");
 
@@ -382,7 +382,7 @@ class CommandOSForbid : public Command
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove forbid on {0} of type {1}"), d->GetMask(), subcommand);
+			logger.Admin(source, _("{source} used {command} to remove forbid on {0} of type {1}"), d->GetMask(), subcommand);
 
 			source.Reply(_("\002{0}\002 deleted from the \002{1}\002 forbid list."), d->GetMask(), subcommand);
 			d->Delete();

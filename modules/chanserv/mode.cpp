@@ -276,8 +276,6 @@ class CommandCSMode : public Command
 		const Anope::string &subcommand = params[2];
 		const Anope::string &param = params.size() > 3 ? params[3] : "";
 
-		bool override = !source.AccessFor(ci).HasPriv("MODE");
-
 		if (Anope::ReadOnly && !subcommand.equals_ci("LIST"))
 		{
 			source.Reply(_("Services are in read-only mode."));
@@ -375,7 +373,7 @@ class CommandCSMode : public Command
 			{
 				source.Reply(_("\002{0}\002 locked on \002{1}\002."), reply, ci->GetName());
 
-				logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to lock {0}"), reply);
+				logger.Command(source, ci, _("{source} used {command} on {channel} to lock {0}"), reply);
 			}
 			else if (needreply)
 			{
@@ -432,7 +430,7 @@ class CommandCSMode : public Command
 								mode_param = " " + mode_param;
 							source.Reply(_("\002{0}{1}{2}\002 has been unlocked from \002{3}\002."), adding == 1 ? '+' : '-', cm->mchar, mode_param, ci->GetName());
 
-							logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to unlock {0}"),
+							logger.Command(source, ci, _("{source} used {command} on {channel} to unlock {0}"),
 									(adding ? '+' : '-') + cm->mchar + mode_param);
 						}
 						else
@@ -489,14 +487,12 @@ class CommandCSMode : public Command
 	{
 		User *u = source.GetUser();
 
-		bool has_access = source.AccessFor(ci).HasPriv("MODE") || source.HasPriv("chanserv/administration");
-		bool can_override = source.HasPriv("chanserv/administration");
+		bool has_access = source.AccessFor(ci).HasPriv("MODE") || source.HasOverridePriv("chanserv/administration");
 
 		spacesepstream sep(params.size() > 3 ? params[3] : "");
 		Anope::string modes = params[2], param;
 
-		bool override = !source.AccessFor(ci).HasPriv("MODE") && source.HasPriv("chanserv/administration");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to set {3}"),
+		logger.Command(source, ci, _("{source} used {command} on {channel} to set {3}"),
 				params[2] + (params.size() > 3 ? " " + params[3] : ""));
 
 		int adding = -1;
@@ -517,7 +513,7 @@ class CommandCSMode : public Command
 					{
 						ChannelMode *cm = ModeManager::GetChannelModes()[j];
 
-						if (!u || cm->CanSet(u) || can_override)
+						if (!u || cm->CanSet(u) || source.IsOverride())
 						{
 							if (cm->type == MODE_REGULAR || (!adding && cm->type == MODE_PARAM))
 							{
@@ -533,7 +529,7 @@ class CommandCSMode : public Command
 					if (adding == -1)
 						break;
 					ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
-					if (!cm || (u && !cm->CanSet(u) && !can_override))
+					if (!cm || (u && !cm->CanSet(u) && !source.IsOverride()))
 						continue;
 					switch (cm->type)
 					{
@@ -564,7 +560,7 @@ class CommandCSMode : public Command
 
 							if (param.find_first_of("*?") != Anope::string::npos)
 							{
-								if (!this->CanSet(source, ci, cm, false) && !can_override)
+								if (!this->CanSet(source, ci, cm, false) && !source.IsOverride())
 								{
 									source.Reply(_("You do not have access to set mode \002{0}\002."), cm->mchar);
 									break;
@@ -577,7 +573,7 @@ class CommandCSMode : public Command
 
 									ChanServ::AccessGroup targ_access = ci->AccessFor(uc->user);
 
-									if (uc->user->IsProtected() || (ci->IsPeace() && targ_access >= u_access && !can_override))
+									if (uc->user->IsProtected() || (ci->IsPeace() && targ_access >= u_access && !source.IsOverride()))
 									{
 										source.Reply(_("You do not have the access to change the modes of \002{0}\002."), uc->user->nick.c_str());
 										continue;
@@ -601,7 +597,7 @@ class CommandCSMode : public Command
 									break;
 								}
 
-								if (!this->CanSet(source, ci, cm, source.GetUser() == target) && !can_override)
+								if (!this->CanSet(source, ci, cm, source.GetUser() == target) && !source.IsOverride())
 								{
 									source.Reply(_("You do not have access to set mode \002{0}\002."), cm->mchar);
 									break;
@@ -610,7 +606,7 @@ class CommandCSMode : public Command
 								if (source.GetUser() != target)
 								{
 									ChanServ::AccessGroup targ_access = ci->AccessFor(target);
-									if (ci->IsPeace() && targ_access >= u_access && !can_override)
+									if (ci->IsPeace() && targ_access >= u_access && !source.IsOverride())
 									{
 										source.Reply(_("You do not have the access to change the modes of \002{0}\002"), target->nick);
 										break;
@@ -720,10 +716,13 @@ class CommandCSMode : public Command
 
 		if (subcommand.equals_ci("LOCK") && params.size() > 2)
 		{
-			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/administration"))
+			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasOverridePriv("chanserv/administration"))
+			{
 				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MODE", ci->GetName());
-			else
-				this->DoLock(source, ci, params);
+				return;
+			}
+
+			this->DoLock(source, ci, params);
 		}
 		else if (!ci->c)
 		{
@@ -810,36 +809,25 @@ class CommandCSModes : public Command
 		ChanServ::AccessGroup u_access = source.AccessFor(ci), targ_access = ci->AccessFor(targ);
 		const std::pair<bool, Anope::string> &m = modes[source.GetCommand()];
 
-		bool can_override = source.HasPriv("chanserv/administration");
-		bool override = false;
-
 		if (m.second.empty())
 			return; // Configuration issue
 
 		const Anope::string &want = u == targ ? m.second + "ME" : m.second;
 		if (!u_access.HasPriv(want))
 		{
-			if (!can_override)
+			if (!source.HasOverridePriv("chanserv/administration"))
 			{
 				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), want, ci->GetName());
 				return;
 			}
-			else
-			{
-				override = true;
-			}
 		}
 
-		if (!override && !m.first && u != targ && (targ->IsProtected() || (ci->IsPeace() && targ_access >= u_access)))
+		if (!m.first && u != targ && (targ->IsProtected() || (ci->IsPeace() && targ_access >= u_access)))
 		{
-			if (!can_override)
+			if (!source.HasOverridePriv("chanserv/administration"))
 			{
 				source.Reply(_("Access denied. \002{0}\002 has the same or more privileges than you on \002{1}\002."), targ->nick, ci->GetName());
 				return;
-			}
-			else
-			{
-				override = true;
 			}
 		}
 
@@ -854,7 +842,7 @@ class CommandCSModes : public Command
 		else
 			ci->c->RemoveMode(NULL, m.second, targ->GetUID());
 
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} on {3}"), targ->nick);
+		logger.Command(source, ci, _("{source} used {command} on {channel} on {3}"), targ->nick);
 	}
 
  	const Anope::string GetDesc(CommandSource &source) const override

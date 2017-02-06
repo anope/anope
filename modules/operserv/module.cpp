@@ -35,7 +35,7 @@ class CommandOSModLoad : public Command
 		ModuleReturn status = ModuleManager::LoadModule(mname, source.GetUser());
 		if (status == MOD_ERR_OK)
 		{
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to load module {0}"), mname);
+			logger.Admin(source, _("{source} used {command} to load module {0}"), mname);
 			source.Reply(_("Module \002{0}\002 loaded."), mname);
 		}
 		else if (status == MOD_ERR_EXISTS)
@@ -101,7 +101,7 @@ class CommandOSModReLoad : public Command
 		status = ModuleManager::LoadModule(mname, source.GetUser());
 		if (status == MOD_ERR_OK)
 		{
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to reload module {0}"), mname);
+			logger.Admin(source, _("{source} used {command} to reload module {0}"), mname);
 			source.Reply(_("Module \002{0}\002 reloaded."), mname);
 		}
 		else
@@ -155,7 +155,7 @@ class CommandOSModUnLoad : public Command
 
 		if (status == MOD_ERR_OK)
 		{
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to unload module {0}"), mname);
+			logger.Admin(source, _("{source} used {command} to unload module {0}"), mname);
 			source.Reply(_("Module \002{0}\002 unloaded."), mname);
 		}
 		else

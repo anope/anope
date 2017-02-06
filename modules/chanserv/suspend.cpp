@@ -189,7 +189,7 @@ class CommandCSSuspend : public Command
 				ci->c->Kick(NULL, users[i], !reason.empty() ? reason : Language::Translate(users[i], _("This channel has been suspended.")));
 		}
 
-		logger.Command(LogType::ADMIN, source, ci, _("{source} used {command} on {channel} ({0}), expires on {1}"),
+		logger.Admin(source, ci, _("{source} used {command} on {channel} ({0}), expires on {1}"),
 				!reason.empty() ? reason : "No reason", expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 
 		source.Reply(_("Channel \002{0}\002 is now suspended."), ci->GetName());
@@ -236,7 +236,7 @@ class CommandCSUnSuspend : public Command
 			return;
 		}
 
-		logger.Command(LogType::ADMIN, source, ci, _("{source} used {command} on {channel} which was suspended by {0} for: {1}"),
+		logger.Admin(source, ci, _("{source} used {command} on {channel} which was suspended by {0} for: {1}"),
 				si->GetBy(), !si->GetReason().empty() ? si->GetReason() : "No reason");
 
 		si->Delete();

@@ -216,7 +216,7 @@ class CommandNSSASetPassword : public Command
 			return;
 		}
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to change the password of {0}"), nc->GetDisplay());
+		logger.Admin(source, _("{source} used {command} to change the password of {0}"), nc->GetDisplay());
 
 		Anope::string tmp_pass;
 		Anope::Encrypt(params[1], tmp_pass);
@@ -1079,7 +1079,7 @@ class CommandNSSASetNoexpire : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to enable {0} for {1}"),
+			logger.Admin(source, _("{source} used {command} to enable {0} for {1}"),
 					"NOEXPIRE", na->GetAccount()->GetDisplay());
 
 			na->SetNoExpire(true);
@@ -1087,7 +1087,7 @@ class CommandNSSASetNoexpire : public Command
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to disable {0} for {1}"),
+			logger.Admin(source, _("{source} used {command} to disable {0} for {1}"),
 					"NOEXPIRE", na->GetAccount()->GetDisplay());
 
 			na->SetNoExpire(false);

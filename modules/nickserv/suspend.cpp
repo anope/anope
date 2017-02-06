@@ -194,7 +194,7 @@ class CommandNSSuspend : public Command
 			}
 		}
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} for {0} ({1}), expires on {2}"),
+		logger.Admin(source, _("{source} used {command} for {0} ({1}), expires on {2}"),
 				nick, !reason.empty() ? reason : "No reason", expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("\002{0}\002 is now suspended."), na->GetNick());
 
@@ -240,7 +240,7 @@ class CommandNSUnSuspend : public Command
 			return;
 		}
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} for {0}, which was suspended by {1} for: {2}"),
+		logger.Admin(source, _("{source} used {command} for {0}, which was suspended by {1} for: {2}"),
 				!si->GetBy().empty() ? si->GetBy() : "(noone)", !si->GetReason().empty() ? si->GetReason() : "no reason");
 
 		si->Delete();

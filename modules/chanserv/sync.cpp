@@ -45,14 +45,13 @@ class CommandCSSync : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && !source.HasPriv("chanserv/administration"))
+		if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && !source.HasOverridePriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "ACCESS_CHANGE", ci->GetName());
 			return;
 		}
 
-		bool override = !source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/administration");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel}"));
+		logger.Command(source, ci, _("{source} used {command} on {channel}"));
 
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 			ci->c->SetCorrectModes(it->second->user, true);

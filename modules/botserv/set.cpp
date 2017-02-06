@@ -111,7 +111,7 @@ class CommandBSSetBanExpire : public Command
 		}
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
-		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
+		if (!access.HasPriv("SET") && !source.HasOverridePriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -139,8 +139,7 @@ class CommandBSSetBanExpire : public Command
 
 		ci->SetBanExpire(t);
 
-		bool override = !access.HasPriv("SET");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to change banexpire to {0}"), arg);
+		logger.Command(source, ci, _("{source} used {command} on {channel} to change banexpire to {0}"), arg);
 
 		if (!t)
 			source.Reply(_("Bot bans will no longer automatically expire."));

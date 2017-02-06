@@ -41,7 +41,7 @@ class CommandBSSetFantasy : public Command
 			return;
 		}
 
-		if (!source.HasPriv("botserv/administration") && !source.AccessFor(ci).HasPriv("SET"))
+		if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -55,16 +55,14 @@ class CommandBSSetFantasy : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			bool override = !source.AccessFor(ci).HasPriv("SET");
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable fantasy"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to enable fantasy"));
 
 			ci->SetFantasy(true);
 			source.Reply(_("Fantasy mode is now \002on\002 on channel \002{0}\002."), ci->GetName());
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			bool override = !source.AccessFor(ci).HasPriv("SET");
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable fantasy"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to disable fantasy"));
 
 			ci->SetFantasy(false);
 			source.Reply(_("Fantasy mode is now \002off\002 on channel \002{0}\002."), ci->GetName());

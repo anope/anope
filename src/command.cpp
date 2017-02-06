@@ -152,6 +152,29 @@ bool CommandSource::IsOper()
 	return false;
 }
 
+bool CommandSource::HasOverridePriv(const Anope::string &priv)
+{
+	if (!HasPriv(priv))
+		return false;
+
+	override = true;
+	return true;
+}
+
+bool CommandSource::HasOverrideCommand(const Anope::string &priv)
+{
+	if (!HasCommand(priv))
+		return false;
+
+	override = true;
+	return true;
+}
+
+bool CommandSource::IsOverride() const
+{
+	return override;
+}
+
 void CommandSource::Reply(const Anope::string &message)
 {
 	const char *translated_message = Language::Translate(this->nc, message.c_str());
@@ -167,10 +190,6 @@ Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t
 	, min_params(minparams)
 	, module(o)
 	, logger(this)
-{
-}
-
-Command::~Command()
 {
 }
 

@@ -61,7 +61,6 @@ public:
 
 		User *u = source.GetUser();
 		ChanServ::Channel *ci = ChanServ::Find(channel);
-		bool override = false;
 
 		if (ci == NULL)
 		{
@@ -84,14 +83,10 @@ public:
 
 		if (!source.IsFounder(ci) || !source.IsFounder(target_ci))
 		{
-			if (!source.HasPriv("chanserv/administration"))
+			if (!source.HasOverridePriv("chanserv/administration"))
 			{
 				source.Reply(_("Access denied. You do not have the privilege \002{0}\002 on \002{1}\002 and \002{2}\002."), "FOUNDER", ci->GetName(), target_ci->GetName());
 				return;
-			}
-			else
-			{
-				override = true;
 			}
 		}
 
@@ -209,7 +204,7 @@ public:
 			return;
 		}
 
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to clone {0} to {1}"),
+		logger.Command(source, ci, _("{source} used {command} on {channel} to clone {0} to {1}"),
 				what.empty() ? "everything from it" : what, target_ci->GetName());
 	}
 

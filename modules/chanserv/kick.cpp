@@ -61,7 +61,7 @@ class CommandCSKick : public Command
 		Anope::string signkickformat = Config->GetModule("chanserv/main")->Get<Anope::string>("signkickformat", "%m (%n)");
 		signkickformat = signkickformat.replace_all_cs("%n", source.GetNick());
 
-		if (!u_access.HasPriv("KICK") && !source.HasPriv("chanserv/kick"))
+		if (!u_access.HasPriv("KICK") && !source.HasOverridePriv("chanserv/kick"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "KICK", ci->GetName());
 			return;
@@ -70,26 +70,34 @@ class CommandCSKick : public Command
 		if (u2)
 		{
 			ChanServ::AccessGroup u2_access = ci->AccessFor(u2);
-			if (u != u2 && ci->IsPeace() && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
+			if (u != u2 && ci->IsPeace() && u2_access >= u_access && !source.HasOverridePriv("chanserv/kick"))
+			{
 				source.Reply(_("Access denied. \002{0}\002 has the same or more privileges than you on \002{1}\002."), u2->nick, ci->GetName());
-			else if (u2->IsProtected())
+				return;
+			}
+
+			if (u2->IsProtected())
+			{
 				source.Reply(_("Access denied. \002{0}\002 is protected and can not be kicked."), u2->nick);
-			else if (!c->FindUser(u2))
+				return;
+			}
+
+			if (!c->FindUser(u2))
+			{
 				source.Reply(_("User \002{0}\002 is not on channel \002{1}\002."), u2->nick, c->name);
+				return;
+			}
+
+			logger.Command(source, ci, _("{source} used {command} on {channel} for {0}"), u2->nick);
+
+			if (ci->IsSignKick() || (ci->IsSignKickLevel() && !u_access.HasPriv("SIGNKICK")))
+			{
+				signkickformat = signkickformat.replace_all_cs("%m", reason);
+				c->Kick(ci->WhoSends(), u2, signkickformat);
+			}
 			else
 			{
-				bool override = !u_access.HasPriv("KICK") || (u != u2 && ci->IsPeace() && u2_access >= u_access);
-				logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} for {0}"), u2->nick);
-
-				if (ci->IsSignKick() || (ci->IsSignKickLevel() && !u_access.HasPriv("SIGNKICK")))
-				{
-					signkickformat = signkickformat.replace_all_cs("%m", reason);
-					c->Kick(ci->WhoSends(), u2, signkickformat);
-				}
-				else
-				{
-					c->Kick(ci->WhoSends(), u2, reason);
-				}
+				c->Kick(ci->WhoSends(), u2, reason);
 			}
 		}
 		else if (u_access.HasPriv("FOUNDER"))

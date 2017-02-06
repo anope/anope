@@ -59,7 +59,7 @@ class CommandHSOn : public Command
 
 		source.Reply(_("Your vhost of \002{0}\002 is now activated."), vhost->Mask());
 		
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to enable their vhost of {0}"), vhost->Mask());
+		logger.Admin(source, _("{source} used {command} to enable their vhost of {0}"), vhost->Mask());
 		IRCD->Send<messages::VhostSet>(u, vhost->GetIdent(), vhost->GetHost());
 		u->vhost = vhost->GetHost();
 		if (IRCD->CanSetVIdent && !vhost->GetIdent().empty())

@@ -150,7 +150,7 @@ class CommandOSAKill : public Command
 		if (percent > 95) // XXX make this configurable..
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; Please use a more specific mask."), mask);
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} and tried to akill {0}% of the network ({1} users)"),
+			logger.Admin(source, _("{source} used {command} and tried to akill {0}% of the network ({1} users)"),
 				95, affected);
 			x->Delete();
 			return;
@@ -170,7 +170,7 @@ class CommandOSAKill : public Command
 
 		source.Reply(_("\002{0}\002 added to the akill list."), mask);
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
+		logger.Admin(source, _("{source} used {command} on {0} ({1}), expires in {2} [affects {3} user(s) ({4}%)]"),
 			mask, x->GetReason(), expires ? Anope::Duration(expires - Anope::CurTime) : "never", affected, percent);
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
@@ -204,7 +204,7 @@ class CommandOSAKill : public Command
 					if (!x)
 						return;
 
-					logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove {0} from the akill list"), x->GetMask());
+					logger.Admin(source, _("{source} used {command} to remove {0} from the akill list"), x->GetMask());
 
 					++deleted;
 					x->Delete();
@@ -233,7 +233,7 @@ class CommandOSAKill : public Command
 			{
 				EventManager::Get()->Dispatch(&Event::DelXLine::OnDelXLine, source, x, akills);
 
-				logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove {0} from the akill list"), x->GetMask());
+				logger.Admin(source, _("{source} used {command} to remove {0} from the akill list"), x->GetMask());
 
 				source.Reply(_("\002{0}\002 deleted from the akill list."), x->GetMask());
 				x->Delete();
@@ -348,7 +348,7 @@ class CommandOSAKill : public Command
 			x->Delete();
 		}
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to CLEAR the akill list"));
+		logger.Admin(source, _("{source} used {command} to CLEAR the akill list"));
 
 		source.Reply(_("The akill list has been cleared."));
 

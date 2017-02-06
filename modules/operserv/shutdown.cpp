@@ -29,7 +29,7 @@ class CommandOSRestart : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		logger.Command(LogType::ADMIN, source, _("{source} used {command}"));
+		logger.Admin(source, _("{source} used {command}"));
 		Anope::QuitReason = source.GetCommand() + " command received from " + source.GetNick();
 		Anope::Quitting = Anope::Restarting = true;
 	}
@@ -51,7 +51,7 @@ class CommandOSShutdown : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		logger.Command(LogType::ADMIN, source, _("{source} used {command}"));
+		logger.Admin(source, _("{source} used {command}"));
 		Anope::QuitReason = source.GetCommand() + " command received from " + source.GetNick();
 		Anope::Quitting = true;
 	}

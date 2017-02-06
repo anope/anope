@@ -140,7 +140,7 @@ class CommandOSMode : public Command
 			}
 
 			if (!log_modes.replace_all_cs("+", "").replace_all_cs("-", "").empty())
-				logger.Command(LogType::ADMIN, source, _("{source} used {command} {0} on {1}"), log_modes + log_params, c ? c->name : target);
+				logger.Admin(source, _("{source} used {command} {0} on {1}"), log_modes + log_params, c ? c->name : target);
 		}
 	}
 
@@ -179,7 +179,7 @@ class CommandOSUMode : public Command
 
 		u2->SendMessage(*source.service, _("\002{0}\002 changed your usermodes to \002{1}\002."), source.GetNick(), modes);
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0}"), target);
+		logger.Admin(source, _("{source} used {command} on {0}"), target);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

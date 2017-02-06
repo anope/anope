@@ -43,7 +43,7 @@ class CommandHSOff : public Command
 		// XXX vident?
 		u->vhost.clear();
 		IRCD->Send<messages::VhostDel>(u);
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to disable their vhost"));
+		logger.Admin(source, _("{source} used {command} to disable their vhost"));
 		source.Reply(_("Your vhost was removed and the normal cloaking restored."));
 	}
 

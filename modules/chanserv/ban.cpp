@@ -70,7 +70,7 @@ class CommandCSBan : public Command
 
 		if (IRCD->GetMaxListFor(c) && c->HasMode(mode) >= IRCD->GetMaxListFor(c))
 		{
-			source.Reply(_("The %s list for %s is full."), mode.lower().c_str(), c->name.c_str());
+			source.Reply(_("The {0} list for {1} is full."), mode.lower(), c->name);
 			return;
 		}
 
@@ -117,7 +117,7 @@ class CommandCSBan : public Command
 
 		ChanServ::AccessGroup u_access = source.AccessFor(ci);
 
-		if (!u_access.HasPriv("BAN") && !source.HasPriv("chanserv/kick"))
+		if (!u_access.HasPriv("BAN") && !source.HasOverridePriv("chanserv/kick"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "BAN", ci->GetName());
 			return;
@@ -127,7 +127,7 @@ class CommandCSBan : public Command
 		{
 			ChanServ::AccessGroup u2_access = ci->AccessFor(u2);
 
-			if (u != u2 && ci->IsPeace() && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
+			if (u != u2 && ci->IsPeace() && u2_access >= u_access && !source.HasOverridePriv("chanserv/kick"))
 			{
 				source.Reply(_("Access denied. \002{0}\002 has the same or more privileges than you on \002{1}\002."), u2->nick, ci->GetName());
 				return;
@@ -151,8 +151,7 @@ class CommandCSBan : public Command
 
 			Anope::string mask = ci->GetIdealBan(u2);
 
-			bool override = !u_access.HasPriv("BAN") || (u != u2 && ci->IsPeace() && u2_access >= u_access);
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} for {0}"), mask);
+			logger.Command(source, ci, _("{source} used {command} on {channel} for {0}"), mask);
 
 			if (!c->HasMode(mode, mask))
 			{
@@ -183,12 +182,9 @@ class CommandCSBan : public Command
 		}
 		else
 		{
-			bool founder = u_access.HasPriv("FOUNDER");
-			bool override = !founder && !u_access.HasPriv("BAN");
-
 			Anope::string mask = IRCD->NormalizeMask(target);
 
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} for {0}"), mask);
+			logger.Command(source, ci, _("{source} used {command} on {channel} for {0}"), mask);
 
 			if (!c->HasMode(mode, mask))
 			{
@@ -213,7 +209,7 @@ class CommandCSBan : public Command
 
 					ChanServ::AccessGroup u2_access = ci->AccessFor(uc->user);
 
-					if (matched > 1 && !founder)
+					if (matched > 1 && !u_access.HasPriv("FOUNDER"))
 						continue;
 					if (u != uc->user && ci->IsPeace() && u2_access >= u_access)
 						continue;

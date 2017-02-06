@@ -225,7 +225,7 @@ class CommandOSDefcon : public Command
 		source.Reply(_("Services are now at defcon \002{0}\002."), DConfig.defaultlevel);
 		this->SendLevels(source);
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} to change defcon level to {0}"), newLevel);
+		logger.Admin(source, _("{source} used {command} to change defcon level to {0}"), newLevel);
 
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */

@@ -53,7 +53,7 @@ class CommandNSConfirm : public Command
 
 			na->GetAccount()->SetUnconfirmed(false);
 			EventManager::Get()->Dispatch(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), na->GetAccount());
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to confirm nickname {0} ({1})"), na->GetNick(), na->GetAccount()->GetDisplay());
+			logger.Admin(source, _("{source} used {command} to confirm nickname {0} ({1})"), na->GetNick(), na->GetAccount()->GetDisplay());
 			source.Reply(_("\002{0}\002 has been confirmed."), na->GetNick());
 
 			/* Login the users online already */

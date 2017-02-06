@@ -207,7 +207,7 @@ class CommandCSSetPrivate : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasOverridePriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -215,14 +215,14 @@ class CommandCSSetPrivate : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable private"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to enable private"));
 
 			ci->SetPrivate(true);
 			source.Reply(_("Private option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable private"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to disable private"));
 
 			ci->SetPrivate(false);
 			source.Reply(_("Private option for \002{0}\002 is now \002off\002."), ci->GetName());

@@ -36,9 +36,9 @@ class CommandOSChanList : public Command
 		User *u2;
 
 		if (!pattern.empty())
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} for {0}"), pattern);
+			logger.Admin(source, _("{source} used {command} for {0}"), pattern);
 		else
-			logger.Command(LogType::ADMIN, source, _("{source} used {command}"));
+			logger.Admin(source, _("{source} used {command}"));
 
 		if (!opt.empty() && opt.equals_ci("SECRET"))
 		{
@@ -138,9 +138,9 @@ class CommandOSUserList : public Command
 		std::set<Anope::string> modes;
 
 		if (!pattern.empty())
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} for {0}"), pattern);
+			logger.Admin(source, _("{source} used {command} for {0}"), pattern);
 		else
-			logger.Command(LogType::ADMIN, source, _("{source} used {command}"));
+			logger.Admin(source, _("{source} used {command}"));
 
 		if (!opt.empty() && opt.equals_ci("INVISIBLE"))
 			modes.insert("INVIS");

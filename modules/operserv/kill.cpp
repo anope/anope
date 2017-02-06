@@ -51,7 +51,7 @@ class CommandOSKill : public Command
 		if (Config->GetModule("operserv/main")->Get<bool>("addakiller"))
 			reason = "(" + source.GetNick() + ") " + reason;
 
-		logger.Command(LogType::ADMIN, source, _("{source} used {command} on {0} for {1}"), u2->nick, reason);
+		logger.Admin(source, _("{source} used {command} on {0} for {1}"), u2->nick, reason);
 
 		u2->Kill(*source.service, reason);
 	}

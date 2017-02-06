@@ -140,16 +140,13 @@ class CommandCSXOP : public Command
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
 		ChanServ::ChanAccess *highest = access.Highest();
-		bool override = false;
 
 		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.GetCommand().upper()),
 			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccessImpl::DetermineLevel(highest)) : order.end();
 
 		if (!access.founder && (!access.HasPriv("ACCESS_CHANGE") || cmd_it <= access_it))
 		{
-			if (source.HasPriv("chanserv/access/modify"))
-				override = true;
-			else
+			if (!source.HasPriv("chanserv/access/modify"))
 			{
 				source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_CHANGE", ci->GetName());
 				return;
@@ -244,7 +241,7 @@ class CommandCSXOP : public Command
 		acc->SetLastSeen(0);
 		acc->SetCreated(Anope::CurTime);
 
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to add {0}"), mask);
+		logger.Command(source, ci, _("{source} used {command} on {channel} to add {0}"), mask);
 
 		EventManager::Get()->Dispatch(&Event::AccessAdd::OnAccessAdd, ci, source, acc);
 		source.Reply(_("\002{0}\002 added to {1} {2} list."), acc->Mask(), ci->GetName(), source.GetCommand());
@@ -275,7 +272,6 @@ class CommandCSXOP : public Command
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
 		ChanServ::ChanAccess *highest = access.Highest();
-		bool override = false;
 
 		if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos && !NickServ::FindNick(mask))
 		{
@@ -294,9 +290,7 @@ class CommandCSXOP : public Command
 
 		if (!mask.equals_ci(nc->GetDisplay()) && !access.founder && (!access.HasPriv("ACCESS_CHANGE") || cmd_it <= access_it))
 		{
-			if (source.HasPriv("chanserv/access/modify"))
-				override = true;
-			else
+			if (!source.HasPriv("chanserv/access/modify"))
 			{
 				source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_CHANGE", ci->GetName());
 				return;
@@ -335,7 +329,7 @@ class CommandCSXOP : public Command
 						 source.Reply(_("No matching entries on {0} {1} list."), ci->GetName(), source.GetCommand());
 					else
 					{
-						logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"), nicks);
+						logger.Command(source, ci, _("{source} used {command} on {channel} to delete {0}"), nicks);
 
 						if (deleted == 1)
 							source.Reply(_("Deleted one entry from {0} {1} list."), ci->GetName(), source.GetCommand());
@@ -355,7 +349,7 @@ class CommandCSXOP : public Command
 
 				if (a->Mask().equals_ci(mask))
 				{
-					logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to delete {0}"), a->GetMask());
+					logger.Command(source, ci, _("{source} used {command} on {channel} to delete {0}"), a->GetMask());
 
 					source.Reply(_("\002{0}\002 deleted from {1} {2} list."), a->Mask(), ci->GetName(), source.GetCommand());
 
@@ -459,14 +453,13 @@ class CommandCSXOP : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
+		if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasOverridePriv("chanserv/access/modify"))
 		{
 			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
 		}
 
-		bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
-		logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to clear the access list"));
+		logger.Command(source, ci, _("{source} used {command} on {channel} to clear the access list"));
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{

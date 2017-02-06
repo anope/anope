@@ -54,7 +54,7 @@ class CommandCSSetKeepTopic : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasOverridePriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -62,14 +62,14 @@ class CommandCSSetKeepTopic : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			logger.Command(!source.AccessFor(ci).HasPriv("SET") ? LogType::OVERRIDE : LogType::COMMAND, source, _("{source} used {command} on {channel} to enable keeptopic"));
+			logger.Command(source, _("{source} used {command} on {channel} to enable keeptopic"));
 
 			ci->SetKeepTopic(true);
 			source.Reply(_("Topic retention option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			logger.Command(!source.AccessFor(ci).HasPriv("SET") ? LogType::OVERRIDE : LogType::COMMAND, source, _("{source} used {command} on {channel} to disable keeptopic"));
+			logger.Command(source, _("{source} used {command} on {channel} to disable keeptopic"));
 
 			ci->SetKeepTopic(false);
 			source.Reply(_("Topic retention option for \002{0}\002 is now \002off\002."), ci->GetName());
@@ -133,11 +133,10 @@ class CommandCSTopic : public Command
 		if (has_topiclock)
 			ci->SetTopicLock(true);
 
-		bool override = !source.AccessFor(ci).HasPriv("TOPIC");
 		if (!topic.empty())
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, _("{source} used {command} on {channel} to change the topic to: {0}"), topic);
+			logger.Command(source, _("{source} used {command} on {channel} to change the topic to: {0}"), topic);
 		else
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, _("{source} used {command} on {channel} to unset the topic"));
+			logger.Command(source, _("{source} used {command} on {channel} to unset the topic"));
 	}
 
 	void Append(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -179,7 +178,7 @@ class CommandCSTopic : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("TOPIC") && !source.HasCommand("chanserv/topic"))
+		if (!source.AccessFor(ci).HasPriv("TOPIC") && !source.HasOverrideCommand("chanserv/topic"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "TOPIC", ci->GetName());
 			return;

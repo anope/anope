@@ -172,7 +172,7 @@ class CommandOSInfo : public Command
 
 			source.Reply(_("Added info to \002{0}\002."), target);
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to add oper information to {0}: {1}"), target, info);
+			logger.Admin(source, _("{source} used {command} to add oper information to {0}: {1}"), target, info);
 
                 	if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
@@ -200,7 +200,7 @@ class CommandOSInfo : public Command
 
 					source.Reply(_("Deleted info from \002{0}\002."), target);
 
-					logger.Command(LogType::ADMIN, source, _("{source} used {command} to remove oper information from {0}: {1}"), target, info);
+					logger.Admin(source, _("{source} used {command} to remove oper information from {0}: {1}"), target, info);
 
 	        	        	if (Anope::ReadOnly)
 						source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
@@ -225,7 +225,7 @@ class CommandOSInfo : public Command
 
 			source.Reply(_("Cleared info from \002{0}\002."), target);
 
-			logger.Command(LogType::ADMIN, source, _("{source} used {command} to clear oper information for {0}"), target);
+			logger.Admin(source, _("{source} used {command} to clear oper information for {0}"), target);
 
                 	if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));

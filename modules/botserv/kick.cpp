@@ -586,7 +586,7 @@ class CommandBSKickBase : public Command
 			this->OnSyntaxError(source, "");
 		else if (!option.equals_ci("ON") && !option.equals_ci("OFF"))
 			this->OnSyntaxError(source, "");
-		else if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("botserv/administration"))
+		else if (!source.AccessFor(ci).HasPriv("SET") && !source.HasOverridePriv("botserv/administration"))
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 		else if (!ci->GetBot())
 			source.Reply(_("There is no bot assigned to \002{0}\002."), ci->GetName());
@@ -636,13 +636,11 @@ class CommandBSKickBase : public Command
 			else
 				source.Reply(_("Bot will now kick for \002{0}\002."), optname);
 
-			bool override = !source.AccessFor(ci).HasPriv("SET");
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable the {0} kicker"), optname);
+			logger.Command(source, ci, _("{source} used {command} on {channel} to enable the {0} kicker"), optname);
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			bool override = !source.AccessFor(ci).HasPriv("SET");
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable the {0} kicker"), optname);
+			logger.Command(source, ci, _("{source} used {command} on {channel} to disable the {0} kicker"), optname);
 
 			(kd->*setter)(false);
 			(kd->*ttbsetter)(0);
@@ -1082,7 +1080,7 @@ class CommandBSSetDontKickOps : public Command
 		}
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
-		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
+		if (!access.HasPriv("SET") && !source.HasOverridePriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -1098,16 +1096,14 @@ class CommandBSSetDontKickOps : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			bool override = !access.HasPriv("SET");
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable dontkickops"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to enable dontkickops"));
 
 			kd->SetDontKickOps(true);
 			source.Reply(_("Bot \002won't kick ops\002 on channel \002{0}\002."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			bool override = !access.HasPriv("SET");
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable dontkickops"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to disable dontkickops"));
 
 			kd->SetDontKickOps(false);
 			source.Reply(_("Bot \002will kick ops\002 on channel \002{0}\002."), ci->GetName());
@@ -1148,7 +1144,7 @@ class CommandBSSetDontKickVoices : public Command
 		}
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
-		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
+		if (!access.HasPriv("SET") && !source.HasOverridePriv("botserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
@@ -1164,19 +1160,17 @@ class CommandBSSetDontKickVoices : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			bool override = !access.HasPriv("SET");
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to enable dontkickvoices"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to enable dontkickvoices"));
 
 			kd->SetDontKickVoices(true);
-			source.Reply(_("Bot \002won't kick voices\002 on channel %s."), ci->GetName().c_str());
+			source.Reply(_("Bot \002won't kick voices\002 on channel \002{0}\002."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			bool override = !access.HasPriv("SET");
-			logger.Command(override ? LogType::OVERRIDE : LogType::COMMAND, source, ci, _("{source} used {command} on {channel} to disable dontkickvoices"));
+			logger.Command(source, ci, _("{source} used {command} on {channel} to disable dontkickvoices"));
 
 			kd->SetDontKickVoices(false);
-			source.Reply(_("Bot \002will kick voices\002 on channel %s."), ci->GetName().c_str());
+			source.Reply(_("Bot \002will kick voices\002 on channel \002{0}\002."), ci->GetName());
 		}
 		else
 		{

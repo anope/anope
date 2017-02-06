@@ -152,7 +152,7 @@ class CommandEntryMessage : public Command
 		msg->SetCreator(source.GetNick());
 		msg->SetMessage(message);
 
-		logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to add a message"));
+		logger.Command(source, ci, _("{source} used {command} on {channel} to add a message"));
 
 		source.Reply(_("Entry message added to \002{0}\002"), ci->GetName());
 	}
@@ -180,7 +180,7 @@ class CommandEntryMessage : public Command
 			{
 				messages[i - 1]->Delete();
 
-				logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to remove a message"));
+				logger.Command(source, ci, _("{source} used {command} on {channel} to remove a message"));
 
 				source.Reply(_("Entry message \002{0}\002 for \002{1]\002 deleted."), i, ci->GetName());
 			}
@@ -198,7 +198,7 @@ class CommandEntryMessage : public Command
 		for (EntryMsg *e : ci->GetRefs<EntryMsg *>())
 			e->Delete();
 
-		logger.Command(source.AccessFor(ci).HasPriv("SET") ? LogType::COMMAND : LogType::OVERRIDE, source, ci, _("{source} used {command} on {channel} to remove all messages"));
+		logger.Command(source, ci, _("{source} used {command} on {channel} to remove all messages"));
 
 		source.Reply(_("Entry messages for \002{0}\002 have been cleared."), ci->GetName());
 	}
@@ -230,7 +230,7 @@ class CommandEntryMessage : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/administration"))
+		if (!source.AccessFor(ci).HasPriv("SET") && !source.HasOverridePriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;

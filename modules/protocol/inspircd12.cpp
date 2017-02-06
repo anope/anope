@@ -151,13 +151,14 @@ class InspIRCd12Proto : public IRCDProto
 
 	void SendVhostDel(User *u) anope_override
 	{
-		if (u->HasMode("CLOAK"))
-			this->SendChgHostInternal(u->nick, u->chost);
-		else
-			this->SendChgHostInternal(u->nick, u->host);
+		UserMode *um = ModeManager::FindUserModeByName("CLOAK");
 
-		if (Servers::Capab.count("CHGIDENT") && u->GetIdent() != u->GetVIdent())
-			this->SendChgIdentInternal(u->nick, u->GetIdent());
+		if (um && !u->HasMode(um->name))
+			// Just set +x if we can
+			u->SetMode(NULL, um);
+		else
+			// Try to restore cloaked host
+			this->SendChgHostInternal(u->nick, u->chost);
 	}
 
 	void SendAkill(User *u, XLine *x) anope_override

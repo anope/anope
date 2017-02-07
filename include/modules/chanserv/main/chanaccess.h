@@ -22,8 +22,7 @@
 class ChanAccessImpl : public ChanServ::ChanAccess
 {
  public:
-	ChanAccessImpl(Serialize::TypeBase *type) : ChanServ::ChanAccess(type) { }
-	ChanAccessImpl(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::ChanAccess(type, id) { }
+	using ChanServ::ChanAccess::ChanAccess;
 
 	ChanServ::Channel *GetChannel() override;
 	void SetChannel(ChanServ::Channel *ci) override;
@@ -40,11 +39,10 @@ class ChanAccessImpl : public ChanServ::ChanAccess
 	Anope::string GetMask() override;
 	void SetMask(const Anope::string &) override;
 
-	Serialize::Object *GetObj() override;
-	void SetObj(Serialize::Object *) override;
+	NickServ::Account *GetAccount() override;
+	void SetAccount(NickServ::Account *) override;
 
 	Anope::string Mask() override;
-	NickServ::Account *GetAccount() override;
 
 	bool Matches(const User *u, NickServ::Account *acc) override;
 };

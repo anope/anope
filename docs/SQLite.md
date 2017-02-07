@@ -6,21 +6,21 @@ It does this by using SQLites support for having indexes on expressions https://
 For example the account table could look like:
 
 ```
-CREATE TABLE `anope_db_account` (
+CREATE TABLE `anope_account` (
+	`id` INTEGER PRIMARY KEY AUTOINCREMENT,
 	`display`,
 	`pass`,
 	`email`,
-	`language`,
-	`id` NOT NULL PRIMARY KEY,
-	FOREIGN KEY (id) REFERENCES anope_db_objects(id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED
+	`language`
 );
-CREATE INDEX idx_display ON `anope_db_account` (anope_canonicalize(display));
+
+CREATE INDEX idx_display ON `anope_account` (anope_canonicalize(display));
 ```
 
 So, to do a SELECT which utilizes the indicies, Anope does something like:
 
 ```
-SELECT id FROM `anope_db_account` WHERE anope_canonicalize(display) = anope_canonicalize('Adam');
+SELECT id FROM `anope_account` WHERE anope_canonicalize(display) = anope_canonicalize('Adam');
 ```
 
 If you are using your own SQLite instance, like the sqlite command line interface, the anope_canonicalize function
@@ -31,13 +31,13 @@ or libanope_sqlite_rfc1459.so into SQLite, depending on your casemap configurati
 sqlite> .load lib/libanope_sqlite_ascii.so
 ```
 
-## Example of adding a new operator via SQLite
+## Example of registering a new user via SQLite
 
 ```
 BEGIN TRANSACTION;
--- Allocate new ID and insert into objects table
-INSERT INTO anope_db_objects (id, type) SELECT MAX(id + 1), 'oper' FROM anope_db_objects;
--- Insert new operator using previously allocated id
-INSERT INTO anope_db_oper (name, type, require_oper, id) VALUES ('Adam', 'Services Root', 1, last_insert_rowid());
+-- Insert new account
+INSERT INTO anope_account (display, email, private, autoop, killprotect) VALUES ('Adam', 'adam@anope.org', 1, 1, 1);
+-- Insert nickname, linking it to the account
+INSERT INTO anope_nick (nick, account) VALUES ('Adam', last_insert_rowid());
 COMMIT;
 ```

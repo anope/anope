@@ -41,11 +41,9 @@ namespace Serialize
 	template<typename T, typename> class Type;
 	template<typename T> class Reference;
 
-	// by id
-	extern std::unordered_map<ID, Object *> objects;
 	extern std::vector<FieldBase *> serializableFields;
 	
-	extern Object *GetID(ID id);
+	extern Object *GetID(Serialize::TypeBase *type, ID id);
 
 	template<typename T>
 	inline T GetObject();
@@ -240,7 +238,6 @@ class CoreExport Serialize::TypeBase : public Service
 	std::set<Object *> objects;
 
 	TypeBase(Module *owner, const Anope::string &n);
-	~TypeBase();
 
 	void Unregister();
 
@@ -292,7 +289,7 @@ class Serialize::Type : public Base
 
 	T* RequireID(ID id)
 	{
-		Object *s = Serialize::GetID(id);
+		Object *s = Serialize::GetID(this, id);
 		if (s == nullptr)
 			return new T(this, id);
 
@@ -353,7 +350,7 @@ class Serialize::Reference
 		if (!valid)
 			return nullptr;
 
-		Object *targ = GetID(id);
+		Object *targ = GetID(type, id);
 		if (targ != nullptr && targ->GetSerializableType() == type)
 			return anope_dynamic_static_cast<T*>(targ);
 

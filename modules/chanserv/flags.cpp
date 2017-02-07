@@ -108,54 +108,27 @@ class CommandCSFlags : public Command
 		ChanServ::AccessGroup u_access = source.AccessFor(ci);
 		ChanServ::ChanAccess *highest = u_access.Highest();
 
-		NickServ::Nick *na = nullptr;
-		ChanServ::Channel *targ_ci = nullptr;
-
-		if (IRCD->IsChannelValid(mask))
+		NickServ::Nick *na = NickServ::FindNick(mask);
+		if (!na && Config->GetModule("chanserv/main")->Get<bool>("disallow_hostmask_access"))
 		{
-			if (Config->GetModule("chanserv/main")->Get<bool>("disallow_channel_access"))
-			{
-				source.Reply(_("Channels may not be on access lists."));
-				return;
-			}
-
-			targ_ci = ChanServ::Find(mask);
-			if (targ_ci == NULL)
-			{
-				source.Reply(_("Channel \002{0}\002 isn't registered."), mask);
-				return;
-			}
-			else if (ci == targ_ci)
-			{
-				source.Reply(_("You can't add a channel to its own access list."));
-				return;
-			}
-
-			mask = targ_ci->GetName();
+			source.Reply(_("Masks and unregistered users may not be on access lists."));
+			return;
 		}
-		else
+
+		if (mask.find_first_of("!*@") == Anope::string::npos && !na)
 		{
-			na = NickServ::FindNick(mask);
-			if (!na && Config->GetModule("chanserv/main")->Get<bool>("disallow_hostmask_access"))
+			User *targ = User::Find(mask, true);
+			if (targ != NULL)
+				mask = "*!*@" + targ->GetDisplayedHost();
+			else
 			{
-				source.Reply(_("Masks and unregistered users may not be on access lists."));
+				source.Reply(_("\002{0}\002 isn't registered."), mask);
 				return;
 			}
-			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
-			{
-				User *targ = User::Find(mask, true);
-				if (targ != NULL)
-					mask = "*!*@" + targ->GetDisplayedHost();
-				else
-				{
-					source.Reply(_("\002{0}\002 isn't registered."), mask);
-					return;
-				}
-			}
-
-			if (na)
-				mask = na->GetNick();
 		}
+
+		if (na)
+			mask = na->GetNick();
 
 		ChanServ::ChanAccess *current = NULL;
 		unsigned current_idx;
@@ -275,9 +248,7 @@ class CommandCSFlags : public Command
 
 		FlagsChanAccess *access = Serialize::New<FlagsChanAccess *>();
 		if (na)
-			access->SetObj(na->GetAccount());
-		else if (targ_ci)
-			access->SetObj(targ_ci);
+			access->SetAccount(na->GetAccount());
 		access->SetChannel(ci);
 		access->SetMask(mask);
 		access->SetCreator(source.GetNick());

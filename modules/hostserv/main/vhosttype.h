@@ -22,7 +22,7 @@
 class VHostType : public Serialize::Type<VHostImpl>
 {
  public:
-	Serialize::ObjectField<VHostImpl, Serialize::Object *> owner;
+	Serialize::ObjectField<VHostImpl, NickServ::Account *> account;
 	Serialize::Field<VHostImpl, Anope::string> vident;
 	Serialize::Field<VHostImpl, Anope::string> vhost;
 	Serialize::Field<VHostImpl, Anope::string> creator;

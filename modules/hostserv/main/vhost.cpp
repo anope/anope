@@ -18,15 +18,16 @@
  */
 
 #include "vhosttype.h"
+#include "modules/nickserv.h"
 
-Serialize::Object *VHostImpl::GetOwner()
+NickServ::Account *VHostImpl::GetAccount()
 {
-	return Get(&VHostType::owner);
+	return Get(&VHostType::account);
 }
 
-void VHostImpl::SetOwner(Serialize::Object *owner)
+void VHostImpl::SetAccount(NickServ::Account *acc)
 {
-	Set(&VHostType::owner, owner);
+	Set(&VHostType::account, acc);
 }
 
 Anope::string VHostImpl::GetIdent()

@@ -25,7 +25,7 @@ class VHostImpl : public HostServ::VHost
 {
 	friend class VHostType;
 
-	Serialize::Storage<Serialize::Object *> owner;
+	Serialize::Storage<NickServ::Account *> account;
 	Serialize::Storage<Anope::string> vident;
 	Serialize::Storage<Anope::string> vhost;
 	Serialize::Storage<Anope::string> creator;
@@ -35,8 +35,8 @@ class VHostImpl : public HostServ::VHost
  public:
 	using HostServ::VHost::VHost;
 
-	Serialize::Object *GetOwner() override;
-	void SetOwner(Serialize::Object *) override;
+	NickServ::Account *GetAccount() override;
+	void SetAccount(NickServ::Account *) override;
 
 	Anope::string GetIdent() override;
 	void SetIdent(const Anope::string &) override;

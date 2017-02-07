@@ -71,14 +71,14 @@ void ChanAccessImpl::SetMask(const Anope::string &n)
 	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::mask, n);
 }
 
-Serialize::Object *ChanAccessImpl::GetObj()
+NickServ::Account *ChanAccessImpl::GetAccount()
 {
-	return Get(&ChanAccessType<ChanServ::ChanAccess>::obj);
+	return Get(&ChanAccessType<ChanServ::ChanAccess>::account);
 }
 
-void ChanAccessImpl::SetObj(Serialize::Object *o)
+void ChanAccessImpl::SetAccount(NickServ::Account *acc)
 {
-	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::obj, o);
+	Object::Set(&ChanAccessType<ChanServ::ChanAccess>::account, acc);
 }
 
 Anope::string ChanAccessImpl::Mask()
@@ -87,14 +87,6 @@ Anope::string ChanAccessImpl::Mask()
 		return acc->GetDisplay();
 
 	return GetMask();
-}
-
-NickServ::Account *ChanAccessImpl::GetAccount()
-{
-	if (!GetObj() || GetObj()->GetSerializableType()->GetName() != NickServ::Account::NAME)
-		return nullptr;
-
-	return anope_dynamic_static_cast<NickServ::Account *>(GetObj());
 }
 
 bool ChanAccessImpl::Matches(const User *u, NickServ::Account *acc)

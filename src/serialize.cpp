@@ -25,7 +25,7 @@
 
 using namespace Serialize;
 
-std::unordered_map<ID, Object *> Serialize::objects;
+static std::map<Serialize::TypeBase *, std::unordered_map<ID, Object *>> objects;
 
 std::vector<FieldBase *> Serialize::serializableFields;
 
@@ -34,33 +34,34 @@ std::multimap<Anope::string, Anope::string> Serialize::child_types;
 static ID curid;
 
 
-Object *Serialize::GetID(ID id)
+Object *Serialize::GetID(Serialize::TypeBase *type, ID id)
 {
-	auto it = objects.find(id);
-	if (it != objects.end())
+	auto it = objects[type].find(id);
+	if (it != objects[type].end())
 		return it->second;
 	return nullptr;
 }
 
 void Serialize::GC()
 {
-	for (auto it = objects.begin(); it != objects.end();)
-	{
-		Object *o = it->second;
-
-		if (!o->CanGC())
+	for (auto it = objects.begin(); it != objects.end(); ++it)
+		for (auto it2 = it->second.begin(); it2 != it->second.end();)
 		{
-			// Wipe internal storage to force refetch
-			o->Wipe();
-			++it;
-			continue;
+			Object *o = it2->second;
+
+			if (!o->CanGC())
+			{
+				// Wipe internal storage to force refetch
+				o->Wipe();
+				++it2;
+				continue;
+			}
+
+			Anope::Logger.Debug2("garbage collected object {0}", o->id);
+
+			it2 = it->second.erase(it2);
+			delete o;
 		}
-
-		Anope::Logger.Debug2("garbage collected object {0}", o->id);
-
-		it = objects.erase(it);
-		delete o;
-	}
 }
 
 void Serialize::Unregister(Module *m)
@@ -109,15 +110,15 @@ std::vector<Edge> Object::GetEdges(TypeBase *type)
 Object::Object(TypeBase *type)
 {
 	ID i;
-	EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializableGetId, i);
+	EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializableGetId, type, i);
 	if (result != EVENT_ALLOW)
 	{
-		while (GetID(++curid));
+		while (GetID(type, ++curid));
 		i = curid;
 	}
 
 	id = i;
-	objects[id] = this;
+	objects[type][id] = this;
 
 	this->s_type = type;
 
@@ -131,7 +132,7 @@ Object::Object(TypeBase *type)
 Object::Object(TypeBase *type, ID i)
 {
 	this->id = i;
-	objects[i] = this;
+	objects[type][id] = this;
 
 	this->s_type = type;
 
@@ -142,7 +143,7 @@ Object::Object(TypeBase *type, ID i)
 
 Object::~Object()
 {
-	Anope::Logger.Debug2("Destructing object id #{0} address {2} type {3}", id, static_cast<void *>(this), s_type->GetName());
+	Anope::Logger.Debug2("Destructing object id #{0} address {1} type {2}", id, static_cast<void *>(this), s_type->GetName());
 
 	/* Remove in memory edges */
 	std::map<TypeBase *, std::vector<Edge>> copy = edges;
@@ -161,7 +162,7 @@ Object::~Object()
 			}
 		}
 
-	objects.erase(id);
+	objects[s_type].erase(id);
 	s_type->objects.erase(this);
 }
 
@@ -230,18 +231,16 @@ TypeBase::TypeBase(Module *o, const Anope::string &n) : Service(o, TypeBase::NAM
 {
 }
 
-TypeBase::~TypeBase()
-{
-	if (!Serialize::GetObjects<Object *>(this->GetName()).empty())
-		throw CoreException("Type destructing with objects still alive");
-}
-
 void TypeBase::Unregister()
 {
 	Anope::Logger.Debug2("Unregistering type {0}", this->GetName());
 
-	for (Object *obj : GetObjects<Object *>(this->GetName()))
-		obj->Delete();
+	// Delete in memory objects
+	std::unordered_map<ID, Object *> objs = ::objects[this];
+	for (auto &pair : objs)
+		delete pair.second;
+
+	::objects.erase(this);
 
 	for (FieldBase *field : serializableFields)
 	{

@@ -1202,7 +1202,7 @@ namespace Event
 
 		virtual EventReturn OnSerializeDeref(Serialize::ID value, Serialize::TypeBase *type) anope_abstract;
 
-		virtual EventReturn OnSerializableGetId(Serialize::ID &id) anope_abstract;
+		virtual EventReturn OnSerializableGetId(Serialize::TypeBase *type, Serialize::ID &id) anope_abstract;
 
 		virtual void OnSerializableDelete(Serialize::Object *) anope_abstract;
 

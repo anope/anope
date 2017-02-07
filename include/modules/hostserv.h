@@ -31,8 +31,8 @@ namespace HostServ
 	 public:
 		static constexpr const char *const NAME = "vhost";
 
-		virtual Serialize::Object *GetOwner() anope_abstract;
-		virtual void SetOwner(Serialize::Object *) anope_abstract;
+		virtual NickServ::Account *GetAccount() anope_abstract;
+		virtual void SetAccount(NickServ::Account *) anope_abstract;
 
 		virtual Anope::string GetIdent() anope_abstract;
 		virtual void SetIdent(const Anope::string &) anope_abstract;

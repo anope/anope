@@ -138,8 +138,11 @@ namespace MemoServ
 
 		virtual bool HasIgnore(User *u) anope_abstract;
 
-		virtual Serialize::Object *GetOwner() anope_abstract;
-		virtual void SetOwner(Serialize::Object *) anope_abstract;
+		virtual NickServ::Account *GetAccount() anope_abstract;
+		virtual void SetAccount(NickServ::Account *) anope_abstract;
+
+		virtual ChanServ::Channel *GetChannel() anope_abstract;
+		virtual void SetChannel(ChanServ::Channel *) anope_abstract;
 
 		virtual int16_t GetMemoMax() anope_abstract;
 		virtual void SetMemoMax(const int16_t &) anope_abstract;

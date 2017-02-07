@@ -25,7 +25,7 @@ class ChanAccessType : public Serialize::Type<T>
  public:
 	Serialize::ObjectField<ChanServ::ChanAccess, ChanServ::Channel *> channel;
 	Serialize::Field<ChanServ::ChanAccess, Anope::string> mask;
-	Serialize::ObjectField<ChanServ::ChanAccess, Serialize::Object *> obj;
+	Serialize::ObjectField<ChanServ::ChanAccess, NickServ::Account *> account;
 	Serialize::Field<ChanServ::ChanAccess, Anope::string> creator;
 	Serialize::Field<ChanServ::ChanAccess, time_t> last_seen;
 	Serialize::Field<ChanServ::ChanAccess, time_t> created;
@@ -33,7 +33,7 @@ class ChanAccessType : public Serialize::Type<T>
 	ChanAccessType(Module *me) : Serialize::Type<T>(me)
 		, channel(this, "channel", &ChanServ::ChanAccess::channel, true)
 		, mask(this, "mask", &ChanServ::ChanAccess::mask)
-		, obj(this, "obj", &ChanServ::ChanAccess::object, true)
+		, account(this, "account", &ChanServ::ChanAccess::account, true)
 		, creator(this, "creator", &ChanServ::ChanAccess::creator)
 		, last_seen(this, "last_seen", &ChanServ::ChanAccess::last_seen)
 		, created(this, "created", &ChanServ::ChanAccess::created)

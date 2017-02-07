@@ -96,7 +96,7 @@ class SQLiteService : public Provider
 	Query BeginTransaction() override;
 	Query Commit() override;
 
-	Serialize::ID GetID(const Anope::string &) override;
+	Serialize::ID GetID(const Anope::string &prefix, const Anope::string &type) override;
 
 	Query GetTables(const Anope::string &prefix);
 
@@ -240,10 +240,6 @@ std::vector<Query> SQLiteService::InitSchema(const Anope::string &prefix)
 
 	queries.push_back(Query("PRAGMA foreign_keys = ON"));
 
-	/* https://sqlite.org/lang_createtable.html#rowid, https://sqlite.org/autoinc.html */
-	Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + "objects` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `type`)";
-	queries.push_back(t);
-
 	return queries;
 }
 
@@ -251,21 +247,7 @@ std::vector<Query> SQLiteService::Replace(const Anope::string &table, const Quer
 {
 	std::vector<Query> queries;
 
-	Anope::string query_text = "INSERT OR IGNORE INTO `" + table + "` (";
-	for (const std::pair<Anope::string, QueryData> &p : q.parameters)
-		query_text += "`" + p.first + "`,";
-	query_text.erase(query_text.length() - 1);
-	query_text += ") VALUES (";
-	for (const std::pair<Anope::string, QueryData> &p : q.parameters)
-		query_text += "@" + p.first + "@,";
-	query_text.erase(query_text.length() - 1);
-	query_text += ")";
-
-	Query query(query_text);
-	query.parameters = q.parameters;
-	queries.push_back(query);
-
-	query_text = "UPDATE `" + table + "` SET ";
+	Anope::string query_text = "UPDATE `" + table + "` SET ";
 	for (const std::pair<Anope::string, QueryData> &p : q.parameters)
 		if (!keys.count(p.first))
 			query_text += "`" + p.first + "` = @" + p.first + "@,";
@@ -280,7 +262,7 @@ std::vector<Query> SQLiteService::Replace(const Anope::string &table, const Quer
 		query_text += "`" + key + "` = @" + key + "@";
 	}
 
-	query = query_text;
+	Query query(query_text);
 	query.parameters = q.parameters;
 	queries.push_back(query);
 
@@ -303,7 +285,7 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &prefix, Seria
 
 			if (field->is_object)
 			{
-				Anope::string refname = field->GetTypeName() == Serialize::Object::NAME ? "objects" : field->GetTypeName();
+				Anope::string refname = field->GetTypeName();
 				query += " REFERENCES " + prefix + refname + "(id) ON DELETE ";
 
 				if (field->depends)
@@ -321,7 +303,7 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &prefix, Seria
 			query += ",";
 		}
 
-		query += " `id` INTEGER PRIMARY KEY, FOREIGN KEY (id) REFERENCES " + prefix + "objects(id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)";
+		query += " `id` INTEGER PRIMARY KEY AUTOINCREMENT)";
 		queries.push_back(query);
 
 		active_schema[prefix + base->GetName()] = fields;
@@ -343,7 +325,8 @@ std::vector<Query> SQLiteService::AlterTable(const Anope::string &prefix, Serial
 
 		if (field->is_object)
 		{
-			buf += " REFERENCES " + prefix + "objects(id) ON DELETE ";
+			Anope::string refname = field->GetTypeName();
+			buf += " REFERENCES " + prefix + refname + "(id) ON DELETE ";
 
 			if (field->depends)
 			{
@@ -394,21 +377,12 @@ Query SQLiteService::Commit()
 	return Query("COMMIT");
 }
 
-Serialize::ID SQLiteService::GetID(const Anope::string &prefix)
+Serialize::ID SQLiteService::GetID(const Anope::string &prefix, const Anope::string &type)
 {
-	Query query = "SELECT MAX(id) AS id FROM `" + prefix + "objects`";
-	Serialize::ID id = 1;
-
+	Query query = "INSERT INTO `" + prefix + type + "` DEFAULT VALUES";
 	Result res = RunQuery(query);
-	if (res.Rows() && !res.IsNull(0, "id"))
-	{
-		id = convertTo<Serialize::ID>(res.Get(0, "id"));
 
-		/* next id */
-		++id;
-	}
-
-	/* OnSerializableCreate is called immediately after this which does the insert, within the same transaction */
+	Serialize::ID id = res.GetID();
 
 	return id;
 }

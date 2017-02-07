@@ -189,7 +189,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 				if (create && !ci->GetMemos())
 				{
 					MemoServ::MemoInfo *mi = Serialize::New<MemoServ::MemoInfo *>();
-					mi->SetOwner(ci);
+					mi->SetChannel(ci);
 				}
 				return ci->GetMemos();
 			}
@@ -208,7 +208,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 				if (create && !na->GetAccount()->GetMemos())
 				{
 					MemoServ::MemoInfo *mi = Serialize::New<MemoServ::MemoInfo *>();
-					mi->SetOwner(na->GetAccount());
+					mi->SetAccount(na->GetAccount());
 				}
 				return na->GetAccount()->GetMemos();
 			}
@@ -238,14 +238,14 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 	void OnNickRegister(User *, NickServ::Nick *na, const Anope::string &) override
 	{
 		MemoServ::MemoInfo *mi = Serialize::New<MemoServ::MemoInfo *>();
-		mi->SetOwner(na->GetAccount());
+		mi->SetAccount(na->GetAccount());
 		mi->SetMemoMax(Config->GetModule(this)->Get<int>("maxmemos"));
 	}
 
 	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
 		MemoServ::MemoInfo *mi = Serialize::New<MemoServ::MemoInfo *>();
-		mi->SetOwner(ci);
+		mi->SetChannel(ci);
 		mi->SetMemoMax(Config->GetModule(this)->Get<int>("maxmemos"));
 	}
 

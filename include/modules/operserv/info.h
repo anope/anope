@@ -25,8 +25,11 @@ class OperInfo : public Serialize::Object
  public:
 	static constexpr const char *const NAME = "operinfo";
 	 
-	virtual Serialize::Object *GetTarget() anope_abstract;
-	virtual void SetTarget(Serialize::Object *) anope_abstract;
+	virtual NickServ::Account *GetAccount() anope_abstract;
+	virtual void SetAccount(NickServ::Account *) anope_abstract;
+
+	virtual ChanServ::Channel *GetChannel() anope_abstract;
+	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
 
 	virtual Anope::string GetInfo() anope_abstract;
 	virtual void SetInfo(const Anope::string &) anope_abstract;

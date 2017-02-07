@@ -110,7 +110,7 @@ class CommandHSAdd : public Command
 			return;
 		}
 
-		vhost->SetOwner(na->GetAccount());
+		vhost->SetAccount(na->GetAccount());
 		vhost->SetIdent(user);
 		vhost->SetHost(host);
 		vhost->SetCreator(source.GetNick());

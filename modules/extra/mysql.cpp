@@ -83,7 +83,7 @@ class MySQLResult : public Result
 		unsigned num_fields = mysql_num_fields(res);
 		MYSQL_FIELD *fields = mysql_fetch_fields(res);
 
-		/* It is not thread safe to log anything here using Log(this->owner) now :( */
+		/* It is not thread safe to log anything here using the loggers now :( */
 
 		if (!num_fields || !fields)
 			return;
@@ -164,7 +164,7 @@ class MySQLService : public Provider
 	Query BeginTransaction() override;
 	Query Commit() override;
 
-	Serialize::ID GetID(const Anope::string &) override;
+	Serialize::ID GetID(const Anope::string &prefix, const Anope::string &type) override;
 
 	Query GetTables(const Anope::string &prefix) override;
 
@@ -241,7 +241,7 @@ class ModuleSQL : public Module
 
 			if (i == config->CountBlock("mysql"))
 			{
-				Log(LogType::NORMAL, "mysql") << "MySQL: Removing server connection " << cname;
+				logger.Log("Removing server connection {0}", cname);
 
 				delete s;
 				this->MySQLServices.erase(cname);
@@ -266,11 +266,11 @@ class ModuleSQL : public Module
 					MySQLService *ss = new MySQLService(this, connname, database, server, user, password, port);
 					this->MySQLServices.insert(std::make_pair(connname, ss));
 
-					Log(LogType::NORMAL, "mysql") << "MySQL: Successfully connected to server " << connname << " (" << server << ")";
+					logger.Log(_("Successfully connected to server {0} ({1})"), connname, server);
 				}
 				catch (const SQL::Exception &ex)
 				{
-					Log(LogType::NORMAL, "mysql") << "MySQL: " << ex.GetReason();
+					logger.Log(ex.GetReason());
 				}
 			}
 		}
@@ -394,8 +394,6 @@ std::vector<Query> MySQLService::InitSchema(const Anope::string &prefix)
 {
 	std::vector<Query> queries;
 
-	queries.push_back(Query("CREATE TABLE IF NOT EXISTS `" + prefix + "objects` (`id` bigint(20) NOT NULL PRIMARY KEY, `type` TINYTEXT) ENGINE=InnoDB"));
-
 	return queries;
 }
 
@@ -431,11 +429,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &prefix, Serial
 
 	if (active_schema.find(prefix + base->GetName()) == active_schema.end())
 	{
-		Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + base->GetName() + "` (`id` bigint(20) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB";
-		queries.push_back(t);
-
-		t = "ALTER TABLE `" + prefix + base->GetName() + "` "
-			"ADD CONSTRAINT `" + base->GetName() + "_id_fk` FOREIGN KEY (`id`) REFERENCES `" + prefix + "objects` (`id`) ON DELETE CASCADE";
+		Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + base->GetName() + "` (`id` bigint(20) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE=InnoDB";
 		queries.push_back(t);
 
 		active_schema[prefix + base->GetName()];
@@ -455,13 +449,13 @@ std::vector<Query> MySQLService::AlterTable(const Anope::string &prefix, Seriali
 	{
 		Anope::string buf = "ALTER TABLE `" + prefix + table + "` ADD COLUMN `" + field->serialize_name + "` ";
 
-		if (!field->object)
+		if (!field->is_object)
 		{
 			buf += "TINYTEXT";
 		}
 		else
 		{
-			buf += "bigint(20), ADD CONSTRAINT `" + table + "_" + field->serialize_name + "_fk` FOREIGN KEY (`" + field->serialize_name + "`) REFERENCES `" + prefix + "objects` (`id`) ON DELETE ";
+			buf += "bigint(20), ADD CONSTRAINT `" + table + "_" + field->serialize_name + "_fk` FOREIGN KEY (`" + field->serialize_name + "`) REFERENCES `" + prefix + field->GetTypeName() + "` (`id`) ON DELETE ";
 
 			if (field->depends)
 				buf += "CASCADE";
@@ -506,21 +500,12 @@ Query MySQLService::Commit()
 	return Query("COMMIT");
 }
 
-Serialize::ID MySQLService::GetID(const Anope::string &prefix)
+Serialize::ID MySQLService::GetID(const Anope::string &prefix, const Anope::string &type)
 {
-	Query query = "SELECT `id` FROM `" + prefix + "objects` ORDER BY `id` DESC LIMIT 1";
-	Serialize::ID id = 1;
-
+	Query query = "INSERT INTO `" + prefix + type + "` VALUES ()";
 	Result res = RunQuery(query);
-	if (res.Rows())
-	{
-		id = convertTo<Serialize::ID>(res.Get(0, "id"));
 
-		/* next id */
-		++id;
-	}
-
-	/* OnSerializableCreate is called immediately after this which does the insert */
+	Serialize::ID id = res.GetID();
 
 	return id;
 }
@@ -542,7 +527,7 @@ void MySQLService::Connect()
 	if (!connect)
 		throw SQL::Exception("Unable to connect to MySQL service " + this->GetName() + ": " + mysql_error(this->sql));
 
-	Log(LogType::DEBUG) << "Successfully connected to MySQL service " << this->GetName() << " at " << this->server << ":" << this->port;
+	this->GetOwner()->logger.Debug("Successfully connected to MySQL service {0} at {1}:{2}", this->GetName(), this->server, this->port);
 }
 
 

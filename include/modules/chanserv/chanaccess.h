@@ -35,7 +35,7 @@ class CoreExport ChanAccess : public Serialize::Object
 	static constexpr const char *const NAME = "access";
 
 	Serialize::Storage<Channel *> channel;
-	Serialize::Storage<Serialize::Object *> object;
+	Serialize::Storage<NickServ::Account *> account;
 	Serialize::Storage<Anope::string> creator, mask;
 	Serialize::Storage<time_t> last_seen, created;
 
@@ -56,11 +56,10 @@ class CoreExport ChanAccess : public Serialize::Object
 	virtual Anope::string GetMask() anope_abstract;
 	virtual void SetMask(const Anope::string &) anope_abstract;
 
-	virtual Serialize::Object *GetObj() anope_abstract;
-	virtual void SetObj(Serialize::Object *) anope_abstract;
+	virtual NickServ::Account *GetAccount() anope_abstract;
+	virtual void SetAccount(NickServ::Account *) anope_abstract;
 
 	virtual Anope::string Mask() anope_abstract;
-	virtual NickServ::Account *GetAccount() anope_abstract;
 
 	/** Check if this access entry matches the given user or account
 	 * @param u The user

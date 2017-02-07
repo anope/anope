@@ -210,7 +210,7 @@ namespace SQL
 		virtual Query BeginTransaction() anope_abstract;
 		virtual Query Commit() anope_abstract;
 
-		virtual Serialize::ID GetID(const Anope::string &) anope_abstract;
+		virtual Serialize::ID GetID(const Anope::string &prefix, const Anope::string &type) anope_abstract;
 
 		virtual Query GetTables(const Anope::string &prefix) anope_abstract;
 	};

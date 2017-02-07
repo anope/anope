@@ -23,7 +23,8 @@ class MemoInfoImpl : public MemoServ::MemoInfo
 {
 	friend class MemoInfoType;
 
-	Serialize::Storage<Serialize::Object *> owner;
+	Serialize::Storage<NickServ::Account *> account;
+	Serialize::Storage<ChanServ::Channel *> channel;
 	Serialize::Storage<int16_t> memomax;
 	Serialize::Storage<bool> hardmax;
 
@@ -35,8 +36,11 @@ class MemoInfoImpl : public MemoServ::MemoInfo
 	void Del(unsigned index) override;
 	bool HasIgnore(User *u) override;
 
-	Serialize::Object *GetOwner() override;
-	void SetOwner(Serialize::Object *) override;
+	NickServ::Account *GetAccount() override;
+	void SetAccount(NickServ::Account *) override;
+
+	ChanServ::Channel *GetChannel() override;
+	void SetChannel(ChanServ::Channel *) override;
 
 	int16_t GetMemoMax() override;
 	void SetMemoMax(const int16_t &) override;

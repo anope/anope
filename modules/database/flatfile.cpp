@@ -129,7 +129,7 @@ class DBFlatFile : public Module
 			HostServ::VHost *vhost = Serialize::New<HostServ::VHost *>();
 			if (vhost != nullptr)
 			{
-				vhost->SetOwner(acc);
+				vhost->SetAccount(acc);
 				vhost->SetIdent(data["vhost_ident"]);
 				vhost->SetHost(data["vhost_host"]);
 				vhost->SetCreator(data["vhost_creator"]);
@@ -352,7 +352,7 @@ class DBFlatFile : public Module
 
 		NickServ::Nick *nick = NickServ::FindNick(mask);
 		if (nick != nullptr)
-			access->SetObj(nick->GetAccount());
+			access->SetAccount(nick->GetAccount());
 
 		access->AccessUnserialize(data["data"]);
 	}
@@ -557,18 +557,18 @@ class DBFlatFile : public Module
 
 	void LoadOperInfo(const Anope::string &type, std::map<Anope::string, Anope::string> &data)
 	{
-		Serialize::Object *target = NickServ::FindAccount(data["target"]);
-		if (target == nullptr)
-			target = ChanServ::Find(data["target"]);
+		NickServ::Account *acc = NickServ::FindAccount(data["target"]);
+		ChanServ::Channel *chan = ChanServ::Find(data["target"]);
 
-		if (target == nullptr)
+		if (acc == nullptr && chan == nullptr)
 			return;
 
 		OperInfo *o = Serialize::New<OperInfo *>();
 		if (o == nullptr)
 			return;
 
-		o->SetTarget(target);
+		o->SetAccount(acc);
+		o->SetChannel(chan);
 		o->SetInfo(data["info"]);
 		o->SetCreator(data["adder"]);
 		try

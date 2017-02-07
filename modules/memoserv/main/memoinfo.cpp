@@ -37,6 +37,7 @@ unsigned MemoInfoImpl::GetIndex(MemoServ::Memo *m)
 
 void MemoInfoImpl::Del(unsigned index)
 {
+#warning "delete on serializable"
 	delete GetMemo(index);
 }
 
@@ -51,14 +52,24 @@ bool MemoInfoImpl::HasIgnore(User *u)
 	return false;
 }
 
-Serialize::Object *MemoInfoImpl::GetOwner()
+NickServ::Account *MemoInfoImpl::GetAccount()
 {
-	return Get(&MemoInfoType::owner);
+	return Get(&MemoInfoType::account);
 }
 
-void MemoInfoImpl::SetOwner(Serialize::Object *o)
+void MemoInfoImpl::SetAccount(NickServ::Account *account)
 {
-	Set(&MemoInfoType::owner, o);
+	Set(&MemoInfoType::account, account);
+}
+
+ChanServ::Channel *MemoInfoImpl::GetChannel()
+{
+	return Get(&MemoInfoType::channel);
+}
+
+void MemoInfoImpl::SetChannel(ChanServ::Channel *channel)
+{
+	Set(&MemoInfoType::channel, channel);
 }
 
 int16_t MemoInfoImpl::GetMemoMax()

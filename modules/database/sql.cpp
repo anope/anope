@@ -157,14 +157,12 @@ class DBSQL : public Module, public Pipe
 	{
 		for (Serialize::FieldBase *field : type->GetFields())
 		{
-			if (field->is_object)
+			if (field->is_object && object->GetSerializableType()->GetName() == field->GetTypeName())
 			{
 				Anope::string table = prefix + type->GetName();
 
-				Query query = "SELECT " + table + ".id FROM " + table +
-					" INNER JOIN " + prefix + "objects AS o ON " +
-					table + "." + field->serialize_name + " = o.id "
-					"WHERE o.id = @id@";
+				Query query = "SELECT id FROM " + table +
+					" WHERE " + field->serialize_name + " = @id@";
 
 				query.SetValue("id", object->id, false);
 
@@ -234,16 +232,15 @@ class DBSQL : public Module, public Pipe
 	{
 		StartTransaction();
 
-		Query query = "SELECT `" + field->serialize_name + "`,j1.type AS " + field->serialize_name + "_type FROM `" + prefix + object->GetSerializableType()->GetName() + "` "
-			"JOIN `" + prefix + "objects` AS j1 ON " + prefix + object->GetSerializableType()->GetName() + "." + field->serialize_name + " = j1.id "
-			"WHERE " + prefix + object->GetSerializableType()->GetName() + ".id = @id@";
+		Query query = "SELECT `" + field->serialize_name + "` FROM `" + prefix + object->GetSerializableType()->GetName() + "` "
+			"WHERE id = @id@";
 		query.SetValue("id", object->id, false);
 		Result res = Run(query);
 
 		if (res.Rows() == 0)
 			return EVENT_CONTINUE;
 
-		type = res.Get(0, field->serialize_name + "_type");
+		type = field->GetTypeName();
 		try
 		{
 			value = convertTo<Serialize::ID>(res.Get(0, field->serialize_name));
@@ -350,32 +347,31 @@ class DBSQL : public Module, public Pipe
 		}
 	}
 
-	EventReturn OnSerializableGetId(Serialize::ID &id) override
+	EventReturn OnSerializableGetId(Serialize::TypeBase *type, Serialize::ID &id) override
 	{
 		if (!SQL)
 			return EVENT_CONTINUE;
 
 		StartTransaction();
 
-		id = SQL->GetID(prefix);
+		for (Query &q : SQL->CreateTable(prefix, type))
+			Run(q);
+
+		id = SQL->GetID(prefix, type->GetName());
 		return EVENT_ALLOW;
 	}
 
 	void OnSerializableCreate(Serialize::Object *object) override
 	{
-		StartTransaction();
-
-		Query q = Query("INSERT INTO `" + prefix + "objects` (`id`,`type`) VALUES (@id@, @type@)");
-		q.SetValue("id", object->id, false);
-		q.SetValue("type", object->GetSerializableType()->GetName());
-		Run(q);
 	}
 
 	void OnSerializableDelete(Serialize::Object *object) override
 	{
 		StartTransaction();
 
-		Query query("DELETE FROM `" + prefix + "objects` WHERE `id` = " + stringify(object->id));
+		Serialize::TypeBase *type = object->GetSerializableType();
+
+		Query query("DELETE FROM `" + prefix + type->GetName() + "` WHERE `id` = " + stringify(object->id));
 		Run(query);
 	}
 };

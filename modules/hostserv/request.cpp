@@ -291,7 +291,7 @@ class CommandHSActivate : public Command
 			return;
 		}
 
-		vhost->SetOwner(na->GetAccount());
+		vhost->SetAccount(na->GetAccount());
 		vhost->SetIdent(req->GetIdent());
 		vhost->SetHost(req->GetHost());
 		vhost->SetCreator(source.GetNick());

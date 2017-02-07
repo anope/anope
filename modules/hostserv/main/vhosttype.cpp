@@ -21,7 +21,7 @@
 #include "vhosttype.h"
 
 VHostType::VHostType(Module *me) : Serialize::Type<VHostImpl>(me)
-	, owner(this, "owner", &VHostImpl::owner, true)
+	, account(this, "account", &VHostImpl::account, true)
 	, vident(this, "vident", &VHostImpl::vident)
 	, vhost(this, "vhost", &VHostImpl::vhost)
 	, creator(this, "creator", &VHostImpl::creator)

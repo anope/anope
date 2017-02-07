@@ -202,7 +202,7 @@ class CommandCSAccess : public Command
 
 		access = Serialize::New<AccessChanAccess *>();
 		if (na)
-			access->SetObj(na->GetAccount());
+			access->SetAccount(na->GetAccount());
 		access->SetChannel(ci);
 		access->SetMask(mask);
 		access->SetCreator(source.GetNick());
@@ -263,7 +263,7 @@ class CommandCSAccess : public Command
 					ChanServ::AccessGroup ag = source.AccessFor(ci);
 					ChanServ::ChanAccess *u_highest = ag.Highest();
 
-					if ((!u_highest || *u_highest <= *access) && !ag.founder && !source.IsOverride() && access->GetObj() != source.nc)
+					if ((!u_highest || *u_highest <= *access) && !ag.founder && !source.IsOverride() && access->GetAccount() != source.nc)
 					{
 						denied = true;
 						return;
@@ -305,7 +305,7 @@ class CommandCSAccess : public Command
 				ChanServ::ChanAccess *access = ci->GetAccess(i - 1);
 				if (mask.equals_ci(access->Mask()))
 				{
-					if (access->GetObj() != source.nc && !u_access.founder && (!highest || *highest <= *access) && !source.HasOverridePriv("chanserv/access/modify"))
+					if (access->GetAccount() != source.nc && !u_access.founder && (!highest || *highest <= *access) && !source.HasOverridePriv("chanserv/access/modify"))
 					{
 						source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to remove the access of \002{1}\002."), ci->GetName(), access->Mask());
 					}
@@ -554,9 +554,6 @@ class CommandCSAccess : public Command
 			               " The privilege set granted to a given user is the union of the privileges of access entries that match the user."
 			               " Use of this command requires the \002{4}\002 privilege on \037channel\037."),
 			               source.GetCommand(), ChanServ::ACCESS_INVALID + 1, ChanServ::ACCESS_FOUNDER - 1, "AUTOOP", "ACCESS_CHANGE");
-
-			if (!Config->GetModule("chanserv/main")->Get<bool>("disallow_channel_access"))
-				source.Reply(_("The given \037mask\037 may also be a channel, which will use the access list from the other channel up to the given \037level\037."));
 
 			//XXX show def levels
 

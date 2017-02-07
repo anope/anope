@@ -22,7 +22,8 @@
 class MemoInfoType : public Serialize::Type<MemoInfoImpl>
 {
  public:
-	Serialize::ObjectField<MemoInfoImpl, Serialize::Object *> owner;
+	Serialize::ObjectField<MemoInfoImpl, NickServ::Account *> account;
+	Serialize::ObjectField<MemoInfoImpl, ChanServ::Channel *> channel;
 	Serialize::Field<MemoInfoImpl, int16_t> memomax;
 	Serialize::Field<MemoInfoImpl, bool> hardmax;
 

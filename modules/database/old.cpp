@@ -743,7 +743,7 @@ static void LoadVHosts()
 		if (vhost == nullptr)
 			continue;
 
-		vhost->SetOwner(na->GetAccount());
+		vhost->SetAccount(na->GetAccount());
 		vhost->SetIdent(ident);
 		vhost->SetHost(host);
 		vhost->SetCreator(creator);

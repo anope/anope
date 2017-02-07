@@ -21,7 +21,8 @@
 #include "memoinfotype.h"
 
 MemoInfoType::MemoInfoType(Module *me) : Serialize::Type<MemoInfoImpl>(me)
-	, owner(this, "owner", &MemoInfoImpl::owner, true)
+	, account(this, "account", &MemoInfoImpl::account, true)
+	, channel(this, "channel", &MemoInfoImpl::channel, true)
 	, memomax(this, "memomax", &MemoInfoImpl::memomax)
 	, hardmax(this, "hardmax", &MemoInfoImpl::hardmax)
 {

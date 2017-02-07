@@ -27,15 +27,19 @@ class OperInfoImpl : public OperInfo
 {
 	friend class OperInfoType;
 
-	Serialize::Storage<Serialize::Object *> target;
+	Serialize::Storage<NickServ::Account *> account;
+	Serialize::Storage<ChanServ::Channel *> channel;
 	Serialize::Storage<Anope::string> info, creator;
 	Serialize::Storage<time_t> created;
 
  public:
 	using OperInfo::OperInfo;
 
-	Serialize::Object *GetTarget() override;
-	void SetTarget(Serialize::Object *) override;
+	NickServ::Account *GetAccount() override;
+	void SetAccount(NickServ::Account *) override;
+
+	ChanServ::Channel *GetChannel() override;
+	void SetChannel(ChanServ::Channel *) override;
 
 	Anope::string GetInfo() override;
 	void SetInfo(const Anope::string &) override;
@@ -50,12 +54,14 @@ class OperInfoImpl : public OperInfo
 class OperInfoType : public Serialize::Type<OperInfoImpl>
 {
  public:
-	Serialize::ObjectField<OperInfoImpl, Serialize::Object *> target;
+	Serialize::ObjectField<OperInfoImpl, NickServ::Account *> account;
+	Serialize::ObjectField<OperInfoImpl, ChanServ::Channel *> channel;
 	Serialize::Field<OperInfoImpl, Anope::string> info, creator;
 	Serialize::Field<OperInfoImpl, time_t> created;
 
 	OperInfoType(Module *c) : Serialize::Type<OperInfoImpl>(c)
-		, target(this, "target", &OperInfoImpl::target, true)
+		, account(this, "account", &OperInfoImpl::account, true)
+		, channel(this, "channel", &OperInfoImpl::channel, true)
 		, info(this, "info", &OperInfoImpl::info)
 		, creator(this, "adder", &OperInfoImpl::creator)
 		, created(this, "created", &OperInfoImpl::created)
@@ -63,14 +69,24 @@ class OperInfoType : public Serialize::Type<OperInfoImpl>
 	}
 };
 
-Serialize::Object *OperInfoImpl::GetTarget()
+NickServ::Account *OperInfoImpl::GetAccount()
 {
-	return Get(&OperInfoType::target);
+	return Get(&OperInfoType::account);
 }
 
-void OperInfoImpl::SetTarget(Serialize::Object *t)
+void OperInfoImpl::SetAccount(NickServ::Account *account)
 {
-	Set(&OperInfoType::target, t);
+	Set(&OperInfoType::account, account);
+}
+
+ChanServ::Channel *OperInfoImpl::GetChannel()
+{
+	return Get(&OperInfoType::channel);
+}
+
+void OperInfoImpl::SetChannel(ChanServ::Channel *channel)
+{
+	Set(&OperInfoType::channel, channel);
 }
 
 Anope::string OperInfoImpl::GetInfo()
@@ -118,7 +134,10 @@ class CommandOSInfo : public Command
 	{
 		const Anope::string &cmd = params[0], target = params[1], info = params.size() > 2 ? params[2] : "";
 
+		NickServ::Account *account = nullptr;
+		ChanServ::Channel *channel = nullptr;
 		Serialize::Object *e;
+
 		if (IRCD->IsChannelValid(target))
 		{
 			ChanServ::Channel *ci = ChanServ::Find(target);
@@ -128,6 +147,7 @@ class CommandOSInfo : public Command
 				return;
 			}
 
+			channel = ci;
 			e = ci;
 		}
 		else
@@ -139,7 +159,8 @@ class CommandOSInfo : public Command
 				return;
 			}
 
-			e = na->GetAccount();
+			account = na->GetAccount();
+			e = account;
 		}
 
 		if (cmd.equals_ci("ADD"))
@@ -165,7 +186,8 @@ class CommandOSInfo : public Command
 				}
 
 			OperInfo *o = Serialize::New<OperInfo *>();
-			o->SetTarget(e);
+			o->SetAccount(account);
+			o->SetChannel(channel);
 			o->SetInfo(info);
 			o->SetCreator(source.GetNick());
 			o->SetCreated(Anope::CurTime);

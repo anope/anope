@@ -30,7 +30,7 @@ using namespace SQL;
 class SQLiteResult : public Result
 {
  public:
-	SQLiteResult(sqlite3 *sql, unsigned int id, const Query &q, const Anope::string &fq, sqlite3_stmt *stmt) : Result(id, q, fq)
+	SQLiteResult(sqlite3 *sql, const Query &q, const Anope::string &fq, sqlite3_stmt *stmt) : Result(0, q, fq)
 	{
 		int cols = sqlite3_column_count(stmt);
 		for (int i = 0; i < cols; ++i)
@@ -58,6 +58,8 @@ class SQLiteResult : public Result
 		{
 			error = sqlite3_errmsg(sql);
 		}
+
+		id = sqlite3_last_insert_rowid(sql);
 	}
 
 	SQLiteResult(const Query &q, const Anope::string &fq, const Anope::string &err) : Result(0, q, fq, err)
@@ -221,8 +223,7 @@ Result SQLiteService::RunQuery(const Query &query)
 		return SQLiteResult(query, real_query, msg);
 	}
 
-	int id = sqlite3_last_insert_rowid(this->sql);
-	SQLiteResult result(this->sql, id, query, real_query, stmt);
+	SQLiteResult result(this->sql, query, real_query, stmt);
 
 	sqlite3_finalize(stmt);
 

@@ -68,7 +68,7 @@ include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include)
 # Pass on REPRODUCIBLE_BUILD
 if(REPRODUCIBLE_BUILD)
   add_definitions(-DREPRODUCIBLE_BUILD)
-endif(REPRODUCIBLE_BUILD)
+endif()
 
 # If using Windows, always add the _WIN32 define
 if(WIN32)
@@ -277,7 +277,7 @@ install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${DB_
 install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${LOGS_DIR}\")")
 if(WIN32)
   install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${DB_DIR}/runtime\")")
-endif(WIN32)
+endif()
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the below directories, as well as the group of the data directory
 if(NOT WIN32 AND RUNGROUP)
   install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/\${DB_DIR}/backups\")")

@@ -15,7 +15,7 @@ macro(build_modules SRC)
         string(REGEX MATCH "\\.c$" ANOPE18MODULE ${MODULE_SRC})
         if(ANOPE18MODULE)
           message(FATAL_ERROR "Anope 1 modules are not compatible with Anope 2!\nOffending module: ${MODULE_SRC}")
-        endif(ANOPE18MODULE)
+        endif()
         string(REGEX MATCH "\\.cpp$" CPP ${MODULE_SRC})
         if(CPP)
           set_source_files_properties(${MODULE_SRC} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
@@ -155,7 +155,7 @@ macro(build_subdir)
   if(APPLE)
     # Mark undefined symbols as having to be looked up at runtime
     set(MOD_EXTRA_LDFLAGS "-undefined dynamic_lookup")
-  endif(APPLE)
+  endif()
 
   # Generate the module and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_library(${SO} SHARED ${MODULES_SUBDIR_SRCS})

@@ -113,7 +113,7 @@ class CommandOSLogSearch : public Command
 				else if (wildcard)
 					match = Anope::Match(buf, "*" + search_string + "*");
 				else
-					match = buf.find_first_of_ci(search_string) != Anope::string::npos;
+					match = buf.find_ci(search_string) != Anope::string::npos;
 
 				if (match)
 				{

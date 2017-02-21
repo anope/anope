@@ -654,6 +654,10 @@ class CommandCSMode : public Command
 								break;
 							if (!sep.GetToken(param))
 								break;
+
+							// Change to internal name, eg giving -b ~q:*
+							cm = cm->Unwrap(param);
+
 							if (adding)
 							{
 								if (IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) < IRCD->GetMaxListFor(ci->c))
@@ -706,6 +710,12 @@ class CommandCSMode : public Command
 		if (cm->type != MODE_STATUS && cm->type != MODE_LIST)
 		{
 			source.Reply(_("Mode %s is not a status or list mode."), param.c_str());
+			return;
+		}
+
+		if (!cm->mchar)
+		{
+			source.Reply(_("Mode %s is a virtual mode and can't be cleared."), cm->name.c_str());
 			return;
 		}
 

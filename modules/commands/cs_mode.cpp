@@ -667,10 +667,10 @@ class CommandCSMode : public Command
 										ci->c->RemoveMode(NULL, cm, v[j]);
 							}
 					}
-			}
-
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << params[2] << (params.size() > 3 ? " " + params[3] : "");
+			} // switch
 		}
+
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << modes << (params.size() > 3 ? " " + params[3] : "");
 	}
 
 	void DoClear(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)

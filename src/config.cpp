@@ -157,7 +157,13 @@ Conf::Conf() : Block("")
 	Block *serverinfo = this->GetBlock("serverinfo"), *options = this->GetBlock("options"),
 		*mail = this->GetBlock("mail"), *networkinfo = this->GetBlock("networkinfo");
 
-	ValidateNotEmpty("serverinfo", "name", serverinfo->Get<const Anope::string>("name"));
+	const Anope::string &servername = serverinfo->Get<Anope::string>("name");
+
+	ValidateNotEmpty("serverinfo", "name", servername);
+
+	if (servername.find(' ') != Anope::string::npos || servername.find('.') == Anope::string::npos)
+		throw ConfigException("serverinfo:name is not a valid server name");
+
 	ValidateNotEmpty("serverinfo", "description", serverinfo->Get<const Anope::string>("description"));
 	ValidateNotEmpty("serverinfo", "pid", serverinfo->Get<const Anope::string>("pid"));
 	ValidateNotEmpty("serverinfo", "motd", serverinfo->Get<const Anope::string>("motd"));
@@ -204,6 +210,9 @@ Conf::Conf() : Block("")
 		ValidateNotEmpty("uplink", "host", host);
 		ValidateNotZero("uplink", "port", port);
 		ValidateNotEmpty("uplink", "password", password);
+
+		if (password.find(' ') != Anope::string::npos || password[0] == ':')
+			throw ConfigException("uplink:password is not valid");
 
 		this->Uplinks.push_back(Uplink(host, port, password, ipv6));
 	}

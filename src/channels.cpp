@@ -464,15 +464,21 @@ void Channel::SetMode(BotInfo *bi, const Anope::string &mname, const Anope::stri
 	SetMode(bi, ModeManager::FindChannelModeByName(mname), param, enforce_mlock);
 }
 
-void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
+void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &wparam, bool enforce_mlock)
 {
 	if (!cm)
 		return;
+
 	/* Don't unset modes that arent set */
 	if ((cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && !HasMode(cm->name))
 		return;
+
+	/* Unwrap to be sure we have the internal representation */
+	Anope::string param = wparam;
+	cm = cm->Unwrap(param);
+
 	/* Don't unset status that aren't set */
-	else if (cm->type == MODE_STATUS)
+	if (cm->type == MODE_STATUS)
 	{
 		User *u = User::Find(param);
 		if (!u || !HasUserStatus(u, anope_dynamic_static_cast<ChannelModeStatus *>(cm)))
@@ -485,13 +491,12 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 	}
 
 	/* Get the param to send, if we need it */
-	Anope::string realparam = param;
 	if (cm->type == MODE_PARAM)
 	{
-		realparam.clear();
+		param.clear();
 		ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
 		if (!cmp->minus_no_arg)
-			this->GetParam(cmp->name, realparam);
+			this->GetParam(cmp->name, param);
 	}
 
 	if (Me->IsSynced())
@@ -505,12 +510,12 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 		this->chanserv_modecount++;
 	}
 
-	Anope::string wparam = realparam;
-	ChannelMode *wcm = cm->Wrap(wparam);
+	/* Wrap to get ircd representation */
+	ChannelMode *wcm = cm->Wrap(param);
 
-	ModeManager::StackerAdd(bi, this, wcm, false, wparam);
+	ModeManager::StackerAdd(bi, this, wcm, false, param);
 	MessageSource ms(bi);
-	RemoveModeInternal(ms, wcm, wparam, enforce_mlock);
+	RemoveModeInternal(ms, wcm, param, enforce_mlock);
 }
 
 void Channel::RemoveMode(BotInfo *bi, const Anope::string &mname, const Anope::string &param, bool enforce_mlock)

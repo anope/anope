@@ -45,6 +45,8 @@ class ForbidService : public Service
 
 	virtual ForbidData *FindForbid(const Anope::string &mask, ForbidType type) = 0;
 
+	virtual ForbidData *FindForbidExact(const Anope::string &mask, ForbidType type) = 0;
+
 	virtual std::vector<ForbidData *> GetForbids() = 0;
 };
 

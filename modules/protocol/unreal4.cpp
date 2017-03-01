@@ -204,6 +204,10 @@ class UnrealIRCdProto : public IRCDProto
 			UplinkSocket::Message(Me) << "CHGIDENT " << u->GetUID() << " " << vIdent;
 		if (!vhost.empty())
 			UplinkSocket::Message(Me) << "CHGHOST " << u->GetUID() << " " << vhost;
+		// Internally unreal sets +xt on chghost
+		BotInfo *bi = Config->GetClient("HostServ");
+		u->SetMode(bi, "CLOAK");
+		u->SetMode(bi, "VHOST");
 	}
 
 	void SendConnect() anope_override

@@ -215,6 +215,18 @@ class DatabaseRedis : public Module, public Pipe
 	{
 		Serialize::Type *t = obj->GetSerializableType();
 
+		if (t == NULL)
+		{
+			/* This is probably the module providing the type unloading.
+			 *
+			 * The types get registered after the extensible container is
+			 * registered so that unserialization on module load can insert
+			 * into the extensible container. So, the type destructs prior to
+			 * the extensible container, which then triggers this
+			 */
+			return;
+		}
+
 		std::vector<Anope::string> args;
 		args.push_back("HGETALL");
 		args.push_back("hash:" + t->GetName() + ":" + stringify(obj->id));

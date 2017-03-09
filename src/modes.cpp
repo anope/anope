@@ -647,7 +647,7 @@ void ModeManager::ProcessModes()
 
 			std::list<Anope::string> ModeStrings = BuildModeStrings(s);
 			for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
-				IRCD->SendMode(s->bi, u, lit->c_str());
+				IRCD->SendMode(s->bi, u, "%s", lit->c_str());
 			delete it->second;
 		}
 		UserStackerObjects.clear();
@@ -662,7 +662,7 @@ void ModeManager::ProcessModes()
 
 			std::list<Anope::string> ModeStrings = BuildModeStrings(s);
 			for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
-				IRCD->SendMode(s->bi, c, lit->c_str());
+				IRCD->SendMode(s->bi, c, "%s", lit->c_str());
 			delete it->second;
 		}
 		ChannelStackerObjects.clear();
@@ -678,7 +678,7 @@ static void StackerDel(std::map<T *, StackerInfo *> &map, T *obj)
 		StackerInfo *si = it->second;
 		std::list<Anope::string> ModeStrings = BuildModeStrings(si);
 		for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
-			IRCD->SendMode(si->bi, obj, lit->c_str());
+			IRCD->SendMode(si->bi, obj, "%s", lit->c_str());
 
 		delete si;
 		map.erase(it);

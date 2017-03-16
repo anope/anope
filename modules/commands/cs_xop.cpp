@@ -561,7 +561,7 @@ class CommandCSXOP : public Command
 		BotInfo *access_bi, *flags_bi;
 		Anope::string access_cmd, flags_cmd;
 		Command::FindCommandFromService("chanserv/access", access_bi, access_cmd);
-		Command::FindCommandFromService("chanserv/flags", flags_bi, access_cmd);
+		Command::FindCommandFromService("chanserv/flags", flags_bi, flags_cmd);
 		if (!access_cmd.empty() || !flags_cmd.empty())
 		{
 			source.Reply(_("Alternative methods of modifying channel access lists are\n"

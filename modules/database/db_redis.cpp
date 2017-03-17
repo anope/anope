@@ -179,6 +179,12 @@ class DatabaseRedis : public Module, public Pipe
 
 	EventReturn OnLoadDatabase() anope_override
 	{
+		if (!redis)
+		{
+			Log(this) << "Unable to load database - unable to find redis provider";
+			return EVENT_CONTINUE;
+		}
+
 		const std::vector<Anope::string> type_order = Serialize::Type::GetTypeOrder();
 		for (unsigned i = 0; i < type_order.size(); ++i)
 		{
@@ -186,7 +192,13 @@ class DatabaseRedis : public Module, public Pipe
 			this->OnSerializeTypeCreate(sb);
 		}
 
-		while (redis->BlockAndProcess());
+		while (!redis->IsSocketDead() && redis->BlockAndProcess());
+
+		if (redis->IsSocketDead())
+		{
+			Log(this) << "I/O error while loading redis database - is it online?";
+			return EVENT_CONTINUE;
+		}
 
 		redis->Subscribe(&this->sl, "__keyspace@*__:hash:*");
 

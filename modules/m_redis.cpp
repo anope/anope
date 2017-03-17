@@ -157,6 +157,11 @@ class MyRedisService : public Provider
 	}
 
  public:
+	bool IsSocketDead() anope_override
+	{
+		return this->sock && this->sock->flags[SF_DEAD];
+	}
+
 	void SendCommand(RedisSocket *s, Interface *i, const std::vector<Anope::string> &cmds)
 	{
 		std::vector<std::pair<const char *, size_t> > args;
@@ -201,9 +206,11 @@ class MyRedisService : public Provider
  public:
 	bool BlockAndProcess() anope_override
 	{
-		this->sock->ProcessWrite();
+		if (!this->sock->ProcessWrite())
+			this->sock->flags[SF_DEAD] = true;
 		this->sock->SetBlocking(true);
-		this->sock->ProcessRead();
+		if (!this->sock->ProcessRead())
+			this->sock->flags[SF_DEAD] = true;
 		this->sock->SetBlocking(false);
 		return !this->sock->interfaces.empty();
 	}

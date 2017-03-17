@@ -58,6 +58,8 @@ namespace Redis
 	 public:
 		Provider(Module *c, const Anope::string &n) : Service(c, "Redis::Provider", n) { }
 
+		virtual bool IsSocketDead() = 0;
+
 		virtual void SendCommand(Interface *i, const std::vector<Anope::string> &cmds) = 0;
 		virtual void SendCommand(Interface *i, const Anope::string &str) = 0;
 

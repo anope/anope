@@ -147,10 +147,10 @@ Anope::string Log::FormatSource() const
 		return nc->display;
 	else if (source)
 	{
-		Anope::string buf = source->GetNick();
-		if (!buf.empty() && !source->ip.empty())
-			buf += " (" + source->ip + ")";
-		return buf;
+		Anope::string nickbuf = source->GetNick();
+		if (!nickbuf.empty() && !source->ip.empty())
+			nickbuf += " (" + source->ip + ")";
+		return nickbuf;
 	}
 	return "";
 }

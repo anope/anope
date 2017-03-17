@@ -143,6 +143,7 @@ class WebPanelProtectedPage : public WebPanelPage
 namespace WebPanel
 {
 	/** Run a command
+	 * @param client HTTP client command is being issued for
 	 * @param User name to run command as, probably nc->display unless nc == NULL
 	 * @param nc Nick core to run command from
 	 * @param service Service for source.owner and source.service
@@ -151,9 +152,9 @@ namespace WebPanel
 	 * @param r Replacements, reply from command goes back here into key
 	 * @param key The key to put the replies into r
 	 */
-	extern void RunCommand(const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
+	extern void RunCommand(HTTPClient *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
 
-	extern void RunCommandWithName(NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
+	extern void RunCommandWithName(HTTPClient *client, NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
 }
 
 #include "pages/index.h"

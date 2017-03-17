@@ -55,7 +55,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 			params.push_back("DEL");
 			params.push_back(message.get_data["mask"]);
 
-			WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/access", params, replacements);
+			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/access", params, replacements);
 		}
 		else if (message.post_data["mask"].empty() == false && message.post_data["access"].empty() == false && message.post_data["provider"].empty() == false)
 		{
@@ -69,7 +69,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 				params.push_back(message.post_data["mask"]);
 				params.push_back(message.post_data["access"]);
 
-				WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/access", params, replacements);
+				WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/access", params, replacements);
 			}
 			else if (provider == "chanserv/xop")
 			{
@@ -78,7 +78,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 				params.push_back("ADD");
 				params.push_back(message.post_data["mask"]);
 
-				WebPanel::RunCommandWithName(na->nc, "ChanServ", "chanserv/xop", message.post_data["access"], params, replacements);
+				WebPanel::RunCommandWithName(client, na->nc, "ChanServ", "chanserv/xop", message.post_data["access"], params, replacements);
 			}
 			else if (provider == "chanserv/flags")
 			{
@@ -88,7 +88,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 				params.push_back(message.post_data["mask"]);
 				params.push_back(message.post_data["access"]);
 
-				WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/flags", params, replacements);
+				WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/flags", params, replacements);
 			}
 		}
 	}

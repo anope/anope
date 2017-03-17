@@ -231,7 +231,7 @@ class ModuleWebCPanel : public Module
 
 namespace WebPanel
 {
-	void RunCommand(const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
+	void RunCommand(HTTPClient *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
 		ServiceReference<Command> cmd("Command", c);
 		if (!cmd)
@@ -266,12 +266,15 @@ namespace WebPanel
 		my_reply(r, key);
 
 		CommandSource source(user, NULL, nc, &my_reply, bi);
+		source.ip = client->clientaddr.addr();
+
 		CommandInfo info;
 		info.name = c;
+
 		cmd->Run(source, "", info, params);
 	}
 
-	void RunCommandWithName(NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
+	void RunCommandWithName(HTTPClient *client, NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
 		ServiceReference<Command> cmd("Command", c);
 		if (!cmd)
@@ -303,6 +306,7 @@ namespace WebPanel
 		my_reply(r, key);
 
 		CommandSource source(nc->display, NULL, nc, &my_reply, bi);
+		source.ip = client->clientaddr.addr();
 
 		cmd->Run(source, cmdname, *info, params);
 	}

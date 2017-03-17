@@ -59,6 +59,8 @@ class CoreExport CommandSource
  public:
 	/* The account executing the command */
 	Reference<NickCore> nc;
+	/* for web clients */
+	Anope::string ip;
 	/* Where the reply should go */
 	CommandReply *reply;
 	/* Channel the command was executed on (fantasy) */

@@ -347,6 +347,15 @@ void ChannelImpl::SetPrivate(bool _private)
 	Set(&ChannelType::_private, _private);
 }
 
+ServiceBot *ChannelImpl::WhoSends()
+{
+	BotInfo *bi = GetBI();
+	if (bi != nullptr)
+		return bi->bot;
+
+	return Config->GetClient("ChanServ");
+}
+
 ChanServ::ChanAccess *ChannelImpl::GetAccess(unsigned index)
 {
 	std::vector<ChanServ::ChanAccess *> a = GetRefs<ChanServ::ChanAccess *>();

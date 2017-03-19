@@ -138,23 +138,7 @@ class CoreExport Channel : public Serialize::Object
 	/** Find which bot should send mode/topic/etc changes for this channel
 	 * @return The bot
 	 */
-	ServiceBot *WhoSends()
-	{
-		if (this)
-			if (ServiceBot *bi = GetBot())
-				return bi;
-
-		ServiceBot *ChanServ = Config->GetClient("ChanServ");
-		if (ChanServ)
-			return ChanServ;
-
-#warning "if(this)"
-		//XXX
-//			if (!BotListByNick->empty())
-//				return BotListByNick->begin()->second;
-
-		return NULL;
-	}
+	virtual ServiceBot *WhoSends() anope_abstract;
 
 	/** Get an entry from the channel access list by index
 	 *

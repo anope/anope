@@ -141,6 +141,7 @@ class ChannelImpl : public ChanServ::Channel
 	void SetPrivate(bool) override;
 
 	bool IsFounder(const User *user) override;
+	ServiceBot *WhoSends() override;
 	ChanServ::ChanAccess *GetAccess(unsigned index) override;
 	ChanServ::AccessGroup AccessFor(const User *u, bool = true) override;
 	ChanServ::AccessGroup AccessFor(NickServ::Account *nc, bool = true) override;

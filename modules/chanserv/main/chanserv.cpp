@@ -380,17 +380,17 @@ class ChanServCore : public Module
 			return;
 
 		if (c->ci)
-			c->SetMode(c->ci->WhoSends(), "REGISTERED", "", false);
+			c->SetMode(nullptr, "REGISTERED", "", false);
 		else
-			c->RemoveMode(c->ci->WhoSends(), "REGISTERED", "", false);
+			c->RemoveMode(nullptr, "REGISTERED", "", false);
 
 		const Anope::string &require = Config->GetModule(this)->Get<Anope::string>("require");
 		if (!require.empty())
 		{
 			if (c->ci)
-				c->SetModes(c->ci->WhoSends(), false, "+%s", require.c_str());
+				c->SetModes(nullptr, false, "+%s", require.c_str());
 			else
-				c->SetModes(c->ci->WhoSends(), false, "-%s", require.c_str());
+				c->SetModes(nullptr, false, "-%s", require.c_str());
 		}
 	}
 
@@ -485,8 +485,13 @@ class ChanServCore : public Module
 				else
 				{
 					if (!ci->GetBot())
-						ci->WhoSends()->Assign(NULL, ci);
-					if (ci->c->FindUser(ci->GetBot()) == NULL)
+					{
+						ServiceBot *bi = ci->WhoSends();
+						if (bi != nullptr)
+							bi->Assign(nullptr, ci);
+					}
+
+					if (ci->GetBot() != nullptr && ci->c->FindUser(ci->GetBot()) == nullptr)
 					{
 						Anope::string botmodes = Config->GetModule("botserv/main")->Get<Anope::string>("botmodes",
 								Config->GetModule("chanserv/main")->Get<Anope::string>("botmodes"));
@@ -535,7 +540,7 @@ class ChanServCore : public Module
 			if (cu && cm && !cu->status.HasMode(cm->mchar))
 			{
 				/* Our -o and their mode change crossing, bounce their mode */
-				c->RemoveMode(c->ci->WhoSends(), mode, param);
+				c->RemoveMode(nullptr, mode, param);
 				/* We don't set mlocks until after the join has finished processing, it will stack with this change,
 				 * so there isn't much for the user to remove except -nt etc which is likely locked anyway.
 				 */

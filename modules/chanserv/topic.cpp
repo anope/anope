@@ -261,7 +261,9 @@ class CSTopic : public Module
 			/* Update channel topic */
 			if ((c->ci->IsTopicLock() || c->ci->IsKeepTopic()) && c->ci->GetLastTopic() != c->topic)
 			{
-				c->ChangeTopic(!c->ci->GetLastTopicSetter().empty() ? c->ci->GetLastTopicSetter() : c->ci->WhoSends()->nick, c->ci->GetLastTopic(), c->ci->GetLastTopicTime() ? c->ci->GetLastTopicTime() : Anope::CurTime);
+				ServiceBot *sender = c->ci->WhoSends();
+				c->ChangeTopic(!c->ci->GetLastTopicSetter().empty() ? c->ci->GetLastTopicSetter() : (sender ? sender->nick : Me->GetName()),
+						c->ci->GetLastTopic(), c->ci->GetLastTopicTime() ? c->ci->GetLastTopicTime() : Anope::CurTime);
 			}
 		}
 	}

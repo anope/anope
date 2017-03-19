@@ -767,9 +767,6 @@ bool Channel::Kick(User *source, User *u, const Anope::string &reason)
 	if (u->IsProtected())
 		return false;
 
-	if (source == NULL)
-		source = this->ci->WhoSends();
-
 	if (!this->KickInternal(source, u->nick, reason))
 		return false;
 	IRCD->SendKick(source, this, u, reason);
@@ -794,7 +791,7 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	this->topic_setter = user;
 	this->topic_ts = ts;
 
-	IRCD->Send<messages::Topic>(this->ci->WhoSends(), this, newtopic, ts, user);
+	IRCD->Send<messages::Topic>(this->ci ? this->ci->WhoSends() : Config->GetClient("ChanServ"), this, newtopic, ts, user);
 
 	/* Now that the topic is set update the time set. This is *after* we set it so the protocol modules are able to tell the old last set time */
 	this->topic_time = Anope::CurTime;

@@ -127,6 +127,8 @@ void Server::Burst()
 			bi->introduced = true;
 	}
 
+	ServiceBot *chanserv = Config->GetClient("ChanServ");
+
 	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 	{
 		Channel *c = it->second;
@@ -142,11 +144,11 @@ void Server::Burst()
 			ChannelMode *cm = ModeManager::FindChannelModeByName(it2->first);
 			if (!cm || cm->type != MODE_LIST)
 				continue;
-			ModeManager::StackerAdd(c->ci->WhoSends(), c, cm, true, it2->second);
+			ModeManager::StackerAdd(nullptr, c, cm, true, it2->second);
 		}
 
 		if (!c->topic.empty() && !c->topic_setter.empty())
-			IRCD->Send<messages::Topic>(c->ci->WhoSends(), c, c->topic, c->topic_ts, c->topic_setter);
+			IRCD->Send<messages::Topic>(c->ci ? c->ci->WhoSends() : chanserv, c, c->topic, c->topic_ts, c->topic_setter);
 
 		c->syncing = true;
 	}

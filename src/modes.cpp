@@ -57,9 +57,7 @@ struct StackerInfo
 	/* Modes to be deleted */
 	std::list<std::pair<Mode *, Anope::string> > DelModes;
 	/* Bot this is sent from */
-	User *bi;
-
-	StackerInfo() : bi(NULL) { }
+	User *bi = nullptr;
 
 	/** Add a mode to this object
 	 * @param mode The mode
@@ -598,7 +596,7 @@ void ModeManager::StackerAdd(User *bi, Channel *c, ChannelMode *cm, bool Set, co
 	s->AddMode(cm, Set, Param);
 	if (bi)
 		s->bi = bi;
-	else
+	else if (c->ci)
 		s->bi = c->ci->WhoSends();
 
 	if (!modePipe)

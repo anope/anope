@@ -1,7 +1,7 @@
 /* ircd-hybrid-8 protocol module
  *
  * (C) 2003-2017 Anope Team <team@anope.org>
- * (C) 2012-2016 ircd-hybrid development team
+ * (C) 2012-2017 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
@@ -184,12 +184,10 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
 
 		/*
-		 * As of January 13, 2016, ircd-hybrid-8 does support the following capabilities
+		 * As of March 19, 2017, ircd-hybrid-8 does support the following capabilities
 		 * which are required to work with IRC-services:
 		 *
 		 * QS     - Can handle quit storm removal
-		 * EX     - Can do channel +e exemptions
-		 * IE     - Can do invite exceptions
 		 * CHW    - Can do channel wall @#
 		 * TBURST - Supports topic burst
 		 * ENCAP  - Supports ENCAP
@@ -197,7 +195,7 @@ class HybridProto : public IRCDProto
 		 * SVS    - Supports services
 		 * EOB    - Supports End Of Burst message
 		 */
-		UplinkSocket::Message() << "CAPAB :QS EX CHW IE ENCAP TBURST SVS HOPS EOB";
+		UplinkSocket::Message() << "CAPAB :QS CHW ENCAP TBURST SVS HOPS EOB";
 
 		SendServer(Me);
 
@@ -662,7 +660,9 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
 		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
+		ModeManager::AddChannelMode(new ChannelMode("HIDEBMASKS", 'u'));
 		ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
+		ModeManager::AddChannelMode(new ChannelModeOperOnly("LBAN", 'L'));
 		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
 		ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
 		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));

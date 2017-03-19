@@ -172,22 +172,22 @@ class Logger
 	Logger Bot(ServiceBot *bot) const;
 	Logger Bot(const Anope::string &name) const;
 
-	template<typename... Args> void Log(LogLevel level, const Anope::string &message, Args&&... args)
+	template<typename... Args> void Log(LogLevel lev, const Anope::string &message, Args&&... args)
 	{
 		Logger l = *this;
 		l.raw_message = message;
-		l.level = level;
+		l.level = lev;
 
 		Anope::string translated = Language::Translate(message);
 		l.LogMessage(l.Format(translated, std::forward<Args>(args)...));
 	}
 
-	template<typename... Args> void Command(LogType type, CommandSource &source, ChanServ::Channel *ci, const Anope::string &message, Args&&... args)
+	template<typename... Args> void Command(LogType ltype, CommandSource &csource, ChanServ::Channel *chan, const Anope::string &message, Args&&... args)
 	{
 		Logger l = *this;
-		l.type = type;
-		l.SetSource(&source);
-		l.SetCi(ci);
+		l.type = ltype;
+		l.SetSource(&csource);
+		l.SetCi(chan);
 
 		// Override if the source is marked override
 		l.CheckOverride();
@@ -196,33 +196,33 @@ class Logger
 		l.LogMessage(l.Format(translated, std::forward<Args>(args)...));
 	}
 
-	template<typename... Args> void Command(LogType type, CommandSource &source, const Anope::string &message, Args&&... args)
+	template<typename... Args> void Command(LogType ltype, CommandSource &csource, const Anope::string &message, Args&&... args)
 	{
-		Command(type, source, nullptr, message, std::forward<Args>(args)...);
+		Command(ltype, csource, nullptr, message, std::forward<Args>(args)...);
 	}
 
 	// LOG_COMMAND
 
-	template<typename... Args> void Command(CommandSource &source, ChanServ::Channel *ci, const Anope::string &message, Args&&... args)
+	template<typename... Args> void Command(CommandSource &csource, ChanServ::Channel *chan, const Anope::string &message, Args&&... args)
 	{
-		Command(LogType::COMMAND, source, ci, message, std::forward<Args>(args)...);
+		Command(LogType::COMMAND, csource, chan, message, std::forward<Args>(args)...);
 	}
 
-	template<typename... Args> void Command(CommandSource &source, const Anope::string &message, Args&&... args)
+	template<typename... Args> void Command(CommandSource &csource, const Anope::string &message, Args&&... args)
 	{
-		Command(LogType::COMMAND, source, nullptr, message, std::forward<Args>(args)...);
+		Command(LogType::COMMAND, csource, nullptr, message, std::forward<Args>(args)...);
 	}
 
 	// LOG_ADMIN
 
-	template<typename... Args> void Admin(CommandSource &source, ChanServ::Channel *ci, const Anope::string &message, Args&&... args)
+	template<typename... Args> void Admin(CommandSource &csource, ChanServ::Channel *chan, const Anope::string &message, Args&&... args)
 	{
-		Command(LogType::ADMIN, source, ci, message, std::forward<Args>(args)...);
+		Command(LogType::ADMIN, csource, chan, message, std::forward<Args>(args)...);
 	}
 
-	template<typename... Args> void Admin(CommandSource &source, const Anope::string &message, Args&&... args)
+	template<typename... Args> void Admin(CommandSource &csource, const Anope::string &message, Args&&... args)
 	{
-		Command(LogType::ADMIN, source, nullptr, message, std::forward<Args>(args)...);
+		Command(LogType::ADMIN, csource, nullptr, message, std::forward<Args>(args)...);
 	}
 
 	template<typename... Args> void Log(const Anope::string &message, Args&&... args)

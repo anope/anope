@@ -111,7 +111,7 @@ bool LogInfo::HasType(LogType ltype, LogLevel level, const Anope::string &type) 
 			return Anope::Debug ? true : this->debug;
 		case LogLevel::DEBUG_2:
 		case LogLevel::DEBUG_3:
-			return;
+			return false;
 	}
 
 	const std::vector<Anope::string> *list = NULL;

@@ -565,7 +565,7 @@ class Serialize::CommonFieldBase : public FieldTypeBase<T>
 		return this->HasField_(s);
 	}
 
-	void Uncache(Object *s)
+	void Uncache(Object *s) override
 	{
 		Unset_(Upcast(s));
 	}

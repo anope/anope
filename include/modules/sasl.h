@@ -102,7 +102,7 @@ namespace SASL
 				if (!hostname.empty() && !ip.empty())
 					user = hostname + " (" + ip + ")";
 
-				Log(Config->GetClient("NickServ"), "sasl") << user << " identified to account " << this->GetAccount() << " using SASL";
+				Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << user << " identified to account " << this->GetAccount() << " using SASL";
 				sasl->Succeed(s, na->nc);
 				delete s;
 			}
@@ -133,7 +133,7 @@ namespace SASL
 			if (!hostname.empty() && !ip.empty())
 				user = hostname + " (" + ip + ")";
 
-			Log(Config->GetClient("NickServ"), "sasl") << user << " failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
+			Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << user << " failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
 		}
 	};
 }

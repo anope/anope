@@ -246,6 +246,7 @@ class CoreExport IdentifyRequest
 	virtual void OnSuccess() = 0;
 	virtual void OnFail() = 0;
 
+	Module *GetOwner() const { return owner; }
 	const Anope::string &GetAccount() const { return account; }
 	const Anope::string &GetPassword() const { return password; }
 

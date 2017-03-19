@@ -1,13 +1,8 @@
 # This usage of CMake requires at least version 3.0
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
-cmake_policy(SET CMP0003 NEW)
-if(POLICY CMP0026)
-  cmake_policy(SET CMP0026 OLD)
-endif()
-if(POLICY CMP0007)
-  cmake_policy(SET CMP0007 OLD)
-endif()
+cmake_policy(SET CMP0007 OLD)
+cmake_policy(SET CMP0026 OLD)
 
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)
@@ -73,7 +68,7 @@ include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include)
 # Pass on REPRODUCIBLE_BUILD
 if(REPRODUCIBLE_BUILD)
   add_definitions(-DREPRODUCIBLE_BUILD)
-endif(REPRODUCIBLE_BUILD)
+endif()
 
 # If using Windows, always add the _WIN32 define
 if(WIN32)
@@ -116,13 +111,6 @@ endif()
 
 # If we are not using Visual Studio, we'll run the following checks
 if(NOT MSVC)
-  # Check if the C++ compiler can accept the -pipe flag, and add it to the compile flags if it works
-  check_cxx_compiler_flag(-pipe HAVE_PIPE_FLAG)
-  # If the flag was accepted, add it to the list of flags
-  if(HAVE_PIPE_FLAG)
-    set(CXXFLAGS "${CXXFLAGS} -pipe")
-  endif()
-
   # The following are additional library checks, they are not required for Windows
   if(NOT WIN32)
     # Check if socket is within the socket library (if the library exists), and add it to the linker flags if needed
@@ -289,7 +277,7 @@ install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${DB_
 install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${LOGS_DIR}\")")
 if(WIN32)
   install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${DB_DIR}/runtime\")")
-endif(WIN32)
+endif()
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the below directories, as well as the group of the data directory
 if(NOT WIN32 AND RUNGROUP)
   install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/\${DB_DIR}/backups\")")

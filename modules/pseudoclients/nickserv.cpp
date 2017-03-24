@@ -493,13 +493,6 @@ class NickServCore : public Module, public NickServService
 				"Accounts that are not used anymore are subject to\n"
 				"the automatic expiration, i.e. they will be deleted\n"
 				"after %d days if not used."), nickserv_expire / 86400);
-		source.Reply(_(" \n"
-			"\002NOTICE:\002 This service is intended to provide a way for\n"
-			"IRC users to ensure their identity is not compromised.\n"
-			"It is \002NOT\002 intended to facilitate \"stealing\" of\n"
-			"nicknames or other malicious actions. Abuse of %s\n"
-			"will result in, at minimum, loss of the abused\n"
-			"nickname(s)."), NickServ->nick.c_str());
 	}
 
 	void OnNickCoreCreate(NickCore *nc)

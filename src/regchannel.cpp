@@ -33,9 +33,8 @@ AutoKick::~AutoKick()
 		if (it != this->ci->akick->end())
 			this->ci->akick->erase(it);
 
-		const NickAlias *na = NickAlias::Find(this->mask);
-		if (na != NULL)
-			na->nc->RemoveChannelReference(this->ci);
+		if (nc != NULL)
+			nc->RemoveChannelReference(this->ci);
 	}
 }
 

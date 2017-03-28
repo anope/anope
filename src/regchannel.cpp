@@ -33,7 +33,7 @@ AutoKick::~AutoKick()
 		if (it != this->ci->akick->end())
 			this->ci->akick->erase(it);
 
-		if (nc != NULL)
+		if (nc)
 			nc->RemoveChannelReference(this->ci);
 	}
 }

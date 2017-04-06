@@ -492,9 +492,6 @@ class CommandCSMode : public Command
 		spacesepstream sep(params.size() > 3 ? params[3] : "");
 		Anope::string modes = params[2], param;
 
-		logger.Command(source, ci, _("{source} used {command} on {channel} to set {3}"),
-				params[2] + (params.size() > 3 ? " " + params[3] : ""));
-
 		int adding = -1;
 		for (size_t i = 0; i < modes.length(); ++i)
 		{
@@ -560,20 +557,19 @@ class CommandCSMode : public Command
 
 							if (param.find_first_of("*?") != Anope::string::npos)
 							{
-								if (!this->CanSet(source, ci, cm, false) && !source.IsOverride())
+								if (!this->CanSet(source, ci, cm, false) && !source.HasOverridePriv("chanserv/administration"))
 								{
 									source.Reply(_("You do not have access to set mode \002{0}\002."), cm->mchar);
 									break;
 								}
 
-								for (Channel::ChanUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end;)
+								for (Channel::ChanUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 								{
 									ChanUserContainer *uc = it->second;
-									++it;
 
 									ChanServ::AccessGroup targ_access = ci->AccessFor(uc->user);
 
-									if (uc->user->IsProtected() || (ci->IsPeace() && targ_access >= u_access && !source.IsOverride()))
+									if (uc->user->IsProtected() || (ci->IsPeace() && targ_access >= u_access && !source.HasOverridePriv("chanserv/administration")))
 									{
 										source.Reply(_("You do not have the access to change the modes of \002{0}\002."), uc->user->nick.c_str());
 										continue;
@@ -591,13 +587,13 @@ class CommandCSMode : public Command
 							else
 							{
 								User *target = User::Find(param, true);
-								if (target == NULL)
+								if (target == nullptr)
 								{
 									source.Reply(_("User \002{0}\002 isn't currently online."), param);
 									break;
 								}
 
-								if (!this->CanSet(source, ci, cm, source.GetUser() == target) && !source.IsOverride())
+								if (!this->CanSet(source, ci, cm, source.GetUser() == target) && !source.HasOverridePriv("chanserv/administration"))
 								{
 									source.Reply(_("You do not have access to set mode \002{0}\002."), cm->mchar);
 									break;
@@ -606,12 +602,13 @@ class CommandCSMode : public Command
 								if (source.GetUser() != target)
 								{
 									ChanServ::AccessGroup targ_access = ci->AccessFor(target);
-									if (ci->IsPeace() && targ_access >= u_access && !source.IsOverride())
+									if (ci->IsPeace() && targ_access >= u_access && !source.HasOverridePriv("chanserv/administration"))
 									{
 										source.Reply(_("You do not have the access to change the modes of \002{0}\002"), target->nick);
 										break;
 									}
-									else if (target->IsProtected())
+
+									if (target->IsProtected())
 									{
 										source.Reply(_("Access denied. \002{0}\002 is protected and can not have their modes changed."), target->nick);
 										break;
@@ -645,6 +642,10 @@ class CommandCSMode : public Command
 					}
 			}
 		}
+
+		logger.Command(source, ci, _("{source} used {command} on {channel} to set {0}"),
+				params[2] + (params.size() > 3 ? " " + params[3] : ""));
+
 	}
 
 	void DoClear(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)

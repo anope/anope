@@ -88,7 +88,7 @@ class CommandMSRead : public Command
 	CommandMSRead(Module *creator) : Command(creator, "memoserv/read", 1, 2)
 	{
 		this->SetDesc(_("Read a memo or memos"));
-		this->SetSyntax(_("[\037channel\037] {\037num\037 | \037list\037 | LAST | NEW}"));
+		this->SetSyntax(_("[\037channel\037] {\037num\037 | \037list\037 | LAST | NEW | ALL}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -122,7 +122,7 @@ class CommandMSRead : public Command
 			mi = source.nc->GetMemos();
 		}
 
-		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && numstr.find_first_not_of("0123456789.,-") != Anope::string::npos))
+		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.equals_ci("ALL") && numstr.find_first_not_of("0123456789.,-") != Anope::string::npos))
 		{
 			this->OnSyntaxError(source, numstr);
 			return;
@@ -166,6 +166,13 @@ class CommandMSRead : public Command
 			for (i = 0, end = memos.size() - 1; i < end; ++i);
 			DoRead(source, mi, ci, i);
 		}
+		else if (numstr.equals_ci("ALL"))
+		{
+			for (i = 0, end = memos.size(); i < end; ++i)
+			{
+				DoRead(source, mi, ci, i);
+			}
+		}
 		else /* number[s] */
 		{
 			bool shown = false;
@@ -191,6 +198,7 @@ class CommandMSRead : public Command
 		source.Reply(_("Sends you the text of the memos specified."
 		               " If LAST is given, sends you the memo you most recently received."
 		               " If NEW is given, sends you all of your new memos."
+			       " If ALL is given, sends you all of your memos."
 		               " Otherwise, sends you memo number \037num\037."
 		               " You can also give a list of numbers, as in the example:\n"
 		               "\n"

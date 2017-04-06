@@ -110,3 +110,23 @@ bool ChanAccessImpl::Matches(const User *u, NickServ::Account *acc)
 
 	return false;
 }
+
+int ChanAccessImpl::Compare(ChanAccess *other)
+{
+	const std::vector<ChanServ::Privilege> &privs = ChanServ::service->GetPrivileges();
+	for (unsigned int i = privs.size(); i > 0; --i)
+	{
+		bool this_p = this->HasPriv(privs[i - 1].name),
+			other_p = other->HasPriv(privs[i - 1].name);
+
+		if (!this_p && !other_p)
+			continue;
+
+		if (this_p && !other_p)
+			return 1;
+		else if (!this_p && other_p)
+			return -1;
+	}
+
+	return 0;
+}

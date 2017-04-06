@@ -83,40 +83,17 @@ class CoreExport ChanAccess : public Serialize::Object
 	 */
 	virtual void AccessUnserialize(const Anope::string &data) anope_abstract;
 
+	virtual int Compare(ChanAccess *other) anope_abstract;
+
 	/* Comparison operators to other Access entries */
-	virtual bool operator>(ChanAccess &other)
+	bool operator>(ChanAccess &other)
 	{
-//		const std::vector<Privilege> &privs = service->GetPrivileges();
-//		for (unsigned i = privs.size(); i > 0; --i)
-//		{
-//			bool this_p = this->HasPriv(privs[i - 1].name),
-//				other_p = other.HasPriv(privs[i - 1].name);
-//
-//			if (!this_p && !other_p)
-//				continue;
-//
-//			return this_p && !other_p;
-//		}
-
-		return false;
+		return Compare(&other) > 0;
 	}
-#warning "move this out"
 
-	virtual bool operator<(ChanAccess &other)
+	bool operator<(ChanAccess &other)
 	{
-//		const std::vector<Privilege> &privs = service->GetPrivileges();
-//		for (unsigned i = privs.size(); i > 0; --i)
-//		{
-//			bool this_p = this->HasPriv(privs[i - 1].name),
-//				other_p = other.HasPriv(privs[i - 1].name);
-//
-//			if (!this_p && !other_p)
-//				continue;
-//
-//			return !this_p && other_p;
-//		}
-
-		return false;
+		return Compare(&other) < 0;
 	}
 
 	bool operator>=(ChanAccess &other)

@@ -60,20 +60,20 @@ class AccessChanAccessImpl : public AccessChanAccess
 		}
 	}
 
-	bool operator>(ChanServ::ChanAccess &other) override
+	int Compare(ChanAccess *other) override
 	{
-		if (this->GetSerializableType() != other.GetSerializableType())
-			return ChanServ::ChanAccess::operator>(other);
-		else
-			return this->GetLevel() > anope_dynamic_static_cast<AccessChanAccess *>(&other)->GetLevel();
-	}
+		if (this->GetSerializableType() != other->GetSerializableType())
+			return ChanAccess::Compare(other);
 
-	bool operator<(ChanServ::ChanAccess &other) override
-	{
-		if (this->GetSerializableType() != other.GetSerializableType())
-			return ChanAccess::operator<(other);
+		int lev = this->GetLevel();
+		int theirlev = anope_dynamic_static_cast<AccessChanAccess *>(other)->GetLevel();
+
+		if (lev > theirlev)
+			return 1;
+		else if (lev < theirlev)
+			return -1;
 		else
-			return this->GetLevel() < anope_dynamic_static_cast<AccessChanAccess *>(&other)->GetLevel();
+			return 0;
 	}
 };
 

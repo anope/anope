@@ -45,4 +45,6 @@ class ChanAccessImpl : public ChanServ::ChanAccess
 	Anope::string Mask() override;
 
 	bool Matches(const User *u, NickServ::Account *acc) override;
+
+	int Compare(ChanAccess *other) override;
 };

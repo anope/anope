@@ -26,7 +26,7 @@ namespace Configuration
 {
 	class CoreExport Block
 	{
-		friend struct Conf;
+		friend class Conf;
 
 	 public:
 		typedef Anope::map<Anope::string> item_map;

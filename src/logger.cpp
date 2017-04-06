@@ -112,6 +112,8 @@ bool LogInfo::HasType(LogType ltype, LogLevel level, const Anope::string &type) 
 		case LogLevel::DEBUG_2:
 		case LogLevel::DEBUG_3:
 			return false;
+		case LogLevel::NORMAL:
+			break;
 	}
 
 	const std::vector<Anope::string> *list = NULL;
@@ -336,6 +338,8 @@ Anope::string Logger::BuildPrefix() const
 			return "USER: ";
 		case LogType::MODULE:
 			return this->module != nullptr ? (this->module->name.upper() + ": ") : "";
+		case LogType::NORMAL:
+			break;
 	}
 
 	return "";

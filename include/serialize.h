@@ -718,7 +718,7 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 		this->is_object = true;
 	}
 
-	T GetField(TypeImpl *s)
+	T GetField(TypeImpl *s) override
 	{
 		T *t = this->Get_(s);
 

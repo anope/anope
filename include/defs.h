@@ -33,7 +33,6 @@ struct ChanUserContainer;
 class ClientSocket;
 class Command;
 class CommandSource;
-namespace Configuration { struct Conf; }
 class ConnectionSocket;
 class Entry;
 class ExtensibleBase;

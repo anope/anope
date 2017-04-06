@@ -23,6 +23,8 @@
 #include "anope.h"
 #include "base.h"
 
+namespace Configuration { class Conf; }
+
 /** The different types of modes
 */
 enum ModeType

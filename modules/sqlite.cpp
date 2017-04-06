@@ -86,7 +86,7 @@ class SQLiteService : public Provider
 
 	void Run(Interface *i, const Query &query) override;
 
-	Result RunQuery(const Query &query);
+	Result RunQuery(const Query &query) override;
 
 	std::vector<Query> InitSchema(const Anope::string &prefix) override;
 	std::vector<Query> Replace(const Anope::string &table, const Query &, const std::set<Anope::string> &) override;
@@ -100,7 +100,7 @@ class SQLiteService : public Provider
 
 	Serialize::ID GetID(const Anope::string &prefix, const Anope::string &type) override;
 
-	Query GetTables(const Anope::string &prefix);
+	Query GetTables(const Anope::string &prefix) override;
 
 	Anope::string BuildQuery(const Query &q);
 
@@ -113,7 +113,7 @@ class ModuleSQLite : public Module
 	std::map<Anope::string, SQLiteService *> SQLiteServices;
 
  public:
-	ModuleSQLite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+	ModuleSQLite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
 	}
 

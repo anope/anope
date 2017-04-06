@@ -43,6 +43,7 @@ void charybdis::senders::NickIntroduction::Send(User *user)
 	Anope::string modes = "+" + user->GetModes();
 	Uplink::Send(Me, "EUID", user->nick, 1, user->timestamp, modes, user->GetIdent(), user->host, 0, user->GetUID(), "*", "*", user->realname);
 }
+
 void charybdis::senders::SASL::Send(const ::SASL::Message& message)
 {
 	Server *s = Server::Find(message.target.substr(0, 3));

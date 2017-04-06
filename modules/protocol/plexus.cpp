@@ -20,6 +20,7 @@
 /* Dependencies: anope_protocol.ratbox */
 
 #include "module.h"
+#include "modules/sasl.h"
 #include "modules/protocol/plexus.h"
 #include "modules/protocol/hybrid.h"
 #include "modules/protocol/ratbox.h"
@@ -44,6 +45,14 @@ void plexus::senders::NOOP::Send(Server* server, bool mode)
 	Uplink::Send("ENCAP", server->GetName(), "SVSNOOP", (mode ? "+" : "-"));
 }
 
+void plexus::senders::SASL::Send(const ::SASL::Message& message)
+{
+	Anope::string sid = message.target.substr(0, 3);
+	Server *s = Server::Find(sid);
+	Uplink::Send(Me, "ENCAP", s ? s->GetName() : sid, "SASL",
+			message.source, message.target, message.type, message.data, message.ext.empty() ? "" : message.ext);
+}
+
 void plexus::senders::Topic::Send(const MessageSource &source, Channel *channel, const Anope::string &topic, time_t topic_ts, const Anope::string &topic_setter)
 {
 	Uplink::Send(source, "ENCAP", "*", "TOPIC", channel->name, topic_setter, topic_ts, topic);
@@ -52,6 +61,14 @@ void plexus::senders::Topic::Send(const MessageSource &source, Channel *channel,
 void plexus::senders::SVSJoin::Send(const MessageSource& source, User* user, const Anope::string& chan, const Anope::string& key)
 {
 	Uplink::Send(source, "ENCAP", user->server->GetName(), "SVSJOIN", user->GetUID(), chan);
+}
+
+void plexus::senders::SVSLogin::Send(const Anope::string& uid, const Anope::string& acc, const Anope::string& vident, const Anope::string& vhost)
+{
+	Anope::string sid = uid.substr(0, 3);
+	Server *s = Server::Find(sid);
+
+	Uplink::Send(Me, "ENCAP", s ? s->GetName() : sid, "SVSLOGIN", uid, "*", vident.empty() ? "*" : vident, vhost.empty() ? "*" : vhost, acc);
 }
 
 void plexus::senders::SVSNick::Send(User* u, const Anope::string& newnick, time_t ts)
@@ -79,7 +96,7 @@ void plexus::senders::VhostSet::Send(User* u, const Anope::string& vident, const
 
 plexus::Proto::Proto(Module *creator) : ts6::Proto(creator, "Plexus 4")
 {
-	DefaultPseudoclientModes = "+oiU";
+	DefaultPseudoclientModes = "+iU";
 	CanSVSNick = true;
 	CanSVSJoin = true;
 	CanSetVHost = true;
@@ -168,7 +185,18 @@ void plexus::Encap::Run(MessageSource &source, const std::vector<Anope::string> 
 			EventManager::Get()->Dispatch(&Event::Fingerprint::OnFingerprint, u);
 		}
 	}
-	return;
+
+	else if (params[1] == "SASL" && sasl && params.size() >= 6)
+	{
+		SASL::Message m;
+		m.source = params[2];
+		m.target = params[3];
+		m.type = params[4];
+		m.data = params[5];
+		m.ext = params.size() > 6 ? params[6] : "";
+
+		sasl->ProcessMessage(m);
+	}
 }
 
 struct IRCDMessagePass : IRCDMessage
@@ -308,7 +336,9 @@ class ProtoPlexus : public Module
 	plexus::senders::ModeUser sender_mode_user;
 	plexus::senders::NickIntroduction sender_nickintroduction;
 	plexus::senders::NOOP sender_noop;
+	plexus::senders::SASL sender_sasl;
 	plexus::senders::SVSJoin sender_svsjoin;
+	plexus::senders::SVSLogin sender_svslogin;
 	plexus::senders::SVSNick sender_svsnick;
 	plexus::senders::SVSPart sender_svspart;
 	plexus::senders::Topic sender_topic;
@@ -367,6 +397,7 @@ class ProtoPlexus : public Module
 		, sender_nickchange(this)
 		, sender_nickintroduction(this)
 		, sender_noop(this)
+		, sender_sasl(this)
 		, sender_notice(this)
 		, sender_part(this)
 		, sender_ping(this)
@@ -380,6 +411,7 @@ class ProtoPlexus : public Module
 		, sender_svshold(this)
 		, sender_svsholddel(this)
 		, sender_svsjoin(this)
+		, sender_svslogin(this)
 		, sender_svsnick(this)
 		, sender_svspart(this)
 		, sender_topic(this)

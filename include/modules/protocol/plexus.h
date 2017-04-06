@@ -53,6 +53,14 @@ class NOOP : public messages::NOOP
 	void Send(Server *s, bool mode) override;
 };
 
+class SASL : public messages::SASL
+{
+ public:
+	using messages::SASL::SASL;
+
+	 void Send(const ::SASL::Message &) override;
+};
+
 class Topic : public messages::Topic
 {
  public:
@@ -67,6 +75,14 @@ class SVSJoin : public messages::SVSJoin
 	using messages::SVSJoin::SVSJoin;
 
 	void Send(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &key) override;
+};
+
+class SVSLogin : public messages::SVSLogin
+{
+ public:
+	using messages::SVSLogin::SVSLogin;
+
+	void Send(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) override;
 };
 
 class SVSNick : public messages::SVSNick
@@ -113,8 +129,10 @@ class Proto : public ts6::Proto
 
 class Encap : public IRCDMessage
 {
+	ServiceReference<SASL::Service> sasl;
+
  public:
-	Encap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	Encap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };

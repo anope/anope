@@ -95,18 +95,29 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		if (mi == NULL)
 			return MEMO_INVALID_TARGET;
 
+		Anope::string sender_display = source;
+
 		User *sender = User::Find(source, true);
-		if (sender != NULL && !sender->HasPriv("memoserv/no-limit") && !force)
+		if (sender != NULL)
 		{
-			time_t send_delay = Config->GetModule("memoserv/main")->Get<time_t>("senddelay");
-			if (send_delay > 0 && sender->lastmemosend + send_delay > Anope::CurTime)
-				return MEMO_TOO_FAST;
-			if (!mi->GetMemoMax())
-				return MEMO_TARGET_FULL;
-			if (mi->GetMemoMax() > 0 && mi->GetMemos().size() >= static_cast<unsigned>(mi->GetMemoMax()))
-				return MEMO_TARGET_FULL;
-			if (mi->HasIgnore(sender))
-				return MEMO_SUCCESS;
+			if (!sender->HasPriv("memoserv/no-limit") && !force)
+			{
+				time_t send_delay = Config->GetModule("memoserv/main")->Get<time_t>("senddelay");
+				if (send_delay > 0 && sender->lastmemosend + send_delay > Anope::CurTime)
+					return MEMO_TOO_FAST;
+				if (!mi->GetMemoMax())
+					return MEMO_TARGET_FULL;
+				if (mi->GetMemoMax() > 0 && mi->GetMemos().size() >= static_cast<unsigned>(mi->GetMemoMax()))
+					return MEMO_TARGET_FULL;
+				if (mi->HasIgnore(sender))
+					return MEMO_SUCCESS;
+			}
+
+			NickServ::Account *acc = sender->Account();
+			if (acc != NULL)
+			{
+				sender_display = acc->GetDisplay();
+			}
 		}
 
 		if (sender != NULL)
@@ -114,7 +125,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 		MemoServ::Memo *m = Serialize::New<MemoServ::Memo *>();
 		m->SetMemoInfo(mi);
-		m->SetSender(source);
+		m->SetSender(sender_display);
 		m->SetTime(Anope::CurTime);
 		m->SetText(message);
 		m->SetUnread(true);

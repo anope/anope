@@ -334,6 +334,12 @@ class CommandCSMode : public Command
 							break;
 						}
 
+						if (cm->type == MODE_STATUS && !CanSet(source, ci, cm, false))
+						{
+							source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), cm->name, ci->GetName());
+							break;
+						}
+
 						if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
 						{
 							source.Reply(_("List for mode \002{0}\002 is full."), cm->mchar);

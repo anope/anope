@@ -339,7 +339,7 @@ class CommandNSResend : public Command
 			return;
 		}
 
-		if (Anope::CurTime < source.nc->lastmail + Config->GetModule(this->GetOwner())->Get<time_t>("resenddelay"))
+		if (Anope::CurTime < source.nc->GetLastMail() + Config->GetModule(this->GetOwner())->Get<time_t>("resenddelay"))
 		{
 			source.Reply(_("Cannot send mail now; please retry a little later."));
 			return;
@@ -351,7 +351,7 @@ class CommandNSResend : public Command
 			return;
 		}
 
-		na->GetAccount()->lastmail = Anope::CurTime;
+		na->GetAccount()->SetLastMail(Anope::CurTime);
 		source.Reply(_("Your passcode has been re-sent to \002{0}\002."), na->GetAccount()->GetEmail());
 		logger.Command(LogType::COMMAND, source, _("{source} used {command} to resend registration verification code"));
 	}

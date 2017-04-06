@@ -39,6 +39,7 @@ class AccountType : public Serialize::Type<AccountImpl>
 	Serialize::Field<AccountImpl, bool> unconfirmed, _private, autoop, keepmodes,
 		killprotect, killquick, killimmed, msg, secure, memosignon, memoreceive,
 		memomail, hideemail, hidemask, hidestatus, hidequit;
+	Serialize::Field<AccountImpl, time_t> last_mail;
 
  	AccountType(Module *);
 

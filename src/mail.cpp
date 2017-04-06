@@ -75,7 +75,7 @@ bool Mail::Send(User *u, NickServ::Account *nc, ServiceBot *service, const Anope
 		else if (nc->GetEmail().empty())
 			return false;
 
-		nc->lastmail = Anope::CurTime;
+		nc->SetLastMail(Anope::CurTime);
 		Thread *t = new Mail::Message(b->Get<Anope::string>("sendfrom"), nc->GetDisplay(), nc->GetEmail(), subject, message);
 		t->Start();
 		return true;
@@ -90,7 +90,8 @@ bool Mail::Send(User *u, NickServ::Account *nc, ServiceBot *service, const Anope
 			u->SendMessage(service, _("E-mail for \002%s\002 is invalid."), nc->GetDisplay().c_str());
 		else
 		{
-			u->lastmail = nc->lastmail = Anope::CurTime;
+			u->lastmail = Anope::CurTime;
+			nc->SetLastMail(Anope::CurTime);
 			Thread *t = new Mail::Message(b->Get<Anope::string>("sendfrom"), nc->GetDisplay(), nc->GetEmail(), subject, message);
 			t->Start();
 			return true;
@@ -106,7 +107,7 @@ bool Mail::Send(NickServ::Account *nc, const Anope::string &subject, const Anope
 	if (!b->Get<bool>("usemail") || b->Get<Anope::string>("sendfrom").empty() || !nc || nc->GetEmail().empty() || subject.empty() || message.empty())
 		return false;
 
-	nc->lastmail = Anope::CurTime;
+	nc->SetLastMail(Anope::CurTime);
 	Thread *t = new Mail::Message(b->Get<Anope::string>("sendfrom"), nc->GetDisplay(), nc->GetEmail(), subject, message);
 	t->Start();
 

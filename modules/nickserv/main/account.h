@@ -37,6 +37,7 @@ class AccountImpl : public NickServ::Account
 	Serialize::Storage<bool> secure;
 	Serialize::Storage<bool> memosignon, memoreceive, memomail;
 	Serialize::Storage<bool> hideemail, hidemask, hidestatus, hidequit;
+	Serialize::Storage<time_t> lastmail;
 
  public:
 	using NickServ::Account::Account;
@@ -116,4 +117,7 @@ class AccountImpl : public NickServ::Account
 	void SetDisplay(NickServ::Nick *na) override;
 	bool IsOnAccess(User *u) override;
 	unsigned int GetChannelCount() override;
+
+	time_t GetLastMail() override;
+	void SetLastMail(time_t) override;
 };

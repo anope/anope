@@ -30,9 +30,6 @@ class CoreExport Account : public Serialize::Object
  public:
 	static constexpr const char *const NAME = "account";
 
-#warning "move lastmail to a field"
-	/* Last time an email was sent to this user */
-	time_t lastmail = 0;
 	/* Users online now logged into this account */
 	std::vector<User *> users;
 
@@ -120,6 +117,9 @@ class CoreExport Account : public Serialize::Object
 	virtual MemoServ::MemoInfo *GetMemos() anope_abstract;
 
 	virtual unsigned int GetChannelCount() anope_abstract;
+
+	virtual time_t GetLastMail() anope_abstract;
+	virtual void SetLastMail(time_t) anope_abstract;
 };
 
 } // namespace NickServ

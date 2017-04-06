@@ -314,3 +314,12 @@ unsigned int AccountImpl::GetChannelCount()
 	return i;
 }
 
+time_t AccountImpl::GetLastMail()
+{
+	return Get(&AccountType::last_mail);
+}
+
+void AccountImpl::SetLastMail(time_t lastmail)
+{
+	Set(&AccountType::last_mail, lastmail);
+}

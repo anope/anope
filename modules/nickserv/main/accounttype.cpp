@@ -43,6 +43,7 @@ AccountType::AccountType(Module *me) : Serialize::Type<AccountImpl>(me)
 	, hidemask(this, "hide_mask", &AccountImpl::hidemask)
 	, hidestatus(this, "hide_status", &AccountImpl::hidestatus)
 	, hidequit(this, "hide_quit", &AccountImpl::hidequit)
+	, last_mail(this, "last_mail", &AccountImpl::lastmail)
 {
 
 }

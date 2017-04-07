@@ -34,6 +34,7 @@ class CommandOSChanList : public Command
 		const Anope::string &opt = params.size() > 1 ? params[1] : "";
 		std::set<Anope::string> modes;
 		User *u2;
+		unsigned int count = 0;
 
 		if (!pattern.empty())
 			logger.Admin(source, _("{source} used {command} for {0}"), pattern);
@@ -68,6 +69,8 @@ class CommandOSChanList : public Command
 				entry["Modes"] = cc->chan->GetModes(true, true);
 				entry["Topic"] = cc->chan->topic;
 				list.AddEntry(entry);
+
+				++count;
 			}
 		}
 		else
@@ -91,6 +94,8 @@ class CommandOSChanList : public Command
 				entry["Modes"] = c->GetModes(true, true);
 				entry["Topic"] = c->topic;
 				list.AddEntry(entry);
+
+				++count;
 			}
 		}
 
@@ -100,7 +105,7 @@ class CommandOSChanList : public Command
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 
-		source.Reply(_("End of channel list."));
+		source.Reply(_("End of channel list. \002{0}\002 channels shown."), count);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

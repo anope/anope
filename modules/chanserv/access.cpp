@@ -900,13 +900,13 @@ class CSAccess : public Module
 		if (group->ci == NULL)
 			return EVENT_CONTINUE;
 
-		const ChanServ::ChanAccess *highest = group->Highest();
-		if (highest && highest->provider == &accesschanaccesstype)
+		ChanServ::ChanAccess *highest = group->Highest();
+		if (highest && highest->GetSerializableType() == &accesschanaccesstype)
 		{
 			/* Access is the only access provider with the concept of negative access,
 			 * so check they don't have negative access
 			 */
-			const AccessChanAccess *aca = anope_dynamic_static_cast<const AccessChanAccess *>(highest);
+			AccessChanAccess *aca = anope_dynamic_static_cast<AccessChanAccess *>(highest);
 
 			if (aca->GetLevel() < 0)
 				return EVENT_CONTINUE;

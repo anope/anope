@@ -1280,7 +1280,7 @@ class CSSet : public Module
 		{
 			if (chan->ci->IsNoAutoop())
 				give_modes = false;
-			if (chan->ci->IsSecureOps() && !user->IsProtected())
+			if (chan->ci->IsSecureOps() && !user->HasPriv("chanserv/administration"))
 				// This overrides what chanserv does because it is loaded after chanserv
 				take_modes = true;
 		}

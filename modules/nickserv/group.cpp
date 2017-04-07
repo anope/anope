@@ -87,22 +87,23 @@ class CommandNSGroup : public Command
 		this->SetDesc(_("Join a group"));
 		this->SetSyntax(_("\037[target]\037 \037[password]\037"));
 		this->AllowUnregistered(true);
-		this->RequireUser(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		User *u = source.GetUser();
+		User *user = source.GetUser();
 
 		Anope::string nick;
 		if (params.empty())
 		{
-			NickServ::Account* core = u->Account();
+			NickServ::Account* core = source.GetAccount();
 			if (core)
 				nick = core->GetDisplay();
 		}
 		else
+		{
 			nick = params[0];
+		}
 
 		if (nick.empty())
 		{
@@ -118,35 +119,33 @@ class CommandNSGroup : public Command
 			return;
 		}
 
-		if (!IRCD->IsNickValid(u->nick))
+		if (!IRCD->IsNickValid(source.GetNick()))
 		{
-			source.Reply(_("\002{0}\002 may not be registered."), u->nick);
+			source.Reply(_("\002{0}\002 may not be registered."), source.GetNick());
 			return;
 		}
 
 		if (Config->GetModule("nickserv/main")->Get<bool>("restrictopernicks"))
 			for (Oper *o : Serialize::GetObjects<Oper *>())
 			{
-				if (!u->HasMode("OPER") && u->nick.find_ci(o->GetName()) != Anope::string::npos)
+				if (user != nullptr && !user->HasMode("OPER") && user->nick.find_ci(o->GetName()) != Anope::string::npos)
 				{
-					source.Reply(_("\002{0}\002 may not be registered because it is too similar to an operator nick."), u->nick);
+					source.Reply(_("\002{0}\002 may not be registered because it is too similar to an operator nick."), user->nick);
 					return;
 				}
 			}
 
-		NickServ::Nick *target, *na = NickServ::FindNick(u->nick);
-		const Anope::string &guestnick = Config->GetModule("nickserv/main")->Get<Anope::string>("guestnickprefix", "Guest");
+		NickServ::Nick *target, *na = NickServ::FindNick(source.GetNick());
 		time_t reg_delay = Config->GetModule("nickserv/main")->Get<time_t>("regdelay");
-		unsigned maxaliases = Config->GetModule(this->GetOwner())->Get<unsigned>("maxaliases");
 		if (!(target = NickServ::FindNick(nick)))
 		{
 			source.Reply(_("\002{0}\002 isn't registered."), nick);
 			return;
 		}
 
-		if (Anope::CurTime < u->lastnickreg + reg_delay)
+		if (user != nullptr && Anope::CurTime < user->lastnickreg + reg_delay)
 		{
-			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), (reg_delay + u->lastnickreg) - Anope::CurTime, source.GetCommand());
+			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), (reg_delay + user->lastnickreg) - Anope::CurTime, source.GetCommand());
 			return;
 		}
 
@@ -170,7 +169,7 @@ class CommandNSGroup : public Command
 			return;
 		}
 
-		if (na && na->GetAccount() != u->Account())
+		if (na && na->GetAccount() != source.GetAccount())
 		{
 			source.Reply(_("\002{0}\002 is already registered."), na->GetNick());
 			return;
@@ -182,36 +181,39 @@ class CommandNSGroup : public Command
 			return;
 		}
 
+		const Anope::string &guestnick = Config->GetModule("nickserv/main")->Get<Anope::string>("guestnickprefix", "Guest");
+		unsigned maxaliases = Config->GetModule(this->GetOwner())->Get<unsigned>("maxaliases");
+
 		if (maxaliases && target->GetAccount()->GetRefs<NickServ::Nick *>().size() >= maxaliases && !target->GetAccount()->GetOper())
 		{
 			source.Reply(_("There are too many nicknames in your group."));
 			return;
 		}
 
-		if (u->nick.length() <= guestnick.length() + 7 &&
-			u->nick.length() >= guestnick.length() + 1 &&
-			!u->nick.find_ci(guestnick) && !u->nick.substr(guestnick.length()).find_first_not_of("1234567890"))
+		if (source.GetNick().length() <= guestnick.length() + 7 &&
+			source.GetNick().length() >= guestnick.length() + 1 &&
+			!source.GetNick().find_ci(guestnick) && !source.GetNick().substr(guestnick.length()).find_first_not_of("1234567890"))
 		{
-			source.Reply(_("\002{0}\002 may not be registered."), u->nick);
+			source.Reply(_("\002{0}\002 may not be registered."), source.GetNick());
 			return;
 		}
 
 		bool ok = false;
-		if (!na && u->Account() == target->GetAccount())
+		if (!na && source.GetAccount() == target->GetAccount())
 			ok = true;
 
-		if (certservice && certservice->Matches(u, target->GetAccount()))
+		if (user != nullptr && certservice && certservice->Matches(user, target->GetAccount()))
 			ok = true;
 
 		if (ok == false && !pass.empty())
 		{
-			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSGroupRequestListener(source, this, u->nick, target), this->GetOwner(), target->GetAccount()->GetDisplay(), pass);
+			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSGroupRequestListener(source, this, source.GetNick(), target), this->GetOwner(), target->GetAccount()->GetDisplay(), pass);
 			EventManager::Get()->Dispatch(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
 			req->Dispatch();
 		}
 		else
 		{
-			NSGroupRequestListener req(source, this, u->nick, target);
+			NSGroupRequestListener req(source, this, source.GetNick(), target);
 
 			if (ok)
 				req.OnSuccess(nullptr);
@@ -240,16 +242,14 @@ class CommandNSUngroup : public Command
 	{
 		this->SetDesc(_("Remove a nick from a group"));
 		this->SetSyntax(_("[\037nickname\037]"));
-		this->RequireUser(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		User *u = source.GetUser();
 		Anope::string nick = !params.empty() ? params[0] : "";
-		NickServ::Nick *na = NickServ::FindNick(!nick.empty() ? nick : u->nick);
+		NickServ::Nick *na = NickServ::FindNick(!nick.empty() ? nick : source.GetNick());
 
-		if (u->Account()->GetRefs<NickServ::Nick *>().size() == 1)
+		if (source.GetAccount()->GetRefs<NickServ::Nick *>().size() == 1)
 		{
 			source.Reply(_("Your nickname is not grouped to anything, so you can't ungroup it."));
 			return;
@@ -257,11 +257,11 @@ class CommandNSUngroup : public Command
 
 		if (!na)
 		{
-			source.Reply(_("\002{0}\002 isn't registered."), !nick.empty() ? nick : u->nick);
+			source.Reply(_("\002{0}\002 isn't registered."), !nick.empty() ? nick : source.GetNick());
 			return;
 		}
 
-		if (na->GetAccount() != u->Account())
+		if (na->GetAccount() != source.GetAccount())
 		{
 			source.Reply(_("\002{0}\002 is not in your group."), na->GetNick());
 			return;

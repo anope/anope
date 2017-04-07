@@ -1047,7 +1047,6 @@ class ModuleDNS : public Module
 			if (packet->answers.size() == answer_size)
 			{
 				logger.Log("Error! There are no servers with any IPs of type {0}", q.type);
-				/* Send back an empty answer anyway */
 			}
 		}
 	}

@@ -862,6 +862,9 @@ class MyManager : public Manager, public Timer
 				}
 			}
 
+			if (packet->answers.empty() && packet->authorities.empty() && packet->additional.empty() && packet->error == ERROR_NONE)
+				packet->error = ERROR_REFUSED; // usually safe, won't cause an NXDOMAIN to get cached
+
 			s->Reply(packet);
 			return true;
 		}

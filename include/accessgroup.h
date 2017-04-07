@@ -50,7 +50,7 @@ class CoreExport AccessGroup : public std::vector<ChanAccess *>
 	 * with the highest rank (see Privilege::rank).
 	 * @return The "highest" entry
 	 */
-	ChanAccess *Highest();
+	ChanAccess *Highest() const;
 
 	/* Comparison operators to other AccessGroups */
 	bool operator>(AccessGroup &other);

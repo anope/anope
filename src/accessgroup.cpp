@@ -53,7 +53,7 @@ bool AccessGroup::HasPriv(const Anope::string &priv)
 	return false;
 }
 
-ChanAccess *AccessGroup::Highest()
+ChanAccess *AccessGroup::Highest() const
 {
 	ChanAccess *highest = NULL;
 	for (unsigned i = 0; i < this->size(); ++i)

@@ -64,7 +64,7 @@ class EOld : public Module
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
 			throw ModuleException("enc_old is deprecated and can not be used as a primary encryption method");
 
-		ModuleManager::LoadModule("enc_md5", User::Find(creator));
+		ModuleManager::LoadModule("enc_md5", User::Find(creator, true));
 		if (!md5)
 			throw ModuleException("Unable to find md5 reference");
 

@@ -560,40 +560,40 @@ static void LoadNicks()
 			switch (u16)
 			{
 				case LANG_ES:
-					nc->SetLanguage("es_ES");
+					nc->SetLanguage("es_ES.UTF-8");
 					break;
 				case LANG_PT:
-					nc->SetLanguage("pt_PT");
+					nc->SetLanguage("pt_PT.UTF-8");
 					break;
 				case LANG_FR:
-					nc->SetLanguage("fr_FR");
+					nc->SetLanguage("fr_FR.UTF-8");
 					break;
 				case LANG_TR:
-					nc->SetLanguage("tr_TR");
+					nc->SetLanguage("tr_TR.UTF-8");
 					break;
 				case LANG_IT:
-					nc->SetLanguage("it_IT");
+					nc->SetLanguage("it_IT.UTF-8");
 					break;
 				case LANG_DE:
-					nc->SetLanguage("de_DE");
+					nc->SetLanguage("de_DE.UTF-8");
 					break;
 				case LANG_CAT:
-					nc->SetLanguage("ca_ES"); // yes, iso639 defines catalan as CA
+					nc->SetLanguage("ca_ES.UTF-8"); // yes, iso639 defines catalan as CA
 					break;
 				case LANG_GR:
-					nc->SetLanguage("el_GR");
+					nc->SetLanguage("el_GR.UTF-8");
 					break;
 				case LANG_NL:
-					nc->SetLanguage("nl_NL");
+					nc->SetLanguage("nl_NL.UTF-8");
 					break;
 				case LANG_RU:
-					nc->SetLanguage("ru_RU");
+					nc->SetLanguage("ru_RU.UTF-8");
 					break;
 				case LANG_HUN:
-					nc->SetLanguage("hu_HU");
+					nc->SetLanguage("hu_HU.UTF-8");
 					break;
 				case LANG_PL:
-					nc->SetLanguage("pl_PL");
+					nc->SetLanguage("pl_PL.UTF-8");
 					break;
 				case LANG_EN_US:
 				case LANG_JA_JIS:

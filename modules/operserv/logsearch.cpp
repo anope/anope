@@ -19,6 +19,8 @@
 
 #include "module.h"
 
+static const unsigned int HARDMAX = 65536;
+
 class CommandOSLogSearch : public Command
 {
 	static inline Anope::string CreateLogName(const Anope::string &file, time_t t = Anope::CurTime)
@@ -97,8 +99,11 @@ class CommandOSLogSearch : public Command
 
 		logger.Admin(source, _("{source} used {command} for {2}"), search_string);
 
+		bool wildcard = search_string.find_first_of("?*") != Anope::string::npos;
+		bool regex = search_string.empty() == false && search_string[0] == '/' && search_string[search_string.length() - 1] == '/';
+
 		const Anope::string &logfile_name = Config->GetModule(this->GetOwner())->Get<Anope::string>("logname");
-		std::list<Anope::string> matches;
+		std::vector<Anope::string> matches;
 		for (int d = days - 1; d >= 0; --d)
 		{
 			Anope::string lf_name = CreateLogName(logfile_name, Anope::CurTime - (d * 86400));
@@ -111,23 +116,48 @@ class CommandOSLogSearch : public Command
 
 			for (Anope::string buf; std::getline(fd, buf.str());)
 				if (Anope::Match(buf, "*" + search_string + "*"))
+				{
+					bool match = false;
+
+					if (regex)
+						match = Anope::Match(buf, search_string, false, true);
+					else if (wildcard)
+						match = Anope::Match(buf, "*" + search_string + "*");
+					else
+						match = buf.find_ci(search_string) != Anope::string::npos;
+
+					if (!match)
+						continue;
+
 					matches.push_back(buf);
+
+					if (matches.size() >= HARDMAX)
+						break;
+				}
 
 			fd.close();
 		}
 
-		unsigned found = matches.size();
+		unsigned int found = matches.size();
 		if (!found)
 		{
 			source.Reply(_("No matches for \002{0}\002 found."), search_string);
 			return;
 		}
 
-		while (matches.size() > static_cast<unsigned>(replies))
-			matches.pop_front();
+		if (found >= HARDMAX)
+		{
+			source.Reply(_("Too many results for \002{0}\002."), search_string);
+			return;
+		}
+
+		if (matches.size() > static_cast<unsigned int>(replies))
+		{
+			matches.erase(matches.begin(), matches.begin() + (matches.size() - static_cast<unsigned int>(replies)));
+		}
 
 		source.Reply(_("Matches for \002{0}\002:"), search_string);
-		unsigned count = 0;
+		unsigned int count = 0;
 		for (const Anope::string &str : matches)
 			source.Reply("#{0}: {1}", ++count, str);
 		source.Reply(_("Showed \002{0}/{1}\002 matches for \002{2}\002."), matches.size(), found, search_string);

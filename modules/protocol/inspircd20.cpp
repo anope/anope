@@ -817,7 +817,7 @@ void inspircd20::ChgName::Run(MessageSource &source, const std::vector<Anope::st
 
 void inspircd20::Encap::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	if (Anope::Match(Me->GetSID(), params[0]) == false)
+	if (!Anope::Match(Me->GetSID(), params[0]) && !Anope::Match(Me->GetName(), params[0]))
 		return;
 
 	const Anope::string &command = params[1];

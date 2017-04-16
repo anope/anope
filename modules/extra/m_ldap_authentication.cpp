@@ -198,6 +198,7 @@ class ModuleLDAPAuthentication : public Module
 	Anope::string password_attribute;
 	Anope::string disable_register_reason;
 	Anope::string disable_email_reason;
+	bool allowgroup;
  public:
 	ModuleLDAPAuthentication(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), orinterface(this),
@@ -223,6 +224,7 @@ class ModuleLDAPAuthentication : public Module
 		email_attribute = conf->Get<const Anope::string>("email_attribute");
 		this->disable_register_reason = conf->Get<const Anope::string>("disable_register_reason");
 		this->disable_email_reason = conf->Get<const Anope::string>("disable_email_reason");
+		this->allowgroup = conf->Get<bool>("allowgroup", "no");
 
 		if (!email_attribute.empty())
 			/* Don't complain to users about how they need to update their email, we will do it for them */
@@ -233,7 +235,7 @@ class ModuleLDAPAuthentication : public Module
 	{
 		if (!this->disable_register_reason.empty())
 		{
-			if (command->name == "nickserv/register" || command->name == "nickserv/group")
+			if (command->name == "nickserv/register" || (command->name == "nickserv/group" && !this->allowgroup))
 			{
 				source.Reply(this->disable_register_reason);
 				return EVENT_STOP;

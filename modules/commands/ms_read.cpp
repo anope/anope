@@ -39,8 +39,8 @@ static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Ano
 
 		/* Notify recipient of the memo that a notification has
 		   been sent to the sender */
-		source.Reply(_("A notification memo has been sent to %s informing him/her you have\n"
-				"read his/her memo."), nc->display.c_str());
+		source.Reply(_("A notification memo has been sent to %s informing them you have\n"
+				"read their memo."), nc->display.c_str());
 	}
 
 	/* Remove receipt flag from the original memo */

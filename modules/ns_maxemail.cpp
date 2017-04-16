@@ -39,26 +39,19 @@ class NSMaxEmail : public Module
 	{
 		int NSEmailMax = Config->GetModule(this)->Get<int>("maxemails");
 
-		if (NSEmailMax < 1 || email.empty())
+		if (NSEmailMax < 1 || email.empty() || this->CountEmail(email, source.nc) < NSEmailMax)
 			return false;
-
-		if (this->CountEmail(email, source.nc) < NSEmailMax)
-			return false;
-
-		if (NSEmailMax == 1)
-			source.Reply(_("The email address \002%s\002 has reached its usage limit of 1 user."), email.c_str());
-		else
-			source.Reply(_("The email address \002%s\002 has reached its usage limit of %d users."), email.c_str(), NSEmailMax);
-
+			
+		source.Reply(_("The email address \002%s\002 has reached its usage limit of %d users."), email.c_str(), NSEmailMax);
 		return true;
 	}
 
 	int CountEmail(const Anope::string &email, NickCore *unc)
 	{
-		int count = 0;
-
 		if (email.empty())
 			return 0;
+			
+		int count = 0;
 
 		Anope::string cleanemail = clean ? CleanMail(email) : email;
 

@@ -134,13 +134,6 @@ class CommandNSSetPassword : public Command
 			return;
 		}
 
-		unsigned int passlen = Config->GetModule("nickserv")->Get<unsigned>("passlen", "32");
-		if (len > passlen)
-		{
-			source.Reply(PASSWORD_TOO_LONG, passlen);
-			return;
-		}
-
 		Log(LOG_COMMAND, source, this) << "to change their password";
 
 		Anope::Encrypt(param, source.nc->pass);
@@ -197,13 +190,6 @@ class CommandNSSASetPassword : public Command
 		if (nc->display.equals_ci(params[1]) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
 		{
 			source.Reply(MORE_OBSCURE_PASSWORD);
-			return;
-		}
-
-		unsigned int passlen = Config->GetModule("nickserv")->Get<unsigned>("passlen", "32");
-		if (len > passlen)
-		{
-			source.Reply(PASSWORD_TOO_LONG, passlen);
 			return;
 		}
 

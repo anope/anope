@@ -235,6 +235,14 @@ class VhostSet : public messages::VhostSet
 	void Send(User *u, const Anope::string &vident, const Anope::string &vhost) override;
 };
 
+class Wallops : public messages::Wallops
+{
+ public:
+	using messages::Wallops::Wallops;
+
+	void Send(const MessageSource &source, const Anope::string &msg) override;
+};
+
 } // namespace senders
 
 class Proto : public IRCDProto

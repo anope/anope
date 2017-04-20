@@ -309,6 +309,11 @@ void unreal::senders::VhostSet::Send(User* u, const Anope::string& vident, const
 		Uplink::Send(Me, "CHGHOST", u->GetUID(), vhost);
 }
 
+void unreal::senders::Wallops::Send(const MessageSource &source, const Anope::string &msg)
+{
+	Uplink::Send(Me, "SENDUMODE", "o", "from " + source.GetName() + ": " + msg);
+}
+
 unreal::Proto::Proto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4")
 {
 	DefaultPseudoclientModes = "+Soiq";
@@ -1145,7 +1150,6 @@ class ProtoUnreal : public Module
 
 	bahamut::senders::NOOP sender_noop;
 	bahamut::senders::SVSNick sender_svsnick;
-	bahamut::senders::Wallops sender_wallops;
 
 	unreal::senders::Akill sender_akill;
 	unreal::senders::AkillDel sender_akill_del;
@@ -1170,6 +1174,7 @@ class ProtoUnreal : public Module
 	unreal::senders::Topic sender_topic;
 	unreal::senders::VhostDel sender_vhost_del;
 	unreal::senders::VhostSet sender_vhost_set;
+	unreal::senders::Wallops sender_wallops;
 
 	bool use_server_side_mlock;
 

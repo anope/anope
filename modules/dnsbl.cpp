@@ -65,8 +65,8 @@ class DNSBLResolver : public Request
 			return;
 
 		const ResourceRecord &ans_record = record->answers[0];
-		// Replies should be in 127.0.0.0/24
-		if (ans_record.rdata.find("127.0.0.") != 0)
+		// Replies should be in 127.0.0.0/8
+		if (ans_record.rdata.find("127.") != 0)
 			return;
 
 		sockaddrs sresult;

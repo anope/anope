@@ -1,7 +1,7 @@
 /*
  * Anope IRC Services
  *
- * Copyright (C) 2003-2016 Anope Team <team@anope.org>
+ * Copyright (C) 2003-2017 Anope Team <team@anope.org>
  * Copyright (C) 2012-2016 ircd-hybrid development team
  *
  * This file is part of Anope. Anope is free software; you can

@@ -1,7 +1,7 @@
 /*
  * Anope IRC Services
  *
- * Copyright (C) 2003-2011 Anope Team <team@anope.org>
+ * Copyright (C) 2003-2017 Anope Team <team@anope.org>
  *
  * This file is part of Anope. Anope is free software; you can
  * redistribute it and/or modify it under the terms of the GNU

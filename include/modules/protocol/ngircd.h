@@ -1,7 +1,7 @@
 /*
  * Anope IRC Services
  *
- * Copyright (C) 2011-2016 Anope Team <team@anope.org>
+ * Copyright (C) 2011-2017 Anope Team <team@anope.org>
  * Copyright (C) 2011-2012, 2014 Alexander Barton <alex@barton.de>
  *
  * This file is part of Anope. Anope is free software; you can

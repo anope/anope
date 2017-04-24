@@ -79,7 +79,7 @@ class CommandCSBan : public Command
 		if (params[1][0] == '+')
 		{
 			ban_time = Anope::DoTime(params[1]);
-			if (ban_time == -1)
+			if (ban_time < 0)
 			{
 				source.Reply(_("Invalid expiry time \002{0}\002."), params[1]);
 				return;

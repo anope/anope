@@ -118,7 +118,7 @@ class External : public Mechanism
 			}
 
 			NickServ::Account *nc = certs->FindAccountFromCert(mysess->cert);
-			if (!nc || nc->HasFieldS("NS_SUSPENDED"))
+			if (!nc || nc->HasFieldS("NS_SUSPENDED") || nc->IsUnconfirmed())
 			{
 				Anope::Logger.Category("sasl").Bot("nickserv").Log(_("A user failed to identify using certificate {0} using SASL EXTERNAL"), mysess->cert);
 				GetService()->Fail(sess);
@@ -288,7 +288,7 @@ class SASLService : public SASL::Service, public Timer
 void IdentifyRequestListener::OnSuccess(NickServ::IdentifyRequest *req)
 {
 	NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
-	if (!na || na->GetAccount()->HasFieldS("NS_SUSPENDED"))
+	if (!na || na->GetAccount()->HasFieldS("NS_SUSPENDED") || na->GetAccount()->IsUnconfirmed())
 		return OnFail(req);
 
 	unsigned int maxlogins = Config->GetModule("nickserv/identify")->Get<unsigned int>("maxlogins");
@@ -319,6 +319,8 @@ void IdentifyRequestListener::OnFail(NickServ::IdentifyRequest *req)
 		accountstatus = "nonexistent ";
 	else if (na->GetAccount()->HasFieldS("NS_SUSPENDED"))
 		accountstatus = "suspended ";
+	else if (na->GetAccount()->IsUnconfirmed())
+		accountstatus = "unconfirmed ";
 
 	Anope::Logger.Category("sasl").Bot("NickServ").Log(_("A user failed to identify for {0}account {1} using SASL"),
 			accountstatus, req->GetAccount());

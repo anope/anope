@@ -99,7 +99,7 @@ class DNSBLResolver : public Request
 class ModuleDNSBL : public Module
 {
 	std::vector<Blacklist> blacklists;
-	std::set<Anope::string> exempts;
+	std::set<cidr> exempts;
 	bool check_on_connect;
 	bool check_on_netburst;
 	bool add_to_akill;
@@ -146,7 +146,10 @@ class ModuleDNSBL : public Module
 
 		this->exempts.clear();
 		for (int i = 0; i < block->CountBlock("exempt"); ++i)
-			this->exempts.insert(block->Get<Anope::string>("ip"));
+		{
+			Configuration::Block *bl = block->GetBlock("exempt", i);
+			this->exempts.insert(bl->Get<Anope::string>("ip"));
+		}
 	}
 
 	void OnUserConnect(User *user, bool &exempt) anope_override
@@ -162,8 +165,14 @@ class ModuleDNSBL : public Module
 			/* User doesn't have a valid IPv4 IP (ipv6/spoof/etc) */
 			return;
 
-		if (this->exempts.count(user->ip.addr()))
+		if (this->blacklists.empty())
 			return;
+
+		if (this->exempts.count(user->ip.addr()))
+		{
+			Log(LOG_DEBUG) << "User " << user->nick << " is exempt from dnsbl check - ip: " << user->ip.addr();
+			return;
+		}
 
 		const unsigned long &ip = user->ip.sa4.sin_addr.s_addr;
 		unsigned long reverse_ip = (ip << 24) | ((ip & 0xFF00) << 8) | ((ip & 0xFF0000) >> 8) | (ip >> 24);

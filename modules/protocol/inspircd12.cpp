@@ -443,10 +443,7 @@ class InspIRCd12Proto : public IRCDProto
 		{
 			const char &c = ident[i];
 
-			if (c >= 'A' && c <= '}')
-				continue;
-
-			if ((c >= '0' && c <= '9') || c == '-' || c == '.')
+			if ((c >= 'A' && c <= '}') || (c >= '0' && c <= '9') || c == '-' || c == '.')
 				continue;
 
 			return false;

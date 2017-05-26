@@ -232,8 +232,6 @@ class UnrealIRCdProto : public IRCDProto
 		   NS     = Config->Numeric Server
 		*/
 		Anope::string protoctl = "NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID MLOCK VL";
-		if (!Me->GetSID().empty())
-			protoctl += " VL";
 		UplinkSocket::Message() << "PROTOCTL " << protoctl;
 		UplinkSocket::Message() << "PASS :" << Config->Uplinks[Anope::CurrentUplink].password;
 		SendServer(Me);
@@ -403,10 +401,7 @@ class UnrealIRCdProto : public IRCDProto
 		{
 			const char &c = ident[i];
 
-			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
-				continue;
-
-			if (c == '-' || c == '.' || c == '_')
+			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-' || c == '_')
 				continue;
 
 			return false;

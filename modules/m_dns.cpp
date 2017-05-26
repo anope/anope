@@ -295,33 +295,18 @@ class Packet : public Query
 				sockaddrs ip(q.name);
 				if (!ip.valid())
 					throw SocketException("Invalid IP");
-
-				if (q.name.find(':') != Anope::string::npos)
+					
+				switch (ip.family())
 				{
-					const char *const hex = "0123456789abcdef";
-					char reverse_ip[128];
-					unsigned reverse_ip_count = 0;
-					for (int j = 15; j >= 0; --j)
-					{
-						reverse_ip[reverse_ip_count++] = hex[ip.sa6.sin6_addr.s6_addr[j] & 0xF];
-						reverse_ip[reverse_ip_count++] = '.';
-						reverse_ip[reverse_ip_count++] = hex[ip.sa6.sin6_addr.s6_addr[j] >> 4];
-						reverse_ip[reverse_ip_count++] = '.';
-					}
-					reverse_ip[reverse_ip_count++] = 0;
-
-					q.name = reverse_ip;
-					q.name += "ip6.arpa";
-				}
-				else
-				{
-					unsigned long forward = ip.sa4.sin_addr.s_addr;
-					in_addr reverse;
-					reverse.s_addr = forward << 24 | (forward & 0xFF00) << 8 | (forward & 0xFF0000) >> 8 | forward >> 24;
-
-					ip.ntop(AF_INET, &reverse);
-
-					q.name = ip.addr() + ".in-addr.arpa";
+					case AF_INET6:
+						q.name = ip.reverse() + ".ip6.arpa";
+						break;
+					case AF_INET:
+						q.name = ip.reverse() + ".in-addr.arpa";
+						break;
+					default:
+						throw SocketException("Unsupported IP Family");
+						break;
 				}
 			}
 

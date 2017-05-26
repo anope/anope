@@ -125,8 +125,6 @@ Anope::string sockaddrs::reverse() const
 				return address;
 			break;
 		}
-		default:
-			break;
 	}
 
 	return "";

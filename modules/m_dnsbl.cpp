@@ -173,7 +173,7 @@ class ModuleDNSBL : public Module
 			return;
 		}
 
-		Anope::string reverse =  user->ip.reverse();
+		Anope::string reverse = user->ip.reverse();
 	
 		for (unsigned i = 0; i < this->blacklists.size(); ++i)
 		{

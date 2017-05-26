@@ -103,7 +103,7 @@ Anope::string sockaddrs::reverse() const
 	{
 		case AF_INET6:
 		{
-			static const char[] hex = "0123456789abcdef";
+			Anope::string hex = "0123456789abcdef";
 			unsigned reverse_ip_count = 0;
 			for (int j = 15; j >= 0; --j)
 			{

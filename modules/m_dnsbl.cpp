@@ -174,7 +174,7 @@ class ModuleDNSBL : public Module
 		}
 
 		Anope::string reverse = user->ip.reverse();
-	
+
 		for (unsigned i = 0; i < this->blacklists.size(); ++i)
 		{
 			const Blacklist &b = this->blacklists[i];

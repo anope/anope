@@ -232,6 +232,8 @@ class UnrealIRCdProto : public IRCDProto
 		   NS     = Config->Numeric Server
 		*/
 		Anope::string protoctl = "NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID MLOCK VL";
+		if (!Me->GetSID().empty())
+			protoctl += " VL";
 		UplinkSocket::Message() << "PROTOCTL " << protoctl;
 		UplinkSocket::Message() << "PASS :" << Config->Uplinks[Anope::CurrentUplink].password;
 		SendServer(Me);

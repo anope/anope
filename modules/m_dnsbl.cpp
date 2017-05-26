@@ -173,11 +173,13 @@ class ModuleDNSBL : public Module
 			return;
 		}
 
+		Anope::string reverse =  user->ip.reverse();
+	
 		for (unsigned i = 0; i < this->blacklists.size(); ++i)
 		{
 			const Blacklist &b = this->blacklists[i];
 
-			Anope::string dnsbl_host = user->ip.reverse() + "." + b.name;
+			Anope::string dnsbl_host = reverse + "." + b.name;
 			DNSBLResolver *res = NULL;
 			try
 			{

@@ -306,7 +306,6 @@ class Packet : public Query
 						break;
 					default:
 						throw SocketException("Unsupported IP Family");
-						break;
 				}
 			}
 

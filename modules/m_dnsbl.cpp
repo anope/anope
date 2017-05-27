@@ -160,9 +160,8 @@ class ModuleDNSBL : public Module
 		if (!this->check_on_netburst && !user->server->IsSynced())
 			return;
 
-		/* At this time we only support IPv4 */
-		if (!user->ip.valid() || user->ip.sa.sa_family != AF_INET)
-			/* User doesn't have a valid IPv4 IP (ipv6/spoof/etc) */
+		if (!user->ip.valid())
+			/* User doesn't have a valid IP (spoof/etc) */
 			return;
 
 		if (this->blacklists.empty())
@@ -174,17 +173,13 @@ class ModuleDNSBL : public Module
 			return;
 		}
 
-		const unsigned long &ip = user->ip.sa4.sin_addr.s_addr;
-		unsigned long reverse_ip = (ip << 24) | ((ip & 0xFF00) << 8) | ((ip & 0xFF0000) >> 8) | (ip >> 24);
-
-		sockaddrs reverse = user->ip;
-		reverse.sa4.sin_addr.s_addr = reverse_ip;
+		Anope::string reverse = user->ip.reverse();
 
 		for (unsigned i = 0; i < this->blacklists.size(); ++i)
 		{
 			const Blacklist &b = this->blacklists[i];
 
-			Anope::string dnsbl_host = reverse.addr() + "." + b.name;
+			Anope::string dnsbl_host = reverse + "." + b.name;
 			DNSBLResolver *res = NULL;
 			try
 			{

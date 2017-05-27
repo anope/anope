@@ -325,8 +325,6 @@ class CommandOSForbid : public Command
 
 					break;
 				}
-				default:
-					break;
 			}
 
 		}

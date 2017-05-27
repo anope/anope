@@ -52,8 +52,6 @@ size_t sockaddrs::size() const
 			return sizeof(sa4);
 		case AF_INET6:
 			return sizeof(sa6);
-		default:
-			break;
 	}
 
 	return 0;
@@ -67,8 +65,6 @@ int sockaddrs::port() const
 			return ntohs(sa4.sin_port);
 		case AF_INET6:
 			return ntohs(sa6.sin6_port);
-		default:
-			break;
 	}
 
 	return -1;
@@ -88,8 +84,41 @@ Anope::string sockaddrs::addr() const
 			if (inet_ntop(AF_INET6, &sa6.sin6_addr, address, sizeof(address)))
 				return address;
 			break;
-		default:
+	}
+
+	return "";
+}
+
+Anope::string sockaddrs::reverse() const
+{
+	char address[128];
+
+	switch (sa.sa_family)
+	{
+		case AF_INET6:
+		{
+			Anope::string hex = "0123456789abcdef";
+			unsigned reverse_ip_count = 0;
+			for (int j = 15; j >= 0; --j)
+			{
+				address[reverse_ip_count++] = hex[sa6.sin6_addr.s6_addr[j] & 0xF];
+				address[reverse_ip_count++] = '.';
+				address[reverse_ip_count++] = hex[sa6.sin6_addr.s6_addr[j] >> 4];
+				address[reverse_ip_count++] = '.';
+			}
+			/* Strip the last '.' */
+			address[reverse_ip_count] = 0;
+			return address;
+		}
+		case AF_INET:
+		{
+			unsigned long forward = sa4.sin_addr.s_addr;
+			in_addr rev;
+			rev.s_addr = forward << 24 | (forward & 0xFF00) << 8 | (forward & 0xFF0000) >> 8 | forward >> 24;
+			if (inet_ntop(AF_INET, &rev, address, sizeof(address)))
+				return address;
 			break;
+		}
 	}
 
 	return "";
@@ -152,8 +181,6 @@ void sockaddrs::pton(int type, const Anope::string &address, int pport)
 			}
 			break;
 		}
-		default:
-			break;
 	}
 }
 
@@ -177,8 +204,6 @@ void sockaddrs::ntop(int type, const void *src)
 			sa6.sin6_addr = *reinterpret_cast<const in6_addr *>(src);
 			sa6.sin6_family = type;
 			return;
-		default:
-			break;
 	}
 
 	this->clear();

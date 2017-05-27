@@ -108,8 +108,6 @@ namespace Config
 				case 5:
 					Console.Write("[{0}] ", ExtraArguments);
 					return ExtraArguments;
-				default:
-					break;
 			}
 
 			return null;
@@ -318,8 +316,6 @@ namespace Config
 								ExtraArguments = null;
 							else
 								ExtraArguments = InstallerResponse;
-							break;
-						default:
 							break;
 					}
 				}

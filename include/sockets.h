@@ -56,7 +56,7 @@ union CoreExport sockaddrs
 	 * @return The address
 	 */
 	Anope::string addr() const;
-	
+
 	/** Get the reverse address represented by this addr
 	 * @return The reverse address
 	 */

@@ -191,8 +191,6 @@ class Packet : public Query
 
 				break;
 			}
-			default:
-				break;
 		}
 
 		Log(LOG_DEBUG_2) << "Resolver: " << record.name << " -> " << record.rdata;
@@ -439,8 +437,6 @@ class Packet : public Query
 
 						break;
 					}
-					default:
-						break;
 				}
 			}
 
@@ -895,8 +891,6 @@ class MyManager : public Manager, public Timer
 				case 5:
 					Log(LOG_DEBUG_2) << "Resolver: refused";
 					error = ERROR_REFUSED;
-					break;
-				default:
 					break;
 			}
 

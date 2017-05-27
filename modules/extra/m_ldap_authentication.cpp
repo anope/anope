@@ -117,8 +117,6 @@ class IdentifyInterface : public LDAPInterface
 				}
 				break;
 			}
-			default:
-				break;
 		}
 	}
 

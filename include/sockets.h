@@ -62,11 +62,6 @@ union CoreExport sockaddrs
 	 */
 	Anope::string reverse() const;
 
-	/** Get the reverse address represented by this addr
-	 * @return The reverse address
-	 */
-	Anope::string reverse() const;
-
 	/* Is this address ipv6? */
 	bool ipv6() const;
 

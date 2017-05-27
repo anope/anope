@@ -295,7 +295,7 @@ class Packet : public Query
 				sockaddrs ip(q.name);
 				if (!ip.valid())
 					throw SocketException("Invalid IP");
-	
+
 				switch (ip.family())
 				{
 					case AF_INET6:

@@ -95,6 +95,41 @@ Anope::string sockaddrs::addr() const
 	return "";
 }
 
+Anope::string sockaddrs::reverse() const
+{
+	char address[128];
+
+	switch (sa.sa_family)
+	{
+		case AF_INET6:
+		{
+			static const char hex[] = "0123456789abcdef";
+			unsigned reverse_ip_count = 0;
+			for (int j = 15; j >= 0; --j)
+			{
+				address[reverse_ip_count++] = hex[sa6.sin6_addr.s6_addr[j] & 0xF];
+				address[reverse_ip_count++] = '.';
+				address[reverse_ip_count++] = hex[sa6.sin6_addr.s6_addr[j] >> 4];
+				address[reverse_ip_count++] = '.';
+			}
+			/* Remove the last '.' */
+			address[reverse_ip_count - 1] = 0;
+			return address;
+		}
+		case AF_INET:
+		{
+			unsigned long forward = sa4.sin_addr.s_addr;
+			in_addr rev;
+			rev.s_addr = forward << 24 | (forward & 0xFF00) << 8 | (forward & 0xFF0000) >> 8 | forward >> 24;
+			if (inet_ntop(AF_INET, &rev, address, sizeof(address)))
+				return address;
+			break;
+		}
+	}
+
+	return "";
+}
+
 bool sockaddrs::ipv6() const
 {
 	return sa.sa_family == AF_INET6;

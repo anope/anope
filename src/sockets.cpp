@@ -113,7 +113,7 @@ Anope::string sockaddrs::reverse() const
 				address[reverse_ip_count++] = '.';
 			}
 			/* Strip the last '.' */
-			address[reverse_ip_count] = 0;
+			address[--reverse_ip_count] = 0;
 			return address;
 		}
 		case AF_INET:

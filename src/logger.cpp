@@ -220,6 +220,8 @@ Anope::string Log::BuildPrefix() const
 				buffer += this->m->name.upper() + ": ";
 			break;
 		}
+		default:
+			break;
 	}
 
 	return buffer;

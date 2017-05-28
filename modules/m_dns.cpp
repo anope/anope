@@ -896,8 +896,6 @@ class MyManager : public Manager, public Timer
 					Log(LOG_DEBUG_2) << "Resolver: refused";
 					error = ERROR_REFUSED;
 					break;
-				default:
-					break;
 			}
 
 			recv_packet.error = error;

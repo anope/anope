@@ -58,6 +58,8 @@ void Anope::Process(const Anope::string &buffer)
 	MessageSource src(source);
 
 	EventReturn MOD_RESULT = EventManager::Get()->Dispatch(&Event::Message::OnMessage, src, command, params);
+	if (MOD_RESULT == EVENT_STOP)
+		return;
 
 	ProcessCommand(src, command, params);
 }

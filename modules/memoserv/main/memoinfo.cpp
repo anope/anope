@@ -57,9 +57,9 @@ NickServ::Account *MemoInfoImpl::GetAccount()
 	return Get(&MemoInfoType::account);
 }
 
-void MemoInfoImpl::SetAccount(NickServ::Account *account)
+void MemoInfoImpl::SetAccount(NickServ::Account *acc)
 {
-	Set(&MemoInfoType::account, account);
+	Set(&MemoInfoType::account, acc);
 }
 
 ChanServ::Channel *MemoInfoImpl::GetChannel()

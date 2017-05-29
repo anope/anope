@@ -36,7 +36,7 @@ class FlagsChanAccessImpl : public FlagsChanAccess
  public:
 	using FlagsChanAccess::FlagsChanAccess;
 
-	const Anope::string &GetFlags() override;
+	const Anope::string GetFlags() override;
 	void SetFlags(const Anope::string &) override;
 
 	bool HasPriv(const Anope::string &priv) override
@@ -85,7 +85,7 @@ class FlagsChanAccessType : public ChanAccessType<FlagsChanAccessImpl>
 	}
 };
 
-const Anope::string &FlagsChanAccessImpl::GetFlags()
+const Anope::string FlagsChanAccessImpl::GetFlags()
 {
 	return Get(&FlagsChanAccessType::flags);
 }

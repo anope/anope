@@ -55,7 +55,7 @@ class XOPChanAccess : public ChanAccessImpl
 
 	using ChanAccessImpl::ChanAccessImpl;
 
-	virtual const Anope::string &GetType() anope_abstract;
+	virtual const Anope::string GetType() anope_abstract;
 	virtual void SetType(const Anope::string &) anope_abstract;
 };
 
@@ -66,7 +66,7 @@ class FlagsChanAccess : public ChanAccessImpl
 
 	using ChanAccessImpl::ChanAccessImpl;
 
-	virtual const Anope::string &GetFlags() anope_abstract;
+	virtual const Anope::string GetFlags() anope_abstract;
 	virtual void SetFlags(const Anope::string &) anope_abstract;
 };
 

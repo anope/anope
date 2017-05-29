@@ -73,9 +73,9 @@ const Anope::string &CommandSource::GetCommand() const
 	return this->command.cname;
 }
 
-void CommandSource::SetCommand(const Anope::string &command)
+void CommandSource::SetCommand(const Anope::string &com)
 {
-	this->command.cname = command;
+	this->command.cname = com;
 }
 
 const Anope::string &CommandSource::GetPermission() const

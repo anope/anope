@@ -40,7 +40,7 @@ class XOPChanAccessImpl : public XOPChanAccess
  public:
 	using XOPChanAccess::XOPChanAccess;
 
-	const Anope::string &GetType() override;
+	const Anope::string GetType() override;
 	void SetType(const Anope::string &) override;
 
 	bool HasPriv(const Anope::string &priv) override
@@ -109,7 +109,7 @@ class XOPChanAccessType : public ChanAccessType<XOPChanAccessImpl>
 	}
 };
 
-const Anope::string &XOPChanAccessImpl::GetType()
+const Anope::string XOPChanAccessImpl::GetType()
 {
 	return Get(&XOPChanAccessType::type);
 }

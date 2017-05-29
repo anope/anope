@@ -488,15 +488,15 @@ Logger Logger::Source(CommandSource *s) const
 	return l;
 }
 
-Logger Logger::Bot(ServiceBot *bot) const
+Logger Logger::Bot(ServiceBot *b) const
 {
 	Logger l = *this;
-	l.bot = bot;
+	l.bot = b;
 	return l;
 }
 
-Logger Logger::Bot(const Anope::string &bot) const
+Logger Logger::Bot(const Anope::string &botname) const
 {
-	return Bot(Config ? Config->GetClient(bot) : nullptr);
+	return Bot(Config ? Config->GetClient(botname) : nullptr);
 }
 

@@ -224,13 +224,13 @@ Conf::Conf() : Block("")
 	this->TimeoutCheck = options->Get<time_t>("timeoutcheck");
 	this->NickChars = networkinfo->Get<Anope::string>("nick_chars");
 
-	Anope::string locale = options->Get<Anope::string>("locale");
+	Anope::string localename = options->Get<Anope::string>("locale");
 	Anope::string casemap = options->Get<Anope::string>("casemap");
 
-	if (locale.empty() == casemap.empty())
+	if (localename.empty() == casemap.empty())
 		throw ConfigException("One of options:locale and options:casemap must be set");
 
-	if (locale.empty())
+	if (localename.empty())
 	{
 		// load locale conf
 		File f(casemap + ".conf", false);
@@ -239,9 +239,9 @@ Conf::Conf() : Block("")
 	else
 	{
 #if Boost_FOUND
-		this->locale = new std::locale(Anope::locale::generate(locale.str()));
+		this->locale = new std::locale(Anope::locale::generate(localename.str()));
 #else
-		throw ConfigException("Boost.Locale is not enabled, cannot use locale " + locale);
+		throw ConfigException("Boost.Locale is not enabled, cannot use locale " + localename);
 #endif
 	}
 
@@ -481,21 +481,21 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("casemap"); ++i)
 	{
-		Block *casemap = this->GetBlock("casemap", i);
+		Block *casemapb = this->GetBlock("casemap", i);
 
-		unsigned char upper = casemap->Get<unsigned int>("upper"),
-				lower = casemap->Get<unsigned int>("lower");
+		unsigned char upper = casemapb->Get<unsigned int>("upper"),
+				lower = casemapb->Get<unsigned int>("lower");
 
 		if (!upper)
 		{
-			Anope::string s = casemap->Get<Anope::string>("upper");
+			Anope::string s = casemapb->Get<Anope::string>("upper");
 			if (s.length() == 1)
 				upper = s[0];
 		}
 
 		if (!lower)
 		{
-			Anope::string s = casemap->Get<Anope::string>("lower");
+			Anope::string s = casemapb->Get<Anope::string>("lower");
 			if (s.length() == 1)
 				lower = s[0];
 		}

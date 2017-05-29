@@ -35,9 +35,9 @@ Anope::string VHostImpl::GetIdent()
 	return Get(&VHostType::vident);
 }
 
-void VHostImpl::SetIdent(const Anope::string &vident)
+void VHostImpl::SetIdent(const Anope::string &vi)
 {
-	Set(&VHostType::vident, vident);
+	Set(&VHostType::vident, vi);
 }
 
 Anope::string VHostImpl::GetHost()
@@ -45,9 +45,9 @@ Anope::string VHostImpl::GetHost()
 	return Get(&VHostType::vhost);
 }
 
-void VHostImpl::SetHost(const Anope::string &vhost)
+void VHostImpl::SetHost(const Anope::string &vh)
 {
-	Set(&VHostType::vhost, vhost);
+	Set(&VHostType::vhost, vh);
 }
 
 Anope::string VHostImpl::GetCreator()
@@ -55,9 +55,9 @@ Anope::string VHostImpl::GetCreator()
 	return Get(&VHostType::creator);
 }
 
-void VHostImpl::SetCreator(const Anope::string &creator)
+void VHostImpl::SetCreator(const Anope::string &c)
 {
-	Set(&VHostType::creator, creator);
+	Set(&VHostType::creator, c);
 }
 
 time_t VHostImpl::GetCreated()
@@ -65,9 +65,9 @@ time_t VHostImpl::GetCreated()
 	return Get(&VHostType::created);
 }
 
-void VHostImpl::SetCreated(time_t created)
+void VHostImpl::SetCreated(time_t cr)
 {
-	Set(&VHostType::created, created);
+	Set(&VHostType::created, cr);
 }
 
 bool VHostImpl::IsDefault()
@@ -75,7 +75,7 @@ bool VHostImpl::IsDefault()
 	return Get(&VHostType::default_);
 }
 
-void VHostImpl::SetDefault(bool default_)
+void VHostImpl::SetDefault(bool d)
 {
-	Set(&VHostType::default_, default_);
+	Set(&VHostType::default_, d);
 }

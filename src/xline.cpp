@@ -37,10 +37,10 @@ void XLine::Recache()
 	delete c;
 	c = nullptr;
 
-	Anope::string mask = GetMask();
-	if (mask.length() >= 2 && mask[0] == '/' && mask[mask.length() - 1] == '/' && Config->regex_flags)
+	Anope::string xlmask = GetMask();
+	if (xlmask.length() >= 2 && xlmask[0] == '/' && xlmask[xlmask.length() - 1] == '/' && Config->regex_flags)
 	{
-		Anope::string stripped_mask = mask.substr(1, mask.length() - 2);
+		Anope::string stripped_mask = xlmask.substr(1, xlmask.length() - 2);
 
 		try
 		{
@@ -52,37 +52,37 @@ void XLine::Recache()
 		}
 	}
 
-	size_t nick_t = mask.find('!');
+	size_t nick_t = xlmask.find('!');
 	if (nick_t != Anope::string::npos)
-		nick = mask.substr(0, nick_t);
+		nick = xlmask.substr(0, nick_t);
 
-	size_t user_t = mask.find('!'), host_t = mask.find('@');
+	size_t user_t = xlmask.find('!'), host_t = xlmask.find('@');
 	if (host_t != Anope::string::npos)
 	{
 		if (user_t != Anope::string::npos && host_t > user_t)
-			user = mask.substr(user_t + 1, host_t - user_t - 1);
+			user = xlmask.substr(user_t + 1, host_t - user_t - 1);
 		else
-			user = mask.substr(0, host_t);
+			user = xlmask.substr(0, host_t);
 	}
 
-	size_t real_t = mask.find('#');
+	size_t real_t = xlmask.find('#');
 	if (host_t != Anope::string::npos)
 	{
 		if (real_t != Anope::string::npos && real_t > host_t)
-			host = mask.substr(host_t + 1, real_t - host_t - 1);
+			host = xlmask.substr(host_t + 1, real_t - host_t - 1);
 		else
-			host = mask.substr(host_t + 1);
+			host = xlmask.substr(host_t + 1);
 	}
 	else
 	{
 		if (real_t != Anope::string::npos)
-			host = mask.substr(0, real_t);
+			host = xlmask.substr(0, real_t);
 		else
-			host = mask;
+			host = xlmask;
 	}
 
 	if (real_t != Anope::string::npos)
-		real = mask.substr(real_t + 1);
+		real = xlmask.substr(real_t + 1);
 
 	if (host.find('/') != Anope::string::npos)
 	{
@@ -141,9 +141,9 @@ Anope::string XLine::GetReason()
 	return Get(&XLineType::reason);
 }
 
-void XLine::SetID(const Anope::string &id)
+void XLine::SetID(const Anope::string &i)
 {
-	Set(&XLineType::id, id);
+	Set(&XLineType::id, i);
 }
 
 Anope::string XLine::GetID()
@@ -206,8 +206,8 @@ bool XLine::HasNickOrReal() const
 
 bool XLine::IsRegex()
 {
-	Anope::string mask = GetMask();
-	return mask.length() > 2 && mask[0] == '/' && mask[mask.length() - 1] == '/';
+	Anope::string m = GetMask();
+	return m.length() > 2 && m[0] == '/' && m[m.length() - 1] == '/';
 }
 
 XLineManager *XLine::GetManager()

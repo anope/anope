@@ -40,7 +40,11 @@ int OperCount = 0;
 
 std::list<User *> User::quitting_users;
 
-User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &uip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickServ::Account *account) : ip(uip), logger(this)
+User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost,
+		const Anope::string &uip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes,
+		const Anope::string &suid, NickServ::Account *account)
+	: logger(this)
+	, ip(uip)
 {
 	if (snick.empty() || sident.empty() || shost.empty())
 		throw CoreException("Bad args passed to User::User");

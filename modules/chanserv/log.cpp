@@ -274,8 +274,6 @@ public:
 					return;
 				}
 
-			bool override = !source.AccessFor(ci).HasPriv("SET");
-
 			std::vector<LogSetting *> ls = ci->GetRefs<LogSetting *>();
 			for (unsigned i = ls.size(); i > 0; --i)
 			{

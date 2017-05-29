@@ -19,7 +19,6 @@
 
 #include "module.h"
 #include "accounttype.h"
-#include "modules/nickserv/access.h"
 
 AccountImpl::~AccountImpl()
 {
@@ -187,16 +186,6 @@ void AccountImpl::SetMsg(bool msg)
 	Set(&AccountType::msg, msg);
 }
 
-bool AccountImpl::IsSecure()
-{
-	return Get(&AccountType::secure);
-}
-
-void AccountImpl::SetSecure(bool secure)
-{
-	Set(&AccountType::secure, secure);
-}
-
 bool AccountImpl::IsMemoSignon()
 {
 	return Get(&AccountType::memosignon);
@@ -286,23 +275,6 @@ void AccountImpl::SetDisplay(NickServ::Nick *na)
 		Anope::Logger.Debug("Duplicate account {0} in nickcore table?", this->GetDisplay());
 
 	nc = this;
-}
-
-bool AccountImpl::IsOnAccess(User *u)
-{
-	Anope::string buf = u->GetIdent() + "@" + u->host, buf2, buf3;
-	if (!u->vhost.empty())
-		buf2 = u->GetIdent() + "@" + u->vhost;
-	if (!u->GetCloakedHost().empty())
-		buf3 = u->GetIdent() + "@" + u->GetCloakedHost();
-
-	for (NickAccess *access : GetRefs<NickAccess *>())
-	{
-		Anope::string a = access->GetMask();
-		if (Anope::Match(buf, a) || (!buf2.empty() && Anope::Match(buf2, a)) || (!buf3.empty() && Anope::Match(buf3, a)))
-			return true;
-	}
-	return false;
 }
 
 unsigned int AccountImpl::GetChannelCount()

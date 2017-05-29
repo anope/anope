@@ -719,7 +719,7 @@ class CommandNSSetKill : public Command
 				"\n"
 				"If you select \002QUICK\002, the user will be given only {1} to change their nick instead {0}."
 				" If you select \002IMMED\002, the user's nickname will be changed immediately \037without\037 being warned first or given a chance to change their nick."
-				" With this set, the only way to use the nickname is to match an entry on the account's access list."));
+				" With this set, the only way to use the nickname is to login to ihe account while not using the nickname (like via SASL)."));
 		return true;
 	}
 };
@@ -961,95 +961,6 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 	}
 };
 
-class CommandNSSetSecure : public Command
-{
- public:
-	CommandNSSetSecure(Module *creator, const Anope::string &sname = "nickserv/set/secure", size_t min = 1) : Command(creator, sname, min, min + 1)
-	{
-		this->SetDesc(_("Turn nickname security on or off"));
-		this->SetSyntax("{ON | OFF}");
-	}
-
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
-	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(_("Services are in read-only mode."));
-			return;
-		}
-
-		NickServ::Nick *na = NickServ::FindNick(user);
-		if (!na)
-		{
-			source.Reply(_("\002{0}\002 isn't registered."), user);
-			return;
-		}
-		NickServ::Account *nc = na->GetAccount();
-
-		EventReturn MOD_RESULT;
-		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (param.equals_ci("ON"))
-		{
-			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to enable {0} for {1}"),
-					"SECURE", nc->GetDisplay());
-			nc->SetSecure(true);
-			source.Reply(_("Secure option is now \002on\002 for \002{0}\002."), nc->GetDisplay());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to disable {0} for {1}"),
-					"SECURE", nc->GetDisplay());
-			nc->SetSecure(false);
-			source.Reply(_("Secure option is now \002off\002 for \002{0}\002."), nc->GetDisplay());
-		}
-		else
-		{
-			this->OnSyntaxError(source, "SECURE");
-		}
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, source.nc->GetDisplay(), params[0]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		source.Reply(_("Turns the security feature on or off for your account."
-		               " With \002SECURE\002 set, you must enter your password before you will be recognized as the owner of the account,"
-		               " regardless of whether your address is on the access list or not."
-		               " However, if you are on the access list, services will not force you to change your nickname, regardless of the setting of the \002kill\002 option."));
-		return true;
-	}
-};
-
-class CommandNSSASetSecure : public CommandNSSetSecure
-{
- public:
-	CommandNSSASetSecure(Module *creator) : CommandNSSetSecure(creator, "nickserv/saset/secure", 2)
-	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037account\037 {ON | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, params[0], params[1]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		source.Reply(_("Turns the security feature on or off for \037account\037."
-		               " With \002SECURE\002 set, you the user must enter their password before they will be recognized as the owner of the account,"
-		               " regardless of whether their address address is on the access list or not."
-		               " However, if they are on the access list, services will not force them to change your nickname, regardless of the setting of the \002kill\002 option."));
-		return true;
-	}
-};
-
 class CommandNSSASetNoexpire : public Command
 {
  public:
@@ -1142,9 +1053,6 @@ class NSSet : public Module
 	CommandNSSetPassword commandnssetpassword;
 	CommandNSSASetPassword commandnssasetpassword;
 
-	CommandNSSetSecure commandnssetsecure;
-	CommandNSSASetSecure commandnssasetsecure;
-
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
 	/* email, passcode */
@@ -1178,8 +1086,6 @@ class NSSet : public Module
 		, commandnssasetmessage(this)
 		, commandnssetpassword(this)
 		, commandnssasetpassword(this)
-		, commandnssetsecure(this)
-		, commandnssasetsecure(this)
 		, commandnssasetnoexpire(this)
 
 		, ns_set_email(this, "ns_set_email")
@@ -1236,8 +1142,6 @@ class NSSet : public Module
 			info.AddOption(_("Quick protection"));
 		else if (na->GetAccount()->IsKillProtect())
 			info.AddOption(_("Protection"));
-		if (na->GetAccount()->IsSecure())
-			info.AddOption(_("Security"));
 		if (na->GetAccount()->IsMsg())
 			info.AddOption(_("Message mode"));
 		if (na->GetAccount()->IsAutoOp())

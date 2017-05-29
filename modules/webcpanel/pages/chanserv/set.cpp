@@ -76,11 +76,6 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 			ci->SetRestricted(!ci->IsRestricted());
 			replacements["MESSAGES"] = "Restricted updated";
 		}
-		if (ci->IsSecure() != message.post_data.count("secure"))
-		{
-			ci->SetSecure(!ci->IsSecure());
-			replacements["MESSAGES"] = "Secure updated";
-		}
 		if (ci->IsSecureOps() != message.post_data.count("secureops"))
 		{
 			ci->SetSecureOps(!ci->IsSecureOps());
@@ -122,9 +117,6 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 
 		if (ci->IsRestricted())
 			replacements["RESTRICTED"];
-
-		if (ci->IsSecure())
-			replacements["SECURE"];
 
 		if (ci->IsSecureOps())
 			replacements["SECUREOPS"];

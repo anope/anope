@@ -702,73 +702,6 @@ class CommandCSSetRestricted : public Command
 	}
 };
 
-class CommandCSSetSecure : public Command
-{
- public:
-	CommandCSSetSecure(Module *creator, const Anope::string &cname = "chanserv/set/secure") : Command(creator, cname, 2, 2)
-	{
-		this->SetDesc(_("Activate security features"));
-		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		const Anope::string &chan = params[0];
-		const Anope::string &param = params[1];
-
-		if (Anope::ReadOnly)
-		{
-			source.Reply(_("Services are in read-only mode."));
-			return;
-		}
-
-		ChanServ::Channel *ci = ChanServ::Find(chan);
-		if (ci == NULL)
-		{
-			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
-			return;
-		}
-
-		EventReturn MOD_RESULT;
-		MOD_RESULT = EventManager::Get()->Dispatch(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.GetPermission().empty() && !source.HasOverridePriv("chanserv/administration"))
-		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
-			return;
-		}
-
-		if (param.equals_ci("ON"))
-		{
-			logger.Command(source, ci, _("{source} used {command} on {channel} to enable secure"));
-
-			ci->SetSecure(true);
-			source.Reply(_("Secure option for \002{0}\002 is now \002on\002."), ci->GetName());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			logger.Command(source, ci, _("{source} used {command} on {channel} to disable secure"));
-
-			ci->SetSecure(false);
-			source.Reply(_("Secure option for \002{0}\002 is now \002off\002."), ci->GetName());
-		}
-		else
-		{
-			this->OnSyntaxError(source, "SECURE");
-		}
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		source.Reply(_("Enables or disables security features for a channel."
-		               " When \002secure\002 is set, only users who have logged in (eg. not recognized based on their hostmask)"
-		               " will be given access to channels from account-based access entries"));
-		return true;
-	}
-};
-
 class CommandCSSetSecureFounder : public Command
 {
  public:
@@ -1143,7 +1076,6 @@ class CSSet : public Module
 	CommandCSSetPeace commandcssetpeace;
 	CommandCSSetPersist commandcssetpersist;
 	CommandCSSetRestricted commandcssetrestricted;
-	CommandCSSetSecure commandcssetsecure;
 	CommandCSSetSecureFounder commandcssetsecurefounder;
 	CommandCSSetSecureOps commandcssetsecureops;
 	CommandCSSetSignKick commandcssetsignkick;
@@ -1176,7 +1108,6 @@ class CSSet : public Module
 		, commandcssetpeace(this)
 		, commandcssetpersist(this)
 		, commandcssetrestricted(this)
-		, commandcssetsecure(this)
 		, commandcssetsecurefounder(this)
 		, commandcssetsecureops(this)
 		, commandcssetsignkick(this)
@@ -1301,8 +1232,6 @@ class CSSet : public Module
 			info.AddOption(_("Peace"));
 		if (ci->IsRestricted())
 			info.AddOption(_("Restricted access"));
-		if (ci->IsSecure())
-			info.AddOption(_("Security"));
 		if (ci->IsSecureFounder())
 			info.AddOption(_("Secure founder"));
 		if (ci->IsSecureOps())

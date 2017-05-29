@@ -35,7 +35,6 @@ class ChannelImpl : public ChanServ::Channel
 	Serialize::Storage<bool> peace;
 	Serialize::Storage<bool> securefounder;
 	Serialize::Storage<bool> restricted;
-	Serialize::Storage<bool> secure;
 	Serialize::Storage<bool> secureops;
 	Serialize::Storage<bool> signkick;
 	Serialize::Storage<bool> signkicklevel;
@@ -109,9 +108,6 @@ class ChannelImpl : public ChanServ::Channel
 
 	bool IsRestricted() override;
 	void SetRestricted(bool) override;
-
-	bool IsSecure() override;
-	void SetSecure(bool) override;
 
 	bool IsSecureOps() override;
 	void SetSecureOps(bool) override;

@@ -58,11 +58,6 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 			na->GetAccount()->SetPrivate(!na->GetAccount()->IsPrivate());
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (na->GetAccount()->IsSecure() != message.post_data.count("secure"))
-		{
-			na->GetAccount()->SetSecure(!na->GetAccount()->IsSecure());
-			replacements["MESSAGES"] = "Secure updated";
-		}
 		if (message.post_data["kill"] == "on" && !na->GetAccount()->IsKillProtect())
 		{
 			na->GetAccount()->SetKillProtect(true);
@@ -101,8 +96,6 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		replacements["AUTOOP"];
 	if (na->GetAccount()->IsPrivate())
 		replacements["PRIVATE"];
-	if (na->GetAccount()->IsSecure())
-		replacements["SECURE"];
 	if (na->GetAccount()->IsKillProtect())
 		replacements["KILL_ON"];
 	if (na->GetAccount()->IsKillQuick())

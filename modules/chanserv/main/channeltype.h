@@ -48,7 +48,7 @@ class ChannelType : public Serialize::Type<ChannelImpl>
 	Serialize::ObjectField<ChannelImpl, BotInfo *> servicebot;
 
 	Serialize::Field<ChannelImpl, bool> greet, fantasy, noautoop, peace, securefounder,
-		restricted, secure, secureops, signkick, signkicklevel, noexpire, keepmodes,
+		restricted, secureops, signkick, signkicklevel, noexpire, keepmodes,
 		persist, topiclock, keeptopic, _private;
 
  	ChannelType(Module *);

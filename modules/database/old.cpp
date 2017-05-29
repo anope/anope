@@ -30,7 +30,6 @@
 #include "modules/nickserv/suspend.h"
 #include "modules/chanserv/suspend.h"
 #include "modules/chanserv/access.h"
-#include "modules/nickserv/access.h"
 
 #define READ(x) \
 if (true) \
@@ -517,8 +516,8 @@ static void LoadNicks()
 			READ(read_uint32(&u32, f));
 			if (u32 & OLD_NI_KILLPROTECT)
 				nc->SetKillProtect(true);
-			if (u32 & OLD_NI_SECURE)
-				nc->SetSecure(true);
+			//if (u32 & OLD_NI_SECURE)
+			//	nc->SetSecure(true);
 			if (u32 & OLD_NI_MSG)
 				nc->SetMsg(true);
 			if (u32 & OLD_NI_MEMO_HARDMAX)
@@ -608,12 +607,14 @@ static void LoadNicks()
 			{
 				READ(read_string(buffer, f));
 
+#if 0
 				NickAccess *a = Serialize::New<NickAccess *>();
 				if (a)
 				{
 					a->SetAccount(nc);
 					a->SetMask(buffer);
 				}
+#endif
 			}
 
 			int16_t i16;
@@ -868,8 +869,8 @@ static void LoadChannels()
 				ci->SetRestricted(true);
 			if (tmpu32 & OLD_CI_PEACE)
 				ci->SetPeace(true);
-			if (tmpu32 & OLD_CI_SECURE)
-				ci->SetSecure(true);
+			//if (tmpu32 & OLD_CI_SECURE)
+			//	ci->SetSecure(true);
 			if (tmpu32 & OLD_CI_NO_EXPIRE)
 				ci->SetNoExpire(true);
 			if (tmpu32 & OLD_CI_MEMO_HARDMAX)

@@ -24,7 +24,6 @@
 #include "modules/chanserv/log.h"
 #include "modules/chanserv/set_misc.h"
 #include "modules/chanserv/suspend.h"
-#include "modules/nickserv/access.h"
 #include "modules/nickserv/ajoin.h"
 #include "modules/nickserv/cert.h"
 #include "modules/nickserv/set_misc.h"
@@ -49,6 +48,7 @@ class DBFlatFile : public Module
 		account->SetLanguage(data["language"]);
 		account->SetOper(Oper::Find(account->GetDisplay()));
 
+#if 0
 		spacesepstream sep = data["access"];
 		for (Anope::string token; sep.GetToken(token);)
 		{
@@ -59,6 +59,7 @@ class DBFlatFile : public Module
 				access->SetMask(token);
 			}
 		}
+#endif
 
 		MemoServ::MemoInfo *memos = account->GetMemos();
 		if (memos != nullptr)
@@ -71,7 +72,7 @@ class DBFlatFile : public Module
 			catch (const ConvertException &) { }
 		}
 
-		sep = data["memoignore"];
+		spacesepstream sep = data["memoignore"];
 		for (Anope::string token; memos && sep.GetToken(token);)
 		{
 			MemoServ::Ignore *ign = Serialize::New<MemoServ::Ignore *>();

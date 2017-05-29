@@ -77,9 +77,6 @@ class CoreExport Account : public Serialize::Object
 	virtual bool IsMsg() anope_abstract;
 	virtual void SetMsg(bool) anope_abstract;
 
-	virtual bool IsSecure() anope_abstract;
-	virtual void SetSecure(bool) anope_abstract;
-
 	virtual bool IsMemoSignon() anope_abstract;
 	virtual void SetMemoSignon(bool) anope_abstract;
 
@@ -105,14 +102,6 @@ class CoreExport Account : public Serialize::Object
 	 * @param na The new display, must be grouped to this account.
 	 */
 	virtual void SetDisplay(Nick *na) anope_abstract;
-
-	/** Is the given user on this accounts access list?
-	 *
-	 * @param u The user
-	 *
-	 * @return true if the user is on the access list
-	 */
-	virtual bool IsOnAccess(User *u) anope_abstract;
 
 	virtual MemoServ::MemoInfo *GetMemos() anope_abstract;
 

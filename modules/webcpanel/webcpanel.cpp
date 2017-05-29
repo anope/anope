@@ -37,7 +37,6 @@ class ModuleWebCPanel : public Module
 
 	WebCPanel::NickServ::Info nickserv_info;
 	WebCPanel::NickServ::Cert nickserv_cert;
-	WebCPanel::NickServ::Access nickserv_access;
 	WebCPanel::NickServ::Alist nickserv_alist;
 
 	WebCPanel::ChanServ::Info chanserv_info;
@@ -69,7 +68,6 @@ class ModuleWebCPanel : public Module
 		, confirm("/confirm")
 		, nickserv_info("NickServ", "/nickserv/info")
 		, nickserv_cert("NickServ", "/nickserv/cert")
-		, nickserv_access("NickServ", "/nickserv/access")
 		, nickserv_alist("NickServ", "/nickserv/alist")
 		, chanserv_info("ChanServ", "/chanserv/info")
 		, chanserv_set("ChanServ", "/chanserv/set")
@@ -123,11 +121,6 @@ class ModuleWebCPanel : public Module
 				s.subsections.push_back(ss);
 				provider->RegisterPage(&this->nickserv_cert);
 			}
-
-			ss.name = "Access";
-			ss.url = "/nickserv/access";
-			s.subsections.push_back(ss);
-			provider->RegisterPage(&this->nickserv_access);
 
 			ss.name = "AList";
 			ss.url = "/nickserv/alist";
@@ -239,7 +232,6 @@ class ModuleWebCPanel : public Module
 
 			provider->UnregisterPage(&this->nickserv_info);
 			provider->UnregisterPage(&this->nickserv_cert);
-			provider->UnregisterPage(&this->nickserv_access);
 			provider->UnregisterPage(&this->nickserv_alist);
 
 			provider->UnregisterPage(&this->chanserv_info);

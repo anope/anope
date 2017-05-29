@@ -247,16 +247,6 @@ void ChannelImpl::SetRestricted(bool restricted)
 	Set(&ChannelType::restricted, restricted);
 }
 
-bool ChannelImpl::IsSecure()
-{
-	return Get(&ChannelType::secure);
-}
-
-void ChannelImpl::SetSecure(bool secure)
-{
-	Set(&ChannelType::secure, secure);
-}
-
 bool ChannelImpl::IsSecureOps()
 {
 	return Get(&ChannelType::secureops);
@@ -370,12 +360,6 @@ ChanServ::AccessGroup ChannelImpl::AccessFor(const User *u, bool updateLastUsed)
 		return group;
 
 	NickServ::Account *nc = u->Account();
-	if (nc == NULL && !this->IsSecure() && u->IsRecognized())
-	{
-		NickServ::Nick *na = NickServ::FindNick(u->nick);
-		if (na != NULL)
-			nc = na->GetAccount();
-	}
 
 	group.super_admin = u->super_admin;
 	group.founder = IsFounder(u);

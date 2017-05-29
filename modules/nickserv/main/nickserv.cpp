@@ -244,45 +244,32 @@ class NickServCore : public Module, public NickServ::NickServService
 		if (MOD_RESULT == EVENT_ALLOW)
 			return;
 
-		if (!na->GetAccount()->IsSecure() && u->IsRecognized())
-		{
-			na->SetLastSeen(Anope::CurTime);
-			na->SetLastUsermask(u->GetIdent() + "@" + u->GetDisplayedHost());
-			na->SetLastRealname(u->realname);
-			return;
-		}
-
 		if (Config->GetModule("nickserv/main")->Get<bool>("nonicknameownership"))
 			return;
 
-		bool on_access = u->IsRecognized(false);
+		if (!na->GetAccount()->IsKillProtect())
+			return;
 
-		if (on_access || !na->GetAccount()->IsKillImmed())
+		if (na->GetAccount()->IsKillImmed())
 		{
-			if (na->GetAccount()->IsSecure())
-				u->SendMessage(*NickServ, _("This nickname is registered and protected. If this is your nickname, type \002{0}{1} IDENTIFY \037password\037\002. Otherwise, please choose a different nickname."), Config->StrictPrivmsg, NickServ->nick); // XXX
-			else
-				u->SendMessage(*NickServ, _("This nickname is owned by someone else. If this is your nickname, type \002{0}{1} IDENTIFY \037password\037\002. Otherwise, please choose a different nickname."), Config->StrictPrivmsg, NickServ->nick); // XXX
+			u->SendMessage(*NickServ, _("This nickname has been registered; you may not use it."));
+			this->Collide(u, na);
+			return;
 		}
-		if (na->GetAccount()->IsKillProtect() && !on_access)
+
+		u->SendMessage(*NickServ, _("This nickname is registered. If this is your nickname, type \002{0}{1} IDENTIFY \037password\037\002. Otherwise, please choose a different nickname."), Config->StrictPrivmsg, NickServ->nick); // XXX
+
+		if (na->GetAccount()->IsKillQuick())
 		{
-			if (na->GetAccount()->IsKillImmed())
-			{
-				u->SendMessage(*NickServ, _("This nickname has been registered; you may not use it."));
-				this->Collide(u, na);
-			}
-			else if (na->GetAccount()->IsKillQuick())
-			{
-				time_t killquick = Config->GetModule("nickserv/main")->Get<time_t>("killquick", "20s");
-				u->SendMessage(*NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(killquick, u->Account()).c_str());
-				new NickServCollide(this, this, u, na, killquick);
-			}
-			else
-			{
-				time_t kill = Config->GetModule("nickserv/main")->Get<time_t>("kill", "60s");
-				u->SendMessage(*NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(kill, u->Account()).c_str());
-				new NickServCollide(this, this, u, na, kill);
-			}
+			time_t killquick = Config->GetModule("nickserv/main")->Get<time_t>("killquick", "20s");
+			u->SendMessage(*NickServ, _("If you do not change within {0}, I will change your nick."), Anope::Duration(killquick, u->Account()));
+			new NickServCollide(this, this, u, na, killquick);
+		}
+		else
+		{
+			time_t kill = Config->GetModule("nickserv/main")->Get<time_t>("kill", "60s");
+			u->SendMessage(*NickServ, _("If you do not change within {0}, I will change your nick."), Anope::Duration(kill, u->Account()));
+			new NickServCollide(this, this, u, na, kill);
 		}
 
 	}
@@ -626,7 +613,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 		/* Update last quit and last seen for the user */
 		NickServ::Nick *na = NickServ::FindNick(u->nick);
-		if (na && !na->GetAccount()->HasFieldS("NS_SUSPENDED") && (u->IsRecognized() || u->IsIdentified(true)))
+		if (na && !na->GetAccount()->HasFieldS("NS_SUSPENDED") && u->IsIdentified(true))
 		{
 			na->SetLastSeen(Anope::CurTime);
 			na->SetLastQuit(msg);
@@ -643,7 +630,7 @@ class NickServCore : public Module, public NickServ::NickServService
 		for (NickServ::Nick *na : Serialize::GetObjects<NickServ::Nick *>())
 		{
 			User *u = User::Find(na->GetNick(), true);
-			if (u && (u->IsIdentified(true) || u->IsRecognized()))
+			if (u && u->IsIdentified(true))
 				na->SetLastSeen(Anope::CurTime);
 
 			bool expire = false;

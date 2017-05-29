@@ -55,8 +55,6 @@ class CoreExport User : public virtual Base, public virtual Extensible, public C
 	Anope::string vident;
 	Anope::string ident;
 	Anope::string uid;
-	/* If the user is on the access list of the nick they're on */
-	bool on_access;
 	/* Map of user modes and the params this user has (if any) */
 	ModeList modes;
 	/* NickServ::Account account the user is currently loggged in as, if they are logged in */
@@ -241,12 +239,6 @@ class CoreExport User : public virtual Base, public virtual Extensible, public C
 	 * @return true or false
 	 */
 	bool IsIdentified(bool check_nick = false) const;
-
-	/** Check if the user is recognized for their nick (on the nicks access list)
-	 * @param check_secure Only returns true if the user has secure off
-	 * @return true or false
-	 */
-	bool IsRecognized(bool check_secure = true) const;
 
 	/** Check if the user is a services oper
 	 * @return true if they are an oper

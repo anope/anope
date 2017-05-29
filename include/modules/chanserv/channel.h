@@ -86,9 +86,6 @@ class CoreExport Channel : public Serialize::Object
 	virtual bool IsRestricted() anope_abstract;
 	virtual void SetRestricted(bool) anope_abstract;
 
-	virtual bool IsSecure() anope_abstract;
-	virtual void SetSecure(bool) anope_abstract;
-
 	virtual bool IsSecureOps() anope_abstract;
 	virtual void SetSecureOps(bool) anope_abstract;
 

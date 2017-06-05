@@ -228,6 +228,9 @@ namespace HTTPUtils
 				case '"':
 					dst += "&quot;";
 					break;
+				case '&':
+					dst += "&amp;";
+					break;
 				default:
 					dst += src[i];
 			}

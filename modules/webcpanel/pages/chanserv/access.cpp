@@ -103,9 +103,9 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 	{
 		ChanAccess *access = ci->GetAccess(i);
 
-		replacements["MASKS"] = HTTPUtils::Escape(access->Mask());
-		replacements["ACCESSES"] = HTTPUtils::Escape(access->AccessSerialize());
-		replacements["CREATORS"] = HTTPUtils::Escape(access->creator);
+		replacements["MASKS"] = access->Mask();
+		replacements["ACCESSES"] = access->AccessSerialize();
+		replacements["CREATORS"] = access->creator;
 	}
 
 	if (Service::FindService("Command", "chanserv/access"))

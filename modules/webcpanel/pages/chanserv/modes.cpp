@@ -96,7 +96,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 
 		std::vector<Anope::string> v = c->GetModeList(cm->name);
 		for (unsigned int i = 0; i < v.size(); ++i)
-			replacements["MASKS"] = HTTPUtils::Escape(v[i]);
+			replacements["MASKS"] = v[i];
 	}
 
 	Page.Serve(server, page_name, client, message, reply, replacements);

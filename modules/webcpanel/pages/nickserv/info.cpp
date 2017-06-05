@@ -84,9 +84,9 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		}
 	}
 
-	replacements["DISPLAY"] = HTTPUtils::Escape(na->nc->display);
+	replacements["DISPLAY"] = na->nc->display;
 	if (na->nc->email.empty() == false)
-		replacements["EMAIL"] = HTTPUtils::Escape(na->nc->email);
+		replacements["EMAIL"] = na->nc->email;
 	replacements["TIME_REGISTERED"] = Anope::strftime(na->time_registered, na->nc);
 	if (na->HasVhost())
 	{
@@ -97,7 +97,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 	}
 	Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
 	if (greet)
-		replacements["GREET"] = HTTPUtils::Escape(*greet);
+		replacements["GREET"] = *greet;
 	if (na->nc->HasExt("AUTOOP"))
 		replacements["AUTOOP"];
 	if (na->nc->HasExt("NS_PRIVATE"))

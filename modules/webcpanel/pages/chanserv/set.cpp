@@ -102,7 +102,7 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 		}
 	}
 
-	replacements["CHANNEL"] = HTTPUtils::Escape(ci->name);
+	replacements["CHANNEL"] = ci->name;
 	replacements["CHANNEL_ESCAPED"] = HTTPUtils::URLEncode(ci->name);
 	if (ci->GetFounder())
 		replacements["FOUNDER"] = ci->GetFounder()->display;
@@ -114,8 +114,8 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 
 	if (!ci->last_topic.empty())
 	{
-		replacements["LAST_TOPIC"] = HTTPUtils::Escape(ci->last_topic);
-		replacements["LAST_TOPIC_SETTER"] = HTTPUtils::Escape(ci->last_topic_setter);
+		replacements["LAST_TOPIC"] = ci->last_topic;
+		replacements["LAST_TOPIC_SETTER"] = ci->last_topic_setter;
 	}
 
 	if (can_set)

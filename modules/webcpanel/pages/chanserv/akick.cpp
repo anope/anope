@@ -74,11 +74,11 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		AutoKick *akick = ci->GetAkick(i);
 
 		if (akick->nc)
-			replacements["MASKS"] = HTTPUtils::Escape(akick->nc->display);
+			replacements["MASKS"] = akick->nc->display;
 		else
-			replacements["MASKS"] = HTTPUtils::Escape(akick->mask);
-		replacements["CREATORS"] = HTTPUtils::Escape(akick->creator);
-		replacements["REASONS"] = HTTPUtils::Escape(akick->reason);
+			replacements["MASKS"] = akick->mask;
+		replacements["CREATORS"] = akick->creator;
+		replacements["REASONS"] = akick->reason;
 	}
 
 	Page.Serve(server, page_name, client, message, reply, replacements);

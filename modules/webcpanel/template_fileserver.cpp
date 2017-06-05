@@ -238,7 +238,11 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 
 				if (ifok && forok)
 				{
-					const Anope::string &replacement = FindReplacement(r, content.substr(0, f - 1));
+					Anope::string replacement = FindReplacement(r, content.substr(0, f - 1));
+
+					// htmlescape all text replaced onto the page
+					replacement = HTTPUtils::Escape(replacement);
+
 					finished += replacement;
 				}
 			}

@@ -52,8 +52,6 @@ size_t sockaddrs::size() const
 			return sizeof(sa4);
 		case AF_INET6:
 			return sizeof(sa6);
-		default:
-			break;
 	}
 
 	return 0;
@@ -67,8 +65,6 @@ int sockaddrs::port() const
 			return ntohs(sa4.sin_port);
 		case AF_INET6:
 			return ntohs(sa6.sin6_port);
-		default:
-			break;
 	}
 
 	return -1;
@@ -87,8 +83,6 @@ Anope::string sockaddrs::addr() const
 		case AF_INET6:
 			if (inet_ntop(AF_INET6, &sa6.sin6_addr, address, sizeof(address)))
 				return address;
-			break;
-		default:
 			break;
 	}
 
@@ -187,8 +181,6 @@ void sockaddrs::pton(int type, const Anope::string &address, int pport)
 			}
 			break;
 		}
-		default:
-			break;
 	}
 }
 
@@ -212,8 +204,6 @@ void sockaddrs::ntop(int type, const void *src)
 			sa6.sin6_addr = *reinterpret_cast<const in6_addr *>(src);
 			sa6.sin6_family = type;
 			return;
-		default:
-			break;
 	}
 
 	this->clear();

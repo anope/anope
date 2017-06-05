@@ -298,8 +298,6 @@ time_t Anope::DoTime(const Anope::string &s)
 					return amount * 86400 * 7;
 				case 'y':
 					return amount * 86400 * 365;
-				default:
-					break;
 			}
 		}
 	}

@@ -15,6 +15,7 @@ class ModuleWebCPanel : public Module
 	ServiceReference<HTTPProvider> provider;
 	Panel panel;
 	PrimitiveExtensibleItem<Anope::string> id, ip;
+	PrimitiveExtensibleItem<time_t> last_login;
 
 	StaticFileServer style_css, logo_png, cubes_png, favicon_ico;
 
@@ -44,7 +45,8 @@ class ModuleWebCPanel : public Module
 
  public:
 	ModuleWebCPanel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-		panel(this, "webcpanel"), id(this, "webcpanel_id"), ip(this, "webcpanel_ip"),
+		panel(this, "webcpanel"),
+		id(this, "webcpanel_id"), ip(this, "webcpanel_ip"), last_login(this, "webcpanel_last_login"),
 		style_css("style.css", "/static/style.css", "text/css"), logo_png("logo.png", "/static/logo.png", "image/png"), cubes_png("cubes.png", "/static/cubes.png", "image/png"), favicon_ico("favicon.ico", "/favicon.ico", "image/x-icon"),
 		index("/"), logout("/logout"), _register("/register"), confirm("/confirm"),
 		nickserv_info("NickServ", "/nickserv/info"), nickserv_cert("NickServ", "/nickserv/cert"), nickserv_access("NickServ", "/nickserv/access"), nickserv_alist("NickServ", "/nickserv/alist"),

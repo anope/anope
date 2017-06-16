@@ -81,6 +81,16 @@ void ChannelImpl::SetTimeRegistered(time_t t)
 	Set(&ChannelType::time_registered, t);
 }
 
+time_t ChannelImpl::GetChannelTS()
+{
+	return Get(&ChannelType::channel_ts);
+}
+
+void ChannelImpl::SetChannelTS(time_t t)
+{
+	Set(&ChannelType::channel_ts, t);
+}
+
 time_t ChannelImpl::GetLastUsed()
 {
 	return Get(&ChannelType::last_used);

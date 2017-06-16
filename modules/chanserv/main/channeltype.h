@@ -31,6 +31,7 @@ class ChannelType : public Serialize::Type<ChannelImpl>
 	} name;
 	Serialize::Field<ChannelImpl, Anope::string> desc;
 	Serialize::Field<ChannelImpl, time_t> time_registered;
+	Serialize::Field<ChannelImpl, time_t> channel_ts;
 	Serialize::Field<ChannelImpl, time_t> last_used;
 
 	Serialize::Field<ChannelImpl, Anope::string> last_topic;

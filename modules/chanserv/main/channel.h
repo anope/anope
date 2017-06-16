@@ -23,7 +23,7 @@ class ChannelImpl : public ChanServ::Channel
 
 	Serialize::Storage<NickServ::Account *> founder, successor;
 	Serialize::Storage<Anope::string> name, desc;
-	Serialize::Storage<time_t> time_registered, last_used;
+	Serialize::Storage<time_t> time_registered, channel_ts, last_used;
 	Serialize::Storage<Anope::string> last_topic, last_topic_setter;
 	Serialize::Storage<time_t> last_topic_time;
 	Serialize::Storage<int16_t> bantype;
@@ -58,6 +58,9 @@ class ChannelImpl : public ChanServ::Channel
 
 	time_t GetTimeRegistered() override;
 	void SetTimeRegistered(time_t) override;
+
+	time_t GetChannelTS() override;
+	void SetChannelTS(time_t) override;
 
 	time_t GetLastUsed() override;
 	void SetLastUsed(time_t) override;

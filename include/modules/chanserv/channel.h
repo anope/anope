@@ -40,6 +40,9 @@ class CoreExport Channel : public Serialize::Object
 	virtual time_t GetTimeRegistered() anope_abstract;
 	virtual void SetTimeRegistered(time_t) anope_abstract;
 
+	virtual time_t GetChannelTS() anope_abstract;
+	virtual void SetChannelTS(time_t) anope_abstract;
+
 	virtual time_t GetLastUsed() anope_abstract;
 	virtual void SetLastUsed(time_t) anope_abstract;
 

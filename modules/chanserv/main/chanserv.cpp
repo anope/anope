@@ -47,14 +47,11 @@ class ChanServCore : public Module
 	, public EventHook<Event::PreUplinkSync>
 	, public EventHook<Event::ChanRegistered>
 	, public EventHook<Event::JoinChannel>
-	, public EventHook<Event::ChannelModeSet>
 	, public EventHook<Event::ChanInfo>
-	, public EventHook<Event::SetCorrectModes>
 {
 	Reference<ServiceBot> ChanServ;
 	std::vector<Anope::string> defaults;
 	ExtensibleItem<bool> inhabit;
-	bool always_lower;
 	std::vector<ChanServ::Privilege> Privileges;
 	ChanServ::registered_channel_map registered_channels;
 	ChannelType channel_type;
@@ -79,11 +76,8 @@ class ChanServCore : public Module
 		, EventHook<Event::PreUplinkSync>(this)
 		, EventHook<Event::ChanRegistered>(this)
 		, EventHook<Event::JoinChannel>(this)
-		, EventHook<Event::ChannelModeSet>(this)
 		, EventHook<Event::ChanInfo>(this)
-		, EventHook<Event::SetCorrectModes>(this)
 		, inhabit(this, "inhabit")
-		, always_lower(false)
 		, channel_type(this)
 		, level_type(this)
 		, mode_type(this)
@@ -252,8 +246,6 @@ class ChanServCore : public Module
 			defaults = { "keeptopic", "secure", "securefounder", "signkick" };
 		else if (defaults[0].equals_ci("none"))
 			defaults.clear();
-
-		always_lower = conf->GetModule(this)->Get<bool>("always_lower_ts");
 	}
 
 	void OnChannelCreate(Channel *c) override
@@ -522,32 +514,20 @@ class ChanServCore : public Module
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (always_lower && c->ci && c->creation_time > c->ci->GetTimeRegistered())
+		if (!c->ci)
+			return;
+
+		time_t ts = c->ci->GetChannelTS();
+		if (ts == 0)
+			ts = c->ci->GetTimeRegistered();
+
+		if (c->creation_time > ts)
 		{
-			logger.Debug("Changing TS of {0} from {1} to {2}", c->name, c->creation_time, c->ci->GetTimeRegistered());
-			c->creation_time = c->ci->GetTimeRegistered();
+			logger.Debug("Changing TS of {0} from {1} to {2}", c->name, c->creation_time, ts);
+			c->creation_time = ts;
 			IRCD->Send<messages::MessageChannel>(c);
 			c->Reset();
 		}
-	}
-
-	EventReturn OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
-	{
-		if (!always_lower && Anope::CurTime == c->creation_time && c->ci && setter.GetUser() && !setter.GetUser()->server->IsULined())
-		{
-			ChanUserContainer *cu = c->FindUser(setter.GetUser());
-			ChannelMode *cm = ModeManager::FindChannelModeByName("OP");
-			if (cu && cm && !cu->status.HasMode(cm->mchar))
-			{
-				/* Our -o and their mode change crossing, bounce their mode */
-				c->RemoveMode(nullptr, mode, param);
-				/* We don't set mlocks until after the join has finished processing, it will stack with this change,
-				 * so there isn't much for the user to remove except -nt etc which is likely locked anyway.
-				 */
-			}
-		}
-
-		return EVENT_CONTINUE;
 	}
 
 	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_all) override
@@ -558,17 +538,6 @@ class ChanServCore : public Module
 		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
 		if (!ci->IsNoExpire() && chanserv_expire && !Anope::NoExpire && ci->GetLastUsed() != Anope::CurTime)
 			info[_("Expires")] = Anope::strftime(ci->GetLastUsed() + chanserv_expire, source.GetAccount());
-	}
-
-	void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) override
-	{
-		if (always_lower)
-			// Since we always lower the TS, the other side will remove the modes if the channel ts lowers, so we don't
-			// have to worry about it
-			take_modes = false;
-		else if (ModeManager::FindChannelModeByName("REGISTERED"))
-			// Otherwise if the registered channel mode exists, we should remove modes if the channel is not +r
-			take_modes = !chan->HasMode("REGISTERED");
 	}
 };
 

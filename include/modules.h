@@ -103,17 +103,17 @@ template<class ModuleClass> void ModuleInfo(ModuleDef *moddef) { }
 		AnopeModuleVersion \
 	};
 
-enum ModuleReturn
+enum class ModuleReturn
 {
-	MOD_ERR_OK,
-	MOD_ERR_PARAMS,
-	MOD_ERR_EXISTS,
-	MOD_ERR_NOEXIST,
-	MOD_ERR_NOLOAD,
-	MOD_ERR_UNKNOWN,
-	MOD_ERR_FILE_IO,
-	MOD_ERR_EXCEPTION,
-	MOD_ERR_VERSION
+	OK,
+	PARAMS,
+	EXISTS,
+	NOEXIST,
+	NOLOAD,
+	UNKNOWN,
+	FILE_IO,
+	EXCEPTION,
+	VERSION
 };
 
 /* Module types, in the order in which they are unloaded. The order these are in is IMPORTANT */

@@ -77,7 +77,7 @@ void ModuleManager::CleanupRuntimeDirectory()
  * runtime folder.
  * @param name the name of the module to copy
  * @param output the destination to copy the module to
- * @return MOD_ERR_OK on success
+ * @return ModuleReturn::OK on success
  */
 static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
@@ -85,13 +85,13 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 
 	struct stat s;
 	if (stat(input.c_str(), &s) == -1)
-		return MOD_ERR_NOEXIST;
+		return ModuleReturn::NOEXIST;
 	else if (!S_ISREG(s.st_mode))
-		return MOD_ERR_NOEXIST;
+		return ModuleReturn::NOEXIST;
 
 	std::ifstream source(input.c_str(), std::ios_base::in | std::ios_base::binary);
 	if (!source.is_open())
-		return MOD_ERR_NOEXIST;
+		return ModuleReturn::NOEXIST;
 
 	char *tmp_output = strdup(output.c_str());
 	int target_fd = mkstemp(tmp_output);
@@ -99,7 +99,7 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 	{
 		free(tmp_output);
 		source.close();
-		return MOD_ERR_FILE_IO;
+		return ModuleReturn::FILE_IO;
 	}
 	output = tmp_output;
 	free(tmp_output);
@@ -110,7 +110,7 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 	if (!target.is_open())
 	{
 		source.close();
-		return MOD_ERR_FILE_IO;
+		return ModuleReturn::FILE_IO;
 	}
 
 	int want = s.st_size;
@@ -127,17 +127,17 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 	source.close();
 	target.close();
 
-	return !source.fail() && !target.fail() ? MOD_ERR_OK : MOD_ERR_FILE_IO;
+	return !source.fail() && !target.fail() ? ModuleReturn::OK : MOD_ERR_FILE_IO;
 }
 #endif
 
 ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 {
 	if (modname.empty())
-		return MOD_ERR_PARAMS;
+		return ModuleReturn::PARAMS;
 
 	if (FindModule(modname))
-		return MOD_ERR_EXISTS;
+		return ModuleReturn::EXISTS;
 
 	Anope::Logger.Debug("Trying to load module: {0}", modname);
 
@@ -147,11 +147,11 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);
-	if (ret != MOD_ERR_OK)
+	if (ret != ModuleReturn::OK)
 	{
-		if (ret == MOD_ERR_NOEXIST)
+		if (ret == ModuleReturn::NOEXIST)
 			Anope::Logger.Terminal(_("Error while loading {0} (file does not exist)"), modname);
-		else if (ret == MOD_ERR_FILE_IO)
+		else if (ret == ModuleReturn::FILE_IO)
 			Anope::Logger.Terminal(_("Error while loading {0} (file IO error, check file permissions and diskspace)"), modname);
 		return ret;
 	}
@@ -166,7 +166,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	{
 		if (err && *err)
 			Anope::Logger.Log(err);
-		return MOD_ERR_NOLOAD;
+		return ModuleReturn::NOLOAD;
 	}
 
 	dlerror();
@@ -178,7 +178,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		if (err && *err)
 			Anope::Logger.Log(err);
 		dlclose(handle);
-		return MOD_ERR_NOLOAD;
+		return ModuleReturn::NOLOAD;
 	}
 
 	try
@@ -189,25 +189,25 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		{
 			Anope::Logger.Log(_("Module {0} is compiled against an older version of Anope {1}.{2}, this is {3}"), modname, v.GetMajor(), v.GetMinor(), Anope::VersionShort());
 			dlclose(handle);
-			return MOD_ERR_VERSION;
+			return ModuleReturn::VERSION;
 		}
 		else if (v.GetMajor() > Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() > Anope::VersionMinor()))
 		{
 			Anope::Logger.Log(_("Module {0} is compiled against a newer version of Anope {1}.{2}, this is {3}"), modname, v.GetMajor(), v.GetMinor(), Anope::VersionShort());
 			dlclose(handle);
-			return MOD_ERR_VERSION;
+			return ModuleReturn::VERSION;
 		}
 		else if (v.GetPatch() < Anope::VersionPatch())
 		{
 			Anope::Logger.Log(_("Module {0} is compiled against an older version of Anope, {1}.{2}.{3}, this is {4}"), modname, v.GetMajor(), v.GetMinor(), v.GetPatch(), Anope::VersionShort());
 			dlclose(handle);
-			return MOD_ERR_VERSION;
+			return ModuleReturn::VERSION;
 		}
 		else if (v.GetPatch() > Anope::VersionPatch())
 		{
 			Anope::Logger.Log(_("Module {0} is compiled against a newer version of Anope, {1}.{2}.{3}, this is {4}"), modname, v.GetMajor(), v.GetMinor(), v.GetPatch(), Anope::VersionShort());
 			dlclose(handle);
-			return MOD_ERR_VERSION;
+			return ModuleReturn::VERSION;
 		}
 		else
 		{
@@ -218,7 +218,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	{
 		/* this error has already been logged */
 		dlclose(handle);
-		return MOD_ERR_NOLOAD;
+		return ModuleReturn::NOLOAD;
 	}
 
 	ModuleDef *def = module->init();
@@ -230,7 +230,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 	Module *m;
 
-	ModuleReturn moderr = MOD_ERR_OK;
+	ModuleReturn moderr = ModuleReturn::OK;
 	try
 	{
 		m = def->Create(modname, nick);
@@ -238,10 +238,10 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	catch (const ModuleException &ex)
 	{
 		Anope::Logger.Log(_("Error while loading {0}: {1}"), modname, ex.GetReason());
-		moderr = MOD_ERR_EXCEPTION;
+		moderr = ModuleReturn::EXCEPTION;
 	}
 	
-	if (moderr != MOD_ERR_OK)
+	if (moderr != ModuleReturn::OK)
 	{
 		if (dlclose(handle))
 			Anope::Logger.Log(dlerror());
@@ -261,15 +261,15 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	catch (const ModuleException &ex)
 	{
 		Anope::Logger.Log(_("Module {0} couldn't load: {1}"), modname, ex.GetReason());
-		moderr = MOD_ERR_EXCEPTION;
+		moderr = ModuleReturn::EXCEPTION;
 	}
 	catch (const ConfigException &ex)
 	{
 		Anope::Logger.Log(_("Module {0} couldn't load due to configuration problems: {1}"), modname, ex.GetReason());
-		moderr = MOD_ERR_EXCEPTION;
+		moderr = ModuleReturn::EXCEPTION;
 	}
 	
-	if (moderr != MOD_ERR_OK)
+	if (moderr != ModuleReturn::OK)
 	{
 		DeleteModule(m);
 		return moderr;
@@ -279,13 +279,13 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 	EventManager::Get()->Dispatch(&Event::ModuleLoad::OnModuleLoad, u, m);
 
-	return MOD_ERR_OK;
+	return ModuleReturn::OK;
 }
 
 ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)
 {
 	if (!m)
-		return MOD_ERR_PARAMS;
+		return ModuleReturn::PARAMS;
 
 	EventManager::Get()->Dispatch(&Event::ModuleUnload::OnModuleUnload, u, m);
 
@@ -345,7 +345,7 @@ void ModuleManager::RequireVersion(int major, int minor, int patch)
 ModuleReturn ModuleManager::DeleteModule(Module *m)
 {
 	if (!m || !m->handle)
-		return MOD_ERR_PARAMS;
+		return ModuleReturn::PARAMS;
 
 	Serialize::Unregister(m);
 
@@ -369,7 +369,7 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 		unlink(filename.c_str());
 #endif
 
-	return MOD_ERR_OK;
+	return ModuleReturn::OK;
 }
 
 void ModuleManager::UnloadAll()

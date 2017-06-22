@@ -33,12 +33,12 @@ class CommandOSModLoad : public Command
 		const Anope::string &mname = params[0];
 
 		ModuleReturn status = ModuleManager::LoadModule(mname, source.GetUser());
-		if (status == MOD_ERR_OK)
+		if (status == ModuleReturn::OK)
 		{
 			logger.Admin(source, _("{source} used {command} to load module {0}"), mname);
 			source.Reply(_("Module \002{0}\002 loaded."), mname);
 		}
-		else if (status == MOD_ERR_EXISTS)
+		else if (status == ModuleReturn::EXISTS)
 		{
 			source.Reply(_("Module \002{0}\002 is already loaded."), mname);
 		}
@@ -92,14 +92,14 @@ class CommandOSModReLoad : public Command
 		bool fatal = m->type == PROTOCOL;
 		ModuleReturn status = ModuleManager::UnloadModule(m, source.GetUser());
 
-		if (status != MOD_ERR_OK)
+		if (status != ModuleReturn::OK)
 		{
 			source.Reply(_("Unable to remove module \002{0}\002."), mname);
 			return;
 		}
 
 		status = ModuleManager::LoadModule(mname, source.GetUser());
-		if (status == MOD_ERR_OK)
+		if (status == ModuleReturn::OK)
 		{
 			logger.Admin(source, _("{source} used {command} to reload module {0}"), mname);
 			source.Reply(_("Module \002{0}\002 reloaded."), mname);
@@ -153,7 +153,7 @@ class CommandOSModUnLoad : public Command
 
 		ModuleReturn status = ModuleManager::UnloadModule(m, source.GetUser());
 
-		if (status == MOD_ERR_OK)
+		if (status == ModuleReturn::OK)
 		{
 			logger.Admin(source, _("{source} used {command} to unload module {0}"), mname);
 			source.Reply(_("Module \002{0}\002 unloaded."), mname);

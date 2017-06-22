@@ -157,6 +157,13 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	}
 #else
 	Anope::string pbuf = Anope::ModuleDir + "/modules/" + modname.replace_all_cs("/", "_") + ".so";
+
+	struct stat s;
+	if (stat(pbuf.c_str(), &s) == -1 || !S_ISREG(s.st_mode))
+	{
+		Anope::Logger.Terminal(_("Error while loading {0} (file does not exist)"), modname);
+		return ModuleReturn::NOEXIST;
+	}
 #endif
 
 	dlerror();

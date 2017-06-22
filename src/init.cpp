@@ -543,7 +543,16 @@ void Anope::Init(int ac, char **av)
 	/* load modules */
 	Anope::Logger.Log("Loading modules...");
 	for (int i = 0; i < Config->CountBlock("module"); ++i)
-		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<Anope::string>("name"), NULL);
+	{
+		Configuration::Block *config = Config->GetBlock("module", i);
+
+		ModuleReturn modret = ModuleManager::LoadModule(config->Get<Anope::string>("name"), NULL);
+
+		if (modret == ModuleReturn::NOEXIST)
+		{
+			throw CoreException("Module " + config->Get<Anope::string>("name") + " does not exist!");
+		}
+	}
 
 	Config->LoadOpers();
 	Config->ApplyBots();

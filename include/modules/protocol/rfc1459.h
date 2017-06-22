@@ -288,6 +288,14 @@ class Ping : public IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 };
 
+class Pong : public IRCDMessage
+{
+ public:
+	Pong(Module *creator, const Anope::string &mname = "PONG") : IRCDMessage(creator, mname) { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
+};
+
 class Privmsg : public IRCDMessage
 {
  public:

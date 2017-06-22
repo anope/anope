@@ -21,6 +21,7 @@
 
 #include "sockets.h"
 #include "protocol.h"
+#include "timers.h"
 
 namespace Uplink
 {
@@ -40,13 +41,22 @@ namespace Uplink
 		IRCMessage message(Me, command, std::forward<Args>(args)...);
 		SendMessage(message);
 	}
+
+	class PingTimer : public Timer
+	{
+	 public:
+		PingTimer(time_t);
+		void Tick(time_t) override;
+	};
 }
 
 /* This is the socket to our uplink */
 class UplinkSocket : public ConnectionSocket, public BufferedSocket
 {
  public:
-	bool error;
+	bool error = false;
+	time_t last_read = 0;
+	bool pinged = false;
 	UplinkSocket();
 	~UplinkSocket();
 	bool ProcessRead() override;

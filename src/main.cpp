@@ -145,6 +145,7 @@ int main(int ac, char **av, char **envp)
 	/* Set up timers */
 	time_t last_check = Anope::CurTime;
 	ExpireTimer expireTimer(Config->GetBlock("options")->Get<time_t>("expiretimeout", "30m"));
+	Uplink::PingTimer pingTimer(30);
 
 	/*** Main loop. ***/
 	while (!Anope::Quitting)

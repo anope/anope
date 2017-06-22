@@ -42,10 +42,46 @@ class ReconnectTimer : public Timer
 		}
 		catch (const SocketException &ex)
 		{
-			Anope::Logger.Terminal(_("Unable to connect to uplink #{0} ({1}:{2}): {3}"), Anope::CurrentUplink + 1, Config->Uplinks[Anope::CurrentUplink].host, Config->Uplinks[Anope::CurrentUplink].port, ex.GetReason());
+			Anope::Logger.Terminal(_("Unable to connect to uplink #{0} ({1}:{2}): {3}"),
+					Anope::CurrentUplink + 1, Config->Uplinks[Anope::CurrentUplink].host,
+					Config->Uplinks[Anope::CurrentUplink].port, ex.GetReason());
 		}
 	}
 };
+
+Uplink::PingTimer::PingTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true)
+{
+}
+
+void Uplink::PingTimer::Tick(time_t)
+{
+	Server *uplink;
+	time_t ping_time = Config->GetBlock("options")->Get<time_t>("ping_time", "60");
+
+	if (!UplinkSock || Anope::CurTime - UplinkSock->last_read <= ping_time)
+		return;
+
+	if (Me->GetLinks().empty())
+		return;
+
+	if (UplinkSock->pinged)
+	{
+		Anope::Logger.Log(_("No response from uplink in {0} seconds, disconnecting"), ping_time);
+
+		UplinkSock->error = true;
+		Anope::QuitReason = "Ping timeout";
+		delete UplinkSock;
+		Anope::QuitReason.clear();
+		return;
+	}
+
+	Anope::Logger.Debug("Pinging uplink");
+
+	uplink = Me->GetLinks().front();
+	UplinkSock->pinged = true;
+
+	IRCD->Send<messages::Ping>(Me->GetName(), uplink->GetName());
+}
 
 void Uplink::Connect()
 {
@@ -71,7 +107,6 @@ void Uplink::Connect()
 
 UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].ipv6), ConnectionSocket(), BufferedSocket()
 {
-	error = false;
 	UplinkSock = this;
 }
 
@@ -142,6 +177,9 @@ UplinkSocket::~UplinkSocket()
 
 bool UplinkSocket::ProcessRead()
 {
+	last_read = Anope::CurTime;
+	pinged = false;
+
 	bool b = BufferedSocket::ProcessRead();
 	for (Anope::string buf; (buf = this->GetLine()).empty() == false;)
 	{

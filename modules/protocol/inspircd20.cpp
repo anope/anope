@@ -1271,6 +1271,7 @@ class ProtoInspIRCd20 : public Module
 	rfc1459::Notice message_notice;
 	rfc1459::Part message_part;
 	rfc1459::Ping message_ping;
+	rfc1459::Pong message_pong;
 	rfc1459::Privmsg message_privmsg;
 	rfc1459::Quit message_quit;
 	rfc1459::Stats message_stats;
@@ -1370,6 +1371,7 @@ class ProtoInspIRCd20 : public Module
 		, message_notice(this)
 		, message_part(this)
 		, message_ping(this)
+		, message_pong(this)
 		, message_privmsg(this)
 		, message_quit(this)
 		, message_stats(this)

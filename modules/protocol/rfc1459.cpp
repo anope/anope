@@ -444,6 +444,12 @@ void Ping::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	IRCD->Send<messages::Pong>(params.size() > 1 ? params[1] : Me->GetSID(), params[0]);
 }
 
+void Pong::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	// Here to get rid of the "unknown command from server"
+	// Read timeout is reset on any uplink recv()
+}
+
 void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	const Anope::string &receiver = params[0];

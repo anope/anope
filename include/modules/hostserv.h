@@ -21,6 +21,9 @@
 
 #include "serialize.h"
 
+#include "hostserv/ban.h"
+#include "hostserv/request.h"
+
 namespace HostServ
 {
 	class VHost : public Serialize::Object

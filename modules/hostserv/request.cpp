@@ -122,7 +122,7 @@ class CommandHSRequest : public Command
 				if (!na)
 					continue;
 
-				Anope::string message = Anope::printf(_("[auto memo] vHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
+				Anope::string message = Anope::Format(_("[auto memo] vHost \002{0}\002 has been requested by {1}."), host, source.GetNick());
 
 				memoserv->Send(source.service->nick, na->GetNick(), message, true);
 			}
@@ -208,17 +208,21 @@ class CommandHSRequest : public Command
 		time_t send_delay = Config->GetModule("memoserv/main")->Get<time_t>("senddelay");
 		if (Config->GetModule(this->GetOwner())->Get<bool>("memooper") && send_delay > 0 && u && u->lastmemosend + send_delay > Anope::CurTime)
 		{
-			source.Reply(_("Please wait %d seconds before requesting a new vHost."), send_delay);
+			source.Reply(_("Please wait \002{0}\002 seconds before requesting a new vHost."), send_delay);
 			u->lastmemosend = Anope::CurTime;
 			return;
 		}
 
 		unsigned int max_vhosts = Config->GetModule("hostserv/main")->Get<unsigned int>("max_vhosts");
-		if (max_vhosts && max_vhosts >= u->Account()->GetRefs<HostServ::VHost *>().size())
+		if (max_vhosts && u->Account()->GetRefs<HostServ::VHost *>().size() >= max_vhosts)
 		{
 			source.Reply(_("You already have the maximum number of vhosts allowed (\002{0}\002)."), max_vhosts);
 			return;
 		}
+
+		EventReturn event_ret = EventManager::Get()->Dispatch(&Event::VhostRequest::OnVhostRequest, &source, u->Account(), user, host);
+		if (event_ret == EVENT_STOP)
+			return;
 
 		HostRequest *req = u->Account()->GetRef<HostRequest *>();
 		if (req != nullptr)

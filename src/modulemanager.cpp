@@ -356,10 +356,11 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 
 	Serialize::Unregister(m);
 
+	Anope::string name = m->name;
 	void *handle = m->handle;
 	Anope::string filename = m->filename;
 
-	Anope::Logger.Log("Unloading module {0}", m->name);
+	Anope::Logger.Log("Unloading module {0}", name);
 
 	ModuleDef *def = m->def;
 	AnopeModule *module = m->module;
@@ -370,6 +371,13 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 	dlerror();
 	if (dlclose(handle))
 		Anope::Logger.Log(dlerror());
+
+	handle = dlopen(filename.c_str(), RTLD_NOLOAD);
+	if (handle != nullptr)
+	{
+		Anope::Logger.Debug("Unloaded module {0} but module is still loaded", name);
+		dlclose(handle);
+	}
 
 #ifdef _WIN32
 	if (!filename.empty())

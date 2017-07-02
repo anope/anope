@@ -13,7 +13,7 @@
 
 std::vector<Oper *> Oper::opers;
 
-Oper::Oper(const Anope::string &n, OperType *o) : name(n), ot(o), require_oper(false)
+Oper::Oper(const Anope::string &n, OperType *o) : name(n), ot(o), require_oper(true)
 {
 	opers.push_back(this);
 }

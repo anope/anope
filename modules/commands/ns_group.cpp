@@ -24,35 +24,42 @@ class NSGroupRequest : public IdentifyRequest
 
 	void OnSuccess() anope_override
 	{
-		if (!source.GetUser())
-			return this->GroupUserless();
+		User *u = source.GetUser();
 
-		if (source.GetUser()->nick != nick || !target || !target->nc)
+		if (u != NULL && u->nick != nick)
 			return;
 
-		User *u = source.GetUser();
-		NickAlias *na = NickAlias::Find(nick);
+		if (!target || !target->nc)
+			return;
+
 		/* If the nick is already registered, drop it. */
+		NickAlias *na = NickAlias::Find(nick);
 		if (na)
 		{
-			FOREACH_MOD(OnChangeCoreDisplay, (na->nc, u->nick));
 			delete na;
 		}
 
 		na = new NickAlias(nick, target->nc);
 
-		Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
-		na->last_usermask = last_usermask;
-		na->last_realname = u->realname;
 		na->time_registered = na->last_seen = Anope::CurTime;
 
-		u->Login(target->nc);
-		FOREACH_MOD(OnNickGroup, (u, target));
+		if (u == NULL) {
+			na->last_realname = source.GetNick();
+		}
+		else
+		{
+			na->last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+			na->last_realname = u->realname;
+
+			u->Login(target->nc);
+			FOREACH_MOD(OnNickGroup, (u, target));
+		}
 
 		Log(LOG_COMMAND, source, cmd) << "to make " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 		source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
 
-		u->lastnickreg = Anope::CurTime;
+		if (u)
+			u->lastnickreg = Anope::CurTime;
 
 	}
 
@@ -70,29 +77,6 @@ class NSGroupRequest : public IdentifyRequest
 		else
 			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
 	}
-
-	void GroupUserless() anope_override
-	{
-		Log(LOG_DEBUG) << "ns_group: trying to add " << nick << " to group: " << target->nick;
-
-		if (source.GetNick() != nick || !target || !target->nc)
-			return;
-
-		Anope::string snick = source.GetNick();
-		NickAlias *na = NickAlias::Find(nick);
-		/* If the nick is already registered, drop it. */
-		if (na)
-		{
-			FOREACH_MOD(OnChangeCoreDisplay, (na->nc, snick));
-			delete na;
-		}
-
-		na = new NickAlias(nick, target->nc);
-
-		na->time_registered = na->last_seen = Anope::CurTime;
-
-		Log(LOG_COMMAND, source, cmd) << "to make " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
-	};
 };
 
 class CommandNSGroup : public Command

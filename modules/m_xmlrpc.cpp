@@ -9,6 +9,7 @@
 #include "module.h"
 #include "modules/xmlrpc.h"
 #include "modules/httpd.h"
+#include <stdexcept>
 
 static struct special_chars
 {
@@ -113,6 +114,10 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 			if (content[0] == '<')
 			{
 				len = content.find_first_of('>');
+				if (len <= 0) {
+					Log(LOG_DEBUG) << "m_xmlrpc: Malformed XML, tag not closed. Aborting.";
+					throw std::runtime_error("Malformed XML, tag not closed.");
+				}
 				istag = true;
 			}
 			else if (content[0] != '>')
@@ -149,18 +154,23 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		Anope::string content = message.content, tname, data;
 		XMLRPCRequest request(reply);
 
-		while (GetData(content, tname, data))
+		try
 		{
-			Log(LOG_DEBUG) << "m_xmlrpc: Tag name: " << tname << ", data: " << data;
-			if (tname == "methodName")
-				request.name = data;
-			else if (tname == "name" && data == "id")
-			{
-				GetData(content, tname, data);
-				request.id = data;
+			while (GetData(content, tname, data)) {
+				Log(LOG_DEBUG) << "m_xmlrpc: Tag name: " << tname << ", data: " << data;
+				if (tname == "methodName")
+					request.name = data;
+				else if (tname == "name" && data == "id") {
+					GetData(content, tname, data);
+					request.id = data;
+				} else if (tname == "string")
+					request.data.push_back(data);
 			}
-			else if (tname == "string")
-				request.data.push_back(data);
+		} catch ( const std::runtime_error& e )
+		{
+			reply.error = HTTP_BAD_REQUEST;
+			reply.Write(e.what());
+			return true;
 		}
 
 		for (unsigned i = 0; i < this->events.size(); ++i)

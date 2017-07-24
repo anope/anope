@@ -24,7 +24,10 @@ class NSGroupRequest : public IdentifyRequest
 
 	void OnSuccess() anope_override
 	{
-		if (!source.GetUser() || source.GetUser()->nick != nick || !target || !target->nc)
+		if (!source.GetUser())
+			return this->GroupUserless();
+
+		if (source.GetUser()->nick != nick || !target || !target->nc)
 			return;
 
 		User *u = source.GetUser();
@@ -67,6 +70,29 @@ class NSGroupRequest : public IdentifyRequest
 		else
 			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
 	}
+
+	void GroupUserless() anope_override
+	{
+		Log(LOG_DEBUG) << "ns_group: trying to add " << nick << " to group: " << target->nick;
+
+		if (source.GetNick() != nick || !target || !target->nc)
+			return;
+
+		Anope::string snick = source.GetNick();
+		NickAlias *na = NickAlias::Find(nick);
+		/* If the nick is already registered, drop it. */
+		if (na)
+		{
+			FOREACH_MOD(OnChangeCoreDisplay, (na->nc, snick));
+			delete na;
+		}
+
+		na = new NickAlias(nick, target->nc);
+
+		na->time_registered = na->last_seen = Anope::CurTime;
+
+		Log(LOG_COMMAND, source, cmd) << "to make " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
+	};
 };
 
 class CommandNSGroup : public Command

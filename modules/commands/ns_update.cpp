@@ -17,12 +17,21 @@ class CommandNSUpdate : public Command
 	CommandNSUpdate(Module *creator) : Command(creator, "nickserv/update", 0, 0)
 	{
 		this->SetDesc(_("Updates your current status, i.e. it checks for new memos"));
-		this->RequireUser(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
+
+        // XMLRPC: Try to look up the user from their nick
+        if (!u)
+            u = User::Find(source.GetNick(), true);
+
+        if (!u)
+        {
+            return;
+        }
+
 		NickAlias *na = NickAlias::Find(u->nick);
 
 		if (na && na->nc == source.GetAccount())

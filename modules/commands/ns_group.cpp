@@ -24,45 +24,58 @@ class NSGroupRequest : public IdentifyRequest
 
 	void OnSuccess() anope_override
 	{
-		if (!source.GetUser() || source.GetUser()->nick != nick || !target || !target->nc)
+		User *u = source.GetUser();
+
+		/* user changed nick? */
+		if (u != NULL && u->nick != nick)
 			return;
 
-		User *u = source.GetUser();
+		if (!target || !target->nc)
+			return;
+
 		NickAlias *na = NickAlias::Find(nick);
 		/* If the nick is already registered, drop it. */
 		if (na)
 		{
-			FOREACH_MOD(OnChangeCoreDisplay, (na->nc, u->nick));
 			delete na;
 		}
 
 		na = new NickAlias(nick, target->nc);
-
-		Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
-		na->last_usermask = last_usermask;
-		na->last_realname = u->realname;
 		na->time_registered = na->last_seen = Anope::CurTime;
 
-		u->Login(target->nc);
-		FOREACH_MOD(OnNickGroup, (u, target));
+		if (u != NULL)
+		{
+			na->last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+			na->last_realname = u->realname;
+		}
+		else
+		{
+			na->last_realname = source.GetNick();
+		}
+
+		if (u != NULL)
+		{
+			u->Login(target->nc);
+			FOREACH_MOD(OnNickGroup, (u, target));
+		}
 
 		Log(LOG_COMMAND, source, cmd) << "to make " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 		source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
 
-		u->lastnickreg = Anope::CurTime;
-
+		if (u)
+			u->lastnickreg = Anope::CurTime;
 	}
 
 	void OnFail() anope_override
 	{
-		if (!source.GetUser())
-			return;
+		User *u = source.GetUser();
 
 		Log(LOG_COMMAND, source, cmd) << "and failed to group to " << target->nick;
 		if (NickAlias::Find(GetAccount()) != NULL)
 		{
 			source.Reply(PASSWORD_INCORRECT);
-			source.GetUser()->BadPassword();
+			if (u)
+				u->BadPassword();
 		}
 		else
 			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());

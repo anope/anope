@@ -28,9 +28,7 @@ class CommandNSUpdate : public Command
 			u = User::Find(source.GetNick(), true);
 
 		if (!u)
-		{
 			return;
-		}
 
 		NickAlias *na = NickAlias::Find(u->nick);
 

@@ -23,14 +23,14 @@ class CommandNSUpdate : public Command
 	{
 		User *u = source.GetUser();
 
-        // XMLRPC: Try to look up the user from their nick
-        if (!u)
-            u = User::Find(source.GetNick(), true);
+		// XMLRPC: Try to look up the user from their nick
+		if (!u)
+			u = User::Find(source.GetNick(), true);
 
-        if (!u)
-        {
-            return;
-        }
+		if (!u)
+		{
+			return;
+		}
 
 		NickAlias *na = NickAlias::Find(u->nick);
 

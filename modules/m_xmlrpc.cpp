@@ -107,7 +107,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 			prev = cur;
 			cur.clear();
 
-			int len = 0;
+			size_t len = 0;
 			istag = false;
 
 			if (content[0] == '<')
@@ -120,20 +120,21 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 				len = content.find_first_of('<');
 			}
 
-			if (len)
+			// len must advance
+			if (len == Anope::string::npos || len == 0)
+				break;
+
+			if (istag)
 			{
-				if (istag)
-				{
-					cur = content.substr(1, len - 1);
-					content.erase(0, len + 1);
-					while (!content.empty() && content[0] == ' ')
-						content.erase(content.begin());
-				}
-				else
-				{
-					cur = content.substr(0,len);
-					content.erase(0, len);
-				}
+				cur = content.substr(1, len - 1);
+				content.erase(0, len + 1);
+				while (!content.empty() && content[0] == ' ')
+					content.erase(content.begin());
+			}
+			else
+			{
+				cur = content.substr(0, len);
+				content.erase(0, len);
 			}
 		}
 		while (istag && !content.empty());

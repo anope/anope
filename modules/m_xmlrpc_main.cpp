@@ -109,7 +109,8 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				reply(out);
 
 				User *u = NULL;
-				if (user) {
+				if (!user.empty())
+				{
 					Log(LOG_DEBUG) << "m_xmlrpc_main: user context requested: " << user;
 					u = User::Find(user, true);
 

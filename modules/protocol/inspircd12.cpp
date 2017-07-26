@@ -105,13 +105,21 @@ class InspIRCd12Proto : public IRCDProto
 
 	void SendAkillDel(const XLine *x) anope_override
 	{
-		/* InspIRCd may support regex bans */
+		/* InspIRCd may support regex bans
+		 * Mask is expected in format: 'n!u@h\sr' and spaces as '\s'
+		 * We remove the '//' and replace '#' and any ' ' with '\s'
+		 */
 		if (x->IsRegex() && Servers::Capab.count("RLINE"))
 		{
 			Anope::string mask = x->mask;
-			size_t h = x->mask.find('#');
+			if (mask.length() >= 2 && mask[0] == '/' && mask[mask.length() - 1] == '/')
+				mask = mask.substr(1, mask.length() - 2);
+			size_t h = mask.find('#');
 			if (h != Anope::string::npos)
-				mask = mask.replace(h, 1, ' ');
+			{
+				mask = mask.replace(h, 1, "\\s");
+				mask = mask.replace_all_cs(" ", "\\s");
+			}
 			SendDelLine("R", mask);
 			return;
 		}
@@ -168,13 +176,21 @@ class InspIRCd12Proto : public IRCDProto
 		if (timeleft > 172800 || !x->expires)
 			timeleft = 172800;
 
-		/* InspIRCd may support regex bans, if they do we can send this and forget about it */
+		/* InspIRCd may support regex bans, if they do we can send this and forget about it
+		 * Mask is expected in format: 'n!u@h\sr' and spaces as '\s'
+		 * We remove the '//' and replace '#' and any ' ' with '\s'
+		 */
 		if (x->IsRegex() && Servers::Capab.count("RLINE"))
 		{
 			Anope::string mask = x->mask;
-			size_t h = x->mask.find('#');
+			if (mask.length() >= 2 && mask[0] == '/' && mask[mask.length() - 1] == '/')
+				mask = mask.substr(1, mask.length() - 2);
+			size_t h = mask.find('#');
 			if (h != Anope::string::npos)
-				mask = mask.replace(h, 1, ' ');
+			{
+				mask = mask.replace(h, 1, "\\s");
+				mask = mask.replace_all_cs(" ", "\\s");
+			}
 			SendAddLine("R", mask, timeleft, x->by, x->GetReason());
 			return;
 		}

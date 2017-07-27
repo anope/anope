@@ -108,16 +108,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				}
 				reply(out);
 
-				User *u = NULL;
-				if (!user.empty())
-				{
-					Log(LOG_DEBUG) << "m_xmlrpc_main: user context requested: " << user;
-					u = User::Find(user, true);
-
-					if (u)
-						Log(LOG_DEBUG) << "m_xmlrpc_main: executing as currently online user: " << u->nick;
-				}
-
+				User *u = User::Find(user, true);
 				CommandSource source(user, u, na ? *na->nc : NULL, &reply, bi);
 				Command::Run(source, command);
 

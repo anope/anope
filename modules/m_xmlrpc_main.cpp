@@ -108,7 +108,8 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				}
 				reply(out);
 
-				CommandSource source(user, NULL, na ? *na->nc : NULL, &reply, bi);
+				User *u = User::Find(user, true);
+				CommandSource source(user, u, na ? *na->nc : NULL, &reply, bi);
 				Command::Run(source, command);
 
 				if (!out.empty())

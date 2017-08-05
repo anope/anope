@@ -78,6 +78,7 @@ namespace Configuration
 		File(const Anope::string &, bool);
 		~File();
 		const Anope::string &GetName() const;
+		Anope::string GetPath() const;
 
 		bool IsOpen() const;
 		bool Open();

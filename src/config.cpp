@@ -665,6 +665,11 @@ const Anope::string &File::GetName() const
 	return this->name;
 }
 
+Anope::string File::GetPath() const
+{
+	return (this->executable ? "" : Anope::ConfigDir + "/") + this->name;
+}
+
 bool File::IsOpen() const
 {
 	return this->fp != NULL;
@@ -722,14 +727,14 @@ void Conf::LoadConf(File &file)
 		return;
 
 	if (!file.Open())
-		throw ConfigException("File " + file.GetName() + " could not be opened.");
+		throw ConfigException("File " + file.GetPath() + " could not be opened.");
 
 	Anope::string itemname, wordbuffer;
 	std::stack<Block *> block_stack;
 	int linenumber = 0;
 	bool in_word = false, in_quote = false, in_comment = false;
 
-	Log(LOG_DEBUG) << "Start to read conf " << file.GetName();
+	Log(LOG_DEBUG) << "Start to read conf " << file.GetPath();
 	// Start reading characters...
 	while (!file.End())
 	{

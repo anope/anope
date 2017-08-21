@@ -168,6 +168,8 @@ namespace Configuration
 		void ApplyBots();
 
 		void LoadOpers();
+
+		static void ProcessEnvVars(Block *);
 	};
 
 	struct Uplink

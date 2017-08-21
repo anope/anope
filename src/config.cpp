@@ -158,6 +158,25 @@ Conf::Conf() : Block("")
 		this->LoadConf(f);
 	}
 
+	// Set env variables from defines
+	for (int i = 0; i < this->CountBlock("define"); ++i)
+	{
+		Block *define = this->GetBlock("define", i);
+
+		const Anope::string &dname = define->Get<Anope::string>("name"),
+		      &dvalue = define->Get<Anope::string>("value");
+
+		if (!dname.empty() && !dvalue.empty())
+		{
+			if (setenv(dname.c_str(), dvalue.c_str(), 1) == -1)
+			{
+				Anope::Logger.Log("Unable to setenv {0}: {1}", dname, Anope::LastError());
+			}
+		}
+	}
+
+	ProcessEnvVars(this);
+
 	for (Module *m : ModuleManager::Modules)
 		m->OnReload(this);
 
@@ -617,6 +636,26 @@ void Conf::Post(Conf *old)
 	}
 }
 
+void Conf::ProcessEnvVars(Block *block)
+{
+	for (auto it = block->items.begin(); it != block->items.end(); ++it)
+	{
+		Anope::string &item = it->second;
+		Anope::string replaced = Anope::ProcessEnvVars(item);
+		if (item != replaced)
+		{
+			Anope::Logger.Debug("Processed conf value \"{0}\" -> \"{1}\"",
+				item, replaced);
+			item = replaced;
+		}
+	}
+	for (auto it = block->blocks.begin(); it != block->blocks.end(); ++it)
+	{
+		Block *b = &it->second;
+		ProcessEnvVars(b);
+	}
+}
+
 void Conf::LoadBots()
 {
 	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>())
@@ -1059,21 +1098,10 @@ void Conf::LoadConf(File &file)
 					Block *b = block_stack.top();
 
 					if (b)
-						Anope::Logger.Debug("ln {0} EOL: s='{1}' '{2}' set to '{3}'", linenumber, b->name, itemname, wordbuffer);
-
-					/* Check defines */
-					for (int i = 0; i < this->CountBlock("define"); ++i)
 					{
-						Block *define = this->GetBlock("define", i);
-
-						const Anope::string &dname = define->Get<Anope::string>("name");
-
-						if (dname == wordbuffer && define != b)
-							wordbuffer = define->Get<Anope::string>("value");
-					}
-
-					if (b)
+						Anope::Logger.Debug("ln {0} EOL: s='{1}' '{2}' set to '{3}'", linenumber, b->name, itemname, wordbuffer);
 						b->items[itemname] = wordbuffer;
+					}
 
 					wordbuffer.clear();
 					itemname.clear();

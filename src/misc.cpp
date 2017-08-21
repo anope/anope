@@ -765,3 +765,58 @@ const Anope::string &FormatInfo::GetFormat() const
 {
 	return format;
 }
+
+Anope::string Anope::ProcessEnvVars(const Anope::string &in)
+{
+	Anope::string out;
+	size_t pos = 0;
+	for (;;)
+	{
+		size_t start = in.find("${", pos);
+		if (start == Anope::string::npos)
+		{
+			// copy from pos
+			out.append(in.substr(pos));
+			break;
+		}
+
+		if (start > 0 && in[start - 1] == '\\')
+		{
+			// literal ${
+			out.append(in.substr(pos, start - pos - 1));
+			out.append("${");
+			pos = start + 2;
+			continue;
+		}
+
+		// copy from pos to start
+		out.append(in.substr(pos, start - pos));
+
+		size_t end = in.find("}", start);
+		if (end == Anope::string::npos)
+			break;
+
+		Anope::string name, def;
+
+		size_t mid = in.find(":-", pos);
+		if (mid != Anope::string::npos && mid < end)
+		{
+			name = in.substr(start + 2, mid - start - 2);
+			def = in.substr(mid + 2, end - mid - 2);
+		}
+		else
+		{
+			name = in.substr(start + 2, end - start - 2);
+		}
+
+		const char *env = getenv(name.c_str());
+		if (env)
+			out.append(env);
+		else
+			out.append(def);
+
+		pos = end + 1;
+	}
+
+	return out;
+}

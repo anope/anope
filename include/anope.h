@@ -552,6 +552,11 @@ namespace Anope
 	 */
 	extern CoreExport Anope::string Random(size_t len);
 
+	/** Replace ${VARIABLE} or ${VARIABLE:-default} in a string with
+	 * the appropriate environment variables
+	 */
+	extern CoreExport Anope::string ProcessEnvVars(const Anope::string &);
+
 	extern Logger Logger;
 }
 

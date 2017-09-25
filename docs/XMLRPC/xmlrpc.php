@@ -40,20 +40,19 @@ class AnopeXMLRPC
      */
     public function run($name, $params)
     {
-        $xmlquery = xmlrpc_encode_request($name, $params);
-        $context = stream_context_create(["http" => [
-            "method" => "POST",
-            "header" => "Content-Type: text/xml",
-            "content" => $xmlquery]]);
-
-        $inbuf = file_get_contents($this->host, false, $context);
-        $response = xmlrpc_decode($inbuf);
-
-        if ($response) {
-            return $response;
-        }
-
-        return null;
+		$xmlquery = xmlrpc_encode_request($name, $params);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $host);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, "xmlRequest=" . $xmlquery);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 300);
+		$inbuf = curl_exec($ch);
+		curl_close($ch);
+		$response = xmlrpc_decode($inbuf);
+		if ($response) {
+			return $response;
+		}
+		return null;
     }
 
     /**

@@ -40,7 +40,7 @@ class AnopeXMLRPC
      */
     public function run($name, $params)
     {
-		$xmlquery = xmlrpc_encode_request($name, $params);
+	    $xmlquery = xmlrpc_encode_request($name, $params);
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $host);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, "xmlRequest=" . $xmlquery);

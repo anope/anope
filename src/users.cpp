@@ -353,9 +353,9 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 			if (buf.length() + add.length() > Config->LineWrap)
 			{
 				if (send_privmsg)
-					IRCD->SendPrivmsg(source, this->GetUID(), buf);
+					IRCD->SendPrivmsg(source, this->GetUID(), "{0}", buf);
 				else
-					IRCD->SendNotice(source, this->GetUID(), buf);
+					IRCD->SendNotice(source, this->GetUID(), "{0}", buf);
 				buf.clear();
 
 				add = word;
@@ -367,9 +367,9 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 		if (!buf.empty())
 		{
 			if (send_privmsg)
-				IRCD->SendPrivmsg(source, this->GetUID(), buf);
+				IRCD->SendPrivmsg(source, this->GetUID(), "{0}", buf);
 			else
-				IRCD->SendNotice(source, this->GetUID(), buf);
+				IRCD->SendNotice(source, this->GetUID(), "{0}", buf);
 		}
 	}
 }

@@ -127,7 +127,7 @@ void unreal::senders::MessageChannel::Send(Channel* c)
 
 void unreal::senders::Join::Send(User* user, Channel* c, const ChannelStatus* status)
 {
-	Uplink::Send(Me, "SJOIN", c->creation_time, c->name, user->GetUID());
+	Uplink::Send(Me, "SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), user->GetUID());
 	if (status)
 	{
 		/* First save the channel status incase uc->Status == status */

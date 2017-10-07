@@ -101,28 +101,7 @@ void unreal::senders::AkillDel::Send(XLine* x)
 
 void unreal::senders::MessageChannel::Send(Channel* c)
 {
-	/* Unreal does not support updating a channels TS without actually joining a user,
-	 * so we will join and part us now
-	 */
-	ServiceBot *bi;
-	if (c->ci)
-		bi = c->ci->WhoSends();
-	else
-		bi = Config->GetClient("ChanServ");
-
-	if (!bi)
-		return;
-
-	if (c->FindUser(bi) == NULL)
-	{
-		bi->Join(c);
-		bi->Part(c);
-	}
-	else
-	{
-		bi->Part(c);
-		bi->Join(c);
-	}
+	Uplink::Send(Me, "SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), "");
 }
 
 void unreal::senders::Join::Send(User* user, Channel* c, const ChannelStatus* status)

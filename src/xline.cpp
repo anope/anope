@@ -199,6 +199,12 @@ Anope::string XLine::GetReasonWithID()
 	return r;
 }
 
+bool XLine::IsExpired()
+{
+	time_t expires = GetExpires();
+	return expires > 0 && expires <= Anope::CurTime;
+}
+
 bool XLine::HasNickOrReal() const
 {
 	return !this->GetNick().empty() || !this->GetReal().empty();

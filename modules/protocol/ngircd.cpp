@@ -26,10 +26,11 @@
 
 void ngircd::senders::Akill::Send(User* u, XLine* x)
 {
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
+	if (x->IsExpired())
+		return;
+
+	// Calculate the time left before this would expire
+	time_t timeleft = x->GetExpires() > 0 ? x->GetExpires() - Anope::CurTime : 0;
 	Uplink::Send(Me, "GLINE", x->GetMask(), timeleft, x->GetReason() + " (" + x->GetBy() + ")");
 }
 

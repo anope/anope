@@ -73,11 +73,10 @@ void unreal::senders::Akill::Send(User* u, XLine* x)
 		}
 	}
 
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
-	Uplink::Send("TKL", "+", "G", x->GetUser(), x->GetHost(), x->GetBy(), Anope::CurTime + timeleft, x->GetCreated(), x->GetReason());
+	if (x->IsExpired())
+		return;
+
+	Uplink::Send("TKL", "+", "G", x->GetUser(), x->GetHost(), x->GetBy(), x->GetExpires(), x->GetCreated(), x->GetReason());
 }
 
 void unreal::senders::AkillDel::Send(XLine* x)
@@ -209,11 +208,10 @@ void unreal::senders::SQLineDel::Send(XLine* x)
 
 void unreal::senders::SZLine::Send(User*, XLine* x)
 {
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
-	Uplink::Send("TKL", "+", "Z", "*", x->GetHost(), x->GetBy(), Anope::CurTime + timeleft, x->GetCreated(), x->GetReason());
+	if (x->IsExpired())
+		return;
+
+	Uplink::Send("TKL", "+", "Z", "*", x->GetHost(), x->GetBy(), x->GetExpires(), x->GetCreated(), x->GetReason());
 }
 
 void unreal::senders::SZLineDel::Send(XLine* x)

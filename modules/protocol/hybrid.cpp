@@ -62,12 +62,11 @@ void hybrid::senders::Akill::Send(User* u, XLine* x)
 				x->GetMask(), u->GetMask(), u->realname, old->GetMask());
 	}
 
-	/* Calculate the time left before this would expire, capping it at 2 days */
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (x->IsExpired())
+		return;
 
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
-
+	/* Calculate the time left before this would expire */
+	time_t timeleft = x->GetExpires() > 0 ? x->GetExpires() - Anope::CurTime : 0;
 	Uplink::Send(Config->GetClient("OperServ"), "KLINE", timeleft, x->GetUser(), x->GetHost(), x->GetReason());
 }
 
@@ -173,12 +172,11 @@ void hybrid::senders::SQLineDel::Send(XLine* x)
 
 void hybrid::senders::SZLine::Send(User*, XLine* x)
 {
-	/* Calculate the time left before this would expire, capping it at 2 days */
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (x->IsExpired())
+		return;
 
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
-
+	/* Calculate the time left before this would expire */
+	time_t timeleft = x->GetExpires() > 0 ? x->GetExpires() - Anope::CurTime : 0;
 	Uplink::Send(Config->GetClient("OperServ"), "DLINE", "*", timeleft, x->GetHost(), x->GetReason());
 }
 

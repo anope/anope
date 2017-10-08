@@ -72,6 +72,7 @@ class CoreExport XLine : public Serialize::Object
 	const Anope::string &GetReal() const;
 
 	Anope::string GetReasonWithID();
+	bool IsExpired();
 
 	bool HasNickOrReal() const;
 	bool IsRegex();

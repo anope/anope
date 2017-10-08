@@ -39,10 +39,11 @@ static unsigned int spanningtree_proto_ver = 0;
 
 void inspircd20::senders::Akill::Send(User* u, XLine* x)
 {
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
+	if (x->IsExpired())
+		return;
+
+	// Calculate the time left before this would expire
+	time_t timeleft = x->GetExpires() > 0 ? x->GetExpires() - Anope::CurTime : 0;
 
 	/* InspIRCd may support regex bans, if they do we can send this and forget about it */
 	if (x->IsRegex() && Servers::Capab.count("RLINE"))
@@ -218,10 +219,11 @@ void inspircd20::senders::MessageServer::Send(Server* server)
 
 void inspircd20::senders::SQLine::Send(User*, XLine* x)
 {
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
+	if (x->IsExpired())
+		return;
+
+	// Calculate the time left before this would expire
+	time_t timeleft = x->GetExpires() > 0 ? x->GetExpires() - Anope::CurTime : 0;
 	proto->SendAddLine("Q", x->GetMask(), timeleft, x->GetBy(), x->GetReason());
 }
 
@@ -247,10 +249,11 @@ void inspircd20::senders::SQuit::Send(Server *s, const Anope::string &message)
 
 void inspircd20::senders::SZLine::Send(User*, XLine* x)
 {
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
+	if (x->IsExpired())
+		return;
+
+	// Calculate the time left before this would expire
+	time_t timeleft = x->GetExpires() > 0 ? x->GetExpires() - Anope::CurTime : 0;
 	proto->SendAddLine("Z", x->GetHost(), timeleft, x->GetBy(), x->GetReason());
 }
 

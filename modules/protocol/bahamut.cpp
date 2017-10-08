@@ -65,11 +65,11 @@ void bahamut::senders::Akill::Send(User* u, XLine* x)
 		}
 	}
 
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-	if (timeleft > 172800)
-		timeleft = 172800;
+	if (x->IsExpired())
+		return;
 
+	// Calculate the time left before this would expire
+	time_t timeleft = x->GetExpires() > 0 ? x->GetExpires() - Anope::CurTime : 0;
 	Uplink::Send("AKILL", x->GetHost(), x->GetUser(), timeleft, x->GetBy(), Anope::CurTime, x->GetReason());
 }
 
@@ -194,10 +194,11 @@ void bahamut::senders::SQLineDel::Send(XLine* x)
 
 void bahamut::senders::SZLine::Send(User*, XLine* x)
 {
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
+	if (x->IsExpired())
+		return;
+
+	// Calculate the time left before this would expire
+	time_t timeleft = x->GetExpires() > 0 ? x->GetExpires() - Anope::CurTime : 0;
 	/* this will likely fail so its only here for legacy */
 	Uplink::Send("SZLINE", x->GetHost(), x->GetReason());
 	/* this is how we are supposed to deal with it */

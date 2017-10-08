@@ -46,12 +46,11 @@ void ratbox::senders::Logout::Send(User *u)
 
 void ratbox::senders::SQLine::Send(User*, XLine* x)
 {
-	/* Calculate the time left before this would expire, capping it at 2 days */
-	time_t timeleft = x->GetExpires() - Anope::CurTime;
+	if (x->IsExpired())
+		return;
 
-	if (timeleft > 172800 || !x->GetExpires())
-		timeleft = 172800;
-
+	/* Calculate the time left before this would expire */
+	time_t timeleft = x->GetExpires() > 0 ? x->GetExpires() - Anope::CurTime : 0;
 #warning "find introduced"
 //	Uplink::Send(FindIntroduced(), "ENCAP", "*", "RESV", timeleft, x->GetMask(), 0, x->GetReason());
 }

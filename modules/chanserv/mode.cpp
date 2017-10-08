@@ -96,9 +96,9 @@ Anope::string ModeLockImpl::GetName()
 	return Get(&ModeLockType::name);
 }
 
-void ModeLockImpl::SetName(const Anope::string &name)
+void ModeLockImpl::SetName(const Anope::string &n)
 {
-	Set(&ModeLockType::name, name);
+	Set(&ModeLockType::name, n);
 }
 
 Anope::string ModeLockImpl::GetParam()

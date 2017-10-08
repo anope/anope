@@ -60,9 +60,9 @@ Anope::string DNSZoneImpl::GetName()
 	return Get(&DNSZoneType::name);
 }
 
-void DNSZoneImpl::SetName(const Anope::string &name)
+void DNSZoneImpl::SetName(const Anope::string &n)
 {
-	Set(&DNSZoneType::name, name);
+	Set(&DNSZoneType::name, n);
 }
 
 class DNSServerImpl : public DNSServer
@@ -286,9 +286,9 @@ Anope::string DNSIPImpl::GetIP()
 	return Get(&DNSIPType::ip);
 }
 
-void DNSIPImpl::SetIP(const Anope::string &ip)
+void DNSIPImpl::SetIP(const Anope::string &i)
 {
-	Set(&DNSIPType::ip, ip);
+	Set(&DNSIPType::ip, i);
 }
 
 class CommandOSDNS : public Command

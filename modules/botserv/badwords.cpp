@@ -256,8 +256,6 @@ class CommandBSBadwords : public Command
 			return;
 		}
 
-		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
-
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (!word.empty() && isdigit(word[0]) && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{

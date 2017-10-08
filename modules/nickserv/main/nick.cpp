@@ -61,9 +61,9 @@ Anope::string NickImpl::GetNick()
 	return Get<Anope::string>(&NickType::nick);
 }
 
-void NickImpl::SetNick(const Anope::string &nick)
+void NickImpl::SetNick(const Anope::string &n)
 {
-	Set(&NickType::nick, nick);
+	Set(&NickType::nick, n);
 }
 
 Anope::string NickImpl::GetLastQuit()
@@ -141,8 +141,8 @@ bool NickImpl::IsNoExpire()
 	return Get(&NickType::noexpire);
 }
 
-void NickImpl::SetNoExpire(bool noexpire)
+void NickImpl::SetNoExpire(bool n)
 {
-	Set(&NickType::noexpire, noexpire);
+	Set(&NickType::noexpire, n);
 }
 

@@ -192,8 +192,6 @@ class CommandNSRegister : public Command
 				}
 			}
 
-		unsigned int passlen = Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32");
-
 		if (Config->GetModule("nickserv/main")->Get<bool>("forceemail", "yes") && email.empty())
 		{
 			this->OnSyntaxError(source, "");
@@ -219,9 +217,10 @@ class CommandNSRegister : public Command
 			return;
 		}
 
-		if (pass.length() > Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32"))
+		unsigned int passlen = Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32");
+		if (pass.length() > passlen)
 		{
-			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv/main")->Get<unsigned>("passlen", "32"));
+			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), passlen);
 			return;
 		}
 

@@ -95,9 +95,9 @@ Anope::string AutoKickImpl::GetMask()
 	return Get(&AutoKickType::mask);
 }
 
-void AutoKickImpl::SetMask(const Anope::string &mask)
+void AutoKickImpl::SetMask(const Anope::string &m)
 {
-	Set(&AutoKickType::mask, mask);
+	Set(&AutoKickType::mask, m);
 }
 
 NickServ::Account *AutoKickImpl::GetAccount()

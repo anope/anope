@@ -50,9 +50,9 @@ Anope::string ChannelImpl::GetName()
 	return Get<Anope::string>(&ChannelType::name);
 }
 
-void ChannelImpl::SetName(const Anope::string &name)
+void ChannelImpl::SetName(const Anope::string &n)
 {
-	Set(&ChannelType::name, name);
+	Set(&ChannelType::name, n);
 }
 
 Anope::string ChannelImpl::GetDesc()
@@ -60,9 +60,9 @@ Anope::string ChannelImpl::GetDesc()
 	return Get(&ChannelType::desc);
 }
 
-void ChannelImpl::SetDesc(const Anope::string &desc)
+void ChannelImpl::SetDesc(const Anope::string &d)
 {
-	Set(&ChannelType::desc, desc);
+	Set(&ChannelType::desc, d);
 }
 
 time_t ChannelImpl::GetTimeRegistered()
@@ -150,20 +150,20 @@ BotInfo *ChannelImpl::GetBI()
 	return Get(&ChannelType::servicebot);
 }
 
-void ChannelImpl::SetBI(BotInfo *bi)
+void ChannelImpl::SetBI(BotInfo *b)
 {
-	Set(&ChannelType::servicebot, bi);
+	Set(&ChannelType::servicebot, b);
 }
 
 ServiceBot *ChannelImpl::GetBot()
 {
-	BotInfo *bi = GetBI();
-	return bi ? bi->bot : nullptr;
+	BotInfo *b = GetBI();
+	return b ? b->bot : nullptr;
 }
 
-void ChannelImpl::SetBot(ServiceBot *bi)
+void ChannelImpl::SetBot(ServiceBot *b)
 {
-	SetBI(bi->bi);
+	SetBI(b->bi);
 }
 
 MemoServ::MemoInfo *ChannelImpl::GetMemos()
@@ -196,9 +196,9 @@ bool ChannelImpl::IsGreet()
 	return Get(&ChannelType::greet);
 }
 
-void ChannelImpl::SetGreet(bool greet)
+void ChannelImpl::SetGreet(bool g)
 {
-	Set(&ChannelType::greet, greet);
+	Set(&ChannelType::greet, g);
 }
 
 bool ChannelImpl::IsFantasy()
@@ -206,9 +206,9 @@ bool ChannelImpl::IsFantasy()
 	return Get(&ChannelType::fantasy);
 }
 
-void ChannelImpl::SetFantasy(bool fantasy)
+void ChannelImpl::SetFantasy(bool f)
 {
-	Set(&ChannelType::fantasy, fantasy);
+	Set(&ChannelType::fantasy, f);
 }
 
 bool ChannelImpl::IsNoAutoop()
@@ -216,9 +216,9 @@ bool ChannelImpl::IsNoAutoop()
 	return Get(&ChannelType::noautoop);
 }
 
-void ChannelImpl::SetNoAutoop(bool noautoop)
+void ChannelImpl::SetNoAutoop(bool n)
 {
-	Set(&ChannelType::noautoop, noautoop);
+	Set(&ChannelType::noautoop, n);
 }
 
 bool ChannelImpl::IsPeace()
@@ -226,9 +226,9 @@ bool ChannelImpl::IsPeace()
 	return Get(&ChannelType::peace);
 }
 
-void ChannelImpl::SetPeace(bool peace)
+void ChannelImpl::SetPeace(bool p)
 {
-	Set(&ChannelType::peace, peace);
+	Set(&ChannelType::peace, p);
 }
 
 bool ChannelImpl::IsSecureFounder()
@@ -236,9 +236,9 @@ bool ChannelImpl::IsSecureFounder()
 	return Get(&ChannelType::securefounder);
 }
 
-void ChannelImpl::SetSecureFounder(bool securefounder)
+void ChannelImpl::SetSecureFounder(bool s)
 {
-	Set(&ChannelType::securefounder, securefounder);
+	Set(&ChannelType::securefounder, s);
 }
 
 bool ChannelImpl::IsRestricted()
@@ -246,9 +246,9 @@ bool ChannelImpl::IsRestricted()
 	return Get(&ChannelType::restricted);
 }
 
-void ChannelImpl::SetRestricted(bool restricted)
+void ChannelImpl::SetRestricted(bool r)
 {
-	Set(&ChannelType::restricted, restricted);
+	Set(&ChannelType::restricted, r);
 }
 
 bool ChannelImpl::IsSecureOps()
@@ -256,9 +256,9 @@ bool ChannelImpl::IsSecureOps()
 	return Get(&ChannelType::secureops);
 }
 
-void ChannelImpl::SetSecureOps(bool secureops)
+void ChannelImpl::SetSecureOps(bool s)
 {
-	Set(&ChannelType::secureops, secureops);
+	Set(&ChannelType::secureops, s);
 }
 
 bool ChannelImpl::IsSignKick()
@@ -266,9 +266,9 @@ bool ChannelImpl::IsSignKick()
 	return Get(&ChannelType::signkick);
 }
 
-void ChannelImpl::SetSignKick(bool signkick)
+void ChannelImpl::SetSignKick(bool s)
 {
-	Set(&ChannelType::signkick, signkick);
+	Set(&ChannelType::signkick, s);
 }
 
 bool ChannelImpl::IsSignKickLevel()
@@ -276,9 +276,9 @@ bool ChannelImpl::IsSignKickLevel()
 	return Get(&ChannelType::signkicklevel);
 }
 
-void ChannelImpl::SetSignKickLevel(bool signkicklevel)
+void ChannelImpl::SetSignKickLevel(bool s)
 {
-	Set(&ChannelType::signkicklevel, signkicklevel);
+	Set(&ChannelType::signkicklevel, s);
 }
 
 bool ChannelImpl::IsNoExpire()
@@ -286,9 +286,9 @@ bool ChannelImpl::IsNoExpire()
 	return Get(&ChannelType::noexpire);
 }
 
-void ChannelImpl::SetNoExpire(bool noexpire)
+void ChannelImpl::SetNoExpire(bool n)
 {
-	Set(&ChannelType::noexpire, noexpire);
+	Set(&ChannelType::noexpire, n);
 }
 
 bool ChannelImpl::IsKeepModes()
@@ -296,9 +296,9 @@ bool ChannelImpl::IsKeepModes()
 	return Get(&ChannelType::keepmodes);
 }
 
-void ChannelImpl::SetKeepModes(bool keepmodes)
+void ChannelImpl::SetKeepModes(bool k)
 {
-	Set(&ChannelType::keepmodes, keepmodes);
+	Set(&ChannelType::keepmodes, k);
 }
 
 bool ChannelImpl::IsPersist()
@@ -306,9 +306,9 @@ bool ChannelImpl::IsPersist()
 	return Get(&ChannelType::persist);
 }
 
-void ChannelImpl::SetPersist(bool persist)
+void ChannelImpl::SetPersist(bool p)
 {
-	Set(&ChannelType::persist, persist);
+	Set(&ChannelType::persist, p);
 }
 
 bool ChannelImpl::IsTopicLock()
@@ -316,9 +316,9 @@ bool ChannelImpl::IsTopicLock()
 	return Get(&ChannelType::topiclock);
 }
 
-void ChannelImpl::SetTopicLock(bool topiclock)
+void ChannelImpl::SetTopicLock(bool t)
 {
-	Set(&ChannelType::topiclock, topiclock);
+	Set(&ChannelType::topiclock, t);
 }
 
 bool ChannelImpl::IsKeepTopic()
@@ -326,9 +326,9 @@ bool ChannelImpl::IsKeepTopic()
 	return Get(&ChannelType::keeptopic);
 }
 
-void ChannelImpl::SetKeepTopic(bool keeptopic)
+void ChannelImpl::SetKeepTopic(bool k)
 {
-	Set(&ChannelType::keeptopic, keeptopic);
+	Set(&ChannelType::keeptopic, k);
 }
 
 bool ChannelImpl::IsPrivate()
@@ -336,16 +336,16 @@ bool ChannelImpl::IsPrivate()
 	return Get(&ChannelType::_private);
 }
 
-void ChannelImpl::SetPrivate(bool _private)
+void ChannelImpl::SetPrivate(bool p)
 {
-	Set(&ChannelType::_private, _private);
+	Set(&ChannelType::_private, p);
 }
 
 ServiceBot *ChannelImpl::WhoSends()
 {
-	BotInfo *bi = GetBI();
-	if (bi != nullptr)
-		return bi->bot;
+	BotInfo *b = GetBI();
+	if (b != nullptr)
+		return b->bot;
 
 	return Config->GetClient("ChanServ");
 }

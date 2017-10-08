@@ -74,9 +74,9 @@ NickServ::Account *OperInfoImpl::GetAccount()
 	return Get(&OperInfoType::account);
 }
 
-void OperInfoImpl::SetAccount(NickServ::Account *account)
+void OperInfoImpl::SetAccount(NickServ::Account *acc)
 {
-	Set(&OperInfoType::account, account);
+	Set(&OperInfoType::account, acc);
 }
 
 ChanServ::Channel *OperInfoImpl::GetChannel()
@@ -84,9 +84,9 @@ ChanServ::Channel *OperInfoImpl::GetChannel()
 	return Get(&OperInfoType::channel);
 }
 
-void OperInfoImpl::SetChannel(ChanServ::Channel *channel)
+void OperInfoImpl::SetChannel(ChanServ::Channel *c)
 {
-	Set(&OperInfoType::channel, channel);
+	Set(&OperInfoType::channel, c);
 }
 
 Anope::string OperInfoImpl::GetInfo()

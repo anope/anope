@@ -67,9 +67,9 @@ ChanServ::Channel *MemoInfoImpl::GetChannel()
 	return Get(&MemoInfoType::channel);
 }
 
-void MemoInfoImpl::SetChannel(ChanServ::Channel *channel)
+void MemoInfoImpl::SetChannel(ChanServ::Channel *c)
 {
-	Set(&MemoInfoType::channel, channel);
+	Set(&MemoInfoType::channel, c);
 }
 
 int16_t MemoInfoImpl::GetMemoMax()
@@ -87,9 +87,9 @@ bool MemoInfoImpl::IsHardMax()
 	return Get(&MemoInfoType::hardmax);
 }
 
-void MemoInfoImpl::SetHardMax(bool hardmax)
+void MemoInfoImpl::SetHardMax(bool h)
 {
-	Set(&MemoInfoType::hardmax, hardmax);
+	Set(&MemoInfoType::hardmax, h);
 }
 
 std::vector<MemoServ::Memo *> MemoInfoImpl::GetMemos()

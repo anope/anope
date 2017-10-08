@@ -29,7 +29,7 @@ namespace SASL
 	};
 
 	class Mechanism;
-	struct Session;
+	class Session;
 
 	class Service : public ::Service
 	{

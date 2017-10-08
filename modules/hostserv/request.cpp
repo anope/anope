@@ -67,9 +67,9 @@ NickServ::Account *HostRequest::GetAccount()
 	return Get(&HostRequestType::acc);
 }
 
-void HostRequest::SetAccount(NickServ::Account *acc)
+void HostRequest::SetAccount(NickServ::Account *a)
 {
-	Set(&HostRequestType::acc, acc);
+	Set(&HostRequestType::acc, a);
 }
 
 Anope::string HostRequest::GetIdent()

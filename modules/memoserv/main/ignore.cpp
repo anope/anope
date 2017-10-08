@@ -39,8 +39,8 @@ Anope::string IgnoreImpl::GetMask()
 	return Get(&IgnoreType::mask);
 }
 
-void IgnoreImpl::SetMask(const Anope::string &mask)
+void IgnoreImpl::SetMask(const Anope::string &m)
 {
-	Set(&IgnoreType::mask, mask);
+	Set(&IgnoreType::mask, m);
 }
 

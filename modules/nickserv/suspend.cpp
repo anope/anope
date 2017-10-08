@@ -81,9 +81,9 @@ Anope::string NSSuspendInfoImpl::GetBy()
 	return Get(&NSSuspendType::by);
 }
 
-void NSSuspendInfoImpl::SetBy(const Anope::string &by)
+void NSSuspendInfoImpl::SetBy(const Anope::string &b)
 {
-	Set(&NSSuspendType::by, by);
+	Set(&NSSuspendType::by, b);
 }
 
 Anope::string NSSuspendInfoImpl::GetReason()
@@ -91,9 +91,9 @@ Anope::string NSSuspendInfoImpl::GetReason()
 	return Get(&NSSuspendType::reason);
 }
 
-void NSSuspendInfoImpl::SetReason(const Anope::string &reason)
+void NSSuspendInfoImpl::SetReason(const Anope::string &r)
 {
-	Set(&NSSuspendType::reason, reason);
+	Set(&NSSuspendType::reason, r);
 }
 
 time_t NSSuspendInfoImpl::GetWhen()

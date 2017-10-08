@@ -82,9 +82,9 @@ Anope::string CSSuspendInfoImpl::GetBy()
 	return Get(&CSSuspendType::by);
 }
 
-void CSSuspendInfoImpl::SetBy(const Anope::string &by)
+void CSSuspendInfoImpl::SetBy(const Anope::string &b)
 {
-	Set(&CSSuspendType::by, by);
+	Set(&CSSuspendType::by, b);
 }
 
 Anope::string CSSuspendInfoImpl::GetReason()
@@ -92,9 +92,9 @@ Anope::string CSSuspendInfoImpl::GetReason()
 	return Get(&CSSuspendType::reason);
 }
 
-void CSSuspendInfoImpl::SetReason(const Anope::string &reason)
+void CSSuspendInfoImpl::SetReason(const Anope::string &r)
 {
-	Set(&CSSuspendType::reason, reason);
+	Set(&CSSuspendType::reason, r);
 }
 
 time_t CSSuspendInfoImpl::GetWhen()

@@ -533,6 +533,7 @@ class ProtongIRCd : public Module
 		, message_squit(this)
 		, message_stats(this)
 		, message_time(this)
+		, message_topic(this)
 		, message_version(this)
 		, message_whois(this)
 
@@ -545,19 +546,13 @@ class ProtongIRCd : public Module
 		, message_njoin(this)
 		, message_pong(this)
 		, message_server(this)
-		, message_topic(this)
 
-		, sender_akill(this)
-		, sender_akill_del(this)
-		, sender_channel(this)
 		, sender_global_notice(this)
 		, sender_global_privmsg(this)
 		, sender_invite(this)
 		, sender_join(this)
 		, sender_kick(this)
 		, sender_svskill(this)
-		, sender_login(this)
-		, sender_logout(this)
 		, sender_mode_chan(this)
 		, sender_mode_user(this)
 		, sender_nickchange(this)
@@ -569,11 +564,17 @@ class ProtongIRCd : public Module
 		, sender_quit(this)
 		, sender_server(this)
 		, sender_squit(this)
-		, sender_svsnick(this)
 		, sender_topic(this)
+		, sender_wallops(this)
+
+		, sender_akill(this)
+		, sender_akill_del(this)
+		, sender_channel(this)
+		, sender_login(this)
+		, sender_logout(this)
+		, sender_svsnick(this)
 		, sender_vhost_del(this)
 		, sender_vhost_set(this)
-		, sender_wallops(this)
 	{
 		Servers::Capab.insert("QS");
 

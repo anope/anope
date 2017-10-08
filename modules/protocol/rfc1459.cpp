@@ -505,7 +505,6 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 				}
 				else if (message.substr(0, 9).equals_ci("\1VERSION\1"))
 				{
-					Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
 					IRCD->SendCTCPReply(bi, u->nick, "VERSION Anope-{0}", Anope::Version());
 				}
 				return;

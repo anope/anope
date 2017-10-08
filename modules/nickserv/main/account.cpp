@@ -66,9 +66,9 @@ Anope::string AccountImpl::GetEmail()
 	return Get(&AccountType::email);
 }
 
-void AccountImpl::SetEmail(const Anope::string &email)
+void AccountImpl::SetEmail(const Anope::string &e)
 {
-	Set(&AccountType::email, email);
+	Set(&AccountType::email, e);
 }
 
 Anope::string AccountImpl::GetLanguage()
@@ -86,9 +86,9 @@ Oper *AccountImpl::GetOper()
 	return Get(&AccountType::oper);
 }
 
-void AccountImpl::SetOper(Oper *oper)
+void AccountImpl::SetOper(Oper *o)
 {
-	Set(&AccountType::oper, oper);
+	Set(&AccountType::oper, o);
 }
 
 MemoServ::MemoInfo *AccountImpl::GetMemos()
@@ -101,9 +101,9 @@ Anope::string AccountImpl::GetGreet()
 	return Get(&AccountType::greet);
 }
 
-void AccountImpl::SetGreet(const Anope::string &greet)
+void AccountImpl::SetGreet(const Anope::string &g)
 {
-	Set(&AccountType::greet, greet);
+	Set(&AccountType::greet, g);
 }
 
 bool AccountImpl::IsUnconfirmed()
@@ -111,9 +111,9 @@ bool AccountImpl::IsUnconfirmed()
 	return Get(&AccountType::unconfirmed);
 }
 
-void AccountImpl::SetUnconfirmed(bool unconfirmed)
+void AccountImpl::SetUnconfirmed(bool u)
 {
-	Set(&AccountType::greet, unconfirmed);
+	Set(&AccountType::greet, u);
 }
 
 bool AccountImpl::IsPrivate()
@@ -121,9 +121,9 @@ bool AccountImpl::IsPrivate()
 	return Get(&AccountType::_private);
 }
 
-void AccountImpl::SetPrivate(bool _private)
+void AccountImpl::SetPrivate(bool p)
 {
-	Set(&AccountType::_private, _private);
+	Set(&AccountType::_private, p);
 }
 
 bool AccountImpl::IsAutoOp()
@@ -131,9 +131,9 @@ bool AccountImpl::IsAutoOp()
 	return Get(&AccountType::autoop);
 }
 
-void AccountImpl::SetAutoOp(bool autoop)
+void AccountImpl::SetAutoOp(bool a)
 {
-	Set(&AccountType::autoop, autoop);
+	Set(&AccountType::autoop, a);
 }
 
 bool AccountImpl::IsKeepModes()
@@ -141,9 +141,9 @@ bool AccountImpl::IsKeepModes()
 	return Get(&AccountType::keepmodes);
 }
 
-void AccountImpl::SetKeepModes(bool keepmodes)
+void AccountImpl::SetKeepModes(bool k)
 {
-	Set(&AccountType::keepmodes, keepmodes);
+	Set(&AccountType::keepmodes, k);
 }
 
 bool AccountImpl::IsKillProtect()
@@ -151,9 +151,9 @@ bool AccountImpl::IsKillProtect()
 	return Get(&AccountType::killprotect);
 }
 
-void AccountImpl::SetKillProtect(bool killprotect)
+void AccountImpl::SetKillProtect(bool k)
 {
-	Set(&AccountType::killprotect, killprotect);
+	Set(&AccountType::killprotect, k);
 }
 
 bool AccountImpl::IsKillQuick()
@@ -161,9 +161,9 @@ bool AccountImpl::IsKillQuick()
 	return Get(&AccountType::killquick);
 }
 
-void AccountImpl::SetKillQuick(bool killquick)
+void AccountImpl::SetKillQuick(bool k)
 {
-	Set(&AccountType::killquick, killquick);
+	Set(&AccountType::killquick, k);
 }
 
 bool AccountImpl::IsKillImmed()
@@ -171,9 +171,9 @@ bool AccountImpl::IsKillImmed()
 	return Get(&AccountType::killimmed);
 }
 
-void AccountImpl::SetKillImmed(bool killimmed)
+void AccountImpl::SetKillImmed(bool k)
 {
-	Set(&AccountType::killimmed, killimmed);
+	Set(&AccountType::killimmed, k);
 }
 
 bool AccountImpl::IsMsg()
@@ -181,9 +181,9 @@ bool AccountImpl::IsMsg()
 	return Get(&AccountType::msg);
 }
 
-void AccountImpl::SetMsg(bool msg)
+void AccountImpl::SetMsg(bool m)
 {
-	Set(&AccountType::msg, msg);
+	Set(&AccountType::msg, m);
 }
 
 bool AccountImpl::IsMemoSignon()
@@ -191,9 +191,9 @@ bool AccountImpl::IsMemoSignon()
 	return Get(&AccountType::memosignon);
 }
 
-void AccountImpl::SetMemoSignon(bool memosignon)
+void AccountImpl::SetMemoSignon(bool m)
 {
-	Set(&AccountType::memosignon, memosignon);
+	Set(&AccountType::memosignon, m);
 }
 
 bool AccountImpl::IsMemoReceive()
@@ -201,9 +201,9 @@ bool AccountImpl::IsMemoReceive()
 	return Get(&AccountType::memoreceive);
 }
 
-void AccountImpl::SetMemoReceive(bool memoreceive)
+void AccountImpl::SetMemoReceive(bool m)
 {
-	Set(&AccountType::memoreceive, memoreceive);
+	Set(&AccountType::memoreceive, m);
 }
 
 bool AccountImpl::IsMemoMail()
@@ -211,9 +211,9 @@ bool AccountImpl::IsMemoMail()
 	return Get(&AccountType::memomail);
 }
 
-void AccountImpl::SetMemoMail(bool memomail)
+void AccountImpl::SetMemoMail(bool m)
 {
-	Set(&AccountType::memomail, memomail);
+	Set(&AccountType::memomail, m);
 }
 
 bool AccountImpl::IsHideEmail()
@@ -221,9 +221,9 @@ bool AccountImpl::IsHideEmail()
 	return Get(&AccountType::hideemail);
 }
 
-void AccountImpl::SetHideEmail(bool hideemail)
+void AccountImpl::SetHideEmail(bool h)
 {
-	Set(&AccountType::hideemail, hideemail);
+	Set(&AccountType::hideemail, h);
 }
 
 bool AccountImpl::IsHideMask()
@@ -231,9 +231,9 @@ bool AccountImpl::IsHideMask()
 	return Get(&AccountType::hidemask);
 }
 
-void AccountImpl::SetHideMask(bool hidemask)
+void AccountImpl::SetHideMask(bool h)
 {
-	Set(&AccountType::hidemask, hidemask);
+	Set(&AccountType::hidemask, h);
 }
 
 bool AccountImpl::IsHideStatus()
@@ -241,9 +241,9 @@ bool AccountImpl::IsHideStatus()
 	return Get(&AccountType::hidestatus);
 }
 
-void AccountImpl::SetHideStatus(bool hidestatus)
+void AccountImpl::SetHideStatus(bool h)
 {
-	Set(&AccountType::hidestatus, hidestatus);
+	Set(&AccountType::hidestatus, h);
 }
 
 bool AccountImpl::IsHideQuit()
@@ -251,9 +251,9 @@ bool AccountImpl::IsHideQuit()
 	return Get(&AccountType::hidequit);
 }
 
-void AccountImpl::SetHideQuit(bool hidequit)
+void AccountImpl::SetHideQuit(bool h)
 {
-	Set(&AccountType::hidequit, hidequit);
+	Set(&AccountType::hidequit, h);
 }
 
 void AccountImpl::SetDisplay(NickServ::Nick *na)
@@ -291,7 +291,7 @@ time_t AccountImpl::GetLastMail()
 	return Get(&AccountType::last_mail);
 }
 
-void AccountImpl::SetLastMail(time_t lastmail)
+void AccountImpl::SetLastMail(time_t l)
 {
-	Set(&AccountType::last_mail, lastmail);
+	Set(&AccountType::last_mail, l);
 }

@@ -36,8 +36,8 @@ class AccessChanAccessImpl : public AccessChanAccess
 
 	using AccessChanAccess::AccessChanAccess;
 
-	int GetLevel();
-	void SetLevel(const int &);
+	int GetLevel() override;
+	void SetLevel(const int &) override;
 
 	bool HasPriv(const Anope::string &name) override
 	{
@@ -179,16 +179,16 @@ class CommandCSAccess : public Command
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
-			ChanServ::ChanAccess *access = ci->GetAccess(i - 1);
-			if (mask.equals_ci(access->Mask()))
+			ChanServ::ChanAccess *a = ci->GetAccess(i - 1);
+			if (mask.equals_ci(a->Mask()))
 			{
 				/* Don't allow lowering from a level >= u_level */
-				if ((!highest || *access >= *highest) && !u_access.founder && !source.HasOverridePriv("chanserv/access/modify"))
+				if ((!highest || *a >= *highest) && !u_access.founder && !source.HasOverridePriv("chanserv/access/modify"))
 				{
-					source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to lower the access of \002{1}\002."), ci->GetName(), access->Mask());
+					source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to lower the access of \002{1}\002."), ci->GetName(), a->Mask());
 					return;
 				}
-				access->Delete();
+				a->Delete();
 				break;
 			}
 		}
@@ -459,7 +459,6 @@ class CommandCSAccess : public Command
 
 		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->GetName());
 
-		bool override = !source.IsFounder(ci);
 		logger.Command(source, ci, _("{source} used {command} on {channel} to clear the access list"));
 	}
 
@@ -489,7 +488,6 @@ class CommandCSAccess : public Command
 		}
 
 		bool is_list = cmd.equals_ci("LIST") || cmd.equals_ci("VIEW");
-		bool is_clear = cmd.equals_ci("CLEAR");
 		bool is_del = cmd.equals_ci("DEL");
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);

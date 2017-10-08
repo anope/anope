@@ -205,8 +205,8 @@ class DBSQL : public Module, public Pipe
 
 		if (type == nullptr)
 		{
-			for (Serialize::TypeBase *type : Serialize::TypeBase::GetTypes())
-				GetRefs(object, type, edges);
+			for (Serialize::TypeBase *t : Serialize::TypeBase::GetTypes())
+				GetRefs(object, t, edges);
 		}
 		else
 		{

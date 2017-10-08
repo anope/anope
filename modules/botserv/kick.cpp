@@ -237,9 +237,9 @@ ChanServ::Channel *KickerDataImpl::GetChannel()
 	return Get(&KickerDataType::channel);
 }
 
-void KickerDataImpl::SetChannel(ChanServ::Channel *channel)
+void KickerDataImpl::SetChannel(ChanServ::Channel *chan)
 {
-	Set(&KickerDataType::amsgs, channel);
+	Set(&KickerDataType::amsgs, chan);
 }
 
 bool KickerDataImpl::GetAmsgs()

@@ -40,11 +40,11 @@ class GlobalCore : public Module
 
  public:
 	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, GlobalService(this)
 		, EventHook<Event::Restart>(this)
 		, EventHook<Event::Shutdown>(this)
 		, EventHook<Event::NewServer>(this)
 		, EventHook<Event::Help>(this)
-		, GlobalService(this)
 	{
 	}
 

@@ -125,11 +125,13 @@ class CommandCSRegister : public Command
 		/* Implement new mode lock */
 		if (c)
 		{
-			c->CheckModes();
 			if (u)
 				c->SetCorrectModes(u, true);
 
 			EventManager::Get()->Dispatch(&Event::ChanRegistered::OnChanRegistered, ci);
+
+			// Check modes after default lock is applied
+			c->CheckModes();
 		}
 	}
 

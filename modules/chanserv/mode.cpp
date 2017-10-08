@@ -108,7 +108,7 @@ Anope::string ModeLockImpl::GetParam()
 
 void ModeLockImpl::SetParam(const Anope::string &p)
 {
-	Set(&ModeLockType::name, p);
+	Set(&ModeLockType::param, p);
 }
 
 Anope::string ModeLockImpl::GetSetter()
@@ -118,7 +118,7 @@ Anope::string ModeLockImpl::GetSetter()
 
 void ModeLockImpl::SetSetter(const Anope::string &s)
 {
-	Set(&ModeLockType::name, s);
+	Set(&ModeLockType::setter, s);
 }
 
 time_t ModeLockImpl::GetCreated()
@@ -193,7 +193,7 @@ class ModeLocksImpl : public ModeLocks
 				if (MOD_RESULT == EVENT_STOP)
 					break;
 
-				delete m;
+				m->Delete();
 				return true;
 			}
 
@@ -352,7 +352,8 @@ class CommandCSMode : public Command
 							break;
 						}
 
-						mlocks->SetMLock(ci, cm, adding, mode_param, source.GetNick());
+						if (!mlocks->SetMLock(ci, cm, adding, mode_param, source.GetNick()))
+							continue;
 
 						if (adding)
 						{

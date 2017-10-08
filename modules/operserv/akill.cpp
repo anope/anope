@@ -355,6 +355,7 @@ class CommandOSAKill : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
+
  public:
 	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 2)
 		, akills("xlinemanager/sgline")

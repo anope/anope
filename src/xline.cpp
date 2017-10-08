@@ -29,7 +29,7 @@
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::vector<XLineManager *> XLineManager::XLineManagers;
 
-void XLine::Recache()
+void XLine::Recache(const Anope::string &xlmask)
 {
 	delete regex;
 	regex = nullptr;
@@ -37,7 +37,6 @@ void XLine::Recache()
 	delete c;
 	c = nullptr;
 
-	Anope::string xlmask = GetMask();
 	if (xlmask.length() >= 2 && xlmask[0] == '/' && xlmask[xlmask.length() - 1] == '/' && Config->regex_flags)
 	{
 		Anope::string stripped_mask = xlmask.substr(1, xlmask.length() - 2);
@@ -223,7 +222,7 @@ XLineManager *XLine::GetManager()
 
 void XLineType::Mask::OnSet(XLine *s, const Anope::string &value)
 {
-	s->Recache();
+	s->Recache(value);
 }
 
 void XLineManager::RegisterXLineManager(XLineManager *xlm)

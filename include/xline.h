@@ -27,7 +27,7 @@
 /* An XLine, eg, anything added with operserv/akill, or any of the operserv/sxline commands */
 class CoreExport XLine : public Serialize::Object
 {
-	void Recache();
+	void Recache(const Anope::string &mask);
 	Anope::string nick, user, host, real;
 
 	friend class XLineType;

@@ -63,7 +63,7 @@ class AccessChanAccessImpl : public AccessChanAccess
 	int Compare(ChanAccess *other) override
 	{
 		if (this->GetSerializableType() != other->GetSerializableType())
-			return ChanAccess::Compare(other);
+			return ChanAccessImpl::Compare(other);
 
 		int lev = this->GetLevel();
 		int theirlev = anope_dynamic_static_cast<AccessChanAccess *>(other)->GetLevel();

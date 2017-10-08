@@ -248,20 +248,22 @@ class BSAssign : public Module
 
 	void OnInvite(User *source, Channel *c, User *targ) override
 	{
-		ServiceBot *bi;
-		if (Anope::ReadOnly || !c->ci || targ->server != Me || !(bi = ServiceBot::Find(targ->nick, true)))
+		ServiceBot *bi = ServiceBot::Find(targ->nick, true);
+		ChanServ::Channel *ci = c->GetChannel();
+
+		if (Anope::ReadOnly || !ci || targ->server != Me || !bi)
 			return;
 
-		ChanServ::AccessGroup access = c->ci->AccessFor(source);
+		ChanServ::AccessGroup access = ci->AccessFor(source);
 		if (!access.HasPriv("ASSIGN") && !source->HasPriv("botserv/administration"))
 		{
-			targ->SendMessage(bi, _("Access denied. You do not have privilege \002ASSIGN\002 on \002{0}\002."), c->ci->GetName());
+			targ->SendMessage(bi, _("Access denied. You do not have privilege \002ASSIGN\002 on \002{0}\002."), ci->GetName());
 			return;
 		}
 
-		if (nobot.HasExt(c->ci))
+		if (nobot.HasExt(ci))
 		{
-			targ->SendMessage(bi, _("Access denied. \002{0}\002 may not have a bot assigned to it because a Services Operator has disallowed it."), c->ci->GetName());
+			targ->SendMessage(bi, _("Access denied. \002{0}\002 may not have a bot assigned to it because a Services Operator has disallowed it."), ci->GetName());
 			return;
 		}
 
@@ -271,14 +273,14 @@ class BSAssign : public Module
 			return;
 		}
 
-		if (c->ci->GetBot() == bi)
+		if (ci->GetBot() == bi)
 		{
-			targ->SendMessage(bi, _("Bot \002{0}\002 is already assigned to \002{1}\002."), bi->nick, c->ci->GetName());
+			targ->SendMessage(bi, _("Bot \002{0}\002 is already assigned to \002{1}\002."), bi->nick, ci->GetName());
 			return;
 		}
 
-		bi->Assign(source, c->ci);
-		targ->SendMessage(bi, _("Bot \002{0}\002 has been assigned to \002{1}\002."), bi->nick, c->ci->GetName());
+		bi->Assign(source, ci);
+		targ->SendMessage(bi, _("Bot \002{0}\002 has been assigned to \002{1}\002."), bi->nick, ci->GetName());
 	}
 
 	void OnServiceBot(CommandSource &source, ServiceBot *bi, ChanServ::Channel *ci, InfoFormatter &info) override

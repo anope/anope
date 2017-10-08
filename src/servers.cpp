@@ -147,8 +147,9 @@ void Server::Burst()
 			ModeManager::StackerAdd(nullptr, c, cm, true, it2->second);
 		}
 
+		ChanServ::Channel *ci = c->GetChannel();
 		if (!c->topic.empty() && !c->topic_setter.empty())
-			IRCD->Send<messages::Topic>(c->ci ? c->ci->WhoSends() : chanserv, c, c->topic, c->topic_ts, c->topic_setter);
+			IRCD->Send<messages::Topic>(ci ? ci->WhoSends() : chanserv, c, c->topic, c->topic_ts, c->topic_setter);
 
 		c->syncing = true;
 	}

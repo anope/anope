@@ -46,11 +46,11 @@ class CommandCSUnban : public Command
 
 			for (ChanServ::Channel *ci : source.GetAccount()->GetRefs<ChanServ::Channel *>())
 			{
-				if (!ci->c || !source.AccessFor(ci).HasPriv("UNBAN"))
+				if (!ci->GetChannel() || !source.AccessFor(ci).HasPriv("UNBAN"))
 					continue;
 
 				for (unsigned int j = 0; j < modes.size(); ++j)
-					if (ci->c->Unban(source.GetUser(), modes[j]->name, true))
+					if (ci->GetChannel()->Unban(source.GetUser(), modes[j]->name, true))
 						++count;
 			}
 
@@ -68,7 +68,7 @@ class CommandCSUnban : public Command
 			return;
 		}
 
-		if (ci->c == NULL)
+		if (ci->GetChannel() == NULL)
 		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 			return;
@@ -94,12 +94,12 @@ class CommandCSUnban : public Command
 		logger.Command(source, _("{source} used {command} on {channel} to unban {0}"), u2->nick);
 
 		for (unsigned i = 0; i < modes.size(); ++i)
-			ci->c->Unban(u2, modes[i]->name, source.GetUser() == u2);
+			ci->GetChannel()->Unban(u2, modes[i]->name, source.GetUser() == u2);
 
 		if (u2 == source.GetUser())
-			source.Reply(_("You have been unbanned from \002{0}\002."), ci->c->name);
+			source.Reply(_("You have been unbanned from \002{0}\002."), ci->GetChannel()->name);
 		else
-			source.Reply(_("\002{0}\002 has been unbanned from \002{1}\002."), u2->nick, ci->c->name);
+			source.Reply(_("\002{0}\002 has been unbanned from \002{1}\002."), u2->nick, ci->GetChannel()->name);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

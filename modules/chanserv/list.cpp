@@ -98,7 +98,7 @@ class CommandCSList : public Command
 			{
 				if (ci->IsPrivate() || ci->HasFieldS("CS_SUSPENDED"))
 					continue;
-				if (ci->c && ci->c->HasMode("SECRET"))
+				if (ci->GetChannel() && ci->GetChannel()->HasMode("SECRET"))
 					continue;
 
 				if (mlocks)

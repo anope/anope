@@ -173,11 +173,11 @@ class CommandCSSuspend : public Command
 		si->SetWhen(Anope::CurTime);
 		si->SetExpires(expiry_secs ? expiry_secs + Anope::CurTime : 0);
 
-		if (ci->c)
+		if (Channel *c = ci->GetChannel())
 		{
 			std::vector<User *> users;
 
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 			{
 				ChanUserContainer *uc = it->second;
 				User *user = uc->user;
@@ -186,7 +186,7 @@ class CommandCSSuspend : public Command
 			}
 
 			for (unsigned i = 0; i < users.size(); ++i)
-				ci->c->Kick(NULL, users[i], !reason.empty() ? reason : Language::Translate(users[i], _("This channel has been suspended.")));
+				c->Kick(NULL, users[i], !reason.empty() ? reason : Language::Translate(users[i], _("This channel has been suspended.")));
 		}
 
 		logger.Admin(source, ci, _("{source} used {command} on {channel} ({0}), expires on {1}"),
@@ -329,7 +329,8 @@ class CSSuspend : public Module
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
-		if (u->HasMode("OPER") || !c->ci || !c->ci->GetRef<CSSuspendInfo *>())
+		ChanServ::Channel *ci = c->GetChannel();
+		if (u->HasMode("OPER") || !ci || !ci->GetRef<CSSuspendInfo *>())
 			return EVENT_CONTINUE;
 
 		reason = Language::Translate(u, _("This channel may not be used."));

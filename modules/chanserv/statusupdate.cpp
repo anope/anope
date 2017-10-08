@@ -25,10 +25,11 @@ class StatusUpdate : public Module
 {
 	void ApplyModes(ChanServ::Channel *ci, ChanServ::ChanAccess *access, bool set)
 	{
-		if (ci->c == nullptr)
+		Channel *c = ci->GetChannel();
+		if (c == nullptr)
 			return;
 
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
 			User *user = it->second->user;
 
@@ -40,11 +41,11 @@ class StatusUpdate : public Module
 				{
 					ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
 					if (!ag.HasPriv("AUTO" + cms->name))
-						ci->c->RemoveMode(NULL, cms, user->GetUID());
+						c->RemoveMode(NULL, cms, user->GetUID());
 				}
 
 				if (set)
-					ci->c->SetCorrectModes(user, true);
+					c->SetCorrectModes(user, true);
 			}
 		}
 	}

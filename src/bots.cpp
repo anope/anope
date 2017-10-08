@@ -139,12 +139,13 @@ void ServiceBot::UnAssign(User *u, ChanServ::Channel *ci)
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
-	if (ci->c && ci->c->FindUser(ci->GetBot()))
+	Channel *c = ci->GetChannel();
+	if (c && c->FindUser(ci->GetBot()))
 	{
 		if (u)
-			ci->GetBot()->Part(ci->c, "UNASSIGN from " + u->nick);
+			ci->GetBot()->Part(c, "UNASSIGN from " + u->nick);
 		else
-			ci->GetBot()->Part(ci->c);
+			ci->GetBot()->Part(c);
 	}
 
 	ci->SetBot(nullptr);

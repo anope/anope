@@ -1465,8 +1465,8 @@ class DBOld : public Module
 			mlock_limit.Unset(ci);
 			mlock_key.Unset(ci);
 
-			if (ci->c)
-				ci->c->CheckModes();
+			if (ci->GetChannel())
+				ci->GetChannel()->CheckModes();
 		}
 	}
 };

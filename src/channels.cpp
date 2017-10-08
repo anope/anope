@@ -59,10 +59,12 @@ Channel::~Channel()
 	if (Me && Me->IsSynced())
 		logger.Category("destroy").Log("Channel {0} was destroyed", this->GetName());
 
-	if (this->ci)
-		this->ci->c = NULL;
-
 	ChannelList.erase(this->name);
+}
+
+ChanServ::Channel *Channel::GetChannel()
+{
+	return ChanServ::Find(this->name);
 }
 
 const Anope::string &Channel::GetName() const
@@ -791,7 +793,8 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	this->topic_setter = user;
 	this->topic_ts = ts;
 
-	IRCD->Send<messages::Topic>(this->ci ? this->ci->WhoSends() : Config->GetClient("ChanServ"), this, newtopic, ts, user);
+	ChanServ::Channel *ci = this->GetChannel();
+	IRCD->Send<messages::Topic>(ci ? ci->WhoSends() : Config->GetClient("ChanServ"), this, newtopic, ts, user);
 
 	/* Now that the topic is set update the time set. This is *after* we set it so the protocol modules are able to tell the old last set time */
 	this->topic_time = Anope::CurTime;
@@ -804,7 +807,8 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 	if (user == NULL)
 		return;
 
-	if (!this->ci)
+	ChanServ::Channel *ci = this->GetChannel();
+	if (!ci)
 		return;
 
 	Anope::Logger.Debug("Setting correct user modes for {0} on {1} ({2}giving modes)", user->nick, this->name, give_modes ? "" : "not ");
@@ -890,7 +894,18 @@ bool Channel::CheckKick(User *user)
 		return false;
 
 	if (mask.empty())
-		mask = this->ci->GetIdealBan(user);
+	{
+		ChanServ::Channel *ci = this->GetChannel();
+		if (ci)
+		{
+			mask = ci->GetIdealBan(user);
+		}
+	}
+	if (mask.empty())
+	{
+		return false;
+	}
+
 	if (reason.empty())
 		reason = Language::Translate(user->Account(), _("You are not permitted to be on this channel."));
 

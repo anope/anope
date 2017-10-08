@@ -52,21 +52,22 @@ class BotServCore : public Module, public BotServ::BotServService
 	void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		/* Do not allow removing bot modes on our service bots */
-		if (chan->ci && chan->ci->GetBot() == user)
+		ChanServ::Channel *ci = chan->GetChannel();
+		if (ci && ci->GetBot() == user)
 		{
 			const Anope::string &botmodes = Config->GetModule(this)->Get<Anope::string>("botmodes");
 			for (unsigned i = 0; i < botmodes.length(); ++i)
-				chan->SetMode(chan->ci->GetBot(), ModeManager::FindChannelModeByChar(botmodes[i]), chan->ci->GetBot()->GetUID());
+				chan->SetMode(ci->GetBot(), ModeManager::FindChannelModeByChar(botmodes[i]), ci->GetBot()->GetUID());
 		}
 	}
 
 	void OnBotAssign(User *sender, ChanServ::Channel *ci, ServiceBot *bi) override
 	{
-		printf("on bot assign !\n");
-		if (ci->c && ci->c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
+		Channel *c = ci->GetChannel();
+		if (c && c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
 		{
 			ChannelStatus status(Config->GetModule(this)->Get<Anope::string>("botmodes"));
-			bi->Join(ci->c, &status);
+			bi->Join(c, &status);
 		}
 	}
 
@@ -108,7 +109,8 @@ class BotServCore : public Module, public BotServ::BotServService
 			ModeManager::ProcessModes();
 		}
 
-		if (user->server != Me && c->ci && c->ci->GetBot())
+		ChanServ::Channel *ci = c->GetChannel();
+		if (user->server != Me && ci && ci->GetBot())
 		{
 			/**
 			 * We let the bot join even if it was an ignored user, as if we don't,
@@ -117,18 +119,20 @@ class BotServCore : public Module, public BotServ::BotServService
 			 * legit users - Rob
 			 **/
 			/* This is before the user has joined the channel, so check usercount + 1 */
-			if (c->users.size() + 1 >= Config->GetModule(this)->Get<unsigned>("minusers") && !c->FindUser(c->ci->GetBot()))
+			if (c->users.size() + 1 >= Config->GetModule(this)->Get<unsigned>("minusers") && !c->FindUser(ci->GetBot()))
 			{
 				ChannelStatus status(Config->GetModule(this)->Get<Anope::string>("botmodes"));
-				c->ci->GetBot()->Join(c, &status);
+				ci->GetBot()->Join(c, &status);
 			}
 		}
 	}
 
 	void OnLeaveChannel(User *u, Channel *c) override
 	{
+		ChanServ::Channel *ci = c->GetChannel();
+
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-		if (c->ci && c->ci->IsPersist())
+		if (ci && ci->IsPersist())
 			return;
 	
 		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediately
@@ -141,9 +145,9 @@ class BotServCore : public Module, public BotServ::BotServService
 		if (inhabit && inhabit->HasExt(c))
 			return;
 
-		if (c->ci)
+		if (ci)
 		{
-			ServiceBot *bot = c->ci->GetBot();
+			ServiceBot *bot = ci->GetBot();
 
 			/* This is called prior to removing the user from the channnel, so c->users.size() - 1 should be safe */
 			if (bot && u != bot && c->users.size() - 1 <= Config->GetModule(this)->Get<unsigned>("minusers") && c->FindUser(bot))
@@ -203,9 +207,10 @@ class BotServCore : public Module, public BotServ::BotServService
 
 	EventReturn OnChannelModeSet(Channel *c, const MessageSource &source, ChannelMode *mode, const Anope::string &param) override
 	{
-		if (source.GetUser() && !source.GetBot() && Config->GetModule(this)->Get<bool>("smartjoin") && mode->name == "BAN" && c->ci && c->ci->GetBot() && c->FindUser(c->ci->GetBot()))
+		ChanServ::Channel *ci = c->GetChannel();
+		if (source.GetUser() && !source.GetBot() && Config->GetModule(this)->Get<bool>("smartjoin") && mode->name == "BAN" && ci && ci->GetBot() && c->FindUser(ci->GetBot()))
 		{
-			ServiceBot *bi = c->ci->GetBot();
+			ServiceBot *bi = ci->GetBot();
 
 			Entry ban("BAN", param);
 			if (ban.Matches(bi))

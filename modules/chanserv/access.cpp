@@ -344,8 +344,8 @@ class CommandCSAccess : public Command
 					ChanServ::ChanAccess *access = ci->GetAccess(number - 1);
 
 					Anope::string timebuf;
-					if (ci->c)
-						for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
+					if (Channel *c = ci->GetChannel())
+						for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
 						{
 							if (access->Matches(cit->second->user, cit->second->user->Account()))
 								timebuf = "Now";
@@ -378,8 +378,8 @@ class CommandCSAccess : public Command
 					continue;
 
 				Anope::string timebuf;
-				if (ci->c)
-					for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
+				if (Channel *c = ci->GetChannel())
+					for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
 					{
 						if (access->Matches(cit->second->user, cit->second->user->Account()))
 							timebuf = "Now";

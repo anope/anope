@@ -106,10 +106,12 @@ class Fantasy : public Module
 
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) override
 	{
-		if (!u || !c || !c->ci || !c->ci->GetBot() || msg.empty() || msg[0] == '\1')
+		if (!u || !c || !c->GetChannel() || !c->GetChannel()->GetBot() || msg.empty() || msg[0] == '\1')
 			return;
 
-		if (Config->GetClient("BotServ") && !c->ci->IsFantasy())
+		ChanServ::Channel *ci = c->GetChannel();
+
+		if (Config->GetClient("BotServ") && !ci->IsFantasy())
 			return;
 
 		std::vector<Anope::string> params;
@@ -121,7 +123,7 @@ class Fantasy : public Module
 		Anope::string normalized_param0 = Anope::NormalizeBuffer(params[0]);
 		Anope::string fantasy_chars = Config->GetModule(this)->Get<Anope::string>("fantasycharacter", "!");
 
-		if (!normalized_param0.find(c->ci->GetBot()->nick))
+		if (!normalized_param0.find(ci->GetBot()->nick))
 		{
 			params.erase(params.begin());
 		}
@@ -185,21 +187,21 @@ class Fantasy : public Module
 		if (params.size() < cmd->min_params)
 			return;
 
-		CommandSource source(u->nick, u, u->Account(), u, c->ci->GetBot());
+		CommandSource source(u->nick, u, u->Account(), u, ci->GetBot());
 		source.c = c;
 		source.SetCommandInfo(info);
 
-		ChanServ::AccessGroup ag = c->ci->AccessFor(u);
+		ChanServ::AccessGroup ag = ci->AccessFor(u);
 		bool has_fantasia = ag.HasPriv("FANTASIA") || source.HasPriv("botserv/fantasy");
 
 		EventReturn MOD_RESULT;
 		if (has_fantasia)
 		{
-			MOD_RESULT = EventManager::Get()->Dispatch(&Event::BotFantasy::OnBotFantasy, source, cmd, c->ci, params);
+			MOD_RESULT = EventManager::Get()->Dispatch(&Event::BotFantasy::OnBotFantasy, source, cmd, ci, params);
 		}
 		else
 		{
-			MOD_RESULT = EventManager::Get()->Dispatch(&Event::BotNoFantasyAccess::OnBotNoFantasyAccess, source, cmd, c->ci, params);
+			MOD_RESULT = EventManager::Get()->Dispatch(&Event::BotNoFantasyAccess::OnBotNoFantasyAccess, source, cmd, ci, params);
 		}
 
 		if (MOD_RESULT == EVENT_STOP || !has_fantasia)

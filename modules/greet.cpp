@@ -190,14 +190,15 @@ class Greet : public Module
 		 * to has synced, or we'll get greet-floods when the net
 		 * recovers from a netsplit. -GD
 		 */
-		if (!c->ci || !c->ci->GetBot() || !user->server->IsSynced() || !user->Account())
+		ChanServ::Channel *ci = c->GetChannel();
+		if (!ci || !ci->GetBot() || !user->server->IsSynced() || !user->Account())
 			return;
 
 		Anope::string greet = user->Account()->GetGreet();
-		if (c->ci->IsGreet() && !greet.empty() && c->FindUser(c->ci->GetBot()) && c->ci->AccessFor(user).HasPriv("GREET"))
+		if (ci->IsGreet() && !greet.empty() && c->FindUser(ci->GetBot()) && ci->AccessFor(user).HasPriv("GREET"))
 		{
-			IRCD->SendPrivmsg(c->ci->GetBot(), c->name, "[{0}] {1}", user->Account()->GetDisplay(), greet);
-			c->ci->GetBot()->lastmsg = Anope::CurTime;
+			IRCD->SendPrivmsg(ci->GetBot(), c->name, "[{0}] {1}", user->Account()->GetDisplay(), greet);
+			ci->GetBot()->lastmsg = Anope::CurTime;
 		}
 	}
 

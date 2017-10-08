@@ -34,11 +34,12 @@ class CommandCSEnforce : public Command
 		bool hadsecureops = ci->IsSecureOps();
 		ci->SetSecureOps(true);
 
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		Channel *c = ci->GetChannel();
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
 			ChanUserContainer *uc = it->second;
 
-			ci->c->SetCorrectModes(uc->user, false);
+			c->SetCorrectModes(uc->user, false);
 		}
 
 		if (!hadsecureops)
@@ -51,8 +52,9 @@ class CommandCSEnforce : public Command
 	{
 		logger.Command(source, ci, _("{source} used {command} on {channel} to enforce restricted"));
 
+		Channel *c = ci->GetChannel();
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
 			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
@@ -70,8 +72,8 @@ class CommandCSEnforce : public Command
 
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("RESTRICTED enforced by ")) + source.GetNick();
-			ci->c->SetMode(NULL, "BAN", mask);
-			ci->c->Kick(NULL, user, reason);
+			c->SetMode(NULL, "BAN", mask);
+			c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("\002Restricted\002 enforced on \002{0}\002."), ci->GetName());
@@ -81,8 +83,9 @@ class CommandCSEnforce : public Command
 	{
 		logger.Command(source, ci, _("{source} used {command} on {channel} to enforce registered only"));
 
+		Channel *c = ci->GetChannel();
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
 			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
@@ -100,9 +103,9 @@ class CommandCSEnforce : public Command
 
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("REGONLY enforced by ")) + source.GetNick();
-			if (!ci->c->HasMode("REGISTEREDONLY"))
-				ci->c->SetMode(NULL, "BAN", mask);
-			ci->c->Kick(NULL, user, reason);
+			if (!c->HasMode("REGISTEREDONLY"))
+				c->SetMode(NULL, "BAN", mask);
+			c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("\002Registered only\002 enforced on \002{0}\002."), ci->GetName());
@@ -112,8 +115,9 @@ class CommandCSEnforce : public Command
 	{
 		logger.Command(source, ci, _("{source} used {command} on {channel} to enforce SSL only"));
 
+		Channel *c = ci->GetChannel();
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
 			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
@@ -131,9 +135,9 @@ class CommandCSEnforce : public Command
 
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("SSLONLY enforced by ")) + source.GetNick();
-			if (!ci->c->HasMode("SSL"))
-				ci->c->SetMode(NULL, "BAN", mask);
-			ci->c->Kick(NULL, user, reason);
+			if (!c->HasMode("SSL"))
+				c->SetMode(NULL, "BAN", mask);
+			c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("\002SSL only\002 enforced on %s."), ci->GetName().c_str());
@@ -143,8 +147,9 @@ class CommandCSEnforce : public Command
 	{
 		logger.Command(source, ci, _("{source} used {command} on {channel} to enforce bans"));
 
+		Channel *c = ci->GetChannel();
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
 			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
@@ -152,7 +157,7 @@ class CommandCSEnforce : public Command
 			if (user->IsProtected())
 				continue;
 
-			if (ci->c->MatchesList(user, "BAN") && !ci->c->MatchesList(user, "EXCEPT"))
+			if (c->MatchesList(user, "BAN") && !c->MatchesList(user, "EXCEPT"))
 				users.push_back(user);
 		}
 
@@ -161,7 +166,7 @@ class CommandCSEnforce : public Command
 			User *user = users[i];
 
 			Anope::string reason = Language::Translate(user, _("BANS enforced by ")) + source.GetNick();
-			ci->c->Kick(NULL, user, reason);
+			c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("\002Bans\002 enforced on %s."), ci->GetName().c_str());
@@ -171,8 +176,9 @@ class CommandCSEnforce : public Command
 	{
 		logger.Command(source, ci, _("{source} used {command} on {channel} to enforce limit"));
 
+		Channel *c = ci->GetChannel();
 		Anope::string l_str;
-		if (!ci->c->GetParam("LIMIT", l_str))
+		if (!c->GetParam("LIMIT", l_str))
 		{
 			source.Reply(_("There is no limit is set on \002{0}\002."), ci->GetName());
 			return;
@@ -193,7 +199,7 @@ class CommandCSEnforce : public Command
 
 		std::vector<User *> users;
 		/* The newer users are at the end of the list, so kick users starting from the end */
-		for (Channel::ChanUserList::reverse_iterator it = ci->c->users.rbegin(), it_end = ci->c->users.rend(); it != it_end; ++it)
+		for (Channel::ChanUserList::reverse_iterator it = c->users.rbegin(), it_end = c->users.rend(); it != it_end; ++it)
 		{
 			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
@@ -204,7 +210,7 @@ class CommandCSEnforce : public Command
 			if (!ci->AccessFor(user).empty())
 				continue;
 
-			if (ci->c->users.size() - users.size() <= static_cast<unsigned>(l))
+			if (c->users.size() - users.size() <= static_cast<unsigned>(l))
 				continue;
 
 			users.push_back(user);
@@ -215,7 +221,7 @@ class CommandCSEnforce : public Command
 			User *user = users[i];
 
 			Anope::string reason = Language::Translate(user, _("LIMIT enforced by ")) + source.GetNick();
-			ci->c->Kick(NULL, user, reason);
+			c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("LIMIT enforced on \002{0}\002, \002{1]\002 users removed."), ci->GetName(), users.size());
@@ -240,7 +246,7 @@ class CommandCSEnforce : public Command
 			return;
 		}
 
-		if (!ci->c)
+		if (!ci->GetChannel())
 		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 			return;

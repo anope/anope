@@ -285,9 +285,10 @@ class CSEntryMessage : public Module
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (u && c && c->ci && u->server->IsSynced())
-			for (EntryMsg *msg : c->ci->GetRefs<EntryMsg *>())
-				u->SendMessage(c->ci->WhoSends(), "[{0}] {1}", c->ci->GetName(), msg->GetMessage());
+		ChanServ::Channel *ci = c->GetChannel();
+		if (ci && u->server->IsSynced())
+			for (EntryMsg *msg : ci->GetRefs<EntryMsg *>())
+				u->SendMessage(ci->WhoSends(), "[{0}] {1}", ci->GetName(), msg->GetMessage());
 	}
 };
 

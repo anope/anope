@@ -135,10 +135,11 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		if (ischan)
 		{
 			ChanServ::Channel *ci = ChanServ::Find(target);
+			Channel *c = ci->GetChannel();
 
-			if (ci->c)
+			if (c)
 			{
-				for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 				{
 					ChanUserContainer *cu = it->second;
 
@@ -273,12 +274,13 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (u->server && u->server->IsSynced() && c->ci && c->ci->GetMemos() && !c->ci->GetMemos()->GetMemos().empty() && c->ci->AccessFor(u).HasPriv("MEMO"))
+		ChanServ::Channel *ci = c->GetChannel();
+		if (u->server && u->server->IsSynced() && ci && ci->GetMemos() && !ci->GetMemos()->GetMemos().empty() && ci->AccessFor(u).HasPriv("MEMO"))
 		{
-			if (c->ci->GetMemos()->GetMemos().size() == 1)
-				u->SendMessage(*MemoServ, _("There is \002{0}\002 memo on channel \002{1}\002."), c->ci->GetMemos()->GetMemos().size(), c->ci->GetName());
+			if (ci->GetMemos()->GetMemos().size() == 1)
+				u->SendMessage(*MemoServ, _("There is \002{0}\002 memo on channel \002{1}\002."), ci->GetMemos()->GetMemos().size(), ci->GetName());
 			else
-				u->SendMessage(*MemoServ, _("There are \002{0}\002 memos on channel \002{1}\002."), c->ci->GetMemos()->GetMemos().size(), c->ci->GetName());
+				u->SendMessage(*MemoServ, _("There are \002{0}\002 memos on channel \002{1}\002."), ci->GetMemos()->GetMemos().size(), ci->GetName());
 		}
 	}
 

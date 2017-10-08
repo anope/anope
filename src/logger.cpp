@@ -237,8 +237,11 @@ void LogInfo::ProcessMessage(const Logger *l, const Anope::string &message)
 				User *bi = l->GetBot();
 				if (!bi)
 					bi = this->bot;
-				if (!bi && c->ci)
-					bi = c->ci->WhoSends();
+				if (!bi)
+				{
+					ChanServ::Channel *ci = c->GetChannel();
+					bi = ci->WhoSends();
+				}
 				if (bi)
 					IRCD->SendPrivmsg(bi, c->name, buffer);
 			}

@@ -23,14 +23,15 @@ class CommandCSUp : public Command
 {
 	void SetModes(User *u, Channel *c)
 	{
-		if (!c->ci)
+		ChanServ::Channel *ci = c->GetChannel();
+		if (!ci)
 			return;
 
 		/* whether or not we are giving modes */
 		bool giving = true;
 		/* whether or not we have given a mode */
 		bool given = false;
-		ChanServ::AccessGroup u_access = c->ci->AccessFor(u);
+		ChanServ::AccessGroup u_access = ci->AccessFor(u);
 
 		for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
 		{
@@ -83,7 +84,8 @@ class CommandCSUp : public Command
 			return;
 		}
 
-		if (ci->c == NULL)
+		Channel *c = ci->GetChannel();
+		if (c == nullptr)
 		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 			return;
@@ -91,7 +93,6 @@ class CommandCSUp : public Command
 
 		User *u = User::Find(nick, true);
 		User *srcu = source.GetUser();
-		Channel *c = ci->c;
 
 		if (u == NULL)
 		{
@@ -111,9 +112,9 @@ class CommandCSUp : public Command
 			return;
 		}
 
-		if (source.GetUser() && u != source.GetUser() && c->ci->IsPeace())
+		if (source.GetUser() && u != source.GetUser() && ci->IsPeace())
 		{
-			if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
+			if (ci->AccessFor(u) >= ci->AccessFor(source.GetUser()))
 			{
 				if (!source.HasOverridePriv("chanserv/administration"))
 				{
@@ -179,15 +180,14 @@ class CommandCSDown : public Command
 			return;
 		}
 
-		if (ci->c == NULL)
+		Channel *c = ci->GetChannel();
+		if (c == nullptr)
 		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 			return;
 		}
 
 		User *u = User::Find(nick, true);
-		Channel *c = ci->c;
-
 		User *srcu = source.GetUser();
 
 		if (u == NULL)
@@ -208,9 +208,9 @@ class CommandCSDown : public Command
 			return;
 		}
 
-		if (source.GetUser() && u != source.GetUser() && c->ci->IsPeace())
+		if (source.GetUser() && u != source.GetUser() && ci->IsPeace())
 		{
-			if (c->ci->AccessFor(u) >= c->ci->AccessFor(source.GetUser()))
+			if (ci->AccessFor(u) >= ci->AccessFor(source.GetUser()))
 			{
 				if (!source.HasPriv("chanserv/administration"))
 				{

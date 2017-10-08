@@ -321,12 +321,7 @@ class NSAJoin : public Module
 		for (AutoJoin *entry : channels)
 		{
 			Channel *c = Channel::Find(entry->GetChannel());
-			ChanServ::Channel *ci;
-
-			if (c)
-				ci = c->ci;
-			else
-				ci = ChanServ::Find(entry->GetChannel());
+			ChanServ::Channel *ci = ChanServ::Find(entry->GetChannel());
 
 			bool need_invite = false;
 			Anope::string key = entry->GetKey();

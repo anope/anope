@@ -107,9 +107,6 @@ class CommandCSRegister : public Command
 		ci->SetLastUsed(Anope::CurTime);
 		ci->SetBanType(2);
 
-		ci->c = c;
-		c->ci = ci;
-
 		if (c && !c->topic.empty())
 		{
 			ci->SetLastTopic(c->topic);

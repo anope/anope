@@ -32,19 +32,13 @@ void ChannelImpl::Delete()
 
 	Anope::Logger.Debug("Deleting channel {0}", this->GetName());
 
-	if (this->c)
+	::Channel *c = this->GetChannel();
+	if (c)
 	{
-		if (this->GetBot() && this->c->FindUser(this->GetBot()))
-			this->GetBot()->Part(this->c);
-
-		/* Parting the service bot can cause the channel to go away */
-
-		if (this->c)
+		if (this->GetBot() && c->FindUser(this->GetBot()))
 		{
-			if (this->c && this->c->CheckDelete())
-				this->c->QueueForDeletion();
-
-			this->c = NULL;
+			this->GetBot()->Part(c);
+			c = nullptr;
 		}
 	}
 

@@ -1323,7 +1323,8 @@ class BSKick : public Module
 		if (u->IsProtected())
 			return;
 
-		BanData::Data &bd = this->GetBanData(u, ci->c);
+		Channel *c = ci->GetChannel();
+		BanData::Data &bd = this->GetBanData(u, c);
 
 		++bd.ttb[ttbtype];
 		if (ttb && bd.ttb[ttbtype] >= ttb)
@@ -1332,15 +1333,15 @@ class BSKick : public Module
 
 			Anope::string mask = ci->GetIdealBan(u);
 
-			ci->c->SetMode(NULL, "BAN", mask);
+			c->SetMode(NULL, "BAN", mask);
 			EventManager::Get()->Dispatch(&Event::BotBan::OnBotBan, u, ci, mask);
 		}
 
-		if (!ci->c->FindUser(u))
+		if (!c->FindUser(u))
 			return;
 
 		Anope::string buf = Anope::Format(message, std::forward<Args>(args)...);
-		ci->c->Kick(ci->GetBot(), u, buf);
+		c->Kick(ci->GetBot(), u, buf);
 	}
 
  public:
@@ -1518,10 +1519,10 @@ class BSKick : public Module
 		 * But FIRST we check whether the user is protected in any
 		 * way.
 		 */
-		ChanServ::Channel *ci = c->ci;
+		ChanServ::Channel *ci = c->GetChannel();
 		if (ci == NULL)
 			return;
-		KickerData *kd = c->ci->GetRef<KickerData *>();
+		KickerData *kd = ci->GetRef<KickerData *>();
 		if (kd == NULL)
 			return;
 
@@ -1734,7 +1735,7 @@ class BSKick : public Module
 					Channel *chan = it->second->chan;
 					++it;
 
-					if (chan->ci && kd->GetAmsgs() && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
+					if (chan->GetChannel() && kd->GetAmsgs() && !chan->GetChannel()->AccessFor(u).HasPriv("NOKICK"))
 					{
 						TakeAction(ci, u, kd->GetTTBAmsgs(), TTB_AMSGS, _("Don't use AMSGs!"));
 						return;

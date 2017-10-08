@@ -41,7 +41,7 @@ class CommandCSInvite : public Command
 			return;
 		}
 
-		ChanServ::Channel *ci = c->ci;
+		ChanServ::Channel *ci = c->GetChannel();
 		if (!ci)
 		{
 			source.Reply(_("Channel \002{0}\002 isn't registered."), c->name);

@@ -209,9 +209,9 @@ class CommandCSAKick : public Command
 		}
 
 		/* Check excepts BEFORE we get this far */
-		if (ci->c)
+		if (Channel *c = ci->GetChannel())
 		{
-			std::vector<Anope::string> modes = ci->c->GetModeList("EXCEPT");
+			std::vector<Anope::string> modes = c->GetModeList("EXCEPT");
 			for (unsigned int i = 0; i < modes.size(); ++i)
 			{
 				if (Anope::Match(modes[i], mask))
@@ -510,7 +510,7 @@ class CommandCSAKick : public Command
 
 	void DoEnforce(CommandSource &source, ChanServ::Channel *ci)
 	{
-		Channel *c = ci->c;
+		Channel *c = ci->GetChannel();
 		int count = 0;
 
 		if (!c)
@@ -696,12 +696,13 @@ class CSAKick : public Module
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
-		if (!c->ci || c->MatchesList(u, "EXCEPT"))
+		ChanServ::Channel *ci = c->GetChannel();
+		if (!ci || c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;
 
-		for (unsigned j = 0, end = c->ci->GetAkickCount(); j < end; ++j)
+		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
 		{
-			AutoKick *ak = c->ci->GetAkick(j);
+			AutoKick *ak = ci->GetAkick(j);
 			bool kick = false;
 
 			if (ak->GetAccount())

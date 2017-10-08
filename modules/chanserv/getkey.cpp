@@ -46,7 +46,7 @@ class CommandCSGetKey : public Command
 		}
 
 		Anope::string key;
-		if (!ci->c || !ci->c->GetParam("KEY", key))
+		if (!ci->GetChannel() || !ci->GetChannel()->GetParam("KEY", key))
 		{
 			source.Reply(_("Channel \002{0}\002 does not have a key."), ci->GetName());
 			return;

@@ -39,7 +39,8 @@ class CommandCSSync : public Command
 			return;
 		}
 
-		if (ci->c == NULL)
+		Channel *c = ci->GetChannel();
+		if (c == nullptr)
 		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 			return;
@@ -53,8 +54,8 @@ class CommandCSSync : public Command
 
 		logger.Command(source, ci, _("{source} used {command} on {channel}"));
 
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
-			ci->c->SetCorrectModes(it->second->user, true);
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+			c->SetCorrectModes(it->second->user, true);
 
 		source.Reply(_("All user modes on \002{0}\002 have been synced."));
 	}

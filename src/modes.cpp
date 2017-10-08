@@ -595,9 +595,17 @@ void ModeManager::StackerAdd(User *bi, Channel *c, ChannelMode *cm, bool Set, co
 	StackerInfo *s = GetInfo(ChannelStackerObjects, c);
 	s->AddMode(cm, Set, Param);
 	if (bi)
+	{
 		s->bi = bi;
-	else if (c->ci)
-		s->bi = c->ci->WhoSends();
+	}
+	else
+	{
+		ChanServ::Channel *ci = c->GetChannel();
+		if (ci)
+		{
+			s->bi = ci->WhoSends();
+		}
+	}
 
 	if (!modePipe)
 		modePipe = new ModePipe();

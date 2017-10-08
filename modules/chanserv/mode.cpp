@@ -270,7 +270,7 @@ class CommandCSMode : public Command
 		return source.AccessFor(ci).HasPriv(cm->name + (self ? "ME" : ""));
 	}
 
-	void DoLock(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
+	void DoLock(CommandSource &source, ChanServ::Channel *ci, Channel *c, const std::vector<Anope::string> &params)
 	{
 		User *u = source.GetUser();
 		const Anope::string &subcommand = params[2];
@@ -340,7 +340,7 @@ class CommandCSMode : public Command
 							break;
 						}
 
-						if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
+						if (cm->type == MODE_LIST && c && IRCD->GetMaxListFor(c) && c->HasMode(cm->name) >= IRCD->GetMaxListFor(c))
 						{
 							source.Reply(_("List for mode \002{0}\002 is full."), cm->mchar);
 							break;
@@ -386,8 +386,8 @@ class CommandCSMode : public Command
 				source.Reply(_("Nothing to do."));
 			}
 
-			if (ci->c)
-				ci->c->CheckModes();
+			if (c)
+				c->CheckModes();
 		}
 		else if (subcommand.equals_ci("DEL") && !param.empty())
 		{
@@ -489,7 +489,7 @@ class CommandCSMode : public Command
 		}
 	}
 
-	void DoSet(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
+	void DoSet(CommandSource &source, ChanServ::Channel *ci, Channel *c, const std::vector<Anope::string> &params)
 	{
 		User *u = source.GetUser();
 
@@ -512,7 +512,7 @@ class CommandCSMode : public Command
 				case '*':
 					if (adding == -1 || !has_access)
 						break;
-					for (unsigned j = 0; j < ModeManager::GetChannelModes().size() && ci->c; ++j)
+					for (unsigned j = 0; j < ModeManager::GetChannelModes().size() && c; ++j)
 					{
 						ChannelMode *cm = ModeManager::GetChannelModes()[j];
 
@@ -521,9 +521,9 @@ class CommandCSMode : public Command
 							if (cm->type == MODE_REGULAR || (!adding && cm->type == MODE_PARAM))
 							{
 								if (adding)
-									ci->c->SetMode(NULL, cm);
+									c->SetMode(NULL, cm);
 								else
-									ci->c->RemoveMode(NULL, cm);
+									c->RemoveMode(NULL, cm);
 							}
 						}
 					}
@@ -540,9 +540,9 @@ class CommandCSMode : public Command
 							if (!has_access)
 								break;
 							if (adding)
-								ci->c->SetMode(NULL, cm);
+								c->SetMode(NULL, cm);
 							else
-								ci->c->RemoveMode(NULL, cm);
+								c->RemoveMode(NULL, cm);
 							break;
 						case MODE_PARAM:
 							if (!has_access)
@@ -550,9 +550,9 @@ class CommandCSMode : public Command
 							if (adding && !sep.GetToken(param))
 								break;
 							if (adding)
-								ci->c->SetMode(NULL, cm, param);
+								c->SetMode(NULL, cm, param);
 							else
-								ci->c->RemoveMode(NULL, cm);
+								c->RemoveMode(NULL, cm);
 							break;
 						case MODE_STATUS:
 						{
@@ -569,7 +569,7 @@ class CommandCSMode : public Command
 									break;
 								}
 
-								for (Channel::ChanUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+								for (Channel::ChanUserList::const_iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 								{
 									ChanUserContainer *uc = it->second;
 
@@ -584,9 +584,9 @@ class CommandCSMode : public Command
 									if (Anope::Match(uc->user->GetMask(), param))
 									{
 										if (adding)
-											ci->c->SetMode(NULL, cm, uc->user->GetUID());
+											c->SetMode(NULL, cm, uc->user->GetUID());
 										else
-											ci->c->RemoveMode(NULL, cm, uc->user->GetUID());
+											c->RemoveMode(NULL, cm, uc->user->GetUID());
 									}
 								}
 							}
@@ -622,9 +622,9 @@ class CommandCSMode : public Command
 								}
 
 								if (adding)
-									ci->c->SetMode(NULL, cm, target->GetUID());
+									c->SetMode(NULL, cm, target->GetUID());
 								else
-									ci->c->RemoveMode(NULL, cm, target->GetUID());
+									c->RemoveMode(NULL, cm, target->GetUID());
 							}
 							break;
 						}
@@ -635,15 +635,15 @@ class CommandCSMode : public Command
 								break;
 							if (adding)
 							{
-								if (IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) < IRCD->GetMaxListFor(ci->c))
-									ci->c->SetMode(NULL, cm, param);
+								if (IRCD->GetMaxListFor(c) && c->HasMode(cm->name) < IRCD->GetMaxListFor(c))
+									c->SetMode(NULL, cm, param);
 							}
 							else
 							{
-								std::vector<Anope::string> v = ci->c->GetModeList(cm->name);
+								std::vector<Anope::string> v = c->GetModeList(cm->name);
 								for (unsigned j = 0; j < v.size(); ++j)
 									if (Anope::Match(v[j], param))
-										ci->c->RemoveMode(NULL, cm, v[j]);
+										c->RemoveMode(NULL, cm, v[j]);
 							}
 					}
 			}
@@ -664,7 +664,7 @@ class CommandCSMode : public Command
 			new_params.push_back(params[0]);
 			new_params.push_back("SET");
 			new_params.push_back("-*");
-			this->DoSet(source, ci, new_params);
+			this->DoSet(source, ci, ci->GetChannel(), new_params);
 			return;
 		}
 
@@ -697,7 +697,7 @@ class CommandCSMode : public Command
 		new_params.push_back("SET");
 		new_params.push_back("-" + stringify(cm->mchar));
 		new_params.push_back("*");
-		this->DoSet(source, ci, new_params);
+		this->DoSet(source, ci, ci->GetChannel(), new_params);
 	}
 
  public:
@@ -721,6 +721,8 @@ class CommandCSMode : public Command
 			return;
 		}
 
+		Channel *c = ci->GetChannel();
+
 		if (subcommand.equals_ci("LOCK") && params.size() > 2)
 		{
 			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasOverridePriv("chanserv/administration"))
@@ -729,15 +731,19 @@ class CommandCSMode : public Command
 				return;
 			}
 
-			this->DoLock(source, ci, params);
+			this->DoLock(source, ci, c, params);
+			return;
 		}
-		else if (!ci->c)
+
+		if (!c)
 		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
+			return;
 		}
-		else if (subcommand.equals_ci("SET") && params.size() > 2)
+
+		if (subcommand.equals_ci("SET") && params.size() > 2)
 		{
-			this->DoSet(source, ci, params);
+			this->DoSet(source, ci, c, params);
 		}
 		else if (subcommand.equals_ci("CLEAR"))
 		{
@@ -807,7 +813,8 @@ class CommandCSModes : public Command
 			return;
 		}
 
-		if (!ci->c)
+		Channel *c = ci->GetChannel();
+		if (!c)
 		{
 			source.Reply(_("Channel \002%s\002 doesn't exist."), ci->GetName());
 			return;
@@ -838,16 +845,16 @@ class CommandCSModes : public Command
 			}
 		}
 
-		if (!ci->c->FindUser(targ))
+		if (!c->FindUser(targ))
 		{
 			source.Reply(_("User \002{0}\002 is not on channel \002{1}\002."), targ->nick, ci->GetName());
 			return;
 		}
 
 		if (m.first)
-			ci->c->SetMode(NULL, m.second, targ->GetUID());
+			c->SetMode(NULL, m.second, targ->GetUID());
 		else
-			ci->c->RemoveMode(NULL, m.second, targ->GetUID());
+			c->RemoveMode(NULL, m.second, targ->GetUID());
 
 		logger.Command(source, ci, _("{source} used {command} on {channel} on {3}"), targ->nick);
 	}
@@ -935,10 +942,10 @@ class CSMode : public Module
 
 	void OnCheckModes(Reference<Channel> &c) override
 	{
-		if (!c || !c->ci)
+		if (!c || !c->GetChannel())
 			return;
 
-		ModeLocks::ModeList locks = modelock.GetMLock(c->ci);
+		ModeLocks::ModeList locks = modelock.GetMLock(c->GetChannel());
 		for (ModeLock *ml : locks)
 		{
 			ChannelMode *cm = ModeManager::FindChannelModeByName(ml->GetName());

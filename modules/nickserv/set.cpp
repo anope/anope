@@ -1118,7 +1118,7 @@ class NSSet : public Module
 
 	void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
-		if (chan->ci)
+		if (chan->GetChannel())
 		{
 			/* Only give modes if autoop is set */
 			give_modes &= !user->Account() || user->Account()->IsAutoOp();

@@ -1301,38 +1301,42 @@ class ProtoUnreal : public Module
 
 	void OnChannelSync(Channel *c) override
 	{
-		if (!c->ci)
+		ChanServ::Channel *ci = c->GetChannel();
+		if (!ci)
 			return;
 
 		if (use_server_side_mlock && Servers::Capab.count("MLOCK") > 0 && mlocks)
 		{
-			Anope::string modes = mlocks->GetMLockAsString(c->ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
-			Uplink::Send(Me, "MLOCK", c->creation_time, c->ci->GetName(), modes);
+			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
+			Uplink::Send(Me, "MLOCK", c->creation_time, ci->GetName(), modes);
 		}
 	}
 
 	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
-		if (!ci->c || !use_server_side_mlock || !mlocks || !Servers::Capab.count("MLOCK"))
+		Channel *c = ci->GetChannel();
+		if (!c || !use_server_side_mlock || !mlocks || !Servers::Capab.count("MLOCK"))
 			return;
 		Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
-		Uplink::Send(Me, "MLOCK", ci->c->creation_time, ci->GetName(), modes);
+		Uplink::Send(Me, "MLOCK", c->creation_time, ci->GetName(), modes);
 	}
 
 	void OnDelChan(ChanServ::Channel *ci) override
 	{
-		if (!ci->c || !use_server_side_mlock || !Servers::Capab.count("MLOCK"))
+		Channel *c = ci->GetChannel();
+		if (!c || !use_server_side_mlock || !Servers::Capab.count("MLOCK"))
 			return;
-		Uplink::Send(Me, "MLOCK", ci->c->creation_time, ci->GetName(), "");
+		Uplink::Send(Me, "MLOCK", c->creation_time, ci->GetName(), "");
 	}
 
 	EventReturn OnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
+		Channel *c = ci->GetChannel();
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->GetName());
-		if (use_server_side_mlock && cm && mlocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
+		if (use_server_side_mlock && cm && mlocks && c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			Uplink::Send(Me, "MLOCK", ci->c->creation_time, ci->GetName(), modes);
+			Uplink::Send(Me, "MLOCK", c->creation_time, ci->GetName(), modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -1340,11 +1344,12 @@ class ProtoUnreal : public Module
 
 	EventReturn OnUnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
+		Channel *c = ci->GetChannel();
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->GetName());
-		if (use_server_side_mlock && cm && mlocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
+		if (use_server_side_mlock && cm && mlocks && c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			Uplink::Send(Me, "MLOCK", ci->c->creation_time, ci->GetName(), modes);
+			Uplink::Send(Me, "MLOCK", c->creation_time, ci->GetName(), modes);
 		}
 
 		return EVENT_CONTINUE;

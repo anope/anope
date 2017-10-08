@@ -129,7 +129,7 @@ class CommandCSTopic : public Command
 	{
 		bool has_topiclock = ci->IsTopicLock();
 		ci->SetTopicLock(false);
-		ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
+		ci->GetChannel()->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
 		if (has_topiclock)
 			ci->SetTopicLock(true);
 
@@ -144,9 +144,9 @@ class CommandCSTopic : public Command
 		const Anope::string &topic = params[2];
 
 		Anope::string new_topic;
-		if (!ci->c->topic.empty())
+		if (!ci->GetChannel()->topic.empty())
 		{
-			new_topic = ci->c->topic + " " + topic;
+			new_topic = ci->GetChannel()->topic + " " + topic;
 			ci->SetLastTopic("");
 		}
 		else
@@ -192,7 +192,7 @@ class CommandCSTopic : public Command
 		{
 			this->Unlock(source, ci, params);
 		}
-		else if (!ci->c)
+		else if (!ci->GetChannel())
 		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 		}
@@ -256,21 +256,23 @@ class CSTopic : public Module
 
 	void OnChannelSync(Channel *c) override
 	{
-		if (c->ci)
+		ChanServ::Channel *ci = c->GetChannel();
+		if (!ci)
+			return;
+
+		/* Update channel topic */
+		if ((ci->IsTopicLock() || ci->IsKeepTopic()) && ci->GetLastTopic() != c->topic)
 		{
-			/* Update channel topic */
-			if ((c->ci->IsTopicLock() || c->ci->IsKeepTopic()) && c->ci->GetLastTopic() != c->topic)
-			{
-				ServiceBot *sender = c->ci->WhoSends();
-				c->ChangeTopic(!c->ci->GetLastTopicSetter().empty() ? c->ci->GetLastTopicSetter() : (sender ? sender->nick : Me->GetName()),
-						c->ci->GetLastTopic(), c->ci->GetLastTopicTime() ? c->ci->GetLastTopicTime() : Anope::CurTime);
-			}
+			ServiceBot *sender = ci->WhoSends();
+			c->ChangeTopic(!ci->GetLastTopicSetter().empty() ? ci->GetLastTopicSetter() : (sender ? sender->nick : Me->GetName()),
+					ci->GetLastTopic(), ci->GetLastTopicTime() ? ci->GetLastTopicTime() : Anope::CurTime);
 		}
 	}
 
 	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) override
 	{
-		if (!c->ci)
+		ChanServ::Channel *ci = c->GetChannel();
+		if (!ci)
 			return;
 
 		/* We only compare the topics here, not the time or setter. This is because some (old) IRCds do not
@@ -278,15 +280,15 @@ class CSTopic : public Module
 		 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
 		 * it is not required
 		 */
-		if (c->ci->IsTopicLock() && c->ci->GetLastTopic() != c->topic && (!source || !c->ci->AccessFor(source).HasPriv("TOPIC")))
+		if (ci->IsTopicLock() && ci->GetLastTopic() != c->topic && (!source || !ci->AccessFor(source).HasPriv("TOPIC")))
 		{
-			c->ChangeTopic(c->ci->GetLastTopicSetter(), c->ci->GetLastTopic(), c->ci->GetLastTopicTime());
+			c->ChangeTopic(ci->GetLastTopicSetter(), ci->GetLastTopic(), ci->GetLastTopicTime());
 		}
 		else
 		{
-			c->ci->SetLastTopic(c->topic);
-			c->ci->SetLastTopicSetter(c->topic_setter);
-			c->ci->SetLastTopicTime(c->topic_ts);
+			ci->SetLastTopic(c->topic);
+			ci->SetLastTopicSetter(c->topic_setter);
+			ci->SetLastTopicTime(c->topic_ts);
 		}
 	}
 
@@ -298,7 +300,8 @@ class CSTopic : public Module
 			info.AddOption(_("Topic lock"));
 
 		ModeLock *secret = mlocks ? mlocks->GetMLock(ci, "SECRET") : nullptr;
-		if (!ci->GetLastTopic().empty() && (show_all || ((!secret || secret->GetSet() == false) && (!ci->c || !ci->c->HasMode("SECRET")))))
+		Channel *c = ci->GetChannel();
+		if (!ci->GetLastTopic().empty() && (show_all || ((!secret || secret->GetSet() == false) && (!c || !c->HasMode("SECRET")))))
 		{
 			info[_("Last topic")] = ci->GetLastTopic();
 			info[_("Topic set by")] = ci->GetLastTopicSetter();

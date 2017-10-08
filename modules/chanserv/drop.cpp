@@ -65,7 +65,7 @@ class CommandCSDrop : public Command
 		logger.Command(source, ci, _("{source} used {command} on {channel} (founder was: {0})"),
 				ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "none");
 
-		Reference<Channel> c = ci->c;
+		Reference<Channel> c = ci->GetChannel();
 		ci->Delete();
 
 		source.Reply(_("Channel \002{0}\002 has been dropped."), chan);

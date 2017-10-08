@@ -59,7 +59,8 @@ class CommandBSSay : public Command
 			return;
 		}
 
-		if (!ci->c || !ci->c->FindUser(ci->GetBot()))
+		Channel *c = ci->GetChannel();
+		if (!c || !c->FindUser(ci->GetBot()))
 		{
 			source.Reply(_("Bot \002{0}\002 is not on channel \002{1}\002."), ci->GetBot()->nick, ci->GetName());
 			return;
@@ -130,7 +131,8 @@ class CommandBSAct : public Command
 			return;
 		}
 
-		if (!ci->c || !ci->c->FindUser(ci->GetBot()))
+		Channel *c = ci->GetChannel();
+		if (!c || !c->FindUser(ci->GetBot()))
 		{
 			source.Reply(_("Bot \002{0}\002 is not on channel \002{1}\002."), ci->GetBot()->nick, ci->GetName());
 			return;

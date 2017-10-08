@@ -53,8 +53,6 @@ class CoreExport Channel : public Base, public Extensible
  public:
  	/* Channel name */
 	Anope::string name;
-	/* Set if this channel is registered. ci->c == this. Contains information relevant to the registered channel */
-	Serialize::Reference<ChanServ::Channel> ci;
 	/* When the channel was created */
 	time_t creation_time;
 	/* If the channel has just been created in a netjoin */
@@ -97,6 +95,10 @@ class CoreExport Channel : public Base, public Extensible
 	/** Destructor
 	 */
 	~Channel();
+
+	/** Get the chanserv channel for this channel
+	 */
+	ChanServ::Channel *GetChannel();
 
 	/** Gets the channels name
 	 * @return the channel name

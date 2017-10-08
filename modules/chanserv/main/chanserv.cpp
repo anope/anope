@@ -32,7 +32,6 @@
 
 class ChanServCore : public Module
 	, public ChanServ::ChanServService
-	, public EventHook<Event::ChannelCreate>
 	, public EventHook<Event::BotDelete>
 	, public EventHook<Event::BotPrivmsg>
 	, public EventHook<Event::DelCore>
@@ -61,7 +60,6 @@ class ChanServCore : public Module
  public:
 	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 		, ChanServService(this)
-		, EventHook<Event::ChannelCreate>(this)
 		, EventHook<Event::BotDelete>(this)
 		, EventHook<Event::BotPrivmsg>(this)
 		, EventHook<Event::DelCore>(this)
@@ -115,15 +113,21 @@ class ChanServCore : public Module
 			/** Constructor
 			 * @param chan The channel
 			 */
-			ChanServTimer(Reference<ServiceBot> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan) : Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s")), ChanServ(cs), inhabit(i), c(chan)
+			ChanServTimer(Reference<ServiceBot> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan) : Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s"))
+				, ChanServ(cs)
+				, inhabit(i)
+				, c(chan)
 			{
 				if (!ChanServ || !c)
 					return;
+
 				inhabit.Set(c, true);
-				if (!c->ci || !c->ci->GetBot())
+
+				ChanServ::Channel *ci = c->GetChannel();
+				if (!ci || !ci->GetBot())
 					ChanServ->Join(c);
-				else if (!c->FindUser(c->ci->GetBot()))
-					c->ci->GetBot()->Join(c);
+				else if (!c->FindUser(ci->GetBot()))
+					ci->GetBot()->Join(c);
 
 				/* Set +ntsi to prevent rejoin */
 				c->SetMode(NULL, "NOEXTERNAL");
@@ -146,14 +150,17 @@ class ChanServCore : public Module
 				c->RemoveMode(NULL, "SECRET");
 				c->RemoveMode(NULL, "INVITE");
 
-				if (!c->ci || !c->ci->GetBot())
+				ChanServ::Channel *ci = c->GetChannel();
+				if (!ci || !ci->GetBot())
 				{
 					if (ChanServ)
 						ChanServ->Part(c);
 				}
 				/* If someone has rejoined this channel in the meantime, don't part the bot */
 				else if (c->users.size() <= 1)
-					c->ci->GetBot()->Part(c);
+				{
+					ci->GetBot()->Part(c);
+				}
 			}
 		};
 
@@ -248,13 +255,6 @@ class ChanServCore : public Module
 			defaults.clear();
 	}
 
-	void OnChannelCreate(Channel *c) override
-	{
-		c->ci = Find(c->name);
-		if (c->ci)
-			c->ci->c = c;
-	}
-
 	void OnBotDelete(ServiceBot *bi) override
 	{
 		if (bi == ChanServ)
@@ -324,14 +324,15 @@ class ChanServCore : public Module
 
 	void OnDelChan(ChanServ::Channel *ci) override
 	{
-		if (ci->c)
-		{
-			ci->c->RemoveMode(ci->WhoSends(), "REGISTERED", "", false);
+		Channel *c = ci->GetChannel();
+		if (c == nullptr)
+			return;
 
-			const Anope::string &require = Config->GetModule(this)->Get<Anope::string>("require");
-			if (!require.empty())
-				ci->c->SetModes(ci->WhoSends(), false, "-%s", require.c_str());
-		}
+		c->RemoveMode(ci->WhoSends(), "REGISTERED", "", false);
+
+		const Anope::string &require = Config->GetModule(this)->Get<Anope::string>("require");
+		if (!require.empty())
+			c->SetModes(ci->WhoSends(), false, "-%s", require.c_str());
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -371,7 +372,8 @@ class ChanServCore : public Module
 		if (!c)
 			return;
 
-		if (c->ci)
+		ChanServ::Channel *ci = c->GetChannel();
+		if (ci)
 			c->SetMode(nullptr, "REGISTERED", "", false);
 		else
 			c->RemoveMode(nullptr, "REGISTERED", "", false);
@@ -379,7 +381,7 @@ class ChanServCore : public Module
 		const Anope::string &require = Config->GetModule(this)->Get<Anope::string>("require");
 		if (!require.empty())
 		{
-			if (c->ci)
+			if (ci)
 				c->SetModes(nullptr, false, "+%s", require.c_str());
 			else
 				c->SetModes(nullptr, false, "-%s", require.c_str());
@@ -396,7 +398,8 @@ class ChanServCore : public Module
 
 	void OnChannelSync(Channel *c) override
 	{
-		bool perm = c->HasMode("PERM") || (c->ci && c->ci->IsPersist());
+		ChanServ::Channel *ci = c->GetChannel();
+		bool perm = c->HasMode("PERM") || (ci && ci->IsPersist());
 		if (!perm && !c->botchannel && (c->users.empty() || (c->users.size() == 1 && c->users.begin()->second->user->server == Me)))
 		{
 			this->Hold(c);
@@ -425,10 +428,11 @@ class ChanServCore : public Module
 
 			if (Anope::CurTime - ci->GetLastUsed() >= chanserv_expire)
 			{
-				if (ci->c)
+				Channel *c = ci->GetChannel();
+				if (c)
 				{
 					time_t last_used = ci->GetLastUsed();
-					for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end && last_used == ci->GetLastUsed(); ++cit)
+					for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end && last_used == ci->GetLastUsed(); ++cit)
 						ci->AccessFor(cit->second->user);
 					expire = last_used == ci->GetLastUsed();
 				}
@@ -465,14 +469,14 @@ class ChanServCore : public Module
 		{
 			if (ci->IsPersist())
 			{
-				bool c;
-				ci->c = Channel::FindOrCreate(ci->GetName(), c, ci->GetTimeRegistered());
+				bool created;
+				Channel *c = Channel::FindOrCreate(ci->GetName(), created, ci->GetTimeRegistered());
 
 				if (ModeManager::FindChannelModeByName("PERM") != NULL)
 				{
-					if (c)
-						IRCD->Send<messages::MessageChannel>(ci->c);
-					ci->c->SetMode(NULL, "PERM");
+					if (created)
+						IRCD->Send<messages::MessageChannel>(c);
+					c->SetMode(NULL, "PERM");
 				}
 				else
 				{
@@ -483,12 +487,12 @@ class ChanServCore : public Module
 							bi->Assign(nullptr, ci);
 					}
 
-					if (ci->GetBot() != nullptr && ci->c->FindUser(ci->GetBot()) == nullptr)
+					if (ci->GetBot() != nullptr && c->FindUser(ci->GetBot()) == nullptr)
 					{
 						Anope::string botmodes = Config->GetModule("botserv/main")->Get<Anope::string>("botmodes",
 								Config->GetModule("chanserv/main")->Get<Anope::string>("botmodes"));
 						ChannelStatus status(botmodes);
-						ci->GetBot()->Join(ci->c, &status);
+						ci->GetBot()->Join(c, &status);
 					}
 				}
 			}
@@ -502,24 +506,26 @@ class ChanServCore : public Module
 		for (unsigned i = 0; i < defaults.size(); ++i)
 			ci->SetS<bool>(defaults[i].upper(), true);
 
-		if (!ci->c)
+		Channel *c = ci->GetChannel();
+		if (!c)
 			return;
 		/* Mark the channel as persistent */
-		if (ci->c->HasMode("PERM"))
+		if (c->HasMode("PERM"))
 			ci->SetPersist(true);
 		/* Persist may be in def cflags, set it here */
 		else if (ci->IsPersist())
-			ci->c->SetMode(NULL, "PERM");
+			c->SetMode(NULL, "PERM");
 	}
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (!c->ci)
+		ChanServ::Channel *ci = c->GetChannel();
+		if (!ci)
 			return;
 
-		time_t ts = c->ci->GetChannelTS();
+		time_t ts = ci->GetChannelTS();
 		if (ts == 0)
-			ts = c->ci->GetTimeRegistered();
+			ts = ci->GetTimeRegistered();
 
 		if (c->creation_time > ts)
 		{

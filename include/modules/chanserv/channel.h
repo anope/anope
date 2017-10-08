@@ -25,11 +25,11 @@ namespace ChanServ
 class CoreExport Channel : public Serialize::Object
 {
  public:
-	::Channel *c = nullptr;                               /* Pointer to channel, if the channel exists */
-
 	static constexpr const char *const NAME = "channel";
 
 	using Serialize::Object::Object;
+
+	::Channel *GetChannel() { return ::Channel::Find(GetName()); }
 
 	virtual Anope::string GetName() anope_abstract;
 	virtual void SetName(const Anope::string &) anope_abstract;

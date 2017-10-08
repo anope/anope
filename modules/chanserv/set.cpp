@@ -384,8 +384,8 @@ class CommandCSSetKeepModes : public Command
 
 			ci->SetKeepModes(true);
 			source.Reply(_("Keep modes for \002{0}\002 is now \002on\002."), ci->GetName());
-			if (ci->c)
-				for (const std::pair<Anope::string, Anope::string> &p : ci->c->GetModes())
+			if (Channel *c = ci->GetChannel())
+				for (const std::pair<Anope::string, Anope::string> &p : c->GetModes())
 				{
 					ChanServ::Mode *mode = Serialize::New<ChanServ::Mode *>();
 					mode->SetChannel(ci);
@@ -538,10 +538,11 @@ class CommandCSSetPersist : public Command
 				ci->SetPersist(true);
 
 				/* Channel doesn't exist, create it */
-				if (!ci->c)
+				Channel *c = ci->GetChannel();
+				if (!c)
 				{
 					bool created;
-					Channel *c = Channel::FindOrCreate(ci->GetName(), created);
+					c = Channel::FindOrCreate(ci->GetName(), created);
 					if (ci->GetBot())
 					{
 						ChannelStatus status(BotModes());
@@ -554,8 +555,8 @@ class CommandCSSetPersist : public Command
 				/* Set the perm mode */
 				if (cm)
 				{
-					if (ci->c && !ci->c->HasMode("PERM"))
-						ci->c->SetMode(NULL, cm);
+					if (c && !c->HasMode("PERM"))
+						c->SetMode(NULL, cm);
 					/* Add it to the channels mlock */
 					if (mlocks)
 						mlocks->SetMLock(ci, cm, true, "", source.GetNick());
@@ -573,10 +574,10 @@ class CommandCSSetPersist : public Command
 					}
 
 					ChanServ->Assign(NULL, ci);
-					if (!ci->c->FindUser(ChanServ))
+					if (!c->FindUser(ChanServ))
 					{
 						ChannelStatus status(BotModes());
-						ChanServ->Join(ci->c, &status);
+						ChanServ->Join(c, &status);
 					}
 				}
 			}
@@ -597,8 +598,9 @@ class CommandCSSetPersist : public Command
 				/* Unset perm mode */
 				if (cm)
 				{
-					if (ci->c && ci->c->HasMode("PERM"))
-						ci->c->RemoveMode(NULL, cm);
+					Channel *c = ci->GetChannel();
+					if (c && c->HasMode("PERM"))
+						c->RemoveMode(NULL, cm);
 					/* Remove from mlock */
 					if (mlocks)
 						mlocks->RemoveMLock(ci, cm, true);
@@ -1130,17 +1132,20 @@ class CSSet : public Module
 
 	void OnChannelSync(Channel *c) override
 	{
-		if (c->ci && c->ci->IsKeepModes())
-			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>())
-				c->SetMode(c->ci->WhoSends(), m->GetMode(), m->GetParam());
+		ChanServ::Channel *ci = c->GetChannel();
+		if (ci && ci->IsKeepModes())
+			for (ChanServ::Mode *m : ci->GetRefs<ChanServ::Mode *>())
+				c->SetMode(ci->WhoSends(), m->GetMode(), m->GetParam());
 	}
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
-		if (!c->ci || !c->ci->IsRestricted() || c->MatchesList(u, "EXCEPT"))
+		ChanServ::Channel *ci = c->GetChannel();
+
+		if (!ci || !ci->IsRestricted() || c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;
 
-		if (c->ci->AccessFor(u).empty() && (!c->ci->GetFounder() || u->Account() != c->ci->GetFounder()))
+		if (ci->AccessFor(u).empty() && (!ci->GetFounder() || u->Account() != ci->GetFounder()))
 			return EVENT_STOP;
 
 		return EVENT_CONTINUE;
@@ -1148,30 +1153,32 @@ class CSSet : public Module
 
 	void OnDelChan(ChanServ::Channel *ci) override
 	{
-		if (ci->c && ci->IsPersist())
+		Channel *c = ci->GetChannel();
+		if (c && ci->IsPersist())
 		{
-			ci->c->RemoveMode(ci->WhoSends(), "PERM", "", false);
+			c->RemoveMode(ci->WhoSends(), "PERM", "", false);
 			ci->SetPersist(false);
 		}
 	}
 
 	EventReturn OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
-		if (c->ci)
-		{
-			/* Channel mode +P or so was set, mark this channel as persistent */
-			if (mode->name == "PERM")
-				c->ci->SetPersist(true);
+		ChanServ::Channel *ci = c->GetChannel();
+		if (ci == nullptr)
+			return EVENT_CONTINUE;
 
-			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
+		/* Channel mode +P or so was set, mark this channel as persistent */
+		if (mode->name == "PERM")
+			ci->SetPersist(true);
+
+		if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
+		{
+			ChanServ::Mode *m = Serialize::New<ChanServ::Mode *>();
+			if (m != nullptr)
 			{
-				ChanServ::Mode *m = Serialize::New<ChanServ::Mode *>();
-				if (m != nullptr)
-				{
-					m->SetChannel(c->ci);
-					m->SetMode(mode->name);
-					m->SetParam(param);
-				}
+				m->SetChannel(ci);
+				m->SetMode(mode->name);
+				m->SetParam(param);
 			}
 		}
 
@@ -1180,14 +1187,16 @@ class CSSet : public Module
 
 	EventReturn OnChannelModeUnset(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
+		ChanServ::Channel *ci = c->GetChannel();
+
 		if (mode->name == "PERM")
 		{
-			if (c->ci)
-				c->ci->SetPersist(false);
+			if (ci)
+				ci->SetPersist(false);
 		}
 
-		if (c->ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
-			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>())
+		if (ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
+			for (ChanServ::Mode *m : ci->GetRefs<ChanServ::Mode *>())
 				if (m->GetMode() == mode->name && m->GetParam().equals_ci(param))
 					m->Delete();
 
@@ -1196,10 +1205,12 @@ class CSSet : public Module
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (persist_lower_ts && c->ci && c->ci->IsPersist() && c->creation_time > c->ci->GetTimeRegistered())
+		ChanServ::Channel *ci = c->GetChannel();
+
+		if (persist_lower_ts && ci && ci->IsPersist() && c->creation_time > ci->GetTimeRegistered())
 		{
-			logger.Debug("Changing TS of {0} from {1} to {2}", c->name, c->creation_time, c->ci->GetTimeRegistered());
-			c->creation_time = c->ci->GetTimeRegistered();
+			logger.Debug("Changing TS of {0} from {1} to {2}", c->name, c->creation_time, ci->GetTimeRegistered());
+			c->creation_time = ci->GetTimeRegistered();
 			IRCD->Send<messages::MessageChannel>(c);
 			c->Reset();
 		}
@@ -1207,14 +1218,15 @@ class CSSet : public Module
 
 	void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
-		if (chan->ci)
-		{
-			if (chan->ci->IsNoAutoop())
-				give_modes = false;
-			if (chan->ci->IsSecureOps() && !user->HasPriv("chanserv/administration"))
-				// This overrides what chanserv does because it is loaded after chanserv
-				take_modes = true;
-		}
+		ChanServ::Channel *ci = chan->GetChannel();
+		if (ci == nullptr)
+			return;
+
+		if (ci->IsNoAutoop())
+			give_modes = false;
+		if (ci->IsSecureOps() && !user->HasPriv("chanserv/administration"))
+			// This overrides what chanserv does because it is loaded after chanserv
+			take_modes = true;
 	}
 
 	void OnPreChanExpire(ChanServ::Channel *ci, bool &expire) override

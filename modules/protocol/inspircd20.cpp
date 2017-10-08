@@ -990,26 +990,30 @@ void inspircd20::Metadata::Run(MessageSource &source, const std::vector<Anope::s
 	else if ((params[0][0] == '#') && (!source.GetServer()->IsSynced()))
 	{
 		Channel *c = Channel::Find(params[0]);
-		if (c && c->ci)
-		{
-			if ((do_mlock) && (params[1] == "mlock"))
-			{
-				ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
-				Anope::string modes;
-				if (modelocks)
-					modes = modelocks->GetMLockAsString(c->ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
+		if (c == nullptr)
+			return;
 
-				// Mode lock string is not what we say it is?
-				if (modes != params[2])
-					Uplink::Send(Me, "METADATA", c->name, "mlock", modes);
-			}
-			else if ((do_topiclock) && (params[1] == "topiclock"))
-			{
-				bool mystate = c->ci->IsTopicLock();
-				bool serverstate = (params[2] == "1");
-				if (mystate != serverstate)
-					Uplink::Send(Me, "METADATA", c->name, "topiclock", mystate ? "1" : "");
-			}
+		ChanServ::Channel *ci = c->GetChannel();
+		if (ci == nullptr)
+			return;
+
+		if ((do_mlock) && (params[1] == "mlock"))
+		{
+			ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
+			Anope::string modes;
+			if (modelocks)
+				modes = modelocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
+
+			// Mode lock string is not what we say it is?
+			if (modes != params[2])
+				Uplink::Send(Me, "METADATA", c->name, "mlock", modes);
+		}
+		else if ((do_topiclock) && (params[1] == "topiclock"))
+		{
+			bool mystate = ci->IsTopicLock();
+			bool serverstate = (params[2] == "1");
+			if (mystate != serverstate)
+				Uplink::Send(Me, "METADATA", c->name, "topiclock", mystate ? "1" : "");
 		}
 	}
 	else if (params[0] == "*")
@@ -1495,41 +1499,45 @@ class ProtoInspIRCd20 : public Module
 
 	void OnChannelSync(Channel *c) override
 	{
-		if (c->ci)
-			this->OnChanRegistered(c->ci);
+		ChanServ::Channel *ci = c->GetChannel();
+		if (ci)
+			this->OnChanRegistered(ci);
 	}
 
 	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
-		if (use_server_side_mlock && ci->c && mlocks && !mlocks->GetMLockAsString(ci, false).empty())
+		Channel *c = ci->GetChannel();
+		if (use_server_side_mlock && c && mlocks && !mlocks->GetMLockAsString(ci, false).empty())
 		{
 			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
-			SendChannelMetadata(ci->c, "mlock", modes);
+			SendChannelMetadata(c, "mlock", modes);
 		}
 
-		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && ci->c)
+		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && c)
 		{
 			if (ci->IsTopicLock())
-				SendChannelMetadata(ci->c, "topiclock", "1");
+				SendChannelMetadata(c, "topiclock", "1");
 		}
 	}
 
 	void OnDelChan(ChanServ::Channel *ci) override
 	{
-		if (use_server_side_mlock && ci->c)
-			SendChannelMetadata(ci->c, "mlock", "");
+		Channel *c = ci->GetChannel();
+		if (use_server_side_mlock && c)
+			SendChannelMetadata(c, "mlock", "");
 
-		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && ci->c)
-			SendChannelMetadata(ci->c, "topiclock", "");
+		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && c)
+			SendChannelMetadata(c, "topiclock", "");
 	}
 
 	EventReturn OnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
+		Channel *c = ci->GetChannel();
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->GetName());
-		if (use_server_side_mlock && cm && ci->c && mlocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
+		if (use_server_side_mlock && cm && c && mlocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
 			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			SendChannelMetadata(ci->c, "mlock", modes);
+			SendChannelMetadata(c, "mlock", modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -1537,11 +1545,12 @@ class ProtoInspIRCd20 : public Module
 
 	EventReturn OnUnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
+		Channel *c = ci->GetChannel();
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->GetName());
-		if (use_server_side_mlock && cm && ci->c && mlocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
+		if (use_server_side_mlock && cm && c && mlocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
 			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			SendChannelMetadata(ci->c, "mlock", modes);
+			SendChannelMetadata(c, "mlock", modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -1549,12 +1558,13 @@ class ProtoInspIRCd20 : public Module
 
 	EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChanServ::Channel *ci, const Anope::string &setting) override
 	{
-		if (cmd->GetName() == "chanserv/topic" && ci->c)
+		Channel *c = ci->GetChannel();
+		if (cmd->GetName() == "chanserv/topic" && c)
 		{
 			if (setting == "topiclock on")
-				SendChannelMetadata(ci->c, "topiclock", "1");
+				SendChannelMetadata(c, "topiclock", "1");
 			else if (setting == "topiclock off")
-				SendChannelMetadata(ci->c, "topiclock", "0");
+				SendChannelMetadata(c, "topiclock", "0");
 		}
 
 		return EVENT_CONTINUE;

@@ -101,27 +101,25 @@ public:
 			target_ci->SetTimeRegistered(Anope::CurTime);
 			ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
 			map[target_ci->GetName()] = target_ci;
-			target_ci->c = Channel::Find(target_ci->GetName());
+			Channel *target_channel = Channel::Find(target_ci->GetName());
 
 			if (ci->GetBot())
 				ci->GetBot()->Assign(u, target_ci);
 			else
 				target_ci->SetBot(nullptr);
 
-			if (target_ci->c)
+			if (target_channel)
 			{
-				target_ci->c->ci = target_ci;
+				target_channel->CheckModes();
 
-				target_ci->c->CheckModes();
-
-				target_ci->c->SetCorrectModes(u, true);
+				target_channel->SetCorrectModes(u, true);
 			}
 
-			if (target_ci->c && !target_ci->c->topic.empty())
+			if (target_channel && !target_channel->topic.empty())
 			{
 				target_ci->SetLastTopic(target_ci->GetLastTopic());
-				target_ci->SetLastTopicSetter(target_ci->c->topic_setter);
-				target_ci->SetLastTopicTime(target_ci->c->topic_time);
+				target_ci->SetLastTopicSetter(target_channel->topic_setter);
+				target_ci->SetLastTopicTime(target_channel->topic_time);
 			}
 			else
 			{

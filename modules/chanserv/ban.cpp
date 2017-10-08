@@ -61,7 +61,7 @@ class CommandCSBan : public Command
 			return;
 		}
 
-		Channel *c = ci->c;
+		Channel *c = ci->GetChannel();
 		if (c == NULL)
 		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
@@ -213,7 +213,7 @@ class CommandCSBan : public Command
 						continue;
 					if (u != uc->user && ci->IsPeace() && u2_access >= u_access)
 						continue;
-					else if (ci->c->MatchesList(uc->user, "EXCEPT"))
+					else if (c->MatchesList(uc->user, "EXCEPT"))
 						continue;
 					else if (uc->user->IsProtected())
 						continue;

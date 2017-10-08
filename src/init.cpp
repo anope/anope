@@ -594,6 +594,8 @@ void Anope::Init(int ac, char **av)
 	EventManager::Get()->Dispatch(&Event::LoadDatabase::OnLoadDatabase);;
 	Anope::Logger.Log("Databases loaded");
 
+	EventManager::Get()->Dispatch(&Event::PostInit::OnPostInit);
+
 	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 		it->second->Sync();
 }

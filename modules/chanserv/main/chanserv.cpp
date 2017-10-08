@@ -43,7 +43,7 @@ class ChanServCore : public Module
 	, public EventHook<Event::Log>
 	, public EventHook<Event::ExpireTick>
 	, public EventHook<Event::CheckDelete>
-	, public EventHook<Event::PreUplinkSync>
+	, public EventHook<Event::PostInit>
 	, public EventHook<Event::ChanRegistered>
 	, public EventHook<Event::JoinChannel>
 	, public EventHook<Event::ChanInfo>
@@ -71,7 +71,7 @@ class ChanServCore : public Module
 		, EventHook<Event::Log>(this)
 		, EventHook<Event::ExpireTick>(this)
 		, EventHook<Event::CheckDelete>(this)
-		, EventHook<Event::PreUplinkSync>(this)
+		, EventHook<Event::PostInit>(this)
 		, EventHook<Event::ChanRegistered>(this)
 		, EventHook<Event::JoinChannel>(this)
 		, EventHook<Event::ChanInfo>(this)
@@ -462,42 +462,42 @@ class ChanServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnPreUplinkSync(Server *serv) override
+	void OnPostInit() override
 	{
-		/* Find all persistent channels and create them, as we are about to finish burst to our uplink */
+		ChannelMode *perm = ModeManager::FindChannelModeByName("PERM");
+
+		/* Find all persistent channels and create them, so they will be bursted to the uplink */
 		for (ChanServ::Channel *ci : Serialize::GetObjects<ChanServ::Channel *>())
 		{
-			if (ci->IsPersist())
+			if (!ci->IsPersist())
+				continue;
+
+			bool created;
+			Channel *c = Channel::FindOrCreate(ci->GetName(), created, ci->GetTimeRegistered());
+			c->syncing |= created;
+
+			if (perm != nullptr)
 			{
-				bool created;
-				Channel *c = Channel::FindOrCreate(ci->GetName(), created, ci->GetTimeRegistered());
-
-				if (ModeManager::FindChannelModeByName("PERM") != NULL)
+				c->SetMode(NULL, perm);
+			}
+			else
+			{
+				if (!ci->GetBot())
 				{
-					if (created)
-						IRCD->Send<messages::MessageChannel>(c);
-					c->SetMode(NULL, "PERM");
+					ServiceBot *bi = ci->WhoSends();
+					if (bi != nullptr)
+						bi->Assign(nullptr, ci);
 				}
-				else
-				{
-					if (!ci->GetBot())
-					{
-						ServiceBot *bi = ci->WhoSends();
-						if (bi != nullptr)
-							bi->Assign(nullptr, ci);
-					}
 
-					if (ci->GetBot() != nullptr && c->FindUser(ci->GetBot()) == nullptr)
-					{
-						Anope::string botmodes = Config->GetModule("botserv/main")->Get<Anope::string>("botmodes",
-								Config->GetModule("chanserv/main")->Get<Anope::string>("botmodes"));
-						ChannelStatus status(botmodes);
-						ci->GetBot()->Join(c, &status);
-					}
+				if (ci->GetBot() != nullptr && c->FindUser(ci->GetBot()) == nullptr)
+				{
+					Anope::string botmodes = Config->GetModule("botserv/main")->Get<Anope::string>("botmodes",
+							Config->GetModule("chanserv/main")->Get<Anope::string>("botmodes"));
+					ChannelStatus status(botmodes);
+					ci->GetBot()->Join(c, &status);
 				}
 			}
 		}
-
 	}
 
 	void OnChanRegistered(ChanServ::Channel *ci) override

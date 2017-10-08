@@ -129,6 +129,7 @@ void Server::Burst()
 
 	ServiceBot *chanserv = Config->GetClient("ChanServ");
 
+	/* Burst channel state */
 	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 	{
 		Channel *c = it->second;
@@ -139,6 +140,7 @@ void Server::Burst()
 			for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
 				IRCD->Send<messages::Join>(cit->second->user, c, &cit->second->status);
 
+		/* Burst b/e/I */
 		for (Channel::ModeList::const_iterator it2 = c->GetModes().begin(); it2 != c->GetModes().end(); ++it2)
 		{
 			ChannelMode *cm = ModeManager::FindChannelModeByName(it2->first);
@@ -151,6 +153,7 @@ void Server::Burst()
 		if (!c->topic.empty() && !c->topic_setter.empty())
 			IRCD->Send<messages::Topic>(ci ? ci->WhoSends() : chanserv, c, c->topic, c->topic_ts, c->topic_setter);
 
+		/* Cause other channel metadata to be synced */
 		c->syncing = true;
 	}
 }

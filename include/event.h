@@ -154,6 +154,17 @@ class EventManager
 
 namespace Event
 {
+	struct CoreExport PostInit : Events
+	{
+		static constexpr const char *NAME = "postinit";
+
+		using Events::Events;
+
+		/** Called after initialization but before connect
+		 */
+		virtual void OnPostInit() anope_abstract;
+	};
+
 	struct CoreExport PreUserKicked : Events
 	{
 		static constexpr const char *NAME = "preuserkicked";

@@ -18,15 +18,12 @@
  */
 
 #include "module.h"
-#include "modules/chanserv/mode.h"
 #include "modules/chanserv.h"
 #include "modules/chanserv/info.h"
 #include "modules/chanserv/set.h"
 
 class CommandCSSet : public Command
 {
-	ServiceReference<ModeLocks> mlocks;
-
  public:
 	CommandCSSet(Module *creator) : Command(creator, "chanserv/set", 2, 3)
 	{
@@ -491,8 +488,6 @@ inline static Anope::string BotModes()
 
 class CommandCSSetPersist : public Command
 {
-	ServiceReference<ModeLocks> mlocks;
-
  public:
 	CommandCSSetPersist(Module *creator, const Anope::string &cname = "chanserv/set/persist") : Command(creator, cname, 2, 2)
 	{
@@ -537,47 +532,33 @@ class CommandCSSetPersist : public Command
 			{
 				ci->SetPersist(true);
 
-				/* Channel doesn't exist, create it */
 				Channel *c = ci->GetChannel();
-				if (!c)
+				if (c)
 				{
-					bool created;
-					c = Channel::FindOrCreate(ci->GetName(), created);
-					if (ci->GetBot())
+					/* Set the perm mode */
+					if (cm)
 					{
-						ChannelStatus status(BotModes());
-						ci->GetBot()->Join(c, &status);
+						if (c && !c->HasMode("PERM"))
+							c->SetMode(NULL, cm);
 					}
-					if (created)
-						c->Sync();
-				}
-
-				/* Set the perm mode */
-				if (cm)
-				{
-					if (c && !c->HasMode("PERM"))
-						c->SetMode(NULL, cm);
-					/* Add it to the channels mlock */
-					if (mlocks)
-						mlocks->SetMLock(ci, cm, true, "", source.GetNick());
-				}
-				/* No botserv bot, no channel mode, give them ChanServ.
-				 * Yes, this works fine with no BotServ.
-				 */
-				else if (!ci->GetBot())
-				{
-					ServiceBot *ChanServ = Config->GetClient("ChanServ");
-					if (!ChanServ)
+					/* No botserv bot, no channel mode, give them ChanServ.
+					 * Yes, this works fine with no BotServ.
+					 */
+					else if (!ci->GetBot())
 					{
-						source.Reply(_("ChanServ is required to enable persist on this network."));
-						return;
-					}
+						ServiceBot *ChanServ = Config->GetClient("ChanServ");
+						if (!ChanServ)
+						{
+							source.Reply(_("ChanServ is required to enable persist on this network."));
+							return;
+						}
 
-					ChanServ->Assign(NULL, ci);
-					if (!c->FindUser(ChanServ))
-					{
-						ChannelStatus status(BotModes());
-						ChanServ->Join(c, &status);
+						ChanServ->Assign(NULL, ci);
+						if (!c->FindUser(ChanServ))
+						{
+							ChannelStatus status(BotModes());
+							ChanServ->Join(c, &status);
+						}
 					}
 				}
 			}
@@ -601,9 +582,6 @@ class CommandCSSetPersist : public Command
 					Channel *c = ci->GetChannel();
 					if (c && c->HasMode("PERM"))
 						c->RemoveMode(NULL, cm);
-					/* Remove from mlock */
-					if (mlocks)
-						mlocks->RemoveMLock(ci, cm, true);
 				}
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on

@@ -42,6 +42,7 @@ class CoreExport XLine : public Serialize::Object
 	std::regex *regex = nullptr;
 
 	using Serialize::Object::Object;
+	void Delete() override;
 
 	~XLine();
 
@@ -98,7 +99,7 @@ class XLineType : public Serialize::Type<XLine>
 		, mask(this, "mask", &XLine::mask)
 		, by(this, "by", &XLine::by)
 		, reason(this, "reason", &XLine::reason)
-		, id(this, "id", &XLine::id)
+		, id(this, "akillid", &XLine::id)
 		, created(this, "created", &XLine::created)
 		, expires(this, "expires", &XLine::expires)
 	{

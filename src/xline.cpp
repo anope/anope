@@ -100,6 +100,15 @@ XLine::~XLine()
 	delete c;
 }
 
+void XLine::Delete()
+{
+	XLineManager *manager = GetManager();
+	if (manager)
+		manager->SendDel(this);
+
+	return Serialize::Object::Delete();
+}
+
 void XLine::SetType(const Anope::string &t)
 {
 	Set(&XLineType::type, t);
@@ -200,8 +209,8 @@ Anope::string XLine::GetReasonWithID()
 
 bool XLine::IsExpired()
 {
-	time_t expires = GetExpires();
-	return expires > 0 && expires <= Anope::CurTime;
+	time_t exp = GetExpires();
+	return exp > 0 && exp <= Anope::CurTime;
 }
 
 bool XLine::HasNickOrReal() const

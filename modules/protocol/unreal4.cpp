@@ -231,6 +231,15 @@ class UnrealIRCdProto : public IRCDProto
 		SendServer(Me);
 	}
 
+	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) anope_override
+	{
+		Anope::string mechlist;
+		for (unsigned i = 0; i < mechanisms.size(); ++i)
+			mechlist += "," + mechanisms[i];
+
+		UplinkSocket::Message() << "MD client " << Me->GetName() << " saslmechlist :" << (mechanisms.empty() ? "" : mechlist.substr(1));
+	}
+
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick, time_t t) anope_override
 	{

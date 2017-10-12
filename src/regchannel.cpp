@@ -140,9 +140,9 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 
 ChannelInfo::~ChannelInfo()
 {
-	UnsetExtensibles();
-
 	FOREACH_MOD(OnDelChan, (this));
+
+	UnsetExtensibles();
 
 	Log(LOG_DEBUG) << "Deleting channel " << this->name;
 

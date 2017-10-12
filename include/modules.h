@@ -301,6 +301,11 @@ class CoreExport Module : public Extensible
 	 * before they will be called.
 	 */
 
+	/** Called on startup after database load, but before
+	 * connecting to the uplink.
+	 */
+	virtual void OnPostInit() { throw NotImplementedException(); }
+
 	/** Called before a user has been kicked from a channel.
 	 * @param source The kicker
 	 * @param cu The user, channel, and status of the user being kicked
@@ -1099,6 +1104,7 @@ class CoreExport Module : public Extensible
 
 enum Implementation
 {
+	I_OnPostInit,
 	I_OnPreUserKicked, I_OnUserKicked, I_OnReload, I_OnPreBotAssign, I_OnBotAssign, I_OnBotUnAssign, I_OnUserConnect,
 	I_OnNewServer, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp, I_OnPreCommand, I_OnPostCommand, I_OnSaveDatabase,
 	I_OnLoadDatabase, I_OnEncrypt, I_OnDecrypt, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd,

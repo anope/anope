@@ -366,22 +366,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendChannel(Channel *c) anope_override
 	{
-		/* Unreal does not support updating a channels TS without actually joining a user,
-		 * so we will join and part us now
-		 */
-		BotInfo *bi = c->ci->WhoSends();
-		if (!bi)
-			;
-		else if (c->FindUser(bi) == NULL)
-		{
-			bi->Join(c);
-			bi->Part(c);
-		}
-		else
-		{
-			bi->Part(c);
-			bi->Join(c);
-		}
+		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name
+			<< " +" << c->GetModes(true, true) << " :";
 	}
 
 	void SendSASLMessage(const SASL::Message &message) anope_override

@@ -1,5 +1,18 @@
 Anope Version 2.0.6-git
 -------------------
+Log client IP for web clients running commands via webcpanel
+Fix log file path for the config file could not be opened log message
+Allow nickserv/group to be used via XMLRPC
+Fix logsearch without wildcards
+Support cidr exempts in m_dnsbl
+Add support for IPv6 dnsbls
+Add +u and +L channel modes for ircd-hybrid
+Set +x after hostserv/off on InspIRCd and UnrealIRCd
+Fix chanserv/mode not being able to set extbans
+Send CHGIDENT/CHGHOST on SVSLOGIN on InspIRCd
+Fix escaping replies from commands in webcpanel
+Enable require_oper for all opers added via operserv/oper
+Advertise SASL mechanisms to UnrealIRCd servers
 
 Anope Version 2.0.5
 -------------------

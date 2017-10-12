@@ -377,34 +377,36 @@ class ChanServCore : public Module, public ChanServService
 		return EVENT_CONTINUE;
 	}
 
-	void OnPreUplinkSync(Server *serv) anope_override
+	void OnPostInit() anope_override
 	{
 		if (!persist)
 			return;
+
+		ChannelMode *perm = ModeManager::FindChannelModeByName("PERM");
+
 		/* Find all persistent channels and create them, as we are about to finish burst to our uplink */
 		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
-			if (persist->HasExt(ci))
-			{
-				bool c;
-				ci->c = Channel::FindOrCreate(ci->name, c, ci->time_registered);
+			if (!persist->HasExt(ci))
+				continue;
 
-				if (ModeManager::FindChannelModeByName("PERM") != NULL)
+			bool c;
+			ci->c = Channel::FindOrCreate(ci->name, c, ci->time_registered);
+			ci->c->syncing |= created;
+
+			if (perm)
+			{
+				ci->c->SetMode(NULL, perm);
+			}
+			else
+			{
+				if (!ci->bi)
+					ci->WhoSends()->Assign(NULL, ci);
+				if (ci->c->FindUser(ci->bi) == NULL)
 				{
-					if (c)
-						IRCD->SendChannel(ci->c);
-					ci->c->SetMode(NULL, "PERM");
-				}
-				else
-				{
-					if (!ci->bi)
-						ci->WhoSends()->Assign(NULL, ci);
-					if (ci->c->FindUser(ci->bi) == NULL)
-					{
-						ChannelStatus status(BotModes());
-						ci->bi->Join(ci->c, &status);
-					}
+					ChannelStatus status(BotModes());
+					ci->bi->Join(ci->c, &status);
 				}
 			}
 		}

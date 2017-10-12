@@ -504,20 +504,6 @@ class CommandCSSetPersist : public Command
 			{
 				ci->Extend<bool>("PERSIST");
 
-				/* Channel doesn't exist, create it */
-				if (!ci->c)
-				{
-					bool created;
-					Channel *c = Channel::FindOrCreate(ci->name, created);
-					if (ci->bi)
-					{
-						ChannelStatus status(BotModes());
-						ci->bi->Join(c, &status);
-					}
-					if (created)
-						c->Sync();
-				}
-
 				/* Set the perm mode */
 				if (cm)
 				{
@@ -541,7 +527,7 @@ class CommandCSSetPersist : public Command
 					}
 
 					ChanServ->Assign(NULL, ci);
-					if (!ci->c->FindUser(ChanServ))
+					if (ci->c && !ci->c->FindUser(ChanServ))
 					{
 						ChannelStatus status(BotModes());
 						ChanServ->Join(ci->c, &status);
@@ -1099,7 +1085,8 @@ class CommandCSSetNoexpire : public Command
 class CSSet : public Module
 {
 	SerializableExtensibleItem<bool> noautoop, peace, securefounder,
-		restricted, secure, secureops, signkick, signkick_level, noexpire;
+		restricted, secure, secureops, signkick, signkick_level, noexpire,
+		persist;
 
 	struct KeepModes : SerializableExtensibleItem<bool>
 	{
@@ -1147,51 +1134,6 @@ class CSSet : public Module
 		}
 	} keep_modes;
 
-	struct Persist : SerializableExtensibleItem<bool>
-	{
-		Persist(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
-
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
-		{
-			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
-
-			if (s->GetSerializableType()->GetName() != "ChannelInfo" || !this->HasExt(e))
-				return;
-
-			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(s);
-			if (ci->c)
-				return;
-
-			bool created;
-			Channel *c = Channel::FindOrCreate(ci->name, created);
-
-			ChannelMode *cm = ModeManager::FindChannelModeByName("PERM");
-			if (cm)
-			{
-				c->SetMode(NULL, cm);
-			}
-			/* on startup we might not know mode availibity here */
-			else if (Me && Me->IsSynced())
-			{
-				if (!ci->bi)
-				{
-					BotInfo *ChanServ = Config->GetClient("ChanServ");
-					if (ChanServ)
-						ChanServ->Assign(NULL, ci);
-				}
-
-				if (ci->bi && !c->FindUser(ci->bi))
-				{
-					ChannelStatus status(BotModes());
-					ci->bi->Join(c, &status);
-				}
-			}
-
-			if (created)
-				c->Sync();
-		}
-	} persist;
-
 	CommandCSSet commandcsset;
 	CommandCSSetAutoOp commandcssetautoop;
 	CommandCSSetBanType commandcssetbantype;
@@ -1218,7 +1160,8 @@ class CSSet : public Module
 		securefounder(this, "SECUREFOUNDER"), restricted(this, "RESTRICTED"),
 		secure(this, "CS_SECURE"), secureops(this, "SECUREOPS"), signkick(this, "SIGNKICK"),
 		signkick_level(this, "SIGNKICK_LEVEL"), noexpire(this, "CS_NO_EXPIRE"),
-		keep_modes(this, "CS_KEEP_MODES"), persist(this, "PERSIST"),
+		persist(this, "PERSIST"),
+		keep_modes(this, "CS_KEEP_MODES"),
 
 		commandcsset(this), commandcssetautoop(this), commandcssetbantype(this),
 		commandcssetdescription(this), commandcssetfounder(this), commandcssetkeepmodes(this),

@@ -142,9 +142,9 @@ Anope::string LogSettingImpl::GetCreator()
 	return Get(&LogSettingType::creator);
 }
 
-void LogSettingImpl::SetCreator(const Anope::string &creator)
+void LogSettingImpl::SetCreator(const Anope::string &c)
 {
-	Set(&LogSettingType::extra, creator);
+	Set(&LogSettingType::creator, c);
 }
 
 time_t LogSettingImpl::GetCreated()
@@ -432,49 +432,50 @@ class CSLog : public Module
 		}
 	}
 
-	void OnLog(Logger *l) override
+	void OnLog(Logger *logger) override
 	{
-#warning "fix log"
-#if 0
-		if (l->type != LogType::COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
+		User *user = logger->GetUser();
+		ChanServ::Channel *channel = logger->GetCi();
+		Command *command = logger->GetCommand();
+		CommandSource *source = logger->GetSource();
+
+		if (logger->GetType() != LogType::COMMAND || user == nullptr || command == nullptr || channel == nullptr || !Me || !Me->IsSynced())
 			return;
 
-		std::vector<LogSetting *> ls = l->ci->GetRefs<LogSetting *>();
-		for (unsigned i = 0; i < ls.size(); ++i)
-		{
-			LogSetting *log = ls[i];
+		Channel *c = channel->GetChannel();
 
+		for (LogSetting *log : channel->GetRefs<LogSetting *>())
+		{
 			/* wrong command */
-			if (log->GetServiceName() != l->c->GetName())
+			if (log->GetServiceName() != command->GetName())
 				continue;
 
 			/* if a command name is given check the service and the command */
 			if (!log->GetCommandName().empty())
 			{
 				/* wrong service (only check if not a fantasy command, though) */
-				if (!l->source->c && log->GetCommandService() != l->source->service->nick)
+				if (!source->c && log->GetCommandService() != source->service->nick)
 					continue;
 
-				if (!log->GetCommandName().equals_ci(l->source->command))
+				if (!log->GetCommandName().equals_ci(source->GetCommand()))
 					continue;
 			}
 
-			Anope::string buffer = l->u->nick + " used " + l->source->command.upper() + " " + l->buf.str();
+			const Anope::string &buffer = logger->GetMaskedMessage();
 
-			if (log->GetMethod().equals_ci("MEMO") && memoserv && l->ci->WhoSends() != NULL)
-				memoserv->Send(l->ci->WhoSends()->nick, l->ci->GetName(), buffer, true);
-			else if (l->source->c)
+			if (log->GetMethod().equals_ci("MEMO") && memoserv && channel->WhoSends() != NULL)
+				memoserv->Send(channel->WhoSends()->nick, channel->GetName(), buffer, true);
+			else if (source->c)
 				/* Sending a channel message or notice in response to a fantasy command */;
-			else if (log->GetMethod().equals_ci("MESSAGE") && l->ci->c)
+			else if (log->GetMethod().equals_ci("MESSAGE") && c)
 			{
-				IRCD->SendPrivmsg(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, buffer);
+				IRCD->SendPrivmsg(channel->WhoSends(), log->GetExtra() + c->name, "{0}", buffer);
 #warning "fix idletimes"
 				//l->ci->WhoSends()->lastmsg = Anope::CurTime;
 			}
-			else if (log->GetMethod().equals_ci("NOTICE") && l->ci->c)
-				IRCD->SendNotice(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, buffer);
+			else if (log->GetMethod().equals_ci("NOTICE") && c)
+				IRCD->SendNotice(channel->WhoSends(), log->GetExtra() + c->name, "{0}", buffer);
 		}
-#endif
 	}
 };
 

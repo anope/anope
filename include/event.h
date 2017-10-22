@@ -1083,9 +1083,9 @@ namespace Event
 		using Events::Events;
 
 		/** Called when a message is logged
-		 * @param l The log message
+		 * @param logger The logger
 		 */
-		virtual void OnLog(Logger *l) anope_abstract;
+		virtual void OnLog(Logger *logger) anope_abstract;
 	};
 
 	struct CoreExport LogMessage : Events

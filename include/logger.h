@@ -108,6 +108,10 @@ class Logger
 	Anope::string category;
 	/* Non formatted message */
 	Anope::string raw_message;
+	/* Message */
+	Anope::string full_message;
+	/* Masked message */
+	Anope::string masked_message;
 
 	/* Sources */
 	User *user = nullptr;
@@ -116,18 +120,18 @@ class Logger
 	ChanServ::Channel *ci = nullptr;
 	CommandSource *source = nullptr;
 
-	Anope::string FormatSource() const;
+	Anope::string FormatSource(bool full) const;
 	Anope::string BuildPrefix() const;
-	void LogMessage(const Anope::string &message);
-	void InsertVariables(FormatInfo &fi);
+	void LogMessage();
+	void InsertVariables(FormatInfo &fi, bool full);
 	void CheckOverride();
 
 	template<typename... Args>
-	Anope::string Format(const Anope::string &message, Args&&... args)
+	Anope::string Format(const Anope::string &message, bool full, Args&&... args)
 	{
 		FormatInfo fi(message, sizeof...(Args));
 		fi.AddArgs(std::forward<Args>(args)...);
-		InsertVariables(fi);
+		InsertVariables(fi, full);
 		fi.Format();
 		return fi.GetFormat();
 	}
@@ -164,6 +168,10 @@ class Logger
 	CommandSource *GetSource() const;
 	void SetSource(CommandSource *);
 
+	const Anope::string &GetUnformattedMessage() const;
+	const Anope::string &GetMessage() const;
+	const Anope::string &GetMaskedMessage() const;
+
 	Logger Category(const Anope::string &c) const;
 	Logger User(class User *u) const;
 	Logger Channel(class Channel *c) const;
@@ -179,12 +187,15 @@ class Logger
 		l.level = lev;
 
 		Anope::string translated = Language::Translate(message);
-		l.LogMessage(l.Format(translated, std::forward<Args>(args)...));
+		l.full_message = l.Format(translated, true, std::forward<Args>(args)...);
+		l.masked_message = l.Format(translated, false, std::forward<Args>(args)...);
+		l.LogMessage();
 	}
 
 	template<typename... Args> void Command(LogType ltype, CommandSource &csource, ChanServ::Channel *chan, const Anope::string &message, Args&&... args)
 	{
 		Logger l = *this;
+		l.raw_message = message;
 		l.type = ltype;
 		l.SetSource(&csource);
 		l.SetCi(chan);
@@ -193,7 +204,9 @@ class Logger
 		l.CheckOverride();
 
 		Anope::string translated = Language::Translate(message);
-		l.LogMessage(l.Format(translated, std::forward<Args>(args)...));
+		l.full_message = l.Format(translated, true, std::forward<Args>(args)...);
+		l.masked_message = l.Format(translated, false, std::forward<Args>(args)...);
+		l.LogMessage();
 	}
 
 	template<typename... Args> void Command(LogType ltype, CommandSource &csource, const Anope::string &message, Args&&... args)

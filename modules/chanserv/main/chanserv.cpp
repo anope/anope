@@ -406,7 +406,7 @@ class ChanServCore : public Module
 		}
 	}
 
-	void OnLog(Logger *l) override
+	void OnLog(Logger *logger) override
 	{
 #warning ""
 #if 0

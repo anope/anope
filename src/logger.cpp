@@ -285,7 +285,7 @@ void LogInfo::ProcessMessage(const Logger *l, const Anope::string &message)
 	}
 }
 
-void Logger::InsertVariables(FormatInfo &fi)
+void Logger::InsertVariables(FormatInfo &fi, bool full)
 {
 	if (user != nullptr)
 		fi.Add("user"_kw = user->GetMask());
@@ -295,7 +295,7 @@ void Logger::InsertVariables(FormatInfo &fi)
 	else if (channel != nullptr)
 		fi.Add("channel"_kw = channel->GetName());
 
-	fi.Add("source"_kw = this->FormatSource());
+	fi.Add("source"_kw = this->FormatSource(full));
 
 	if (source != nullptr && !source->GetCommand().empty())
 		fi.Add("command"_kw = source->GetCommand());
@@ -309,13 +309,17 @@ void Logger::CheckOverride()
 		type = LogType::OVERRIDE;
 }
 
-Anope::string Logger::FormatSource() const
+Anope::string Logger::FormatSource(bool full) const
 {
 	if (user)
+	{
+		const Anope::string &umask = full ? user->GetMask() : user->GetDisplayedMask();
+
 		if (account)
-			return user->GetMask() + " (" + account->GetDisplay() + ")";
+			return umask + " (" + account->GetDisplay() + ")";
 		else
-			return user->GetMask();
+			return umask;
+	}
 	else if (account)
 		return account->GetDisplay();
 	else if (source)
@@ -348,14 +352,14 @@ Anope::string Logger::BuildPrefix() const
 	return "";
 }
 
-void Logger::LogMessage(const Anope::string &message)
+void Logger::LogMessage()
 {
 	if (Anope::NoFork && Anope::Debug && level >= LogLevel::NORMAL && static_cast<int>(level) <= static_cast<int>(LogLevel::DEBUG) + Anope::Debug - 1)
-		std::cout << GetTimeStamp() << " Debug: " << this->BuildPrefix() << message << std::endl;
+		std::cout << GetTimeStamp() << " Debug: " << this->BuildPrefix() << full_message << std::endl;
 	else if (Anope::NoFork && level <= LogLevel::TERMINAL)
-		std::cout << GetTimeStamp() << " " << this->BuildPrefix() << message << std::endl;
+		std::cout << GetTimeStamp() << " " << this->BuildPrefix() << full_message << std::endl;
 	else if (level == LogLevel::TERMINAL)
-		std::cout << this->BuildPrefix() << message << std::endl;
+		std::cout << this->BuildPrefix() << full_message << std::endl;
 
 	if (level <= LogLevel::NORMAL)
 	{
@@ -367,7 +371,7 @@ void Logger::LogMessage(const Anope::string &message)
 	if (Config != nullptr)
 		for (LogInfo &info : Config->LogInfos)
 			if (info.HasType(this->type, this->level, this->category))
-				info.ProcessMessage(this, message);
+				info.ProcessMessage(this, full_message);
 }
 
 LogType Logger::GetType() const
@@ -454,6 +458,21 @@ void Logger::SetSource(CommandSource *s)
 		SetAccount(s->GetAccount());
 		SetChannel(s->c);
 	}
+}
+
+const Anope::string &Logger::GetUnformattedMessage() const
+{
+	return raw_message;
+}
+
+const Anope::string &Logger::GetMessage() const
+{
+	return full_message;
+}
+
+const Anope::string &Logger::GetMaskedMessage() const
+{
+	return masked_message;
 }
 
 Logger Logger::Category(const Anope::string &c) const

@@ -28,7 +28,7 @@ class CommandHSGroup : public Command
 		for (unsigned i = 0; i < na->nc->aliases->size(); ++i)
 		{
 			NickAlias *nick = na->nc->aliases->at(i);
-			if (nick)
+			if (nick && nick != na)
 			{
 				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 				FOREACH_MOD(OnSetVhost, (nick));

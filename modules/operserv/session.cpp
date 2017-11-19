@@ -312,7 +312,7 @@ class CommandOSSession : public Command
 		else if (cmd.equals_ci("VIEW"))
 			this->DoView(source, params);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -598,7 +598,7 @@ class CommandOSException : public Command
 		else if (cmd.equals_ci("VIEW"))
 			return this->DoView(source, params);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -625,6 +625,22 @@ class CommandOSException : public Command
 			               "\002{0} LIST\002 and \002{0} VIEW\002 show all current sessions if the optional mask is given, the list is limited to those sessions matching the mask."
 			               " The difference is that \002{0} VIEW\002 is more verbose, displaying the name of the person who added the exception, its session limit, reason, host mask and the expiry date and time.\n"));
 		return true;
+	}
+
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand = "") override
+	{
+		if (subcommand.equals_ci("ADD"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("[\037+expiry\037] \037mask\037 \037limit\037 \037reason\037"));
+		}
+		else if (subcommand.equals_ci("DEL"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("{\037mask\037 | \037entry-num\037 | \037list\037}"));
+		}
+		else
+		{
+			Command::OnSyntaxError(source, subcommand);
+		}
 	}
 };
 

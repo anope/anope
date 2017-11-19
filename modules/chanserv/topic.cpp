@@ -76,7 +76,7 @@ class CommandCSSetKeepTopic : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "KEEPTOPIC");
+			this->OnSyntaxError(source);
 		}
 	}
 

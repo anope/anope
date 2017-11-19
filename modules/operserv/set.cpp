@@ -198,7 +198,7 @@ class CommandOSSet : public Command
 		else if (option.equals_ci("SUPERADMIN"))
 			return this->DoSetSuperAdmin(source, params);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -213,32 +213,21 @@ class CommandOSSet : public Command
 					"    LIST       List the options"));
 		}
 		else if (subcommand.equals_ci("LIST"))
-#warning "?"
-			//source.Reply(_("Syntax: \002LIST\002\n"
-			//		" \n"
 			source.Reply(("Display the various {0} settings."), source.service->nick);
 		else if (subcommand.equals_ci("READONLY"))
-			//source.Reply(_("Syntax: \002READONLY {ON | OFF}\002\n"
-			//		" \n"
-			source.Reply(_("Sets read-only mode on or off.  In read-only mode, norma users will not be allowed to modify any Services data, including channel and nickname access lists, etc."
+			source.Reply(_("Sets read-only mode on or off.  In read-only mode, normal users will not be allowed to modify any Services data, including channel and nickname access lists, etc."
 				       "Services Operators will still be able to do most tasks, but should understand any changes they do may not be permanent.\n"
 				       "\n"
 			               "This option is equivalent to the command-line option \002--readonly\002."));
 		else if (subcommand.equals_ci("DEBUG"))
-			//source.Reply(_("Syntax: \002DEBUG {ON | OFF}\002\n"
-			//		" \n"
 			source.Reply(_("Sets debug mode on or off.\n"
 			               "\n"
 			               "This option is equivalent to the command-line option \002--debug\002."));
 		else if (subcommand.equals_ci("NOEXPIRE"))
-			//source.Reply(_("Syntax: \002NOEXPIRE {ON | OFF}\002\n"
-			//		" \n"
 			source.Reply(_("Sets no expire mode on or off. In no expire mode, nicks, channels, akills and exceptions won't expire until the option is unset.\n"
 			               "\n"
 			               "This option is equivalent to the command-line option \002--noexpire\002."));
 		else if (subcommand.equals_ci("SUPERADMIN"))
-			//source.Reply(_("Syntax: \002SUPERADMIN {ON | OFF}\002\n"
-			//		" \n"
 			source.Reply(_("Setting this will grant you extra privileges, such as the ability to be \"founder\" on all channels."
 			               "\n"
 			               "This option is \002not\002 persistent, and should only be used when needed, and set back to OFF when no longer needed."));
@@ -246,6 +235,18 @@ class CommandOSSet : public Command
 			return false;
 		
 		return true;
+	}
+
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand = "") override
+	{
+		if (subcommand.equals_ci("READONLY") || subcommand.equals_ci("DEBUG") || subcommand.equals_ci("NOEXPIRE") || subcommand.equals_ci("SUPERADMIN"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("{ON | OFF}"));
+		}
+		else
+		{
+			Command::OnSyntaxError(source, subcommand);
+		}
 	}
 };
 

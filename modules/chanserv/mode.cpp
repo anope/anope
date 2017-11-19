@@ -486,7 +486,7 @@ class CommandCSMode : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, subcommand);
+			this->OnSyntaxError(source);
 		}
 	}
 
@@ -755,7 +755,7 @@ class CommandCSMode : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 		}
 	}
 

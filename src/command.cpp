@@ -215,11 +215,32 @@ void Command::SendSyntax(CommandSource &source)
 	{
 		source.Reply("{0}: \002{1} {2}\002", s, source.GetCommand(), Language::Translate(source.GetAccount(), this->syntax[0].c_str()));
 		Anope::string spaces(s.length(), ' ');
-		for (unsigned i = 1, j = this->syntax.size(); i < j; ++i)
+		for (unsigned int i = 1; i < this->syntax.size(); ++i)
 			source.Reply("{0}  \002{1} {2}\002", spaces, source.GetCommand(), Language::Translate(source.GetAccount(), this->syntax[i].c_str()));
 	}
 	else
+	{
 		source.Reply("{0}: \002{1}\002", s, source.GetCommand());
+	}
+}
+
+void Command::SendHelpCommand(CommandSource &source, const Anope::string &subcommand)
+{
+	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
+	if (!has_help)
+		return;
+
+	if (subcommand.empty())
+		source.Reply(_("\002{0}{1} HELP {2}\002 for more information."), Config->StrictPrivmsg, source.service->nick, source.GetCommand());
+	else
+		source.Reply(_("\002{0}{1} HELP {2} {3}\002 for more information."), Config->StrictPrivmsg, source.service->nick, source.GetCommand(), subcommand.upper());
+}
+
+void Command::SubcommandSyntaxError(CommandSource &source, const Anope::string &subcommand, const Anope::string &subsyntax)
+{
+	Anope::string s = Language::Translate(source.GetAccount(), _("Syntax"));
+	source.Reply("{0}: \002{1} {2} {3}\002", s, source.GetCommand(), subcommand.upper(), Language::Translate(source.GetAccount(), subsyntax.c_str()));
+	SendHelpCommand(source, subcommand);
 }
 
 bool Command::AllowUnregistered() const
@@ -257,9 +278,7 @@ bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { r
 void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 {
 	this->SendSyntax(source);
-	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
-	if (has_help)
-		source.Reply(_("\002{0}{1} HELP {2}\002 for more information."), Config->StrictPrivmsg, source.service->nick, source.GetCommand());
+	SendHelpCommand(source, subcommand);
 }
 
 void Command::Run(CommandSource &source, const Anope::string &message)

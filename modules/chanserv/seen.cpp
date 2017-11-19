@@ -153,7 +153,7 @@ class CommandOSSeen : public Command
 			time_t time = 0;
 			if ((params.size() < 2) || (0 >= (time = Anope::DoTime(params[1]))))
 			{
-				this->OnSyntaxError(source, params[0]);
+				this->OnSyntaxError(source, "CLEAR");
 				return;
 			}
 			time = Anope::CurTime - time;

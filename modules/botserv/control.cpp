@@ -68,7 +68,7 @@ class CommandBSSay : public Command
 
 		if (text[0] == '\001')
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 			return;
 		}
 

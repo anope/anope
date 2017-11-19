@@ -62,7 +62,7 @@ class CommandMSList : public Command
 
 		if (!param.empty() && !isdigit(param[0]) && !param.equals_ci("NEW"))
 		{
-			this->OnSyntaxError(source, param);
+			this->OnSyntaxError(source);
 			return;
 		}
 

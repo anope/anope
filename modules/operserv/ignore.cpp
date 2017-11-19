@@ -386,6 +386,22 @@ class CommandOSIgnore : public Command
 
 		return true;
 	}
+
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) override
+	{
+		if (subcommand.equals_ci("ADD"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("\037expiry\037 {\037nick\037|\037mask\037} [\037reason\037]"));
+		}
+		else if (subcommand.equals_ci("DEL"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("{\037nick\037|\037mask\037}"));
+		}
+		else
+		{
+			Command::OnSyntaxError(source, subcommand);
+		}
+	}
 };
 
 class OSIgnore : public Module

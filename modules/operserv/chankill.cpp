@@ -65,7 +65,7 @@ class CommandOSChanKill : public Command
 
 		if (params.size() <= last_param)
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 			return;
 		}
 

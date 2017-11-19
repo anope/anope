@@ -89,7 +89,7 @@ class CommandOSLogSearch : public Command
 
 		if (i >= params.size())
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 			return;
 		}
 

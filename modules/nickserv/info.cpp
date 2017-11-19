@@ -188,7 +188,7 @@ class CommandNSSetHide : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "HIDE");
+			this->OnSyntaxError(source);
 			return;
 		}
 
@@ -211,7 +211,7 @@ class CommandNSSetHide : public Command
 			source.Reply(offmsg, nc->GetDisplay(), source.service->nick);
 		}
 		else
-			this->OnSyntaxError(source, "HIDE");
+			this->OnSyntaxError(source);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override

@@ -31,7 +31,7 @@ class CommandBSSet : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->OnSyntaxError(source, "");
+		this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -191,7 +191,7 @@ class CommandBSSetPrivate : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, source.GetCommand());
+			this->OnSyntaxError(source);
 		}
 	}
 

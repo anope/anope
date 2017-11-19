@@ -290,7 +290,7 @@ class NewsBase : public Command
 		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(source, params, ntype, msgs);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
  public:
 	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2)
@@ -303,6 +303,22 @@ class NewsBase : public Command
 	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_abstract;
 
 	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_abstract;
+
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand = "") override
+	{
+		if (subcommand.equals_ci("ADD"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("\037text\037"));
+		}
+		else if (subcommand.equals_ci("DEL"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("{\037num\037 | ALL}"));
+		}
+		else
+		{
+			Command::OnSyntaxError(source, subcommand);
+		}
+	}
 };
 
 class CommandOSLogonNews : public NewsBase

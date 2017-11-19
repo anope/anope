@@ -131,7 +131,7 @@ class CommandMSIgnore : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 		}
 	}
 

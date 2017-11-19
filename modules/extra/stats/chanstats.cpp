@@ -43,7 +43,7 @@ class CommandCSSetChanstats : public Command
 			source.Reply(_("Chanstats statistics are now disabled for this channel."));
 		}
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -96,7 +96,7 @@ class CommandNSSetChanstats : public Command
 				source.Reply(_("Chanstats statistics are now disabled for your nick."));
 		}
 		else
-			this->OnSyntaxError(source, "CHANSTATS");
+			this->OnSyntaxError(source);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override

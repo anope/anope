@@ -127,7 +127,7 @@ class CommandOSConfig : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, what);
+			this->OnSyntaxError(source);
 		}
 	}
 

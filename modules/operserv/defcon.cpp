@@ -209,7 +209,7 @@ class CommandOSDefcon : public Command
 
 		if (newLevel < 1 || newLevel > 5)
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 			return;
 		}
 

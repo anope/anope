@@ -271,7 +271,7 @@ class CommandCSEnforce : public Command
 		else if (what.equals_ci("LIMIT"))
 			this->DoLimit(source, ci);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

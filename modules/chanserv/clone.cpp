@@ -198,7 +198,7 @@ public:
 		}
 		else
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 			return;
 		}
 

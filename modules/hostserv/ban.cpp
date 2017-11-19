@@ -144,7 +144,7 @@ class CommandHSBan : public Command
 
 		if (reason.empty())
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 			return;
 		}
 

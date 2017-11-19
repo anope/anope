@@ -33,7 +33,7 @@ class CommandNSSet : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->OnSyntaxError(source, "");
+		this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -87,7 +87,7 @@ class CommandNSSASet : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->OnSyntaxError(source, "");
+		this->OnSyntaxError(source);
 		return;
 	}
 
@@ -275,7 +275,7 @@ class CommandNSSetAutoOp : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "AUTOOP");
+			this->OnSyntaxError(source);
 		}
 	}
 
@@ -580,7 +580,7 @@ class CommandNSSetKeepModes : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 		}
 	}
 
@@ -703,7 +703,7 @@ class CommandNSSetKill : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "KILL");
+			this->OnSyntaxError(source);
 		}
 	}
 
@@ -787,7 +787,7 @@ class CommandNSSetLanguage : public Command
 					break;
 				else if (j + 1 == Language::Languages.size())
 				{
-					this->OnSyntaxError(source, "");
+					this->OnSyntaxError(source);
 					return;
 				}
 			}
@@ -908,7 +908,7 @@ class CommandNSSetMessage : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "MSG");
+			this->OnSyntaxError(source);
 		}
 	}
 
@@ -1006,7 +1006,7 @@ class CommandNSSASetNoexpire : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "NOEXPIRE");
+			this->OnSyntaxError(source);
 		}
 	}
 

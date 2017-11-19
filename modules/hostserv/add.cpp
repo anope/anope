@@ -63,7 +63,7 @@ class CommandHSAdd : public Command
 
 		if (host.empty())
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 			return;
 		}
 

@@ -479,7 +479,7 @@ class CommandCSXOP : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			return this->DoClear(source, ci);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 
@@ -573,6 +573,22 @@ class CommandCSXOP : public Command
 			}
 		}
 		return true;
+	}
+
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand = "") override
+	{
+		if (subcommand.equals_ci("ADD"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("\037channel\037 ADD \037mask\037"));
+		}
+		else if (subcommand.equals_ci("DEL"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("{\037mask\037 | \037entry-num\037 | \037list\037}"));
+		}
+		else
+		{
+			Command::OnSyntaxError(source, subcommand);
+		}
 	}
 };
 

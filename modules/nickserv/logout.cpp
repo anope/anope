@@ -37,7 +37,7 @@ class CommandNSLogout : public Command
 
 		if (!source.IsServicesOper() && !nick.empty())
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 			return;
 		}
 

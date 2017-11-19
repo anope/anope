@@ -75,7 +75,7 @@ class CommandMSSet : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source, "NOTIFY");
 		}
 	}
 
@@ -132,7 +132,7 @@ class CommandMSSet : public Command
 			}
 			else if (p1.empty() || (!p1.is_pos_number_only() && !p1.equals_ci("NONE")) || (!p2.empty() && !p2.equals_ci("HARD")))
 			{
-				this->OnSyntaxError(source, "");
+				this->OnSyntaxError(source, "LIMIT");
 				return;
 			}
 			if (!chan.empty())
@@ -160,7 +160,7 @@ class CommandMSSet : public Command
 		{
 			if (p1.empty() || !p2.empty() || !isdigit(p1[0]))
 			{
-				this->OnSyntaxError(source, "");
+				this->OnSyntaxError(source, "LIMIT");
 				return;
 			}
 			if (!chan.empty() && mi->IsHardMax())
@@ -228,6 +228,7 @@ class CommandMSSet : public Command
 		const Anope::string &cmd = params[0];
 		MemoServ::MemoInfo *mi = source.nc->GetMemos();
 
+#warning "split this into subcommands"
 		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, memo option setting is temporarily disabled."));
 		else if (cmd.equals_ci("NOTIFY"))
@@ -235,7 +236,7 @@ class CommandMSSet : public Command
 		else if (cmd.equals_ci("LIMIT"))
 			return this->DoLimit(source, params, mi);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

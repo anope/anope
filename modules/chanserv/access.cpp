@@ -625,6 +625,22 @@ class CommandCSAccess : public Command
 
 		return true;
 	}
+
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) override
+	{
+		if (subcommand.equals_ci("ADD"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("\037mask\037 \037level\037"));
+		}
+		else if (subcommand.equals_ci("DEL"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("{\037mask\037 | \037entry-num\037 | \037list\037}"));
+		}
+		else
+		{
+			Command::OnSyntaxError(source, subcommand);
+		}
+	}
 };
 
 class CommandCSLevels : public Command
@@ -872,6 +888,22 @@ class CommandCSLevels : public Command
 				       source.GetCommand(), name, "FOUNDER", help->cname, source.GetCommand());
 		}
 		return true;
+	}
+
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) override
+	{
+		if (subcommand.equals_ci("SET"))
+		{
+			SubcommandSyntaxError(source, subcommand, "\037privilege\037 \037level\037");
+		}
+		else if (subcommand.equals_ci("DISABLE"))
+		{
+			SubcommandSyntaxError(source, subcommand, "\037privilege\037");
+		}
+		else
+		{
+			Command::OnSyntaxError(source, subcommand);
+		}
 	}
 };
 

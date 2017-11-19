@@ -336,7 +336,7 @@ class CommandBSBadwords : public Command
 
 		if (!need_args && word.empty())
 		{
-			this->OnSyntaxError(source, cmd);
+			this->OnSyntaxError(source);
 			return;
 		}
 
@@ -368,7 +368,7 @@ class CommandBSBadwords : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			this->DoClear(source, ci);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

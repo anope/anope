@@ -124,7 +124,7 @@ class CommandMSRead : public Command
 
 		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.equals_ci("ALL") && numstr.find_first_not_of("0123456789.,-") != Anope::string::npos))
 		{
-			this->OnSyntaxError(source, numstr);
+			this->OnSyntaxError(source);
 			return;
 		}
 

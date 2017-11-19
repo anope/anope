@@ -217,10 +217,26 @@ class CommandOSSXLineBase : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			return this->OnClear(source);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
+	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) override anope_abstract;
+
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand = "") override
+	{
+		if (subcommand.equals_ci("ADD"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("[+\037expiry\037] \037mask\037:\037reason\037"));
+		}
+		else if (subcommand.equals_ci("DEL"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("{\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));
+		}
+		else
+		{
+			Command::OnSyntaxError(source, subcommand);
+		}
+	}
 };
 
 class CommandOSSNLine : public CommandOSSXLineBase

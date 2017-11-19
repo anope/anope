@@ -599,7 +599,7 @@ class CommandCSAKick : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			this->DoClear(source, ci);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -677,6 +677,22 @@ class CommandCSAKick : public Command
 		}
 
 		return true;
+	}
+
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand = "") override
+	{
+		if (subcommand.equals_ci("ADD"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("{\037nick\037 | \037mask\037} [\037reason\037]"));
+		}
+		else if (subcommand.equals_ci("DEL"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("{\037nick\037 | \037mask\037 | \037entry-num\037 | \037list\037}"));
+		}
+		else
+		{
+			Command::OnSyntaxError(source, subcommand);
+		}
 	}
 };
 

@@ -523,7 +523,7 @@ class CommandBSKick : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->OnSyntaxError(source, "");
+		this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -583,9 +583,9 @@ class CommandBSKickBase : public Command
 		else if (ci == NULL)
 			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 		else if (option.empty())
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 		else if (!option.equals_ci("ON") && !option.equals_ci("OFF"))
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 		else if (!source.AccessFor(ci).HasPriv("SET") && !source.HasOverridePriv("botserv/administration"))
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 		else if (!ci->GetBot())
@@ -648,7 +648,7 @@ class CommandBSKickBase : public Command
 			source.Reply(_("Bot won't kick for \002{0}\002 anymore."), optname);
 		}
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 };
 
@@ -896,7 +896,7 @@ class CommandBSKickFlood : public CommandBSKickBase
 		}
 		else
 		{
-			this->OnSyntaxError(source, params[1]);
+			this->OnSyntaxError(source);
 		}
 	}
 
@@ -998,7 +998,7 @@ class CommandBSKickRepeat : public CommandBSKickBase
 		}
 		else
 		{
-			this->OnSyntaxError(source, params[1]);
+			this->OnSyntaxError(source);
 		}
 	}
 
@@ -1110,7 +1110,7 @@ class CommandBSSetDontKickOps : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, source.GetCommand());
+			this->OnSyntaxError(source);
 		}
 	}
 
@@ -1174,7 +1174,7 @@ class CommandBSSetDontKickVoices : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, source.GetCommand());
+			this->OnSyntaxError(source);
 		}
 	}
 

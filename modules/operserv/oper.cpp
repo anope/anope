@@ -235,7 +235,7 @@ class CommandOSOper : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, subcommand);
+			this->OnSyntaxError(source);
 		}
 	}
 

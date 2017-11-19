@@ -267,7 +267,7 @@ class CommandNSAJoin : public Command
 		else if (nc->HasFieldS("NS_SUSPENDED"))
 			source.Reply(_("\002{0}\002 isn't registered."), nc->GetDisplay());
 		else if (param.empty())
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 		else if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode."));
 		else if (cmd.equals_ci("ADD"))
@@ -275,7 +275,7 @@ class CommandNSAJoin : public Command
 		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(source, nc, param);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

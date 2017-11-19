@@ -206,7 +206,7 @@ class CommandBSSetNoBot : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, source.GetCommand());
+			this->OnSyntaxError(source);
 		}
 	}
 

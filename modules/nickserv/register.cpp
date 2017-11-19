@@ -194,7 +194,7 @@ class CommandNSRegister : public Command
 
 		if (Config->GetModule("nickserv/main")->Get<bool>("forceemail", "yes") && email.empty())
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 			return;
 		}
 

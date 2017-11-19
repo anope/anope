@@ -101,7 +101,7 @@ class CommandCSFlags : public Command
 	{
 		if (flags.empty())
 		{
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 			return;
 		}
 

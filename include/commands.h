@@ -127,6 +127,7 @@ class CoreExport Command : public Service
 	/* Command requires that a user is executing it */
 	bool require_user = false;
 
+	static void SendHelpCommand(CommandSource &source, const Anope::string &subcommand);
  public:
 	static constexpr const char *NAME = "Command";
 
@@ -157,7 +158,12 @@ class CoreExport Command : public Service
 	void AllowUnregistered(bool b);
 	void RequireUser(bool b);
 
+	/**
+	 * send the syntax for this command
+	 */
 	void SendSyntax(CommandSource &);
+	void SubcommandSyntaxError(CommandSource &source, const Anope::string &subcommand, const Anope::string &syntax);
+
 	bool AllowUnregistered() const;
 	bool RequireUser() const;
 
@@ -189,7 +195,7 @@ class CoreExport Command : public Service
 	 * @param source The source
 	 * @param subcommand The subcommand the user tried to use
 	 */
-	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand);
+	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand = "");
 
 	/** Runs a command
 	 * @param source The source of the command

@@ -241,13 +241,13 @@ class CommandEntryMessage : public Command
 		else if (params[1].equals_ci("CLEAR"))
 			this->DoClear(source, ci);
 		else if (params.size() < 3)
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 		else if (params[1].equals_ci("ADD"))
 			this->DoAdd(source, ci, params[2]);
 		else if (params[1].equals_ci("DEL"))
 			this->DoDel(source, ci, params[2]);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

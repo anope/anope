@@ -167,7 +167,7 @@ class CommandOSInfo : public Command
 		{
 			if (info.empty())
 			{
-				this->OnSyntaxError(source, cmd);
+				this->OnSyntaxError(source, "ADD");
 				return;
 			}
 
@@ -203,7 +203,7 @@ class CommandOSInfo : public Command
 		{
 			if (info.empty())
 			{
-				this->OnSyntaxError(source, cmd);
+				this->OnSyntaxError(source, "DEL");
 				return;
 			}
 
@@ -254,7 +254,7 @@ class CommandOSInfo : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, cmd);
+			this->OnSyntaxError(source);
 		}
 	}
 
@@ -262,6 +262,22 @@ class CommandOSInfo : public Command
 	{
 		source.Reply(_("Add or delete oper information for a given account or channel. This information will show to opers in the respective info command for the account or channel."));
 		return true;
+	}
+
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand = "") override
+	{
+		if (subcommand.equals_ci("ADD"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("\037target\037 \037info\037"));
+		}
+		else if (subcommand.equals_ci("DEL"))
+		{
+			SubcommandSyntaxError(source, subcommand, _("\037target\037 \037info\037"));
+		}
+		else
+		{
+			Command::OnSyntaxError(source, subcommand);
+		}
 	}
 };
 

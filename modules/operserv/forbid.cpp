@@ -449,7 +449,7 @@ class CommandOSForbid : public Command
 				source.Reply(_("End of forbid list - \002{0}\002/\002{1}\002 entries shown."), shown, forbids.size());
 		}
 		else
-			this->OnSyntaxError(source, command);
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

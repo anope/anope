@@ -229,7 +229,7 @@ class CommandCSSetPrivate : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(source, "PRIVATE");
+			this->OnSyntaxError(source);
 		}
 	}
 

@@ -205,7 +205,7 @@ class CommandNSCert : public Command
 
 		if (certfp.empty())
 		{
-			this->OnSyntaxError(source, "DEL");
+			this->OnSyntaxError(source);
 			return;
 		}
 
@@ -293,7 +293,7 @@ class CommandNSCert : public Command
 		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(source, nc, certfp);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

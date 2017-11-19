@@ -798,7 +798,7 @@ class CommandOSDNS : public Command
 		else if (params[0].equals_ci("DEPOOL") && params.size() > 1)
 			this->OnDepool(source, params);
 		else
-			this->OnSyntaxError(source, "");
+			this->OnSyntaxError(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -228,7 +228,7 @@ class CommandNSSetPrivate : public Command
 			source.Reply(_("Private option is now \002off\002 for \002{0}\002."), nc->GetDisplay());
 		}
 		else
-			this->OnSyntaxError(source, "PRIVATE");
+			this->OnSyntaxError(source);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override

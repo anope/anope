@@ -875,18 +875,6 @@ namespace Event
 		virtual void OnInvite(User *source, Channel *c, User *targ) anope_abstract;
 	};
 
-	struct CoreExport SetVhost : Events
-	{
-		static constexpr const char *NAME = "setvhost";
-
-		using Events::Events;
-
-		/** Called when a vhost is set
-		 * @param na The nickalias of the vhost
-		 */
-		virtual void OnSetVhost(NickServ::Nick *na) anope_abstract;
-	};
-
 	struct CoreExport SetDisplayedHost : Events
 	{
 		static constexpr const char *NAME = "setdisplayedhost";

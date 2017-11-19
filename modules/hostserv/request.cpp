@@ -19,6 +19,7 @@
 
 #include "module.h"
 #include "modules/memoserv.h"
+#include "modules/hostserv/add.h"
 
 class HostRequest : public Serialize::Object
 {
@@ -301,7 +302,7 @@ class CommandHSActivate : public Command
 		vhost->SetCreator(source.GetNick());
 		vhost->SetCreated(req->GetTime());
 
-		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, na);
+		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, &source, na->GetAccount(), vhost);
 
 		if (Config->GetModule(this->GetOwner())->Get<bool>("memouser") && memoserv)
 			memoserv->Send(source.service->nick, na->GetNick(), _("[auto memo] Your requested vHost has been approved."), true);

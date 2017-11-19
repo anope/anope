@@ -19,25 +19,18 @@
 
 namespace Event
 {
-	struct CoreExport DeleteVhost : Events
-	{
-		static constexpr const char *NAME = "deletevhost";
+        struct CoreExport SetVhost : Events
+        {
+                static constexpr const char *NAME = "setvhost";
 
-		using Events::Events;
+                using Events::Events;
 
-		/**
-		 * Called when all of a users vhosts are being deleted
-		 * @param source The user deleting the vhost
-		 * @param account The account the vhost is being deleted from
-		 */
-		virtual void OnDeleteAllVhost(CommandSource *source, NickServ::Account *account) anope_abstract;
-
-		/** Called when a vhost is deleted
-		 * @param source The user deleting the vhost
-		 * @param account The account the vhost is being deleted from
-		 * @param vhost The vhost being deleted
-		 */
-		virtual void OnDeleteVhost(CommandSource *source, NickServ::Account *account, HostServ::VHost *vhost) anope_abstract;
-	};
+                /** Called when a vhost is set
+                 * @param source The setter of the vhost
+                 * @param account The account the vhost is set on
+                 * @param vhost The vhost
+                 */
+                virtual void OnSetVhost(CommandSource *source, NickServ::Account *account, HostServ::VHost *vhost) anope_abstract;
+        };
 }
 

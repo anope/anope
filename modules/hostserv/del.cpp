@@ -56,6 +56,7 @@ class CommandHSDel : public Command
 
 			logger.Admin(source, _("{source} used {command} on {0} to remove vhost {1}"), na->GetAccount()->GetDisplay(), vhost->Mask());
 			source.Reply(_("Vhost \002{0}\002 for \002{1}\002 has been removed."), vhost->Mask(), na->GetAccount()->GetDisplay());
+			EventManager::Get()->Dispatch(&Event::DeleteVhost::OnDeleteVhost, &source, na->GetAccount(), vhost);
 			vhost->Delete();
 			return;
 		}
@@ -69,8 +70,7 @@ class CommandHSDel : public Command
 
 		logger.Admin(source, _("{source} used {command} on {0}"), na->GetAccount()->GetDisplay());
 
-#warning "send account"
-		EventManager::Get()->Dispatch(&Event::DeleteVhost::OnDeleteVhost, na);
+		EventManager::Get()->Dispatch(&Event::DeleteVhost::OnDeleteAllVhost, &source, na->GetAccount());
 
 		for (HostServ::VHost *v : vhosts)
 			v->Delete();

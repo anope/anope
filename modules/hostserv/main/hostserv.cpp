@@ -21,6 +21,7 @@
 #include "modules/help.h"
 #include "modules/nickserv/update.h"
 #include "modules/nickserv/info.h"
+#include "modules/hostserv/add.h"
 #include "modules/hostserv/del.h"
 #include "vhosttype.h"
 
@@ -111,47 +112,42 @@ class HostServCore : public Module
 	{
 	}
 
-	void OnSetVhost(NickServ::Nick *na) override
+	void OnSetVhost(CommandSource *source, NickServ::Account *account, HostServ::VHost *vhost) override
 	{
-		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
+		if (!Config->GetModule(this)->Get<bool>("activate_on_set"))
+			return;
+
+		for (User *u : account->users)
 		{
-			User *u = User::Find(na->GetNick());
+			IRCD->Send<messages::VhostSet>(u, vhost->GetIdent(), vhost->GetHost());
 
-			if (u && u->Account() == na->GetAccount())
+			u->vhost = vhost->GetHost();
+			u->UpdateHost();
+
+			if (IRCD->CanSetVIdent && !vhost->GetIdent().empty())
+				u->SetVIdent(vhost->GetIdent());
+
+			if (HostServ)
 			{
-				HostServ::VHost *vhost = HostServ::FindVHost(u->Account());
-
-				if (vhost == nullptr)
-					return;
-
-				IRCD->Send<messages::VhostSet>(u, vhost->GetIdent(), vhost->GetHost());
-
-				u->vhost = vhost->GetHost();
-				u->UpdateHost();
-
-				if (IRCD->CanSetVIdent && !vhost->GetIdent().empty())
-					u->SetVIdent(vhost->GetIdent());
-
-				if (HostServ)
-				{
-					if (!vhost->GetIdent().empty())
-						u->SendMessage(*HostServ, _("Your vhost of \002{0}\002@\002{1}\002 is now activated."), vhost->GetIdent(), vhost->GetHost());
-					else
-						u->SendMessage(*HostServ, _("Your vhost of \002{0}\002 is now activated."), vhost->GetHost());
-				}
+				if (!vhost->GetIdent().empty())
+					u->SendMessage(*HostServ, _("Your vhost of \002{0}\002@\002{1}\002 is now activated."), vhost->GetIdent(), vhost->GetHost());
+				else
+					u->SendMessage(*HostServ, _("Your vhost of \002{0}\002 is now activated."), vhost->GetHost());
 			}
 		}
 	}
 
-	void OnDeleteVhost(NickServ::Nick *na) override
+	void OnDeleteAllVhost(CommandSource *source, NickServ::Account *account) override
 	{
-		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
-		{
-			User *u = User::Find(na->GetNick());
+		if (!Config->GetModule(this)->Get<bool>("activate_on_set"))
+			return;
 
-			if (u && u->Account() == na->GetAccount())
-				IRCD->Send<messages::VhostDel>(u);
-		}
+		for (User *u : account->users)
+			IRCD->Send<messages::VhostDel>(u);
+	}
+
+	void OnDeleteVhost(CommandSource *source, NickServ::Account *account, HostServ::VHost *vhost) override
+	{
 	}
 
 	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override

@@ -18,6 +18,7 @@
  */
 
 #include "module.h"
+#include "modules/hostserv/add.h"
 
 class CommandHSAdd : public Command
 {
@@ -116,8 +117,7 @@ class CommandHSAdd : public Command
 		vhost->SetCreator(source.GetNick());
 		vhost->SetCreated(Anope::CurTime);
 
-#warning "change event to broadcast account"
-		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, na);
+		EventManager::Get()->Dispatch(&Event::SetVhost::OnSetVhost, &source, na->GetAccount(), vhost);
 		source.Reply(_("Vhost \002{0}\002 added to \002{1}\002."), mask, na->GetAccount()->GetDisplay());
 	}
 

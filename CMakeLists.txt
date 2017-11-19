@@ -1,7 +1,6 @@
 # This usage of CMake requires at least version 3.0
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
-cmake_policy(SET CMP0007 OLD)
 cmake_policy(SET CMP0026 OLD)
 
 # Set the project as C++ primarily, but have C enabled for the checks required later

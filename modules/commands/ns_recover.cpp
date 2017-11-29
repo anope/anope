@@ -246,13 +246,16 @@ class NSRecover : public Module
 				{
 					Channel *c = Channel::Find(it->first);
 					const Anope::string &cname = it->first;
+					Anope::string key;
 					++it;
 
 					/* User might already be on the channel */
 					if (u->FindChannel(c))
 						this->OnJoinChannel(u, c);
-					else if (IRCD->CanSVSJoin)
-						IRCD->SendSVSJoin(NickServ, u, cname, "");
+					else if (IRCD->CanSVSJoin) {
+						c->GetParam("KEY", key);
+						IRCD->SendSVSJoin(NickServ, u, cname, key);
+					}
 				}
 		}
 

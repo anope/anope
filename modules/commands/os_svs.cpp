@@ -89,6 +89,7 @@ class CommandOSSVSJoin : public Command
 
 		User *target = User::Find(params[0], true);
 		Channel *c = Channel::Find(params[1]);
+		Anope::string key;
 		if (target == NULL)
 			source.Reply(NICK_X_NOT_IN_USE, params[0].c_str());
 		else if (source.GetUser() != target && (target->IsProtected() || target->server == Me))
@@ -99,7 +100,8 @@ class CommandOSSVSJoin : public Command
 			source.Reply(_("\002%s\002 is already in \002%s\002."), target->nick.c_str(), c->name.c_str());
 		else
 		{
-			IRCD->SendSVSJoin(*source.service, target, params[1], "");
+			c->GetParam("KEY", key);
+			IRCD->SendSVSJoin(*source.service, target, params[1], key);
 			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to join " << params[1];
 			source.Reply(_("\002%s\002 has been joined to \002%s\002."), target->nick.c_str(), params[1].c_str());
 		}

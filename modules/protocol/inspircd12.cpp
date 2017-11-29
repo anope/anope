@@ -339,8 +339,14 @@ class InspIRCd12Proto : public IRCDProto
 		SendAddLine("Z", x->GetHost(), timeleft, x->by, x->GetReason());
 	}
 
-	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) anope_override
+	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) anope_override
 	{
+		/* InspIRCd 1.2 and 2.0 have a bug where SVSJOIN cannot join
+		 * users into +k channels. Work around this with sending an
+		 * INVITE message first.
+		 */
+		if (!param.empty())
+			UplinkSocket::Message(source) << "INVITE " << u->GetUID() << " " << chan;
 		UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
 	}
 

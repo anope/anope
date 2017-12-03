@@ -53,10 +53,9 @@ ChannelType::ChannelType(Module *me) : Serialize::Type<ChannelImpl>(me)
 
 }
 
-void ChannelType::Name::OnSet(ChannelImpl *c, const Anope::string &value)
+void ChannelType::Name::OnSet(ChannelImpl *c, Anope::string *old, const Anope::string &value)
 {
 	ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
-	Anope::string *old = this->Get_(c);
 	if (old != nullptr)
 		map.erase(*old);
 

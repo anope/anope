@@ -229,7 +229,7 @@ XLineManager *XLine::GetManager()
 	return ServiceManager::Get()->FindService<XLineManager *>(GetType());
 }
 
-void XLineType::Mask::OnSet(XLine *s, const Anope::string &value)
+void XLineType::Mask::OnSet(XLine *s, Anope::string *old, const Anope::string &value)
 {
 	s->Recache(value);
 }

@@ -27,7 +27,7 @@ class AccountType : public Serialize::Type<AccountImpl>
 	{
 		using Serialize::Field<AccountImpl, Anope::string>::Field;
 
-		void OnSet(AccountImpl *s, const Anope::string &) override;
+		void OnSet(AccountImpl *s, Anope::string *, const Anope::string &) override;
 	} display;
 	/* User password in form of hashm:data */
 	Serialize::Field<AccountImpl, Anope::string> pass;

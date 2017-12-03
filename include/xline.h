@@ -89,7 +89,7 @@ class XLineType : public Serialize::Type<XLine>
 	{
 		using Serialize::Field<XLine, Anope::string>::Field;
 
-		void OnSet(XLine *s, const Anope::string &value) override;
+		void OnSet(XLine *s, Anope::string *old, const Anope::string &value) override;
 	} mask;
 	Serialize::Field<XLine, Anope::string> by, reason, id;
 	Serialize::Field<XLine, time_t> created, expires;

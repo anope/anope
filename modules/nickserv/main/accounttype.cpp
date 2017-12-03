@@ -47,11 +47,10 @@ AccountType::AccountType(Module *me) : Serialize::Type<AccountImpl>(me)
 
 }
 
-void AccountType::Display::OnSet(AccountImpl *acc, const Anope::string &disp)
+void AccountType::Display::OnSet(AccountImpl *acc, Anope::string *old, const Anope::string &disp)
 {
 	NickServ::nickcore_map& map = NickServ::service->GetAccountMap();
 
-	Anope::string *old = this->Get_(acc);
 	if (old != nullptr)
 		map.erase(*old);
 

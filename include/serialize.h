@@ -602,8 +602,8 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 			T t2 = this->Unserialize(value);
 
 			// set & cache
-			OnSet(s, t2);
 			this->Set_(s, t2);
+			OnSet(s, t, t2);
 
 			return t2;
 		}
@@ -620,14 +620,16 @@ class Serialize::Field : public CommonFieldBase<TypeImpl, T>
 	 * Override to hook to changes in the internally
 	 * cached value
 	 */
-	virtual void OnSet(TypeImpl *s, const T &value) { }
+	virtual void OnSet(TypeImpl *s, T *old, const T &value) { }
 
 	void SetField(TypeImpl *s, const T &value)
 	{
+		T* t = this->Get_(s);
+
 		Anope::string strvalue = this->Serialize(value);
 		EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeSet, s, this, strvalue);
 
-		OnSet(s, value);
+		OnSet(s, t, value);
 		this->Set_(s, value);
 	}
 
@@ -739,8 +741,8 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 
 			T t2 = result == EVENT_ALLOW ? static_cast<T>(base->Require(sid)) : nullptr;
 
-			OnSet(s, t2);
-			this->Set_(s, t2);
+			this->Set_(s, t2); // internally set & cache
+			OnSet(s, t != nullptr ? *t : nullptr, t2); // now trigger set event with old and new values
 
 			return t2;
 		}
@@ -753,7 +755,7 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 		SetField(this->Upcast(s), value);
 	}
 
-	virtual void OnSet(TypeImpl *s, T value) { }
+	virtual void OnSet(TypeImpl *s, T old, T value) { }
 
 	void SetField(TypeImpl *s, T value)
 	{
@@ -763,8 +765,8 @@ class Serialize::ObjectField : public CommonFieldBase<TypeImpl, T>
 		if (old != nullptr && *old != nullptr)
 			s->RemoveEdge(*old, this);
 
-		OnSet(s, value);
 		this->Set_(s, value);
+		OnSet(s, old != nullptr ? *old : nullptr, value);
 
 		if (value != nullptr)
 			s->AddEdge(value, this);

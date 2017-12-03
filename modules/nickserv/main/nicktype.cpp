@@ -34,11 +34,11 @@ NickType::NickType(Module *me) : Serialize::Type<NickImpl>(me)
 
 }
 
-void NickType::Nick::OnSet(NickImpl *na, const Anope::string &value)
+void NickType::Nick::OnSet(NickImpl *na, Anope::string *old, const Anope::string &value)
 {
 	/* Remove us from the aliases list */
 	NickServ::nickalias_map &map = NickServ::service->GetNickMap();
-	Anope::string *old = this->Get_(na);
+
 	if (old != nullptr)
 		map.erase(*old);
 

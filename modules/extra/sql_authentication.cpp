@@ -26,10 +26,10 @@ static Module *me;
 class SQLAuthenticationResult : public SQL::Interface
 {
 	Reference<User> user;
-	IdentifyRequest *req;
+	NickServ::IdentifyRequest *req;
 
  public:
-	SQLAuthenticationResult(User *u, IdentifyRequest *r) : SQL::Interface(me), user(u), req(r)
+	SQLAuthenticationResult(User *u, NickServ::IdentifyRequest *r) : SQL::Interface(me), user(u), req(r)
 	{
 		req->Hold(me);
 	}
@@ -43,12 +43,12 @@ class SQLAuthenticationResult : public SQL::Interface
 	{
 		if (r.Rows() == 0)
 		{
-			Log(LogType::DEBUG) << "m_sql_authentication: Unsuccessful authentication for " << req->GetAccount();
+			this->owner->logger.Debug("m_sql_authentication: Unsuccessful authentication for {0}", req->GetAccount());
 			delete this;
 			return;
 		}
 
-		Log(LogType::DEBUG) << "m_sql_authentication: Successful authentication for " << req->GetAccount();
+		this->owner->logger.Debug("m_sql_authentication: Successful authentication for {0}", req->GetAccount());
 
 		Anope::string email;
 		try
@@ -61,8 +61,19 @@ class SQLAuthenticationResult : public SQL::Interface
 		ServiceBot *NickServ = Config->GetClient("NickServ");
 		if (na == NULL)
 		{
-			na = new NickServ::Nick(req->GetAccount(), new NickServ::Account(req->GetAccount()));
-			NickServ::EventManager::Get()->Dispatch(&NickServ::Event::NickRegister::OnNickRegister, user, na, "");
+			NickServ::Account *nc = Serialize::New<NickServ::Account *>();
+			nc->SetDisplay(req->GetAccount());
+
+			na = Serialize::New<NickServ::Nick *>();
+			na->SetNick(nc->GetDisplay());
+			na->SetAccount(nc);
+			na->SetTimeRegistered(Anope::CurTime);
+			na->SetLastSeen(Anope::CurTime);
+
+			this->owner->logger.Log("Created account {0}", nc->GetDisplay());
+
+			EventManager::Get()->Dispatch(&NickServ::Event::NickRegister::OnNickRegister, user, na, "");
+
 			if (user && NickServ)
 				user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->GetNick().c_str());
 		}
@@ -80,7 +91,7 @@ class SQLAuthenticationResult : public SQL::Interface
 
 	void OnError(const SQL::Result &r) override
 	{
-		Log(this->owner) << "m_sql_authentication: Error executing query " << r.GetQuery().query << ": " << r.GetError();
+		this->owner->logger.Log("Error executing query {0}: {1}", r.GetQuery().query, r.GetError());
 		delete this;
 	}
 };
@@ -97,6 +108,8 @@ class ModuleSQLAuthentication : public Module
 
  public:
 	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::PreCommand>(this)
+		, EventHook<Event::CheckAuthentication>(this)
 	{
 		me = this;
 
@@ -110,18 +123,18 @@ class ModuleSQLAuthentication : public Module
 		this->disable_reason = config->Get<Anope::string>("disable_reason");
 		this->disable_email_reason = config->Get<Anope::string>("disable_email_reason");
 
-		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
+		this->SQL = ServiceReference<SQL::Provider>(this->engine);
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
-		if (!this->disable_reason.empty() && (command->name == "nickserv/register" || command->name == "nickserv/group"))
+		if (!this->disable_reason.empty() && (command->GetName() == "nickserv/register" || command->GetName() == "nickserv/group"))
 		{
 			source.Reply(this->disable_reason);
 			return EVENT_STOP;
 		}
 
-		if (!this->disable_email_reason.empty() && command->name == "nickserv/set/email")
+		if (!this->disable_email_reason.empty() && command->GetName() == "nickserv/set/email")
 		{
 			source.Reply(this->disable_email_reason);
 			return EVENT_STOP;
@@ -130,11 +143,11 @@ class ModuleSQLAuthentication : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnCheckAuthentication(User *u, IdentifyRequest *req) override
+	void OnCheckAuthentication(User *u, NickServ::IdentifyRequest *req) override
 	{
 		if (!this->SQL)
 		{
-			Log(this) << "Unable to find SQL engine";
+			logger.Log("Unable to find SQL engine");
 			return;
 		}
 
@@ -155,7 +168,7 @@ class ModuleSQLAuthentication : public Module
 
 		this->SQL->Run(new SQLAuthenticationResult(u, req), q);
 
-		Log(LogType::DEBUG) << "m_sql_authentication: Checking authentication for " << req->GetAccount();
+		logger.Debug("Checking authentication for {0}", req->GetAccount());
 	}
 };
 

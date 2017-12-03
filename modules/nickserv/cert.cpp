@@ -24,35 +24,6 @@
 
 static Anope::hash_map<NickServ::Account *> certmap;
 
-class CertServiceImpl : public CertService
-{
- public:
-	CertServiceImpl(Module *o) : CertService(o) { }
-
-	NickServ::Account* FindAccountFromCert(const Anope::string &cert) override
-	{
-#warning "use serialize find"
-		Anope::hash_map<NickServ::Account *>::iterator it = certmap.find(cert);
-		if (it != certmap.end())
-			return it->second;
-		return NULL;
-	}
-
-	bool Matches(User *u, NickServ::Account *nc) override
-	{
-		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>();
-		return !u->fingerprint.empty() && FindCert(cl, u->fingerprint);
-	}
-
-	NSCertEntry *FindCert(const std::vector<NSCertEntry *> &cl, const Anope::string &certfp) override
-	{
-		for (NSCertEntry *e : cl)
-			if (e->GetCert() == certfp)
-				return e;
-		return nullptr;
-	}
-};
-
 class NSCertEntryImpl : public NSCertEntry
 {
 	friend class NSCertEntryType;
@@ -78,7 +49,7 @@ class NSCertEntryType : public Serialize::Type<NSCertEntryImpl>
 	{
 		using Serialize::ObjectField<NSCertEntryImpl, NickServ::Account *>::ObjectField;
 
-		void OnSet(NSCertEntryImpl *s, NickServ::Account *acc) override
+		void OnSet(NSCertEntryImpl *s, NickServ::Account *old, NickServ::Account *acc) override
 		{
 			const Anope::string &cert = s->GetCert();
 
@@ -91,9 +62,8 @@ class NSCertEntryType : public Serialize::Type<NSCertEntryImpl>
 	{
 		using Serialize::Field<NSCertEntryImpl, Anope::string>::Field;
 
-		void OnSet(NSCertEntryImpl *s, const Anope::string &m) override
+		void OnSet(NSCertEntryImpl *s, Anope::string *old, const Anope::string &m) override
 		{
-			Anope::string *old = this->Get_(s);
 			if (old != nullptr)
 				certmap.erase(*old);
 
@@ -106,6 +76,49 @@ class NSCertEntryType : public Serialize::Type<NSCertEntryImpl>
 		, account(this, "account", &NSCertEntryImpl::account, true)
 		, mask(this, "mask", &NSCertEntryImpl::cert)
 	{
+	}
+
+	NickServ::Account *FindAccount(const Anope::string &cert)
+	{
+		Serialize::ID id;
+		EventReturn result = EventManager::Get()->Dispatch(&Event::SerializeEvents::OnSerializeFind, this, &this->mask, cert, id);
+		if (result == EVENT_ALLOW)
+			return RequireID(id)->GetAccount();
+
+		Anope::hash_map<NickServ::Account *>::iterator it = certmap.find(cert);
+		if (it != certmap.end())
+			return it->second;
+		return nullptr;
+	}
+};
+
+class CertServiceImpl : public CertService
+{
+	NSCertEntryType &cert_type;
+
+ public:
+	CertServiceImpl(Module *o, NSCertEntryType &ct) : CertService(o)
+		, cert_type(ct)
+	{
+	}
+
+	NickServ::Account* FindAccountFromCert(const Anope::string &cert) override
+	{
+		return cert_type.FindAccount(cert);
+	}
+
+	bool Matches(User *u, NickServ::Account *nc) override
+	{
+		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>();
+		return !u->fingerprint.empty() && FindCert(cl, u->fingerprint);
+	}
+
+	NSCertEntry *FindCert(const std::vector<NSCertEntry *> &cl, const Anope::string &certfp) override
+	{
+		for (NSCertEntry *e : cl)
+			if (e->GetCert() == certfp)
+				return e;
+		return nullptr;
 	}
 };
 
@@ -317,6 +330,7 @@ class NSCert : public Module
 	, public EventHook<Event::Fingerprint>
 	, public EventHook<NickServ::Event::NickValidate>
 {
+	NSCertEntryType certtype;
 	CommandNSCert commandnscert;
 	CertServiceImpl cs;
 
@@ -324,8 +338,9 @@ class NSCert : public Module
 	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::Fingerprint>(this)
 		, EventHook<NickServ::Event::NickValidate>(this)
+		, certtype(this)
 		, commandnscert(this)
-		, cs(this)
+		, cs(this, certtype)
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("Your IRCd does not support ssl client certificates");

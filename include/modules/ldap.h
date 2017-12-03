@@ -136,6 +136,8 @@ class LDAPInterface
 class LDAPProvider : public Service
 {
  public:
+	static constexpr const char *NAME = "ldap";
+
 	LDAPProvider(Module *c, const Anope::string &n) : Service(c, "LDAPProvider", n) { }
 
 	/** Attempt to bind to the LDAP server as an admin

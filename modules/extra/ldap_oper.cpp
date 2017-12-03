@@ -20,7 +20,6 @@
 #include "module.h"
 #include "modules/ldap.h"
 
-static std::set<Oper *> my_opers;
 static Anope::string opertype_attribute;
 
 class IdentifyInterface : public LDAPInterface
@@ -45,35 +44,21 @@ class IdentifyInterface : public LDAPInterface
 
 			const Anope::string &opertype = attr.get(opertype_attribute);
 
+			Oper *o = nc->GetOper();
 			OperType *ot = OperType::Find(opertype);
-			if (ot != NULL && (nc->o == NULL || ot != nc->o->ot))
+			if (ot != NULL && (o == nullptr || ot != o->GetType()))
 			{
-				Oper *o = nc->o;
-				if (o != NULL && my_opers.count(o) > 0)
-				{
-					my_opers.erase(o);
-					delete o;
-				}
-				o = new Oper(u->nick, ot);
-				my_opers.insert(o);
-				nc->o = o;
+				o = Serialize::New<Oper *>();
+				o->SetName(u->nick);
+				o->SetType(ot);
 
-				Log(this->owner) << "Tied " << u->nick << " (" << nc->GetDisplay() << ") to opertype " << ot->GetName();
+				nc->SetOper(o);
+
+				this->owner->logger.Log("Tied {0} ({1}) to opertype {2}", u->nick, nc->GetDisplay(), ot->GetName());
 			}
 		}
 		catch (const LDAPException &ex)
 		{
-			if (nc->o != NULL)
-			{
-				if (my_opers.count(nc->o) > 0)
-				{
-					my_opers.erase(nc->o);
-					delete nc->o;
-				}
-				nc->o = NULL;
-
-				Log(this->owner) << "Removed services operator from " << u->nick << " (" << nc->GetDisplay() << ")";
-			}
 		}
 	}
 
@@ -81,7 +66,7 @@ class IdentifyInterface : public LDAPInterface
 	{
 	}
 
-	void OnDelete() anope_override
+	void OnDelete() override
 	{
 		delete this;
 	}
@@ -89,7 +74,6 @@ class IdentifyInterface : public LDAPInterface
 
 class LDAPOper : public Module
 	, public EventHook<Event::NickIdentify>
-	, public EventHook<Event::DelCore>
 {
 	ServiceReference<LDAPProvider> ldap;
 
@@ -100,7 +84,8 @@ class LDAPOper : public Module
  public:
 	LDAPOper(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
-		, ldap("LDAPProvider", "ldap/main")
+		, EventHook<Event::NickIdentify>(this)
+		, ldap("ldap/main")
 	{
 
 	}
@@ -114,10 +99,6 @@ class LDAPOper : public Module
 		this->basedn = config->Get<Anope::string>("basedn");
 		this->filter = config->Get<Anope::string>("filter");
 		opertype_attribute = config->Get<Anope::string>("opertype_attribute");
-
-		for (std::set<Oper *>::iterator it = my_opers.begin(), it_end = my_opers.end(); it != it_end; ++it)
-			delete *it;
-		my_opers.clear();
 	}
 
 	void OnNickIdentify(User *u) override
@@ -135,17 +116,7 @@ class LDAPOper : public Module
 		}
 		catch (const LDAPException &ex)
 		{
-			Log() << ex.GetReason();
-		}
-	}
-
-	void OnDelCore(NickServ::Account *nc) override
-	{
-		if (nc->o != NULL && my_opers.count(nc->o) > 0)
-		{
-			my_opers.erase(nc->o);
-			delete nc->o;
-			nc->o = NULL;
+			logger.Log(ex.GetReason());
 		}
 	}
 };

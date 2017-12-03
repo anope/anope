@@ -315,6 +315,7 @@ class GnuTLSModule : public Module
 	MySSLService service;
 
 	GnuTLSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::PreServerConnect>(this)
 		, cred(NULL)
 		, service(this, "ssl")
 	{
@@ -337,11 +338,11 @@ class GnuTLSModule : public Module
 			cred->decrref();
 	}
 
-	static void CheckFile(const Anope::string &filename)
+	void CheckFile(const Anope::string &filename)
 	{
 		if (!Anope::IsFile(filename.c_str()))
 		{
-			Log() << "File does not exist: " << filename;
+			logger.Log("File does not exist: {0}", filename);
 			throw ConfigException("Error loading certificate/private key");
 		}
 	}
@@ -371,7 +372,7 @@ class GnuTLSModule : public Module
 				delete newcred;
 				throw;
 			}
-			Log(LogType::DEBUG) << "m_ssl_gnutls: Successfully loaded DH parameters from " << dhfile;
+			logger.Debug("Successfully loaded DH parameters from {0}", dhfile);
 		}
 
 		if (cred)
@@ -379,7 +380,7 @@ class GnuTLSModule : public Module
 		cred = newcred;
 		cred->incrref();
 
-		Log(LogType::DEBUG) << "m_ssl_gnutls: Successfully loaded certificate " << certfile << " and private key " << keyfile;
+		logger.Debug("Successfully loaded certificate {0} and private key {1}", certfile, keyfile);
 	}
 
 	void OnPreServerConnect() override
@@ -423,7 +424,7 @@ int SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
 				if (s == UplinkSock)
 				{
 					// Log and fake an errno because this is a fatal error on the uplink socket
-					Log() << "SSL error: " << gnutls_strerror(ret);
+					Anope::Logger.Log("SSL error: {0}", gnutls_strerror(ret));
 				}
 				SocketEngine::SetLastError(ECONNRESET);
 		}
@@ -451,7 +452,7 @@ int SSLSocketIO::Send(Socket *s, const char *buf, size_t sz)
 				if (s == UplinkSock)
 				{
 					// Log and fake an errno because this is a fatal error on the uplink socket
-					Log() << "SSL error: " << gnutls_strerror(ret);
+					Anope::Logger.Log("SSL error: {0}", gnutls_strerror(ret));
 				}
 				SocketEngine::SetLastError(ECONNRESET);
 		}

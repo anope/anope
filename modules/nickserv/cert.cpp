@@ -198,8 +198,9 @@ class CommandNSCert : public Command
 		NSCertEntry *e = Serialize::New<NSCertEntry *>();
 		e->SetAccount(nc);
 		e->SetCert(certfp);
+
+		EventManager::Get()->Dispatch(&Event::NickCertEvents::OnNickAddCert, e);
 		
-#warning "events?"
 		logger.Command(nc == source.GetAccount() ? LogType::COMMAND : LogType::ADMIN, source, _("{source} used {command} to add certificate fingerprint {0} to {1}"), certfp, nc->GetDisplay());
 
 		source.Reply(_("\002{0}\002 added to the certificate list of \002{1}\002."), certfp, nc->GetDisplay());
@@ -228,6 +229,8 @@ class CommandNSCert : public Command
 			source.Reply(_("\002{0}\002 not found on the certificate list of \002{1}\002."), certfp, nc->GetDisplay());
 			return;
 		}
+
+		EventManager::Get()->Dispatch(&Event::NickCertEvents::OnNickEraseCert, cert);
 
 		cert->Delete();
 

@@ -55,22 +55,16 @@ namespace Event
 
 		using Events::Events;
 
-		/** Called when a user adds an entry to their cert list
-		 * @param nc The nick
-		 * @param entry The entry
+		/** Called when a certificate is added to an account
+		 * @param cert The certificate
 		 */
-		virtual void OnNickAddCert(NickServ::Account *nc, const Anope::string &entry) anope_abstract;
+		virtual void OnNickAddCert(NSCertEntry *cert) anope_abstract;
 
-		/** Called from NickServ::Account::EraseCert()
-		 * @param nc pointer to the NickServ::Account
+		/** Called before a certificate is deleted
+		 * @param cert The certificate
 		 * @param entry The fingerprint
 		 */
-		virtual void OnNickEraseCert(NickServ::Account *nc, const Anope::string &entry) anope_abstract;
-
-		/** called from NickServ::Account::ClearCert()
-		 * @param nc pointer to the NickServ::Account
-		 */
-		virtual void OnNickClearCert(NickServ::Account *nc) anope_abstract;
+		virtual void OnNickEraseCert(NSCertEntry *cert) anope_abstract;
 	};
 }
 

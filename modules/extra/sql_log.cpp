@@ -28,6 +28,7 @@ class SQLLog : public Module
 
  public:
 	SQLLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
+		, EventHook<Event::LogMessage>(this)
 	{
 	}
 
@@ -37,7 +38,7 @@ class SQLLog : public Module
 		this->table = config->Get<Anope::string>("table", "logs");
 	}
 
-	void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) override
+	void OnLogMessage(LogInfo *li, const Logger *l, const Anope::string &msg) override
 	{
 		Anope::string ref_name;
 		ServiceReference<SQL::Provider> SQL;
@@ -49,7 +50,7 @@ class SQLLog : public Module
 			if (!sz)
 			{
 				ref_name = target.substr(8);
-				SQL = ServiceReference<SQL::Provider>("SQL::Provider", ref_name);
+				SQL = ServiceReference<SQL::Provider>(ref_name);
 				break;
 			}
 		}
@@ -77,7 +78,7 @@ class SQLLog : public Module
 		SQL::Query insert("INSERT INTO `" + table + "` (`type`,`user`,`acc`,`command`,`channel`,`msg`)"
 			"VALUES (@type@, @user@, @acc@, @command@, @channel@, @msg@)");
 
-		switch (l->type)
+		switch (l->GetType())
 		{
 			case LogType::ADMIN:
 				insert.SetValue("type", "ADMIN");
@@ -107,10 +108,18 @@ class SQLLog : public Module
 				return;
 		}
 
-		insert.SetValue("user", l->u ? l->u->nick : "");
-		insert.SetValue("acc", l->nc ? l->nc->GetDisplay() : "");
-		insert.SetValue("command", l->c ? l->c->name : "");
-		insert.SetValue("channel", l->ci ? l->ci->GetName() : "");
+		User *u = l->GetUser();
+		insert.SetValue("user", u ? u->nick : "");
+
+		NickServ::Account *acc = l->GetAccount();
+		insert.SetValue("acc", acc ? acc->GetDisplay() : "");
+
+		Command *cmd = l->GetCommand();
+		insert.SetValue("command", cmd ? cmd->GetName() : "");
+
+		ChanServ::Channel *ci = l->GetCi();
+		insert.SetValue("channel", ci ? ci->GetName() : "");
+
 		insert.SetValue("msg", msg);
 
 		SQL->Run(NULL, insert);

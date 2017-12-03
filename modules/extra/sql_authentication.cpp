@@ -63,6 +63,7 @@ class SQLAuthenticationResult : public SQL::Interface
 		{
 			NickServ::Account *nc = Serialize::New<NickServ::Account *>();
 			nc->SetDisplay(req->GetAccount());
+			nc->SetOper(Oper::Find(nc->GetDisplay()));
 
 			na = Serialize::New<NickServ::Nick *>();
 			na->SetNick(nc->GetDisplay());

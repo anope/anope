@@ -32,12 +32,12 @@ static Anope::string username_attribute;
 struct IdentifyInfo
 {
 	Reference<User> user;
-	IdentifyRequest *req;
+	NickServ::IdentifyRequest *req;
 	ServiceReference<LDAPProvider> lprov;
 	bool admin_bind;
 	Anope::string dn;
 
-	IdentifyInfo(User *u, IdentifyRequest *r, ServiceReference<LDAPProvider> &lp) : user(u), req(r), lprov(lp), admin_bind(true)
+	IdentifyInfo(User *u, NickServ::IdentifyRequest *r, ServiceReference<LDAPProvider> &lp) : user(u), req(r), lprov(lp), admin_bind(true)
 	{
 		req->Hold(me);
 	}
@@ -60,7 +60,7 @@ class IdentifyInterface : public LDAPInterface
 		delete ii;
 	}
 
-	void OnDelete() anope_override
+	void OnDelete() override
 	{
 		delete this;
 	}
@@ -80,14 +80,14 @@ class IdentifyInterface : public LDAPInterface
 					{
 						const LDAPAttributes &attr = r.get(0);
 						ii->dn = attr.get("dn");
-						Log(LogType::DEBUG) << "m_ldap_authenticationn: binding as " << ii->dn;
+						this->owner->logger.Debug("binding as {0}", ii->dn);
 
 						ii->lprov->Bind(new IdentifyInterface(this->owner, ii), ii->dn, ii->req->GetPassword());
 						ii = NULL;
 					}
 					catch (const LDAPException &ex)
 					{
-						Log(this->owner) << "Error binding after search: " << ex.GetReason();
+						this->owner->logger.Log("Error binding after search: {0}", ex.GetReason());
 					}
 				}
 				break;
@@ -99,14 +99,14 @@ class IdentifyInterface : public LDAPInterface
 					Anope::string sf = search_filter.replace_all_cs("%account", ii->req->GetAccount()).replace_all_cs("%object_class", object_class);
 					try
 					{
-						Log(LogType::DEBUG) << "m_ldap_authentication: searching for " << sf;
+						this->owner->logger.Debug("searching for {0}", sf);
 						ii->lprov->Search(new IdentifyInterface(this->owner, ii), basedn, sf);
 						ii->admin_bind = false;
 						ii = NULL;
 					}
 					catch (const LDAPException &ex)
 					{
-						Log(this->owner) << "Unable to search for " << sf << ": " << ex.GetReason();
+						this->owner->logger.Log("Unable to search for {0}: {1}", sf, ex.GetReason());
 					}
 				}
 				else
@@ -114,15 +114,27 @@ class IdentifyInterface : public LDAPInterface
 					NickServ::Nick *na = NickServ::FindNick(ii->req->GetAccount());
 					if (na == NULL)
 					{
-						na = new NickServ::Nick(ii->req->GetAccount(), new NickServ::Account(ii->req->GetAccount()));
+						NickServ::Account *nc = Serialize::New<NickServ::Account *>();
+						nc->SetDisplay(ii->req->GetAccount());
+						nc->SetOper(Oper::Find(nc->GetDisplay()));
+
+						na = Serialize::New<NickServ::Nick *>();
+						na->SetNick(ii->req->GetAccount());
+						na->SetAccount(nc);
+						na->SetTimeRegistered(Anope::CurTime);
+						na->SetLastSeen(Anope::CurTime);
 						na->SetLastRealname(ii->user ? ii->user->realname : ii->req->GetAccount());
-						NickServ::EventManager::Get()->Dispatch(&NickServ::Event::NickRegister::OnNickRegister, ii->user, na, ii->req->GetPassword());;
+
+						EventManager::Get()->Dispatch(&NickServ::Event::NickRegister::OnNickRegister, ii->user, na, ii->req->GetPassword());
+
 						ServiceBot *NickServ = Config->GetClient("NickServ");
 						if (ii->user && NickServ)
 							ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->GetNick().c_str());
 					}
 					// encrypt and store the password in the nickcore
-					Anope::Encrypt(ii->req->GetPassword(), na->GetAccount()->pass);
+					Anope::string pass;
+					Anope::Encrypt(ii->req->GetPassword(), pass);
+					na->GetAccount()->SetPassword(pass);
 
 					na->GetAccount()->Extend<Anope::string>("m_ldap_authentication_dn", ii->dn);
 					ii->req->Success(me);
@@ -146,7 +158,7 @@ class OnIdentifyInterface : public LDAPInterface
  public:
 	OnIdentifyInterface(Module *m, const Anope::string &i) : LDAPInterface(m), uid(i) { }
 
-	void OnDelete() anope_override
+	void OnDelete() override
 	{
 		delete this;
 	}
@@ -169,18 +181,18 @@ class OnIdentifyInterface : public LDAPInterface
 				ServiceBot *NickServ = Config->GetClient("NickServ");
 				if (NickServ)
 					u->SendMessage(NickServ, _("Your email has been updated to \002%s\002"), email.c_str());
-				Log(this->owner) << "Updated email address for " << u->nick << " (" << u->Account()->GetDisplay() << ") to " << email;
+				this->owner->logger.Log("Updated email address for {0} ({1}) to {2}", u->nick, u->Account()->GetDisplay(), email);
 			}
 		}
 		catch (const LDAPException &ex)
 		{
-			Log(this->owner) << ex.GetReason();
+			this->owner->logger.Log(ex.GetReason());
 		}
 	}
 
 	void OnError(const LDAPResult &r) override
 	{
-		Log(this->owner) << r.error;
+		this->owner->logger.Log(r.error);
 	}
 };
 
@@ -191,12 +203,12 @@ class OnRegisterInterface : public LDAPInterface
 
 	void OnResult(const LDAPResult &r) override
 	{
-		Log(this->owner) << "Successfully added newly created account to LDAP";
+		this->owner->logger.Log("Successfully added newly created account to LDAP");
 	}
 
 	void OnError(const LDAPResult &r) override
 	{
-		Log(this->owner) << "Error adding newly created account to LDAP: " << r.getError();
+		this->owner->logger.Log("Error adding newly created account to LDAP: {0}", r.getError());
 	}
 };
 
@@ -209,7 +221,7 @@ class ModuleLDAPAuthentication : public Module
 	ServiceReference<LDAPProvider> ldap;
 	OnRegisterInterface orinterface;
 
-	PrimitiveExtensibleItem<Anope::string> dn;
+	ExtensibleItem<Anope::string> dn;
 
 	Anope::string password_attribute;
 	Anope::string disable_register_reason;
@@ -217,11 +229,11 @@ class ModuleLDAPAuthentication : public Module
 
  public:
 	ModuleLDAPAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-		, EventHook<Event::PreCommand>("OnPreCommand", EventHook<Event::PreCommand>::Priority::FIRST)
-		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication", EventHook<Event::CheckAuthentication>::Priority::FIRST)
-		, EventHook<Event::NickIdentify>("OnNickIdentify", EventHook<Event::NickIdentify>::Priority::FIRST)
-		, EventHook<NickServ::Event::NickRegister>("OnNickRegister", EventHook<NickServ::Event::NickRegister>::Priority::FIRST)
-		, ldap("LDAPProvider", "ldap/main")
+		, EventHook<Event::PreCommand>(this, EventHook<Event::PreCommand>::Priority::FIRST)
+		, EventHook<Event::CheckAuthentication>(this, EventHook<Event::CheckAuthentication>::Priority::FIRST)
+		, EventHook<Event::NickIdentify>(this, EventHook<Event::NickIdentify>::Priority::FIRST)
+		, EventHook<NickServ::Event::NickRegister>(this, EventHook<NickServ::Event::NickRegister>::Priority::FIRST)
+		, ldap("ldap/main")
 		, orinterface(this)
 		, dn(this, "m_ldap_authentication_dn")
 	{
@@ -250,14 +262,14 @@ class ModuleLDAPAuthentication : public Module
 	{
 		if (!this->disable_register_reason.empty())
 		{
-			if (command->name == "nickserv/register" || command->name == "nickserv/group")
+			if (command->GetName() == "nickserv/register" || command->GetName() == "nickserv/group")
 			{
 				source.Reply(this->disable_register_reason);
 				return EVENT_STOP;
 			}
 		}
 
-		if (!email_attribute.empty() && !this->disable_email_reason.empty() && command->name == "nickserv/set/email")
+		if (!email_attribute.empty() && !this->disable_email_reason.empty() && command->GetName() == "nickserv/set/email")
 		{
 			source.Reply(this->disable_email_reason);
 			return EVENT_STOP;
@@ -266,7 +278,7 @@ class ModuleLDAPAuthentication : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnCheckAuthentication(User *u, IdentifyRequest *req) override
+	void OnCheckAuthentication(User *u, NickServ::IdentifyRequest *req) override
 	{
 		if (!this->ldap)
 			return;

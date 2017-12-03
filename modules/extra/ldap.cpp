@@ -73,7 +73,7 @@ class LDAPBind : public LDAPRequest
 		type = QUERY_BIND;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPSearch : public LDAPRequest
@@ -90,7 +90,7 @@ class LDAPSearch : public LDAPRequest
 		type = QUERY_SEARCH;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPAdd : public LDAPRequest
@@ -107,7 +107,7 @@ class LDAPAdd : public LDAPRequest
 		type = QUERY_ADD;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPDel : public LDAPRequest
@@ -122,7 +122,7 @@ class LDAPDel : public LDAPRequest
 		type = QUERY_DELETE;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPModify : public LDAPRequest
@@ -139,7 +139,7 @@ class LDAPModify : public LDAPRequest
 		type = QUERY_MODIFY;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPService : public LDAPProvider, public Thread, public Condition
@@ -197,24 +197,24 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 	{
 		int i = ldap_initialize(&this->con, this->server.c_str());
 		if (i != LDAP_SUCCESS)
-			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + ldap_err2string(i));
+			throw LDAPException("Unable to connect to LDAP service " + this->GetName() + ": " + ldap_err2string(i));
 
 		const int version = LDAP_VERSION3;
 		i = ldap_set_option(this->con, LDAP_OPT_PROTOCOL_VERSION, &version);
 		if (i != LDAP_OPT_SUCCESS)
-			throw LDAPException("Unable to set protocol version for " + this->name + ": " + ldap_err2string(i));
+			throw LDAPException("Unable to set protocol version for " + this->GetName() + ": " + ldap_err2string(i));
 
 		const struct timeval tv = { 0, 0 };
 		i = ldap_set_option(this->con, LDAP_OPT_NETWORK_TIMEOUT, &tv);
 		if (i != LDAP_OPT_SUCCESS)
-			throw LDAPException("Unable to set timeout for " + this->name + ": " + ldap_err2string(i));
+			throw LDAPException("Unable to set timeout for " + this->GetName() + ": " + ldap_err2string(i));
 	}
 
 	void Reconnect()
 	{
 		/* Only try one connect a minute. It is an expensive blocking operation */
 		if (last_connect > Anope::CurTime - 60)
-			throw LDAPException("Unable to connect to LDAP service " + this->name + ": reconnecting too fast");
+			throw LDAPException("Unable to connect to LDAP service " + this->GetName() + ": reconnecting too fast");
 		last_connect = Anope::CurTime;
 
 		ldap_unbind_ext(this->con, NULL, NULL);
@@ -304,13 +304,13 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		QueueRequest(add);
 	}
 
-	void Del(LDAPInterface *i, const Anope::string &dn) anope_override
+	void Del(LDAPInterface *i, const Anope::string &dn) override
 	{
 		LDAPDel *del = new LDAPDel(this, i, dn);
 		QueueRequest(del);
 	}
 
-	void Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) anope_override
+	void Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) override
 	{
 		LDAPModify *mod = new LDAPModify(this, i, base, attributes);
 		QueueRequest(mod);
@@ -417,7 +417,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 	}
 
  public:
-	void Run() anope_override
+	void Run() override
 	{
 		while (!this->GetExitState())
 		{
@@ -445,6 +445,7 @@ class ModuleLDAP : public Module, public Pipe
  public:
 
 	ModuleLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::ModuleUnload>(this)
 	{
 		me = this;
 	}
@@ -479,7 +480,7 @@ class ModuleLDAP : public Module, public Pipe
 
 			if (i == conf->CountBlock("ldap"))
 			{
-				Log(LogType::NORMAL, "ldap") << "LDAP: Removing server connection " << cname;
+				logger.Log("Removing server connection {0}", cname);
 
 				s->SetExitState();
 				s->Wakeup();
@@ -499,7 +500,7 @@ class ModuleLDAP : public Module, public Pipe
 			{
 				const Anope::string &server = ldap->Get<Anope::string>("server", "127.0.0.1");
 				const Anope::string &admin_binddn = ldap->Get<Anope::string>("admin_binddn");
-				const Anope::string &admin_password = ldap->GetAnope::string>("admin_password");
+				const Anope::string &admin_password = ldap->Get<Anope::string>("admin_password");
 
 				try
 				{
@@ -507,11 +508,11 @@ class ModuleLDAP : public Module, public Pipe
 					ss->Start();
 					this->LDAPServices.insert(std::make_pair(connname, ss));
 
-					Log(LogType::NORMAL, "ldap") << "LDAP: Successfully initialized server " << connname << " (" << server << ")";
+					logger.Log("Successfully initialized server {0} ({1})", connname, server);
 				}
 				catch (const LDAPException &ex)
 				{
-					Log(LogType::NORMAL, "ldap") << "LDAP: " << ex.GetReason();
+					logger.Log(ex.GetReason());
 				}
 			}
 		}
@@ -575,7 +576,7 @@ class ModuleLDAP : public Module, public Pipe
 				{
 					if (!r->getError().empty())
 					{
-						Log(this) << "Error running LDAP query: " << r->getError();
+						logger.Log("Error running LDAP query: {0}", r->getError());
 						li->OnError(*r);
 					}
 					else

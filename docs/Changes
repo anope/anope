@@ -1,4 +1,4 @@
-Anope Version 2.0.6-git
+Anope Version 2.0.6
 -------------------
 Log client IP for web clients running commands via webcpanel
 Fix log file path for the config file could not be opened log message

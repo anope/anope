@@ -14,10 +14,11 @@
 class MemoDelCallback : public NumberList
 {
 	CommandSource &source;
+	Command *cmd;
 	ChannelInfo *ci;
 	MemoInfo *mi;
  public:
-	MemoDelCallback(CommandSource &_source, ChannelInfo *_ci, MemoInfo *_mi, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), mi(_mi)
+	MemoDelCallback(CommandSource &_source, Command *c, ChannelInfo *_ci, MemoInfo *_mi, const Anope::string &list) : NumberList(list, true), source(_source), cmd(c), ci(_ci), mi(_mi)
 	{
 	}
 
@@ -30,6 +31,8 @@ class MemoDelCallback : public NumberList
 
 		mi->Del(number - 1);
 		source.Reply(_("Memo %d has been deleted."), number);
+		if (ci)
+			Log(LOG_COMMAND, source, cmd, ci) << "on memo " << number;
 	}
 };
 
@@ -87,7 +90,7 @@ class CommandMSDel : public Command
 		{
 			if (isdigit(numstr[0]))
 			{
-				MemoDelCallback list(source, ci, mi, numstr);
+				MemoDelCallback list(source, this, ci, mi, numstr);
 				list.Process();
 			}
 			else if (numstr.equals_ci("LAST"))
@@ -96,6 +99,8 @@ class CommandMSDel : public Command
 				FOREACH_MOD(OnMemoDel, (ci ? ci->name : source.nc->display, mi, mi->GetMemo(mi->memos->size() - 1)));
 				mi->Del(mi->memos->size() - 1);
 				source.Reply(_("Memo %d has been deleted."), mi->memos->size() + 1);
+				if (ci)
+					Log(LOG_COMMAND, source, this, ci) << "on LAST memo";
 			}
 			else
 			{
@@ -106,7 +111,10 @@ class CommandMSDel : public Command
 					mi->Del(i - 1);
 				}
 				if (!chan.empty())
+				{
 					source.Reply(_("All memos for channel %s have been deleted."), chan.c_str());
+					Log(LOG_COMMAND, source, this, ci) << "on ALL memos";
+				}
 				else
 					source.Reply(_("All of your memos have been deleted."));
 			}

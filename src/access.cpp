@@ -42,6 +42,7 @@ static struct
 	{"INVITE", _("Allowed to use the INVITE command")},
 	{"KICK", _("Allowed to use the KICK command")},
 	{"MEMO", _("Allowed to read channel memos")},
+	{"MEMODEL", _("Allowed to delete channel memos")},
 	{"MODE", _("Allowed to use the MODE command")},
 	{"NOKICK", _("Prevents users being kicked by Services")},
 	{"OP", _("Allowed to (de)op users")},

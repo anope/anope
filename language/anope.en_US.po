@@ -2513,6 +2513,10 @@ msgstr "Allowed to modify the access list"
 msgid "Allowed to read channel memos"
 msgstr "Allowed to read channel memos"
 
+#: src/access.cpp:45
+msgid "Allowed to delete channel memos"
+msgstr "Allowed to delete channel memos"
+
 #: src/access.cpp:54
 msgid "Allowed to set channel settings"
 msgstr "Allowed to set channel settings"

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-16 18:59-0500\n"
-"PO-Revision-Date: 2018-02-03 00:12+0100\n"
+"PO-Revision-Date: 2018-02-03 17:30+0100\n"
 "Last-Translator: Dragone2 <dragone2@risposteinformatiche.it>\n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -304,12 +304,12 @@ msgstr ""
 #: modules/commands/cs_invite.cpp:66
 #, c-format
 msgid "%s is already in %s!"
-msgstr "%s è già presente in %s!"
+msgstr "%s è già presente in %s!"
 
 #: modules/commands/os_svs.cpp:99
 #, c-format
 msgid "%s is already in %s."
-msgstr "%s è già presente in %s."
+msgstr "%s è già presente in %s."
 
 #: modules/commands/ms_ignore.cpp:65
 #, c-format
@@ -349,7 +349,7 @@ msgstr "%s non è al momento nel canale %s."
 #: modules/commands/os_svs.cpp:144
 #, c-format
 msgid "%s is not in %s."
-msgstr "%s non è presente in %s."
+msgstr "%s non è presente in %s."
 
 #: modules/commands/ms_ignore.cpp:77
 #, c-format
@@ -369,7 +369,7 @@ msgstr "%s è il founder del canale %s."
 #: modules/commands/cs_status.cpp:78
 #, c-format
 msgid "%s matches access entry %s (from entry %s), which has privilege %s."
-msgstr "%s corrisponde al record %s  (dal record %s),  che ha livello %s."
+msgstr "%s corrisponde al record %s (dal record %s), che ha livello %s."
 
 #: modules/commands/cs_status.cpp:71
 #, c-format
@@ -379,7 +379,7 @@ msgstr "%s corrisponde al record %s, che ha privilegio %s."
 #: include/language.h:109
 #, c-format
 msgid "%s matches an except on %s and cannot be banned until the except has been removed."
-msgstr "%s corrisponde a un exception su %s e non può essere bannato fino a quando non viene rimossa."
+msgstr "%s corrisponde a un'eccezione su %s e non può essere bannato fino a quando non viene rimossa."
 
 #: modules/commands/cs_status.cpp:96
 #, c-format
@@ -434,7 +434,7 @@ msgstr "Impossibile trovare %s nella lista delle eccezioni session-limit."
 #: modules/commands/os_sxline.cpp:92
 #, c-format
 msgid "%s not found on the %s list."
-msgstr "%s non trovato nella lista %s."
+msgstr "%s non trovato nella lista %s."
 
 #: modules/commands/os_akill.cpp:237
 #, c-format
@@ -464,7 +464,7 @@ msgstr "%s non è più ignorato."
 #: modules/commands/os_ignore.cpp:238
 #, c-format
 msgid "%s will now be ignored for %s."
-msgstr "%s sarà ignorato per  %s."
+msgstr "%s sarà ignorato per %s."
 
 #: modules/commands/os_ignore.cpp:233
 #, c-format
@@ -474,9 +474,7 @@ msgstr "%s sarà ignorato permanentemente."
 #: include/language.h:66
 #, c-format
 msgid "%s%s HELP %s for more information."
-msgstr ""
-"Digita %s%s HELP %s opzione per ottenere maggiori\n"
-"informazioni su un comando specifico."
+msgstr "%s%s HELP %s per ottenere maggiori."
 
 #: modules/commands/bs_bot.cpp:270
 msgid "ADD nick user host real"
@@ -516,7 +514,7 @@ msgid ""
 msgstr ""
 "EXCEPTION ADD aggiunge la hostmask specificata alla lista delle\n"
 "eccezioni. Bisogna tenere presente che le mask nick!user@host\n"
-"e  user@host non sono valide. Soltanto le vere mask di host,\n"
+"e user@host non sono valide. Soltanto le vere mask di host,\n"
 "come ad esempio box.host.dom e *.host.dom, sono permesse,\n"
 "poiché la limitazione delle sessioni non tiene conto del nick e\n"
 "degli username (ident). limite deve essere un numero maggiore o\n"
@@ -537,7 +535,7 @@ msgstr ""
 "sessioni, il motivo, la host mask e la data di scadenza.\n"
 "\n"
 "Bisogna tener conto che un client che si connette \"userà\" la prima\n"
-"eccezione che corrisponde al loro host. Liste di eccezioni molto\n"
+"eccezione che corrisponde al suo host. Liste di eccezioni molto\n"
 "grandi ed mask generiche possono degradare la funzionalità dei\n"
 "Services."
 
@@ -561,7 +559,7 @@ msgid ""
 "information."
 msgstr ""
 "Il livello di accesso degli utenti può essere visto usando il\n"
-"comando %s. Digita %s%s HELP LEVELS per\n"
+"comando %s. Digita %s%s HELP LEVELS per\n"
 "informazioni."
 
 #: modules/commands/ms_read.cpp:35
@@ -1033,7 +1031,7 @@ msgstr ""
 "anche se è la stessa di default.  La durata di default per le\n"
 "SNLINE può essere trovata con il comando STATS AKILL.\n"
 " \n"
-"Nota: visto che le mask di realname possono contenere spazi, il\n"
+"Nota: visto che le mask di realname possono contenere spazi, il\n"
 "separatore tra questa e il motivo sono i due punti."
 
 #: modules/commands/os_sxline.cpp:678
@@ -1112,7 +1110,7 @@ msgstr ""
 " \n"
 "Attiva o disattiva l'uso dei comandi di fantasia\n"
 "nel canale. Quando è attivo, gli utenti potranno\n"
-"digitare nel canale i comandi utilizzando il prefisso %s\n"
+"digitare nel canale i comandi utilizzando il prefisso %s\n"
 "\n"
 "Gli utenti che vogliono usare i comandi di fantasia\n"
 "DEVONO avere privilegi sufficienti sia per il livello\n"
@@ -1484,7 +1482,7 @@ msgid ""
 "above commands."
 msgstr ""
 " \n"
-"Digita %s%s HELP comando per maggiori informazioni\n"
+"Digita %s%s HELP comando per maggiori informazioni\n"
 "sull'uso dei comandi sopraelencati."
 
 #: modules/commands/os_oper.cpp:168
@@ -1495,7 +1493,7 @@ msgstr "   %s è online usando questo oper block."
 #: modules/commands/os_modinfo.cpp:55
 #, c-format
 msgid "   Command %s on %s is linked to %s"
-msgstr "   Il comando %s su %s è linkato a %s"
+msgstr "   Il comando %s su %s è linkato a %s"
 
 #: modules/commands/os_modinfo.cpp:43
 #, c-format
@@ -1589,32 +1587,32 @@ msgstr "La lista %2$s di %1$s è vuota."
 #: modules/commands/bs_kick.cpp:1211
 #, c-format
 msgid "%s (%d kick(s) to ban)"
-msgstr "%s (%d kick(s) to ban)"
+msgstr "%s (%d kick(s) al ban)"
 
 #: modules/commands/bs_kick.cpp:1161
 #, c-format
 msgid "%s (%d kick(s) to ban; %d lines in %ds)"
-msgstr "%s (%d kick(s) to ban; %d lines in %ds)"
+msgstr "%s (%d kick(s) al ban; %d linee in %ds)"
 
 #: modules/commands/bs_kick.cpp:1171
 #, c-format
 msgid "%s (%d kick(s) to ban; %d times)"
-msgstr "%s (%d kick(s) to ban; %d times)"
+msgstr "%s (%d kick(s) al ban; %d volte)"
 
 #: modules/commands/bs_kick.cpp:1141
 #, c-format
 msgid "%s (%d kick(s) to ban; minimum %d/%d%%)"
-msgstr "%s (%d kick(s) to ban; minimum %d/%d%%)"
+msgstr "%s (%d kick(s) al ban; minimo %d/%d%%)"
 
 #: modules/commands/bs_kick.cpp:1163
 #, c-format
 msgid "%s (%d lines in %ds)"
-msgstr "%s (%d lines in %ds)"
+msgstr "%s (%d linee in %ds)"
 
 #: modules/commands/bs_kick.cpp:1173
 #, c-format
 msgid "%s (%d times)"
-msgstr "%s (%d times)"
+msgstr "%s (%d volte)"
 
 #: modules/commands/cs_seen.cpp:358
 #, c-format
@@ -1669,7 +1667,7 @@ msgstr "%s (%s) è stato visto l'ultima volta uscire da IRC (%s) %s fa (%s)."
 #: modules/commands/bs_kick.cpp:1143
 #, c-format
 msgid "%s (minimum %d/%d%%)"
-msgstr "%s (minimum %d/%d%%)"
+msgstr "%s (minimo %d/%d%%)"
 
 #: modules/commands/cs_flags.cpp:295 modules/commands/cs_access.cpp:245
 #: modules/commands/cs_access.cpp:349 modules/commands/cs_access.cpp:454
@@ -2077,7 +2075,7 @@ msgid ""
 "A confirmation e-mail has been sent to %s. Follow the instructions in it to change your e-mail "
 "address."
 msgstr ""
-"È stata inviata una e-mail di conferma a %s. Segui le istruzioni contenute nel messaggio per "
+"È stata inviata una e-mail di conferma a %s. Segui le istruzioni contenute nel messaggio per "
 "cambiare il tuo indirizzo e-mail."
 
 #: modules/commands/ms_sendall.cpp:45
@@ -2166,7 +2164,7 @@ msgstr "ADDSERVER server.nome [zona.nome]"
 
 #: modules/commands/os_dns.cpp:661
 msgid "ADDZONE zone.name"
-msgstr "ADDSERVER zona.nome"
+msgstr "ADDSERVER zona.nome"
 
 #: modules/commands/cs_akick.cpp:407
 #, c-format
@@ -2198,7 +2196,7 @@ msgstr "Accesso non consentito."
 #: modules/commands/cs_status.cpp:58
 #, c-format
 msgid "Access for %s on %s:"
-msgstr "Accesso per %s su %s:"
+msgstr "Accesso per %s su %s:"
 
 #: include/language.h:107
 #, c-format
@@ -2227,7 +2225,7 @@ msgstr "Lista di accesso di %s:"
 #: modules/commands/help.cpp:166
 #, c-format
 msgid "Access to this command requires the permission %s to be present in your opertype."
-msgstr "L' accesso a questo comando richiede che i permessi %s siano presenti nel tuo opertype."
+msgstr "L'accesso a questo comando richiede che i permessi %s siano presenti nel tuo opertype."
 
 #: modules/commands/ns_identify.cpp:94 modules/commands/ns_cert.cpp:368
 #: modules/commands/ns_cert.cpp:392
@@ -2345,7 +2343,7 @@ msgstr "Tutte le voci akick impostate su %s sono state clonate su %s."
 #: modules/commands/help.cpp:57
 #, c-format
 msgid "All available commands for %s:"
-msgstr "Tutti i comandi disponibili per %s:"
+msgstr "Tutti i comandi disponibili per %s:"
 
 #: modules/commands/cs_clone.cpp:96
 #, c-format
@@ -2482,7 +2480,7 @@ msgstr "Autorizzato alla modifica della lista badparole del canale"
 
 #: src/access.cpp:24
 msgid "Allowed to modify the access list"
-msgstr "Autorizzato alla modifica della lista di accesso"
+msgstr "Autorizzato alla modifica della lista di accesso"
 
 #: src/access.cpp:44
 msgid "Allowed to read channel memos"
@@ -2747,7 +2745,7 @@ msgid ""
 msgstr ""
 "Permette ai Services Operators di visualizzare la lista delle sessioni.\n"
 " \n"
-"SESSION LIST mostra gli host con almeno threshold sessioni.\n"
+"SESSION LIST mostra gli host con almeno una soglia sessioni.\n"
 "La soglia deve essere un numero maggiore di 1, in modo da evitare\n"
 "la visualizzazione accidentale di un gran numero di host con una\n"
 "sola sessione.\n"
@@ -3056,7 +3054,7 @@ msgstr "Privilegi disponibili per %s:"
 
 #: modules/commands/cs_enforce.cpp:162
 msgid "BANS enforced by "
-msgstr "BAN forzati da"
+msgstr "BAN forzati da "
 
 #: modules/commands/bs_kick.cpp:1121 modules/commands/bs_kick.cpp:1123
 #: modules/commands/bs_kick.cpp:1126
@@ -3211,7 +3209,7 @@ msgstr "Le ident dei bot possono contenere unicamente caratteri validi."
 #: include/language.h:121
 #, c-format
 msgid "Bot is not on channel %s."
-msgstr "Il bot non è presente nel canale %s."
+msgstr "Il bot non è presente nel canale %s."
 
 #: modules/commands/bs_botlist.cpp:51
 msgid "Bot list:"
@@ -3236,13 +3234,13 @@ msgid ""
 "Bot will now kick for %s, and will place a ban\n"
 "after %d kicks for the same user."
 msgstr ""
-"Il bot adesso  kickerà per %s, e imposterà un ban\n"
+"Il bot adesso  kickerà per %s, e imposterà un ban\n"
 "dopo %d kick nei confronti dello stesso utente.."
 
 #: modules/commands/bs_kick.cpp:228
 #, c-format
 msgid "Bot will now kick for %s."
-msgstr "Il bot ora kickerà per %s."
+msgstr "Il bot ora kickerà per %s."
 
 #: modules/commands/bs_kick.cpp:416
 #, c-format
@@ -3372,7 +3370,7 @@ msgstr ""
 #: modules/commands/cs_clone.cpp:149
 #, c-format
 msgid "Cannot clone channel %s to itself!"
-msgstr "Non puoi clonare il canale %s su se stesso!"
+msgstr "Non puoi clonare il canale %s su sé stesso!"
 
 #: modules/commands/ns_register.cpp:332
 msgid "Cannot send mail now; please retry a little later."
@@ -3488,7 +3486,7 @@ msgstr ""
 "Cambia la lingua utilizzata dai Services per inviarti\n"
 "i messaggi, ad esempio per rispondere a un comando che\n"
 "tu invii.\n"
-"La lingua può essere scelta dalla seguente lista di\n"
+"La lingua può essere scelta dalla seguente lista di\n"
 "lingue supportate:"
 
 #: modules/commands/ns_set.cpp:840
@@ -3501,7 +3499,7 @@ msgstr ""
 "Cambia la lingua utilizzata dai Services per inviarti\n"
 "i messaggi, ad esempio per rispondere a un comando che\n"
 "tu invii.\n"
-"La lingua può essere scelta dalla seguente lista di\n"
+"La lingua può essere scelta dalla seguente lista di\n"
 "lingue supportate:"
 
 #: modules/commands/ns_set.cpp:224
@@ -3612,7 +3610,7 @@ msgstr "Il canale %s non scadrà."
 #: modules/commands/cs_xop.cpp:475
 #, c-format
 msgid "Channel %s %s list has been cleared."
-msgstr "La lista %2$s del canale %1$s è stata svuotata."
+msgstr "La lista %2$s del canale %1$s è stata svuotata."
 
 #: modules/commands/cs_flags.cpp:361 modules/commands/cs_access.cpp:486
 #, c-format
@@ -3698,7 +3696,7 @@ msgid ""
 "or changing nick on the network and tells you when and, depending\n"
 "on channel or user settings, where it was."
 msgstr ""
-"Controlla l'ultima volta che un nick è stato visto accedere, uscire,\n"
+"Controlla l'ultima volta che un nick è stato visto accedere, uscire,\n"
 "o cambiare nick sul network e ti informa, in base alle impostazioni\n"
 "del canale o dell'utente, dove si trovava."
 
@@ -3717,7 +3715,7 @@ msgstr ""
 #: modules/commands/os_info.cpp:227
 #, c-format
 msgid "Cleared info from %s."
-msgstr "Info annullate da %s."
+msgstr "Info annullate da %s."
 
 #: modules/commands/bs_kick.cpp:1151 modules/commands/bs_kick.cpp:1153
 #: modules/commands/bs_kick.cpp:1156
@@ -3742,7 +3740,7 @@ msgstr "Configura i Kick in caso di grassetto"
 
 #: modules/commands/bs_kick.cpp:132
 msgid "Configures bot kickers.  option can be one of:"
-msgstr "Configura i kick del bot. L' opzione può essere una delle seguenti:"
+msgstr "Configura i kick del bot. L'opzione può essere una delle seguenti:"
 
 #: modules/commands/bs_set.cpp:19
 msgid "Configures bot options"
@@ -3816,9 +3814,9 @@ msgid ""
 "or LEVELS then only the respective settings are cloned.\n"
 "You must be the founder of channel and target."
 msgstr ""
-"Copia tutte le impostazioni, accessi, akick, etc da un canale\n"
-"al canale di destinazione. Se specificato ACCESS, AKICK,\n"
-"o BADWORDS solamente i rispettivi setting sono clonati.\n"
+"Copia tutte le impostazioni, accessi, akick, etc da un canale\n"
+"al canale di destinazione. Se specificato ACCESS, AKICK,\n"
+"o BADWORDS solamente le rispettive impostazioni saranno clonate.\n"
 "È necessario essere founder di entrambi i canali per usare\n"
 "questo comando."
 
@@ -4232,7 +4230,7 @@ msgid ""
 msgstr ""
 "Impedisce chiunque di utilizzare il canale\n"
 "specificato. Può essere annullato utilizzando il comando\n"
-"UNSUSPEND preservando tutti i dati e le impostazioni precedenti.\n"
+"UNSUSPEND preservando tutti i dati e le impostazioni precedenti.\n"
 "Se specificata una scadenza, il canale tornerà utilizzabile\n"
 "dopo quel periodo di tempo, altrimenti viene usata la\n"
 "scadenza predefinita nella configurazione.\n"
@@ -4276,7 +4274,7 @@ msgstr ""
 "accesso, l'ultimo indirizzo utilizzato e le opzioni stesse\n"
 "del nick. Se non viene specificato il nick, e sei identificato,\n"
 "viene usato il tuo nome account, altrimenti sarà usato\n"
-"il tuo nickname in uso."
+"il tuo nickname in uso."
 
 #: modules/commands/ms_info.cpp:19
 msgid "Displays information about your memos"
@@ -4443,7 +4441,7 @@ msgid ""
 "channel. When disabled, users who join the channel will\n"
 "not automatically gain any status from %s."
 msgstr ""
-"Attiva o disattiva l'opzione %s autoop per il canale.\n"
+"Attiva o disattiva l'opzione %s autoop per il canale.\n"
 "Quando l'opzione è disabilitata, gli utenti che accedono\n"
 "al canale non otteranno automaticamente alcuno stato da %s."
 
@@ -4453,8 +4451,8 @@ msgid ""
 "modes is enabled, services will remember modes set on the channel\n"
 "and attempt to re-set them the next time the channel is created."
 msgstr ""
-"Attiva o disattiva il mantenimento dei modi per il canale\n"
-"specificato. Quando il mantenimento dei modi è attivo,\n"
+"Attiva o disattiva il mantenimento dei modi per il canale\n"
+"specificato. Quando il mantenimento dei modi è attivo,\n"
 "i services memorizzeranno i modi impostati nel canale\n"
 "e provvederanno a reimpostatarli la prossima volta che il canale\n"
 "sarà creato."
@@ -4522,7 +4520,7 @@ msgid ""
 "ban or remove a channel status of a user that has\n"
 "a level superior or equal to his via %s commands."
 msgstr ""
-"Attiva o disattiva l'opzione \"pace\" per il canale.\n"
+"Attiva o disattiva l'opzione \"pace\" per il canale.\n"
 "Quando l'opzione è attiva, gli utenti non potranno\n"
 "kickare, bannare o rimuovere uno stato di canale\n"
 "(op, halfop, ecc.) di un utente con livello superiore,\n"
@@ -4530,7 +4528,7 @@ msgstr ""
 
 #: modules/commands/cs_list.cpp:232
 msgid "Enables or disables the private option for a channel."
-msgstr "Abilita o disabilita l'opzione privato per un canale."
+msgstr "Abilita o disabilita l'opzione privato per un canale."
 
 #: modules/commands/cs_set.cpp:682
 msgid ""
@@ -4538,7 +4536,7 @@ msgid ""
 "channel. When restricted access is set, users not on the access list will\n"
 "instead be kicked and banned from the channel."
 msgstr ""
-"Abilita o disabilita l'opzione di accesso limitato per un\n"
+"Abilita o disabilita l'opzione di accesso limitato per un\n"
 "canale.  Quando è impostato l'accesso limitato, gli utenti non\n"
 "presenti in lista di accesso saranno kickati e bannati dal canale."
 
@@ -4578,7 +4576,7 @@ msgid ""
 "next time the channel is created."
 msgstr ""
 "Attiva o disattiva il mantenimento del topic per\n"
-"il canale. Quando %s è attivo il topic sarà memorizzato da %s\n"
+"il canale. Quando %s è attivo il topic sarà memorizzato da %s\n"
 "anche quando l'ultimo utente esce dal canale,\n"
 "e sarà reimpostato la volta successiva che il canale\n"
 "sarà creato."
@@ -4654,7 +4652,7 @@ msgstr "Fine della lista parolacce."
 #: modules/commands/os_list.cpp:100
 #, c-format
 msgid "End of channel list. %u channels shown."
-msgstr "Fine della lista canali. %u canali mostrati."
+msgstr "Fine della lista canali. %u canali mostrati."
 
 #: modules/commands/os_config.cpp:117
 msgid "End of configuration."
@@ -4690,7 +4688,7 @@ msgstr "Fine della lista news."
 #: modules/commands/os_list.cpp:235
 #, c-format
 msgid "End of users list. %u users shown."
-msgstr "Fine della lista dei nick - %u utenti mostrati."
+msgstr "Fine della lista dei nick - %u utenti mostrati."
 
 #: modules/commands/cs_enforce.cpp:227
 msgid "Enforce various channel modes and set options"
@@ -4957,7 +4955,7 @@ msgid ""
 "not given, it will %s you."
 msgstr ""
 "Imposta lo stato di %s al nick specificato in un canale. Se il\n"
-"nick non viene specificato, lo stato di %s viene impostato su te stesso."
+"nick non viene specificato, lo stato di %s viene impostato su te stesso."
 
 #: modules/commands/cs_mode.cpp:878
 #, c-format
@@ -4985,12 +4983,12 @@ msgstr "Messaggio di saluto per %s rimosso."
 #: modules/commands/greet.cpp:60
 #, c-format
 msgid "Greet mode is now off on channel %s."
-msgstr "La modalità greet ora è disabilitata nel canale %s."
+msgstr "La modalità greet ora è disabilitata nel canale %s."
 
 #: modules/commands/greet.cpp:52
 #, c-format
 msgid "Greet mode is now on on channel %s."
-msgstr "La modalità greet ora è attiva nel canale %s."
+msgstr "La modalità greet ora è attiva nel canale %s."
 
 #: modules/commands/ns_resetpass.cpp:21
 msgid "Helps you reset lost passwords"
@@ -5087,7 +5085,7 @@ msgstr "Indirizzo e-mail non corretto."
 
 #: include/language.h:89
 msgid "Incorrect range specified. The correct syntax is #from-to."
-msgstr "Range specificato errato. La sintassi corretta è #da-a."
+msgstr "Range specificato errato. La sintassi corretta è #da-a."
 
 #: modules/commands/os_modinfo.cpp:19
 msgid "Info about a loaded module"
@@ -5170,12 +5168,12 @@ msgstr "Mantenimento modi"
 #: modules/commands/ns_set.cpp:595 modules/commands/cs_set.cpp:374
 #, c-format
 msgid "Keep modes for %s is now off."
-msgstr "Il mantenimento dei modi per %s è stato disattivato."
+msgstr "Il mantenimento dei modi per %s è stato disattivato."
 
 #: modules/commands/ns_set.cpp:589 modules/commands/cs_set.cpp:366
 #, c-format
 msgid "Keep modes for %s is now on."
-msgstr "Il mantenimento dei modi per %s è stato attivato."
+msgstr "Il mantenimento dei modi per %s è stato attivato."
 
 #: modules/commands/ns_ajoin.cpp:100
 msgid "Key"
@@ -5227,7 +5225,7 @@ msgstr "LIMIT forzato su %s, %d utenti rimossi."
 
 #: modules/commands/os_session.cpp:246
 msgid "LIST threshold"
-msgstr "LIST soglia"
+msgstr "LIST soglia"
 
 #: modules/commands/os_akill.cpp:388 modules/commands/os_sxline.cpp:427
 #: modules/commands/os_sxline.cpp:661
@@ -5254,7 +5252,7 @@ msgstr "Lingua cambiata a Italiano."
 #: modules/commands/ns_set.cpp:828
 #, c-format
 msgid "Language for %s changed to %s."
-msgstr "Lingua per %s cambiata a%s."
+msgstr "Lingua per %s cambiata a %s."
 
 #: modules/commands/ms_cancel.cpp:72
 #, c-format
@@ -5430,16 +5428,16 @@ msgstr ""
 "Mostra la lista dei canali registrati corrispondenti\n"
 "la chiave specificata. I canali con l'opzione PRIVATE\n"
 "impostata saranno mostrati solo ai Services Operators.\n"
-"I canali con l'opzione NOEXPIRE impostata avranno come prefisso\n"
+"I canali con l'opzione NOEXPIRE impostata avranno come prefisso\n"
 "un ! (solo per i Services Operators). \n"
 "Nota che l'uso del carattere '#' specifica un range,\n"
 "i nomi dei canali devono essere scritti senza cancelletto.\n"
 " \n"
-"Se le opzioni SUSPENDED o NOEXPIRE sono specificate, solamente\n"
-"i canali che sono rispettivamente SUSPENDED o hanno la flag NOEXPIRE\n"
+"Se le opzioni SUSPENDED o NOEXPIRE sono specificate, solamente\n"
+"i canali che sono rispettivamente SUSPENDED o hanno la flag NOEXPIRE\n"
 "saranno mostrati. Se specificate opzioni multiple, tutti i canali\n"
 "corrispondenti almeno un opzione saranno mostrati.\n"
-"Nota che queste opzioni sono limitate ai Services Operators.\n"
+"Nota che queste opzioni sono limitate ai Services Operators.\n"
 " \n"
 "Esempi:\n"
 " \n"
@@ -5697,9 +5695,8 @@ msgstr ""
 "in un canale.\n"
 " \n"
 "Il comando %s LOCK permette di aggiungere, rimuovere, e vedere il blocco dei modi in un canale.\n"
-"Se un modo è bloccato o disattivati, i services non permetteranno a quel modo di essere cambiato.\n"
-"Il comando SET rimuovera tutti i modi bloccati e imposterà i nuovi modi specificati, mentre ADD e "
-"DEL\n"
+"Se un modo è bloccato o disattivato, i services non permetteranno a quel modo di essere cambiato.\n"
+"Il comando SET rimuovera tutti i modi bloccati e imposterà i nuovi modi specificati, mentre ADD e DEL\n"
 "apportano modifiche ai modi bloccati esistenti.\n"
 "Esempi:\n"
 "     MODE #canale LOCK ADD +bmnt *!*@*aol*\n"
@@ -5715,7 +5712,7 @@ msgstr ""
 " \n"
 "Il comando %s CLEAR è un modo semplice per rimuovere tutti i modi in un canale. \"cosa\" può "
 "essere\n"
-"uno tra bans, exempts, inviteoverrides, ops, halfops, or voices. Se il parametro \"cosa\" è omesso, "
+"uno tra bans, exempts, inviteoverrides, ops, halfops, or voices. Se il parametro \"cosa\" è omesso, "
 "allora\n"
 "tutti i modi saranno rimossi dal canale."
 
@@ -5755,14 +5752,14 @@ msgid ""
 "will be added to the akick list instead of the mask.\n"
 "All users within that nickgroup will then be akicked.\n"
 msgstr ""
-"Gestice la lista AutoKick. Se un utente che si trova nella\n"
+"Gestice la lista AutoKick. Se un utente che si trova nella\n"
 "cerca di entrare nel canale, %s imposterà un ban su di esso\n"
 "e in seguito lo espellerà dal canale. \n"
-"Il comando AKICK ADD aggiunge il nick o la mask specificata\n"
+"Il comando AKICK ADD aggiunge il nick o la mask specificata\n"
 "alla lista AutoKick. Se viene specificato un motivo, sarà\n"
 "utilizzato quando l'utente viene kickato, altrimenti\n"
-"verrà utilizzata la frase standard \"You have been banned\n"
-"from the canale\".\n"
+"verrà utilizzata la frase standard \"Sei stato bannato\n"
+"dal canale\".\n"
 "Quando viene usato un AKICK su un nick registrato\n"
 "l'AKICK sarà aggiunto sull'account %s anzichè sulla mask.\n"
 "Tutti i nickname presenti nel gruppo dell'account saranno in AKICK.\n"
@@ -5778,7 +5775,7 @@ msgid ""
 "a user level of 0, and any unregistered user has a user level\n"
 "of -1."
 msgstr ""
-"Gestisce la lista di accesso del canale.  La lista\n"
+"Gestisce la lista di accesso del canale.  La lista\n"
 "list di accesso specifica quali utenti hanno diritto\n"
 "allo stato di operatore di canale e ai vari comandi di\n"
 "di %s.  Livelli utente diversi permettono l'accesso\n"
@@ -6442,7 +6439,7 @@ msgstr "Non ci sono stats per %s."
 #: modules/commands/os_info.cpp:201
 #, c-format
 msgid "No such info \"%s\" on %s."
-msgstr "Nessuna informazione \"%s\" su %s."
+msgstr "Nessuna informazione \"%s\" su %s."
 
 #: modules/commands/cs_kick.cpp:118 modules/commands/cs_ban.cpp:219
 #, c-format
@@ -6452,12 +6449,12 @@ msgstr "Nessun user su %s corrisponde a %s."
 #: modules/commands/bs_assign.cpp:188
 #, c-format
 msgid "No-bot mode is now off on channel %s."
-msgstr "La modalità No Bot ora è non attiva nel canale %s."
+msgstr "La modalità No Bot ora è disattivata nel canale %s."
 
 #: modules/commands/bs_assign.cpp:181
 #, c-format
 msgid "No-bot mode is now on on channel %s."
-msgstr "La modalità No Bot ora è attiva nel canale %s."
+msgstr "La modalità No Bot ora è attiva nel canale %s."
 
 #: modules/commands/os_mode.cpp:64
 #, c-format
@@ -6497,7 +6494,7 @@ msgstr "Connesso da"
 #, c-format
 msgid "Oper %s is configured in the configuration file(s) and can not be removed by this command."
 msgstr ""
-"L'oper %s è configurato nel file di configurazione e non può essere rimosso da questo comando."
+"L'oper %s è configurato nel file di configurazione e non può essere rimosso da questo comando."
 
 #: modules/commands/os_info.cpp:268
 msgid "Oper Info"
@@ -6506,7 +6503,7 @@ msgstr "Informazioni Operatore"
 #: modules/commands/os_info.cpp:182 modules/commands/os_info.cpp:221
 #, c-format
 msgid "Oper info list for %s is empty."
-msgstr "La lista oper info per %s è vuota."
+msgstr "La lista oper info per %s è vuota."
 
 #: modules/commands/os_news.cpp:46
 #, c-format
@@ -6588,7 +6585,7 @@ msgstr "Autenticazione con password richiesta per questo comando."
 #: modules/commands/ns_set.cpp:149 modules/commands/ns_set.cpp:215
 #, c-format
 msgid "Password for %s changed to %s."
-msgstr "La password di %s è stata cambiata in %s."
+msgstr "La password di %s è stata cambiata in %s."
 
 #: modules/commands/ns_set.cpp:151 modules/commands/ns_set.cpp:217
 #, c-format
@@ -6607,7 +6604,7 @@ msgstr "Passparola errata."
 #: modules/commands/ns_resetpass.cpp:39
 #, c-format
 msgid "Password reset email for %s has been sent."
-msgstr "È stata inviata una email per il reset della password di %s."
+msgstr "È stata inviata una email per il reset della password di %s."
 
 #: modules/commands/cs_set.cpp:1335
 msgid "Peace"
@@ -6616,7 +6613,7 @@ msgstr "Pace"
 #: modules/commands/cs_set.cpp:437
 #, c-format
 msgid "Peace option for %s is now off."
-msgstr "L'opzione peace per %s è ora disattivata."
+msgstr "L'opzione peace per %s è ora disattivata."
 
 #: modules/commands/cs_set.cpp:431
 #, c-format
@@ -6648,7 +6645,7 @@ msgstr "Utilizza un nome server valido per eseguire il jupe."
 #: include/language.h:104
 msgid "Please use the symbol of # when attempting to register."
 msgstr ""
-"Per favore usa il simbolo # davanti al nome del canale per poter procedere con la registrazione."
+"Per favore usa il simbolo # davanti al nome del canale per poter procedere con la registrazione."
 
 #: src/mail.cpp:77
 #, c-format
@@ -6723,7 +6720,7 @@ msgstr "Privato"
 #: modules/commands/bs_set.cpp:187
 #, c-format
 msgid "Private mode of bot %s is now off."
-msgstr "La modalità Private del bot %s ora è disattivata."
+msgstr "La modalità Private del bot %s ora è disattivata."
 
 #: modules/commands/bs_set.cpp:182
 #, c-format
@@ -6733,7 +6730,7 @@ msgstr "La modalità private del bot %s ora è attiva."
 #: modules/commands/cs_list.cpp:220
 #, c-format
 msgid "Private option for %s is now off."
-msgstr "L'opzione private per %s è ora disattivata."
+msgstr "L'opzione private per %s è ora disattivata."
 
 #: modules/commands/cs_list.cpp:214
 #, c-format
@@ -6743,22 +6740,22 @@ msgstr "L'opzione private per %s è ora attiva."
 #: modules/commands/ns_list.cpp:221
 #, c-format
 msgid "Private option is now off for %s."
-msgstr "L'opzione private è adesso disattivata per %s."
+msgstr "L'opzione private è adesso disattivata per %s."
 
 #: modules/commands/ns_list.cpp:215
 #, c-format
 msgid "Private option is now on for %s."
-msgstr "L'opzione private è adesso attiva per %s."
+msgstr "L'opzione private è adesso attiva per %s."
 
 #: modules/commands/cs_flags.cpp:281
 #, c-format
 msgid "Privilege %s added to %s on %s, new flags are +%s"
-msgstr "Il privilegio %s è stato aggiunto a %s su %s, le nuove flags sono +%s"
+msgstr "Il privilegio %s è stato aggiunto a %s su %s, le nuove flags sono +%s"
 
 #: modules/commands/cs_flags.cpp:283
 #, c-format
 msgid "Privilege %s removed from %s on %s, new flags are +%s"
-msgstr "Il privilegio %s è stato rimosso a %s su %s, le nuove flags sono +%s"
+msgstr "Il privilegio %s è stato rimosso a %s su %s, le nuove flags sono +%s"
 
 #: modules/commands/ns_set.cpp:1301
 msgid "Protection"
@@ -6767,22 +6764,22 @@ msgstr "Protezione"
 #: modules/commands/ns_set.cpp:713
 #, c-format
 msgid "Protection is now off for %s."
-msgstr "La protezione è adesso disattivata per %s."
+msgstr "La protezione è adesso disattivata per %s."
 
 #: modules/commands/ns_set.cpp:692
 #, c-format
 msgid "Protection is now on for %s, with a reduced delay."
-msgstr "La protezione è adesso attiva per %s, con un ritardo ridotto."
+msgstr "La protezione è adesso attiva per %s, con un ritardo ridotto."
 
 #: modules/commands/ns_set.cpp:702
 #, c-format
 msgid "Protection is now on for %s, with no delay."
-msgstr "La protezione è adesso attiva per %s, senza ritardo."
+msgstr "La protezione è adesso attiva per %s, senza ritardo."
 
 #: modules/commands/ns_set.cpp:684
 #, c-format
 msgid "Protection is now on for %s."
-msgstr "La protezione è adesso attiva per %s."
+msgstr "La protezione è adesso attiva per %s."
 
 #: modules/commands/os_chankill.cpp:100
 msgid ""
@@ -7072,7 +7069,7 @@ msgid ""
 "Removes %s status from the selected nick on a channel. If nick is\n"
 "not given, it will de%s you."
 msgstr ""
-"Rimuove lo stato di %s al nick specificato in un canale. Se il nick\n"
+"Rimuove lo stato di %s al nick specificato in un canale. Se il nick\n"
 "non viene specificato, lo stato di %s sarà rimosso a te stesso."
 
 #: modules/commands/cs_mode.cpp:880
@@ -7090,9 +7087,9 @@ msgid ""
 "omitted then your status is removed. If channel is omitted then\n"
 "your channel status is removed on every channel you are in."
 msgstr ""
-"Rimuove lo stato di un nick specificato in un canale. Se il nick\n"
+"Rimuove lo stato di un nick specificato in un canale. Se il nick\n"
 "non viene specificato, lo stato viene rimosso a te stesso. Se il\n"
-"canale non viene specificato, lo stato viene rimosso su tutti i canali\n"
+"canale non viene specificato, lo stato viene rimosso su tutti i canali\n"
 "in cui ti trovi."
 
 #: src/xline.cpp:412
@@ -7134,12 +7131,12 @@ msgstr "Acesso limitato"
 #: modules/commands/cs_set.cpp:672
 #, c-format
 msgid "Restricted access option for %s is now off."
-msgstr "L'opzione accesso ristretto per %s è ora disattivata."
+msgstr "L'opzione accesso ristretto per %s è ora disattivata."
 
 #: modules/commands/cs_set.cpp:666
 #, c-format
 msgid "Restricted access option for %s is now on."
-msgstr "L'opzione accesso ristretto per %s è ora attiva."
+msgstr "L'opzione accesso ristretto per %s è ora attiva."
 
 #: modules/commands/cs_enforce.cpp:73
 #, c-format
@@ -7283,7 +7280,7 @@ msgstr "L'opzione Secure founder per %s è ora disattivata."
 #: modules/commands/cs_set.cpp:791
 #, c-format
 msgid "Secure founder option for %s is now on."
-msgstr "L'opzione Secure founder per %s è ora attiva."
+msgstr "L'opzione Secure founder per %s è ora attiva."
 
 #: modules/commands/cs_set.cpp:1343
 msgid "Secure ops"
@@ -7292,12 +7289,12 @@ msgstr "Secure ops"
 #: modules/commands/cs_set.cpp:861
 #, c-format
 msgid "Secure ops option for %s is now off."
-msgstr "L'opzione Secure ops per %s è ora disattivata."
+msgstr "L'opzione Secure ops per %s è ora disattivata."
 
 #: modules/commands/cs_set.cpp:855
 #, c-format
 msgid "Secure ops option for %s is now on."
-msgstr "L'opzione Secure ops per %s è ora attiva."
+msgstr "L'opzione Secure ops per %s è ora attiva."
 
 #: modules/commands/cs_set.cpp:734
 #, c-format
@@ -7312,12 +7309,12 @@ msgstr "L'opzione Secure per %s è ora attiva."
 #: modules/commands/ns_set.cpp:1036
 #, c-format
 msgid "Secure option is now off for %s."
-msgstr "Opzione secure disattivata per %s."
+msgstr "Opzione secure disattivata per %s."
 
 #: modules/commands/ns_set.cpp:1030
 #, c-format
 msgid "Secure option is now on for %s."
-msgstr "Opzione secure attiva per %s."
+msgstr "Opzione secure attiva per %s."
 
 #: modules/commands/cs_enforce.cpp:42
 #, c-format
@@ -7343,7 +7340,7 @@ msgid ""
 "See %s%s HELP %s for more information\n"
 "about the flags system."
 msgstr ""
-"Digita %s%s HELP %s per ottenere maggiori\n"
+"Digita %s%s HELP %s per ottenere maggiori\n"
 "informazioni sul sistema delle flags."
 
 #: modules/commands/ms_send.cpp:24
@@ -7378,7 +7375,7 @@ msgid ""
 msgstr ""
 "Invia un messaggio contenente un codice di attivazione e le istruzioni\n"
 "necessarie per procedere al reset della password per il nickname specificato.\n"
-"L' indirizzo email deve corrispondere all'indirizzo email associato\n"
+"L'indirizzo email deve corrispondere all'indirizzo email associato\n"
 "al nickname."
 
 #: modules/commands/ms_sendall.cpp:52
@@ -7396,7 +7393,7 @@ msgid ""
 "receive a notice that he/she has a new memo. The target\n"
 "nickname/channel must be registered."
 msgstr ""
-"Invia un memo che contiene il testo-memo al nick\n"
+"Invia un memo che contiene il testo-memo al nick\n"
 "o al canale specificato. Quando si invia un memo a un\n"
 "nick, il destinatario riceverà un messaggio che lo notifica\n"
 "che ha un nuovo memo. Il nick/canale di destinazione deve\n"
@@ -7412,7 +7409,7 @@ msgid ""
 "memo will be sent to the sender informing him/her that the memo\n"
 "has been read."
 msgstr ""
-"Invia un memo contenente memo-text al nick o canale\n"
+"Invia un memo contenente testo-memo al nick o canale\n"
 "specificato. Se inviato ad un nickname, il destinatario riceverà\n"
 "un notice che gli segnala il nuovo memo. Il nickname o canale\n"
 "dev'essere registrato.\n"
@@ -7559,7 +7556,7 @@ msgstr "I Services sono ora in modalità no expire."
 
 #: modules/commands/os_set.cpp:120
 msgid "Services are now in non-debug mode."
-msgstr "I Services sono ora modalità no-debug."
+msgstr "I Services sono ora modalità no-debug."
 
 #: modules/commands/os_set.cpp:47
 msgid "Services are now in read-only mode."
@@ -7595,7 +7592,7 @@ msgstr "I servizi imposteranno lo stato di %s automaticamente nei canali."
 #: modules/commands/cs_set.cpp:111
 #, c-format
 msgid "Services will no longer automatically give modes to users in %s."
-msgstr "I servizi non imposterannno più lo stato di %s automaticamente nei canali."
+msgstr "I servizi non imposterannno più lo stato di %s automaticamente nei canali."
 
 #: modules/commands/ns_set.cpp:269
 #, c-format
@@ -7605,17 +7602,17 @@ msgstr "I servizi non imposterannno più lo stato di %s nei canali."
 #: modules/commands/cs_set.cpp:105
 #, c-format
 msgid "Services will now automatically give modes to users in %s."
-msgstr "I servizi imposteranno automaticamente lo stato degli utenti su %s."
+msgstr "I servizi imposteranno automaticamente lo stato degli utenti su %s."
 
 #: modules/commands/ns_set.cpp:932
 #, c-format
 msgid "Services will now reply to %s with messages."
-msgstr "I servizi risponderanno a %s usando i messaggi."
+msgstr "I servizi risponderanno a %s usando i messaggi."
 
 #: modules/commands/ns_set.cpp:938
 #, c-format
 msgid "Services will now reply to %s with notices."
-msgstr "I servizi risponderanno a %s usando i notices."
+msgstr "I servizi risponderanno a %s usando i notices."
 
 #: modules/commands/os_reload.cpp:34
 msgid "Services' configuration has been reloaded."
@@ -7741,7 +7738,7 @@ msgstr ""
 "parole presenti nella lista delle badparole dal canale.\n"
 " \n"
 "Le parolacce possono essere definite usando il comando\n"
-"BADWORDS. Digita %s%s HELP BADWORDS per ottenere\n"
+"BADWORDS. Digita %s%s HELP BADWORDS per ottenere\n"
 "maggiori informazioni.\n"
 " \n"
 "ttb è il numero di volte che un utente può essere kickato\n"
@@ -7941,7 +7938,7 @@ msgid ""
 "added to the group after this command was used."
 msgstr ""
 "Imposta il vHost per tutti i nick nel gruppo del nick indicato.\n"
-"Se il tuo IRCD supporta i vIdent, la forma SETALL <nick>\n"
+"Se il tuo IRCD supporta i vIdent, la forma SETALL <nick>\n"
 "<ident>@<hostmask> permette di impostare l'ident, oltre che il\n"
 "vHost.\n"
 " \n"
@@ -8028,7 +8025,7 @@ msgid ""
 "some modes may not get set automatically."
 msgstr ""
 "Imposta se i service imposteranno automaticamente lo stato\n"
-"del nickname specificato nei canali. Imposta su ON per permettere a %s\n"
+"del nickname specificato nei canali. Imposta su ON per permettere a %s\n"
 "di impostare lo stato del nickname specificato automaticamente\n"
 "quando accede al canale."
 
@@ -8056,7 +8053,7 @@ msgstr ""
 #: modules/commands/cs_access.cpp:648 modules/commands/cs_access.cpp:689
 #, c-format
 msgid "Setting %s not known.  Type %s%s HELP LEVELS for a list of valid settings."
-msgstr "Impostazione %s sconosciuta. Digita %s%s HELP LEVELS per una lista delle impostazioni valide."
+msgstr "Impostazione %s sconosciuta. Digita %s%s HELP LEVELS per una lista delle impostazioni valide."
 
 #: modules/commands/os_set.cpp:133
 msgid "Setting for DEBUG must be ON, OFF, or a positive number."
@@ -8085,7 +8082,7 @@ msgstr "Mostra lo stato dei Services e della rete"
 #: modules/commands/os_logsearch.cpp:152
 #, c-format
 msgid "Showed %d/%d matches for %s."
-msgstr "Mostrati %d/%d risultati per %s."
+msgstr "Mostrati %d/%d risultati per %s."
 
 #: modules/commands/cs_set.cpp:883
 msgid "Sign kicks that are done with the KICK command"
@@ -8094,7 +8091,7 @@ msgstr "Firma i kick effettuati con il comando KICK"
 #: modules/commands/cs_set.cpp:932
 #, c-format
 msgid "Signed kick option for %s is now off."
-msgstr "L'opzione Signed kick per %s è ora disattivata."
+msgstr "L'opzione Signed kick per %s è ora disattivata."
 
 #: modules/commands/cs_set.cpp:924
 #, c-format
@@ -8108,7 +8105,7 @@ msgstr ""
 #: modules/commands/cs_set.cpp:917
 #, c-format
 msgid "Signed kick option for %s is now on."
-msgstr "L'opzione Signed kick per %s è ora attiva."
+msgstr "L'opzione Signed kick per %s è ora attiva."
 
 #: modules/commands/cs_set.cpp:1345
 msgid "Signed kicks"
@@ -8232,12 +8229,12 @@ msgstr "Spiacente, puoi avere un massimo di %d parolacce nella lista di un canal
 #: include/language.h:103
 #, c-format
 msgid "Sorry, you have already exceeded your limit of %d channels."
-msgstr "Spiacente, hai già superato il tuo limite di %d canali."
+msgstr "Spiacente, hai già superato il tuo limite di %d canali."
 
 #: include/language.h:102
 #, c-format
 msgid "Sorry, you have already reached your limit of %d channels."
-msgstr "Spiacente, hai già raggiunto il tuo limite di %d canali."
+msgstr "Spiacente, hai già raggiunto il tuo limite di %d canali."
 
 #: modules/commands/os_dns.cpp:218
 msgid "State"
@@ -8278,7 +8275,7 @@ msgstr "Successore"
 #: modules/commands/cs_set.cpp:1017
 #, c-format
 msgid "Successor for %s changed to %s."
-msgstr "Il successor del canale %s ora è %s."
+msgstr "Il successor del canale %s ora è %s."
 
 #: modules/commands/cs_set.cpp:1019
 #, c-format
@@ -8369,7 +8366,7 @@ msgid ""
 "group of the given nick.\n"
 "Specifying a nick is limited to Services Operators."
 msgstr ""
-"Sintassi:  %s [nickname]\n"
+"Sintassi: %s [nickname]\n"
 "\n"
 "Senza parametro, mostra tutti i nick presenti nel\n"
 "tuo gruppo.\n"
@@ -8404,7 +8401,7 @@ msgid ""
 "able to send any memos to you.  However, you cannot set\n"
 "this any higher than %d."
 msgstr ""
-"Sintassi: LIMIT [canale] limit\n"
+"Sintassi: LIMIT [canale] limit\n"
 " \n"
 "Imposta il numero massimo di memo che si possono tenere\n"
 "in archivio (o che può tenere in archivio il canale indicato).\n"
@@ -8435,7 +8432,7 @@ msgid ""
 "remove their limit, may not set a limit above %d, and may\n"
 "not set a hard limit."
 msgstr ""
-"Sintassi: SET LIMIT [user | canale] {limit | NONE} [HARD]\n"
+"Sintassi: SET LIMIT [user | canale] {limite | NONE} [HARD]\n"
 " \n"
 "Imposta il numero massimo di memo che un utente o un\n"
 "canale può avere. Impostare il limite a 0 fa in modo che\n"
@@ -8674,10 +8671,10 @@ msgid ""
 "When a user joins the channel the access they receive is from the\n"
 "highest level entry in the access list."
 msgstr ""
-"Il comando ACCESS ADD aggiunge il nick specificato alla\n"
+"Il comando ACCESS ADD aggiunge il nick specificato alla\n"
 "lista di accesso con il livello specificato, se il nick è\n"
 "già presente nella lista, il suo livello viene modificato,\n"
-"impostandolo a quello specificato nel comando. Il livello\n"
+"impostandolo a quello specificato nel comando. Il livello\n"
 "specificato può essere un livello numerico o il nome di un\n"
 "privilegio (es. AUTOOP)."
 
@@ -8689,7 +8686,7 @@ msgid ""
 "You may remove yourself from an access list, even if you\n"
 "do not have access to modify that list otherwise."
 msgstr ""
-"Il comando ACCESS DEL rimuove il nick specificato dalla\n"
+"Il comando ACCESS DEL rimuove il nick specificato dalla\n"
 "lista di accesso. Se viene specificata una lista di id numerici,\n"
 "i record corrispondenti vengono rimossi. (Guarda l'esempio di\n"
 "LIST). Se vuoi puoi rimuovere te stesso da una lista di accesso,\n"
@@ -8786,7 +8783,7 @@ msgid ""
 "the list of messages shown to users when they join\n"
 "the channel."
 msgstr ""
-"Il comando ENTRYMSG ADD aggiunge il messaggio specificato\n"
+"Il comando ENTRYMSG ADD aggiunge il messaggio specificato\n"
 "alla lista dei messaggi da mostrare agli utenti al momento\n"
 "dell'ingresso nel canale."
 
@@ -8796,7 +8793,7 @@ msgid ""
 "the list of messages shown to users when they join\n"
 "the channel, effectively disabling entry messages."
 msgstr ""
-"Il comando ENTRYMSG CLEAR rimuove tutti i records dalla\n"
+"Il comando ENTRYMSG CLEAR rimuove tutti i records dalla\n"
 "lista dei messaggi da mostrare agli utenti al momento\n"
 "dell'ingresso nel canale, l'invio del messaggio di\n"
 "di ingresso è di conseguenza disabilitato."
@@ -8819,7 +8816,7 @@ msgid ""
 "The ENTRYMSG LIST command displays a listing of messages\n"
 "shown to users when they join the channel."
 msgstr ""
-"Il comando ENTRYMSG LIST mosta la lista dei messaggi da mostrare agli utenti al momento "
+"Il comando ENTRYMSG LIST mosta la lista dei messaggi da mostrare agli utenti al momento "
 "dell'ingresso nel canale."
 
 #: modules/commands/ns_set.cpp:705
@@ -8849,11 +8846,11 @@ msgid ""
 "For a list of the features and functions whose levels can be\n"
 "set, see HELP LEVELS DESC."
 msgstr ""
-"Il comando LEVELS permette un controllo preciso del\n"
+"Il comando LEVELS permette un controllo preciso del\n"
 "significato dei livelli di accesso numerici usati nei canali.\n"
 "Con questo comando, è possibile definire il livello di accesso\n"
 "necessario per la maggior parte delle funzioni di %s. (Il comando\n"
-"SET FOUNDER,  e questo comando sono sempre riservati al founder.)\n"
+"SET FOUNDER, e questo comando sono sempre riservati al founder.)\n"
 " \n"
 "LEVELS SET permette di definire il livello di accesso per una funzione\n"
 "o per un gruppo di funzioni. LEVELS DISABLE (o abbreviato DIS) disabilita\n"
@@ -8910,11 +8907,11 @@ msgid ""
 "any third-party person. You may also wish to SET HIDE it\n"
 "after registering if it isn't the default setting already."
 msgstr ""
-"Il parametro email è facoltativo e imposterà l'email\n"
+"Il parametro email è facoltativo e imposterà l'email\n"
 "per il tuo nick immediatamente.\n"
 "La tua privacy è rispettata, questa e-mail non sarà ceduta a terzi.\n"
 "Puoi scegliere se mostrare o nascondere il tuo indirizzo email\n"
-"dall'output del comando INFO utilizzando il comando SET HIDE.\n"
+"dall'output del comando INFO utilizzando il comando SET HIDE.\n"
 "Di default l'indirizzo email è nascosto."
 
 #: modules/commands/cs_log.cpp:258
@@ -8945,7 +8942,7 @@ msgstr ""
 "comando mostra la lista del metodo di logging attualmente in funzione\n"
 "per il canale.\n"
 " \n"
-"Altrimenti, command deve essere il nome di un comando, e method\n"
+"Altrimenti, comando deve essere il nome di un comando, e metodo\n"
 "è uno dei seguenti metodi di logging:\n"
 " \n"
 " MESSAGE [status], NOTICE [status], MEMO\n"
@@ -9034,7 +9031,7 @@ msgstr ""
 #: modules/commands/os_session.cpp:240
 #, c-format
 msgid "The host %s currently has %d sessions with a limit of %d because it matches entry: %s."
-msgstr "L'host %s ha %d sessioni, con un limite di %d perchè corrisponde il record: %s."
+msgstr "L'host %s ha %d sessioni, con un limite di %d perchè corrisponde il record: %s."
 
 #: modules/commands/ms_check.cpp:54
 #, c-format
@@ -9107,7 +9104,7 @@ msgstr "La nuova informazione specificata è uguale alla vecchia."
 #: modules/commands/os_info.cpp:157
 #, c-format
 msgid "The oper info already exists on %s."
-msgstr "L'oper info è già esistente su %s."
+msgstr "L'oper info è già esistente su %s."
 
 #: modules/commands/os_info.cpp:147
 #, c-format
@@ -9179,7 +9176,7 @@ msgid ""
 "Type %s%s READ %s %d to read it."
 msgstr ""
 "C'è un nuovo memo sul canale %s.\n"
-"Digita %s%s READ %s %d per leggerlo."
+"Digita %s%s READ %s %d per leggerlo."
 
 #: modules/commands/bs_assign.cpp:132
 #, c-format
@@ -9246,20 +9243,20 @@ msgid ""
 " \n"
 "The POOL and DEPOOL commands actually add and remove servers to their given zones."
 msgstr ""
-"This command allows managing DNS zones used for controlling what servers users\n"
-"are directed to when connecting. Omitting all parameters prints out the status of\n"
-"the DNS zone.\n"
+"Questo comando permette di gestire le zone DNS usate per controllare su quali server gli utenti\n"
+"verranno indirizzati in fase di connessione. Omettere i parametri mostrerà lo stato della\n"
+"zona DNS.\n"
 " \n"
-"ADDZONE adds a zone, eg us.yournetwork.tld. Servers can then be added to this\n"
-"zone with the ADDSERVER command.\n"
+"ADDZONE aggiunge una zona, es: us.yournetwork.tld. I servers possono essere aggiunti a tale\n"
+"zona con il comando ADDSERVER.\n"
 " \n"
-"The ADDSERVER command adds a server to the given zone. When a query is done, the\n"
-"zone in question is served if it exists, else all servers in all zones are served.\n"
-"A server may be in more than one zone.\n"
+"Il comando ADDSERVER aggiungere un server alla zona. Quando una query viene eseguita, la\n"
+"zona in questione sarà servita se esiste, altrimenti tutti i server in tutte le zone verranno serviti.\n"
+"Un server potrebbe essere in più di una zona.\n"
 " \n"
-"The ADDIP command associates an IP with a server.\n"
+"Il comando ADDIP associa un IP con un server.\n"
 " \n"
-"The POOL and DEPOOL commands actually add and remove servers to their given zones."
+"I comandi POOL e DEPOOL aggiungono e rimuovono i server dalle loro rispettive zone."
 
 #: modules/commands/hs_group.cpp:72
 msgid ""
@@ -9334,7 +9331,7 @@ msgid ""
 "This command loads the module named modname from the modules\n"
 "directory."
 msgstr ""
-"Questo comando carica il modulo chiamato modname dalla cartella\n"
+"Questo comando carica il modulo chiamato nomemod dalla cartella\n"
 "modules."
 
 #: modules/commands/ns_group.cpp:187
@@ -9367,7 +9364,7 @@ msgid ""
 "Note: all the nicknames of a group have the same password."
 msgstr ""
 "Questo comando fa sì che il tuo nick entri nel gruppo del\n"
-"nick target , password è la password del nick target .\n"
+"nick target, password è la password del nick target .\n"
 " \n"
 "Entrare in un gruppo ti permetterà di condividere la tua\n"
 "configurazione, i tuoi memo e i privilegi sui canali con\n"
@@ -9454,7 +9451,7 @@ msgstr ""
 "Questo comando mostra il livello di accesso degli utenti in un canale\n"
 "e a quali voci in lista di accesso, se presenti, corrispondono. Inoltre, informerà\n"
 "della presenza di eventuali voci auto kick che affliggono l'utente\n"
-"specificato. L' uso di questo comando è limitato agli utenti che hanno\n"
+"specificato. L'uso di questo comando è limitato agli utenti che hanno\n"
 "accesso alla possibilità di modificare la lista di accesso del canale."
 
 #: modules/commands/ns_group.cpp:270
@@ -9473,7 +9470,7 @@ msgstr ""
 
 #: modules/commands/os_module.cpp:168
 msgid "This command unloads the module named modname."
-msgstr "Questo comando scarica il modulo chiamato modname."
+msgstr "Questo comando scarica il modulo chiamato nomemod."
 
 #: modules/commands/ns_register.cpp:353
 msgid "This command will resend you the registration confirmation email."
@@ -9514,7 +9511,7 @@ msgstr "Questo nickname è stato registrato, non puoi usarlo."
 
 #: modules/commands/ns_suspend.cpp:246
 msgid "This nickname is suspended."
-msgstr "Questo nickname è sospeso."
+msgstr "Questo nickname è sospeso."
 
 #: include/language.h:92
 #, c-format
@@ -9535,7 +9532,7 @@ msgstr "Per cancellare, digita: %s%s %s %d"
 #: modules/commands/ms_read.cpp:93
 #, c-format
 msgid "To delete, type: %s%s %s %s %d"
-msgstr "Per cancellare, digita: %s%s %s %s %d"
+msgstr "Per cancellare, digita: %s%s %s %s %d"
 
 #: modules/commands/bs_kick.cpp:791
 msgid "To protect ops against bot kicks"
@@ -9574,7 +9571,7 @@ msgstr "Blocco del topic"
 #: modules/commands/cs_topic.cpp:114
 #, c-format
 msgid "Topic lock option for %s is now off."
-msgstr "Il blocco del topic per %s è ora disattivato."
+msgstr "Il blocco del topic per %s è ora disattivato."
 
 #: modules/commands/cs_topic.cpp:97
 #, c-format
@@ -9588,12 +9585,12 @@ msgstr "Mantenimento del topic"
 #: modules/commands/cs_topic.cpp:60
 #, c-format
 msgid "Topic retention option for %s is now off."
-msgstr "Il mantenimento del topic per %s è ora disattivato."
+msgstr "Il mantenimento del topic per %s è ora disattivato."
 
 #: modules/commands/cs_topic.cpp:54
 #, c-format
 msgid "Topic retention option for %s is now on."
-msgstr "Il mantenimento del topic per %s è ora attivo."
+msgstr "Il mantenimento del topic per %s è ora attivo."
 
 #: modules/commands/cs_topic.cpp:265
 msgid "Topic set by"
@@ -9796,7 +9793,7 @@ msgstr "Rimuove un modulo"
 #: modules/commands/os_sxline.cpp:552
 #, c-format
 msgid "Unable to find regex engine %s."
-msgstr "Impossibile trovare il motore di regex %s."
+msgstr "Impossibile trovare il motore di regex %s."
 
 #: modules/commands/os_module.cpp:36 modules/commands/os_module.cpp:108
 #, c-format
@@ -9834,12 +9831,12 @@ msgstr "Kick in caso di sottolineato"
 
 #: modules/commands/os_dns.cpp:595
 msgid "Unknown SET option."
-msgstr "Opzione SET sconosciuta."
+msgstr "Opzione SET sconosciuta."
 
 #: modules/commands/os_stats.cpp:229
 #, c-format
 msgid "Unknown STATS option: %s"
-msgstr "Opzione STATS sconosciuta: %s"
+msgstr "Opzione STATS sconosciuta: %s"
 
 #: src/command.cpp:222 src/command.cpp:233
 #, c-format
@@ -9871,7 +9868,7 @@ msgid ""
 "the channel founder."
 msgstr ""
 "Deregistra il canale specificato. Può essere usato soltanto\n"
-"dal founder del canale."
+"dal founder del canale."
 
 #: modules/commands/cs_drop.cpp:74
 msgid ""
@@ -9895,8 +9892,8 @@ msgid ""
 "omitted then your status is updated. If channel is omitted then\n"
 "your channel status is updated on every channel you are in."
 msgstr ""
-"Aggiorna lo stato del nick specificato in un canale. Se il nick\n"
-"è omesso, viene aggiornato il tuo stato. Se il canale è omesso, il tuo\n"
+"Aggiorna lo stato del nick specificato in un canale. Se il nick\n"
+"è omesso, viene aggiornato il tuo stato. Se il canale è omesso, il tuo\n"
 "stato viene aggiornato in tutti i canali in cui sei presente."
 
 #: modules/commands/cs_updown.cpp:48
@@ -10143,7 +10140,7 @@ msgstr ""
 "registrato al numero degli utenti connessi attualmente\n"
 "alla rete.\n"
 " \n"
-"L' opzione UPLINK , mostra informazioni relative al server\n"
+"L'opzione UPLINK , mostra informazioni relative al server\n"
 "attualmente usato come uplink al network.\n"
 " \n"
 "l'opzione HASH , mostra informazioni relativa alla hash map. \n"
@@ -10465,7 +10462,7 @@ msgstr "È necessario essere operatore del canale per poterlo registrare."
 #: modules/commands/cs_updown.cpp:94 modules/commands/cs_updown.cpp:192
 #, c-format
 msgid "You must be in %s to use this command."
-msgstr "Devi essere in %s per usare questo comando."
+msgstr "Devi essere in %s per usare questo comando."
 
 #: modules/commands/cs_register.cpp:37
 msgid "You must confirm your account before you can register a channel."
@@ -10569,7 +10566,7 @@ msgstr ""
 #: modules/extra/m_ldap_authentication.cpp:110 modules/extra/m_sql_authentication.cpp:55
 #, c-format
 msgid "Your account %s has been successfully created."
-msgstr "Il tuo account %s è stato creato con successo."
+msgstr "Il tuo account %s è stato creato con successo."
 
 #: modules/commands/ns_register.cpp:328
 msgid "Your account is already confirmed."
@@ -10600,7 +10597,7 @@ msgstr ""
 #: modules/commands/ns_register.cpp:67
 #, c-format
 msgid "Your email address of %s has been confirmed."
-msgstr "Il tuo indirizzo email per %s è stato confermato."
+msgstr "Il tuo indirizzo email per %s è stato confermato."
 
 #: modules/extra/m_ldap_authentication.cpp:159
 #, c-format
@@ -10646,7 +10643,7 @@ msgstr "Non sei più identificato per il tuo nick."
 
 #: modules/commands/ns_group.cpp:142
 msgid "Your nick is already registered."
-msgstr "Il tuo nick è già registrato."
+msgstr "Il tuo nick è già registrato."
 
 #: modules/commands/ns_group.cpp:232
 msgid "Your nick is not grouped to anything, you can't ungroup it."
@@ -10692,7 +10689,7 @@ msgstr "Il tuo vHost è stato richisto."
 #: modules/pseudoclients/hostserv.cpp:103
 #, c-format
 msgid "Your vhost of %s is now activated."
-msgstr "Il tuo vHost %s ora è attivato."
+msgstr "Il tuo vHost %s ora è attivato."
 
 #: modules/commands/hs_on.cpp:35 modules/pseudoclients/hostserv.cpp:62
 #: modules/pseudoclients/hostserv.cpp:101
@@ -10749,7 +10746,7 @@ msgstr "[account] password"
 
 #: modules/commands/cs_updown.cpp:49 modules/commands/cs_updown.cpp:147
 msgid "[channel [nick]]"
-msgstr "[canale [nick]]"
+msgstr "[canale [nick]]"
 
 #: modules/commands/ms_ignore.cpp:20
 msgid "[channel] ADD entry"
@@ -10769,7 +10766,7 @@ msgstr "[canale] [list | NEW]"
 
 #: modules/extra/stats/cs_fantasy_stats.cpp:40
 msgid "[channel] [nick]"
-msgstr "[canale] [nick]"
+msgstr "[canale] [nick]"
 
 #: modules/commands/ms_del.cpp:42
 msgid "[channel] {num | list | LAST | ALL}"
@@ -10805,7 +10802,7 @@ msgstr "[parametro]"
 
 #: modules/commands/os_logsearch.cpp:33
 msgid "[+daysd] [+limitl] pattern"
-msgstr "[+daysd] [+limitl] pattern"
+msgstr "[+giornid] [+limitel] pattern"
 
 #: modules/commands/os_chankill.cpp:22
 msgid "[+expiry] channel reason"
@@ -10979,4 +10976,4 @@ msgstr "{nick | canale}"
 
 #: modules/commands/ms_send.cpp:25 modules/commands/ms_rsend.cpp:25
 msgid "{nick | channel} memo-text"
-msgstr "{nick | canale } testo-memo"
+msgstr "{nick | canale} testo-memo"

@@ -952,7 +952,7 @@ class MyManager : public Manager, public Timer
 
 			packet->questions.push_back(Question(zone, QUERY_SOA));
 
-			new NotifySocket(ip.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, packet);
+			new NotifySocket(ip.find(':') != Anope::string::npos, packet);
 		}
 	}
 

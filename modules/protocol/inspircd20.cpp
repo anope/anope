@@ -651,7 +651,7 @@ struct IRCDMessageCapab : Message::Capab
 				if (capab.find("CHANMODES") != Anope::string::npos)
 				{
 					Anope::string modes(capab.begin() + 10, capab.end());
-					commasepstream sep(modes);
+					commasepstream sep(modes, true);
 					Anope::string modebuf;
 
 					sep.GetToken(modebuf);
@@ -689,7 +689,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (capab.find("USERMODES") != Anope::string::npos)
 				{
 					Anope::string modes(capab.begin() + 10, capab.end());
-					commasepstream sep(modes);
+					commasepstream sep(modes, true);
 					Anope::string modebuf;
 
 					sep.GetToken(modebuf);

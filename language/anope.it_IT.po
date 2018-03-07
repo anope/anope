@@ -6572,11 +6572,11 @@ msgstr "Parametro"
 
 #: modules/commands/ns_identify.cpp:38
 msgid "Password accepted - you are now recognized."
-msgstr "Passparola accettata - adesso sei riconosciuto."
+msgstr "Password accettata - adesso sei riconosciuto."
 
 #: modules/commands/os_login.cpp:44
 msgid "Password accepted."
-msgstr "Passparola accettata."
+msgstr "Password accettata."
 
 #: include/language.h:85
 msgid "Password authentication required for that command."
@@ -6599,7 +6599,7 @@ msgstr "La password di %s è %s."
 
 #: include/language.h:71
 msgid "Password incorrect."
-msgstr "Passparola errata."
+msgstr "Password errata."
 
 #: modules/commands/ns_resetpass.cpp:39
 #, c-format

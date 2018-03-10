@@ -963,7 +963,7 @@ class CommandNSSetMessage : public Command
 
 	void OnServHelp(CommandSource &source) anope_override
 	{
-		if (!Config->GetBlock("options")->Get<bool>("useprivmsg"))
+		if (Config->GetBlock("options")->Get<bool>("useprivmsg"))
 			Command::OnServHelp(source);
 	}
 };

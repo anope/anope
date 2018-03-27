@@ -23,7 +23,7 @@ struct HTTPReply
 {
 	HTTPError error;
 	Anope::string content_type;
-	std::map<Anope::string, Anope::string> headers;
+	std::map<Anope::string, Anope::string, ci::less> headers;
 	typedef std::list<std::pair<Anope::string, Anope::string> > cookie;
 	std::vector<cookie> cookies;
 

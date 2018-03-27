@@ -199,7 +199,7 @@ class MyHTTPClient : public HTTPClient
 			this->page = this->provider->FindPage(targ);
 			this->page_name = targ;
 		}
-		else if (buf.find("Cookie: ") == 0)
+		else if (buf.find_ci("Cookie: ") == 0)
 		{
 			spacesepstream sep(buf.substr(8));
 			Anope::string token;
@@ -215,7 +215,7 @@ class MyHTTPClient : public HTTPClient
 				this->message.cookies[token.substr(0, sz)] = token.substr(sz + 1, end);
 			}
 		}
-		else if (buf.find("Content-Length: ") == 0)
+		else if (buf.find_ci("Content-Length: ") == 0)
 		{
 			try
 			{

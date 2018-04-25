@@ -426,11 +426,13 @@ class CommandNSSetEmail : public Command
 
 		subject = subject.replace_all_cs("%e", nc->email);
 		subject = subject.replace_all_cs("%E", new_email);
+		subject = subject.replace_all_cs("%n", nc->display);
 		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 		subject = subject.replace_all_cs("%c", code);
 
 		message = message.replace_all_cs("%e", nc->email);
 		message = message.replace_all_cs("%E", new_email);
+		message = message.replace_all_cs("%n", nc->display);
 		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 		message = message.replace_all_cs("%c", code);
 

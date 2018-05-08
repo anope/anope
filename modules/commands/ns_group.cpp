@@ -268,6 +268,7 @@ class CommandNSUngroup : public Command
 				nc->email = oldcore->email;
 			nc->language = oldcore->language;
 
+			Log(LOG_COMMAND, source, this) << "to make " << na->nick << " leave group of " << oldcore->display << " (email: " << (!oldcore->email.empty() ? oldcore->email : "none") << ")";
 			source.Reply(_("Nick %s has been ungrouped from %s."), na->nick.c_str(), oldcore->display.c_str());
 
 			User *user = User::Find(na->nick, true);

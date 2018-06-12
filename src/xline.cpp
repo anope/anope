@@ -176,7 +176,7 @@ void XLine::SetExpires(const time_t &e)
 
 time_t XLine::GetExpires()
 {
-	return Get(&XLineType::created);
+	return Get(&XLineType::expires);
 }
 
 const Anope::string &XLine::GetNick() const

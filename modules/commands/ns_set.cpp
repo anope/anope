@@ -42,6 +42,9 @@ class CommandNSSet : public Command
 
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
+				if (info.hide)
+					continue;
+
 				ServiceReference<Command> c("Command", info.name);
 				// XXX dup
 				if (!c)

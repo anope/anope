@@ -43,6 +43,9 @@ class CommandCSSet : public Command
 			const CommandInfo &info = it->second;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
+				if (info.hide)
+					continue;
+
 				ServiceReference<Command> c("Command", info.name);
 
 				// XXX dup

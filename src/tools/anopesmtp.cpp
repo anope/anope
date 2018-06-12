@@ -429,6 +429,8 @@ int smtp_send_email()
 
 void smtp_disconnect()
 {
+	char buf[1024];
+
 	if (!smtp_send("QUIT\r\n"))
 	{
 		alog("SMTP: error writing to socket");
@@ -439,7 +441,7 @@ void smtp_disconnect()
 		alog("SMTP: error reading buffer");
 	}
 
-	code = smtp_get_code(buf);
+	int code = smtp_get_code(buf);
 	if (code != 221)
 	{
 		alog("SMTP: error expected code 221 got %d",code);

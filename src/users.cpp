@@ -561,7 +561,12 @@ void User::RemoveModeInternal(const MessageSource &source, UserMode *um)
 	this->modes.erase(um->name);
 
 	if (um->name == "OPER")
+	{
 		--OperCount;
+
+		// Don't let people de-oper and remain a SuperAdmin
+		this->super_admin = false;
+	}
 
 	if (um->name == "CLOAK" || um->name == "VHOST")
 	{

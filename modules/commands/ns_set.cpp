@@ -499,7 +499,10 @@ class CommandNSSetEmail : public Command
 		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
 		{
 			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
+			{
+				Log(LOG_COMMAND, source, this) << "to request changing the email of " << nc->display << " to " << param;
 				source.Reply(_("A confirmation e-mail has been sent to \002%s\002. Follow the instructions in it to change your e-mail address."), param.c_str());
+			}
 		}
 		else
 		{

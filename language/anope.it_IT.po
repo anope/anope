@@ -5655,7 +5655,7 @@ msgid ""
 "This command is only useful if your oper block is configured\n"
 "with a password."
 msgstr ""
-"Dà accesso a %s permettendo di ottenere i privilegi di Services Operator.\n"
+"Effettua il logout da %s in modo da perdere i privilegi di Services Operator.\n"
 "Questo comando è utile solamente se il tuo oper block\n"
 "è configurato con una password."
 

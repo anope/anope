@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-16 18:59-0500\n"
-"PO-Revision-Date: 2018-03-07 20:04+0100\n"
+"PO-Revision-Date: 2018-09-23 23:15+0100\n"
 "Last-Translator: Dragone2 <dragone2@risposteinformatiche.it>\n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -5644,7 +5644,7 @@ msgid ""
 "This command may be unnecessary if your oper block is\n"
 "configured without a password."
 msgstr ""
-"Da accesso a %s permettendo di ottenere i privilegi si Services Operator.\n"
+"Dà accesso a %s permettendo di ottenere i privilegi di Services Operator.\n"
 "Questo comando potrebbe non essere necessario se il tuo oper block\n"
 "è configurato senza una password."
 
@@ -5655,7 +5655,7 @@ msgid ""
 "This command is only useful if your oper block is configured\n"
 "with a password."
 msgstr ""
-"Da accesso a %s permettendo di ottenere i privilegi si Services Operator.\n"
+"Dà accesso a %s permettendo di ottenere i privilegi di Services Operator.\n"
 "Questo comando è utile solamente se il tuo oper block\n"
 "è configurato con una password."
 
@@ -9934,7 +9934,7 @@ msgstr "Usa il comando %s ALL per ottenere la lista completa dei comandi e la 
 
 #: modules/commands/bs_info.cpp:59
 msgid "Used on"
-msgstr "Usato on"
+msgstr "Usato su"
 
 #: data/chanserv.example.conf:821
 msgid "Used to manage channels"

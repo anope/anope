@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-16 18:59-0500\n"
-"PO-Revision-Date: 2018-09-23 23:20+0100\n"
+"PO-Revision-Date: 2018-09-25 23:040100\n"
 "Last-Translator: Dragone2 <dragone2@risposteinformatiche.it>\n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -640,7 +640,7 @@ msgstr "canale ADD mask"
 
 #: modules/commands/cs_access.cpp:499
 msgid "channel ADD mask level"
-msgstr "canale ADD mask level"
+msgstr "canale ADD mask livello"
 
 #: modules/commands/cs_entrymsg.cpp:194
 msgid "channel ADD message"
@@ -747,7 +747,7 @@ msgstr "canale [parametri]"
 
 #: modules/commands/cs_status.cpp:20 modules/commands/cs_mode.cpp:797
 msgid "channel [user]"
-msgstr "canale [user]"
+msgstr "canale [utente]"
 
 #: modules/commands/cs_suspend.cpp:59
 msgid "channel [+expiry] [reason]"
@@ -8275,12 +8275,12 @@ msgstr "Successore"
 #: modules/commands/cs_set.cpp:1017
 #, c-format
 msgid "Successor for %s changed to %s."
-msgstr "Il successor del canale %s ora è %s."
+msgstr "Il successore del canale %s ora è %s."
 
 #: modules/commands/cs_set.cpp:1019
 #, c-format
 msgid "Successor for %s unset."
-msgstr "Il successor del canale %s è stato annullato."
+msgstr "Il successore del canale %s è stato rimosso."
 
 #: modules/commands/os_set.cpp:81
 msgid "Super admin can not be set because it is not enabled in the configuration."
@@ -8288,15 +8288,15 @@ msgstr "L'impostazione SuperAdmin non può essere attivata perché non è abilit
 
 #: modules/commands/ns_suspend.cpp:60
 msgid "Suspend a given nick"
-msgstr "Sospendi il nick specificato"
+msgstr "Sospende il nick specificato"
 
 #: modules/commands/cs_suspend.cpp:236 modules/commands/ns_suspend.cpp:250
 msgid "Suspend reason"
-msgstr "Suspend motivo"
+msgstr "Motivo sospensione"
 
 #: modules/commands/cs_suspend.cpp:232 modules/commands/ns_suspend.cpp:246
 msgid "Suspended"
-msgstr "Suspended"
+msgstr "Sospeso"
 
 #: modules/commands/cs_suspend.cpp:234 modules/commands/ns_suspend.cpp:248
 msgid "Suspended by"
@@ -8389,7 +8389,7 @@ msgstr ""
 "Attiva o disattiva la modalità di debug.\n"
 " \n"
 "Questa opzione è equivalente all'opzione di riga di comando\n"
-"--dubug."
+"--debug."
 
 #: modules/commands/ms_set.cpp:287
 #, c-format
@@ -10703,7 +10703,7 @@ msgstr "Il tuo vHost è stato rimosso e l'offuscamento IP/Host standard ripristi
 
 #: modules/commands/os_dns.cpp:255
 msgid "Zone"
-msgstr "Zone"
+msgstr "Zona"
 
 #: modules/commands/os_dns.cpp:290
 #, c-format

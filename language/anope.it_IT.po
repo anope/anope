@@ -2167,7 +2167,7 @@ msgstr "L'accesso a questo comando richiede che i permessi %s siano presenti n
 #: modules/commands/ns_identify.cpp:94 modules/commands/ns_cert.cpp:368 
 #: modules/commands/ns_cert.cpp:392
 #, c-format
-msgid "Account %s has already reached the maximum number of simultaneous logins "(%u)."
+msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "L'account %s ha già raggiunto il numero massimo di login simultanei (%u)."
 
 #: modules/commands/cs_set.cpp:694
@@ -5575,7 +5575,7 @@ msgstr "Gestisce la lista delle parolacce"
 
 #: modules/commands/bs_control.cpp:79
 msgid "Makes the bot do the equivalent of a \"/me\" command"
-msgstr "Fa sì che il bot invii l'equivalente di un comando \"/me\
+msgstr "Fa sì che il bot invii l'equivalente di un comando \"/me\""
 #: modules/commands/bs_control.cpp:127
 msgid "Makes the bot do the equivalent of a \"/me\" command\n"
 "on the specified channel using the specified text."

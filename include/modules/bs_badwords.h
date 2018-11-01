@@ -20,7 +20,9 @@ enum BadWordType
 	/* The word has to start with the badword */
 	BW_START,
 	/* The word has to end with the badword */
-	BW_END
+	BW_END,
+	/* Evaluate a regular expression on the message */
+	BW_REGEX
 };
 
 /* Structure used to contain bad words. */
@@ -29,8 +31,13 @@ struct BadWord
 	Anope::string chan;
 	Anope::string word;
 	BadWordType type;
+	Regex *regex;
 
-	virtual ~BadWord() { }
+	virtual ~BadWord()
+	{
+		if(regex != NULL)
+			delete regex;
+	}
  protected:
 	BadWord() { }
 };

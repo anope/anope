@@ -24,9 +24,9 @@ die="yes"
 ###########################
 
 # The GeoIP data is created by MaxMind, available from www.maxmind.com.
-geoip_country_source="http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip"
-geoip_city_source="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip"
-geoip_region_source="http://dev.maxmind.com/static/csv/codes/maxmind/region.csv"
+geoip_country_source="https://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip"
+geoip_city_source="https://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip"
+geoip_region_source="https://www.maxmind.com/download/geoip/misc/region_codes.csv"
 
 ###########################
 LOGIN="--host=$mysql_host --user=$mysql_user --password=$mysql_password $mysql_database"

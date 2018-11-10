@@ -111,7 +111,7 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 }
 #endif
 
-/* This code was found online at http://www.linuxjournal.com/article/3687#comment-26593
+/* This code was found online at https://web.archive.org/web/20180318184211/https://www.linuxjournal.com/article/3687#comment-26593
  *
  * This function will take a pointer from either dlsym or GetProcAddress and cast it in
  * a way that won't cause C++ warnings/errors to come up.

@@ -18,10 +18,10 @@ Anope for Windows
     1) Download the required files:
 
         * Current Anope source:
-            http://sourceforge.net/project/showfiles.php?group_id=94081
+            https://github.com/anope/anope/releases
 
         * CMake:
-            http://www.cmake.org/cmake/resources/software.html
+            https://cmake.org/download/
 
         (NOTE: When installing, tell CMake to add itself to the PATH.)
 

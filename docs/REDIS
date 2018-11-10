@@ -1,8 +1,8 @@
-Starting in Anope 1.9.9, Anope has Redis database support (http://redis.io/).
+Starting in Anope 1.9.9, Anope has Redis database support (https://redis.io/).
 This document explains the data structure used by Anope, and explains how
 keyspace notification works.
 
-This is not a tutorial on how to use Redis, see http://redis.io/documentation
+This is not a tutorial on how to use Redis, see https://redis.io/documentation
 for that.
 
 Table of Contents
@@ -70,7 +70,7 @@ Table of Contents
 2) Keyspace notifications
 
     Redis 2.7 (unstable) and 2.8 (stable) and newer support keyspace notifications
-    (http://redis.io/topics/notifications). This allows Redis to notify Anope of
+    (https://redis.io/topics/notifications). This allows Redis to notify Anope of
     any external changes to objects in the database. Once notified, Anope will
     immediately update the object. Otherwise, Anope keeps all objects in memory
     and will not regularly read from the databaes once started.

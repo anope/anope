@@ -8,7 +8,7 @@ Based on Services 1996-1999 Andrew Church <achurch@achurch.org>.
 This program is free but copyrighted software; see the file COPYING for
 details.
 
-Information about Anope may be found at http://www.anope.org/
+Information about Anope may be found at https://www.anope.org/
 
 Table of Contents
 -----------------
@@ -240,7 +240,7 @@ Table of Contents
 6) Contact
 
     For announcements and discussions about Anope, please visit our
-    Portal and Forums at http://www.anope.org/ -- make sure you register
+    Portal and Forums at https://www.anope.org/ -- make sure you register
     yourself to get full benefits.
 
     If you read the documentation carefully, and didn't find the answer to
@@ -252,7 +252,7 @@ Table of Contents
     The more precise you are the sooner you'll be likely to get an answer.
 
     If you think you found a bug, add it to the bug tracking system
-    (http://bugs.anope.org) and - again - be as precise as possible. Also say
+    (https://bugs.anope.org/) and - again - be as precise as possible. Also say
     whether the bug happens always or under what circumstances, and anything
     that could be useful to track your bug down. If you wrote a patch, send
     it over. :)

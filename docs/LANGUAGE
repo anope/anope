@@ -22,13 +22,13 @@ Anope Mutli Language Support
 
 2) Adding a new language
 
-    Anope uses gettext (http://www.gnu.org/software/gettext/) to translate messages for users. To add a new language
+    Anope uses gettext (https://www.gnu.org/software/gettext/) to translate messages for users. To add a new language
     install gettext and run `msginit -l language -o anope.language.po -i anope.pot`. For example if I was translating to
     Spanish I could run `msginit -l es_ES -o anope.es_ES.po -i anope.pot`. Open the newly generating .po file and start
     translating. Once you are done simply rerun ./Config; make && make install and add the language to your services.conf.
     Note that on Windows it is not quite this simple, windows.cpp must be edited and Anope recompiled and restarted.
 
-    Poedit (http://www.poedit.net/) is a popular po file editor, and we recommend using it or another editor designed to edit
+    Poedit (https://poedit.net/) is a popular po file editor, and we recommend using it or another editor designed to edit
     po files (especially on Windows).
 
     If you have finished a language file translation and you want others to use it, please send it to team@anope.org

@@ -141,7 +141,7 @@ class HTTPProvider : public ListenSocket, public Service
 	unsigned short port;
 	bool ssl;
  public:
-	Anope::string ext_ip;
+	std::vector<Anope::string> ext_ips;
 	std::vector<Anope::string> ext_headers;
 
 	HTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, bool s) : ListenSocket(i, p, i.find(':') != Anope::string::npos), Service(c, "HTTPProvider", n), ip(i), port(p), ssl(s) { }

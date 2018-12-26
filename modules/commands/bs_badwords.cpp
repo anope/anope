@@ -43,27 +43,6 @@ struct BadWordsImpl : BadWords
 		bw->chan = ci->name;
 		bw->word = word;
 		bw->type = type;
-		
-		if(type == BW_REGEX)
-		{
-			ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string>("regexengine"));
-			if (provider)
-			{
-				try
-				{
-					bw->regex = provider->Compile(bw->word);
-				}
-				catch (const RegexException &ex)
-				{
-					Log(LOG_DEBUG) << ex.GetReason();
-					bw->regex = NULL;
-				}
-			}
-			else
-				bw->regex = NULL;
-		}
-		else
-			bw->regex = NULL;
 
 		this->badwords->push_back(bw);
 
@@ -157,27 +136,6 @@ Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 	bw->chan = sci;
 	bw->word = sword;
 	bw->type = static_cast<BadWordType>(n);
-	
-	if(bw->type == BW_REGEX)
-	{
-		ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string>("regexengine"));
-		if (provider)
-		{
-			try
-			{
-				bw->regex = provider->Compile(sword);
-			}
-			catch (const RegexException &ex)
-			{
-				Log(LOG_DEBUG) << ex.GetReason();
-				bw->regex = NULL;
-			}
-		}
-		else
-			bw->regex = NULL;
-	}
-	else
-		bw->regex = NULL;
 
 	BadWordsImpl *bws = ci->Require<BadWordsImpl>("badwords");
 	if (!obj)
@@ -260,14 +218,7 @@ class CommandBSBadwords : public Command
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(Number);
 					entry["Word"] = b->word;
-					switch(b->type){
-						case BW_SINGLE: entry["Type"] = "(SINGLE)"; break;
-						case BW_START: entry["Type"] = "(START)"; break;
-						case BW_END: entry["Type"] = "(END)"; break;
-						case BW_REGEX: entry["Type"] = "(REGEX)"; break;
-						default: entry["Type"] = ""; break;
-					}
-//					entry["Type"] = b->type == BW_SINGLE ? "(SINGLE)" : (b->type == BW_START ? "(START)" : (b->type == BW_END ? "(END)" : ""));
+					entry["Type"] = b->type == BW_SINGLE ? "(SINGLE)" : (b->type == BW_START ? "(START)" : (b->type == BW_END ? "(END)" : ""));
 					this->list.AddEntry(entry);
 				}
 			}
@@ -286,13 +237,7 @@ class CommandBSBadwords : public Command
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
 				entry["Word"] = b->word;
-				switch(b->type){
-					case BW_SINGLE: entry["Type"] = "(SINGLE)"; break;
-					case BW_START: entry["Type"] = "(START)"; break;
-					case BW_END: entry["Type"] = "(END)"; break;
-					case BW_REGEX: entry["Type"] = "(REGEX)"; break;
-					default: entry["Type"] = ""; break;
-				}
+				entry["Type"] = b->type == BW_SINGLE ? "(SINGLE)" : (b->type == BW_START ? "(START)" : (b->type == BW_END ? "(END)" : ""));
 				list.AddEntry(entry);
 			}
 		}
@@ -331,8 +276,6 @@ class CommandBSBadwords : public Command
 					bwtype = BW_START;
 				else if (opt.equals_ci("END"))
 					bwtype = BW_END;
-				else if(opt.equals_ci("REGEX"))
-					bwtype = BW_REGEX;
 			}
 			realword = word.substr(0, pos);
 		}
@@ -353,34 +296,6 @@ class CommandBSBadwords : public Command
 			if ((casesensitive && realword.equals_cs(bw->word)) || (!casesensitive && realword.equals_ci(bw->word)))
 			{
 				source.Reply(_("\002%s\002 already exists in %s bad words list."), bw->word.c_str(), ci->name.c_str());
-				return;
-			}
-		}
-		
-		if(bwtype == BW_REGEX) /* checking the expression for correctness */
-		{
-			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
-			
-			if (regexengine.empty())
-			{
-				source.Reply(_("Regex is disabled."));
-				return;
-			}
-
-			ServiceReference<RegexProvider> provider("Regex", regexengine);
-			if (!provider)
-			{
-				source.Reply(_("Unable to find regex engine %s."), regexengine.c_str());
-				return;
-			}
-
-			try
-			{
-				delete provider->Compile(realword);
-			}
-			catch (const RegexException &ex)
-			{
-				source.Reply("%s", ex.GetReason().c_str());
 				return;
 			}
 		}
@@ -453,7 +368,7 @@ class CommandBSBadwords : public Command
 	CommandBSBadwords(Module *creator) : Command(creator, "botserv/badwords", 2, 3)
 	{
 		this->SetDesc(_("Maintains the bad words list"));
-		this->SetSyntax(_("\037channel\037 ADD \037word\037 [\037SINGLE\037 | \037START\037 | \037END\037 | \037REGEX\037]"));
+		this->SetSyntax(_("\037channel\037 ADD \037word\037 [\037SINGLE\037 | \037START\037 | \037END\037]"));
 		this->SetSyntax(_("\037channel\037 DEL {\037word\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037list\037]"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));
@@ -517,8 +432,6 @@ class CommandBSBadwords : public Command
 				"specified, a kick will be done if a user says a word\n"
 				"that starts with \037word\037. If END is specified, a kick\n"
 				"will be done if a user says a word that ends with\n"
-				"\037word\037. If REGEX is specified, user will be kicked when\n"
-				"the message matches the regular expression specified as\n"
 				"\037word\037. If you don't specify anything, a kick will\n"
 				"be issued every time \037word\037 is said by a user.\n"
 				" \n"), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());

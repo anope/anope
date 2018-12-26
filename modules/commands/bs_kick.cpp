@@ -1398,11 +1398,6 @@ class BSKick : public Module
 								mustkick = true;
 						}
 					}
-					else if (bw->type == BW_REGEX)
-					{
-						if(bw->regex != NULL && bw->regex->Matches(nbuf))
-							mustkick = true;
-					}
 
 					if (mustkick)
 					{

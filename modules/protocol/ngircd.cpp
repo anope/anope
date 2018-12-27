@@ -609,10 +609,14 @@ class ProtongIRCd : public Module
 	void AddModes()
 	{
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode("NOCTCP", 'b'));
+		ModeManager::AddUserMode(new UserMode("AWAY", 'a'));
+		ModeManager::AddUserMode(new UserMode("NOPRIVMSG", 'b'));
 		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
+		ModeManager::AddUserMode(new UserModeOperOnly("CONNCECT_NOTICE", 'c'));
 		ModeManager::AddUserMode(new UserMode("COMMONCHANS", 'C'));
+		ModeManager::AddUserMode(new UserModeOperOnly("RELAXED_FLOOD_PROT", 'F'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode("HIDECHANS", 'I'));
 		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
 		ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", 'q'));
 		ModeManager::AddUserMode(new UserModeOperOnly("RESTRICTED", 'r'));
@@ -640,6 +644,7 @@ class ProtongIRCd : public Module
 		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
 		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
 		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
+		ModeManager::AddChannelMode(new ChannelMode("NONICK"; 'N'));
 		ModeManager::AddChannelMode(new ChannelMode("OPERONLY", 'O'));
 		ModeManager::AddChannelMode(new ChannelMode("PERM", 'P'));
 		ModeManager::AddChannelMode(new ChannelMode("NOKICK", 'Q'));

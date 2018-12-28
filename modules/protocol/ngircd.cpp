@@ -612,7 +612,7 @@ class ProtongIRCd : public Module
 		ModeManager::AddUserMode(new UserMode("AWAY", 'a'));
 		ModeManager::AddUserMode(new UserMode("NOPRIVMSG", 'b'));
 		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
-		ModeManager::AddUserMode(new UserModeOperOnly("CONNCECT_NOTICE", 'c'));
+		ModeManager::AddUserMode(new UserModeOperOnly("CONNECT_NOTICE", 'c'));
 		ModeManager::AddUserMode(new UserMode("COMMONCHANS", 'C'));
 		ModeManager::AddUserMode(new UserModeOperOnly("RELAXED_FLOOD_PROT", 'F'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));

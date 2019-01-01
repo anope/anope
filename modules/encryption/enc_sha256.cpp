@@ -5,7 +5,7 @@
  * IMPORTANT: DATA HASHES CANNOT BE "DECRYPTED" BACK TO PLAIN TEXT.
  *
  * Modified for Anope.
- * (C) 2003-2018 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Taken from InspIRCd (https://www.inspircd.org/),

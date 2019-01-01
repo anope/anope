@@ -1,7 +1,7 @@
 /* ngIRCd Protocol module for Anope IRC Services
  *
  * (C) 2011-2012, 2014 Alexander Barton <alex@barton.de>
- * (C) 2011-2018 Anope Team <team@anope.org>
+ * (C) 2011-2019 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *

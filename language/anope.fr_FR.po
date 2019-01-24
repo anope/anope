@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-24 03:28+0100\n"
-"PO-Revision-Date: 2019-01-24 15:05+0100\n"
+"PO-Revision-Date: 2019-01-24 17:28+0100\n"
 "Last-Translator: Thomas Fargeix <t.fargeix@gmail.com>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -4773,7 +4773,6 @@ msgid "Enforce various channel modes and set options"
 msgstr "Applique les modes et les paramètres divers d'un canal"
 
 #: modules/commands/cs_enforce.cpp:263
-#, fuzzy
 msgid ""
 "Enforce various channel modes and set options. The channel\n"
 "option indicates what channel to enforce the modes and options\n"

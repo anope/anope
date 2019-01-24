@@ -4710,7 +4710,6 @@ msgid "Enforce various channel modes and set options"
 msgstr "Wymuszanie różnych flag kanału i opcji"
 
 #: modules/commands/cs_enforce.cpp:263
-#, fuzzy
 msgid ""
 "Enforce various channel modes and set options. The channel\n"
 "option indicates what channel to enforce the modes and options\n"

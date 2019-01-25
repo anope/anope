@@ -302,7 +302,7 @@ class ModuleSASL : public Module
 {
 	SASLService sasl;
 
-	Plain plain;
+	Plain *plain;
 	External *external;
 
 	std::vector<Anope::string> mechs;
@@ -320,21 +320,42 @@ class ModuleSASL : public Module
 			IRCD->SendSASLMechanisms(mechs);
 	}
 
+	template<typename Mech>
+	void ToggleMech(Mech *&mech, bool enable)
+	{
+		if (enable && !mech)
+		{
+			try
+			{
+				mech = new Mech(this);
+			}
+			catch (ModuleException &) { }
+		}
+		else if (!enable && mech)
+		{
+			delete mech;
+			mech = NULL;
+		}
+	}
+
  public:
 	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		sasl(this), plain(this), external(NULL)
+		sasl(this), plain(NULL), external(NULL)
 	{
-		try
-		{
-			external = new External(this);
-			CheckMechs();
-		}
-		catch (ModuleException &) { }
 	}
 
 	~ModuleSASL()
 	{
+		delete plain;
 		delete external;
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		Configuration::Block *block = conf->GetModule(this);
+		ToggleMech<External>(external, block->Get<bool>("use_external", "yes"));
+		ToggleMech<Plain>(plain, block->Get<bool>("use_plain", "yes"));
+		CheckMechs();
 	}
 
 	void OnModuleLoad(User *, Module *) anope_override

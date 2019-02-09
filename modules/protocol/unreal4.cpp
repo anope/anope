@@ -373,18 +373,40 @@ class UnrealIRCdProto : public IRCDProto
 	void SendSASLMessage(const SASL::Message &message) anope_override
 	{
 		size_t p = message.target.find('!');
-		if (p == Anope::string::npos)
-			return;
+		Anope::string distmask;
 
-		UplinkSocket::Message(BotInfo::Find(message.source)) << "SASL " << message.target.substr(0, p) << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : " " + message.ext);
+		if (p == Anope::string::npos)
+		{
+			Server *s = Server::Find(message.target.substr(0, 3));
+			if (!s)
+				return;
+			distmask = s->GetName();
+		}
+		else
+		{
+			distmask = message.target.substr(0, p);
+		}
+
+		UplinkSocket::Message(BotInfo::Find(message.source)) << "SASL " << distmask << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : " " + message.ext);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
 	{
 		size_t p = uid.find('!');
+		Anope::string distmask;
+
 		if (p == Anope::string::npos)
-			return;
-		UplinkSocket::Message(Me) << "SVSLOGIN " << uid.substr(0, p) << " " << uid << " " << acc;
+		{
+			Server *s = Server::Find(uid.substr(0, 3));
+			if (!s)
+				return;
+			distmask = s->GetName();
+		}
+		else
+		{
+			distmask = uid.substr(0, p);
+		}
+		UplinkSocket::Message(Me) << "SVSLOGIN " << distmask << " " << uid << " " << acc;
 	}
 
 	bool IsIdentValid(const Anope::string &ident) anope_override
@@ -1005,8 +1027,7 @@ struct IRCDMessageSASL : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		size_t p = params[1].find('!');
-		if (!SASL::sasl || p == Anope::string::npos)
+		if (!SASL::sasl)
 			return;
 
 		SASL::Message m;

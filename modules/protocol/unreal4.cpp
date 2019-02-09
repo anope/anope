@@ -381,7 +381,9 @@ class UnrealIRCdProto : public IRCDProto
 			if (!s)
 				return;
 			distmask = s->GetName();
-		} else {
+		}
+		else
+		{
 			distmask = message.target.substr(0, p);
 		}
 

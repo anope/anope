@@ -399,7 +399,9 @@ class UnrealIRCdProto : public IRCDProto
 			if (!s)
 				return;
 			distmask = s->GetName();
-		} else {
+		}
+		else
+		{
 			distmask = uid.substr(0, p);
 		}
 		UplinkSocket::Message(Me) << "SVSLOGIN " << distmask << " " << uid << " " << acc;

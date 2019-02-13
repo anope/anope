@@ -1020,7 +1020,7 @@ class CommandCSSetSuccessor : public Command
 				"channel. The new nickname must be a registered one."));
 		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
 		if (max_reg)
-			source.Reply(_("However, if the successor already has too many\n"
+			source.Reply(_("\002NOTE:\002 However, if the successor already has too many\n"
 				"channels registered (%d), the channel will be dropped\n"
 				"instead. If there's no successor set, then\n"
 				"the first nickname in the access list (with the highest mode if\n"

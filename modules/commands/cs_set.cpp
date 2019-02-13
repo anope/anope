@@ -1022,7 +1022,10 @@ class CommandCSSetSuccessor : public Command
 		if (max_reg)
 			source.Reply(_("However, if the successor already has too many\n"
 				"channels registered (%d), the channel will be dropped\n"
-				"instead, just as if no successor had been set."), max_reg);
+				"instead. If there's no successor set, then\n"
+				"the first nickname in the access list (with the highest mode if\n"
+				"applicable) will become the new founder. The new founder isn't warned in\n"
+				"any way about ownership change."), max_reg);
 		return true;
 	}
 };

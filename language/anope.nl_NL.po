@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-02-28 02:52+0100\n"
-"PO-Revision-Date: 2019-01-24 03:28+0100\n"
+"PO-Revision-Date: 2019-02-28 04:44+0100\n"
 "Last-Translator: Robby <robby@chatbelgie.be>\n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -3555,7 +3555,6 @@ msgstr ""
 "als de eigenaar van de nick."
 
 #: modules/commands/cs_set.cpp:1017
-#, fuzzy
 msgid ""
 "Changes the successor of a channel. If the founder's\n"
 "nickname expires or is dropped while the channel is still\n"
@@ -3569,8 +3568,12 @@ msgstr ""
 "Verandert de opvolger van een kanaal. Als de nick van de\n"
 "stichter verloopt of de registratie ervan wordt geannuleerd\n"
 "terwijl het kanaal nog geregistreerd is, dan wordt de opvolger\n"
-"de nieuwe stichter van het kanaal. De nieuwe nick moet een\n"
-"geregistreerde nick zijn."
+"de nieuwe stichter van het kanaal. De opvolgers nick moet een\n"
+"geregistreerde nick zijn. Als er geen opvolger ingesteld staat,\n"
+"dan zal de eerste nick op de toegangslijst (met de hoogste\n"
+"toegangsrechten, indien van toepassing) de nieuwe stichter\n"
+"worden, maar als de toegangslijst leeg is, dan zal het kanaal\n"
+"verlopen."
 
 #: modules/commands/ns_alist.cpp:48 modules/commands/ns_ajoin.cpp:100
 msgid "Channel"
@@ -6560,16 +6563,17 @@ msgid "None"
 msgstr "Geen"
 
 #: modules/commands/cs_set.cpp:1028
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Note, however, if the successor already has too many\n"
 "channels registered (%d), they will not be able to\n"
 "become the new founder and it will be as if the\n"
 "channel had no successor set."
 msgstr ""
-"Maar als de opvolger al teveel geregistreerde kanalen\n"
-"heeft (%d), dan zal het kanaal verwijderd worden, net\n"
-"alsof er geen opvolger ingesteld staat."
+"Merk op dat als de opvolger al teveel geregistreerde\n"
+"kanalen heeft (%d), dat die niet de nieuwe opvolger\n"
+"zal kunnen worden en het dan zal zijn net alsof het\n"
+"kanaal geen opvolger ingesteld heeft staan."
 
 #: modules/commands/cs_mode.cpp:380 modules/commands/cs_mode.cpp:437
 msgid "Nothing to do."

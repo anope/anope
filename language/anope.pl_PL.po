@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-24 03:28+0100\n"
+"POT-Creation-Date: 2019-02-28 02:52+0100\n"
 "PO-Revision-Date: 2018-10-11 22:07+0200\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Polish\n"
@@ -818,7 +818,7 @@ msgstr "kanał {ON | LEVEL | OFF}"
 #: modules/commands/cs_set.cpp:336 modules/commands/cs_set.cpp:401
 #: modules/commands/cs_set.cpp:473 modules/commands/cs_set.cpp:622
 #: modules/commands/cs_set.cpp:684 modules/commands/cs_set.cpp:747
-#: modules/commands/cs_set.cpp:811 modules/commands/cs_set.cpp:1036
+#: modules/commands/cs_set.cpp:811 modules/commands/cs_set.cpp:1042
 #: modules/commands/bs_kick.cpp:792 modules/commands/bs_kick.cpp:857
 #: modules/commands/cs_topic.cpp:21 modules/commands/cs_list.cpp:181
 msgid "channel {ON | OFF}"
@@ -3532,11 +3532,16 @@ msgid ""
 msgstr "Zmienia Twoje hasło do nicka."
 
 #: modules/commands/cs_set.cpp:1017
+#, fuzzy
 msgid ""
 "Changes the successor of a channel. If the founder's\n"
 "nickname expires or is dropped while the channel is still\n"
 "registered, the successor will become the new founder of the\n"
-"channel. The new nickname must be a registered one."
+"channel. The successor's nickname must be a registered one.\n"
+"If there's no successor set, then the first nickname on the\n"
+"access list (with the highest access, if applicable) will\n"
+"become the new founder, but if the access list is empty, the\n"
+"channel will be dropped."
 msgstr ""
 "Ustawia spadkobiercę kanału. Jeśli nick właściciela\n"
 "wygaśnie lub zostanie usunięty, kanał zostaje przekazany\n"
@@ -3613,12 +3618,12 @@ msgstr "Kanał %s nie jest zawieszony."
 msgid "Channel %s registered under your account: %s"
 msgstr "Kanał %s został zarejestrowany dla Twojego konta: %s"
 
-#: modules/commands/cs_set.cpp:1070
+#: modules/commands/cs_set.cpp:1076
 #, c-format
 msgid "Channel %s will expire."
 msgstr "Kanał %s od teraz podlega prawu wygasania."
 
-#: modules/commands/cs_set.cpp:1064
+#: modules/commands/cs_set.cpp:1070
 #, c-format
 msgid "Channel %s will not expire."
 msgstr "Kanał %s nie wygaśnie."
@@ -5035,17 +5040,6 @@ msgstr "Host"
 msgid "Hosts with at least %d sessions:"
 msgstr "Hosty z przynajmniej %d sesjami:"
 
-#: modules/commands/cs_set.cpp:1023
-#, c-format
-msgid ""
-"However, if the successor already has too many\n"
-"channels registered (%d), the channel will be dropped\n"
-"instead, just as if no successor had been set."
-msgstr ""
-"W przypadku, gdy zastępca już posiada zbyt wiele (%d) zarejestrowanych\n"
-"kanałów, kanał zostanie skasowany, jak w przypadku, gdyby zastępca\n"
-"nie był ustawiony."
-
 #: modules/commands/cs_seen.cpp:207
 #, c-format
 msgid "I don't know who %s is."
@@ -5186,7 +5180,7 @@ msgstr "Kopanie za pochyły tekst"
 msgid "Join a group"
 msgstr "Dołącza nick do wskazanej grupy"
 
-#: modules/commands/cs_set.cpp:1297 modules/commands/ns_set.cpp:1319
+#: modules/commands/cs_set.cpp:1303 modules/commands/ns_set.cpp:1319
 msgid "Keep modes"
 msgstr "Utrzymywanie trybów"
 
@@ -6365,7 +6359,7 @@ msgstr "Nick %s został zarejestrowany z maską: %s"
 msgid "Nickname %s registered."
 msgstr "Nick %s został zarejestrowany."
 
-#: modules/commands/cs_set.cpp:1299
+#: modules/commands/cs_set.cpp:1305
 msgid "No auto-op"
 msgstr "Brak AUTOOP"
 
@@ -6373,7 +6367,7 @@ msgstr "Brak AUTOOP"
 msgid "No bot"
 msgstr "NOBOT"
 
-#: modules/commands/cs_set.cpp:1295 modules/commands/ns_set.cpp:1317
+#: modules/commands/cs_set.cpp:1301 modules/commands/ns_set.cpp:1317
 msgid "No expire"
 msgstr "nie wygasa"
 
@@ -6516,6 +6510,18 @@ msgstr ""
 #: modules/commands/os_dns.cpp:226 modules/commands/bs_info.cpp:58
 msgid "None"
 msgstr "Brak"
+
+#: modules/commands/cs_set.cpp:1028
+#, fuzzy, c-format
+msgid ""
+"Note, however, if the successor already has too many\n"
+"channels registered (%d), they will not be able to\n"
+"become the new founder and it will be as if the\n"
+"channel had no successor set."
+msgstr ""
+"W przypadku, gdy zastępca już posiada zbyt wiele (%d) zarejestrowanych\n"
+"kanałów, kanał zostanie skasowany, jak w przypadku, gdyby zastępca\n"
+"nie był ustawiony."
 
 #: modules/commands/cs_mode.cpp:380 modules/commands/cs_mode.cpp:437
 msgid "Nothing to do."
@@ -6662,7 +6668,7 @@ msgstr "Nieprawidłowe hasło."
 msgid "Password reset email for %s has been sent."
 msgstr "Wysłano wiadomość e-mail służącą resetowaniu hasła dla %s."
 
-#: modules/commands/cs_set.cpp:1281
+#: modules/commands/cs_set.cpp:1287
 msgid "Peace"
 msgstr "PEACE"
 
@@ -6676,7 +6682,7 @@ msgstr "Opcja PEACE dla kanału %s została wyłączona."
 msgid "Peace option for %s is now on."
 msgstr "Opcja PEACE dla kanału %s została włączona."
 
-#: modules/commands/cs_set.cpp:1293
+#: modules/commands/cs_set.cpp:1299
 msgid "Persistent"
 msgstr "Trwały"
 
@@ -6754,7 +6760,7 @@ msgstr "Uniemożliwia przypisanie bota do kanału"
 msgid "Prevent a channel from being used preserving channel data and settings"
 msgstr "Blokuje podany kanał z zachowaniem wszelkich jego danych i ustawień"
 
-#: modules/commands/cs_set.cpp:1035
+#: modules/commands/cs_set.cpp:1041
 msgid "Prevent the channel from expiring"
 msgstr "Uniemożliwia wygaśnięcie kanału"
 
@@ -7180,7 +7186,7 @@ msgstr "Ponownie wysyła e-maila potwierdzającego rejestrację"
 msgid "Restrict access to the channel"
 msgstr "Ogranicza dostęp do kanału"
 
-#: modules/commands/cs_set.cpp:1283
+#: modules/commands/cs_set.cpp:1289
 msgid "Restricted access"
 msgstr "RESTRICTED"
 
@@ -7323,7 +7329,7 @@ msgstr "Zapisuje bazy i restartuje serwisy"
 msgid "Searches logs for a matching pattern"
 msgstr "Przeszukuje logi pod kątem wyrażenia"
 
-#: modules/commands/cs_set.cpp:1287
+#: modules/commands/cs_set.cpp:1293
 msgid "Secure founder"
 msgstr "SECUREFOUNDER"
 
@@ -7337,7 +7343,7 @@ msgstr "Status właściciela kanału %s nie będzie teraz chroniony."
 msgid "Secure founder option for %s is now on."
 msgstr "Status właściciela kanału %s będzie teraz chroniony."
 
-#: modules/commands/cs_set.cpp:1289
+#: modules/commands/cs_set.cpp:1295
 msgid "Secure ops"
 msgstr "SECUREOPS"
 
@@ -7376,7 +7382,7 @@ msgstr "Opcja bezpieczeństwa dla %s została włączona."
 msgid "Secureops enforced on %s."
 msgstr "Opcja bezpieczeństwa dla %s została wymuszona."
 
-#: modules/commands/cs_set.cpp:1285 modules/commands/ns_set.cpp:1311
+#: modules/commands/cs_set.cpp:1291 modules/commands/ns_set.cpp:1311
 msgid "Security"
 msgstr "SECURE"
 
@@ -8060,7 +8066,7 @@ msgstr ""
 "Pozwala na wybór, czy serwisy będą ustawiały automatycznie Twoje uprawnienia "
 "na kanale."
 
-#: modules/commands/cs_set.cpp:1082
+#: modules/commands/cs_set.cpp:1088
 msgid ""
 "Sets whether the given channel will expire.  Setting this\n"
 "to ON prevents the channel from expiring."
@@ -8163,7 +8169,7 @@ msgstr ""
 msgid "Signed kick option for %s is now on."
 msgstr "Podpisywanie komendy KICK na kanale %s zostało włączone."
 
-#: modules/commands/cs_set.cpp:1291
+#: modules/commands/cs_set.cpp:1297
 msgid "Signed kicks"
 msgstr "SIGNKICK"
 

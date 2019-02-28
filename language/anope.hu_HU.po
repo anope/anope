@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-24 03:28+0100\n"
+"POT-Creation-Date: 2019-02-28 02:52+0100\n"
 "PO-Revision-Date: 2010-09-19 20:37-0400\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Hungarian\n"
@@ -880,7 +880,7 @@ msgstr "SET #szoba SIGNKICK {ON | LEVEL | OFF}"
 #: modules/commands/cs_set.cpp:336 modules/commands/cs_set.cpp:401
 #: modules/commands/cs_set.cpp:473 modules/commands/cs_set.cpp:622
 #: modules/commands/cs_set.cpp:684 modules/commands/cs_set.cpp:747
-#: modules/commands/cs_set.cpp:811 modules/commands/cs_set.cpp:1036
+#: modules/commands/cs_set.cpp:811 modules/commands/cs_set.cpp:1042
 #: modules/commands/bs_kick.cpp:792 modules/commands/bs_kick.cpp:857
 #: modules/commands/cs_topic.cpp:21 modules/commands/cs_list.cpp:181
 #, fuzzy
@@ -3876,7 +3876,11 @@ msgid ""
 "Changes the successor of a channel. If the founder's\n"
 "nickname expires or is dropped while the channel is still\n"
 "registered, the successor will become the new founder of the\n"
-"channel. The new nickname must be a registered one."
+"channel. The successor's nickname must be a registered one.\n"
+"If there's no successor set, then the first nickname on the\n"
+"access list (with the highest access, if applicable) will\n"
+"become the new founder, but if the access list is empty, the\n"
+"channel will be dropped."
 msgstr ""
 "Syntax: %s #szoba SUCCESSOR nick\n"
 "\n"
@@ -3958,12 +3962,12 @@ msgstr "(%s) szoba használata felfüggesztve."
 msgid "Channel %s registered under your account: %s"
 msgstr "Ez a nicknév: %s számodra lett regisztrálva: %s"
 
-#: modules/commands/cs_set.cpp:1070
+#: modules/commands/cs_set.cpp:1076
 #, c-format
 msgid "Channel %s will expire."
 msgstr "A megadott csatorna (%s) el fog évülni."
 
-#: modules/commands/cs_set.cpp:1064
+#: modules/commands/cs_set.cpp:1070
 #, c-format
 msgid "Channel %s will not expire."
 msgstr "A megadott csatorna (%s) nem fog elévülni."
@@ -5487,14 +5491,6 @@ msgstr ""
 msgid "Hosts with at least %d sessions:"
 msgstr "Hosztok legalább %d sessionnel:"
 
-#: modules/commands/cs_set.cpp:1023
-#, c-format
-msgid ""
-"However, if the successor already has too many\n"
-"channels registered (%d), the channel will be dropped\n"
-"instead, just as if no successor had been set."
-msgstr ""
-
 #: modules/commands/cs_seen.cpp:207
 #, c-format
 msgid "I don't know who %s is."
@@ -5648,7 +5644,7 @@ msgstr "\tItalics kicker : %s"
 msgid "Join a group"
 msgstr "    GROUP      Csatlakozás egy csoporthoz"
 
-#: modules/commands/cs_set.cpp:1297 modules/commands/ns_set.cpp:1319
+#: modules/commands/cs_set.cpp:1303 modules/commands/ns_set.cpp:1319
 #, fuzzy
 msgid "Keep modes"
 msgstr "Üzenet mód"
@@ -6855,7 +6851,7 @@ msgstr "Ez a nicknév: %s számodra lett regisztrálva: %s"
 msgid "Nickname %s registered."
 msgstr "Nickname %s registered."
 
-#: modules/commands/cs_set.cpp:1299
+#: modules/commands/cs_set.cpp:1305
 #, fuzzy
 msgid "No auto-op"
 msgstr "Auto-op"
@@ -6864,7 +6860,7 @@ msgstr "Auto-op"
 msgid "No bot"
 msgstr "Nincs bot"
 
-#: modules/commands/cs_set.cpp:1295 modules/commands/ns_set.cpp:1317
+#: modules/commands/cs_set.cpp:1301 modules/commands/ns_set.cpp:1317
 #, fuzzy
 msgid "No expire"
 msgstr "nem fog elévülni"
@@ -7008,6 +7004,15 @@ msgstr ""
 #: modules/commands/os_dns.cpp:226 modules/commands/bs_info.cpp:58
 msgid "None"
 msgstr "Nincs"
+
+#: modules/commands/cs_set.cpp:1028
+#, c-format
+msgid ""
+"Note, however, if the successor already has too many\n"
+"channels registered (%d), they will not be able to\n"
+"become the new founder and it will be as if the\n"
+"channel had no successor set."
+msgstr ""
 
 #: modules/commands/cs_mode.cpp:380 modules/commands/cs_mode.cpp:437
 msgid "Nothing to do."
@@ -7157,7 +7162,7 @@ msgstr "Hibás jelszó."
 msgid "Password reset email for %s has been sent."
 msgstr "Password reset email for %s has been sent."
 
-#: modules/commands/cs_set.cpp:1281
+#: modules/commands/cs_set.cpp:1287
 msgid "Peace"
 msgstr "Békesség"
 
@@ -7171,7 +7176,7 @@ msgstr "Peace option for %s is now ON."
 msgid "Peace option for %s is now on."
 msgstr "Peace option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:1293
+#: modules/commands/cs_set.cpp:1299
 #, fuzzy
 msgid "Persistent"
 msgstr "Persistant"
@@ -7253,7 +7258,7 @@ msgstr ""
 "    SUSPEND    Felfüggeszti a szoba használatát de\n"
 "               megőrzi az adatokat és beállításokat."
 
-#: modules/commands/cs_set.cpp:1035
+#: modules/commands/cs_set.cpp:1041
 #, fuzzy
 msgid "Prevent the channel from expiring"
 msgstr "    NOEXPIRE      Prevent the channel from expiring"
@@ -7719,7 +7724,7 @@ msgstr "    RELOAD      Újratölti a szervíz Konfigurációs fájlját"
 msgid "Restrict access to the channel"
 msgstr "    RESTRICTED    Restrict access to the channel"
 
-#: modules/commands/cs_set.cpp:1283
+#: modules/commands/cs_set.cpp:1289
 #, fuzzy
 msgid "Restricted access"
 msgstr "Korlátozott hozzáférés"
@@ -7889,7 +7894,7 @@ msgstr "    RESTART     Menti az adatbázist, és újraindítja a szervízt"
 msgid "Searches logs for a matching pattern"
 msgstr ""
 
-#: modules/commands/cs_set.cpp:1287
+#: modules/commands/cs_set.cpp:1293
 #, fuzzy
 msgid "Secure founder"
 msgstr "Founderjog védelme"
@@ -7904,7 +7909,7 @@ msgstr "Secure founder option for %s is now ON."
 msgid "Secure founder option for %s is now on."
 msgstr "Secure founder option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:1289
+#: modules/commands/cs_set.cpp:1295
 #, fuzzy
 msgid "Secure ops"
 msgstr "Opjog védelme"
@@ -7944,7 +7949,7 @@ msgstr "Secure option is now ON for %s."
 msgid "Secureops enforced on %s."
 msgstr "Secure option is now ON for %s."
 
-#: modules/commands/cs_set.cpp:1285 modules/commands/ns_set.cpp:1311
+#: modules/commands/cs_set.cpp:1291 modules/commands/ns_set.cpp:1311
 msgid "Security"
 msgstr "Biztonság"
 
@@ -8725,7 +8730,7 @@ msgid ""
 "Sets whether services should set channel status modes on you automatically."
 msgstr ""
 
-#: modules/commands/cs_set.cpp:1082
+#: modules/commands/cs_set.cpp:1088
 #, fuzzy
 msgid ""
 "Sets whether the given channel will expire.  Setting this\n"
@@ -8844,7 +8849,7 @@ msgstr ""
 msgid "Signed kick option for %s is now on."
 msgstr "Signed kick option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:1291
+#: modules/commands/cs_set.cpp:1297
 msgid "Signed kicks"
 msgstr "Signed kicks"
 

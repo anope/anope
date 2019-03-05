@@ -1024,11 +1024,13 @@ class CommandCSSetSuccessor : public Command
 				"channel will be dropped."));
 		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
 		if (max_reg)
+		{
 			source.Reply(" ");
 			source.Reply(_("Note, however, if the successor already has too many\n"
 				"channels registered (%d), they will not be able to\n"
 				"become the new founder and it will be as if the\n"
 				"channel had no successor set."), max_reg);
+		}
 		return true;
 	}
 };

@@ -947,7 +947,7 @@ class CommandCSSetSuccessor : public Command
 	CommandCSSetSuccessor(Module *creator, const Anope::string &cname = "chanserv/set/successor") : Command(creator, cname, 1, 2)
 	{
 		this->SetDesc(_("Set the successor for a channel"));
-		this->SetSyntax(_("\037channel\037 \037nick\037"));
+		this->SetSyntax(_("\037channel\037 [\037nick\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

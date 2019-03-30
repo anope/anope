@@ -74,7 +74,7 @@ class InspIRCd3Proto : public IRCDProto
 		UplinkSocket::Message() << "CAPAB START 1205";
 		UplinkSocket::Message() << "CAPAB CAPABILITIES :CASEMAPPING=" << Config->GetBlock("options")->Get<const Anope::string>("casemap", "ascii");
 		UplinkSocket::Message() << "CAPAB END";
-		SendServer(Me);
+		UplinkSocket::Message() << "SERVER " << Me->GetName() << " " << Config->Uplinks[Anope::CurrentUplink].password << " 0 " << Me->GetSID() << " :" << Me->GetDescription();
 	}
 
 	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) anope_override
@@ -254,7 +254,7 @@ class InspIRCd3Proto : public IRCDProto
 	{
 		/* if rsquit is set then we are waiting on a squit */
 		if (rsquit_id.empty() && rsquit_server.empty())
-			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << Config->Uplinks[Anope::CurrentUplink].password << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetSID() << " :" << server->GetDescription();
 	}
 
 	void SendSquit(Server *s, const Anope::string &message) anope_override
@@ -1594,20 +1594,34 @@ struct IRCDMessageRSQuit : IRCDMessage
 
 struct IRCDMessageServer : IRCDMessage
 {
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 5) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	/*
-	 * [Nov 04 00:08:46.308435 2009] debug: Received: SERVER irc.inspircd.com pass 0 964 :Testnet Central!
-	 * 0: name
-	 * 1: pass
-	 * 2: hops
-	 * 3: numeric
-	 * 4: desc
-	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		unsigned int hops = Anope::string(params[2]).is_pos_number_only() ? convertTo<unsigned>(params[2]) : 0;
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[4], params[3]);
+		if (!source.GetServer() && params.size() == 5)
+		{
+			/*
+			 * SERVER testnet.inspircd.org hunter7 0 123 :InspIRCd Test Network
+			 * 0: name
+			 * 1: pass
+			 * 2: hops
+			 * 3: numeric
+			 * 4: desc
+			 */
+			unsigned int hops = Anope::string(params[2]).is_pos_number_only() ? convertTo<unsigned>(params[2]) : 0;
+			new Server(Me, params[0], hops, params[4], params[3]);
+		}
+		else if (source.GetServer())
+		{
+			/*
+			 * SERVER testnet.inspircd.org 123 burst=1234 hidden=0 :InspIRCd Test Network
+			 * 0: name
+			 * 1: numeric
+			 * 2 to N-1: various key=value pairs.
+			 * N: desc
+			 */
+			new Server(source.GetServer(), params[0], 1, params.back(), params[1]);
+		}
 	}
 };
 

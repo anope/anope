@@ -562,7 +562,10 @@ struct IRCDMessageCapab : Message::Capab
 				UserMode *um = NULL;
 
 				if (modename.equals_cs("bot"))
+				{
 					um = new UserMode("BOT", modechar[0]);
+					IRCD->DefaultPseudoclientModes += modechar;
+				}
 				else if (modename.equals_cs("callerid"))
 					um = new UserMode("CALLERID", modechar[0]);
 				else if (modename.equals_cs("cloak"))

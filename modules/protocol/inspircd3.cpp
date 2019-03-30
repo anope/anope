@@ -154,7 +154,7 @@ class InspIRCd3Proto : public IRCDProto
 			if (c->topic_time > ts)
 				ts = Anope::CurTime;
 			/* But don't modify c->topic_ts, it should remain set to the real TS we want as ci->last_topic_time pulls from it */
-			UplinkSocket::Message(source) << "FTOPIC " << c->name << " " << ts << " " << c->topic_setter << " :" << c->topic;
+			UplinkSocket::Message(source) << "FTOPIC " << c->name << " " << c->creation_time << " " << ts << " " << c->topic_setter << " :" << c->topic;
 		}
 	}
 
@@ -1491,15 +1491,15 @@ struct IRCDMessageFMode : IRCDMessage
 
 struct IRCDMessageFTopic : IRCDMessage
 {
-	IRCDMessageFTopic(Module *creator) : IRCDMessage(creator, "FTOPIC", 4) { }
+	IRCDMessageFTopic(Module *creator) : IRCDMessage(creator, "FTOPIC", 5) { }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		/* :source FTOPIC channel topicts setby :topic */
+		/* :source FTOPIC channel ts topicts setby :topic */
 
 		Channel *c = Channel::Find(params[0]);
 		if (c)
-			c->ChangeTopicInternal(NULL, params[2], params[3], Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime);
+			c->ChangeTopicInternal(NULL, params[3], params[4], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
 	}
 };
 

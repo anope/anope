@@ -24,8 +24,6 @@ static std::list<SASLUser> saslusers;
 
 static Anope::string rsquit_server, rsquit_id;
 
-static unsigned int spanningtree_proto_ver = 0;
-
 class InspIRCd3Proto : public IRCDProto
 {
  private:
@@ -73,8 +71,8 @@ class InspIRCd3Proto : public IRCDProto
 
 	void SendConnect() anope_override
 	{
-		UplinkSocket::Message() << "CAPAB START 1202";
-		UplinkSocket::Message() << "CAPAB CAPABILITIES :PROTOCOL=1202 CASEMAPPING=" << Config->GetBlock("options")->Get<const Anope::string>("casemap", "ascii");
+		UplinkSocket::Message() << "CAPAB START 1205";
+		UplinkSocket::Message() << "CAPAB CAPABILITIES :CASEMAPPING=" << Config->GetBlock("options")->Get<const Anope::string>("casemap", "ascii");
 		UplinkSocket::Message() << "CAPAB END";
 		SendServer(Me);
 	}
@@ -770,10 +768,11 @@ struct IRCDMessageCapab : Message::Capab
 	{
 		if (params[0].equals_cs("START"))
 		{
+			unsigned int spanningtree_proto_ver = 0;
 			if (params.size() >= 2)
-				spanningtree_proto_ver = (Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0);
+				spanningtree_proto_ver = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
 
-			if (spanningtree_proto_ver < 1202)
+			if (spanningtree_proto_ver < 1205)
 			{
 				UplinkSocket::Message() << "ERROR :Protocol mismatch, no or invalid protocol version given in CAPAB START";
 				Anope::QuitReason = "Protocol mismatch, no or invalid protocol version given in CAPAB START";

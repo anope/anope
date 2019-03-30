@@ -410,6 +410,7 @@ struct IRCDMessageCapab : Message::Capab
 			Servers::Capab.insert("SERVERS");
 			Servers::Capab.insert("TOPICLOCK");
 			IRCD->CanSVSHold = false;
+			IRCD->DefaultPseudoclientModes = "+I";
 		}
 		else if (params[0].equals_cs("CHANMODES") && params.size() > 1)
 		{

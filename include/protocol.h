@@ -39,7 +39,7 @@ class CoreExport IRCDProto : public Service
 	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf);
 
 	const Anope::string &GetProtocolName();
-	virtual void Parse(const Anope::string &, Anope::string &, Anope::string &, std::vector<Anope::string> &);
+	virtual bool Parse(const Anope::string &, Anope::map<Anope::string> &, Anope::string &, Anope::string &, std::vector<Anope::string> &);
 	virtual Anope::string Format(const Anope::string &source, const Anope::string &message);
 
 	/* Modes used by default by our clients */
@@ -278,9 +278,37 @@ class CoreExport IRCDMessage : public Service
 	IRCDMessage(Module *owner, const Anope::string &n, unsigned p = 0);
 	unsigned GetParamCount() const;
 	virtual void Run(MessageSource &, const std::vector<Anope::string> &params) = 0;
+	virtual void Run(MessageSource &, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags);
 
 	void SetFlag(IRCDMessageFlag f) { flags.insert(f); }
 	bool HasFlag(IRCDMessageFlag f) const { return flags.count(f); }
+};
+
+/** MessageTokenizer allows tokens in the IRC wire format to be read from a string */
+class CoreExport MessageTokenizer
+{
+private:
+	/** The message we are parsing tokens from. */
+	Anope::string message;
+
+	/** The current position within the message. */
+	Anope::string::size_type position;
+
+ public:
+	/** Create a tokenstream and fill it with the provided data. */
+	MessageTokenizer(const Anope::string &msg);
+
+	/** Retrieve the next \<middle> token in the message.
+	 * @param token The next token available, or an empty string if none remain.
+	 * @return True if a token was retrieved; otherwise, false.
+	 */
+	bool GetMiddle(Anope::string &token);
+
+	/** Retrieve the next \<trailing> token in the message.
+	 * @param token The next token available, or an empty string if none remain.
+	 * @return True if a token was retrieved; otherwise, false.
+	 */
+	bool GetTrailing(Anope::string &token);
 };
 
 extern CoreExport IRCDProto *IRCD;

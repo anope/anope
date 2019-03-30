@@ -1,4 +1,4 @@
-/* Inspircd 2.0 functions
+/* InspIRCd 3.0 functions
  *
  * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
@@ -16,10 +16,10 @@ static unsigned int spanningtree_proto_ver = 0;
 
 static ServiceReference<IRCDProto> insp12("IRCDProto", "inspircd12");
 
-class InspIRCd20Proto : public IRCDProto
+class InspIRCd3Proto : public IRCDProto
 {
  public:
-	InspIRCd20Proto(Module *creator) : IRCDProto(creator, "InspIRCd 2.0")
+	InspIRCd3Proto(Module *creator) : IRCDProto(creator, "InspIRCd 3")
 	{
 		DefaultPseudoclientModes = "+I";
 		CanSVSNick = true;
@@ -936,11 +936,11 @@ class IRCDMessageMetadata : IRCDMessage
 	}
 };
 
-class ProtoInspIRCd20 : public Module
+class ProtoInspIRCd3 : public Module
 {
 	Module *m_insp12;
 
-	InspIRCd20Proto ircd_proto;
+	InspIRCd3Proto ircd_proto;
 
 	/* Core message handlers */
 	Message::Error message_error;
@@ -980,25 +980,25 @@ class ProtoInspIRCd20 : public Module
 	}
 
  public:
-	ProtoInspIRCd20(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
+	ProtoInspIRCd3(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_error(this), message_invite(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_notice(this), message_part(this), message_ping(this), message_privmsg(this),
 		message_quit(this), message_stats(this), message_topic(this),
 
-		message_endburst("IRCDMessage", "inspircd20/endburst", "inspircd12/endburst"),
-		message_fjoin("IRCDMessage", "inspircd20/fjoin", "inspircd12/fjoin"),
-		message_fmode("IRCDMessage", "inspircd20/fmode", "inspircd12/fmode"),
-		message_ftopic("IRCDMessage", "inspircd20/ftopic", "inspircd12/ftopic"),
-		message_idle("IRCDMessage", "inspircd20/idle", "inspircd12/idle"),
-		message_mode("IRCDMessage", "inspircd20/mode", "inspircd12/mode"),
-		message_nick("IRCDMessage", "inspircd20/nick", "inspircd12/nick"),
-		message_opertype("IRCDMessage", "inspircd20/opertype", "inspircd12/opertype"),
-		message_rsquit("IRCDMessage", "inspircd20/rsquit", "inspircd12/rsquit"),
-		message_server("IRCDMessage", "inspircd20/server", "inspircd12/server"),
-		message_squit("IRCDMessage", "inspircd20/squit", "inspircd12/squit"),
-		message_time("IRCDMessage", "inspircd20/time", "inspircd12/time"),
-		message_uid("IRCDMessage", "inspircd20/uid", "inspircd12/uid"),
+		message_endburst("IRCDMessage", "inspircd3/endburst", "inspircd12/endburst"),
+		message_fjoin("IRCDMessage", "inspircd3/fjoin", "inspircd12/fjoin"),
+		message_fmode("IRCDMessage", "inspircd3/fmode", "inspircd12/fmode"),
+		message_ftopic("IRCDMessage", "inspircd3/ftopic", "inspircd12/ftopic"),
+		message_idle("IRCDMessage", "inspircd3/idle", "inspircd12/idle"),
+		message_mode("IRCDMessage", "inspircd3/mode", "inspircd12/mode"),
+		message_nick("IRCDMessage", "inspircd3/nick", "inspircd12/nick"),
+		message_opertype("IRCDMessage", "inspircd3/opertype", "inspircd12/opertype"),
+		message_rsquit("IRCDMessage", "inspircd3/rsquit", "inspircd12/rsquit"),
+		message_server("IRCDMessage", "inspircd3/server", "inspircd12/server"),
+		message_squit("IRCDMessage", "inspircd3/squit", "inspircd12/squit"),
+		message_time("IRCDMessage", "inspircd3/time", "inspircd12/time"),
+		message_uid("IRCDMessage", "inspircd3/uid", "inspircd12/uid"),
 
 		message_away(this), message_capab(this), message_encap(this), message_fhost(this), message_fident(this),
 		message_metadata(this, use_server_side_topiclock, use_server_side_mlock), message_save(this)
@@ -1015,7 +1015,7 @@ class ProtoInspIRCd20 : public Module
 
 	}
 
-	~ProtoInspIRCd20()
+	~ProtoInspIRCd3()
 	{
 		m_insp12 = ModuleManager::FindModule("inspircd12");
 		ModuleManager::UnloadModule(m_insp12, NULL);
@@ -1103,4 +1103,4 @@ class ProtoInspIRCd20 : public Module
 	}
 };
 
-MODULE_INIT(ProtoInspIRCd20)
+MODULE_INIT(ProtoInspIRCd3)

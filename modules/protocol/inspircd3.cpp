@@ -234,8 +234,7 @@ class InspIRCd3Proto : public IRCDProto
 
 	void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf) anope_override
 	{
-		User *u = User::Find(dest);
-		UplinkSocket::Message() << "PUSH " << dest << " ::" << Me->GetName() << " " << numeric << " " << (u ? u->nick : dest) << " " << buf;
+		UplinkSocket::Message() << "NUM " << Me->GetSID() << " " << dest << " " << numeric << " " << buf;
 	}
 
 	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) anope_override

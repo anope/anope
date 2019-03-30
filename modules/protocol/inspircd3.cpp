@@ -366,7 +366,9 @@ class InspIRCd3Proto : public IRCDProto
 	{
 		UplinkSocket::Message(Me) << "BURST " << Anope::CurTime;
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		UplinkSocket::Message(Me) << "VERSION :Anope-" << Anope::Version() << " " << Me->GetName() << " :" << IRCD->GetProtocolName() << " - (" << (enc ? enc->name : "none") << ") -- " << Anope::VersionBuildString();
+		UplinkSocket::Message(Me) << "SINFO version :Anope-" << Anope::Version() << " " << Me->GetName() << " :" << IRCD->GetProtocolName() << " - (" << (enc ? enc->name : "none") << ") -- " << Anope::VersionBuildString();
+		UplinkSocket::Message(Me) << "SINFO fullversion :Anope-" << Anope::Version() << " " << Me->GetName() << " :[" << Me->GetSID() << "] " << IRCD->GetProtocolName() << " - (" << (enc ? enc->name : "none") << ") -- " << Anope::VersionBuildString();
+		UplinkSocket::Message(Me) << "SINFO rawversion :Anope-" << Anope::VersionShort();
 	}
 
 	void SendEOB() anope_override

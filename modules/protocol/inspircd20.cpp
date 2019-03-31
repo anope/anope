@@ -410,6 +410,7 @@ struct IRCDMessageCapab : Message::Capab
 			Servers::Capab.insert("SERVERS");
 			Servers::Capab.insert("TOPICLOCK");
 			IRCD->CanSVSHold = false;
+			IRCD->DefaultPseudoclientModes = "+I";
 		}
 		else if (params[0].equals_cs("CHANMODES") && params.size() > 1)
 		{
@@ -562,7 +563,10 @@ struct IRCDMessageCapab : Message::Capab
 				UserMode *um = NULL;
 
 				if (modename.equals_cs("bot"))
+				{
 					um = new UserMode("BOT", modechar[0]);
+					IRCD->DefaultPseudoclientModes += modechar;
+				}
 				else if (modename.equals_cs("callerid"))
 					um = new UserMode("CALLERID", modechar[0]);
 				else if (modename.equals_cs("cloak"))

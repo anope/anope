@@ -376,9 +376,13 @@ void LogInfo::ProcessMessage(const Log *l)
 		}
 		else if (target == "globops")
 		{
-			if (UplinkSock && l->bi && l->type <= LOG_NORMAL && Me && Me->IsSynced())
+			if (UplinkSock && l->type <= LOG_NORMAL && Me && Me->IsSynced())
 			{
-				IRCD->SendGlobops(l->bi, "%s", buffer.c_str());
+				BotInfo *bi = l->bi;
+				if (!bi)
+					bi = this->bot;
+				if (bi)
+					IRCD->SendGlobops(bi, "%s", buffer.c_str());
 			}
 		}
 	}

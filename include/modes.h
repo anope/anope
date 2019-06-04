@@ -192,7 +192,7 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	/* The "level" of the mode, used to compare with other modes.
 	 * Used so we know op > halfop > voice etc.
 	 */
-	short level;
+	unsigned level;
 
 	/** constructor
 	 * @param name The mode name
@@ -200,7 +200,7 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	 * @param msymbol The symbol for the mode, eg @ %
 	 * @param mlevel A level for the mode, which is usually determined by the PREFIX capab
 	 */
-	ChannelModeStatus(const Anope::string &name, char mc, char msymbol, short mlevel);
+	ChannelModeStatus(const Anope::string &name, char mc, char msymbol, unsigned mlevel);
 };
 
 /** A virtual mode. This mode doesn't natively exist on the IRCd (like extbans),

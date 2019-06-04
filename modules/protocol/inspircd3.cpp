@@ -1549,6 +1549,42 @@ struct IRCDMessageIdle : IRCDMessage
 	}
 };
 
+struct IRCDMessageIJoin : IRCDMessage
+{
+	IRCDMessageIJoin(Module *creator) : IRCDMessage(creator, "IJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		// :<uid> IJOIN <chan> <membid> [<ts> [<flags>]]
+		Channel *c = Channel::Find(params[0]);
+		if (!c)
+		{
+			// When receiving an IJOIN, first check if the target channel exists. If it does not exist,
+			// ignore the join (that is, do not create the channel) and send a RESYNC back to the source.
+			UplinkSocket::Message(Me) <<  "RESYNC " << params[0];
+			return;
+		}
+
+		// If the channel does exist then join the user, and in case any prefix modes were sent (found in
+		// the 3rd parameter), compare the TS of the channel to the TS in the IJOIN (2nd parameter). If
+		// the timestamps match, set the modes on the user, otherwise ignore the modes.
+		Message::Join::SJoinUser user;
+		user.second = source.GetUser();
+
+		time_t chants = Anope::CurTime;
+		if (params.size() >= 4)
+		{
+			chants = params[2].is_pos_number_only() ? convertTo<unsigned>(params[2]) : 3;
+			for (unsigned i = 0; i < params[5].length(); ++i)
+				user.first.AddMode(params[5][i]);
+		}
+
+		std::list<Message::Join::SJoinUser> users;
+		users.push_back(user);
+		Message::Join::SJoin(source, params[0], chants, "", users);
+	}
+};
+
 struct IRCDMessageMode : IRCDMessage
 {
 	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1763,6 +1799,7 @@ class ProtoInspIRCd3 : public Module
 	IRCDMessageFMode message_fmode;
 	IRCDMessageFTopic message_ftopic;
 	IRCDMessageIdle message_idle;
+	IRCDMessageIJoin message_ijoin;
 	IRCDMessageMode message_mode;
 	IRCDMessageNick message_nick;
 	IRCDMessageOperType message_opertype;
@@ -1787,7 +1824,7 @@ class ProtoInspIRCd3 : public Module
 		message_quit(this), message_stats(this), message_away(this), message_capab(this),
 		message_encap(this), message_fhost(this), message_fident(this), message_kick(this),
 		message_metadata(this, use_server_side_topiclock, use_server_side_mlock), message_save(this),
-		message_endburst(this), message_fjoin(this), message_fmode(this), message_ftopic(this), message_idle(this),
+		message_endburst(this), message_fjoin(this), message_fmode(this), message_ftopic(this), message_idle(this), message_ijoin(this),
 		message_mode(this), message_nick(this), message_opertype(this), message_rsquit(this), message_server(this),
 		message_squit(this), message_time(this), message_uid(this)
 	{

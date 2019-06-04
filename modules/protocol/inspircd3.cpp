@@ -1465,6 +1465,14 @@ struct IRCDMessageFJoin : IRCDMessage
 			if (!buf.empty())
 				buf.erase(buf.begin());
 
+			/* Erase the :membid */
+			if (!buf.empty())
+			{
+				Anope::string::size_type membid = buf.find(':');
+				if (membid != Anope::string::npos)
+					buf.erase(membid, Anope::string::npos);
+			}
+
 			sju.second = User::Find(buf);
 			if (!sju.second)
 			{

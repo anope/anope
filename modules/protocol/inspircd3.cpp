@@ -1707,7 +1707,6 @@ class ProtoInspIRCd3 : public Module
 	Message::Privmsg message_privmsg;
 	Message::Quit message_quit;
 	Message::Stats message_stats;
-	Message::Topic message_topic;
 
 	/* Our message handlers */
 	IRCDMessageAway message_away;
@@ -1743,7 +1742,7 @@ class ProtoInspIRCd3 : public Module
 		ircd_proto(this),
 		message_error(this), message_invite(this), message_kick(this), message_kill(this),
 		message_motd(this), message_notice(this), message_part(this), message_ping(this), message_privmsg(this),
-		message_quit(this), message_stats(this), message_topic(this), message_away(this), message_capab(this),
+		message_quit(this), message_stats(this), message_away(this), message_capab(this),
 		message_encap(this), message_fhost(this), message_fident(this),
 		message_metadata(this, use_server_side_topiclock, use_server_side_mlock), message_save(this),
 		message_endburst(this), message_fjoin(this), message_fmode(this), message_ftopic(this), message_idle(this),

@@ -1239,6 +1239,21 @@ struct IRCDMessageFIdent : IRCDMessage
 	}
 };
 
+struct CoreExport IRCDMessageKick : IRCDMessage
+{
+	IRCDMessageKick(Module *creator) : IRCDMessage(creator, "KICK", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		Channel *c = Channel::Find(params[0]);
+		if (c)
+			return;
+
+		const Anope::string &reason = params.size() > 3 ? params[3] : "";
+		c->KickInternal(source, params[1], reason);
+	}
+};
+
 struct IRCDMessageSave : IRCDMessage
 {
 	time_t last_collide;
@@ -1717,7 +1732,6 @@ class ProtoInspIRCd3 : public Module
 	/* Core message handlers */
 	Message::Error message_error;
 	Message::Invite message_invite;
-	Message::Kick message_kick;
 	Message::Kill message_kill;
 	Message::MOTD message_motd;
 	Message::Notice message_notice;
@@ -1733,6 +1747,7 @@ class ProtoInspIRCd3 : public Module
 	IRCDMessageEncap message_encap;
 	IRCDMessageFHost message_fhost;
 	IRCDMessageFIdent message_fident;
+	IRCDMessageKick message_kick;
 	IRCDMessageMetadata message_metadata;
 	IRCDMessageSave message_save;
 	IRCDMessageEndburst message_endburst;
@@ -1759,10 +1774,10 @@ class ProtoInspIRCd3 : public Module
  public:
 	ProtoInspIRCd3(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
-		message_error(this), message_invite(this), message_kick(this), message_kill(this),
+		message_error(this), message_invite(this), message_kill(this),
 		message_motd(this), message_notice(this), message_part(this), message_ping(this), message_privmsg(this),
 		message_quit(this), message_stats(this), message_away(this), message_capab(this),
-		message_encap(this), message_fhost(this), message_fident(this),
+		message_encap(this), message_fhost(this), message_fident(this), message_kick(this),
 		message_metadata(this, use_server_side_topiclock, use_server_side_mlock), message_save(this),
 		message_endburst(this), message_fjoin(this), message_fmode(this), message_ftopic(this), message_idle(this),
 		message_mode(this), message_nick(this), message_opertype(this), message_rsquit(this), message_server(this),

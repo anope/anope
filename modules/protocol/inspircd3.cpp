@@ -141,6 +141,11 @@ class InspIRCd3Proto : public IRCDProto
 		}
 	}
 
+	void SendInvite(const MessageSource &source, const Channel *c, User *u) anope_override
+	{
+		UplinkSocket::Message(source) << "INVITE " << u->GetUID() << " " << c->name << " " << c->creation_time;
+	}
+
 	void SendTopic(const MessageSource &source, Channel *c) anope_override
 	{
 		if (Servers::Capab.count("SVSTOPIC"))

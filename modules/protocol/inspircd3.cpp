@@ -425,7 +425,7 @@ class InspIRCd3Proto : public IRCDProto
 	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
 	{
 		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << acc;
-		
+
 		if (!vident.empty())
 			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGIDENT " << uid << " " << vident;
 		if (!vhost.empty())
@@ -1802,22 +1802,22 @@ class ProtoInspIRCd3 : public Module
 	IRCDMessageAway message_away;
 	IRCDMessageCapab message_capab;
 	IRCDMessageEncap message_encap;
+	IRCDMessageEndburst message_endburst;
 	IRCDMessageFHost message_fhost;
 	IRCDMessageFIdent message_fident;
-	IRCDMessageKick message_kick;
-	IRCDMessageMetadata message_metadata;
-	IRCDMessageSave message_save;
-	IRCDMessageEndburst message_endburst;
 	IRCDMessageFJoin message_fjoin;
 	IRCDMessageFMode message_fmode;
 	IRCDMessageFTopic message_ftopic;
 	IRCDMessageIdle message_idle;
 	IRCDMessageIJoin message_ijoin;
+	IRCDMessageKick message_kick;
+	IRCDMessageMetadata message_metadata;
 	IRCDMessageMode message_mode;
 	IRCDMessageNick message_nick;
 	IRCDMessageOperType message_opertype;
 	IRCDMessagePing message_ping;
 	IRCDMessageRSQuit message_rsquit;
+	IRCDMessageSave message_save;
 	IRCDMessageServer message_server;
 	IRCDMessageSQuit message_squit;
 	IRCDMessageTime message_time;
@@ -1833,14 +1833,13 @@ class ProtoInspIRCd3 : public Module
  public:
 	ProtoInspIRCd3(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
-		message_error(this), message_invite(this), message_kill(this),
-		message_motd(this), message_notice(this), message_part(this), message_privmsg(this),
-		message_quit(this), message_stats(this), message_away(this), message_capab(this),
-		message_encap(this), message_fhost(this), message_fident(this), message_kick(this),
-		message_metadata(this, use_server_side_topiclock, use_server_side_mlock), message_save(this),
-		message_endburst(this), message_fjoin(this), message_fmode(this), message_ftopic(this), message_idle(this), message_ijoin(this),
-		message_mode(this), message_nick(this), message_opertype(this), message_ping(this), message_rsquit(this), message_server(this),
-		message_squit(this), message_time(this), message_uid(this)
+		message_error(this), message_invite(this), message_kill(this), message_motd(this), message_notice(this),
+		message_part(this), message_privmsg(this), message_quit(this), message_stats(this),
+		message_away(this), message_capab(this), message_encap(this), message_endburst(this), message_fhost(this),
+		message_fident(this), message_fjoin(this), message_fmode(this), message_ftopic(this), message_idle(this),
+		message_ijoin(this), message_kick(this), message_metadata(this, use_server_side_topiclock, use_server_side_mlock),
+		message_mode(this), message_nick(this), message_opertype(this), message_ping(this), message_rsquit(this),
+		message_save(this), message_server(this), message_squit(this), message_time(this), message_uid(this)
 	{
 	}
 

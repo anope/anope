@@ -1776,7 +1776,7 @@ class ProtoInspIRCd3 : public Module
 
 	void SendChannelMetadata(Channel *c, const Anope::string &metadataname, const Anope::string &value)
 	{
-		UplinkSocket::Message(Me) << "METADATA " << c->name << " " << metadataname << " :" << value;
+		UplinkSocket::Message(Me) << "METADATA " << c->name << " " << c->creation_time << " " << metadataname << " :" << value;
 	}
 
  public:

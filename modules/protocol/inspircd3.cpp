@@ -617,10 +617,10 @@ namespace InspIRCdExtban
 	 	}
 	};
 
-	class FinerprintMatcher : public InspIRCdExtBan
+	class FingerprintMatcher : public InspIRCdExtBan
 	{
 	 public:
-	 	FinerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+	 	FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
 	 	{
 	 	}
 
@@ -981,7 +981,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (mode.name.equals_cs("sslonly"))
 				{
 					cm = new ChannelMode("SSL", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::FinerprintMatcher("SSLBAN", "BAN", 'z'));
+					ModeManager::AddChannelMode(new InspIRCdExtban::FingerprintMatcher("SSLBAN", "BAN", 'z'));
 				}
 				else if (mode.name.equals_cs("stripcolor"))
 				{

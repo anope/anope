@@ -15,7 +15,7 @@
 
 using namespace SQL;
 
-/* SQLite3 API, based from InspiRCd */
+/* SQLite3 API, based from InspIRCd */
 
 /** A SQLite result
  */

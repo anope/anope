@@ -53,7 +53,7 @@ if test $geoip_database = "country"; then
 	echo "Unpacking..."
 	unzip -jo GeoIPCountryCSV.zip
 	rm GeoIPCountryCSV.zip
-	echo "Converting to UFT-8..."
+	echo "Converting to UTF-8..."
 	iconv -f ISO-8859-1 -t UTF-8 GeoIPCountryWhois.csv -o $prefix"geoip_country.csv"
 	rm GeoIPCountryWhois.csv
 	echo "Importing..."

@@ -1,4 +1,4 @@
-/* Inspircd 2.0 functions
+/* InspIRCd 2.0 functions
  *
  * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
@@ -227,10 +227,10 @@ namespace InspIRCdExtban
 	 	}
 	};
 
-	class FinerprintMatcher : public InspIRCdExtBan
+	class FingerprintMatcher : public InspIRCdExtBan
 	{
 	 public:
-	 	FinerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+	 	FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
 	 	{
 	 	}
 
@@ -529,7 +529,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("sslonly"))
 				{
 					cm = new ChannelMode("SSL", modechar[0]);
-					ModeManager::AddChannelMode(new InspIRCdExtban::FinerprintMatcher("SSLBAN", "BAN", 'z'));
+					ModeManager::AddChannelMode(new InspIRCdExtban::FingerprintMatcher("SSLBAN", "BAN", 'z'));
 				}
 				else if (modename.equals_cs("stripcolor"))
 				{

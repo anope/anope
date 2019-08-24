@@ -41,6 +41,7 @@ void Mail::Message::Run()
 	else
 		fprintf(pipe, "To: \"%s\" <%s>\n", mail_to.c_str(), addr.c_str());
 	fprintf(pipe, "Subject: %s\n", subject.c_str());
+	fprintf(pipe, "\n");
 	fprintf(pipe, "%s", message.c_str());
 	fprintf(pipe, "\n.\n");
 

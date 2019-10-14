@@ -187,6 +187,9 @@ class CommandNSRecover : public Command
 		if (source.GetUser() && !source.GetUser()->fingerprint.empty() && cl && cl->FindCert(source.GetUser()->fingerprint))
 			ok = true;
 
+		if (source.HasPriv("nickserv/recover"))
+			ok = true;
+
 		if (ok == false && !pass.empty())
 		{
 			NSRecoverRequest *req = new NSRecoverRequest(owner, source, this, na->nick, pass);

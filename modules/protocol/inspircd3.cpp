@@ -1243,7 +1243,7 @@ struct IRCDMessageFIdent : IRCDMessage
 	}
 };
 
-struct CoreExport IRCDMessageKick : IRCDMessage
+struct IRCDMessageKick : IRCDMessage
 {
 	IRCDMessageKick(Module *creator) : IRCDMessage(creator, "KICK", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 

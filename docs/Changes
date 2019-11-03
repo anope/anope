@@ -1,4 +1,4 @@
-Anope Version 2.0.7-git
+Anope Version 2.0.7
 -------------------
 Fix not sending login data on successful NickServ GROUP
 Fix m_httpd to not consider headers to be case sensitive

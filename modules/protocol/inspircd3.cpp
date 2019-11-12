@@ -1306,17 +1306,19 @@ class IRCDMessageMetadata : IRCDMessage
 	const bool &do_mlock;
 
  public:
-	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock) : IRCDMessage(creator, "METADATA", 3), do_topiclock(handle_topiclock), do_mlock(handle_mlock) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock) : IRCDMessage(creator, "METADATA", 3), do_topiclock(handle_topiclock), do_mlock(handle_mlock) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		// We deliberately ignore non-bursting servers to avoid pseudoserver fights
-		if ((params[0][0] == '#') && (!source.GetServer()->IsSynced()))
+		// Channel METADATA has an additional parameter: the channel TS
+		// Received: :715 METADATA #chan 1572026333 mlock :nt
+		if ((params[0][0] == '#') && (params.size() > 3) && (!source.GetServer()->IsSynced()))
 		{
 			Channel *c = Channel::Find(params[0]);
 			if (c && c->ci)
 			{
-				if ((do_mlock) && (params[1] == "mlock"))
+				if ((do_mlock) && (params[2] == "mlock"))
 				{
 					ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
 					Anope::string modes;
@@ -1324,15 +1326,15 @@ class IRCDMessageMetadata : IRCDMessage
 						modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 
 					// Mode lock string is not what we say it is?
-					if (modes != params[2])
-						UplinkSocket::Message(Me) << "METADATA " << c->name << " mlock :" << modes;
+					if (modes != params[3])
+						UplinkSocket::Message(Me) << "METADATA " << c->name << " " << c->creation_time << " mlock :" << modes;
 				}
-				else if ((do_topiclock) && (params[1] == "topiclock"))
+				else if ((do_topiclock) && (params[2] == "topiclock"))
 				{
-					bool mystate = c->ci->GetExt<bool>("TOPICLOCK");
-					bool serverstate = (params[2] == "1");
+					bool mystate = c->ci->HasExt("TOPICLOCK");
+					bool serverstate = (params[3] == "1");
 					if (mystate != serverstate)
-						UplinkSocket::Message(Me) << "METADATA " << c->name << " topiclock :" << (mystate ? "1" : "");
+						UplinkSocket::Message(Me) << "METADATA " << c->name << " " << c->creation_time << " topiclock :" << (mystate ? "1" : "");
 				}
 			}
 		}

@@ -1786,6 +1786,7 @@ struct IRCDMessageUID : IRCDMessage
 class ProtoInspIRCd3 : public Module
 {
 	InspIRCd3Proto ircd_proto;
+	ExtensibleItem<bool> ssl;
 
 	/* Core message handlers */
 	Message::Error message_error;
@@ -1832,7 +1833,7 @@ class ProtoInspIRCd3 : public Module
 
  public:
 	ProtoInspIRCd3(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this),
+		ircd_proto(this), ssl(this, "ssl"),
 		message_error(this), message_invite(this), message_kill(this), message_motd(this), message_notice(this),
 		message_part(this), message_privmsg(this), message_quit(this), message_stats(this),
 		message_away(this), message_capab(this), message_encap(this), message_endburst(this), message_fhost(this),

@@ -923,7 +923,7 @@ class IRCDMessageMetadata : IRCDMessage
 				}
 				else if ((do_topiclock) && (params[1] == "topiclock"))
 				{
-					bool mystate = c->ci->GetExt<bool>("TOPICLOCK");
+					bool mystate = c->ci->HasExt("TOPICLOCK");
 					bool serverstate = (params[2] == "1");
 					if (mystate != serverstate)
 						UplinkSocket::Message(Me) << "METADATA " << c->name << " topiclock :" << (mystate ? "1" : "");

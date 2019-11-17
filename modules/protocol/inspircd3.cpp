@@ -1578,9 +1578,9 @@ struct IRCDMessageIJoin : IRCDMessage
 		time_t chants = Anope::CurTime;
 		if (params.size() >= 4)
 		{
-			chants = params[2].is_pos_number_only() ? convertTo<unsigned>(params[2]) : 3;
-			for (unsigned i = 0; i < params[5].length(); ++i)
-				user.first.AddMode(params[5][i]);
+			chants = params[2].is_pos_number_only() ? convertTo<unsigned>(params[2]) : 0;
+			for (unsigned i = 0; i < params[3].length(); ++i)
+				user.first.AddMode(params[3][i]);
 		}
 
 		std::list<Message::Join::SJoinUser> users;

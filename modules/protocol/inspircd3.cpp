@@ -1146,15 +1146,15 @@ struct IRCDMessageCapab : Message::Capab
 		{
 			if (!Servers::Capab.count("SERVICES"))
 			{
-				UplinkSocket::Message() << "ERROR :m_services_account.so is not loaded. This is required by Anope";
-				Anope::QuitReason = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
+				UplinkSocket::Message() << "ERROR :The services_account module is not loaded. This is required by Anope";
+				Anope::QuitReason = "ERROR: Remote server does not have the services_account module loaded, and this is required.";
 				Anope::Quitting = true;
 				return;
 			}
 			if (!ModeManager::FindUserModeByName("PRIV"))
 			{
-				UplinkSocket::Message() << "ERROR :m_hidechans.so is not loaded. This is required by Anope";
-				Anope::QuitReason = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
+				UplinkSocket::Message() << "ERROR :The hidechans module is not loaded. This is required by Anope";
+				Anope::QuitReason = "ERROR: Remote server does not have the hidechans module loaded, and this is required.";
 				Anope::Quitting = true;
 				return;
 			}

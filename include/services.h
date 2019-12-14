@@ -48,7 +48,7 @@
 
 #define _(x) x
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if defined __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus >= 201103L
 # define anope_override override
 # define anope_final final
 #else

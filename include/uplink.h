@@ -38,9 +38,9 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 		std::stringstream buffer;
 
 	 public:
-	 	Message();
-	 	Message(const MessageSource &);
-	 	~Message();
+		Message();
+		Message(const MessageSource &);
+		~Message();
 		template<typename T> Message &operator<<(const T &val)
 		{
 			this->buffer << val;

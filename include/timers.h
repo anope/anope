@@ -17,7 +17,7 @@
 class CoreExport Timer
 {
  private:
- 	/** The owner of the timer, if any
+	/** The owner of the timer, if any
 	 */
 	Module *owner;
 

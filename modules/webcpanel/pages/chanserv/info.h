@@ -14,7 +14,7 @@ namespace ChanServ
 class Info : public WebPanelProtectedPage
 {
  public:
- 	Info(const Anope::string &cat, const Anope::string &u);
+	Info(const Anope::string &cat, const Anope::string &u);
 
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) anope_override;
 };

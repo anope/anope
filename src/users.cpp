@@ -381,7 +381,7 @@ void User::Identify(NickAlias *na)
 		if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 		{
 			this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
- 			this->SetDisplayedHost(this->nc->o->vhost);
+			this->SetDisplayedHost(this->nc->o->vhost);
 			IRCD->SendVhost(this, "", this->nc->o->vhost);
 		}
 	}
@@ -541,7 +541,7 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 			if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 			{
 				this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
- 				this->SetDisplayedHost(this->nc->o->vhost);
+				this->SetDisplayedHost(this->nc->o->vhost);
 				IRCD->SendVhost(this, "", this->nc->o->vhost);
 			}
 		}

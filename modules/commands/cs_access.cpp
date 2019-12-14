@@ -25,7 +25,7 @@ class AccessChanAccess : public ChanAccess
  public:
 	int level;
 
- 	AccessChanAccess(AccessProvider *p) : ChanAccess(p), level(0)
+	AccessChanAccess(AccessProvider *p) : ChanAccess(p), level(0)
 	{
 	}
 

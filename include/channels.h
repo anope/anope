@@ -41,7 +41,7 @@ class CoreExport Channel : public Base, public Extensible
 	ModeList modes;
 
  public:
- 	/* Channel name */
+	/* Channel name */
 	Anope::string name;
 	/* Set if this channel is registered. ci->c == this. Contains information relevant to the registered channel */
 	Serialize::Reference<ChannelInfo> ci;
@@ -139,7 +139,7 @@ class CoreExport Channel : public Base, public Extensible
 	/** See if a channel has a mode
 	 * @param name The mode name
 	 * @return The number of modes set
- 	 * @param param The optional mode param
+	 * @param param The optional mode param
 	 */
 	size_t HasMode(const Anope::string &name, const Anope::string &param = "");
 

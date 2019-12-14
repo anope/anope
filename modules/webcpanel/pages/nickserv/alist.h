@@ -14,7 +14,7 @@ namespace NickServ
 class Alist : public WebPanelProtectedPage
 {
  public:
- 	Alist(const Anope::string &cat, const Anope::string &u);
+	Alist(const Anope::string &cat, const Anope::string &u);
 
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) anope_override;
 };

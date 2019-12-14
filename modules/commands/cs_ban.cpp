@@ -16,7 +16,7 @@ static Module *me;
 class TempBan : public Timer
 {
  private:
- 	Anope::string channel;
+	Anope::string channel;
 	Anope::string mask;
 	Anope::string mode;
 

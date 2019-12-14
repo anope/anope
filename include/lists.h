@@ -64,7 +64,7 @@ class CoreExport NumberList
 class CoreExport ListFormatter
 {
  public:
- 	typedef std::map<Anope::string, Anope::string> ListEntry;
+	typedef std::map<Anope::string, Anope::string> ListEntry;
  private:
 	NickCore *nc;
 	std::vector<Anope::string> columns;

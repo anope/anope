@@ -22,7 +22,7 @@ class CoreExport IRCDProto : public Service
 	Anope::string proto_name;
 
  protected:
- 	IRCDProto(Module *creator, const Anope::string &proto_name);
+	IRCDProto(Module *creator, const Anope::string &proto_name);
  public:
 	virtual ~IRCDProto();
 

@@ -24,7 +24,7 @@ static SSL_CTX *server_ctx, *client_ctx;
 class MySSLService : public SSLService
 {
  public:
- 	MySSLService(Module *o, const Anope::string &n);
+	MySSLService(Module *o, const Anope::string &n);
 
 	/** Initialize a socket to use SSL
 	 * @param s The socket
@@ -43,7 +43,7 @@ class SSLSocketIO : public SocketIO
 	SSLSocketIO();
 
 	/** Really receive something from the buffer
- 	 * @param s The socket
+	 * @param s The socket
 	 * @param buf The buf to read to
 	 * @param sz How much to read
 	 * @return Number of bytes received

@@ -57,11 +57,11 @@ class ProxyConnect : public ConnectionSocket
 	static ServiceReference<XLineManager> akills;
 
  public:
- 	static std::set<ProxyConnect *> proxies;
+	static std::set<ProxyConnect *> proxies;
 
- 	ProxyCheck proxy;
+	ProxyCheck proxy;
 	unsigned short port;
- 	time_t created;
+	time_t created;
 
 	ProxyConnect(ProxyCheck &p, unsigned short po) : Socket(-1), ConnectionSocket(), proxy(p),
 		port(po), created(Anope::CurTime)

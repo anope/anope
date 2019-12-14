@@ -37,6 +37,6 @@ struct LogSettings : Serialize::Checker<std::vector<LogSetting *> >
 	}
 
  public:
- 	virtual ~LogSettings() { }
+	virtual ~LogSettings() { }
 	virtual LogSetting *Create() = 0;
 };

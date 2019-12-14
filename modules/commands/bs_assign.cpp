@@ -46,7 +46,7 @@ class CommandBSAssign : public Command
 		}
 
 		AccessGroup access = source.AccessFor(ci);
- 		if (ci->HasExt("BS_NOBOT") || (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration")))
+		if (ci->HasExt("BS_NOBOT") || (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

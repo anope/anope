@@ -91,12 +91,12 @@ class DNSServer : public Serializable
 	std::vector<Anope::string> ips;
 	unsigned limit;
 	/* wants to be in the pool */
- 	bool pooled;
+	bool pooled;
 	/* is actually in the pool */
 	bool active;
 
  public:
- 	std::set<Anope::string, ci::less> zones;
+	std::set<Anope::string, ci::less> zones;
 	time_t repool;
 
 	DNSServer(const Anope::string &sn) : Serializable("DNSServer"), server_name(sn), limit(0), pooled(false), active(false), repool(0)

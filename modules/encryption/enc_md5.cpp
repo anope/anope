@@ -321,7 +321,7 @@ class MD5Context : public Encryption::Context
 class MD5Provider : public Encryption::Provider
 {
  public:
- 	MD5Provider(Module *creator) : Encryption::Provider(creator, "md5") { }
+	MD5Provider(Module *creator) : Encryption::Provider(creator, "md5") { }
 
 	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
 	{

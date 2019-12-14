@@ -56,7 +56,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 
 
  public: // XXX: exposing a tiny bit too much
- 	/* User's current nick */
+	/* User's current nick */
 	Anope::string nick;
 
 	/* User's real hostname */

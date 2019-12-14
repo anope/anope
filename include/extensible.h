@@ -164,7 +164,7 @@ template<typename T>
 class SerializableExtensibleItem : public PrimitiveExtensibleItem<T>
 {
  public:
- 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<T>(m, n) { }
+	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<T>(m, n) { }
 
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
 	{
@@ -186,7 +186,7 @@ template<>
 class SerializableExtensibleItem<bool> : public PrimitiveExtensibleItem<bool>
 {
  public:
- 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<bool>(m, n) { }
+	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<bool>(m, n) { }
 
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
 	{

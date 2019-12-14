@@ -17,7 +17,7 @@ static ServiceReference<Encryption::Provider> md5("Encryption::Provider", "md5")
 class OldMD5Provider : public Encryption::Provider
 {
  public:
- 	OldMD5Provider(Module *creator) : Encryption::Provider(creator, "oldmd5") { }
+	OldMD5Provider(Module *creator) : Encryption::Provider(creator, "oldmd5") { }
 
 	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
 	{

@@ -165,7 +165,7 @@ namespace Message
 
 	struct CoreExport Whois : IRCDMessage
 	{
- 		Whois(Module *creator, const Anope::string &mname = "WHOIS") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Whois(Module *creator, const Anope::string &mname = "WHOIS") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 	};

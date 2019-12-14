@@ -43,7 +43,7 @@ class CoreExport Service : public virtual Base
 	}
 
  public:
- 	static Service *FindService(const Anope::string &t, const Anope::string &n)
+	static Service *FindService(const Anope::string &t, const Anope::string &n)
 	{
 		std::map<Anope::string, std::map<Anope::string, Service *> >::const_iterator it = Services.find(t);
 		if (it == Services.end())
@@ -122,7 +122,7 @@ class ServiceReference : public Reference<T>
 	Anope::string name;
 
  public:
- 	ServiceReference() { }
+	ServiceReference() { }
 
 	ServiceReference(const Anope::string &t, const Anope::string &n) : type(t), name(n)
 	{

@@ -220,7 +220,7 @@ class SHA256Context : public Encryption::Context
 class SHA256Provider : public Encryption::Provider
 {
  public:
- 	SHA256Provider(Module *creator) : Encryption::Provider(creator, "sha256") { }
+	SHA256Provider(Module *creator) : Encryption::Provider(creator, "sha256") { }
 
 	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
 	{

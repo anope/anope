@@ -116,7 +116,7 @@ class ngIRCdProto : public IRCDProto
 	void SendLogout(User *u) anope_override
 	{
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
-	} 
+	}
 
 	/* SERVER name hop descript */
 	void SendServer(const Server *server) anope_override
@@ -509,8 +509,8 @@ struct IRCDMessageServer : IRCDMessage
 	 * New directly linked server:
 	 *
 	 * SERVER tolsun.oulu.fi 1 :Experimental server
-	 * 	New server tolsun.oulu.fi introducing itself
-	 * 	and attempting to register.
+	 *   New server tolsun.oulu.fi introducing itself
+	 *   and attempting to register.
 	 *
 	 * params[0] = servername
 	 * params[1] = hop count
@@ -519,10 +519,10 @@ struct IRCDMessageServer : IRCDMessage
 	 * New remote server in the network:
 	 *
 	 * :tolsun.oulu.fi SERVER csd.bu.edu 5 34 :BU Central Server
-	 *	Server tolsun.oulu.fi is our uplink for csd.bu.edu
-	 *	which is 5 hops away. The token "34" will be used
-	 *	by tolsun.oulu.fi when introducing new users or
-	 *	services connected to csd.bu.edu.
+	 *   Server tolsun.oulu.fi is our uplink for csd.bu.edu
+	 *   which is 5 hops away. The token "34" will be used
+	 *   by tolsun.oulu.fi when introducing new users or
+	 *   services connected to csd.bu.edu.
 	 *
 	 * params[0] = servername
 	 * params[1] = hop count

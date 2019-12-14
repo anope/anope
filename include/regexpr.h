@@ -30,7 +30,7 @@ class CoreExport Regex
  protected:
 	Regex(const Anope::string &expr) : expression(expr) { }
  public:
- 	virtual ~Regex() { }
+	virtual ~Regex() { }
 	const Anope::string &GetExpression() { return expression; }
 	virtual bool Matches(const Anope::string &str) = 0;
 };

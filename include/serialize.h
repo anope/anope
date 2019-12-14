@@ -22,7 +22,7 @@ namespace Serialize
 	class Data
 	{
 	 public:
- 		enum Type
+		enum Type
 		{
 			DT_TEXT,
 			DT_INT
@@ -62,7 +62,7 @@ class CoreExport Serializable : public virtual Base
 	friend class Serialize::Type;
 	/* The type of item this object is */
 	Serialize::Type *s_type;
- 	/* Iterator into serializable_items */
+	/* Iterator into serializable_items */
 	std::list<Serializable *>::iterator s_iter;
 	/* The hash of the last serialized form of this object committed to the database */
 	size_t last_commit;
@@ -70,7 +70,7 @@ class CoreExport Serializable : public virtual Base
 	time_t last_commit_time;
 
  protected:
- 	Serializable(const Anope::string &serialize_type);
+	Serializable(const Anope::string &serialize_type);
 	Serializable(const Serializable &);
 
 	Serializable &operator=(const Serializable &);
@@ -78,7 +78,7 @@ class CoreExport Serializable : public virtual Base
  public:
 	virtual ~Serializable();
 
- 	/* Unique ID (per type, not globally) for this object */
+	/* Unique ID (per type, not globally) for this object */
 	uint64_t id;
 
 	/* Only used by redis, to ignore updates */
@@ -130,7 +130,7 @@ class CoreExport Serialize::Type : public Base
 	time_t timestamp;
 
  public:
- 	/* Map of Serializable::id to Serializable objects */
+	/* Map of Serializable::id to Serializable objects */
 	std::map<uint64_t, Serializable *> objects;
 
 	/** Creates a new serializable type
@@ -247,7 +247,7 @@ class Serialize::Reference : public ReferenceBase
 	T *ref;
 
  public:
- 	Reference() : ref(NULL)
+	Reference() : ref(NULL)
 	{
 	}
 

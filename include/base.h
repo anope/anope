@@ -50,7 +50,7 @@ class Reference : public ReferenceBase
  protected:
 	T *ref;
  public:
- 	Reference() : ref(NULL)
+	Reference() : ref(NULL)
 	{
 	}
 

@@ -497,11 +497,11 @@ namespace UnrealExtban
 	class EntryMatcher : public UnrealExtBan
 	{
 	 public:
-	 	EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
-	 	{
-	 	}
+		EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
 
-	 	bool Matches(User *u, const Entry *e) anope_override
+		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(3);
@@ -513,11 +513,11 @@ namespace UnrealExtban
 	class RealnameMatcher : public UnrealExtBan
 	{
 	 public:
-	 	RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
-	 	{
-	 	}
+		RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
 
-	 	bool Matches(User *u, const Entry *e) anope_override
+		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(3);
@@ -529,11 +529,11 @@ namespace UnrealExtban
 	class RegisteredMatcher : public UnrealExtBan
 	{
 	 public:
-	 	RegisteredMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
-	 	{
-	 	}
+		RegisteredMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
 
-	 	bool Matches(User *u, const Entry *e) anope_override
+		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
 			return u->HasMode("REGISTERED") && mask.equals_ci(u->nick);
@@ -543,17 +543,17 @@ namespace UnrealExtban
 	class AccountMatcher : public UnrealExtBan
 	{
 	 public:
-	 	AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
-	 	{
-	 	}
+		AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
 
-	 	bool Matches(User *u, const Entry *e) anope_override
-	 	{
-	 		const Anope::string &mask = e->GetMask();
+		bool Matches(User *u, const Entry *e) anope_override
+		{
+			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(3);
 
-	 		return u->Account() && Anope::Match(u->Account()->display, real_mask);
-	 	}
+			return u->Account() && Anope::Match(u->Account()->display, real_mask);
+		}
 	};
 
 	class FingerprintMatcher : public UnrealExtBan

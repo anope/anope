@@ -11,7 +11,7 @@ namespace WebCPanel
 class Logout : public WebPanelProtectedPage
 {
  public:
- 	Logout(const Anope::string &u);
+	Logout(const Anope::string &u);
 
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) anope_override;
 };

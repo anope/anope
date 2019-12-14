@@ -39,8 +39,8 @@ enum ModeClass
 class CoreExport Mode : public Base
 {
  public:
- 	/* Mode name */
- 	Anope::string name;
+	/* Mode name */
+	Anope::string name;
 	/* Class of mode this is (user/channel) */
 	ModeClass mclass;
 	/* Mode char for this, eg 'b' */
@@ -78,7 +78,7 @@ class CoreExport UserMode : public Mode
 class CoreExport UserModeParam : public UserMode
 {
  public:
- 	/** constructor
+	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
 	 */
@@ -229,9 +229,9 @@ class CoreExport ChannelStatus
 {
 	Anope::string modes;
  public:
- 	ChannelStatus();
- 	ChannelStatus(const Anope::string &modes);
- 	void AddMode(char c);
+	ChannelStatus();
+	ChannelStatus(const Anope::string &modes);
+	void AddMode(char c);
 	void DelMode(char c);
 	bool HasMode(char c) const;
 	bool Empty() const;
@@ -399,7 +399,7 @@ class CoreExport Entry
 	Anope::string nick, user, host, real;
 
 	/** Constructor
- 	 * @param mode What mode this host is for, can be empty for unknown/no mode
+	 * @param mode What mode this host is for, can be empty for unknown/no mode
 	 * @param host A full or poartial nick!ident@host/cidr#real name mask
 	 */
 	Entry(const Anope::string &mode, const Anope::string &host);

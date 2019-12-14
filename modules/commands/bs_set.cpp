@@ -69,7 +69,7 @@ class CommandBSSet : public Command
 class CommandBSSetBanExpire : public Command
 {
  public:
- 	class UnbanTimer : public Timer
+	class UnbanTimer : public Timer
 	{
 		Anope::string chname;
 		Anope::string mask;

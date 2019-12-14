@@ -80,7 +80,7 @@ class CoreExport ChanAccess : public Serializable
  public:
 	typedef std::vector<ChanAccess *> Path;
 
- 	/* The provider that created this access entry */
+	/* The provider that created this access entry */
 	AccessProvider *provider;
 	/* Channel this access entry is on */
 	Serialize::Reference<ChannelInfo> ci;
@@ -139,7 +139,7 @@ class CoreExport AccessGroup
 	/* access entries + paths */
 	std::vector<ChanAccess::Path> paths;
 	/* Channel these access entries are on */
- 	const ChannelInfo *ci;
+	const ChannelInfo *ci;
 	/* Account these entries affect, if any */
 	const NickCore *nc;
 	/* super_admin always gets all privs. founder is a special case where ci->founder == nc */

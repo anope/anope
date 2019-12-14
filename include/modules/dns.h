@@ -139,8 +139,8 @@ namespace DNS
 		/* Use result cache if available */
 		bool use_cache;
 		/* Request id */
-	 	unsigned short id;
-	 	/* Creator of this request */
+		unsigned short id;
+		/* Creator of this request */
 		Module *creator;
 
 		Request(Manager *mgr, Module *c, const Anope::string &addr, QueryType qt, bool cache = false) : Timer(0), Question(addr, qt), manager(mgr),

@@ -33,7 +33,7 @@ struct NSCertListImpl : NSCertList
 	std::vector<Anope::string> certs;
 
  public:
- 	NSCertListImpl(Extensible *obj) : nc(anope_dynamic_static_cast<NickCore *>(obj)) { }
+	NSCertListImpl(Extensible *obj) : nc(anope_dynamic_static_cast<NickCore *>(obj)) { }
 
 	~NSCertListImpl()
 	{

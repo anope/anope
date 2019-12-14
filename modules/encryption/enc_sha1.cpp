@@ -181,7 +181,7 @@ class SHA1Context : public Encryption::Context
 class SHA1Provider : public Encryption::Provider
 {
  public:
- 	SHA1Provider(Module *creator) : Encryption::Provider(creator, "sha1") { }
+	SHA1Provider(Module *creator) : Encryption::Provider(creator, "sha1") { }
 
 	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
 	{

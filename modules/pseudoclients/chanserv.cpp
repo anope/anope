@@ -45,7 +45,7 @@ class ChanServCore : public Module, public ChanServService
 			Reference<Channel> c;
 
 		 public:
-		 	/** Constructor
+			/** Constructor
 			 * @param chan The channel
 			 */
 			ChanServTimer(Reference<BotInfo> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan) : Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s")), ChanServ(cs), inhabit(i), c(chan)

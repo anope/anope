@@ -74,7 +74,7 @@ struct ModeLocks
 
 	/** Get details for a specific mlock
 	 * @param mname The mode name
- 	 * @param An optional param to match with
+	 * @param An optional param to match with
 	 * @return The MLock, if any
 	 */
 	virtual const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "") = 0;

@@ -144,7 +144,7 @@ class CommandNSAJoin : public Command
 			else if (i != (*channels)->size())
 				alreadyadded += chan + ", ";
 			else if (IRCD->IsChannelValid(chan) == false)
-	 			source.Reply(CHAN_X_INVALID, chan.c_str());
+				source.Reply(CHAN_X_INVALID, chan.c_str());
 			else
 			{
 				Channel *c = Channel::Find(chan);

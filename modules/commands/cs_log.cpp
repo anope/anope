@@ -81,7 +81,7 @@ struct LogSettingsImpl : LogSettings
 {
 	LogSettingsImpl(Extensible *) { }
 
- 	~LogSettingsImpl()
+	~LogSettingsImpl()
 	{
 		for (iterator it = (*this)->begin(); it != (*this)->end();)
 		{

@@ -14,7 +14,7 @@ namespace ChanServ
 class Access : public WebPanelProtectedPage
 {
  public:
- 	Access(const Anope::string &cat, const Anope::string &u);
+	Access(const Anope::string &cat, const Anope::string &u);
 
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) anope_override;
 

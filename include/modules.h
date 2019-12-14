@@ -1138,7 +1138,7 @@ class CoreExport ModuleManager
 	 */
 	static std::vector<Module *> EventHandlers[I_SIZE];
 
- 	/** List of all modules loaded in Anope
+	/** List of all modules loaded in Anope
 	 */
 	static std::list<Module *> Modules;
 

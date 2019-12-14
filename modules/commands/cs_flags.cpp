@@ -18,7 +18,7 @@ class FlagsChanAccess : public ChanAccess
  public:
 	std::set<char> flags;
 
- 	FlagsChanAccess(AccessProvider *p) : ChanAccess(p)
+	FlagsChanAccess(AccessProvider *p) : ChanAccess(p)
 	{
 	}
 

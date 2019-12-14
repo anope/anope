@@ -99,7 +99,7 @@ class HTTPPage : public Base
 	Anope::string content_type;
 
  public:
- 	HTTPPage(const Anope::string &u, const Anope::string &ct = "text/html") : url(u), content_type(ct) { }
+	HTTPPage(const Anope::string &u, const Anope::string &ct = "text/html") : url(u), content_type(ct) { }
 
 	const Anope::string &GetURL() const { return this->url; }
 
@@ -137,7 +137,7 @@ class HTTPClient : public ClientSocket, public BinarySocket, public Base
 
 class HTTPProvider : public ListenSocket, public Service
 {
- 	Anope::string ip;
+	Anope::string ip;
 	unsigned short port;
 	bool ssl;
  public:

@@ -35,7 +35,7 @@ namespace Configuration
 		int linenum;
 
 	 public:
-	 	Block(const Anope::string &);
+		Block(const Anope::string &);
 		const Anope::string &GetName() const;
 		int CountBlock(const Anope::string &name);
 		Block* GetBlock(const Anope::string &name, int num = 0);

@@ -359,7 +359,7 @@ bool IRCDProto::IsNickValid(const Anope::string &nick)
 	 **/
 
 	 if (nick.empty())
-	 	return false;
+		return false;
 
 	Anope::string special = "[]\\`_^{|}";
 

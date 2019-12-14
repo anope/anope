@@ -57,7 +57,7 @@ class SXLineDelCallback : public NumberList
 class CommandOSSXLineBase : public Command
 {
  private:
- 	virtual XLineManager* xlm() = 0;
+	virtual XLineManager* xlm() = 0;
 
 	virtual void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
@@ -420,7 +420,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 	ServiceReference<XLineManager> snlines;
  public:
- 	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline"), snlines("XLineManager", "xlinemanager/snline")
+	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline"), snlines("XLineManager", "xlinemanager/snline")
 	{
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037:\037reason\037"));
 		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));
@@ -652,7 +652,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			source.Reply(READ_ONLY_MODE);
 	}
 
- 	ServiceReference<XLineManager> sqlines;
+	ServiceReference<XLineManager> sqlines;
  public:
 	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/sqline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{

@@ -468,7 +468,7 @@ class TCPSocket : public ListenSocket
 	class Client : public ClientSocket, public Timer, public ReplySocket
 	{
 		Manager *manager;
- 		Packet *packet;
+		Packet *packet;
 		unsigned char packet_buffer[524];
 		int length;
 
@@ -495,7 +495,7 @@ class TCPSocket : public ListenSocket
 			SocketEngine::Change(this, true, SF_WRITABLE);
 		}
 
-	 	bool ProcessRead() anope_override
+		bool ProcessRead() anope_override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Reading from DNS TCP socket";
 

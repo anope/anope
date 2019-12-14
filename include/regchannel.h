@@ -36,7 +36,7 @@ class CoreExport AutoKick : public Serializable
 	time_t addtime;
 	time_t last_used;
 
- 	AutoKick();
+	AutoKick();
 	~AutoKick();
 	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
@@ -56,7 +56,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	Anope::map<int16_t> levels;
 
  public:
- 	friend class ChanAccess;
+	friend class ChanAccess;
 	friend class AutoKick;
 
 	Anope::string name;                       /* Channel name */
@@ -82,7 +82,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 
 	time_t banexpire;                       /* Time bans expire in */
 
- 	/** Constructor
+	/** Constructor
 	 * @param chname The channel name
 	 */
 	ChannelInfo(const Anope::string &chname);

@@ -879,7 +879,7 @@ class CommandCSModes : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "on " << targ->nick;
 	}
 
- 	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const anope_override
 	{
 		const std::pair<bool, Anope::string> &m = modes[source.command];
 		if (!m.second.empty())

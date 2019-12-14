@@ -19,9 +19,9 @@ class CoreExport Memo : public Serializable
 {
  public:
 	MemoInfo *mi;
- 	bool unread;
+	bool unread;
 	bool receipt;
- 	Memo();
+	Memo();
 	~Memo();
 
 	void Serialize(Serialize::Data &data) const anope_override;

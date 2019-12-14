@@ -67,6 +67,7 @@ class InspIRCd3Proto : public IRCDProto
 		CanCertFP = true;
 		RequiresID = true;
 		MaxModes = 20;
+		MaxLine = 4096;
 	}
 
 	void SendConnect() anope_override
@@ -1431,10 +1432,11 @@ struct IRCDMessageEndburst : IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Server *s = source.GetServer();
-
 		Log(LOG_DEBUG) << "Processed ENDBURST for " << s->GetName();
-
 		s->Sync(true);
+
+		// Once connected the InspIRCd S2S protocol has no max message length.
+		IRCD->MaxLine = std::numeric_limits<unsigned>::max();
 	}
 };
 

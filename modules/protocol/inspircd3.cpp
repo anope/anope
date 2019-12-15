@@ -12,6 +12,7 @@
 #include "module.h"
 #include "modules/cs_mode.h"
 #include "modules/sasl.h"
+#include <limits>
 
 struct SASLUser
 {

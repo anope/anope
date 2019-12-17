@@ -1,6 +1,6 @@
 /* smtp stuff handler for win32.
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -411,12 +411,42 @@ int smtp_send_email()
 		return 0;
 	}
 
+	if (!smtp_read(buf, 1024))
+	{
+		alog("SMTP: error reading buffer");
+		return 0;
+	}
+
+	code = smtp_get_code(buf);
+	if (code != 250)
+	{
+		alog("SMTP: error expected code 250 got %d",code);
+		return 0;
+	}
+
 	return 1;
 }
 
 void smtp_disconnect()
 {
-	smtp_send("QUIT\r\n");
+	char buf[1024];
+
+	if (!smtp_send("QUIT\r\n"))
+	{
+		alog("SMTP: error writing to socket");
+	}
+
+	if (!smtp_read(buf, 1024))
+	{
+		alog("SMTP: error reading buffer");
+	}
+
+	int code = smtp_get_code(buf);
+	if (code != 221)
+	{
+		alog("SMTP: error expected code 221 got %d",code);
+	}
+
 	ano_sockclose(smail.sock);
 }
 

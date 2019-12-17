@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -165,7 +165,7 @@ namespace Message
 
 	struct CoreExport Whois : IRCDMessage
 	{
- 		Whois(Module *creator, const Anope::string &mname = "WHOIS") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Whois(Module *creator, const Anope::string &mname = "WHOIS") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 	};

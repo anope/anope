@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,7 +18,7 @@
 class SaveData : public Serialize::Data
 {
  public:
- 	Anope::string last;
+	Anope::string last;
 	std::fstream *fs;
 
 	SaveData() : fs(NULL) { }
@@ -38,7 +38,7 @@ class SaveData : public Serialize::Data
 class LoadData : public Serialize::Data
 {
  public:
- 	std::fstream *fs;
+	std::fstream *fs;
 	unsigned int id;
 	std::map<Anope::string, Anope::string> data;
 	std::stringstream ss;

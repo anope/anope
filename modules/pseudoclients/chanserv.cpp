@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -45,7 +45,7 @@ class ChanServCore : public Module, public ChanServService
 			Reference<Channel> c;
 
 		 public:
-		 	/** Constructor
+			/** Constructor
 			 * @param chan The channel
 			 */
 			ChanServTimer(Reference<BotInfo> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan) : Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s")), ChanServ(cs), inhabit(i), c(chan)

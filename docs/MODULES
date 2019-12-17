@@ -87,7 +87,7 @@ Anope Modules
 
 5) More Modules
 
-    You can download more useful modules from http://modules.anope.org/. Just
+    You can download more useful modules from https://modules.anope.org/. Just
     grab the module file (usually with a .cpp extension). Place the module
     file in your modules (anope-1.9.x/modules/third) folder; although any of
     the other folders within the modules directory will work.
@@ -118,11 +118,11 @@ Anope Modules
     There are a number of useful documents on the Anope Wiki. The Anope Wiki
     can be reached at:
 
-    * http://wiki.anope.org/
+    * https://wiki.anope.org/
 
 8) Modules Repository
 
-    You can find modules at http://modules.anope.org
+    You can find modules at https://modules.anope.org/
 
     These modules are 3rd party and as such are not supported by the Anope Team.
     Contact the Module Author directly with problems, not the Anope Team.

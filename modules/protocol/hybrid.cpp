@@ -1,7 +1,7 @@
 /* ircd-hybrid-8 protocol module
  *
- * (C) 2003-2017 Anope Team <team@anope.org>
- * (C) 2012-2017 ircd-hybrid development team
+ * (C) 2003-2019 Anope Team <team@anope.org>
+ * (C) 2012-2018 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
@@ -36,7 +36,7 @@ class HybridProto : public IRCDProto
 	}
 
   public:
-	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.2.x")
+	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.x")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
@@ -184,18 +184,17 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
 
 		/*
-		 * As of March 19, 2017, ircd-hybrid-8 does support the following capabilities
+		 * As of March 23, 2018, ircd-hybrid-8 does support the following capabilities
 		 * which are required to work with IRC-services:
 		 *
 		 * QS     - Can handle quit storm removal
-		 * CHW    - Can do channel wall @#
 		 * TBURST - Supports topic burst
 		 * ENCAP  - Supports ENCAP
-		 * HOPS   - Supports HalfOps
 		 * SVS    - Supports services
 		 * EOB    - Supports End Of Burst message
+		 * RHOST  - Supports UID message with realhost information
 		 */
-		UplinkSocket::Message() << "CAPAB :QS CHW ENCAP TBURST SVS HOPS EOB";
+		UplinkSocket::Message() << "CAPAB :QS ENCAP TBURST SVS EOB RHOST";
 
 		SendServer(Me);
 
@@ -206,8 +205,12 @@ class HybridProto : public IRCDProto
 	{
 		Anope::string modes = "+" + u->GetModes();
 
-		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " "
-					 << u->GetIdent() << " " << u->host << " 0.0.0.0 " << u->GetUID() << " * :" << u->realname;
+		if (Servers::Capab.count("RHOST"))
+			UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " "
+							<< u->host << " " << u->host << " 0.0.0.0 " << u->GetUID() << " * :" << u->realname;
+		else
+			UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " "
+							<< u->host << " 0.0.0.0 " << u->GetUID() << " * :" << u->realname;
 	}
 
 	void SendEOB() anope_override
@@ -247,7 +250,10 @@ class HybridProto : public IRCDProto
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
 	{
-		UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << newnick << " " << when;
+		if (Servers::Capab.count("RHOST"))
+			UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
+		else
+			UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << newnick << " " << when;
 	}
 
 	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) anope_override
@@ -275,14 +281,23 @@ class HybridProto : public IRCDProto
 		this->SendSQLineDel(&x);
 	}
 
+
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) anope_override
 	{
-		u->SetMode(Config->GetClient("HostServ"), "CLOAK", host);
+		if (Servers::Capab.count("RHOST"))
+			UplinkSocket::Message(Me) << "SVSHOST " << u->GetUID() << " " << u->timestamp << " " << host;
+		else
+			/* Note: the +x doesn't set any mode on the ircd-hybrid side */
+			UplinkSocket::Message(Me) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << "+x " << host;
 	}
 
 	void SendVhostDel(User *u) anope_override
 	{
-		u->RemoveMode(Config->GetClient("HostServ"), "CLOAK", u->host);
+		if (Servers::Capab.count("RHOST"))
+			UplinkSocket::Message(Me) << "SVSHOST " << u->GetUID() << " " << u->timestamp << " " << u->host;
+		else
+			/* Note: the +x doesn't set any mode on the ircd-hybrid side */
+			UplinkSocket::Message(Me) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << "+x " << u->host;
 	}
 
 	bool IsIdentValid(const Anope::string &ident) anope_override
@@ -537,26 +552,37 @@ struct IRCDMessageTMode : IRCDMessage
 
 struct IRCDMessageUID : IRCDMessage
 {
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	/*          0     1 2          3   4      5             6        7         8           9                   */
-	/* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB Steve      :Mining all the time */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		Anope::string ip = params[6];
-
-		if (ip == "0") /* Can be 0 for spoofed clients */
-			ip.clear();
-
 		NickAlias *na = NULL;
-		if (params[8] != "0" && params[8] != "*")
-			na = NickAlias::Find(params[8]);
 
-		/* Source is always the server */
-		User::OnIntroduce(params[0], params[4], params[5], "",
-				ip, source.GetServer(),
-				params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
-				params[3], params[7], na ? *na->nc : NULL);
+		if (params.size() == 11)
+		{
+			/* CAPAB RHOST */
+			/*          0     1 2          3   4      5            6         7        8         9      10                  */
+			/* :0MC UID Steve 1 1350157102 +oi ~steve virtual.host real.host 10.0.0.1 0MCAAAAAB Steve :Mining all the time */
+			if (params[9] != "*")
+				na = NickAlias::Find(params[9]);
+
+			/* Source is always the server */
+			User::OnIntroduce(params[0], params[4], params[6], params[5], params[7], source.GetServer(), params[10],
+					params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
+					params[3], params[8], na ? *na->nc : NULL);
+		}
+		else
+		{
+		        /*          0     1 2          3   4      5             6        7         8      9                   */
+		        /* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB Steve :Mining all the time */
+			if (params[8] != "*")
+				na = NickAlias::Find(params[8]);
+
+			/* Source is always the server */
+			User::OnIntroduce(params[0], params[4], params[5], "", params[6], source.GetServer(), params[9],
+					params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
+					params[3], params[7], na ? *na->nc : NULL);
+		}
 	}
 };
 
@@ -629,7 +655,6 @@ class ProtoHybrid : public Module
 		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
 		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
 		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
-		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
 		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
 		ModeManager::AddUserMode(new UserMode("SOFTCALLERID", 'G'));
 		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));

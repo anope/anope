@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -139,8 +139,8 @@ namespace DNS
 		/* Use result cache if available */
 		bool use_cache;
 		/* Request id */
-	 	unsigned short id;
-	 	/* Creator of this request */
+		unsigned short id;
+		/* Creator of this request */
 		Module *creator;
 
 		Request(Manager *mgr, Module *c, const Anope::string &addr, QueryType qt, bool cache = false) : Timer(0), Question(addr, qt), manager(mgr),

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -26,7 +26,7 @@ namespace Mail
 	class Message : public Thread
 	{
 	 private:
-	 	Anope::string sendmail_path;
+		Anope::string sendmail_path;
 		Anope::string send_from;
 		Anope::string mail_to;
 		Anope::string addr;
@@ -36,7 +36,7 @@ namespace Mail
 
 		bool success;
 	 public:
-	 	/** Construct this message. Once constructed call Thread::Start to launch the mail sending.
+		/** Construct this message. Once constructed call Thread::Start to launch the mail sending.
 		 * @param sf Config->SendFrom
 		 * @param mailto Name of person being mailed (u->nick, nc->display, etc)
 		 * @param addr Destination address to mail

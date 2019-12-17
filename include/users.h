@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2003-2017 Anope Team <team@anope.org>
+ * (C) 2003-2019 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *
@@ -56,7 +56,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 
 
  public: // XXX: exposing a tiny bit too much
- 	/* User's current nick */
+	/* User's current nick */
 	Anope::string nick;
 
 	/* User's real hostname */

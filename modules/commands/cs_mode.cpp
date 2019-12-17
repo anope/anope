@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -879,7 +879,7 @@ class CommandCSModes : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "on " << targ->nick;
 	}
 
- 	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const anope_override
 	{
 		const std::pair<bool, Anope::string> &m = modes[source.command];
 		if (!m.second.empty())

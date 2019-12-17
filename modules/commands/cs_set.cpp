@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -43,6 +43,9 @@ class CommandCSSet : public Command
 			const CommandInfo &info = it->second;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
+				if (info.hide)
+					continue;
+
 				ServiceReference<Command> c("Command", info.name);
 
 				// XXX dup
@@ -944,7 +947,7 @@ class CommandCSSetSuccessor : public Command
 	CommandCSSetSuccessor(Module *creator, const Anope::string &cname = "chanserv/set/successor") : Command(creator, cname, 1, 2)
 	{
 		this->SetDesc(_("Set the successor for a channel"));
-		this->SetSyntax(_("\037channel\037 \037nick\037"));
+		this->SetSyntax(_("\037channel\037 [\037nick\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -1014,12 +1017,20 @@ class CommandCSSetSuccessor : public Command
 		source.Reply(_("Changes the successor of a channel. If the founder's\n"
 				"nickname expires or is dropped while the channel is still\n"
 				"registered, the successor will become the new founder of the\n"
-				"channel. The new nickname must be a registered one."));
+				"channel. The successor's nickname must be a registered one.\n"
+				"If there's no successor set, then the first nickname on the\n"
+				"access list (with the highest access, if applicable) will\n"
+				"become the new founder, but if the access list is empty, the\n"
+				"channel will be dropped."));
 		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
 		if (max_reg)
-			source.Reply(_("However, if the successor already has too many\n"
-				"channels registered (%d), the channel will be dropped\n"
-				"instead, just as if no successor had been set."), max_reg);
+		{
+			source.Reply(" ");
+			source.Reply(_("Note, however, if the successor already has too many\n"
+				"channels registered (%d), they will not be able to\n"
+				"become the new founder and it will be as if the\n"
+				"channel had no successor set."), max_reg);
+		}
 		return true;
 	}
 };

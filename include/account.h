@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -45,7 +45,7 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	/* Account this nick is tied to. Multiple nicks can be tied to a single account. */
 	Serialize::Reference<NickCore> nc;
 
- 	/** Constructor
+	/** Constructor
 	 * @param nickname The nick
 	 * @param nickcore The nickcore for this nick
 	 */
@@ -55,7 +55,7 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
- 	/** Set a vhost for the user
+	/** Set a vhost for the user
 	 * @param ident The ident
 	 * @param host The host
 	 * @param creator Who created the vhost
@@ -108,7 +108,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 	/* Channels which reference this core in some way (this is on their access list, akick list, is founder, successor, etc) */
 	Serialize::Checker<std::map<ChannelInfo *, int> > chanaccess;
  public:
- 	/* Name of the account. Find(display)->nc == this. */
+	/* Name of the account. Find(display)->nc == this. */
 	Anope::string display;
 	/* User password in form of hashm:data */
 	Anope::string pass;
@@ -242,7 +242,7 @@ class CoreExport IdentifyRequest
 	virtual ~IdentifyRequest();
 
  public:
- 	/* One of these is called when the request goes through */
+	/* One of these is called when the request goes through */
 	virtual void OnSuccess() = 0;
 	virtual void OnFail() = 0;
 

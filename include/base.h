@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Adam <Adam@anope.org>
- * (C) 2008-2017 Anope Team <team@anope.org>
+ * (C) 2008-2019 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -50,7 +50,7 @@ class Reference : public ReferenceBase
  protected:
 	T *ref;
  public:
- 	Reference() : ref(NULL)
+	Reference() : ref(NULL)
 	{
 	}
 

@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -46,7 +46,7 @@ class CommandBSAssign : public Command
 		}
 
 		AccessGroup access = source.AccessFor(ci);
- 		if (ci->HasExt("BS_NOBOT") || (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration")))
+		if (ci->HasExt("BS_NOBOT") || (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

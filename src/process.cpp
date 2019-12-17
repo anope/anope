@@ -1,6 +1,6 @@
 /* Main processing code for Services.
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -24,13 +24,21 @@ void Anope::Process(const Anope::string &buffer)
 	if (buffer.empty())
 		return;
 
+	Anope::map<Anope::string> tags;
 	Anope::string source, command;
 	std::vector<Anope::string> params;
 
-	IRCD->Parse(buffer, source, command, params);
+	if (!IRCD->Parse(buffer, tags, source, command, params))
+		return;
 
 	if (Anope::ProtocolDebug)
 	{
+		if (tags.empty())
+			Log() << "No tags";
+		else
+			for (Anope::map<Anope::string>::const_iterator it = tags.begin(); it != tags.end(); ++it)
+				Log() << "tags " << it->first << ": " << it->second;
+
 		Log() << "Source : " << (source.empty() ? "No source" : source);
 		Log() << "Command: " << command;
 
@@ -39,12 +47,6 @@ void Anope::Process(const Anope::string &buffer)
 		else
 			for (unsigned i = 0; i < params.size(); ++i)
 				Log() << "params " << i << ": " << params[i];
-	}
-
-	if (command.empty())
-	{
-		Log(LOG_DEBUG) << "No command? " << buffer;
-		return;
 	}
 
 	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
@@ -70,34 +72,55 @@ void Anope::Process(const Anope::string &buffer)
 	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
 		Log(LOG_DEBUG) << "unexpected non-server source " << source << " for " << command;
 	else
-		m->Run(src, params);
+		m->Run(src, params, tags);
 }
 
-void IRCDProto::Parse(const Anope::string &buffer, Anope::string &source, Anope::string &command, std::vector<Anope::string> &params)
+bool IRCDProto::Parse(const Anope::string &buffer, Anope::map<Anope::string> &tags, Anope::string &source, Anope::string &command, std::vector<Anope::string> &params)
 {
-	spacesepstream sep(buffer);
+	MessageTokenizer tokens(buffer);
 
-	if (buffer[0] == ':')
+	// This will always exist because of the check in Anope::Process.
+	Anope::string token;
+	tokens.GetMiddle(token);
+
+	if (token[0] == '@')
 	{
-		sep.GetToken(source);
-		source.erase(0, 1);
-	}
-
-	sep.GetToken(command);
-
-	for (Anope::string token; sep.GetToken(token);)
-	{
-		if (token[0] == ':')
+		// The line begins with message tags.
+		sepstream tagstream(token.substr(1), ';');
+		while (tagstream.GetToken(token))
 		{
-			if (!sep.StreamEnd())
-				params.push_back(token.substr(1) + " " + sep.GetRemaining());
+			const Anope::string::size_type valsep = token.find('=');
+			if (valsep == Anope::string::npos)
+			{
+				// Tag has no value.
+				tags[token];
+			}
 			else
-				params.push_back(token.substr(1));
-			break;
+			{
+				// Tag has a value
+				tags[token.substr(0, valsep)] = token.substr(valsep + 1);
+			}
 		}
-		else
-			params.push_back(token);
+
+		if (!tokens.GetMiddle(token))
+			return false;
 	}
+
+	if (token[0] == ':')
+	{
+		source = token.substr(1);
+		if (!tokens.GetMiddle(token))
+			return false;
+	}
+
+	// Store the command name.
+	command = token;
+
+	// Retrieve all of the parameters.
+	while (tokens.GetTrailing(token))
+		params.push_back(token);
+
+	return true;
 }
 
 Anope::string IRCDProto::Format(const Anope::string &source, const Anope::string &message)
@@ -106,4 +129,54 @@ Anope::string IRCDProto::Format(const Anope::string &source, const Anope::string
 		return ":" + source + " " + message;
 	else
 		return message;
+}
+
+MessageTokenizer::MessageTokenizer(const Anope::string &msg)
+	: message(msg)
+	, position(0)
+{
+}
+
+bool MessageTokenizer::GetMiddle(Anope::string &token)
+{
+	// If we are past the end of the string we can't do anything.
+	if (position >= message.length())
+	{
+		token.clear();
+		return false;
+	}
+
+	// If we can't find another separator this is the last token in the message.
+	Anope::string::size_type separator = message.find(' ', position);
+	if (separator == Anope::string::npos)
+	{
+		token = message.substr(position);
+		position = message.length();
+		return true;
+	}
+
+	token = message.substr(position, separator - position);
+	position = message.find_first_not_of(' ', separator);
+	return true;
+}
+
+bool MessageTokenizer::GetTrailing(Anope::string &token)
+{
+	// If we are past the end of the string we can't do anything.
+	if (position >= message.length())
+	{
+		token.clear();
+		return false;
+	}
+
+	// If this is true then we have a <trailing> token!
+	if (message[position] == ':')
+	{
+		token = message.substr(position + 1);
+		position = message.length();
+		return true;
+	}
+
+	// There is no <trailing> token so it must be a <middle> token.
+	return GetMiddle(token);
 }

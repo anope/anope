@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-16 18:59-0500\n"
+"POT-Creation-Date: 2019-02-28 02:52+0100\n"
 "PO-Revision-Date: 2010-09-19 20:37-0400\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Hungarian\n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: modules/commands/os_forbid.cpp:312
+#: modules/commands/os_forbid.cpp:324
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
 msgstr ""
 
-#: modules/commands/os_forbid.cpp:253
+#: modules/commands/os_forbid.cpp:265
 #, fuzzy, c-format
 msgid "%d nickname(s) dropped."
 msgstr "A nickneved dropolva lett,"
@@ -46,7 +46,7 @@ msgstr ""
 "%s hozzáadva a %s hozzáférési listájához.\n"
 "A hozzáférési szintje a ChanServ parancsokhoz:  %d."
 
-#: modules/commands/cs_akick.cpp:165
+#: modules/commands/cs_akick.cpp:190
 #, c-format
 msgid "%s added to %s autokick list."
 msgstr "%s hozzáadva a (%s) csatorna autokick listájához"
@@ -169,7 +169,7 @@ msgstr ""
 msgid "%s already exists in %s bad words list."
 msgstr "A %s szót már tartalmazza a %s tiltott szavak listája"
 
-#: modules/commands/cs_akick.cpp:145
+#: modules/commands/cs_akick.cpp:170
 #, c-format
 msgid "%s already exists on %s autokick list."
 msgstr "%s már szerepel a (%s) csatorna autokick listáján."
@@ -205,7 +205,7 @@ msgstr "%s törölve lett a %s AOP listáról."
 msgid "%s deleted from %s access list."
 msgstr "%s törölve lett a (%s) csatorna hozzáférési listájáról."
 
-#: modules/commands/cs_akick.cpp:251
+#: modules/commands/cs_akick.cpp:276
 #, c-format
 msgid "%s deleted from %s autokick list."
 msgstr "%s törölve a (%s) csatorna autokick listájáról."
@@ -275,7 +275,7 @@ msgstr "%s letiltva a (%s) csatornán."
 msgid "%s has no access on %s."
 msgstr "%s has been invited to %s."
 
-#: modules/commands/cs_set.cpp:304
+#: modules/commands/cs_set.cpp:307
 #, c-format
 msgid "%s has too many channels registered."
 msgstr "%s részére túl sok csatorna van regisztrálva."
@@ -323,12 +323,12 @@ msgstr "%s hozzáadva a hozzáférési listádhoz."
 msgid "%s is already suspended."
 msgstr "You are already in %s! "
 
-#: modules/commands/ms_send.cpp:55 modules/commands/ms_rsend.cpp:56
+#: modules/commands/ms_rsend.cpp:56 modules/commands/ms_send.cpp:55
 #, fuzzy, c-format
 msgid "%s is not a registered unforbidden nick or channel."
 msgstr "%s nem érvényes bot vagy regisztrált szoba."
 
-#: modules/commands/cs_set.cpp:175
+#: modules/commands/cs_set.cpp:178
 #, c-format
 msgid "%s is not a valid ban type."
 msgstr "%s nem érvényes ban típus."
@@ -395,12 +395,12 @@ msgstr "%s hozzáadva a (%s) csatorna autokick listájához"
 msgid "%s not found on %s %s list."
 msgstr "%s nem találatható a %s AOP listán."
 
-#: modules/commands/cs_flags.cpp:255 modules/commands/cs_access.cpp:338
+#: modules/commands/cs_access.cpp:338 modules/commands/cs_flags.cpp:255
 #, c-format
 msgid "%s not found on %s access list."
 msgstr "%s nem található a (%s) csatorna hozzáférési listáján."
 
-#: modules/commands/cs_akick.cpp:240
+#: modules/commands/cs_akick.cpp:265
 #, c-format
 msgid "%s not found on %s autokick list."
 msgstr "%s nem szerepel a (%s) csatorna autokick listáján."
@@ -591,30 +591,30 @@ msgstr ""
 msgid "[auto-memo] The memo you sent to %s has been viewed."
 msgstr "[auto-memo] A memo, amit %s számára küldtél meg lett tekintve."
 
-#: modules/commands/ns_group.cpp:78
+#: modules/commands/ns_group.cpp:92
 #, fuzzy
 msgid "[target] [password]"
 msgstr "GROUP célnick jelszó"
 
-#: modules/commands/ns_set.cpp:448
+#: modules/commands/ns_set.cpp:453
 msgid "address"
 msgstr ""
 
-#: modules/commands/bs_set.cpp:159
+#: modules/commands/bs_set.cpp:162
 #, fuzzy
 msgid "botname {ON|OFF}"
 msgstr "SASET nickname AUTOOP {ON | OFF}"
 
-#: modules/commands/bs_assign.cpp:91 modules/commands/cs_info.cpp:20
-#: modules/commands/cs_suspend.cpp:152 modules/commands/cs_getkey.cpp:20
-#: modules/commands/cs_log.cpp:106 modules/commands/cs_sync.cpp:20
 #: modules/extra/stats/cs_fantasy_top.cpp:39
 #: modules/extra/stats/cs_fantasy_top.cpp:51
+#: modules/commands/cs_suspend.cpp:152 modules/commands/cs_sync.cpp:20
+#: modules/commands/cs_log.cpp:106 modules/commands/bs_assign.cpp:91
+#: modules/commands/cs_info.cpp:20 modules/commands/cs_getkey.cpp:20
 #, fuzzy
 msgid "channel"
 msgstr "DROP #szoba"
 
-#: modules/commands/cs_set.cpp:135
+#: modules/commands/cs_set.cpp:138
 #, fuzzy
 msgid "channel bantype"
 msgstr "ACT #szoba szöveg"
@@ -639,8 +639,8 @@ msgstr "BAN #channel nick [reason]"
 msgid "channel modes"
 msgstr "MODE szoba mód"
 
-#: modules/commands/bs_assign.cpp:20 modules/commands/cs_set.cpp:264
-#: modules/commands/cs_set.cpp:961
+#: modules/commands/cs_set.cpp:267 modules/commands/cs_set.cpp:950
+#: modules/commands/bs_assign.cpp:20
 #, fuzzy
 msgid "channel nick"
 msgstr "UNBAN #szoba [nick]"
@@ -660,7 +660,7 @@ msgstr "CLEAR #szoba mit?"
 msgid "channel text"
 msgstr "ACT #szoba szöveg"
 
-#: modules/commands/bs_set.cpp:88
+#: modules/commands/bs_set.cpp:91
 #, fuzzy
 msgid "channel time"
 msgstr "ACT #szoba szöveg"
@@ -693,7 +693,7 @@ msgstr "MODE szoba mód"
 msgid "channel ADD word [SINGLE | START | END]"
 msgstr ""
 
-#: modules/commands/cs_akick.cpp:423
+#: modules/commands/cs_akick.cpp:435
 #, fuzzy
 msgid "channel ADD {nick | mask} [reason]"
 msgstr "BAN #channel nick [reason]"
@@ -703,14 +703,14 @@ msgstr "BAN #channel nick [reason]"
 msgid "channel APPEND topic"
 msgstr "TOPIC #szoba [topic]"
 
-#: modules/commands/bs_badwords.cpp:374 modules/commands/cs_xop.cpp:484
-#: modules/commands/cs_entrymsg.cpp:197 modules/commands/cs_flags.cpp:376
-#: modules/commands/cs_akick.cpp:428 modules/commands/cs_access.cpp:503
+#: modules/commands/cs_access.cpp:503 modules/commands/cs_flags.cpp:376
+#: modules/commands/cs_xop.cpp:484 modules/commands/cs_entrymsg.cpp:197
+#: modules/commands/bs_badwords.cpp:374 modules/commands/cs_akick.cpp:440
 #, fuzzy
 msgid "channel CLEAR"
 msgstr "DROP #szoba"
 
-#: modules/commands/cs_mode.cpp:726
+#: modules/commands/cs_mode.cpp:736
 #, fuzzy
 msgid "channel CLEAR [what]"
 msgstr "TOPIC #szoba [topic]"
@@ -725,12 +725,12 @@ msgstr "DROP #szoba"
 msgid "channel DEL num"
 msgstr "MODE szoba mód"
 
-#: modules/commands/cs_xop.cpp:482 modules/commands/cs_access.cpp:500
+#: modules/commands/cs_access.cpp:500 modules/commands/cs_xop.cpp:482
 #, fuzzy
 msgid "channel DEL {mask | entry-num | list}"
 msgstr "DEL [#szoba] { szám | list | ALL}"
 
-#: modules/commands/cs_akick.cpp:424
+#: modules/commands/cs_akick.cpp:436
 #, fuzzy
 msgid "channel DEL {nick | mask | entry-num | list}"
 msgstr "AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
@@ -740,22 +740,22 @@ msgstr "AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
 msgid "channel DEL {word | entry-num | list}"
 msgstr "DEL [#szoba] { szám | list | ALL}"
 
-#: modules/commands/cs_akick.cpp:427
+#: modules/commands/cs_akick.cpp:439
 msgid "channel ENFORCE"
 msgstr ""
 
-#: modules/commands/cs_entrymsg.cpp:196 modules/commands/cs_access.cpp:744
+#: modules/commands/cs_access.cpp:744 modules/commands/cs_entrymsg.cpp:196
 #, fuzzy
 msgid "channel LIST"
 msgstr "DROP #szoba"
 
-#: modules/commands/cs_akick.cpp:425
+#: modules/commands/cs_akick.cpp:437
 #, fuzzy
 msgid "channel LIST [mask | entry-num | list]"
 msgstr "AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
 
-#: modules/commands/bs_badwords.cpp:373 modules/commands/cs_xop.cpp:483
-#: modules/commands/cs_access.cpp:501
+#: modules/commands/cs_access.cpp:501 modules/commands/cs_xop.cpp:483
+#: modules/commands/bs_badwords.cpp:373
 #, fuzzy
 msgid "channel LIST [mask | list]"
 msgstr "AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
@@ -764,7 +764,7 @@ msgstr "AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
 msgid "channel LIST [mask | +flags]"
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:724
+#: modules/commands/cs_mode.cpp:734
 #, fuzzy
 msgid "channel LOCK {ADD|DEL|SET|LIST} [what]"
 msgstr "AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
@@ -774,7 +774,7 @@ msgstr "AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
 msgid "channel RESET"
 msgstr "SET szoba GREET {ON|OFF}"
 
-#: modules/commands/cs_mode.cpp:725
+#: modules/commands/cs_mode.cpp:735
 #, fuzzy
 msgid "channel SET modes"
 msgstr "MODE szoba mód"
@@ -783,7 +783,7 @@ msgstr "MODE szoba mód"
 msgid "channel SET type level"
 msgstr ""
 
-#: modules/commands/cs_akick.cpp:426
+#: modules/commands/cs_akick.cpp:438
 #, fuzzy
 msgid "channel VIEW [mask | entry-num | list]"
 msgstr "AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
@@ -793,12 +793,12 @@ msgstr "AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
 msgid "channel VIEW [mask | list]"
 msgstr "DEL [#szoba] { szám | list | ALL}"
 
-#: modules/commands/cs_set.cpp:202 modules/commands/cs_register.cpp:20
+#: modules/commands/cs_register.cpp:20 modules/commands/cs_set.cpp:205
 #, fuzzy
 msgid "channel [description]"
 msgstr "REGISTER #szoba leírás"
 
-#: modules/commands/cs_unban.cpp:20 modules/commands/cs_invite.cpp:20
+#: modules/commands/cs_invite.cpp:20 modules/commands/cs_unban.cpp:20
 #, fuzzy
 msgid "channel [nick]"
 msgstr "UNBAN #szoba [nick]"
@@ -808,7 +808,7 @@ msgstr "UNBAN #szoba [nick]"
 msgid "channel [parameters]"
 msgstr "CLEAR #szoba mit?"
 
-#: modules/commands/cs_status.cpp:20 modules/commands/cs_mode.cpp:797
+#: modules/commands/cs_mode.cpp:807 modules/commands/cs_status.cpp:20
 #, fuzzy
 msgid "channel [user]"
 msgstr "UNBAN #szoba [nick]"
@@ -838,8 +838,8 @@ msgstr "TOPIC #szoba [topic]"
 msgid "channel [UNLOCK|LOCK]"
 msgstr "DROP #szoba"
 
-#: modules/commands/bs_assign.cpp:154 modules/commands/greet.cpp:20
-#: modules/fantasy.cpp:20
+#: modules/fantasy.cpp:20 modules/commands/greet.cpp:20
+#: modules/commands/bs_assign.cpp:154
 #, fuzzy
 msgid "channel {ON|OFF}"
 msgstr "SET #szoba XOP {ON | OFF}"
@@ -871,18 +871,18 @@ msgstr "SET #szoba XOP {ON | OFF}"
 msgid "channel {DIS | DISABLE} type"
 msgstr ""
 
-#: modules/commands/cs_set.cpp:884
+#: modules/commands/cs_set.cpp:873
 #, fuzzy
 msgid "channel {ON | LEVEL | OFF}"
 msgstr "SET #szoba SIGNKICK {ON | LEVEL | OFF}"
 
-#: modules/commands/cs_list.cpp:181 modules/commands/bs_kick.cpp:792
-#: modules/commands/bs_kick.cpp:857 modules/commands/cs_topic.cpp:21
-#: modules/commands/cs_set.cpp:72 modules/commands/cs_set.cpp:333
-#: modules/commands/cs_set.cpp:398 modules/commands/cs_set.cpp:470
-#: modules/commands/cs_set.cpp:633 modules/commands/cs_set.cpp:695
-#: modules/commands/cs_set.cpp:758 modules/commands/cs_set.cpp:822
-#: modules/commands/cs_set.cpp:1047 modules/extra/stats/m_chanstats.cpp:18
+#: modules/extra/stats/m_chanstats.cpp:18 modules/commands/cs_set.cpp:75
+#: modules/commands/cs_set.cpp:336 modules/commands/cs_set.cpp:401
+#: modules/commands/cs_set.cpp:473 modules/commands/cs_set.cpp:622
+#: modules/commands/cs_set.cpp:684 modules/commands/cs_set.cpp:747
+#: modules/commands/cs_set.cpp:811 modules/commands/cs_set.cpp:1042
+#: modules/commands/bs_kick.cpp:792 modules/commands/bs_kick.cpp:857
+#: modules/commands/cs_topic.cpp:21 modules/commands/cs_list.cpp:181
 #, fuzzy
 msgid "channel {ON | OFF}"
 msgstr "SET #szoba XOP {ON | OFF}"
@@ -891,17 +891,17 @@ msgstr "SET #szoba XOP {ON | OFF}"
 msgid "email"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:786
+#: modules/commands/ns_set.cpp:794
 #, fuzzy
 msgid "language"
 msgstr "SET LANGUAGE szám"
 
-#: modules/commands/ms_staff.cpp:25 modules/commands/ms_sendall.cpp:25
+#: modules/commands/ms_sendall.cpp:25 modules/commands/ms_staff.cpp:25
 #, fuzzy
 msgid "memo-text"
 msgstr "STAFF memo-text"
 
-#: modules/commands/greet.cpp:84 modules/commands/gl_global.cpp:22
+#: modules/commands/gl_global.cpp:22 modules/commands/greet.cpp:84
 #, fuzzy
 msgid "message"
 msgstr "GLOBAL üzenet"
@@ -911,18 +911,18 @@ msgstr "GLOBAL üzenet"
 msgid "modname"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:327
+#: modules/commands/ns_set.cpp:330
 msgid "new-display"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:117
+#: modules/commands/ns_set.cpp:120
 #, fuzzy
 msgid "new-password"
 msgstr "GROUP célnick jelszó"
 
-#: modules/commands/cs_seen.cpp:262 modules/commands/hs_del.cpp:20
-#: modules/commands/hs_del.cpp:60 modules/commands/hs_request.cpp:192
-#: modules/commands/ms_check.cpp:20 modules/extra/stats/cs_fantasy_stats.cpp:52
+#: modules/extra/stats/cs_fantasy_stats.cpp:52 modules/commands/hs_del.cpp:20
+#: modules/commands/hs_del.cpp:60 modules/commands/ms_check.cpp:20
+#: modules/commands/hs_request.cpp:192 modules/commands/cs_seen.cpp:262
 #, fuzzy
 msgid "nick"
 msgstr "INFO nick"
@@ -957,13 +957,13 @@ msgstr "SVSNICK nick újnick "
 msgid "nick [reason]"
 msgstr "BAN #channel nick [reason]"
 
-#: modules/commands/ns_getpass.cpp:20 modules/commands/ns_suspend.cpp:161
-#: modules/commands/ns_drop.cpp:19
+#: modules/commands/ns_getpass.cpp:20 modules/commands/ns_drop.cpp:19
+#: modules/commands/ns_suspend.cpp:161
 #, fuzzy
 msgid "nickname"
 msgstr "CHECK nicknév "
 
-#: modules/commands/ns_set.cpp:538
+#: modules/commands/ns_set.cpp:546
 #, fuzzy
 msgid "nickname address"
 msgstr "FORBID nicknév indok"
@@ -973,7 +973,7 @@ msgstr "FORBID nicknév indok"
 msgid "nickname email"
 msgstr "FORBID nicknév indok"
 
-#: modules/commands/ns_set.cpp:864
+#: modules/commands/ns_set.cpp:872
 #, fuzzy
 msgid "nickname language"
 msgstr "FORBID nicknév indok"
@@ -983,17 +983,17 @@ msgstr "FORBID nicknév indok"
 msgid "nickname message"
 msgstr "FORBID nicknév indok"
 
-#: modules/commands/ns_set.cpp:396
+#: modules/commands/ns_set.cpp:399
 #, fuzzy
 msgid "nickname new-display"
 msgstr "FORBID nicknév indok"
 
-#: modules/commands/ns_set.cpp:170
+#: modules/commands/ns_set.cpp:173
 #, fuzzy
 msgid "nickname new-password"
 msgstr "GHOST nicknév [jelszó]"
 
-#: modules/commands/ns_set_misc.cpp:169
+#: modules/commands/ns_set_misc.cpp:170
 #, fuzzy
 msgid "nickname [parameter]"
 msgstr "GHOST nicknév [jelszó]"
@@ -1013,15 +1013,15 @@ msgstr "FORBID nicknév indok"
 msgid "nickname {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"
 msgstr "SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"
 
-#: modules/commands/ns_set.cpp:299 modules/commands/ns_set.cpp:623
-#: modules/commands/ns_set.cpp:977 modules/commands/ns_set.cpp:1068
-#: modules/commands/ns_set.cpp:1097 modules/commands/ns_list.cpp:252
-#: modules/extra/stats/m_chanstats.cpp:130
+#: modules/extra/stats/m_chanstats.cpp:130 modules/commands/ns_set.cpp:302
+#: modules/commands/ns_set.cpp:631 modules/commands/ns_set.cpp:985
+#: modules/commands/ns_set.cpp:1076 modules/commands/ns_set.cpp:1105
+#: modules/commands/ns_list.cpp:252
 #, fuzzy
 msgid "nickname {ON | OFF}"
 msgstr "SASET nickname AUTOOP {ON | OFF}"
 
-#: modules/commands/ns_set.cpp:752
+#: modules/commands/ns_set.cpp:760
 #, fuzzy
 msgid "nickname {ON | QUICK | IMMED | OFF}"
 msgstr "SASET nickname KILL {ON | QUICK | IMMED | OFF}"
@@ -1041,11 +1041,11 @@ msgstr "SEND {nick | #szoba} memo-szöveg"
 msgid "option channel {ON|OFF} [settings]"
 msgstr "KICK #szoba opció {ON|OFF} [beállítások]"
 
-#: modules/commands/ns_set.cpp:72
+#: modules/commands/ns_set.cpp:75
 msgid "option nickname parameters"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:20 modules/commands/ms_set.cpp:207
+#: modules/commands/ms_set.cpp:207 modules/commands/ns_set.cpp:20
 #, fuzzy
 msgid "option parameters"
 msgstr "SET opció beállítás"
@@ -1099,25 +1099,6 @@ msgstr "MODE szoba mód"
 #, fuzzy
 msgid "user [reason]"
 msgstr "JUPE szervernév [leírás]"
-
-#: modules/pseudoclients/nickserv.cpp:496
-#, fuzzy, c-format
-msgid ""
-" \n"
-"NOTICE: This service is intended to provide a way for\n"
-"IRC users to ensure their identity is not compromised.\n"
-"It is NOT intended to facilitate \"stealing\" of\n"
-"nicknames or other malicious actions. Abuse of %s\n"
-"will result in, at minimum, loss of the abused\n"
-"nickname(s)."
-msgstr ""
-"Megjegyzés: Ez a szolgáltatás szeretné biztosítani az \n"
-"IRC felhasználok számára hogy a kilétüket ne lehessen \n"
-"kompromitálni. Egyáltalán NEM azt szolgálja, hogy \n"
-"lehetőséget nyújtson nicknevek \"lopására\" vagy más\n"
-"erkölcstelen akciókra. A %s segítségével elkövetett\n"
-"visszaélés jutalma minimum az visszaélő nickjének\n"
-"elvesztése."
 
 #: modules/commands/os_sxline.cpp:440
 #, fuzzy
@@ -1395,7 +1376,7 @@ msgstr ""
 "hogy a szoba jelszót használnának, és megnézhetika az\n"
 "access, AKICK, és beállitási szint listát a csatornán."
 
-#: modules/commands/bs_set.cpp:144
+#: modules/commands/bs_set.cpp:147
 msgid ""
 " \n"
 "Sets the time bot bans expire in. If enabled, any bans placed by\n"
@@ -1468,7 +1449,7 @@ msgstr ""
 "és írd be: /msg %s HELP SET XOP hogy megnézd, hogyan \n"
 "tudsz váltani az xOP rendszerről access lista rendszerre."
 
-#: modules/commands/cs_akick.cpp:496
+#: modules/commands/cs_akick.cpp:508
 #, c-format
 msgid ""
 " \n"
@@ -1703,7 +1684,7 @@ msgstr ""
 "\n"
 "Korlátozva Szervíz adminoknak."
 
-#: modules/commands/bs_set.cpp:196
+#: modules/commands/bs_set.cpp:199
 #, fuzzy
 msgid ""
 " \n"
@@ -1725,7 +1706,7 @@ msgid ""
 "above commands."
 msgstr ""
 
-#: modules/commands/os_oper.cpp:168
+#: modules/commands/os_oper.cpp:167
 #, c-format
 msgid "   %s is online using this oper block."
 msgstr ""
@@ -1740,7 +1721,7 @@ msgstr ""
 msgid "   Providing service: %s"
 msgstr "Modul parancsai: /msg %s %s"
 
-#: modules/commands/os_oper.cpp:164
+#: modules/commands/os_oper.cpp:163
 msgid "   This oper is configured in the configuration file."
 msgstr ""
 
@@ -1766,7 +1747,7 @@ msgstr ""
 msgid "\"Jupiter\" a server"
 msgstr "    JUPE        Létrehoz egy \"Jupiter\" álszervert."
 
-#: modules/commands/os_oper.cpp:162
+#: modules/commands/os_oper.cpp:161
 #, fuzzy, c-format
 msgid "%-8s %s"
 msgstr "%-20s %s@%s"
@@ -1810,7 +1791,7 @@ msgstr "%d botok rendelkezésre állnak."
 msgid "%d modules loaded."
 msgstr "%d Modul betöltve."
 
-#: modules/commands/ns_group.cpp:342
+#: modules/commands/ns_group.cpp:357
 #, fuzzy, c-format
 msgid "%d nickname(s) in the group."
 msgstr "%d nicknév van a csoportban."
@@ -1913,9 +1894,9 @@ msgstr ""
 msgid "%s (minimum %d/%d%%)"
 msgstr "\tCaps Lockért kirúgás: %s (minimum %d/%d%%)"
 
-#: modules/commands/cs_flags.cpp:295 modules/commands/cs_access.cpp:245
-#: modules/commands/cs_access.cpp:349 modules/commands/cs_access.cpp:454
-#: modules/commands/cs_access.cpp:467
+#: modules/commands/cs_access.cpp:245 modules/commands/cs_access.cpp:349
+#: modules/commands/cs_access.cpp:454 modules/commands/cs_access.cpp:467
+#: modules/commands/cs_flags.cpp:295
 #, c-format
 msgid "%s access list is empty."
 msgstr "%s hozzáférési listája üres."
@@ -1930,8 +1911,8 @@ msgstr "%s hozzáadva a (%s) csatorna autokick listájához"
 msgid "%s already exists."
 msgstr "%s nevű bot már létezik."
 
-#: modules/commands/cs_akick.cpp:177 modules/commands/cs_akick.cpp:362
-#: modules/commands/cs_akick.cpp:375
+#: modules/commands/cs_akick.cpp:202 modules/commands/cs_akick.cpp:387
+#: modules/commands/cs_akick.cpp:400
 #, c-format
 msgid "%s autokick list is empty."
 msgstr "%s autokick listája üres."
@@ -1941,13 +1922,13 @@ msgstr "%s autokick listája üres."
 msgid "%s bad words list is empty."
 msgstr "%s tiltott szavak listája üres."
 
-#: modules/commands/cs_set.cpp:1004
+#: modules/commands/cs_set.cpp:993
 #, fuzzy, c-format
 msgid "%s cannot be the successor on channel %s as they are the founder."
 msgstr "%s nem lehet a %s csatorna successora, mert ő a founder is."
 
-#: modules/pseudoclients/global.cpp:90 modules/pseudoclients/operserv.cpp:287
-#: modules/pseudoclients/hostserv.cpp:78
+#: modules/pseudoclients/global.cpp:90 modules/pseudoclients/hostserv.cpp:78
+#: modules/pseudoclients/operserv.cpp:287
 #, c-format
 msgid "%s commands:"
 msgstr "%s parancsok:"
@@ -1992,7 +1973,7 @@ msgstr "%s listáján van 1 üzenet."
 msgid "%s currently has no memos."
 msgstr "%s üzenetlistája üres."
 
-#: modules/commands/os_forbid.cpp:332
+#: modules/commands/os_forbid.cpp:344
 #, fuzzy, c-format
 msgid "%s deleted from the %s forbid list."
 msgstr "A %s szó törölve %s tiltott szavak listájából."
@@ -2319,7 +2300,7 @@ msgstr "%s jelenleg online."
 msgid "<unknown>"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:497
+#: modules/commands/ns_set.cpp:504
 #, fuzzy, c-format
 msgid ""
 "A confirmation e-mail has been sent to %s. Follow the instructions in it to "
@@ -2397,7 +2378,7 @@ msgstr "CHANKILL [+lejárat] {#szoba} [indok]"
 msgid "ADD [nickname] [fingerprint]"
 msgstr "FORBID nicknév indok"
 
-#: modules/commands/os_akill.cpp:386 modules/commands/os_sxline.cpp:659
+#: modules/commands/os_sxline.cpp:659 modules/commands/os_akill.cpp:386
 #, fuzzy
 msgid "ADD [+expiry] mask reason"
 msgstr "CHANKILL [+lejárat] {#szoba} [indok]"
@@ -2407,7 +2388,7 @@ msgstr "CHANKILL [+lejárat] {#szoba} [indok]"
 msgid "ADD [+expiry] mask:reason"
 msgstr "CHANKILL [+lejárat] {#szoba} [indok]"
 
-#: modules/commands/os_forbid.cpp:145
+#: modules/commands/os_forbid.cpp:157
 #, fuzzy
 msgid "ADD {NICK|CHAN|EMAIL|REGISTER} [+expiry] entry reason"
 msgstr "CHANKILL [+lejárat] {#szoba} [indok]"
@@ -2424,7 +2405,7 @@ msgstr ""
 msgid "ADDZONE zone.name"
 msgstr ""
 
-#: modules/commands/cs_akick.cpp:407
+#: modules/commands/cs_akick.cpp:38
 #, c-format
 msgid "AKICK ENFORCE for %s complete; %d users were affected."
 msgstr ""
@@ -2481,7 +2462,7 @@ msgstr "%s hozzáférési szintjeinek beállításai:"
 msgid "Access levels for %s reset to defaults."
 msgstr "%s szintjei visszaállítva az alapértékekre."
 
-#: modules/commands/ns_access.cpp:87 modules/commands/cs_access.cpp:439
+#: modules/commands/cs_access.cpp:439 modules/commands/ns_access.cpp:87
 #, fuzzy, c-format
 msgid "Access list for %s:"
 msgstr "%s hozzáférési listája:"
@@ -2495,15 +2476,15 @@ msgstr ""
 "Access to this command requires the permission %s to be present in your "
 "opertype."
 
-#: modules/commands/ns_identify.cpp:94 modules/commands/ns_cert.cpp:368
-#: modules/commands/ns_cert.cpp:392
+#: modules/commands/ns_cert.cpp:368 modules/commands/ns_cert.cpp:392
+#: modules/commands/ns_identify.cpp:94
 #, c-format
 msgid ""
 "Account %s has already reached the maximum number of simultaneous logins "
 "(%u)."
 msgstr ""
 
-#: modules/commands/cs_set.cpp:694
+#: modules/commands/cs_set.cpp:683
 #, fuzzy
 msgid "Activate security features"
 msgstr "    SECURE        Aktiválja a %s biztonsági lehetőségeit"
@@ -2542,7 +2523,7 @@ msgstr ""
 msgid "Added IP %s to %s."
 msgstr ""
 
-#: modules/commands/os_forbid.cpp:227
+#: modules/commands/os_forbid.cpp:239
 #, c-format
 msgid "Added a forbid on %s of type %s to expire on %s."
 msgstr ""
@@ -3110,7 +3091,7 @@ msgstr ""
 "\n"
 "Elérhető opciók:"
 
-#: modules/commands/os_oper.cpp:251
+#: modules/commands/os_oper.cpp:250
 msgid ""
 "Allows you to change and view Services Operators.\n"
 "Note that operators removed by this command but are still set in\n"
@@ -3128,7 +3109,7 @@ msgid ""
 "     MODIFY nickserv forcemail no"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:984
+#: modules/commands/ns_set.cpp:992
 #, fuzzy
 msgid ""
 "Allows you to choose the way Services are communicating with\n"
@@ -3141,7 +3122,7 @@ msgstr ""
 "the given user. With MSG set, Services will use messages,\n"
 "else they'll use notices."
 
-#: modules/commands/ns_set.cpp:958
+#: modules/commands/ns_set.cpp:966
 #, fuzzy, c-format
 msgid ""
 "Allows you to choose the way Services are communicating with\n"
@@ -3295,7 +3276,7 @@ msgstr "    GREET      Köszöntő üzenet társítása a nicknevedhez"
 msgid "Associate an E-mail address with the channel"
 msgstr "    EMAIL      Egy E-mail cím társítása a nicknevedhez"
 
-#: modules/commands/ns_set.cpp:447
+#: modules/commands/ns_set.cpp:452
 #, fuzzy
 msgid "Associate an E-mail address with your nickname"
 msgstr "    EMAIL      Egy E-mail cím társítása a nicknevedhez"
@@ -3305,12 +3286,12 @@ msgstr "    EMAIL      Egy E-mail cím társítása a nicknevedhez"
 msgid "Associate oper info with a nick or channel"
 msgstr "ASSIGN             Társít egy botot a csatornához"
 
-#: modules/commands/ns_set.cpp:550
+#: modules/commands/ns_set.cpp:558
 #, fuzzy
 msgid "Associates the given E-mail address with the nickname."
 msgstr "    EMAIL      Egy E-mail cím társítása a nicknevedhez"
 
-#: modules/commands/ns_set.cpp:525
+#: modules/commands/ns_set.cpp:533
 #, fuzzy
 msgid ""
 "Associates the given E-mail address with your nickname.\n"
@@ -3323,11 +3304,11 @@ msgstr ""
 "Ez az E-mail cím szerepelni fog az INFO-id között,\n"
 "amit bárki lekérhet az INFO paranccsal."
 
-#: modules/commands/ns_set.cpp:1307
+#: modules/commands/ns_set.cpp:1315
 msgid "Auto-op"
 msgstr "Auto-op"
 
-#: modules/commands/cs_akick.cpp:349
+#: modules/commands/cs_akick.cpp:374
 #, c-format
 msgid "Autokick list for %s:"
 msgstr "%s autokick listája:"
@@ -3352,17 +3333,17 @@ msgstr ""
 msgid "Automatic voice on join"
 msgstr ""
 
-#: modules/commands/os_oper.cpp:197
+#: modules/commands/os_oper.cpp:196
 #, fuzzy, c-format
 msgid "Available commands for %s:"
 msgstr "Nincs ezzel kapcsolatban segítség: %s."
 
-#: modules/commands/os_oper.cpp:176
+#: modules/commands/os_oper.cpp:175
 #, fuzzy
 msgid "Available opertypes:"
 msgstr "Nincs ezzel kapcsolatban segítség: %s."
 
-#: modules/commands/os_oper.cpp:219
+#: modules/commands/os_oper.cpp:218
 #, c-format
 msgid "Available privileges for %s:"
 msgstr ""
@@ -3386,7 +3367,7 @@ msgstr "%s hozzáférési listája:"
 msgid "Bad words list is now empty."
 msgstr "Tiltott szó lista üres."
 
-#: modules/commands/bs_set.cpp:126
+#: modules/commands/bs_set.cpp:129
 msgid "Ban expiry may not be longer than 1 day."
 msgstr ""
 
@@ -3399,7 +3380,7 @@ msgstr "%s nevű bot már létezik."
 msgid "Ban type"
 msgstr ""
 
-#: modules/commands/cs_set.cpp:171
+#: modules/commands/cs_set.cpp:174
 #, c-format
 msgid "Ban type for channel %s is now #%d."
 msgstr "A megadott csatorna (%s) új ban típusa: #%d."
@@ -3497,12 +3478,12 @@ msgstr "Nincs Bot mód most ONa %s szobán."
 msgid "Bot %s is not deletable."
 msgstr "A %s nevű bot törölve."
 
-#: modules/commands/bs_set.cpp:138
+#: modules/commands/bs_set.cpp:141
 #, c-format
 msgid "Bot bans will automatically expire after %s."
 msgstr ""
 
-#: modules/commands/bs_set.cpp:136
+#: modules/commands/bs_set.cpp:139
 #, fuzzy
 msgid "Bot bans will no longer automatically expire."
 msgstr "Services will no longer autoop %s in channels."
@@ -3656,8 +3637,8 @@ msgstr "A Bot nem fog kirúgni flood miatt."
 msgid "Bot won't kick for repeats anymore."
 msgstr "A Bot nem fog kirúgni ismétlés miatt."
 
-#: modules/commands/os_session.cpp:514 modules/commands/os_sxline.cpp:201
-#: modules/commands/cs_access.cpp:472
+#: modules/commands/cs_access.cpp:472 modules/commands/os_sxline.cpp:201
+#: modules/commands/os_session.cpp:514
 msgid "By"
 msgstr ""
 
@@ -3786,7 +3767,7 @@ msgstr ""
 msgid "Certificate list for %s:"
 msgstr "%s hozzáférési listája:"
 
-#: modules/commands/cs_set.cpp:539 modules/commands/cs_set.cpp:581
+#: modules/commands/cs_set.cpp:528 modules/commands/cs_set.cpp:570
 msgid "ChanServ is required to enable persist on this network."
 msgstr ""
 
@@ -3795,7 +3776,7 @@ msgstr ""
 msgid "Change channel modes"
 msgstr "%s váltóztatott a módodon."
 
-#: modules/commands/ns_set.cpp:897
+#: modules/commands/ns_set.cpp:905
 #, fuzzy
 msgid "Change the communication method of Services"
 msgstr "    MSG        Megváltoztatja a szervízzel való kommunikációt"
@@ -3810,7 +3791,7 @@ msgstr "%s váltóztatott a módodon."
 msgid "Changed usermodes of %s to %s."
 msgstr "%s usermódjai megváltoztatva."
 
-#: modules/commands/ns_set.cpp:408
+#: modules/commands/ns_set.cpp:411
 #, fuzzy
 msgid ""
 "Changes the display used to refer to the nickname group in\n"
@@ -3822,7 +3803,7 @@ msgstr ""
 "szervízben.\tAz új megjelenítésnek a csoport egyik\n"
 "nickjének KELL lennie."
 
-#: modules/commands/ns_set.cpp:384
+#: modules/commands/ns_set.cpp:387
 #, fuzzy
 msgid ""
 "Changes the display used to refer to your nickname group in\n"
@@ -3834,7 +3815,7 @@ msgstr ""
 "szervízben.\tAz új megjelenítésnek a csoport egyik\n"
 "nickjének KELL lennie."
 
-#: modules/commands/cs_set.cpp:321
+#: modules/commands/cs_set.cpp:324
 #, fuzzy
 msgid ""
 "Changes the founder of a channel. The new nickname must\n"
@@ -3845,7 +3826,7 @@ msgstr ""
 "Megváltoztatja a szoba founderjét.\n"
 "Az új nicknév regisztrált kell hogy legyen!"
 
-#: modules/commands/ns_set.cpp:876
+#: modules/commands/ns_set.cpp:884
 #, fuzzy
 msgid ""
 "Changes the language Services uses when sending messages to\n"
@@ -3858,7 +3839,7 @@ msgstr ""
 "írja.(Például: amikor válaszol egy parancsra, amit te \n"
 "adtál ki). A sorszám alapján válaszd ki a nyelvezetet:"
 
-#: modules/commands/ns_set.cpp:840
+#: modules/commands/ns_set.cpp:848
 #, fuzzy
 msgid ""
 "Changes the language Services uses when sending messages to\n"
@@ -3871,7 +3852,7 @@ msgstr ""
 "írja.(Például: amikor válaszol egy parancsra, amit te \n"
 "adtál ki). A sorszám alapján válaszd ki a nyelvezetet:"
 
-#: modules/commands/ns_set.cpp:224
+#: modules/commands/ns_set.cpp:227
 #, fuzzy
 msgid "Changes the password used to identify as the nick's owner."
 msgstr ""
@@ -3879,7 +3860,7 @@ msgstr ""
 "\n"
 "Megváltoztatja a nicknév tulajdonosának jelszavát."
 
-#: modules/commands/ns_set.cpp:158
+#: modules/commands/ns_set.cpp:161
 #, fuzzy
 msgid ""
 "Changes the password used to identify you as the nick's\n"
@@ -3889,13 +3870,17 @@ msgstr ""
 "\n"
 "Megváltoztatja a nicknév tulajdonosának jelszavát."
 
-#: modules/commands/cs_set.cpp:1028
+#: modules/commands/cs_set.cpp:1017
 #, fuzzy
 msgid ""
 "Changes the successor of a channel. If the founder's\n"
 "nickname expires or is dropped while the channel is still\n"
 "registered, the successor will become the new founder of the\n"
-"channel. The new nickname must be a registered one."
+"channel. The successor's nickname must be a registered one.\n"
+"If there's no successor set, then the first nickname on the\n"
+"access list (with the highest access, if applicable) will\n"
+"become the new founder, but if the access list is empty, the\n"
+"channel will be dropped."
 msgstr ""
 "Syntax: %s #szoba SUCCESSOR nick\n"
 "\n"
@@ -3932,22 +3917,22 @@ msgstr "The channel %s has no key."
 msgid "Channel %s is already registered!"
 msgstr "A megadott csatorna %s már regisztrált!"
 
-#: modules/commands/os_forbid.cpp:512
+#: modules/commands/os_forbid.cpp:524
 #, fuzzy, c-format
 msgid "Channel %s is forbidden by %s: %s"
 msgstr "Ez a szoba a %s adatbázisában regisztrált."
 
-#: modules/commands/os_forbid.cpp:514
+#: modules/commands/os_forbid.cpp:526
 #, fuzzy, c-format
 msgid "Channel %s is forbidden."
 msgstr "Channel %s is now persistant."
 
-#: modules/commands/cs_set.cpp:591
+#: modules/commands/cs_set.cpp:580
 #, fuzzy, c-format
 msgid "Channel %s is no longer persistent."
 msgstr "Channel %s is no longer persistant."
 
-#: modules/commands/cs_set.cpp:553
+#: modules/commands/cs_set.cpp:542
 #, fuzzy, c-format
 msgid "Channel %s is now persistent."
 msgstr "Channel %s is now persistant."
@@ -3977,12 +3962,12 @@ msgstr "(%s) szoba használata felfüggesztve."
 msgid "Channel %s registered under your account: %s"
 msgstr "Ez a nicknév: %s számodra lett regisztrálva: %s"
 
-#: modules/commands/cs_set.cpp:1081
+#: modules/commands/cs_set.cpp:1076
 #, c-format
 msgid "Channel %s will expire."
 msgstr "A megadott csatorna (%s) el fog évülni."
 
-#: modules/commands/cs_set.cpp:1075
+#: modules/commands/cs_set.cpp:1070
 #, c-format
 msgid "Channel %s will not expire."
 msgstr "A megadott csatorna (%s) nem fog elévülni."
@@ -3992,12 +3977,12 @@ msgstr "A megadott csatorna (%s) nem fog elévülni."
 msgid "Channel %s %s list has been cleared."
 msgstr "Channel %s AOP list has been cleared."
 
-#: modules/commands/cs_flags.cpp:361 modules/commands/cs_access.cpp:486
+#: modules/commands/cs_access.cpp:486 modules/commands/cs_flags.cpp:361
 #, c-format
 msgid "Channel %s access list has been cleared."
 msgstr "Channel %s access list has been cleared."
 
-#: modules/commands/cs_akick.cpp:416
+#: modules/commands/cs_akick.cpp:428
 #, c-format
 msgid "Channel %s akick list has been cleared."
 msgstr "Channel %s akick list has been cleared."
@@ -4029,8 +4014,8 @@ msgstr ""
 "Azon csatornák, ahol %s nicknek hozzáférése van:\n"
 "  Sorszám  Csatorna              Szint    Meghatározás"
 
-#: modules/commands/cs_xop.cpp:139 modules/commands/cs_flags.cpp:97
-#: modules/commands/cs_access.cpp:142
+#: modules/commands/cs_access.cpp:142 modules/commands/cs_flags.cpp:97
+#: modules/commands/cs_xop.cpp:139
 #, fuzzy
 msgid "Channels may not be on access lists."
 msgstr "%s nem található a (%s) csatorna hozzáférési listáján."
@@ -4196,7 +4181,7 @@ msgstr "KICK               Konfigurálja a kirúgásokat"
 msgid "Configures reverses kicker"
 msgstr "KICK               Konfigurálja a kirúgásokat"
 
-#: modules/commands/bs_set.cpp:87
+#: modules/commands/bs_set.cpp:90
 #, fuzzy
 msgid "Configures the time bot bans expire in"
 msgstr "SET                Konfigurálja a bot opcióit"
@@ -4211,7 +4196,7 @@ msgstr "KICK               Konfigurálja a kirúgásokat"
 msgid "Confirm a passcode"
 msgstr "    CONFIRM    Confirm a nickserv auth code"
 
-#: modules/commands/cs_mode.cpp:723
+#: modules/commands/cs_mode.cpp:733
 #, fuzzy
 msgid "Control modes and mode locks on a channel"
 msgstr "    CLEARMODES  Törli a szoba módot"
@@ -4235,21 +4220,21 @@ msgid "Copy all settings from one channel to another"
 msgstr ""
 "    UNBAN      Remove all bans preventing a user from entering a channel"
 
-#: modules/commands/os_akill.cpp:358 modules/commands/hs_list.cpp:58
-#: modules/commands/os_news.cpp:156 modules/commands/bs_info.cpp:57
-#: modules/commands/cs_mode.cpp:449 modules/commands/os_session.cpp:514
-#: modules/commands/cs_entrymsg.cpp:116 modules/commands/os_sxline.cpp:201
-#: modules/commands/cs_flags.cpp:301 modules/commands/cs_akick.cpp:380
-#: modules/commands/hs_request.cpp:305
+#: modules/commands/hs_list.cpp:58 modules/commands/cs_flags.cpp:301
+#: modules/commands/cs_mode.cpp:449 modules/commands/cs_entrymsg.cpp:116
+#: modules/commands/os_sxline.cpp:201 modules/commands/os_news.cpp:156
+#: modules/commands/hs_request.cpp:305 modules/commands/cs_akick.cpp:405
+#: modules/commands/os_session.cpp:514 modules/commands/bs_info.cpp:57
+#: modules/commands/os_akill.cpp:358
 #, fuzzy
 msgid "Created"
 msgstr "Született: %s"
 
-#: modules/commands/os_akill.cpp:358 modules/commands/hs_list.cpp:58
-#: modules/commands/os_news.cpp:156 modules/commands/cs_mode.cpp:449
-#: modules/commands/cs_entrymsg.cpp:116 modules/commands/os_forbid.cpp:346
-#: modules/commands/cs_flags.cpp:301 modules/commands/cs_akick.cpp:380
-#: modules/commands/os_ignore.cpp:266
+#: modules/commands/hs_list.cpp:58 modules/commands/cs_flags.cpp:301
+#: modules/commands/cs_mode.cpp:449 modules/commands/cs_entrymsg.cpp:116
+#: modules/commands/os_ignore.cpp:266 modules/commands/os_forbid.cpp:358
+#: modules/commands/os_news.cpp:156 modules/commands/cs_akick.cpp:405
+#: modules/commands/os_akill.cpp:358
 #, fuzzy
 msgid "Creator"
 msgstr "Született: %s"
@@ -4318,8 +4303,8 @@ msgstr "FORBID nicknév indok"
 msgid "DEL [nickname] mask"
 msgstr "MODE szoba mód"
 
-#: modules/commands/os_akill.cpp:387 modules/commands/os_sxline.cpp:426
-#: modules/commands/os_sxline.cpp:660
+#: modules/commands/os_sxline.cpp:426 modules/commands/os_sxline.cpp:660
+#: modules/commands/os_akill.cpp:387
 #, fuzzy
 msgid "DEL {mask | entry-num | list | id}"
 msgstr "DEL [#szoba] { szám | list | ALL}"
@@ -4339,7 +4324,7 @@ msgstr "DEL <nick>."
 msgid "DEL {num | ALL}"
 msgstr "Syntax: OPERNEWS DEL {szám | ALL}"
 
-#: modules/commands/os_forbid.cpp:146
+#: modules/commands/os_forbid.cpp:158
 msgid "DEL {NICK|CHAN|EMAIL|REGISTER} entry"
 msgstr ""
 
@@ -4514,7 +4499,7 @@ msgstr "%d bejegyzés törölve a %s AOP listáról."
 msgid "Deleted %d entries from %s access list."
 msgstr "%d bejegyzés törölve (%s) csatorna hozzáférési listájáról."
 
-#: modules/commands/cs_akick.cpp:203
+#: modules/commands/cs_akick.cpp:228
 #, c-format
 msgid "Deleted %d entries from %s autokick list."
 msgstr "%d bejegyzés törölve a (%s) csatorna autokick listájáról."
@@ -4544,7 +4529,7 @@ msgstr "Törölve %d bejegyzés az AKILL listáról."
 msgid "Deleted 1 entry from %s access list."
 msgstr "1 bejegyzés törölve a (%s) csatorna hozzáférési listájáról"
 
-#: modules/commands/cs_akick.cpp:201
+#: modules/commands/cs_akick.cpp:226
 #, c-format
 msgid "Deleted 1 entry from %s autokick list."
 msgstr "1 bejegyzés törölve a (%s) csatorna autokick listájáról."
@@ -4644,18 +4629,18 @@ msgstr ""
 msgid "Depooled %s."
 msgstr ""
 
+#: modules/commands/cs_access.cpp:799 modules/commands/ns_alist.cpp:48
 #: modules/commands/cs_list.cpp:75 modules/commands/cs_info.cpp:53
-#: modules/commands/ns_alist.cpp:48 modules/commands/cs_access.cpp:799
 #, fuzzy
 msgid "Description"
 msgstr "%s csatorna leírás megváltoztatva: %s."
 
-#: modules/commands/cs_set.cpp:236
+#: modules/commands/cs_set.cpp:239
 #, c-format
 msgid "Description of %s changed to %s."
 msgstr "%s csatorna leírás megváltoztatva: %s."
 
-#: modules/commands/cs_set.cpp:242
+#: modules/commands/cs_set.cpp:245
 #, fuzzy, c-format
 msgid "Description of %s unset."
 msgstr "%s csatorna leírás megváltoztatva: %s."
@@ -4808,12 +4793,12 @@ msgid ""
 "this nick."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:505
+#: modules/commands/ns_set.cpp:513
 #, c-format
 msgid "E-mail address for %s changed to %s."
 msgstr "E-mail address for %s changed to %s."
 
-#: modules/commands/ns_set.cpp:511
+#: modules/commands/ns_set.cpp:519
 #, c-format
 msgid "E-mail address for %s unset."
 msgstr "E-mail address for %s unset."
@@ -4902,7 +4887,7 @@ msgstr ""
 msgid "Enable greet messages"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:560
+#: modules/commands/ns_set.cpp:568
 msgid "Enable or disable keep modes"
 msgstr ""
 
@@ -4911,7 +4896,7 @@ msgstr ""
 msgid "Enabled"
 msgstr "%s is enable"
 
-#: modules/commands/cs_set.cpp:121
+#: modules/commands/cs_set.cpp:124
 #, fuzzy, c-format
 msgid ""
 "Enables or disables %s's autoop feature for a\n"
@@ -4925,7 +4910,7 @@ msgstr ""
 "nem szerepelnek a hozzáférési listán nem kaphatnak szoba\n"
 "operátori státuszt."
 
-#: modules/commands/cs_set.cpp:385
+#: modules/commands/cs_set.cpp:388
 #, fuzzy
 msgid ""
 "Enables or disables keepmodes for the given channel. If keep\n"
@@ -4939,21 +4924,21 @@ msgstr ""
 "a topicot a %s megjegyzi miután az utolsó user elhagyja a\n"
 "szobát, és visszaállítja a következő megnyitáskor."
 
-#: modules/commands/ns_set.cpp:635
+#: modules/commands/ns_set.cpp:643
 msgid ""
 "Enables or disables keepmodes for the given nick. If keep\n"
 "modes is enabled, services will remember users' usermodes\n"
 "and attempt to re-set them the next time they authenticate."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:610
+#: modules/commands/ns_set.cpp:618
 msgid ""
 "Enables or disables keepmodes for your nick. If keep\n"
 "modes is enabled, services will remember your usermodes\n"
 "and attempt to re-set them the next time you authenticate."
 msgstr ""
 
-#: modules/commands/cs_set.cpp:744
+#: modules/commands/cs_set.cpp:733
 #, fuzzy
 msgid ""
 "Enables or disables security features for a\n"
@@ -4969,7 +4954,7 @@ msgstr ""
 "jelszavukkal (használván az IDENTIFY parancsot) kaphatnak\n"
 "a szobában jogokat, ha szerepelnek a hozzáférési listán."
 
-#: modules/commands/cs_set.cpp:943
+#: modules/commands/cs_set.cpp:932
 #, fuzzy
 msgid ""
 "Enables or disables signed kicks for a\n"
@@ -4992,7 +4977,7 @@ msgstr ""
 "a neve nem fog szerepelni a kick indokjában.\n"
 "Lásd még: /msg %s HELP LEVELS bővebb információkért. "
 
-#: modules/commands/cs_set.cpp:449
+#: modules/commands/cs_set.cpp:452
 #, fuzzy, c-format
 msgid ""
 "Enables or disables the peace option for a channel.\n"
@@ -5011,7 +4996,7 @@ msgstr ""
 msgid "Enables or disables the private option for a channel."
 msgstr ""
 
-#: modules/commands/cs_set.cpp:682
+#: modules/commands/cs_set.cpp:671
 #, fuzzy
 msgid ""
 "Enables or disables the restricted access option for a\n"
@@ -5024,7 +5009,7 @@ msgstr ""
 "channel.  When restricted access is set, users not on the access list will\n"
 "instead be kicked and banned from the channel."
 
-#: modules/commands/cs_set.cpp:807
+#: modules/commands/cs_set.cpp:796
 #, fuzzy
 msgid ""
 "Enables or disables the secure founder option for a channel.\n"
@@ -5041,7 +5026,7 @@ msgstr ""
 "szoba jelszavát, founderét, jogutódját, de azok nem,\n"
 "akik csak az IDENTIFY parancsot használták a %s-ben."
 
-#: modules/commands/cs_set.cpp:871
+#: modules/commands/cs_set.cpp:860
 #, fuzzy
 msgid ""
 "Enables or disables the secure ops option for a channel.\n"
@@ -5071,7 +5056,7 @@ msgstr ""
 "a topicot a %s megjegyzi miután az utolsó user elhagyja a\n"
 "szobát, és visszaállítja a következő megnyitáskor."
 
-#: modules/commands/cs_set.cpp:603
+#: modules/commands/cs_set.cpp:592
 #, fuzzy, c-format
 msgid ""
 "Enables or disables the persistent channel setting.\n"
@@ -5134,7 +5119,7 @@ msgstr "Lista vége - %d / %d találat megjelenítve."
 msgid "End of access list."
 msgstr "Hozzáférési lista vége."
 
-#: modules/commands/cs_akick.cpp:354
+#: modules/commands/cs_akick.cpp:379
 #, fuzzy
 msgid "End of autokick list"
 msgstr "Hozzáférési lista vége."
@@ -5158,12 +5143,12 @@ msgstr ""
 msgid "End of entry message list."
 msgstr "Vége a felhasználó listának."
 
-#: modules/commands/os_forbid.cpp:395
+#: modules/commands/os_forbid.cpp:407
 #, fuzzy, c-format
 msgid "End of forbid list - %d/%d entries shown."
 msgstr "Lista vége - %d / %d találat megjelenítve."
 
-#: modules/commands/os_forbid.cpp:393
+#: modules/commands/os_forbid.cpp:405
 #, fuzzy
 msgid "End of forbid list."
 msgstr "Vége a felhasználó listának."
@@ -5173,7 +5158,7 @@ msgstr "Vége a felhasználó listának."
 msgid "End of list - %d channels shown."
 msgstr "Lista vége - %d / %d találat megjelenítve."
 
-#: modules/commands/cs_list.cpp:130 modules/commands/ns_list.cpp:131
+#: modules/commands/ns_list.cpp:131 modules/commands/cs_list.cpp:130
 #, c-format
 msgid "End of list - %d/%d matches shown."
 msgstr "Lista vége - %d / %d találat megjelenítve."
@@ -5201,7 +5186,7 @@ msgid ""
 "BANS, or LIMIT.\n"
 " \n"
 "Use SECUREOPS to enforce the SECUREOPS option, even if it is not\n"
-"enabled. Use RESTRICTED to enfore the RESTRICTED option, also\n"
+"enabled. Use RESTRICTED to enforce the RESTRICTED option, also\n"
 "if it's not enabled. Use REGONLY to kick all unregistered users\n"
 "from the channel. Use SSLONLY to kick all users not using a secure\n"
 "connection from the channel. BANS will enforce bans on the channel by\n"
@@ -5209,8 +5194,8 @@ msgid ""
 "user count drops below the channel limit, if one is set."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:828 modules/commands/ns_set.cpp:848
-#: modules/commands/ns_set.cpp:883 src/language.cpp:43
+#: src/language.cpp:43 modules/commands/ns_set.cpp:836
+#: modules/commands/ns_set.cpp:856 modules/commands/ns_set.cpp:891
 msgid "English"
 msgstr "Magyar"
 
@@ -5284,12 +5269,12 @@ msgstr ""
 msgid "Exception for %s has been updated to %d."
 msgstr "Exception for %s has been updated to %d."
 
-#: modules/commands/os_akill.cpp:358 modules/commands/os_session.cpp:514
-#: modules/commands/os_sxline.cpp:201 modules/commands/os_forbid.cpp:346
-#: modules/commands/ns_group.cpp:312 modules/commands/os_ignore.cpp:266
-#: modules/pseudoclients/chanserv.cpp:463
-#: modules/pseudoclients/nickserv.cpp:564
-#: modules/pseudoclients/nickserv.cpp:569
+#: modules/pseudoclients/chanserv.cpp:465
+#: modules/pseudoclients/nickserv.cpp:557
+#: modules/pseudoclients/nickserv.cpp:562 modules/commands/os_ignore.cpp:266
+#: modules/commands/os_sxline.cpp:201 modules/commands/os_forbid.cpp:358
+#: modules/commands/os_session.cpp:514 modules/commands/ns_group.cpp:327
+#: modules/commands/os_akill.cpp:358
 #, fuzzy
 msgid "Expires"
 msgstr "Expires in: %s"
@@ -5353,28 +5338,28 @@ msgstr "%s hozzáférési listája:"
 msgid "Flood kicker"
 msgstr "\tFloodért kirúgás: %s"
 
-#: modules/commands/os_forbid.cpp:409
+#: modules/commands/os_forbid.cpp:421
 msgid ""
 "Forbid allows you to forbid usage of certain nicknames, channels,\n"
 "and email addresses. Wildcards are accepted for all entries."
 msgstr ""
 
-#: modules/commands/os_forbid.cpp:342
+#: modules/commands/os_forbid.cpp:354
 #, fuzzy
 msgid "Forbid list is empty."
 msgstr "Mellőzöttek lista üres."
 
-#: modules/commands/os_forbid.cpp:384
+#: modules/commands/os_forbid.cpp:396
 #, fuzzy
 msgid "Forbid list:"
 msgstr "Botok listája:"
 
-#: modules/commands/os_forbid.cpp:336
+#: modules/commands/os_forbid.cpp:348
 #, c-format
 msgid "Forbid on %s was not found."
 msgstr ""
 
-#: modules/commands/os_forbid.cpp:144
+#: modules/commands/os_forbid.cpp:156
 msgid "Forbid usage of nicknames, channels, and emails"
 msgstr ""
 
@@ -5418,12 +5403,12 @@ msgstr "    KICK        Kirúgja a felhasználót csatornáról"
 msgid "Forcefully part a user from a channel."
 msgstr "    KICK        Kirúgja a felhasználót csatornáról"
 
-#: modules/commands/cs_info.cpp:47 modules/commands/ns_alist.cpp:64
+#: modules/commands/ns_alist.cpp:64 modules/commands/cs_info.cpp:47
 #, fuzzy
 msgid "Founder"
 msgstr "Founderjog védelme"
 
-#: modules/commands/cs_set.cpp:312
+#: modules/commands/cs_set.cpp:315
 #, fuzzy, c-format
 msgid "Founder of %s changed to %s."
 msgstr "A megadott csatorna (%s) új foundere: %s."
@@ -5441,14 +5426,14 @@ msgstr "A befagyott kliens killelve."
 msgid "Give Operflags to a certain user"
 msgstr "    OLINE       Operflaget ad a biztos felhasználónak"
 
-#: modules/commands/cs_mode.cpp:895
+#: modules/commands/cs_mode.cpp:905
 #, c-format
 msgid ""
 "Gives %s status to the selected nick on a channel. If nick is\n"
 "not given, it will %s you."
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:878
+#: modules/commands/cs_mode.cpp:888
 #, fuzzy, c-format
 msgid "Gives you or the specified nick %s status on a channel"
 msgstr "    OWNER      Gives you owner status on channel"
@@ -5506,14 +5491,6 @@ msgstr ""
 msgid "Hosts with at least %d sessions:"
 msgstr "Hosztok legalább %d sessionnel:"
 
-#: modules/commands/cs_set.cpp:1034
-#, c-format
-msgid ""
-"However, if the successor already has too many\n"
-"channels registered (%d), the channel will be dropped\n"
-"instead, just as if no successor had been set."
-msgstr ""
-
 #: modules/commands/cs_seen.cpp:207
 #, c-format
 msgid "I don't know who %s is."
@@ -5524,7 +5501,7 @@ msgstr ""
 msgid "I've never seen %s on this channel."
 msgstr "Nem írj visszafelé ezen a csatornán!"
 
-#: modules/commands/os_akill.cpp:360 modules/commands/os_sxline.cpp:203
+#: modules/commands/os_sxline.cpp:203 modules/commands/os_akill.cpp:360
 msgid "ID"
 msgstr ""
 
@@ -5570,7 +5547,7 @@ msgstr "Mellőzöttek lista üres."
 msgid "Ignore list:"
 msgstr "Botok listája:"
 
-#: modules/commands/ns_set.cpp:1297
+#: modules/commands/ns_set.cpp:1305
 #, fuzzy
 msgid "Immediate protection"
 msgstr "Voices védelme"
@@ -5662,22 +5639,22 @@ msgstr "    OP         Gives Op status to a selected nick on a channel"
 msgid "Italics kicker"
 msgstr "\tItalics kicker : %s"
 
-#: modules/commands/ns_group.cpp:77
+#: modules/commands/ns_group.cpp:91
 #, fuzzy
 msgid "Join a group"
 msgstr "    GROUP      Csatlakozás egy csoporthoz"
 
-#: modules/commands/ns_set.cpp:1311 modules/commands/cs_set.cpp:1351
+#: modules/commands/cs_set.cpp:1303 modules/commands/ns_set.cpp:1319
 #, fuzzy
 msgid "Keep modes"
 msgstr "Üzenet mód"
 
-#: modules/commands/ns_set.cpp:595 modules/commands/cs_set.cpp:374
+#: modules/commands/cs_set.cpp:377 modules/commands/ns_set.cpp:603
 #, fuzzy, c-format
 msgid "Keep modes for %s is now off."
 msgstr "Peace option for %s is now ON."
 
-#: modules/commands/ns_set.cpp:589 modules/commands/cs_set.cpp:366
+#: modules/commands/cs_set.cpp:369 modules/commands/ns_set.cpp:597
 #, fuzzy, c-format
 msgid "Keep modes for %s is now on."
 msgstr "Peace option for %s is now ON."
@@ -5696,7 +5673,7 @@ msgstr "Key for channel %s is %s."
 msgid "Kick a user from a channel"
 msgstr "    KICK        Kirúgja a felhasználót csatornáról"
 
-#: modules/commands/cs_kick.cpp:116 modules/commands/cs_ban.cpp:217
+#: modules/commands/cs_ban.cpp:217 modules/commands/cs_kick.cpp:116
 #, c-format
 msgid "Kicked %d/%d users matching %s from %s."
 msgstr ""
@@ -5738,8 +5715,8 @@ msgstr ""
 msgid "LIST threshold"
 msgstr ""
 
-#: modules/commands/os_akill.cpp:388 modules/commands/os_sxline.cpp:427
-#: modules/commands/os_sxline.cpp:661
+#: modules/commands/os_sxline.cpp:427 modules/commands/os_sxline.cpp:661
+#: modules/commands/os_akill.cpp:388
 #, fuzzy
 msgid "LIST [mask | list | id]"
 msgstr "LIST [#szoba] [list | NEW ]"
@@ -5759,11 +5736,11 @@ msgstr "CHECK nicknév "
 msgid "LOGONNEWS {ADD|DEL|LIST} [text|num]"
 msgstr "LOGONNEWS { ADD | DEL | LIST } [szöveg|szám]"
 
-#: modules/commands/ns_set.cpp:826
+#: modules/commands/ns_set.cpp:834
 msgid "Language changed to English."
 msgstr "Új nyelvezet: Magyar."
 
-#: modules/commands/ns_set.cpp:828
+#: modules/commands/ns_set.cpp:836
 #, fuzzy, c-format
 msgid "Language for %s changed to %s."
 msgstr "A megadott csatorna (%s) új successora: %s."
@@ -5778,7 +5755,7 @@ msgstr "%s részére küldött utolsó memo üzenet visszavonva."
 msgid "Last quit message"
 msgstr "Utolsó kilépő üzenet: %s"
 
-#: modules/commands/ns_info.cpp:92 modules/commands/cs_access.cpp:472
+#: modules/commands/cs_access.cpp:472 modules/commands/ns_info.cpp:92
 #, fuzzy
 msgid "Last seen"
 msgstr "Utoljára ekkor volt: %s"
@@ -5792,7 +5769,7 @@ msgstr "Utoljára látott cím: %s"
 msgid "Last topic"
 msgstr ""
 
-#: modules/commands/cs_info.cpp:56 modules/commands/cs_akick.cpp:380
+#: modules/commands/cs_akick.cpp:405 modules/commands/cs_info.cpp:56
 #, fuzzy
 msgid "Last used"
 msgstr "Utoljára ekkor volt: %s"
@@ -5822,8 +5799,8 @@ msgstr "Level for %s on channel %s changed to founder only."
 msgid "Level must be between %d and %d inclusive."
 msgstr "A szintnek kizárólag %d és %d között kell lennie."
 
-#: modules/commands/os_session.cpp:506 modules/commands/os_session.cpp:514
-#: modules/commands/os_dns.cpp:218
+#: modules/commands/os_dns.cpp:218 modules/commands/os_session.cpp:506
+#: modules/commands/os_session.cpp:514
 msgid "Limit"
 msgstr ""
 
@@ -5848,17 +5825,17 @@ msgstr ""
 msgid "List loaded modules"
 msgstr "    MODLIST     Listázza a betöltött modulokat"
 
-#: modules/commands/cs_list.cpp:72 modules/commands/ns_list.cpp:123
+#: modules/commands/ns_list.cpp:123 modules/commands/cs_list.cpp:72
 #, fuzzy, c-format
 msgid "List of entries matching %s:"
 msgstr "%s csoportjába tartozó nickek listája:"
 
-#: modules/commands/ns_group.cpp:335
+#: modules/commands/ns_group.cpp:350
 #, c-format
 msgid "List of nicknames in the group of %s:"
 msgstr "%s csoportjába tartozó nickek listája:"
 
-#: modules/commands/ns_group.cpp:335
+#: modules/commands/ns_group.cpp:350
 msgid "List of nicknames in your group:"
 msgstr "A csoportodba tartozó nickek listája:"
 
@@ -5915,7 +5892,7 @@ msgid ""
 "limited to Services Operators"
 msgstr ""
 
-#: modules/commands/ns_group.cpp:284
+#: modules/commands/ns_group.cpp:299
 #, fuzzy
 msgid "Lists all nicknames in your group"
 msgstr "A csoportodba tartozó nickek listája:"
@@ -6203,7 +6180,7 @@ msgstr ""
 msgid "Looking for yourself, eh %s?"
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:763
+#: modules/commands/cs_mode.cpp:773
 #, c-format
 msgid ""
 "Mainly controls mode locks and mode access (which is different from channel "
@@ -6237,7 +6214,7 @@ msgid ""
 "is not given then all basic modes are removed."
 msgstr ""
 
-#: modules/commands/cs_akick.cpp:422
+#: modules/commands/cs_akick.cpp:434
 #, fuzzy
 msgid "Maintain the AutoKick list"
 msgstr "    AKICK      AutoKirúgás listára teheted a \"rossz\" usereket"
@@ -6255,7 +6232,7 @@ msgid ""
 " "
 msgstr ""
 
-#: modules/commands/cs_akick.cpp:481
+#: modules/commands/cs_akick.cpp:493
 #, c-format
 msgid ""
 "Maintains the AutoKick list for a channel.  If a user\n"
@@ -6441,15 +6418,15 @@ msgstr "    DEFCON      Manipulálja a DefCon rendszert"
 msgid "Manipulate the topic of the specified channel"
 msgstr "    TOPIC      Manipulate the topic of the specified channel"
 
-#: modules/commands/os_list.cpp:153 modules/commands/cs_xop.cpp:377
-#: modules/commands/os_akill.cpp:344 modules/commands/os_akill.cpp:358
-#: modules/commands/bs_info.cpp:55 modules/commands/os_session.cpp:506
-#: modules/commands/os_session.cpp:514 modules/commands/os_sxline.cpp:193
-#: modules/commands/os_sxline.cpp:201 modules/commands/os_forbid.cpp:346
-#: modules/commands/cs_flags.cpp:301 modules/commands/ms_ignore.cpp:86
-#: modules/commands/cs_akick.cpp:367 modules/commands/cs_akick.cpp:380
 #: modules/commands/bs_botlist.cpp:27 modules/commands/cs_access.cpp:459
-#: modules/commands/cs_access.cpp:472 modules/commands/os_ignore.cpp:266
+#: modules/commands/cs_access.cpp:472 modules/commands/cs_flags.cpp:301
+#: modules/commands/cs_xop.cpp:377 modules/commands/os_ignore.cpp:266
+#: modules/commands/os_sxline.cpp:193 modules/commands/os_sxline.cpp:201
+#: modules/commands/os_forbid.cpp:358 modules/commands/cs_akick.cpp:392
+#: modules/commands/cs_akick.cpp:405 modules/commands/ms_ignore.cpp:86
+#: modules/commands/os_session.cpp:506 modules/commands/os_session.cpp:514
+#: modules/commands/os_list.cpp:153 modules/commands/bs_info.cpp:55
+#: modules/commands/os_akill.cpp:344 modules/commands/os_akill.cpp:358
 msgid "Mask"
 msgstr ""
 
@@ -6462,8 +6439,8 @@ msgstr "Ez a maszk: %s már szerepel a hozzáférési listádon."
 msgid "Mask must be in the form user@host."
 msgstr ""
 
-#: modules/commands/cs_xop.cpp:162 modules/commands/cs_flags.cpp:120
-#: modules/commands/cs_access.cpp:166
+#: modules/commands/cs_access.cpp:166 modules/commands/cs_flags.cpp:120
+#: modules/commands/cs_xop.cpp:162
 #, fuzzy
 msgid "Masks and unregistered users may not be on access lists."
 msgstr "Ez a maszk: %s már szerepel a hozzáférési listádon."
@@ -6515,7 +6492,7 @@ msgstr "%s maximálisan fogadható üzeneteinek száma: %d."
 msgid "Memo limit for %s set to 0."
 msgstr "%s ezentúl nem fogadhat üzeneteket."
 
-#: modules/commands/ms_send.cpp:51 modules/commands/ms_rsend.cpp:63
+#: modules/commands/ms_rsend.cpp:63 modules/commands/ms_send.cpp:51
 #, c-format
 msgid "Memo sent to %s."
 msgstr "Üzenet elküldve %s részére."
@@ -6530,7 +6507,7 @@ msgstr "\tRögzített módok: %s"
 msgid "Message"
 msgstr "GLOBAL üzenet"
 
-#: modules/commands/ns_set.cpp:1305
+#: modules/commands/ns_set.cpp:1313
 msgid "Message mode"
 msgstr "Üzenet mód"
 
@@ -6547,12 +6524,17 @@ msgstr ""
 msgid "Mode"
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:708
+#: modules/commands/cs_mode.cpp:718
+#, fuzzy, c-format
+msgid "Mode %s is a virtual mode and can't be cleared."
+msgstr " %snick illegális nicknév vagy nem használható."
+
+#: modules/commands/cs_mode.cpp:712
 #, fuzzy, c-format
 msgid "Mode %s is not a status or list mode."
 msgstr "%s nick nem található a mellőzöttek listáján."
 
-#: modules/commands/cs_mode.cpp:1055
+#: modules/commands/cs_mode.cpp:1065
 #, fuzzy
 msgid "Mode lock"
 msgstr "\tRögzített módok: %s"
@@ -6642,7 +6624,7 @@ msgstr "    AOP        AutoOperátor lista beállítása"
 msgid "Modify the list of authorized addresses"
 msgstr "    ACCESS     A hozzáférési lista módosítása"
 
-#: modules/commands/cs_flags.cpp:373 modules/commands/cs_access.cpp:498
+#: modules/commands/cs_access.cpp:498 modules/commands/cs_flags.cpp:373
 #, fuzzy
 msgid "Modify the list of privileged users"
 msgstr "    ACCESS     A szoba hozzáférési listájának beállítása"
@@ -6701,14 +6683,14 @@ msgstr "Modul: %s Verzió: %s Szerző: %s Betöltve: %s"
 msgid "Module: %s [%s] [%s]"
 msgstr "Modul: %s [%s] [%s]"
 
-#: modules/commands/os_list.cpp:43 modules/commands/os_list.cpp:153
-#: modules/commands/cs_list.cpp:75 modules/commands/cs_access.cpp:697
-#: modules/commands/cs_access.cpp:799 modules/commands/os_config.cpp:66
-#: modules/commands/os_config.cpp:88
+#: modules/commands/cs_access.cpp:697 modules/commands/cs_access.cpp:799
+#: modules/commands/os_config.cpp:66 modules/commands/os_config.cpp:88
+#: modules/commands/cs_list.cpp:75 modules/commands/os_list.cpp:43
+#: modules/commands/os_list.cpp:153
 msgid "Name"
 msgstr ""
 
-#: modules/commands/os_oper.cpp:154
+#: modules/commands/os_oper.cpp:153
 msgid "Name     Type"
 msgstr ""
 
@@ -6717,13 +6699,13 @@ msgstr ""
 msgid "Network stats for %s:"
 msgstr "%s hozzáférési listája:"
 
-#: modules/commands/os_forbid.cpp:372
+#: modules/commands/os_forbid.cpp:384
 msgid "Never"
 msgstr ""
 
-#: modules/commands/hs_list.cpp:58 modules/commands/ns_group.cpp:312
-#: modules/commands/bs_botlist.cpp:27 modules/commands/ns_list.cpp:75
-#: modules/commands/hs_request.cpp:305
+#: modules/commands/hs_list.cpp:58 modules/commands/bs_botlist.cpp:27
+#: modules/commands/hs_request.cpp:305 modules/commands/ns_list.cpp:75
+#: modules/commands/ns_group.cpp:327
 #, fuzzy
 msgid "Nick"
 msgstr "INFO nick"
@@ -6754,17 +6736,17 @@ msgstr " %snick illegális nicknév vagy nem használható."
 msgid "Nick %s is currently in use."
 msgstr "Ez a nick: %s jelenleg használatban van."
 
-#: modules/commands/os_forbid.cpp:500
+#: modules/commands/os_forbid.cpp:512
 #, fuzzy, c-format
 msgid "Nick %s is forbidden by %s: %s"
 msgstr "Ez a nick: %s jelenleg használatban van."
 
-#: modules/commands/os_forbid.cpp:502
+#: modules/commands/os_forbid.cpp:514
 #, fuzzy, c-format
 msgid "Nick %s is forbidden."
 msgstr "Ezt a nicket %s nem fogja a services."
 
-#: modules/commands/os_oper.cpp:135
+#: modules/commands/os_oper.cpp:134
 #, fuzzy, c-format
 msgid "Nick %s is not a Services Operator."
 msgstr "%s is a services operator of type %s."
@@ -6789,12 +6771,12 @@ msgstr "Nickname %s registered."
 msgid "Nick %s was truncated to %d characters."
 msgstr "A nicked %s meg lett csonkítva %d karakter hosszúságúra."
 
-#: modules/commands/ns_set.cpp:1127
+#: modules/commands/ns_set.cpp:1135
 #, c-format
 msgid "Nick %s will expire."
 msgstr "Nick %s will expire."
 
-#: modules/commands/ns_set.cpp:1121
+#: modules/commands/ns_set.cpp:1129
 #, c-format
 msgid "Nick %s will not expire."
 msgstr "Nick %s will not expire."
@@ -6809,7 +6791,7 @@ msgstr "%s nickre nem érkezett memo üzenet tőled."
 msgid "Nick %s has been logged out."
 msgstr " %s nick sikeresen kijelentkezett."
 
-#: modules/commands/ns_group.cpp:257
+#: modules/commands/ns_group.cpp:272
 #, c-format
 msgid "Nick %s has been ungrouped from %s."
 msgstr "Nick %s has been ungrouped from %s."
@@ -6819,7 +6801,7 @@ msgstr "Nick %s has been ungrouped from %s."
 msgid "Nick %s is currently suspended."
 msgstr "Nick %s is now suspended."
 
-#: modules/commands/ns_group.cpp:236
+#: modules/commands/ns_group.cpp:250
 #, fuzzy, c-format
 msgid "Nick %s is not in your group."
 msgstr "The nick %s is not in your group."
@@ -6869,7 +6851,7 @@ msgstr "Ez a nicknév: %s számodra lett regisztrálva: %s"
 msgid "Nickname %s registered."
 msgstr "Nickname %s registered."
 
-#: modules/commands/cs_set.cpp:1353
+#: modules/commands/cs_set.cpp:1305
 #, fuzzy
 msgid "No auto-op"
 msgstr "Auto-op"
@@ -6878,7 +6860,7 @@ msgstr "Auto-op"
 msgid "No bot"
 msgstr "Nincs bot"
 
-#: modules/commands/ns_set.cpp:1309 modules/commands/cs_set.cpp:1349
+#: modules/commands/cs_set.cpp:1301 modules/commands/ns_set.cpp:1317
 #, fuzzy
 msgid "No expire"
 msgstr "nem fog elévülni"
@@ -6912,13 +6894,13 @@ msgstr "Nincs Email listázva ehhez: %s."
 msgid "No matching entries on %s %s list."
 msgstr "Nincs ilyen bejegyzés a %s AOP listán."
 
-#: modules/commands/cs_xop.cpp:428 modules/commands/cs_flags.cpp:335
 #: modules/commands/cs_access.cpp:269 modules/commands/cs_access.cpp:433
+#: modules/commands/cs_flags.cpp:335 modules/commands/cs_xop.cpp:428
 #, c-format
 msgid "No matching entries on %s access list."
 msgstr "Nincs ilyen bejegyzés a (%s) csatorna hozzáférési listáján."
 
-#: modules/commands/cs_akick.cpp:199 modules/commands/cs_akick.cpp:343
+#: modules/commands/cs_akick.cpp:224 modules/commands/cs_akick.cpp:368
 #, c-format
 msgid "No matching entries on %s autokick list."
 msgstr "Nincs ilyen bejegyzés a (%s) csatorna autokick listáján."
@@ -6988,8 +6970,8 @@ msgstr ""
 msgid "No signed kick when SIGNKICK LEVEL is used"
 msgstr ""
 
-#: modules/extra/stats/cs_fantasy_stats.cpp:156
 #: modules/extra/stats/cs_fantasy_top.cpp:159
+#: modules/extra/stats/cs_fantasy_stats.cpp:156
 #, fuzzy, c-format
 msgid "No stats for %s."
 msgstr "%s hozzáférési listája:"
@@ -6999,7 +6981,7 @@ msgstr "%s hozzáférési listája:"
 msgid "No such info \"%s\" on %s."
 msgstr "%s has been invited to %s."
 
-#: modules/commands/cs_kick.cpp:118 modules/commands/cs_ban.cpp:219
+#: modules/commands/cs_ban.cpp:219 modules/commands/cs_kick.cpp:118
 #, fuzzy, c-format
 msgid "No users on %s match %s."
 msgstr "%s usermódjai megváltoztatva."
@@ -7019,25 +7001,34 @@ msgstr "Nincs Bot mód most ONa %s szobán."
 msgid "Non-status modes cleared on %s."
 msgstr ""
 
-#: modules/commands/bs_info.cpp:58 modules/commands/os_dns.cpp:226
+#: modules/commands/os_dns.cpp:226 modules/commands/bs_info.cpp:58
 msgid "None"
 msgstr "Nincs"
+
+#: modules/commands/cs_set.cpp:1028
+#, c-format
+msgid ""
+"Note, however, if the successor already has too many\n"
+"channels registered (%d), they will not be able to\n"
+"become the new founder and it will be as if the\n"
+"channel had no successor set."
+msgstr ""
 
 #: modules/commands/cs_mode.cpp:380 modules/commands/cs_mode.cpp:437
 msgid "Nothing to do."
 msgstr ""
 
-#: modules/commands/bs_badwords.cpp:194 modules/commands/cs_xop.cpp:377
-#: modules/commands/os_akill.cpp:344 modules/commands/os_akill.cpp:358
-#: modules/commands/hs_list.cpp:58 modules/commands/os_news.cpp:156
-#: modules/commands/os_session.cpp:506 modules/commands/os_session.cpp:514
+#: modules/commands/hs_list.cpp:58 modules/commands/cs_access.cpp:459
+#: modules/commands/cs_access.cpp:472 modules/commands/cs_flags.cpp:301
+#: modules/commands/cs_xop.cpp:377 modules/commands/ns_alist.cpp:48
 #: modules/commands/cs_entrymsg.cpp:116 modules/commands/os_sxline.cpp:193
-#: modules/commands/os_sxline.cpp:201 modules/commands/ns_alist.cpp:48
-#: modules/commands/cs_flags.cpp:301 modules/commands/ns_ajoin.cpp:100
-#: modules/commands/cs_log.cpp:127 modules/commands/cs_akick.cpp:367
-#: modules/commands/cs_akick.cpp:380 modules/commands/ms_list.cpp:64
-#: modules/commands/hs_request.cpp:305 modules/commands/cs_access.cpp:459
-#: modules/commands/cs_access.cpp:472
+#: modules/commands/os_sxline.cpp:201 modules/commands/ms_list.cpp:64
+#: modules/commands/bs_badwords.cpp:194 modules/commands/os_news.cpp:156
+#: modules/commands/hs_request.cpp:305 modules/commands/cs_akick.cpp:392
+#: modules/commands/cs_akick.cpp:405 modules/commands/cs_log.cpp:127
+#: modules/commands/os_session.cpp:506 modules/commands/os_session.cpp:514
+#: modules/commands/os_akill.cpp:344 modules/commands/os_akill.cpp:358
+#: modules/commands/ns_ajoin.cpp:100
 msgid "Number"
 msgstr ""
 
@@ -7050,7 +7041,7 @@ msgstr "OPERNEWS { ADD | DEL |LIST } [ szöveg | szám ]"
 msgid "Online from"
 msgstr "Jelenleg online erről a címről: %s"
 
-#: modules/commands/os_oper.cpp:139
+#: modules/commands/os_oper.cpp:138
 #, c-format
 msgid ""
 "Oper %s is configured in the configuration file(s) and can not be removed by "
@@ -7080,12 +7071,12 @@ msgstr "Oper news tétel #%d nem található!"
 msgid "Oper news items:"
 msgstr "Oper hírek listája:"
 
-#: modules/commands/os_oper.cpp:149
+#: modules/commands/os_oper.cpp:148
 #, c-format
 msgid "Oper privileges removed from %s (%s)."
 msgstr ""
 
-#: modules/commands/os_oper.cpp:101 modules/commands/os_oper.cpp:190
+#: modules/commands/os_oper.cpp:101 modules/commands/os_oper.cpp:189
 #, fuzzy, c-format
 msgid "Oper type %s has not been configured."
 msgstr "A %s nicknevet dropoltad."
@@ -7100,17 +7091,17 @@ msgstr "%s operflagek megadva a %s nicknek."
 msgid "Operflags %s have been removed from %s."
 msgstr "%s operflagek megadva a %s nicknek."
 
-#: modules/commands/os_oper.cpp:194
+#: modules/commands/os_oper.cpp:193
 #, c-format
 msgid "Opertype %s has no allowed commands."
 msgstr ""
 
-#: modules/commands/os_oper.cpp:216
+#: modules/commands/os_oper.cpp:215
 #, c-format
 msgid "Opertype %s has no allowed privileges."
 msgstr ""
 
-#: modules/commands/os_oper.cpp:238
+#: modules/commands/os_oper.cpp:237
 #, c-format
 msgid "Opertype %s receives modes %s once identified."
 msgstr ""
@@ -7119,7 +7110,7 @@ msgstr ""
 msgid "Ops protection"
 msgstr "Opok védelme"
 
-#: modules/commands/bs_info.cpp:58 src/misc.cpp:258
+#: src/misc.cpp:258 modules/commands/bs_info.cpp:58
 #, fuzzy
 msgid "Options"
 msgstr "Beállításai: %s"
@@ -7146,12 +7137,12 @@ msgstr "Hibás jelszó."
 msgid "Password authentication required for that command."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:149 modules/commands/ns_set.cpp:215
+#: modules/commands/ns_set.cpp:152 modules/commands/ns_set.cpp:218
 #, fuzzy, c-format
 msgid "Password for %s changed to %s."
 msgstr "A megadott csatorna (%s) új successora: %s."
 
-#: modules/commands/ns_set.cpp:151 modules/commands/ns_set.cpp:217
+#: modules/commands/ns_set.cpp:154 modules/commands/ns_set.cpp:220
 #, fuzzy, c-format
 msgid "Password for %s changed."
 msgstr "%s nick jelszava elküldve."
@@ -7171,21 +7162,21 @@ msgstr "Hibás jelszó."
 msgid "Password reset email for %s has been sent."
 msgstr "Password reset email for %s has been sent."
 
-#: modules/commands/cs_set.cpp:1335
+#: modules/commands/cs_set.cpp:1287
 msgid "Peace"
 msgstr "Békesség"
 
-#: modules/commands/cs_set.cpp:437
+#: modules/commands/cs_set.cpp:440
 #, fuzzy, c-format
 msgid "Peace option for %s is now off."
 msgstr "Peace option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:431
+#: modules/commands/cs_set.cpp:434
 #, fuzzy, c-format
 msgid "Peace option for %s is now on."
 msgstr "Peace option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:1347
+#: modules/commands/cs_set.cpp:1299
 #, fuzzy
 msgid "Persistent"
 msgstr "Persistant"
@@ -7221,12 +7212,12 @@ msgstr "Kérlek várj %d másodpercet és próbáld újra."
 msgid "Please wait %d seconds before requesting a new vHost."
 msgstr "Kérlek, várj %d másodpercet mielőtt SEND parancsot újra használod!"
 
-#: modules/commands/ms_send.cpp:57 modules/commands/ms_rsend.cpp:58
+#: modules/commands/ms_rsend.cpp:58 modules/commands/ms_send.cpp:57
 #, fuzzy, c-format
 msgid "Please wait %d seconds before using the %s command again."
 msgstr "Kérlek, várj %d másodpercet mielőtt SEND parancsot újra használod!"
 
-#: modules/commands/ns_group.cpp:135
+#: modules/commands/ns_group.cpp:149
 #, c-format
 msgid "Please wait %d seconds before using the GROUP command again."
 msgstr "Kérlek várj %d másodpercet, mielőtt ismét használod a GROUP parancsot."
@@ -7249,7 +7240,7 @@ msgstr ""
 msgid "Pooled/Not Active"
 msgstr ""
 
-#: modules/commands/bs_set.cpp:158
+#: modules/commands/bs_set.cpp:161
 msgid "Prevent a bot from being assigned by non IRC operators"
 msgstr ""
 
@@ -7267,7 +7258,7 @@ msgstr ""
 "    SUSPEND    Felfüggeszti a szoba használatát de\n"
 "               megőrzi az adatokat és beállításokat."
 
-#: modules/commands/cs_set.cpp:1046
+#: modules/commands/cs_set.cpp:1041
 #, fuzzy
 msgid "Prevent the channel from expiring"
 msgstr "    NOEXPIRE      Prevent the channel from expiring"
@@ -7279,7 +7270,7 @@ msgstr ""
 "    PRIVATE    Prevent the nickname from appearing in a\n"
 "                   /msg %s LIST"
 
-#: modules/commands/ns_set.cpp:1096
+#: modules/commands/ns_set.cpp:1104
 #, fuzzy
 msgid "Prevent the nickname from expiring"
 msgstr "    NOEXPIRE   Prevent the nickname from expiring"
@@ -7288,17 +7279,17 @@ msgstr "    NOEXPIRE   Prevent the nickname from expiring"
 msgid "Prevents users being kicked by Services"
 msgstr ""
 
-#: modules/commands/cs_list.cpp:262 modules/commands/bs_info.cpp:58
-#: modules/commands/ns_list.cpp:297
+#: modules/commands/ns_list.cpp:297 modules/commands/cs_list.cpp:262
+#: modules/commands/bs_info.cpp:58
 msgid "Private"
 msgstr "Privát"
 
-#: modules/commands/bs_set.cpp:187
+#: modules/commands/bs_set.cpp:190
 #, fuzzy, c-format
 msgid "Private mode of bot %s is now off."
 msgstr "Private mód a %s botban most ON."
 
-#: modules/commands/bs_set.cpp:182
+#: modules/commands/bs_set.cpp:185
 #, fuzzy, c-format
 msgid "Private mode of bot %s is now on."
 msgstr "Private mód a %s botban most ON."
@@ -7333,26 +7324,26 @@ msgstr ""
 msgid "Privilege %s removed from %s on %s, new flags are +%s"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:1301
+#: modules/commands/ns_set.cpp:1309
 msgid "Protection"
 msgstr "Kill védelem"
 
-#: modules/commands/ns_set.cpp:713
+#: modules/commands/ns_set.cpp:721
 #, fuzzy, c-format
 msgid "Protection is now off for %s."
 msgstr "Protection is now ON for %s."
 
-#: modules/commands/ns_set.cpp:692
+#: modules/commands/ns_set.cpp:700
 #, fuzzy, c-format
 msgid "Protection is now on for %s, with a reduced delay."
 msgstr "Protection is now ON for %s, with a reduced delay."
 
-#: modules/commands/ns_set.cpp:702
+#: modules/commands/ns_set.cpp:710
 #, fuzzy, c-format
 msgid "Protection is now on for %s, with no delay."
 msgstr "Protection is now ON for %s, with no delay."
 
-#: modules/commands/ns_set.cpp:684
+#: modules/commands/ns_set.cpp:692
 #, fuzzy, c-format
 msgid "Protection is now on for %s."
 msgstr "Protection is now ON for %s."
@@ -7369,7 +7360,7 @@ msgstr ""
 "és teljesen valós ident@host maszkot használja, minden \n"
 "nick esetében végrehajtja az AKILLt."
 
-#: modules/commands/ns_set.cpp:1299
+#: modules/commands/ns_set.cpp:1307
 #, fuzzy
 msgid "Quick protection"
 msgstr "Voices védelme"
@@ -7420,11 +7411,11 @@ msgstr "Valódi neve: %s"
 msgid "Realname"
 msgstr "Valódi neve: %s"
 
-#: modules/commands/os_akill.cpp:344 modules/commands/os_akill.cpp:361
-#: modules/commands/os_session.cpp:514 modules/commands/os_sxline.cpp:193
-#: modules/commands/os_sxline.cpp:204 modules/commands/os_forbid.cpp:346
-#: modules/commands/cs_akick.cpp:367 modules/commands/cs_akick.cpp:380
-#: modules/commands/os_ignore.cpp:266
+#: modules/commands/os_ignore.cpp:266 modules/commands/os_sxline.cpp:193
+#: modules/commands/os_sxline.cpp:204 modules/commands/os_forbid.cpp:358
+#: modules/commands/cs_akick.cpp:392 modules/commands/cs_akick.cpp:405
+#: modules/commands/os_session.cpp:514 modules/commands/os_akill.cpp:344
+#: modules/commands/os_akill.cpp:361
 msgid "Reason"
 msgstr ""
 
@@ -7453,23 +7444,23 @@ msgstr "    LEVELS     Átállíthatod a szoba hozzáférési szintjeit"
 msgid "Regains control of your nick"
 msgstr "    RELEASE    Visszaadja a neved a RECOVER után"
 
-#: modules/commands/os_akill.cpp:129 modules/commands/os_sxline.cpp:330
-#: modules/commands/os_sxline.cpp:545
+#: modules/commands/os_sxline.cpp:330 modules/commands/os_sxline.cpp:545
+#: modules/commands/os_akill.cpp:129
 #, fuzzy
 msgid "Regex is disabled."
 msgstr "%s is enable"
 
-#: modules/commands/os_akill.cpp:444 modules/commands/os_sxline.cpp:459
-#: modules/commands/os_sxline.cpp:694
+#: modules/commands/os_sxline.cpp:459 modules/commands/os_sxline.cpp:694
+#: modules/commands/os_akill.cpp:444
 #, c-format
 msgid ""
 "Regex matches are also supported using the %s engine.\n"
 "Enclose your mask in // if this is desired."
 msgstr ""
 
+#: modules/commands/os_ignore.cpp:386 modules/commands/os_forbid.cpp:428
+#: modules/commands/ns_list.cpp:172 modules/commands/cs_list.cpp:167
 #: modules/commands/os_list.cpp:119 modules/commands/os_list.cpp:255
-#: modules/commands/cs_list.cpp:167 modules/commands/os_forbid.cpp:416
-#: modules/commands/ns_list.cpp:172 modules/commands/os_ignore.cpp:386
 #, c-format
 msgid ""
 "Regex matches are also supported using the %s engine.\n"
@@ -7600,7 +7591,7 @@ msgstr ""
 msgid "Registration is currently disabled."
 msgstr "Sajnálom,  a csatorna regisztráció jelenleg szünetel."
 
-#: modules/commands/cs_set.cpp:397
+#: modules/commands/cs_set.cpp:400
 #, fuzzy
 msgid "Regulate the use of critical commands"
 msgstr "    PEACE         Szabályozza a kritikus parancsok használatát"
@@ -7643,7 +7634,7 @@ msgstr "    MODLOAD     Betölti a modult"
 msgid "Reload services' configuration file"
 msgstr "    RELOAD      Újratölti a szervíz Konfigurációs fájlját"
 
-#: modules/commands/ns_group.cpp:222
+#: modules/commands/ns_group.cpp:236
 #, fuzzy
 msgid "Remove a nick from a group"
 msgstr "    UNGROUP    Remove a nick from a group"
@@ -7676,14 +7667,14 @@ msgstr ""
 msgid "Removed server %s."
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:899
+#: modules/commands/cs_mode.cpp:909
 #, c-format
 msgid ""
 "Removes %s status from the selected nick on a channel. If nick is\n"
 "not given, it will de%s you."
 msgstr ""
 
-#: modules/commands/cs_mode.cpp:880
+#: modules/commands/cs_mode.cpp:890
 #, fuzzy, c-format
 msgid "Removes %s status from you or the specified nick on a channel"
 msgstr "    OP         Gives Op status to a selected nick on a channel"
@@ -7728,22 +7719,22 @@ msgstr ""
 msgid "Resend registration confirmation email"
 msgstr "    RELOAD      Újratölti a szervíz Konfigurációs fájlját"
 
-#: modules/commands/cs_set.cpp:632
+#: modules/commands/cs_set.cpp:621
 #, fuzzy
 msgid "Restrict access to the channel"
 msgstr "    RESTRICTED    Restrict access to the channel"
 
-#: modules/commands/cs_set.cpp:1337
+#: modules/commands/cs_set.cpp:1289
 #, fuzzy
 msgid "Restricted access"
 msgstr "Korlátozott hozzáférés"
 
-#: modules/commands/cs_set.cpp:672
+#: modules/commands/cs_set.cpp:661
 #, fuzzy, c-format
 msgid "Restricted access option for %s is now off."
 msgstr "Restricted access option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:666
+#: modules/commands/cs_set.cpp:655
 #, fuzzy, c-format
 msgid "Restricted access option for %s is now on."
 msgstr "Restricted access option for %s is now ON."
@@ -7753,7 +7744,7 @@ msgstr "Restricted access option for %s is now ON."
 msgid "Restricted enforced on %s."
 msgstr "Korlátozott hozzáférés"
 
-#: modules/commands/cs_set.cpp:332
+#: modules/commands/cs_set.cpp:335
 #, fuzzy
 msgid "Retain modes when channel is not in use"
 msgstr "    KEEPTOPIC     Topic megtartása ha a szoba nincs használatban"
@@ -7903,52 +7894,52 @@ msgstr "    RESTART     Menti az adatbázist, és újraindítja a szervízt"
 msgid "Searches logs for a matching pattern"
 msgstr ""
 
-#: modules/commands/cs_set.cpp:1341
+#: modules/commands/cs_set.cpp:1293
 #, fuzzy
 msgid "Secure founder"
 msgstr "Founderjog védelme"
 
-#: modules/commands/cs_set.cpp:797
+#: modules/commands/cs_set.cpp:786
 #, fuzzy, c-format
 msgid "Secure founder option for %s is now off."
 msgstr "Secure founder option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:791
+#: modules/commands/cs_set.cpp:780
 #, fuzzy, c-format
 msgid "Secure founder option for %s is now on."
 msgstr "Secure founder option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:1343
+#: modules/commands/cs_set.cpp:1295
 #, fuzzy
 msgid "Secure ops"
 msgstr "Opjog védelme"
 
-#: modules/commands/cs_set.cpp:861
+#: modules/commands/cs_set.cpp:850
 #, fuzzy, c-format
 msgid "Secure ops option for %s is now off."
 msgstr "Secure ops option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:855
+#: modules/commands/cs_set.cpp:844
 #, fuzzy, c-format
 msgid "Secure ops option for %s is now on."
 msgstr "Secure ops option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:734
+#: modules/commands/cs_set.cpp:723
 #, fuzzy, c-format
 msgid "Secure option for %s is now off."
 msgstr "Secure option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:728
+#: modules/commands/cs_set.cpp:717
 #, fuzzy, c-format
 msgid "Secure option for %s is now on."
 msgstr "Secure option for %s is now ON."
 
-#: modules/commands/ns_set.cpp:1036
+#: modules/commands/ns_set.cpp:1044
 #, fuzzy, c-format
 msgid "Secure option is now off for %s."
 msgstr "Secure option is now ON for %s."
 
-#: modules/commands/ns_set.cpp:1030
+#: modules/commands/ns_set.cpp:1038
 #, fuzzy, c-format
 msgid "Secure option is now on for %s."
 msgstr "Secure option is now ON for %s."
@@ -7958,7 +7949,7 @@ msgstr "Secure option is now ON for %s."
 msgid "Secureops enforced on %s."
 msgstr "Secure option is now ON for %s."
 
-#: modules/commands/ns_set.cpp:1303 modules/commands/cs_set.cpp:1339
+#: modules/commands/cs_set.cpp:1291 modules/commands/ns_set.cpp:1311
 msgid "Security"
 msgstr "Biztonság"
 
@@ -8182,7 +8173,7 @@ msgstr "Servers found: %d"
 msgid "Service's hold on %s has been released."
 msgstr "A Services rendelkezésedre bocsájtotta a nicket."
 
-#: data/chanserv.example.conf:827 data/nickserv.example.conf:235
+#: data/nickserv.example.conf:235 data/chanserv.example.conf:827
 #, fuzzy
 msgid "Services Operator commands"
 msgstr "%s is a services operator of type %s."
@@ -8258,32 +8249,32 @@ msgstr ""
 msgid "Services up %s."
 msgstr "Servers found: %d"
 
-#: modules/commands/ns_set.cpp:263
+#: modules/commands/ns_set.cpp:266
 #, fuzzy, c-format
 msgid "Services will from now on set status modes on %s in channels."
 msgstr "Services will no longer autoop %s in channels."
 
-#: modules/commands/cs_set.cpp:111
+#: modules/commands/cs_set.cpp:114
 #, fuzzy, c-format
 msgid "Services will no longer automatically give modes to users in %s."
 msgstr "Services will no longer autoop %s in channels."
 
-#: modules/commands/ns_set.cpp:269
+#: modules/commands/ns_set.cpp:272
 #, fuzzy, c-format
 msgid "Services will no longer set status modes on %s in channels."
 msgstr "Services will no longer autoop %s in channels."
 
-#: modules/commands/cs_set.cpp:105
+#: modules/commands/cs_set.cpp:108
 #, fuzzy, c-format
 msgid "Services will now automatically give modes to users in %s."
 msgstr "Services will now autoop %s in channels."
 
-#: modules/commands/ns_set.cpp:932
+#: modules/commands/ns_set.cpp:940
 #, c-format
 msgid "Services will now reply to %s with messages."
 msgstr "Services will now reply to %s with messages."
 
-#: modules/commands/ns_set.cpp:938
+#: modules/commands/ns_set.cpp:946
 #, c-format
 msgid "Services will now reply to %s with notices."
 msgstr "Services will now reply to %s with notices."
@@ -8311,7 +8302,7 @@ msgstr "Session korlátozás tiltva."
 msgid "Sessions: %lu entries, %lu buckets, longest chain is %d"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:71
+#: modules/commands/ns_set.cpp:74
 #, fuzzy
 msgid "Set SET-options on another nickname"
 msgstr "    SASET      Set SET-options on another nickname"
@@ -8321,7 +8312,7 @@ msgstr "    SASET      Set SET-options on another nickname"
 msgid "Set channel options and information"
 msgstr "    SET        Beállíthatod a csatornád opcióit"
 
-#: modules/commands/cs_set.cpp:134
+#: modules/commands/cs_set.cpp:137
 #, fuzzy
 msgid "Set how Services make bans on the channel"
 msgstr "    BANTYPE       A banolás tipusának beállítása"
@@ -8336,37 +8327,37 @@ msgstr "    SET    Üzenetekkel kapcsolatos beállításokat hajt végre"
 msgid "Set options, including kill protection"
 msgstr "    SET        Opciók beállítása, például kill védelem"
 
-#: modules/commands/cs_set.cpp:469
+#: modules/commands/cs_set.cpp:472
 #, fuzzy
 msgid "Set the channel as permanent"
 msgstr "    PERSIST       Set the channel as permanent"
 
-#: modules/commands/cs_set.cpp:201
+#: modules/commands/cs_set.cpp:204
 #, fuzzy
 msgid "Set the channel description"
 msgstr "    DESC          A szobameghatározás állítás"
 
-#: modules/commands/ns_set.cpp:326
+#: modules/commands/ns_set.cpp:329
 #, fuzzy
 msgid "Set the display of your group in Services"
 msgstr "    DISPLAY    Set the display of your group in Services"
 
-#: modules/commands/cs_set.cpp:263
+#: modules/commands/cs_set.cpp:266
 #, fuzzy
 msgid "Set the founder of a channel"
 msgstr "    FOUNDER       A founder megváltoztatása"
 
-#: modules/commands/ns_set.cpp:785
+#: modules/commands/ns_set.cpp:793
 #, fuzzy
 msgid "Set the language Services will use when messaging you"
 msgstr "    LANGUAGE   A szervíz nyelvezetének megválasztása"
 
-#: modules/commands/ns_set.cpp:169
+#: modules/commands/ns_set.cpp:172
 #, fuzzy
 msgid "Set the nickname password"
 msgstr "    PASSWORD   Set the nickname password"
 
-#: modules/commands/cs_set.cpp:960
+#: modules/commands/cs_set.cpp:949
 #, fuzzy
 msgid "Set the successor for a channel"
 msgstr "    SUCCESSOR     A successor megadása"
@@ -8386,7 +8377,7 @@ msgstr "    SET         Beállít egy vhosztot a felhasználónak"
 msgid "Set various global Services options"
 msgstr "    SET         Beállítja szervíz általános változóit"
 
-#: modules/commands/ns_set.cpp:116
+#: modules/commands/ns_set.cpp:119
 #, fuzzy
 msgid "Set your nickname password"
 msgstr "    PASSWORD   Set your nickname password"
@@ -8437,7 +8428,7 @@ msgstr ""
 "Ha nem adod meg, akkor csak kirúgást eszközöl a bot.\n"
 "Ha megadod a ttb-t, akkor x kirúgás után banol a bot."
 
-#: modules/commands/cs_set.cpp:183
+#: modules/commands/cs_set.cpp:186
 #, fuzzy
 msgid ""
 "Sets the ban type that will be used by services whenever\n"
@@ -8529,7 +8520,7 @@ msgstr ""
 "Ha nem adod meg, akkor csak kirúgást eszközöl a bot.\n"
 "Ha megadod a ttb-t, akkor x kirúgás után banol a bot."
 
-#: modules/commands/cs_set.cpp:252
+#: modules/commands/cs_set.cpp:255
 #, fuzzy
 msgid ""
 "Sets the description for the channel, which shows up with\n"
@@ -8726,7 +8717,7 @@ msgstr ""
 "\n"
 "További információért írd be: /msg %s HELP SET opció"
 
-#: modules/commands/ns_set.cpp:33 modules/commands/ns_set.cpp:85
+#: modules/commands/ns_set.cpp:33 modules/commands/ns_set.cpp:88
 #, fuzzy
 msgid "Sets various nickname options. option can be one of:"
 msgstr ""
@@ -8734,12 +8725,12 @@ msgstr ""
 "\n"
 "Beállítható nicknév opciók. Az opció ezek egyike lehet:"
 
-#: modules/commands/ns_set.cpp:234
+#: modules/commands/ns_set.cpp:237
 msgid ""
 "Sets whether services should set channel status modes on you automatically."
 msgstr ""
 
-#: modules/commands/cs_set.cpp:1093
+#: modules/commands/cs_set.cpp:1088
 #, fuzzy
 msgid ""
 "Sets whether the given channel will expire.  Setting this\n"
@@ -8752,7 +8743,7 @@ msgstr ""
 "\n"
 "Korlátozva Szervíz adminnak."
 
-#: modules/commands/ns_set.cpp:312
+#: modules/commands/ns_set.cpp:315
 #, fuzzy, c-format
 msgid ""
 "Sets whether the given nickname will be given its status modes\n"
@@ -8767,7 +8758,7 @@ msgstr ""
 "Set to ON to allow ChanServ to op the given nickname \n"
 "automatically when joining channels."
 
-#: modules/commands/ns_set.cpp:1137
+#: modules/commands/ns_set.cpp:1145
 #, fuzzy
 msgid ""
 "Sets whether the given nickname will expire.  Setting this\n"
@@ -8778,7 +8769,7 @@ msgstr ""
 "Sets whether the given nickname will expire.  Setting this\n"
 "to ON prevents the nickname from expiring."
 
-#: modules/commands/ns_set.cpp:285
+#: modules/commands/ns_set.cpp:288
 #, fuzzy, c-format
 msgid ""
 "Sets whether you will be given your channel status modes automatically.\n"
@@ -8819,7 +8810,7 @@ msgstr "READONLY beállitáshoz kell lenni ON vagy OFF."
 msgid "Setting for super admin must be ON or OFF."
 msgstr "READONLY beállitáshoz kell lenni ON vagy OFF."
 
-#: modules/commands/cs_set.cpp:71
+#: modules/commands/cs_set.cpp:74
 #, fuzzy
 msgid "Should services automatically give status to users"
 msgstr "    AUTOOP     Should services op you automatically.    "
@@ -8834,17 +8825,17 @@ msgstr "    STATS       Mutatja a Szervít és hálózat állapotát"
 msgid "Showed %d/%d matches for %s."
 msgstr ""
 
-#: modules/commands/cs_set.cpp:883
+#: modules/commands/cs_set.cpp:872
 #, fuzzy
 msgid "Sign kicks that are done with the KICK command"
 msgstr "    SIGNKICK      Sign kickek, melyek a KICK paranccsal történnek"
 
-#: modules/commands/cs_set.cpp:932
+#: modules/commands/cs_set.cpp:921
 #, fuzzy, c-format
 msgid "Signed kick option for %s is now off."
 msgstr "Signed kick option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:924
+#: modules/commands/cs_set.cpp:913
 #, fuzzy, c-format
 msgid ""
 "Signed kick option for %s is now on, but depends of the\n"
@@ -8853,16 +8844,16 @@ msgstr ""
 "Signed kick option for %s is now ON, but depends of the\n"
 "level of the user that is using the command."
 
-#: modules/commands/cs_set.cpp:917
+#: modules/commands/cs_set.cpp:906
 #, fuzzy, c-format
 msgid "Signed kick option for %s is now on."
 msgstr "Signed kick option for %s is now ON."
 
-#: modules/commands/cs_set.cpp:1345
+#: modules/commands/cs_set.cpp:1297
 msgid "Signed kicks"
 msgstr "Signed kicks"
 
-#: modules/commands/ms_send.cpp:59 modules/commands/ms_rsend.cpp:60
+#: modules/commands/ms_rsend.cpp:60 modules/commands/ms_send.cpp:59
 #, fuzzy, c-format
 msgid "Sorry, %s currently has too many memos and cannot receive more."
 msgstr "%s túl sok üzenettel rendelkezik, és nem fogadhat többet."
@@ -8882,16 +8873,16 @@ msgstr "Csatornán tiltott szaval listájának változtatása letiltva."
 msgid "Sorry, bot assignment is temporarily disabled."
 msgstr "Bot beállítás időlegesen szünetel."
 
-#: modules/commands/bs_assign.cpp:164 modules/commands/bs_bot.cpp:281
+#: modules/commands/bs_bot.cpp:281 modules/commands/bs_assign.cpp:164
 msgid "Sorry, bot modification is temporarily disabled."
 msgstr "A bot módosítás ideiglenesen szünetel."
 
-#: modules/commands/bs_kick.cpp:813 modules/commands/bs_kick.cpp:878
-#: modules/fantasy.cpp:42
+#: modules/fantasy.cpp:42 modules/commands/bs_kick.cpp:813
+#: modules/commands/bs_kick.cpp:878
 msgid "Sorry, bot option setting is temporarily disabled."
 msgstr "Bot beállítás időlegesen szünetel."
 
-#: modules/commands/bs_set.cpp:112
+#: modules/commands/bs_set.cpp:115
 #, fuzzy
 msgid "Sorry, changing bot options is temporarily disabled."
 msgstr "Bot beállítás időlegesen szünetel."
@@ -8902,11 +8893,11 @@ msgstr "Bot beállítás időlegesen szünetel."
 msgid "Sorry, channel %s list modification is temporarily disabled."
 msgstr "Csatorna AOP lista módosítás szünetel."
 
-#: modules/commands/cs_flags.cpp:405 modules/commands/cs_access.cpp:547
+#: modules/commands/cs_access.cpp:547 modules/commands/cs_flags.cpp:405
 msgid "Sorry, channel access list modification is temporarily disabled."
 msgstr "A csatorna hozzáférési listájának módosítása szünetel."
 
-#: modules/commands/cs_akick.cpp:457
+#: modules/commands/cs_akick.cpp:469
 msgid "Sorry, channel autokick list modification is temporarily disabled."
 msgstr "Csatorna autokick listájának módosítása szünetel."
 
@@ -8935,7 +8926,7 @@ msgstr "Üzenet opcióinak beállítása szünetel."
 msgid "Sorry, nickname de-registration is temporarily disabled."
 msgstr "Sajnálom,  a nicknevek regisztrációjának törlése  szünetel."
 
-#: modules/commands/ns_group.cpp:106
+#: modules/commands/ns_group.cpp:120
 msgid "Sorry, nickname grouping is temporarily disabled."
 msgstr "Sajnálom, a csoportok használata ideiglenesen le van tiltva."
 
@@ -8963,15 +8954,15 @@ msgstr "Neked csak %d bejegyzésed lehet a hozzáférési listán."
 msgid "Sorry, the memo ignore list for %s is full."
 msgstr "Greet message for %s unset."
 
-#: modules/commands/cs_xop.cpp:201 modules/commands/cs_flags.cpp:174
-#: modules/commands/cs_access.cpp:204
+#: modules/commands/cs_access.cpp:204 modules/commands/cs_flags.cpp:174
+#: modules/commands/cs_xop.cpp:201
 #, fuzzy, c-format
 msgid ""
 "Sorry, you can only have %d access entries on a channel, including access "
 "entries from other channels."
 msgstr "Neked csak %d  helyed van a csatorna listáján."
 
-#: modules/commands/cs_akick.cpp:152
+#: modules/commands/cs_akick.cpp:177
 #, c-format
 msgid "Sorry, you can only have %d autokick masks on a channel."
 msgstr "%d bejegyzésnél nem lehet több a listán."
@@ -9015,26 +9006,26 @@ msgstr "Ne floodolj!"
 msgid "Stop repeating yourself!"
 msgstr "Ne ismételd magad!"
 
-#: modules/commands/cs_set.cpp:757
+#: modules/commands/cs_set.cpp:746
 #, fuzzy
 msgid "Stricter control of channel founder status"
 msgstr "    SECUREFOUNDER Csatornán a founder státusz szigorú kezelése"
 
-#: modules/commands/cs_set.cpp:821
+#: modules/commands/cs_set.cpp:810
 #, fuzzy
 msgid "Stricter control of chanop status"
 msgstr "    SECUREOPS     A csatornán az op státusz szigorú kezelése"
 
-#: modules/commands/cs_info.cpp:50 modules/commands/ns_alist.cpp:75
+#: modules/commands/ns_alist.cpp:75 modules/commands/cs_info.cpp:50
 msgid "Successor"
 msgstr ""
 
-#: modules/commands/cs_set.cpp:1017
+#: modules/commands/cs_set.cpp:1006
 #, fuzzy, c-format
 msgid "Successor for %s changed to %s."
 msgstr "A megadott csatorna (%s) új successora: %s."
 
-#: modules/commands/cs_set.cpp:1019
+#: modules/commands/cs_set.cpp:1008
 #, c-format
 msgid "Successor for %s unset."
 msgstr "A megadott csatorna %s successora törölve."
@@ -9110,7 +9101,7 @@ msgstr "    GROUP       A vhostot a csoport minden tagjára állítja"
 msgid "Syntax"
 msgstr ""
 
-#: modules/commands/ns_group.cpp:358
+#: modules/commands/ns_group.cpp:373
 #, fuzzy, c-format
 msgid ""
 "Syntax: %s\n"
@@ -9121,7 +9112,7 @@ msgstr ""
 "\n"
 "Listáz minden nicket a csoportodból."
 
-#: modules/commands/ns_group.cpp:348
+#: modules/commands/ns_group.cpp:363
 #, fuzzy, c-format
 msgid ""
 "Syntax: %s [nickname]\n"
@@ -9577,7 +9568,7 @@ msgid ""
 "shown to users when they join the channel."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:705
+#: modules/commands/ns_set.cpp:713
 msgid "The IMMED option is not available on this network."
 msgstr "Az  IMMED opció nem elérhető ezen a hálózaton."
 
@@ -9812,7 +9803,7 @@ msgstr ""
 msgid "The limit on %s is not valid."
 msgstr "Nem változtathatod meg %s üzeneteinek számát."
 
-#: modules/commands/os_forbid.cpp:181
+#: modules/commands/os_forbid.cpp:193
 msgid "The mask must contain at least one non wildcard character."
 msgstr ""
 
@@ -9826,7 +9817,7 @@ msgstr "Nem változtathatod meg %s üzeneteinek számát."
 msgid "The mode lock list of %s is full."
 msgstr "Greet message for %s unset."
 
-#: modules/commands/ns_set.cpp:352
+#: modules/commands/ns_set.cpp:355
 #, c-format
 msgid "The new display MUST be a nickname of the nickname group %s."
 msgstr ""
@@ -9896,12 +9887,12 @@ msgstr ""
 msgid "There are no configured servers."
 msgstr ""
 
-#: modules/commands/os_forbid.cpp:380
+#: modules/commands/os_forbid.cpp:392
 #, fuzzy, c-format
 msgid "There are no forbids of type %s."
 msgstr "Összesen %d üzenet van a %s csatornán."
 
-#: modules/commands/ns_group.cpp:148
+#: modules/commands/ns_group.cpp:162
 #, fuzzy
 msgid "There are too many nicks in your group."
 msgstr "    DELALL      Törli a vhosztot a nickekröl a csoportban"
@@ -9945,7 +9936,7 @@ msgstr "Nincs véletlenszerű hír."
 msgid "There is no such configuration block %s."
 msgstr "    RELOAD      Újratölti a szervíz Konfigurációs fájlját"
 
-#: modules/commands/cs_mode.cpp:702
+#: modules/commands/cs_mode.cpp:706
 #, fuzzy, c-format
 msgid "There is no such mode %s."
 msgstr "Nincs oper news."
@@ -9954,7 +9945,7 @@ msgstr "Nincs oper news."
 msgid "There's no email address set for your nick."
 msgstr "Nincs beállítva email cím a nevedhez."
 
-#: modules/commands/os_forbid.cpp:292 modules/commands/os_forbid.cpp:484
+#: modules/commands/os_forbid.cpp:304 modules/commands/os_forbid.cpp:496
 #, fuzzy, c-format
 msgid "This channel has been forbidden: %s"
 msgstr "Ez a szoba a %s adatbázisában regisztrált."
@@ -10089,7 +10080,7 @@ msgstr ""
 "Ez a parancs betölti azt modult, a modules könyvtárból,\n"
 "amelyiknek a fájlnevét megadtad."
 
-#: modules/commands/ns_group.cpp:187
+#: modules/commands/ns_group.cpp:201
 #, fuzzy
 msgid ""
 "This command makes your nickname join the target nickname's\n"
@@ -10157,7 +10148,7 @@ msgid ""
 "auto join lists."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:342 modules/commands/ns_set.cpp:661
+#: modules/commands/ns_set.cpp:345 modules/commands/ns_set.cpp:669
 msgid ""
 "This command may not be used on this network because nickname ownership is "
 "disabled."
@@ -10200,7 +10191,7 @@ msgid ""
 "access entries on the channel."
 msgstr ""
 
-#: modules/commands/ns_group.cpp:270
+#: modules/commands/ns_group.cpp:285
 #, fuzzy
 msgid ""
 "This command ungroups your nick, or if given, the specificed nick,\n"
@@ -10236,7 +10227,7 @@ msgid ""
 "(If this is your nick, type %s%s IDENTIFY password.)"
 msgstr ""
 
-#: modules/commands/os_forbid.cpp:457
+#: modules/commands/os_forbid.cpp:469
 #, fuzzy, c-format
 msgid "This nickname has been forbidden: %s"
 msgstr "This nickname is currently suspended, reason: %s"
@@ -10356,12 +10347,12 @@ msgstr "Kapcsold ki a caps lockod!"
 msgid "Turn chanstats statistics on or off"
 msgstr "    SECURE     A nickneved védelmének be-,kikapcsolása"
 
-#: modules/commands/ns_set.cpp:1001
+#: modules/commands/ns_set.cpp:1009
 #, fuzzy
 msgid "Turn nickname security on or off"
 msgstr "    SECURE     A nickneved védelmének be-,kikapcsolása"
 
-#: modules/commands/ns_set.cpp:647
+#: modules/commands/ns_set.cpp:655
 #, fuzzy
 msgid "Turn protection on or off"
 msgstr "    KILL       A kill védelem be-,kikapcsolása"
@@ -10401,7 +10392,7 @@ msgstr ""
 "(Máskülönben, bárki kaphat információt a nicknevedről\n"
 "használva az INFO parancsot.)"
 
-#: modules/commands/ns_set.cpp:1051 modules/commands/ns_set.cpp:1080
+#: modules/commands/ns_set.cpp:1059 modules/commands/ns_set.cpp:1088
 #, fuzzy, c-format
 msgid ""
 "Turns %s's security features on or off for your\n"
@@ -10432,7 +10423,7 @@ msgstr "    SECURE     A nickneved védelmének be-,kikapcsolása"
 msgid "Turns chanstats channel statistics ON or OFF for this user."
 msgstr "    SECURE     A nickneved védelmének be-,kikapcsolása"
 
-#: modules/commands/ns_set.cpp:764
+#: modules/commands/ns_set.cpp:772
 #, fuzzy, c-format
 msgid ""
 "Turns the automatic protection option for the nick\n"
@@ -10463,7 +10454,7 @@ msgstr ""
 "do not use this option unless necessary.  Also, your\n"
 "network's administrators may have disabled this option."
 
-#: modules/commands/ns_set.cpp:730
+#: modules/commands/ns_set.cpp:738
 #, fuzzy, c-format
 msgid ""
 "Turns the automatic protection option for your nick\n"
@@ -10494,11 +10485,11 @@ msgstr ""
 "kérlek ne használd ezt az opciót csak ha nagyon indokolt.\n"
 "A network adminisztrátorok letilthatják ezt."
 
-#: modules/commands/bs_badwords.cpp:194 modules/commands/os_forbid.cpp:346
+#: modules/commands/bs_badwords.cpp:194 modules/commands/os_forbid.cpp:358
 msgid "Type"
 msgstr ""
 
-#: modules/commands/ns_set.cpp:59
+#: modules/commands/ns_set.cpp:62
 #, fuzzy, c-format
 msgid ""
 "Type %s%s HELP %s option for more information\n"
@@ -10520,7 +10511,7 @@ msgstr ""
 "on a specific option. The options will be set on the given\n"
 "nickname. "
 
-#: modules/commands/ns_set.cpp:104
+#: modules/commands/ns_set.cpp:107
 #, fuzzy, c-format
 msgid ""
 "Type %s%s HELP %s option for more information\n"
@@ -10531,7 +10522,7 @@ msgstr ""
 "on a specific option. The options will be set on the given\n"
 "nickname. "
 
-#: modules/commands/cs_set.cpp:60 modules/commands/bs_set.cpp:59
+#: modules/commands/bs_set.cpp:62 modules/commands/cs_set.cpp:63
 #, fuzzy, c-format
 msgid ""
 "Type %s%s HELP %s option for more information on a\n"
@@ -10555,8 +10546,8 @@ msgstr ""
 msgid "Un-Load a module"
 msgstr "    MODUNLOAD   Kitölti a modult"
 
-#: modules/commands/os_akill.cpp:136 modules/commands/os_sxline.cpp:337
-#: modules/commands/os_sxline.cpp:552
+#: modules/commands/os_sxline.cpp:337 modules/commands/os_sxline.cpp:552
+#: modules/commands/os_akill.cpp:136
 #, fuzzy, c-format
 msgid "Unable to find regex engine %s."
 msgstr "Nem sikerült eltávolítani a %s modult"
@@ -10734,7 +10725,7 @@ msgstr "    ACCESS     A szoba hozzáférési listájának beállítása"
 msgid "Used to modify the channel status of you or other users"
 msgstr ""
 
-#: modules/commands/cs_akick.cpp:563
+#: modules/commands/cs_akick.cpp:575
 #, fuzzy
 msgid "User has been banned from the channel"
 msgstr "%s csatornán a tiltást levetetted magadról."
@@ -10797,8 +10788,8 @@ msgstr "A %s csoport vhostja erre változott: %s@%s."
 msgid "VIEW host"
 msgstr ""
 
-#: modules/commands/os_akill.cpp:389 modules/commands/os_sxline.cpp:428
-#: modules/commands/os_sxline.cpp:662
+#: modules/commands/os_sxline.cpp:428 modules/commands/os_sxline.cpp:662
+#: modules/commands/os_akill.cpp:389
 #, fuzzy
 msgid "VIEW [mask | list | id]"
 msgstr "LIST [#szoba] [list | NEW ]"
@@ -10945,12 +10936,12 @@ msgstr ""
 msgid "Word"
 msgstr ""
 
-#: modules/commands/ns_group.cpp:144
+#: modules/commands/ns_group.cpp:158
 #, c-format
 msgid "You are already a member of the group of %s."
 msgstr "Már tagja vagy ennek a csoportnak: %s."
 
-#: modules/commands/ns_identify.cpp:87 modules/commands/os_login.cpp:34
+#: modules/commands/os_login.cpp:34 modules/commands/ns_identify.cpp:87
 msgid "You are already identified."
 msgstr "Már be vagy azonosítva. :-)"
 
@@ -10997,7 +10988,7 @@ msgstr "Most már IRC Operátor vagy!"
 msgid "You are now identified for your nick. Change your password now."
 msgstr "You are now identified for your nick. Change your password now."
 
-#: modules/commands/ns_group.cpp:50
+#: modules/commands/ns_group.cpp:64
 #, c-format
 msgid "You are now in the group of %s."
 msgstr "Mostantól tagja vagy a %scsoportnak."
@@ -11045,8 +11036,8 @@ msgstr "You can not request a receipt when sending a memo to yourself."
 msgid "You can't %s yourself!"
 msgstr "Nem ghostolhatod ki magad!"
 
-#: modules/commands/cs_xop.cpp:151 modules/commands/cs_flags.cpp:109
-#: modules/commands/cs_access.cpp:154
+#: modules/commands/cs_access.cpp:154 modules/commands/cs_flags.cpp:109
+#: modules/commands/cs_xop.cpp:151
 #, fuzzy
 msgid "You can't add a channel to its own access list."
 msgstr "Nincs ilyen bejegyzés a (%s) csatorna hozzáférési listáján."
@@ -11056,7 +11047,7 @@ msgstr "Nincs ilyen bejegyzés a (%s) csatorna hozzáférési listáján."
 msgid "You can't logout %s, they are a Services Operator."
 msgstr "%s nem tud kijelentkezni, mert ő egy Services Operator."
 
-#: modules/commands/ns_set.cpp:919
+#: modules/commands/ns_set.cpp:927
 #, fuzzy, c-format
 msgid "You cannot %s on this network."
 msgstr "Nem törölheted ezen a hálózaton az e-mail címed."
@@ -11081,7 +11072,7 @@ msgstr "A max. bejövő üzenetek száma nem lehet több, mint %d."
 msgid "You cannot unassign bots while persist is set on the channel."
 msgstr "You can not unassign bots while persist is set on the channel."
 
-#: modules/commands/ns_set.cpp:475
+#: modules/commands/ns_set.cpp:480
 msgid "You cannot unset the e-mail on this network."
 msgstr "Nem törölheted ezen a hálózaton az e-mail címed."
 
@@ -11163,7 +11154,7 @@ msgstr "You have been invited to %s."
 msgid "You have been invited to %s."
 msgstr "You have been invited to %s."
 
-#: modules/commands/ns_recover.cpp:96 modules/protocol/ratbox.cpp:166
+#: modules/protocol/ratbox.cpp:166 modules/commands/ns_recover.cpp:96
 #, fuzzy, c-format
 msgid "You have been logged in as %s."
 msgstr "A nicked sikeresen kijelentkezett."
@@ -11221,17 +11212,17 @@ msgstr "    DELALL      Törli a vhosztot a nickekröl a csoportban"
 msgid "You may not (un)lock mode %c."
 msgstr ""
 
-#: modules/commands/ns_set.cpp:480
+#: modules/commands/ns_set.cpp:485
 #, fuzzy
 msgid "You may not change the e-mail of other Services Operators."
 msgstr "Nem törölheted ezen a hálózaton az e-mail címed."
 
-#: modules/commands/ns_set.cpp:469
+#: modules/commands/ns_set.cpp:474
 #, fuzzy
 msgid "You may not change the email of an unconfirmed account."
 msgstr "Nem törölheted ezen a hálózaton az e-mail címed."
 
-#: modules/commands/ns_set.cpp:193
+#: modules/commands/ns_set.cpp:196
 #, fuzzy
 msgid "You may not change the password of other Services Operators."
 msgstr "%s nem tud kijelentkezni, mert ő egy Services Operator."
@@ -11309,7 +11300,7 @@ msgid "You must have been using this nick for at least %d seconds to register."
 msgstr ""
 "A nicked regisztrálásához %d másodpercnél régebben kell csatlakozva lenned."
 
-#: modules/commands/cs_mode.cpp:903
+#: modules/commands/cs_mode.cpp:913
 #, fuzzy, c-format
 msgid "You must have the %s(ME) privilege on the channel to use this command."
 msgstr "You need to be identified to use this command."
@@ -11405,12 +11396,12 @@ msgstr "Már be vagy azonosítva. :-)"
 msgid "Your account will expire, if not confirmed, in %s."
 msgstr "Már be vagy azonosítva. :-)"
 
-#: modules/commands/ns_set.cpp:1266
+#: modules/commands/ns_set.cpp:1274
 #, fuzzy, c-format
 msgid "Your email address has been changed to %s."
 msgstr "E-mail address for %s changed to %s."
 
-#: modules/commands/os_forbid.cpp:532 modules/commands/os_forbid.cpp:541
+#: modules/commands/os_forbid.cpp:544 modules/commands/os_forbid.cpp:553
 #, fuzzy
 msgid "Your email address is not allowed, choose a different one."
 msgstr "Összes O:lines %s módosítva."
@@ -11472,12 +11463,12 @@ msgstr ""
 msgid "Your nick has been logged out."
 msgstr "A nicked sikeresen kijelentkezett."
 
-#: modules/commands/ns_group.cpp:142
+#: modules/commands/ns_group.cpp:156
 #, fuzzy
 msgid "Your nick is already registered."
 msgstr "A nicked már regisztrált; írd be /msg %s DROP először."
 
-#: modules/commands/ns_group.cpp:232
+#: modules/commands/ns_group.cpp:246
 msgid "Your nick is not grouped to anything, you can't ungroup it."
 msgstr "Your nick is not grouped to anything, you can't ungroup it."
 
@@ -11519,14 +11510,14 @@ msgstr "Your password request has expired."
 msgid "Your vHost has been requested."
 msgstr "A %s nevű bot törölve."
 
-#: modules/commands/hs_on.cpp:37 modules/pseudoclients/hostserv.cpp:64
-#: modules/pseudoclients/hostserv.cpp:103
+#: modules/pseudoclients/hostserv.cpp:64
+#: modules/pseudoclients/hostserv.cpp:103 modules/commands/hs_on.cpp:37
 #, c-format
 msgid "Your vhost of %s is now activated."
 msgstr "A %s virtuális hosztod aktiválva."
 
-#: modules/commands/hs_on.cpp:35 modules/pseudoclients/hostserv.cpp:62
-#: modules/pseudoclients/hostserv.cpp:101
+#: modules/pseudoclients/hostserv.cpp:62
+#: modules/pseudoclients/hostserv.cpp:101 modules/commands/hs_on.cpp:35
 #, c-format
 msgid "Your vhost of %s@%s is now activated."
 msgstr "A  %s@%s virtuális hosztod aktiválva."
@@ -11630,7 +11621,7 @@ msgstr ""
 msgid "[nick | channel]"
 msgstr "CANCEL {nick | #szoba}"
 
-#: modules/commands/ns_group.cpp:223
+#: modules/commands/ns_group.cpp:237
 #, fuzzy
 msgid "[nick]"
 msgstr "INFO nick"
@@ -11639,8 +11630,8 @@ msgstr "INFO nick"
 msgid "[nickname [REVALIDATE]]"
 msgstr ""
 
-#: modules/commands/ns_info.cpp:20 modules/commands/ns_status.cpp:20
-#: modules/commands/ns_alist.cpp:25
+#: modules/commands/ns_alist.cpp:25 modules/commands/ns_status.cpp:20
+#: modules/commands/ns_info.cpp:20
 #, fuzzy
 msgid "[nickname]"
 msgstr "CHECK nicknév "
@@ -11662,7 +11653,7 @@ msgstr "CHANKILL [+lejárat] {#szoba} [indok]"
 msgid "[Hostname hidden]"
 msgstr ""
 
-#: modules/commands/cs_list.cpp:115 modules/commands/ns_list.cpp:112
+#: modules/commands/ns_list.cpp:112 modules/commands/cs_list.cpp:115
 msgid "[Suspended]"
 msgstr ""
 
@@ -11831,7 +11822,7 @@ msgstr "UNBAN #szoba [nick]"
 msgid "{nick | channel}"
 msgstr "CANCEL {nick | #szoba}"
 
-#: modules/commands/ms_send.cpp:25 modules/commands/ms_rsend.cpp:25
+#: modules/commands/ms_rsend.cpp:25 modules/commands/ms_send.cpp:25
 #, fuzzy
 msgid "{nick | channel} memo-text"
 msgstr "SEND {nick | #szoba} memo-szöveg"

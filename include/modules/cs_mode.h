@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -74,7 +74,7 @@ struct ModeLocks
 
 	/** Get details for a specific mlock
 	 * @param mname The mode name
- 	 * @param An optional param to match with
+	 * @param An optional param to match with
 	 * @return The MLock, if any
 	 */
 	virtual const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "") = 0;

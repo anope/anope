@@ -2,7 +2,7 @@
 #
 # Configuration script for Services
 #
-# (C) 2003-2017 Anope Team
+# (C) 2003-2019 Anope Team
 # Contact us at team@anope.org
 #
 # Please read COPYING and README for further details.
@@ -65,7 +65,7 @@ if [ "$1" = "start" ] ; then
                 echo "This error has been logged in your Anope Log file"
                 echo "Located in "$LOG""
                 echo "This may help you diagnose the problem"
-                echo "Further help may be available from http://www.anope.org/"
+                echo "Further help may be available from https://www.anope.org/"
 		exit 1
 	fi
 
@@ -101,7 +101,7 @@ elif [ "$1" = "restart" ] ; then
                 echo "This error has been logged in your Anope Log file"
                 echo "Located in "$LOG""
                 echo "This may help you diagnose the problem"
-                echo "Further help may be available from http://www.anope.org/"
+                echo "Further help may be available from https://www.anope.org/"
 		exit 1
 	fi
 
@@ -128,7 +128,7 @@ elif [ "$1" = "help" ] ; then
 		echo "$0 help           Show this help menu"
 		echo "If you need further help please check the /docs/"
 		echo "folder or make use of our extensive online support at"
-		echo "http://www.anope.org/"
+		echo "https://www.anope.org/"
 	fi
 
 else

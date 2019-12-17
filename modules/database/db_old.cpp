@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -81,8 +81,8 @@ else \
 #define OLD_BS_NOBOT			0x00000020
 
 /* BotServ Kickers flags */
-#define OLD_BS_KICK_BOLDS 		0x80000000
-#define OLD_BS_KICK_COLORS 		0x40000000
+#define OLD_BS_KICK_BOLDS		0x80000000
+#define OLD_BS_KICK_COLORS		0x40000000
 #define OLD_BS_KICK_REVERSES	0x20000000
 #define OLD_BS_KICK_UNDERLINES	0x10000000
 #define OLD_BS_KICK_BADWORDS	0x08000000

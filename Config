@@ -2,7 +2,7 @@
 #
 # Configuration script for Services.
 #
-# Anope (c) 2003-2017 Anope Team
+# Anope (c) 2003-2019 Anope Team
 # Contact us at team@anope.org
 #
 # This program is free but copyrighted software; see the file COPYING for
@@ -173,7 +173,7 @@ done
 cmake --version 2>&1 > /dev/null
 if [ $? -ne 0 ] ; then
 	clear
-	echo "Anope requires CMake 2.4 or newer, which can be downloaded at http://cmake.org or through your system's package manager."
+	echo "Anope requires CMake 2.4 or newer, which can be downloaded at https://cmake.org/ or through your system's package manager."
 	echo "If you have installed CMake already, ensure it is in your PATH environment variable."
 	exit 0
 fi

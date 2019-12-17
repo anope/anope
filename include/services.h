@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -48,7 +48,7 @@
 
 #define _(x) x
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if defined __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus >= 201103L
 # define anope_override override
 # define anope_final final
 #else

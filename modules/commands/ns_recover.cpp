@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -185,6 +185,9 @@ class CommandNSRecover : public Command
 
 		NSCertList *cl = na->nc->GetExt<NSCertList>("certificates");
 		if (source.GetUser() && !source.GetUser()->fingerprint.empty() && cl && cl->FindCert(source.GetUser()->fingerprint))
+			ok = true;
+
+		if (source.HasPriv("nickserv/recover"))
 			ok = true;
 
 		if (ok == false && !pass.empty())

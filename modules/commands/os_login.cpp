@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -55,7 +55,7 @@ class CommandOSLogin : public Command
 		return true;
 	}
 
- 	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const anope_override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Login to %s")), source.service->nick.c_str());
 	}
@@ -97,7 +97,7 @@ class CommandOSLogout : public Command
 		return true;
 	}
 
- 	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const anope_override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Logout from %s")), source.service->nick.c_str());
 	}

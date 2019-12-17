@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -30,7 +30,7 @@ class CoreExport Regex
  protected:
 	Regex(const Anope::string &expr) : expression(expr) { }
  public:
- 	virtual ~Regex() { }
+	virtual ~Regex() { }
 	const Anope::string &GetExpression() { return expression; }
 	virtual bool Matches(const Anope::string &str) = 0;
 };

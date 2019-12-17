@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -42,6 +42,9 @@ class CommandNSSet : public Command
 
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
+				if (info.hide)
+					continue;
+
 				ServiceReference<Command> c("Command", info.name);
 				// XXX dup
 				if (!c)
@@ -426,11 +429,13 @@ class CommandNSSetEmail : public Command
 
 		subject = subject.replace_all_cs("%e", nc->email);
 		subject = subject.replace_all_cs("%E", new_email);
+		subject = subject.replace_all_cs("%n", nc->display);
 		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 		subject = subject.replace_all_cs("%c", code);
 
 		message = message.replace_all_cs("%e", nc->email);
 		message = message.replace_all_cs("%E", new_email);
+		message = message.replace_all_cs("%n", nc->display);
 		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 		message = message.replace_all_cs("%c", code);
 
@@ -494,7 +499,10 @@ class CommandNSSetEmail : public Command
 		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
 		{
 			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
+			{
+				Log(LOG_COMMAND, source, this) << "to request changing the email of " << nc->display << " to " << param;
 				source.Reply(_("A confirmation e-mail has been sent to \002%s\002. Follow the instructions in it to change your e-mail address."), param.c_str());
+			}
 		}
 		else
 		{
@@ -963,7 +971,7 @@ class CommandNSSetMessage : public Command
 
 	void OnServHelp(CommandSource &source) anope_override
 	{
-		if (!Config->GetBlock("options")->Get<bool>("useprivmsg"))
+		if (Config->GetBlock("options")->Get<bool>("useprivmsg"))
 			Command::OnServHelp(source);
 	}
 };

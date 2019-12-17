@@ -1,7 +1,7 @@
 /* Mode support
  *
  * (C) 2008-2011 Adam <Adam@anope.org>
- * (C) 2008-2017 Anope Team <team@anope.org>
+ * (C) 2008-2019 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -186,7 +186,7 @@ ChannelModeParam::ChannelModeParam(const Anope::string &cm, char mch, bool ma) :
 	this->type = MODE_PARAM;
 }
 
-ChannelModeStatus::ChannelModeStatus(const Anope::string &mname, char modeChar, char msymbol, short mlevel) : ChannelMode(mname, modeChar), symbol(msymbol), level(mlevel)
+ChannelModeStatus::ChannelModeStatus(const Anope::string &mname, char modeChar, char msymbol, unsigned mlevel) : ChannelMode(mname, modeChar), symbol(msymbol), level(mlevel)
 {
 	this->type = MODE_STATUS;
 }

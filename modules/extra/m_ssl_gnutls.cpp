@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2014 Attila Molnar <attilamolnar@hush.com>
- * (C) 2014-2017 Anope Team
+ * (C) 2014-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -25,7 +25,7 @@ namespace GnuTLS { class X509CertCredentials; }
 class MySSLService : public SSLService
 {
  public:
- 	MySSLService(Module *o, const Anope::string &n);
+	MySSLService(Module *o, const Anope::string &n);
 
 	/** Initialize a socket to use SSL
 	 * @param s The socket
@@ -44,7 +44,7 @@ class SSLSocketIO : public SocketIO
 	SSLSocketIO();
 
 	/** Really receive something from the buffer
- 	 * @param s The socket
+	 * @param s The socket
 	 * @param buf The buf to read to
 	 * @param sz How much to read
 	 * @return Number of bytes received

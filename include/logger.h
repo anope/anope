@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -52,7 +52,7 @@ struct LogFile
 class CoreExport Log
 {
  public:
- 	/* Bot that should log this message */
+	/* Bot that should log this message */
 	BotInfo *bi;
 	/* For commands, the user executing the command, but might not always exist */
 	User *u;
@@ -113,7 +113,7 @@ class CoreExport Log
 class CoreExport LogInfo
 {
  public:
- 	BotInfo *bot;
+	BotInfo *bot;
 	std::vector<Anope::string> targets;
 	std::vector<LogFile *> logfiles;
 	int last_day;

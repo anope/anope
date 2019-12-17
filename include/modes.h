@@ -1,7 +1,7 @@
 /* Mode support
  *
  * (C) 2008-2011 Adam <Adam@anope.org>
- * (C) 2008-2017 Anope Team <team@anope.org>
+ * (C) 2008-2019 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -39,8 +39,8 @@ enum ModeClass
 class CoreExport Mode : public Base
 {
  public:
- 	/* Mode name */
- 	Anope::string name;
+	/* Mode name */
+	Anope::string name;
 	/* Class of mode this is (user/channel) */
 	ModeClass mclass;
 	/* Mode char for this, eg 'b' */
@@ -78,7 +78,7 @@ class CoreExport UserMode : public Mode
 class CoreExport UserModeParam : public UserMode
 {
  public:
- 	/** constructor
+	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
 	 */
@@ -192,7 +192,7 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	/* The "level" of the mode, used to compare with other modes.
 	 * Used so we know op > halfop > voice etc.
 	 */
-	short level;
+	unsigned level;
 
 	/** constructor
 	 * @param name The mode name
@@ -200,7 +200,7 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	 * @param msymbol The symbol for the mode, eg @ %
 	 * @param mlevel A level for the mode, which is usually determined by the PREFIX capab
 	 */
-	ChannelModeStatus(const Anope::string &name, char mc, char msymbol, short mlevel);
+	ChannelModeStatus(const Anope::string &name, char mc, char msymbol, unsigned mlevel);
 };
 
 /** A virtual mode. This mode doesn't natively exist on the IRCd (like extbans),
@@ -229,9 +229,9 @@ class CoreExport ChannelStatus
 {
 	Anope::string modes;
  public:
- 	ChannelStatus();
- 	ChannelStatus(const Anope::string &modes);
- 	void AddMode(char c);
+	ChannelStatus();
+	ChannelStatus(const Anope::string &modes);
+	void AddMode(char c);
 	void DelMode(char c);
 	bool HasMode(char c) const;
 	bool Empty() const;
@@ -399,7 +399,7 @@ class CoreExport Entry
 	Anope::string nick, user, host, real;
 
 	/** Constructor
- 	 * @param mode What mode this host is for, can be empty for unknown/no mode
+	 * @param mode What mode this host is for, can be empty for unknown/no mode
 	 * @param host A full or poartial nick!ident@host/cidr#real name mask
 	 */
 	Entry(const Anope::string &mode, const Anope::string &host);

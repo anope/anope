@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -359,7 +359,7 @@ bool IRCDProto::IsNickValid(const Anope::string &nick)
 	 **/
 
 	 if (nick.empty())
-	 	return false;
+		return false;
 
 	Anope::string special = "[]\\`_^{|}";
 
@@ -502,3 +502,10 @@ unsigned IRCDMessage::GetParamCount() const
 {
 	return this->param_count;
 }
+
+void IRCDMessage::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+{
+	// Most IRCds don't support message tags yet so use the tagless variant.
+	Run(source, params);
+}
+

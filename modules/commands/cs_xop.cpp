@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -22,7 +22,7 @@ class XOPChanAccess : public ChanAccess
  public:
 	Anope::string type;
 
- 	XOPChanAccess(AccessProvider *p) : ChanAccess(p)
+	XOPChanAccess(AccessProvider *p) : ChanAccess(p)
 	{
 	}
 
@@ -484,7 +484,7 @@ class CommandCSXOP : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
- 	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const anope_override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.upper().c_str());
 	}

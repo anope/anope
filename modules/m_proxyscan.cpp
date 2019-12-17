@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -57,11 +57,11 @@ class ProxyConnect : public ConnectionSocket
 	static ServiceReference<XLineManager> akills;
 
  public:
- 	static std::set<ProxyConnect *> proxies;
+	static std::set<ProxyConnect *> proxies;
 
- 	ProxyCheck proxy;
+	ProxyCheck proxy;
 	unsigned short port;
- 	time_t created;
+	time_t created;
 
 	ProxyConnect(ProxyCheck &p, unsigned short po) : Socket(-1), ConnectionSocket(), proxy(p),
 		port(po), created(Anope::CurTime)

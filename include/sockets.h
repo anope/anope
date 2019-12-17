@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -98,7 +98,7 @@ class CoreExport cidr
 	Anope::string cidr_ip;
 	unsigned short cidr_len;
  public:
- 	cidr(const Anope::string &ip);
+	cidr(const Anope::string &ip);
 	cidr(const Anope::string &ip, unsigned char len);
 	cidr(const sockaddrs &ip, unsigned char len);
 	Anope::string mask() const;
@@ -147,7 +147,7 @@ class CoreExport SocketIO
 	virtual ~SocketIO() { }
 
 	/** Receive something from the buffer
- 	 * @param s The socket
+	 * @param s The socket
 	 * @param buf The buf to read to
 	 * @param sz How much to read
 	 * @return Number of bytes received
@@ -208,13 +208,13 @@ class CoreExport Socket
 	bool ipv6;
 
  public:
- 	std::bitset<SF_SIZE> flags;
+	std::bitset<SF_SIZE> flags;
 
 	/* Sockaddrs for bind() (if it's bound) */
 	sockaddrs bindaddr;
 
 	/* I/O functions used for this socket */
- 	SocketIO *io;
+	SocketIO *io;
 
 	/** Empty constructor, should not be called.
 	 */
@@ -225,7 +225,7 @@ class CoreExport Socket
 	 * @param ipv6 true if using ipv6
 	 * @param type The socket type, defaults to SOCK_STREAM
 	 */
- 	Socket(int sock, bool ipv6 = false, int type = SOCK_STREAM);
+	Socket(int sock, bool ipv6 = false, int type = SOCK_STREAM);
 
 	/** Destructor, closes the socket and removes it from the engine
 	 */
@@ -277,8 +277,8 @@ class CoreExport Socket
 class CoreExport BufferedSocket : public virtual Socket
 {
  protected:
- 	/* Things read from the socket */
- 	Anope::string read_buffer;
+	/* Things read from the socket */
+	Anope::string read_buffer;
 	/* Things to be written to the socket */
 	Anope::string write_buffer;
 	/* How much data was received from this socket on this recv() */
@@ -385,8 +385,8 @@ class CoreExport ListenSocket : public virtual Socket
 	bool ProcessRead();
 
 	/** Called when a connection is accepted
- 	 * @param fd The FD for the new connection
- 	 * @param addr The sockaddr for where the connection came from
+	 * @param fd The FD for the new connection
+	 * @param addr The sockaddr for where the connection came from
 	 * @return The new socket
 	 */
 	virtual ClientSocket *OnAccept(int fd, const sockaddrs &addr) = 0;
@@ -462,10 +462,10 @@ class CoreExport ClientSocket : public virtual Socket
 class CoreExport Pipe : public Socket
 {
  public:
- 	/** The FD of the write pipe
+	/** The FD of the write pipe
 	 * this->sock is the readfd
 	 */
- 	int write_pipe;
+	int write_pipe;
 
 	Pipe();
 	~Pipe();

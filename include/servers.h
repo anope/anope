@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -79,8 +79,8 @@ class CoreExport Server : public Extensible
 	~Server();
 
  public:
- 	/* Number of users on the server */
- 	unsigned users;
+	/* Number of users on the server */
+	unsigned users;
 
 	/** Delete this server with a reason
 	 * @param reason The reason

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2011-2017 Anope Team
+ * (C) 2011-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -35,7 +35,7 @@ struct Exception : Serializable
 class SessionService : public Service
 {
  public:
- 	typedef TR1NS::unordered_map<cidr, Session *, cidr::hash> SessionMap;
+	typedef TR1NS::unordered_map<cidr, Session *, cidr::hash> SessionMap;
 	typedef std::vector<Exception *> ExceptionVector;
 
 	SessionService(Module *m) : Service(m, "SessionService", "session") { }

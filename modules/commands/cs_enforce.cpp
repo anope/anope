@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Original Coder: GeniusDex <geniusdex@anope.org>
@@ -267,7 +267,7 @@ class CommandCSEnforce : public Command
 			"\002BANS\002, or \002LIMIT\002.\n"
 			" \n"
 			"Use \002SECUREOPS\002 to enforce the SECUREOPS option, even if it is not\n"
-			"enabled. Use \002RESTRICTED\002 to enfore the RESTRICTED option, also\n"
+			"enabled. Use \002RESTRICTED\002 to enforce the RESTRICTED option, also\n"
 			"if it's not enabled. Use \002REGONLY\002 to kick all unregistered users\n"
 			"from the channel. Use \002SSLONLY\002 to kick all users not using a secure\n"
 			"connection from the channel. \002BANS\002 will enforce bans on the channel by\n"

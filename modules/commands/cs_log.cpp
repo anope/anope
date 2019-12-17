@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -81,7 +81,7 @@ struct LogSettingsImpl : LogSettings
 {
 	LogSettingsImpl(Extensible *) { }
 
- 	~LogSettingsImpl()
+	~LogSettingsImpl()
 	{
 		for (iterator it = (*this)->begin(); it != (*this)->end();)
 		{

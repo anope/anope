@@ -19,7 +19,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     La première chose que vous devez faire est d'obtenir le package Anope
     (si ce n'est déjà fait). Vous pouvez le trouver ici :
 
-        http://www.anope.org/
+        https://www.anope.org/
 
     Anope nécessite cmake pour être compilé. Vous pouvez vérifier si CMake
     est déjà installé sur votre système avec la commande :
@@ -32,7 +32,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     pourrez pas utiliser CMake à moins de l'installer vous-même dans votre
     répertoire home. CMake peut être téléchargé ici :
 
-        http://www.cmake.org/cmake/resources/software.html
+        https://cmake.org/download/
 
     Ensuite, décompressez le package dans votre répertoire home, et allez
     dans le répértoire qui vient d'être créé.
@@ -64,7 +64,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     recommandée, et Anope ne fonctionnera probablement pas !
 
     Si vous avez besoin d'aide, vous pouvez aller sur le site
-    http://forum.anope.org/ ou le canal #anope sur irc.anope.org.
+    https://forum.anope.org/ ou le canal #anope sur irc.anope.org.
     Fournissez *l'essemble* des erreurs qui apparaîssent, en plus de
     toutes informations utiles, comme les versions de votre OS, du
     compilateur utilisé et de la librairie C++. Lisez le fichier README
@@ -99,7 +99,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     Vous pouvez également essayer notre créateur de bloc link interactif
     situé ici :
 
-        http://anope.org/ilm.php
+        https://www.anope.org/ilm.php
 
 4) Mettre en route Anope
 

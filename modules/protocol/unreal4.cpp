@@ -1,6 +1,6 @@
 /* Unreal IRCD 4 functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -321,7 +321,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendSWhois(const MessageSource &source, const Anope::string &who, const Anope::string &mask) anope_override
 	{
-		UplinkSocket::Message(source) << "SWHOIS " << who << " :" << mask;
+		UplinkSocket::Message() << "SWHOIS " << who << " :" << mask;
 	}
 
 	void SendEOB() anope_override
@@ -373,18 +373,40 @@ class UnrealIRCdProto : public IRCDProto
 	void SendSASLMessage(const SASL::Message &message) anope_override
 	{
 		size_t p = message.target.find('!');
-		if (p == Anope::string::npos)
-			return;
+		Anope::string distmask;
 
-		UplinkSocket::Message(BotInfo::Find(message.source)) << "SASL " << message.target.substr(0, p) << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : " " + message.ext);
+		if (p == Anope::string::npos)
+		{
+			Server *s = Server::Find(message.target.substr(0, 3));
+			if (!s)
+				return;
+			distmask = s->GetName();
+		}
+		else
+		{
+			distmask = message.target.substr(0, p);
+		}
+
+		UplinkSocket::Message(BotInfo::Find(message.source)) << "SASL " << distmask << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : " " + message.ext);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
 	{
 		size_t p = uid.find('!');
+		Anope::string distmask;
+
 		if (p == Anope::string::npos)
-			return;
-		UplinkSocket::Message(Me) << "SVSLOGIN " << uid.substr(0, p) << " " << uid << " " << acc;
+		{
+			Server *s = Server::Find(uid.substr(0, 3));
+			if (!s)
+				return;
+			distmask = s->GetName();
+		}
+		else
+		{
+			distmask = uid.substr(0, p);
+		}
+		UplinkSocket::Message(Me) << "SVSLOGIN " << distmask << " " << uid << " " << acc;
 	}
 
 	bool IsIdentValid(const Anope::string &ident) anope_override
@@ -475,11 +497,11 @@ namespace UnrealExtban
 	class EntryMatcher : public UnrealExtBan
 	{
 	 public:
-	 	EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
-	 	{
-	 	}
+		EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
 
-	 	bool Matches(User *u, const Entry *e) anope_override
+		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(3);
@@ -491,11 +513,11 @@ namespace UnrealExtban
 	class RealnameMatcher : public UnrealExtBan
 	{
 	 public:
-	 	RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
-	 	{
-	 	}
+		RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
 
-	 	bool Matches(User *u, const Entry *e) anope_override
+		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(3);
@@ -507,11 +529,11 @@ namespace UnrealExtban
 	class RegisteredMatcher : public UnrealExtBan
 	{
 	 public:
-	 	RegisteredMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
-	 	{
-	 	}
+		RegisteredMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
 
-	 	bool Matches(User *u, const Entry *e) anope_override
+		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
 			return u->HasMode("REGISTERED") && mask.equals_ci(u->nick);
@@ -521,17 +543,17 @@ namespace UnrealExtban
 	class AccountMatcher : public UnrealExtBan
 	{
 	 public:
-	 	AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
-	 	{
-	 	}
+		AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
 
-	 	bool Matches(User *u, const Entry *e) anope_override
-	 	{
-	 		const Anope::string &mask = e->GetMask();
+		bool Matches(User *u, const Entry *e) anope_override
+		{
+			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(3);
 
-	 		return u->Account() && Anope::Match(u->Account()->display, real_mask);
-	 	}
+			return u->Account() && Anope::Match(u->Account()->display, real_mask);
+		}
 	};
 
 	class FingerprintMatcher : public UnrealExtBan
@@ -1005,8 +1027,7 @@ struct IRCDMessageSASL : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		size_t p = params[1].find('!');
-		if (!SASL::sasl || p == Anope::string::npos)
+		if (!SASL::sasl)
 			return;
 
 		SASL::Message m;

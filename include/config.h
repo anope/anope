@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -35,7 +35,7 @@ namespace Configuration
 		int linenum;
 
 	 public:
-	 	Block(const Anope::string &);
+		Block(const Anope::string &);
 		const Anope::string &GetName() const;
 		int CountBlock(const Anope::string &name);
 		Block* GetBlock(const Anope::string &name, int num = 0);

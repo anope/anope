@@ -1,6 +1,6 @@
 /* Declarations for command data.
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -101,7 +101,7 @@ class CoreExport Command : public Service
 	bool require_user;
 
  public:
- 	/* Maximum paramaters accepted by this command */
+	/* Maximum paramaters accepted by this command */
 	size_t max_params;
 	/* Minimum parameters required to use this command */
 	size_t min_params;
@@ -136,11 +136,11 @@ class CoreExport Command : public Service
 	bool AllowUnregistered() const;
 	bool RequireUser() const;
 
- 	/** Get the command description
+	/** Get the command description
 	 * @param source The source wanting the command description
 	 * @return The commands description
 	 */
- 	virtual const Anope::string GetDesc(CommandSource &source) const;
+	virtual const Anope::string GetDesc(CommandSource &source) const;
 
 	/** Execute this command.
 	 * @param source The source

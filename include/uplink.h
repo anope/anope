@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -38,9 +38,9 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 		std::stringstream buffer;
 
 	 public:
-	 	Message();
-	 	Message(const MessageSource &);
-	 	~Message();
+		Message();
+		Message(const MessageSource &);
+		~Message();
 		template<typename T> Message &operator<<(const T &val)
 		{
 			this->buffer << val;

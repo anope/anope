@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2010-2017 Anope Team
+ * (C) 2010-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -24,7 +24,7 @@ static SSL_CTX *server_ctx, *client_ctx;
 class MySSLService : public SSLService
 {
  public:
- 	MySSLService(Module *o, const Anope::string &n);
+	MySSLService(Module *o, const Anope::string &n);
 
 	/** Initialize a socket to use SSL
 	 * @param s The socket
@@ -43,7 +43,7 @@ class SSLSocketIO : public SocketIO
 	SSLSocketIO();
 
 	/** Really receive something from the buffer
- 	 * @param s The socket
+	 * @param s The socket
 	 * @param buf The buf to read to
 	 * @param sz How much to read
 	 * @return Number of bytes received

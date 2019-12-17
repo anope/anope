@@ -1,13 +1,13 @@
 /* Module for providing bcrypt hashing
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * This program is free but copyrighted software; see the file COPYING for
  * details.
  *
  * Most of the code in this file is taken from
- * http://openwall.com/crypt/crypt_blowfish-1.2.tar.gz
+ * https://www.openwall.com/crypt/crypt_blowfish-1.3.tar.gz
 */
 
 /*
@@ -19,11 +19,11 @@
  * and crypt(3) interfaces added, but optimizations specific to password
  * cracking removed.
  *
- * Written by Solar Designer <solar at openwall.com> in 1998-2011.
+ * Written by Solar Designer <solar at openwall.com> in 1998-2014.
  * No copyright is claimed, and the software is hereby placed in the public
  * domain.  In case this attempt to disclaim copyright and place the software
  * in the public domain is deemed null and void, then the software is
- * Copyright (c) 1998-2011 Solar Designer and it is hereby released to the
+ * Copyright (c) 1998-2014 Solar Designer and it is hereby released to the
  * general public under the following terms:
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,12 +39,12 @@
  * you place this code and any modifications you make under a license
  * of your choice.
  *
- * This implementation is mostly compatible with OpenBSD's bcrypt.c (prefix
- * "$2a$") by Niels Provos <provos at citi.umich.edu>, and uses some of his
- * ideas.  The password hashing algorithm was designed by David Mazieres
- * <dm at lcs.mit.edu>.  For more information on the level of compatibility,
- * prefer refer to the comments in BF_set_key() below and to the included
- * crypt(3) man page.
+ * This implementation is fully compatible with OpenBSD's bcrypt.c for prefix
+ * "$2b$", originally by Niels Provos <provos at citi.umich.edu>, and it uses
+ * some of his ideas.  The password hashing algorithm was designed by David
+ * Mazieres <dm at lcs.mit.edu>.  For information on the level of
+ * compatibility for bcrypt hash prefixes other than "$2b$", please refer to
+ * the comments in BF_set_key() below and to the included crypt(3) man page.
  *
  * There's a paper on the algorithm that explains its design decisions:
  *
@@ -574,6 +574,7 @@ static void BF_set_key(const char *key, BF_key expanded, BF_key initial,
  * Valid combinations of settings are:
  *
  * Prefix "$2a$": bug = 0, safety = 0x10000
+ * Prefix "$2b$": bug = 0, safety = 0
  * Prefix "$2x$": bug = 1, safety = 0
  * Prefix "$2y$": bug = 0, safety = 0
  */
@@ -637,13 +638,14 @@ static void BF_set_key(const char *key, BF_key expanded, BF_key initial,
 	initial[0] ^= sign;
 }
 
+static const unsigned char flags_by_subtype[26] =
+	{2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 0};
+
 static char *BF_crypt(const char *key, const char *setting,
 	char *output, int size,
 	BF_word min)
 {
-	static const unsigned char flags_by_subtype[26] =
-		{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 0};
 	struct {
 		BF_ctx ctx;
 		BF_key expanded_key;
@@ -814,7 +816,7 @@ char *_crypt_gensalt_blowfish_rn(const char *prefix, unsigned long count,
 	if (size < 16 || output_size < 7 + 22 + 1 ||
 	    (count && (count < 4 || count > 31)) ||
 	    prefix[0] != '$' || prefix[1] != '2' ||
-	    (prefix[2] != 'a' && prefix[2] != 'y')) {
+	    (prefix[2] != 'a' && prefix[2] != 'b' && prefix[2] != 'y')) {
 		if (output_size > 0) output[0] = '\0';
 		return NULL;
 	}

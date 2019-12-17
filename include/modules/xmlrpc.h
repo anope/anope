@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2010-2017 Anope Team
+ * (C) 2010-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -28,7 +28,7 @@ class XMLRPCServiceInterface;
 class XMLRPCEvent
 {
  public:
- 	virtual ~XMLRPCEvent() { }
+	virtual ~XMLRPCEvent() { }
 	virtual bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) = 0;
 };
 

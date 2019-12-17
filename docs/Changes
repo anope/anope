@@ -1,5 +1,19 @@
-Anope Version 2.0.7-git
+Anope Version 2.0.8-git
 -------------------
+
+Anope Version 2.0.7
+-------------------
+Fix not sending login data on successful NickServ GROUP
+Fix m_httpd to not consider headers to be case sensitive
+Add InspIRCd 3 protocol support
+Add 'n' email token for use in the email change template
+Add logging for NickServ UNGROUP
+Fix setting swhois on UnrealIRCd
+Add nickserv/recover permission to allow opers to recover other users
+Fix superadmin not being removed when deopering
+Fix setting nickserv access list in webcpanel
+Add support for post-handshake SASL in Unreal 4.2.2+
+Add logging for channel memo deletionso
 
 Anope Version 2.0.6
 -------------------

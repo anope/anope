@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -144,7 +144,7 @@ class CommandNSAJoin : public Command
 			else if (i != (*channels)->size())
 				alreadyadded += chan + ", ";
 			else if (IRCD->IsChannelValid(chan) == false)
-	 			source.Reply(CHAN_X_INVALID, chan.c_str());
+				source.Reply(CHAN_X_INVALID, chan.c_str());
 			else
 			{
 				Channel *c = Channel::Find(chan);

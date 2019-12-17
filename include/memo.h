@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -19,9 +19,9 @@ class CoreExport Memo : public Serializable
 {
  public:
 	MemoInfo *mi;
- 	bool unread;
+	bool unread;
 	bool receipt;
- 	Memo();
+	Memo();
 	~Memo();
 
 	void Serialize(Serialize::Data &data) const anope_override;

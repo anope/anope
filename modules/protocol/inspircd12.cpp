@@ -1,6 +1,6 @@
 /* inspircd 1.2 functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -426,7 +426,7 @@ class InspIRCd12Proto : public IRCDProto
 	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
 	{
 		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << acc;
-		
+
 		if (!vident.empty())
 			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGIDENT " << uid << " " << vident;
 		if (!vhost.empty())

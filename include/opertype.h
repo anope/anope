@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2017 Anope Team <team@anope.org>
+ * (C) 2008-2019 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -67,7 +67,7 @@ class CoreExport OperType
 	 */
 	std::set<OperType *> inheritances;
  public:
- 	/** Modes to set when someone identifys using this opertype
+	/** Modes to set when someone identifys using this opertype
 	 */
 	Anope::string modes;
 

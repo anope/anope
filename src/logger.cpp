@@ -1,6 +1,6 @@
 /* Logging routines.
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -376,9 +376,13 @@ void LogInfo::ProcessMessage(const Log *l)
 		}
 		else if (target == "globops")
 		{
-			if (UplinkSock && l->bi && l->type <= LOG_NORMAL && Me && Me->IsSynced())
+			if (UplinkSock && l->type <= LOG_NORMAL && Me && Me->IsSynced())
 			{
-				IRCD->SendGlobops(l->bi, "%s", buffer.c_str());
+				BotInfo *bi = l->bi;
+				if (!bi)
+					bi = this->bot;
+				if (bi)
+					IRCD->SendGlobops(bi, "%s", buffer.c_str());
 			}
 		}
 	}

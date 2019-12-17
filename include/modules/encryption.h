@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -17,7 +17,7 @@ namespace Encryption
 	class Context
 	{
 	 public:
-	 	virtual ~Context() { }
+		virtual ~Context() { }
 		virtual void Update(const unsigned char *data, size_t len) = 0;
 		virtual void Finalize() = 0;
 		virtual Hash GetFinalizedHash() = 0;

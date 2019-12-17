@@ -1,6 +1,6 @@
 /* Initialization and related routines.
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -305,7 +305,7 @@ void Anope::Init(int ac, char **av)
 	if (GetCommandLineArgument("help", 'h'))
 	{
 		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::VersionBuildString();
-		Log(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
+		Log(LOG_TERMINAL) << "Anope IRC Services (https://www.anope.org/)";
 		Log(LOG_TERMINAL) << "Usage ./" << Anope::ServicesBin << " [options] ...";
 		Log(LOG_TERMINAL) << "-c, --config=filename.conf";
 		Log(LOG_TERMINAL) << "    --confdir=conf file direcory";
@@ -323,7 +323,7 @@ void Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "-s, --support";
 		Log(LOG_TERMINAL) << "-v, --version";
 		Log(LOG_TERMINAL) << "";
-		Log(LOG_TERMINAL) << "Further support is available from http://www.anope.org";
+		Log(LOG_TERMINAL) << "Further support is available from https://www.anope.org/";
 		Log(LOG_TERMINAL) << "Or visit us on IRC at irc.anope.org #anope";
 		throw CoreException();
 	}
@@ -490,7 +490,7 @@ void Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << ex.GetReason();
 		Log(LOG_TERMINAL) << "*** Support resources: Read through the services.conf self-contained";
 		Log(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
-		Log(LOG_TERMINAL) << "*** folder. Visit our portal located at http://www.anope.org/. Join";
+		Log(LOG_TERMINAL) << "*** folder. Visit our portal located at https://www.anope.org/. Join";
 		Log(LOG_TERMINAL) << "*** our support channel on /server irc.anope.org channel #anope.";
 		throw CoreException("Configuration file failed to validate");
 	}

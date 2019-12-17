@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -468,7 +468,7 @@ class TCPSocket : public ListenSocket
 	class Client : public ClientSocket, public Timer, public ReplySocket
 	{
 		Manager *manager;
- 		Packet *packet;
+		Packet *packet;
 		unsigned char packet_buffer[524];
 		int length;
 
@@ -495,7 +495,7 @@ class TCPSocket : public ListenSocket
 			SocketEngine::Change(this, true, SF_WRITABLE);
 		}
 
-	 	bool ProcessRead() anope_override
+		bool ProcessRead() anope_override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Reading from DNS TCP socket";
 
@@ -952,7 +952,7 @@ class MyManager : public Manager, public Timer
 
 			packet->questions.push_back(Question(zone, QUERY_SOA));
 
-			new NotifySocket(ip.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, packet);
+			new NotifySocket(ip.find(':') != Anope::string::npos, packet);
 		}
 	}
 

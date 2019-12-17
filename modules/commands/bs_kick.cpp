@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -718,7 +718,7 @@ class CommandBSKickRepeat : public CommandBSKickBase
 class CommandBSKickReverses : public CommandBSKickBase
 {
  public:
- 	CommandBSKickReverses(Module *creator) : CommandBSKickBase(creator, "botserv/kick/reverses", 2, 3)
+	CommandBSKickReverses(Module *creator) : CommandBSKickBase(creator, "botserv/kick/reverses", 2, 3)
 	{
 		this->SetDesc(_("Configures reverses kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
@@ -934,7 +934,7 @@ struct BanData
 	data_type data_map;
 
  public:
- 	BanData(Extensible *) { }
+	BanData(Extensible *) { }
 
 	Data &get(const Anope::string &key)
 	{

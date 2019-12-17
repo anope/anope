@@ -1,6 +1,6 @@
 /* Modular support
  *
- * (C) 2003-2017 Anope Team
+ * (C) 2003-2019 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -1138,7 +1138,7 @@ class CoreExport ModuleManager
 	 */
 	static std::vector<Module *> EventHandlers[I_SIZE];
 
- 	/** List of all modules loaded in Anope
+	/** List of all modules loaded in Anope
 	 */
 	static std::list<Module *> Modules;
 

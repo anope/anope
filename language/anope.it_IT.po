@@ -549,7 +549,7 @@ msgstr ""
 "\n"
 "Bisogna tener conto che un client che si connette \"userà\" la prima\n"
 "eccezione che corrisponde al suo host. Liste di eccezioni molto\n"
-"grandi ed mask generiche possono degradare la funzionalità dei\n"
+"grandi e mask generiche possono degradare le prestazioni dei\n"
 "Services."
 
 #: modules/commands/os_noop.cpp:68
@@ -559,9 +559,9 @@ msgid ""
 "up on the given server. REVOKE removes this\n"
 "restriction."
 msgstr ""
-"SET killa tutti gli operatori del server\n"
-"specificato e previene gli operatori dal riottenere gradi\n"
-"sul server dato. REVOKE rimuove questa\n"
+"SET disconnette tutti gli operatori del server\n"
+"specificato e impedisce agli operatori di riottenere gradi\n"
+"sul server specificato. REVOKE rimuove questa\n"
 "restrizione."
 
 #: modules/commands/cs_access.cpp:611
@@ -1073,7 +1073,7 @@ msgid ""
 msgstr ""
 " \n"
 "I nick che non sono più usati sono soggetti a\n"
-"cancellazione automatica, saranno cioè eliminati\n"
+"cancellazione automatica, saranno quindi eliminati\n"
 "dopo %d giorni di inutilizzo."
 
 #: modules/pseudoclients/botserv.cpp:143
@@ -1510,7 +1510,7 @@ msgstr "   Questo oper è configurato nel file di configurazione."
 #: modules/commands/os_modinfo.cpp:34
 #, c-format
 msgid " Loaded at: %p"
-msgstr " Caricato il: %p"
+msgstr " Caricato a: %p"
 
 #: modules/commands/cs_seen.cpp:303
 #, c-format
@@ -1559,7 +1559,7 @@ msgstr "%c%c%s è stato sbloccato da %s."
 #: modules/commands/cs_clone.cpp:56
 #, c-format
 msgid "%d access entries from %s have been cloned to %s."
-msgstr "%d records della lista di %s sono stati clonati su %s."
+msgstr "%d record della lista di %s sono stati clonati su %s."
 
 #: modules/commands/bs_botlist.cpp:56
 #, c-format
@@ -3423,7 +3423,7 @@ msgid ""
 "and they should not be saved."
 msgstr ""
 "Termina immediatamente i Services senza salvarne i\n"
-"databaase. Questo comando non deve mai essere usato,\n"
+"database. Questo comando non deve mai essere usato,\n"
 "se non in caso di danni alla copia in memoria dei\n"
 "database, per evitare che la copia danneggiata venga\n"
 "salvata."
@@ -7329,7 +7329,7 @@ msgstr ""
 "    1 - l'utente non è riconosciuto come proprietario del nick\n"
 "    2 - l'utente è riconosciuto come proprietario solo attraverso\n"
 "        la lista di accesso\n"
-"    3 - l'utente è riconosciuto come proprietario attravrso\n"
+"    3 - l'utente è riconosciuto come proprietario attraverso\n"
 "        l'identificazione per mezzo della password\n"
 "\n"
 "Se nessun nickname è specificato sarà indicato lo stato del tuo nick."
@@ -9106,8 +9106,8 @@ msgid ""
 msgstr ""
 "Il comando %s permette agli utenti di configurare le impostazioni di\n"
 "logging per i loro canali. Se non vengono specificati parametri, questo\n"
-"comando mostra la lista del metodo di logging attualmente in funzione\n"
-"per il canale.\n"
+"comando mostra la lista dei metodi di logging attualmente attivi\n"
+"sul canale.\n"
 " \n"
 "Altrimenti, comando deve essere il nome di un comando, e metodo\n"
 "è uno dei seguenti metodi di logging:\n"
@@ -9624,18 +9624,16 @@ msgid ""
 "      containing Anope and lists the most recent 500 of them."
 msgstr ""
 "Questo comando effettua una ricerca nel file di log dei Services\n"
-"dei messaggi corrispondenti lo schema specificato. Gli argomenti day e "
-"limit\n"
-"possono essere usati per specificare per quanti giorni cercare nei logs\n"
-"e il limite di risultati da mostrare. Come impostazione predefinita\n"
-"questo comando effettua ricerche nei log di una settimana e limita i "
-"risultati\n"
-"a 50.\n"
+"utilizzando il pattern specificato. Gli argomenti day e "
+"limit possono essere usati per specificare fino a quanti giorni\n"
+"estendere la ricerca nei logs e il limite dei risultati da mostrare.\n"
+"Come impostazione predefinita questo comando recupera una settimana di\n"
+"logs e limita i risultati a 50.\n"
 " \n"
 "Per esempio:\n"
 "    LOGSEARCH +21d +500l Anope\n"
-"      Cerca messaggi contenti la parola Anope nei logs relativi\n"
-"      agli ultimi 21 giorni e mostra i 500 più recenti di essi."
+"      Cerca i messaggi contenenti la parola Anope nei logs relativi\n"
+"      agli ultimi 21 giorni e ne mostra i 500 più recenti."
 
 #: modules/commands/cs_status.cpp:106
 msgid ""
@@ -10113,7 +10111,7 @@ msgid ""
 "your userflags (lastseentime, etc)."
 msgstr ""
 "Aggiorna il tuo stato attuale, ovvero controlla eventuali nuovi memo,\n"
-"imposta i chanmodo necessari e i tuoi userflags (lastseentime, etc)."
+"imposta i modi canale necessari e i tuoi userflags (lastseentime, etc)."
 
 #: modules/commands/os_update.cpp:25
 msgid "Updating databases."
@@ -10458,7 +10456,7 @@ msgstr "Non puoi aggiungere un canale alla sua stessa access list."
 #: modules/commands/ns_logout.cpp:37
 #, c-format
 msgid "You can't logout %s, they are a Services Operator."
-msgstr "Non puoi deidentificare %s , è un Services Operator."
+msgstr "Non puoi deidentificare %s, è un Services Operator."
 
 #: modules/commands/ns_set.cpp:927
 #, c-format
@@ -10577,7 +10575,7 @@ msgstr "Hai effettuato il login come %s."
 
 #: modules/commands/os_login.cpp:86
 msgid "You have been logged out."
-msgstr "Non sei più identificato per il tuo nick."
+msgstr "Non sei più identificato al tuo nick."
 
 #: modules/commands/cs_unban.cpp:94
 #, c-format
@@ -10814,7 +10812,7 @@ msgstr "Il tuo account è già stato confermato."
 #: modules/commands/ns_register.cpp:396
 #, c-format
 msgid "Your account will expire, if not confirmed, in %s."
-msgstr "Se non confermato, il tuo account scadra in %s."
+msgstr "Se non confermato, il tuo account scadrà in %s."
 
 #: modules/commands/ns_set.cpp:1274
 #, c-format
@@ -10823,7 +10821,7 @@ msgstr "Il tuo indirizzo email è stato cambiato in %s."
 
 #: modules/commands/os_forbid.cpp:544 modules/commands/os_forbid.cpp:553
 msgid "Your email address is not allowed, choose a different one."
-msgstr "Il tuo indirizzo email non è consentito, scegline un altro diverso."
+msgstr "Il tuo indirizzo email non è consentito, scegline uno diverso."
 
 #: modules/commands/ns_register.cpp:260 modules/commands/ns_register.cpp:391
 msgid ""
@@ -10881,7 +10879,7 @@ msgstr ""
 
 #: modules/commands/ns_logout.cpp:50
 msgid "Your nick has been logged out."
-msgstr "Non sei più identificato per il tuo nick."
+msgstr "Non sei più identificato al tuo nick."
 
 #: modules/commands/ns_group.cpp:156
 msgid "Your nick is already registered."
@@ -10889,7 +10887,7 @@ msgstr "Il tuo nick è già registrato."
 
 #: modules/commands/ns_group.cpp:246
 msgid "Your nick is not grouped to anything, you can't ungroup it."
-msgstr "Il tuo nick è presente in nessun gruppo, non puoi usare UNGROUP."
+msgstr "Il tuo nick non appartiene a un gruppo, non puoi usare UNGROUP."
 
 #: include/language.h:77
 msgid "Your nick isn't registered."

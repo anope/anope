@@ -3838,7 +3838,7 @@ msgstr "Configura i kick in caso di underline"
 
 #: modules/commands/ns_register.cpp:21
 msgid "Confirm a passcode"
-msgstr "Conferma un codice di attivazione (passcode) di nickserv"
+msgstr "Conferma un codice di attivazione (passcode) di NickServ"
 
 #: modules/commands/cs_mode.cpp:733
 msgid "Control modes and mode locks on a channel"

@@ -280,7 +280,7 @@ msgstr "%s non è presente nella lista di accesso di %s."
 #: modules/commands/cs_set.cpp:307
 #, c-format
 msgid "%s has too many channels registered."
-msgstr "%s ha registrato troppi nick."
+msgstr "%s ha troppi canali registrati."
 
 #: modules/commands/cs_status.cpp:51
 #, c-format
@@ -373,7 +373,7 @@ msgstr "%s è il founder del canale %s."
 #: modules/commands/cs_status.cpp:78
 #, c-format
 msgid "%s matches access entry %s (from entry %s), which has privilege %s."
-msgstr "%s corrisponde al record %s (dal record %s), che ha livello %s."
+msgstr "%s corrisponde al record %s (dalla voce %s), che ha livello %s."
 
 #: modules/commands/cs_status.cpp:71
 #, c-format
@@ -403,7 +403,7 @@ msgstr "%1$s non trovato nella lista %3$s di %2$s."
 #: modules/commands/cs_access.cpp:338 modules/commands/cs_flags.cpp:255
 #, c-format
 msgid "%s not found on %s access list."
-msgstr "%s non trovato nella lista nella lista di accesso di %s."
+msgstr "%s non trovato nella lista di accesso di %s."
 
 #: modules/commands/cs_akick.cpp:265
 #, c-format
@@ -560,8 +560,8 @@ msgid ""
 "restriction."
 msgstr ""
 "SET disconnette tutti gli operatori del server\n"
-"specificato e impedisce agli operatori di riottenere gradi\n"
-"sul server specificato. REVOKE rimuove questa\n"
+"specificato e ne impedisce di riottenere\n"
+"gradi. REVOKE rimuove questa\n"
 "restrizione."
 
 #: modules/commands/cs_access.cpp:611
@@ -582,7 +582,7 @@ msgstr "[auto-memo] Il memo che hai inviato a %s è stato letto."
 
 #: modules/commands/ns_group.cpp:92
 msgid "[target] [password]"
-msgstr "[target] [password]"
+msgstr "[obiettivo] [password]"
 
 #: modules/commands/ns_set.cpp:453
 msgid "address"
@@ -999,7 +999,7 @@ msgstr "utente modi"
 
 #: modules/commands/os_kill.cpp:20
 msgid "user [reason]"
-msgstr "user [motivo]"
+msgstr "utente [motivo]"
 
 #: modules/commands/os_sxline.cpp:440
 msgid ""
@@ -1033,7 +1033,7 @@ msgstr ""
 "SNLINE può essere trovata con il comando STATS AKILL.\n"
 " \n"
 "Nota: visto che i realname possono contenere spazi, il\n"
-"separatore tra questo e il motivo sono i due punti."
+"separatore tra il realname e il motivo sono i due punti."
 
 #: modules/commands/os_sxline.cpp:678
 msgid ""
@@ -1164,7 +1164,7 @@ msgid ""
 "Fantasy commands may be prefixed with one of the following characters: %s\n"
 msgstr ""
 " \n"
-"I comandi Fantasy possono essere inviati utilizzando uno dei seguenti "
+"I comandi di fantasia possono essere inviati utilizzando uno dei seguenti "
 "caratteri come prefisso: %s\n"
 
 #: modules/commands/cs_register.cpp:105
@@ -1241,7 +1241,7 @@ msgstr ""
 "ban impostati dai\n"
 "bots, come ad esempio kick per flood, kick per parolacce, ecc. saranno "
 "automaticamente\n"
-"rimossi dopo il tempo stabilito. Impostando il valore 0 disabilita la "
+"rimossi dopo il tempo stabilito. Impostando il valore 0 si disabilita la "
 "scadenza\n"
 "automatica dei ban."
 
@@ -1278,10 +1278,10 @@ msgstr ""
 "Il comando %s LIST mostra la lista %s. Se viene\n"
 "utilizzata una wildcard per la mask, solo i record che\n"
 "corrispondono alla mask vengono mostrati. Se viene\n"
-"specificata una lista, i record corrispondenti vengono mostrati.\n"
+"specificato un elenco, solo i record corrispondenti saranno mostrati.\n"
 "Esempio:\n"
 "   %s #canale LIST 2-5,7-9\n"
-"      Mostra i record %s che hanno numero da 2 a 5\n"
+"      Mostra i record %s che vanno da 2 a 5\n"
 "      e da 7 a 9.\n"
 "      \n"
 "Il comando %s CLEAR svuota la lista %s."
@@ -2390,7 +2390,7 @@ msgstr "Tutti i memo per il canale %s sono stati cancellati."
 #: modules/commands/os_mode.cpp:61
 #, c-format
 msgid "All modes cleared on %s."
-msgstr "Tutti i modo sono stati rimossi su %s."
+msgstr "Tutti i modi sono stati rimossi su %s."
 
 #: modules/commands/ns_register.cpp:258 modules/commands/ns_register.cpp:389
 msgid ""
@@ -6712,12 +6712,12 @@ msgstr "Pace"
 #: modules/commands/cs_set.cpp:440
 #, c-format
 msgid "Peace option for %s is now off."
-msgstr "L'opzione peace per %s è ora disattivata."
+msgstr "L'opzione pace per %s è ora disattivata."
 
 #: modules/commands/cs_set.cpp:434
 #, c-format
 msgid "Peace option for %s is now on."
-msgstr "L'opzione peace per %s è ora attiva."
+msgstr "L'opzione pace per %s è ora attiva."
 
 #: modules/commands/cs_set.cpp:1299
 msgid "Persistent"

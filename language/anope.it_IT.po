@@ -560,7 +560,7 @@ msgid ""
 "restriction."
 msgstr ""
 "SET disconnette tutti gli operatori del server\n"
-"specificato e ne impedisce di riottenere\n"
+"specificato e gli impedisce di riottenere\n"
 "gradi. REVOKE rimuove questa\n"
 "restrizione."
 

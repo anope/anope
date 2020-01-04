@@ -1250,11 +1250,13 @@ struct IRCDMessageKick : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		// Received: :715AAAAAA KICK #chan 715AAAAAD :reason
+		// Received: :715AAAAAA KICK #chan 628AAAAAA 4 :reason
 		Channel *c = Channel::Find(params[0]);
-		if (c)
+		if (!c)
 			return;
 
-		const Anope::string &reason = params.size() > 3 ? params[3] : "";
+		const Anope::string &reason = params.size() > 3 ? params[3] : params[2];
 		c->KickInternal(source, params[1], reason);
 	}
 };

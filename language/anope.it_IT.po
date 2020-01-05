@@ -4334,23 +4334,23 @@ msgstr "Mostra uno o più vHost nel database"
 
 #: modules/extra/stats/cs_fantasy_top.cpp:50
 msgid "Displays the top 10 users of a channel"
-msgstr "Mostra la top 10 utenti di un canale"
+msgstr "Mostra i primi 10 utenti del canale"
 
 #: modules/extra/stats/cs_fantasy_top.cpp:73
 msgid "Displays the top 10 users of the network"
-msgstr "Mostra la top 10 utenti del network"
+msgstr "Mostra i primi 10 utenti del network"
 
 #: modules/extra/stats/cs_fantasy_top.cpp:38
 msgid "Displays the top 3 users of a channel"
-msgstr "Displays the top 3 users of a canale"
+msgstr "Mostra i primi 3 utenti del canale"
 
 #: modules/extra/stats/cs_fantasy_top.cpp:62
 msgid "Displays the top 3 users of the network"
-msgstr "Mostra la top 3 utenti del network"
+msgstr "Mostra i primi 3 utenti del network"
 
 #: modules/commands/help.cpp:33
 msgid "Displays this list and give information about commands"
-msgstr "Mostra questa lista e da informazioni sui comandi"
+msgstr "Mostra questa lista e dà informazioni sui comandi"
 
 #: modules/extra/stats/cs_fantasy_stats.cpp:39
 msgid "Displays your Channel Stats"
@@ -4358,7 +4358,7 @@ msgstr "Mostra le statistiche del tuo canale"
 
 #: modules/extra/stats/cs_fantasy_stats.cpp:51
 msgid "Displays your Global Stats"
-msgstr "Mostra le tue stats globali"
+msgstr "Mostra le tue statistiche globali"
 
 #: modules/commands/bs_kick.cpp:1463
 msgid "Don't use AMSGs!"
@@ -9865,8 +9865,7 @@ msgstr "Attiva o disattiva le statistiche di Chanstats."
 
 #: modules/extra/stats/m_chanstats.cpp:142
 msgid "Turns chanstats channel statistics ON or OFF for this user."
-msgstr ""
-"Attiva o disattiva le statistiche di chanstats nel canale per questo utente."
+msgstr "Attiva o disattiva le statistiche di chanstats per questo utente."
 
 #: modules/commands/ns_set.cpp:772
 #, c-format

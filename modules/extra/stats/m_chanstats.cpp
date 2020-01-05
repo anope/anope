@@ -58,7 +58,7 @@ class CommandCSSetChanstats : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply("Turn Chanstats channel statistics ON or OFF.");
+		source.Reply(_("Turns Chanstats statistics ON or OFF."));
 		return true;
 	}
 };

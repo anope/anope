@@ -1,14 +1,14 @@
 # Anope IRC Services language file
-# Copyright (C) 2013-2019
+# Copyright (C) 2013-2020
 # This file is distributed under the same license as the Anope IRC Services package.
-# Robby <robby@chatbelgie.be>, 2013-2019.
+# Robby <robby@chatbelgie.be>, 2013-2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-01-06 18:19+0100\n"
-"PO-Revision-Date: 2019-02-28 04:44+0100\n"
+"PO-Revision-Date: 2020-01-07 04:27+0100\n"
 "Last-Translator: Robby <robby@chatbelgie.be>\n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -1881,8 +1881,8 @@ msgstr ""
 
 #: modules/commands/ms_info.cpp:122
 #, c-format
-msgid "%s is notified of news memos at logon."
-msgstr "%s wordt geïnformeerd over nieuwe memo's wanneer je inlogt."
+msgid "%s is notified of new memos at logon."
+msgstr "%s wordt geïnformeerd over nieuwe memo's wanneer hij/zij inlogt."
 
 #: modules/commands/ms_info.cpp:120
 #, c-format

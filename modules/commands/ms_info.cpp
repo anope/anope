@@ -119,7 +119,7 @@ class CommandMSInfo : public Command
 				else if (na->nc->HasExt("MEMO_RECEIVE"))
 					source.Reply(_("%s is notified when new memos arrive."), nname.c_str());
 				else if (na->nc->HasExt("MEMO_SIGNON"))
-					source.Reply(_("%s is notified of news memos at logon."), nname.c_str());
+					source.Reply(_("%s is notified of new memos at logon."), nname.c_str());
 				else
 					source.Reply(_("%s is not notified of new memos."), nname.c_str());
 			}

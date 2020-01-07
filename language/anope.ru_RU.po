@@ -2144,7 +2144,7 @@ msgstr ""
 
 #: modules/commands/ms_info.cpp:122
 #, c-format
-msgid "%s is notified of news memos at logon."
+msgid "%s is notified of new memos at logon."
 msgstr "%s уведомляется о новых сообщениях сразу после идентификации к нику."
 
 #: modules/commands/ms_info.cpp:120

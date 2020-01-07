@@ -1879,7 +1879,7 @@ msgstr ""
 
 #: modules/commands/ms_info.cpp:122
 #, c-format
-msgid "%s is notified of news memos at logon."
+msgid "%s is notified of new memos at logon."
 msgstr "%s viene informato dei nuovi memo quando si connette."
 
 #: modules/commands/ms_info.cpp:120

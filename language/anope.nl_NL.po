@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-28 02:52+0100\n"
+"POT-Creation-Date: 2020-01-06 18:19+0100\n"
 "PO-Revision-Date: 2019-02-28 04:44+0100\n"
 "Last-Translator: Robby <robby@chatbelgie.be>\n"
 "Language-Team: Dutch\n"
@@ -615,8 +615,7 @@ msgstr "kanaal masker [reden]"
 msgid "channel modes"
 msgstr "kanaal modes"
 
-#: modules/commands/cs_set.cpp:267 modules/commands/cs_set.cpp:950
-#: modules/commands/bs_assign.cpp:20
+#: modules/commands/cs_set.cpp:267 modules/commands/bs_assign.cpp:20
 msgid "channel nick"
 msgstr "kanaal nick"
 
@@ -747,7 +746,8 @@ msgstr "kanaal VIEW [masker | lijst]"
 msgid "channel [description]"
 msgstr "kanaal [beschrijving]"
 
-#: modules/commands/cs_invite.cpp:20 modules/commands/cs_unban.cpp:20
+#: modules/commands/cs_set.cpp:950 modules/commands/cs_invite.cpp:20
+#: modules/commands/cs_unban.cpp:20
 msgid "channel [nick]"
 msgstr "kanaal [nick]"
 
@@ -815,7 +815,7 @@ msgstr "kanaal {ON | LEVEL | OFF}"
 #: modules/commands/cs_set.cpp:336 modules/commands/cs_set.cpp:401
 #: modules/commands/cs_set.cpp:473 modules/commands/cs_set.cpp:622
 #: modules/commands/cs_set.cpp:684 modules/commands/cs_set.cpp:747
-#: modules/commands/cs_set.cpp:811 modules/commands/cs_set.cpp:1042
+#: modules/commands/cs_set.cpp:811 modules/commands/cs_set.cpp:1044
 #: modules/commands/bs_kick.cpp:792 modules/commands/bs_kick.cpp:857
 #: modules/commands/cs_topic.cpp:21 modules/commands/cs_list.cpp:181
 msgid "channel {ON | OFF}"
@@ -2388,7 +2388,7 @@ msgstr "Alle toegangsniveaus van %s zijn gekopiëerd naar %s."
 msgid "All logon news items deleted."
 msgstr "Alle login nieuwsberichten zijn verwijderd."
 
-#: modules/commands/ms_del.cpp:109
+#: modules/commands/ms_del.cpp:115
 #, c-format
 msgid "All memos for channel %s have been deleted."
 msgstr "Alle memo's voor kanaal %s zijn verwijderd."
@@ -2406,7 +2406,7 @@ msgstr ""
 "Alle nieuwe accounts moeten gevalideerd worden door een beheerder. Gelieve "
 "te wachten op bevestiging."
 
-#: modules/commands/ms_del.cpp:111
+#: modules/commands/ms_del.cpp:119
 msgid "All of your memos have been deleted."
 msgstr "Al je memo's zijn verwijderd."
 
@@ -3012,11 +3012,11 @@ msgstr ""
 msgid "Associate a URL with the channel"
 msgstr "Koppel een URL aan het kanaal"
 
-#: data/nickserv.example.conf:593
+#: data/nickserv.example.conf:594
 msgid "Associate a URL with this account"
 msgstr "Koppel een URL aan dit account"
 
-#: data/nickserv.example.conf:592
+#: data/nickserv.example.conf:593
 msgid "Associate a URL with your account"
 msgstr "Koppel een URL aan jouw account"
 
@@ -3644,12 +3644,12 @@ msgstr "Kanaal %s is niet geschorst."
 msgid "Channel %s registered under your account: %s"
 msgstr "Kanaal %s is nu geregistreerd op jouw account: %s"
 
-#: modules/commands/cs_set.cpp:1076
+#: modules/commands/cs_set.cpp:1078
 #, c-format
 msgid "Channel %s will expire."
 msgstr "Kanaal %s zal verlopen."
 
-#: modules/commands/cs_set.cpp:1070
+#: modules/commands/cs_set.cpp:1072
 #, c-format
 msgid "Channel %s will not expire."
 msgstr "Kanaal %s zal niet verlopen."
@@ -4120,7 +4120,7 @@ msgid "Define messages to be shown to users who oper"
 msgstr ""
 "Stel de berichten in die gebruikers te zien krijgen wanneer ze OPER worden"
 
-#: modules/commands/ms_del.cpp:41
+#: modules/commands/ms_del.cpp:44
 msgid "Delete a memo or memos"
 msgstr "Verwijder een of meerdere memo's"
 
@@ -4203,7 +4203,7 @@ msgstr "Info verwijderd van %s."
 msgid "Deleted one entry from %s %s list."
 msgstr "1 vermelding verwijderd van %s %s lijst."
 
-#: modules/commands/ms_del.cpp:121
+#: modules/commands/ms_del.cpp:129
 msgid ""
 "Deletes the specified memo or memos. You can supply\n"
 "multiple memo numbers or ranges of numbers instead of a\n"
@@ -4423,7 +4423,7 @@ msgstr "E-mailadres voor %s gewijzigd naar %s."
 msgid "E-mail address for %s unset."
 msgstr "E-mailadres voor %s verwijderd."
 
-#: src/mail.cpp:79
+#: src/mail.cpp:80
 #, c-format
 msgid "E-mail for %s is invalid."
 msgstr "E-mail voor %s is ongeldig."
@@ -5227,7 +5227,7 @@ msgstr "Cursiefkicker"
 msgid "Join a group"
 msgstr "Bij een groep aanmelden"
 
-#: modules/commands/cs_set.cpp:1303 modules/commands/ns_set.cpp:1319
+#: modules/commands/cs_set.cpp:1305 modules/commands/ns_set.cpp:1319
 msgid "Keep modes"
 msgstr "Behoud modes"
 
@@ -6033,7 +6033,7 @@ msgstr "Maximum gebruikers: %d (%s)"
 msgid "Memo %d from %s (%s)."
 msgstr "Memo %d van %s (%s)."
 
-#: modules/commands/ms_del.cpp:32 modules/commands/ms_del.cpp:98
+#: modules/commands/ms_del.cpp:33 modules/commands/ms_del.cpp:101
 #, c-format
 msgid "Memo %d has been deleted."
 msgstr "Memo %d werd verwijderd."
@@ -6410,7 +6410,7 @@ msgstr "Nick %s is geregistreerd onder jouw gebruikersmasker: %s"
 msgid "Nickname %s registered."
 msgstr "Nick %s is geregistreerd."
 
-#: modules/commands/cs_set.cpp:1305
+#: modules/commands/cs_set.cpp:1307
 msgid "No auto-op"
 msgstr "Geen auto-op"
 
@@ -6418,7 +6418,7 @@ msgstr "Geen auto-op"
 msgid "No bot"
 msgstr "Geen bot"
 
-#: modules/commands/cs_set.cpp:1301 modules/commands/ns_set.cpp:1317
+#: modules/commands/cs_set.cpp:1303 modules/commands/ns_set.cpp:1317
 msgid "No expire"
 msgstr "Verloopt niet"
 
@@ -6562,7 +6562,7 @@ msgstr "Niet-statusmodes weggehaald op %s."
 msgid "None"
 msgstr "Geen"
 
-#: modules/commands/cs_set.cpp:1028
+#: modules/commands/cs_set.cpp:1029
 #, c-format
 msgid ""
 "Note, however, if the successor already has too many\n"
@@ -6720,7 +6720,7 @@ msgstr "Fout wachtwoord."
 msgid "Password reset email for %s has been sent."
 msgstr "Wachtwoord reset e-mail voor %s werd verstuurd."
 
-#: modules/commands/cs_set.cpp:1287
+#: modules/commands/cs_set.cpp:1289
 msgid "Peace"
 msgstr "Vrede"
 
@@ -6734,7 +6734,7 @@ msgstr "Vrede-optie voor %s is nu uit."
 msgid "Peace option for %s is now on."
 msgstr "Vrede-optie voor %s is nu aan."
 
-#: modules/commands/cs_set.cpp:1299
+#: modules/commands/cs_set.cpp:1301
 msgid "Persistent"
 msgstr "Permanent"
 
@@ -6765,7 +6765,7 @@ msgstr "Gelieve een geldige servernaam te gebruiken bij het blokkeren."
 msgid "Please use the symbol of # when attempting to register."
 msgstr "Gelieve het #-symbool te gebruiken bij het registreren."
 
-#: src/mail.cpp:77
+#: src/mail.cpp:78
 #, c-format
 msgid "Please wait %d seconds and retry."
 msgstr "Gelieve %d seconden te wachten en opnieuw te proberen."
@@ -6823,7 +6823,7 @@ msgstr ""
 "Voorkom gebruik van een kanaal terwijl de data en instellingen ervan toch "
 "behouden blijven"
 
-#: modules/commands/cs_set.cpp:1041
+#: modules/commands/cs_set.cpp:1043
 msgid "Prevent the channel from expiring"
 msgstr "Voorkom dat het kanaal verloopt"
 
@@ -6977,7 +6977,7 @@ msgstr "Reden"
 msgid "Reason for %s updated."
 msgstr "Reden voor %s geüpdatet."
 
-#: modules/commands/ns_recover.cpp:211
+#: modules/commands/ns_recover.cpp:214
 msgid ""
 "Recovers your nick from another user or from services.\n"
 "If services are currently holding your nick, the hold\n"
@@ -7254,7 +7254,7 @@ msgstr "Registratiebevestigings-e-mail opnieuw verzenden"
 msgid "Restrict access to the channel"
 msgstr "Beperk de toegang tot het kanaal"
 
-#: modules/commands/cs_set.cpp:1289
+#: modules/commands/cs_set.cpp:1291
 msgid "Restricted access"
 msgstr "Beperkte toegang"
 
@@ -7399,7 +7399,7 @@ msgstr "Sla de database op en herstart Services"
 msgid "Searches logs for a matching pattern"
 msgstr "Doorzoekt logs voor een overeenstemmend patroon"
 
-#: modules/commands/cs_set.cpp:1293
+#: modules/commands/cs_set.cpp:1295
 msgid "Secure founder"
 msgstr "Strikte stichter controle"
 
@@ -7413,7 +7413,7 @@ msgstr "Strikte stichter controle-optie voor %s is nu uit."
 msgid "Secure founder option for %s is now on."
 msgstr "Strikte stichter controle-optie voor %s is nu aan."
 
-#: modules/commands/cs_set.cpp:1295
+#: modules/commands/cs_set.cpp:1297
 msgid "Secure ops"
 msgstr "Strikte operator controle"
 
@@ -7452,7 +7452,7 @@ msgstr "Veiligheidsoptie is nu aan voor %s."
 msgid "Secureops enforced on %s."
 msgstr "SECUREOPS afgedwongen op %s."
 
-#: modules/commands/cs_set.cpp:1291 modules/commands/ns_set.cpp:1311
+#: modules/commands/cs_set.cpp:1293 modules/commands/ns_set.cpp:1311
 msgid "Security"
 msgstr "Veiligheid"
 
@@ -7648,7 +7648,7 @@ msgstr "Service"
 msgid "Service's hold on %s has been released."
 msgstr "Nick %s werd vrijgegeven."
 
-#: data/nickserv.example.conf:235 data/chanserv.example.conf:827
+#: data/nickserv.example.conf:236 data/chanserv.example.conf:827
 msgid "Services Operator commands"
 msgstr "Services Operator commando's"
 
@@ -7696,7 +7696,7 @@ msgstr "Services zijn nu in alleen-lezen modus."
 msgid "Services are now in read-write mode."
 msgstr "Services zijn nu in lezen-schrijven modus."
 
-#: src/mail.cpp:75
+#: src/mail.cpp:76
 msgid "Services have been configured to not send mail."
 msgstr "Services zijn geconfigureerd om geen e-mails te versturen."
 
@@ -8138,7 +8138,7 @@ msgid ""
 msgstr ""
 "Stelt in of Services je automatisch je status modes geeft op het kanaal."
 
-#: modules/commands/cs_set.cpp:1088
+#: modules/commands/cs_set.cpp:1090
 msgid ""
 "Sets whether the given channel will expire.  Setting this\n"
 "to ON prevents the channel from expiring."
@@ -8241,7 +8241,7 @@ msgstr ""
 msgid "Signed kick option for %s is now on."
 msgstr "Ondertekende kicks-optie voor %s is nu aan."
 
-#: modules/commands/cs_set.cpp:1297
+#: modules/commands/cs_set.cpp:1299
 msgid "Signed kicks"
 msgstr "Ondertekende kicks"
 
@@ -9846,13 +9846,14 @@ msgstr ""
 "%s je niet automatisch killen, hoe de KILL optie ook\n"
 "ingesteld staat."
 
-#: modules/extra/stats/m_chanstats.cpp:119
-msgid "Turns Chanstats statistics ON or OFF."
-msgstr "Zet chanstats statistieken aan of uit."
-
 #: modules/extra/stats/m_chanstats.cpp:142
 msgid "Turns chanstats channel statistics ON or OFF for this user."
 msgstr "Zet chanstats kanaal statistieken aan of uit voor deze gebruiker."
+
+#: modules/extra/stats/m_chanstats.cpp:61
+#: modules/extra/stats/m_chanstats.cpp:119
+msgid "Turns chanstats statistics ON or OFF."
+msgstr "Zet chanstats statistieken aan of uit."
 
 #: modules/commands/ns_set.cpp:772
 #, c-format
@@ -10999,7 +11000,7 @@ msgstr "[kanaal] [lijst | NEW]"
 msgid "[channel] [nick]"
 msgstr "[kanaal] [nick]"
 
-#: modules/commands/ms_del.cpp:42
+#: modules/commands/ms_del.cpp:45
 msgid "[channel] {num | list | LAST | ALL}"
 msgstr "[kanaal] {nr | lijst | LAST | ALL}"
 

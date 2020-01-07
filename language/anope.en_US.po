@@ -1,5 +1,5 @@
 # Anope IRC Services language file
-# Copyright (C) 2014-2019
+# Copyright (C) 2014-2020
 # This file is distributed under the same license as the Anope IRC Services package.
 # Adam <adam@anope.org>, 2014.
 #
@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-28 02:52+0100\n"
-"PO-Revision-Date: 2019-02-28 02:59+0100\n"
+"POT-Creation-Date: 2020-01-06 17:08+0100\n"
+"PO-Revision-Date: 2020-01-06 17:08+0100\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -611,8 +611,7 @@ msgstr "channel mask [reason]"
 msgid "channel modes"
 msgstr "channel modes"
 
-#: modules/commands/cs_set.cpp:267 modules/commands/cs_set.cpp:950
-#: modules/commands/bs_assign.cpp:20
+#: modules/commands/cs_set.cpp:267 modules/commands/bs_assign.cpp:20
 msgid "channel nick"
 msgstr "channel nick"
 
@@ -743,7 +742,8 @@ msgstr "channel VIEW [mask | list]"
 msgid "channel [description]"
 msgstr "channel [description]"
 
-#: modules/commands/cs_invite.cpp:20 modules/commands/cs_unban.cpp:20
+#: modules/commands/cs_set.cpp:950 modules/commands/cs_invite.cpp:20
+#: modules/commands/cs_unban.cpp:20
 msgid "channel [nick]"
 msgstr "channel [nick]"
 
@@ -811,7 +811,7 @@ msgstr "channel {ON | LEVEL | OFF}"
 #: modules/commands/cs_set.cpp:336 modules/commands/cs_set.cpp:401
 #: modules/commands/cs_set.cpp:473 modules/commands/cs_set.cpp:622
 #: modules/commands/cs_set.cpp:684 modules/commands/cs_set.cpp:747
-#: modules/commands/cs_set.cpp:811 modules/commands/cs_set.cpp:1042
+#: modules/commands/cs_set.cpp:811 modules/commands/cs_set.cpp:1044
 #: modules/commands/bs_kick.cpp:792 modules/commands/bs_kick.cpp:857
 #: modules/commands/cs_topic.cpp:21 modules/commands/cs_list.cpp:181
 msgid "channel {ON | OFF}"
@@ -2364,7 +2364,7 @@ msgstr "All level entries from %s have been cloned into %s."
 msgid "All logon news items deleted."
 msgstr "All logon news items deleted."
 
-#: modules/commands/ms_del.cpp:109
+#: modules/commands/ms_del.cpp:115
 #, c-format
 msgid "All memos for channel %s have been deleted."
 msgstr "All memos for channel %s have been deleted."
@@ -2382,7 +2382,7 @@ msgstr ""
 "All new accounts must be validated by an administrator. Please wait for your "
 "registration to be confirmed."
 
-#: modules/commands/ms_del.cpp:111
+#: modules/commands/ms_del.cpp:119
 msgid "All of your memos have been deleted."
 msgstr "All of your memos have been deleted."
 
@@ -2976,11 +2976,11 @@ msgstr ""
 msgid "Associate a URL with the channel"
 msgstr "Associate a URL with the channel"
 
-#: data/nickserv.example.conf:593
+#: data/nickserv.example.conf:594
 msgid "Associate a URL with this account"
 msgstr "Associate a URL with this account"
 
-#: data/nickserv.example.conf:592
+#: data/nickserv.example.conf:593
 msgid "Associate a URL with your account"
 msgstr "Associate a URL with your account"
 
@@ -3603,12 +3603,12 @@ msgstr "Channel %s isn't suspended."
 msgid "Channel %s registered under your account: %s"
 msgstr "Channel %s registered under your account: %s"
 
-#: modules/commands/cs_set.cpp:1076
+#: modules/commands/cs_set.cpp:1078
 #, c-format
 msgid "Channel %s will expire."
 msgstr "Channel %s will expire."
 
-#: modules/commands/cs_set.cpp:1070
+#: modules/commands/cs_set.cpp:1072
 #, c-format
 msgid "Channel %s will not expire."
 msgstr "Channel %s will not expire."
@@ -4073,7 +4073,7 @@ msgstr "Define messages to be shown to users at logon"
 msgid "Define messages to be shown to users who oper"
 msgstr "Define messages to be shown to users who oper"
 
-#: modules/commands/ms_del.cpp:41
+#: modules/commands/ms_del.cpp:44
 msgid "Delete a memo or memos"
 msgstr "Delete a memo or memos"
 
@@ -4154,7 +4154,7 @@ msgstr "Deleted info from %s."
 msgid "Deleted one entry from %s %s list."
 msgstr "Deleted one entry from %s %s list."
 
-#: modules/commands/ms_del.cpp:121
+#: modules/commands/ms_del.cpp:129
 msgid ""
 "Deletes the specified memo or memos. You can supply\n"
 "multiple memo numbers or ranges of numbers instead of a\n"
@@ -4375,7 +4375,7 @@ msgstr "E-mail address for %s changed to %s."
 msgid "E-mail address for %s unset."
 msgstr "E-mail address for %s unset."
 
-#: src/mail.cpp:79
+#: src/mail.cpp:80
 #, c-format
 msgid "E-mail for %s is invalid."
 msgstr "E-mail for %s is invalid."
@@ -5163,7 +5163,7 @@ msgstr "Italics kicker"
 msgid "Join a group"
 msgstr "Join a group"
 
-#: modules/commands/cs_set.cpp:1303 modules/commands/ns_set.cpp:1319
+#: modules/commands/cs_set.cpp:1305 modules/commands/ns_set.cpp:1319
 msgid "Keep modes"
 msgstr "Keep modes"
 
@@ -5950,7 +5950,7 @@ msgstr "Maximum users: %d (%s)"
 msgid "Memo %d from %s (%s)."
 msgstr "Memo %d from %s (%s)."
 
-#: modules/commands/ms_del.cpp:32 modules/commands/ms_del.cpp:98
+#: modules/commands/ms_del.cpp:33 modules/commands/ms_del.cpp:101
 #, c-format
 msgid "Memo %d has been deleted."
 msgstr "Memo %d has been deleted."
@@ -6327,7 +6327,7 @@ msgstr "Nickname %s registered under your user@host-mask: %s"
 msgid "Nickname %s registered."
 msgstr "Nickname %s registered."
 
-#: modules/commands/cs_set.cpp:1305
+#: modules/commands/cs_set.cpp:1307
 msgid "No auto-op"
 msgstr "No auto-op"
 
@@ -6335,7 +6335,7 @@ msgstr "No auto-op"
 msgid "No bot"
 msgstr "No bot"
 
-#: modules/commands/cs_set.cpp:1301 modules/commands/ns_set.cpp:1317
+#: modules/commands/cs_set.cpp:1303 modules/commands/ns_set.cpp:1317
 msgid "No expire"
 msgstr "No expire"
 
@@ -6478,7 +6478,7 @@ msgstr "Non-status modes cleared on %s."
 msgid "None"
 msgstr "None"
 
-#: modules/commands/cs_set.cpp:1028
+#: modules/commands/cs_set.cpp:1029
 #, c-format
 msgid ""
 "Note, however, if the successor already has too many\n"
@@ -6636,7 +6636,7 @@ msgstr "Password incorrect."
 msgid "Password reset email for %s has been sent."
 msgstr "Password reset email for %s has been sent."
 
-#: modules/commands/cs_set.cpp:1287
+#: modules/commands/cs_set.cpp:1289
 msgid "Peace"
 msgstr "Peace"
 
@@ -6650,7 +6650,7 @@ msgstr "Peace option for %s is now off."
 msgid "Peace option for %s is now on."
 msgstr "Peace option for %s is now on."
 
-#: modules/commands/cs_set.cpp:1299
+#: modules/commands/cs_set.cpp:1301
 msgid "Persistent"
 msgstr "Persistent"
 
@@ -6678,7 +6678,7 @@ msgstr "Please use a valid server name when juping."
 msgid "Please use the symbol of # when attempting to register."
 msgstr "Please use the symbol of # when attempting to register."
 
-#: src/mail.cpp:77
+#: src/mail.cpp:78
 #, c-format
 msgid "Please wait %d seconds and retry."
 msgstr "Please wait %d seconds and retry."
@@ -6728,7 +6728,7 @@ msgstr "Prevent a bot from being assigned to a channel"
 msgid "Prevent a channel from being used preserving channel data and settings"
 msgstr "Prevent a channel from being used preserving channel data and settings"
 
-#: modules/commands/cs_set.cpp:1041
+#: modules/commands/cs_set.cpp:1043
 msgid "Prevent the channel from expiring"
 msgstr "Prevent the channel from expiring"
 
@@ -6882,7 +6882,7 @@ msgstr "Reason"
 msgid "Reason for %s updated."
 msgstr "Reason for %s updated."
 
-#: modules/commands/ns_recover.cpp:211
+#: modules/commands/ns_recover.cpp:214
 msgid ""
 "Recovers your nick from another user or from services.\n"
 "If services are currently holding your nick, the hold\n"
@@ -7153,7 +7153,7 @@ msgstr "Resend registration confirmation email"
 msgid "Restrict access to the channel"
 msgstr "Restrict access to the channel"
 
-#: modules/commands/cs_set.cpp:1289
+#: modules/commands/cs_set.cpp:1291
 msgid "Restricted access"
 msgstr "Restricted access"
 
@@ -7295,7 +7295,7 @@ msgstr "Save databases and restart Services"
 msgid "Searches logs for a matching pattern"
 msgstr "Searches logs for a matching pattern"
 
-#: modules/commands/cs_set.cpp:1293
+#: modules/commands/cs_set.cpp:1295
 msgid "Secure founder"
 msgstr "Secure founder"
 
@@ -7309,7 +7309,7 @@ msgstr "Secure founder option for %s is now off."
 msgid "Secure founder option for %s is now on."
 msgstr "Secure founder option for %s is now on."
 
-#: modules/commands/cs_set.cpp:1295
+#: modules/commands/cs_set.cpp:1297
 msgid "Secure ops"
 msgstr "Secure ops"
 
@@ -7348,7 +7348,7 @@ msgstr "Secure option is now on for %s."
 msgid "Secureops enforced on %s."
 msgstr "Secureops enforced on %s."
 
-#: modules/commands/cs_set.cpp:1291 modules/commands/ns_set.cpp:1311
+#: modules/commands/cs_set.cpp:1293 modules/commands/ns_set.cpp:1311
 msgid "Security"
 msgstr "Security"
 
@@ -7544,7 +7544,7 @@ msgstr "Service"
 msgid "Service's hold on %s has been released."
 msgstr "Service's hold on %s has been released."
 
-#: data/nickserv.example.conf:235 data/chanserv.example.conf:827
+#: data/nickserv.example.conf:236 data/chanserv.example.conf:827
 msgid "Services Operator commands"
 msgstr "Services Operator commands"
 
@@ -7592,7 +7592,7 @@ msgstr "Services are now in read-only mode."
 msgid "Services are now in read-write mode."
 msgstr "Services are now in read-write mode."
 
-#: src/mail.cpp:75
+#: src/mail.cpp:76
 msgid "Services have been configured to not send mail."
 msgstr "Services have been configured to not send mail."
 
@@ -8029,7 +8029,7 @@ msgid ""
 msgstr ""
 "Sets whether services should set channel status modes on you automatically."
 
-#: modules/commands/cs_set.cpp:1088
+#: modules/commands/cs_set.cpp:1090
 msgid ""
 "Sets whether the given channel will expire.  Setting this\n"
 "to ON prevents the channel from expiring."
@@ -8132,7 +8132,7 @@ msgstr ""
 msgid "Signed kick option for %s is now on."
 msgstr "Signed kick option for %s is now on."
 
-#: modules/commands/cs_set.cpp:1297
+#: modules/commands/cs_set.cpp:1299
 msgid "Signed kicks"
 msgstr "Signed kicks"
 
@@ -9727,13 +9727,14 @@ msgstr ""
 "will not auto-kill you regardless of the setting of the\n"
 "KILL option."
 
-#: modules/extra/stats/m_chanstats.cpp:119
-msgid "Turns Chanstats statistics ON or OFF."
-msgstr "Turns Chanstats statistics ON or OFF."
-
 #: modules/extra/stats/m_chanstats.cpp:142
 msgid "Turns chanstats channel statistics ON or OFF for this user."
 msgstr "Turns chanstats channel statistics ON or OFF for this user."
+
+#: modules/extra/stats/m_chanstats.cpp:61
+#: modules/extra/stats/m_chanstats.cpp:119
+msgid "Turns chanstats statistics ON or OFF."
+msgstr "Turns chanstats statistics ON or OFF."
 
 #: modules/commands/ns_set.cpp:772
 #, c-format
@@ -10857,7 +10858,7 @@ msgstr "[channel] [list | NEW]"
 msgid "[channel] [nick]"
 msgstr "[channel] [nick]"
 
-#: modules/commands/ms_del.cpp:42
+#: modules/commands/ms_del.cpp:45
 msgid "[channel] {num | list | LAST | ALL}"
 msgstr "[channel] {num | list | LAST | ALL}"
 

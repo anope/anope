@@ -247,7 +247,7 @@ class InspIRCd12Proto : public IRCDProto
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "UID " << u->GetUID() << " " << u->timestamp << " " << u->nick << " " << u->host << " " << u->host << " " << u->GetIdent() << " 0.0.0.0 " << u->timestamp << " " << modes << " :" << u->realname;
 		if (modes.find('o') != Anope::string::npos)
-			UplinkSocket::Message(u) << "OPERTYPE :services";
+			UplinkSocket::Message(u) << "OPERTYPE :service";
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */

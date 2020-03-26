@@ -1528,15 +1528,19 @@ struct IRCDMessageFMode : IRCDMessage
 
 struct IRCDMessageFTopic : IRCDMessage
 {
-	IRCDMessageFTopic(Module *creator) : IRCDMessage(creator, "FTOPIC", 5) { }
+	IRCDMessageFTopic(Module *creator) : IRCDMessage(creator, "FTOPIC", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT);  }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		/* :source FTOPIC channel ts topicts setby :topic */
+		// :source FTOPIC channel ts topicts :topic
+		// :source FTOPIC channel ts topicts setby :topic (burst or RESYNC)
+
+		const Anope::string &setby = params.size() > 4 ? params[3] : source.GetName();
+		const Anope::string &topic = params.size() > 4 ? params[4] : params[3];
 
 		Channel *c = Channel::Find(params[0]);
 		if (c)
-			c->ChangeTopicInternal(NULL, params[3], params[4], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
+			c->ChangeTopicInternal(NULL, setby, topic, params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
 	}
 };
 

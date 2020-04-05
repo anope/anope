@@ -100,7 +100,7 @@ class NSResetPass : public Module
 					reset.Unset(nc);
 					nc->Shrink<bool>("UNCONFIRMED");
 
-					Log(LOG_COMMAND, source, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify as " << na->nick;
+					Log(LOG_COMMAND, source, &commandnsresetpass) << "to confirm RESETPASS and forcefully identify as " << na->nick;
 
 					if (source.GetUser())
 					{

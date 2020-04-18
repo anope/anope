@@ -204,7 +204,9 @@ class UnrealIRCdProto : public IRCDProto
 			UplinkSocket::Message(Me) << "CHGHOST " << u->GetUID() << " " << vhost;
 		// Internally unreal sets +xt on chghost
 		BotInfo *bi = Config->GetClient("HostServ");
-		u->SetMode(bi, "CLOAK");
+		// If the user was previously -x by default (or by admin choice in the IRCd config)
+		// we shouldn't force the cloak on the user. Commented in case we might need it later
+		// u->SetMode(bi, "CLOAK");
 		u->SetMode(bi, "VHOST");
 	}
 

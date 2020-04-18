@@ -79,8 +79,6 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		BotInfo *HostServ = Config->GetClient("HostServ");
 		u->RemoveMode(HostServ, "VHOST");
-		ModeManager::ProcessModes();
-		u->SetMode(HostServ, "CLOAK");
 	}
 
 	void SendAkill(User *u, XLine *x) anope_override

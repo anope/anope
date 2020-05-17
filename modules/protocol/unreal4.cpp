@@ -78,18 +78,7 @@ class UnrealIRCdProto : public IRCDProto
 	void SendVhostDel(User *u) anope_override
 	{
 		BotInfo *HostServ = Config->GetClient("HostServ");
-		/* Should we unset the cloak (umode +x)? If the IRC client has no support to the CHGHOST cap
-		 * then the user real IP is displayed for a fraction of a second which is bad
-		 * For security, we only remove the vhost (umode -t) without touching the cloak
-		 * Line is only commented as it might be useful in a near future
-		 */
-		// u->RemoveMode(HostServ, "CLOAK");
 		u->RemoveMode(HostServ, "VHOST");
-		/* Because the change above this is no longer needed
-		 * Commented as it might be useful in a near future
-		 */
-		// ModeManager::ProcessModes();
-		// u->SetMode(HostServ, "CLOAK");
 	}
 
 	void SendAkill(User *u, XLine *x) anope_override
@@ -215,11 +204,6 @@ class UnrealIRCdProto : public IRCDProto
 			UplinkSocket::Message(Me) << "CHGHOST " << u->GetUID() << " " << vhost;
 		// Internally unreal sets +xt on chghost
 		BotInfo *bi = Config->GetClient("HostServ");
-		/* If user is already uncloaked (umode -x) due to personal choice or IRCd config
-		 * we shouldn't force the cloak in that case. Line commented because it might be useful in a near future
-		 */
-		// u->SetMode(bi, "CLOAK");
-		/* This is where se set the vHost */
 		u->SetMode(bi, "VHOST");
 	}
 

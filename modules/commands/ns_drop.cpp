@@ -45,10 +45,14 @@ class CommandNSDrop : public Command
 			source.Reply(_("You may not drop other Services Operators' nicknames."));
 		else
 		{
+			User *u = source.GetUser();
 			FOREACH_MOD(OnNickDrop, (source, na));
 
 			Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 			delete na;
+			u->vhost.clear();
+			IRCD->SendVhostDel(u);
+			u->UpdateHost();
 
 			source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
 		}

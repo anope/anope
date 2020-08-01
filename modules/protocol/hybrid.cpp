@@ -687,6 +687,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
 		ModeManager::AddChannelMode(new ChannelMode("HIDEBMASKS", 'u'));
 		ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
+		ModeManager::AddChannelMode(new ChannelMode("NOKNOCK", 'K'));
 		ModeManager::AddChannelMode(new ChannelModeOperOnly("LBAN", 'L'));
 		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
 		ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));

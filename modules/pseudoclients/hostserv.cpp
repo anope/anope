@@ -66,6 +66,15 @@ class HostServCore : public Module
 		}
 	}
 
+	void OnNickDrop(CommandSource &source, NickAlias *na) anope_override
+	{
+		if (na->HasVhost())
+		{
+			FOREACH_MOD(OnDeleteVhost, (na));
+			na->RemoveVhost();
+		}
+	}
+
 	void OnNickUpdate(User *u) anope_override
 	{
 		this->OnUserLogin(u);

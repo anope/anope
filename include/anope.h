@@ -470,6 +470,13 @@ namespace Anope
 	 */
 	extern CoreExport bool Decrypt(const Anope::string &src, Anope::string &dest);
 
+	/** Hashes a buffer with SipHash-2-4
+	 * @param src The start of the buffer to hash
+	 * @param src_sz The total number of bytes in the buffer
+	 * @param key A 16 byte key to hash the buffer with.
+	 */
+	extern CoreExport uint64_t SipHash24(const void *src, unsigned long src_sz, const char key[16]);
+
 	/** Returns a sequence of data formatted as the format argument specifies.
 	 ** After the format parameter, the function expects at least as many
 	 ** additional arguments as specified in format.

@@ -13,10 +13,12 @@
 #include "modules.h"
 #include "account.h"
 #include "config.h"
+#include <climits>
 
 Serialize::Checker<nickcore_map> NickCoreList("NickCore");
+nickcoreid_map NickCoreIdList;
 
-NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"), chanaccess("ChannelInfo"), aliases("NickAlias")
+NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid) : Serializable("NickCore"), chanaccess("ChannelInfo"), aliases("NickAlias")
 {
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
@@ -26,11 +28,15 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 	this->lastmail = 0;
 
 	this->display = coredisplay;
+	this->id = coreid;
 
 	size_t old = NickCoreList->size();
 	(*NickCoreList)[this->display] = this;
 	if (old == NickCoreList->size())
 		Log(LOG_DEBUG) << "Duplicate account " << coredisplay << " in nickcore table?";
+
+	if (this->id)
+		NickCoreIdList[this->id] = this;
 
 	FOREACH_MOD(OnNickCoreCreate, (this));
 }
@@ -52,6 +58,8 @@ NickCore::~NickCore()
 	this->users.clear();
 
 	NickCoreList->erase(this->display);
+	if (this->id)
+		NickCoreIdList.erase(this->id);
 
 	this->ClearAccess();
 
@@ -66,6 +74,7 @@ NickCore::~NickCore()
 void NickCore::Serialize(Serialize::Data &data) const
 {
 	data["display"] << this->display;
+	data["id"] << this->id;
 	data["pass"] << this->pass;
 	data["email"] << this->email;
 	data["language"] << this->language;
@@ -82,13 +91,15 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	NickCore *nc;
 
 	Anope::string sdisplay;
-
 	data["display"] >> sdisplay;
+
+	uint64_t sid = 0;
+	data["id"] >> sid;
 
 	if (obj)
 		nc = anope_dynamic_static_cast<NickCore *>(obj);
 	else
-		nc = new NickCore(sdisplay);
+		nc = new NickCore(sdisplay, sid);
 
 	data["pass"] >> nc->pass;
 	data["email"] >> nc->email;
@@ -266,4 +277,42 @@ NickCore* NickCore::Find(const Anope::string &nick)
 	}
 
 	return NULL;
+}
+
+uint64_t NickCore::GetId()
+{
+	if (this->id)
+		return this->id;
+
+	NickAlias *na = NickAlias::Find(this->display);
+	if (!na)
+	{
+		Log(LOG_DEBUG) << "Unable to find the display NickAlias for NickCore: " << this->display;
+		return 0;
+	}
+
+	Anope::string secretid = this->display + "\0" + stringify(na->time_registered);
+
+	// Generate the account id. This should almost always only have one
+	// iteration but in the rare case that we generate a duplicate id we try
+	// again with a new key.
+	while (!this->id)
+	{
+		// Generate a random key for SipHash.
+		char key[16];
+		for (size_t i = 0; i < sizeof(key); ++i)
+			key[i] = rand() % CHAR_MAX;
+
+		uint64_t newid = Anope::SipHash24(secretid.c_str(), secretid.length(), key);
+		nickcoreid_map::const_iterator it = NickCoreIdList.find(newid);
+		if (it == NickCoreIdList.end())
+		{
+			this->id = newid;
+			NickCoreIdList[this->id] = this;
+			this->QueueUpdate();
+			break;
+		}
+	}
+
+	return this->id;
 }

@@ -739,7 +739,7 @@ Anope::string Anope::Resolve(const Anope::string &host, int type)
 	if (getaddrinfo(host.c_str(), NULL, &hints, &addrresult) == 0)
 	{
 		sockaddrs addr;
-		memcpy(&addr, addrresult->ai_addr, addrresult->ai_addrlen);
+		memcpy(static_cast<void*>(&addr), addrresult->ai_addr, addrresult->ai_addrlen);
 		result = addr.addr();
 		Log(LOG_DEBUG_2) << "Resolver: " << host << " -> " << result;
 

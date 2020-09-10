@@ -391,7 +391,7 @@ struct IRCDMessageServer : IRCDMessage
 		if (params.size() == 5)
 			UplinkSID = params[2];
 
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[params.size() - 1], UplinkSID);
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params.back(), UplinkSID);
 
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}

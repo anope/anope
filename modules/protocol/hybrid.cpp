@@ -12,6 +12,7 @@
 #include "module.h"
 
 static Anope::string UplinkSID;
+static bool UseSVSAccount = false;  // Temporary backwards compatibility hack until old proto is deprecated
 
 class HybridProto : public IRCDProto
 {
@@ -206,12 +207,18 @@ class HybridProto : public IRCDProto
 
 	void SendLogin(User *u, NickAlias *na) anope_override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
+		if (UseSVSAccount == false)
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
+		else
+			UplinkSocket::Message() << "SVSACCOUNT " << u->GetUID() << " " << u->timestamp << " " << na->nc->display;
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d *");
+		if (UseSVSAccount == false)
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d *");
+		else
+			UplinkSocket::Message() << "SVSACCOUNT " << u->GetUID() << " " << u->timestamp << " *";
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -389,7 +396,10 @@ struct IRCDMessageServer : IRCDMessage
 			return;
 
 		if (params.size() == 5)
+		{
 			UplinkSID = params[2];
+			UseSVSAccount = true;
+		}
 
 		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params.back(), UplinkSID);
 
@@ -406,7 +416,7 @@ struct IRCDMessageSID : IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		unsigned int hops = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[params.size() - 1], params[2]);
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params.back(), params[2]);
 
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}

@@ -551,6 +551,12 @@ void Anope::Init(int ac, char **av)
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(OnLoadDatabase, MOD_RESULT, ());
 	static_cast<void>(MOD_RESULT);
+
+	/* Compatibility for databases without ids */
+	for (nickcore_map::iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		it->second->GetId();
+	/* End compatibility for databases without ids */
+
 	Log() << "Databases loaded";
 
 	FOREACH_MOD(OnPostInit, ());

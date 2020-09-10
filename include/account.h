@@ -20,9 +20,11 @@
 
 typedef Anope::hash_map<NickAlias *> nickalias_map;
 typedef Anope::hash_map<NickCore *> nickcore_map;
+typedef TR1NS::unordered_map<uint64_t, NickCore *> nickcoreid_map;
 
 extern CoreExport Serialize::Checker<nickalias_map> NickAliasList;
 extern CoreExport Serialize::Checker<nickcore_map> NickCoreList;
+extern CoreExport nickcoreid_map NickCoreIdList;
 
 /* A registered nickname.
  * It matters that Base is here before Extensible (it is inherited by Serializable)
@@ -107,6 +109,8 @@ class CoreExport NickCore : public Serializable, public Extensible
 {
 	/* Channels which reference this core in some way (this is on their access list, akick list, is founder, successor, etc) */
 	Serialize::Checker<std::map<ChannelInfo *, int> > chanaccess;
+	/* Unique identifier for the account. */
+	uint64_t id;
  public:
 	/* Name of the account. Find(display)->nc == this. */
 	Anope::string display;
@@ -140,8 +144,9 @@ class CoreExport NickCore : public Serializable, public Extensible
 
 	/** Constructor
 	 * @param display The display nick
+	 * @param id The account id
 	 */
-	NickCore(const Anope::string &nickdisplay);
+	NickCore(const Anope::string &nickdisplay, uint64_t nickid = 0);
 	~NickCore();
 
 	void Serialize(Serialize::Data &data) const anope_override;
@@ -177,6 +182,9 @@ class CoreExport NickCore : public Serializable, public Extensible
 	/** Get the number of entries on the access list for this account.
 	 */
 	unsigned GetAccessCount() const;
+
+	/** Retrieves the account id for this user */
+	uint64_t GetId();
 
 	/** Find an entry in the nick's access list
 	 *

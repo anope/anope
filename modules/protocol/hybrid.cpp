@@ -1,4 +1,4 @@
-/* ircd-hybrid-8 protocol module
+/* ircd-hybrid protocol module. Minimum supported version of ircd-hybrid is 8.2.23.
  *
  * (C) 2003-2020 Anope Team <team@anope.org>
  * (C) 2012-2020 ircd-hybrid development team
@@ -23,7 +23,7 @@ class HybridProto : public IRCDProto
 	}
 
   public:
-	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.x")
+	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.23+")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;

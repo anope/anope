@@ -205,7 +205,8 @@ class ESHA1 : public Module
 	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		sha1provider(this)
 	{
-
+		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			throw ModuleException("enc_sha1 is deprecated and can not be used as a primary encryption method");
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override

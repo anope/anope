@@ -44,6 +44,8 @@ class EOld : public Module
 	EOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		oldmd5provider(this)
 	{
+		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			throw ModuleException("enc_old is deprecated and can not be used as a primary encryption method");
 
 		ModuleManager::LoadModule("enc_md5", User::Find(creator, true));
 		if (!md5)

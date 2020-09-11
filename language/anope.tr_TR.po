@@ -4782,7 +4782,7 @@ msgstr ""
 "to them.  (However, no more than %d messages will be\n"
 "sent in order to avoid flooding the user.  If there are\n"
 "more news messages, only the most recent will be sent.)\n"
-"NewsCount can be configured in services.conf.\n"
+"NewsCount can be configured in anope.conf.\n"
 "\n"
 "LOGONNEWS may only be used by Services Operators."
 
@@ -4804,7 +4804,7 @@ msgstr ""
 "be sent to them.  (However, no more than %d messages will\n"
 "be sent in order to avoid flooding the user.  If there are\n"
 "more news messages, only the most recent will be sent.)\n"
-"NewsCount can be configured in services.conf.\n"
+"NewsCount can be configured in anope.conf.\n"
 "\n"
 "OPERNEWS may only be used by Services Operators."
 
@@ -8985,7 +8985,7 @@ msgstr "%s için successor kaldırıldı."
 #, fuzzy
 msgid ""
 "Super admin can not be set because it is not enabled in the configuration."
-msgstr "SuperAdmin setting not enabled in services.conf"
+msgstr "SuperAdmin setting not enabled in anope.conf"
 
 #: modules/commands/ns_suspend.cpp:60
 #, fuzzy

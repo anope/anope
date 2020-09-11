@@ -366,7 +366,7 @@ namespace Anope
 	 */
 	extern CoreExport bool ReadOnly, NoFork, NoThird, NoExpire, ProtocolDebug;
 
-	/** The root of the services installation. Usually ~/services
+	/** The root of the services installation. Usually ~/anope
 	 */
 	extern CoreExport Anope::string ServicesDir;
 

@@ -22,7 +22,7 @@ Anope Modules
     1. If modules are supported by your system, they will be configured
        automatically when you run ./Config. The modules will be installed
        to the modules directory in your data path (by default this will
-       be ~/services/data/modules).
+       be ~/anope/data/modules).
 
     2. Compile Anope as usual using ./Config. The "make" process will now
        compile module support into Anope, and compile the default sample
@@ -98,7 +98,7 @@ Anope Modules
     1. Make sure you're in the main source directory. (usually anope-1.X.XX/)
     2. Run ./Config to find and configure modules, then `cd build`.
     3. Run `make` to compile Anope, and any modules.
-    4. Run `make install` to copy the compiled binaries to the ~/services/
+    4. Run `make install` to copy the compiled binaries to the ~/anope/
        directory.
 
     You can now use /msg OperServ MODLOAD to load the new modules.

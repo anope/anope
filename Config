@@ -125,7 +125,7 @@ export ECHO2 ECHO2SUF
 # Init values
 ###########################################################################
 
-INSTDIR=$HOME/services
+INSTDIR=$HOME/anope
 RUNGROUP=
 UMASK=
 DEBUG="no"

@@ -405,7 +405,6 @@ class CoreExport Module : public Extensible
 	 *  see src/encrypt.c for detailed informations
 	 */
 	virtual EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) { throw NotImplementedException(); }
-	virtual EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest) { throw NotImplementedException(); }
 
 	/** Called on fantasy command
 	 * @param source The source of the command

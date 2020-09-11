@@ -462,14 +462,6 @@ namespace Anope
 	 */
 	extern CoreExport void Encrypt(const Anope::string &src, Anope::string &dest);
 
-	/** Decrypts what is in 'src' to 'dest'.
-	 * @param src The source string to decrypt
-	 * @param dest The destination where the decrypted string is placed
-	 * @return true if decryption was successful. This is usually not the case
-	 * as most encryption methods we use are one way.
-	 */
-	extern CoreExport bool Decrypt(const Anope::string &src, Anope::string &dest);
-
 	/** Hashes a buffer with SipHash-2-4
 	 * @param src The start of the buffer to hash
 	 * @param src_sz The total number of bytes in the buffer

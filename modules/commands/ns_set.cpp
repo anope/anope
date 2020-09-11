@@ -147,11 +147,7 @@ class CommandNSSetPassword : public Command
 		Log(LOG_COMMAND, source, this) << "to change their password";
 
 		Anope::Encrypt(param, source.nc->pass);
-		Anope::string tmp_pass;
-		if (Anope::Decrypt(source.nc->pass, tmp_pass) == 1)
-			source.Reply(_("Password for \002%s\002 changed to \002%s\002."), source.nc->display.c_str(), tmp_pass.c_str());
-		else
-			source.Reply(_("Password for \002%s\002 changed."), source.nc->display.c_str());
+		source.Reply(_("Password for \002%s\002 changed."), source.nc->display.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -214,10 +210,7 @@ class CommandNSSASetPassword : public Command
 
 		Anope::Encrypt(params[1], nc->pass);
 		Anope::string tmp_pass;
-		if (Anope::Decrypt(nc->pass, tmp_pass) == 1)
-			source.Reply(_("Password for \002%s\002 changed to \002%s\002."), nc->display.c_str(), tmp_pass.c_str());
-		else
-			source.Reply(_("Password for \002%s\002 changed."), nc->display.c_str());
+		source.Reply(_("Password for \002%s\002 changed."), nc->display.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override

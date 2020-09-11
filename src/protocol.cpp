@@ -502,10 +502,3 @@ unsigned IRCDMessage::GetParamCount() const
 {
 	return this->param_count;
 }
-
-void IRCDMessage::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
-{
-	// Most IRCds don't support message tags yet so use the tagless variant.
-	Run(source, params);
-}
-

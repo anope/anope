@@ -191,7 +191,7 @@ struct IRCDMessageEncap : IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		/*
 		 * Received: :dev.anope.de ENCAP * SU DukePyrolator DukePyrolator
@@ -247,7 +247,7 @@ struct IRCDMessagePass : IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		UplinkSID = params[3];
 	}
@@ -259,7 +259,7 @@ struct IRCDMessageServer : IRCDMessage
 
 	/*        0          1  2                       */
 	/* SERVER hades.arpa 1 :ircd-hybrid test server */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		/* Servers other than our immediate uplink are introduced via SID */
 		if (params[1] != "1")
@@ -287,7 +287,7 @@ struct IRCDMessageUID : IRCDMessage
 	   params[10] = info
 	*/
 	// :42X UID Adam 1 1348535644 +aow Adam 192.168.0.5 192.168.0.5 42XAAAAAB 0 192.168.0.5 :Adam
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		/* An IP of 0 means the user is spoofed */
 		Anope::string ip = params[6];

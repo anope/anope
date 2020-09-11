@@ -148,7 +148,7 @@ struct IRCDMessageEncap : IRCDMessage
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 3) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	// Debug: Received: :00BAAAAAB ENCAP * LOGIN Adam
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		if (params[1] == "LOGIN" || params[1] == "SU")
 		{
@@ -172,10 +172,10 @@ struct IRCDMessageJoin : Message::Join
 {
 	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		if (params.size() == 1 && params[0] == "0")
-			return Message::Join::Run(source, params);
+			return Message::Join::Run(source, params, tags);
 
 		if (params.size() < 2)
 			return;
@@ -183,7 +183,7 @@ struct IRCDMessageJoin : Message::Join
 		std::vector<Anope::string> p = params;
 		p.erase(p.begin());
 
-		return Message::Join::Run(source, p);
+		return Message::Join::Run(source, p, tags);
 	}
 };
 
@@ -191,7 +191,7 @@ struct IRCDMessagePass : IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		UplinkSID = params[3];
 	}
@@ -202,7 +202,7 @@ struct IRCDMessageServer : IRCDMessage
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	// SERVER hades.arpa 1 :ircd-ratbox test server
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		// Servers other then our immediate uplink are introduced via SID
 		if (params[1] != "1")
@@ -222,7 +222,7 @@ struct IRCDMessageTBurst : IRCDMessage
 	 * params[2] = topic OR who set the topic
 	 * params[3] = topic if params[2] isn't the topic
 	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		time_t topic_time = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
 		Channel *c = Channel::Find(params[0]);
@@ -242,7 +242,7 @@ struct IRCDMessageUID : IRCDMessage
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 9) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	// :42X UID Adam 1 1348535644 +aow Adam 192.168.0.5 192.168.0.5 42XAAAAAB :Adam
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		/* Source is always the server */
 		User::OnIntroduce(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7], NULL);

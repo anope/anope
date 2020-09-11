@@ -172,7 +172,7 @@ struct IRCDMessageEncap : IRCDMessage
 		SetFlag(IRCDMESSAGE_SOFT_LIMIT);
 	}
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		// In a burst, states that the source user is logged in as the account.
 		if (params[1] == "LOGIN" || params[1] == "SU")
@@ -238,7 +238,7 @@ struct IRCDMessageEUID : IRCDMessage
 	 * user is not logged in with services). Hence a NICK or UID command received
 	 * from a remote server should not be sent in EUID form to other servers.
 	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		NickAlias *na = NULL;
 		if (params[9] != "*")
@@ -254,7 +254,7 @@ struct IRCDMessageServer : IRCDMessage
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	// SERVER dev.anope.de 1 :charybdis test server
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		// Servers other then our immediate uplink are introduced via SID
 		if (params[1] != "1")
@@ -269,7 +269,7 @@ struct IRCDMessagePass : IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		// UplinkSID is used in IRCDMessageServer
 		UplinkSID = params[3];

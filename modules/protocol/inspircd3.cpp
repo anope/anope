@@ -766,13 +766,13 @@ struct IRCDMessageAway : Message::Away
 {
 	IRCDMessageAway(Module *creator) : Message::Away(creator, "AWAY") { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		std::vector<Anope::string> newparams(params);
 		if (newparams.size() > 1)
 			newparams.erase(newparams.begin());
 
-		Message::Away::Run(source, newparams);
+		Message::Away::Run(source, newparams, tags);
 	}
 };
 
@@ -844,7 +844,7 @@ struct IRCDMessageCapab : Message::Capab
 
 	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		if (params[0].equals_cs("START"))
 		{
@@ -1169,7 +1169,7 @@ struct IRCDMessageCapab : Message::Capab
 				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
 		}
 
-		Message::Capab::Run(source, params);
+		Message::Capab::Run(source, params, tags);
 	}
 };
 
@@ -1177,7 +1177,7 @@ struct IRCDMessageEncap : IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		if (!Anope::Match(Me->GetSID(), params[0]) && !Anope::Match(Me->GetName(), params[0]))
 			return;
@@ -1227,7 +1227,7 @@ struct IRCDMessageFHost : IRCDMessage
 {
 	IRCDMessageFHost(Module *creator) : IRCDMessage(creator, "FHOST", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		User *u = source.GetUser();
 		if (u->HasMode("CLOAK"))
@@ -1240,7 +1240,7 @@ struct IRCDMessageFIdent : IRCDMessage
 {
 	IRCDMessageFIdent(Module *creator) : IRCDMessage(creator, "FIDENT", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		source.GetUser()->SetIdent(params[0]);
 	}
@@ -1250,7 +1250,7 @@ struct IRCDMessageKick : IRCDMessage
 {
 	IRCDMessageKick(Module *creator) : IRCDMessage(creator, "KICK", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		// Received: :715AAAAAA KICK #chan 715AAAAAD :reason
 		// Received: :715AAAAAA KICK #chan 628AAAAAA 4 :reason
@@ -1269,7 +1269,7 @@ struct IRCDMessageSave : IRCDMessage
 
 	IRCDMessageSave(Module *creator) : IRCDMessage(creator, "SAVE", 2), last_collide(0) { }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		User *targ = User::Find(params[0]);
 		time_t ts;
@@ -1313,7 +1313,7 @@ class IRCDMessageMetadata : IRCDMessage
  public:
 	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock) : IRCDMessage(creator, "METADATA", 3), do_topiclock(handle_topiclock), do_mlock(handle_mlock) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		// We deliberately ignore non-bursting servers to avoid pseudoserver fights
 		// Channel METADATA has an additional parameter: the channel TS
@@ -1433,7 +1433,7 @@ struct IRCDMessageEndburst : IRCDMessage
 {
 	IRCDMessageEndburst(Module *creator) : IRCDMessage(creator, "ENDBURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		Server *s = source.GetServer();
 
@@ -1447,7 +1447,7 @@ struct IRCDMessageFJoin : IRCDMessage
 {
 	IRCDMessageFJoin(Module *creator) : IRCDMessage(creator, "FJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		Anope::string modes;
 		if (params.size() >= 3)
@@ -1503,7 +1503,7 @@ struct IRCDMessageFMode : IRCDMessage
 {
 	IRCDMessageFMode(Module *creator) : IRCDMessage(creator, "FMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		/* :source FMODE #test 12345678 +nto foo */
 
@@ -1532,7 +1532,7 @@ struct IRCDMessageFTopic : IRCDMessage
 {
 	IRCDMessageFTopic(Module *creator) : IRCDMessage(creator, "FTOPIC", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT);  }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		// :source FTOPIC channel ts topicts :topic
 		// :source FTOPIC channel ts topicts setby :topic (burst or RESYNC)
@@ -1550,7 +1550,7 @@ struct IRCDMessageIdle : IRCDMessage
 {
 	IRCDMessageIdle(Module *creator) : IRCDMessage(creator, "IDLE", 1) { }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		BotInfo *bi = BotInfo::Find(params[0]);
 		if (bi)
@@ -1568,7 +1568,7 @@ struct IRCDMessageIJoin : IRCDMessage
 {
 	IRCDMessageIJoin(Module *creator) : IRCDMessage(creator, "IJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		// :<uid> IJOIN <chan> <membid> [<ts> [<flags>]]
 		Channel *c = Channel::Find(params[0]);
@@ -1604,7 +1604,7 @@ struct IRCDMessageMode : IRCDMessage
 {
 	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		if (IRCD->IsChannelValid(params[0]))
 		{
@@ -1634,7 +1634,7 @@ struct IRCDMessageNick : IRCDMessage
 {
 	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		source.GetUser()->ChangeNick(params[0]);
 	}
@@ -1644,7 +1644,7 @@ struct IRCDMessageOperType : IRCDMessage
 {
 	IRCDMessageOperType(Module *creator) : IRCDMessage(creator, "OPERTYPE", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		/* opertype is equivalent to mode +o because servers
 		   don't do this directly */
@@ -1658,7 +1658,7 @@ struct IRCDMessagePing : IRCDMessage
 {
 	IRCDMessagePing(Module *creator) : IRCDMessage(creator, "PING", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		if (params[0] == Me->GetSID())
 			IRCD->SendPong(params[0], source.GetServer()->GetSID());
@@ -1669,7 +1669,7 @@ struct IRCDMessageRSQuit : IRCDMessage
 {
 	IRCDMessageRSQuit(Module *creator) : IRCDMessage(creator, "RSQUIT", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		Server *s = Server::Find(params[0]);
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
@@ -1685,7 +1685,7 @@ struct IRCDMessageServer : IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		if (!source.GetServer() && params.size() == 5)
 		{
@@ -1718,7 +1718,7 @@ struct IRCDMessageSQuit : Message::SQuit
 {
 	IRCDMessageSQuit(Module *creator) : Message::SQuit(creator) { }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		if (params[0] == rsquit_id || params[0] == rsquit_server)
 		{
@@ -1732,7 +1732,7 @@ struct IRCDMessageSQuit : Message::SQuit
 				IRCD->SendServer(s);
 		}
 		else
-			Message::SQuit::Run(source, params);
+			Message::SQuit::Run(source, params, tags);
 	}
 };
 
@@ -1740,7 +1740,7 @@ struct IRCDMessageTime : IRCDMessage
 {
 	IRCDMessageTime(Module *creator) : IRCDMessage(creator, "TIME", 2) { }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		UplinkSocket::Message(Me) << "TIME " << source.GetSource() << " " << params[1] << " " << Anope::CurTime;
 	}
@@ -1763,7 +1763,7 @@ struct IRCDMessageUID : IRCDMessage
 	 * 8+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
 	 * last: realname
 	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		time_t ts = convertTo<time_t>(params[1]);
 

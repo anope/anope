@@ -60,8 +60,6 @@ class CoreExport IRCDProto : public Service
 	bool CanSZLine;
 	/* Can we place temporary holds on specific nicknames? */
 	bool CanSVSHold;
-	/* See os_oline */
-	bool CanSVSO;
 	/* See ns_cert */
 	bool CanCertFP;
 	/* Whether this IRCd requires unique IDs for each user or server. See TS6/P10. */
@@ -178,10 +176,6 @@ class CoreExport IRCDProto : public Service
 
 	virtual void SendInvite(const MessageSource &source, const Channel *c, User *u);
 	virtual void SendGlobops(const MessageSource &source, const char *fmt, ...);
-
-	/** Sets oper flags on a user, currently only supported by Unreal
-	 */
-	virtual void SendSVSO(BotInfo *, const Anope::string &, const Anope::string &) { }
 
 	/** Sends a nick change of one of our clients.
 	 */

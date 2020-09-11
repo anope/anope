@@ -5,7 +5,6 @@
 
 #cmakedefine DEFUMASK @DEFUMASK@
 #cmakedefine HAVE_CSTDINT 1
-#cmakedefine HAVE_STDINT_H 1
 #cmakedefine HAVE_STDDEF_H 1
 #cmakedefine HAVE_STRCASECMP 1
 #cmakedefine HAVE_STRICMP 1
@@ -19,11 +18,7 @@
 #ifdef HAVE_CSTDINT
 # include <cstdint>
 #else
-# ifdef HAVE_STDINT_H
-#  include <stdint.h>
-# else
-#  include "pstdint.h"
-# endif
+# include <stdint.h>
 #endif
 #ifdef HAVE_STDDEF_H
 # include <stddef.h>

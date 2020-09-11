@@ -357,7 +357,6 @@ endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEB
 
 # Check for the existence of the following include files
 check_include_file(cstdint HAVE_CSTDINT)
-check_include_file(stdint.h HAVE_STDINT_H)
 check_include_file(strings.h HAVE_STRINGS_H)
 
 # Check for the existence of the following functions

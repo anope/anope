@@ -18,7 +18,7 @@ static Anope::string UplinkSID;
 class UnrealIRCdProto : public IRCDProto
 {
  public:
-	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4")
+	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4+")
 	{
 		DefaultPseudoclientModes = "+Soiq";
 		CanSVSNick = true;

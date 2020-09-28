@@ -1,4 +1,4 @@
-/* InspIRCd 3.0 functions
+/* InspIRCd functions
  *
  * (C) 2003-2020 Anope Team
  * Contact us at team@anope.org
@@ -24,7 +24,7 @@ static std::list<SASLUser> saslusers;
 
 static Anope::string rsquit_server, rsquit_id;
 
-class InspIRCd3Proto : public IRCDProto
+class InspIRCdProto : public IRCDProto
 {
  private:
 	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
@@ -54,7 +54,7 @@ class InspIRCd3Proto : public IRCDProto
 	}
 
  public:
-	InspIRCd3Proto(Module *creator) : IRCDProto(creator, "InspIRCd 3")
+	InspIRCdProto(Module *creator) : IRCDProto(creator, "InspIRCd 3+")
 	{
 		DefaultPseudoclientModes = "+I";
 		CanSVSNick = true;
@@ -1794,9 +1794,9 @@ struct IRCDMessageUID : IRCDMessage
 	}
 };
 
-class ProtoInspIRCd3 : public Module
+class ProtoInspIRCd : public Module
 {
-	InspIRCd3Proto ircd_proto;
+	InspIRCdProto ircd_proto;
 	ExtensibleItem<bool> ssl;
 
 	/* Core message handlers */
@@ -1843,7 +1843,7 @@ class ProtoInspIRCd3 : public Module
 	}
 
  public:
-	ProtoInspIRCd3(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
+	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this), ssl(this, "ssl"),
 		message_error(this), message_invite(this), message_kill(this), message_motd(this), message_notice(this),
 		message_part(this), message_privmsg(this), message_quit(this), message_stats(this),
@@ -1937,4 +1937,4 @@ class ProtoInspIRCd3 : public Module
 	}
 };
 
-MODULE_INIT(ProtoInspIRCd3)
+MODULE_INIT(ProtoInspIRCd)

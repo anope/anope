@@ -1,4 +1,4 @@
-/* Unreal IRCD 4 functions
+/* UnrealIRCd functions
  *
  * (C) 2003-2020 Anope Team
  * Contact us at team@anope.org

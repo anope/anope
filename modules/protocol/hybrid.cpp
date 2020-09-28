@@ -174,13 +174,12 @@ class HybridProto : public IRCDProto
 		 * As of September 09, 2020, ircd-hybrid-8 does support the following capabilities
 		 * which are required to work with IRC-services:
 		 *
-		 * QS     - Can handle quit storm removal
 		 * TBURST - Supports topic burst
 		 * ENCAP  - Supports ENCAP
 		 * EOB    - Supports End Of Burst message
 		 * RHOST  - Supports UID message with realhost information
 		 */
-		UplinkSocket::Message() << "CAPAB :QS ENCAP TBURST EOB RHOST";
+		UplinkSocket::Message() << "CAPAB :ENCAP TBURST EOB RHOST";
 
 		SendServer(Me);
 

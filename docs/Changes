@@ -1,5 +1,14 @@
 Anope Version 2.0.8-git
 -------------------
+Add +K channel mode for ircd-hybrid
+Add immutable identifiers to user accounts
+Fix build on systems that use musl libc
+Fix not removing vhosts when an nick is dropped
+Fix parsing channel metadata on InspIRCd 3+
+Fix parsing kicks on InspIRCd 3+
+Fix parsing topic changes on InspIRCd 3+
+Fix topiclock on InspIRCd
+
 
 Anope Version 2.0.7
 -------------------

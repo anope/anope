@@ -1,7 +1,7 @@
-/* ircd-hybrid-8 protocol module
+/* ircd-hybrid protocol module. Minimum supported version of ircd-hybrid is 8.2.23.
  *
  * (C) 2003-2020 Anope Team <team@anope.org>
- * (C) 2012-2018 ircd-hybrid development team
+ * (C) 2012-2020 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
@@ -12,23 +12,10 @@
 #include "module.h"
 
 static Anope::string UplinkSID;
+static bool UseSVSAccount = false;  // Temporary backwards compatibility hack until old proto is deprecated
 
 class HybridProto : public IRCDProto
 {
-	BotInfo *FindIntroduced()
-	{
-		BotInfo *bi = Config->GetClient("OperServ");
-
-		if (bi && bi->introduced)
-			return bi;
-
-		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-			if (it->second->introduced)
-				return it->second;
-
-		return NULL;
-	}
-
 	void SendSVSKillInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override
 	{
 		IRCDProto::SendSVSKillInternal(source, u, buf);
@@ -36,7 +23,7 @@ class HybridProto : public IRCDProto
 	}
 
   public:
-	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.x")
+	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.23+")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
@@ -69,22 +56,22 @@ class HybridProto : public IRCDProto
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(FindIntroduced()) << "RESV * " << (x->expires ? x->expires - Anope::CurTime : 0) << " " << x->mask << " :" << x->reason;
+		UplinkSocket::Message(Me) << "RESV * " << (x->expires ? x->expires - Anope::CurTime : 0) << " " << x->mask << " :" << x->reason;
 	}
 
 	void SendSGLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNXLINE * " << x->mask;
+		UplinkSocket::Message(Me) << "UNXLINE * " << x->mask;
 	}
 
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "XLINE * " << x->mask << " " << (x->expires ? x->expires - Anope::CurTime : 0) << " :" << x->GetReason();
+		UplinkSocket::Message(Me) << "XLINE * " << x->mask << " " << (x->expires ? x->expires - Anope::CurTime : 0) << " :" << x->GetReason();
 	}
 
 	void SendSZLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNDLINE * " << x->GetHost();
+		UplinkSocket::Message(Me) << "UNDLINE * " << x->GetHost();
 	}
 
 	void SendSZLine(User *, const XLine *x) anope_override
@@ -95,7 +82,7 @@ class HybridProto : public IRCDProto
 		if (timeleft > 172800 || !x->expires)
 			timeleft = 172800;
 
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "DLINE * " << timeleft << " " << x->GetHost() << " :" << x->GetReason();
+		UplinkSocket::Message(Me) << "DLINE * " << timeleft << " " << x->GetHost() << " :" << x->GetReason();
 	}
 
 	void SendAkillDel(const XLine *x) anope_override
@@ -103,12 +90,12 @@ class HybridProto : public IRCDProto
 		if (x->IsRegex() || x->HasNickOrReal())
 			return;
 
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
+		UplinkSocket::Message(Me) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
 
 	void SendSQLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNRESV * " << x->mask;
+		UplinkSocket::Message(Me) << "UNRESV * " << x->mask;
 	}
 
 	void SendJoin(User *u, Channel *c, const ChannelStatus *status) anope_override
@@ -117,8 +104,8 @@ class HybridProto : public IRCDProto
 		 * Note that we must send our modes with the SJOIN and can not add them to the
 		 * mode stacker because ircd-hybrid does not allow *any* client to op itself
 		 */
-		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :"
-					<< (status != NULL ? status->BuildModePrefixList() : "") << u->GetUID();
+		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :"
+					  << (status != NULL ? status->BuildModePrefixList() : "") << u->GetUID();
 
 		/* And update our internal status for this user since this is not going through our mode handling system */
 		if (status)
@@ -168,49 +155,43 @@ class HybridProto : public IRCDProto
 		if (timeleft > 172800 || !x->expires)
 			timeleft = 172800;
 
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
+		UplinkSocket::Message(Me) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
 	}
 
 	void SendServer(const Server *server) anope_override
 	{
 		if (server == Me)
-			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() + 1 << " :" << server->GetDescription();
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() + 1 << " " << server->GetSID() << " +" << " :" << server->GetDescription();
 		else
-			UplinkSocket::Message(Me) << "SID " << server->GetName() << " " << server->GetHops() + 1 << " " << server->GetSID() << " :" << server->GetDescription();
+			UplinkSocket::Message(Me) << "SID " << server->GetName() << " " << server->GetHops() + 1 << " " << server->GetSID() << " +" << " :" << server->GetDescription();
 	}
 
 	void SendConnect() anope_override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password;
 
 		/*
-		 * As of March 23, 2018, ircd-hybrid-8 does support the following capabilities
+		 * As of October 02, 2020, ircd-hybrid-8 does support the following capabilities
 		 * which are required to work with IRC-services:
 		 *
-		 * QS     - Can handle quit storm removal
 		 * TBURST - Supports topic burst
 		 * ENCAP  - Supports ENCAP
-		 * SVS    - Supports services
 		 * EOB    - Supports End Of Burst message
 		 * RHOST  - Supports UID message with realhost information
 		 */
-		UplinkSocket::Message() << "CAPAB :QS ENCAP TBURST SVS EOB RHOST";
+		UplinkSocket::Message() << "CAPAB :ENCAP TBURST EOB RHOST";
 
 		SendServer(Me);
 
-		UplinkSocket::Message() << "SVINFO 6 6 0 :" << Anope::CurTime;
+		UplinkSocket::Message(Me) << "SVINFO 6 6 0 :" << Anope::CurTime;
 	}
 
 	void SendClientIntroduction(User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
 
-		if (Servers::Capab.count("RHOST"))
-			UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " "
-							<< u->host << " " << u->host << " 0.0.0.0 " << u->GetUID() << " * :" << u->realname;
-		else
-			UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " "
-							<< u->host << " 0.0.0.0 " << u->GetUID() << " * :" << u->realname;
+		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " "
+						<< u->host << " " << u->host << " 0.0.0.0 " << u->GetUID() << " * :" << u->realname;
 	}
 
 	void SendEOB() anope_override
@@ -225,12 +206,18 @@ class HybridProto : public IRCDProto
 
 	void SendLogin(User *u, NickAlias *na) anope_override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
+		if (UseSVSAccount == false)
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
+		else
+			UplinkSocket::Message(Me) << "SVSACCOUNT " << u->GetUID() << " " << u->timestamp << " " << na->nc->display;
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d *");
+		if (UseSVSAccount == false)
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d *");
+		else
+			UplinkSocket::Message(Me) << "SVSACCOUNT " << u->GetUID() << " " << u->timestamp << " *";
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -240,7 +227,7 @@ class HybridProto : public IRCDProto
 		if (modes.empty())
 			modes = "+";
 
-		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
+		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) anope_override
@@ -250,10 +237,7 @@ class HybridProto : public IRCDProto
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
 	{
-		if (Servers::Capab.count("RHOST"))
-			UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
-		else
-			UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << newnick << " " << when;
+		UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
 	}
 
 	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) anope_override
@@ -281,23 +265,14 @@ class HybridProto : public IRCDProto
 		this->SendSQLineDel(&x);
 	}
 
-
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) anope_override
 	{
-		if (Servers::Capab.count("RHOST"))
-			UplinkSocket::Message(Me) << "SVSHOST " << u->GetUID() << " " << u->timestamp << " " << host;
-		else
-			/* Note: the +x doesn't set any mode on the ircd-hybrid side */
-			UplinkSocket::Message(Me) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << "+x " << host;
+		UplinkSocket::Message(Me) << "SVSHOST " << u->GetUID() << " " << u->timestamp << " " << host;
 	}
 
 	void SendVhostDel(User *u) anope_override
 	{
-		if (Servers::Capab.count("RHOST"))
-			UplinkSocket::Message(Me) << "SVSHOST " << u->GetUID() << " " << u->timestamp << " " << u->host;
-		else
-			/* Note: the +x doesn't set any mode on the ircd-hybrid side */
-			UplinkSocket::Message(Me) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << "+x " << u->host;
+		UplinkSocket::Message(Me) << "SVSHOST " << u->GetUID() << " " << u->timestamp << " " << u->host;
 	}
 
 	bool IsIdentValid(const Anope::string &ident) anope_override
@@ -348,7 +323,7 @@ struct IRCDMessageBMask : IRCDMessage
 
 struct IRCDMessageEOB : IRCDMessage
 {
-	IRCDMessageEOB(Module *craetor) : IRCDMessage(craetor, "EOB", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageEOB(Module *creator) : IRCDMessage(creator, "EOB", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -386,19 +361,20 @@ struct IRCDMessageNick : IRCDMessage
 
 struct IRCDMessagePass : IRCDMessage
 {
-	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 1) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	/*      0        1  2 3   */
-	/* PASS password TS 6 0MC */
+	/*      0        */
+	/* PASS password */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		UplinkSID = params[3];
+		if (params.size() == 4)
+			UplinkSID = params[3];
 	}
 };
 
 struct IRCDMessagePong : IRCDMessage
 {
-	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -408,17 +384,23 @@ struct IRCDMessagePong : IRCDMessage
 
 struct IRCDMessageServer : IRCDMessage
 {
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	/*        0          1  2                       */
-	/* SERVER hades.arpa 1 :ircd-hybrid test server */
+	/*        0          1 2   3  4                       */
+	/* SERVER hades.arpa 1 4XY + :ircd-hybrid test server */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		/* Servers other than our immediate uplink are introduced via SID */
 		if (params[1] != "1")
 			return;
 
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+		if (params.size() == 5)
+		{
+			UplinkSID = params[2];
+			UseSVSAccount = true;
+		}
+
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params.back(), UplinkSID);
 
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}
@@ -426,14 +408,14 @@ struct IRCDMessageServer : IRCDMessage
 
 struct IRCDMessageSID : IRCDMessage
 {
-	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	/*          0          1 2    3                       */
-	/* :0MC SID hades.arpa 2 4XY :ircd-hybrid test server */
+	/*          0          1 2   3  4                       */
+	/* :0MC SID hades.arpa 2 4XY + :ircd-hybrid test server */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		unsigned int hops = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[3], params[2]);
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params.back(), params[2]);
 
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}
@@ -464,7 +446,7 @@ struct IRCDMessageSJoin : IRCDMessage
 			Message::Join::SJoinUser sju;
 
 			/* Get prefixes from the nick */
-			for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
+			for (char ch; (ch = ModeManager::GetStatusChar(buf[0])); )
 			{
 				buf.erase(buf.begin());
 				sju.first.AddMode(ch);
@@ -493,7 +475,6 @@ struct IRCDMessageSVSMode : IRCDMessage
 	 * parv[0] = nickname
 	 * parv[1] = TS
 	 * parv[2] = mode
-	 * parv[3] = optional argument (services id)
 	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -552,37 +533,21 @@ struct IRCDMessageTMode : IRCDMessage
 
 struct IRCDMessageUID : IRCDMessage
 {
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		NickAlias *na = NULL;
 
-		if (params.size() == 11)
-		{
-			/* CAPAB RHOST */
-			/*          0     1 2          3   4      5            6         7        8         9      10                  */
-			/* :0MC UID Steve 1 1350157102 +oi ~steve virtual.host real.host 10.0.0.1 0MCAAAAAB Steve :Mining all the time */
-			if (params[9] != "*")
-				na = NickAlias::Find(params[9]);
+		/*          0     1 2          3   4      5            6         7        8         9      10                  */
+		/* :0MC UID Steve 1 1350157102 +oi ~steve virtual.host real.host 10.0.0.1 0MCAAAAAB Steve :Mining all the time */
+		if (params[9] != "*")
+			na = NickAlias::Find(params[9]);
 
-			/* Source is always the server */
-			User::OnIntroduce(params[0], params[4], params[6], params[5], params[7], source.GetServer(), params[10],
-					params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
-					params[3], params[8], na ? *na->nc : NULL);
-		}
-		else
-		{
-		        /*          0     1 2          3   4      5             6        7         8      9                   */
-		        /* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB Steve :Mining all the time */
-			if (params[8] != "*")
-				na = NickAlias::Find(params[8]);
-
-			/* Source is always the server */
-			User::OnIntroduce(params[0], params[4], params[5], "", params[6], source.GetServer(), params[9],
-					params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
-					params[3], params[7], na ? *na->nc : NULL);
-		}
+		/* Source is always the server */
+		User::OnIntroduce(params[0], params[4], params[6], params[5], params[7], source.GetServer(), params[10],
+				params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
+				params[3], params[8], na ? *na->nc : NULL);
 	}
 };
 

@@ -48,4 +48,4 @@ jobs:
           - g++
         standard:
           - c++98
-          - c++14
+          - c++17

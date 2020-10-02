@@ -63,7 +63,7 @@ int ci::ci_char_traits::compare(const char *str1, const char *str2, size_t n)
 {
 	for (unsigned i = 0; i < n; ++i)
 	{
-		register unsigned char c1 = case_map_upper[static_cast<unsigned char>(*str1)],
+		unsigned char c1 = case_map_upper[static_cast<unsigned char>(*str1)],
 					c2 = case_map_upper[static_cast<unsigned char>(*str2)];
 
 		if (c1 > c2)

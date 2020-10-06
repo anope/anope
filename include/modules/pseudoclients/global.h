@@ -16,6 +16,9 @@ class GlobalService : public Service
 	{
 	}
 
+	/** Retrieves the bot which sends global messages unless otherwise specified. */
+	virtual Reference<BotInfo> GetDefaultSender() = 0;
+
 	/** Send out a global message to all users
 	 * @param sender Our client which should send the global
 	 * @param source The sender of the global

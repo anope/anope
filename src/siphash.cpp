@@ -38,33 +38,47 @@
 #include "services.h"
 #include "anope.h"
 
-#if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && \
-	__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#  define _le64toh(x) ((uint64_t)(x))
-#elif defined(_WIN32)
-/* Windows is always little endian, unless you're on xbox360
-   http://msdn.microsoft.com/en-us/library/b0084kay(v=vs.80).aspx */
-#  define _le64toh(x) ((uint64_t)(x))
-#elif defined(__APPLE__)
+// WARNING: This ifdef maze could be a lot simpler but unfortunately
+// that will cause find_includes to be unable to parse it.
+
+#ifdef __APPLE__
 #  include <libkern/OSByteOrder.h>
 #  define _le64toh(x) OSSwapLittleToHostInt64(x)
-#else
-
-/* See: http://sourceforge.net/p/predef/wiki/Endianness/ */
-#  if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-#    include <sys/endian.h>
-#  else
-#    include <endian.h>
-#  endif
-#  if defined(__BYTE_ORDER) && defined(__LITTLE_ENDIAN) && \
-	__BYTE_ORDER == __LITTLE_ENDIAN
-#    define _le64toh(x) ((uint64_t)(x))
-#  else
-#    define _le64toh(x) le64toh(x)
-#  endif
-
 #endif
 
+#ifdef __FreeBSD__
+#  include <sys/endian.h>
+#  define _le64toh(x) le64toh(x)
+#endif
+
+#ifdef __linux__
+#  include <endian.h>
+#endif
+
+#ifdef __NetBSD__
+#  include <sys/endian.h>
+#  define _le64toh(x) le64toh(x)
+#endif
+
+#ifdef __OpenBSD__
+#  include <sys/endian.h>
+#  define _le64toh(x) le64toh(x)
+#endif
+
+// Windows is always little endian.
+#ifdef _WIN32
+#  define _le64toh(x) ((uint64_t)(x))
+#endif
+
+// Attempt to work on unenumerated platforms.
+#if defined(le64toh) && !defined(__le64toh)
+#  define _le64toh le64toh
+#endif
+
+// We can't do anything about this.
+#ifndef _le64toh
+#  error Please define _le64toh for your platform!
+#endif
 
 #define ROTATE(x, b) (uint64_t)( ((x) << (b)) | ( (x) >> (64 - (b))) )
 

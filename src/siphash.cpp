@@ -71,7 +71,7 @@
 #endif
 
 // Attempt to work on unenumerated platforms.
-#if defined(le64toh) && !defined(__le64toh)
+#if defined(le64toh) && !defined(_le64toh)
 #  define _le64toh le64toh
 #endif
 

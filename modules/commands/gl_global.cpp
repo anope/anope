@@ -37,10 +37,16 @@ class CommandGLGlobal : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		Reference<BotInfo> sender;
+		if (GService)
+			sender = GService->GetDefaultSender();
+		if (!sender)
+			sender = source.service;
+
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Allows Administrators to send messages to all users on the\n"
-				"network. The message will be sent from the nick \002%s\002."), source.service->nick.c_str());
+				"network. The message will be sent from the nick \002%s\002."), sender->nick.c_str());
 		return true;
 	}
 };

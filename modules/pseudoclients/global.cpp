@@ -29,6 +29,11 @@ class GlobalCore : public Module, public GlobalService
 	{
 	}
 
+	Reference<BotInfo> GetDefaultSender() anope_override
+	{
+		return Global;
+	}
+
 	void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) anope_override
 	{
 		if (Me->GetLinks().empty())

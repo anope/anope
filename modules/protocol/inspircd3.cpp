@@ -405,8 +405,8 @@ class InspIRCd3Proto : public IRCDProto
 		if (na->nc->HasExt("UNCONFIRMED"))
 			return;
 
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountid :" << na->nc->GetId();
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
 	}
 
 	void SendLogout(User *u) anope_override
@@ -427,6 +427,12 @@ class InspIRCd3Proto : public IRCDProto
 
 	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
 	{
+		// TODO: in 2.1 this function should take a NickAlias instead of strings.
+		NickCore *nc = NickCore::Find(acc);
+		if (!nc)
+			return;
+
+		UplinkSocket::Message(Me) << "METADATA " << uid << " accountid :" << nc->GetId();
 		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << acc;
 
 		if (!vident.empty())

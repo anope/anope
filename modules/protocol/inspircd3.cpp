@@ -411,8 +411,8 @@ class InspIRCd3Proto : public IRCDProto
 
 	void SendLogout(User *u) anope_override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountid :";
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
 	}
 
 	void SendChannel(Channel *c) anope_override

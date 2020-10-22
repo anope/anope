@@ -1,5 +1,8 @@
 Anope Version 2.0.9-git
 -------------------
+Fix a regression from 2.0.8 that prevented serialising to MySQL.
+Send account identifiers to InspIRCd on SASL logins too
+Fix a query bug in irc2sql.
 
 Anope Version 2.0.8
 -------------------

@@ -62,6 +62,7 @@ class InspIRCd3Proto : public IRCDProto
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSQLine = true;
+		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanSVSHold = true;
 		CanCertFP = true;
@@ -313,7 +314,10 @@ class InspIRCd3Proto : public IRCDProto
 
 	void SendSQLineDel(const XLine *x) anope_override
 	{
-		SendDelLine("Q", x->mask);
+		if (IRCD->CanSQLineChannel && (x->mask[0] == '#'))
+			SendDelLine("CBAN", x->mask);
+		else
+			SendDelLine("Q", x->mask);
 	}
 
 	void SendSQLine(User *u, const XLine *x) anope_override
@@ -322,7 +326,11 @@ class InspIRCd3Proto : public IRCDProto
 		time_t timeleft = x->expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->expires)
 			timeleft = 172800;
-		SendAddLine("Q", x->mask, timeleft, x->by, x->GetReason());
+
+		if (IRCD->CanSQLineChannel && (x->mask[0] == '#'))
+			SendAddLine("CBAN", x->mask, timeleft, x->by, x->GetReason());
+		else
+			SendAddLine("Q", x->mask, timeleft, x->by, x->GetReason());
 	}
 
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) anope_override
@@ -869,6 +877,7 @@ struct IRCDMessageCapab : Message::Capab
 			/* reset CAPAB */
 			Servers::Capab.insert("SERVERS");
 			Servers::Capab.insert("TOPICLOCK");
+			IRCD->CanSQLineChannel = false;
 			IRCD->CanSVSHold = false;
 			IRCD->DefaultPseudoclientModes = "+I";
 		}
@@ -1105,6 +1114,8 @@ struct IRCDMessageCapab : Message::Capab
 				}
 				else if (module.equals_cs("m_topiclock.so"))
 					Servers::Capab.insert("TOPICLOCK");
+				else if (module.equals_cs("m_cban.so=glob"))
+					IRCD->CanSQLineChannel = true;
 			}
 		}
 		else if (params[0].equals_cs("MODSUPPORT") && params.size() > 1)

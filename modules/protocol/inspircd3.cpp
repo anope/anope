@@ -1114,9 +1114,8 @@ struct IRCDMessageCapab : Message::Capab
 				}
 				else if (module.equals_cs("m_topiclock.so"))
 					Servers::Capab.insert("TOPICLOCK");
-				else if (module.find("m_cban.so") == 0)
-					if (module.length() > 10 && module.substr(10) == "glob")
-						IRCD->CanSQLineChannel = true;
+				else if (module.equals_cs("m_cban.so=glob"))
+					IRCD->CanSQLineChannel = true;
 			}
 		}
 		else if (params[0].equals_cs("MODSUPPORT") && params.size() > 1)

@@ -60,6 +60,7 @@ class CommandNSInfo : public Command
 
 			InfoFormatter info(source.nc);
 
+			info[_("Account")] = na->nc->display;
 			if (nick_online)
 			{
 				bool shown = false;

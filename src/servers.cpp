@@ -1,6 +1,6 @@
 /* Routines to maintain a list of connected servers
  *
- * (C) 2003-2020 Anope Team
+ * (C) 2003-2021 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.

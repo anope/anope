@@ -1,7 +1,7 @@
 /* ircd-hybrid protocol module. Minimum supported version of ircd-hybrid is 8.2.23.
  *
- * (C) 2003-2020 Anope Team <team@anope.org>
- * (C) 2012-2020 ircd-hybrid development team
+ * (C) 2003-2021 Anope Team <team@anope.org>
+ * (C) 2012-2021 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
@@ -171,7 +171,7 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password;
 
 		/*
-		 * As of October 02, 2020, ircd-hybrid-8 does support the following capabilities
+		 * As of October 02, 2021, ircd-hybrid-8 does support the following capabilities
 		 * which are required to work with IRC-services:
 		 *
 		 * TBURST - Supports topic burst

@@ -1,5 +1,5 @@
 # Anope IRC Services language file
-# Copyright (C) 2014-2020
+# Copyright (C) 2014-2021
 # This file is distributed under the same license as the Anope IRC Services package.
 # Adam <adam@anope.org>, 2014.
 #
@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 17:08+0100\n"
-"PO-Revision-Date: 2020-01-06 17:08+0100\n"
+"POT-Creation-Date: 2021-01-06 17:08+0100\n"
+"PO-Revision-Date: 2021-01-06 17:08+0100\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: English\n"
 "Language: en_US\n"

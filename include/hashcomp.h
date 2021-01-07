@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2002-2011 InspIRCd Development Team
- * (C) 2009-2020 Anope Team <team@anope.org>
+ * (C) 2009-2021 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */

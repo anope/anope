@@ -908,7 +908,7 @@ class CSAccess : public Module
 		int16_t level = group->ci->GetLevel(priv);
 		if (level == -1)
 			return EVENT_ALLOW;
-		else if (level == 0 && group->nc)
+		else if (level == 0 && group->nc && !group->nc->HasExt("UNCONFIRMED"))
 			return EVENT_ALLOW;
 		return EVENT_CONTINUE;
 	}

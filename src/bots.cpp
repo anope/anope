@@ -62,9 +62,9 @@ BotInfo::~BotInfo()
 		IRCD->SendSQLineDel(&x);
 	}
 
-	for (std::set<ChannelInfo *>::iterator it = this->channels->begin(), it_end = this->channels->end(); it != it_end; ++it)
+	for (std::set<ChannelInfo *>::iterator it = this->channels->begin(), it_end = this->channels->end(); it != it_end;)
 	{
-		ChannelInfo *ci = *it;
+		ChannelInfo *ci = *it++;
 		this->UnAssign(NULL, ci);
 	}
 

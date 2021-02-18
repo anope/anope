@@ -1,6 +1,6 @@
 /* Initialization and related routines.
  *
- * (C) 2003-2020 Anope Team
+ * (C) 2003-2021 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -551,12 +551,6 @@ void Anope::Init(int ac, char **av)
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(OnLoadDatabase, MOD_RESULT, ());
 	static_cast<void>(MOD_RESULT);
-
-	/* Compatibility for databases without ids */
-	for (nickcore_map::iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
-		it->second->GetId();
-	/* End compatibility for databases without ids */
-
 	Log() << "Databases loaded";
 
 	FOREACH_MOD(OnPostInit, ());

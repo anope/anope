@@ -1,6 +1,6 @@
 /* InspIRCd functions
  *
- * (C) 2003-2020 Anope Team
+ * (C) 2003-2021 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -62,6 +62,7 @@ class InspIRCdProto : public IRCDProto
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSQLine = true;
+		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanSVSHold = true;
 		CanCertFP = true;
@@ -313,7 +314,10 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSQLineDel(const XLine *x) anope_override
 	{
-		SendDelLine("Q", x->mask);
+		if (IRCD->CanSQLineChannel && (x->mask[0] == '#'))
+			SendDelLine("CBAN", x->mask);
+		else
+			SendDelLine("Q", x->mask);
 	}
 
 	void SendSQLine(User *u, const XLine *x) anope_override
@@ -322,7 +326,11 @@ class InspIRCdProto : public IRCDProto
 		time_t timeleft = x->expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->expires)
 			timeleft = 172800;
-		SendAddLine("Q", x->mask, timeleft, x->by, x->GetReason());
+
+		if (IRCD->CanSQLineChannel && (x->mask[0] == '#'))
+			SendAddLine("CBAN", x->mask, timeleft, x->by, x->GetReason());
+		else
+			SendAddLine("Q", x->mask, timeleft, x->by, x->GetReason());
 	}
 
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) anope_override
@@ -405,14 +413,14 @@ class InspIRCdProto : public IRCDProto
 		if (na->nc->HasExt("UNCONFIRMED"))
 			return;
 
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountid :" << na->nc->GetId();
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountid :";
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -427,6 +435,12 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
 	{
+		// TODO: in 2.1 this function should take a NickAlias instead of strings.
+		NickCore *nc = NickCore::Find(acc);
+		if (!nc)
+			return;
+
+		UplinkSocket::Message(Me) << "METADATA " << uid << " accountid :" << nc->GetId();
 		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << acc;
 
 		if (!vident.empty())
@@ -863,6 +877,7 @@ struct IRCDMessageCapab : Message::Capab
 			/* reset CAPAB */
 			Servers::Capab.insert("SERVERS");
 			Servers::Capab.insert("TOPICLOCK");
+			IRCD->CanSQLineChannel = false;
 			IRCD->CanSVSHold = false;
 			IRCD->DefaultPseudoclientModes = "+I";
 		}
@@ -1099,6 +1114,8 @@ struct IRCDMessageCapab : Message::Capab
 				}
 				else if (module.equals_cs("m_topiclock.so"))
 					Servers::Capab.insert("TOPICLOCK");
+				else if (module.equals_cs("m_cban.so=glob"))
+					IRCD->CanSQLineChannel = true;
 			}
 		}
 		else if (params[0].equals_cs("MODSUPPORT") && params.size() > 1)

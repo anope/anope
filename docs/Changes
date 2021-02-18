@@ -1,3 +1,12 @@
+Anope Version 2.0.10-git
+--------------------
+
+Anope Version 2.0.9
+-------------------
+Fix a regression from 2.0.8 that prevented serialising to MySQL.
+Send account identifiers to InspIRCd on SASL logins too
+Fix a query bug in irc2sql.
+
 Anope Version 2.0.8
 -------------------
 Add +K channel mode for ircd-hybrid

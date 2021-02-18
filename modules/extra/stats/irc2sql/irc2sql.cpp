@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2013-2020 Anope Team
+ * (C) 2013-2021 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -71,7 +71,7 @@ void IRC2SQL::OnNewServer(Server *server)
 	query = "INSERT DELAYED INTO `" + prefix + "server` (name, hops, comment, link_time, online, ulined) "
 		"VALUES (@name@, @hops@, @comment@, now(), 'Y', @ulined@) "
 		"ON DUPLICATE KEY UPDATE name=VALUES(name), hops=VALUES(hops), comment=VALUES(comment), "
-			"link_time=VALUES(link_time), online=VALUES(online), ulined=(ulined)";
+			"link_time=VALUES(link_time), online=VALUES(online), ulined=VALUES(ulined)";
 	query.SetValue("name", server->GetName());
 	query.SetValue("hops", server->GetHops());
 	query.SetValue("comment", server->GetDescription());

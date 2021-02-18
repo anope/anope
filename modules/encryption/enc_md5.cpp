@@ -1,7 +1,7 @@
 /* Module for encryption using MD5.
  *
  * Modified for Anope.
- * (C) 2003-2020 Anope Team
+ * (C) 2003-2021 Anope Team
  * Contact us at team@anope.org
  *
  * Taken from IRC Services and is copyright (c) 1996-2002 Andrew Church.

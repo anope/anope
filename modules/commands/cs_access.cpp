@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2020 Anope Team
+ * (C) 2003-2021 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -908,7 +908,7 @@ class CSAccess : public Module
 		int16_t level = group->ci->GetLevel(priv);
 		if (level == -1)
 			return EVENT_ALLOW;
-		else if (level == 0 && group->nc)
+		else if (level == 0 && group->nc && !group->nc->HasExt("UNCONFIRMED"))
 			return EVENT_ALLOW;
 		return EVENT_CONTINUE;
 	}

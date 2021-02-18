@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2020 Anope Team
+ * (C) 2003-2021 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -74,7 +74,7 @@ NickCore::~NickCore()
 void NickCore::Serialize(Serialize::Data &data) const
 {
 	data["display"] << this->display;
-	data["id"] << this->id;
+	data["uniqueid"] << this->id;
 	data["pass"] << this->pass;
 	data["email"] << this->email;
 	data["language"] << this->language;
@@ -94,7 +94,7 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["display"] >> sdisplay;
 
 	uint64_t sid = 0;
-	data["id"] >> sid;
+	data["uniqueid"] >> sid;
 
 	if (obj)
 		nc = anope_dynamic_static_cast<NickCore *>(obj);

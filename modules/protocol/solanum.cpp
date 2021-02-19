@@ -1,4 +1,4 @@
-/* Charybdis IRCD functions
+/* Solanum functions
  *
  * (C) 2003-2021 Anope Team
  * Contact us at team@anope.org
@@ -29,11 +29,11 @@ class ChannelModeLargeBan : public ChannelMode
 };
 
 
-class CharybdisProto : public IRCDProto
+class SolanumProto : public IRCDProto
 {
  public:
 
-	CharybdisProto(Module *creator) : IRCDProto(creator, "Charybdis 3.4+")
+	SolanumProto(Module *creator) : IRCDProto(creator, "Solanum")
 	{
 		DefaultPseudoclientModes = "+oiS";
 		CanCertFP = true;
@@ -205,7 +205,7 @@ struct IRCDMessageEncap : IRCDMessage
 		 * termination: 'A' for abort, 'F' for authentication failure, 'S' for
 		 * authentication success).
 		 *
-		 * Charybdis only accepts messages from SASL agents; these must have umode +S
+		 * Solanum only accepts messages from SASL agents; these must have umode +S
 		 */
 		else if (params[1] == "SASL" && SASL::sasl && params.size() >= 6)
 		{
@@ -253,7 +253,7 @@ struct IRCDMessageServer : IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	// SERVER dev.anope.de 1 :charybdis test server
+	// SERVER dev.anope.de 1 :solanum test server
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		// Servers other then our immediate uplink are introduced via SID
@@ -276,11 +276,11 @@ struct IRCDMessagePass : IRCDMessage
 	}
 };
 
-class ProtoCharybdis : public Module
+class ProtoSolanum : public Module
 {
 	Module *m_ratbox;
 
-	CharybdisProto ircd_proto;
+	SolanumProto ircd_proto;
 
 	/* Core message handlers */
 	Message::Away message_away;
@@ -340,22 +340,22 @@ class ProtoCharybdis : public Module
 	}
 
  public:
-	ProtoCharybdis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
+	ProtoSolanum(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),
 		message_kill(this), message_mode(this), message_motd(this), message_notice(this), message_part(this),
 		message_ping(this), message_privmsg(this), message_quit(this), message_squit(this), message_stats(this),
 		message_time(this), message_topic(this), message_version(this), message_whois(this),
 
-		message_bmask("IRCDMessage", "charybdis/bmask", "ratbox/bmask"),
-		message_join("IRCDMessage", "charybdis/join", "ratbox/join"),
-		message_nick("IRCDMessage", "charybdis/nick", "ratbox/nick"),
-		message_pong("IRCDMessage", "charybdis/pong", "ratbox/pong"),
-		message_sid("IRCDMessage", "charybdis/sid", "ratbox/sid"),
-		message_sjoin("IRCDMessage", "charybdis/sjoin", "ratbox/sjoin"),
-		message_tb("IRCDMessage", "charybdis/tb", "ratbox/tb"),
-		message_tmode("IRCDMessage", "charybdis/tmode", "ratbox/tmode"),
-		message_uid("IRCDMessage", "charybdis/uid", "ratbox/uid"),
+		message_bmask("IRCDMessage", "solanum/bmask", "ratbox/bmask"),
+		message_join("IRCDMessage", "solanum/join", "ratbox/join"),
+		message_nick("IRCDMessage", "solanum/nick", "ratbox/nick"),
+		message_pong("IRCDMessage", "solanum/pong", "ratbox/pong"),
+		message_sid("IRCDMessage", "solanum/sid", "ratbox/sid"),
+		message_sjoin("IRCDMessage", "solanum/sjoin", "ratbox/sjoin"),
+		message_tb("IRCDMessage", "solanum/tb", "ratbox/tb"),
+		message_tmode("IRCDMessage", "solanum/tmode", "ratbox/tmode"),
+		message_uid("IRCDMessage", "solanum/uid", "ratbox/uid"),
 
 		message_encap(this), message_euid(this), message_pass(this), message_server(this)
 
@@ -373,7 +373,7 @@ class ProtoCharybdis : public Module
 		this->AddModes();
 	}
 
-	~ProtoCharybdis()
+	~ProtoSolanum()
 	{
 		m_ratbox = ModuleManager::FindModule("ratbox");
 		ModuleManager::UnloadModule(m_ratbox, NULL);
@@ -424,4 +424,4 @@ class ProtoCharybdis : public Module
 	}
 };
 
-MODULE_INIT(ProtoCharybdis)
+MODULE_INIT(ProtoSolanum)

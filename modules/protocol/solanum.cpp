@@ -379,6 +379,27 @@ class ProtoSolanum : public Module
 		ModuleManager::UnloadModule(m_ratbox, NULL);
 	}
 
+	void OnUserLogin(User *u) anope_override
+	{
+		// If the user has logged into their current nickname then mark them as such.
+		NickAlias *na = NickAlias::Find(u->nick);
+		UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " " << (na && na->nc == u->Account() ? na->nick : "OFF");
+	}
+
+	void OnNickLogout(User *u) anope_override
+	{
+		// We don't know what account the user was logged into so send in all cases.
+		UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " OFF";
+	}
+
+	void OnUserNickChange(User *u, const Anope::string &) anope_override
+	{
+		// If the user is logged into an account check if we need to mark them
+		// as not identified to their nick.
+		if (u->Account())
+			OnUserLogin(u);
+	}
+
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");

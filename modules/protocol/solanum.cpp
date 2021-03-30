@@ -383,13 +383,16 @@ class ProtoSolanum : public Module
 	{
 		// If the user has logged into their current nickname then mark them as such.
 		NickAlias *na = NickAlias::Find(u->nick);
-		UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " " << (na && na->nc == u->Account() ? na->nick : "OFF");
+		if (na && na->nc == u->Account())
+			UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " " << u->nick;
+		else
+			UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " " << u->nick << " OFF";
 	}
 
 	void OnNickLogout(User *u) anope_override
 	{
 		// We don't know what account the user was logged into so send in all cases.
-		UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " OFF";
+		UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " " << u->nick << " OFF";
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

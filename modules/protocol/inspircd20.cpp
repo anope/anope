@@ -37,7 +37,7 @@ class InspIRCd20Proto : public IRCDProto
 	void SendConnect() anope_override
 	{
 		UplinkSocket::Message() << "CAPAB START 1202";
-		UplinkSocket::Message() << "CAPAB CAPABILITIES :PROTOCOL=1202 CASEMAPPING=" << Config->GetBlock("options")->Get<const Anope::string>("casemap", "ascii");
+		UplinkSocket::Message() << "CAPAB CAPABILITIES :PROTOCOL=1202";
 		UplinkSocket::Message() << "CAPAB END";
 		insp12->SendConnect();
 	}

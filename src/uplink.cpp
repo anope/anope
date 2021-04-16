@@ -94,14 +94,13 @@ UplinkSocket::~UplinkSocket()
 		}
 
 		IRCD->SendSquit(Me, Anope::QuitReason);
-
-		this->ProcessWrite(); // Write out the last bit
 	}
 
 	for (unsigned i = Me->GetLinks().size(); i > 0; --i)
 		if (!Me->GetLinks()[i - 1]->IsJuped())
 			Me->GetLinks()[i - 1]->Delete(Me->GetName() + " " + Me->GetLinks()[i - 1]->GetName());
 
+	this->ProcessWrite(); // Write out the last bit
 	UplinkSock = NULL;
 
 	Me->Unsync();

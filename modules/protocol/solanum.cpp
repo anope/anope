@@ -284,7 +284,7 @@ struct IRCDMessageNotice : Message::Notice
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		if (Servers::Capab.count("ECHO"))
-			UplinkSocket::Message(Me) << "ECHO N " << " " << source.GetSource() << " :"  << params[1];
+			UplinkSocket::Message(Me) << "ECHO N " << source.GetSource() << " :"  << params[1];
 
 		Message::Notice::Run(source, params, tags);
 	}
@@ -297,7 +297,7 @@ struct IRCDMessagePrivmsg : Message::Privmsg
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
 		if (Servers::Capab.count("ECHO"))
-			UplinkSocket::Message(Me) << "ECHO P " << " " << source.GetSource() << " :"  << params[1];
+			UplinkSocket::Message(Me) << "ECHO P " << source.GetSource() << " :"  << params[1];
 
 		Message::Privmsg::Run(source, params, tags);
 	}

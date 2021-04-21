@@ -88,6 +88,7 @@ class SolanumProto : public IRCDProto
 		 * BAN      - Can do BAN message
 		 * CHW      - Can do channel wall @#
 		 * CLUSTER  - Supports umode +l, can send LOCOPS (encap only)
+		 * ECHO     - Supports sending echoed messages
 		 * ENCAP    - Can do ENCAP message
 		 * EOPMOD   - Can do channel wall =# (for cmode +z)
 		 * EUID     - Can do EUID (its similar to UID but includes the ENCAP REALHOST and ENCAP LOGIN information)
@@ -104,7 +105,7 @@ class SolanumProto : public IRCDProto
 		 * UNKLN    - Can do UNKLINE (encap only)
 		 * QS       - Can handle quit storm removal
 		*/
-		UplinkSocket::Message() << "CAPAB :BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN";
+		UplinkSocket::Message() << "CAPAB :BAN CHW CLUSTER ECHO ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN";
 
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
@@ -276,6 +277,32 @@ struct IRCDMessagePass : IRCDMessage
 	}
 };
 
+struct IRCDMessageNotice : Message::Notice
+{
+	IRCDMessageNotice(Module *creator) : Message::Notice(creator) { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	{
+		if (Servers::Capab.count("ECHO"))
+			UplinkSocket::Message(Me) << "ECHO N " << " " << source.GetSource() << " "  << params[1];
+
+		Message::Notice::Run(source, params, tags);
+	}
+};
+
+struct IRCDMessagePrivmsg : Message::Privmsg
+{
+	IRCDMessagePrivmsg(Module *creator) : Message::Privmsg(creator) { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	{
+		if (Servers::Capab.count("ECHO"))
+			UplinkSocket::Message(Me) << "ECHO P " << " " << source.GetSource() << " "  << params[1];
+
+		Message::Privmsg::Run(source, params, tags);
+	}
+};
+
 class ProtoSolanum : public Module
 {
 	Module *m_ratbox;
@@ -291,10 +318,8 @@ class ProtoSolanum : public Module
 	Message::Kill message_kill;
 	Message::Mode message_mode;
 	Message::MOTD message_motd;
-	Message::Notice message_notice;
 	Message::Part message_part;
 	Message::Ping message_ping;
-	Message::Privmsg message_privmsg;
 	Message::Quit message_quit;
 	Message::SQuit message_squit;
 	Message::Stats message_stats;
@@ -310,7 +335,9 @@ class ProtoSolanum : public Module
 	/* Our message handlers */
 	IRCDMessageEncap message_encap;
 	IRCDMessageEUID message_euid;
+	IRCDMessageNotice message_notice;
 	IRCDMessagePass message_pass;
+	IRCDMessagePrivmsg message_privmsg;
 	IRCDMessageServer message_server;
 
 	bool use_server_side_mlock;
@@ -343,9 +370,9 @@ class ProtoSolanum : public Module
 	ProtoSolanum(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),
-		message_kill(this), message_mode(this), message_motd(this), message_notice(this), message_part(this),
-		message_ping(this), message_privmsg(this), message_quit(this), message_squit(this), message_stats(this),
-		message_time(this), message_topic(this), message_version(this), message_whois(this),
+		message_kill(this), message_mode(this), message_motd(this), message_part(this), message_ping(this),
+		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_topic(this),
+		message_version(this), message_whois(this),
 
 		message_bmask("IRCDMessage", "solanum/bmask", "ratbox/bmask"),
 		message_join("IRCDMessage", "solanum/join", "ratbox/join"),
@@ -357,8 +384,8 @@ class ProtoSolanum : public Module
 		message_tmode("IRCDMessage", "solanum/tmode", "ratbox/tmode"),
 		message_uid("IRCDMessage", "solanum/uid", "ratbox/uid"),
 
-		message_encap(this), message_euid(this), message_pass(this), message_server(this)
-
+		message_encap(this), message_euid(this), message_notice(this), message_pass(this),
+		message_privmsg(this), message_server(this)
 	{
 
 

@@ -29,7 +29,7 @@ macro(build_modules SRC)
           calculate_depends(${MODULE_SRC} TEMP_INCLUDES)
           # If there were some extra include directories, add them to the list
           if(TEMP_INCLUDES)
-            append_to_list(EXTRA_INCLUDES ${TEMP_INCLUDES})
+            list(APPEND EXTRA_INCLUDES ${TEMP_INCLUDES})
           endif()
 
           # Reset linker flags
@@ -84,7 +84,7 @@ endmacro()
 
 macro(build_subdir)
   file(GLOB_RECURSE MODULES_SUBDIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
-  sort_list(MODULES_SUBDIR_SRCS)
+  list(SORT MODULES_SUBDIR_SRCS)
 
   GET_FILENAME_COMPONENT(FOLDER_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
   set(SO "${FOLDER_NAME}.so")
@@ -117,7 +117,7 @@ macro(build_subdir)
 
       # Append this source file's linker flags to the subdirectoy's linker flags, if there are any to append
       if(TEMP_DEPENDENCIES)
-        append_to_list(SUBDIR_EXTRA_DEPENDS ${TEMP_DEPDENCIES})
+        list(APPEND SUBDIR_EXTRA_DEPENDS ${TEMP_DEPDENCIES})
       endif()
     endif()
   endforeach()
@@ -126,12 +126,12 @@ macro(build_subdir)
   if(HAS_FUNCTION)
     # Remove duplicates from the linker flags
     if(SUBDIR_LDFLAGS)
-      remove_list_duplicates(SUBDIR_LDFLAGS)
+      list(REMOVE_DUPLICATES SUBDIR_LDFLAGS)
     endif()
 
     # Remove duplicates from the extra dependencies
     if(SUBDIR_EXTRA_DEPENDS)
-      remove_list_duplicates(SUBDIR_EXTRA_DEPENDS)
+      list(REMOVE_DUPLICATES SUBDIR_EXTRA_DEPENDS)
     endif()
 
     # For Visual Studio only, include win32_memory static library, required to override Visual Studio's overrides of the new/delete operators

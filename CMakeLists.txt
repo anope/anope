@@ -14,60 +14,6 @@ endif()
 project(Anope CXX)
 enable_language(C)
 
-# Detect the version of CMake for the later conditional checks
-execute_process(COMMAND ${CMAKE_COMMAND} --version OUTPUT_VARIABLE VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-string(REGEX REPLACE "cmake version 2\\.(.*)" "\\1" ONLY_VERSION "${VERSION}")
-string(REGEX MATCH "-patch .*$" HAS_PATCH "${ONLY_VERSION}")
-if(HAS_PATCH)
-  string(REGEX REPLACE "(.*)-patch .*" "\\1" MINOR_VERSION "${ONLY_VERSION}")
-  string(REGEX REPLACE ".*-patch (.*)" "\\1" PATCH_VERSION "${ONLY_VERSION}")
-else()
-  string(REGEX MATCH "\\." HAS_DOT "${ONLY_VERSION}")
-  if(HAS_DOT)
-    string(REGEX REPLACE "(.*)\\..*" "\\1" MINOR_VERSION "${ONLY_VERSION}")
-    string(REGEX REPLACE ".*\\.(.*)" "\\1" PATCH_VERSION "${ONLY_VERSION}")
-  else()
-    string(REGEX REPLACE "(.*)-beta" "\\1" MINOR_VERSION "${ONLY_VERSION}")
-    if(MINOR_VERSION STREQUAL "4-1\n")
-      set(PATCH_VERSION 1)
-    else()
-      set(PATCH_VERSION 0)
-    endif()
-    set(MINOR_VERSION 4)
-  endif()
-endif()
-
-# Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
-if(MINOR_VERSION GREATER 5)
-  set(CMAKE26_OR_BETTER TRUE)
-  set(CMAKE248_OR_BETTER TRUE)
-  set(CMAKE244_OR_BETTER TRUE)
-  set(CMAKE242_OR_BETTER TRUE)
-else()
-  set(CMAKE26_OR_BETTER FALSE)
-  # Also detect if we are using CMake 2.4.8 or better, the FIND sub-command of list() is nonexistent in earlier versions
-  if(PATCH_VERSION GREATER 7)
-    set(CMAKE248_OR_BETTER TRUE)
-    set(CMAKE244_OR_BETTER TRUE)
-    set(CMAKE242_OR_BETTER TRUE)
-  else()
-    set(CMAKE248_OR_BETTER FALSE)
-    # Also detect if we are using CMake 2.4.4 or better, the CheckCXXCompilerFlag module and SORT sub-command of list() are nonexistent in earlier versions
-    if(PATCH_VERSION GREATER 3)
-      set(CMAKE244_OR_BETTER TRUE)
-      set(CMAKE242_OR_BETTER TRUE)
-    else()
-      set(CMAKE244_OR_BETTER FALSE)
-      # ALSO detect if we are using CMake 2.4.2 or better, the APPEND sub-command of list() is nonexistent in earlier versions
-      if(PATCH_VERSION GREATER 1)
-        set(CMAKE242_OR_BETTER TRUE)
-      else()
-        set(CMAKE242_OR_BETTER FALSE)
-      endif()
-    endif()
-  endif()
-endif()
-
 # Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
 set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR}/cmake)
 
@@ -82,12 +28,9 @@ set(DEFAULT_INCLUDE_DIRS)
 
 # Check that we aren't running on an ancient broken GCC
 if(CMAKE_COMPILER_IS_GNUCXX)
-  execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_FULL_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-  string(REGEX REPLACE "^(\\d+\\.\\d+)" "\\1" GCC_VERSION ${GCC_FULL_VERSION})
-  if(GCC_VERSION LESS 4.2)
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.2)
     message(FATAL_ERROR "Your compiler is too old to build Anope. Upgrade to GCC 4.2 or newer!")
-  endif()
-  if(GCC_VERSION GREATER 6.0 OR GCC_VERSION EQUAL 6.0)
+  elseif(CMAKE_CXX_COMPILER_ID VERSION_GREATER_EQUAL 6.0)
     set(CXXFLAGS "${CXXFLAGS} -fno-delete-null-pointer-checks")
   endif()
 endif()
@@ -111,12 +54,12 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang$")
     if(NOT FIRST_CHAR STREQUAL "=")
       # If the directory had no = in front of it, make sure it's absolute and add it to the list of default library directories
       get_filename_component(LIBRARY ${LIBRARY} ABSOLUTE)
-      append_to_list(DEFAULT_LIBRARY_DIRS ${LIBRARY})
+      list(APPEND DEFAULT_LIBRARY_DIRS ${LIBRARY})
     endif()
   endforeach()
   # Remove duplicate entries from the list
   if(DEFAULT_LIBRARY_DIRS)
-    remove_list_duplicates(DEFAULT_LIBRARY_DIRS)
+    list(REMOVE_DUPLICATES DEFAULT_LIBRARY_DIRS)
   endif()
   # Create a temporary file to test for the default include directories
   FILE(WRITE empty.cpp "")
@@ -150,14 +93,14 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang$")
           # Convert the path to an absolute one, just in case it wasn't
           get_filename_component(INCLUDE ${INCLUDE} ABSOLUTE)
           # Add that directory to the list of default include directories
-          append_to_list(DEFAULT_INCLUDE_DIRS ${INCLUDE})
+          list(APPEND DEFAULT_INCLUDE_DIRS ${INCLUDE})
         endif()
       endif()
     endif()
   endforeach()
   # Remove duplicate entries from the list
   if(DEFAULT_INCLUDE_DIRS)
-    remove_list_duplicates(DEFAULT_INCLUDE_DIRS)
+    list(REMOVE_DUPLICATES DEFAULT_INCLUDE_DIRS)
   endif()
 endif()
 
@@ -216,11 +159,7 @@ include(CheckFunctionExists)
 include(CheckIncludeFile)
 include(CheckTypeSize)
 include(CheckLibraryExists)
-if(CMAKE244_OR_BETTER)
-  include(CheckCXXCompilerFlag)
-else()
-  include(TestCXXAcceptsFlag)
-endif()
+include(CheckCXXCompilerFlag)
 
 # If extra include directories were specified, tell cmake about them.
 if(EXTRA_INCLUDE)
@@ -284,7 +223,7 @@ endif()
 
 # If CMake has found that the given system requires a special library for dl* calls, include it with the linker flags
 if(CMAKE_DL_LIBS)
-  append_to_list(LINK_LIBS ${CMAKE_DL_LIBS})
+  list(APPEND LINK_LIBS ${CMAKE_DL_LIBS})
 endif()
 
 # Under MinGW, the -shared flag isn't properly set in the module-specific linker flags, add it from the C flags for shared libraries
@@ -299,13 +238,7 @@ endif()
 # If we are not using Visual Studio, we'll run the following checks
 if(NOT MSVC)
   # Check if the C++ compiler can accept the -pipe flag, and add it to the compile flags if it works
-  if(CMAKE244_OR_BETTER)
-    # If using CMake 2.4.4 or better, we can use check_cxx_compiler_flag
-    check_cxx_compiler_flag(-pipe HAVE_PIPE_FLAG)
-  else()
-    # If using CMake 2.4.3 or older, we will use check_cxx_accepts_flags instead
-    check_cxx_accepts_flag(-pipe HAVE_PIPE_FLAG)
-  endif()
+  check_cxx_compiler_flag(-pipe HAVE_PIPE_FLAG)
   # If the flag was accepted, add it to the list of flags
   if(HAVE_PIPE_FLAG)
     set(CXXFLAGS "${CXXFLAGS} -pipe")
@@ -316,12 +249,12 @@ if(NOT MSVC)
     # Check if socket is within the socket library (if the library exists), and add it to the linker flags if needed
     check_library_exists(socket socket "" HAVE_SOCKET_LIB)
     if(HAVE_SOCKET_LIB)
-      append_to_list(LINK_LIBS socket)
+      list(APPEND LINK_LIBS socket)
     endif()
     # Check if inet_addr is within the nsl library (if the library exists), and add it to the linker flags if needed
     check_library_exists(nsl inet_addr "" HAVE_NSL_LIB)
     if(HAVE_NSL_LIB)
-      append_to_list(LINK_LIBS nsl)
+      list(APPEND LINK_LIBS nsl)
     endif()
     # Check if pthread_create is within the pthread library (if the library exists), and add it to the linker flags if needed
     check_library_exists(pthread pthread_create "" HAVE_PTHREAD)
@@ -363,11 +296,11 @@ check_function_exists(kqueue HAVE_KQUEUE)
 
 # Strip the leading and trailing spaces from the compile flags
 if(CXXFLAGS)
-  strip_string(${CXXFLAGS} CXXFLAGS)
+  string(STRIP ${CXXFLAGS} CXXFLAGS)
 endif()
 # Strip the leading and trailing spaces from the linker flags
 if(LDFLAGS)
-  strip_string(${LDFLAGS} LDFLAGS)
+  string(STRIP ${LDFLAGS} LDFLAGS)
 endif()
 
 # Search for the following programs
@@ -408,7 +341,7 @@ endif()
 
 # Version number processing
 # Find all lines in src/version.sh that start with VERSION_
-read_from_file(${Anope_SOURCE_DIR}/src/version.sh "^VERSION_" VERSIONS)
+file(STRINGS ${Anope_SOURCE_DIR}/src/version.sh VERSIONS REGEX "^VERSION_")
 # Iterate through the strings found
 foreach(VERSION_STR ${VERSIONS})
   string(REGEX REPLACE "^VERSION_([A-Z]+)=\"?([^\"]*)\"?$" "\\1;\\2" VERSION_OUT ${VERSION_STR})
@@ -427,7 +360,7 @@ set(VERSION_BUILD 0)
 # Only change the build number if version.h exists
 if(EXISTS "${Anope_SOURCE_DIR}/include/version.h")
   # Attempt to read the build number from include/version.h
-  read_from_file(${Anope_SOURCE_DIR}/include/version.h "^#define VERSION_BUILD" VERSIONS)
+  file(STRINGS ${Anope_SOURCE_DIR}/src/version.sh VERSIONS REGEX "^#define VERSION_BUILD")
   foreach(VERSION_STR ${VERSIONS})
     # Get the length of the string
     string(LENGTH ${VERSION_STR} VERSION_LEN)

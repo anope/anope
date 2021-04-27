@@ -1,245 +1,11 @@
 ###############################################################################
-# strip_string(<input string> <output string>)
-#
-# A macro to handle stripping the leading and trailing spaces from a string,
-#   uses string(STRIP) if using CMake 2.6.x or better, otherwise uses
-#   string(REGEX REPLACE).
-###############################################################################
-macro(strip_string INPUT_STRING OUTPUT_STRING)
-  if(CMAKE26_OR_BETTER)
-    # For CMake 2.6.x or better, we can just use the STRIP sub-command of string()
-    string(STRIP ${INPUT_STRING} ${OUTPUT_STRING})
-  else()
-    # For CMake 2.4.x, we will have to use the REGEX REPLACE sub-command of string() instead
-    # First check if the input string is empty or not
-    if (${INPUT_STRING} STREQUAL "")
-      set(${OUTPUT_STRING} "")
-    else()
-      # Determine if the string is entirely empty or not
-      string(REGEX MATCH "^[ \t]*$" EMPTY_STRING "${INPUT_STRING}")
-      if(EMPTY_STRING)
-        set(${OUTPUT_STRING} "")
-      else()
-        # We detect if there is any leading whitespace and remove any if there is
-        string(SUBSTRING "${INPUT_STRING}" 0 1 FIRST_CHAR)
-        if(FIRST_CHAR STREQUAL " " OR FIRST_CHAR STREQUAL "\t")
-          string(REGEX REPLACE "^[ \t]+" "" TEMP_STRING "${INPUT_STRING}")
-        else()
-          set(TEMP_STRING "${INPUT_STRING}")
-        endif()
-        # Next we detect if there is any trailing whitespace and remove any if there is
-        string(LENGTH "${TEMP_STRING}" STRING_LEN)
-        math(EXPR STRING_LEN "${STRING_LEN} - 1")
-        string(SUBSTRING "${TEMP_STRING}" ${STRING_LEN} 1 LAST_CHAR)
-        if(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
-          string(REGEX REPLACE "[ \t]+$" "" ${OUTPUT_STRING} "${TEMP_STRING}")
-        else()
-          set(${OUTPUT_STRING} "${TEMP_STRING}")
-        endif()
-      endif()
-    endif()
-  endif()
-endmacro()
-
-###############################################################################
-# append_to_list(<list> <args>...)
-#
-# A macro to handle appending to lists, uses list(APPEND) if using CMake 2.4.2
-#   or better, otherwise uses set() instead.
-###############################################################################
-macro(append_to_list LIST)
-  if(CMAKE242_OR_BETTER)
-    # For CMake 2.4.2 or better, we can just use the APPEND sub-command of list()
-    list(APPEND ${LIST} ${ARGN})
-  else()
-    # For CMake 2.4.x before 2.4.2, we have to do this manually use set() instead
-    set(${LIST} ${${LIST}} ${ARGN})
-  endif()
-endmacro()
-
-###############################################################################
-# find_in_list(<list> <value> <output variable>)
-#
-# A macro to handle searching within a list, will store the result in the
-#   given <output variable>, uses list(FIND) if using CMake 2.6.x or better
-#   (or CMake 2.4.8 or better), otherwise it iterates through the list to find
-#   the item.
-###############################################################################
-macro(find_in_list LIST ITEM_TO_FIND FOUND)
-  if(CMAKE248_OR_BETTER)
-    # For CMake 2.4.8 or better, we can use the FIND sub-command of list()
-    list(FIND ${LIST} ${ITEM_TO_FIND} ITEM_FOUND)
-  else()
-    # For CMake 2.4.x before 2.4.8, we have to do this ourselves (NOTE: This is very slow due to a lack of break() as well)
-    # Firstly we set the position to -1 indicating nothing found, we also use a temporary position
-    set(ITEM_FOUND -1)
-    set(POS 0)
-    # Iterate through the list
-    foreach(ITEM ${${LIST}})
-      # If the item we are looking at is the item we are trying to find, set that we've found the item
-      if(${ITEM} STREQUAL ${ITEM_TO_FIND})
-        set(ITEM_FOUND ${POS})
-      endif()
-      # Increase the position value by 1
-      math(EXPR POS "${POS} + 1")
-    endforeach()
-  endif()
-  # Set the given FOUND variable to the result
-  set(${FOUND} ${ITEM_FOUND})
-endmacro()
-
-###############################################################################
-# remove_list_duplicates(<list>)
-#
-# A macro to handle removing duplicates from a list, uses
-#   list(REMOVE_DUPLICATES) if using CMake 2.6.x or better, otherwise it uses
-#   a slower method of creating a temporary list and only adding to it when
-#   a duplicate item hasn't been found.
-###############################################################################
-macro(remove_list_duplicates LIST)
-  if(CMAKE26_OR_BETTER)
-    # For CMake 2.6.x or better, this can be done automatically
-    list(REMOVE_DUPLICATES ${LIST})
-  else()
-    # For CMake 2.4.x, we have to do this ourselves, firstly we'll clear a temporary list
-    set(NEW_LIST)
-    # Iterate through the old list
-    foreach(ITEM ${${LIST}})
-      # Check if the item is in the new list
-      find_in_list(NEW_LIST ${ITEM} FOUND_ITEM)
-      if(FOUND_ITEM EQUAL -1)
-        # If the item was not found, append it to the list
-        append_to_list(NEW_LIST ${ITEM})
-      endif()
-    endforeach()
-    # Replace the old list with the new list
-    set(${LIST} ${NEW_LIST})
-  endif()
-endmacro()
-
-###############################################################################
-# remove_item_from_list(<list> <value>)
-#
-# A macro to handle removing a value from a list, uses list(REMOVE_ITEM) in
-#   both cases, but can remove the value itself using CMake 2.4.2 or better,
-#   while older versions use a slower method of iterating the list to find the
-#   index of the value to remove.
-###############################################################################
-macro(remove_item_from_list LIST VALUE)
-  if(CMAKE242_OR_BETTER)
-    # For CMake 2.4.2 or better, this can be done automatically
-    list(REMOVE_ITEM ${LIST} ${VALUE})
-  else()
-    # For CMake 2.4.x before 2.4.2, we have to do this ourselves, firstly we set the index and a variable to indicate if the item was found
-    set(INDEX 0)
-    set(FOUND FALSE)
-    # Iterate through the old list
-    foreach(ITEM ${${LIST}})
-      # If the item hasn't been found yet, but the current item is the same, remove it
-      if(NOT FOUND)
-        if(ITEM STREQUAL ${VALUE})
-          set(FOUND TRUE)
-          list(REMOVE_ITEM ${LIST} ${INDEX})
-        endif()
-      endif()
-      # Increase the index value by 1
-      math(EXPR INDEX "${INDEX} + 1")
-    endforeach()
-  endif()
-endmacro()
-
-###############################################################################
-# sort_list(<list>)
-#
-# A macro to handle sorting a list, uses list(SORT) if using CMake 2.4.4 or
-#   better, otherwise it uses a slower method of creating a temporary list and
-#   adding elements in alphabetical order.
-###############################################################################
-macro(sort_list LIST)
-  if(CMAKE244_OR_BETTER)
-    # For CMake 2.4.4 or better, this can be done automatically
-    list(SORT ${LIST})
-  else()
-    # For CMake 2.4.x before 2.4.4, we have to do this ourselves, firstly we'll create a teporary list
-    set(NEW_LIST)
-    # Iterate through the old list
-    foreach(ITEM ${${LIST}})
-      # Temporary index position for the new list, as well as temporary value to store if the item was ever found
-      set(INDEX 0)
-      set(FOUND FALSE)
-      # Iterate through the new list
-      foreach(NEW_ITEM ${NEW_LIST})
-        # Compare the items, only if nothing was found before
-        if(NOT FOUND)
-          if(NEW_ITEM STRGREATER "${ITEM}")
-            set(FOUND TRUE)
-            list(INSERT NEW_LIST ${INDEX} ${ITEM})
-          endif()
-        endif()
-        # Increase the index value by 1
-        math(EXPR INDEX "${INDEX} + 1")
-      endforeach()
-      # If the item was never found, just append it to the end
-      if(NOT FOUND)
-        append_to_list(NEW_LIST ${ITEM})
-      endif()
-    endforeach()
-    # Replace the old list with the new list
-    set(${LIST} ${NEW_LIST})
-  endif()
-endmacro()
-
-###############################################################################
-# read_from_file(<filename> <regex> <output variable>)
-#
-# A macro to handle reading specific lines from a file, uses file(STRINGS) if
-#   using CMake 2.6.x or better, otherwise we read in the entire file and
-#   perform a string(REGEX MATCH) on each line of the file instead.  This
-#   macro can also be used to read in all the lines of a file if REGEX is set
-#   to "".
-###############################################################################
-macro(read_from_file FILE REGEX STRINGS)
-  if(CMAKE26_OR_BETTER)
-    # For CMake 2.6.x or better, we can just use the STRINGS sub-command to get the lines that match the given regular expression (if one is given, otherwise get all lines)
-    if(REGEX STREQUAL "")
-      file(STRINGS ${FILE} RESULT)
-    else()
-      file(STRINGS ${FILE} RESULT REGEX ${REGEX})
-    endif()
-  else()
-    # For CMake 2.4.x, we need to do this manually, firstly we read the file in
-    execute_process(COMMAND ${CMAKE_COMMAND} -DFILE:STRING=${FILE} -P ${Anope_SOURCE_DIR}/cmake/ReadFile.cmake ERROR_VARIABLE ALL_STRINGS)
-    # Next we replace all newlines with semicolons
-    string(REGEX REPLACE "\n" ";" ALL_STRINGS ${ALL_STRINGS})
-    if(REGEX STREQUAL "")
-      # For no regular expression, just set the result to all the lines
-      set(RESULT ${ALL_STRINGS})
-    else()
-      # Clear the result list
-      set(RESULT)
-      # Iterate through all the lines of the file
-      foreach(STRING ${ALL_STRINGS})
-        # Check for a match against the given regular expression
-        string(REGEX MATCH ${REGEX} STRING_MATCH ${STRING})
-        # If we had a match, append the match to the list
-        if(STRING_MATCH)
-          append_to_list(RESULT ${STRING})
-        endif()
-      endforeach()
-    endif()
-  endif()
-  # Set the given STRINGS variable to the result
-  set(${STRINGS} ${RESULT})
-endmacro()
-
-###############################################################################
 # extract_include_filename(<line> <output variable> [<optional output variable of quote type>])
 #
 # This macro will take a #include line and extract the filename.
 ###############################################################################
 macro(extract_include_filename INCLUDE FILENAME)
   # Strip the leading and trailing spaces from the include line
-  strip_string(${INCLUDE} INCLUDE_STRIPPED)
+  string(STRIP ${INCLUDE} INCLUDE_STRIPPED)
   # Make sure to only do the following if there is a string
   if(INCLUDE_STRIPPED STREQUAL "")
     set(FILE "")
@@ -271,7 +37,7 @@ endmacro()
 ###############################################################################
 macro(find_includes SRC INCLUDES)
   # Read all lines from the file that start with #, regardless of whitespace before the #
-  read_from_file(${SRC} "^[ \t]*#.*$" LINES)
+  file(STRINGS ${SRC} LINES REGEX "^[ \t]*#.*$")
   # Set that any #include lines found are valid, and create temporary variables for the last found #ifdef/#ifndef
   set(VALID_LINE TRUE)
   set(LAST_DEF)
@@ -347,7 +113,7 @@ macro(find_includes SRC INCLUDES)
             # If we found a #include on the line, add the entire line to the list of includes unless the line isn't valid
             if(FOUND_INCLUDE)
               if(VALID_LINE)
-                append_to_list(INCLUDES_LIST "${LINE}")
+                list(APPEND INCLUDES_LIST "${LINE}")
               endif()
             endif()
           endif()
@@ -390,7 +156,7 @@ macro(calculate_depends SRC)
         endif()
         # If the include file was found, add it's path to the list of include paths, but only if it doesn't already exist and isn't in the defaults for the compiler
         if(FOUND_${FILENAME}_INCLUDE)
-          # This used to be find_in_list, but it was changed to this loop to do a find on each default include directory, this fixes Mac OS X trying to get it's framework directories in here
+          # This used to be list(FIND), but it was changed to this loop to do a find on each default include directory, this fixes Mac OS X trying to get it's framework directories in here
           set(FOUND_IN_DEFAULTS -1)
           foreach(DEFAULT_INCLUDE_DIR ${DEFAULT_INCLUDE_DIRS})
             string(REGEX REPLACE "\\+" "\\\\+" DEFAULT_INCLUDE_DIR ${DEFAULT_INCLUDE_DIR})
@@ -400,9 +166,8 @@ macro(calculate_depends SRC)
             endif()
           endforeach()
           if(FOUND_IN_DEFAULTS EQUAL -1)
-            find_in_list(${ARGV1} "${FOUND_${FILENAME}_INCLUDE}" FOUND_IN_INCLUDES)
-            if(FOUND_IN_INCLUDES EQUAL -1)
-              append_to_list(${ARGV1} "${FOUND_${FILENAME}_INCLUDE}")
+            if("${FOUND_${FILENAME}_INCLUDE}" IN_LIST ARGV1)
+              list(APPEND ${ARGV1} "${FOUND_${FILENAME}_INCLUDE}")
             endif()
           endif()
         else()
@@ -433,9 +198,9 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
   set(LIBRARIES)
   # Check to see if there are any lines matching: /* RequiredLibraries: [something] */
   if(WIN32)
-    read_from_file(${SRC} "/\\\\*[ \t]*RequiredWindowsLibraries:[ \t]*.*[ \t]*\\\\*/" REQUIRED_LIBRARIES)
+    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\\\*[ \t]*RequiredWindowsLibraries:[ \t]*.*[ \t]*\\\\*/")
   else()
-    read_from_file(${SRC} "/\\\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\\\*/" REQUIRED_LIBRARIES)
+    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\\\*/")
   endif()
   # Iterate through those lines
   foreach(REQUIRED_LIBRARY ${REQUIRED_LIBRARIES})
@@ -458,11 +223,11 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
         get_filename_component(LIBRARY_PATH ${FOUND_${LIBRARY}_LIBRARY} PATH)
         if(MSVC)
           # For Visual Studio, instead of editing the linker flags, we'll add the library to a separate list of extra dependencies
-          append_to_list(EXTRA_DEPENDENCIES "${FOUND_${LIBRARY}_LIBRARY}")
+          list(APPEND EXTRA_DEPENDENCIES "${FOUND_${LIBRARY}_LIBRARY}")
         else()
           # For all others, add the library paths and libraries
-          append_to_list(LIBRARY_PATHS "${LIBRARY_PATH}")
-          append_to_list(LIBRARIES "${LIBRARY}")
+          list(APPEND LIBRARY_PATHS "${LIBRARY_PATH}")
+          list(APPEND LIBRARIES "${LIBRARY}")
         endif()
       else()
         # In the case of the library not being found, we fatally error so CMake stops trying to generate
@@ -472,22 +237,21 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
   endforeach()
   # Remove duplicates from the library paths
   if(LIBRARY_PATHS)
-    remove_list_duplicates(LIBRARY_PATHS)
+    list(REMOVE_DUPLICATES LIBRARY_PATHS)
   endif()
   # Remove diplicates from the libraries
   if(LIBRARIES)
-    remove_list_duplicates(LIBRARIES)
+    list(REMOVE_DUPLICATES LIBRARIES)
   endif()
   # Iterate through library paths and add them to the linker flags
   foreach(LIBRARY_PATH ${LIBRARY_PATHS})
-    find_in_list(DEFAULT_LIBRARY_DIRS "${LIBRARY_PATH}" FOUND_IN_DEFAULTS)
-    if(FOUND_IN_DEFAULTS EQUAL -1)
+    if(NOT "${LIBRARY_PATH}" IN_LIST DEFAULT_LIBRARY_DIRS)
       set(THIS_LDFLAGS "${THIS_LDFLAGS} -L${LIBRARY_PATH}")
     endif()
   endforeach()
   # Iterate through libraries and add them to the linker flags
   foreach(LIBRARY ${LIBRARIES})
-    append_to_list(EXTRA_DEPENDENCIES "${LIBRARY}")
+    list(APPEND EXTRA_DEPENDENCIES "${LIBRARY}")
   endforeach()
   set(${SRC_LDFLAGS} "${THIS_LDFLAGS}")
   set(${EXTRA_DEPENDS} "${EXTRA_DEPENDENCIES}")
@@ -503,7 +267,7 @@ macro(check_functions SRC SUCCESS)
   # Default to true
   set(${SUCCESS} TRUE)
   # Check to see if there are any lines matching: /* RequiredFunctions: [something] */
-  read_from_file(${SRC} "/\\\\*[ \t]*RequiredFunctions:[ \t]*.*[ \t]*\\\\*/" REQUIRED_FUNCTIONS)
+  file(STRINGS ${SRC} REQUIRED_FUNCTIONS REGEX "/\\\\*[ \t]*RequiredFunctions:[ \t]*.*[ \t]*\\\\*/")
   # Iterate through those lines
   foreach(REQUIRED_FUNCTION ${REQUIRED_FUNCTIONS})
     # Strip off the /* RequiredFunctions: and */ from the line

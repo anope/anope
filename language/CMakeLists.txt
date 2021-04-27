@@ -2,7 +2,7 @@
 if(GETTEXT_FOUND)
   # Get all of the .po files
   file(GLOB LANG_SRCS_PO RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.*.po")
-  sort_list(LANG_SRCS_PO)
+  list(SORT LANG_SRCS_PO)
 
   foreach(LANG_PO ${LANG_SRCS_PO})
     # Get the domain for this language file

@@ -1,6 +1,6 @@
 # Find all the *.cpp files within the current source directory, and sort the list
 file(GLOB TOOLS_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
-sort_list(TOOLS_SRCS)
+list(SORT TOOLS_SRCS)
 
 # Set all the files to use C++ as well as set their compile flags
 set_source_files_properties(${TOOLS_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")

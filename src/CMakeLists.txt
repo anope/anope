@@ -9,21 +9,21 @@ if(WIN32)
   append_to_list(SRC_SRCS win32/pipe/pipe.cpp)
   append_to_list(SRC_SRCS win32/pthread/pthread.cpp)
   append_to_list(SRC_SRCS win32/sigaction/sigaction.cpp)
-endif(WIN32)
+endif()
 
 if(HAVE_EPOLL)
   append_to_list(SRC_SRCS socketengines/socketengine_epoll.cpp)
-else(HAVE_EPOLL)
+else()
   if(HAVE_KQUEUE)
     append_to_list(SRC_SRCS socketengines/socketengine_kqueue.cpp)
-  else(HAVE_KQUEUE)
+  else()
     if(HAVE_POLL)
       append_to_list(SRC_SRCS socketengines/socketengine_poll.cpp)
-    else(HAVE_POLL)
+    else()
       append_to_list(SRC_SRCS socketengines/socketengine_select.cpp)
-    endif(HAVE_POLL)
-  endif(HAVE_KQUEUE)
-endif(HAVE_EPOLL)
+    endif()
+  endif()
+endif()
 
 sort_list(SRC_SRCS)
 
@@ -41,13 +41,13 @@ foreach(SRC ${SRC_SRCS})
   # If there were some extra include directories, add them to the list
   if(TEMP_INCLUDES)
     append_to_list(EXTRA_INCLUDES ${TEMP_INCLUDES})
-  endif(TEMP_INCLUDES)
-endforeach(SRC)
+  endif()
+endforeach()
 # If there were extra include directories, remove the duplicates and add the directories to the include path
 if(EXTRA_INCLUDES)
   remove_list_duplicates(EXTRA_INCLUDES)
   include_directories(${EXTRA_INCLUDES})
-endif(EXTRA_INCLUDES)
+endif()
 
 # Under Windows, we also include a resource file to the build
 if(WIN32)
@@ -61,13 +61,13 @@ if(WIN32)
     # If any sort of debugging is being enabled, add a _DEBUG define to the flags for the resource compiler
     if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
       set(RC_CFLAGS "${RC_CFLAGS} -D_DEBUG")
-    endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
+    endif()
     set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc COMPILE_FLAGS "${RC_CFLAGS}")
   # For anything else, assumingly Visual Studio at this point, use a different set of compile flags
-  else(MINGW)
+  else()
     set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc COMPILE_FLAGS "/i\"${Anope_SOURCE_DIR}/include\"")
-  endif(MINGW)
-endif(WIN32)
+  endif()
+endif()
 
 # If compiling with Visual Studio, create a static library out of win32/win32_memory.cpp to be included with everything else, needed to override its override of new/delete operators
 if(MSVC)
@@ -75,9 +75,9 @@ if(MSVC)
   add_library(win32_memory STATIC win32/win32_memory.cpp)
   set(WIN32_MEMORY win32_memory)
   set(EXTRA_LDFLAGS "/OPT:NOREF") # https://sourceware.org/bugzilla/show_bug.cgi?id=12633
-else(MSVC)
+else()
   set(WIN32_MEMORY)
-endif(MSVC)
+endif()
 
 # Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
 add_executable(${PROGRAM_NAME} ${SRC_SRCS})
@@ -86,15 +86,15 @@ set_target_properties(${PROGRAM_NAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS 
 if(WIN32)
   target_link_libraries(${PROGRAM_NAME} wsock32 Ws2_32 ${LINK_LIBS} ${GETTEXT_LIBRARIES} ${WIN32_MEMORY})
   set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
-else(WIN32)
+else()
   target_link_libraries(${PROGRAM_NAME} ${LINK_LIBS} ${GETTEXT_LIBRARIES})
-endif(WIN32)
+endif()
 # Building the Anope executable requires the version.h header to be generated
 add_dependencies(${PROGRAM_NAME} headers)
 # Also require the language files if we have gettext
 if(GETTEXT_FOUND)
   add_dependencies(${PROGRAM_NAME} language)
-endif(GETTEXT_FOUND)
+endif()
 
 # Get the filename of the Anope executable as it is in on this system
 get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
@@ -108,7 +108,7 @@ configure_file(${Anope_SOURCE_DIR}/include/sysconf.h.cmake ${Anope_BINARY_DIR}/i
 # Go into the following directories and run their CMakeLists.txt as well
 if(NOT DISABLE_TOOLS)
   add_subdirectory(tools)
-endif(NOT DISABLE_TOOLS)
+endif()
 
 # Set Anope to be installed to the bin directory
 install(TARGETS ${PROGRAM_NAME}

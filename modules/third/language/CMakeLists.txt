@@ -26,13 +26,13 @@ if(GETTEXT_FOUND)
     # Add to cpack ignored files if not on Windows.
     if(NOT WIN32)
       add_to_cpack_ignored_files("${LANG_MO}")
-    endif(NOT WIN32)
+    endif()
 
     # Install the new language file
     install(CODE "FILE(MAKE_DIRECTORY ${LOCALE_DIR}/${LANG_LANG}/LC_MESSAGES/)")
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO} DESTINATION ${LOCALE_DIR}/${LANG_LANG}/LC_MESSAGES RENAME ${LANG_DOMAIN}.mo PERMISSIONS ${PERMS})
-  endforeach(LANG_PO)
+  endforeach()
 
   # Generate languages, depends on the mo files
   add_custom_target(module_language DEPENDS ${LANG_SRCS_MO})
-endif(GETTEXT_FOUND)
+endif()

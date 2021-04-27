@@ -20,10 +20,10 @@ foreach(SRC ${TOOLS_SRCS})
     # Only for Windows, set anopesmtp to require the wsock32 library
     if(WIN32 AND ${EXE} STREQUAL anopesmtp)
       target_link_libraries(${EXE} wsock32)
-    endif(WIN32 AND ${EXE} STREQUAL anopesmtp)
+    endif()
     if(${CMAKE_SYSTEM_NAME} STREQUAL "SunOS" AND ${EXE} STREQUAL anopesmtp)
       target_link_libraries(${EXE} socket nsl)
-    endif(${CMAKE_SYSTEM_NAME} STREQUAL "SunOS" AND ${EXE} STREQUAL anopesmtp)
+    endif()
     # Set the executable to be installed to the bin directory under the main directory
     install(TARGETS ${EXE}
       DESTINATION ${BIN_DIR}
@@ -32,8 +32,8 @@ foreach(SRC ${TOOLS_SRCS})
     get_target_property(EXE_BINARY ${EXE} LOCATION)
     get_filename_component(EXE_BINARY ${EXE_BINARY} NAME)
     add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
-  endif(NOT SKIP)
-endforeach(SRC)
+  endif()
+endforeach()
 
 # If not on Windows, generate anoperc and install it along with mydbgen
 if(NOT WIN32)
@@ -44,9 +44,9 @@ if(NOT WIN32)
   install (PROGRAMS geoipupdate.sh
     DESTINATION ${BIN_DIR}
   )
-endif(NOT WIN32)
+endif()
 
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the tools directory
 if(NOT WIN32 AND RUNGROUP)
   install(CODE "execute_process(COMMAND ${CHMOD} 2770 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin\")")
-endif(NOT WIN32 AND RUNGROUP)
+endif()

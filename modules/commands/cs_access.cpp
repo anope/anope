@@ -34,7 +34,7 @@ class AccessChanAccess : public ChanAccess
 		return this->ci->GetLevel(name) != ACCESS_INVALID && this->level >= this->ci->GetLevel(name);
 	}
 
-	Anope::string AccessSerialize() const
+	Anope::string AccessSerialize() const anope_override
 	{
 		return stringify(this->level);
 	}

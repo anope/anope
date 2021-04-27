@@ -253,12 +253,12 @@ class CommandOSSXLineBase : public Command
 		return;
 	}
 
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) = 0;
+	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override = 0;
 };
 
 class CommandOSSNLine : public CommandOSSXLineBase
 {
-	XLineManager *xlm()
+	XLineManager *xlm() anope_override
 	{
 		return this->snlines;
 	}
@@ -484,7 +484,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 class CommandOSSQLine : public CommandOSSXLineBase
 {
-	XLineManager *xlm()
+	XLineManager *xlm() anope_override
 	{
 		return this->sqlines;
 	}

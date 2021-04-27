@@ -495,14 +495,14 @@ class NickServCore : public Module, public NickServService
 				"after %d days if not used."), nickserv_expire / 86400);
 	}
 
-	void OnNickCoreCreate(NickCore *nc)
+	void OnNickCoreCreate(NickCore *nc) anope_override
 	{
 		/* Set default flags */
 		for (unsigned i = 0; i < defaults.size(); ++i)
 			nc->Extend<bool>(defaults[i].upper());
 	}
 
-	void OnUserQuit(User *u, const Anope::string &msg)
+	void OnUserQuit(User *u, const Anope::string &msg) anope_override
 	{
 		if (u->server && !u->server->GetQuitReason().empty() && Config->GetModule(this)->Get<bool>("hidenetsplitquit"))
 			return;

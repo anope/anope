@@ -129,7 +129,7 @@ class MemoServCore : public Module, public MemoServService
 		return MEMO_SUCCESS;
 	}
 
-	void Check(User *u)
+	void Check(User *u) anope_override
 	{
 		const NickCore *nc = u->Account();
 		if (!nc)

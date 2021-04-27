@@ -208,7 +208,7 @@ class Fantasy : public Module
 		FOREACH_MOD(OnPostCommand, (source, cmd, params));
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info)
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
 	{
 		if (fantasy.HasExt(ci))
 			info.AddOption(_("Fantasy"));

@@ -433,24 +433,19 @@ class InspIRCdProto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENCAP " << message.target.substr(0, 3) << " SASL " << message.source << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : (" " + message.ext));
 	}
 
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
+	void SendSVSLogin(const Anope::string &uid, NickAlias *na) anope_override
 	{
-		// TODO: in 2.1 this function should take a NickAlias instead of strings.
-		NickCore *nc = NickCore::Find(acc);
-		if (!nc)
-			return;
+		UplinkSocket::Message(Me) << "METADATA " << uid << " accountid :" << na->nc->GetId();
+		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << na->nc->display;
 
-		UplinkSocket::Message(Me) << "METADATA " << uid << " accountid :" << nc->GetId();
-		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << acc;
-
-		if (!vident.empty())
-			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGIDENT " << uid << " " << vident;
-		if (!vhost.empty())
-			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGHOST " << uid << " " << vhost;
+		if (!na->GetVhostIdent().empty())
+			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGIDENT " << uid << " " << na->GetVhostIdent();
+		if (!na->GetVhostHost().empty())
+			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGHOST " << uid << " " << na->GetVhostHost();
 
 		SASLUser su;
 		su.uid = uid;
-		su.acc = acc;
+		su.acc = na->nc->display;
 		su.created = Anope::CurTime;
 
 		for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)

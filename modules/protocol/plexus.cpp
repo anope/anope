@@ -174,11 +174,11 @@ class PlexusProto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : message.target.substr(0, 3)) << " SASL " << message.source << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : (" " + message.ext));
 	}
 
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
+	void SendSVSLogin(const Anope::string &uid, NickAlias *na) anope_override
 	{
 		Server *s = Server::Find(uid.substr(0, 3));
 		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : uid.substr(0, 3)) << " SVSLOGIN " << uid << " * * "
-			<< (vhost.empty() ? "*" : vhost) << " " << acc;
+			<< (na->GetVhostHost().empty() ? "*" : na->GetVhostHost()) << " " << na->nc->display;
 	}
 
 	void SendSVSNOOP(const Server *server, bool set) anope_override

@@ -390,7 +390,7 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message(BotInfo::Find(message.source)) << "SASL " << distmask << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : " " + message.ext);
 	}
 
-	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc, const Anope::string &vident, const Anope::string &vhost) anope_override
+	void SendSVSLogin(const Anope::string &uid, NickAlias *na) anope_override
 	{
 		size_t p = uid.find('!');
 		Anope::string distmask;
@@ -406,7 +406,7 @@ class UnrealIRCdProto : public IRCDProto
 		{
 			distmask = uid.substr(0, p);
 		}
-		UplinkSocket::Message(Me) << "SVSLOGIN " << distmask << " " << uid << " " << acc;
+		UplinkSocket::Message(Me) << "SVSLOGIN " << distmask << " " << uid << " " << na->nc->display;
 	}
 
 	bool IsIdentValid(const Anope::string &ident) anope_override

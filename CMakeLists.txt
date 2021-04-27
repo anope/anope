@@ -1,5 +1,5 @@
-# This usage of CMake requires at least version 2.4 (checks are made to determine what to use when certain versions lack functions)
-cmake_minimum_required(VERSION 2.4 FATAL_ERROR)
+# This usage of CMake requires at least version 3.8
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
   if(POLICY CMP0026)

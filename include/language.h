@@ -82,7 +82,7 @@ namespace Language
 #define CHAN_X_SUSPENDED		_("Channel %s is currently suspended.")
 #define CHAN_X_NOT_REGISTERED		_("Channel \002%s\002 isn't registered.")
 #define CHAN_X_NOT_IN_USE		_("Channel \002%s\002 doesn't exist.")
-#define NICK_IDENTIFY_REQUIRED		_("Password authentication required for that command.")
+#define NICK_IDENTIFY_REQUIRED		_("You must be logged into an account to use that command.")
 #define MAIL_X_INVALID			_("\002%s\002 is not a valid e-mail address.")
 #define UNKNOWN				_("<unknown>")
 #define NO_EXPIRE			_("does not expire")

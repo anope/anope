@@ -149,6 +149,9 @@ while [ $# -ge 1 ] ; do
 		echo "-nointro     Skip intro (disclaimer, etc)"
 		echo "-quick       Skip questions, go straight to cmake"
 		exit 0
+	elif [ $1 = "-devel" ] ; then
+		DEBUG="yes"
+		INSTDIR="$PWD/run"
 	elif [ $1 = "-nocache" ] ; then
 		IGNORE_CACHE="1"
 	elif [ $1 = "-nointro" ] ; then

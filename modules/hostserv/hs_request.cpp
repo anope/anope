@@ -15,20 +15,20 @@
  */
 
 #include "module.h"
+#include "modules/hs_request.h"
 
 static ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
 
 static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vIdent, const Anope::string &vHost);
 
-struct HostRequest final
-	: Serializable
+struct HostRequestImpl final
+	: HostRequest
+	, Serializable
 {
-	Anope::string nick;
-	Anope::string ident;
-	Anope::string host;
-	time_t time;
-
-	HostRequest(Extensible *) : Serializable("HostRequest") { }
+	HostRequestImpl(Extensible *)
+		: Serializable("HostRequest")
+	{
+	}
 
 	void Serialize(Serialize::Data &data) const override
 	{
@@ -47,11 +47,11 @@ struct HostRequest final
 		if (na == NULL)
 			return NULL;
 
-		HostRequest *req;
+		HostRequestImpl *req;
 		if (obj)
-			req = anope_dynamic_static_cast<HostRequest *>(obj);
+			req = anope_dynamic_static_cast<HostRequestImpl *>(obj);
 		else
-			req = na->Extend<HostRequest>("hostrequest");
+			req = na->Extend<HostRequestImpl>("hostrequest");
 		if (req)
 		{
 			req->nick = na->nick;
@@ -162,12 +162,12 @@ public:
 			return;
 		}
 
-		HostRequest req(na);
+		HostRequestImpl req(na);
 		req.nick = source.GetNick();
 		req.ident = user;
 		req.host = host;
 		req.time = Anope::CurTime;
-		na->Extend<HostRequest>("hostrequest", req);
+		na->Extend<HostRequestImpl>("hostrequest", req);
 
 		source.Reply(_("Your vHost has been requested."));
 		req_send_memos(owner, source, user, host);
@@ -206,7 +206,7 @@ public:
 		const Anope::string &nick = params[0];
 
 		NickAlias *na = NickAlias::Find(nick);
-		HostRequest *req = na ? na->GetExt<HostRequest>("hostrequest") : NULL;
+		HostRequestImpl *req = na ? na->GetExt<HostRequestImpl>("hostrequest") : NULL;
 		if (req)
 		{
 			na->SetVhost(req->ident, req->host, source.GetNick(), req->time);
@@ -217,7 +217,7 @@ public:
 
 			source.Reply(_("vHost for %s has been activated."), na->nick.c_str());
 			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
-			na->Shrink<HostRequest>("hostrequest");
+			na->Shrink<HostRequestImpl>("hostrequest");
 		}
 		else
 			source.Reply(_("No request for nick %s found."), nick.c_str());
@@ -257,10 +257,10 @@ public:
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
 		NickAlias *na = NickAlias::Find(nick);
-		HostRequest *req = na ? na->GetExt<HostRequest>("hostrequest") : NULL;
+		HostRequestImpl *req = na ? na->GetExt<HostRequestImpl>("hostrequest") : NULL;
 		if (req)
 		{
-			na->Shrink<HostRequest>("hostrequest");
+			na->Shrink<HostRequestImpl>("hostrequest");
 
 			if (Config->GetModule(this->owner)->Get<bool>("memouser") && memoserv)
 			{
@@ -311,7 +311,7 @@ public:
 
 		for (const auto &[nick, na] : *NickAliasList)
 		{
-			HostRequest *hr = na->GetExt<HostRequest>("hostrequest");
+			HostRequestImpl *hr = na->GetExt<HostRequestImpl>("hostrequest");
 			if (!hr)
 				continue;
 
@@ -358,13 +358,13 @@ class HSRequest final
 	CommandHSActivate commandhsactive;
 	CommandHSReject commandhsreject;
 	CommandHSWaiting commandhswaiting;
-	ExtensibleItem<HostRequest> hostrequest;
+	ExtensibleItem<HostRequestImpl> hostrequest;
 	Serialize::Type request_type;
 
 public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsrequest(this), commandhsactive(this),
-		commandhsreject(this), commandhswaiting(this), hostrequest(this, "hostrequest"), request_type("HostRequest", HostRequest::Unserialize)
+		commandhsreject(this), commandhswaiting(this), hostrequest(this, "hostrequest"), request_type("HostRequest", HostRequestImpl::Unserialize)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");

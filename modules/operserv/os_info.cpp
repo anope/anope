@@ -7,20 +7,24 @@
  */
 
 #include "module.h"
+#include "modules/info.h"
 
-struct OperInfo final
-	: Serializable
+struct OperInfoImpl final
+	: OperInfo
+	, Serializable
 {
-	Anope::string target;
-	Anope::string info;
-	Anope::string adder;
-	time_t created = 0;
+	OperInfoImpl()
+		: Serializable("OperInfo")
+	{
+	}
 
-	OperInfo() : Serializable("OperInfo") { }
-	OperInfo(const Anope::string &t, const Anope::string &i, const Anope::string &a, time_t c) :
-		Serializable("OperInfo"), target(t), info(i), adder(a), created(c) { }
+	OperInfoImpl(const Anope::string &t, const Anope::string &i, const Anope::string &a, time_t c)
+		: OperInfo(t, i, a, c)
+		, Serializable("OperInfo")
+	{
+	}
 
-	~OperInfo() override;
+	~OperInfoImpl() override;
 
 	void Serialize(Serialize::Data &data) const override
 	{
@@ -34,14 +38,13 @@ struct OperInfo final
 };
 
 struct OperInfos final
-	: Serialize::Checker<std::vector<OperInfo *> >
+	: OperInfoList
 {
-	OperInfos(Extensible *) : Serialize::Checker<std::vector<OperInfo *> >("OperInfo") { }
+	OperInfos(Extensible *) { }
 
-	~OperInfos()
+	OperInfo *Create() override
 	{
-		for (unsigned i = (*this)->size(); i > 0; --i)
-			delete (*this)->at(i - 1);
+		return new OperInfoImpl();
 	}
 
 	static Extensible *Find(const Anope::string &target)
@@ -53,7 +56,7 @@ struct OperInfos final
 	}
 };
 
-OperInfo::~OperInfo()
+OperInfoImpl::~OperInfoImpl()
 {
 	Extensible *e = OperInfos::Find(target);
 	if (e)
@@ -68,7 +71,7 @@ OperInfo::~OperInfo()
 	}
 }
 
-Serializable *OperInfo::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *OperInfoImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string starget;
 	data["target"] >> starget;
@@ -78,12 +81,12 @@ Serializable *OperInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		return NULL;
 
 	OperInfos *oi = e->Require<OperInfos>("operinfo");
-	OperInfo *o;
+	OperInfoImpl *o;
 	if (obj)
-		o = anope_dynamic_static_cast<OperInfo *>(obj);
+		o = anope_dynamic_static_cast<OperInfoImpl *>(obj);
 	else
 	{
-		o = new OperInfo();
+		o = new OperInfoImpl();
 		o->target = starget;
 	}
 	data["info"] >> o->info;
@@ -160,7 +163,7 @@ public:
 				}
 			}
 
-			(*oi)->push_back(new OperInfo(target, info, source.GetNick(), Anope::CurTime));
+			(*oi)->push_back(new OperInfoImpl(target, info, source.GetNick(), Anope::CurTime));
 
 			source.Reply(_("Added info to \002%s\002."), target.c_str());
 			Log(LOG_ADMIN, source, this) << "to add information to " << target;
@@ -272,7 +275,7 @@ class OSInfo final
 
 public:
 	OSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosinfo(this), oinfo(this, "operinfo"), oinfo_type("OperInfo", OperInfo::Unserialize)
+		commandosinfo(this), oinfo(this, "operinfo"), oinfo_type("OperInfo", OperInfoImpl::Unserialize)
 	{
 
 	}

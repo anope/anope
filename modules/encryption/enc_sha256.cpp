@@ -278,8 +278,6 @@ public:
 	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		sha256provider(this)
 	{
-
-
 		use_iv = false;
 	}
 
@@ -324,10 +322,10 @@ public:
 		this->OnEncrypt(req->GetPassword(), buf);
 		if (nc->pass.equals_cs(buf))
 		{
-			/* if we are NOT the first module in the list,
+			/* if we are NOT the first module in the list or we are using a default IV
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
+			if (ModuleManager::FindFirstOf(ENCRYPTION) != this || !memcmp(iv, sha256_h0, 8))
 				Anope::Encrypt(req->GetPassword(), nc->pass);
 			req->Success(this);
 		}

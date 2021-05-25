@@ -590,6 +590,9 @@ public:
 	 */
 	sepstream(const Anope::string &source, char separator, bool allowempty = false);
 
+	/** Retrieves the underlying string. */
+	const auto &GetString() const { return tokens; }
+
 	/** Fetch the next token from the stream
 	 * @param token The next token from the stream is placed here
 	 * @return True if tokens still remain, false if there are none left

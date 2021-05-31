@@ -131,7 +131,7 @@ class CommandNSSetPassword : public Command
 			return;
 		}
 
-		if (source.GetNick().equals_ci(param) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
+		if (source.GetNick().equals_ci(param))
 		{
 			source.Reply(MORE_OBSCURE_PASSWORD);
 			return;
@@ -200,7 +200,7 @@ class CommandNSSASetPassword : public Command
 			return;
 		}
 
-		if (nc->display.equals_ci(params[1]) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
+		if (nc->display.equals_ci(params[1]))
 		{
 			source.Reply(MORE_OBSCURE_PASSWORD);
 			return;

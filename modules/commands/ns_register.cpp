@@ -201,7 +201,7 @@ class CommandNSRegister : public Command
 			source.Reply(_("Please wait %d seconds before using the REGISTER command again."), (u->lastnickreg + reg_delay) - Anope::CurTime);
 		else if (NickAlias::Find(u_nick) != NULL)
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());
-		else if (pass.equals_ci(u_nick) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && pass.length() < 5))
+		else if (pass.equals_ci(u_nick))
 			source.Reply(MORE_OBSCURE_PASSWORD);
 		else if (pass.length() < minpasslen)
 			source.Reply(PASSWORD_TOO_SHORT, minpasslen);

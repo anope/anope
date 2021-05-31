@@ -137,10 +137,10 @@ class CommandNSSetPassword : public Command
 			return;
 		}
 
-		unsigned int passlen = Config->GetModule("nickserv")->Get<unsigned>("passlen", "32");
-		if (len > passlen)
+		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "32");
+		if (len > maxpasslen)
 		{
-			source.Reply(PASSWORD_TOO_LONG, passlen);
+			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
 			return;
 		}
 
@@ -199,10 +199,10 @@ class CommandNSSASetPassword : public Command
 			return;
 		}
 
-		unsigned int passlen = Config->GetModule("nickserv")->Get<unsigned>("passlen", "32");
-		if (len > passlen)
+		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "32");
+		if (len > maxpasslen)
 		{
-			source.Reply(PASSWORD_TOO_LONG, passlen);
+			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
 			return;
 		}
 

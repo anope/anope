@@ -137,6 +137,13 @@ class CommandNSSetPassword : public Command
 			return;
 		}
 
+		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "8");
+		if (len < minpasslen)
+		{
+			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
+			return;
+		}
+
 		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "32");
 		if (len > maxpasslen)
 		{
@@ -196,6 +203,13 @@ class CommandNSSASetPassword : public Command
 		if (nc->display.equals_ci(params[1]) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
 		{
 			source.Reply(MORE_OBSCURE_PASSWORD);
+			return;
+		}
+
+		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "8");
+		if (len < minpasslen)
+		{
+			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
 			return;
 		}
 

@@ -66,6 +66,7 @@ class InspIRCdProto : public IRCDProto
 		CanSZLine = true;
 		CanSVSHold = true;
 		CanCertFP = true;
+		CanSendTags = true;
 		RequiresID = true;
 		MaxModes = 20;
 		MaxLine = 4096;

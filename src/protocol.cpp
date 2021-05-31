@@ -25,7 +25,7 @@ IRCDProto::IRCDProto(Module *creator, const Anope::string &p) : Service(creator,
 {
 	DefaultPseudoclientModes = "+io";
 	CanSVSNick = CanSVSJoin = CanSetVHost = CanSetVIdent = CanSNLine = CanSQLine = CanSQLineChannel
-		= CanSZLine = CanSVSHold = CanCertFP = RequiresID = AmbiguousID = false;
+		= CanSZLine = CanSVSHold = CanCertFP = CanSendTags = RequiresID = AmbiguousID = false;
 	MaxModes = 3;
 	MaxLine = 512;
 

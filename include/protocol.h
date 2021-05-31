@@ -62,6 +62,8 @@ class CoreExport IRCDProto : public Service
 	bool CanSVSHold;
 	/* See ns_cert */
 	bool CanCertFP;
+	/* Can we send arbitrary message tags? */
+	bool CanSendTags;
 	/* Whether this IRCd requires unique IDs for each user or server. See TS6/P10. */
 	bool RequiresID;
 	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */

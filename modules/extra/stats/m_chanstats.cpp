@@ -317,7 +317,7 @@ class MChanstats : public Module
 				"KEY `nick` (`nick`),"
 				"KEY `chan_` (`chan`),"
 				"KEY `type` (`type`)"
-				") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 			this->RunQuery(query);
 		}
 		/* There is no CREATE OR REPLACE PROCEDURE in MySQL */

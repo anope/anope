@@ -179,6 +179,7 @@ class CommandNSRegister : public Command
 		}
 
 		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
+		{
 			for (unsigned i = 0; i < Oper::opers.size(); ++i)
 			{
 				Oper *o = Oper::opers[i];
@@ -189,6 +190,7 @@ class CommandNSRegister : public Command
 					return;
 				}
 			}
+		}
 
 		unsigned int passlen = Config->GetModule("nickserv")->Get<unsigned>("passlen", "32");
 

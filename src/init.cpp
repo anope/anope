@@ -106,9 +106,12 @@ void Anope::Fork()
 #ifndef _WIN32
 	kill(getppid(), SIGUSR2);
 
-	freopen("/dev/null", "r", stdin);
-	freopen("/dev/null", "w", stdout);
-	freopen("/dev/null", "w", stderr);
+	if (!freopen("/dev/null", "r", stdin))
+		Log() << "Unable to redirect stdin to /dev/null: " << Anope::LastError();
+	if (!freopen("/dev/null", "w", stdout))
+		Log() << "Unable to redirect stdout to /dev/null: " << Anope::LastError();
+	if (!freopen("/dev/null", "w", stderr))
+		Log() << "Unable to redirect stderr to /dev/null: " << Anope::LastError();
 
 	setpgid(0, 0);
 
@@ -263,7 +266,9 @@ static void setuidgid()
 		{
 			LogFile* lf = li.logfiles[j];
 
-			chown(lf->filename.c_str(), uid, gid);
+			errno = 0;
+			if (chown(lf->filename.c_str(), uid, gid) != 0)
+				Log() << "Unable to change the ownership of " << lf->filename << " to " << uid << "/" << gid << ": " << Anope::LastError();
 		}
 	}
 

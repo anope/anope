@@ -30,7 +30,7 @@ class FlagsChanAccess : public ChanAccess
 		return false;
 	}
 
-	Anope::string AccessSerialize() const
+	Anope::string AccessSerialize() const anope_override
 	{
 		return Anope::string(this->flags.begin(), this->flags.end());
 	}

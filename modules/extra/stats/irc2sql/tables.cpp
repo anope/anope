@@ -34,7 +34,7 @@ void IRC2SQL::CheckTables()
 			"`countryname` varchar(50),"
 			"PRIMARY KEY `end` (`end`),"
 			"KEY `start` (`start`)"
-			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 		this->RunQuery(query);
 	}
 	if (GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_blocks"))
@@ -45,7 +45,7 @@ void IRC2SQL::CheckTables()
 			"`locId` INT UNSIGNED NOT NULL,"
 			"PRIMARY KEY `end` (`end`),"
 			"KEY `start` (`start`)"
-			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 		this->RunQuery(query);
 
 	}
@@ -60,7 +60,7 @@ void IRC2SQL::CheckTables()
 			"`longitude` FLOAT,"
 			"`areaCode` INT,"
 			"PRIMARY KEY (`locId`)"
-			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 		this->RunQuery(query);
 	}
 	if (GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_region"))
@@ -69,7 +69,7 @@ void IRC2SQL::CheckTables()
 			"`region` CHAR(2) NOT NULL,"
 			"`regionname` VARCHAR(100) NOT NULL,"
 			"PRIMARY KEY (`country`,`region`)"
-			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 		this->RunQuery(query);
 	}
 	if (!this->HasTable(prefix + "server"))
@@ -87,7 +87,7 @@ void IRC2SQL::CheckTables()
 			"`ulined` enum('Y','N') NOT NULL DEFAULT 'N',"
 			"PRIMARY KEY (`id`),"
 			"UNIQUE KEY `name` (`name`)"
-			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 		this->RunQuery(query);
 	}
 	if (!this->HasTable(prefix + "chan"))
@@ -101,7 +101,7 @@ void IRC2SQL::CheckTables()
 			"`modes` varchar(512) DEFAULT NULL,"
 			"PRIMARY KEY (`chanid`),"
 			"UNIQUE KEY `channel`(`channel`)"
-			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 		this->RunQuery(query);
 	}
 	if (!this->HasTable(prefix + "user"))
@@ -136,7 +136,7 @@ void IRC2SQL::CheckTables()
 			"PRIMARY KEY (`nickid`),"
 			"UNIQUE KEY `nick` (`nick`),"
 			"KEY `servid` (`servid`)"
-			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 		this->RunQuery(query);
 	}
 	if (!this->HasTable(prefix + "ison"))
@@ -147,7 +147,7 @@ void IRC2SQL::CheckTables()
 			"`modes` varchar(255) NOT NULL default '',"
 			"PRIMARY KEY  (`nickid`,`chanid`),"
 			"KEY `modes` (`modes`)"
-			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 		this->RunQuery(query);
 	}
 	if (!this->HasTable(prefix + "maxusers"))
@@ -158,7 +158,7 @@ void IRC2SQL::CheckTables()
 			"`maxtime` DATETIME NOT NULL,"
 			"`lastused` DATETIME NOT NULL,"
 			"UNIQUE KEY `name` (`name`)"
-			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 		this->RunQuery(query);
 	}
 	if (this->HasProcedure(prefix + "UserConnect"))

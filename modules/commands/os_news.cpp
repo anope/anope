@@ -111,12 +111,12 @@ class MyNewsService : public NewsService
 		return new MyNewsItem();
 	}
 
-	void AddNewsItem(NewsItem *n)
+	void AddNewsItem(NewsItem *n) anope_override
 	{
 		this->newsItems[n->type].push_back(n);
 	}
 
-	void DelNewsItem(NewsItem *n)
+	void DelNewsItem(NewsItem *n) anope_override
 	{
 		std::vector<NewsItem *> &list = this->GetNewsList(n->type);
 		std::vector<NewsItem *>::iterator it = std::find(list.begin(), list.end(), n);
@@ -125,7 +125,7 @@ class MyNewsService : public NewsService
 		delete n;
 	}
 
-	std::vector<NewsItem *> &GetNewsList(NewsType t)
+	std::vector<NewsItem *> &GetNewsList(NewsType t) anope_override
 	{
 		return this->newsItems[t];
 	}

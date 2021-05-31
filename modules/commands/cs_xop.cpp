@@ -37,7 +37,7 @@ class XOPChanAccess : public ChanAccess
 		return false;
 	}
 
-	Anope::string AccessSerialize() const
+	Anope::string AccessSerialize() const anope_override
 	{
 		return this->type;
 	}
@@ -489,7 +489,7 @@ class CommandCSXOP : public Command
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.upper().c_str());
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)

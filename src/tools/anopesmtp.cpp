@@ -112,9 +112,9 @@ static std::string GetTimeStamp()
 {
 	char tbuf[256];
 	time_t t = time(NULL);
-	struct tm *tm = localtime(&t);
+	struct tm *tm = gmtime(&t);
 
-	strftime(tbuf, sizeof(tbuf) - 1, "%a, %d %b %Y %H:%M:%S %z", tm);
+	strftime(tbuf, sizeof(tbuf) - 1, "%a, %d %b %Y %H:%M:%S +0000", tm);
 
 	return tbuf;
 }

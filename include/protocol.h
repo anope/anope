@@ -15,6 +15,7 @@
 #include "services.h"
 #include "anope.h"
 #include "service.h"
+#include "modes.h"
 
 /* Encapsultes the IRCd protocol we are speaking. */
 class CoreExport IRCDProto : public Service
@@ -241,6 +242,7 @@ class CoreExport IRCDProto : public Service
 	 * Defaults to Config->ListSize
 	 */
 	virtual unsigned GetMaxListFor(Channel *c);
+	virtual unsigned GetMaxListFor(Channel *c, ChannelMode *cm);
 
 	virtual Anope::string NormalizeMask(const Anope::string &mask);
 };

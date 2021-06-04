@@ -42,10 +42,13 @@ class CommandCSBan : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		const Anope::string &chan = params[0];
 		Configuration::Block *block = Config->GetCommand(source);
 		const Anope::string &mode = block->Get<Anope::string>("mode", "BAN");
+		ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
+		if (cm == NULL)
+			return;
 
+		const Anope::string &chan = params[0];
 		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci == NULL)
 		{
@@ -59,7 +62,7 @@ class CommandCSBan : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 			return;
 		}
-		else if (IRCD->GetMaxListFor(c) && c->HasMode(mode) >= IRCD->GetMaxListFor(c))
+		else if (IRCD->GetMaxListFor(c, cm) && c->HasMode(mode) >= IRCD->GetMaxListFor(c, cm))
 		{
 			source.Reply(_("The %s list for %s is full."), mode.lower().c_str(), c->name.c_str());
 			return;

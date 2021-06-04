@@ -438,6 +438,11 @@ unsigned IRCDProto::GetMaxListFor(Channel *c)
 	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<int>("modelistsize");
 }
 
+unsigned IRCDProto::GetMaxListFor(Channel *c, ChannelMode *cm)
+{
+	return GetMaxListFor(c);
+}
+
 Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 {
 	if (IsExtbanValid(mask))

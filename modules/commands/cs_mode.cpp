@@ -336,7 +336,7 @@ class CommandCSMode : public Command
 							continue;
 						}
 
-						if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
+						if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c, cm) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c, cm))
 						{
 							source.Reply(_("List for mode %c is full."), cm->mchar);
 							continue;
@@ -660,7 +660,7 @@ class CommandCSMode : public Command
 
 							if (adding)
 							{
-								if (IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) < IRCD->GetMaxListFor(ci->c))
+								if (IRCD->GetMaxListFor(ci->c, cm) && ci->c->HasMode(cm->name) < IRCD->GetMaxListFor(ci->c, cm))
 									ci->c->SetMode(NULL, cm, param);
 							}
 							else

@@ -299,7 +299,7 @@ F Unban command to accept an optional nick arg
 F Some typos in services.conf
 F Crash when users change their host that are identified to a group, but not a nick
 F Host length checking in HS SET(ALL) and HS REQUEST
-F Only show if a user is online in NS INFO if they are really identiifed for the group of the nick they are on
+F Only show if a user is online in NS INFO if they are really identified for the group of the nick they are on
 F Crash when using BSSmartJoin
 F Converting access entries to access from xop when a users access is below voice
 F A bad pointer passed to the OnDelEvent which could cause some 3rd party modules to crash

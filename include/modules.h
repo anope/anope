@@ -939,12 +939,12 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) { throw NotImplementedException(); }
 
-	/** Called when a channel mode is introducted into Anope
+	/** Called when a channel mode is introduced into Anope
 	 * @param cm The mode
 	 */
 	virtual void OnChannelModeAdd(ChannelMode *cm) { throw NotImplementedException(); }
 
-	/** Called when a user mode is introducted into Anope
+	/** Called when a user mode is introduced into Anope
 	 * @param um The mode
 	 */
 	virtual void OnUserModeAdd(UserMode *um) { throw NotImplementedException(); }

@@ -61,7 +61,7 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	 * @param ident The ident
 	 * @param host The host
 	 * @param creator Who created the vhost
-	 * @param time When the vhost was craated
+	 * @param time When the vhost was created
 	 */
 	void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime);
 

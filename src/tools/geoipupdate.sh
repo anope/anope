@@ -6,7 +6,7 @@
 # by the irc2sql module on the first load.
 
 # Don't forget to rename this file or your changes
-# will be overwritte on the next 'make install'
+# will be overwrite on the next 'make install'
 
 ############################
 # Config

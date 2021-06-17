@@ -268,7 +268,7 @@ class CoreExport IdentifyRequest
 	void Hold(Module *m);
 
 	/** Releases a held request
-	 * @param m The module releaseing the hold
+	 * @param m The module releasing the hold
 	 */
 	void Release(Module *m);
 

@@ -249,7 +249,7 @@ class CoreExport Channel : public Base, public Extensible
 
 	/** Get a string of the modes set on this channel
 	 * @param complete Include mode parameters
-	 * @param plus If set to false (with complete), mode parameters will not be given for modes requring no parameters to be unset
+	 * @param plus If set to false (with complete), mode parameters will not be given for modes requiring no parameters to be unset
 	 * @return A mode string
 	 */
 	Anope::string GetModes(bool complete, bool plus);

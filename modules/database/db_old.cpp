@@ -340,7 +340,7 @@ static dbFILE *open_db_read(const char *service, const char *filename, int versi
 	}
 	else if (myversion < version)
 	{
-		Log() << "Unsuported database version (" << myversion << ") on " << f->filename << ".";
+		Log() << "Unsupported database version (" << myversion << ") on " << f->filename << ".";
 		delete f;
 		return NULL;
 	}

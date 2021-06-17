@@ -80,7 +80,7 @@ struct HTTPReply
 	}
 };
 
-/* A message from soneone */
+/* A message from someone */
 struct HTTPMessage
 {
 	std::map<Anope::string, Anope::string> headers;

@@ -32,7 +32,7 @@ Table of Contents
 
         hash -  The keys in hash are the actual objects, stored as hashes. For
                 example, if I had just looked up all BotInfo ids and wanted to iterate
-                over all of them, I woulld start by:
+                over all of them, I would start by:
 
                 redis 127.0.0.1:6379> HGETALL hash:BotInfo:1
 
@@ -73,7 +73,7 @@ Table of Contents
     (https://redis.io/topics/notifications). This allows Redis to notify Anope of
     any external changes to objects in the database. Once notified, Anope will
     immediately update the object. Otherwise, Anope keeps all objects in memory
-    and will not regularly read from the databaes once started.
+    and will not regularly read from the database once started.
 
     You can use this to modify objects in Redis and have them immediately reflected
     back into Anope. Additionally you can use this feature to run multiple Anope
@@ -93,7 +93,7 @@ Table of Contents
 
     The key space ids and value are managed entirely by Anope, you do
     not (and should not) modify them. Once you modify the object (hash), Anope will
-    update them for you to correctly refelect any changes made to the object.
+    update them for you to correctly reflect any changes made to the object.
 
     Finally, always use atomic operations. If you are inserting a new object with
     multiple commands, or inserting multiple objects at once, specifically if the

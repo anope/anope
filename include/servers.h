@@ -170,7 +170,7 @@ class CoreExport Server : public Extensible
 	 */
 	bool IsQuitting() const;
 
-	/** Send a message to alll users on this server
+	/** Send a message to all users on this server
 	 * @param source The source of the message
 	 * @param message The message
 	 */

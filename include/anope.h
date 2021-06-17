@@ -362,7 +362,7 @@ namespace Anope
 	 */
 	extern CoreExport int Debug;
 
-	/** Other comand line options.
+	/** Other command line options.
 	 */
 	extern CoreExport bool ReadOnly, NoFork, NoThird, NoExpire, ProtocolDebug;
 
@@ -403,7 +403,7 @@ namespace Anope
 
 	/** Used to "fork" the process and go into the background during initial startup
 	 * while we are AtTerm(). The actual fork is not done here, but earlier, and this
-	 * simply notifys the parent via kill() to exit().
+	 * simply notifies the parent via kill() to exit().
 	 */
 	extern void Fork();
 
@@ -413,7 +413,7 @@ namespace Anope
 
 	/** One of the first functions called, does general initialization such as reading
 	 * command line args, loading the configuration, doing the initial fork() if necessary,
-	 * initializating language support, loading modules, and loading databases.
+	 * initializing language support, loading modules, and loading databases.
 	 * @throws CoreException if something bad went wrong
 	 */
 	extern void Init(int ac, char **av);
@@ -574,7 +574,7 @@ class CoreExport sepstream
  public:
 	/** Create a sepstream and fill it with the provided data
 	 */
-	sepstream(const Anope::string &source, char seperator, bool allowempty = false);
+	sepstream(const Anope::string &source, char separator, bool allowempty = false);
 
 	/** Fetch the next token from the stream
 	 * @param token The next token from the stream is placed here
@@ -584,7 +584,7 @@ class CoreExport sepstream
 
 	/** Gets token number 'num' from the stream
 	 * @param token The token is placed here
-	 * @param num The token number to featch
+	 * @param num The token number to fetch
 	 * @return True if the token was able to be fetched
 	 */
 	bool GetToken(Anope::string &token, int num);
@@ -602,7 +602,7 @@ class CoreExport sepstream
 
 	/** Gets token number 'num' from the stream and all remaining tokens.
 	 * @param token The token is placed here
-	 * @param num The token number to featch
+	 * @param num The token number to fetch
 	 * @return True if the token was able to be fetched
 	 */
 	bool GetTokenRemainder(Anope::string &token, int num);
@@ -628,7 +628,7 @@ class CoreExport sepstream
 class commasepstream : public sepstream
 {
  public:
-	/** Initialize with comma seperator
+	/** Initialize with comma separator
 	 */
 	commasepstream(const Anope::string &source, bool allowempty = false) : sepstream(source, ',', allowempty) { }
 };
@@ -638,7 +638,7 @@ class commasepstream : public sepstream
 class spacesepstream : public sepstream
 {
  public:
-	/** Initialize with space seperator
+	/** Initialize with space separator
 	 */
 	spacesepstream(const Anope::string &source) : sepstream(source, ' ') { }
 };
@@ -659,7 +659,7 @@ class CoreException : public std::exception
 	 */
 	Anope::string source;
  public:
-	/** Default constructor, just uses the error mesage 'Core threw an exception'.
+	/** Default constructor, just uses the error message 'Core threw an exception'.
 	 */
 	CoreException() : err("Core threw an exception"), source("The core") { }
 	/** This constructor can be used to specify an error message before throwing.
@@ -691,7 +691,7 @@ class CoreException : public std::exception
 class ModuleException : public CoreException
 {
  public:
-	/** Default constructor, just uses the error mesage 'Module threw an exception'.
+	/** Default constructor, just uses the error message 'Module threw an exception'.
 	 */
 	ModuleException() : CoreException("Module threw an exception", "A Module") { }
 
@@ -766,7 +766,7 @@ template<typename T> inline T convertTo(const Anope::string &s, bool failIfLefto
 }
 
 /** Casts to be used instead of dynamic_cast, this uses dynamic_cast
- * for debug builds and static_cast on releass builds
+ * for debug builds and static_cast on release builds
  * to speed up the program because dynamic_cast relies on RTTI.
  */
 #ifdef DEBUG_BUILD

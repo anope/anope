@@ -160,7 +160,7 @@ macro(sort_list LIST)
     # For CMake 2.4.4 or better, this can be done automatically
     list(SORT ${LIST})
   else(CMAKE244_OR_BETTER)
-    # For CMake 2.4.x before 2.4.4, we have to do this ourselves, firstly we'll create a teporary list
+    # For CMake 2.4.x before 2.4.4, we have to do this ourselves, firstly we'll create a temporary list
     set(NEW_LIST)
     # Iterate through the old list
     foreach(ITEM ${${LIST}})
@@ -497,7 +497,7 @@ endmacro(calculate_libraries)
 # check_functions(<source filename> <output variable set to TRUE on success>)
 #
 # This macro is used in most of the module (sub)directories to calculate the
-#   fcuntion dependencies for the given source file.
+#   function dependencies for the given source file.
 ###############################################################################
 macro(check_functions SRC SUCCESS)
   # Default to true

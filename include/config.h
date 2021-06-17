@@ -165,7 +165,7 @@ namespace Configuration
 class ConfigException : public CoreException
 {
  public:
-	/** Default constructor, just uses the error mesage 'Config threw an exception'.
+	/** Default constructor, just uses the error message 'Config threw an exception'.
 	 */
 	ConfigException() : CoreException("Config threw an exception", "Config Parser") { }
 	/** This constructor can be used to specify an error message before throwing.

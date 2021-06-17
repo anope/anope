@@ -25,7 +25,7 @@ class MemoServService : public Service
 	}
 
 	/** Sends a memo.
-	 * @param source The source of the memo, can be anythin.
+	 * @param source The source of the memo, can be anything.
 	 * @param target The target of the memo, nick or channel.
 	 * @param message Memo text
 	 * @param force true to force the memo, restrictions/delays etc are not checked

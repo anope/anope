@@ -282,7 +282,7 @@ class CommandNSUngroup : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command ungroups your nick, or if given, the specificed nick,\n"
+		source.Reply(_("This command ungroups your nick, or if given, the specified nick,\n"
 				"from the group it is in. The ungrouped nick keeps its registration\n"
 				"time, password, email, greet, language, and url. Everything else\n"
 				"is reset. You may not ungroup yourself if there is only one nick in\n"

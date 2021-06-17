@@ -53,7 +53,7 @@ void ModuleManager::CleanupRuntimeDirectory()
 /**
  * Copy the module from the modules folder to the runtime folder.
  * This will prevent module updates while the modules is loaded from
- * triggering a segfault, as the actaul file in use will be in the
+ * triggering a segfault, as the actual file in use will be in the
  * runtime folder.
  * @param name the name of the module to copy
  * @param output the destination to copy the module to
@@ -489,17 +489,17 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 	if (swap && swap_pos != source)
 	{
 		/* Suggestion from Phoenix, "shuffle" the modules to better retain call order */
-		int incrmnt = 1;
+		int increment = 1;
 
 		if (source > swap_pos)
-			incrmnt = -1;
+			increment = -1;
 
-		for (unsigned j = source; j != swap_pos; j += incrmnt)
+		for (unsigned j = source; j != swap_pos; j += increment)
 		{
-			if (j + incrmnt > EventHandlers[i].size() - 1 || (!j && incrmnt == -1))
+			if (j + increment > EventHandlers[i].size() - 1 || (!j && increment == -1))
 				continue;
 
-			std::swap(EventHandlers[i][j], EventHandlers[i][j + incrmnt]);
+			std::swap(EventHandlers[i][j], EventHandlers[i][j + increment]);
 		}
 	}
 

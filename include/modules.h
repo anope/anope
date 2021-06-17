@@ -507,7 +507,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnChanExpire(ChannelInfo *ci) { throw NotImplementedException(); }
 
-	/** Called before Anope connecs to its uplink
+	/** Called before Anope connects to its uplink
 	 */
 	virtual void OnPreServerConnect() { throw NotImplementedException(); }
 
@@ -555,7 +555,7 @@ class CoreExport Module : public Extensible
 
 	/** Called before an exception is deleted
 	 * @param source The source deleting it
-	 * @param ex The exceotion
+	 * @param ex The exception
 	 */
 	virtual void OnExceptionDel(CommandSource &source, Exception *ex) { throw NotImplementedException(); }
 
@@ -776,7 +776,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickSuspend(NickAlias *na) { throw NotImplementedException(); }
 
-	/** Called when a nick is unsuspneded
+	/** Called when a nick is unsuspended
 	 * @param na The nick alias
 	 */
 	virtual void OnNickUnsuspended(NickAlias *na) { throw NotImplementedException(); }
@@ -939,12 +939,12 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) { throw NotImplementedException(); }
 
-	/** Called when a channel mode is introducted into Anope
+	/** Called when a channel mode is introduced into Anope
 	 * @param cm The mode
 	 */
 	virtual void OnChannelModeAdd(ChannelMode *cm) { throw NotImplementedException(); }
 
-	/** Called when a user mode is introducted into Anope
+	/** Called when a user mode is introduced into Anope
 	 * @param um The mode
 	 */
 	virtual void OnUserModeAdd(UserMode *um) { throw NotImplementedException(); }
@@ -1080,7 +1080,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnMessage(MessageSource &source, Anope::string &command, std::vector<Anope::string> &param) { throw NotImplementedException(); }
 
-	/** Called to determine if a chnanel mode can be set by a user
+	/** Called to determine if a channel mode can be set by a user
 	 * @param u The user
 	 * @param cm The mode
 	 */
@@ -1093,7 +1093,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnExpireTick() { throw NotImplementedException(); }
 
-	/** Called when a nick is validated. That is, to determine if a user is permissted
+	/** Called when a nick is validated. That is, to determine if a user is permitted
 	 * to be on the given nick.
 	 * @param u The user
 	 * @param na The nick they are on
@@ -1177,7 +1177,7 @@ class CoreExport ModuleManager
 	/** Checks whether this version of Anope is at least major.minor.patch.build
 	 * Throws a ModuleException if not
 	 * @param major The major version
-	 * @param minor The minor vesion
+	 * @param minor The minor version
 	 * @param patch The patch version
 	 */
 	static void RequireVersion(int major, int minor, int patch);

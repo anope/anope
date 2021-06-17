@@ -555,7 +555,7 @@ class CoreExport Module : public Extensible
 
 	/** Called before an exception is deleted
 	 * @param source The source deleting it
-	 * @param ex The exceotion
+	 * @param ex The exception
 	 */
 	virtual void OnExceptionDel(CommandSource &source, Exception *ex) { throw NotImplementedException(); }
 

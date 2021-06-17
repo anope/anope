@@ -584,7 +584,7 @@ class CoreExport sepstream
 
 	/** Gets token number 'num' from the stream
 	 * @param token The token is placed here
-	 * @param num The token number to featch
+	 * @param num The token number to fetch
 	 * @return True if the token was able to be fetched
 	 */
 	bool GetToken(Anope::string &token, int num);
@@ -602,7 +602,7 @@ class CoreExport sepstream
 
 	/** Gets token number 'num' from the stream and all remaining tokens.
 	 * @param token The token is placed here
-	 * @param num The token number to featch
+	 * @param num The token number to fetch
 	 * @return True if the token was able to be fetched
 	 */
 	bool GetTokenRemainder(Anope::string &token, int num);

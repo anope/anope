@@ -19,7 +19,7 @@ enum LogType
 {
 	/* Used whenever an administrator uses an administrative command */
 	LOG_ADMIN,
-	/* Used whenever an administrator overides something, such as adding
+	/* Used whenever an administrator overrides something, such as adding
 	 * access to a channel where they don't have permission to.
 	 */
 	LOG_OVERRIDE,

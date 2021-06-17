@@ -288,8 +288,8 @@ class ESHA256 : public Module
 		else
 			use_iv = false;
 
-		Encryption::IV initilization(this->iv, 8);
-		SHA256Context ctx(&initilization);
+		Encryption::IV initialization(this->iv, 8);
+		SHA256Context ctx(&initialization);
 		ctx.Update(reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
 		ctx.Finalize();
 

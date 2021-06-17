@@ -160,7 +160,7 @@ macro(sort_list LIST)
     # For CMake 2.4.4 or better, this can be done automatically
     list(SORT ${LIST})
   else(CMAKE244_OR_BETTER)
-    # For CMake 2.4.x before 2.4.4, we have to do this ourselves, firstly we'll create a teporary list
+    # For CMake 2.4.x before 2.4.4, we have to do this ourselves, firstly we'll create a temporary list
     set(NEW_LIST)
     # Iterate through the old list
     foreach(ITEM ${${LIST}})

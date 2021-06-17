@@ -413,7 +413,7 @@ namespace Anope
 
 	/** One of the first functions called, does general initialization such as reading
 	 * command line args, loading the configuration, doing the initial fork() if necessary,
-	 * initializating language support, loading modules, and loading databases.
+	 * initializing language support, loading modules, and loading databases.
 	 * @throws CoreException if something bad went wrong
 	 */
 	extern void Init(int ac, char **av);

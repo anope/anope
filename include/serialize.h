@@ -123,7 +123,7 @@ class CoreExport Serialize::Type : public Base
 	 */
 	Module *owner;
 
-	/* The timesatmp for this type. All objects of this type are as up to date as
+	/* The timestamp for this type. All objects of this type are as up to date as
 	 * this timestamp. if curtime == timestamp then we have the most up to date
 	 * version of every object of this type.
 	 */

@@ -403,7 +403,7 @@ namespace Anope
 
 	/** Used to "fork" the process and go into the background during initial startup
 	 * while we are AtTerm(). The actual fork is not done here, but earlier, and this
-	 * simply notifys the parent via kill() to exit().
+	 * simply notifies the parent via kill() to exit().
 	 */
 	extern void Fork();
 

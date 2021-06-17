@@ -574,7 +574,7 @@ class CoreExport sepstream
  public:
 	/** Create a sepstream and fill it with the provided data
 	 */
-	sepstream(const Anope::string &source, char seperator, bool allowempty = false);
+	sepstream(const Anope::string &source, char separator, bool allowempty = false);
 
 	/** Fetch the next token from the stream
 	 * @param token The next token from the stream is placed here
@@ -628,7 +628,7 @@ class CoreExport sepstream
 class commasepstream : public sepstream
 {
  public:
-	/** Initialize with comma seperator
+	/** Initialize with comma separator
 	 */
 	commasepstream(const Anope::string &source, bool allowempty = false) : sepstream(source, ',', allowempty) { }
 };
@@ -638,7 +638,7 @@ class commasepstream : public sepstream
 class spacesepstream : public sepstream
 {
  public:
-	/** Initialize with space seperator
+	/** Initialize with space separator
 	 */
 	spacesepstream(const Anope::string &source) : sepstream(source, ' ') { }
 };

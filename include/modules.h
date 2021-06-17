@@ -1093,7 +1093,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnExpireTick() { throw NotImplementedException(); }
 
-	/** Called when a nick is validated. That is, to determine if a user is permissted
+	/** Called when a nick is validated. That is, to determine if a user is permitted
 	 * to be on the given nick.
 	 * @param u The user
 	 * @param na The nick they are on

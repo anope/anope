@@ -178,7 +178,7 @@ class CoreExport Command : public Service
 	 * Note that if the same command exists multiple places this will return the first one encountered
 	 * @param command_service The command service to lookup, eg, nickserv/register
 	 * @param bot If found, is set to the bot the command is on, eg NickServ
-	 * @param name If found, is set to the comand name, eg REGISTER
+	 * @param name If found, is set to the command name, eg REGISTER
 	 * @return true if the given command service exists
 	 */
 	static bool FindCommandFromService(const Anope::string &command_service, BotInfo* &bi, Anope::string &name);

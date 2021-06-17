@@ -362,7 +362,7 @@ namespace Anope
 	 */
 	extern CoreExport int Debug;
 
-	/** Other comand line options.
+	/** Other command line options.
 	 */
 	extern CoreExport bool ReadOnly, NoFork, NoThird, NoExpire, ProtocolDebug;
 

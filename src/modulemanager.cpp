@@ -53,7 +53,7 @@ void ModuleManager::CleanupRuntimeDirectory()
 /**
  * Copy the module from the modules folder to the runtime folder.
  * This will prevent module updates while the modules is loaded from
- * triggering a segfault, as the actaul file in use will be in the
+ * triggering a segfault, as the actual file in use will be in the
  * runtime folder.
  * @param name the name of the module to copy
  * @param output the destination to copy the module to

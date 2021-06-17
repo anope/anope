@@ -497,7 +497,7 @@ endmacro(calculate_libraries)
 # check_functions(<source filename> <output variable set to TRUE on success>)
 #
 # This macro is used in most of the module (sub)directories to calculate the
-#   fcuntion dependencies for the given source file.
+#   function dependencies for the given source file.
 ###############################################################################
 macro(check_functions SRC SUCCESS)
   # Default to true

@@ -93,7 +93,7 @@ Table of Contents
 
     The key space ids and value are managed entirely by Anope, you do
     not (and should not) modify them. Once you modify the object (hash), Anope will
-    update them for you to correctly refelect any changes made to the object.
+    update them for you to correctly reflect any changes made to the object.
 
     Finally, always use atomic operations. If you are inserting a new object with
     multiple commands, or inserting multiple objects at once, specifically if the

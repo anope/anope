@@ -766,7 +766,7 @@ template<typename T> inline T convertTo(const Anope::string &s, bool failIfLefto
 }
 
 /** Casts to be used instead of dynamic_cast, this uses dynamic_cast
- * for debug builds and static_cast on releass builds
+ * for debug builds and static_cast on releases builds
  * to speed up the program because dynamic_cast relies on RTTI.
  */
 #ifdef DEBUG_BUILD

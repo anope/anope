@@ -73,7 +73,7 @@ Table of Contents
     (https://redis.io/topics/notifications). This allows Redis to notify Anope of
     any external changes to objects in the database. Once notified, Anope will
     immediately update the object. Otherwise, Anope keeps all objects in memory
-    and will not regularly read from the databaes once started.
+    and will not regularly read from the database once started.
 
     You can use this to modify objects in Redis and have them immediately reflected
     back into Anope. Additionally you can use this feature to run multiple Anope

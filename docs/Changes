@@ -273,7 +273,7 @@ A Made OperServ, Global, MemoServ, and ChanServ optional
 F Shutting down if a config reload fails
 F Autoid to live through restarts on Unreal
 F Storing vhosts in MySQL
-F Not flushing the anope_extra table before rewriting databaes
+F Not flushing the anope_extra table before rewriting database
 F Anoperc start/stop to send the globaloncycle global, and fixed anoperc rehash to really rehash
 F Fixed a potential crash if HostServ or BotServ was disbled
 

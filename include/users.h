@@ -46,7 +46,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	bool on_access;
 	/* Map of user modes and the params this user has (if any) */
 	ModeList modes;
-	/* NickCore account the user is currently loggged in as, if they are logged in */
+	/* NickCore account the user is currently logged in as, if they are logged in */
 	Serialize::Reference<NickCore> nc;
 
 	/* # of invalid password attempts */

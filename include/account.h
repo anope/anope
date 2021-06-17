@@ -130,7 +130,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 	 */
 	Serialize::Checker<std::vector<NickAlias *> > aliases;
 
-	/* Set if this user is a services operattor. o->ot must exist. */
+	/* Set if this user is a services operator. o->ot must exist. */
 	Oper *o;
 
 	/* Unsaved data */

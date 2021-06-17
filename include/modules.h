@@ -1080,7 +1080,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnMessage(MessageSource &source, Anope::string &command, std::vector<Anope::string> &param) { throw NotImplementedException(); }
 
-	/** Called to determine if a chnanel mode can be set by a user
+	/** Called to determine if a channel mode can be set by a user
 	 * @param u The user
 	 * @param cm The mode
 	 */

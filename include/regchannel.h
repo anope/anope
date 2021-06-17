@@ -97,7 +97,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
-	/** Change the founder of the channek
+	/** Change the founder of the channel
 	 * @params nc The new founder
 	 */
 	void SetFounder(NickCore *nc);

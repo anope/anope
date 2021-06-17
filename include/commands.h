@@ -101,7 +101,7 @@ class CoreExport Command : public Service
 	bool require_user;
 
  public:
-	/* Maximum paramaters accepted by this command */
+	/* Maximum parameters accepted by this command */
 	size_t max_params;
 	/* Minimum parameters required to use this command */
 	size_t min_params;

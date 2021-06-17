@@ -143,22 +143,22 @@ bool ListFormatter::IsEmpty() const
 void ListFormatter::Process(std::vector<Anope::string> &buffer)
 {
 	std::vector<Anope::string> tcolumns;
-	std::map<Anope::string, size_t> lenghts;
+	std::map<Anope::string, size_t> lengths;
 	std::set<Anope::string> breaks;
 	for (unsigned i = 0; i < this->columns.size(); ++i)
 	{
 		tcolumns.push_back(Language::Translate(this->nc, this->columns[i].c_str()));
-		lenghts[this->columns[i]] = tcolumns[i].length();
+		lengths[this->columns[i]] = tcolumns[i].length();
 	}
 	for (unsigned i = 0; i < this->entries.size(); ++i)
 	{
 		ListEntry &e = this->entries[i];
 		for (unsigned j = 0; j < this->columns.size(); ++j)
-			if (e[this->columns[j]].length() > lenghts[this->columns[j]])
-				lenghts[this->columns[j]] = e[this->columns[j]].length();
+			if (e[this->columns[j]].length() > lengths[this->columns[j]])
+				lengths[this->columns[j]] = e[this->columns[j]].length();
 	}
 	unsigned length = 0;
-	for (std::map<Anope::string, size_t>::iterator it = lenghts.begin(), it_end = lenghts.end(); it != it_end; ++it)
+	for (std::map<Anope::string, size_t>::iterator it = lengths.begin(), it_end = lengths.end(); it != it_end; ++it)
 	{
 		/* Break lines at 80 chars */
 		if (length > 80)
@@ -185,7 +185,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 				s += "  ";
 			s += tcolumns[i];
 			if (i + 1 != this->columns.size())
-				for (unsigned j = tcolumns[i].length(); j < lenghts[this->columns[i]]; ++j)
+				for (unsigned j = tcolumns[i].length(); j < lengths[this->columns[i]]; ++j)
 					s += " ";
 		}
 		buffer.push_back(s);
@@ -207,7 +207,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 				s += "  ";
 			s += e[this->columns[j]];
 			if (j + 1 != this->columns.size())
-				for (unsigned k = e[this->columns[j]].length(); k < lenghts[this->columns[j]]; ++k)
+				for (unsigned k = e[this->columns[j]].length(); k < lengths[this->columns[j]]; ++k)
 					s += " ";
 		}
 		buffer.push_back(s);

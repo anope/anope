@@ -776,7 +776,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickSuspend(NickAlias *na) { throw NotImplementedException(); }
 
-	/** Called when a nick is unsuspneded
+	/** Called when a nick is unsuspended
 	 * @param na The nick alias
 	 */
 	virtual void OnNickUnsuspended(NickAlias *na) { throw NotImplementedException(); }

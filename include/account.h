@@ -272,7 +272,7 @@ class CoreExport IdentifyRequest
 	 */
 	void Release(Module *m);
 
-	/** Called by modules when this IdentifyRequest has successeded successfully.
+	/** Called by modules when this IdentifyRequest has succeeded successfully.
 	 * If this request is behind held it must still be Released after calling this.
 	 * @param m The module confirming authentication
 	 */

@@ -59,7 +59,7 @@ yet follows these. This will be rectified with time.
 4. Braces
 
    Always put braces opening and closing blocks on separate lines, see the
-   identation example. For example, place braces like this:
+   indentation example. For example, place braces like this:
      if (apples == "green")
      {
          cout << "Apples are green" << endl;

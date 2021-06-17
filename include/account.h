@@ -262,7 +262,7 @@ class CoreExport IdentifyRequest
 	 * for the request to complete. Multiple modules may hold a request at any time,
 	 * but the request is not complete until every module has released it. If you do not
 	 * require holding this (eg, your password check is done in this thread and immediately)
-	 * then you don't need to hold the request before Succeeding it.
+	 * then you don't need to hold the request before calling `Success()`.
 	 * @param m The module holding this request
 	 */
 	void Hold(Module *m);
@@ -272,7 +272,7 @@ class CoreExport IdentifyRequest
 	 */
 	void Release(Module *m);
 
-	/** Called by modules when this IdentifyRequest has succeeded successfully.
+	/** Called by modules when this IdentifyRequest has succeeded.
 	 * If this request is behind held it must still be Released after calling this.
 	 * @param m The module confirming authentication
 	 */

@@ -55,7 +55,7 @@ class CoreExport IRCDProto : public Service
 	bool CanSNLine;
 	/* Can we ban specific nicknames from being used? */
 	bool CanSQLine;
-	/* Can we ban sepcific channel names from being used? */
+	/* Can we ban specific channel names from being used? */
 	bool CanSQLineChannel;
 	/* Can we ban by IP? */
 	bool CanSZLine;

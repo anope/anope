@@ -1177,7 +1177,7 @@ class CoreExport ModuleManager
 	/** Checks whether this version of Anope is at least major.minor.patch.build
 	 * Throws a ModuleException if not
 	 * @param major The major version
-	 * @param minor The minor vesion
+	 * @param minor The minor version
 	 * @param patch The patch version
 	 */
 	static void RequireVersion(int major, int minor, int patch);

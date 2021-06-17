@@ -659,7 +659,7 @@ class CoreException : public std::exception
 	 */
 	Anope::string source;
  public:
-	/** Default constructor, just uses the error mesage 'Core threw an exception'.
+	/** Default constructor, just uses the error message 'Core threw an exception'.
 	 */
 	CoreException() : err("Core threw an exception"), source("The core") { }
 	/** This constructor can be used to specify an error message before throwing.
@@ -691,7 +691,7 @@ class CoreException : public std::exception
 class ModuleException : public CoreException
 {
  public:
-	/** Default constructor, just uses the error mesage 'Module threw an exception'.
+	/** Default constructor, just uses the error message 'Module threw an exception'.
 	 */
 	ModuleException() : CoreException("Module threw an exception", "A Module") { }
 

@@ -489,17 +489,17 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 	if (swap && swap_pos != source)
 	{
 		/* Suggestion from Phoenix, "shuffle" the modules to better retain call order */
-		int incrmnt = 1;
+		int increment = 1;
 
 		if (source > swap_pos)
-			incrmnt = -1;
+			increment = -1;
 
-		for (unsigned j = source; j != swap_pos; j += incrmnt)
+		for (unsigned j = source; j != swap_pos; j += increment)
 		{
-			if (j + incrmnt > EventHandlers[i].size() - 1 || (!j && incrmnt == -1))
+			if (j + increment > EventHandlers[i].size() - 1 || (!j && increment == -1))
 				continue;
 
-			std::swap(EventHandlers[i][j], EventHandlers[i][j + incrmnt]);
+			std::swap(EventHandlers[i][j], EventHandlers[i][j + increment]);
 		}
 	}
 

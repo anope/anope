@@ -135,7 +135,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	AccessGroup AccessFor(const User *u, bool updateLastUsed = true);
 	AccessGroup AccessFor(const NickCore *nc, bool updateLastUsed = true);
 
-	/** Get the size of the accss vector for this channel
+	/** Get the size of the access vector for this channel
 	 * @return The access vector size
 	 */
 	unsigned GetAccessCount() const;

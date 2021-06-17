@@ -115,7 +115,7 @@ class PlexusProto : public IRCDProto
 		 * KNOCK  - Supports KNOCK
 		 * TBURST - Supports TBURST
 		 * PARA   - Supports invite broadcasting for +p
-		 * ENCAP  - Supports encapsulization of protocol messages
+		 * ENCAP  - Supports encapsulation of protocol messages
 		 * SVS    - Supports services protocol extensions
 		 */
 		UplinkSocket::Message() << "CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS";

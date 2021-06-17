@@ -32,7 +32,7 @@ Table of Contents
 
         hash -  The keys in hash are the actual objects, stored as hashes. For
                 example, if I had just looked up all BotInfo ids and wanted to iterate
-                over all of them, I woulld start by:
+                over all of them, I would start by:
 
                 redis 127.0.0.1:6379> HGETALL hash:BotInfo:1
 

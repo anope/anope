@@ -400,7 +400,7 @@ class CoreExport Entry
 
 	/** Constructor
 	 * @param mode What mode this host is for, can be empty for unknown/no mode
-	 * @param host A full or poartial nick!ident@host/cidr#real name mask
+	 * @param host A full or partial nick!ident@host/cidr#real name mask
 	 */
 	Entry(const Anope::string &mode, const Anope::string &host);
 

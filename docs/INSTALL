@@ -80,7 +80,7 @@ Note: You should also read the README and FAQ files!
 
     The configuration varies depending on the IRCd, but you will probably need
     a link block (also called connect block, or C line), a U line (also called
-    a shared block), and be sure that the IRCd is listneing on the given port
+    a shared block), and be sure that the IRCd is listening on the given port
     in the link block.
 
     Example link configurations can be found in example.conf for some of the

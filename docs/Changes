@@ -275,7 +275,7 @@ F Autoid to live through restarts on Unreal
 F Storing vhosts in MySQL
 F Not flushing the anope_extra table before rewriting database
 F Anoperc start/stop to send the globaloncycle global, and fixed anoperc rehash to really rehash
-F Fixed a potential crash if HostServ or BotServ was disbled
+F Fixed a potential crash if HostServ or BotServ was disabled
 
 Anope Version 1.9.2
 -------------------

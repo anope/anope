@@ -234,7 +234,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 class CoreExport IdentifyRequest
 {
 	/* Owner of this request, used to cleanup requests if a module is unloaded
-	 * while a reqyest us pending */
+	 * while a request us pending */
 	Module *owner;
 	Anope::string account;
 	Anope::string password;

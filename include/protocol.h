@@ -17,7 +17,7 @@
 #include "service.h"
 #include "modes.h"
 
-/* Encapsultes the IRCd protocol we are speaking. */
+/* Encapsulates the IRCd protocol we are speaking. */
 class CoreExport IRCDProto : public Service
 {
 	Anope::string proto_name;

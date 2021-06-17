@@ -40,7 +40,7 @@ struct CommandInfo
 	bool prepend_channel;
 };
 
-/* Where the replies from commands go to. User inheits from this and is the normal
+/* Where the replies from commands go to. User inherits from this and is the normal
  * source of a CommandReply
  */
 struct CoreExport CommandReply

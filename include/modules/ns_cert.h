@@ -26,7 +26,7 @@ struct NSCertList
 
 	/** Get an entry from the nick's cert list by index
 	 *
-	 * @param entry Index in the certificaate list vector to retrieve
+	 * @param entry Index in the certificate list vector to retrieve
 	 * @return The fingerprint entry of the given index if within bounds, an empty string if the vector is empty or the index is out of bounds
 	 *
 	 * Retrieves an entry from the certificate list corresponding to the given index.

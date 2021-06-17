@@ -507,7 +507,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnChanExpire(ChannelInfo *ci) { throw NotImplementedException(); }
 
-	/** Called before Anope connecs to its uplink
+	/** Called before Anope connects to its uplink
 	 */
 	virtual void OnPreServerConnect() { throw NotImplementedException(); }
 

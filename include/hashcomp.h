@@ -26,7 +26,7 @@ namespace Anope
 {
 	class string;
 
-	/* Casemap in use by Anope. ci::string's comparation functions use this (and thus Anope::string) */
+	/* Casemap in use by Anope. ci::string's comparison functions use this (and thus Anope::string) */
 	extern std::locale casemap;
 
 	extern void CaseMapRebuild();

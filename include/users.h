@@ -161,13 +161,13 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 
 	/** Update the real ident (username) of a user record.
 	 * @param ident The new ident to give this user.
-	 * NOTE: Where possible, you should use the Get/SetVIdent() equivilants.
+	 * NOTE: Where possible, you should use the Get/SetVIdent() equivalents.
 	 */
 	void SetIdent(const Anope::string &ident);
 
 	/** Get the real ident (username) of this user.
 	 * @return The displayed ident of this user.
-	 * NOTE: Where possible, you should use the Get/SetVIdent() equivilants.
+	 * NOTE: Where possible, you should use the Get/SetVIdent() equivalents.
 	 */
 	const Anope::string &GetIdent() const;
 

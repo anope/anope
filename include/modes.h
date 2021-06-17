@@ -96,7 +96,7 @@ class CoreExport UserModeParam : public UserMode
 class CoreExport ChannelMode : public Mode
 {
  public:
-	/* channel modes that can posssibly unwrap this mode */
+	/* channel modes that can possibly unwrap this mode */
 	std::vector<ChannelMode *> listeners;
 
 	/** constructor

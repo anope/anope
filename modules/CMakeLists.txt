@@ -117,7 +117,7 @@ macro(build_subdir)
 
       # Append this source file's linker flags to the subdirectoy's linker flags, if there are any to append
       if(TEMP_DEPENDENCIES)
-        append_to_list(SUBDIR_EXTRA_DEPENDS ${TEMP_DEPDENCIES})
+        append_to_list(SUBDIR_EXTRA_DEPENDS ${TEMP_DEPENDENCIES})
       endif(TEMP_DEPENDENCIES)
     endif(HAS_FUNCTION)
   endforeach(SRC ${MODULES_SUBDIR_SRCS})

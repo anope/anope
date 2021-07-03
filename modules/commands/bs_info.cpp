@@ -85,6 +85,7 @@ class CommandBSInfo : public Command
 
 			source.Reply(CHAN_INFO_HEADER, ci->name.c_str());
 			info[_("Bot nick")] = ci->bi ? ci->bi->nick : _("not assigned yet");
+			info[_("Ban expiration")] = stringify(ci->banexpire);
 
 			Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
 			Anope::string disabled = Language::Translate(source.nc, _("Disabled"));

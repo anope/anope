@@ -105,8 +105,9 @@ class NSResetPass : public Module
 					if (source.GetUser())
 					{
 						source.GetUser()->Identify(na);
-						source.Reply(_("You are now identified for your nick. Change your password now."));
 					}
+					
+					source.Reply(_("You are now identified for your nick. Change your password now."));
 				}
 				else
 					return EVENT_CONTINUE;

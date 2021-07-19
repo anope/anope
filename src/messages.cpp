@@ -484,8 +484,10 @@ void Version::Run(MessageSource &source, const std::vector<Anope::string> &param
 void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *u = User::Find(params[0]);
-
-	if (u && u->server == Me)
+	if (u)
+		Server *s = Server::Find(u->server);
+	
+	if (u && (u->server == Me || s == Me))
 	{
 		const BotInfo *bi = BotInfo::Find(u->GetUID());
 		IRCD->SendNumeric(311, source.GetSource(), "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());

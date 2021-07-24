@@ -268,7 +268,7 @@ namespace WebPanel
 		my_reply(r, key);
 
 		CommandSource source(user, NULL, nc, &my_reply, bi);
-		source.ip = client->clientaddr.addr();
+		source.ip = client->GetIP();
 
 		CommandInfo info;
 		info.name = c;
@@ -308,7 +308,7 @@ namespace WebPanel
 		my_reply(r, key);
 
 		CommandSource source(nc->display, NULL, nc, &my_reply, bi);
-		source.ip = client->clientaddr.addr();
+		source.ip = client->GetIP();
 
 		cmd->Run(source, cmdname, *info, params);
 	}

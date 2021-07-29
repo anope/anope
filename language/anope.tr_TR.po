@@ -3175,12 +3175,12 @@ msgstr ""
 #: modules/commands/hs_request.cpp:191
 #, fuzzy
 msgid "Approve the requested vHost of a user"
-msgstr "    DEL         Delete the vhost of another user"
+msgstr "    DEL         Baska bir kullanıcının vhost'unu silin"
 
 #: modules/commands/ns_drop.cpp:68
 #, fuzzy
 msgid "As a Services Operator, you may drop any nick."
-msgstr "%s is a services operator of type %s."
+msgstr "%s bir hizmet oparatorudur %s."
 
 #: modules/commands/bs_assign.cpp:19
 #, fuzzy
@@ -3263,23 +3263,23 @@ msgstr "%s kanalının akick listesi:"
 
 #: src/access.cpp:29
 msgid "Automatic channel operator status upon join"
-msgstr ""
+msgstr "Katılma sırasında otomatik kanal operatoru durumu"
 
 #: src/access.cpp:28
 msgid "Automatic halfop upon join"
-msgstr ""
+msgstr "Otomatik halfop katilmak uzere"
 
 #: src/access.cpp:30
 msgid "Automatic owner upon join"
-msgstr ""
+msgstr "Otomatik owner katikmak uzere"
 
 #: src/access.cpp:31
 msgid "Automatic protect upon join"
-msgstr ""
+msgstr "Katıldıktan sonra otomatik koruma"
 
 #: src/access.cpp:32
 msgid "Automatic voice on join"
-msgstr ""
+msgstr "Katildiktan sonra otomatik ses (voice)"
 
 #: modules/commands/os_oper.cpp:196
 #, fuzzy, c-format
@@ -3294,7 +3294,7 @@ msgstr "%s hakkında yardım bulunamadı."
 #: modules/commands/os_oper.cpp:218
 #, c-format
 msgid "Available privileges for %s:"
-msgstr ""
+msgstr "Mevcut ayrilaciklar %s:"
 
 #: modules/commands/cs_enforce.cpp:162
 msgid "BANS enforced by "
@@ -3429,12 +3429,12 @@ msgstr "%s botu silindi."
 #: modules/commands/bs_set.cpp:141
 #, c-format
 msgid "Bot bans will automatically expire after %s."
-msgstr ""
+msgstr "Bot yasakları, %s otomatik olarak sona erecek"
 
 #: modules/commands/bs_set.cpp:139
 #, fuzzy
 msgid "Bot bans will no longer automatically expire."
-msgstr "Services will no longer autoop %s in channels."
+msgstr "Hizmetler artık kanallarda %s otomatik olarak kullanilmayacak."
 
 #: modules/commands/bs_bot.cpp:46 modules/commands/bs_bot.cpp:138
 #, fuzzy, c-format

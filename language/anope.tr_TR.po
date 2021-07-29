@@ -20,7 +20,7 @@ msgstr ""
 #: modules/commands/os_forbid.cpp:324
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
-msgstr ""
+msgstr "%d kanallar temizlendi ve %d dusuruldu."
 
 #: modules/commands/os_forbid.cpp:265
 #, fuzzy, c-format
@@ -171,7 +171,7 @@ msgstr "%s nicki %s kanalının akick listesinde zaten var."
 #: modules/commands/os_session.cpp:361
 #, c-format
 msgid "%s already exists on the EXCEPTION list."
-msgstr "%s already exists on the EXCEPTION list."
+msgstr "%s ozel durum listesinde zaten var"
 
 #: modules/commands/bs_kick.cpp:214 modules/commands/bs_kick.cpp:389
 #: modules/commands/bs_kick.cpp:520 modules/commands/bs_kick.cpp:651
@@ -182,7 +182,7 @@ msgstr "%s değeri kullanılamaz."
 #: modules/commands/os_mode.cpp:163
 #, fuzzy, c-format
 msgid "%s changed your usermodes to %s."
-msgstr "%s changed your usermodes."
+msgstr "%s kullanıcı modlarinizi degistirin."
 
 #: modules/commands/os_list.cpp:47
 #, fuzzy, c-format
@@ -242,22 +242,22 @@ msgstr "%s %s kanalında iptal edildi."
 #: modules/commands/cs_invite.cpp:75
 #, c-format
 msgid "%s has been invited to %s."
-msgstr "%s has been invited to %s."
+msgstr "%s davet edildi %s."
 
 #: modules/commands/os_svs.cpp:104
 #, fuzzy, c-format
 msgid "%s has been joined to %s."
-msgstr "%s has been invited to %s."
+msgstr "%s davet edildi %s."
 
 #: modules/commands/os_svs.cpp:152
 #, fuzzy, c-format
 msgid "%s has been parted from %s."
-msgstr "%s has been unbanned from %s."
+msgstr "%s davetten cikarildi %s."
 
 #: modules/commands/cs_unban.cpp:96
 #, c-format
 msgid "%s has been unbanned from %s."
-msgstr "%s has been unbanned from %s."
+msgstr "%s ban kaldirildi %s."
 
 #: modules/commands/ns_alist.cpp:110
 #, fuzzy, c-format
@@ -267,7 +267,7 @@ msgstr "%s %s kanalında iptal edildi."
 #: modules/commands/cs_status.cpp:55
 #, fuzzy, c-format
 msgid "%s has no access on %s."
-msgstr "%s has been invited to %s."
+msgstr "%s davet edildi %s."
 
 #: modules/commands/cs_set.cpp:307
 #, c-format
@@ -277,7 +277,7 @@ msgstr "%s çok fazla kanala sahip."
 #: modules/commands/cs_status.cpp:51
 #, fuzzy, c-format
 msgid "%s is a super administrator."
-msgstr "%s is a services operator of type %s."
+msgstr "%s hizmet operatörüdür %s."
 
 #: modules/pseudoclients/memoserv.cpp:214
 #, fuzzy, c-format
@@ -299,12 +299,12 @@ msgstr ""
 #: modules/commands/cs_invite.cpp:66
 #, fuzzy, c-format
 msgid "%s is already in %s!"
-msgstr "You are already in %s! "
+msgstr "zaten içeridesin %s! "
 
 #: modules/commands/os_svs.cpp:99
 #, fuzzy, c-format
 msgid "%s is already in %s."
-msgstr "You are already in %s! "
+msgstr "zaten içeridesin %s! "
 
 #: modules/commands/ms_ignore.cpp:65
 #, fuzzy, c-format
@@ -314,7 +314,7 @@ msgstr "%s access listenize eklendi."
 #: modules/commands/cs_suspend.cpp:97 modules/commands/ns_suspend.cpp:106
 #, fuzzy, c-format
 msgid "%s is already suspended."
-msgstr "You are already in %s! "
+msgstr "zaten içeridesin %s! "
 
 #: modules/commands/ms_rsend.cpp:56 modules/commands/ms_send.cpp:55
 #, fuzzy, c-format
@@ -344,12 +344,12 @@ msgstr "%s %s kanalında iptal edildi."
 #: modules/commands/os_svs.cpp:144
 #, fuzzy, c-format
 msgid "%s is not in %s."
-msgstr "You are already in %s! "
+msgstr "zaten içeridesin %s! "
 
 #: modules/commands/ms_ignore.cpp:77
 #, fuzzy, c-format
 msgid "%s is not on the ignore list."
-msgstr "%s not found on ignore list."
+msgstr "%s ingore listesinde yok."
 
 #: modules/commands/cs_status.cpp:90
 #, fuzzy, c-format
@@ -364,12 +364,12 @@ msgstr "%s %s kanalında iptal edildi."
 #: modules/commands/cs_status.cpp:78
 #, c-format
 msgid "%s matches access entry %s (from entry %s), which has privilege %s."
-msgstr ""
+msgstr "%s %s ayrıcalıgına sahip olan %s erisim girisiyle (%s girisinden) eslesir"
 
 #: modules/commands/cs_status.cpp:71
 #, c-format
 msgid "%s matches access entry %s, which has privilege %s."
-msgstr ""
+msgstr "%s ayrıcalığı olan %s erişim girişiyle eşleşir %s."
 
 #: include/language.h:109
 #, c-format
@@ -416,7 +416,7 @@ msgstr "%s access listenizde bulunamadı."
 #: modules/commands/os_ignore.cpp:320
 #, fuzzy, c-format
 msgid "%s not found on ignore list."
-msgstr "%s not found on ignore list."
+msgstr "%s ignore listesinde bulunamadi"
 
 #: modules/commands/os_session.cpp:238
 #, c-format
@@ -458,17 +458,17 @@ msgstr "Kullanıcı listesi sonu."
 #: modules/commands/os_ignore.cpp:316
 #, c-format
 msgid "%s will no longer be ignored."
-msgstr "%s will no longer be ignored."
+msgstr "%s artik goz ardi edilmiyecek (ignored listesinde yok)."
 
 #: modules/commands/os_ignore.cpp:238
 #, c-format
 msgid "%s will now be ignored for %s."
-msgstr "%s will now be ignored for %s."
+msgstr "%s artik goz ardi edilecek (ignored edilecek) %s."
 
 #: modules/commands/os_ignore.cpp:233
 #, c-format
 msgid "%s will now permanently be ignored."
-msgstr "%s will now permanently be ignored."
+msgstr "%s artık kalıcı olarak yoksayılacak."
 
 #: include/language.h:66
 #, fuzzy, c-format
@@ -580,7 +580,7 @@ msgstr ""
 #: modules/commands/ms_read.cpp:35
 #, c-format
 msgid "[auto-memo] The memo you sent to %s has been viewed."
-msgstr "[auto-memo] The memo you sent to %s has been viewed."
+msgstr "[auto-memo] %s adresine gönderdiğiniz not görüntülendi."
 
 #: modules/commands/ns_group.cpp:92
 #, fuzzy
@@ -589,7 +589,7 @@ msgstr "GROUP hedef şifre"
 
 #: modules/commands/ns_set.cpp:453
 msgid "address"
-msgstr ""
+msgstr "address"
 
 #: modules/commands/bs_set.cpp:162
 #, fuzzy
@@ -1663,7 +1663,7 @@ msgstr ""
 #: modules/commands/os_oper.cpp:167
 #, c-format
 msgid "   %s is online using this oper block."
-msgstr ""
+msgstr "cevrim ici oper block'u"
 
 #: modules/commands/os_modinfo.cpp:55
 #, c-format
@@ -1677,12 +1677,12 @@ msgstr "Providing command: /msg %s %s"
 
 #: modules/commands/os_oper.cpp:163
 msgid "   This oper is configured in the configuration file."
-msgstr ""
+msgstr "Oper yapılandırma dosyasında yapılandırılır."
 
 #: modules/commands/os_modinfo.cpp:34
 #, c-format
 msgid " Loaded at: %p"
-msgstr ""
+msgstr "Yuklendi: %p"
 
 #: modules/commands/cs_seen.cpp:303
 #, c-format
@@ -1694,7 +1694,7 @@ msgstr ""
 msgid ""
 "\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."
 msgstr ""
-"\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."
+"\"/msg %s\" artık desteklenmiyor.Kullanmak\"/msg %s@%s\" veya \"/%s\" yerine."
 
 #: modules/commands/os_jupe.cpp:19
 #, fuzzy
@@ -1718,7 +1718,7 @@ msgstr ""
 #: modules/commands/cs_log.cpp:205
 #, c-format
 msgid "%c is an unknown status mode."
-msgstr ""
+msgstr "bilinmeyen bir durum modudur"
 
 #: modules/commands/cs_mode.cpp:431
 #, fuzzy, c-format
@@ -1728,7 +1728,7 @@ msgstr "%s yeni mesajlar için uyarılmayacak."
 #: modules/commands/cs_mode.cpp:427
 #, fuzzy, c-format
 msgid "%c%c%s has been unlocked from %s."
-msgstr "Nick %s has been ungrouped from %s."
+msgstr "Nick %s gruplandirilmamis %s."
 
 #: modules/commands/cs_clone.cpp:56
 #, fuzzy, c-format
@@ -1743,7 +1743,7 @@ msgstr "%d bot mevcut."
 #: modules/commands/os_modinfo.cpp:189
 #, fuzzy, c-format
 msgid "%d modules loaded."
-msgstr "%d Modules loaded."
+msgstr "%d Moduller yuklendi."
 
 #: modules/commands/ns_group.cpp:357
 #, fuzzy, c-format
@@ -1796,52 +1796,52 @@ msgstr ""
 #: modules/commands/cs_seen.cpp:358
 #, c-format
 msgid "%s (%s) was kicked from %s (\"%s\") %s ago%s"
-msgstr ""
+msgstr "%s (%s) kicked atildi %s (\"%s\") %s az once%s"
 
 #: modules/commands/cs_seen.cpp:355
 #, c-format
 msgid "%s (%s) was kicked from a secret channel %s ago%s"
-msgstr ""
+msgstr "%s (%s) gizli kanaldan kicked atildi %s az once%s"
 
 #: modules/commands/cs_seen.cpp:326
 #, c-format
 msgid "%s (%s) was last seen changing nick from %s to %s %s ago%s"
-msgstr ""
+msgstr "%s (%s) nıck degisirken gorundu %s ile %s %s az once%s"
 
 #: modules/commands/cs_seen.cpp:321
 #, c-format
 msgid "%s (%s) was last seen changing nick to %s %s ago%s"
-msgstr ""
+msgstr "%s (%s) nick degisirken goruldu %s %s az once%s"
 
 #: modules/commands/cs_seen.cpp:310
 #, c-format
 msgid "%s (%s) was last seen connecting %s ago (%s)%s"
-msgstr ""
+msgstr "%s (%s) baglanirken goruldu %s az once (%s)%s"
 
 #: modules/commands/cs_seen.cpp:335
 #, c-format
 msgid "%s (%s) was last seen joining %s %s ago%s"
-msgstr ""
+msgstr "%s (%s) katilirken goruldu %s %s az once%s"
 
 #: modules/commands/cs_seen.cpp:332
 #, c-format
 msgid "%s (%s) was last seen joining a secret channel %s ago%s"
-msgstr ""
+msgstr "%s (%s) gizli kanala katilirken goruldu %s az once%s"
 
 #: modules/commands/cs_seen.cpp:344
 #, c-format
 msgid "%s (%s) was last seen parting %s %s ago%s"
-msgstr ""
+msgstr "%s (%s) ayrilirken goruldu %s %s az once%s"
 
 #: modules/commands/cs_seen.cpp:341
 #, c-format
 msgid "%s (%s) was last seen parting a secret channel %s ago%s"
-msgstr ""
+msgstr ""%s (%s) gizli kanaldan ayrilirken goruldu %s az once%s""
 
 #: modules/commands/cs_seen.cpp:349
 #, c-format
 msgid "%s (%s) was last seen quitting (%s) %s ago (%s)."
-msgstr ""
+msgstr "s (%s) cikarken goruldu (%s) %s az once (%s)."
 
 #: modules/commands/bs_kick.cpp:1143
 #, fuzzy, c-format
@@ -1890,7 +1890,7 @@ msgstr "%s commands:"
 #: include/language.h:69
 #, c-format
 msgid "%s coverage is too wide; Please use a more specific mask."
-msgstr ""
+msgstr "%s kapsama alanı cok genis; farkli bir mask kullanin."
 
 #: modules/commands/ms_info.cpp:94
 #, c-format
@@ -2090,12 +2090,12 @@ msgstr "%s %s kanali AOP listesinde bulunamadi."
 #: modules/commands/os_config.cpp:79
 #, c-format
 msgid "%s settings:"
-msgstr ""
+msgstr "%s ayarlar:"
 
 #: modules/commands/cs_seen.cpp:255
 #, c-format
 msgid "%s was last seen here %s ago."
-msgstr ""
+msgstr "%s burada goruldu %s az once."
 
 #: modules/commands/ns_ajoin.cpp:213
 #, fuzzy, c-format
@@ -2207,17 +2207,17 @@ msgstr "* AKILL any new clients connecting"
 #: modules/commands/os_defcon.cpp:158
 #, fuzzy, c-format
 msgid "* Force channel modes (%s) to be set on all channels"
-msgstr "* Force Chan Modes (%s) to be set on all channels"
+msgstr "* Kanal Modlari (%s) tum kanallarda uygulanacak"
 
 #: modules/commands/os_defcon.cpp:164
 #, fuzzy
 msgid "* Ignore non-opers with a message"
-msgstr "* Ignore any non-opers with message"
+msgstr "* Ignore herhangi non-opers mesaj ile"
 
 #: modules/commands/os_defcon.cpp:162
 #, fuzzy
 msgid "* Kill any new clients connecting"
-msgstr "* Kill any NEW clients connecting"
+msgstr "* Kill baglanan tum istemciler"
 
 #: modules/commands/os_defcon.cpp:156
 #, fuzzy
@@ -2226,15 +2226,15 @@ msgstr "* No MLOCK changes"
 
 #: modules/commands/os_defcon.cpp:152
 msgid "* No new channel registrations"
-msgstr "* No new channel registrations"
+msgstr "* kayitli yeni kanal kaydi yok"
 
 #: modules/commands/os_defcon.cpp:170
 msgid "* No new memos sent"
-msgstr "* No new memos sent"
+msgstr "* Yeni memo (not) yok"
 
 #: modules/commands/os_defcon.cpp:154
 msgid "* No new nick registrations"
-msgstr "* No new nick registrations"
+msgstr "* Yeni nick kaydi yok"
 
 #: modules/commands/os_defcon.cpp:166
 msgid "* Silently ignore non-opers"
@@ -2243,7 +2243,7 @@ msgstr "* Silently ignore non-opers"
 #: modules/commands/os_defcon.cpp:160
 #, c-format
 msgid "* Use the reduced session limit of %d"
-msgstr "* Use the reduced session limit of %d"
+msgstr "* azaltilmis oturum sinirini kullanin %d"
 
 #: modules/commands/cs_seen.cpp:319
 #, c-format
@@ -2265,12 +2265,12 @@ msgid ""
 "A confirmation e-mail has been sent to %s. Follow the instructions in it to "
 "change your e-mail address."
 msgstr ""
-"A passcode has been sent to %s, please type /msg %s confirm <passcode> to "
-"complete registration"
+"adresine bir şifre gönderildi %s, lütfen yazın /msg %s onaylamak icin <passcode> ile "
+"kaydini tamamla"
 
 #: modules/commands/ms_sendall.cpp:45
 msgid "A massmemo has been sent to all registered users."
-msgstr "A massmemo has been sent to all registered users."
+msgstr "Tum kayitli kullanıcılara toplu mesaj gonderildi."
 
 #: modules/commands/hs_request.cpp:285
 msgid ""
@@ -2280,7 +2280,7 @@ msgstr ""
 
 #: modules/commands/hs_request.cpp:229
 msgid "A memo informing the user will also be sent."
-msgstr ""
+msgstr "Kullanıcıyı bilgilendiren bir not da gönderilecektir"
 
 #: modules/commands/ms_read.cpp:42
 #, c-format
@@ -2448,7 +2448,7 @@ msgstr "    SECURE        %s güvenlik özelliklerini aktifleştirir"
 
 #: modules/commands/hs_request.cpp:227
 msgid "Activate the requested vHost for the given nick."
-msgstr ""
+msgstr "Nick icin istenen vHost'u etkinleştirin."
 
 #: modules/commands/hs_on.cpp:55
 #, fuzzy
@@ -2477,7 +2477,7 @@ msgstr ""
 #: modules/commands/os_dns.cpp:515
 #, c-format
 msgid "Added IP %s to %s."
-msgstr ""
+msgstr "Ekle IP %s ile %s."
 
 #: modules/commands/os_forbid.cpp:239
 #, c-format

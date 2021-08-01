@@ -119,7 +119,7 @@ class BotServCore : public Module
 		if (inhabit && inhabit->HasExt(c))
 			return;
 
-		/* This is called prior to removing the user from the channnel, so c->users.size() - 1 should be safe */
+		/* This is called prior to removing the user from the channel, so c->users.size() - 1 should be safe */
 		if (c->ci && c->ci->bi && u != *c->ci->bi && c->users.size() - 1 <= Config->GetModule(this)->Get<unsigned>("minusers") && c->FindUser(c->ci->bi))
 			c->ci->bi->Part(c->ci->c);
 	}

@@ -351,7 +351,7 @@ void IRCDProto::SendNumeric(int numeric, const Anope::string &dest, const char *
 bool IRCDProto::IsNickValid(const Anope::string &nick)
 {
 	/**
-	 * RFC: defination of a valid nick
+	 * RFC: definition of a valid nick
 	 * nickname =  ( letter / special ) ( letter / digit / special / "-" )
 	 * letter   =  A-Z / a-z
 	 * digit    =  0-9
@@ -436,6 +436,11 @@ void IRCDProto::SendOper(User *u)
 unsigned IRCDProto::GetMaxListFor(Channel *c)
 {
 	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<int>("modelistsize");
+}
+
+unsigned IRCDProto::GetMaxListFor(Channel *c, ChannelMode *cm)
+{
+	return GetMaxListFor(c);
 }
 
 Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)

@@ -40,7 +40,7 @@ struct CommandInfo
 	bool prepend_channel;
 };
 
-/* Where the replies from commands go to. User inheits from this and is the normal
+/* Where the replies from commands go to. User inherits from this and is the normal
  * source of a CommandReply
  */
 struct CoreExport CommandReply
@@ -101,7 +101,7 @@ class CoreExport Command : public Service
 	bool require_user;
 
  public:
-	/* Maximum paramaters accepted by this command */
+	/* Maximum parameters accepted by this command */
 	size_t max_params;
 	/* Minimum parameters required to use this command */
 	size_t min_params;
@@ -148,7 +148,7 @@ class CoreExport Command : public Service
 	 */
 	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
-	/** Called when HELP is requsted for the client this command is on.
+	/** Called when HELP is requested for the client this command is on.
 	 * @param source The source
 	 */
 	virtual void OnServHelp(CommandSource &source);
@@ -178,7 +178,7 @@ class CoreExport Command : public Service
 	 * Note that if the same command exists multiple places this will return the first one encountered
 	 * @param command_service The command service to lookup, eg, nickserv/register
 	 * @param bot If found, is set to the bot the command is on, eg NickServ
-	 * @param name If found, is set to the comand name, eg REGISTER
+	 * @param name If found, is set to the command name, eg REGISTER
 	 * @return true if the given command service exists
 	 */
 	static bool FindCommandFromService(const Anope::string &command_service, BotInfo* &bi, Anope::string &name);

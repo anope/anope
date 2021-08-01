@@ -96,7 +96,7 @@ class CoreExport UserModeParam : public UserMode
 class CoreExport ChannelMode : public Mode
 {
  public:
-	/* channel modes that can posssibly unwrap this mode */
+	/* channel modes that can possibly unwrap this mode */
 	std::vector<ChannelMode *> listeners;
 
 	/** constructor
@@ -400,7 +400,7 @@ class CoreExport Entry
 
 	/** Constructor
 	 * @param mode What mode this host is for, can be empty for unknown/no mode
-	 * @param host A full or poartial nick!ident@host/cidr#real name mask
+	 * @param host A full or partial nick!ident@host/cidr#real name mask
 	 */
 	Entry(const Anope::string &mode, const Anope::string &host);
 

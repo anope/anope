@@ -83,7 +83,7 @@ Fix chankill to not add duplicate akills
 Allow nickserv/maxemail to disregard gmail style aliases when comparing emails
 Fix chanserv/mode when setting listmodes with CIDR ranges
 Fix reported expiry time when the time is divisible by 1 year
-Clearify botserv repeat kicker help and allow setting repeat times to 1
+Clarify botserv repeat kicker help and allow setting repeat times to 1
 Send vident/vhost with SASL login
 Add support for SASL reauth
 Fix log and database backup directories to be properly created by the installer
@@ -255,7 +255,7 @@ Anope Version 1.9.3
 A Added italics BotServ kicks support
 A Tell users when their nicks expire in /ns glist and /ns info
 A Added SSL support
-A Prevent negaitve mode changes, kicks, bans, and autokicks from affecting people with the 'god' user mode (On UnrealIRCd, usermode +q)
+A Prevent negative mode changes, kicks, bans, and autokicks from affecting people with the 'god' user mode (On UnrealIRCd, usermode +q)
 A Added nickserv/auxpex permission
 A Added nickserv ungroup command
 A Renamed the SGLINE to be SNLINE
@@ -267,15 +267,15 @@ A Added m_mysql which uses threads to execute queries
 A Added many subcommand modules for some commands, eg ns_set_autoop, ns_set_email, etc
 A Added a new logging system that is a bit more flexible
 A Added cs_set_misc and ns_set_misc to add miscellaneous set commands
-A Added os_modreload, which allows reloading some modules not normally unloable, like the protocol module
+A Added os_modreload, which allows reloading some modules not normally unloadable, like the protocol module
 A Added FOUNDER access level
 A Made OperServ, Global, MemoServ, and ChanServ optional
 F Shutting down if a config reload fails
 F Autoid to live through restarts on Unreal
 F Storing vhosts in MySQL
-F Not flushing the anope_extra table before rewriting databaes
+F Not flushing the anope_extra table before rewriting database
 F Anoperc start/stop to send the globaloncycle global, and fixed anoperc rehash to really rehash
-F Fixed a potential crash if HostServ or BotServ was disbled
+F Fixed a potential crash if HostServ or BotServ was disabled
 
 Anope Version 1.9.2
 -------------------
@@ -299,7 +299,7 @@ F Unban command to accept an optional nick arg
 F Some typos in services.conf
 F Crash when users change their host that are identified to a group, but not a nick
 F Host length checking in HS SET(ALL) and HS REQUEST
-F Only show if a user is online in NS INFO if they are really identiifed for the group of the nick they are on
+F Only show if a user is online in NS INFO if they are really identified for the group of the nick they are on
 F Crash when using BSSmartJoin
 F Converting access entries to access from xop when a users access is below voice
 F A bad pointer passed to the OnDelEvent which could cause some 3rd party modules to crash

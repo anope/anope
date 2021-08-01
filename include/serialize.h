@@ -46,7 +46,7 @@ namespace Serialize
 	template<typename T> class Reference;
 }
 
-/** A serialziable object. Serializable objects can be serialized into
+/** A serializable object. Serializable objects can be serialized into
  * abstract data types (Serialize::Data), and then reconstructed or
  * updated later at any time.
  */
@@ -105,7 +105,7 @@ class CoreExport Serializable : public virtual Base
 };
 
 /* A serializable type. There should be one of these classes for each type
- * of class that inherits from Serialiable. Used for unserializing objects
+ * of class that inherits from Serializable. Used for unserializing objects
  * of this type, as it requires a function pointer to a static member function.
  */
 class CoreExport Serialize::Type : public Base
@@ -123,7 +123,7 @@ class CoreExport Serialize::Type : public Base
 	 */
 	Module *owner;
 
-	/* The timesatmp for this type. All objects of this type are as up to date as
+	/* The timestamp for this type. All objects of this type are as up to date as
 	 * this timestamp. if curtime == timestamp then we have the most up to date
 	 * version of every object of this type.
 	 */

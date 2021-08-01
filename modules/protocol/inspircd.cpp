@@ -13,6 +13,8 @@
 #include "modules/cs_mode.h"
 #include "modules/sasl.h"
 
+typedef std::map<char, unsigned> ListLimits;
+
 struct SASLUser
 {
 	Anope::string uid;
@@ -54,7 +56,9 @@ class InspIRCdProto : public IRCDProto
 	}
 
  public:
-	InspIRCdProto(Module *creator) : IRCDProto(creator, "InspIRCd 3+")
+	PrimitiveExtensibleItem<ListLimits> maxlist;
+
+	InspIRCdProto(Module *creator) : IRCDProto(creator, "InspIRCd 3+"), maxlist(creator, "maxlist")
 	{
 		DefaultPseudoclientModes = "+I";
 		CanSVSNick = true;
@@ -70,6 +74,20 @@ class InspIRCdProto : public IRCDProto
 		RequiresID = true;
 		MaxModes = 20;
 		MaxLine = 4096;
+	}
+
+	unsigned GetMaxListFor(Channel *c, ChannelMode *cm)
+	{
+		ListLimits *limits = maxlist.Get(c);
+		if (limits)
+		{
+			ListLimits::const_iterator limit = limits->find(cm->mchar);
+			if (limit != limits->end())
+				return limit->second;
+		}
+
+		// Fall back to the config limit if we can't find the mode.
+		return IRCDProto::GetMaxListFor(c, cm);
 	}
 
 	void SendConnect() anope_override
@@ -1322,9 +1340,10 @@ class IRCDMessageMetadata : IRCDMessage
 {
 	const bool &do_topiclock;
 	const bool &do_mlock;
+	PrimitiveExtensibleItem<ListLimits> &maxlist;
 
  public:
-	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock) : IRCDMessage(creator, "METADATA", 3), do_topiclock(handle_topiclock), do_mlock(handle_mlock) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock, PrimitiveExtensibleItem<ListLimits> &listlimits) : IRCDMessage(creator, "METADATA", 3), do_topiclock(handle_topiclock), do_mlock(handle_mlock), maxlist(listlimits) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
 	{
@@ -1334,9 +1353,9 @@ class IRCDMessageMetadata : IRCDMessage
 		if ((params[0][0] == '#') && (params.size() > 3) && (!source.GetServer()->IsSynced()))
 		{
 			Channel *c = Channel::Find(params[0]);
-			if (c && c->ci)
+			if (c)
 			{
-				if ((do_mlock) && (params[2] == "mlock"))
+				if ((c->ci) && (do_mlock) && (params[2] == "mlock"))
 				{
 					ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
 					Anope::string modes;
@@ -1347,12 +1366,23 @@ class IRCDMessageMetadata : IRCDMessage
 					if (modes != params[3])
 						UplinkSocket::Message(Me) << "METADATA " << c->name << " " << c->creation_time << " mlock :" << modes;
 				}
-				else if ((do_topiclock) && (params[2] == "topiclock"))
+				else if ((c->ci) && (do_topiclock) && (params[2] == "topiclock"))
 				{
 					bool mystate = c->ci->HasExt("TOPICLOCK");
 					bool serverstate = (params[3] == "1");
 					if (mystate != serverstate)
 						UplinkSocket::Message(Me) << "METADATA " << c->name << " " << c->creation_time << " topiclock :" << (mystate ? "1" : "");
+				}
+				else if (params[2] == "maxlist")
+				{
+					ListLimits limits;
+					spacesepstream limitstream(params[3]);
+					Anope::string modechr, modelimit;
+					while (limitstream.GetToken(modechr) && limitstream.GetToken(modelimit))
+					{
+						limits.insert(std::make_pair(modechr[0], convertTo<unsigned>(modelimit)));
+					}
+					maxlist.Set(c, limits);
 				}
 			}
 		}
@@ -1862,7 +1892,7 @@ class ProtoInspIRCd : public Module
 		message_part(this), message_privmsg(this), message_quit(this), message_stats(this),
 		message_away(this), message_capab(this), message_encap(this), message_endburst(this), message_fhost(this),
 		message_fident(this), message_fjoin(this), message_fmode(this), message_ftopic(this), message_idle(this),
-		message_ijoin(this), message_kick(this), message_metadata(this, use_server_side_topiclock, use_server_side_mlock),
+		message_ijoin(this), message_kick(this), message_metadata(this, use_server_side_topiclock, use_server_side_mlock, ircd_proto.maxlist),
 		message_mode(this), message_nick(this), message_opertype(this), message_ping(this), message_rsquit(this),
 		message_save(this), message_server(this), message_squit(this), message_time(this), message_uid(this)
 	{

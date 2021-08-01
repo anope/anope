@@ -232,7 +232,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param bi The sender, can be NULL for the service bot for this channel
 	 * @param u The user being kicked
 	 * @param reason The reason for the kick
-	 * @return true if the kick was scucessful, false if a module blocked the kick
+	 * @return true if the kick was successful, false if a module blocked the kick
 	 */
 	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...);
 
@@ -249,7 +249,7 @@ class CoreExport Channel : public Base, public Extensible
 
 	/** Get a string of the modes set on this channel
 	 * @param complete Include mode parameters
-	 * @param plus If set to false (with complete), mode parameters will not be given for modes requring no parameters to be unset
+	 * @param plus If set to false (with complete), mode parameters will not be given for modes requiring no parameters to be unset
 	 * @return A mode string
 	 */
 	Anope::string GetModes(bool complete, bool plus);

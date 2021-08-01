@@ -61,7 +61,7 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	 * @param ident The ident
 	 * @param host The host
 	 * @param creator Who created the vhost
-	 * @param time When the vhost was craated
+	 * @param time When the vhost was created
 	 */
 	void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime);
 
@@ -130,7 +130,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 	 */
 	Serialize::Checker<std::vector<NickAlias *> > aliases;
 
-	/* Set if this user is a services operattor. o->ot must exist. */
+	/* Set if this user is a services operator. o->ot must exist. */
 	Oper *o;
 
 	/* Unsaved data */
@@ -234,7 +234,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 class CoreExport IdentifyRequest
 {
 	/* Owner of this request, used to cleanup requests if a module is unloaded
-	 * while a reqyest us pending */
+	 * while a request us pending */
 	Module *owner;
 	Anope::string account;
 	Anope::string password;
@@ -262,17 +262,17 @@ class CoreExport IdentifyRequest
 	 * for the request to complete. Multiple modules may hold a request at any time,
 	 * but the request is not complete until every module has released it. If you do not
 	 * require holding this (eg, your password check is done in this thread and immediately)
-	 * then you don't need to hold the request before Successing it.
+	 * then you don't need to hold the request before calling `Success()`.
 	 * @param m The module holding this request
 	 */
 	void Hold(Module *m);
 
 	/** Releases a held request
-	 * @param m The module releaseing the hold
+	 * @param m The module releasing the hold
 	 */
 	void Release(Module *m);
 
-	/** Called by modules when this IdentifyRequest has successeded successfully.
+	/** Called by modules when this IdentifyRequest has succeeded.
 	 * If this request is behind held it must still be Released after calling this.
 	 * @param m The module confirming authentication
 	 */

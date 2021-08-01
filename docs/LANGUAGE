@@ -1,4 +1,4 @@
-Anope Mutli Language Support
+Anope Multi Language Support
 ----------------------------
 
 1) Building Anope with gettext support
@@ -36,7 +36,7 @@ Anope Mutli Language Support
 
     NOTE: There is no guarantee we will use your work so please do not be offended if we say no thanks.
 
-3) Using langages with modules
+3) Using languages with modules
 
     Module authors can easily add the ability to have their modules translated by adding _() around the strings they
     want translated (messages to the user, etc).

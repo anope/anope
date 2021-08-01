@@ -313,7 +313,7 @@ void Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "Anope IRC Services (https://www.anope.org/)";
 		Log(LOG_TERMINAL) << "Usage ./" << Anope::ServicesBin << " [options] ...";
 		Log(LOG_TERMINAL) << "-c, --config=filename.conf";
-		Log(LOG_TERMINAL) << "    --confdir=conf file direcory";
+		Log(LOG_TERMINAL) << "    --confdir=conf file directory";
 		Log(LOG_TERMINAL) << "    --dbdir=database directory";
 		Log(LOG_TERMINAL) << "-d, --debug[=level]";
 		Log(LOG_TERMINAL) << "-h, --help";

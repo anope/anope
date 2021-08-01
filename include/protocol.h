@@ -15,8 +15,9 @@
 #include "services.h"
 #include "anope.h"
 #include "service.h"
+#include "modes.h"
 
-/* Encapsultes the IRCd protocol we are speaking. */
+/* Encapsulates the IRCd protocol we are speaking. */
 class CoreExport IRCDProto : public Service
 {
 	Anope::string proto_name;
@@ -54,7 +55,7 @@ class CoreExport IRCDProto : public Service
 	bool CanSNLine;
 	/* Can we ban specific nicknames from being used? */
 	bool CanSQLine;
-	/* Can we ban sepcific channel names from being used? */
+	/* Can we ban specific channel names from being used? */
 	bool CanSQLineChannel;
 	/* Can we ban by IP? */
 	bool CanSZLine;
@@ -237,6 +238,7 @@ class CoreExport IRCDProto : public Service
 	 * Defaults to Config->ListSize
 	 */
 	virtual unsigned GetMaxListFor(Channel *c);
+	virtual unsigned GetMaxListFor(Channel *c, ChannelMode *cm);
 
 	virtual Anope::string NormalizeMask(const Anope::string &mask);
 };

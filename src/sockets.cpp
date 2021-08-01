@@ -332,7 +332,7 @@ bool cidr::operator<(const cidr &other) const
 			if (i || this->cidr_len >= 128)
 				return i < 0;
 
-			// Now all thats left is to compare 'remainig' bits at offset this->cidr_len / 8
+			// Now all thats left is to compare 'remaining' bits at offset this->cidr_len / 8
 			int remaining = this->cidr_len % 8;
 			unsigned char m = 0xFF << (8 - remaining);
 

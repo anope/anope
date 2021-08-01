@@ -24,7 +24,7 @@ using namespace SQL;
  *
  * This module spawns a single thread that is used to execute blocking MySQL queries.
  * When a module requests a query to be executed it is added to a list for the thread
- * (which never stops looping and sleeing) to pick up and execute, the result of which
+ * (which never stops looping and sleeping) to pick up and execute, the result of which
  * is inserted in to another queue to be picked up by the main thread. The main thread
  * uses Pipe to become notified through the socket engine when there are results waiting
  * to be sent back to the modules requesting the query

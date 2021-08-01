@@ -119,7 +119,7 @@ class CommandCSEnforce : public Command
 			if (user->IsProtected())
 				continue;
 
-			if (!user->HasMode("SSL") && !user->HasExt("ssl"))
+			if (!user->IsSecurelyConnected())
 				users.push_back(user);
 		}
 

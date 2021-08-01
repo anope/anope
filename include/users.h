@@ -226,6 +226,11 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	bool IsRecognized(bool check_secure = true) const;
 
+	/** Check if the user is connected securely.
+	 * @return True if the user is connected securely; otherwise, false.
+	 */
+	bool IsSecurelyConnected() const;
+
 	/** Check if the user is a services oper
 	 * @return true if they are an oper
 	 */

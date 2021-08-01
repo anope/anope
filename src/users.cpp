@@ -448,6 +448,11 @@ bool User::IsRecognized(bool check_secure) const
 	return on_access;
 }
 
+bool User::IsSecurelyConnected() const
+{
+	return HasMode("SSL") || HasExt("ssl");
+}
+
 bool User::IsServicesOper()
 {
 	if (!this->nc || !this->nc->IsServicesOper())

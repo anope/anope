@@ -1,11 +1,22 @@
-Anope Version 2.0.10-git
+Anope Version 2.0.10
 --------------------
+Add support for channel SQLines on InspIRCd
+Change default protocol module from inspircd20 to inspircd3
+Change the character set used by chanstats and irc2sql to utf8mb4
+Fix a ton of typos in messages
+Fix being able to override MAXLIST on InspIRCd
+Fix blocking on boot when trying to upgrade SQL databases without account identifiers
+Fix not flushing the ERROR message on squit
+Fix using an invalidated iterator when deleting bots
+Fix various harmless compiler warnings
+Fix webcpanel not using the forwarded IP
+Show the account name in nickserv/info
 
 Anope Version 2.0.9
 -------------------
-Fix a regression from 2.0.8 that prevented serialising to MySQL.
+Fix a regression from 2.0.8 that prevented serialising to MySQL
 Send account identifiers to InspIRCd on SASL logins too
-Fix a query bug in irc2sql.
+Fix a query bug in irc2sql
 
 Anope Version 2.0.8
 -------------------

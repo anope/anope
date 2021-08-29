@@ -60,7 +60,7 @@ class InspIRCd3Proto : public IRCDProto
 
 	InspIRCd3Proto(Module *creator) : IRCDProto(creator, "InspIRCd 3"), maxlist(creator, "maxlist")
 	{
-		DefaultPseudoclientModes = "+I";
+		DefaultPseudoclientModes = "+oI";
 		CanSVSNick = true;
 		CanSVSJoin = true;
 		CanSetVHost = true;
@@ -897,7 +897,7 @@ struct IRCDMessageCapab : Message::Capab
 			Servers::Capab.insert("TOPICLOCK");
 			IRCD->CanSQLineChannel = false;
 			IRCD->CanSVSHold = false;
-			IRCD->DefaultPseudoclientModes = "+I";
+			IRCD->DefaultPseudoclientModes = "+oI";
 		}
 		else if (params[0].equals_cs("CHANMODES") && params.size() > 1)
 		{

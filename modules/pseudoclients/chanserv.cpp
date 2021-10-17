@@ -267,7 +267,7 @@ class ChanServCore : public Module, public ChanServService
 	{
 		if (!params.empty() || source.c || source.service != *ChanServ)
 			return;
-		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
+		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "30d");
 		if (chanserv_expire >= 86400)
 			source.Reply(_(" \n"
 				"Note that any channel which is not used for %d days\n"
@@ -332,7 +332,7 @@ class ChanServCore : public Module, public ChanServService
 
 	void OnExpireTick() anope_override
 	{
-		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
+		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "30d");
 
 		if (!chanserv_expire || Anope::NoExpire || Anope::ReadOnly)
 			return;
@@ -460,7 +460,7 @@ class ChanServCore : public Module, public ChanServService
 		if (!show_all)
 			return;
 
-		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
+		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "30d");
 		if (!ci->HasExt("CS_NO_EXPIRE") && chanserv_expire && !Anope::NoExpire && ci->last_used != Anope::CurTime)
 			info[_("Expires")] = Anope::strftime(ci->last_used + chanserv_expire, source.GetAccount());
 	}

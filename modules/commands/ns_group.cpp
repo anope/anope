@@ -325,7 +325,7 @@ class CommandNSGList : public Command
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
-		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire", "21d"),
+		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire", "90d"),
 		       unconfirmed_expire = Config->GetModule("ns_register")->Get<time_t>("unconfirmedexpire", "1d");
 		for (unsigned i = 0; i < nc->aliases->size(); ++i)
 		{

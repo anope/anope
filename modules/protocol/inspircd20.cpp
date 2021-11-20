@@ -802,7 +802,7 @@ struct IRCDMessageEncap : IRCDMessage
 				return;
 
 			u->SetIdent(params[3]);
-			UplinkSocket::Message(u) << "FIDENT " << params[3];
+			UplinkSocket::Message(u) << "FIDENT :" << params[3];
 		}
 		else if (params[1] == "CHGHOST")
 		{
@@ -811,7 +811,7 @@ struct IRCDMessageEncap : IRCDMessage
 				return;
 
 			u->SetDisplayedHost(params[3]);
-			UplinkSocket::Message(u) << "FHOST " << params[3];
+			UplinkSocket::Message(u) << "FHOST :" << params[3];
 		}
 		else if (params[1] == "CHGNAME")
 		{
@@ -820,7 +820,7 @@ struct IRCDMessageEncap : IRCDMessage
 				return;
 
 			u->SetRealname(params[3]);
-			UplinkSocket::Message(u) << "FNAME " << params[3];
+			UplinkSocket::Message(u) << "FNAME :" << params[3];
 		}
 
 		if (insp12_encap)

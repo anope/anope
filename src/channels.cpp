@@ -912,7 +912,7 @@ bool Channel::CheckKick(User *user)
 		return false;
 
 	if (mask.empty())
-		mask = this->ci->GetIdealBan(user);
+		mask = this->ci ? this->ci->GetIdealBan(user) : "*!*@" + user->GetDisplayedHost();
 	if (reason.empty())
 		reason = Language::Translate(user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
 

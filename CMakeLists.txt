@@ -21,8 +21,6 @@ set(DEFAULT_INCLUDE_DIRS)
 if(CMAKE_COMPILER_IS_GNUCXX)
   if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.2)
     message(FATAL_ERROR "Your compiler is too old to build Anope. Upgrade to GCC 4.2 or newer!")
-  elseif(CMAKE_CXX_COMPILER_ID VERSION_GREATER_EQUAL 6.0)
-    set(CXXFLAGS "${CXXFLAGS} -fno-delete-null-pointer-checks")
   endif()
 endif()
 

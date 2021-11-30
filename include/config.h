@@ -60,7 +60,7 @@ namespace Configuration
 		}
 
 		bool Set(const Anope::string &tag, const Anope::string &value);
-		const item_map* GetItems() const;
+		const item_map &GetItems() const;
 	};
 
 	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const;
@@ -128,6 +128,9 @@ namespace Configuration
 		/* module configuration blocks */
 		std::map<Anope::string, Block *> modules;
 		Anope::map<Anope::string> bots;
+
+		/* Represents a missing tag. */
+		Block EmptyBlock;
 
 		Conf();
 		~Conf();

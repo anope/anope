@@ -33,47 +33,32 @@ const Anope::string &Block::GetName() const
 
 int Block::CountBlock(const Anope::string &bname)
 {
-	if (!this)
-		return 0;
-
 	return blocks.count(bname);
 }
 
 Block* Block::GetBlock(const Anope::string &bname, int num)
 {
-	if (!this)
-		return NULL;
-
 	std::pair<block_map::iterator, block_map::iterator> it = blocks.equal_range(bname);
 
 	for (int i = 0; it.first != it.second; ++it.first, ++i)
 		if (i == num)
 			return &it.first->second;
-	return NULL;
+	return &(Config->EmptyBlock);
 }
 
 bool Block::Set(const Anope::string &tag, const Anope::string &value)
 {
-	if (!this)
-		return false;
-
 	items[tag] = value;
 	return true;
 }
 
-const Block::item_map* Block::GetItems() const
+const Block::item_map& Block::GetItems() const
 {
-	if (this)
-		return &items;
-	else
-		return NULL;
+	return items;
 }
 
 template<> const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const
 {
-	if (!this)
-		return def;
-
 	Anope::map<Anope::string>::const_iterator it = items.find(tag);
 	if (it != items.end())
 		return it->second;
@@ -110,7 +95,7 @@ template<typename T> static void ValidateNotZero(const Anope::string &block, con
 		throw ConfigException("The value for <" + block + ":" + name + "> cannot be zero!");
 }
 
-Conf::Conf() : Block("")
+Conf::Conf() : Block(""), EmptyBlock("")
 {
 	ReadTimeout = 0;
 	UsePrivmsg = DefPrivmsg = false;
@@ -596,7 +581,7 @@ void Conf::Post(Conf *old)
 Block *Conf::GetModule(Module *m)
 {
 	if (!m)
-		return NULL;
+		return &(Config->EmptyBlock);
 
 	return GetModule(m->name);
 }
@@ -648,7 +633,7 @@ Block *Conf::GetCommand(CommandSource &source)
 			return b;
 	}
 
-	return NULL;
+	return &(Config->EmptyBlock);
 }
 
 File::File(const Anope::string &n, bool e) : name(n), executable(e), fp(NULL)

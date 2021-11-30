@@ -57,15 +57,12 @@ class CommandOSConfig : public Command
 			for (unsigned i = 0; !show_blocks[i].empty(); ++i)
 			{
 				Configuration::Block *block = Config->GetBlock(show_blocks[i]);
-				const Configuration::Block::item_map *items = block->GetItems();
-
-				if (!items)
-					continue;
+				const Configuration::Block::item_map &items = block->GetItems();
 
 				ListFormatter lflist(source.GetAccount());
 				lflist.AddColumn(_("Name")).AddColumn(_("Value"));
 
-				for (Configuration::Block::item_map::const_iterator it = items->begin(), it_end = items->end(); it != it_end; ++it)
+				for (Configuration::Block::item_map::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
 				{
 					ListFormatter::ListEntry entry;
 					entry["Name"] = it->first;
@@ -90,15 +87,15 @@ class CommandOSConfig : public Command
 			for (int i = 0; i < Config->CountBlock("module"); ++i)
 			{
 				Configuration::Block *block = Config->GetBlock("module", i);
-				const Configuration::Block::item_map *items = block->GetItems();
+				const Configuration::Block::item_map &items = block->GetItems();
 
-				if (!items || items->size() <= 1)
+				if (items.size() <= 1)
 					continue;
 
 				ListFormatter::ListEntry entry;
 				entry["Module Name"] = block->Get<Anope::string>("name");
 
-				for (Configuration::Block::item_map::const_iterator it = items->begin(), it_end = items->end(); it != it_end; ++it)
+				for (Configuration::Block::item_map::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
 				{
 					entry["Name"] = it->first;
 					entry["Value"] = it->second;

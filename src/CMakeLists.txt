@@ -97,7 +97,7 @@ if(GETTEXT_FOUND)
 endif(GETTEXT_FOUND)
 
 # Get the filename of the Anope executable as it is in on this system
-get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
+set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 # Add the Anope executable to the list of files for CPack to ignore
 add_to_cpack_ignored_files("${SERVICES_BINARY}$" TRUE)

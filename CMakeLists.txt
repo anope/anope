@@ -1,14 +1,5 @@
 # This usage of CMake requires at least version 2.4 (checks are made to determine what to use when certain versions lack functions)
-cmake_minimum_required(VERSION 2.4 FATAL_ERROR)
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-  if(POLICY CMP0026)
-    cmake_policy(SET CMP0026 OLD)
-  endif(POLICY CMP0026)
-  if(POLICY CMP0007)
-    cmake_policy(SET CMP0007 OLD)
-  endif(POLICY CMP0007)
-endif(COMMAND cmake_policy)
+cmake_minimum_required(VERSION 2.4...3.99 FATAL_ERROR)
 
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)
@@ -422,7 +413,6 @@ read_from_file(${Anope_SOURCE_DIR}/src/version.sh "^VERSION_" VERSIONS)
 # Iterate through the strings found
 foreach(VERSION_STR ${VERSIONS})
   string(REGEX REPLACE "^VERSION_([A-Z]+)=\"?([^\"]*)\"?$" "\\1;\\2" VERSION_OUT ${VERSION_STR})
-  # Depends on CMP0007 OLD
   list(LENGTH VERSION_OUT VERSION_LEN)
   list(GET VERSION_OUT 0 VERSION_TYPE)
   if(${VERSION_LEN} GREATER 1)
@@ -488,7 +478,7 @@ add_subdirectory(modules)
 add_subdirectory(include)
 
 # Get the filename of the Anope binary, to use later
-get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
+set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 
 # At install time, create the following additional directories

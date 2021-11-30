@@ -29,7 +29,7 @@ foreach(SRC ${TOOLS_SRCS})
       DESTINATION ${BIN_DIR}
     )
     # Add the executable to the list of files for CPack to ignore
-    get_target_property(EXE_BINARY ${EXE} LOCATION)
+    set(EXE_BINARY "$<TARGET_FILE:${EXE}>")
     get_filename_component(EXE_BINARY ${EXE_BINARY} NAME)
     add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
   endif()

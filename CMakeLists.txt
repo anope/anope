@@ -2,9 +2,6 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
-  if(POLICY CMP0026)
-    cmake_policy(SET CMP0026 OLD)
-  endif()
   if(POLICY CMP0007)
     cmake_policy(SET CMP0007 OLD)
   endif()
@@ -411,7 +408,7 @@ add_subdirectory(modules)
 add_subdirectory(include)
 
 # Get the filename of the Anope binary, to use later
-get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
+set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 
 # At install time, create the following additional directories

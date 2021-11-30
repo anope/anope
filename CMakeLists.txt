@@ -1,11 +1,5 @@
 # This usage of CMake requires at least version 3.8
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-  if(POLICY CMP0007)
-    cmake_policy(SET CMP0007 OLD)
-  endif()
-endif()
 
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)
@@ -342,7 +336,6 @@ file(STRINGS ${Anope_SOURCE_DIR}/src/version.sh VERSIONS REGEX "^VERSION_")
 # Iterate through the strings found
 foreach(VERSION_STR ${VERSIONS})
   string(REGEX REPLACE "^VERSION_([A-Z]+)=\"?([^\"]*)\"?$" "\\1;\\2" VERSION_OUT ${VERSION_STR})
-  # Depends on CMP0007 OLD
   list(LENGTH VERSION_OUT VERSION_LEN)
   list(GET VERSION_OUT 0 VERSION_TYPE)
   if(${VERSION_LEN} GREATER 1)

@@ -355,7 +355,7 @@ NickCore *ChannelInfo::GetSuccessor() const
 
 BotInfo *ChannelInfo::WhoSends() const
 {
-	if (this && this->bi)
+	if (this->bi)
 		return this->bi;
 
 	BotInfo *ChanServ = Config->GetClient("ChanServ");

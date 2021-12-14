@@ -198,9 +198,9 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
   set(LIBRARIES)
   # Check to see if there are any lines matching: /* RequiredLibraries: [something] */
   if(WIN32)
-    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\\\*[ \t]*RequiredWindowsLibraries:[ \t]*.*[ \t]*\\\\*/")
+    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\*[ \t]*RequiredWindowsLibraries:[ \t]*.*[ \t]*\\*/")
   else()
-    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\\\*/")
+    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\*/")
   endif()
   # Iterate through those lines
   foreach(REQUIRED_LIBRARY ${REQUIRED_LIBRARIES})
@@ -267,7 +267,7 @@ macro(check_functions SRC SUCCESS)
   # Default to true
   set(${SUCCESS} TRUE)
   # Check to see if there are any lines matching: /* RequiredFunctions: [something] */
-  file(STRINGS ${SRC} REQUIRED_FUNCTIONS REGEX "/\\\\*[ \t]*RequiredFunctions:[ \t]*.*[ \t]*\\\\*/")
+  file(STRINGS ${SRC} REQUIRED_FUNCTIONS REGEX "/\\*[ \t]*RequiredFunctions:[ \t]*.*[ \t]*\\*/")
   # Iterate through those lines
   foreach(REQUIRED_FUNCTION ${REQUIRED_FUNCTIONS})
     # Strip off the /* RequiredFunctions: and */ from the line

@@ -10863,12 +10863,12 @@ msgstr ""
 #: modules/commands/cs_invite.cpp:76
 #, fuzzy, c-format
 msgid "You have been invited to %s by %s."
-msgstr "Du wurdest zu %seingeladen."
+msgstr "Du wurdest zu %s eingeladen."
 
 #: modules/commands/cs_invite.cpp:81
 #, c-format
 msgid "You have been invited to %s."
-msgstr "Du wurdest zu %seingeladen."
+msgstr "Du wurdest zu %s eingeladen."
 
 #: modules/protocol/ratbox.cpp:137
 #, c-format

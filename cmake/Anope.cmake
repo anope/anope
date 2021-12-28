@@ -460,15 +460,17 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
       endif(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
       # If the library was found, we will add it to the linker flags
       if(FOUND_${LIBRARY}_LIBRARY)
-        # Get the path only of the library, to add it to linker flags
-        get_filename_component(LIBRARY_PATH ${FOUND_${LIBRARY}_LIBRARY} PATH)
         if(MSVC)
           # For Visual Studio, instead of editing the linker flags, we'll add the library to a separate list of extra dependencies
           append_to_list(EXTRA_DEPENDENCIES "${FOUND_${LIBRARY}_LIBRARY}")
         else(MSVC)
-          # For all others, add the library paths and libraries
+          # Get the path only of the library, to add it to library paths.
+          get_filename_component(LIBRARY_PATH ${FOUND_${LIBRARY}_LIBRARY} PATH)
           append_to_list(LIBRARY_PATHS "${LIBRARY_PATH}")
-          append_to_list(LIBRARIES "${LIBRARY}")
+          # Extract the library short name, add it to the library path
+          get_filename_component(LIBRARY_NAME ${FOUND_${LIBRARY}_LIBRARY} NAME_WE)
+          string(REGEX REPLACE "^lib" "" LIBRARY_NAME ${LIBRARY_NAME})
+          append_to_list(LIBRARIES ${LIBRARY_NAME})
         endif(MSVC)
       else(FOUND_${LIBRARY}_LIBRARY)
         # In the case of the library not being found, we fatally error so CMake stops trying to generate

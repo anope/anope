@@ -9,8 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/* RequiredLibraries: ldap_r,lber */
-/* RequiredWindowsLibraries: libldap_r,liblber */
+/* RequiredLibraries: ldap_r|ldap,lber */
+/* RequiredWindowsLibraries: libldap_r|libldap,liblber */
 
 #include "module.h"
 #include "modules/ldap.h"

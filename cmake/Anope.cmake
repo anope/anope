@@ -445,12 +445,18 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
     string(REGEX REPLACE "," ";" REQUIRED_LIBRARY ${REQUIRED_LIBRARY})
     # Iterate through the libraries given
     foreach(LIBRARY ${REQUIRED_LIBRARY})
+      # If the library has multiple names extract the alternate.
+      unset(LIBRARY_ALT)
+      if (${LIBRARY} MATCHES "^.+\\|.+$")
+        string(REGEX REPLACE ".+\\|(.*)" "\\1" LIBRARY_ALT ${LIBRARY})
+        string(REGEX REPLACE "(.+)\\|.*" "\\1" LIBRARY ${LIBRARY})
+      endif(${LIBRARY} MATCHES "^.+\\|.+$")
       # Locate the library to see if it exists
       if(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
-        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} PATHS ${DEFAULT_LIBRARY_DIRS} ${WSDK_PATH}/lib $ENV{VCINSTALLDIR}/lib ${EXTRA_INCLUDE} ${EXTRA_LIBS})
+        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} ${LIBRARY_ALT} PATHS ${DEFAULT_LIBRARY_DIRS} ${WSDK_PATH}/lib $ENV{VCINSTALLDIR}/lib ${EXTRA_INCLUDE} ${EXTRA_LIBS})
       else(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
-        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} PATHS ${EXTRA_INCLUDE} ${EXTRA_LIBS} NO_DEFAULT_PATH)
-        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} PATHS ${EXTRA_INCLUDE} ${EXTRA_LIBS})
+        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} ${LIBRARY_ALT} PATHS ${EXTRA_INCLUDE} ${EXTRA_LIBS} NO_DEFAULT_PATH)
+        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} ${LIBRARY_ALT} PATHS ${EXTRA_INCLUDE} ${EXTRA_LIBS})
       endif(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
       # If the library was found, we will add it to the linker flags
       if(FOUND_${LIBRARY}_LIBRARY)

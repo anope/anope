@@ -16,6 +16,11 @@
 #include "modules/ldap.h"
 #include <ldap.h>
 
+#if defined LDAP_API_FEATURE_X_OPENLDAP_REENTRANT && !LDAP_API_FEATURE_X_OPENLDAP_REENTRANT
+# error Anope requires OpenLDAP to be built as reentrant.
+#endif
+
+
 class LDAPService;
 static Pipe *me;
 

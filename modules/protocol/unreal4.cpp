@@ -799,6 +799,42 @@ struct IRCDMessageCapab : Message::Capab
 			{
 				UplinkSID = capab.substr(4);
 			}
+			else if (!capab.find("PREFIX=")) /* PREFIX=(qaohv)~&@%+ */
+			{
+				Anope::string modes(capab.begin() + 7, capab.end());
+				reverse(modes.begin(), modes.end()); /* +%@&!)vhoaq( */
+				std::size_t mode_count = modes.find(')');
+				Anope::string mode_prefixes = modes.substr(0, mode_count);
+				Anope::string mode_chars = modes.substr(mode_count+1, mode_count);
+				
+				for (size_t t = 0, end = mode_chars.length(); t < end; ++t)
+				{
+					Anope::string mode_name;
+					switch (mode_chars[t])
+					{
+
+						case 'v':
+							mode_name = "VOICE";
+							break;
+						case 'h':
+							mode_name = "HALFOP";
+							break;
+						case 'o':
+							mode_name = "OP";
+							break;
+						case 'a':
+							mode_name = "PROTECT";
+							break;
+						case 'q':
+							mode_name = "OWNER";
+							break;
+						default:
+							mode_name = "";
+							break;
+					}
+					ModeManager::AddChannelMode(new ChannelModeStatus(mode_name, mode_chars[t], mode_prefixes[t], t));
+				}
+			}
 		}
 
 		Message::Capab::Run(source, params);
@@ -1373,13 +1409,6 @@ class ProtoUnreal : public Module
 
 	void AddModes()
 	{
-		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
-		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
-		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));
-		/* Unreal sends +q as * and +a as ~ */
-		ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT", 'a', '~', 3));
-		ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '*', 4));
-
 		/* Add user modes */
 		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
 		ModeManager::AddUserMode(new UserMode("CENSOR", 'G'));

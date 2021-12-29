@@ -646,7 +646,76 @@ struct IRCDMessageCapab : Message::Capab
 		{
 			Anope::string capab = params[i];
 
-			if (capab.find("CHANMODES") != Anope::string::npos)
+			if (capab.find("USERMODES=") != Anope::string::npos)
+			{
+				Anope::string modebuf(capab.begin() + 10, capab.end());
+				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
+				{
+					switch (modebuf[t])
+					{
+						case 'B':
+							ModeManager::AddUserMode(new UserMode("BOT", 'B'));
+							continue;
+						case 'G':
+							ModeManager::AddUserMode(new UserMode("CENSOR", 'G'));
+							continue;
+						case 'H':
+							ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
+							continue;
+						case 'I':
+							ModeManager::AddUserMode(new UserModeOperOnly("HIDEIDLE", 'I'));
+							continue;
+						case 'R':
+							ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
+							continue;
+						case 'S':
+							ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", 'S'));
+							continue;
+						case 'T':
+							ModeManager::AddUserMode(new UserMode("NOCTCP", 'T'));
+							continue;
+						case 'W':
+							ModeManager::AddUserMode(new UserModeOperOnly("WHOIS", 'W'));
+							continue;
+						case 'd':
+							ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
+							continue;
+						case 'i':
+							ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
+							continue;
+						case 'o':
+							ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
+							continue;
+						case 'p':
+							ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
+							continue;
+						case 'q':
+							ModeManager::AddUserMode(new UserModeOperOnly("GOD", 'q'));
+							continue;
+						case 'r':
+							ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
+							continue;
+						case 's':
+							ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
+							continue;
+						case 't':
+							ModeManager::AddUserMode(new UserModeNoone("VHOST", 't'));
+							continue;
+						case 'w':
+							ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
+							continue;
+						case 'x':
+							ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
+							continue;
+						case 'z':
+							ModeManager::AddUserMode(new UserModeNoone("SSL", 'z'));
+							continue;
+						default:
+							ModeManager::AddUserMode(new UserMode("", modebuf[t]));
+					}
+				}
+			}
+			else if (capab.find("CHANMODES=") != Anope::string::npos)
 			{
 				Anope::string modes(capab.begin() + 10, capab.end());
 				commasepstream sep(modes);
@@ -1409,30 +1478,6 @@ class ProtoUnreal : public Module
 
 	bool use_server_side_mlock;
 
-	void AddModes()
-	{
-		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
-		ModeManager::AddUserMode(new UserMode("CENSOR", 'G'));
-		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
-		ModeManager::AddUserMode(new UserModeOperOnly("HIDEIDLE", 'I'));
-		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", 'S'));
-		ModeManager::AddUserMode(new UserMode("NOCTCP", 'T'));
-		ModeManager::AddUserMode(new UserModeOperOnly("WHOIS", 'W'));
-		ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
-		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
-		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
-		ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
-		ModeManager::AddUserMode(new UserModeOperOnly("GOD", 'q'));
-		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
-		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
-		ModeManager::AddUserMode(new UserModeNoone("VHOST", 't'));
-		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
-		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
-		ModeManager::AddUserMode(new UserModeNoone("SSL", 'z'));
-	}
-
  public:
 	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
@@ -1447,7 +1492,6 @@ class ProtoUnreal : public Module
 		message_sid(this), message_sjoin(this), message_topic(this), message_uid(this), message_umode2(this)
 	{
 
-		this->AddModes();
 	}
 
 	void Prioritize() anope_override

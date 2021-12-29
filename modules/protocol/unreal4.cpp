@@ -623,6 +623,45 @@ class ChannelModeFlood : public ChannelModeParam
 	}
 };
 
+class ChannelModeHistory : public ChannelModeParam /* stolen from inspircd3's ColonDelimitedParamMode */
+{
+ public:
+	ChannelModeHistory(char modeChar) : ChannelModeParam("HISTORY", modeChar, true) { }
+
+	bool IsValid(Anope::string &value) const anope_override
+	{
+		if (value.empty())
+			return false; // empty param is never valid
+
+		Anope::string::size_type pos = value.find(':');
+		if ((pos == Anope::string::npos) || (pos == 0))
+			return false; // no ':' or it's the first char, both are invalid
+
+		Anope::string rest;
+		try
+		{
+			if (convertTo<int>(value, rest, false) <= 0)
+				return false; // negative numbers and zero are invalid
+
+			rest = rest.substr(1);
+			int n;
+			// The part after the ':' is a duration and it
+			// can be in the user friendly "1d3h20m" format, make sure we accept that
+			n = Anope::DoTime(rest);
+
+			if (n <= 0)
+				return false;
+		}
+		catch (const ConvertException &e)
+		{
+			// conversion error, invalid
+			return false;
+		}
+
+		return true;
+	}
+};
+
 class ChannelModeUnrealSSL : public ChannelMode
 {
  public:

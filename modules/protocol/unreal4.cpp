@@ -708,6 +708,8 @@ struct IRCDMessageCapab : Message::Capab
 						case 'l':
 							ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
 							continue;
+						case 'H':
+							ModeManager::AddChannelMode(new ChannelModeHistory('H'));
 						default:
 							ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t], true));
 					}
@@ -1417,11 +1419,8 @@ class ProtoUnreal : public Module
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", 'S'));
 		ModeManager::AddUserMode(new UserMode("NOCTCP", 'T'));
-		ModeManager::AddUserMode(new UserMode("WEBTV", 'V'));
 		ModeManager::AddUserMode(new UserModeOperOnly("WHOIS", 'W'));
 		ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
-		ModeManager::AddUserMode(new UserModeOperOnly("GLOBOPS", 'g'));
-		ModeManager::AddUserMode(new UserModeOperOnly("HELPOP", 'h'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
 		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
 		ModeManager::AddUserMode(new UserMode("PRIV", 'p'));

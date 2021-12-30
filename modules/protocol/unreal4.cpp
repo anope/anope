@@ -1278,6 +1278,19 @@ struct IRCDMessageSID : IRCDMessage
 	}
 };
 
+static char UnrealSjoinPrefixToModeChar(char sjoin_prefix)
+{
+	switch(sjoin_prefix)
+	{
+		case '*':
+			return ModeManager::GetStatusChar('~');
+		case '~':
+			return ModeManager::GetStatusChar('&');
+		default:
+			return ModeManager::GetStatusChar(sjoin_prefix); /* remaining are regular */
+	}
+}
+
 struct IRCDMessageSJoin : IRCDMessage
 {
 	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1321,7 +1334,7 @@ struct IRCDMessageSJoin : IRCDMessage
 				Message::Join::SJoinUser sju;
 
 				/* Get prefixes from the nick */
-				for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
+				for (char ch; (ch = UnrealSjoinPrefixToModeChar(buf[0]));)
 				{
 					sju.first.AddMode(ch);
 					buf.erase(buf.begin());

@@ -824,6 +824,7 @@ struct IRCDMessageCapab : Message::Capab
 							continue;
 						case 'H':
 							ModeManager::AddChannelMode(new ChannelModeHistory('H'));
+							continue;
 						default:
 							ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t], true));
 					}

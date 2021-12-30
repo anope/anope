@@ -719,6 +719,9 @@ struct IRCDMessageCapab : Message::Capab
 						case 'd':
 							ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
 							continue;
+						case 'D':
+							ModeManager::AddUserMode(new UserMode("PRIVDEAF", 'D'));
+							continue;
 						case 'i':
 							ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
 							continue;
@@ -748,6 +751,9 @@ struct IRCDMessageCapab : Message::Capab
 							continue;
 						case 'z':
 							ModeManager::AddUserMode(new UserModeNoone("SSL", 'z'));
+							continue;
+						case 'Z':
+							ModeManager::AddUserMode(new UserMode("SSLPRIV", 'Z'));
 							continue;
 						default:
 							ModeManager::AddUserMode(new UserMode("", modebuf[t]));
@@ -889,7 +895,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelMode("CENSOR", 'G'));
 							continue;
 						case 'Z':
-							ModeManager::AddChannelMode(new ChannelModeUnrealSSL("", 'Z'));
+							ModeManager::AddChannelMode(new ChannelModeUnrealSSL("ALLSSL", 'Z'));
 							continue;
 						case 'd':
 							// post delayed. means that channel is -D but invisible users still exist.
@@ -898,7 +904,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelMode("DELAYEDJOIN", 'D'));
 							continue;
 						case 'P':
-							ModeManager::AddChannelMode(new ChannelMode("PERM", 'P'));
+							ModeManager::AddChannelMode(new ChannelModeOperOnly("PERM", 'P'));
 							continue;
 						default:
 							ModeManager::AddChannelMode(new ChannelMode("", modebuf[t]));

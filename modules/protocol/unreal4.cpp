@@ -226,7 +226,7 @@ class UnrealIRCdProto : public IRCDProto
 		   SID    = SID/UID mode
 		*/
 		UplinkSocket::Message() << "PASS :" << Config->Uplinks[Anope::CurrentUplink].password;
-		UplinkSocket::Message() << "PROTOCTL " << "NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT MLOCK SID";
+		UplinkSocket::Message() << "PROTOCTL " << "NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT MLOCK SID MTAGS";
 		UplinkSocket::Message() << "PROTOCTL " << "EAUTH=" << Me->GetName() << ",,,Anope-" << Anope::VersionShort();
 		UplinkSocket::Message() << "PROTOCTL " << "SID=" << Me->GetSID();
 		SendServer(Me);

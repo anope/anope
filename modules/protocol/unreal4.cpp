@@ -570,6 +570,23 @@ namespace UnrealExtban
 			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, real_mask);
 		}
 	};
+	
+	class TimedBanMatcher : public UnrealExtBan
+	{
+	 public:
+	 	TimedBanMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
+		
+		bool Matches(User *u, const Entry *e) anope_override
+		{
+			/* strip down the time (~t:1234:) and call other matchers */
+			const Anope::string &mask = e->GetMask();
+			Anope::string real_mask = mask.substr(3);
+			real_mask = real_mask.substr(real_mask.find(":") + 1);
+			return Entry("BAN", real_mask).Matches(u);
+		}
+	};
 }
 
 class ChannelModeFlood : public ChannelModeParam
@@ -782,6 +799,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new UnrealExtban::RegisteredMatcher("REGISTEREDBAN", "BAN", 'R'));
 							ModeManager::AddChannelMode(new UnrealExtban::AccountMatcher("ACCOUNTBAN", "BAN", 'a'));
 							ModeManager::AddChannelMode(new UnrealExtban::FingerprintMatcher("SSLBAN", "BAN", 'S'));
+							ModeManager::AddChannelMode(new UnrealExtban::TimedBanMatcher("TIMEDBAN", "BAN", 't'));
 							// also has O for opertype extban, but it doesn't send us users opertypes
 							continue;
 						case 'e':

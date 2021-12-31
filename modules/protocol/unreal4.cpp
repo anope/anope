@@ -569,6 +569,22 @@ namespace UnrealExtban
 		}
 	};
 	
+	class OperclassMatcher : public UnrealExtBan
+	{
+	 public:
+	 	OperclassMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
+		
+		bool Matches(User *u, const Entry *e) anope_override
+		{
+			const Anope::string &mask = e->GetMask();
+			Anope::string real_mask = mask.substr(3);
+			Anope::string *operclass = u->GetExt<Anope::string>("operclass");
+			return operclass && !operclass->empty() && Anope::Match(*operclass, real_mask);
+		}
+	};
+	
 	class TimedBanMatcher : public UnrealExtBan
 	{
 	 public:
@@ -798,7 +814,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new UnrealExtban::AccountMatcher("ACCOUNTBAN", "BAN", 'a'));
 							ModeManager::AddChannelMode(new UnrealExtban::FingerprintMatcher("SSLBAN", "BAN", 'S'));
 							ModeManager::AddChannelMode(new UnrealExtban::TimedBanMatcher("TIMEDBAN", "BAN", 't'));
-							// also has O for opertype extban, but it doesn't send us users opertypes
+							ModeManager::AddChannelMode(new UnrealExtban::OperclassMatcher("OPERCLASSBAN", "BAN", 'O'));
 							continue;
 						case 'e':
 							ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
@@ -1033,6 +1049,13 @@ struct IRCDMessageMD : IRCDMessage
 				u->Extend<bool>("ssl");
 				u->fingerprint = value;
 				FOREACH_MOD(OnFingerprint, (u));
+			}
+			else if (var == "operclass")
+			{
+				if (value.empty())
+					u->Shrink<Anope::string>("operclass");
+				else
+					u->Extend<Anope::string>("operclass", value);
 			}
 		}
 	}

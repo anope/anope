@@ -13,12 +13,16 @@
 #include "modules/cs_mode.h"
 #include "modules/sasl.h"
 
+typedef std::map<Anope::string, Anope::string> ModData;
 static Anope::string UplinkSID;
 
 class UnrealIRCdProto : public IRCDProto
 {
  public:
-	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4+")
+	PrimitiveExtensibleItem<ModData> ClientModData;
+	PrimitiveExtensibleItem<ModData> ChannelModData;
+
+	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4+"), ClientModData(creator, "ClientModData"), ChannelModData(creator, "ChannelModData")
 	{
 		DefaultPseudoclientModes = "+Soiq";
 		CanSVSNick = true;
@@ -580,8 +584,8 @@ namespace UnrealExtban
 		{
 			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(3);
-			Anope::string *operclass = u->GetExt<Anope::string>("operclass");
-			return operclass && !operclass->empty() && Anope::Match(*operclass, real_mask);
+			ModData *moddata = u->GetExt<ModData>("ClientModData");
+			return moddata != NULL && moddata->find("operclass") != moddata->end() && Anope::Match((*moddata)["operclass"], real_mask);
 		}
 	};
 	
@@ -1028,7 +1032,13 @@ struct IRCDMessageChgName : IRCDMessage
 
 struct IRCDMessageMD : IRCDMessage
 {
-	IRCDMessageMD(Module *creator) : IRCDMessage(creator, "MD", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	PrimitiveExtensibleItem<ModData> &ClientModData;
+	PrimitiveExtensibleItem<ModData> &ChannelModData;
+
+	IRCDMessageMD(Module *creator, PrimitiveExtensibleItem<ModData> &clmoddata, PrimitiveExtensibleItem<ModData> &chmoddata) : IRCDMessage(creator, "MD", 3), ClientModData(clmoddata), ChannelModData(chmoddata)
+	{
+		SetFlag(IRCDMESSAGE_SOFT_LIMIT);
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -1037,25 +1047,50 @@ struct IRCDMessageMD : IRCDMessage
 				    &var = params[2],
 				    &value = params.size() > 3 ? params[3] : "";
 
-		if (mdtype == "client")
+		if (mdtype == "client") /* can be a server too! */
 		{
 			User *u = User::Find(obj);
 
 			if (u == NULL)
 				return;
-
+			
+			ModData &clientmd = *ClientModData.Require(u);
+			
+			if (value.empty())
+			{
+				clientmd.erase(var);
+				Log(LOG_DEBUG) << "Erased client moddata " << var << " from " << u->nick;
+			}
+			else
+			{
+				clientmd[var] = value;
+				Log(LOG_DEBUG) << "Set client moddata " << var << "=\"" << value << "\" to " << u->nick;
+			}
 			if (var == "certfp" && !value.empty())
 			{
 				u->Extend<bool>("ssl");
 				u->fingerprint = value;
 				FOREACH_MOD(OnFingerprint, (u));
 			}
-			else if (var == "operclass")
+		}
+		else if (mdtype == "channel")
+		{
+			Channel *c = Channel::Find(obj);
+
+			if (c == NULL)
+				return;
+			
+			ModData &channelmd = *ChannelModData.Require(c);
+			
+			if (value.empty())
 			{
-				if (value.empty())
-					u->Shrink<Anope::string>("operclass");
-				else
-					u->Extend<Anope::string>("operclass", value);
+				channelmd.erase(var);
+				Log(LOG_DEBUG) << "Erased channel moddata " << var << " from " << c->name;
+			}
+			else
+			{
+				channelmd[var] = value;
+				Log(LOG_DEBUG) << "Set channel moddata " << var << "=\"" << value << "\" to " << c->name;
 			}
 		}
 	}
@@ -1584,7 +1619,8 @@ class ProtoUnreal : public Module
 		message_privmsg(this), message_quit(this), message_squit(this), message_stats(this), message_time(this),
 		message_version(this), message_whois(this),
 
-		message_capab(this), message_chghost(this), message_chgident(this), message_chgname(this), message_md(this), message_mode(this, "MODE"),
+		message_capab(this), message_chghost(this), message_chgident(this), message_chgname(this),
+		message_md(this, ircd_proto.ClientModData, ircd_proto.ChannelModData),message_mode(this, "MODE"),
 		message_svsmode(this, "SVSMODE"), message_svs2mode(this, "SVS2MODE"), message_netinfo(this), message_nick(this), message_pong(this),
 		message_sasl(this), message_sdesc(this), message_sethost(this), message_setident(this), message_setname(this), message_server(this),
 		message_sid(this), message_sjoin(this), message_topic(this), message_uid(this), message_umode2(this)

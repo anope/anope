@@ -16,6 +16,14 @@
 typedef std::map<Anope::string, Anope::string> ModData;
 static Anope::string UplinkSID;
 
+class pipesepstream : public sepstream
+{
+ public:
+	/** Initialize with separator
+	 */
+	pipesepstream(const Anope::string &source, bool allowempty = false) : sepstream(source, '|', allowempty) { }
+};
+
 class UnrealIRCdProto : public IRCDProto
 {
  public:
@@ -608,6 +616,33 @@ namespace UnrealExtban
 			return Entry("BAN", real_mask).Matches(u);
 		}
 	};
+
+	class CountryMatcher : public UnrealExtBan
+	{
+	 public:
+	 	CountryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
+		
+		bool Matches(User *u, const Entry *e) anope_override
+		{
+			const Anope::string &mask = e->GetMask();
+			Anope::string real_mask = mask.substr(3);
+			ModData *moddata = u->GetExt<ModData>("ClientModData");
+			if (moddata == NULL || moddata->find("geoip") == moddata->end())
+				return false;
+
+			pipesepstream sep((*moddata)["geoip"]); /* "cc=PL|cd=Poland" */
+			Anope::string tokenbuf;
+			while (sep.GetToken(tokenbuf))
+			{
+				if (tokenbuf.rfind("cc=", 0) == 0)
+					return (tokenbuf.substr(3, 2) == real_mask);
+			}
+			return false;
+		}
+	};
+	
 }
 
 class ChannelModeFlood : public ChannelModeParam
@@ -822,6 +857,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new UnrealExtban::FingerprintMatcher("SSLBAN", "BAN", 'S'));
 							ModeManager::AddChannelMode(new UnrealExtban::TimedBanMatcher("TIMEDBAN", "BAN", 't'));
 							ModeManager::AddChannelMode(new UnrealExtban::OperclassMatcher("OPERCLASSBAN", "BAN", 'O'));
+							ModeManager::AddChannelMode(new UnrealExtban::CountryMatcher("COUNTRYBAN", "BAN", 'C'));
 							continue;
 						case 'e':
 							ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));

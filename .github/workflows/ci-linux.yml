@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       CXX: ${{ matrix.compiler }}
-      CXXFLAGS: -std=${{ matrix.standard }}
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
@@ -46,6 +45,3 @@ jobs:
         compiler:
           - clang++
           - g++
-        standard:
-          - c++98
-          - c++17

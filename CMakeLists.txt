@@ -17,12 +17,10 @@ set(ENV{LC_ALL} C)
 set(DEFAULT_LIBRARY_DIRS)
 set(DEFAULT_INCLUDE_DIRS)
 
-# Check that we aren't running on an ancient broken GCC
-if(CMAKE_COMPILER_IS_GNUCXX)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.2)
-    message(FATAL_ERROR "Your compiler is too old to build Anope. Upgrade to GCC 4.2 or newer!")
-  endif()
-endif()
+# We require C++17 to build
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # If we are using a GNU compiler (have to use CXX because it seems to fail on C), we will be able to determine it's default paths for libraries and includes
 if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang$")
@@ -193,9 +191,9 @@ else()
   set(CXXFLAGS "${CXXFLAGS} -Wall -Wshadow")
   # If on a *nix system, also set the compile flags to remove GNU extensions (favor ISO C++) as well as reject non-ISO C++ code, also remove all leading underscores in exported symbols (only on GNU compiler)
   if(UNIX)
-    set(CXXFLAGS "${CXXFLAGS} -ansi -pedantic ${CMAKE_CXX_FLAGS}")
+    set(CXXFLAGS "${CXXFLAGS} -pedantic ${CMAKE_CXX_FLAGS}")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      set(CXXFLAGS "${CXXFLAGS} -Wno-long-long -fno-leading-underscore")
+      set(CXXFLAGS "${CXXFLAGS} -fno-leading-underscore")
     endif()
   # If we aren't on a *nix system, we are using MinGW
   else()

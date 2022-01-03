@@ -126,7 +126,7 @@ class SocketException : public CoreException
 	/** Destructor
 	 * @throws Nothing
 	 */
-	virtual ~SocketException() throw() { }
+	virtual ~SocketException() throw() = default;
 };
 
 enum SocketFlag
@@ -144,7 +144,7 @@ enum SocketFlag
 class CoreExport SocketIO
 {
  public:
-	virtual ~SocketIO() { }
+	virtual ~SocketIO() = default;
 
 	/** Receive something from the buffer
 	 * @param s The socket
@@ -285,8 +285,7 @@ class CoreExport BufferedSocket : public virtual Socket
 	int recv_len;
 
  public:
-	BufferedSocket();
-	virtual ~BufferedSocket();
+	virtual ~BufferedSocket() = default;
 
 	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
@@ -339,8 +338,7 @@ class CoreExport BinarySocket : public virtual Socket
 	std::deque<DataBlock *> write_buffer;
 
  public:
-	BinarySocket();
-	virtual ~BinarySocket();
+	virtual ~BinarySocket() = default;
 
 	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
@@ -377,7 +375,7 @@ class CoreExport ListenSocket : public virtual Socket
 	 * @param ipv6 true for ipv6
 	 */
 	ListenSocket(const Anope::string &bindip, int port, bool ipv6);
-	virtual ~ListenSocket();
+	virtual ~ListenSocket() = default;
 
 	/** Process what has come in from the connection
 	 * @return false to destroy this socket

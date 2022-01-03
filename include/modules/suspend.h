@@ -14,6 +14,6 @@ struct SuspendInfo
 	Anope::string what, by, reason;
 	time_t when, expires;
 
-	SuspendInfo() { }
-	virtual ~SuspendInfo() { }
+	SuspendInfo() = default;
+	virtual ~SuspendInfo() = default;
 };

@@ -90,10 +90,6 @@ NumberList::NumberList(const Anope::string &list, bool descending) : desc(descen
 	} while (sep.GetToken(token));
 }
 
-NumberList::~NumberList()
-{
-}
-
 void NumberList::Process()
 {
 	if (!is_valid)

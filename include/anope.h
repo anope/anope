@@ -665,7 +665,7 @@ class CoreException : public std::exception
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~CoreException() throw() { }
+	virtual ~CoreException() throw() = default;
 	/** Returns the reason for the exception.
 	 * The module should probably put something informative here as the user will see this upon failure.
 	 */
@@ -694,7 +694,7 @@ class ModuleException : public CoreException
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~ModuleException() throw() { }
+	virtual ~ModuleException() throw() = default;
 };
 
 class ConvertException : public CoreException
@@ -702,7 +702,7 @@ class ConvertException : public CoreException
  public:
 	ConvertException(const Anope::string &reason = "") : CoreException(reason) { }
 
-	virtual ~ConvertException() throw() { }
+	virtual ~ConvertException() throw() = default;
 };
 
 /** Convert something to a string

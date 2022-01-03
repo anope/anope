@@ -13,9 +13,9 @@ struct EntryMsg
 	Anope::string message;
 	time_t when;
 
-	virtual ~EntryMsg() { }
+	virtual ~EntryMsg() = default;
  protected:
-	EntryMsg() { }
+	EntryMsg() = default;
 };
 
 struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >

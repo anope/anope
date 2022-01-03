@@ -27,7 +27,7 @@ class CoreExport Thread : public Pipe, public Extensible
 
 	/** Threads destructor
 	 */
-	virtual ~Thread();
+	virtual ~Thread() = default;
 
 	/** Join to the thread, sets the exit state to true
 	 */

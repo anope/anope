@@ -21,7 +21,7 @@ class RegexException : public CoreException
  public:
 	RegexException(const Anope::string &reason = "") : CoreException(reason) { }
 
-	virtual ~RegexException() throw() { }
+	virtual ~RegexException() throw() = default;
 };
 
 class CoreExport Regex
@@ -30,7 +30,7 @@ class CoreExport Regex
  protected:
 	Regex(const Anope::string &expr) : expression(expr) { }
  public:
-	virtual ~Regex() { }
+	virtual ~Regex() = default;
 	const Anope::string &GetExpression() { return expression; }
 	virtual bool Matches(const Anope::string &str) = 0;
 };

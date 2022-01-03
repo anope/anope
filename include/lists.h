@@ -39,7 +39,7 @@ class CoreExport NumberList
 
 	/** Destructor, does nothing
 	 */
-	virtual ~NumberList();
+	virtual ~NumberList() = default;
 
 	/** Should be called after the constructors are done running. This calls the callbacks.
 	 */

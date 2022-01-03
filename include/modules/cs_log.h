@@ -22,9 +22,9 @@ struct LogSetting
 	Anope::string creator;
 	time_t created;
 
-	virtual ~LogSetting() { }
+	virtual ~LogSetting() = default;
  protected:
-	LogSetting() { }
+	LogSetting() = default;
 };
 
 struct LogSettings : Serialize::Checker<std::vector<LogSetting *> >
@@ -37,6 +37,6 @@ struct LogSettings : Serialize::Checker<std::vector<LogSetting *> >
 	}
 
  public:
-	virtual ~LogSettings() { }
+	virtual ~LogSettings() = default;
 	virtual LogSetting *Create() = 0;
 };

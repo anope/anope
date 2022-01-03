@@ -82,7 +82,7 @@ namespace SQL
 	 public:
 		Exception(const Anope::string &reason) : ModuleException(reason) { }
 
-		virtual ~Exception() throw() { }
+		virtual ~Exception() throw() = default;
 	};
 
 	/** A SQL query
@@ -187,7 +187,7 @@ namespace SQL
 		Module *owner;
 
 		Interface(Module *m) : owner(m) { }
-		virtual ~Interface() { }
+		virtual ~Interface() = default;
 
 		virtual void OnResult(const Result &r) = 0;
 		virtual void OnError(const Result &r) = 0;

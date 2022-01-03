@@ -27,7 +27,7 @@ struct ForbidData
 	time_t expires = 0;
 	ForbidType type;
 
-	virtual ~ForbidData() { }
+	virtual ~ForbidData() = default;
  protected:
 	ForbidData() = default;
 };

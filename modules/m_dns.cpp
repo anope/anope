@@ -453,7 +453,7 @@ namespace DNS
 	class ReplySocket : public virtual Socket
 	{
 	 public:
-		virtual ~ReplySocket() { }
+		virtual ~ReplySocket() = default;
 		virtual void Reply(Packet *p) = 0;
 	};
 }

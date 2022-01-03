@@ -56,10 +56,6 @@ struct StackerInfo
 	void AddMode(Mode *mode, bool set, const Anope::string &param);
 };
 
-ChannelStatus::ChannelStatus()
-{
-}
-
 ChannelStatus::ChannelStatus(const Anope::string &m) : modes(m)
 {
 }
@@ -113,10 +109,6 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 }
 
 Mode::Mode(const Anope::string &mname, ModeClass mcl, char mch, ModeType mt) : name(mname), mclass(mcl), mchar(mch), type(mt)
-{
-}
-
-Mode::~Mode()
 {
 }
 

@@ -30,14 +30,14 @@ struct BadWord
 	Anope::string word;
 	BadWordType type;
 
-	virtual ~BadWord() { }
+	virtual ~BadWord() = default;
  protected:
-	BadWord() { }
+	BadWord() = default;
 };
 
 struct BadWords
 {
-	virtual ~BadWords() { }
+	virtual ~BadWords() = default;
 
 	/** Add a badword to the badword list
 	 * @param word The badword

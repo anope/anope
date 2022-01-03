@@ -12,9 +12,9 @@
 struct NSCertList
 {
  protected:
-	NSCertList() { }
+	NSCertList() = default;
  public:
-	virtual ~NSCertList() { }
+	virtual ~NSCertList() = default;
 
 	/** Add an entry to the nick's certificate list
 	 *

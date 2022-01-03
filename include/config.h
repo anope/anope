@@ -178,7 +178,7 @@ class ConfigException : public CoreException
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~ConfigException() throw() { }
+	virtual ~ConfigException() throw() = default;
 };
 
 extern Configuration::File ServicesConf;

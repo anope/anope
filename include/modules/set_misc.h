@@ -12,6 +12,7 @@ struct MiscData
 	Anope::string name;
 	Anope::string data;
 
-	MiscData() { }
-	virtual ~MiscData() { }
+	virtual ~MiscData() = default;
+ protected:
+	MiscData() = default;
 };

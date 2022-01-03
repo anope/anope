@@ -28,7 +28,7 @@ namespace Serialize
 			DT_INT
 		};
 
-		virtual ~Data() { }
+		virtual ~Data() = default;
 
 		virtual std::iostream& operator[](const Anope::string &key) = 0;
 		virtual std::set<Anope::string> KeySet() const { throw CoreException("Not supported"); }

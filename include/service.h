@@ -122,7 +122,7 @@ class ServiceReference : public Reference<T>
 	Anope::string name;
 
  public:
-	ServiceReference() { }
+	ServiceReference() = default;
 
 	ServiceReference(const Anope::string &t, const Anope::string &n) : type(t), name(n)
 	{

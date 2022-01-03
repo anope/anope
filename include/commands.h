@@ -43,7 +43,7 @@ struct CommandInfo
  */
 struct CoreExport CommandReply
 {
-	virtual ~CommandReply() { }
+	virtual ~CommandReply() = default;
 	virtual void SendMessage(BotInfo *source, const Anope::string &msg) = 0;
 };
 
@@ -118,7 +118,7 @@ class CoreExport Command : public Service
 	Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params = 0);
 
  public:
-	virtual ~Command();
+	virtual ~Command() = default;
 
  protected:
 	void SetDesc(const Anope::string &d);

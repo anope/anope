@@ -567,10 +567,6 @@ ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool i)
 		throw SocketException("Unable to listen: " + Anope::LastError());
 }
 
-ListenSocket::~ListenSocket()
-{
-}
-
 bool ListenSocket::ProcessRead()
 {
 	try

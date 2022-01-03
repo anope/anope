@@ -118,7 +118,7 @@ namespace DNS
 	{
 	 public:
 		Manager(Module *creator) : Service(creator, "DNS::Manager", "dns/manager") { }
-		virtual ~Manager() { }
+		virtual ~Manager() = default;
 
 		virtual void Process(Request *req) = 0;
 		virtual void RemoveRequest(Request *req) = 0;

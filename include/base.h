@@ -36,7 +36,7 @@ class ReferenceBase
  public:
 	ReferenceBase() = default;
 	ReferenceBase(const ReferenceBase &other) : invalid(other.invalid) { }
-	virtual ~ReferenceBase() { }
+	virtual ~ReferenceBase() = default;
 	inline void Invalidate() { this->invalid = true; }
 };
 

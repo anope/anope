@@ -16,7 +16,7 @@ struct IgnoreData
 	Anope::string reason;
 	time_t time = 0; /* When do we stop ignoring them? */
 
-	virtual ~IgnoreData() { }
+	virtual ~IgnoreData() = default;
  protected:
 	IgnoreData() = default;
 };

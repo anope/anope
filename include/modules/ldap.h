@@ -14,7 +14,7 @@ class LDAPException : public ModuleException
  public:
 	LDAPException(const Anope::string &reason) : ModuleException(reason) { }
 
-	virtual ~LDAPException() throw() { }
+	virtual ~LDAPException() throw() = default;
 };
 
 struct LDAPModification
@@ -116,7 +116,7 @@ class LDAPInterface
 	Module *owner;
 
 	LDAPInterface(Module *m) : owner(m) { }
-	virtual ~LDAPInterface() { }
+	virtual ~LDAPInterface() = default;
 
 	virtual void OnResult(const LDAPResult &r) = 0;
 	virtual void OnError(const LDAPResult &err) = 0;

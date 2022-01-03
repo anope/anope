@@ -18,16 +18,16 @@ struct ModeLock
 	Anope::string setter;
 	time_t created;
 
-	virtual ~ModeLock() { }
+	virtual ~ModeLock() = default;
  protected:
-	ModeLock() { }
+	ModeLock() = default;
 };
 
 struct ModeLocks
 {
 	typedef std::vector<ModeLock *> ModeList;
 
-	virtual ~ModeLocks() { }
+	virtual ~ModeLocks() = default;
 
 	/** Check if a mode is mlocked
 	 * @param mode The mode

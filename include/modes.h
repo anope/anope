@@ -55,7 +55,7 @@ class CoreExport Mode : public Base
 	 * @param type The mode type
 	 */
 	Mode(const Anope::string &mname, ModeClass mclass, char mc, ModeType type);
-	virtual ~Mode();
+	virtual ~Mode() = default;
 
 	/** Can a user set this mode, used for mlock
 	 * @param u The user
@@ -229,7 +229,7 @@ class CoreExport ChannelStatus
 {
 	Anope::string modes;
  public:
-	ChannelStatus();
+	ChannelStatus() = default;
 	ChannelStatus(const Anope::string &modes);
 	void AddMode(char c);
 	void DelMode(char c);

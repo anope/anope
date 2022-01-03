@@ -122,10 +122,6 @@ Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t
 	allow_unregistered = require_user = false;
 }
 
-Command::~Command()
-{
-}
-
 void Command::SetDesc(const Anope::string &d)
 {
 	this->desc = d;

@@ -36,9 +36,9 @@ struct KickerData
 	bool dontkickops, dontkickvoices;
 
  protected:
-	KickerData() { }
+	KickerData() = default;
 
  public:
-	virtual ~KickerData() { }
+	virtual ~KickerData() = default;
 	virtual void Check(ChannelInfo *ci) = 0;
 };

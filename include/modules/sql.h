@@ -149,7 +149,7 @@ namespace SQL
 
 		inline operator bool() const { return this->error.empty(); }
 
-		inline const unsigned int GetID() const { return this->id; }
+		inline unsigned int GetID() const { return this->id; }
 		inline const Query &GetQuery() const { return this->query; }
 		inline const Anope::string &GetError() const { return this->error; }
 

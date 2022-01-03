@@ -253,9 +253,13 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		{
 			OperType *ot = Config->MyOperTypes[i];
 			Anope::string perms;
-			for (std::list<Anope::string>::const_iterator it2 = ot->GetPrivs().begin(), it2_end = ot->GetPrivs().end(); it2 != it2_end; ++it2)
+
+			std::list<Anope::string> privs = ot->GetPrivs();
+			for (std::list<Anope::string>::const_iterator it2 = privs.begin(), it2_end = privs.end(); it2 != it2_end; ++it2)
 				perms += " " + *it2;
-			for (std::list<Anope::string>::const_iterator it2 = ot->GetCommands().begin(), it2_end = ot->GetCommands().end(); it2 != it2_end; ++it2)
+
+			std::list<Anope::string> commands = ot->GetCommands();
+			for (std::list<Anope::string>::const_iterator it2 = commands.begin(), it2_end = commands.end(); it2 != it2_end; ++it2)
 				perms += " " + *it2;
 			request.reply(ot->GetName(), perms);
 		}

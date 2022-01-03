@@ -75,7 +75,7 @@ class InspIRCd3Proto : public IRCDProto
 		MaxLine = 4096;
 	}
 
-	unsigned GetMaxListFor(Channel *c, ChannelMode *cm)
+	unsigned GetMaxListFor(Channel *c, ChannelMode *cm) anope_override
 	{
 		ListLimits *limits = maxlist.Get(c);
 		if (limits)

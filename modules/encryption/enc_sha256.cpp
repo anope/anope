@@ -55,7 +55,6 @@ static const unsigned SHA256_BLOCK_SIZE = 512 / 8;
 
 inline static uint32_t SHFR(uint32_t x, uint32_t n) { return x >> n; }
 inline static uint32_t ROTR(uint32_t x, uint32_t n) { return (x >> n) | (x << ((sizeof(x) << 3) - n)); }
-inline static uint32_t ROTL(uint32_t x, uint32_t n) { return (x << n) | (x >> ((sizeof(x) << 3) - n)); }
 inline static uint32_t CH(uint32_t x, uint32_t y, uint32_t z) { return (x & y) ^ (~x & z); }
 inline static uint32_t MAJ(uint32_t x, uint32_t y, uint32_t z) { return (x & y) ^ (x & z) ^ (y & z); }
 

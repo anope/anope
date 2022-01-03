@@ -29,8 +29,6 @@
 # define DllExport __declspec(dllimport)
 #endif
 
-#define MARK_DEPRECATED
-
 #if GETTEXT_FOUND
 /* Undefine some functions libintl defines */
 # undef snprintf

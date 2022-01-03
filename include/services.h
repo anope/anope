@@ -51,7 +51,6 @@
 #ifndef _WIN32
 # define DllExport
 # define CoreExport
-# define MARK_DEPRECATED __attribute((deprecated))
 # define anope_close close
 #else
 # include "anope_windows.h"

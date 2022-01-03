@@ -16,10 +16,10 @@ static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sglin
 class AkillDelCallback : public NumberList
 {
 	CommandSource &source;
-	unsigned deleted;
+	unsigned deleted = 0;
 	Command *cmd;
  public:
-	AkillDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), deleted(0), cmd(c)
+	AkillDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), cmd(c)
 	{
 	}
 

@@ -44,7 +44,7 @@ class SQLiteService : public Provider
 
 	Anope::string database;
 
-	sqlite3 *sql;
+	sqlite3 *sql = nullptr;
 
 	Anope::string Escape(const Anope::string &query);
 
@@ -134,7 +134,7 @@ class ModuleSQLite : public Module
 };
 
 SQLiteService::SQLiteService(Module *o, const Anope::string &n, const Anope::string &d)
-: Provider(o, n), database(d), sql(NULL)
+: Provider(o, n), database(d)
 {
 	int db = sqlite3_open_v2(database.c_str(), &this->sql, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
 	if (db != SQLITE_OK)

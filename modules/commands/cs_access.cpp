@@ -23,9 +23,9 @@ static inline void reset_levels(ChannelInfo *ci)
 class AccessChanAccess : public ChanAccess
 {
  public:
-	int level;
+	int level = 0;
 
-	AccessChanAccess(AccessProvider *p) : ChanAccess(p), level(0)
+	AccessChanAccess(AccessProvider *p) : ChanAccess(p)
 	{
 	}
 
@@ -250,12 +250,12 @@ class CommandCSAccess : public Command
 				CommandSource &source;
 				ChannelInfo *ci;
 				Command *c;
-				unsigned deleted;
+				unsigned deleted = 0;
 				Anope::string Nicks;
-				bool denied;
-				bool override;
+				bool denied = false;
+				bool override = false;
 			 public:
-				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), denied(false), override(false)
+				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c)
 				{
 					if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/access/modify"))
 						this->override = true;

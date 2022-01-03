@@ -89,17 +89,17 @@ class DNSServer : public Serializable
 {
 	Anope::string server_name;
 	std::vector<Anope::string> ips;
-	unsigned limit;
+	unsigned limit = 0;
 	/* wants to be in the pool */
-	bool pooled;
+	bool pooled = false;
 	/* is actually in the pool */
-	bool active;
+	bool active = false;
 
  public:
 	std::set<Anope::string, ci::less> zones;
-	time_t repool;
+	time_t repool = 0;
 
-	DNSServer(const Anope::string &sn) : Serializable("DNSServer"), server_name(sn), limit(0), pooled(false), active(false), repool(0)
+	DNSServer(const Anope::string &sn) : Serializable("DNSServer"), server_name(sn)
 	{
 		dns_servers->push_back(this);
 	}
@@ -729,15 +729,12 @@ class ModuleDNS : public Module
 	bool remove_split_servers;
 	bool readd_connected_servers;
 
-	time_t last_warn;
+	time_t last_warn = 0;
 
  public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-		zone_type("DNSZone", DNSZone::Unserialize), dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this),
-		last_warn(0)
+		zone_type("DNSZone", DNSZone::Unserialize), dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this)
 	{
-
-
 		for (unsigned j = 0; j < dns_servers->size(); ++j)
 		{
 			DNSServer *s = dns_servers->at(j);

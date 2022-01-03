@@ -22,10 +22,10 @@ struct IdentifyInfo
 	Reference<User> user;
 	IdentifyRequest *req;
 	ServiceReference<LDAPProvider> lprov;
-	bool admin_bind;
+	bool admin_bind = true;
 	Anope::string dn;
 
-	IdentifyInfo(User *u, IdentifyRequest *r, ServiceReference<LDAPProvider> &lp) : user(u), req(r), lprov(lp), admin_bind(true)
+	IdentifyInfo(User *u, IdentifyRequest *r, ServiceReference<LDAPProvider> &lp) : user(u), req(r), lprov(lp)
 	{
 		req->Hold(me);
 	}

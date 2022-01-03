@@ -44,10 +44,6 @@ static void *entry_point(void *parameter)
 	return NULL;
 }
 
-Thread::Thread() : exit(false)
-{
-}
-
 Thread::~Thread()
 {
 }

@@ -16,9 +16,8 @@
 class CoreExport Base
 {
 	/* References to this base class */
-	std::set<ReferenceBase *> *references;
+	std::set<ReferenceBase *> *references = nullptr;
  public:
-	Base();
 	virtual ~Base();
 
 	/** Adds a reference to this object. Eg, when a Reference
@@ -33,9 +32,9 @@ class CoreExport Base
 class ReferenceBase
 {
  protected:
-	bool invalid;
+	bool invalid = false;
  public:
-	ReferenceBase() : invalid(false) { }
+	ReferenceBase() = default;
 	ReferenceBase(const ReferenceBase &other) : invalid(other.invalid) { }
 	virtual ~ReferenceBase() { }
 	inline void Invalidate() { this->invalid = true; }
@@ -48,11 +47,9 @@ template<typename T>
 class Reference : public ReferenceBase
 {
  protected:
-	T *ref;
+	T *ref = nullptr;
  public:
-	Reference() : ref(NULL)
-	{
-	}
+	Reference() = default;
 
 	Reference(T *obj) : ref(obj)
 	{

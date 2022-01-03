@@ -22,7 +22,7 @@ struct CoreExport Oper
 	/* The type of operator this operator is */
 	OperType *ot;
 	/* Whether the user must be an IRC operator (umode +o) to be considered a services operator */
-	bool require_oper;
+	bool require_oper = true;
 	Anope::string password;
 	Anope::string certfp;
 	/* Hosts allowed to use this operator block */

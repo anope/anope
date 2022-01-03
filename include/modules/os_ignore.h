@@ -14,11 +14,11 @@ struct IgnoreData
 	Anope::string mask;
 	Anope::string creator;
 	Anope::string reason;
-	time_t time; /* When do we stop ignoring them? */
+	time_t time = 0; /* When do we stop ignoring them? */
 
 	virtual ~IgnoreData() { }
  protected:
-	IgnoreData() : time(0) { }
+	IgnoreData() = default;
 };
 
 class IgnoreService : public Service

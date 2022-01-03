@@ -23,8 +23,8 @@ class CoreExport XLine : public Serializable
 	Anope::string mask;
 	Regex *regex;
 	Anope::string by;
-	time_t created;
-	time_t expires;
+	time_t created = 0;
+	time_t expires = 0;
 	Anope::string reason;
 	XLineManager *manager;
 	Anope::string id;

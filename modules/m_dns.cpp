@@ -209,11 +209,11 @@ class Packet : public Query
 	/* Source or destination of the packet */
 	sockaddrs addr;
 	/* ID for this packet */
-	unsigned short id;
+	unsigned short id = 0;
 	/* Flags on the packet */
-	unsigned short flags;
+	unsigned short flags = 0;
 
-	Packet(Manager *m, sockaddrs *a) : manager(m), id(0), flags(0)
+	Packet(Manager *m, sockaddrs *a) : manager(m)
 	{
 		if (a)
 			addr = *a;
@@ -468,13 +468,13 @@ class TCPSocket : public ListenSocket
 	class Client : public ClientSocket, public Timer, public ReplySocket
 	{
 		Manager *manager;
-		Packet *packet;
+		Packet *packet = nullptr;
 		unsigned char packet_buffer[524];
-		int length;
+		int length = 0;
 
 	 public:
 		Client(Manager *m, TCPSocket *l, int fd, const sockaddrs &addr) : Socket(fd, l->IsIPv6()), ClientSocket(l, addr), Timer(5),
-			manager(m), packet(NULL), length(0)
+			manager(m)
 		{
 			Log(LOG_DEBUG_2) << "Resolver: New client from " << addr.addr();
 		}
@@ -652,18 +652,17 @@ class MyManager : public Manager, public Timer
 	typedef TR1NS::unordered_map<Question, Query, Question::hash> cache_map;
 	cache_map cache;
 
-	TCPSocket *tcpsock;
-	UDPSocket *udpsock;
+	TCPSocket *tcpsock = nullptr;
+	UDPSocket *udpsock = nullptr;
 
-	bool listen;
+	bool listen = false;
 	sockaddrs addrs;
 
 	std::vector<std::pair<Anope::string, short> > notify;
  public:
 	std::map<unsigned short, Request *> requests;
 
-	MyManager(Module *creator) : Manager(creator), Timer(300, Anope::CurTime, true), serial(Anope::CurTime), tcpsock(NULL), udpsock(NULL),
-		listen(false), cur_id(rand())
+	MyManager(Module *creator) : Manager(creator), Timer(300, Anope::CurTime, true), serial(Anope::CurTime), cur_id(rand())
 	{
 	}
 

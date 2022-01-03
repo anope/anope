@@ -73,7 +73,7 @@ namespace Configuration
 	{
 		Anope::string name;
 		bool executable;
-		FILE *fp;
+		FILE *fp = nullptr;
 	 public:
 		File(const Anope::string &, bool);
 		~File();

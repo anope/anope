@@ -61,7 +61,7 @@ struct QueryResult
  */
 class MySQLResult : public Result
 {
-	MYSQL_RES *res;
+	MYSQL_RES *res = nullptr;
 
  public:
 	MySQLResult(unsigned int i, const Query &q, const Anope::string &fq, MYSQL_RES *r) : Result(i, q, fq), res(r)
@@ -94,7 +94,7 @@ class MySQLResult : public Result
 		}
 	}
 
-	MySQLResult(const Query &q, const Anope::string &fq, const Anope::string &err) : Result(0, q, fq, err), res(NULL)
+	MySQLResult(const Query &q, const Anope::string &fq, const Anope::string &err) : Result(0, q, fq, err)
 	{
 	}
 
@@ -117,7 +117,7 @@ class MySQLService : public Provider
 	Anope::string password;
 	int port;
 
-	MYSQL *sql;
+	MYSQL *sql = nullptr;
 
 	/** Escape a query.
 	 * Note the mutex must be held!
@@ -300,7 +300,7 @@ class ModuleSQL : public Module, public Pipe
 };
 
 MySQLService::MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, int po)
-: Provider(o, n), database(d), server(s), user(u), password(p), port(po), sql(NULL)
+: Provider(o, n), database(d), server(s), user(u), password(p), port(po)
 {
 	Connect();
 }

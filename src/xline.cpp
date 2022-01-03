@@ -86,7 +86,7 @@ void XLine::Init()
 	}
 }
 
-XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(Me->GetName()), created(0), expires(0), reason(r), id(uid)
+XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(Me->GetName()), reason(r), id(uid)
 {
 	regex = NULL;
 	manager = NULL;

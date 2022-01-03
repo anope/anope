@@ -21,13 +21,13 @@ enum HTTPError
 /* A message to someone */
 struct HTTPReply
 {
-	HTTPError error;
+	HTTPError error = HTTP_ERROR_OK;
 	Anope::string content_type;
 	std::map<Anope::string, Anope::string, ci::less> headers;
 	typedef std::list<std::pair<Anope::string, Anope::string> > cookie;
 	std::vector<cookie> cookies;
 
-	HTTPReply() : error(HTTP_ERROR_OK), length(0) { }
+	HTTPReply() = default;
 
 	HTTPReply(const HTTPReply& other) : error(other.error), length(other.length)
 	{
@@ -65,7 +65,7 @@ struct HTTPReply
 	};
 
 	std::deque<Data *> out;
-	size_t length;
+	size_t length = 0;
 
 	void Write(const Anope::string &message)
 	{

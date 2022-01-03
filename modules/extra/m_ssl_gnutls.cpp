@@ -36,7 +36,7 @@ class MySSLService : public SSLService
 class SSLSocketIO : public SocketIO
 {
  public:
-	gnutls_session_t sess;
+	gnutls_session_t sess = nullptr;
 	GnuTLS::X509CertCredentials* mycreds;
 
 	/** Constructor
@@ -115,11 +115,9 @@ namespace GnuTLS
 
 	class DHParams
 	{
-		gnutls_dh_params_t dh_params;
+		gnutls_dh_params_t dh_params = nullptr;
 
 	 public:
-		DHParams() : dh_params(NULL) { }
-
 		void Import(const Anope::string &dhstr)
 		{
 			if (dh_params != NULL)
@@ -225,7 +223,7 @@ namespace GnuTLS
 
 	class X509CertCredentials
 	{
-		unsigned int refcount;
+		unsigned int refcount = 0;
 		gnutls_certificate_credentials_t cred;
 		DHParams dh;
 
@@ -247,7 +245,7 @@ namespace GnuTLS
 		X509Key key;
 
 		X509CertCredentials(const Anope::string &certfile, const Anope::string &keyfile)
-			: refcount(0), certs(LoadFile(certfile)), key(LoadFile(keyfile))
+			: certs(LoadFile(certfile)), key(LoadFile(keyfile))
 		{
 			if (gnutls_certificate_allocate_credentials(&cred) < 0)
 				throw ConfigException("Cannot allocate certificate credentials");
@@ -299,10 +297,10 @@ class GnuTLSModule : public Module
 	GnuTLS::Init libinit;
 
  public:
-	GnuTLS::X509CertCredentials *cred;
+	GnuTLS::X509CertCredentials *cred = nullptr;
 	MySSLService service;
 
-	GnuTLSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), cred(NULL), service(this, "ssl")
+	GnuTLSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), service(this, "ssl")
 	{
 		me = this;
 		this->SetPermanent(true);
@@ -630,7 +628,7 @@ void SSLSocketIO::Destroy()
 	delete this;
 }
 
-SSLSocketIO::SSLSocketIO() : sess(NULL), mycreds(me->cred)
+SSLSocketIO::SSLSocketIO() : mycreds(me->cred)
 {
 	mycreds->incrref();
 }

@@ -16,9 +16,9 @@ class SXLineDelCallback : public NumberList
 	XLineManager *xlm;
 	Command *command;
 	CommandSource &source;
-	unsigned deleted;
+	unsigned deleted = 0;
  public:
-	SXLineDelCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), xlm(x), command(c), source(_source), deleted(0)
+	SXLineDelCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), xlm(x), command(c), source(_source)
 	{
 	}
 

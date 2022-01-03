@@ -19,15 +19,11 @@ class CoreExport Thread : public Pipe, public Extensible
 {
  private:
 	/* Set to true to tell the thread to finish and we are waiting for it */
-	bool exit;
+	bool exit = false;
 
  public:
 	/* Handle for this thread */
 	pthread_t handle;
-
-	/** Threads constructor
-	 */
-	Thread();
 
 	/** Threads destructor
 	 */

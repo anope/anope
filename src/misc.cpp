@@ -27,7 +27,7 @@
 #include <netdb.h>
 #endif
 
-NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(true), desc(descending)
+NumberList::NumberList(const Anope::string &list, bool descending) : desc(descending)
 {
 	Anope::string error;
 	commasepstream sep(list);
@@ -214,7 +214,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 	}
 }
 
-InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc), longest(0)
+InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc)
 {
 }
 

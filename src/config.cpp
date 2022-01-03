@@ -636,7 +636,7 @@ Block *Conf::GetCommand(CommandSource &source)
 	return &(Config->EmptyBlock);
 }
 
-File::File(const Anope::string &n, bool e) : name(n), executable(e), fp(NULL)
+File::File(const Anope::string &n, bool e) : name(n), executable(e)
 {
 }
 

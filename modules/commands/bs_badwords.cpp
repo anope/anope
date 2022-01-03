@@ -150,10 +150,10 @@ class BadwordsDelCallback : public NumberList
 	ChannelInfo *ci;
 	BadWords *bw;
 	Command *c;
-	unsigned deleted;
-	bool override;
+	unsigned deleted = 0;
+	bool override = false;
  public:
-	BadwordsDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0), override(false)
+	BadwordsDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c)
 	{
 		if (!source.AccessFor(ci).HasPriv("BADWORDS") && source.HasPriv("botserv/administration"))
 			this->override = true;

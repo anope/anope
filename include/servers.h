@@ -80,7 +80,7 @@ class CoreExport Server : public Extensible
 
  public:
 	/* Number of users on the server */
-	unsigned users;
+	unsigned users = 0;
 
 	/** Delete this server with a reason
 	 * @param reason The reason

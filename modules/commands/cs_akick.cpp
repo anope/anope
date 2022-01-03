@@ -211,10 +211,10 @@ class CommandCSAKick : public Command
 				CommandSource &source;
 				ChannelInfo *ci;
 				Command *c;
-				unsigned deleted;
+				unsigned deleted = 0;
 				AccessGroup ag;
 			 public:
-				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0), ag(source.AccessFor(ci))
+				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), ag(source.AccessFor(ci))
 				{
 				}
 

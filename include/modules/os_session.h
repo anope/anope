@@ -12,10 +12,10 @@
 struct Session
 {
 	cidr addr;                      /* A cidr (sockaddrs + len) representing this session */
-	unsigned count;                 /* Number of clients with this host */
-	unsigned hits;                  /* Number of subsequent kills for a host */
+	unsigned count = 1;             /* Number of clients with this host */
+	unsigned hits = 0;              /* Number of subsequent kills for a host */
 
-	Session(const sockaddrs &ip, int len) : addr(ip, len), count(1), hits(0) { }
+	Session(const sockaddrs &ip, int len) : addr(ip, len) { }
 };
 
 struct Exception : Serializable

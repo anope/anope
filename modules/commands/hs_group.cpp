@@ -13,7 +13,7 @@
 
 class CommandHSGroup : public Command
 {
-	bool setting;
+	bool setting = false;
 
  public:
 	void Sync(const NickAlias *na)
@@ -37,7 +37,7 @@ class CommandHSGroup : public Command
 		setting = false;
 	}
 
-	CommandHSGroup(Module *creator) : Command(creator, "hostserv/group", 0, 0), setting(false)
+	CommandHSGroup(Module *creator) : Command(creator, "hostserv/group", 0, 0)
 	{
 		this->SetDesc(_("Syncs the vhost for all nicks in a group"));
 	}

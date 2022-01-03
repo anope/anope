@@ -13,9 +13,9 @@ struct OperInfo : Serializable
 	Anope::string target;
 	Anope::string info;
 	Anope::string adder;
-	time_t created;
+	time_t created = 0;
 
-	OperInfo() : Serializable("OperInfo"), created(0) { }
+	OperInfo() : Serializable("OperInfo") { }
 	OperInfo(const Anope::string &t, const Anope::string &i, const Anope::string &a, time_t c) :
 		Serializable("OperInfo"), target(t), info(i), adder(a), created(c) { }
 

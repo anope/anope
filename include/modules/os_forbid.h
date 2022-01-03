@@ -23,13 +23,13 @@ struct ForbidData
 	Anope::string mask;
 	Anope::string creator;
 	Anope::string reason;
-	time_t created;
-	time_t expires;
+	time_t created = 0;
+	time_t expires = 0;
 	ForbidType type;
 
 	virtual ~ForbidData() { }
  protected:
-	ForbidData() : created(0), expires(0) { }
+	ForbidData() = default;
 };
 
 class ForbidService : public Service

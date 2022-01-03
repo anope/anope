@@ -63,10 +63,10 @@ class DBSQL : public Module, public Pipe
 	bool import;
 
 	std::set<Serializable *> updated_items;
-	bool shutting_down;
-	bool loading_databases;
-	bool loaded;
-	bool imported;
+	bool shutting_down = false;
+	bool loading_databases = false;
+	bool loaded = false;
+	bool imported = false;
 
 	void RunBackground(const Query &q, Interface *iface = NULL)
 	{
@@ -90,7 +90,7 @@ class DBSQL : public Module, public Pipe
 	}
 
  public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sql("", ""), sqlinterface(this), shutting_down(false), loading_databases(false), loaded(false), imported(false)
+	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sql("", ""), sqlinterface(this)
 	{
 
 

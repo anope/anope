@@ -246,8 +246,8 @@ class CoreExport IRCDProto : public Service
 class CoreExport MessageSource
 {
 	Anope::string source;
-	User *u;
-	Server *s;
+	User *u = nullptr;
+	Server *s = nullptr;
 
  public:
 	MessageSource(const Anope::string &);
@@ -289,7 +289,7 @@ private:
 	Anope::string message;
 
 	/** The current position within the message. */
-	Anope::string::size_type position;
+	Anope::string::size_type position = 0;
 
  public:
 	/** Create a tokenstream and fill it with the provided data. */

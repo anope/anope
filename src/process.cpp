@@ -133,7 +133,6 @@ Anope::string IRCDProto::Format(const Anope::string &source, const Anope::string
 
 MessageTokenizer::MessageTokenizer(const Anope::string &msg)
 	: message(msg)
-	, position(0)
 {
 }
 

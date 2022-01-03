@@ -29,18 +29,15 @@ class LDAPRequest
  public:
 	LDAPService *service;
 	LDAPInterface *inter;
-	LDAPMessage *message; /* message returned by ldap_ */
-	LDAPResult *result; /* final result */
+	LDAPMessage *message = nullptr; /* message returned by ldap_ */
+	LDAPResult *result = nullptr; /* final result */
 	struct timeval tv;
-	QueryType type;
+	QueryType type = QUERY_UNKNOWN;
 
 	LDAPRequest(LDAPService *s, LDAPInterface *i)
 		: service(s)
 		, inter(i)
-		, message(NULL)
-		, result(NULL)
 	{
-		type = QUERY_UNKNOWN;
 		tv.tv_sec = 0;
 		tv.tv_usec = 100000;
 	}
@@ -147,7 +144,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 	LDAP *con;
 
-	time_t last_connect;
+	time_t last_connect = 0;
 
  public:
 	static LDAPMod **BuildMods(const LDAPMods &attributes)
@@ -232,7 +229,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 	query_queue queries, results;
 	Mutex process_mutex; /* held when processing requests not in either queue */
 
-	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, n), server(s), admin_binddn(b), admin_pass(p), last_connect(0)
+	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, n), server(s), admin_binddn(b), admin_pass(p)
 	{
 		Connect();
 	}

@@ -82,13 +82,12 @@ class MyRedisService : public Provider
 	int port;
 	unsigned db;
 
-	RedisSocket *sock, *sub;
+	RedisSocket *sock = nullptr, *sub = nullptr;
 
 	Transaction ti;
-	bool in_transaction;
+	bool in_transaction = false;
 
-	MyRedisService(Module *c, const Anope::string &n, const Anope::string &h, int p, unsigned d) : Provider(c, n), host(h), port(p), db(d), sock(NULL), sub(NULL),
-		ti(c), in_transaction(false)
+	MyRedisService(Module *c, const Anope::string &n, const Anope::string &h, int p, unsigned d) : Provider(c, n), host(h), port(p), db(d), ti(c)
 	{
 		sock = new RedisSocket(this, host.find(':') != Anope::string::npos);
 		sock->Connect(host, port);

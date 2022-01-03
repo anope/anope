@@ -14,7 +14,7 @@
 
 class NSMaxEmail : public Module
 {
-	bool clean;
+	bool clean = false;
 
 	/* strip dots from username, and remove anything after the first + */
 	Anope::string CleanMail(const Anope::string &email)
@@ -77,7 +77,6 @@ class NSMaxEmail : public Module
 
  public:
 	NSMaxEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, clean(false)
 	{
 	}
 

@@ -280,11 +280,11 @@ class CommandCSXOP : public Command
 				CommandSource &source;
 				ChannelInfo *ci;
 				Command *c;
-				unsigned deleted;
+				unsigned deleted = 0;
 				Anope::string nicks;
 				bool override;
 			 public:
-				XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), override(_override)
+				XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), override(_override)
 				{
 				}
 

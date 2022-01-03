@@ -303,7 +303,7 @@ class ModuleSASL : public Module
 	SASLService sasl;
 
 	Plain plain;
-	External *external;
+	External *external = nullptr;
 
 	std::vector<Anope::string> mechs;
 
@@ -322,7 +322,7 @@ class ModuleSASL : public Module
 
  public:
 	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		sasl(this), plain(this), external(NULL)
+		sasl(this), plain(this)
 	{
 		try
 		{

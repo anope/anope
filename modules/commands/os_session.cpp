@@ -132,10 +132,10 @@ class ExceptionDelCallback : public NumberList
 {
  protected:
 	CommandSource &source;
-	unsigned deleted;
+	unsigned deleted = 0;
 	Command *cmd;
  public:
-	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), deleted(0), cmd(c)
+	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), cmd(c)
 	{
 	}
 

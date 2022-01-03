@@ -26,8 +26,6 @@ struct CommandInfo
 {
 	typedef Anope::map<CommandInfo> map;
 
-	CommandInfo() : hide(false), prepend_channel(false) { }
-
 	/* Service name of the command */
 	Anope::string name;
 	/* Permission required to execute the command */
@@ -35,9 +33,9 @@ struct CommandInfo
 	/* Group this command is in */
 	Anope::string group;
 	/* whether or not to hide this command in help output */
-	bool hide;
+	bool hide = false;
 	/* Only used with fantasy */
-	bool prepend_channel;
+	bool prepend_channel = false;
 };
 
 /* Where the replies from commands go to. User inherits from this and is the normal

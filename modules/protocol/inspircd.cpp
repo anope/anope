@@ -809,21 +809,19 @@ struct IRCDMessageCapab : Message::Capab
 	struct ModeInfo
 	{
 		// The letter assigned to the mode (e.g. o).
-		char letter;
+		char letter = 0;
 
 		// If a prefix mode then the rank of the prefix.
-		unsigned level;
+		unsigned level = 0;
 
 		// The name of the mode.
 		Anope::string name;
 
 		// If a prefix mode then the symbol associated with the prefix.
-		char symbol;
+		char symbol = 0;
 
 		// The type of mode.
 		Anope::string type;
-
-		ModeInfo() : letter(0), level(0), symbol(0) { }
 	};
 
 	static bool ParseMode(const Anope::string& token, ModeInfo& mode)
@@ -1296,9 +1294,9 @@ struct IRCDMessageKick : IRCDMessage
 
 struct IRCDMessageSave : IRCDMessage
 {
-	time_t last_collide;
+	time_t last_collide = 0;
 
-	IRCDMessageSave(Module *creator) : IRCDMessage(creator, "SAVE", 2), last_collide(0) { }
+	IRCDMessageSave(Module *creator) : IRCDMessage(creator, "SAVE", 2) { }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{

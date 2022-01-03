@@ -34,7 +34,7 @@ namespace Mail
 		Anope::string message;
 		bool dont_quote_addresses;
 
-		bool success;
+		bool success = false;
 	 public:
 		/** Construct this message. Once constructed call Thread::Start to launch the mail sending.
 		 * @param sf Config->SendFrom

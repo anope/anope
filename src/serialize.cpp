@@ -41,7 +41,7 @@ void Serialize::CheckTypes()
 	}
 }
 
-Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0), last_commit_time(0), id(0), redis_ignore(0)
+Serializable::Serializable(const Anope::string &serialize_type)
 {
 	if (SerializableItems == NULL)
 		SerializableItems = new std::list<Serializable *>();
@@ -55,7 +55,7 @@ Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0)
 	FOREACH_MOD(OnSerializableConstruct, (this));
 }
 
-Serializable::Serializable(const Serializable &other) : last_commit(0), last_commit_time(0), id(0), redis_ignore(0)
+Serializable::Serializable(const Serializable &other)
 {
 	SerializableItems->push_back(this);
 	this->s_iter = SerializableItems->end();
@@ -112,7 +112,7 @@ const std::list<Serializable *> &Serializable::GetItems()
 	return *SerializableItems;
 }
 
-Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o), timestamp(0)
+Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o)
 {
 	TypeOrder.push_back(this->name);
 	Types[this->name] = this;

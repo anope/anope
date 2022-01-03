@@ -18,7 +18,7 @@
 
 std::set<IdentifyRequest *> IdentifyRequest::Requests;
 
-IdentifyRequest::IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass) : owner(o), account(acc), password(pass), dispatched(false), success(false)
+IdentifyRequest::IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass) : owner(o), account(acc), password(pass)
 {
 	Requests.insert(this);
 }

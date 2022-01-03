@@ -13,10 +13,6 @@
 std::map<Anope::string, std::map<Anope::string, Service *> > Service::Services;
 std::map<Anope::string, std::map<Anope::string, Anope::string> > Service::Aliases;
 
-Base::Base() : references(NULL)
-{
-}
-
 Base::~Base()
 {
 	if (this->references != NULL)

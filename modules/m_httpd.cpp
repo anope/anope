@@ -41,19 +41,19 @@ class MyHTTPClient : public HTTPClient
 {
 	HTTPProvider *provider;
 	HTTPMessage message;
-	bool header_done, served;
+	bool header_done = false, served = false;
 	Anope::string page_name;
 	Reference<HTTPPage> page;
 	Anope::string ip;
 
-	unsigned content_length;
+	unsigned content_length = 0;
 
 	enum
 	{
 		ACTION_NONE,
 		ACTION_GET,
 		ACTION_POST
-	} action;
+	} action = ACTION_NONE;
 
 	void Serve()
 	{
@@ -94,7 +94,7 @@ class MyHTTPClient : public HTTPClient
  public:
 	time_t created;
 
-	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), HTTPClient(l, f, a), provider(l), header_done(false), served(false), ip(a.addr()), content_length(0), action(ACTION_NONE), created(Anope::CurTime)
+	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), HTTPClient(l, f, a), provider(l), ip(a.addr()), created(Anope::CurTime)
 	{
 		Log(LOG_DEBUG, "httpd") << "Accepted connection " << f << " from " << a.addr();
 	}

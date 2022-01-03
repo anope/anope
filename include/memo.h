@@ -39,7 +39,7 @@ class CoreExport Memo : public Serializable
  */
 struct CoreExport MemoInfo
 {
-	int16_t memomax;
+	int16_t memomax = 0;
 	Serialize::Checker<std::vector<Memo *> > memos;
 	std::vector<Anope::string> ignores;
 

@@ -46,9 +46,7 @@ struct StackerInfo
 	/* Modes to be deleted */
 	std::list<std::pair<Mode *, Anope::string> > DelModes;
 	/* Bot this is sent from */
-	BotInfo *bi;
-
-	StackerInfo() : bi(NULL) { }
+	BotInfo *bi = nullptr;
 
 	/** Add a mode to this object
 	 * @param mode The mode
@@ -742,7 +740,7 @@ void ModeManager::StackerDel(Mode *m)
 	}
 }
 
-Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh), cidr_len(0), family(0)
+Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh)
 {
 	Anope::string n, u, h;
 

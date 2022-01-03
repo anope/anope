@@ -19,9 +19,7 @@ class SaveData : public Serialize::Data
 {
  public:
 	Anope::string last;
-	std::fstream *fs;
-
-	SaveData() : fs(NULL) { }
+	std::fstream *fs = nullptr;
 
 	std::iostream& operator[](const Anope::string &key) override
 	{
@@ -38,13 +36,11 @@ class SaveData : public Serialize::Data
 class LoadData : public Serialize::Data
 {
  public:
-	std::fstream *fs;
-	unsigned int id;
+	std::fstream *fs = nullptr;
+	unsigned int id = 0;
 	std::map<Anope::string, Anope::string> data;
 	std::stringstream ss;
-	bool read;
-
-	LoadData() : fs(NULL), id(0), read(false) { }
+	bool read = false;
 
 	std::iostream& operator[](const Anope::string &key) override
 	{
@@ -106,12 +102,12 @@ class LoadData : public Serialize::Data
 class DBFlatFile : public Module, public Pipe
 {
 	/* Day the last backup was on */
-	int last_day;
+	int last_day = 0;
 	/* Backup file names */
 	std::map<Anope::string, std::list<Anope::string> > backups;
-	bool loaded;
+	bool loaded = false;
 
-	int child_pid;
+	int child_pid = -1;
 
 	void BackupDatabase()
 	{
@@ -172,7 +168,7 @@ class DBFlatFile : public Module, public Pipe
 	}
 
  public:
-	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), last_day(0), loaded(false), child_pid(-1)
+	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
 	{
 
 	}

@@ -141,10 +141,10 @@ namespace SQL
 		Query query;
 		Anope::string error;
 	 public:
-		unsigned int id;
+		unsigned int id = 0;
 		Anope::string finished_query;
 
-		Result() : id(0) { }
+		Result() = default;
 		Result(unsigned int i, const Query &q, const Anope::string &fq, const Anope::string &err = "") : query(q), error(err), id(i), finished_query(fq) { }
 
 		inline operator bool() const { return this->error.empty(); }

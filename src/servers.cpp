@@ -27,7 +27,7 @@ Anope::map<Server *> Servers::ByID;
 
 std::set<Anope::string> Servers::Capab;
 
-Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Anope::string &desc, const Anope::string &ssid, bool jupe) : name(sname), hops(shops), description(desc), sid(ssid), uplink(up), users(0)
+Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Anope::string &desc, const Anope::string &ssid, bool jupe) : name(sname), hops(shops), description(desc), sid(ssid), uplink(up)
 {
 	syncing = true;
 	juped = jupe;

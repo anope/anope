@@ -559,7 +559,7 @@ class CoreExport sepstream
 	char sep;
 	/** Current string position
 	 */
-	size_t pos;
+	size_t pos = 0;
 	/** If set then GetToken() can return an empty string
 	 */
 	bool allow_empty;

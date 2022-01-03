@@ -25,11 +25,11 @@ class ChanServCore : public Module, public ChanServService
 	std::vector<Anope::string> defaults;
 	ExtensibleItem<bool> inhabit;
 	ExtensibleRef<bool> persist;
-	bool always_lower;
+	bool always_lower = false;
 
  public:
 	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		ChanServService(this), inhabit(this, "inhabit"), persist("PERSIST"), always_lower(false)
+		ChanServService(this), inhabit(this, "inhabit"), persist("PERSIST")
 	{
 	}
 

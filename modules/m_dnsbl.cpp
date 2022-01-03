@@ -18,19 +18,17 @@ struct Blacklist
 {
 	struct Reply
 	{
-		int code;
+		int code = 0;
 		Anope::string reason;
-		bool allow_account;
+		bool allow_account = false;
 
-		Reply() : code(0), allow_account(false) { }
+		Reply() = default;
 	};
 
 	Anope::string name;
-	time_t bantime;
+	time_t bantime = 0;
 	Anope::string reason;
 	std::vector<Reply> replies;
-
-	Blacklist() : bantime(0) { }
 
 	Reply *Find(int code)
 	{

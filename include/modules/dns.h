@@ -73,10 +73,10 @@ namespace DNS
 	struct Question
 	{
 		Anope::string name;
-		QueryType type;
-		unsigned short qclass;
+		QueryType type = QUERY_NONE;
+		unsigned short qclass = 0;
 
-		Question() : type(QUERY_NONE), qclass(0) { }
+		Question() = default;
 		Question(const Anope::string &n, QueryType t, unsigned short c = 1) : name(n), type(t), qclass(c) { }
 		inline bool operator==(const Question & other) const { return name == other.name && type == other.type && qclass == other.qclass; }
 
@@ -91,12 +91,12 @@ namespace DNS
 
 	struct ResourceRecord : Question
 	{
-		unsigned int ttl;
+		unsigned int ttl = 0;
 		Anope::string rdata;
 		time_t created;
 
-		ResourceRecord(const Anope::string &n, QueryType t, unsigned short c = 1) : Question(n, t, c), ttl(0), created(Anope::CurTime) { }
-		ResourceRecord(const Question &q) : Question(q), ttl(0), created(Anope::CurTime) { }
+		ResourceRecord(const Anope::string &n, QueryType t, unsigned short c = 1) : Question(n, t, c), created(Anope::CurTime) { }
+		ResourceRecord(const Question &q) : Question(q), created(Anope::CurTime) { }
 	};
 
 	struct Query
@@ -139,12 +139,12 @@ namespace DNS
 		/* Use result cache if available */
 		bool use_cache;
 		/* Request id */
-		unsigned short id;
+		unsigned short id = 0;
 		/* Creator of this request */
 		Module *creator;
 
 		Request(Manager *mgr, Module *c, const Anope::string &addr, QueryType qt, bool cache = false) : Timer(0), Question(addr, qt), manager(mgr),
-			use_cache(cache), id(0), creator(c) { }
+			use_cache(cache), creator(c) { }
 
 		virtual ~Request()
 		{

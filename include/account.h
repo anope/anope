@@ -240,8 +240,8 @@ class CoreExport IdentifyRequest
 	Anope::string password;
 
 	std::set<Module *> holds;
-	bool dispatched;
-	bool success;
+	bool dispatched = false;
+	bool success = false;
 
 	static std::set<IdentifyRequest *> Requests;
 

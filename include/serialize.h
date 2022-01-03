@@ -65,9 +65,9 @@ class CoreExport Serializable : public virtual Base
 	/* Iterator into serializable_items */
 	std::list<Serializable *>::iterator s_iter;
 	/* The hash of the last serialized form of this object committed to the database */
-	size_t last_commit;
+	size_t last_commit = 0;
 	/* The last time this object was committed to the database */
-	time_t last_commit_time;
+	time_t last_commit_time = 0;
 
  protected:
 	Serializable(const Anope::string &serialize_type);
@@ -79,10 +79,10 @@ class CoreExport Serializable : public virtual Base
 	virtual ~Serializable();
 
 	/* Unique ID (per type, not globally) for this object */
-	uint64_t id;
+	uint64_t id = 0;
 
 	/* Only used by redis, to ignore updates */
-	unsigned short redis_ignore;
+	unsigned short redis_ignore = 0;
 
 	/** Marks the object as potentially being updated "soon".
 	 */
@@ -127,7 +127,7 @@ class CoreExport Serialize::Type : public Base
 	 * this timestamp. if curtime == timestamp then we have the most up to date
 	 * version of every object of this type.
 	 */
-	time_t timestamp;
+	time_t timestamp = 0;
 
  public:
 	/* Map of Serializable::id to Serializable objects */
@@ -187,7 +187,7 @@ class Serialize::Checker
 {
 	Anope::string name;
 	T obj;
-	mutable ::Reference<Serialize::Type> type;
+	mutable ::Reference<Serialize::Type> type = nullptr;
 
 	inline void Check() const
 	{
@@ -198,7 +198,7 @@ class Serialize::Checker
 	}
 
  public:
-	Checker(const Anope::string &n) : name(n), type(NULL) { }
+	Checker(const Anope::string &n) : name(n) { }
 
 	inline const T* operator->() const
 	{
@@ -244,12 +244,10 @@ template<typename T>
 class Serialize::Reference : public ReferenceBase
 {
  protected:
-	T *ref;
+	T *ref = nullptr;
 
  public:
-	Reference() : ref(NULL)
-	{
-	}
+	Reference() = default;
 
 	Reference(T *obj) : ref(obj)
 	{

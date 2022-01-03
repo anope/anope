@@ -25,7 +25,7 @@
 class CoreExport NumberList
 {
  private:
-	bool is_valid;
+	bool is_valid = true;
 
 	std::set<unsigned> numbers;
 
@@ -83,7 +83,7 @@ class CoreExport InfoFormatter
 {
 	NickCore *nc;
 	std::vector<std::pair<Anope::string, Anope::string> > replies;
-	unsigned longest;
+	unsigned longest = 0;
  public:
 	InfoFormatter(NickCore *nc);
 	void Process(std::vector<Anope::string> &);

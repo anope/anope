@@ -450,7 +450,7 @@ Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 	return Entry("", mask).GetNUHMask();
 }
 
-MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
+MessageSource::MessageSource(const Anope::string &src) : source(src)
 {
 	/* no source for incoming message is our uplink */
 	if (src.empty())
@@ -461,11 +461,11 @@ MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s
 		this->u = User::Find(src);
 }
 
-MessageSource::MessageSource(User *_u) : source(_u ? _u->nick : ""), u(_u), s(NULL)
+MessageSource::MessageSource(User *_u) : source(_u ? _u->nick : ""), u(_u)
 {
 }
 
-MessageSource::MessageSource(Server *_s) : source(_s ? _s->GetName() : ""), u(NULL), s(_s)
+MessageSource::MessageSource(Server *_s) : source(_s ? _s->GetName() : ""), s(_s)
 {
 }
 

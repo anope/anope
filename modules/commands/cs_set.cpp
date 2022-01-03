@@ -21,12 +21,12 @@ class CommandCSSet : public Command
 		this->SetSyntax(_("\037option\037 \037channel\037 \037parameters\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -75,7 +75,7 @@ class CommandCSSetAutoOp : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -117,7 +117,7 @@ class CommandCSSetAutoOp : public Command
 			this->OnSyntaxError(source, "AUTOOP");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -138,7 +138,7 @@ class CommandCSSetBanType : public Command
 		this->SetSyntax(_("\037channel\037 \037bantype\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -179,7 +179,7 @@ class CommandCSSetBanType : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -205,7 +205,7 @@ class CommandCSSetDescription : public Command
 		this->SetSyntax(_("\037channel\037 [\037description\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -248,7 +248,7 @@ class CommandCSSetDescription : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -267,7 +267,7 @@ class CommandCSSetFounder : public Command
 		this->SetSyntax(_("\037channel\037 \037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -317,7 +317,7 @@ class CommandCSSetFounder : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -336,7 +336,7 @@ class CommandCSSetKeepModes : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -381,7 +381,7 @@ class CommandCSSetKeepModes : public Command
 			this->OnSyntaxError(source, "KEEPMODES");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -401,7 +401,7 @@ class CommandCSSetPeace : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -445,7 +445,7 @@ class CommandCSSetPeace : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -473,7 +473,7 @@ class CommandCSSetPersist : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -583,7 +583,7 @@ class CommandCSSetPersist : public Command
 			this->OnSyntaxError(source, "PERSIST");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		BotInfo *BotServ = Config->GetClient("BotServ");
 		BotInfo *ChanServ = Config->GetClient("ChanServ");
@@ -622,7 +622,7 @@ class CommandCSSetRestricted : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -664,7 +664,7 @@ class CommandCSSetRestricted : public Command
 			this->OnSyntaxError(source, "RESTRICTED");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -684,7 +684,7 @@ class CommandCSSetSecure : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -726,7 +726,7 @@ class CommandCSSetSecure : public Command
 			this->OnSyntaxError(source, "SECURE");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -747,7 +747,7 @@ class CommandCSSetSecureFounder : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -789,7 +789,7 @@ class CommandCSSetSecureFounder : public Command
 			this->OnSyntaxError(source, "SECUREFOUNDER");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -811,7 +811,7 @@ class CommandCSSetSecureOps : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -853,7 +853,7 @@ class CommandCSSetSecureOps : public Command
 			this->OnSyntaxError(source, "SECUREOPS");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -873,7 +873,7 @@ class CommandCSSetSignKick : public Command
 		this->SetSyntax(_("\037channel\037 {ON | LEVEL | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -925,7 +925,7 @@ class CommandCSSetSignKick : public Command
 			this->OnSyntaxError(source, "SIGNKICK");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -950,7 +950,7 @@ class CommandCSSetSuccessor : public Command
 		this->SetSyntax(_("\037channel\037 [\037nick\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -1010,7 +1010,7 @@ class CommandCSSetSuccessor : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -1044,7 +1044,7 @@ class CommandCSSetNoexpire : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -1083,7 +1083,7 @@ class CommandCSSetNoexpire : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -1103,7 +1103,7 @@ class CSSet : public Module
 	{
 		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
 
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
 			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
 
@@ -1123,7 +1123,7 @@ class CSSet : public Module
 			data["last_modes"] << modes;
 		}
 
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
@@ -1184,17 +1184,17 @@ class CSSet : public Module
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		persist_lower_ts = conf->GetModule(this)->Get<bool>("persist_lower_ts");
 	}
 
-	void OnCreateChan(ChannelInfo *ci) anope_override
+	void OnCreateChan(ChannelInfo *ci) override
 	{
 		ci->bantype = Config->GetModule(this)->Get<int>("defbantype", "2");
 	}
 
-	void OnChannelSync(Channel *c) anope_override
+	void OnChannelSync(Channel *c) override
 	{
 		if (c->ci && keep_modes.HasExt(c->ci))
 		{
@@ -1204,7 +1204,7 @@ class CSSet : public Module
 		}
 	}
 
-	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
+	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
 		if (!c->ci || !restricted.HasExt(c->ci) || c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;
@@ -1215,14 +1215,14 @@ class CSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnDelChan(ChannelInfo *ci) anope_override
+	void OnDelChan(ChannelInfo *ci) override
 	{
 		if (ci->c && persist.HasExt(ci))
 			ci->c->RemoveMode(ci->WhoSends(), "PERM", "", false);
 		persist.Unset(ci);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (c->ci)
 		{
@@ -1237,7 +1237,7 @@ class CSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (mode->name == "PERM")
 		{
@@ -1251,7 +1251,7 @@ class CSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	void OnJoinChannel(User *u, Channel *c) override
 	{
 		if (u->server != Me && persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->time_registered)
 		{
@@ -1262,7 +1262,7 @@ class CSSet : public Module
 		}
 	}
 
-	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_override
+	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		if (chan->ci)
 		{
@@ -1274,13 +1274,13 @@ class CSSet : public Module
 		}
 	}
 
-	void OnPreChanExpire(ChannelInfo *ci, bool &expire) anope_override
+	void OnPreChanExpire(ChannelInfo *ci, bool &expire) override
 	{
 		if (noexpire.HasExt(ci))
 			expire = false;
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;

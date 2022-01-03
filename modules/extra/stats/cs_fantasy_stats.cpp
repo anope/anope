@@ -17,11 +17,11 @@ class MySQLInterface : public SQL::Interface
  public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
-	void OnResult(const SQL::Result &r) anope_override
+	void OnResult(const SQL::Result &r) override
 	{
 	}
 
-	void OnError(const SQL::Result &r) anope_override
+	void OnError(const SQL::Result &r) override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
@@ -73,7 +73,7 @@ class CSStats : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		prefix = conf->GetModule("m_chanstats")->Get<const Anope::string>("prefix", "anope_");
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("m_chanstats")->Get<const Anope::string>("engine"));

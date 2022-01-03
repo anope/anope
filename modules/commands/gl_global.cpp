@@ -22,7 +22,7 @@ class CommandGLGlobal : public Command
 		this->SetSyntax(_("\037message\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &msg = params[0];
 
@@ -35,7 +35,7 @@ class CommandGLGlobal : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		Reference<BotInfo> sender;
 		if (GService)

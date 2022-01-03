@@ -21,7 +21,7 @@ namespace SQL
 			Clear();
 		}
 
-		std::iostream& operator[](const Anope::string &key) anope_override
+		std::iostream& operator[](const Anope::string &key) override
 		{
 			std::stringstream *&ss = data[key];
 			if (!ss)
@@ -29,7 +29,7 @@ namespace SQL
 			return *ss;
 		}
 
-		std::set<Anope::string> KeySet() const anope_override
+		std::set<Anope::string> KeySet() const override
 		{
 			std::set<Anope::string> keys;
 			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
@@ -37,7 +37,7 @@ namespace SQL
 			return keys;
 		}
 
-		size_t Hash() const anope_override
+		size_t Hash() const override
 		{
 			size_t hash = 0;
 			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
@@ -61,12 +61,12 @@ namespace SQL
 			this->data.clear();
 		}
 
-		void SetType(const Anope::string &key, Type t) anope_override
+		void SetType(const Anope::string &key, Type t) override
 		{
 			this->types[key] = t;
 		}
 
-		Type GetType(const Anope::string &key) const anope_override
+		Type GetType(const Anope::string &key) const override
 		{
 			std::map<Anope::string, Type>::const_iterator it = this->types.find(key);
 			if (it != this->types.end())

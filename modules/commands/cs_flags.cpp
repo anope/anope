@@ -22,7 +22,7 @@ class FlagsChanAccess : public ChanAccess
 	{
 	}
 
-	bool HasPriv(const Anope::string &priv) const anope_override
+	bool HasPriv(const Anope::string &priv) const override
 	{
 		std::map<Anope::string, char>::iterator it = defaultFlags.find(priv);
 		if (it != defaultFlags.end() && this->flags.count(it->second) > 0)
@@ -30,12 +30,12 @@ class FlagsChanAccess : public ChanAccess
 		return false;
 	}
 
-	Anope::string AccessSerialize() const anope_override
+	Anope::string AccessSerialize() const override
 	{
 		return Anope::string(this->flags.begin(), this->flags.end());
 	}
 
-	void AccessUnserialize(const Anope::string &data) anope_override
+	void AccessUnserialize(const Anope::string &data) override
 	{
 		for (unsigned i = data.length(); i > 0; --i)
 			this->flags.insert(data[i - 1]);
@@ -69,7 +69,7 @@ class FlagsAccessProvider : public AccessProvider
 		ap = this;
 	}
 
-	ChanAccess *Create() anope_override
+	ChanAccess *Create() override
 	{
 		return new FlagsChanAccess(this);
 	}
@@ -376,7 +376,7 @@ class CommandCSFlags : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &cmd = params.size() > 1 ? params[1] : "";
@@ -425,7 +425,7 @@ class CommandCSFlags : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -478,7 +478,7 @@ class CSFlags : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		defaultFlags.clear();
 

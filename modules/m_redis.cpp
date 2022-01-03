@@ -25,10 +25,10 @@ class RedisSocket : public BinarySocket, public ConnectionSocket
 
 	~RedisSocket();
 
-	void OnConnect() anope_override;
-	void OnError(const Anope::string &error) anope_override;
+	void OnConnect() override;
+	void OnError(const Anope::string &error) override;
 
-	bool Read(const char *buffer, size_t l) anope_override;
+	bool Read(const char *buffer, size_t l) override;
 };
 
 class Transaction : public Interface
@@ -51,7 +51,7 @@ class Transaction : public Interface
 		}
 	}
 
-	void OnResult(const Reply &r) anope_override
+	void OnResult(const Reply &r) override
 	{
 		/* This is a multi bulk reply of the results of the queued commands
 		 * in this transaction
@@ -157,7 +157,7 @@ class MyRedisService : public Provider
 	}
 
  public:
-	bool IsSocketDead() anope_override
+	bool IsSocketDead() override
 	{
 		return this->sock && this->sock->flags[SF_DEAD];
 	}
@@ -188,7 +188,7 @@ class MyRedisService : public Provider
 		this->Send(sock, i, args);
 	}
 
-	void SendCommand(Interface *i, const std::vector<Anope::string> &cmds) anope_override
+	void SendCommand(Interface *i, const std::vector<Anope::string> &cmds) override
 	{
 		std::vector<std::pair<const char *, size_t> > args;
 		for (unsigned j = 0; j < cmds.size(); ++j)
@@ -196,7 +196,7 @@ class MyRedisService : public Provider
 		this->Send(i, args);
 	}
 
-	void SendCommand(Interface *i, const Anope::string &str) anope_override
+	void SendCommand(Interface *i, const Anope::string &str) override
 	{
 		std::vector<Anope::string> args;
 		spacesepstream(str).GetTokens(args);
@@ -204,7 +204,7 @@ class MyRedisService : public Provider
 	}
 
  public:
-	bool BlockAndProcess() anope_override
+	bool BlockAndProcess() override
 	{
 		if (!this->sock->ProcessWrite())
 			this->sock->flags[SF_DEAD] = true;
@@ -215,7 +215,7 @@ class MyRedisService : public Provider
 		return !this->sock->interfaces.empty();
 	}
 
-	void Subscribe(Interface *i, const Anope::string &pattern) anope_override
+	void Subscribe(Interface *i, const Anope::string &pattern) override
 	{
 		if (sub == NULL)
 		{
@@ -231,13 +231,13 @@ class MyRedisService : public Provider
 		sub->subinterfaces[pattern] = i;
 	}
 
-	void Unsubscribe(const Anope::string &pattern) anope_override
+	void Unsubscribe(const Anope::string &pattern) override
 	{
 		if (sub)
 			sub->subinterfaces.erase(pattern);
 	}
 
-	void StartTransaction() anope_override
+	void StartTransaction() override
 	{
 		if (in_transaction)
 			throw CoreException();
@@ -246,7 +246,7 @@ class MyRedisService : public Provider
 		in_transaction = true;
 	}
 
-	void CommitTransaction() anope_override
+	void CommitTransaction() override
 	{
 		/* The result of the transaction comes back to the reply of EXEC as a multi bulk.
 		 * The reply to the individual commands that make up the transaction when executed
@@ -549,7 +549,7 @@ class ModuleRedis : public Module
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		std::vector<Anope::string> new_services;
@@ -578,7 +578,7 @@ class ModuleRedis : public Module
 		}
 	}
 
-	void OnModuleUnload(User *, Module *m) anope_override
+	void OnModuleUnload(User *, Module *m) override
 	{
 		for (std::map<Anope::string, MyRedisService *>::iterator it = services.begin(); it != services.end(); ++it)
 		{

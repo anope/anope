@@ -42,7 +42,7 @@ class CommandHSGroup : public Command
 		this->SetDesc(_("Syncs the vhost for all nicks in a group"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -65,7 +65,7 @@ class CommandHSGroup : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -90,7 +90,7 @@ class HSGroup : public Module
 			throw ModuleException("Your IRCd does not support vhosts");
 	}
 
-	void OnSetVhost(NickAlias *na) anope_override
+	void OnSetVhost(NickAlias *na) override
 	{
 		if (!synconset)
 			return;
@@ -98,7 +98,7 @@ class HSGroup : public Module
 		commandhsgroup.Sync(na);
 	}
 
-	void OnNickGroup(User *u, NickAlias *na) anope_override
+	void OnNickGroup(User *u, NickAlias *na) override
 	{
 		if (!syncongroup)
 			return;
@@ -106,7 +106,7 @@ class HSGroup : public Module
 		commandhsgroup.Sync(na);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		syncongroup = block->Get<bool>("syncongroup");

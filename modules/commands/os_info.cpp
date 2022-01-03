@@ -21,7 +21,7 @@ struct OperInfo : Serializable
 
 	~OperInfo();
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["target"] << target;
 		data["info"] << info;
@@ -104,7 +104,7 @@ class CommandOSInfo : public Command
 		this->SetSyntax(_("CLEAR \037target\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0], target = params[1], info = params.size() > 2 ? params[2] : "";
 
@@ -236,7 +236,7 @@ class CommandOSInfo : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -276,12 +276,12 @@ class OSInfo : public Module
 
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
 	{
 		OnInfo(source, na->nc, info);
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) override
 	{
 		OnInfo(source, ci, info);
 	}

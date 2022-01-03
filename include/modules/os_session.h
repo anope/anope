@@ -28,7 +28,7 @@ struct Exception : Serializable
 	time_t expires;			/* Time when it expires. 0 == no expiry */
 
 	Exception() : Serializable("Exception") { }
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 

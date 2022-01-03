@@ -27,7 +27,7 @@ class SQLAuthenticationResult : public SQL::Interface
 		req->Release(me);
 	}
 
-	void OnResult(const SQL::Result &r) anope_override
+	void OnResult(const SQL::Result &r) override
 	{
 		if (r.Rows() == 0)
 		{
@@ -66,7 +66,7 @@ class SQLAuthenticationResult : public SQL::Interface
 		delete this;
 	}
 
-	void OnError(const SQL::Result &r) anope_override
+	void OnError(const SQL::Result &r) override
 	{
 		Log(this->owner) << "m_sql_authentication: Error executing query " << r.GetQuery().query << ": " << r.GetError();
 		delete this;
@@ -88,7 +88,7 @@ class ModuleSQLAuthentication : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 		this->engine = config->Get<const Anope::string>("engine");
@@ -99,7 +99,7 @@ class ModuleSQLAuthentication : public Module
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		if (!this->disable_reason.empty() && (command->name == "nickserv/register" || command->name == "nickserv/group"))
 		{
@@ -116,7 +116,7 @@ class ModuleSQLAuthentication : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnCheckAuthentication(User *u, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *u, IdentifyRequest *req) override
 	{
 		if (!this->SQL)
 		{

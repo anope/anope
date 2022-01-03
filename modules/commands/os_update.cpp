@@ -19,7 +19,7 @@ class CommandOSUpdate : public Command
 		this->SetDesc(_("Force the Services databases to be updated immediately"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Log(LOG_ADMIN, source, this);
 		source.Reply(_("Updating databases."));
@@ -27,7 +27,7 @@ class CommandOSUpdate : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

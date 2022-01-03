@@ -17,7 +17,7 @@ struct BadWordImpl : BadWord, Serializable
 	BadWordImpl() : Serializable("BadWord") { }
 	~BadWordImpl();
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["ci"] << this->chan;
 		data["word"] << this->word;
@@ -37,7 +37,7 @@ struct BadWordsImpl : BadWords
 
 	~BadWordsImpl();
 
-	BadWord* AddBadWord(const Anope::string &word, BadWordType type) anope_override
+	BadWord* AddBadWord(const Anope::string &word, BadWordType type) override
 	{
 		BadWordImpl *bw = new BadWordImpl();
 		bw->chan = ci->name;
@@ -51,7 +51,7 @@ struct BadWordsImpl : BadWords
 		return bw;
 	}
 
-	BadWord* GetBadWord(unsigned index) const anope_override
+	BadWord* GetBadWord(unsigned index) const override
 	{
 		if (this->badwords->empty() || index >= this->badwords->size())
 			return NULL;
@@ -61,12 +61,12 @@ struct BadWordsImpl : BadWords
 		return bw;
 	}
 
-	unsigned GetBadWordCount() const anope_override
+	unsigned GetBadWordCount() const override
 	{
 		return this->badwords->size();
 	}
 
-	void EraseBadWord(unsigned index) anope_override
+	void EraseBadWord(unsigned index) override
 	{
 		if (this->badwords->empty() || index >= this->badwords->size())
 			return;
@@ -76,13 +76,13 @@ struct BadWordsImpl : BadWords
 		delete this->badwords->at(index);
 	}
 
-	void ClearBadWords() anope_override
+	void ClearBadWords() override
 	{
 		while (!this->badwords->empty())
 			delete this->badwords->back();
 	}
 
-	void Check() anope_override
+	void Check() override
 	{
 		if (this->badwords->empty())
 			ci->Shrink<BadWords>("badwords");
@@ -170,7 +170,7 @@ class BadwordsDelCallback : public NumberList
 			source.Reply(_("Deleted %d entries from %s bad words list."), deleted, ci->name.c_str());
 	}
 
-	void HandleNumber(unsigned Number) anope_override
+	void HandleNumber(unsigned Number) override
 	{
 		if (!bw || !Number || Number > bw->GetBadWordCount())
 			return;
@@ -209,7 +209,7 @@ class CommandBSBadwords : public Command
 				{
 				}
 
-				void HandleNumber(unsigned Number) anope_override
+				void HandleNumber(unsigned Number) override
 				{
 					if (!Number || Number > bw->GetBadWordCount())
 						return;
@@ -374,7 +374,7 @@ class CommandBSBadwords : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[1];
 		const Anope::string &word = params.size() > 2 ? params[2] : "";
@@ -417,7 +417,7 @@ class CommandBSBadwords : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

@@ -36,7 +36,7 @@ struct DNSZone : Serializable
 			zones->erase(it);
 	}
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["name"] << name;
 		unsigned count = 0;
@@ -139,7 +139,7 @@ class DNSServer : public Serializable
 		}
 	}
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["server_name"] << server_name;
 		for (unsigned i = 0; i < ips.size(); ++i)
@@ -669,7 +669,7 @@ class CommandOSDNS : public Command
 		this->SetSyntax(_("DEPOOL \037server.name\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params.empty())
 			this->DisplayPoolState(source);
@@ -695,7 +695,7 @@ class CommandOSDNS : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -754,7 +754,7 @@ class ModuleDNS : public Module
 			delete dns_servers->at(i - 1);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		this->ttl = block->Get<time_t>("ttl");
@@ -765,7 +765,7 @@ class ModuleDNS : public Module
 		this->readd_connected_servers = block->Get<bool>("readd_connected_servers");
 	}
 
-	void OnNewServer(Server *s) anope_override
+	void OnNewServer(Server *s) override
 	{
 		if (s == Me || s->IsJuped())
 			return;
@@ -780,7 +780,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnServerQuit(Server *s) anope_override
+	void OnServerQuit(Server *s) override
 	{
 		DNSServer *dns = DNSServer::Find(s->GetName());
 		if (remove_split_servers && dns && dns->Pooled() && dns->Active())
@@ -793,7 +793,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnUserConnect(User *u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (!u->Quitting() && u->server)
 		{
@@ -807,7 +807,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnPreUserLogoff(User *u) anope_override
+	void OnPreUserLogoff(User *u) override
 	{
 		if (u && u->server)
 		{
@@ -852,7 +852,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnDnsRequest(DNS::Query &req, DNS::Query *packet) anope_override
+	void OnDnsRequest(DNS::Query &req, DNS::Query *packet) override
 	{
 		if (req.questions.empty())
 			return;

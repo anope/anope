@@ -29,12 +29,12 @@ class GlobalCore : public Module, public GlobalService
 	{
 	}
 
-	Reference<BotInfo> GetDefaultSender() anope_override
+	Reference<BotInfo> GetDefaultSender() override
 	{
 		return Global;
 	}
 
-	void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) anope_override
+	void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) override
 	{
 		if (Me->GetLinks().empty())
 			return;
@@ -53,7 +53,7 @@ class GlobalCore : public Module, public GlobalService
 		this->ServerGlobal(sender, Servers::GetUplink(), rmessage);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		const Anope::string &glnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
@@ -67,28 +67,28 @@ class GlobalCore : public Module, public GlobalService
 		Global = bi;
 	}
 
-	void OnRestart() anope_override
+	void OnRestart() override
 	{
 		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
 		if (!gl.empty())
 			this->SendGlobal(Global, "", gl);
 	}
 
-	void OnShutdown() anope_override
+	void OnShutdown() override
 	{
 		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
 		if (!gl.empty())
 			this->SendGlobal(Global, "", gl);
 	}
 
-	void OnNewServer(Server *s) anope_override
+	void OnNewServer(Server *s) override
 	{
 		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycleup");
 		if (!gl.empty() && !Me->IsSynced())
 			s->Notice(Global, gl);
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!params.empty() || source.c || source.service != *Global)
 			return EVENT_CONTINUE;

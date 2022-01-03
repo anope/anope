@@ -20,7 +20,7 @@ class CommandBSSetFantasy : public Command
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		const Anope::string &value = params[1];
@@ -63,7 +63,7 @@ class CommandBSSetFantasy : public Command
 			this->OnSyntaxError(source, source.command);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -92,7 +92,7 @@ class Fantasy : public Module
 	{
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) override
 	{
 		if (!u || !c || !c->ci || !c->ci->bi || msg.empty() || msg[0] == '\1')
 			return;
@@ -208,7 +208,7 @@ class Fantasy : public Module
 		FOREACH_MOD(OnPostCommand, (source, cmd, params));
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
 	{
 		if (fantasy.HasExt(ci))
 			info.AddOption(_("Fantasy"));

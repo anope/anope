@@ -888,14 +888,14 @@ class EBCRYPT : public Module
 			throw ModuleException("BCrypt could not load!");
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		dest = "bcrypt:" + Generate(src, Salt());
 		Log(LOG_DEBUG_2) << "(enc_bcrypt) hashed password from [" << src << "] to [" << dest << "]";
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)
@@ -935,7 +935,7 @@ class EBCRYPT : public Module
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		rounds = block->Get<unsigned int>("rounds", "10");

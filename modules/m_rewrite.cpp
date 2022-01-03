@@ -106,7 +106,7 @@ class RewriteCommand : public Command
  public:
 	RewriteCommand(Module *creator) : Command(creator, "rewrite", 0, 0) { }
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		std::vector<Anope::string> full_params = params;
 		full_params.insert(full_params.begin(), source.command);
@@ -125,7 +125,7 @@ class RewriteCommand : public Command
 			Log() << "m_rewrite: Unable to rewrite '" << source.command << (!params.empty() ? " " + params[0] : "") << "'";
 	}
 
-	void OnServHelp(CommandSource &source) anope_override
+	void OnServHelp(CommandSource &source) override
 	{
 		Rewrite *r = Rewrite::Find(!source.c ? source.service->nick : "", source.command);
 		if (r != NULL && !r->desc.empty())
@@ -135,7 +135,7 @@ class RewriteCommand : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		Rewrite *r = Rewrite::Find(!source.c ? source.service->nick : "", source.command);
 		if (r != NULL && !r->desc.empty())
@@ -158,7 +158,7 @@ class ModuleRewrite : public Module
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Rewrite::rewrites.clear();
 

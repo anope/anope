@@ -22,7 +22,7 @@ class ChannelModeLargeBan : public ChannelMode
  public:
 	ChannelModeLargeBan(const Anope::string &mname, char modeChar) : ChannelMode(mname, modeChar) { }
 
-	bool CanSet(User *u) const anope_override
+	bool CanSet(User *u) const override
 	{
 		return u && u->HasMode("OPER");
 	}
@@ -48,25 +48,25 @@ class SolanumProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) anope_override { ratbox->SendSVSKillInternal(source, targ, reason); }
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { ratbox->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override { ratbox->SendGlobopsInternal(source, buf); }
-	void SendSGLine(User *u, const XLine *x) anope_override { ratbox->SendSGLine(u, x); }
-	void SendSGLineDel(const XLine *x) anope_override { ratbox->SendSGLineDel(x); }
-	void SendAkill(User *u, XLine *x) anope_override { ratbox->SendAkill(u, x); }
-	void SendAkillDel(const XLine *x) anope_override { ratbox->SendAkillDel(x); }
-	void SendSQLine(User *u, const XLine *x) anope_override { ratbox->SendSQLine(u, x); }
-	void SendSQLineDel(const XLine *x) anope_override { ratbox->SendSQLineDel(x); }
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { ratbox->SendJoin(user, c, status); }
-	void SendServer(const Server *server) anope_override { ratbox->SendServer(server); }
-	void SendChannel(Channel *c) anope_override { ratbox->SendChannel(c); }
-	void SendTopic(const MessageSource &source, Channel *c) anope_override { ratbox->SendTopic(source, c); }
-	bool IsIdentValid(const Anope::string &ident) anope_override { return ratbox->IsIdentValid(ident); }
-	void SendLogin(User *u, NickAlias *na) anope_override { ratbox->SendLogin(u, na); }
-	void SendLogout(User *u) anope_override { ratbox->SendLogout(u); }
+	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { ratbox->SendSVSKillInternal(source, targ, reason); }
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override { ratbox->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override { ratbox->SendGlobopsInternal(source, buf); }
+	void SendSGLine(User *u, const XLine *x) override { ratbox->SendSGLine(u, x); }
+	void SendSGLineDel(const XLine *x) override { ratbox->SendSGLineDel(x); }
+	void SendAkill(User *u, XLine *x) override { ratbox->SendAkill(u, x); }
+	void SendAkillDel(const XLine *x) override { ratbox->SendAkillDel(x); }
+	void SendSQLine(User *u, const XLine *x) override { ratbox->SendSQLine(u, x); }
+	void SendSQLineDel(const XLine *x) override { ratbox->SendSQLineDel(x); }
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { ratbox->SendJoin(user, c, status); }
+	void SendServer(const Server *server) override { ratbox->SendServer(server); }
+	void SendChannel(Channel *c) override { ratbox->SendChannel(c); }
+	void SendTopic(const MessageSource &source, Channel *c) override { ratbox->SendTopic(source, c); }
+	bool IsIdentValid(const Anope::string &ident) override { return ratbox->IsIdentValid(ident); }
+	void SendLogin(User *u, NickAlias *na) override { ratbox->SendLogin(u, na); }
+	void SendLogout(User *u) override { ratbox->SendLogout(u); }
 
-	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) anope_override
+	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override
 	{
 		Anope::string mechlist;
 
@@ -78,7 +78,7 @@ class SolanumProto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENCAP * MECHLIST :" << (mechanisms.empty() ? "" : mechlist.substr(1));
 	}
 
-	void SendConnect() anope_override
+	void SendConnect() override
 	{
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
 		/*
@@ -120,45 +120,45 @@ class SolanumProto : public IRCDProto
 		UplinkSocket::Message() << "SVINFO 6 6 0 :" << Anope::CurTime;
 	}
 
-	void SendClientIntroduction(User *u) anope_override
+	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "EUID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " * * :" << u->realname;
 	}
 
-	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
+	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
 		UplinkSocket::Message(Me) << "ENCAP " << u->server->GetName() << " RSFNC " << u->GetUID()
 						<< " " << newnick << " " << when << " " << u->timestamp;
 	}
 
-	void SendSVSHold(const Anope::string &nick, time_t delay) anope_override
+	void SendSVSHold(const Anope::string &nick, time_t delay) override
 	{
 		UplinkSocket::Message(Me) << "ENCAP * NICKDELAY " << delay << " " << nick;
 	}
 
-	void SendSVSHoldDel(const Anope::string &nick) anope_override
+	void SendSVSHoldDel(const Anope::string &nick) override
 	{
 		UplinkSocket::Message(Me) << "ENCAP * NICKDELAY 0 " << nick;
 	}
 
-	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) anope_override
+	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
 	{
 		UplinkSocket::Message(Me) << "ENCAP * CHGHOST " << u->GetUID() << " :" << host;
 	}
 
-	void SendVhostDel(User *u) anope_override
+	void SendVhostDel(User *u) override
 	{
 		this->SendVhost(u, "", u->host);
 	}
 
-	void SendSASLMessage(const SASL::Message &message) anope_override
+	void SendSASLMessage(const SASL::Message &message) override
 	{
 		Server *s = Server::Find(message.target.substr(0, 3));
 		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : message.target.substr(0, 3)) << " SASL " << message.source << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : (" " + message.ext));
 	}
 
-	void SendSVSLogin(const Anope::string &uid, NickAlias *na) anope_override
+	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
 	{
 		Server *s = Server::Find(uid.substr(0, 3));
 		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : uid.substr(0, 3)) << " SVSLOGIN " << uid << " * " << (!na->GetVhostIdent().empty() ? na->GetVhostIdent() : '*')
@@ -174,7 +174,7 @@ struct IRCDMessageEncap : IRCDMessage
 		SetFlag(IRCDMESSAGE_SOFT_LIMIT);
 	}
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		// In a burst, states that the source user is logged in as the account.
 		if (params[1] == "LOGIN" || params[1] == "SU")
@@ -240,7 +240,7 @@ struct IRCDMessageEUID : IRCDMessage
 	 * user is not logged in with services). Hence a NICK or UID command received
 	 * from a remote server should not be sent in EUID form to other servers.
 	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		NickAlias *na = NULL;
 		if (params[9] != "*")
@@ -256,7 +256,7 @@ struct IRCDMessageServer : IRCDMessage
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	// SERVER dev.anope.de 1 :solanum test server
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		// Servers other then our immediate uplink are introduced via SID
 		if (params[1] != "1")
@@ -271,7 +271,7 @@ struct IRCDMessagePass : IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		// UplinkSID is used in IRCDMessageServer
 		UplinkSID = params[3];
@@ -282,7 +282,7 @@ struct IRCDMessageNotice : Message::Notice
 {
 	IRCDMessageNotice(Module *creator) : Message::Notice(creator) { }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		if (Servers::Capab.count("ECHO"))
 			UplinkSocket::Message(Me) << "ECHO N " << source.GetSource() << " :"  << params[1];
@@ -295,7 +295,7 @@ struct IRCDMessagePrivmsg : Message::Privmsg
 {
 	IRCDMessagePrivmsg(Module *creator) : Message::Privmsg(creator) { }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		if (Servers::Capab.count("ECHO"))
 			UplinkSocket::Message(Me) << "ECHO P " << source.GetSource() << " :"  << params[1];
@@ -407,7 +407,7 @@ class ProtoSolanum : public Module
 		ModuleManager::UnloadModule(m_ratbox, NULL);
 	}
 
-	void OnUserLogin(User *u) anope_override
+	void OnUserLogin(User *u) override
 	{
 		// If the user has logged into their current nickname then mark them as such.
 		NickAlias *na = NickAlias::Find(u->nick);
@@ -417,13 +417,13 @@ class ProtoSolanum : public Module
 			UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " " << u->nick << " OFF";
 	}
 
-	void OnNickLogout(User *u) anope_override
+	void OnNickLogout(User *u) override
 	{
 		// We don't know what account the user was logged into so send in all cases.
 		UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " " << u->nick << " OFF";
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &) anope_override
+	void OnUserNickChange(User *u, const Anope::string &) override
 	{
 		// If the user is logged into an account check if we need to mark them
 		// as not identified to their nick.
@@ -431,12 +431,12 @@ class ProtoSolanum : public Module
 			OnUserLogin(u);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
 	}
 
-	void OnChannelSync(Channel *c) anope_override
+	void OnChannelSync(Channel *c) override
 	{
 		if (!c->ci)
 			return;
@@ -449,7 +449,7 @@ class ProtoSolanum : public Module
 		}
 	}
 
-	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
+	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
@@ -462,7 +462,7 @@ class ProtoSolanum : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
+	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);

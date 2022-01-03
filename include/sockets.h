@@ -291,12 +291,12 @@ class CoreExport BufferedSocket : public virtual Socket
 	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessRead() anope_override;
+	bool ProcessRead() override;
 
 	/** Called when the socket is ready to be written to
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessWrite() anope_override;
+	bool ProcessWrite() override;
 
 	/** Gets the new line from the input buffer, if any
 	 */
@@ -345,12 +345,12 @@ class CoreExport BinarySocket : public virtual Socket
 	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessRead() anope_override;
+	bool ProcessRead() override;
 
 	/** Called when the socket is ready to be written to
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessWrite() anope_override;
+	bool ProcessWrite() override;
 
 	/** Write data to the socket
 	 * @param buffer The data to write
@@ -408,12 +408,12 @@ class CoreExport ConnectionSocket : public virtual Socket
 	 * Used to determine whether or not this socket is connected yet.
 	 * @return true to continue to call ProcessRead/ProcessWrite, false to not continue
 	 */
-	bool Process() anope_override;
+	bool Process() override;
 
 	/** Called when there is an error for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	void ProcessError() anope_override;
+	void ProcessError() override;
 
 	/** Called on a successful connect
 	 */
@@ -443,12 +443,12 @@ class CoreExport ClientSocket : public virtual Socket
 	 * Used to determine whether or not this socket is connected yet.
 	 * @return true to continue to call ProcessRead/ProcessWrite, false to not continue
 	 */
-	bool Process() anope_override;
+	bool Process() override;
 
 	/** Called when there is an error for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	void ProcessError() anope_override;
+	void ProcessError() override;
 
 	/** Called when a client has been accepted() successfully.
 	 */
@@ -472,7 +472,7 @@ class CoreExport Pipe : public Socket
 
 	/** Called when data is to be read, reads the data then calls OnNotify
 	 */
-	bool ProcessRead() anope_override;
+	bool ProcessRead() override;
 
 	/** Write data to this pipe
 	 * @param data The data to write

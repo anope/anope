@@ -42,7 +42,7 @@ class SQLOperResult : public SQL::Interface
  public:
 	SQLOperResult(Module *m, User *u) : SQL::Interface(m), user(u) { }
 
-	void OnResult(const SQL::Result &r) anope_override
+	void OnResult(const SQL::Result &r) override
 	{
 		SQLOperResultDeleter d(this);
 
@@ -116,7 +116,7 @@ class SQLOperResult : public SQL::Interface
 		}
 	}
 
-	void OnError(const SQL::Result &r) anope_override
+	void OnError(const SQL::Result &r) override
 	{
 		SQLOperResultDeleter d(this);
 		Log(this->owner) << "m_sql_oper: Error executing query " << r.GetQuery().query << ": " << r.GetError();
@@ -149,7 +149,7 @@ class ModuleSQLOper : public Module
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
@@ -159,7 +159,7 @@ class ModuleSQLOper : public Module
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnNickIdentify(User *u) override
 	{
 		if (!this->SQL)
 		{

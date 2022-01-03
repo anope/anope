@@ -93,7 +93,7 @@ class BaseExtensibleItem : public ExtensibleBase
 		return t;
 	}
 
-	void Unset(Extensible *obj) anope_override
+	void Unset(Extensible *obj) override
 	{
 		T *value = Get(obj);
 		items.erase(obj);
@@ -128,7 +128,7 @@ template<typename T>
 class ExtensibleItem : public BaseExtensibleItem<T>
 {
  protected:
-	T* Create(Extensible *obj) anope_override
+	T* Create(Extensible *obj) override
 	{
 		return new T(obj);
 	}
@@ -140,7 +140,7 @@ template<typename T>
 class PrimitiveExtensibleItem : public BaseExtensibleItem<T>
 {
  protected:
-	T* Create(Extensible *obj) anope_override
+	T* Create(Extensible *obj) override
 	{
 		return new T();
 	}
@@ -152,7 +152,7 @@ template<>
 class PrimitiveExtensibleItem<bool> : public BaseExtensibleItem<bool>
 {
  protected:
-	bool* Create(Extensible *) anope_override
+	bool* Create(Extensible *) override
 	{
 		return NULL;
 	}
@@ -166,13 +166,13 @@ class SerializableExtensibleItem : public PrimitiveExtensibleItem<T>
  public:
 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<T>(m, n) { }
 
-	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 	{
 		T* t = this->Get(e);
 		data[this->name] << *t;
 	}
 
-	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 	{
 		T t;
 		if (data[this->name] >> t)
@@ -188,12 +188,12 @@ class SerializableExtensibleItem<bool> : public PrimitiveExtensibleItem<bool>
  public:
 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<bool>(m, n) { }
 
-	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 	{
 		data[this->name] << true;
 	}
 
-	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 	{
 		bool b = false;
 		data[this->name] >> b;

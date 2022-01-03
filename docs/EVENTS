@@ -22,13 +22,10 @@ Anope Internal Events
     The full list of functions and parameters are in modules.h. In this
     case, you would be overriding OnJoinChannel() and OnPartChannel() like so:
 
-    void OnJoinChannel(User *u, Channel *c) anope_override { }
-    void OnPartChannel(User *u, Channel *c) anope_override { }
+    void OnJoinChannel(User *u, Channel *c) override { }
+    void OnPartChannel(User *u, Channel *c) override { }
 
     Some of these event overrides can be used to prevent or allow things to
     happen that would normally not be allowed or denied. You can also use
     ModuleManager (not explained here) to set control which order the modules
     are queried (when multiple modules hook to the same event).
-
-    The "anope_override" identifier is for compatibility with C++11.
-    Its usage is highly recommended.

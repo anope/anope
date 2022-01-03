@@ -20,7 +20,7 @@ class CommandOSModInfo : public Command
 		this->SetSyntax(_("\037modname\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &file = params[0];
 
@@ -63,7 +63,7 @@ class CommandOSModInfo : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -81,7 +81,7 @@ class CommandOSModList : public Command
 		this->SetSyntax("[all|third|vendor|extra|database|encryption|pseudoclient|protocol]");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &param = !params.empty() ? params[0] : "";
 
@@ -189,7 +189,7 @@ class CommandOSModList : public Command
 			source.Reply(_("%d modules loaded."), count);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

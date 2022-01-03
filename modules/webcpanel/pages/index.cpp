@@ -19,7 +19,7 @@ class WebpanelRequest : public IdentifyRequest
  public:
 	WebpanelRequest(Module *o, HTTPReply &r, HTTPMessage &m, HTTPProvider *s, const Anope::string &p_n, HTTPClient *c, TemplateFileServer::Replacements &re, const Anope::string &user, const Anope::string &pass) : IdentifyRequest(o, user, pass), reply(r), message(m), server(s), page_name(p_n), client(c), replacements(re) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		if (!client || !server)
 			return;
@@ -78,7 +78,7 @@ class WebpanelRequest : public IdentifyRequest
 		client->SendReply(&reply);
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		if (!client || !server)
 			return;

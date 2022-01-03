@@ -41,7 +41,7 @@ class MemoServCore : public Module, public MemoServService
 	{
 	}
 
-	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) anope_override
+	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) override
 	{
 		bool ischan;
 		MemoInfo *mi = MemoInfo::GetMemoInfo(target, ischan);
@@ -129,7 +129,7 @@ class MemoServCore : public Module, public MemoServService
 		return MEMO_SUCCESS;
 	}
 
-	void Check(User *u) anope_override
+	void Check(User *u) override
 	{
 		const NickCore *nc = u->Account();
 		if (!nc)
@@ -150,7 +150,7 @@ class MemoServCore : public Module, public MemoServService
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		const Anope::string &msnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
@@ -164,28 +164,28 @@ class MemoServCore : public Module, public MemoServService
 		MemoServ = bi;
 	}
 
-	void OnNickCoreCreate(NickCore *nc) anope_override
+	void OnNickCoreCreate(NickCore *nc) override
 	{
 		nc->memos.memomax = Config->GetModule(this)->Get<int>("maxmemos");
 	}
 
-	void OnCreateChan(ChannelInfo *ci) anope_override
+	void OnCreateChan(ChannelInfo *ci) override
 	{
 		ci->memos.memomax = Config->GetModule(this)->Get<int>("maxmemos");
 	}
 
-	void OnBotDelete(BotInfo *bi) anope_override
+	void OnBotDelete(BotInfo *bi) override
 	{
 		if (bi == MemoServ)
 			MemoServ = NULL;
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnNickIdentify(User *u) override
 	{
 		this->Check(u);
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	void OnJoinChannel(User *u, Channel *c) override
 	{
 		if (c->ci && !c->ci->memos.memos->empty() && c->ci->AccessFor(u).HasPriv("MEMO"))
 		{
@@ -196,18 +196,18 @@ class MemoServCore : public Module, public MemoServService
 		}
 	}
 
-	void OnUserAway(User *u, const Anope::string &message) anope_override
+	void OnUserAway(User *u, const Anope::string &message) override
 	{
 		if (message.empty())
 			this->Check(u);
 	}
 
-	void OnNickUpdate(User *u) anope_override
+	void OnNickUpdate(User *u) override
 	{
 		this->Check(u);
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!params.empty() || source.c || source.service != *MemoServ)
 			return EVENT_CONTINUE;
@@ -220,7 +220,7 @@ class MemoServCore : public Module, public MemoServService
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!params.empty() || source.c || source.service != *MemoServ)
 			return;

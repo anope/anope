@@ -42,24 +42,24 @@ class MySessionService : public SessionService
  public:
 	MySessionService(Module *m) : SessionService(m), Exceptions("Exception") { }
 
-	Exception *CreateException() anope_override
+	Exception *CreateException() override
 	{
 		return new Exception();
 	}
 
-	void AddException(Exception *e) anope_override
+	void AddException(Exception *e) override
 	{
 		this->Exceptions->push_back(e);
 	}
 
-	void DelException(Exception *e) anope_override
+	void DelException(Exception *e) override
 	{
 		ExceptionVector::iterator it = std::find(this->Exceptions->begin(), this->Exceptions->end(), e);
 		if (it != this->Exceptions->end())
 			this->Exceptions->erase(it);
 	}
 
-	Exception *FindException(User *u) anope_override
+	Exception *FindException(User *u) override
 	{
 		for (std::vector<Exception *>::const_iterator it = this->Exceptions->begin(), it_end = this->Exceptions->end(); it != it_end; ++it)
 		{
@@ -73,7 +73,7 @@ class MySessionService : public SessionService
 		return NULL;
 	}
 
-	Exception *FindException(const Anope::string &host) anope_override
+	Exception *FindException(const Anope::string &host) override
 	{
 		for (std::vector<Exception *>::const_iterator it = this->Exceptions->begin(), it_end = this->Exceptions->end(); it != it_end; ++it)
 		{
@@ -88,7 +88,7 @@ class MySessionService : public SessionService
 		return NULL;
 	}
 
-	ExceptionVector &GetExceptions() anope_override
+	ExceptionVector &GetExceptions() override
 	{
 		return this->Exceptions;
 	}
@@ -98,7 +98,7 @@ class MySessionService : public SessionService
 		this->Sessions.erase(s->addr);
 	}
 
-	Session *FindSession(const Anope::string &ip) anope_override
+	Session *FindSession(const Anope::string &ip) override
 	{
 		cidr c(ip, ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
 		if (!c.valid())
@@ -122,7 +122,7 @@ class MySessionService : public SessionService
 		return this->Sessions[ip];
 	}
 
-	SessionMap &GetSessions() anope_override
+	SessionMap &GetSessions() override
 	{
 		return this->Sessions;
 	}
@@ -149,7 +149,7 @@ class ExceptionDelCallback : public NumberList
 			source.Reply(_("Deleted %d entries from session-limit exception list."), deleted);
 	}
 
-	virtual void HandleNumber(unsigned number) anope_override
+	virtual void HandleNumber(unsigned number) override
 	{
 		if (!number || number > session_service->GetExceptions().size())
 			return;
@@ -247,7 +247,7 @@ class CommandOSSession : public Command
 		this->SetSyntax(_("VIEW \037host\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -263,7 +263,7 @@ class CommandOSSession : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -445,7 +445,7 @@ class CommandOSException : public Command
 				{
 				}
 
-				void HandleNumber(unsigned Number) anope_override
+				void HandleNumber(unsigned Number) override
 				{
 					if (!Number || Number > session_service->GetExceptions().size())
 						return;
@@ -526,7 +526,7 @@ class CommandOSException : public Command
 		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -544,7 +544,7 @@ class CommandOSException : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -597,12 +597,12 @@ class OSSession : public Module
 		this->SetPermanent(true);
 	}
 
-	void Prioritize() anope_override
+	void Prioritize() override
 	{
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = Config->GetModule(this);
 
@@ -622,7 +622,7 @@ class OSSession : public Module
 			throw ConfigException(this->name + ": session CIDR value out of range");
 	}
 
-	void OnUserConnect(User *u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (u->Quitting() || !session_limit || exempt || !u->server || u->server->IsULined())
 			return;
@@ -693,7 +693,7 @@ class OSSession : public Module
 		}
 	}
 
-	void OnUserQuit(User *u, const Anope::string &msg) anope_override
+	void OnUserQuit(User *u, const Anope::string &msg) override
 	{
 		if (!session_limit || !u->server || u->server->IsULined())
 			return;
@@ -716,7 +716,7 @@ class OSSession : public Module
 		sessions.erase(sit);
 	}
 
-	void OnExpireTick() anope_override
+	void OnExpireTick() override
 	{
 		if (Anope::NoExpire)
 			return;

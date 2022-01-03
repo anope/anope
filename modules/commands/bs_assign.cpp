@@ -20,7 +20,7 @@ class CommandBSAssign : public Command
 		this->SetSyntax(_("\037channel\037 \037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &nick = params[1];
@@ -71,7 +71,7 @@ class CommandBSAssign : public Command
 		source.Reply(_("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), ci->name.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -91,7 +91,7 @@ class CommandBSUnassign : public Command
 		this->SetSyntax(_("\037channel\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -132,7 +132,7 @@ class CommandBSUnassign : public Command
 		source.Reply(_("There is no bot assigned to %s anymore."), ci->name.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -154,7 +154,7 @@ class CommandBSSetNoBot : public Command
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		const Anope::string &value = params[1];
@@ -191,7 +191,7 @@ class CommandBSSetNoBot : public Command
 			this->OnSyntaxError(source, source.command);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -217,7 +217,7 @@ class BSAssign : public Module
 	{
 	}
 
-	void OnInvite(User *source, Channel *c, User *targ) anope_override
+	void OnInvite(User *source, Channel *c, User *targ) override
 	{
 		BotInfo *bi;
 		if (Anope::ReadOnly || !c->ci || targ->server != Me || !(bi = dynamic_cast<BotInfo *>(targ)))
@@ -246,7 +246,7 @@ class BSAssign : public Module
 		targ->SendMessage(bi, _("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), c->name.c_str());
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
 	{
 		if (nobot.HasExt(ci))
 			info.AddOption(_("No bot"));

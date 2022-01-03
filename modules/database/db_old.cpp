@@ -1313,7 +1313,7 @@ class DBOld : public Module
 			throw ModuleException("Invalid hash method");
 	}
 
-	EventReturn OnLoadDatabase() anope_override
+	EventReturn OnLoadDatabase() override
 	{
 		LoadNicks();
 		LoadVHosts();
@@ -1326,7 +1326,7 @@ class DBOld : public Module
 		return EVENT_STOP;
 	}
 
-	void OnUplinkSync(Server *s) anope_override
+	void OnUplinkSync(Server *s) override
 	{
 		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{

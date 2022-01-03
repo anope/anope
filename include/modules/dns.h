@@ -164,7 +164,7 @@ namespace DNS
 		/** Used to time out the query, xalls OnError and lets the TimerManager
 		 * delete this request.
 		 */
-		void Tick(time_t) anope_override
+		void Tick(time_t) override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: timeout for query " << this->name;
 			Query rr(*this);

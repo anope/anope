@@ -228,7 +228,7 @@ class CommandCSEnforce : public Command
 		this->SetSyntax(_("\037channel\037 \037what\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &what = params.size() > 1 ? params[1] : "";
 
@@ -256,7 +256,7 @@ class CommandCSEnforce : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

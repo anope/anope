@@ -39,12 +39,12 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
  public:
 	MyXMLRPCServiceInterface(Module *creator, const Anope::string &sname) : XMLRPCServiceInterface(creator, sname), HTTPPage("/xmlrpc", "text/xml") { }
 
-	void Register(XMLRPCEvent *event) anope_override
+	void Register(XMLRPCEvent *event) override
 	{
 		this->events.push_back(event);
 	}
 
-	void Unregister(XMLRPCEvent *event) anope_override
+	void Unregister(XMLRPCEvent *event) override
 	{
 		std::deque<XMLRPCEvent *>::iterator it = std::find(this->events.begin(), this->events.end(), event);
 
@@ -52,7 +52,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 			this->events.erase(it);
 	}
 
-	Anope::string Sanitize(const Anope::string &string) anope_override
+	Anope::string Sanitize(const Anope::string &string) override
 	{
 		Anope::string ret = string;
 		for (int i = 0; special[i].character.empty() == false; ++i)
@@ -145,7 +145,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 	}
 
  public:
-	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) anope_override
+	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
 	{
 		Anope::string content = message.content, tname, data;
 		XMLRPCRequest request(reply);
@@ -182,7 +182,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		return true;
 	}
 
-	void Reply(XMLRPCRequest &request) anope_override
+	void Reply(XMLRPCRequest &request) override
 	{
 		if (!request.id.empty())
 			request.reply("id", request.id);
@@ -214,7 +214,7 @@ class ModuleXMLRPC : public Module
 			httpref->UnregisterPage(&xmlrpcinterface);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		if (httpref)
 			httpref->UnregisterPage(&xmlrpcinterface);

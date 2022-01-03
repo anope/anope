@@ -19,12 +19,12 @@ class SQLSQLInterface : public Interface
  public:
 	SQLSQLInterface(Module *o) : Interface(o) { }
 
-	void OnResult(const Result &r) anope_override
+	void OnResult(const Result &r) override
 	{
 		Log(LOG_DEBUG) << "SQL successfully executed query: " << r.finished_query;
 	}
 
-	void OnError(const Result &r) anope_override
+	void OnError(const Result &r) override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Error executing query " << r.finished_query << ": " << r.GetError();
@@ -40,7 +40,7 @@ class ResultSQLSQLInterface : public SQLSQLInterface
 public:
 	ResultSQLSQLInterface(Module *o, Serializable *ob) : SQLSQLInterface(o), obj(ob) { }
 
-	void OnResult(const Result &r) anope_override
+	void OnResult(const Result &r) override
 	{
 		SQLSQLInterface::OnResult(r);
 		if (r.GetID() > 0 && this->obj)
@@ -48,7 +48,7 @@ public:
 		delete this;
 	}
 
-	void OnError(const Result &r) anope_override
+	void OnError(const Result &r) override
 	{
 		SQLSQLInterface::OnError(r);
 		delete this;
@@ -98,7 +98,7 @@ class DBSQL : public Module, public Pipe
 			throw ModuleException("db_sql can not be loaded after db_sql_live");
 	}
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
 		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
 		{
@@ -151,7 +151,7 @@ class DBSQL : public Module, public Pipe
 		this->imported = true;
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		this->sql = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
@@ -159,18 +159,18 @@ class DBSQL : public Module, public Pipe
 		this->import = block->Get<bool>("import");
 	}
 
-	void OnShutdown() anope_override
+	void OnShutdown() override
 	{
 		this->shutting_down = true;
 		this->OnNotify();
 	}
 
-	void OnRestart() anope_override
+	void OnRestart() override
 	{
 		this->OnShutdown();
 	}
 
-	EventReturn OnLoadDatabase() anope_override
+	EventReturn OnLoadDatabase() override
 	{
 		if (!this->sql)
 		{
@@ -193,7 +193,7 @@ class DBSQL : public Module, public Pipe
 		return EVENT_STOP;
 	}
 
-	void OnSerializableConstruct(Serializable *obj) anope_override
+	void OnSerializableConstruct(Serializable *obj) override
 	{
 		if (this->shutting_down || this->loading_databases)
 			return;
@@ -202,7 +202,7 @@ class DBSQL : public Module, public Pipe
 		this->Notify();
 	}
 
-	void OnSerializableDestruct(Serializable *obj) anope_override
+	void OnSerializableDestruct(Serializable *obj) override
 	{
 		if (this->shutting_down)
 			return;
@@ -212,7 +212,7 @@ class DBSQL : public Module, public Pipe
 		this->updated_items.erase(obj);
 	}
 
-	void OnSerializableUpdate(Serializable *obj) anope_override
+	void OnSerializableUpdate(Serializable *obj) override
 	{
 		if (this->shutting_down || obj->IsTSCached())
 			return;
@@ -223,7 +223,7 @@ class DBSQL : public Module, public Pipe
 		this->Notify();
 	}
 
-	void OnSerializeTypeCreate(Serialize::Type *sb) anope_override
+	void OnSerializeTypeCreate(Serialize::Type *sb) override
 	{
 		if (!this->loading_databases && !this->loaded)
 			return;

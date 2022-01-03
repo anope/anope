@@ -20,7 +20,7 @@ class Index : public WebPanelPage
  public:
 	Index(const Anope::string &u) : WebPanelPage(u), last_clear(0) { }
 
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) anope_override;
+	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) override;
 };
 
 }

@@ -43,7 +43,7 @@ struct SeenInfo : Serializable
 			database.erase(iter);
 	}
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["nick"] << nick;
 		data["vhost"] << vhost;
@@ -119,7 +119,7 @@ class CommandOSSeen : public Command
 		this->SetSyntax(_("CLEAR \037time\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params[0].equals_ci("STATS"))
 		{
@@ -165,7 +165,7 @@ class CommandOSSeen : public Command
 			this->SendSyntax(source);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -263,7 +263,7 @@ class CommandSeen : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &target = params[0];
 
@@ -360,7 +360,7 @@ class CommandSeen : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -381,12 +381,12 @@ class CSSeen : public Module
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		simple = conf->GetModule(this)->Get<bool>("simple");
 	}
 
-	void OnExpireTick() anope_override
+	void OnExpireTick() override
 	{
 		size_t previous_size = database.size();
 		time_t purgetime = Config->GetModule(this)->Get<time_t>("purgetime");
@@ -406,34 +406,34 @@ class CSSeen : public Module
 		Log(LOG_DEBUG) << "cs_seen: Purged database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";
 	}
 
-	void OnUserConnect(User *u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (!u->Quitting())
 			UpdateUser(u, NEW, u->nick, "", "", "");
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
+	void OnUserNickChange(User *u, const Anope::string &oldnick) override
 	{
 		UpdateUser(u, NICK_TO, oldnick, u->nick, "", "");
 		UpdateUser(u, NICK_FROM, u->nick, oldnick, "", "");
 	}
 
-	void OnUserQuit(User *u, const Anope::string &msg) anope_override
+	void OnUserQuit(User *u, const Anope::string &msg) override
 	{
 		UpdateUser(u, QUIT, u->nick, "", "", msg);
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	void OnJoinChannel(User *u, Channel *c) override
 	{
 		UpdateUser(u, JOIN, u->nick, "", c->name, "");
 	}
 
-	void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg) anope_override
+	void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg) override
 	{
 		UpdateUser(u, PART, u->nick, "", channel, msg);
 	}
 
-	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &msg) anope_override
+	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &msg) override
 	{
 		UpdateUser(cu->user, KICK, cu->user->nick, source.GetSource(), cu->chan->name, msg);
 	}

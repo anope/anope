@@ -38,7 +38,7 @@ namespace Anope
 	class ascii_ctype : public std::ctype<char_type>
 	{
 	 public:
-		char_type do_toupper(char_type c) const anope_override
+		char_type do_toupper(char_type c) const override
 		{
 			if (c >= 'a' && c <= 'z')
 				return c - 32;
@@ -46,7 +46,7 @@ namespace Anope
 				return c;
 		}
 
-		char_type do_tolower(char_type c) const anope_override
+		char_type do_tolower(char_type c) const override
 		{
 			if (c >= 'A' && c <= 'Z')
 				return c + 32;
@@ -60,7 +60,7 @@ namespace Anope
 	class rfc1459_ctype : public ascii_ctype<char_type>
 	{
 	 public:
-		char_type do_toupper(char_type c) const anope_override
+		char_type do_toupper(char_type c) const override
 		{
 			if (c == '{' || c == '}' || c == '|')
 				return c - 32;
@@ -68,7 +68,7 @@ namespace Anope
 				return ascii_ctype<char_type>::do_toupper(c);
 		}
 
-		char_type do_tolower(char_type c) const anope_override
+		char_type do_tolower(char_type c) const override
 		{
 			if (c == '[' || c == ']' || c == '\\')
 				return c + 32;

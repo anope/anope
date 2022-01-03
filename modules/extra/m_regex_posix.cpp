@@ -43,7 +43,7 @@ class POSIXRegexProvider : public RegexProvider
  public:
 	POSIXRegexProvider(Module *creator) : RegexProvider(creator, "regex/posix") { }
 
-	Regex *Compile(const Anope::string &expression) anope_override
+	Regex *Compile(const Anope::string &expression) override
 	{
 		return new POSIXRegex(expression);
 	}

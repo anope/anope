@@ -19,7 +19,7 @@ class CommandBSBotList : public Command
 		this->SetDesc(_("Lists available bots"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		unsigned count = 0;
 		ListFormatter list(source.GetAccount());
@@ -57,7 +57,7 @@ class CommandBSBotList : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

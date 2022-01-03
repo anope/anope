@@ -33,7 +33,7 @@ class CommandOSLogSearch : public Command
 		this->SetSyntax(_("[+\037days\037d] [+\037limit\037l] \037pattern\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		int days = 7, replies = 50;
 
@@ -152,7 +152,7 @@ class CommandOSLogSearch : public Command
 		source.Reply(_("Showed %d/%d matches for \002%s\002."), matches.size(), found, search_string.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

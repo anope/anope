@@ -81,12 +81,12 @@ class NSMaxEmail : public Module
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		clean = conf->GetModule(this)->Get<bool>("remove_aliases", "true");
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		if (source.IsOper())
 			return EVENT_CONTINUE;

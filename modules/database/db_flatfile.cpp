@@ -23,7 +23,7 @@ class SaveData : public Serialize::Data
 
 	SaveData() : fs(NULL) { }
 
-	std::iostream& operator[](const Anope::string &key) anope_override
+	std::iostream& operator[](const Anope::string &key) override
 	{
 		if (key != last)
 		{
@@ -46,7 +46,7 @@ class LoadData : public Serialize::Data
 
 	LoadData() : fs(NULL), id(0), read(false) { }
 
-	std::iostream& operator[](const Anope::string &key) anope_override
+	std::iostream& operator[](const Anope::string &key) override
 	{
 		if (!read)
 		{
@@ -78,7 +78,7 @@ class LoadData : public Serialize::Data
 		return this->ss;
 	}
 
-	std::set<Anope::string> KeySet() const anope_override
+	std::set<Anope::string> KeySet() const override
 	{
 		std::set<Anope::string> keys;
 		for (std::map<Anope::string, Anope::string>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
@@ -86,7 +86,7 @@ class LoadData : public Serialize::Data
 		return keys;
 	}
 
-	size_t Hash() const anope_override
+	size_t Hash() const override
 	{
 		size_t hash = 0;
 		for (std::map<Anope::string, Anope::string>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
@@ -178,12 +178,12 @@ class DBFlatFile : public Module, public Pipe
 	}
 
 #ifndef _WIN32
-	void OnRestart() anope_override
+	void OnRestart() override
 	{
 		OnShutdown();
 	}
 
-	void OnShutdown() anope_override
+	void OnShutdown() override
 	{
 		if (child_pid > -1)
 		{
@@ -197,7 +197,7 @@ class DBFlatFile : public Module, public Pipe
 	}
 #endif
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
 		char buf[512];
 		int i = this->Read(buf, sizeof(buf) - 1);
@@ -219,7 +219,7 @@ class DBFlatFile : public Module, public Pipe
 			Anope::Quitting = true;
 	}
 
-	EventReturn OnLoadDatabase() anope_override
+	EventReturn OnLoadDatabase() override
 	{
 		const std::vector<Anope::string> &type_order = Serialize::Type::GetTypeOrder();
 		std::set<Anope::string> tried_dbs;
@@ -269,7 +269,7 @@ class DBFlatFile : public Module, public Pipe
 	}
 
 
-	void OnSaveDatabase() anope_override
+	void OnSaveDatabase() override
 	{
 		if (child_pid > -1)
 		{
@@ -376,7 +376,7 @@ class DBFlatFile : public Module, public Pipe
 	}
 
 	/* Load just one type. Done if a module is reloaded during runtime */
-	void OnSerializeTypeCreate(Serialize::Type *stype) anope_override
+	void OnSerializeTypeCreate(Serialize::Type *stype) override
 	{
 		if (!loaded)
 			return;

@@ -20,7 +20,7 @@ class CommandBSSetGreet : public Command
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		const Anope::string &value = params[1];
@@ -63,7 +63,7 @@ class CommandBSSetGreet : public Command
 			this->OnSyntaxError(source, source.command);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -119,12 +119,12 @@ class CommandNSSetGreet : public Command
 		}
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params.size() > 0 ? params[0] : "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -145,12 +145,12 @@ class CommandNSSASetGreet : public CommandNSSetGreet
 		this->SetSyntax(_("\037nickname\037 \037message\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -182,7 +182,7 @@ class Greet : public Module
 	{
 	}
 
-	void OnJoinChannel(User *user, Channel *c) anope_override
+	void OnJoinChannel(User *user, Channel *c) override
 	{
 		/* Only display the greet if the main uplink we're connected
 		 * to has synced, or we'll get greet-floods when the net
@@ -199,14 +199,14 @@ class Greet : public Module
 		}
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
 	{
 		Anope::string *greet = ns_greet.Get(na->nc);
 		if (greet != NULL)
 			info[_("Greet")] = *greet;
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
 	{
 		if (bs_greet.HasExt(ci))
 			info.AddOption(_("Greet"));

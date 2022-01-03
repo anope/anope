@@ -44,7 +44,7 @@ class TRERegexProvider : public RegexProvider
  public:
 	TRERegexProvider(Module *creator) : RegexProvider(creator, "regex/tre") { }
 
-	Regex *Compile(const Anope::string &expression) anope_override
+	Regex *Compile(const Anope::string &expression) override
 	{
 		return new TRERegex(expression);
 	}

@@ -70,7 +70,7 @@ class LDAPBind : public LDAPRequest
 		type = QUERY_BIND;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPSearch : public LDAPRequest
@@ -87,7 +87,7 @@ class LDAPSearch : public LDAPRequest
 		type = QUERY_SEARCH;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPAdd : public LDAPRequest
@@ -104,7 +104,7 @@ class LDAPAdd : public LDAPRequest
 		type = QUERY_ADD;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPDel : public LDAPRequest
@@ -119,7 +119,7 @@ class LDAPDel : public LDAPRequest
 		type = QUERY_DELETE;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPModify : public LDAPRequest
@@ -136,7 +136,7 @@ class LDAPModify : public LDAPRequest
 		type = QUERY_MODIFY;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPService : public LDAPProvider, public Thread, public Condition
@@ -275,18 +275,18 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		ldap_unbind_ext(this->con, NULL, NULL);
 	}
 
-	void BindAsAdmin(LDAPInterface *i) anope_override
+	void BindAsAdmin(LDAPInterface *i) override
 	{
 		this->Bind(i, this->admin_binddn, this->admin_pass);
 	}
 
-	void Bind(LDAPInterface *i, const Anope::string &who, const Anope::string &pass) anope_override
+	void Bind(LDAPInterface *i, const Anope::string &who, const Anope::string &pass) override
 	{
 		LDAPBind *b = new LDAPBind(this, i, who, pass);
 		QueueRequest(b);
 	}
 
-	void Search(LDAPInterface *i, const Anope::string &base, const Anope::string &filter) anope_override
+	void Search(LDAPInterface *i, const Anope::string &base, const Anope::string &filter) override
 	{
 		if (i == NULL)
 			throw LDAPException("No interface");
@@ -295,19 +295,19 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		QueueRequest(s);
 	}
 
-	void Add(LDAPInterface *i, const Anope::string &dn, LDAPMods &attributes) anope_override
+	void Add(LDAPInterface *i, const Anope::string &dn, LDAPMods &attributes) override
 	{
 		LDAPAdd *add = new LDAPAdd(this, i, dn, attributes);
 		QueueRequest(add);
 	}
 
-	void Del(LDAPInterface *i, const Anope::string &dn) anope_override
+	void Del(LDAPInterface *i, const Anope::string &dn) override
 	{
 		LDAPDel *del = new LDAPDel(this, i, dn);
 		QueueRequest(del);
 	}
 
-	void Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) anope_override
+	void Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) override
 	{
 		LDAPModify *mod = new LDAPModify(this, i, base, attributes);
 		QueueRequest(mod);
@@ -414,7 +414,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 	}
 
  public:
-	void Run() anope_override
+	void Run() override
 	{
 		while (!this->GetExitState())
 		{
@@ -457,7 +457,7 @@ class ModuleLDAP : public Module, public Pipe
 		LDAPServices.clear();
 	}
 
-	void OnReload(Configuration::Conf *config) anope_override
+	void OnReload(Configuration::Conf *config) override
 	{
 		Configuration::Block *conf = config->GetModule(this);
 
@@ -513,7 +513,7 @@ class ModuleLDAP : public Module, public Pipe
 		}
 	}
 
-	void OnModuleUnload(User *, Module *m) anope_override
+	void OnModuleUnload(User *, Module *m) override
 	{
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end(); ++it)
 		{
@@ -550,7 +550,7 @@ class ModuleLDAP : public Module, public Pipe
 		}
 	}
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end(); ++it)
 		{

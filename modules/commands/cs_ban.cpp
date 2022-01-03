@@ -23,7 +23,7 @@ class TempBan : public Timer
  public:
 	TempBan(time_t seconds, Channel *c, const Anope::string &banmask, const Anope::string &mod) : Timer(me, seconds), channel(c->name), mask(banmask), mode(mod) { }
 
-	void Tick(time_t ctime) anope_override
+	void Tick(time_t ctime) override
 	{
 		Channel *c = Channel::Find(this->channel);
 		if (c)
@@ -40,7 +40,7 @@ class CommandCSBan : public Command
 		this->SetSyntax(_("\037channel\037 [+\037expiry\037] {\037nick\037 | \037mask\037} [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Configuration::Block *block = Config->GetCommand(source);
 		const Anope::string &mode = block->Get<Anope::string>("mode", "BAN");
@@ -223,7 +223,7 @@ class CommandCSBan : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

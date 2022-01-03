@@ -15,7 +15,7 @@ class HelpChannel : public Module
 	{
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (mode->name == "OP" && c && c->ci && c->name.equals_ci(Config->GetModule(this)->Get<const Anope::string>("helpchannel")))
 		{

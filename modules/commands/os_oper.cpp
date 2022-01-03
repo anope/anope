@@ -15,7 +15,7 @@ struct MyOper : Oper, Serializable
 {
 	MyOper(const Anope::string &n, OperType *o) : Oper(n, o), Serializable("Oper") { }
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["name"] << this->name;
 		data["type"] << this->ot->GetName();
@@ -73,7 +73,7 @@ class CommandOSOper : public Command
 		this->SetSyntax("LIST");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &subcommand = params[0];
 
@@ -243,7 +243,7 @@ class CommandOSOper : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -279,7 +279,7 @@ class OSOper : public Module
 		}
 	}
 
-	void OnDelCore(NickCore *nc) anope_override
+	void OnDelCore(NickCore *nc) override
 	{
 		if (nc->o && dynamic_cast<MyOper *>(nc->o))
 		{

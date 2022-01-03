@@ -18,7 +18,7 @@ class ENone : public Module
 			throw ModuleException("enc_none is deprecated and can not be used as a primary encryption method");
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		Anope::string buf = "plain:";
 		Anope::string cpass;
@@ -29,7 +29,7 @@ class ENone : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)

@@ -42,7 +42,7 @@ struct CSMiscData : MiscData, Serializable
 		data = d;
 	}
 
-	void Serialize(Serialize::Data &sdata) const anope_override
+	void Serialize(Serialize::Data &sdata) const override
 	{
 		sdata["ci"] << this->object;
 		sdata["name"] << this->name;
@@ -96,7 +96,7 @@ class CommandCSSetMisc : public Command
 		this->SetSyntax(_("\037channel\037 [\037parameters\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -143,7 +143,7 @@ class CommandCSSetMisc : public Command
 		}
 	}
 
-	void OnServHelp(CommandSource &source) anope_override
+	void OnServHelp(CommandSource &source) override
 	{
 		if (descriptions.count(source.command))
 		{
@@ -152,7 +152,7 @@ class CommandCSSetMisc : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (descriptions.count(source.command))
 		{
@@ -182,7 +182,7 @@ class CSSetMisc : public Module
 			delete it->second;
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		descriptions.clear();
 
@@ -203,7 +203,7 @@ class CSSetMisc : public Module
 		}
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool) override
 	{
 		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
 		{

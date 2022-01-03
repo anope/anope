@@ -105,17 +105,17 @@ class MyHTTPClient : public HTTPClient
 	}
 
 	/* Close connection once all data is written */
-	bool ProcessWrite() anope_override
+	bool ProcessWrite() override
 	{
 		return !BinarySocket::ProcessWrite() || this->write_buffer.empty() ? false : true;
 	}
 
-	const Anope::string GetIP() anope_override
+	const Anope::string GetIP() override
 	{
 		return this->ip;
 	}
 
-	bool Read(const char *buffer, size_t l) anope_override
+	bool Read(const char *buffer, size_t l) override
 	{
 		message.content.append(buffer, l);
 
@@ -233,7 +233,7 @@ class MyHTTPClient : public HTTPClient
 		return true;
 	}
 
-	void SendError(HTTPError err, const Anope::string &msg) anope_override
+	void SendError(HTTPError err, const Anope::string &msg) override
 	{
 		HTTPReply h;
 
@@ -244,7 +244,7 @@ class MyHTTPClient : public HTTPClient
 		this->SendReply(&h);
 	}
 
-	void SendReply(HTTPReply *msg) anope_override
+	void SendReply(HTTPReply *msg) override
 	{
 		this->WriteClient("HTTP/1.1 " + GetStatusFromCode(msg->error));
 		this->WriteClient("Date: " + BuildDate());
@@ -296,7 +296,7 @@ class MyHTTPProvider : public HTTPProvider, public Timer
  public:
 	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t, bool s) : Socket(-1, i.find(':') != Anope::string::npos), HTTPProvider(c, n, i, p, s), Timer(c, 10, Anope::CurTime, true), timeout(t) { }
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		while (!this->clients.empty())
 		{
@@ -309,24 +309,24 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 		}
 	}
 
-	ClientSocket* OnAccept(int fd, const sockaddrs &addr) anope_override
+	ClientSocket* OnAccept(int fd, const sockaddrs &addr) override
 	{
 		MyHTTPClient *c = new MyHTTPClient(this, fd, addr);
 		this->clients.push_back(c);
 		return c;
 	}
 
-	bool RegisterPage(HTTPPage *page) anope_override
+	bool RegisterPage(HTTPPage *page) override
 	{
 		return this->pages.insert(std::make_pair(page->GetURL(), page)).second;
 	}
 
-	void UnregisterPage(HTTPPage *page) anope_override
+	void UnregisterPage(HTTPPage *page) override
 	{
 		this->pages.erase(page->GetURL());
 	}
 
-	HTTPPage* FindPage(const Anope::string &pname) anope_override
+	HTTPPage* FindPage(const Anope::string &pname) override
 	{
 		if (this->pages.count(pname) == 0)
 			return NULL;
@@ -358,7 +358,7 @@ class HTTPD : public Module
 		this->providers.clear();
 	}
 
-	void OnReload(Configuration::Conf *config) anope_override
+	void OnReload(Configuration::Conf *config) override
 	{
 		Configuration::Block *conf = config->GetModule(this);
 		std::set<Anope::string> existing;
@@ -453,7 +453,7 @@ class HTTPD : public Module
 		}
 	}
 
-	void OnModuleLoad(User *u, Module *m) anope_override
+	void OnModuleLoad(User *u, Module *m) override
 	{
 		for (std::map<Anope::string, MyHTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end; ++it)
 		{

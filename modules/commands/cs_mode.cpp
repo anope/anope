@@ -29,7 +29,7 @@ struct ModeLockImpl : ModeLock, Serializable
 		}
 	}
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
@@ -53,7 +53,7 @@ struct ModeLocksImpl : ModeLocks
 		}
 	}
 
-	bool HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const anope_override
+	bool HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const override
 	{
 		if (!mode)
 			return false;
@@ -69,7 +69,7 @@ struct ModeLocksImpl : ModeLocks
 		return false;
 	}
 
-	bool SetMLock(ChannelMode *mode, bool status, const Anope::string &param, Anope::string setter, time_t created = Anope::CurTime) anope_override
+	bool SetMLock(ChannelMode *mode, bool status, const Anope::string &param, Anope::string setter, time_t created = Anope::CurTime) override
 	{
 		if (!mode)
 			return false;
@@ -99,7 +99,7 @@ struct ModeLocksImpl : ModeLocks
 		return true;
 	}
 
-	bool RemoveMLock(ChannelMode *mode, bool status, const Anope::string &param = "") anope_override
+	bool RemoveMLock(ChannelMode *mode, bool status, const Anope::string &param = "") override
 	{
 		if (!mode)
 			return false;
@@ -128,14 +128,14 @@ struct ModeLocksImpl : ModeLocks
 		return false;
 	}
 
-	void RemoveMLock(ModeLock *mlock) anope_override
+	void RemoveMLock(ModeLock *mlock) override
 	{
 		ModeList::iterator it = std::find(this->mlocks->begin(), this->mlocks->end(), mlock);
 		if (it != this->mlocks->end())
 			this->mlocks->erase(it);
 	}
 
-	void ClearMLock() anope_override
+	void ClearMLock() override
 	{
 		ModeList ml;
 		this->mlocks->swap(ml);
@@ -143,12 +143,12 @@ struct ModeLocksImpl : ModeLocks
 			delete ml[i];
 	}
 
-	const ModeList &GetMLock() const anope_override
+	const ModeList &GetMLock() const override
 	{
 		return this->mlocks;
 	}
 
-	std::list<ModeLock *> GetModeLockList(const Anope::string &name) anope_override
+	std::list<ModeLock *> GetModeLockList(const Anope::string &name) override
 	{
 		std::list<ModeLock *> mlist;
 		for (ModeList::const_iterator it = this->mlocks->begin(); it != this->mlocks->end(); ++it)
@@ -160,7 +160,7 @@ struct ModeLocksImpl : ModeLocks
 		return mlist;
 	}
 
-	const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "") anope_override
+	const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "") override
 	{
 		for (ModeList::const_iterator it = this->mlocks->begin(); it != this->mlocks->end(); ++it)
 		{
@@ -173,7 +173,7 @@ struct ModeLocksImpl : ModeLocks
 		return NULL;
 	}
 
-	Anope::string GetMLockAsString(bool complete) const anope_override
+	Anope::string GetMLockAsString(bool complete) const override
 	{
 		Anope::string pos = "+", neg = "-", params;
 
@@ -202,7 +202,7 @@ struct ModeLocksImpl : ModeLocks
 		return pos + neg + params;
 	}
 
-	void Check() anope_override
+	void Check() override
 	{
 		if (this->mlocks->empty())
 			ci->Shrink<ModeLocks>("modelocks");
@@ -736,7 +736,7 @@ class CommandCSMode : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR [\037what\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &subcommand = params[1];
 
@@ -766,7 +766,7 @@ class CommandCSMode : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -807,7 +807,7 @@ class CommandCSModes : public Command
 		this->SetSyntax(_("\037channel\037 [\037user\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser(),
 			*targ = params.size() > 1 ? User::Find(params[1], true) : u;
@@ -879,7 +879,7 @@ class CommandCSModes : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "on " << targ->nick;
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		const std::pair<bool, Anope::string> &m = modes[source.command];
 		if (!m.second.empty())
@@ -893,7 +893,7 @@ class CommandCSModes : public Command
 			return "";
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		const std::pair<bool, Anope::string> &m = modes[source.command];
 		if (m.second.empty())
@@ -932,7 +932,7 @@ class CSMode : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		modes.clear();
 
@@ -956,7 +956,7 @@ class CSMode : public Module
 		}
 	}
 
-	void OnCheckModes(Reference<Channel> &c) anope_override
+	void OnCheckModes(Reference<Channel> &c) override
 	{
 		if (!c || !c->ci)
 			return;
@@ -1005,7 +1005,7 @@ class CSMode : public Module
 			}
 	}
 
-	void OnChanRegistered(ChannelInfo *ci) anope_override
+	void OnChanRegistered(ChannelInfo *ci) override
 	{
 		ModeLocks *ml = modelocks.Require(ci);
 		Anope::string mlock;
@@ -1055,7 +1055,7 @@ class CSMode : public Module
 		ml->Check();
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) override
 	{
 		if (!show_hidden)
 			return;

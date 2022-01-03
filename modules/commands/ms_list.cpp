@@ -20,7 +20,7 @@ class CommandMSList : public Command
 		this->SetSyntax(_("[\037channel\037] [\037list\037 | NEW]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
 		Anope::string param = !params.empty() ? params[0] : "", chan;
@@ -75,7 +75,7 @@ class CommandMSList : public Command
 					{
 					}
 
-					void HandleNumber(unsigned number) anope_override
+					void HandleNumber(unsigned number) override
 					{
 						if (!number || number > mi->memos->size())
 							return;
@@ -135,7 +135,7 @@ class CommandMSList : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

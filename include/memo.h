@@ -24,7 +24,7 @@ class CoreExport Memo : public Serializable
 	Memo();
 	~Memo();
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	Anope::string owner;

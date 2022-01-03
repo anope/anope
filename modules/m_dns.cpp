@@ -486,16 +486,16 @@ class TCPSocket : public ListenSocket
 		}
 
 		/* Times out after a few seconds */
-		void Tick(time_t) anope_override { }
+		void Tick(time_t) override { }
 
-		void Reply(Packet *p) anope_override
+		void Reply(Packet *p) override
 		{
 			delete packet;
 			packet = p;
 			SocketEngine::Change(this, true, SF_WRITABLE);
 		}
 
-		bool ProcessRead() anope_override
+		bool ProcessRead() override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Reading from DNS TCP socket";
 
@@ -515,7 +515,7 @@ class TCPSocket : public ListenSocket
 			return true;
 		}
 
-		bool ProcessWrite() anope_override
+		bool ProcessWrite() override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Writing to DNS TCP socket";
 
@@ -545,7 +545,7 @@ class TCPSocket : public ListenSocket
 
 	TCPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos), ListenSocket(ip, port, ip.find(':') != Anope::string::npos), manager(m) { }
 
-	ClientSocket *OnAccept(int fd, const sockaddrs &addr) anope_override
+	ClientSocket *OnAccept(int fd, const sockaddrs &addr) override
 	{
 		return new Client(this->manager, this, fd, addr);
 	}
@@ -566,7 +566,7 @@ class UDPSocket : public ReplySocket
 			delete packets[i];
 	}
 
-	void Reply(Packet *p) anope_override
+	void Reply(Packet *p) override
 	{
 		packets.push_back(p);
 		SocketEngine::Change(this, true, SF_WRITABLE);
@@ -574,7 +574,7 @@ class UDPSocket : public ReplySocket
 
 	std::deque<Packet *>& GetPackets() { return packets; }
 
-	bool ProcessRead() anope_override
+	bool ProcessRead() override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Reading from DNS UDP socket";
 
@@ -585,7 +585,7 @@ class UDPSocket : public ReplySocket
 		return this->manager->HandlePacket(this, packet_buffer, length, &from_server);
 	}
 
-	bool ProcessWrite() anope_override
+	bool ProcessWrite() override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Writing to DNS UDP socket";
 
@@ -622,7 +622,7 @@ class NotifySocket : public Socket
 		SocketEngine::Change(this, true, SF_WRITABLE);
 	}
 
-	bool ProcessWrite() anope_override
+	bool ProcessWrite() override
 	{
 		if (!packet)
 			return false;
@@ -733,7 +733,7 @@ class MyManager : public Manager, public Timer
 	}
 
  public:
-	void Process(Request *req) anope_override
+	void Process(Request *req) override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Processing request to lookup " << req->name << ", of type " << req->type;
 
@@ -760,12 +760,12 @@ class MyManager : public Manager, public Timer
 		this->udpsock->Reply(p);
 	}
 
-	void RemoveRequest(Request *req) anope_override
+	void RemoveRequest(Request *req) override
 	{
 		this->requests.erase(req->id);
 	}
 
-	bool HandlePacket(ReplySocket *s, const unsigned char *const packet_buffer, int length, sockaddrs *from) anope_override
+	bool HandlePacket(ReplySocket *s, const unsigned char *const packet_buffer, int length, sockaddrs *from) override
 	{
 		if (length < Packet::HEADER_LENGTH)
 			return true;
@@ -920,12 +920,12 @@ class MyManager : public Manager, public Timer
 		return true;
 	}
 
-	void UpdateSerial() anope_override
+	void UpdateSerial() override
 	{
 		serial = Anope::CurTime;
 	}
 
-	void Notify(const Anope::string &zone) anope_override
+	void Notify(const Anope::string &zone) override
 	{
 		/* notify slaves of the update */
 		for (unsigned i = 0; i < notify.size(); ++i)
@@ -956,12 +956,12 @@ class MyManager : public Manager, public Timer
 		}
 	}
 
-	uint32_t GetSerial() const anope_override
+	uint32_t GetSerial() const override
 	{
 		return serial;
 	}
 
-	void Tick(time_t now) anope_override
+	void Tick(time_t now) override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Purging DNS cache";
 
@@ -1035,7 +1035,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 
@@ -1101,7 +1101,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnModuleUnload(User *u, Module *m) anope_override
+	void OnModuleUnload(User *u, Module *m) override
 	{
 		for (std::map<unsigned short, Request *>::iterator it = this->manager.requests.begin(), it_end = this->manager.requests.end(); it != it_end;)
 		{

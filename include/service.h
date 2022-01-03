@@ -134,7 +134,7 @@ class ServiceReference : public Reference<T>
 		this->invalid = true;
 	}
 
-	operator bool() anope_override
+	operator bool() override
 	{
 		if (this->invalid)
 		{

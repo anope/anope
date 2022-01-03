@@ -19,7 +19,7 @@ class CommandOSQuit : public Command
 		this->SetDesc(_("Terminate Services WITHOUT saving"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
@@ -27,7 +27,7 @@ class CommandOSQuit : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -47,7 +47,7 @@ class CommandOSRestart : public Command
 		this->SetDesc(_("Save databases and restart Services"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
@@ -56,7 +56,7 @@ class CommandOSRestart : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_("Causes Services to save all databases and then restart\n"
@@ -73,7 +73,7 @@ class CommandOSShutdown : public Command
 		this->SetDesc(_("Terminate services with save"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
@@ -82,7 +82,7 @@ class CommandOSShutdown : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

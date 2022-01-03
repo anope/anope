@@ -38,7 +38,7 @@ class CoreExport AutoKick : public Serializable
 
 	AutoKick();
 	~AutoKick();
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
@@ -94,7 +94,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 
 	~ChannelInfo();
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Change the founder of the channel

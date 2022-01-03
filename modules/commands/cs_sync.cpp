@@ -20,7 +20,7 @@ class CommandCSSync : public Command
 		this->SetSyntax(_("\037channel\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 
@@ -42,7 +42,7 @@ class CommandCSSync : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &params) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &params) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

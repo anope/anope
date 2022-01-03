@@ -44,7 +44,7 @@ class CoreExport XLine : public Serializable
 	bool HasNickOrReal() const;
 	bool IsRegex() const;
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 

@@ -27,9 +27,9 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 	bool error;
 	UplinkSocket();
 	~UplinkSocket();
-	bool ProcessRead() anope_override;
-	void OnConnect() anope_override;
-	void OnError(const Anope::string &) anope_override;
+	bool ProcessRead() override;
+	void OnConnect() override;
+	void OnError(const Anope::string &) override;
 
 	/* A message sent over the uplink socket */
 	class CoreExport Message

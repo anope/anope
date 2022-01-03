@@ -34,7 +34,7 @@ class CommandHelp : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnPreHelp, MOD_RESULT, (source, params));

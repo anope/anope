@@ -48,7 +48,7 @@ namespace Mail
 		~Message();
 
 		/* Called from within the thread to actually send the mail */
-		void Run() anope_override;
+		void Run() override;
 	};
 
 } // namespace Mail

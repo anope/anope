@@ -135,15 +135,15 @@ class MySQLService : public Provider
 
 	~MySQLService();
 
-	void Run(Interface *i, const Query &query) anope_override;
+	void Run(Interface *i, const Query &query) override;
 
-	Result RunQuery(const Query &query) anope_override;
+	Result RunQuery(const Query &query) override;
 
-	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) anope_override;
+	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) override;
 
-	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) anope_override;
+	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) override;
 
-	Query GetTables(const Anope::string &prefix) anope_override;
+	Query GetTables(const Anope::string &prefix) override;
 
 	void Connect();
 
@@ -161,7 +161,7 @@ class DispatcherThread : public Thread, public Condition
  public:
 	DispatcherThread() : Thread() { }
 
-	void Run() anope_override;
+	void Run() override;
 };
 
 class ModuleSQL;
@@ -199,7 +199,7 @@ class ModuleSQL : public Module, public Pipe
 		delete DThread;
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
@@ -252,7 +252,7 @@ class ModuleSQL : public Module, public Pipe
 		}
 	}
 
-	void OnModuleUnload(User *, Module *m) anope_override
+	void OnModuleUnload(User *, Module *m) override
 	{
 		this->DThread->Lock();
 
@@ -277,7 +277,7 @@ class ModuleSQL : public Module, public Pipe
 		this->OnNotify();
 	}
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
 		this->DThread->Lock();
 		std::deque<QueryResult> finishedRequests = this->FinishedRequests;

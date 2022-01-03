@@ -28,6 +28,7 @@ struct HTTPReply
 	std::vector<cookie> cookies;
 
 	HTTPReply() = default;
+	HTTPReply& operator=(const HTTPReply &) = default;
 
 	HTTPReply(const HTTPReply& other) : error(other.error), length(other.length)
 	{
@@ -93,7 +94,7 @@ struct HTTPMessage
 class HTTPClient;
 class HTTPProvider;
 
-class HTTPPage : public Base
+class HTTPPage : public virtual Base
 {
 	Anope::string url;
 	Anope::string content_type;

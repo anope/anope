@@ -151,7 +151,7 @@ class MySQLService : public Provider
 
 	Anope::string BuildQuery(const Query &q);
 
-	Anope::string FromUnixtime(time_t);
+	Anope::string FromUnixtime(time_t) override;
 };
 
 /** The SQL thread used to execute queries

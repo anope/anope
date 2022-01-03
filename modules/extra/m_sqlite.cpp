@@ -55,17 +55,17 @@ class SQLiteService : public Provider
 
 	void Run(Interface *i, const Query &query) override;
 
-	Result RunQuery(const Query &query);
+	Result RunQuery(const Query &query) override;
 
 	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) override;
 
-	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data);
+	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) override;
 
-	Query GetTables(const Anope::string &prefix);
+	Query GetTables(const Anope::string &prefix) override;
 
 	Anope::string BuildQuery(const Query &q);
 
-	Anope::string FromUnixtime(time_t);
+	Anope::string FromUnixtime(time_t) override;
 };
 
 class ModuleSQLite : public Module
@@ -200,7 +200,7 @@ Result SQLiteService::RunQuery(const Query &query)
 	if (err != SQLITE_DONE)
 		return SQLiteResult(query, real_query, sqlite3_errmsg(this->sql));
 
-	return result;
+	return std::move(result);
 }
 
 std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const Data &data)

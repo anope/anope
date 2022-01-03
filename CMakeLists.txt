@@ -188,19 +188,10 @@ if(MSVC)
 # Otherwise, we're not using Visual Studio
 else()
   # Set the compile flags to have all warnings on (including shadowed variables)
-  set(CXXFLAGS "${CXXFLAGS} -Wall -Wshadow")
-  # If on a *nix system, also set the compile flags to remove GNU extensions (favor ISO C++) as well as reject non-ISO C++ code, also remove all leading underscores in exported symbols (only on GNU compiler)
-  if(UNIX)
-    set(CXXFLAGS "${CXXFLAGS} -pedantic ${CMAKE_CXX_FLAGS}")
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      set(CXXFLAGS "${CXXFLAGS} -fno-leading-underscore")
-    endif()
-  # If we aren't on a *nix system, we are using MinGW
-  else()
-    # Also, if we are building under MinGW, add another define for MinGW
-    if(MINGW)
-      add_definitions(-DMINGW)
-    endif()
+  set(CXXFLAGS "${CXXFLAGS} -Wall -Wextra -Wpedantic -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
+  # Also, if we are building under MinGW, add another define for MinGW
+  if(MINGW)
+    add_definitions(-DMINGW)
   endif()
 endif()
 

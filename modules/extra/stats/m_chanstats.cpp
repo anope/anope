@@ -639,13 +639,13 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
-	void OnChanRegistered(ChannelInfo *ci)
+	void OnChanRegistered(ChannelInfo *ci) override
 	{
 		if (CSDefChanstats)
 			ci->Extend<bool>("CS_STATS");
 	}
 
-	void OnNickRegister(User *user, NickAlias *na, const Anope::string &)
+	void OnNickRegister(User *user, NickAlias *na, const Anope::string &) override
 	{
 		if (NSDefChanstats)
 			na->nc->Extend<bool>("NS_STATS");

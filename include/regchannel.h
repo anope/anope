@@ -93,6 +93,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	ChannelInfo(const ChannelInfo &ci);
 
 	~ChannelInfo();
+	ChannelInfo& operator=(const ChannelInfo &) = default;
 
 	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);

@@ -306,7 +306,7 @@ bool cidr::match(const sockaddrs &other)
 	byte = len % 8;
 	if (byte)
 	{
-		uint8_t m = ~0 << (8 - byte);
+		uint8_t m = ~0u << (8 - byte);
 		return (*ip & m) == (*their_ip & m);
 	}
 

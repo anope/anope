@@ -31,6 +31,8 @@
 #endif
 
 /* Pull in the various bits of STL */
+#include <cstdint>
+#include <cstddef>
 #include <iostream>
 #include <fstream>
 #include <sstream>

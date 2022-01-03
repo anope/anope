@@ -12,14 +12,6 @@
  * *nix port by Trystan Scott Lee <trystan@nomadirc.net>
  */
 
-#include "sysconf.h"
-
-/* Some Linux boxes (or maybe glibc includes) require this for the
- * prototype of strsignal(). */
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE
-#endif
-
 #include <string>
 #include <vector>
 #include <cstdarg>
@@ -45,15 +37,6 @@
 #endif
 
 #include <sys/types.h>
-
-#ifdef _AIX
-extern int strcasecmp(const char *, const char *);
-extern int strncasecmp(const char *, const char *, size_t);
-# if 0 /* These break on some AIX boxes (4.3.1 reported). */
-extern int socket(int, int, int);
-extern int connect(int, struct sockaddr *, int);
-# endif
-#endif /* _AIX */
 
 /* Some SUN fixs */
 #ifdef __sun

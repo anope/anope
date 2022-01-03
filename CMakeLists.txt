@@ -258,12 +258,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINF
 endif()
 
 # Check for the existence of the following include files
-check_include_file(cstdint HAVE_CSTDINT)
 check_include_file(strings.h HAVE_STRINGS_H)
 
 # Check for the existence of the following functions
-check_function_exists(strcasecmp HAVE_STRCASECMP)
-check_function_exists(stricmp HAVE_STRICMP)
 check_function_exists(umask HAVE_UMASK)
 check_function_exists(epoll_wait HAVE_EPOLL)
 check_function_exists(poll HAVE_POLL)

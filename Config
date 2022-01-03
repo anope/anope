@@ -62,12 +62,6 @@ Run_Build_System () {
 		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=RELEASE"
 	fi
 
-	if [ "$USE_PCH" = "yes" ] ; then
-		PCH="-DUSE_PCH:BOOLEAN=ON"
-	else
-		PCH="-DUSE_PCH:BOOLEAN=OFF"
-	fi
-
 	if [ "$EXTRA_INCLUDE_DIRS" != "" ] ; then
 		EXTRA_INCLUDE="-DEXTRA_INCLUDE:STRING=$EXTRA_INCLUDE_DIRS"
 	fi
@@ -91,9 +85,9 @@ Run_Build_System () {
 		REAL_SOURCE_DIR="$SOURCE_DIR"
 	fi
 
-	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $PCH $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
+	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
 
-	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $PCH $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
+	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
 	if [ $? -ne 0 ]; then
 		echo "You should fix these issues and then run ./Config -quick to rerun CMake."
 		exit 1
@@ -129,7 +123,6 @@ INSTDIR=$HOME/anope
 RUNGROUP=
 UMASK=
 DEBUG="no"
-USE_PCH="no"
 EXTRA_INCLUDE_DIRS=
 EXTRA_LIB_DIRS=
 EXTRA_CONFIG_ARGS=
@@ -321,25 +314,6 @@ echo ""
 
 ####
 
-TEMP_YN="n"
-if [ "$USE_PCH" = "yes" ] ; then
-	TEMP_YN="y"
-fi
-echo "Do you want to build using precompiled headers? This can speed up"
-echo "the build, but uses more disk space."
-echo2 "[$TEMP_YN] "
-read YN
-if [ "$YN" ] ; then
-	if [ "$YN" = "y" ] ; then
-		USE_PCH="yes"
-	else
-		USE_PCH="no"
-	fi
-fi
-echo ""
-
-####
-
 echo "Are there any extra include directories you wish to use?"
 echo "You may only need to do this if CMake is unable to locate"
 echo "missing dependencies without hints."
@@ -402,7 +376,6 @@ INSTDIR="$INSTDIR"
 RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
 DEBUG="$DEBUG"
-USE_PCH="$USE_PCH"
 EXTRA_INCLUDE_DIRS="$EXTRA_INCLUDE_DIRS"
 EXTRA_LIB_DIRS="$EXTRA_LIB_DIRS"
 EXTRA_CONFIG_ARGS="$EXTRA_CONFIG_ARGS"

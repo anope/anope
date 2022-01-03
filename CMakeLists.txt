@@ -163,12 +163,8 @@ endif()
 # Find gettext
 find_package(Gettext)
 
-option(USE_PCH "Use precompiled headers" OFF)
-
 # Use the following directories as includes
-# Note that it is important the binary include directory comes before the
-# source include directory so the precompiled headers work correctly.
-include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/language ${Anope_SOURCE_DIR}/modules/pseudoclients)
+include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include)
 
 # Pass on REPRODUCIBLE_BUILD
 if(REPRODUCIBLE_BUILD)

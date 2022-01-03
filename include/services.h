@@ -51,8 +51,8 @@
 #define _(x) x
 
 #ifndef _WIN32
-# define DllExport
-# define CoreExport
+# define DllExport __attribute__ ((visibility ("default")))
+# define CoreExport __attribute__ ((visibility ("default")))
 # define anope_close close
 #else
 # include "anope_windows.h"

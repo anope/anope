@@ -188,7 +188,7 @@ if(MSVC)
 # Otherwise, we're not using Visual Studio
 else()
   # Set the compile flags to have all warnings on (including shadowed variables)
-  set(CXXFLAGS "${CXXFLAGS} -Wall -Wextra -Wpedantic -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
+  set(CXXFLAGS "${CXXFLAGS} -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wpedantic -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
   # Also, if we are building under MinGW, add another define for MinGW
   if(MINGW)
     add_definitions(-DMINGW)

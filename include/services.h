@@ -21,9 +21,6 @@
 #include <stdexcept>
 
 #include <string.h>
-#if HAVE_STRINGS_H
-# include <strings.h>
-#endif
 
 #ifndef _WIN32
 #include <unistd.h>

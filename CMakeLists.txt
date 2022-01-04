@@ -143,7 +143,6 @@ endif()
 
 # Include the checking functions used later in this CMakeLists.txt
 include(CheckFunctionExists)
-include(CheckIncludeFile)
 include(CheckTypeSize)
 include(CheckLibraryExists)
 include(CheckCXXCompilerFlag)
@@ -256,9 +255,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINF
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
   set(DEBUG_BUILD TRUE)
 endif()
-
-# Check for the existence of the following include files
-check_include_file(strings.h HAVE_STRINGS_H)
 
 # Check for the existence of the following functions
 check_function_exists(umask HAVE_UMASK)

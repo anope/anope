@@ -166,7 +166,7 @@ class CommandOSSet : public Command
  public:
 	CommandOSSet(Module *creator) : Command(creator, "operserv/set", 1, 2)
 	{
-		this->SetDesc(_("Set various global Services options"));
+		this->SetDesc(_("Set various global services options"));
 		this->SetSyntax(_("\037option\037 \037setting\037"));
 	}
 
@@ -196,7 +196,7 @@ class CommandOSSet : public Command
 		{
 			this->SendSyntax(source);
 			source.Reply(" ");
-			source.Reply(_("Sets various global Services options.  Option names\n"
+			source.Reply(_("Sets various global services options.  Option names\n"
 					"currently defined are:\n"
 					"    READONLY   Set read-only or read-write mode\n"
 					"    DEBUG      Activate or deactivate debug mode\n"
@@ -212,13 +212,13 @@ class CommandOSSet : public Command
 			source.Reply(_("Syntax: \002READONLY {ON | OFF}\002\n"
 					" \n"
 					"Sets read-only mode on or off.  In read-only mode, normal\n"
-					"users will not be allowed to modify any Services data,\n"
+					"users will not be allowed to modify any services data,\n"
 					"including channel and nickname access lists, etc.  IRCops\n"
-					"with sufficient Services privileges will be able to modify\n"
+					"with sufficient services privileges will be able to modify\n"
 					"Services' AKILL, SQLINE, SNLINE and ignore lists, drop,\n"
 					"suspend or forbid nicknames and channels, and manage news,\n"
 					"oper info and DNS, but any such changes will not be saved\n"
-					"unless read-only mode is deactivated before Services are\n"
+					"unless read-only mode is deactivated before services are\n"
 					"terminated or restarted.\n"
 					" \n"
 					"This option is equivalent to the command-line option\n"

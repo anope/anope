@@ -16,7 +16,7 @@ class CommandOSQuit : public Command
  public:
 	CommandOSQuit(Module *creator) : Command(creator, "operserv/quit", 0, 0)
 	{
-		this->SetDesc(_("Terminate Services WITHOUT saving"));
+		this->SetDesc(_("Terminate services WITHOUT saving"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -31,7 +31,7 @@ class CommandOSQuit : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes Services to do an immediate shutdown; databases are\n"
+		source.Reply(_("Causes services to do an immediate shutdown; databases are\n"
 				"\002not\002 saved.  This command should not be used unless\n"
 				"damage to the in-memory copies of the databases is feared\n"
 				"and they should not be saved."));
@@ -59,7 +59,7 @@ class CommandOSRestart : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_("Causes Services to save all databases and then restart\n"
+		source.Reply(_("Causes services to save all databases and then restart\n"
 				"(i.e. exit and immediately re-run the executable)."));
 		return true;
 	}
@@ -86,7 +86,7 @@ class CommandOSShutdown : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes Services to save all databases and then shut down."));
+		source.Reply(_("Causes services to save all databases and then shut down."));
 		return true;
 	}
 };

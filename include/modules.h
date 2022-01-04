@@ -321,7 +321,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) { throw NotImplementedException(); }
 
-	/** Called when Services' configuration is being (re)loaded.
+	/** Called when the configuration is being (re)loaded.
 	 * @param conf The config that is being built now and will replace the global Config object
 	 * @throws A ConfigException to abort the config (re)loading process.
 	 */

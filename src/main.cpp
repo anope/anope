@@ -1,4 +1,4 @@
-/* Services -- main source file.
+/* Anope -- main source file.
  *
  * (C) 2003-2021 Anope Team
  * Contact us at team@anope.org

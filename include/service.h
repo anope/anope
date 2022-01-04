@@ -112,7 +112,7 @@ class CoreExport Service : public virtual Base
 	}
 };
 
-/** Like Reference, but used to refer to Services.
+/** Like Reference, but used to refer to a Service.
  */
 template<typename T>
 class ServiceReference : public Reference<T>

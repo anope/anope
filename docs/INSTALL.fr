@@ -82,7 +82,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
 
 3) Configuration de l'IRCd
 
-    Les Services agissent comme un serveur IRC avec des pseudo-clients.
+    Anope agit comme un serveur IRC avec des pseudo-clients.
     Pour les relier à votre réseau, vous aurez besoin de configurer votre
     IRCd pour permettre aux services de se connecter.
 

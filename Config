@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Configuration script for Services.
+# Configuration script for Anope.
 #
 # Anope (c) 2003-2021 Anope Team
 # Contact us at team@anope.org
@@ -193,7 +193,7 @@ else
 	echo ""
 fi
 
-echo "Beginning Services configuration."
+echo "Beginning Anope configuration."
 echo ""
 
 ###########################################################################
@@ -232,7 +232,7 @@ while [ $ok -eq 0 ] ; do
 			fi
 		fi
 	elif exists "$INPUT/include/services.h" ; then
-		echo "You cannot use the Services source directory as a target directory."
+		echo "You cannot use the Anope source directory as a target directory."
 	else
 		ok=1
 	fi
@@ -244,11 +244,11 @@ echo ""
 
 OLD_RUNGROUP="$RUNGROUP"
 if [ "$RUNGROUP" ] ; then
-	echo "Which group should all Services data files be owned by?  (If Services"
+	echo "Which group should all Anope data files be owned by?  (If Anope"
 	echo "should not force files to be owned by a particular group, type \"none\""
 	echo "(without the quotes) and press Return.)"
 else
-	echo "Which group should all Services data files be owned by?  (If Services"
+	echo "Which group should all Anope data files be owned by?  (If Anope"
 	echo "should not force files to be owned by a particular group, just press"
 	echo "Return.)"
 fi

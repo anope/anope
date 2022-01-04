@@ -200,7 +200,7 @@ class CommandOSStats : public Command
 	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1),
 		akills("XLineManager", "xlinemanager/sgline"), snlines("XLineManager", "xlinemanager/snline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
-		this->SetDesc(_("Show status of Services and network"));
+		this->SetDesc(_("Show status of services and network"));
 		this->SetSyntax("[AKILL | HASH | UPLINK | UPTIME | ALL | RESET]");
 	}
 
@@ -234,8 +234,8 @@ class CommandOSStats : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Without any option, shows the current number of users online,\n"
-				"and the highest number of users online since Services was\n"
-				"started, and the length of time Services has been running.\n"
+				"and the highest number of users online since services was\n"
+				"started, and the length of time services has been running.\n"
 				" \n"
 				"With the \002AKILL\002 option, displays the current size of the\n"
 				"AKILL list and the current default expiry time.\n"

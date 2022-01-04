@@ -75,7 +75,7 @@ Note: You should also read the README and FAQ files!
 
 3) Setting up the IRCd
 
-    Services acts as an IRC server with pseudo-clients on it. To link them to
+    Anope acts as an IRC server with pseudo-clients on it. To link them to
     your network, you'll need to configure your IRCd to allow services to link.
 
     The configuration varies depending on the IRCd, but you will probably need
@@ -101,7 +101,7 @@ Note: You should also read the README and FAQ files!
     displayed on the screen. Correct them until there are no errors anymore.
     A successful startup won't generate any message.
 
-    Give Services at least one minute to link to your network, as certain
+    Give Anope at least one minute to link to your network, as certain
     IRCds on some OSes may be really slow for the link process. If nothing
     happens after about a minute, it is probably a configuration problem. Try
     to launch Anope with ./anope -debug -nofork to see any errors that it

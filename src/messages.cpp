@@ -199,7 +199,7 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 
 		if (last_time == Anope::CurTime)
 		{
-			Anope::QuitReason = "Kill loop detected. Are Services U:Lined?";
+			Anope::QuitReason = "Kill loop detected. Is Anope U:Lined?";
 			Anope::Quitting = true;
 			return;
 		}

@@ -797,7 +797,7 @@ class CommandNSSetLanguage : public Command
  public:
 	CommandNSSetLanguage(Module *creator, const Anope::string &sname = "nickserv/set/language", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Set the language Services will use when messaging you"));
+		this->SetDesc(_("Set the language services will use when messaging you"));
 		this->SetSyntax(_("\037language\037"));
 	}
 
@@ -852,7 +852,7 @@ class CommandNSSetLanguage : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the language Services uses when sending messages to\n"
+		source.Reply(_("Changes the language services uses when sending messages to\n"
 				"you (for example, when responding to a command you send).\n"
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
@@ -888,7 +888,7 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the language Services uses when sending messages to\n"
+		source.Reply(_("Changes the language services uses when sending messages to\n"
 				"the given user (for example, when responding to a command they send).\n"
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
@@ -909,7 +909,7 @@ class CommandNSSetMessage : public Command
  public:
 	CommandNSSetMessage(Module *creator, const Anope::string &sname = "nickserv/set/message", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Change the communication method of Services"));
+		this->SetDesc(_("Change the communication method of services"));
 		this->SetSyntax("{ON | OFF}");
 	}
 
@@ -970,8 +970,8 @@ class CommandNSSetMessage : public Command
 
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way Services are communicating with\n"
-				"you. With \002%s\002 set, Services will use messages, else they'll\n"
+		source.Reply(_("Allows you to choose the way services are communicating with\n"
+				"you. With \002%s\002 set, services will use messages, else they'll\n"
 				"use notices."), cmd.upper().c_str());
 		return true;
 	}
@@ -996,8 +996,8 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way Services are communicating with\n"
-				"the given user. With \002MSG\002 set, Services will use messages,\n"
+		source.Reply(_("Allows you to choose the way services are communicating with\n"
+				"the given user. With \002MSG\002 set, services will use messages,\n"
 				"else they'll use notices."));
 		return true;
 	}

@@ -120,7 +120,7 @@ Table of Contents
 
 2) Presentation
 
-    Anope is a set of Services for IRC networks that allows users to manage
+    Anope is a set of services for IRC networks that allows users to manage
     their nicks and channels in a secure and efficient way, and administrators
     to manage their network with powerful tools.
 
@@ -225,7 +225,7 @@ Table of Contents
     the log file; if you send a bug report, PLEASE include an excerpt from
     the log file WITH DEBUGGING ACTIVE; we cannot emphasize enough how
     important this is to tracking down problems. (You can also enable
-    debugging while Services is running using OperServ's SET DEBUG command.)
+    debugging while Anope is running using OperServ's SET DEBUG command.)
     If you repeat use --debug=<level>, the debugging level will be increased,
     which provides more detailed information but may also slow Anope down
     considerably and make the log file grow dramatically faster. In general,

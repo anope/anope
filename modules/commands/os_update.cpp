@@ -16,7 +16,7 @@ class CommandOSUpdate : public Command
  public:
 	CommandOSUpdate(Module *creator) : Command(creator, "operserv/update", 0, 0)
 	{
-		this->SetDesc(_("Force the Services databases to be updated immediately"));
+		this->SetDesc(_("Force the services databases to be updated immediately"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -31,7 +31,7 @@ class CommandOSUpdate : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes Services to update all database files as soon as you\n"
+		source.Reply(_("Causes services to update all database files as soon as you\n"
 				"send the command."));
 		return true;
 	}

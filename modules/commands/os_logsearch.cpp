@@ -156,7 +156,7 @@ class CommandOSLogSearch : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command searches the Services logfiles for messages\n"
+		source.Reply(_("This command searches the services logfiles for messages\n"
 				"that match the given pattern. The day and limit argument\n"
 				"may be used to specify how many days of logs to search\n"
 				"and the number of replies to limit to. By default this\n"

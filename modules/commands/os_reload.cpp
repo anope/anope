@@ -44,9 +44,9 @@ class CommandOSReload : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes Services to reload the configuration file. Note that\n"
-				"some directives still need the restart of the Services to\n"
-				"take effect (such as Services' nicknames, activation of the\n"
+		source.Reply(_("Causes services to reload the configuration file. Note that\n"
+				"some directives still need the restart of the services to\n"
+				"take effect (such as services' nicknames, activation of the\n"
 				"session limitation, etc.)."));
 		return true;
 	}

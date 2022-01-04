@@ -69,7 +69,7 @@ class CommandNSLogout : public Command
 				"yourself.\n"
 				" \n"
 				"With a parameter, does the same for the given nick. If you\n"
-				"specify \002REVALIDATE\002 as well, Services will ask the given nick\n"
+				"specify \002REVALIDATE\002 as well, services will ask the given nick\n"
 				"to re-identify. This is limited to \002Services Operators\002."));
 
 		return true;

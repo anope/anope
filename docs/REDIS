@@ -149,12 +149,12 @@ Table of Contents
         Which returns a new object ID for me, in this example it will be "8".
         Now I can create the object:
 
-        HMSET hash:BotInfo:8 nick redis user redis host services.anope.org realname "Services for IRC Networks"
+        HMSET hash:BotInfo:8 nick redis user redis host services.anope.org realname "Anope IRC Services"
 
         Note if you are using HSET instead of HMSET you will need to use a transaction, as shown in the above example.
         If you are watching your services logs you will immediately see:
 
-        USERS: redis!redis@services.anope.org (Services for IRC Networks) connected to the network (services.anope.org)
+        USERS: redis!redis@services.anope.org (Anope IRC Services) connected to the network (services.anope.org)
 
         And the bot redis will be in BotServ's bot list.
         Notice how ids:BotInfo and the value keys are updated automatically.

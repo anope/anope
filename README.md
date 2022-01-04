@@ -1,6 +1,6 @@
 ## About
 
-Anope is an open source set of IRC Services. It is highly modular, with a vast number of configurable parameters, and is the most used IRC services package. There are also many modules on the [modsite](https://modules.anope.org) to add additional features. It runs on Linux, BSD, and Windows, and supports many modern IRCds, including InspIRCd, UnrealIRCd, and ircd-hybrid. For more details, credits, command line options, and contact information see [docs/README](https://github.com/anope/anope/blob/2.0/docs/README).
+Anope is an open source set of IRC services. It is highly modular, with a vast number of configurable parameters, and is the most used IRC services package. There are also many modules on the [modsite](https://modules.anope.org) to add additional features. It runs on Linux, BSD, and Windows, and supports many modern IRCds, including InspIRCd, UnrealIRCd, and ircd-hybrid. For more details, credits, command line options, and contact information see [docs/README](https://github.com/anope/anope/blob/2.0/docs/README).
 
 * [Website](https://anope.org)
 * [GitHub](https://github.com/anope)

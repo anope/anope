@@ -19,7 +19,7 @@
 
 using namespace Configuration;
 
-File ServicesConf("anope.conf", false); // Services configuration file name
+File ServicesConf("anope.conf", false); // Configuration file name
 Conf *Config = NULL;
 
 Block::Block(const Anope::string &n) : name(n), linenum(-1)

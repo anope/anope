@@ -53,8 +53,8 @@ class CommandOSJupe : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Tells Services to jupiter a server -- that is, to create\n"
-				"a fake \"server\" connected to Services which prevents\n"
+		source.Reply(_("Tells services to jupiter a server -- that is, to create\n"
+				"a fake \"server\" connected to services which prevents\n"
 				"the real server of that name from connecting.  The jupe\n"
 				"may be removed using a standard \002SQUIT\002. If a reason is\n"
 				"given, it is placed in the server information field;\n"

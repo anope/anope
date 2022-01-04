@@ -54,6 +54,7 @@ namespace Anope
 		string(const ci::string &_str) : _string(_str.c_str()) { }
 		string(const string &_str, size_type pos, size_type n = npos) : _string(_str._string, pos, n) { }
 		template <class InputIterator> string(InputIterator first, InputIterator last) : _string(first, last) { }
+		string(const string &) = default;
 
 		/**
 		 * Assignment operators, so any type of string can be assigned to this class.

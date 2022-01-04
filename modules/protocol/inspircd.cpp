@@ -76,7 +76,7 @@ class InspIRCdProto : public IRCDProto
 		MaxLine = 4096;
 	}
 
-	unsigned GetMaxListFor(Channel *c, ChannelMode *cm)
+	unsigned GetMaxListFor(Channel *c, ChannelMode *cm) override
 	{
 		ListLimits *limits = maxlist.Get(c);
 		if (limits)

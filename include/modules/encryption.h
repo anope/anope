@@ -9,6 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#pragma once
+
 namespace Encryption
 {
 	typedef std::pair<const unsigned char *, size_t> Hash;

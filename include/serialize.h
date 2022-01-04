@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SERIALIZE_H
-#define SERIALIZE_H
+#pragma once
 
 #include <sstream>
 
@@ -329,5 +328,3 @@ class Serialize::Reference : public ReferenceBase
 		return NULL;
 	}
 };
-
-#endif // SERIALIZE_H

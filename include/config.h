@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include "account.h"
 #include "regchannel.h"
@@ -183,5 +182,3 @@ class ConfigException : public CoreException
 
 extern Configuration::File ServicesConf;
 extern CoreExport Configuration::Conf *Config;
-
-#endif // CONFIG_H

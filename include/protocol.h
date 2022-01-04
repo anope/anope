@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -309,5 +308,3 @@ private:
 };
 
 extern CoreExport IRCDProto *IRCD;
-
-#endif // PROTOCOL_H

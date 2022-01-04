@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef ACCESS_H
-#define ACCESS_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -170,5 +169,3 @@ class CoreExport AccessGroup
 
 	inline bool empty() const { return paths.empty(); }
 };
-
-#endif

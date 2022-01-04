@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef LISTS_H
-#define LISTS_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -90,5 +89,3 @@ class CoreExport InfoFormatter
 	Anope::string &operator[](const Anope::string &key);
 	void AddOption(const Anope::string &opt);
 };
-
-#endif // LISTS_H

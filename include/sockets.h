@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SOCKETS_H
-#define SOCKETS_H
+#pragma once
 
 #ifndef _WIN32
 #include <netinet/in.h>
@@ -505,5 +504,3 @@ class CoreExport Pipe : public Socket
 extern CoreExport uint32_t TotalRead;
 extern CoreExport uint32_t TotalWritten;
 extern CoreExport SocketIO NormalSocketIO;
-
-#endif // SOCKET_H

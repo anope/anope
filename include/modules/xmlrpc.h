@@ -6,6 +6,8 @@
  * Please read COPYING and README for further details.
  */
 
+#pragma once
+
 #include "httpd.h"
 
 class XMLRPCRequest

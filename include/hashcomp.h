@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef HASHCOMP_H
-#define HASHCOMP_H
+#pragma once
 
 #include <string>
 #include <locale>
@@ -195,5 +194,3 @@ inline bool operator!=(const std::string &leftval, const ci::string &rightval)
 {
 	return !(leftval.c_str() == rightval);
 }
-
-#endif // HASHCOMP_H

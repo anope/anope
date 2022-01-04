@@ -9,11 +9,10 @@
  * Based on the original code of Services by Andy Church.
  */
 
+
+#pragma once
+
 #include "serialize.h"
-
-#ifndef MODULES_H
-#define MODULES_H
-
 #include "base.h"
 #include "modes.h"
 #include "timers.h"
@@ -1227,5 +1226,3 @@ class CoreExport ModuleManager
 	 */
 	static ModuleVersion GetVersion(void *handle);
 };
-
-#endif // MODULES_H

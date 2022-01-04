@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef OPERTYPE_H
-#define OPERTYPE_H
+#pragma once
 
 #include "services.h"
 #include "account.h"
@@ -123,5 +122,3 @@ class CoreExport OperType
 	 */
 	const std::list<Anope::string> GetPrivs() const;
 };
-
-#endif // OPERTYPE_H

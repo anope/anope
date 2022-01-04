@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef MAIL_H
-#define MAIL_H
+#pragma once
 
 #include "anope.h"
 #include "threadengine.h"
@@ -52,5 +51,3 @@ namespace Mail
 	};
 
 } // namespace Mail
-
-#endif // MAIL_H

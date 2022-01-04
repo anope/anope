@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SOCKETENGINE_H
-#define SOCKETENGINE_H
+#pragma once
 
 #include "services.h"
 #include "sockets.h"
@@ -46,5 +45,3 @@ class CoreExport SocketEngine
 
 	static bool IgnoreErrno();
 };
-
-#endif // SOCKETENGINE_H

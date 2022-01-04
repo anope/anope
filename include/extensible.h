@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef EXTENSIBLE_H
-#define EXTENSIBLE_H
+#pragma once
 
 #include "anope.h"
 #include "serialize.h"
@@ -259,5 +258,3 @@ void Extensible::Shrink(const Anope::string &name)
 	else
 		Log(LOG_DEBUG) << "Shrink for nonexistent type " << name << " on " << static_cast<void *>(this);
 }
-
-#endif // EXTENSIBLE_H

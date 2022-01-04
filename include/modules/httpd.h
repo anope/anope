@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef ANOPE_HTTPD_H
-#define ANOPE_HTTPD_H
+#pragma once
 
 enum HTTPError
 {
@@ -240,5 +239,3 @@ namespace HTTPUtils
 		return dst;
 	}
 }
-
-#endif // ANOPE_HTTPD_H

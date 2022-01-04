@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef USERS_H
-#define USERS_H
+#pragma once
 
 #include "anope.h"
 #include "modes.h"
@@ -375,5 +374,3 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	static void QuitUsers();
 };
-
-#endif // USERS_H

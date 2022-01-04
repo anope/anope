@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef UPLINK_H
-#define UPLINK_H
+#pragma once
 
 #include "sockets.h"
 #include "protocol.h"
@@ -49,5 +48,3 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 	};
 };
 extern CoreExport UplinkSocket *UplinkSock;
-
-#endif // UPLINK_H

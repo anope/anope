@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#pragma once
 
 class GlobalService : public Service
 {
@@ -26,5 +25,3 @@ class GlobalService : public Service
 	 */
 	virtual void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) = 0;
 };
-
-#endif // GLOBAL_H

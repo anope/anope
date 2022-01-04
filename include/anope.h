@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef ANOPE_H
-#define ANOPE_H
+#pragma once
 
 #include <signal.h>
 
@@ -777,5 +776,3 @@ template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
 	return static_cast<T>(ptr);
 }
 #endif
-
-#endif // ANOPE_H

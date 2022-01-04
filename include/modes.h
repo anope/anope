@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef MODES_H
-#define MODES_H
+#pragma once
 
 #include "anope.h"
 #include "base.h"
@@ -418,5 +417,3 @@ class CoreExport Entry
 	 */
 	bool Matches(User *u, bool full = false) const;
 };
-
-#endif // MODES_H

@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef BOTS_H
-#define BOTS_H
+#pragma once
 
 #include "users.h"
 #include "anope.h"
@@ -131,5 +130,3 @@ class CoreExport BotInfo : public User, public Serializable
 	 */
 	static BotInfo* Find(const Anope::string &nick, bool nick_only = false);
 };
-
-#endif // BOTS_H

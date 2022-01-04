@@ -6,6 +6,8 @@
  * Please read COPYING and README for further details.
  */
 
+#pragma once
+
 class SSLService : public Service
 {
  public:

@@ -9,6 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#pragma once
+
 class AccessGroup;
 class AutoKick;
 class BotInfo;

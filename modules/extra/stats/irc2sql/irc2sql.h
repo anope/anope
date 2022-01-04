@@ -6,6 +6,8 @@
  * Please read COPYING and README for further details.
  */
 
+#pragma once
+
 #include "module.h"
 #include "modules/sql.h"
 

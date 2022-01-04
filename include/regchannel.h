@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef REGCHANNEL_H
-#define REGCHANNEL_H
+#pragma once
 
 #include "memo.h"
 #include "modes.h"
@@ -249,5 +248,3 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
  * @return true or false
  */
 extern CoreExport bool IsFounder(const User *user, const ChannelInfo *ci);
-
-#endif // REGCHANNEL_H

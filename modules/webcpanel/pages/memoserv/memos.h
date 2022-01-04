@@ -5,6 +5,8 @@
  * Please read COPYING and README for further details.
  */
 
+#pragma once
+
 namespace WebCPanel
 {
 

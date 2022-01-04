@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef OS_NEWS
-#define OS_NEWS
+#pragma once
 
 enum NewsType
 {
@@ -48,5 +47,3 @@ class NewsService : public Service
 };
 
 static ServiceReference<NewsService> news_service("NewsService", "news");
-
-#endif // OS_NEWS

@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef XLINE_H
-#define XLINE_H
+#pragma once
 
 #include "serialize.h"
 #include "service.h"
@@ -180,5 +179,3 @@ class CoreExport XLineManager : public Service
 	 */
 	virtual void SendDel(XLine *x) = 0;
 };
-
-#endif // XLINE_H

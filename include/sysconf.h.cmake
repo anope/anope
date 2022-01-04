@@ -1,5 +1,15 @@
-#ifndef _SYSCONF_H_
-#define _SYSCONF_H_
+/*
+ *
+ * (C) 2003-2021 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ */
+
+#pragma once
 
 #cmakedefine DEBUG_BUILD
 
@@ -21,6 +31,4 @@
 # define MAXPATHLEN MAX_PATH
 # define bzero(buf, size) memset(buf, 0, size)
 # define sleep(x) Sleep(x * 1000)
-#endif
-
 #endif

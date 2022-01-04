@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef BASE_H
-#define BASE_H
+#pragma once
 
 #include "services.h"
 
@@ -136,5 +135,3 @@ class Reference : public ReferenceBase
 		return false;
 	}
 };
-
-#endif // BASE_H

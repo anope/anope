@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef DNS_H
-#define DNS_H
+#pragma once
 
 namespace DNS
 {
@@ -174,5 +173,3 @@ namespace DNS
 	};
 
 } // namespace DNS
-
-#endif // DNS_H

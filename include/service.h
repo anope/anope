@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SERVICE_H
-#define SERVICE_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -169,5 +168,3 @@ class ServiceAlias
 		Service::DelAlias(t, f);
 	}
 };
-
-#endif // SERVICE_H

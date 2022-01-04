@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef CHANNELS_H
-#define CHANNELS_H
+#pragma once
 
 #include "anope.h"
 #include "extensible.h"
@@ -306,5 +305,3 @@ class CoreExport Channel : public Base, public Extensible
 
 	static void DeleteChannels();
 };
-
-#endif // CHANNELS_H

@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SERVERS_H
-#define SERVERS_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -183,5 +182,3 @@ class CoreExport Server : public Extensible
 	 */
 	static Server *Find(const Anope::string &name, bool name_only = false);
 };
-
-#endif // SERVERS_H

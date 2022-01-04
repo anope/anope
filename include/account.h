@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef ACCOUNT_H
-#define ACCOUNT_H
+#pragma once
 
 #include "extensible.h"
 #include "serialize.h"
@@ -286,5 +285,3 @@ class CoreExport IdentifyRequest
 
 	static void ModuleUnload(Module *m);
 };
-
-#endif // ACCOUNT_H

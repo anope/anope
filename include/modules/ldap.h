@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef ANOPE_LDAP_H
-#define ANOPE_LDAP_H
+#pragma once
 
 class LDAPException : public ModuleException
 {
@@ -167,5 +166,3 @@ class LDAPProvider : public Service
 	 */
 	virtual void Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) = 0;
 };
-
-#endif // ANOPE_LDAP_H

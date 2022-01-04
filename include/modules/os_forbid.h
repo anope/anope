@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef OS_FORBID_H
-#define OS_FORBID_H
+#pragma once
 
 enum ForbidType
 {
@@ -51,5 +50,3 @@ class ForbidService : public Service
 };
 
 static ServiceReference<ForbidService> forbid_service("ForbidService", "forbid");
-
-#endif

@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SERVICES_H
-#define SERVICES_H
+#pragma once
 
 #include "sysconf.h"
 
@@ -57,5 +56,3 @@
 #else
 # include "anope_windows.h"
 #endif
-
-#endif // SERVICES_H

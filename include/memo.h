@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef MEMO_H
-#define MEMO_H
+#pragma once
 
 #include "anope.h"
 #include "serialize.h"
@@ -51,5 +50,3 @@ struct CoreExport MemoInfo
 
 	static MemoInfo *GetMemoInfo(const Anope::string &targ, bool &is_chan);
 };
-
-#endif // MEMO_H

@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef OS_SESSION_H
-#define OS_SESSION_H
+#pragma once
 
 struct Session
 {
@@ -90,5 +89,3 @@ Serializable* Exception::Unserialize(Serializable *obj, Serialize::Data &data)
 		session_service->AddException(ex);
 	return ex;
 }
-
-#endif

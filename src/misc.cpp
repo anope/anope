@@ -19,9 +19,9 @@
 #include "regexpr.h"
 #include "sockets.h"
 
-#include <errno.h>
-#include <sys/types.h>
+#include <cerrno>
 #include <sys/stat.h>
+#include <sys/types.h>
 #ifndef _WIN32
 #include <sys/socket.h>
 #include <netdb.h>

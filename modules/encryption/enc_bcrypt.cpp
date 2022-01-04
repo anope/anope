@@ -55,7 +55,7 @@
  * hadn't seen his code).
  */
 
-#include <string.h>
+#include <cstring>
 
 #ifdef __i386__
 #define BF_SCALE			1

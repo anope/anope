@@ -15,9 +15,9 @@
 #include "socketengine.h"
 #include "config.h"
 
+#include <cerrno>
 #include <sys/epoll.h>
 #include <ulimit.h>
-#include <errno.h>
 
 static int EngineHandle;
 static std::vector<epoll_event> events;

@@ -16,7 +16,7 @@
 
 #ifndef _WIN32
 #include <arpa/inet.h>
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>
 #endif
 

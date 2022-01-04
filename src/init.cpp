@@ -23,10 +23,10 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 
-#include <errno.h>
-#include <sys/types.h>
-#include <pwd.h>
+#include <cerrno>
 #include <grp.h>
+#include <pwd.h>
+#include <sys/types.h>
 #endif
 
 Anope::string Anope::ConfigDir = "conf", Anope::DataDir = "data", Anope::ModuleDir = "lib", Anope::LocaleDir = "locale", Anope::LogDir = "logs";

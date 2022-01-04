@@ -17,7 +17,7 @@
 #include "uplink.h"
 
 #ifndef _WIN32
-#include <limits.h>
+#include <climits>
 #else
 #include <process.h>
 #endif

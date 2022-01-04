@@ -29,18 +29,18 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 		{
 			std::vector<Anope::string> params;
 			std::stringstream cmdstr;
-			params.push_back("ADD");
+			params.emplace_back("ADD");
 			cmdstr << "+" << HTTPUtils::URLDecode(message.post_data["expiry"]);
 			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["mask"]);
 			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["reason"]);
-			params.push_back(cmdstr.str());
+			params.emplace_back(cmdstr.str());
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "OperServ", "operserv/akill", params, replacements);
 		}
 
 		if (message.get_data["del"] == "1" && message.get_data.count("number") > 0)
 		{
 			std::vector<Anope::string> params;
-			params.push_back("DEL");
+			params.emplace_back("DEL");
 			params.push_back(HTTPUtils::URLDecode(message.get_data["number"]));
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "OperServ", "operserv/akill", params, replacements);
 		}

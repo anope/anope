@@ -58,7 +58,7 @@ class CommandMSIgnore : public Command
 
 			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
 			{
-				mi->ignores.push_back(param.ci_str());
+				mi->ignores.emplace_back(param.ci_str());
 				source.Reply(_("\002%s\002 added to ignore list."), param.c_str());
 			}
 			else

@@ -151,7 +151,7 @@ class DatabaseRedis : public Module, public Pipe
 			obj->UpdateCache(data);
 
 			std::vector<Anope::string> args;
-			args.push_back("HGETALL");
+			args.emplace_back("HGETALL");
 			args.push_back("hash:" + t->GetName() + ":" + stringify(obj->id));
 
 			/* Get object attrs to clear before updating */
@@ -211,7 +211,7 @@ class DatabaseRedis : public Module, public Pipe
 			return;
 
 		std::vector<Anope::string> args;
-		args.push_back("SMEMBERS");
+		args.emplace_back("SMEMBERS");
 		args.push_back("ids:" + sb->GetName());
 
 		redis->SendCommand(new TypeLoader(this, sb->GetName()), args);
@@ -240,7 +240,7 @@ class DatabaseRedis : public Module, public Pipe
 		}
 
 		std::vector<Anope::string> args;
-		args.push_back("HGETALL");
+		args.emplace_back("HGETALL");
 		args.push_back("hash:" + t->GetName() + ":" + stringify(obj->id));
 
 		/* Get all of the attributes for this object */
@@ -284,7 +284,7 @@ void TypeLoader::OnResult(const Reply &r)
 		}
 
 		std::vector<Anope::string> args;
-		args.push_back("HGETALL");
+		args.emplace_back("HGETALL");
 		args.push_back("hash:" + this->type + ":" + stringify(id));
 
 		me->redis->SendCommand(new ObjectLoader(me, this->type, id), args);
@@ -358,14 +358,14 @@ void Deleter::OnResult(const Reply &r)
 	me->redis->StartTransaction();
 
 	std::vector<Anope::string> args;
-	args.push_back("DEL");
+	args.emplace_back("DEL");
 	args.push_back("hash:" + this->type + ":" + stringify(this->id));
 
 	/* Delete hash object */
 	me->redis->SendCommand(NULL, args);
 
 	args.clear();
-	args.push_back("SREM");
+	args.emplace_back("SREM");
 	args.push_back("ids:" + this->type);
 	args.push_back(stringify(this->id));
 
@@ -378,7 +378,7 @@ void Deleter::OnResult(const Reply &r)
 			*value = r.multi_bulk[i + 1];
 
 		args.clear();
-		args.push_back("SREM");
+		args.emplace_back("SREM");
 		args.push_back("value:" + this->type + ":" + key->bulk + ":" + value->bulk);
 		args.push_back(stringify(this->id));
 
@@ -421,7 +421,7 @@ void Updater::OnResult(const Reply &r)
 			*value = r.multi_bulk[i + 1];
 
 		std::vector<Anope::string> args;
-		args.push_back("SREM");
+		args.emplace_back("SREM");
 		args.push_back("value:" + this->type + ":" + key->bulk + ":" + value->bulk);
 		args.push_back(stringify(this->id));
 
@@ -431,13 +431,13 @@ void Updater::OnResult(const Reply &r)
 
 	/* Add object id to id set for this type */
 	std::vector<Anope::string> args;
-	args.push_back("SADD");
+	args.emplace_back("SADD");
 	args.push_back("ids:" + this->type);
 	args.push_back(stringify(obj->id));
 	me->redis->SendCommand(NULL, args);
 
 	args.clear();
-	args.push_back("HMSET");
+	args.emplace_back("HMSET");
 	args.push_back("hash:" + this->type + ":" + stringify(obj->id));
 
 	typedef std::map<Anope::string, std::stringstream *> items;
@@ -447,11 +447,11 @@ void Updater::OnResult(const Reply &r)
 		std::stringstream *value = it->second;
 
 		args.push_back(key);
-		args.push_back(value->str());
+		args.emplace_back(value->str());
 
 		std::vector<Anope::string> args2;
 
-		args2.push_back("SADD");
+		args2.emplace_back("SADD");
 		args2.push_back("value:" + this->type + ":" + key + ":" + value->str());
 		args2.push_back(stringify(obj->id));
 
@@ -528,7 +528,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 			Log(LOG_DEBUG) << "redis: notify: got modify for object id " << obj_id << " of type " << type;
 
 			std::vector<Anope::string> args;
-			args.push_back("HGETALL");
+			args.emplace_back("HGETALL");
 			args.push_back("hash:" + type + ":" + id);
 
 			me->redis->SendCommand(new ModifiedObject(me, type, obj_id), args);
@@ -556,7 +556,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 			std::stringstream *value = it->second;
 
 			std::vector<Anope::string> args;
-			args.push_back("SREM");
+			args.emplace_back("SREM");
 			args.push_back("value:" + type + ":" + k + ":" + value->str());
 			args.push_back(id);
 
@@ -565,7 +565,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 		}
 
 		std::vector<Anope::string> args;
-		args.push_back("SREM");
+		args.emplace_back("SREM");
 		args.push_back("ids:" + type);
 		args.push_back(stringify(s->id));
 
@@ -609,7 +609,7 @@ void ModifiedObject::OnResult(const Reply &r)
 			std::stringstream *value = it->second;
 
 			std::vector<Anope::string> args;
-			args.push_back("SREM");
+			args.emplace_back("SREM");
 			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());
 			args.push_back(stringify(this->id));
 
@@ -642,7 +642,7 @@ void ModifiedObject::OnResult(const Reply &r)
 			std::stringstream *value = it->second;
 
 			std::vector<Anope::string> args;
-			args.push_back("SADD");
+			args.emplace_back("SADD");
 			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());
 			args.push_back(stringify(obj->id));
 
@@ -651,7 +651,7 @@ void ModifiedObject::OnResult(const Reply &r)
 		}
 
 		std::vector<Anope::string> args;
-		args.push_back("SADD");
+		args.emplace_back("SADD");
 		args.push_back("ids:" + st->GetName());
 		args.push_back(stringify(obj->id));
 

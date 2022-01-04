@@ -186,7 +186,7 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 					if (temp_variables.size() != real_variables.size())
 						Log() << "Invalid FOR in web template " << this->file_name << " variable mismatch";
 					else
-						ForLoop::Stack.push_back(ForLoop(j + f, r, temp_variables, real_variables));
+						ForLoop::Stack.emplace_back(j + f, r, temp_variables, real_variables);
 				}
 			}
 			else if (content == "END FOR")

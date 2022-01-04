@@ -685,8 +685,8 @@ class CommandCSMode : public Command
 		{
 			std::vector<Anope::string> new_params;
 			new_params.push_back(params[0]);
-			new_params.push_back("SET");
-			new_params.push_back("-*");
+			new_params.emplace_back("SET");
+			new_params.emplace_back("-*");
 			this->DoSet(source, ci, new_params);
 			return;
 		}
@@ -721,9 +721,9 @@ class CommandCSMode : public Command
 
 		std::vector<Anope::string> new_params;
 		new_params.push_back(params[0]);
-		new_params.push_back("SET");
+		new_params.emplace_back("SET");
 		new_params.push_back("-" + stringify(cm->mchar));
-		new_params.push_back("*");
+		new_params.emplace_back("*");
 		this->DoSet(source, ci, new_params);
 	}
 

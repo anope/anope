@@ -92,7 +92,7 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 		}
 
 		std::list<SJoinUser> users;
-		users.push_back(std::make_pair(ChannelStatus(), user));
+		users.emplace_back(ChannelStatus(), user);
 
 		Channel *chan = Channel::Find(channel);
 		SJoin(source, channel, chan ? chan->creation_time : Anope::CurTime, "", users);

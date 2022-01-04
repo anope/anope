@@ -949,7 +949,7 @@ class MyManager : public Manager, public Timer
 				continue;
 			}
 
-			packet->questions.push_back(Question(zone, QUERY_SOA));
+			packet->questions.emplace_back(zone, QUERY_SOA);
 
 			new NotifySocket(ip.find(':') != Anope::string::npos, packet);
 		}
@@ -1052,7 +1052,7 @@ class ModuleDNS : public Module
 			Anope::string nip = n->Get<Anope::string>("ip");
 			short nport = n->Get<short>("port");
 
-			notify.push_back(std::make_pair(nip, nport));
+			notify.emplace_back(nip, nport);
 		}
 
 		if (Anope::IsFile(nameserver))

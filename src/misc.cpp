@@ -143,7 +143,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 	std::set<Anope::string> breaks;
 	for (unsigned i = 0; i < this->columns.size(); ++i)
 	{
-		tcolumns.push_back(Language::Translate(this->nc, this->columns[i].c_str()));
+		tcolumns.emplace_back(Language::Translate(this->nc, this->columns[i].c_str()));
 		lengths[this->columns[i]] = tcolumns[i].length();
 	}
 	for (unsigned i = 0; i < this->entries.size(); ++i)
@@ -234,7 +234,7 @@ Anope::string& InfoFormatter::operator[](const Anope::string &key)
 	Anope::string tkey = Language::Translate(this->nc, key.c_str());
 	if (tkey.length() > this->longest)
 		this->longest = tkey.length();
-	this->replies.push_back(std::make_pair(tkey, ""));
+	this->replies.emplace_back(tkey, "");
 	return this->replies.back().second;
 }
 

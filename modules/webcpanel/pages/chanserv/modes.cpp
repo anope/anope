@@ -79,7 +79,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);
-			params.push_back("SET");
+			params.emplace_back("SET");
 			params.push_back("-" + Anope::string(cm->mchar));
 			params.push_back(message.get_data["mask"]);
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
@@ -88,7 +88,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);
-			params.push_back("SET");
+			params.emplace_back("SET");
 			params.push_back("+" + Anope::string(cm->mchar));
 			params.push_back(message.post_data["mask"]);
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);

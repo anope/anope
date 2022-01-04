@@ -295,9 +295,9 @@ class NickServCore : public Module, public NickServService
 		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "ns_secure memo_signon memo_receive")).GetTokens(defaults);
 		if (defaults.empty())
 		{
-			defaults.push_back("NS_SECURE");
-			defaults.push_back("MEMO_SIGNON");
-			defaults.push_back("MEMO_RECEIVE");
+			defaults.emplace_back("NS_SECURE");
+			defaults.emplace_back("MEMO_SIGNON");
+			defaults.emplace_back("MEMO_RECEIVE");
 		}
 		else if (defaults[0].equals_ci("none"))
 			defaults.clear();

@@ -112,10 +112,10 @@ class ChanServCore : public Module, public ChanServService
 		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy")).GetTokens(defaults);
 		if (defaults.empty())
 		{
-			defaults.push_back("KEEPTOPIC");
-			defaults.push_back("CS_SECURE");
-			defaults.push_back("SECUREFOUNDER");
-			defaults.push_back("SIGNKICK");
+			defaults.emplace_back("KEEPTOPIC");
+			defaults.emplace_back("CS_SECURE");
+			defaults.emplace_back("SECUREFOUNDER");
+			defaults.emplace_back("SIGNKICK");
 		}
 		else if (defaults[0].equals_ci("none"))
 			defaults.clear();

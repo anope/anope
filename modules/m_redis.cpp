@@ -165,7 +165,7 @@ class MyRedisService : public Provider
 	{
 		std::vector<std::pair<const char *, size_t> > args;
 		for (unsigned j = 0; j < cmds.size(); ++j)
-			args.push_back(std::make_pair(cmds[j].c_str(), cmds[j].length()));
+			args.emplace_back(cmds[j].c_str(), cmds[j].length());
 		this->Send(s, i, args);
 	}
 
@@ -191,7 +191,7 @@ class MyRedisService : public Provider
 	{
 		std::vector<std::pair<const char *, size_t> > args;
 		for (unsigned j = 0; j < cmds.size(); ++j)
-			args.push_back(std::make_pair(cmds[j].c_str(), cmds[j].length()));
+			args.emplace_back(cmds[j].c_str(), cmds[j].length());
 		this->Send(i, args);
 	}
 
@@ -223,7 +223,7 @@ class MyRedisService : public Provider
 		}
 
 		std::vector<Anope::string> args;
-		args.push_back("PSUBSCRIBE");
+		args.emplace_back("PSUBSCRIBE");
 		args.push_back(pattern);
 		this->SendCommand(sub, NULL, args);
 

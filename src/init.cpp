@@ -57,7 +57,7 @@ static void ParseCommandLineArguments(int ac, char **av)
 		if (option.empty())
 			continue;
 
-		CommandLineArguments.push_back(std::make_pair(option, param));
+		CommandLineArguments.emplace_back(option, param);
 	}
 }
 

@@ -199,7 +199,7 @@ Conf::Conf() : Block(""), EmptyBlock("")
 		if (password.find(' ') != Anope::string::npos || password[0] == ':')
 			throw ConfigException("uplink:password is not valid");
 
-		this->Uplinks.push_back(Uplink(host, port, password, ipv6));
+		this->Uplinks.emplace_back(host, port, password, ipv6);
 	}
 
 	for (int i = 0; i < this->CountBlock("module"); ++i)

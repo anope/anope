@@ -17,7 +17,7 @@ bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::str
 	if (message.post_data.count("certfp") > 0)
 	{
 		std::vector<Anope::string> params;
-		params.push_back("ADD");
+		params.emplace_back("ADD");
 		params.push_back(message.post_data["certfp"]);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/cert", params, replacements);
@@ -25,7 +25,7 @@ bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::str
 	else if (message.get_data.count("del") > 0 && message.get_data.count("mask") > 0)
 	{
 		std::vector<Anope::string> params;
-		params.push_back("DEL");
+		params.emplace_back("DEL");
 		params.push_back(message.get_data["mask"]);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/cert", params, replacements);

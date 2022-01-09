@@ -45,6 +45,7 @@ void Mail::Message::Run()
 	fprintf(pipe, "Content-Transfer-Encoding: 8bit\n");
 	fprintf(pipe, "\n");
 	fprintf(pipe, "%s", message.c_str());
+	fprintf(pipe, "\n.\n");
 
 	pclose(pipe);
 

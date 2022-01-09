@@ -480,13 +480,10 @@ class InspIRCd12Proto : public IRCDProto
 class InspIRCdExtBan : public ChannelModeList
 {
  public:
-	InspIRCdExtBan(const Anope::string &mname, char modeChar) : ChannelModeList(mname, modeChar)
-	{
-		IRCD->AddExtban(mname);
-	}
+	InspIRCdExtBan(const Anope::string &mname, char modeChar) : ChannelModeList(mname, modeChar) { }
 
 	bool Matches(User *u, const Entry *e) anope_override
-	{ /* FIXME these matches will never work, as e->GetMask will return only "unwrapped" mask! */
+	{
 		const Anope::string &mask = e->GetMask();
 
 		if (mask.find("m:") == 0 || mask.find("N:") == 0)

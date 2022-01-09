@@ -109,7 +109,6 @@ class InspIRCdExtBan : public ChannelModeVirtual<ChannelModeList>
 	InspIRCdExtBan(const Anope::string &mname, const Anope::string &basename, char extban) : ChannelModeVirtual<ChannelModeList>(mname, basename)
 		, ext(extban)
 	{
-		IRCD->AddExtban(mname);
 	}
 
 	ChannelMode *Wrap(Anope::string &param) anope_override
@@ -140,8 +139,9 @@ namespace InspIRCdExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
+			Anope::string real_mask = mask.substr(3);
 
-			return Entry(this->name, mask).Matches(u);
+			return Entry(this->name, real_mask).Matches(u);
 		}
 	};
 
@@ -154,7 +154,9 @@ namespace InspIRCdExtban
 
 		bool Matches(User *u, const Entry *e) anope_override
 		{
-			Anope::string channel = e->GetMask();
+			const Anope::string &mask = e->GetMask();
+
+			Anope::string channel = mask.substr(3);
 
 			ChannelMode *cm = NULL;
 			if (channel[0] != '#')
@@ -189,8 +191,9 @@ namespace InspIRCdExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
+			Anope::string real_mask = mask.substr(2);
 
-			return u->IsIdentified() && mask.equals_ci(u->Account()->display);
+			return u->IsIdentified() && real_mask.equals_ci(u->Account()->display);
 		}
 	};
 
@@ -204,7 +207,8 @@ namespace InspIRCdExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
-			return Anope::Match(u->realname, mask);
+			Anope::string real_mask = mask.substr(2);
+			return Anope::Match(u->realname, real_mask);
 		}
 	};
 
@@ -218,7 +222,8 @@ namespace InspIRCdExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
-			return Anope::Match(u->server->GetName(), mask);
+			Anope::string real_mask = mask.substr(2);
+			return Anope::Match(u->server->GetName(), real_mask);
 		}
 	};
 
@@ -232,7 +237,8 @@ namespace InspIRCdExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
-			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, mask);
+			Anope::string real_mask = mask.substr(2);
+			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, real_mask);
 		}
 	};
 
@@ -246,7 +252,8 @@ namespace InspIRCdExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
-			return !u->Account() && Entry("BAN", mask).Matches(u);
+			Anope::string real_mask = mask.substr(2);
+			return !u->Account() && Entry("BAN", real_mask).Matches(u);
 		}
 	};
 }

@@ -73,8 +73,6 @@ class CoreExport IRCDProto : public Service
 	unsigned MaxModes;
 	/* The maximum number of bytes a line may have */
 	unsigned MaxLine;
-	/* Extban list */
-	std::vector<Anope::string> extbanNames;
 
 	/* Retrieves the next free UID or SID */
 	virtual Anope::string UID_Retrieve();
@@ -239,9 +237,6 @@ class CoreExport IRCDProto : public Service
 	virtual bool IsIdentValid(const Anope::string &);
 	virtual bool IsHostValid(const Anope::string &);
 	virtual bool IsExtbanValid(const Anope::string &) { return false; }
-	virtual bool IsExtban(const Anope::string &, const Anope::string &);
-
-	virtual void AddExtban(const Anope::string &);
 
 	/** Retrieve the maximum number of list modes settable on this channel
 	 * Defaults to Config->ListSize

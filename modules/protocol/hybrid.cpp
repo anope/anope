@@ -280,16 +280,30 @@ class HybridProto : public IRCDProto
 		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
 			return false;
 
-		Anope::string chars = "~}|{ `_^]\\[ .-$";
+		/*
+		 * If the user name begins with a tilde (~), make sure there is at least
+		 * one succeeding character.
+		 */
+		unsigned i = ident[0] == '~';
+		if (i >= ident.length())
+			return false;
 
-		for (unsigned i = 0; i < ident.length(); ++i)
+		/* User names may not start with a '-', '_', or '.'. */
+		const char &a = ident[i];
+		if (a == '-' || a == '_' || a == '.')
+			return false;
+
+		for (i = 0; i < ident.length(); ++i)
 		{
 			const char &c = ident[i];
 
-			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))
+			/* A tilde can only be used as the first character of a user name. */
+			if (c == '~' && i == 0)
 				continue;
 
-			if (chars.find(c) != Anope::string::npos)
+			if ((c >= 'A' && c <= 'Z') ||
+				(c >= 'a' && c <= 'z') ||
+				(c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.')
 				continue;
 
 			return false;

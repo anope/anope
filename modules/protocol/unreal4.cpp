@@ -13,7 +13,7 @@
 #include "modules/cs_mode.h"
 #include "modules/sasl.h"
 
-typedef std::map<Anope::string, Anope::string> ModData;
+typedef Anope::map<Anope::string> ModData;
 static Anope::string UplinkSID;
 
 class UnrealIRCdProto : public IRCDProto

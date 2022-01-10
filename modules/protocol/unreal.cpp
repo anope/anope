@@ -424,6 +424,7 @@ class UnrealExtBan : public ChannelModeVirtual<ChannelModeList>
 	UnrealExtBan(const Anope::string &mname, const Anope::string &basename, char extban) : ChannelModeVirtual<ChannelModeList>(mname, basename)
 		, ext(extban)
 	{
+		IRCD->AddExtban(mname);
 	}
 
 	ChannelMode *Wrap(Anope::string &param) anope_override
@@ -453,8 +454,7 @@ namespace UnrealExtban
 
 		bool Matches(User *u, const Entry *e) anope_override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string channel = mask.substr(3);
+			Anope::string channel = e->GetMask();
 
 			ChannelMode *cm = NULL;
 			if (channel[0] != '#')
@@ -489,9 +489,8 @@ namespace UnrealExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
 
-			return Entry(this->name, real_mask).Matches(u);
+			return Entry(this->name, mask).Matches(u);
 		}
 	};
 
@@ -505,9 +504,8 @@ namespace UnrealExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
 
-			return Anope::Match(u->realname, real_mask);
+			return Anope::Match(u->realname, mask);
 		}
 	};
 
@@ -535,9 +533,8 @@ namespace UnrealExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
 
-			return u->Account() && Anope::Match(u->Account()->display, real_mask);
+			return u->Account() && Anope::Match(u->Account()->display, mask);
 		}
 	};
 }

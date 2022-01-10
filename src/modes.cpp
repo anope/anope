@@ -849,14 +849,13 @@ const Anope::string Entry::GetNUHMask() const
 bool Entry::Matches(User *u, bool full) const
 {
 	/* First check if this mode has defined any matches (usually for extbans). */
-	if (IRCD->IsExtbanValid(this->mask))
+	if (IRCD->IsExtban(this->name, this->mask))
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(this->name);
 		if (cm != NULL && cm->type == MODE_LIST)
 		{
 			ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
-			if (cml->Matches(u, this))
-				return true;
+			return (cml->Matches(u, this));
 		}
 	}
 

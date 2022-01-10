@@ -32,7 +32,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4+"), ClientModData(creator, "ClientModData"), ChannelModData(creator, "ChannelModData")
 	{
-		DefaultPseudoclientModes = "+SoiqB";
+		DefaultPseudoclientModes = "+BioqS";
 		CanSVSNick = true;
 		CanSVSJoin = true;
 		CanSetVHost = true;

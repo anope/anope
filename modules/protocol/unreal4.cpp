@@ -16,14 +16,6 @@
 typedef std::map<Anope::string, Anope::string> ModData;
 static Anope::string UplinkSID;
 
-class pipesepstream : public sepstream
-{
- public:
-	/** Initialize with separator
-	 */
-	pipesepstream(const Anope::string &source, bool allowempty = false) : sepstream(source, '|', allowempty) { }
-};
-
 class UnrealIRCdProto : public IRCDProto
 {
  public:
@@ -634,7 +626,7 @@ namespace UnrealExtban
 			if (moddata == NULL || moddata->find("geoip") == moddata->end())
 				return false;
 
-			pipesepstream sep((*moddata)["geoip"]); /* "cc=PL|cd=Poland" */
+			sepstream sep((*moddata)["geoip"], '|');/* "cc=PL|cd=Poland" */
 			Anope::string tokenbuf;
 			while (sep.GetToken(tokenbuf))
 			{

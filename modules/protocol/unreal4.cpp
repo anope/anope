@@ -455,6 +455,7 @@ class UnrealExtBan : public ChannelModeVirtual<ChannelModeList>
 
 	ChannelMode *Wrap(Anope::string &param) anope_override
 	{
+		param = "~" + Anope::string(ext) + ":" + param;
 		return ChannelModeVirtual<ChannelModeList>::Wrap(param);
 	}
 
@@ -463,6 +464,7 @@ class UnrealExtBan : public ChannelModeVirtual<ChannelModeList>
 		if (cm->type != MODE_LIST || param.length() < 4 || param[0] != '~' || param[1] != ext || param[2] != ':')
 			return cm;
 
+		param = param.substr(3);
 		return this;
 	}
 };

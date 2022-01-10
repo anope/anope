@@ -45,7 +45,7 @@ class CommandCSUnban : public Command
 				if (!ci->c || !source.AccessFor(ci).HasPriv("UNBAN"))
 					continue;
 				
-				FOREACH_MOD(OnChannelUnban, (source.GetUser(), ci->c));
+				FOREACH_MOD(OnChannelUnban, (source.GetUser(), ci));
 
 				for (unsigned j = 0; j < modes.size(); ++j)
 					if (ci->c->Unban(source.GetUser(), modes[j]->name, true))
@@ -90,7 +90,7 @@ class CommandCSUnban : public Command
 		bool override = !source.AccessFor(ci).HasPriv("UNBAN") && source.HasPriv("chanserv/kick");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unban " << u2->nick;
 
-		FOREACH_MOD(OnChannelUnban, (u2, ci->c));
+		FOREACH_MOD(OnChannelUnban, (u2, ci));
 
 		for (unsigned i = 0; i < modes.size(); ++i)
 			ci->c->Unban(u2, modes[i]->name, source.GetUser() == u2);

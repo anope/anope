@@ -1106,7 +1106,7 @@ class CoreExport Module : public Extensible
 	 * @param u The user to be unbanned
 	 * @param c The channel that user has to be unbanned on
 	 */
-	virtual void OnChannelUnban(User *u, Channel *c) { throw NotImplementedException(); }
+	virtual void OnChannelUnban(User *u, ChannelInfo *ci) { throw NotImplementedException(); }
 };
 
 enum Implementation

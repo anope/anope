@@ -1741,9 +1741,9 @@ class ProtoUnreal : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnChannelUnban(User *u, Channel *c) anope_override
+	void OnChannelUnban(User *u, ChannelInfo *ci) anope_override
 	{
-		UplinkSocket::Message(Config->GetClient("ChanServ")) << "SVS2MODE " << c->name << " -b " << u->GetUID();
+		UplinkSocket::Message(ci->WhoSends()) << "SVS2MODE " << ci->c->name << " -b " << u->GetUID();
 		/* Unreal will remove all matching bans for us regardless of our internal matching.
 		   Don't use Message(Me) here as certain Unreal versions will always respond with TS-less MODE message. */
 	}

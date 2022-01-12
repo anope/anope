@@ -29,7 +29,7 @@
 # define DllExport __declspec(dllimport)
 #endif
 
-#if GETTEXT_FOUND
+#if HAVE_LOCALIZATION
 /* Undefine some functions libintl defines */
 # undef snprintf
 # undef vsnprintf

@@ -159,6 +159,14 @@ endif()
 
 # Find gettext
 find_package(Gettext)
+find_package(Intl)
+if(GETTEXT_FOUND AND Intl_FOUND)
+  set(HAVE_LOCALIZATION ON)
+  include_directories(${Intl_INCLUDE_DIRS})
+else()
+  message("Unable to find gettext and libintl; disabling localization")
+  set(HAVE_LOCALIZATION OFF)
+endif()
 
 # Use the following directories as includes
 include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include)

@@ -11,7 +11,7 @@
 #include "language.h"
 #include "account.h"
 
-#ifdef GETTEXT_FOUND
+#ifdef HAVE_LOCALIZATION
 # include <libintl.h>
 #endif
 
@@ -39,7 +39,7 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 
 	ModuleManager::Modules.push_back(this);
 
-#if GETTEXT_FOUND
+#if HAVE_LOCALIZATION
 	for (unsigned i = 0; i < Language::Languages.size(); ++i)
 	{
 		/* Remove .UTF-8 or any other suffix */
@@ -75,7 +75,7 @@ Module::~Module()
 	if (it != ModuleManager::Modules.end())
 		ModuleManager::Modules.erase(it);
 
-#if GETTEXT_FOUND
+#if HAVE_LOCALIZATION
 	std::vector<Anope::string>::iterator dit = std::find(Language::Domains.begin(), Language::Domains.end(), this->name);
 	if (dit != Language::Domains.end())
 		Language::Domains.erase(dit);

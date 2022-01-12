@@ -14,8 +14,8 @@
 #cmakedefine DEBUG_BUILD
 
 #cmakedefine DEFUMASK @DEFUMASK@
-#cmakedefine HAVE_UMASK 1
-#cmakedefine GETTEXT_FOUND 1
+#cmakedefine01 HAVE_UMASK
+#cmakedefine01 HAVE_LOCALIZATION
 
 #ifdef _WIN32
 # define popen _popen

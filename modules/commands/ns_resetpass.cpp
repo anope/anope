@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2022 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -105,8 +105,9 @@ class NSResetPass : public Module
 					if (source.GetUser())
 					{
 						source.GetUser()->Identify(na);
-						source.Reply(_("You are now identified for your nick. Change your password now."));
 					}
+
+					source.Reply(_("You are now identified for your nick. Change your password now."));
 				}
 				else
 					return EVENT_CONTINUE;

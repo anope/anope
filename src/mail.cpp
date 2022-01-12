@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2022 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -41,6 +41,8 @@ void Mail::Message::Run()
 	else
 		fprintf(pipe, "To: \"%s\" <%s>\n", mail_to.c_str(), addr.c_str());
 	fprintf(pipe, "Subject: %s\n", subject.c_str());
+	fprintf(pipe, "Content-Type: text/plain; charset=UTF-8;\n");
+	fprintf(pipe, "Content-Transfer-Encoding: 8bit\n");
 	fprintf(pipe, "\n");
 	fprintf(pipe, "%s", message.c_str());
 	fprintf(pipe, "\n.\n");

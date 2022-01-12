@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2013-2021 Anope Team
+ * (C) 2013-2022 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -25,52 +25,57 @@ void IRC2SQL::CheckTables()
 
 	this->GetTables();
 
-	if (GeoIPDB.equals_ci("country") && !this->HasTable(prefix + "geoip_country"))
+	if (GeoIPDB.equals_ci("country"))
 	{
-		query = "CREATE TABLE `" + prefix + "geoip_country` ("
-			"`start` INT UNSIGNED NOT NULL,"
-			"`end` INT UNSIGNED NOT NULL,"
-			"`countrycode` varchar(2),"
-			"`countryname` varchar(50),"
-			"PRIMARY KEY `end` (`end`),"
-			"KEY `start` (`start`)"
-			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-		this->RunQuery(query);
+		if (!this->HasTable(prefix + "geoip_country"))
+		{
+			query = "CREATE TABLE `" + prefix + "geoip_country` ("
+				"`start` INT UNSIGNED NOT NULL,"
+				"`end` INT UNSIGNED NOT NULL,"
+				"`countrycode` varchar(2),"
+				"`countryname` varchar(50),"
+				"PRIMARY KEY `end` (`end`),"
+				"KEY `start` (`start`)"
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+			this->RunQuery(query);
+		}
 	}
-	if (GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_blocks"))
+	else if (GeoIPDB.equals_ci("city"))
 	{
-		query = "CREATE TABLE `" + prefix + "geoip_city_blocks` ("
-			"`start` INT UNSIGNED NOT NULL,"
-			"`end` INT UNSIGNED NOT NULL,"
-			"`locId` INT UNSIGNED NOT NULL,"
-			"PRIMARY KEY `end` (`end`),"
-			"KEY `start` (`start`)"
-			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-		this->RunQuery(query);
-
-	}
-	if (GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_location"))
-	{
-		query = "CREATE TABLE `" + prefix + "geoip_city_location` ("
-			"`locId` INT UNSIGNED NOT NULL,"
-			"`country` CHAR(2) NOT NULL,"
-			"`region` CHAR(2) NOT NULL,"
-			"`city` VARCHAR(50),"
-			"`latitude` FLOAT,"
-			"`longitude` FLOAT,"
-			"`areaCode` INT,"
-			"PRIMARY KEY (`locId`)"
-			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-		this->RunQuery(query);
-	}
-	if (GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_region"))
-	{	query = "CREATE TABLE `" + prefix + "geoip_city_region` ("
-			"`country` CHAR(2) NOT NULL,"
-			"`region` CHAR(2) NOT NULL,"
-			"`regionname` VARCHAR(100) NOT NULL,"
-			"PRIMARY KEY (`country`,`region`)"
-			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-		this->RunQuery(query);
+		if (!this->HasTable(prefix + "geoip_city_blocks"))
+		{
+			query = "CREATE TABLE `" + prefix + "geoip_city_blocks` ("
+				"`start` INT UNSIGNED NOT NULL,"
+				"`end` INT UNSIGNED NOT NULL,"
+				"`locId` INT UNSIGNED NOT NULL,"
+				"PRIMARY KEY `end` (`end`),"
+				"KEY `start` (`start`)"
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+			this->RunQuery(query);
+		}
+		if (!this->HasTable(prefix + "geoip_city_location"))
+		{
+			query = "CREATE TABLE `" + prefix + "geoip_city_location` ("
+				"`locId` INT UNSIGNED NOT NULL,"
+				"`country` CHAR(2) NOT NULL,"
+				"`region` CHAR(2) NOT NULL,"
+				"`city` VARCHAR(50),"
+				"`latitude` FLOAT,"
+				"`longitude` FLOAT,"
+				"`areaCode` INT,"
+				"PRIMARY KEY (`locId`)"
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+			this->RunQuery(query);
+		}
+		if (!this->HasTable(prefix + "geoip_city_region"))
+		{	query = "CREATE TABLE `" + prefix + "geoip_city_region` ("
+				"`country` CHAR(2) NOT NULL,"
+				"`region` CHAR(2) NOT NULL,"
+				"`regionname` VARCHAR(100) NOT NULL,"
+				"PRIMARY KEY (`country`,`region`)"
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+			this->RunQuery(query);
+		}
 	}
 	if (!this->HasTable(prefix + "server"))
 	{

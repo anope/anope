@@ -11,7 +11,7 @@
 
 #include "module.h"
 #include "modules/sql.h"
-#define NO_CLIENT_LONG_LONG
+
 #ifdef WIN32
 # include <mysql.h>
 #else

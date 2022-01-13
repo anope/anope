@@ -23,15 +23,6 @@ macro(build_modules SRC)
           file(RELATIVE_PATH FNAME ${SRC} ${MODULE_SRC})
           # Convert the real source file extension to have a .so extension
           string(REGEX REPLACE "\\.cpp$" ".so" SO ${FNAME})
-          # Temporary variable for the current source's include directories
-          set(TEMP_INCLUDES)
-          # Calculate the header file dependencies for the given source file
-          calculate_depends(${MODULE_SRC} TEMP_INCLUDES)
-          # If there were some extra include directories, add them to the list
-          if(TEMP_INCLUDES)
-            list(APPEND EXTRA_INCLUDES ${TEMP_INCLUDES})
-          endif()
-
           # Reset linker flags
           set(TEMP_LDFLAGS)
           # Reset extra dependencies
@@ -95,15 +86,6 @@ macro(build_subdir)
   # Iterate through the source files in the subdirectory
   foreach(SRC ${MODULES_SUBDIR_SRCS})
     if(HAS_FUNCTION)
-      # Temporary variable for the current source's include directories
-      set(TEMP_INCLUDES)
-      # Calculate the header file dependencies for the given source file
-      calculate_depends(${SRC} TEMP_INCLUDES)
-      # If there were some extra include directories, add them to the list
-      if(TEMP_INCLUDES)
-        include_directories(${TEMP_INCLUDES})
-      endif()
-
       # Reset linker flags
       set(TEMP_LDFLAGS)
       # Reset extra dependencies

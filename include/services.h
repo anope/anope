@@ -20,7 +20,7 @@
 #include <cstdarg>
 #include <stdexcept>
 
-#include <string.h>
+#include <cstring>
 
 #ifndef _WIN32
 #include <unistd.h>

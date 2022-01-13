@@ -176,10 +176,8 @@ if(REPRODUCIBLE_BUILD)
   add_definitions(-DREPRODUCIBLE_BUILD)
 endif()
 
-# If using Windows, always add the _WIN32 define
 if(WIN32)
-  add_definitions(-D_WIN32)
-  # And include the windows specific folder for our anope_windows.h
+  # If using Windows, include the windows specific folder for anope_windows.h
   include_directories(${Anope_SOURCE_DIR}/src/win32)
 endif()
 
@@ -191,15 +189,11 @@ if(MSVC)
   string(REPLACE "/W3 " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   # Set the compile flags to have warnings on the max setting (but disable a few annoying ones), exception handling turned on, the proper defines
   set(CXXFLAGS "${CXXFLAGS} /W4 /wd4100 /wd4127 /wd4250 /wd4251 /wd4355 /wd4706 /wd4800 /wd4996 /EHs")
-  add_definitions(-DMSVCPP -D_CRT_SECURE_NO_WARNINGS)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 # Otherwise, we're not using Visual Studio
 else()
   # Set the compile flags to have all warnings on (including shadowed variables)
   set(CXXFLAGS "${CXXFLAGS} -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wpedantic -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
-  # Also, if we are building under MinGW, add another define for MinGW
-  if(MINGW)
-    add_definitions(-DMINGW)
-  endif()
 endif()
 
 # If CMake has found that the given system requires a special library for dl* calls, include it with the linker flags

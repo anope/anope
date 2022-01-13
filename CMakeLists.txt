@@ -91,37 +91,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang$")
   endif()
 endif()
 
-# If we are using Visual Studio, locate the path of the Windows Server 2008 SDK or Windows Server 2003 Platform SDK, depending on which is installed
-if(MSVC)
-  # If the path comes up as "/registry" from any of these, the path wasn't found, otherwise, we'll set WSDK_PATH to the corresponding path
-  # Look for the 2008 SDK under HKLM first
-  get_filename_component(WSDK2008_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" ABSOLUTE CACHE)
-  if(WSDK2008_PATH STREQUAL "/registry")
-    # If not found, look for the 2003 SDK under HKLM
-    get_filename_component(WSDK2003_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\MicrosoftSDK\\InstalledSDKs\\D2FF9F89-8AA2-4373-8A31-C838BF4DBBE1;Install Dir]" ABSOLUTE CACHE)
-    if(WSDK2003_PATH STREQUAL "/registry")
-      # If not found, look for the 2008 SDK under HKCU
-      get_filename_component(WSDK2008_PATH "[HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" ABSOLUTE CACHE)
-      if(WSDK2008_PATH STREQUAL "/registry")
-        # If not found, look for the 2003 SDK under HKCU
-        get_filename_component(WSDK2003_PATH "[HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\MicrosoftSDK\\InstalledSDKs\\D2FF9F89-8AA2-4373-8A31-C838BF4DBBE1;Install Dir]" ABSOLUTE CACHE)
-        if(WSDK2003_PATH STREQUAL "/registry")
-          # The SDK was never found, set the path to nothing
-          set(WSDK_PATH "")
-        else()
-          set(WSDK_PATH "${WSDK2003_PATH}")
-        endif()
-      else()
-        set(WSDK_PATH "${WSDK2008_PATH}")
-      endif()
-    else()
-      set(WSDK_PATH "${WSDK2003_PATH}")
-    endif()
-  else()
-    set(WSDK_PATH "${WSDK2008_PATH}")
-  endif()
-endif()
-
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
 # to Debug

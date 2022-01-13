@@ -1,0 +1,25 @@
+name: Windows CI
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 0 * * 0'
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1.0
+
+      - name: Run CMake
+        run: |
+          mkdir ${{ github.workspace }}\build
+          cd ${{ github.workspace }}\build
+          cmake -A "x64" -G "Visual Studio 16 2019" ..
+
+      - name: Build Anope
+        working-directory: ${{ github.workspace }}\build
+        run: |
+          msbuild Anope.sln /M:3 /P:Configuration=Release /P:Platform=x64 /T:ALL_BUILD

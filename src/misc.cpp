@@ -617,7 +617,7 @@ Anope::string Anope::VersionBuildString()
 #endif
 	Anope::string flags;
 
-#ifdef DEBUG_BUILD
+#if DEBUG_BUILD
 	flags += "D";
 #endif
 #ifdef VERSION_GIT

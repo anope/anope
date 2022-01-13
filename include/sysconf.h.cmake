@@ -11,11 +11,17 @@
 
 #pragma once
 
-#cmakedefine DEBUG_BUILD
-
+// The default umask to use for files.
 #cmakedefine DEFUMASK @DEFUMASK@
-#cmakedefine01 HAVE_UMASK
+
+// Whether Anope was built in debug mode.
+#cmakedefine01 DEBUG_BUILD
+
+// Whether Anope was built with localization support.
 #cmakedefine01 HAVE_LOCALIZATION
+
+// Whether the umask() function is available.
+#cmakedefine01 HAVE_UMASK
 
 #ifdef _WIN32
 # define popen _popen

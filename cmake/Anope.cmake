@@ -83,36 +83,6 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
 endmacro()
 
 ###############################################################################
-# check_functions(<source filename> <output variable set to TRUE on success>)
-#
-# This macro is used in most of the module (sub)directories to calculate the
-#   function dependencies for the given source file.
-###############################################################################
-macro(check_functions SRC SUCCESS)
-  # Default to true
-  set(${SUCCESS} TRUE)
-  # Check to see if there are any lines matching: /* RequiredFunctions: [something] */
-  file(STRINGS ${SRC} REQUIRED_FUNCTIONS REGEX "/\\*[ \t]*RequiredFunctions:[ \t]*.*[ \t]*\\*/")
-  # Iterate through those lines
-  foreach(REQUIRED_FUNCTION ${REQUIRED_FUNCTIONS})
-    # Strip off the /* RequiredFunctions: and */ from the line
-    string(REGEX REPLACE "/\\*[ \t]*RequiredFunctions:[ \t]*([^ \t]*)[ \t]*\\*/" "\\1" REQUIRED_FUNCTION ${REQUIRED_FUNCTION})
-    # Replace all commas with semicolons
-    string(REGEX REPLACE "," ";" REQUIRED_FUNCTION ${REQUIRED_FUNCTION})
-    # Iterate through the functions given
-    foreach(FUNCTION ${REQUIRED_FUNCTION})
-      # Check if the function exists
-      check_function_exists(${REQUIRED_FUNCTION} HAVE_${REQUIRED_FUNCTION})
-      # If we don't have the function warn the user and set SUCCESS to FALSE
-      if(NOT HAVE_${REQUIRED_FUNCTION})
-        message("${SRC} needs function ${REQUIRED_FUNCTION} but we were unable to locate that function!")
-        set(${SUCCESS} FALSE)
-      endif()
-    endforeach()
-  endforeach()
-endmacro()
-
-###############################################################################
 # add_to_cpack_ignored_files(<item> [TRUE])
 #
 # A macro to update the environment variable CPACK_IGNORED_FILES which

@@ -11,7 +11,7 @@
 #include "language.h"
 #include "account.h"
 
-#ifdef HAVE_LOCALIZATION
+#if HAVE_LOCALIZATION
 # include <libintl.h>
 #endif
 

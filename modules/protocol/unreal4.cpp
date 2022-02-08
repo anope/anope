@@ -82,7 +82,6 @@ class UnrealIRCdProto : public IRCDProto
 	void SendVhostDel(User *u) anope_override
 	{
 		BotInfo *HostServ = Config->GetClient("HostServ");
-		u->RemoveMode(HostServ, "CLOAK");
 		u->RemoveMode(HostServ, "VHOST");
 		ModeManager::ProcessModes();
 		u->SetMode(HostServ, "CLOAK");

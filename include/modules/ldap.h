@@ -13,7 +13,7 @@ class LDAPException : public ModuleException
  public:
 	LDAPException(const Anope::string &reason) : ModuleException(reason) { }
 
-	virtual ~LDAPException() throw() = default;
+	virtual ~LDAPException() noexcept = default;
 };
 
 struct LDAPModification

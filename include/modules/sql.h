@@ -84,7 +84,7 @@ namespace SQL
 	 public:
 		Exception(const Anope::string &reason) : ModuleException(reason) { }
 
-		virtual ~Exception() throw() = default;
+		virtual ~Exception() noexcept = default;
 	};
 
 	/** A SQL query

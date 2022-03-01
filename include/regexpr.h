@@ -20,7 +20,7 @@ class RegexException : public CoreException
  public:
 	RegexException(const Anope::string &reason = "") : CoreException(reason) { }
 
-	virtual ~RegexException() throw() = default;
+	virtual ~RegexException() noexcept = default;
 };
 
 class CoreExport Regex

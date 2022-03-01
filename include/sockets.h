@@ -125,7 +125,7 @@ class SocketException : public CoreException
 	/** Destructor
 	 * @throws Nothing
 	 */
-	virtual ~SocketException() throw() = default;
+	virtual ~SocketException() noexcept = default;
 };
 
 enum SocketFlag

@@ -34,7 +34,7 @@ struct Exception : Serializable
 class SessionService : public Service
 {
  public:
-	typedef TR1NS::unordered_map<cidr, Session *, cidr::hash> SessionMap;
+	typedef std::unordered_map<cidr, Session *, cidr::hash> SessionMap;
 	typedef std::vector<Exception *> ExceptionVector;
 
 	SessionService(Module *m) : Service(m, "SessionService", "session") { }

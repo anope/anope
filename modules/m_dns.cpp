@@ -649,7 +649,7 @@ class MyManager : public Manager, public Timer
 {
 	uint32_t serial;
 
-	typedef TR1NS::unordered_map<Question, Query, Question::hash> cache_map;
+	typedef std::unordered_map<Question, Query, Question::hash> cache_map;
 	cache_map cache;
 
 	TCPSocket *tcpsock = nullptr;

@@ -19,7 +19,7 @@
 
 typedef Anope::hash_map<NickAlias *> nickalias_map;
 typedef Anope::hash_map<NickCore *> nickcore_map;
-typedef TR1NS::unordered_map<uint64_t, NickCore *> nickcoreid_map;
+typedef std::unordered_map<uint64_t, NickCore *> nickcoreid_map;
 
 extern CoreExport Serialize::Checker<nickalias_map> NickAliasList;
 extern CoreExport Serialize::Checker<nickcore_map> NickCoreList;

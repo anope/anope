@@ -6,7 +6,7 @@ on:
     - cron: '0 0 * * 0'
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
 
@@ -22,4 +22,4 @@ jobs:
       - name: Build Anope
         working-directory: ${{ github.workspace }}\build
         run: |
-          msbuild Anope.sln /M:3 /P:Configuration=Release /P:Platform=x64 /T:ALL_BUILD
+          msbuild Anope.sln /M:3 /P:Configuration=Release /P:Platform=x64 /T:ALL_BUILD /VERBOSITY:MINIMAL

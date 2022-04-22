@@ -1,5 +1,5 @@
-Anope Version 2.0.11-git
-------------------------
+Anope Version 2.0.11
+--------------------
 Fixed ldap on OpenLDAP 2.5+
 Fixed not using utf-8 encoding for outgoing email
 Fixed ns_resetpass not returning a response for XMLRPC

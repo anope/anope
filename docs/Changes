@@ -1,3 +1,15 @@
+Anope Version 2.0.11
+--------------------
+Fixed ldap on OpenLDAP 2.5+
+Fixed not using utf-8 encoding for outgoing email
+Fixed ns_resetpass not returning a response for XMLRPC
+Fixed some message params being sent as <middle> instead of <trailing>
+Fixed unsetting vhosts on unreal4
+Fixed username validity checking on ircd-hybrid
+Send the oper mode for services pseudoclients on InspIRCd
+Updated the pl_PL translation
+Updated unreal4 for various protocol changes
+
 Anope Version 2.0.10
 --------------------
 Add support for channel SQLines on InspIRCd

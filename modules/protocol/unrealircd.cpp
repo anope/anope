@@ -82,10 +82,7 @@ class UnrealIRCdProto : public IRCDProto
 	void SendVhostDel(User *u) override
 	{
 		BotInfo *HostServ = Config->GetClient("HostServ");
-		u->RemoveMode(HostServ, "CLOAK");
 		u->RemoveMode(HostServ, "VHOST");
-		ModeManager::ProcessModes();
-		u->SetMode(HostServ, "CLOAK");
 	}
 
 	void SendAkill(User *u, XLine *x) override

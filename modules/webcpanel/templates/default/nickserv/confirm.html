@@ -1,9 +1,11 @@
 {INCLUDE header.html}
 		<div class="panel-heading">Confirm your Email</div>
 		<div class="panel-body">
+			{FOR M IN MESSAGES}
 			<div class="alert alert-info">
 				{M}<br>
 			</div>
+			{END FOR}
 
 			<em>You can <strong>CONFIRM</strong> your registration by entering your confirmation code below.</em>
 

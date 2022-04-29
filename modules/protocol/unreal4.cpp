@@ -32,6 +32,7 @@ class UnrealIRCdProto : public IRCDProto
 		CanSNLine = true;
 		CanSQLine = true;
 		CanSZLine = true;
+                CanSVSO = true;
 		CanSVSHold = true;
 		CanCertFP = true;
 		RequiresID = true;

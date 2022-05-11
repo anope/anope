@@ -174,7 +174,7 @@ void smtp_parse_header(const std::string &buf, std::string &header, std::string 
 	else
 	{
 		header = newbuf;
-		value = "";
+		value.clear();
 	}
 }
 

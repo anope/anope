@@ -41,7 +41,6 @@ class CommandHelp : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		Anope::string source_command = source.command;
 		const BotInfo *bi = source.service;
 		const CommandInfo::map &map = source.c ? Config->Fantasy : bi->commands;
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
@@ -123,6 +122,7 @@ class CommandHelp : public Command
 			}
 			if (!groups.empty())
 			{
+				Anope::string source_command = source.command;
 				source.Reply(" ");
 				source.Reply(_("Use the \002%s ALL\002 command to list all commands and their descriptions."), source_command.c_str());
 			}

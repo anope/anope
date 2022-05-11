@@ -44,7 +44,7 @@ namespace Anope
 		/**
 		 * Constructors that can take in any type of string.
 		 */
-		string() : _string("") { }
+		string() : _string() { }
 		string(char chr) : _string() { _string = chr; }
 		string(size_type n, char chr) : _string(n, chr) { }
 		string(const char *_str) : _string(_str) { }

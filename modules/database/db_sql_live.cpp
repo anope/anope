@@ -136,7 +136,7 @@ class DBMySQL : public Module, public Pipe
 
 	void OnRestart() override
 	{
-		init = false;
+		this->OnRestart();
 	}
 
 	void OnReload(Configuration::Conf *conf) override

@@ -11,7 +11,7 @@
 
 #include <windows.h>
 #include "sigaction.h"
-#include <signal.h>
+#include <csignal>
 
 int sigaction(int sig, struct sigaction *action, struct sigaction *old)
 {

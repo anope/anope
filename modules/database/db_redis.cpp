@@ -253,8 +253,7 @@ class DatabaseRedis : public Module, public Pipe
 
 	void OnSerializableUpdate(Serializable *obj) override
 	{
-		this->updated_items.insert(obj);
-		this->Notify();
+		this->OnSerializableConstruct(obj);
 	}
 };
 

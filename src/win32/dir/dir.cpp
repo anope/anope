@@ -7,7 +7,7 @@
  */
 
 #include "dir.h"
-#include <stdio.h>
+#include <cstdio>
 
 DIR *opendir(const char *path)
 {

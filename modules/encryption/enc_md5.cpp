@@ -201,7 +201,11 @@ class MD5Context : public Encryption::Context
 		state[3] += d;
 
 		/* Zeroize sensitive information. */
+#ifdef _MSC_VER
+		RtlSecureZeroMemory(x, sizeof(x));
+#else
 		memset(x, 0, sizeof(x));
+#endif
 	}
 
 	/* Encodes input (unsigned) into output (unsigned char). Assumes len is

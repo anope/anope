@@ -280,9 +280,7 @@ class NewsBase : public Command
 		this->SetSyntax("LIST");
 	}
 
-	virtual ~NewsBase()
-	{
-	}
+	virtual ~NewsBase() = default;
 
 	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 

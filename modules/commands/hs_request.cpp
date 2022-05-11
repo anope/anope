@@ -369,7 +369,6 @@ class HSRequest : public Module
 static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vIdent, const Anope::string &vHost)
 {
 	Anope::string host;
-	std::list<std::pair<Anope::string, Anope::string> >::iterator it, it_end;
 
 	if (!vIdent.empty())
 		host = vIdent + "@" + vHost;

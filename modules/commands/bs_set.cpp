@@ -14,7 +14,7 @@
 class CommandBSSet : public Command
 {
  public:
-	CommandBSSet(Module *creator) : Command(creator, "botserv/set", 3, 3)
+	explicit CommandBSSet(Module *creator) : Command(creator, "botserv/set", 3, 3)
 	{
 		this->SetDesc(_("Configures bot options"));
 		this->SetSyntax(_("\037option\037 \037(channel | bot)\037 \037settings\037"));
@@ -85,7 +85,7 @@ class CommandBSSetBanExpire : public Command
 		}
 	};
 
-	CommandBSSetBanExpire(Module *creator, const Anope::string &sname = "botserv/set/banexpire") : Command(creator, sname, 2, 2)
+	explicit CommandBSSetBanExpire(Module *creator, const Anope::string &sname = "botserv/set/banexpire") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("Configures the time bot bans expire in"));
 		this->SetSyntax(_("\037channel\037 \037time\037"));
@@ -156,7 +156,7 @@ class CommandBSSetBanExpire : public Command
 class CommandBSSetPrivate : public Command
 {
  public:
-	CommandBSSetPrivate(Module *creator, const Anope::string &sname = "botserv/set/private") : Command(creator, sname, 2, 2)
+	explicit CommandBSSetPrivate(Module *creator, const Anope::string &sname = "botserv/set/private") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("Prevent a bot from being assigned by non IRC operators"));
 		this->SetSyntax(_("\037botname\037 {\037ON|OFF\037}"));

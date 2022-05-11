@@ -489,7 +489,6 @@ static unsigned int GetDeepAccessCount(const ChannelInfo *ci, std::set<const Cha
 
 	for (unsigned int i = 0; i < ci->GetAccessCount(); ++i)
 	{
-		ChanAccess::Path path;
 		ChanAccess *a = ci->GetAccess(i);
 		ChannelInfo *next = NULL;
 

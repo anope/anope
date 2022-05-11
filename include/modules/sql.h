@@ -101,7 +101,7 @@ namespace SQL
 		Anope::string query;
 		std::map<Anope::string, QueryData> parameters;
 
-		Query() { }
+		Query() = default;
 		Query(const Anope::string &q) : query(q) { }
 
 		Query& operator=(const Anope::string &q)

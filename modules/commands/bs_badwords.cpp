@@ -15,7 +15,7 @@
 struct BadWordImpl : BadWord, Serializable
 {
 	BadWordImpl() : Serializable("BadWord") { }
-	~BadWordImpl();
+	~BadWordImpl() override;
 
 	void Serialize(Serialize::Data &data) const override
 	{
@@ -33,9 +33,9 @@ struct BadWordsImpl : BadWords
 	typedef std::vector<BadWordImpl *> list;
 	Serialize::Checker<list> badwords;
 
-	BadWordsImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), badwords("BadWord") { }
+	explicit BadWordsImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), badwords("BadWord") { }
 
-	~BadWordsImpl();
+	~BadWordsImpl() override;
 
 	BadWord* AddBadWord(const Anope::string &word, BadWordType type) override
 	{
@@ -160,7 +160,7 @@ class BadwordsDelCallback : public NumberList
 		bw = ci->Require<BadWords>("badwords");
 	}
 
-	~BadwordsDelCallback()
+	~BadwordsDelCallback() override
 	{
 		if (!deleted)
 			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
@@ -365,7 +365,7 @@ class CommandBSBadwords : public Command
 	}
 
  public:
-	CommandBSBadwords(Module *creator) : Command(creator, "botserv/badwords", 2, 3)
+	explicit CommandBSBadwords(Module *creator) : Command(creator, "botserv/badwords", 2, 3)
 	{
 		this->SetDesc(_("Maintains the bad words list"));
 		this->SetSyntax(_("\037channel\037 ADD \037word\037 [\037SINGLE\037 | \037START\037 | \037END\037]"));

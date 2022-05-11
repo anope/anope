@@ -218,7 +218,6 @@ class DBFlatFile : public Module, public Pipe
 	EventReturn OnLoadDatabase() override
 	{
 		const std::vector<Anope::string> &type_order = Serialize::Type::GetTypeOrder();
-		std::set<Anope::string> tried_dbs;
 
 		const Anope::string &db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
 

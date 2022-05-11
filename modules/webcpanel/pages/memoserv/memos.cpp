@@ -70,7 +70,6 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 	}
 	if (message.get_data.count("read") > 0 && message.get_data.count("number") > 0)
 	{
-		std::vector<Anope::string> params;
 		int number = -1;
 
 		try

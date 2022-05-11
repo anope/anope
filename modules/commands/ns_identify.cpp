@@ -73,7 +73,7 @@ class CommandNSIdentify : public Command
 		User *u = source.GetUser();
 
 		const Anope::string &nick = params.size() == 2 ? params[0] : u->nick;
-		Anope::string pass = params[params.size() - 1];
+		const auto &pass = params[params.size() - 1];
 
 		NickAlias *na = NickAlias::Find(nick);
 		if (na && na->nc->HasExt("NS_SUSPENDED"))

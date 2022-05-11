@@ -39,7 +39,7 @@ struct BadWordsImpl : BadWords
 
 	BadWord* AddBadWord(const Anope::string &word, BadWordType type) override
 	{
-		BadWordImpl *bw = new BadWordImpl();
+		auto *bw = new BadWordImpl();
 		bw->chan = ci->name;
 		bw->word = word;
 		bw->type = type;
@@ -91,7 +91,7 @@ struct BadWordsImpl : BadWords
 
 BadWordsImpl::~BadWordsImpl()
 {
-	for (list::iterator it = badwords->begin(); it != badwords->end();)
+	for (auto it = badwords->begin(); it != badwords->end();)
 	{
 		BadWord *bw = *it;
 		++it;
@@ -107,7 +107,7 @@ BadWordImpl::~BadWordImpl()
 		BadWordsImpl *badwords = ci->GetExt<BadWordsImpl>("badwords");
 		if (badwords)
 		{
-			BadWordsImpl::list::iterator it = std::find(badwords->badwords->begin(), badwords->badwords->end(), this);
+			auto it = std::find(badwords->badwords->begin(), badwords->badwords->end(), this);
 			if (it != badwords->badwords->end())
 				badwords->badwords->erase(it);
 		}

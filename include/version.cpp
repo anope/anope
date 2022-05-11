@@ -64,7 +64,7 @@ static bool read_version_sh(const std::string &version_sh, std::map<std::string,
 			std::string type = filebuf.substr(0, eq);
 			std::string value = filebuf.substr(eq + 1);
 
-			versions[type] = value;
+			versions[type] = std::move(value);
 		}
 	}
 
@@ -131,7 +131,7 @@ static void read_version_h(const std::string &versionh, std::map<std::string, st
 			std::string name = filebuf.substr(8).substr(0, space),
 				version = filebuf.substr(8).substr(space + 1);
 
-			versions[name] = version;
+			versions[name] = std::move(version);
 		}
 	}
 
@@ -146,7 +146,7 @@ static bool write_version_h(const std::string &versionh, const std::map<std::str
 		return false;
 
 	fd << "#pragma once" << std::endl;
-	for (std::map<std::string, std::string>::const_iterator it = versions.begin(); it != versions.end(); ++it)
+	for (auto it = versions.begin(); it != versions.end(); ++it)
 	{
 		fd << "#define " << it->first << " " << it->second << std::endl;
 	}

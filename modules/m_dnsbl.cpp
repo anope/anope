@@ -178,7 +178,7 @@ class ModuleDNSBL : public Module
 			const Blacklist &b = this->blacklists[i];
 
 			Anope::string dnsbl_host = reverse + "." + b.name;
-			DNSBLResolver *res = NULL;
+			DNSBLResolver *res = nullptr;
 			try
 			{
 				res = new DNSBLResolver(this, user, b, dnsbl_host, this->add_to_akill);

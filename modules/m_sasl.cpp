@@ -313,7 +313,7 @@ class ModuleSASL : public Module
 		if (newmechs == mechs)
 			return;
 
-		mechs = newmechs;
+		mechs = std::move(newmechs);
 
 		// If we are connected to the network then broadcast the mechlist.
 		if (Me && Me->IsSynced())

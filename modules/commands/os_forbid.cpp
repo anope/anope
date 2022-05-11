@@ -34,7 +34,7 @@ void ForbidDataImpl::Serialize(Serialize::Data &data) const
 Serializable* ForbidDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!forbid_service)
-		return NULL;
+		return nullptr;
 
 	ForbidDataImpl *fb;
 	if (obj)

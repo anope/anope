@@ -106,7 +106,7 @@ class CommandOSInfo : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const Anope::string &cmd = params[0], target = params[1], info = params.size() > 2 ? params[2] : "";
+		const auto &cmd = params[0],target = params[1], info = params.size() > 2 ? params[2] : "";
 
 		Extensible *e;
 		if (IRCD->IsChannelValid(target))

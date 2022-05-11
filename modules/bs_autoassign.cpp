@@ -23,13 +23,13 @@ class BSAutoAssign : public Module
 			return;
 
 		BotInfo *bi = BotInfo::Find(bot, true);
-		if (bi == NULL)
+		if (bi == nullptr)
 		{
 			Log(this) << "bs_autoassign is configured to assign bot " << bot << ", but it does not exist?";
 			return;
 		}
 
-		bi->Assign(NULL, ci);
+		bi->Assign(nullptr, ci);
 	}
 };
 

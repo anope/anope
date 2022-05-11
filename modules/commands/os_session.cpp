@@ -175,7 +175,7 @@ class CommandOSSession : public Command
  private:
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string param = params[1];
+		const auto &param = params[1];
 
 		unsigned mincount = 0;
 		try
@@ -219,7 +219,7 @@ class CommandOSSession : public Command
 
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string param = params[1];
+		const auto &param = params[1];
 		Session *session = session_service->FindSession(param);
 
 		Exception *exception = session_service->FindException(param);

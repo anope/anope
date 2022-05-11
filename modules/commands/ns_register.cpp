@@ -130,7 +130,7 @@ class CommandNSRegister : public Command
 		User *u = source.GetUser();
 		Anope::string u_nick = source.GetNick();
 		size_t nicklen = u_nick.length();
-		Anope::string pass = params[0];
+		const auto &pass = params[0];
 		Anope::string email = params.size() > 1 ? params[1] : "";
 		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<const Anope::string>("registration");
 

@@ -37,7 +37,7 @@ class CommandHSSet : public Command
 			return;
 		}
 
-		Anope::string rawhostmask = params[1];
+		const auto &rawhostmask = params[1];
 
 		Anope::string user, host;
 		size_t a = rawhostmask.find('@');
@@ -134,7 +134,7 @@ class CommandHSSetAll : public Command
 			return;
 		}
 
-		Anope::string nick = params[0];
+		const auto &nick = params[0];
 
 		NickAlias *na = NickAlias::Find(nick);
 		if (na == NULL)
@@ -143,7 +143,7 @@ class CommandHSSetAll : public Command
 			return;
 		}
 
-		Anope::string rawhostmask = params[1];
+		const auto &rawhostmask = params[1];
 
 		Anope::string user, host;
 		size_t a = rawhostmask.find('@');

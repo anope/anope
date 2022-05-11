@@ -101,7 +101,7 @@ class CommandHSRequest : public Command
 			return;
 		}
 
-		Anope::string rawhostmask = params[0];
+		const auto &rawhostmask = params[0];
 
 		Anope::string user, host;
 		size_t a = rawhostmask.find('@');

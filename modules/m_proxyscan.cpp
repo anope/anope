@@ -356,7 +356,7 @@ class ModuleProxyScan : public Module
 				{
 					try
 					{
-						ProxyConnect *con = NULL;
+						ProxyConnect *con = nullptr;
 						if (it->equals_ci("HTTP"))
 							con = new HTTPProxyConnect(p, p.ports[k]);
 						else if (it->equals_ci("SOCKS5"))

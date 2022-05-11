@@ -510,7 +510,7 @@ class TCPSocket : public ListenSocket
 			{
 				int len = length - 2;
 				length -= want_len + 2;
-				return this->manager->HandlePacket(this, packet_buffer + 2, len, NULL);
+				return this->manager->HandlePacket(this, packet_buffer + 2, len, nullptr);
 			}
 			return true;
 		}
@@ -519,7 +519,7 @@ class TCPSocket : public ListenSocket
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Writing to DNS TCP socket";
 
-			if (packet != NULL)
+			if (packet != nullptr)
 			{
 				try
 				{
@@ -535,7 +535,7 @@ class TCPSocket : public ListenSocket
 				catch (const SocketException &) { }
 
 				delete packet;
-				packet = NULL;
+				packet = nullptr;
 			}
 
 			SocketEngine::Change(this, false, SF_WRITABLE);
@@ -589,8 +589,8 @@ class UDPSocket : public ReplySocket
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Writing to DNS UDP socket";
 
-		Packet *r = !packets.empty() ? packets.front() : NULL;
-		if (r != NULL)
+		Packet *r = !packets.empty() ? packets.front() : nullptr;
+		if (r != nullptr)
 		{
 			try
 			{
@@ -639,7 +639,7 @@ class NotifySocket : public Socket
 		catch (const SocketException &) { }
 
 		delete packet;
-		packet = NULL;
+		packet = nullptr;
 
 		return false;
 	}
@@ -692,8 +692,8 @@ class MyManager : public Manager, public Timer
 		delete udpsock;
 		delete tcpsock;
 
-		udpsock = NULL;
-		tcpsock = NULL;
+		udpsock = nullptr;
+		tcpsock = nullptr;
 
 		try
 		{
@@ -713,7 +713,7 @@ class MyManager : public Manager, public Timer
 			Log() << "Unable to bind dns to " << ip << ":" << port << ": " << ex.GetReason();
 		}
 
-		notify = n;
+		notify = std::move(n);
 	}
 
  private:
@@ -844,7 +844,7 @@ class MyManager : public Manager, public Timer
 			return true;
 		}
 
-		if (from == NULL)
+		if (from == nullptr)
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Received an answer over TCP. This is not supported.";
 			return true;

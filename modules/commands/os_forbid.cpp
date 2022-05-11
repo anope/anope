@@ -51,8 +51,10 @@ Serializable* ForbidDataImpl::Unserialize(Serializable *obj, Serialize::Data &da
 	data["type"] >> t;
 	fb->type = static_cast<ForbidType>(t);
 
-	if (t > FT_SIZE - 1)
-		return NULL;
+	if (t > FT_SIZE - 1) {
+		delete fb;
+		return nullptr;
+	}
 
 	if (!obj)
 		forbid_service->AddForbid(fb);

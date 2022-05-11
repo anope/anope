@@ -720,6 +720,7 @@ class CommandCSMode : public Command
 		}
 
 		std::vector<Anope::string> new_params;
+		new_params.reserve(4);
 		new_params.push_back(params[0]);
 		new_params.emplace_back("SET");
 		new_params.push_back("-" + stringify(cm->mchar));

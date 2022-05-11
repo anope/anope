@@ -74,7 +74,7 @@ bool Privilege::operator==(const Privilege &other) const
 
 std::vector<Privilege> PrivilegeManager::Privileges;
 
-void PrivilegeManager::AddPrivilege(Privilege p)
+void PrivilegeManager::AddPrivilege(const Privilege &p)
 {
 	unsigned i;
 	for (i = 0; i < Privileges.size(); ++i)

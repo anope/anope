@@ -42,7 +42,7 @@ class CoreExport PrivilegeManager
 {
 	static std::vector<Privilege> Privileges;
  public:
-	static void AddPrivilege(Privilege p);
+	static void AddPrivilege(const Privilege &p);
 	static void RemovePrivilege(Privilege &p);
 	static Privilege *FindPrivilege(const Anope::string &name);
 	static std::vector<Privilege> &GetPrivileges();

@@ -349,11 +349,13 @@ class CommandOSDNS : public Command
 				DNSZone *z = DNSZone::Find(zone);
 				if (!z)
 				{
+					delete z;
 					source.Reply(_("Zone %s does not exist."), zone.c_str());
 					return;
 				}
 				else if (z->servers.count(s->GetName()))
 				{
+					delete s;
 					source.Reply(_("Server %s is already in zone %s."), s->GetName().c_str(), z->name.c_str());
 					return;
 				}

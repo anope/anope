@@ -57,7 +57,7 @@ static bool read_version_sh(const std::string &version_sh, std::map<std::string,
 	std::string filebuf;
 	while (getline(fd, filebuf))
 	{
-		if (!filebuf.find("VERSION_"))
+		if (filebuf.find("VERSION_") == std::string::npos)
 		{
 			size_t eq = filebuf.find('=');
 
@@ -82,7 +82,7 @@ static bool write_build_h(const std::string &buildh, const std::string &git_vers
 	{
 		for (std::string filebuf; getline(fd, filebuf);)
 		{
-			if (!filebuf.find("#define BUILD"))
+			if (filebuf.find("#define BUILD") == std::string::npos)
 			{
 				size_t tab = filebuf.find('	');
 
@@ -124,7 +124,7 @@ static void read_version_h(const std::string &versionh, std::map<std::string, st
 
 	for (std::string filebuf; getline(fd, filebuf);)
 	{
-		if (!filebuf.find("#define VERSION_"))
+		if (filebuf.find("#define VERSION_") == std::string::npos)
 		{
 			size_t space = filebuf.substr(8).find(' ');
 

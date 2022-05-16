@@ -51,8 +51,8 @@ class CommandOSChanList : public Command
 				ChanUserContainer *cc = uit->second;
 
 				if (!modes.empty())
-					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
-						if (!cc->chan->HasMode(*it))
+					for (const auto &m : modes)
+						if (!cc->chan->HasMode(m))
 							continue;
 
 				ListFormatter::ListEntry entry;
@@ -76,8 +76,8 @@ class CommandOSChanList : public Command
 				if (!pattern.empty() && !Anope::Match(c->name, pattern, false, true))
 					continue;
 				if (!modes.empty())
-					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
-						if (!c->HasMode(*it))
+					for (const auto &m : modes)
+						if (!c->HasMode(m))
 							continue;
 
 				ListFormatter::ListEntry entry;
@@ -161,8 +161,8 @@ class CommandOSUserList : public Command
 				ChanUserContainer *uc = cuit->second;
 
 				if (!modes.empty())
-					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
-						if (!uc->user->HasMode(*it))
+					for (const auto &m : modes)
+						if (!uc->user->HasMode(m))
 							continue;
 
 				ListFormatter::ListEntry entry;
@@ -211,8 +211,8 @@ class CommandOSUserList : public Command
 						continue;
 
 					if (!modes.empty())
-						for (std::set<Anope::string>::iterator mit = modes.begin(), mit_end = modes.end(); mit != mit_end; ++mit)
-							if (!u2->HasMode(*mit))
+						for (const auto &m : modes)
+							if (!u2->HasMode(m))
 								continue;
 				}
 

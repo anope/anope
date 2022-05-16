@@ -161,10 +161,17 @@ class SHA1Context : public Encryption::Context
 			this->digest[i] = static_cast<unsigned char>((this->state[i>>2] >> ((3 - (i & 3)) * 8)) & 255);
 
 		/* Wipe variables */
+#ifdef _WIN32
+		RtlSecureZeroMemory(this->buffer, sizeof(this->buffer));
+		RtlSecureZeroMemory(this->state, sizeof(this->state));
+		RtlSecureZeroMemory(this->count, sizeof(this->count));
+		RtlSecureZeroMemory(&finalcount, sizeof(finalcount));
+#else
 		memset(this->buffer, 0, sizeof(this->buffer));
 		memset(this->state, 0, sizeof(this->state));
 		memset(this->count, 0, sizeof(this->count));
 		memset(&finalcount, 0, sizeof(finalcount));
+#endif
 
 		this->Transform(this->buffer);
 	}

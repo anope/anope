@@ -145,8 +145,8 @@ class CommandOSStats : public Command
 	void DoStatsUplink(CommandSource &source)
 	{
 		Anope::string buf;
-		for (std::set<Anope::string>::iterator it = Servers::Capab.begin(); it != Servers::Capab.end(); ++it)
-			buf += " " + *it;
+		for (const auto& c : Servers::Capab)
+			buf += " " + c;
 		if (!buf.empty())
 			buf.erase(buf.begin());
 

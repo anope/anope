@@ -94,19 +94,17 @@ class CommandHelp : public Command
 
 			}
 
-			for (GroupInfo::iterator it = groups.begin(), it_end = groups.end(); it != it_end; ++it)
+			for (const auto& [key, value] : groups)
 			{
-				CommandGroup *gr = it->first;
+				CommandGroup *gr = key;
 
 				source.Reply(" ");
 				source.Reply("%s", gr->description.c_str());
 
 				Anope::string buf;
-				for (std::list<Anope::string>::iterator it2 = it->second.begin(), it2_end = it->second.end(); it2 != it2_end; ++it2)
+				for (const auto &name : value)
 				{
-					const Anope::string &c_name = *it2;
-
-					buf += ", " + c_name;
+					buf += ", " + name;
 
 					if (buf.length() > help_wrap_len)
 					{
@@ -122,7 +120,7 @@ class CommandHelp : public Command
 			}
 			if (!groups.empty())
 			{
-				Anope::string source_command = source.command;
+				const Anope::string& source_command = source.command;
 				source.Reply(" ");
 				source.Reply(_("Use the \002%s ALL\002 command to list all commands and their descriptions."), source_command.c_str());
 			}

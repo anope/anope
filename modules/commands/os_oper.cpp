@@ -52,12 +52,12 @@ class CommandOSOper : public Command
 	{
 		std::list<Anope::string> commands = ot->GetCommands(), privs = ot->GetPrivs();
 
-		for (std::list<Anope::string>::iterator it = commands.begin(); it != commands.end(); ++it)
-			if (!source.HasCommand(*it))
+		for (const auto &c : commands)
+			if (!source.HasCommand(c))
 				return false;
 
-		for (std::list<Anope::string>::iterator it = privs.begin(); it != privs.end(); ++it)
-			if (!source.HasPriv(*it))
+		for (const auto &p : privs)
+			if (!source.HasPriv(p))
 				return false;
 
 		return true;
@@ -161,11 +161,8 @@ class CommandOSOper : public Command
 				source.Reply(_("%-8s %s"), nc->o->name.c_str(), nc->o->ot->GetName().c_str());
 				if (std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
 					source.Reply(_("   This oper is configured in the configuration file."));
-				for (std::list<User *>::const_iterator uit = nc->users.begin(); uit != nc->users.end(); ++uit)
-				{
-					User *u = *uit;
+				for (const auto &u : nc->users)
 					source.Reply(_("   %s is online using this oper block."), u->nick.c_str());
-				}
 			}
 		}
 		else if (subcommand.equals_ci("INFO"))
@@ -196,9 +193,9 @@ class CommandOSOper : public Command
 					source.Reply(_("Available commands for \002%s\002:"), ot->GetName().c_str());
 					Anope::string buf;
 					std::list<Anope::string> cmds = ot->GetCommands();
-					for (std::list<Anope::string>::const_iterator it = cmds.begin(), it_end = cmds.end(); it != it_end; ++it)
+					for (const auto &c : cmds)
 					{
-						buf += *it + " ";
+						buf += c + " ";
 						if (buf.length() > 400)
 						{
 							source.Reply("%s", buf.c_str());
@@ -218,9 +215,9 @@ class CommandOSOper : public Command
 					source.Reply(_("Available privileges for \002%s\002:"), ot->GetName().c_str());
 					Anope::string buf;
 					std::list<Anope::string> privs = ot->GetPrivs();
-					for (std::list<Anope::string>::const_iterator it = privs.begin(), it_end = privs.end(); it != it_end; ++it)
+					for (const auto &p : privs)
 					{
-						buf += *it + " ";
+						buf += p + " ";
 						if (buf.length() > 400)
 						{
 							source.Reply("%s", buf.c_str());

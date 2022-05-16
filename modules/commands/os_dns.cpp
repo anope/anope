@@ -40,8 +40,8 @@ struct DNSZone : Serializable
 	{
 		data["name"] << name;
 		unsigned count = 0;
-		for (std::set<Anope::string, ci::less>::iterator it = servers.begin(), it_end = servers.end(); it != it_end; ++it)
-			data["server" + stringify(count++)] << *it;
+		for (const auto &s : servers)
+			data["server" + stringify(count++)] << s;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
@@ -134,8 +134,8 @@ class DNSServer : public Serializable
 		if (dnsmanager)
 		{
 			dnsmanager->UpdateSerial();
-			for (std::set<Anope::string, ci::less>::iterator it = zones.begin(), it_end = zones.end(); it != it_end; ++it)
-				dnsmanager->Notify(*it);
+			for (const auto &z : zones)
+				dnsmanager->Notify(z);
 		}
 	}
 
@@ -147,8 +147,8 @@ class DNSServer : public Serializable
 		data["limit"] << limit;
 		data["pooled"] << pooled;
 		unsigned count = 0;
-		for (std::set<Anope::string, ci::less>::iterator it = zones.begin(), it_end = zones.end(); it != it_end; ++it)
-			data["zone" + stringify(count++)] << *it;
+		for (const auto &z : zones)
+			data["zone" + stringify(count++)] << z;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
@@ -262,8 +262,8 @@ class CommandOSDNS : public Command
 				entry["Zone"] = z->name;
 
 				Anope::string server_str;
-				for (std::set<Anope::string, ci::less>::iterator it = z->servers.begin(), it_end = z->servers.end(); it != it_end; ++it)
-					server_str += *it + " ";
+				for (const auto &s : z->servers)
+					server_str += s + " ";
 				server_str.trim();
 
 				if (server_str.empty())
@@ -316,9 +316,9 @@ class CommandOSDNS : public Command
 
 		Log(LOG_ADMIN, source, this) << "to delete zone " << z->name;
 
-		for (std::set<Anope::string, ci::less>::iterator it = z->servers.begin(), it_end = z->servers.end(); it != it_end; ++it)
+		for (const auto &server : z->servers)
 		{
-			DNSServer *s = DNSServer::Find(*it);
+			DNSServer *s = DNSServer::Find(server);
 			if (s)
 				s->zones.erase(z->name);
 		}
@@ -466,9 +466,9 @@ class CommandOSDNS : public Command
 			return;
 		}
 
-		for (std::set<Anope::string, ci::less>::iterator it = s->zones.begin(), it_end = s->zones.end(); it != it_end; ++it)
+		for (const auto &zone : s->zones)
 		{
-			DNSZone *z = DNSZone::Find(*it);
+			DNSZone *z = DNSZone::Find(zone);
 			if (z)
 				z->servers.erase(s->GetName());
 		}
@@ -518,8 +518,8 @@ class CommandOSDNS : public Command
 		if (s->Active() && dnsmanager)
 		{
 			dnsmanager->UpdateSerial();
-			for (std::set<Anope::string, ci::less>::iterator it = s->zones.begin(), it_end = s->zones.end(); it != it_end; ++it)
-				dnsmanager->Notify(*it);
+			for (const auto &zone : s->zones)
+				dnsmanager->Notify(zone);
 		}
 	}
 
@@ -552,8 +552,8 @@ class CommandOSDNS : public Command
 				if (s->Active() && dnsmanager)
 				{
 					dnsmanager->UpdateSerial();
-					for (std::set<Anope::string, ci::less>::iterator it = s->zones.begin(), it_end = s->zones.end(); it != it_end; ++it)
-						dnsmanager->Notify(*it);
+					for (const auto &zone : s->zones)
+						dnsmanager->Notify(zone);
 				}
 
 				return;
@@ -862,9 +862,9 @@ class ModuleDNS : public Module
 		size_t answer_size = packet->answers.size();
 		if (zone)
 		{
-			for (std::set<Anope::string, ci::less>::iterator it = zone->servers.begin(), it_end = zone->servers.end(); it != it_end; ++it)
+			for (const auto &server : zone->servers)
 			{
-				DNSServer *s = DNSServer::Find(*it);
+				DNSServer *s = DNSServer::Find(server);
 				if (!s || !s->Active())
 					continue;
 

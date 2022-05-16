@@ -80,10 +80,7 @@ class MemoListCallback : public NumberList
 		if (!m)
 			return;
 
-		if (ci)
-			source.Reply(_("Memo %d from %s (%s)."), index + 1, m->sender.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
-		else
-			source.Reply(_("Memo %d from %s (%s)."), index + 1, m->sender.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
+		source.Reply(_("Memo %d from %s (%s)."), index + 1, m->sender.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
 
 		BotInfo *bi;
 		Anope::string cmd;

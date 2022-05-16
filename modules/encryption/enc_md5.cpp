@@ -308,9 +308,15 @@ class MD5Context : public Encryption::Context
 		this->Encode(digest, this->state, 16);
 
 		/* Zeroize sensitive information. */
+#ifdef _WIN32
+		RtlSecureZeroMemory(this->state, sizeof(this->state));
+		RtlSecureZeroMemory(this->count, sizeof(this->count));
+		RtlSecureZeroMemory(this->buffer, sizeof(this->buffer));
+#else
 		memset(this->state, 0, sizeof(this->state));
 		memset(this->count, 0, sizeof(this->count));
 		memset(this->buffer, 0, sizeof(this->buffer));
+#endif
 	}
 
 	Encryption::Hash GetFinalizedHash() override

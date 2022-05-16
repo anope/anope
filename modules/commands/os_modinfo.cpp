@@ -116,10 +116,8 @@ class CommandOSModList : public Command
 		source.Reply(_("Current module list:"));
 
 		int count = 0;
-		for (std::list<Module *>::iterator it = ModuleManager::Modules.begin(), it_end = ModuleManager::Modules.end(); it != it_end; ++it)
+		for (const auto &m : ModuleManager::Modules)
 		{
-			Module *m = *it;
-
 			bool show = false;
 			Anope::string mtype;
 

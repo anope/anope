@@ -373,11 +373,8 @@ class CommandNSSetDisplay : public Command
 		user_na->nc->SetDisplay(na);
 
 		/* Send updated account name */
-		for (std::list<User *>::iterator it = user_na->nc->users.begin(); it != user_na->nc->users.end(); ++it)
-		{
-			User *u = *it;
+		for (const auto &u : user_na->nc->users)
 			IRCD->SendLogin(u, user_na);
-		}
 
 		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
 	}

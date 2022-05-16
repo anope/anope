@@ -42,10 +42,8 @@ class CommandNSConfirm : public Command
 				source.Reply(_("Nick \002%s\002 has been confirmed."), na->nick.c_str());
 
 				/* Login the users online already */
-				for (std::list<User *>::iterator it = na->nc->users.begin(); it != na->nc->users.end(); ++it)
+				for (const auto &u : na->nc->users)
 				{
-					User *u = *it;
-
 					IRCD->SendLogin(u, na);
 
 					NickAlias *u_na = NickAlias::Find(u->nick);

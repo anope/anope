@@ -347,9 +347,8 @@ class CommandOSException : public Command
 				return;
 			}
 
-			for (std::vector<Exception *>::iterator it = session_service->GetExceptions().begin(), it_end = session_service->GetExceptions().end(); it != it_end; ++it)
+			for (const auto &e : session_service->GetExceptions())
 			{
-				Exception *e = *it;
 				if (e->mask.equals_ci(mask))
 				{
 					if (e->limit != limit)

@@ -68,7 +68,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	if (sserver) // Our bots are introduced on startup with no server
 	{
 		++sserver->users;
-		if (server->IsSynced())
+		if (server && server->IsSynced())
 			Log(this, "connect") << (!vhost.empty() && vhost != host ? "(" + vhost + ") " : "") << "(" << srealname << ") " << (!uip.empty() && uip != host ? "[" + uip + "] " : "") << "connected to the network (" << sserver->GetName() << ")";
 	}
 

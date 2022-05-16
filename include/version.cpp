@@ -148,7 +148,7 @@ static bool write_version_h(const std::string &versionh, const std::map<std::str
 	fd << "#pragma once" << std::endl;
 	for (const auto &[key, value] : versions)
 	{
-		fd << "#define " << it->first << " " << it->second << std::endl;
+		fd << "#define " << key << " " << value << std::endl;
 	}
 
 	fd.close();

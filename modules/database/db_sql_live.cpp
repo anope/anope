@@ -207,8 +207,8 @@ class DBMySQL : public Module, public Pipe
 			{
 				Data data;
 
-				for (std::map<Anope::string, Anope::string>::const_iterator it = row.begin(), it_end = row.end(); it != it_end; ++it)
-					data[it->first] << it->second;
+				for (const auto& [key, value] : row)
+					data[key] << value;
 
 				Serializable *s = NULL;
 				std::map<uint64_t, Serializable *>::iterator it = obj->objects.find(id);

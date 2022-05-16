@@ -304,7 +304,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Ano
 	else if (this->HasMode(cm->name, param))
 		return;
 
-	this->modes.insert(std::make_pair(cm->name, param));
+	this->modes.emplace(cm->name, param);
 
 	if (param.empty() && cm->type != MODE_REGULAR)
 	{

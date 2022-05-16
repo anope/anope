@@ -58,10 +58,10 @@ class XOPChanAccess : public ChanAccess
 		{
 			std::map<Anope::string, int> count;
 
-			for (std::map<Anope::string, std::vector<Anope::string> >::const_iterator it = permissions.begin(), it_end = permissions.end(); it != it_end; ++it)
+			for (const auto& [key, value] : permissions)
 			{
-				int &c = count[it->first];
-				const std::vector<Anope::string> &perms = it->second;
+				int &c = count[key];
+				const std::vector<Anope::string> &perms = value;
 				for (unsigned i = 0; i < perms.size(); ++i)
 					if (access->HasPriv(perms[i]))
 						++c;
@@ -69,11 +69,11 @@ class XOPChanAccess : public ChanAccess
 
 			Anope::string max;
 			int maxn = 0;
-			for (std::map<Anope::string, int>::iterator it = count.begin(), it_end = count.end(); it != it_end; ++it)
-				if (it->second > maxn)
+			for (const auto& [key, value] : count)
+				if (value > maxn)
 				{
-					maxn = it->second;
-					max = it->first;
+					maxn = value;
+					max = key;
 				}
 
 			return max;

@@ -1231,9 +1231,9 @@ class NSSet : public Module
 			{
 				size_t c = modes.find(',');
 				if (c == Anope::string::npos)
-					nc->last_modes.insert(std::make_pair(modes, ""));
+					nc->last_modes.emplace(modes, "");
 				else
-					nc->last_modes.insert(std::make_pair(modes.substr(0, c), modes.substr(c + 1)));
+					nc->last_modes.emplace(modes.substr(0, c), modes.substr(c + 1));
 			}
 		}
 	} keep_modes;

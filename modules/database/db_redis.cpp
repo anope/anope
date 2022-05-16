@@ -21,8 +21,8 @@ class Data : public Serialize::Data
 
 	~Data()
 	{
-		for (std::map<Anope::string, std::stringstream *>::iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			delete it->second;
+		for (const auto& [key, value] : data)
+			delete value;
 	}
 
 	std::iostream& operator[](const Anope::string &key) override
@@ -36,17 +36,17 @@ class Data : public Serialize::Data
 	std::set<Anope::string> KeySet() const override
 	{
 		std::set<Anope::string> keys;
-		for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-			keys.insert(it->first);
+		for (const auto& [key, value] : this->data)
+			keys.insert(key);
 		return keys;
 	}
 
 	size_t Hash() const override
 	{
 		size_t hash = 0;
-		for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-			if (!it->second->str().empty())
-				hash ^= Anope::hash_cs()(it->second->str());
+		for (const auto& [key, value] : this->data)
+			if (!value->str().empty())
+				hash ^= Anope::hash_cs()(value->str());
 		return hash;
 	}
 };

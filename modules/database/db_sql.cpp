@@ -235,9 +235,9 @@ class DBSQL : public Module, public Pipe
 		{
 			Data data;
 
-			const std::map<Anope::string, Anope::string> &row = res.Row(j);
-			for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
-				data[rit->first] << rit->second;
+			const auto &row = res.Row(j);
+			for (const auto& [key, value] : row)
+				data[key] << value;
 
 			Serializable *obj = sb->Unserialize(NULL, data);
 			try

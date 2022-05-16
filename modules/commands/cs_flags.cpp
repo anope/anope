@@ -48,9 +48,9 @@ class FlagsChanAccess : public ChanAccess
 
 		std::set<char> buffer;
 
-		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
-			if (access->HasPriv(it->first))
-				buffer.insert(it->second);
+		for (const auto& [key, value] : defaultFlags)
+			if (access->HasPriv(key))
+				buffer.insert(value);
 
 		if (buffer.empty())
 			return "(none)";
@@ -189,14 +189,14 @@ class CommandCSFlags : public Command
 					add = false;
 					break;
 				case '*':
-					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
+					for (const auto& [key, value] : defaultFlags)
 					{
-						bool has = current_flags.count(it->second);
+						bool has = current_flags.count(value);
 						// If we are adding a flag they already have or removing one they don't have, don't bother
 						if (add == has)
 							continue;
 
-						if (!u_access.HasPriv(it->first) && !u_access.founder)
+						if (!u_access.HasPriv(key) && !u_access.founder)
 						{
 							if (source.HasPriv("chanserv/access/modify"))
 								override = true;
@@ -205,9 +205,9 @@ class CommandCSFlags : public Command
 						}
 
 						if (add)
-							current_flags.insert(it->second);
+							current_flags.insert(value);
 						else
-							current_flags.erase(it->second);
+							current_flags.erase(value);
 					}
 					break;
 				default:
@@ -218,11 +218,11 @@ class CommandCSFlags : public Command
 						i = flags.length();
 					}
 
-					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
+					for (const auto& [key, value] : defaultFlags)
 					{
-						if (f != it->second)
+						if (f != value)
 							continue;
-						else if (!u_access.HasPriv(it->first) && !u_access.founder)
+						else if (!u_access.HasPriv(key) && !u_access.founder)
 						{
 							if (source.HasPriv("chanserv/access/modify"))
 								override = true;
@@ -265,7 +265,7 @@ class CommandCSFlags : public Command
 		access->creator = source.GetNick();
 		access->last_seen = current ? current->last_seen : 0;
 		access->created = Anope::CurTime;
-		access->flags = current_flags;
+		access->flags = std::move(current_flags);
 
 		if (current != NULL)
 			delete current;
@@ -450,8 +450,8 @@ class CommandCSFlags : public Command
 
 		typedef std::multimap<char, Anope::string, ci::less> reverse_map;
 		reverse_map reverse;
-		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
-			reverse.insert(std::make_pair(it->second, it->first));
+		for (const auto& [key, value] : defaultFlags)
+			reverse.emplace(value, key);
 
 		for (reverse_map::iterator it = reverse.begin(), it_end = reverse.end(); it != it_end; ++it)
 		{

@@ -825,7 +825,7 @@ void Conf::LoadConf(File &file)
 				}
 
 				Block *b = block_stack.empty() ? this : block_stack.top();
-				block_map::iterator it = b->blocks.insert(std::make_pair(wordbuffer, Configuration::Block(wordbuffer)));
+				auto it = b->blocks.emplace(wordbuffer, Configuration::Block(wordbuffer));
 				b = &it->second;
 				b->linenum = linenumber;
 				block_stack.push(b);

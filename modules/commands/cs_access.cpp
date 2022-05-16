@@ -16,8 +16,8 @@ static std::map<Anope::string, int16_t, ci::less> defaultLevels;
 static inline void reset_levels(ChannelInfo *ci)
 {
 	ci->ClearLevels();
-	for (std::map<Anope::string, int16_t, ci::less>::iterator it = defaultLevels.begin(), it_end = defaultLevels.end(); it != it_end; ++it)
-		ci->SetLevel(it->first, it->second);
+	for (const auto& [key, value] : defaultLevels)
+		ci->SetLevel(key, value);
 }
 
 class AccessChanAccess : public ChanAccess

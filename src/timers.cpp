@@ -80,7 +80,7 @@ Module *Timer::GetOwner() const
 
 void TimerManager::AddTimer(Timer *t)
 {
-	Timers.insert(std::make_pair(t->GetTimer(), t));
+	Timers.emplace(t->GetTimer(), t);
 }
 
 void TimerManager::DelTimer(Timer *t)

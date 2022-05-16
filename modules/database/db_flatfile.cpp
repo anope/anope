@@ -77,17 +77,17 @@ class LoadData : public Serialize::Data
 	std::set<Anope::string> KeySet() const override
 	{
 		std::set<Anope::string> keys;
-		for (std::map<Anope::string, Anope::string>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-			keys.insert(it->first);
+		for (const auto& [key, value] : this->data)
+			keys.insert(key);
 		return keys;
 	}
 
 	size_t Hash() const override
 	{
 		size_t hash = 0;
-		for (std::map<Anope::string, Anope::string>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-			if (!it->second.empty())
-				hash ^= Anope::hash_cs()(it->second);
+		for (const auto& [key, value] : this->data)
+			if (!value.empty())
+				hash ^= Anope::hash_cs()(value);
 		return hash;
 	}
 
@@ -294,9 +294,9 @@ class DBFlatFile : public Module, public Pipe
 			std::map<Module *, std::fstream *> databases;
 
 			/* First open the databases of all of the registered types. This way, if we have a type with 0 objects, that database will be properly cleared */
-			for (std::map<Anope::string, Serialize::Type *>::const_iterator it = Serialize::Type::GetTypes().begin(), it_end = Serialize::Type::GetTypes().end(); it != it_end; ++it)
+			for (const auto& [key, value] : Serialize::Type::GetTypes())
 			{
-				Serialize::Type *s_type = it->second;
+				Serialize::Type *s_type = value;
 
 				if (databases[s_type->GetOwner()])
 					continue;
@@ -334,10 +334,10 @@ class DBFlatFile : public Module, public Pipe
 				*data.fs << "\nEND\n";
 			}
 
-			for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
+			for (const auto& [key, value] : databases)
 			{
-				std::fstream *f = it->second;
-				const Anope::string &db_name = Anope::DataDir + "/" + (it->first ? (it->first->name + ".db") : Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+				std::fstream *f = value;
+				const Anope::string &db_name = Anope::DataDir + "/" + (key ? (key->name + ".db") : Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
 
 				if (!f->is_open() || !f->good())
 				{

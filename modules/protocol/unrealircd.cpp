@@ -1011,7 +1011,7 @@ struct IRCDMessageCapab : Message::Capab
 							mode_name = "OWNER";
 							break;
 						default:
-							mode_name = "";
+							mode_name.clear();
 							break;
 					}
 					ModeManager::AddChannelMode(new ChannelModeStatus(mode_name, mode_chars[t], mode_prefixes[t], t));
@@ -1407,7 +1407,7 @@ struct IRCDMessageSJoin : IRCDMessage
 		if (!modes.empty())
 			modes.erase(modes.begin());
 
-		std::list<Anope::string> bans, excepts, invites;
+		std::vector<Anope::string> bans, excepts, invites;
 		std::list<Message::Join::SJoinUser> users;
 
 		spacesepstream sep(params[params.size() - 1]);
@@ -1469,13 +1469,13 @@ struct IRCDMessageSJoin : IRCDMessage
 				*invex = ModeManager::FindChannelModeByName("INVITEOVERRIDE");
 
 			if (ban)
-				for (std::list<Anope::string>::iterator it = bans.begin(), it_end = bans.end(); it != it_end; ++it)
+				for (auto it = bans.begin(), it_end = bans.end(); it != it_end; ++it)
 					c->SetModeInternal(source, ban, *it);
 			if (except)
-				for (std::list<Anope::string>::iterator it = excepts.begin(), it_end = excepts.end(); it != it_end; ++it)
+				for (auto it = excepts.begin(), it_end = excepts.end(); it != it_end; ++it)
 					c->SetModeInternal(source, except, *it);
 			if (invex)
-				for (std::list<Anope::string>::iterator it = invites.begin(), it_end = invites.end(); it != it_end; ++it)
+				for (auto it = invites.begin(), it_end = invites.end(); it != it_end; ++it)
 					c->SetModeInternal(source, invex, *it);
 		}
 	}

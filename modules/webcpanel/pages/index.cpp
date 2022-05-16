@@ -60,15 +60,15 @@ class WebpanelRequest : public IdentifyRequest
 
 		{
 			HTTPReply::cookie c;
-			c.push_back(std::make_pair("account", na->nick));
-			c.push_back(std::make_pair("Path", "/"));
+			c.emplace_back("account", na->nick);
+			c.emplace_back("Path", "/");
 			reply.cookies.push_back(c);
 		}
 
 		{
 			HTTPReply::cookie c;
-			c.push_back(std::make_pair("id", id));
-			c.push_back(std::make_pair("Path", "/"));
+			c.emplace_back("id", id);
+			c.emplace_back("Path", "/");
 			reply.cookies.push_back(c);
 		}
 

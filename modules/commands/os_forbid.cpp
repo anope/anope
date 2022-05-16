@@ -351,7 +351,7 @@ class CommandOSForbid : public Command
 		}
 		else if (command.equals_ci("LIST"))
 		{
-			const std::vector<ForbidData *> &forbids = this->fs->GetForbids();
+			const auto &forbids = this->fs->GetForbids();
 			if (forbids.empty())
 				source.Reply(_("Forbid list is empty."));
 			else

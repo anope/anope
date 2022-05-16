@@ -267,7 +267,7 @@ class CommandBSBadwords : public Command
 
 		if (pos != Anope::string::npos)
 		{
-			Anope::string opt = word.substr(pos + 1);
+			const Anope::string& opt = word.substr(pos + 1);
 			if (!opt.empty())
 			{
 				if (opt.equals_ci("SINGLE"))

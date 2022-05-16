@@ -696,7 +696,7 @@ class CommandCSLevels : public Command
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Level"));
 
-		const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+		const auto &privs = PrivilegeManager::GetPrivileges();
 
 		for (unsigned i = 0; i < privs.size(); ++i)
 		{
@@ -798,7 +798,7 @@ class CommandCSLevels : public Command
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Name")).AddColumn(_("Description"));
 
-			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+			const auto &privs = PrivilegeManager::GetPrivileges();
 			for (unsigned i = 0; i < privs.size(); ++i)
 			{
 				const Privilege &p = privs[i];

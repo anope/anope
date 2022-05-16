@@ -117,7 +117,7 @@ class DBFlatFile : public Module, public Pipe
 		{
 			last_day = tm->tm_mday;
 
-			const std::vector<Anope::string> &type_order = Serialize::Type::GetTypeOrder();
+			const auto &type_order = Serialize::Type::GetTypeOrder();
 
 			std::set<Anope::string> dbs;
 			dbs.insert(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
@@ -217,9 +217,9 @@ class DBFlatFile : public Module, public Pipe
 
 	EventReturn OnLoadDatabase() override
 	{
-		const std::vector<Anope::string> &type_order = Serialize::Type::GetTypeOrder();
+		const auto &type_order = Serialize::Type::GetTypeOrder();
 
-		const Anope::string &db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
+		const auto &db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
 
 		std::fstream fd(db_name.c_str(), std::ios_base::in | std::ios_base::binary);
 		if (!fd.is_open())

@@ -81,7 +81,7 @@ class InspIRCdProto : public IRCDProto
 		ListLimits *limits = maxlist.Get(c);
 		if (limits)
 		{
-			ListLimits::const_iterator limit = limits->find(cm->mchar);
+			const auto &limit = limits->find(cm->mchar);
 			if (limit != limits->end())
 				return limit->second;
 		}
@@ -1378,7 +1378,7 @@ class IRCDMessageMetadata : IRCDMessage
 					Anope::string modechr, modelimit;
 					while (limitstream.GetToken(modechr) && limitstream.GetToken(modelimit))
 					{
-						limits.insert(std::make_pair(modechr[0], convertTo<unsigned>(modelimit)));
+						limits.emplace(modechr[0], convertTo<unsigned>(modelimit));
 					}
 					maxlist.Set(c, limits);
 				}

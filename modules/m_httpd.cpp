@@ -318,7 +318,7 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 
 	bool RegisterPage(HTTPPage *page) override
 	{
-		return this->pages.insert(std::make_pair(page->GetURL(), page)).second;
+		return this->pages.emplace(page->GetURL(), page).second;
 	}
 
 	void UnregisterPage(HTTPPage *page) override

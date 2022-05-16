@@ -30,7 +30,7 @@ class XOPChanAccess : public ChanAccess
 	{
 		for (std::vector<Anope::string>::iterator it = std::find(order.begin(), order.end(), this->type); it != order.end(); ++it)
 		{
-			const std::vector<Anope::string> &privs = permissions[*it];
+			const auto &privs = permissions[*it];
 			if (std::find(privs.begin(), privs.end(), priv) != privs.end())
 				return true;
 		}
@@ -61,7 +61,7 @@ class XOPChanAccess : public ChanAccess
 			for (const auto& [key, value] : permissions)
 			{
 				int &c = count[key];
-				const std::vector<Anope::string> &perms = value;
+				const auto &perms = value;
 				for (unsigned i = 0; i < perms.size(); ++i)
 					if (access->HasPriv(perms[i]))
 						++c;

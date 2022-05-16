@@ -286,7 +286,7 @@ bool ChanAccess::Matches(const User *u, const NickCore *acc, ChannelInfo* &next)
 
 bool ChanAccess::operator>(const ChanAccess &other) const
 {
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+	const auto &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
 	{
 		bool this_p = this->HasPriv(privs[i - 1].name),
@@ -303,7 +303,7 @@ bool ChanAccess::operator>(const ChanAccess &other) const
 
 bool ChanAccess::operator<(const ChanAccess &other) const
 {
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+	const auto &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
 	{
 		bool this_p = this->HasPriv(privs[i - 1].name),
@@ -423,7 +423,7 @@ bool AccessGroup::operator>(const AccessGroup &other) const
 	else if (this->founder)
 		return true;
 
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+	const auto &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
 	{
 		bool this_p = this->HasPriv(privs[i - 1].name),
@@ -449,7 +449,7 @@ bool AccessGroup::operator<(const AccessGroup &other) const
 	else if (other.founder)
 		return true;
 
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+	const auto &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
 	{
 		bool this_p = this->HasPriv(privs[i - 1].name),

@@ -185,7 +185,7 @@ class DatabaseRedis : public Module, public Pipe
 			return EVENT_CONTINUE;
 		}
 
-		const std::vector<Anope::string> type_order = Serialize::Type::GetTypeOrder();
+		const auto type_order = Serialize::Type::GetTypeOrder();
 		for (unsigned i = 0; i < type_order.size(); ++i)
 		{
 			Serialize::Type *sb = Serialize::Type::Find(type_order[i]);

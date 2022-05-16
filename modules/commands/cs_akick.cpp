@@ -152,7 +152,7 @@ class CommandCSAKick : public Command
 				AccessGroup nc_access = ci->AccessFor(na->nc), u_access = source.AccessFor(ci);
 				if (na->nc && (na->nc == ci->GetFounder() || nc_access >= u_access))
 				{
-					Anope::string buf = na->nick + "!" + na->last_usermask;
+					const Anope::string& buf = na->nick + "!" + na->last_usermask;
 					if (Anope::Match(buf, mask))
 					{
 						source.Reply(ACCESS_DENIED);

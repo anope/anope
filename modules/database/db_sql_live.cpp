@@ -183,7 +183,7 @@ class DBMySQL : public Module, public Pipe
 		bool clear_null = false;
 		for (int i = 0; i < res.Rows(); ++i)
 		{
-			const std::map<Anope::string, Anope::string> &row = res.Row(i);
+			const auto &row = res.Row(i);
 
 			unsigned int id;
 			try

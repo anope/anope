@@ -131,7 +131,7 @@ class CommandBSKick : public Command
 		source.Reply(" ");
 		source.Reply(_("Configures bot kickers.  \037option\037 can be one of:"));
 
-		Anope::string this_name = source.command;
+		const Anope::string& this_name = source.command;
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
@@ -1064,7 +1064,7 @@ class BSKick : public Module
 
 			bd.ttb[ttbtype] = 0;
 
-			Anope::string mask = ci->GetIdealBan(u);
+			const Anope::string& mask = ci->GetIdealBan(u);
 
 			ci->c->SetMode(NULL, "BAN", mask);
 			FOREACH_MOD(OnBotBan, (u, ci, mask));
@@ -1079,7 +1079,7 @@ class BSKick : public Module
 		if (!ci || !ci->bi || !ci->c || !u || u->IsProtected() || !ci->c->FindUser(u))
 			return;
 
-		Anope::string fmt = Language::Translate(u, message);
+		const Anope::string& fmt = Language::Translate(u, message);
 		va_start(args, message);
 		vsnprintf(buf, sizeof(buf), fmt.c_str(), args);
 		va_end(args);
@@ -1111,8 +1111,8 @@ class BSKick : public Module
 		if (!ci)
 			return;
 
-		Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
-		Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
+		const Anope::string& enabled = Language::Translate(source.nc, _("Enabled"));
+		const Anope::string& disabled = Language::Translate(source.nc, _("Disabled"));
 		KickerData *kd = kickerdata.Get(ci);
 
 		if (kd && kd->badwords)
@@ -1332,7 +1332,7 @@ class BSKick : public Module
 			BadWords *badwords = ci->GetExt<BadWords>("badwords");
 
 			/* Normalize the buffer */
-			Anope::string nbuf = Anope::NormalizeBuffer(realbuf);
+			const Anope::string& nbuf = Anope::NormalizeBuffer(realbuf);
 			bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
 
 			/* Normalize can return an empty string if this only contains control codes etc */
@@ -1363,7 +1363,7 @@ class BSKick : public Module
 								mustkick = true;
 							else
 							{
-								Anope::string wordbuf = " " + bw->word + " ";
+								const Anope::string& wordbuf = " " + bw->word + " ";
 
 								if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 									mustkick = true;
@@ -1378,7 +1378,7 @@ class BSKick : public Module
 							mustkick = true;
 						else
 						{
-							Anope::string wordbuf = " " + bw->word;
+							const Anope::string& wordbuf = " " + bw->word;
 
 							if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 								mustkick = true;
@@ -1392,7 +1392,7 @@ class BSKick : public Module
 							mustkick = true;
 						else
 						{
-							Anope::string wordbuf = bw->word + " ";
+							const Anope::string& wordbuf = bw->word + " ";
 
 							if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 								mustkick = true;

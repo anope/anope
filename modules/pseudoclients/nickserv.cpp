@@ -96,7 +96,7 @@ class NickServRelease : public User, public Timer
 			delete nit->second;
 		}
 
-		NickServReleases.insert(std::make_pair(this->nick, this));
+		NickServReleases.emplace(this->nick, this);
 
 		IRCD->SendClientIntroduction(this);
 	}

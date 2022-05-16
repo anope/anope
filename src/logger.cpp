@@ -239,7 +239,7 @@ LogInfo::~LogInfo()
 
 bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 {
-	const std::vector<Anope::string> *list = NULL;
+	const std::vector<Anope::string> *list = nullptr;
 	switch (ltype)
 	{
 		case LOG_ADMIN:
@@ -277,7 +277,7 @@ bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 			break;
 	}
 
-	if (list == NULL)
+	if (list == nullptr)
 		return false;
 
 	for (unsigned i = 0; i < list->size(); ++i)

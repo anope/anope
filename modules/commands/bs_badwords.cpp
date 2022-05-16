@@ -33,7 +33,7 @@ struct BadWordsImpl : BadWords
 	typedef std::vector<BadWordImpl *> list;
 	Serialize::Checker<list> badwords;
 
-	explicit BadWordsImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), badwords("BadWord") { }
+	BadWordsImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), badwords("BadWord") { }
 
 	~BadWordsImpl() override;
 
@@ -365,7 +365,7 @@ class CommandBSBadwords : public Command
 	}
 
  public:
-	explicit CommandBSBadwords(Module *creator) : Command(creator, "botserv/badwords", 2, 3)
+	CommandBSBadwords(Module *creator) : Command(creator, "botserv/badwords", 2, 3)
 	{
 		this->SetDesc(_("Maintains the bad words list"));
 		this->SetSyntax(_("\037channel\037 ADD \037word\037 [\037SINGLE\037 | \037START\037 | \037END\037]"));

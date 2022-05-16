@@ -14,7 +14,7 @@
 class CommandBSSay : public Command
 {
  public:
-	explicit CommandBSSay(Module *creator) : Command(creator, "botserv/say", 2, 2)
+	CommandBSSay(Module *creator) : Command(creator, "botserv/say", 2, 2)
 	{
 		this->SetDesc(_("Makes the bot say the specified text on the specified channel"));
 		this->SetSyntax(_("\037channel\037 \037text\037"));
@@ -74,7 +74,7 @@ class CommandBSSay : public Command
 class CommandBSAct : public Command
 {
  public:
-	explicit CommandBSAct(Module *creator) : Command(creator, "botserv/act", 2, 2)
+	CommandBSAct(Module *creator) : Command(creator, "botserv/act", 2, 2)
 	{
 		this->SetDesc(_("Makes the bot do the equivalent of a \"/me\" command"));
 		this->SetSyntax(_("\037channel\037 \037text\037"));

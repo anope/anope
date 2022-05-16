@@ -36,7 +36,7 @@ class CommandBSInfo : public Command
 	}
 
  public:
-	explicit CommandBSInfo(Module *creator) : Command(creator, "botserv/info", 1, 1)
+	CommandBSInfo(Module *creator) : Command(creator, "botserv/info", 1, 1)
 	{
 		this->SetSyntax(_("{\037channel\037 | \037nickname\037}"));
 	}

@@ -14,7 +14,7 @@
 class CommandBSBotList : public Command
 {
  public:
-	explicit CommandBSBotList(Module *creator) : Command(creator, "botserv/botlist", 0, 0)
+	CommandBSBotList(Module *creator) : Command(creator, "botserv/botlist", 0, 0)
 	{
 		this->SetDesc(_("Lists available bots"));
 	}

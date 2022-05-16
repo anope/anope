@@ -17,7 +17,7 @@ static Module *me;
 
 struct KickerDataImpl : KickerData
 {
-	explicit KickerDataImpl(Extensible *obj)
+	KickerDataImpl(Extensible *obj)
 	{
 		amsgs = badwords = bolds = caps = colors = flood = italics = repeat = reverses = underlines = false;
 		for (int16_t i = 0; i < TTB_SIZE; ++i)
@@ -114,7 +114,7 @@ struct KickerDataImpl : KickerData
 class CommandBSKick : public Command
 {
  public:
-	explicit CommandBSKick(Module *creator) : Command(creator, "botserv/kick", 0)
+	CommandBSKick(Module *creator) : Command(creator, "botserv/kick", 0)
 	{
 		this->SetDesc(_("Configures kickers"));
 		this->SetSyntax(_("\037option\037 \037channel\037 {\037ON|OFF\037} [\037settings\037]"));
@@ -246,7 +246,7 @@ class CommandBSKickBase : public Command
 class CommandBSKickAMSG : public CommandBSKickBase
 {
  public:
-	explicit CommandBSKickAMSG(Module *creator) : CommandBSKickBase(creator, "botserv/kick/amsg", 2, 3)
+	CommandBSKickAMSG(Module *creator) : CommandBSKickBase(creator, "botserv/kick/amsg", 2, 3)
 	{
 		this->SetDesc(_("Configures AMSG kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
@@ -282,7 +282,7 @@ class CommandBSKickAMSG : public CommandBSKickBase
 class CommandBSKickBadwords : public CommandBSKickBase
 {
  public:
-	explicit CommandBSKickBadwords(Module *creator) : CommandBSKickBase(creator, "botserv/kick/badwords", 2, 3)
+	CommandBSKickBadwords(Module *creator) : CommandBSKickBase(creator, "botserv/kick/badwords", 2, 3)
 	{
 		this->SetDesc(_("Configures badwords kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
@@ -321,7 +321,7 @@ class CommandBSKickBadwords : public CommandBSKickBase
 class CommandBSKickBolds : public CommandBSKickBase
 {
  public:
-	explicit CommandBSKickBolds(Module *creator) : CommandBSKickBase(creator, "botserv/kick/bolds", 2, 3)
+	CommandBSKickBolds(Module *creator) : CommandBSKickBase(creator, "botserv/kick/bolds", 2, 3)
 	{
 		this->SetDesc(_("Configures bolds kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
@@ -355,7 +355,7 @@ class CommandBSKickBolds : public CommandBSKickBase
 class CommandBSKickCaps : public CommandBSKickBase
 {
  public:
-	explicit CommandBSKickCaps(Module *creator) : CommandBSKickBase(creator, "botserv/kick/caps", 2, 5)
+	CommandBSKickCaps(Module *creator) : CommandBSKickBase(creator, "botserv/kick/caps", 2, 5)
 	{
 		this->SetDesc(_("Configures caps kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037min\037 [\037percent\037]]]\002"));
@@ -451,7 +451,7 @@ class CommandBSKickCaps : public CommandBSKickBase
 class CommandBSKickColors : public CommandBSKickBase
 {
  public:
-	explicit CommandBSKickColors(Module *creator) : CommandBSKickBase(creator, "botserv/kick/colors", 2, 3)
+	CommandBSKickColors(Module *creator) : CommandBSKickBase(creator, "botserv/kick/colors", 2, 3)
 	{
 		this->SetDesc(_("Configures color kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
@@ -485,7 +485,7 @@ class CommandBSKickColors : public CommandBSKickBase
 class CommandBSKickFlood : public CommandBSKickBase
 {
  public:
-	explicit CommandBSKickFlood(Module *creator) : CommandBSKickBase(creator, "botserv/kick/flood", 2, 5)
+	CommandBSKickFlood(Module *creator) : CommandBSKickBase(creator, "botserv/kick/flood", 2, 5)
 	{
 		this->SetDesc(_("Configures flood kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037ln\037 [\037secs\037]]]\002"));
@@ -583,7 +583,7 @@ class CommandBSKickFlood : public CommandBSKickBase
 class CommandBSKickItalics : public CommandBSKickBase
 {
  public:
-	explicit CommandBSKickItalics(Module *creator) : CommandBSKickBase(creator, "botserv/kick/italics", 2, 3)
+	CommandBSKickItalics(Module *creator) : CommandBSKickBase(creator, "botserv/kick/italics", 2, 3)
 	{
 		this->SetDesc(_("Configures italics kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
@@ -617,7 +617,7 @@ class CommandBSKickItalics : public CommandBSKickBase
 class CommandBSKickRepeat : public CommandBSKickBase
 {
  public:
-	explicit CommandBSKickRepeat(Module *creator) : CommandBSKickBase(creator, "botserv/kick/repeat", 2, 4)
+	CommandBSKickRepeat(Module *creator) : CommandBSKickBase(creator, "botserv/kick/repeat", 2, 4)
 	{
 		this->SetDesc(_("Configures repeat kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037num\037]]\002"));
@@ -718,7 +718,7 @@ class CommandBSKickRepeat : public CommandBSKickBase
 class CommandBSKickReverses : public CommandBSKickBase
 {
  public:
-	explicit CommandBSKickReverses(Module *creator) : CommandBSKickBase(creator, "botserv/kick/reverses", 2, 3)
+	CommandBSKickReverses(Module *creator) : CommandBSKickBase(creator, "botserv/kick/reverses", 2, 3)
 	{
 		this->SetDesc(_("Configures reverses kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
@@ -752,7 +752,7 @@ class CommandBSKickReverses : public CommandBSKickBase
 class CommandBSKickUnderlines : public CommandBSKickBase
 {
  public:
-	explicit CommandBSKickUnderlines(Module *creator) : CommandBSKickBase(creator, "botserv/kick/underlines", 2, 3)
+	CommandBSKickUnderlines(Module *creator) : CommandBSKickBase(creator, "botserv/kick/underlines", 2, 3)
 	{
 		this->SetDesc(_("Configures underlines kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
@@ -786,7 +786,7 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 class CommandBSSetDontKickOps : public Command
 {
  public:
-	explicit CommandBSSetDontKickOps(Module *creator, const Anope::string &sname = "botserv/set/dontkickops") : Command(creator, sname, 2, 2)
+	CommandBSSetDontKickOps(Module *creator, const Anope::string &sname = "botserv/set/dontkickops") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("To protect ops against bot kicks"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -851,7 +851,7 @@ class CommandBSSetDontKickOps : public Command
 class CommandBSSetDontKickVoices : public Command
 {
  public:
-	explicit CommandBSSetDontKickVoices(Module *creator, const Anope::string &sname = "botserv/set/dontkickvoices") : Command(creator, sname, 2, 2)
+	CommandBSSetDontKickVoices(Module *creator, const Anope::string &sname = "botserv/set/dontkickvoices") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("To protect voices against bot kicks"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -934,7 +934,7 @@ struct BanData
 	data_type data_map;
 
  public:
-	explicit BanData(Extensible *) { }
+	BanData(Extensible *) { }
 
 	Data &get(const Anope::string &key)
 	{
@@ -963,7 +963,7 @@ struct BanData
 
 struct UserData
 {
-	explicit UserData(Extensible *)
+	UserData(Extensible *)
 	{
 		last_use = last_start = Anope::CurTime;
 		lines = times = 0;
@@ -987,7 +987,7 @@ struct UserData
 class BanDataPurger : public Timer
 {
  public:
-	explicit BanDataPurger(Module *o) : Timer(o, 300, Anope::CurTime, true) { }
+	BanDataPurger(Module *o) : Timer(o, 300, Anope::CurTime, true) { }
 
 	void Tick(time_t) override
 	{

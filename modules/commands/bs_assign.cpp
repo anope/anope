@@ -14,7 +14,7 @@
 class CommandBSAssign : public Command
 {
  public:
-	explicit CommandBSAssign(Module *creator) : Command(creator, "botserv/assign", 2, 2)
+	CommandBSAssign(Module *creator) : Command(creator, "botserv/assign", 2, 2)
 	{
 		this->SetDesc(_("Assigns a bot to a channel"));
 		this->SetSyntax(_("\037channel\037 \037nick\037"));
@@ -85,7 +85,7 @@ class CommandBSAssign : public Command
 class CommandBSUnassign : public Command
 {
  public:
-	explicit CommandBSUnassign(Module *creator) : Command(creator, "botserv/unassign", 1, 1)
+	CommandBSUnassign(Module *creator) : Command(creator, "botserv/unassign", 1, 1)
 	{
 		this->SetDesc(_("Unassigns a bot from a channel"));
 		this->SetSyntax(_("\037channel\037"));
@@ -148,7 +148,7 @@ class CommandBSUnassign : public Command
 class CommandBSSetNoBot : public Command
 {
  public:
-	explicit CommandBSSetNoBot(Module *creator, const Anope::string &sname = "botserv/set/nobot") : Command(creator, sname, 2, 2)
+	CommandBSSetNoBot(Module *creator, const Anope::string &sname = "botserv/set/nobot") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("Prevent a bot from being assigned to a channel"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037}"));

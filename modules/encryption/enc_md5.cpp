@@ -201,7 +201,7 @@ class MD5Context : public Encryption::Context
 		state[3] += d;
 
 		/* Zeroize sensitive information. */
-#ifdef _MSC_VER
+#ifdef _WIN32
 		RtlSecureZeroMemory(x, sizeof(x));
 #else
 		memset(x, 0, sizeof(x));

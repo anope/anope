@@ -78,9 +78,9 @@ class CommandCSList : public Command
 		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 			ordered_map[it->first] = it->second;
 
-		for (Anope::map<ChannelInfo *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
+		for (const auto& [key, value] : ordered_map)
 		{
-			const ChannelInfo *ci = it->second;
+			const ChannelInfo *ci = value;
 
 			if (!is_servadmin)
 			{

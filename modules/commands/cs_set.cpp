@@ -37,10 +37,10 @@ class CommandCSSet : public Command
 		Anope::string this_name = source.command;
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto& [key, value] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
+			const Anope::string &c_name = key;
+			const CommandInfo &info = value;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				if (info.hide)

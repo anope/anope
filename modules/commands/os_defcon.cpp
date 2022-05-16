@@ -559,8 +559,8 @@ static void runDefCon()
 			{
 				Log(OperServ, "operserv/defcon") << "DEFCON: setting " << DConfig.chanmodes << " on all channels";
 				DefConModesSet = true;
-				for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-					it->second->SetModes(OperServ, false, "%s", DConfig.chanmodes.c_str());
+				for (const auto& [key, value] : ChannelList)
+					value->SetModes(OperServ, false, "%s", DConfig.chanmodes.c_str());
 			}
 		}
 	}
@@ -575,8 +575,8 @@ static void runDefCon()
 				if (!newmodes.empty())
 				{
 					Log(OperServ, "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
-					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-						it->second->SetModes(OperServ, true, "%s", newmodes.c_str());
+					for (const auto& [key, value] : ChannelList)
+						value->SetModes(OperServ, true, "%s", newmodes.c_str());
 				}
 			}
 		}

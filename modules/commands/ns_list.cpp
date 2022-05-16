@@ -78,9 +78,9 @@ class CommandNSList : public Command
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
 			ordered_map[it->first] = it->second;
 
-		for (Anope::map<NickAlias *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
+		for (const auto& [key, value] : ordered_map)
 		{
-			const NickAlias *na = it->second;
+			const NickAlias *na = value;
 
 			/* Don't show private nicks to non-services admins. */
 			if (na->nc->HasExt("NS_PRIVATE") && !is_servadmin && na->nc != mync)

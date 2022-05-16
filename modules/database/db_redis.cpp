@@ -440,10 +440,10 @@ void Updater::OnResult(const Reply &r)
 	args.push_back("hash:" + this->type + ":" + stringify(obj->id));
 
 	typedef std::map<Anope::string, std::stringstream *> items;
-	for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+	for (const auto& [k, v] : data.data)
 	{
-		const Anope::string &key = it->first;
-		std::stringstream *value = it->second;
+		const Anope::string &key = k;
+		std::stringstream *value = v;
 
 		args.push_back(key);
 		args.emplace_back(value->str());
@@ -549,14 +549,14 @@ void SubscriptionListener::OnResult(const Reply &r)
 		me->redis->StartTransaction();
 
 		typedef std::map<Anope::string, std::stringstream *> items;
-		for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (const auto& [k, v] : data.data)
 		{
-			const Anope::string &k = it->first;
-			std::stringstream *value = it->second;
+			const Anope::string &key = k;
+			std::stringstream *value = v;
 
 			std::vector<Anope::string> args;
 			args.emplace_back("SREM");
-			args.push_back("value:" + type + ":" + k + ":" + value->str());
+			args.push_back("value:" + type + ":" + key + ":" + value->str());
 			args.push_back(id);
 
 			/* Delete value -> object id */
@@ -602,10 +602,10 @@ void ModifiedObject::OnResult(const Reply &r)
 		obj->Serialize(data);
 
 		typedef std::map<Anope::string, std::stringstream *> items;
-		for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (const auto& [k, v] : data.data)
 		{
-			const Anope::string &key = it->first;
-			std::stringstream *value = it->second;
+			const Anope::string &key = k;
+			std::stringstream *value = v;
 
 			std::vector<Anope::string> args;
 			args.emplace_back("SREM");
@@ -635,10 +635,10 @@ void ModifiedObject::OnResult(const Reply &r)
 
 		/* Insert new object values */
 		typedef std::map<Anope::string, std::stringstream *> items;
-		for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (const auto& [k, v] : data.data)
 		{
-			const Anope::string &key = it->first;
-			std::stringstream *value = it->second;
+			const Anope::string &key = k;
+			std::stringstream *value = v;
 
 			std::vector<Anope::string> args;
 			args.emplace_back("SADD");

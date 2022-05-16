@@ -191,9 +191,9 @@ class CommandOSSession : public Command
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Session")).AddColumn(_("Host"));
 
-			for (SessionService::SessionMap::iterator it = session_service->GetSessions().begin(), it_end = session_service->GetSessions().end(); it != it_end; ++it)
+			for (const auto& [key, value] : session_service->GetSessions())
 			{
-				Session *session = it->second;
+				Session *session = value;
 
 				if (session->count >= mincount)
 				{

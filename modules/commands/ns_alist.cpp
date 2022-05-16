@@ -27,11 +27,11 @@ class CommandNSAList : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		Anope::string nick = source.GetNick();
 		NickCore *nc = source.nc;
 
 		if (params.size() && source.HasPriv("nickserv/alist"))
 		{
+			Anope::string nick = source.GetNick();
 			nick = params[0];
 			const NickAlias *na = NickAlias::Find(nick);
 			if (!na)

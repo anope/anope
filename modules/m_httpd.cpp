@@ -259,8 +259,8 @@ class MyHTTPClient : public HTTPClient
 		{
 			Anope::string buf = "Set-Cookie:";
 
-			for (HTTPReply::cookie::iterator it = msg->cookies[i].begin(), it_end = msg->cookies[i].end(); it != it_end; ++it)
-				buf += " " + it->first + "=" + it->second + ";";
+			for (const auto& [key, value] : msg->cookies[i])
+				buf += " " + key + "=" + value + ";";
 
 			buf.erase(buf.length() - 1);
 
@@ -268,8 +268,8 @@ class MyHTTPClient : public HTTPClient
 		}
 
 		typedef std::map<Anope::string, Anope::string> map;
-		for (map::iterator it = msg->headers.begin(), it_end = msg->headers.end(); it != it_end; ++it)
-			this->WriteClient(it->first + ": " + it->second);
+		for (const auto& [key, value] : msg->headers)
+			this->WriteClient(key + ": " + value);
 
 		this->WriteClient("Connection: Close");
 		this->WriteClient("");
@@ -455,9 +455,9 @@ class HTTPD : public Module
 
 	void OnModuleLoad(User *u, Module *m) override
 	{
-		for (std::map<Anope::string, MyHTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end; ++it)
+		for (const auto& [key, value] : this->providers)
 		{
-			MyHTTPProvider *p = it->second;
+			MyHTTPProvider *p = value;
 
 			if (p->IsSSL() && sslref)
 				try

@@ -125,14 +125,14 @@ class CommandOSSeen : public Command
 		{
 			size_t mem_counter;
 			mem_counter = sizeof(database_map);
-			for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end; ++it)
+			for (const auto& [key, value] : database)
 			{
 				mem_counter += (5 * sizeof(Anope::string)) + sizeof(TypeInfo) + sizeof(time_t);
-				mem_counter += it->first.capacity();
-				mem_counter += it->second->vhost.capacity();
-				mem_counter += it->second->nick2.capacity();
-				mem_counter += it->second->channel.capacity();
-				mem_counter += it->second->message.capacity();
+				mem_counter += key.capacity();
+				mem_counter += value->vhost.capacity();
+				mem_counter += value->nick2.capacity();
+				mem_counter += value->channel.capacity();
+				mem_counter += value->message.capacity();
 			}
 			source.Reply(_("%lu nicks are stored in the database, using %.2Lf kB of memory."), database.size(), static_cast<long double>(mem_counter) / 1024);
 		}
@@ -222,9 +222,9 @@ class CommandSeen : public Command
 			return;
 		}
 
-		for (Channel::ChanUserList::const_iterator it = source.c->users.begin(), it_end = source.c->users.end(); it != it_end; ++it)
+		for (const auto& [key, value] : source.c->users)
 		{
-			ChanUserContainer *uc = it->second;
+			ChanUserContainer *uc = value;
 			User *u = uc->user;
 
 			if (u->Account() == na->nc)

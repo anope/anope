@@ -1469,14 +1469,14 @@ struct IRCDMessageSJoin : IRCDMessage
 				*invex = ModeManager::FindChannelModeByName("INVITEOVERRIDE");
 
 			if (ban)
-				for (auto it = bans.begin(), it_end = bans.end(); it != it_end; ++it)
-					c->SetModeInternal(source, ban, *it);
+				for (const auto& p : bans)
+					c->SetModeInternal(source, ban, p);
 			if (except)
-				for (auto it = excepts.begin(), it_end = excepts.end(); it != it_end; ++it)
-					c->SetModeInternal(source, except, *it);
+				for (const auto& p : excepts)
+					c->SetModeInternal(source, except, p);
 			if (invex)
-				for (auto it = invites.begin(), it_end = invites.end(); it != it_end; ++it)
-					c->SetModeInternal(source, invex, *it);
+				for (const auto& p : invites)
+					c->SetModeInternal(source, invex, p);
 		}
 	}
 };

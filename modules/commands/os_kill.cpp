@@ -23,7 +23,6 @@ class CommandOSKill : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = params[0];
-		Anope::string reason = params.size() > 1 ? params[1] : "";
 
 		User *u2 = User::Find(nick, true);
 		if (u2 == NULL)
@@ -32,6 +31,7 @@ class CommandOSKill : public Command
 			source.Reply(ACCESS_DENIED);
 		else
 		{
+			Anope::string reason = params.size() > 1 ? params[1] : "";
 			if (reason.empty())
 				reason = "No reason specified";
 			if (Config->GetModule("operserv")->Get<bool>("addakiller"))

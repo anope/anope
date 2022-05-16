@@ -109,9 +109,9 @@ class CommandCSSuspend : public Command
 		{
 			std::vector<User *> users;
 
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+			for (const auto& [key, value] : ci->c->users)
 			{
-				ChanUserContainer *uc = it->second;
+				ChanUserContainer *uc = value;
 				User *user = uc->user;
 				if (!user->HasMode("OPER") && user->server != Me)
 					users.push_back(user);

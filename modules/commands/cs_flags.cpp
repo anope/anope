@@ -453,12 +453,12 @@ class CommandCSFlags : public Command
 		for (const auto& [key, value] : defaultFlags)
 			reverse.emplace(value, key);
 
-		for (reverse_map::iterator it = reverse.begin(), it_end = reverse.end(); it != it_end; ++it)
+		for (const auto& [key, value] : reverse)
 		{
-			Privilege *p = PrivilegeManager::FindPrivilege(it->second);
+			Privilege *p = PrivilegeManager::FindPrivilege(value);
 			if (p == NULL)
 				continue;
-			source.Reply("  %c - %s", it->first, Language::Translate(source.nc, p->desc.c_str()));
+			source.Reply("  %c - %s", key, Language::Translate(source.nc, p->desc.c_str()));
 		}
 
 		return true;

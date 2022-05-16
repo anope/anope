@@ -62,11 +62,11 @@ class CommandOSConfig : public Command
 				ListFormatter lflist(source.GetAccount());
 				lflist.AddColumn(_("Name")).AddColumn(_("Value"));
 
-				for (Configuration::Block::item_map::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
+				for (const auto& [key, value] : items)
 				{
 					ListFormatter::ListEntry entry;
-					entry["Name"] = it->first;
-					entry["Value"] = it->second;
+					entry["Name"] = key;
+					entry["Value"] = value;
 					lflist.AddEntry(entry);
 				}
 
@@ -95,10 +95,10 @@ class CommandOSConfig : public Command
 				ListFormatter::ListEntry entry;
 				entry["Module Name"] = block->Get<Anope::string>("name");
 
-				for (Configuration::Block::item_map::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
+				for (const auto& [key, value] : items)
 				{
-					entry["Name"] = it->first;
-					entry["Value"] = it->second;
+					entry["Name"] = key;
+					entry["Value"] = value;
 					lflist.AddEntry(entry);
 				}
 			}

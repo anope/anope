@@ -19,9 +19,9 @@ class StatusUpdate : public Module
 	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
 	{
 		if (ci->c)
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+			for (const auto& [key, value] : ci->c->users)
 			{
-				User *user = it->second->user;
+				User *user = value->user;
 
 				ChannelInfo *next;
 				if (user->server != Me && access->Matches(user, user->Account(), next))
@@ -42,9 +42,9 @@ class StatusUpdate : public Module
 	void OnAccessDel(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
 	{
 		if (ci->c)
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+			for (const auto& [key, value] : ci->c->users)
 			{
-				User *user = it->second->user;
+				User *user = value->user;
 
 				ChannelInfo *next;
 				if (user->server != Me && access->Matches(user, user->Account(), next))

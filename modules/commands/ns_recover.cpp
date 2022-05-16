@@ -69,8 +69,8 @@ class NSRecoverRequest : public IdentifyRequest
 				if (!u->chans.empty())
 				{
 					NSRecoverInfo *ei = source.GetUser()->Extend<NSRecoverInfo>("recover");
-					for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
-						(*ei)[it->first->name] = it->second->status;
+					for (const auto& [key, value] : u->chans)
+						(*ei)[key->name] = value->status;
 				}
 			}
 

@@ -55,10 +55,10 @@ class CommandHelp : public Command
 			if (all)
 				source.Reply(_("All available commands for \002%s\002:"), source.service->nick.c_str());
 
-			for (CommandInfo::map::const_iterator it = map.begin(), it_end = map.end(); it != it_end; ++it)
+			for (const auto& [key, value] : map)
 			{
-				const Anope::string &c_name = it->first;
-				const CommandInfo &info = it->second;
+				const Anope::string &c_name = key;
+				const CommandInfo &info = value;
 
 				if (info.hide)
 					continue;
@@ -66,7 +66,7 @@ class CommandHelp : public Command
 				// Smaller command exists
 				Anope::string cmd;
 				spacesepstream(c_name).GetToken(cmd, 0);
-				if (cmd != it->first && map.count(cmd))
+				if (cmd != key && map.count(cmd))
 					continue;
 
 				ServiceReference<Command> c("Command", info.name);

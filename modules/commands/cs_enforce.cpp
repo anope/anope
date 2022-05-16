@@ -29,10 +29,9 @@ class CommandCSEnforce : public Command
 		bool hadsecureops = ci->HasExt("SECUREOPS");
 		ci->Extend<bool>("SECUREOPS");
 
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (const auto& [key, value] : ci->c->users)
 		{
-			ChanUserContainer *uc = it->second;
-
+			ChanUserContainer *uc = value;
 			ci->c->SetCorrectModes(uc->user, false);
 		}
 
@@ -48,9 +47,9 @@ class CommandCSEnforce : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce restricted";
 
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (const auto& [key, value] : ci->c->users)
 		{
-			ChanUserContainer *uc = it->second;
+			ChanUserContainer *uc = value;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -79,9 +78,9 @@ class CommandCSEnforce : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce registered only";
 
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (const auto& [key, value] : ci->c->users)
 		{
-			ChanUserContainer *uc = it->second;
+			ChanUserContainer *uc = value;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -111,9 +110,9 @@ class CommandCSEnforce : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce SSL only";
 
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (const auto& [key, value] : ci->c->users)
 		{
-			ChanUserContainer *uc = it->second;
+			ChanUserContainer *uc = value;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -143,9 +142,9 @@ class CommandCSEnforce : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce bans";
 
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (const auto& [key, value] : ci->c->users)
 		{
-			ChanUserContainer *uc = it->second;
+			ChanUserContainer *uc = value;
 			User *user = uc->user;
 
 			if (user->IsProtected())

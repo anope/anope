@@ -47,9 +47,9 @@ class CommandOSMode : public Command
 
 			if (all)
 			{
-				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+				for (const auto& [key, value] : c->users)
 				{
-					ChanUserContainer *uc = it->second;
+					ChanUserContainer *uc = value;
 
 					if (uc->user->HasMode("OPER"))
 						continue;

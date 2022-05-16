@@ -147,8 +147,8 @@ class CommandOSLogSearch : public Command
 
 		source.Reply(_("Matches for \002%s\002:"), search_string.c_str());
 		unsigned int count = 0;
-		for (std::vector<Anope::string>::iterator it = matches.begin(), it_end = matches.end(); it != it_end; ++it)
-			source.Reply("#%d: %s", ++count, it->c_str());
+		for (const auto& p : matches)
+			source.Reply("#%d: %s", ++count, p.c_str());
 		source.Reply(_("Showed %d/%d matches for \002%s\002."), matches.size(), found, search_string.c_str());
 	}
 

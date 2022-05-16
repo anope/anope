@@ -132,10 +132,10 @@ class CommandBSKick : public Command
 		source.Reply(_("Configures bot kickers.  \037option\037 can be one of:"));
 
 		const Anope::string& this_name = source.command;
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto& [key, value] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
+			const Anope::string &c_name = key;
+			const CommandInfo &info = value;
 
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
@@ -993,9 +993,9 @@ class BanDataPurger : public Timer
 	{
 		Log(LOG_DEBUG) << "bs_main: Running bandata purger";
 
-		for (channel_map::iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+		for (const auto& [key, value] : ChannelList)
 		{
-			Channel *c = it->second;
+			Channel *c = value;
 
 			BanData *bd = c->GetExt<BanData>("bandata");
 			if (bd != NULL)

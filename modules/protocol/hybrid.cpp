@@ -1,7 +1,7 @@
 /* ircd-hybrid protocol module. Minimum supported version of ircd-hybrid is 8.2.23.
  *
  * (C) 2003-2022 Anope Team <team@anope.org>
- * (C) 2012-2020 ircd-hybrid development team
+ * (C) 2012-2022 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
@@ -171,15 +171,14 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password;
 
 		/*
-		 * As of October 02, 2020, ircd-hybrid-8 does support the following capabilities
+		 * As of June 01, 2022, ircd-hybrid-8 does support the following capabilities
 		 * which are required to work with IRC-services:
 		 *
 		 * TBURST - Supports topic burst
 		 * ENCAP  - Supports ENCAP
 		 * EOB    - Supports End Of Burst message
-		 * RHOST  - Supports UID message with realhost information
 		 */
-		UplinkSocket::Message() << "CAPAB :ENCAP TBURST EOB RHOST";
+		UplinkSocket::Message() << "CAPAB :ENCAP TBURST EOB";
 
 		SendServer(Me);
 
@@ -580,13 +579,35 @@ struct IRCDMessageCertFP: IRCDMessage
 	}
 };
 
+struct IRCDMessageCapab : Message::Capab
+{
+	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		spacesepstream sep(params[0]);
+		Anope::string capab;
+
+		while (sep.GetToken(capab))
+		{
+			if (capab.find("HOP") != Anope::string::npos || capab.find("RHOST") != Anope::string::npos)
+				ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
+			if (capab.find("AOP") != Anope::string::npos)
+				ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT", 'a', '&', 3));
+			if (capab.find("QOP") != Anope::string::npos)
+				ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '~', 4));
+		}
+
+		Message::Capab::Run(source, params);
+	}
+};
+
 class ProtoHybrid : public Module
 {
 	HybridProto ircd_proto;
 
 	/* Core message handlers */
 	Message::Away message_away;
-	Message::Capab message_capab;
 	Message::Error message_error;
 	Message::Invite message_invite;
 	Message::Kick message_kick;
@@ -607,6 +628,7 @@ class ProtoHybrid : public Module
 
 	/* Our message handlers */
 	IRCDMessageBMask message_bmask;
+	IRCDMessageCapab message_capab;
 	IRCDMessageEOB message_eob;
 	IRCDMessageJoin message_join;
 	IRCDMessageNick message_nick;
@@ -646,9 +668,8 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
 		ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
 
-		/* v/h/o */
+		/* v/o */
 		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
-		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
 		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));
 
 		/* l/k */
@@ -664,7 +685,6 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
 		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
-		ModeManager::AddChannelMode(new ChannelMode("HIDEBMASKS", 'u'));
 		ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
 		ModeManager::AddChannelMode(new ChannelMode("NOKNOCK", 'K'));
 		ModeManager::AddChannelMode(new ChannelModeOperOnly("LBAN", 'L'));
@@ -678,11 +698,11 @@ class ProtoHybrid : public Module
 public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
-		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),
+		message_away(this), message_error(this), message_invite(this), message_kick(this),
 		message_kill(this), message_mode(this), message_motd(this), message_notice(this), message_part(this),
 		message_ping(this), message_privmsg(this), message_quit(this), message_squit(this), message_stats(this),
 		message_time(this), message_topic(this), message_version(this), message_whois(this),
-		message_bmask(this), message_eob(this), message_join(this),
+		message_bmask(this), message_capab(this), message_eob(this), message_join(this),
 		message_nick(this), message_pass(this), message_pong(this), message_server(this), message_sid(this),
 		message_sjoin(this), message_svsmode(this), message_tburst(this), message_tmode(this), message_uid(this),
 		message_certfp(this)

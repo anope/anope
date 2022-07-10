@@ -312,10 +312,7 @@ class DBFlatFile : public Module, public Pipe
 				else
 					db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
 
-				if (Anope::IsFile(db_name))
-					rename(db_name.c_str(), (db_name + ".tmp").c_str());
-
-				std::fstream *fs = databases[s_type->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+				std::fstream *fs = databases[s_type->GetOwner()] = new std::fstream((db_name + ".tmp").c_str(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
 
 				if (!fs->is_open())
 					Log(this) << "Unable to open " << db_name << " for writing";
@@ -349,14 +346,15 @@ class DBFlatFile : public Module, public Pipe
 					this->Write("Unable to write database " + db_name);
 
 					f->close();
-
-					if (Anope::IsFile((db_name + ".tmp").c_str()))
-						rename((db_name + ".tmp").c_str(), db_name.c_str());
 				}
 				else
 				{
 					f->close();
-					unlink((db_name + ".tmp").c_str());
+#ifdef _WIN32
+					/* Windows rename() fails if the file already exists. */
+					remove(db_name.c_str());
+#endif
+					rename((db_name + ".tmp").c_str(), db_name.c_str());
 				}
 
 				delete f;

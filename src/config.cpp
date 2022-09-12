@@ -104,6 +104,12 @@ static void ValidateNoSpaces(const Anope::string &block, const Anope::string &na
 		throw ConfigException("The value for <" + block + ":" + name + "> may not contain spaces!");
 }
 
+static void ValidateNotEmptyOrSpaces(const Anope::string &block, const Anope::string &name, const Anope::string &value)
+{
+	ValidateNotEmpty(block, name, value);
+	ValidateNoSpaces(block, name, value);
+}
+
 template<typename T> static void ValidateNotZero(const Anope::string &block, const Anope::string &name, T value)
 {
 	if (!value)
@@ -159,7 +165,7 @@ Conf::Conf() : Block("")
 
 	const Anope::string &servername = serverinfo->Get<Anope::string>("name");
 
-	ValidateNotEmpty("serverinfo", "name", servername);
+	ValidateNotEmptyOrSpaces("serverinfo", "name", servername);
 
 	if (servername.find(' ') != Anope::string::npos || servername.find('.') == Anope::string::npos)
 		throw ConfigException("serverinfo:name is not a valid server name");
@@ -207,9 +213,9 @@ Conf::Conf() : Block("")
 		int port = uplink->Get<int>("port");
 		const Anope::string &password = uplink->Get<const Anope::string>("password");
 
-		ValidateNotEmpty("uplink", "host", host);
+		ValidateNotEmptyOrSpaces("uplink", "host", host);
 		ValidateNotZero("uplink", "port", port);
-		ValidateNotEmpty("uplink", "password", password);
+		ValidateNotEmptyOrSpaces("uplink", "password", password);
 
 		if (password.find(' ') != Anope::string::npos || password[0] == ':')
 			throw ConfigException("uplink:password is not valid");
@@ -223,7 +229,7 @@ Conf::Conf() : Block("")
 
 		const Anope::string &modname = module->Get<const Anope::string>("name");
 
-		ValidateNotEmpty("module", "name", modname);
+		ValidateNotEmptyOrSpaces("module", "name", modname);
 
 		this->ModulesAutoLoad.push_back(modname);
 	}
@@ -285,7 +291,7 @@ Conf::Conf() : Block("")
 					&vhost = oper->Get<const Anope::string>("vhost");
 		bool require_oper = oper->Get<bool>("require_oper");
 
-		ValidateNotEmpty("oper", "name", nname);
+		ValidateNotEmptyOrSpaces("oper", "name", nname);
 		ValidateNotEmpty("oper", "type", type);
 
 		OperType *ot = NULL;
@@ -318,9 +324,9 @@ Conf::Conf() : Block("")
 					&modes = service->Get<const Anope::string>("modes"),
 					&channels = service->Get<const Anope::string>("channels");
 
-		ValidateNotEmpty("service", "nick", nick);
-		ValidateNotEmpty("service", "user", user);
-		ValidateNotEmpty("service", "host", host);
+		ValidateNotEmptyOrSpaces("service", "nick", nick);
+		ValidateNotEmptyOrSpaces("service", "user", user);
+		ValidateNotEmptyOrSpaces("service", "host", host);
 		ValidateNotEmpty("service", "gecos", gecos);
 		ValidateNoSpaces("service", "channels", channels);
 
@@ -430,9 +436,9 @@ Conf::Conf() : Block("")
 					&group = command->Get<const Anope::string>("group");
 		bool hide = command->Get<bool>("hide");
 
-		ValidateNotEmpty("command", "service", service);
+		ValidateNotEmptyOrSpaces("command", "service", service);
 		ValidateNotEmpty("command", "name", nname);
-		ValidateNotEmpty("command", "command", cmd);
+		ValidateNotEmptyOrSpaces("command", "command", cmd);
 
 		BotInfo *bi = this->GetClient(service);
 		if (!bi)
@@ -466,8 +472,8 @@ Conf::Conf() : Block("")
 		bool hide = fantasy->Get<bool>("hide"),
 			prepend_channel = fantasy->Get<bool>("prepend_channel", "yes");
 
-		ValidateNotEmpty("fantasy", "name", nname);
-		ValidateNotEmpty("fantasy", "command", service);
+		ValidateNotEmptyOrSpaces("fantasy", "name", nname);
+		ValidateNotEmptyOrSpaces("fantasy", "command", service);
 
 		CommandInfo &c = this->Fantasy[nname];
 		c.name = service;

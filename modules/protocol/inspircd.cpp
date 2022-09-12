@@ -1378,7 +1378,7 @@ class IRCDMessageMetadata : IRCDMessage
 					Anope::string modechr, modelimit;
 					while (limitstream.GetToken(modechr) && limitstream.GetToken(modelimit))
 					{
-						limits.insert(std::make_pair(modechr[0], convertTo<unsigned>(modelimit)));
+						limits.emplace(modechr[0], convertTo<unsigned>(modelimit));
 					}
 					maxlist.Set(c, limits);
 				}

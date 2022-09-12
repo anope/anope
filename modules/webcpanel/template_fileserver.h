@@ -18,7 +18,7 @@ class TemplateFileServer
 	{
 		Anope::string& operator[](const Anope::string &key)
 		{
-			return insert(std::make_pair(key, ""))->second;
+			return emplace(key, "")->second;
 		}
 	};
 

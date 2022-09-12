@@ -498,7 +498,7 @@ class ModuleLDAP : public Module, public Pipe
 				{
 					LDAPService *ss = new LDAPService(this, connname, server, admin_binddn, admin_password);
 					ss->Start();
-					this->LDAPServices.insert(std::make_pair(connname, ss));
+					this->LDAPServices.emplace(connname, ss);
 
 					Log(LOG_NORMAL, "ldap") << "LDAP: Successfully initialized server " << connname << " (" << server << ")";
 				}

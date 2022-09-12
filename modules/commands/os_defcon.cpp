@@ -72,7 +72,7 @@ struct DefconConfig
 
 	bool SetDefConParam(const Anope::string &name, const Anope::string &buf)
 	{
-	       return DefConModesOnParams.insert(std::make_pair(name, buf)).second;
+	       return DefConModesOnParams.emplace(name, buf).second;
 	}
 
 	void UnsetDefConParam(const Anope::string &name)

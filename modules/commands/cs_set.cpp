@@ -1138,9 +1138,9 @@ class CSSet : public Module
 			{
 				size_t c = modes.find(',');
 				if (c == Anope::string::npos)
-					ci->last_modes.insert(std::make_pair(modes, ""));
+					ci->last_modes.emplace(modes, "");
 				else
-					ci->last_modes.insert(std::make_pair(modes.substr(0, c), modes.substr(c + 1)));
+					ci->last_modes.emplace(modes.substr(0, c), modes.substr(c + 1));
 			}
 		}
 	} keep_modes;

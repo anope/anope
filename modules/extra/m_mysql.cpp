@@ -240,7 +240,7 @@ class ModuleSQL : public Module, public Pipe
 				try
 				{
 					MySQLService *ss = new MySQLService(this, connname, database, server, user, password, port);
-					this->MySQLServices.insert(std::make_pair(connname, ss));
+					this->MySQLServices.emplace(connname, ss);
 
 					Log(LOG_NORMAL, "mysql") << "MySQL: Successfully connected to server " << connname << " (" << server << ")";
 				}

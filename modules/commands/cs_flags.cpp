@@ -451,7 +451,7 @@ class CommandCSFlags : public Command
 		typedef std::multimap<char, Anope::string, ci::less> reverse_map;
 		reverse_map reverse;
 		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
-			reverse.insert(std::make_pair(it->second, it->first));
+			reverse.emplace(it->second, it->first);
 
 		for (reverse_map::iterator it = reverse.begin(), it_end = reverse.end(); it != it_end; ++it)
 		{

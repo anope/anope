@@ -297,7 +297,7 @@ void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 	}
 
 	/* Add this mode and its param to our list */
-	list->push_back(std::make_pair(mode, param));
+	list->emplace_back(mode, param);
 }
 
 static class ModePipe : public Pipe

@@ -288,7 +288,7 @@ const std::vector<XLine *> &XLineManager::GetList() const
 void XLineManager::AddXLine(XLine *x)
 {
 	if (!x->id.empty())
-		XLinesByUID->insert(std::make_pair(x->id, x));
+		XLinesByUID->emplace(x->id, x);
 	this->xlines->push_back(x);
 	x->manager = this;
 }

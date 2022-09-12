@@ -524,6 +524,7 @@ class ProtoBahamut : public Module
 
 		/* v/h/o/a/q */
 		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
+		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
 		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 1));
 
 		/* Add channel modes */

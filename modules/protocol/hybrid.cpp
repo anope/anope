@@ -1,7 +1,7 @@
 /* ircd-hybrid protocol module. Minimum supported version of ircd-hybrid is 8.2.23.
  *
  * (C) 2003-2022 Anope Team <team@anope.org>
- * (C) 2012-2020 ircd-hybrid development team
+ * (C) 2012-2022 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/cs_mode.h"
 
 static Anope::string UplinkSID;
 static bool UseSVSAccount = false;  // Temporary backwards compatibility hack until old proto is deprecated
@@ -22,7 +23,7 @@ class HybridProto : public IRCDProto
 		u->KillInternal(source, buf);
 	}
 
-  public:
+ public:
 	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.23+")
 	{
 		DefaultPseudoclientModes = "+oi";
@@ -100,20 +101,32 @@ class HybridProto : public IRCDProto
 
 	void SendJoin(User *u, Channel *c, const ChannelStatus *status) override
 	{
-		/*
-		 * Note that we must send our modes with the SJOIN and can not add them to the
-		 * mode stacker because ircd-hybrid does not allow *any* client to op itself
-		 */
-		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :"
-					  << (status != NULL ? status->BuildModePrefixList() : "") << u->GetUID();
+		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << u->GetUID();
 
-		/* And update our internal status for this user since this is not going through our mode handling system */
+		/*
+		 * Note that we can send this with the SJOIN but choose not to
+		 * because the mode stacker will handle this and probably will
+		 * merge these modes with +nrt and other mlocked modes.
+		 */
 		if (status)
 		{
+			/* First save the channel status in case uc->status == status */
+			ChannelStatus cs = *status;
+
+			/*
+			 * If the user is internally on the channel with flags, kill them so that
+			 * the stacker will allow this.
+			 */
 			ChanUserContainer *uc = c->FindUser(u);
+			if (uc)
+				uc->status.Clear();
+
+			BotInfo *setter = BotInfo::Find(u->GetUID());
+			for (size_t i = 0; i < cs.Modes().length(); ++i)
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), u->GetUID(), false);
 
 			if (uc)
-				uc->status = *status;
+				uc->status = cs;
 		}
 	}
 
@@ -171,15 +184,13 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password;
 
 		/*
-		 * As of October 02, 2020, ircd-hybrid-8 does support the following capabilities
-		 * which are required to work with IRC-services:
-		 *
 		 * TBURST - Supports topic burst
 		 * ENCAP  - Supports ENCAP
 		 * EOB    - Supports End Of Burst message
 		 * RHOST  - Supports UID message with realhost information
+		 * MLOCK  - Supports MLOCK
 		 */
-		UplinkSocket::Message() << "CAPAB :ENCAP TBURST EOB RHOST";
+		UplinkSocket::Message() << "CAPAB :ENCAP TBURST EOB RHOST MLOCK";
 
 		SendServer(Me);
 
@@ -222,11 +233,7 @@ class HybridProto : public IRCDProto
 
 	void SendChannel(Channel *c) override
 	{
-		Anope::string modes = c->GetModes(true, true);
-
-		if (modes.empty())
-			modes = "+";
-
+		Anope::string modes = "+" + c->GetModes(true, true);
 		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
 	}
 
@@ -275,6 +282,11 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message(Me) << "SVSHOST " << u->GetUID() << " " << u->timestamp << " " << u->host;
 	}
 
+	bool IsExtbanValid(const Anope::string &mask) override
+	{
+		return mask.length() >= 4 && mask[0] == '$' && mask[2] == ':';
+	}
+
 	bool IsIdentValid(const Anope::string &ident) override
 	{
 		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
@@ -317,7 +329,7 @@ struct IRCDMessageBMask : IRCDMessage
 {
 	IRCDMessageBMask(Module *creator) : IRCDMessage(creator, "BMASK", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	/*            0          1        2  3              */
+	/*            0          1        2 3               */
 	/* :0MC BMASK 1350157102 #channel b :*!*@*.test.com */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
@@ -332,6 +344,31 @@ struct IRCDMessageBMask : IRCDMessage
 			while (bans.GetToken(token))
 				c->SetModeInternal(source, mode, token);
 		}
+	}
+};
+
+struct IRCDMessageCapab : Message::Capab
+{
+	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	/*       0                 */
+	/* CAPAB :TBURST EOB MLOCK */
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		spacesepstream sep(params[0]);
+		Anope::string capab;
+
+		while (sep.GetToken(capab))
+		{
+			if (capab.find("HOP") != Anope::string::npos || capab.find("RHOST") != Anope::string::npos)
+				ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
+			if (capab.find("AOP") != Anope::string::npos)
+				ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT", 'a', '&', 3));
+			if (capab.find("QOP") != Anope::string::npos)
+				ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '~', 4));
+		}
+
+		Message::Capab::Run(source, params, tags);
 	}
 };
 
@@ -357,7 +394,32 @@ struct IRCDMessageJoin : Message::Join
 		std::vector<Anope::string> p = params;
 		p.erase(p.begin());
 
-		return Message::Join::Run(source, p, tags);
+		Message::Join::Run(source, p, tags);
+	}
+};
+
+struct IRCDMessageMLock : IRCDMessage
+{
+	IRCDMessageMLock(Module *creator) : IRCDMessage(creator, "MLOCK", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	/*            0          1        2          3   */
+	/* :0MC MLOCK 1350157102 #channel 1350158923 :nt */
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		Channel *c = Channel::Find(params[1]);
+
+		if (c && c->ci)
+		{
+			ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
+			Anope::string modes;
+
+			if (modelocks)
+				modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+
+			// Mode lock string is not what we say it is?
+			if (modes != params[3])
+				UplinkSocket::Message(Me) << "MLOCK " << c->creation_time << " " << c->name << " " << Anope::CurTime << " :" << modes;
+		}
 	}
 };
 
@@ -400,7 +462,7 @@ struct IRCDMessageServer : IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	/*        0          1 2   3  4                       */
+	/*        0          1 2   3 4                        */
 	/* SERVER hades.arpa 1 4XY + :ircd-hybrid test server */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
@@ -422,9 +484,9 @@ struct IRCDMessageServer : IRCDMessage
 
 struct IRCDMessageSID : IRCDMessage
 {
-	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 5) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	/*          0          1 2   3  4                       */
+	/*          0          1 2   3 4                        */
 	/* :0MC SID hades.arpa 2 4XY + :ircd-hybrid test server */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
@@ -437,15 +499,16 @@ struct IRCDMessageSID : IRCDMessage
 
 struct IRCDMessageSJoin : IRCDMessage
 {
-	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
+	/*            0          1       2   3                      */
+	/* :0MC SJOIN 1654877335 #nether +nt :@0MCAAAAAB +0MCAAAAAC */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		Anope::string modes;
 
-		if (params.size() >= 3)
-			for (unsigned i = 2; i < params.size() - 1; ++i)
-				modes += " " + params[i];
+		for (unsigned i = 2; i < params.size() - 1; ++i)
+			modes += " " + params[i];
 
 		if (!modes.empty())
 			modes.erase(modes.begin());
@@ -485,11 +548,8 @@ struct IRCDMessageSVSMode : IRCDMessage
 {
 	IRCDMessageSVSMode(Module *creator) : IRCDMessage(creator, "SVSMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	/*
-	 * parv[0] = nickname
-	 * parv[1] = TS
-	 * parv[2] = mode
-	 */
+	/*              0         1          2  */
+	/* :0MC SVSMODE 0MCAAAAAB 1350157102 +r */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		User *u = User::Find(params[0]);
@@ -508,6 +568,8 @@ struct IRCDMessageTBurst : IRCDMessage
 {
 	IRCDMessageTBurst(Module *creator) : IRCDMessage(creator, "TBURST", 5) { }
 
+	/*             0          1       2          3                      4                      */
+	/* :0MC TBURST 1654867975 #nether 1654877335 Steve!~steve@the.mines :Join the ghast nation */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		Anope::string setter;
@@ -524,6 +586,8 @@ struct IRCDMessageTMode : IRCDMessage
 {
 	IRCDMessageTMode(Module *creator) : IRCDMessage(creator, "TMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
+	/*            0          1       2    */
+	/* :0MC TMODE 1654867975 #nether +ntR */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		time_t ts = 0;
@@ -547,14 +611,14 @@ struct IRCDMessageTMode : IRCDMessage
 
 struct IRCDMessageUID : IRCDMessage
 {
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
+	/*          0     1 2          3   4      5            6         7        8         9     10                   */
+	/* :0MC UID Steve 1 1350157102 +oi ~steve virtual.host real.host 10.0.0.1 0MCAAAAAB Steve :Mining all the time */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		NickAlias *na = NULL;
 
-		/*          0     1 2          3   4      5            6         7        8         9      10                  */
-		/* :0MC UID Steve 1 1350157102 +oi ~steve virtual.host real.host 10.0.0.1 0MCAAAAAB Steve :Mining all the time */
 		if (params[9] != "*")
 			na = NickAlias::Find(params[9]);
 
@@ -586,7 +650,6 @@ class ProtoHybrid : public Module
 
 	/* Core message handlers */
 	Message::Away message_away;
-	Message::Capab message_capab;
 	Message::Error message_error;
 	Message::Invite message_invite;
 	Message::Kick message_kick;
@@ -607,8 +670,10 @@ class ProtoHybrid : public Module
 
 	/* Our message handlers */
 	IRCDMessageBMask message_bmask;
+	IRCDMessageCapab message_capab;
 	IRCDMessageEOB message_eob;
 	IRCDMessageJoin message_join;
+	IRCDMessageMLock message_mlock;
 	IRCDMessageNick message_nick;
 	IRCDMessagePass message_pass;
 	IRCDMessagePong message_pong;
@@ -621,11 +686,13 @@ class ProtoHybrid : public Module
 	IRCDMessageUID message_uid;
 	IRCDMessageCertFP message_certfp;
 
+	bool use_server_side_mlock;
+
 	void AddModes()
 	{
 		/* Add user modes */
 		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));
-		ModeManager::AddUserMode(new UserModeOperOnly("CALLERID", 'g'));
+		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
 		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
 		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
@@ -634,21 +701,22 @@ class ProtoHybrid : public Module
 		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
 		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
 		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
 		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
 		ModeManager::AddUserMode(new UserMode("SOFTCALLERID", 'G'));
 		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeNoone("SSL", 'S'));
 		ModeManager::AddUserMode(new UserModeNoone("WEBIRC", 'W'));
+		ModeManager::AddUserMode(new UserMode("SECUREONLY", 'Z'));
 
 		/* b/e/I */
 		ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
 		ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
 		ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
 
-		/* v/h/o */
+		/* v/o */
 		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
-		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
 		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));
 
 		/* l/k */
@@ -664,25 +732,28 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
 		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
-		ModeManager::AddChannelMode(new ChannelMode("HIDEBMASKS", 'u'));
 		ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
 		ModeManager::AddChannelMode(new ChannelMode("NOKNOCK", 'K'));
 		ModeManager::AddChannelMode(new ChannelModeOperOnly("LBAN", 'L'));
 		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
+		ModeManager::AddChannelMode(new ChannelMode("NONICK", 'N'));
 		ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
+		ModeManager::AddChannelMode(new ChannelMode("NOKICK", 'Q'));
 		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
 		ModeManager::AddChannelMode(new ChannelMode("SSL", 'S'));
 		ModeManager::AddChannelMode(new ChannelMode("NONOTICE", 'T'));
+		ModeManager::AddChannelMode(new ChannelMode("NOINVITE", 'V'));
+		ModeManager::AddChannelMode(new ChannelModeNoone("ISSECURE", 'Z'));
 	}
 
-public:
+ public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
-		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),
+		message_away(this), message_error(this), message_invite(this), message_kick(this),
 		message_kill(this), message_mode(this), message_motd(this), message_notice(this), message_part(this),
 		message_ping(this), message_privmsg(this), message_quit(this), message_squit(this), message_stats(this),
 		message_time(this), message_topic(this), message_version(this), message_whois(this),
-		message_bmask(this), message_eob(this), message_join(this),
+		message_bmask(this), message_capab(this), message_eob(this), message_join(this), message_mlock(this),
 		message_nick(this), message_pass(this), message_pong(this), message_server(this), message_sid(this),
 		message_sjoin(this), message_svsmode(this), message_tburst(this), message_tmode(this), message_uid(this),
 		message_certfp(this)
@@ -694,6 +765,56 @@ public:
 	void OnUserNickChange(User *u, const Anope::string &) override
 	{
 		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
+	}
+
+	void OnReload(Configuration::Conf *conf) override
+	{
+		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
+	}
+
+	void OnChannelSync(Channel *c) override
+	{
+		if (!c->ci)
+			return;
+
+		ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
+		if (use_server_side_mlock && modelocks && Servers::Capab.count("MLOCK"))
+		{
+			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+			UplinkSocket::Message(Me) << "MLOCK " << c->creation_time << " " << c->ci->name << " " << Anope::CurTime << " :" << modes;
+		}
+	}
+
+	void OnDelChan(ChannelInfo *ci) override
+	{
+		if (use_server_side_mlock && ci->c && Servers::Capab.count("MLOCK"))
+			UplinkSocket::Message(Me) << "MLOCK " << ci->c->creation_time << " " << ci->name << " " << Anope::CurTime << " :";
+	}
+
+	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
+	{
+		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
+		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
+		{
+			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
+			UplinkSocket::Message(Me) << "MLOCK " << ci->c->creation_time << " " << ci->name << " " << Anope::CurTime << " :" << modes;
+		}
+
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) override
+	{
+		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
+		if (use_server_side_mlock && cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
+		{
+			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
+			UplinkSocket::Message(Me) << "MLOCK " << ci->c->creation_time << " " << ci->name << " " << Anope::CurTime << " :" << modes;
+		}
+
+		return EVENT_CONTINUE;
 	}
 };
 

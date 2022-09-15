@@ -7235,7 +7235,7 @@ msgstr "Limita l'accesso al canale"
 
 #: modules/commands/cs_set.cpp:1291
 msgid "Restricted access"
-msgstr "Acesso limitato"
+msgstr "Accesso limitato"
 
 #: modules/commands/cs_set.cpp:661
 #, c-format

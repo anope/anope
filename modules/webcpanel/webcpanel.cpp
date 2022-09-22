@@ -28,6 +28,7 @@ class ModuleWebCPanel : public Module
 	WebCPanel::NickServ::Cert nickserv_cert;
 	WebCPanel::NickServ::Access nickserv_access;
 	WebCPanel::NickServ::Alist nickserv_alist;
+	WebCPanel::NickServ::Confirm nickserv_confirm;
 
 	WebCPanel::ChanServ::Info chanserv_info;
 	WebCPanel::ChanServ::Set chanserv_set;
@@ -49,7 +50,7 @@ class ModuleWebCPanel : public Module
 		id(this, "webcpanel_id"), ip(this, "webcpanel_ip"), last_login(this, "webcpanel_last_login"),
 		style_css("style.css", "/static/style.css", "text/css"), logo_png("logo.png", "/static/logo.png", "image/png"), cubes_png("cubes.png", "/static/cubes.png", "image/png"), favicon_ico("favicon.ico", "/favicon.ico", "image/x-icon"),
 		index("/"), logout("/logout"), _register("/register"), confirm("/confirm"),
-		nickserv_info("NickServ", "/nickserv/info"), nickserv_cert("NickServ", "/nickserv/cert"), nickserv_access("NickServ", "/nickserv/access"), nickserv_alist("NickServ", "/nickserv/alist"),
+		nickserv_info("NickServ", "/nickserv/info"), nickserv_cert("NickServ", "/nickserv/cert"), nickserv_access("NickServ", "/nickserv/access"), nickserv_alist("NickServ", "/nickserv/alist"), nickserv_confirm("NickServ", "/nickserv/confirm"),
 		chanserv_info("ChanServ", "/chanserv/info"), chanserv_set("ChanServ", "/chanserv/set"), chanserv_access("ChanServ", "/chanserv/access"), chanserv_akick("ChanServ", "/chanserv/akick"),
 		chanserv_modes("ChanServ", "/chanserv/modes"), chanserv_drop("ChanServ", "/chanserv/drop"), memoserv_memos("MemoServ", "/memoserv/memos"), hostserv_request("HostServ", "/hostserv/request"),
 		operserv_akill("OperServ", "/operserv/akill")
@@ -106,6 +107,11 @@ class ModuleWebCPanel : public Module
 			ss.url = "/nickserv/alist";
 			s.subsections.push_back(ss);
 			provider->RegisterPage(&this->nickserv_alist);
+
+			ss.name = "Confirm";
+			ss.url = "/nickserv/confirm";
+			s.subsections.push_back(ss);
+			provider->RegisterPage(&this->nickserv_confirm);
 
 			panel.sections.push_back(s);
 		}
@@ -214,6 +220,7 @@ class ModuleWebCPanel : public Module
 			provider->UnregisterPage(&this->nickserv_cert);
 			provider->UnregisterPage(&this->nickserv_access);
 			provider->UnregisterPage(&this->nickserv_alist);
+			provider->UnregisterPage(&this->nickserv_confirm);
 
 			provider->UnregisterPage(&this->chanserv_info);
 			provider->UnregisterPage(&this->chanserv_set);

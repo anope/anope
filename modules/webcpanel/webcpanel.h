@@ -166,6 +166,7 @@ namespace WebPanel
 #include "pages/nickserv/cert.h"
 #include "pages/nickserv/access.h"
 #include "pages/nickserv/alist.h"
+#include "pages/nickserv/confirm.h"
 
 #include "pages/chanserv/info.h"
 #include "pages/chanserv/set.h"

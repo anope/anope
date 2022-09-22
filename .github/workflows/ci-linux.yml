@@ -22,6 +22,7 @@ jobs:
             libgnutls28-dev \
             libldap2-dev \
             libmysqlclient-dev \
+            libpcre2-dev \
             libpcre3-dev \
             libsqlite3-dev \
             libssl-dev \
@@ -29,7 +30,7 @@ jobs:
             make
       - name: Enable extras
         run: |
-          for MODULE in m_ldap.cpp m_ldap_authentication.cpp m_ldap_oper.cpp m_mysql.cpp m_regex_pcre.cpp m_regex_posix.cpp m_regex_tre.cpp m_sql_authentication.cpp m_sql_log.cpp m_sql_oper.cpp m_sqlite.cpp m_ssl_gnutls.cpp m_ssl_openssl.cpp stats
+          for MODULE in m_ldap.cpp m_ldap_authentication.cpp m_ldap_oper.cpp m_mysql.cpp m_regex_pcre.cpp m_regex_pcre2.cpp m_regex_posix.cpp m_regex_tre.cpp m_sql_authentication.cpp m_sql_log.cpp m_sql_oper.cpp m_sqlite.cpp m_ssl_gnutls.cpp m_ssl_openssl.cpp stats
           do
             ln -s ${{ github.workspace }}/modules/extra/$MODULE ${{ github.workspace }}/modules
           done

@@ -14,10 +14,10 @@ WebCPanel::NickServ::Confirm::Confirm(const Anope::string &cat, const Anope::str
 bool WebCPanel::NickServ::Confirm::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 
-		std::vector<Anope::string> params;
-		params.push_back(message.post_data["code"]);
+	std::vector<Anope::string> params;
+	params.push_back(message.post_data["code"]);
 
-		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/confirm", params, replacements);
+	WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/confirm", params, replacements);
 
 	TemplateFileServer page("nickserv/confirm.html");
 

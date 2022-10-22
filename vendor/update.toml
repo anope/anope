@@ -1,0 +1,8 @@
+[bcrypt]
+author  = "Solar Designer"
+email   = "solar@openwall.com"
+files   = "crypt_blowfish.[ch]"
+license = "Public Domain"
+tarball = "https://www.openwall.com/crypt/crypt_blowfish-1.3.tar.gz"
+version = "v1.3"
+website = "https://www.openwall.com/crypt/"

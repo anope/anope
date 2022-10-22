@@ -138,7 +138,11 @@ else()
 endif()
 
 # Use the following directories as includes
-include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include)
+include_directories(
+  ${Anope_BINARY_DIR}/include
+  ${Anope_SOURCE_DIR}/include
+  ${Anope_SOURCE_DIR}/vendor
+)
 
 # Pass on REPRODUCIBLE_BUILD
 if(REPRODUCIBLE_BUILD)

@@ -6,6 +6,7 @@ modules/m_ldap_authentication.cpp
 modules/m_ldap_oper.cpp
 modules/m_mysql.cpp
 modules/m_regex_pcre.cpp
+modules/m_regex_pcre2.cpp
 modules/m_regex_posix.cpp
 modules/m_regex_tre.cpp
 modules/m_sql_authentication.cpp

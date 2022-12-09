@@ -1,3 +1,13 @@
+Anope Version 2.0.12
+--------------------
+Added account confirmation to the web panel
+Added the regex_pcre2 module which provides regex/pcre with PCRE2
+Documented the cs_no_expire channel default
+Fixed config validation mistakenly allowing spaces in some fields
+Fixed the bahamut protocol module not knowing about halfops
+Fixed writing a flatfile database not being atomic
+Updated the hybrid protocol module for recent protocol changes
+
 Anope Version 2.0.11
 --------------------
 Fixed ldap on OpenLDAP 2.5+

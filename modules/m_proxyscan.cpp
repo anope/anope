@@ -26,7 +26,7 @@ class ProxyCallbackListener : public ListenSocket
 	class ProxyCallbackClient : public ClientSocket, public BufferedSocket
 	{
 	 public:
-		ProxyCallbackClient(ListenSocket *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), ClientSocket(l, a), BufferedSocket()
+		ProxyCallbackClient(ListenSocket *l, int f, const sockaddrs &a) : Socket(f, l->GetFamily()), ClientSocket(l, a), BufferedSocket()
 		{
 		}
 

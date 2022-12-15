@@ -473,7 +473,7 @@ class TCPSocket : public ListenSocket
 		int length = 0;
 
 	 public:
-		Client(Manager *m, TCPSocket *l, int fd, const sockaddrs &addr) : Socket(fd, l->IsIPv6()), ClientSocket(l, addr), Timer(5),
+		Client(Manager *m, TCPSocket *l, int fd, const sockaddrs &addr) : Socket(fd, l->GetFamily()), ClientSocket(l, addr), Timer(5),
 			manager(m)
 		{
 			Log(LOG_DEBUG_2) << "Resolver: New client from " << addr.addr();

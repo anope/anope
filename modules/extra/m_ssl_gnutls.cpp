@@ -533,7 +533,7 @@ void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int 
 
 	s->flags[SF_CONNECTING] = s->flags[SF_CONNECTED] = false;
 
-	s->conaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, target, port);
+	s->conaddr.pton(s->GetFamily(), target, port);
 	int c = connect(s->GetFD(), &s->conaddr.sa, s->conaddr.size());
 	if (c == -1)
 	{

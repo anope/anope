@@ -150,10 +150,10 @@ namespace Configuration
 		Anope::string host;
 		unsigned port;
 		Anope::string password;
-		bool ipv6;
+		int protocol;
 
-		Uplink(const Anope::string &_host, int _port, const Anope::string &_password, bool _ipv6) : host(_host), port(_port), password(_password), ipv6(_ipv6) { }
-		inline bool operator==(const Uplink &other) const { return host == other.host && port == other.port && password == other.password && ipv6 == other.ipv6; }
+		Uplink(const Anope::string &_host, int _port, const Anope::string &_password, int _protocol) : host(_host), port(_port), password(_password), protocol(_protocol) { }
+		inline bool operator==(const Uplink &other) const { return host == other.host && port == other.port && password == other.password && protocol == other.protocol; }
 		inline bool operator!=(const Uplink &other) const { return !(*this == other); }
 	};
 }

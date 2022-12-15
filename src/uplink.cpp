@@ -52,12 +52,12 @@ void Uplink::Connect()
 	if (!Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost").empty())
 		UplinkSock->Bind(Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost"));
 	FOREACH_MOD(OnPreServerConnect, ());
-	Anope::string ip = Anope::Resolve(u.host, u.ipv6 ? AF_INET6 : AF_INET);
+	Anope::string ip = Anope::Resolve(u.host, u.protocol);
 	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u.host << " (" << ip << '/' << u.port << ") with protocol " << IRCD->GetProtocolName();
 	UplinkSock->Connect(ip, u.port);
 }
 
-UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].ipv6), ConnectionSocket(), BufferedSocket()
+UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].protocol), ConnectionSocket(), BufferedSocket()
 {
 	error = false;
 	UplinkSock = this;

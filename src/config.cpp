@@ -193,19 +193,33 @@ Conf::Conf() : Block(""), EmptyBlock("")
 	{
 		Block *uplink = this->GetBlock("uplink", i);
 
+		int protocol;
+		const Anope::string &protocolstr = uplink->Get<const Anope::string>("protocol", "ipv4");
+		if (protocolstr == "ipv4")
+			protocol = AF_INET;
+		else if (protocolstr == "ipv6")
+			protocol = AF_INET6;
+		else if (protocolstr == "unix")
+			protocol = AF_UNIX;
+		else
+			throw ConfigException("uplink:protocol must be set to ipv4, ipv6, or unix");
+
 		const Anope::string &host = uplink->Get<const Anope::string>("host");
-		bool ipv6 = uplink->Get<bool>("ipv6");
-		int port = uplink->Get<int>("port");
-		const Anope::string &password = uplink->Get<const Anope::string>("password");
-
 		ValidateNotEmptyOrSpaces("uplink", "host", host);
-		ValidateNotZero("uplink", "port", port);
-		ValidateNotEmptyOrSpaces("uplink", "password", password);
 
-		if (password.find(' ') != Anope::string::npos || password[0] == ':')
+		int port = 0;
+		if (protocol != AF_UNIX)
+		{
+			ValidateNotZero("uplink", "port", port);
+			port = uplink->Get<int>("port");
+		}
+
+		const Anope::string &password = uplink->Get<const Anope::string>("password");
+		ValidateNotEmptyOrSpaces("uplink", "password", password);
+		if (password[0] == ':')
 			throw ConfigException("uplink:password is not valid");
 
-		this->Uplinks.emplace_back(host, port, password, ipv6);
+		this->Uplinks.emplace_back(host, port, password, protocol);
 	}
 
 	for (int i = 0; i < this->CountBlock("module"); ++i)

@@ -15,9 +15,15 @@
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/un.h>
 #endif
 
 #include "anope.h"
+
+// This has to be after anope.h
+#ifdef _WIN32
+# include <afunix.h>
+#endif
 
 #define NET_BUFSIZE 65535
 
@@ -28,6 +34,7 @@ union CoreExport sockaddrs
 	sockaddr sa;
 	sockaddr_in sa4;
 	sockaddr_in6 sa6;
+	sockaddr_un saun;
 
 	/** Construct the object, sets everything to 0
 	 */
@@ -203,8 +210,9 @@ class CoreExport Socket
  protected:
 	/* Socket FD */
 	int sock;
-	/* Is this an IPv6 socket? */
-	bool ipv6;
+
+	/* The family of this socket FD */
+	int family;
 
  public:
 	std::bitset<SF_SIZE> flags;
@@ -221,24 +229,24 @@ class CoreExport Socket
 
 	/** Constructor, possibly creates the socket and adds it to the engine
 	 * @param sock The socket to use, -1 if we need to create our own
-	 * @param ipv6 true if using ipv6
+	 * @param family The family of the socket
 	 * @param type The socket type, defaults to SOCK_STREAM
 	 */
-	Socket(int sock, bool ipv6 = false, int type = SOCK_STREAM);
+	Socket(int sock, bool family = AF_INET, int type = SOCK_STREAM);
 
 	/** Destructor, closes the socket and removes it from the engine
 	 */
 	virtual ~Socket();
 
+	/** Get the socket family for this socket
+	 * @return the family
+	 */
+	int GetFamily() const;
+
 	/** Get the socket FD for this socket
 	 * @return the fd
 	 */
 	int GetFD() const;
-
-	/** Check if this socket is IPv6
-	 * @return true or false
-	 */
-	bool IsIPv6() const;
 
 	/** Mark a socket as (non)blocking
 	 * @param state true to enable blocking, false to disable blocking

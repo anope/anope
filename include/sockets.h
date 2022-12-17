@@ -63,6 +63,11 @@ union CoreExport sockaddrs
 	 */
 	Anope::string addr() const;
 
+	/** Gets the endpoint represented by this addr.
+	 * @return The endpoint.
+	 */
+	Anope::string str() const;
+
 	/** Get the reverse address represented by this addr
 	 * @return The reverse address
 	 */
@@ -232,7 +237,7 @@ class CoreExport Socket
 	 * @param family The family of the socket
 	 * @param type The socket type, defaults to SOCK_STREAM
 	 */
-	Socket(int sock, bool family = AF_INET, int type = SOCK_STREAM);
+	Socket(int sock, int family = AF_INET, int type = SOCK_STREAM);
 
 	/** Destructor, closes the socket and removes it from the engine
 	 */

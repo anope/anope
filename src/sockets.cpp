@@ -80,18 +80,49 @@ int sockaddrs::port() const
 
 Anope::string sockaddrs::addr() const
 {
-	char address[INET6_ADDRSTRLEN];
-
 	switch (sa.sa_family)
 	{
 		case AF_INET:
-			if (inet_ntop(AF_INET, &sa4.sin_addr, address, sizeof(address)))
-				return address;
+		{
+			char v4address[INET_ADDRSTRLEN];
+			if (inet_ntop(AF_INET, &sa4.sin_addr, v4address, sizeof(v4address)))
+				return v4address;
 			break;
+		}
 		case AF_INET6:
-			if (inet_ntop(AF_INET6, &sa6.sin6_addr, address, sizeof(address)))
-				return address;
+		{
+			char v6address[INET6_ADDRSTRLEN];
+			if (inet_ntop(AF_INET6, &sa6.sin6_addr, v6address, sizeof(v6address)))
+				return v6address;
 			break;
+		}
+		case AF_UNIX:
+			return saun.sun_path;
+		default:
+			break;
+	}
+
+	return "";
+}
+
+Anope::string sockaddrs::str() const
+{
+	switch (sa.sa_family)
+	{
+		case AF_INET:
+		{
+			char v4address[INET_ADDRSTRLEN];
+			if (!inet_ntop(AF_INET, &sa4.sin_addr, v4address, sizeof(v4address)))
+				strcpy(v4address, "0.0.0.0");
+			return Anope::printf("%s:%u", v4address, sa4.sin_port);
+		}
+		case AF_INET6:
+		{
+			char v6address[INET6_ADDRSTRLEN];
+			if (!inet_ntop(AF_INET6, &sa6.sin6_addr, v6address, sizeof(v6address)))
+				strcpy(v6address, "0:0:0:0:0:0:0:0");
+			return Anope::printf("[%s]:%u", v6address, sa6.sin6_port);
+		}
 		case AF_UNIX:
 			return saun.sun_path;
 		default:
@@ -503,7 +534,7 @@ Socket::Socket()
 	throw CoreException("Socket::Socket() ?");
 }
 
-Socket::Socket(int s, bool f, int type)
+Socket::Socket(int s, int f, int type)
 {
 	this->io = &NormalSocketIO;
 	this->family = f;

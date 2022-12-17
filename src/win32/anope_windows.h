@@ -51,7 +51,6 @@
 #define EINPROGRESS WSAEWOULDBLOCK
 
 #include "socket.h"
-#include "dir/dir.h"
 #include "dl/dl.h"
 #include "pipe/pipe.h"
 #include "pthread/pthread.h"

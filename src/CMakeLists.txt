@@ -2,7 +2,6 @@
 file(GLOB SRC_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 
 if(WIN32)
-  list(APPEND SRC_SRCS win32/dir/dir.cpp)
   list(APPEND SRC_SRCS win32/socket.cpp)
   list(APPEND SRC_SRCS win32/windows.cpp)
   list(APPEND SRC_SRCS win32/dl/dl.cpp)

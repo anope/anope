@@ -15,10 +15,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifndef _WIN32
-#include <dirent.h>
 #include <sys/types.h>
 #include <dlfcn.h>
 #endif
+
+#include <filesystem>
 
 std::list<Module *> ModuleManager::Modules;
 std::vector<Module *> ModuleManager::EventHandlers[I_SIZE];
@@ -29,25 +30,18 @@ void ModuleManager::CleanupRuntimeDirectory()
 	Anope::string dirbuf = Anope::DataDir + "/runtime";
 
 	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment, please wait";
-
-	DIR *dirp = opendir(dirbuf.c_str());
-	if (!dirp)
+	try
 	{
-		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << ")";
-		return;
+		for (const auto &entry : std::filesystem::directory_iterator(dirbuf.str()))
+		{
+			if (entry.is_regular_file())
+				std::filesystem::remove(entry);
+		}
 	}
-
-	for (dirent *dp; (dp = readdir(dirp));)
+	catch (const std::filesystem::filesystem_error &err)
 	{
-		if (!dp->d_ino)
-			continue;
-		if (Anope::string(dp->d_name).equals_cs(".") || Anope::string(dp->d_name).equals_cs(".."))
-			continue;
-		Anope::string filebuf = dirbuf + "/" + dp->d_name;
-		unlink(filebuf.c_str());
+		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << "): " << err.what();
 	}
-
-	closedir(dirp);
 }
 
 /**

@@ -95,13 +95,13 @@ template<> bool Block::Get(const Anope::string &tag, const Anope::string &def) c
 static void ValidateNotEmpty(const Anope::string &block, const Anope::string &name, const Anope::string &value)
 {
 	if (value.empty())
-		throw ConfigException("The value for <" + block + ":" + name + "> cannot be empty!");
+		throw ConfigException("The value for <" + block + ":" + name + "> (" + value + ") cannot be empty!");
 }
 
 static void ValidateNoSpaces(const Anope::string &block, const Anope::string &name, const Anope::string &value)
 {
 	if (value.find(' ') != Anope::string::npos)
-		throw ConfigException("The value for <" + block + ":" + name + "> may not contain spaces!");
+		throw ConfigException("The value for <" + block + ":" + name + "> (" + value + ") may not contain spaces!");
 }
 
 static void ValidateNotEmptyOrSpaces(const Anope::string &block, const Anope::string &name, const Anope::string &value)

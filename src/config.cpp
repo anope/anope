@@ -472,7 +472,7 @@ Conf::Conf() : Block("")
 		bool hide = fantasy->Get<bool>("hide"),
 			prepend_channel = fantasy->Get<bool>("prepend_channel", "yes");
 
-		ValidateNotEmptyOrSpaces("fantasy", "name", nname);
+		ValidateNotEmpty("fantasy", "name", nname);
 		ValidateNotEmptyOrSpaces("fantasy", "command", service);
 
 		CommandInfo &c = this->Fantasy[nname];

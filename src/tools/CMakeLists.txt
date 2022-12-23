@@ -15,13 +15,6 @@ foreach(SRC ${TOOLS_SRCS})
     add_executable(${EXE} ${SRC})
     set_target_properties(${EXE} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
     add_dependencies(${EXE} ${PROGRAM_NAME})
-    # Only for Windows, set anopesmtp to require the wsock32 library
-    if(WIN32 AND ${EXE} STREQUAL anopesmtp)
-      target_link_libraries(${EXE} wsock32)
-    endif()
-    if(${CMAKE_SYSTEM_NAME} STREQUAL "SunOS" AND ${EXE} STREQUAL anopesmtp)
-      target_link_libraries(${EXE} socket nsl)
-    endif()
     # Set the executable to be installed to the bin directory under the main directory
     install(TARGETS ${EXE}
       DESTINATION ${BIN_DIR}

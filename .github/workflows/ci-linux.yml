@@ -17,8 +17,6 @@ jobs:
             clang \
             g++ \
             git \
-            libc++-dev \
-            libc++abi-dev \
             libgnutls28-dev \
             libldap2-dev \
             libmysqlclient-dev \

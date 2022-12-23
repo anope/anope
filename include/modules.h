@@ -24,32 +24,7 @@
  * and functions needed to make a module loadable by the OS.
  * It defines the class factory and external AnopeInit and AnopeFini functions.
  */
-#ifdef _WIN32
-# define MODULE_INIT(x) \
-	extern "C" DllExport Module *AnopeInit(const Anope::string &, const Anope::string &); \
-	extern "C" Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
-	{ \
-		return new x(modname, creator); \
-	} \
-	BOOLEAN WINAPI DllMain(HINSTANCE, DWORD, LPVOID) \
-	{ \
-		return TRUE; \
-	} \
-	extern "C" DllExport void AnopeFini(x *); \
-	extern "C" void AnopeFini(x *m) \
-	{ \
-		delete m; \
-	} \
-	extern "C" DllExport ModuleVersionC AnopeVersion() \
-	{ \
-		ModuleVersionC ver; \
-		ver.version_major = VERSION_MAJOR; \
-		ver.version_minor = VERSION_MINOR; \
-		ver.version_patch = VERSION_PATCH; \
-		return ver; \
-	}
-#else
-# define MODULE_INIT(x) \
+#define MODULE_INIT(x) \
 	extern "C" DllExport Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
 	{ \
 		return new x(modname, creator); \
@@ -66,7 +41,6 @@
 		ver.version_patch = VERSION_PATCH; \
 		return ver; \
 	}
-#endif
 
 /**
  * This #define allows us to call a method in all

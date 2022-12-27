@@ -210,8 +210,8 @@ Conf::Conf() : Block(""), EmptyBlock("")
 		int port = 0;
 		if (protocol != AF_UNIX)
 		{
-			ValidateNotZero("uplink", "port", port);
 			port = uplink->Get<int>("port");
+			ValidateNotZero("uplink", "port", port);
 		}
 
 		const Anope::string &password = uplink->Get<const Anope::string>("password");

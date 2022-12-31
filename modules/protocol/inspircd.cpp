@@ -1,6 +1,6 @@
 /* InspIRCd functions
  *
- * (C) 2003-2022 Anope Team
+ * (C) 2003-2023 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -281,8 +281,16 @@ class InspIRCdProto : public IRCDProto
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "UID " << u->GetUID() << " " << u->timestamp << " " << u->nick << " " << u->host << " " << u->host << " " << u->GetIdent() << " 0.0.0.0 " << u->timestamp << " " << modes << " :" << u->realname;
+
 		if (modes.find('o') != Anope::string::npos)
+		{
+			// Mark as introduced so we can send an oper type.
+			BotInfo *bi = BotInfo::Find(u->nick, true);
+			if (bi)
+				bi->introduced = true;
+
 			UplinkSocket::Message(u) << "OPERTYPE :service";
+		}
 	}
 
 	void SendServer(const Server *server) override

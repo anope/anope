@@ -1,6 +1,6 @@
 /* Configuration file handling.
  *
- * (C) 2003-2022 Anope Team
+ * (C) 2003-2023 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -80,13 +80,13 @@ template<> bool Block::Get(const Anope::string &tag, const Anope::string &def) c
 static void ValidateNotEmpty(const Anope::string &block, const Anope::string &name, const Anope::string &value)
 {
 	if (value.empty())
-		throw ConfigException("The value for <" + block + ":" + name + "> cannot be empty!");
+		throw ConfigException("The value for <" + block + ":" + name + "> (" + value + ") cannot be empty!");
 }
 
 static void ValidateNoSpaces(const Anope::string &block, const Anope::string &name, const Anope::string &value)
 {
 	if (value.find(' ') != Anope::string::npos)
-		throw ConfigException("The value for <" + block + ":" + name + "> may not contain spaces!");
+		throw ConfigException("The value for <" + block + ":" + name + "> (" + value + ") may not contain spaces!");
 }
 
 static void ValidateNotEmptyOrSpaces(const Anope::string &block, const Anope::string &name, const Anope::string &value)
@@ -471,7 +471,7 @@ Conf::Conf() : Block(""), EmptyBlock("")
 		bool hide = fantasy->Get<bool>("hide"),
 			prepend_channel = fantasy->Get<bool>("prepend_channel", "yes");
 
-		ValidateNotEmptyOrSpaces("fantasy", "name", nname);
+		ValidateNotEmpty("fantasy", "name", nname);
 		ValidateNotEmptyOrSpaces("fantasy", "command", service);
 
 		CommandInfo &c = this->Fantasy[nname];

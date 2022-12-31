@@ -1,6 +1,6 @@
 /* Module for plain text encryption.
  *
- * (C) 2003-2022 Anope Team
+ * (C) 2003-2023 Anope Team
  * Contact us at team@anope.org
  *
  * This program is free but copyrighted software; see the file COPYING for

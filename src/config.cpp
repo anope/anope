@@ -943,5 +943,10 @@ void Conf::LoadConf(File &file)
 	if (!itemname.empty() || !wordbuffer.empty())
 		throw ConfigException("Unexpected garbage at end of file: " + file.GetName());
 	if (!block_stack.empty())
-		throw ConfigException("Unterminated block at end of file: " + file.GetName() + ". Block was opened on line " + stringify(block_stack.top()->linenum));
+	{
+		if (block_stack.top())
+			throw ConfigException("Unterminated block at end of file: " + file.GetName() + ". Block was opened on line " + stringify(block_stack.top()->linenum));
+		else
+			throw ConfigException("Unterminated commented block at end of file: " + file.GetName());
+	}
 }

@@ -407,6 +407,11 @@ class UnrealIRCdProto : public IRCDProto
 		{
 			distmask = uid.substr(0, p);
 		}
+
+		if (!vident.empty())
+			UplinkSocket::Message(Me) << "CHGIDENT " << uid << " " << vident;
+		if (!vhost.empty())
+			UplinkSocket::Message(Me) << "CHGHOST " << uid << " " << vhost;
 		UplinkSocket::Message(Me) << "SVSLOGIN " << distmask << " " << uid << " " << acc;
 	}
 

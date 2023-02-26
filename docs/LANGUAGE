@@ -58,6 +58,8 @@ Anope Multi Language Support
     Poedit (https://poedit.net/) is a popular po file editor, and we recommend using it or another editor designed to edit
     po files (especially on Windows).
 
-    After editing the relevant file in languages/, run `update.sh` in the languages/ folder, i.e. `cd` to it and run
+    Before editing the relevant file in languages/, run `update.sh` in the languages/ folder, i.e. `cd` to it and run
         ./update.sh
+    This will update the language file to contain all strings that need a translation.
+
     Then commit only the changed .po files in git.

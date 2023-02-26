@@ -4,6 +4,7 @@ Anope Multi Language Support
 1) Building Anope with gettext support
 2) Adding a new language
 3) Using languages with modules
+4) Updating a language file
 
 1) Building Anope with gettext support
 
@@ -51,3 +52,14 @@ Anope Multi Language Support
 
     All .po and .pot files should be placed in modules/third/language. Additionally an update script is provided there
     that will create .pot files and merge any changes to it with existing .po files.
+
+4) Updating a language file
+
+    Poedit (https://poedit.net/) is a popular po file editor, and we recommend using it or another editor designed to edit
+    po files (especially on Windows).
+
+    Before editing the relevant file in languages/, run `update.sh` in the languages/ folder, i.e. `cd` to it and run
+        ./update.sh
+    This will update the language file to contain all strings that need a translation.
+
+    Then commit only the changed .po files in git.

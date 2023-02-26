@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-26 23:39+0100\n"
-"PO-Revision-Date: 2023-02-26 23:10+0100\n"
+"POT-Creation-Date: 2023-02-27 00:01+0100\n"
+"PO-Revision-Date: 2023-02-27 00:01+0100\n"
 "Last-Translator: henk\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -1908,7 +1908,7 @@ msgid "Access to this command requires the permission %s to be present in your
 msgstr "Um Zugriff auf diesen Befehl zu haben benötigst Du die Berechtigung %s in Deinem Oper Type."
 
 msgid "Account"
-msgstr ""
+msgstr "Konto"
 
 #, c-format
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
@@ -8321,7 +8321,6 @@ msgid ""
 "access entries on the channel."
 msgstr ""
 
-#, fuzzy
 msgid ""
 "This command ungroups your nick, or if given, the specified nick,\n"
 "from the group it is in. The ungrouped nick keeps its registration\n"
@@ -8329,12 +8328,10 @@ msgid ""
 "is reset. You may not ungroup yourself if there is only one nick in\n"
 "your group."
 msgstr ""
-"Syntax: UNGROUP [nick]\n"
-"Dieser befehl hebt die Gruppierung deines Nicks oder eines ausgewählten Nicks auf,\n"
-"Der Nick ohne Gruppierung behält  Registrierung\n"
-"Zeit,PAsswort, Email, Begrüßungsnachricht, Sprache, url, and icq. \n"
-"Alles andere wird zurückgesetzt.Du kannst die Gruppierung nicht aufheben wenn sich nur ein nick\n"
-"in der gruppe befindet."
+"Dieser Befehl entfernt deinen oder einen angegebenen Nicknamen aus seiner Gruppe.\n"
+"Der entfernte Nickname behält Registrierungszeitpunkt, Passwort, Email,\n"
+"Begrüßungsnachricht, Sprache und URL. Alles andere wird zurückgesetzt.\n"
+"Du kannst die Gruppierung nicht aufheben wenn sich nur ein Nickname in der Gruppe befindet."
 
 #, fuzzy
 msgid "This command unloads the module named modname."
@@ -9661,6 +9658,3 @@ msgstr "{Nickname | Kanal}"
 
 msgid "{nick | channel} memo-text"
 msgstr "{Nickname | Kanal} Memo-Text"
-
-#~ msgid "Password authentication required for that command."
-#~ msgstr "Password Authentisierung ist notwendig für diesen Befehl."

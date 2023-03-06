@@ -26,7 +26,7 @@ struct EntryMsgImpl : EntryMsg, Serializable
 		this->when = ct;
 	}
 
-	~EntryMsgImpl();
+	~EntryMsgImpl() override;
 
 	void Serialize(Serialize::Data &data) const override
 	{

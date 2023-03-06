@@ -22,7 +22,7 @@ class SXLineDelCallback : public NumberList
 	{
 	}
 
-	~SXLineDelCallback()
+	~SXLineDelCallback() override
 	{
 		if (!deleted)
 			source.Reply(_("No matching entries on the %s list."), source.command.c_str());
@@ -253,7 +253,7 @@ class CommandOSSXLineBase : public Command
 		return;
 	}
 
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 };
 
 class CommandOSSNLine : public CommandOSSXLineBase

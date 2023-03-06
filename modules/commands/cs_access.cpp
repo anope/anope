@@ -261,7 +261,7 @@ class CommandCSAccess : public Command
 						this->override = true;
 				}
 
-				~AccessDelCallback()
+				~AccessDelCallback() override
 				{
 					if (denied && !deleted)
 						source.Reply(ACCESS_DENIED);

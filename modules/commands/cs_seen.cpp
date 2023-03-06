@@ -36,7 +36,7 @@ struct SeenInfo : Serializable
 	{
 	}
 
-	~SeenInfo()
+	~SeenInfo() override
 	{
 		database_map::iterator iter = database.find(nick);
 		if (iter != database.end() && iter->second == this)

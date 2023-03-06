@@ -19,7 +19,7 @@ class Data : public Serialize::Data
  public:
 	std::map<Anope::string, std::stringstream *> data;
 
-	~Data()
+	~Data() override
 	{
 		for (std::map<Anope::string, std::stringstream *>::iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
 			delete it->second;

@@ -300,7 +300,7 @@ class ModuleXMLRPCMain : public Module
 		xmlrpc->Register(&stats);
 	}
 
-	~ModuleXMLRPCMain()
+	~ModuleXMLRPCMain() override
 	{
 		if (xmlrpc)
 			xmlrpc->Unregister(&stats);

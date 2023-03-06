@@ -363,7 +363,7 @@ class ProtoRatbox : public Module
 		this->AddModes();
 	}
 
-	~ProtoRatbox()
+	~ProtoRatbox() override
 	{
 		m_hybrid = ModuleManager::FindModule("hybrid");
 		ModuleManager::UnloadModule(m_hybrid, NULL);

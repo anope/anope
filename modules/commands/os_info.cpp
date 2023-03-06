@@ -19,7 +19,7 @@ struct OperInfo : Serializable
 	OperInfo(const Anope::string &t, const Anope::string &i, const Anope::string &a, time_t c) :
 		Serializable("OperInfo"), target(t), info(i), adder(a), created(c) { }
 
-	~OperInfo();
+	~OperInfo() override;
 
 	void Serialize(Serialize::Data &data) const override
 	{

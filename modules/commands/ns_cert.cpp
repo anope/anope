@@ -35,7 +35,7 @@ struct NSCertListImpl : NSCertList
  public:
 	NSCertListImpl(Extensible *obj) : nc(anope_dynamic_static_cast<NickCore *>(obj)) { }
 
-	~NSCertListImpl()
+	~NSCertListImpl() override
 	{
 		ClearCert();
 	}

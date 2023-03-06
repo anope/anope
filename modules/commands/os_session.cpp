@@ -139,7 +139,7 @@ class ExceptionDelCallback : public NumberList
 	{
 	}
 
-	~ExceptionDelCallback()
+	~ExceptionDelCallback() override
 	{
 		if (!deleted)
 			source.Reply(_("No matching entries on session-limit exception list."));
@@ -149,7 +149,7 @@ class ExceptionDelCallback : public NumberList
 			source.Reply(_("Deleted %d entries from session-limit exception list."), deleted);
 	}
 
-	virtual void HandleNumber(unsigned number) override
+	void HandleNumber(unsigned number) override
 	{
 		if (!number || number > session_service->GetExceptions().size())
 			return;

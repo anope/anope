@@ -69,12 +69,12 @@ class ProxyConnect : public ConnectionSocket
 		proxies.insert(this);
 	}
 
-	~ProxyConnect()
+	~ProxyConnect() override
 	{
 		proxies.erase(this);
 	}
 
-	virtual void OnConnect() override = 0;
+	void OnConnect() override = 0;
 	virtual const Anope::string GetType() const = 0;
 
  protected:
@@ -227,7 +227,7 @@ class ModuleProxyScan : public Module
 		this->listener = NULL;
 	}
 
-	~ModuleProxyScan()
+	~ModuleProxyScan() override
 	{
 		for (std::set<ProxyConnect *>::iterator it = ProxyConnect::proxies.begin(), it_end = ProxyConnect::proxies.end(); it != it_end;)
 		{

@@ -189,7 +189,7 @@ class NSSetMisc : public Module
 		me = this;
 	}
 
-	~NSSetMisc()
+	~NSSetMisc() override
 	{
 		for (Anope::map<ExtensibleItem<NSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
 			delete it->second;

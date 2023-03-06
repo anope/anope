@@ -453,7 +453,7 @@ namespace DNS
 	class ReplySocket : public virtual Socket
 	{
 	 public:
-		virtual ~ReplySocket() = default;
+		~ReplySocket() override = default;
 		virtual void Reply(Packet *p) = 0;
 	};
 }
@@ -479,7 +479,7 @@ class TCPSocket : public ListenSocket
 			Log(LOG_DEBUG_2) << "Resolver: New client from " << addr.addr();
 		}
 
-		~Client()
+		~Client() override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Exiting client from " << clientaddr.addr();
 			delete packet;
@@ -560,7 +560,7 @@ class UDPSocket : public ReplySocket
  public:
 	UDPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos, SOCK_DGRAM), manager(m) { }
 
-	~UDPSocket()
+	~UDPSocket() override
 	{
 		for (unsigned i = 0; i < packets.size(); ++i)
 			delete packets[i];
@@ -666,7 +666,7 @@ class MyManager : public Manager, public Timer
 	{
 	}
 
-	~MyManager()
+	~MyManager() override
 	{
 		delete udpsock;
 		delete tcpsock;
@@ -1022,7 +1022,7 @@ class ModuleDNS : public Module
 
 	}
 
-	~ModuleDNS()
+	~ModuleDNS() override
 	{
 		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
 		{

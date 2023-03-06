@@ -99,7 +99,7 @@ class MyNewsService : public NewsService
  public:
 	MyNewsService(Module *m) : NewsService(m) { }
 
-	~MyNewsService()
+	~MyNewsService() override
 	{
 		for (unsigned i = 0; i < 3; ++i)
 			for (unsigned j = 0; j < newsItems[i].size(); ++j)
@@ -280,13 +280,13 @@ class NewsBase : public Command
 		this->SetSyntax("LIST");
 	}
 
-	virtual ~NewsBase()
+	~NewsBase() override
 	{
 	}
 
-	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override = 0;
 
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) = 0;
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 };
 
 class CommandOSLogonNews : public NewsBase

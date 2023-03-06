@@ -18,7 +18,7 @@ struct LogSettingImpl : LogSetting, Serializable
 	{
 	}
 
-	~LogSettingImpl()
+	~LogSettingImpl() override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci)
@@ -81,7 +81,7 @@ struct LogSettingsImpl : LogSettings
 {
 	LogSettingsImpl(Extensible *) { }
 
-	~LogSettingsImpl()
+	~LogSettingsImpl() override
 	{
 		for (iterator it = (*this)->begin(); it != (*this)->end();)
 		{

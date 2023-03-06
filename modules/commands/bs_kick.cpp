@@ -165,9 +165,9 @@ class CommandBSKickBase : public Command
 	{
 	}
 
-	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) override = 0;
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override = 0;
 
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 
  protected:
 	bool CheckArguments(CommandSource &source, const std::vector<Anope::string> &params, ChannelInfo* &ci)

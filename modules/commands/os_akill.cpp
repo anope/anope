@@ -23,7 +23,7 @@ class AkillDelCallback : public NumberList
 	{
 	}
 
-	~AkillDelCallback()
+	~AkillDelCallback() override
 	{
 		if (!deleted)
 			source.Reply(_("No matching entries on the AKILL list."));

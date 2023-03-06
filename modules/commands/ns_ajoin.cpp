@@ -27,7 +27,7 @@ struct AJoinEntry : Serializable
 
 	AJoinEntry(Extensible *) : Serializable("AJoinEntry") { }
 
-	~AJoinEntry()
+	~AJoinEntry() override
 	{
 		AJoinList *channels = owner->GetExt<AJoinList>("ajoinlist");
 		if (channels)

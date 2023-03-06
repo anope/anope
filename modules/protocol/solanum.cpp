@@ -401,7 +401,7 @@ class ProtoSolanum : public Module
 		this->AddModes();
 	}
 
-	~ProtoSolanum()
+	~ProtoSolanum() override
 	{
 		m_ratbox = ModuleManager::FindModule("ratbox");
 		ModuleManager::UnloadModule(m_ratbox, NULL);

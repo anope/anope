@@ -59,7 +59,7 @@ class MemoListCallback : public NumberList
 		found = false;
 	}
 
-	~MemoListCallback()
+	~MemoListCallback() override
 	{
 		if (!found)
 			source.Reply(_("No memos to display."));

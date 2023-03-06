@@ -202,7 +202,7 @@ class ModuleWebCPanel : public Module
 		}
 	}
 
-	~ModuleWebCPanel()
+	~ModuleWebCPanel() override
 	{
 		if (provider)
 		{

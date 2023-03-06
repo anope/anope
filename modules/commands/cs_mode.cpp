@@ -18,7 +18,7 @@ struct ModeLockImpl : ModeLock, Serializable
 	{
 	}
 
-	~ModeLockImpl()
+	~ModeLockImpl() override
 	{
 		ChannelInfo *chan = ChannelInfo::Find(ci);
 		if (chan)
@@ -42,7 +42,7 @@ struct ModeLocksImpl : ModeLocks
 	{
 	}
 
-	~ModeLocksImpl()
+	~ModeLocksImpl() override
 	{
 		ModeList modelist;
 		mlocks->swap(modelist);

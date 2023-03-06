@@ -208,7 +208,7 @@ class ModuleXMLRPC : public Module
 
 	}
 
-	~ModuleXMLRPC()
+	~ModuleXMLRPC() override
 	{
 		if (httpref)
 			httpref->UnregisterPage(&xmlrpcinterface);

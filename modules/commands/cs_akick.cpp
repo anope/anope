@@ -218,7 +218,7 @@ class CommandCSAKick : public Command
 				{
 				}
 
-				~AkickDelCallback()
+				~AkickDelCallback() override
 				{
 					if (!deleted)
 						source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());

@@ -15,7 +15,7 @@
 struct BadWordImpl : BadWord, Serializable
 {
 	BadWordImpl() : Serializable("BadWord") { }
-	~BadWordImpl();
+	~BadWordImpl() override;
 
 	void Serialize(Serialize::Data &data) const override
 	{
@@ -35,7 +35,7 @@ struct BadWordsImpl : BadWords
 
 	BadWordsImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), badwords("BadWord") { }
 
-	~BadWordsImpl();
+	~BadWordsImpl() override;
 
 	BadWord* AddBadWord(const Anope::string &word, BadWordType type) override
 	{
@@ -160,7 +160,7 @@ class BadwordsDelCallback : public NumberList
 		bw = ci->Require<BadWords>("badwords");
 	}
 
-	~BadwordsDelCallback()
+	~BadwordsDelCallback() override
 	{
 		if (!deleted)
 			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());

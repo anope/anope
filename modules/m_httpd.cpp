@@ -99,7 +99,7 @@ class MyHTTPClient : public HTTPClient
 		Log(LOG_DEBUG, "httpd") << "Accepted connection " << f << " from " << a.addr();
 	}
 
-	~MyHTTPClient()
+	~MyHTTPClient() override
 	{
 		Log(LOG_DEBUG, "httpd") << "Closing connection " << this->GetFD() << " from " << this->ip;
 	}
@@ -344,7 +344,7 @@ class HTTPD : public Module
 
 	}
 
-	~HTTPD()
+	~HTTPD() override
 	{
 		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
 		{

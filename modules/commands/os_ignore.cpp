@@ -15,7 +15,7 @@
 struct IgnoreDataImpl : IgnoreData, Serializable
 {
 	IgnoreDataImpl() : Serializable("IgnoreData") { }
-	~IgnoreDataImpl();
+	~IgnoreDataImpl() override;
 	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };

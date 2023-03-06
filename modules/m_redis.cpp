@@ -23,7 +23,7 @@ class RedisSocket : public BinarySocket, public ConnectionSocket
 
 	RedisSocket(MyRedisService *pro, bool v6) : Socket(-1, v6), provider(pro) { }
 
-	~RedisSocket();
+	~RedisSocket() override;
 
 	void OnConnect() override;
 	void OnError(const Anope::string &error) override;
@@ -38,7 +38,7 @@ class Transaction : public Interface
 
 	Transaction(Module *creator) : Interface(creator) { }
 
-	~Transaction()
+	~Transaction() override
 	{
 		for (unsigned i = 0; i < interfaces.size(); ++i)
 		{
@@ -96,7 +96,7 @@ class MyRedisService : public Provider
 		sub->Connect(host, port);
 	}
 
-	~MyRedisService()
+	~MyRedisService() override
 	{
 		if (sock)
 		{
@@ -533,7 +533,7 @@ class ModuleRedis : public Module
 	{
 	}
 
-	~ModuleRedis()
+	~ModuleRedis() override
 	{
 		for (std::map<Anope::string, MyRedisService *>::iterator it = services.begin(); it != services.end(); ++it)
 		{

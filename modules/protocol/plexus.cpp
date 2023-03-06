@@ -441,7 +441,7 @@ class ProtoPlexus : public Module
 		this->AddModes();
 	}
 
-	~ProtoPlexus()
+	~ProtoPlexus() override
 	{
 		m_hybrid = ModuleManager::FindModule("hybrid");
 		ModuleManager::UnloadModule(m_hybrid, NULL);

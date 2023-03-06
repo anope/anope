@@ -115,7 +115,7 @@ class DefConTimeout : public Timer
 		timeout = this;
 	}
 
-	~DefConTimeout()
+	~DefConTimeout() override
 	{
 		timeout = NULL;
 	}

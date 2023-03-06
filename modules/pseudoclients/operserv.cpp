@@ -200,7 +200,7 @@ class OperServCore : public Module
 		XLineManager::RegisterXLineManager(&snlines);
 	}
 
-	~OperServCore()
+	~OperServCore() override
 	{
 		this->sglines.Clear();
 		this->sqlines.Clear();

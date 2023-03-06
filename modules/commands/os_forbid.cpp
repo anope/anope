@@ -68,7 +68,7 @@ class MyForbidService : public ForbidService
  public:
 	MyForbidService(Module *m) : ForbidService(m), forbid_data("ForbidData") { }
 
-	~MyForbidService()
+	~MyForbidService() override
 	{
 		std::vector<ForbidData *> f = GetForbids();
 		for (unsigned i = 0; i < f.size(); ++i)

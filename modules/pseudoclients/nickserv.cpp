@@ -29,7 +29,7 @@ class NickServCollide : public Timer
 		collides.insert(this);
 	}
 
-	~NickServCollide()
+	~NickServCollide() override
 	{
 		collides.erase(this);
 	}
@@ -68,7 +68,7 @@ class NickServHeld : public Timer
 		n->Extend<bool>("HELD");
 	}
 
-	void Tick(time_t)
+	void Tick(time_t) override
 	{
 		if (na)
 			na->Shrink<bool>("HELD");
@@ -101,7 +101,7 @@ class NickServRelease : public User, public Timer
 		IRCD->SendClientIntroduction(this);
 	}
 
-	~NickServRelease()
+	~NickServRelease() override
 	{
 		IRCD->SendQuit(this, "");
 		NickServReleases.erase(this->nick);
@@ -137,7 +137,7 @@ class NickServCore : public Module, public NickServService
 	{
 	}
 
-	~NickServCore()
+	~NickServCore() override
 	{
 		OnShutdown();
 	}

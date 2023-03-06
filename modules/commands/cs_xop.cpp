@@ -288,7 +288,7 @@ class CommandCSXOP : public Command
 				{
 				}
 
-				~XOPDelCallback()
+				~XOPDelCallback() override
 				{
 					if (!deleted)
 						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());

@@ -131,7 +131,7 @@ class SASLService : public SASL::Service, public Timer
  public:
 	SASLService(Module *o) : SASL::Service(o), Timer(o, 60, Anope::CurTime, true) { }
 
-	~SASLService()
+	~SASLService() override
 	{
 		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end(); it++)
 			delete it->second;
@@ -332,7 +332,7 @@ class ModuleSASL : public Module
 		catch (ModuleException &) { }
 	}
 
-	~ModuleSASL()
+	~ModuleSASL() override
 	{
 		delete external;
 	}

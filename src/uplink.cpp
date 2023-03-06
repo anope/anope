@@ -22,7 +22,7 @@ class ReconnectTimer : public Timer
  public:
 	ReconnectTimer(int wait) : Timer(wait) { }
 
-	void Tick(time_t)
+	void Tick(time_t) override
 	{
 		try
 		{

@@ -265,7 +265,7 @@ class OSOper : public Module
 	{
 	}
 
-	~OSOper()
+	~OSOper() override
 	{
 		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{

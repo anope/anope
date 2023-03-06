@@ -176,7 +176,7 @@ class CSSetMisc : public Module
 		me = this;
 	}
 
-	~CSSetMisc()
+	~CSSetMisc() override
 	{
 		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
 			delete it->second;

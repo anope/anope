@@ -29,7 +29,7 @@ struct DNSZone : Serializable
 		zones->push_back(this);
 	}
 
-	~DNSZone()
+	~DNSZone() override
 	{
 		std::vector<DNSZone *>::iterator it = std::find(zones->begin(), zones->end(), this);
 		if (it != zones->end())
@@ -104,7 +104,7 @@ class DNSServer : public Serializable
 		dns_servers->push_back(this);
 	}
 
-	~DNSServer()
+	~DNSServer() override
 	{
 		std::vector<DNSServer *>::iterator it = std::find(dns_servers->begin(), dns_servers->end(), this);
 		if (it != dns_servers->end())
@@ -743,7 +743,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	~ModuleDNS()
+	~ModuleDNS() override
 	{
 		for (unsigned i = zones->size(); i > 0; --i)
 			delete zones->at(i - 1);

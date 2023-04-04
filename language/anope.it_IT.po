@@ -9084,6 +9084,3 @@ msgstr "{nick | canale}"
 
 msgid "{nick | channel} memo-text"
 msgstr "{nick | canale} testo-memo"
-
-#~ msgid "Password authentication required for that command."
-#~ msgstr "Autenticazione con password richiesta per questo comando."

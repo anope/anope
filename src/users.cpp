@@ -69,7 +69,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	{
 		++sserver->users;
 		if (server->IsSynced())
-			Log(this, "connect") << (!vhost.empty() && vhost != host ? "(" + vhost + ") " : "") << "(" << srealname << ") " << (!uip.empty() && uip != host ? "[" + uip + "] " : "") << "connected to the network (" << sserver->GetName() << ")";
+			Log(this, "connect") << (!vhost.empty() && vhost != host ? "(" + vhost + ") " : "") << "(" << Anope::NormaliseBuffer(srealname) << ") " << (!uip.empty() && uip != host ? "[" + uip + "] " : "") << "connected to the network (" << sserver->GetName() << ")";
 	}
 
 	if (UserListByNick.size() > MaxUserCount)
@@ -295,7 +295,7 @@ User::~User()
 	if (this->server != NULL)
 	{
 		if (this->server->IsSynced())
-			Log(this, "disconnect") << "(" << this->realname << ") disconnected from the network (" << this->server->GetName() << ")";
+			Log(this, "disconnect") << "(" << Anope::NormaliseBuffer(this->realname) << ") disconnected from the network (" << this->server->GetName() << ")";
 		--this->server->users;
 	}
 

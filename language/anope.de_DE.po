@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-27 00:01+0100\n"
-"PO-Revision-Date: 2023-02-27 00:01+0100\n"
+"POT-Creation-Date: 2023-04-21 21:30+0200\n"
+"PO-Revision-Date: 2023-04-21 22:04+0200\n"
 "Last-Translator: henk\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -1731,7 +1731,7 @@ msgid "(%s from now)"
 msgstr "(in %s)"
 
 msgid "(Split)"
-msgstr ""
+msgstr "(aufgeteilt)"
 
 #, c-format
 msgid "(by %s on %s) %s"
@@ -2576,7 +2576,7 @@ msgid "Associate a URL with your account"
 msgstr "Stellt eine Begrüssungsmeldung für Deinen Nicknamen ein."
 
 msgid "Associate a greet message with your nickname"
-msgstr "Stellt eine Begrüssungsmeldung für Deinen Nicknamen ein."
+msgstr "Stelle eine Begrüssungsmeldung für Deinen Nicknamen ein."
 
 #, fuzzy
 msgid "Associate an E-mail address with the channel"
@@ -2637,7 +2637,7 @@ msgid "Available privileges for %s:"
 msgstr "Verfügbare Rechte für %s:"
 
 msgid "BANS enforced by "
-msgstr "BANS durchgesetzt durch"
+msgstr "BANS durchgesetzt durch "
 
 msgid "Bad words kicker"
 msgstr "Bad words kicker"
@@ -3112,7 +3112,7 @@ msgstr "Der Channel %s ist jetzt auf SUSPENDED gesetzt."
 
 #, c-format
 msgid "Channel %s registered under your account: %s"
-msgstr "Der Raum %s wurde unter deinem Account %s registriert."
+msgstr "Der Kanal %s wurde unter deinem Konto %s registriert."
 
 #, c-format
 msgid "Channel %s will expire."
@@ -3198,8 +3198,8 @@ msgid ""
 "on channel or user settings, where it was."
 msgstr ""
 "Prüft den letzten Zeitpunkt, wann Nickname einen Kanal betreten,\n"
-"verlassen oder seinen Nicknamen gewechselt hat. Zeigt an, wann und\n"
-"je nach Kanal- und Benutzereinstellungen auch wo das war. "
+"verlassen oder seinen Nicknamen gewechselt hat. Zeigt an, wann und,\n"
+"je nach Kanal- und Benutzereinstellungen auch wo, das war."
 
 msgid "Checks if last memo to a nick was read"
 msgstr "Überprüft ob Deine letzte gesendete Memo vom Empänger gelesen wurde"
@@ -3317,7 +3317,7 @@ msgstr ""
 "Der Anwender muss der Gründer von channel und target sein."
 
 msgid "Copy all settings from one channel to another"
-msgstr "Kopiert alle Einstellungen von einem Raum zu einem anderen."
+msgstr "Kopiert alle Einstellungen von einem Kanal zu einem anderen."
 
 msgid "Created"
 msgstr "Erstellt"
@@ -3502,7 +3502,7 @@ msgid "Default SQLINE expiry time: No expiration"
 msgstr "Standard Auslaufzeit von SQLINEs: Kein Auslauf, permanent"
 
 msgid "Define messages to be randomly shown to users at logon"
-msgstr "Zufalls-News bearbeiten, die beim Einloggen angezeigt werden."
+msgstr "Zufalls-News bearbeiten, die Benutzern beim Einloggen angezeigt werden."
 
 msgid "Define messages to be shown to users at logon"
 msgstr "Logon-News bearbeiten"
@@ -4428,7 +4428,7 @@ msgid "Invalid value for LIMIT. Must be numerical."
 msgstr "Ungültiger Wert für LIMIT: muss numerisch sein."
 
 msgid "Invites you or an optionally specified nick into a channel"
-msgstr "Lädt Dich oder einen optional angegebenen Benutzer in einen Raum ein."
+msgstr "Lädt Dich oder einen optional angegebenen Benutzer in einen Kanal ein."
 
 msgid "Italics kicker"
 msgstr "Italics kicker : %s"
@@ -4621,13 +4621,13 @@ msgid ""
 "prefixed by an exclamation mark. The nickname parameter is\n"
 "limited to Services Operators"
 msgstr ""
-"Auflisten aller Kanäle, in denen du Zugriffsrechte hast.\n"
+"Auflisten aller Kanäle, zu denen du Zugriffsrechte hast.\n"
 "\n"
 "Kanäle, bei denen die NOEXPIRE Option gesetzt ist, haben ein Ausrufezeichen\n"
 "als Präfix. Der Nickname Parameter kann nur von Services Operators genutzt werden."
 
 msgid "Lists all nicknames in your group"
-msgstr "Listet alle Nicknamen in Deiner Gruppe."
+msgstr "Listet alle Nicknamen in Deiner Gruppe auf."
 
 msgid "Lists all registered channels matching the given pattern"
 msgstr "Listet alle registrieten Channels des angegebenen Musters"
@@ -4909,6 +4909,33 @@ msgid ""
 "any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If what\n"
 "is not given then all basic modes are removed."
 msgstr ""
+"Hauptsächlich zum Verwalten von festgesetzten Modi (mode locks) und\n"
+"Moduszugang (mode access, was etwas anderes ist als Kanalzugang, channel access)\n"
+"eines Kanals.\n"
+" \n"
+"Der %s LOCK Befehl dient dem Hinzufügen, Entfernen und Anschauen\n"
+"der festgesetzten Modi eines Kanals.\n"
+"Wenn ein Modus auf \"an\" oder \"aus\" festgesetzt ist, erlauben die Services keine\n"
+"Änderung dieses Modus.\n"
+"Der SET Befehl entfernt alle bestehenden Modus-Festsetzungen und setzt nur\n"
+"die angegebenen, während ADD and DEL die bestehenden verändern.\n"
+"Beispiel:\n"
+"     MODE #channel LOCK ADD +bmnt *!*@*aol*\n"
+" \n"
+"Der %s SET Befehl erlaubt es, Modi durch die Services zu setzen.\n"
+"Die Platzhalter * und ? dürfen als Parameter für Listen und Status Modi\n"
+"verwendet werden.\n"
+"Beispiel:\n"
+"     MODE #channel SET +v *\n"
+"       Gibt allen Benutzern im Kanal 'Voice'.\n"
+" \n"
+"     MODE #channel SET -b ~c:*\n"
+"       Entfernt alle erweiterten (extended) Bans, die mit ~c: beginnen.\n"
+" \n"
+"Der %s CLEAR Befehl ist ein einfacher Weg, alle Modi eines Kanals zu entfernen.\n"
+"what darf ein beliebiger Modusname sein.\n"
+"Beispiele beinhalten bans, excepts, inviteoverrides, ops, halfops, and voices.\n"
+"Wenn what nicht angegeben ist, werden alle Basismodi entfernt."
 
 #, fuzzy
 msgid "Maintain the AutoKick list"
@@ -4944,6 +4971,19 @@ msgid ""
 "will be added to the akick list instead of the mask.\n"
 "All users within that nickgroup will then be akicked.\n"
 msgstr ""
+"Verwaltet die AutoKick Liste eines Kanals. Wenn ein Benutzer\n"
+"auf dieser Liste versucht, einen Kanal zu betreten, wird\n"
+"%s ihn aus dem Kanal verbannen und ihn dann kicken.\n"
+" \n"
+"Der AKICK ADD Befehl fügt den angegebenen Nicknamen oder\n"
+"das Muster (usermask) der Liste hinzu. Wenn ein reason (Grund)\n"
+"mitgegeben wird, wird dieser beim Kick angegeben; falls nicht,\n"
+"wird der Standard \"Benutzer wurde aus diesem Kanal verbannt\"\n"
+"verwendet.\n"
+"Wenn ein registrierter Nick angegeben wurde, wird das %s Konto\n"
+"statt des Musters (mask) zur Liste hinzugefügt.\n"
+"Alle Nicknamen in der Nickgruppe dieses Benutzers werden dann\n"
+"automatisch gekickt.\n"
 
 #, c-format
 msgid ""
@@ -4955,6 +4995,12 @@ msgid ""
 "a user level of 0, and any unregistered user has a user level\n"
 "of -1."
 msgstr ""
+"Verwaltet die access list (Zugangsliste) eines Kanals.\n"
+"Diese Liste legt fest, welche Benutzer OP status oder Zugang zu\n"
+"den %s Befehlen für diesen Kanal haben. Unterschiedliche Level\n"
+"erlauben die Benutzung unterschiedlicher Untermengen von\n"
+"Privilegien. Alle registrierten Benutzer, die nicht auf der Liste sind,\n"
+"haben Benutzerlevel 0 und unregistrierte Benutzer Level -1."
 
 #, fuzzy, c-format
 msgid ""
@@ -5816,11 +5862,11 @@ msgstr "Der Privat-Modus (PRIVATE) ist für %s jetzt aktiviert (ON)."
 
 #, c-format
 msgid "Privilege %s added to %s on %s, new flags are +%s"
-msgstr ""
+msgstr "Privileg %s wurde %s in %s hinzugefügt, neue Flags sind +%s"
 
 #, c-format
 msgid "Privilege %s removed from %s on %s, new flags are +%s"
-msgstr ""
+msgstr "Privileg %s wurde %s in %s genommen, neue Flags sind +%s"
 
 msgid "Protection"
 msgstr "Kill-Schutz"
@@ -5893,7 +5939,7 @@ msgid "Realname"
 msgstr "  Echter Name: %s"
 
 msgid "Reason"
-msgstr ""
+msgstr "Grund"
 
 #, fuzzy, c-format
 msgid "Reason for %s updated."
@@ -5907,6 +5953,14 @@ msgid ""
 "GHOST command). If they are not identified they will be\n"
 "forced off of the nick."
 msgstr ""
+"Fordert einen Nicknamen von einem anderen Benutzer oder\n"
+"den Services zurück.\n"
+"Falls die Services momentan deinen Nickname besetzen, wird\n"
+"er wieder freigegeben.\n"
+"Falls ein anderen Benutzer ihn innehat und 'identifiziert' ist, wird\n"
+"er gekillt (wie ehemals beim GHOST Befehl).\n"
+"Falls der andere Benutzer nicht 'identifiziert' ist, wird er zu einem\n"
+"anderen Nicknamen gezwungen."
 
 #, fuzzy
 msgid "Redefine the meanings of access levels"
@@ -8103,7 +8157,7 @@ msgstr "Du hast keine zulässige Email Adresse gesetzt."
 
 #, c-format
 msgid "This channel has been forbidden: %s"
-msgstr "Dieser Channel wurde verboten: %s."
+msgstr "Dieser Kanal wurde verboten: %s."
 
 #, fuzzy
 msgid "This channel has been suspended."
@@ -9001,7 +9055,7 @@ msgstr "Du bist bereits angemeldet."
 
 #, c-format
 msgid "You are already in %s!"
-msgstr "Du bist schon in %s! "
+msgstr "Du bist schon in %s!"
 
 #, fuzzy
 msgid "You are no longer a super admin."

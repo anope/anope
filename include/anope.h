@@ -548,6 +548,13 @@ namespace Anope
 	 */
 	extern Anope::string Resolve(const Anope::string &host, int type);
 
+	/** Does a blocking dns query and returns all IPs.
+	 * @param host host to look up
+	 * @param type inet addr type
+	 * @return A list of all IPs that the host resolves to
+	 */
+	extern std::vector<Anope::string> ResolveMultiple(const Anope::string &host, int type);
+
 	/** Generate a string of random letters and numbers
 	 * @param len The length of the string returned
 	 */

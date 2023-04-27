@@ -727,7 +727,13 @@ Anope::string Anope::NormalizeBuffer(const Anope::string &buf)
 
 Anope::string Anope::Resolve(const Anope::string &host, int type)
 {
-	Anope::string result = host;
+	std::vector<Anope::string> results = Anope::ResolveMultiple(host, type);
+	return results.empty() ? host : results[0];
+}
+
+std::vector<Anope::string> Anope::ResolveMultiple(const Anope::string &host, int type)
+{
+	std::vector<Anope::string> results;
 
 	addrinfo hints;
 	memset(&hints, 0, sizeof(hints));
@@ -738,15 +744,19 @@ Anope::string Anope::Resolve(const Anope::string &host, int type)
 	addrinfo *addrresult = NULL;
 	if (getaddrinfo(host.c_str(), NULL, &hints, &addrresult) == 0)
 	{
-		sockaddrs addr;
-		memcpy(static_cast<void*>(&addr), addrresult->ai_addr, addrresult->ai_addrlen);
-		result = addr.addr();
-		Log(LOG_DEBUG_2) << "Resolver: " << host << " -> " << result;
+		for (addrinfo *thisresult = addrresult; thisresult; thisresult = thisresult->ai_next)
+		{
+			sockaddrs addr;
+			memcpy(static_cast<void*>(&addr), thisresult->ai_addr, thisresult->ai_addrlen);
+
+			results.push_back(addr.addr());
+			Log(LOG_DEBUG_2) << "Resolver: " << host << " -> " << addr.addr();
+		}
 
 		freeaddrinfo(addrresult);
 	}
 
-	return result;
+	return results;
 }
 
 Anope::string Anope::Random(size_t len)

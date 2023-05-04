@@ -129,6 +129,9 @@ namespace Configuration
 		std::map<Anope::string, Block *> modules;
 		Anope::map<Anope::string> bots;
 
+		/* Represents a missing tag. */
+		Block EmptyBlock;
+
 		Conf();
 		~Conf();
 

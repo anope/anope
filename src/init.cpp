@@ -427,8 +427,8 @@ void Anope::Init(int ac, char **av)
 	if (!getuid() && !getgid())
 	{
 		/* If we are configured to setuid later, don't issue a warning */
-		Configuration::Block *options = Config->GetBlock("options");
-		if (options->Get<const Anope::string>("user").empty())
+		Configuration::Block *options = Config ? Config->GetBlock("options") : NULL;
+		if (!options || options->Get<const Anope::string>("user").empty())
 		{
 			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
 			std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;

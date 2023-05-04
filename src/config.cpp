@@ -49,7 +49,7 @@ Block* Block::GetBlock(const Anope::string &bname, int num)
 	for (int i = 0; it.first != it.second; ++it.first, ++i)
 		if (i == num)
 			return &it.first->second;
-	return NULL;
+	return &(Config->EmptyBlock);
 }
 
 bool Block::Set(const Anope::string &tag, const Anope::string &value)
@@ -116,7 +116,7 @@ template<typename T> static void ValidateNotZero(const Anope::string &block, con
 		throw ConfigException("The value for <" + block + ":" + name + "> cannot be zero!");
 }
 
-Conf::Conf() : Block("")
+Conf::Conf() : Block(""), EmptyBlock("")
 {
 	ReadTimeout = 0;
 	UsePrivmsg = DefPrivmsg = false;
@@ -602,7 +602,7 @@ void Conf::Post(Conf *old)
 Block *Conf::GetModule(Module *m)
 {
 	if (!m)
-		return NULL;
+		return &(Config->EmptyBlock);
 
 	return GetModule(m->name);
 }
@@ -654,7 +654,7 @@ Block *Conf::GetCommand(CommandSource &source)
 			return b;
 	}
 
-	return NULL;
+	return &(Config->EmptyBlock);
 }
 
 File::File(const Anope::string &n, bool e) : name(n), executable(e), fp(NULL)

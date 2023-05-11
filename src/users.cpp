@@ -462,9 +462,16 @@ bool User::IsServicesOper()
 	{
 		bool match = false;
 		Anope::string match_host = this->GetIdent() + "@" + this->host;
+		Anope::string match_ip = this->GetIdent() + "@" + this->ip.addr();
 		for (unsigned i = 0; i < this->nc->o->hosts.size(); ++i)
-			if (Anope::Match(match_host, this->nc->o->hosts[i]))
+		{
+			const Anope::string &userhost = this->nc->o->hosts[i];
+			if (Anope::Match(match_host, userhost) || Anope::Match(match_ip, userhost))
+			{
 				match = true;
+				break;
+			}
+		}
 		if (match == false)
 			return false;
 	}

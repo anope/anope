@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-04 17:08+0200\n"
-"PO-Revision-Date: 2023-04-04 17:11+0200\n"
+"POT-Creation-Date: 2023-05-22 14:47+0200\n"
+"PO-Revision-Date: 2023-05-23 16:12+0200\n"
 "Last-Translator: Dragone2 <dragone2@risposteinformatiche.it>\n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -60,7 +60,7 @@ msgstr "%s aggiunto alla lista ignorati."
 
 #, c-format
 msgid "%s added to the %s list."
-msgstr "%s aggiunto alla lista  %s."
+msgstr "%s aggiunto alla lista %s."
 
 #, c-format
 msgid "%s added to the AKILL list."
@@ -2522,7 +2522,7 @@ msgstr "Tipologie di oper disponibili:"
 
 #, c-format
 msgid "Available privileges for %s:"
-msgstr "Privilegi disponibili per %s:"
+msgstr "Privilegi disponibili per %s:"
 
 msgid "BANS enforced by "
 msgstr "BAN forzati da "
@@ -2946,7 +2946,7 @@ msgstr "Il canale %s è già registrato!"
 
 #, c-format
 msgid "Channel %s is forbidden by %s: %s"
-msgstr "Il canale %s è stato vietato da %s: %s"
+msgstr "Il canale %s è stato vietato da %s: %s"
 
 #, c-format
 msgid "Channel %s is forbidden."
@@ -2954,7 +2954,7 @@ msgstr "Il canale %s è vietato."
 
 #, c-format
 msgid "Channel %s is no longer persistent."
-msgstr "Il canale %s non è più persistente."
+msgstr "Il canale %s non è più persistente."
 
 #, c-format
 msgid "Channel %s is now persistent."
@@ -3912,15 +3912,15 @@ msgstr "Italiano"
 
 #, c-format
 msgid "Entry message %i for %s deleted."
-msgstr "Il messaggio di ingresso %i per %s rimosso."
+msgstr "Il messaggio di ingresso %i per %s è stato rimosso."
 
 #, c-format
 msgid "Entry message %s not found on channel %s."
-msgstr "Il messaggio di ingresso %s non è stato trovato nel canale %s."
+msgstr "Il messaggio di ingresso %s non è stato trovato nel canale %s."
 
 #, c-format
 msgid "Entry message added to %s"
-msgstr "Messaggio di ingresso aggiunto a %s"
+msgstr "Messaggio di ingresso aggiunto a %s"
 
 #, c-format
 msgid "Entry message list for %s is empty."
@@ -4016,7 +4016,7 @@ msgstr "Flag"
 
 #, c-format
 msgid "Flags for %s on %s set to +%s"
-msgstr "Flag per %s su %s impostati a +%s"
+msgstr "Flag per %s su %s impostati a +%s"
 
 #, c-format
 msgid "Flags list for %s"
@@ -4071,7 +4071,7 @@ msgstr "Fondatore"
 
 #, c-format
 msgid "Founder of %s changed to %s."
-msgstr "Il fondatore del canale %s adesso è %s."
+msgstr "Il fondatore del canale %s adesso è %s."
 
 msgid "GETPASS command unavailable because encryption is in use."
 msgstr "Il comando GETPASS non è disponibile perché è in uso la criptazione dei dati."
@@ -4408,7 +4408,7 @@ msgid ""
 msgstr ""
 "Mostra i canali in cui si ha accesso.\n"
 " \n"
-"I canali che hanno l'opzione NOEXPIRE impostata\n"
+"I canali che hanno l'opzione NOEXPIRE impostata\n"
 "avranno come prefisso un punto esclamativo. Il parametro nick\n"
 "è limitato ai Services Operators"
 
@@ -4463,7 +4463,7 @@ msgstr ""
 "Esempi:\n"
 " \n"
 "    LIST *anope*\n"
-"        Mostra tutti i canali registrati che contengono anope nei\n"
+"        Mostra tutti i canali registrati che contengono anope nei\n"
 "        loro nomi (senza distinzione tra maiuscole e minuscole).\n"
 " \n"
 "    LIST * NOEXPIRE\n"
@@ -4743,7 +4743,7 @@ msgid ""
 "will be added to the akick list instead of the mask.\n"
 "All users within that nickgroup will then be akicked.\n"
 msgstr ""
-"Gestice la lista AutoKick. Se un utente che si trova nella\n"
+"Gestisce la lista AutoKick. Se un utente che si trova nella lista AutoKick\n"
 "cerca di entrare nel canale, %s imposterà un ban su di esso\n"
 "e in seguito lo espellerà dal canale. \n"
 "Il comando AKICK ADD aggiunge il nick o la maschera specificata\n"
@@ -4765,14 +4765,15 @@ msgid ""
 "a user level of 0, and any unregistered user has a user level\n"
 "of -1."
 msgstr ""
-"Gestisce la lista di accesso del canale.  La lista\n"
-"list di accesso specifica quali utenti hanno diritto\n"
-"allo stato di operatore di canale e ai vari comandi di\n"
-"di %s.  Livelli utente diversi permettono l'accesso\n"
+"Gestisce la lista di accesso di un canale. La lista\n"
+"di accesso specifica quali utenti hanno diritto\n"
+"allo stato di operatore di canale o l'accesso ai\n"
+"comandi di %s sul canale. \n"
+"Livelli utente diversi permettono l'accesso\n"
 "a diversi sottoinsiemi di privilegi. Qualsiasi utente\n"
 "registrato non presente nella lista di accesso del canale\n"
-"ha livello utente 0, e qualsiasi utente non registrato\n"
-"ha livello utente -1."
+"ha livello 0, mentre quelli non registrati\n"
+"hanno livello -1."
 
 #, c-format
 msgid ""
@@ -5123,7 +5124,7 @@ msgstr "Il nick %s è vietato."
 
 #, c-format
 msgid "Nick %s is not a Services Operator."
-msgstr "%s non è un Services Operator."
+msgstr "Il nick %s non è un Services Operator."
 
 #, c-format
 msgid "Nick %s is part of this Network's Services."
@@ -5135,7 +5136,7 @@ msgstr "Il nick %s non è attualmente in uso."
 
 #, c-format
 msgid "Nick %s isn't registered."
-msgstr "Il nickname %s non è registrato."
+msgstr "Il nick %s non è registrato."
 
 #, c-format
 msgid "Nick %s was truncated to %d characters."
@@ -6487,7 +6488,7 @@ msgid ""
 "the ban system once activated."
 msgstr ""
 "Attiva o disattiva l'espulsione per ripetizione. Quando questa\n"
-"opzione è attiva, il bot espellerà tutti gli utenti ripetono\n"
+"opzione è attiva, il bot espellerà tutti gli utenti che ripetono\n"
 "la stessa cosa almeno num volte. Il valore di default per questo\n"
 "parametro è 3.\n"
 " \n"
@@ -7208,7 +7209,7 @@ msgid ""
 "The ACCESS CLEAR command clears all entries of the\n"
 "access list."
 msgstr ""
-"Il comando ACCESS LIST mostra la lista di accesso. Se viene\n"
+"Il comando ACCESS LIST mostra la lista di accesso. Se viene\n"
 "utilizzata una wildcard per la maschera, solo i record che\n"
 "corrispondono alla maschera vengono mostrati. Se viene specificata\n"
 "una lista di id numerici, i record corrispondenti vengono mostrati.\n"
@@ -7220,7 +7221,7 @@ msgstr ""
 "Il comando ACCESS VIEW mostra la lista di accesso in modo simile\n"
 "a ACCESS LIST ma mostra chi ha inserito il record e l'ultimo accesso.\n"
 " \n"
-"Il comando ACCESS CLEAR svuota completamente la lista di\n"
+"Il comando ACCESS CLEAR svuota completamente la lista di\n"
 "accesso."
 
 msgid "The CLEAR command clears the channel access list. This requires channel founder access."
@@ -7236,7 +7237,7 @@ msgid ""
 " Will remove all entries that were added within the last 30 minutes."
 msgstr ""
 "Il comando CLEAR ti permette di pulire il database rimuovendo tutti i dati\n"
-"aggiunti nel lasso di tempo specificato dai dati presenti nel database.\n"
+"aggiunti nel lasso di tempo specificato dai dati presenti nel database.\n"
 " \n"
 "Esempio:\n"
 " %s CLEAR 30m\n"
@@ -7272,7 +7273,7 @@ msgstr ""
 "      Mostra le parolacce con id numerico da 2 a 5 e da\n"
 "      7 a 9  (escludendo quindi il 6).\n"
 " \n"
-"Il comando CLEAR rimuove tutti i record dalla lista parolacce."
+"Il comando CLEAR rimuove tutti i record dalla lista parolacce."
 
 msgid ""
 "The ENTRYMSG ADD command adds the given message to\n"
@@ -7383,7 +7384,7 @@ msgstr ""
 "Non è possibile dare livello di accesso superiore di quello posseduto ad altri utenti."
 
 msgid "The STATS command prints out statistics about stored nicks and memory usage."
-msgstr "Il comando STATS mostra le statistiche relative ai memorizzati e l'uso della memoria."
+msgstr "Il comando STATS mostra le statistiche relative ai memorizzati e l'uso della memoria."
 
 msgid ""
 "The email parameter is optional and will set the email\n"
@@ -7497,7 +7498,7 @@ msgid ""
 "access list from the other channel up to the given level."
 msgstr ""
 "La maschera specificata può essere anche un canale, il quale userà\n"
-"la lista di accesso dell'altro canale fino al livello specificato."
+"la lista di accesso dell'altro canale fino al livello specificato."
 
 #, c-format
 msgid "The host %s currently has %d sessions with a limit of %d because it matches entry: %s."
@@ -7743,11 +7744,11 @@ msgid ""
 "nick/vhost entries."
 msgstr ""
 "Questo comando elenca i vHost registrati all'operatore.\n"
-"Se una chiave è specificata, verranno mostrati unicamente i\n"
-"vHost corrispondenti a quanto immesso come  chiave, ad\n"
+"Se una chiave è specificata, verranno mostrati unicamente i\n"
+"vHost corrispondenti a quanto immesso come chiave, ad\n"
 "esempio Rob* per tutte le corrispondenze che iniziano con \"Rob\"\n"
-"Se viene usata una lista in stile #X-Y, verranno mostrate unicamente\n"
-"le corrispondenze tra X ed Y, ad es. #1-3 mostrerà unicamente le prime\n"
+"Se viene usata una lista in stile #X-Y, verranno mostrate unicamente\n"
+"le corrispondenze tra X ed Y, ad es. #1-3 mostrerà unicamente le prime\n"
 "3 corrispondenze nick/vHost."
 
 msgid ""
@@ -7786,7 +7787,7 @@ msgid ""
 "Note: all the nicknames of a group have the same password."
 msgstr ""
 "Questo comando fa sì che il tuo nick entri nel gruppo del\n"
-"nick obiettivo, password è la password del nick obiettivo .\n"
+"nick obiettivo, password è la password del nick obiettivo.\n"
 " \n"
 "Entrare in un gruppo ti permetterà di condividere la tua\n"
 "configurazione, i tuoi memo e i privilegi sui canali con\n"
@@ -7806,7 +7807,7 @@ msgstr ""
 "con l'uso stesso di questo comando.\n"
 " \n"
 "È possibile stare in un solo gruppo per volta. L'unione dei\n"
-"gruppi non è possibile\n"
+"gruppi non è possibile.\n"
 " \n"
 "Nota: tutti i nick di un gruppo hanno la stessa password."
 

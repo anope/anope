@@ -289,6 +289,11 @@ class CoreExport Channel : public Base, public Extensible
 	 */
 	bool CheckKick(User *user);
 
+	/** Find which bot should send mode/topic/etc changes for this channel
+	 * @return The bot
+	 */
+	BotInfo *WhoSends() const;
+
 	/** Finds a channel
 	 * @param name The channel to find
 	 * @return The channel, if found

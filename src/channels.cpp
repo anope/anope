@@ -783,7 +783,7 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 		return false;
 
 	if (bi == NULL)
-		bi = this->ci->WhoSends();
+		bi = this->WhoSends();
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(OnBotKick, MOD_RESULT, (bi, this, u, buf));
@@ -812,7 +812,7 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	this->topic_setter = user;
 	this->topic_ts = ts;
 
-	IRCD->SendTopic(this->ci->WhoSends(), this);
+	IRCD->SendTopic(this->WhoSends(), this);
 
 	/* Now that the topic is set update the time set. This is *after* we set it so the protocol modules are able to tell the old last set time */
 	this->topic_time = Anope::CurTime;
@@ -911,8 +911,10 @@ bool Channel::CheckKick(User *user)
 	if (MOD_RESULT != EVENT_STOP)
 		return false;
 
-	if (mask.empty())
+	if (mask.empty() && this->ci)
 		mask = this->ci->GetIdealBan(user);
+	if (mask.empty())
+		mask = "*!*@" + user->GetDisplayedHost();
 	if (reason.empty())
 		reason = Language::Translate(user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
 
@@ -922,6 +924,21 @@ bool Channel::CheckKick(User *user)
 	this->Kick(NULL, user, "%s", reason.c_str());
 
 	return true;
+}
+
+BotInfo* Channel::WhoSends() const
+{
+	if (ci)
+		return ci->WhoSends();
+
+	BotInfo *ChanServ = Config->GetClient("ChanServ");
+	if (ChanServ)
+		return ChanServ;
+
+	if (!BotListByNick->empty())
+		return BotListByNick->begin()->second;
+
+	return NULL;
 }
 
 Channel* Channel::Find(const Anope::string &name)

@@ -617,7 +617,7 @@ void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set,
 	if (bi)
 		s->bi = bi;
 	else
-		s->bi = c->ci->WhoSends();
+		s->bi = c->WhoSends();
 
 	if (!modePipe)
 		modePipe = new ModePipe();

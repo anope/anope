@@ -355,7 +355,7 @@ NickCore *ChannelInfo::GetSuccessor() const
 
 BotInfo *ChannelInfo::WhoSends() const
 {
-	if (this && this->bi)
+	if (this->bi)
 		return this->bi;
 
 	BotInfo *ChanServ = Config->GetClient("ChanServ");
@@ -629,8 +629,7 @@ void ChannelInfo::ClearLevels()
 
 Anope::string ChannelInfo::GetIdealBan(User *u) const
 {
-	int bt = this ? this->bantype : -1;
-	switch (bt)
+	switch (this->bantype)
 	{
 		case 0:
 			return "*!" + u->GetVIdent() + "@" + u->GetDisplayedHost();

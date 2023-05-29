@@ -362,7 +362,7 @@ class UnrealIRCdProto : public IRCDProto
 		/* Unreal does not support updating a channels TS without actually joining a user,
 		 * so we will join and part us now
 		 */
-		BotInfo *bi = c->ci->WhoSends();
+		BotInfo *bi = c->WhoSends();
 		if (!bi)
 			;
 		else if (c->FindUser(bi) == NULL)

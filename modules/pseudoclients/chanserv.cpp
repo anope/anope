@@ -288,7 +288,7 @@ class ChanServCore : public Module, public ChanServService
 		if (c->ci)
 			c->SetMode(c->ci->WhoSends(), "REGISTERED", "", false);
 		else
-			c->RemoveMode(c->ci->WhoSends(), "REGISTERED", "", false);
+			c->RemoveMode(c->WhoSends(), "REGISTERED", "", false);
 
 		const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require");
 		if (!require.empty())
@@ -296,7 +296,7 @@ class ChanServCore : public Module, public ChanServService
 			if (c->ci)
 				c->SetModes(c->ci->WhoSends(), false, "+%s", require.c_str());
 			else
-				c->SetModes(c->ci->WhoSends(), false, "-%s", require.c_str());
+				c->SetModes(c->WhoSends(), false, "-%s", require.c_str());
 		}
 	}
 

@@ -20,9 +20,11 @@
 
 namespace Configuration
 {
+	namespace Internal
+	{
 	class CoreExport Block
 	{
-		friend struct Conf;
+		friend struct Configuration::Conf;
 
 	 public:
 		typedef Anope::map<Anope::string> item_map;
@@ -34,13 +36,17 @@ namespace Configuration
 		block_map blocks;
 		int linenum;
 
+		/* Represents a missing tag. */
+		static Block EmptyBlock;
+
 	 public:
 		Block(const Anope::string &);
 		const Anope::string &GetName() const;
-		int CountBlock(const Anope::string &name);
-		Block* GetBlock(const Anope::string &name, int num = 0);
+		int CountBlock(const Anope::string &name) const;
+		const Block* GetBlock(const Anope::string &name, int num = 0) const;
+		Block* GetMutableBlock(const Anope::string &name, int num = 0);
 
-		template<typename T> inline T Get(const Anope::string &tag)
+		template<typename T> inline T Get(const Anope::string &tag) const
 		{
 			return this->Get<T>(tag, "");
 		}
@@ -66,6 +72,10 @@ namespace Configuration
 	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const;
 	template<> CoreExport time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
+	} // namespace Internal
+
+	typedef const Internal::Block Block;
+	typedef Internal::Block MutableBlock;
 
 	/** Represents a configuration file
 	 */
@@ -129,9 +139,6 @@ namespace Configuration
 		std::map<Anope::string, Block *> modules;
 		Anope::map<Anope::string> bots;
 
-		/* Represents a missing tag. */
-		Block EmptyBlock;
-
 		Conf();
 		~Conf();
 
@@ -143,7 +150,7 @@ namespace Configuration
 
 		BotInfo *GetClient(const Anope::string &name);
 
-		Block *GetCommand(CommandSource &);
+		const Block *GetCommand(CommandSource &);
 	};
 
 	struct Uplink

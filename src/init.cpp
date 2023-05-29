@@ -422,20 +422,6 @@ void Anope::Init(int ac, char **av)
 #ifdef _WIN32
 	if (!SupportedWindowsVersion())
 		throw CoreException(GetWindowsVersion() + " is not a supported version of Windows");
-#else
-	/* If we're root, issue a warning now */
-	if (!getuid() && !getgid())
-	{
-		/* If we are configured to setuid later, don't issue a warning */
-		Configuration::Block *options = Config ? Config->GetBlock("options") : NULL;
-		if (!options || options->Get<const Anope::string>("user").empty())
-		{
-			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
-			std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
-			std::cerr << "         as the root superuser." << std::endl;
-			sleep(3);
-		}
-	}
 #endif
 
 #ifdef _WIN32
@@ -527,6 +513,20 @@ void Anope::Init(int ac, char **av)
 		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<const Anope::string>("name"), NULL);
 
 #ifndef _WIN32
+	/* If we're root, issue a warning now */
+	if (!getuid() && !getgid())
+	{
+		/* If we are configured to setuid later, don't issue a warning */
+		Configuration::Block *options = Config->GetBlock("options");
+		if (options->Get<const Anope::string>("user").empty())
+		{
+			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
+			std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
+			std::cerr << "         as the root superuser." << std::endl;
+			sleep(3);
+		}
+	}
+
 	/* We won't background later, so we should setuid now */
 	if (Anope::NoFork)
 		setuidgid();

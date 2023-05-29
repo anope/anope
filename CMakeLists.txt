@@ -87,9 +87,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   if(GCC_VERSION LESS 4.2)
     message(FATAL_ERROR "Your compiler is too old to build Anope. Upgrade to GCC 4.2 or newer!")
   endif(GCC_VERSION LESS 4.2)
-  if(GCC_VERSION GREATER 6.0 OR GCC_VERSION EQUAL 6.0)
-    set(CXXFLAGS "${CXXFLAGS} -fno-delete-null-pointer-checks")
-  endif(GCC_VERSION GREATER 6.0 OR GCC_VERSION EQUAL 6.0)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # If we are using a GNU compiler (have to use CXX because it seems to fail on C), we will be able to determine it's default paths for libraries and includes

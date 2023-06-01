@@ -1,5 +1,5 @@
-Anope Version 2.0.13-git
-------------------------
+Anope Version 2.0.13
+--------------------
 Fixed a crash on some compilers when trying to call methods on a null pointer
 Fixed a crash when encountering an unterminated commented config block
 Fixed erroneously rejecting spaces in fantasy:name

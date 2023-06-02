@@ -502,10 +502,6 @@ if(WIN32)
   install(FILES ${Anope_SOURCE_DIR}/src/win32/anope.bat
     DESTINATION ${BIN_DIR}
   )
-
-  # Package any DLLs in src/win/
-  file(GLOB EXTRA_DLLS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${Anope_SOURCE_DIR}/src/win32/*.dll")
-  install(FILES ${EXTRA_DLLS} DESTINATION ${BIN_DIR})
 endif(WIN32)
 
 install(CODE "file(REMOVE_RECURSE \"$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${LIB_DIR}/modules\")")

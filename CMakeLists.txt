@@ -229,6 +229,12 @@ if(EXTRA_LIBS)
   link_directories(${EXTRA_LIBS})
 endif(EXTRA_LIBS)
 
+# setup conan
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conanbuildinfo.cmake")
+  include("${CMAKE_CURRENT_SOURCE_DIR}/conanbuildinfo.cmake")
+  conan_basic_setup()
+endif()
+
 # Find gettext
 find_package(Gettext)
 

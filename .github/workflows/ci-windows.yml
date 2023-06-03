@@ -13,6 +13,15 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3
 
+      - name: Setup Conan
+        uses: turtlebrowser/get-conan@v1.2
+        with:
+          version: 1.59.0
+
+      - name: Install libraries
+        run: |
+          conan install ${{ github.workspace }}\src\win32 --build=missing
+
       - name: Run CMake
         run: |
           mkdir ${{ github.workspace }}\build

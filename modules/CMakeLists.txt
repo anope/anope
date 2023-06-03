@@ -3,6 +3,40 @@ if(WIN32)
   add_definitions(-DMODULE_COMPILE)
 endif()
 
+# enable extra modules if conan is used
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../conanbuildinfo.cmake")
+  function(enable_extra NAME PACKAGE)
+    if(DEFINED "CONAN_${PACKAGE}_ROOT")
+      message("Enabling the ${NAME} module")
+      # copy the modules out of extra so it gets picked up by build_modules
+      file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/extra/${NAME}.cpp" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}")
+    else()
+      message("Unable to enable the ${NAME} module (missing library)")
+    endif()
+  endfunction()
+
+  function(copy_extra NAME)
+    file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/extra/${NAME}.cpp" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}")
+  endfunction()
+
+  enable_extra("m_mysql" "LIBMYSQLCLIENT")
+  enable_extra("m_regex_pcre2" "PCRE2")
+  enable_extra("m_sqlite" "SQLITE3")
+  enable_extra("m_ssl_openssl" "OPENSSL")
+  # this uses Wldap so should always be available
+  copy_extra("m_ldap")
+  # these don't actually have extra dependencies, but require a module which does
+  copy_extra("m_sql_authentication")
+  copy_extra("m_sql_log")
+  copy_extra("m_sql_oper")
+  copy_extra("m_ldap_authentication")
+  copy_extra("m_ldap_oper")
+
+  # Package extra dlls
+  file(GLOB EXTRA_DLLS "${Anope_SOURCE_DIR}/extradll/bin/*.dll" "${Anope_SOURCE_DIR}/extradll/lib/*.dll")
+  install(FILES ${EXTRA_DLLS} DESTINATION ${BIN_DIR})
+endif()
+
 macro(build_modules SRC)
   if(NOT ${SRC} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR} AND EXISTS "${SRC}/CMakeLists.txt")
     add_subdirectory("${SRC}")

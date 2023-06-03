@@ -6,8 +6,8 @@ set_target_properties(version-bin PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${L
 set(version_BINARY "$<TARGET_FILE:version-bin>")
 # Modify version.h from the above executable, with dependencies to version.cpp
 # and all of the source files in the main build
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_build
-  COMMAND ${version_BINARY} ${Anope_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/version.h ${CMAKE_CURRENT_BINARY_DIR}/build.h
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.h ${CMAKE_CURRENT_BINARY_DIR}/build.h
+  COMMAND version-bin ${Anope_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/version.h ${CMAKE_CURRENT_BINARY_DIR}/build.h
   DEPENDS version-bin ${SRC_SRCS}
 )
 # Add version-bin to list of files for CPack to ignore
@@ -19,4 +19,4 @@ if(NOT WIN32)
 endif()
 
 # Add a custom target to the above file
-add_custom_target(headers DEPENDS version-bin ${CMAKE_CURRENT_BINARY_DIR}/version_build)
+add_custom_target(headers DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/version.h ${CMAKE_CURRENT_BINARY_DIR}/build.h)

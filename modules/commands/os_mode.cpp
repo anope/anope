@@ -37,7 +37,7 @@ class CommandOSMode : public Command
 
 			const Channel::ModeList chmodes = c->GetModes();
 			for (Channel::ModeList::const_iterator it = chmodes.begin(), it_end = chmodes.end(); it != it_end && c; ++it)
-				c->RemoveMode(c->ci->WhoSends(), it->first, it->second, false);
+				c->RemoveMode(c->WhoSends(), it->first, it->second, false);
 
 			if (!c)
 			{
@@ -55,7 +55,7 @@ class CommandOSMode : public Command
 						continue;
 
 					for (size_t i = uc->status.Modes().length(); i > 0; --i)
-						c->RemoveMode(c->ci->WhoSends(), ModeManager::FindChannelModeByChar(uc->status.Modes()[i - 1]), uc->user->GetUID(), false);
+						c->RemoveMode(c->WhoSends(), ModeManager::FindChannelModeByChar(uc->status.Modes()[i - 1]), uc->user->GetUID(), false);
 				}
 
 				source.Reply(_("All modes cleared on %s."), c->name.c_str());

@@ -7,7 +7,7 @@
  */
 
 /* RequiredLibraries: pcre2-8 */
-/* RequiredWindowsLibraries: libpcre2-8 */
+/* RequiredWindowsLibraries: pcre2-8 */
 
 #include "module.h"
 

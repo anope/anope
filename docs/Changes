@@ -1,6 +1,17 @@
-Anope Version 2.0.13-git
+Anope Version 2.0.14-git
 ------------------------
 No significant changes.
+
+Anope Version 2.0.13
+--------------------
+Fixed a crash on some compilers when trying to call methods on a null pointer
+Fixed a crash when encountering an unterminated commented config block
+Fixed erroneously rejecting spaces in fantasy:name
+Fixed marking services pseudoclients as an oper on InspIRCd
+Fixed not checking user@ip as well as user@host when logging into an operator account
+Fixed setting the vhost/vident during SASL on UnrealIRCd
+Updated the German translation
+Updated the Italian translation
 
 Anope Version 2.0.12
 --------------------

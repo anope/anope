@@ -180,7 +180,7 @@ class InspIRCdProto : public IRCDProto
 	{
 		if (Servers::Capab.count("SVSTOPIC"))
 		{
-			UplinkSocket::Message(c->ci->WhoSends()) << "SVSTOPIC " << c->name << " " << c->topic_ts << " " << c->topic_setter << " :" << c->topic;
+			UplinkSocket::Message(c->WhoSends()) << "SVSTOPIC " << c->name << " " << c->topic_ts << " " << c->topic_setter << " :" << c->topic;
 		}
 		else
 		{

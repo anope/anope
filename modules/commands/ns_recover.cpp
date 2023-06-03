@@ -284,7 +284,7 @@ class NSRecover : public Module
 				if (it != ei->end())
 				{
 					for (size_t i = 0; i < it->second.Modes().length(); ++i)
-						c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByChar(it->second.Modes()[i]), u->GetUID());
+						c->SetMode(c->WhoSends(), ModeManager::FindChannelModeByChar(it->second.Modes()[i]), u->GetUID());
 
 					ei->erase(it);
 					if (ei->empty())

@@ -7,7 +7,7 @@
  */
 
 /* RequiredLibraries: ssl,crypto */
-/* RequiredWindowsLibraries: ssleay32,libeay32 */
+/* RequiredWindowsLibraries: libssl,libcrypto */
 
 #include "module.h"
 #include "modules/ssl.h"

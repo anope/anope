@@ -121,11 +121,11 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 					ChannelMode *cm = ModeManager::FindChannelModeByName(it2->first);
 					if (!cm || cm->type != MODE_LIST)
 						continue;
-					ModeManager::StackerAdd(c->ci->WhoSends(), c, cm, true, it2->second);
+					ModeManager::StackerAdd(c->WhoSends(), c, cm, true, it2->second);
 				}
 
 				if (!c->topic.empty() && !c->topic_setter.empty())
-					IRCD->SendTopic(c->ci->WhoSends(), c);
+					IRCD->SendTopic(c->WhoSends(), c);
 
 				c->syncing = true;
 			}

@@ -32,7 +32,7 @@ class CommandOSConfig : public Command
 				return;
 			}
 
-			Configuration::Block *block = Config->GetBlock(params[1]);
+			Configuration::MutableBlock *block = Config->GetMutableBlock(params[1]);
 			if (!block)
 				block = Config->GetModule(params[1]);
 

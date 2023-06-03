@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 18:19+0100\n"
-"PO-Revision-Date: 2021-12-26 21:47+0100\n"
+"POT-Creation-Date: 2023-04-21 21:30+0200\n"
+"PO-Revision-Date: 2023-04-21 22:04+0200\n"
 "Last-Translator: henk\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -325,9 +325,7 @@ msgstr "%s passt zum Eintrag %s, der folgendes Privileg hat: %s."
 
 #, c-format
 msgid "%s matches an except on %s and cannot be banned until the except has been removed."
-msgstr ""
-"%s passt auf eine Ausnahme (exception) von %s und kann nicht gebannt werden bis die Ausnahme entfernt "
-"worden ist."
+msgstr "%s passt auf eine Ausnahme (exception) von %s und kann nicht gebannt werden bis die Ausnahme entfernt worden ist."
 
 #, c-format
 msgid "%s matches auto kick entry %s on %s (%s)."
@@ -363,8 +361,7 @@ msgstr "%s wurde nicht in der Ignore-Liste gefunden."
 
 #, c-format
 msgid "%s not found on session list, but has a limit of %d because it matches entry: %s."
-msgstr ""
-"%s nicht in der Sitzungsliste gefunden, hat aber eine Beschränkung auf %d, weil dieser Eintrag passt: %s."
+msgstr "%s nicht in der Sitzungsliste gefunden, hat aber eine Beschränkung auf %d, weil dieser Eintrag passt: %s."
 
 #, c-format
 msgid "%s not found on session-limit exception list."
@@ -479,8 +476,7 @@ msgid ""
 "up on the given server. REVOKE removes this\n"
 "restriction."
 msgstr ""
-"SET killt alle Operatoren vom angegebenen server und verhindert auf ihm das Erlangen von Operatoren-"
-"Rechten.\n"
+"SET killt alle Operatoren vom angegebenen server und verhindert auf ihm das Erlangen von Operatoren-Rechten.\n"
 "REVOKE entfernt diese Einschränkung wieder."
 
 #, c-format
@@ -488,9 +484,7 @@ msgid ""
 "User access levels can be seen by using the\n"
 "%s command; type %s%s HELP LEVELS for\n"
 "information."
-msgstr ""
-"User access levels können mit dem Befehl %s angezeigt werden; siehe %s%s HELP LEVELS für weitere "
-"Informationen."
+msgstr "User access levels können mit dem Befehl %s angezeigt werden; siehe %s%s HELP LEVELS für weitere Informationen."
 
 #, c-format
 msgid "[auto-memo] The memo you sent to %s has been viewed."
@@ -609,7 +603,7 @@ msgid "channel SET modes"
 msgstr "Channel SET Modi"
 
 msgid "channel SET type level"
-msgstr ""
+msgstr "channel SET Typ Level"
 
 msgid "channel VIEW [mask | entry-num | list]"
 msgstr "Channel VIEW [Maske | Nummer | Liste]"
@@ -669,7 +663,7 @@ msgid "channel {ON|OFF} [ttb]"
 msgstr "Channel {ON | OFF}"
 
 msgid "channel {DIS | DISABLE} type"
-msgstr ""
+msgstr "channel {DIS | DISABLE} Typ"
 
 #, fuzzy
 msgid "channel {ON | LEVEL | OFF}"
@@ -1018,8 +1012,7 @@ msgid ""
 "other channel users.\n"
 msgstr ""
 " \n"
-"Siehe Befehl %s (%s%s HELP ACCESS) für Informationen, wie man einen Teil dieser Rechte anderen "
-"Kanalbenutzern geben kann.\n"
+"Siehe Befehl %s (%s%s HELP ACCESS) für Informationen, wie man einen Teil dieser Rechte anderen Kanalbenutzern geben kann.\n"
 
 msgid ""
 " \n"
@@ -1052,9 +1045,7 @@ msgid ""
 "automatically expiring."
 msgstr ""
 " \n"
-"Setzt die Zeit nach der Bot Bans ablaufen. Wenn dies eingeschaltet ist, werden von Bots durch \"Badword "
-"Kicker\", \"Flood Kicker\", etc. gesetzte Bans automatisch nach der angegebenen Zeit entfernt. Mit dem "
-"Wert 0 wird dieser Automatismus abgeschaltet."
+"Setzt die Zeit nach der Bot Bans ablaufen. Wenn dies eingeschaltet ist, werden von Bots durch \"Badword Kicker\", \"Flood Kicker\", etc. gesetzte Bans automatisch nach der angegebenen Zeit entfernt. Mit dem Wert 0 wird dieser Automatismus abgeschaltet."
 
 #, fuzzy, c-format
 msgid ""
@@ -1133,17 +1124,13 @@ msgid ""
 "akick list."
 msgstr ""
 " \n"
-"Der Befehl AKICK DEL entfernt den angegebenen Nickname oder das angegebene Muster von der AutoKick-Liste. "
-"Er entfernt jedoch keine Bans, die durch einen AutoKick gesetzt wurden; diese müssen manuell entfernt "
-"werden.\n"
+"Der Befehl AKICK DEL entfernt den angegebenen Nickname oder das angegebene Muster von der AutoKick-Liste. Er entfernt jedoch keine Bans, die durch einen AutoKick gesetzt wurden; diese müssen manuell entfernt werden.\n"
 " \n"
-"Der Befehl AKICK LIST zeigt entweder die komplette AutoKick-Liste an oder, mit Angabe eines optionalen "
-"Musters, nur die darauf passenden Einträge.\n"
+"Der Befehl AKICK LIST zeigt entweder die komplette AutoKick-Liste an oder, mit Angabe eines optionalen Musters, nur die darauf passenden Einträge.\n"
 " \n"
 "Der Befehl AKICK VIEW ist eine ausführlichere Version des Befehls AKICK LIST.\n"
 " \n"
-"Der Befehl AKICK ENFORCE lässt %s die momentane AKICK Liste durchsetzen, also diejenigen Nutzer "
-"entfernen, die auf ein Muster der AKICK Liste passen.\n"
+"Der Befehl AKICK ENFORCE lässt %s die momentane AKICK Liste durchsetzen, also diejenigen Nutzer entfernen, die auf ein Muster der AKICK Liste passen.\n"
 " \n"
 "Der Befehl AKICK CLEAR entfernt alle Einträge in der AKICK Liste."
 
@@ -1744,20 +1731,20 @@ msgid "(%s from now)"
 msgstr "(in %s)"
 
 msgid "(Split)"
-msgstr ""
+msgstr "(aufgeteilt)"
 
 #, c-format
 msgid "(by %s on %s) %s"
-msgstr ""
+msgstr "(von %s am %s) %s"
 
 msgid "(disabled)"
 msgstr "(deaktiviert)"
 
 msgid "(founder only)"
-msgstr ""
+msgstr "(nur 'founder')"
 
 msgid "(now)"
-msgstr ""
+msgstr "(jetzt)"
 
 msgid "* AKILL any new clients connecting"
 msgstr "* Setzt einen AKILL auf jeden NEU verbindenden Clienten"
@@ -1785,7 +1772,7 @@ msgid "* No new nick registrations"
 msgstr "* Keine neuen Nicknamen-Registrierungen"
 
 msgid "* Silently ignore non-opers"
-msgstr "* Stilles Ignorieren von Nicht-Operatoren."
+msgstr "* Stilles Ignorieren von Nicht-Operatoren"
 
 #, c-format
 msgid "* Use the reduced session limit of %d"
@@ -1803,18 +1790,14 @@ msgid "<unknown>"
 msgstr "<unbekannt>"
 
 #, c-format
-msgid ""
-"A confirmation e-mail has been sent to %s. Follow the instructions in it to change your e-mail address."
-msgstr ""
-"Eine Bestätigungsmail wurde an %s gesendet. Folge den Anweisungen, um Deine E-Mail Adresse zu ändern."
+msgid "A confirmation e-mail has been sent to %s. Follow the instructions in it to change your e-mail address."
+msgstr "Eine Bestätigungsmail wurde an %s gesendet. Folge den Anweisungen, um Deine E-Mail Adresse zu ändern."
 
 msgid "A massmemo has been sent to all registered users."
 msgstr "Ein Massen-Memo wurde an alle regsitrierten Benutzer gesendet."
 
-msgid ""
-"A memo informing the user will also be sent, which includes the reason for the rejection if supplied."
-msgstr ""
-"Ausserdem wird dem Nutzer eine Notiz gesendet, die den Grund für die Ablehnung enthält, falls angegeben."
+msgid "A memo informing the user will also be sent, which includes the reason for the rejection if supplied."
+msgstr "Ausserdem wird dem Nutzer eine Notiz gesendet, die den Grund für die Ablehnung enthält, falls angegeben."
 
 msgid "A memo informing the user will also be sent."
 msgstr "Ausserdem wird dem Nutzer eine Notiz gesendet."
@@ -1924,6 +1907,9 @@ msgstr "Zugriffs-Liste von %s:"
 msgid "Access to this command requires the permission %s to be present in your opertype."
 msgstr "Um Zugriff auf diesen Befehl zu haben benötigst Du die Berechtigung %s in Deinem Oper Type."
 
+msgid "Account"
+msgstr "Konto"
+
 #, c-format
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "Das Konto %s hat die erlaubte Anzahl gleichzeitiger Anmeldungen bereits erreicht (%u)."
@@ -2001,9 +1987,7 @@ msgid ""
 "Additionally, if fantasy is enabled fantasy commands\n"
 "can be executed by prefixing the command name with\n"
 "one of the following characters: %s"
-msgstr ""
-"Falls \"fantasy\" eingeschaltet ist, können Fantasy-Befehle ausgeführt werden, indem Befehlen eines der "
-"folgenden Zeichen vorangestellt wird: %s"
+msgstr "Falls \"fantasy\" eingeschaltet ist, können Fantasy-Befehle ausgeführt werden, indem Befehlen eines der folgenden Zeichen vorangestellt wird: %s"
 
 #, c-format
 msgid "All O:lines of %s have been reset."
@@ -2036,11 +2020,8 @@ msgstr "Alle Memos für den Channel %s wurden gelöscht."
 msgid "All modes cleared on %s."
 msgstr "Alle Modi von %s gesäubert."
 
-msgid ""
-"All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."
-msgstr ""
-"Alle neuen Konten müssen von einem Administrator validiert werden. Bitte auf die Bestätigung der "
-"Registrierung warten."
+msgid "All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."
+msgstr "Alle neuen Konten müssen von einem Administrator validiert werden. Bitte auf die Bestätigung der Registrierung warten."
 
 msgid "All of your memos have been deleted."
 msgstr "Alle Deine Memos wurden gelöscht."
@@ -2349,12 +2330,7 @@ msgid ""
 "killed. Before the user is killed, they are notified, of a\n"
 "source of help regarding session limiting. The content of\n"
 "this notice is a config setting."
-msgstr ""
-"Erlaubt Dienstoperatoren die Liste der Computer mit spezifischen Sitzungslimiten zu verändern, z.B. um "
-"Shell-Servern mehr Klienten gleichzeitig als standardmässig zu erlauben. Sobald ein Computer sein "
-"Sitzungslimit erreicht, werden alle Klienten, die von diesem Computer aus verbinden werden gekillt. Bevor "
-"das passiert, bekommt er eine Benachrichtigung mit Informationen zu Sitzungslimiten. Der Inhalt dieser "
-"Benachrichtigung ist konfigurierbar."
+msgstr "Erlaubt Dienstoperatoren die Liste der Computer mit spezifischen Sitzungslimiten zu verändern, z.B. um Shell-Servern mehr Klienten gleichzeitig als standardmässig zu erlauben. Sobald ein Computer sein Sitzungslimit erreicht, werden alle Klienten, die von diesem Computer aus verbinden werden gekillt. Bevor das passiert, bekommt er eine Benachrichtigung mit Informationen zu Sitzungslimiten. Der Inhalt dieser Benachrichtigung ist konfigurierbar."
 
 #, fuzzy
 msgid ""
@@ -2400,6 +2376,14 @@ msgid ""
 "topic lock is set, the channel topic will be unchangeable by users who do not have\n"
 "the TOPIC privilege."
 msgstr ""
+"Verändern des 'topic' des angegebenen Kanals.\n"
+"Der Befehl SET setzt das 'topic' des Kanals auf den angegebenen Wert\n"
+"oder entfernt es, wenn kein Wert angegeben wird. Der Befehl APPEND\n"
+"hängt den angegebenen Wert an das momentane 'topic' an.\n"
+" \n"
+"Mit LOCK und UNLOCK kann das 'topic' ge- bzw. entsperrt werden. Wenn\n"
+"es gesperrt ist, kann es nur von Benutzern mit dem TOPIC-Privileg geändert\n"
+"werden."
 
 #, c-format
 msgid ""
@@ -2434,6 +2418,9 @@ msgid ""
 "Note that operators removed by this command but are still set in\n"
 "the configuration file are not permanently affected by this."
 msgstr ""
+"Einsehen und Ändern der 'Services Operators'.\n"
+"Zu beachten: hiermit entfernte Operatoren, die aber noch in der\n"
+"Konfigurations-Datei aufgeführt sind, bleiben nicht permanent entfernt."
 
 msgid ""
 "Allows you to change and view configuration settings.\n"
@@ -2444,6 +2431,13 @@ msgid ""
 "Example:\n"
 "     MODIFY nickserv forcemail no"
 msgstr ""
+"Einsehen und Ändern der Konfiguration.\n"
+"Mit diesem Befehl vorgenommene Änderungen sind temporär und werden nicht\n"
+"in die Konfigurationsdatei übernommen, sondern gehen verloren, wenn diese neu\n"
+"gelesen, Anope gestoppt oder neugestartet wird.\n"
+" \n"
+"Beispiel:\n"
+"     MODIFY nickserv forcemail no"
 
 #, fuzzy
 msgid ""
@@ -2475,12 +2469,18 @@ msgid ""
 "to memo you or a channel, they will not be told that you have\n"
 "them ignored."
 msgstr ""
+"Erlaubt die Memos eines Benutzer (basierend auf Nickname oder Host)\n"
+"an dich oder einen Kanal zu ignorieren. Wenn jemand auf dieser liste\n"
+"versucht, dir oder einem Kanal ein Memo zu schicken, wird die Person\n"
+"nicht informiert, dass du sie ignorierst."
 
 msgid ""
 "Allows you to kill a user from the network.\n"
 "Parameters are the same as for the standard /KILL\n"
 "command."
 msgstr ""
+"Einen Benutzer aus dem Netzwerk werfen.\n"
+"Parameter sind die selben wie für den standard /KILL Befehl."
 
 #, fuzzy, c-format
 msgid ""
@@ -2541,7 +2541,7 @@ msgstr ""
 msgid ""
 "Alternative methods of modifying channel access lists are\n"
 "available. "
-msgstr ""
+msgstr "Alternative Methoden zum Bearbeiten der Kanalzugangsliste sind verfügbar."
 
 msgid "Approve the requested vHost of a user"
 msgstr "Genehmigt den beantragten vHost eines Users"
@@ -2576,7 +2576,7 @@ msgid "Associate a URL with your account"
 msgstr "Stellt eine Begrüssungsmeldung für Deinen Nicknamen ein."
 
 msgid "Associate a greet message with your nickname"
-msgstr "Stellt eine Begrüssungsmeldung für Deinen Nicknamen ein."
+msgstr "Stelle eine Begrüssungsmeldung für Deinen Nicknamen ein."
 
 #, fuzzy
 msgid "Associate an E-mail address with the channel"
@@ -2637,7 +2637,7 @@ msgid "Available privileges for %s:"
 msgstr "Verfügbare Rechte für %s:"
 
 msgid "BANS enforced by "
-msgstr ""
+msgstr "BANS durchgesetzt durch "
 
 msgid "Bad words kicker"
 msgstr "Bad words kicker"
@@ -2867,7 +2867,7 @@ msgid "Bot won't kick for repeats anymore."
 msgstr "Der Bot ignoriert jetzt User die sich wiederholen und wird nicht kicken."
 
 msgid "By"
-msgstr ""
+msgstr "Von"
 
 #, fuzzy
 msgid "CLEAR target"
@@ -2952,7 +2952,7 @@ msgid "Certificate list for %s:"
 msgstr "Zertifikat-Liste von %s:"
 
 msgid "ChanServ is required to enable persist on this network."
-msgstr ""
+msgstr "ChanServ ist notwendig, um 'persist' auf diesem Netzwerk einzuschalten."
 
 msgid "Change channel modes"
 msgstr "Ändert die Raum Modi"
@@ -3112,7 +3112,7 @@ msgstr "Der Channel %s ist jetzt auf SUSPENDED gesetzt."
 
 #, c-format
 msgid "Channel %s registered under your account: %s"
-msgstr "Der Raum %s wurde unter deinem Account %s registriert."
+msgstr "Der Kanal %s wurde unter deinem Konto %s registriert."
 
 #, c-format
 msgid "Channel %s will expire."
@@ -3163,7 +3163,7 @@ msgstr "Die Räume auf die %s Zugriff hat:"
 
 #, c-format
 msgid "Channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr ""
+msgstr "Kanäle: %lu Einträge, %lu buckets, längste Kette ist %d"
 
 msgid "Chanstats"
 msgstr "Chanstats"
@@ -3197,6 +3197,9 @@ msgid ""
 "or changing nick on the network and tells you when and, depending\n"
 "on channel or user settings, where it was."
 msgstr ""
+"Prüft den letzten Zeitpunkt, wann Nickname einen Kanal betreten,\n"
+"verlassen oder seinen Nicknamen gewechselt hat. Zeigt an, wann und,\n"
+"je nach Kanal- und Benutzereinstellungen auch wo, das war."
 
 msgid "Checks if last memo to a nick was read"
 msgstr "Überprüft ob Deine letzte gesendete Memo vom Empänger gelesen wurde"
@@ -3211,7 +3214,7 @@ msgstr ""
 
 #, c-format
 msgid "Cleared info from %s."
-msgstr ""
+msgstr "Info entfernt von %s."
 
 msgid "Colors kicker"
 msgstr "Farb-Kicker"
@@ -3299,6 +3302,8 @@ msgstr "Regelt Modi und gesperrte Modi eines Raumes"
 
 msgid "Controls what messages will be sent to users when they join the channel."
 msgstr ""
+"Zum Einstellen der Nachrichten, die Benutzern gesendet werden, wenn\n"
+"sie dem Kanal beitreten."
 
 msgid ""
 "Copies all settings, access, akicks, etc from channel to the\n"
@@ -3306,9 +3311,13 @@ msgid ""
 "or LEVELS then only the respective settings are cloned.\n"
 "You must be the founder of channel and target."
 msgstr ""
+"Kopiert alle Einstellungen, Zugriffsrechte, akicks, etc von channel nach\n"
+"target. Falls what als ACCESS, AKICK, BADWORDS,\n"
+"oder LEVELS angegeben wurde, werden nur diese Einstellungen kopiert.\n"
+"Der Anwender muss der Gründer von channel und target sein."
 
 msgid "Copy all settings from one channel to another"
-msgstr "Kopiert alle Einstellungen von einem Raum zu einem anderen."
+msgstr "Kopiert alle Einstellungen von einem Kanal zu einem anderen."
 
 msgid "Created"
 msgstr "Erstellt"
@@ -3493,7 +3502,7 @@ msgid "Default SQLINE expiry time: No expiration"
 msgstr "Standard Auslaufzeit von SQLINEs: Kein Auslauf, permanent"
 
 msgid "Define messages to be randomly shown to users at logon"
-msgstr "Zufalls-News bearbeiten, die beim Einloggen angezeigt werden."
+msgstr "Zufalls-News bearbeiten, die Benutzern beim Einloggen angezeigt werden."
 
 msgid "Define messages to be shown to users at logon"
 msgstr "Logon-News bearbeiten"
@@ -3619,7 +3628,7 @@ msgstr ""
 
 #, c-format
 msgid "Depooled %s."
-msgstr ""
+msgstr "%s aus dem Pool entfernt."
 
 #, fuzzy
 msgid "Description"
@@ -3707,10 +3716,10 @@ msgid "Displays this list and give information about commands"
 msgstr "Zeigt Informationen bezüglich Deiner Memos an"
 
 msgid "Displays your Channel Stats"
-msgstr ""
+msgstr "Zeigt deine Kanalstatistiken an."
 
 msgid "Displays your Global Stats"
-msgstr ""
+msgstr "Zeigt deine globalen Statistiken an."
 
 msgid "Don't use AMSGs!"
 msgstr "Benutze keine AMSGs!"
@@ -3740,6 +3749,9 @@ msgid ""
 "you may own. Any other user will be able to gain control of\n"
 "this nick."
 msgstr ""
+"Entfernt den angegebenen Nicknamen aus der Datenbank.\n"
+"Sobald der Nickname entfernt wird, gehen dir alle Zugriffsrechte und Kanäle,\n"
+"die du besitzt, verloren. Andere Benutzer können diesen Nickname übernehmen."
 
 #, c-format
 msgid "E-mail address for %s changed to %s."
@@ -3808,13 +3820,13 @@ msgid "Email matched: %s (%s) to %s."
 msgstr "Passende Emails %s bis %s."
 
 msgid "Enable fantaisist commands"
-msgstr ""
+msgstr "Aktivieren der Fantasy Befehle"
 
 msgid "Enable greet messages"
-msgstr ""
+msgstr "Aktivieren der Begrüssungsnachrichten"
 
 msgid "Enable or disable keep modes"
-msgstr ""
+msgstr "Aktivieren oder deaktivieren des \"keep\" Modus"
 
 msgid "Enabled"
 msgstr "Aktiviert"
@@ -3848,12 +3860,19 @@ msgid ""
 "modes is enabled, services will remember users' usermodes\n"
 "and attempt to re-set them the next time they authenticate."
 msgstr ""
+"Aktivieren oder deaktivieren des \"keep\" Modus für den angegebenen Nickname.\n"
+"Wenn der Modus aktiv ist, merken die Services sich die 'Modes' des Benutzers\n"
+"und versuchen sie wiederherzustellen, wenn der Benutzer sich das nächste Mal\n"
+"authentisiert."
 
 msgid ""
 "Enables or disables keepmodes for your nick. If keep\n"
 "modes is enabled, services will remember your usermodes\n"
 "and attempt to re-set them the next time you authenticate."
 msgstr ""
+"Aktivieren oder deaktivieren des \"keep\" Modus für deinen Nickname.\n"
+"Wenn der Modus aktiv ist, merken die Services sich deine 'Modes' und versuchen\n"
+"sie wiederherzustellen, wenn du dich das nächste Mal authentisiert."
 
 #, fuzzy
 msgid ""
@@ -4051,7 +4070,7 @@ msgid "End of users list. %u users shown."
 msgstr "Ende der Zugangsliste - %d/%d Treffer angezeigt."
 
 msgid "Enforce various channel modes and set options"
-msgstr ""
+msgstr "Erzwingen diverser Kanal Modi und Einstellungen"
 
 msgid ""
 "Enforce various channel modes and set options. The channel\n"
@@ -4068,6 +4087,19 @@ msgid ""
 "kicking users affected by them, and LIMIT will kick users until the\n"
 "user count drops below the channel limit, if one is set."
 msgstr ""
+"Verschiedene Kanalmodi und Einstellungen erzwingen. Das Argument channel\n"
+"gibt an, in welchem Kanal dies passieren soll.\n"
+"Das Argument what gibt an, was durchgesetzt werden soll, mögliche Werte sind\n"
+"SECUREOPS, RESTRICTED, REGONLY, SSLONLY, BANS und LIMIT.\n"
+" \n"
+"Mit SECUREOPS kann die SECUREOPS Einstellung durchgesetzt werden, selbst wenn\n"
+"diese nicht aktiviert ist\n"
+"Mit RESTRICTED kann die RESTRICTED Einstellung durchgesetzt werden, selbst wenn\n"
+"diese nicht aktiviert ist.\n"
+"Mit REGONLY werden alle nicht registrierten Benutzer aus dem Kanal gekickt.\n"
+"Mit SSLONLY werden alle Benutzer gekickt, die keine verschlüsselte Verbindung nutzen.\n"
+"Mit BANS werden Bans durchgesetzt, indem von ihnen betroffene Benutzer gekickt werden.\n"
+"Mit LIMIT werden Benutzer gekickt, bis die Nutzerzahl unter ein evtl. gesetztes Limit sinkt."
 
 msgid "English"
 msgstr "Deutsch"
@@ -4122,6 +4154,17 @@ msgid ""
 "    CERT LIST\n"
 "        Displays the current certificate list."
 msgstr ""
+"Beispiele:\n"
+" \n"
+"    CERT ADD\n"
+"        Fügt deinen momentanen Fingerabdruck zu deiner Zertifikatsliste hinzu\n"
+"\tund identifiziert dicah automatisch, wenn du dich mit diesem Zertifikat verbindest.\n"
+" \n"
+"    CERT DEL <fingerprint>\n"
+"        Entfernt den Fingerabdruck <fingerprint> von deiner Zertifikatsliste.\n"
+" \n"
+"    CERT LIST\n"
+"        Anzeigen der aktuellen Zertifikatsliste."
 
 #, c-format
 msgid "Exception for %s has been updated to %d."
@@ -4242,9 +4285,7 @@ msgstr "Einem User \"Operflags\" setzen"
 msgid ""
 "Gives %s status to the selected nick on a channel. If nick is\n"
 "not given, it will %s you."
-msgstr ""
-"Gibt dem angegebenen Nickname den Status %s in einem Kanal. Falls kein nick angegeben ist, bekommt der "
-"aufrufende Nickname %s."
+msgstr "Gibt dem angegebenen Nickname den Status %s in einem Kanal. Falls kein nick angegeben ist, bekommt der aufrufende Nickname %s."
 
 #, fuzzy, c-format
 msgid "Gives you or the specified nick %s status on a channel"
@@ -4356,25 +4397,23 @@ msgstr "Information für den Raum %s:"
 
 #, c-format
 msgid "Invalid duration %s, using %d days."
-msgstr ""
+msgstr "Ungültige Zeitdauer %s, werde '%d Tage' benutzen."
 
 msgid "Invalid expiry time."
 msgstr "Ungültige Ablaufzeit."
 
-msgid ""
-"Invalid hostmask. Only real hostmasks are valid, as exceptions are not matched against nicks or usernames."
-msgstr ""
-"Ungültige Hostmask. Nur echte Hostmasken sind gültig, da auf Nicknames oder Idents nicht geprüft wird."
+msgid "Invalid hostmask. Only real hostmasks are valid, as exceptions are not matched against nicks or usernames."
+msgstr "Ungültige Hostmask. Nur echte Hostmasken sind gültig, da auf Nicknames oder Idents nicht geprüft wird."
 
 #, c-format
 msgid "Invalid limit %s, using %d."
-msgstr ""
+msgstr "Ungültige Einschränkung %s, werde %d benutzen."
 
 msgid "Invalid passcode has been entered, please check the e-mail again, and retry."
-msgstr ""
+msgstr "Ein ungültiger Code wurde angegeben. Bitte nochmal die E-Mail prüfen und erneut versuchen."
 
 msgid "Invalid passcode."
-msgstr ""
+msgstr "Ungültiger Code."
 
 #, c-format
 msgid "Invalid session limit. It must be a valid integer greater than or equal to zero and less than %d."
@@ -4386,10 +4425,10 @@ msgid "Invalid threshold value. It must be a valid integer greater than 1."
 msgstr "Ungültiger Wert. Es muss eine gültige grade Zahl sein, die grösser als 1 ist."
 
 msgid "Invalid value for LIMIT. Must be numerical."
-msgstr ""
+msgstr "Ungültiger Wert für LIMIT: muss numerisch sein."
 
 msgid "Invites you or an optionally specified nick into a channel"
-msgstr "Lädt Dich oder einen optional angegebenen Benutzer in einen Raum ein."
+msgstr "Lädt Dich oder einen optional angegebenen Benutzer in einen Kanal ein."
 
 msgid "Italics kicker"
 msgstr "Italics kicker : %s"
@@ -4417,11 +4456,11 @@ msgid "Key for channel %s is %s."
 msgstr "Key für Chatrauml %s ist %s."
 
 msgid "Kick a user from a channel"
-msgstr "Kickt einen Benutzer aus einem Chatraum."
+msgstr "Kickt einen Benutzer aus einem Kanal."
 
 #, c-format
 msgid "Kicked %d/%d users matching %s from %s."
-msgstr ""
+msgstr "%d/%d Benutzer gekickt, die auf %s von %s passen."
 
 #, fuzzy
 msgid "Kicks a specified nick from a channel"
@@ -4445,11 +4484,11 @@ msgid "Kill a user"
 msgstr "Trennt die Verbindung eines Nutzers zum Netz"
 
 msgid "LIMIT enforced by "
-msgstr ""
+msgstr "LIMIT durchgesetzt von"
 
 #, c-format
 msgid "LIMIT enforced on %s, %d users removed."
-msgstr ""
+msgstr "LIMIT in %s erzwungen, %d Benutzer entfernt."
 
 msgid "LIST threshold"
 msgstr ""
@@ -4488,7 +4527,7 @@ msgid "Last seen address"
 msgstr "Letzte gesehene Hostmaske: %s"
 
 msgid "Last topic"
-msgstr ""
+msgstr "Letztes Topic"
 
 #, fuzzy
 msgid "Last used"
@@ -4524,7 +4563,7 @@ msgstr "Listet Chaträume zu denen Du Zugang hast"
 
 #, c-format
 msgid "List for mode %c is full."
-msgstr ""
+msgstr "Die Liste für Modus %c ist voll."
 
 msgid "List loaded modules"
 msgstr "Listet die geladenen Module auf"
@@ -4582,9 +4621,13 @@ msgid ""
 "prefixed by an exclamation mark. The nickname parameter is\n"
 "limited to Services Operators"
 msgstr ""
+"Auflisten aller Kanäle, zu denen du Zugriffsrechte hast.\n"
+"\n"
+"Kanäle, bei denen die NOEXPIRE Option gesetzt ist, haben ein Ausrufezeichen\n"
+"als Präfix. Der Nickname Parameter kann nur von Services Operators genutzt werden."
 
 msgid "Lists all nicknames in your group"
-msgstr "Liste der Nicknamen in Deiner Gruppe:"
+msgstr "Listet alle Nicknamen in Deiner Gruppe auf."
 
 msgid "Lists all registered channels matching the given pattern"
 msgstr "Listet alle registrieten Channels des angegebenen Musters"
@@ -4790,15 +4833,15 @@ msgstr "Log-iste von %s:"
 
 #, c-format
 msgid "Logging changed for command %s on %s, now using log method %s%s%s."
-msgstr ""
+msgstr "Protokollierung für den Befehl %s auf %s wurde geändert, neue Methode ist %s%s%s."
 
 #, c-format
 msgid "Logging for command %s on %s with log method %s%s%s has been removed."
-msgstr ""
+msgstr "Protokollierung für den Befehl %s auf %s mit Methode %s%s%s wurde entfernt."
 
 #, c-format
 msgid "Logging is now active for command %s on %s, using log method %s%s%s."
-msgstr ""
+msgstr "Protokollierung für den Befehl %s auf %s mit Methode %s%s%s wurde aktiviert."
 
 #, c-format
 msgid "Login to %s"
@@ -4825,6 +4868,8 @@ msgid ""
 "This command may be unnecessary if your oper block is\n"
 "configured without a password."
 msgstr ""
+"Meldet dich an %s an, sodass du Services Operator Privilegien bekommst.\n"
+"Dieser Befehl mag überflüssig sein, wenn dein Oper Block kein Password gesetzt hat."
 
 #, c-format
 msgid ""
@@ -4832,10 +4877,12 @@ msgid ""
 "This command is only useful if your oper block is configured\n"
 "with a password."
 msgstr ""
+"Meldet dich von %s ab, sodass du deine Services Operator Privilegien verlierst.\n"
+"Dieser Befehl ist nur sinnvoll, wenn dein Oper Block ein Password gesetzt hat."
 
 #, c-format
 msgid "Looking for yourself, eh %s?"
-msgstr ""
+msgstr "Auf der Suche nach dir selbst, was %s?"
 
 #, c-format
 msgid ""
@@ -4862,6 +4909,33 @@ msgid ""
 "any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If what\n"
 "is not given then all basic modes are removed."
 msgstr ""
+"Hauptsächlich zum Verwalten von festgesetzten Modi (mode locks) und\n"
+"Moduszugang (mode access, was etwas anderes ist als Kanalzugang, channel access)\n"
+"eines Kanals.\n"
+" \n"
+"Der %s LOCK Befehl dient dem Hinzufügen, Entfernen und Anschauen\n"
+"der festgesetzten Modi eines Kanals.\n"
+"Wenn ein Modus auf \"an\" oder \"aus\" festgesetzt ist, erlauben die Services keine\n"
+"Änderung dieses Modus.\n"
+"Der SET Befehl entfernt alle bestehenden Modus-Festsetzungen und setzt nur\n"
+"die angegebenen, während ADD and DEL die bestehenden verändern.\n"
+"Beispiel:\n"
+"     MODE #channel LOCK ADD +bmnt *!*@*aol*\n"
+" \n"
+"Der %s SET Befehl erlaubt es, Modi durch die Services zu setzen.\n"
+"Die Platzhalter * und ? dürfen als Parameter für Listen und Status Modi\n"
+"verwendet werden.\n"
+"Beispiel:\n"
+"     MODE #channel SET +v *\n"
+"       Gibt allen Benutzern im Kanal 'Voice'.\n"
+" \n"
+"     MODE #channel SET -b ~c:*\n"
+"       Entfernt alle erweiterten (extended) Bans, die mit ~c: beginnen.\n"
+" \n"
+"Der %s CLEAR Befehl ist ein einfacher Weg, alle Modi eines Kanals zu entfernen.\n"
+"what darf ein beliebiger Modusname sein.\n"
+"Beispiele beinhalten bans, excepts, inviteoverrides, ops, halfops, and voices.\n"
+"Wenn what nicht angegeben ist, werden alle Basismodi entfernt."
 
 #, fuzzy
 msgid "Maintain the AutoKick list"
@@ -4877,6 +4951,9 @@ msgid ""
 "on the %s list receive the following privileges:\n"
 " "
 msgstr ""
+"Verwaltet die %s Liste eines Kanals. Benutzer, auf die ein Eintrag der %s Liste\n"
+"passt, erhalten folgende Privilegien:\n"
+" "
 
 #, c-format
 msgid ""
@@ -4894,6 +4971,19 @@ msgid ""
 "will be added to the akick list instead of the mask.\n"
 "All users within that nickgroup will then be akicked.\n"
 msgstr ""
+"Verwaltet die AutoKick Liste eines Kanals. Wenn ein Benutzer\n"
+"auf dieser Liste versucht, einen Kanal zu betreten, wird\n"
+"%s ihn aus dem Kanal verbannen und ihn dann kicken.\n"
+" \n"
+"Der AKICK ADD Befehl fügt den angegebenen Nicknamen oder\n"
+"das Muster (usermask) der Liste hinzu. Wenn ein reason (Grund)\n"
+"mitgegeben wird, wird dieser beim Kick angegeben; falls nicht,\n"
+"wird der Standard \"Benutzer wurde aus diesem Kanal verbannt\"\n"
+"verwendet.\n"
+"Wenn ein registrierter Nick angegeben wurde, wird das %s Konto\n"
+"statt des Musters (mask) zur Liste hinzugefügt.\n"
+"Alle Nicknamen in der Nickgruppe dieses Benutzers werden dann\n"
+"automatisch gekickt.\n"
 
 #, c-format
 msgid ""
@@ -4905,6 +4995,12 @@ msgid ""
 "a user level of 0, and any unregistered user has a user level\n"
 "of -1."
 msgstr ""
+"Verwaltet die access list (Zugangsliste) eines Kanals.\n"
+"Diese Liste legt fest, welche Benutzer OP status oder Zugang zu\n"
+"den %s Befehlen für diesen Kanal haben. Unterschiedliche Level\n"
+"erlauben die Benutzung unterschiedlicher Untermengen von\n"
+"Privilegien. Alle registrierten Benutzer, die nicht auf der Liste sind,\n"
+"haben Benutzerlevel 0 und unregistrierte Benutzer Level -1."
 
 #, fuzzy, c-format
 msgid ""
@@ -5120,7 +5216,7 @@ msgstr ""
 
 #, c-format
 msgid "Missing parameter for mode %c."
-msgstr ""
+msgstr "Fehlender Parameter für Modus %c."
 
 msgid "Mode"
 msgstr ""
@@ -5146,7 +5242,7 @@ msgstr ""
 
 #, c-format
 msgid "Modes cleared on %s and the channel destroyed."
-msgstr ""
+msgstr "Modi von %s entfernt und Kanal zerstört."
 
 #, fuzzy, c-format
 msgid ""
@@ -5202,6 +5298,12 @@ msgid ""
 "may provide a nick to modify other users' certificate lists.\n"
 " \n"
 msgstr ""
+"Ändern oder Anzeigen der Zertifikatsliste für deinen Nickname.\n"
+"Wenn du bei der Verbindung ein Client-Zertifikat verwendest, dessen\n"
+"Fingerabdruck zu einem Eintrag in der Zertifikatsliste passt, wirst du\n"
+"automatisch bei den Services angemeldet. Services Operators können\n"
+"einen Nickname angeben, um die Zertifikatsliste anderer Nutzer\n"
+"zu ändern.\n"
 
 #, fuzzy
 msgid "Modify the Services ignore list"
@@ -5372,7 +5474,7 @@ msgstr "Der Nickname %s ist jetzt suspendiert."
 
 #, c-format
 msgid "Nick too long, max length is %u characters."
-msgstr ""
+msgstr "Nickname ist zu lang, maximale Länge ist %u Zeichen."
 
 #, c-format
 msgid "Nickname %s has been dropped."
@@ -5456,17 +5558,17 @@ msgid "No memo was cancelable."
 msgstr "Kein Memo konnte widerrufen werden."
 
 msgid "No memos to display."
-msgstr ""
+msgstr "Keine Nachrichten anzuzeigen."
 
 #, fuzzy
 msgid "No modules currently loaded matching that criteria."
 msgstr "Derzeit keine Module geladen"
 
 msgid "No one is using your nick, and services are not holding it."
-msgstr ""
+msgstr "Niemand benutzt deinen Nickname und die Services halten ihn nicht."
 
 msgid "No oper block for your nick."
-msgstr ""
+msgstr "Es gibt keinen Oper Block für deinen Nickname."
 
 msgid "No oper news items to delete!"
 msgstr "Keine Oper-News-Einträge zu löschen!"
@@ -5475,7 +5577,7 @@ msgid "No random news items to delete!"
 msgstr "Keine randomnews Einträge zu löschen!"
 
 msgid "No records to display."
-msgstr ""
+msgstr "Keine Einträge zum Anzeigen."
 
 #, fuzzy, c-format
 msgid "No registrations matching %s were found."
@@ -5483,10 +5585,10 @@ msgstr "* Keine neuen Nicknamen-Registrierungen"
 
 #, c-format
 msgid "No request for nick %s found."
-msgstr ""
+msgstr "Es wurde keine Anfrage für Nicknamen %s gefunden."
 
 msgid "No signed kick when SIGNKICK LEVEL is used"
-msgstr ""
+msgstr "Keine signierten Kicks wenn SIGNKICK LEVEL benutzt wird."
 
 #, fuzzy, c-format
 msgid "No stats for %s."
@@ -5510,7 +5612,7 @@ msgstr "No-Bot-Mode ist jetzt ON im Channel %s."
 
 #, c-format
 msgid "Non-status modes cleared on %s."
-msgstr ""
+msgstr "Nicht-Status Modi von %s wurden zurückgesetzt."
 
 msgid "None"
 msgstr "Keine"
@@ -5522,9 +5624,12 @@ msgid ""
 "become the new founder and it will be as if the\n"
 "channel had no successor set."
 msgstr ""
+"Beachte allerdings, dass der Nachfolger (successor) nicht zum Gründer (founder)\n"
+"werden kann, wenn er bereits zuviele Kanäle besitzt (%d).\n"
+"Dann verhält es sich, als wäre für den Kanal kein Nachfolger (successor) gesetzt."
 
 msgid "Nothing to do."
-msgstr ""
+msgstr "Es war nichts zu tun."
 
 msgid "Number"
 msgstr ""
@@ -5560,7 +5665,7 @@ msgstr "Oper News Einträge:"
 
 #, c-format
 msgid "Oper privileges removed from %s (%s)."
-msgstr ""
+msgstr "Oper-Privilegien von %s (%s) wurden entfernt."
 
 #, fuzzy, c-format
 msgid "Oper type %s has not been configured."
@@ -5576,15 +5681,15 @@ msgstr "Operflags %s wurden für %s hinzugefügt. "
 
 #, c-format
 msgid "Opertype %s has no allowed commands."
-msgstr ""
+msgstr "Oper-Typ %s hat keine erlaubten Befehle."
 
 #, c-format
 msgid "Opertype %s has no allowed privileges."
-msgstr ""
+msgstr "Oper-Typ %s hat keine erlaubten Privilegien."
 
 #, c-format
 msgid "Opertype %s receives modes %s once identified."
-msgstr ""
+msgstr "Oper-Typ %s erhält Modi %s beim Identifizieren."
 
 msgid "Ops protection"
 msgstr "Op-Schutz"
@@ -5606,9 +5711,6 @@ msgstr "Passwort akzeptiert - Du bist jetzt angemeldet."
 #, fuzzy
 msgid "Password accepted."
 msgstr "Falsches Passwort."
-
-msgid "Password authentication required for that command."
-msgstr ""
 
 #, fuzzy, c-format
 msgid "Password for %s changed to %s."
@@ -5646,20 +5748,24 @@ msgid "Persistent"
 msgstr "Persistant"
 
 msgid "Please contact an Operator to get a vHost assigned to this nick."
-msgstr ""
+msgstr "Bitte kontaktiere einen Operator, um diesem Nickname einen vHost zuzuordnen."
 
 msgid ""
 "Please try again with a more obscure password. Passwords should be at least\n"
 "five characters long, should not be something easily guessed\n"
 "(e.g. your real name or your nick), and cannot contain the space or tab characters."
 msgstr ""
+"Bitte versuch es erneut mit einem komplizierteren Passwort.\n"
+"Passwörter sollten mindestens 5 Zeichen lang sein, nicht einfach zu erraten\n"
+"sein (z.B. dein Realname oder dein Nickname) und können weder Leerzeichen\n"
+"noch Tab enthalten."
 
 #, fuzzy
 msgid "Please use a valid server name when juping."
 msgstr "Benutze bitte einen gültigen hostnamen, wenn Du jupiterst"
 
 msgid "Please use the symbol of # when attempting to register."
-msgstr ""
+msgstr "Benutze bitte die Raute # zum Registrieren."
 
 #, c-format
 msgid "Please wait %d seconds and retry."
@@ -5692,7 +5798,7 @@ msgid "Pooled/Not Active"
 msgstr ""
 
 msgid "Prevent a bot from being assigned by non IRC operators"
-msgstr ""
+msgstr "Verhindert, dass dieser Bot von einem Nicht-IRC-Operator zugewiesen wird."
 
 #, fuzzy
 msgid "Prevent a bot from being assigned to a channel"
@@ -5725,7 +5831,7 @@ msgstr ""
 "               Zeit verfällt"
 
 msgid "Prevents users being kicked by Services"
-msgstr ""
+msgstr "Verhindert, dass Benutzer von den Services gekickt werden"
 
 msgid "Private"
 msgstr "Privat"
@@ -5756,11 +5862,11 @@ msgstr "Der Privat-Modus (PRIVATE) ist für %s jetzt aktiviert (ON)."
 
 #, c-format
 msgid "Privilege %s added to %s on %s, new flags are +%s"
-msgstr ""
+msgstr "Privileg %s wurde %s in %s hinzugefügt, neue Flags sind +%s"
 
 #, c-format
 msgid "Privilege %s removed from %s on %s, new flags are +%s"
-msgstr ""
+msgstr "Privileg %s wurde %s in %s genommen, neue Flags sind +%s"
 
 msgid "Protection"
 msgstr "Kill-Schutz"
@@ -5833,7 +5939,7 @@ msgid "Realname"
 msgstr "  Echter Name: %s"
 
 msgid "Reason"
-msgstr ""
+msgstr "Grund"
 
 #, fuzzy, c-format
 msgid "Reason for %s updated."
@@ -5847,6 +5953,14 @@ msgid ""
 "GHOST command). If they are not identified they will be\n"
 "forced off of the nick."
 msgstr ""
+"Fordert einen Nicknamen von einem anderen Benutzer oder\n"
+"den Services zurück.\n"
+"Falls die Services momentan deinen Nickname besetzen, wird\n"
+"er wieder freigegeben.\n"
+"Falls ein anderen Benutzer ihn innehat und 'identifiziert' ist, wird\n"
+"er gekillt (wie ehemals beim GHOST Befehl).\n"
+"Falls der andere Benutzer nicht 'identifiziert' ist, wird er zu einem\n"
+"anderen Nicknamen gezwungen."
 
 #, fuzzy
 msgid "Redefine the meanings of access levels"
@@ -7058,8 +7172,7 @@ msgstr ""
 
 #, fuzzy, c-format
 msgid "Setting %s not known.  Type %s%s HELP LEVELS for a list of valid settings."
-msgstr ""
-"Einstellung %s ist unbekannt.  Tippe /msg %s HELP LEVELS DESC für eine ausführliche Einstellungsliste."
+msgstr "Einstellung %s ist unbekannt.  Tippe /msg %s HELP LEVELS DESC für eine ausführliche Einstellungsliste."
 
 #, fuzzy
 msgid "Setting for DEBUG must be ON, OFF, or a positive number."
@@ -7194,8 +7307,7 @@ msgid "Sorry, the memo ignore list for %s is full."
 msgstr "Die Liste der Begrüßungsnachrichten für %s ist voll."
 
 #, fuzzy, c-format
-msgid ""
-"Sorry, you can only have %d access entries on a channel, including access entries from other channels."
+msgid "Sorry, you can only have %d access entries on a channel, including access entries from other channels."
 msgstr "Die Access-Liste ist auf %d Einträge beschränkt."
 
 #, c-format
@@ -7252,8 +7364,7 @@ msgid "Successor for %s unset."
 msgstr "Der Eintrag des Vertreters für %s wurde entfernt."
 
 #, fuzzy
-msgid ""
-"Super admin can not be set because it is not enabled in the configuration."
+msgid "Super admin can not be set because it is not enabled in the configuration."
 msgstr "SuperAdmin muss in der anope.conf eingeschaltet werden."
 
 #, fuzzy
@@ -7613,7 +7724,7 @@ msgid "Tells you about the last time a user was seen"
 msgstr ""
 
 msgid "Terminate Services WITHOUT saving"
-msgstr " Datenbanken NICHT speichern und Services beenden"
+msgstr "Datenbanken NICHT speichern und Services beenden"
 
 msgid "Terminate services with save"
 msgstr "Datenbanken speichern und Services beenden"
@@ -7991,7 +8102,9 @@ msgstr "Es gibt %d Benachrichtigungen für den Channel %s."
 msgid ""
 "There are no bots available at this time.\n"
 "Ask a Services Operator to create one!"
-msgstr "Es sind derzeit keine Bots verfügbar. Frag einen Services Administrator, ob er einen erstellt."
+msgstr ""
+"Es sind derzeit keine Bots verfügbar.\n"
+"Bitte einen Services Administrator, einen zu erstellen."
 
 msgid "There are no configured servers."
 msgstr ""
@@ -8044,7 +8157,7 @@ msgstr "Du hast keine zulässige Email Adresse gesetzt."
 
 #, c-format
 msgid "This channel has been forbidden: %s"
-msgstr "Dieser Channel wurde verboten: %s."
+msgstr "Dieser Kanal wurde verboten: %s."
 
 #, fuzzy
 msgid "This channel has been suspended."
@@ -8263,18 +8376,16 @@ msgid ""
 msgstr ""
 
 msgid ""
-"This command ungroups your nick, or if given, the specificed nick,\n"
+"This command ungroups your nick, or if given, the specified nick,\n"
 "from the group it is in. The ungrouped nick keeps its registration\n"
 "time, password, email, greet, language, and url. Everything else\n"
 "is reset. You may not ungroup yourself if there is only one nick in\n"
 "your group."
 msgstr ""
-"Syntax: UNGROUP [nick]\n"
-"Dieser befehl hebt die Gruppierung deines Nicks oder eines ausgewählten Nicks auf,\n"
-"Der Nick ohne Gruppierung behält  Registrierung\n"
-"Zeit,PAsswort, Email, Begrüßungsnachricht, Sprache, url, and icq. \n"
-"Alles andere wird zurückgesetzt.Du kannst die Gruppierung nicht aufheben wenn sich nur ein nick\n"
-"in der gruppe befindet."
+"Dieser Befehl entfernt deinen oder einen angegebenen Nicknamen aus seiner Gruppe.\n"
+"Der entfernte Nickname behält Registrierungszeitpunkt, Passwort, Email,\n"
+"Begrüßungsnachricht, Sprache und URL. Alles andere wird zurückgesetzt.\n"
+"Du kannst die Gruppierung nicht aufheben wenn sich nur ein Nickname in der Gruppe befindet."
 
 #, fuzzy
 msgid "This command unloads the module named modname."
@@ -8944,7 +9055,7 @@ msgstr "Du bist bereits angemeldet."
 
 #, c-format
 msgid "You are already in %s!"
-msgstr "Du bist schon in %s! "
+msgstr "Du bist schon in %s!"
 
 #, fuzzy
 msgid "You are no longer a super admin."
@@ -8978,21 +9089,14 @@ msgid "You are now in the group of %s."
 msgstr "Du bist jetzt in der Gruppe %s vertreten."
 
 #, fuzzy, c-format
-msgid ""
-"You are over your maximum number of memos (%d). You will be unable to receive any new memos until you "
-"delete some of your current ones."
-msgstr ""
-"Warnung: Du hast die maximale Anzahl gespeicherter Memos überschritten (%d). Du kannst keine weiteren "
-"Memos empfangen, bis Du einige Deiner jetzigen Memos gelöscht hast."
+msgid "You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."
+msgstr "Warnung: Du hast die maximale Anzahl gespeicherter Memos überschritten (%d). Du kannst keine weiteren Memos empfangen, bis Du einige Deiner jetzigen Memos gelöscht hast."
 
 msgid "You can not NOOP Services."
 msgstr ""
 
-msgid ""
-"You can not disable the founder privilege because it would be impossible to reenable it at a later time."
-msgstr ""
-"Du kannst das 'founder' Privileg nicht abschalten, weil es dann unmöglich wäre, es später wieder "
-"einzuschalten."
+msgid "You can not disable the founder privilege because it would be impossible to reenable it at a later time."
+msgstr "Du kannst das 'founder' Privileg nicht abschalten, weil es dann unmöglich wäre, es später wieder einzuschalten."
 
 #, fuzzy
 msgid "You can not jupe an already juped server."
@@ -9134,12 +9238,8 @@ msgid "You have no new memos."
 msgstr "Du hast keine neuen  Nachrichten."
 
 #, c-format
-msgid ""
-"You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you "
-"delete some of your current ones."
-msgstr ""
-"Du hast die maximale Anzahl gespeicherter Memos erreicht (%d). Du kannst keine weiteren Nachrichten "
-"empfangen, bis Du einige Deiner jetzigen Memos gelöscht hast."
+msgid "You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."
+msgstr "Du hast die maximale Anzahl gespeicherter Memos erreicht (%d). Du kannst keine weiteren Nachrichten empfangen, bis Du einige Deiner jetzigen Memos gelöscht hast."
 
 #, fuzzy, c-format
 msgid "You have regained control of %s."
@@ -9196,6 +9296,10 @@ msgstr "Du musst Kanal-Operator sein um den Kanal zu registrieren."
 
 #, fuzzy, c-format
 msgid "You must be in %s to use this command."
+msgstr "Du musst dich anmelden um diesen Befehl zu nutzen."
+
+#, fuzzy
+msgid "You must be logged into an account to use that command."
 msgstr "Du musst dich anmelden um diesen Befehl zu nutzen."
 
 msgid "You must confirm your account before you can register a channel."
@@ -9302,8 +9406,7 @@ msgstr "Deine eMail-Adresse wurde auf %s geändert."
 msgid "Your email address is not allowed, choose a different one."
 msgstr "Deine eMail-Adresse %s wurde bestätigt.#"
 
-msgid ""
-"Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."
+msgid "Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."
 msgstr ""
 
 #, c-format
@@ -9337,9 +9440,7 @@ msgid "Your memo limit is 0; you will not receive any new memos."
 msgstr "Dein Memo-Limit ist 0; Du kannst keine neuen Memos empfangen."
 
 msgid "Your memo limit is 0; you will not receive any new memos. You cannot change this limit."
-msgstr ""
-"Dein Memo-Limit ist 0; Du kannst keine neuen Memos empfangen. Das Limit kann von Dir nicht verändert "
-"werden."
+msgstr "Dein Memo-Limit ist 0; Du kannst keine neuen Memos empfangen. Das Limit kann von Dir nicht verändert werden."
 
 msgid "Your nick has been logged out."
 msgstr "Du wurdest abgemeldet."
@@ -9594,10 +9695,10 @@ msgid "vhosts for group %s have been removed."
 msgstr "vHosts für die Gruppe %s wurden gelöscht."
 
 msgid "year"
-msgstr ""
+msgstr "Jahr"
 
 msgid "years"
-msgstr ""
+msgstr "Jahre"
 
 msgid "{MODIFY|VIEW} [block name item name item value]"
 msgstr ""

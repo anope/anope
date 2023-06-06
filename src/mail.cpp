@@ -35,17 +35,17 @@ void Mail::Message::Run()
 		return;
 	}
 
-	fprintf(pipe, "From: %s\n", send_from.c_str());
+	fprintf(pipe, "From: %s\r\n", send_from.c_str());
 	if (this->dont_quote_addresses)
-		fprintf(pipe, "To: %s <%s>\n", mail_to.c_str(), addr.c_str());
+		fprintf(pipe, "To: %s <%s>\r\n", mail_to.c_str(), addr.c_str());
 	else
-		fprintf(pipe, "To: \"%s\" <%s>\n", mail_to.c_str(), addr.c_str());
-	fprintf(pipe, "Subject: %s\n", subject.c_str());
-	fprintf(pipe, "Content-Type: text/plain; charset=UTF-8;\n");
-	fprintf(pipe, "Content-Transfer-Encoding: 8bit\n");
-	fprintf(pipe, "\n");
+		fprintf(pipe, "To: \"%s\" <%s>\r\n", mail_to.c_str(), addr.c_str());
+	fprintf(pipe, "Subject: %s\r\n", subject.c_str());
+	fprintf(pipe, "Content-Type: text/plain; charset=UTF-8;\r\n");
+	fprintf(pipe, "Content-Transfer-Encoding: 8bit\r\n");
+	fprintf(pipe, "\r\n");
 	fprintf(pipe, "%s", message.c_str());
-	fprintf(pipe, "\n.\n");
+	fprintf(pipe, "\r\n.\r\n");
 
 	pclose(pipe);
 

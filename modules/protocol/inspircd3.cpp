@@ -1165,7 +1165,7 @@ struct IRCDMessageCapab : Message::Capab
 					ModeManager::AddChannelMode(new InspIRCdExtban::ChannelMatcher("CHANNELBAN", "BAN", 'j'));
 				else if (module == "m_gecosban.so")
 					ModeManager::AddChannelMode(new InspIRCdExtban::RealnameMatcher("REALNAMEBAN", "BAN", 'r'));
-				else if (module == "m_nopartmessage.so")
+				else if (module == "m_nopartmsg.so")
 					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("PARTMESSAGEBAN", "BAN", 'p'));
 				else if (module == "m_serverban.so")
 					ModeManager::AddChannelMode(new InspIRCdExtban::ServerMatcher("SERVERBAN", "BAN", 's'));

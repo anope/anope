@@ -56,10 +56,18 @@ while (my ($name, $info) = each %{$data}) {
 	my $vendordir = catdir $RealDir, $name;
 	my $success = 0;
 	if (defined $info->{git}) {
-		$success ||= execute 'git', 'clone', $info->{git}, $unpackdir;
+		my @extra_args;
+		push @extra_args, '--branch', $info->{branch} if defined $info->{branch};
+		$success ||= execute 'git', 'clone', @extra_args, $info->{git}, $unpackdir;
 		chomp(my $tag = `git -C $unpackdir describe --abbrev=0 --tags HEAD 2>/dev/null`) unless $success;
 		$success ||= execute 'git', '-C', $unpackdir, 'checkout', $tag if $tag;
 		chomp($info->{version} = `git -C $unpackdir describe --always --tags HEAD 2>/dev/null`);
+		if (defined $info->{patches}) {
+			my $patches = catfile($unpackdir, $info->{patches});
+			for my $patch (glob $patches) {
+				$success |= execute 'git', '-C', $unpackdir, 'apply', $patch;
+			}
+		}
 	} elsif (defined $info->{tarball}) {
 		my $tarball = catfile $unpackdir, basename $info->{tarball};
 		$success ||= execute 'wget', '--output-document', $tarball, $info->{tarball};

@@ -83,7 +83,7 @@ class CommandNSConfirm : public Command
 				source.Reply(_("Invalid passcode."));
 		}
 		else
-			source.Reply(_("Invalid passcode."));
+			source.Reply(NICK_IDENTIFY_REQUIRED);
 
 		return;
 	}

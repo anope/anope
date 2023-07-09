@@ -31,7 +31,7 @@ struct KickerDataImpl : KickerData
 
 	void Check(ChannelInfo *ci) anope_override
 	{
-		if (amsgs || badwords || bolds || caps || colors || flood || italics || repeat || reverses || underlines)
+		if (amsgs || badwords || bolds || caps || colors || flood || italics || repeat || reverses || underlines || dontkickops || dontkickvoices)
 			return;
 
 		ci->Shrink<KickerData>("kickerdata");
@@ -67,6 +67,8 @@ struct KickerDataImpl : KickerData
 			data.SetType("floodlines", Serialize::Data::DT_INT); data["floodlines"] << kd->floodlines;
 			data.SetType("floodsecs", Serialize::Data::DT_INT); data["floodsecs"] << kd->floodsecs;
 			data.SetType("repeattimes", Serialize::Data::DT_INT); data["repeattimes"] << kd->repeattimes;
+			data.SetType("dontkickops", Serialize::Data::DT_INT); data["dontkickops"] << kd->dontkickops;
+			data.SetType("dontkickvoices", Serialize::Data::DT_INT); data["dontkickvoices"] << kd->dontkickvoices;
 			for (int16_t i = 0; i < TTB_SIZE; ++i)
 				data["ttb"] << kd->ttb[i] << " ";
 		}
@@ -95,6 +97,8 @@ struct KickerDataImpl : KickerData
 			data["floodlines"] >> kd->floodlines;
 			data["floodsecs"] >> kd->floodsecs;
 			data["repeattimes"] >> kd->repeattimes;
+			data["dontkickops"] >> kd->dontkickops;
+			data["dontkickvoices"] >> kd->dontkickvoices;
 
 			Anope::string ttb, tok;
 			data["ttb"] >> ttb;

@@ -32,6 +32,7 @@ namespace Mail
 		Anope::string addr;
 		Anope::string subject;
 		Anope::string message;
+		Anope::string content_type;
 		bool dont_quote_addresses;
 
 		bool success;

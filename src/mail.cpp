@@ -13,7 +13,16 @@
 #include "mail.h"
 #include "config.h"
 
-Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m) : Thread(), sendmail_path(Config->GetBlock("mail")->Get<const Anope::string>("sendmailpath")), send_from(sf), mail_to(mailto), addr(a), subject(s), message(m), dont_quote_addresses(Config->GetBlock("mail")->Get<bool>("dontquoteaddresses")), success(false)
+Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m)
+	: Thread()
+	, sendmail_path(Config->GetBlock("mail")->Get<const Anope::string>("sendmailpath"))
+	, send_from(sf), mail_to(mailto)
+	, addr(a)
+	, subject(s)
+	, message(m)
+	, content_type(Config->GetBlock("mail")->Get<const Anope::string>("content_type", "text/plain; charset=UTF-8"))
+	, dont_quote_addresses(Config->GetBlock("mail")->Get<bool>("dontquoteaddresses"))
+	, success(false)
 {
 }
 
@@ -41,7 +50,7 @@ void Mail::Message::Run()
 	else
 		fprintf(pipe, "To: \"%s\" <%s>\r\n", mail_to.c_str(), addr.c_str());
 	fprintf(pipe, "Subject: %s\r\n", subject.c_str());
-	fprintf(pipe, "Content-Type: text/plain; charset=UTF-8;\r\n");
+	fprintf(pipe, "Content-Type: %s\r\n", content_type.c_str());
 	fprintf(pipe, "Content-Transfer-Encoding: 8bit\r\n");
 	fprintf(pipe, "\r\n");
 	fprintf(pipe, "%s", message.c_str());

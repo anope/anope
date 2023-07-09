@@ -207,6 +207,11 @@ class MemoServCore : public Module, public MemoServService
 		this->Check(u);
 	}
 
+	void OnUserConnect(User *user, bool &exempt) anope_override
+	{
+		this->Check(user);
+	}
+
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.c || source.service != *MemoServ)

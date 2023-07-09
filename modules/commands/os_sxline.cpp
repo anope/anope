@@ -676,7 +676,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 				"regular expression, the expression will be matched against\n"
 				"channels too."));
 		source.Reply(_(" \n"
-				"\002SQLINE ADD\002 adds the given (nick's) mask to the SQLINE\n"
+				"\002SQLINE ADD\002 adds the given (nick/channel) mask to the SQLINE\n"
 				"list for the given reason (which \002must\002 be given).\n"
 				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
 				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"

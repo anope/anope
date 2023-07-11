@@ -252,7 +252,7 @@ Table of Contents
     The more precise you are the sooner you'll be likely to get an answer.
 
     If you think you found a bug, add it to the bug tracking system
-    (https://bugs.anope.org/) and - again - be as precise as possible. Also say
-    whether the bug happens always or under what circumstances, and anything
+    (https://github.com/anope/anope/issues) and - again - be as precise as possible.
+    Also say whether the bug happens always or under what circumstances, and anything
     that could be useful to track your bug down. If you wrote a patch, send
     it over. :)

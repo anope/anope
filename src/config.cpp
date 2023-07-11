@@ -640,6 +640,9 @@ Block *Conf::GetModule(const Anope::string &mname)
 		}
 	}
 
+	if (!block)
+		block = &Block::EmptyBlock;
+
 	return GetModule(mname);
 }
 

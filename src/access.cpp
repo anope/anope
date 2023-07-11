@@ -211,6 +211,7 @@ void ChanAccess::Serialize(Serialize::Data &data) const
 	data["ci"] << this->ci->name;
 	data["mask"] << this->Mask();
 	data["creator"] << this->creator;
+	data["description"] << this->description;
 	data.SetType("last_seen", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
 	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;
 	data["data"] << this->AccessSerialize();
@@ -238,6 +239,7 @@ Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["mask"] >> m;
 	access->SetMask(m, ci);
 	data["creator"] >> access->creator;
+	data["description"] >> access->description;
 	data["last_seen"] >> access->last_seen;
 	data["created"] >> access->created;
 

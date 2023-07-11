@@ -44,6 +44,7 @@ class CommandCSClone : public Command
 			ChanAccess *newaccess = provider->Create();
 			newaccess->SetMask(taccess->Mask(), target_ci);
 			newaccess->creator = taccess->creator;
+			newaccess->description = taccess->description;
 			newaccess->last_seen = taccess->last_seen;
 			newaccess->created = taccess->created;
 			newaccess->AccessUnserialize(taccess->AccessSerialize());

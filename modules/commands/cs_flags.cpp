@@ -78,7 +78,7 @@ FlagsAccessProvider* FlagsAccessProvider::ap;
 
 class CommandCSFlags : public Command
 {
-	void DoModify(CommandSource &source, ChannelInfo *ci, Anope::string mask, const Anope::string &flags)
+	void DoModify(CommandSource &source, ChannelInfo *ci, Anope::string mask, const Anope::string &flags, const Anope::string &description)
 	{
 		if (flags.empty())
 		{
@@ -262,7 +262,8 @@ class CommandCSFlags : public Command
 			return;
 		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
 		access->SetMask(mask, ci);
-		access->creator = source.GetNick();
+			access->creator = source.GetNick();
+		access->description = current ? current->description : description;
 		access->last_seen = current ? current->last_seen : 0;
 		access->created = Anope::CurTime;
 		access->flags = current_flags;
@@ -298,7 +299,7 @@ class CommandCSFlags : public Command
 
 		ListFormatter list(source.GetAccount());
 
-		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Flags")).AddColumn(_("Creator")).AddColumn(_("Created"));
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Flags")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Description"));
 
 		unsigned count = 0;
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
@@ -328,6 +329,7 @@ class CommandCSFlags : public Command
 			entry["Flags"] = flags;
 			entry["Creator"] = access->creator;
 			entry["Created"] = Anope::strftime(access->created, source.nc, true);
+			entry["Description"] = access->description;
 			list.AddEntry(entry);
 		}
 
@@ -368,10 +370,10 @@ class CommandCSFlags : public Command
 	}
 
  public:
-	CommandCSFlags(Module *creator) : Command(creator, "chanserv/flags", 1, 4)
+	CommandCSFlags(Module *creator) : Command(creator, "chanserv/flags", 1, 5)
 	{
 		this->SetDesc(_("Modify the list of privileged users"));
-		this->SetSyntax(_("\037channel\037 [MODIFY] \037mask\037 \037changes\037"));
+		this->SetSyntax(_("\037channel\037 [MODIFY] \037mask\037 \037changes\037 [\037description\037]"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | +\037flags\037]"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
@@ -409,19 +411,21 @@ class CommandCSFlags : public Command
 			this->DoClear(source, ci);
 		else
 		{
-			Anope::string mask, flags;
+			Anope::string mask, flags, description;
 			if (cmd.equals_ci("MODIFY"))
 			{
 				mask = params.size() > 2 ? params[2] : "";
 				flags = params.size() > 3 ? params[3] : "";
+				description = params.size() > 4 ? params[4] : "";
 			}
 			else
 			{
 				mask = cmd;
 				flags = params.size() > 2 ? params[2] : "";
+				description = params.size() > 3 ? params[3] : "";
 			}
 
-			this->DoModify(source, ci, mask, flags);
+			this->DoModify(source, ci, mask, flags, description);
 		}
 	}
 

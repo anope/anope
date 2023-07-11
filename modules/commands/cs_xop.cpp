@@ -100,6 +100,7 @@ class CommandCSXOP : public Command
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params.size() > 2 ? params[2] : "";
+		Anope::string description = params.size() > 3 ? params[3] : "";
 
 		if (mask.empty())
 		{
@@ -208,6 +209,7 @@ class CommandCSXOP : public Command
 		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(provider->Create());
 		acc->SetMask(mask, ci);
 		acc->creator = source.GetNick();
+		acc->description = description;
 		acc->type = source.command.upper();
 		acc->last_seen = 0;
 		acc->created = Anope::CurTime;
@@ -374,7 +376,7 @@ class CommandCSXOP : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Mask"));
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Description"));
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
@@ -401,6 +403,7 @@ class CommandCSXOP : public Command
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(Number);
 					entry["Mask"] = a->Mask();
+					entry["Description"] = a->description;
 					this->list.AddEntry(entry);
 				}
 			} nl_list(list, ci, nick, source);
@@ -420,6 +423,7 @@ class CommandCSXOP : public Command
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
 				entry["Mask"] = a->Mask();
+				entry["Description"] = a->description;
 				list.AddEntry(entry);
 			}
 		}
@@ -478,7 +482,7 @@ class CommandCSXOP : public Command
  public:
 	CommandCSXOP(Module *modname) : Command(modname, "chanserv/xop", 2, 4)
 	{
-		this->SetSyntax(_("\037channel\037 ADD \037mask\037"));
+		this->SetSyntax(_("\037channel\037 ADD \037mask\037 [\037description\037]"));
 		this->SetSyntax(_("\037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037list\037]"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));

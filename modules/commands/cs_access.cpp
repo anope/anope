@@ -214,6 +214,7 @@ class CommandCSAccess : public Command
 		access->level = level;
 		access->last_seen = 0;
 		access->created = Anope::CurTime;
+		access->description = params.size() > 4 ? params[4] : "";
 		ci->AddAccess(access);
 
 		FOREACH_MOD(OnAccessAdd, (ci, source, access));
@@ -388,6 +389,7 @@ class CommandCSAccess : public Command
 					entry["Mask"] = access->Mask();
 					entry["By"] = access->creator;
 					entry["Last seen"] = timebuf;
+					entry["Description"] = access->description;
 					this->list.AddEntry(entry);
 				}
 			}
@@ -425,6 +427,7 @@ class CommandCSAccess : public Command
 				entry["Mask"] = access->Mask();
 				entry["By"] = access->creator;
 				entry["Last seen"] = timebuf;
+				entry["Description"] = access->description;
 				list.AddEntry(entry);
 			}
 		}
@@ -456,7 +459,7 @@ class CommandCSAccess : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask"));
+		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask")).AddColumn(_("Description"));
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -469,7 +472,7 @@ class CommandCSAccess : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Last seen"));
+		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Last seen")).AddColumn(_("Description"));
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -493,10 +496,10 @@ class CommandCSAccess : public Command
 	}
 
  public:
-	CommandCSAccess(Module *creator) : Command(creator, "chanserv/access", 2, 4)
+	CommandCSAccess(Module *creator) : Command(creator, "chanserv/access", 2, 5)
 	{
 		this->SetDesc(_("Modify the list of privileged users"));
-		this->SetSyntax(_("\037channel\037 ADD \037mask\037 \037level\037"));
+		this->SetSyntax(_("\037channel\037 ADD \037mask\037 \037level\037 [\037description\037]"));
 		this->SetSyntax(_("\037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037list\037]"));
 		this->SetSyntax(_("\037channel\037 VIEW [\037mask\037 | \037list\037]"));

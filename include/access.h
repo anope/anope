@@ -84,6 +84,7 @@ class CoreExport ChanAccess : public Serializable
 	/* Channel this access entry is on */
 	Serialize::Reference<ChannelInfo> ci;
 	Anope::string creator;
+	Anope::string description;
 	time_t last_seen;
 	time_t created;
 

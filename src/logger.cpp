@@ -89,7 +89,7 @@ Log::Log(LogType t, CommandSource &src, Command *_c, ChannelInfo *_ci) : u(src.G
 	size_t sl = c->name.find('/');
 	this->bi = NULL;
 	if (sl != Anope::string::npos)
-		this->bi = BotInfo::Find(c->name.substr(0, sl), true);
+		this->bi = Config->GetClient(c->name.substr(0, sl));
 	this->category = c->name;
 }
 

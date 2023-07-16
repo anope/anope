@@ -96,11 +96,6 @@ Note : Vous devrez également lire les fichiers README et FAQ !
 
     Souvenez-vous de /rehash votre IRCd pour appliquer les changements.
 
-    Vous pouvez également essayer notre créateur de bloc link interactif
-    situé ici :
-
-        https://www.anope.org/ilm.php
-
 4) Mettre en route Anope
 
     Allez dans le répertoire où les fichiers binaires ont été installés

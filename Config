@@ -70,12 +70,6 @@ Run_Build_System () {
 		EXTRA_LIBS="-DEXTRA_LIBS:STRING=$EXTRA_LIB_DIRS"
 	fi
 
-	case `uname -s` in
-		MINGW*)
-			GEN_TYPE="-G\"MSYS Makefiles\""
-			;;
-	esac
-
 	if [ "$SOURCE_DIR" = "." ] ; then
 		pwdsave=`pwd`
 		test -d build || mkdir build
@@ -177,17 +171,8 @@ fi
 ###########################################################################
 
 if [ ! "$NO_INTRO" ] ; then
-	case `uname -s` in
-		MINGW*)
-			PAGER=less
-			;;
-		*)
-			PAGER=more
-			clear
-			;;
-	esac
 	. $SOURCE_DIR/src/version.sh
-	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | $PAGER
+	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | more
 	echo ""
 else
 	echo ""

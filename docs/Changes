@@ -1,5 +1,5 @@
-Anope Version 2.0.14-git
-------------------------
+Anope Version 2.0.14
+--------------------
 Added support for sqlining channels on UnrealIRCd.
 Fixed a crash when trying to access config for non-loaded modules.
 Fixed detection of the InspIRCd nopartmsg module.

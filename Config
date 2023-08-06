@@ -171,6 +171,7 @@ fi
 ###########################################################################
 
 if [ ! "$NO_INTRO" ] ; then
+	export MORE='-e'
 	. $SOURCE_DIR/src/version.sh
 	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | more
 	echo ""

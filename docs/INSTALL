@@ -88,10 +88,6 @@ Note: You should also read the README and FAQ files!
 
     Don't forget to /rehash your IRCd to apply changes.
 
-    You may also try our interactive link maker, which is located at:
-
-        https://www.anope.org/ilm.php
-
 4) Starting Anope
 
     Go into the directory where binaries were installed (by default, this is

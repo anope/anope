@@ -1,6 +1,19 @@
-Anope Version 2.0.14-git
+Anope Version 2.0.15-git
 ------------------------
 No significant changes.
+
+Anope Version 2.0.14
+--------------------
+Added support for sqlining channels on UnrealIRCd.
+Fixed a crash when trying to access config for non-loaded modules.
+Fixed detection of the InspIRCd nopartmsg module.
+Fixed not getting memo notifications when authing with SASL.
+Fixed not serialising dontkickops/dontkickvoices in botserv/kick.
+Fixed sending emails with the wrong kind of line terminator.
+Fixed sending log messages from a renamed pseudoclient.
+Fixed telling users their passcode is incorrect when they need to authenticate in nickserv/confirm.
+Fixed the Config script freezing on some versions of util-linux.
+Updated the Windows packaging scripts to use dependencies from Conan.
 
 Anope Version 2.0.13
 --------------------

@@ -76,7 +76,7 @@ class DBSQL : public Module, public Pipe
 			if (last_warn + 300 < Anope::CurTime)
 			{
 				last_warn = Anope::CurTime;
-				Log(this) << "db_sql: Unable to execute query, is SQL configured correctly?";
+				Log(this) << "db_sql: Unable to execute query, is SQL (" << this->sql.GetServiceName() << ") configured correctly?";
 			}
 		}
 		else if (!Anope::Quitting)
@@ -174,7 +174,7 @@ class DBSQL : public Module, public Pipe
 	{
 		if (!this->sql)
 		{
-			Log(this) << "Unable to load databases, is SQL configured correctly?";
+			Log(this) << "Unable to load databases, is SQL (" << this->sql.GetServiceName() << ") configured correctly?";
 			return EVENT_CONTINUE;
 		}
 

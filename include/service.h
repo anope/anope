@@ -128,6 +128,10 @@ class ServiceReference : public Reference<T>
 	{
 	}
 
+	const Anope::string &GetServiceName() const { return name; }
+
+	const Anope::string &GetServiceType() const { return type; }
+
 	inline void operator=(const Anope::string &n)
 	{
 		this->name = n;

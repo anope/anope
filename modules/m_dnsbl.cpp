@@ -30,11 +30,11 @@ struct Blacklist
 	Anope::string reason;
 	std::vector<Reply> replies;
 
-	Reply *Find(int code)
+	const Reply *Find(int code)
 	{
-		for (unsigned int i = 0; i < replies.size(); ++i)
-			if (replies[i].code == code)
-				return &replies[i];
+		for (const auto &reply : replies)
+			if (reply.code == code)
+				return &reply;
 		return NULL;
 	}
 };
@@ -62,7 +62,7 @@ class DNSBLResolver : public Request
 		sresult.pton(AF_INET, ans_record.rdata);
 		int result = sresult.sa4.sin_addr.s_addr >> 24;
 
-		Blacklist::Reply *reply = blacklist.Find(result);
+		const Blacklist::Reply *reply = blacklist.Find(result);
 		if (!blacklist.replies.empty() && !reply)
 			return;
 
@@ -173,10 +173,8 @@ class ModuleDNSBL : public Module
 
 		Anope::string reverse = user->ip.reverse();
 
-		for (unsigned i = 0; i < this->blacklists.size(); ++i)
+		for (const auto &b : this->blacklists)
 		{
-			const Blacklist &b = this->blacklists[i];
-
 			Anope::string dnsbl_host = reverse + "." + b.name;
 			DNSBLResolver *res = NULL;
 			try

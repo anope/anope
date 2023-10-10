@@ -251,8 +251,8 @@ class CommandBSBadwords : public Command
 
 			source.Reply(_("Bad words list for %s:"), ci->name.c_str());
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of bad words list."));
 		}

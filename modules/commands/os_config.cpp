@@ -62,11 +62,11 @@ class CommandOSConfig : public Command
 				ListFormatter lflist(source.GetAccount());
 				lflist.AddColumn(_("Name")).AddColumn(_("Value"));
 
-				for (Configuration::Block::item_map::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
+				for (const auto &[name, value] : items)
 				{
 					ListFormatter::ListEntry entry;
-					entry["Name"] = it->first;
-					entry["Value"] = it->second;
+					entry["Name"] = name;
+					entry["Value"] = value;
 					lflist.AddEntry(entry);
 				}
 
@@ -75,8 +75,8 @@ class CommandOSConfig : public Command
 
 				source.Reply(_("%s settings:"), block->GetName().c_str());
 
-				for (unsigned j = 0; j < replies.size(); ++j)
-					source.Reply(replies[j]);
+				for (const auto &reply : replies)
+					source.Reply(reply);
 
 				source.Reply(" ");
 			}
@@ -95,10 +95,10 @@ class CommandOSConfig : public Command
 				ListFormatter::ListEntry entry;
 				entry["Module Name"] = block->Get<Anope::string>("name");
 
-				for (Configuration::Block::item_map::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
+				for (const auto &[name, value] : items)
 				{
-					entry["Name"] = it->first;
-					entry["Value"] = it->second;
+					entry["Name"] = name;
+					entry["Value"] = value;
 					lflist.AddEntry(entry);
 				}
 			}
@@ -108,8 +108,8 @@ class CommandOSConfig : public Command
 
 			source.Reply(_("Module settings:"));
 
-			for (unsigned j = 0; j < replies.size(); ++j)
-				source.Reply(replies[j]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of configuration."));
 		}

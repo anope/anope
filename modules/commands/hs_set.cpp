@@ -111,9 +111,8 @@ class CommandHSSetAll : public Command
 		if (!na || !na->HasVhost())
 			return;
 
-		for (unsigned i = 0; i < na->nc->aliases->size(); ++i)
+		for (auto *nick : *na->nc->aliases)
 		{
-			NickAlias *nick = na->nc->aliases->at(i);
 			if (nick)
 				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 		}

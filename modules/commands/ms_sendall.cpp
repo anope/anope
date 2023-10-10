@@ -34,10 +34,8 @@ class CommandMSSendAll : public Command
 
 		Log(LOG_ADMIN, source, this) << "to send " << text;
 
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			const NickCore *nc = it->second;
-
 			if (nc != source.nc)
 				memoserv->Send(source.GetNick(), nc->display, text);
 		}

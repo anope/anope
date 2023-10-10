@@ -267,8 +267,8 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	Log(LOG_DEBUG) << "Module " << modname << " loaded.";
 
 	/* Attach module to all events */
-	for (unsigned i = 0; i < I_SIZE; ++i)
-		EventHandlers[i].push_back(m);
+	for (auto &mods : EventHandlers)
+		mods.push_back(m);
 
 	m->Prioritize();
 
@@ -307,10 +307,8 @@ ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)
 
 Module *ModuleManager::FindModule(const Anope::string &name)
 {
-	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	for (auto *m : Modules)
 	{
-		Module *m = *it;
-
 		if (m->name.equals_ci(name))
 			return m;
 	}
@@ -320,10 +318,8 @@ Module *ModuleManager::FindModule(const Anope::string &name)
 
 Module *ModuleManager::FindFirstOf(ModType type)
 {
-	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	for (auto *m : Modules)
 	{
-		Module *m = *it;
-
 		if (m->type & type)
 			return m;
 	}
@@ -389,9 +385,8 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 
 void ModuleManager::DetachAll(Module *mod)
 {
-	for (unsigned i = 0; i < I_SIZE; ++i)
+	for (auto &mods : EventHandlers)
 	{
-		std::vector<Module *> &mods = EventHandlers[i];
 		std::vector<Module *>::iterator it2 = std::find(mods.begin(), mods.end(), mod);
 		if (it2 != mods.end())
 			mods.erase(it2);
@@ -504,16 +499,17 @@ void ModuleManager::UnloadAll()
 {
 	std::vector<Anope::string> modules;
 	for (size_t i = 1, j = 0; i != MT_END; j |= i, i <<= 1)
-		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	{
+		for (auto *m : Modules)
 		{
-			Module *m = *it;
 			if ((m->type & j) == m->type)
 				modules.push_back(m->name);
 		}
+	}
 
-	for (unsigned i = 0; i < modules.size(); ++i)
+	for (auto &module : modules)
 	{
-		Module *m = FindModule(modules[i]);
+		Module *m = FindModule(module);
 		if (m != NULL)
 			UnloadModule(m, NULL);
 	}

@@ -133,8 +133,8 @@ class SASLService : public SASL::Service, public Timer
 
 	~SASLService() override
 	{
-		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end(); it++)
-			delete it->second;
+		for (const auto &[_, session] : sessions)
+			delete session;
 	}
 
 	void ProcessMessage(const SASL::Message &m) override
@@ -275,8 +275,8 @@ class SASLService : public SASL::Service, public Timer
 	{
 		std::vector<Anope::string> mechs = Service::GetServiceKeys("SASL::Mechanism");
 		Anope::string buf;
-		for (unsigned j = 0; j < mechs.size(); ++j)
-			buf += "," + mechs[j];
+		for (const auto &mech : mechs)
+			buf += "," + mech;
 
 		this->SendMessage(session, "M", buf.empty() ? "" : buf.substr(1));
 	}

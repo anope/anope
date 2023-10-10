@@ -34,9 +34,8 @@ void Serialize::RegisterTypes()
 
 void Serialize::CheckTypes()
 {
-	for (std::map<Anope::string, Serialize::Type *>::const_iterator it = Serialize::Type::GetTypes().begin(), it_end = Serialize::Type::GetTypes().end(); it != it_end; ++it)
+	for (const auto &[_, t] : Serialize::Type::GetTypes())
 	{
-		Serialize::Type *t = it->second;
 		t->Check();
 	}
 }
@@ -124,13 +123,13 @@ Type::~Type()
 {
 	/* null the type of existing serializable objects of this type */
 	if (Serializable::SerializableItems != NULL)
-		for (std::list<Serializable *>::iterator it = Serializable::SerializableItems->begin(); it != Serializable::SerializableItems->end(); ++it)
+	{
+		for (auto *s : *Serializable::SerializableItems)
 		{
-			Serializable *s = *it;
-
 			if (s->s_type == this)
 				s->s_type = NULL;
 		}
+	}
 
 	std::vector<Anope::string>::iterator it = std::find(TypeOrder.begin(), TypeOrder.end(), this->name);
 	if (it != TypeOrder.end())

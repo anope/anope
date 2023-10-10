@@ -17,8 +17,8 @@ Base::~Base()
 {
 	if (this->references != NULL)
 	{
-		for (std::set<ReferenceBase *>::iterator it = this->references->begin(), it_end = this->references->end(); it != it_end; ++it)
-			(*it)->Invalidate();
+		for (auto *reference : *this->references)
+			reference->Invalidate();
 		delete this->references;
 	}
 }

@@ -182,8 +182,8 @@ class CommandOSSXLineBase : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 	}
 
@@ -371,8 +371,8 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			if (this->xlm()->Check(it->second, x))
+		for (const auto &[_, user] : UserListByNick)
+			if (this->xlm()->Check(user, x))
 				++affected;
 		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
 
@@ -401,10 +401,8 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		{
 			Anope::string rreason = "G-Lined: " + reason;
 
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			for (const auto &[_, user] : UserListByNick)
 			{
-				User *user = it->second;
-
 				if (!user->HasMode("OPER") && user->server != Me && this->xlm()->Check(user, x))
 					user->Kill(Me, rreason);
 			}
@@ -579,8 +577,8 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			if (this->xlm()->Check(it->second, x))
+		for (const auto &[_, user] : UserListByNick)
+			if (this->xlm()->Check(user, x))
 				++affected;
 		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
 
@@ -611,33 +609,28 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 			if (mask[0] == '#')
 			{
-				for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
+				for (const auto &[_, c] : ChannelList)
 				{
-					Channel *c = cit->second;
-
 					if (!Anope::Match(c->name, mask, false, true))
 						continue;
 
 					std::vector<User *> users;
-					for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+					for (const auto &[_, uc] : c->users)
 					{
-						ChanUserContainer *uc = it->second;
 						User *user = uc->user;
 
 						if (!user->HasMode("OPER") && user->server != Me)
 							users.push_back(user);
 					}
 
-					for (unsigned i = 0; i < users.size(); ++i)
-						c->Kick(NULL, users[i], "%s", reason.c_str());
+					for (auto *user : users)
+						c->Kick(NULL, user, "%s", reason.c_str());
 				}
 			}
 			else
 			{
-				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+				for (const auto &[_, user] : UserListByNick)
 				{
-					User *user = it->second;
-
 					if (!user->HasMode("OPER") && user->server != Me && this->xlm()->Check(user, x))
 						user->Kill(Me, rreason);
 				}

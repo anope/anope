@@ -20,8 +20,8 @@ struct KickerDataImpl : KickerData
 	KickerDataImpl(Extensible *obj)
 	{
 		amsgs = badwords = bolds = caps = colors = flood = italics = repeat = reverses = underlines = false;
-		for (int16_t i = 0; i < TTB_SIZE; ++i)
-			ttb[i] = 0;
+		for (auto &ttbtype : ttb)
+			ttbtype = 0;
 		capsmin = capspercent = 0;
 		floodlines = floodsecs = 0;
 		repeattimes = 0;
@@ -69,8 +69,8 @@ struct KickerDataImpl : KickerData
 			data.SetType("repeattimes", Serialize::Data::DT_INT); data["repeattimes"] << kd->repeattimes;
 			data.SetType("dontkickops", Serialize::Data::DT_INT); data["dontkickops"] << kd->dontkickops;
 			data.SetType("dontkickvoices", Serialize::Data::DT_INT); data["dontkickvoices"] << kd->dontkickvoices;
-			for (int16_t i = 0; i < TTB_SIZE; ++i)
-				data["ttb"] << kd->ttb[i] << " ";
+			for (auto ttbtype : kd->ttb)
+				data["ttb"] << ttbtype << " ";
 		}
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
@@ -136,11 +136,8 @@ class CommandBSKick : public Command
 		source.Reply(_("Configures bot kickers.  \037option\037 can be one of:"));
 
 		Anope::string this_name = source.command;
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto &[c_name, info] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
-
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				ServiceReference<Command> command("Command", info.name);
@@ -928,8 +925,8 @@ struct BanData
 		Data()
 		{
 			last_use = 0;
-			for (int i = 0; i < TTB_SIZE; ++i)
-				this->ttb[i] = 0;
+			for (auto &ttbtype : this->ttb)
+				ttbtype = 0;
 		}
 	};
 
@@ -997,10 +994,8 @@ class BanDataPurger : public Timer
 	{
 		Log(LOG_DEBUG) << "bs_main: Running bandata purger";
 
-		for (channel_map::iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+		for (auto &[_, c] : ChannelList)
 		{
-			Channel *c = it->second;
-
 			BanData *bd = c->GetExt<BanData>("bandata");
 			if (bd != NULL)
 			{
@@ -1049,7 +1044,7 @@ class BSKick : public Module
 
 		UserData *ud = userdata.Require(uc);
 		return ud;
-       }
+	}
 
 	void check_ban(ChannelInfo *ci, User *u, KickerData *kd, int ttbtype)
 	{
@@ -1308,11 +1303,11 @@ class BSKick : public Module
 		{
 			int i = 0, l = 0;
 
-			for (unsigned j = 0, end = realbuf.length(); j < end; ++j)
+			for (auto chr : realbuf)
 			{
-				if (isupper(realbuf[j]))
+				if (isupper(chr))
 					++i;
-				else if (islower(realbuf[j]))
+				else if (islower(chr))
 					++l;
 			}
 

@@ -34,32 +34,34 @@ namespace SQL
 		std::set<Anope::string> KeySet() const override
 		{
 			std::set<Anope::string> keys;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				keys.insert(it->first);
+			for (const auto &[key, _] : this->data)
+				keys.insert(key);
 			return keys;
 		}
 
 		size_t Hash() const override
 		{
 			size_t hash = 0;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				if (!it->second->str().empty())
-					hash ^= Anope::hash_cs()(it->second->str());
+			for (const auto &[_, value] : this->data)
+			{
+				if (!value->str().empty())
+					hash ^= Anope::hash_cs()(value->str());
+			}
 			return hash;
 		}
 
 		std::map<Anope::string, std::iostream *> GetData() const
 		{
 			std::map<Anope::string, std::iostream *> d;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				d[it->first] = it->second;
+			for (const auto &[key, value] : this->data)
+				d[key] = value;
 			return d;
 		}
 
 		void Clear()
 		{
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				delete it->second;
+			for (const auto &[_, value] : this->data)
+				delete value;
 			this->data.clear();
 		}
 

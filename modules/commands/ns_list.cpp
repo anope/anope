@@ -75,13 +75,11 @@ class CommandNSList : public Command
 		list.AddColumn(_("Nick")).AddColumn(_("Last usermask"));
 
 		Anope::map<NickAlias *> ordered_map;
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
-			ordered_map[it->first] = it->second;
+		for (const auto &[nick, na] : *NickAliasList)
+			ordered_map[nick] = na;
 
-		for (Anope::map<NickAlias *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
+		for (const auto &[_, na] : ordered_map)
 		{
-			const NickAlias *na = it->second;
-
 			/* Don't show private nicks to non-services admins. */
 			if (na->nc->HasExt("NS_PRIVATE") && !is_servadmin && na->nc != mync)
 				continue;
@@ -125,8 +123,8 @@ class CommandNSList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("End of list - %d/%d matches shown."), nnicks > listmax ? listmax : nnicks, nnicks);
 		return;

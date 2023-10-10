@@ -50,8 +50,10 @@ static int stats_count_servers(Server *s)
 	int count = 1;
 
 	if (!s->GetLinks().empty())
-		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
-			count += stats_count_servers(s->GetLinks()[i]);
+	{
+		for (auto *link : s->GetLinks())
+			count += stats_count_servers(link);
+	}
 
 	return count;
 }
@@ -145,8 +147,8 @@ class CommandOSStats : public Command
 	void DoStatsUplink(CommandSource &source)
 	{
 		Anope::string buf;
-		for (std::set<Anope::string>::iterator it = Servers::Capab.begin(); it != Servers::Capab.end(); ++it)
-			buf += " " + *it;
+		for (const auto &capab : Servers::Capab)
+			buf += " " + capab;
 		if (!buf.empty())
 			buf.erase(buf.begin());
 

@@ -58,25 +58,28 @@ class XOPChanAccess : public ChanAccess
 		{
 			std::map<Anope::string, int> count;
 
-			for (std::map<Anope::string, std::vector<Anope::string> >::const_iterator it = permissions.begin(), it_end = permissions.end(); it != it_end; ++it)
+			for (const auto &[name, perms] : permissions)
 			{
-				int &c = count[it->first];
-				const std::vector<Anope::string> &perms = it->second;
-				for (unsigned i = 0; i < perms.size(); ++i)
-					if (access->HasPriv(perms[i]))
+				int &c = count[name];
+				for (const auto &perm : perms)
+				{
+					if (access->HasPriv(perm))
 						++c;
+				}
 			}
 
-			Anope::string max;
-			int maxn = 0;
-			for (std::map<Anope::string, int>::iterator it = count.begin(), it_end = count.end(); it != it_end; ++it)
-				if (it->second > maxn)
+			Anope::string maxname;
+			int maxpriv = 0;
+			for (const auto &[name, priv] : count)
+			{
+				if (priv > maxpriv)
 				{
-					maxn = it->second;
-					max = it->first;
+					maxname = name;
+					maxpriv = priv;
 				}
+			}
 
-			return max;
+			return maxname;
 		}
 	}
 };
@@ -436,8 +439,8 @@ class CommandCSXOP : public Command
 			list.Process(replies);
 
 			source.Reply(_("%s list for %s"), source.command.c_str(), ci->name.c_str());
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 	}
 
@@ -528,9 +531,9 @@ class CommandCSXOP : public Command
 				" "), cmd.c_str(), cmd.c_str());
 
 		Anope::string buf;
-		for (unsigned i = 0; i < permissions[cmd].size(); ++i)
+		for (const auto &permission : permissions[cmd])
 		{
-			buf += ", " + permissions[cmd][i];
+			buf += ", " + permission;
 			if (buf.length() > 75)
 			{
 				source.Reply("  %s\n", buf.substr(2).c_str());

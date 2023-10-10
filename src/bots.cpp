@@ -131,8 +131,8 @@ void BotInfo::OnKill()
 	IRCD->SendClientIntroduction(this);
 	this->introduced = true;
 
-	for (User::ChanUserList::const_iterator cit = this->chans.begin(), cit_end = this->chans.end(); cit != cit_end; ++cit)
-		IRCD->SendJoin(this, cit->second->chan, &cit->second->status);
+	for (const auto &[_, chan] : this->chans)
+		IRCD->SendJoin(this, chan->chan, &chan->status);
 }
 
 void BotInfo::SetNewNick(const Anope::string &newnick)

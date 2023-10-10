@@ -42,10 +42,8 @@ class CommandOSNOOP : public Command
 
 			Anope::string reason = "NOOP command used by " + source.GetNick();
 			/* Kill all the IRCops of the server */
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			for (const auto &[_, u2] : UserListByNick)
 			{
-				User *u2 = it->second;
-
 				if (u2->server == s && u2->HasMode("OPER"))
 					u2->Kill(*source.service, reason);
 			}

@@ -48,27 +48,26 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 		if (Me == this->uplink && !juped)
 		{
 			/* Now do mode related stuff as we know what modes exist .. */
-			for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+			for (auto &[_, bi] : *BotListByNick)
 			{
-				BotInfo *bi = it->second;
 				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : IRCD->DefaultPseudoclientModes;
 
 				bi->SetModesInternal(bi, modes.c_str());
-				for (unsigned i = 0; i < bi->botchannels.size(); ++i)
+				for (const auto &botchannel : bi->botchannels)
 				{
-					size_t h = bi->botchannels[i].find('#');
+					size_t h = botchannel.find('#');
 					if (h == Anope::string::npos)
 						continue;
-					Anope::string chname = bi->botchannels[i].substr(h);
+					Anope::string chname = botchannel.substr(h);
 					Channel *c = Channel::Find(chname);
 					if (c && c->FindUser(bi))
 					{
-						Anope::string want_modes = bi->botchannels[i].substr(0, h);
-						for (unsigned j = 0; j < want_modes.length(); ++j)
+						Anope::string want_modes = botchannel.substr(0, h);
+						for (char want_mode : want_modes)
 						{
-							ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
+							ChannelMode *cm = ModeManager::FindChannelModeByChar(want_mode);
 							if (cm == NULL)
-								cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
+								cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_mode));
 							if (cm && cm->type == MODE_STATUS)
 							{
 								MessageSource ms = bi;
@@ -81,19 +80,15 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 
 			IRCD->SendBOB();
 
-			for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
+			for (auto *link : Me->GetLinks())
 			{
-				Server *s = Me->GetLinks()[i];
-
-				if (s->juped)
-					IRCD->SendServer(s);
+				if (link->juped)
+					IRCD->SendServer(link);
 			}
 
 			/* We make the bots go online */
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			for (const auto &[_, u] : UserListByNick)
 			{
-				User *u = it->second;
-
 				BotInfo *bi = BotInfo::Find(u->GetUID());
 				if (bi)
 				{
@@ -106,22 +101,22 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 					bi->introduced = true;
 			}
 
-			for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+			for (const auto &[_, c] : ChannelList)
 			{
-				Channel *c = it->second;
-
 				if (c->users.empty())
 					IRCD->SendChannel(c);
 				else
-					for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
-						IRCD->SendJoin(cit->second->user, c, &cit->second->status);
-
-				for (Channel::ModeList::const_iterator it2 = c->GetModes().begin(); it2 != c->GetModes().end(); ++it2)
 				{
-					ChannelMode *cm = ModeManager::FindChannelModeByName(it2->first);
+					for (const auto &[_, uc] : c->users)
+						IRCD->SendJoin(uc->user, c, &uc->status);
+				}
+
+				for (const auto &[mode, value] :  c->GetModes())
+				{
+					ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
 					if (!cm || cm->type != MODE_LIST)
 						continue;
-					ModeManager::StackerAdd(c->WhoSends(), c, cm, true, it2->second);
+					ModeManager::StackerAdd(c->WhoSends(), c, cm, true, value);
 				}
 
 				if (!c->topic.empty() && !c->topic_setter.empty())
@@ -139,10 +134,8 @@ Server::~Server()
 {
 	Log(this, "quit") << "quit from " << (this->uplink ? this->uplink->GetName() : "no uplink") << " for " << this->quit_reason;
 
-	for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+	for (const auto &[_, u] : UserListByNick)
 	{
-		User *u = it->second;
-
 		if (u->server == this)
 		{
 			u->Quit(this->quit_reason);
@@ -259,8 +252,8 @@ void Server::Sync(bool sync_links)
 
 	if (sync_links && !this->links.empty())
 	{
-		for (unsigned i = 0, j = this->links.size(); i < j; ++i)
-			this->links[i]->Sync(true);
+		for (auto *link : this->links)
+			link->Sync(true);
 	}
 
 	bool me = this->GetUplink() && this->GetUplink() == Me;
@@ -309,9 +302,11 @@ bool Server::IsULined() const
 	if (this == Me)
 		return true;
 
-	for (unsigned i = 0; i < Config->Ulines.size(); ++i)
-		if (Config->Ulines[i].equals_ci(this->GetName()))
+	for (const auto &uline : Config->Ulines)
+	{
+		if (uline.equals_ci(this->GetName()))
 			return true;
+	}
 	return false;
 }
 
@@ -353,8 +348,10 @@ Server *Server::Find(const Anope::string &name, bool name_only)
 
 Server* Servers::GetUplink()
 {
-	for (unsigned i = 0; Me && i < Me->GetLinks().size(); ++i)
-		if (!Me->GetLinks()[i]->IsJuped())
-			return Me->GetLinks()[i];
+	for (auto *link : Me->GetLinks())
+	{
+		if (!link->IsJuped())
+			return link;
+	}
 	return NULL;
 }

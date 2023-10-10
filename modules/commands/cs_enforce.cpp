@@ -29,10 +29,8 @@ class CommandCSEnforce : public Command
 		bool hadsecureops = ci->HasExt("SECUREOPS");
 		ci->Extend<bool>("SECUREOPS");
 
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (const auto &[_, uc] : ci->c->users)
 		{
-			ChanUserContainer *uc = it->second;
-
 			ci->c->SetCorrectModes(uc->user, false);
 		}
 
@@ -48,9 +46,9 @@ class CommandCSEnforce : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce restricted";
 
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+
+		for (const auto &[_, uc] : ci->c->users)
 		{
-			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -60,10 +58,8 @@ class CommandCSEnforce : public Command
 				users.push_back(user);
 		}
 
-		for (unsigned i = 0; i < users.size(); ++i)
+		for (auto *user : users)
 		{
-			User *user = users[i];
-
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("RESTRICTED enforced by ")) + source.GetNick();
 			ci->c->SetMode(NULL, "BAN", mask);
@@ -79,9 +75,8 @@ class CommandCSEnforce : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce registered only";
 
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (const auto &[_, uc] : ci->c->users)
 		{
-			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -91,10 +86,8 @@ class CommandCSEnforce : public Command
 				users.push_back(user);
 		}
 
-		for (unsigned i = 0; i < users.size(); ++i)
+		for (auto *user : users)
 		{
-			User *user = users[i];
-
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("REGONLY enforced by ")) + source.GetNick();
 			if (!ci->c->HasMode("REGISTEREDONLY"))
@@ -111,9 +104,8 @@ class CommandCSEnforce : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce SSL only";
 
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (auto &[_, uc] : ci->c->users)
 		{
-			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -123,10 +115,8 @@ class CommandCSEnforce : public Command
 				users.push_back(user);
 		}
 
-		for (unsigned i = 0; i < users.size(); ++i)
+		for (auto *user : users)
 		{
-			User *user = users[i];
-
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("SSLONLY enforced by ")) + source.GetNick();
 			if (!ci->c->HasMode("SSL"))
@@ -143,9 +133,8 @@ class CommandCSEnforce : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce bans";
 
 		std::vector<User *> users;
-		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		for (const auto &[_, uc] : ci->c->users)
 		{
-			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -155,10 +144,8 @@ class CommandCSEnforce : public Command
 				users.push_back(user);
 		}
 
-		for (unsigned i = 0; i < users.size(); ++i)
+		for (auto *user : users)
 		{
-			User *user = users[i];
-
 			Anope::string reason = Language::Translate(user, _("BANS enforced by ")) + source.GetNick();
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
@@ -210,10 +197,8 @@ class CommandCSEnforce : public Command
 			users.push_back(user);
 		}
 
-		for (unsigned i = 0; i < users.size(); ++i)
+		for (auto *user : users)
 		{
-			User *user = users[i];
-
 			Anope::string reason = Language::Translate(user, _("LIMIT enforced by ")) + source.GetNick();
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}

@@ -42,8 +42,8 @@ struct LDAPAttributes : public std::map<Anope::string, std::vector<Anope::string
 	const std::vector<Anope::string> keys() const
 	{
 		std::vector<Anope::string> k;
-		for (const_iterator it = this->begin(), it_end = this->end(); it != it_end; ++it)
-			k.push_back(it->first);
+		for (const auto &[key, _] : *this)
+			k.push_back(key);
 		return k;
 	}
 

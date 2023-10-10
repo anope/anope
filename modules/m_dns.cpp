@@ -286,10 +286,8 @@ class Packet : public Query
 		output[pos++] = this->additional.size() >> 8;
 		output[pos++] = this->additional.size() & 0xFF;
 
-		for (unsigned i = 0; i < this->questions.size(); ++i)
+		for (auto &q : this->questions)
 		{
-			Question &q = this->questions[i];
-
 			if (q.type == QUERY_PTR)
 			{
 				sockaddrs ip(q.name);
@@ -324,11 +322,10 @@ class Packet : public Query
 		}
 
 		std::vector<ResourceRecord> types[] = { this->answers, this->authorities, this->additional };
-		for (int i = 0; i < 3; ++i)
-			for (unsigned j = 0; j < types[i].size(); ++j)
+		for (auto &type : types)
+		{
+			for (const auto &rr : type)
 			{
-				ResourceRecord &rr = types[i][j];
-
 				this->PackName(output, output_size, pos, rr.name);
 
 				if (pos + 8 >= output_size)
@@ -443,6 +440,7 @@ class Packet : public Query
 						break;
 				}
 			}
+		}
 
 		return pos;
 	}
@@ -562,8 +560,8 @@ class UDPSocket : public ReplySocket
 
 	~UDPSocket() override
 	{
-		for (unsigned i = 0; i < packets.size(); ++i)
-			delete packets[i];
+		for (const auto *packet : packets)
+			delete packet;
 	}
 
 	void Reply(Packet *p) override
@@ -799,10 +797,8 @@ class MyManager : public Manager, public Timer
 			packet->authorities.clear();
 			packet->additional.clear();
 
-			for (unsigned i = 0; i < recv_packet.questions.size(); ++i)
+			for (auto &q : recv_packet.questions)
 			{
-				const Question& q = recv_packet.questions[i];
-
 				if (q.type == QUERY_AXFR || q.type == QUERY_SOA)
 				{
 					ResourceRecord rr(q.name, QUERY_SOA);
@@ -825,10 +821,8 @@ class MyManager : public Manager, public Timer
 
 			FOREACH_MOD(OnDnsRequest, (recv_packet, packet));
 
-			for (unsigned i = 0; i < recv_packet.questions.size(); ++i)
+			for (auto &q : recv_packet.questions)
 			{
-				const Question& q = recv_packet.questions[i];
-
 				if (q.type == QUERY_AXFR)
 				{
 					ResourceRecord rr(q.name, QUERY_SOA);
@@ -927,11 +921,8 @@ class MyManager : public Manager, public Timer
 	void Notify(const Anope::string &zone) override
 	{
 		/* notify slaves of the update */
-		for (unsigned i = 0; i < notify.size(); ++i)
+		for (const auto &[ip, port] : notify)
 		{
-			const Anope::string &ip = notify[i].first;
-			short port = notify[i].second;
-
 			sockaddrs addr;
 			addr.pton(ip.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, ip, port);
 			if (!addr.valid())

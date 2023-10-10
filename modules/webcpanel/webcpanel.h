@@ -105,16 +105,17 @@ class WebPanelProtectedPage : public WebPanelPage
 
 		Anope::string sections, get;
 
-		for (std::map<Anope::string, Anope::string>::iterator it = message.get_data.begin(), it_end = message.get_data.end(); it != it_end; ++it)
-			if (this->GetData().count(it->first) > 0)
-				get += "&" + it->first + "=" + HTTPUtils::URLEncode(it->second);
+		for (const auto &[key, value] : message.get_data)
+		{
+			if (this->GetData().count(key) > 0)
+				get += "&" + key + "=" + HTTPUtils::URLEncode(value);
+		}
 		if (get.empty() == false)
 			get = "?" + get.substr(1);
 
 		Section *ns = NULL;
-		for (unsigned i = 0; i < panel->sections.size(); ++i)
+		for (auto &s : panel->sections)
 		{
-			Section& s = panel->sections[i];
 			if (s.name == this->category)
 				ns = &s;
 			replacements["CATEGORY_URLS"] = s.subsections[0].url;
@@ -124,9 +125,8 @@ class WebPanelProtectedPage : public WebPanelPage
 		if (ns)
 		{
 			sections = "";
-			for (unsigned i = 0; i < ns->subsections.size(); ++i)
+			for (const auto &ss : ns->subsections)
 			{
-				SubSection& ss = ns->subsections[i];
 				replacements["SUBCATEGORY_URLS"] = ss.url;
 				replacements["SUBCATEGORY_GETS"] = get;
 				replacements["SUBCATEGORY_NAMES"] = ss.name;

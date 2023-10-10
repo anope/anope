@@ -43,8 +43,10 @@ void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params,
 			Servers::Capab.insert(token);
 	}
 	else
-		for (unsigned i = 0; i < params.size(); ++i)
-			Servers::Capab.insert(params[i]);
+	{
+		for (const auto &param : params)
+			Servers::Capab.insert(param);
+	}
 }
 
 void Error::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
@@ -127,10 +129,8 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		 */
 		c->SetModesInternal(source, modes, ts, !c->syncing);
 
-	for (std::list<SJoinUser>::const_iterator it = users.begin(), it_end = users.end(); it != it_end; ++it)
+	for (const auto &[status, u] : users)
 	{
-		const ChannelStatus &status = it->first;
-		User *u = it->second;
 		keep_their_modes = ts <= c->creation_time; // OnJoinChannel can call modules which can modify this channel's ts
 
 		if (c->FindUser(u))
@@ -426,10 +426,8 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			else
 			{
-				for (unsigned i = 0; i < Oper::opers.size(); ++i)
+				for (auto *o : Oper::opers)
 				{
-					Oper *o = Oper::opers[i];
-
 					const NickAlias *na = NickAlias::Find(o->name);
 					if (na)
 						IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->name.c_str(), o->ot->GetName().replace_all_cs(" ", "_").c_str());

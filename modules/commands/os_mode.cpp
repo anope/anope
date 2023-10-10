@@ -35,9 +35,8 @@ class CommandOSMode : public Command
 		{
 			bool all = params.size() > 2 && params[2].equals_ci("ALL");
 
-			const Channel::ModeList chmodes = c->GetModes();
-			for (Channel::ModeList::const_iterator it = chmodes.begin(), it_end = chmodes.end(); it != it_end && c; ++it)
-				c->RemoveMode(c->WhoSends(), it->first, it->second, false);
+			for (const auto &[mode, value] : c->GetModes())
+				c->RemoveMode(c->WhoSends(), mode, value, false);
 
 			if (!c)
 			{
@@ -47,10 +46,8 @@ class CommandOSMode : public Command
 
 			if (all)
 			{
-				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+				for (const auto &[_, uc] : c->users)
 				{
-					ChanUserContainer *uc = it->second;
-
 					if (uc->user->HasMode("OPER"))
 						continue;
 

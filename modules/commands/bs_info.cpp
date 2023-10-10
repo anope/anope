@@ -17,10 +17,8 @@ class CommandBSInfo : public Command
 	void send_bot_channels(std::vector<Anope::string> &buffers, const BotInfo *bi)
 	{
 		Anope::string buf;
-		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+		for (const auto &[_, ci] : *RegisteredChannelList)
 		{
-			const ChannelInfo *ci = it->second;
-
 			if (ci->bi == bi)
 			{
 				buf += " " + ci->name + " ";
@@ -63,15 +61,15 @@ class CommandBSInfo : public Command
 			std::vector<Anope::string> replies;
 			info.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			if (source.HasPriv("botserv/administration"))
 			{
 				std::vector<Anope::string> buf;
 				this->send_bot_channels(buf, bi);
-				for (unsigned i = 0; i < buf.size(); ++i)
-					source.Reply(buf[i]);
+				for (const auto &line : buf)
+					source.Reply(line);
 			}
 
 		}
@@ -94,8 +92,8 @@ class CommandBSInfo : public Command
 			std::vector<Anope::string> replies;
 			info.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 		else
 			source.Reply(_("\002%s\002 is not a valid bot or registered channel."), query.c_str());

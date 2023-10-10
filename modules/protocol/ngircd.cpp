@@ -100,8 +100,8 @@ class ngIRCdProto : public IRCDProto
 				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->GetUID());
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+			for (auto mode : cs.Modes())
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(mode), user->GetUID(), false);
 
 			if (uc != NULL)
 				uc->status = cs;
@@ -157,13 +157,13 @@ struct IRCDMessage005 : IRCDMessage
 	{
 		size_t pos;
 		Anope::string parameter, data;
-		for (unsigned i = 0, end = params.size(); i < end; ++i)
+		for (const auto &param : params)
 		{
-			pos = params[i].find('=');
+			pos = param.find('=');
 			if (pos != Anope::string::npos)
 			{
-				parameter = params[i].substr(0, pos);
-				data = params[i].substr(pos+1, params[i].length());
+				parameter = param.substr(0, pos);
+				data = param.substr(pos+1, param.length());
 				if (parameter == "MODES")
 				{
 					unsigned maxmodes = convertTo<unsigned>(data);

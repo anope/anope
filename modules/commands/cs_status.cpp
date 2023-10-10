@@ -57,11 +57,9 @@ public:
 			{
 				source.Reply(_("Access for \002%s\002 on \002%s\002:"), nick.c_str(), ci->name.c_str());
 
-				for (unsigned i = 0; i < ag.paths.size(); ++i)
+				for (const auto &p : ag.paths)
 				{
-					ChanAccess::Path &p = ag.paths[i];
-
-					if (p.empty())
+						if (p.empty())
 						continue;
 
 					if (p.size() == 1)

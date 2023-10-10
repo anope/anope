@@ -93,9 +93,9 @@ class UnrealIRCdProto : public IRCDProto
 			if (!u)
 			{
 				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
-				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (x->manager->Check(it->second, x))
-						this->SendAkill(it->second, x);
+				for (const auto &[_, user] : UserListByNick)
+					if (x->manager->Check(user, x))
+						this->SendAkill(user, x);
 				return;
 			}
 
@@ -174,8 +174,8 @@ class UnrealIRCdProto : public IRCDProto
 				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->GetUID());
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+			for (auto mode : cs.Modes())
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(mode), user->GetUID(), false);
 
 			if (uc != NULL)
 				uc->status = cs;
@@ -237,8 +237,8 @@ class UnrealIRCdProto : public IRCDProto
 	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override
 	{
 		Anope::string mechlist;
-		for (unsigned i = 0; i < mechanisms.size(); ++i)
-			mechlist += "," + mechanisms[i];
+		for (const auto &mechanism : mechanisms)
+			mechlist += "," + mechanism;
 
 		UplinkSocket::Message() << "MD client " << Me->GetName() << " saslmechlist :" << (mechanisms.empty() ? "" : mechlist.substr(1));
 	}
@@ -421,10 +421,8 @@ class UnrealIRCdProto : public IRCDProto
 		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
 			return false;
 
-		for (unsigned i = 0; i < ident.length(); ++i)
+		for (auto c : ident)
 		{
-			const char &c = ident[i];
-
 			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
 				continue;
 
@@ -750,16 +748,14 @@ struct IRCDMessageCapab : Message::Capab
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		for (unsigned i = 0; i < params.size(); ++i)
+		for (const auto &capab : params)
 		{
-			Anope::string capab = params[i];
-
 			if (capab.find("USERMODES=") != Anope::string::npos)
 			{
 				Anope::string modebuf(capab.begin() + 10, capab.end());
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
+				for (auto mode : modebuf)
 				{
-					switch (modebuf[t])
+					switch (mode)
 					{
 						case 'B':
 							ModeManager::AddUserMode(new UserMode("BOT", 'B'));
@@ -825,7 +821,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddUserMode(new UserMode("SSLPRIV", 'Z'));
 							continue;
 						default:
-							ModeManager::AddUserMode(new UserMode("", modebuf[t]));
+							ModeManager::AddUserMode(new UserMode("", mode));
 					}
 				}
 			}
@@ -836,9 +832,9 @@ struct IRCDMessageCapab : Message::Capab
 				Anope::string modebuf;
 
 				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
+				for (auto mode : modebuf)
 				{
-					switch (modebuf[t])
+					switch (mode)
 					{
 						case 'b':
 							ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
@@ -862,14 +858,14 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeList("", modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeList("", mode));
 					}
 				}
 
 				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
+				for (auto mode : modebuf)
 				{
-					switch (modebuf[t])
+					switch (mode)
 					{
 						case 'k':
 							ModeManager::AddChannelMode(new ChannelModeKey('k'));
@@ -881,14 +877,14 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelModeParam("REDIRECT", 'L'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeParam("", mode));
 					}
 				}
 
 				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
+				for (auto mode : modebuf)
 				{
-					switch (modebuf[t])
+					switch (mode)
 					{
 						case 'l':
 							ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
@@ -897,14 +893,14 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelModeHistory('H'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t], true));
+							ModeManager::AddChannelMode(new ChannelModeParam("", mode, true));
 					}
 				}
 
 				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
+				for (auto mode : modebuf)
 				{
-					switch (modebuf[t])
+					switch (mode)
 					{
 						case 'p':
 							ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
@@ -979,7 +975,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelModeOperOnly("PERM", 'P'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelMode("", modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelMode("", mode));
 					}
 				}
 			}
@@ -1475,14 +1471,20 @@ struct IRCDMessageSJoin : IRCDMessage
 				*invex = ModeManager::FindChannelModeByName("INVITEOVERRIDE");
 
 			if (ban)
-				for (std::list<Anope::string>::iterator it = bans.begin(), it_end = bans.end(); it != it_end; ++it)
-					c->SetModeInternal(source, ban, *it);
+			{
+				for (const auto &entry : bans)
+					c->SetModeInternal(source, ban, entry);
+			}
 			if (except)
-				for (std::list<Anope::string>::iterator it = excepts.begin(), it_end = excepts.end(); it != it_end; ++it)
-					c->SetModeInternal(source, except, *it);
+			{
+				for (const auto &entry : excepts)
+					c->SetModeInternal(source, except, entry);
+			}
 			if (invex)
-				for (std::list<Anope::string>::iterator it = invites.begin(), it_end = invites.end(); it != it_end; ++it)
-					c->SetModeInternal(source, invex, *it);
+			{
+				for (const auto &entry : invites)
+					c->SetModeInternal(source, invex, entry);
+			}
 		}
 	}
 };

@@ -101,8 +101,8 @@ class InspIRCdProto : public IRCDProto
 	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override
 	{
 		Anope::string mechlist;
-		for (unsigned i = 0; i < mechanisms.size(); ++i)
-			mechlist += "," + mechanisms[i];
+		for (const auto &mechanism : mechanisms)
+			mechlist += "," + mechanism;
 
 		UplinkSocket::Message(Me) << "METADATA * saslmechlist :" << (mechanisms.empty() ? "" : mechlist.substr(1));
 	}
@@ -235,9 +235,9 @@ class InspIRCdProto : public IRCDProto
 			if (!u)
 			{
 				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
-				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (x->manager->Check(it->second, x))
-						this->SendAkill(it->second, x);
+				for (const auto &[_, user] : UserListByNick)
+					if (x->manager->Check(user, x))
+						this->SendAkill(user, x);
 				return;
 			}
 
@@ -331,8 +331,8 @@ class InspIRCdProto : public IRCDProto
 				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->GetUID());
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+			for (auto mode : cs.Modes())
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(mode), user->GetUID(), false);
 
 			if (uc != NULL)
 				uc->status = cs;
@@ -498,10 +498,8 @@ class InspIRCdProto : public IRCDProto
 		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
 			return false;
 
-		for (unsigned i = 0; i < ident.length(); ++i)
+		for (auto c : ident)
 		{
-			const char &c = ident[i];
-
 			if (c >= 'A' && c <= '}')
 				continue;
 
@@ -1639,8 +1637,8 @@ struct IRCDMessageIJoin : IRCDMessage
 		if (params.size() >= 4)
 		{
 			chants = params[2].is_pos_number_only() ? convertTo<unsigned>(params[2]) : 0;
-			for (unsigned i = 0; i < params[3].length(); ++i)
-				user.first.AddMode(params[3][i]);
+			for (auto mode : params[3])
+				user.first.AddMode(mode);
 		}
 
 		std::list<Message::Join::SJoinUser> users;

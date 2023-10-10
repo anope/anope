@@ -62,10 +62,8 @@ class NSMaxEmail : public Module
 
 		Anope::string cleanemail = clean ? CleanMail(email) : email;
 
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			const NickCore *nc = it->second;
-
 			Anope::string cleannc = clean ? CleanMail(nc->email) : nc->email;
 
 			if (unc != nc && cleanemail.equals_ci(cleannc))

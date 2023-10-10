@@ -57,10 +57,8 @@ class CommandHSList : public Command
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Creator")).AddColumn(_("Created"));
 
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
+		for (const auto &[_, na] : *NickAliasList)
 		{
-			const NickAlias *na = it->second;
-
 			if (!na->HasVhost())
 				continue;
 
@@ -125,8 +123,8 @@ class CommandHSList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -37,10 +37,8 @@ class CommandCSSet : public Command
 		Anope::string this_name = source.command;
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto &[c_name, info] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				if (info.hide)
@@ -56,7 +54,7 @@ class CommandCSSet : public Command
 				else if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 
-				source.command = it->first;
+				source.command = c_name;
 				c->OnServHelp(source);
 			}
 		}
@@ -1112,13 +1110,13 @@ class CSSet : public Module
 
 			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(s);
 			Anope::string modes;
-			for (Channel::ModeList::const_iterator it = ci->last_modes.begin(); it != ci->last_modes.end(); ++it)
+			for (const auto &[last_mode, last_value] : ci->last_modes)
 			{
 				if (!modes.empty())
 					modes += " ";
-				modes += it->first;
-				if (!it->second.empty())
-					modes += "," + it->second;
+				modes += last_mode;
+				if (!last_value.empty())
+					modes += "," + last_value;
 			}
 			data["last_modes"] << modes;
 		}
@@ -1199,8 +1197,8 @@ class CSSet : public Module
 		if (c->ci && keep_modes.HasExt(c->ci))
 		{
 			Channel::ModeList ml = c->ci->last_modes;
-			for (Channel::ModeList::iterator it = ml.begin(); it != ml.end(); ++it)
-				c->SetMode(c->ci->WhoSends(), it->first, it->second);
+			for (const auto &[last_mode, last_value] : c->ci->last_modes)
+				c->SetMode(c->ci->WhoSends(), last_mode, last_value);
 		}
 	}
 

@@ -77,17 +77,17 @@ class LoadData : public Serialize::Data
 	std::set<Anope::string> KeySet() const override
 	{
 		std::set<Anope::string> keys;
-		for (std::map<Anope::string, Anope::string>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-			keys.insert(it->first);
+		for (const auto &[key, _]: this->data)
+			keys.insert(key);
 		return keys;
 	}
 
 	size_t Hash() const override
 	{
 		size_t hash = 0;
-		for (std::map<Anope::string, Anope::string>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-			if (!it->second.empty())
-				hash ^= Anope::hash_cs()(it->second);
+		for (const auto &[_, value] : this->data)
+			if (!value.empty())
+				hash ^= Anope::hash_cs()(value);
 		return hash;
 	}
 
@@ -117,51 +117,49 @@ class DBFlatFile : public Module, public Pipe
 		{
 			last_day = tm->tm_mday;
 
-			const std::vector<Anope::string> &type_order = Serialize::Type::GetTypeOrder();
-
 			std::set<Anope::string> dbs;
 			dbs.insert(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
 
-			for (unsigned i = 0; i < type_order.size(); ++i)
+			for (const auto &type_order : Serialize::Type::GetTypeOrder())
 			{
-				Serialize::Type *stype = Serialize::Type::Find(type_order[i]);
+				Serialize::Type *stype = Serialize::Type::Find(type_order);
 
 				if (stype && stype->GetOwner())
 					dbs.insert("module_" + stype->GetOwner()->name + ".db");
 			}
 
 
-			for (std::set<Anope::string>::const_iterator it = dbs.begin(), it_end = dbs.end(); it != it_end; ++it)
+			for (const auto &db : dbs)
 			{
-				const Anope::string &oldname = Anope::DataDir + "/" + *it;
-				Anope::string newname = Anope::DataDir + "/backups/" + *it + "-" + stringify(tm->tm_year + 1900) + Anope::printf("-%02i-", tm->tm_mon + 1) + Anope::printf("%02i", tm->tm_mday);
+				const Anope::string &oldname = Anope::DataDir + "/" + db;
+				Anope::string newname = Anope::DataDir + "/backups/" + db + "-" + stringify(tm->tm_year + 1900) + Anope::printf("-%02i-", tm->tm_mon + 1) + Anope::printf("%02i", tm->tm_mday);
 
 				/* Backup already exists or no database to backup */
 				if (Anope::IsFile(newname) || !Anope::IsFile(oldname))
 					continue;
 
-				Log(LOG_DEBUG) << "db_flatfile: Attempting to rename " << *it << " to " << newname;
+				Log(LOG_DEBUG) << "db_flatfile: Attempting to rename " << db << " to " << newname;
 				if (rename(oldname.c_str(), newname.c_str()))
 				{
 					Anope::string err = Anope::LastError();
-					Log(this) << "Unable to back up database " << *it << " (" << err << ")!";
+					Log(this) << "Unable to back up database " << db << " (" << err << ")!";
 
 					if (!Config->GetModule(this)->Get<bool>("nobackupokay"))
 					{
 						Anope::Quitting = true;
-						Anope::QuitReason = "Unable to back up database " + *it + " (" + err + ")";
+						Anope::QuitReason = "Unable to back up database " + db + " (" + err + ")";
 					}
 
 					continue;
 				}
 
-				backups[*it].push_back(newname);
+				backups[db].push_back(newname);
 
 				unsigned keepbackups = Config->GetModule(this)->Get<unsigned>("keepbackups");
-				if (keepbackups > 0 && backups[*it].size() > keepbackups)
+				if (keepbackups > 0 && backups[db].size() > keepbackups)
 				{
-					unlink(backups[*it].front().c_str());
-					backups[*it].pop_front();
+					unlink(backups[db].front().c_str());
+					backups[db].pop_front();
 				}
 			}
 		}
@@ -217,7 +215,6 @@ class DBFlatFile : public Module, public Pipe
 
 	EventReturn OnLoadDatabase() override
 	{
-		const std::vector<Anope::string> &type_order = Serialize::Type::GetTypeOrder();
 		std::set<Anope::string> tried_dbs;
 
 		const Anope::string &db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
@@ -238,18 +235,16 @@ class DBFlatFile : public Module, public Pipe
 		LoadData ld;
 		ld.fs = &fd;
 
-		for (unsigned i = 0; i < type_order.size(); ++i)
+		for (const auto &type_order : Serialize::Type::GetTypeOrder())
 		{
-			Serialize::Type *stype = Serialize::Type::Find(type_order[i]);
+			Serialize::Type *stype = Serialize::Type::Find(type_order);
 			if (!stype || stype->GetOwner())
 				continue;
 
-			std::vector<std::streampos> &pos = positions[stype->GetName()];
-
-			for (unsigned j = 0; j < pos.size(); ++j)
+			for (const auto &position : positions[stype->GetName()])
 			{
 				fd.clear();
-				fd.seekg(pos[j]);
+				fd.seekg(position);
 
 				Serializable *obj = stype->Unserialize(NULL, ld);
 				if (obj != NULL)
@@ -295,10 +290,8 @@ class DBFlatFile : public Module, public Pipe
 			std::map<Module *, std::fstream *> databases;
 
 			/* First open the databases of all of the registered types. This way, if we have a type with 0 objects, that database will be properly cleared */
-			for (std::map<Anope::string, Serialize::Type *>::const_iterator it = Serialize::Type::GetTypes().begin(), it_end = Serialize::Type::GetTypes().end(); it != it_end; ++it)
+			for (const auto &[_, s_type] : Serialize::Type::GetTypes())
 			{
-				Serialize::Type *s_type = it->second;
-
 				if (databases[s_type->GetOwner()])
 					continue;
 
@@ -316,9 +309,8 @@ class DBFlatFile : public Module, public Pipe
 
 			SaveData data;
 			const std::list<Serializable *> &items = Serializable::GetItems();
-			for (std::list<Serializable *>::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
+			for (auto *base : items)
 			{
-				Serializable *base = *it;
 				Serialize::Type *s_type = base->GetSerializableType();
 
 				data.fs = databases[s_type->GetOwner()];
@@ -332,10 +324,9 @@ class DBFlatFile : public Module, public Pipe
 				*data.fs << "\nEND\n";
 			}
 
-			for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
+			for (auto &[mod, f] : databases)
 			{
-				std::fstream *f = it->second;
-				const Anope::string &db_name = Anope::DataDir + "/" + (it->first ? (it->first->name + ".db") : Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+				const Anope::string &db_name = Anope::DataDir + "/" + (mod ? (mod->name + ".db") : Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
 
 				if (!f->is_open() || !f->good())
 				{

@@ -176,8 +176,8 @@ class BahamutIRCdProto : public IRCDProto
 				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->GetUID());
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+			for (auto mode : cs.Modes())
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(mode), user->GetUID(), false);
 
 			if (uc != NULL)
 				uc->status = cs;
@@ -191,9 +191,9 @@ class BahamutIRCdProto : public IRCDProto
 			if (!u)
 			{
 				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
-				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (x->manager->Check(it->second, x))
-						this->SendAkill(it->second, x);
+				for (const auto &[_, user] : UserListByNick)
+					if (x->manager->Check(user, x))
+						this->SendAkill(user, x);
 				return;
 			}
 

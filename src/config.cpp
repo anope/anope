@@ -154,9 +154,11 @@ Conf::Conf() : Block("")
 			{"networkinfo", "chanlen"},
 		};
 
-		for (unsigned i = 0; i < sizeof(noreload) / sizeof(noreload[0]); ++i)
-			if (this->GetBlock(noreload[i].block)->Get<const Anope::string>(noreload[i].name) != Config->GetBlock(noreload[i].block)->Get<const Anope::string>(noreload[i].name))
-				throw ConfigException("<" + noreload[i].block + ":" + noreload[i].name + "> can not be modified once set");
+		for (const auto &tag : noreload)
+		{
+			if (this->GetBlock(tag.block)->Get<const Anope::string>(tag.name) != Config->GetBlock(tag.block)->Get<const Anope::string>(tag.name))
+				throw ConfigException("<" + tag.block + ":" + tag.name + "> can not be modified once set");
+		}
 	}
 
 	const Block *serverinfo = this->GetBlock("serverinfo"), *options = this->GetBlock("options"),
@@ -186,8 +188,8 @@ Conf::Conf() : Block("")
 	if (mail->Get<bool>("usemail"))
 	{
 		Anope::string check[] = { "sendmailpath", "sendfrom", "registration_subject", "registration_message", "emailchange_subject", "emailchange_message", "memo_subject", "memo_message" };
-		for (unsigned i = 0; i < sizeof(check) / sizeof(Anope::string); ++i)
-			ValidateNotEmpty("mail", check[i], mail->Get<const Anope::string>(check[i]));
+		for (const auto &field : check)
+			ValidateNotEmpty("mail", field, mail->Get<const Anope::string>(field));
 	}
 
 	this->ReadTimeout = options->Get<time_t>("readtimeout");
@@ -276,10 +278,8 @@ Conf::Conf() : Block("")
 			/* Strip leading ' ' after , */
 			if (str.length() > 1 && str[0] == ' ')
 				str.erase(str.begin());
-			for (unsigned j = 0; j < this->MyOperTypes.size(); ++j)
+			for (auto *ot2 : this->MyOperTypes)
 			{
-				OperType *ot2 = this->MyOperTypes[j];
-
 				if (ot2->GetName().equals_ci(str))
 				{
 					Log() << "Inheriting commands and privs from " << ot2->GetName() << " to " << ot->GetName();
@@ -308,9 +308,11 @@ Conf::Conf() : Block("")
 		ValidateNotEmpty("oper", "type", type);
 
 		OperType *ot = NULL;
-		for (unsigned j = 0; j < this->MyOperTypes.size(); ++j)
-			if (this->MyOperTypes[j]->GetName() == type)
-				ot = this->MyOperTypes[j];
+		for (auto *opertype : this->MyOperTypes)
+		{
+			if (opertype->GetName() == type)
+				ot = opertype;
+		}
 		if (ot == NULL)
 			throw ConfigException("Oper block for " + nname + " has invalid oper type " + type);
 
@@ -324,8 +326,8 @@ Conf::Conf() : Block("")
 		this->Opers.push_back(o);
 	}
 
-	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-		it->second->conf = false;
+	for (const auto &[_, bi] : *BotListByNick)
+		bi->conf = false;
 	for (int i = 0; i < this->CountBlock("service"); ++i)
 	{
 		const Block *service = this->GetBlock("service", i);
@@ -373,28 +375,30 @@ Conf::Conf() : Block("")
 			/* Remove all existing modes */
 			ChanUserContainer *cu = c->FindUser(bi);
 			if (cu != NULL)
-				for (size_t j = 0; j < cu->status.Modes().length(); ++j)
-					c->RemoveMode(bi, ModeManager::FindChannelModeByChar(cu->status.Modes()[j]), bi->GetUID());
-			/* Set the new modes */
-			for (unsigned j = 0; j < want_modes.length(); ++j)
 			{
-				ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
+				for (auto mode : cu->status.Modes())
+					c->RemoveMode(bi, ModeManager::FindChannelModeByChar(mode), bi->GetUID());
+			}
+			/* Set the new modes */
+			for (char want_mode : want_modes)
+			{
+				ChannelMode *cm = ModeManager::FindChannelModeByChar(want_mode);
 				if (cm == NULL)
-					cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
+					cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_mode));
 				if (cm && cm->type == MODE_STATUS)
 					c->SetMode(bi, cm, bi->GetUID());
 			}
 		}
-		for (unsigned k = 0; k < oldchannels.size(); ++k)
+		for (const auto &oldchannel : oldchannels)
 		{
-			size_t ch = oldchannels[k].find('#');
-			Anope::string chname = oldchannels[k].substr(ch != Anope::string::npos ? ch : 0);
+			size_t ch = oldchannel.find('#');
+			Anope::string chname = oldchannel.substr(ch != Anope::string::npos ? ch : 0);
 
 			bool found = false;
-			for (unsigned j = 0; j < bi->botchannels.size(); ++j)
+			for (const auto &botchannel : bi->botchannels)
 			{
-				ch = bi->botchannels[j].find('#');
-				Anope::string ochname = bi->botchannels[j].substr(ch != Anope::string::npos ? ch : 0);
+				ch = botchannel.find('#');
+				Anope::string ochname = botchannel.substr(ch != Anope::string::npos ? ch : 0);
 
 				if (chname.equals_ci(ochname))
 					found = true;
@@ -436,8 +440,8 @@ Conf::Conf() : Block("")
 		this->LogInfos.push_back(l);
 	}
 
-	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-		it->second->commands.clear();
+	for (const auto &[_, bi] : *BotListByNick)
+		bi->commands.clear();
 	for (int i = 0; i < this->CountBlock("command"); ++i)
 	{
 		const Block *command = this->GetBlock("command", i);
@@ -514,17 +518,14 @@ Conf::Conf() : Block("")
 
 	if (Config)
 		/* Clear existing conf opers */
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			NickCore *nc = it->second;
 			if (nc->o && std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
 				nc->o = NULL;
 		}
 	/* Apply new opers */
-	for (unsigned i = 0; i < this->Opers.size(); ++i)
+	for (auto *o : this->Opers)
 	{
-		Oper *o = this->Opers[i];
-
 		NickAlias *na = NickAlias::Find(o->name);
 		if (!na)
 			continue;
@@ -564,21 +565,27 @@ Conf::Conf() : Block("")
 
 Conf::~Conf()
 {
-	for (unsigned i = 0; i < MyOperTypes.size(); ++i)
-		delete MyOperTypes[i];
-	for (unsigned i = 0; i < Opers.size(); ++i)
-		delete Opers[i];
+	for (const auto *opertype : MyOperTypes)
+		delete opertype;
+
+	for (const auto *oper : Opers)
+		delete oper;
 }
 
 void Conf::Post(Conf *old)
 {
 	/* Apply module changes */
-	for (unsigned i = 0; i < old->ModulesAutoLoad.size(); ++i)
-		if (std::find(this->ModulesAutoLoad.begin(), this->ModulesAutoLoad.end(), old->ModulesAutoLoad[i]) == this->ModulesAutoLoad.end())
-			ModuleManager::UnloadModule(ModuleManager::FindModule(old->ModulesAutoLoad[i]), NULL);
-	for (unsigned i = 0; i < this->ModulesAutoLoad.size(); ++i)
-		if (std::find(old->ModulesAutoLoad.begin(), old->ModulesAutoLoad.end(), this->ModulesAutoLoad[i]) == old->ModulesAutoLoad.end())
-			ModuleManager::LoadModule(this->ModulesAutoLoad[i], NULL);
+	for (const auto &mod : old->ModulesAutoLoad)
+	{
+		if (std::find(this->ModulesAutoLoad.begin(), this->ModulesAutoLoad.end(), mod) == this->ModulesAutoLoad.end())
+			ModuleManager::UnloadModule(ModuleManager::FindModule(mod), NULL);
+	}
+
+	for (const auto &mod : this->ModulesAutoLoad)
+	{
+		if (std::find(old->ModulesAutoLoad.begin(), old->ModulesAutoLoad.end(), mod) == old->ModulesAutoLoad.end())
+			ModuleManager::LoadModule(mod, NULL);
+	}
 
 	/* Apply opertype changes, as non-conf opers still point to the old oper types */
 	for (unsigned i = Oper::opers.size(); i > 0; --i)
@@ -591,9 +598,11 @@ void Conf::Post(Conf *old)
 			OperType *ot = o->ot;
 			o->ot = NULL;
 
-			for (unsigned j = 0; j < MyOperTypes.size(); ++j)
-				if (ot->GetName() == MyOperTypes[j]->GetName())
-					o->ot = MyOperTypes[j];
+			for (auto *opertype : MyOperTypes)
+			{
+				if (ot->GetName() == opertype->GetName())
+					o->ot = opertype;
+			}
 
 			if (o->ot == NULL)
 			{

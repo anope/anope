@@ -101,9 +101,11 @@ class MyNewsService : public NewsService
 
 	~MyNewsService() override
 	{
-		for (unsigned i = 0; i < 3; ++i)
-			for (unsigned j = 0; j < newsItems[i].size(); ++j)
-				delete newsItems[i][j];
+		for (const auto &newstype : newsItems)
+		{
+			for (const auto *newsitem : newstype)
+				delete newsitem;
+		}
 	}
 
 	NewsItem *CreateNewsItem() override
@@ -134,9 +136,9 @@ class MyNewsService : public NewsService
 #define lenof(a)        (sizeof(a) / sizeof(*(a)))
 static const char **findmsgs(NewsType type)
 {
-	for (unsigned i = 0; i < lenof(msgarray); ++i)
-		if (msgarray[i].type == type)
-			return msgarray[i].msgs;
+	for (auto &msg : msgarray)
+		if (msg.type == type)
+			return msg.msgs;
 	return NULL;
 }
 
@@ -170,8 +172,8 @@ class NewsBase : public Command
 			std::vector<Anope::string> replies;
 			lflist.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of news list."));
 		}

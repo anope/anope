@@ -70,9 +70,8 @@ class MyForbidService : public ForbidService
 
 	~MyForbidService() override
 	{
-		std::vector<ForbidData *> f = GetForbids();
-		for (unsigned i = 0; i < f.size(); ++i)
-			delete f[i];
+		for (const auto *forbid : GetForbids())
+			delete forbid;
 	}
 
 	void AddForbid(ForbidData *d) override
@@ -245,8 +244,8 @@ class CommandOSForbid : public Command
 				{
 					int na_matches = 0;
 
-					for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-						module->OnUserNickChange(it->second, "");
+					for (const auto &[_, user] : UserListByNick)
+						module->OnUserNickChange(user, "");
 
 					for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end;)
 					{
@@ -358,31 +357,29 @@ class CommandOSForbid : public Command
 				list.AddColumn(_("Mask")).AddColumn(_("Type")).AddColumn(_("Creator")).AddColumn(_("Expires")).AddColumn(_("Reason"));
 
 				unsigned shown = 0;
-				for (unsigned i = 0; i < forbids.size(); ++i)
+				for (auto *forbid : forbids)
 				{
-					ForbidData *d = forbids[i];
-
-					if (ftype != FT_SIZE && ftype != d->type)
+					if (ftype != FT_SIZE && ftype != forbid->type)
 						continue;
 
 					Anope::string stype;
-					if (d->type == FT_NICK)
+					if (forbid->type == FT_NICK)
 						stype = "NICK";
-					else if (d->type == FT_CHAN)
+					else if (forbid->type == FT_CHAN)
 						stype = "CHAN";
-					else if (d->type == FT_EMAIL)
+					else if (forbid->type == FT_EMAIL)
 						stype = "EMAIL";
-					else if (d->type == FT_REGISTER)
+					else if (forbid->type == FT_REGISTER)
 						stype = "REGISTER";
 					else
 						continue;
 
 					ListFormatter::ListEntry entry;
-					entry["Mask"] = d->mask;
+					entry["Mask"] = forbid->mask;
 					entry["Type"] = stype;
-					entry["Creator"] = d->creator;
-					entry["Expires"] = d->expires ? Anope::strftime(d->expires, NULL, true).c_str() : Language::Translate(source.GetAccount(), _("Never"));
-					entry["Reason"] = d->reason;
+					entry["Creator"] = forbid->creator;
+					entry["Expires"] = forbid->expires ? Anope::strftime(forbid->expires, NULL, true).c_str() : Language::Translate(source.GetAccount(), _("Never"));
+					entry["Reason"] = forbid->reason;
 					list.AddEntry(entry);
 					++shown;
 				}
@@ -398,8 +395,8 @@ class CommandOSForbid : public Command
 					std::vector<Anope::string> replies;
 					list.Process(replies);
 
-					for (unsigned i = 0; i < replies.size(); ++i)
-						source.Reply(replies[i]);
+					for (const auto &reply : replies)
+						source.Reply(reply);
 
 					if (shown >= forbids.size())
 						source.Reply(_("End of forbid list."));

@@ -146,10 +146,8 @@ class ChanServCore : public Module, public ChanServService
 		nc->GetChannelReferences(chans);
 		int max_reg = Config->GetModule(this)->Get<int>("maxregistered");
 
-		for (unsigned i = 0; i < chans.size(); ++i)
+		for (auto *ci : chans)
 		{
-			ChannelInfo *ci = chans[i];
-
 			if (ci->GetFounder() == nc)
 			{
 				NickCore *newowner = NULL;
@@ -220,9 +218,9 @@ class ChanServCore : public Module, public ChanServService
 		std::deque<Anope::string> chans;
 		ci->GetChannelReferences(chans);
 
-		for (unsigned i = 0; i < chans.size(); ++i)
+		for (const auto &chan : chans)
 		{
-			ChannelInfo *c = ChannelInfo::Find(chans[i]);
+			ChannelInfo *c = ChannelInfo::Find(chan);
 			if (!c)
 				continue;
 
@@ -303,8 +301,8 @@ class ChanServCore : public Module, public ChanServService
 	void OnCreateChan(ChannelInfo *ci) override
 	{
 		/* Set default chan flags */
-		for (unsigned i = 0; i < defaults.size(); ++i)
-			ci->Extend<bool>(defaults[i].upper());
+		for (const auto &def : defaults)
+			ci->Extend<bool>(def.upper());
 	}
 
 	EventReturn OnCanSet(User *u, const ChannelMode *cm) override
@@ -385,9 +383,8 @@ class ChanServCore : public Module, public ChanServService
 		ChannelMode *perm = ModeManager::FindChannelModeByName("PERM");
 
 		/* Find all persistent channels and create them, as we are about to finish burst to our uplink */
-		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+		for (const auto &[_, ci] : *RegisteredChannelList)
 		{
-			ChannelInfo *ci = it->second;
 			if (!persist->HasExt(ci))
 				continue;
 

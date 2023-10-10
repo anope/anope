@@ -24,9 +24,9 @@ class RatboxProto : public IRCDProto
 		if (bi && bi->introduced)
 			return bi;
 
-		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-			if (it->second->introduced)
-				return it->second;
+		for (const auto &[_, bi] : *BotListByNick)
+			if (bi->introduced)
+				return bi;
 
 		return NULL;
 	}

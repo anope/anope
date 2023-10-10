@@ -144,8 +144,8 @@ public:
 				std::vector<Anope::string> replies;
 				list.Process(replies);
 
-				for (unsigned i = 0; i < replies.size(); ++i)
-					source.Reply(replies[i]);
+				for (const auto &reply : replies)
+					source.Reply(reply);
 			}
 		}
 		else if (params.size() > 2)
@@ -199,12 +199,14 @@ public:
 				return;
 			}
 
-			for (unsigned i = 0; i < extra.length(); ++i)
-				if (ModeManager::GetStatusChar(extra[i]) == 0)
+			for (auto chr : extra)
+			{
+				if (ModeManager::GetStatusChar(chr) == 0)
 				{
-					source.Reply(_("%c is an unknown status mode."), extra[i]);
+					source.Reply(_("%c is an unknown status mode."), chr);
 					return;
 				}
+			}
 
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 
@@ -326,10 +328,8 @@ class CSLog : public Module
 			return;
 
 		LogSettings *ls = logsettings.Require(ci);
-		for (unsigned i = 0; i < defaults.size(); ++i)
+		for (auto &d : defaults)
 		{
-			LogDefault &d = defaults[i];
-
 			LogSetting *log = new LogSettingImpl();
 			log->chan = ci->name;
 
@@ -360,11 +360,10 @@ class CSLog : public Module
 
 		LogSettings *ls = logsettings.Get(l->ci);
 		if (ls)
-			for (unsigned i = 0; i < (*ls)->size(); ++i)
+		{
+			for (auto *log : *(*ls))
 			{
-				const LogSetting *log = (*ls)->at(i);
-
-				/* wrong command */
+					/* wrong command */
 				if (log->service_name != l->c->name)
 					continue;
 
@@ -393,6 +392,7 @@ class CSLog : public Module
 				else if (log->method.equals_ci("NOTICE") && l->ci->c)
 					IRCD->SendNotice(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());
 			}
+		}
 	}
 };
 

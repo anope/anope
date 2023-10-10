@@ -108,8 +108,8 @@ struct NSCertListImpl : NSCertList
 	void ClearCert() override
 	{
 		FOREACH_MOD(OnNickClearCert, (this->nc));
-		for (unsigned i = 0; i < certs.size(); ++i)
-			certmap.erase(certs[i]);
+		for (const auto &cert : certs)
+			certmap.erase(cert);
 		this->certs.clear();
 	}
 
@@ -148,8 +148,8 @@ struct NSCertListImpl : NSCertList
 			Anope::string buf;
 			data["cert"] >> buf;
 			spacesepstream sep(buf);
-			for (unsigned i = 0; i < c->certs.size(); ++i)
-				certmap.erase(c->certs[i]);
+			for (const auto &cert : c->certs)
+				certmap.erase(cert);
 			c->certs.clear();
 			while (sep.GetToken(buf))
 			{

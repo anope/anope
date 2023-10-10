@@ -128,16 +128,16 @@ class CommandNSGroup : public Command
 		}
 
 		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
-			for (unsigned i = 0; i < Oper::opers.size(); ++i)
+		{
+			for (auto *o : Oper::opers)
 			{
-				Oper *o = Oper::opers[i];
-
 				if (user != NULL && !user->HasMode("OPER") && user->nick.find_ci(o->name) != Anope::string::npos)
 				{
 					source.Reply(NICK_CANNOT_BE_REGISTERED, user->nick.c_str());
 					return;
 				}
 			}
+		}
 
 		NickAlias *target, *na = NickAlias::Find(source.GetNick());
 		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
@@ -327,10 +327,8 @@ class CommandNSGList : public Command
 		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
 		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire", "90d"),
 		       unconfirmed_expire = Config->GetModule("ns_register")->Get<time_t>("unconfirmedexpire", "1d");
-		for (unsigned i = 0; i < nc->aliases->size(); ++i)
+		for (auto *na2 : *nc->aliases)
 		{
-			const NickAlias *na2 = nc->aliases->at(i);
-
 			Anope::string expires;
 			if (na2->HasExt("NS_NO_EXPIRE"))
 				expires = NO_EXPIRE;
@@ -351,8 +349,8 @@ class CommandNSGList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("%d nickname(s) in the group."), nc->aliases->size());
 	}

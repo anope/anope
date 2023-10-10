@@ -253,7 +253,6 @@ class OSDefcon : public Module
 	void ParseModeString()
 	{
 		int add = -1; /* 1 if adding, 0 if deleting, -1 if neither */
-		unsigned char mode;
 		ChannelMode *cm;
 		ChannelModeParam *cmp;
 		Anope::string modes, param;
@@ -265,10 +264,8 @@ class OSDefcon : public Module
 		ss.GetToken(modes);
 
 		/* Loop while there are modes to set */
-		for (unsigned i = 0, end = modes.length(); i < end; ++i)
+		for (auto mode : modes)
 		{
-			mode = modes[i];
-
 			switch (mode)
 			{
 				case '+':
@@ -559,8 +556,8 @@ static void runDefCon()
 			{
 				Log(OperServ, "operserv/defcon") << "DEFCON: setting " << DConfig.chanmodes << " on all channels";
 				DefConModesSet = true;
-				for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-					it->second->SetModes(OperServ, false, "%s", DConfig.chanmodes.c_str());
+				for (const auto &[_, chan] : ChannelList)
+					chan->SetModes(OperServ, false, "%s", DConfig.chanmodes.c_str());
 			}
 		}
 	}
@@ -575,8 +572,8 @@ static void runDefCon()
 				if (!newmodes.empty())
 				{
 					Log(OperServ, "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
-					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-						it->second->SetModes(OperServ, true, "%s", newmodes.c_str());
+					for (const auto &[_, chan] : ChannelList)
+						chan->SetModes(OperServ, true, "%s", newmodes.c_str());
 				}
 			}
 		}
@@ -588,14 +585,14 @@ static Anope::string defconReverseModes(const Anope::string &modes)
 	if (modes.empty())
 		return "";
 	Anope::string newmodes;
-	for (unsigned i = 0, end = modes.length(); i < end; ++i)
+	for (auto mode : modes)
 	{
-		if (modes[i] == '+')
+		if (mode == '+')
 			newmodes += '-';
-		else if (modes[i] == '-')
+		else if (mode == '-')
 			newmodes += '+';
 		else
-			newmodes += modes[i];
+			newmodes += mode;
 	}
 	return newmodes;
 }

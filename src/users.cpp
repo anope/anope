@@ -468,9 +468,8 @@ bool User::IsServicesOper()
 		bool match = false;
 		Anope::string match_host = this->GetIdent() + "@" + this->host;
 		Anope::string match_ip = this->GetIdent() + "@" + this->ip.addr();
-		for (unsigned i = 0; i < this->nc->o->hosts.size(); ++i)
+		for (const auto &userhost : this->nc->o->hosts)
 		{
-			const Anope::string &userhost = this->nc->o->hosts[i];
 			if (Anope::Match(match_host, userhost) || Anope::Match(match_ip, userhost))
 			{
 				match = true;
@@ -629,11 +628,11 @@ void User::SetModes(BotInfo *bi, const char *umodes, ...)
 
 	spacesepstream sep(buf);
 	sep.GetToken(modebuf);
-	for (unsigned i = 0, end = modebuf.length(); i < end; ++i)
+	for (auto mode : modebuf)
 	{
 		UserMode *um;
 
-		switch (modebuf[i])
+		switch (mode)
 		{
 			case '+':
 				add = 1;
@@ -644,7 +643,7 @@ void User::SetModes(BotInfo *bi, const char *umodes, ...)
 			default:
 				if (add == -1)
 					continue;
-				um = ModeManager::FindUserModeByChar(modebuf[i]);
+				um = ModeManager::FindUserModeByChar(mode);
 				if (!um)
 					continue;
 		}
@@ -676,11 +675,11 @@ void User::SetModesInternal(const MessageSource &source, const char *umodes, ...
 
 	spacesepstream sep(buf);
 	sep.GetToken(modebuf);
-	for (unsigned i = 0, end = modebuf.length(); i < end; ++i)
+	for (auto mode : modebuf)
 	{
 		UserMode *um;
 
-		switch (modebuf[i])
+		switch (mode)
 		{
 			case '+':
 				add = 1;
@@ -691,7 +690,7 @@ void User::SetModesInternal(const MessageSource &source, const char *umodes, ...
 			default:
 				if (add == -1)
 					continue;
-				um = ModeManager::FindUserModeByChar(modebuf[i]);
+				um = ModeManager::FindUserModeByChar(mode);
 				if (!um)
 					continue;
 		}
@@ -712,16 +711,16 @@ Anope::string User::GetModes() const
 {
 	Anope::string m, params;
 
-	for (ModeList::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
+	for (const auto &[mode, value] : this->modes)
 	{
-		UserMode *um = ModeManager::FindUserModeByName(it->first);
+		UserMode *um = ModeManager::FindUserModeByName(mode);
 		if (um == NULL)
 			continue;
 
 		m += um->mchar;
 
-		if (!it->second.empty())
-			params += " " + it->second;
+		if (!value.empty())
+			params += " " + value;
 	}
 
 	return m + params;
@@ -852,7 +851,7 @@ User* User::Find(const Anope::string &name, bool nick_only)
 
 void User::QuitUsers()
 {
-	for (std::list<User *>::iterator it = quitting_users.begin(), it_end = quitting_users.end(); it != it_end; ++it)
-		delete *it;
+	for (const auto *quitting_user : quitting_users)
+		delete quitting_user;
 	quitting_users.clear();
 }

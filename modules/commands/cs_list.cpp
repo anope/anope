@@ -75,13 +75,11 @@ class CommandCSList : public Command
 		list.AddColumn(_("Name")).AddColumn(_("Description"));
 
 		Anope::map<ChannelInfo *> ordered_map;
-		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
-			ordered_map[it->first] = it->second;
+		for (const auto &[cname, ci] : *RegisteredChannelList)
+			ordered_map[cname] = ci;
 
-		for (Anope::map<ChannelInfo *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
+		for (const auto &[_, ci] : ordered_map)
 		{
-			const ChannelInfo *ci = it->second;
-
 			if (!is_servadmin)
 			{
 				if (ci->HasExt("CS_PRIVATE") || ci->HasExt("CS_SUSPENDED"))
@@ -124,8 +122,8 @@ class CommandCSList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("End of list - %d/%d matches shown."), nchans > listmax ? listmax : nchans, nchans);
 	}

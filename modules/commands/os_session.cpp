@@ -61,9 +61,8 @@ class MySessionService : public SessionService
 
 	Exception *FindException(User *u) override
 	{
-		for (std::vector<Exception *>::const_iterator it = this->Exceptions->begin(), it_end = this->Exceptions->end(); it != it_end; ++it)
+		for (auto *e : *this->Exceptions)
 		{
-			Exception *e = *it;
 			if (Anope::Match(u->host, e->mask) || Anope::Match(u->ip.addr(), e->mask))
 				return e;
 
@@ -75,9 +74,8 @@ class MySessionService : public SessionService
 
 	Exception *FindException(const Anope::string &host) override
 	{
-		for (std::vector<Exception *>::const_iterator it = this->Exceptions->begin(), it_end = this->Exceptions->end(); it != it_end; ++it)
+		for (auto *e : *this->Exceptions)
 		{
-			Exception *e = *it;
 			if (Anope::Match(host, e->mask))
 				return e;
 
@@ -191,10 +189,8 @@ class CommandOSSession : public Command
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Session")).AddColumn(_("Host"));
 
-			for (SessionService::SessionMap::iterator it = session_service->GetSessions().begin(), it_end = session_service->GetSessions().end(); it != it_end; ++it)
+			for (const auto &[_, session] : session_service->GetSessions())
 			{
-				Session *session = it->second;
-
 				if (session->count >= mincount)
 				{
 					ListFormatter::ListEntry entry;
@@ -210,8 +206,8 @@ class CommandOSSession : public Command
 			list.Process(replies);
 
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 
 		return;
@@ -347,9 +343,8 @@ class CommandOSException : public Command
 				return;
 			}
 
-			for (std::vector<Exception *>::iterator it = session_service->GetExceptions().begin(), it_end = session_service->GetExceptions().end(); it != it_end; ++it)
+			for (auto *e : session_service->GetExceptions())
 			{
-				Exception *e = *it;
 				if (e->mask.equals_ci(mask))
 				{
 					if (e->limit != limit)
@@ -495,8 +490,8 @@ class CommandOSException : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 	}
 

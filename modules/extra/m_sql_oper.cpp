@@ -137,10 +137,8 @@ class ModuleSQLOper : public Module
 
 	~ModuleSQLOper()
 	{
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			NickCore *nc = it->second;
-
 			if (nc->o && dynamic_cast<SQLOper *>(nc->o))
 			{
 				delete nc->o;

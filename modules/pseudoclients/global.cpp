@@ -19,8 +19,8 @@ class GlobalCore : public Module, public GlobalService
 	{
 		if (s != Me && !s->IsJuped())
 			s->Notice(sender, message);
-		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
-			this->ServerGlobal(sender, s->GetLinks()[i], message);
+		for (auto *link : s->GetLinks())
+			this->ServerGlobal(sender, link, message);
 	}
 
  public:

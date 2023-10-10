@@ -74,10 +74,8 @@ struct Rewrite
 
 	static Rewrite *Find(const Anope::string &client, const Anope::string &cmd)
 	{
-		for (unsigned i = 0; i < rewrites.size(); ++i)
+		for (auto &r : rewrites)
 		{
-			Rewrite &r = rewrites[i];
-
 			if ((client.empty() || r.client.equals_ci(client)) && (r.source_message.equals_ci(cmd) || r.source_message.find_ci(cmd + " ") == 0))
 				return &r;
 		}
@@ -87,10 +85,8 @@ struct Rewrite
 
 	static Rewrite *Match(const Anope::string &client, const std::vector<Anope::string> &params)
 	{
-		for (unsigned i = 0; i < rewrites.size(); ++i)
+		for (auto &r : rewrites)
 		{
-			Rewrite &r = rewrites[i];
-
 			if ((client.empty() || r.client.equals_ci(client)) && r.Matches(params))
 				return &r;
 		}

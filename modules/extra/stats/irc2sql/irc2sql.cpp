@@ -47,19 +47,18 @@ void IRC2SQL::OnReload(Configuration::Conf *conf)
 			this->OnNewServer(it->second);
 		}
 
-		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+		for (const auto &[_, c] : ChannelList)
 		{
-			this->OnChannelCreate(it->second);
+			this->OnChannelCreate(c);
 		}
 
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (const auto &[_, u] : UserListByNick)
 		{
-			User *u = it->second;
 			bool exempt = false;
 			this->OnUserConnect(u, exempt);
-			for (User::ChanUserList::const_iterator cit = u->chans.begin(), cit_end = u->chans.end(); cit != cit_end; ++cit)
+			for (const auto &[_, uc] : u->chans)
 			{
-				this->OnJoinChannel(u, cit->second->chan);
+				this->OnJoinChannel(u, uc->chan);
 			}
 		}
 	}

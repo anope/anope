@@ -30,8 +30,8 @@ bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/access", params, replacements);
 	}
 
-	for (unsigned i = 0; i < na->nc->access.size(); ++i)
-		replacements["ACCESS"] = na->nc->access[i];
+	for (const auto &access : na->nc->access)
+		replacements["ACCESS"] = access;
 
 	TemplateFileServer page("nickserv/access.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

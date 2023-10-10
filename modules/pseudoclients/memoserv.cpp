@@ -94,10 +94,8 @@ class MemoServCore : public Module, public MemoServService
 
 			if (ci->c)
 			{
-				for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+				for (const auto &[_, cu] : ci->c->users)
 				{
-					ChanUserContainer *cu = it->second;
-
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
@@ -112,9 +110,8 @@ class MemoServCore : public Module, public MemoServService
 
 			if (nc->HasExt("MEMO_RECEIVE"))
 			{
-				for (unsigned i = 0; i < nc->aliases->size(); ++i)
+				for (auto *na : *nc->aliases)
 				{
-					const NickAlias *na = nc->aliases->at(i);
 					User *user = User::Find(na->nick, true);
 					if (user && user->IsIdentified())
 						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), mi->memos->size());

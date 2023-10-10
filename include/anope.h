@@ -254,8 +254,8 @@ namespace Anope
 		inline string lower() const
 		{
 			Anope::string new_string = *this;
-			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = Anope::tolower(new_string[i]);
+			for (auto &chr : new_string)
+				chr = Anope::tolower(chr);
 			return new_string;
 		}
 
@@ -265,8 +265,8 @@ namespace Anope
 		inline string upper() const
 		{
 			Anope::string new_string = *this;
-			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = Anope::toupper(new_string[i]);
+			for (auto &chr : new_string)
+				chr = Anope::toupper(chr);
 			return new_string;
 		}
 

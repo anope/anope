@@ -24,9 +24,8 @@ class CommandCSUp : public Command
 		bool given = false;
 		AccessGroup u_access = c->ci->AccessFor(u);
 
-		for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+		for (auto *cm : ModeManager::GetStatusChannelModesByRank())
 		{
-			ChannelModeStatus *cm = ModeManager::GetStatusChannelModesByRank()[i];
 			bool has_priv = u_access.HasPriv("AUTO" + cm->name) || u_access.HasPriv(cm->name);
 
 			if (has_priv)

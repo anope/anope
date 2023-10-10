@@ -25,28 +25,24 @@ struct ForLoop
 
 	ForLoop(size_t s, TemplateFileServer::Replacements &r, const std::vector<Anope::string> &v, const std::vector<Anope::string> &r_names) : start(s), vars(v)
 	{
-		for (unsigned i = 0; i < r_names.size(); ++i)
-			ranges.push_back(r.equal_range(r_names[i]));
+		for (const auto &r_name : r_names)
+			ranges.push_back(r.equal_range(r_name));
 	}
 
 	void increment(const TemplateFileServer::Replacements &r)
 	{
-		for (unsigned i = 0; i < ranges.size(); ++i)
+		for (auto &[begin, end] : ranges)
 		{
-			range &ra = ranges[i];
-
-			if (ra.first != r.end() && ra.first != ra.second)
-				++ra.first;
+			if (begin != r.end() && begin != end)
+				++begin;
 		}
 	}
 
 	bool finished(const TemplateFileServer::Replacements &r) const
 	{
-		for (unsigned i = 0; i < ranges.size(); ++i)
+		for (const auto &[begin, end] : ranges)
 		{
-			const range &ra = ranges[i];
-
-			if (ra.first != r.end() && ra.first != ra.second)
+			if (begin != r.end() && begin != end)
 				return false;
 		}
 

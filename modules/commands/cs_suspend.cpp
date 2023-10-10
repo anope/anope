@@ -109,16 +109,15 @@ class CommandCSSuspend : public Command
 		{
 			std::vector<User *> users;
 
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+			for (const auto &[_, uc] : ci->c->users)
 			{
-				ChanUserContainer *uc = it->second;
 				User *user = uc->user;
 				if (!user->HasMode("OPER") && user->server != Me)
 					users.push_back(user);
 			}
 
-			for (unsigned i = 0; i < users.size(); ++i)
-				ci->c->Kick(NULL, users[i], "%s", !reason.empty() ? reason.c_str() : Language::Translate(users[i], _("This channel has been suspended.")));
+			for (auto *user : users)
+				ci->c->Kick(NULL, user, "%s", !reason.empty() ? reason.c_str() : Language::Translate(user, _("This channel has been suspended.")));
 		}
 
 		Log(LOG_ADMIN, source, this, ci) << "(" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");

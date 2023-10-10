@@ -65,8 +65,8 @@ class CommandCSInfo : public Command
 		std::vector<Anope::string> replies;
 		info.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

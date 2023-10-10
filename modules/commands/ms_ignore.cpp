@@ -84,10 +84,10 @@ class CommandMSIgnore : public Command
 			{
 				ListFormatter list(source.GetAccount());
 				list.AddColumn(_("Mask"));
-				for (unsigned i = 0; i < mi->ignores.size(); ++i)
+				for (const auto &ignore : mi->ignores)
 				{
 					ListFormatter::ListEntry entry;
-					entry["Mask"] = mi->ignores[i];
+					entry["Mask"] = ignore;
 					list.AddEntry(entry);
 				}
 
@@ -96,8 +96,8 @@ class CommandMSIgnore : public Command
 				std::vector<Anope::string> replies;
 				list.Process(replies);
 
-				for (unsigned i = 0; i < replies.size(); ++i)
-					source.Reply(replies[i]);
+				for (const auto &reply : replies)
+					source.Reply(reply);
 			}
 		}
 		else

@@ -21,8 +21,8 @@ class Data : public Serialize::Data
 
 	~Data() override
 	{
-		for (std::map<Anope::string, std::stringstream *>::iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			delete it->second;
+		for (auto &[_, stream] : data)
+			delete stream;
 	}
 
 	std::iostream& operator[](const Anope::string &key) override
@@ -36,17 +36,17 @@ class Data : public Serialize::Data
 	std::set<Anope::string> KeySet() const override
 	{
 		std::set<Anope::string> keys;
-		for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-			keys.insert(it->first);
+		for (const auto &[key, _] : this->data)
+			keys.insert(key);
 		return keys;
 	}
 
 	size_t Hash() const override
 	{
 		size_t hash = 0;
-		for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-			if (!it->second->str().empty())
-				hash ^= Anope::hash_cs()(it->second->str());
+		for (const auto &[_, value] : this->data)
+			if (!value->str().empty())
+				hash ^= Anope::hash_cs()(value->str());
 		return hash;
 	}
 };
@@ -161,11 +161,9 @@ class DatabaseRedis : public Module, public Pipe
 
 	void OnNotify() override
 	{
-		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
+		for (auto *obj : this->updated_items)
 		{
-			Serializable *s = *it;
-
-			this->InsertObject(s);
+			this->InsertObject(obj);
 		}
 
 		this->updated_items.clear();
@@ -185,10 +183,9 @@ class DatabaseRedis : public Module, public Pipe
 			return EVENT_CONTINUE;
 		}
 
-		const std::vector<Anope::string> type_order = Serialize::Type::GetTypeOrder();
-		for (unsigned i = 0; i < type_order.size(); ++i)
+		for (const auto &type_order : Serialize::Type::GetTypeOrder())
 		{
-			Serialize::Type *sb = Serialize::Type::Find(type_order[i]);
+			Serialize::Type *sb = Serialize::Type::Find(type_order);
 			this->OnSerializeTypeCreate(sb);
 		}
 
@@ -266,10 +263,8 @@ void TypeLoader::OnResult(const Reply &r)
 		return;
 	}
 
-	for (unsigned i = 0; i < r.multi_bulk.size(); ++i)
+	for (auto *reply : r.multi_bulk)
 	{
-		const Reply *reply = r.multi_bulk[i];
-
 		if (reply->type != Reply::BULK)
 			continue;
 
@@ -440,12 +435,8 @@ void Updater::OnResult(const Reply &r)
 	args.emplace_back("HMSET");
 	args.push_back("hash:" + this->type + ":" + stringify(obj->id));
 
-	typedef std::map<Anope::string, std::stringstream *> items;
-	for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+	for (const auto &[key, value] : data.data)
 	{
-		const Anope::string &key = it->first;
-		std::stringstream *value = it->second;
-
 		args.push_back(key);
 		args.emplace_back(value->str());
 
@@ -549,12 +540,8 @@ void SubscriptionListener::OnResult(const Reply &r)
 		/* Transaction start */
 		me->redis->StartTransaction();
 
-		typedef std::map<Anope::string, std::stringstream *> items;
-		for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (const auto &[k, value] : data.data)
 		{
-			const Anope::string &k = it->first;
-			std::stringstream *value = it->second;
-
 			std::vector<Anope::string> args;
 			args.emplace_back("SREM");
 			args.push_back("value:" + type + ":" + k + ":" + value->str());
@@ -602,12 +589,8 @@ void ModifiedObject::OnResult(const Reply &r)
 
 		obj->Serialize(data);
 
-		typedef std::map<Anope::string, std::stringstream *> items;
-		for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (auto &[key, value] : data.data)
 		{
-			const Anope::string &key = it->first;
-			std::stringstream *value = it->second;
-
 			std::vector<Anope::string> args;
 			args.emplace_back("SREM");
 			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());
@@ -635,12 +618,8 @@ void ModifiedObject::OnResult(const Reply &r)
 		obj->UpdateCache(data);
 
 		/* Insert new object values */
-		typedef std::map<Anope::string, std::stringstream *> items;
-		for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (const auto &[key, value] : data.data)
 		{
-			const Anope::string &key = it->first;
-			std::stringstream *value = it->second;
-
 			std::vector<Anope::string> args;
 			args.emplace_back("SADD");
 			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());

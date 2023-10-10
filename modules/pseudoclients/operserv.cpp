@@ -122,10 +122,8 @@ class SQLineManager : public XLineManager
 
 	XLine *CheckChannel(Channel *c)
 	{
-		for (std::vector<XLine *>::const_iterator it = this->GetList().begin(), it_end = this->GetList().end(); it != it_end; ++it)
+		for (auto *x : this->GetList())
 		{
-			XLine *x = *it;
-
 			if (x->regex)
 			{
 				if (x->regex->Matches(c->name))

@@ -191,8 +191,8 @@ class NSSetMisc : public Module
 
 	~NSSetMisc() override
 	{
-		for (Anope::map<ExtensibleItem<NSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
-			delete it->second;
+		for (const auto &[_, data] : items)
+			delete data;
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -220,9 +220,8 @@ class NSSetMisc : public Module
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool) override
 	{
-		for (Anope::map<ExtensibleItem<NSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
+		for (const auto &[_, e] : items)
 		{
-			ExtensibleItem<NSMiscData> *e = it->second;
 			NSMiscData *data = e->Get(na->nc);
 
 			if (data != NULL)

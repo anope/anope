@@ -245,8 +245,8 @@ class ESHA256 : public Module
 	/* initializes the IV with a new random value */
 	void NewRandomIV()
 	{
-		for (int i = 0; i < 8; ++i)
-			iv[i] = static_cast<uint32_t>(rand());
+		for (auto &ivsegment : iv)
+			ivsegment = static_cast<uint32_t>(rand());
 	}
 
 	/* returns the IV as base64-encrypted string */

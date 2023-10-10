@@ -148,10 +148,8 @@ class CommandOSInfo : public Command
 				return;
 			}
 
-			for (unsigned i = 0; i < (*oi)->size(); ++i)
+			for (auto *o : *(*oi))
 			{
-				OperInfo *o = (*oi)->at(i);
-
 				if (o->info.equals_ci(info))
 				{
 					source.Reply(_("The oper info already exists on \002%s\002."), target.c_str());
@@ -262,9 +260,8 @@ class OSInfo : public Module
 		if (!oi)
 			return;
 
-		for (unsigned i = 0; i < (*oi)->size(); ++i)
+		for (auto *o : *(*oi))
 		{
-			OperInfo *o = (*oi)->at(i);
 			info[_("Oper Info")] = Anope::printf(_("(by %s on %s) %s"), o->adder.c_str(), Anope::strftime(o->created, source.GetAccount(), true).c_str(), o->info.c_str());
 		}
 	}

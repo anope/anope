@@ -288,15 +288,10 @@ bool Command::FindCommandFromService(const Anope::string &command_service, BotIn
 {
 	bot = NULL;
 
-	for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	for (const auto &[_, bi] : *BotListByNick)
 	{
-		BotInfo *bi = it->second;
-
-		for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
+		for (const auto &[c_name, info] : bi->commands)
 		{
-			const Anope::string &c_name = cit->first;
-			const CommandInfo &info = cit->second;
-
 			if (info.name != command_service)
 				continue;
 

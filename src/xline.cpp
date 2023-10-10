@@ -224,10 +224,8 @@ void XLineManager::UnregisterXLineManager(XLineManager *xlm)
 
 void XLineManager::CheckAll(User *u)
 {
-	for (std::list<XLineManager *>::iterator it = XLineManagers.begin(), it_end = XLineManagers.end(); it != it_end; ++it)
+	for (auto *xlm : XLineManagers)
 	{
-		XLineManager *xlm = *it;
-
 		if (xlm->CheckAllXLines(u))
 			break;
 	}
@@ -361,9 +359,8 @@ void XLineManager::Clear()
 	std::vector<XLine *> xl;
 	this->xlines->swap(xl);
 
-	for (unsigned i = 0; i < xl.size(); ++i)
+	for (auto *x : xl)
 	{
-		XLine *x = xl[i];
 		if (!x->id.empty())
 			XLinesByUID->erase(x->id);
 		delete x;
@@ -427,10 +424,8 @@ XLine* XLineManager::HasEntry(const Anope::string &mask)
 				it->second->QueueUpdate();
 				return it->second;
 			}
-	for (unsigned i = 0, end = this->xlines->size(); i < end; ++i)
+	for (auto *x : *this->xlines)
 	{
-		XLine *x = this->xlines->at(i);
-
 		if (x->mask.equals_ci(mask))
 		{
 			x->QueueUpdate();

@@ -16,8 +16,8 @@ static std::map<Anope::string, int16_t, ci::less> defaultLevels;
 static inline void reset_levels(ChannelInfo *ci)
 {
 	ci->ClearLevels();
-	for (std::map<Anope::string, int16_t, ci::less>::iterator it = defaultLevels.begin(), it_end = defaultLevels.end(); it != it_end; ++it)
-		ci->SetLevel(it->first, it->second);
+	for (auto &[priv, level] : defaultLevels)
+		ci->SetLevel(priv, level);
 }
 
 class AccessChanAccess : public ChanAccess
@@ -369,12 +369,14 @@ class CommandCSAccess : public Command
 
 					Anope::string timebuf;
 					if (ci->c)
-						for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
+					{
+						for (const auto &[_, cuc] : ci->c->users)
 						{
 							ChannelInfo *p;
-							if (access->Matches(cit->second->user, cit->second->user->Account(), p))
+							if (access->Matches(cuc->user, cuc->user->Account(), p))
 								timebuf = "Now";
 						}
+					}
 					if (timebuf.empty())
 					{
 						if (access->last_seen == 0)
@@ -407,12 +409,14 @@ class CommandCSAccess : public Command
 
 				Anope::string timebuf;
 				if (ci->c)
-					for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
+				{
+					for (auto &[_, cuc] : ci->c->users)
 					{
 						ChannelInfo *p;
-						if (access->Matches(cit->second->user, cit->second->user->Account(), p))
+						if (access->Matches(cuc->user, cuc->user->Account(), p))
 							timebuf = "Now";
 					}
+				}
 				if (timebuf.empty())
 				{
 					if (access->last_seen == 0)
@@ -441,8 +445,8 @@ class CommandCSAccess : public Command
 
 			source.Reply(_("Access list for %s:"), ci->name.c_str());
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of access list"));
 		}
@@ -701,9 +705,8 @@ class CommandCSLevels : public Command
 
 		const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 
-		for (unsigned i = 0; i < privs.size(); ++i)
+		for (const auto &p : privs)
 		{
-			const Privilege &p = privs[i];
 			int16_t j = ci->GetLevel(p.name);
 
 			ListFormatter::ListEntry entry;
@@ -722,8 +725,8 @@ class CommandCSLevels : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 	}
 
 	void DoReset(CommandSource &source, ChannelInfo *ci)
@@ -801,10 +804,8 @@ class CommandCSLevels : public Command
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Name")).AddColumn(_("Description"));
 
-			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-			for (unsigned i = 0; i < privs.size(); ++i)
+			for (const auto &p : PrivilegeManager::GetPrivileges())
 			{
-				const Privilege &p = privs[i];
 				ListFormatter::ListEntry entry;
 				entry["Name"] = p.name;
 				entry["Description"] = Language::Translate(source.nc, p.desc.c_str());
@@ -814,8 +815,8 @@ class CommandCSLevels : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 		else
 		{

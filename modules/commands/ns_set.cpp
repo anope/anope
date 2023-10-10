@@ -35,11 +35,8 @@ class CommandNSSet : public Command
 		Anope::string this_name = source.command;
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto &[c_name, info] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
-
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				if (info.hide)
@@ -88,11 +85,8 @@ class CommandNSSASet : public Command
 		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
 
 		Anope::string this_name = source.command;
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto &[c_name, info] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
-
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				ServiceReference<Command> command("Command", info.name);
@@ -858,12 +852,12 @@ class CommandNSSetLanguage : public Command
 				"supported languages:"));
 
 		source.Reply("         en_US (English)");
-		for (unsigned j = 0; j < Language::Languages.size(); ++j)
+		for (const auto &language : Language::Languages)
 		{
-			const Anope::string &langname = Language::Translate(Language::Languages[j].c_str(), _("English"));
+			const Anope::string &langname = Language::Translate(language.c_str(), _("English"));
 			if (langname == "English")
 				continue;
-			source.Reply("         %s (%s)", Language::Languages[j].c_str(), langname.c_str());
+			source.Reply("         %s (%s)", language.c_str(), langname.c_str());
 		}
 
 		return true;
@@ -893,12 +887,12 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
 		source.Reply("         en (English)");
-		for (unsigned j = 0; j < Language::Languages.size(); ++j)
+		for (const auto &language : Language::Languages)
 		{
-			const Anope::string &langname = Language::Translate(Language::Languages[j].c_str(), _("English"));
+			const Anope::string &langname = Language::Translate(language.c_str(), _("English"));
 			if (langname == "English")
 				continue;
-			source.Reply("         %s (%s)", Language::Languages[j].c_str(), langname.c_str());
+			source.Reply("         %s (%s)", language.c_str(), langname.c_str());
 		}
 		return true;
 	}
@@ -1205,13 +1199,13 @@ class NSSet : public Module
 
 			const NickCore *nc = anope_dynamic_static_cast<const NickCore *>(s);
 			Anope::string modes;
-			for (User::ModeList::const_iterator it = nc->last_modes.begin(); it != nc->last_modes.end(); ++it)
+			for (const auto &[last_mode, last_value] : nc->last_modes)
 			{
 				if (!modes.empty())
 					modes += " ";
-				modes += it->first;
-				if (!it->second.empty())
-					modes += "," + it->second;
+				modes += last_mode;
+				if (!last_value.empty())
+					modes += "," + last_value;
 			}
 			data["last_modes"] << modes;
 		}
@@ -1342,13 +1336,12 @@ class NSSet : public Module
 	{
 		if (keep_modes.HasExt(u->Account()))
 		{
-			User::ModeList modes = u->Account()->last_modes;
-			for (User::ModeList::iterator it = modes.begin(); it != modes.end(); ++it)
+			for (const auto &[last_mode, last_value] : u->Account()->last_modes)
 			{
-				UserMode *um = ModeManager::FindUserModeByName(it->first);
+				UserMode *um = ModeManager::FindUserModeByName(last_mode);
 				/* if the null user can set the mode, then it's probably safe */
 				if (um && um->CanSet(NULL))
-					u->SetMode(NULL, it->first, it->second);
+					u->SetMode(NULL, last_mode, last_value);
 			}
 		}
 	}

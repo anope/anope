@@ -88,10 +88,8 @@ class DBMySQL : public Module, public Pipe
 		if (!this->CheckInit())
 			return;
 
-		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
+		for (auto *obj : this->updated_items)
 		{
-			Serializable *obj = *it;
-
 			if (obj && this->SQL)
 			{
 				Data data;
@@ -107,8 +105,8 @@ class DBMySQL : public Module, public Pipe
 					continue;
 
 				std::vector<Query> create = this->SQL->CreateTable(this->prefix + s_type->GetName(), data);
-				for (unsigned i = 0; i < create.size(); ++i)
-					this->RunQueryResult(create[i]);
+				for (const auto &query : create)
+					this->RunQueryResult(query);
 
 				Result res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + s_type->GetName(), obj->id, data));
 				if (res.GetID() && obj->id != res.GetID())
@@ -207,8 +205,8 @@ class DBMySQL : public Module, public Pipe
 			{
 				Data data;
 
-				for (std::map<Anope::string, Anope::string>::const_iterator it = row.begin(), it_end = row.end(); it != it_end; ++it)
-					data[it->first] << it->second;
+				for (const auto &[key, value] : row)
+					data[key] << value;
 
 				Serializable *s = NULL;
 				std::map<uint64_t, Serializable *>::iterator it = obj->objects.find(id);

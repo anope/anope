@@ -128,8 +128,8 @@ class CommandEntryMessage : public Command
 
 		std::vector<Anope::string> replies;
 		list.Process(replies);
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("End of entry message list."));
 	}
@@ -280,8 +280,8 @@ class CSEntryMessage : public Module
 			EntryMessageList *messages = c->ci->GetExt<EntryMessageList>("entrymsg");
 
 			if (messages != NULL)
-				for (unsigned i = 0; i < (*messages)->size(); ++i)
-					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), (*messages)->at(i)->message.c_str());
+				for (const auto &message : *(*messages))
+					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), message->message.c_str());
 		}
 	}
 };

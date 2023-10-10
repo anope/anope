@@ -125,14 +125,14 @@ class CommandOSSeen : public Command
 		{
 			size_t mem_counter;
 			mem_counter = sizeof(database_map);
-			for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end; ++it)
+			for (auto &[nick, si] : database)
 			{
 				mem_counter += (5 * sizeof(Anope::string)) + sizeof(TypeInfo) + sizeof(time_t);
-				mem_counter += it->first.capacity();
-				mem_counter += it->second->vhost.capacity();
-				mem_counter += it->second->nick2.capacity();
-				mem_counter += it->second->channel.capacity();
-				mem_counter += it->second->message.capacity();
+				mem_counter += nick.capacity();
+				mem_counter += si->vhost.capacity();
+				mem_counter += si->nick2.capacity();
+				mem_counter += si->channel.capacity();
+				mem_counter += si->message.capacity();
 			}
 			source.Reply(_("%lu nicks are stored in the database, using %.2Lf kB of memory."), database.size(), static_cast<long double>(mem_counter) / 1024);
 		}
@@ -222,9 +222,8 @@ class CommandSeen : public Command
 			return;
 		}
 
-		for (Channel::ChanUserList::const_iterator it = source.c->users.begin(), it_end = source.c->users.end(); it != it_end; ++it)
+		for (const auto &[_, uc] : source.c->users)
 		{
-			ChanUserContainer *uc = it->second;
 			User *u = uc->user;
 
 			if (u->Account() == na->nc)
@@ -236,10 +235,8 @@ class CommandSeen : public Command
 
 		AccessGroup ag = source.c->ci->AccessFor(na->nc);
 		time_t last = 0;
-		for (unsigned int i = 0; i < ag.paths.size(); ++i)
+		for (const auto &p : ag.paths)
 		{
-			ChanAccess::Path &p = ag.paths[i];
-
 			if (p.empty())
 				continue;
 

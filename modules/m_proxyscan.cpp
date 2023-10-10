@@ -350,20 +350,20 @@ class ModuleProxyScan : public Module
 		{
 			ProxyCheck &p = this->proxyscans[i - 1];
 
-			for (std::set<Anope::string, ci::less>::iterator it = p.types.begin(), it_end = p.types.end(); it != it_end; ++it)
+			for (const auto &type : p.types)
 			{
-				for (unsigned k = 0; k < p.ports.size(); ++k)
+				for (const auto port : p.ports)
 				{
 					try
 					{
 						ProxyConnect *con = NULL;
-						if (it->equals_ci("HTTP"))
-							con = new HTTPProxyConnect(p, p.ports[k]);
-						else if (it->equals_ci("SOCKS5"))
-							con = new SOCKS5ProxyConnect(p, p.ports[k]);
+						if (type.equals_ci("HTTP"))
+							con = new HTTPProxyConnect(p, port);
+						else if (type.equals_ci("SOCKS5"))
+							con = new SOCKS5ProxyConnect(p, port);
 						else
 							continue;
-						con->Connect(user->ip.addr(), p.ports[k]);
+						con->Connect(user->ip.addr(), port);
 					}
 					catch (const SocketException &ex)
 					{

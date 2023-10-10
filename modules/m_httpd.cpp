@@ -69,10 +69,8 @@ class MyHTTPClient : public HTTPClient
 
 		if (std::find(this->provider->ext_ips.begin(), this->provider->ext_ips.end(), this->ip) != this->provider->ext_ips.end())
 		{
-			for (unsigned i = 0; i < this->provider->ext_headers.size(); ++i)
+			for (auto &token : this->provider->ext_headers)
 			{
-				const Anope::string &token = this->provider->ext_headers[i];
-
 				if (this->message.headers.count(token))
 				{
 					this->ip = this->message.headers[token];
@@ -255,30 +253,27 @@ class MyHTTPClient : public HTTPClient
 			this->WriteClient("Content-Type: " + msg->content_type);
 		this->WriteClient("Content-Length: " + stringify(msg->length));
 
-		for (unsigned i = 0; i < msg->cookies.size(); ++i)
+		for (const auto &cookie : msg->cookies)
 		{
 			Anope::string buf = "Set-Cookie:";
 
-			for (HTTPReply::cookie::iterator it = msg->cookies[i].begin(), it_end = msg->cookies[i].end(); it != it_end; ++it)
-				buf += " " + it->first + "=" + it->second + ";";
+			for (const auto &[name, value] : cookie)
+				buf += " " + name + "=" + value + ";";
 
 			buf.erase(buf.length() - 1);
 
 			this->WriteClient(buf);
 		}
 
-		typedef std::map<Anope::string, Anope::string> map;
-		for (map::iterator it = msg->headers.begin(), it_end = msg->headers.end(); it != it_end; ++it)
-			this->WriteClient(it->first + ": " + it->second);
+		for (auto &[name, value] : msg->headers)
+			this->WriteClient(name + ": " + value);
 
 		this->WriteClient("Connection: Close");
 		this->WriteClient("");
 
-		for (unsigned i = 0; i < msg->out.size(); ++i)
+		for (auto *d : msg->out)
 		{
-			HTTPReply::Data* d = msg->out[i];
-
-			this->Write(d->buf, d->len);
+				this->Write(d->buf, d->len);
 
 			delete d;
 		}
@@ -455,10 +450,8 @@ class HTTPD : public Module
 
 	void OnModuleLoad(User *u, Module *m) override
 	{
-		for (std::map<Anope::string, MyHTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end; ++it)
+		for (auto &[_, p] : this->providers)
 		{
-			MyHTTPProvider *p = it->second;
-
 			if (p->IsSSL() && sslref)
 				try
 				{

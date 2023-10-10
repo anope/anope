@@ -132,12 +132,14 @@ class CommandHSRequest : public Command
 				source.Reply(HOST_NO_VIDENT);
 				return;
 			}
-			for (Anope::string::iterator s = user.begin(), s_end = user.end(); s != s_end; ++s)
-				if (!isvalidchar(*s))
+			for (const auto &chr : user)
+			{
+				if (!isvalidchar(chr))
 				{
 					source.Reply(HOST_SET_IDENT_ERROR);
 					return;
 				}
+			}
 		}
 
 		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
@@ -304,9 +306,8 @@ class CommandHSWaiting : public Command
 
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Created"));
 
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
+		for (const auto &[nick, na] : *NickAliasList)
 		{
-			const NickAlias *na = it->second;
 			HostRequest *hr = na->GetExt<HostRequest>("hostrequest");
 			if (!hr)
 				continue;
@@ -317,7 +318,7 @@ class CommandHSWaiting : public Command
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(display_counter);
-				entry["Nick"] = it->first;
+				entry["Nick"] = nick;
 				if (!hr->ident.empty())
 					entry["Vhost"] = hr->ident + "@" + hr->host;
 				else
@@ -331,8 +332,8 @@ class CommandHSWaiting : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("Displayed \002%d\002 records (\002%d\002 total)."), display_counter, counter);
 	}
@@ -369,18 +370,15 @@ class HSRequest : public Module
 static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vIdent, const Anope::string &vHost)
 {
 	Anope::string host;
-	std::list<std::pair<Anope::string, Anope::string> >::iterator it, it_end;
-
 	if (!vIdent.empty())
 		host = vIdent + "@" + vHost;
 	else
 		host = vHost;
 
 	if (Config->GetModule(me)->Get<bool>("memooper") && memoserv)
-		for (unsigned i = 0; i < Oper::opers.size(); ++i)
+	{
+		for (auto *o : Oper::opers)
 		{
-			Oper *o = Oper::opers[i];
-
 			const NickAlias *na = NickAlias::Find(o->name);
 			if (!na)
 				continue;
@@ -389,6 +387,7 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 
 			memoserv->Send(source.service->nick, na->nick, message, true);
 		}
+	}
 }
 
 MODULE_INIT(HSRequest)

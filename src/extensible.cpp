@@ -52,10 +52,9 @@ void Extensible::ExtensibleSerialize(const Extensible *e, const Serializable *s,
 
 void Extensible::ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data)
 {
-	for (std::set<ExtensibleBase *>::iterator it = extensible_items.begin(); it != extensible_items.end(); ++it)
+	for (auto *extensible_item : extensible_items)
 	{
-		ExtensibleBase *eb = *it;
-		eb->ExtensibleUnserialize(e, s, data);
+		extensible_item->ExtensibleUnserialize(e, s, data);
 	}
 }
 

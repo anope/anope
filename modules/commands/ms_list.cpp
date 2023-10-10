@@ -129,8 +129,8 @@ class CommandMSList : public Command
 			list.Process(replies);
 
 			source.Reply(_("Memos for %s:"), ci ? ci->name.c_str() : source.GetNick().c_str());
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 		return;
 	}

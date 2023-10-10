@@ -46,14 +46,16 @@ class CommandOSChanList : public Command
 		{
 			source.Reply(_("\002%s\002 channel list:"), u2->nick.c_str());
 
-			for (User::ChanUserList::iterator uit = u2->chans.begin(), uit_end = u2->chans.end(); uit != uit_end; ++uit)
+			for (const auto &[_, cc]: u2->chans)
 			{
-				ChanUserContainer *cc = uit->second;
-
 				if (!modes.empty())
-					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
-						if (!cc->chan->HasMode(*it))
+				{
+					for (const auto &mode : modes)
+					{
+						if (!cc->chan->HasMode(mode))
 							continue;
+					}
+				}
 
 				ListFormatter::ListEntry entry;
 				entry["Name"] = cc->chan->name;
@@ -69,16 +71,18 @@ class CommandOSChanList : public Command
 		{
 			source.Reply(_("Channel list:"));
 
-			for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
+			for (const auto &[_, c] : ChannelList)
 			{
-				Channel *c = cit->second;
-
 				if (!pattern.empty() && !Anope::Match(c->name, pattern, false, true))
 					continue;
 				if (!modes.empty())
-					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
-						if (!c->HasMode(*it))
+				{
+					for (const auto &mode : modes)
+					{
+						if (!c->HasMode(mode))
 							continue;
+					}
+				}
 
 				ListFormatter::ListEntry entry;
 				entry["Name"] = c->name;
@@ -94,8 +98,8 @@ class CommandOSChanList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("End of channel list. \002%u\002 channels shown."), count);
 	}
@@ -156,14 +160,16 @@ class CommandOSUserList : public Command
 		{
 			source.Reply(_("\002%s\002 users list:"), pattern.c_str());
 
-			for (Channel::ChanUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
+			for (const auto &[_, uc] : c->users)
 			{
-				ChanUserContainer *uc = cuit->second;
-
 				if (!modes.empty())
-					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
-						if (!uc->user->HasMode(*it))
+				{
+					for (const auto &mode : modes)
+					{
+						if (!uc->user->HasMode(mode))
 							continue;
+					}
+				}
 
 				ListFormatter::ListEntry entry;
 				entry["Name"] = uc->user->nick;
@@ -178,8 +184,8 @@ class CommandOSUserList : public Command
 		{
 			/* Historically this has been ordered, so... */
 			Anope::map<User *> ordered_map;
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-				ordered_map[it->first] = it->second;
+			for (const auto &[nick, user] : UserListByNick)
+				ordered_map[nick] = user;
 
 			source.Reply(_("Users list:"));
 
@@ -197,10 +203,10 @@ class CommandOSUserList : public Command
 					};
 
 					bool match = false;
-					for (unsigned int i = 0; i < sizeof(masks) / sizeof(*masks); ++i)
+					for (const auto &mask : masks)
 					{
 						/* Check mask with realname included, too */
-						if (Anope::Match(masks[i], pattern, false, true) || Anope::Match(masks[i] + "#" + u2->realname, pattern, false, true))
+						if (Anope::Match(mask, pattern, false, true) || Anope::Match(mask + "#" + u2->realname, pattern, false, true))
 						{
 							match = true;
 							break;
@@ -211,9 +217,13 @@ class CommandOSUserList : public Command
 						continue;
 
 					if (!modes.empty())
-						for (std::set<Anope::string>::iterator mit = modes.begin(), mit_end = modes.end(); mit != mit_end; ++mit)
-							if (!u2->HasMode(*mit))
+					{
+						for (const auto &mode : modes)
+						{
+							if (!u2->HasMode(mode))
 								continue;
+						}
+					}
 				}
 
 				ListFormatter::ListEntry entry;
@@ -229,8 +239,8 @@ class CommandOSUserList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("End of users list. \002%u\002 users shown."), count);
 		return;

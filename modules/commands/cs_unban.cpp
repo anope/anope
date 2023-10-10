@@ -38,17 +38,15 @@ class CommandCSUnban : public Command
 			source.GetAccount()->GetChannelReferences(queue);
 
 			unsigned count = 0;
-			for (unsigned i = 0; i < queue.size(); ++i)
+			for (auto *ci : queue)
 			{
-				ChannelInfo *ci = queue[i];
-
 				if (!ci->c || !source.AccessFor(ci).HasPriv("UNBAN"))
 					continue;
 
 				FOREACH_MOD(OnChannelUnban, (source.GetUser(), ci));
 
-				for (unsigned j = 0; j < modes.size(); ++j)
-					if (ci->c->Unban(source.GetUser(), modes[j]->name, true))
+				for (const auto *mode : modes)
+					if (ci->c->Unban(source.GetUser(), mode->name, true))
 						++count;
 			}
 
@@ -92,8 +90,8 @@ class CommandCSUnban : public Command
 
 		FOREACH_MOD(OnChannelUnban, (u2, ci));
 
-		for (unsigned i = 0; i < modes.size(); ++i)
-			ci->c->Unban(u2, modes[i]->name, source.GetUser() == u2);
+		for (const auto *mode : modes)
+			ci->c->Unban(u2, mode->name, source.GetUser() == u2);
 		if (u2 == source.GetUser())
 			source.Reply(_("You have been unbanned from \002%s\002."), ci->c->name.c_str());
 		else

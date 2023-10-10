@@ -62,9 +62,13 @@ static struct
 Privilege::Privilege(const Anope::string &n, const Anope::string &d, int r) : name(n), desc(d), rank(r)
 {
 	if (this->desc.empty())
-		for (unsigned j = 0; j < sizeof(descriptions) / sizeof(*descriptions); ++j)
-			if (descriptions[j].name.equals_ci(name))
-				this->desc = descriptions[j].desc;
+	{
+		for (const auto &description : descriptions)
+		{
+			if (description.name.equals_ci(name))
+				this->desc = description.desc;
+		}
+	}
 }
 
 bool Privilege::operator==(const Privilege &other) const
@@ -94,10 +98,10 @@ void PrivilegeManager::RemovePrivilege(Privilege &p)
 	if (it != Privileges.end())
 		Privileges.erase(it);
 
-	for (registered_channel_map::const_iterator cit = RegisteredChannelList->begin(), cit_end = RegisteredChannelList->end(); cit != cit_end; ++cit)
+	for (const auto &[_, ci] : *RegisteredChannelList)
 	{
-		cit->second->QueueUpdate();
-		cit->second->RemoveLevel(p.name);
+		ci->QueueUpdate();
+		ci->RemoveLevel(p.name);
 	}
 }
 
@@ -270,9 +274,8 @@ bool ChanAccess::Matches(const User *u, const NickCore *acc, ChannelInfo* &next)
 
 	if (acc)
 	{
-		for (unsigned i = 0; i < acc->aliases->size(); ++i)
+		for (auto *na : *acc->aliases)
 		{
-			const NickAlias *na = acc->aliases->at(i);
 			if (Anope::Match(na->nick, this->mask))
 				return true;
 		}
@@ -342,10 +345,8 @@ static bool HasPriv(const ChanAccess::Path &path, const Anope::string &name)
 	if (path.empty())
 		return false;
 
-	for (unsigned int i = 0; i < path.size(); ++i)
+	for (auto *access : path)
 	{
-		ChanAccess *access = path[i];
-
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnCheckPriv, MOD_RESULT, (access, name));
 
@@ -392,9 +393,9 @@ static ChanAccess *HighestInPath(const ChanAccess::Path &path)
 {
 	ChanAccess *highest = NULL;
 
-	for (unsigned int i = 0; i < path.size(); ++i)
-		if (highest == NULL || *path[i] > *highest)
-			highest = path[i];
+	for (auto *ca : path)
+		if (highest == NULL || *ca > *highest)
+			highest = ca;
 
 	return highest;
 }
@@ -403,9 +404,9 @@ const ChanAccess *AccessGroup::Highest() const
 {
 	ChanAccess *highest = NULL;
 
-	for (unsigned int i = 0; i < paths.size(); ++i)
+	for (const auto &path : paths)
 	{
-		ChanAccess *hip = HighestInPath(paths[i]);
+		ChanAccess *hip = HighestInPath(path);
 
 		if (highest == NULL || *hip > *highest)
 			highest = hip;

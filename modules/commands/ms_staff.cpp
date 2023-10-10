@@ -32,10 +32,8 @@ class CommandMSStaff : public Command
 
 		const Anope::string &text = params[0];
 
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			const NickCore *nc = it->second;
-
 			if (source.nc != nc && nc->IsServicesOper())
 				memoserv->Send(source.GetNick(), nc->display, text, true);
 		}

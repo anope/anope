@@ -51,9 +51,8 @@ class CommandNSAList : public Command
 		nc->GetChannelReferences(queue);
 		std::sort(queue.begin(), queue.end(), ChannelSort);
 
-		for (unsigned i = 0; i < queue.size(); ++i)
+		for (auto *ci : queue)
 		{
-			ChannelInfo *ci = queue[i];
 			ListFormatter::ListEntry entry;
 
 			if (ci->GetFounder() == nc)
@@ -86,10 +85,8 @@ class CommandNSAList : public Command
 
 			entry["Number"] = stringify(chan_count);
 			entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
-			for (unsigned j = 0; j < access.paths.size(); ++j)
+			for (auto &p : access.paths)
 			{
-				ChanAccess::Path &p = access.paths[j];
-
 				// not interested in indirect access
 				if (p.size() != 1)
 					continue;
@@ -113,8 +110,8 @@ class CommandNSAList : public Command
 		{
 			source.Reply(_("Channels that \002%s\002 has access on:"), nc->display.c_str());
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of list - %d channels shown."), chan_count);
 		}

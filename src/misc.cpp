@@ -102,8 +102,8 @@ void NumberList::Process()
 	}
 	else
 	{
-		for (std::set<unsigned>::iterator it = numbers.begin(), it_end = numbers.end(); it != it_end; ++it)
-			this->HandleNumber(*it);
+		for (unsigned int number : numbers)
+			this->HandleNumber(number);
 	}
 }
 
@@ -141,29 +141,30 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 	std::vector<Anope::string> tcolumns;
 	std::map<Anope::string, size_t> lengths;
 	std::set<Anope::string> breaks;
-	for (unsigned i = 0; i < this->columns.size(); ++i)
+	for (const auto &column : this->columns)
 	{
-		tcolumns.emplace_back(Language::Translate(this->nc, this->columns[i].c_str()));
-		lengths[this->columns[i]] = tcolumns[i].length();
+		tcolumns.emplace_back(Language::Translate(this->nc, column.c_str()));
+		lengths[column] = column.length();
 	}
-	for (unsigned i = 0; i < this->entries.size(); ++i)
+	for (auto &entry : this->entries)
 	{
-		ListEntry &e = this->entries[i];
-		for (unsigned j = 0; j < this->columns.size(); ++j)
-			if (e[this->columns[j]].length() > lengths[this->columns[j]])
-				lengths[this->columns[j]] = e[this->columns[j]].length();
+		for (const auto &column : this->columns)
+		{
+			if (entry[column].length() > lengths[column])
+				lengths[column] = entry[column].length();
+		}
 	}
-	unsigned length = 0;
-	for (std::map<Anope::string, size_t>::iterator it = lengths.begin(), it_end = lengths.end(); it != it_end; ++it)
+	unsigned total_length = 0;
+	for (const auto &[column, length] : lengths)
 	{
 		/* Break lines at 80 chars */
-		if (length > 80)
+		if (total_length > 80)
 		{
-			breaks.insert(it->first);
-			length = 0;
+			breaks.insert(column);
+			total_length = 0;
 		}
 		else
-			length += it->second;
+			total_length += length;
 	}
 
 	/* Only put a list header if more than 1 column */
@@ -187,10 +188,8 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 		buffer.push_back(s);
 	}
 
-	for (unsigned i = 0; i < this->entries.size(); ++i)
+	for (auto &entry : this->entries)
 	{
-		ListEntry &e = this->entries[i];
-
 		Anope::string s;
 		for (unsigned j = 0; j < this->columns.size(); ++j)
 		{
@@ -201,9 +200,9 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 			}
 			else if (!s.empty())
 				s += "  ";
-			s += e[this->columns[j]];
+			s += entry[this->columns[j]];
 			if (j + 1 != this->columns.size())
-				for (unsigned k = e[this->columns[j]].length(); k < lengths[this->columns[j]]; ++k)
+				for (unsigned k = entry[this->columns[j]].length(); k < lengths[this->columns[j]]; ++k)
 					s += " ";
 		}
 		buffer.push_back(s);
@@ -218,12 +217,12 @@ void InfoFormatter::Process(std::vector<Anope::string> &buffer)
 {
 	buffer.clear();
 
-	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = this->replies.begin(), it_end = this->replies.end(); it != it_end; ++it)
+	for (const auto &[key, value] : this->replies)
 	{
 		Anope::string s;
-		for (unsigned i = it->first.length(); i < this->longest; ++i)
+		for (unsigned i = key.length(); i < this->longest; ++i)
 			s += " ";
-		s += it->first + ": " + Language::Translate(this->nc, it->second.c_str());
+		s += key + ": " + Language::Translate(this->nc, value.c_str());
 
 		buffer.push_back(s);
 	}
@@ -242,11 +241,11 @@ void InfoFormatter::AddOption(const Anope::string &opt)
 {
 	Anope::string options = Language::Translate(this->nc, "Options");
 	Anope::string *optstr = NULL;
-	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = this->replies.begin(), it_end = this->replies.end(); it != it_end; ++it)
+	for (auto &[option, value] : this->replies)
 	{
-		if (it->first == options)
+		if (option == options)
 		{
-			optstr = &it->second;
+			optstr = &value;
 			break;
 		}
 	}

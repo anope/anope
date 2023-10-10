@@ -69,11 +69,8 @@ class SolanumProto : public IRCDProto
 	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override
 	{
 		Anope::string mechlist;
-
-		for (unsigned i = 0; i < mechanisms.size(); ++i)
-		{
-			mechlist += "," + mechanisms[i];
-		}
+		for (const auto &mechanism : mechanisms)
+			mechlist += "," + mechanism;
 
 		UplinkSocket::Message(Me) << "ENCAP * MECHLIST :" << (mechanisms.empty() ? "" : mechlist.substr(1));
 	}

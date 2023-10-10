@@ -19,46 +19,48 @@ class StatusUpdate : public Module
 	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
 	{
 		if (ci->c)
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		{
+			for (const auto &[_, uc] : ci->c->users)
 			{
-				User *user = it->second->user;
+				User *user = uc->user;
 
 				ChannelInfo *next;
 				if (user->server != Me && access->Matches(user, user->Account(), next))
 				{
 					AccessGroup ag = ci->AccessFor(user);
 
-					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+					for (auto *cms : ModeManager::GetStatusChannelModesByRank())
 					{
-						ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
 						if (!ag.HasPriv("AUTO" + cms->name))
 							ci->c->RemoveMode(NULL, cms, user->GetUID());
 					}
 					ci->c->SetCorrectModes(user, true);
 				}
 			}
+		}
 	}
 
 	void OnAccessDel(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
 	{
 		if (ci->c)
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		{
+			for (const auto &[_, uc] : ci->c->users)
 			{
-				User *user = it->second->user;
+				User *user = uc->user;
 
 				ChannelInfo *next;
 				if (user->server != Me && access->Matches(user, user->Account(), next))
 				{
 					AccessGroup ag = ci->AccessFor(user);
 
-					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+					for (auto *cms : ModeManager::GetStatusChannelModesByRank())
 					{
-						ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
-						if (!ag.HasPriv("AUTO" + cms->name))
+							if (!ag.HasPriv("AUTO" + cms->name))
 							ci->c->RemoveMode(NULL, cms, user->GetUID());
 					}
 				}
 			}
+		}
 	}
 };
 

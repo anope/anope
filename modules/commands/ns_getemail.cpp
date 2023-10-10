@@ -31,10 +31,8 @@ class CommandNSGetEMail : public Command
 
 		Log(LOG_ADMIN, source, this) << "on " << email;
 
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			const NickCore *nc = it->second;
-
 			if (!nc->email.empty() && Anope::Match(nc->email, email))
 			{
 				++j;

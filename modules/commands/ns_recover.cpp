@@ -69,8 +69,8 @@ class NSRecoverRequest : public IdentifyRequest
 				if (!u->chans.empty())
 				{
 					NSRecoverInfo *ei = source.GetUser()->Extend<NSRecoverInfo>("recover");
-					for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
-						(*ei)[it->first->name] = it->second->status;
+					for (auto &[chan, cuc] : u->chans)
+						(*ei)[chan->name] = cuc->status;
 				}
 			}
 
@@ -283,8 +283,8 @@ class NSRecover : public Module
 				NSRecoverInfo::iterator it = ei->find(c->name);
 				if (it != ei->end())
 				{
-					for (size_t i = 0; i < it->second.Modes().length(); ++i)
-						c->SetMode(c->WhoSends(), ModeManager::FindChannelModeByChar(it->second.Modes()[i]), u->GetUID());
+					for (auto mode : it->second.Modes())
+						c->SetMode(c->WhoSends(), ModeManager::FindChannelModeByChar(mode), u->GetUID());
 
 					ei->erase(it);
 					if (ei->empty())

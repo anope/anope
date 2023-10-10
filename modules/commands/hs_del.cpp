@@ -74,9 +74,9 @@ class CommandHSDelAll : public Command
 		{
 			FOREACH_MOD(OnDeleteVhost, (na));
 			const NickCore *nc = na->nc;
-			for (unsigned i = 0; i < nc->aliases->size(); ++i)
+			for (auto *alias : *nc->aliases)
 			{
-				na = nc->aliases->at(i);
+				na = alias;
 				na->RemoveVhost();
 			}
 			Log(LOG_ADMIN, source, this) << "for all nicks in group " << nc->display;

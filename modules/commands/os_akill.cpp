@@ -172,8 +172,8 @@ class CommandOSAKill : public Command
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			if (akills->Check(it->second, x))
+		for (const auto &[_, user] : UserListByNick)
+			if (akills->Check(user, x))
 				++affected;
 		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
 
@@ -325,8 +325,8 @@ class CommandOSAKill : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of AKILL list."));
 		}

@@ -26,10 +26,8 @@ class CommandBSBotList : public Command
 
 		list.AddColumn(_("Nick")).AddColumn(_("Mask"));
 
-		for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+		for (const auto &[_, bi] : *BotListByNick)
 		{
-			BotInfo *bi = it->second;
-
 			if (source.HasPriv("botserv/administration") || !bi->oper_only)
 			{
 				++count;
@@ -50,8 +48,8 @@ class CommandBSBotList : public Command
 		{
 			source.Reply(_("Bot list:"));
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("%d bots available."), count);
 		}

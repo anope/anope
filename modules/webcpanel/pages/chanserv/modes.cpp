@@ -57,10 +57,8 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	replacements["MODE"] = "YES";
 
 	/* build a list with the names of all listmodes */
-	for (unsigned i = 0; i < ModeManager::GetChannelModes().size(); ++i)
+	for (auto *cm : ModeManager::GetChannelModes())
 	{
-		ChannelMode *cm = ModeManager::GetChannelModes()[i];
-
 		if (cm->type == MODE_LIST && cm->mchar)
 			replacements["LISTMODES"] = cm->mchar;
 	}
@@ -94,9 +92,8 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
 		}
 
-		std::vector<Anope::string> v = c->GetModeList(cm->name);
-		for (unsigned int i = 0; i < v.size(); ++i)
-			replacements["MASKS"] = v[i];
+		for (const auto &mask : c->GetModeList(cm->name))
+			replacements["MASKS"] = mask;
 	}
 
 	Page.Serve(server, page_name, client, message, reply, replacements);

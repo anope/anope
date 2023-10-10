@@ -35,14 +35,14 @@ struct HTTPReply
 		headers = other.headers;
 		cookies = other.cookies;
 
-		for (unsigned i = 0; i < other.out.size(); ++i)
-			out.push_back(new Data(other.out[i]->buf, other.out[i]->len));
+		for (const auto &datum : other.out)
+			out.push_back(new Data(datum->buf, datum->len));
 	}
 
 	~HTTPReply()
 	{
-		for (unsigned i = 0; i < out.size(); ++i)
-			delete out[i];
+		for (const auto *datum : out)
+			delete datum;
 		out.clear();
 	}
 
@@ -196,10 +196,8 @@ namespace HTTPUtils
 	{
 		Anope::string encoded;
 
-		for (unsigned i = 0; i < url.length(); ++i)
+		for (const auto c : url)
 		{
-			const char& c = url[i];
-
 			if (isalnum(c) || c == '.' || c == '-' || c == '*' || c == '_')
 				encoded += c;
 			else if (c == ' ')
@@ -215,9 +213,9 @@ namespace HTTPUtils
 	{
 		Anope::string dst;
 
-		for (unsigned i = 0; i < src.length(); ++i)
+		for (const auto c : src)
 		{
-			switch (src[i])
+			switch (c)
 			{
 				case '<':
 					dst += "&lt;";
@@ -232,7 +230,7 @@ namespace HTTPUtils
 					dst += "&amp;";
 					break;
 				default:
-					dst += src[i];
+					dst += c;
 			}
 		}
 

@@ -71,25 +71,23 @@ void Channel::Reset()
 {
 	this->modes.clear();
 
-	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
+	for (const auto &[_, uc] : this->users)
 	{
-		ChanUserContainer *uc = it->second;
-
 		ChannelStatus f = uc->status;
 		uc->status.Clear();
 
 		/* reset modes for my clients */
 		if (uc->user->server == Me)
 		{
-			for (size_t i = 0; i < f.Modes().length(); ++i)
-				this->SetMode(NULL, ModeManager::FindChannelModeByChar(f.Modes()[i]), uc->user->GetUID(), false);
+			for (auto mode : f.Modes())
+				this->SetMode(NULL, ModeManager::FindChannelModeByChar(mode), uc->user->GetUID(), false);
 			/* Modes might not exist yet, so be sure the status is really reset */
 			uc->status = f;
 		}
 	}
 
-	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
-		this->SetCorrectModes(it->second->user, true);
+	for (auto &[_, cuc] : this->users)
+		this->SetCorrectModes(cuc->user, true);
 
 	// If the channel is syncing now, do not force a sync due to Reset(), as we are probably iterating over users in Message::SJoin
 	// A sync will come soon
@@ -203,10 +201,12 @@ size_t Channel::HasMode(const Anope::string &mname, const Anope::string &param)
 {
 	if (param.empty())
 		return modes.count(mname);
-	std::vector<Anope::string> v = this->GetModeList(mname);
-	for (unsigned int i = 0; i < v.size(); ++i)
-		if (v[i].equals_ci(param))
+
+	for (const auto &mode : this->GetModeList(mname))
+	{
+		if (mode.equals_ci(param))
 			return 1;
+	}
 	return 0;
 }
 
@@ -214,22 +214,22 @@ Anope::string Channel::GetModes(bool complete, bool plus)
 {
 	Anope::string res, params;
 
-	for (std::multimap<Anope::string, Anope::string>::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
+	for (const auto &[mode, value] : this->modes)
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByName(it->first);
+		ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
 		if (!cm || cm->type == MODE_LIST)
 			continue;
 
 		res += cm->mchar;
 
-		if (complete && !it->second.empty())
+		if (complete && !value.empty())
 		{
 			ChannelModeParam *cmp = NULL;
 			if (cm->type == MODE_PARAM)
 				cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
 
 			if (plus || !cmp || !cmp->minus_no_arg)
-				params += " " + it->second;
+				params += " " + value;
 		}
 	}
 
@@ -728,10 +728,9 @@ bool Channel::MatchesList(User *u, const Anope::string &mode)
 	if (!this->HasMode(mode))
 		return false;
 
-	std::vector<Anope::string> v = this->GetModeList(mode);
-	for (unsigned i = 0; i < v.size(); ++i)
+	for (const auto &entry : this->GetModeList(mode))
 	{
-		Entry e(mode, v[i]);
+		Entry e(mode, entry);
 		if (e.Matches(u))
 			return true;
 	}
@@ -845,9 +844,8 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 	bool giving = give_modes;
 	/* whether or not we have given a mode */
 	bool given = false;
-	for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+	for (auto *cm : ModeManager::GetStatusChannelModesByRank())
 	{
-		ChannelModeStatus *cm = ModeManager::GetStatusChannelModesByRank()[i];
 		bool has_priv = u_access.HasPriv("AUTO" + cm->name);
 
 		if (give_modes && has_priv)
@@ -880,10 +878,9 @@ bool Channel::Unban(User *u, const Anope::string &mode, bool full)
 
 	bool ret = false;
 
-	std::vector<Anope::string> v = this->GetModeList(mode);
-	for (unsigned int i = 0; i < v.size(); ++i)
+	for (const auto &entry : this->GetModeList(mode))
 	{
-		Entry ban(mode, v[i]);
+		Entry ban(mode, entry);
 		if (ban.Matches(u, full))
 		{
 			this->RemoveMode(NULL, mode, ban.GetMask());
@@ -967,10 +964,8 @@ void Channel::QueueForDeletion()
 
 void Channel::DeleteChannels()
 {
-	for (unsigned int i = 0; i < deleting.size(); ++i)
+	for (auto *c : deleting)
 	{
-		Channel *c = deleting[i];
-
 		if (c->CheckDelete())
 			delete c;
 	}

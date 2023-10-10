@@ -194,16 +194,16 @@ void ChannelInfo::Serialize(Serialize::Data &data) const
 	data.SetType("bantype", Serialize::Data::DT_INT); data["bantype"] << this->bantype;
 	{
 		Anope::string levels_buffer;
-		for (Anope::map<int16_t>::const_iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
-			levels_buffer += it->first + " " + stringify(it->second) + " ";
+		for (const auto &[name, level] : this->levels)
+			levels_buffer += name + " " + stringify(level) + " ";
 		data["levels"] << levels_buffer;
 	}
 	if (this->bi)
 		data["bi"] << this->bi->nick;
 	data.SetType("banexpire", Serialize::Data::DT_INT); data["banexpire"] << this->banexpire;
 	data["memomax"] << this->memos.memomax;
-	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
-		data["memoignores"] << this->memos.ignores[i] << " ";
+	for (const auto &ignore : this->memos.ignores)
+		data["memoignores"] << ignore << " ";
 
 	Extensible::ExtensibleSerialize(this, this, data);
 }
@@ -443,12 +443,10 @@ AccessGroup ChannelInfo::AccessFor(const User *u, bool updateLastUsed)
 		if (updateLastUsed)
 			this->last_used = Anope::CurTime;
 
-		for (unsigned i = 0; i < group.paths.size(); ++i)
+		for (auto &p : group.paths)
 		{
-			ChanAccess::Path &p = group.paths[i];
-
-			for (unsigned int j = 0; j < p.size(); ++j)
-				p[j]->last_seen = Anope::CurTime;
+			for (auto *ca : p)
+				ca->last_seen = Anope::CurTime;
 		}
 	}
 
@@ -688,6 +686,6 @@ void ChannelInfo::RemoveChannelReference(const Anope::string &what)
 void ChannelInfo::GetChannelReferences(std::deque<Anope::string> &chans)
 {
 	chans.clear();
-	for (Anope::map<int>::iterator it = references.begin(); it != references.end(); ++it)
-		chans.push_back(it->first);
+	for (auto &[chan, _] : references)
+		chans.push_back(chan);
 }

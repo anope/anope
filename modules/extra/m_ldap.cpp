@@ -315,10 +315,8 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 		this->Lock();
 
-		for (unsigned int i = 0; i < this->queries.size(); ++i)
+		for (auto *req : this->queries)
 		{
-			LDAPRequest *req = this->queries[i];
-
 			/* queries have no results yet */
 			req->result = new LDAPResult();
 			req->result->type = req->type;
@@ -330,10 +328,8 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		}
 		this->queries.clear();
 
-		for (unsigned int i = 0; i < this->results.size(); ++i)
+		for (const auto *req : this->queries)
 		{
-			LDAPRequest *req = this->results[i];
-
 			/* even though this may have already finished successfully we return that it didn't */
 			req->result->error = "LDAP Interface is going away";
 			if (req->inter)
@@ -454,9 +450,8 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 			return;
 		}
 
-		for (unsigned int i = 0; i < q.size(); ++i)
+		for (auto *req : q)
 		{
-			LDAPRequest *req = q[i];
 			int ret = req->run();
 
 			if (ret == LDAP_SERVER_DOWN || ret == LDAP_TIMEOUT)
@@ -633,9 +628,8 @@ class ModuleLDAP : public Module, public Pipe
 			results.swap(s->results);
 			s->Unlock();
 
-			for (unsigned int i = 0; i < results.size(); ++i)
+			for (const auto *req : results)
 			{
-				LDAPRequest *req = results[i];
 				LDAPInterface *li = req->inter;
 				LDAPResult *r = req->result;
 

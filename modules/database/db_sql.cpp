@@ -100,10 +100,8 @@ class DBSQL : public Module, public Pipe
 
 	void OnNotify() override
 	{
-		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
+		for (auto *obj : this->updated_items)
 		{
-			Serializable *obj = *it;
-
 			if (this->sql)
 			{
 				Data data;
@@ -127,15 +125,15 @@ class DBSQL : public Module, public Pipe
 
 				if (this->imported)
 				{
-					for (unsigned i = 0; i < create.size(); ++i)
-						this->RunBackground(create[i]);
+					for (const auto &query : create)
+						this->RunBackground(query);
 
 					this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
 				}
 				else
 				{
-					for (unsigned i = 0; i < create.size(); ++i)
-						this->sql->RunQuery(create[i]);
+					for (const auto &query : create)
+						this->sql->RunQuery(query);
 
 					/* We are importing objects from another database module, so don't do asynchronous
 					 * queries in case the core has to shut down, it will cut short the import
@@ -180,10 +178,9 @@ class DBSQL : public Module, public Pipe
 
 		this->loading_databases = true;
 
-		const std::vector<Anope::string> type_order = Serialize::Type::GetTypeOrder();
-		for (unsigned i = 0; i < type_order.size(); ++i)
+		for (const auto &type_order : Serialize::Type::GetTypeOrder())
 		{
-			Serialize::Type *sb = Serialize::Type::Find(type_order[i]);
+			Serialize::Type *sb = Serialize::Type::Find(type_order);
 			this->OnSerializeTypeCreate(sb);
 		}
 
@@ -235,9 +232,8 @@ class DBSQL : public Module, public Pipe
 		{
 			Data data;
 
-			const std::map<Anope::string, Anope::string> &row = res.Row(j);
-			for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
-				data[rit->first] << rit->second;
+			for (const auto &[key, value] : res.Row(j))
+				data[key] << value;
 
 			Serializable *obj = sb->Unserialize(NULL, data);
 			try

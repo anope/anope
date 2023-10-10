@@ -147,8 +147,8 @@ class NickServCore : public Module, public NickServService
 		/* On shutdown, restart, or mod unload, remove all of our holds for nicks (svshold or qlines)
 		 * because some IRCds do not allow us to have these automatically expire
 		 */
-		for (nickalias_map::const_iterator it = NickAliasList->begin(); it != NickAliasList->end(); ++it)
-			this->Release(it->second);
+		for (const auto &[_, na] : *NickAliasList)
+			this->Release(na);
 	}
 
 	void OnRestart() override
@@ -340,14 +340,14 @@ class NickServCore : public Module, public NickServService
 		Configuration::Block *block = Config->GetModule(this);
 
 		if (block->Get<bool>("modeonid", "yes"))
-
-			for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
+		{
+			for (const auto &[_, cc] : u->chans)
 			{
-				ChanUserContainer *cc = it->second;
 				Channel *c = cc->chan;
 				if (c)
 					c->SetCorrectModes(u, true);
 			}
+		}
 
 		const Anope::string &modesonid = block->Get<const Anope::string>("modesonid");
 		if (!modesonid.empty())
@@ -363,9 +363,8 @@ class NickServCore : public Module, public NickServService
 							"any third-party person."), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
 		}
 
-		for (std::set<NickServCollide *>::iterator it = collides.begin(); it != collides.end(); ++it)
+		for (auto *c : collides)
 		{
-			NickServCollide *c = *it;
 			if (c->GetUser() == u && c->GetNick() && c->GetNick()->nc == u->Account())
 			{
 				delete c;
@@ -382,9 +381,8 @@ class NickServCore : public Module, public NickServService
 
 	void OnNickUpdate(User *u) override
 	{
-		for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
+		for (const auto &[_, cc] : u->chans)
 		{
-			ChanUserContainer *cc = it->second;
 			Channel *c = cc->chan;
 			if (c)
 				c->SetCorrectModes(u, true);
@@ -414,10 +412,8 @@ class NickServCore : public Module, public NickServService
 
 	void OnServerSync(Server *s) override
 	{
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (const auto &[_, u] : UserListByNick)
 		{
-			User *u = it->second;
-
 			if (u->server == s)
 			{
 				if (u->HasMode("REGISTERED") && !u->IsIdentified(true))
@@ -498,8 +494,8 @@ class NickServCore : public Module, public NickServService
 	void OnNickCoreCreate(NickCore *nc) override
 	{
 		/* Set default flags */
-		for (unsigned i = 0; i < defaults.size(); ++i)
-			nc->Extend<bool>(defaults[i].upper());
+		for (const auto &def : defaults)
+			nc->Extend<bool>(def.upper());
 	}
 
 	void OnUserQuit(User *u, const Anope::string &msg) override

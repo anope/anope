@@ -61,15 +61,10 @@ class ModuleRegexPCRE : public Module
 
 	~ModuleRegexPCRE()
 	{
-		for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(); it != XLineManager::XLineManagers.end(); ++it)
+		for (auto *xlm : XLineManager::XLineManagers)
 		{
-			XLineManager *xlm = *it;
-			const std::vector<XLine *> &xlines = xlm->GetList();
-
-			for (unsigned int i = 0; i < xlines.size(); ++i)
+			for (auto *x : xlm->GetList())
 			{
-				XLine *x = xlines[i];
-
 				if (x->regex && dynamic_cast<PCRERegex *>(x->regex))
 				{
 					delete x->regex;

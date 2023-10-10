@@ -180,10 +180,8 @@ class CommandNSRegister : public Command
 
 		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
 		{
-			for (unsigned i = 0; i < Oper::opers.size(); ++i)
+			for (auto *o : Oper::opers)
 			{
-				Oper *o = Oper::opers[i];
-
 				if (!source.IsOper() && u_nick.find_ci(o->name) != Anope::string::npos)
 				{
 					source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());

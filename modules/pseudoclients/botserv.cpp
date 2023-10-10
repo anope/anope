@@ -34,8 +34,8 @@ class BotServCore : public Module
 		if (chan->ci && chan->ci->bi == user)
 		{
 			const Anope::string &botmodes = Config->GetModule(this)->Get<const Anope::string>("botmodes");
-			for (unsigned i = 0; i < botmodes.length(); ++i)
-				chan->SetMode(chan->ci->bi, ModeManager::FindChannelModeByChar(botmodes[i]), chan->ci->bi->GetUID());
+			for (auto botmode : botmodes)
+				chan->SetMode(chan->ci->bi, ModeManager::FindChannelModeByChar(botmode), chan->ci->bi->GetUID());
 		}
 	}
 
@@ -56,12 +56,10 @@ class BotServCore : public Module
 		BotInfo *bi = user->server == Me ? dynamic_cast<BotInfo *>(user) : NULL;
 		if (bi && Config->GetModule(this)->Get<bool>("smartjoin"))
 		{
-			std::vector<Anope::string> bans = c->GetModeList("BAN");
-
 			/* We check for bans */
-			for (unsigned int i = 0; i < bans.size(); ++i)
+			for (const auto &entry : c->GetModeList("BAN"))
 			{
-				Entry ban("BAN", bans[i]);
+				Entry ban("BAN", entry);
 				if (ban.Matches(user))
 					c->RemoveMode(NULL, "BAN", ban.GetMask());
 			}

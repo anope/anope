@@ -32,8 +32,8 @@ namespace Redis
 			i = 0;
 			bulk.clear();
 			multi_bulk_size = 0;
-			for (unsigned j = 0; j < multi_bulk.size(); ++j)
-				delete multi_bulk[j];
+			for (const auto *reply : multi_bulk)
+				delete reply;
 			multi_bulk.clear();
 		}
 

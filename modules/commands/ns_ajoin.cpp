@@ -82,8 +82,8 @@ struct AJoinEntry : Serializable
 
 AJoinList::~AJoinList()
 {
-	for (unsigned i = 0; i < (*this)->size(); ++i)
-		delete (*this)->at(i);
+	for (const auto *ajoin : *(*this))
+		delete ajoin;
 }
 
 class CommandNSAJoin : public Command
@@ -113,8 +113,8 @@ class CommandNSAJoin : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 	}
 
@@ -327,9 +327,8 @@ class NSAJoin : public Module
 		/* Set +r now, so we can ajoin users into +R channels */
 		ModeManager::ProcessModes();
 
-		for (unsigned i = 0; i < (*channels)->size(); ++i)
+		for (auto *entry : *(*channels))
 		{
-			AJoinEntry *entry = (*channels)->at(i);
 			Channel *c = Channel::Find(entry->channel);
 			ChannelInfo *ci;
 

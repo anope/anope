@@ -34,22 +34,18 @@ class CommandOSModInfo : public Command
 				source.Reply(_(" Loaded at: %p"), m->handle);
 
 			std::vector<Anope::string> servicekeys = Service::GetServiceKeys("Command");
-			for (unsigned i = 0; i < servicekeys.size(); ++i)
+			for (const auto &servicekey : servicekeys)
 			{
-				ServiceReference<Command> c("Command", servicekeys[i]);
+				ServiceReference<Command> c("Command", servicekey);
 				if (!c || c->owner != m)
 					continue;
 
 				source.Reply(_("   Providing service: \002%s\002"), c->name.c_str());
 
-				for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+				for (const auto &[_, bi] : *BotListByNick)
 				{
-					const BotInfo *bi = it->second;
-
-					for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
+					for (const auto &[c_name, info] : bi->commands)
 					{
-						const Anope::string &c_name = cit->first;
-						const CommandInfo &info = cit->second;
 						if (info.name != c->name)
 							continue;
 						source.Reply(_("   Command \002%s\002 on \002%s\002 is linked to \002%s\002"), c_name.c_str(), bi->nick.c_str(), c->name.c_str());
@@ -116,10 +112,8 @@ class CommandOSModList : public Command
 		source.Reply(_("Current module list:"));
 
 		int count = 0;
-		for (std::list<Module *>::iterator it = ModuleManager::Modules.begin(), it_end = ModuleManager::Modules.end(); it != it_end; ++it)
+		for (auto *m : ModuleManager::Modules)
 		{
-			Module *m = *it;
-
 			bool show = false;
 			Anope::string mtype;
 

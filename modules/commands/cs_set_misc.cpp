@@ -178,8 +178,8 @@ class CSSetMisc : public Module
 
 	~CSSetMisc() override
 	{
-		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
-			delete it->second;
+		for (const auto &[_, item] : items)
+			delete item;
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -205,9 +205,8 @@ class CSSetMisc : public Module
 
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool) override
 	{
-		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
+		for (const auto &[_, e] : items)
 		{
-			ExtensibleItem<CSMiscData> *e = it->second;
 			MiscData *data = e->Get(ci);
 
 			if (data != NULL)

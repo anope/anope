@@ -96,10 +96,9 @@ class CommandCSAKick : public Command
 		/* Check excepts BEFORE we get this far */
 		if (ci->c)
 		{
-			std::vector<Anope::string> modes = ci->c->GetModeList("EXCEPT");
-			for (unsigned int i = 0; i < modes.size(); ++i)
+			for (const auto &mode : ci->c->GetModeList("EXCEPT"))
 			{
-				if (Anope::Match(modes[i], mask))
+				if (Anope::Match(mode, mask))
 				{
 					source.Reply(CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
 					return;
@@ -129,10 +128,8 @@ class CommandCSAKick : public Command
 		{
 			/* Match against all currently online users with equal or
 			 * higher access. - Viper */
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			for (const auto &[_, u2] : UserListByNick)
 			{
-				User *u2 = it->second;
-
 				AccessGroup nc_access = ci->AccessFor(nc), u_access = source.AccessFor(ci);
 				Entry entry_mask("", mask);
 
@@ -145,9 +142,9 @@ class CommandCSAKick : public Command
 
 			/* Match against the lastusermask of all nickalias's with equal
 			 * or higher access. - Viper */
-			for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
+			for (const auto &[_, na2] : *NickAliasList)
 			{
-				na = it->second;
+				na = na2;
 
 				AccessGroup nc_access = ci->AccessFor(na->nc), u_access = source.AccessFor(ci);
 				if (na->nc && (na->nc == ci->GetFounder() || nc_access >= u_access))
@@ -373,8 +370,8 @@ class CommandCSAKick : public Command
 
 			source.Reply(_("Autokick list for %s:"), ci->name.c_str());
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of autokick list"));
 		}

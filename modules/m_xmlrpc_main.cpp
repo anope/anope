@@ -142,8 +142,8 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		request.reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
 			Anope::string buf;
-			for (std::set<Anope::string>::iterator it = Servers::Capab.begin(); it != Servers::Capab.end(); ++it)
-				buf += " " + *it;
+			for (const auto &capab : Servers::Capab)
+				buf += " " + capab;
 			if (!buf.empty())
 				buf.erase(buf.begin());
 			request.reply("uplinkcapab", buf);
@@ -166,21 +166,18 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		{
 			request.reply("bancount", stringify(c->HasMode("BAN")));
 			int count = 0;
-			std::vector<Anope::string> v = c->GetModeList("BAN");
-			for (unsigned int i = 0; i < v.size(); ++i)
-				request.reply("ban" + stringify(++count), iface->Sanitize(v[i]));
+			for (auto &ban : c->GetModeList("BAN"))
+				request.reply("ban" + stringify(++count), iface->Sanitize(ban));
 
 			request.reply("exceptcount", stringify(c->HasMode("EXCEPT")));
 			count = 0;
-			v = c->GetModeList("EXCEPT");
-			for (unsigned int i = 0; i < v.size(); ++i)
-				request.reply("except" + stringify(++count), iface->Sanitize(v[i]));
+			for (auto &except : c->GetModeList("EXCEPT"))
+				request.reply("except" + stringify(++count), iface->Sanitize(except));
 
 			request.reply("invitecount", stringify(c->HasMode("INVITEOVERRIDE")));
 			count = 0;
-			v = c->GetModeList("INVITEOVERRIDE");
-			for (unsigned int i = 0; i < v.size(); ++i)
-				request.reply("invite" + stringify(++count), iface->Sanitize(v[i]));
+			for (auto &invite : c->GetModeList("INVITEOVERRIDE"))
+				request.reply("invite" + stringify(++count), iface->Sanitize(invite));
 
 			Anope::string users;
 			for (Channel::ChanUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
@@ -249,18 +246,13 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 	void DoOperType(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
-		for (unsigned i = 0; i < Config->MyOperTypes.size(); ++i)
+		for (auto *ot : Config->MyOperTypes)
 		{
-			OperType *ot = Config->MyOperTypes[i];
 			Anope::string perms;
-
-			std::list<Anope::string> privs = ot->GetPrivs();
-			for (std::list<Anope::string>::const_iterator it2 = privs.begin(), it2_end = privs.end(); it2 != it2_end; ++it2)
-				perms += " " + *it2;
-
-			std::list<Anope::string> commands = ot->GetCommands();
-			for (std::list<Anope::string>::const_iterator it2 = commands.begin(), it2_end = commands.end(); it2 != it2_end; ++it2)
-				perms += " " + *it2;
+			for (const auto &priv : ot->GetPrivs())
+				perms += " " + priv;
+			for (const auto &command : ot->GetCommands())
+				perms += " " + command;
 			request.reply(ot->GetName(), perms);
 		}
 	}

@@ -164,10 +164,8 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 				request.data.push_back(data);
 		}
 
-		for (unsigned i = 0; i < this->events.size(); ++i)
+		for (auto *e : this->events)
 		{
-			XMLRPCEvent *e = this->events[i];
-
 			if (!e->Run(this, client, request))
 				return false;
 			else if (!request.get_replies().empty())
@@ -188,8 +186,8 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 			request.reply("id", request.id);
 
 		Anope::string r = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<methodResponse>\n<params>\n<param>\n<value>\n<struct>\n";
-		for (std::map<Anope::string, Anope::string>::const_iterator it = request.get_replies().begin(); it != request.get_replies().end(); ++it)
-			r += "<member>\n<name>" + it->first + "</name>\n<value>\n<string>" + this->Sanitize(it->second) + "</string>\n</value>\n</member>\n";
+		for (const auto &[name, value] : request.get_replies())
+			r += "<member>\n<name>" + name + "</name>\n<value>\n<string>" + this->Sanitize(value) + "</string>\n</value>\n</member>\n";
 		r += "</struct>\n</value>\n</param>\n</params>\n</methodResponse>";
 
 		request.r.Write(r);

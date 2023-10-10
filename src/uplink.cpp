@@ -79,10 +79,8 @@ UplinkSocket::~UplinkSocket()
 	{
 		FOREACH_MOD(OnServerDisconnect, ());
 
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (const auto &[_, u] : UserListByNick)
 		{
-			User *u = it->second;
-
 			if (u->server == Me)
 			{
 				/* Don't use quitmsg here, it may contain information you don't want people to see */

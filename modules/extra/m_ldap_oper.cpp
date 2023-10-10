@@ -100,8 +100,8 @@ class LDAPOper : public Module
 		this->filter = config->Get<const Anope::string>("filter");
 		opertype_attribute = config->Get<const Anope::string>("opertype_attribute");
 
-		for (std::set<Oper *>::iterator it = my_opers.begin(), it_end = my_opers.end(); it != it_end; ++it)
-			delete *it;
+		for (const auto *oper : my_opers)
+			delete oper;
 		my_opers.clear();
 	}
 

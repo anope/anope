@@ -389,10 +389,8 @@ bool IRCDProto::IsIdentValid(const Anope::string &ident)
 	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
 		return false;
 
-	for (unsigned i = 0; i < ident.length(); ++i)
+	for (auto c : ident)
 	{
-		const char &c = ident[i];
-
 		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
 			continue;
 
@@ -416,11 +414,11 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 		return false;
 
 	int dots = 0;
-	for (unsigned i = 0; i < host.length(); ++i)
+	for (auto chr : host)
 	{
-		if (host[i] == '.')
+		if (chr == '.')
 			++dots;
-		if (vhostchars.find_first_of(host[i]) == Anope::string::npos)
+		if (vhostchars.find_first_of(chr) == Anope::string::npos)
 			return false;
 	}
 

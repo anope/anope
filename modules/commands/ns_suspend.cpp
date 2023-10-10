@@ -116,10 +116,8 @@ class CommandNSSuspend : public Command
 		si->when = Anope::CurTime;
 		si->expires = expiry_secs ? expiry_secs + Anope::CurTime : 0;
 
-		for (unsigned i = 0; i < nc->aliases->size(); ++i)
+		for (auto *na2 : *nc->aliases)
 		{
-			NickAlias *na2 = nc->aliases->at(i);
-
 			if (na2 && *na2->nc == *na->nc)
 			{
 				na2->last_quit = reason;

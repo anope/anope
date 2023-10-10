@@ -48,9 +48,9 @@ class FlagsChanAccess : public ChanAccess
 
 		std::set<char> buffer;
 
-		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
-			if (access->HasPriv(it->first))
-				buffer.insert(it->second);
+		for (auto &[priv, flag] : defaultFlags)
+			if (access->HasPriv(priv))
+				buffer.insert(flag);
 
 		if (buffer.empty())
 			return "(none)";
@@ -189,14 +189,14 @@ class CommandCSFlags : public Command
 					add = false;
 					break;
 				case '*':
-					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
+					for (const auto &[priv, flag] : defaultFlags)
 					{
-						bool has = current_flags.count(it->second);
+						bool has = current_flags.count(flag);
 						// If we are adding a flag they already have or removing one they don't have, don't bother
 						if (add == has)
 							continue;
 
-						if (!u_access.HasPriv(it->first) && !u_access.founder)
+						if (!u_access.HasPriv(priv) && !u_access.founder)
 						{
 							if (source.HasPriv("chanserv/access/modify"))
 								override = true;
@@ -205,9 +205,9 @@ class CommandCSFlags : public Command
 						}
 
 						if (add)
-							current_flags.insert(it->second);
+							current_flags.insert(flag);
 						else
-							current_flags.erase(it->second);
+							current_flags.erase(flag);
 					}
 					break;
 				default:
@@ -218,11 +218,11 @@ class CommandCSFlags : public Command
 						i = flags.length();
 					}
 
-					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
+					for (const auto &[priv, flag] : defaultFlags)
 					{
-						if (f != it->second)
+						if (f != flag)
 							continue;
-						else if (!u_access.HasPriv(it->first) && !u_access.founder)
+						else if (!u_access.HasPriv(priv) && !u_access.founder)
 						{
 							if (source.HasPriv("chanserv/access/modify"))
 								override = true;
@@ -341,8 +341,8 @@ class CommandCSFlags : public Command
 			list.Process(replies);
 
 			source.Reply(_("Flags list for %s"), ci->name.c_str());
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 			if (count == ci->GetAccessCount())
 				source.Reply(_("End of access list."));
 			else
@@ -454,15 +454,15 @@ class CommandCSFlags : public Command
 
 		typedef std::multimap<char, Anope::string, ci::less> reverse_map;
 		reverse_map reverse;
-		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
-			reverse.emplace(it->second, it->first);
+		for (auto &[priv, flag] : defaultFlags)
+			reverse.emplace(flag, priv);
 
-		for (reverse_map::iterator it = reverse.begin(), it_end = reverse.end(); it != it_end; ++it)
+		for (auto &[flag, priv] : reverse)
 		{
-			Privilege *p = PrivilegeManager::FindPrivilege(it->second);
+			Privilege *p = PrivilegeManager::FindPrivilege(priv);
 			if (p == NULL)
 				continue;
-			source.Reply("  %c - %s", it->first, Language::Translate(source.nc, p->desc.c_str()));
+			source.Reply("  %c - %s", flag, Language::Translate(source.nc, p->desc.c_str()));
 		}
 
 		return true;

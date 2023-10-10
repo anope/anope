@@ -144,13 +144,15 @@ bool Mail::Validate(const Anope::string &email)
 		return false;
 
 	/* Check for forbidden characters in the name */
-	for (unsigned i = 0, end = copy.length(); i < end; ++i)
+	for (auto chr : copy)
 	{
-		if (copy[i] <= 31 || copy[i] >= 127)
+		if (chr <= 31 || chr >= 127)
 			return false;
-		for (unsigned int j = 0; j < 13; ++j)
-			if (copy[i] == specials[j])
+		for (auto special : specials)
+		{
+			if (chr == special)
 				return false;
+		}
 	}
 
 	/* Check for forbidden characters in the domain */
@@ -158,9 +160,11 @@ bool Mail::Validate(const Anope::string &email)
 	{
 		if (domain[i] <= 31 || domain[i] >= 127)
 			return false;
-		for (unsigned int j = 0; j < 13; ++j)
-			if (domain[i] == specials[j])
+		for (auto special : specials)
+		{
+			if (domain[i] == special)
 				return false;
+		}
 		if (domain[i] == '.')
 		{
 			if (!i || i == end - 1)

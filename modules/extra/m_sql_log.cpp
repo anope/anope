@@ -30,9 +30,8 @@ class SQLLog : public Module
 		Anope::string ref_name;
 		ServiceReference<SQL::Provider> SQL;
 
-		for (unsigned i = 0; i < li->targets.size(); ++i)
+		for (const auto &target : li->targets)
 		{
-			const Anope::string &target = li->targets[i];
 			size_t sz = target.find("sql_log:");
 			if (!sz)
 			{

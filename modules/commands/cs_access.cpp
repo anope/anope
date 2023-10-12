@@ -229,7 +229,12 @@ class CommandCSAccess : public Command
 	{
 		Anope::string mask = params[2];
 
-		if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos && !NickAlias::Find(mask))
+		const NickAlias *na = NickAlias::Find(mask);
+		if (na && na->nc)
+		{
+			mask = na->nc->display;
+		}
+		else if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos)
 		{
 			User *targ = User::Find(mask, true);
 			if (targ != NULL)

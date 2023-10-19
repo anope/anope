@@ -1395,9 +1395,22 @@ class IRCDMessageMetadata : IRCDMessage
 			if (params[1].equals_cs("accountname"))
 			{
 				User *u = User::Find(params[0]);
-				NickCore *nc = NickCore::Find(params[2]);
-				if (u && nc)
-					u->Login(nc);
+				if (!u)
+					return; // Should never happen.
+
+				if (params[2].empty())
+				{
+					// The user has been logged out by the IRC server.
+					u->Logout();
+				}
+				else
+				{
+					// If we're bursting then then the user was probably logged
+					// in during a previous connection.
+					NickCore *nc = NickCore::Find(params[2]);
+					if (nc)
+						u->Login(nc);
+				}
 			}
 
 			/*

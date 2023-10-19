@@ -1489,6 +1489,35 @@ struct IRCDMessageSJoin : IRCDMessage
 	}
 };
 
+class IRCDMessageSVSLogin : IRCDMessage
+{
+ public:
+	IRCDMessageSVSLogin(Module *creator) : IRCDMessage(creator, "SVSLOGIN", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		// :irc.example.com SVSLOGIN <mask> <nick> <account>
+		// :irc.example.com SVSLOGIN <mask> <nick> 0
+		User *u = User::Find(params[1]);
+		if (!u)
+			return; // Should never happen.
+
+		if (params[2] == "0")
+		{
+			// The user has been logged out by the IRC server.
+			u->Logout();
+		}
+		else
+		{
+			// If we're bursting then then the user was probably logged
+			// in during a previous connection.
+			NickCore *nc = NickCore::Find(params[2]);
+			if (nc)
+				u->Login(nc);
+		}
+	}
+};
+
 struct IRCDMessageTopic : IRCDMessage
 {
 	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 4) { }
@@ -1642,6 +1671,7 @@ class ProtoUnreal : public Module
 	IRCDMessageServer message_server;
 	IRCDMessageSID message_sid;
 	IRCDMessageSJoin message_sjoin;
+	IRCDMessageSVSLogin message_svslogin;
 	IRCDMessageTopic message_topic;
 	IRCDMessageUID message_uid;
 	IRCDMessageUmode2 message_umode2;
@@ -1660,7 +1690,7 @@ class ProtoUnreal : public Module
 		message_md(this, ircd_proto.ClientModData, ircd_proto.ChannelModData),message_mode(this, "MODE"),
 		message_svsmode(this, "SVSMODE"), message_svs2mode(this, "SVS2MODE"), message_netinfo(this), message_nick(this), message_pong(this),
 		message_sasl(this), message_sdesc(this), message_sethost(this), message_setident(this), message_setname(this), message_server(this),
-		message_sid(this), message_sjoin(this), message_topic(this), message_uid(this), message_umode2(this)
+		message_sid(this), message_sjoin(this), message_svslogin(this), message_topic(this), message_uid(this), message_umode2(this)
 	{
 
 	}

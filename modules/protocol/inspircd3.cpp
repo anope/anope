@@ -112,7 +112,7 @@ class InspIRCd3Proto : public IRCDProto
 		user->KillInternal(source, buf);
 	}
 
-	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
+	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
 	{
 		UplinkSocket::Message() << "SVSNICK " << u->GetUID() << " " << newnick << " " << when << " " << u->timestamp;
 	}

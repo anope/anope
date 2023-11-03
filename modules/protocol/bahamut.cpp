@@ -106,10 +106,9 @@ class BahamutIRCdProto : public IRCDProto
 	/* SZLINE */
 	void SendSZLine(User *, const XLine *x) override
 	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
-			timeleft = 172800;
+		// Calculate the time left before this would expire
+		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
+
 		/* this will likely fail so its only here for legacy */
 		UplinkSocket::Message() << "SZLINE " << x->GetHost() << " :" << x->GetReason();
 		/* this is how we are supposed to deal with it */
@@ -220,10 +219,8 @@ class BahamutIRCdProto : public IRCDProto
 			}
 		}
 
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800)
-			timeleft = 172800;
+		// Calculate the time left before this would expire
+		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
 		UplinkSocket::Message() << "AKILL " << x->GetHost() << " " << x->GetUser() << " " << timeleft << " " << x->by << " " << Anope::CurTime << " :" << x->GetReason();
 	}
 

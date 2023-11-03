@@ -77,11 +77,8 @@ class HybridProto : public IRCDProto
 
 	void SendSZLine(User *, const XLine *x) override
 	{
-		/* Calculate the time left before this would expire, capping it at 2 days */
-		time_t timeleft = x->expires - Anope::CurTime;
-
-		if (timeleft > 172800 || !x->expires)
-			timeleft = 172800;
+		/* Calculate the time left before this would expire */
+		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
 
 		UplinkSocket::Message(Me) << "DLINE * " << timeleft << " " << x->GetHost() << " :" << x->GetReason();
 	}
@@ -162,11 +159,8 @@ class HybridProto : public IRCDProto
 					<< u->realname << " matches " << old->mask;
 		}
 
-		/* Calculate the time left before this would expire, capping it at 2 days */
-		time_t timeleft = x->expires - Anope::CurTime;
-
-		if (timeleft > 172800 || !x->expires)
-			timeleft = 172800;
+		/* Calculate the time left before this would expire */
+		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
 
 		UplinkSocket::Message(Me) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
 	}

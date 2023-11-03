@@ -207,10 +207,8 @@ class InspIRCdProto : public IRCDProto
 
 	void SendAkill(User *u, XLine *x) override
 	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
-			timeleft = 172800;
+		// Calculate the time left before this would expire
+		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
 
 		/* InspIRCd may support regex bans, if they do we can send this and forget about it
 		 * Mask is expected in format: 'n!u@h\sr' and spaces as '\s'
@@ -349,10 +347,8 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSQLine(User *u, const XLine *x) override
 	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
-			timeleft = 172800;
+		// Calculate the time left before this would expire
+		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
 
 		if (IRCD->CanSQLineChannel && (x->mask[0] == '#'))
 			SendAddLine("CBAN", x->mask, timeleft, x->by, x->GetReason());
@@ -385,10 +381,9 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSZLine(User *u, const XLine *x) override
 	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
-			timeleft = 172800;
+		// Calculate the time left before this would expire
+		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
+
 		SendAddLine("Z", x->GetHost(), timeleft, x->by, x->GetReason());
 	}
 

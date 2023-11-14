@@ -64,6 +64,8 @@ class CoreExport IRCDProto : public Service
 	bool CanCertFP;
 	/* Can we send arbitrary message tags? */
 	bool CanSendTags;
+	/* Can users log out before being fully connected? */
+	bool CanSVSLogout;
 	/* Whether this IRCd requires unique IDs for each user or server. See TS6/P10. */
 	bool RequiresID;
 	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */

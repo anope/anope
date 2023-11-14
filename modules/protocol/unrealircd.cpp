@@ -34,6 +34,7 @@ class UnrealIRCdProto : public IRCDProto
 		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanSVSHold = true;
+		CanSVSLogout = true;
 		CanCertFP = true;
 		RequiresID = true;
 		MaxModes = 12;
@@ -401,11 +402,14 @@ class UnrealIRCdProto : public IRCDProto
 			distmask = uid.substr(0, p);
 		}
 
-		if (!na->GetVhostIdent().empty())
-			UplinkSocket::Message(Me) << "CHGIDENT " << uid << " " << na->GetVhostIdent();
-		if (!na->GetVhostHost().empty())
-			UplinkSocket::Message(Me) << "CHGHOST " << uid << " " << na->GetVhostHost();
-		UplinkSocket::Message(Me) << "SVSLOGIN " << distmask << " " << uid << " " << na->nc->display;
+		if (na)
+		{
+			if (!na->GetVhostIdent().empty())
+				UplinkSocket::Message(Me) << "CHGIDENT " << uid << " " << na->GetVhostIdent();
+			if (!na->GetVhostHost().empty())
+				UplinkSocket::Message(Me) << "CHGHOST " << uid << " " << na->GetVhostHost();
+		}
+		UplinkSocket::Message(Me) << "SVSLOGIN " << distmask << " " << uid << " " << (na ? na->nc->display : "0");
 	}
 
 	bool IsIdentValid(const Anope::string &ident) override

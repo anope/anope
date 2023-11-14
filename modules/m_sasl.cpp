@@ -124,6 +124,42 @@ class External : public Mechanism
 	}
 };
 
+class Anonymous : public Mechanism
+{
+ public:
+	Anonymous(Module *o) : Mechanism(o, "ANONYMOUS") { }
+
+	void ProcessMessage(Session *sess, const SASL::Message &m) override
+	{
+		if (!IRCD->CanSVSLogout && !User::Find(sess->uid))
+		{
+			// This IRCd can't log users out yet.
+			sasl->Fail(sess);
+			delete sess;
+			return;
+		}
+
+		if (m.type == "S")
+		{
+			sasl->SendMessage(sess, "C", "+");
+		}
+		else if (m.type == "C")
+		{
+			Anope::string decoded;
+			Anope::B64Decode(m.data, decoded);
+
+			Anope::string user = "A user";
+			if (!sess->hostname.empty() && !sess->ip.empty())
+				user = sess->hostname + " (" + sess->ip + ")";
+			if (!decoded.empty())
+				user += " [" + decoded + "]";
+
+			Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " unidentified using SASL ANONYMOUS";
+			sasl->Succeed(sess, nullptr);
+		}
+	}
+};
+
 class SASLService : public SASL::Service, public Timer
 {
 	std::map<Anope::string, SASL::Session *> sessions;
@@ -257,7 +293,10 @@ class SASLService : public SASL::Service, public Timer
 		NickAlias *na = NickAlias::Find(nc->display);
 		if (user)
 		{
-			user->Identify(na);
+			if (na)
+				user->Identify(na);
+			else
+				user->Logout();
 		}
 		else
 		{
@@ -302,6 +341,7 @@ class ModuleSASL : public Module
 {
 	SASLService sasl;
 
+	Anonymous anonymous;
 	Plain plain;
 	External *external = nullptr;
 
@@ -322,7 +362,7 @@ class ModuleSASL : public Module
 
  public:
 	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		sasl(this), plain(this)
+		sasl(this), anonymous(this), plain(this)
 	{
 		try
 		{

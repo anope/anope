@@ -43,6 +43,7 @@ class SolanumProto : public IRCDProto
 		CanSZLine = true;
 		CanSVSNick = true;
 		CanSVSHold = true;
+		CanSVSLogout = true;
 		CanSetVHost = true;
 		RequiresID = true;
 		MaxModes = 4;
@@ -158,8 +159,13 @@ class SolanumProto : public IRCDProto
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
 	{
 		Server *s = Server::Find(uid.substr(0, 3));
-		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : uid.substr(0, 3)) << " SVSLOGIN " << uid << " * " << (!na->GetVhostIdent().empty() ? na->GetVhostIdent() : '*')
-			<< " " << (!na->GetVhostHost().empty() ? na->GetVhostHost() : '*') << " " << na->nc->display;
+
+		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : uid.substr(0, 3)) << " SVSLOGIN " << uid << " * "
+			<< (na && !na->GetVhostIdent().empty() ? na->GetVhostIdent() : '*')
+			<< " "
+			<< (na && !na->GetVhostHost().empty() ? na->GetVhostHost() : '*')
+			<< " "
+			<< (na ? na->nc->display : "0");
 	}
 };
 

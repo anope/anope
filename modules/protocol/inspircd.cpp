@@ -75,6 +75,7 @@ class InspIRCdProto : public IRCDProto
 		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanSVSHold = true;
+		CanSVSLogout = true;
 		CanCertFP = true;
 		CanSendTags = true;
 		RequiresID = true;
@@ -461,27 +462,30 @@ class InspIRCdProto : public IRCDProto
 	{
 		SendAccount(uid, na);
 
-		if (!na->GetVhostIdent().empty())
-			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGIDENT " << uid << " " << na->GetVhostIdent();
-		if (!na->GetVhostHost().empty())
-			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGHOST " << uid << " " << na->GetVhostHost();
-
-		SASLUser su;
-		su.uid = uid;
-		su.acc = na->nc->display;
-		su.created = Anope::CurTime;
-
-		for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
+		// Expire old pending sessions or other sessions for this user.
+		for (auto it = saslusers.begin(); it != saslusers.end(); )
 		{
-			SASLUser &u = *it;
-
+			const SASLUser &u = *it;
 			if (u.created + 30 < Anope::CurTime || u.uid == uid)
 				it = saslusers.erase(it);
 			else
 				++it;
 		}
 
-		saslusers.push_back(su);
+		if (na)
+		{
+			if (!na->GetVhostIdent().empty())
+				UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGIDENT " << uid << " " << na->GetVhostIdent();
+			if (!na->GetVhostHost().empty())
+				UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGHOST " << uid << " " << na->GetVhostHost();
+
+			// Mark this SASL session as pending user introduction.
+			SASLUser su;
+			su.uid = uid;
+			su.acc = na->nc->display;
+			su.created = Anope::CurTime;
+			saslusers.push_back(su);
+		}
 	}
 
 	bool IsExtbanValid(const Anope::string &mask) override

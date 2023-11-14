@@ -55,6 +55,12 @@ class InspIRCdProto : public IRCDProto
 		UplinkSocket::Message(Me) << "DELLINE " << xtype << " " << mask;
 	}
 
+	void SendAccount(const Anope::string &uid, NickAlias *na)
+	{
+		UplinkSocket::Message(Me) << "METADATA " << uid << " accountid :" << (na ? na->nc->GetId() : Anope::string());
+		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << (na ? na->nc->display : Anope::string());
+	}
+
  public:
 	PrimitiveExtensibleItem<ListLimits> maxlist;
 
@@ -432,17 +438,13 @@ class InspIRCdProto : public IRCDProto
 	void SendLogin(User *u, NickAlias *na) override
 	{
 		/* InspIRCd uses an account to bypass chmode +R, not umode +r, so we can't send this here */
-		if (na->nc->HasExt("UNCONFIRMED"))
-			return;
-
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountid :" << na->nc->GetId();
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
+		if (!na->nc->HasExt("UNCONFIRMED"))
+			SendAccount(u->GetUID(), na);
 	}
 
 	void SendLogout(User *u) override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountid :";
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
+		SendAccount(u->GetUID(), nullptr);
 	}
 
 	void SendChannel(Channel *c) override
@@ -457,8 +459,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << uid << " accountid :" << na->nc->GetId();
-		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << na->nc->display;
+		SendAccount(uid, na);
 
 		if (!na->GetVhostIdent().empty())
 			UplinkSocket::Message(Me) << "ENCAP " << uid.substr(0, 3) << " CHGIDENT " << uid << " " << na->GetVhostIdent();

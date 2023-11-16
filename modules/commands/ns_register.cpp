@@ -25,13 +25,15 @@ class CommandNSConfirm : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const Anope::string &passcode = params[0];
+		Anope::string *code = source.nc ? source.nc->GetExt<Anope::string>("passcode") : NULL;
+		bool confirming_other = !code || *code != params[0];
 
-		if (source.nc && (!source.nc->HasExt("UNCONFIRMED") || source.IsOper()) && source.HasPriv("nickserv/confirm"))
+		if (source.nc && (!source.nc->HasExt("UNCONFIRMED") || (source.IsOper() && confirming_other)) && source.HasPriv("nickserv/confirm"))
 		{
-			NickAlias *na = NickAlias::Find(passcode);
+			const Anope::string &nick = params[0];
+			NickAlias *na = NickAlias::Find(nick);
 			if (na == NULL)
-				source.Reply(NICK_X_NOT_REGISTERED, passcode.c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 			else if (na->nc->HasExt("UNCONFIRMED") == false)
 				source.Reply(_("Nick \002%s\002 is already confirmed."), na->nick.c_str());
 			else
@@ -58,7 +60,7 @@ class CommandNSConfirm : public Command
 		}
 		else if (source.nc)
 		{
-			Anope::string *code = source.nc->GetExt<Anope::string>("passcode");
+			const Anope::string &passcode = params[0];
 			if (code != NULL && *code == passcode)
 			{
 				NickCore *nc = source.nc;

@@ -120,6 +120,11 @@ class InspIRCdProto : public IRCDProto
 		user->KillInternal(source, buf);
 	}
 
+	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
+	{
+		UplinkSocket::Message() << "SVSNICK " << u->GetUID() << " " << newnick << " " << when << " " << u->timestamp;
+	}
+
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;

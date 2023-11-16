@@ -222,6 +222,13 @@ class CSSuspend : public Module
 	{
 	}
 
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		Anope::string s = conf->GetModule(this)->Get<Anope::string>("show");
+		commasepstream(s).GetTokens(show);
+		std::transform(show.begin(), show.end(), show.begin(), trim());
+	}
+
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) anope_override
 	{
 		CSSuspendInfo *si = suspend.Get(ci);

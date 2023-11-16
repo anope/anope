@@ -25,37 +25,47 @@ class Plain : public Mechanism
 		}
 		else if (m.type == "C")
 		{
-			Anope::string decoded;
-			Anope::B64Decode(m.data, decoded);
+			// message = [authzid] UTF8NUL authcid UTF8NUL passwd
+			Anope::string message;
+			Anope::B64Decode(m.data, message);
 
-			size_t p = decoded.find('\0');
-			if (p == Anope::string::npos)
-			{
-				sasl->Fail(sess);
-				delete sess;
-				return;
-			}
-			decoded = decoded.substr(p + 1);
-
-			p = decoded.find('\0');
-			if (p == Anope::string::npos)
+			size_t zcsep = message.find('\0');
+			if (zcsep == Anope::string::npos)
 			{
 				sasl->Fail(sess);
 				delete sess;
 				return;
 			}
 
-			Anope::string acc = decoded.substr(0, p),
-				pass = decoded.substr(p + 1);
-
-			if (acc.empty() || pass.empty() || !IRCD->IsNickValid(acc) || pass.find_first_of("\r\n") != Anope::string::npos)
+			size_t cpsep = message.find('\0', zcsep + 1);
+			if (cpsep == Anope::string::npos)
 			{
 				sasl->Fail(sess);
 				delete sess;
 				return;
 			}
 
-			SASL::IdentifyRequest *req = new SASL::IdentifyRequest(this->owner, m.source, acc, pass, sess->hostname, sess->ip);
+			Anope::string authzid = message.substr(0, zcsep);
+			Anope::string authcid = message.substr(zcsep + 1, cpsep - zcsep - 1);
+
+			// We don't support having an authcid that is different to the authzid.
+			if (!authzid.empty() && authzid != authcid)
+			{
+				sasl->Fail(sess);
+				delete sess;
+				return;
+			}
+
+			Anope::string passwd = message.substr(cpsep + 1);
+
+			if (authcid.empty() || passwd.empty() || !IRCD->IsNickValid(authcid) || passwd.find_first_of("\r\n\0") != Anope::string::npos)
+			{
+				sasl->Fail(sess);
+				delete sess;
+				return;
+			}
+
+			SASL::IdentifyRequest *req = new SASL::IdentifyRequest(this->owner, m.source, authcid, passwd, sess->hostname, sess->ip);
 			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 			req->Dispatch();
 		}

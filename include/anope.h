@@ -384,7 +384,7 @@ namespace Anope
 
 	/** The uplink we are currently connected to
 	 */
-	extern CoreExport int CurrentUplink;
+	extern CoreExport size_t CurrentUplink;
 
 	/** Various methods to determine the Anope version running
 	 */

@@ -43,7 +43,7 @@ void Uplink::Connect()
 		return;
 	}
 
-	if (static_cast<unsigned>(++Anope::CurrentUplink) >= Config->Uplinks.size())
+	if (++Anope::CurrentUplink >= Config->Uplinks.size())
 		Anope::CurrentUplink = 0;
 
 	Configuration::Uplink &u = Config->Uplinks[Anope::CurrentUplink];

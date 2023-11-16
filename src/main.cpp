@@ -39,7 +39,7 @@ static Anope::string BinaryDir;       /* Full path to services bin directory */
 time_t Anope::StartTime = time(NULL);
 time_t Anope::CurTime = time(NULL);
 
-int Anope::CurrentUplink = -1;
+size_t Anope::CurrentUplink = -1;
 
 class UpdateTimer : public Timer
 {

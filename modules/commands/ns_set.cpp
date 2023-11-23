@@ -322,6 +322,89 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 	}
 };
 
+class CommandNSSetNeverOp : public Command
+{
+ public:
+	CommandNSSetNeverOp(Module *creator, const Anope::string &sname = "nickserv/set/neverop", size_t min = 1) : Command(creator, sname, min, min + 1)
+	{
+		this->SetDesc(_("Sets whether you can be added to a channel access list."));
+		this->SetSyntax("{ON | OFF}");
+	}
+
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
+	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
+		const NickAlias *na = NickAlias::Find(user);
+		if (na == NULL)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
+		NickCore *nc = na->nc;
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
+		if (param.equals_ci("ON"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable neverop for " << na->nc->display;
+			nc->Extend<bool>("NEVEROP");
+			source.Reply(_("%s can no longer be added to channel access lists."), nc->display.c_str());
+		}
+		else if (param.equals_ci("OFF"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable neverop for " << na->nc->display;
+			nc->Shrink<bool>("NEVEROP");
+			source.Reply(_("%s can now be added to channel access lists."), nc->display.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "NEVEROP");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		this->Run(source, source.nc->display, params[0]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets whether you can be added to a channel access list."));
+		return true;
+	}
+};
+
+class CommandNSSASetNeverOp : public CommandNSSetNeverOp
+{
+ public:
+	CommandNSSASetNeverOp(Module *creator) : CommandNSSetNeverOp(creator, "nickserv/saset/neverop", 2)
+	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		this->Run(source, params[0], params[1]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets whether the given nickname can be added to a channel access list."));
+		return true;
+	}
+};
+
 class CommandNSSetDisplay : public Command
 {
  public:
@@ -1157,6 +1240,9 @@ class NSSet : public Module
 	CommandNSSetAutoOp commandnssetautoop;
 	CommandNSSASetAutoOp commandnssasetautoop;
 
+	CommandNSSetNeverOp commandnssetneverop;
+	CommandNSSASetNeverOp commandnssasetneverop;
+
 	CommandNSSetDisplay commandnssetdisplay;
 	CommandNSSASetDisplay commandnssasetdisplay;
 
@@ -1183,7 +1269,7 @@ class NSSet : public Module
 
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
-	SerializableExtensibleItem<bool> autoop, killprotect, kill_quick, kill_immed,
+	SerializableExtensibleItem<bool> autoop, neverop, killprotect, kill_quick, kill_immed,
 		message, secure, noexpire;
 
 	struct KeepModes : SerializableExtensibleItem<bool>
@@ -1239,6 +1325,7 @@ class NSSet : public Module
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsset(this), commandnssaset(this),
 		commandnssetautoop(this), commandnssasetautoop(this),
+		commandnssetneverop(this), commandnssasetneverop(this),
 		commandnssetdisplay(this), commandnssasetdisplay(this),
 		commandnssetemail(this), commandnssasetemail(this),
 		commandnssetkeepmodes(this), commandnssasetkeepmodes(this),
@@ -1249,7 +1336,7 @@ class NSSet : public Module
 		commandnssetsecure(this), commandnssasetsecure(this),
 		commandnssasetnoexpire(this),
 
-		autoop(this, "AUTOOP"),
+		autoop(this, "AUTOOP"), neverop(this, "NEVEROP"),
 		killprotect(this, "KILLPROTECT"), kill_quick(this, "KILL_QUICK"),
 		kill_immed(this, "KILL_IMMED"), message(this, "MSG"),
 		secure(this, "NS_SECURE"), noexpire(this, "NS_NO_EXPIRE"),
@@ -1314,6 +1401,8 @@ class NSSet : public Module
 			info.AddOption(_("Message mode"));
 		if (autoop.HasExt(na->nc))
 			info.AddOption(_("Auto-op"));
+		if (neverop.HasExt(na->nc))
+			info.AddOption(_("Never-op"));
 		if (noexpire.HasExt(na))
 			info.AddOption(_("No expire"));
 		if (keep_modes.HasExt(na->nc))

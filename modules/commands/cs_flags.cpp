@@ -120,6 +120,12 @@ class CommandCSFlags : public Command
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
 			}
+			else if (na && na->nc->HasExt("NEVEROP"))
+			{
+				source.Reply(_("\002%s\002 does not wish to be added to channel access lists."),
+					na->nc->display.c_str());
+				return;
+			}
 			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
 			{
 				User *targ = User::Find(mask, true);

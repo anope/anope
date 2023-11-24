@@ -1,3 +1,18 @@
+Anope Version 2.1.0-git
+-----------------------
+Added support for access list entry descriptions.
+Added support for linking over a UNIX socket.
+Added support for server-initiated logins and logouts on UnrealIRCd.
+Added support for server-initiated logouts on InspIRCd.
+Added support for the ANONYMOUS SASL mechanism.
+Allowed users to opt-out of being added to channel access lists.
+Cleaned up the codebase to use Modern C++17.
+Modernized the build system to use a modern version of CMake.
+Removed support for using insecure encryption methods as the primary method.
+Removed the Windows-only anopesmtp tool.
+Removed the two day X-line cap.
+Updated all references to IRCServices to refer to Anope instead.
+
 Anope Version 2.0.15-git
 ------------------------
 No significant changes.

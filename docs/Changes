@@ -1,5 +1,5 @@
-Anope Version 2.1.0-git
------------------------
+Anope Version 2.1.0
+-------------------
 Added support for access list entry descriptions.
 Added support for linking over a UNIX socket.
 Added support for server-initiated logins and logouts on UnrealIRCd.

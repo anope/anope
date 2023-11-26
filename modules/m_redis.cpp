@@ -21,7 +21,7 @@ class RedisSocket : public BinarySocket, public ConnectionSocket
 	std::deque<Interface *> interfaces;
 	std::map<Anope::string, Interface *> subinterfaces;
 
-	RedisSocket(MyRedisService *pro, bool v6) : Socket(-1, v6), provider(pro) { }
+	RedisSocket(MyRedisService *pro, bool v6) : Socket(-1, v6 ? AF_INET6 : AF_INET), provider(pro) { }
 
 	~RedisSocket() override;
 

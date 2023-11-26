@@ -541,7 +541,7 @@ class TCPSocket : public ListenSocket
 		}
 	};
 
-	TCPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos), ListenSocket(ip, port, ip.find(':') != Anope::string::npos), manager(m) { }
+	TCPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') == Anope::string::npos ? AF_INET : AF_INET6), ListenSocket(ip, port, ip.find(':') != Anope::string::npos), manager(m) { }
 
 	ClientSocket *OnAccept(int fd, const sockaddrs &addr) override
 	{
@@ -556,7 +556,7 @@ class UDPSocket : public ReplySocket
 	std::deque<Packet *> packets;
 
  public:
-	UDPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos, SOCK_DGRAM), manager(m) { }
+	UDPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') == Anope::string::npos ? AF_INET : AF_INET6, SOCK_DGRAM), manager(m) { }
 
 	~UDPSocket() override
 	{
@@ -614,7 +614,7 @@ class NotifySocket : public Socket
 {
 	Packet *packet;
  public:
-	NotifySocket(bool v6, Packet *p) : Socket(-1, v6, SOCK_DGRAM), packet(p)
+	NotifySocket(int family, Packet *p) : Socket(-1, family, SOCK_DGRAM), packet(p)
 	{
 		SocketEngine::Change(this, false, SF_READABLE);
 		SocketEngine::Change(this, true, SF_WRITABLE);
@@ -942,7 +942,7 @@ class MyManager : public Manager, public Timer
 
 			packet->questions.emplace_back(zone, QUERY_SOA);
 
-			new NotifySocket(ip.find(':') != Anope::string::npos, packet);
+			new NotifySocket(ip.find(':') == Anope::string::npos ? AF_INET : AF_INET6, packet);
 		}
 	}
 

@@ -40,7 +40,7 @@ class CommandCSUnban : public Command
 			unsigned count = 0;
 			for (auto *ci : queue)
 			{
-				if (!ci->c || !source.AccessFor(ci).HasPriv("UNBAN"))
+				if (!ci->c || !(source.AccessFor(ci).HasPriv("UNBAN") || source.AccessFor(ci).HasPriv("UNBANME")))
 					continue;
 
 				FOREACH_MOD(OnChannelUnban, (source.GetUser(), ci));
@@ -69,12 +69,6 @@ class CommandCSUnban : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("UNBAN") && !source.HasPriv("chanserv/kick"))
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
-
 		User *u2 = source.GetUser();
 		if (params.size() > 1)
 			u2 = User::Find(params[1], true);
@@ -82,6 +76,14 @@ class CommandCSUnban : public Command
 		if (!u2)
 		{
 			source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
+			return;
+		}
+
+		if (!source.AccessFor(ci).HasPriv("UNBAN") &&
+			!(u2 == source.GetUser() && source.AccessFor(ci).HasPriv("UNBANME")) &&
+			!source.HasPriv("chanserv/kick"))
+		{
+			source.Reply(ACCESS_DENIED);
 			return;
 		}
 

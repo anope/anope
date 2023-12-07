@@ -253,8 +253,10 @@ if(LDFLAGS)
 endif()
 
 # Search for the following programs
-find_program(CHGRP "chgrp" REQUIRED)
-find_program(CHMOD "chmod" REQUIRED)
+if(NOT WIN32 AND RUNGROUP)
+  find_program(CHGRP "chgrp" REQUIRED)
+  find_program(CHMOD "chmod" REQUIRED)
+endif()
 
 # If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the anope directory under the user's home directory
 if(INSTDIR)

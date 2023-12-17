@@ -674,7 +674,7 @@ class CommandCSLevels : public Command
 		/* Don't allow disabling of the founder level. It would be hard to change it back if you don't have access to use this command */
 		if (what.equals_ci("FOUNDER"))
 		{
-			source.Reply(_("You can not disable the founder privilege because it would be impossible to reenable it at a later time."));
+			source.Reply(_("You can not disable the founder privilege because it would be impossible to re-enable it at a later time."));
 			return;
 		}
 
@@ -833,7 +833,7 @@ class CommandCSLevels : public Command
 					"functions to be changed. \002LEVELS DISABLE\002 (or \002DIS\002 for short)\n"
 					"disables an automatic feature or disallows access to a\n"
 					"function by anyone, INCLUDING the founder (although, the founder\n"
-					"can always reenable it). Use \002LEVELS SET founder\002 to make a level\n"
+					"can always re-enable it). Use \002LEVELS SET founder\002 to make a level\n"
 					"founder only.\n"
 					" \n"
 					"\002LEVELS LIST\002 shows the current levels for each function or\n"

@@ -539,7 +539,7 @@ endmacro(check_functions)
 #   of TRUE is given, periods will be converted to \\. for CPack.
 ###############################################################################
 macro(add_to_cpack_ignored_files ITEM)
-  # Temporary copy of the orignal item
+  # Temporary copy of the original item
   set(REAL_ITEM "${ITEM}")
   # If we have 2+ arguments, assume that the second one was something like TRUE (doesn't matter really) and convert periods so they will be \\. for CPack
   if(${ARGC} GREATER 1)

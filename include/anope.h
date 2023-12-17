@@ -572,7 +572,7 @@ class CoreExport sepstream
 	/** Original string.
 	 */
 	Anope::string tokens;
-	/** Seperator value
+	/** Separator value
 	 */
 	char sep;
 	/** Current string position

@@ -93,7 +93,7 @@ class CommandCSRegister : public Command
 			"\"founder\" of the channel. The channel founder is allowed\n"
 			"to change all of the channel settings for the channel;\n"
 			"%s will also automatically give the founder\n"
-			"channel-operator privileges when s/he enters the channel."),
+			"channel operator privileges when they enter the channel."),
 				source.service->nick.c_str(), source.service->nick.c_str());
 		BotInfo *bi;
 		Anope::string cmd;

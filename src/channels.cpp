@@ -308,7 +308,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Ano
 
 	if (param.empty() && cm->type != MODE_REGULAR)
 	{
-		Log() << "Channel::SetModeInternal() mode " << cm->mchar << " for " << this->name << " with no paramater, but is a param mode";
+		Log() << "Channel::SetModeInternal() mode " << cm->mchar << " for " << this->name << " with no parameter, but is a param mode";
 		return;
 	}
 

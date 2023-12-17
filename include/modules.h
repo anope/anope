@@ -402,7 +402,6 @@ class CoreExport Module : public Extensible
 	virtual EventReturn OnLoadDatabase() { throw NotImplementedException(); }
 
 	/** Called when anope needs to check passwords against encryption
-	 *  see src/encrypt.c for detailed informations
 	 */
 	virtual EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) { throw NotImplementedException(); }
 	virtual EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest) { throw NotImplementedException(); }
@@ -1066,7 +1065,7 @@ class CoreExport Module : public Extensible
 	/** Called when a nickserv/set command is used.
 	 * @param source The source of the command
 	 * @param cmd The command
-	 * @param nc The nickcore being modifed
+	 * @param nc The nickcore being modified
 	 * @param setting The setting passed to the command. Probably ON/OFF.
 	 * @return EVENT_STOP to halt immediately
 	 */

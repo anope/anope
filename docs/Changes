@@ -159,7 +159,7 @@ Show memo notify settings in ms_info
 Fix some actions bumping channels last used time that shouldn't have
 Add maxlogins configuration directive to limit the number of concurrent logins to one account
 Fix race with auto svsnick on ghost sometimes causing nick collisions instead
-Fix saset langauge reply
+Fix saset language reply
 Show akill/sxlines ids in VIEW
 Fix crash when an oper is configured in both the configuration and via os_oper
 Fix m_ldap reconnect logic not properly setting protocol and network timeout settings
@@ -226,7 +226,7 @@ A Added SQL logging support
 A Added Redis database support
 A Added ability to configure what privileges XOP commands give
 U Updated Dutch language file, from Robby <robby@chat.be>
-U Updated Spanish langauge file, from Isaac Fontal <i_fontal@hotmail.com>
+U Updated Spanish language file, from Isaac Fontal <i_fontal@hotmail.com>
 F Fix build on Solaris and OSX
 F Fixed setting BotServ's default settings in the config
 F Fixed some names of config items, including NickServ's kill protect

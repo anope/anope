@@ -120,7 +120,7 @@ class CommandCSBan : public Command
 			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
 				source.Reply(ACCESS_DENIED);
 			/*
-			 * Don't ban/kick the user on channels where he is excepted
+			 * Don't ban/kick the user on channels where they are excepted
 			 * to prevent services <-> server wars.
 			 */
 			else if (c->MatchesList(u2, "EXCEPT"))

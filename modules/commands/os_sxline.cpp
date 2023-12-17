@@ -435,7 +435,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		source.Reply(" ");
 		source.Reply(_("Allows Services Operators to manipulate the SNLINE list.  If\n"
 				"a user with a realname matching an SNLINE mask attempts to\n"
-				"connect, Services will not allow it to pursue his IRC\n"
+				"connect, Services will not allow them to pursue their IRC\n"
 				"session."));
 		source.Reply(_(" \n"
 				"\002SNLINE ADD\002 adds the given realname mask to the SNLINE\n"
@@ -669,7 +669,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		source.Reply(" ");
 		source.Reply(_("Allows Services Operators to manipulate the SQLINE list.  If\n"
 				"a user with a nick matching an SQLINE mask attempts to\n"
-				"connect, Services will not allow it to pursue his IRC\n"
+				"connect, Services will not allow them to pursue their IRC\n"
 				"session.\n"
 				"If the first character of the mask is #, services will\n"
 				"prevent the use of matching channels. If the mask is a\n"

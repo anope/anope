@@ -452,7 +452,7 @@ class CommandCSSetPeace : public Command
 		source.Reply(_("Enables or disables the \002peace\002 option for a channel.\n"
 				"When \002peace\002 is set, a user won't be able to kick,\n"
 				"ban or remove a channel status of a user that has\n"
-				"a level superior or equal to his via %s commands."), source.service->nick.c_str());
+				"a level superior or equal to theirs via %s commands."), source.service->nick.c_str());
 		return true;
 	}
 };

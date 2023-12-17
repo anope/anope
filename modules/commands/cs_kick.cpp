@@ -13,7 +13,7 @@
 
 class CommandCSKick : public Command
 {
- public:
+public:
 	CommandCSKick(Module *creator) : Command(creator, "chanserv/kick", 2, 3)
 	{
 		this->SetDesc(_("Kicks a specified nick from a channel"));
@@ -137,7 +137,7 @@ class CSKick : public Module
 {
 	CommandCSKick commandcskick;
 
- public:
+public:
 	CSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcskick(this)
 	{
 

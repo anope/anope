@@ -10,7 +10,7 @@
 
 class HelpChannel : public Module
 {
- public:
+public:
 	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
 	}

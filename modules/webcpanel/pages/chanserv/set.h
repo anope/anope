@@ -15,7 +15,7 @@ namespace ChanServ
 
 class Set : public WebPanelProtectedPage
 {
- public:
+public:
 	Set(const Anope::string &cat, const Anope::string &u);
 
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;

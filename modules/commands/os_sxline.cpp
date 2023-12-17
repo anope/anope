@@ -17,7 +17,7 @@ class SXLineDelCallback : public NumberList
 	Command *command;
 	CommandSource &source;
 	unsigned deleted = 0;
- public:
+public:
 	SXLineDelCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), xlm(x), command(c), source(_source)
 	{
 	}
@@ -56,7 +56,7 @@ class SXLineDelCallback : public NumberList
 
 class CommandOSSXLineBase : public Command
 {
- private:
+private:
 	virtual XLineManager* xlm() = 0;
 
 	virtual void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) = 0;
@@ -123,7 +123,7 @@ class CommandOSSXLineBase : public Command
 				XLineManager *xlm;
 				CommandSource &source;
 				ListFormatter &list;
-			 public:
+			public:
 				SXLineListCallback(XLineManager *x, CommandSource &_source, ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), xlm(x), source(_source), list(_list)
 				{
 				}
@@ -223,7 +223,7 @@ class CommandOSSXLineBase : public Command
 
 		return;
 	}
- public:
+public:
 	CommandOSSXLineBase(Module *creator, const Anope::string &cmd) : Command(creator, cmd, 1, 4)
 	{
 	}
@@ -417,7 +417,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 	}
 
 	ServiceReference<XLineManager> snlines;
- public:
+public:
 	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline"), snlines("XLineManager", "xlinemanager/snline")
 	{
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037:\037reason\037"));
@@ -646,7 +646,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 	}
 
 	ServiceReference<XLineManager> sqlines;
- public:
+public:
 	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/sqline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037 \037reason\037"));
@@ -715,7 +715,7 @@ class OSSXLine : public Module
 	CommandOSSNLine commandossnline;
 	CommandOSSQLine commandossqline;
 
- public:
+public:
 	OSSXLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandossnline(this), commandossqline(this)
 	{

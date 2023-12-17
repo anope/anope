@@ -19,16 +19,16 @@ struct IgnoreData
 	time_t time = 0; /* When do we stop ignoring them? */
 
 	virtual ~IgnoreData() = default;
- protected:
+protected:
 	IgnoreData() = default;
 };
 
 class IgnoreService : public Service
 {
- protected:
+protected:
 	IgnoreService(Module *c) : Service(c, "IgnoreService", "ignore") { }
 
- public:
+public:
 	virtual void AddIgnore(IgnoreData *) = 0;
 
 	virtual void DelIgnore(IgnoreData *) = 0;

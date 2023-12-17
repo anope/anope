@@ -61,7 +61,7 @@ static int stats_count_servers(Server *s)
 class CommandOSStats : public Command
 {
 	ServiceReference<XLineManager> akills, snlines, sqlines;
- private:
+private:
 	void DoStatsAkill(CommandSource &source)
 	{
 		int timeout;
@@ -198,7 +198,7 @@ class CommandOSStats : public Command
 		}
 	}
 
- public:
+public:
 	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1),
 		akills("XLineManager", "xlinemanager/sgline"), snlines("XLineManager", "xlinemanager/snline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
@@ -261,7 +261,7 @@ class OSStats : public Module
 	Serialize::Type stats_type;
 	Stats stats_saver;
 
- public:
+public:
 	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosstats(this), stats_type("Stats", Stats::Unserialize)
 	{

@@ -13,7 +13,7 @@
 
 class CommandMSList : public Command
 {
- public:
+public:
 	CommandMSList(Module *creator) : Command(creator, "memoserv/list", 0, 2)
 	{
 		this->SetDesc(_("List your memos"));
@@ -70,7 +70,7 @@ class CommandMSList : public Command
 					ListFormatter &list;
 					CommandSource &source;
 					const MemoInfo *mi;
-				 public:
+				public:
 					MemoListCallback(ListFormatter &_list, CommandSource &_source, const MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), list(_list), source(_source), mi(_mi)
 					{
 					}
@@ -153,7 +153,7 @@ class MSList : public Module
 {
 	CommandMSList commandmslist;
 
- public:
+public:
 	MSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmslist(this)
 	{

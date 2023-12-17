@@ -27,13 +27,13 @@ struct ForbidData
 	ForbidType type;
 
 	virtual ~ForbidData() = default;
- protected:
+protected:
 	ForbidData() = default;
 };
 
 class ForbidService : public Service
 {
- public:
+public:
 	ForbidService(Module *m) : Service(m, "ForbidService", "forbid") { }
 
 	virtual void AddForbid(ForbidData *d) = 0;

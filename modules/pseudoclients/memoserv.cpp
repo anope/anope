@@ -35,7 +35,7 @@ class MemoServCore : public Module, public MemoServService
 		return Mail::Send(nc, subject, message);
 	}
 
- public:
+public:
 	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		MemoServService(this)
 	{

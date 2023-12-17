@@ -16,7 +16,7 @@ class NSIdentifyRequest : public IdentifyRequest
 	CommandSource source;
 	Command *cmd;
 
- public:
+public:
 	NSIdentifyRequest(Module *o, CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(o, acc, pass), source(s), cmd(c) { }
 
 	void OnSuccess() override
@@ -59,7 +59,7 @@ class NSIdentifyRequest : public IdentifyRequest
 
 class CommandNSIdentify : public Command
 {
- public:
+public:
 	CommandNSIdentify(Module *creator) : Command(creator, "nickserv/identify", 1, 2)
 	{
 		this->SetDesc(_("Identify yourself with your password"));
@@ -117,7 +117,7 @@ class NSIdentify : public Module
 {
 	CommandNSIdentify commandnsidentify;
 
- public:
+public:
 	NSIdentify(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsidentify(this)
 	{

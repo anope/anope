@@ -109,7 +109,7 @@ class DefConTimeout : public Timer
 {
 	int level;
 
- public:
+public:
 	DefConTimeout(Module *mod, int newlevel) : Timer(mod, DConfig.timeout), level(newlevel)
 	{
 		timeout = this;
@@ -170,7 +170,7 @@ class CommandOSDefcon : public Command
 			source.Reply(_("* No new memos sent"));
 	}
 
- public:
+public:
 	CommandOSDefcon(Module *creator) : Command(creator, "operserv/defcon", 1, 1)
 	{
 		this->SetDesc(_("Manipulate the DefCon system"));
@@ -326,7 +326,7 @@ class OSDefcon : public Module
 		}
 	}
 
- public:
+public:
 	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), session_service("SessionService", "session"), akills("XLineManager", "xlinemanager/sgline"), commandosdefcon(this)
 	{
 

@@ -13,7 +13,7 @@
 
 class CommandNSList : public Command
 {
- public:
+public:
 	CommandNSList(Module *creator) : Command(creator, "nickserv/list", 1, 2)
 	{
 		this->SetDesc(_("List all registered nicknames that match a given pattern"));
@@ -178,7 +178,7 @@ class CommandNSList : public Command
 
 class CommandNSSetPrivate : public Command
 {
- public:
+public:
 	CommandNSSetPrivate(Module *creator, const Anope::string &sname = "nickserv/set/private", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Prevent the nickname from appearing in the LIST command"));
@@ -243,7 +243,7 @@ class CommandNSSetPrivate : public Command
 
 class CommandNSSASetPrivate : public CommandNSSetPrivate
 {
- public:
+public:
 	CommandNSSASetPrivate(Module *creator) : CommandNSSetPrivate(creator, "nickserv/saset/private", 2)
 	{
 		this->ClearSyntax();
@@ -279,7 +279,7 @@ class NSList : public Module
 
 	SerializableExtensibleItem<bool> priv;
 
- public:
+public:
 	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnslist(this), commandnssetprivate(this), commandnssasetprivate(this),
 		priv(this, "NS_PRIVATE")

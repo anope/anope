@@ -23,7 +23,7 @@ static SSL_CTX *server_ctx, *client_ctx;
 
 class MySSLService : public SSLService
 {
- public:
+public:
 	MySSLService(Module *o, const Anope::string &n);
 
 	/** Initialize a socket to use SSL
@@ -34,7 +34,7 @@ class MySSLService : public SSLService
 
 class SSLSocketIO : public SocketIO
 {
- public:
+public:
 	/* The SSL socket for this socket */
 	SSL *sslsock;
 
@@ -93,7 +93,7 @@ class SSLModule : public Module
 {
 	Anope::string certfile, keyfile;
 
- public:
+public:
 	MySSLService service;
 
 	SSLModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), service(this, "ssl")

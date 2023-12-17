@@ -13,7 +13,7 @@
 
 class CommandOSModInfo : public Command
 {
- public:
+public:
 	CommandOSModInfo(Module *creator) : Command(creator, "operserv/modinfo", 1, 1)
 	{
 		this->SetDesc(_("Info about a loaded module"));
@@ -70,7 +70,7 @@ class CommandOSModInfo : public Command
 
 class CommandOSModList : public Command
 {
- public:
+public:
 	CommandOSModList(Module *creator) : Command(creator, "operserv/modlist", 0, 1)
 	{
 		this->SetDesc(_("List loaded modules"));
@@ -197,7 +197,7 @@ class OSModInfo : public Module
 	CommandOSModInfo commandosmodinfo;
 	CommandOSModList commandosmodlist;
 
- public:
+public:
 	OSModInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosmodinfo(this), commandosmodlist(this)
 	{

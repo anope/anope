@@ -22,7 +22,7 @@ static inline void reset_levels(ChannelInfo *ci)
 
 class AccessChanAccess : public ChanAccess
 {
- public:
+public:
 	int level = 0;
 
 	AccessChanAccess(AccessProvider *p) : ChanAccess(p)
@@ -69,7 +69,7 @@ class AccessChanAccess : public ChanAccess
 
 class AccessAccessProvider : public AccessProvider
 {
- public:
+public:
 	static AccessAccessProvider *me;
 
 	AccessAccessProvider(Module *o) : AccessProvider(o, "access/access")
@@ -266,7 +266,7 @@ class CommandCSAccess : public Command
 				Anope::string Nicks;
 				bool denied = false;
 				bool override = false;
-			 public:
+			public:
 				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c)
 				{
 					if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/access/modify"))
@@ -366,7 +366,7 @@ class CommandCSAccess : public Command
 				ListFormatter &list;
 				ChannelInfo *ci;
 
-			 public:
+			public:
 				AccessListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
 				{
 				}
@@ -510,7 +510,7 @@ class CommandCSAccess : public Command
 		return;
 	}
 
- public:
+public:
 	CommandCSAccess(Module *creator) : Command(creator, "chanserv/access", 2, 5)
 	{
 		this->SetDesc(_("Modify the list of privileged users"));
@@ -752,7 +752,7 @@ class CommandCSLevels : public Command
 		return;
 	}
 
- public:
+public:
 	CommandCSLevels(Module *creator) : Command(creator, "chanserv/levels", 2, 4)
 	{
 		this->SetDesc(_("Redefine the meanings of access levels"));
@@ -863,7 +863,7 @@ class CSAccess : public Module
 	CommandCSAccess commandcsaccess;
 	CommandCSLevels commandcslevels;
 
- public:
+public:
 	CSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		accessprovider(this), commandcsaccess(this), commandcslevels(this)
 	{

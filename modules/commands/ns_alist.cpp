@@ -18,7 +18,7 @@ class CommandNSAList : public Command
 		return ci::less()(ci1->name, ci2->name);
 	}
 
- public:
+public:
 	CommandNSAList(Module *creator) : Command(creator, "nickserv/alist", 0, 2)
 	{
 		this->SetDesc(_("List channels you have access on"));
@@ -135,7 +135,7 @@ class NSAList : public Module
 {
 	CommandNSAList commandnsalist;
 
- public:
+public:
 	NSAList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsalist(this)
 	{

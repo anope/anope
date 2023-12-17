@@ -18,7 +18,7 @@ namespace
 
 class CommandMSRSend : public Command
 {
- public:
+public:
 	CommandMSRSend(Module *creator) : Command(creator, "memoserv/rsend", 2, 2)
 	{
 		this->SetDesc(_("Sends a memo and requests a read receipt"));
@@ -92,7 +92,7 @@ class MSRSend : public Module
 {
 	CommandMSRSend commandmsrsend;
 
- public:
+public:
 	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsrsend(this)
 	{

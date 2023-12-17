@@ -18,7 +18,7 @@ class PCRERegex : public Regex
 {
 	pcre2_code *regex;
 
- public:
+public:
 	PCRERegex(const Anope::string &expr) : Regex(expr)
 	{
 		int errcode;
@@ -49,7 +49,7 @@ class PCRERegex : public Regex
 
 class PCRERegexProvider : public RegexProvider
 {
- public:
+public:
 	PCRERegexProvider(Module *creator) : RegexProvider(creator, "regex/pcre") { }
 
 	Regex *Compile(const Anope::string &expression) override
@@ -62,7 +62,7 @@ class ModuleRegexPCRE : public Module
 {
 	PCRERegexProvider pcre_regex_provider;
 
- public:
+public:
 	ModuleRegexPCRE(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		pcre_regex_provider(this)
 	{

@@ -13,7 +13,7 @@
 
 class CommandOSSVSNick : public Command
 {
- public:
+public:
 	CommandOSSVSNick(Module *creator) : Command(creator, "operserv/svsnick", 2, 2)
 	{
 		this->SetDesc(_("Forcefully change a user's nickname"));
@@ -72,7 +72,7 @@ class CommandOSSVSNick : public Command
 
 class CommandOSSVSJoin : public Command
 {
- public:
+public:
 	CommandOSSVSJoin(Module *creator) : Command(creator, "operserv/svsjoin", 2, 2)
 	{
 		this->SetDesc(_("Forcefully join a user to a channel"));
@@ -116,7 +116,7 @@ class CommandOSSVSJoin : public Command
 
 class CommandOSSVSPart : public Command
 {
- public:
+public:
 	CommandOSSVSPart(Module *creator) : Command(creator, "operserv/svspart", 2, 3)
 	{
 		this->SetDesc(_("Forcefully part a user from a channel"));
@@ -168,7 +168,7 @@ class OSSVS : public Module
 	CommandOSSVSJoin commandossvsjoin;
 	CommandOSSVSPart commandossvspart;
 
- public:
+public:
 	OSSVS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandossvsnick(this), commandossvsjoin(this), commandossvspart(this)
 	{

@@ -13,7 +13,7 @@
 
 class CommandOSNOOP : public Command
 {
- public:
+public:
 	CommandOSNOOP(Module *creator) : Command(creator, "operserv/noop", 2, 2)
 	{
 		this->SetDesc(_("Remove all operators from a server remotely"));
@@ -76,7 +76,7 @@ class OSNOOP : public Module
 	CommandOSNOOP commandosnoop;
 	PrimitiveExtensibleItem<Anope::string> noop;
 
- public:
+public:
 	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosnoop(this), noop(this, "noop")
 	{

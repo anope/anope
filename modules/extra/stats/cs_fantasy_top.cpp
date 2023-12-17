@@ -14,7 +14,7 @@
 
 class MySQLInterface : public SQL::Interface
 {
- public:
+public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
 	void OnResult(const SQL::Result &r) override
@@ -32,7 +32,7 @@ class MySQLInterface : public SQL::Interface
 
 class CommandCSTop : public Command
 {
- public:
+public:
 	CommandCSTop(Module *creator) : Command (creator, "chanserv/top", 0, 2)
 	{
 		this->SetDesc(_("Displays the top 3 users of a channel"));
@@ -44,7 +44,7 @@ class CommandCSTop : public Command
 
 class CommandCSTop10 : public Command
 {
- public:
+public:
 	CommandCSTop10(Module *creator) : Command (creator, "chanserv/top10", 0, 2)
 	{
 		this->SetDesc(_("Displays the top 10 users of a channel"));
@@ -56,7 +56,7 @@ class CommandCSTop10 : public Command
 
 class CommandCSGTop : public Command
 {
- public:
+public:
 	CommandCSGTop(Module *creator) : Command (creator, "chanserv/gtop", 0, 1)
 	{
 		this->SetDesc(_("Displays the top 3 users of the network"));
@@ -67,7 +67,7 @@ class CommandCSGTop : public Command
 
 class CommandCSGTop10 : public Command
 {
- public:
+public:
 	CommandCSGTop10(Module *creator) : Command (creator, "chanserv/gtop10", 0, 1)
 	{
 		this->SetDesc(_("Displays the top 10 users of the network"));
@@ -89,7 +89,7 @@ class CSTop : public Module
 	MySQLInterface sqlinterface;
 	Anope::string prefix;
 
- public:
+public:
 	CSTop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcstop(this), commandcsgtop(this), commandcstop10(this), commandcsgtop10(this), sql("", ""),
 		sqlinterface(this)

@@ -16,7 +16,7 @@ using namespace SQL;
 
 class SQLSQLInterface : public Interface
 {
- public:
+public:
 	SQLSQLInterface(Module *o) : Interface(o) { }
 
 	void OnResult(const Result &r) override
@@ -89,7 +89,7 @@ class DBSQL : public Module, public Pipe
 			this->sql->RunQuery(q);
 	}
 
- public:
+public:
 	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sql("", ""), sqlinterface(this)
 	{
 

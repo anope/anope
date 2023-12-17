@@ -37,7 +37,7 @@ enum ModeClass
  */
 class CoreExport Mode : public Base
 {
- public:
+public:
 	/* Mode name */
 	Anope::string name;
 	/* Class of mode this is (user/channel) */
@@ -66,7 +66,7 @@ class CoreExport Mode : public Base
  */
 class CoreExport UserMode : public Mode
 {
- public:
+public:
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
@@ -76,7 +76,7 @@ class CoreExport UserMode : public Mode
 
 class CoreExport UserModeParam : public UserMode
 {
- public:
+public:
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
@@ -94,7 +94,7 @@ class CoreExport UserModeParam : public UserMode
  */
 class CoreExport ChannelMode : public Mode
 {
- public:
+public:
 	/* channel modes that can possibly unwrap this mode */
 	std::vector<ChannelMode *> listeners;
 
@@ -125,7 +125,7 @@ class CoreExport ChannelMode : public Mode
  */
 class CoreExport ChannelModeList : public ChannelMode
 {
- public:
+public:
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
@@ -163,7 +163,7 @@ class CoreExport ChannelModeList : public ChannelMode
 */
 class CoreExport ChannelModeParam : public ChannelMode
 {
- public:
+public:
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
@@ -185,7 +185,7 @@ class CoreExport ChannelModeParam : public ChannelMode
 */
 class CoreExport ChannelModeStatus : public ChannelMode
 {
- public:
+public:
 	/* The symbol, eg @ % + */
 	char symbol;
 	/* The "level" of the mode, used to compare with other modes.
@@ -211,7 +211,7 @@ class CoreExport ChannelModeVirtual : public T
 	Anope::string base;
 	ChannelMode *basech;
 
- public:
+public:
 	ChannelModeVirtual(const Anope::string &mname, const Anope::string &basename);
 
 	~ChannelModeVirtual();
@@ -227,7 +227,7 @@ class CoreExport ChannelModeVirtual : public T
 class CoreExport ChannelStatus
 {
 	Anope::string modes;
- public:
+public:
 	ChannelStatus() = default;
 	ChannelStatus(const Anope::string &modes);
 	void AddMode(char c);
@@ -241,7 +241,7 @@ class CoreExport ChannelStatus
 
 class CoreExport UserModeOperOnly : public UserMode
 {
- public:
+public:
 	UserModeOperOnly(const Anope::string &mname, char um) : UserMode(mname, um) { }
 
 	bool CanSet(User *u) const override;
@@ -249,7 +249,7 @@ class CoreExport UserModeOperOnly : public UserMode
 
 class CoreExport UserModeNoone : public UserMode
 {
- public:
+public:
 	UserModeNoone(const Anope::string &mname, char um) : UserMode(mname, um) { }
 
 	bool CanSet(User *u) const override;
@@ -259,7 +259,7 @@ class CoreExport UserModeNoone : public UserMode
  */
 class CoreExport ChannelModeKey : public ChannelModeParam
 {
- public:
+public:
 	ChannelModeKey(char mc) : ChannelModeParam("KEY", mc) { }
 
 	bool IsValid(Anope::string &value) const override;
@@ -269,7 +269,7 @@ class CoreExport ChannelModeKey : public ChannelModeParam
  */
 class CoreExport ChannelModeOperOnly : public ChannelMode
 {
- public:
+public:
 	ChannelModeOperOnly(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
 
 	/* Opers only */
@@ -280,7 +280,7 @@ class CoreExport ChannelModeOperOnly : public ChannelMode
  */
 class CoreExport ChannelModeNoone : public ChannelMode
 {
- public:
+public:
 	ChannelModeNoone(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
 
 	bool CanSet(User *u) const override;
@@ -294,7 +294,7 @@ class CoreExport ChannelModeNoone : public ChannelMode
  */
 class CoreExport ModeManager
 {
- public:
+public:
 
 	/* Number of generic channel and user modes we are tracking */
 	static unsigned GenericChannelModes;
@@ -392,7 +392,7 @@ class CoreExport Entry
 {
 	Anope::string name;
 	Anope::string mask;
- public:
+public:
 	unsigned short cidr_len = 0;
 	int family = 0;
 	Anope::string nick, user, host, real;

@@ -52,7 +52,7 @@ struct CSSuspendInfo : SuspendInfo, Serializable
 
 class CommandCSSuspend : public Command
 {
- public:
+public:
 	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 2, 3)
 	{
 		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
@@ -144,7 +144,7 @@ class CommandCSSuspend : public Command
 
 class CommandCSUnSuspend : public Command
 {
- public:
+public:
 	CommandCSUnSuspend(Module *creator) : Command(creator, "chanserv/unsuspend", 1, 1)
 	{
 		this->SetDesc(_("Releases a suspended channel"));
@@ -214,7 +214,7 @@ class CSSuspend : public Module
 		return source.IsOper() || std::find(show.begin(), show.end(), what) != show.end();
 	}
 
- public:
+public:
 	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcssuspend(this), commandcsunsuspend(this), suspend(this, "CS_SUSPENDED"),
 		suspend_type("CSSuspendInfo", CSSuspendInfo::Unserialize)

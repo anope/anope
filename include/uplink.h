@@ -22,7 +22,7 @@ namespace Uplink
 /* This is the socket to our uplink */
 class UplinkSocket : public ConnectionSocket, public BufferedSocket
 {
- public:
+public:
 	bool error;
 	UplinkSocket();
 	~UplinkSocket();
@@ -36,7 +36,7 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 		MessageSource source;
 		std::stringstream buffer;
 
-	 public:
+	public:
 		Message();
 		Message(const MessageSource &);
 		~Message();

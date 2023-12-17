@@ -41,7 +41,7 @@ struct CoreExport Privilege
 class CoreExport PrivilegeManager
 {
 	static std::vector<Privilege> Privileges;
- public:
+public:
 	static void AddPrivilege(Privilege p);
 	static void RemovePrivilege(Privilege &p);
 	static Privilege *FindPrivilege(const Anope::string &name);
@@ -54,7 +54,7 @@ class CoreExport PrivilegeManager
  */
 class CoreExport AccessProvider : public Service
 {
- public:
+public:
 	AccessProvider(Module *owner, const Anope::string &name);
 	virtual ~AccessProvider();
 
@@ -63,9 +63,9 @@ class CoreExport AccessProvider : public Service
 	 */
 	virtual ChanAccess *Create() = 0;
 
- private:
+private:
 	static std::list<AccessProvider *> Providers;
- public:
+public:
 	static const std::list<AccessProvider *>& GetProviders();
 };
 
@@ -76,7 +76,7 @@ class CoreExport ChanAccess : public Serializable
 	/* account this access entry is for, if any */
 	Serialize::Reference<NickCore> nc;
 
- public:
+public:
 	typedef std::vector<ChanAccess *> Path;
 
 	/* The provider that created this access entry */
@@ -135,7 +135,7 @@ class CoreExport ChanAccess : public Serializable
  */
 class CoreExport AccessGroup
 {
- public:
+public:
 	/* access entries + paths */
 	std::vector<ChanAccess::Path> paths;
 	/* Channel these access entries are on */

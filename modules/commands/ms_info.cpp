@@ -13,7 +13,7 @@
 
 class CommandMSInfo : public Command
 {
- public:
+public:
 	CommandMSInfo(Module *creator) : Command(creator, "memoserv/info", 0, 1)
 	{
 		this->SetDesc(_("Displays information about your memos"));
@@ -220,7 +220,7 @@ class MSInfo : public Module
 {
 	CommandMSInfo commandmsinfo;
 
- public:
+public:
 	MSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsinfo(this)
 	{

@@ -17,7 +17,7 @@
 
 class SaveData : public Serialize::Data
 {
- public:
+public:
 	Anope::string last;
 	std::fstream *fs = nullptr;
 
@@ -35,7 +35,7 @@ class SaveData : public Serialize::Data
 
 class LoadData : public Serialize::Data
 {
- public:
+public:
 	std::fstream *fs = nullptr;
 	unsigned int id = 0;
 	std::map<Anope::string, Anope::string> data;
@@ -165,7 +165,7 @@ class DBFlatFile : public Module, public Pipe
 		}
 	}
 
- public:
+public:
 	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
 	{
 

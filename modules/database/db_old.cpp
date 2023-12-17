@@ -1302,7 +1302,7 @@ class DBOld : public Module
 	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit;
 	PrimitiveExtensibleItem<Anope::string> mlock_key;
 
- public:
+public:
 	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR),
 		mlock_on(this, "mlock_on"), mlock_off(this, "mlock_off"), mlock_limit(this, "mlock_limit"), mlock_key(this, "mlock_key")
 	{

@@ -152,7 +152,7 @@ class BadwordsDelCallback : public NumberList
 	Command *c;
 	unsigned deleted = 0;
 	bool override = false;
- public:
+public:
 	BadwordsDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c)
 	{
 		if (!source.AccessFor(ci).HasPriv("BADWORDS") && source.HasPriv("botserv/administration"))
@@ -183,7 +183,7 @@ class BadwordsDelCallback : public NumberList
 
 class CommandBSBadwords : public Command
 {
- private:
+private:
 	void DoList(CommandSource &source, ChannelInfo *ci, const Anope::string &word)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
@@ -204,7 +204,7 @@ class CommandBSBadwords : public Command
 			{
 				ListFormatter &list;
 				BadWords *bw;
-			 public:
+			public:
 				BadwordsListCallback(ListFormatter &_list, BadWords *_bw, const Anope::string &numlist) : NumberList(numlist, false), list(_list), bw(_bw)
 				{
 				}
@@ -364,7 +364,7 @@ class CommandBSBadwords : public Command
 		source.Reply(_("Bad words list is now empty."));
 	}
 
- public:
+public:
 	CommandBSBadwords(Module *creator) : Command(creator, "botserv/badwords", 2, 3)
 	{
 		this->SetDesc(_("Maintains the bad words list"));
@@ -459,7 +459,7 @@ class BSBadwords : public Module
 	ExtensibleItem<BadWordsImpl> badwords;
 	Serialize::Type badword_type;
 
- public:
+public:
 	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsbadwords(this), badwords(this, "badwords"), badword_type("BadWord", BadWordImpl::Unserialize)
 	{

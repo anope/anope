@@ -13,7 +13,7 @@
 
 class CommandBSSet : public Command
 {
- public:
+public:
 	CommandBSSet(Module *creator) : Command(creator, "botserv/set", 3, 3)
 	{
 		this->SetDesc(_("Configures bot options"));
@@ -66,13 +66,13 @@ class CommandBSSet : public Command
 
 class CommandBSSetBanExpire : public Command
 {
- public:
+public:
 	class UnbanTimer : public Timer
 	{
 		Anope::string chname;
 		Anope::string mask;
 
-	 public:
+	public:
 		UnbanTimer(Module *creator, const Anope::string &ch, const Anope::string &bmask, time_t t) : Timer(creator, t), chname(ch), mask(bmask) { }
 
 		void Tick(time_t) override
@@ -153,7 +153,7 @@ class CommandBSSetBanExpire : public Command
 
 class CommandBSSetPrivate : public Command
 {
- public:
+public:
 	CommandBSSetPrivate(Module *creator, const Anope::string &sname = "botserv/set/private") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("Prevent a bot from being assigned by non IRC operators"));
@@ -207,7 +207,7 @@ class BSSet : public Module
 	CommandBSSetBanExpire commandbssetbanexpire;
 	CommandBSSetPrivate commandbssetprivate;
 
- public:
+public:
 	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsset(this), commandbssetbanexpire(this),
 		commandbssetprivate(this)

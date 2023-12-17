@@ -14,7 +14,7 @@ class XMLRPCRequest
 {
 	std::map<Anope::string, Anope::string> replies;
 
- public:
+public:
 	Anope::string name;
 	Anope::string id;
 	std::deque<Anope::string> data;
@@ -29,14 +29,14 @@ class XMLRPCServiceInterface;
 
 class XMLRPCEvent
 {
- public:
+public:
 	virtual ~XMLRPCEvent() = default;
 	virtual bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) = 0;
 };
 
 class XMLRPCServiceInterface : public Service
 {
- public:
+public:
 	XMLRPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, "XMLRPCServiceInterface", sname) { }
 
 	virtual void Register(XMLRPCEvent *event) = 0;

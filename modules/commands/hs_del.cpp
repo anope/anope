@@ -13,7 +13,7 @@
 
 class CommandHSDel : public Command
 {
- public:
+public:
 	CommandHSDel(Module *creator) : Command(creator, "hostserv/del", 1, 1)
 	{
 		this->SetDesc(_("Delete the vhost of another user"));
@@ -53,7 +53,7 @@ class CommandHSDel : public Command
 
 class CommandHSDelAll : public Command
 {
- public:
+public:
 	CommandHSDelAll(Module *creator) : Command(creator, "hostserv/delall", 1, 1)
 	{
 		this->SetDesc(_("Deletes the vhost for all nicks in a group"));
@@ -101,7 +101,7 @@ class HSDel : public Module
 	CommandHSDel commandhsdel;
 	CommandHSDelAll commandhsdelall;
 
- public:
+public:
 	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsdel(this), commandhsdelall(this)
 	{

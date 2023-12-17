@@ -14,7 +14,7 @@ using namespace SASL;
 
 class Plain : public Mechanism
 {
- public:
+public:
 	Plain(Module *o) : Mechanism(o, "PLAIN") { }
 
 	void ProcessMessage(Session *sess, const SASL::Message &m) override
@@ -83,7 +83,7 @@ class External : public Mechanism
 		Session(Mechanism *m, const Anope::string &u) : SASL::Session(m, u) { }
 	};
 
- public:
+public:
 	External(Module *o) : Mechanism(o, "EXTERNAL"), certs("CertService", "certs")
 	{
 		if (!IRCD || !IRCD->CanCertFP)
@@ -136,7 +136,7 @@ class External : public Mechanism
 
 class Anonymous : public Mechanism
 {
- public:
+public:
 	Anonymous(Module *o) : Mechanism(o, "ANONYMOUS") { }
 
 	void ProcessMessage(Session *sess, const SASL::Message &m) override
@@ -174,7 +174,7 @@ class SASLService : public SASL::Service, public Timer
 {
 	std::map<Anope::string, SASL::Session *> sessions;
 
- public:
+public:
 	SASLService(Module *o) : SASL::Service(o), Timer(o, 60, Anope::CurTime, true) { }
 
 	~SASLService() override
@@ -370,7 +370,7 @@ class ModuleSASL : public Module
 			IRCD->SendSASLMechanisms(mechs);
 	}
 
- public:
+public:
 	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		sasl(this), anonymous(this), plain(this)
 	{

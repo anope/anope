@@ -19,7 +19,7 @@ namespace
 
 class XOPChanAccess : public ChanAccess
 {
- public:
+public:
 	Anope::string type;
 
 	XOPChanAccess(AccessProvider *p) : ChanAccess(p)
@@ -86,7 +86,7 @@ class XOPChanAccess : public ChanAccess
 
 class XOPAccessProvider : public AccessProvider
 {
- public:
+public:
 	XOPAccessProvider(Module *o) : AccessProvider(o, "access/xop")
 	{
 	}
@@ -99,7 +99,7 @@ class XOPAccessProvider : public AccessProvider
 
 class CommandCSXOP : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params.size() > 2 ? params[2] : "";
@@ -299,7 +299,7 @@ class CommandCSXOP : public Command
 				unsigned deleted = 0;
 				Anope::string nicks;
 				bool override;
-			 public:
+			public:
 				XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), override(_override)
 				{
 				}
@@ -399,7 +399,7 @@ class CommandCSXOP : public Command
 				ListFormatter &list;
 				ChannelInfo *ci;
 				CommandSource &source;
-			 public:
+			public:
 				XOPListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist, CommandSource &src) : NumberList(numlist, false), list(_list), ci(_ci), source(src)
 				{
 				}
@@ -493,7 +493,7 @@ class CommandCSXOP : public Command
 		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.c_str());
 	}
 
- public:
+public:
 	CommandCSXOP(Module *modname) : Command(modname, "chanserv/xop", 2, 4)
 	{
 		this->SetSyntax(_("\037channel\037 ADD \037mask\037 [\037description\037]"));
@@ -600,7 +600,7 @@ class CSXOP : public Module
 	XOPAccessProvider accessprovider;
 	CommandCSXOP commandcsxop;
 
- public:
+public:
 	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		accessprovider(this), commandcsxop(this)
 	{

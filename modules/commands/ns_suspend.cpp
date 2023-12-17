@@ -54,7 +54,7 @@ struct NSSuspendInfo : SuspendInfo, Serializable
 
 class CommandNSSuspend : public Command
 {
- public:
+public:
 	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 3)
 	{
 		this->SetDesc(_("Suspend a given nick"));
@@ -152,7 +152,7 @@ class CommandNSSuspend : public Command
 
 class CommandNSUnSuspend : public Command
 {
- public:
+public:
 	CommandNSUnSuspend(Module *creator) : Command(creator, "nickserv/unsuspend", 1, 1)
 	{
 		this->SetDesc(_("Unsuspend a given nick"));
@@ -220,7 +220,7 @@ class NSSuspend : public Module
 		return source.IsOper() || std::find(show.begin(), show.end(), what) != show.end();
 	}
 
- public:
+public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnssuspend(this), commandnsunsuspend(this), suspend(this, "NS_SUSPENDED"),
 		suspend_type("NSSuspendInfo", NSSuspendInfo::Unserialize)

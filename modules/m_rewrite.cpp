@@ -99,7 +99,7 @@ std::vector<Rewrite> Rewrite::rewrites;
 
 class RewriteCommand : public Command
 {
- public:
+public:
 	RewriteCommand(Module *creator) : Command(creator, "rewrite", 0, 0) { }
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -149,7 +149,7 @@ class ModuleRewrite : public Module
 {
 	RewriteCommand cmdrewrite;
 
- public:
+public:
 	ModuleRewrite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA), cmdrewrite(this)
 	{
 	}

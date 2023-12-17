@@ -33,7 +33,7 @@ struct Exception : Serializable
 
 class SessionService : public Service
 {
- public:
+public:
 	typedef std::unordered_map<cidr, Session *, cidr::hash> SessionMap;
 	typedef std::vector<Exception *> ExceptionVector;
 

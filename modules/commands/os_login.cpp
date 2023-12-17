@@ -13,7 +13,7 @@
 
 class CommandOSLogin : public Command
 {
- public:
+public:
 	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 1, 1)
 	{
 		this->SetSyntax(_("\037password\037"));
@@ -63,7 +63,7 @@ class CommandOSLogin : public Command
 
 class CommandOSLogout : public Command
 {
- public:
+public:
 	CommandOSLogout(Module *creator) : Command(creator, "operserv/logout", 0, 0)
 	{
 		this->RequireUser(true);
@@ -109,7 +109,7 @@ class OSLogin : public Module
 	CommandOSLogout commandoslogout;
 	ExtensibleItem<bool> os_login;
 
- public:
+public:
 	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoslogin(this), commandoslogout(this), os_login(this, "os_login")
 	{

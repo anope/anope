@@ -13,7 +13,7 @@
 
 class CommandOSModLoad : public Command
 {
- public:
+public:
 	CommandOSModLoad(Module *creator) : Command(creator, "operserv/modload", 1, 1)
 	{
 		this->SetDesc(_("Load a module"));
@@ -50,7 +50,7 @@ class CommandOSModLoad : public Command
 
 class CommandOSModReLoad : public Command
 {
- public:
+public:
 	CommandOSModReLoad(Module *creator) : Command(creator, "operserv/modreload", 1, 1)
 	{
 		this->SetDesc(_("Reload a module"));
@@ -122,7 +122,7 @@ class CommandOSModReLoad : public Command
 
 class CommandOSModUnLoad : public Command
 {
- public:
+public:
 	CommandOSModUnLoad(Module *creator) : Command(creator, "operserv/modunload", 1, 1)
 	{
 		this->SetDesc(_("Un-Load a module"));
@@ -176,7 +176,7 @@ class OSModule : public Module
 	CommandOSModReLoad commandosmodreload;
 	CommandOSModUnLoad commandosmodunload;
 
- public:
+public:
 	OSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosmodload(this), commandosmodreload(this), commandosmodunload(this)
 	{

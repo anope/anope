@@ -16,16 +16,16 @@ struct EntryMsg
 	time_t when;
 
 	virtual ~EntryMsg() = default;
- protected:
+protected:
 	EntryMsg() = default;
 };
 
 struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >
 {
- protected:
+protected:
 	EntryMessageList() : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }
 
- public:
+public:
 	virtual ~EntryMessageList()
 	{
 		for (unsigned i = (*this)->size(); i > 0; --i)

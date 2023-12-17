@@ -17,7 +17,7 @@ class CoreExport XLine : public Serializable
 {
 	void Init();
 	Anope::string nick, user, host, real;
- public:
+public:
 	cidr *c;
 	Anope::string mask;
 	Regex *regex;
@@ -55,7 +55,7 @@ class CoreExport XLineManager : public Service
 	Serialize::Checker<std::vector<XLine *> > xlines;
 	/* Akills can have the same IDs, sometimes */
 	static Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLinesByUID;
- public:
+public:
 	/* List of XLine managers we check users against in XLineManager::CheckAll */
 	static std::list<XLineManager *> XLineManagers;
 

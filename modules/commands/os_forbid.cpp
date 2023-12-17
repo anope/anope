@@ -65,7 +65,7 @@ class MyForbidService : public ForbidService
 
 	inline std::vector<ForbidData *>& forbids(unsigned t) { return (*this->forbid_data)[t - 1]; }
 
- public:
+public:
 	MyForbidService(Module *m) : ForbidService(m), forbid_data("ForbidData") { }
 
 	~MyForbidService() override
@@ -149,7 +149,7 @@ class MyForbidService : public ForbidService
 class CommandOSForbid : public Command
 {
 	ServiceReference<ForbidService> fs;
- public:
+public:
 	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("ForbidService", "forbid")
 	{
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
@@ -436,7 +436,7 @@ class OSForbid : public Module
 	Serialize::Type forbiddata_type;
 	CommandOSForbid commandosforbid;
 
- public:
+public:
 	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		forbidService(this), forbiddata_type("ForbidData", ForbidDataImpl::Unserialize), commandosforbid(this)
 	{

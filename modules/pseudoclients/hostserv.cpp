@@ -14,7 +14,7 @@
 class HostServCore : public Module
 {
 	Reference<BotInfo> HostServ;
- public:
+public:
 	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)

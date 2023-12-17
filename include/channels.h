@@ -32,14 +32,14 @@ class CoreExport Channel : public Base, public Extensible
 {
 	static std::vector<Channel *> deleting;
 
- public:
+public:
 	typedef std::multimap<Anope::string, Anope::string> ModeList;
- private:
+private:
 	/** A map of channel modes with their parameters set on this channel
 	 */
 	ModeList modes;
 
- public:
+public:
 	/* Channel name */
 	Anope::string name;
 	/* Set if this channel is registered. ci->c == this. Contains information relevant to the registered channel */
@@ -73,14 +73,14 @@ class CoreExport Channel : public Base, public Extensible
 	int16_t chanserv_modecount;	/* Number of check_mode()'s this sec */
 	int16_t bouncy_modes;		/* Did we fail to set modes here? */
 
- private:
+private:
 	/** Constructor
 	 * @param name The channel name
 	 * @param ts The time the channel was created
 	 */
 	Channel(const Anope::string &nname, time_t ts = Anope::CurTime);
 
- public:
+public:
 	/** Destructor
 	 */
 	~Channel();

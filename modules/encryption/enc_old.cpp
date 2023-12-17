@@ -16,7 +16,7 @@ static ServiceReference<Encryption::Provider> md5("Encryption::Provider", "md5")
 
 class OldMD5Provider : public Encryption::Provider
 {
- public:
+public:
 	OldMD5Provider(Module *creator) : Encryption::Provider(creator, "oldmd5") { }
 
 	Encryption::Context *CreateContext(Encryption::IV *iv) override
@@ -40,7 +40,7 @@ class EOld : public Module
 
 	inline static char XTOI(char c) { return c > 9 ? c - 'A' + 10 : c - '0'; }
 
- public:
+public:
 	EOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		oldmd5provider(this)
 	{

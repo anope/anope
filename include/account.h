@@ -33,7 +33,7 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_created;
 
- public:
+public:
 	Anope::string nick;
 	Anope::string last_quit;
 	Anope::string last_realname;
@@ -110,7 +110,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 	Serialize::Checker<std::map<ChannelInfo *, int> > chanaccess;
 	/* Unique identifier for the account. */
 	uint64_t id;
- public:
+public:
 	/* Name of the account. Find(display)->nc == this. */
 	Anope::string display;
 	/* User password in form of hashm:data */
@@ -244,11 +244,11 @@ class CoreExport IdentifyRequest
 
 	static std::set<IdentifyRequest *> Requests;
 
- protected:
+protected:
 	IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass);
 	virtual ~IdentifyRequest();
 
- public:
+public:
 	/* One of these is called when the request goes through */
 	virtual void OnSuccess() = 0;
 	virtual void OnFail() = 0;

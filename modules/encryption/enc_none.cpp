@@ -11,7 +11,7 @@
 
 class ENone : public Module
 {
- public:
+public:
 	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)

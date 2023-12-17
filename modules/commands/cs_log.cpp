@@ -295,7 +295,7 @@ class CSLog : public Module
 
 	std::vector<LogDefault> defaults;
 
- public:
+public:
 	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		MSService("MemoServService", "MemoServ"), commandcslog(this),
 		logsettings(this, "logsettings"), logsetting_type("LogSetting", LogSettingImpl::Unserialize)

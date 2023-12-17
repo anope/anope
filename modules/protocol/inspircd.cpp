@@ -28,7 +28,7 @@ static Anope::string rsquit_server, rsquit_id;
 
 class InspIRCdProto : public IRCDProto
 {
- private:
+private:
 	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
 	{
 		if (!Servers::Capab.count("CHGIDENT"))
@@ -61,7 +61,7 @@ class InspIRCdProto : public IRCDProto
 		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << (na ? na->nc->display : Anope::string());
 	}
 
- public:
+public:
 	PrimitiveExtensibleItem<ListLimits> maxlist;
 
 	InspIRCdProto(Module *creator) : IRCDProto(creator, "InspIRCd 3+"), maxlist(creator, "maxlist")
@@ -520,7 +520,7 @@ class InspIRCdProto : public IRCDProto
 
 class InspIRCdAutoOpMode : public ChannelModeList
 {
- public:
+public:
 	InspIRCdAutoOpMode(char mode) : ChannelModeList("AUTOOP", mode)
 	{
 	}
@@ -537,7 +537,7 @@ class InspIRCdExtBan : public ChannelModeVirtual<ChannelModeList>
 {
 	char ext;
 
- public:
+public:
 	InspIRCdExtBan(const Anope::string &mname, const Anope::string &basename, char extban) : ChannelModeVirtual<ChannelModeList>(mname, basename)
 		, ext(extban)
 	{
@@ -563,7 +563,7 @@ namespace InspIRCdExtban
 {
 	class EntryMatcher : public InspIRCdExtBan
 	{
-	 public:
+	public:
 		EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
 		{
 		}
@@ -579,7 +579,7 @@ namespace InspIRCdExtban
 
 	class ChannelMatcher : public InspIRCdExtBan
 	{
-	 public:
+	public:
 		ChannelMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
 		{
 		}
@@ -615,7 +615,7 @@ namespace InspIRCdExtban
 
 	class AccountMatcher : public InspIRCdExtBan
 	{
-	 public:
+	public:
 		AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
 		{
 		}
@@ -631,7 +631,7 @@ namespace InspIRCdExtban
 
 	class RealnameMatcher : public InspIRCdExtBan
 	{
-	 public:
+	public:
 		RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
 		{
 		}
@@ -646,7 +646,7 @@ namespace InspIRCdExtban
 
 	class ServerMatcher : public InspIRCdExtBan
 	{
-	 public:
+	public:
 		ServerMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
 		{
 		}
@@ -661,7 +661,7 @@ namespace InspIRCdExtban
 
 	class FingerprintMatcher : public InspIRCdExtBan
 	{
-	 public:
+	public:
 		FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
 		{
 		}
@@ -676,7 +676,7 @@ namespace InspIRCdExtban
 
 	class UnidentifiedMatcher : public InspIRCdExtBan
 	{
-	 public:
+	public:
 		UnidentifiedMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
 		{
 		}
@@ -692,7 +692,7 @@ namespace InspIRCdExtban
 
 class ColonDelimitedParamMode : public ChannelModeParam
 {
- public:
+public:
 	ColonDelimitedParamMode(const Anope::string &modename, char modeChar) : ChannelModeParam(modename, modeChar, true) { }
 
 	bool IsValid(Anope::string &value) const override
@@ -741,7 +741,7 @@ class ColonDelimitedParamMode : public ChannelModeParam
 
 class SimpleNumberParamMode : public ChannelModeParam
 {
- public:
+public:
 	SimpleNumberParamMode(const Anope::string &modename, char modeChar) : ChannelModeParam(modename, modeChar, true) { }
 
 	bool IsValid(Anope::string &value) const override
@@ -766,7 +766,7 @@ class SimpleNumberParamMode : public ChannelModeParam
 
 class ChannelModeFlood : public ColonDelimitedParamMode
 {
- public:
+public:
 	ChannelModeFlood(char modeChar) : ColonDelimitedParamMode("FLOOD", modeChar) { }
 
 	bool IsValid(Anope::string &value) const override
@@ -780,7 +780,7 @@ class ChannelModeFlood : public ColonDelimitedParamMode
 
 class ChannelModeHistory : public ColonDelimitedParamMode
 {
- public:
+public:
 	ChannelModeHistory(char modeChar) : ColonDelimitedParamMode("HISTORY", modeChar) { }
 
 	bool IsValid(Anope::string &value) const override
@@ -791,7 +791,7 @@ class ChannelModeHistory : public ColonDelimitedParamMode
 
 class ChannelModeRedirect : public ChannelModeParam
 {
- public:
+public:
 	ChannelModeRedirect(char modeChar) : ChannelModeParam("REDIRECT", modeChar, true) { }
 
 	bool IsValid(Anope::string &value) const override
@@ -1351,7 +1351,7 @@ class IRCDMessageMetadata : IRCDMessage
 	const bool &do_mlock;
 	PrimitiveExtensibleItem<ListLimits> &maxlist;
 
- public:
+public:
 	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock, PrimitiveExtensibleItem<ListLimits> &listlimits) : IRCDMessage(creator, "METADATA", 3), do_topiclock(handle_topiclock), do_mlock(handle_mlock), maxlist(listlimits) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
@@ -1907,7 +1907,7 @@ class ProtoInspIRCd : public Module
 		UplinkSocket::Message(Me) << "METADATA " << c->name << " " << c->creation_time << " " << metadataname << " :" << value;
 	}
 
- public:
+public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this), ssl(this, "ssl"),
 		message_error(this), message_invite(this), message_kill(this), message_motd(this), message_notice(this),

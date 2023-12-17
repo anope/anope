@@ -224,7 +224,7 @@ class CommandNSAJoin : public Command
 			nc->Shrink<AJoinList>("ajoinlist");
 	}
 
- public:
+public:
 	CommandNSAJoin(Module *creator) : Command(creator, "nickserv/ajoin", 1, 4)
 	{
 		this->SetDesc(_("Manage your auto join list"));
@@ -303,7 +303,7 @@ class NSAJoin : public Module
 	ExtensibleItem<AJoinList> ajoinlist;
 	Serialize::Type ajoinentry_type;
 
- public:
+public:
 	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsajoin(this), ajoinlist(this, "ajoinlist"),
 		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize)

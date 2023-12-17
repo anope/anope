@@ -33,7 +33,7 @@ struct BadWord
 	BadWordType type;
 
 	virtual ~BadWord() = default;
- protected:
+protected:
 	BadWord() = default;
 };
 

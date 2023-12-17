@@ -23,7 +23,7 @@ class NickServCollide : public Timer
 	time_t ts;
 	Reference<NickAlias> na;
 
- public:
+public:
 	NickServCollide(Module *me, NickServService *nss, User *user, NickAlias *nick, time_t delay) : Timer(me, delay), service(nss), u(user), ts(user->timestamp), na(nick)
 	{
 		collides.insert(this);
@@ -62,7 +62,7 @@ class NickServHeld : public Timer
 {
 	Reference<NickAlias> na;
 	Anope::string nick;
- public:
+public:
 	NickServHeld(Module *me, NickAlias *n, long l) : Timer(me, l), na(n), nick(na->nick)
 	{
 		n->Extend<bool>("HELD");
@@ -84,7 +84,7 @@ class NickServRelease : public User, public Timer
 {
 	Anope::string nick;
 
- public:
+public:
 	NickServRelease(Module *me, NickAlias *na, time_t delay) : User(na->nick, Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser", "user"),
 		Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost", Me->GetName()), "", "", Me, "Services Enforcer", Anope::CurTime, "", IRCD->UID_Retrieve(), NULL), Timer(me, delay), nick(na->nick)
 	{
@@ -131,7 +131,7 @@ class NickServCore : public Module, public NickServService
 		}
 	}
 
- public:
+public:
 	NickServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		NickServService(this), held(this, "HELD"), collided(this, "COLLIDED")
 	{

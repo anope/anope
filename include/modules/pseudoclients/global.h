@@ -10,7 +10,7 @@
 
 class GlobalService : public Service
 {
- public:
+public:
 	GlobalService(Module *m) : Service(m, "GlobalService", "Global")
 	{
 	}

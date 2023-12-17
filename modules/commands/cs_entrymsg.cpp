@@ -99,7 +99,7 @@ Serializable* EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data
 
 class CommandEntryMessage : public Command
 {
- private:
+private:
 	void DoList(CommandSource &source, ChannelInfo *ci)
 	{
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
@@ -187,7 +187,7 @@ class CommandEntryMessage : public Command
 		source.Reply(_("Entry messages for \002%s\002 have been cleared."), ci->name.c_str());
 	}
 
- public:
+public:
 	CommandEntryMessage(Module *creator) : Command(creator, "chanserv/entrymsg", 2, 3)
 	{
 		this->SetDesc(_("Manage the channel's entry messages"));
@@ -266,7 +266,7 @@ class CSEntryMessage : public Module
 	ExtensibleItem<EntryMessageListImpl> eml;
 	Serialize::Type entrymsg_type;
 
- public:
+public:
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 	commandentrymsg(this),
 	eml(this, "entrymsg"), entrymsg_type("EntryMsg", EntryMsgImpl::Unserialize)

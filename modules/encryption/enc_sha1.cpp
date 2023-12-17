@@ -106,7 +106,7 @@ class SHA1Context : public Encryption::Context
 		a = b = c = d = e = 0;
 	}
 
- public:
+public:
 	SHA1Context(Encryption::IV *iv = NULL)
 	{
 		if (iv != NULL)
@@ -180,7 +180,7 @@ class SHA1Context : public Encryption::Context
 
 class SHA1Provider : public Encryption::Provider
 {
- public:
+public:
 	SHA1Provider(Module *creator) : Encryption::Provider(creator, "sha1") { }
 
 	Encryption::Context *CreateContext(Encryption::IV *iv) override
@@ -201,7 +201,7 @@ class ESHA1 : public Module
 {
 	SHA1Provider sha1provider;
 
- public:
+public:
 	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		sha1provider(this)
 	{

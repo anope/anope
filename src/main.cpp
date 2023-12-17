@@ -43,7 +43,7 @@ size_t Anope::CurrentUplink = -1;
 
 class UpdateTimer : public Timer
 {
- public:
+public:
 	UpdateTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
 
 	void Tick(time_t) override
@@ -54,7 +54,7 @@ class UpdateTimer : public Timer
 
 class ExpireTimer : public Timer
 {
- public:
+public:
 	ExpireTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
 
 	void Tick(time_t) override

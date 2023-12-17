@@ -34,7 +34,7 @@ struct NewsItem : Serializable
 
 class NewsService : public Service
 {
- public:
+public:
 	NewsService(Module *m) : Service(m, "NewsService", "news") { }
 
 	virtual NewsItem *CreateNewsItem() = 0;

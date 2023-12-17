@@ -10,7 +10,7 @@
 
 class LDAPException : public ModuleException
 {
- public:
+public:
 	LDAPException(const Anope::string &reason) : ModuleException(reason) { }
 
 	virtual ~LDAPException() noexcept = default;
@@ -111,7 +111,7 @@ struct LDAPResult
 
 class LDAPInterface
 {
- public:
+public:
 	Module *owner;
 
 	LDAPInterface(Module *m) : owner(m) { }
@@ -124,7 +124,7 @@ class LDAPInterface
 
 class LDAPProvider : public Service
 {
- public:
+public:
 	LDAPProvider(Module *c, const Anope::string &n) : Service(c, "LDAPProvider", n) { }
 
 	/** Attempt to bind to the LDAP server as an admin

@@ -41,7 +41,7 @@ class CommandCSUp : public Command
 			}
 		}
 	}
- public:
+public:
 	CommandCSUp(Module *creator) : Command(creator, "chanserv/up", 0, 2)
 	{
 		this->SetDesc(_("Updates a selected nicks status on a channel"));
@@ -139,7 +139,7 @@ class CommandCSDown : public Command
 				c->RemoveMode(NULL, ModeManager::FindChannelModeByChar(cu->status.Modes()[--i]), u->GetUID());
 	}
 
- public:
+public:
 	CommandCSDown(Module *creator) : Command(creator, "chanserv/down", 0, 2)
 	{
 		this->SetDesc(_("Removes a selected nicks status from a channel"));
@@ -231,7 +231,7 @@ class CSUpDown : public Module
 	CommandCSUp commandcsup;
 	CommandCSDown commandcsdown;
 
- public:
+public:
 	CSUpDown(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsup(this), commandcsdown(this)
 	{

@@ -19,7 +19,7 @@ static ServiceReference<IRCDProto> ratbox("IRCDProto", "ratbox");
 
 class ChannelModeLargeBan : public ChannelMode
 {
- public:
+public:
 	ChannelModeLargeBan(const Anope::string &mname, char modeChar) : ChannelMode(mname, modeChar) { }
 
 	bool CanSet(User *u) const override
@@ -31,7 +31,7 @@ class ChannelModeLargeBan : public ChannelMode
 
 class SolanumProto : public IRCDProto
 {
- public:
+public:
 
 	SolanumProto(Module *creator) : IRCDProto(creator, "Solanum")
 	{
@@ -370,7 +370,7 @@ class ProtoSolanum : public Module
 		ModeManager::AddChannelMode(new ChannelMode("OPMODERATED", 'z'));
 	}
 
- public:
+public:
 	ProtoSolanum(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),

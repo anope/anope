@@ -90,7 +90,7 @@ static Anope::string GetAttribute(const Anope::string &command)
 
 class CommandNSSetMisc : public Command
 {
- public:
+public:
 	CommandNSSetMisc(Module *creator, const Anope::string &cname = "nickserv/set/misc", size_t min = 0) : Command(creator, cname, min, min + 1)
 	{
 		this->SetSyntax(_("[\037parameter\037]"));
@@ -163,7 +163,7 @@ class CommandNSSetMisc : public Command
 
 class CommandNSSASetMisc : public CommandNSSetMisc
 {
- public:
+public:
 	CommandNSSASetMisc(Module *creator) : CommandNSSetMisc(creator, "nickserv/saset/misc", 1)
 	{
 		this->ClearSyntax();
@@ -182,7 +182,7 @@ class NSSetMisc : public Module
 	CommandNSSASetMisc commandnssasetmisc;
 	Serialize::Type nsmiscdata_type;
 
- public:
+public:
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnssetmisc(this), commandnssasetmisc(this), nsmiscdata_type("NSMiscData", NSMiscData::Unserialize)
 	{

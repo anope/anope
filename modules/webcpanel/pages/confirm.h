@@ -14,7 +14,7 @@ namespace WebCPanel
 
 class Confirm : public WebPanelPage
 {
- public:
+public:
 	Confirm(const Anope::string &u) : WebPanelPage(u) { }
 
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) override;

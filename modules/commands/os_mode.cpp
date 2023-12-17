@@ -13,7 +13,7 @@
 
 class CommandOSMode : public Command
 {
- public:
+public:
 	CommandOSMode(Module *creator) : Command(creator, "operserv/mode", 2, 3)
 	{
 		this->SetDesc(_("Change channel modes"));
@@ -137,7 +137,7 @@ class CommandOSMode : public Command
 
 class CommandOSUMode : public Command
 {
- public:
+public:
 	CommandOSUMode(Module *creator) : Command(creator, "operserv/umode", 2, 2)
 	{
 		this->SetDesc(_("Change user modes"));
@@ -178,7 +178,7 @@ class OSMode : public Module
 	CommandOSMode commandosmode;
 	CommandOSUMode commandosumode;
 
- public:
+public:
 	OSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosmode(this), commandosumode(this)
 	{

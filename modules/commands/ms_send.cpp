@@ -18,7 +18,7 @@ namespace
 
 class CommandMSSend : public Command
 {
- public:
+public:
 	CommandMSSend(Module *creator) : Command(creator, "memoserv/send", 2, 2)
 	{
 		this->SetDesc(_("Send a memo to a nick or channel"));
@@ -75,7 +75,7 @@ class MSSend : public Module
 {
 	CommandMSSend commandmssend;
 
- public:
+public:
 	MSSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmssend(this)
 	{

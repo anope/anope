@@ -42,7 +42,7 @@ struct CoreExport Oper
 
 class CoreExport OperType
 {
- private:
+private:
 	/** The name of this opertype, e.g. "sra".
 	 */
 	Anope::string name;
@@ -65,7 +65,7 @@ class CoreExport OperType
 	/** Set of opertypes we inherit from
 	 */
 	std::set<OperType *> inheritances;
- public:
+public:
 	/** Modes to set when someone identifies using this opertype
 	 */
 	Anope::string modes;

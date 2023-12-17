@@ -13,7 +13,7 @@
 
 class CommandOSKill : public Command
 {
- public:
+public:
 	CommandOSKill(Module *creator) : Command(creator, "operserv/kill", 1, 2)
 	{
 		this->SetDesc(_("Kill a user"));
@@ -56,7 +56,7 @@ class OSKill : public Module
 {
 	CommandOSKill commandoskill;
 
- public:
+public:
 	OSKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoskill(this)
 	{

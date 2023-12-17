@@ -13,7 +13,7 @@
 
 class SGLineManager : public XLineManager
 {
- public:
+public:
 	SGLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sgline", 'G') { }
 
 	void OnMatch(User *u, XLine *x) override
@@ -67,7 +67,7 @@ class SQLineManager : public XLineManager
 {
 	ServiceReference<NickServService> nickserv;
 
- public:
+public:
 	SQLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sqline", 'Q'), nickserv("NickServService", "NickServ") { }
 
 	void OnMatch(User *u, XLine *x) override
@@ -144,7 +144,7 @@ class SQLineManager : public XLineManager
 
 class SNLineManager : public XLineManager
 {
- public:
+public:
 	SNLineManager(Module *creator) : XLineManager(creator, "xlinemanager/snline", 'N') { }
 
 	void OnMatch(User *u, XLine *x) override
@@ -187,7 +187,7 @@ class OperServCore : public Module
 	SQLineManager sqlines;
 	SNLineManager snlines;
 
- public:
+public:
 	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		sglines(this), sqlines(this), snlines(this)
 	{

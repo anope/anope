@@ -18,7 +18,7 @@ namespace
 
 class CommandMSSendAll : public Command
 {
- public:
+public:
 	CommandMSSendAll(Module *creator) : Command(creator, "memoserv/sendall", 1, 1)
 	{
 		this->SetDesc(_("Send a memo to all registered users"));
@@ -56,7 +56,7 @@ class MSSendAll : public Module
 {
 	CommandMSSendAll commandmssendall;
 
- public:
+public:
 	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmssendall(this)
 	{

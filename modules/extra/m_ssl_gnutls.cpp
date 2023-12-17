@@ -24,7 +24,7 @@ namespace GnuTLS { class X509CertCredentials; }
 
 class MySSLService : public SSLService
 {
- public:
+public:
 	MySSLService(Module *o, const Anope::string &n);
 
 	/** Initialize a socket to use SSL
@@ -35,7 +35,7 @@ class MySSLService : public SSLService
 
 class SSLSocketIO : public SocketIO
 {
- public:
+public:
 	gnutls_session_t sess = nullptr;
 	GnuTLS::X509CertCredentials* mycreds;
 
@@ -92,7 +92,7 @@ namespace GnuTLS
 {
 	class Init
 	{
-	 public:
+	public:
 		Init() { gnutls_global_init(); }
 		~Init() { gnutls_global_deinit(); }
 	};
@@ -103,7 +103,7 @@ namespace GnuTLS
 	{
 		gnutls_datum_t datum;
 
-	 public:
+	public:
 		Datum(const Anope::string &dat)
 		{
 			datum.data = reinterpret_cast<unsigned char *>(const_cast<char *>(dat.data()));
@@ -117,7 +117,7 @@ namespace GnuTLS
 	{
 		gnutls_dh_params_t dh_params = nullptr;
 
-	 public:
+	public:
 		void Import(const Anope::string &dhstr)
 		{
 			if (dh_params != NULL)
@@ -154,7 +154,7 @@ namespace GnuTLS
 		 */
 		class RAIIKey
 		{
-		 public:
+		public:
 			gnutls_x509_privkey_t key;
 
 			RAIIKey()
@@ -170,7 +170,7 @@ namespace GnuTLS
 			}
 		} key;
 
-	 public:
+	public:
 		/** Import */
 		X509Key(const Anope::string &keystr)
 		{
@@ -186,7 +186,7 @@ namespace GnuTLS
 	{
 		std::vector<gnutls_x509_crt_t> certs;
 
-	 public:
+	public:
 		/** Import */
 		X509CertList(const Anope::string &certstr)
 		{
@@ -240,7 +240,7 @@ namespace GnuTLS
 		static int cert_callback(gnutls_session_t sess, const gnutls_datum_t* req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length, gnutls_retr2_st* st);
 		#endif
 
-	 public:
+	public:
 		X509CertList certs;
 		X509Key key;
 
@@ -296,7 +296,7 @@ class GnuTLSModule : public Module
 {
 	GnuTLS::Init libinit;
 
- public:
+public:
 	GnuTLS::X509CertCredentials *cred = nullptr;
 	MySSLService service;
 

@@ -61,7 +61,7 @@ class OSIgnoreService : public IgnoreService
 {
 	Serialize::Checker<std::vector<IgnoreData *> > ignores;
 
- public:
+public:
 	OSIgnoreService(Module *o) : IgnoreService(o), ignores("IgnoreData") { }
 
 	void AddIgnore(IgnoreData *ign) override
@@ -156,7 +156,7 @@ class OSIgnoreService : public IgnoreService
 
 class CommandOSIgnore : public Command
 {
- private:
+private:
 	Anope::string RealMask(const Anope::string &mask)
 	{
 		/* If it s an existing user, we ignore the hostmask. */
@@ -335,7 +335,7 @@ class CommandOSIgnore : public Command
 		return;
 	}
 
- public:
+public:
 	CommandOSIgnore(Module *creator) : Command(creator, "operserv/ignore", 1, 4)
 	{
 		this->SetDesc(_("Modify the services ignore list"));
@@ -397,7 +397,7 @@ class OSIgnore : public Module
 	OSIgnoreService osignoreservice;
 	CommandOSIgnore commandosignore;
 
- public:
+public:
 	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		ignoredata_type("IgnoreData", IgnoreDataImpl::Unserialize), osignoreservice(this), commandosignore(this)
 	{

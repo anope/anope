@@ -39,7 +39,7 @@ class MySessionService : public SessionService
 {
 	SessionMap Sessions;
 	Serialize::Checker<ExceptionVector> Exceptions;
- public:
+public:
 	MySessionService(Module *m) : SessionService(m), Exceptions("Exception") { }
 
 	Exception *CreateException() override
@@ -128,11 +128,11 @@ class MySessionService : public SessionService
 
 class ExceptionDelCallback : public NumberList
 {
- protected:
+protected:
 	CommandSource &source;
 	unsigned deleted = 0;
 	Command *cmd;
- public:
+public:
 	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), cmd(c)
 	{
 	}
@@ -170,7 +170,7 @@ class ExceptionDelCallback : public NumberList
 
 class CommandOSSession : public Command
 {
- private:
+private:
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
@@ -235,7 +235,7 @@ class CommandOSSession : public Command
 		else
 			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002 because it matches entry: \002%s\002."), session->addr.mask().c_str(), session->count, limit, entry.c_str());
 	}
- public:
+public:
 	CommandOSSession(Module *creator) : Command(creator, "operserv/session", 2, 2)
 	{
 		this->SetDesc(_("View the list of host sessions"));
@@ -283,7 +283,7 @@ class CommandOSSession : public Command
 
 class CommandOSException : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask, expiry, limitstr;
@@ -435,7 +435,7 @@ class CommandOSException : public Command
 			{
 				CommandSource &source;
 				ListFormatter &list;
-			 public:
+			public:
 				ExceptionListCallback(CommandSource &_source, ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), source(_source), list(_list)
 				{
 				}
@@ -511,7 +511,7 @@ class CommandOSException : public Command
 		this->ProcessList(source, params, list);
 	}
 
- public:
+public:
 	CommandOSException(Module *creator) : Command(creator, "operserv/exception", 1, 5)
 	{
 		this->SetDesc(_("Modify the session-limit exception list"));
@@ -585,7 +585,7 @@ class OSSession : public Module
 	CommandOSException commandosexception;
 	ServiceReference<XLineManager> akills;
 
- public:
+public:
 	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		exception_type("Exception", Exception::Unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
 	{

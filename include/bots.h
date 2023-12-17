@@ -23,7 +23,7 @@ class CoreExport BotInfo : public User, public Serializable
 {
 	/* Channels this bot is assigned to */
 	Serialize::Checker<std::set<ChannelInfo *> > channels;
- public:
+public:
 	time_t created;
 	/* Last time this bot said something (via privmsg) */
 	time_t lastmsg;

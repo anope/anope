@@ -15,12 +15,12 @@ static Module *me;
 
 class TempBan : public Timer
 {
- private:
+private:
 	Anope::string channel;
 	Anope::string mask;
 	Anope::string mode;
 
- public:
+public:
 	TempBan(time_t seconds, Channel *c, const Anope::string &banmask, const Anope::string &mod) : Timer(me, seconds), channel(c->name), mask(banmask), mode(mod) { }
 
 	void Tick(time_t ctime) override
@@ -33,7 +33,7 @@ class TempBan : public Timer
 
 class CommandCSBan : public Command
 {
- public:
+public:
 	CommandCSBan(Module *creator) : Command(creator, "chanserv/ban", 2, 4)
 	{
 		this->SetDesc(_("Bans a given nick or mask on a channel"));
@@ -241,7 +241,7 @@ class CSBan : public Module
 {
 	CommandCSBan commandcsban;
 
- public:
+public:
 	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsban(this)
 	{
 		me = this;

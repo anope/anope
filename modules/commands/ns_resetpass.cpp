@@ -15,7 +15,7 @@ static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi);
 
 class CommandNSResetPass : public Command
 {
- public:
+public:
 	CommandNSResetPass(Module *creator) : Command(creator, "nickserv/resetpass", 2, 2)
 	{
 		this->SetDesc(_("Helps you reset lost passwords"));
@@ -65,7 +65,7 @@ class NSResetPass : public Module
 	CommandNSResetPass commandnsresetpass;
 	PrimitiveExtensibleItem<ResetInfo> reset;
 
- public:
+public:
 	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsresetpass(this), reset(this, "reset")
 	{

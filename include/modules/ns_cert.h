@@ -13,9 +13,9 @@
 
 struct NSCertList
 {
- protected:
+protected:
 	NSCertList() = default;
- public:
+public:
 	virtual ~NSCertList() = default;
 
 	/** Add an entry to the nick's certificate list
@@ -65,7 +65,7 @@ struct NSCertList
 
 class CertService : public Service
 {
- public:
+public:
 	CertService(Module *c) : Service(c, "CertService", "certs") { }
 
 	virtual NickCore* FindAccountFromCert(const Anope::string &cert) = 0;

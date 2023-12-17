@@ -10,7 +10,7 @@
 
 class ChanServService : public Service
 {
- public:
+public:
 	ChanServService(Module *m) : Service(m, "ChanServService", "ChanServ")
 	{
 	}

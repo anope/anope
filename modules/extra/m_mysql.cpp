@@ -63,7 +63,7 @@ class MySQLResult : public Result
 {
 	MYSQL_RES *res = nullptr;
 
- public:
+public:
 	MySQLResult(unsigned int i, const Query &q, const Anope::string &fq, MYSQL_RES *r) : Result(i, q, fq), res(r)
 	{
 		unsigned num_fields = res ? mysql_num_fields(res) : 0;
@@ -124,7 +124,7 @@ class MySQLService : public Provider
 	 */
 	Anope::string Escape(const Anope::string &query);
 
- public:
+public:
 	/* Locked by the SQL thread when a query is pending on this database,
 	 * prevents us from deleting a connection while a query is executing
 	 * in the thread
@@ -158,7 +158,7 @@ class MySQLService : public Provider
  */
 class DispatcherThread : public Thread, public Condition
 {
- public:
+public:
 	DispatcherThread() : Thread() { }
 
 	void Run() override;
@@ -170,7 +170,7 @@ class ModuleSQL : public Module, public Pipe
 {
 	/* SQL connections */
 	std::map<Anope::string, MySQLService *> MySQLServices;
- public:
+public:
 	/* Pending query requests */
 	std::deque<QueryRequest> QueryRequests;
 	/* Pending finished requests with results */

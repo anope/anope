@@ -13,7 +13,7 @@
 
 class MySQLInterface : public SQL::Interface
 {
- public:
+public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
 	void OnResult(const SQL::Result &r) override
@@ -49,7 +49,7 @@ class IRC2SQL : public Module
 
 	void CheckTables();
 
- public:
+public:
 	IRC2SQL(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, EXTRA | VENDOR), sql("", ""), sqlinterface(this), versionreply(this, "CTCPVERSION")
 	{

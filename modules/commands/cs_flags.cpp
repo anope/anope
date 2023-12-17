@@ -15,7 +15,7 @@ static std::map<Anope::string, char> defaultFlags;
 
 class FlagsChanAccess : public ChanAccess
 {
- public:
+public:
 	std::set<char> flags;
 
 	FlagsChanAccess(AccessProvider *p) : ChanAccess(p)
@@ -61,7 +61,7 @@ class FlagsChanAccess : public ChanAccess
 
 class FlagsAccessProvider : public AccessProvider
 {
- public:
+public:
 	static FlagsAccessProvider *ap;
 
 	FlagsAccessProvider(Module *o) : AccessProvider(o, "access/flags")
@@ -375,7 +375,7 @@ class CommandCSFlags : public Command
 		return;
 	}
 
- public:
+public:
 	CommandCSFlags(Module *creator) : Command(creator, "chanserv/flags", 1, 5)
 	{
 		this->SetDesc(_("Modify the list of privileged users"));
@@ -480,7 +480,7 @@ class CSFlags : public Module
 	FlagsAccessProvider accessprovider;
 	CommandCSFlags commandcsflags;
 
- public:
+public:
 	CSFlags(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		accessprovider(this), commandcsflags(this)
 	{

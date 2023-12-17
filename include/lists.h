@@ -23,13 +23,13 @@
  */
 class CoreExport NumberList
 {
- private:
+private:
 	bool is_valid = true;
 
 	std::set<unsigned> numbers;
 
 	bool desc;
- public:
+public:
 	/** Processes a numbered list
 	 * @param list The list
 	 * @param descending True to make HandleNumber get called with numbers in descending order
@@ -62,13 +62,13 @@ class CoreExport NumberList
  */
 class CoreExport ListFormatter
 {
- public:
+public:
 	typedef std::map<Anope::string, Anope::string> ListEntry;
- private:
+private:
 	NickCore *nc;
 	std::vector<Anope::string> columns;
 	std::vector<ListEntry> entries;
- public:
+public:
 	ListFormatter(NickCore *nc);
 	ListFormatter &AddColumn(const Anope::string &name);
 	void AddEntry(const ListEntry &entry);
@@ -83,7 +83,7 @@ class CoreExport InfoFormatter
 	NickCore *nc;
 	std::vector<std::pair<Anope::string, Anope::string> > replies;
 	unsigned longest = 0;
- public:
+public:
 	InfoFormatter(NickCore *nc);
 	void Process(std::vector<Anope::string> &);
 	Anope::string &operator[](const Anope::string &key);

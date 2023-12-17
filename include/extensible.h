@@ -17,13 +17,13 @@ class Extensible;
 
 class CoreExport ExtensibleBase : public Service
 {
- protected:
+protected:
 	std::map<Extensible *, void *> items;
 
 	ExtensibleBase(Module *m, const Anope::string &n);
 	~ExtensibleBase();
 
- public:
+public:
 	virtual void Unset(Extensible *obj) = 0;
 
 	/* called when an object we are keep track of is serializing */
@@ -33,7 +33,7 @@ class CoreExport ExtensibleBase : public Service
 
 class CoreExport Extensible
 {
- public:
+public:
 	std::set<ExtensibleBase *> extension_items;
 
 	virtual ~Extensible();
@@ -55,10 +55,10 @@ class CoreExport Extensible
 template<typename T>
 class BaseExtensibleItem : public ExtensibleBase
 {
- protected:
+protected:
 	virtual T *Create(Extensible *) = 0;
 
- public:
+public:
 	BaseExtensibleItem(Module *m, const Anope::string &n) : ExtensibleBase(m, n) { }
 
 	~BaseExtensibleItem()
@@ -126,43 +126,43 @@ class BaseExtensibleItem : public ExtensibleBase
 template<typename T>
 class ExtensibleItem : public BaseExtensibleItem<T>
 {
- protected:
+protected:
 	T* Create(Extensible *obj) override
 	{
 		return new T(obj);
 	}
- public:
+public:
 	ExtensibleItem(Module *m, const Anope::string &n) : BaseExtensibleItem<T>(m, n) { }
 };
 
 template<typename T>
 class PrimitiveExtensibleItem : public BaseExtensibleItem<T>
 {
- protected:
+protected:
 	T* Create(Extensible *obj) override
 	{
 		return new T();
 	}
- public:
+public:
 	PrimitiveExtensibleItem(Module *m, const Anope::string &n) : BaseExtensibleItem<T>(m, n) { }
 };
 
 template<>
 class PrimitiveExtensibleItem<bool> : public BaseExtensibleItem<bool>
 {
- protected:
+protected:
 	bool* Create(Extensible *) override
 	{
 		return NULL;
 	}
- public:
+public:
 	PrimitiveExtensibleItem(Module *m, const Anope::string &n) : BaseExtensibleItem<bool>(m, n) { }
 };
 
 template<typename T>
 class SerializableExtensibleItem : public PrimitiveExtensibleItem<T>
 {
- public:
+public:
 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<T>(m, n) { }
 
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
@@ -184,7 +184,7 @@ class SerializableExtensibleItem : public PrimitiveExtensibleItem<T>
 template<>
 class SerializableExtensibleItem<bool> : public PrimitiveExtensibleItem<bool>
 {
- public:
+public:
 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<bool>(m, n) { }
 
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override

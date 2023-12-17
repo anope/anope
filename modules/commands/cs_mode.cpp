@@ -717,7 +717,7 @@ class CommandCSMode : public Command
 		this->DoSet(source, ci, new_params);
 	}
 
- public:
+public:
 	CommandCSMode(Module *creator) : Command(creator, "chanserv/mode", 2, 4)
 	{
 		this->SetDesc(_("Control modes and mode locks on a channel"));
@@ -791,7 +791,7 @@ static Anope::map<std::pair<bool, Anope::string> > modes;
 
 class CommandCSModes : public Command
 {
- public:
+public:
 	CommandCSModes(Module *creator) : Command(creator, "chanserv/modes", 1, 2)
 	{
 		this->SetSyntax(_("\037channel\037 [\037user\037]"));
@@ -913,7 +913,7 @@ class CSMode : public Module
 	ExtensibleItem<ModeLocksImpl> modelocks;
 	Serialize::Type modelocks_type;
 
- public:
+public:
 	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsmode(this), commandcsmodes(this),
 		modelocks(this, "modelocks"),

@@ -45,7 +45,7 @@ namespace Redis
 
 	class Interface
 	{
-	 public:
+	public:
 		Module *owner;
 
 		Interface(Module *m) : owner(m) { }
@@ -57,7 +57,7 @@ namespace Redis
 
 	class Provider : public Service
 	{
-	 public:
+	public:
 		Provider(Module *c, const Anope::string &n) : Service(c, "Redis::Provider", n) { }
 
 		virtual bool IsSocketDead() = 0;

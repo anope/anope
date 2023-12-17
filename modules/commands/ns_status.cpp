@@ -13,7 +13,7 @@
 
 class CommandNSStatus : public Command
 {
- public:
+public:
 	CommandNSStatus(Module *creator) : Command(creator, "nickserv/status", 0, 16)
 	{
 		this->SetDesc(_("Returns the owner status of the given nickname"));
@@ -76,7 +76,7 @@ class NSStatus : public Module
 {
 	CommandNSStatus commandnsstatus;
 
- public:
+public:
 	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsstatus(this)
 	{

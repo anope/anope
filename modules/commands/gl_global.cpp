@@ -15,7 +15,7 @@ class CommandGLGlobal : public Command
 {
 	ServiceReference<GlobalService> GService;
 
- public:
+public:
 	CommandGLGlobal(Module *creator) : Command(creator, "global/global", 1, 1), GService("GlobalService", "Global")
 	{
 		this->SetDesc(_("Send a message to all users"));
@@ -55,7 +55,7 @@ class GLGlobal : public Module
 {
 	CommandGLGlobal commandglglobal;
 
- public:
+public:
 	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandglglobal(this)
 	{

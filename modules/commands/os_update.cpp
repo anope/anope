@@ -13,7 +13,7 @@
 
 class CommandOSUpdate : public Command
 {
- public:
+public:
 	CommandOSUpdate(Module *creator) : Command(creator, "operserv/update", 0, 0)
 	{
 		this->SetDesc(_("Force the services databases to be updated immediately"));
@@ -41,7 +41,7 @@ class OSUpdate : public Module
 {
 	CommandOSUpdate commandosupdate;
 
- public:
+public:
 	OSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosupdate(this)
 	{

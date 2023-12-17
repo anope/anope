@@ -13,7 +13,7 @@ using namespace SQL;
 
 class DBMySQL : public Module, public Pipe
 {
- private:
+private:
 	Anope::string prefix;
 	ServiceReference<Provider> SQL;
 	time_t lastwarn;
@@ -71,7 +71,7 @@ class DBMySQL : public Module, public Pipe
 		throw SQL::Exception("No SQL!");
 	}
 
- public:
+public:
 	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), SQL("", "")
 	{
 		this->lastwarn = 0;

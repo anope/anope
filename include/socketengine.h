@@ -17,7 +17,7 @@
 class CoreExport SocketEngine
 {
 	static const int DefaultSize = 2; // Uplink, mode stacker
- public:
+public:
 	/* Map of sockets */
 	static std::map<int, Socket *> Sockets;
 

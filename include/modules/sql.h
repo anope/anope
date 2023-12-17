@@ -13,7 +13,7 @@ namespace SQL
 
 	class Data : public Serialize::Data
 	{
-	 public:
+	public:
 		typedef std::map<Anope::string, std::stringstream *> Map;
 		Map data;
 		std::map<Anope::string, Type> types;
@@ -83,7 +83,7 @@ namespace SQL
 	 */
 	class Exception : public ModuleException
 	{
-	 public:
+	public:
 		Exception(const Anope::string &reason) : ModuleException(reason) { }
 
 		virtual ~Exception() noexcept = default;
@@ -139,12 +139,12 @@ namespace SQL
 	 */
 	class Result
 	{
-	 protected:
+	protected:
 		/* Rows, column, item */
 		std::vector<std::map<Anope::string, Anope::string> > entries;
 		Query query;
 		Anope::string error;
-	 public:
+	public:
 		unsigned int id = 0;
 		Anope::string finished_query;
 
@@ -187,7 +187,7 @@ namespace SQL
 	 */
 	class Interface
 	{
-	 public:
+	public:
 		Module *owner;
 
 		Interface(Module *m) : owner(m) { }
@@ -201,7 +201,7 @@ namespace SQL
 	 */
 	class Provider : public Service
 	{
-	 public:
+	public:
 		Provider(Module *c, const Anope::string &n) : Service(c, "SQL::Provider", n) { }
 
 		virtual void Run(Interface *i, const Query &query) = 0;

@@ -14,7 +14,7 @@ class SQLLog : public Module
 	std::set<Anope::string> inited;
 	Anope::string table;
 
- public:
+public:
 	SQLLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
 	{
 	}

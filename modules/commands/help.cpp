@@ -26,7 +26,7 @@ class CommandHelp : public Command
 		return NULL;
 	}
 
- public:
+public:
 	CommandHelp(Module *creator) : Command(creator, "generic/help", 0)
 	{
 		this->SetDesc(_("Displays this list and give information about commands"));
@@ -186,7 +186,7 @@ class Help : public Module
 {
 	CommandHelp commandhelp;
 
- public:
+public:
 	Help(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhelp(this)
 	{

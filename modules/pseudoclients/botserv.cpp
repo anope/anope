@@ -16,7 +16,7 @@ class BotServCore : public Module
 	Reference<BotInfo> BotServ;
 	ExtensibleRef<bool> persist, inhabit;
 
- public:
+public:
 	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		persist("PERSIST"), inhabit("inhabit")
 	{

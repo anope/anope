@@ -40,7 +40,7 @@ class IdentifyInterface : public LDAPInterface
 {
 	IdentifyInfo *ii;
 
- public:
+public:
 	IdentifyInterface(Module *m, IdentifyInfo *i) : LDAPInterface(m), ii(i) { }
 
 	~IdentifyInterface()
@@ -131,7 +131,7 @@ class OnIdentifyInterface : public LDAPInterface
 {
 	Anope::string uid;
 
- public:
+public:
 	OnIdentifyInterface(Module *m, const Anope::string &i) : LDAPInterface(m), uid(i) { }
 
 	void OnDelete() override
@@ -174,7 +174,7 @@ class OnIdentifyInterface : public LDAPInterface
 
 class OnRegisterInterface : public LDAPInterface
 {
- public:
+public:
 	OnRegisterInterface(Module *m) : LDAPInterface(m) { }
 
 	void OnResult(const LDAPResult &r) override
@@ -198,7 +198,7 @@ class ModuleLDAPAuthentication : public Module
 	Anope::string password_attribute;
 	Anope::string disable_register_reason;
 	Anope::string disable_email_reason;
- public:
+public:
 	ModuleLDAPAuthentication(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), orinterface(this),
 		dn(this, "m_ldap_authentication_dn")

@@ -96,7 +96,7 @@ struct MyNewsItem : NewsItem
 class MyNewsService : public NewsService
 {
 	std::vector<NewsItem *> newsItems[3];
- public:
+public:
 	MyNewsService(Module *m) : NewsService(m) { }
 
 	~MyNewsService() override
@@ -146,7 +146,7 @@ class NewsBase : public Command
 {
 	ServiceReference<NewsService> ns;
 
- protected:
+protected:
 	void DoList(CommandSource &source, NewsType ntype, const char **msgs)
 	{
 		std::vector<NewsItem *> &list = this->ns->GetNewsList(ntype);
@@ -274,7 +274,7 @@ class NewsBase : public Command
 
 		return;
 	}
- public:
+public:
 	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2), ns("NewsService", "news")
 	{
 		this->SetSyntax(_("ADD \037text\037"));
@@ -293,7 +293,7 @@ class NewsBase : public Command
 
 class CommandOSLogonNews : public NewsBase
 {
- public:
+public:
 	CommandOSLogonNews(Module *creator) : NewsBase(creator, "operserv/logonnews")
 	{
 		this->SetDesc(_("Define messages to be shown to users at logon"));
@@ -320,7 +320,7 @@ class CommandOSLogonNews : public NewsBase
 
 class CommandOSOperNews : public NewsBase
 {
- public:
+public:
 	CommandOSOperNews(Module *creator) : NewsBase(creator, "operserv/opernews")
 	{
 		this->SetDesc(_("Define messages to be shown to users who oper"));
@@ -347,7 +347,7 @@ class CommandOSOperNews : public NewsBase
 
 class CommandOSRandomNews : public NewsBase
 {
- public:
+public:
 	CommandOSRandomNews(Module *creator) : NewsBase(creator, "operserv/randomnews")
 	{
 		this->SetDesc(_("Define messages to be randomly shown to users at logon"));
@@ -433,7 +433,7 @@ class OSNews : public Module
 			cur_rand_news = 0;
 	}
 
- public:
+public:
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		newsservice(this), newsitem_type("NewsItem", MyNewsItem::Unserialize),
 		commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)

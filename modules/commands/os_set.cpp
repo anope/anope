@@ -13,7 +13,7 @@
 
 class CommandOSSet : public Command
 {
- private:
+private:
 	void DoList(CommandSource &source)
 	{
 		Log(LOG_ADMIN, source, this) << "LIST";
@@ -163,7 +163,7 @@ class CommandOSSet : public Command
 
 		return;
 	}
- public:
+public:
 	CommandOSSet(Module *creator) : Command(creator, "operserv/set", 1, 2)
 	{
 		this->SetDesc(_("Set various global services options"));
@@ -257,7 +257,7 @@ class OSSet : public Module
 {
 	CommandOSSet commandosset;
 
- public:
+public:
 	OSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosset(this)
 	{

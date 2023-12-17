@@ -210,7 +210,7 @@ class CommandCSAKick : public Command
 				Command *c;
 				unsigned deleted = 0;
 				AccessGroup ag;
-			 public:
+			public:
 				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), ag(source.AccessFor(ci))
 				{
 				}
@@ -285,7 +285,7 @@ class CommandCSAKick : public Command
 				ListFormatter &list;
 				ChannelInfo *ci;
 
-			 public:
+			public:
 				AkickListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
 				{
 				}
@@ -425,7 +425,7 @@ class CommandCSAKick : public Command
 		source.Reply(_("Channel %s akick list has been cleared."), ci->name.c_str());
 	}
 
- public:
+public:
 	CommandCSAKick(Module *creator) : Command(creator, "chanserv/akick", 2, 4)
 	{
 		this->SetDesc(_("Maintain the AutoKick list"));
@@ -529,7 +529,7 @@ class CSAKick : public Module
 {
 	CommandCSAKick commandcsakick;
 
- public:
+public:
 	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsakick(this)
 	{

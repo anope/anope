@@ -13,7 +13,7 @@
 
 class CommandHSOn : public Command
 {
- public:
+public:
 	CommandHSOn(Module *creator) : Command(creator, "hostserv/on", 0, 0)
 	{
 		this->SetDesc(_("Activates your assigned vhost"));
@@ -63,7 +63,7 @@ class HSOn : public Module
 {
 	CommandHSOn commandhson;
 
- public:
+public:
 	HSOn(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhson(this)
 	{

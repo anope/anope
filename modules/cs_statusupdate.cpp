@@ -10,7 +10,7 @@
 
 class StatusUpdate : public Module
 {
- public:
+public:
 	StatusUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
 

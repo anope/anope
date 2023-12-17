@@ -24,13 +24,13 @@ namespace Anope
 	 */
 	class CoreExport string
 	{
-	 private:
+	private:
 		/**
 		 * The actual string is stored in an std::string as it can be converted to
 		 * ci::string, or a C-style string at any time.
 		 */
 		std::string _string;
-	 public:
+	public:
 		/**
 		 * Extras.
 		 */
@@ -557,7 +557,7 @@ namespace Anope
  */
 class CoreExport sepstream
 {
- private:
+private:
 	/** Original string.
 	 */
 	Anope::string tokens;
@@ -570,7 +570,7 @@ class CoreExport sepstream
 	/** If set then GetToken() can return an empty string
 	 */
 	bool allow_empty;
- public:
+public:
 	/** Create a sepstream and fill it with the provided data
 	 */
 	sepstream(const Anope::string &source, char separator, bool allowempty = false);
@@ -626,7 +626,7 @@ class CoreExport sepstream
  */
 class commasepstream : public sepstream
 {
- public:
+public:
 	/** Initialize with comma separator
 	 */
 	commasepstream(const Anope::string &source, bool allowempty = false) : sepstream(source, ',', allowempty) { }
@@ -636,7 +636,7 @@ class commasepstream : public sepstream
  */
 class spacesepstream : public sepstream
 {
- public:
+public:
 	/** Initialize with space separator
 	 */
 	spacesepstream(const Anope::string &source) : sepstream(source, ' ') { }
@@ -650,14 +650,14 @@ class spacesepstream : public sepstream
  */
 class CoreException : public std::exception
 {
- protected:
+protected:
 	/** Holds the error message to be displayed
 	 */
 	Anope::string err;
 	/** Source of the exception
 	 */
 	Anope::string source;
- public:
+public:
 	/** Default constructor, just uses the error message 'Core threw an exception'.
 	 */
 	CoreException() : err("Core threw an exception"), source("The core") { }
@@ -689,7 +689,7 @@ class CoreException : public std::exception
 
 class ModuleException : public CoreException
 {
- public:
+public:
 	/** Default constructor, just uses the error message 'Module threw an exception'.
 	 */
 	ModuleException() : CoreException("Module threw an exception", "A Module") { }
@@ -706,7 +706,7 @@ class ModuleException : public CoreException
 
 class ConvertException : public CoreException
 {
- public:
+public:
 	ConvertException(const Anope::string &reason = "") : CoreException(reason) { }
 
 	virtual ~ConvertException() noexcept = default;

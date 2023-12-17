@@ -29,7 +29,7 @@ namespace Anope
 	template<typename char_type>
 	class ascii_ctype : public std::ctype<char_type>
 	{
-	 public:
+	public:
 		char_type do_toupper(char_type c) const override
 		{
 			if (c >= 'a' && c <= 'z')
@@ -51,7 +51,7 @@ namespace Anope
 	template<typename char_type>
 	class rfc1459_ctype : public ascii_ctype<char_type>
 	{
-	 public:
+	public:
 		char_type do_toupper(char_type c) const override
 		{
 			if (c == '{' || c == '}' || c == '|')

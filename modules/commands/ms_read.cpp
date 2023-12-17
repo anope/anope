@@ -53,7 +53,7 @@ class MemoListCallback : public NumberList
 	MemoInfo *mi;
 	const ChannelInfo *ci;
 	bool found;
- public:
+public:
 	MemoListCallback(CommandSource &_source, MemoInfo *_mi, const ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi), ci(_ci)
 	{
 		found = false;
@@ -106,7 +106,7 @@ class MemoListCallback : public NumberList
 
 class CommandMSRead : public Command
 {
- public:
+public:
 	CommandMSRead(Module *creator) : Command(creator, "memoserv/read", 1, 2)
 	{
 		this->SetDesc(_("Read a memo or memos"));
@@ -213,7 +213,7 @@ class MSRead : public Module
 {
 	CommandMSRead commandmsread;
 
- public:
+public:
 	MSRead(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsread(this)
 	{

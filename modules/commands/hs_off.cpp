@@ -13,7 +13,7 @@
 
 class CommandHSOff : public Command
 {
- public:
+public:
 	CommandHSOff(Module *creator) : Command(creator, "hostserv/off", 0, 0)
 	{
 		this->SetDesc(_("Deactivates your assigned vhost"));
@@ -57,7 +57,7 @@ class HSOff : public Module
 {
 	CommandHSOff commandhsoff;
 
- public:
+public:
 	HSOff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsoff(this)
 	{

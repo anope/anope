@@ -25,11 +25,11 @@ namespace Configuration
 	{
 		friend struct Configuration::Conf;
 
-	 public:
+	public:
 		typedef Anope::map<Anope::string> item_map;
 		typedef Anope::multimap<Block> block_map;
 
-	 private:
+	private:
 		Anope::string name;
 		item_map items;
 		block_map blocks;
@@ -38,7 +38,7 @@ namespace Configuration
 		/* Represents a missing tag. */
 		static Block EmptyBlock;
 
-	 public:
+	public:
 		Block(const Anope::string &);
 		const Anope::string &GetName() const;
 		int CountBlock(const Anope::string &name) const;
@@ -83,7 +83,7 @@ namespace Configuration
 		Anope::string name;
 		bool executable;
 		FILE *fp = nullptr;
-	 public:
+	public:
 		File(const Anope::string &, bool);
 		~File();
 		const Anope::string &GetName() const;
@@ -173,7 +173,7 @@ namespace Configuration
  */
 class ConfigException : public CoreException
 {
- public:
+public:
 	/** Default constructor, just uses the error message 'Config threw an exception'.
 	 */
 	ConfigException() : CoreException("Config threw an exception", "Config Parser") { }

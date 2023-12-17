@@ -14,7 +14,7 @@
 
 class CommandCSSetKeepTopic : public Command
 {
- public:
+public:
 	CommandCSSetKeepTopic(Module *creator, const Anope::string &cname = "chanserv/set/keeptopic") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Retain topic when channel is not in use"));
@@ -142,7 +142,7 @@ class CommandCSTopic : public Command
 		this->Set(source, ci, new_topic);
 	}
 
- public:
+public:
 	CommandCSTopic(Module *creator) : Command(creator, "chanserv/topic", 2, 3),
 		topiclock("TOPICLOCK")
 	{
@@ -209,7 +209,7 @@ class CSTopic : public Module
 
 	SerializableExtensibleItem<bool> topiclock, keeptopic;
 
- public:
+public:
 	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcstopic(this), commandcssetkeeptopic(this), topiclock(this, "TOPICLOCK"), keeptopic(this, "KEEPTOPIC")
 	{

@@ -13,7 +13,7 @@
 
 class CommandMSCancel : public Command
 {
- public:
+public:
 	CommandMSCancel(Module *creator) : Command(creator, "memoserv/cancel", 1, 1)
 	{
 		this->SetDesc(_("Cancel the last memo you sent"));
@@ -91,7 +91,7 @@ class MSCancel : public Module
 {
 	CommandMSCancel commandmscancel;
 
- public:
+public:
 	MSCancel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmscancel(this)
 	{

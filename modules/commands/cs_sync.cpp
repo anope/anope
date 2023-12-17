@@ -13,7 +13,7 @@
 
 class CommandCSSync : public Command
 {
- public:
+public:
 	CommandCSSync(Module *creator) : Command(creator, "chanserv/sync", 1, 1)
 	{
 		this->SetDesc(_("Sync users channel modes"));
@@ -55,7 +55,7 @@ class CommandCSSync : public Command
 class CSSync : public Module
 {
 	CommandCSSync commandcssync;
- public:
+public:
 	CSSync(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcssync(this)
 	{

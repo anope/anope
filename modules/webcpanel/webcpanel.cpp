@@ -44,7 +44,7 @@ class ModuleWebCPanel : public Module
 	WebCPanel::OperServ::Akill operserv_akill;
 
 
- public:
+public:
 	ModuleWebCPanel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		panel(this, "webcpanel"),
 		id(this, "webcpanel_id"), ip(this, "webcpanel_ip"), last_login(this, "webcpanel_last_login"),

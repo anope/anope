@@ -36,7 +36,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 {
 	std::deque<XMLRPCEvent *> events;
 
- public:
+public:
 	MyXMLRPCServiceInterface(Module *creator, const Anope::string &sname) : XMLRPCServiceInterface(creator, sname), HTTPPage("/xmlrpc", "text/xml") { }
 
 	void Register(XMLRPCEvent *event) override
@@ -93,7 +93,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		return ret;
 	}
 
- private:
+private:
 	static bool GetData(Anope::string &content, Anope::string &tag, Anope::string &data)
 	{
 		if (content.empty())
@@ -144,7 +144,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		return !istag && !data.empty();
 	}
 
- public:
+public:
 	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
 	{
 		Anope::string content = message.content, tname, data;
@@ -197,7 +197,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 class ModuleXMLRPC : public Module
 {
 	ServiceReference<HTTPProvider> httpref;
- public:
+public:
 	MyXMLRPCServiceInterface xmlrpcinterface;
 
 	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),

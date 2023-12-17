@@ -16,7 +16,7 @@ class MyRedisService;
 class RedisSocket : public BinarySocket, public ConnectionSocket
 {
 	size_t ParseReply(Reply &r, const char *buf, size_t l);
- public:
+public:
 	MyRedisService *provider;
 	std::deque<Interface *> interfaces;
 	std::map<Anope::string, Interface *> subinterfaces;
@@ -33,7 +33,7 @@ class RedisSocket : public BinarySocket, public ConnectionSocket
 
 class Transaction : public Interface
 {
- public:
+public:
 	std::deque<Interface *> interfaces;
 
 	Transaction(Module *creator) : Interface(creator) { }
@@ -73,7 +73,7 @@ class Transaction : public Interface
 
 class MyRedisService : public Provider
 {
- public:
+public:
 	Anope::string host;
 	int port;
 	unsigned db;
@@ -107,7 +107,7 @@ class MyRedisService : public Provider
 		}
 	}
 
- private:
+private:
 	inline void Pack(std::vector<char> &buffer, const char *buf, size_t sz = 0)
 	{
 		if (!sz)
@@ -149,7 +149,7 @@ class MyRedisService : public Provider
 			s->interfaces.push_back(i);
 	}
 
- public:
+public:
 	bool IsSocketDead() override
 	{
 		return this->sock && this->sock->flags[SF_DEAD];
@@ -196,7 +196,7 @@ class MyRedisService : public Provider
 		this->SendCommand(i, args);
 	}
 
- public:
+public:
 	bool BlockAndProcess() override
 	{
 		if (!this->sock->ProcessWrite())
@@ -520,7 +520,7 @@ class ModuleRedis : public Module
 {
 	std::map<Anope::string, MyRedisService *> services;
 
- public:
+public:
 	ModuleRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 	}

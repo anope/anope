@@ -13,7 +13,7 @@
 
 class CommandCSInfo : public Command
 {
- public:
+public:
 	CommandCSInfo(Module *creator) : Command(creator, "chanserv/info", 1, 2)
 	{
 		this->SetDesc(_("Lists information about the specified registered channel"));
@@ -87,7 +87,7 @@ class CSInfo : public Module
 {
 	CommandCSInfo commandcsinfo;
 
- public:
+public:
 	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsinfo(this)
 	{

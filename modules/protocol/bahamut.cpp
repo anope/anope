@@ -13,7 +13,7 @@
 
 class ChannelModeFlood : public ChannelModeParam
 {
- public:
+public:
 	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
 
 	bool IsValid(Anope::string &value) const override
@@ -32,7 +32,7 @@ class ChannelModeFlood : public ChannelModeParam
 
 class BahamutIRCdProto : public IRCDProto
 {
- public:
+public:
 	BahamutIRCdProto(Module *creator) : IRCDProto(creator, "Bahamut 1.8.x")
 	{
 		DefaultPseudoclientModes = "+";
@@ -541,7 +541,7 @@ class ProtoBahamut : public Module
 		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
 	}
 
- public:
+public:
 	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_invite(this),

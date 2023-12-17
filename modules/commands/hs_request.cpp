@@ -72,7 +72,7 @@ class CommandHSRequest : public Command
 		return false;
 	}
 
- public:
+public:
 	CommandHSRequest(Module *creator) : Command(creator, "hostserv/request", 1, 1)
 	{
 		this->SetDesc(_("Request a vHost for your nick"));
@@ -187,7 +187,7 @@ class CommandHSRequest : public Command
 
 class CommandHSActivate : public Command
 {
- public:
+public:
 	CommandHSActivate(Module *creator) : Command(creator, "hostserv/activate", 1, 1)
 	{
 		this->SetDesc(_("Approve the requested vHost of a user"));
@@ -236,7 +236,7 @@ class CommandHSActivate : public Command
 
 class CommandHSReject : public Command
 {
- public:
+public:
 	CommandHSReject(Module *creator) : Command(creator, "hostserv/reject", 1, 2)
 	{
 		this->SetDesc(_("Reject the requested vHost of a user"));
@@ -292,7 +292,7 @@ class CommandHSReject : public Command
 
 class CommandHSWaiting : public Command
 {
- public:
+public:
 	CommandHSWaiting(Module *creator) : Command(creator, "hostserv/waiting", 0, 0)
 	{
 		this->SetDesc(_("Retrieves the vhost requests"));
@@ -357,7 +357,7 @@ class HSRequest : public Module
 	ExtensibleItem<HostRequest> hostrequest;
 	Serialize::Type request_type;
 
- public:
+public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsrequest(this), commandhsactive(this),
 		commandhsreject(this), commandhswaiting(this), hostrequest(this, "hostrequest"), request_type("HostRequest", HostRequest::Unserialize)

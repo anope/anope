@@ -18,7 +18,7 @@ class AkillDelCallback : public NumberList
 	CommandSource &source;
 	unsigned deleted = 0;
 	Command *cmd;
- public:
+public:
 	AkillDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), cmd(c)
 	{
 	}
@@ -57,7 +57,7 @@ class AkillDelCallback : public NumberList
 
 class CommandOSAKill : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string expiry, mask;
@@ -266,7 +266,7 @@ class CommandOSAKill : public Command
 			{
 				CommandSource &source;
 				ListFormatter &list;
-			 public:
+			public:
 				ListCallback(CommandSource &_source, ListFormatter &_list, const Anope::string &numstr) : NumberList(numstr, false), source(_source), list(_list)
 				{
 				}
@@ -379,7 +379,7 @@ class CommandOSAKill : public Command
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 	}
- public:
+public:
 	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 2)
 	{
 		this->SetDesc(_("Manipulate the AKILL list"));
@@ -472,7 +472,7 @@ class OSAKill : public Module
 {
 	CommandOSAKill commandosakill;
 
- public:
+public:
 	OSAKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosakill(this)
 	{

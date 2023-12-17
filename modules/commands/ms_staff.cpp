@@ -18,7 +18,7 @@ namespace
 
 class CommandMSStaff : public Command
 {
- public:
+public:
 	CommandMSStaff(Module *creator) : Command(creator, "memoserv/staff", 1, 1)
 	{
 		this->SetDesc(_("Send a memo to all opers/admins"));
@@ -53,7 +53,7 @@ class MSStaff : public Module
 {
 	CommandMSStaff commandmsstaff;
 
- public:
+public:
 	MSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsstaff(this)
 	{

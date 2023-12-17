@@ -15,7 +15,7 @@ static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sglin
 
 class CommandOSChanKill : public Command
 {
- public:
+public:
 	CommandOSChanKill(Module *creator) : Command(creator, "operserv/chankill", 2, 3)
 	{
 		this->SetDesc(_("AKILL all users on a specific channel"));
@@ -106,7 +106,7 @@ class OSChanKill : public Module
 {
 	CommandOSChanKill commandoschankill;
 
- public:
+public:
 	OSChanKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoschankill(this)
 	{

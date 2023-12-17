@@ -16,7 +16,7 @@ static DatabaseRedis *me;
 
 class Data : public Serialize::Data
 {
- public:
+public:
 	std::map<Anope::string, std::stringstream *> data;
 
 	~Data() override
@@ -54,7 +54,7 @@ class Data : public Serialize::Data
 class TypeLoader : public Interface
 {
 	Anope::string type;
- public:
+public:
 	TypeLoader(Module *creator, const Anope::string &t) : Interface(creator), type(t) { }
 
 	void OnResult(const Reply &r) override;
@@ -65,7 +65,7 @@ class ObjectLoader : public Interface
 	Anope::string type;
 	int64_t id;
 
- public:
+public:
 	ObjectLoader(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
 	void OnResult(const Reply &r) override;
@@ -74,7 +74,7 @@ class ObjectLoader : public Interface
 class IDInterface : public Interface
 {
 	Reference<Serializable> o;
- public:
+public:
 	IDInterface(Module *creator, Serializable *obj) : Interface(creator), o(obj) { }
 
 	void OnResult(const Reply &r) override;
@@ -84,7 +84,7 @@ class Deleter : public Interface
 {
 	Anope::string type;
 	int64_t id;
- public:
+public:
 	Deleter(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
 	void OnResult(const Reply &r) override;
@@ -94,7 +94,7 @@ class Updater : public Interface
 {
 	Anope::string type;
 	int64_t id;
- public:
+public:
 	Updater(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
 	void OnResult(const Reply &r) override;
@@ -104,7 +104,7 @@ class ModifiedObject : public Interface
 {
 	Anope::string type;
 	int64_t id;
- public:
+public:
 	ModifiedObject(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
 	void OnResult(const Reply &r) override;
@@ -112,7 +112,7 @@ class ModifiedObject : public Interface
 
 class SubscriptionListener : public Interface
 {
- public:
+public:
 	SubscriptionListener(Module *creator) : Interface(creator) { }
 
 	void OnResult(const Reply &r) override;
@@ -123,7 +123,7 @@ class DatabaseRedis : public Module, public Pipe
 	SubscriptionListener sl;
 	std::set<Serializable *> updated_items;
 
- public:
+public:
 	ServiceReference<Provider> redis;
 
 	DatabaseRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sl(this)

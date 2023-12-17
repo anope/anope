@@ -14,7 +14,7 @@
 
 class MySQLInterface : public SQL::Interface
 {
- public:
+public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
 	void OnResult(const SQL::Result &r) override
@@ -33,7 +33,7 @@ class MySQLInterface : public SQL::Interface
 
 class CommandCSStats : public Command
 {
- public:
+public:
 	CommandCSStats(Module *creator) : Command (creator, "chanserv/stats", 0, 2)
 	{
 		this->SetDesc(_("Displays your Channel Stats"));
@@ -45,7 +45,7 @@ class CommandCSStats : public Command
 
 class CommandCSGStats : public Command
 {
- public:
+public:
 	CommandCSGStats(Module *creator) : Command (creator, "chanserv/gstats", 0, 2)
 	{
 		this->SetDesc(_("Displays your Global Stats"));
@@ -65,7 +65,7 @@ class CSStats : public Module
 	ServiceReference<SQL::Provider> sql;
 	MySQLInterface sqlinterface;
 	Anope::string prefix;
- public:
+public:
 	CSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsstats(this), commandcsgstats(this), sql("", ""), sqlinterface(this)
 	{

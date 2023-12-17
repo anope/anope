@@ -13,7 +13,7 @@
 
 class CommandCSUnban : public Command
 {
- public:
+public:
 	CommandCSUnban(Module *creator) : Command(creator, "chanserv/unban", 0, 2)
 	{
 		this->SetDesc(_("Remove all bans preventing a user from entering a channel"));
@@ -119,7 +119,7 @@ class CSUnban : public Module
 {
 	CommandCSUnban commandcsunban;
 
- public:
+public:
 	CSUnban(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsunban(this)
 	{

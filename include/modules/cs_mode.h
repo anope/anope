@@ -21,7 +21,7 @@ struct ModeLock
 	time_t created;
 
 	virtual ~ModeLock() = default;
- protected:
+protected:
 	ModeLock() = default;
 };
 

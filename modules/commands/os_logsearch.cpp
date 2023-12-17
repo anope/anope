@@ -26,7 +26,7 @@ class CommandOSLogSearch : public Command
 		return Anope::LogDir + "/" + file + "." + timestamp;
 	}
 
- public:
+public:
 	CommandOSLogSearch(Module *creator) : Command(creator, "operserv/logsearch", 1, 3)
 	{
 		this->SetDesc(_("Searches logs for a matching pattern"));
@@ -175,7 +175,7 @@ class OSLogSearch : public Module
 {
 	CommandOSLogSearch commandoslogsearch;
 
- public:
+public:
 	OSLogSearch(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoslogsearch(this)
 	{

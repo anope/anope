@@ -13,7 +13,7 @@
 
 class CommandNSInfo : public Command
 {
- public:
+public:
 	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 0, 2)
 	{
 		this->SetDesc(_("Displays information about a given nickname"));
@@ -136,7 +136,7 @@ class CommandNSInfo : public Command
 
 class CommandNSSetHide : public Command
 {
- public:
+public:
 	CommandNSSetHide(Module *creator, const Anope::string &sname = "nickserv/set/hide", size_t min = 2) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Hide certain pieces of nickname information"));
@@ -234,7 +234,7 @@ class CommandNSSetHide : public Command
 
 class CommandNSSASetHide : public CommandNSSetHide
 {
- public:
+public:
 	CommandNSSASetHide(Module *creator) : CommandNSSetHide(creator, "nickserv/saset/hide", 3)
 	{
 		this->SetSyntax(_("\037nickname\037 {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
@@ -270,7 +270,7 @@ class NSInfo : public Module
 
 	SerializableExtensibleItem<bool> hide_email, hide_usermask, hide_status, hide_quit;
 
- public:
+public:
 	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsinfo(this), commandnssethide(this), commandnssasethide(this),
 		 hide_email(this, "HIDE_EMAIL"), hide_usermask(this, "HIDE_MASK"), hide_status(this, "HIDE_STATUS"),

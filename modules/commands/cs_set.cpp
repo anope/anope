@@ -14,7 +14,7 @@
 
 class CommandCSSet : public Command
 {
- public:
+public:
 	CommandCSSet(Module *creator) : Command(creator, "chanserv/set", 2, 3)
 	{
 		this->SetDesc(_("Set channel options and information"));
@@ -66,7 +66,7 @@ class CommandCSSet : public Command
 
 class CommandCSSetAutoOp : public Command
 {
- public:
+public:
 	CommandCSSetAutoOp(Module *creator, const Anope::string &cname = "chanserv/set/autoop") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Should services automatically give status to users"));
@@ -129,7 +129,7 @@ class CommandCSSetAutoOp : public Command
 
 class CommandCSSetBanType : public Command
 {
- public:
+public:
 	CommandCSSetBanType(Module *creator, const Anope::string &cname = "chanserv/set/bantype") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Set how services make bans on the channel"));
@@ -196,7 +196,7 @@ class CommandCSSetBanType : public Command
 
 class CommandCSSetDescription : public Command
 {
- public:
+public:
 	CommandCSSetDescription(Module *creator, const Anope::string &cname = "chanserv/set/description") : Command(creator, cname, 1, 2)
 	{
 		this->SetDesc(_("Set the channel description"));
@@ -258,7 +258,7 @@ class CommandCSSetDescription : public Command
 
 class CommandCSSetFounder : public Command
 {
- public:
+public:
 	CommandCSSetFounder(Module *creator, const Anope::string &cname = "chanserv/set/founder") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Set the founder of a channel"));
@@ -327,7 +327,7 @@ class CommandCSSetFounder : public Command
 
 class CommandCSSetKeepModes : public Command
 {
- public:
+public:
 	CommandCSSetKeepModes(Module *creator, const Anope::string &cname = "chanserv/set/keepmodes") :  Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Retain modes when channel is not in use"));
@@ -392,7 +392,7 @@ class CommandCSSetKeepModes : public Command
 
 class CommandCSSetPeace : public Command
 {
- public:
+public:
 	CommandCSSetPeace(Module *creator, const Anope::string &cname = "chanserv/set/peace") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Regulate the use of critical commands"));
@@ -464,7 +464,7 @@ inline static Anope::string BotModes()
 
 class CommandCSSetPersist : public Command
 {
- public:
+public:
 	CommandCSSetPersist(Module *creator, const Anope::string &cname = "chanserv/set/persist") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Set the channel as permanent"));
@@ -613,7 +613,7 @@ class CommandCSSetPersist : public Command
 
 class CommandCSSetRestricted : public Command
 {
- public:
+public:
 	CommandCSSetRestricted(Module *creator, const Anope::string &cname = "chanserv/set/restricted") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Restrict access to the channel"));
@@ -675,7 +675,7 @@ class CommandCSSetRestricted : public Command
 
 class CommandCSSetSecure : public Command
 {
- public:
+public:
 	CommandCSSetSecure(Module *creator, const Anope::string &cname = "chanserv/set/secure") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Activate security features"));
@@ -738,7 +738,7 @@ class CommandCSSetSecure : public Command
 
 class CommandCSSetSecureFounder : public Command
 {
- public:
+public:
 	CommandCSSetSecureFounder(Module *creator, const Anope::string &cname = "chanserv/set/securefounder") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Stricter control of channel founder status"));
@@ -802,7 +802,7 @@ class CommandCSSetSecureFounder : public Command
 
 class CommandCSSetSecureOps : public Command
 {
- public:
+public:
 	CommandCSSetSecureOps(Module *creator, const Anope::string &cname = "chanserv/set/secureops") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Stricter control of chanop status"));
@@ -864,7 +864,7 @@ class CommandCSSetSecureOps : public Command
 
 class CommandCSSetSignKick : public Command
 {
- public:
+public:
 	CommandCSSetSignKick(Module *creator, const Anope::string &cname = "chanserv/set/signkick") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Sign kicks that are done with the KICK command"));
@@ -941,7 +941,7 @@ class CommandCSSetSignKick : public Command
 
 class CommandCSSetSuccessor : public Command
 {
- public:
+public:
 	CommandCSSetSuccessor(Module *creator, const Anope::string &cname = "chanserv/set/successor") : Command(creator, cname, 1, 2)
 	{
 		this->SetDesc(_("Set the successor for a channel"));
@@ -1035,7 +1035,7 @@ class CommandCSSetSuccessor : public Command
 
 class CommandCSSetNoexpire : public Command
 {
- public:
+public:
 	CommandCSSetNoexpire(Module *creator) : Command(creator, "chanserv/saset/noexpire", 2, 2)
 	{
 		this->SetDesc(_("Prevent the channel from expiring"));
@@ -1163,7 +1163,7 @@ class CSSet : public Module
 
 	bool persist_lower_ts;
 
- public:
+public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		noautoop(this, "NOAUTOOP"), peace(this, "PEACE"),
 		securefounder(this, "SECUREFOUNDER"), restricted(this, "RESTRICTED"),

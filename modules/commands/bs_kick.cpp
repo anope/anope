@@ -117,7 +117,7 @@ struct KickerDataImpl : KickerData
 
 class CommandBSKick : public Command
 {
- public:
+public:
 	CommandBSKick(Module *creator) : Command(creator, "botserv/kick", 0)
 	{
 		this->SetDesc(_("Configures kickers"));
@@ -161,7 +161,7 @@ class CommandBSKick : public Command
 
 class CommandBSKickBase : public Command
 {
- public:
+public:
 	CommandBSKickBase(Module *creator, const Anope::string &cname, int minarg, int maxarg) : Command(creator, cname, minarg, maxarg)
 	{
 	}
@@ -170,7 +170,7 @@ class CommandBSKickBase : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 
- protected:
+protected:
 	bool CheckArguments(CommandSource &source, const std::vector<Anope::string> &params, ChannelInfo* &ci)
 	{
 		const Anope::string &chan = params[0];
@@ -246,7 +246,7 @@ class CommandBSKickBase : public Command
 
 class CommandBSKickAMSG : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickAMSG(Module *creator) : CommandBSKickBase(creator, "botserv/kick/amsg", 2, 3)
 	{
 		this->SetDesc(_("Configures AMSG kicker"));
@@ -282,7 +282,7 @@ class CommandBSKickAMSG : public CommandBSKickBase
 
 class CommandBSKickBadwords : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickBadwords(Module *creator) : CommandBSKickBase(creator, "botserv/kick/badwords", 2, 3)
 	{
 		this->SetDesc(_("Configures badwords kicker"));
@@ -321,7 +321,7 @@ class CommandBSKickBadwords : public CommandBSKickBase
 
 class CommandBSKickBolds : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickBolds(Module *creator) : CommandBSKickBase(creator, "botserv/kick/bolds", 2, 3)
 	{
 		this->SetDesc(_("Configures bolds kicker"));
@@ -355,7 +355,7 @@ class CommandBSKickBolds : public CommandBSKickBase
 
 class CommandBSKickCaps : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickCaps(Module *creator) : CommandBSKickBase(creator, "botserv/kick/caps", 2, 5)
 	{
 		this->SetDesc(_("Configures caps kicker"));
@@ -451,7 +451,7 @@ class CommandBSKickCaps : public CommandBSKickBase
 
 class CommandBSKickColors : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickColors(Module *creator) : CommandBSKickBase(creator, "botserv/kick/colors", 2, 3)
 	{
 		this->SetDesc(_("Configures color kicker"));
@@ -485,7 +485,7 @@ class CommandBSKickColors : public CommandBSKickBase
 
 class CommandBSKickFlood : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickFlood(Module *creator) : CommandBSKickBase(creator, "botserv/kick/flood", 2, 5)
 	{
 		this->SetDesc(_("Configures flood kicker"));
@@ -583,7 +583,7 @@ class CommandBSKickFlood : public CommandBSKickBase
 
 class CommandBSKickItalics : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickItalics(Module *creator) : CommandBSKickBase(creator, "botserv/kick/italics", 2, 3)
 	{
 		this->SetDesc(_("Configures italics kicker"));
@@ -617,7 +617,7 @@ class CommandBSKickItalics : public CommandBSKickBase
 
 class CommandBSKickRepeat : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickRepeat(Module *creator) : CommandBSKickBase(creator, "botserv/kick/repeat", 2, 4)
 	{
 		this->SetDesc(_("Configures repeat kicker"));
@@ -718,7 +718,7 @@ class CommandBSKickRepeat : public CommandBSKickBase
 
 class CommandBSKickReverses : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickReverses(Module *creator) : CommandBSKickBase(creator, "botserv/kick/reverses", 2, 3)
 	{
 		this->SetDesc(_("Configures reverses kicker"));
@@ -752,7 +752,7 @@ class CommandBSKickReverses : public CommandBSKickBase
 
 class CommandBSKickUnderlines : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickUnderlines(Module *creator) : CommandBSKickBase(creator, "botserv/kick/underlines", 2, 3)
 	{
 		this->SetDesc(_("Configures underlines kicker"));
@@ -786,7 +786,7 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 
 class CommandBSSetDontKickOps : public Command
 {
- public:
+public:
 	CommandBSSetDontKickOps(Module *creator, const Anope::string &sname = "botserv/set/dontkickops") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("To protect ops against bot kicks"));
@@ -851,7 +851,7 @@ class CommandBSSetDontKickOps : public Command
 
 class CommandBSSetDontKickVoices : public Command
 {
- public:
+public:
 	CommandBSSetDontKickVoices(Module *creator, const Anope::string &sname = "botserv/set/dontkickvoices") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("To protect voices against bot kicks"));
@@ -930,11 +930,11 @@ struct BanData
 		}
 	};
 
- private:
+private:
 	typedef Anope::map<Data> data_type;
 	data_type data_map;
 
- public:
+public:
 	BanData(Extensible *) { }
 
 	Data &get(const Anope::string &key)
@@ -987,7 +987,7 @@ struct UserData
 
 class BanDataPurger : public Timer
 {
- public:
+public:
 	BanDataPurger(Module *o) : Timer(o, 300, Anope::CurTime, true) { }
 
 	void Tick(time_t) override
@@ -1086,7 +1086,7 @@ class BSKick : public Module
 		ci->c->Kick(ci->bi, u, "%s", buf);
 	}
 
- public:
+public:
 	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		bandata(this, "bandata"),
 		userdata(this, "userdata"),

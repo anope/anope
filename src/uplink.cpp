@@ -19,7 +19,7 @@ UplinkSocket *UplinkSock = NULL;
 
 class ReconnectTimer : public Timer
 {
- public:
+public:
 	ReconnectTimer(int wait) : Timer(wait) { }
 
 	void Tick(time_t) override

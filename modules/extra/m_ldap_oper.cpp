@@ -16,7 +16,7 @@ class IdentifyInterface : public LDAPInterface
 {
 	Reference<User> u;
 
- public:
+public:
 	IdentifyInterface(Module *m, User *user) : LDAPInterface(m), u(user)
 	{
 	}
@@ -83,7 +83,7 @@ class LDAPOper : public Module
 	Anope::string password;
 	Anope::string basedn;
 	Anope::string filter;
- public:
+public:
 	LDAPOper(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main")
 	{

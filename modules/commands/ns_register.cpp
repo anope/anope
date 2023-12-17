@@ -15,7 +15,7 @@ static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
 
 class CommandNSConfirm : public Command
 {
- public:
+public:
 	CommandNSConfirm(Module *creator) : Command(creator, "nickserv/confirm", 1, 2)
 	{
 		this->SetDesc(_("Confirm a passcode"));
@@ -116,7 +116,7 @@ class CommandNSConfirm : public Command
 
 class CommandNSRegister : public Command
 {
- public:
+public:
 	CommandNSRegister(Module *creator) : Command(creator, "nickserv/register", 1, 2)
 	{
 		this->SetDesc(_("Register a nickname"));
@@ -307,7 +307,7 @@ class CommandNSRegister : public Command
 
 class CommandNSResend : public Command
 {
- public:
+public:
 	CommandNSResend(Module *creator) : Command(creator, "nickserv/resend", 0, 0)
 	{
 		this->SetDesc(_("Resend registration confirmation email"));
@@ -371,7 +371,7 @@ class NSRegister : public Module
 	SerializableExtensibleItem<bool> unconfirmed;
 	SerializableExtensibleItem<Anope::string> passcode;
 
- public:
+public:
 	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsregister(this), commandnsconfirm(this), commandnsrsend(this), unconfirmed(this, "UNCONFIRMED"),
 		passcode(this, "passcode")

@@ -13,7 +13,7 @@
 
 class CommandMSCheck : public Command
 {
- public:
+public:
 	CommandMSCheck(Module *creator) : Command(creator, "memoserv/check", 1, 1)
 	{
 		this->SetDesc(_("Checks if last memo to a nick was read"));
@@ -76,7 +76,7 @@ class MSCheck : public Module
 {
 	CommandMSCheck commandmscheck;
 
- public:
+public:
 	MSCheck(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmscheck(this)
 	{

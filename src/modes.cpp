@@ -302,7 +302,7 @@ void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 
 static class ModePipe : public Pipe
 {
- public:
+public:
 	void OnNotify() override
 	{
 		ModeManager::ProcessModes();

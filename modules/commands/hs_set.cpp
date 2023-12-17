@@ -13,7 +13,7 @@
 
 class CommandHSSet : public Command
 {
- public:
+public:
 	CommandHSSet(Module *creator) : Command(creator, "hostserv/set", 2, 2)
 	{
 		this->SetDesc(_("Set the vhost of another user"));
@@ -118,7 +118,7 @@ class CommandHSSetAll : public Command
 		}
 	}
 
- public:
+public:
 	CommandHSSetAll(Module *creator) : Command(creator, "hostserv/setall", 2, 2)
 	{
 		this->SetDesc(_("Set the vhost for all nicks in a group"));
@@ -217,7 +217,7 @@ class HSSet : public Module
 	CommandHSSet commandhsset;
 	CommandHSSetAll commandhssetall;
 
- public:
+public:
 	HSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandhsset(this), commandhssetall(this)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)

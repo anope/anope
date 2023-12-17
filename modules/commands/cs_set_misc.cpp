@@ -90,7 +90,7 @@ static Anope::string GetAttribute(const Anope::string &command)
 
 class CommandCSSetMisc : public Command
 {
- public:
+public:
 	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 2)
 	{
 		this->SetSyntax(_("\037channel\037 [\037parameters\037]"));
@@ -169,7 +169,7 @@ class CSSetMisc : public Module
 	CommandCSSetMisc commandcssetmisc;
 	Serialize::Type csmiscdata_type;
 
- public:
+public:
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcssetmisc(this), csmiscdata_type("CSMiscData", CSMiscData::Unserialize)
 	{

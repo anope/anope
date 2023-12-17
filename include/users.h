@@ -35,9 +35,9 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/* Users that are in the process of quitting */
 	static std::list<User *> quitting_users;
 
- public:
+public:
 	typedef std::map<Anope::string, Anope::string> ModeList;
- protected:
+protected:
 	Anope::string vident;
 	Anope::string ident;
 	Anope::string uid;
@@ -54,7 +54,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	time_t invalid_pw_time;
 
 
- public: // XXX: exposing a tiny bit too much
+public: // XXX: exposing a tiny bit too much
 	/* User's current nick */
 	Anope::string nick;
 
@@ -90,7 +90,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/* Last time this user sent an email */
 	time_t lastmail;
 
- protected:
+protected:
 	/** Create a new user object, initialising necessary fields and
 	 * adds it to the hash
 	 *
@@ -112,7 +112,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	virtual ~User();
 
- public:
+public:
 	static User* OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
 
 	/** Update the nickname of a user record accordingly, should be

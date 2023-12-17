@@ -227,7 +227,7 @@ class MD5Context : public Encryption::Context
 			output[i] = static_cast<unsigned>(input[j]) | (static_cast<unsigned>(input[j + 1]) << 8) | (static_cast<unsigned>(input[j + 2]) << 16) | (static_cast<unsigned>(input[j + 3]) << 24);
 	}
 
- public:
+public:
 	MD5Context(Encryption::IV *iv = NULL)
 	{
 		if (iv != NULL)
@@ -320,7 +320,7 @@ class MD5Context : public Encryption::Context
 
 class MD5Provider : public Encryption::Provider
 {
- public:
+public:
 	MD5Provider(Module *creator) : Encryption::Provider(creator, "md5") { }
 
 	Encryption::Context *CreateContext(Encryption::IV *iv) override
@@ -341,7 +341,7 @@ class EMD5 : public Module
 {
 	MD5Provider md5provider;
 
- public:
+public:
 	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		md5provider(this)
 	{

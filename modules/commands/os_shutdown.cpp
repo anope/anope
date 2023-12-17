@@ -13,7 +13,7 @@
 
 class CommandOSQuit : public Command
 {
- public:
+public:
 	CommandOSQuit(Module *creator) : Command(creator, "operserv/quit", 0, 0)
 	{
 		this->SetDesc(_("Terminate services WITHOUT saving"));
@@ -41,7 +41,7 @@ class CommandOSQuit : public Command
 
 class CommandOSRestart : public Command
 {
- public:
+public:
 	CommandOSRestart(Module *creator) : Command(creator, "operserv/restart", 0, 0)
 	{
 		this->SetDesc(_("Save databases and restart Services"));
@@ -67,7 +67,7 @@ class CommandOSRestart : public Command
 
 class CommandOSShutdown : public Command
 {
- public:
+public:
 	CommandOSShutdown(Module *creator) : Command(creator, "operserv/shutdown", 0, 0)
 	{
 		this->SetDesc(_("Terminate services with save"));
@@ -97,7 +97,7 @@ class OSShutdown : public Module
 	CommandOSRestart commandosrestart;
 	CommandOSShutdown commandosshutdown;
 
- public:
+public:
 	OSShutdown(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosquit(this), commandosrestart(this), commandosshutdown(this)
 	{

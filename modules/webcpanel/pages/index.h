@@ -19,7 +19,7 @@ class Index : public WebPanelPage
 	Anope::hash_map<time_t> last_login_attempt;
 	time_t last_clear = 0;
 
- public:
+public:
 	Index(const Anope::string &u) : WebPanelPage(u) { }
 
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) override;

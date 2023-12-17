@@ -39,7 +39,7 @@ namespace Servers
  */
 class CoreExport Server : public Extensible
 {
- private:
+private:
 	/* Server name */
 	Anope::string name;
 	/* Hops between services and server */
@@ -61,7 +61,7 @@ class CoreExport Server : public Extensible
 	/* Reason this server was quit */
 	Anope::string quit_reason;
 
- public:
+public:
 	/** Constructor
 	 * @param uplink The uplink this server is from, is only NULL when creating Me
 	 * @param name The server name
@@ -72,12 +72,12 @@ class CoreExport Server : public Extensible
 	 */
 	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid = "", bool jupe = false);
 
- private:
+private:
 	/** Destructor
 	 */
 	~Server();
 
- public:
+public:
 	/* Number of users on the server */
 	unsigned users = 0;
 

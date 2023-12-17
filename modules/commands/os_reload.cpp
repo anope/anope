@@ -13,7 +13,7 @@
 
 class CommandOSReload : public Command
 {
- public:
+public:
 	CommandOSReload(Module *creator) : Command(creator, "operserv/reload", 0, 0)
 	{
 		this->SetDesc(_("Reload services' configuration file"));
@@ -56,7 +56,7 @@ class OSReload : public Module
 {
 	CommandOSReload commandosreload;
 
- public:
+public:
 	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosreload(this)
 	{

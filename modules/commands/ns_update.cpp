@@ -13,7 +13,7 @@
 
 class CommandNSUpdate : public Command
 {
- public:
+public:
 	CommandNSUpdate(Module *creator) : Command(creator, "nickserv/update", 0, 0)
 	{
 		this->SetDesc(_("Updates your current status, i.e. it checks for new memos"));
@@ -51,7 +51,7 @@ class NSUpdate : public Module
 {
 	CommandNSUpdate commandnsupdate;
 
- public:
+public:
 	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsupdate(this)
 	{

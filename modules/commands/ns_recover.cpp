@@ -18,7 +18,7 @@ typedef std::map<Anope::string, ChannelStatus> NSRecoverInfo;
 
 class NSRecoverSvsnick
 {
- public:
+public:
 	Reference<User> from;
 	Anope::string to;
 };
@@ -29,7 +29,7 @@ class NSRecoverRequest : public IdentifyRequest
 	Command *cmd;
 	Anope::string user;
 
- public:
+public:
 	NSRecoverRequest(Module *o, CommandSource &src, Command *c, const Anope::string &nick, const Anope::string &pass) : IdentifyRequest(o, nick, pass), source(src), cmd(c), user(nick) { }
 
 	void OnSuccess() override
@@ -143,7 +143,7 @@ class NSRecoverRequest : public IdentifyRequest
 
 class CommandNSRecover : public Command
 {
- public:
+public:
 	CommandNSRecover(Module *creator) : Command(creator, "nickserv/recover", 1, 2)
 	{
 		this->SetDesc(_("Regains control of your nick"));
@@ -227,7 +227,7 @@ class NSRecover : public Module
 	PrimitiveExtensibleItem<NSRecoverInfo> recover;
 	PrimitiveExtensibleItem<NSRecoverSvsnick> svsnick;
 
- public:
+public:
 	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsrecover(this), recover(this, "recover"), svsnick(this, "svsnick")
 	{

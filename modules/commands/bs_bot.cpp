@@ -13,7 +13,7 @@
 
 class CommandBSBot : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &nick = params[1];
@@ -263,7 +263,7 @@ class CommandBSBot : public Command
 		delete bi;
 		return;
 	}
- public:
+public:
 	CommandBSBot(Module *creator) : Command(creator, "botserv/bot", 1, 6)
 	{
 		this->SetDesc(_("Maintains network bot list"));
@@ -374,7 +374,7 @@ class BSBot : public Module
 {
 	CommandBSBot commandbsbot;
 
- public:
+public:
 	BSBot(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsbot(this)
 	{

@@ -13,7 +13,7 @@
 
 class CommandHSList : public Command
 {
- public:
+public:
 	CommandHSList(Module *creator) : Command(creator, "hostserv/list", 0, 1)
 	{
 		this->SetDesc(_("Displays one or more vhost entries"));
@@ -146,7 +146,7 @@ class HSList : public Module
 {
 	CommandHSList commandhslist;
 
- public:
+public:
 	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhslist(this)
 	{

@@ -11,7 +11,7 @@
 
 class BSAutoAssign : public Module
 {
- public:
+public:
 	BSAutoAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
 	}

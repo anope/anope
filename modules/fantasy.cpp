@@ -13,7 +13,7 @@
 
 class CommandBSSetFantasy : public Command
 {
- public:
+public:
 	CommandBSSetFantasy(Module *creator, const Anope::string &sname = "botserv/set/fantasy") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("Enable fantaisist commands"));
@@ -86,7 +86,7 @@ class Fantasy : public Module
 
 	CommandBSSetFantasy commandbssetfantasy;
 
- public:
+public:
 	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		fantasy(this, "BS_FANTASY"), commandbssetfantasy(this)
 	{

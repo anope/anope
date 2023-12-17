@@ -32,7 +32,7 @@ struct NSCertListImpl : NSCertList
 	Serialize::Reference<NickCore> nc;
 	std::vector<Anope::string> certs;
 
- public:
+public:
 	NSCertListImpl(Extensible *obj) : nc(anope_dynamic_static_cast<NickCore *>(obj)) { }
 
 	~NSCertListImpl() override
@@ -162,7 +162,7 @@ struct NSCertListImpl : NSCertList
 
 class CommandNSCert : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, NickCore *nc, Anope::string certfp)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
@@ -251,7 +251,7 @@ class CommandNSCert : public Command
 		}
 	}
 
- public:
+public:
 	CommandNSCert(Module *creator) : Command(creator, "nickserv/cert", 1, 3)
 	{
 		this->SetDesc(_("Modify the nickname client certificate list"));
@@ -344,7 +344,7 @@ class NSCert : public Module
 	NSCertListImpl::ExtensibleItem certs;
 	CertServiceImpl cs;
 
- public:
+public:
 	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnscert(this), certs(this, "certificates"), cs(this)
 	{

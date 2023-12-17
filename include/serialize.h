@@ -20,7 +20,7 @@ namespace Serialize
 {
 	class Data
 	{
-	 public:
+	public:
 		enum Type
 		{
 			DT_TEXT,
@@ -51,7 +51,7 @@ namespace Serialize
  */
 class CoreExport Serializable : public virtual Base
 {
- private:
+private:
 	/* A list of every serializable item in Anope.
 	 * Some of these are static and constructed at runtime,
 	 * so this list must be on the heap, as it is not always
@@ -68,13 +68,13 @@ class CoreExport Serializable : public virtual Base
 	/* The last time this object was committed to the database */
 	time_t last_commit_time = 0;
 
- protected:
+protected:
 	Serializable(const Anope::string &serialize_type);
 	Serializable(const Serializable &);
 
 	Serializable &operator=(const Serializable &);
 
- public:
+public:
 	virtual ~Serializable();
 
 	/* Unique ID (per type, not globally) for this object */
@@ -128,7 +128,7 @@ class CoreExport Serialize::Type : public Base
 	 */
 	time_t timestamp = 0;
 
- public:
+public:
 	/* Map of Serializable::id to Serializable objects */
 	std::map<uint64_t, Serializable *> objects;
 
@@ -196,7 +196,7 @@ class Serialize::Checker
 			type->Check();
 	}
 
- public:
+public:
 	Checker(const Anope::string &n) : name(n) { }
 
 	inline const T* operator->() const
@@ -242,10 +242,10 @@ class Serialize::Checker
 template<typename T>
 class Serialize::Reference : public ReferenceBase
 {
- protected:
+protected:
 	T *ref = nullptr;
 
- public:
+public:
 	Reference() = default;
 
 	Reference(T *obj) : ref(obj)

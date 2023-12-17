@@ -13,7 +13,7 @@
 
 class CommandCSGetKey : public Command
 {
- public:
+public:
 	CommandCSGetKey(Module *creator) : Command(creator, "chanserv/getkey", 1, 1)
 	{
 		this->SetDesc(_("Returns the key of the given channel"));
@@ -63,7 +63,7 @@ class CSGetKey : public Module
 {
 	CommandCSGetKey commandcsgetkey;
 
- public:
+public:
 	CSGetKey(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsgetkey(this)
 	{
 

@@ -18,7 +18,7 @@ static Anope::string UplinkSID;
 
 class UnrealIRCdProto : public IRCDProto
 {
- public:
+public:
 	PrimitiveExtensibleItem<ModData> ClientModData;
 	PrimitiveExtensibleItem<ModData> ChannelModData;
 
@@ -40,7 +40,7 @@ class UnrealIRCdProto : public IRCDProto
 		MaxModes = 12;
 	}
 
- private:
+private:
 	/* SVSNOOP */
 	void SendSVSNOOP(const Server *server, bool set) override
 	{
@@ -436,7 +436,7 @@ class UnrealExtBan : public ChannelModeVirtual<ChannelModeList>
 {
 	char ext;
 
- public:
+public:
 	UnrealExtBan(const Anope::string &mname, const Anope::string &basename, char extban) : ChannelModeVirtual<ChannelModeList>(mname, basename)
 		, ext(extban)
 	{
@@ -462,7 +462,7 @@ namespace UnrealExtban
 {
 	class ChannelMatcher : public UnrealExtBan
 	{
-	 public:
+	public:
 		ChannelMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
 		{
 		}
@@ -497,7 +497,7 @@ namespace UnrealExtban
 
 	class EntryMatcher : public UnrealExtBan
 	{
-	 public:
+	public:
 		EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
 		{
 		}
@@ -513,7 +513,7 @@ namespace UnrealExtban
 
 	class RealnameMatcher : public UnrealExtBan
 	{
-	 public:
+	public:
 		RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
 		{
 		}
@@ -529,7 +529,7 @@ namespace UnrealExtban
 
 	class RegisteredMatcher : public UnrealExtBan
 	{
-	 public:
+	public:
 		RegisteredMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
 		{
 		}
@@ -543,7 +543,7 @@ namespace UnrealExtban
 
 	class AccountMatcher : public UnrealExtBan
 	{
-	 public:
+	public:
 		AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
 		{
 		}
@@ -562,7 +562,7 @@ namespace UnrealExtban
 
 	class FingerprintMatcher : public UnrealExtBan
 	{
-	 public:
+	public:
 		FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
 		{
 		}
@@ -577,7 +577,7 @@ namespace UnrealExtban
 
 	class OperclassMatcher : public UnrealExtBan
 	{
-	 public:
+	public:
 	 	OperclassMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
 		{
 		}
@@ -593,7 +593,7 @@ namespace UnrealExtban
 
 	class TimedBanMatcher : public UnrealExtBan
 	{
-	 public:
+	public:
 	 	TimedBanMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
 		{
 		}
@@ -610,7 +610,7 @@ namespace UnrealExtban
 
 	class CountryMatcher : public UnrealExtBan
 	{
-	 public:
+	public:
 	 	CountryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
 		{
 		}
@@ -637,7 +637,7 @@ namespace UnrealExtban
 
 class ChannelModeFlood : public ChannelModeParam
 {
- public:
+public:
 	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
 
 	/* Borrowed part of this check from UnrealIRCd */
@@ -688,7 +688,7 @@ class ChannelModeFlood : public ChannelModeParam
 
 class ChannelModeHistory : public ChannelModeParam /* stolen from inspircd3's ColonDelimitedParamMode */
 {
- public:
+public:
 	ChannelModeHistory(char modeChar) : ChannelModeParam("HISTORY", modeChar, true) { }
 
 	bool IsValid(Anope::string &value) const override
@@ -727,7 +727,7 @@ class ChannelModeHistory : public ChannelModeParam /* stolen from inspircd3's Co
 
 class ChannelModeUnrealSSL : public ChannelMode
 {
- public:
+public:
 	ChannelModeUnrealSSL(const Anope::string &n, char c) : ChannelMode(n, c)
 	{
 	}
@@ -1487,7 +1487,7 @@ struct IRCDMessageSJoin : IRCDMessage
 
 class IRCDMessageSVSLogin : IRCDMessage
 {
- public:
+public:
 	IRCDMessageSVSLogin(Module *creator) : IRCDMessage(creator, "SVSLOGIN", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
@@ -1674,7 +1674,7 @@ class ProtoUnreal : public Module
 
 	bool use_server_side_mlock;
 
- public:
+public:
 	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this),

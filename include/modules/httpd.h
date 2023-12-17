@@ -98,7 +98,7 @@ class HTTPPage : public virtual Base
 	Anope::string url;
 	Anope::string content_type;
 
- public:
+public:
 	HTTPPage(const Anope::string &u, const Anope::string &ct = "text/html") : url(u), content_type(ct) { }
 
 	const Anope::string &GetURL() const { return this->url; }
@@ -117,13 +117,13 @@ class HTTPPage : public virtual Base
 
 class HTTPClient : public ClientSocket, public BinarySocket, public Base
 {
- protected:
+protected:
 	void WriteClient(const Anope::string &message)
 	{
 		BinarySocket::Write(message + "\r\n");
 	}
 
- public:
+public:
 	HTTPClient(ListenSocket *l, int f, const sockaddrs &a) : ClientSocket(l, a), BinarySocket() { }
 
 	virtual const Anope::string GetIP()
@@ -140,7 +140,7 @@ class HTTPProvider : public ListenSocket, public Service
 	Anope::string ip;
 	unsigned short port;
 	bool ssl;
- public:
+public:
 	std::vector<Anope::string> ext_ips;
 	std::vector<Anope::string> ext_headers;
 

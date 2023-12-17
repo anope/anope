@@ -25,7 +25,7 @@ struct LogSetting
 	time_t created;
 
 	virtual ~LogSetting() = default;
- protected:
+protected:
 	LogSetting() = default;
 };
 
@@ -33,12 +33,12 @@ struct LogSettings : Serialize::Checker<std::vector<LogSetting *> >
 {
 	typedef std::vector<LogSetting *>::iterator iterator;
 
- protected:
+protected:
 	LogSettings() : Serialize::Checker<std::vector<LogSetting *> >("LogSetting")
 	{
 	}
 
- public:
+public:
 	virtual ~LogSettings() = default;
 	virtual LogSetting *Create() = 0;
 };

@@ -13,7 +13,7 @@
 
 class CommandNSDrop : public Command
 {
- public:
+public:
 	CommandNSDrop(Module *creator) : Command(creator, "nickserv/drop", 1, 1)
 	{
 		this->SetSyntax(_("\037nickname\037"));
@@ -75,7 +75,7 @@ class NSDrop : public Module
 {
 	CommandNSDrop commandnsdrop;
 
- public:
+public:
 	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsdrop(this)
 	{

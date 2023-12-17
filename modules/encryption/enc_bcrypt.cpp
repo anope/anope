@@ -45,7 +45,7 @@ class EBCRYPT : public Module
 		return (ret == hash);
 	}
 
- public:
+public:
 	EBCRYPT(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		rounds(10)
 	{

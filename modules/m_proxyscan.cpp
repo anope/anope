@@ -25,7 +25,7 @@ class ProxyCallbackListener : public ListenSocket
 {
 	class ProxyCallbackClient : public ClientSocket, public BufferedSocket
 	{
-	 public:
+	public:
 		ProxyCallbackClient(ListenSocket *l, int f, const sockaddrs &a) : Socket(f, l->GetFamily()), ClientSocket(l, a), BufferedSocket()
 		{
 		}
@@ -41,7 +41,7 @@ class ProxyCallbackListener : public ListenSocket
 		}
 	};
 
- public:
+public:
 	ProxyCallbackListener(const Anope::string &b, int p) : Socket(-1, b.find(':') == Anope::string::npos ? AF_INET : AF_INET6), ListenSocket(b, p, false)
 	{
 	}
@@ -56,7 +56,7 @@ class ProxyConnect : public ConnectionSocket
 {
 	static ServiceReference<XLineManager> akills;
 
- public:
+public:
 	static std::set<ProxyConnect *> proxies;
 
 	ProxyCheck proxy;
@@ -77,7 +77,7 @@ class ProxyConnect : public ConnectionSocket
 	void OnConnect() override = 0;
 	virtual const Anope::string GetType() const = 0;
 
- protected:
+protected:
 	void Ban()
 	{
 		Anope::string reason = this->proxy.reason;
@@ -109,7 +109,7 @@ std::set<ProxyConnect *> ProxyConnect::proxies;
 
 class HTTPProxyConnect : public ProxyConnect, public BufferedSocket
 {
- public:
+public:
 	HTTPProxyConnect(ProxyCheck &p, unsigned short po) : Socket(-1), ProxyConnect(p, po), BufferedSocket()
 	{
 	}
@@ -141,7 +141,7 @@ class HTTPProxyConnect : public ProxyConnect, public BufferedSocket
 
 class SOCKS5ProxyConnect : public ProxyConnect, public BinarySocket
 {
- public:
+public:
 	SOCKS5ProxyConnect(ProxyCheck &p, unsigned short po) : Socket(-1), ProxyConnect(p, po), BinarySocket()
 	{
 	}
@@ -200,7 +200,7 @@ class ModuleProxyScan : public Module
 
 	class ConnectionTimeout : public Timer
 	{
-	 public:
+	public:
 		ConnectionTimeout(Module *c, long timeout) : Timer(c, timeout, Anope::CurTime, true)
 		{
 		}
@@ -218,7 +218,7 @@ class ModuleProxyScan : public Module
 		}
 	} connectionTimeout;
 
- public:
+public:
 	ModuleProxyScan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		connectionTimeout(this, 5)
 	{

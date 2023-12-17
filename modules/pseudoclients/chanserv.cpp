@@ -27,7 +27,7 @@ class ChanServCore : public Module, public ChanServService
 	ExtensibleRef<bool> persist;
 	bool always_lower = false;
 
- public:
+public:
 	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		ChanServService(this), inhabit(this, "inhabit"), persist("PERSIST")
 	{
@@ -44,7 +44,7 @@ class ChanServCore : public Module, public ChanServService
 			ExtensibleItem<bool> &inhabit;
 			Reference<Channel> c;
 
-		 public:
+		public:
 			/** Constructor
 			 * @param chan The channel
 			 */

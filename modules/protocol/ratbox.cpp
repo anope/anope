@@ -31,7 +31,7 @@ class RatboxProto : public IRCDProto
 		return NULL;
 	}
 
- public:
+public:
 	RatboxProto(Module *creator) : IRCDProto(creator, "Ratbox 3.0+")
 	{
 		DefaultPseudoclientModes = "+oiS";
@@ -334,7 +334,7 @@ class ProtoRatbox : public Module
 		ModeManager::AddChannelMode(new ChannelMode("SSL", 'S'));
 	}
 
- public:
+public:
 	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),

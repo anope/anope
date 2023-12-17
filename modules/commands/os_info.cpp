@@ -95,7 +95,7 @@ Serializable *OperInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 
 class CommandOSInfo : public Command
 {
- public:
+public:
 	CommandOSInfo(Module *creator) : Command(creator, "operserv/info", 2, 3)
 	{
 		this->SetDesc(_("Associate oper info with a nick or channel"));
@@ -266,7 +266,7 @@ class OSInfo : public Module
 		}
 	}
 
- public:
+public:
 	OSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosinfo(this), oinfo(this, "operinfo"), oinfo_type("OperInfo", OperInfo::Unserialize)
 	{

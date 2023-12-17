@@ -250,7 +250,7 @@ class CSClone : public Module
 {
 	CommandCSClone commandcsclone;
 
- public:
+public:
 	CSClone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsclone(this)
 	{
 

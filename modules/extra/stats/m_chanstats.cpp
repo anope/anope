@@ -11,7 +11,7 @@
 
 class CommandCSSetChanstats : public Command
 {
- public:
+public:
 	CommandCSSetChanstats(Module *creator) : Command(creator, "chanserv/set/chanstats", 2, 2)
 	{
 		this->SetDesc(_("Turn chanstats statistics on or off"));
@@ -65,7 +65,7 @@ class CommandCSSetChanstats : public Command
 
 class CommandNSSetChanstats : public Command
 {
- public:
+public:
 	CommandNSSetChanstats(Module *creator, const Anope::string &sname = "nickserv/set/chanstats", size_t min = 1 ) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn chanstats statistics on or off"));
@@ -123,7 +123,7 @@ class CommandNSSetChanstats : public Command
 
 class CommandNSSASetChanstats : public CommandNSSetChanstats
 {
- public:
+public:
 	CommandNSSASetChanstats(Module *creator) : CommandNSSetChanstats(creator, "nickserv/saset/chanstats", 2)
 	{
 		this->ClearSyntax();
@@ -146,7 +146,7 @@ class CommandNSSASetChanstats : public CommandNSSetChanstats
 
 class MySQLInterface : public SQL::Interface
 {
- public:
+public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
 	void OnResult(const SQL::Result &r) override
@@ -483,7 +483,7 @@ class MChanstats : public Module
 	}
 
 
- public:
+public:
 	MChanstats(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, EXTRA | VENDOR),
 		cs_stats(this, "CS_STATS"), ns_stats(this, "NS_STATS"),
@@ -547,7 +547,7 @@ class MChanstats : public Module
 		return EVENT_CONTINUE;
 	}
 
- private:
+private:
 	void OnModeChange(Channel *c, User *u)
 	{
 		if (!u || !u->Account() || !c->ci || !cs_stats.HasExt(c->ci))
@@ -559,7 +559,7 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
- public:
+public:
 	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) override
 	{
 		if (!cu->chan->ci || !cs_stats.HasExt(cu->chan->ci))

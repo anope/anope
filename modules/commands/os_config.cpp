@@ -13,7 +13,7 @@
 
 class CommandOSConfig : public Command
 {
- public:
+public:
 	CommandOSConfig(Module *creator) : Command(creator, "operserv/config", 1, 4)
 	{
 		this->SetDesc(_("View and change configuration file settings"));
@@ -136,7 +136,7 @@ class OSConfig : public Module
 {
 	CommandOSConfig commandosconfig;
 
- public:
+public:
 	OSConfig(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosconfig(this)
 	{

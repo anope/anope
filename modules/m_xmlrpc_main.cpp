@@ -19,7 +19,7 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 	Reference<HTTPClient> client;
 	Reference<XMLRPCServiceInterface> xinterface;
 
- public:
+public:
 	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest& req, HTTPClient *c, XMLRPCServiceInterface* iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
 
 	void OnSuccess() override
@@ -52,7 +52,7 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 
 class MyXMLRPCEvent : public XMLRPCEvent
 {
- public:
+public:
 	bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) override
 	{
 		if (request.name == "command")
@@ -73,7 +73,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		return true;
 	}
 
- private:
+private:
 	void DoCommand(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
 		Anope::string service = request.data.size() > 0 ? request.data[0] : "";
@@ -281,7 +281,7 @@ class ModuleXMLRPCMain : public Module
 
 	MyXMLRPCEvent stats;
 
- public:
+public:
 	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), xmlrpc("XMLRPCServiceInterface", "xmlrpc")
 	{
 		me = this;

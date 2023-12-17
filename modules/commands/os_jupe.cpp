@@ -13,7 +13,7 @@
 
 class CommandOSJupe : public Command
 {
- public:
+public:
 	CommandOSJupe(Module *creator) : Command(creator, "operserv/jupe", 1, 2)
 	{
 		this->SetDesc(_("\"Jupiter\" a server"));
@@ -69,7 +69,7 @@ class OSJupe : public Module
 {
 	CommandOSJupe commandosjupe;
 
- public:
+public:
 	OSJupe(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosjupe(this)
 	{

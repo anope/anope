@@ -19,7 +19,7 @@ class NSGroupRequest : public IdentifyRequest
 	Anope::string nick;
 	Reference<NickAlias> target;
 
- public:
+public:
 	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(o, targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
 
 	void OnSuccess() override
@@ -85,7 +85,7 @@ class NSGroupRequest : public IdentifyRequest
 
 class CommandNSGroup : public Command
 {
- public:
+public:
 	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 0, 2)
 	{
 		this->SetDesc(_("Join a group"));
@@ -230,7 +230,7 @@ class CommandNSGroup : public Command
 
 class CommandNSUngroup : public Command
 {
- public:
+public:
 	CommandNSUngroup(Module *creator) : Command(creator, "nickserv/ungroup", 0, 1)
 	{
 		this->SetDesc(_("Remove a nick from a group"));
@@ -293,7 +293,7 @@ class CommandNSUngroup : public Command
 
 class CommandNSGList : public Command
 {
- public:
+public:
 	CommandNSGList(Module *creator) : Command(creator, "nickserv/glist", 0, 1)
 	{
 		this->SetDesc(_("Lists all nicknames in your group"));
@@ -382,7 +382,7 @@ class NSGroup : public Module
 	CommandNSUngroup commandnsungroup;
 	CommandNSGList commandnsglist;
 
- public:
+public:
 	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsgroup(this), commandnsungroup(this), commandnsglist(this)
 	{

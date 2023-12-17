@@ -15,7 +15,7 @@
 
 class CommandCSEnforce : public Command
 {
- private:
+private:
 	void DoSecureOps(CommandSource &source, ChannelInfo *ci)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
@@ -206,7 +206,7 @@ class CommandCSEnforce : public Command
 		source.Reply(_("LIMIT enforced on %s, %d users removed."), ci->name.c_str(), users.size());
 	}
 
- public:
+public:
 	CommandCSEnforce(Module *creator) : Command(creator, "chanserv/enforce", 2, 2)
 	{
 		this->SetDesc(_("Enforce various channel modes and set options"));
@@ -266,7 +266,7 @@ class CSEnforce : public Module
 {
 	CommandCSEnforce commandcsenforce;
 
- public:
+public:
 	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsenforce(this)
 	{

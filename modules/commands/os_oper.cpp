@@ -65,7 +65,7 @@ class CommandOSOper : public Command
 		return true;
 	}
 
- public:
+public:
 	CommandOSOper(Module *creator) : Command(creator, "operserv/oper", 1, 3)
 	{
 		this->SetDesc(_("View and change Services Operators"));
@@ -257,7 +257,7 @@ class OSOper : public Module
 	Serialize::Type myoper_type;
 	CommandOSOper commandosoper;
 
- public:
+public:
 	OSOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		myoper_type("Oper", MyOper::Unserialize), commandosoper(this)
 	{

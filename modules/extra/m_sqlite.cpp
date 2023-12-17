@@ -21,7 +21,7 @@ using namespace SQL;
  */
 class SQLiteResult : public Result
 {
- public:
+public:
 	SQLiteResult(unsigned int i, const Query &q, const Anope::string &fq) : Result(i, q, fq)
 	{
 	}
@@ -48,7 +48,7 @@ class SQLiteService : public Provider
 
 	Anope::string Escape(const Anope::string &query);
 
- public:
+public:
 	SQLiteService(Module *o, const Anope::string &n, const Anope::string &d);
 
 	~SQLiteService();
@@ -72,7 +72,7 @@ class ModuleSQLite : public Module
 {
 	/* SQL connections */
 	std::map<Anope::string, SQLiteService *> SQLiteServices;
- public:
+public:
 	ModuleSQLite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 	}

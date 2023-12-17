@@ -15,7 +15,7 @@ class TRERegex : public Regex
 {
 	regex_t regbuf;
 
- public:
+public:
 	TRERegex(const Anope::string &expr) : Regex(expr)
 	{
 		int err = regcomp(&this->regbuf, expr.c_str(), REG_EXTENDED | REG_NOSUB);
@@ -41,7 +41,7 @@ class TRERegex : public Regex
 
 class TRERegexProvider : public RegexProvider
 {
- public:
+public:
 	TRERegexProvider(Module *creator) : RegexProvider(creator, "regex/tre") { }
 
 	Regex *Compile(const Anope::string &expression) override
@@ -54,7 +54,7 @@ class ModuleRegexTRE : public Module
 {
 	TRERegexProvider tre_regex_provider;
 
- public:
+public:
 	ModuleRegexTRE(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		tre_regex_provider(this)
 	{

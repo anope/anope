@@ -172,12 +172,12 @@ struct ModuleVersionC
  */
 class ModuleVersion
 {
- private:
+private:
 	int version_major;
 	int version_minor;
 	int version_patch;
 
- public:
+public:
 	ModuleVersion(const ModuleVersionC &);
 
 	/** Get the major version of Anope this was built against
@@ -202,9 +202,9 @@ class NotImplementedException : public CoreException { };
  */
 class CoreExport Module : public Extensible
 {
- private:
+private:
 	bool permanent;
- public:
+public:
 	/** The module name (e.g. os_modload)
 	 */
 	Anope::string name;
@@ -1112,7 +1112,7 @@ enum Implementation
  */
 class CoreExport ModuleManager
 {
- public:
+public:
 	/** Event handler hooks.
 	 */
 	static std::vector<Module *> EventHandlers[I_SIZE];
@@ -1195,7 +1195,7 @@ class CoreExport ModuleManager
 	 */
 	static void UnloadAll();
 
- private:
+private:
 	/** Call the module_delete function to safely delete the module
 	 * @param m the module to delete
 	 * @return MOD_ERR_OK on success, anything else on fail

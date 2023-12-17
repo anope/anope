@@ -13,7 +13,7 @@
 
 class CommandOSKick : public Command
 {
- public:
+public:
 	CommandOSKick(Module *creator) : Command(creator, "operserv/kick", 3, 3)
 	{
 		this->SetDesc(_("Kick a user from a channel"));
@@ -73,7 +73,7 @@ class OSKick : public Module
 {
 	CommandOSKick commandoskick;
 
- public:
+public:
 	OSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoskick(this)
 	{

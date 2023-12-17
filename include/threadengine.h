@@ -16,11 +16,11 @@
 
 class CoreExport Thread : public Pipe, public Extensible
 {
- private:
+private:
 	/* Set to true to tell the thread to finish and we are waiting for it */
 	bool exit = false;
 
- public:
+public:
 	/* Handle for this thread */
 	pthread_t handle;
 
@@ -60,11 +60,11 @@ class CoreExport Thread : public Pipe, public Extensible
 
 class CoreExport Mutex
 {
- protected:
+protected:
 	/* A mutex, used to keep threads in sync */
 	pthread_mutex_t mutex;
 
- public:
+public:
 	/** Constructor
 	 */
 	Mutex();
@@ -90,11 +90,11 @@ class CoreExport Mutex
 
 class CoreExport Condition : public Mutex
 {
- private:
+private:
 	/* A condition */
 	pthread_cond_t cond;
 
- public:
+public:
 	/** Constructor
 	 */
 	Condition();

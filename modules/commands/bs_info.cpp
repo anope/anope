@@ -13,7 +13,7 @@
 
 class CommandBSInfo : public Command
 {
- private:
+private:
 	void send_bot_channels(std::vector<Anope::string> &buffers, const BotInfo *bi)
 	{
 		Anope::string buf;
@@ -33,7 +33,7 @@ class CommandBSInfo : public Command
 			buffers.push_back(buf);
 	}
 
- public:
+public:
 	CommandBSInfo(Module *creator) : Command(creator, "botserv/info", 1, 1)
 	{
 		this->SetSyntax(_("{\037channel\037 | \037nickname\037}"));
@@ -121,7 +121,7 @@ class BSInfo : public Module
 {
 	CommandBSInfo commandbsinfo;
 
- public:
+public:
 	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsinfo(this)
 	{

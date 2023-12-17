@@ -18,7 +18,7 @@ static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
 
 class PlexusProto : public IRCDProto
 {
- public:
+public:
 	PlexusProto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
 	{
 		DefaultPseudoclientModes = "+iU";
@@ -413,7 +413,7 @@ class ProtoPlexus : public Module
 		ModeManager::AddChannelMode(new ChannelMode("PERM", 'z'));
 	}
 
- public:
+public:
 	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this), message_kill(this),

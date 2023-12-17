@@ -13,7 +13,7 @@
 
 class CommandCSDrop : public Command
 {
- public:
+public:
 	CommandCSDrop(Module *creator) : Command(creator, "chanserv/drop", 1, 2)
 	{
 		this->SetDesc(_("Cancel the registration of a channel"));
@@ -85,7 +85,7 @@ class CSDrop : public Module
 {
 	CommandCSDrop commandcsdrop;
 
- public:
+public:
 	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsdrop(this)
 	{
 

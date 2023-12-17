@@ -44,7 +44,7 @@ static Pipe *me;
 
 class LDAPRequest
 {
- public:
+public:
 	LDAPService *service;
 	LDAPInterface *inter;
 	LDAPMessage *message = nullptr; /* message returned by ldap_ */
@@ -76,7 +76,7 @@ class LDAPBind : public LDAPRequest
 {
 	Anope::string who, pass;
 
- public:
+public:
 	LDAPBind(LDAPService *s, LDAPInterface *i, const Anope::string &w, const Anope::string &p)
 		: LDAPRequest(s, i)
 		, who(w)
@@ -93,7 +93,7 @@ class LDAPSearchRequest : public LDAPRequest
 	Anope::string base;
 	Anope::string filter;
 
- public:
+public:
 	LDAPSearchRequest(LDAPService *s, LDAPInterface *i, const Anope::string &b, const Anope::string &f)
 		: LDAPRequest(s, i)
 		, base(b)
@@ -110,7 +110,7 @@ class LDAPAdd : public LDAPRequest
 	Anope::string dn;
 	LDAPMods attributes;
 
- public:
+public:
 	LDAPAdd(LDAPService *s, LDAPInterface *i, const Anope::string &d, const LDAPMods &attr)
 		: LDAPRequest(s, i)
 		, dn(d)
@@ -126,7 +126,7 @@ class LDAPDel : public LDAPRequest
 {
 	Anope::string dn;
 
- public:
+public:
 	LDAPDel(LDAPService *s, LDAPInterface *i, const Anope::string &d)
 		: LDAPRequest(s, i)
 		, dn(d)
@@ -142,7 +142,7 @@ class LDAPModify : public LDAPRequest
 	Anope::string base;
 	LDAPMods attributes;
 
- public:
+public:
 	LDAPModify(LDAPService *s, LDAPInterface *i, const Anope::string &b, const LDAPMods &attr)
 		: LDAPRequest(s, i)
 		, base(b)
@@ -164,7 +164,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 	time_t last_connect = 0;
 
- public:
+public:
 	static LDAPMod **BuildMods(const LDAPMods &attributes)
 	{
 		LDAPMod **mods = new LDAPMod*[attributes.size() + 1];
@@ -204,7 +204,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		delete [] mods;
 	}
 
- private:
+private:
 #ifdef _WIN32
 	// Windows LDAP does not implement this so we need to do it.
 	int ldap_initialize(LDAP** ldap, const char* url)
@@ -299,7 +299,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		this->Unlock();
 	}
 
- public:
+public:
 	typedef std::vector<LDAPRequest *> query_queue;
 	query_queue queries, results;
 	Mutex process_mutex; /* held when processing requests not in either queue */
@@ -381,7 +381,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		QueueRequest(mod);
 	}
 
- private:
+private:
 	void BuildReply(int res, LDAPRequest *req)
 	{
 		LDAPResult *ldap_result = req->result = new LDAPResult();
@@ -480,7 +480,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		process_mutex.Unlock();
 	}
 
- public:
+public:
 	void Run() override
 	{
 		while (!this->GetExitState())
@@ -505,7 +505,7 @@ class ModuleLDAP : public Module, public Pipe
 {
 	std::map<Anope::string, LDAPService *> LDAPServices;
 
- public:
+public:
 
 	ModuleLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{

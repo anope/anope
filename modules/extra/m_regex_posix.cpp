@@ -14,7 +14,7 @@ class POSIXRegex : public Regex
 {
 	regex_t regbuf;
 
- public:
+public:
 	POSIXRegex(const Anope::string &expr) : Regex(expr)
 	{
 		int err = regcomp(&this->regbuf, expr.c_str(), REG_EXTENDED | REG_NOSUB | REG_ICASE);
@@ -40,7 +40,7 @@ class POSIXRegex : public Regex
 
 class POSIXRegexProvider : public RegexProvider
 {
- public:
+public:
 	POSIXRegexProvider(Module *creator) : RegexProvider(creator, "regex/posix") { }
 
 	Regex *Compile(const Anope::string &expression) override
@@ -53,7 +53,7 @@ class ModuleRegexPOSIX : public Module
 {
 	POSIXRegexProvider posix_regex_provider;
 
- public:
+public:
 	ModuleRegexPOSIX(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		posix_regex_provider(this)
 	{

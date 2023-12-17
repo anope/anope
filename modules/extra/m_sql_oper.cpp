@@ -39,7 +39,7 @@ class SQLOperResult : public SQL::Interface
 		}
 	}
 
- public:
+public:
 	SQLOperResult(Module *m, User *u) : SQL::Interface(m), user(u) { }
 
 	void OnResult(const SQL::Result &r) override
@@ -130,7 +130,7 @@ class ModuleSQLOper : public Module
 
 	ServiceReference<SQL::Provider> SQL;
 
- public:
+public:
 	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 	}

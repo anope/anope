@@ -13,7 +13,7 @@
 
 class CommandMSIgnore : public Command
 {
- public:
+public:
 	CommandMSIgnore(Module *creator) : Command(creator, "memoserv/ignore", 1, 3)
 	{
 		this->SetDesc(_("Manage the memo ignore list"));
@@ -122,7 +122,7 @@ class MSIgnore : public Module
 {
 	CommandMSIgnore commandmsignore;
 
- public:
+public:
 	MSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsignore(this)
 	{

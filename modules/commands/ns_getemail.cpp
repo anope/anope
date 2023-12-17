@@ -17,7 +17,7 @@
 
 class CommandNSGetEMail : public Command
 {
- public:
+public:
 	CommandNSGetEMail(Module *creator) : Command(creator, "nickserv/getemail", 1, 1)
 	{
 		this->SetDesc(_("Matches and returns all users that registered using given email"));
@@ -61,7 +61,7 @@ class CommandNSGetEMail : public Command
 class NSGetEMail : public Module
 {
 	CommandNSGetEMail commandnsgetemail;
- public:
+public:
 	NSGetEMail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsgetemail(this)
 	{

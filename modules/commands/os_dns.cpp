@@ -96,7 +96,7 @@ class DNSServer : public Serializable
 	/* is actually in the pool */
 	bool active = false;
 
- public:
+public:
 	std::set<Anope::string, ci::less> zones;
 	time_t repool = 0;
 
@@ -653,7 +653,7 @@ class CommandOSDNS : public Command
 		Log(LOG_ADMIN, source, this) << "to depool " << s->GetName();
 	}
 
- public:
+public:
 	CommandOSDNS(Module *creator) : Command(creator, "operserv/dns", 0, 4)
 	{
 		this->SetDesc(_("Manage DNS zones for this network"));
@@ -730,7 +730,7 @@ class ModuleDNS : public Module
 
 	time_t last_warn = 0;
 
- public:
+public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		zone_type("DNSZone", DNSZone::Unserialize), dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this)
 	{

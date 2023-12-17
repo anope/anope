@@ -13,7 +13,7 @@
 
 class CommandBSBotList : public Command
 {
- public:
+public:
 	CommandBSBotList(Module *creator) : Command(creator, "botserv/botlist", 0, 0)
 	{
 		this->SetDesc(_("Lists available bots"));
@@ -69,7 +69,7 @@ class BSBotList : public Module
 {
 	CommandBSBotList commandbsbotlist;
 
- public:
+public:
 	BSBotList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsbotlist(this)
 	{

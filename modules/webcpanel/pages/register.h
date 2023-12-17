@@ -14,7 +14,7 @@ namespace WebCPanel
 
 class Register : public WebPanelPage
 {
- public:
+public:
 	Register(const Anope::string &u) : WebPanelPage(u) { }
 
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) override;

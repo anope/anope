@@ -200,7 +200,7 @@ class Packet : public Query
 		return record;
 	}
 
- public:
+public:
 	static const int POINTER = 0xC0;
 	static const int LABEL = 0x3F;
 	static const int HEADER_LENGTH = 12;
@@ -450,7 +450,7 @@ namespace DNS
 {
 	class ReplySocket : public virtual Socket
 	{
-	 public:
+	public:
 		~ReplySocket() override = default;
 		virtual void Reply(Packet *p) = 0;
 	};
@@ -461,7 +461,7 @@ class TCPSocket : public ListenSocket
 {
 	Manager *manager;
 
- public:
+public:
 	/* A TCP client */
 	class Client : public ClientSocket, public Timer, public ReplySocket
 	{
@@ -470,7 +470,7 @@ class TCPSocket : public ListenSocket
 		unsigned char packet_buffer[524];
 		int length = 0;
 
-	 public:
+	public:
 		Client(Manager *m, TCPSocket *l, int fd, const sockaddrs &addr) : Socket(fd, l->GetFamily()), ClientSocket(l, addr), Timer(5),
 			manager(m)
 		{
@@ -555,7 +555,7 @@ class UDPSocket : public ReplySocket
 	Manager *manager;
 	std::deque<Packet *> packets;
 
- public:
+public:
 	UDPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') == Anope::string::npos ? AF_INET : AF_INET6, SOCK_DGRAM), manager(m) { }
 
 	~UDPSocket() override
@@ -613,7 +613,7 @@ class UDPSocket : public ReplySocket
 class NotifySocket : public Socket
 {
 	Packet *packet;
- public:
+public:
 	NotifySocket(int family, Packet *p) : Socket(-1, family, SOCK_DGRAM), packet(p)
 	{
 		SocketEngine::Change(this, false, SF_READABLE);
@@ -657,7 +657,7 @@ class MyManager : public Manager, public Timer
 	sockaddrs addrs;
 
 	std::vector<std::pair<Anope::string, short> > notify;
- public:
+public:
 	std::map<unsigned short, Request *> requests;
 
 	MyManager(Module *creator) : Manager(creator), Timer(300, Anope::CurTime, true), serial(Anope::CurTime), cur_id(rand())
@@ -714,7 +714,7 @@ class MyManager : public Manager, public Timer
 		notify = n;
 	}
 
- private:
+private:
 	unsigned short cur_id;
 
 	unsigned short GetID()
@@ -729,7 +729,7 @@ class MyManager : public Manager, public Timer
 		return cur_id;
 	}
 
- public:
+public:
 	void Process(Request *req) override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Processing request to lookup " << req->name << ", of type " << req->type;
@@ -967,7 +967,7 @@ class MyManager : public Manager, public Timer
 		}
 	}
 
- private:
+private:
 	/** Add a record to the dns cache
 	 * @param r The record
 	 */
@@ -1007,7 +1007,7 @@ class ModuleDNS : public Module
 
 	std::vector<std::pair<Anope::string, short> > notify;
 
- public:
+public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), manager(this)
 	{
 

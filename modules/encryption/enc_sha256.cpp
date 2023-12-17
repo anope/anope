@@ -152,7 +152,7 @@ class SHA256Context : public Encryption::Context
 	uint32_t h[8];
 	unsigned char digest[SHA256_DIGEST_SIZE];
 
- public:
+public:
 	SHA256Context(Encryption::IV *iv)
 	{
 		if (iv != NULL)
@@ -218,7 +218,7 @@ class SHA256Context : public Encryption::Context
 
 class SHA256Provider : public Encryption::Provider
 {
- public:
+public:
 	SHA256Provider(Module *creator) : Encryption::Provider(creator, "sha256") { }
 
 	Encryption::Context *CreateContext(Encryption::IV *iv) override
@@ -271,7 +271,7 @@ class ESHA256 : public Module
 			PACK32(reinterpret_cast<unsigned char *>(&buf2[i << 2]), iv[i]);
 	}
 
- public:
+public:
 	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		sha256provider(this)
 	{

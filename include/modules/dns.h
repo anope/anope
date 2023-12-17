@@ -115,7 +115,7 @@ namespace DNS
 	 */
 	class Manager : public Service
 	{
-	 public:
+	public:
 		Manager(Module *creator) : Service(creator, "DNS::Manager", "dns/manager") { }
 		virtual ~Manager() = default;
 
@@ -134,7 +134,7 @@ namespace DNS
 	class Request : public Timer, public Question
 	{
 		Manager *manager;
-	 public:
+	public:
 		/* Use result cache if available */
 		bool use_cache;
 		/* Request id */

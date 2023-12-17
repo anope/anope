@@ -15,7 +15,7 @@ class CommandHSGroup : public Command
 {
 	bool setting = false;
 
- public:
+public:
 	void Sync(const NickAlias *na)
 	{
 		if (setting)
@@ -81,7 +81,7 @@ class HSGroup : public Module
 	bool syncongroup;
 	bool synconset;
 
- public:
+public:
 	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsgroup(this)
 	{

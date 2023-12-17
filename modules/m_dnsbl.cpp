@@ -45,7 +45,7 @@ class DNSBLResolver : public Request
 	Blacklist blacklist;
 	bool add_to_akill;
 
- public:
+public:
 	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : Request(dnsmanager, c, host, QUERY_A, true), user(u), blacklist(b), add_to_akill(add_akill) { }
 
 	void OnLookupComplete(const Query *record) override
@@ -102,7 +102,7 @@ class ModuleDNSBL : public Module
 	bool check_on_netburst;
 	bool add_to_akill;
 
- public:
+public:
 	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
 	{
 

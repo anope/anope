@@ -10,7 +10,7 @@
 
 class MemoServService : public Service
 {
- public:
+public:
 	enum MemoResult
 	{
 		MEMO_SUCCESS,

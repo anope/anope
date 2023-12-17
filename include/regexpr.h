@@ -17,7 +17,7 @@
 
 class RegexException : public CoreException
 {
- public:
+public:
 	RegexException(const Anope::string &reason = "") : CoreException(reason) { }
 
 	virtual ~RegexException() noexcept = default;
@@ -26,9 +26,9 @@ class RegexException : public CoreException
 class CoreExport Regex
 {
 	Anope::string expression;
- protected:
+protected:
 	Regex(const Anope::string &expr) : expression(expr) { }
- public:
+public:
 	virtual ~Regex() = default;
 	const Anope::string &GetExpression() { return expression; }
 	virtual bool Matches(const Anope::string &str) = 0;
@@ -36,7 +36,7 @@ class CoreExport Regex
 
 class CoreExport RegexProvider : public Service
 {
- public:
+public:
 	RegexProvider(Module *o, const Anope::string &n) : Service(o, "Regex", n) { }
 	virtual Regex *Compile(const Anope::string &) = 0;
 };

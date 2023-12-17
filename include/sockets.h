@@ -108,7 +108,7 @@ class CoreExport cidr
 	sockaddrs addr;
 	Anope::string cidr_ip;
 	unsigned short cidr_len;
- public:
+public:
 	cidr(const Anope::string &ip);
 	cidr(const Anope::string &ip, unsigned char len);
 	cidr(const sockaddrs &ip, unsigned char len);
@@ -128,7 +128,7 @@ class CoreExport cidr
 
 class SocketException : public CoreException
 {
- public:
+public:
 	/** Constructor for socket exceptions
 	 * @param message Error message
 	 */
@@ -154,7 +154,7 @@ enum SocketFlag
 
 class CoreExport SocketIO
 {
- public:
+public:
 	virtual ~SocketIO() = default;
 
 	/** Receive something from the buffer
@@ -212,14 +212,14 @@ class CoreExport SocketIO
 
 class CoreExport Socket
 {
- protected:
+protected:
 	/* Socket FD */
 	int sock;
 
 	/* The family of this socket FD */
 	int family;
 
- public:
+public:
 	std::bitset<SF_SIZE> flags;
 
 	/* Sockaddrs for bind() (if it's bound) */
@@ -288,7 +288,7 @@ class CoreExport Socket
 
 class CoreExport BufferedSocket : public virtual Socket
 {
- protected:
+protected:
 	/* Things read from the socket */
 	Anope::string read_buffer;
 	/* Things to be written to the socket */
@@ -296,7 +296,7 @@ class CoreExport BufferedSocket : public virtual Socket
 	/* How much data was received from this socket on this recv() */
 	int recv_len;
 
- public:
+public:
 	virtual ~BufferedSocket() = default;
 
 	/** Called when there is something to be received for this socket
@@ -316,9 +316,9 @@ class CoreExport BufferedSocket : public virtual Socket
 	/** Write to the socket
 	* @param message The message
 	*/
- protected:
+protected:
 	virtual void Write(const char *buffer, size_t l);
- public:
+public:
 	void Write(const char *message, ...);
 	void Write(const Anope::string &message);
 
@@ -335,7 +335,7 @@ class CoreExport BufferedSocket : public virtual Socket
 
 class CoreExport BinarySocket : public virtual Socket
 {
- protected:
+protected:
 	struct DataBlock
 	{
 		char *orig;
@@ -349,7 +349,7 @@ class CoreExport BinarySocket : public virtual Socket
 	/* Data to be written out */
 	std::deque<DataBlock *> write_buffer;
 
- public:
+public:
 	virtual ~BinarySocket() = default;
 
 	/** Called when there is something to be received for this socket
@@ -380,7 +380,7 @@ class CoreExport BinarySocket : public virtual Socket
 
 class CoreExport ListenSocket : public virtual Socket
 {
- public:
+public:
 	/** Constructor
 	 * @param bindip The IP to bind to
 	 * @param port The port to listen on
@@ -404,7 +404,7 @@ class CoreExport ListenSocket : public virtual Socket
 
 class CoreExport ConnectionSocket : public virtual Socket
 {
- public:
+public:
 	/* Sockaddrs for connection ip/port */
 	sockaddrs conaddr;
 
@@ -437,7 +437,7 @@ class CoreExport ConnectionSocket : public virtual Socket
 
 class CoreExport ClientSocket : public virtual Socket
 {
- public:
+public:
 	/* Listen socket this connection came from */
 	ListenSocket *ls;
 	/* Clients address */
@@ -471,7 +471,7 @@ class CoreExport ClientSocket : public virtual Socket
 
 class CoreExport Pipe : public Socket
 {
- public:
+public:
 	/** The FD of the write pipe
 	 * this->sock is the readfd
 	 */

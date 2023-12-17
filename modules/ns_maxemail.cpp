@@ -73,7 +73,7 @@ class NSMaxEmail : public Module
 		return count;
 	}
 
- public:
+public:
 	NSMaxEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
 	}

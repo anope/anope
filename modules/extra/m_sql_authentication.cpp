@@ -16,7 +16,7 @@ class SQLAuthenticationResult : public SQL::Interface
 	Reference<User> user;
 	IdentifyRequest *req;
 
- public:
+public:
 	SQLAuthenticationResult(User *u, IdentifyRequest *r) : SQL::Interface(me), user(u), req(r)
 	{
 		req->Hold(me);
@@ -81,7 +81,7 @@ class ModuleSQLAuthentication : public Module
 
 	ServiceReference<SQL::Provider> SQL;
 
- public:
+public:
 	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 		me = this;

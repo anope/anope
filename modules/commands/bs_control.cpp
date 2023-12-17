@@ -13,7 +13,7 @@
 
 class CommandBSSay : public Command
 {
- public:
+public:
 	CommandBSSay(Module *creator) : Command(creator, "botserv/say", 2, 2)
 	{
 		this->SetDesc(_("Makes the bot say the specified text on the specified channel"));
@@ -73,7 +73,7 @@ class CommandBSSay : public Command
 
 class CommandBSAct : public Command
 {
- public:
+public:
 	CommandBSAct(Module *creator) : Command(creator, "botserv/act", 2, 2)
 	{
 		this->SetDesc(_("Makes the bot do the equivalent of a \"/me\" command"));
@@ -135,7 +135,7 @@ class BSControl : public Module
 	CommandBSSay commandbssay;
 	CommandBSAct commandbsact;
 
- public:
+public:
 	BSControl(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbssay(this), commandbsact(this)
 	{

@@ -89,7 +89,7 @@ class MyHTTPClient : public HTTPClient
 			this->SendReply(&reply);
 	}
 
- public:
+public:
 	time_t created;
 
 	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->GetFamily()), HTTPClient(l, f, a), provider(l), ip(a.addr()), created(Anope::CurTime)
@@ -288,7 +288,7 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 	std::map<Anope::string, HTTPPage *> pages;
 	std::list<Reference<MyHTTPClient> > clients;
 
- public:
+public:
 	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t, bool s) : Socket(-1, i.find(':') == Anope::string::npos ? AF_INET : AF_INET6), HTTPProvider(c, n, i, p, s), Timer(c, 10, Anope::CurTime, true), timeout(t) { }
 
 	void Tick(time_t) override
@@ -333,7 +333,7 @@ class HTTPD : public Module
 {
 	ServiceReference<SSLService> sslref;
 	std::map<Anope::string, MyHTTPProvider *> providers;
- public:
+public:
 	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), sslref("SSLService", "ssl")
 	{
 

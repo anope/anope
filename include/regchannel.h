@@ -23,7 +23,7 @@ extern CoreExport Serialize::Checker<registered_channel_map> RegisteredChannelLi
 /* AutoKick data. */
 class CoreExport AutoKick : public Serializable
 {
- public:
+public:
 	/* Channel this autokick is on */
 	Serialize::Reference<ChannelInfo> ci;
 
@@ -47,14 +47,14 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 {
 	/* channels who reference this one */
 	Anope::map<int> references;
- private:
+private:
 	Serialize::Reference<NickCore> founder;					/* Channel founder */
 	Serialize::Reference<NickCore> successor;                               /* Who gets the channel if the founder nick is dropped or expires */
 	Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
 	Serialize::Checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
 	Anope::map<int16_t> levels;
 
- public:
+public:
 	friend class ChanAccess;
 	friend class AutoKick;
 

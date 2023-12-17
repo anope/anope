@@ -13,7 +13,7 @@
 
 class CommandBSSetGreet : public Command
 {
- public:
+public:
 	CommandBSSetGreet(Module *creator, const Anope::string &sname = "botserv/set/greet") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("Enable greet messages"));
@@ -77,7 +77,7 @@ class CommandBSSetGreet : public Command
 
 class CommandNSSetGreet : public Command
 {
- public:
+public:
 	CommandNSSetGreet(Module *creator, const Anope::string &sname = "nickserv/set/greet", size_t min = 0) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Associate a greet message with your nickname"));
@@ -138,7 +138,7 @@ class CommandNSSetGreet : public Command
 
 class CommandNSSASetGreet : public CommandNSSetGreet
 {
- public:
+public:
 	CommandNSSASetGreet(Module *creator) : CommandNSSetGreet(creator, "nickserv/saset/greet", 1)
 	{
 		this->ClearSyntax();
@@ -173,7 +173,7 @@ class Greet : public Module
 	CommandNSSetGreet commandnssetgreet;
 	CommandNSSASetGreet commandnssasetgreet;
 
- public:
+public:
 	Greet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		bs_greet(this, "BS_GREET"),
 		ns_greet(this, "greet"),

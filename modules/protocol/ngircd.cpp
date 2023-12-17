@@ -19,7 +19,7 @@ class ngIRCdProto : public IRCDProto
 		user->KillInternal(source, buf);
 	}
 
- public:
+public:
 	ngIRCdProto(Module *creator) : IRCDProto(creator, "ngIRCd")
 	{
 		DefaultPseudoclientModes = "+oi";
@@ -649,7 +649,7 @@ class ProtongIRCd : public Module
 		ModeManager::AddChannelMode(new ChannelMode("SSL", 'z'));
 	}
 
- public:
+public:
 	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_capab(this), message_error(this), message_invite(this), message_kick(this), message_kill(this),

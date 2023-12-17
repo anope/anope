@@ -13,7 +13,7 @@
 
 class CommandNSAccess : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
 		if (mask.empty())
@@ -95,7 +95,7 @@ class CommandNSAccess : public Command
 
 		return;
 	}
- public:
+public:
 	CommandNSAccess(Module *creator) : Command(creator, "nickserv/access", 1, 3)
 	{
 		this->SetDesc(_("Modify the list of authorized addresses"));
@@ -190,7 +190,7 @@ class NSAccess : public Module
 {
 	CommandNSAccess commandnsaccess;
 
- public:
+public:
 	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsaccess(this)
 	{

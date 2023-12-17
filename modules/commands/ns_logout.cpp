@@ -15,7 +15,7 @@ static ServiceReference<NickServService> NickServService("NickServService", "Nic
 
 class CommandNSLogout : public Command
 {
- public:
+public:
 	CommandNSLogout(Module *creator) : Command(creator, "nickserv/logout", 0, 2)
 	{
 		this->SetDesc(_("Reverses the effect of the IDENTIFY command"));
@@ -80,7 +80,7 @@ class NSLogout : public Module
 {
 	CommandNSLogout commandnslogout;
 
- public:
+public:
 	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnslogout(this)
 	{

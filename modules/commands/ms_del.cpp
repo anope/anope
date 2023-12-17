@@ -17,7 +17,7 @@ class MemoDelCallback : public NumberList
 	Command *cmd;
 	ChannelInfo *ci;
 	MemoInfo *mi;
- public:
+public:
 	MemoDelCallback(CommandSource &_source, Command *c, ChannelInfo *_ci, MemoInfo *_mi, const Anope::string &list) : NumberList(list, true), source(_source), cmd(c), ci(_ci), mi(_mi)
 	{
 	}
@@ -38,7 +38,7 @@ class MemoDelCallback : public NumberList
 
 class CommandMSDel : public Command
 {
- public:
+public:
 	CommandMSDel(Module *creator) : Command(creator, "memoserv/del", 0, 2)
 	{
 		this->SetDesc(_("Delete a memo or memos"));
@@ -148,7 +148,7 @@ class MSDel : public Module
 {
 	CommandMSDel commandmsdel;
 
- public:
+public:
 	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsdel(this)
 	{

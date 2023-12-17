@@ -14,7 +14,7 @@
 
 class CommandCSList : public Command
 {
- public:
+public:
 	CommandCSList(Module *creator) : Command(creator, "chanserv/list", 1, 2)
 	{
 		this->SetDesc(_("Lists all registered channels matching the given pattern"));
@@ -172,7 +172,7 @@ class CommandCSList : public Command
 
 class CommandCSSetPrivate : public Command
 {
- public:
+public:
 	CommandCSSetPrivate(Module *creator, const Anope::string &cname = "chanserv/set/private") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Hide channel from the LIST command"));
@@ -245,7 +245,7 @@ class CSList : public Module
 
 	SerializableExtensibleItem<bool> priv;
 
- public:
+public:
 	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcslist(this), commandcssetprivate(this), priv(this, "CS_PRIVATE")
 	{

@@ -114,7 +114,7 @@ class CSStatus : public Module
 {
 	CommandCSStatus commandcsstatus;
 
- public:
+public:
 	CSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsstatus(this)
 	{
 	}

@@ -23,7 +23,7 @@ class HybridProto : public IRCDProto
 		u->KillInternal(source, buf);
 	}
 
- public:
+public:
 	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.23+")
 	{
 		DefaultPseudoclientModes = "+oi";
@@ -765,7 +765,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelModeNoone("ISSECURE", 'Z'));
 	}
 
- public:
+public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this),

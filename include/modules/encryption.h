@@ -18,7 +18,7 @@ namespace Encryption
 
 	class Context
 	{
-	 public:
+	public:
 		virtual ~Context() = default;
 		virtual void Update(const unsigned char *data, size_t len) = 0;
 		virtual void Finalize() = 0;
@@ -27,7 +27,7 @@ namespace Encryption
 
 	class Provider : public Service
 	{
-	 public:
+	public:
 		Provider(Module *creator, const Anope::string &sname) : Service(creator, "Encryption::Provider", sname) { }
 		virtual ~Provider() = default;
 

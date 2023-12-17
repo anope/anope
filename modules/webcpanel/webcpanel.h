@@ -32,7 +32,7 @@ struct Section
 /* An interface for this webpanel used by other modules */
 class Panel : public Section, public Service
 {
- public:
+public:
 	Panel(Module *c, const Anope::string &n) : Service(c, "Panel", n) { }
 
 	std::vector<Section> sections;
@@ -65,7 +65,7 @@ class Panel : public Section, public Service
 
 class WebPanelPage : public HTTPPage
 {
- public:
+public:
 	WebPanelPage(const Anope::string &u, const Anope::string &ct = "text/html") : HTTPPage(u, ct)
 	{
 	}
@@ -77,7 +77,7 @@ class WebPanelProtectedPage : public WebPanelPage
 {
 	Anope::string category;
 
- public:
+public:
 	WebPanelProtectedPage(const Anope::string &cat, const Anope::string &u, const Anope::string &ct = "text/html") : WebPanelPage(u, ct), category(cat)
 	{
 	}

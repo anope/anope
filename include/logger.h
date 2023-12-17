@@ -50,7 +50,7 @@ struct LogFile
 /* Represents a single log message */
 class CoreExport Log
 {
- public:
+public:
 	/* Bot that should log this message */
 	BotInfo *bi = nullptr;
 	/* For commands, the user executing the command, but might not always exist */
@@ -94,11 +94,11 @@ class CoreExport Log
 
 	~Log();
 
- private:
+private:
 	Anope::string FormatSource() const;
 	Anope::string FormatCommand() const;
 
- public:
+public:
 	Anope::string BuildPrefix() const;
 
 	template<typename T> Log &operator<<(T val)
@@ -111,7 +111,7 @@ class CoreExport Log
 /* Configured in the configuration file, actually does the message logging */
 class CoreExport LogInfo
 {
- public:
+public:
 	BotInfo *bot = nullptr;
 	std::vector<Anope::string> targets;
 	std::vector<LogFile *> logfiles;

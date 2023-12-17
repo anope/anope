@@ -23,7 +23,7 @@ class GlobalCore : public Module, public GlobalService
 			this->ServerGlobal(sender, link, message);
 	}
 
- public:
+public:
 	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		GlobalService(this)
 	{

@@ -13,7 +13,7 @@
 
 class CommandCSRegister : public Command
 {
- public:
+public:
 	CommandCSRegister(Module *creator) : Command(creator, "chanserv/register", 1, 2)
 	{
 		this->SetDesc(_("Register a channel"));
@@ -114,7 +114,7 @@ class CSRegister : public Module
 {
 	CommandCSRegister commandcsregister;
 
- public:
+public:
 	CSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsregister(this)
 	{

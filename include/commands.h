@@ -53,7 +53,7 @@ class CoreExport CommandSource
 	Anope::string nick;
 	/* User executing the command, may be NULL */
 	Reference<User> u;
- public:
+public:
 	/* The account executing the command */
 	Reference<NickCore> nc;
 	/* for web clients */
@@ -97,7 +97,7 @@ class CoreExport Command : public Service
 	/* Command requires that a user is executing it */
 	bool require_user;
 
- public:
+public:
 	/* Maximum parameters accepted by this command */
 	size_t max_params;
 	/* Minimum parameters required to use this command */
@@ -106,7 +106,7 @@ class CoreExport Command : public Service
 	/* Module which owns us */
 	Module *module;
 
- protected:
+protected:
 	/** Create a new command.
 	 * @param owner The owner of the command
 	 * @param sname The command name
@@ -116,10 +116,10 @@ class CoreExport Command : public Service
 	 */
 	Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params = 0);
 
- public:
+public:
 	virtual ~Command() = default;
 
- protected:
+protected:
 	void SetDesc(const Anope::string &d);
 
 	void ClearSyntax();
@@ -129,7 +129,7 @@ class CoreExport Command : public Service
 	void AllowUnregistered(bool b);
 	void RequireUser(bool b);
 
- public:
+public:
 	bool AllowUnregistered() const;
 	bool RequireUser() const;
 

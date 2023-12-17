@@ -13,7 +13,7 @@
 
 class CommandOSChanList : public Command
 {
- public:
+public:
 	CommandOSChanList(Module *creator) : Command(creator, "operserv/chanlist", 0, 2)
 	{
 		this->SetDesc(_("Lists all channel records"));
@@ -130,7 +130,7 @@ class CommandOSChanList : public Command
 
 class CommandOSUserList : public Command
 {
- public:
+public:
 	CommandOSUserList(Module *creator) : Command(creator, "operserv/userlist", 0, 2)
 	{
 		this->SetDesc(_("Lists all user records"));
@@ -275,7 +275,7 @@ class OSList : public Module
 	CommandOSChanList commandoschanlist;
 	CommandOSUserList commandosuserlist;
 
- public:
+public:
 	OSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoschanlist(this), commandosuserlist(this)
 	{

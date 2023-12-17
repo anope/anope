@@ -21,9 +21,9 @@ class CoreExport IRCDProto : public Service
 {
 	Anope::string proto_name;
 
- protected:
+protected:
 	IRCDProto(Module *creator, const Anope::string &proto_name);
- public:
+public:
 	virtual ~IRCDProto();
 
 	virtual void SendSVSKillInternal(const MessageSource &, User *, const Anope::string &);
@@ -250,7 +250,7 @@ class CoreExport MessageSource
 	User *u = nullptr;
 	Server *s = nullptr;
 
- public:
+public:
 	MessageSource(const Anope::string &);
 	MessageSource(User *u);
 	MessageSource(Server *s);
@@ -273,7 +273,7 @@ class CoreExport IRCDMessage : public Service
 	Anope::string name;
 	unsigned param_count;
 	std::set<IRCDMessageFlag> flags;
- public:
+public:
 	IRCDMessage(Module *owner, const Anope::string &n, unsigned p = 0);
 	unsigned GetParamCount() const;
 	virtual void Run(MessageSource &, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) = 0;
@@ -292,7 +292,7 @@ private:
 	/** The current position within the message. */
 	Anope::string::size_type position = 0;
 
- public:
+public:
 	/** Create a tokenstream and fill it with the provided data. */
 	MessageTokenizer(const Anope::string &msg);
 

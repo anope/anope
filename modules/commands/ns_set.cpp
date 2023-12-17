@@ -13,7 +13,7 @@
 
 class CommandNSSet : public Command
 {
- public:
+public:
 	CommandNSSet(Module *creator) : Command(creator, "nickserv/set", 1, 3)
 	{
 		this->SetDesc(_("Set options, including kill protection"));
@@ -65,7 +65,7 @@ class CommandNSSet : public Command
 
 class CommandNSSASet : public Command
 {
- public:
+public:
 	CommandNSSASet(Module *creator) : Command(creator, "nickserv/saset", 2, 4)
 	{
 		this->SetDesc(_("Set SET-options on another nickname"));
@@ -107,7 +107,7 @@ class CommandNSSASet : public Command
 
 class CommandNSSetPassword : public Command
 {
- public:
+public:
 	CommandNSSetPassword(Module *creator) : Command(creator, "nickserv/set/password", 1)
 	{
 		this->SetDesc(_("Set your nickname password"));
@@ -163,7 +163,7 @@ class CommandNSSetPassword : public Command
 
 class CommandNSSASetPassword : public Command
 {
- public:
+public:
 	CommandNSSASetPassword(Module *creator) : Command(creator, "nickserv/saset/password", 2, 2)
 	{
 		this->SetDesc(_("Set the nickname password"));
@@ -232,7 +232,7 @@ class CommandNSSASetPassword : public Command
 
 class CommandNSSetAutoOp : public Command
 {
- public:
+public:
 	CommandNSSetAutoOp(Module *creator, const Anope::string &sname = "nickserv/set/autoop", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Sets whether services should set channel status modes on you automatically."));
@@ -296,7 +296,7 @@ class CommandNSSetAutoOp : public Command
 
 class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 {
- public:
+public:
 	CommandNSSASetAutoOp(Module *creator) : CommandNSSetAutoOp(creator, "nickserv/saset/autoop", 2)
 	{
 		this->ClearSyntax();
@@ -324,7 +324,7 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 
 class CommandNSSetNeverOp : public Command
 {
- public:
+public:
 	CommandNSSetNeverOp(Module *creator, const Anope::string &sname = "nickserv/set/neverop", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Sets whether you can be added to a channel access list."));
@@ -384,7 +384,7 @@ class CommandNSSetNeverOp : public Command
 
 class CommandNSSASetNeverOp : public CommandNSSetNeverOp
 {
- public:
+public:
 	CommandNSSASetNeverOp(Module *creator) : CommandNSSetNeverOp(creator, "nickserv/saset/neverop", 2)
 	{
 		this->ClearSyntax();
@@ -407,7 +407,7 @@ class CommandNSSASetNeverOp : public CommandNSSetNeverOp
 
 class CommandNSSetDisplay : public Command
 {
- public:
+public:
 	CommandNSSetDisplay(Module *creator, const Anope::string &sname = "nickserv/set/display", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Set the display of your group in Services"));
@@ -476,7 +476,7 @@ class CommandNSSetDisplay : public Command
 
 class CommandNSSASetDisplay : public CommandNSSetDisplay
 {
- public:
+public:
 	CommandNSSASetDisplay(Module *creator) : CommandNSSetDisplay(creator, "nickserv/saset/display", 2)
 	{
 		this->ClearSyntax();
@@ -530,7 +530,7 @@ class CommandNSSetEmail : public Command
 		return b;
 	}
 
- public:
+public:
 	CommandNSSetEmail(Module *creator, const Anope::string &cname = "nickserv/set/email", size_t min = 0) : Command(creator, cname, min, min + 1)
 	{
 		this->SetDesc(_("Associate an E-mail address with your nickname"));
@@ -623,7 +623,7 @@ class CommandNSSetEmail : public Command
 
 class CommandNSSASetEmail : public CommandNSSetEmail
 {
- public:
+public:
 	CommandNSSASetEmail(Module *creator) : CommandNSSetEmail(creator, "nickserv/saset/email", 2)
 	{
 		this->ClearSyntax();
@@ -646,7 +646,7 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 
 class CommandNSSetKeepModes : public Command
 {
- public:
+public:
 	CommandNSSetKeepModes(Module *creator, const Anope::string &sname = "nickserv/set/keepmodes", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Enable or disable keep modes"));
@@ -708,7 +708,7 @@ class CommandNSSetKeepModes : public Command
 
 class CommandNSSASetKeepModes : public CommandNSSetKeepModes
 {
- public:
+public:
 	CommandNSSASetKeepModes(Module *creator) : CommandNSSetKeepModes(creator, "nickserv/saset/keepmodes", 2)
 	{
 		this->ClearSyntax();
@@ -733,7 +733,7 @@ class CommandNSSASetKeepModes : public CommandNSSetKeepModes
 
 class CommandNSSetKill : public Command
 {
- public:
+public:
 	CommandNSSetKill(Module *creator, const Anope::string &sname = "nickserv/set/kill", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn protection on or off"));
@@ -837,7 +837,7 @@ class CommandNSSetKill : public Command
 
 class CommandNSSASetKill : public CommandNSSetKill
 {
- public:
+public:
 	CommandNSSASetKill(Module *creator) : CommandNSSetKill(creator, "nickserv/saset/kill", 2)
 	{
 		this->ClearSyntax();
@@ -871,7 +871,7 @@ class CommandNSSASetKill : public CommandNSSetKill
 
 class CommandNSSetLanguage : public Command
 {
- public:
+public:
 	CommandNSSetLanguage(Module *creator, const Anope::string &sname = "nickserv/set/language", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Set the language services will use when messaging you"));
@@ -949,7 +949,7 @@ class CommandNSSetLanguage : public Command
 
 class CommandNSSASetLanguage : public CommandNSSetLanguage
 {
- public:
+public:
 	CommandNSSASetLanguage(Module *creator) : CommandNSSetLanguage(creator, "nickserv/saset/language", 2)
 	{
 		this->ClearSyntax();
@@ -983,7 +983,7 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 
 class CommandNSSetMessage : public Command
 {
- public:
+public:
 	CommandNSSetMessage(Module *creator, const Anope::string &sname = "nickserv/set/message", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Change the communication method of services"));
@@ -1062,7 +1062,7 @@ class CommandNSSetMessage : public Command
 
 class CommandNSSASetMessage : public CommandNSSetMessage
 {
- public:
+public:
 	CommandNSSASetMessage(Module *creator) : CommandNSSetMessage(creator, "nickserv/saset/message", 2)
 	{
 		this->ClearSyntax();
@@ -1087,7 +1087,7 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 
 class CommandNSSetSecure : public Command
 {
- public:
+public:
 	CommandNSSetSecure(Module *creator, const Anope::string &sname = "nickserv/set/secure", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn nickname security on or off"));
@@ -1153,7 +1153,7 @@ class CommandNSSetSecure : public Command
 
 class CommandNSSASetSecure : public CommandNSSetSecure
 {
- public:
+public:
 	CommandNSSASetSecure(Module *creator) : CommandNSSetSecure(creator, "nickserv/saset/secure", 2)
 	{
 		this->ClearSyntax();
@@ -1182,7 +1182,7 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 
 class CommandNSSASetNoexpire : public Command
 {
- public:
+public:
 	CommandNSSASetNoexpire(Module *creator) : Command(creator, "nickserv/saset/noexpire", 1, 2)
 	{
 		this->SetDesc(_("Prevent the nickname from expiring"));
@@ -1321,7 +1321,7 @@ class NSSet : public Module
 	/* email, passcode */
 	PrimitiveExtensibleItem<std::pair<Anope::string, Anope::string > > ns_set_email;
 
- public:
+public:
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsset(this), commandnssaset(this),
 		commandnssetautoop(this), commandnssasetautoop(this),

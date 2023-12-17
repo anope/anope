@@ -13,7 +13,7 @@
 
 class CommandCSInvite : public Command
 {
- public:
+public:
 	CommandCSInvite(Module *creator) : Command(creator, "chanserv/invite", 1, 3)
 	{
 		this->SetDesc(_("Invites you or an optionally specified nick into a channel"));
@@ -101,7 +101,7 @@ class CSInvite : public Module
 {
 	CommandCSInvite commandcsinvite;
 
- public:
+public:
 	CSInvite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsinvite(this)
 	{
 

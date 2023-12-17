@@ -111,7 +111,7 @@ static bool ShouldHide(const Anope::string &channel, User *u)
 
 class CommandOSSeen : public Command
 {
- public:
+public:
 	CommandOSSeen(Module *creator) : Command(creator, "operserv/seen", 1, 2)
 	{
 		this->SetDesc(_("Statistics and maintenance for seen data"));
@@ -252,7 +252,7 @@ class CommandSeen : public Command
 			source.Reply(_("%s was last seen here %s ago."), na->nick.c_str(), Anope::Duration(Anope::CurTime - last, source.GetAccount()).c_str());
 	}
 
- public:
+public:
 	CommandSeen(Module *creator) : Command(creator, "chanserv/seen", 1, 2)
 	{
 		this->SetDesc(_("Tells you about the last time a user was seen"));
@@ -373,7 +373,7 @@ class CSSeen : public Module
 	Serialize::Type seeninfo_type;
 	CommandSeen commandseen;
 	CommandOSSeen commandosseen;
- public:
+public:
 	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this)
 	{
 	}
@@ -435,7 +435,7 @@ class CSSeen : public Module
 		UpdateUser(cu->user, KICK, cu->user->nick, source.GetSource(), cu->chan->name, msg);
 	}
 
- private:
+private:
 	void UpdateUser(const User *u, const TypeInfo Type, const Anope::string &nick, const Anope::string &nick2, const Anope::string &channel, const Anope::string &message)
 	{
 		if (simple || !u->server->IsSynced())

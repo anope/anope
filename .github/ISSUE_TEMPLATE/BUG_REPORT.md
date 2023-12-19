@@ -4,7 +4,7 @@ about: Report a non-security issue with Anope.
 ---
 
 <!--
-Please fill in the template below. It will help us process your bug report a lot faster.
+Please fill in the template below. It will help us process your bug report a lot faster. If you have multiple bugs to report then please open one issue for each bug.
 -->
 
 **Description**

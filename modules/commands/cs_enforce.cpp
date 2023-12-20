@@ -7,7 +7,7 @@
  *
  * Please read COPYING and README for further details.
  *
- * Send any bug reports to the Anope Coder, as he will be able
+ * Send any bug reports to the Anope Coder, as they will be able
  * to deal with it best.
  */
 

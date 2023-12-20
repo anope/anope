@@ -159,7 +159,7 @@ public:
 	virtual void OnDel(Channel *chan, const Anope::string &mask) { }
 };
 
-/** This is a mode with a paramater, eg +k/l. These modes should use/inherit from this
+/** This is a mode with a parameter, eg +k/l. These modes should use/inherit from this
 */
 class CoreExport ChannelModeParam : public ChannelMode
 {

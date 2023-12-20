@@ -130,7 +130,7 @@ enum
 	LANG_JA_EUC, /* Japanese (EUC encoding) */
 	LANG_JA_SJIS, /* Japanese (SJIS encoding) */
 	LANG_ES, /* Spanish */
-	LANG_PT, /* Portugese */
+	LANG_PT, /* Portuguese */
 	LANG_FR, /* French */
 	LANG_TR, /* Turkish */
 	LANG_IT, /* Italian */

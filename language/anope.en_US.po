@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-20 00:02+0000\n"
-"PO-Revision-Date: 2023-12-20 00:07+0000\n"
+"POT-Creation-Date: 2023-12-22 15:42+0000\n"
+"PO-Revision-Date: 2023-12-22 15:44+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1965,32 +1965,32 @@ msgstr "All vhosts in the group %s have been set to %s."
 msgid "All vhosts in the group %s have been set to %s@%s."
 msgstr "All vhosts in the group %s have been set to %s@%s."
 
-msgid "Allowed to (de)halfop him/herself"
-msgstr "Allowed to (de)halfop him/herself"
+msgid "Allowed to (de)halfop themself"
+msgstr "Allowed to (de)halfop themself"
 
 msgid "Allowed to (de)halfop users"
 msgstr "Allowed to (de)halfop users"
 
-msgid "Allowed to (de)op him/herself"
-msgstr "Allowed to (de)op him/herself"
+msgid "Allowed to (de)op themself"
+msgstr "Allowed to (de)op themself"
 
 msgid "Allowed to (de)op users"
 msgstr "Allowed to (de)op users"
 
-msgid "Allowed to (de)owner him/herself"
-msgstr "Allowed to (de)owner him/herself"
+msgid "Allowed to (de)owner themself"
+msgstr "Allowed to (de)owner themself"
 
 msgid "Allowed to (de)owner users"
 msgstr "Allowed to (de)owner users"
 
-msgid "Allowed to (de)protect him/herself"
-msgstr "Allowed to (de)protect him/herself"
+msgid "Allowed to (de)protect themself"
+msgstr "Allowed to (de)protect themself"
 
 msgid "Allowed to (de)protect users"
 msgstr "Allowed to (de)protect users"
 
-msgid "Allowed to (de)voice him/herself"
-msgstr "Allowed to (de)voice him/herself"
+msgid "Allowed to (de)voice themself"
+msgstr "Allowed to (de)voice themself"
 
 msgid "Allowed to (de)voice users"
 msgstr "Allowed to (de)voice users"
@@ -2021,6 +2021,9 @@ msgstr "Allowed to read channel memos"
 
 msgid "Allowed to set channel settings"
 msgstr "Allowed to set channel settings"
+
+msgid "Allowed to unban themself"
+msgstr "Allowed to unban themself"
 
 msgid "Allowed to unban users"
 msgstr "Allowed to unban users"
@@ -5458,8 +5461,8 @@ msgstr "Prevent the nickname from appearing in the LIST command"
 msgid "Prevent the nickname from expiring"
 msgstr "Prevent the nickname from expiring"
 
-msgid "Prevents users being kicked by Services"
-msgstr "Prevents users being kicked by Services"
+msgid "Prevents users being kicked by services"
+msgstr "Prevents users being kicked by services"
 
 msgid "Private"
 msgstr "Private"

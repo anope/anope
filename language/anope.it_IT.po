@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-20 19:02+0100\n"
-"PO-Revision-Date: 2023-12-20 19:02+0100\n"
+"POT-Creation-Date: 2023-12-22 15:42+0000\n"
+"PO-Revision-Date: 2023-12-22 15:53+0000\n"
 "Last-Translator: Dragone2 <dragone2@risposteinformatiche.it>\n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.4\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -1972,31 +1972,31 @@ msgstr "Tutti i vHost nel gruppo %s sono stati impostati a %s."
 msgid "All vhosts in the group %s have been set to %s@%s."
 msgstr "Tutti i vHost nel gruppo %s sono stati impostati a %s@%s."
 
-msgid "Allowed to (de)halfop him/herself"
+msgid "Allowed to (de)halfop themself"
 msgstr "Autorizzato a dare o rimuovere lo stato di halfop a sé stesso"
 
 msgid "Allowed to (de)halfop users"
 msgstr "Autorizzato a dare o rimuovere lo stato di halfop agli utenti"
 
-msgid "Allowed to (de)op him/herself"
+msgid "Allowed to (de)op themself"
 msgstr "Autorizzato a dare o rimuovere lo stato di op a sé stesso"
 
 msgid "Allowed to (de)op users"
 msgstr "Autorizzato a dare o rimuovere lo stato di op agli utenti"
 
-msgid "Allowed to (de)owner him/herself"
+msgid "Allowed to (de)owner themself"
 msgstr "Autorizzato a dare o rimuovere lo stato di owner a sé stesso"
 
 msgid "Allowed to (de)owner users"
 msgstr "Autorizzato a dare o rimuovere lo stato di owner agli utenti"
 
-msgid "Allowed to (de)protect him/herself"
+msgid "Allowed to (de)protect themself"
 msgstr "Autorizzato a dare o rimuovere lo stato di protect a sé stesso"
 
 msgid "Allowed to (de)protect users"
 msgstr "Autorizzato a dare o rimuovere lo stato di protect agli utenti"
 
-msgid "Allowed to (de)voice him/herself"
+msgid "Allowed to (de)voice themself"
 msgstr "Autorizzato a dare o rimuovere lo stato di voice a sé stesso"
 
 msgid "Allowed to (de)voice users"
@@ -2028,6 +2028,9 @@ msgstr "Autorizzato alla lettura dei memo del canale"
 
 msgid "Allowed to set channel settings"
 msgstr "Autorizzato ad impostare i impostazioni del canale"
+
+msgid "Allowed to unban themself"
+msgstr ""
 
 msgid "Allowed to unban users"
 msgstr "Autorizzato a rimuovere i ban sugli utenti"
@@ -5494,7 +5497,7 @@ msgstr "Nasconde il nickname dall'output del comando LIST"
 msgid "Prevent the nickname from expiring"
 msgstr "Impedisce ad un nickname di scadere"
 
-msgid "Prevents users being kicked by Services"
+msgid "Prevents users being kicked by services"
 msgstr "Impedisce agli utenti di essere espulsi dai Services"
 
 msgid "Private"

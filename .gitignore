@@ -17,3 +17,4 @@ modules/m_ssl_gnutls.cpp
 modules/m_ssl_openssl.cpp
 modules/stats
 run/
+*.mo

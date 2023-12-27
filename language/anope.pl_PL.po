@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-26 15:10+0100\n"
-"PO-Revision-Date: 2023-12-26 15:38+0100\n"
+"PO-Revision-Date: 2023-12-27 15:00+0100\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -9033,67 +9033,3 @@ msgstr "{nick | kanał}"
 
 msgid "{nick | channel} memo-text"
 msgstr "{nick | kanał} treść"
-
-#~ msgid "channel ADD mask"
-#~ msgstr "kanał ADD maska"
-
-#~ msgid "nick flags"
-#~ msgstr "nick flagi"
-
-#~ msgid ""
-#~ "Allows Services Operators to give Operflags to any user.\n"
-#~ "Flags have to be prefixed with a \"+\" or a \"-\". To\n"
-#~ "remove all flags simply type a \"-\" instead of any flags."
-#~ msgstr ""
-#~ "Pozwala Services Operators na nadanie wskazanemu\n"
-#~ "użytkownikowi uprawnień irc operatora z określonymi\n"
-#~ "flagami. Flagi powinny być poprzedzone znakami \"+\" lub \"-\". \n"
-#~ "Aby usunąć wszystkie flagi wystarczy podać \"-\"."
-
-#~ msgid "GETPASS command unavailable because encryption is in use."
-#~ msgstr "Komenda GETPASS nie działa, bo hasła są szyfrowane."
-
-#~ msgid "Give Operflags to a certain user"
-#~ msgstr "Daje flagi operatora wybranemu użytkownikowi"
-
-#, c-format
-#~ msgid "Operflags %s have been added for %s."
-#~ msgstr "Flagi operatora %s zostały przyznane dla %s."
-
-#, c-format
-#~ msgid "Operflags %s have been removed from %s."
-#~ msgstr "Flagi operatora %s zostały zabrane %s."
-
-#~ msgid "Password authentication required for that command."
-#~ msgstr "Ta komenda wymaga zalogowania do zarejestrowanego nicka."
-
-#, c-format
-#~ msgid "Password for %s changed to %s."
-#~ msgstr "Hasło dla %s zmieniono na %s"
-
-#, c-format
-#~ msgid "Password for %s is %s."
-#~ msgstr "Hasło dla %s to %s."
-
-#~ msgid "Retrieve the password for a nickname"
-#~ msgstr "Podaje hasło do wskazanego nicka"
-
-#~ msgid ""
-#~ "Returns the password for the given nickname.  Note that\n"
-#~ "whenever this command is used, a message including the\n"
-#~ "person who issued the command and the nickname it was used\n"
-#~ "on will be logged and sent out as a WALLOPS/GLOBOPS."
-#~ msgstr ""
-#~ "Zwraca hasło dla wskazanego nicka.\n"
-#~ "UWAGA: użycie tej komendy powoduje wysłanie\n"
-#~ "informacji o jej użyciu przy pomocy WALLOP/GLOBOP."
-
-#~ msgid "You are now an IRC Operator."
-#~ msgstr "Jesteś teraz IRC operatorem."
-
-#~ msgid "You may not get the password of other Services Operators."
-#~ msgstr "Nie możesz odczytać hasła innych operatorów serwisów."
-
-#, c-format
-#~ msgid "Your password is %s - remember this for later use."
-#~ msgstr "Twoje hasło do nicka to %s"

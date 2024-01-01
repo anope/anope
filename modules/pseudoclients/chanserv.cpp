@@ -109,10 +109,11 @@ class ChanServCore : public Module, public ChanServService
 
 		ChanServ = bi;
 
-		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy")).GetTokens(defaults);
+		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "keeptopic peace cs_secure securefounder signkick")).GetTokens(defaults);
 		if (defaults.empty())
 		{
 			defaults.push_back("KEEPTOPIC");
+			defaults.push_back("PEACE");
 			defaults.push_back("CS_SECURE");
 			defaults.push_back("SECUREFOUNDER");
 			defaults.push_back("SIGNKICK");

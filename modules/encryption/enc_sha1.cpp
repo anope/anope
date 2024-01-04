@@ -1,7 +1,7 @@
 /*
  *
  * Modified for Anope.
- * (C) 2006-2023 Anope Team
+ * (C) 2006-2024 Anope Team
  * Contact us at team@anope.org
 
 SHA-1 in C

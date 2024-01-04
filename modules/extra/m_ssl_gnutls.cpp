@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2014 Attila Molnar <attilamolnar@hush.com>
- * (C) 2014-2023 Anope Team
+ * (C) 2014-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.

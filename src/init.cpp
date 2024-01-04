@@ -75,7 +75,7 @@ static bool GetCommandLineArgument(const Anope::string &name, char shortname, An
 	{
 		if (argument.equals_ci(name) || (argument.length() == 1 && argument[0] == shortname))
 		{
-			param = argument;
+			param = value;
 			return true;
 		}
 	}

@@ -1,5 +1,5 @@
-Anope Version 2.1.1-git
------------------------
+Anope Version 2.1.1
+-------------------
 Added the UNBANME privilege to allow users to unban themselves.
 Fixed building on Windows systems without chgrp/chmod.
 Fixed creating sockets in the m_dns, m_httpd, m_proxyscan, and m_redis modules.

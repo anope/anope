@@ -29,7 +29,7 @@ public:
 		if (!IRCD->IsHostValid(jserver) || jserver.find('.') == Anope::string::npos)
 			source.Reply(_("Please use a valid server name when juping."));
 		else if (server == Me || server == Servers::GetUplink())
-			source.Reply(_("You can not jupe your Services' pseudoserver or your uplink server."));
+			source.Reply(_("You can not jupe your services' pseudoserver or your uplink server."));
 		else if (server && server->IsJuped())
 			source.Reply(_("You can not jupe an already juped server."));
 		else

@@ -418,7 +418,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Allows Services Operators to manipulate the AKILL list. If\n"
-				"a user matching an AKILL mask attempts to connect, Services\n"
+				"a user matching an AKILL mask attempts to connect, services\n"
 				"will issue a KILL for that user and, on supported server\n"
 				"types, will instruct all servers to add a ban for the mask\n"
 				"which the user matched.\n"

@@ -1035,7 +1035,7 @@ msgid ""
 "STATS AKILL command."
 msgstr ""
 " \n"
-"SQLINE ADD ajoute le masque de pseudo indiqué à la liste des\n"
+"SQLINE ADD ajoute le masque de pseudo/canal indiqué à la liste des\n"
 "SQLINE avec la raison indiquée (qui doit être précisée).\n"
 "expiration est spécifiée par un nombre entier suivi d'un d\n"
 "(jours), h (heures), ou m (minutes). Les combinaisons (comme\n"
@@ -2079,11 +2079,12 @@ msgid "A memo informing the user will also be sent."
 msgstr "Un mémo informant l'utilisateur sera également envoyé."
 
 #: modules/commands/ms_read.cpp:42
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "A notification memo has been sent to %s informing them you have\n"
 "read their memo."
-msgstr "Un accusé de réception a été envoyé a %s."
+msgstr "Un accusé de réception a été envoyé a %s, l'informant que\n"
+"vous avez lu son mémo."
 
 #: include/language.h:123
 msgid "A vHost ident must be in the format of a valid ident."
@@ -2661,7 +2662,6 @@ msgstr ""
 "être consultée par la commande STATS AKILL."
 
 #: modules/commands/os_sxline.cpp:436
-#, fuzzy
 msgid ""
 "Allows Services Operators to manipulate the SNLINE list.  If\n"
 "a user with a realname matching an SNLINE mask attempts to\n"
@@ -2674,7 +2674,6 @@ msgstr ""
 "à se poursuivre."
 
 #: modules/commands/os_sxline.cpp:670
-#, fuzzy
 msgid ""
 "Allows Services Operators to manipulate the SQLINE list.  If\n"
 "a user with a nick matching an SQLINE mask attempts to\n"
@@ -4519,7 +4518,7 @@ msgstr ""
 "n'auront pas leurs kicks signés."
 
 #: modules/commands/cs_set.cpp:452
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Enables or disables the peace option for a channel.\n"
 "When peace is set, a user won't be able to kick,\n"
@@ -6935,7 +6934,7 @@ msgid "Registered only enforced on %s."
 msgstr "Application sur %s de la restriction aux seuls pseudos enregistrés"
 
 #: modules/commands/cs_register.cpp:86
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Registers a channel in the %s database.  In order\n"
 "to use this command, you must first be a channel operator\n"
@@ -7385,7 +7384,6 @@ msgid "Sends all services staff a memo containing memo-text."
 msgstr "Envoie un mémo dont le message est texte à tous le staff des services."
 
 #: modules/commands/ms_send.cpp:66
-#, fuzzy
 msgid ""
 "Sends the named nick or channel a memo containing\n"
 "memo-text. When sending to a nickname, the recipient will\n"
@@ -7398,7 +7396,6 @@ msgstr ""
 "un canal enregistré."
 
 #: modules/commands/ms_rsend.cpp:80
-#, fuzzy
 msgid ""
 "Sends the named nick or channel a memo containing\n"
 "memo-text. When sending to a nickname, the recipient will\n"

@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -50,7 +50,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 	{
 		std::vector<Anope::string> params;
 		params.push_back(ci->name);
-		params.push_back("DEL");
+		params.emplace_back("DEL");
 		params.push_back(message.get_data["mask"]);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/akick", params, replacements);
@@ -59,7 +59,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 	{
 		std::vector<Anope::string> params;
 		params.push_back(ci->name);
-		params.push_back("ADD");
+		params.emplace_back("ADD");
 		params.push_back(message.post_data["mask"]);
 		if (message.post_data["reason"].empty() == false)
 			params.push_back(message.post_data["reason"]);

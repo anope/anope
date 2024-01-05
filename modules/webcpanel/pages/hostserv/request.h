@@ -1,9 +1,11 @@
 /*
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
+
+#pragma once
 
 namespace WebCPanel
 {
@@ -13,10 +15,10 @@ namespace HostServ
 
 class Request : public WebPanelProtectedPage
 {
- public:
+public:
 	Request(const Anope::string &cat, const Anope::string &u);
 
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) anope_override;
+	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
 };
 
 }

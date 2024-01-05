@@ -1,6 +1,6 @@
 /* hs_request.c - Add request and activate functionality to HostServ
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Based on the original module by Rob <rob@anope.org>
@@ -29,7 +29,7 @@ struct HostRequest : Serializable
 
 	HostRequest(Extensible *) : Serializable("HostRequest") { }
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["nick"] << this->nick;
 		data["ident"] << this->ident;
@@ -72,14 +72,14 @@ class CommandHSRequest : public Command
 		return false;
 	}
 
- public:
+public:
 	CommandHSRequest(Module *creator) : Command(creator, "hostserv/request", 1, 1)
 	{
 		this->SetDesc(_("Request a vHost for your nick"));
 		this->SetSyntax(_("vhost"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -132,12 +132,14 @@ class CommandHSRequest : public Command
 				source.Reply(HOST_NO_VIDENT);
 				return;
 			}
-			for (Anope::string::iterator s = user.begin(), s_end = user.end(); s != s_end; ++s)
-				if (!isvalidchar(*s))
+			for (const auto &chr : user)
+			{
+				if (!isvalidchar(chr))
 				{
 					source.Reply(HOST_SET_IDENT_ERROR);
 					return;
 				}
+			}
 		}
 
 		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
@@ -172,7 +174,7 @@ class CommandHSRequest : public Command
 		Log(LOG_COMMAND, source, this) << "to request new vhost " << (!user.empty() ? user + "@" : "") << host;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -185,14 +187,14 @@ class CommandHSRequest : public Command
 
 class CommandHSActivate : public Command
 {
- public:
+public:
 	CommandHSActivate(Module *creator) : Command(creator, "hostserv/activate", 1, 1)
 	{
 		this->SetDesc(_("Approve the requested vHost of a user"));
 		this->SetSyntax(_("\037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -220,7 +222,7 @@ class CommandHSActivate : public Command
 			source.Reply(_("No request for nick %s found."), nick.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -234,14 +236,14 @@ class CommandHSActivate : public Command
 
 class CommandHSReject : public Command
 {
- public:
+public:
 	CommandHSReject(Module *creator) : Command(creator, "hostserv/reject", 1, 2)
 	{
 		this->SetDesc(_("Reject the requested vHost of a user"));
 		this->SetSyntax(_("\037nick\037 [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -276,7 +278,7 @@ class CommandHSReject : public Command
 			source.Reply(_("No request for nick %s found."), nick.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -290,13 +292,13 @@ class CommandHSReject : public Command
 
 class CommandHSWaiting : public Command
 {
- public:
+public:
 	CommandHSWaiting(Module *creator) : Command(creator, "hostserv/waiting", 0, 0)
 	{
 		this->SetDesc(_("Retrieves the vhost requests"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		unsigned counter = 0;
 		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
@@ -304,9 +306,8 @@ class CommandHSWaiting : public Command
 
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Created"));
 
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
+		for (const auto &[nick, na] : *NickAliasList)
 		{
-			const NickAlias *na = it->second;
 			HostRequest *hr = na->GetExt<HostRequest>("hostrequest");
 			if (!hr)
 				continue;
@@ -317,7 +318,7 @@ class CommandHSWaiting : public Command
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(display_counter);
-				entry["Nick"] = it->first;
+				entry["Nick"] = nick;
 				if (!hr->ident.empty())
 					entry["Vhost"] = hr->ident + "@" + hr->host;
 				else
@@ -331,13 +332,13 @@ class CommandHSWaiting : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("Displayed \002%d\002 records (\002%d\002 total)."), display_counter, counter);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -356,7 +357,7 @@ class HSRequest : public Module
 	ExtensibleItem<HostRequest> hostrequest;
 	Serialize::Type request_type;
 
- public:
+public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsrequest(this), commandhsactive(this),
 		commandhsreject(this), commandhswaiting(this), hostrequest(this, "hostrequest"), request_type("HostRequest", HostRequest::Unserialize)
@@ -369,18 +370,15 @@ class HSRequest : public Module
 static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vIdent, const Anope::string &vHost)
 {
 	Anope::string host;
-	std::list<std::pair<Anope::string, Anope::string> >::iterator it, it_end;
-
 	if (!vIdent.empty())
 		host = vIdent + "@" + vHost;
 	else
 		host = vHost;
 
 	if (Config->GetModule(me)->Get<bool>("memooper") && memoserv)
-		for (unsigned i = 0; i < Oper::opers.size(); ++i)
+	{
+		for (auto *o : Oper::opers)
 		{
-			Oper *o = Oper::opers[i];
-
 			const NickAlias *na = NickAlias::Find(o->name);
 			if (!na)
 				continue;
@@ -389,6 +387,7 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 
 			memoserv->Send(source.service->nick, na->nick, message, true);
 		}
+	}
 }
 
 MODULE_INIT(HSRequest)

@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2021 Anope Team <team@anope.org>
+ * (C) 2008-2024 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -120,10 +120,6 @@ void CommandSource::Reply(const Anope::string &message)
 Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(o)
 {
 	allow_unregistered = require_user = false;
-}
-
-Command::~Command()
-{
 }
 
 void Command::SetDesc(const Anope::string &d)
@@ -292,15 +288,10 @@ bool Command::FindCommandFromService(const Anope::string &command_service, BotIn
 {
 	bot = NULL;
 
-	for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	for (const auto &[_, bi] : *BotListByNick)
 	{
-		BotInfo *bi = it->second;
-
-		for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
+		for (const auto &[c_name, info] : bi->commands)
 		{
-			const Anope::string &c_name = cit->first;
-			const CommandInfo &info = cit->second;
-
 			if (info.name != command_service)
 				continue;
 

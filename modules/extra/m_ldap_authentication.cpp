@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2011-2021 Anope Team
+ * (C) 2011-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -22,10 +22,10 @@ struct IdentifyInfo
 	Reference<User> user;
 	IdentifyRequest *req;
 	ServiceReference<LDAPProvider> lprov;
-	bool admin_bind;
+	bool admin_bind = true;
 	Anope::string dn;
 
-	IdentifyInfo(User *u, IdentifyRequest *r, ServiceReference<LDAPProvider> &lp) : user(u), req(r), lprov(lp), admin_bind(true)
+	IdentifyInfo(User *u, IdentifyRequest *r, ServiceReference<LDAPProvider> &lp) : user(u), req(r), lprov(lp)
 	{
 		req->Hold(me);
 	}
@@ -40,7 +40,7 @@ class IdentifyInterface : public LDAPInterface
 {
 	IdentifyInfo *ii;
 
- public:
+public:
 	IdentifyInterface(Module *m, IdentifyInfo *i) : LDAPInterface(m), ii(i) { }
 
 	~IdentifyInterface()
@@ -48,12 +48,12 @@ class IdentifyInterface : public LDAPInterface
 		delete ii;
 	}
 
-	void OnDelete() anope_override
+	void OnDelete() override
 	{
 		delete this;
 	}
 
-	void OnResult(const LDAPResult &r) anope_override
+	void OnResult(const LDAPResult &r) override
 	{
 		if (!ii->lprov)
 			return;
@@ -122,7 +122,7 @@ class IdentifyInterface : public LDAPInterface
 		}
 	}
 
-	void OnError(const LDAPResult &r) anope_override
+	void OnError(const LDAPResult &r) override
 	{
 	}
 };
@@ -131,15 +131,15 @@ class OnIdentifyInterface : public LDAPInterface
 {
 	Anope::string uid;
 
- public:
+public:
 	OnIdentifyInterface(Module *m, const Anope::string &i) : LDAPInterface(m), uid(i) { }
 
-	void OnDelete() anope_override
+	void OnDelete() override
 	{
 		delete this;
 	}
 
-	void OnResult(const LDAPResult &r) anope_override
+	void OnResult(const LDAPResult &r) override
 	{
 		User *u = User::Find(uid);
 
@@ -166,7 +166,7 @@ class OnIdentifyInterface : public LDAPInterface
 		}
 	}
 
-	void OnError(const LDAPResult &r) anope_override
+	void OnError(const LDAPResult &r) override
 	{
 		Log(this->owner) << r.error;
 	}
@@ -174,15 +174,15 @@ class OnIdentifyInterface : public LDAPInterface
 
 class OnRegisterInterface : public LDAPInterface
 {
- public:
+public:
 	OnRegisterInterface(Module *m) : LDAPInterface(m) { }
 
-	void OnResult(const LDAPResult &r) anope_override
+	void OnResult(const LDAPResult &r) override
 	{
 		Log(this->owner) << "Successfully added newly created account to LDAP";
 	}
 
-	void OnError(const LDAPResult &r) anope_override
+	void OnError(const LDAPResult &r) override
 	{
 		Log(this->owner) << "Error adding newly created account to LDAP: " << r.getError();
 	}
@@ -198,7 +198,7 @@ class ModuleLDAPAuthentication : public Module
 	Anope::string password_attribute;
 	Anope::string disable_register_reason;
 	Anope::string disable_email_reason;
- public:
+public:
 	ModuleLDAPAuthentication(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), orinterface(this),
 		dn(this, "m_ldap_authentication_dn")
@@ -206,12 +206,12 @@ class ModuleLDAPAuthentication : public Module
 		me = this;
 	}
 
-	void Prioritize() anope_override
+	void Prioritize() override
 	{
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnReload(Configuration::Conf *config) anope_override
+	void OnReload(Configuration::Conf *config) override
 	{
 		Configuration::Block *conf = Config->GetModule(this);
 
@@ -229,7 +229,7 @@ class ModuleLDAPAuthentication : public Module
 			config->GetModule("nickserv")->Set("forceemail", "false");
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		if (!this->disable_register_reason.empty())
 		{
@@ -249,7 +249,7 @@ class ModuleLDAPAuthentication : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnCheckAuthentication(User *u, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *u, IdentifyRequest *req) override
 	{
 		if (!this->ldap)
 			return;
@@ -258,7 +258,7 @@ class ModuleLDAPAuthentication : public Module
 		this->ldap->BindAsAdmin(new IdentifyInterface(this, ii));
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnNickIdentify(User *u) override
 	{
 		if (email_attribute.empty() || !this->ldap)
 			return;
@@ -270,7 +270,7 @@ class ModuleLDAPAuthentication : public Module
 		this->ldap->Search(new OnIdentifyInterface(this, u->GetUID()), *d, "(" + email_attribute + "=*)");
 	}
 
-	void OnNickRegister(User *, NickAlias *na, const Anope::string &pass) anope_override
+	void OnNickRegister(User *, NickAlias *na, const Anope::string &pass) override
 	{
 		if (!this->disable_register_reason.empty() || !this->ldap)
 			return;

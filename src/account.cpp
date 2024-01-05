@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,7 +18,7 @@
 
 std::set<IdentifyRequest *> IdentifyRequest::Requests;
 
-IdentifyRequest::IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass) : owner(o), account(acc), password(pass), dispatched(false), success(false)
+IdentifyRequest::IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass) : owner(o), account(acc), password(pass)
 {
 	Requests.insert(this);
 }

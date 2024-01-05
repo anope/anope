@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,30 +16,30 @@ static std::map<Anope::string, int16_t, ci::less> defaultLevels;
 static inline void reset_levels(ChannelInfo *ci)
 {
 	ci->ClearLevels();
-	for (std::map<Anope::string, int16_t, ci::less>::iterator it = defaultLevels.begin(), it_end = defaultLevels.end(); it != it_end; ++it)
-		ci->SetLevel(it->first, it->second);
+	for (auto &[priv, level] : defaultLevels)
+		ci->SetLevel(priv, level);
 }
 
 class AccessChanAccess : public ChanAccess
 {
- public:
-	int level;
+public:
+	int level = 0;
 
-	AccessChanAccess(AccessProvider *p) : ChanAccess(p), level(0)
+	AccessChanAccess(AccessProvider *p) : ChanAccess(p)
 	{
 	}
 
-	bool HasPriv(const Anope::string &name) const anope_override
+	bool HasPriv(const Anope::string &name) const override
 	{
 		return this->ci->GetLevel(name) != ACCESS_INVALID && this->level >= this->ci->GetLevel(name);
 	}
 
-	Anope::string AccessSerialize() const anope_override
+	Anope::string AccessSerialize() const override
 	{
 		return stringify(this->level);
 	}
 
-	void AccessUnserialize(const Anope::string &data) anope_override
+	void AccessUnserialize(const Anope::string &data) override
 	{
 		try
 		{
@@ -50,7 +50,7 @@ class AccessChanAccess : public ChanAccess
 		}
 	}
 
-	bool operator>(const ChanAccess &other) const anope_override
+	bool operator>(const ChanAccess &other) const override
 	{
 		if (this->provider != other.provider)
 			return ChanAccess::operator>(other);
@@ -58,7 +58,7 @@ class AccessChanAccess : public ChanAccess
 			return this->level > anope_dynamic_static_cast<const AccessChanAccess *>(&other)->level;
 	}
 
-	bool operator<(const ChanAccess &other) const anope_override
+	bool operator<(const ChanAccess &other) const override
 	{
 		if (this->provider != other.provider)
 			return ChanAccess::operator<(other);
@@ -69,7 +69,7 @@ class AccessChanAccess : public ChanAccess
 
 class AccessAccessProvider : public AccessProvider
 {
- public:
+public:
 	static AccessAccessProvider *me;
 
 	AccessAccessProvider(Module *o) : AccessProvider(o, "access/access")
@@ -77,7 +77,7 @@ class AccessAccessProvider : public AccessProvider
 		me = this;
 	}
 
-	ChanAccess *Create() anope_override
+	ChanAccess *Create() override
 	{
 		return new AccessChanAccess(this);
 	}
@@ -166,6 +166,12 @@ class CommandCSAccess : public Command
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
 			}
+			else if (na && na->nc->HasExt("NEVEROP"))
+			{
+				source.Reply(_("\002%s\002 does not wish to be added to channel access lists."),
+					na->nc->display.c_str());
+				return;
+			}
 			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
 			{
 				User *targ = User::Find(mask, true);
@@ -214,6 +220,7 @@ class CommandCSAccess : public Command
 		access->level = level;
 		access->last_seen = 0;
 		access->created = Anope::CurTime;
+		access->description = params.size() > 4 ? params[4] : "";
 		ci->AddAccess(access);
 
 		FOREACH_MOD(OnAccessAdd, (ci, source, access));
@@ -229,7 +236,12 @@ class CommandCSAccess : public Command
 	{
 		Anope::string mask = params[2];
 
-		if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos && !NickAlias::Find(mask))
+		const NickAlias *na = NickAlias::Find(mask);
+		if (na && na->nc)
+		{
+			mask = na->nc->display;
+		}
+		else if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos)
 		{
 			User *targ = User::Find(mask, true);
 			if (targ != NULL)
@@ -250,18 +262,18 @@ class CommandCSAccess : public Command
 				CommandSource &source;
 				ChannelInfo *ci;
 				Command *c;
-				unsigned deleted;
+				unsigned deleted = 0;
 				Anope::string Nicks;
-				bool denied;
-				bool override;
-			 public:
-				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), denied(false), override(false)
+				bool denied = false;
+				bool override = false;
+			public:
+				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c)
 				{
 					if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/access/modify"))
 						this->override = true;
 				}
 
-				~AccessDelCallback()
+				~AccessDelCallback() override
 				{
 					if (denied && !deleted)
 						source.Reply(ACCESS_DENIED);
@@ -278,7 +290,7 @@ class CommandCSAccess : public Command
 					}
 				}
 
-				void HandleNumber(unsigned Number) anope_override
+				void HandleNumber(unsigned Number) override
 				{
 					if (!Number || Number > ci->GetAccessCount())
 						return;
@@ -354,12 +366,12 @@ class CommandCSAccess : public Command
 				ListFormatter &list;
 				ChannelInfo *ci;
 
-			 public:
+			public:
 				AccessListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
 				{
 				}
 
-				void HandleNumber(unsigned number) anope_override
+				void HandleNumber(unsigned number) override
 				{
 					if (!number || number > ci->GetAccessCount())
 						return;
@@ -368,12 +380,14 @@ class CommandCSAccess : public Command
 
 					Anope::string timebuf;
 					if (ci->c)
-						for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
+					{
+						for (const auto &[_, cuc] : ci->c->users)
 						{
 							ChannelInfo *p;
-							if (access->Matches(cit->second->user, cit->second->user->Account(), p))
+							if (access->Matches(cuc->user, cuc->user->Account(), p))
 								timebuf = "Now";
 						}
+					}
 					if (timebuf.empty())
 					{
 						if (access->last_seen == 0)
@@ -388,6 +402,7 @@ class CommandCSAccess : public Command
 					entry["Mask"] = access->Mask();
 					entry["By"] = access->creator;
 					entry["Last seen"] = timebuf;
+					entry["Description"] = access->description;
 					this->list.AddEntry(entry);
 				}
 			}
@@ -405,12 +420,14 @@ class CommandCSAccess : public Command
 
 				Anope::string timebuf;
 				if (ci->c)
-					for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
+				{
+					for (auto &[_, cuc] : ci->c->users)
 					{
 						ChannelInfo *p;
-						if (access->Matches(cit->second->user, cit->second->user->Account(), p))
+						if (access->Matches(cuc->user, cuc->user->Account(), p))
 							timebuf = "Now";
 					}
+				}
 				if (timebuf.empty())
 				{
 					if (access->last_seen == 0)
@@ -425,6 +442,7 @@ class CommandCSAccess : public Command
 				entry["Mask"] = access->Mask();
 				entry["By"] = access->creator;
 				entry["Last seen"] = timebuf;
+				entry["Description"] = access->description;
 				list.AddEntry(entry);
 			}
 		}
@@ -438,8 +456,8 @@ class CommandCSAccess : public Command
 
 			source.Reply(_("Access list for %s:"), ci->name.c_str());
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of access list"));
 		}
@@ -456,7 +474,7 @@ class CommandCSAccess : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask"));
+		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask")).AddColumn(_("Description"));
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -469,7 +487,7 @@ class CommandCSAccess : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Last seen"));
+		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Last seen")).AddColumn(_("Description"));
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -492,18 +510,18 @@ class CommandCSAccess : public Command
 		return;
 	}
 
- public:
-	CommandCSAccess(Module *creator) : Command(creator, "chanserv/access", 2, 4)
+public:
+	CommandCSAccess(Module *creator) : Command(creator, "chanserv/access", 2, 5)
 	{
 		this->SetDesc(_("Modify the list of privileged users"));
-		this->SetSyntax(_("\037channel\037 ADD \037mask\037 \037level\037"));
+		this->SetSyntax(_("\037channel\037 ADD \037mask\037 \037level\037 [\037description\037]"));
 		this->SetSyntax(_("\037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037list\037]"));
 		this->SetSyntax(_("\037channel\037 VIEW [\037mask\037 | \037list\037]"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[1];
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
@@ -561,7 +579,7 @@ class CommandCSAccess : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -669,7 +687,7 @@ class CommandCSLevels : public Command
 		/* Don't allow disabling of the founder level. It would be hard to change it back if you don't have access to use this command */
 		if (what.equals_ci("FOUNDER"))
 		{
-			source.Reply(_("You can not disable the founder privilege because it would be impossible to reenable it at a later time."));
+			source.Reply(_("You can not disable the founder privilege because it would be impossible to re-enable it at a later time."));
 			return;
 		}
 
@@ -698,9 +716,8 @@ class CommandCSLevels : public Command
 
 		const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 
-		for (unsigned i = 0; i < privs.size(); ++i)
+		for (const auto &p : privs)
 		{
-			const Privilege &p = privs[i];
 			int16_t j = ci->GetLevel(p.name);
 
 			ListFormatter::ListEntry entry;
@@ -719,8 +736,8 @@ class CommandCSLevels : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 	}
 
 	void DoReset(CommandSource &source, ChannelInfo *ci)
@@ -735,7 +752,7 @@ class CommandCSLevels : public Command
 		return;
 	}
 
- public:
+public:
 	CommandCSLevels(Module *creator) : Command(creator, "chanserv/levels", 2, 4)
 	{
 		this->SetDesc(_("Redefine the meanings of access levels"));
@@ -745,7 +762,7 @@ class CommandCSLevels : public Command
 		this->SetSyntax(_("\037channel\037 RESET"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[1];
 		const Anope::string &what = params.size() > 2 ? params[2] : "";
@@ -789,7 +806,7 @@ class CommandCSLevels : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (subcommand.equals_ci("DESC"))
 		{
@@ -798,10 +815,8 @@ class CommandCSLevels : public Command
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Name")).AddColumn(_("Description"));
 
-			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-			for (unsigned i = 0; i < privs.size(); ++i)
+			for (const auto &p : PrivilegeManager::GetPrivileges())
 			{
-				const Privilege &p = privs[i];
 				ListFormatter::ListEntry entry;
 				entry["Name"] = p.name;
 				entry["Description"] = Language::Translate(source.nc, p.desc.c_str());
@@ -811,8 +826,8 @@ class CommandCSLevels : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 		else
 		{
@@ -828,7 +843,7 @@ class CommandCSLevels : public Command
 					"functions to be changed. \002LEVELS DISABLE\002 (or \002DIS\002 for short)\n"
 					"disables an automatic feature or disallows access to a\n"
 					"function by anyone, INCLUDING the founder (although, the founder\n"
-					"can always reenable it). Use \002LEVELS SET founder\002 to make a level\n"
+					"can always re-enable it). Use \002LEVELS SET founder\002 to make a level\n"
 					"founder only.\n"
 					" \n"
 					"\002LEVELS LIST\002 shows the current levels for each function or\n"
@@ -848,7 +863,7 @@ class CSAccess : public Module
 	CommandCSAccess commandcsaccess;
 	CommandCSLevels commandcslevels;
 
- public:
+public:
 	CSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		accessprovider(this), commandcsaccess(this), commandcslevels(this)
 	{
@@ -856,7 +871,7 @@ class CSAccess : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		defaultLevels.clear();
 
@@ -882,12 +897,12 @@ class CSAccess : public Module
 		}
 	}
 
-	void OnCreateChan(ChannelInfo *ci) anope_override
+	void OnCreateChan(ChannelInfo *ci) override
 	{
 		reset_levels(ci);
 	}
 
-	EventReturn OnGroupCheckPriv(const AccessGroup *group, const Anope::string &priv) anope_override
+	EventReturn OnGroupCheckPriv(const AccessGroup *group, const Anope::string &priv) override
 	{
 		if (group->ci == NULL)
 			return EVENT_CONTINUE;

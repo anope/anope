@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2012-2021 Anope Team
+ * (C) 2012-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -39,10 +39,10 @@ class SQLOperResult : public SQL::Interface
 		}
 	}
 
- public:
+public:
 	SQLOperResult(Module *m, User *u) : SQL::Interface(m), user(u) { }
 
-	void OnResult(const SQL::Result &r) anope_override
+	void OnResult(const SQL::Result &r) override
 	{
 		SQLOperResultDeleter d(this);
 
@@ -116,7 +116,7 @@ class SQLOperResult : public SQL::Interface
 		}
 	}
 
-	void OnError(const SQL::Result &r) anope_override
+	void OnError(const SQL::Result &r) override
 	{
 		SQLOperResultDeleter d(this);
 		Log(this->owner) << "m_sql_oper: Error executing query " << r.GetQuery().query << ": " << r.GetError();
@@ -130,17 +130,15 @@ class ModuleSQLOper : public Module
 
 	ServiceReference<SQL::Provider> SQL;
 
- public:
+public:
 	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 	}
 
 	~ModuleSQLOper()
 	{
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			NickCore *nc = it->second;
-
 			if (nc->o && dynamic_cast<SQLOper *>(nc->o))
 			{
 				delete nc->o;
@@ -149,7 +147,7 @@ class ModuleSQLOper : public Module
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
@@ -159,7 +157,7 @@ class ModuleSQLOper : public Module
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnNickIdentify(User *u) override
 	{
 		if (!this->SQL)
 		{

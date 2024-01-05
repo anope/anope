@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@
 
 class CommandOSSet : public Command
 {
- private:
+private:
 	void DoList(CommandSource &source)
 	{
 		Log(LOG_ADMIN, source, this) << "LIST";
@@ -163,14 +163,14 @@ class CommandOSSet : public Command
 
 		return;
 	}
- public:
+public:
 	CommandOSSet(Module *creator) : Command(creator, "operserv/set", 1, 2)
 	{
-		this->SetDesc(_("Set various global Services options"));
+		this->SetDesc(_("Set various global services options"));
 		this->SetSyntax(_("\037option\037 \037setting\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &option = params[0];
 
@@ -190,13 +190,13 @@ class CommandOSSet : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (subcommand.empty())
 		{
 			this->SendSyntax(source);
 			source.Reply(" ");
-			source.Reply(_("Sets various global Services options.  Option names\n"
+			source.Reply(_("Sets various global services options.  Option names\n"
 					"currently defined are:\n"
 					"    READONLY   Set read-only or read-write mode\n"
 					"    DEBUG      Activate or deactivate debug mode\n"
@@ -212,13 +212,13 @@ class CommandOSSet : public Command
 			source.Reply(_("Syntax: \002READONLY {ON | OFF}\002\n"
 					" \n"
 					"Sets read-only mode on or off.  In read-only mode, normal\n"
-					"users will not be allowed to modify any Services data,\n"
+					"users will not be allowed to modify any services data,\n"
 					"including channel and nickname access lists, etc.  IRCops\n"
-					"with sufficient Services privileges will be able to modify\n"
+					"with sufficient services privileges will be able to modify\n"
 					"Services' AKILL, SQLINE, SNLINE and ignore lists, drop,\n"
 					"suspend or forbid nicknames and channels, and manage news,\n"
 					"oper info and DNS, but any such changes will not be saved\n"
-					"unless read-only mode is deactivated before Services are\n"
+					"unless read-only mode is deactivated before services are\n"
 					"terminated or restarted.\n"
 					" \n"
 					"This option is equivalent to the command-line option\n"
@@ -257,7 +257,7 @@ class OSSet : public Module
 {
 	CommandOSSet commandosset;
 
- public:
+public:
 	OSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosset(this)
 	{

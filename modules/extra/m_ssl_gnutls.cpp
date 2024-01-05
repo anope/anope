@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2014 Attila Molnar <attilamolnar@hush.com>
- * (C) 2014-2021 Anope Team
+ * (C) 2014-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -24,19 +24,19 @@ namespace GnuTLS { class X509CertCredentials; }
 
 class MySSLService : public SSLService
 {
- public:
+public:
 	MySSLService(Module *o, const Anope::string &n);
 
 	/** Initialize a socket to use SSL
 	 * @param s The socket
 	 */
-	void Init(Socket *s) anope_override;
+	void Init(Socket *s) override;
 };
 
 class SSLSocketIO : public SocketIO
 {
- public:
-	gnutls_session_t sess;
+public:
+	gnutls_session_t sess = nullptr;
 	GnuTLS::X509CertCredentials* mycreds;
 
 	/** Constructor
@@ -49,50 +49,50 @@ class SSLSocketIO : public SocketIO
 	 * @param sz How much to read
 	 * @return Number of bytes received
 	 */
-	int Recv(Socket *s, char *buf, size_t sz) anope_override;
+	int Recv(Socket *s, char *buf, size_t sz) override;
 
 	/** Write something to the socket
 	 * @param s The socket
 	 * @param buf The data to write
 	 * @param size The length of the data
 	 */
-	int Send(Socket *s, const char *buf, size_t sz) anope_override;
+	int Send(Socket *s, const char *buf, size_t sz) override;
 
 	/** Accept a connection from a socket
 	 * @param s The socket
 	 * @return The new socket
 	 */
-	ClientSocket *Accept(ListenSocket *s) anope_override;
+	ClientSocket *Accept(ListenSocket *s) override;
 
 	/** Finished accepting a connection from a socket
 	 * @param s The socket
 	 * @return SF_ACCEPTED if accepted, SF_ACCEPTING if still in process, SF_DEAD on error
 	 */
-	SocketFlag FinishAccept(ClientSocket *cs) anope_override;
+	SocketFlag FinishAccept(ClientSocket *cs) override;
 
 	/** Connect the socket
 	 * @param s THe socket
 	 * @param target IP to connect to
 	 * @param port to connect to
 	 */
-	void Connect(ConnectionSocket *s, const Anope::string &target, int port) anope_override;
+	void Connect(ConnectionSocket *s, const Anope::string &target, int port) override;
 
 	/** Called to potentially finish a pending connection
 	 * @param s The socket
 	 * @return SF_CONNECTED on success, SF_CONNECTING if still pending, and SF_DEAD on error.
 	 */
-	SocketFlag FinishConnect(ConnectionSocket *s) anope_override;
+	SocketFlag FinishConnect(ConnectionSocket *s) override;
 
 	/** Called when the socket is destructing
 	 */
-	void Destroy() anope_override;
+	void Destroy() override;
 };
 
 namespace GnuTLS
 {
 	class Init
 	{
-	 public:
+	public:
 		Init() { gnutls_global_init(); }
 		~Init() { gnutls_global_deinit(); }
 	};
@@ -103,7 +103,7 @@ namespace GnuTLS
 	{
 		gnutls_datum_t datum;
 
-	 public:
+	public:
 		Datum(const Anope::string &dat)
 		{
 			datum.data = reinterpret_cast<unsigned char *>(const_cast<char *>(dat.data()));
@@ -115,11 +115,9 @@ namespace GnuTLS
 
 	class DHParams
 	{
-		gnutls_dh_params_t dh_params;
+		gnutls_dh_params_t dh_params = nullptr;
 
-	 public:
-		DHParams() : dh_params(NULL) { }
-
+	public:
 		void Import(const Anope::string &dhstr)
 		{
 			if (dh_params != NULL)
@@ -156,7 +154,7 @@ namespace GnuTLS
 		 */
 		class RAIIKey
 		{
-		 public:
+		public:
 			gnutls_x509_privkey_t key;
 
 			RAIIKey()
@@ -172,7 +170,7 @@ namespace GnuTLS
 			}
 		} key;
 
-	 public:
+	public:
 		/** Import */
 		X509Key(const Anope::string &keystr)
 		{
@@ -188,7 +186,7 @@ namespace GnuTLS
 	{
 		std::vector<gnutls_x509_crt_t> certs;
 
-	 public:
+	public:
 		/** Import */
 		X509CertList(const Anope::string &certstr)
 		{
@@ -225,7 +223,7 @@ namespace GnuTLS
 
 	class X509CertCredentials
 	{
-		unsigned int refcount;
+		unsigned int refcount = 0;
 		gnutls_certificate_credentials_t cred;
 		DHParams dh;
 
@@ -242,12 +240,12 @@ namespace GnuTLS
 		static int cert_callback(gnutls_session_t sess, const gnutls_datum_t* req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length, gnutls_retr2_st* st);
 		#endif
 
-	 public:
+	public:
 		X509CertList certs;
 		X509Key key;
 
 		X509CertCredentials(const Anope::string &certfile, const Anope::string &keyfile)
-			: refcount(0), certs(LoadFile(certfile)), key(LoadFile(keyfile))
+			: certs(LoadFile(certfile)), key(LoadFile(keyfile))
 		{
 			if (gnutls_certificate_allocate_credentials(&cred) < 0)
 				throw ConfigException("Cannot allocate certificate credentials");
@@ -298,11 +296,11 @@ class GnuTLSModule : public Module
 {
 	GnuTLS::Init libinit;
 
- public:
-	GnuTLS::X509CertCredentials *cred;
+public:
+	GnuTLS::X509CertCredentials *cred = nullptr;
 	MySSLService service;
 
-	GnuTLSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), cred(NULL), service(this, "ssl")
+	GnuTLSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), service(this, "ssl")
 	{
 		me = this;
 		this->SetPermanent(true);
@@ -332,7 +330,7 @@ class GnuTLSModule : public Module
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
@@ -368,7 +366,7 @@ class GnuTLSModule : public Module
 		Log(LOG_DEBUG) << "m_ssl_gnutls: Successfully loaded certificate " << certfile << " and private key " << keyfile;
 	}
 
-	void OnPreServerConnect() anope_override
+	void OnPreServerConnect() override
 	{
 		Configuration::Block *config = Config->GetBlock("uplink", Anope::CurrentUplink);
 
@@ -535,7 +533,7 @@ void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int 
 
 	s->flags[SF_CONNECTING] = s->flags[SF_CONNECTED] = false;
 
-	s->conaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, target, port);
+	s->conaddr.pton(s->GetFamily(), target, port);
 	int c = connect(s->GetFD(), &s->conaddr.sa, s->conaddr.size());
 	if (c == -1)
 	{
@@ -630,7 +628,7 @@ void SSLSocketIO::Destroy()
 	delete this;
 }
 
-SSLSocketIO::SSLSocketIO() : sess(NULL), mycreds(me->cred)
+SSLSocketIO::SSLSocketIO() : mycreds(me->cred)
 {
 	mycreds->incrref();
 }

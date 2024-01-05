@@ -1,6 +1,6 @@
 /* Timer include stuff.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,14 +9,13 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef TIMERS_H
-#define TIMERS_H
+#pragma once
 
 #include "anope.h"
 
 class CoreExport Timer
 {
- private:
+private:
 	/** The owner of the timer, if any
 	 */
 	Module *owner;
@@ -37,7 +36,7 @@ class CoreExport Timer
 	 */
 	bool repeat;
 
- public:
+public:
 	/** Constructor, initializes the triggering time
 	 * @param time_from_now The number of seconds from now to trigger the timer
 	 * @param now The time now
@@ -107,7 +106,7 @@ class CoreExport TimerManager
 	/** A list of timers
 	 */
 	static std::multimap<time_t, Timer *> Timers;
- public:
+public:
 	/** Add a timer to the list
 	 * @param t A Timer derived class to add
 	 */
@@ -127,5 +126,3 @@ class CoreExport TimerManager
 	 */
 	static void DeleteTimersFor(Module *m);
 };
-
-#endif // TIMERS_H

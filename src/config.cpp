@@ -1,6 +1,6 @@
 /* Configuration file handling.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -17,10 +17,14 @@
 #include "channels.h"
 #include "hashcomp.h"
 
-using namespace Configuration;
+using Configuration::File;
+using Configuration::Conf;
+using Configuration::Internal::Block;
 
-File ServicesConf("anope.conf", false); // Services configuration file name
+File ServicesConf("anope.conf", false); // Configuration file name
 Conf *Config = NULL;
+
+Block Block::EmptyBlock("");
 
 Block::Block(const Anope::string &n) : name(n), linenum(-1)
 {
@@ -31,19 +35,23 @@ const Anope::string &Block::GetName() const
 	return name;
 }
 
-int Block::CountBlock(const Anope::string &bname)
+int Block::CountBlock(const Anope::string &bname) const
 {
-	if (!this)
-		return 0;
-
 	return blocks.count(bname);
 }
 
-Block* Block::GetBlock(const Anope::string &bname, int num)
+const Block* Block::GetBlock(const Anope::string &bname, int num) const
 {
-	if (!this)
-		return NULL;
+	std::pair<block_map::const_iterator, block_map::const_iterator> it = blocks.equal_range(bname);
 
+	for (int i = 0; it.first != it.second; ++it.first, ++i)
+		if (i == num)
+			return &it.first->second;
+	return &EmptyBlock;
+}
+
+Block* Block::GetMutableBlock(const Anope::string &bname, int num)
+{
 	std::pair<block_map::iterator, block_map::iterator> it = blocks.equal_range(bname);
 
 	for (int i = 0; it.first != it.second; ++it.first, ++i)
@@ -54,26 +62,17 @@ Block* Block::GetBlock(const Anope::string &bname, int num)
 
 bool Block::Set(const Anope::string &tag, const Anope::string &value)
 {
-	if (!this)
-		return false;
-
 	items[tag] = value;
 	return true;
 }
 
-const Block::item_map* Block::GetItems() const
+const Block::item_map &Block::GetItems() const
 {
-	if (this)
-		return &items;
-	else
-		return NULL;
+	return items;
 }
 
 template<> const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const
 {
-	if (!this)
-		return def;
-
 	Anope::map<Anope::string>::const_iterator it = items.find(tag);
 	if (it != items.end())
 		return it->second;
@@ -95,13 +94,19 @@ template<> bool Block::Get(const Anope::string &tag, const Anope::string &def) c
 static void ValidateNotEmpty(const Anope::string &block, const Anope::string &name, const Anope::string &value)
 {
 	if (value.empty())
-		throw ConfigException("The value for <" + block + ":" + name + "> cannot be empty!");
+		throw ConfigException("The value for <" + block + ":" + name + "> (" + value + ") cannot be empty!");
 }
 
 static void ValidateNoSpaces(const Anope::string &block, const Anope::string &name, const Anope::string &value)
 {
 	if (value.find(' ') != Anope::string::npos)
-		throw ConfigException("The value for <" + block + ":" + name + "> may not contain spaces!");
+		throw ConfigException("The value for <" + block + ":" + name + "> (" + value + ") may not contain spaces!");
+}
+
+static void ValidateNotEmptyOrSpaces(const Anope::string &block, const Anope::string &name, const Anope::string &value)
+{
+	ValidateNotEmpty(block, name, value);
+	ValidateNoSpaces(block, name, value);
 }
 
 template<typename T> static void ValidateNotZero(const Anope::string &block, const Anope::string &name, T value)
@@ -119,7 +124,7 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("include"); ++i)
 	{
-		Block *include = this->GetBlock("include", i);
+		const Block *include = this->GetBlock("include", i);
 
 		const Anope::string &type = include->Get<const Anope::string>("type"),
 					&file = include->Get<const Anope::string>("name");
@@ -149,17 +154,19 @@ Conf::Conf() : Block("")
 			{"networkinfo", "chanlen"},
 		};
 
-		for (unsigned i = 0; i < sizeof(noreload) / sizeof(noreload[0]); ++i)
-			if (this->GetBlock(noreload[i].block)->Get<const Anope::string>(noreload[i].name) != Config->GetBlock(noreload[i].block)->Get<const Anope::string>(noreload[i].name))
-				throw ConfigException("<" + noreload[i].block + ":" + noreload[i].name + "> can not be modified once set");
+		for (const auto &tag : noreload)
+		{
+			if (this->GetBlock(tag.block)->Get<const Anope::string>(tag.name) != Config->GetBlock(tag.block)->Get<const Anope::string>(tag.name))
+				throw ConfigException("<" + tag.block + ":" + tag.name + "> can not be modified once set");
+		}
 	}
 
-	Block *serverinfo = this->GetBlock("serverinfo"), *options = this->GetBlock("options"),
+	const Block *serverinfo = this->GetBlock("serverinfo"), *options = this->GetBlock("options"),
 		*mail = this->GetBlock("mail"), *networkinfo = this->GetBlock("networkinfo");
 
 	const Anope::string &servername = serverinfo->Get<Anope::string>("name");
 
-	ValidateNotEmpty("serverinfo", "name", servername);
+	ValidateNotEmptyOrSpaces("serverinfo", "name", servername);
 
 	if (servername.find(' ') != Anope::string::npos || servername.find('.') == Anope::string::npos)
 		throw ConfigException("serverinfo:name is not a valid server name");
@@ -181,8 +188,8 @@ Conf::Conf() : Block("")
 	if (mail->Get<bool>("usemail"))
 	{
 		Anope::string check[] = { "sendmailpath", "sendfrom", "registration_subject", "registration_message", "emailchange_subject", "emailchange_message", "memo_subject", "memo_message" };
-		for (unsigned i = 0; i < sizeof(check) / sizeof(Anope::string); ++i)
-			ValidateNotEmpty("mail", check[i], mail->Get<const Anope::string>(check[i]));
+		for (const auto &field : check)
+			ValidateNotEmpty("mail", field, mail->Get<const Anope::string>(field));
 	}
 
 	this->ReadTimeout = options->Get<time_t>("readtimeout");
@@ -200,37 +207,51 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("uplink"); ++i)
 	{
-		Block *uplink = this->GetBlock("uplink", i);
+		const Block *uplink = this->GetBlock("uplink", i);
+
+		int protocol;
+		const Anope::string &protocolstr = uplink->Get<const Anope::string>("protocol", "ipv4");
+		if (protocolstr == "ipv4")
+			protocol = AF_INET;
+		else if (protocolstr == "ipv6")
+			protocol = AF_INET6;
+		else if (protocolstr == "unix")
+			protocol = AF_UNIX;
+		else
+			throw ConfigException("uplink:protocol must be set to ipv4, ipv6, or unix");
 
 		const Anope::string &host = uplink->Get<const Anope::string>("host");
-		bool ipv6 = uplink->Get<bool>("ipv6");
-		int port = uplink->Get<int>("port");
+		ValidateNotEmptyOrSpaces("uplink", "host", host);
+
+		int port = 0;
+		if (protocol != AF_UNIX)
+		{
+			port = uplink->Get<int>("port");
+			ValidateNotZero("uplink", "port", port);
+		}
+
 		const Anope::string &password = uplink->Get<const Anope::string>("password");
-
-		ValidateNotEmpty("uplink", "host", host);
-		ValidateNotZero("uplink", "port", port);
-		ValidateNotEmpty("uplink", "password", password);
-
-		if (password.find(' ') != Anope::string::npos || password[0] == ':')
+		ValidateNotEmptyOrSpaces("uplink", "password", password);
+		if (password[0] == ':')
 			throw ConfigException("uplink:password is not valid");
 
-		this->Uplinks.push_back(Uplink(host, port, password, ipv6));
+		this->Uplinks.emplace_back(host, port, password, protocol);
 	}
 
 	for (int i = 0; i < this->CountBlock("module"); ++i)
 	{
-		Block *module = this->GetBlock("module", i);
+		const Block *module = this->GetBlock("module", i);
 
 		const Anope::string &modname = module->Get<const Anope::string>("name");
 
-		ValidateNotEmpty("module", "name", modname);
+		ValidateNotEmptyOrSpaces("module", "name", modname);
 
 		this->ModulesAutoLoad.push_back(modname);
 	}
 
 	for (int i = 0; i < this->CountBlock("opertype"); ++i)
 	{
-		Block *opertype = this->GetBlock("opertype", i);
+		const Block *opertype = this->GetBlock("opertype", i);
 
 		const Anope::string &oname = opertype->Get<const Anope::string>("name"),
 				&modes = opertype->Get<const Anope::string>("modes"),
@@ -257,10 +278,8 @@ Conf::Conf() : Block("")
 			/* Strip leading ' ' after , */
 			if (str.length() > 1 && str[0] == ' ')
 				str.erase(str.begin());
-			for (unsigned j = 0; j < this->MyOperTypes.size(); ++j)
+			for (auto *ot2 : this->MyOperTypes)
 			{
-				OperType *ot2 = this->MyOperTypes[j];
-
 				if (ot2->GetName().equals_ci(str))
 				{
 					Log() << "Inheriting commands and privs from " << ot2->GetName() << " to " << ot->GetName();
@@ -275,7 +294,7 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("oper"); ++i)
 	{
-		Block *oper = this->GetBlock("oper", i);
+		const Block *oper = this->GetBlock("oper", i);
 
 		const Anope::string &nname = oper->Get<const Anope::string>("name"),
 					&type = oper->Get<const Anope::string>("type"),
@@ -285,13 +304,15 @@ Conf::Conf() : Block("")
 					&vhost = oper->Get<const Anope::string>("vhost");
 		bool require_oper = oper->Get<bool>("require_oper");
 
-		ValidateNotEmpty("oper", "name", nname);
+		ValidateNotEmptyOrSpaces("oper", "name", nname);
 		ValidateNotEmpty("oper", "type", type);
 
 		OperType *ot = NULL;
-		for (unsigned j = 0; j < this->MyOperTypes.size(); ++j)
-			if (this->MyOperTypes[j]->GetName() == type)
-				ot = this->MyOperTypes[j];
+		for (auto *opertype : this->MyOperTypes)
+		{
+			if (opertype->GetName() == type)
+				ot = opertype;
+		}
 		if (ot == NULL)
 			throw ConfigException("Oper block for " + nname + " has invalid oper type " + type);
 
@@ -305,11 +326,11 @@ Conf::Conf() : Block("")
 		this->Opers.push_back(o);
 	}
 
-	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-		it->second->conf = false;
+	for (const auto &[_, bi] : *BotListByNick)
+		bi->conf = false;
 	for (int i = 0; i < this->CountBlock("service"); ++i)
 	{
-		Block *service = this->GetBlock("service", i);
+		const Block *service = this->GetBlock("service", i);
 
 		const Anope::string &nick = service->Get<const Anope::string>("nick"),
 					&user = service->Get<const Anope::string>("user"),
@@ -318,9 +339,9 @@ Conf::Conf() : Block("")
 					&modes = service->Get<const Anope::string>("modes"),
 					&channels = service->Get<const Anope::string>("channels");
 
-		ValidateNotEmpty("service", "nick", nick);
-		ValidateNotEmpty("service", "user", user);
-		ValidateNotEmpty("service", "host", host);
+		ValidateNotEmptyOrSpaces("service", "nick", nick);
+		ValidateNotEmptyOrSpaces("service", "user", user);
+		ValidateNotEmptyOrSpaces("service", "host", host);
 		ValidateNotEmpty("service", "gecos", gecos);
 		ValidateNoSpaces("service", "channels", channels);
 
@@ -354,28 +375,30 @@ Conf::Conf() : Block("")
 			/* Remove all existing modes */
 			ChanUserContainer *cu = c->FindUser(bi);
 			if (cu != NULL)
-				for (size_t j = 0; j < cu->status.Modes().length(); ++j)
-					c->RemoveMode(bi, ModeManager::FindChannelModeByChar(cu->status.Modes()[j]), bi->GetUID());
-			/* Set the new modes */
-			for (unsigned j = 0; j < want_modes.length(); ++j)
 			{
-				ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
+				for (auto mode : cu->status.Modes())
+					c->RemoveMode(bi, ModeManager::FindChannelModeByChar(mode), bi->GetUID());
+			}
+			/* Set the new modes */
+			for (char want_mode : want_modes)
+			{
+				ChannelMode *cm = ModeManager::FindChannelModeByChar(want_mode);
 				if (cm == NULL)
-					cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
+					cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_mode));
 				if (cm && cm->type == MODE_STATUS)
 					c->SetMode(bi, cm, bi->GetUID());
 			}
 		}
-		for (unsigned k = 0; k < oldchannels.size(); ++k)
+		for (const auto &oldchannel : oldchannels)
 		{
-			size_t ch = oldchannels[k].find('#');
-			Anope::string chname = oldchannels[k].substr(ch != Anope::string::npos ? ch : 0);
+			size_t ch = oldchannel.find('#');
+			Anope::string chname = oldchannel.substr(ch != Anope::string::npos ? ch : 0);
 
 			bool found = false;
-			for (unsigned j = 0; j < bi->botchannels.size(); ++j)
+			for (const auto &botchannel : bi->botchannels)
 			{
-				ch = bi->botchannels[j].find('#');
-				Anope::string ochname = bi->botchannels[j].substr(ch != Anope::string::npos ? ch : 0);
+				ch = botchannel.find('#');
+				Anope::string ochname = botchannel.substr(ch != Anope::string::npos ? ch : 0);
 
 				if (chname.equals_ci(ochname))
 					found = true;
@@ -395,7 +418,7 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("log"); ++i)
 	{
-		Block *log = this->GetBlock("log", i);
+		const Block *log = this->GetBlock("log", i);
 
 		int logage = log->Get<int>("logage");
 		bool rawio = log->Get<bool>("rawio");
@@ -417,11 +440,11 @@ Conf::Conf() : Block("")
 		this->LogInfos.push_back(l);
 	}
 
-	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-		it->second->commands.clear();
+	for (const auto &[_, bi] : *BotListByNick)
+		bi->commands.clear();
 	for (int i = 0; i < this->CountBlock("command"); ++i)
 	{
-		Block *command = this->GetBlock("command", i);
+		const Block *command = this->GetBlock("command", i);
 
 		const Anope::string &service = command->Get<const Anope::string>("service"),
 					&nname = command->Get<const Anope::string>("name"),
@@ -430,9 +453,9 @@ Conf::Conf() : Block("")
 					&group = command->Get<const Anope::string>("group");
 		bool hide = command->Get<bool>("hide");
 
-		ValidateNotEmpty("command", "service", service);
+		ValidateNotEmptyOrSpaces("command", "service", service);
 		ValidateNotEmpty("command", "name", nname);
-		ValidateNotEmpty("command", "command", cmd);
+		ValidateNotEmptyOrSpaces("command", "command", cmd);
 
 		BotInfo *bi = this->GetClient(service);
 		if (!bi)
@@ -446,7 +469,7 @@ Conf::Conf() : Block("")
 	PrivilegeManager::ClearPrivileges();
 	for (int i = 0; i < this->CountBlock("privilege"); ++i)
 	{
-		Block *privilege = this->GetBlock("privilege", i);
+		const Block *privilege = this->GetBlock("privilege", i);
 
 		const Anope::string &nname = privilege->Get<const Anope::string>("name"),
 					&desc = privilege->Get<const Anope::string>("desc");
@@ -457,7 +480,7 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("fantasy"); ++i)
 	{
-		Block *fantasy = this->GetBlock("fantasy", i);
+		const Block *fantasy = this->GetBlock("fantasy", i);
 
 		const Anope::string &nname = fantasy->Get<const Anope::string>("name"),
 					&service = fantasy->Get<const Anope::string>("command"),
@@ -467,7 +490,7 @@ Conf::Conf() : Block("")
 			prepend_channel = fantasy->Get<bool>("prepend_channel", "yes");
 
 		ValidateNotEmpty("fantasy", "name", nname);
-		ValidateNotEmpty("fantasy", "command", service);
+		ValidateNotEmptyOrSpaces("fantasy", "command", service);
 
 		CommandInfo &c = this->Fantasy[nname];
 		c.name = service;
@@ -479,7 +502,7 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("command_group"); ++i)
 	{
-		Block *command_group = this->GetBlock("command_group", i);
+		const Block *command_group = this->GetBlock("command_group", i);
 
 		const Anope::string &nname = command_group->Get<const Anope::string>("name"),
 					&description = command_group->Get<const Anope::string>("description");
@@ -495,17 +518,14 @@ Conf::Conf() : Block("")
 
 	if (Config)
 		/* Clear existing conf opers */
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			NickCore *nc = it->second;
 			if (nc->o && std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
 				nc->o = NULL;
 		}
 	/* Apply new opers */
-	for (unsigned i = 0; i < this->Opers.size(); ++i)
+	for (auto *o : this->Opers)
 	{
-		Oper *o = this->Opers[i];
-
 		NickAlias *na = NickAlias::Find(o->name);
 		if (!na)
 			continue;
@@ -545,21 +565,27 @@ Conf::Conf() : Block("")
 
 Conf::~Conf()
 {
-	for (unsigned i = 0; i < MyOperTypes.size(); ++i)
-		delete MyOperTypes[i];
-	for (unsigned i = 0; i < Opers.size(); ++i)
-		delete Opers[i];
+	for (const auto *opertype : MyOperTypes)
+		delete opertype;
+
+	for (const auto *oper : Opers)
+		delete oper;
 }
 
 void Conf::Post(Conf *old)
 {
 	/* Apply module changes */
-	for (unsigned i = 0; i < old->ModulesAutoLoad.size(); ++i)
-		if (std::find(this->ModulesAutoLoad.begin(), this->ModulesAutoLoad.end(), old->ModulesAutoLoad[i]) == this->ModulesAutoLoad.end())
-			ModuleManager::UnloadModule(ModuleManager::FindModule(old->ModulesAutoLoad[i]), NULL);
-	for (unsigned i = 0; i < this->ModulesAutoLoad.size(); ++i)
-		if (std::find(old->ModulesAutoLoad.begin(), old->ModulesAutoLoad.end(), this->ModulesAutoLoad[i]) == old->ModulesAutoLoad.end())
-			ModuleManager::LoadModule(this->ModulesAutoLoad[i], NULL);
+	for (const auto &mod : old->ModulesAutoLoad)
+	{
+		if (std::find(this->ModulesAutoLoad.begin(), this->ModulesAutoLoad.end(), mod) == this->ModulesAutoLoad.end())
+			ModuleManager::UnloadModule(ModuleManager::FindModule(mod), NULL);
+	}
+
+	for (const auto &mod : this->ModulesAutoLoad)
+	{
+		if (std::find(old->ModulesAutoLoad.begin(), old->ModulesAutoLoad.end(), mod) == old->ModulesAutoLoad.end())
+			ModuleManager::LoadModule(mod, NULL);
+	}
 
 	/* Apply opertype changes, as non-conf opers still point to the old oper types */
 	for (unsigned i = Oper::opers.size(); i > 0; --i)
@@ -572,9 +598,11 @@ void Conf::Post(Conf *old)
 			OperType *ot = o->ot;
 			o->ot = NULL;
 
-			for (unsigned j = 0; j < MyOperTypes.size(); ++j)
-				if (ot->GetName() == MyOperTypes[j]->GetName())
-					o->ot = MyOperTypes[j];
+			for (auto *opertype : MyOperTypes)
+			{
+				if (ot->GetName() == opertype->GetName())
+					o->ot = opertype;
+			}
 
 			if (o->ot == NULL)
 			{
@@ -621,6 +649,9 @@ Block *Conf::GetModule(const Anope::string &mname)
 		}
 	}
 
+	if (!block)
+		block = &Block::EmptyBlock;
+
 	return GetModule(mname);
 }
 
@@ -636,7 +667,7 @@ BotInfo *Conf::GetClient(const Anope::string &cname)
 	return GetClient(cname);
 }
 
-Block *Conf::GetCommand(CommandSource &source)
+const Block *Conf::GetCommand(CommandSource &source)
 {
 	const Anope::string &block_name = source.c ? "fantasy" : "command";
 
@@ -648,10 +679,10 @@ Block *Conf::GetCommand(CommandSource &source)
 			return b;
 	}
 
-	return NULL;
+	return &Block::EmptyBlock;
 }
 
-File::File(const Anope::string &n, bool e) : name(n), executable(e), fp(NULL)
+File::File(const Anope::string &n, bool e) : name(n), executable(e)
 {
 }
 
@@ -840,7 +871,7 @@ void Conf::LoadConf(File &file)
 				}
 
 				Block *b = block_stack.empty() ? this : block_stack.top();
-				block_map::iterator it = b->blocks.insert(std::make_pair(wordbuffer, Configuration::Block(wordbuffer)));
+				block_map::iterator it = b->blocks.emplace(wordbuffer, Configuration::Block(wordbuffer));
 				b = &it->second;
 				b->linenum = linenumber;
 				block_stack.push(b);
@@ -899,7 +930,7 @@ void Conf::LoadConf(File &file)
 					/* Check defines */
 					for (int i = 0; i < this->CountBlock("define"); ++i)
 					{
-						Block *define = this->GetBlock("define", i);
+						const Block *define = this->GetBlock("define", i);
 
 						const Anope::string &dname = define->Get<const Anope::string>("name");
 
@@ -937,5 +968,10 @@ void Conf::LoadConf(File &file)
 	if (!itemname.empty() || !wordbuffer.empty())
 		throw ConfigException("Unexpected garbage at end of file: " + file.GetName());
 	if (!block_stack.empty())
-		throw ConfigException("Unterminated block at end of file: " + file.GetName() + ". Block was opened on line " + stringify(block_stack.top()->linenum));
+	{
+		if (block_stack.top())
+			throw ConfigException("Unterminated block at end of file: " + file.GetName() + ". Block was opened on line " + stringify(block_stack.top()->linenum));
+		else
+			throw ConfigException("Unterminated commented block at end of file: " + file.GetName());
+	}
 }

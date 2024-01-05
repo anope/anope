@@ -1,7 +1,7 @@
 /* Module for encryption using MD5.
  *
  * Modified for Anope.
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Taken from IRC Services and is copyright (c) 1996-2002 Andrew Church.
@@ -227,7 +227,7 @@ class MD5Context : public Encryption::Context
 			output[i] = static_cast<unsigned>(input[j]) | (static_cast<unsigned>(input[j + 1]) << 8) | (static_cast<unsigned>(input[j + 2]) << 16) | (static_cast<unsigned>(input[j + 3]) << 24);
 	}
 
- public:
+public:
 	MD5Context(Encryption::IV *iv = NULL)
 	{
 		if (iv != NULL)
@@ -250,7 +250,7 @@ class MD5Context : public Encryption::Context
 	 * operation, processing another message block, and updating the
 	 * context.
 	 */
-	void Update(const unsigned char *input, size_t len) anope_override
+	void Update(const unsigned char *input, size_t len) override
 	{
 		unsigned i, index, partLen;
 
@@ -285,7 +285,7 @@ class MD5Context : public Encryption::Context
 	/* MD5 finalization. Ends an MD5 message-digest opera
 	 * the message digest and zeroizing the context.
 	 */
-	void Finalize() anope_override
+	void Finalize() override
 	{
 		unsigned char bits[8];
 		unsigned index, padLen;
@@ -309,7 +309,7 @@ class MD5Context : public Encryption::Context
 		memset(this->buffer, 0, sizeof(this->buffer));
 	}
 
-	Encryption::Hash GetFinalizedHash() anope_override
+	Encryption::Hash GetFinalizedHash() override
 	{
 		Encryption::Hash hash;
 		hash.first = this->digest;
@@ -320,15 +320,15 @@ class MD5Context : public Encryption::Context
 
 class MD5Provider : public Encryption::Provider
 {
- public:
+public:
 	MD5Provider(Module *creator) : Encryption::Provider(creator, "md5") { }
 
-	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
+	Encryption::Context *CreateContext(Encryption::IV *iv) override
 	{
 		return new MD5Context(iv);
 	}
 
-	Encryption::IV GetDefaultIV() anope_override
+	Encryption::IV GetDefaultIV() override
 	{
 		Encryption::IV iv;
 		iv.first = md5_iv;
@@ -341,7 +341,7 @@ class EMD5 : public Module
 {
 	MD5Provider md5provider;
 
- public:
+public:
 	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		md5provider(this)
 	{
@@ -349,7 +349,7 @@ class EMD5 : public Module
 			throw ModuleException("enc_md5 is deprecated and can not be used as a primary encryption method");
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		MD5Context context;
 
@@ -365,7 +365,7 @@ class EMD5 : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)

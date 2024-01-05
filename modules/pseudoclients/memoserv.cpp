@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -35,13 +35,13 @@ class MemoServCore : public Module, public MemoServService
 		return Mail::Send(nc, subject, message);
 	}
 
- public:
+public:
 	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		MemoServService(this)
 	{
 	}
 
-	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) anope_override
+	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) override
 	{
 		bool ischan;
 		MemoInfo *mi = MemoInfo::GetMemoInfo(target, ischan);
@@ -94,10 +94,8 @@ class MemoServCore : public Module, public MemoServService
 
 			if (ci->c)
 			{
-				for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+				for (const auto &[_, cu] : ci->c->users)
 				{
-					ChanUserContainer *cu = it->second;
-
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
@@ -112,9 +110,8 @@ class MemoServCore : public Module, public MemoServService
 
 			if (nc->HasExt("MEMO_RECEIVE"))
 			{
-				for (unsigned i = 0; i < nc->aliases->size(); ++i)
+				for (auto *na : *nc->aliases)
 				{
-					const NickAlias *na = nc->aliases->at(i);
 					User *user = User::Find(na->nick, true);
 					if (user && user->IsIdentified())
 						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), mi->memos->size());
@@ -129,7 +126,7 @@ class MemoServCore : public Module, public MemoServService
 		return MEMO_SUCCESS;
 	}
 
-	void Check(User *u) anope_override
+	void Check(User *u) override
 	{
 		const NickCore *nc = u->Account();
 		if (!nc)
@@ -150,7 +147,7 @@ class MemoServCore : public Module, public MemoServService
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		const Anope::string &msnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
@@ -164,28 +161,28 @@ class MemoServCore : public Module, public MemoServService
 		MemoServ = bi;
 	}
 
-	void OnNickCoreCreate(NickCore *nc) anope_override
+	void OnNickCoreCreate(NickCore *nc) override
 	{
 		nc->memos.memomax = Config->GetModule(this)->Get<int>("maxmemos");
 	}
 
-	void OnCreateChan(ChannelInfo *ci) anope_override
+	void OnCreateChan(ChannelInfo *ci) override
 	{
 		ci->memos.memomax = Config->GetModule(this)->Get<int>("maxmemos");
 	}
 
-	void OnBotDelete(BotInfo *bi) anope_override
+	void OnBotDelete(BotInfo *bi) override
 	{
 		if (bi == MemoServ)
 			MemoServ = NULL;
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnNickIdentify(User *u) override
 	{
 		this->Check(u);
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	void OnJoinChannel(User *u, Channel *c) override
 	{
 		if (c->ci && !c->ci->memos.memos->empty() && c->ci->AccessFor(u).HasPriv("MEMO"))
 		{
@@ -196,18 +193,23 @@ class MemoServCore : public Module, public MemoServService
 		}
 	}
 
-	void OnUserAway(User *u, const Anope::string &message) anope_override
+	void OnUserAway(User *u, const Anope::string &message) override
 	{
 		if (message.empty())
 			this->Check(u);
 	}
 
-	void OnNickUpdate(User *u) anope_override
+	void OnNickUpdate(User *u) override
 	{
 		this->Check(u);
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void OnUserConnect(User *user, bool &exempt) override
+	{
+		this->Check(user);
+	}
+
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!params.empty() || source.c || source.service != *MemoServ)
 			return EVENT_CONTINUE;
@@ -220,7 +222,7 @@ class MemoServCore : public Module, public MemoServService
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!params.empty() || source.c || source.service != *MemoServ)
 			return;

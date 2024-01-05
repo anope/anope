@@ -1,7 +1,7 @@
 /* POSIX emulation layer for Windows.
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2021 Anope Team <team@anope.org>
+ * (C) 2008-2024 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *
@@ -29,9 +29,7 @@
 # define DllExport __declspec(dllimport)
 #endif
 
-#define MARK_DEPRECATED
-
-#if GETTEXT_FOUND
+#if HAVE_LOCALIZATION
 /* Undefine some functions libintl defines */
 # undef snprintf
 # undef vsnprintf
@@ -53,7 +51,6 @@
 #define EINPROGRESS WSAEWOULDBLOCK
 
 #include "socket.h"
-#include "dir/dir.h"
 #include "dl/dl.h"
 #include "pipe/pipe.h"
 #include "pthread/pthread.h"

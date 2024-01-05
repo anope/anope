@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@
 
 class CommandCSInfo : public Command
 {
- public:
+public:
 	CommandCSInfo(Module *creator) : Command(creator, "chanserv/info", 1, 2)
 	{
 		this->SetDesc(_("Lists information about the specified registered channel"));
@@ -21,7 +21,7 @@ class CommandCSInfo : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &chan = params[0];
 
@@ -65,11 +65,11 @@ class CommandCSInfo : public Command
 		std::vector<Anope::string> replies;
 		info.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -87,7 +87,7 @@ class CSInfo : public Module
 {
 	CommandCSInfo commandcsinfo;
 
- public:
+public:
 	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsinfo(this)
 	{

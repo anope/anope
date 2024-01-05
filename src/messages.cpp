@@ -1,6 +1,6 @@
 /* Common message handlers
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -43,8 +43,10 @@ void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params,
 			Servers::Capab.insert(token);
 	}
 	else
-		for (unsigned i = 0; i < params.size(); ++i)
-			Servers::Capab.insert(params[i]);
+	{
+		for (const auto &param : params)
+			Servers::Capab.insert(param);
+	}
 }
 
 void Error::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
@@ -92,7 +94,7 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 		}
 
 		std::list<SJoinUser> users;
-		users.push_back(std::make_pair(ChannelStatus(), user));
+		users.emplace_back(ChannelStatus(), user);
 
 		Channel *chan = Channel::Find(channel);
 		SJoin(source, channel, chan ? chan->creation_time : Anope::CurTime, "", users);
@@ -127,10 +129,8 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		 */
 		c->SetModesInternal(source, modes, ts, !c->syncing);
 
-	for (std::list<SJoinUser>::const_iterator it = users.begin(), it_end = users.end(); it != it_end; ++it)
+	for (const auto &[status, u] : users)
 	{
-		const ChannelStatus &status = it->first;
-		User *u = it->second;
 		keep_their_modes = ts <= c->creation_time; // OnJoinChannel can call modules which can modify this channel's ts
 
 		if (c->FindUser(u))
@@ -199,7 +199,7 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 
 		if (last_time == Anope::CurTime)
 		{
-			Anope::QuitReason = "Kill loop detected. Are Services U:Lined?";
+			Anope::QuitReason = "Kill loop detected. Is Anope U:Lined?";
 			Anope::Quitting = true;
 			return;
 		}
@@ -426,10 +426,8 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			else
 			{
-				for (unsigned i = 0; i < Oper::opers.size(); ++i)
+				for (auto *o : Oper::opers)
 				{
-					Oper *o = Oper::opers[i];
-
 					const NickAlias *na = NickAlias::Find(o->name);
 					if (na)
 						IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->name.c_str(), o->ot->GetName().replace_all_cs(" ", "_").c_str());
@@ -442,8 +440,8 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 		case 'u':
 		{
 			long uptime = static_cast<long>(Anope::CurTime - Anope::StartTime);
-			IRCD->SendNumeric(242, source.GetSource(), ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
-			IRCD->SendNumeric(250, source.GetSource(), ":Current users: %d (%d ops); maximum %d", UserListByNick.size(), OperCount, MaxUserCount);
+			IRCD->SendNumeric(242, source.GetSource(), ":Services up %ld day%s, %02ld:%02ld:%02ld", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
+			IRCD->SendNumeric(250, source.GetSource(), ":Current users: %zu (%d ops); maximum %u", UserListByNick.size(), OperCount, MaxUserCount);
 			IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			break;
 		} /* case 'u' */
@@ -494,6 +492,7 @@ void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params,
 		IRCD->SendNumeric(312, source.GetSource(), "%s %s :%s", u->nick.c_str(), Me->GetName().c_str(), Config->GetBlock("serverinfo")->Get<const Anope::string>("description").c_str());
 		if (bi)
 			IRCD->SendNumeric(317, source.GetSource(), "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(bi->signon));
+		IRCD->SendNumeric(313, source.GetSource(), "%s :is a Network Service",  u->nick.c_str());
 		IRCD->SendNumeric(318, source.GetSource(), "%s :End of /WHOIS list.", u->nick.c_str());
 	}
 	else

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,16 @@
 #include "mail.h"
 #include "config.h"
 
-Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m) : Thread(), sendmail_path(Config->GetBlock("mail")->Get<const Anope::string>("sendmailpath")), send_from(sf), mail_to(mailto), addr(a), subject(s), message(m), dont_quote_addresses(Config->GetBlock("mail")->Get<bool>("dontquoteaddresses")), success(false)
+Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m)
+	: Thread()
+	, sendmail_path(Config->GetBlock("mail")->Get<const Anope::string>("sendmailpath"))
+	, send_from(sf)
+	, mail_to(mailto)
+	, addr(a)
+	, subject(s)
+	, message(m)
+	, content_type(Config->GetBlock("mail")->Get<const Anope::string>("content_type", "text/plain; charset=UTF-8"))
+	, dont_quote_addresses(Config->GetBlock("mail")->Get<bool>("dontquoteaddresses"))
 {
 }
 
@@ -35,15 +44,17 @@ void Mail::Message::Run()
 		return;
 	}
 
-	fprintf(pipe, "From: %s\n", send_from.c_str());
+	fprintf(pipe, "From: %s\r\n", send_from.c_str());
 	if (this->dont_quote_addresses)
-		fprintf(pipe, "To: %s <%s>\n", mail_to.c_str(), addr.c_str());
+		fprintf(pipe, "To: %s <%s>\r\n", mail_to.c_str(), addr.c_str());
 	else
-		fprintf(pipe, "To: \"%s\" <%s>\n", mail_to.c_str(), addr.c_str());
-	fprintf(pipe, "Subject: %s\n", subject.c_str());
-	fprintf(pipe, "\n");
+		fprintf(pipe, "To: \"%s\" <%s>\r\n", mail_to.c_str(), addr.c_str());
+	fprintf(pipe, "Subject: %s\r\n", subject.c_str());
+	fprintf(pipe, "Content-Type: %s\r\n", content_type.c_str());
+	fprintf(pipe, "Content-Transfer-Encoding: 8bit\r\n");
+	fprintf(pipe, "\r\n");
 	fprintf(pipe, "%s", message.c_str());
-	fprintf(pipe, "\n.\n");
+	fprintf(pipe, "\r\n.\r\n");
 
 	pclose(pipe);
 
@@ -133,13 +144,15 @@ bool Mail::Validate(const Anope::string &email)
 		return false;
 
 	/* Check for forbidden characters in the name */
-	for (unsigned i = 0, end = copy.length(); i < end; ++i)
+	for (auto chr : copy)
 	{
-		if (copy[i] <= 31 || copy[i] >= 127)
+		if (chr <= 31 || chr >= 127)
 			return false;
-		for (unsigned int j = 0; j < 13; ++j)
-			if (copy[i] == specials[j])
+		for (auto special : specials)
+		{
+			if (chr == special)
 				return false;
+		}
 	}
 
 	/* Check for forbidden characters in the domain */
@@ -147,9 +160,11 @@ bool Mail::Validate(const Anope::string &email)
 	{
 		if (domain[i] <= 31 || domain[i] >= 127)
 			return false;
-		for (unsigned int j = 0; j < 13; ++j)
-			if (domain[i] == specials[j])
+		for (auto special : specials)
+		{
+			if (domain[i] == special)
 				return false;
+		}
 		if (domain[i] == '.')
 		{
 			if (!i || i == end - 1)

@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -33,9 +33,8 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 
 	std::deque<ChannelInfo *> queue;
 	na->nc->GetChannelReferences(queue);
-	for (unsigned i = 0; i < queue.size(); ++i)
+	for (auto *ci : queue)
 	{
-		ChannelInfo *ci = queue[i];
 		if ((ci->HasExt("SECUREFOUNDER") ? ci->AccessFor(na->nc).founder : ci->AccessFor(na->nc).HasPriv("FOUNDER")) || (na->nc->IsServicesOper() && na->nc->o->ot->HasCommand("chanserv/drop")))
 		{
 			replacements["CHANNEL_NAMES"] = ci->name;

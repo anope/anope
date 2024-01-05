@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@
 
 class CommandMSSet : public Command
 {
- private:
+private:
 	void DoNotify(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
 	{
 		const Anope::string &param = params[1];
@@ -200,14 +200,14 @@ class CommandMSSet : public Command
 		}
 		return;
 	}
- public:
+public:
 	CommandMSSet(Module *creator) : Command(creator, "memoserv/set", 2, 5)
 	{
 		this->SetDesc(_("Set options related to memos"));
 		this->SetSyntax(_("\037option\037 \037parameters\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 		MemoInfo *mi = &source.nc->memos;
@@ -226,7 +226,7 @@ class CommandMSSet : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (subcommand.empty())
 		{
@@ -303,7 +303,7 @@ class MSSet : public Module
 	CommandMSSet commandmsset;
 	SerializableExtensibleItem<bool> memo_signon, memo_receive, memo_mail, memo_hardmax;
 
- public:
+public:
 	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsset(this), memo_signon(this, "MEMO_SIGNON"), memo_receive(this, "MEMO_RECEIVE"), memo_mail(this, "MEMO_MAIL"),
 		memo_hardmax(this, "MEMO_HARDMAX")

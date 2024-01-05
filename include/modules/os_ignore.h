@@ -1,6 +1,6 @@
 /* OperServ ignore interface
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,24 +9,26 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#pragma once
+
 struct IgnoreData
 {
 	Anope::string mask;
 	Anope::string creator;
 	Anope::string reason;
-	time_t time; /* When do we stop ignoring them? */
+	time_t time = 0; /* When do we stop ignoring them? */
 
-	virtual ~IgnoreData() { }
- protected:
-	IgnoreData() : time(0) { }
+	virtual ~IgnoreData() = default;
+protected:
+	IgnoreData() = default;
 };
 
 class IgnoreService : public Service
 {
- protected:
+protected:
 	IgnoreService(Module *c) : Service(c, "IgnoreService", "ignore") { }
 
- public:
+public:
 	virtual void AddIgnore(IgnoreData *) = 0;
 
 	virtual void DelIgnore(IgnoreData *) = 0;

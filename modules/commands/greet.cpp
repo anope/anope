@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandBSSetGreet : public Command
 {
- public:
+public:
 	CommandBSSetGreet(Module *creator, const Anope::string &sname = "botserv/set/greet") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("Enable greet messages"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		const Anope::string &value = params[1];
@@ -63,7 +63,7 @@ class CommandBSSetGreet : public Command
 			this->OnSyntaxError(source, source.command);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -77,7 +77,7 @@ class CommandBSSetGreet : public Command
 
 class CommandNSSetGreet : public Command
 {
- public:
+public:
 	CommandNSSetGreet(Module *creator, const Anope::string &sname = "nickserv/set/greet", size_t min = 0) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Associate a greet message with your nickname"));
@@ -119,12 +119,12 @@ class CommandNSSetGreet : public Command
 		}
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params.size() > 0 ? params[0] : "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -138,19 +138,19 @@ class CommandNSSetGreet : public Command
 
 class CommandNSSASetGreet : public CommandNSSetGreet
 {
- public:
+public:
 	CommandNSSASetGreet(Module *creator) : CommandNSSetGreet(creator, "nickserv/saset/greet", 1)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 \037message\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -173,7 +173,7 @@ class Greet : public Module
 	CommandNSSetGreet commandnssetgreet;
 	CommandNSSASetGreet commandnssasetgreet;
 
- public:
+public:
 	Greet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		bs_greet(this, "BS_GREET"),
 		ns_greet(this, "greet"),
@@ -182,7 +182,7 @@ class Greet : public Module
 	{
 	}
 
-	void OnJoinChannel(User *user, Channel *c) anope_override
+	void OnJoinChannel(User *user, Channel *c) override
 	{
 		/* Only display the greet if the main uplink we're connected
 		 * to has synced, or we'll get greet-floods when the net
@@ -199,14 +199,14 @@ class Greet : public Module
 		}
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
 	{
 		Anope::string *greet = ns_greet.Get(na->nc);
 		if (greet != NULL)
 			info[_("Greet")] = *greet;
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
 	{
 		if (bs_greet.HasExt(ci))
 			info.AddOption(_("Greet"));

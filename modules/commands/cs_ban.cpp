@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,15 +15,15 @@ static Module *me;
 
 class TempBan : public Timer
 {
- private:
+private:
 	Anope::string channel;
 	Anope::string mask;
 	Anope::string mode;
 
- public:
+public:
 	TempBan(time_t seconds, Channel *c, const Anope::string &banmask, const Anope::string &mod) : Timer(me, seconds), channel(c->name), mask(banmask), mode(mod) { }
 
-	void Tick(time_t ctime) anope_override
+	void Tick(time_t ctime) override
 	{
 		Channel *c = Channel::Find(this->channel);
 		if (c)
@@ -33,19 +33,22 @@ class TempBan : public Timer
 
 class CommandCSBan : public Command
 {
- public:
+public:
 	CommandCSBan(Module *creator) : Command(creator, "chanserv/ban", 2, 4)
 	{
 		this->SetDesc(_("Bans a given nick or mask on a channel"));
 		this->SetSyntax(_("\037channel\037 [+\037expiry\037] {\037nick\037 | \037mask\037} [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const Anope::string &chan = params[0];
 		Configuration::Block *block = Config->GetCommand(source);
 		const Anope::string &mode = block->Get<Anope::string>("mode", "BAN");
+		ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
+		if (cm == NULL)
+			return;
 
+		const Anope::string &chan = params[0];
 		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci == NULL)
 		{
@@ -59,7 +62,7 @@ class CommandCSBan : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 			return;
 		}
-		else if (IRCD->GetMaxListFor(c) && c->HasMode(mode) >= IRCD->GetMaxListFor(c))
+		else if (IRCD->GetMaxListFor(c, cm) && c->HasMode(mode) >= IRCD->GetMaxListFor(c, cm))
 		{
 			source.Reply(_("The %s list for %s is full."), mode.lower().c_str(), c->name.c_str());
 			return;
@@ -117,7 +120,7 @@ class CommandCSBan : public Command
 			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
 				source.Reply(ACCESS_DENIED);
 			/*
-			 * Don't ban/kick the user on channels where he is excepted
+			 * Don't ban/kick the user on channels where they are excepted
 			 * to prevent services <-> server wars.
 			 */
 			else if (c->MatchesList(u2, "EXCEPT"))
@@ -220,7 +223,7 @@ class CommandCSBan : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -238,7 +241,7 @@ class CSBan : public Module
 {
 	CommandCSBan commandcsban;
 
- public:
+public:
 	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsban(this)
 	{
 		me = this;

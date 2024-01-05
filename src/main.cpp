@@ -1,6 +1,6 @@
-/* Services -- main source file.
+/* Anope -- main source file.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -17,7 +17,7 @@
 #include "uplink.h"
 
 #ifndef _WIN32
-#include <limits.h>
+#include <climits>
 #else
 #include <process.h>
 #endif
@@ -39,14 +39,14 @@ static Anope::string BinaryDir;       /* Full path to services bin directory */
 time_t Anope::StartTime = time(NULL);
 time_t Anope::CurTime = time(NULL);
 
-int Anope::CurrentUplink = -1;
+size_t Anope::CurrentUplink = -1;
 
 class UpdateTimer : public Timer
 {
- public:
+public:
 	UpdateTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		Anope::SaveDatabases();
 	}
@@ -54,10 +54,10 @@ class UpdateTimer : public Timer
 
 class ExpireTimer : public Timer
 {
- public:
+public:
 	ExpireTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		FOREACH_MOD(OnExpireTick, ());
 	}
@@ -137,12 +137,13 @@ int main(int ac, char **av, char **envp)
 	try
 	{
 		/* General initialization first */
-		Anope::Init(ac, av);
+		if (!Anope::Init(ac, av))
+			return Anope::ReturnValue;
 	}
 	catch (const CoreException &ex)
 	{
 		Log() << ex.GetReason();
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	try

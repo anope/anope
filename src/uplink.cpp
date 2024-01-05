@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -19,10 +19,10 @@ UplinkSocket *UplinkSock = NULL;
 
 class ReconnectTimer : public Timer
 {
- public:
+public:
 	ReconnectTimer(int wait) : Timer(wait) { }
 
-	void Tick(time_t)
+	void Tick(time_t) override
 	{
 		try
 		{
@@ -43,7 +43,7 @@ void Uplink::Connect()
 		return;
 	}
 
-	if (static_cast<unsigned>(++Anope::CurrentUplink) >= Config->Uplinks.size())
+	if (++Anope::CurrentUplink >= Config->Uplinks.size())
 		Anope::CurrentUplink = 0;
 
 	Configuration::Uplink &u = Config->Uplinks[Anope::CurrentUplink];
@@ -52,12 +52,12 @@ void Uplink::Connect()
 	if (!Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost").empty())
 		UplinkSock->Bind(Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost"));
 	FOREACH_MOD(OnPreServerConnect, ());
-	Anope::string ip = Anope::Resolve(u.host, u.ipv6 ? AF_INET6 : AF_INET);
-	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u.host << " (" << ip << "), port " << u.port;
+	Anope::string ip = Anope::Resolve(u.host, u.protocol);
+	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u.host << " (" << ip << '/' << u.port << ") with protocol " << IRCD->GetProtocolName();
 	UplinkSock->Connect(ip, u.port);
 }
 
-UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].ipv6), ConnectionSocket(), BufferedSocket()
+UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].protocol), ConnectionSocket(), BufferedSocket()
 {
 	error = false;
 	UplinkSock = this;
@@ -79,10 +79,8 @@ UplinkSocket::~UplinkSocket()
 	{
 		FOREACH_MOD(OnServerDisconnect, ());
 
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (const auto &[_, u] : UserListByNick)
 		{
-			User *u = it->second;
-
 			if (u->server == Me)
 			{
 				/* Don't use quitmsg here, it may contain information you don't want people to see */

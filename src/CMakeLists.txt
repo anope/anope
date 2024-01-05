@@ -2,7 +2,6 @@
 file(GLOB SRC_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 
 if(WIN32)
-  list(APPEND SRC_SRCS win32/dir/dir.cpp)
   list(APPEND SRC_SRCS win32/socket.cpp)
   list(APPEND SRC_SRCS win32/windows.cpp)
   list(APPEND SRC_SRCS win32/dl/dl.cpp)
@@ -25,25 +24,6 @@ list(SORT SRC_SRCS)
 
 # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
 set_source_files_properties(${SRC_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
-
-# Create an empty list to store extra include directories
-set(EXTRA_INCLUDES)
-# Iterate through all the source files
-foreach(SRC ${SRC_SRCS})
-  # Temporary variable for the current source's include directories
-  set(TEMP_INCLUDES)
-  # Calculate the header file dependencies for the given source file
-  calculate_depends(${SRC} TEMP_INCLUDES)
-  # If there were some extra include directories, add them to the list
-  if(TEMP_INCLUDES)
-    list(APPEND EXTRA_INCLUDES ${TEMP_INCLUDES})
-  endif()
-endforeach()
-# If there were extra include directories, remove the duplicates and add the directories to the include path
-if(EXTRA_INCLUDES)
-  list(REMOVE_DUPLICATES EXTRA_INCLUDES)
-  include_directories(${EXTRA_INCLUDES})
-endif()
 
 # Under Windows, we also include a resource file to the build
 if(WIN32)
@@ -78,22 +58,29 @@ endif()
 # Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
 add_executable(${PROGRAM_NAME} ${SRC_SRCS})
 set_target_properties(${PROGRAM_NAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS} ${EXTRA_LDFLAGS}" ENABLE_EXPORTS ON INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
+
 # On Windows, also link Anope to the wsock32 and Ws2_32 library, as well as set the version
 if(WIN32)
-  target_link_libraries(${PROGRAM_NAME} wsock32 Ws2_32 ${LINK_LIBS} ${GETTEXT_LIBRARIES} ${WIN32_MEMORY})
+  target_link_libraries(${PROGRAM_NAME} wsock32 Ws2_32 ${LINK_LIBS} ${WIN32_MEMORY})
   set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
 else()
-  target_link_libraries(${PROGRAM_NAME} ${LINK_LIBS} ${GETTEXT_LIBRARIES})
+  target_link_libraries(${PROGRAM_NAME} ${LINK_LIBS})
 endif()
+
+# If being built with localisation we might need to link against libintl.
+if(HAVE_LOCALIZATION AND Intl_LIBRARY)
+  target_link_libraries(${PROGRAM_NAME} ${Intl_LIBRARY})
+endif()
+
 # Building the Anope executable requires the version.h header to be generated
 add_dependencies(${PROGRAM_NAME} headers)
 # Also require the language files if we have gettext
-if(GETTEXT_FOUND)
+if(HAVE_LOCALIZATION)
   add_dependencies(${PROGRAM_NAME} language)
 endif()
 
 # Get the filename of the Anope executable as it is in on this system
-get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
+set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 # Add the Anope executable to the list of files for CPack to ignore
 add_to_cpack_ignored_files("${SERVICES_BINARY}$" TRUE)

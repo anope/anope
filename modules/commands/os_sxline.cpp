@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,13 +16,13 @@ class SXLineDelCallback : public NumberList
 	XLineManager *xlm;
 	Command *command;
 	CommandSource &source;
-	unsigned deleted;
- public:
-	SXLineDelCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), xlm(x), command(c), source(_source), deleted(0)
+	unsigned deleted = 0;
+public:
+	SXLineDelCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), xlm(x), command(c), source(_source)
 	{
 	}
 
-	~SXLineDelCallback()
+	~SXLineDelCallback() override
 	{
 		if (!deleted)
 			source.Reply(_("No matching entries on the %s list."), source.command.c_str());
@@ -32,7 +32,7 @@ class SXLineDelCallback : public NumberList
 			source.Reply(_("Deleted %d entries from the %s list."), deleted, source.command.c_str());
 	}
 
-	void HandleNumber(unsigned number) anope_override
+	void HandleNumber(unsigned number) override
 	{
 		if (!number)
 			return;
@@ -56,7 +56,7 @@ class SXLineDelCallback : public NumberList
 
 class CommandOSSXLineBase : public Command
 {
- private:
+private:
 	virtual XLineManager* xlm() = 0;
 
 	virtual void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) = 0;
@@ -123,12 +123,12 @@ class CommandOSSXLineBase : public Command
 				XLineManager *xlm;
 				CommandSource &source;
 				ListFormatter &list;
-			 public:
+			public:
 				SXLineListCallback(XLineManager *x, CommandSource &_source, ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), xlm(x), source(_source), list(_list)
 				{
 				}
 
-				void HandleNumber(unsigned number) anope_override
+				void HandleNumber(unsigned number) override
 				{
 					if (!number)
 						return;
@@ -182,8 +182,8 @@ class CommandOSSXLineBase : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 	}
 
@@ -223,17 +223,17 @@ class CommandOSSXLineBase : public Command
 
 		return;
 	}
- public:
+public:
 	CommandOSSXLineBase(Module *creator, const Anope::string &cmd) : Command(creator, cmd, 1, 4)
 	{
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Manipulate the %s list")), source.command.upper().c_str());
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -253,17 +253,17 @@ class CommandOSSXLineBase : public Command
 		return;
 	}
 
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override = 0;
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 };
 
 class CommandOSSNLine : public CommandOSSXLineBase
 {
-	XLineManager *xlm() anope_override
+	XLineManager *xlm() override
 	{
 		return this->snlines;
 	}
 
-	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!this->xlm())
 			return;
@@ -371,8 +371,8 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			if (this->xlm()->Check(it->second, x))
+		for (const auto &[_, user] : UserListByNick)
+			if (this->xlm()->Check(user, x))
 				++affected;
 		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
 
@@ -401,10 +401,8 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		{
 			Anope::string rreason = "G-Lined: " + reason;
 
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			for (const auto &[_, user] : UserListByNick)
 			{
-				User *user = it->second;
-
 				if (!user->HasMode("OPER") && user->server != Me && this->xlm()->Check(user, x))
 					user->Kill(Me, rreason);
 			}
@@ -419,7 +417,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 	}
 
 	ServiceReference<XLineManager> snlines;
- public:
+public:
 	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline"), snlines("XLineManager", "xlinemanager/snline")
 	{
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037:\037reason\037"));
@@ -429,13 +427,13 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		this->SetSyntax("CLEAR");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Allows Services Operators to manipulate the SNLINE list.  If\n"
 				"a user with a realname matching an SNLINE mask attempts to\n"
-				"connect, Services will not allow it to pursue his IRC\n"
+				"connect, services will not allow them to pursue their IRC\n"
 				"session."));
 		source.Reply(_(" \n"
 				"\002SNLINE ADD\002 adds the given realname mask to the SNLINE\n"
@@ -484,12 +482,12 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 class CommandOSSQLine : public CommandOSSXLineBase
 {
-	XLineManager *xlm() anope_override
+	XLineManager *xlm() override
 	{
 		return this->sqlines;
 	}
 
-	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!this->xlm())
 			return;
@@ -579,8 +577,8 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			if (this->xlm()->Check(it->second, x))
+		for (const auto &[_, user] : UserListByNick)
+			if (this->xlm()->Check(user, x))
 				++affected;
 		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
 
@@ -611,33 +609,28 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 			if (mask[0] == '#')
 			{
-				for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
+				for (const auto &[_, c] : ChannelList)
 				{
-					Channel *c = cit->second;
-
 					if (!Anope::Match(c->name, mask, false, true))
 						continue;
 
 					std::vector<User *> users;
-					for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+					for (const auto &[_, uc] : c->users)
 					{
-						ChanUserContainer *uc = it->second;
 						User *user = uc->user;
 
 						if (!user->HasMode("OPER") && user->server != Me)
 							users.push_back(user);
 					}
 
-					for (unsigned i = 0; i < users.size(); ++i)
-						c->Kick(NULL, users[i], "%s", reason.c_str());
+					for (auto *user : users)
+						c->Kick(NULL, user, "%s", reason.c_str());
 				}
 			}
 			else
 			{
-				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+				for (const auto &[_, user] : UserListByNick)
 				{
-					User *user = it->second;
-
 					if (!user->HasMode("OPER") && user->server != Me && this->xlm()->Check(user, x))
 						user->Kill(Me, rreason);
 				}
@@ -653,7 +646,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 	}
 
 	ServiceReference<XLineManager> sqlines;
- public:
+public:
 	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/sqline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037 \037reason\037"));
@@ -663,20 +656,20 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		this->SetSyntax("CLEAR");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Allows Services Operators to manipulate the SQLINE list.  If\n"
 				"a user with a nick matching an SQLINE mask attempts to\n"
-				"connect, Services will not allow it to pursue his IRC\n"
+				"connect, services will not allow them to pursue their IRC\n"
 				"session.\n"
 				"If the first character of the mask is #, services will\n"
 				"prevent the use of matching channels. If the mask is a\n"
 				"regular expression, the expression will be matched against\n"
 				"channels too."));
 		source.Reply(_(" \n"
-				"\002SQLINE ADD\002 adds the given (nick's) mask to the SQLINE\n"
+				"\002SQLINE ADD\002 adds the given (nick/channel) mask to the SQLINE\n"
 				"list for the given reason (which \002must\002 be given).\n"
 				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
 				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"
@@ -722,7 +715,7 @@ class OSSXLine : public Module
 	CommandOSSNLine commandossnline;
 	CommandOSSQLine commandossqline;
 
- public:
+public:
 	OSSXLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandossnline(this), commandossqline(this)
 	{

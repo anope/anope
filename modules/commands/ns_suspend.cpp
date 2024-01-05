@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,7 +18,7 @@ struct NSSuspendInfo : SuspendInfo, Serializable
 {
 	NSSuspendInfo(Extensible *) : Serializable("NSSuspendInfo") { }
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["nick"] << what;
 		data["by"] << by;
@@ -54,14 +54,14 @@ struct NSSuspendInfo : SuspendInfo, Serializable
 
 class CommandNSSuspend : public Command
 {
- public:
+public:
 	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 3)
 	{
 		this->SetDesc(_("Suspend a given nick"));
 		this->SetSyntax(_("\037nickname\037 [+\037expiry\037] [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
 		const Anope::string &nick = params[0];
@@ -116,10 +116,8 @@ class CommandNSSuspend : public Command
 		si->when = Anope::CurTime;
 		si->expires = expiry_secs ? expiry_secs + Anope::CurTime : 0;
 
-		for (unsigned i = 0; i < nc->aliases->size(); ++i)
+		for (auto *na2 : *nc->aliases)
 		{
-			NickAlias *na2 = nc->aliases->at(i);
-
 			if (na2 && *na2->nc == *na->nc)
 			{
 				na2->last_quit = reason;
@@ -140,7 +138,7 @@ class CommandNSSuspend : public Command
 		FOREACH_MOD(OnNickSuspend, (na));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -154,14 +152,14 @@ class CommandNSSuspend : public Command
 
 class CommandNSUnSuspend : public Command
 {
- public:
+public:
 	CommandNSUnSuspend(Module *creator) : Command(creator, "nickserv/unsuspend", 1, 1)
 	{
 		this->SetDesc(_("Unsuspend a given nick"));
 		this->SetSyntax(_("\037nickname\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = params[0];
 
@@ -192,7 +190,7 @@ class CommandNSUnSuspend : public Command
 		FOREACH_MOD(OnNickUnsuspended, (na));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -222,21 +220,21 @@ class NSSuspend : public Module
 		return source.IsOper() || std::find(show.begin(), show.end(), what) != show.end();
 	}
 
- public:
+public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnssuspend(this), commandnsunsuspend(this), suspend(this, "NS_SUSPENDED"),
 		suspend_type("NSSuspendInfo", NSSuspendInfo::Unserialize)
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Anope::string s = conf->GetModule(this)->Get<Anope::string>("show");
 		commasepstream(s).GetTokens(show);
 		std::transform(show.begin(), show.end(), show.begin(), trim());
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
 	{
 		NSSuspendInfo *s = suspend.Get(na->nc);
 		if (!s)
@@ -254,7 +252,7 @@ class NSSuspend : public Module
 			info[_("Suspension expires")] = Anope::strftime(s->expires, source.GetAccount());
 	}
 
-	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
+	void OnPreNickExpire(NickAlias *na, bool &expire) override
 	{
 		NSSuspendInfo *s = suspend.Get(na->nc);
 		if (!s)
@@ -274,7 +272,7 @@ class NSSuspend : public Module
 		}
 	}
 
-	EventReturn OnNickValidate(User *u, NickAlias *na) anope_override
+	EventReturn OnNickValidate(User *u, NickAlias *na) override
 	{
 		NSSuspendInfo *s = suspend.Get(na->nc);
 		if (!s)

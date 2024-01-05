@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,7 +15,7 @@ static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
 
 class CommandNSConfirm : public Command
 {
- public:
+public:
 	CommandNSConfirm(Module *creator) : Command(creator, "nickserv/confirm", 1, 2)
 	{
 		this->SetDesc(_("Confirm a passcode"));
@@ -23,15 +23,17 @@ class CommandNSConfirm : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const Anope::string &passcode = params[0];
+		Anope::string *code = source.nc ? source.nc->GetExt<Anope::string>("passcode") : NULL;
+		bool confirming_other = !code || *code != params[0];
 
-		if (source.nc && (!source.nc->HasExt("UNCONFIRMED") || source.IsOper()) && source.HasPriv("nickserv/confirm"))
+		if (source.nc && (!source.nc->HasExt("UNCONFIRMED") || (source.IsOper() && confirming_other)) && source.HasPriv("nickserv/confirm"))
 		{
-			NickAlias *na = NickAlias::Find(passcode);
+			const Anope::string &nick = params[0];
+			NickAlias *na = NickAlias::Find(nick);
 			if (na == NULL)
-				source.Reply(NICK_X_NOT_REGISTERED, passcode.c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 			else if (na->nc->HasExt("UNCONFIRMED") == false)
 				source.Reply(_("Nick \002%s\002 is already confirmed."), na->nick.c_str());
 			else
@@ -58,7 +60,7 @@ class CommandNSConfirm : public Command
 		}
 		else if (source.nc)
 		{
-			Anope::string *code = source.nc->GetExt<Anope::string>("passcode");
+			const Anope::string &passcode = params[0];
 			if (code != NULL && *code == passcode)
 			{
 				NickCore *nc = source.nc;
@@ -83,12 +85,12 @@ class CommandNSConfirm : public Command
 				source.Reply(_("Invalid passcode."));
 		}
 		else
-			source.Reply(_("Invalid passcode."));
+			source.Reply(NICK_IDENTIFY_REQUIRED);
 
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -106,7 +108,7 @@ class CommandNSConfirm : public Command
 		return true;
 	}
 
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) anope_override
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) override
 	{
 		source.Reply(NICK_CONFIRM_INVALID);
 	}
@@ -114,7 +116,7 @@ class CommandNSConfirm : public Command
 
 class CommandNSRegister : public Command
 {
- public:
+public:
 	CommandNSRegister(Module *creator) : Command(creator, "nickserv/register", 1, 2)
 	{
 		this->SetDesc(_("Register a nickname"));
@@ -125,7 +127,7 @@ class CommandNSRegister : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
 		Anope::string u_nick = source.GetNick();
@@ -180,10 +182,8 @@ class CommandNSRegister : public Command
 
 		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
 		{
-			for (unsigned i = 0; i < Oper::opers.size(); ++i)
+			for (auto *o : Oper::opers)
 			{
-				Oper *o = Oper::opers[i];
-
 				if (!source.IsOper() && u_nick.find_ci(o->name) != Anope::string::npos)
 				{
 					source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
@@ -263,7 +263,7 @@ class CommandNSRegister : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -307,13 +307,13 @@ class CommandNSRegister : public Command
 
 class CommandNSResend : public Command
 {
- public:
+public:
 	CommandNSResend(Module *creator) : Command(creator, "nickserv/resend", 0, 0)
 	{
 		this->SetDesc(_("Resend registration confirmation email"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 		{
@@ -344,7 +344,7 @@ class CommandNSResend : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 			return false;
@@ -355,7 +355,7 @@ class CommandNSResend : public Command
 		return true;
 	}
 
-	void OnServHelp(CommandSource &source) anope_override
+	void OnServHelp(CommandSource &source) override
 	{
 		if (Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 			Command::OnServHelp(source);
@@ -371,7 +371,7 @@ class NSRegister : public Module
 	SerializableExtensibleItem<bool> unconfirmed;
 	SerializableExtensibleItem<Anope::string> passcode;
 
- public:
+public:
 	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsregister(this), commandnsconfirm(this), commandnsrsend(this), unconfirmed(this, "UNCONFIRMED"),
 		passcode(this, "passcode")
@@ -380,7 +380,7 @@ class NSRegister : public Module
 			throw ModuleException("Module " + this->name + " will not load with registration disabled.");
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnNickIdentify(User *u) override
 	{
 		BotInfo *NickServ;
 		if (unconfirmed.HasExt(u->Account()) && (NickServ = Config->GetClient("NickServ")))
@@ -398,7 +398,7 @@ class NSRegister : public Module
 		}
 	}
 
-	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
+	void OnPreNickExpire(NickAlias *na, bool &expire) override
 	{
 		if (unconfirmed.HasExt(na->nc))
 		{

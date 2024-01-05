@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,21 +9,21 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
 #include "service.h"
+#include "modes.h"
 
-/* Encapsultes the IRCd protocol we are speaking. */
+/* Encapsulates the IRCd protocol we are speaking. */
 class CoreExport IRCDProto : public Service
 {
 	Anope::string proto_name;
 
- protected:
+protected:
 	IRCDProto(Module *creator, const Anope::string &proto_name);
- public:
+public:
 	virtual ~IRCDProto();
 
 	virtual void SendSVSKillInternal(const MessageSource &, User *, const Anope::string &);
@@ -54,7 +54,7 @@ class CoreExport IRCDProto : public Service
 	bool CanSNLine;
 	/* Can we ban specific nicknames from being used? */
 	bool CanSQLine;
-	/* Can we ban sepcific channel names from being used? */
+	/* Can we ban specific channel names from being used? */
 	bool CanSQLineChannel;
 	/* Can we ban by IP? */
 	bool CanSZLine;
@@ -64,6 +64,8 @@ class CoreExport IRCDProto : public Service
 	bool CanCertFP;
 	/* Can we send arbitrary message tags? */
 	bool CanSendTags;
+	/* Can users log out before being fully connected? */
+	bool CanSVSLogout;
 	/* Whether this IRCd requires unique IDs for each user or server. See TS6/P10. */
 	bool RequiresID;
 	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */
@@ -237,6 +239,7 @@ class CoreExport IRCDProto : public Service
 	 * Defaults to Config->ListSize
 	 */
 	virtual unsigned GetMaxListFor(Channel *c);
+	virtual unsigned GetMaxListFor(Channel *c, ChannelMode *cm);
 
 	virtual Anope::string NormalizeMask(const Anope::string &mask);
 };
@@ -244,10 +247,10 @@ class CoreExport IRCDProto : public Service
 class CoreExport MessageSource
 {
 	Anope::string source;
-	User *u;
-	Server *s;
+	User *u = nullptr;
+	Server *s = nullptr;
 
- public:
+public:
 	MessageSource(const Anope::string &);
 	MessageSource(User *u);
 	MessageSource(Server *s);
@@ -270,7 +273,7 @@ class CoreExport IRCDMessage : public Service
 	Anope::string name;
 	unsigned param_count;
 	std::set<IRCDMessageFlag> flags;
- public:
+public:
 	IRCDMessage(Module *owner, const Anope::string &n, unsigned p = 0);
 	unsigned GetParamCount() const;
 	virtual void Run(MessageSource &, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) = 0;
@@ -287,9 +290,9 @@ private:
 	Anope::string message;
 
 	/** The current position within the message. */
-	Anope::string::size_type position;
+	Anope::string::size_type position = 0;
 
- public:
+public:
 	/** Create a tokenstream and fill it with the provided data. */
 	MessageTokenizer(const Anope::string &msg);
 
@@ -307,5 +310,3 @@ private:
 };
 
 extern CoreExport IRCDProto *IRCD;
-
-#endif // PROTOCOL_H

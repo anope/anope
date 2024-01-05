@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandOSModInfo : public Command
 {
- public:
+public:
 	CommandOSModInfo(Module *creator) : Command(creator, "operserv/modinfo", 1, 1)
 	{
 		this->SetDesc(_("Info about a loaded module"));
 		this->SetSyntax(_("\037modname\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &file = params[0];
 
@@ -34,22 +34,18 @@ class CommandOSModInfo : public Command
 				source.Reply(_(" Loaded at: %p"), m->handle);
 
 			std::vector<Anope::string> servicekeys = Service::GetServiceKeys("Command");
-			for (unsigned i = 0; i < servicekeys.size(); ++i)
+			for (const auto &servicekey : servicekeys)
 			{
-				ServiceReference<Command> c("Command", servicekeys[i]);
+				ServiceReference<Command> c("Command", servicekey);
 				if (!c || c->owner != m)
 					continue;
 
 				source.Reply(_("   Providing service: \002%s\002"), c->name.c_str());
 
-				for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+				for (const auto &[_, bi] : *BotListByNick)
 				{
-					const BotInfo *bi = it->second;
-
-					for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
+					for (const auto &[c_name, info] : bi->commands)
 					{
-						const Anope::string &c_name = cit->first;
-						const CommandInfo &info = cit->second;
 						if (info.name != c->name)
 							continue;
 						source.Reply(_("   Command \002%s\002 on \002%s\002 is linked to \002%s\002"), c_name.c_str(), bi->nick.c_str(), c->name.c_str());
@@ -63,7 +59,7 @@ class CommandOSModInfo : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -74,14 +70,14 @@ class CommandOSModInfo : public Command
 
 class CommandOSModList : public Command
 {
- public:
+public:
 	CommandOSModList(Module *creator) : Command(creator, "operserv/modlist", 0, 1)
 	{
 		this->SetDesc(_("List loaded modules"));
 		this->SetSyntax("[all|third|vendor|extra|database|encryption|pseudoclient|protocol]");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &param = !params.empty() ? params[0] : "";
 
@@ -116,10 +112,8 @@ class CommandOSModList : public Command
 		source.Reply(_("Current module list:"));
 
 		int count = 0;
-		for (std::list<Module *>::iterator it = ModuleManager::Modules.begin(), it_end = ModuleManager::Modules.end(); it != it_end; ++it)
+		for (auto *m : ModuleManager::Modules)
 		{
-			Module *m = *it;
-
 			bool show = false;
 			Anope::string mtype;
 
@@ -189,7 +183,7 @@ class CommandOSModList : public Command
 			source.Reply(_("%d modules loaded."), count);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -203,7 +197,7 @@ class OSModInfo : public Module
 	CommandOSModInfo commandosmodinfo;
 	CommandOSModList commandosmodlist;
 
- public:
+public:
 	OSModInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosmodinfo(this), commandosmodlist(this)
 	{

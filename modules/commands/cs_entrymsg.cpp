@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -26,9 +26,9 @@ struct EntryMsgImpl : EntryMsg, Serializable
 		this->when = ct;
 	}
 
-	~EntryMsgImpl();
+	~EntryMsgImpl() override;
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["ci"] << this->chan;
 		data["creator"] << this->creator;
@@ -43,7 +43,7 @@ struct EntryMessageListImpl : EntryMessageList
 {
 	EntryMessageListImpl(Extensible *) { }
 
-	EntryMsg* Create() anope_override
+	EntryMsg* Create() override
 	{
 		return new EntryMsgImpl();
 	}
@@ -99,7 +99,7 @@ Serializable* EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data
 
 class CommandEntryMessage : public Command
 {
- private:
+private:
 	void DoList(CommandSource &source, ChannelInfo *ci)
 	{
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
@@ -128,8 +128,8 @@ class CommandEntryMessage : public Command
 
 		std::vector<Anope::string> replies;
 		list.Process(replies);
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("End of entry message list."));
 	}
@@ -187,7 +187,7 @@ class CommandEntryMessage : public Command
 		source.Reply(_("Entry messages for \002%s\002 have been cleared."), ci->name.c_str());
 	}
 
- public:
+public:
 	CommandEntryMessage(Module *creator) : Command(creator, "chanserv/entrymsg", 2, 3)
 	{
 		this->SetDesc(_("Manage the channel's entry messages"));
@@ -197,7 +197,7 @@ class CommandEntryMessage : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
@@ -232,7 +232,7 @@ class CommandEntryMessage : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -266,22 +266,22 @@ class CSEntryMessage : public Module
 	ExtensibleItem<EntryMessageListImpl> eml;
 	Serialize::Type entrymsg_type;
 
- public:
+public:
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 	commandentrymsg(this),
 	eml(this, "entrymsg"), entrymsg_type("EntryMsg", EntryMsgImpl::Unserialize)
 	{
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	void OnJoinChannel(User *u, Channel *c) override
 	{
 		if (u && c && c->ci && u->server->IsSynced())
 		{
 			EntryMessageList *messages = c->ci->GetExt<EntryMessageList>("entrymsg");
 
 			if (messages != NULL)
-				for (unsigned i = 0; i < (*messages)->size(); ++i)
-					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), (*messages)->at(i)->message.c_str());
+				for (const auto &message : *(*messages))
+					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), message->message.c_str());
 		}
 	}
 };

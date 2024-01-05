@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef ACCESS_H
-#define ACCESS_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -42,7 +41,7 @@ struct CoreExport Privilege
 class CoreExport PrivilegeManager
 {
 	static std::vector<Privilege> Privileges;
- public:
+public:
 	static void AddPrivilege(Privilege p);
 	static void RemovePrivilege(Privilege &p);
 	static Privilege *FindPrivilege(const Anope::string &name);
@@ -55,7 +54,7 @@ class CoreExport PrivilegeManager
  */
 class CoreExport AccessProvider : public Service
 {
- public:
+public:
 	AccessProvider(Module *owner, const Anope::string &name);
 	virtual ~AccessProvider();
 
@@ -64,9 +63,9 @@ class CoreExport AccessProvider : public Service
 	 */
 	virtual ChanAccess *Create() = 0;
 
- private:
+private:
 	static std::list<AccessProvider *> Providers;
- public:
+public:
 	static const std::list<AccessProvider *>& GetProviders();
 };
 
@@ -77,7 +76,7 @@ class CoreExport ChanAccess : public Serializable
 	/* account this access entry is for, if any */
 	Serialize::Reference<NickCore> nc;
 
- public:
+public:
 	typedef std::vector<ChanAccess *> Path;
 
 	/* The provider that created this access entry */
@@ -85,6 +84,7 @@ class CoreExport ChanAccess : public Serializable
 	/* Channel this access entry is on */
 	Serialize::Reference<ChannelInfo> ci;
 	Anope::string creator;
+	Anope::string description;
 	time_t last_seen;
 	time_t created;
 
@@ -95,7 +95,7 @@ class CoreExport ChanAccess : public Serializable
 	const Anope::string &Mask() const;
 	NickCore *GetAccount() const;
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	static const unsigned int MAX_DEPTH = 4;
@@ -135,7 +135,7 @@ class CoreExport ChanAccess : public Serializable
  */
 class CoreExport AccessGroup
 {
- public:
+public:
 	/* access entries + paths */
 	std::vector<ChanAccess::Path> paths;
 	/* Channel these access entries are on */
@@ -170,5 +170,3 @@ class CoreExport AccessGroup
 
 	inline bool empty() const { return paths.empty(); }
 };
-
-#endif

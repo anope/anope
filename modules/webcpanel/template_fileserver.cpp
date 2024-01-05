@@ -1,14 +1,14 @@
 /*
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
 #include "webcpanel.h"
+#include <cerrno>
 #include <fstream>
 #include <stack>
-#include <errno.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -25,28 +25,24 @@ struct ForLoop
 
 	ForLoop(size_t s, TemplateFileServer::Replacements &r, const std::vector<Anope::string> &v, const std::vector<Anope::string> &r_names) : start(s), vars(v)
 	{
-		for (unsigned i = 0; i < r_names.size(); ++i)
-			ranges.push_back(r.equal_range(r_names[i]));
+		for (const auto &r_name : r_names)
+			ranges.push_back(r.equal_range(r_name));
 	}
 
 	void increment(const TemplateFileServer::Replacements &r)
 	{
-		for (unsigned i = 0; i < ranges.size(); ++i)
+		for (auto &[begin, end] : ranges)
 		{
-			range &ra = ranges[i];
-
-			if (ra.first != r.end() && ra.first != ra.second)
-				++ra.first;
+			if (begin != r.end() && begin != end)
+				++begin;
 		}
 	}
 
 	bool finished(const TemplateFileServer::Replacements &r) const
 	{
-		for (unsigned i = 0; i < ranges.size(); ++i)
+		for (const auto &[begin, end] : ranges)
 		{
-			const range &ra = ranges[i];
-
-			if (ra.first != r.end() && ra.first != ra.second)
+			if (begin != r.end() && begin != end)
 				return false;
 		}
 
@@ -186,7 +182,7 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 					if (temp_variables.size() != real_variables.size())
 						Log() << "Invalid FOR in web template " << this->file_name << " variable mismatch";
 					else
-						ForLoop::Stack.push_back(ForLoop(j + f, r, temp_variables, real_variables));
+						ForLoop::Stack.emplace_back(j + f, r, temp_variables, real_variables);
 				}
 			}
 			else if (content == "END FOR")

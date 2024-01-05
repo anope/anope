@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,16 +13,12 @@
 std::map<Anope::string, std::map<Anope::string, Service *> > Service::Services;
 std::map<Anope::string, std::map<Anope::string, Anope::string> > Service::Aliases;
 
-Base::Base() : references(NULL)
-{
-}
-
 Base::~Base()
 {
 	if (this->references != NULL)
 	{
-		for (std::set<ReferenceBase *>::iterator it = this->references->begin(), it_end = this->references->end(); it != it_end; ++it)
-			(*it)->Invalidate();
+		for (auto *reference : *this->references)
+			reference->Invalidate();
 		delete this->references;
 	}
 }

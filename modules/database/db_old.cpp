@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -130,7 +130,7 @@ enum
 	LANG_JA_EUC, /* Japanese (EUC encoding) */
 	LANG_JA_SJIS, /* Japanese (SJIS encoding) */
 	LANG_ES, /* Spanish */
-	LANG_PT, /* Portugese */
+	LANG_PT, /* Portuguese */
 	LANG_FR, /* French */
 	LANG_TR, /* Turkish */
 	LANG_IT, /* Italian */
@@ -146,20 +146,22 @@ enum
 static void process_mlock(ChannelInfo *ci, uint32_t lock, bool status, uint32_t *limit, Anope::string *key)
 {
 	ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
-	for (unsigned i = 0; i < (sizeof(mlock_infos) / sizeof(mlock_info)); ++i)
-		if (lock & mlock_infos[i].m)
+	for (auto &mlock_info : mlock_infos)
+	{
+		if (lock & mlock_info.m)
 		{
-			ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock_infos[i].c);
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock_info.c);
 			if (cm && ml)
 			{
-				if (limit && mlock_infos[i].c == 'l')
+				if (limit && mlock_info.c == 'l')
 					ml->SetMLock(cm, status, stringify(*limit));
-				else if (key && mlock_infos[i].c == 'k')
+				else if (key && mlock_info.c == 'k')
 					ml->SetMLock(cm, status, *key);
 				else
 					ml->SetMLock(cm, status);
 			}
 		}
+	}
 }
 
 static const char Base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -340,7 +342,7 @@ static dbFILE *open_db_read(const char *service, const char *filename, int versi
 	}
 	else if (myversion < version)
 	{
-		Log() << "Unsuported database version (" << myversion << ") on " << f->filename << ".";
+		Log() << "Unsupported database version (" << myversion << ") on " << f->filename << ".";
 		delete f;
 		return NULL;
 	}
@@ -449,8 +451,8 @@ static void LoadNicks()
 
 			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_secure", "ns_private", "hide_email",
 				"hide_mask", "hide_quit", "memo_signon", "memo_receive", "autoop", "msg", "ns_keepmodes" };
-			for (unsigned j = 0; j < sizeof(settings) / sizeof(Anope::string); ++j)
-				nc->Shrink<bool>(settings[j].upper());
+			for (const auto &setting : settings)
+				nc->Shrink<bool>(setting.upper());
 
 			char pwbuf[32];
 			READ(read_buffer(pwbuf, f));
@@ -752,8 +754,8 @@ static void LoadChannels()
 
 			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "cs_secure", "secureops", "securefounder",
 				"signkick", "signkick_level", "topiclock", "persist", "noautoop", "cs_keepmodes" };
-			for (unsigned j = 0; j < sizeof(settings) / sizeof(Anope::string); ++j)
-				ci->Shrink<bool>(settings[j].upper());
+			for (const auto &setting : settings)
+				ci->Shrink<bool>(setting.upper());
 
 			READ(read_string(buffer, f));
 			ci->SetFounder(NickCore::Find(buffer));
@@ -1104,9 +1106,8 @@ static void LoadOper()
 	XLineManager *akill, *sqline, *snline, *szline;
 	akill = sqline = snline = szline = NULL;
 
-	for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(), it_end = XLineManager::XLineManagers.end(); it != it_end; ++it)
+	for (auto *xl : XLineManager::XLineManagers)
 	{
-		XLineManager *xl = *it;
 		if (xl->Type() == 'G')
 			akill = xl;
 		else if (xl->Type() == 'Q')
@@ -1301,7 +1302,7 @@ class DBOld : public Module
 	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit;
 	PrimitiveExtensibleItem<Anope::string> mlock_key;
 
- public:
+public:
 	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR),
 		mlock_on(this, "mlock_on"), mlock_off(this, "mlock_off"), mlock_limit(this, "mlock_limit"), mlock_key(this, "mlock_key")
 	{
@@ -1313,7 +1314,7 @@ class DBOld : public Module
 			throw ModuleException("Invalid hash method");
 	}
 
-	EventReturn OnLoadDatabase() anope_override
+	EventReturn OnLoadDatabase() override
 	{
 		LoadNicks();
 		LoadVHosts();
@@ -1326,11 +1327,10 @@ class DBOld : public Module
 		return EVENT_STOP;
 	}
 
-	void OnUplinkSync(Server *s) anope_override
+	void OnUplinkSync(Server *s) override
 	{
-		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+		for (auto &[_, ci] : *RegisteredChannelList)
 		{
-			ChannelInfo *ci = it->second;
 			uint32_t *limit = mlock_limit.Get(ci);
 			Anope::string *key = mlock_key.Get(ci);
 

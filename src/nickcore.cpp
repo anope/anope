@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -78,11 +78,11 @@ void NickCore::Serialize(Serialize::Data &data) const
 	data["pass"] << this->pass;
 	data["email"] << this->email;
 	data["language"] << this->language;
-	for (unsigned i = 0; i < this->access.size(); ++i)
-		data["access"] << this->access[i] << " ";
+	for (const auto &mask : this->access)
+		data["access"] << mask << " ";
 	data["memomax"] << this->memos.memomax;
-	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
-		data["memoignores"] << this->memos.ignores[i] << " ";
+	for (const auto &ignore : this->memos.ignores)
+		data["memoignores"] << ignore << " ";
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
@@ -171,8 +171,8 @@ void NickCore::SetDisplay(const NickAlias *na)
 	FOREACH_MOD(OnChangeCoreDisplay, (this, na->nick));
 
 	/* this affects the serialized aliases */
-	for (unsigned i = 0; i < aliases->size(); ++i)
-		aliases->at(i)->QueueUpdate();
+	for (auto *alias : *aliases)
+		alias->QueueUpdate();
 
 	/* Remove the core from the list */
 	NickCoreList->erase(this->display);
@@ -207,9 +207,11 @@ unsigned NickCore::GetAccessCount() const
 
 bool NickCore::FindAccess(const Anope::string &entry)
 {
-	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-		if (this->access[i] == entry)
+	for (const auto &mask : this->access)
+	{
+		if (mask == entry)
 			return true;
+	}
 
 	return false;
 }
@@ -263,8 +265,8 @@ void NickCore::RemoveChannelReference(ChannelInfo *ci)
 void NickCore::GetChannelReferences(std::deque<ChannelInfo *> &queue)
 {
 	queue.clear();
-	for (std::map<ChannelInfo *, int>::iterator it = this->chanaccess->begin(), it_end = this->chanaccess->end(); it != it_end; ++it)
-		queue.push_back(it->first);
+	for (const auto &[ci, _] : *this->chanaccess)
+		queue.push_back(ci);
 }
 
 NickCore* NickCore::Find(const Anope::string &nick)
@@ -300,8 +302,8 @@ uint64_t NickCore::GetId()
 	{
 		// Generate a random key for SipHash.
 		char key[16];
-		for (size_t i = 0; i < sizeof(key); ++i)
-			key[i] = rand() % CHAR_MAX;
+		for (auto &chr : key)
+			chr = rand() % CHAR_MAX;
 
 		uint64_t newid = Anope::SipHash24(secretid.c_str(), secretid.length(), key);
 		nickcoreid_map::const_iterator it = NickCoreIdList.find(newid);

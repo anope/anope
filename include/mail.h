@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef MAIL_H
-#define MAIL_H
+#pragma once
 
 #include "anope.h"
 #include "threadengine.h"
@@ -25,17 +24,18 @@ namespace Mail
 	/* A email message being sent */
 	class Message : public Thread
 	{
-	 private:
+	private:
 		Anope::string sendmail_path;
 		Anope::string send_from;
 		Anope::string mail_to;
 		Anope::string addr;
 		Anope::string subject;
 		Anope::string message;
+		Anope::string content_type;
 		bool dont_quote_addresses;
 
-		bool success;
-	 public:
+		bool success = false;
+	public:
 		/** Construct this message. Once constructed call Thread::Start to launch the mail sending.
 		 * @param sf Config->SendFrom
 		 * @param mailto Name of person being mailed (u->nick, nc->display, etc)
@@ -48,9 +48,7 @@ namespace Mail
 		~Message();
 
 		/* Called from within the thread to actually send the mail */
-		void Run() anope_override;
+		void Run() override;
 	};
 
 } // namespace Mail
-
-#endif // MAIL_H

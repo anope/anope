@@ -1,13 +1,12 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef EXTENSIBLE_H
-#define EXTENSIBLE_H
+#pragma once
 
 #include "anope.h"
 #include "serialize.h"
@@ -18,13 +17,13 @@ class Extensible;
 
 class CoreExport ExtensibleBase : public Service
 {
- protected:
+protected:
 	std::map<Extensible *, void *> items;
 
 	ExtensibleBase(Module *m, const Anope::string &n);
 	~ExtensibleBase();
 
- public:
+public:
 	virtual void Unset(Extensible *obj) = 0;
 
 	/* called when an object we are keep track of is serializing */
@@ -34,7 +33,7 @@ class CoreExport ExtensibleBase : public Service
 
 class CoreExport Extensible
 {
- public:
+public:
 	std::set<ExtensibleBase *> extension_items;
 
 	virtual ~Extensible();
@@ -56,10 +55,10 @@ class CoreExport Extensible
 template<typename T>
 class BaseExtensibleItem : public ExtensibleBase
 {
- protected:
+protected:
 	virtual T *Create(Extensible *) = 0;
 
- public:
+public:
 	BaseExtensibleItem(Module *m, const Anope::string &n) : ExtensibleBase(m, n) { }
 
 	~BaseExtensibleItem()
@@ -93,7 +92,7 @@ class BaseExtensibleItem : public ExtensibleBase
 		return t;
 	}
 
-	void Unset(Extensible *obj) anope_override
+	void Unset(Extensible *obj) override
 	{
 		T *value = Get(obj);
 		items.erase(obj);
@@ -127,52 +126,52 @@ class BaseExtensibleItem : public ExtensibleBase
 template<typename T>
 class ExtensibleItem : public BaseExtensibleItem<T>
 {
- protected:
-	T* Create(Extensible *obj) anope_override
+protected:
+	T* Create(Extensible *obj) override
 	{
 		return new T(obj);
 	}
- public:
+public:
 	ExtensibleItem(Module *m, const Anope::string &n) : BaseExtensibleItem<T>(m, n) { }
 };
 
 template<typename T>
 class PrimitiveExtensibleItem : public BaseExtensibleItem<T>
 {
- protected:
-	T* Create(Extensible *obj) anope_override
+protected:
+	T* Create(Extensible *obj) override
 	{
 		return new T();
 	}
- public:
+public:
 	PrimitiveExtensibleItem(Module *m, const Anope::string &n) : BaseExtensibleItem<T>(m, n) { }
 };
 
 template<>
 class PrimitiveExtensibleItem<bool> : public BaseExtensibleItem<bool>
 {
- protected:
-	bool* Create(Extensible *) anope_override
+protected:
+	bool* Create(Extensible *) override
 	{
 		return NULL;
 	}
- public:
+public:
 	PrimitiveExtensibleItem(Module *m, const Anope::string &n) : BaseExtensibleItem<bool>(m, n) { }
 };
 
 template<typename T>
 class SerializableExtensibleItem : public PrimitiveExtensibleItem<T>
 {
- public:
+public:
 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<T>(m, n) { }
 
-	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 	{
 		T* t = this->Get(e);
 		data[this->name] << *t;
 	}
 
-	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 	{
 		T t;
 		if (data[this->name] >> t)
@@ -185,15 +184,15 @@ class SerializableExtensibleItem : public PrimitiveExtensibleItem<T>
 template<>
 class SerializableExtensibleItem<bool> : public PrimitiveExtensibleItem<bool>
 {
- public:
+public:
 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<bool>(m, n) { }
 
-	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 	{
 		data[this->name] << true;
 	}
 
-	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 	{
 		bool b = false;
 		data[this->name] >> b;
@@ -259,5 +258,3 @@ void Extensible::Shrink(const Anope::string &name)
 	else
 		Log(LOG_DEBUG) << "Shrink for nonexistent type " << name << " on " << static_cast<void *>(this);
 }
-
-#endif // EXTENSIBLE_H

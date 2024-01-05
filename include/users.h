@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2003-2021 Anope Team <team@anope.org>
+ * (C) 2003-2024 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef USERS_H
-#define USERS_H
+#pragma once
 
 #include "anope.h"
 #include "modes.h"
@@ -36,9 +35,9 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/* Users that are in the process of quitting */
 	static std::list<User *> quitting_users;
 
- public:
+public:
 	typedef std::map<Anope::string, Anope::string> ModeList;
- protected:
+protected:
 	Anope::string vident;
 	Anope::string ident;
 	Anope::string uid;
@@ -46,7 +45,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	bool on_access;
 	/* Map of user modes and the params this user has (if any) */
 	ModeList modes;
-	/* NickCore account the user is currently loggged in as, if they are logged in */
+	/* NickCore account the user is currently logged in as, if they are logged in */
 	Serialize::Reference<NickCore> nc;
 
 	/* # of invalid password attempts */
@@ -55,7 +54,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	time_t invalid_pw_time;
 
 
- public: // XXX: exposing a tiny bit too much
+public: // XXX: exposing a tiny bit too much
 	/* User's current nick */
 	Anope::string nick;
 
@@ -91,7 +90,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/* Last time this user sent an email */
 	time_t lastmail;
 
- protected:
+protected:
 	/** Create a new user object, initialising necessary fields and
 	 * adds it to the hash
 	 *
@@ -113,7 +112,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	virtual ~User();
 
- public:
+public:
 	static User* OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
 
 	/** Update the nickname of a user record accordingly, should be
@@ -161,13 +160,13 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 
 	/** Update the real ident (username) of a user record.
 	 * @param ident The new ident to give this user.
-	 * NOTE: Where possible, you should use the Get/SetVIdent() equivilants.
+	 * NOTE: Where possible, you should use the Get/SetVIdent() equivalents.
 	 */
 	void SetIdent(const Anope::string &ident);
 
 	/** Get the real ident (username) of this user.
 	 * @return The displayed ident of this user.
-	 * NOTE: Where possible, you should use the Get/SetVIdent() equivilants.
+	 * NOTE: Where possible, you should use the Get/SetVIdent() equivalents.
 	 */
 	const Anope::string &GetIdent() const;
 
@@ -190,7 +189,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param ... any number of parameters
 	 */
 	void SendMessage(BotInfo *source, const char *fmt, ...);
-	void SendMessage(BotInfo *source, const Anope::string &msg) anope_override;
+	void SendMessage(BotInfo *source, const Anope::string &msg) override;
 
 	/** Identify the user to a nick.
 	 * updates last_seen, logs the user in,
@@ -225,6 +224,11 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @return true or false
 	 */
 	bool IsRecognized(bool check_secure = true) const;
+
+	/** Check if the user is connected securely.
+	 * @return True if the user is connected securely; otherwise, false.
+	 */
+	bool IsSecurelyConnected() const;
 
 	/** Check if the user is a services oper
 	 * @return true if they are an oper
@@ -370,5 +374,3 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	static void QuitUsers();
 };
-
-#endif // USERS_H

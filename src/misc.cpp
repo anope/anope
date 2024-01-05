@@ -1,6 +1,6 @@
 /* Miscellaneous routines.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -19,15 +19,15 @@
 #include "regexpr.h"
 #include "sockets.h"
 
-#include <errno.h>
-#include <sys/types.h>
+#include <cerrno>
 #include <sys/stat.h>
+#include <sys/types.h>
 #ifndef _WIN32
 #include <sys/socket.h>
 #include <netdb.h>
 #endif
 
-NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(true), desc(descending)
+NumberList::NumberList(const Anope::string &list, bool descending) : desc(descending)
 {
 	Anope::string error;
 	commasepstream sep(list);
@@ -90,10 +90,6 @@ NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(tr
 	} while (sep.GetToken(token));
 }
 
-NumberList::~NumberList()
-{
-}
-
 void NumberList::Process()
 {
 	if (!is_valid)
@@ -106,8 +102,8 @@ void NumberList::Process()
 	}
 	else
 	{
-		for (std::set<unsigned>::iterator it = numbers.begin(), it_end = numbers.end(); it != it_end; ++it)
-			this->HandleNumber(*it);
+		for (unsigned int number : numbers)
+			this->HandleNumber(number);
 	}
 }
 
@@ -143,31 +139,32 @@ bool ListFormatter::IsEmpty() const
 void ListFormatter::Process(std::vector<Anope::string> &buffer)
 {
 	std::vector<Anope::string> tcolumns;
-	std::map<Anope::string, size_t> lenghts;
+	std::map<Anope::string, size_t> lengths;
 	std::set<Anope::string> breaks;
-	for (unsigned i = 0; i < this->columns.size(); ++i)
+	for (const auto &column : this->columns)
 	{
-		tcolumns.push_back(Language::Translate(this->nc, this->columns[i].c_str()));
-		lenghts[this->columns[i]] = tcolumns[i].length();
+		tcolumns.emplace_back(Language::Translate(this->nc, column.c_str()));
+		lengths[column] = column.length();
 	}
-	for (unsigned i = 0; i < this->entries.size(); ++i)
+	for (auto &entry : this->entries)
 	{
-		ListEntry &e = this->entries[i];
-		for (unsigned j = 0; j < this->columns.size(); ++j)
-			if (e[this->columns[j]].length() > lenghts[this->columns[j]])
-				lenghts[this->columns[j]] = e[this->columns[j]].length();
+		for (const auto &column : this->columns)
+		{
+			if (entry[column].length() > lengths[column])
+				lengths[column] = entry[column].length();
+		}
 	}
-	unsigned length = 0;
-	for (std::map<Anope::string, size_t>::iterator it = lenghts.begin(), it_end = lenghts.end(); it != it_end; ++it)
+	unsigned total_length = 0;
+	for (const auto &[column, length] : lengths)
 	{
 		/* Break lines at 80 chars */
-		if (length > 80)
+		if (total_length > 80)
 		{
-			breaks.insert(it->first);
-			length = 0;
+			breaks.insert(column);
+			total_length = 0;
 		}
 		else
-			length += it->second;
+			total_length += length;
 	}
 
 	/* Only put a list header if more than 1 column */
@@ -185,16 +182,14 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 				s += "  ";
 			s += tcolumns[i];
 			if (i + 1 != this->columns.size())
-				for (unsigned j = tcolumns[i].length(); j < lenghts[this->columns[i]]; ++j)
+				for (unsigned j = tcolumns[i].length(); j < lengths[this->columns[i]]; ++j)
 					s += " ";
 		}
 		buffer.push_back(s);
 	}
 
-	for (unsigned i = 0; i < this->entries.size(); ++i)
+	for (auto &entry : this->entries)
 	{
-		ListEntry &e = this->entries[i];
-
 		Anope::string s;
 		for (unsigned j = 0; j < this->columns.size(); ++j)
 		{
@@ -205,16 +200,16 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 			}
 			else if (!s.empty())
 				s += "  ";
-			s += e[this->columns[j]];
+			s += entry[this->columns[j]];
 			if (j + 1 != this->columns.size())
-				for (unsigned k = e[this->columns[j]].length(); k < lenghts[this->columns[j]]; ++k)
+				for (unsigned k = entry[this->columns[j]].length(); k < lengths[this->columns[j]]; ++k)
 					s += " ";
 		}
 		buffer.push_back(s);
 	}
 }
 
-InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc), longest(0)
+InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc)
 {
 }
 
@@ -222,12 +217,12 @@ void InfoFormatter::Process(std::vector<Anope::string> &buffer)
 {
 	buffer.clear();
 
-	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = this->replies.begin(), it_end = this->replies.end(); it != it_end; ++it)
+	for (const auto &[key, value] : this->replies)
 	{
 		Anope::string s;
-		for (unsigned i = it->first.length(); i < this->longest; ++i)
+		for (unsigned i = key.length(); i < this->longest; ++i)
 			s += " ";
-		s += it->first + ": " + Language::Translate(this->nc, it->second.c_str());
+		s += key + ": " + Language::Translate(this->nc, value.c_str());
 
 		buffer.push_back(s);
 	}
@@ -238,7 +233,7 @@ Anope::string& InfoFormatter::operator[](const Anope::string &key)
 	Anope::string tkey = Language::Translate(this->nc, key.c_str());
 	if (tkey.length() > this->longest)
 		this->longest = tkey.length();
-	this->replies.push_back(std::make_pair(tkey, ""));
+	this->replies.emplace_back(tkey, "");
 	return this->replies.back().second;
 }
 
@@ -246,11 +241,11 @@ void InfoFormatter::AddOption(const Anope::string &opt)
 {
 	Anope::string options = Language::Translate(this->nc, "Options");
 	Anope::string *optstr = NULL;
-	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = this->replies.begin(), it_end = this->replies.end(); it != it_end; ++it)
+	for (auto &[option, value] : this->replies)
 	{
-		if (it->first == options)
+		if (option == options)
 		{
-			optstr = &it->second;
+			optstr = &value;
 			break;
 		}
 	}
@@ -356,7 +351,7 @@ Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 {
 	tm tm = *localtime(&t);
 	char buf[BUFSIZE];
-	strftime(buf, sizeof(buf), Language::Translate(nc, _("%b %d %H:%M:%S %Y %Z")), &tm);
+	strftime(buf, sizeof(buf), Language::Translate(nc, _("%b %d %Y %H:%M:%S %Z")), &tm);
 	if (short_output)
 		return buf;
 	if (t < Anope::CurTime)
@@ -621,7 +616,7 @@ Anope::string Anope::VersionBuildString()
 #endif
 	Anope::string flags;
 
-#ifdef DEBUG_BUILD
+#if DEBUG_BUILD
 	flags += "D";
 #endif
 #ifdef VERSION_GIT
@@ -709,7 +704,13 @@ Anope::string Anope::NormalizeBuffer(const Anope::string &buf)
 
 Anope::string Anope::Resolve(const Anope::string &host, int type)
 {
-	Anope::string result = host;
+	std::vector<Anope::string> results = Anope::ResolveMultiple(host, type);
+	return results.empty() ? host : results[0];
+}
+
+std::vector<Anope::string> Anope::ResolveMultiple(const Anope::string &host, int type)
+{
+	std::vector<Anope::string> results;
 
 	addrinfo hints;
 	memset(&hints, 0, sizeof(hints));
@@ -720,15 +721,19 @@ Anope::string Anope::Resolve(const Anope::string &host, int type)
 	addrinfo *addrresult = NULL;
 	if (getaddrinfo(host.c_str(), NULL, &hints, &addrresult) == 0)
 	{
-		sockaddrs addr;
-		memcpy(static_cast<void*>(&addr), addrresult->ai_addr, addrresult->ai_addrlen);
-		result = addr.addr();
-		Log(LOG_DEBUG_2) << "Resolver: " << host << " -> " << result;
+		for (addrinfo *thisresult = addrresult; thisresult; thisresult = thisresult->ai_next)
+		{
+			sockaddrs addr;
+			memcpy(static_cast<void*>(&addr), thisresult->ai_addr, thisresult->ai_addrlen);
+
+			results.push_back(addr.addr());
+			Log(LOG_DEBUG_2) << "Resolver: " << host << " -> " << addr.addr();
+		}
 
 		freeaddrinfo(addrresult);
 	}
 
-	return result;
+	return results;
 }
 
 Anope::string Anope::Random(size_t len)

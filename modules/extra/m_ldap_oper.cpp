@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2011-2021 Anope Team
+ * (C) 2011-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,12 +16,12 @@ class IdentifyInterface : public LDAPInterface
 {
 	Reference<User> u;
 
- public:
+public:
 	IdentifyInterface(Module *m, User *user) : LDAPInterface(m), u(user)
 	{
 	}
 
-	void OnResult(const LDAPResult &r) anope_override
+	void OnResult(const LDAPResult &r) override
 	{
 		if (!u || !u->Account())
 			return;
@@ -65,11 +65,11 @@ class IdentifyInterface : public LDAPInterface
 		}
 	}
 
-	void OnError(const LDAPResult &r) anope_override
+	void OnError(const LDAPResult &r) override
 	{
 	}
 
-	void OnDelete() anope_override
+	void OnDelete() override
 	{
 		delete this;
 	}
@@ -83,14 +83,14 @@ class LDAPOper : public Module
 	Anope::string password;
 	Anope::string basedn;
 	Anope::string filter;
- public:
+public:
 	LDAPOper(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main")
 	{
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = Config->GetModule(this);
 
@@ -100,12 +100,12 @@ class LDAPOper : public Module
 		this->filter = config->Get<const Anope::string>("filter");
 		opertype_attribute = config->Get<const Anope::string>("opertype_attribute");
 
-		for (std::set<Oper *>::iterator it = my_opers.begin(), it_end = my_opers.end(); it != it_end; ++it)
-			delete *it;
+		for (const auto *oper : my_opers)
+			delete oper;
 		my_opers.clear();
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnNickIdentify(User *u) override
 	{
 		try
 		{
@@ -124,7 +124,7 @@ class LDAPOper : public Module
 		}
 	}
 
-	void OnDelCore(NickCore *nc) anope_override
+	void OnDelCore(NickCore *nc) override
 	{
 		if (nc->o != NULL && my_opers.count(nc->o) > 0)
 		{

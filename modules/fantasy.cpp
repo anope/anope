@@ -1,6 +1,6 @@
 /* Fantasy functionality
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandBSSetFantasy : public Command
 {
- public:
+public:
 	CommandBSSetFantasy(Module *creator, const Anope::string &sname = "botserv/set/fantasy") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("Enable fantaisist commands"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		const Anope::string &value = params[1];
@@ -63,7 +63,7 @@ class CommandBSSetFantasy : public Command
 			this->OnSyntaxError(source, source.command);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -86,13 +86,13 @@ class Fantasy : public Module
 
 	CommandBSSetFantasy commandbssetfantasy;
 
- public:
+public:
 	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		fantasy(this, "BS_FANTASY"), commandbssetfantasy(this)
 	{
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) override
 	{
 		if (!u || !c || !c->ci || !c->ci->bi || msg.empty() || msg[0] == '\1')
 			return;
@@ -208,7 +208,7 @@ class Fantasy : public Module
 		FOREACH_MOD(OnPostCommand, (source, cmd, params));
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
 	{
 		if (fantasy.HasExt(ci))
 			info.AddOption(_("Fantasy"));

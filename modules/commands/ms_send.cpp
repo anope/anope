@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,14 +18,14 @@ namespace
 
 class CommandMSSend : public Command
 {
- public:
+public:
 	CommandMSSend(Module *creator) : Command(creator, "memoserv/send", 2, 2)
 	{
 		this->SetDesc(_("Send a memo to a nick or channel"));
 		this->SetSyntax(_("{\037nick\037 | \037channel\037} \037memo-text\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!memoserv)
 			return;
@@ -59,13 +59,13 @@ class CommandMSSend : public Command
 			source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Sends the named \037nick\037 or \037channel\037 a memo containing\n"
 				"\037memo-text\037. When sending to a nickname, the recipient will\n"
-				"receive a notice that he/she has a new memo. The target\n"
+				"receive a notice that they have a new memo. The target\n"
 				"nickname/channel must be registered."));
 		return true;
 	}
@@ -75,7 +75,7 @@ class MSSend : public Module
 {
 	CommandMSSend commandmssend;
 
- public:
+public:
 	MSSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmssend(this)
 	{

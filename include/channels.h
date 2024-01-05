@@ -1,13 +1,12 @@
 /* Channel support
  *
- * (C) 2008-2021 Anope Team
+ * (C) 2008-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef CHANNELS_H
-#define CHANNELS_H
+#pragma once
 
 #include "anope.h"
 #include "extensible.h"
@@ -33,14 +32,14 @@ class CoreExport Channel : public Base, public Extensible
 {
 	static std::vector<Channel *> deleting;
 
- public:
+public:
 	typedef std::multimap<Anope::string, Anope::string> ModeList;
- private:
+private:
 	/** A map of channel modes with their parameters set on this channel
 	 */
 	ModeList modes;
 
- public:
+public:
 	/* Channel name */
 	Anope::string name;
 	/* Set if this channel is registered. ci->c == this. Contains information relevant to the registered channel */
@@ -74,14 +73,14 @@ class CoreExport Channel : public Base, public Extensible
 	int16_t chanserv_modecount;	/* Number of check_mode()'s this sec */
 	int16_t bouncy_modes;		/* Did we fail to set modes here? */
 
- private:
+private:
 	/** Constructor
 	 * @param name The channel name
 	 * @param ts The time the channel was created
 	 */
 	Channel(const Anope::string &nname, time_t ts = Anope::CurTime);
 
- public:
+public:
 	/** Destructor
 	 */
 	~Channel();
@@ -232,7 +231,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param bi The sender, can be NULL for the service bot for this channel
 	 * @param u The user being kicked
 	 * @param reason The reason for the kick
-	 * @return true if the kick was scucessful, false if a module blocked the kick
+	 * @return true if the kick was successful, false if a module blocked the kick
 	 */
 	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...);
 
@@ -249,7 +248,7 @@ class CoreExport Channel : public Base, public Extensible
 
 	/** Get a string of the modes set on this channel
 	 * @param complete Include mode parameters
-	 * @param plus If set to false (with complete), mode parameters will not be given for modes requring no parameters to be unset
+	 * @param plus If set to false (with complete), mode parameters will not be given for modes requiring no parameters to be unset
 	 * @return A mode string
 	 */
 	Anope::string GetModes(bool complete, bool plus);
@@ -289,6 +288,11 @@ class CoreExport Channel : public Base, public Extensible
 	 */
 	bool CheckKick(User *user);
 
+	/** Find which bot should send mode/topic/etc changes for this channel
+	 * @return The bot
+	 */
+	BotInfo *WhoSends() const;
+
 	/** Finds a channel
 	 * @param name The channel to find
 	 * @return The channel, if found
@@ -306,5 +310,3 @@ class CoreExport Channel : public Base, public Extensible
 
 	static void DeleteChannels();
 };
-
-#endif // CHANNELS_H

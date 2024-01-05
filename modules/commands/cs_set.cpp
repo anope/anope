@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,19 +14,19 @@
 
 class CommandCSSet : public Command
 {
- public:
+public:
 	CommandCSSet(Module *creator) : Command(creator, "chanserv/set", 2, 3)
 	{
 		this->SetDesc(_("Set channel options and information"));
 		this->SetSyntax(_("\037option\037 \037channel\037 \037parameters\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -37,10 +37,8 @@ class CommandCSSet : public Command
 		Anope::string this_name = source.command;
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto &[c_name, info] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				if (info.hide)
@@ -56,7 +54,7 @@ class CommandCSSet : public Command
 				else if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 
-				source.command = it->first;
+				source.command = c_name;
 				c->OnServHelp(source);
 			}
 		}
@@ -68,14 +66,14 @@ class CommandCSSet : public Command
 
 class CommandCSSetAutoOp : public Command
 {
- public:
+public:
 	CommandCSSetAutoOp(Module *creator, const Anope::string &cname = "chanserv/set/autoop") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Should services automatically give status to users"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -117,7 +115,7 @@ class CommandCSSetAutoOp : public Command
 			this->OnSyntaxError(source, "AUTOOP");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -131,14 +129,14 @@ class CommandCSSetAutoOp : public Command
 
 class CommandCSSetBanType : public Command
 {
- public:
+public:
 	CommandCSSetBanType(Module *creator, const Anope::string &cname = "chanserv/set/bantype") : Command(creator, cname, 2, 2)
 	{
-		this->SetDesc(_("Set how Services make bans on the channel"));
+		this->SetDesc(_("Set how services make bans on the channel"));
 		this->SetSyntax(_("\037channel\037 \037bantype\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -179,7 +177,7 @@ class CommandCSSetBanType : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -198,14 +196,14 @@ class CommandCSSetBanType : public Command
 
 class CommandCSSetDescription : public Command
 {
- public:
+public:
 	CommandCSSetDescription(Module *creator, const Anope::string &cname = "chanserv/set/description") : Command(creator, cname, 1, 2)
 	{
 		this->SetDesc(_("Set the channel description"));
 		this->SetSyntax(_("\037channel\037 [\037description\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -248,7 +246,7 @@ class CommandCSSetDescription : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -260,14 +258,14 @@ class CommandCSSetDescription : public Command
 
 class CommandCSSetFounder : public Command
 {
- public:
+public:
 	CommandCSSetFounder(Module *creator, const Anope::string &cname = "chanserv/set/founder") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Set the founder of a channel"));
 		this->SetSyntax(_("\037channel\037 \037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -317,7 +315,7 @@ class CommandCSSetFounder : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -329,14 +327,14 @@ class CommandCSSetFounder : public Command
 
 class CommandCSSetKeepModes : public Command
 {
- public:
+public:
 	CommandCSSetKeepModes(Module *creator, const Anope::string &cname = "chanserv/set/keepmodes") :  Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Retain modes when channel is not in use"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -381,7 +379,7 @@ class CommandCSSetKeepModes : public Command
 			this->OnSyntaxError(source, "KEEPMODES");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -394,14 +392,14 @@ class CommandCSSetKeepModes : public Command
 
 class CommandCSSetPeace : public Command
 {
- public:
+public:
 	CommandCSSetPeace(Module *creator, const Anope::string &cname = "chanserv/set/peace") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Regulate the use of critical commands"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -445,14 +443,14 @@ class CommandCSSetPeace : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Enables or disables the \002peace\002 option for a channel.\n"
 				"When \002peace\002 is set, a user won't be able to kick,\n"
 				"ban or remove a channel status of a user that has\n"
-				"a level superior or equal to his via %s commands."), source.service->nick.c_str());
+				"a level superior or equal to theirs via %s commands."), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -466,14 +464,14 @@ inline static Anope::string BotModes()
 
 class CommandCSSetPersist : public Command
 {
- public:
+public:
 	CommandCSSetPersist(Module *creator, const Anope::string &cname = "chanserv/set/persist") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Set the channel as permanent"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -583,7 +581,7 @@ class CommandCSSetPersist : public Command
 			this->OnSyntaxError(source, "PERSIST");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		BotInfo *BotServ = Config->GetClient("BotServ");
 		BotInfo *ChanServ = Config->GetClient("ChanServ");
@@ -615,14 +613,14 @@ class CommandCSSetPersist : public Command
 
 class CommandCSSetRestricted : public Command
 {
- public:
+public:
 	CommandCSSetRestricted(Module *creator, const Anope::string &cname = "chanserv/set/restricted") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Restrict access to the channel"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -664,7 +662,7 @@ class CommandCSSetRestricted : public Command
 			this->OnSyntaxError(source, "RESTRICTED");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -677,14 +675,14 @@ class CommandCSSetRestricted : public Command
 
 class CommandCSSetSecure : public Command
 {
- public:
+public:
 	CommandCSSetSecure(Module *creator, const Anope::string &cname = "chanserv/set/secure") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Activate security features"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -726,7 +724,7 @@ class CommandCSSetSecure : public Command
 			this->OnSyntaxError(source, "SECURE");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -740,14 +738,14 @@ class CommandCSSetSecure : public Command
 
 class CommandCSSetSecureFounder : public Command
 {
- public:
+public:
 	CommandCSSetSecureFounder(Module *creator, const Anope::string &cname = "chanserv/set/securefounder") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Stricter control of channel founder status"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -789,7 +787,7 @@ class CommandCSSetSecureFounder : public Command
 			this->OnSyntaxError(source, "SECUREFOUNDER");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -804,14 +802,14 @@ class CommandCSSetSecureFounder : public Command
 
 class CommandCSSetSecureOps : public Command
 {
- public:
+public:
 	CommandCSSetSecureOps(Module *creator, const Anope::string &cname = "chanserv/set/secureops") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Stricter control of chanop status"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -853,7 +851,7 @@ class CommandCSSetSecureOps : public Command
 			this->OnSyntaxError(source, "SECUREOPS");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -866,14 +864,14 @@ class CommandCSSetSecureOps : public Command
 
 class CommandCSSetSignKick : public Command
 {
- public:
+public:
 	CommandCSSetSignKick(Module *creator, const Anope::string &cname = "chanserv/set/signkick") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Sign kicks that are done with the KICK command"));
 		this->SetSyntax(_("\037channel\037 {ON | LEVEL | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -925,7 +923,7 @@ class CommandCSSetSignKick : public Command
 			this->OnSyntaxError(source, "SIGNKICK");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -943,14 +941,14 @@ class CommandCSSetSignKick : public Command
 
 class CommandCSSetSuccessor : public Command
 {
- public:
+public:
 	CommandCSSetSuccessor(Module *creator, const Anope::string &cname = "chanserv/set/successor") : Command(creator, cname, 1, 2)
 	{
 		this->SetDesc(_("Set the successor for a channel"));
 		this->SetSyntax(_("\037channel\037 [\037nick\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -1010,7 +1008,7 @@ class CommandCSSetSuccessor : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -1037,14 +1035,14 @@ class CommandCSSetSuccessor : public Command
 
 class CommandCSSetNoexpire : public Command
 {
- public:
+public:
 	CommandCSSetNoexpire(Module *creator) : Command(creator, "chanserv/saset/noexpire", 2, 2)
 	{
 		this->SetDesc(_("Prevent the channel from expiring"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -1083,7 +1081,7 @@ class CommandCSSetNoexpire : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -1103,7 +1101,7 @@ class CSSet : public Module
 	{
 		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
 
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
 			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
 
@@ -1112,18 +1110,18 @@ class CSSet : public Module
 
 			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(s);
 			Anope::string modes;
-			for (Channel::ModeList::const_iterator it = ci->last_modes.begin(); it != ci->last_modes.end(); ++it)
+			for (const auto &[last_mode, last_value] : ci->last_modes)
 			{
 				if (!modes.empty())
 					modes += " ";
-				modes += it->first;
-				if (!it->second.empty())
-					modes += "," + it->second;
+				modes += last_mode;
+				if (!last_value.empty())
+					modes += "," + last_value;
 			}
 			data["last_modes"] << modes;
 		}
 
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
@@ -1138,9 +1136,9 @@ class CSSet : public Module
 			{
 				size_t c = modes.find(',');
 				if (c == Anope::string::npos)
-					ci->last_modes.insert(std::make_pair(modes, ""));
+					ci->last_modes.emplace(modes, "");
 				else
-					ci->last_modes.insert(std::make_pair(modes.substr(0, c), modes.substr(c + 1)));
+					ci->last_modes.emplace(modes.substr(0, c), modes.substr(c + 1));
 			}
 		}
 	} keep_modes;
@@ -1165,7 +1163,7 @@ class CSSet : public Module
 
 	bool persist_lower_ts;
 
- public:
+public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		noautoop(this, "NOAUTOOP"), peace(this, "PEACE"),
 		securefounder(this, "SECUREFOUNDER"), restricted(this, "RESTRICTED"),
@@ -1184,27 +1182,27 @@ class CSSet : public Module
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		persist_lower_ts = conf->GetModule(this)->Get<bool>("persist_lower_ts");
 	}
 
-	void OnCreateChan(ChannelInfo *ci) anope_override
+	void OnCreateChan(ChannelInfo *ci) override
 	{
 		ci->bantype = Config->GetModule(this)->Get<int>("defbantype", "2");
 	}
 
-	void OnChannelSync(Channel *c) anope_override
+	void OnChannelSync(Channel *c) override
 	{
 		if (c->ci && keep_modes.HasExt(c->ci))
 		{
 			Channel::ModeList ml = c->ci->last_modes;
-			for (Channel::ModeList::iterator it = ml.begin(); it != ml.end(); ++it)
-				c->SetMode(c->ci->WhoSends(), it->first, it->second);
+			for (const auto &[last_mode, last_value] : c->ci->last_modes)
+				c->SetMode(c->ci->WhoSends(), last_mode, last_value);
 		}
 	}
 
-	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
+	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
 		if (!c->ci || !restricted.HasExt(c->ci) || c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;
@@ -1215,14 +1213,14 @@ class CSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnDelChan(ChannelInfo *ci) anope_override
+	void OnDelChan(ChannelInfo *ci) override
 	{
 		if (ci->c && persist.HasExt(ci))
 			ci->c->RemoveMode(ci->WhoSends(), "PERM", "", false);
 		persist.Unset(ci);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (c->ci)
 		{
@@ -1237,7 +1235,7 @@ class CSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (mode->name == "PERM")
 		{
@@ -1251,7 +1249,7 @@ class CSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	void OnJoinChannel(User *u, Channel *c) override
 	{
 		if (u->server != Me && persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->time_registered)
 		{
@@ -1262,7 +1260,7 @@ class CSSet : public Module
 		}
 	}
 
-	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_override
+	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		if (chan->ci)
 		{
@@ -1274,13 +1272,13 @@ class CSSet : public Module
 		}
 	}
 
-	void OnPreChanExpire(ChannelInfo *ci, bool &expire) anope_override
+	void OnPreChanExpire(ChannelInfo *ci, bool &expire) override
 	{
 		if (noexpire.HasExt(ci))
 			expire = false;
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;

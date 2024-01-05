@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@
 
 class CommandNSInfo : public Command
 {
- public:
+public:
 	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 0, 2)
 	{
 		this->SetDesc(_("Displays information about a given nickname"));
@@ -21,7 +21,7 @@ class CommandNSInfo : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
 		const Anope::string &nick = params.size() ? params[0] : (source.nc ? source.nc->display : source.GetNick());
@@ -114,12 +114,12 @@ class CommandNSInfo : public Command
 			std::vector<Anope::string> replies;
 			info.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -136,7 +136,7 @@ class CommandNSInfo : public Command
 
 class CommandNSSetHide : public Command
 {
- public:
+public:
 	CommandNSSetHide(Module *creator, const Anope::string &sname = "nickserv/set/hide", size_t min = 2) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Hide certain pieces of nickname information"));
@@ -212,12 +212,12 @@ class CommandNSSetHide : public Command
 			this->OnSyntaxError(source, "HIDE");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -234,19 +234,19 @@ class CommandNSSetHide : public Command
 
 class CommandNSSASetHide : public CommandNSSetHide
 {
- public:
+public:
 	CommandNSSASetHide(Module *creator) : CommandNSSetHide(creator, "nickserv/saset/hide", 3)
 	{
 		this->SetSyntax(_("\037nickname\037 {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->ClearSyntax();
 		this->Run(source, params[0], params[1], params[2]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -270,7 +270,7 @@ class NSInfo : public Module
 
 	SerializableExtensibleItem<bool> hide_email, hide_usermask, hide_status, hide_quit;
 
- public:
+public:
 	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsinfo(this), commandnssethide(this), commandnssasethide(this),
 		 hide_email(this, "HIDE_EMAIL"), hide_usermask(this, "HIDE_MASK"), hide_status(this, "HIDE_STATUS"),

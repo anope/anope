@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandCSSync : public Command
 {
- public:
+public:
 	CommandCSSync(Module *creator) : Command(creator, "chanserv/sync", 1, 1)
 	{
 		this->SetDesc(_("Sync users channel modes"));
 		this->SetSyntax(_("\037channel\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 
@@ -35,14 +35,14 @@ class CommandCSSync : public Command
 			bool override = !source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/administration");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
 
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
-				ci->c->SetCorrectModes(it->second->user, true);
+			for (const auto &[_, uc] : ci->c->users)
+				ci->c->SetCorrectModes(uc->user, true);
 
 			source.Reply(_("All user modes on \002%s\002 have been synced."), ci->name.c_str());
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &params) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &params) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -55,7 +55,7 @@ class CommandCSSync : public Command
 class CSSync : public Module
 {
 	CommandCSSync commandcssync;
- public:
+public:
 	CSSync(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcssync(this)
 	{

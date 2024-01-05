@@ -1,17 +1,16 @@
 /*
  *
- * (C) 2011-2021 Anope Team
+ * (C) 2011-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef MEMOSERV_H
-#define MEMOSERV_H
+#pragma once
 
 class MemoServService : public Service
 {
- public:
+public:
 	enum MemoResult
 	{
 		MEMO_SUCCESS,
@@ -25,7 +24,7 @@ class MemoServService : public Service
 	}
 
 	/** Sends a memo.
-	 * @param source The source of the memo, can be anythin.
+	 * @param source The source of the memo, can be anything.
 	 * @param target The target of the memo, nick or channel.
 	 * @param message Memo text
 	 * @param force true to force the memo, restrictions/delays etc are not checked
@@ -37,5 +36,3 @@ class MemoServService : public Service
 	 */
 	virtual void Check(User *u) = 0;
 };
-
-#endif // MEMOSERV_H

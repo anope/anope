@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandOSKill : public Command
 {
- public:
+public:
 	CommandOSKill(Module *creator) : Command(creator, "operserv/kill", 1, 2)
 	{
 		this->SetDesc(_("Kill a user"));
 		this->SetSyntax(_("\037user\037 [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = params[0];
 		Anope::string reason = params.size() > 1 ? params[1] : "";
@@ -41,7 +41,7 @@ class CommandOSKill : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -56,7 +56,7 @@ class OSKill : public Module
 {
 	CommandOSKill commandoskill;
 
- public:
+public:
 	OSKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoskill(this)
 	{

@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -27,7 +27,7 @@ struct AJoinEntry : Serializable
 
 	AJoinEntry(Extensible *) : Serializable("AJoinEntry") { }
 
-	~AJoinEntry()
+	~AJoinEntry() override
 	{
 		AJoinList *channels = owner->GetExt<AJoinList>("ajoinlist");
 		if (channels)
@@ -38,7 +38,7 @@ struct AJoinEntry : Serializable
 		}
 	}
 
-	void Serialize(Serialize::Data &sd) const anope_override
+	void Serialize(Serialize::Data &sd) const override
 	{
 		if (!this->owner)
 			return;
@@ -82,8 +82,8 @@ struct AJoinEntry : Serializable
 
 AJoinList::~AJoinList()
 {
-	for (unsigned i = 0; i < (*this)->size(); ++i)
-		delete (*this)->at(i);
+	for (const auto *ajoin : *(*this))
+		delete ajoin;
 }
 
 class CommandNSAJoin : public Command
@@ -113,8 +113,8 @@ class CommandNSAJoin : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 	}
 
@@ -224,7 +224,7 @@ class CommandNSAJoin : public Command
 			nc->Shrink<AJoinList>("ajoinlist");
 	}
 
- public:
+public:
 	CommandNSAJoin(Module *creator) : Command(creator, "nickserv/ajoin", 1, 4)
 	{
 		this->SetDesc(_("Manage your auto join list"));
@@ -233,7 +233,7 @@ class CommandNSAJoin : public Command
 		this->SetSyntax(_("LIST [\037nickname\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 		Anope::string nick, param, param2;
@@ -285,7 +285,7 @@ class CommandNSAJoin : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -303,7 +303,7 @@ class NSAJoin : public Module
 	ExtensibleItem<AJoinList> ajoinlist;
 	Serialize::Type ajoinentry_type;
 
- public:
+public:
 	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsajoin(this), ajoinlist(this, "ajoinlist"),
 		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize)
@@ -314,7 +314,7 @@ class NSAJoin : public Module
 
 	}
 
-	void OnUserLogin(User *u) anope_override
+	void OnUserLogin(User *u) override
 	{
 		BotInfo *NickServ = Config->GetClient("NickServ");
 		if (!NickServ)
@@ -327,9 +327,8 @@ class NSAJoin : public Module
 		/* Set +r now, so we can ajoin users into +R channels */
 		ModeManager::ProcessModes();
 
-		for (unsigned i = 0; i < (*channels)->size(); ++i)
+		for (auto *entry : *(*channels))
 		{
-			AJoinEntry *entry = (*channels)->at(i);
 			Channel *c = Channel::Find(entry->channel);
 			ChannelInfo *ci;
 
@@ -356,7 +355,7 @@ class NSAJoin : public Module
 					continue;
 				else if (c->HasMode("ADMINONLY") && !u->HasMode("ADMIN"))
 					continue;
-				else if (c->HasMode("SSL") && !(u->HasMode("SSL") || u->HasExt("ssl")))
+				else if (c->HasMode("SSL") && !u->IsSecurelyConnected())
 					continue;
 				else if (c->MatchesList(u, "BAN") == true && c->MatchesList(u, "EXCEPT") == false)
 					need_invite = true;

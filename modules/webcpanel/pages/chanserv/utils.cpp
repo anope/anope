@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -27,10 +27,8 @@ void BuildChanList(NickAlias *na, TemplateFileServer::Replacements &replacements
 	na->nc->GetChannelReferences(queue);
 	std::sort(queue.begin(), queue.end(), ChannelSort);
 
-	for (unsigned i = 0; i < queue.size(); ++i)
+	for (auto *ci : queue)
 	{
-		ChannelInfo *ci = queue[i];
-
 		if (na->nc != ci->GetFounder() && ci->AccessFor(na->nc).empty())
 			continue;
 

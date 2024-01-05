@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,14 +18,14 @@ namespace
 
 class CommandMSSendAll : public Command
 {
- public:
+public:
 	CommandMSSendAll(Module *creator) : Command(creator, "memoserv/sendall", 1, 1)
 	{
 		this->SetDesc(_("Send a memo to all registered users"));
 		this->SetSyntax(_("\037memo-text\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!memoserv)
 			return;
@@ -34,10 +34,8 @@ class CommandMSSendAll : public Command
 
 		Log(LOG_ADMIN, source, this) << "to send " << text;
 
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			const NickCore *nc = it->second;
-
 			if (nc != source.nc)
 				memoserv->Send(source.GetNick(), nc->display, text);
 		}
@@ -45,7 +43,7 @@ class CommandMSSendAll : public Command
 		source.Reply(_("A massmemo has been sent to all registered users."));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -58,7 +56,7 @@ class MSSendAll : public Module
 {
 	CommandMSSendAll commandmssendall;
 
- public:
+public:
 	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmssendall(this)
 	{

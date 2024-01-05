@@ -1,6 +1,6 @@
 /* Include file for high-level encryption routines.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,17 +16,17 @@ static ServiceReference<Encryption::Provider> md5("Encryption::Provider", "md5")
 
 class OldMD5Provider : public Encryption::Provider
 {
- public:
+public:
 	OldMD5Provider(Module *creator) : Encryption::Provider(creator, "oldmd5") { }
 
-	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
+	Encryption::Context *CreateContext(Encryption::IV *iv) override
 	{
 		if (md5)
 			return md5->CreateContext(iv);
 		return NULL;
 	}
 
-	Encryption::IV GetDefaultIV() anope_override
+	Encryption::IV GetDefaultIV() override
 	{
 		if (md5)
 			return md5->GetDefaultIV();
@@ -40,7 +40,7 @@ class EOld : public Module
 
 	inline static char XTOI(char c) { return c > 9 ? c - 'A' + 10 : c - '0'; }
 
- public:
+public:
 	EOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		oldmd5provider(this)
 	{
@@ -53,7 +53,7 @@ class EOld : public Module
 
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		if (!md5)
 			return EVENT_CONTINUE;
@@ -81,7 +81,7 @@ class EOld : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)

@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@
 
 class CommandMSIgnore : public Command
 {
- public:
+public:
 	CommandMSIgnore(Module *creator) : Command(creator, "memoserv/ignore", 1, 3)
 	{
 		this->SetDesc(_("Manage the memo ignore list"));
@@ -22,7 +22,7 @@ class CommandMSIgnore : public Command
 		this->SetSyntax(_("[\037channel\037] LIST"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -58,7 +58,7 @@ class CommandMSIgnore : public Command
 
 			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
 			{
-				mi->ignores.push_back(param.ci_str());
+				mi->ignores.emplace_back(param.ci_str());
 				source.Reply(_("\002%s\002 added to ignore list."), param.c_str());
 			}
 			else
@@ -84,10 +84,10 @@ class CommandMSIgnore : public Command
 			{
 				ListFormatter list(source.GetAccount());
 				list.AddColumn(_("Mask"));
-				for (unsigned i = 0; i < mi->ignores.size(); ++i)
+				for (const auto &ignore : mi->ignores)
 				{
 					ListFormatter::ListEntry entry;
-					entry["Mask"] = mi->ignores[i];
+					entry["Mask"] = ignore;
 					list.AddEntry(entry);
 				}
 
@@ -96,8 +96,8 @@ class CommandMSIgnore : public Command
 				std::vector<Anope::string> replies;
 				list.Process(replies);
 
-				for (unsigned i = 0; i < replies.size(); ++i)
-					source.Reply(replies[i]);
+				for (const auto &reply : replies)
+					source.Reply(reply);
 			}
 		}
 		else
@@ -106,7 +106,7 @@ class CommandMSIgnore : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -122,7 +122,7 @@ class MSIgnore : public Module
 {
 	CommandMSIgnore commandmsignore;
 
- public:
+public:
 	MSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsignore(this)
 	{

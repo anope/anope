@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -8,6 +8,8 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  */
+
+#pragma once
 
 struct LogSetting
 {
@@ -22,21 +24,21 @@ struct LogSetting
 	Anope::string creator;
 	time_t created;
 
-	virtual ~LogSetting() { }
- protected:
-	LogSetting() { }
+	virtual ~LogSetting() = default;
+protected:
+	LogSetting() = default;
 };
 
 struct LogSettings : Serialize::Checker<std::vector<LogSetting *> >
 {
 	typedef std::vector<LogSetting *>::iterator iterator;
 
- protected:
+protected:
 	LogSettings() : Serialize::Checker<std::vector<LogSetting *> >("LogSetting")
 	{
 	}
 
- public:
-	virtual ~LogSettings() { }
+public:
+	virtual ~LogSettings() = default;
 	virtual LogSetting *Create() = 0;
 };

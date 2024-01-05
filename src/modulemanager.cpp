@@ -1,6 +1,6 @@
 /* Modular support
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,10 +15,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifndef _WIN32
-#include <dirent.h>
 #include <sys/types.h>
 #include <dlfcn.h>
 #endif
+
+#include <filesystem>
 
 std::list<Module *> ModuleManager::Modules;
 std::vector<Module *> ModuleManager::EventHandlers[I_SIZE];
@@ -29,31 +30,24 @@ void ModuleManager::CleanupRuntimeDirectory()
 	Anope::string dirbuf = Anope::DataDir + "/runtime";
 
 	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment, please wait";
-
-	DIR *dirp = opendir(dirbuf.c_str());
-	if (!dirp)
+	try
 	{
-		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << ")";
-		return;
+		for (const auto &entry : std::filesystem::directory_iterator(dirbuf.str()))
+		{
+			if (entry.is_regular_file())
+				std::filesystem::remove(entry);
+		}
 	}
-
-	for (dirent *dp; (dp = readdir(dirp));)
+	catch (const std::filesystem::filesystem_error &err)
 	{
-		if (!dp->d_ino)
-			continue;
-		if (Anope::string(dp->d_name).equals_cs(".") || Anope::string(dp->d_name).equals_cs(".."))
-			continue;
-		Anope::string filebuf = dirbuf + "/" + dp->d_name;
-		unlink(filebuf.c_str());
+		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << "): " << err.what();
 	}
-
-	closedir(dirp);
 }
 
 /**
  * Copy the module from the modules folder to the runtime folder.
  * This will prevent module updates while the modules is loaded from
- * triggering a segfault, as the actaul file in use will be in the
+ * triggering a segfault, as the actual file in use will be in the
  * runtime folder.
  * @param name the name of the module to copy
  * @param output the destination to copy the module to
@@ -273,8 +267,8 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	Log(LOG_DEBUG) << "Module " << modname << " loaded.";
 
 	/* Attach module to all events */
-	for (unsigned i = 0; i < I_SIZE; ++i)
-		EventHandlers[i].push_back(m);
+	for (auto &mods : EventHandlers)
+		mods.push_back(m);
 
 	m->Prioritize();
 
@@ -313,10 +307,8 @@ ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)
 
 Module *ModuleManager::FindModule(const Anope::string &name)
 {
-	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	for (auto *m : Modules)
 	{
-		Module *m = *it;
-
 		if (m->name.equals_ci(name))
 			return m;
 	}
@@ -326,10 +318,8 @@ Module *ModuleManager::FindModule(const Anope::string &name)
 
 Module *ModuleManager::FindFirstOf(ModType type)
 {
-	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	for (auto *m : Modules)
 	{
-		Module *m = *it;
-
 		if (m->type & type)
 			return m;
 	}
@@ -395,9 +385,8 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 
 void ModuleManager::DetachAll(Module *mod)
 {
-	for (unsigned i = 0; i < I_SIZE; ++i)
+	for (auto &mods : EventHandlers)
 	{
-		std::vector<Module *> &mods = EventHandlers[i];
 		std::vector<Module *>::iterator it2 = std::find(mods.begin(), mods.end(), mod);
 		if (it2 != mods.end())
 			mods.erase(it2);
@@ -489,17 +478,17 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 	if (swap && swap_pos != source)
 	{
 		/* Suggestion from Phoenix, "shuffle" the modules to better retain call order */
-		int incrmnt = 1;
+		int increment = 1;
 
 		if (source > swap_pos)
-			incrmnt = -1;
+			increment = -1;
 
-		for (unsigned j = source; j != swap_pos; j += incrmnt)
+		for (unsigned j = source; j != swap_pos; j += increment)
 		{
-			if (j + incrmnt > EventHandlers[i].size() - 1 || (!j && incrmnt == -1))
+			if (j + increment > EventHandlers[i].size() - 1 || (!j && increment == -1))
 				continue;
 
-			std::swap(EventHandlers[i][j], EventHandlers[i][j + incrmnt]);
+			std::swap(EventHandlers[i][j], EventHandlers[i][j + increment]);
 		}
 	}
 
@@ -510,16 +499,17 @@ void ModuleManager::UnloadAll()
 {
 	std::vector<Anope::string> modules;
 	for (size_t i = 1, j = 0; i != MT_END; j |= i, i <<= 1)
-		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	{
+		for (auto *m : Modules)
 		{
-			Module *m = *it;
 			if ((m->type & j) == m->type)
 				modules.push_back(m->name);
 		}
+	}
 
-	for (unsigned i = 0; i < modules.size(); ++i)
+	for (auto &module : modules)
 	{
-		Module *m = FindModule(modules[i]);
+		Module *m = FindModule(module);
 		if (m != NULL)
 			UnloadModule(m, NULL);
 	}

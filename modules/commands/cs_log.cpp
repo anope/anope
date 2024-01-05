@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,7 +18,7 @@ struct LogSettingImpl : LogSetting, Serializable
 	{
 	}
 
-	~LogSettingImpl()
+	~LogSettingImpl() override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci)
@@ -33,7 +33,7 @@ struct LogSettingImpl : LogSetting, Serializable
 		}
 	}
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["ci"] << chan;
 		data["service_name"] << service_name;
@@ -81,7 +81,7 @@ struct LogSettingsImpl : LogSettings
 {
 	LogSettingsImpl(Extensible *) { }
 
-	~LogSettingsImpl()
+	~LogSettingsImpl() override
 	{
 		for (iterator it = (*this)->begin(); it != (*this)->end();)
 		{
@@ -91,7 +91,7 @@ struct LogSettingsImpl : LogSettings
 		}
 	}
 
-	LogSetting *Create() anope_override
+	LogSetting *Create() override
 	{
 		return new LogSettingImpl();
 	}
@@ -107,7 +107,7 @@ public:
 		this->SetSyntax(_("\037channel\037 \037command\037 \037method\037 [\037status\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &channel = params[0];
 
@@ -144,8 +144,8 @@ public:
 				std::vector<Anope::string> replies;
 				list.Process(replies);
 
-				for (unsigned i = 0; i < replies.size(); ++i)
-					source.Reply(replies[i]);
+				for (const auto &reply : replies)
+					source.Reply(reply);
 			}
 		}
 		else if (params.size() > 2)
@@ -199,12 +199,14 @@ public:
 				return;
 			}
 
-			for (unsigned i = 0; i < extra.length(); ++i)
-				if (ModeManager::GetStatusChar(extra[i]) == 0)
+			for (auto chr : extra)
+			{
+				if (ModeManager::GetStatusChar(chr) == 0)
 				{
-					source.Reply(_("%c is an unknown status mode."), extra[i]);
+					source.Reply(_("%c is an unknown status mode."), chr);
 					return;
 				}
+			}
 
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 
@@ -251,7 +253,7 @@ public:
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -293,7 +295,7 @@ class CSLog : public Module
 
 	std::vector<LogDefault> defaults;
 
- public:
+public:
 	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		MSService("MemoServService", "MemoServ"), commandcslog(this),
 		logsettings(this, "logsettings"), logsetting_type("LogSetting", LogSettingImpl::Unserialize)
@@ -301,7 +303,7 @@ class CSLog : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		defaults.clear();
@@ -320,16 +322,14 @@ class CSLog : public Module
 		}
 	}
 
-	void OnChanRegistered(ChannelInfo *ci) anope_override
+	void OnChanRegistered(ChannelInfo *ci) override
 	{
 		if (defaults.empty())
 			return;
 
 		LogSettings *ls = logsettings.Require(ci);
-		for (unsigned i = 0; i < defaults.size(); ++i)
+		for (auto &d : defaults)
 		{
-			LogDefault &d = defaults[i];
-
 			LogSetting *log = new LogSettingImpl();
 			log->chan = ci->name;
 
@@ -353,18 +353,17 @@ class CSLog : public Module
 		}
 	}
 
-	void OnLog(Log *l) anope_override
+	void OnLog(Log *l) override
 	{
 		if (l->type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
 			return;
 
 		LogSettings *ls = logsettings.Get(l->ci);
 		if (ls)
-			for (unsigned i = 0; i < (*ls)->size(); ++i)
+		{
+			for (auto *log : *(*ls))
 			{
-				const LogSetting *log = (*ls)->at(i);
-
-				/* wrong command */
+					/* wrong command */
 				if (log->service_name != l->c->name)
 					continue;
 
@@ -393,6 +392,7 @@ class CSLog : public Module
 				else if (log->method.equals_ci("NOTICE") && l->ci->c)
 					IRCD->SendNotice(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());
 			}
+		}
 	}
 };
 

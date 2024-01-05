@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -41,19 +41,19 @@ class MyHTTPClient : public HTTPClient
 {
 	HTTPProvider *provider;
 	HTTPMessage message;
-	bool header_done, served;
+	bool header_done = false, served = false;
 	Anope::string page_name;
 	Reference<HTTPPage> page;
 	Anope::string ip;
 
-	unsigned content_length;
+	unsigned content_length = 0;
 
 	enum
 	{
 		ACTION_NONE,
 		ACTION_GET,
 		ACTION_POST
-	} action;
+	} action = ACTION_NONE;
 
 	void Serve()
 	{
@@ -69,10 +69,8 @@ class MyHTTPClient : public HTTPClient
 
 		if (std::find(this->provider->ext_ips.begin(), this->provider->ext_ips.end(), this->ip) != this->provider->ext_ips.end())
 		{
-			for (unsigned i = 0; i < this->provider->ext_headers.size(); ++i)
+			for (auto &token : this->provider->ext_headers)
 			{
-				const Anope::string &token = this->provider->ext_headers[i];
-
 				if (this->message.headers.count(token))
 				{
 					this->ip = this->message.headers[token];
@@ -91,31 +89,31 @@ class MyHTTPClient : public HTTPClient
 			this->SendReply(&reply);
 	}
 
- public:
+public:
 	time_t created;
 
-	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), HTTPClient(l, f, a), provider(l), header_done(false), served(false), ip(a.addr()), content_length(0), action(ACTION_NONE), created(Anope::CurTime)
+	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->GetFamily()), HTTPClient(l, f, a), provider(l), ip(a.addr()), created(Anope::CurTime)
 	{
 		Log(LOG_DEBUG, "httpd") << "Accepted connection " << f << " from " << a.addr();
 	}
 
-	~MyHTTPClient()
+	~MyHTTPClient() override
 	{
 		Log(LOG_DEBUG, "httpd") << "Closing connection " << this->GetFD() << " from " << this->ip;
 	}
 
 	/* Close connection once all data is written */
-	bool ProcessWrite() anope_override
+	bool ProcessWrite() override
 	{
 		return !BinarySocket::ProcessWrite() || this->write_buffer.empty() ? false : true;
 	}
 
-	const Anope::string GetIP() anope_override
+	const Anope::string GetIP() override
 	{
 		return this->ip;
 	}
 
-	bool Read(const char *buffer, size_t l) anope_override
+	bool Read(const char *buffer, size_t l) override
 	{
 		message.content.append(buffer, l);
 
@@ -233,7 +231,7 @@ class MyHTTPClient : public HTTPClient
 		return true;
 	}
 
-	void SendError(HTTPError err, const Anope::string &msg) anope_override
+	void SendError(HTTPError err, const Anope::string &msg) override
 	{
 		HTTPReply h;
 
@@ -244,7 +242,7 @@ class MyHTTPClient : public HTTPClient
 		this->SendReply(&h);
 	}
 
-	void SendReply(HTTPReply *msg) anope_override
+	void SendReply(HTTPReply *msg) override
 	{
 		this->WriteClient("HTTP/1.1 " + GetStatusFromCode(msg->error));
 		this->WriteClient("Date: " + BuildDate());
@@ -255,30 +253,27 @@ class MyHTTPClient : public HTTPClient
 			this->WriteClient("Content-Type: " + msg->content_type);
 		this->WriteClient("Content-Length: " + stringify(msg->length));
 
-		for (unsigned i = 0; i < msg->cookies.size(); ++i)
+		for (const auto &cookie : msg->cookies)
 		{
 			Anope::string buf = "Set-Cookie:";
 
-			for (HTTPReply::cookie::iterator it = msg->cookies[i].begin(), it_end = msg->cookies[i].end(); it != it_end; ++it)
-				buf += " " + it->first + "=" + it->second + ";";
+			for (const auto &[name, value] : cookie)
+				buf += " " + name + "=" + value + ";";
 
 			buf.erase(buf.length() - 1);
 
 			this->WriteClient(buf);
 		}
 
-		typedef std::map<Anope::string, Anope::string> map;
-		for (map::iterator it = msg->headers.begin(), it_end = msg->headers.end(); it != it_end; ++it)
-			this->WriteClient(it->first + ": " + it->second);
+		for (auto &[name, value] : msg->headers)
+			this->WriteClient(name + ": " + value);
 
 		this->WriteClient("Connection: Close");
 		this->WriteClient("");
 
-		for (unsigned i = 0; i < msg->out.size(); ++i)
+		for (auto *d : msg->out)
 		{
-			HTTPReply::Data* d = msg->out[i];
-
-			this->Write(d->buf, d->len);
+				this->Write(d->buf, d->len);
 
 			delete d;
 		}
@@ -293,10 +288,10 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 	std::map<Anope::string, HTTPPage *> pages;
 	std::list<Reference<MyHTTPClient> > clients;
 
- public:
-	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t, bool s) : Socket(-1, i.find(':') != Anope::string::npos), HTTPProvider(c, n, i, p, s), Timer(c, 10, Anope::CurTime, true), timeout(t) { }
+public:
+	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t, bool s) : Socket(-1, i.find(':') == Anope::string::npos ? AF_INET : AF_INET6), HTTPProvider(c, n, i, p, s), Timer(c, 10, Anope::CurTime, true), timeout(t) { }
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		while (!this->clients.empty())
 		{
@@ -309,24 +304,24 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 		}
 	}
 
-	ClientSocket* OnAccept(int fd, const sockaddrs &addr) anope_override
+	ClientSocket* OnAccept(int fd, const sockaddrs &addr) override
 	{
 		MyHTTPClient *c = new MyHTTPClient(this, fd, addr);
-		this->clients.push_back(c);
+		this->clients.emplace_back(c);
 		return c;
 	}
 
-	bool RegisterPage(HTTPPage *page) anope_override
+	bool RegisterPage(HTTPPage *page) override
 	{
-		return this->pages.insert(std::make_pair(page->GetURL(), page)).second;
+		return this->pages.emplace(page->GetURL(), page).second;
 	}
 
-	void UnregisterPage(HTTPPage *page) anope_override
+	void UnregisterPage(HTTPPage *page) override
 	{
 		this->pages.erase(page->GetURL());
 	}
 
-	HTTPPage* FindPage(const Anope::string &pname) anope_override
+	HTTPPage* FindPage(const Anope::string &pname) override
 	{
 		if (this->pages.count(pname) == 0)
 			return NULL;
@@ -338,13 +333,13 @@ class HTTPD : public Module
 {
 	ServiceReference<SSLService> sslref;
 	std::map<Anope::string, MyHTTPProvider *> providers;
- public:
+public:
 	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), sslref("SSLService", "ssl")
 	{
 
 	}
 
-	~HTTPD()
+	~HTTPD() override
 	{
 		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
 		{
@@ -358,7 +353,7 @@ class HTTPD : public Module
 		this->providers.clear();
 	}
 
-	void OnReload(Configuration::Conf *config) anope_override
+	void OnReload(Configuration::Conf *config) override
 	{
 		Configuration::Block *conf = config->GetModule(this);
 		std::set<Anope::string> existing;
@@ -453,12 +448,10 @@ class HTTPD : public Module
 		}
 	}
 
-	void OnModuleLoad(User *u, Module *m) anope_override
+	void OnModuleLoad(User *u, Module *m) override
 	{
-		for (std::map<Anope::string, MyHTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end; ++it)
+		for (auto &[_, p] : this->providers)
 		{
-			MyHTTPProvider *p = it->second;
-
 			if (p->IsSSL() && sslref)
 				try
 				{

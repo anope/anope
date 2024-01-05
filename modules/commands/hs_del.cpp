@@ -1,6 +1,6 @@
 /* HostServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandHSDel : public Command
 {
- public:
+public:
 	CommandHSDel(Module *creator) : Command(creator, "hostserv/del", 1, 1)
 	{
 		this->SetDesc(_("Delete the vhost of another user"));
 		this->SetSyntax(_("\037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -41,7 +41,7 @@ class CommandHSDel : public Command
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -53,14 +53,14 @@ class CommandHSDel : public Command
 
 class CommandHSDelAll : public Command
 {
- public:
+public:
 	CommandHSDelAll(Module *creator) : Command(creator, "hostserv/delall", 1, 1)
 	{
 		this->SetDesc(_("Deletes the vhost for all nicks in a group"));
 		this->SetSyntax(_("\037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -74,9 +74,9 @@ class CommandHSDelAll : public Command
 		{
 			FOREACH_MOD(OnDeleteVhost, (na));
 			const NickCore *nc = na->nc;
-			for (unsigned i = 0; i < nc->aliases->size(); ++i)
+			for (auto *alias : *nc->aliases)
 			{
-				na = nc->aliases->at(i);
+				na = alias;
 				na->RemoveVhost();
 			}
 			Log(LOG_ADMIN, source, this) << "for all nicks in group " << nc->display;
@@ -86,7 +86,7 @@ class CommandHSDelAll : public Command
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -101,7 +101,7 @@ class HSDel : public Module
 	CommandHSDel commandhsdel;
 	CommandHSDelAll commandhsdelall;
 
- public:
+public:
 	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsdel(this), commandhsdelall(this)
 	{

@@ -1,7 +1,7 @@
 /*
  *
  * Modified for Anope.
- * (C) 2006-2021 Anope Team
+ * (C) 2006-2024 Anope Team
  * Contact us at team@anope.org
 
 SHA-1 in C
@@ -106,7 +106,7 @@ class SHA1Context : public Encryption::Context
 		a = b = c = d = e = 0;
 	}
 
- public:
+public:
 	SHA1Context(Encryption::IV *iv = NULL)
 	{
 		if (iv != NULL)
@@ -125,7 +125,7 @@ class SHA1Context : public Encryption::Context
 		memset(this->digest, 0, sizeof(this->digest));
 	}
 
-	void Update(const unsigned char *data, size_t len) anope_override
+	void Update(const unsigned char *data, size_t len) override
 	{
 		uint32_t i, j;
 
@@ -146,7 +146,7 @@ class SHA1Context : public Encryption::Context
 		memcpy(&this->buffer[j], &data[i], len - i);
 	}
 
-	void Finalize() anope_override
+	void Finalize() override
 	{
 		uint32_t i;
 		unsigned char finalcount[8];
@@ -169,7 +169,7 @@ class SHA1Context : public Encryption::Context
 		this->Transform(this->buffer);
 	}
 
-	Encryption::Hash GetFinalizedHash() anope_override
+	Encryption::Hash GetFinalizedHash() override
 	{
 		Encryption::Hash hash;
 		hash.first = this->digest;
@@ -180,15 +180,15 @@ class SHA1Context : public Encryption::Context
 
 class SHA1Provider : public Encryption::Provider
 {
- public:
+public:
 	SHA1Provider(Module *creator) : Encryption::Provider(creator, "sha1") { }
 
-	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
+	Encryption::Context *CreateContext(Encryption::IV *iv) override
 	{
 		return new SHA1Context(iv);
 	}
 
-	Encryption::IV GetDefaultIV() anope_override
+	Encryption::IV GetDefaultIV() override
 	{
 		Encryption::IV iv;
 		iv.first = sha1_iv;
@@ -201,7 +201,7 @@ class ESHA1 : public Module
 {
 	SHA1Provider sha1provider;
 
- public:
+public:
 	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		sha1provider(this)
 	{
@@ -209,7 +209,7 @@ class ESHA1 : public Module
 			throw ModuleException("enc_sha1 is deprecated and can not be used as a primary encryption method");
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		SHA1Context context;
 
@@ -225,7 +225,7 @@ class ESHA1 : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)

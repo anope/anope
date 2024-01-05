@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SOCKETENGINE_H
-#define SOCKETENGINE_H
+#pragma once
 
 #include "services.h"
 #include "sockets.h"
@@ -18,7 +17,7 @@
 class CoreExport SocketEngine
 {
 	static const int DefaultSize = 2; // Uplink, mode stacker
- public:
+public:
 	/* Map of sockets */
 	static std::map<int, Socket *> Sockets;
 
@@ -46,5 +45,3 @@ class CoreExport SocketEngine
 
 	static bool IgnoreErrno();
 };
-
-#endif // SOCKETENGINE_H

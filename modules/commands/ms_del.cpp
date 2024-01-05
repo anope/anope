@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -17,12 +17,12 @@ class MemoDelCallback : public NumberList
 	Command *cmd;
 	ChannelInfo *ci;
 	MemoInfo *mi;
- public:
+public:
 	MemoDelCallback(CommandSource &_source, Command *c, ChannelInfo *_ci, MemoInfo *_mi, const Anope::string &list) : NumberList(list, true), source(_source), cmd(c), ci(_ci), mi(_mi)
 	{
 	}
 
-	void HandleNumber(unsigned number) anope_override
+	void HandleNumber(unsigned number) override
 	{
 		if (!number || number > mi->memos->size())
 			return;
@@ -38,14 +38,14 @@ class MemoDelCallback : public NumberList
 
 class CommandMSDel : public Command
 {
- public:
+public:
 	CommandMSDel(Module *creator) : Command(creator, "memoserv/del", 0, 2)
 	{
 		this->SetDesc(_("Delete a memo or memos"));
 		this->SetSyntax(_("[\037channel\037] {\037num\037 | \037list\037 | LAST | ALL}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -122,7 +122,7 @@ class CommandMSDel : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -148,7 +148,7 @@ class MSDel : public Module
 {
 	CommandMSDel commandmsdel;
 
- public:
+public:
 	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsdel(this)
 	{

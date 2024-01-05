@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandOSChanList : public Command
 {
- public:
+public:
 	CommandOSChanList(Module *creator) : Command(creator, "operserv/chanlist", 0, 2)
 	{
 		this->SetDesc(_("Lists all channel records"));
 		this->SetSyntax(_("[{\037pattern\037 | \037nick\037} [\037SECRET\037]]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &pattern = !params.empty() ? params[0] : "";
 		const Anope::string &opt = params.size() > 1 ? params[1] : "";
@@ -46,14 +46,16 @@ class CommandOSChanList : public Command
 		{
 			source.Reply(_("\002%s\002 channel list:"), u2->nick.c_str());
 
-			for (User::ChanUserList::iterator uit = u2->chans.begin(), uit_end = u2->chans.end(); uit != uit_end; ++uit)
+			for (const auto &[_, cc]: u2->chans)
 			{
-				ChanUserContainer *cc = uit->second;
-
 				if (!modes.empty())
-					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
-						if (!cc->chan->HasMode(*it))
+				{
+					for (const auto &mode : modes)
+					{
+						if (!cc->chan->HasMode(mode))
 							continue;
+					}
+				}
 
 				ListFormatter::ListEntry entry;
 				entry["Name"] = cc->chan->name;
@@ -69,16 +71,18 @@ class CommandOSChanList : public Command
 		{
 			source.Reply(_("Channel list:"));
 
-			for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
+			for (const auto &[_, c] : ChannelList)
 			{
-				Channel *c = cit->second;
-
 				if (!pattern.empty() && !Anope::Match(c->name, pattern, false, true))
 					continue;
 				if (!modes.empty())
-					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
-						if (!c->HasMode(*it))
+				{
+					for (const auto &mode : modes)
+					{
+						if (!c->HasMode(mode))
 							continue;
+					}
+				}
 
 				ListFormatter::ListEntry entry;
 				entry["Name"] = c->name;
@@ -94,13 +98,13 @@ class CommandOSChanList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("End of channel list. \002%u\002 channels shown."), count);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -126,14 +130,14 @@ class CommandOSChanList : public Command
 
 class CommandOSUserList : public Command
 {
- public:
+public:
 	CommandOSUserList(Module *creator) : Command(creator, "operserv/userlist", 0, 2)
 	{
 		this->SetDesc(_("Lists all user records"));
 		this->SetSyntax(_("[{\037pattern\037 | \037channel\037} [\037INVISIBLE\037]]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &pattern = !params.empty() ? params[0] : "";
 		const Anope::string &opt = params.size() > 1 ? params[1] : "";
@@ -156,14 +160,16 @@ class CommandOSUserList : public Command
 		{
 			source.Reply(_("\002%s\002 users list:"), pattern.c_str());
 
-			for (Channel::ChanUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
+			for (const auto &[_, uc] : c->users)
 			{
-				ChanUserContainer *uc = cuit->second;
-
 				if (!modes.empty())
-					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
-						if (!uc->user->HasMode(*it))
+				{
+					for (const auto &mode : modes)
+					{
+						if (!uc->user->HasMode(mode))
 							continue;
+					}
+				}
 
 				ListFormatter::ListEntry entry;
 				entry["Name"] = uc->user->nick;
@@ -178,8 +184,8 @@ class CommandOSUserList : public Command
 		{
 			/* Historically this has been ordered, so... */
 			Anope::map<User *> ordered_map;
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-				ordered_map[it->first] = it->second;
+			for (const auto &[nick, user] : UserListByNick)
+				ordered_map[nick] = user;
 
 			source.Reply(_("Users list:"));
 
@@ -197,10 +203,10 @@ class CommandOSUserList : public Command
 					};
 
 					bool match = false;
-					for (unsigned int i = 0; i < sizeof(masks) / sizeof(*masks); ++i)
+					for (const auto &mask : masks)
 					{
 						/* Check mask with realname included, too */
-						if (Anope::Match(masks[i], pattern, false, true) || Anope::Match(masks[i] + "#" + u2->realname, pattern, false, true))
+						if (Anope::Match(mask, pattern, false, true) || Anope::Match(mask + "#" + u2->realname, pattern, false, true))
 						{
 							match = true;
 							break;
@@ -211,9 +217,13 @@ class CommandOSUserList : public Command
 						continue;
 
 					if (!modes.empty())
-						for (std::set<Anope::string>::iterator mit = modes.begin(), mit_end = modes.end(); mit != mit_end; ++mit)
-							if (!u2->HasMode(*mit))
+					{
+						for (const auto &mode : modes)
+						{
+							if (!u2->HasMode(mode))
 								continue;
+						}
+					}
 				}
 
 				ListFormatter::ListEntry entry;
@@ -229,14 +239,14 @@ class CommandOSUserList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("End of users list. \002%u\002 users shown."), count);
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -265,7 +275,7 @@ class OSList : public Module
 	CommandOSChanList commandoschanlist;
 	CommandOSUserList commandosuserlist;
 
- public:
+public:
 	OSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoschanlist(this), commandosuserlist(this)
 	{

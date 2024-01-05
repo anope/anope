@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandOSConfig : public Command
 {
- public:
+public:
 	CommandOSConfig(Module *creator) : Command(creator, "operserv/config", 1, 4)
 	{
 		this->SetDesc(_("View and change configuration file settings"));
 		this->SetSyntax(_("{\037MODIFY\037|\037VIEW\037} [\037block name\037 \037item name\037 \037item value\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &what = params[0];
 
@@ -32,7 +32,7 @@ class CommandOSConfig : public Command
 				return;
 			}
 
-			Configuration::Block *block = Config->GetBlock(params[1]);
+			Configuration::MutableBlock *block = Config->GetMutableBlock(params[1]);
 			if (!block)
 				block = Config->GetModule(params[1]);
 
@@ -57,19 +57,16 @@ class CommandOSConfig : public Command
 			for (unsigned i = 0; !show_blocks[i].empty(); ++i)
 			{
 				Configuration::Block *block = Config->GetBlock(show_blocks[i]);
-				const Configuration::Block::item_map *items = block->GetItems();
-
-				if (!items)
-					continue;
+				const Configuration::Block::item_map &items = block->GetItems();
 
 				ListFormatter lflist(source.GetAccount());
 				lflist.AddColumn(_("Name")).AddColumn(_("Value"));
 
-				for (Configuration::Block::item_map::const_iterator it = items->begin(), it_end = items->end(); it != it_end; ++it)
+				for (const auto &[name, value] : items)
 				{
 					ListFormatter::ListEntry entry;
-					entry["Name"] = it->first;
-					entry["Value"] = it->second;
+					entry["Name"] = name;
+					entry["Value"] = value;
 					lflist.AddEntry(entry);
 				}
 
@@ -78,8 +75,8 @@ class CommandOSConfig : public Command
 
 				source.Reply(_("%s settings:"), block->GetName().c_str());
 
-				for (unsigned j = 0; j < replies.size(); ++j)
-					source.Reply(replies[j]);
+				for (const auto &reply : replies)
+					source.Reply(reply);
 
 				source.Reply(" ");
 			}
@@ -90,18 +87,18 @@ class CommandOSConfig : public Command
 			for (int i = 0; i < Config->CountBlock("module"); ++i)
 			{
 				Configuration::Block *block = Config->GetBlock("module", i);
-				const Configuration::Block::item_map *items = block->GetItems();
+				const Configuration::Block::item_map &items = block->GetItems();
 
-				if (!items || items->size() <= 1)
+				if (items.size() <= 1)
 					continue;
 
 				ListFormatter::ListEntry entry;
 				entry["Module Name"] = block->Get<Anope::string>("name");
 
-				for (Configuration::Block::item_map::const_iterator it = items->begin(), it_end = items->end(); it != it_end; ++it)
+				for (const auto &[name, value] : items)
 				{
-					entry["Name"] = it->first;
-					entry["Value"] = it->second;
+					entry["Name"] = name;
+					entry["Value"] = value;
 					lflist.AddEntry(entry);
 				}
 			}
@@ -111,8 +108,8 @@ class CommandOSConfig : public Command
 
 			source.Reply(_("Module settings:"));
 
-			for (unsigned j = 0; j < replies.size(); ++j)
-				source.Reply(replies[j]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of configuration."));
 		}
@@ -120,7 +117,7 @@ class CommandOSConfig : public Command
 			this->OnSyntaxError(source, what);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -139,7 +136,7 @@ class OSConfig : public Module
 {
 	CommandOSConfig commandosconfig;
 
- public:
+public:
 	OSConfig(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosconfig(this)
 	{

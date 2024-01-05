@@ -1,5 +1,5 @@
 # Only do this if gettext is installed
-if(GETTEXT_FOUND)
+if(HAVE_LOCALIZATION)
   # Get all of the .po files
   file(GLOB LANG_SRCS_PO RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.*.po")
   list(SORT LANG_SRCS_PO)

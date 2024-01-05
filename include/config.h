@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include "account.h"
 #include "regchannel.h"
@@ -20,27 +19,33 @@
 
 namespace Configuration
 {
+	namespace Internal
+	{
 	class CoreExport Block
 	{
-		friend struct Conf;
+		friend struct Configuration::Conf;
 
-	 public:
+	public:
 		typedef Anope::map<Anope::string> item_map;
 		typedef Anope::multimap<Block> block_map;
 
-	 private:
+	private:
 		Anope::string name;
 		item_map items;
 		block_map blocks;
 		int linenum;
 
-	 public:
+		/* Represents a missing tag. */
+		static Block EmptyBlock;
+
+	public:
 		Block(const Anope::string &);
 		const Anope::string &GetName() const;
-		int CountBlock(const Anope::string &name);
-		Block* GetBlock(const Anope::string &name, int num = 0);
+		int CountBlock(const Anope::string &name) const;
+		const Block* GetBlock(const Anope::string &name, int num = 0) const;
+		Block* GetMutableBlock(const Anope::string &name, int num = 0);
 
-		template<typename T> inline T Get(const Anope::string &tag)
+		template<typename T> inline T Get(const Anope::string &tag) const
 		{
 			return this->Get<T>(tag, "");
 		}
@@ -60,12 +65,16 @@ namespace Configuration
 		}
 
 		bool Set(const Anope::string &tag, const Anope::string &value);
-		const item_map* GetItems() const;
+		const item_map &GetItems() const;
 	};
 
 	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const;
 	template<> CoreExport time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
+	} // namespace Internal
+
+	typedef const Internal::Block Block;
+	typedef Internal::Block MutableBlock;
 
 	/** Represents a configuration file
 	 */
@@ -73,8 +82,8 @@ namespace Configuration
 	{
 		Anope::string name;
 		bool executable;
-		FILE *fp;
-	 public:
+		FILE *fp = nullptr;
+	public:
 		File(const Anope::string &, bool);
 		~File();
 		const Anope::string &GetName() const;
@@ -140,7 +149,7 @@ namespace Configuration
 
 		BotInfo *GetClient(const Anope::string &name);
 
-		Block *GetCommand(CommandSource &);
+		const Block *GetCommand(CommandSource &);
 	};
 
 	struct Uplink
@@ -148,10 +157,10 @@ namespace Configuration
 		Anope::string host;
 		unsigned port;
 		Anope::string password;
-		bool ipv6;
+		int protocol;
 
-		Uplink(const Anope::string &_host, int _port, const Anope::string &_password, bool _ipv6) : host(_host), port(_port), password(_password), ipv6(_ipv6) { }
-		inline bool operator==(const Uplink &other) const { return host == other.host && port == other.port && password == other.password && ipv6 == other.ipv6; }
+		Uplink(const Anope::string &_host, int _port, const Anope::string &_password, int _protocol) : host(_host), port(_port), password(_password), protocol(_protocol) { }
+		inline bool operator==(const Uplink &other) const { return host == other.host && port == other.port && password == other.password && protocol == other.protocol; }
 		inline bool operator!=(const Uplink &other) const { return !(*this == other); }
 	};
 }
@@ -164,8 +173,8 @@ namespace Configuration
  */
 class ConfigException : public CoreException
 {
- public:
-	/** Default constructor, just uses the error mesage 'Config threw an exception'.
+public:
+	/** Default constructor, just uses the error message 'Config threw an exception'.
 	 */
 	ConfigException() : CoreException("Config threw an exception", "Config Parser") { }
 	/** This constructor can be used to specify an error message before throwing.
@@ -175,10 +184,8 @@ class ConfigException : public CoreException
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~ConfigException() throw() { }
+	virtual ~ConfigException() noexcept = default;
 };
 
 extern Configuration::File ServicesConf;
 extern CoreExport Configuration::Conf *Config;
-
-#endif // CONFIG_H

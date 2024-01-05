@@ -1,6 +1,6 @@
 /* Core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -17,9 +17,8 @@ class CommandHelp : public Command
 
 	static CommandGroup *FindGroup(const Anope::string &name)
 	{
-		for (unsigned i = 0; i < Config->CommandGroups.size(); ++i)
+		for (auto &gr : Config->CommandGroups)
 		{
-			CommandGroup &gr = Config->CommandGroups[i];
 			if (gr.name == name)
 				return &gr;
 		}
@@ -27,14 +26,14 @@ class CommandHelp : public Command
 		return NULL;
 	}
 
- public:
+public:
 	CommandHelp(Module *creator) : Command(creator, "generic/help", 0)
 	{
 		this->SetDesc(_("Displays this list and give information about commands"));
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnPreHelp, MOD_RESULT, (source, params));
@@ -56,18 +55,15 @@ class CommandHelp : public Command
 			if (all)
 				source.Reply(_("All available commands for \002%s\002:"), source.service->nick.c_str());
 
-			for (CommandInfo::map::const_iterator it = map.begin(), it_end = map.end(); it != it_end; ++it)
+			for (const auto &[c_name, info] : map)
 			{
-				const Anope::string &c_name = it->first;
-				const CommandInfo &info = it->second;
-
 				if (info.hide)
 					continue;
 
 				// Smaller command exists
 				Anope::string cmd;
 				spacesepstream(c_name).GetToken(cmd, 0);
-				if (cmd != it->first && map.count(cmd))
+				if (cmd != c_name && map.count(cmd))
 					continue;
 
 				ServiceReference<Command> c("Command", info.name);
@@ -95,18 +91,14 @@ class CommandHelp : public Command
 
 			}
 
-			for (GroupInfo::iterator it = groups.begin(), it_end = groups.end(); it != it_end; ++it)
+			for (auto &[gr, cmds] : groups)
 			{
-				CommandGroup *gr = it->first;
-
 				source.Reply(" ");
 				source.Reply("%s", gr->description.c_str());
 
 				Anope::string buf;
-				for (std::list<Anope::string>::iterator it2 = it->second.begin(), it2_end = it->second.end(); it2 != it2_end; ++it2)
+				for (const auto &c_name : cmds)
 				{
-					const Anope::string &c_name = *it2;
-
 					buf += ", " + c_name;
 
 					if (buf.length() > help_wrap_len)
@@ -194,7 +186,7 @@ class Help : public Module
 {
 	CommandHelp commandhelp;
 
- public:
+public:
 	Help(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhelp(this)
 	{

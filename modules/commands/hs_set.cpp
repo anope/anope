@@ -1,6 +1,6 @@
 /* HostServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandHSSet : public Command
 {
- public:
+public:
 	CommandHSSet(Module *creator) : Command(creator, "hostserv/set", 2, 2)
 	{
 		this->SetDesc(_("Set the vhost of another user"));
 		this->SetSyntax(_("\037nick\037 \037hostmask\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -92,7 +92,7 @@ class CommandHSSet : public Command
 			source.Reply(_("VHost for \002%s\002 set to \002%s\002."), nick.c_str(), host.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -111,22 +111,21 @@ class CommandHSSetAll : public Command
 		if (!na || !na->HasVhost())
 			return;
 
-		for (unsigned i = 0; i < na->nc->aliases->size(); ++i)
+		for (auto *nick : *na->nc->aliases)
 		{
-			NickAlias *nick = na->nc->aliases->at(i);
 			if (nick)
 				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 		}
 	}
 
- public:
+public:
 	CommandHSSetAll(Module *creator) : Command(creator, "hostserv/setall", 2, 2)
 	{
 		this->SetDesc(_("Set the vhost for all nicks in a group"));
 		this->SetSyntax(_("\037nick\037 \037hostmask\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -199,7 +198,7 @@ class CommandHSSetAll : public Command
 			source.Reply(_("VHost for group \002%s\002 set to \002%s\002."), nick.c_str(), host.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -218,7 +217,7 @@ class HSSet : public Module
 	CommandHSSet commandhsset;
 	CommandHSSetAll commandhssetall;
 
- public:
+public:
 	HSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandhsset(this), commandhssetall(this)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)

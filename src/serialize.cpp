@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -34,14 +34,13 @@ void Serialize::RegisterTypes()
 
 void Serialize::CheckTypes()
 {
-	for (std::map<Anope::string, Serialize::Type *>::const_iterator it = Serialize::Type::GetTypes().begin(), it_end = Serialize::Type::GetTypes().end(); it != it_end; ++it)
+	for (const auto &[_, t] : Serialize::Type::GetTypes())
 	{
-		Serialize::Type *t = it->second;
 		t->Check();
 	}
 }
 
-Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0), last_commit_time(0), id(0), redis_ignore(0)
+Serializable::Serializable(const Anope::string &serialize_type)
 {
 	if (SerializableItems == NULL)
 		SerializableItems = new std::list<Serializable *>();
@@ -55,7 +54,7 @@ Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0)
 	FOREACH_MOD(OnSerializableConstruct, (this));
 }
 
-Serializable::Serializable(const Serializable &other) : last_commit(0), last_commit_time(0), id(0), redis_ignore(0)
+Serializable::Serializable(const Serializable &other)
 {
 	SerializableItems->push_back(this);
 	this->s_iter = SerializableItems->end();
@@ -112,7 +111,7 @@ const std::list<Serializable *> &Serializable::GetItems()
 	return *SerializableItems;
 }
 
-Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o), timestamp(0)
+Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o)
 {
 	TypeOrder.push_back(this->name);
 	Types[this->name] = this;
@@ -124,13 +123,13 @@ Type::~Type()
 {
 	/* null the type of existing serializable objects of this type */
 	if (Serializable::SerializableItems != NULL)
-		for (std::list<Serializable *>::iterator it = Serializable::SerializableItems->begin(); it != Serializable::SerializableItems->end(); ++it)
+	{
+		for (auto *s : *Serializable::SerializableItems)
 		{
-			Serializable *s = *it;
-
 			if (s->s_type == this)
 				s->s_type = NULL;
 		}
+	}
 
 	std::vector<Anope::string>::iterator it = std::find(TypeOrder.begin(), TypeOrder.end(), this->name);
 	if (it != TypeOrder.end())

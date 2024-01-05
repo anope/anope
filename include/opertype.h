@@ -1,13 +1,12 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2021 Anope Team <team@anope.org>
+ * (C) 2008-2024 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef OPERTYPE_H
-#define OPERTYPE_H
+#pragma once
 
 #include "services.h"
 #include "account.h"
@@ -22,7 +21,7 @@ struct CoreExport Oper
 	/* The type of operator this operator is */
 	OperType *ot;
 	/* Whether the user must be an IRC operator (umode +o) to be considered a services operator */
-	bool require_oper;
+	bool require_oper = true;
 	Anope::string password;
 	Anope::string certfp;
 	/* Hosts allowed to use this operator block */
@@ -43,7 +42,7 @@ struct CoreExport Oper
 
 class CoreExport OperType
 {
- private:
+private:
 	/** The name of this opertype, e.g. "sra".
 	 */
 	Anope::string name;
@@ -66,8 +65,8 @@ class CoreExport OperType
 	/** Set of opertypes we inherit from
 	 */
 	std::set<OperType *> inheritances;
- public:
-	/** Modes to set when someone identifys using this opertype
+public:
+	/** Modes to set when someone identifies using this opertype
 	 */
 	Anope::string modes;
 
@@ -123,5 +122,3 @@ class CoreExport OperType
 	 */
 	const std::list<Anope::string> GetPrivs() const;
 };
-
-#endif // OPERTYPE_H

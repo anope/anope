@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -8,6 +8,8 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  */
+
+#pragma once
 
 struct ModeLock
 {
@@ -18,16 +20,16 @@ struct ModeLock
 	Anope::string setter;
 	time_t created;
 
-	virtual ~ModeLock() { }
- protected:
-	ModeLock() { }
+	virtual ~ModeLock() = default;
+protected:
+	ModeLock() = default;
 };
 
 struct ModeLocks
 {
 	typedef std::vector<ModeLock *> ModeList;
 
-	virtual ~ModeLocks() { }
+	virtual ~ModeLocks() = default;
 
 	/** Check if a mode is mlocked
 	 * @param mode The mode

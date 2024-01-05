@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2012-2021 Anope Team
+ * (C) 2012-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@ using namespace SQL;
 
 class DBMySQL : public Module, public Pipe
 {
- private:
+private:
 	Anope::string prefix;
 	ServiceReference<Provider> SQL;
 	time_t lastwarn;
@@ -71,7 +71,7 @@ class DBMySQL : public Module, public Pipe
 		throw SQL::Exception("No SQL!");
 	}
 
- public:
+public:
 	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), SQL("", "")
 	{
 		this->lastwarn = 0;
@@ -83,15 +83,13 @@ class DBMySQL : public Module, public Pipe
 			throw ModuleException("If db_sql_live is loaded it must be the first database module loaded.");
 	}
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
 		if (!this->CheckInit())
 			return;
 
-		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
+		for (auto *obj : this->updated_items)
 		{
-			Serializable *obj = *it;
-
 			if (obj && this->SQL)
 			{
 				Data data;
@@ -107,8 +105,8 @@ class DBMySQL : public Module, public Pipe
 					continue;
 
 				std::vector<Query> create = this->SQL->CreateTable(this->prefix + s_type->GetName(), data);
-				for (unsigned i = 0; i < create.size(); ++i)
-					this->RunQueryResult(create[i]);
+				for (const auto &query : create)
+					this->RunQueryResult(query);
 
 				Result res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + s_type->GetName(), obj->id, data));
 				if (res.GetID() && obj->id != res.GetID())
@@ -123,30 +121,30 @@ class DBMySQL : public Module, public Pipe
 		this->updated_items.clear();
 	}
 
-	EventReturn OnLoadDatabase() anope_override
+	EventReturn OnLoadDatabase() override
 	{
 		init = true;
 		return EVENT_STOP;
 	}
 
-	void OnShutdown() anope_override
+	void OnShutdown() override
 	{
 		init = false;
 	}
 
-	void OnRestart() anope_override
+	void OnRestart() override
 	{
 		init = false;
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		this->SQL = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
 		this->prefix = block->Get<const Anope::string>("prefix", "anope_db_");
 	}
 
-	void OnSerializableConstruct(Serializable *obj) anope_override
+	void OnSerializableConstruct(Serializable *obj) override
 	{
 		if (!this->CheckInit())
 			return;
@@ -155,7 +153,7 @@ class DBMySQL : public Module, public Pipe
 		this->Notify();
 	}
 
-	void OnSerializableDestruct(Serializable *obj) anope_override
+	void OnSerializableDestruct(Serializable *obj) override
 	{
 		if (!this->CheckInit())
 			return;
@@ -169,7 +167,7 @@ class DBMySQL : public Module, public Pipe
 		this->updated_items.erase(obj);
 	}
 
-	void OnSerializeCheck(Serialize::Type *obj) anope_override
+	void OnSerializeCheck(Serialize::Type *obj) override
 	{
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
@@ -207,8 +205,8 @@ class DBMySQL : public Module, public Pipe
 			{
 				Data data;
 
-				for (std::map<Anope::string, Anope::string>::const_iterator it = row.begin(), it_end = row.end(); it != it_end; ++it)
-					data[it->first] << it->second;
+				for (const auto &[key, value] : row)
+					data[key] << value;
 
 				Serializable *s = NULL;
 				std::map<uint64_t, Serializable *>::iterator it = obj->objects.find(id);
@@ -251,7 +249,7 @@ class DBMySQL : public Module, public Pipe
 		}
 	}
 
-	void OnSerializableUpdate(Serializable *obj) anope_override
+	void OnSerializableUpdate(Serializable *obj) override
 	{
 		if (!this->CheckInit() || obj->IsTSCached())
 			return;

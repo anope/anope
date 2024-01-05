@@ -1,7 +1,7 @@
 Anope -- a set of IRC services for IRC networks
 -----------------------------------------------
 
-Anope is          2003-2021 Anope Team    <team@anope.org>.
+Anope is          2003-2024 Anope Team    <team@anope.org>.
 Based on Epona    2000-2002 PegSoft       <epona@pegsoft.net>.
 Based on Services 1996-1999 Andrew Church <achurch@achurch.org>.
 
@@ -92,7 +92,7 @@ Table of Contents
         * Lee Holmes <lethality@anope.org>
         * Lucas Nussbaum <lucas@lucas-nussbaum.net>
         * Mark Summers <mark@goopler.net>
-        * Matthew Beeching <jobe@invictachat.net>
+        * Matthew Beeching <jobe@mdbnet.co.uk>
         * Naram Qashat <cyberbotx@anope.org>
         * Phil Lavin <phil@anope.org>
         * Pieter Bootsma <geniusdex@anope.org>
@@ -120,7 +120,7 @@ Table of Contents
 
 2) Presentation
 
-    Anope is a set of Services for IRC networks that allows users to manage
+    Anope is a set of services for IRC networks that allows users to manage
     their nicks and channels in a secure and efficient way, and administrators
     to manage their network with powerful tools.
 
@@ -225,7 +225,7 @@ Table of Contents
     the log file; if you send a bug report, PLEASE include an excerpt from
     the log file WITH DEBUGGING ACTIVE; we cannot emphasize enough how
     important this is to tracking down problems. (You can also enable
-    debugging while Services is running using OperServ's SET DEBUG command.)
+    debugging while Anope is running using OperServ's SET DEBUG command.)
     If you repeat use --debug=<level>, the debugging level will be increased,
     which provides more detailed information but may also slow Anope down
     considerably and make the log file grow dramatically faster. In general,
@@ -252,7 +252,7 @@ Table of Contents
     The more precise you are the sooner you'll be likely to get an answer.
 
     If you think you found a bug, add it to the bug tracking system
-    (https://bugs.anope.org/) and - again - be as precise as possible. Also say
-    whether the bug happens always or under what circumstances, and anything
+    (https://github.com/anope/anope/issues) and - again - be as precise as possible.
+    Also say whether the bug happens always or under what circumstances, and anything
     that could be useful to track your bug down. If you wrote a patch, send
     it over. :)

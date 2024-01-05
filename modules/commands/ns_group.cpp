@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -19,10 +19,10 @@ class NSGroupRequest : public IdentifyRequest
 	Anope::string nick;
 	Reference<NickAlias> target;
 
- public:
+public:
 	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(o, targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		User *u = source.GetUser();
 
@@ -67,7 +67,7 @@ class NSGroupRequest : public IdentifyRequest
 			u->lastnickreg = Anope::CurTime;
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		User *u = source.GetUser();
 
@@ -85,7 +85,7 @@ class NSGroupRequest : public IdentifyRequest
 
 class CommandNSGroup : public Command
 {
- public:
+public:
 	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 0, 2)
 	{
 		this->SetDesc(_("Join a group"));
@@ -93,7 +93,7 @@ class CommandNSGroup : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *user = source.GetUser();
 
@@ -128,16 +128,16 @@ class CommandNSGroup : public Command
 		}
 
 		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
-			for (unsigned i = 0; i < Oper::opers.size(); ++i)
+		{
+			for (auto *o : Oper::opers)
 			{
-				Oper *o = Oper::opers[i];
-
 				if (user != NULL && !user->HasMode("OPER") && user->nick.find_ci(o->name) != Anope::string::npos)
 				{
 					source.Reply(NICK_CANNOT_BE_REGISTERED, user->nick.c_str());
 					return;
 				}
 			}
+		}
 
 		NickAlias *target, *na = NickAlias::Find(source.GetNick());
 		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
@@ -194,7 +194,7 @@ class CommandNSGroup : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -230,14 +230,14 @@ class CommandNSGroup : public Command
 
 class CommandNSUngroup : public Command
 {
- public:
+public:
 	CommandNSUngroup(Module *creator) : Command(creator, "nickserv/ungroup", 0, 1)
 	{
 		this->SetDesc(_("Remove a nick from a group"));
 		this->SetSyntax(_("[\037nick\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string nick = !params.empty() ? params[0] : "";
 		NickAlias *na = NickAlias::Find(!nick.empty() ? nick : source.GetNick());
@@ -278,11 +278,11 @@ class CommandNSUngroup : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command ungroups your nick, or if given, the specificed nick,\n"
+		source.Reply(_("This command ungroups your nick, or if given, the specified nick,\n"
 				"from the group it is in. The ungrouped nick keeps its registration\n"
 				"time, password, email, greet, language, and url. Everything else\n"
 				"is reset. You may not ungroup yourself if there is only one nick in\n"
@@ -293,13 +293,13 @@ class CommandNSUngroup : public Command
 
 class CommandNSGList : public Command
 {
- public:
+public:
 	CommandNSGList(Module *creator) : Command(creator, "nickserv/glist", 0, 1)
 	{
 		this->SetDesc(_("Lists all nicknames in your group"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = !params.empty() ? params[0] : "";
 		const NickCore *nc;
@@ -325,12 +325,10 @@ class CommandNSGList : public Command
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
-		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire", "21d"),
+		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire", "90d"),
 		       unconfirmed_expire = Config->GetModule("ns_register")->Get<time_t>("unconfirmedexpire", "1d");
-		for (unsigned i = 0; i < nc->aliases->size(); ++i)
+		for (auto *na2 : *nc->aliases)
 		{
-			const NickAlias *na2 = nc->aliases->at(i);
-
 			Anope::string expires;
 			if (na2->HasExt("NS_NO_EXPIRE"))
 				expires = NO_EXPIRE;
@@ -351,13 +349,13 @@ class CommandNSGList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("%d nickname(s) in the group."), nc->aliases->size());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (source.IsServicesOper())
 			source.Reply(_("Syntax: \002%s [\037nickname\037]\002\n"
@@ -384,7 +382,7 @@ class NSGroup : public Module
 	CommandNSUngroup commandnsungroup;
 	CommandNSGList commandnsglist;
 
- public:
+public:
 	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsgroup(this), commandnsungroup(this), commandnsglist(this)
 	{

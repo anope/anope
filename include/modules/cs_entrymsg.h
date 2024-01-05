@@ -1,10 +1,12 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
+
+#pragma once
 
 struct EntryMsg
 {
@@ -13,17 +15,17 @@ struct EntryMsg
 	Anope::string message;
 	time_t when;
 
-	virtual ~EntryMsg() { }
- protected:
-	EntryMsg() { }
+	virtual ~EntryMsg() = default;
+protected:
+	EntryMsg() = default;
 };
 
 struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >
 {
- protected:
+protected:
 	EntryMessageList() : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }
 
- public:
+public:
 	virtual ~EntryMessageList()
 	{
 		for (unsigned i = (*this)->size(); i > 0; --i)

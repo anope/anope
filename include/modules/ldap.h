@@ -1,20 +1,19 @@
 /*
  *
- * (C) 2011-2021 Anope Team
+ * (C) 2011-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef ANOPE_LDAP_H
-#define ANOPE_LDAP_H
+#pragma once
 
 class LDAPException : public ModuleException
 {
- public:
+public:
 	LDAPException(const Anope::string &reason) : ModuleException(reason) { }
 
-	virtual ~LDAPException() throw() { }
+	virtual ~LDAPException() noexcept = default;
 };
 
 struct LDAPModification
@@ -43,8 +42,8 @@ struct LDAPAttributes : public std::map<Anope::string, std::vector<Anope::string
 	const std::vector<Anope::string> keys() const
 	{
 		std::vector<Anope::string> k;
-		for (const_iterator it = this->begin(), it_end = this->end(); it != it_end; ++it)
-			k.push_back(it->first);
+		for (const auto &[key, _] : *this)
+			k.push_back(key);
 		return k;
 	}
 
@@ -112,11 +111,11 @@ struct LDAPResult
 
 class LDAPInterface
 {
- public:
+public:
 	Module *owner;
 
 	LDAPInterface(Module *m) : owner(m) { }
-	virtual ~LDAPInterface() { }
+	virtual ~LDAPInterface() = default;
 
 	virtual void OnResult(const LDAPResult &r) = 0;
 	virtual void OnError(const LDAPResult &err) = 0;
@@ -125,7 +124,7 @@ class LDAPInterface
 
 class LDAPProvider : public Service
 {
- public:
+public:
 	LDAPProvider(Module *c, const Anope::string &n) : Service(c, "LDAPProvider", n) { }
 
 	/** Attempt to bind to the LDAP server as an admin
@@ -167,5 +166,3 @@ class LDAPProvider : public Service
 	 */
 	virtual void Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) = 0;
 };
-
-#endif // ANOPE_LDAP_H

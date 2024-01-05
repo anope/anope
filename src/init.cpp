@@ -1,6 +1,6 @@
 /* Initialization and related routines.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -23,10 +23,10 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 
-#include <errno.h>
-#include <sys/types.h>
-#include <pwd.h>
+#include <cerrno>
 #include <grp.h>
+#include <pwd.h>
+#include <sys/types.h>
 #endif
 
 Anope::string Anope::ConfigDir = "conf", Anope::DataDir = "data", Anope::ModuleDir = "lib", Anope::LocaleDir = "locale", Anope::LogDir = "logs";
@@ -57,7 +57,7 @@ static void ParseCommandLineArguments(int ac, char **av)
 		if (option.empty())
 			continue;
 
-		CommandLineArguments.push_back(std::make_pair(option, param));
+		CommandLineArguments.emplace_back(option, param);
 	}
 }
 
@@ -71,11 +71,11 @@ static bool GetCommandLineArgument(const Anope::string &name, char shortname, An
 {
 	param.clear();
 
-	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = CommandLineArguments.begin(), it_end = CommandLineArguments.end(); it != it_end; ++it)
+	for (const auto &[argument, value] : CommandLineArguments)
 	{
-		if (it->first.equals_ci(name) || (it->first.length() == 1 && it->first[0] == shortname))
+		if (argument.equals_ci(name) || (argument.length() == 1 && argument[0] == shortname))
 		{
-			param = it->second;
+			param = value;
 			return true;
 		}
 	}
@@ -258,14 +258,10 @@ static void setuidgid()
 			gid = g->gr_gid;
 	}
 
-	for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
+	for (const auto &li : Config->LogInfos)
 	{
-		LogInfo& li = Config->LogInfos[i];
-
-		for (unsigned j = 0; j < li.logfiles.size(); ++j)
+		for (const auto *lf : li.logfiles)
 		{
-			LogFile* lf = li.logfiles[j];
-
 			errno = 0;
 			if (chown(lf->filename.c_str(), uid, gid) != 0)
 				Log() << "Unable to change the ownership of " << lf->filename << " to " << uid << "/" << gid << ": " << Anope::LastError();
@@ -289,7 +285,7 @@ static void setuidgid()
 #endif
 }
 
-void Anope::Init(int ac, char **av)
+bool Anope::Init(int ac, char **av)
 {
 	/* Set file creation mask and group ID. */
 #if defined(DEFUMASK) && HAVE_UMASK
@@ -304,7 +300,8 @@ void Anope::Init(int ac, char **av)
 	if (GetCommandLineArgument("version", 'v'))
 	{
 		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::VersionBuildString();
-		throw CoreException();
+		Anope::ReturnValue = EXIT_SUCCESS;
+		return false;
 	}
 
 	if (GetCommandLineArgument("help", 'h'))
@@ -313,7 +310,7 @@ void Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "Anope IRC Services (https://www.anope.org/)";
 		Log(LOG_TERMINAL) << "Usage ./" << Anope::ServicesBin << " [options] ...";
 		Log(LOG_TERMINAL) << "-c, --config=filename.conf";
-		Log(LOG_TERMINAL) << "    --confdir=conf file direcory";
+		Log(LOG_TERMINAL) << "    --confdir=conf file directory";
 		Log(LOG_TERMINAL) << "    --dbdir=database directory";
 		Log(LOG_TERMINAL) << "-d, --debug[=level]";
 		Log(LOG_TERMINAL) << "-h, --help";
@@ -330,7 +327,8 @@ void Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "";
 		Log(LOG_TERMINAL) << "Further support is available from https://www.anope.org/";
 		Log(LOG_TERMINAL) << "Or visit us on IRC at irc.anope.org #anope";
-		throw CoreException();
+		Anope::ReturnValue = EXIT_SUCCESS;
+		return false;
 	}
 
 	if (GetCommandLineArgument("nofork", 'n'))
@@ -411,7 +409,7 @@ void Anope::Init(int ac, char **av)
 		Anope::LogDir = arg;
 	}
 
-	/* Chdir to Services data directory. */
+	/* Chdir to Anope data directory. */
 	if (chdir(Anope::ServicesDir.c_str()) < 0)
 	{
 		throw CoreException("Unable to chdir to " + Anope::ServicesDir + ": " + Anope::LastError());
@@ -422,20 +420,6 @@ void Anope::Init(int ac, char **av)
 #ifdef _WIN32
 	if (!SupportedWindowsVersion())
 		throw CoreException(GetWindowsVersion() + " is not a supported version of Windows");
-#else
-	/* If we're root, issue a warning now */
-	if (!getuid() && !getgid())
-	{
-		/* If we are configured to setuid later, don't issue a warning */
-		Configuration::Block *options = Config->GetBlock("options");
-		if (options->Get<const Anope::string>("user").empty())
-		{
-			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
-			std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
-			std::cerr << "         as the root superuser." << std::endl;
-			sleep(3);
-		}
-	}
 #endif
 
 #ifdef _WIN32
@@ -467,7 +451,7 @@ void Anope::Init(int ac, char **av)
 			sigemptyset(&mask);
 			sigsuspend(&mask);
 
-			exit(Anope::ReturnValue);
+			return false;
 		}
 		else if (i == -1)
 		{
@@ -503,9 +487,9 @@ void Anope::Init(int ac, char **av)
 	/* Create me */
 	Configuration::Block *block = Config->GetBlock("serverinfo");
 	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), block->Get<const Anope::string>("id"));
-	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	for (const auto &[_, bi] : *BotListByNick)
 	{
-		it->second->server = Me;
+		bi->server = Me;
 		++Me->users;
 	}
 
@@ -527,6 +511,20 @@ void Anope::Init(int ac, char **av)
 		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<const Anope::string>("name"), NULL);
 
 #ifndef _WIN32
+	/* If we're root, issue a warning now */
+	if (!getuid() && !getgid())
+	{
+		/* If we are configured to setuid later, don't issue a warning */
+		Configuration::Block *options = Config->GetBlock("options");
+		if (options->Get<const Anope::string>("user").empty())
+		{
+			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
+			std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
+			std::cerr << "         as the root superuser." << std::endl;
+			sleep(3);
+		}
+	}
+
 	/* We won't background later, so we should setuid now */
 	if (Anope::NoFork)
 		setuidgid();
@@ -547,8 +545,8 @@ void Anope::Init(int ac, char **av)
 		Anope::string sid = IRCD->SID_Retrieve();
 		if (Me->GetSID() == Me->GetName())
 			Me->SetSID(sid);
-		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-			it->second->GenerateUID();
+		for (const auto &[_, bi] : *BotListByNick)
+			bi->GenerateUID();
 	}
 
 	/* Load up databases */
@@ -560,8 +558,9 @@ void Anope::Init(int ac, char **av)
 
 	FOREACH_MOD(OnPostInit, ());
 
-	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-		it->second->Sync();
+	for (const auto &[_, ci] : ChannelList)
+		ci->Sync();
 
 	Serialize::CheckTypes();
+	return true;
 }

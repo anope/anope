@@ -1,10 +1,12 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
+
+#pragma once
 
 struct MiscData
 {
@@ -12,6 +14,7 @@ struct MiscData
 	Anope::string name;
 	Anope::string data;
 
-	MiscData() { }
-	virtual ~MiscData() { }
+	virtual ~MiscData() = default;
+protected:
+	MiscData() = default;
 };

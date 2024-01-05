@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2014-2021 Anope Team
+ * (C) 2014-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,10 +14,10 @@ using namespace SASL;
 
 class Plain : public Mechanism
 {
- public:
+public:
 	Plain(Module *o) : Mechanism(o, "PLAIN") { }
 
-	void ProcessMessage(Session *sess, const SASL::Message &m) anope_override
+	void ProcessMessage(Session *sess, const SASL::Message &m) override
 	{
 		if (m.type == "S")
 		{
@@ -25,37 +25,47 @@ class Plain : public Mechanism
 		}
 		else if (m.type == "C")
 		{
-			Anope::string decoded;
-			Anope::B64Decode(m.data, decoded);
+			// message = [authzid] UTF8NUL authcid UTF8NUL passwd
+			Anope::string message;
+			Anope::B64Decode(m.data, message);
 
-			size_t p = decoded.find('\0');
-			if (p == Anope::string::npos)
-			{
-				sasl->Fail(sess);
-				delete sess;
-				return;
-			}
-			decoded = decoded.substr(p + 1);
-
-			p = decoded.find('\0');
-			if (p == Anope::string::npos)
+			size_t zcsep = message.find('\0');
+			if (zcsep == Anope::string::npos)
 			{
 				sasl->Fail(sess);
 				delete sess;
 				return;
 			}
 
-			Anope::string acc = decoded.substr(0, p),
-				pass = decoded.substr(p + 1);
-
-			if (acc.empty() || pass.empty() || !IRCD->IsNickValid(acc) || pass.find_first_of("\r\n") != Anope::string::npos)
+			size_t cpsep = message.find('\0', zcsep + 1);
+			if (cpsep == Anope::string::npos)
 			{
 				sasl->Fail(sess);
 				delete sess;
 				return;
 			}
 
-			SASL::IdentifyRequest *req = new SASL::IdentifyRequest(this->owner, m.source, acc, pass, sess->hostname, sess->ip);
+			Anope::string authzid = message.substr(0, zcsep);
+			Anope::string authcid = message.substr(zcsep + 1, cpsep - zcsep - 1);
+
+			// We don't support having an authcid that is different to the authzid.
+			if (!authzid.empty() && authzid != authcid)
+			{
+				sasl->Fail(sess);
+				delete sess;
+				return;
+			}
+
+			Anope::string passwd = message.substr(cpsep + 1);
+
+			if (authcid.empty() || passwd.empty() || !IRCD->IsNickValid(authcid) || passwd.find_first_of("\r\n\0") != Anope::string::npos)
+			{
+				sasl->Fail(sess);
+				delete sess;
+				return;
+			}
+
+			SASL::IdentifyRequest *req = new SASL::IdentifyRequest(this->owner, m.source, authcid, passwd, sess->hostname, sess->ip);
 			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 			req->Dispatch();
 		}
@@ -73,19 +83,19 @@ class External : public Mechanism
 		Session(Mechanism *m, const Anope::string &u) : SASL::Session(m, u) { }
 	};
 
- public:
+public:
 	External(Module *o) : Mechanism(o, "EXTERNAL"), certs("CertService", "certs")
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("No CertFP");
 	}
 
-	Session* CreateSession(const Anope::string &uid) anope_override
+	Session* CreateSession(const Anope::string &uid) override
 	{
 		return new Session(this, uid);
 	}
 
-	void ProcessMessage(SASL::Session *sess, const SASL::Message &m) anope_override
+	void ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
 	{
 		Session *mysess = anope_dynamic_static_cast<Session *>(sess);
 
@@ -124,20 +134,56 @@ class External : public Mechanism
 	}
 };
 
+class Anonymous : public Mechanism
+{
+public:
+	Anonymous(Module *o) : Mechanism(o, "ANONYMOUS") { }
+
+	void ProcessMessage(Session *sess, const SASL::Message &m) override
+	{
+		if (!IRCD->CanSVSLogout && !User::Find(sess->uid))
+		{
+			// This IRCd can't log users out yet.
+			sasl->Fail(sess);
+			delete sess;
+			return;
+		}
+
+		if (m.type == "S")
+		{
+			sasl->SendMessage(sess, "C", "+");
+		}
+		else if (m.type == "C")
+		{
+			Anope::string decoded;
+			Anope::B64Decode(m.data, decoded);
+
+			Anope::string user = "A user";
+			if (!sess->hostname.empty() && !sess->ip.empty())
+				user = sess->hostname + " (" + sess->ip + ")";
+			if (!decoded.empty())
+				user += " [" + decoded + "]";
+
+			Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " unidentified using SASL ANONYMOUS";
+			sasl->Succeed(sess, nullptr);
+		}
+	}
+};
+
 class SASLService : public SASL::Service, public Timer
 {
 	std::map<Anope::string, SASL::Session *> sessions;
 
- public:
+public:
 	SASLService(Module *o) : SASL::Service(o), Timer(o, 60, Anope::CurTime, true) { }
 
-	~SASLService()
+	~SASLService() override
 	{
-		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end(); it++)
-			delete it->second;
+		for (const auto &[_, session] : sessions)
+			delete session;
 	}
 
-	void ProcessMessage(const SASL::Message &m) anope_override
+	void ProcessMessage(const SASL::Message &m) override
 	{
 		if (m.target != "*")
 		{
@@ -202,7 +248,7 @@ class SASLService : public SASL::Service, public Timer
 			session->mech->ProcessMessage(session, m);
 	}
 
-	Anope::string GetAgent() anope_override
+	Anope::string GetAgent() override
 	{
 		Anope::string agent = Config->GetModule(Service::owner)->Get<Anope::string>("agent", "NickServ");
 		BotInfo *bi = Config->GetClient(agent);
@@ -211,7 +257,7 @@ class SASLService : public SASL::Service, public Timer
 		return agent;
 	}
 
-	Session* GetSession(const Anope::string &uid) anope_override
+	Session* GetSession(const Anope::string &uid) override
 	{
 		std::map<Anope::string, Session *>::iterator it = sessions.find(uid);
 		if (it != sessions.end())
@@ -219,12 +265,12 @@ class SASLService : public SASL::Service, public Timer
 		return NULL;
 	}
 
-	void RemoveSession(Session *sess) anope_override
+	void RemoveSession(Session *sess) override
 	{
 		sessions.erase(sess->uid);
 	}
 
-	void DeleteSessions(Mechanism *mech, bool da) anope_override
+	void DeleteSessions(Mechanism *mech, bool da) override
 	{
 		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end();)
 		{
@@ -238,7 +284,7 @@ class SASLService : public SASL::Service, public Timer
 		}
 	}
 
-	void SendMessage(Session *session, const Anope::string &mtype, const Anope::string &data) anope_override
+	void SendMessage(Session *session, const Anope::string &mtype, const Anope::string &data) override
 	{
 		SASL::Message msg;
 		msg.source = this->GetAgent();
@@ -249,7 +295,7 @@ class SASLService : public SASL::Service, public Timer
 		IRCD->SendSASLMessage(msg);
 	}
 
-	void Succeed(Session *session, NickCore *nc) anope_override
+	void Succeed(Session *session, NickCore *nc) override
 	{
 		// If the user is already introduced then we log them in now.
 		// Otherwise, we send an SVSLOGIN to log them in later.
@@ -257,7 +303,10 @@ class SASLService : public SASL::Service, public Timer
 		NickAlias *na = NickAlias::Find(nc->display);
 		if (user)
 		{
-			user->Identify(na);
+			if (na)
+				user->Identify(na);
+			else
+				user->Logout();
 		}
 		else
 		{
@@ -266,22 +315,22 @@ class SASLService : public SASL::Service, public Timer
 		this->SendMessage(session, "D", "S");
 	}
 
-	void Fail(Session *session) anope_override
+	void Fail(Session *session) override
 	{
 		this->SendMessage(session, "D", "F");
 	}
 
-	void SendMechs(Session *session) anope_override
+	void SendMechs(Session *session) override
 	{
 		std::vector<Anope::string> mechs = Service::GetServiceKeys("SASL::Mechanism");
 		Anope::string buf;
-		for (unsigned j = 0; j < mechs.size(); ++j)
-			buf += "," + mechs[j];
+		for (const auto &mech : mechs)
+			buf += "," + mech;
 
 		this->SendMessage(session, "M", buf.empty() ? "" : buf.substr(1));
 	}
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end();)
 		{
@@ -302,8 +351,9 @@ class ModuleSASL : public Module
 {
 	SASLService sasl;
 
+	Anonymous anonymous;
 	Plain plain;
-	External *external;
+	External *external = nullptr;
 
 	std::vector<Anope::string> mechs;
 
@@ -320,9 +370,9 @@ class ModuleSASL : public Module
 			IRCD->SendSASLMechanisms(mechs);
 	}
 
- public:
+public:
 	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		sasl(this), plain(this), external(NULL)
+		sasl(this), anonymous(this), plain(this)
 	{
 		try
 		{
@@ -332,22 +382,22 @@ class ModuleSASL : public Module
 		catch (ModuleException &) { }
 	}
 
-	~ModuleSASL()
+	~ModuleSASL() override
 	{
 		delete external;
 	}
 
-	void OnModuleLoad(User *, Module *) anope_override
+	void OnModuleLoad(User *, Module *) override
 	{
 		CheckMechs();
 	}
 
-	void OnModuleUnload(User *, Module *) anope_override
+	void OnModuleUnload(User *, Module *) override
 	{
 		CheckMechs();
 	}
 
-	void OnPreUplinkSync(Server *) anope_override
+	void OnPreUplinkSync(Server *) override
 	{
 		// We have not yet sent a mechanism list so always do it here.
 		IRCD->SendSASLMechanisms(mechs);

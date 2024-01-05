@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -19,14 +19,14 @@ namespace
 
 class XOPChanAccess : public ChanAccess
 {
- public:
+public:
 	Anope::string type;
 
 	XOPChanAccess(AccessProvider *p) : ChanAccess(p)
 	{
 	}
 
-	bool HasPriv(const Anope::string &priv) const anope_override
+	bool HasPriv(const Anope::string &priv) const override
 	{
 		for (std::vector<Anope::string>::iterator it = std::find(order.begin(), order.end(), this->type); it != order.end(); ++it)
 		{
@@ -37,12 +37,12 @@ class XOPChanAccess : public ChanAccess
 		return false;
 	}
 
-	Anope::string AccessSerialize() const anope_override
+	Anope::string AccessSerialize() const override
 	{
 		return this->type;
 	}
 
-	void AccessUnserialize(const Anope::string &data) anope_override
+	void AccessUnserialize(const Anope::string &data) override
 	{
 		this->type = data;
 	}
@@ -58,37 +58,40 @@ class XOPChanAccess : public ChanAccess
 		{
 			std::map<Anope::string, int> count;
 
-			for (std::map<Anope::string, std::vector<Anope::string> >::const_iterator it = permissions.begin(), it_end = permissions.end(); it != it_end; ++it)
+			for (const auto &[name, perms] : permissions)
 			{
-				int &c = count[it->first];
-				const std::vector<Anope::string> &perms = it->second;
-				for (unsigned i = 0; i < perms.size(); ++i)
-					if (access->HasPriv(perms[i]))
+				int &c = count[name];
+				for (const auto &perm : perms)
+				{
+					if (access->HasPriv(perm))
 						++c;
+				}
 			}
 
-			Anope::string max;
-			int maxn = 0;
-			for (std::map<Anope::string, int>::iterator it = count.begin(), it_end = count.end(); it != it_end; ++it)
-				if (it->second > maxn)
+			Anope::string maxname;
+			int maxpriv = 0;
+			for (const auto &[name, priv] : count)
+			{
+				if (priv > maxpriv)
 				{
-					maxn = it->second;
-					max = it->first;
+					maxname = name;
+					maxpriv = priv;
 				}
+			}
 
-			return max;
+			return maxname;
 		}
 	}
 };
 
 class XOPAccessProvider : public AccessProvider
 {
- public:
+public:
 	XOPAccessProvider(Module *o) : AccessProvider(o, "access/xop")
 	{
 	}
 
-	ChanAccess *Create() anope_override
+	ChanAccess *Create() override
 	{
 		return new XOPChanAccess(this);
 	}
@@ -96,10 +99,11 @@ class XOPAccessProvider : public AccessProvider
 
 class CommandCSXOP : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params.size() > 2 ? params[2] : "";
+		Anope::string description = params.size() > 3 ? params[3] : "";
 
 		if (mask.empty())
 		{
@@ -162,6 +166,12 @@ class CommandCSXOP : public Command
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
 			}
+			else if (na && na->nc->HasExt("NEVEROP"))
+			{
+				source.Reply(_("\002%s\002 does not wish to be added to channel access lists."),
+					na->nc->display.c_str());
+				return;
+			}
 			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
 			{
 				User *targ = User::Find(mask, true);
@@ -208,6 +218,7 @@ class CommandCSXOP : public Command
 		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(provider->Create());
 		acc->SetMask(mask, ci);
 		acc->creator = source.GetNick();
+		acc->description = description;
 		acc->type = source.command.upper();
 		acc->last_seen = 0;
 		acc->created = Anope::CurTime;
@@ -246,7 +257,12 @@ class CommandCSXOP : public Command
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
 
-		if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos && !NickAlias::Find(mask))
+		const NickAlias *na = NickAlias::Find(mask);
+		if (na && na->nc)
+		{
+			mask = na->nc->display;
+		}
+		else if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos)
 		{
 			User *targ = User::Find(mask, true);
 			if (targ != NULL)
@@ -280,15 +296,15 @@ class CommandCSXOP : public Command
 				CommandSource &source;
 				ChannelInfo *ci;
 				Command *c;
-				unsigned deleted;
+				unsigned deleted = 0;
 				Anope::string nicks;
 				bool override;
-			 public:
-				XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), override(_override)
+			public:
+				XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), override(_override)
 				{
 				}
 
-				~XOPDelCallback()
+				~XOPDelCallback() override
 				{
 					if (!deleted)
 						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
@@ -303,7 +319,7 @@ class CommandCSXOP : public Command
 					}
 				}
 
-				void HandleNumber(unsigned number) anope_override
+				void HandleNumber(unsigned number) override
 				{
 					if (!number || number > ci->GetAccessCount())
 						return;
@@ -374,7 +390,7 @@ class CommandCSXOP : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Mask"));
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Description"));
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
@@ -383,12 +399,12 @@ class CommandCSXOP : public Command
 				ListFormatter &list;
 				ChannelInfo *ci;
 				CommandSource &source;
-			 public:
+			public:
 				XOPListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist, CommandSource &src) : NumberList(numlist, false), list(_list), ci(_ci), source(src)
 				{
 				}
 
-				void HandleNumber(unsigned Number) anope_override
+				void HandleNumber(unsigned Number) override
 				{
 					if (!Number || Number > ci->GetAccessCount())
 						return;
@@ -401,6 +417,7 @@ class CommandCSXOP : public Command
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(Number);
 					entry["Mask"] = a->Mask();
+					entry["Description"] = a->description;
 					this->list.AddEntry(entry);
 				}
 			} nl_list(list, ci, nick, source);
@@ -420,6 +437,7 @@ class CommandCSXOP : public Command
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
 				entry["Mask"] = a->Mask();
+				entry["Description"] = a->description;
 				list.AddEntry(entry);
 			}
 		}
@@ -432,8 +450,8 @@ class CommandCSXOP : public Command
 			list.Process(replies);
 
 			source.Reply(_("%s list for %s"), source.command.c_str(), ci->name.c_str());
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 	}
 
@@ -475,21 +493,21 @@ class CommandCSXOP : public Command
 		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.c_str());
 	}
 
- public:
+public:
 	CommandCSXOP(Module *modname) : Command(modname, "chanserv/xop", 2, 4)
 	{
-		this->SetSyntax(_("\037channel\037 ADD \037mask\037"));
+		this->SetSyntax(_("\037channel\037 ADD \037mask\037 [\037description\037]"));
 		this->SetSyntax(_("\037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037list\037]"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.upper().c_str());
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
@@ -513,7 +531,7 @@ class CommandCSXOP : public Command
 	}
 
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		const Anope::string &cmd = source.command.upper();
 
@@ -524,9 +542,9 @@ class CommandCSXOP : public Command
 				" "), cmd.c_str(), cmd.c_str());
 
 		Anope::string buf;
-		for (unsigned i = 0; i < permissions[cmd].size(); ++i)
+		for (const auto &permission : permissions[cmd])
 		{
-			buf += ", " + permissions[cmd][i];
+			buf += ", " + permission;
 			if (buf.length() > 75)
 			{
 				source.Reply("  %s\n", buf.substr(2).c_str());
@@ -565,7 +583,7 @@ class CommandCSXOP : public Command
 		if (!access_cmd.empty() || !flags_cmd.empty())
 		{
 			source.Reply(_("Alternative methods of modifying channel access lists are\n"
-					"available. "));
+					"available."));
 			if (!access_cmd.empty())
 				source.Reply(_("See \002%s%s HELP %s\002 for more information\n"
 						"about the access list."), Config->StrictPrivmsg.c_str(), access_bi->nick.c_str(), access_cmd.c_str());
@@ -582,7 +600,7 @@ class CSXOP : public Module
 	XOPAccessProvider accessprovider;
 	CommandCSXOP commandcsxop;
 
- public:
+public:
 	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		accessprovider(this), commandcsxop(this)
 	{
@@ -590,7 +608,7 @@ class CSXOP : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		order.clear();
 		permissions.clear();

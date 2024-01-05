@@ -1,6 +1,6 @@
 /* Modular support
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -11,7 +11,7 @@
 #include "language.h"
 #include "account.h"
 
-#ifdef GETTEXT_FOUND
+#if HAVE_LOCALIZATION
 # include <libintl.h>
 #endif
 
@@ -39,12 +39,12 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 
 	ModuleManager::Modules.push_back(this);
 
-#if GETTEXT_FOUND
-	for (unsigned i = 0; i < Language::Languages.size(); ++i)
+#if HAVE_LOCALIZATION
+	for (const auto &language : Language::Languages)
 	{
 		/* Remove .UTF-8 or any other suffix */
 		Anope::string lang;
-		sepstream(Language::Languages[i], '.').GetToken(lang);
+		sepstream(language, '.').GetToken(lang);
 
 		if (Anope::IsFile(Anope::LocaleDir + "/" + lang + "/LC_MESSAGES/" + modname + ".mo"))
 		{
@@ -75,7 +75,7 @@ Module::~Module()
 	if (it != ModuleManager::Modules.end())
 		ModuleManager::Modules.erase(it);
 
-#if GETTEXT_FOUND
+#if HAVE_LOCALIZATION
 	std::vector<Anope::string>::iterator dit = std::find(Language::Domains.begin(), Language::Domains.end(), this->name);
 	if (dit != Language::Domains.end())
 		Language::Domains.erase(dit);

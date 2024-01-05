@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,25 +18,23 @@ struct Blacklist
 {
 	struct Reply
 	{
-		int code;
+		int code = 0;
 		Anope::string reason;
-		bool allow_account;
+		bool allow_account = false;
 
-		Reply() : code(0), allow_account(false) { }
+		Reply() = default;
 	};
 
 	Anope::string name;
-	time_t bantime;
+	time_t bantime = 0;
 	Anope::string reason;
 	std::vector<Reply> replies;
 
-	Blacklist() : bantime(0) { }
-
-	Reply *Find(int code)
+	const Reply *Find(int code)
 	{
-		for (unsigned int i = 0; i < replies.size(); ++i)
-			if (replies[i].code == code)
-				return &replies[i];
+		for (const auto &reply : replies)
+			if (reply.code == code)
+				return &reply;
 		return NULL;
 	}
 };
@@ -47,10 +45,10 @@ class DNSBLResolver : public Request
 	Blacklist blacklist;
 	bool add_to_akill;
 
- public:
+public:
 	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : Request(dnsmanager, c, host, QUERY_A, true), user(u), blacklist(b), add_to_akill(add_akill) { }
 
-	void OnLookupComplete(const Query *record) anope_override
+	void OnLookupComplete(const Query *record) override
 	{
 		if (!user || user->Quitting())
 			return;
@@ -64,7 +62,7 @@ class DNSBLResolver : public Request
 		sresult.pton(AF_INET, ans_record.rdata);
 		int result = sresult.sa4.sin_addr.s_addr >> 24;
 
-		Blacklist::Reply *reply = blacklist.Find(result);
+		const Blacklist::Reply *reply = blacklist.Find(result);
 		if (!blacklist.replies.empty() && !reply)
 			return;
 
@@ -104,13 +102,13 @@ class ModuleDNSBL : public Module
 	bool check_on_netburst;
 	bool add_to_akill;
 
- public:
+public:
 	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
 	{
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		this->check_on_connect = block->Get<bool>("check_on_connect");
@@ -152,7 +150,7 @@ class ModuleDNSBL : public Module
 		}
 	}
 
-	void OnUserConnect(User *user, bool &exempt) anope_override
+	void OnUserConnect(User *user, bool &exempt) override
 	{
 		if (exempt || user->Quitting() || (!this->check_on_connect && !Me->IsSynced()) || !dnsmanager)
 			return;
@@ -175,10 +173,8 @@ class ModuleDNSBL : public Module
 
 		Anope::string reverse = user->ip.reverse();
 
-		for (unsigned i = 0; i < this->blacklists.size(); ++i)
+		for (const auto &b : this->blacklists)
 		{
-			const Blacklist &b = this->blacklists[i];
-
 			Anope::string dnsbl_host = reverse + "." + b.name;
 			DNSBLResolver *res = NULL;
 			try

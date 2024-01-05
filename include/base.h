@@ -1,13 +1,12 @@
 /*
  *
  * (C) 2008-2011 Adam <Adam@anope.org>
- * (C) 2008-2021 Anope Team <team@anope.org>
+ * (C) 2008-2024 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef BASE_H
-#define BASE_H
+#pragma once
 
 #include "services.h"
 
@@ -16,9 +15,8 @@
 class CoreExport Base
 {
 	/* References to this base class */
-	std::set<ReferenceBase *> *references;
- public:
-	Base();
+	std::set<ReferenceBase *> *references = nullptr;
+public:
 	virtual ~Base();
 
 	/** Adds a reference to this object. Eg, when a Reference
@@ -32,12 +30,12 @@ class CoreExport Base
 
 class ReferenceBase
 {
- protected:
-	bool invalid;
- public:
-	ReferenceBase() : invalid(false) { }
+protected:
+	bool invalid = false;
+public:
+	ReferenceBase() = default;
 	ReferenceBase(const ReferenceBase &other) : invalid(other.invalid) { }
-	virtual ~ReferenceBase() { }
+	virtual ~ReferenceBase() = default;
 	inline void Invalidate() { this->invalid = true; }
 };
 
@@ -47,12 +45,10 @@ class ReferenceBase
 template<typename T>
 class Reference : public ReferenceBase
 {
- protected:
-	T *ref;
- public:
-	Reference() : ref(NULL)
-	{
-	}
+protected:
+	T *ref = nullptr;
+public:
+	Reference() = default;
 
 	Reference(T *obj) : ref(obj)
 	{
@@ -139,5 +135,3 @@ class Reference : public ReferenceBase
 		return false;
 	}
 };
-
-#endif // BASE_H

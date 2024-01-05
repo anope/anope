@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,14 +18,14 @@ namespace
 
 class CommandMSRSend : public Command
 {
- public:
+public:
 	CommandMSRSend(Module *creator) : Command(creator, "memoserv/rsend", 2, 2)
 	{
 		this->SetDesc(_("Sends a memo and requests a read receipt"));
 		this->SetSyntax(_("{\037nick\037 | \037channel\037} \037memo-text\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!memoserv)
 			return;
@@ -73,16 +73,16 @@ class CommandMSRSend : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Sends the named \037nick\037 or \037channel\037 a memo containing\n"
 				"\037memo-text\037. When sending to a nickname, the recipient will\n"
-				"receive a notice that he/she has a new memo. The target\n"
+				"receive a notice that they have a new memo. The target\n"
 				"nickname/channel must be registered.\n"
 				"Once the memo is read by its recipient, an automatic notification\n"
-				"memo will be sent to the sender informing him/her that the memo\n"
+				"memo will be sent to the sender informing them that the memo\n"
 				"has been read."));
 		return true;
 	}
@@ -92,7 +92,7 @@ class MSRSend : public Module
 {
 	CommandMSRSend commandmsrsend;
 
- public:
+public:
 	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsrsend(this)
 	{

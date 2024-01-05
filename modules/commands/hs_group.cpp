@@ -1,6 +1,6 @@
 /* HostServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,9 +13,9 @@
 
 class CommandHSGroup : public Command
 {
-	bool setting;
+	bool setting = false;
 
- public:
+public:
 	void Sync(const NickAlias *na)
 	{
 		if (setting)
@@ -25,9 +25,8 @@ class CommandHSGroup : public Command
 			return;
 
 		setting = true;
-		for (unsigned i = 0; i < na->nc->aliases->size(); ++i)
+		for (auto *nick : *na->nc->aliases)
 		{
-			NickAlias *nick = na->nc->aliases->at(i);
 			if (nick)
 			{
 				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
@@ -37,12 +36,12 @@ class CommandHSGroup : public Command
 		setting = false;
 	}
 
-	CommandHSGroup(Module *creator) : Command(creator, "hostserv/group", 0, 0), setting(false)
+	CommandHSGroup(Module *creator) : Command(creator, "hostserv/group", 0, 0)
 	{
 		this->SetDesc(_("Syncs the vhost for all nicks in a group"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -65,7 +64,7 @@ class CommandHSGroup : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -82,7 +81,7 @@ class HSGroup : public Module
 	bool syncongroup;
 	bool synconset;
 
- public:
+public:
 	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsgroup(this)
 	{
@@ -90,7 +89,7 @@ class HSGroup : public Module
 			throw ModuleException("Your IRCd does not support vhosts");
 	}
 
-	void OnSetVhost(NickAlias *na) anope_override
+	void OnSetVhost(NickAlias *na) override
 	{
 		if (!synconset)
 			return;
@@ -98,7 +97,7 @@ class HSGroup : public Module
 		commandhsgroup.Sync(na);
 	}
 
-	void OnNickGroup(User *u, NickAlias *na) anope_override
+	void OnNickGroup(User *u, NickAlias *na) override
 	{
 		if (!syncongroup)
 			return;
@@ -106,7 +105,7 @@ class HSGroup : public Module
 		commandhsgroup.Sync(na);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		syncongroup = block->Get<bool>("syncongroup");

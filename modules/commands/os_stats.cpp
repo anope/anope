@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -21,7 +21,7 @@ struct Stats : Serializable
 		me = this;
 	}
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["maxusercnt"] << MaxUserCount;
 		data["maxusertime"] << MaxUserTime;
@@ -50,8 +50,10 @@ static int stats_count_servers(Server *s)
 	int count = 1;
 
 	if (!s->GetLinks().empty())
-		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
-			count += stats_count_servers(s->GetLinks()[i]);
+	{
+		for (auto *link : s->GetLinks())
+			count += stats_count_servers(link);
+	}
 
 	return count;
 }
@@ -59,7 +61,7 @@ static int stats_count_servers(Server *s)
 class CommandOSStats : public Command
 {
 	ServiceReference<XLineManager> akills, snlines, sqlines;
- private:
+private:
 	void DoStatsAkill(CommandSource &source)
 	{
 		int timeout;
@@ -145,8 +147,8 @@ class CommandOSStats : public Command
 	void DoStatsUplink(CommandSource &source)
 	{
 		Anope::string buf;
-		for (std::set<Anope::string>::iterator it = Servers::Capab.begin(); it != Servers::Capab.end(); ++it)
-			buf += " " + *it;
+		for (const auto &capab : Servers::Capab)
+			buf += " " + capab;
 		if (!buf.empty())
 			buf.erase(buf.begin());
 
@@ -196,15 +198,15 @@ class CommandOSStats : public Command
 		}
 	}
 
- public:
+public:
 	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1),
 		akills("XLineManager", "xlinemanager/sgline"), snlines("XLineManager", "xlinemanager/snline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
-		this->SetDesc(_("Show status of Services and network"));
+		this->SetDesc(_("Show status of services and network"));
 		this->SetSyntax("[AKILL | HASH | UPLINK | UPTIME | ALL | RESET]");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string extra = !params.empty() ? params[0] : "";
 
@@ -229,13 +231,13 @@ class CommandOSStats : public Command
 			source.Reply(_("Unknown STATS option: \002%s\002"), extra.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Without any option, shows the current number of users online,\n"
-				"and the highest number of users online since Services was\n"
-				"started, and the length of time Services has been running.\n"
+				"and the highest number of users online since services was\n"
+				"started, and the length of time services has been running.\n"
 				" \n"
 				"With the \002AKILL\002 option, displays the current size of the\n"
 				"AKILL list and the current default expiry time.\n"
@@ -259,14 +261,14 @@ class OSStats : public Module
 	Serialize::Type stats_type;
 	Stats stats_saver;
 
- public:
+public:
 	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosstats(this), stats_type("Stats", Stats::Unserialize)
 	{
 
 	}
 
-	void OnUserConnect(User *u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (UserListByNick.size() == MaxUserCount && Anope::CurTime == MaxUserTime)
 			stats_saver.QueueUpdate();

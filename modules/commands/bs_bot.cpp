@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@
 
 class CommandBSBot : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &nick = params[1];
@@ -263,7 +263,7 @@ class CommandBSBot : public Command
 		delete bi;
 		return;
 	}
- public:
+public:
 	CommandBSBot(Module *creator) : Command(creator, "botserv/bot", 1, 6)
 	{
 		this->SetDesc(_("Maintains network bot list"));
@@ -272,7 +272,7 @@ class CommandBSBot : public Command
 		this->SetSyntax(_("\002DEL \037nick\037\002"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -345,7 +345,7 @@ class CommandBSBot : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -374,7 +374,7 @@ class BSBot : public Module
 {
 	CommandBSBot commandbsbot;
 
- public:
+public:
 	BSBot(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsbot(this)
 	{

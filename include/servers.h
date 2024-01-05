@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SERVERS_H
-#define SERVERS_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -40,7 +39,7 @@ namespace Servers
  */
 class CoreExport Server : public Extensible
 {
- private:
+private:
 	/* Server name */
 	Anope::string name;
 	/* Hops between services and server */
@@ -62,7 +61,7 @@ class CoreExport Server : public Extensible
 	/* Reason this server was quit */
 	Anope::string quit_reason;
 
- public:
+public:
 	/** Constructor
 	 * @param uplink The uplink this server is from, is only NULL when creating Me
 	 * @param name The server name
@@ -73,14 +72,14 @@ class CoreExport Server : public Extensible
 	 */
 	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid = "", bool jupe = false);
 
- private:
+private:
 	/** Destructor
 	 */
 	~Server();
 
- public:
+public:
 	/* Number of users on the server */
-	unsigned users;
+	unsigned users = 0;
 
 	/** Delete this server with a reason
 	 * @param reason The reason
@@ -170,7 +169,7 @@ class CoreExport Server : public Extensible
 	 */
 	bool IsQuitting() const;
 
-	/** Send a message to alll users on this server
+	/** Send a message to all users on this server
 	 * @param source The source of the message
 	 * @param message The message
 	 */
@@ -183,5 +182,3 @@ class CoreExport Server : public Extensible
 	 */
 	static Server *Find(const Anope::string &name, bool name_only = false);
 };
-
-#endif // SERVERS_H

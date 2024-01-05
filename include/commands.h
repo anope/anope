@@ -1,6 +1,6 @@
 /* Declarations for command data.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef COMMAND_H
-#define COMMAND_H
+#pragma once
 
 #include "service.h"
 #include "anope.h"
@@ -26,8 +25,6 @@ struct CommandInfo
 {
 	typedef Anope::map<CommandInfo> map;
 
-	CommandInfo() : hide(false), prepend_channel(false) { }
-
 	/* Service name of the command */
 	Anope::string name;
 	/* Permission required to execute the command */
@@ -35,17 +32,17 @@ struct CommandInfo
 	/* Group this command is in */
 	Anope::string group;
 	/* whether or not to hide this command in help output */
-	bool hide;
+	bool hide = false;
 	/* Only used with fantasy */
-	bool prepend_channel;
+	bool prepend_channel = false;
 };
 
-/* Where the replies from commands go to. User inheits from this and is the normal
+/* Where the replies from commands go to. User inherits from this and is the normal
  * source of a CommandReply
  */
 struct CoreExport CommandReply
 {
-	virtual ~CommandReply() { }
+	virtual ~CommandReply() = default;
 	virtual void SendMessage(BotInfo *source, const Anope::string &msg) = 0;
 };
 
@@ -56,7 +53,7 @@ class CoreExport CommandSource
 	Anope::string nick;
 	/* User executing the command, may be NULL */
 	Reference<User> u;
- public:
+public:
 	/* The account executing the command */
 	Reference<NickCore> nc;
 	/* for web clients */
@@ -100,8 +97,8 @@ class CoreExport Command : public Service
 	/* Command requires that a user is executing it */
 	bool require_user;
 
- public:
-	/* Maximum paramaters accepted by this command */
+public:
+	/* Maximum parameters accepted by this command */
 	size_t max_params;
 	/* Minimum parameters required to use this command */
 	size_t min_params;
@@ -109,7 +106,7 @@ class CoreExport Command : public Service
 	/* Module which owns us */
 	Module *module;
 
- protected:
+protected:
 	/** Create a new command.
 	 * @param owner The owner of the command
 	 * @param sname The command name
@@ -119,10 +116,10 @@ class CoreExport Command : public Service
 	 */
 	Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params = 0);
 
- public:
-	virtual ~Command();
+public:
+	virtual ~Command() = default;
 
- protected:
+protected:
 	void SetDesc(const Anope::string &d);
 
 	void ClearSyntax();
@@ -132,7 +129,7 @@ class CoreExport Command : public Service
 	void AllowUnregistered(bool b);
 	void RequireUser(bool b);
 
- public:
+public:
 	bool AllowUnregistered() const;
 	bool RequireUser() const;
 
@@ -148,7 +145,7 @@ class CoreExport Command : public Service
 	 */
 	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
-	/** Called when HELP is requsted for the client this command is on.
+	/** Called when HELP is requested for the client this command is on.
 	 * @param source The source
 	 */
 	virtual void OnServHelp(CommandSource &source);
@@ -178,10 +175,8 @@ class CoreExport Command : public Service
 	 * Note that if the same command exists multiple places this will return the first one encountered
 	 * @param command_service The command service to lookup, eg, nickserv/register
 	 * @param bot If found, is set to the bot the command is on, eg NickServ
-	 * @param name If found, is set to the comand name, eg REGISTER
+	 * @param name If found, is set to the command name, eg REGISTER
 	 * @return true if the given command service exists
 	 */
 	static bool FindCommandFromService(const Anope::string &command_service, BotInfo* &bi, Anope::string &name);
 };
-
-#endif // COMMANDS_H

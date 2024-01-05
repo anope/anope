@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,23 +13,21 @@
 
 class CommandBSBotList : public Command
 {
- public:
+public:
 	CommandBSBotList(Module *creator) : Command(creator, "botserv/botlist", 0, 0)
 	{
 		this->SetDesc(_("Lists available bots"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		unsigned count = 0;
 		ListFormatter list(source.GetAccount());
 
 		list.AddColumn(_("Nick")).AddColumn(_("Mask"));
 
-		for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+		for (const auto &[_, bi] : *BotListByNick)
 		{
-			BotInfo *bi = it->second;
-
 			if (source.HasPriv("botserv/administration") || !bi->oper_only)
 			{
 				++count;
@@ -50,14 +48,14 @@ class CommandBSBotList : public Command
 		{
 			source.Reply(_("Bot list:"));
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("%d bots available."), count);
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -71,7 +69,7 @@ class BSBotList : public Module
 {
 	CommandBSBotList commandbsbotlist;
 
- public:
+public:
 	BSBotList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsbotlist(this)
 	{

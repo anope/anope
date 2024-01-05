@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,7 +15,7 @@ static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi);
 
 class CommandNSResetPass : public Command
 {
- public:
+public:
 	CommandNSResetPass(Module *creator) : Command(creator, "nickserv/resetpass", 2, 2)
 	{
 		this->SetDesc(_("Helps you reset lost passwords"));
@@ -23,7 +23,7 @@ class CommandNSResetPass : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const NickAlias *na;
 
@@ -43,7 +43,7 @@ class CommandNSResetPass : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -65,7 +65,7 @@ class NSResetPass : public Module
 	CommandNSResetPass commandnsresetpass;
 	PrimitiveExtensibleItem<ResetInfo> reset;
 
- public:
+public:
 	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsresetpass(this), reset(this, "reset")
 	{
@@ -73,7 +73,7 @@ class NSResetPass : public Module
 			throw ModuleException("Not using mail.");
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		if (command->name == "nickserv/confirm" && params.size() > 1)
 		{
@@ -105,8 +105,9 @@ class NSResetPass : public Module
 					if (source.GetUser())
 					{
 						source.GetUser()->Identify(na);
-						source.Reply(_("You are now identified for your nick. Change your password now."));
 					}
+
+					source.Reply(_("You are now identified for your nick. Change your password now."));
 				}
 				else
 					return EVENT_CONTINUE;

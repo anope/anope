@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2011-2021 Anope Team
+ * (C) 2011-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -21,7 +21,7 @@ using namespace SQL;
  */
 class SQLiteResult : public Result
 {
- public:
+public:
 	SQLiteResult(unsigned int i, const Query &q, const Anope::string &fq) : Result(i, q, fq)
 	{
 	}
@@ -44,35 +44,35 @@ class SQLiteService : public Provider
 
 	Anope::string database;
 
-	sqlite3 *sql;
+	sqlite3 *sql = nullptr;
 
 	Anope::string Escape(const Anope::string &query);
 
- public:
+public:
 	SQLiteService(Module *o, const Anope::string &n, const Anope::string &d);
 
 	~SQLiteService();
 
-	void Run(Interface *i, const Query &query) anope_override;
+	void Run(Interface *i, const Query &query) override;
 
-	Result RunQuery(const Query &query);
+	Result RunQuery(const Query &query) override;
 
-	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) anope_override;
+	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) override;
 
-	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data);
+	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) override;
 
-	Query GetTables(const Anope::string &prefix);
+	Query GetTables(const Anope::string &prefix) override;
 
 	Anope::string BuildQuery(const Query &q);
 
-	Anope::string FromUnixtime(time_t);
+	Anope::string FromUnixtime(time_t) override;
 };
 
 class ModuleSQLite : public Module
 {
 	/* SQL connections */
 	std::map<Anope::string, SQLiteService *> SQLiteServices;
- public:
+public:
 	ModuleSQLite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 	}
@@ -84,7 +84,7 @@ class ModuleSQLite : public Module
 		SQLiteServices.clear();
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
@@ -134,7 +134,7 @@ class ModuleSQLite : public Module
 };
 
 SQLiteService::SQLiteService(Module *o, const Anope::string &n, const Anope::string &d)
-: Provider(o, n), database(d), sql(NULL)
+: Provider(o, n), database(d)
 {
 	int db = sqlite3_open_v2(database.c_str(), &this->sql, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
 	if (db != SQLITE_OK)
@@ -200,7 +200,7 @@ Result SQLiteService::RunQuery(const Query &query)
 	if (err != SQLITE_DONE)
 		return SQLiteResult(query, real_query, sqlite3_errmsg(this->sql));
 
-	return result;
+	return std::move(result);
 }
 
 std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const Data &data)
@@ -226,12 +226,12 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const 
 	{
 		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` INTEGER PRIMARY KEY, `timestamp` timestamp DEFAULT CURRENT_TIMESTAMP";
 
-		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (const auto &[column, _] : data.data)
 		{
-			known_cols.insert(it->first);
+			known_cols.insert(column);
 
-			query_text += ", `" + it->first + "` ";
-			if (data.GetType(it->first) == Serialize::Data::DT_INT)
+			query_text += ", `" + column + "` ";
+			if (data.GetType(column) == Serialize::Data::DT_INT)
 				query_text += "int(11)";
 			else
 				query_text += "text";
@@ -251,21 +251,23 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const 
 		queries.push_back(query_text);
 	}
 	else
-		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+	{
+		for (const auto &[column, _] : data.data)
 		{
-			if (known_cols.count(it->first) > 0)
+			if (known_cols.count(column) > 0)
 				continue;
 
-			known_cols.insert(it->first);
+			known_cols.insert(column);
 
-			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
-			if (data.GetType(it->first) == Serialize::Data::DT_INT)
+			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` ";
+			if (data.GetType(column) == Serialize::Data::DT_INT)
 				query_text += "int(11)";
 			else
 				query_text += "text";
 
 			queries.push_back(query_text);
 		}
+	}
 
 	return queries;
 }
@@ -273,31 +275,32 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const 
 Query SQLiteService::BuildInsert(const Anope::string &table, unsigned int id, Data &data)
 {
 	/* Empty columns not present in the data set */
-	const std::set<Anope::string> &known_cols = this->active_schema[table];
-	for (std::set<Anope::string>::iterator it = known_cols.begin(), it_end = known_cols.end(); it != it_end; ++it)
-		if (*it != "id" && *it != "timestamp" && data.data.count(*it) == 0)
-			data[*it] << "";
+	for (const auto &known_col : this->active_schema[table])
+	{
+		if (known_col != "id" && known_col != "timestamp" && data.data.count(known_col) == 0)
+			data[known_col] << "";
+	}
 
 	Anope::string query_text = "REPLACE INTO `" + table + "` (";
 	if (id > 0)
 		query_text += "`id`,";
-	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
-		query_text += "`" + it->first + "`,";
+	for (const auto &[field, _] : data.data)
+		query_text += "`" + field + "`,";
 	query_text.erase(query_text.length() - 1);
 	query_text += ") VALUES (";
 	if (id > 0)
 		query_text += stringify(id) + ",";
-	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
-		query_text += "@" + it->first + "@,";
+	for (const auto &[field, _] : data.data)
+		query_text += "@" + field + "@,";
 	query_text.erase(query_text.length() - 1);
 	query_text += ")";
 
 	Query query(query_text);
-	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+	for (auto &[field, value] : data.data)
 	{
 		Anope::string buf;
-		*it->second >> buf;
-		query.SetValue(it->first, buf);
+		*value >> buf;
+		query.SetValue(field, buf);
 	}
 
 	return query;
@@ -320,8 +323,8 @@ Anope::string SQLiteService::BuildQuery(const Query &q)
 {
 	Anope::string real_query = q.query;
 
-	for (std::map<Anope::string, QueryData>::const_iterator it = q.parameters.begin(), it_end = q.parameters.end(); it != it_end; ++it)
-		real_query = real_query.replace_all_cs("@" + it->first + "@", (it->second.escape ? ("'" + this->Escape(it->second.data) + "'") : it->second.data));
+	for (const auto &[name, value] : q.parameters)
+		real_query = real_query.replace_all_cs("@" + name + "@", (value.escape ? ("'" + this->Escape(value.data) + "'") : value.data));
 
 	return real_query;
 }

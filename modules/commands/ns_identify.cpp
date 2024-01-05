@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,10 +16,10 @@ class NSIdentifyRequest : public IdentifyRequest
 	CommandSource source;
 	Command *cmd;
 
- public:
+public:
 	NSIdentifyRequest(Module *o, CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(o, acc, pass), source(s), cmd(c) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		if (!source.GetUser())
 			return;
@@ -40,7 +40,7 @@ class NSIdentifyRequest : public IdentifyRequest
 		}
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		if (source.GetUser())
 		{
@@ -59,7 +59,7 @@ class NSIdentifyRequest : public IdentifyRequest
 
 class CommandNSIdentify : public Command
 {
- public:
+public:
 	CommandNSIdentify(Module *creator) : Command(creator, "nickserv/identify", 1, 2)
 	{
 		this->SetDesc(_("Identify yourself with your password"));
@@ -68,7 +68,7 @@ class CommandNSIdentify : public Command
 		this->RequireUser(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
 
@@ -100,7 +100,7 @@ class CommandNSIdentify : public Command
 		req->Dispatch();
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -117,7 +117,7 @@ class NSIdentify : public Module
 {
 	CommandNSIdentify commandnsidentify;
 
- public:
+public:
 	NSIdentify(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsidentify(this)
 	{

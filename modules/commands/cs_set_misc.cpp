@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -42,7 +42,7 @@ struct CSMiscData : MiscData, Serializable
 		data = d;
 	}
 
-	void Serialize(Serialize::Data &sdata) const anope_override
+	void Serialize(Serialize::Data &sdata) const override
 	{
 		sdata["ci"] << this->object;
 		sdata["name"] << this->name;
@@ -90,13 +90,13 @@ static Anope::string GetAttribute(const Anope::string &command)
 
 class CommandCSSetMisc : public Command
 {
- public:
+public:
 	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 2)
 	{
 		this->SetSyntax(_("\037channel\037 [\037parameters\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -143,7 +143,7 @@ class CommandCSSetMisc : public Command
 		}
 	}
 
-	void OnServHelp(CommandSource &source) anope_override
+	void OnServHelp(CommandSource &source) override
 	{
 		if (descriptions.count(source.command))
 		{
@@ -152,7 +152,7 @@ class CommandCSSetMisc : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (descriptions.count(source.command))
 		{
@@ -169,20 +169,20 @@ class CSSetMisc : public Module
 	CommandCSSetMisc commandcssetmisc;
 	Serialize::Type csmiscdata_type;
 
- public:
+public:
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcssetmisc(this), csmiscdata_type("CSMiscData", CSMiscData::Unserialize)
 	{
 		me = this;
 	}
 
-	~CSSetMisc()
+	~CSSetMisc() override
 	{
-		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
-			delete it->second;
+		for (const auto &[_, item] : items)
+			delete item;
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		descriptions.clear();
 
@@ -203,11 +203,10 @@ class CSSetMisc : public Module
 		}
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool) override
 	{
-		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
+		for (const auto &[_, e] : items)
 		{
-			ExtensibleItem<CSMiscData> *e = it->second;
 			MiscData *data = e->Get(ci);
 
 			if (data != NULL)

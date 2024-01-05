@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,13 +13,13 @@
 
 class CommandOSReload : public Command
 {
- public:
+public:
 	CommandOSReload(Module *creator) : Command(creator, "operserv/reload", 0, 0)
 	{
 		this->SetDesc(_("Reload services' configuration file"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		try
 		{
@@ -40,13 +40,13 @@ class CommandOSReload : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes Services to reload the configuration file. Note that\n"
-				"some directives still need the restart of the Services to\n"
-				"take effect (such as Services' nicknames, activation of the\n"
+		source.Reply(_("Causes services to reload the configuration file. Note that\n"
+				"some directives still need the restart of the services to\n"
+				"take effect (such as services' nicknames, activation of the\n"
 				"session limitation, etc.)."));
 		return true;
 	}
@@ -56,7 +56,7 @@ class OSReload : public Module
 {
 	CommandOSReload commandosreload;
 
- public:
+public:
 	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosreload(this)
 	{

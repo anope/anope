@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,17 +9,16 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#pragma once
 
 #include "anope.h"
 #include "defs.h"
 
 enum LogType
 {
-	/* Used whenever an administrator uses an administrative comand */
+	/* Used whenever an administrator uses an administrative command */
 	LOG_ADMIN,
-	/* Used whenever an administrator overides something, such as adding
+	/* Used whenever an administrator overrides something, such as adding
 	 * access to a channel where they don't have permission to.
 	 */
 	LOG_OVERRIDE,
@@ -51,25 +50,25 @@ struct LogFile
 /* Represents a single log message */
 class CoreExport Log
 {
- public:
+public:
 	/* Bot that should log this message */
-	BotInfo *bi;
+	BotInfo *bi = nullptr;
 	/* For commands, the user executing the command, but might not always exist */
-	User *u;
+	User *u = nullptr;
 	/* For commands, the account executing the command, but will not always exist */
-	NickCore *nc;
+	NickCore *nc = nullptr;
 	/* For commands, the command being executed */
-	Command *c;
+	Command *c = nullptr;
 	/* For commands, the command source */
-	CommandSource *source;
+	CommandSource *source = nullptr;
 	/* Used for LOG_CHANNEL */
-	Channel *chan;
+	Channel *chan = nullptr;
 	/* For commands, the channel the command was executed on, will not always exist */
-	const ChannelInfo *ci;
+	const ChannelInfo *ci = nullptr;
 	/* For LOG_SERVER */
-	Server *s;
+	Server *s = nullptr;
 	/* For LOG_MODULE */
-	Module *m;
+	Module *m = nullptr;
 	LogType type;
 	Anope::string category;
 
@@ -95,11 +94,11 @@ class CoreExport Log
 
 	~Log();
 
- private:
+private:
 	Anope::string FormatSource() const;
 	Anope::string FormatCommand() const;
 
- public:
+public:
 	Anope::string BuildPrefix() const;
 
 	template<typename T> Log &operator<<(T val)
@@ -112,11 +111,11 @@ class CoreExport Log
 /* Configured in the configuration file, actually does the message logging */
 class CoreExport LogInfo
 {
- public:
-	BotInfo *bot;
+public:
+	BotInfo *bot = nullptr;
 	std::vector<Anope::string> targets;
 	std::vector<LogFile *> logfiles;
-	int last_day;
+	int last_day = 0;
 	std::vector<Anope::string> sources;
 	int log_age;
 	std::vector<Anope::string> admin;
@@ -140,5 +139,3 @@ class CoreExport LogInfo
 	/* Logs the message l if configured to */
 	void ProcessMessage(const Log *l);
 };
-
-#endif // LOGGER_H

@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -20,8 +20,8 @@ struct KickerDataImpl : KickerData
 	KickerDataImpl(Extensible *obj)
 	{
 		amsgs = badwords = bolds = caps = colors = flood = italics = repeat = reverses = underlines = false;
-		for (int16_t i = 0; i < TTB_SIZE; ++i)
-			ttb[i] = 0;
+		for (auto &ttbtype : ttb)
+			ttbtype = 0;
 		capsmin = capspercent = 0;
 		floodlines = floodsecs = 0;
 		repeattimes = 0;
@@ -29,9 +29,9 @@ struct KickerDataImpl : KickerData
 		dontkickops = dontkickvoices = false;
 	}
 
-	void Check(ChannelInfo *ci) anope_override
+	void Check(ChannelInfo *ci) override
 	{
-		if (amsgs || badwords || bolds || caps || colors || flood || italics || repeat || reverses || underlines)
+		if (amsgs || badwords || bolds || caps || colors || flood || italics || repeat || reverses || underlines || dontkickops || dontkickvoices)
 			return;
 
 		ci->Shrink<KickerData>("kickerdata");
@@ -41,7 +41,7 @@ struct KickerDataImpl : KickerData
 	{
 		ExtensibleItem(Module *m, const Anope::string &ename) : ::ExtensibleItem<KickerDataImpl>(m, ename) { }
 
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
 			if (s->GetSerializableType()->GetName() != "ChannelInfo")
 				return;
@@ -67,11 +67,13 @@ struct KickerDataImpl : KickerData
 			data.SetType("floodlines", Serialize::Data::DT_INT); data["floodlines"] << kd->floodlines;
 			data.SetType("floodsecs", Serialize::Data::DT_INT); data["floodsecs"] << kd->floodsecs;
 			data.SetType("repeattimes", Serialize::Data::DT_INT); data["repeattimes"] << kd->repeattimes;
-			for (int16_t i = 0; i < TTB_SIZE; ++i)
-				data["ttb"] << kd->ttb[i] << " ";
+			data.SetType("dontkickops", Serialize::Data::DT_INT); data["dontkickops"] << kd->dontkickops;
+			data.SetType("dontkickvoices", Serialize::Data::DT_INT); data["dontkickvoices"] << kd->dontkickvoices;
+			for (auto ttbtype : kd->ttb)
+				data["ttb"] << ttbtype << " ";
 		}
 
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
 			if (s->GetSerializableType()->GetName() != "ChannelInfo")
 				return;
@@ -95,6 +97,8 @@ struct KickerDataImpl : KickerData
 			data["floodlines"] >> kd->floodlines;
 			data["floodsecs"] >> kd->floodsecs;
 			data["repeattimes"] >> kd->repeattimes;
+			data["dontkickops"] >> kd->dontkickops;
+			data["dontkickvoices"] >> kd->dontkickvoices;
 
 			Anope::string ttb, tok;
 			data["ttb"] >> ttb;
@@ -113,30 +117,27 @@ struct KickerDataImpl : KickerData
 
 class CommandBSKick : public Command
 {
- public:
+public:
 	CommandBSKick(Module *creator) : Command(creator, "botserv/kick", 0)
 	{
 		this->SetDesc(_("Configures kickers"));
 		this->SetSyntax(_("\037option\037 \037channel\037 {\037ON|OFF\037} [\037settings\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Configures bot kickers.  \037option\037 can be one of:"));
 
 		Anope::string this_name = source.command;
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto &[c_name, info] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
-
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				ServiceReference<Command> command("Command", info.name);
@@ -160,16 +161,16 @@ class CommandBSKick : public Command
 
 class CommandBSKickBase : public Command
 {
- public:
+public:
 	CommandBSKickBase(Module *creator, const Anope::string &cname, int minarg, int maxarg) : Command(creator, cname, minarg, maxarg)
 	{
 	}
 
-	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override = 0;
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override = 0;
 
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override = 0;
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 
- protected:
+protected:
 	bool CheckArguments(CommandSource &source, const std::vector<Anope::string> &params, ChannelInfo* &ci)
 	{
 		const Anope::string &chan = params[0];
@@ -245,14 +246,14 @@ class CommandBSKickBase : public Command
 
 class CommandBSKickAMSG : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickAMSG(Module *creator) : CommandBSKickBase(creator, "botserv/kick/amsg", 2, 3)
 	{
 		this->SetDesc(_("Configures AMSG kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -263,7 +264,7 @@ class CommandBSKickAMSG : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -281,14 +282,14 @@ class CommandBSKickAMSG : public CommandBSKickBase
 
 class CommandBSKickBadwords : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickBadwords(Module *creator) : CommandBSKickBase(creator, "botserv/kick/badwords", 2, 3)
 	{
 		this->SetDesc(_("Configures badwords kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -300,7 +301,7 @@ class CommandBSKickBadwords : public CommandBSKickBase
 
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -320,14 +321,14 @@ class CommandBSKickBadwords : public CommandBSKickBase
 
 class CommandBSKickBolds : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickBolds(Module *creator) : CommandBSKickBase(creator, "botserv/kick/bolds", 2, 3)
 	{
 		this->SetDesc(_("Configures bolds kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -338,7 +339,7 @@ class CommandBSKickBolds : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -354,14 +355,14 @@ class CommandBSKickBolds : public CommandBSKickBase
 
 class CommandBSKickCaps : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickCaps(Module *creator) : CommandBSKickBase(creator, "botserv/kick/caps", 2, 5)
 	{
 		this->SetDesc(_("Configures caps kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037min\037 [\037percent\037]]]\002"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (!CheckArguments(source, params, ci))
@@ -429,7 +430,7 @@ class CommandBSKickCaps : public CommandBSKickBase
 		kd->Check(ci);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -450,14 +451,14 @@ class CommandBSKickCaps : public CommandBSKickBase
 
 class CommandBSKickColors : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickColors(Module *creator) : CommandBSKickBase(creator, "botserv/kick/colors", 2, 3)
 	{
 		this->SetDesc(_("Configures color kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -468,7 +469,7 @@ class CommandBSKickColors : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -484,14 +485,14 @@ class CommandBSKickColors : public CommandBSKickBase
 
 class CommandBSKickFlood : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickFlood(Module *creator) : CommandBSKickBase(creator, "botserv/kick/flood", 2, 5)
 	{
 		this->SetDesc(_("Configures flood kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037ln\037 [\037secs\037]]]\002"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (!CheckArguments(source, params, ci))
@@ -564,7 +565,7 @@ class CommandBSKickFlood : public CommandBSKickBase
 		kd->Check(ci);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -582,14 +583,14 @@ class CommandBSKickFlood : public CommandBSKickBase
 
 class CommandBSKickItalics : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickItalics(Module *creator) : CommandBSKickBase(creator, "botserv/kick/italics", 2, 3)
 	{
 		this->SetDesc(_("Configures italics kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -600,7 +601,7 @@ class CommandBSKickItalics : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -616,14 +617,14 @@ class CommandBSKickItalics : public CommandBSKickBase
 
 class CommandBSKickRepeat : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickRepeat(Module *creator) : CommandBSKickBase(creator, "botserv/kick/repeat", 2, 4)
 	{
 		this->SetDesc(_("Configures repeat kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037num\037]]\002"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (!CheckArguments(source, params, ci))
@@ -699,7 +700,7 @@ class CommandBSKickRepeat : public CommandBSKickBase
 		kd->Check(ci);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -717,14 +718,14 @@ class CommandBSKickRepeat : public CommandBSKickBase
 
 class CommandBSKickReverses : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickReverses(Module *creator) : CommandBSKickBase(creator, "botserv/kick/reverses", 2, 3)
 	{
 		this->SetDesc(_("Configures reverses kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -735,7 +736,7 @@ class CommandBSKickReverses : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -751,14 +752,14 @@ class CommandBSKickReverses : public CommandBSKickBase
 
 class CommandBSKickUnderlines : public CommandBSKickBase
 {
- public:
+public:
 	CommandBSKickUnderlines(Module *creator) : CommandBSKickBase(creator, "botserv/kick/underlines", 2, 3)
 	{
 		this->SetDesc(_("Configures underlines kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -769,7 +770,7 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -785,14 +786,14 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 
 class CommandBSSetDontKickOps : public Command
 {
- public:
+public:
 	CommandBSSetDontKickOps(Module *creator, const Anope::string &sname = "botserv/set/dontkickops") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("To protect ops against bot kicks"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
@@ -837,7 +838,7 @@ class CommandBSSetDontKickOps : public Command
 		kd->Check(ci);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -850,14 +851,14 @@ class CommandBSSetDontKickOps : public Command
 
 class CommandBSSetDontKickVoices : public Command
 {
- public:
+public:
 	CommandBSSetDontKickVoices(Module *creator, const Anope::string &sname = "botserv/set/dontkickvoices") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("To protect voices against bot kicks"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
@@ -902,7 +903,7 @@ class CommandBSSetDontKickVoices : public Command
 		kd->Check(ci);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -924,16 +925,16 @@ struct BanData
 		Data()
 		{
 			last_use = 0;
-			for (int i = 0; i < TTB_SIZE; ++i)
-				this->ttb[i] = 0;
+			for (auto &ttbtype : this->ttb)
+				ttbtype = 0;
 		}
 	};
 
- private:
+private:
 	typedef Anope::map<Data> data_type;
 	data_type data_map;
 
- public:
+public:
 	BanData(Extensible *) { }
 
 	Data &get(const Anope::string &key)
@@ -986,17 +987,15 @@ struct UserData
 
 class BanDataPurger : public Timer
 {
- public:
+public:
 	BanDataPurger(Module *o) : Timer(o, 300, Anope::CurTime, true) { }
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		Log(LOG_DEBUG) << "bs_main: Running bandata purger";
 
-		for (channel_map::iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+		for (auto &[_, c] : ChannelList)
 		{
-			Channel *c = it->second;
-
 			BanData *bd = c->GetExt<BanData>("bandata");
 			if (bd != NULL)
 			{
@@ -1045,7 +1044,7 @@ class BSKick : public Module
 
 		UserData *ud = userdata.Require(uc);
 		return ud;
-       }
+	}
 
 	void check_ban(ChannelInfo *ci, User *u, KickerData *kd, int ttbtype)
 	{
@@ -1087,7 +1086,7 @@ class BSKick : public Module
 		ci->c->Kick(ci->bi, u, "%s", buf);
 	}
 
- public:
+public:
 	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		bandata(this, "bandata"),
 		userdata(this, "userdata"),
@@ -1106,7 +1105,7 @@ class BSKick : public Module
 
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
 	{
 		if (!ci)
 			return;
@@ -1221,7 +1220,7 @@ class BSKick : public Module
 			info.AddOption(_("Voices protection"));
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) override
 	{
 		/* Now we can make kicker stuff. We try to order the checks
 		 * from the fastest one to the slowest one, since there's
@@ -1304,11 +1303,11 @@ class BSKick : public Module
 		{
 			int i = 0, l = 0;
 
-			for (unsigned j = 0, end = realbuf.length(); j < end; ++j)
+			for (auto chr : realbuf)
 			{
-				if (isupper(realbuf[j]))
+				if (isupper(chr))
 					++i;
-				else if (islower(realbuf[j]))
+				else if (islower(chr))
 					++l;
 			}
 
@@ -1335,7 +1334,7 @@ class BSKick : public Module
 			Anope::string nbuf = Anope::NormalizeBuffer(realbuf);
 			bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
 
-			/* Normalize can return an empty string if this only conains control codes etc */
+			/* Normalize can return an empty string if this only contains control codes etc */
 			if (badwords && !nbuf.empty())
 				for (unsigned i = 0; i < badwords->GetBadWordCount(); ++i)
 				{

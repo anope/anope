@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@
 
 class CommandNSAccess : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
 		if (mask.empty())
@@ -95,7 +95,7 @@ class CommandNSAccess : public Command
 
 		return;
 	}
- public:
+public:
 	CommandNSAccess(Module *creator) : Command(creator, "nickserv/access", 1, 3)
 	{
 		this->SetDesc(_("Modify the list of authorized addresses"));
@@ -104,7 +104,7 @@ class CommandNSAccess : public Command
 		this->SetSyntax(_("LIST [\037nickname\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 		Anope::string nick, mask;
@@ -159,7 +159,7 @@ class CommandNSAccess : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -190,13 +190,13 @@ class NSAccess : public Module
 {
 	CommandNSAccess commandnsaccess;
 
- public:
+public:
 	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsaccess(this)
 	{
 	}
 
-	void OnNickRegister(User *u, NickAlias *na, const Anope::string &) anope_override
+	void OnNickRegister(User *u, NickAlias *na, const Anope::string &) override
 	{
 		if (u && Config->GetModule(this)->Get<bool>("addaccessonreg"))
 			na->nc->AddAccess(u->Mask());

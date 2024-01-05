@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -24,9 +24,8 @@ class CommandCSUp : public Command
 		bool given = false;
 		AccessGroup u_access = c->ci->AccessFor(u);
 
-		for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+		for (auto *cm : ModeManager::GetStatusChannelModesByRank())
 		{
-			ChannelModeStatus *cm = ModeManager::GetStatusChannelModesByRank()[i];
 			bool has_priv = u_access.HasPriv("AUTO" + cm->name) || u_access.HasPriv(cm->name);
 
 			if (has_priv)
@@ -42,14 +41,14 @@ class CommandCSUp : public Command
 			}
 		}
 	}
- public:
+public:
 	CommandCSUp(Module *creator) : Command(creator, "chanserv/up", 0, 2)
 	{
 		this->SetDesc(_("Updates a selected nicks status on a channel"));
 		this->SetSyntax(_("[\037channel\037 [\037nick\037]]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params.empty())
 		{
@@ -119,7 +118,7 @@ class CommandCSUp : public Command
 
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -140,14 +139,14 @@ class CommandCSDown : public Command
 				c->RemoveMode(NULL, ModeManager::FindChannelModeByChar(cu->status.Modes()[--i]), u->GetUID());
 	}
 
- public:
+public:
 	CommandCSDown(Module *creator) : Command(creator, "chanserv/down", 0, 2)
 	{
 		this->SetDesc(_("Removes a selected nicks status from a channel"));
 		this->SetSyntax(_("[\037channel\037 [\037nick\037]]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params.empty())
 		{
@@ -216,7 +215,7 @@ class CommandCSDown : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -232,7 +231,7 @@ class CSUpDown : public Module
 	CommandCSUp commandcsup;
 	CommandCSDown commandcsdown;
 
- public:
+public:
 	CSUpDown(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsup(this), commandcsdown(this)
 	{

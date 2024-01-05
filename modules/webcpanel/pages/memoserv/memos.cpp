@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,9 +18,9 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 	const MemoInfo *mi;
 	Memo *m;
 
-	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+	for (const auto &[_, ci2] : *RegisteredChannelList)
 	{
-		ci = it->second;
+		ci = ci2;
 
 		if (ci->AccessFor(na->nc).HasPriv("MEMO"))
 		{

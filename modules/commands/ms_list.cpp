@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandMSList : public Command
 {
- public:
+public:
 	CommandMSList(Module *creator) : Command(creator, "memoserv/list", 0, 2)
 	{
 		this->SetDesc(_("List your memos"));
 		this->SetSyntax(_("[\037channel\037] [\037list\037 | NEW]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
 		Anope::string param = !params.empty() ? params[0] : "", chan;
@@ -70,12 +70,12 @@ class CommandMSList : public Command
 					ListFormatter &list;
 					CommandSource &source;
 					const MemoInfo *mi;
-				 public:
+				public:
 					MemoListCallback(ListFormatter &_list, CommandSource &_source, const MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), list(_list), source(_source), mi(_mi)
 					{
 					}
 
-					void HandleNumber(unsigned number) anope_override
+					void HandleNumber(unsigned number) override
 					{
 						if (!number || number > mi->memos->size())
 							return;
@@ -129,13 +129,13 @@ class CommandMSList : public Command
 			list.Process(replies);
 
 			source.Reply(_("Memos for %s:"), ci ? ci->name.c_str() : source.GetNick().c_str());
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -153,7 +153,7 @@ class MSList : public Module
 {
 	CommandMSList commandmslist;
 
- public:
+public:
 	MSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmslist(this)
 	{

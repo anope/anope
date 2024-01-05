@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2012-2021 Anope Team
+ * (C) 2012-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,7 +15,7 @@ class TRERegex : public Regex
 {
 	regex_t regbuf;
 
- public:
+public:
 	TRERegex(const Anope::string &expr) : Regex(expr)
 	{
 		int err = regcomp(&this->regbuf, expr.c_str(), REG_EXTENDED | REG_NOSUB);
@@ -41,10 +41,10 @@ class TRERegex : public Regex
 
 class TRERegexProvider : public RegexProvider
 {
- public:
+public:
 	TRERegexProvider(Module *creator) : RegexProvider(creator, "regex/tre") { }
 
-	Regex *Compile(const Anope::string &expression) anope_override
+	Regex *Compile(const Anope::string &expression) override
 	{
 		return new TRERegex(expression);
 	}
@@ -54,7 +54,7 @@ class ModuleRegexTRE : public Module
 {
 	TRERegexProvider tre_regex_provider;
 
- public:
+public:
 	ModuleRegexTRE(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		tre_regex_provider(this)
 	{
@@ -63,15 +63,10 @@ class ModuleRegexTRE : public Module
 
 	~ModuleRegexTRE()
 	{
-		for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(); it != XLineManager::XLineManagers.end(); ++it)
+		for (auto *xlm : XLineManager::XLineManagers)
 		{
-			XLineManager *xlm = *it;
-			const std::vector<XLine *> &xlines = xlm->GetList();
-
-			for (unsigned int i = 0; i < xlines.size(); ++i)
+			for (auto *x : xlm->GetList())
 			{
-				XLine *x = xlines[i];
-
 				if (x->regex && dynamic_cast<TRERegex *>(x->regex))
 				{
 					delete x->regex;

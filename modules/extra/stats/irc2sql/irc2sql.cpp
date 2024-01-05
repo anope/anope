@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2013-2021 Anope Team
+ * (C) 2013-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -47,19 +47,18 @@ void IRC2SQL::OnReload(Configuration::Conf *conf)
 			this->OnNewServer(it->second);
 		}
 
-		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+		for (const auto &[_, c] : ChannelList)
 		{
-			this->OnChannelCreate(it->second);
+			this->OnChannelCreate(c);
 		}
 
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (const auto &[_, u] : UserListByNick)
 		{
-			User *u = it->second;
 			bool exempt = false;
 			this->OnUserConnect(u, exempt);
-			for (User::ChanUserList::const_iterator cit = u->chans.begin(), cit_end = u->chans.end(); cit != cit_end; ++cit)
+			for (const auto &[_, uc] : u->chans)
 			{
-				this->OnJoinChannel(u, cit->second->chan);
+				this->OnJoinChannel(u, uc->chan);
 			}
 		}
 	}
@@ -107,7 +106,7 @@ void IRC2SQL::OnUserConnect(User *u, bool &exempt)
 	query.SetValue("ip", u->ip.addr());
 	query.SetValue("ident", u->GetIdent());
 	query.SetValue("vident", u->GetVIdent());
-	query.SetValue("secure", u->HasMode("SSL") || u->HasExt("ssl") ? "Y" : "N");
+	query.SetValue("secure", u->IsSecurelyConnected() ? "Y" : "N");
 	query.SetValue("account", u->Account() ? u->Account()->display : "");
 	query.SetValue("fingerprint", u->fingerprint);
 	query.SetValue("signon", u->signon);
@@ -152,7 +151,7 @@ void IRC2SQL::OnUserAway(User *u, const Anope::string &message)
 void IRC2SQL::OnFingerprint(User *u)
 {
 	query = "UPDATE `" + prefix + "user` SET secure=@secure@, fingerprint=@fingerprint@ WHERE nick=@nick@";
-	query.SetValue("secure", u->HasMode("SSL") || u->HasExt("ssl") ? "Y" : "N");
+	query.SetValue("secure", u->IsSecurelyConnected() ? "Y" : "N");
 	query.SetValue("fingerprint", u->fingerprint);
 	query.SetValue("nick", u->nick);
 	this->RunQuery(query);

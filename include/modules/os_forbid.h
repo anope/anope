@@ -1,13 +1,12 @@
 /*
  *
- * (C) 2011-2021 Anope Team
+ * (C) 2011-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef OS_FORBID_H
-#define OS_FORBID_H
+#pragma once
 
 enum ForbidType
 {
@@ -23,18 +22,18 @@ struct ForbidData
 	Anope::string mask;
 	Anope::string creator;
 	Anope::string reason;
-	time_t created;
-	time_t expires;
+	time_t created = 0;
+	time_t expires = 0;
 	ForbidType type;
 
-	virtual ~ForbidData() { }
- protected:
-	ForbidData() : created(0), expires(0) { }
+	virtual ~ForbidData() = default;
+protected:
+	ForbidData() = default;
 };
 
 class ForbidService : public Service
 {
- public:
+public:
 	ForbidService(Module *m) : Service(m, "ForbidService", "forbid") { }
 
 	virtual void AddForbid(ForbidData *d) = 0;
@@ -51,5 +50,3 @@ class ForbidService : public Service
 };
 
 static ServiceReference<ForbidService> forbid_service("ForbidService", "forbid");
-
-#endif

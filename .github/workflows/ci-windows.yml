@@ -1,0 +1,34 @@
+name: Windows CI
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 0 * * 0'
+jobs:
+  build:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.3
+
+      - name: Setup Conan
+        uses: turtlebrowser/get-conan@v1.2
+        with:
+          version: 1.59.0
+
+      - name: Install libraries
+        run: |
+          conan install ${{ github.workspace }}\src\win32 --build=missing
+
+      - name: Run CMake
+        run: |
+          mkdir ${{ github.workspace }}\build
+          cd ${{ github.workspace }}\build
+          cmake -A "x64" -G "Visual Studio 16 2019" ..
+
+      - name: Build Anope
+        working-directory: ${{ github.workspace }}\build
+        run: |
+          msbuild PACKAGE.vcxproj /M:3 /P:Configuration=Release /P:Platform=x64 /VERBOSITY:MINIMAL

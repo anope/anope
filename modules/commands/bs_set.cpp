@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,19 +13,19 @@
 
 class CommandBSSet : public Command
 {
- public:
+public:
 	CommandBSSet(Module *creator) : Command(creator, "botserv/set", 3, 3)
 	{
 		this->SetDesc(_("Configures bot options"));
 		this->SetSyntax(_("\037option\037 \037(channel | bot)\037 \037settings\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -35,10 +35,8 @@ class CommandBSSet : public Command
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
 		Anope::string this_name = source.command;
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto &[c_name, info] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				if (info.hide)
@@ -54,7 +52,7 @@ class CommandBSSet : public Command
 					if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 						continue;
 
-					source.command = it->first;
+					source.command = c_name;
 					command->OnServHelp(source);
 				}
 			}
@@ -68,16 +66,16 @@ class CommandBSSet : public Command
 
 class CommandBSSetBanExpire : public Command
 {
- public:
+public:
 	class UnbanTimer : public Timer
 	{
 		Anope::string chname;
 		Anope::string mask;
 
-	 public:
+	public:
 		UnbanTimer(Module *creator, const Anope::string &ch, const Anope::string &bmask, time_t t) : Timer(creator, t), chname(ch), mask(bmask) { }
 
-		void Tick(time_t) anope_override
+		void Tick(time_t) override
 		{
 			Channel *c = Channel::Find(chname);
 			if (c)
@@ -91,7 +89,7 @@ class CommandBSSetBanExpire : public Command
 		this->SetSyntax(_("\037channel\037 \037time\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &arg = params[1];
@@ -141,7 +139,7 @@ class CommandBSSetBanExpire : public Command
 			source.Reply(_("Bot bans will automatically expire after %s."), Anope::Duration(ci->banexpire, source.GetAccount()).c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -155,14 +153,14 @@ class CommandBSSetBanExpire : public Command
 
 class CommandBSSetPrivate : public Command
 {
- public:
+public:
 	CommandBSSetPrivate(Module *creator, const Anope::string &sname = "botserv/set/private") : Command(creator, sname, 2, 2)
 	{
 		this->SetDesc(_("Prevent a bot from being assigned by non IRC operators"));
 		this->SetSyntax(_("\037botname\037 {\037ON|OFF\037}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		BotInfo *bi = BotInfo::Find(params[0], true);
 		const Anope::string &value = params[1];
@@ -193,7 +191,7 @@ class CommandBSSetPrivate : public Command
 			this->OnSyntaxError(source, source.command);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -209,14 +207,14 @@ class BSSet : public Module
 	CommandBSSetBanExpire commandbssetbanexpire;
 	CommandBSSetPrivate commandbssetprivate;
 
- public:
+public:
 	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsset(this), commandbssetbanexpire(this),
 		commandbssetprivate(this)
 	{
 	}
 
-	void OnBotBan(User *u, ChannelInfo *ci, const Anope::string &mask) anope_override
+	void OnBotBan(User *u, ChannelInfo *ci, const Anope::string &mask) override
 	{
 		if (!ci->banexpire)
 			return;

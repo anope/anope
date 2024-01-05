@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -200,7 +200,7 @@ class Packet : public Query
 		return record;
 	}
 
- public:
+public:
 	static const int POINTER = 0xC0;
 	static const int LABEL = 0x3F;
 	static const int HEADER_LENGTH = 12;
@@ -209,11 +209,11 @@ class Packet : public Query
 	/* Source or destination of the packet */
 	sockaddrs addr;
 	/* ID for this packet */
-	unsigned short id;
+	unsigned short id = 0;
 	/* Flags on the packet */
-	unsigned short flags;
+	unsigned short flags = 0;
 
-	Packet(Manager *m, sockaddrs *a) : manager(m), id(0), flags(0)
+	Packet(Manager *m, sockaddrs *a) : manager(m)
 	{
 		if (a)
 			addr = *a;
@@ -286,10 +286,8 @@ class Packet : public Query
 		output[pos++] = this->additional.size() >> 8;
 		output[pos++] = this->additional.size() & 0xFF;
 
-		for (unsigned i = 0; i < this->questions.size(); ++i)
+		for (auto &q : this->questions)
 		{
-			Question &q = this->questions[i];
-
 			if (q.type == QUERY_PTR)
 			{
 				sockaddrs ip(q.name);
@@ -324,11 +322,10 @@ class Packet : public Query
 		}
 
 		std::vector<ResourceRecord> types[] = { this->answers, this->authorities, this->additional };
-		for (int i = 0; i < 3; ++i)
-			for (unsigned j = 0; j < types[i].size(); ++j)
+		for (auto &type : types)
+		{
+			for (const auto &rr : type)
 			{
-				ResourceRecord &rr = types[i][j];
-
 				this->PackName(output, output_size, pos, rr.name);
 
 				if (pos + 8 >= output_size)
@@ -443,6 +440,7 @@ class Packet : public Query
 						break;
 				}
 			}
+		}
 
 		return pos;
 	}
@@ -452,8 +450,8 @@ namespace DNS
 {
 	class ReplySocket : public virtual Socket
 	{
-	 public:
-		virtual ~ReplySocket() { }
+	public:
+		~ReplySocket() override = default;
 		virtual void Reply(Packet *p) = 0;
 	};
 }
@@ -463,39 +461,39 @@ class TCPSocket : public ListenSocket
 {
 	Manager *manager;
 
- public:
+public:
 	/* A TCP client */
 	class Client : public ClientSocket, public Timer, public ReplySocket
 	{
 		Manager *manager;
-		Packet *packet;
+		Packet *packet = nullptr;
 		unsigned char packet_buffer[524];
-		int length;
+		int length = 0;
 
-	 public:
-		Client(Manager *m, TCPSocket *l, int fd, const sockaddrs &addr) : Socket(fd, l->IsIPv6()), ClientSocket(l, addr), Timer(5),
-			manager(m), packet(NULL), length(0)
+	public:
+		Client(Manager *m, TCPSocket *l, int fd, const sockaddrs &addr) : Socket(fd, l->GetFamily()), ClientSocket(l, addr), Timer(5),
+			manager(m)
 		{
 			Log(LOG_DEBUG_2) << "Resolver: New client from " << addr.addr();
 		}
 
-		~Client()
+		~Client() override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Exiting client from " << clientaddr.addr();
 			delete packet;
 		}
 
 		/* Times out after a few seconds */
-		void Tick(time_t) anope_override { }
+		void Tick(time_t) override { }
 
-		void Reply(Packet *p) anope_override
+		void Reply(Packet *p) override
 		{
 			delete packet;
 			packet = p;
 			SocketEngine::Change(this, true, SF_WRITABLE);
 		}
 
-		bool ProcessRead() anope_override
+		bool ProcessRead() override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Reading from DNS TCP socket";
 
@@ -515,7 +513,7 @@ class TCPSocket : public ListenSocket
 			return true;
 		}
 
-		bool ProcessWrite() anope_override
+		bool ProcessWrite() override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Writing to DNS TCP socket";
 
@@ -543,9 +541,9 @@ class TCPSocket : public ListenSocket
 		}
 	};
 
-	TCPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos), ListenSocket(ip, port, ip.find(':') != Anope::string::npos), manager(m) { }
+	TCPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') == Anope::string::npos ? AF_INET : AF_INET6), ListenSocket(ip, port, ip.find(':') != Anope::string::npos), manager(m) { }
 
-	ClientSocket *OnAccept(int fd, const sockaddrs &addr) anope_override
+	ClientSocket *OnAccept(int fd, const sockaddrs &addr) override
 	{
 		return new Client(this->manager, this, fd, addr);
 	}
@@ -557,16 +555,16 @@ class UDPSocket : public ReplySocket
 	Manager *manager;
 	std::deque<Packet *> packets;
 
- public:
-	UDPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos, SOCK_DGRAM), manager(m) { }
+public:
+	UDPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') == Anope::string::npos ? AF_INET : AF_INET6, SOCK_DGRAM), manager(m) { }
 
-	~UDPSocket()
+	~UDPSocket() override
 	{
-		for (unsigned i = 0; i < packets.size(); ++i)
-			delete packets[i];
+		for (const auto *packet : packets)
+			delete packet;
 	}
 
-	void Reply(Packet *p) anope_override
+	void Reply(Packet *p) override
 	{
 		packets.push_back(p);
 		SocketEngine::Change(this, true, SF_WRITABLE);
@@ -574,7 +572,7 @@ class UDPSocket : public ReplySocket
 
 	std::deque<Packet *>& GetPackets() { return packets; }
 
-	bool ProcessRead() anope_override
+	bool ProcessRead() override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Reading from DNS UDP socket";
 
@@ -585,7 +583,7 @@ class UDPSocket : public ReplySocket
 		return this->manager->HandlePacket(this, packet_buffer, length, &from_server);
 	}
 
-	bool ProcessWrite() anope_override
+	bool ProcessWrite() override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Writing to DNS UDP socket";
 
@@ -615,14 +613,14 @@ class UDPSocket : public ReplySocket
 class NotifySocket : public Socket
 {
 	Packet *packet;
- public:
-	NotifySocket(bool v6, Packet *p) : Socket(-1, v6, SOCK_DGRAM), packet(p)
+public:
+	NotifySocket(int family, Packet *p) : Socket(-1, family, SOCK_DGRAM), packet(p)
 	{
 		SocketEngine::Change(this, false, SF_READABLE);
 		SocketEngine::Change(this, true, SF_WRITABLE);
 	}
 
-	bool ProcessWrite() anope_override
+	bool ProcessWrite() override
 	{
 		if (!packet)
 			return false;
@@ -649,25 +647,24 @@ class MyManager : public Manager, public Timer
 {
 	uint32_t serial;
 
-	typedef TR1NS::unordered_map<Question, Query, Question::hash> cache_map;
+	typedef std::unordered_map<Question, Query, Question::hash> cache_map;
 	cache_map cache;
 
-	TCPSocket *tcpsock;
-	UDPSocket *udpsock;
+	TCPSocket *tcpsock = nullptr;
+	UDPSocket *udpsock = nullptr;
 
-	bool listen;
+	bool listen = false;
 	sockaddrs addrs;
 
 	std::vector<std::pair<Anope::string, short> > notify;
- public:
+public:
 	std::map<unsigned short, Request *> requests;
 
-	MyManager(Module *creator) : Manager(creator), Timer(300, Anope::CurTime, true), serial(Anope::CurTime), tcpsock(NULL), udpsock(NULL),
-		listen(false), cur_id(rand())
+	MyManager(Module *creator) : Manager(creator), Timer(300, Anope::CurTime, true), serial(Anope::CurTime), cur_id(rand())
 	{
 	}
 
-	~MyManager()
+	~MyManager() override
 	{
 		delete udpsock;
 		delete tcpsock;
@@ -717,7 +714,7 @@ class MyManager : public Manager, public Timer
 		notify = n;
 	}
 
- private:
+private:
 	unsigned short cur_id;
 
 	unsigned short GetID()
@@ -732,8 +729,8 @@ class MyManager : public Manager, public Timer
 		return cur_id;
 	}
 
- public:
-	void Process(Request *req) anope_override
+public:
+	void Process(Request *req) override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Processing request to lookup " << req->name << ", of type " << req->type;
 
@@ -760,12 +757,12 @@ class MyManager : public Manager, public Timer
 		this->udpsock->Reply(p);
 	}
 
-	void RemoveRequest(Request *req) anope_override
+	void RemoveRequest(Request *req) override
 	{
 		this->requests.erase(req->id);
 	}
 
-	bool HandlePacket(ReplySocket *s, const unsigned char *const packet_buffer, int length, sockaddrs *from) anope_override
+	bool HandlePacket(ReplySocket *s, const unsigned char *const packet_buffer, int length, sockaddrs *from) override
 	{
 		if (length < Packet::HEADER_LENGTH)
 			return true;
@@ -800,10 +797,8 @@ class MyManager : public Manager, public Timer
 			packet->authorities.clear();
 			packet->additional.clear();
 
-			for (unsigned i = 0; i < recv_packet.questions.size(); ++i)
+			for (auto &q : recv_packet.questions)
 			{
-				const Question& q = recv_packet.questions[i];
-
 				if (q.type == QUERY_AXFR || q.type == QUERY_SOA)
 				{
 					ResourceRecord rr(q.name, QUERY_SOA);
@@ -826,10 +821,8 @@ class MyManager : public Manager, public Timer
 
 			FOREACH_MOD(OnDnsRequest, (recv_packet, packet));
 
-			for (unsigned i = 0; i < recv_packet.questions.size(); ++i)
+			for (auto &q : recv_packet.questions)
 			{
-				const Question& q = recv_packet.questions[i];
-
 				if (q.type == QUERY_AXFR)
 				{
 					ResourceRecord rr(q.name, QUERY_SOA);
@@ -920,19 +913,16 @@ class MyManager : public Manager, public Timer
 		return true;
 	}
 
-	void UpdateSerial() anope_override
+	void UpdateSerial() override
 	{
 		serial = Anope::CurTime;
 	}
 
-	void Notify(const Anope::string &zone) anope_override
+	void Notify(const Anope::string &zone) override
 	{
 		/* notify slaves of the update */
-		for (unsigned i = 0; i < notify.size(); ++i)
+		for (const auto &[ip, port] : notify)
 		{
-			const Anope::string &ip = notify[i].first;
-			short port = notify[i].second;
-
 			sockaddrs addr;
 			addr.pton(ip.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, ip, port);
 			if (!addr.valid())
@@ -950,18 +940,18 @@ class MyManager : public Manager, public Timer
 				continue;
 			}
 
-			packet->questions.push_back(Question(zone, QUERY_SOA));
+			packet->questions.emplace_back(zone, QUERY_SOA);
 
-			new NotifySocket(ip.find(':') != Anope::string::npos, packet);
+			new NotifySocket(ip.find(':') == Anope::string::npos ? AF_INET : AF_INET6, packet);
 		}
 	}
 
-	uint32_t GetSerial() const anope_override
+	uint32_t GetSerial() const override
 	{
 		return serial;
 	}
 
-	void Tick(time_t now) anope_override
+	void Tick(time_t now) override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Purging DNS cache";
 
@@ -977,7 +967,7 @@ class MyManager : public Manager, public Timer
 		}
 	}
 
- private:
+private:
 	/** Add a record to the dns cache
 	 * @param r The record
 	 */
@@ -1017,13 +1007,13 @@ class ModuleDNS : public Module
 
 	std::vector<std::pair<Anope::string, short> > notify;
 
- public:
+public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), manager(this)
 	{
 
 	}
 
-	~ModuleDNS()
+	~ModuleDNS() override
 	{
 		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
 		{
@@ -1035,7 +1025,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 
@@ -1053,7 +1043,7 @@ class ModuleDNS : public Module
 			Anope::string nip = n->Get<Anope::string>("ip");
 			short nport = n->Get<short>("port");
 
-			notify.push_back(std::make_pair(nip, nport));
+			notify.emplace_back(nip, nport);
 		}
 
 		if (Anope::IsFile(nameserver))
@@ -1101,7 +1091,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnModuleUnload(User *u, Module *m) anope_override
+	void OnModuleUnload(User *u, Module *m) override
 	{
 		for (std::map<unsigned short, Request *>::iterator it = this->manager.requests.begin(), it_end = this->manager.requests.end(); it != it_end;)
 		{

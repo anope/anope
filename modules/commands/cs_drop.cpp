@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandCSDrop : public Command
 {
- public:
+public:
 	CommandCSDrop(Module *creator) : Command(creator, "chanserv/drop", 1, 2)
 	{
 		this->SetDesc(_("Cancel the registration of a channel"));
 		this->SetSyntax(_("\037channel\037 \037channel\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &chan = params[0];
 
@@ -66,7 +66,7 @@ class CommandCSDrop : public Command
 			c->CheckModes();
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -85,7 +85,7 @@ class CSDrop : public Module
 {
 	CommandCSDrop commandcsdrop;
 
- public:
+public:
 	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsdrop(this)
 	{
 

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,7 +15,7 @@
 #include "config.h"
 #include "language.h"
 
-#if GETTEXT_FOUND
+#if HAVE_LOCALIZATION
 # include <libintl.h>
 #endif
 
@@ -24,7 +24,7 @@ std::vector<Anope::string> Language::Domains;
 
 void Language::InitLanguages()
 {
-#if GETTEXT_FOUND
+#if HAVE_LOCALIZATION
 	Log(LOG_DEBUG) << "Initializing Languages...";
 
 	Languages.clear();
@@ -73,7 +73,7 @@ const char *Language::Translate(const NickCore *nc, const char *string)
 	return Translate(nc ? nc->language.c_str() : "", string);
 }
 
-#if GETTEXT_FOUND
+#if HAVE_LOCALIZATION
 
 #if defined(__GLIBC__) && defined(__USE_GNU_GETTEXT)
 extern "C" int _nl_msg_cat_cntr;

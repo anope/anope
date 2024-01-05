@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@
 
 class CommandNSStatus : public Command
 {
- public:
+public:
 	CommandNSStatus(Module *creator) : Command(creator, "nickserv/status", 0, 16)
 	{
 		this->SetDesc(_("Returns the owner status of the given nickname"));
@@ -21,7 +21,7 @@ class CommandNSStatus : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = !params.empty() ? params[0] : source.GetNick();
 		const NickAlias *na = NickAlias::Find(nick);
@@ -48,7 +48,7 @@ class CommandNSStatus : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -76,7 +76,7 @@ class NSStatus : public Module
 {
 	CommandNSStatus commandnsstatus;
 
- public:
+public:
 	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsstatus(this)
 	{

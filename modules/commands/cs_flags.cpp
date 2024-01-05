@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,14 +15,14 @@ static std::map<Anope::string, char> defaultFlags;
 
 class FlagsChanAccess : public ChanAccess
 {
- public:
+public:
 	std::set<char> flags;
 
 	FlagsChanAccess(AccessProvider *p) : ChanAccess(p)
 	{
 	}
 
-	bool HasPriv(const Anope::string &priv) const anope_override
+	bool HasPriv(const Anope::string &priv) const override
 	{
 		std::map<Anope::string, char>::iterator it = defaultFlags.find(priv);
 		if (it != defaultFlags.end() && this->flags.count(it->second) > 0)
@@ -30,12 +30,12 @@ class FlagsChanAccess : public ChanAccess
 		return false;
 	}
 
-	Anope::string AccessSerialize() const anope_override
+	Anope::string AccessSerialize() const override
 	{
 		return Anope::string(this->flags.begin(), this->flags.end());
 	}
 
-	void AccessUnserialize(const Anope::string &data) anope_override
+	void AccessUnserialize(const Anope::string &data) override
 	{
 		for (unsigned i = data.length(); i > 0; --i)
 			this->flags.insert(data[i - 1]);
@@ -48,9 +48,9 @@ class FlagsChanAccess : public ChanAccess
 
 		std::set<char> buffer;
 
-		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
-			if (access->HasPriv(it->first))
-				buffer.insert(it->second);
+		for (auto &[priv, flag] : defaultFlags)
+			if (access->HasPriv(priv))
+				buffer.insert(flag);
 
 		if (buffer.empty())
 			return "(none)";
@@ -61,7 +61,7 @@ class FlagsChanAccess : public ChanAccess
 
 class FlagsAccessProvider : public AccessProvider
 {
- public:
+public:
 	static FlagsAccessProvider *ap;
 
 	FlagsAccessProvider(Module *o) : AccessProvider(o, "access/flags")
@@ -69,7 +69,7 @@ class FlagsAccessProvider : public AccessProvider
 		ap = this;
 	}
 
-	ChanAccess *Create() anope_override
+	ChanAccess *Create() override
 	{
 		return new FlagsChanAccess(this);
 	}
@@ -78,7 +78,7 @@ FlagsAccessProvider* FlagsAccessProvider::ap;
 
 class CommandCSFlags : public Command
 {
-	void DoModify(CommandSource &source, ChannelInfo *ci, Anope::string mask, const Anope::string &flags)
+	void DoModify(CommandSource &source, ChannelInfo *ci, Anope::string mask, const Anope::string &flags, const Anope::string &description)
 	{
 		if (flags.empty())
 		{
@@ -118,6 +118,12 @@ class CommandCSFlags : public Command
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
+				return;
+			}
+			else if (na && na->nc->HasExt("NEVEROP"))
+			{
+				source.Reply(_("\002%s\002 does not wish to be added to channel access lists."),
+					na->nc->display.c_str());
 				return;
 			}
 			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
@@ -189,14 +195,14 @@ class CommandCSFlags : public Command
 					add = false;
 					break;
 				case '*':
-					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
+					for (const auto &[priv, flag] : defaultFlags)
 					{
-						bool has = current_flags.count(it->second);
+						bool has = current_flags.count(flag);
 						// If we are adding a flag they already have or removing one they don't have, don't bother
 						if (add == has)
 							continue;
 
-						if (!u_access.HasPriv(it->first) && !u_access.founder)
+						if (!u_access.HasPriv(priv) && !u_access.founder)
 						{
 							if (source.HasPriv("chanserv/access/modify"))
 								override = true;
@@ -205,9 +211,9 @@ class CommandCSFlags : public Command
 						}
 
 						if (add)
-							current_flags.insert(it->second);
+							current_flags.insert(flag);
 						else
-							current_flags.erase(it->second);
+							current_flags.erase(flag);
 					}
 					break;
 				default:
@@ -218,11 +224,11 @@ class CommandCSFlags : public Command
 						i = flags.length();
 					}
 
-					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
+					for (const auto &[priv, flag] : defaultFlags)
 					{
-						if (f != it->second)
+						if (f != flag)
 							continue;
-						else if (!u_access.HasPriv(it->first) && !u_access.founder)
+						else if (!u_access.HasPriv(priv) && !u_access.founder)
 						{
 							if (source.HasPriv("chanserv/access/modify"))
 								override = true;
@@ -262,7 +268,8 @@ class CommandCSFlags : public Command
 			return;
 		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
 		access->SetMask(mask, ci);
-		access->creator = source.GetNick();
+			access->creator = source.GetNick();
+		access->description = current ? current->description : description;
 		access->last_seen = current ? current->last_seen : 0;
 		access->created = Anope::CurTime;
 		access->flags = current_flags;
@@ -298,7 +305,7 @@ class CommandCSFlags : public Command
 
 		ListFormatter list(source.GetAccount());
 
-		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Flags")).AddColumn(_("Creator")).AddColumn(_("Created"));
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Flags")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Description"));
 
 		unsigned count = 0;
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
@@ -328,6 +335,7 @@ class CommandCSFlags : public Command
 			entry["Flags"] = flags;
 			entry["Creator"] = access->creator;
 			entry["Created"] = Anope::strftime(access->created, source.nc, true);
+			entry["Description"] = access->description;
 			list.AddEntry(entry);
 		}
 
@@ -339,8 +347,8 @@ class CommandCSFlags : public Command
 			list.Process(replies);
 
 			source.Reply(_("Flags list for %s"), ci->name.c_str());
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 			if (count == ci->GetAccessCount())
 				source.Reply(_("End of access list."));
 			else
@@ -367,16 +375,16 @@ class CommandCSFlags : public Command
 		return;
 	}
 
- public:
-	CommandCSFlags(Module *creator) : Command(creator, "chanserv/flags", 1, 4)
+public:
+	CommandCSFlags(Module *creator) : Command(creator, "chanserv/flags", 1, 5)
 	{
 		this->SetDesc(_("Modify the list of privileged users"));
-		this->SetSyntax(_("\037channel\037 [MODIFY] \037mask\037 \037changes\037"));
+		this->SetSyntax(_("\037channel\037 [MODIFY] \037mask\037 \037changes\037 [\037description\037]"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | +\037flags\037]"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &cmd = params.size() > 1 ? params[1] : "";
@@ -409,23 +417,25 @@ class CommandCSFlags : public Command
 			this->DoClear(source, ci);
 		else
 		{
-			Anope::string mask, flags;
+			Anope::string mask, flags, description;
 			if (cmd.equals_ci("MODIFY"))
 			{
 				mask = params.size() > 2 ? params[2] : "";
 				flags = params.size() > 3 ? params[3] : "";
+				description = params.size() > 4 ? params[4] : "";
 			}
 			else
 			{
 				mask = cmd;
 				flags = params.size() > 2 ? params[2] : "";
+				description = params.size() > 3 ? params[3] : "";
 			}
 
-			this->DoModify(source, ci, mask, flags);
+			this->DoModify(source, ci, mask, flags, description);
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -450,15 +460,15 @@ class CommandCSFlags : public Command
 
 		typedef std::multimap<char, Anope::string, ci::less> reverse_map;
 		reverse_map reverse;
-		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
-			reverse.insert(std::make_pair(it->second, it->first));
+		for (auto &[priv, flag] : defaultFlags)
+			reverse.emplace(flag, priv);
 
-		for (reverse_map::iterator it = reverse.begin(), it_end = reverse.end(); it != it_end; ++it)
+		for (auto &[flag, priv] : reverse)
 		{
-			Privilege *p = PrivilegeManager::FindPrivilege(it->second);
+			Privilege *p = PrivilegeManager::FindPrivilege(priv);
 			if (p == NULL)
 				continue;
-			source.Reply("  %c - %s", it->first, Language::Translate(source.nc, p->desc.c_str()));
+			source.Reply("  %c - %s", flag, Language::Translate(source.nc, p->desc.c_str()));
 		}
 
 		return true;
@@ -470,7 +480,7 @@ class CSFlags : public Module
 	FlagsAccessProvider accessprovider;
 	CommandCSFlags commandcsflags;
 
- public:
+public:
 	CSFlags(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		accessprovider(this), commandcsflags(this)
 	{
@@ -478,7 +488,7 @@ class CSFlags : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		defaultFlags.clear();
 

@@ -1,7 +1,7 @@
 /* ns_maxemail.cpp - Limit the amount of times an email address
  *                   can be used for a NickServ account.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Included in the Anope module pack since Anope 1.7.9
@@ -14,7 +14,7 @@
 
 class NSMaxEmail : public Module
 {
-	bool clean;
+	bool clean = false;
 
 	/* strip dots from username, and remove anything after the first + */
 	Anope::string CleanMail(const Anope::string &email)
@@ -62,10 +62,8 @@ class NSMaxEmail : public Module
 
 		Anope::string cleanemail = clean ? CleanMail(email) : email;
 
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			const NickCore *nc = it->second;
-
 			Anope::string cleannc = clean ? CleanMail(nc->email) : nc->email;
 
 			if (unc != nc && cleanemail.equals_ci(cleannc))
@@ -75,18 +73,17 @@ class NSMaxEmail : public Module
 		return count;
 	}
 
- public:
+public:
 	NSMaxEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, clean(false)
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		clean = conf->GetModule(this)->Get<bool>("remove_aliases", "true");
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		if (source.IsOper())
 			return EVENT_CONTINUE;

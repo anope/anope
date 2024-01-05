@@ -1,6 +1,6 @@
 /* Timer stuff.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -80,7 +80,7 @@ Module *Timer::GetOwner() const
 
 void TimerManager::AddTimer(Timer *t)
 {
-	Timers.insert(std::make_pair(t->GetTimer(), t));
+	Timers.emplace(t->GetTimer(), t);
 }
 
 void TimerManager::DelTimer(Timer *t)

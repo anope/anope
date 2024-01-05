@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,7 +16,7 @@ bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 	if (message.post_data.count("access") > 0)
 	{
 		std::vector<Anope::string> params;
-		params.push_back("ADD");
+		params.emplace_back("ADD");
 		params.push_back(message.post_data["access"]);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/access", params, replacements);
@@ -24,14 +24,14 @@ bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 	else if (message.get_data.count("del") > 0 && message.get_data.count("mask") > 0)
 	{
 		std::vector<Anope::string> params;
-		params.push_back("DEL");
+		params.emplace_back("DEL");
 		params.push_back(message.get_data["mask"]);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/access", params, replacements);
 	}
 
-	for (unsigned i = 0; i < na->nc->access.size(); ++i)
-		replacements["ACCESS"] = na->nc->access[i];
+	for (const auto &access : na->nc->access)
+		replacements["ACCESS"] = access;
 
 	TemplateFileServer page("nickserv/access.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

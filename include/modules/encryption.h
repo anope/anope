@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,6 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#pragma once
+
 namespace Encryption
 {
 	typedef std::pair<const unsigned char *, size_t> Hash;
@@ -16,8 +18,8 @@ namespace Encryption
 
 	class Context
 	{
-	 public:
-		virtual ~Context() { }
+	public:
+		virtual ~Context() = default;
 		virtual void Update(const unsigned char *data, size_t len) = 0;
 		virtual void Finalize() = 0;
 		virtual Hash GetFinalizedHash() = 0;
@@ -25,9 +27,9 @@ namespace Encryption
 
 	class Provider : public Service
 	{
-	 public:
+	public:
 		Provider(Module *creator, const Anope::string &sname) : Service(creator, "Encryption::Provider", sname) { }
-		virtual ~Provider() { }
+		virtual ~Provider() = default;
 
 		virtual Context *CreateContext(IV * = NULL) = 0;
 		virtual IV GetDefaultIV() = 0;

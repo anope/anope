@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandMSInfo : public Command
 {
- public:
+public:
 	CommandMSInfo(Module *creator) : Command(creator, "memoserv/info", 0, 1)
 	{
 		this->SetDesc(_("Displays information about your memos"));
 		this->SetSyntax(_("[\037nick\037 | \037channel\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		NickCore *nc = source.nc;
 		const MemoInfo *mi;
@@ -197,7 +197,7 @@ class CommandMSInfo : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -220,7 +220,7 @@ class MSInfo : public Module
 {
 	CommandMSInfo commandmsinfo;
 
- public:
+public:
 	MSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsinfo(this)
 	{

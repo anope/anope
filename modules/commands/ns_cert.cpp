@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,7 +18,7 @@ struct CertServiceImpl : CertService
 {
 	CertServiceImpl(Module *o) : CertService(o) { }
 
-	NickCore* FindAccountFromCert(const Anope::string &cert) anope_override
+	NickCore* FindAccountFromCert(const Anope::string &cert) override
 	{
 		Anope::hash_map<NickCore *>::iterator it = certmap.find(cert);
 		if (it != certmap.end())
@@ -32,10 +32,10 @@ struct NSCertListImpl : NSCertList
 	Serialize::Reference<NickCore> nc;
 	std::vector<Anope::string> certs;
 
- public:
+public:
 	NSCertListImpl(Extensible *obj) : nc(anope_dynamic_static_cast<NickCore *>(obj)) { }
 
-	~NSCertListImpl()
+	~NSCertListImpl() override
 	{
 		ClearCert();
 	}
@@ -46,7 +46,7 @@ struct NSCertListImpl : NSCertList
 	 *
 	 * Adds a new entry into the cert list.
 	 */
-	void AddCert(const Anope::string &entry) anope_override
+	void AddCert(const Anope::string &entry) override
 	{
 		this->certs.push_back(entry);
 		certmap[entry] = nc;
@@ -55,19 +55,19 @@ struct NSCertListImpl : NSCertList
 
 	/** Get an entry from the nick's cert list by index
 	 *
-	 * @param entry Index in the certificaate list vector to retrieve
+	 * @param entry Index in the certificate list vector to retrieve
 	 * @return The fingerprint entry of the given index if within bounds, an empty string if the vector is empty or the index is out of bounds
 	 *
 	 * Retrieves an entry from the certificate list corresponding to the given index.
 	 */
-	Anope::string GetCert(unsigned entry) const anope_override
+	Anope::string GetCert(unsigned entry) const override
 	{
 		if (entry >= this->certs.size())
 			return "";
 		return this->certs[entry];
 	}
 
-	unsigned GetCertCount() const anope_override
+	unsigned GetCertCount() const override
 	{
 		return this->certs.size();
 	}
@@ -79,7 +79,7 @@ struct NSCertListImpl : NSCertList
 	 *
 	 * Search for an fingerprint within the cert list.
 	 */
-	bool FindCert(const Anope::string &entry) const anope_override
+	bool FindCert(const Anope::string &entry) const override
 	{
 		return std::find(this->certs.begin(), this->certs.end(), entry) != this->certs.end();
 	}
@@ -90,7 +90,7 @@ struct NSCertListImpl : NSCertList
 	 *
 	 * Removes the specified fingerprint from the cert list.
 	 */
-	void EraseCert(const Anope::string &entry) anope_override
+	void EraseCert(const Anope::string &entry) override
 	{
 		std::vector<Anope::string>::iterator it = std::find(this->certs.begin(), this->certs.end(), entry);
 		if (it != this->certs.end())
@@ -105,15 +105,15 @@ struct NSCertListImpl : NSCertList
 	 *
 	 * Deletes all the memory allocated in the certificate list vector and then clears the vector.
 	 */
-	void ClearCert() anope_override
+	void ClearCert() override
 	{
 		FOREACH_MOD(OnNickClearCert, (this->nc));
-		for (unsigned i = 0; i < certs.size(); ++i)
-			certmap.erase(certs[i]);
+		for (const auto &cert : certs)
+			certmap.erase(cert);
 		this->certs.clear();
 	}
 
-	void Check() anope_override
+	void Check() override
 	{
 		if (this->certs.empty())
 			nc->Shrink<NSCertList>("certificates");
@@ -123,7 +123,7 @@ struct NSCertListImpl : NSCertList
 	{
 		ExtensibleItem(Module *m, const Anope::string &ename) : ::ExtensibleItem<NSCertListImpl>(m, ename) { }
 
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
 			if (s->GetSerializableType()->GetName() != "NickCore")
 				return;
@@ -137,7 +137,7 @@ struct NSCertListImpl : NSCertList
 				data["cert"] << c->GetCert(i) << " ";
 		}
 
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
 			if (s->GetSerializableType()->GetName() != "NickCore")
 				return;
@@ -148,8 +148,8 @@ struct NSCertListImpl : NSCertList
 			Anope::string buf;
 			data["cert"] >> buf;
 			spacesepstream sep(buf);
-			for (unsigned i = 0; i < c->certs.size(); ++i)
-				certmap.erase(c->certs[i]);
+			for (const auto &cert : c->certs)
+				certmap.erase(cert);
 			c->certs.clear();
 			while (sep.GetToken(buf))
 			{
@@ -162,7 +162,7 @@ struct NSCertListImpl : NSCertList
 
 class CommandNSCert : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, NickCore *nc, Anope::string certfp)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
@@ -251,7 +251,7 @@ class CommandNSCert : public Command
 		}
 	}
 
- public:
+public:
 	CommandNSCert(Module *creator) : Command(creator, "nickserv/cert", 1, 3)
 	{
 		this->SetDesc(_("Modify the nickname client certificate list"));
@@ -260,7 +260,7 @@ class CommandNSCert : public Command
 		this->SetSyntax(_("LIST [\037nickname\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 		Anope::string nick, certfp;
@@ -312,7 +312,7 @@ class CommandNSCert : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -344,7 +344,7 @@ class NSCert : public Module
 	NSCertListImpl::ExtensibleItem certs;
 	CertServiceImpl cs;
 
- public:
+public:
 	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnscert(this), certs(this, "certificates"), cs(this)
 	{
@@ -352,7 +352,7 @@ class NSCert : public Module
 			throw ModuleException("Your IRCd does not support ssl client certificates");
 	}
 
-	void OnFingerprint(User *u) anope_override
+	void OnFingerprint(User *u) override
 	{
 		BotInfo *NickServ = Config->GetClient("NickServ");
 		if (!NickServ || u->IsIdentified())
@@ -379,7 +379,7 @@ class NSCert : public Module
 		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->display << " via SSL certificate fingerprint";
 	}
 
-	EventReturn OnNickValidate(User *u, NickAlias *na) anope_override
+	EventReturn OnNickValidate(User *u, NickAlias *na) override
 	{
 		NSCertList *cl = certs.Get(na->nc);
 		if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))

@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -72,7 +72,7 @@ struct DefconConfig
 
 	bool SetDefConParam(const Anope::string &name, const Anope::string &buf)
 	{
-	       return DefConModesOnParams.insert(std::make_pair(name, buf)).second;
+	       return DefConModesOnParams.emplace(name, buf).second;
 	}
 
 	void UnsetDefConParam(const Anope::string &name)
@@ -109,18 +109,18 @@ class DefConTimeout : public Timer
 {
 	int level;
 
- public:
+public:
 	DefConTimeout(Module *mod, int newlevel) : Timer(mod, DConfig.timeout), level(newlevel)
 	{
 		timeout = this;
 	}
 
-	~DefConTimeout()
+	~DefConTimeout() override
 	{
 		timeout = NULL;
 	}
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		if (DConfig.defaultlevel != level)
 		{
@@ -170,14 +170,14 @@ class CommandOSDefcon : public Command
 			source.Reply(_("* No new memos sent"));
 	}
 
- public:
+public:
 	CommandOSDefcon(Module *creator) : Command(creator, "operserv/defcon", 1, 1)
 	{
 		this->SetDesc(_("Manipulate the DefCon system"));
 		this->SetSyntax(_("[\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &lvl = params[0];
 
@@ -233,7 +233,7 @@ class CommandOSDefcon : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -253,7 +253,6 @@ class OSDefcon : public Module
 	void ParseModeString()
 	{
 		int add = -1; /* 1 if adding, 0 if deleting, -1 if neither */
-		unsigned char mode;
 		ChannelMode *cm;
 		ChannelModeParam *cmp;
 		Anope::string modes, param;
@@ -265,10 +264,8 @@ class OSDefcon : public Module
 		ss.GetToken(modes);
 
 		/* Loop while there are modes to set */
-		for (unsigned i = 0, end = modes.length(); i < end; ++i)
+		for (auto mode : modes)
 		{
-			mode = modes[i];
-
 			switch (mode)
 			{
 				case '+':
@@ -329,13 +326,13 @@ class OSDefcon : public Module
 		}
 	}
 
- public:
+public:
 	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), session_service("SessionService", "session"), akills("XLineManager", "xlinemanager/sgline"), commandosdefcon(this)
 	{
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		DefconConfig dconfig;
@@ -406,7 +403,7 @@ class OSDefcon : public Module
 		this->ParseModeString();
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOff.count(mode->name) && source.GetUser() && !source.GetBot())
 		{
@@ -418,7 +415,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOn.count(mode->name) && source.GetUser() && !source.GetBot())
 		{
@@ -436,7 +433,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		if (DConfig.Check(DEFCON_OPER_ONLY) && !source.IsOper())
 		{
@@ -483,7 +480,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnUserConnect(User *u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (exempt || u->Quitting() || !u->server->IsSynced() || u->server->IsULined())
 			return;
@@ -535,13 +532,13 @@ class OSDefcon : public Module
 		}
 	}
 
-	void OnChannelModeAdd(ChannelMode *cm) anope_override
+	void OnChannelModeAdd(ChannelMode *cm) override
 	{
 		if (DConfig.chanmodes.find(cm->mchar) != Anope::string::npos)
 			this->ParseModeString();
 	}
 
-	void OnChannelSync(Channel *c) anope_override
+	void OnChannelSync(Channel *c) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES))
 			c->SetModes(Config->GetClient("OperServ"), false, "%s", DConfig.chanmodes.c_str());
@@ -559,8 +556,8 @@ static void runDefCon()
 			{
 				Log(OperServ, "operserv/defcon") << "DEFCON: setting " << DConfig.chanmodes << " on all channels";
 				DefConModesSet = true;
-				for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-					it->second->SetModes(OperServ, false, "%s", DConfig.chanmodes.c_str());
+				for (const auto &[_, chan] : ChannelList)
+					chan->SetModes(OperServ, false, "%s", DConfig.chanmodes.c_str());
 			}
 		}
 	}
@@ -575,8 +572,8 @@ static void runDefCon()
 				if (!newmodes.empty())
 				{
 					Log(OperServ, "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
-					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-						it->second->SetModes(OperServ, true, "%s", newmodes.c_str());
+					for (const auto &[_, chan] : ChannelList)
+						chan->SetModes(OperServ, true, "%s", newmodes.c_str());
 				}
 			}
 		}
@@ -588,14 +585,14 @@ static Anope::string defconReverseModes(const Anope::string &modes)
 	if (modes.empty())
 		return "";
 	Anope::string newmodes;
-	for (unsigned i = 0, end = modes.length(); i < end; ++i)
+	for (auto mode : modes)
 	{
-		if (modes[i] == '+')
+		if (mode == '+')
 			newmodes += '-';
-		else if (modes[i] == '-')
+		else if (mode == '-')
 			newmodes += '+';
 		else
-			newmodes += modes[i];
+			newmodes += mode;
 	}
 	return newmodes;
 }

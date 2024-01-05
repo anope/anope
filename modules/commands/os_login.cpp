@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandOSLogin : public Command
 {
- public:
+public:
 	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 1, 1)
 	{
 		this->SetSyntax(_("\037password\037"));
 		this->RequireUser(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &password = params[0];
 
@@ -45,7 +45,7 @@ class CommandOSLogin : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -55,7 +55,7 @@ class CommandOSLogin : public Command
 		return true;
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Login to %s")), source.service->nick.c_str());
 	}
@@ -63,13 +63,13 @@ class CommandOSLogin : public Command
 
 class CommandOSLogout : public Command
 {
- public:
+public:
 	CommandOSLogout(Module *creator) : Command(creator, "operserv/logout", 0, 0)
 	{
 		this->RequireUser(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
 		Oper *o = source.nc->o;
@@ -87,7 +87,7 @@ class CommandOSLogout : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -97,7 +97,7 @@ class CommandOSLogout : public Command
 		return true;
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Logout from %s")), source.service->nick.c_str());
 	}
@@ -109,14 +109,14 @@ class OSLogin : public Module
 	CommandOSLogout commandoslogout;
 	ExtensibleItem<bool> os_login;
 
- public:
+public:
 	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoslogin(this), commandoslogout(this), os_login(this, "os_login")
 	{
 
 	}
 
-	EventReturn IsServicesOper(User *u) anope_override
+	EventReturn IsServicesOper(User *u) override
 	{
 		if (!u->Account()->o->password.empty())
 		{

@@ -1,6 +1,6 @@
 /* HostServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandHSList : public Command
 {
- public:
+public:
 	CommandHSList(Module *creator) : Command(creator, "hostserv/list", 0, 1)
 	{
 		this->SetDesc(_("Displays one or more vhost entries"));
 		this->SetSyntax(_("[\037key\037|\037#X-Y\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &key = !params.empty() ? params[0] : "";
 		int from = 0, to = 0, counter = 1;
@@ -57,10 +57,8 @@ class CommandHSList : public Command
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Creator")).AddColumn(_("Created"));
 
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
+		for (const auto &[_, na] : *NickAliasList)
 		{
-			const NickAlias *na = it->second;
-
 			if (!na->HasVhost())
 				continue;
 
@@ -125,11 +123,11 @@ class CommandHSList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -148,7 +146,7 @@ class HSList : public Module
 {
 	CommandHSList commandhslist;
 
- public:
+public:
 	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhslist(this)
 	{

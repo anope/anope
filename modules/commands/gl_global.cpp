@@ -1,6 +1,6 @@
 /* Global core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,14 +15,14 @@ class CommandGLGlobal : public Command
 {
 	ServiceReference<GlobalService> GService;
 
- public:
+public:
 	CommandGLGlobal(Module *creator) : Command(creator, "global/global", 1, 1), GService("GlobalService", "Global")
 	{
 		this->SetDesc(_("Send a message to all users"));
 		this->SetSyntax(_("\037message\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &msg = params[0];
 
@@ -35,7 +35,7 @@ class CommandGLGlobal : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		Reference<BotInfo> sender;
 		if (GService)
@@ -55,7 +55,7 @@ class GLGlobal : public Module
 {
 	CommandGLGlobal commandglglobal;
 
- public:
+public:
 	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandglglobal(this)
 	{

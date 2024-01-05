@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,7 +15,7 @@ struct MyOper : Oper, Serializable
 {
 	MyOper(const Anope::string &n, OperType *o) : Oper(n, o), Serializable("Oper") { }
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["name"] << this->name;
 		data["type"] << this->ot->GetName();
@@ -50,20 +50,22 @@ class CommandOSOper : public Command
 {
 	bool HasPrivs(CommandSource &source, OperType *ot) const
 	{
-		std::list<Anope::string> commands = ot->GetCommands(), privs = ot->GetPrivs();
-
-		for (std::list<Anope::string>::iterator it = commands.begin(); it != commands.end(); ++it)
-			if (!source.HasCommand(*it))
+		for (const auto &command : ot->GetCommands())
+		{
+			if (!source.HasCommand(command))
 				return false;
+		}
 
-		for (std::list<Anope::string>::iterator it = privs.begin(); it != privs.end(); ++it)
-			if (!source.HasPriv(*it))
+		for (const auto &priv : ot->GetPrivs())
+		{
+			if (!source.HasPriv(priv))
 				return false;
+		}
 
 		return true;
 	}
 
- public:
+public:
 	CommandOSOper(Module *creator) : Command(creator, "operserv/oper", 1, 3)
 	{
 		this->SetDesc(_("View and change Services Operators"));
@@ -73,7 +75,7 @@ class CommandOSOper : public Command
 		this->SetSyntax("LIST");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &subcommand = params[0];
 
@@ -151,20 +153,17 @@ class CommandOSOper : public Command
 		else if (subcommand.equals_ci("LIST"))
 		{
 			source.Reply(_("Name     Type"));
-			for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+			for (const auto &[_, nc] : *NickCoreList)
 			{
-				const NickCore *nc = it->second;
-
 				if (!nc->o)
 					continue;
 
 				source.Reply(_("%-8s %s"), nc->o->name.c_str(), nc->o->ot->GetName().c_str());
 				if (std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
 					source.Reply(_("   This oper is configured in the configuration file."));
-				for (std::list<User *>::const_iterator uit = nc->users.begin(); uit != nc->users.end(); ++uit)
+				for (auto *u : nc->users)
 				{
-					User *u = *uit;
-					source.Reply(_("   %s is online using this oper block."), u->nick.c_str());
+						source.Reply(_("   %s is online using this oper block."), u->nick.c_str());
 				}
 			}
 		}
@@ -173,9 +172,8 @@ class CommandOSOper : public Command
 			if (params.size() < 2)
 			{
 				source.Reply(_("Available opertypes:"));
-				for (unsigned i = 0; i < Config->MyOperTypes.size(); ++i)
+				for (auto *ot : Config->MyOperTypes)
 				{
-					OperType *ot = Config->MyOperTypes[i];
 					source.Reply("%s", ot->GetName().c_str());
 				}
 				return;
@@ -196,9 +194,9 @@ class CommandOSOper : public Command
 					source.Reply(_("Available commands for \002%s\002:"), ot->GetName().c_str());
 					Anope::string buf;
 					std::list<Anope::string> cmds = ot->GetCommands();
-					for (std::list<Anope::string>::const_iterator it = cmds.begin(), it_end = cmds.end(); it != it_end; ++it)
+					for (const auto &cmd : cmds)
 					{
-						buf += *it + " ";
+						buf += cmd + " ";
 						if (buf.length() > 400)
 						{
 							source.Reply("%s", buf.c_str());
@@ -218,9 +216,9 @@ class CommandOSOper : public Command
 					source.Reply(_("Available privileges for \002%s\002:"), ot->GetName().c_str());
 					Anope::string buf;
 					std::list<Anope::string> privs = ot->GetPrivs();
-					for (std::list<Anope::string>::const_iterator it = privs.begin(), it_end = privs.end(); it != it_end; ++it)
+					for (const auto &priv : privs)
 					{
-						buf += *it + " ";
+						buf += priv + " ";
 						if (buf.length() > 400)
 						{
 							source.Reply("%s", buf.c_str());
@@ -243,7 +241,7 @@ class CommandOSOper : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -259,18 +257,16 @@ class OSOper : public Module
 	Serialize::Type myoper_type;
 	CommandOSOper commandosoper;
 
- public:
+public:
 	OSOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		myoper_type("Oper", MyOper::Unserialize), commandosoper(this)
 	{
 	}
 
-	~OSOper()
+	~OSOper() override
 	{
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (const auto &[_, nc] : *NickCoreList)
 		{
-			NickCore *nc = it->second;
-
 			if (nc->o && dynamic_cast<MyOper *>(nc->o))
 			{
 				delete nc->o;
@@ -279,7 +275,7 @@ class OSOper : public Module
 		}
 	}
 
-	void OnDelCore(NickCore *nc) anope_override
+	void OnDelCore(NickCore *nc) override
 	{
 		if (nc->o && dynamic_cast<MyOper *>(nc->o))
 		{

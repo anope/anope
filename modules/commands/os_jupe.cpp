@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandOSJupe : public Command
 {
- public:
+public:
 	CommandOSJupe(Module *creator) : Command(creator, "operserv/jupe", 1, 2)
 	{
 		this->SetDesc(_("\"Jupiter\" a server"));
 		this->SetSyntax(_("\037server\037 [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &jserver = params[0];
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
@@ -49,12 +49,12 @@ class CommandOSJupe : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Tells Services to jupiter a server -- that is, to create\n"
-				"a fake \"server\" connected to Services which prevents\n"
+		source.Reply(_("Tells services to jupiter a server -- that is, to create\n"
+				"a fake \"server\" connected to services which prevents\n"
 				"the real server of that name from connecting.  The jupe\n"
 				"may be removed using a standard \002SQUIT\002. If a reason is\n"
 				"given, it is placed in the server information field;\n"
@@ -69,7 +69,7 @@ class OSJupe : public Module
 {
 	CommandOSJupe commandosjupe;
 
- public:
+public:
 	OSJupe(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosjupe(this)
 	{

@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandNSList : public Command
 {
- public:
+public:
 	CommandNSList(Module *creator) : Command(creator, "nickserv/list", 1, 2)
 	{
 		this->SetDesc(_("List all registered nicknames that match a given pattern"));
 		this->SetSyntax(_("\037pattern\037 [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
 		Anope::string pattern = params[0];
@@ -75,13 +75,11 @@ class CommandNSList : public Command
 		list.AddColumn(_("Nick")).AddColumn(_("Last usermask"));
 
 		Anope::map<NickAlias *> ordered_map;
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
-			ordered_map[it->first] = it->second;
+		for (const auto &[nick, na] : *NickAliasList)
+			ordered_map[nick] = na;
 
-		for (Anope::map<NickAlias *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
+		for (const auto &[_, na] : ordered_map)
 		{
-			const NickAlias *na = it->second;
-
 			/* Don't show private nicks to non-services admins. */
 			if (na->nc->HasExt("NS_PRIVATE") && !is_servadmin && na->nc != mync)
 				continue;
@@ -125,14 +123,14 @@ class CommandNSList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("End of list - %d/%d matches shown."), nnicks > listmax ? listmax : nnicks, nnicks);
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -180,7 +178,7 @@ class CommandNSList : public Command
 
 class CommandNSSetPrivate : public Command
 {
- public:
+public:
 	CommandNSSetPrivate(Module *creator, const Anope::string &sname = "nickserv/set/private", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Prevent the nickname from appearing in the LIST command"));
@@ -224,12 +222,12 @@ class CommandNSSetPrivate : public Command
 			this->OnSyntaxError(source, "PRIVATE");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -245,19 +243,19 @@ class CommandNSSetPrivate : public Command
 
 class CommandNSSASetPrivate : public CommandNSSetPrivate
 {
- public:
+public:
 	CommandNSSASetPrivate(Module *creator) : CommandNSSetPrivate(creator, "nickserv/saset/private", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -281,14 +279,14 @@ class NSList : public Module
 
 	SerializableExtensibleItem<bool> priv;
 
- public:
+public:
 	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnslist(this), commandnssetprivate(this), commandnssasetprivate(this),
 		priv(this, "NS_PRIVATE")
 	{
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_all) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;

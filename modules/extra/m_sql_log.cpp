@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,25 +14,24 @@ class SQLLog : public Module
 	std::set<Anope::string> inited;
 	Anope::string table;
 
- public:
+public:
 	SQLLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 		this->table = config->Get<const Anope::string>("table", "logs");
 	}
 
-	void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) anope_override
+	void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) override
 	{
 		Anope::string ref_name;
 		ServiceReference<SQL::Provider> SQL;
 
-		for (unsigned i = 0; i < li->targets.size(); ++i)
+		for (const auto &target : li->targets)
 		{
-			const Anope::string &target = li->targets[i];
 			size_t sz = target.find("sql_log:");
 			if (!sz)
 			{

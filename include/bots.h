@@ -1,13 +1,12 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2021 Anope Team <team@anope.org>
+ * (C) 2008-2024 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef BOTS_H
-#define BOTS_H
+#pragma once
 
 #include "users.h"
 #include "anope.h"
@@ -24,7 +23,7 @@ class CoreExport BotInfo : public User, public Serializable
 {
 	/* Channels this bot is assigned to */
 	Serialize::Checker<std::set<ChannelInfo *> > channels;
- public:
+public:
 	time_t created;
 	/* Last time this bot said something (via privmsg) */
 	time_t lastmsg;
@@ -131,5 +130,3 @@ class CoreExport BotInfo : public User, public Serializable
 	 */
 	static BotInfo* Find(const Anope::string &nick, bool nick_only = false);
 };
-
-#endif // BOTS_H

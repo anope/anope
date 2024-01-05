@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2002-2011 InspIRCd Development Team
- * (C) 2008-2021 Anope Team <team@anope.org>
+ * (C) 2008-2024 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -91,7 +91,7 @@ bool ci::less::operator()(const Anope::string &s1, const Anope::string &s2) cons
 	return s1.ci_str().compare(s2.ci_str()) < 0;
 }
 
-sepstream::sepstream(const Anope::string &source, char seperator, bool ae) : tokens(source), sep(seperator), pos(0), allow_empty(ae)
+sepstream::sepstream(const Anope::string &source, char separator, bool ae) : tokens(source), sep(separator), allow_empty(ae)
 {
 }
 

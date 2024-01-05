@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,14 +18,14 @@ class CommandNSAList : public Command
 		return ci::less()(ci1->name, ci2->name);
 	}
 
- public:
+public:
 	CommandNSAList(Module *creator) : Command(creator, "nickserv/alist", 0, 2)
 	{
 		this->SetDesc(_("List channels you have access on"));
 		this->SetSyntax(_("[\037nickname\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string nick = source.GetNick();
 		NickCore *nc = source.nc;
@@ -51,9 +51,8 @@ class CommandNSAList : public Command
 		nc->GetChannelReferences(queue);
 		std::sort(queue.begin(), queue.end(), ChannelSort);
 
-		for (unsigned i = 0; i < queue.size(); ++i)
+		for (auto *ci : queue)
 		{
-			ChannelInfo *ci = queue[i];
 			ListFormatter::ListEntry entry;
 
 			if (ci->GetFounder() == nc)
@@ -86,10 +85,8 @@ class CommandNSAList : public Command
 
 			entry["Number"] = stringify(chan_count);
 			entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
-			for (unsigned j = 0; j < access.paths.size(); ++j)
+			for (auto &p : access.paths)
 			{
-				ChanAccess::Path &p = access.paths[j];
-
 				// not interested in indirect access
 				if (p.size() != 1)
 					continue;
@@ -113,14 +110,14 @@ class CommandNSAList : public Command
 		{
 			source.Reply(_("Channels that \002%s\002 has access on:"), nc->display.c_str());
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of list - %d channels shown."), chan_count);
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -138,7 +135,7 @@ class NSAList : public Module
 {
 	CommandNSAList commandnsalist;
 
- public:
+public:
 	NSAList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsalist(this)
 	{

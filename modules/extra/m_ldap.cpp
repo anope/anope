@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2011-2021 Anope Team
+ * (C) 2011-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,33 +9,53 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/* RequiredLibraries: ldap_r,lber */
-/* RequiredWindowsLibraries: libldap_r,liblber */
+/* RequiredLibraries: ldap_r|ldap,lber */
 
 #include "module.h"
 #include "modules/ldap.h"
-#include <ldap.h>
+
+#ifdef _WIN32
+# include <Winldap.h>
+# include <WinBer.h>
+# include <wininet.h>
+# define LDAP_OPT_SUCCESS LDAP_SUCCESS
+# define LDAP_OPT_NETWORK_TIMEOUT LDAP_OPT_SEND_TIMEOUT
+# define LDAP_STR(X) const_cast<PSTR>((X).c_str())
+# define LDAP_SASL_SIMPLE static_cast<PSTR>(0)
+# define LDAP_TIME(X) reinterpret_cast<PLDAP_TIMEVAL>(&(X))
+# define ldap_first_message ldap_first_entry
+# define ldap_next_message ldap_next_entry
+# define ldap_unbind_ext(LDAP, UNUSED1, UNUSED2) ldap_unbind(LDAP)
+# pragma comment(lib, "Wldap32.lib")
+# pragma comment(lib, "Wininet.lib")
+#else
+# include <ldap.h>
+# define LDAP_STR(X) ((X).c_str())
+# define LDAP_TIME(X) (&(X))
+#endif
+
+#if defined LDAP_API_FEATURE_X_OPENLDAP_REENTRANT && !LDAP_API_FEATURE_X_OPENLDAP_REENTRANT
+# error Anope requires OpenLDAP to be built as reentrant.
+#endif
+
 
 class LDAPService;
 static Pipe *me;
 
 class LDAPRequest
 {
- public:
+public:
 	LDAPService *service;
 	LDAPInterface *inter;
-	LDAPMessage *message; /* message returned by ldap_ */
-	LDAPResult *result; /* final result */
+	LDAPMessage *message = nullptr; /* message returned by ldap_ */
+	LDAPResult *result = nullptr; /* final result */
 	struct timeval tv;
-	QueryType type;
+	QueryType type = QUERY_UNKNOWN;
 
 	LDAPRequest(LDAPService *s, LDAPInterface *i)
 		: service(s)
 		, inter(i)
-		, message(NULL)
-		, result(NULL)
 	{
-		type = QUERY_UNKNOWN;
 		tv.tv_sec = 0;
 		tv.tv_usec = 100000;
 	}
@@ -56,7 +76,7 @@ class LDAPBind : public LDAPRequest
 {
 	Anope::string who, pass;
 
- public:
+public:
 	LDAPBind(LDAPService *s, LDAPInterface *i, const Anope::string &w, const Anope::string &p)
 		: LDAPRequest(s, i)
 		, who(w)
@@ -65,16 +85,16 @@ class LDAPBind : public LDAPRequest
 		type = QUERY_BIND;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
-class LDAPSearch : public LDAPRequest
+class LDAPSearchRequest : public LDAPRequest
 {
 	Anope::string base;
 	Anope::string filter;
 
- public:
-	LDAPSearch(LDAPService *s, LDAPInterface *i, const Anope::string &b, const Anope::string &f)
+public:
+	LDAPSearchRequest(LDAPService *s, LDAPInterface *i, const Anope::string &b, const Anope::string &f)
 		: LDAPRequest(s, i)
 		, base(b)
 		, filter(f)
@@ -82,7 +102,7 @@ class LDAPSearch : public LDAPRequest
 		type = QUERY_SEARCH;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPAdd : public LDAPRequest
@@ -90,7 +110,7 @@ class LDAPAdd : public LDAPRequest
 	Anope::string dn;
 	LDAPMods attributes;
 
- public:
+public:
 	LDAPAdd(LDAPService *s, LDAPInterface *i, const Anope::string &d, const LDAPMods &attr)
 		: LDAPRequest(s, i)
 		, dn(d)
@@ -99,14 +119,14 @@ class LDAPAdd : public LDAPRequest
 		type = QUERY_ADD;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPDel : public LDAPRequest
 {
 	Anope::string dn;
 
- public:
+public:
 	LDAPDel(LDAPService *s, LDAPInterface *i, const Anope::string &d)
 		: LDAPRequest(s, i)
 		, dn(d)
@@ -114,7 +134,7 @@ class LDAPDel : public LDAPRequest
 		type = QUERY_DELETE;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPModify : public LDAPRequest
@@ -122,7 +142,7 @@ class LDAPModify : public LDAPRequest
 	Anope::string base;
 	LDAPMods attributes;
 
- public:
+public:
 	LDAPModify(LDAPService *s, LDAPInterface *i, const Anope::string &b, const LDAPMods &attr)
 		: LDAPRequest(s, i)
 		, base(b)
@@ -131,7 +151,7 @@ class LDAPModify : public LDAPRequest
 		type = QUERY_MODIFY;
 	}
 
-	int run() anope_override;
+	int run() override;
 };
 
 class LDAPService : public LDAPProvider, public Thread, public Condition
@@ -142,9 +162,9 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 	LDAP *con;
 
-	time_t last_connect;
+	time_t last_connect = 0;
 
- public:
+public:
 	static LDAPMod **BuildMods(const LDAPMods &attributes)
 	{
 		LDAPMod **mods = new LDAPMod*[attributes.size() + 1];
@@ -184,7 +204,64 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		delete [] mods;
 	}
 
- private:
+private:
+#ifdef _WIN32
+	// Windows LDAP does not implement this so we need to do it.
+	int ldap_initialize(LDAP** ldap, const char* url)
+	{
+		URL_COMPONENTS urlComponents;
+		memset(&urlComponents, 0, sizeof(urlComponents));
+		urlComponents.dwStructSize = sizeof(urlComponents);
+
+		urlComponents.lpszScheme = new char[8];
+		urlComponents.dwSchemeLength = 8;
+
+		urlComponents.lpszHostName = new char[1024];
+		urlComponents.dwHostNameLength = 1024;
+
+		if (!InternetCrackUrlA(url, 0, 0, &urlComponents))
+		{
+			delete[] urlComponents.lpszScheme;
+			delete[] urlComponents.lpszHostName;
+			return LDAP_CONNECT_ERROR; // Malformed url.
+		}
+
+		unsigned long port = 389; // Default plaintext port.
+		bool secure = false; // LDAP defaults to plaintext.
+		if (urlComponents.dwSchemeLength > 0)
+		{
+			const Anope::string scheme(urlComponents.lpszScheme);
+			if (scheme.equals_ci("ldaps"))
+			{
+				port = 636; // Default encrypted port.
+				secure = true;
+			}
+			else if (!scheme.equals_ci("ldap"))
+			{
+				delete[] urlComponents.lpszScheme;
+				delete[] urlComponents.lpszHostName;
+				return LDAP_CONNECT_ERROR; // Invalid protocol.
+			}
+		}
+
+		if (urlComponents.nPort > 0)
+		{
+			port = urlComponents.nPort;
+		}
+
+		*ldap = ldap_sslinit(urlComponents.lpszHostName, port, secure);
+		delete[] urlComponents.lpszScheme;
+		delete[] urlComponents.lpszHostName;
+		if (!*ldap)
+		{
+			return LdapGetLastError(); // Something went wrong, find out what.
+		}
+
+		// We're connected to the LDAP server!
+		return LDAP_SUCCESS;
+	}
+#endif
+
 	void Connect()
 	{
 		int i = ldap_initialize(&this->con, this->server.c_str());
@@ -222,12 +299,12 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		this->Unlock();
 	}
 
- public:
+public:
 	typedef std::vector<LDAPRequest *> query_queue;
 	query_queue queries, results;
 	Mutex process_mutex; /* held when processing requests not in either queue */
 
-	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, n), server(s), admin_binddn(b), admin_pass(p), last_connect(0)
+	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, n), server(s), admin_binddn(b), admin_pass(p)
 	{
 		Connect();
 	}
@@ -238,10 +315,8 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 		this->Lock();
 
-		for (unsigned int i = 0; i < this->queries.size(); ++i)
+		for (auto *req : this->queries)
 		{
-			LDAPRequest *req = this->queries[i];
-
 			/* queries have no results yet */
 			req->result = new LDAPResult();
 			req->result->type = req->type;
@@ -253,10 +328,8 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		}
 		this->queries.clear();
 
-		for (unsigned int i = 0; i < this->results.size(); ++i)
+		for (const auto *req : this->queries)
 		{
-			LDAPRequest *req = this->results[i];
-
 			/* even though this may have already finished successfully we return that it didn't */
 			req->result->error = "LDAP Interface is going away";
 			if (req->inter)
@@ -270,45 +343,45 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		ldap_unbind_ext(this->con, NULL, NULL);
 	}
 
-	void BindAsAdmin(LDAPInterface *i) anope_override
+	void BindAsAdmin(LDAPInterface *i) override
 	{
 		this->Bind(i, this->admin_binddn, this->admin_pass);
 	}
 
-	void Bind(LDAPInterface *i, const Anope::string &who, const Anope::string &pass) anope_override
+	void Bind(LDAPInterface *i, const Anope::string &who, const Anope::string &pass) override
 	{
 		LDAPBind *b = new LDAPBind(this, i, who, pass);
 		QueueRequest(b);
 	}
 
-	void Search(LDAPInterface *i, const Anope::string &base, const Anope::string &filter) anope_override
+	void Search(LDAPInterface *i, const Anope::string &base, const Anope::string &filter) override
 	{
 		if (i == NULL)
 			throw LDAPException("No interface");
 
-		LDAPSearch *s = new LDAPSearch(this, i, base, filter);
+		LDAPSearchRequest *s = new LDAPSearchRequest(this, i, base, filter);
 		QueueRequest(s);
 	}
 
-	void Add(LDAPInterface *i, const Anope::string &dn, LDAPMods &attributes) anope_override
+	void Add(LDAPInterface *i, const Anope::string &dn, LDAPMods &attributes) override
 	{
 		LDAPAdd *add = new LDAPAdd(this, i, dn, attributes);
 		QueueRequest(add);
 	}
 
-	void Del(LDAPInterface *i, const Anope::string &dn) anope_override
+	void Del(LDAPInterface *i, const Anope::string &dn) override
 	{
 		LDAPDel *del = new LDAPDel(this, i, dn);
 		QueueRequest(del);
 	}
 
-	void Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) anope_override
+	void Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) override
 	{
 		LDAPModify *mod = new LDAPModify(this, i, base, attributes);
 		QueueRequest(mod);
 	}
 
- private:
+private:
 	void BuildReply(int res, LDAPRequest *req)
 	{
 		LDAPResult *ldap_result = req->result = new LDAPResult();
@@ -377,9 +450,8 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 			return;
 		}
 
-		for (unsigned int i = 0; i < q.size(); ++i)
+		for (auto *req : q)
 		{
-			LDAPRequest *req = q[i];
 			int ret = req->run();
 
 			if (ret == LDAP_SERVER_DOWN || ret == LDAP_TIMEOUT)
@@ -408,8 +480,8 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		process_mutex.Unlock();
 	}
 
- public:
-	void Run() anope_override
+public:
+	void Run() override
 	{
 		while (!this->GetExitState())
 		{
@@ -433,7 +505,7 @@ class ModuleLDAP : public Module, public Pipe
 {
 	std::map<Anope::string, LDAPService *> LDAPServices;
 
- public:
+public:
 
 	ModuleLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
@@ -452,7 +524,7 @@ class ModuleLDAP : public Module, public Pipe
 		LDAPServices.clear();
 	}
 
-	void OnReload(Configuration::Conf *config) anope_override
+	void OnReload(Configuration::Conf *config) override
 	{
 		Configuration::Block *conf = config->GetModule(this);
 
@@ -496,7 +568,7 @@ class ModuleLDAP : public Module, public Pipe
 				{
 					LDAPService *ss = new LDAPService(this, connname, server, admin_binddn, admin_password);
 					ss->Start();
-					this->LDAPServices.insert(std::make_pair(connname, ss));
+					this->LDAPServices.emplace(connname, ss);
 
 					Log(LOG_NORMAL, "ldap") << "LDAP: Successfully initialized server " << connname << " (" << server << ")";
 				}
@@ -508,7 +580,7 @@ class ModuleLDAP : public Module, public Pipe
 		}
 	}
 
-	void OnModuleUnload(User *, Module *m) anope_override
+	void OnModuleUnload(User *, Module *m) override
 	{
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end(); ++it)
 		{
@@ -545,7 +617,7 @@ class ModuleLDAP : public Module, public Pipe
 		}
 	}
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end(); ++it)
 		{
@@ -556,9 +628,8 @@ class ModuleLDAP : public Module, public Pipe
 			results.swap(s->results);
 			s->Unlock();
 
-			for (unsigned int i = 0; i < results.size(); ++i)
+			for (const auto *req : results)
 			{
-				LDAPRequest *req = results[i];
 				LDAPInterface *li = req->inter;
 				LDAPResult *r = req->result;
 
@@ -585,35 +656,35 @@ int LDAPBind::run()
 	cred.bv_val = strdup(pass.c_str());
 	cred.bv_len = pass.length();
 
-	int i = ldap_sasl_bind_s(service->GetConnection(), who.c_str(), LDAP_SASL_SIMPLE, &cred, NULL, NULL, NULL);
+	int i = ldap_sasl_bind_s(service->GetConnection(), LDAP_STR(who), LDAP_SASL_SIMPLE, &cred, NULL, NULL, NULL);
 
 	free(cred.bv_val);
 
 	return i;
 }
 
-int LDAPSearch::run()
+int LDAPSearchRequest::run()
 {
-	return ldap_search_ext_s(service->GetConnection(), base.c_str(), LDAP_SCOPE_SUBTREE, filter.c_str(), NULL, 0, NULL, NULL, &tv, 0, &message);
+	return ldap_search_ext_s(service->GetConnection(), LDAP_STR(base), LDAP_SCOPE_SUBTREE, LDAP_STR(filter), NULL, 0, NULL, NULL, LDAP_TIME(tv), 0, &message);
 }
 
 int LDAPAdd::run()
 {
 	LDAPMod **mods = LDAPService::BuildMods(attributes);
-	int i = ldap_add_ext_s(service->GetConnection(), dn.c_str(), mods, NULL, NULL);
+	int i = ldap_add_ext_s(service->GetConnection(), LDAP_STR(dn), mods, NULL, NULL);
 	LDAPService::FreeMods(mods);
 	return i;
 }
 
 int LDAPDel::run()
 {
-	return ldap_delete_ext_s(service->GetConnection(), dn.c_str(), NULL, NULL);
+	return ldap_delete_ext_s(service->GetConnection(), LDAP_STR(dn), NULL, NULL);
 }
 
 int LDAPModify::run()
 {
 	LDAPMod **mods = LDAPService::BuildMods(attributes);
-	int i = ldap_modify_ext_s(service->GetConnection(), base.c_str(), mods, NULL, NULL);
+	int i = ldap_modify_ext_s(service->GetConnection(), LDAP_STR(base), mods, NULL, NULL);
 	LDAPService::FreeMods(mods);
 	return i;
 }

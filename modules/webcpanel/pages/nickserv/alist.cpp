@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -24,10 +24,8 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 
 	int chan_count = 0;
 
-	for (unsigned q = 0; q < queue.size(); ++q)
+	for (auto *ci : queue)
 	{
-		ChannelInfo *ci = queue[q];
-
 		if (ci->GetFounder() == na->nc)
 		{
 			++chan_count;

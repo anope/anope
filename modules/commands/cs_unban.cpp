@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandCSUnban : public Command
 {
- public:
+public:
 	CommandCSUnban(Module *creator) : Command(creator, "chanserv/unban", 0, 2)
 	{
 		this->SetDesc(_("Remove all bans preventing a user from entering a channel"));
 		this->SetSyntax(_("\037channel\037 [\037nick\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName("BAN");
 		if (!cm)
@@ -38,15 +38,15 @@ class CommandCSUnban : public Command
 			source.GetAccount()->GetChannelReferences(queue);
 
 			unsigned count = 0;
-			for (unsigned i = 0; i < queue.size(); ++i)
+			for (auto *ci : queue)
 			{
-				ChannelInfo *ci = queue[i];
-
-				if (!ci->c || !source.AccessFor(ci).HasPriv("UNBAN"))
+				if (!ci->c || !(source.AccessFor(ci).HasPriv("UNBAN") || source.AccessFor(ci).HasPriv("UNBANME")))
 					continue;
 
-				for (unsigned j = 0; j < modes.size(); ++j)
-					if (ci->c->Unban(source.GetUser(), modes[j]->name, true))
+				FOREACH_MOD(OnChannelUnban, (source.GetUser(), ci));
+
+				for (const auto *mode : modes)
+					if (ci->c->Unban(source.GetUser(), mode->name, true))
 						++count;
 			}
 
@@ -69,12 +69,6 @@ class CommandCSUnban : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("UNBAN") && !source.HasPriv("chanserv/kick"))
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
-
 		User *u2 = source.GetUser();
 		if (params.size() > 1)
 			u2 = User::Find(params[1], true);
@@ -85,18 +79,28 @@ class CommandCSUnban : public Command
 			return;
 		}
 
+		if (!source.AccessFor(ci).HasPriv("UNBAN") &&
+			!(u2 == source.GetUser() && source.AccessFor(ci).HasPriv("UNBANME")) &&
+			!source.HasPriv("chanserv/kick"))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
 		bool override = !source.AccessFor(ci).HasPriv("UNBAN") && source.HasPriv("chanserv/kick");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unban " << u2->nick;
 
-		for (unsigned i = 0; i < modes.size(); ++i)
-			ci->c->Unban(u2, modes[i]->name, source.GetUser() == u2);
+		FOREACH_MOD(OnChannelUnban, (u2, ci));
+
+		for (const auto *mode : modes)
+			ci->c->Unban(u2, mode->name, source.GetUser() == u2);
 		if (u2 == source.GetUser())
 			source.Reply(_("You have been unbanned from \002%s\002."), ci->c->name.c_str());
 		else
 			source.Reply(_("\002%s\002 has been unbanned from \002%s\002."), u2->nick.c_str(), ci->c->name.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -115,7 +119,7 @@ class CSUnban : public Module
 {
 	CommandCSUnban commandcsunban;
 
- public:
+public:
 	CSUnban(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsunban(this)
 	{

@@ -1,6 +1,6 @@
 /* Module for plain text encryption.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * This program is free but copyrighted software; see the file COPYING for
@@ -11,14 +11,14 @@
 
 class ENone : public Module
 {
- public:
+public:
 	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
 			throw ModuleException("enc_none is deprecated and can not be used as a primary encryption method");
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		Anope::string buf = "plain:";
 		Anope::string cpass;
@@ -29,7 +29,7 @@ class ENone : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)

@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,8 +15,8 @@
 struct IgnoreDataImpl : IgnoreData, Serializable
 {
 	IgnoreDataImpl() : Serializable("IgnoreData") { }
-	~IgnoreDataImpl();
-	void Serialize(Serialize::Data &data) const anope_override;
+	~IgnoreDataImpl() override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
@@ -61,22 +61,22 @@ class OSIgnoreService : public IgnoreService
 {
 	Serialize::Checker<std::vector<IgnoreData *> > ignores;
 
- public:
+public:
 	OSIgnoreService(Module *o) : IgnoreService(o), ignores("IgnoreData") { }
 
-	void AddIgnore(IgnoreData *ign) anope_override
+	void AddIgnore(IgnoreData *ign) override
 	{
 		ignores->push_back(ign);
 	}
 
-	void DelIgnore(IgnoreData *ign) anope_override
+	void DelIgnore(IgnoreData *ign) override
 	{
 		std::vector<IgnoreData *>::iterator it = std::find(ignores->begin(), ignores->end(), ign);
 		if (it != ignores->end())
 			ignores->erase(it);
 	}
 
-	void ClearIgnores() anope_override
+	void ClearIgnores() override
 	{
 		for (unsigned i = ignores->size(); i > 0; --i)
 		{
@@ -85,12 +85,12 @@ class OSIgnoreService : public IgnoreService
 		}
 	}
 
-	IgnoreData *Create() anope_override
+	IgnoreData *Create() override
 	{
 		return new IgnoreDataImpl();
 	}
 
-	IgnoreData *Find(const Anope::string &mask) anope_override
+	IgnoreData *Find(const Anope::string &mask) override
 	{
 		User *u = User::Find(mask, true);
 		std::vector<IgnoreData *>::iterator ign = this->ignores->begin(), ign_end = this->ignores->end();
@@ -148,7 +148,7 @@ class OSIgnoreService : public IgnoreService
 		return NULL;
 	}
 
-	std::vector<IgnoreData *> &GetIgnores() anope_override
+	std::vector<IgnoreData *> &GetIgnores() override
 	{
 		return *ignores;
 	}
@@ -156,7 +156,7 @@ class OSIgnoreService : public IgnoreService
 
 class CommandOSIgnore : public Command
 {
- private:
+private:
 	Anope::string RealMask(const Anope::string &mask)
 	{
 		/* If it s an existing user, we ignore the hostmask. */
@@ -282,8 +282,8 @@ class CommandOSIgnore : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 	}
 
@@ -335,17 +335,17 @@ class CommandOSIgnore : public Command
 		return;
 	}
 
- public:
+public:
 	CommandOSIgnore(Module *creator) : Command(creator, "operserv/ignore", 1, 4)
 	{
-		this->SetDesc(_("Modify the Services ignore list"));
+		this->SetDesc(_("Modify the services ignore list"));
 		this->SetSyntax(_("ADD \037expiry\037 {\037nick\037|\037mask\037} [\037reason\037]"));
 		this->SetSyntax(_("DEL {\037nick\037|\037mask\037}"));
 		this->SetSyntax("LIST");
 		this->SetSyntax("CLEAR");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -363,17 +363,17 @@ class CommandOSIgnore : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to make Services ignore a nick or mask\n"
+		source.Reply(_("Allows Services Operators to make services ignore a nick or mask\n"
 				"for a certain time or until the next restart. The default\n"
 				"time format is seconds. You can specify it by using units.\n"
 				"Valid units are: \037s\037 for seconds, \037m\037 for minutes,\n"
 				"\037h\037 for hours and \037d\037 for days.\n"
 				"Combinations of these units are not permitted.\n"
-				"To make Services permanently ignore the user, type 0 as time.\n"
+				"To make services permanently ignore the user, type 0 as time.\n"
 				"When adding a \037mask\037, it should be in the format nick!user@host,\n"
 				"everything else will be considered a nick. Wildcards are permitted.\n"
 				" \n"
@@ -397,14 +397,14 @@ class OSIgnore : public Module
 	OSIgnoreService osignoreservice;
 	CommandOSIgnore commandosignore;
 
- public:
+public:
 	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		ignoredata_type("IgnoreData", IgnoreDataImpl::Unserialize), osignoreservice(this), commandosignore(this)
 	{
 
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) override
 	{
 		if (!u->HasMode("OPER") && this->osignoreservice.Find(u->nick))
 			return EVENT_STOP;

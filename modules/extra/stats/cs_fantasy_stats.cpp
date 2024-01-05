@@ -1,6 +1,6 @@
 /* Chanstats core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,14 +14,14 @@
 
 class MySQLInterface : public SQL::Interface
 {
- public:
+public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
-	void OnResult(const SQL::Result &r) anope_override
+	void OnResult(const SQL::Result &r) override
 	{
 	}
 
-	void OnError(const SQL::Result &r) anope_override
+	void OnError(const SQL::Result &r) override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
@@ -33,7 +33,7 @@ class MySQLInterface : public SQL::Interface
 
 class CommandCSStats : public Command
 {
- public:
+public:
 	CommandCSStats(Module *creator) : Command (creator, "chanserv/stats", 0, 2)
 	{
 		this->SetDesc(_("Displays your Channel Stats"));
@@ -45,7 +45,7 @@ class CommandCSStats : public Command
 
 class CommandCSGStats : public Command
 {
- public:
+public:
 	CommandCSGStats(Module *creator) : Command (creator, "chanserv/gstats", 0, 2)
 	{
 		this->SetDesc(_("Displays your Global Stats"));
@@ -65,7 +65,7 @@ class CSStats : public Module
 	ServiceReference<SQL::Provider> sql;
 	MySQLInterface sqlinterface;
 	Anope::string prefix;
- public:
+public:
 	CSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsstats(this), commandcsgstats(this), sql("", ""), sqlinterface(this)
 	{
@@ -73,7 +73,7 @@ class CSStats : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		prefix = conf->GetModule("m_chanstats")->Get<const Anope::string>("prefix", "anope_");
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("m_chanstats")->Get<const Anope::string>("engine"));

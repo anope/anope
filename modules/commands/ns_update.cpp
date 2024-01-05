@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandNSUpdate : public Command
 {
- public:
+public:
 	CommandNSUpdate(Module *creator) : Command(creator, "nickserv/update", 0, 0)
 	{
 		this->SetDesc(_("Updates your current status, i.e. it checks for new memos"));
 		this->RequireUser(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
 		NickAlias *na = NickAlias::Find(u->nick);
@@ -36,7 +36,7 @@ class CommandNSUpdate : public Command
 		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -51,7 +51,7 @@ class NSUpdate : public Module
 {
 	CommandNSUpdate commandnsupdate;
 
- public:
+public:
 	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsupdate(this)
 	{

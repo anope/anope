@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,7 +18,7 @@ typedef std::map<Anope::string, ChannelStatus> NSRecoverInfo;
 
 class NSRecoverSvsnick
 {
- public:
+public:
 	Reference<User> from;
 	Anope::string to;
 };
@@ -29,10 +29,10 @@ class NSRecoverRequest : public IdentifyRequest
 	Command *cmd;
 	Anope::string user;
 
- public:
+public:
 	NSRecoverRequest(Module *o, CommandSource &src, Command *c, const Anope::string &nick, const Anope::string &pass) : IdentifyRequest(o, nick, pass), source(src), cmd(c), user(nick) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		User *u = User::Find(user, true);
 		if (!source.GetUser() || !source.service)
@@ -69,8 +69,8 @@ class NSRecoverRequest : public IdentifyRequest
 				if (!u->chans.empty())
 				{
 					NSRecoverInfo *ei = source.GetUser()->Extend<NSRecoverInfo>("recover");
-					for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
-						(*ei)[it->first->name] = it->second->status;
+					for (auto &[chan, cuc] : u->chans)
+						(*ei)[chan->name] = cuc->status;
 				}
 			}
 
@@ -124,7 +124,7 @@ class NSRecoverRequest : public IdentifyRequest
 		}
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		if (NickAlias::Find(GetAccount()) != NULL)
 		{
@@ -143,7 +143,7 @@ class NSRecoverRequest : public IdentifyRequest
 
 class CommandNSRecover : public Command
 {
- public:
+public:
 	CommandNSRecover(Module *creator) : Command(creator, "nickserv/recover", 1, 2)
 	{
 		this->SetDesc(_("Regains control of your nick"));
@@ -151,7 +151,7 @@ class CommandNSRecover : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = params[0];
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
@@ -207,7 +207,7 @@ class CommandNSRecover : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -227,7 +227,7 @@ class NSRecover : public Module
 	PrimitiveExtensibleItem<NSRecoverInfo> recover;
 	PrimitiveExtensibleItem<NSRecoverSvsnick> svsnick;
 
- public:
+public:
 	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsrecover(this), recover(this, "recover"), svsnick(this, "svsnick")
 	{
@@ -237,7 +237,7 @@ class NSRecover : public Module
 
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
+	void OnUserNickChange(User *u, const Anope::string &oldnick) override
 	{
 		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
 		{
@@ -272,7 +272,7 @@ class NSRecover : public Module
 		}
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	void OnJoinChannel(User *u, Channel *c) override
 	{
 		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
 		{
@@ -283,8 +283,8 @@ class NSRecover : public Module
 				NSRecoverInfo::iterator it = ei->find(c->name);
 				if (it != ei->end())
 				{
-					for (size_t i = 0; i < it->second.Modes().length(); ++i)
-						c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByChar(it->second.Modes()[i]), u->GetUID());
+					for (auto mode : it->second.Modes())
+						c->SetMode(c->WhoSends(), ModeManager::FindChannelModeByChar(mode), u->GetUID());
 
 					ei->erase(it);
 					if (ei->empty())

@@ -1,10 +1,12 @@
 /*
  *
- * (C) 2014-2021 Anope Team
+ * (C) 2014-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
+
+#pragma once
 
 namespace SASL
 {
@@ -22,7 +24,7 @@ namespace SASL
 
 	class Service : public ::Service
 	{
-	 public:
+	public:
 		Service(Module *o) : ::Service(o, "SASL::Service", "sasl") { }
 
 		virtual void ProcessMessage(const Message &) = 0;
@@ -60,7 +62,7 @@ namespace SASL
 	/* PLAIN, EXTERNAL, etc */
 	class Mechanism : public ::Service
 	{
-	 public:
+	public:
 		Mechanism(Module *o, const Anope::string &sname) : Service(o, "SASL::Mechanism", sname) { }
 
 		virtual Session* CreateSession(const Anope::string &uid) { return new Session(this, uid); }
@@ -79,10 +81,10 @@ namespace SASL
 		Anope::string uid;
 		Anope::string hostname, ip;
 
-	 public:
+	public:
 		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass, const Anope::string &h, const Anope::string &i) : ::IdentifyRequest(m, acc, pass), uid(id), hostname(h), ip(i) { }
 
-		void OnSuccess() anope_override
+		void OnSuccess() override
 		{
 			if (!sasl)
 				return;
@@ -108,7 +110,7 @@ namespace SASL
 			}
 		}
 
-		void OnFail() anope_override
+		void OnFail() override
 		{
 			if (!sasl)
 				return;

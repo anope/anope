@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -74,10 +74,8 @@ struct Rewrite
 
 	static Rewrite *Find(const Anope::string &client, const Anope::string &cmd)
 	{
-		for (unsigned i = 0; i < rewrites.size(); ++i)
+		for (auto &r : rewrites)
 		{
-			Rewrite &r = rewrites[i];
-
 			if ((client.empty() || r.client.equals_ci(client)) && (r.source_message.equals_ci(cmd) || r.source_message.find_ci(cmd + " ") == 0))
 				return &r;
 		}
@@ -87,10 +85,8 @@ struct Rewrite
 
 	static Rewrite *Match(const Anope::string &client, const std::vector<Anope::string> &params)
 	{
-		for (unsigned i = 0; i < rewrites.size(); ++i)
+		for (auto &r : rewrites)
 		{
-			Rewrite &r = rewrites[i];
-
 			if ((client.empty() || r.client.equals_ci(client)) && r.Matches(params))
 				return &r;
 		}
@@ -103,10 +99,10 @@ std::vector<Rewrite> Rewrite::rewrites;
 
 class RewriteCommand : public Command
 {
- public:
+public:
 	RewriteCommand(Module *creator) : Command(creator, "rewrite", 0, 0) { }
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		std::vector<Anope::string> full_params = params;
 		full_params.insert(full_params.begin(), source.command);
@@ -125,7 +121,7 @@ class RewriteCommand : public Command
 			Log() << "m_rewrite: Unable to rewrite '" << source.command << (!params.empty() ? " " + params[0] : "") << "'";
 	}
 
-	void OnServHelp(CommandSource &source) anope_override
+	void OnServHelp(CommandSource &source) override
 	{
 		Rewrite *r = Rewrite::Find(!source.c ? source.service->nick : "", source.command);
 		if (r != NULL && !r->desc.empty())
@@ -135,7 +131,7 @@ class RewriteCommand : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		Rewrite *r = Rewrite::Find(!source.c ? source.service->nick : "", source.command);
 		if (r != NULL && !r->desc.empty())
@@ -153,12 +149,12 @@ class ModuleRewrite : public Module
 {
 	RewriteCommand cmdrewrite;
 
- public:
+public:
 	ModuleRewrite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA), cmdrewrite(this)
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Rewrite::rewrites.clear();
 

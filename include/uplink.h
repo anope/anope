@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef UPLINK_H
-#define UPLINK_H
+#pragma once
 
 #include "sockets.h"
 #include "protocol.h"
@@ -23,13 +22,13 @@ namespace Uplink
 /* This is the socket to our uplink */
 class UplinkSocket : public ConnectionSocket, public BufferedSocket
 {
- public:
+public:
 	bool error;
 	UplinkSocket();
 	~UplinkSocket();
-	bool ProcessRead() anope_override;
-	void OnConnect() anope_override;
-	void OnError(const Anope::string &) anope_override;
+	bool ProcessRead() override;
+	void OnConnect() override;
+	void OnError(const Anope::string &) override;
 
 	/* A message sent over the uplink socket */
 	class CoreExport Message
@@ -37,7 +36,7 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 		MessageSource source;
 		std::stringstream buffer;
 
-	 public:
+	public:
 		Message();
 		Message(const MessageSource &);
 		~Message();
@@ -49,5 +48,3 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 	};
 };
 extern CoreExport UplinkSocket *UplinkSock;
-
-#endif // UPLINK_H

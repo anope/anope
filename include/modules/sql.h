@@ -1,17 +1,19 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
+
+#pragma once
 
 namespace SQL
 {
 
 	class Data : public Serialize::Data
 	{
-	 public:
+	public:
 		typedef std::map<Anope::string, std::stringstream *> Map;
 		Map data;
 		std::map<Anope::string, Type> types;
@@ -21,7 +23,7 @@ namespace SQL
 			Clear();
 		}
 
-		std::iostream& operator[](const Anope::string &key) anope_override
+		std::iostream& operator[](const Anope::string &key) override
 		{
 			std::stringstream *&ss = data[key];
 			if (!ss)
@@ -29,44 +31,46 @@ namespace SQL
 			return *ss;
 		}
 
-		std::set<Anope::string> KeySet() const anope_override
+		std::set<Anope::string> KeySet() const override
 		{
 			std::set<Anope::string> keys;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				keys.insert(it->first);
+			for (const auto &[key, _] : this->data)
+				keys.insert(key);
 			return keys;
 		}
 
-		size_t Hash() const anope_override
+		size_t Hash() const override
 		{
 			size_t hash = 0;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				if (!it->second->str().empty())
-					hash ^= Anope::hash_cs()(it->second->str());
+			for (const auto &[_, value] : this->data)
+			{
+				if (!value->str().empty())
+					hash ^= Anope::hash_cs()(value->str());
+			}
 			return hash;
 		}
 
 		std::map<Anope::string, std::iostream *> GetData() const
 		{
 			std::map<Anope::string, std::iostream *> d;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				d[it->first] = it->second;
+			for (const auto &[key, value] : this->data)
+				d[key] = value;
 			return d;
 		}
 
 		void Clear()
 		{
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				delete it->second;
+			for (const auto &[_, value] : this->data)
+				delete value;
 			this->data.clear();
 		}
 
-		void SetType(const Anope::string &key, Type t) anope_override
+		void SetType(const Anope::string &key, Type t) override
 		{
 			this->types[key] = t;
 		}
 
-		Type GetType(const Anope::string &key) const anope_override
+		Type GetType(const Anope::string &key) const override
 		{
 			std::map<Anope::string, Type>::const_iterator it = this->types.find(key);
 			if (it != this->types.end())
@@ -79,10 +83,10 @@ namespace SQL
 	 */
 	class Exception : public ModuleException
 	{
-	 public:
+	public:
 		Exception(const Anope::string &reason) : ModuleException(reason) { }
 
-		virtual ~Exception() throw() { }
+		virtual ~Exception() noexcept = default;
 	};
 
 	/** A SQL query
@@ -135,21 +139,21 @@ namespace SQL
 	 */
 	class Result
 	{
-	 protected:
+	protected:
 		/* Rows, column, item */
 		std::vector<std::map<Anope::string, Anope::string> > entries;
 		Query query;
 		Anope::string error;
-	 public:
-		unsigned int id;
+	public:
+		unsigned int id = 0;
 		Anope::string finished_query;
 
-		Result() : id(0) { }
+		Result() = default;
 		Result(unsigned int i, const Query &q, const Anope::string &fq, const Anope::string &err = "") : query(q), error(err), id(i), finished_query(fq) { }
 
 		inline operator bool() const { return this->error.empty(); }
 
-		inline const unsigned int GetID() const { return this->id; }
+		inline unsigned int GetID() const { return this->id; }
 		inline const Query &GetQuery() const { return this->query; }
 		inline const Anope::string &GetError() const { return this->error; }
 
@@ -183,11 +187,11 @@ namespace SQL
 	 */
 	class Interface
 	{
-	 public:
+	public:
 		Module *owner;
 
 		Interface(Module *m) : owner(m) { }
-		virtual ~Interface() { }
+		virtual ~Interface() = default;
 
 		virtual void OnResult(const Result &r) = 0;
 		virtual void OnError(const Result &r) = 0;
@@ -197,7 +201,7 @@ namespace SQL
 	 */
 	class Provider : public Service
 	{
-	 public:
+	public:
 		Provider(Module *c, const Anope::string &n) : Service(c, "SQL::Provider", n) { }
 
 		virtual void Run(Interface *i, const Query &query) = 0;

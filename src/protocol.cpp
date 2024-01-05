@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -25,7 +25,7 @@ IRCDProto::IRCDProto(Module *creator, const Anope::string &p) : Service(creator,
 {
 	DefaultPseudoclientModes = "+io";
 	CanSVSNick = CanSVSJoin = CanSetVHost = CanSetVIdent = CanSNLine = CanSQLine = CanSQLineChannel
-		= CanSZLine = CanSVSHold = CanCertFP = CanSendTags = RequiresID = AmbiguousID = false;
+		= CanSZLine = CanSVSHold = CanCertFP = CanSendTags = CanSVSLogout = RequiresID = AmbiguousID = false;
 	MaxModes = 3;
 	MaxLine = 512;
 
@@ -351,7 +351,7 @@ void IRCDProto::SendNumeric(int numeric, const Anope::string &dest, const char *
 bool IRCDProto::IsNickValid(const Anope::string &nick)
 {
 	/**
-	 * RFC: defination of a valid nick
+	 * RFC: definition of a valid nick
 	 * nickname =  ( letter / special ) ( letter / digit / special / "-" )
 	 * letter   =  A-Z / a-z
 	 * digit    =  0-9
@@ -389,10 +389,8 @@ bool IRCDProto::IsIdentValid(const Anope::string &ident)
 	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
 		return false;
 
-	for (unsigned i = 0; i < ident.length(); ++i)
+	for (auto c : ident)
 	{
-		const char &c = ident[i];
-
 		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
 			continue;
 
@@ -416,11 +414,11 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 		return false;
 
 	int dots = 0;
-	for (unsigned i = 0; i < host.length(); ++i)
+	for (auto chr : host)
 	{
-		if (host[i] == '.')
+		if (chr == '.')
 			++dots;
-		if (vhostchars.find_first_of(host[i]) == Anope::string::npos)
+		if (vhostchars.find_first_of(chr) == Anope::string::npos)
 			return false;
 	}
 
@@ -438,6 +436,11 @@ unsigned IRCDProto::GetMaxListFor(Channel *c)
 	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<int>("modelistsize");
 }
 
+unsigned IRCDProto::GetMaxListFor(Channel *c, ChannelMode *cm)
+{
+	return GetMaxListFor(c);
+}
+
 Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 {
 	if (IsExtbanValid(mask))
@@ -445,7 +448,7 @@ Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 	return Entry("", mask).GetNUHMask();
 }
 
-MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
+MessageSource::MessageSource(const Anope::string &src) : source(src)
 {
 	/* no source for incoming message is our uplink */
 	if (src.empty())
@@ -456,11 +459,11 @@ MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s
 		this->u = User::Find(src);
 }
 
-MessageSource::MessageSource(User *_u) : source(_u ? _u->nick : ""), u(_u), s(NULL)
+MessageSource::MessageSource(User *_u) : source(_u ? _u->nick : ""), u(_u)
 {
 }
 
-MessageSource::MessageSource(Server *_s) : source(_s ? _s->GetName() : ""), u(NULL), s(_s)
+MessageSource::MessageSource(Server *_s) : source(_s ? _s->GetName() : ""), s(_s)
 {
 }
 

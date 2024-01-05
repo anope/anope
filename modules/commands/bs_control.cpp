@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandBSSay : public Command
 {
- public:
+public:
 	CommandBSSay(Module *creator) : Command(creator, "botserv/say", 2, 2)
 	{
 		this->SetDesc(_("Makes the bot say the specified text on the specified channel"));
 		this->SetSyntax(_("\037channel\037 \037text\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &text = params[1];
 
@@ -62,7 +62,7 @@ class CommandBSSay : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to say: " << text;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -73,14 +73,14 @@ class CommandBSSay : public Command
 
 class CommandBSAct : public Command
 {
- public:
+public:
 	CommandBSAct(Module *creator) : Command(creator, "botserv/act", 2, 2)
 	{
 		this->SetDesc(_("Makes the bot do the equivalent of a \"/me\" command"));
 		this->SetSyntax(_("\037channel\037 \037text\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string message = params[1];
 
@@ -120,7 +120,7 @@ class CommandBSAct : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to say: " << message;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -135,7 +135,7 @@ class BSControl : public Module
 	CommandBSSay commandbssay;
 	CommandBSAct commandbsact;
 
- public:
+public:
 	BSControl(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbssay(this), commandbsact(this)
 	{

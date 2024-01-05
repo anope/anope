@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2012-2021 Anope Team
+ * (C) 2012-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -11,14 +11,14 @@
 
 class CommandCSSetChanstats : public Command
 {
- public:
+public:
 	CommandCSSetChanstats(Module *creator) : Command(creator, "chanserv/set/chanstats", 2, 2)
 	{
 		this->SetDesc(_("Turn chanstats statistics on or off"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (!ci)
@@ -54,7 +54,7 @@ class CommandCSSetChanstats : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -65,7 +65,7 @@ class CommandCSSetChanstats : public Command
 
 class CommandNSSetChanstats : public Command
 {
- public:
+public:
 	CommandNSSetChanstats(Module *creator, const Anope::string &sname = "nickserv/set/chanstats", size_t min = 1 ) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn chanstats statistics on or off"));
@@ -107,12 +107,12 @@ class CommandNSSetChanstats : public Command
 			this->OnSyntaxError(source, "CHANSTATS");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -123,19 +123,19 @@ class CommandNSSetChanstats : public Command
 
 class CommandNSSASetChanstats : public CommandNSSetChanstats
 {
- public:
+public:
 	CommandNSSASetChanstats(Module *creator) : CommandNSSetChanstats(creator, "nickserv/saset/chanstats", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1], true);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -146,14 +146,14 @@ class CommandNSSASetChanstats : public CommandNSSetChanstats
 
 class MySQLInterface : public SQL::Interface
 {
- public:
+public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
-	void OnResult(const SQL::Result &r) anope_override
+	void OnResult(const SQL::Result &r) override
 	{
 	}
 
-	void OnError(const SQL::Result &r) anope_override
+	void OnError(const SQL::Result &r) override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
@@ -483,7 +483,7 @@ class MChanstats : public Module
 	}
 
 
- public:
+public:
 	MChanstats(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, EXTRA | VENDOR),
 		cs_stats(this, "CS_STATS"), ns_stats(this, "NS_STATS"),
@@ -492,7 +492,7 @@ class MChanstats : public Module
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		prefix = block->Get<const Anope::string>("prefix", "anope_");
@@ -509,7 +509,7 @@ class MChanstats : public Module
 			Log(this) << "no database connection to " << engine;
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;
@@ -517,7 +517,7 @@ class MChanstats : public Module
 			info.AddOption(_("Chanstats"));
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
 	{
 		if (!show_hidden)
 			return;
@@ -525,7 +525,7 @@ class MChanstats : public Module
 			info.AddOption(_("Chanstats"));
 	}
 
-	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
+	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) override
 	{
 		if (!source || !source->Account() || !c->ci || !cs_stats.HasExt(c->ci))
 			return;
@@ -535,19 +535,19 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
 		this->OnModeChange(c, setter.GetUser());
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *, const Anope::string &param) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *, const Anope::string &param) override
 	{
 		this->OnModeChange(c, setter.GetUser());
 		return EVENT_CONTINUE;
 	}
 
- private:
+private:
 	void OnModeChange(Channel *c, User *u)
 	{
 		if (!u || !u->Account() || !c->ci || !cs_stats.HasExt(c->ci))
@@ -559,8 +559,8 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
- public:
-	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_override
+public:
+	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) override
 	{
 		if (!cu->chan->ci || !cs_stats.HasExt(cu->chan->ci))
 			return;
@@ -576,7 +576,7 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) override
 	{
 		if (!c->ci || !cs_stats.HasExt(c->ci))
 			return;
@@ -617,14 +617,14 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
-	void OnDelCore(NickCore *nc) anope_override
+	void OnDelCore(NickCore *nc) override
 	{
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `nick` = @nick@;";
 		query.SetValue("nick", nc->display);
 		this->RunQuery(query);
 	}
 
-	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) anope_override
+	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) override
 	{
 		query = "CALL " + prefix + "chanstats_proc_chgdisplay(@old_display@, @new_display@);";
 		query.SetValue("old_display", nc->display);
@@ -632,20 +632,20 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
-	void OnDelChan(ChannelInfo *ci) anope_override
+	void OnDelChan(ChannelInfo *ci) override
 	{
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `chan` = @channel@;";
 		query.SetValue("channel", ci->name);
 		this->RunQuery(query);
 	}
 
-	void OnChanRegistered(ChannelInfo *ci)
+	void OnChanRegistered(ChannelInfo *ci) override
 	{
 		if (CSDefChanstats)
 			ci->Extend<bool>("CS_STATS");
 	}
 
-	void OnNickRegister(User *user, NickAlias *na, const Anope::string &)
+	void OnNickRegister(User *user, NickAlias *na, const Anope::string &) override
 	{
 		if (NSDefChanstats)
 			na->nc->Extend<bool>("NS_STATS");

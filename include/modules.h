@@ -1,6 +1,6 @@
 /* Modular support
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,11 +9,10 @@
  * Based on the original code of Services by Andy Church.
  */
 
+
+#pragma once
+
 #include "serialize.h"
-
-#ifndef MODULES_H
-#define MODULES_H
-
 #include "base.h"
 #include "modes.h"
 #include "timers.h"
@@ -25,32 +24,7 @@
  * and functions needed to make a module loadable by the OS.
  * It defines the class factory and external AnopeInit and AnopeFini functions.
  */
-#ifdef _WIN32
-# define MODULE_INIT(x) \
-	extern "C" DllExport Module *AnopeInit(const Anope::string &, const Anope::string &); \
-	extern "C" Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
-	{ \
-		return new x(modname, creator); \
-	} \
-	BOOLEAN WINAPI DllMain(HINSTANCE, DWORD, LPVOID) \
-	{ \
-		return TRUE; \
-	} \
-	extern "C" DllExport void AnopeFini(x *); \
-	extern "C" void AnopeFini(x *m) \
-	{ \
-		delete m; \
-	} \
-	extern "C" DllExport ModuleVersionC AnopeVersion() \
-	{ \
-		ModuleVersionC ver; \
-		ver.version_major = VERSION_MAJOR; \
-		ver.version_minor = VERSION_MINOR; \
-		ver.version_patch = VERSION_PATCH; \
-		return ver; \
-	}
-#else
-# define MODULE_INIT(x) \
+#define MODULE_INIT(x) \
 	extern "C" DllExport Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
 	{ \
 		return new x(modname, creator); \
@@ -67,7 +41,6 @@
 		ver.version_patch = VERSION_PATCH; \
 		return ver; \
 	}
-#endif
 
 /**
  * This #define allows us to call a method in all
@@ -199,12 +172,12 @@ struct ModuleVersionC
  */
 class ModuleVersion
 {
- private:
+private:
 	int version_major;
 	int version_minor;
 	int version_patch;
 
- public:
+public:
 	ModuleVersion(const ModuleVersionC &);
 
 	/** Get the major version of Anope this was built against
@@ -229,9 +202,9 @@ class NotImplementedException : public CoreException { };
  */
 class CoreExport Module : public Extensible
 {
- private:
+private:
 	bool permanent;
- public:
+public:
 	/** The module name (e.g. os_modload)
 	 */
 	Anope::string name;
@@ -322,7 +295,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) { throw NotImplementedException(); }
 
-	/** Called when Services' configuration is being (re)loaded.
+	/** Called when the configuration is being (re)loaded.
 	 * @param conf The config that is being built now and will replace the global Config object
 	 * @throws A ConfigException to abort the config (re)loading process.
 	 */
@@ -402,7 +375,6 @@ class CoreExport Module : public Extensible
 	virtual EventReturn OnLoadDatabase() { throw NotImplementedException(); }
 
 	/** Called when anope needs to check passwords against encryption
-	 *  see src/encrypt.c for detailed informations
 	 */
 	virtual EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) { throw NotImplementedException(); }
 
@@ -506,7 +478,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnChanExpire(ChannelInfo *ci) { throw NotImplementedException(); }
 
-	/** Called before Anope connecs to its uplink
+	/** Called before Anope connects to its uplink
 	 */
 	virtual void OnPreServerConnect() { throw NotImplementedException(); }
 
@@ -554,7 +526,7 @@ class CoreExport Module : public Extensible
 
 	/** Called before an exception is deleted
 	 * @param source The source deleting it
-	 * @param ex The exceotion
+	 * @param ex The exception
 	 */
 	virtual void OnExceptionDel(CommandSource &source, Exception *ex) { throw NotImplementedException(); }
 
@@ -775,7 +747,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickSuspend(NickAlias *na) { throw NotImplementedException(); }
 
-	/** Called when a nick is unsuspneded
+	/** Called when a nick is unsuspended
 	 * @param na The nick alias
 	 */
 	virtual void OnNickUnsuspended(NickAlias *na) { throw NotImplementedException(); }
@@ -938,12 +910,12 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) { throw NotImplementedException(); }
 
-	/** Called when a channel mode is introducted into Anope
+	/** Called when a channel mode is introduced into Anope
 	 * @param cm The mode
 	 */
 	virtual void OnChannelModeAdd(ChannelMode *cm) { throw NotImplementedException(); }
 
-	/** Called when a user mode is introducted into Anope
+	/** Called when a user mode is introduced into Anope
 	 * @param um The mode
 	 */
 	virtual void OnUserModeAdd(UserMode *um) { throw NotImplementedException(); }
@@ -1065,7 +1037,7 @@ class CoreExport Module : public Extensible
 	/** Called when a nickserv/set command is used.
 	 * @param source The source of the command
 	 * @param cmd The command
-	 * @param nc The nickcore being modifed
+	 * @param nc The nickcore being modified
 	 * @param setting The setting passed to the command. Probably ON/OFF.
 	 * @return EVENT_STOP to halt immediately
 	 */
@@ -1079,7 +1051,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnMessage(MessageSource &source, Anope::string &command, std::vector<Anope::string> &param) { throw NotImplementedException(); }
 
-	/** Called to determine if a chnanel mode can be set by a user
+	/** Called to determine if a channel mode can be set by a user
 	 * @param u The user
 	 * @param cm The mode
 	 */
@@ -1092,13 +1064,20 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnExpireTick() { throw NotImplementedException(); }
 
-	/** Called when a nick is validated. That is, to determine if a user is permissted
+	/** Called when a nick is validated. That is, to determine if a user is permitted
 	 * to be on the given nick.
 	 * @param u The user
 	 * @param na The nick they are on
 	 * @return EVENT_STOP to force the user off of the nick
 	 */
 	virtual EventReturn OnNickValidate(User *u, NickAlias *na) { throw NotImplementedException(); }
+
+	/** Called when a certain user has to be unbanned on a certain channel.
+	 * May be used to send protocol-specific messages.
+	 * @param u The user to be unbanned
+	 * @param c The channel that user has to be unbanned on
+	 */
+	virtual void OnChannelUnban(User *u, ChannelInfo *ci) { throw NotImplementedException(); }
 };
 
 enum Implementation
@@ -1124,7 +1103,7 @@ enum Implementation
 	I_OnPrivmsg, I_OnLog, I_OnLogMessage, I_OnDnsRequest, I_OnCheckModes, I_OnChannelSync, I_OnSetCorrectModes,
 	I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate,
 	I_OnSerializeTypeCreate, I_OnSetChannelOption, I_OnSetNickOption, I_OnMessage, I_OnCanSet, I_OnCheckDelete,
-	I_OnExpireTick, I_OnNickValidate,
+	I_OnExpireTick, I_OnNickValidate, I_OnChannelUnban,
 	I_SIZE
 };
 
@@ -1132,7 +1111,7 @@ enum Implementation
  */
 class CoreExport ModuleManager
 {
- public:
+public:
 	/** Event handler hooks.
 	 */
 	static std::vector<Module *> EventHandlers[I_SIZE];
@@ -1176,7 +1155,7 @@ class CoreExport ModuleManager
 	/** Checks whether this version of Anope is at least major.minor.patch.build
 	 * Throws a ModuleException if not
 	 * @param major The major version
-	 * @param minor The minor vesion
+	 * @param minor The minor version
 	 * @param patch The patch version
 	 */
 	static void RequireVersion(int major, int minor, int patch);
@@ -1215,7 +1194,7 @@ class CoreExport ModuleManager
 	 */
 	static void UnloadAll();
 
- private:
+private:
 	/** Call the module_delete function to safely delete the module
 	 * @param m the module to delete
 	 * @return MOD_ERR_OK on success, anything else on fail
@@ -1227,5 +1206,3 @@ class CoreExport ModuleManager
 	 */
 	static ModuleVersion GetVersion(void *handle);
 };
-
-#endif // MODULES_H

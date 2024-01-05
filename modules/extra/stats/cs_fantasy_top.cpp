@@ -1,6 +1,6 @@
 /* Chanstats core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,14 +14,14 @@
 
 class MySQLInterface : public SQL::Interface
 {
- public:
+public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
-	void OnResult(const SQL::Result &r) anope_override
+	void OnResult(const SQL::Result &r) override
 	{
 	}
 
-	void OnError(const SQL::Result &r) anope_override
+	void OnError(const SQL::Result &r) override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
@@ -32,7 +32,7 @@ class MySQLInterface : public SQL::Interface
 
 class CommandCSTop : public Command
 {
- public:
+public:
 	CommandCSTop(Module *creator) : Command (creator, "chanserv/top", 0, 2)
 	{
 		this->SetDesc(_("Displays the top 3 users of a channel"));
@@ -44,7 +44,7 @@ class CommandCSTop : public Command
 
 class CommandCSTop10 : public Command
 {
- public:
+public:
 	CommandCSTop10(Module *creator) : Command (creator, "chanserv/top10", 0, 2)
 	{
 		this->SetDesc(_("Displays the top 10 users of a channel"));
@@ -56,7 +56,7 @@ class CommandCSTop10 : public Command
 
 class CommandCSGTop : public Command
 {
- public:
+public:
 	CommandCSGTop(Module *creator) : Command (creator, "chanserv/gtop", 0, 1)
 	{
 		this->SetDesc(_("Displays the top 3 users of the network"));
@@ -67,7 +67,7 @@ class CommandCSGTop : public Command
 
 class CommandCSGTop10 : public Command
 {
- public:
+public:
 	CommandCSGTop10(Module *creator) : Command (creator, "chanserv/gtop10", 0, 1)
 	{
 		this->SetDesc(_("Displays the top 10 users of the network"));
@@ -89,7 +89,7 @@ class CSTop : public Module
 	MySQLInterface sqlinterface;
 	Anope::string prefix;
 
- public:
+public:
 	CSTop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcstop(this), commandcsgtop(this), commandcstop10(this), commandcsgtop10(this), sql("", ""),
 		sqlinterface(this)
@@ -98,7 +98,7 @@ class CSTop : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		prefix = conf->GetModule("m_chanstats")->Get<const Anope::string>("prefix", "anope_");
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("m_chanstats")->Get<const Anope::string>("engine"));

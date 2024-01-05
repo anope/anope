@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SERIALIZE_H
-#define SERIALIZE_H
+#pragma once
 
 #include <sstream>
 
@@ -21,14 +20,14 @@ namespace Serialize
 {
 	class Data
 	{
-	 public:
+	public:
 		enum Type
 		{
 			DT_TEXT,
 			DT_INT
 		};
 
-		virtual ~Data() { }
+		virtual ~Data() = default;
 
 		virtual std::iostream& operator[](const Anope::string &key) = 0;
 		virtual std::set<Anope::string> KeySet() const { throw CoreException("Not supported"); }
@@ -46,13 +45,13 @@ namespace Serialize
 	template<typename T> class Reference;
 }
 
-/** A serialziable object. Serializable objects can be serialized into
+/** A serializable object. Serializable objects can be serialized into
  * abstract data types (Serialize::Data), and then reconstructed or
  * updated later at any time.
  */
 class CoreExport Serializable : public virtual Base
 {
- private:
+private:
 	/* A list of every serializable item in Anope.
 	 * Some of these are static and constructed at runtime,
 	 * so this list must be on the heap, as it is not always
@@ -65,24 +64,24 @@ class CoreExport Serializable : public virtual Base
 	/* Iterator into serializable_items */
 	std::list<Serializable *>::iterator s_iter;
 	/* The hash of the last serialized form of this object committed to the database */
-	size_t last_commit;
+	size_t last_commit = 0;
 	/* The last time this object was committed to the database */
-	time_t last_commit_time;
+	time_t last_commit_time = 0;
 
- protected:
+protected:
 	Serializable(const Anope::string &serialize_type);
 	Serializable(const Serializable &);
 
 	Serializable &operator=(const Serializable &);
 
- public:
+public:
 	virtual ~Serializable();
 
 	/* Unique ID (per type, not globally) for this object */
-	uint64_t id;
+	uint64_t id = 0;
 
 	/* Only used by redis, to ignore updates */
-	unsigned short redis_ignore;
+	unsigned short redis_ignore = 0;
 
 	/** Marks the object as potentially being updated "soon".
 	 */
@@ -105,7 +104,7 @@ class CoreExport Serializable : public virtual Base
 };
 
 /* A serializable type. There should be one of these classes for each type
- * of class that inherits from Serialiable. Used for unserializing objects
+ * of class that inherits from Serializable. Used for unserializing objects
  * of this type, as it requires a function pointer to a static member function.
  */
 class CoreExport Serialize::Type : public Base
@@ -123,13 +122,13 @@ class CoreExport Serialize::Type : public Base
 	 */
 	Module *owner;
 
-	/* The timesatmp for this type. All objects of this type are as up to date as
+	/* The timestamp for this type. All objects of this type are as up to date as
 	 * this timestamp. if curtime == timestamp then we have the most up to date
 	 * version of every object of this type.
 	 */
-	time_t timestamp;
+	time_t timestamp = 0;
 
- public:
+public:
 	/* Map of Serializable::id to Serializable objects */
 	std::map<uint64_t, Serializable *> objects;
 
@@ -187,7 +186,7 @@ class Serialize::Checker
 {
 	Anope::string name;
 	T obj;
-	mutable ::Reference<Serialize::Type> type;
+	mutable ::Reference<Serialize::Type> type = nullptr;
 
 	inline void Check() const
 	{
@@ -197,8 +196,8 @@ class Serialize::Checker
 			type->Check();
 	}
 
- public:
-	Checker(const Anope::string &n) : name(n), type(NULL) { }
+public:
+	Checker(const Anope::string &n) : name(n) { }
 
 	inline const T* operator->() const
 	{
@@ -243,13 +242,11 @@ class Serialize::Checker
 template<typename T>
 class Serialize::Reference : public ReferenceBase
 {
- protected:
-	T *ref;
+protected:
+	T *ref = nullptr;
 
- public:
-	Reference() : ref(NULL)
-	{
-	}
+public:
+	Reference() = default;
 
 	Reference(T *obj) : ref(obj)
 	{
@@ -331,5 +328,3 @@ class Serialize::Reference : public ReferenceBase
 		return NULL;
 	}
 };
-
-#endif // SERIALIZE_H

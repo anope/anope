@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,42 +16,40 @@ class MyRedisService;
 class RedisSocket : public BinarySocket, public ConnectionSocket
 {
 	size_t ParseReply(Reply &r, const char *buf, size_t l);
- public:
+public:
 	MyRedisService *provider;
 	std::deque<Interface *> interfaces;
 	std::map<Anope::string, Interface *> subinterfaces;
 
-	RedisSocket(MyRedisService *pro, bool v6) : Socket(-1, v6), provider(pro) { }
+	RedisSocket(MyRedisService *pro, bool v6) : Socket(-1, v6 ? AF_INET6 : AF_INET), provider(pro) { }
 
-	~RedisSocket();
+	~RedisSocket() override;
 
-	void OnConnect() anope_override;
-	void OnError(const Anope::string &error) anope_override;
+	void OnConnect() override;
+	void OnError(const Anope::string &error) override;
 
-	bool Read(const char *buffer, size_t l) anope_override;
+	bool Read(const char *buffer, size_t l) override;
 };
 
 class Transaction : public Interface
 {
- public:
+public:
 	std::deque<Interface *> interfaces;
 
 	Transaction(Module *creator) : Interface(creator) { }
 
-	~Transaction()
+	~Transaction() override
 	{
-		for (unsigned i = 0; i < interfaces.size(); ++i)
+		for (auto *iface : interfaces)
 		{
-			Interface *inter = interfaces[i];
-
-			if (!inter)
+			if (!iface)
 				continue;
 
-			inter->OnError("Interface going away");
+			iface->OnError("Interface going away");
 		}
 	}
 
-	void OnResult(const Reply &r) anope_override
+	void OnResult(const Reply &r) override
 	{
 		/* This is a multi bulk reply of the results of the queued commands
 		 * in this transaction
@@ -59,10 +57,8 @@ class Transaction : public Interface
 
 		Log(LOG_DEBUG_2) << "redis: transaction complete with " << r.multi_bulk.size() << " results";
 
-		for (unsigned i = 0; i < r.multi_bulk.size(); ++i)
+		for (auto *result : r.multi_bulk)
 		{
-			const Reply *reply = r.multi_bulk[i];
-
 			if (interfaces.empty())
 				break;
 
@@ -70,25 +66,24 @@ class Transaction : public Interface
 			interfaces.pop_front();
 
 			if (inter)
-				inter->OnResult(*reply);
+				inter->OnResult(*result);
 		}
 	}
 };
 
 class MyRedisService : public Provider
 {
- public:
+public:
 	Anope::string host;
 	int port;
 	unsigned db;
 
-	RedisSocket *sock, *sub;
+	RedisSocket *sock = nullptr, *sub = nullptr;
 
 	Transaction ti;
-	bool in_transaction;
+	bool in_transaction = false;
 
-	MyRedisService(Module *c, const Anope::string &n, const Anope::string &h, int p, unsigned d) : Provider(c, n), host(h), port(p), db(d), sock(NULL), sub(NULL),
-		ti(c), in_transaction(false)
+	MyRedisService(Module *c, const Anope::string &n, const Anope::string &h, int p, unsigned d) : Provider(c, n), host(h), port(p), db(d), ti(c)
 	{
 		sock = new RedisSocket(this, host.find(':') != Anope::string::npos);
 		sock->Connect(host, port);
@@ -97,7 +92,7 @@ class MyRedisService : public Provider
 		sub->Connect(host, port);
 	}
 
-	~MyRedisService()
+	~MyRedisService() override
 	{
 		if (sock)
 		{
@@ -112,7 +107,7 @@ class MyRedisService : public Provider
 		}
 	}
 
- private:
+private:
 	inline void Pack(std::vector<char> &buffer, const char *buf, size_t sz = 0)
 	{
 		if (!sz)
@@ -131,15 +126,13 @@ class MyRedisService : public Provider
 		Pack(buffer, stringify(args.size()).c_str());
 		Pack(buffer, "\r\n");
 
-		for (unsigned j = 0; j < args.size(); ++j)
+		for (const auto &[key, value] : args)
 		{
-			const std::pair<const char *, size_t> &pair = args[j];
-
 			Pack(buffer, "$");
-			Pack(buffer, stringify(pair.second).c_str());
+			Pack(buffer, stringify(value).c_str());
 			Pack(buffer, "\r\n");
 
-			Pack(buffer, pair.first, pair.second);
+			Pack(buffer, key, value);
 			Pack(buffer, "\r\n");
 		}
 
@@ -156,8 +149,8 @@ class MyRedisService : public Provider
 			s->interfaces.push_back(i);
 	}
 
- public:
-	bool IsSocketDead() anope_override
+public:
+	bool IsSocketDead() override
 	{
 		return this->sock && this->sock->flags[SF_DEAD];
 	}
@@ -165,8 +158,8 @@ class MyRedisService : public Provider
 	void SendCommand(RedisSocket *s, Interface *i, const std::vector<Anope::string> &cmds)
 	{
 		std::vector<std::pair<const char *, size_t> > args;
-		for (unsigned j = 0; j < cmds.size(); ++j)
-			args.push_back(std::make_pair(cmds[j].c_str(), cmds[j].length()));
+		for (const auto &cmd : cmds)
+			args.emplace_back(cmd.c_str(), cmd.length());
 		this->Send(s, i, args);
 	}
 
@@ -188,23 +181,23 @@ class MyRedisService : public Provider
 		this->Send(sock, i, args);
 	}
 
-	void SendCommand(Interface *i, const std::vector<Anope::string> &cmds) anope_override
+	void SendCommand(Interface *i, const std::vector<Anope::string> &cmds) override
 	{
 		std::vector<std::pair<const char *, size_t> > args;
-		for (unsigned j = 0; j < cmds.size(); ++j)
-			args.push_back(std::make_pair(cmds[j].c_str(), cmds[j].length()));
+		for (const auto &cmd : cmds)
+			args.emplace_back(cmd.c_str(), cmd.length());
 		this->Send(i, args);
 	}
 
-	void SendCommand(Interface *i, const Anope::string &str) anope_override
+	void SendCommand(Interface *i, const Anope::string &str) override
 	{
 		std::vector<Anope::string> args;
 		spacesepstream(str).GetTokens(args);
 		this->SendCommand(i, args);
 	}
 
- public:
-	bool BlockAndProcess() anope_override
+public:
+	bool BlockAndProcess() override
 	{
 		if (!this->sock->ProcessWrite())
 			this->sock->flags[SF_DEAD] = true;
@@ -215,7 +208,7 @@ class MyRedisService : public Provider
 		return !this->sock->interfaces.empty();
 	}
 
-	void Subscribe(Interface *i, const Anope::string &pattern) anope_override
+	void Subscribe(Interface *i, const Anope::string &pattern) override
 	{
 		if (sub == NULL)
 		{
@@ -224,20 +217,20 @@ class MyRedisService : public Provider
 		}
 
 		std::vector<Anope::string> args;
-		args.push_back("PSUBSCRIBE");
+		args.emplace_back("PSUBSCRIBE");
 		args.push_back(pattern);
 		this->SendCommand(sub, NULL, args);
 
 		sub->subinterfaces[pattern] = i;
 	}
 
-	void Unsubscribe(const Anope::string &pattern) anope_override
+	void Unsubscribe(const Anope::string &pattern) override
 	{
 		if (sub)
 			sub->subinterfaces.erase(pattern);
 	}
 
-	void StartTransaction() anope_override
+	void StartTransaction() override
 	{
 		if (in_transaction)
 			throw CoreException();
@@ -246,7 +239,7 @@ class MyRedisService : public Provider
 		in_transaction = true;
 	}
 
-	void CommitTransaction() anope_override
+	void CommitTransaction() override
 	{
 		/* The result of the transaction comes back to the reply of EXEC as a multi bulk.
 		 * The reply to the individual commands that make up the transaction when executed
@@ -267,14 +260,12 @@ RedisSocket::~RedisSocket()
 			provider->sub = NULL;
 	}
 
-	for (unsigned i = 0; i < interfaces.size(); ++i)
+	for (auto *iface : interfaces)
 	{
-		Interface *inter = interfaces[i];
-
-		if (!inter)
+		if (!iface)
 			continue;
 
-		inter->OnError("Interface going away");
+		iface->OnError("Interface going away");
 	}
 }
 
@@ -403,9 +394,9 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 			else if (r.multi_bulk_size >= 0 && r.multi_bulk.size() == static_cast<unsigned>(r.multi_bulk_size))
 			{
 				/* This multi bulk is already complete, so check the sub bulks */
-				for (unsigned i = 0; i < r.multi_bulk.size(); ++i)
-					if (r.multi_bulk[i]->type == Reply::MULTI_BULK)
-						ParseReply(*r.multi_bulk[i], buffer + used, l - used);
+				for (auto &bulk : r.multi_bulk)
+					if (bulk->type == Reply::MULTI_BULK)
+						ParseReply(*bulk, buffer + used, l - used);
 				break;
 			}
 
@@ -529,19 +520,18 @@ class ModuleRedis : public Module
 {
 	std::map<Anope::string, MyRedisService *> services;
 
- public:
+public:
 	ModuleRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 	}
 
-	~ModuleRedis()
+	~ModuleRedis() override
 	{
-		for (std::map<Anope::string, MyRedisService *>::iterator it = services.begin(); it != services.end(); ++it)
+		for (auto &[_, p] : services)
 		{
-			MyRedisService *p = it->second;
-
 			delete p->sock;
 			p->sock = NULL;
+
 			delete p->sub;
 			p->sub = NULL;
 
@@ -549,7 +539,7 @@ class ModuleRedis : public Module
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		std::vector<Anope::string> new_services;
@@ -578,12 +568,10 @@ class ModuleRedis : public Module
 		}
 	}
 
-	void OnModuleUnload(User *, Module *m) anope_override
+	void OnModuleUnload(User *, Module *m) override
 	{
-		for (std::map<Anope::string, MyRedisService *>::iterator it = services.begin(); it != services.end(); ++it)
+		for (auto &[_, p] : services)
 		{
-			MyRedisService *p = it->second;
-
 			if (p->sock)
 				for (unsigned i = p->sock->interfaces.size(); i > 0; --i)
 				{

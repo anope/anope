@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandMSCheck : public Command
 {
- public:
+public:
 	CommandMSCheck(Module *creator) : Command(creator, "memoserv/check", 1, 1)
 	{
 		this->SetDesc(_("Checks if last memo to a nick was read"));
 		this->SetSyntax(_("\037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
 		const Anope::string &recipient = params[0];
@@ -62,7 +62,7 @@ class CommandMSCheck : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -76,7 +76,7 @@ class MSCheck : public Module
 {
 	CommandMSCheck commandmscheck;
 
- public:
+public:
 	MSCheck(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmscheck(this)
 	{

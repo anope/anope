@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -20,7 +20,7 @@ public:
 		this->SetSyntax(_("\037channel\037 [\037user\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &channel = params[0];
 
@@ -57,11 +57,9 @@ public:
 			{
 				source.Reply(_("Access for \002%s\002 on \002%s\002:"), nick.c_str(), ci->name.c_str());
 
-				for (unsigned i = 0; i < ag.paths.size(); ++i)
+				for (const auto &p : ag.paths)
 				{
-					ChanAccess::Path &p = ag.paths[i];
-
-					if (p.empty())
+						if (p.empty())
 						continue;
 
 					if (p.size() == 1)
@@ -99,7 +97,7 @@ public:
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -116,7 +114,7 @@ class CSStatus : public Module
 {
 	CommandCSStatus commandcsstatus;
 
- public:
+public:
 	CSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsstatus(this)
 	{
 	}

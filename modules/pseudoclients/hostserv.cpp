@@ -1,6 +1,6 @@
 /* HostServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,14 +14,14 @@
 class HostServCore : public Module
 {
 	Reference<BotInfo> HostServ;
- public:
+public:
 	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		const Anope::string &hsnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
@@ -35,7 +35,7 @@ class HostServCore : public Module
 		HostServ = bi;
 	}
 
-	void OnUserLogin(User *u) anope_override
+	void OnUserLogin(User *u) override
 	{
 		if (!IRCD->CanSetVHost)
 			return;
@@ -66,7 +66,7 @@ class HostServCore : public Module
 		}
 	}
 
-	void OnNickDrop(CommandSource &source, NickAlias *na) anope_override
+	void OnNickDrop(CommandSource &source, NickAlias *na) override
 	{
 		if (na->HasVhost())
 		{
@@ -75,12 +75,12 @@ class HostServCore : public Module
 		}
 	}
 
-	void OnNickUpdate(User *u) anope_override
+	void OnNickUpdate(User *u) override
 	{
 		this->OnUserLogin(u);
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!params.empty() || source.c || source.service != *HostServ)
 			return EVENT_CONTINUE;
@@ -88,7 +88,7 @@ class HostServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnSetVhost(NickAlias *na) anope_override
+	void OnSetVhost(NickAlias *na) override
 	{
 		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
 		{
@@ -115,7 +115,7 @@ class HostServCore : public Module
 		}
 	}
 
-	void OnDeleteVhost(NickAlias *na) anope_override
+	void OnDeleteVhost(NickAlias *na) override
 	{
 		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
 		{

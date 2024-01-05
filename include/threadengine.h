@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,29 +9,24 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef THREADENGINE_H
-#define THREADENGINE_H
+#pragma once
 
 #include "sockets.h"
 #include "extensible.h"
 
 class CoreExport Thread : public Pipe, public Extensible
 {
- private:
+private:
 	/* Set to true to tell the thread to finish and we are waiting for it */
-	bool exit;
+	bool exit = false;
 
- public:
+public:
 	/* Handle for this thread */
 	pthread_t handle;
 
-	/** Threads constructor
-	 */
-	Thread();
-
 	/** Threads destructor
 	 */
-	virtual ~Thread();
+	virtual ~Thread() = default;
 
 	/** Join to the thread, sets the exit state to true
 	 */
@@ -65,11 +60,11 @@ class CoreExport Thread : public Pipe, public Extensible
 
 class CoreExport Mutex
 {
- protected:
+protected:
 	/* A mutex, used to keep threads in sync */
 	pthread_mutex_t mutex;
 
- public:
+public:
 	/** Constructor
 	 */
 	Mutex();
@@ -95,11 +90,11 @@ class CoreExport Mutex
 
 class CoreExport Condition : public Mutex
 {
- private:
+private:
 	/* A condition */
 	pthread_cond_t cond;
 
- public:
+public:
 	/** Constructor
 	 */
 	Condition();
@@ -116,5 +111,3 @@ class CoreExport Condition : public Mutex
 	 */
 	void Wait();
 };
-
-#endif // THREADENGINE_H

@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,30 +13,30 @@
 
 class SGLineManager : public XLineManager
 {
- public:
+public:
 	SGLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sgline", 'G') { }
 
-	void OnMatch(User *u, XLine *x) anope_override
+	void OnMatch(User *u, XLine *x) override
 	{
 		this->Send(u, x);
 	}
 
-	void OnExpire(const XLine *x) anope_override
+	void OnExpire(const XLine *x) override
 	{
 		Log(Config->GetClient("OperServ"), "expire/akill") << "AKILL on \002" << x->mask << "\002 has expired";
 	}
 
-	void Send(User *u, XLine *x) anope_override
+	void Send(User *u, XLine *x) override
 	{
 		IRCD->SendAkill(u, x);
 	}
 
-	void SendDel(XLine *x) anope_override
+	void SendDel(XLine *x) override
 	{
 		IRCD->SendAkillDel(x);
 	}
 
-	bool Check(User *u, const XLine *x) anope_override
+	bool Check(User *u, const XLine *x) override
 	{
 		if (x->regex)
 		{
@@ -67,20 +67,20 @@ class SQLineManager : public XLineManager
 {
 	ServiceReference<NickServService> nickserv;
 
- public:
+public:
 	SQLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sqline", 'Q'), nickserv("NickServService", "NickServ") { }
 
-	void OnMatch(User *u, XLine *x) anope_override
+	void OnMatch(User *u, XLine *x) override
 	{
 		this->Send(u, x);
 	}
 
-	void OnExpire(const XLine *x) anope_override
+	void OnExpire(const XLine *x) override
 	{
 		Log(Config->GetClient("OperServ"), "expire/sqline") << "SQLINE on \002" << x->mask << "\002 has expired";
 	}
 
-	void Send(User *u, XLine *x) anope_override
+	void Send(User *u, XLine *x) override
 	{
 		if (!IRCD->CanSQLine)
 		{
@@ -105,7 +105,7 @@ class SQLineManager : public XLineManager
 		}
 	}
 
-	void SendDel(XLine *x) anope_override
+	void SendDel(XLine *x) override
 	{
 		if (!IRCD->CanSQLine || x->IsRegex())
 			;
@@ -113,7 +113,7 @@ class SQLineManager : public XLineManager
 			IRCD->SendSQLineDel(x);
 	}
 
-	bool Check(User *u, const XLine *x) anope_override
+	bool Check(User *u, const XLine *x) override
 	{
 		if (x->regex)
 			return x->regex->Matches(u->nick);
@@ -122,10 +122,8 @@ class SQLineManager : public XLineManager
 
 	XLine *CheckChannel(Channel *c)
 	{
-		for (std::vector<XLine *>::const_iterator it = this->GetList().begin(), it_end = this->GetList().end(); it != it_end; ++it)
+		for (auto *x : this->GetList())
 		{
-			XLine *x = *it;
-
 			if (x->regex)
 			{
 				if (x->regex->Matches(c->name))
@@ -146,20 +144,20 @@ class SQLineManager : public XLineManager
 
 class SNLineManager : public XLineManager
 {
- public:
+public:
 	SNLineManager(Module *creator) : XLineManager(creator, "xlinemanager/snline", 'N') { }
 
-	void OnMatch(User *u, XLine *x) anope_override
+	void OnMatch(User *u, XLine *x) override
 	{
 		this->Send(u, x);
 	}
 
-	void OnExpire(const XLine *x) anope_override
+	void OnExpire(const XLine *x) override
 	{
 		Log(Config->GetClient("OperServ"), "expire/snline") << "SNLINE on \002" << x->mask << "\002 has expired";
 	}
 
-	void Send(User *u, XLine *x) anope_override
+	void Send(User *u, XLine *x) override
 	{
 		if (IRCD->CanSNLine && !x->IsRegex())
 			IRCD->SendSGLine(u, x);
@@ -168,13 +166,13 @@ class SNLineManager : public XLineManager
 			u->Kill(Config->GetClient("OperServ"), "SNLined: " + x->reason);
 	}
 
-	void SendDel(XLine *x) anope_override
+	void SendDel(XLine *x) override
 	{
 		if (IRCD->CanSNLine && !x->IsRegex())
 			IRCD->SendSGLineDel(x);
 	}
 
-	bool Check(User *u, const XLine *x) anope_override
+	bool Check(User *u, const XLine *x) override
 	{
 		if (x->regex)
 			return x->regex->Matches(u->realname);
@@ -189,7 +187,7 @@ class OperServCore : public Module
 	SQLineManager sqlines;
 	SNLineManager snlines;
 
- public:
+public:
 	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		sglines(this), sqlines(this), snlines(this)
 	{
@@ -200,7 +198,7 @@ class OperServCore : public Module
 		XLineManager::RegisterXLineManager(&snlines);
 	}
 
-	~OperServCore()
+	~OperServCore() override
 	{
 		this->sglines.Clear();
 		this->sqlines.Clear();
@@ -211,7 +209,7 @@ class OperServCore : public Module
 		XLineManager::UnregisterXLineManager(&snlines);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		const Anope::string &osnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
@@ -225,7 +223,7 @@ class OperServCore : public Module
 		OperServ = bi;
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) override
 	{
 		if (bi == OperServ && !u->HasMode("OPER") && Config->GetModule(this)->Get<bool>("opersonly"))
 		{
@@ -237,37 +235,37 @@ class OperServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnServerQuit(Server *server) anope_override
+	void OnServerQuit(Server *server) override
 	{
 		if (server->IsJuped())
 			Log(server, "squit", OperServ) << "Received SQUIT for juped server " << server->GetName();
 	}
 
-	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
+	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (mname == "OPER")
 			Log(u, "oper", OperServ) << "is now an IRC operator.";
 	}
 
-	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
+	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (mname == "OPER")
 			Log(u, "oper", OperServ) << "is no longer an IRC operator";
 	}
 
-	void OnUserConnect(User *u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (!u->Quitting() && !exempt)
 			XLineManager::CheckAll(u);
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
+	void OnUserNickChange(User *u, const Anope::string &oldnick) override
 	{
 		if (!u->HasMode("OPER"))
 			this->sqlines.CheckAllXLines(u);
 	}
 
-	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
+	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
 		XLine *x = this->sqlines.CheckChannel(c);
 		if (x)
@@ -280,7 +278,7 @@ class OperServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!params.empty() || source.c || source.service != *OperServ)
 			return EVENT_CONTINUE;
@@ -288,7 +286,7 @@ class OperServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnLog(Log *l) anope_override
+	void OnLog(Log *l) override
 	{
 		if (l->type == LOG_SERVER)
 			l->bi = OperServ;

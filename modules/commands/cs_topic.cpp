@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,14 +14,14 @@
 
 class CommandCSSetKeepTopic : public Command
 {
- public:
+public:
 	CommandCSSetKeepTopic(Module *creator, const Anope::string &cname = "chanserv/set/keeptopic") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Retain topic when channel is not in use"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -63,7 +63,7 @@ class CommandCSSetKeepTopic : public Command
 			this->OnSyntaxError(source, "KEEPTOPIC");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -142,7 +142,7 @@ class CommandCSTopic : public Command
 		this->Set(source, ci, new_topic);
 	}
 
- public:
+public:
 	CommandCSTopic(Module *creator) : Command(creator, "chanserv/topic", 2, 3),
 		topiclock("TOPICLOCK")
 	{
@@ -152,7 +152,7 @@ class CommandCSTopic : public Command
 		this->SetSyntax(_("\037channel\037 [UNLOCK|LOCK]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &subcmd = params[1];
 
@@ -186,7 +186,7 @@ class CommandCSTopic : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -209,14 +209,14 @@ class CSTopic : public Module
 
 	SerializableExtensibleItem<bool> topiclock, keeptopic;
 
- public:
+public:
 	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcstopic(this), commandcssetkeeptopic(this), topiclock(this, "TOPICLOCK"), keeptopic(this, "KEEPTOPIC")
 	{
 
 	}
 
-	void OnChannelSync(Channel *c) anope_override
+	void OnChannelSync(Channel *c) override
 	{
 		if (c->ci)
 		{
@@ -228,7 +228,7 @@ class CSTopic : public Module
 		}
 	}
 
-	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
+	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) override
 	{
 		if (!c->ci)
 			return;
@@ -250,7 +250,7 @@ class CSTopic : public Module
 		}
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (keeptopic.HasExt(ci))
 			info.AddOption(_("Topic retention"));

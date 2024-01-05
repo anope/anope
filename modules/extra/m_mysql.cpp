@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2010-2021 Anope Team
+ * (C) 2010-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -11,7 +11,7 @@
 
 #include "module.h"
 #include "modules/sql.h"
-#define NO_CLIENT_LONG_LONG
+
 #ifdef WIN32
 # include <mysql.h>
 #else
@@ -24,7 +24,7 @@ using namespace SQL;
  *
  * This module spawns a single thread that is used to execute blocking MySQL queries.
  * When a module requests a query to be executed it is added to a list for the thread
- * (which never stops looping and sleeing) to pick up and execute, the result of which
+ * (which never stops looping and sleeping) to pick up and execute, the result of which
  * is inserted in to another queue to be picked up by the main thread. The main thread
  * uses Pipe to become notified through the socket engine when there are results waiting
  * to be sent back to the modules requesting the query
@@ -61,9 +61,9 @@ struct QueryResult
  */
 class MySQLResult : public Result
 {
-	MYSQL_RES *res;
+	MYSQL_RES *res = nullptr;
 
- public:
+public:
 	MySQLResult(unsigned int i, const Query &q, const Anope::string &fq, MYSQL_RES *r) : Result(i, q, fq), res(r)
 	{
 		unsigned num_fields = res ? mysql_num_fields(res) : 0;
@@ -94,7 +94,7 @@ class MySQLResult : public Result
 		}
 	}
 
-	MySQLResult(const Query &q, const Anope::string &fq, const Anope::string &err) : Result(0, q, fq, err), res(NULL)
+	MySQLResult(const Query &q, const Anope::string &fq, const Anope::string &err) : Result(0, q, fq, err)
 	{
 	}
 
@@ -117,14 +117,14 @@ class MySQLService : public Provider
 	Anope::string password;
 	int port;
 
-	MYSQL *sql;
+	MYSQL *sql = nullptr;
 
 	/** Escape a query.
 	 * Note the mutex must be held!
 	 */
 	Anope::string Escape(const Anope::string &query);
 
- public:
+public:
 	/* Locked by the SQL thread when a query is pending on this database,
 	 * prevents us from deleting a connection while a query is executing
 	 * in the thread
@@ -135,15 +135,15 @@ class MySQLService : public Provider
 
 	~MySQLService();
 
-	void Run(Interface *i, const Query &query) anope_override;
+	void Run(Interface *i, const Query &query) override;
 
-	Result RunQuery(const Query &query) anope_override;
+	Result RunQuery(const Query &query) override;
 
-	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) anope_override;
+	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) override;
 
-	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) anope_override;
+	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) override;
 
-	Query GetTables(const Anope::string &prefix) anope_override;
+	Query GetTables(const Anope::string &prefix) override;
 
 	void Connect();
 
@@ -151,17 +151,17 @@ class MySQLService : public Provider
 
 	Anope::string BuildQuery(const Query &q);
 
-	Anope::string FromUnixtime(time_t);
+	Anope::string FromUnixtime(time_t) override;
 };
 
 /** The SQL thread used to execute queries
  */
 class DispatcherThread : public Thread, public Condition
 {
- public:
+public:
 	DispatcherThread() : Thread() { }
 
-	void Run() anope_override;
+	void Run() override;
 };
 
 class ModuleSQL;
@@ -170,7 +170,7 @@ class ModuleSQL : public Module, public Pipe
 {
 	/* SQL connections */
 	std::map<Anope::string, MySQLService *> MySQLServices;
- public:
+public:
 	/* Pending query requests */
 	std::deque<QueryRequest> QueryRequests;
 	/* Pending finished requests with results */
@@ -199,7 +199,7 @@ class ModuleSQL : public Module, public Pipe
 		delete DThread;
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
@@ -240,7 +240,7 @@ class ModuleSQL : public Module, public Pipe
 				try
 				{
 					MySQLService *ss = new MySQLService(this, connname, database, server, user, password, port);
-					this->MySQLServices.insert(std::make_pair(connname, ss));
+					this->MySQLServices.emplace(connname, ss);
 
 					Log(LOG_NORMAL, "mysql") << "MySQL: Successfully connected to server " << connname << " (" << server << ")";
 				}
@@ -252,7 +252,7 @@ class ModuleSQL : public Module, public Pipe
 		}
 	}
 
-	void OnModuleUnload(User *, Module *m) anope_override
+	void OnModuleUnload(User *, Module *m) override
 	{
 		this->DThread->Lock();
 
@@ -277,17 +277,15 @@ class ModuleSQL : public Module, public Pipe
 		this->OnNotify();
 	}
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
 		this->DThread->Lock();
 		std::deque<QueryResult> finishedRequests = this->FinishedRequests;
 		this->FinishedRequests.clear();
 		this->DThread->Unlock();
 
-		for (std::deque<QueryResult>::const_iterator it = finishedRequests.begin(), it_end = finishedRequests.end(); it != it_end; ++it)
+		for (const auto &qr : finishedRequests)
 		{
-			const QueryResult &qr = *it;
-
 			if (!qr.sqlinterface)
 				throw SQL::Exception("NULL qr.sqlinterface in MySQLPipe::OnNotify() ?");
 
@@ -300,7 +298,7 @@ class ModuleSQL : public Module, public Pipe
 };
 
 MySQLService::MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, int po)
-: Provider(o, n), database(d), server(s), user(u), password(p), port(po), sql(NULL)
+: Provider(o, n), database(d), server(s), user(u), password(p), port(po)
 {
 	Connect();
 }
@@ -389,12 +387,12 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 	{
 		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
 			" `timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
-		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (const auto &[column, _] : data.data)
 		{
-			known_cols.insert(it->first);
+			known_cols.insert(column);
 
-			query_text += ", `" + it->first + "` ";
-			if (data.GetType(it->first) == Serialize::Data::DT_INT)
+			query_text += ", `" + column + "` ";
+			if (data.GetType(column) == Serialize::Data::DT_INT)
 				query_text += "int(11)";
 			else
 				query_text += "text";
@@ -403,21 +401,23 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 		queries.push_back(query_text);
 	}
 	else
-		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+	{
+		for (const auto &[column, _] : data.data)
 		{
-			if (known_cols.count(it->first) > 0)
+			if (known_cols.count(column) > 0)
 				continue;
 
-			known_cols.insert(it->first);
+			known_cols.insert(column);
 
-			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
-			if (data.GetType(it->first) == Serialize::Data::DT_INT)
+			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` ";
+			if (data.GetType(column) == Serialize::Data::DT_INT)
 				query_text += "int(11)";
 			else
 				query_text += "text";
 
 			queries.push_back(query_text);
 		}
+	}
 
 	return queries;
 }
@@ -425,27 +425,29 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Data &data)
 {
 	/* Empty columns not present in the data set */
-	const std::set<Anope::string> &known_cols = this->active_schema[table];
-	for (std::set<Anope::string>::iterator it = known_cols.begin(), it_end = known_cols.end(); it != it_end; ++it)
-		if (*it != "id" && *it != "timestamp" && data.data.count(*it) == 0)
-			data[*it] << "";
+	for (const auto &known_col : this->active_schema[table])
+	{
+		if (known_col != "id" && known_col != "timestamp" && data.data.count(known_col) == 0)
+			data[known_col] << "";
+	}
 
 	Anope::string query_text = "INSERT INTO `" + table + "` (`id`";
-	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
-		query_text += ",`" + it->first + "`";
+
+	for (const auto &[field, _] : data.data)
+		query_text += ",`" + field + "`";
 	query_text += ") VALUES (" + stringify(id);
-	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
-		query_text += ",@" + it->first + "@";
+	for (const auto &[field, _] : data.data)
+		query_text += ",@" + field + "@";
 	query_text += ") ON DUPLICATE KEY UPDATE ";
-	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
-		query_text += "`" + it->first + "`=VALUES(`" + it->first + "`),";
+	for (const auto &[field, _] : data.data)
+		query_text += "`" + field + "`=VALUES(`" + field + "`),";
 	query_text.erase(query_text.end() - 1);
 
 	Query query(query_text);
-	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+	for (auto &[field, value] : data.data)
 	{
 		Anope::string buf;
-		*it->second >> buf;
+		*value >> buf;
 
 		bool escape = true;
 		if (buf.empty())
@@ -454,7 +456,7 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 			escape = false;
 		}
 
-		query.SetValue(it->first, buf, escape);
+		query.SetValue(field, buf, escape);
 	}
 
 	return query;
@@ -509,8 +511,8 @@ Anope::string MySQLService::BuildQuery(const Query &q)
 {
 	Anope::string real_query = q.query;
 
-	for (std::map<Anope::string, QueryData>::const_iterator it = q.parameters.begin(), it_end = q.parameters.end(); it != it_end; ++it)
-		real_query = real_query.replace_all_cs("@" + it->first + "@", (it->second.escape ? ("'" + this->Escape(it->second.data) + "'") : it->second.data));
+	for (const auto &[name, value] : q.parameters)
+		real_query = real_query.replace_all_cs("@" + name + "@", (value.escape ? ("'" + this->Escape(value.data) + "'") : value.data));
 
 	return real_query;
 }

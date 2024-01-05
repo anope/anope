@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,13 +13,13 @@
 
 class CommandOSUpdate : public Command
 {
- public:
+public:
 	CommandOSUpdate(Module *creator) : Command(creator, "operserv/update", 0, 0)
 	{
-		this->SetDesc(_("Force the Services databases to be updated immediately"));
+		this->SetDesc(_("Force the services databases to be updated immediately"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Log(LOG_ADMIN, source, this);
 		source.Reply(_("Updating databases."));
@@ -27,11 +27,11 @@ class CommandOSUpdate : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes Services to update all database files as soon as you\n"
+		source.Reply(_("Causes services to update all database files as soon as you\n"
 				"send the command."));
 		return true;
 	}
@@ -41,7 +41,7 @@ class OSUpdate : public Module
 {
 	CommandOSUpdate commandosupdate;
 
- public:
+public:
 	OSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosupdate(this)
 	{

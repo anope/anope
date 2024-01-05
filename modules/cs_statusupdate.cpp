@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,55 +10,57 @@
 
 class StatusUpdate : public Module
 {
- public:
+public:
 	StatusUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
 
 	}
 
-	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access) anope_override
+	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
 	{
 		if (ci->c)
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		{
+			for (const auto &[_, uc] : ci->c->users)
 			{
-				User *user = it->second->user;
+				User *user = uc->user;
 
 				ChannelInfo *next;
 				if (user->server != Me && access->Matches(user, user->Account(), next))
 				{
 					AccessGroup ag = ci->AccessFor(user);
 
-					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+					for (auto *cms : ModeManager::GetStatusChannelModesByRank())
 					{
-						ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
 						if (!ag.HasPriv("AUTO" + cms->name))
 							ci->c->RemoveMode(NULL, cms, user->GetUID());
 					}
 					ci->c->SetCorrectModes(user, true);
 				}
 			}
+		}
 	}
 
-	void OnAccessDel(ChannelInfo *ci, CommandSource &, ChanAccess *access) anope_override
+	void OnAccessDel(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
 	{
 		if (ci->c)
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+		{
+			for (const auto &[_, uc] : ci->c->users)
 			{
-				User *user = it->second->user;
+				User *user = uc->user;
 
 				ChannelInfo *next;
 				if (user->server != Me && access->Matches(user, user->Account(), next))
 				{
 					AccessGroup ag = ci->AccessFor(user);
 
-					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+					for (auto *cms : ModeManager::GetStatusChannelModesByRank())
 					{
-						ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
-						if (!ag.HasPriv("AUTO" + cms->name))
+							if (!ag.HasPriv("AUTO" + cms->name))
 							ci->c->RemoveMode(NULL, cms, user->GetUID());
 					}
 				}
 			}
+		}
 	}
 };
 

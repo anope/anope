@@ -1,7 +1,7 @@
 /* Mode support
  *
  * (C) 2008-2011 Adam <Adam@anope.org>
- * (C) 2008-2021 Anope Team <team@anope.org>
+ * (C) 2008-2024 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -46,9 +46,7 @@ struct StackerInfo
 	/* Modes to be deleted */
 	std::list<std::pair<Mode *, Anope::string> > DelModes;
 	/* Bot this is sent from */
-	BotInfo *bi;
-
-	StackerInfo() : bi(NULL) { }
+	BotInfo *bi = nullptr;
 
 	/** Add a mode to this object
 	 * @param mode The mode
@@ -57,10 +55,6 @@ struct StackerInfo
 	 */
 	void AddMode(Mode *mode, bool set, const Anope::string &param);
 };
-
-ChannelStatus::ChannelStatus()
-{
-}
 
 ChannelStatus::ChannelStatus(const Anope::string &m) : modes(m)
 {
@@ -101,9 +95,9 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 {
 	Anope::string ret;
 
-	for (size_t i = 0; i < modes.length(); ++i)
+	for (auto mode : modes)
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
+		ChannelMode *cm = ModeManager::FindChannelModeByChar(mode);
 		if (cm != NULL && cm->type == MODE_STATUS)
 		{
 			ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
@@ -115,10 +109,6 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 }
 
 Mode::Mode(const Anope::string &mname, ModeClass mcl, char mch, ModeType mt) : name(mname), mclass(mcl), mchar(mch), type(mt)
-{
-}
-
-Mode::~Mode()
 {
 }
 
@@ -154,9 +144,9 @@ ChannelMode *ChannelMode::Wrap(Anope::string &param)
 
 ChannelMode *ChannelMode::Unwrap(Anope::string &param)
 {
-	for (unsigned i = 0; i < listeners.size(); ++i)
+	for (auto *listener : listeners)
 	{
-		ChannelMode *cm = listeners[i]->Unwrap(this, param);
+		ChannelMode *cm = listener->Unwrap(this, param);
 		if (cm != this)
 			return cm;
 	}
@@ -307,13 +297,13 @@ void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 	}
 
 	/* Add this mode and its param to our list */
-	list->push_back(std::make_pair(mode, param));
+	list->emplace_back(mode, param);
 }
 
 static class ModePipe : public Pipe
 {
- public:
-	void OnNotify()
+public:
+	void OnNotify() override
 	{
 		ModeManager::ProcessModes();
 	}
@@ -456,8 +446,8 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 
 	FOREACH_MOD(OnChannelModeAdd, (cm));
 
-	for (unsigned int i = 0; i < ChannelModes.size(); ++i)
-		ChannelModes[i]->Check();
+	for (auto *cmode : ChannelModes)
+		cmode->Check();
 
 	return true;
 }
@@ -600,10 +590,8 @@ static struct StatusSort
 void ModeManager::RebuildStatusModes()
 {
 	ChannelModesByStatus.clear();
-	for (unsigned j = 0; j < ChannelModesIdx.size(); ++j)
+	for (auto *cm : ChannelModesIdx)
 	{
-		ChannelMode *cm = ChannelModesIdx[j];
-
 		if (cm && cm->type == MODE_STATUS && std::find(ChannelModesByStatus.begin(), ChannelModesByStatus.end(), cm) == ChannelModesByStatus.end())
 			ChannelModesByStatus.push_back(anope_dynamic_static_cast<ChannelModeStatus *>(cm));
 	}
@@ -617,7 +605,7 @@ void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set,
 	if (bi)
 		s->bi = bi;
 	else
-		s->bi = c->ci->WhoSends();
+		s->bi = c->WhoSends();
 
 	if (!modePipe)
 		modePipe = new ModePipe();
@@ -640,30 +628,22 @@ void ModeManager::ProcessModes()
 {
 	if (!UserStackerObjects.empty())
 	{
-		for (std::map<User *, StackerInfo *>::const_iterator it = UserStackerObjects.begin(), it_end = UserStackerObjects.end(); it != it_end; ++it)
+		for (const auto &[u, s] : UserStackerObjects)
 		{
-			User *u = it->first;
-			StackerInfo *s = it->second;
-
-			std::list<Anope::string> ModeStrings = BuildModeStrings(s);
-			for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
-				IRCD->SendMode(s->bi, u, "%s", lit->c_str());
-			delete it->second;
+			for (const auto &modestr : BuildModeStrings(s))
+				IRCD->SendMode(s->bi, u, "%s", modestr.c_str());
+			delete s;
 		}
 		UserStackerObjects.clear();
 	}
 
 	if (!ChannelStackerObjects.empty())
 	{
-		for (std::map<Channel *, StackerInfo *>::const_iterator it = ChannelStackerObjects.begin(), it_end = ChannelStackerObjects.end(); it != it_end; ++it)
+		for (const auto &[c, s] : ChannelStackerObjects)
 		{
-			Channel *c = it->first;
-			StackerInfo *s = it->second;
-
-			std::list<Anope::string> ModeStrings = BuildModeStrings(s);
-			for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
-				IRCD->SendMode(s->bi, c, "%s", lit->c_str());
-			delete it->second;
+			for (const auto &modestr : BuildModeStrings(s))
+				IRCD->SendMode(s->bi, c, "%s", modestr.c_str());
+			delete s;
 		}
 		ChannelStackerObjects.clear();
 	}
@@ -676,9 +656,8 @@ static void StackerDel(std::map<T *, StackerInfo *> &map, T *obj)
 	if (it != map.end())
 	{
 		StackerInfo *si = it->second;
-		std::list<Anope::string> ModeStrings = BuildModeStrings(si);
-		for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
-			IRCD->SendMode(si->bi, obj, "%s", lit->c_str());
+		for (const auto &modestr : BuildModeStrings(si))
+			IRCD->SendMode(si->bi, obj, "%s", modestr.c_str());
 
 		delete si;
 		map.erase(it);
@@ -742,7 +721,7 @@ void ModeManager::StackerDel(Mode *m)
 	}
 }
 
-Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh), cidr_len(0), family(0)
+Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh)
 {
 	Anope::string n, u, h;
 

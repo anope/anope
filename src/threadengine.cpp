@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -42,14 +42,6 @@ static void *entry_point(void *parameter)
 	thread->SetExitState();
 	pthread_exit(0);
 	return NULL;
-}
-
-Thread::Thread() : exit(false)
-{
-}
-
-Thread::~Thread()
-{
 }
 
 void Thread::Join()

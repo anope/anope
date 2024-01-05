@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -26,14 +26,14 @@ class CommandOSLogSearch : public Command
 		return Anope::LogDir + "/" + file + "." + timestamp;
 	}
 
- public:
+public:
 	CommandOSLogSearch(Module *creator) : Command(creator, "operserv/logsearch", 1, 3)
 	{
 		this->SetDesc(_("Searches logs for a matching pattern"));
 		this->SetSyntax(_("[+\037days\037d] [+\037limit\037l] \037pattern\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		int days = 7, replies = 50;
 
@@ -147,16 +147,16 @@ class CommandOSLogSearch : public Command
 
 		source.Reply(_("Matches for \002%s\002:"), search_string.c_str());
 		unsigned int count = 0;
-		for (std::vector<Anope::string>::iterator it = matches.begin(), it_end = matches.end(); it != it_end; ++it)
-			source.Reply("#%d: %s", ++count, it->c_str());
+		for (const auto &match : matches)
+			source.Reply("#%d: %s", ++count, match.c_str());
 		source.Reply(_("Showed %d/%d matches for \002%s\002."), matches.size(), found, search_string.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command searches the Services logfiles for messages\n"
+		source.Reply(_("This command searches the services logfiles for messages\n"
 				"that match the given pattern. The day and limit argument\n"
 				"may be used to specify how many days of logs to search\n"
 				"and the number of replies to limit to. By default this\n"
@@ -175,7 +175,7 @@ class OSLogSearch : public Module
 {
 	CommandOSLogSearch commandoslogsearch;
 
- public:
+public:
 	OSLogSearch(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoslogsearch(this)
 	{

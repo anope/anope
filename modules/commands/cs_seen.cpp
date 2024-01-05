@@ -1,6 +1,6 @@
 /* cs_seen: provides a seen command by tracking all users
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -36,14 +36,14 @@ struct SeenInfo : Serializable
 	{
 	}
 
-	~SeenInfo()
+	~SeenInfo() override
 	{
 		database_map::iterator iter = database.find(nick);
 		if (iter != database.end() && iter->second == this)
 			database.erase(iter);
 	}
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["nick"] << nick;
 		data["vhost"] << vhost;
@@ -111,7 +111,7 @@ static bool ShouldHide(const Anope::string &channel, User *u)
 
 class CommandOSSeen : public Command
 {
- public:
+public:
 	CommandOSSeen(Module *creator) : Command(creator, "operserv/seen", 1, 2)
 	{
 		this->SetDesc(_("Statistics and maintenance for seen data"));
@@ -119,20 +119,20 @@ class CommandOSSeen : public Command
 		this->SetSyntax(_("CLEAR \037time\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params[0].equals_ci("STATS"))
 		{
 			size_t mem_counter;
 			mem_counter = sizeof(database_map);
-			for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end; ++it)
+			for (auto &[nick, si] : database)
 			{
 				mem_counter += (5 * sizeof(Anope::string)) + sizeof(TypeInfo) + sizeof(time_t);
-				mem_counter += it->first.capacity();
-				mem_counter += it->second->vhost.capacity();
-				mem_counter += it->second->nick2.capacity();
-				mem_counter += it->second->channel.capacity();
-				mem_counter += it->second->message.capacity();
+				mem_counter += nick.capacity();
+				mem_counter += si->vhost.capacity();
+				mem_counter += si->nick2.capacity();
+				mem_counter += si->channel.capacity();
+				mem_counter += si->message.capacity();
 			}
 			source.Reply(_("%lu nicks are stored in the database, using %.2Lf kB of memory."), database.size(), static_cast<long double>(mem_counter) / 1024);
 		}
@@ -165,7 +165,7 @@ class CommandOSSeen : public Command
 			this->SendSyntax(source);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -222,9 +222,8 @@ class CommandSeen : public Command
 			return;
 		}
 
-		for (Channel::ChanUserList::const_iterator it = source.c->users.begin(), it_end = source.c->users.end(); it != it_end; ++it)
+		for (const auto &[_, uc] : source.c->users)
 		{
-			ChanUserContainer *uc = it->second;
 			User *u = uc->user;
 
 			if (u->Account() == na->nc)
@@ -236,10 +235,8 @@ class CommandSeen : public Command
 
 		AccessGroup ag = source.c->ci->AccessFor(na->nc);
 		time_t last = 0;
-		for (unsigned int i = 0; i < ag.paths.size(); ++i)
+		for (const auto &p : ag.paths)
 		{
-			ChanAccess::Path &p = ag.paths[i];
-
 			if (p.empty())
 				continue;
 
@@ -255,7 +252,7 @@ class CommandSeen : public Command
 			source.Reply(_("%s was last seen here %s ago."), na->nick.c_str(), Anope::Duration(Anope::CurTime - last, source.GetAccount()).c_str());
 	}
 
- public:
+public:
 	CommandSeen(Module *creator) : Command(creator, "chanserv/seen", 1, 2)
 	{
 		this->SetDesc(_("Tells you about the last time a user was seen"));
@@ -263,7 +260,7 @@ class CommandSeen : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &target = params[0];
 
@@ -360,7 +357,7 @@ class CommandSeen : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -376,17 +373,17 @@ class CSSeen : public Module
 	Serialize::Type seeninfo_type;
 	CommandSeen commandseen;
 	CommandOSSeen commandosseen;
- public:
+public:
 	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this)
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		simple = conf->GetModule(this)->Get<bool>("simple");
 	}
 
-	void OnExpireTick() anope_override
+	void OnExpireTick() override
 	{
 		size_t previous_size = database.size();
 		time_t purgetime = Config->GetModule(this)->Get<time_t>("purgetime");
@@ -406,39 +403,39 @@ class CSSeen : public Module
 		Log(LOG_DEBUG) << "cs_seen: Purged database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";
 	}
 
-	void OnUserConnect(User *u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (!u->Quitting())
 			UpdateUser(u, NEW, u->nick, "", "", "");
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
+	void OnUserNickChange(User *u, const Anope::string &oldnick) override
 	{
 		UpdateUser(u, NICK_TO, oldnick, u->nick, "", "");
 		UpdateUser(u, NICK_FROM, u->nick, oldnick, "", "");
 	}
 
-	void OnUserQuit(User *u, const Anope::string &msg) anope_override
+	void OnUserQuit(User *u, const Anope::string &msg) override
 	{
 		UpdateUser(u, QUIT, u->nick, "", "", msg);
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	void OnJoinChannel(User *u, Channel *c) override
 	{
 		UpdateUser(u, JOIN, u->nick, "", c->name, "");
 	}
 
-	void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg) anope_override
+	void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg) override
 	{
 		UpdateUser(u, PART, u->nick, "", channel, msg);
 	}
 
-	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &msg) anope_override
+	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &msg) override
 	{
 		UpdateUser(cu->user, KICK, cu->user->nick, source.GetSource(), cu->chan->name, msg);
 	}
 
- private:
+private:
 	void UpdateUser(const User *u, const TypeInfo Type, const Anope::string &nick, const Anope::string &nick2, const Anope::string &channel, const Anope::string &message)
 	{
 		if (simple || !u->server->IsSynced())

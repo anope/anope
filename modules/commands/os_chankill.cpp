@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,14 +15,14 @@ static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sglin
 
 class CommandOSChanKill : public Command
 {
- public:
+public:
 	CommandOSChanKill(Module *creator) : Command(creator, "operserv/chankill", 2, 3)
 	{
 		this->SetDesc(_("AKILL all users on a specific channel"));
 		this->SetSyntax(_("[+\037expiry\037] \037channel\037 \037reason\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!akills)
 			return;
@@ -69,10 +69,8 @@ class CommandOSChanKill : public Command
 
 			if ((c = Channel::Find(channel)))
 			{
-				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+				for (const auto &[_, uc] : c->users)
 				{
-					ChanUserContainer *uc = it->second;
-
 					if (uc->user->server == Me || uc->user->HasMode("OPER"))
 						continue;
 
@@ -93,7 +91,7 @@ class CommandOSChanKill : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -108,7 +106,7 @@ class OSChanKill : public Module
 {
 	CommandOSChanKill commandoschankill;
 
- public:
+public:
 	OSChanKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoschankill(this)
 	{

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef ANOPE_H
-#define ANOPE_H
+#pragma once
 
 #include <signal.h>
 
@@ -25,13 +24,13 @@ namespace Anope
 	 */
 	class CoreExport string
 	{
-	 private:
+	private:
 		/**
 		 * The actual string is stored in an std::string as it can be converted to
 		 * ci::string, or a C-style string at any time.
 		 */
 		std::string _string;
-	 public:
+	public:
 		/**
 		 * Extras.
 		 */
@@ -54,6 +53,7 @@ namespace Anope
 		string(const ci::string &_str) : _string(_str.c_str()) { }
 		string(const string &_str, size_type pos, size_type n = npos) : _string(_str._string, pos, n) { }
 		template <class InputIterator> string(InputIterator first, InputIterator last) : _string(first, last) { }
+		string(const string &) = default;
 
 		/**
 		 * Assignment operators, so any type of string can be assigned to this class.
@@ -254,8 +254,8 @@ namespace Anope
 		inline string lower() const
 		{
 			Anope::string new_string = *this;
-			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = Anope::tolower(new_string[i]);
+			for (auto &chr : new_string)
+				chr = Anope::tolower(chr);
 			return new_string;
 		}
 
@@ -265,8 +265,8 @@ namespace Anope
 		inline string upper() const
 		{
 			Anope::string new_string = *this;
-			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = Anope::toupper(new_string[i]);
+			for (auto &chr : new_string)
+				chr = Anope::toupper(chr);
 			return new_string;
 		}
 
@@ -312,7 +312,7 @@ namespace Anope
 	{
 		inline size_t operator()(const string &s) const
 		{
-			return TR1NS::hash<std::string>()(s.lower().str());
+			return std::hash<std::string>()(s.lower().str());
 		}
 	};
 
@@ -320,7 +320,7 @@ namespace Anope
 	{
 		inline size_t operator()(const string &s) const
 		{
-			return TR1NS::hash<std::string>()(s.str());
+			return std::hash<std::string>()(s.str());
 		}
 	};
 
@@ -334,7 +334,7 @@ namespace Anope
 
 	template<typename T> class map : public std::map<string, T, ci::less> { };
 	template<typename T> class multimap : public std::multimap<string, T, ci::less> { };
-	template<typename T> class hash_map : public TR1NS::unordered_map<string, T, hash_ci, compare> { };
+	template<typename T> class hash_map : public std::unordered_map<string, T, hash_ci, compare> { };
 
 #ifndef REPRODUCIBLE_BUILD
 	static const char *const compiled = __TIME__ " " __DATE__;
@@ -362,15 +362,15 @@ namespace Anope
 	 */
 	extern CoreExport int Debug;
 
-	/** Other comand line options.
+	/** Other command line options.
 	 */
 	extern CoreExport bool ReadOnly, NoFork, NoThird, NoExpire, ProtocolDebug;
 
-	/** The root of the services installation. Usually ~/anope
+	/** The root of the Anope installation. Usually ~/anope
 	 */
 	extern CoreExport Anope::string ServicesDir;
 
-	/** Services binary name (eg services)
+	/** Anope binary name (eg anope)
 	 */
 	extern CoreExport Anope::string ServicesBin;
 
@@ -384,7 +384,7 @@ namespace Anope
 
 	/** The uplink we are currently connected to
 	 */
-	extern CoreExport int CurrentUplink;
+	extern CoreExport size_t CurrentUplink;
 
 	/** Various methods to determine the Anope version running
 	 */
@@ -403,7 +403,7 @@ namespace Anope
 
 	/** Used to "fork" the process and go into the background during initial startup
 	 * while we are AtTerm(). The actual fork is not done here, but earlier, and this
-	 * simply notifys the parent via kill() to exit().
+	 * simply notifies the parent via kill() to exit().
 	 */
 	extern void Fork();
 
@@ -413,10 +413,10 @@ namespace Anope
 
 	/** One of the first functions called, does general initialization such as reading
 	 * command line args, loading the configuration, doing the initial fork() if necessary,
-	 * initializating language support, loading modules, and loading databases.
+	 * initializing language support, loading modules, and loading databases.
 	 * @throws CoreException if something bad went wrong
 	 */
-	extern void Init(int ac, char **av);
+	extern bool Init(int ac, char **av);
 
 	/** Calls the save database event
 	 */
@@ -537,6 +537,13 @@ namespace Anope
 	 */
 	extern Anope::string Resolve(const Anope::string &host, int type);
 
+	/** Does a blocking dns query and returns all IPs.
+	 * @param host host to look up
+	 * @param type inet addr type
+	 * @return A list of all IPs that the host resolves to
+	 */
+	extern std::vector<Anope::string> ResolveMultiple(const Anope::string &host, int type);
+
 	/** Generate a string of random letters and numbers
 	 * @param len The length of the string returned
 	 */
@@ -550,23 +557,23 @@ namespace Anope
  */
 class CoreExport sepstream
 {
- private:
+private:
 	/** Original string.
 	 */
 	Anope::string tokens;
-	/** Seperator value
+	/** Separator value
 	 */
 	char sep;
 	/** Current string position
 	 */
-	size_t pos;
+	size_t pos = 0;
 	/** If set then GetToken() can return an empty string
 	 */
 	bool allow_empty;
- public:
+public:
 	/** Create a sepstream and fill it with the provided data
 	 */
-	sepstream(const Anope::string &source, char seperator, bool allowempty = false);
+	sepstream(const Anope::string &source, char separator, bool allowempty = false);
 
 	/** Fetch the next token from the stream
 	 * @param token The next token from the stream is placed here
@@ -576,7 +583,7 @@ class CoreExport sepstream
 
 	/** Gets token number 'num' from the stream
 	 * @param token The token is placed here
-	 * @param num The token number to featch
+	 * @param num The token number to fetch
 	 * @return True if the token was able to be fetched
 	 */
 	bool GetToken(Anope::string &token, int num);
@@ -594,7 +601,7 @@ class CoreExport sepstream
 
 	/** Gets token number 'num' from the stream and all remaining tokens.
 	 * @param token The token is placed here
-	 * @param num The token number to featch
+	 * @param num The token number to fetch
 	 * @return True if the token was able to be fetched
 	 */
 	bool GetTokenRemainder(Anope::string &token, int num);
@@ -619,8 +626,8 @@ class CoreExport sepstream
  */
 class commasepstream : public sepstream
 {
- public:
-	/** Initialize with comma seperator
+public:
+	/** Initialize with comma separator
 	 */
 	commasepstream(const Anope::string &source, bool allowempty = false) : sepstream(source, ',', allowempty) { }
 };
@@ -629,8 +636,8 @@ class commasepstream : public sepstream
  */
 class spacesepstream : public sepstream
 {
- public:
-	/** Initialize with space seperator
+public:
+	/** Initialize with space separator
 	 */
 	spacesepstream(const Anope::string &source) : sepstream(source, ' ') { }
 };
@@ -643,15 +650,15 @@ class spacesepstream : public sepstream
  */
 class CoreException : public std::exception
 {
- protected:
+protected:
 	/** Holds the error message to be displayed
 	 */
 	Anope::string err;
 	/** Source of the exception
 	 */
 	Anope::string source;
- public:
-	/** Default constructor, just uses the error mesage 'Core threw an exception'.
+public:
+	/** Default constructor, just uses the error message 'Core threw an exception'.
 	 */
 	CoreException() : err("Core threw an exception"), source("The core") { }
 	/** This constructor can be used to specify an error message before throwing.
@@ -665,7 +672,7 @@ class CoreException : public std::exception
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~CoreException() throw() { }
+	virtual ~CoreException() noexcept = default;
 	/** Returns the reason for the exception.
 	 * The module should probably put something informative here as the user will see this upon failure.
 	 */
@@ -682,8 +689,8 @@ class CoreException : public std::exception
 
 class ModuleException : public CoreException
 {
- public:
-	/** Default constructor, just uses the error mesage 'Module threw an exception'.
+public:
+	/** Default constructor, just uses the error message 'Module threw an exception'.
 	 */
 	ModuleException() : CoreException("Module threw an exception", "A Module") { }
 
@@ -694,15 +701,15 @@ class ModuleException : public CoreException
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~ModuleException() throw() { }
+	virtual ~ModuleException() noexcept = default;
 };
 
 class ConvertException : public CoreException
 {
- public:
+public:
 	ConvertException(const Anope::string &reason = "") : CoreException(reason) { }
 
-	virtual ~ConvertException() throw() { }
+	virtual ~ConvertException() noexcept = default;
 };
 
 /** Convert something to a string
@@ -758,7 +765,7 @@ template<typename T> inline T convertTo(const Anope::string &s, bool failIfLefto
 }
 
 /** Casts to be used instead of dynamic_cast, this uses dynamic_cast
- * for debug builds and static_cast on releass builds
+ * for debug builds and static_cast on release builds
  * to speed up the program because dynamic_cast relies on RTTI.
  */
 #ifdef DEBUG_BUILD
@@ -776,5 +783,3 @@ template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
 	return static_cast<T>(ptr);
 }
 #endif
-
-#endif // ANOPE_H

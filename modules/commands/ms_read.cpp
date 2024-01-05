@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -39,8 +39,8 @@ static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Ano
 
 		/* Notify recipient of the memo that a notification has
 		   been sent to the sender */
-		source.Reply(_("A notification memo has been sent to %s informing him/her you have\n"
-				"read his/her memo."), nc->display.c_str());
+		source.Reply(_("A notification memo has been sent to %s informing them you have\n"
+				"read their memo."), nc->display.c_str());
 	}
 
 	/* Remove receipt flag from the original memo */
@@ -53,19 +53,19 @@ class MemoListCallback : public NumberList
 	MemoInfo *mi;
 	const ChannelInfo *ci;
 	bool found;
- public:
+public:
 	MemoListCallback(CommandSource &_source, MemoInfo *_mi, const ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi), ci(_ci)
 	{
 		found = false;
 	}
 
-	~MemoListCallback()
+	~MemoListCallback() override
 	{
 		if (!found)
 			source.Reply(_("No memos to display."));
 	}
 
-	void HandleNumber(unsigned number) anope_override
+	void HandleNumber(unsigned number) override
 	{
 		if (!number || number > mi->memos->size())
 			return;
@@ -106,14 +106,14 @@ class MemoListCallback : public NumberList
 
 class CommandMSRead : public Command
 {
- public:
+public:
 	CommandMSRead(Module *creator) : Command(creator, "memoserv/read", 1, 2)
 	{
 		this->SetDesc(_("Read a memo or memos"));
 		this->SetSyntax(_("[\037channel\037] {\037num\037 | \037list\037 | LAST | NEW | ALL}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
 		MemoInfo *mi;
@@ -192,7 +192,7 @@ class CommandMSRead : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -213,7 +213,7 @@ class MSRead : public Module
 {
 	CommandMSRead commandmsread;
 
- public:
+public:
 	MSRead(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsread(this)
 	{

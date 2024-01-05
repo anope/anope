@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -61,7 +61,7 @@ struct NewsMessages msgarray[] = {
 
 struct MyNewsItem : NewsItem
 {
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["type"] << this->type;
 		data["text"] << this->text;
@@ -96,27 +96,29 @@ struct MyNewsItem : NewsItem
 class MyNewsService : public NewsService
 {
 	std::vector<NewsItem *> newsItems[3];
- public:
+public:
 	MyNewsService(Module *m) : NewsService(m) { }
 
-	~MyNewsService()
+	~MyNewsService() override
 	{
-		for (unsigned i = 0; i < 3; ++i)
-			for (unsigned j = 0; j < newsItems[i].size(); ++j)
-				delete newsItems[i][j];
+		for (const auto &newstype : newsItems)
+		{
+			for (const auto *newsitem : newstype)
+				delete newsitem;
+		}
 	}
 
-	NewsItem *CreateNewsItem() anope_override
+	NewsItem *CreateNewsItem() override
 	{
 		return new MyNewsItem();
 	}
 
-	void AddNewsItem(NewsItem *n) anope_override
+	void AddNewsItem(NewsItem *n) override
 	{
 		this->newsItems[n->type].push_back(n);
 	}
 
-	void DelNewsItem(NewsItem *n) anope_override
+	void DelNewsItem(NewsItem *n) override
 	{
 		std::vector<NewsItem *> &list = this->GetNewsList(n->type);
 		std::vector<NewsItem *>::iterator it = std::find(list.begin(), list.end(), n);
@@ -125,7 +127,7 @@ class MyNewsService : public NewsService
 		delete n;
 	}
 
-	std::vector<NewsItem *> &GetNewsList(NewsType t) anope_override
+	std::vector<NewsItem *> &GetNewsList(NewsType t) override
 	{
 		return this->newsItems[t];
 	}
@@ -134,9 +136,9 @@ class MyNewsService : public NewsService
 #define lenof(a)        (sizeof(a) / sizeof(*(a)))
 static const char **findmsgs(NewsType type)
 {
-	for (unsigned i = 0; i < lenof(msgarray); ++i)
-		if (msgarray[i].type == type)
-			return msgarray[i].msgs;
+	for (auto &msg : msgarray)
+		if (msg.type == type)
+			return msg.msgs;
 	return NULL;
 }
 
@@ -144,7 +146,7 @@ class NewsBase : public Command
 {
 	ServiceReference<NewsService> ns;
 
- protected:
+protected:
 	void DoList(CommandSource &source, NewsType ntype, const char **msgs)
 	{
 		std::vector<NewsItem *> &list = this->ns->GetNewsList(ntype);
@@ -170,8 +172,8 @@ class NewsBase : public Command
 			std::vector<Anope::string> replies;
 			lflist.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of news list."));
 		}
@@ -272,7 +274,7 @@ class NewsBase : public Command
 
 		return;
 	}
- public:
+public:
 	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2), ns("NewsService", "news")
 	{
 		this->SetSyntax(_("ADD \037text\037"));
@@ -280,29 +282,29 @@ class NewsBase : public Command
 		this->SetSyntax("LIST");
 	}
 
-	virtual ~NewsBase()
+	~NewsBase() override
 	{
 	}
 
-	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override = 0;
 
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) = 0;
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 };
 
 class CommandOSLogonNews : public NewsBase
 {
- public:
+public:
 	CommandOSLogonNews(Module *creator) : NewsBase(creator, "operserv/logonnews")
 	{
 		this->SetDesc(_("Define messages to be shown to users at logon"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		return this->DoNews(source, params, NEWS_LOGON);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -318,18 +320,18 @@ class CommandOSLogonNews : public NewsBase
 
 class CommandOSOperNews : public NewsBase
 {
- public:
+public:
 	CommandOSOperNews(Module *creator) : NewsBase(creator, "operserv/opernews")
 	{
 		this->SetDesc(_("Define messages to be shown to users who oper"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		return this->DoNews(source, params, NEWS_OPER);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -345,18 +347,18 @@ class CommandOSOperNews : public NewsBase
 
 class CommandOSRandomNews : public NewsBase
 {
- public:
+public:
 	CommandOSRandomNews(Module *creator) : NewsBase(creator, "operserv/randomnews")
 	{
 		this->SetDesc(_("Define messages to be randomly shown to users at logon"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		return this->DoNews(source, params, NEWS_RANDOM);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -431,27 +433,27 @@ class OSNews : public Module
 			cur_rand_news = 0;
 	}
 
- public:
+public:
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		newsservice(this), newsitem_type("NewsItem", MyNewsItem::Unserialize),
 		commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		oper_announcer = conf->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ");
 		announcer = conf->GetModule(this)->Get<const Anope::string>("announcer", "Global");
 		news_count = conf->GetModule(this)->Get<unsigned>("newscount", "3");
 	}
 
-	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
+	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (mname == "OPER")
 			DisplayNews(u, NEWS_OPER);
 	}
 
-	void OnUserConnect(User *user, bool &) anope_override
+	void OnUserConnect(User *user, bool &) override
 	{
 		if (user->Quitting() || !user->server->IsSynced())
 			return;

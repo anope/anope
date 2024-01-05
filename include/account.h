@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef ACCOUNT_H
-#define ACCOUNT_H
+#pragma once
 
 #include "extensible.h"
 #include "serialize.h"
@@ -20,7 +19,7 @@
 
 typedef Anope::hash_map<NickAlias *> nickalias_map;
 typedef Anope::hash_map<NickCore *> nickcore_map;
-typedef TR1NS::unordered_map<uint64_t, NickCore *> nickcoreid_map;
+typedef std::unordered_map<uint64_t, NickCore *> nickcoreid_map;
 
 extern CoreExport Serialize::Checker<nickalias_map> NickAliasList;
 extern CoreExport Serialize::Checker<nickcore_map> NickCoreList;
@@ -34,7 +33,7 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_created;
 
- public:
+public:
 	Anope::string nick;
 	Anope::string last_quit;
 	Anope::string last_realname;
@@ -54,14 +53,14 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	NickAlias(const Anope::string &nickname, NickCore *nickcore);
 	~NickAlias();
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Set a vhost for the user
 	 * @param ident The ident
 	 * @param host The host
 	 * @param creator Who created the vhost
-	 * @param time When the vhost was craated
+	 * @param time When the vhost was created
 	 */
 	void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime);
 
@@ -111,7 +110,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 	Serialize::Checker<std::map<ChannelInfo *, int> > chanaccess;
 	/* Unique identifier for the account. */
 	uint64_t id;
- public:
+public:
 	/* Name of the account. Find(display)->nc == this. */
 	Anope::string display;
 	/* User password in form of hashm:data */
@@ -130,7 +129,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 	 */
 	Serialize::Checker<std::vector<NickAlias *> > aliases;
 
-	/* Set if this user is a services operattor. o->ot must exist. */
+	/* Set if this user is a services operator. o->ot must exist. */
 	Oper *o;
 
 	/* Unsaved data */
@@ -149,7 +148,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 	NickCore(const Anope::string &nickdisplay, uint64_t nickid = 0);
 	~NickCore();
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Changes the display for this account
@@ -234,22 +233,22 @@ class CoreExport NickCore : public Serializable, public Extensible
 class CoreExport IdentifyRequest
 {
 	/* Owner of this request, used to cleanup requests if a module is unloaded
-	 * while a reqyest us pending */
+	 * while a request us pending */
 	Module *owner;
 	Anope::string account;
 	Anope::string password;
 
 	std::set<Module *> holds;
-	bool dispatched;
-	bool success;
+	bool dispatched = false;
+	bool success = false;
 
 	static std::set<IdentifyRequest *> Requests;
 
- protected:
+protected:
 	IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass);
 	virtual ~IdentifyRequest();
 
- public:
+public:
 	/* One of these is called when the request goes through */
 	virtual void OnSuccess() = 0;
 	virtual void OnFail() = 0;
@@ -262,17 +261,17 @@ class CoreExport IdentifyRequest
 	 * for the request to complete. Multiple modules may hold a request at any time,
 	 * but the request is not complete until every module has released it. If you do not
 	 * require holding this (eg, your password check is done in this thread and immediately)
-	 * then you don't need to hold the request before Successing it.
+	 * then you don't need to hold the request before calling `Success()`.
 	 * @param m The module holding this request
 	 */
 	void Hold(Module *m);
 
 	/** Releases a held request
-	 * @param m The module releaseing the hold
+	 * @param m The module releasing the hold
 	 */
 	void Release(Module *m);
 
-	/** Called by modules when this IdentifyRequest has successeded successfully.
+	/** Called by modules when this IdentifyRequest has succeeded.
 	 * If this request is behind held it must still be Released after calling this.
 	 * @param m The module confirming authentication
 	 */
@@ -286,5 +285,3 @@ class CoreExport IdentifyRequest
 
 	static void ModuleUnload(Module *m);
 };
-
-#endif // ACCOUNT_H

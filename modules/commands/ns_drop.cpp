@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandNSDrop : public Command
 {
- public:
+public:
 	CommandNSDrop(Module *creator) : Command(creator, "nickserv/drop", 1, 1)
 	{
 		this->SetSyntax(_("\037nickname\037"));
 		this->SetDesc(_("Cancel the registration of a nickname"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = params[0];
 
@@ -54,7 +54,7 @@ class CommandNSDrop : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -75,7 +75,7 @@ class NSDrop : public Module
 {
 	CommandNSDrop commandnsdrop;
 
- public:
+public:
 	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsdrop(this)
 	{

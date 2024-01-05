@@ -1,13 +1,12 @@
 /*
  *
- * (C) 2011-2021 Anope Team
+ * (C) 2011-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef OS_NEWS
-#define OS_NEWS
+#pragma once
 
 enum NewsType
 {
@@ -35,7 +34,7 @@ struct NewsItem : Serializable
 
 class NewsService : public Service
 {
- public:
+public:
 	NewsService(Module *m) : Service(m, "NewsService", "news") { }
 
 	virtual NewsItem *CreateNewsItem() = 0;
@@ -48,5 +47,3 @@ class NewsService : public Service
 };
 
 static ServiceReference<NewsService> news_service("NewsService", "news");
-
-#endif // OS_NEWS

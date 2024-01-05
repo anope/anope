@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,9 +15,9 @@
 #include "socketengine.h"
 #include "config.h"
 
+#include <cerrno>
 #include <sys/epoll.h>
 #include <ulimit.h>
-#include <errno.h>
 
 static int EngineHandle;
 static std::vector<epoll_event> events;
@@ -53,7 +53,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 
 	memset(&ev, 0, sizeof(ev));
 
-	ev.events = (s->flags[SF_READABLE] ? EPOLLIN : 0) | (s->flags[SF_WRITABLE] ? EPOLLOUT : 0);
+	ev.events = (s->flags[SF_READABLE] ? EPOLLIN : 0u) | (s->flags[SF_WRITABLE] ? EPOLLOUT : 0u);
 	ev.data.fd = s->GetFD();
 
 	int mod;

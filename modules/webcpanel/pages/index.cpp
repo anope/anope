@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,10 +16,10 @@ class WebpanelRequest : public IdentifyRequest
 	Reference<HTTPClient> client;
 	TemplateFileServer::Replacements replacements;
 
- public:
+public:
 	WebpanelRequest(Module *o, HTTPReply &r, HTTPMessage &m, HTTPProvider *s, const Anope::string &p_n, HTTPClient *c, TemplateFileServer::Replacements &re, const Anope::string &user, const Anope::string &pass) : IdentifyRequest(o, user, pass), reply(r), message(m), server(s), page_name(p_n), client(c), replacements(re) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		if (!client || !server)
 			return;
@@ -60,15 +60,15 @@ class WebpanelRequest : public IdentifyRequest
 
 		{
 			HTTPReply::cookie c;
-			c.push_back(std::make_pair("account", na->nick));
-			c.push_back(std::make_pair("Path", "/"));
+			c.emplace_back("account", na->nick);
+			c.emplace_back("Path", "/");
 			reply.cookies.push_back(c);
 		}
 
 		{
 			HTTPReply::cookie c;
-			c.push_back(std::make_pair("id", id));
-			c.push_back(std::make_pair("Path", "/"));
+			c.emplace_back("id", id);
+			c.emplace_back("Path", "/");
 			reply.cookies.push_back(c);
 		}
 
@@ -78,7 +78,7 @@ class WebpanelRequest : public IdentifyRequest
 		client->SendReply(&reply);
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		if (!client || !server)
 			return;

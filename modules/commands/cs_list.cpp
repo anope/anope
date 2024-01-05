@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,14 +14,14 @@
 
 class CommandCSList : public Command
 {
- public:
+public:
 	CommandCSList(Module *creator) : Command(creator, "chanserv/list", 1, 2)
 	{
 		this->SetDesc(_("Lists all registered channels matching the given pattern"));
 		this->SetSyntax(_("\037pattern\037 [SUSPENDED] [NOEXPIRE]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string pattern = params[0];
 		unsigned nchans;
@@ -75,13 +75,11 @@ class CommandCSList : public Command
 		list.AddColumn(_("Name")).AddColumn(_("Description"));
 
 		Anope::map<ChannelInfo *> ordered_map;
-		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
-			ordered_map[it->first] = it->second;
+		for (const auto &[cname, ci] : *RegisteredChannelList)
+			ordered_map[cname] = ci;
 
-		for (Anope::map<ChannelInfo *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
+		for (const auto &[_, ci] : ordered_map)
 		{
-			const ChannelInfo *ci = it->second;
-
 			if (!is_servadmin)
 			{
 				if (ci->HasExt("CS_PRIVATE") || ci->HasExt("CS_SUSPENDED"))
@@ -124,13 +122,13 @@ class CommandCSList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const auto &reply : replies)
+			source.Reply(reply);
 
 		source.Reply(_("End of list - %d/%d matches shown."), nchans > listmax ? listmax : nchans, nchans);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -174,14 +172,14 @@ class CommandCSList : public Command
 
 class CommandCSSetPrivate : public Command
 {
- public:
+public:
 	CommandCSSetPrivate(Module *creator, const Anope::string &cname = "chanserv/set/private") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Hide channel from the LIST command"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -225,7 +223,7 @@ class CommandCSSetPrivate : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -247,13 +245,13 @@ class CSList : public Module
 
 	SerializableExtensibleItem<bool> priv;
 
- public:
+public:
 	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcslist(this), commandcssetprivate(this), priv(this, "CS_PRIVATE")
 	{
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;

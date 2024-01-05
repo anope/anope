@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,12 @@
 
 class CommandBSInfo : public Command
 {
- private:
+private:
 	void send_bot_channels(std::vector<Anope::string> &buffers, const BotInfo *bi)
 	{
 		Anope::string buf;
-		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+		for (const auto &[_, ci] : *RegisteredChannelList)
 		{
-			const ChannelInfo *ci = it->second;
-
 			if (ci->bi == bi)
 			{
 				buf += " " + ci->name + " ";
@@ -35,13 +33,13 @@ class CommandBSInfo : public Command
 			buffers.push_back(buf);
 	}
 
- public:
+public:
 	CommandBSInfo(Module *creator) : Command(creator, "botserv/info", 1, 1)
 	{
 		this->SetSyntax(_("{\037channel\037 | \037nickname\037}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &query = params[0];
 
@@ -63,15 +61,15 @@ class CommandBSInfo : public Command
 			std::vector<Anope::string> replies;
 			info.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			if (source.HasPriv("botserv/administration"))
 			{
 				std::vector<Anope::string> buf;
 				this->send_bot_channels(buf, bi);
-				for (unsigned i = 0; i < buf.size(); ++i)
-					source.Reply(buf[i]);
+				for (const auto &line : buf)
+					source.Reply(line);
 			}
 
 		}
@@ -94,14 +92,14 @@ class CommandBSInfo : public Command
 			std::vector<Anope::string> replies;
 			info.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 		}
 		else
 			source.Reply(_("\002%s\002 is not a valid bot or registered channel."), query.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -113,7 +111,7 @@ class CommandBSInfo : public Command
 		return true;
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Allows you to see %s information about a channel or a bot")), source.service->nick.c_str());
 	}
@@ -123,7 +121,7 @@ class BSInfo : public Module
 {
 	CommandBSInfo commandbsinfo;
 
- public:
+public:
 	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsinfo(this)
 	{

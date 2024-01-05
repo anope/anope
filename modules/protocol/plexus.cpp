@@ -1,6 +1,6 @@
 /* Plexus 3+ IRCD functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,7 +18,7 @@ static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
 
 class PlexusProto : public IRCDProto
 {
- public:
+public:
 	PlexusProto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
 	{
 		DefaultPseudoclientModes = "+iU";
@@ -35,26 +35,26 @@ class PlexusProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) anope_override { hybrid->SendSVSKillInternal(source, targ, reason); }
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendSQLine(User *u, const XLine *x) anope_override { hybrid->SendSQLine(u, x); }
-	void SendSQLineDel(const XLine *x) anope_override { hybrid->SendSQLineDel(x); }
-	void SendSGLineDel(const XLine *x) anope_override { hybrid->SendSGLineDel(x); }
-	void SendSGLine(User *u, const XLine *x) anope_override { hybrid->SendSGLine(u, x); }
-	void SendAkillDel(const XLine *x) anope_override { hybrid->SendAkillDel(x); }
-	void SendAkill(User *u, XLine *x) anope_override { hybrid->SendAkill(u, x); }
-	void SendServer(const Server *server) anope_override { hybrid->SendServer(server); }
-	void SendChannel(Channel *c) anope_override { hybrid->SendChannel(c); }
-	void SendSVSHold(const Anope::string &nick, time_t t) anope_override { hybrid->SendSVSHold(nick, t); }
-	void SendSVSHoldDel(const Anope::string &nick) anope_override { hybrid->SendSVSHoldDel(nick); }
+	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKillInternal(source, targ, reason); }
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendSQLine(User *u, const XLine *x) override { hybrid->SendSQLine(u, x); }
+	void SendSQLineDel(const XLine *x) override { hybrid->SendSQLineDel(x); }
+	void SendSGLineDel(const XLine *x) override { hybrid->SendSGLineDel(x); }
+	void SendSGLine(User *u, const XLine *x) override { hybrid->SendSGLine(u, x); }
+	void SendAkillDel(const XLine *x) override { hybrid->SendAkillDel(x); }
+	void SendAkill(User *u, XLine *x) override { hybrid->SendAkill(u, x); }
+	void SendServer(const Server *server) override { hybrid->SendServer(server); }
+	void SendChannel(Channel *c) override { hybrid->SendChannel(c); }
+	void SendSVSHold(const Anope::string &nick, time_t t) override { hybrid->SendSVSHold(nick, t); }
+	void SendSVSHoldDel(const Anope::string &nick) override { hybrid->SendSVSHoldDel(nick); }
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
 	{
 		UplinkSocket::Message(source) << "OPERWALL :" << buf;
 	}
 
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
 		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << user->GetUID();
 		if (status)
@@ -69,20 +69,20 @@ class PlexusProto : public IRCDProto
 				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->GetUID());
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+			for (auto mode : cs.Modes())
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(mode), user->GetUID(), false);
 
 			if (uc != NULL)
 				uc->status = cs;
 		}
 	}
 
-	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
+	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
 		UplinkSocket::Message(Me) << "ENCAP " << u->server->GetName() << " SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
 	}
 
-	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) anope_override
+	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
 	{
 		if (!ident.empty())
 			UplinkSocket::Message(Me) << "ENCAP * CHGIDENT " << u->GetUID() << " " << ident;
@@ -90,12 +90,12 @@ class PlexusProto : public IRCDProto
 		u->SetMode(Config->GetClient("HostServ"), "CLOAK");
 	}
 
-	void SendVhostDel(User *u) anope_override
+	void SendVhostDel(User *u) override
 	{
 		u->RemoveMode(Config->GetClient("HostServ"), "CLOAK");
 	}
 
-	void SendConnect() anope_override
+	void SendConnect() override
 	{
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
 		/* CAPAB
@@ -115,7 +115,7 @@ class PlexusProto : public IRCDProto
 		 * KNOCK  - Supports KNOCK
 		 * TBURST - Supports TBURST
 		 * PARA   - Supports invite broadcasting for +p
-		 * ENCAP  - Supports encapsulization of protocol messages
+		 * ENCAP  - Supports encapsulation of protocol messages
 		 * SVS    - Supports services protocol extensions
 		 */
 		UplinkSocket::Message() << "CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS";
@@ -132,56 +132,56 @@ class PlexusProto : public IRCDProto
 		UplinkSocket::Message() << "SVINFO 6 5 0 :" << Anope::CurTime;
 	}
 
-	void SendClientIntroduction(User *u) anope_override
+	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 255.255.255.255 " << u->GetUID() << " 0 " << u->host << " :" << u->realname;
 	}
 
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
 		UplinkSocket::Message(source) << "ENCAP * SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
 	}
 
-	void SendLogin(User *u, NickAlias *na) anope_override
+	void SendLogin(User *u, NickAlias *na) override
 	{
 		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->nc->display;
 	}
 
-	void SendLogout(User *u) anope_override
+	void SendLogout(User *u) override
 	{
 		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
 	}
 
-	void SendTopic(const MessageSource &source, Channel *c) anope_override
+	void SendTopic(const MessageSource &source, Channel *c) override
 	{
 		UplinkSocket::Message(source) << "ENCAP * TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
 	}
 
-	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) anope_override
+	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
 	{
 		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSJOIN " << user->GetUID() << " " << chan;
 	}
 
-	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) anope_override
+	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
 	{
 		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSPART " << user->GetUID() << " " << chan;
 	}
 
-	void SendSASLMessage(const SASL::Message &message) anope_override
+	void SendSASLMessage(const SASL::Message &message) override
 	{
 		Server *s = Server::Find(message.target.substr(0, 3));
 		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : message.target.substr(0, 3)) << " SASL " << message.source << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : (" " + message.ext));
 	}
 
-	void SendSVSLogin(const Anope::string &uid, NickAlias *na) anope_override
+	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
 	{
 		Server *s = Server::Find(uid.substr(0, 3));
 		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : uid.substr(0, 3)) << " SVSLOGIN " << uid << " * * "
 			<< (na->GetVhostHost().empty() ? "*" : na->GetVhostHost()) << " " << na->nc->display;
 	}
 
-	void SendSVSNOOP(const Server *server, bool set) anope_override
+	void SendSVSNOOP(const Server *server, bool set) override
 	{
 		UplinkSocket::Message() << "ENCAP " << server->GetName() << " SVSNOOP " << (set ? "+" : "-");
 	}
@@ -191,7 +191,7 @@ struct IRCDMessageEncap : IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		/*
 		 * Received: :dev.anope.de ENCAP * SU DukePyrolator DukePyrolator
@@ -247,7 +247,7 @@ struct IRCDMessagePass : IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		UplinkSID = params[3];
 	}
@@ -259,7 +259,7 @@ struct IRCDMessageServer : IRCDMessage
 
 	/*        0          1  2                       */
 	/* SERVER hades.arpa 1 :ircd-hybrid test server */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		/* Servers other than our immediate uplink are introduced via SID */
 		if (params[1] != "1")
@@ -287,7 +287,7 @@ struct IRCDMessageUID : IRCDMessage
 	   params[10] = info
 	*/
 	// :42X UID Adam 1 1348535644 +aow Adam 192.168.0.5 192.168.0.5 42XAAAAAB 0 192.168.0.5 :Adam
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		/* An IP of 0 means the user is spoofed */
 		Anope::string ip = params[6];
@@ -413,7 +413,7 @@ class ProtoPlexus : public Module
 		ModeManager::AddChannelMode(new ChannelMode("PERM", 'z'));
 	}
 
- public:
+public:
 	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this), message_kill(this),
@@ -441,7 +441,7 @@ class ProtoPlexus : public Module
 		this->AddModes();
 	}
 
-	~ProtoPlexus()
+	~ProtoPlexus() override
 	{
 		m_hybrid = ModuleManager::FindModule("hybrid");
 		ModuleManager::UnloadModule(m_hybrid, NULL);

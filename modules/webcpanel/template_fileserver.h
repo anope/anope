@@ -1,9 +1,11 @@
 /*
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
+
+#pragma once
 
 #include "modules/httpd.h"
 
@@ -11,12 +13,12 @@
 class TemplateFileServer
 {
 	Anope::string file_name;
- public:
+public:
 	struct Replacements : std::multimap<Anope::string, Anope::string>
 	{
 		Anope::string& operator[](const Anope::string &key)
 		{
-			return insert(std::make_pair(key, ""))->second;
+			return emplace(key, "")->second;
 		}
 	};
 

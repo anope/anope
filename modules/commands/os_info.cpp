@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,15 +13,15 @@ struct OperInfo : Serializable
 	Anope::string target;
 	Anope::string info;
 	Anope::string adder;
-	time_t created;
+	time_t created = 0;
 
-	OperInfo() : Serializable("OperInfo"), created(0) { }
+	OperInfo() : Serializable("OperInfo") { }
 	OperInfo(const Anope::string &t, const Anope::string &i, const Anope::string &a, time_t c) :
 		Serializable("OperInfo"), target(t), info(i), adder(a), created(c) { }
 
-	~OperInfo();
+	~OperInfo() override;
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["target"] << target;
 		data["info"] << info;
@@ -95,7 +95,7 @@ Serializable *OperInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 
 class CommandOSInfo : public Command
 {
- public:
+public:
 	CommandOSInfo(Module *creator) : Command(creator, "operserv/info", 2, 3)
 	{
 		this->SetDesc(_("Associate oper info with a nick or channel"));
@@ -104,7 +104,7 @@ class CommandOSInfo : public Command
 		this->SetSyntax(_("CLEAR \037target\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0], target = params[1], info = params.size() > 2 ? params[2] : "";
 
@@ -148,10 +148,8 @@ class CommandOSInfo : public Command
 				return;
 			}
 
-			for (unsigned i = 0; i < (*oi)->size(); ++i)
+			for (auto *o : *(*oi))
 			{
-				OperInfo *o = (*oi)->at(i);
-
 				if (o->info.equals_ci(info))
 				{
 					source.Reply(_("The oper info already exists on \002%s\002."), target.c_str());
@@ -236,7 +234,7 @@ class CommandOSInfo : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -262,26 +260,25 @@ class OSInfo : public Module
 		if (!oi)
 			return;
 
-		for (unsigned i = 0; i < (*oi)->size(); ++i)
+		for (auto *o : *(*oi))
 		{
-			OperInfo *o = (*oi)->at(i);
 			info[_("Oper Info")] = Anope::printf(_("(by %s on %s) %s"), o->adder.c_str(), Anope::strftime(o->created, source.GetAccount(), true).c_str(), o->info.c_str());
 		}
 	}
 
- public:
+public:
 	OSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosinfo(this), oinfo(this, "operinfo"), oinfo_type("OperInfo", OperInfo::Unserialize)
 	{
 
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
 	{
 		OnInfo(source, na->nc, info);
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) override
 	{
 		OnInfo(source, ci, info);
 	}

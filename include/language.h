@@ -1,10 +1,12 @@
 /*
  *
- * (C) 2008-2021 Anope Team
+ * (C) 2008-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
+
+#pragma once
 
 #include "anope.h"
 
@@ -40,7 +42,7 @@ namespace Language
 	extern CoreExport const char *Translate(const char *string);
 
 	/** Translates a string to the language of the given user.
-	 * @param u The user to transate the string for
+	 * @param u The user to translate the string for
 	 * @param string A string to translate
 	 * @return The translated string if found, else the original string.
 	 */

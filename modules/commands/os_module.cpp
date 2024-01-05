@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandOSModLoad : public Command
 {
- public:
+public:
 	CommandOSModLoad(Module *creator) : Command(creator, "operserv/modload", 1, 1)
 	{
 		this->SetDesc(_("Load a module"));
 		this->SetSyntax(_("\037modname\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &mname = params[0];
 
@@ -38,7 +38,7 @@ class CommandOSModLoad : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -50,14 +50,14 @@ class CommandOSModLoad : public Command
 
 class CommandOSModReLoad : public Command
 {
- public:
+public:
 	CommandOSModReLoad(Module *creator) : Command(creator, "operserv/modreload", 1, 1)
 	{
 		this->SetDesc(_("Reload a module"));
 		this->SetSyntax(_("\037modname\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &mname = params[0];
 
@@ -111,7 +111,7 @@ class CommandOSModReLoad : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -122,14 +122,14 @@ class CommandOSModReLoad : public Command
 
 class CommandOSModUnLoad : public Command
 {
- public:
+public:
 	CommandOSModUnLoad(Module *creator) : Command(creator, "operserv/modunload", 1, 1)
 	{
 		this->SetDesc(_("Un-Load a module"));
 		this->SetSyntax(_("\037modname\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &mname = params[0];
 
@@ -161,7 +161,7 @@ class CommandOSModUnLoad : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -176,7 +176,7 @@ class OSModule : public Module
 	CommandOSModReLoad commandosmodreload;
 	CommandOSModUnLoad commandosmodunload;
 
- public:
+public:
 	OSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosmodload(this), commandosmodreload(this), commandosmodunload(this)
 	{

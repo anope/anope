@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@
 
 class CommandOSMode : public Command
 {
- public:
+public:
 	CommandOSMode(Module *creator) : Command(creator, "operserv/mode", 2, 3)
 	{
 		this->SetDesc(_("Change channel modes"));
@@ -21,7 +21,7 @@ class CommandOSMode : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR [ALL]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &target = params[0];
 		const Anope::string &modes = params[1];
@@ -35,9 +35,8 @@ class CommandOSMode : public Command
 		{
 			bool all = params.size() > 2 && params[2].equals_ci("ALL");
 
-			const Channel::ModeList chmodes = c->GetModes();
-			for (Channel::ModeList::const_iterator it = chmodes.begin(), it_end = chmodes.end(); it != it_end && c; ++it)
-				c->RemoveMode(c->ci->WhoSends(), it->first, it->second, false);
+			for (const auto &[mode, value] : c->GetModes())
+				c->RemoveMode(c->WhoSends(), mode, value, false);
 
 			if (!c)
 			{
@@ -47,15 +46,13 @@ class CommandOSMode : public Command
 
 			if (all)
 			{
-				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+				for (const auto &[_, uc] : c->users)
 				{
-					ChanUserContainer *uc = it->second;
-
 					if (uc->user->HasMode("OPER"))
 						continue;
 
 					for (size_t i = uc->status.Modes().length(); i > 0; --i)
-						c->RemoveMode(c->ci->WhoSends(), ModeManager::FindChannelModeByChar(uc->status.Modes()[i - 1]), uc->user->GetUID(), false);
+						c->RemoveMode(c->WhoSends(), ModeManager::FindChannelModeByChar(uc->status.Modes()[i - 1]), uc->user->GetUID(), false);
 				}
 
 				source.Reply(_("All modes cleared on %s."), c->name.c_str());
@@ -126,7 +123,7 @@ class CommandOSMode : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -140,14 +137,14 @@ class CommandOSMode : public Command
 
 class CommandOSUMode : public Command
 {
- public:
+public:
 	CommandOSUMode(Module *creator) : Command(creator, "operserv/umode", 2, 2)
 	{
 		this->SetDesc(_("Change user modes"));
 		this->SetSyntax(_("\037user\037 \037modes\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &target = params[0];
 		const Anope::string &modes = params[1];
@@ -166,7 +163,7 @@ class CommandOSUMode : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -181,7 +178,7 @@ class OSMode : public Module
 	CommandOSMode commandosmode;
 	CommandOSUMode commandosumode;
 
- public:
+public:
 	OSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosmode(this), commandosumode(this)
 	{

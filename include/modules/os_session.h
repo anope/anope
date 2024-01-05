@@ -1,21 +1,20 @@
 /*
  *
- * (C) 2011-2021 Anope Team
+ * (C) 2011-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef OS_SESSION_H
-#define OS_SESSION_H
+#pragma once
 
 struct Session
 {
 	cidr addr;                      /* A cidr (sockaddrs + len) representing this session */
-	unsigned count;                 /* Number of clients with this host */
-	unsigned hits;                  /* Number of subsequent kills for a host */
+	unsigned count = 1;             /* Number of clients with this host */
+	unsigned hits = 0;              /* Number of subsequent kills for a host */
 
-	Session(const sockaddrs &ip, int len) : addr(ip, len), count(1), hits(0) { }
+	Session(const sockaddrs &ip, int len) : addr(ip, len) { }
 };
 
 struct Exception : Serializable
@@ -28,14 +27,14 @@ struct Exception : Serializable
 	time_t expires;			/* Time when it expires. 0 == no expiry */
 
 	Exception() : Serializable("Exception") { }
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class SessionService : public Service
 {
- public:
-	typedef TR1NS::unordered_map<cidr, Session *, cidr::hash> SessionMap;
+public:
+	typedef std::unordered_map<cidr, Session *, cidr::hash> SessionMap;
 	typedef std::vector<Exception *> ExceptionVector;
 
 	SessionService(Module *m) : Service(m, "SessionService", "session") { }
@@ -90,5 +89,3 @@ Serializable* Exception::Unserialize(Serializable *obj, Serialize::Data &data)
 		session_service->AddException(ex);
 	return ex;
 }
-
-#endif

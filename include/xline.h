@@ -1,13 +1,12 @@
 /*
  *
- * (C) 2008-2021 Anope Team
+ * (C) 2008-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef XLINE_H
-#define XLINE_H
+#pragma once
 
 #include "serialize.h"
 #include "service.h"
@@ -18,13 +17,13 @@ class CoreExport XLine : public Serializable
 {
 	void Init();
 	Anope::string nick, user, host, real;
- public:
+public:
 	cidr *c;
 	Anope::string mask;
 	Regex *regex;
 	Anope::string by;
-	time_t created;
-	time_t expires;
+	time_t created = 0;
+	time_t expires = 0;
 	Anope::string reason;
 	XLineManager *manager;
 	Anope::string id;
@@ -44,7 +43,7 @@ class CoreExport XLine : public Serializable
 	bool HasNickOrReal() const;
 	bool IsRegex() const;
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
@@ -56,7 +55,7 @@ class CoreExport XLineManager : public Service
 	Serialize::Checker<std::vector<XLine *> > xlines;
 	/* Akills can have the same IDs, sometimes */
 	static Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLinesByUID;
- public:
+public:
 	/* List of XLine managers we check users against in XLineManager::CheckAll */
 	static std::list<XLineManager *> XLineManagers;
 
@@ -180,5 +179,3 @@ class CoreExport XLineManager : public Service
 	 */
 	virtual void SendDel(XLine *x) = 0;
 };
-
-#endif // XLINE_H

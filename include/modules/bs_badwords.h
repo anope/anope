@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -8,6 +8,8 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  */
+
+#pragma once
 
 /** Flags for badwords
  */
@@ -30,14 +32,14 @@ struct BadWord
 	Anope::string word;
 	BadWordType type;
 
-	virtual ~BadWord() { }
- protected:
-	BadWord() { }
+	virtual ~BadWord() = default;
+protected:
+	BadWord() = default;
 };
 
 struct BadWords
 {
-	virtual ~BadWords() { }
+	virtual ~BadWords() = default;
 
 	/** Add a badword to the badword list
 	 * @param word The badword

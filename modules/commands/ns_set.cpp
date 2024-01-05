@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,20 +13,20 @@
 
 class CommandNSSet : public Command
 {
- public:
+public:
 	CommandNSSet(Module *creator) : Command(creator, "nickserv/set", 1, 3)
 	{
 		this->SetDesc(_("Set options, including kill protection"));
 		this->SetSyntax(_("\037option\037 \037parameters\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -35,11 +35,8 @@ class CommandNSSet : public Command
 		Anope::string this_name = source.command;
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto &[c_name, info] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
-
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				if (info.hide)
@@ -68,31 +65,28 @@ class CommandNSSet : public Command
 
 class CommandNSSASet : public Command
 {
- public:
+public:
 	CommandNSSASet(Module *creator) : Command(creator, "nickserv/saset", 2, 4)
 	{
 		this->SetDesc(_("Set SET-options on another nickname"));
 		this->SetSyntax(_("\037option\037 \037nickname\037 \037parameters\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
 
 		Anope::string this_name = source.command;
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		for (const auto &[c_name, info] : source.service->commands)
 		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
-
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				ServiceReference<Command> command("Command", info.name);
@@ -113,14 +107,14 @@ class CommandNSSASet : public Command
 
 class CommandNSSetPassword : public Command
 {
- public:
+public:
 	CommandNSSetPassword(Module *creator) : Command(creator, "nickserv/set/password", 1)
 	{
 		this->SetDesc(_("Set your nickname password"));
 		this->SetSyntax(_("\037new-password\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &param = params[0];
 		unsigned len = param.length();
@@ -157,7 +151,7 @@ class CommandNSSetPassword : public Command
 		source.Reply(_("Password for \002%s\002 changed."), source.nc->display.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -169,14 +163,14 @@ class CommandNSSetPassword : public Command
 
 class CommandNSSASetPassword : public Command
 {
- public:
+public:
 	CommandNSSASetPassword(Module *creator) : Command(creator, "nickserv/saset/password", 2, 2)
 	{
 		this->SetDesc(_("Set the nickname password"));
 		this->SetSyntax(_("\037nickname\037 \037new-password\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -227,7 +221,7 @@ class CommandNSSASetPassword : public Command
 		source.Reply(_("Password for \002%s\002 changed."), nc->display.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -238,7 +232,7 @@ class CommandNSSASetPassword : public Command
 
 class CommandNSSetAutoOp : public Command
 {
- public:
+public:
 	CommandNSSetAutoOp(Module *creator, const Anope::string &sname = "nickserv/set/autoop", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Sets whether services should set channel status modes on you automatically."));
@@ -282,12 +276,12 @@ class CommandNSSetAutoOp : public Command
 			this->OnSyntaxError(source, "AUTOOP");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		BotInfo *bi = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
@@ -302,19 +296,19 @@ class CommandNSSetAutoOp : public Command
 
 class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 {
- public:
+public:
 	CommandNSSASetAutoOp(Module *creator) : CommandNSSetAutoOp(creator, "nickserv/saset/autoop", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		BotInfo *bi = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
@@ -328,9 +322,92 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 	}
 };
 
+class CommandNSSetNeverOp : public Command
+{
+public:
+	CommandNSSetNeverOp(Module *creator, const Anope::string &sname = "nickserv/set/neverop", size_t min = 1) : Command(creator, sname, min, min + 1)
+	{
+		this->SetDesc(_("Sets whether you can be added to a channel access list."));
+		this->SetSyntax("{ON | OFF}");
+	}
+
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
+	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
+		const NickAlias *na = NickAlias::Find(user);
+		if (na == NULL)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
+		NickCore *nc = na->nc;
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
+		if (param.equals_ci("ON"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable neverop for " << na->nc->display;
+			nc->Extend<bool>("NEVEROP");
+			source.Reply(_("%s can no longer be added to channel access lists."), nc->display.c_str());
+		}
+		else if (param.equals_ci("OFF"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable neverop for " << na->nc->display;
+			nc->Shrink<bool>("NEVEROP");
+			source.Reply(_("%s can now be added to channel access lists."), nc->display.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "NEVEROP");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		this->Run(source, source.nc->display, params[0]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets whether you can be added to a channel access list."));
+		return true;
+	}
+};
+
+class CommandNSSASetNeverOp : public CommandNSSetNeverOp
+{
+public:
+	CommandNSSASetNeverOp(Module *creator) : CommandNSSetNeverOp(creator, "nickserv/saset/neverop", 2)
+	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		this->Run(source, params[0], params[1]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets whether the given nickname can be added to a channel access list."));
+		return true;
+	}
+};
+
 class CommandNSSetDisplay : public Command
 {
- public:
+public:
 	CommandNSSetDisplay(Module *creator, const Anope::string &sname = "nickserv/set/display", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Set the display of your group in Services"));
@@ -382,12 +459,12 @@ class CommandNSSetDisplay : public Command
 		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -399,19 +476,19 @@ class CommandNSSetDisplay : public Command
 
 class CommandNSSASetDisplay : public CommandNSSetDisplay
 {
- public:
+public:
 	CommandNSSASetDisplay(Module *creator) : CommandNSSetDisplay(creator, "nickserv/saset/display", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 \037new-display\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -453,7 +530,7 @@ class CommandNSSetEmail : public Command
 		return b;
 	}
 
- public:
+public:
 	CommandNSSetEmail(Module *creator, const Anope::string &cname = "nickserv/set/email", size_t min = 0) : Command(creator, cname, min, min + 1)
 	{
 		this->SetDesc(_("Associate an E-mail address with your nickname"));
@@ -528,12 +605,12 @@ class CommandNSSetEmail : public Command
 		}
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params.size() ? params[0] : "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -546,19 +623,19 @@ class CommandNSSetEmail : public Command
 
 class CommandNSSASetEmail : public CommandNSSetEmail
 {
- public:
+public:
 	CommandNSSASetEmail(Module *creator) : CommandNSSetEmail(creator, "nickserv/saset/email", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 \037address\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -569,7 +646,7 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 
 class CommandNSSetKeepModes : public Command
 {
- public:
+public:
 	CommandNSSetKeepModes(Module *creator, const Anope::string &sname = "nickserv/set/keepmodes", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Enable or disable keep modes"));
@@ -613,12 +690,12 @@ class CommandNSSetKeepModes : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -631,19 +708,19 @@ class CommandNSSetKeepModes : public Command
 
 class CommandNSSASetKeepModes : public CommandNSSetKeepModes
 {
- public:
+public:
 	CommandNSSASetKeepModes(Module *creator) : CommandNSSetKeepModes(creator, "nickserv/saset/keepmodes", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -656,7 +733,7 @@ class CommandNSSASetKeepModes : public CommandNSSetKeepModes
 
 class CommandNSSetKill : public Command
 {
- public:
+public:
 	CommandNSSetKill(Module *creator, const Anope::string &sname = "nickserv/set/kill", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn protection on or off"));
@@ -733,12 +810,12 @@ class CommandNSSetKill : public Command
 		return;
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -760,19 +837,19 @@ class CommandNSSetKill : public Command
 
 class CommandNSSASetKill : public CommandNSSetKill
 {
- public:
+public:
 	CommandNSSASetKill(Module *creator) : CommandNSSetKill(creator, "nickserv/saset/kill", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | QUICK | IMMED | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -794,10 +871,10 @@ class CommandNSSASetKill : public CommandNSSetKill
 
 class CommandNSSetLanguage : public Command
 {
- public:
+public:
 	CommandNSSetLanguage(Module *creator, const Anope::string &sname = "nickserv/set/language", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Set the language Services will use when messaging you"));
+		this->SetDesc(_("Set the language services will use when messaging you"));
 		this->SetSyntax(_("\037language\037"));
 	}
 
@@ -843,27 +920,27 @@ class CommandNSSetLanguage : public Command
 			source.Reply(_("Language for \002%s\002 changed to \002%s\002."), nc->display.c_str(), Language::Translate(param.c_str(), _("English")));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &param) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &param) override
 	{
 		this->Run(source, source.nc->display, param[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the language Services uses when sending messages to\n"
+		source.Reply(_("Changes the language services uses when sending messages to\n"
 				"you (for example, when responding to a command you send).\n"
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
 
 		source.Reply("         en_US (English)");
-		for (unsigned j = 0; j < Language::Languages.size(); ++j)
+		for (const auto &language : Language::Languages)
 		{
-			const Anope::string &langname = Language::Translate(Language::Languages[j].c_str(), _("English"));
+			const Anope::string &langname = Language::Translate(language.c_str(), _("English"));
 			if (langname == "English")
 				continue;
-			source.Reply("         %s (%s)", Language::Languages[j].c_str(), langname.c_str());
+			source.Reply("         %s (%s)", language.c_str(), langname.c_str());
 		}
 
 		return true;
@@ -872,33 +949,33 @@ class CommandNSSetLanguage : public Command
 
 class CommandNSSASetLanguage : public CommandNSSetLanguage
 {
- public:
+public:
 	CommandNSSASetLanguage(Module *creator) : CommandNSSetLanguage(creator, "nickserv/saset/language", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 \037language\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the language Services uses when sending messages to\n"
+		source.Reply(_("Changes the language services uses when sending messages to\n"
 				"the given user (for example, when responding to a command they send).\n"
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
 		source.Reply("         en (English)");
-		for (unsigned j = 0; j < Language::Languages.size(); ++j)
+		for (const auto &language : Language::Languages)
 		{
-			const Anope::string &langname = Language::Translate(Language::Languages[j].c_str(), _("English"));
+			const Anope::string &langname = Language::Translate(language.c_str(), _("English"));
 			if (langname == "English")
 				continue;
-			source.Reply("         %s (%s)", Language::Languages[j].c_str(), langname.c_str());
+			source.Reply("         %s (%s)", language.c_str(), langname.c_str());
 		}
 		return true;
 	}
@@ -906,10 +983,10 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 
 class CommandNSSetMessage : public Command
 {
- public:
+public:
 	CommandNSSetMessage(Module *creator, const Anope::string &sname = "nickserv/set/message", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Change the communication method of Services"));
+		this->SetDesc(_("Change the communication method of services"));
 		this->SetSyntax("{ON | OFF}");
 	}
 
@@ -956,12 +1033,12 @@ class CommandNSSetMessage : public Command
 			this->OnSyntaxError(source, "MSG");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		Anope::string cmd = source.command;
 		size_t i = cmd.find_last_of(' ');
@@ -970,13 +1047,13 @@ class CommandNSSetMessage : public Command
 
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way Services are communicating with\n"
-				"you. With \002%s\002 set, Services will use messages, else they'll\n"
+		source.Reply(_("Allows you to choose the way services are communicating with\n"
+				"you. With \002%s\002 set, services will use messages, else they'll\n"
 				"use notices."), cmd.upper().c_str());
 		return true;
 	}
 
-	void OnServHelp(CommandSource &source) anope_override
+	void OnServHelp(CommandSource &source) override
 	{
 		if (Config->GetBlock("options")->Get<bool>("useprivmsg"))
 			Command::OnServHelp(source);
@@ -985,24 +1062,24 @@ class CommandNSSetMessage : public Command
 
 class CommandNSSASetMessage : public CommandNSSetMessage
 {
- public:
+public:
 	CommandNSSASetMessage(Module *creator) : CommandNSSetMessage(creator, "nickserv/saset/message", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way Services are communicating with\n"
-				"the given user. With \002MSG\002 set, Services will use messages,\n"
+		source.Reply(_("Allows you to choose the way services are communicating with\n"
+				"the given user. With \002MSG\002 set, services will use messages,\n"
 				"else they'll use notices."));
 		return true;
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
@@ -1010,7 +1087,7 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 
 class CommandNSSetSecure : public Command
 {
- public:
+public:
 	CommandNSSetSecure(Module *creator, const Anope::string &sname = "nickserv/set/secure", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn nickname security on or off"));
@@ -1054,12 +1131,12 @@ class CommandNSSetSecure : public Command
 			this->OnSyntaxError(source, "SECURE");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -1076,19 +1153,19 @@ class CommandNSSetSecure : public Command
 
 class CommandNSSASetSecure : public CommandNSSetSecure
 {
- public:
+public:
 	CommandNSSASetSecure(Module *creator) : CommandNSSetSecure(creator, "nickserv/saset/secure", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -1105,14 +1182,14 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 
 class CommandNSSASetNoexpire : public Command
 {
- public:
+public:
 	CommandNSSASetNoexpire(Module *creator) : Command(creator, "nickserv/saset/noexpire", 1, 2)
 	{
 		this->SetDesc(_("Prevent the nickname from expiring"));
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -1145,7 +1222,7 @@ class CommandNSSASetNoexpire : public Command
 			this->OnSyntaxError(source, "NOEXPIRE");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -1162,6 +1239,9 @@ class NSSet : public Module
 
 	CommandNSSetAutoOp commandnssetautoop;
 	CommandNSSASetAutoOp commandnssasetautoop;
+
+	CommandNSSetNeverOp commandnssetneverop;
+	CommandNSSASetNeverOp commandnssasetneverop;
 
 	CommandNSSetDisplay commandnssetdisplay;
 	CommandNSSASetDisplay commandnssasetdisplay;
@@ -1189,14 +1269,14 @@ class NSSet : public Module
 
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
-	SerializableExtensibleItem<bool> autoop, killprotect, kill_quick, kill_immed,
+	SerializableExtensibleItem<bool> autoop, neverop, killprotect, kill_quick, kill_immed,
 		message, secure, noexpire;
 
 	struct KeepModes : SerializableExtensibleItem<bool>
 	{
 		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
 
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
 			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
 
@@ -1205,18 +1285,18 @@ class NSSet : public Module
 
 			const NickCore *nc = anope_dynamic_static_cast<const NickCore *>(s);
 			Anope::string modes;
-			for (User::ModeList::const_iterator it = nc->last_modes.begin(); it != nc->last_modes.end(); ++it)
+			for (const auto &[last_mode, last_value] : nc->last_modes)
 			{
 				if (!modes.empty())
 					modes += " ";
-				modes += it->first;
-				if (!it->second.empty())
-					modes += "," + it->second;
+				modes += last_mode;
+				if (!last_value.empty())
+					modes += "," + last_value;
 			}
 			data["last_modes"] << modes;
 		}
 
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
@@ -1231,9 +1311,9 @@ class NSSet : public Module
 			{
 				size_t c = modes.find(',');
 				if (c == Anope::string::npos)
-					nc->last_modes.insert(std::make_pair(modes, ""));
+					nc->last_modes.emplace(modes, "");
 				else
-					nc->last_modes.insert(std::make_pair(modes.substr(0, c), modes.substr(c + 1)));
+					nc->last_modes.emplace(modes.substr(0, c), modes.substr(c + 1));
 			}
 		}
 	} keep_modes;
@@ -1241,10 +1321,11 @@ class NSSet : public Module
 	/* email, passcode */
 	PrimitiveExtensibleItem<std::pair<Anope::string, Anope::string > > ns_set_email;
 
- public:
+public:
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsset(this), commandnssaset(this),
 		commandnssetautoop(this), commandnssasetautoop(this),
+		commandnssetneverop(this), commandnssasetneverop(this),
 		commandnssetdisplay(this), commandnssasetdisplay(this),
 		commandnssetemail(this), commandnssasetemail(this),
 		commandnssetkeepmodes(this), commandnssasetkeepmodes(this),
@@ -1255,7 +1336,7 @@ class NSSet : public Module
 		commandnssetsecure(this), commandnssasetsecure(this),
 		commandnssasetnoexpire(this),
 
-		autoop(this, "AUTOOP"),
+		autoop(this, "AUTOOP"), neverop(this, "NEVEROP"),
 		killprotect(this, "KILLPROTECT"), kill_quick(this, "KILL_QUICK"),
 		kill_immed(this, "KILL_IMMED"), message(this, "MSG"),
 		secure(this, "NS_SECURE"), noexpire(this, "NS_NO_EXPIRE"),
@@ -1265,7 +1346,7 @@ class NSSet : public Module
 
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		NickCore *uac = source.nc;
 
@@ -1288,7 +1369,7 @@ class NSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_override
+	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		if (chan->ci)
 		{
@@ -1297,13 +1378,13 @@ class NSSet : public Module
 		}
 	}
 
-	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
+	void OnPreNickExpire(NickAlias *na, bool &expire) override
 	{
 		if (noexpire.HasExt(na))
 			expire = false;
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
 	{
 		if (!show_hidden)
 			return;
@@ -1320,35 +1401,36 @@ class NSSet : public Module
 			info.AddOption(_("Message mode"));
 		if (autoop.HasExt(na->nc))
 			info.AddOption(_("Auto-op"));
+		if (neverop.HasExt(na->nc))
+			info.AddOption(_("Never-op"));
 		if (noexpire.HasExt(na))
 			info.AddOption(_("No expire"));
 		if (keep_modes.HasExt(na->nc))
 			info.AddOption(_("Keep modes"));
 	}
 
-	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
+	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (u->Account() && setter.GetUser() == u)
 			u->Account()->last_modes = u->GetModeList();
 	}
 
-	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
+	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (u->Account() && setter.GetUser() == u)
 			u->Account()->last_modes = u->GetModeList();
 	}
 
-	void OnUserLogin(User *u) anope_override
+	void OnUserLogin(User *u) override
 	{
 		if (keep_modes.HasExt(u->Account()))
 		{
-			User::ModeList modes = u->Account()->last_modes;
-			for (User::ModeList::iterator it = modes.begin(); it != modes.end(); ++it)
+			for (const auto &[last_mode, last_value] : u->Account()->last_modes)
 			{
-				UserMode *um = ModeManager::FindUserModeByName(it->first);
+				UserMode *um = ModeManager::FindUserModeByName(last_mode);
 				/* if the null user can set the mode, then it's probably safe */
 				if (um && um->CanSet(NULL))
-					u->SetMode(NULL, it->first, it->second);
+					u->SetMode(NULL, last_mode, last_value);
 			}
 		}
 	}

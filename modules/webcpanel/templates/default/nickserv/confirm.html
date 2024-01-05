@@ -1,0 +1,29 @@
+{INCLUDE header.html}
+		<div class="panel-heading">Confirm your Email</div>
+		<div class="panel-body">
+			{FOR M IN MESSAGES}
+			<div class="alert alert-info">
+				{M}<br>
+			</div>
+			{END FOR}
+
+			<em>You can <strong>CONFIRM</strong> your registration by entering your confirmation code below.</em>
+
+			<hr>
+
+			<h4>Confirm your account</h4>
+			<form class="form-horizontal" method="post" action="/nickserv/confirm">
+				<div class="form-group">
+					<label class="control-label col-lg-2" for="confirm">Confirmation Code:</label>
+					<div class="col-lg-5">
+						<input class="form-control" type="text" name="code" id="code" placeholder="Code from Email">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-lg-offset-2 col-lg-5">
+						<button type="submit" class="btn btn-primary">Confirm Me!</button>
+					</div>
+				</div>
+			</form>
+		</div>
+{INCLUDE footer.html}

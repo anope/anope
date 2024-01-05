@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2010-2021 Anope Team
+ * (C) 2010-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -36,15 +36,15 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 {
 	std::deque<XMLRPCEvent *> events;
 
- public:
+public:
 	MyXMLRPCServiceInterface(Module *creator, const Anope::string &sname) : XMLRPCServiceInterface(creator, sname), HTTPPage("/xmlrpc", "text/xml") { }
 
-	void Register(XMLRPCEvent *event) anope_override
+	void Register(XMLRPCEvent *event) override
 	{
 		this->events.push_back(event);
 	}
 
-	void Unregister(XMLRPCEvent *event) anope_override
+	void Unregister(XMLRPCEvent *event) override
 	{
 		std::deque<XMLRPCEvent *>::iterator it = std::find(this->events.begin(), this->events.end(), event);
 
@@ -52,7 +52,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 			this->events.erase(it);
 	}
 
-	Anope::string Sanitize(const Anope::string &string) anope_override
+	Anope::string Sanitize(const Anope::string &string) override
 	{
 		Anope::string ret = string;
 		for (int i = 0; special[i].character.empty() == false; ++i)
@@ -93,7 +93,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		return ret;
 	}
 
- private:
+private:
 	static bool GetData(Anope::string &content, Anope::string &tag, Anope::string &data)
 	{
 		if (content.empty())
@@ -144,8 +144,8 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		return !istag && !data.empty();
 	}
 
- public:
-	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) anope_override
+public:
+	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
 	{
 		Anope::string content = message.content, tname, data;
 		XMLRPCRequest request(reply);
@@ -164,10 +164,8 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 				request.data.push_back(data);
 		}
 
-		for (unsigned i = 0; i < this->events.size(); ++i)
+		for (auto *e : this->events)
 		{
-			XMLRPCEvent *e = this->events[i];
-
 			if (!e->Run(this, client, request))
 				return false;
 			else if (!request.get_replies().empty())
@@ -182,14 +180,14 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		return true;
 	}
 
-	void Reply(XMLRPCRequest &request) anope_override
+	void Reply(XMLRPCRequest &request) override
 	{
 		if (!request.id.empty())
 			request.reply("id", request.id);
 
 		Anope::string r = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<methodResponse>\n<params>\n<param>\n<value>\n<struct>\n";
-		for (std::map<Anope::string, Anope::string>::const_iterator it = request.get_replies().begin(); it != request.get_replies().end(); ++it)
-			r += "<member>\n<name>" + it->first + "</name>\n<value>\n<string>" + this->Sanitize(it->second) + "</string>\n</value>\n</member>\n";
+		for (const auto &[name, value] : request.get_replies())
+			r += "<member>\n<name>" + name + "</name>\n<value>\n<string>" + this->Sanitize(value) + "</string>\n</value>\n</member>\n";
 		r += "</struct>\n</value>\n</param>\n</params>\n</methodResponse>";
 
 		request.r.Write(r);
@@ -199,7 +197,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 class ModuleXMLRPC : public Module
 {
 	ServiceReference<HTTPProvider> httpref;
- public:
+public:
 	MyXMLRPCServiceInterface xmlrpcinterface;
 
 	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
@@ -208,13 +206,13 @@ class ModuleXMLRPC : public Module
 
 	}
 
-	~ModuleXMLRPC()
+	~ModuleXMLRPC() override
 	{
 		if (httpref)
 			httpref->UnregisterPage(&xmlrpcinterface);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		if (httpref)
 			httpref->UnregisterPage(&xmlrpcinterface);

@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2021 Anope Team <team@anope.org>
+ * (C) 2008-2024 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -131,8 +131,8 @@ void BotInfo::OnKill()
 	IRCD->SendClientIntroduction(this);
 	this->introduced = true;
 
-	for (User::ChanUserList::const_iterator cit = this->chans.begin(), cit_end = this->chans.end(); cit != cit_end; ++cit)
-		IRCD->SendJoin(this, cit->second->chan, &cit->second->status);
+	for (const auto &[_, chan] : this->chans)
+		IRCD->SendJoin(this, chan->chan, &chan->status);
 }
 
 void BotInfo::SetNewNick(const Anope::string &newnick)

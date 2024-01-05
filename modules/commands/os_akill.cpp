@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,14 +16,14 @@ static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sglin
 class AkillDelCallback : public NumberList
 {
 	CommandSource &source;
-	unsigned deleted;
+	unsigned deleted = 0;
 	Command *cmd;
- public:
-	AkillDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), deleted(0), cmd(c)
+public:
+	AkillDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), cmd(c)
 	{
 	}
 
-	~AkillDelCallback()
+	~AkillDelCallback() override
 	{
 		if (!deleted)
 			source.Reply(_("No matching entries on the AKILL list."));
@@ -33,7 +33,7 @@ class AkillDelCallback : public NumberList
 			source.Reply(_("Deleted %d entries from the AKILL list."), deleted);
 	}
 
-	void HandleNumber(unsigned number) anope_override
+	void HandleNumber(unsigned number) override
 	{
 		if (!number)
 			return;
@@ -57,7 +57,7 @@ class AkillDelCallback : public NumberList
 
 class CommandOSAKill : public Command
 {
- private:
+private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string expiry, mask;
@@ -172,8 +172,8 @@ class CommandOSAKill : public Command
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			if (akills->Check(it->second, x))
+		for (const auto &[_, user] : UserListByNick)
+			if (akills->Check(user, x))
 				++affected;
 		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
 
@@ -266,12 +266,12 @@ class CommandOSAKill : public Command
 			{
 				CommandSource &source;
 				ListFormatter &list;
-			 public:
+			public:
 				ListCallback(CommandSource &_source, ListFormatter &_list, const Anope::string &numstr) : NumberList(numstr, false), source(_source), list(_list)
 				{
 				}
 
-				void HandleNumber(unsigned number) anope_override
+				void HandleNumber(unsigned number) override
 				{
 					if (!number)
 						return;
@@ -325,8 +325,8 @@ class CommandOSAKill : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			for (const auto &reply : replies)
+				source.Reply(reply);
 
 			source.Reply(_("End of AKILL list."));
 		}
@@ -379,7 +379,7 @@ class CommandOSAKill : public Command
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 	}
- public:
+public:
 	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 2)
 	{
 		this->SetDesc(_("Manipulate the AKILL list"));
@@ -390,7 +390,7 @@ class CommandOSAKill : public Command
 		this->SetSyntax("CLEAR");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -413,7 +413,7 @@ class CommandOSAKill : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -472,7 +472,7 @@ class OSAKill : public Module
 {
 	CommandOSAKill commandosakill;
 
- public:
+public:
 	OSAKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosakill(this)
 	{

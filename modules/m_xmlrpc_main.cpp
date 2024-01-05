@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2010-2021 Anope Team
+ * (C) 2010-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -19,10 +19,10 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 	Reference<HTTPClient> client;
 	Reference<XMLRPCServiceInterface> xinterface;
 
- public:
+public:
 	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest& req, HTTPClient *c, XMLRPCServiceInterface* iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		if (!xinterface || !client)
 			return;
@@ -36,7 +36,7 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 		client->SendReply(&request.r);
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		if (!xinterface || !client)
 			return;
@@ -52,8 +52,8 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 
 class MyXMLRPCEvent : public XMLRPCEvent
 {
- public:
-	bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) anope_override
+public:
+	bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) override
 	{
 		if (request.name == "command")
 			this->DoCommand(iface, client, request);
@@ -73,7 +73,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		return true;
 	}
 
- private:
+private:
 	void DoCommand(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
 		Anope::string service = request.data.size() > 0 ? request.data[0] : "";
@@ -101,7 +101,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 					XMLRPCommandReply(Anope::string &s) : str(s) { }
 
-					void SendMessage(BotInfo *, const Anope::string &msg) anope_override
+					void SendMessage(BotInfo *, const Anope::string &msg) override
 					{
 						str += msg + "\n";
 					};
@@ -142,8 +142,8 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		request.reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
 			Anope::string buf;
-			for (std::set<Anope::string>::iterator it = Servers::Capab.begin(); it != Servers::Capab.end(); ++it)
-				buf += " " + *it;
+			for (const auto &capab : Servers::Capab)
+				buf += " " + capab;
 			if (!buf.empty())
 				buf.erase(buf.begin());
 			request.reply("uplinkcapab", buf);
@@ -166,21 +166,18 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		{
 			request.reply("bancount", stringify(c->HasMode("BAN")));
 			int count = 0;
-			std::vector<Anope::string> v = c->GetModeList("BAN");
-			for (unsigned int i = 0; i < v.size(); ++i)
-				request.reply("ban" + stringify(++count), iface->Sanitize(v[i]));
+			for (auto &ban : c->GetModeList("BAN"))
+				request.reply("ban" + stringify(++count), iface->Sanitize(ban));
 
 			request.reply("exceptcount", stringify(c->HasMode("EXCEPT")));
 			count = 0;
-			v = c->GetModeList("EXCEPT");
-			for (unsigned int i = 0; i < v.size(); ++i)
-				request.reply("except" + stringify(++count), iface->Sanitize(v[i]));
+			for (auto &except : c->GetModeList("EXCEPT"))
+				request.reply("except" + stringify(++count), iface->Sanitize(except));
 
 			request.reply("invitecount", stringify(c->HasMode("INVITEOVERRIDE")));
 			count = 0;
-			v = c->GetModeList("INVITEOVERRIDE");
-			for (unsigned int i = 0; i < v.size(); ++i)
-				request.reply("invite" + stringify(++count), iface->Sanitize(v[i]));
+			for (auto &invite : c->GetModeList("INVITEOVERRIDE"))
+				request.reply("invite" + stringify(++count), iface->Sanitize(invite));
 
 			Anope::string users;
 			for (Channel::ChanUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
@@ -249,14 +246,13 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 	void DoOperType(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
-		for (unsigned i = 0; i < Config->MyOperTypes.size(); ++i)
+		for (auto *ot : Config->MyOperTypes)
 		{
-			OperType *ot = Config->MyOperTypes[i];
 			Anope::string perms;
-			for (std::list<Anope::string>::const_iterator it2 = ot->GetPrivs().begin(), it2_end = ot->GetPrivs().end(); it2 != it2_end; ++it2)
-				perms += " " + *it2;
-			for (std::list<Anope::string>::const_iterator it2 = ot->GetCommands().begin(), it2_end = ot->GetCommands().end(); it2 != it2_end; ++it2)
-				perms += " " + *it2;
+			for (const auto &priv : ot->GetPrivs())
+				perms += " " + priv;
+			for (const auto &command : ot->GetCommands())
+				perms += " " + command;
 			request.reply(ot->GetName(), perms);
 		}
 	}
@@ -285,7 +281,7 @@ class ModuleXMLRPCMain : public Module
 
 	MyXMLRPCEvent stats;
 
- public:
+public:
 	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), xmlrpc("XMLRPCServiceInterface", "xmlrpc")
 	{
 		me = this;
@@ -296,7 +292,7 @@ class ModuleXMLRPCMain : public Module
 		xmlrpc->Register(&stats);
 	}
 
-	~ModuleXMLRPCMain()
+	~ModuleXMLRPCMain() override
 	{
 		if (xmlrpc)
 			xmlrpc->Unregister(&stats);

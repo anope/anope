@@ -1,10 +1,12 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
+
+#pragma once
 
 namespace Redis
 {
@@ -30,8 +32,8 @@ namespace Redis
 			i = 0;
 			bulk.clear();
 			multi_bulk_size = 0;
-			for (unsigned j = 0; j < multi_bulk.size(); ++j)
-				delete multi_bulk[j];
+			for (const auto *reply : multi_bulk)
+				delete reply;
 			multi_bulk.clear();
 		}
 
@@ -43,11 +45,11 @@ namespace Redis
 
 	class Interface
 	{
-	 public:
+	public:
 		Module *owner;
 
 		Interface(Module *m) : owner(m) { }
-		virtual ~Interface() { }
+		virtual ~Interface() = default;
 
 		virtual void OnResult(const Reply &r) = 0;
 		virtual void OnError(const Anope::string &error) { Log(owner) << error; }
@@ -55,7 +57,7 @@ namespace Redis
 
 	class Provider : public Service
 	{
-	 public:
+	public:
 		Provider(Module *c, const Anope::string &n) : Service(c, "Redis::Provider", n) { }
 
 		virtual bool IsSocketDead() = 0;

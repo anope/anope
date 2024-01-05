@@ -1,6 +1,6 @@
 /* Main processing code for Services.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -133,7 +133,6 @@ Anope::string IRCDProto::Format(const Anope::string &source, const Anope::string
 
 MessageTokenizer::MessageTokenizer(const Anope::string &msg)
 	: message(msg)
-	, position(0)
 {
 }
 

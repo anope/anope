@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -8,6 +8,8 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  */
+
+#pragma once
 
 /* Indices for TTB (Times To Ban) */
 enum
@@ -35,10 +37,10 @@ struct KickerData
 
 	bool dontkickops, dontkickvoices;
 
- protected:
-	KickerData() { }
+protected:
+	KickerData() = default;
 
- public:
-	virtual ~KickerData() { }
+public:
+	virtual ~KickerData() = default;
 	virtual void Check(ChannelInfo *ci) = 0;
 };

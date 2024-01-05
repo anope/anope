@@ -5,7 +5,7 @@
  * IMPORTANT: DATA HASHES CANNOT BE "DECRYPTED" BACK TO PLAIN TEXT.
  *
  * Modified for Anope.
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Taken from InspIRCd (https://www.inspircd.org/),
@@ -55,7 +55,6 @@ static const unsigned SHA256_BLOCK_SIZE = 512 / 8;
 
 inline static uint32_t SHFR(uint32_t x, uint32_t n) { return x >> n; }
 inline static uint32_t ROTR(uint32_t x, uint32_t n) { return (x >> n) | (x << ((sizeof(x) << 3) - n)); }
-inline static uint32_t ROTL(uint32_t x, uint32_t n) { return (x << n) | (x >> ((sizeof(x) << 3) - n)); }
 inline static uint32_t CH(uint32_t x, uint32_t y, uint32_t z) { return (x & y) ^ (~x & z); }
 inline static uint32_t MAJ(uint32_t x, uint32_t y, uint32_t z) { return (x & y) ^ (x & z) ^ (y & z); }
 
@@ -153,7 +152,7 @@ class SHA256Context : public Encryption::Context
 	uint32_t h[8];
 	unsigned char digest[SHA256_DIGEST_SIZE];
 
- public:
+public:
 	SHA256Context(Encryption::IV *iv)
 	{
 		if (iv != NULL)
@@ -173,7 +172,7 @@ class SHA256Context : public Encryption::Context
 		memset(this->digest, 0, sizeof(this->digest));
 	}
 
-	void Update(const unsigned char *message, size_t mlen) anope_override
+	void Update(const unsigned char *message, size_t mlen) override
 	{
 		unsigned tmp_len = SHA256_BLOCK_SIZE - this->len, rem_len = mlen < tmp_len ? mlen : tmp_len;
 
@@ -195,7 +194,7 @@ class SHA256Context : public Encryption::Context
 		this->tot_len += (block_nb + 1) << 6;
 	}
 
-	void Finalize() anope_override
+	void Finalize() override
 	{
 		unsigned block_nb = 1 + ((SHA256_BLOCK_SIZE - 9) < (this->len % SHA256_BLOCK_SIZE));
 		unsigned len_b = (this->tot_len + this->len) << 3;
@@ -208,7 +207,7 @@ class SHA256Context : public Encryption::Context
 			UNPACK32(this->h[i], &this->digest[i << 2]);
 	}
 
-	Encryption::Hash GetFinalizedHash() anope_override
+	Encryption::Hash GetFinalizedHash() override
 	{
 		Encryption::Hash hash;
 		hash.first = this->digest;
@@ -219,15 +218,15 @@ class SHA256Context : public Encryption::Context
 
 class SHA256Provider : public Encryption::Provider
 {
- public:
+public:
 	SHA256Provider(Module *creator) : Encryption::Provider(creator, "sha256") { }
 
-	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
+	Encryption::Context *CreateContext(Encryption::IV *iv) override
 	{
 		return new SHA256Context(iv);
 	}
 
-	Encryption::IV GetDefaultIV() anope_override
+	Encryption::IV GetDefaultIV() override
 	{
 		Encryption::IV iv;
 		iv.first = sha256_h0;
@@ -246,8 +245,8 @@ class ESHA256 : public Module
 	/* initializes the IV with a new random value */
 	void NewRandomIV()
 	{
-		for (int i = 0; i < 8; ++i)
-			iv[i] = static_cast<uint32_t>(rand());
+		for (auto &ivsegment : iv)
+			ivsegment = static_cast<uint32_t>(rand());
 	}
 
 	/* returns the IV as base64-encrypted string */
@@ -272,7 +271,7 @@ class ESHA256 : public Module
 			PACK32(reinterpret_cast<unsigned char *>(&buf2[i << 2]), iv[i]);
 	}
 
- public:
+public:
 	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		sha256provider(this)
 	{
@@ -281,15 +280,15 @@ class ESHA256 : public Module
 		use_iv = false;
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		if (!use_iv)
 			NewRandomIV();
 		else
 			use_iv = false;
 
-		Encryption::IV initilization(this->iv, 8);
-		SHA256Context ctx(&initilization);
+		Encryption::IV initialization(this->iv, 8);
+		SHA256Context ctx(&initialization);
 		ctx.Update(reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
 		ctx.Finalize();
 
@@ -302,7 +301,7 @@ class ESHA256 : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)

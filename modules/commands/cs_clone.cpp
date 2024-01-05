@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -44,6 +44,7 @@ class CommandCSClone : public Command
 			ChanAccess *newaccess = provider->Create();
 			newaccess->SetMask(taccess->Mask(), target_ci);
 			newaccess->creator = taccess->creator;
+			newaccess->description = taccess->description;
 			newaccess->last_seen = taccess->last_seen;
 			newaccess->created = taccess->created;
 			newaccess->AccessUnserialize(taccess->AccessSerialize());
@@ -98,11 +99,9 @@ class CommandCSClone : public Command
 
 	void CopyLevels(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
 	{
-		const Anope::map<int16_t> &cilevels = ci->GetLevelEntries();
-
-		for (Anope::map<int16_t>::const_iterator it = cilevels.begin(); it != cilevels.end(); ++it)
+		for (const auto &[priv, level] : ci->GetLevelEntries())
 		{
-			target_ci->SetLevel(it->first, it->second);
+			target_ci->SetLevel(priv, level);
 		}
 
 		source.Reply(_("All level entries from \002%s\002 have been cloned into \002%s\002."), ci->name.c_str(), target_ci->name.c_str());
@@ -115,7 +114,7 @@ public:
 		this->SetSyntax(_("\037channel\037 \037target\037 [\037what\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &channel = params[0];
 		const Anope::string &target = params[1];
@@ -198,8 +197,8 @@ public:
 			const Anope::string settings[] = { "NOAUTOOP", "CS_KEEP_MODES", "PEACE", "PERSIST", "RESTRICTED",
 				"CS_SECURE", "SECUREFOUNDER", "SECUREOPS", "SIGNKICK", "SIGNKICK_LEVEL", "CS_NO_EXPIRE" };
 
-			for (unsigned int i = 0; i < sizeof(settings) / sizeof(Anope::string); ++i)
-				CopySetting(ci, target_ci, settings[i]);
+			for (const auto &setting : settings)
+				CopySetting(ci, target_ci, setting);
 
 			CopyAccess(source, ci, target_ci);
 			CopyAkick(source, ci, target_ci);
@@ -235,7 +234,7 @@ public:
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clone " << (what.empty() ? "everything from it" : what) << " to " << target_ci->name;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -251,7 +250,7 @@ class CSClone : public Module
 {
 	CommandCSClone commandcsclone;
 
- public:
+public:
 	CSClone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsclone(this)
 	{
 

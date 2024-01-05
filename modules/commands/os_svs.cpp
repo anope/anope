@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,14 +13,14 @@
 
 class CommandOSSVSNick : public Command
 {
- public:
+public:
 	CommandOSSVSNick(Module *creator) : Command(creator, "operserv/svsnick", 2, 2)
 	{
 		this->SetDesc(_("Forcefully change a user's nickname"));
 		this->SetSyntax(_("\037nick\037 \037newnick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = params[0];
 		Anope::string newnick = params[1];
@@ -61,7 +61,7 @@ class CommandOSSVSNick : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -72,14 +72,14 @@ class CommandOSSVSNick : public Command
 
 class CommandOSSVSJoin : public Command
 {
- public:
+public:
 	CommandOSSVSJoin(Module *creator) : Command(creator, "operserv/svsjoin", 2, 2)
 	{
 		this->SetDesc(_("Forcefully join a user to a channel"));
 		this->SetSyntax(_("\037nick\037 \037channel\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!IRCD->CanSVSJoin)
 		{
@@ -105,7 +105,7 @@ class CommandOSSVSJoin : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -116,14 +116,14 @@ class CommandOSSVSJoin : public Command
 
 class CommandOSSVSPart : public Command
 {
- public:
+public:
 	CommandOSSVSPart(Module *creator) : Command(creator, "operserv/svspart", 2, 3)
 	{
 		this->SetDesc(_("Forcefully part a user from a channel"));
 		this->SetSyntax(_("\037nick\037 \037channel\037 [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!IRCD->CanSVSJoin)
 		{
@@ -153,7 +153,7 @@ class CommandOSSVSPart : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -168,7 +168,7 @@ class OSSVS : public Module
 	CommandOSSVSJoin commandossvsjoin;
 	CommandOSSVSPart commandossvspart;
 
- public:
+public:
 	OSSVS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandossvsnick(this), commandossvsjoin(this), commandossvspart(this)
 	{

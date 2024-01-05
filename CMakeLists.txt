@@ -1,14 +1,5 @@
 # This usage of CMake requires at least version 3.8
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-  if(POLICY CMP0026)
-    cmake_policy(SET CMP0026 OLD)
-  endif()
-  if(POLICY CMP0007)
-    cmake_policy(SET CMP0007 OLD)
-  endif()
-endif()
 
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)
@@ -26,14 +17,10 @@ set(ENV{LC_ALL} C)
 set(DEFAULT_LIBRARY_DIRS)
 set(DEFAULT_INCLUDE_DIRS)
 
-# Check that we aren't running on an ancient broken GCC
-if(CMAKE_COMPILER_IS_GNUCXX)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.2)
-    message(FATAL_ERROR "Your compiler is too old to build Anope. Upgrade to GCC 4.2 or newer!")
-  elseif(CMAKE_CXX_COMPILER_ID VERSION_GREATER_EQUAL 6.0)
-    set(CXXFLAGS "${CXXFLAGS} -fno-delete-null-pointer-checks")
-  endif()
-endif()
+# We require C++17 to build
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # If we are using a GNU compiler (have to use CXX because it seems to fail on C), we will be able to determine it's default paths for libraries and includes
 if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang$")
@@ -104,37 +91,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang$")
   endif()
 endif()
 
-# If we are using Visual Studio, locate the path of the Windows Server 2008 SDK or Windows Server 2003 Platform SDK, depending on which is installed
-if(MSVC)
-  # If the path comes up as "/registry" from any of these, the path wasn't found, otherwise, we'll set WSDK_PATH to the corresponding path
-  # Look for the 2008 SDK under HKLM first
-  get_filename_component(WSDK2008_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" ABSOLUTE CACHE)
-  if(WSDK2008_PATH STREQUAL "/registry")
-    # If not found, look for the 2003 SDK under HKLM
-    get_filename_component(WSDK2003_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\MicrosoftSDK\\InstalledSDKs\\D2FF9F89-8AA2-4373-8A31-C838BF4DBBE1;Install Dir]" ABSOLUTE CACHE)
-    if(WSDK2003_PATH STREQUAL "/registry")
-      # If not found, look for the 2008 SDK under HKCU
-      get_filename_component(WSDK2008_PATH "[HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" ABSOLUTE CACHE)
-      if(WSDK2008_PATH STREQUAL "/registry")
-        # If not found, look for the 2003 SDK under HKCU
-        get_filename_component(WSDK2003_PATH "[HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\MicrosoftSDK\\InstalledSDKs\\D2FF9F89-8AA2-4373-8A31-C838BF4DBBE1;Install Dir]" ABSOLUTE CACHE)
-        if(WSDK2003_PATH STREQUAL "/registry")
-          # The SDK was never found, set the path to nothing
-          set(WSDK_PATH "")
-        else()
-          set(WSDK_PATH "${WSDK2003_PATH}")
-        endif()
-      else()
-        set(WSDK_PATH "${WSDK2008_PATH}")
-      endif()
-    else()
-      set(WSDK_PATH "${WSDK2003_PATH}")
-    endif()
-  else()
-    set(WSDK_PATH "${WSDK2008_PATH}")
-  endif()
-endif()
-
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
 # to Debug
@@ -156,7 +112,6 @@ endif()
 
 # Include the checking functions used later in this CMakeLists.txt
 include(CheckFunctionExists)
-include(CheckIncludeFile)
 include(CheckTypeSize)
 include(CheckLibraryExists)
 include(CheckCXXCompilerFlag)
@@ -171,25 +126,37 @@ if(EXTRA_LIBS)
   link_directories(${EXTRA_LIBS})
 endif()
 
+# setup conan
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conanbuildinfo.cmake")
+  include("${CMAKE_CURRENT_SOURCE_DIR}/conanbuildinfo.cmake")
+  conan_basic_setup()
+endif()
+
 # Find gettext
 find_package(Gettext)
-
-option(USE_PCH "Use precompiled headers" OFF)
+find_package(Intl)
+if(GETTEXT_FOUND AND Intl_FOUND)
+  set(HAVE_LOCALIZATION ON)
+  include_directories(${Intl_INCLUDE_DIRS})
+else()
+  message("Unable to find gettext and libintl; disabling localization")
+  set(HAVE_LOCALIZATION OFF)
+endif()
 
 # Use the following directories as includes
-# Note that it is important the binary include directory comes before the
-# source include directory so the precompiled headers work correctly.
-include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/language ${Anope_SOURCE_DIR}/modules/pseudoclients)
+include_directories(
+  ${Anope_BINARY_DIR}/include
+  ${Anope_SOURCE_DIR}/include
+  ${Anope_SOURCE_DIR}/vendor
+)
 
 # Pass on REPRODUCIBLE_BUILD
 if(REPRODUCIBLE_BUILD)
   add_definitions(-DREPRODUCIBLE_BUILD)
 endif()
 
-# If using Windows, always add the _WIN32 define
 if(WIN32)
-  add_definitions(-D_WIN32)
-  # And include the windows specific folder for our anope_windows.h
+  # If using Windows, include the windows specific folder for anope_windows.h
   include_directories(${Anope_SOURCE_DIR}/src/win32)
 endif()
 
@@ -201,24 +168,11 @@ if(MSVC)
   string(REPLACE "/W3 " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   # Set the compile flags to have warnings on the max setting (but disable a few annoying ones), exception handling turned on, the proper defines
   set(CXXFLAGS "${CXXFLAGS} /W4 /wd4100 /wd4127 /wd4250 /wd4251 /wd4355 /wd4706 /wd4800 /wd4996 /EHs")
-  add_definitions(-DMSVCPP -D_CRT_SECURE_NO_WARNINGS)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 # Otherwise, we're not using Visual Studio
 else()
   # Set the compile flags to have all warnings on (including shadowed variables)
-  set(CXXFLAGS "${CXXFLAGS} -Wall -Wshadow")
-  # If on a *nix system, also set the compile flags to remove GNU extensions (favor ISO C++) as well as reject non-ISO C++ code, also remove all leading underscores in exported symbols (only on GNU compiler)
-  if(UNIX)
-    set(CXXFLAGS "${CXXFLAGS} -ansi -pedantic ${CMAKE_CXX_FLAGS}")
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      set(CXXFLAGS "${CXXFLAGS} -Wno-long-long -fno-leading-underscore")
-    endif()
-  # If we aren't on a *nix system, we are using MinGW
-  else()
-    # Also, if we are building under MinGW, add another define for MinGW
-    if(MINGW)
-      add_definitions(-DMINGW)
-    endif()
-  endif()
+  set(CXXFLAGS "${CXXFLAGS} -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wpedantic -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
 endif()
 
 # If CMake has found that the given system requires a special library for dl* calls, include it with the linker flags
@@ -279,16 +233,11 @@ endif()
 
 # Set the DEBUG_BUILD for sysconf.h
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
   set(DEBUG_BUILD TRUE)
 endif()
 
-# Check for the existence of the following include files
-check_include_file(cstdint HAVE_CSTDINT)
-check_include_file(strings.h HAVE_STRINGS_H)
-
 # Check for the existence of the following functions
-check_function_exists(strcasecmp HAVE_STRCASECMP)
-check_function_exists(stricmp HAVE_STRICMP)
 check_function_exists(umask HAVE_UMASK)
 check_function_exists(epoll_wait HAVE_EPOLL)
 check_function_exists(poll HAVE_POLL)
@@ -304,10 +253,10 @@ if(LDFLAGS)
 endif()
 
 # Search for the following programs
-find_program(GREP grep)
-find_program(SH sh)
-find_program(CHGRP chgrp)
-find_program(CHMOD chmod)
+if(NOT WIN32 AND RUNGROUP)
+  find_program(CHGRP "chgrp" REQUIRED)
+  find_program(CHMOD "chmod" REQUIRED)
+endif()
 
 # If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the anope directory under the user's home directory
 if(INSTDIR)
@@ -345,7 +294,6 @@ file(STRINGS ${Anope_SOURCE_DIR}/src/version.sh VERSIONS REGEX "^VERSION_")
 # Iterate through the strings found
 foreach(VERSION_STR ${VERSIONS})
   string(REGEX REPLACE "^VERSION_([A-Z]+)=\"?([^\"]*)\"?$" "\\1;\\2" VERSION_OUT ${VERSION_STR})
-  # Depends on CMP0007 OLD
   list(LENGTH VERSION_OUT VERSION_LEN)
   list(GET VERSION_OUT 0 VERSION_TYPE)
   if(${VERSION_LEN} GREATER 1)
@@ -411,7 +359,7 @@ add_subdirectory(modules)
 add_subdirectory(include)
 
 # Get the filename of the Anope binary, to use later
-get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
+set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 
 # At install time, create the following additional directories
@@ -431,10 +379,6 @@ if(WIN32)
   install(FILES ${Anope_SOURCE_DIR}/src/win32/anope.bat
     DESTINATION ${BIN_DIR}
   )
-
-  # Package any DLLs in src/win/
-  file(GLOB EXTRA_DLLS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${Anope_SOURCE_DIR}/src/win32/*.dll")
-  install(FILES ${EXTRA_DLLS} DESTINATION ${BIN_DIR})
 endif()
 
 install(CODE "file(REMOVE_RECURSE \"$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${LIB_DIR}/modules\")")

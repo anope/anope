@@ -1,10 +1,12 @@
 /*
  *
- * (C) 2010-2021 Anope Team
+ * (C) 2010-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
+
+#pragma once
 
 #include "httpd.h"
 
@@ -12,14 +14,14 @@ class XMLRPCRequest
 {
 	std::map<Anope::string, Anope::string> replies;
 
- public:
+public:
 	Anope::string name;
 	Anope::string id;
 	std::deque<Anope::string> data;
 	HTTPReply& r;
 
 	XMLRPCRequest(HTTPReply &_r) : r(_r) { }
-	inline void reply(const Anope::string &dname, const Anope::string &ddata) { this->replies.insert(std::make_pair(dname, ddata)); }
+	inline void reply(const Anope::string &dname, const Anope::string &ddata) { this->replies.emplace(dname, ddata); }
 	inline const std::map<Anope::string, Anope::string> &get_replies() { return this->replies; }
 };
 
@@ -27,14 +29,14 @@ class XMLRPCServiceInterface;
 
 class XMLRPCEvent
 {
- public:
-	virtual ~XMLRPCEvent() { }
+public:
+	virtual ~XMLRPCEvent() = default;
 	virtual bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) = 0;
 };
 
 class XMLRPCServiceInterface : public Service
 {
- public:
+public:
 	XMLRPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, "XMLRPCServiceInterface", sname) { }
 
 	virtual void Register(XMLRPCEvent *event) = 0;

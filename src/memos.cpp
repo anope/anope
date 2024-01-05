@@ -1,6 +1,6 @@
 /* MemoServ functions.
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -76,7 +76,7 @@ Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 	return m;
 }
 
-MemoInfo::MemoInfo() : memomax(0), memos("Memo")
+MemoInfo::MemoInfo() : memos("Memo")
 {
 }
 
@@ -113,9 +113,11 @@ void MemoInfo::Del(unsigned index)
 
 bool MemoInfo::HasIgnore(User *u)
 {
-	for (unsigned i = 0; i < this->ignores.size(); ++i)
-		if (u->nick.equals_ci(this->ignores[i]) || (u->Account() && u->Account()->display.equals_ci(this->ignores[i])) || Anope::Match(u->GetMask(), Anope::string(this->ignores[i])))
+	for (const auto &ignore : this->ignores)
+	{
+		if (u->nick.equals_ci(ignore) || (u->Account() && u->Account()->display.equals_ci(ignore)) || Anope::Match(u->GetMask(), Anope::string(ignore)))
 			return true;
+	}
 	return false;
 }
 

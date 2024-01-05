@@ -1,13 +1,12 @@
 /*
  *
- * (C) 2008-2021 Anope Team
+ * (C) 2008-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
-#ifndef REGCHANNEL_H
-#define REGCHANNEL_H
+#pragma once
 
 #include "memo.h"
 #include "modes.h"
@@ -24,7 +23,7 @@ extern CoreExport Serialize::Checker<registered_channel_map> RegisteredChannelLi
 /* AutoKick data. */
 class CoreExport AutoKick : public Serializable
 {
- public:
+public:
 	/* Channel this autokick is on */
 	Serialize::Reference<ChannelInfo> ci;
 
@@ -38,7 +37,7 @@ class CoreExport AutoKick : public Serializable
 
 	AutoKick();
 	~AutoKick();
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
@@ -48,14 +47,14 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 {
 	/* channels who reference this one */
 	Anope::map<int> references;
- private:
+private:
 	Serialize::Reference<NickCore> founder;					/* Channel founder */
 	Serialize::Reference<NickCore> successor;                               /* Who gets the channel if the founder nick is dropped or expires */
 	Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
 	Serialize::Checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
 	Anope::map<int16_t> levels;
 
- public:
+public:
 	friend class ChanAccess;
 	friend class AutoKick;
 
@@ -93,11 +92,12 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	ChannelInfo(const ChannelInfo &ci);
 
 	~ChannelInfo();
+	ChannelInfo& operator=(const ChannelInfo &) = default;
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
-	/** Change the founder of the channek
+	/** Change the founder of the channel
 	 * @params nc The new founder
 	 */
 	void SetFounder(NickCore *nc);
@@ -135,7 +135,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	AccessGroup AccessFor(const User *u, bool updateLastUsed = true);
 	AccessGroup AccessFor(const NickCore *nc, bool updateLastUsed = true);
 
-	/** Get the size of the accss vector for this channel
+	/** Get the size of the access vector for this channel
 	 * @return The access vector size
 	 */
 	unsigned GetAccessCount() const;
@@ -248,5 +248,3 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
  * @return true or false
  */
 extern CoreExport bool IsFounder(const User *user, const ChannelInfo *ci);
-
-#endif // REGCHANNEL_H

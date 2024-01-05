@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,7 +13,7 @@
 
 class CommandOSNOOP : public Command
 {
- public:
+public:
 	CommandOSNOOP(Module *creator) : Command(creator, "operserv/noop", 2, 2)
 	{
 		this->SetDesc(_("Remove all operators from a server remotely"));
@@ -21,7 +21,7 @@ class CommandOSNOOP : public Command
 		this->SetSyntax(_("REVOKE \037server\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 		const Anope::string &server = params[1];
@@ -42,10 +42,8 @@ class CommandOSNOOP : public Command
 
 			Anope::string reason = "NOOP command used by " + source.GetNick();
 			/* Kill all the IRCops of the server */
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			for (const auto &[_, u2] : UserListByNick)
 			{
-				User *u2 = it->second;
-
 				if (u2->server == s && u2->HasMode("OPER"))
 					u2->Kill(*source.service, reason);
 			}
@@ -61,7 +59,7 @@ class CommandOSNOOP : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -78,14 +76,14 @@ class OSNOOP : public Module
 	CommandOSNOOP commandosnoop;
 	PrimitiveExtensibleItem<Anope::string> noop;
 
- public:
+public:
 	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosnoop(this), noop(this, "noop")
 	{
 
 	}
 
-	void OnUserModeSet(const MessageSource &, User *u, const Anope::string &mname) anope_override
+	void OnUserModeSet(const MessageSource &, User *u, const Anope::string &mname) override
 	{
 		Anope::string *setter;
 		if (mname == "OPER" && (setter = noop.Get(u->server)))

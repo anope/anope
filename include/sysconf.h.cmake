@@ -1,42 +1,33 @@
-#ifndef _SYSCONF_H_
-#define _SYSCONF_H_
+/*
+ *
+ * (C) 2003-2024 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ */
 
-#cmakedefine DEBUG_BUILD
+#pragma once
 
+// The default umask to use for files.
 #cmakedefine DEFUMASK @DEFUMASK@
-#cmakedefine HAVE_CSTDINT 1
-#cmakedefine HAVE_STDDEF_H 1
-#cmakedefine HAVE_STRCASECMP 1
-#cmakedefine HAVE_STRICMP 1
-#cmakedefine HAVE_STRINGS_H 1
-#cmakedefine HAVE_UMASK 1
-#cmakedefine HAVE_EVENTFD 1
-#cmakedefine HAVE_EPOLL 1
-#cmakedefine HAVE_POLL 1
-#cmakedefine GETTEXT_FOUND 1
 
-#ifdef HAVE_CSTDINT
-# include <cstdint>
-#else
-# include <stdint.h>
-#endif
-#ifdef HAVE_STDDEF_H
-# include <stddef.h>
-#endif
+// Whether Anope was built in debug mode.
+#cmakedefine01 DEBUG_BUILD
+
+// Whether Anope was built with localization support.
+#cmakedefine01 HAVE_LOCALIZATION
+
+// Whether the umask() function is available.
+#cmakedefine01 HAVE_UMASK
 
 #ifdef _WIN32
 # define popen _popen
 # define pclose _pclose
-# define ftruncate _chsize
-# ifdef MSVCPP
+# ifdef _MSC_VER
 #  define PATH_MAX MAX_PATH
 # endif
-# define MAXPATHLEN MAX_PATH
-# define bzero(buf, size) memset(buf, 0, size)
-# ifdef MSVCPP
-#  define strcasecmp stricmp
-# endif
 # define sleep(x) Sleep(x * 1000)
-#endif
-
 #endif

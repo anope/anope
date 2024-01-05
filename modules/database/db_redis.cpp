@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2021 Anope Team
+ * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,16 +16,16 @@ static DatabaseRedis *me;
 
 class Data : public Serialize::Data
 {
- public:
+public:
 	std::map<Anope::string, std::stringstream *> data;
 
-	~Data()
+	~Data() override
 	{
-		for (std::map<Anope::string, std::stringstream *>::iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			delete it->second;
+		for (auto &[_, stream] : data)
+			delete stream;
 	}
 
-	std::iostream& operator[](const Anope::string &key) anope_override
+	std::iostream& operator[](const Anope::string &key) override
 	{
 		std::stringstream* &stream = data[key];
 		if (!stream)
@@ -33,20 +33,20 @@ class Data : public Serialize::Data
 		return *stream;
 	}
 
-	std::set<Anope::string> KeySet() const anope_override
+	std::set<Anope::string> KeySet() const override
 	{
 		std::set<Anope::string> keys;
-		for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-			keys.insert(it->first);
+		for (const auto &[key, _] : this->data)
+			keys.insert(key);
 		return keys;
 	}
 
-	size_t Hash() const anope_override
+	size_t Hash() const override
 	{
 		size_t hash = 0;
-		for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-			if (!it->second->str().empty())
-				hash ^= Anope::hash_cs()(it->second->str());
+		for (const auto &[_, value] : this->data)
+			if (!value->str().empty())
+				hash ^= Anope::hash_cs()(value->str());
 		return hash;
 	}
 };
@@ -54,10 +54,10 @@ class Data : public Serialize::Data
 class TypeLoader : public Interface
 {
 	Anope::string type;
- public:
+public:
 	TypeLoader(Module *creator, const Anope::string &t) : Interface(creator), type(t) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class ObjectLoader : public Interface
@@ -65,57 +65,57 @@ class ObjectLoader : public Interface
 	Anope::string type;
 	int64_t id;
 
- public:
+public:
 	ObjectLoader(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class IDInterface : public Interface
 {
 	Reference<Serializable> o;
- public:
+public:
 	IDInterface(Module *creator, Serializable *obj) : Interface(creator), o(obj) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class Deleter : public Interface
 {
 	Anope::string type;
 	int64_t id;
- public:
+public:
 	Deleter(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class Updater : public Interface
 {
 	Anope::string type;
 	int64_t id;
- public:
+public:
 	Updater(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class ModifiedObject : public Interface
 {
 	Anope::string type;
 	int64_t id;
- public:
+public:
 	ModifiedObject(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class SubscriptionListener : public Interface
 {
- public:
+public:
 	SubscriptionListener(Module *creator) : Interface(creator) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class DatabaseRedis : public Module, public Pipe
@@ -123,7 +123,7 @@ class DatabaseRedis : public Module, public Pipe
 	SubscriptionListener sl;
 	std::set<Serializable *> updated_items;
 
- public:
+public:
 	ServiceReference<Provider> redis;
 
 	DatabaseRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sl(this)
@@ -151,7 +151,7 @@ class DatabaseRedis : public Module, public Pipe
 			obj->UpdateCache(data);
 
 			std::vector<Anope::string> args;
-			args.push_back("HGETALL");
+			args.emplace_back("HGETALL");
 			args.push_back("hash:" + t->GetName() + ":" + stringify(obj->id));
 
 			/* Get object attrs to clear before updating */
@@ -159,25 +159,23 @@ class DatabaseRedis : public Module, public Pipe
 		}
 	}
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
-		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
+		for (auto *obj : this->updated_items)
 		{
-			Serializable *s = *it;
-
-			this->InsertObject(s);
+			this->InsertObject(obj);
 		}
 
 		this->updated_items.clear();
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		this->redis = ServiceReference<Provider>("Redis::Provider", block->Get<const Anope::string>("engine", "redis/main"));
 	}
 
-	EventReturn OnLoadDatabase() anope_override
+	EventReturn OnLoadDatabase() override
 	{
 		if (!redis)
 		{
@@ -185,10 +183,9 @@ class DatabaseRedis : public Module, public Pipe
 			return EVENT_CONTINUE;
 		}
 
-		const std::vector<Anope::string> type_order = Serialize::Type::GetTypeOrder();
-		for (unsigned i = 0; i < type_order.size(); ++i)
+		for (const auto &type_order : Serialize::Type::GetTypeOrder())
 		{
-			Serialize::Type *sb = Serialize::Type::Find(type_order[i]);
+			Serialize::Type *sb = Serialize::Type::Find(type_order);
 			this->OnSerializeTypeCreate(sb);
 		}
 
@@ -205,25 +202,25 @@ class DatabaseRedis : public Module, public Pipe
 		return EVENT_STOP;
 	}
 
-	void OnSerializeTypeCreate(Serialize::Type *sb) anope_override
+	void OnSerializeTypeCreate(Serialize::Type *sb) override
 	{
 		if (!redis)
 			return;
 
 		std::vector<Anope::string> args;
-		args.push_back("SMEMBERS");
+		args.emplace_back("SMEMBERS");
 		args.push_back("ids:" + sb->GetName());
 
 		redis->SendCommand(new TypeLoader(this, sb->GetName()), args);
 	}
 
-	void OnSerializableConstruct(Serializable *obj) anope_override
+	void OnSerializableConstruct(Serializable *obj) override
 	{
 		this->updated_items.insert(obj);
 		this->Notify();
 	}
 
-	void OnSerializableDestruct(Serializable *obj) anope_override
+	void OnSerializableDestruct(Serializable *obj) override
 	{
 		Serialize::Type *t = obj->GetSerializableType();
 
@@ -240,7 +237,7 @@ class DatabaseRedis : public Module, public Pipe
 		}
 
 		std::vector<Anope::string> args;
-		args.push_back("HGETALL");
+		args.emplace_back("HGETALL");
 		args.push_back("hash:" + t->GetName() + ":" + stringify(obj->id));
 
 		/* Get all of the attributes for this object */
@@ -251,7 +248,7 @@ class DatabaseRedis : public Module, public Pipe
 		this->Notify();
 	}
 
-	void OnSerializableUpdate(Serializable *obj) anope_override
+	void OnSerializableUpdate(Serializable *obj) override
 	{
 		this->updated_items.insert(obj);
 		this->Notify();
@@ -266,10 +263,8 @@ void TypeLoader::OnResult(const Reply &r)
 		return;
 	}
 
-	for (unsigned i = 0; i < r.multi_bulk.size(); ++i)
+	for (auto *reply : r.multi_bulk)
 	{
-		const Reply *reply = r.multi_bulk[i];
-
 		if (reply->type != Reply::BULK)
 			continue;
 
@@ -284,7 +279,7 @@ void TypeLoader::OnResult(const Reply &r)
 		}
 
 		std::vector<Anope::string> args;
-		args.push_back("HGETALL");
+		args.emplace_back("HGETALL");
 		args.push_back("hash:" + this->type + ":" + stringify(id));
 
 		me->redis->SendCommand(new ObjectLoader(me, this->type, id), args);
@@ -358,14 +353,14 @@ void Deleter::OnResult(const Reply &r)
 	me->redis->StartTransaction();
 
 	std::vector<Anope::string> args;
-	args.push_back("DEL");
+	args.emplace_back("DEL");
 	args.push_back("hash:" + this->type + ":" + stringify(this->id));
 
 	/* Delete hash object */
 	me->redis->SendCommand(NULL, args);
 
 	args.clear();
-	args.push_back("SREM");
+	args.emplace_back("SREM");
 	args.push_back("ids:" + this->type);
 	args.push_back(stringify(this->id));
 
@@ -378,7 +373,7 @@ void Deleter::OnResult(const Reply &r)
 			*value = r.multi_bulk[i + 1];
 
 		args.clear();
-		args.push_back("SREM");
+		args.emplace_back("SREM");
 		args.push_back("value:" + this->type + ":" + key->bulk + ":" + value->bulk);
 		args.push_back(stringify(this->id));
 
@@ -421,7 +416,7 @@ void Updater::OnResult(const Reply &r)
 			*value = r.multi_bulk[i + 1];
 
 		std::vector<Anope::string> args;
-		args.push_back("SREM");
+		args.emplace_back("SREM");
 		args.push_back("value:" + this->type + ":" + key->bulk + ":" + value->bulk);
 		args.push_back(stringify(this->id));
 
@@ -431,27 +426,23 @@ void Updater::OnResult(const Reply &r)
 
 	/* Add object id to id set for this type */
 	std::vector<Anope::string> args;
-	args.push_back("SADD");
+	args.emplace_back("SADD");
 	args.push_back("ids:" + this->type);
 	args.push_back(stringify(obj->id));
 	me->redis->SendCommand(NULL, args);
 
 	args.clear();
-	args.push_back("HMSET");
+	args.emplace_back("HMSET");
 	args.push_back("hash:" + this->type + ":" + stringify(obj->id));
 
-	typedef std::map<Anope::string, std::stringstream *> items;
-	for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+	for (const auto &[key, value] : data.data)
 	{
-		const Anope::string &key = it->first;
-		std::stringstream *value = it->second;
-
 		args.push_back(key);
-		args.push_back(value->str());
+		args.emplace_back(value->str());
 
 		std::vector<Anope::string> args2;
 
-		args2.push_back("SADD");
+		args2.emplace_back("SADD");
 		args2.push_back("value:" + this->type + ":" + key + ":" + value->str());
 		args2.push_back(stringify(obj->id));
 
@@ -528,7 +519,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 			Log(LOG_DEBUG) << "redis: notify: got modify for object id " << obj_id << " of type " << type;
 
 			std::vector<Anope::string> args;
-			args.push_back("HGETALL");
+			args.emplace_back("HGETALL");
 			args.push_back("hash:" + type + ":" + id);
 
 			me->redis->SendCommand(new ModifiedObject(me, type, obj_id), args);
@@ -549,14 +540,10 @@ void SubscriptionListener::OnResult(const Reply &r)
 		/* Transaction start */
 		me->redis->StartTransaction();
 
-		typedef std::map<Anope::string, std::stringstream *> items;
-		for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (const auto &[k, value] : data.data)
 		{
-			const Anope::string &k = it->first;
-			std::stringstream *value = it->second;
-
 			std::vector<Anope::string> args;
-			args.push_back("SREM");
+			args.emplace_back("SREM");
 			args.push_back("value:" + type + ":" + k + ":" + value->str());
 			args.push_back(id);
 
@@ -565,7 +552,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 		}
 
 		std::vector<Anope::string> args;
-		args.push_back("SREM");
+		args.emplace_back("SREM");
 		args.push_back("ids:" + type);
 		args.push_back(stringify(s->id));
 
@@ -602,14 +589,10 @@ void ModifiedObject::OnResult(const Reply &r)
 
 		obj->Serialize(data);
 
-		typedef std::map<Anope::string, std::stringstream *> items;
-		for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (auto &[key, value] : data.data)
 		{
-			const Anope::string &key = it->first;
-			std::stringstream *value = it->second;
-
 			std::vector<Anope::string> args;
-			args.push_back("SREM");
+			args.emplace_back("SREM");
 			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());
 			args.push_back(stringify(this->id));
 
@@ -635,14 +618,10 @@ void ModifiedObject::OnResult(const Reply &r)
 		obj->UpdateCache(data);
 
 		/* Insert new object values */
-		typedef std::map<Anope::string, std::stringstream *> items;
-		for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+		for (const auto &[key, value] : data.data)
 		{
-			const Anope::string &key = it->first;
-			std::stringstream *value = it->second;
-
 			std::vector<Anope::string> args;
-			args.push_back("SADD");
+			args.emplace_back("SADD");
 			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());
 			args.push_back(stringify(obj->id));
 
@@ -651,7 +630,7 @@ void ModifiedObject::OnResult(const Reply &r)
 		}
 
 		std::vector<Anope::string> args;
-		args.push_back("SADD");
+		args.emplace_back("SADD");
 		args.push_back("ids:" + st->GetName());
 		args.push_back(stringify(obj->id));
 

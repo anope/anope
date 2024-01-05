@@ -16,6 +16,7 @@ jobs:
           sudo apt-get install --assume-yes --no-install-recommends \
             clang \
             g++ \
+            gettext \
             git \
             libgnutls28-dev \
             libldap2-dev \

@@ -8845,7 +8845,7 @@ msgstr "Votre mot de passe est trop long. Il ne doit pas dépasser %u caractère
 
 #, c-format
 msgid "Your password is too short. It must must be longer than %u characters."
-msgstr "Votre mot de passe est trop long. Il ne doit pas dépasser %u caractères."
+msgstr "Votre mot de passe est trop court. Il doit faire au moins %u caractères."
 
 msgid "Your password reset request has expired."
 msgstr "Votre demande de réinitialisation de mot de passe a expiré."

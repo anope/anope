@@ -809,7 +809,6 @@ msgstr ""
 "Note : Puisque le masque de realname peut contenir des espaces, le\n"
 "séparateur entre le masque et la raison est le caractère ':'."
 
-#, fuzzy
 msgid ""
 " \n"
 "SQLINE ADD adds the given (nick/channel) mask to the SQLINE\n"
@@ -825,7 +824,7 @@ msgid ""
 "STATS AKILL command."
 msgstr ""
 " \n"
-"SQLINE ADD ajoute le masque de pseudo indiqué à la liste des\n"
+"SQLINE ADD ajoute le masque de pseudo/canal indiqué à la liste des\n"
 "SQLINE avec la raison indiquée (qui doit être précisée).\n"
 "expiration est spécifiée par un nombre entier suivi d'un d\n"
 "(jours), h (heures), ou m (minutes). Les combinaisons (comme\n"
@@ -1711,11 +1710,12 @@ msgstr "Un mémo informant l'utilisateur sera également envoyé, incluant la ra
 msgid "A memo informing the user will also be sent."
 msgstr "Un mémo informant l'utilisateur sera également envoyé."
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "A notification memo has been sent to %s informing them you have\n"
 "read their memo."
-msgstr "Un accusé de réception a été envoyé a %s."
+msgstr "Un accusé de réception a été envoyé a %s, l'informant que\n"
+"vous avez lu son mémo."
 
 msgid "A vHost ident must be in the format of a valid ident."
 msgstr "L'ident d'un vhost doit être d'un format valide pour un ident."
@@ -2187,7 +2187,6 @@ msgstr ""
 "celle par défaut. L'échéance par défaut pour les AKILLs peut \n"
 "être consultée par la commande STATS AKILL."
 
-#, fuzzy
 msgid ""
 "Allows Services Operators to manipulate the SNLINE list.  If\n"
 "a user with a realname matching an SNLINE mask attempts to\n"
@@ -2199,7 +2198,6 @@ msgstr ""
 "de se connecter, les Services n'autoriseront pas la session IRC\n"
 "à se poursuivre."
 
-#, fuzzy
 msgid ""
 "Allows Services Operators to manipulate the SQLINE list.  If\n"
 "a user with a nick matching an SQLINE mask attempts to\n"
@@ -3727,7 +3725,7 @@ msgstr ""
 "supérieur ou égal au niveau SIGNKICK sur le canal\n"
 "n'auront pas leurs kicks signés."
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Enables or disables the peace option for a channel.\n"
 "When peace is set, a user won't be able to kick,\n"
@@ -5685,7 +5683,7 @@ msgstr "Pseudos enregistrés : %lu entrées, %lu paniers, plus longue chaîne : 
 msgid "Registered only enforced on %s."
 msgstr "Application sur %s de la restriction aux seuls pseudos enregistrés"
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Registers a channel in the %s database.  In order\n"
 "to use this command, you must first be a channel operator\n"
@@ -6060,7 +6058,6 @@ msgstr "Envoie un mémo dont le message est texte à tous les pseudos enregist
 msgid "Sends all services staff a memo containing memo-text."
 msgstr "Envoie un mémo dont le message est texte à tous le staff des services."
 
-#, fuzzy
 msgid ""
 "Sends the named nick or channel a memo containing\n"
 "memo-text. When sending to a nickname, the recipient will\n"
@@ -6072,7 +6069,6 @@ msgstr ""
 "qu'il ou elle a reçu un nouveau mémo. Le destinataire doit être un pseudo ou\n"
 "un canal enregistré."
 
-#, fuzzy
 msgid ""
 "Sends the named nick or channel a memo containing\n"
 "memo-text. When sending to a nickname, the recipient will\n"
@@ -7330,7 +7326,7 @@ msgstr ""
 msgid "The IMMED option is not available on this network."
 msgstr "L'option IMMED n'est pas disponible sur ce réseau."
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The LEVELS command allows fine control over the meaning of\n"
 "the numeric access levels used for channels.  With this\n"
@@ -7889,7 +7885,6 @@ msgstr ""
 "automatiques qui correspondent, s'il y en a. L'utilisation de cette commande\n"
 "est limitée aux utilisateurs qui ont la possibilité de modifier les accès du canal."
 
-#, fuzzy
 msgid ""
 "This command ungroups your nick, or if given, the specified nick,\n"
 "from the group it is in. The ungrouped nick keeps its registration\n"
@@ -8526,7 +8521,6 @@ msgstr "Vous avez dépassé votre nombre maximum de mémos (%d). Vous ne pourrez
 msgid "You can not NOOP Services."
 msgstr "Vous ne pouvez pas NOOP les Services."
 
-#, fuzzy
 msgid "You can not disable the founder privilege because it would be impossible to re-enable it at a later time."
 msgstr "Vous ne pouvez pas désactiver les privilèges de fondateur puisqu'il serait impossible de les réactiver plus tard."
 
@@ -8718,9 +8712,8 @@ msgstr "Vous devez être un opérateur du canal pour l'enregistrer."
 msgid "You must be in %s to use this command."
 msgstr "Vous devez être sur %s pour utiliser cette commande."
 
-#, fuzzy
 msgid "You must be logged into an account to use that command."
-msgstr "Vous devez être sur %s pour utiliser cette commande."
+msgstr "Vous devez être identifié(e) pour utiliser cette commande."
 
 msgid "You must confirm your account before you can register a channel."
 msgstr "Vous devez confirmer votre compte avant de pouvoir enregistrer un canal."

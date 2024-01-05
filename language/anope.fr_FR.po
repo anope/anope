@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-05 20:32+0100\n"
-"PO-Revision-Date: 2019-01-24 17:28+0100\n"
+"POT-Creation-Date: 2020-01-06 18:19+0100\n"
+"PO-Revision-Date: 2024-01-05 19:37+0100\n"
 "Last-Translator: Thomas Fargeix <t.fargeix@gmail.com>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -16,6 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -2526,7 +2527,7 @@ msgid "Available privileges for %s:"
 msgstr "Privilèges disponibles pour %s :"
 
 msgid "BANS enforced by "
-msgstr "Bans appliqués par"
+msgstr "Bans appliqués par "
 
 msgid "Bad words kicker"
 msgstr "Kicker de mots interdits"
@@ -4279,7 +4280,7 @@ msgid "Kill a user"
 msgstr "Kill un utilisateur"
 
 msgid "LIMIT enforced by "
-msgstr "LIMIT appliquée par"
+msgstr "LIMIT appliquée par "
 
 #, c-format
 msgid "LIMIT enforced on %s, %d users removed."
@@ -5583,10 +5584,10 @@ msgid "RANDOMNEWS {ADD|DEL|LIST} [text|num]"
 msgstr "RANDOMNEWS {ADD|DEL|LIST} [texte|numéro]"
 
 msgid "REGONLY enforced by "
-msgstr "REGONLY appliqué par"
+msgstr "REGONLY appliqué par "
 
 msgid "RESTRICTED enforced by "
-msgstr "RESTRICTED appliqué par"
+msgstr "RESTRICTED appliqué par "
 
 msgid "REVOKE server"
 msgstr "REVOKE serveur"
@@ -5957,7 +5958,7 @@ msgid "SSL only enforced on %s."
 msgstr "Application sur %s de la restriction aux seuls utilisateurs connectés en SSL."
 
 msgid "SSLONLY enforced by "
-msgstr "SSLONLY appliqué par"
+msgstr "SSLONLY appliqué par "
 
 msgid "Save databases and restart Services"
 msgstr "Sauvegarde les bases de données et relance les services."
@@ -6880,7 +6881,7 @@ msgid "Syncs the vhost for all nicks in a group"
 msgstr "Synchronise le vhost pour tous les pseudos d'un groupe"
 
 msgid "Syntax"
-msgstr "Syntaxe "
+msgstr "Syntaxe"
 
 #, c-format
 msgid ""

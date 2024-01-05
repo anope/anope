@@ -137,12 +137,13 @@ int main(int ac, char **av, char **envp)
 	try
 	{
 		/* General initialization first */
-		Anope::Init(ac, av);
+		if (!Anope::Init(ac, av))
+			return Anope::ReturnValue;
 	}
 	catch (const CoreException &ex)
 	{
 		Log() << ex.GetReason();
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	try

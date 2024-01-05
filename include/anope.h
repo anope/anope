@@ -416,7 +416,7 @@ namespace Anope
 	 * initializing language support, loading modules, and loading databases.
 	 * @throws CoreException if something bad went wrong
 	 */
-	extern void Init(int ac, char **av);
+	extern bool Init(int ac, char **av);
 
 	/** Calls the save database event
 	 */

@@ -285,7 +285,7 @@ static void setuidgid()
 #endif
 }
 
-void Anope::Init(int ac, char **av)
+bool Anope::Init(int ac, char **av)
 {
 	/* Set file creation mask and group ID. */
 #if defined(DEFUMASK) && HAVE_UMASK
@@ -300,7 +300,8 @@ void Anope::Init(int ac, char **av)
 	if (GetCommandLineArgument("version", 'v'))
 	{
 		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::VersionBuildString();
-		throw CoreException();
+		Anope::ReturnValue = EXIT_SUCCESS;
+		return false;
 	}
 
 	if (GetCommandLineArgument("help", 'h'))
@@ -326,7 +327,8 @@ void Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "";
 		Log(LOG_TERMINAL) << "Further support is available from https://www.anope.org/";
 		Log(LOG_TERMINAL) << "Or visit us on IRC at irc.anope.org #anope";
-		throw CoreException();
+		Anope::ReturnValue = EXIT_SUCCESS;
+		return false;
 	}
 
 	if (GetCommandLineArgument("nofork", 'n'))
@@ -449,7 +451,7 @@ void Anope::Init(int ac, char **av)
 			sigemptyset(&mask);
 			sigsuspend(&mask);
 
-			exit(Anope::ReturnValue);
+			return false;
 		}
 		else if (i == -1)
 		{
@@ -560,4 +562,5 @@ void Anope::Init(int ac, char **av)
 		ci->Sync();
 
 	Serialize::CheckTypes();
+	return true;
 }

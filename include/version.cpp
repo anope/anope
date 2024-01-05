@@ -172,19 +172,19 @@ int main(int argc, char *argv[])
 	std::map<std::string, std::string> versions, old_versions;
 
 	if (!read_version_sh(version_sh, versions))
-		return -1;
+		return EXIT_FAILURE;
 
 	std::string git_version = get_git_hash(git_dir);
 	if (!write_build_h(buildh, git_version))
-		return -1;
+		return EXIT_FAILURE;
 
 	read_version_h(versionh, old_versions);
 
 	if (versions == old_versions)
-		return 0;
+		return EXIT_SUCCESS;
 
 	if (!write_version_h(versionh, versions))
-		return -1;
+		return EXIT_FAILURE;
 
-	return 0;
+	return EXIT_SUCCESS;
 }

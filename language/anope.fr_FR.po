@@ -6575,7 +6575,7 @@ msgstr ""
 "empêche le canal d'expirer."
 
 msgid "Sets whether the given nickname can be added to a channel access list."
-msgstr ""
+msgstr "Définit si le pseudo donné peut être ajouté à une liste d'accès de canal."
 
 #, c-format
 msgid ""

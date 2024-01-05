@@ -410,7 +410,7 @@ class CommandNSSetDisplay : public Command
 public:
 	CommandNSSetDisplay(Module *creator, const Anope::string &sname = "nickserv/set/display", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Set the display of your group in Services"));
+		this->SetDesc(_("Set the display of your group in services"));
 		this->SetSyntax(_("\037new-display\037"));
 	}
 
@@ -469,7 +469,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Changes the display used to refer to your nickname group in\n"
-				"Services. The new display MUST be a nick of your group."));
+				"services. The new display MUST be a nick of your group."));
 		return true;
 	}
 };
@@ -493,7 +493,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Changes the display used to refer to the nickname group in\n"
-				"Services. The new display MUST be a nick of the group."));
+				"services. The new display MUST be a nick of the group."));
 		return true;
 	}
 };

@@ -30,7 +30,7 @@ public:
 		if (s == NULL)
 			source.Reply(_("Server %s does not exist."), server.c_str());
 		else if (s == Me || s->IsJuped())
-			source.Reply(_("You can not NOOP Services."));
+			source.Reply(_("You can not NOOP services."));
 		else if (cmd.equals_ci("SET"))
 		{
 			/* Remove the O:lines */

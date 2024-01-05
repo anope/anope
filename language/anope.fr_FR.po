@@ -3579,7 +3579,6 @@ msgstr ""
 "que propriétaire du pseudo."
 
 #: modules/commands/cs_set.cpp:1017
-#, fuzzy
 msgid ""
 "Changes the successor of a channel. If the founder's\n"
 "nickname expires or is dropped while the channel is still\n"
@@ -3593,7 +3592,11 @@ msgstr ""
 "Change le successeur d'un canal. Si le pseudo du fondateur\n"
 "expire ou est effacé alors que le canal est toujours enregistré,\n"
 " le successeur deviendra le nouveau fondateur du canal. Le\n"
-"nouveau pseudo doit être enregistré."
+"nouveau pseudo doit être enregistré. Si il n'y a pas de \n"
+"successeur configuré, alors le premier pseudo sur la liste \n"
+"d'accès (avec le plus haut accès, si applicable) deviendra \n"
+"le nouveau fondateur, mais si la liste d'accès est vide, \n"
+"alors le canal sera supprimé."
 
 #: modules/commands/ns_alist.cpp:48 modules/commands/ns_ajoin.cpp:100
 msgid "Channel"
@@ -5609,7 +5612,6 @@ msgid "Lists all user records"
 msgstr "Liste tous les utilisateurs"
 
 #: modules/commands/os_list.cpp:243
-#, fuzzy
 msgid ""
 "Lists all users currently online on the IRC network, whether their\n"
 "nick is registered or not.\n"
@@ -6588,7 +6590,7 @@ msgid "None"
 msgstr "Aucune"
 
 #: modules/commands/cs_set.cpp:1029
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Note, however, if the successor already has too many\n"
 "channels registered (%d), they will not be able to\n"
@@ -6596,7 +6598,8 @@ msgid ""
 "channel had no successor set."
 msgstr ""
 "Cependant, si le successeur a déjà trop de canaux\n"
-"enregistrés (%d), le canal sera effacé à la place,\n"
+"enregistrés (%d), il ne pourra pas devenir le nouveau \n"
+"fondateur, et le canal sera effacé à la place,\n"
 "comme si aucun successeur n'avait été défini."
 
 #: modules/commands/cs_mode.cpp:380 modules/commands/cs_mode.cpp:437
@@ -7578,7 +7581,6 @@ msgstr ""
 "envoyé afin de vous prévenir que le mémo a été lu."
 
 #: modules/commands/ms_read.cpp:199
-#, fuzzy
 msgid ""
 "Sends you the text of the memos specified. If LAST is\n"
 "given, sends you the memo you most recently received. If\n"
@@ -7592,7 +7594,8 @@ msgid ""
 msgstr ""
 "Vous envoie le texte des mémos spécifiés. Si LAST est donné,\n"
 "vous envoie le dernier mémo reçu. Si NEW est donné, vous\n"
-"envoie tous vos nouveaux mémos. Sinon, vous envoie le mémo\n"
+"envoie tous vos nouveaux mémos. Si ALL est donné, vous\n"
+"envoie tous vos mémos. Sinon, vous envoie le mémo\n"
 "numéro numéro. Vous pouvez également donner une liste\n"
 "de nombres, comme dans cet exemple :\n"
 " \n"

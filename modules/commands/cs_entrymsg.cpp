@@ -92,7 +92,7 @@ Serializable* EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data
 
 	data["when"] >> swhen;
 
-	EntryMsgImpl *m = new EntryMsgImpl(ci, screator, smessage, swhen);
+	auto *m = new EntryMsgImpl(ci, screator, smessage, swhen);
 	(*messages)->push_back(m);
 	return m;
 }

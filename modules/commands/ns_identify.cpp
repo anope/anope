@@ -95,7 +95,7 @@ public:
 			return;
 		}
 
-		NSIdentifyRequest *req = new NSIdentifyRequest(owner, source, this, na ? na->nc->display : nick, pass);
+		auto *req = new NSIdentifyRequest(owner, source, this, na ? na->nc->display : nick, pass);
 		FOREACH_MOD(OnCheckAuthentication, (u, req));
 		req->Dispatch();
 	}

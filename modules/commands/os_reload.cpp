@@ -25,7 +25,7 @@ public:
 		{
 			Log(LOG_ADMIN, source, this);
 
-			Configuration::Conf *new_config = new Configuration::Conf();
+			auto *new_config = new Configuration::Conf();
 			Configuration::Conf *old = Config;
 			Config = new_config;
 			Config->Post(old);

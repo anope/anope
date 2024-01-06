@@ -125,7 +125,7 @@ bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 
 		last_login_attempt[ip] = Anope::CurTime;
 
-		WebpanelRequest *req = new WebpanelRequest(me, reply, message, server, page_name, client, replacements, user, pass);
+		auto *req = new WebpanelRequest(me, reply, message, server, page_name, client, replacements, user, pass);
 		FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 		req->Dispatch();
 		return false;

@@ -76,7 +76,7 @@ struct ModeLocksImpl : ModeLocks
 		if (setter.empty())
 			setter = ci->GetFounder() ? ci->GetFounder()->display : "Unknown";
 
-		ModeLock *ml = new ModeLockImpl();
+		auto *ml = new ModeLockImpl();
 		ml->ci = ci->name;
 		ml->set = status;
 		ml->name = mode->name;

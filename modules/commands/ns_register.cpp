@@ -211,8 +211,8 @@ public:
 			source.Reply(MAIL_X_INVALID, email.c_str());
 		else
 		{
-			NickCore *nc = new NickCore(u_nick);
-			NickAlias *na = new NickAlias(u_nick, nc);
+			auto *nc = new NickCore(u_nick);
+			auto *na = new NickAlias(u_nick, nc);
 			Anope::Encrypt(pass, nc->pass);
 			if (!email.empty())
 				nc->email = email;

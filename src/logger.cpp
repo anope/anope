@@ -312,7 +312,7 @@ void LogInfo::OpenLogFiles()
 		if (target.empty() || target[0] == '#' || target == "globops" || target.find(":") != Anope::string::npos)
 			continue;
 
-		LogFile *lf = new LogFile(CreateLogName(target));
+		auto *lf = new LogFile(CreateLogName(target));
 		if (!lf->stream.is_open())
 		{
 			Log() << "Unable to open logfile " << lf->GetName();

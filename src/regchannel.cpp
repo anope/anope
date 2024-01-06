@@ -525,7 +525,7 @@ void ChannelInfo::ClearAccess()
 
 AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t, time_t lu)
 {
-	AutoKick *autokick = new AutoKick();
+	auto *autokick = new AutoKick();
 	autokick->ci = this;
 	autokick->nc = akicknc;
 	autokick->reason = reason;
@@ -542,7 +542,7 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, co
 
 AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t, time_t lu)
 {
-	AutoKick *autokick = new AutoKick();
+	auto *autokick = new AutoKick();
 	autokick->ci = this;
 	autokick->mask = mask;
 	autokick->nc = NULL;

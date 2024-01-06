@@ -178,7 +178,7 @@ public:
 
 			if (ok == false && !pass.empty())
 			{
-				NSGroupRequest *req = new NSGroupRequest(owner, source, this, source.GetNick(), target, pass);
+				auto *req = new NSGroupRequest(owner, source, this, source.GetNick(), target, pass);
 				FOREACH_MOD(OnCheckAuthentication, (source.GetUser(), req));
 				req->Dispatch();
 			}
@@ -259,7 +259,7 @@ public:
 			if (na->nick.equals_ci(oldcore->display))
 				oldcore->SetDisplay(oldcore->aliases->front());
 
-			NickCore *nc = new NickCore(na->nick);
+			auto *nc = new NickCore(na->nick);
 			na->nc = nc;
 			nc->aliases->push_back(na);
 

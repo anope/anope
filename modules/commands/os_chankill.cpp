@@ -78,7 +78,7 @@ public:
 					if (akills->HasEntry(akillmask))
 						continue;
 
-					XLine *x = new XLine(akillmask, source.GetNick(), expires, realreason, XLineManager::GenerateUID());
+					auto *x = new XLine(akillmask, source.GetNick(), expires, realreason, XLineManager::GenerateUID());
 					akills->AddXLine(x);
 					akills->OnMatch(uc->user, x);
 				}

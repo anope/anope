@@ -320,7 +320,7 @@ static StackerInfo *GetInfo(List &l, Object *o)
 	if (it != l.end())
 		return it->second;
 
-	StackerInfo *s = new StackerInfo();
+	auto *s = new StackerInfo();
 	l[o] = s;
 	return s;
 }

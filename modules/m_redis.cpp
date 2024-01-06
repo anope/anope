@@ -402,7 +402,7 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 
 			for (int i = r.multi_bulk.size(); i < r.multi_bulk_size; ++i)
 			{
-				Reply *reply = new Reply();
+				auto *reply = new Reply();
 				size_t u = ParseReply(*reply, buffer + used, l - used);
 				if (!u)
 				{

@@ -82,7 +82,7 @@ private:
 			return;
 		}
 
-		BotInfo *bi = new BotInfo(nick, user, host, real);
+		auto *bi = new BotInfo(nick, user, host, real);
 
 		Log(LOG_ADMIN, source, this) << "ADD " << bi->GetMask() << " " << bi->realname;
 

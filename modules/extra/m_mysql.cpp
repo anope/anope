@@ -239,7 +239,7 @@ public:
 
 				try
 				{
-					MySQLService *ss = new MySQLService(this, connname, database, server, user, password, port);
+					auto *ss = new MySQLService(this, connname, database, server, user, password, port);
 					this->MySQLServices.emplace(connname, ss);
 
 					Log(LOG_NORMAL, "mysql") << "MySQL: Successfully connected to server " << connname << " (" << server << ")";

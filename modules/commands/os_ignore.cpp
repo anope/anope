@@ -221,7 +221,7 @@ private:
 			if (Anope::ReadOnly)
 				source.Reply(READ_ONLY_MODE);
 
-			IgnoreData *ign = new IgnoreDataImpl();
+			auto *ign = new IgnoreDataImpl();
 			ign->mask = mask;
 			ign->creator = source.GetNick();
 			ign->reason = reason;

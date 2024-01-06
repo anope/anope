@@ -77,7 +77,7 @@ public:
 		if (sender != NULL)
 			sender->lastmemosend = Anope::CurTime;
 
-		Memo *m = new Memo();
+		auto *m = new Memo();
 		m->mi = mi;
 		mi->memos->push_back(m);
 		m->owner = target;

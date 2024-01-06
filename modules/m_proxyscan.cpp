@@ -88,7 +88,7 @@ protected:
 
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		Log(OperServ) << "PROXYSCAN: Open " << this->GetType() << " proxy found on " << this->conaddr.str() << " (" << reason << ")";
-		XLine *x = new XLine("*@" + this->conaddr.addr(), OperServ ? OperServ->nick : "", Anope::CurTime + this->proxy.duration, reason, XLineManager::GenerateUID());
+		auto *x = new XLine("*@" + this->conaddr.addr(), OperServ ? OperServ->nick : "", Anope::CurTime + this->proxy.duration, reason, XLineManager::GenerateUID());
 		if (add_to_akill && akills)
 		{
 			akills->AddXLine(x);

@@ -261,7 +261,7 @@ Conf::Conf() : Block("")
 
 		ValidateNotEmpty("opertype", "name", oname);
 
-		OperType *ot = new OperType(oname);
+		auto *ot = new OperType(oname);
 		ot->modes = modes;
 
 		spacesepstream cmdstr(commands);
@@ -316,7 +316,7 @@ Conf::Conf() : Block("")
 		if (ot == NULL)
 			throw ConfigException("Oper block for " + nname + " has invalid oper type " + type);
 
-		Oper *o = new Oper(nname, ot);
+		auto *o = new Oper(nname, ot);
 		o->require_oper = require_oper;
 		o->password = password;
 		o->certfp = certfp;

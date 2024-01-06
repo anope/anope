@@ -358,7 +358,7 @@ private:
 				}
 			}
 
-			Exception *exception = new Exception();
+			auto *exception = new Exception();
 			exception->mask = mask;
 			exception->limit = limit;
 			exception->reason = reason;
@@ -671,7 +671,7 @@ public:
 				const Anope::string &akillmask = "*@" + session->addr.mask();
 				if (max_session_kill && session->hits >= max_session_kill && akills && !akills->HasEntry(akillmask))
 				{
-					XLine *x = new XLine(akillmask, OperServ ? OperServ->nick : "", Anope::CurTime + session_autokill_expiry, "Session limit exceeded", XLineManager::GenerateUID());
+					auto *x = new XLine(akillmask, OperServ ? OperServ->nick : "", Anope::CurTime + session_autokill_expiry, "Session limit exceeded", XLineManager::GenerateUID());
 					akills->AddXLine(x);
 					akills->Send(NULL, x);
 					Log(OperServ, "akill/session") << "Added a temporary AKILL for \002" << akillmask << "\002 due to excessive connections";

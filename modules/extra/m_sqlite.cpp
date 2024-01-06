@@ -119,7 +119,7 @@ public:
 
 				try
 				{
-					SQLiteService *ss = new SQLiteService(this, connname, database);
+					auto *ss = new SQLiteService(this, connname, database);
 					this->SQLiteServices[connname] = ss;
 
 					Log(LOG_NORMAL, "sqlite") << "SQLite: Successfully added database " << database;

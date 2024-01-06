@@ -306,7 +306,7 @@ public:
 
 	ClientSocket* OnAccept(int fd, const sockaddrs &addr) override
 	{
-		MyHTTPClient *c = new MyHTTPClient(this, fd, addr);
+		auto *c = new MyHTTPClient(this, fd, addr);
 		this->clients.emplace_back(c);
 		return c;
 	}

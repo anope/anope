@@ -155,7 +155,7 @@ class CommandNSAJoin : public Command
 					continue;
 				}
 
-				AJoinEntry *entry = new AJoinEntry(nc);
+				auto *entry = new AJoinEntry(nc);
 				entry->owner = nc;
 				entry->channel = chan;
 				entry->key = key;

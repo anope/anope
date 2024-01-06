@@ -192,7 +192,7 @@ public:
 
 		if (ok == false && !pass.empty())
 		{
-			NSRecoverRequest *req = new NSRecoverRequest(owner, source, this, na->nick, pass);
+			auto *req = new NSRecoverRequest(owner, source, this, na->nick, pass);
 			FOREACH_MOD(OnCheckAuthentication, (source.GetUser(), req));
 			req->Dispatch();
 		}

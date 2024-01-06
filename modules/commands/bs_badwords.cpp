@@ -39,7 +39,7 @@ struct BadWordsImpl : BadWords
 
 	BadWord* AddBadWord(const Anope::string &word, BadWordType type) override
 	{
-		BadWordImpl *bw = new BadWordImpl();
+		auto *bw = new BadWordImpl();
 		bw->chan = ci->name;
 		bw->word = word;
 		bw->type = type;

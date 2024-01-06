@@ -392,7 +392,7 @@ static int read_string(Anope::string &str, dbFILE *f)
 		return -1;
 	if (len == 0)
 		return 0;
-	char *s = new char[len];
+	auto *s = new char[len];
 	if (len != fread(s, 1, len, f->fp))
 	{
 		delete [] s;
@@ -447,7 +447,7 @@ static void LoadNicks()
 			Anope::string buffer;
 
 			READ(read_string(buffer, f));
-			NickCore *nc = new NickCore(buffer);
+			auto *nc = new NickCore(buffer);
 
 			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_secure", "ns_private", "hide_email",
 				"hide_mask", "hide_quit", "memo_signon", "memo_receive", "autoop", "msg", "ns_keepmodes" };
@@ -579,7 +579,7 @@ static void LoadNicks()
 			READ(read_int16(&nc->memos.memomax, f));
 			for (int16_t j = 0; j < i16; ++j)
 			{
-				Memo *m = new Memo;
+				auto *m = new Memo;
 				READ(read_uint32(&u32, f));
 				uint16_t flags;
 				READ(read_uint16(&flags, f));
@@ -655,7 +655,7 @@ static void LoadNicks()
 				continue;
 			}
 
-			NickAlias *na = new NickAlias(nick, nc);
+			auto *na = new NickAlias(nick, nc);
 			na->last_usermask = last_usermask;
 			na->last_realname = last_realname;
 			na->last_quit = last_quit;
@@ -750,7 +750,7 @@ static void LoadChannels()
 			Anope::string buffer;
 			char namebuf[64];
 			READ(read_buffer(namebuf, f));
-			ChannelInfo *ci = new ChannelInfo(namebuf);
+			auto *ci = new ChannelInfo(namebuf);
 
 			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "cs_secure", "secureops", "securefounder",
 				"signkick", "signkick_level", "topiclock", "persist", "noautoop", "cs_keepmodes" };
@@ -950,7 +950,7 @@ static void LoadChannels()
 			{
 				READ(read_uint32(&tmpu32, f));
 				READ(read_uint16(&tmpu16, f));
-				Memo *m = new Memo;
+				auto *m = new Memo;
 				READ(read_int32(&tmp32, f));
 				m->time = tmp32;
 				char sbuf[32];
@@ -1139,7 +1139,7 @@ static void LoadOper()
 		if (!akill)
 			continue;
 
-		XLine *x = new XLine(user + "@" + host, by, expires, reason, XLineManager::GenerateUID());
+		auto *x = new XLine(user + "@" + host, by, expires, reason, XLineManager::GenerateUID());
 		x->created = seton;
 		akill->AddXLine(x);
 	}
@@ -1159,7 +1159,7 @@ static void LoadOper()
 		if (!snline)
 			continue;
 
-		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		auto *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
 		x->created = seton;
 		snline->AddXLine(x);
 	}
@@ -1179,7 +1179,7 @@ static void LoadOper()
 		if (!sqline)
 			continue;
 
-		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		auto *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
 		x->created = seton;
 		sqline->AddXLine(x);
 	}
@@ -1199,7 +1199,7 @@ static void LoadOper()
 		if (!szline)
 			continue;
 
-		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		auto *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
 		x->created = seton;
 		szline->AddXLine(x);
 	}

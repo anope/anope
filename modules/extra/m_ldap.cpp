@@ -350,7 +350,7 @@ public:
 
 	void Bind(LDAPInterface *i, const Anope::string &who, const Anope::string &pass) override
 	{
-		LDAPBind *b = new LDAPBind(this, i, who, pass);
+		auto *b = new LDAPBind(this, i, who, pass);
 		QueueRequest(b);
 	}
 
@@ -359,25 +359,25 @@ public:
 		if (i == NULL)
 			throw LDAPException("No interface");
 
-		LDAPSearchRequest *s = new LDAPSearchRequest(this, i, base, filter);
+		auto *s = new LDAPSearchRequest(this, i, base, filter);
 		QueueRequest(s);
 	}
 
 	void Add(LDAPInterface *i, const Anope::string &dn, LDAPMods &attributes) override
 	{
-		LDAPAdd *add = new LDAPAdd(this, i, dn, attributes);
+		auto *add = new LDAPAdd(this, i, dn, attributes);
 		QueueRequest(add);
 	}
 
 	void Del(LDAPInterface *i, const Anope::string &dn) override
 	{
-		LDAPDel *del = new LDAPDel(this, i, dn);
+		auto *del = new LDAPDel(this, i, dn);
 		QueueRequest(del);
 	}
 
 	void Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) override
 	{
-		LDAPModify *mod = new LDAPModify(this, i, base, attributes);
+		auto *mod = new LDAPModify(this, i, base, attributes);
 		QueueRequest(mod);
 	}
 
@@ -566,7 +566,7 @@ public:
 
 				try
 				{
-					LDAPService *ss = new LDAPService(this, connname, server, admin_binddn, admin_password);
+					auto *ss = new LDAPService(this, connname, server, admin_binddn, admin_password);
 					ss->Start();
 					this->LDAPServices.emplace(connname, ss);
 

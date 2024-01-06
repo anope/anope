@@ -749,7 +749,7 @@ public:
 
 		req->SetSecs(timeout);
 
-		Packet *p = new Packet(this, &this->addrs);
+		auto *p = new Packet(this, &this->addrs);
 		p->flags = QUERYFLAGS_RD;
 		p->id = req->id;
 		p->questions.push_back(*req);
@@ -789,7 +789,7 @@ public:
 				return true;
 			}
 
-			Packet *packet = new Packet(recv_packet);
+			auto *packet = new Packet(recv_packet);
 			packet->flags |= QUERYFLAGS_QR; /* This is a response */
 			packet->flags |= QUERYFLAGS_AA; /* And we are authoritative */
 
@@ -928,7 +928,7 @@ public:
 			if (!addr.valid())
 				return;
 
-			Packet *packet = new Packet(this, &addr);
+			auto *packet = new Packet(this, &addr);
 			packet->flags = QUERYFLAGS_AA | QUERYFLAGS_OPCODE_NOTIFY;
 			try
 			{

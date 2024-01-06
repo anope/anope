@@ -366,7 +366,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			return;
 		}
 
-		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
+		auto *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
 			x->id = XLineManager::GenerateUID();
 
@@ -572,7 +572,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			return;
 		}
 
-		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
+		auto *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
 			x->id = XLineManager::GenerateUID();
 

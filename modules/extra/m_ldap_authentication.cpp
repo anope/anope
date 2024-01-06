@@ -254,7 +254,7 @@ public:
 		if (!this->ldap)
 			return;
 
-		IdentifyInfo *ii = new IdentifyInfo(u, req, this->ldap);
+		auto *ii = new IdentifyInfo(u, req, this->ldap);
 		this->ldap->BindAsAdmin(new IdentifyInterface(this, ii));
 	}
 

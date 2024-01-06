@@ -106,7 +106,7 @@ private:
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			XLine *xline = new XLine("*@" + u->host, old->by, old->expires, old->reason, old->id);
+			auto *xline = new XLine("*@" + u->host, old->by, old->expires, old->reason, old->id);
 			old->manager->AddXLine(xline);
 			x = xline;
 

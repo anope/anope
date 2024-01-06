@@ -127,7 +127,7 @@ private:
 			request.reply("error", "Invalid parameters");
 		else
 		{
-			XMLRPCIdentifyRequest *req = new XMLRPCIdentifyRequest(me, request, client, iface, username, password);
+			auto *req = new XMLRPCIdentifyRequest(me, request, client, iface, username, password);
 			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 			req->Dispatch();
 			return false;

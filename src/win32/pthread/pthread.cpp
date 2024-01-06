@@ -36,7 +36,7 @@ int pthread_attr_setdetachstate(pthread_attr_t *, int)
 
 int pthread_create(pthread_t *thread, const pthread_attr_t *, void *(*entry)(void *), void *param)
 {
-	ThreadInfo *ti = new ThreadInfo;
+	auto *ti = new ThreadInfo;
 	ti->entry = entry;
 	ti->param = param;
 

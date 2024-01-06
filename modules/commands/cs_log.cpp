@@ -232,7 +232,7 @@ public:
 				}
 			}
 
-			LogSetting *log = new LogSettingImpl();
+			auto *log = new LogSettingImpl();
 			log->chan = ci->name;
 			log->service_name = service_name;
 			if (bi)
@@ -330,7 +330,7 @@ public:
 		LogSettings *ls = logsettings.Require(ci);
 		for (auto &d : defaults)
 		{
-			LogSetting *log = new LogSettingImpl();
+			auto *log = new LogSettingImpl();
 			log->chan = ci->name;
 
 			if (!d.service.empty())

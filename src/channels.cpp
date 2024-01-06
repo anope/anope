@@ -142,7 +142,7 @@ ChanUserContainer* Channel::JoinUser(User *user, const ChannelStatus *status)
 	if (user->server && user->server->IsSynced())
 		Log(user, this, "join");
 
-	ChanUserContainer *cuc = new ChanUserContainer(user, this);
+	auto *cuc = new ChanUserContainer(user, this);
 	user->chans[this] = cuc;
 	this->users[user] = cuc;
 	if (status)

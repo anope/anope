@@ -593,7 +593,7 @@ struct IRCDMessageSVSMode : IRCDMessage
 		if (!params[1].is_pos_number_only() || convertTo<time_t>(params[1]) != u->timestamp)
 			return;
 
-		u->SetModesInternal(source, "%s", params[2].c_str());
+		u->SetModesInternal(source, params[2]);
 	}
 };
 

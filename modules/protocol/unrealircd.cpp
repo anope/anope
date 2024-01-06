@@ -1153,7 +1153,7 @@ struct IRCDMessageMode : IRCDMessage
 		{
 			User *u = User::Find(params[0]);
 			if (u)
-				u->SetModesInternal(source, "%s", params[1].c_str());
+				u->SetModesInternal(source, params[1]);
 		}
 	}
 };
@@ -1622,7 +1622,7 @@ struct IRCDMessageUmode2 : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		source.GetUser()->SetModesInternal(source, "%s", params[0].c_str());
+		source.GetUser()->SetModesInternal(source, params[0]);
 	}
 };
 

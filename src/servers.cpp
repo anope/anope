@@ -52,7 +52,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 			{
 				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : IRCD->DefaultPseudoclientModes;
 
-				bi->SetModesInternal(bi, modes.c_str());
+				bi->SetModesInternal(bi, modes);
 				for (const auto &botchannel : bi->botchannels)
 				{
 					size_t h = botchannel.find('#');

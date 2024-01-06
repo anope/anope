@@ -1690,7 +1690,7 @@ struct IRCDMessageMode : IRCDMessage
 			 */
 			User *u = User::Find(params[0]);
 			if (u)
-				u->SetModesInternal(source, "%s", params[1].c_str());
+				u->SetModesInternal(source, params[1]);
 		}
 	}
 };

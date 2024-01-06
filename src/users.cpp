@@ -50,7 +50,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->server = sserver;
 	this->realname = srealname;
 	this->timestamp = this->signon = ts;
-	this->SetModesInternal(sserver, "%s", smodes.c_str());
+	this->SetModesInternal(sserver, smodes);
 	this->uid = suid;
 	this->super_admin = false;
 	this->nc = NULL;
@@ -664,16 +664,21 @@ void User::SetModesInternal(const MessageSource &source, const char *umodes, ...
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
-	Anope::string modebuf, sbuf;
-	int add = -1;
 	va_start(args, umodes);
 	vsnprintf(buf, BUFSIZE - 1, umodes, args);
 	va_end(args);
 
-	if (this->server && this->server->IsSynced() && Anope::string(buf) != "+")
-		Log(this, "mode") << "changes modes to " << buf;
+	SetModesInternal(source, Anope::string(buf));
+}
 
-	spacesepstream sep(buf);
+void User::SetModesInternal(const MessageSource &source, const Anope::string &umodes)
+{
+	if (this->server && this->server->IsSynced() && Anope::string(umodes) != "+")
+		Log(this, "mode") << "changes modes to " << umodes;
+
+	int add = -1;
+	Anope::string modebuf;
+	spacesepstream sep(umodes);
 	sep.GetToken(modebuf);
 	for (auto mode : modebuf)
 	{
@@ -697,6 +702,7 @@ void User::SetModesInternal(const MessageSource &source, const char *umodes, ...
 
 		if (add)
 		{
+			Anope::string sbuf;
 			if (um->type == MODE_PARAM && sep.GetToken(sbuf))
 				this->SetModeInternal(source, um, sbuf);
 			else

@@ -309,6 +309,7 @@ public:
 	 * @param umodes The modes
 	 */
 	void SetModesInternal(const MessageSource &source, const char *umodes, ...) ATTR_FORMAT(3, 4);
+	void SetModesInternal(const MessageSource &source, const Anope::string &umodes);
 
 	/** Get modes set for this user.
 	 * @return A string of modes set on the user

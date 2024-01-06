@@ -229,7 +229,7 @@ void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> 
 		User *u = User::Find(params[0]);
 
 		if (u)
-			u->SetModesInternal(source, "%s", buf.substr(1).c_str());
+			u->SetModesInternal(source, buf.substr(1));
 	}
 }
 

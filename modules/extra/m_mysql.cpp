@@ -115,7 +115,7 @@ class MySQLService : public Provider
 	Anope::string server;
 	Anope::string user;
 	Anope::string password;
-	int port;
+	unsigned int port;
 
 	MYSQL *sql = nullptr;
 
@@ -235,7 +235,7 @@ public:
 				const Anope::string &server = block->Get<const Anope::string>("server", "127.0.0.1");
 				const Anope::string &user = block->Get<const Anope::string>("username", "anope");
 				const Anope::string &password = block->Get<const Anope::string>("password");
-				int port = block->Get<int>("port", "3306");
+				unsigned int port = block->Get<unsigned int>("port", "3306");
 
 				try
 				{
@@ -297,8 +297,13 @@ public:
 	}
 };
 
-MySQLService::MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, int po)
-: Provider(o, n), database(d), server(s), user(u), password(p), port(po)
+MySQLService::MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, unsigned int po)
+	: Provider(o, n)
+	, database(d)
+	, server(s)
+	, user(u)
+	, password(p)
+	, port(po)
 {
 	Connect();
 }

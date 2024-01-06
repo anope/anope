@@ -204,7 +204,7 @@ public:
 	 * @param enforce_mlock Should mlock be enforced on this mode change
 	 * @param cmodes The modes to set
 	 */
-	void SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...);
+	void SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...) ATTR_FORMAT(4, 5);
 
 	/** Set a string of modes internally on a channel
 	 * @param source The setter
@@ -233,7 +233,7 @@ public:
 	 * @param reason The reason for the kick
 	 * @return true if the kick was successful, false if a module blocked the kick
 	 */
-	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...);
+	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...) ATTR_FORMAT(4, 5);
 
 	/** Get all modes set on this channel, excluding status modes.
 	 * @return a map of modes and their optional parameters.

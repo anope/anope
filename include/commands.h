@@ -77,7 +77,7 @@ public:
 	AccessGroup AccessFor(ChannelInfo *ci);
 	bool IsFounder(ChannelInfo *ci);
 
-	void Reply(const char *message, ...);
+	void Reply(const char *message, ...) ATTR_FORMAT(2, 3);
 	void Reply(const Anope::string &message);
 
 	bool HasCommand(const Anope::string &cmd);

@@ -188,7 +188,7 @@ public:
 	 * @param fmt Format of the Message
 	 * @param ... any number of parameters
 	 */
-	void SendMessage(BotInfo *source, const char *fmt, ...);
+	void SendMessage(BotInfo *source, const char *fmt, ...) ATTR_FORMAT(3, 4);
 	void SendMessage(BotInfo *source, const Anope::string &msg) override;
 
 	/** Identify the user to a nick.
@@ -302,13 +302,13 @@ public:
 	 * @param bi The client setting the modes
 	 * @param umodes The modes
 	 */
-	void SetModes(BotInfo *bi, const char *umodes, ...);
+	void SetModes(BotInfo *bi, const char *umodes, ...) ATTR_FORMAT(3, 4);
 
 	/** Set a string of modes on a user internally
 	 * @param setter who/what is setting the mode
 	 * @param umodes The modes
 	 */
-	void SetModesInternal(const MessageSource &source, const char *umodes, ...);
+	void SetModesInternal(const MessageSource &source, const char *umodes, ...) ATTR_FORMAT(3, 4);
 
 	/** Get modes set for this user.
 	 * @return A string of modes set on the user

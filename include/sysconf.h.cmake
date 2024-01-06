@@ -31,3 +31,9 @@
 # endif
 # define sleep(x) Sleep(x * 1000)
 #endif
+
+#if defined __GNUC__
+# define ATTR_FORMAT(STRINGPOS, FIRSTPOS) __attribute__((format(printf, STRINGPOS, FIRSTPOS)))
+#else
+# define ATTR_FORMAT(STRINGPOS, FIRSTPOS)
+#endif

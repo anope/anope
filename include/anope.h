@@ -476,7 +476,7 @@ namespace Anope
 	 * @param ... any number of parameters
 	 * @return a Anope::string
 	 */
-	extern CoreExport string printf(const char *fmt, ...);
+	extern CoreExport string printf(const char *fmt, ...) ATTR_FORMAT(1, 2);
 
 	/** Return the last error code
 	 * @return The error code

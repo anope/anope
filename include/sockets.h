@@ -319,7 +319,7 @@ public:
 protected:
 	virtual void Write(const char *buffer, size_t l);
 public:
-	void Write(const char *message, ...);
+	void Write(const char *message, ...) ATTR_FORMAT(2, 3);
 	void Write(const Anope::string &message);
 
 	/** Get the length of the read buffer
@@ -367,7 +367,7 @@ public:
 	 * @param l The length of the data; if 0 then this function returns without doing anything
 	 */
 	virtual void Write(const char *buffer, size_t l);
-	void Write(const char *message, ...);
+	void Write(const char *message, ...) ATTR_FORMAT(2, 3);
 	void Write(const Anope::string &message);
 
 	/** Called with data from the socket

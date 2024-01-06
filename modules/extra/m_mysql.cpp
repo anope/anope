@@ -131,7 +131,7 @@ public:
 	 */
 	Mutex Lock;
 
-	MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, int po);
+	MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, unsigned int po);
 
 	~MySQLService();
 

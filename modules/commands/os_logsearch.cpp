@@ -127,7 +127,7 @@ public:
 			fd.close();
 		}
 
-		unsigned int found = matches.size();
+		size_t found = matches.size();
 		if (!found)
 		{
 			source.Reply(_("No matches for \002%s\002 found."), search_string.c_str());
@@ -146,10 +146,10 @@ public:
 		}
 
 		source.Reply(_("Matches for \002%s\002:"), search_string.c_str());
-		unsigned int count = 0;
+		size_t count = 0;
 		for (const auto &match : matches)
-			source.Reply("#%d: %s", ++count, match.c_str());
-		source.Reply(_("Showed %d/%d matches for \002%s\002."), matches.size(), found, search_string.c_str());
+			source.Reply("#%zu: %s", ++count, match.c_str());
+		source.Reply(_("Showed %zu/%zu matches for \002%s\002."), matches.size(), found, search_string.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

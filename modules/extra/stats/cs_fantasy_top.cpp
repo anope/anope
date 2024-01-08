@@ -149,7 +149,7 @@ public:
 				source.Reply(_("Top %i of %s"), limit, (is_global ? "Network" : channel.c_str()));
 				for (int i = 0; i < res.Rows(); ++i)
 				{
-					source.Reply(_("%2lu \002%-16s\002 letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"),
+					source.Reply(_("%2d \002%-16s\002 letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"),
 						i+1, res.Get(i, "nick").c_str(), res.Get(i, "letters").c_str(),
 						res.Get(i, "words").c_str(), res.Get(i, "line").c_str(),
 						res.Get(i, "smileys").c_str(), res.Get(i, "actions").c_str());

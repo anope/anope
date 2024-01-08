@@ -122,7 +122,7 @@ public:
 		source.Reply(_("Enables or disables %s's autoop feature for a\n"
 			"channel. When disabled, users who join the channel will\n"
 			"not automatically gain any status from %s."), source.service->nick.c_str(),
-			source.service->nick.c_str(), this->name.c_str());
+			source.service->nick.c_str());
 		return true;
 	}
 };
@@ -189,7 +189,7 @@ public:
 				"0: ban in the form *!user@host\n"
 				"1: ban in the form *!*user@host\n"
 				"2: ban in the form *!*@host\n"
-				"3: ban in the form *!*user@*.domain"), this->name.c_str());
+				"3: ban in the form *!*user@*.domain"));
 		return true;
 	}
 };
@@ -251,7 +251,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Sets the description for the channel, which shows up with\n"
-				"the \002LIST\002 and \002INFO\002 commands."), this->name.c_str());
+				"the \002LIST\002 and \002INFO\002 commands."));
 		return true;
 	}
 };
@@ -320,7 +320,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Changes the founder of a channel. The new nickname must\n"
-				"be a registered one."), this->name.c_str());
+				"be a registered one."));
 		return true;
 	}
 };

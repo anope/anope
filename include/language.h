@@ -111,9 +111,9 @@ namespace Language
 #define CHAN_INFO_HEADER		_("Information for channel \002%s\002:")
 #define CHAN_EXCEPTED			_("\002%s\002 matches an except on %s and cannot be banned until the except has been removed.")
 #define MEMO_NEW_X_MEMO_ARRIVED		_("There is a new memo on channel %s.\n" \
-						"Type \002%s%s READ %s %d\002 to read it.")
+						"Type \002%s%s READ %s %zu\002 to read it.")
 #define MEMO_NEW_MEMO_ARRIVED		_("You have a new memo from %s.\n" \
-						"Type \002%s%s READ %d\002 to read it.")
+						"Type \002%s%s READ %zu\002 to read it.")
 #define MEMO_HAVE_NO_MEMOS		_("You have no memos.")
 #define MEMO_X_HAS_NO_MEMOS		_("%s has no memos.")
 #define MEMO_SEND_DISABLED		_("Sorry, memo sending is temporarily disabled.")

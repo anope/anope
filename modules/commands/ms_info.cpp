@@ -80,18 +80,19 @@ public:
 			}
 			else
 			{
-				unsigned count = 0, i, end;
-				for (i = 0, end = mi->memos->size(); i < end; ++i)
+				size_t count = 0;
+				for (size_t i = 0; i < mi->memos->size(); ++i)
 					if (mi->GetMemo(i)->unread)
 						++count;
+
 				if (count == mi->memos->size())
-					source.Reply(_("%s currently has \002%d\002 memos; all of them are unread."), nname.c_str(), count);
+					source.Reply(_("%s currently has \002%zu\002 memos; all of them are unread."), nname.c_str(), count);
 				else if (!count)
-					source.Reply(_("%s currently has \002%d\002 memos."), nname.c_str(), mi->memos->size());
+					source.Reply(_("%s currently has \002%zu\002 memos."), nname.c_str(), mi->memos->size());
 				else if (count == 1)
-					source.Reply(_("%s currently has \002%d\002 memos, of which \0021\002 is unread."), nname.c_str(), mi->memos->size());
+					source.Reply(_("%s currently has \002%zu\002 memos, of which \0021\002 is unread."), nname.c_str(), mi->memos->size());
 				else
-					source.Reply(_("%s currently has \002%d\002 memos, of which \002%d\002 are unread."), nname.c_str(), mi->memos->size(), count);
+					source.Reply(_("%s currently has \002%zu\002 memos, of which \002%zu\002 are unread."), nname.c_str(), mi->memos->size(), count);
 			}
 			if (!mi->memomax)
 			{
@@ -137,18 +138,19 @@ public:
 			}
 			else
 			{
-				unsigned count = 0, i, end;
-				for (i = 0, end = mi->memos->size(); i < end; ++i)
+				size_t count = 0;
+				for (size_t i = 0; i < mi->memos->size(); ++i)
 					if (mi->GetMemo(i)->unread)
 						++count;
+
 				if (count == mi->memos->size())
-					source.Reply(_("You currently have \002%d\002 memos; all of them are unread."), count);
+					source.Reply(_("You currently have \002%zu\002 memos; all of them are unread."), count);
 				else if (!count)
-					source.Reply(_("You currently have \002%d\002 memos."), mi->memos->size());
+					source.Reply(_("You currently have \002%zu\002 memos."), mi->memos->size());
 				else if (count == 1)
-					source.Reply(_("You currently have \002%d\002 memos, of which \0021\002 is unread."), mi->memos->size());
+					source.Reply(_("You currently have \002%zu\002 memos, of which \0021\002 is unread."), mi->memos->size());
 				else
-					source.Reply(_("You currently have \002%d\002 memos, of which \002%d\002 are unread."), mi->memos->size(), count);
+					source.Reply(_("You currently have \002%zu\002 memos, of which \002%zu\002 are unread."), mi->memos->size(), count);
 			}
 
 			if (!mi->memomax)

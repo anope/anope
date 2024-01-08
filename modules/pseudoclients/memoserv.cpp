@@ -187,9 +187,9 @@ public:
 		if (c->ci && !c->ci->memos.memos->empty() && c->ci->AccessFor(u).HasPriv("MEMO"))
 		{
 			if (c->ci->memos.memos->size() == 1)
-				u->SendMessage(MemoServ, _("There is \002%d\002 memo on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
+				u->SendMessage(MemoServ, _("There is \002%zu\002 memo on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
 			else
-				u->SendMessage(MemoServ, _("There are \002%d\002 memos on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
+				u->SendMessage(MemoServ, _("There are \002%zu\002 memos on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
 		}
 	}
 

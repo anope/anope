@@ -68,7 +68,7 @@ private:
 		if (akills)
 		{
 			/* AKILLs */
-			source.Reply(_("Current number of AKILLs: \002%d\002"), akills->GetCount());
+			source.Reply(_("Current number of AKILLs: \002%zu\002"), akills->GetCount());
 			timeout = Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d") + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default AKILL expiry time: \002%d days\002"), timeout / 86400);
@@ -88,7 +88,7 @@ private:
 		if (snlines)
 		{
 			/* SNLINEs */
-			source.Reply(_("Current number of SNLINEs: \002%d\002"), snlines->GetCount());
+			source.Reply(_("Current number of SNLINEs: \002%zu\002"), snlines->GetCount());
 			timeout = Config->GetModule("operserv")->Get<time_t>("snlineexpiry", "30d") + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default SNLINE expiry time: \002%d days\002"), timeout / 86400);
@@ -108,7 +108,7 @@ private:
 		if (sqlines)
 		{
 			/* SQLINEs */
-			source.Reply(_("Current number of SQLINEs: \002%d\002"), sqlines->GetCount());
+			source.Reply(_("Current number of SQLINEs: \002%zu\002"), sqlines->GetCount());
 			timeout = Config->GetModule("operserv")->Get<time_t>("sglineexpiry", "30d") + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default SQLINE expiry time: \002%d days\002"), timeout / 86400);
@@ -137,7 +137,7 @@ private:
 	void DoStatsUptime(CommandSource &source)
 	{
 		time_t uptime = Anope::CurTime - Anope::StartTime;
-		source.Reply(_("Current users: \002%d\002 (\002%d\002 ops)"), UserListByNick.size(), OperCount);
+		source.Reply(_("Current users: \002%zu\002 (\002%d\002 ops)"), UserListByNick.size(), OperCount);
 		source.Reply(_("Maximum users: \002%d\002 (%s)"), MaxUserCount, Anope::strftime(MaxUserTime, source.GetAccount()).c_str());
 		source.Reply(_("Services up %s."), Anope::Duration(uptime, source.GetAccount()).c_str());
 
@@ -171,30 +171,30 @@ private:
 		size_t entries, buckets, max_chain;
 
 		GetHashStats(UserListByNick, entries, buckets, max_chain);
-		source.Reply(_("Users (nick): %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		source.Reply(_("Users (nick): %lu entries, %lu buckets, longest chain is %zu"), entries, buckets, max_chain);
 
 		if (!UserListByUID.empty())
 		{
 			GetHashStats(UserListByUID, entries, buckets, max_chain);
-			source.Reply(_("Users (uid): %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+			source.Reply(_("Users (uid): %lu entries, %lu buckets, longest chain is %zu"), entries, buckets, max_chain);
 		}
 
 		GetHashStats(ChannelList, entries, buckets, max_chain);
-		source.Reply(_("Channels: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		source.Reply(_("Channels: %zu entries, %zu buckets, longest chain is %zu"), entries, buckets, max_chain);
 
 		GetHashStats(*RegisteredChannelList, entries, buckets, max_chain);
-		source.Reply(_("Registered channels: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		source.Reply(_("Registered channels: %zu entries, %zu buckets, longest chain is %zu"), entries, buckets, max_chain);
 
 		GetHashStats(*NickAliasList, entries, buckets, max_chain);
-		source.Reply(_("Registered nicknames: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		source.Reply(_("Registered nicknames: %zu entries, %zu buckets, longest chain is %zu"), entries, buckets, max_chain);
 
 		GetHashStats(*NickCoreList, entries, buckets, max_chain);
-		source.Reply(_("Registered nick groups: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		source.Reply(_("Registered nick groups: %zu entries, %zu buckets, longest chain is %zu"), entries, buckets, max_chain);
 
 		if (session_service)
 		{
 			GetHashStats(session_service->GetSessions(), entries, buckets, max_chain);
-			source.Reply(_("Sessions: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+			source.Reply(_("Sessions: %zu entries, %zu buckets, longest chain is %zu"), entries, buckets, max_chain);
 		}
 	}
 

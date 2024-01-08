@@ -36,7 +36,7 @@ public:
 		unsigned nicklen = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
 		if (newnick.length() > nicklen)
 		{
-			source.Reply(_("Nick \002%s\002 was truncated to %d characters."), newnick.c_str(), nicklen, newnick.c_str());
+			source.Reply(_("Nick \002%s\002 was truncated to %u characters."), newnick.c_str(), nicklen);
 			newnick = params[1].substr(0, nicklen);
 		}
 

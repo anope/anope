@@ -488,7 +488,7 @@ public:
 			source.Reply(_(" \n"
 				"Accounts that are not used anymore are subject to\n"
 				"the automatic expiration, i.e. they will be deleted\n"
-				"after %d days if not used."), nickserv_expire / 86400);
+				"after %lu days if not used."), (unsigned long)nickserv_expire / 86400);
 	}
 
 	void OnNickCoreCreate(NickCore *nc) override

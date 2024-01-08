@@ -12,6 +12,11 @@
 #include "module.h"
 #include "modules/os_news.h"
 
+// TODO: msgarray breaks the format string checking
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wformat-security"
+#endif
+
 /* List of messages for each news type.  This simplifies message sending. */
 
 enum

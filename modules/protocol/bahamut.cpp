@@ -281,7 +281,7 @@ public:
 
 	void SendLogin(User *u, NickAlias *) override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %d", u->signon);
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %ld", (unsigned long)u->signon);
 	}
 
 	void SendLogout(User *u) override

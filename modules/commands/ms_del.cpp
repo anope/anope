@@ -98,7 +98,7 @@ public:
 				/* Delete last memo. */
 				FOREACH_MOD(OnMemoDel, (ci ? ci->name : source.nc->display, mi, mi->GetMemo(mi->memos->size() - 1)));
 				mi->Del(mi->memos->size() - 1);
-				source.Reply(_("Memo %d has been deleted."), mi->memos->size() + 1);
+				source.Reply(_("Memo %zu has been deleted."), mi->memos->size() + 1);
 				if (ci)
 					Log(LOG_COMMAND, source, this, ci) << "on LAST memo";
 			}

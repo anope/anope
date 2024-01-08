@@ -152,7 +152,8 @@ public:
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		if (u && !u->HasMode("OPER") && nickregdelay && Anope::CurTime - u->timestamp < nickregdelay)
 		{
-			source.Reply(_("You must have been using this nick for at least %d seconds to register."), nickregdelay);
+			source.Reply(_("You must have been using this nick for at least %lu seconds to register."),
+				(unsigned long)nickregdelay);
 			return;
 		}
 
@@ -198,7 +199,10 @@ public:
 		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
 			this->OnSyntaxError(source, "");
 		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
-			source.Reply(_("Please wait %d seconds before using the REGISTER command again."), (u->lastnickreg + reg_delay) - Anope::CurTime);
+		{
+			source.Reply(_("Please wait %lu seconds before using the REGISTER command again."),
+				(unsigned long)(u->lastnickreg + reg_delay) - Anope::CurTime);
+		}
 		else if (NickAlias::Find(u_nick) != NULL)
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());
 		else if (pass.equals_ci(u_nick))

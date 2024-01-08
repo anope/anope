@@ -356,7 +356,7 @@ public:
 				ListFormatter list(source.GetAccount());
 				list.AddColumn(_("Mask")).AddColumn(_("Type")).AddColumn(_("Creator")).AddColumn(_("Expires")).AddColumn(_("Reason"));
 
-				unsigned shown = 0;
+				size_t shown = 0;
 				for (auto *forbid : forbids)
 				{
 					if (ftype != FT_SIZE && ftype != forbid->type)
@@ -401,7 +401,7 @@ public:
 					if (shown >= forbids.size())
 						source.Reply(_("End of forbid list."));
 					else
-						source.Reply(_("End of forbid list - %d/%d entries shown."), shown, forbids.size());
+						source.Reply(_("End of forbid list - %zu/%zu entries shown."), shown, forbids.size());
 				}
 			}
 		}

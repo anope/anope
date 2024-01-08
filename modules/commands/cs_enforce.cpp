@@ -203,7 +203,7 @@ private:
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("LIMIT enforced on %s, %d users removed."), ci->name.c_str(), users.size());
+		source.Reply(_("LIMIT enforced on %s, %zu users removed."), ci->name.c_str(), users.size());
 	}
 
 public:

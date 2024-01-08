@@ -258,7 +258,7 @@ public:
 			"commands are listed below; to use them, type\n"
 			"\002%s%s \037command\037\002. For more information on a\n"
 			"specific command, type \002%s%s HELP \037command\037\002.\n"),
-			ChanServ->nick.c_str(), ChanServ->nick.c_str(), Config->StrictPrivmsg.c_str(), ChanServ->nick.c_str(), Config->StrictPrivmsg.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str(), source.command.c_str());
+			ChanServ->nick.c_str(), ChanServ->nick.c_str(),  Config->StrictPrivmsg.c_str(), ChanServ->nick.c_str(), Config->StrictPrivmsg.c_str(), ChanServ->nick.c_str());
 		return EVENT_CONTINUE;
 	}
 
@@ -269,9 +269,9 @@ public:
 		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "30d");
 		if (chanserv_expire >= 86400)
 			source.Reply(_(" \n"
-				"Note that any channel which is not used for %d days\n"
+				"Note that any channel which is not used for %lu days\n"
 				"(i.e. which no user on the channel's access list enters\n"
-				"for that period of time) will be automatically dropped."), chanserv_expire / 86400);
+				"for that period of time) will be automatically dropped."), (unsigned long)chanserv_expire / 86400);
 		if (source.IsServicesOper())
 			source.Reply(_(" \n"
 				"Services Operators can also, depending on their access drop\n"

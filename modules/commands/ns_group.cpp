@@ -146,7 +146,7 @@ public:
 		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (user && Anope::CurTime < user->lastnickreg + reg_delay)
-			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (reg_delay + user->lastnickreg) - Anope::CurTime);
+			source.Reply(_("Please wait %lu seconds before using the GROUP command again."), (unsigned long)(reg_delay + user->lastnickreg) - Anope::CurTime);
 		else if (target->nc->HasExt("NS_SUSPENDED"))
 		{
 			Log(LOG_COMMAND, source, this) << "and tried to group to SUSPENDED nick " << target->nick;
@@ -352,7 +352,7 @@ public:
 		for (const auto &reply : replies)
 			source.Reply(reply);
 
-		source.Reply(_("%d nickname(s) in the group."), nc->aliases->size());
+		source.Reply(_("%zu nickname(s) in the group."), nc->aliases->size());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

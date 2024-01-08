@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-05 21:34+0000\n"
-"PO-Revision-Date: 2024-01-05 21:36+0000\n"
+"POT-Creation-Date: 2024-01-08 13:20+0000\n"
+"PO-Revision-Date: 2024-01-08 13:26+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -840,12 +840,12 @@ msgid ""
 " \n"
 "Accounts that are not used anymore are subject to\n"
 "the automatic expiration, i.e. they will be deleted\n"
-"after %d days if not used."
+"after %lu days if not used."
 msgstr ""
 " \n"
 "Accounts that are not used anymore are subject to\n"
 "the automatic expiration, i.e. they will be deleted\n"
-"after %d days if not used."
+"after %lu days if not used."
 
 msgid ""
 " \n"
@@ -941,12 +941,12 @@ msgstr ""
 #, c-format
 msgid ""
 " \n"
-"Note that any channel which is not used for %d days\n"
+"Note that any channel which is not used for %lu days\n"
 "(i.e. which no user on the channel's access list enters\n"
 "for that period of time) will be automatically dropped."
 msgstr ""
 " \n"
-"Note that any channel which is not used for %d days\n"
+"Note that any channel which is not used for %lu days\n"
 "(i.e. which no user on the channel's access list enters\n"
 "for that period of time) will be automatically dropped."
 
@@ -1267,8 +1267,8 @@ msgid "%-8s %s"
 msgstr "%-8s %s"
 
 #, c-format
-msgid "%2lu %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
-msgstr "%2lu %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
+msgid "%2d %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
+msgstr "%2d %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
 
 msgid "%b %d %Y %H:%M:%S %Z"
 msgstr "%b %d %Y %H:%M:%S %Z"
@@ -1296,10 +1296,6 @@ msgstr "%d bots available."
 #, c-format
 msgid "%d modules loaded."
 msgstr "%d modules loaded."
-
-#, c-format
-msgid "%d nickname(s) in the group."
-msgstr "%d nickname(s) in the group."
 
 #, c-format
 msgid "%lu nicks are stored in the database, using %.2Lf kB of memory."
@@ -1418,20 +1414,20 @@ msgid "%s coverage is too wide; Please use a more specific mask."
 msgstr "%s coverage is too wide; Please use a more specific mask."
 
 #, c-format
-msgid "%s currently has %d memos, of which %d are unread."
-msgstr "%s currently has %d memos, of which %d are unread."
+msgid "%s currently has %zu memos, of which %zu are unread."
+msgstr "%s currently has %zu memos, of which %zu are unread."
 
 #, c-format
-msgid "%s currently has %d memos, of which 1 is unread."
-msgstr "%s currently has %d memos, of which 1 is unread."
+msgid "%s currently has %zu memos, of which 1 is unread."
+msgstr "%s currently has %zu memos, of which 1 is unread."
 
 #, c-format
-msgid "%s currently has %d memos."
-msgstr "%s currently has %d memos."
+msgid "%s currently has %zu memos."
+msgstr "%s currently has %zu memos."
 
 #, c-format
-msgid "%s currently has %d memos; all of them are unread."
-msgstr "%s currently has %d memos; all of them are unread."
+msgid "%s currently has %zu memos; all of them are unread."
+msgstr "%s currently has %zu memos; all of them are unread."
 
 #, c-format
 msgid "%s currently has 1 memo, and it has not yet been read."
@@ -1632,6 +1628,10 @@ msgstr "%s's memo limit is %d, and may not be changed."
 #, c-format
 msgid "%s's memo limit is %d."
 msgstr "%s's memo limit is %d."
+
+#, c-format
+msgid "%zu nickname(s) in the group."
+msgstr "%zu nickname(s) in the group."
 
 #, c-format
 msgid "(%s ago)"
@@ -3016,8 +3016,8 @@ msgid "Channels that %s has access on:"
 msgstr "Channels that %s has access on:"
 
 #, c-format
-msgid "Channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Channels: %lu entries, %lu buckets, longest chain is %d"
+msgid "Channels: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Channels: %zu entries, %zu buckets, longest chain is %zu"
 
 msgid "Chanstats"
 msgstr "Chanstats"
@@ -3168,20 +3168,20 @@ msgid "Current module list:"
 msgstr "Current module list:"
 
 #, c-format
-msgid "Current number of AKILLs: %d"
-msgstr "Current number of AKILLs: %d"
+msgid "Current number of AKILLs: %zu"
+msgstr "Current number of AKILLs: %zu"
 
 #, c-format
-msgid "Current number of SNLINEs: %d"
-msgstr "Current number of SNLINEs: %d"
+msgid "Current number of SNLINEs: %zu"
+msgstr "Current number of SNLINEs: %zu"
 
 #, c-format
-msgid "Current number of SQLINEs: %d"
-msgstr "Current number of SQLINEs: %d"
+msgid "Current number of SQLINEs: %zu"
+msgstr "Current number of SQLINEs: %zu"
 
 #, c-format
-msgid "Current users: %d (%d ops)"
-msgstr "Current users: %d (%d ops)"
+msgid "Current users: %zu (%d ops)"
+msgstr "Current users: %zu (%d ops)"
 
 msgid "DEL oper"
 msgstr "DEL oper"
@@ -3833,8 +3833,8 @@ msgid "End of entry message list."
 msgstr "End of entry message list."
 
 #, c-format
-msgid "End of forbid list - %d/%d entries shown."
-msgstr "End of forbid list - %d/%d entries shown."
+msgid "End of forbid list - %zu/%zu entries shown."
+msgstr "End of forbid list - %zu/%zu entries shown."
 
 msgid "End of forbid list."
 msgstr "End of forbid list."
@@ -4250,8 +4250,8 @@ msgid "LIMIT enforced by "
 msgstr "LIMIT enforced by "
 
 #, c-format
-msgid "LIMIT enforced on %s, %d users removed."
-msgstr "LIMIT enforced on %s, %d users removed."
+msgid "LIMIT enforced on %s, %zu users removed."
+msgstr "LIMIT enforced on %s, %zu users removed."
 
 msgid "LIST threshold"
 msgstr "LIST threshold"
@@ -4868,6 +4868,10 @@ msgstr "Memo %d from %s (%s)."
 msgid "Memo %d has been deleted."
 msgstr "Memo %d has been deleted."
 
+#, c-format
+msgid "Memo %zu has been deleted."
+msgstr "Memo %zu has been deleted."
+
 msgid "Memo ignore list is empty."
 msgstr "Memo ignore list is empty."
 
@@ -5103,8 +5107,8 @@ msgid "Nick %s isn't registered."
 msgstr "Nick %s isn't registered."
 
 #, c-format
-msgid "Nick %s was truncated to %d characters."
-msgstr "Nick %s was truncated to %d characters."
+msgid "Nick %s was truncated to %u characters."
+msgstr "Nick %s was truncated to %u characters."
 
 #, c-format
 msgid "Nick %s will expire."
@@ -5414,24 +5418,24 @@ msgid "Please use the symbol of # when attempting to register."
 msgstr "Please use the symbol of # when attempting to register."
 
 #, c-format
-msgid "Please wait %d seconds and retry."
-msgstr "Please wait %d seconds and retry."
+msgid "Please wait %lu seconds and retry."
+msgstr "Please wait %lu seconds and retry."
 
 #, c-format
-msgid "Please wait %d seconds before requesting a new vHost."
-msgstr "Please wait %d seconds before requesting a new vHost."
+msgid "Please wait %lu seconds before requesting a new vHost."
+msgstr "Please wait %lu seconds before requesting a new vHost."
 
 #, c-format
-msgid "Please wait %d seconds before using the %s command again."
-msgstr "Please wait %d seconds before using the %s command again."
+msgid "Please wait %lu seconds before using the %s command again."
+msgstr "Please wait %lu seconds before using the %s command again."
 
 #, c-format
-msgid "Please wait %d seconds before using the GROUP command again."
-msgstr "Please wait %d seconds before using the GROUP command again."
+msgid "Please wait %lu seconds before using the GROUP command again."
+msgstr "Please wait %lu seconds before using the GROUP command again."
 
 #, c-format
-msgid "Please wait %d seconds before using the REGISTER command again."
-msgstr "Please wait %d seconds before using the REGISTER command again."
+msgid "Please wait %lu seconds before using the REGISTER command again."
+msgstr "Please wait %lu seconds before using the REGISTER command again."
 
 #, c-format
 msgid "Pooled %s."
@@ -5619,16 +5623,16 @@ msgid "Registered"
 msgstr "Registered"
 
 #, c-format
-msgid "Registered channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Registered channels: %lu entries, %lu buckets, longest chain is %d"
+msgid "Registered channels: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Registered channels: %zu entries, %zu buckets, longest chain is %zu"
 
 #, c-format
-msgid "Registered nick groups: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Registered nick groups: %lu entries, %lu buckets, longest chain is %d"
+msgid "Registered nick groups: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Registered nick groups: %zu entries, %zu buckets, longest chain is %zu"
 
 #, c-format
-msgid "Registered nicknames: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Registered nicknames: %lu entries, %lu buckets, longest chain is %d"
+msgid "Registered nicknames: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Registered nicknames: %zu entries, %zu buckets, longest chain is %zu"
 
 #, c-format
 msgid "Registered only enforced on %s."
@@ -6189,8 +6193,8 @@ msgid "Session limiting is disabled."
 msgstr "Session limiting is disabled."
 
 #, c-format
-msgid "Sessions: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Sessions: %lu entries, %lu buckets, longest chain is %d"
+msgid "Sessions: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Sessions: %zu entries, %zu buckets, longest chain is %zu"
 
 msgid "Set SET-options on another nickname"
 msgstr "Set SET-options on another nickname"
@@ -6589,8 +6593,8 @@ msgid "Show status of services and network"
 msgstr "Show status of services and network"
 
 #, c-format
-msgid "Showed %d/%d matches for %s."
-msgstr "Showed %d/%d matches for %s."
+msgid "Showed %zu/%zu matches for %s."
+msgstr "Showed %zu/%zu matches for %s."
 
 msgid "Sign kicks that are done with the KICK command"
 msgstr "Sign kicks that are done with the KICK command"
@@ -7500,8 +7504,8 @@ msgstr ""
 "to release services's hold on your nick."
 
 #, c-format
-msgid "There are %d memos on channel %s."
-msgstr "There are %d memos on channel %s."
+msgid "There are %zu memos on channel %s."
+msgstr "There are %zu memos on channel %s."
 
 msgid ""
 "There are no bots available at this time.\n"
@@ -7525,16 +7529,16 @@ msgid "There currently are no logging configurations for %s."
 msgstr "There currently are no logging configurations for %s."
 
 #, c-format
-msgid "There is %d memo on channel %s."
-msgstr "There is %d memo on channel %s."
+msgid "There is %zu memo on channel %s."
+msgstr "There is %zu memo on channel %s."
 
 #, c-format
 msgid ""
 "There is a new memo on channel %s.\n"
-"Type %s%s READ %s %d to read it."
+"Type %s%s READ %s %zu to read it."
 msgstr ""
 "There is a new memo on channel %s.\n"
-"Type %s%s READ %s %d to read it."
+"Type %s%s READ %s %zu to read it."
 
 #, c-format
 msgid "There is no bot assigned to %s anymore."
@@ -8222,12 +8226,12 @@ msgid "Users"
 msgstr "Users"
 
 #, c-format
-msgid "Users (nick): %lu entries, %lu buckets, longest chain is %d"
-msgstr "Users (nick): %lu entries, %lu buckets, longest chain is %d"
+msgid "Users (nick): %lu entries, %lu buckets, longest chain is %zu"
+msgstr "Users (nick): %lu entries, %lu buckets, longest chain is %zu"
 
 #, c-format
-msgid "Users (uid): %lu entries, %lu buckets, longest chain is %d"
-msgstr "Users (uid): %lu entries, %lu buckets, longest chain is %d"
+msgid "Users (uid): %lu entries, %lu buckets, longest chain is %zu"
+msgstr "Users (uid): %lu entries, %lu buckets, longest chain is %zu"
 
 msgid "Users list:"
 msgstr "Users list:"
@@ -8473,20 +8477,20 @@ msgid "You cannot use this command."
 msgstr "You cannot use this command."
 
 #, c-format
-msgid "You currently have %d memos, of which %d are unread."
-msgstr "You currently have %d memos, of which %d are unread."
+msgid "You currently have %zu memos, of which %zu are unread."
+msgstr "You currently have %zu memos, of which %zu are unread."
 
 #, c-format
-msgid "You currently have %d memos, of which 1 is unread."
-msgstr "You currently have %d memos, of which 1 is unread."
+msgid "You currently have %zu memos, of which 1 is unread."
+msgstr "You currently have %zu memos, of which 1 is unread."
 
 #, c-format
-msgid "You currently have %d memos."
-msgstr "You currently have %d memos."
+msgid "You currently have %zu memos."
+msgstr "You currently have %zu memos."
 
 #, c-format
-msgid "You currently have %d memos; all of them are unread."
-msgstr "You currently have %d memos; all of them are unread."
+msgid "You currently have %zu memos; all of them are unread."
+msgstr "You currently have %zu memos; all of them are unread."
 
 msgid "You currently have 1 memo, and it has not yet been read."
 msgstr "You currently have 1 memo, and it has not yet been read."
@@ -8519,10 +8523,10 @@ msgstr "You have 1 new memo."
 #, c-format
 msgid ""
 "You have a new memo from %s.\n"
-"Type %s%s READ %d to read it."
+"Type %s%s READ %zu to read it."
 msgstr ""
 "You have a new memo from %s.\n"
-"Type %s%s READ %d to read it."
+"Type %s%s READ %zu to read it."
 
 #, c-format
 msgid "You have been invited to %s by %s."
@@ -8623,8 +8627,8 @@ msgid "You must enter the channel name twice as a confirmation that you wish to 
 msgstr "You must enter the channel name twice as a confirmation that you wish to drop %s."
 
 #, c-format
-msgid "You must have been using this nick for at least %d seconds to register."
-msgstr "You must have been using this nick for at least %d seconds to register."
+msgid "You must have been using this nick for at least %lu seconds to register."
+msgstr "You must have been using this nick for at least %lu seconds to register."
 
 #, c-format
 msgid "You must have the %s(ME) privilege on the channel to use this command."

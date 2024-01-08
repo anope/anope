@@ -112,7 +112,7 @@ public:
 			IRCD->SendOper(user);
 
 			if (!modes.empty())
-				user->SetModes(OperServ, "%s", modes.c_str());
+				user->SetModes(OperServ, modes);
 		}
 	}
 

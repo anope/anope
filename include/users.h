@@ -303,6 +303,7 @@ public:
 	 * @param umodes The modes
 	 */
 	void SetModes(BotInfo *bi, const char *umodes, ...) ATTR_FORMAT(3, 4);
+	void SetModes(BotInfo *bi, const Anope::string &umodes);
 
 	/** Set a string of modes on a user internally
 	 * @param setter who/what is setting the mode

@@ -372,7 +372,7 @@ void User::Identify(NickAlias *na)
 	{
 		if (!this->nc->o->ot->modes.empty())
 		{
-			this->SetModes(NULL, "%s", this->nc->o->ot->modes.c_str());
+			this->SetModes(NULL, this->nc->o->ot->modes);
 			this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
 			UserMode *um = ModeManager::FindUserModeByName("OPER");
 			if (um && !this->HasMode("OPER") && this->nc->o->ot->modes.find(um->mchar) != Anope::string::npos)
@@ -543,7 +543,7 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 		{
 			if (!this->nc->o->ot->modes.empty())
 			{
-				this->SetModes(NULL, "%s", this->nc->o->ot->modes.c_str());
+				this->SetModes(NULL, this->nc->o->ot->modes);
 				this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
 				UserMode *oper = ModeManager::FindUserModeByName("OPER");
 				if (oper && !this->HasMode("OPER") && this->nc->o->ot->modes.find(oper->mchar) != Anope::string::npos)
@@ -620,13 +620,18 @@ void User::SetModes(BotInfo *bi, const char *umodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
-	Anope::string modebuf, sbuf;
-	int add = -1;
 	va_start(args, umodes);
 	vsnprintf(buf, BUFSIZE - 1, umodes, args);
 	va_end(args);
 
-	spacesepstream sep(buf);
+	SetModes(bi, Anope::string(buf));
+}
+
+void User::SetModes(BotInfo *bi, const Anope::string &umodes)
+{
+	Anope::string modebuf, sbuf;
+	int add = -1;
+	spacesepstream sep(umodes);
 	sep.GetToken(modebuf);
 	for (auto mode : modebuf)
 	{

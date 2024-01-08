@@ -154,7 +154,7 @@ public:
 			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
 		else
 		{
-			u2->SetModes(source.service, "%s", modes.c_str());
+			u2->SetModes(source.service, modes);
 			source.Reply(_("Changed usermodes of \002%s\002 to %s."), u2->nick.c_str(), modes.c_str());
 
 			u2->SendMessage(source.service, _("\002%s\002 changed your usermodes to %s."), source.GetNick().c_str(), modes.c_str());

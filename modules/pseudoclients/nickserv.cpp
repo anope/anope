@@ -223,7 +223,7 @@ public:
 
 		const Anope::string &modesonid = Config->GetModule(this)->Get<Anope::string>("modesonid");
 		if (!modesonid.empty())
-			u->SetModes(NickServ, "%s", modesonid.c_str());
+			u->SetModes(NickServ, modesonid);
 	}
 
 	void Collide(User *u, NickAlias *na) override
@@ -351,7 +351,7 @@ public:
 
 		const Anope::string &modesonid = block->Get<const Anope::string>("modesonid");
 		if (!modesonid.empty())
-			u->SetModes(NickServ, "%s", modesonid.c_str());
+			u->SetModes(NickServ, modesonid);
 
 		if (block->Get<bool>("forceemail", "yes") && u->Account()->email.empty())
 		{

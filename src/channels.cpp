@@ -542,15 +542,21 @@ void Channel::SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
-	Anope::string modebuf, sbuf;
-	int add = -1;
 	va_start(args, cmodes);
 	vsnprintf(buf, BUFSIZE - 1, cmodes, args);
 	va_end(args);
 
+	SetModes(bi, enforce_mlock, Anope::string(buf));
+}
+
+
+void Channel::SetModes(BotInfo *bi, bool enforce_mlock, const Anope::string &cmodes)
+{
+	Anope::string modebuf, sbuf;
+	int add = -1;
 	Reference<Channel> this_reference(this);
 
-	spacesepstream sep(buf);
+	spacesepstream sep(cmodes);
 	sep.GetToken(modebuf);
 	for (unsigned i = 0, end = modebuf.length(); this_reference && i < end; ++i)
 	{

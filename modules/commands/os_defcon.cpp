@@ -541,7 +541,7 @@ public:
 	void OnChannelSync(Channel *c) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES))
-			c->SetModes(Config->GetClient("OperServ"), false, "%s", DConfig.chanmodes.c_str());
+			c->SetModes(Config->GetClient("OperServ"), false, DConfig.chanmodes);
 	}
 };
 
@@ -557,7 +557,7 @@ static void runDefCon()
 				Log(OperServ, "operserv/defcon") << "DEFCON: setting " << DConfig.chanmodes << " on all channels";
 				DefConModesSet = true;
 				for (const auto &[_, chan] : ChannelList)
-					chan->SetModes(OperServ, false, "%s", DConfig.chanmodes.c_str());
+					chan->SetModes(OperServ, false, DConfig.chanmodes);
 			}
 		}
 	}
@@ -573,7 +573,7 @@ static void runDefCon()
 				{
 					Log(OperServ, "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
 					for (const auto &[_, chan] : ChannelList)
-						chan->SetModes(OperServ, true, "%s", newmodes.c_str());
+						chan->SetModes(OperServ, true, newmodes);
 				}
 			}
 		}

@@ -205,6 +205,7 @@ public:
 	 * @param cmodes The modes to set
 	 */
 	void SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...) ATTR_FORMAT(4, 5);
+	void SetModes(BotInfo *bi, bool enforce_mlock, const Anope::string &cmodes);
 
 	/** Set a string of modes internally on a channel
 	 * @param source The setter

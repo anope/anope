@@ -624,7 +624,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 					}
 
 					for (auto *user : users)
-						c->Kick(NULL, user, "%s", reason.c_str());
+						c->Kick(NULL, user, reason);
 				}
 			}
 			else

@@ -302,7 +302,7 @@ public:
 
 							reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
 
-							c->Kick(source.service, u, "%s", reason.c_str());
+							c->Kick(source.service, u, reason);
 						}
 					}
 

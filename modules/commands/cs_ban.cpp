@@ -153,10 +153,10 @@ public:
 					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
 					{
 						signkickformat = signkickformat.replace_all_cs("%m", reason);
-						c->Kick(ci->WhoSends(), u2, "%s", signkickformat.c_str());
+						c->Kick(ci->WhoSends(), u2, signkickformat);
 					}
 					else
-						c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
+						c->Kick(ci->WhoSends(), u2, reason);
 				}
 			}
 		}
@@ -208,7 +208,7 @@ public:
 						{
 							reason += " (Matches " + mask + ")";
 							signkickformat = signkickformat.replace_all_cs("%m", reason);
-							c->Kick(ci->WhoSends(), uc->user, "%s", signkickformat.c_str());
+							c->Kick(ci->WhoSends(), uc->user, signkickformat);
 						}
 						else
 							c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), mask.c_str());

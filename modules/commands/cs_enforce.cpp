@@ -63,7 +63,7 @@ private:
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("RESTRICTED enforced by ")) + source.GetNick();
 			ci->c->SetMode(NULL, "BAN", mask);
-			ci->c->Kick(NULL, user, "%s", reason.c_str());
+			ci->c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("Restricted enforced on %s."), ci->name.c_str());
@@ -92,7 +92,7 @@ private:
 			Anope::string reason = Language::Translate(user, _("REGONLY enforced by ")) + source.GetNick();
 			if (!ci->c->HasMode("REGISTEREDONLY"))
 				ci->c->SetMode(NULL, "BAN", mask);
-			ci->c->Kick(NULL, user, "%s", reason.c_str());
+			ci->c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("Registered only enforced on %s."), ci->name.c_str());
@@ -121,7 +121,7 @@ private:
 			Anope::string reason = Language::Translate(user, _("SSLONLY enforced by ")) + source.GetNick();
 			if (!ci->c->HasMode("SSL"))
 				ci->c->SetMode(NULL, "BAN", mask);
-			ci->c->Kick(NULL, user, "%s", reason.c_str());
+			ci->c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("SSL only enforced on %s."), ci->name.c_str());
@@ -147,7 +147,7 @@ private:
 		for (auto *user : users)
 		{
 			Anope::string reason = Language::Translate(user, _("BANS enforced by ")) + source.GetNick();
-			ci->c->Kick(NULL, user, "%s", reason.c_str());
+			ci->c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("Bans enforced on %s."), ci->name.c_str());
@@ -200,7 +200,7 @@ private:
 		for (auto *user : users)
 		{
 			Anope::string reason = Language::Translate(user, _("LIMIT enforced by ")) + source.GetNick();
-			ci->c->Kick(NULL, user, "%s", reason.c_str());
+			ci->c->Kick(NULL, user, reason);
 		}
 
 		source.Reply(_("LIMIT enforced on %s, %zu users removed."), ci->name.c_str(), users.size());

@@ -235,6 +235,7 @@ public:
 	 * @return true if the kick was successful, false if a module blocked the kick
 	 */
 	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...) ATTR_FORMAT(4, 5);
+	bool Kick(BotInfo *bi, User *u, const Anope::string &reason);
 
 	/** Get all modes set on this channel, excluding status modes.
 	 * @return a map of modes and their optional parameters.

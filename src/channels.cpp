@@ -783,6 +783,11 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	vsnprintf(buf, BUFSIZE - 1, reason, args);
 	va_end(args);
 
+	return Kick(bi, u, Anope::string(reason));
+}
+
+bool Channel::Kick(BotInfo *bi, User *u, const Anope::string &reason)
+{
 	/* Do not kick protected clients or Ulines */
 	if (u->IsProtected())
 		return false;
@@ -791,11 +796,11 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 		bi = this->WhoSends();
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnBotKick, MOD_RESULT, (bi, this, u, buf));
+	FOREACH_RESULT(OnBotKick, MOD_RESULT, (bi, this, u, reason));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
-	IRCD->SendKick(bi, this, u, "%s", buf);
-	this->KickInternal(bi, u->nick, buf);
+	IRCD->SendKick(bi, this, u, "%s", reason.c_str());
+	this->KickInternal(bi, u->nick, reason);
 	return true;
 }
 
@@ -924,7 +929,7 @@ bool Channel::CheckKick(User *user)
 	Log(LOG_DEBUG) << "Autokicking " << user->nick << " (" << mask << ") from " << this->name;
 
 	this->SetMode(NULL, "BAN", mask);
-	this->Kick(NULL, user, "%s", reason.c_str());
+	this->Kick(NULL, user, reason);
 
 	return true;
 }

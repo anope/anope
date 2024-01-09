@@ -12,7 +12,9 @@
 #include "module.h"
 #include "modules/ssl.h"
 
-#define OPENSSL_NO_SHA512
+#define OPENSSL_API_COMPAT 0x10100000L
+#define OPENSSL_NO_DEPRECATED
+
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -102,11 +104,10 @@ public:
 
 		this->SetPermanent(true);
 
-		SSL_library_init();
-		SSL_load_error_strings();
+		OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS, nullptr);
 
-		client_ctx = SSL_CTX_new(SSLv23_client_method());
-		server_ctx = SSL_CTX_new(SSLv23_server_method());
+		client_ctx = SSL_CTX_new(TLS_client_method());
+		server_ctx = SSL_CTX_new(TLS_server_method());
 
 		if (!client_ctx || !server_ctx)
 			throw ModuleException("Error initializing SSL CTX");

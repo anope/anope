@@ -111,7 +111,7 @@ public:
 		if (!client_ctx || !server_ctx)
 			throw ModuleException("Error initializing SSL CTX");
 
-		long opts = SSL_OP_NO_SSLv2 | SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION | SSL_OP_CIPHER_SERVER_PREFERENCE;
+		long opts = SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION | SSL_OP_CIPHER_SERVER_PREFERENCE;
 		SSL_CTX_set_options(client_ctx, opts);
 		SSL_CTX_set_options(server_ctx, opts);
 
@@ -170,19 +170,38 @@ public:
 				Log() << "Unable to open private key " << this->keyfile;
 		}
 
-		// Allow disabling SSLv3
-		if (!config->Get<Anope::string>("sslv3").empty())
+		// Allow disabling old versions of TLS
+		if (config->Get<bool>("tlsv10", "false"))
 		{
-			if (config->Get<bool>("sslv3"))
-			{
-				SSL_CTX_clear_options(client_ctx, SSL_OP_NO_SSLv3);
-				SSL_CTX_clear_options(server_ctx, SSL_OP_NO_SSLv3);
-			}
-			else
-			{
-				SSL_CTX_set_options(client_ctx, SSL_OP_NO_SSLv3);
-				SSL_CTX_set_options(server_ctx, SSL_OP_NO_SSLv3);
-			}
+			SSL_CTX_clear_options(client_ctx, SSL_OP_NO_TLSv1);
+			SSL_CTX_clear_options(server_ctx, SSL_OP_NO_TLSv1);
+		}
+		else
+		{
+			SSL_CTX_set_options(client_ctx, SSL_OP_NO_TLSv1);
+			SSL_CTX_set_options(server_ctx, SSL_OP_NO_TLSv1);
+		}
+
+		if (config->Get<bool>("tlsv11", "true"))
+		{
+			SSL_CTX_clear_options(client_ctx, SSL_OP_NO_TLSv1_1);
+			SSL_CTX_clear_options(server_ctx, SSL_OP_NO_TLSv1_1);
+		}
+		else
+		{
+			SSL_CTX_set_options(client_ctx, SSL_OP_NO_TLSv1_1);
+			SSL_CTX_set_options(server_ctx, SSL_OP_NO_TLSv1_1);
+		}
+
+		if (config->Get<bool>("tlsv12", "true"))
+		{
+			SSL_CTX_clear_options(client_ctx, SSL_OP_NO_TLSv1_2);
+			SSL_CTX_clear_options(server_ctx, SSL_OP_NO_TLSv1_2);
+		}
+		else
+		{
+			SSL_CTX_set_options(client_ctx, SSL_OP_NO_TLSv1_2);
+			SSL_CTX_set_options(server_ctx, SSL_OP_NO_TLSv1_2);
 		}
 	}
 

@@ -14,6 +14,9 @@
 // The default umask to use for files.
 #cmakedefine DEFUMASK @DEFUMASK@
 
+// The extension used for module file extensions.
+#define DLL_EXT "@CMAKE_SHARED_LIBRARY_SUFFIX@"
+
 // Whether Anope was built in debug mode.
 #cmakedefine01 DEBUG_BUILD
 

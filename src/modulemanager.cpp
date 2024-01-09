@@ -55,7 +55,7 @@ void ModuleManager::CleanupRuntimeDirectory()
  */
 static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
-	Anope::string input = Anope::ModuleDir + "/modules/" + name + ".so";
+	Anope::string input = Anope::ModuleDir + "/modules/" + name + DLL_EXT;
 
 	struct stat s;
 	if (stat(input.c_str(), &s) == -1)
@@ -133,7 +133,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 #ifdef _WIN32
 	/* Generate the filename for the temporary copy of the module */
-	Anope::string pbuf = Anope::DataDir + "/runtime/" + modname + ".so.XXXXXX";
+	Anope::string pbuf = Anope::DataDir + "/runtime/" + modname + DLL_EXT ".XXXXXX";
 
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);
@@ -146,7 +146,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		return ret;
 	}
 #else
-	Anope::string pbuf = Anope::ModuleDir + "/modules/" + modname + ".so";
+	Anope::string pbuf = Anope::ModuleDir + "/modules/" + modname + DLL_EXT;
 #endif
 
 	dlerror();

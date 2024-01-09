@@ -55,8 +55,8 @@ macro(build_modules SRC)
           set_source_files_properties(${MODULE_SRC} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
 
           file(RELATIVE_PATH FNAME ${SRC} ${MODULE_SRC})
-          # Convert the real source file extension to have a .so extension
-          string(REGEX REPLACE "\\.cpp$" ".so" SO ${FNAME})
+          # Convert the real source file extension to have a library extension
+          string(REGEX REPLACE "\\.cpp$" "${CMAKE_SHARED_LIBRARY_SUFFIX}" SO ${FNAME})
           # Reset linker flags
           set(TEMP_LDFLAGS)
           # Reset extra dependencies
@@ -111,7 +111,7 @@ macro(build_subdir)
   list(SORT MODULES_SUBDIR_SRCS)
 
   GET_FILENAME_COMPONENT(FOLDER_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-  set(SO "${FOLDER_NAME}.so")
+  set(SO "${FOLDER_NAME}.${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
   # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
   set_source_files_properties(${MODULES_SUBDIR_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")

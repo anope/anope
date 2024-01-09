@@ -77,7 +77,15 @@ macro(build_modules SRC)
           else()
             set(WIN32_NO_LIBS)
           endif()
-          set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX "" LINK_FLAGS "${TEMP_LDFLAGS} ${WIN32_NO_LIBS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
+          set_target_properties(${SO} PROPERTIES
+            BUILD_WITH_INSTALL_RPATH ON
+            FOLDER "Modules"
+            INSTALL_RPATH_USE_LINK_PATH ON
+            LINKER_LANGUAGE CXX
+            LINK_FLAGS "${TEMP_LDFLAGS} ${WIN32_NO_LIBS}"
+            PREFIX ""
+            SUFFIX ""
+          )
           add_dependencies(${SO} ${PROGRAM_NAME})
           if(HAVE_LOCALIZATION)
             add_dependencies(${SO} module_language)

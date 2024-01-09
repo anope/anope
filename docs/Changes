@@ -1,6 +1,10 @@
 Anope Version 2.1.2-git
 -----------------------
-No significant changes.
+Bumped the minimum OpenSSL version to 1.1.0.
+Bumped the minumum GnuTLS version to 3.0.0.
+Disabled SSLv3 support in the m_ssl_openssl module.
+Normalised the program exit codes.
+Updated the French translation.
 
 Anope Version 2.1.1
 -------------------

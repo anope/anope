@@ -210,6 +210,10 @@ namespace Anope
 		inline size_type find_last_not_of(const string &_str, size_type pos = npos) const { return this->_string.find_last_not_of(_str._string, pos); }
 		inline size_type find_last_not_of_ci(const string &_str, size_type pos = npos) const { return ci::string(this->_string.c_str()).find_last_not_of(ci::string(_str._string.c_str()), pos); }
 
+		inline int compare(size_t pos, size_t len, const string& str) const { return ci::string(this->_string.c_str()).compare(pos, len, ci::string(str.c_str())); }
+		inline int compare(size_t pos, size_t len, const string& str, size_t subpos, size_type sublen = npos) const { return ci::string(this->_string.c_str()).compare(pos, len, ci::string(str.c_str()), subpos, sublen); }
+		inline int compare(size_t pos, size_t len, const char* s, size_type n = npos) const { return ci::string(this->_string.c_str()).compare(pos, len, s, n); }
+
 		/**
 		 * Determine if string consists of only numbers.
 		 */

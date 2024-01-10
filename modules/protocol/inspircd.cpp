@@ -26,6 +26,24 @@ static std::list<SASLUser> saslusers;
 
 static Anope::string rsquit_server, rsquit_id;
 
+static void ParseModule(const Anope::string &module, Anope::string &modname, Anope::string &moddata)
+{
+	size_t sep = module.find('=');
+
+	// Extract and clean up the module name.
+	modname = module.substr(0, sep);
+	if (modname.compare(0, 2, "m_", 2) == 0)
+		modname.erase(0, 2);
+
+	if (modname.length() > 3 && modname.compare(modname.length() - 3, 3, ".so", 3) == 0)
+		modname.erase(modname.length() - 3);
+
+	// Extract the module link data (if any).
+	moddata = sep == Anope::string::npos ? "" : module.substr(sep);
+
+	Log(LOG_DEBUG) << "Parsed module: " << "name=" << modname << " data=" << moddata;
+}
+
 class InspIRCdProto : public IRCDProto
 {
 private:
@@ -1119,14 +1137,17 @@ struct IRCDMessageCapab : Message::Capab
 					ModeManager::AddUserMode(um);
 			}
 		}
-		else if (params[0].equals_cs("MODULES") && params.size() > 1)
+		else if ((params[0].equals_cs("MODULES") || params[0].equals_cs("MODSUPPORT")) && params.size() > 1)
 		{
 			spacesepstream ssep(params[1]);
 			Anope::string module;
 
 			while (ssep.GetToken(module))
 			{
-				if (module.equals_cs("m_svshold.so"))
+				Anope::string modname, moddata;
+				ParseModule(module, modname, moddata);
+
+				if (modname.equals_cs("svshold"))
 					IRCD->CanSVSHold = true;
 				else if (module.find("m_rline.so") == 0)
 				{
@@ -1135,28 +1156,19 @@ struct IRCDMessageCapab : Message::Capab
 					if (!regexengine.empty() && module.length() > 11 && regexengine != module.substr(11))
 						Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << regexengine << ". This may cause inconsistencies.";
 				}
-				else if (module.equals_cs("m_topiclock.so"))
+				else if (modname.equals_cs("topiclock"))
 					Servers::Capab.insert("TOPICLOCK");
-				else if (module.equals_cs("m_cban.so=glob"))
+				else if (module.equals_cs("cban" && moddata.equals_cs("glob")))
 					IRCD->CanSQLineChannel = true;
-			}
-		}
-		else if (params[0].equals_cs("MODSUPPORT") && params.size() > 1)
-		{
-			spacesepstream ssep(params[1]);
-			Anope::string module;
-
-			while (ssep.GetToken(module))
-			{
-				if (module.equals_cs("m_services_account.so"))
+				else if (modname.equals_cs("services_account"))
 				{
 					Servers::Capab.insert("SERVICES");
 					ModeManager::AddChannelMode(new InspIRCdExtban::AccountMatcher("ACCOUNTBAN", "BAN", 'R'));
 					ModeManager::AddChannelMode(new InspIRCdExtban::UnidentifiedMatcher("UNREGISTEREDBAN", "BAN", 'U'));
 				}
-				else if (module.equals_cs("m_chghost.so"))
+				else if (modname.equals_cs("chghost"))
 					Servers::Capab.insert("CHGHOST");
-				else if (module.equals_cs("m_chgident.so"))
+				else if (modname.equals_cs("chgident"))
 					Servers::Capab.insert("CHGIDENT");
 				else if (module == "m_channelban.so")
 					ModeManager::AddChannelMode(new InspIRCdExtban::ChannelMatcher("CHANNELBAN", "BAN", 'j'));
@@ -1455,21 +1467,23 @@ public:
 					return;
 
 				bool required = false;
-				Anope::string capab, module = params[2].substr(1);
+				Anope::string capab, modname, moddata;
+				ParseModule(params[2].substr(1), modname, moddata);
 
-				if (module.equals_cs("m_services_account.so"))
+
+				if (modname.equals_cs("services_account"))
 					required = true;
-				else if (module.equals_cs("m_hidechans.so"))
+				else if (modname.equals_cs("hidechans"))
 					required = true;
-				else if (module.equals_cs("m_chghost.so"))
+				else if (modname.equals_cs("chghost"))
 					capab = "CHGHOST";
-				else if (module.equals_cs("m_chgident.so"))
+				else if (modname.equals_cs("chgident"))
 					capab = "CHGIDENT";
-				else if (module.equals_cs("m_svshold.so"))
+				else if (modname.equals_cs("svshold"))
 					capab = "SVSHOLD";
-				else if (module.equals_cs("m_rline.so"))
+				else if (modname.equals_cs("rline"))
 					capab = "RLINE";
-				else if (module.equals_cs("m_topiclock.so"))
+				else if (modname.equals_cs("topiclock"))
 					capab = "TOPICLOCK";
 				else
 					return;
@@ -1477,7 +1491,7 @@ public:
 				if (required)
 				{
 					if (!plus)
-						Log() << "Warning: InspIRCd unloaded module " << module << ", Anope won't function correctly without it";
+						Log() << "Warning: InspIRCd unloaded module " << modname << ", Anope won't function correctly without it";
 				}
 				else
 				{
@@ -1486,7 +1500,7 @@ public:
 					else
 						Servers::Capab.erase(capab);
 
-					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " module " << module << ", adjusted functionality";
+					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " module " << modname << ", adjusted functionality";
 				}
 
 			}

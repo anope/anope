@@ -111,7 +111,7 @@ macro(build_subdir)
   list(SORT MODULES_SUBDIR_SRCS)
 
   GET_FILENAME_COMPONENT(FOLDER_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-  set(SO "${FOLDER_NAME}.${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  set(SO "${FOLDER_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
   # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
   set_source_files_properties(${MODULES_SUBDIR_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")

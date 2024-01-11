@@ -1149,12 +1149,12 @@ struct IRCDMessageCapab : Message::Capab
 
 				if (modname.equals_cs("svshold"))
 					IRCD->CanSVSHold = true;
-				else if (module.find("m_rline.so") == 0)
+				else if (modname.equals_cs("rline"))
 				{
 					Servers::Capab.insert("RLINE");
 					const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
-					if (!regexengine.empty() && module.length() > 11 && regexengine != module.substr(11))
-						Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << regexengine << ". This may cause inconsistencies.";
+					if (!regexengine.empty() && regexengine != moddata)
+						Log() << "Warning: InspIRCd is using regex engine " << modname << ", but we have " << regexengine << ". This may cause inconsistencies.";
 				}
 				else if (modname.equals_cs("topiclock"))
 					Servers::Capab.insert("TOPICLOCK");
@@ -1170,15 +1170,15 @@ struct IRCDMessageCapab : Message::Capab
 					Servers::Capab.insert("CHGHOST");
 				else if (modname.equals_cs("chgident"))
 					Servers::Capab.insert("CHGIDENT");
-				else if (module == "m_channelban.so")
+				else if (modname.equals_cs("channelban"))
 					ModeManager::AddChannelMode(new InspIRCdExtban::ChannelMatcher("CHANNELBAN", "BAN", 'j'));
-				else if (module == "m_gecosban.so")
+				else if (modname.equals_cs("gecosban"))
 					ModeManager::AddChannelMode(new InspIRCdExtban::RealnameMatcher("REALNAMEBAN", "BAN", 'r'));
-				else if (module == "m_nopartmsg.so")
+				else if (modname.equals_cs("nopartmsg"))
 					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("PARTMESSAGEBAN", "BAN", 'p'));
-				else if (module == "m_serverban.so")
+				else if (modname.equals_cs("serverban"))
 					ModeManager::AddChannelMode(new InspIRCdExtban::ServerMatcher("SERVERBAN", "BAN", 's'));
-				else if (module == "m_muteban.so")
+				else if (modname.equals_cs("muteban"))
 					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("QUIET", "BAN", 'm'));
 			}
 		}

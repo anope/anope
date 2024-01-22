@@ -8,7 +8,7 @@
 
 #pragma once
 
-class LDAPException : public ModuleException
+class CoreExport LDAPException : public ModuleException
 {
 public:
 	LDAPException(const Anope::string &reason) : ModuleException(reason) { }

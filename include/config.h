@@ -171,7 +171,7 @@ namespace Configuration
  * be loaded. If this happens, the error message returned by ModuleException::GetReason will be displayed to the user
  * attempting to load the module, or dumped to the console if the ircd is currently loading for the first time.
  */
-class ConfigException : public CoreException
+class CoreExport ConfigException : public CoreException
 {
 public:
 	/** Default constructor, just uses the error message 'Config threw an exception'.

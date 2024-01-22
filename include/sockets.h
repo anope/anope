@@ -126,7 +126,7 @@ public:
 	};
 };
 
-class SocketException : public CoreException
+class CoreExport SocketException : public CoreException
 {
 public:
 	/** Constructor for socket exceptions

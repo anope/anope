@@ -652,7 +652,7 @@ public:
  * be loaded. If this happens, the error message returned by ModuleException::GetReason will be displayed to the user
  * attempting to load the module, or dumped to the console if the ircd is currently loading for the first time.
  */
-class CoreException : public std::exception
+class CoreExport CoreException : public std::exception
 {
 protected:
 	/** Holds the error message to be displayed
@@ -691,7 +691,7 @@ public:
 	}
 };
 
-class ModuleException : public CoreException
+class CoreExport ModuleException : public CoreException
 {
 public:
 	/** Default constructor, just uses the error message 'Module threw an exception'.
@@ -708,7 +708,7 @@ public:
 	virtual ~ModuleException() noexcept = default;
 };
 
-class ConvertException : public CoreException
+class CoreExport ConvertException : public CoreException
 {
 public:
 	ConvertException(const Anope::string &reason = "") : CoreException(reason) { }

@@ -15,7 +15,7 @@
 #include "anope.h"
 #include "service.h"
 
-class RegexException : public CoreException
+class CoreExport RegexException : public CoreException
 {
 public:
 	RegexException(const Anope::string &reason = "") : CoreException(reason) { }

@@ -37,8 +37,7 @@ public:
 			return;
 		}
 
-		const NickCore *nc;
-		nc = source.GetAccount();
+		const NickCore *nc = source.GetAccount();
 
 		bool is_mine = source.GetAccount() == na->nc;
 
@@ -50,7 +49,7 @@ public:
 
 		if (!is_mine && !source.HasPriv("nickserv/drop"))
 			source.Reply(ACCESS_DENIED);
-		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
+		else if (Config->GetModule(this->module)->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
 			source.Reply(_("You may not drop other Services Operators' nicknames."));
 		else
 		{
@@ -71,7 +70,7 @@ public:
 				"is dropped you may lose all of your access and channels that\n"
 				"you may own. Any other user will be able to gain control of\n"
 				"this nick."));
-		if (Config->GetModule("ns_drop")->Get<bool>("deny_dropping_display"))
+		if (Config->GetModule(this->module)->Get<bool>("deny_dropping_display"))
 			source.Reply(_("You must drop all aliases in the group\n"
 				before you can drop your display nick."));
 		if (!source.HasPriv("nickserv/drop"))

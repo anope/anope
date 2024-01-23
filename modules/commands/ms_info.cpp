@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandMSInfo
+class CommandMSInfo final
 	: public Command
 {
 public:
@@ -219,7 +219,7 @@ public:
 	}
 };
 
-class MSInfo
+class MSInfo final
 	: public Module
 {
 	CommandMSInfo commandmsinfo;

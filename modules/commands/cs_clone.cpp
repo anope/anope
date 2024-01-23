@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/bs_badwords.h"
 
-class CommandCSClone
+class CommandCSClone final
 	: public Command
 {
 	void CopySetting(ChannelInfo *ci, ChannelInfo *target_ci, const Anope::string &setting)
@@ -247,7 +247,7 @@ public:
 	}
 };
 
-class CSClone
+class CSClone final
 	: public Module
 {
 	CommandCSClone commandcsclone;

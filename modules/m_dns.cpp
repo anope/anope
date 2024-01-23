@@ -23,7 +23,7 @@ namespace
 
 /** A full packet sent or received to/from the nameserver
  */
-class Packet
+class Packet final
 	: public Query
 {
 	static bool IsValidName(const Anope::string &name)
@@ -459,14 +459,14 @@ namespace DNS
 }
 
 /* Listens for TCP requests */
-class TCPSocket
+class TCPSocket final
 	: public ListenSocket
 {
 	Manager *manager;
 
 public:
 	/* A TCP client */
-	class Client
+	class Client final
 		: public ClientSocket
 		, public Timer
 		, public ReplySocket
@@ -556,7 +556,7 @@ public:
 };
 
 /* Listens for UDP requests */
-class UDPSocket
+class UDPSocket final
 	: public ReplySocket
 {
 	Manager *manager;
@@ -617,7 +617,7 @@ public:
 	}
 };
 
-class NotifySocket
+class NotifySocket final
 	: public Socket
 {
 	Packet *packet;
@@ -651,7 +651,7 @@ public:
 	}
 };
 
-class MyManager
+class MyManager final
 	: public Manager
 	, public Timer
 {
@@ -1007,7 +1007,7 @@ private:
 
 };
 
-class ModuleDNS
+class ModuleDNS final
 	: public Module
 {
 	MyManager manager;

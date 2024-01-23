@@ -11,7 +11,7 @@
 
 using namespace SQL;
 
-class DBMySQL
+class DBMySQL final
 	: public Module
 	, public Pipe
 {

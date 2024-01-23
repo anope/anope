@@ -8,7 +8,7 @@
 
 #include "module.h"
 
-struct OperInfo
+struct OperInfo final
 	: Serializable
 {
 	Anope::string target;
@@ -33,7 +33,7 @@ struct OperInfo
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-struct OperInfos
+struct OperInfos final
 	: Serialize::Checker<std::vector<OperInfo *> >
 {
 	OperInfos(Extensible *) : Serialize::Checker<std::vector<OperInfo *> >("OperInfo") { }
@@ -95,7 +95,7 @@ Serializable *OperInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	return o;
 }
 
-class CommandOSInfo
+class CommandOSInfo final
 	: public Command
 {
 public:
@@ -248,7 +248,7 @@ public:
 	}
 };
 
-class OSInfo
+class OSInfo final
 	: public Module
 {
 	CommandOSInfo commandosinfo;

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSSVSNick
+class CommandOSSVSNick final
 	: public Command
 {
 public:
@@ -71,7 +71,7 @@ public:
 	}
 };
 
-class CommandOSSVSJoin
+class CommandOSSVSJoin final
 	: public Command
 {
 public:
@@ -116,7 +116,7 @@ public:
 	}
 };
 
-class CommandOSSVSPart
+class CommandOSSVSPart final
 	: public Command
 {
 public:
@@ -165,7 +165,7 @@ public:
 	}
 };
 
-class OSSVS
+class OSSVS final
 	: public Module
 {
 	CommandOSSVSNick commandossvsnick;

@@ -17,7 +17,7 @@
 
 UplinkSocket *UplinkSock = NULL;
 
-class ReconnectTimer
+class ReconnectTimer final
 	: public Timer
 {
 public:

@@ -8,7 +8,7 @@
 
 #include "pthread.h"
 
-struct ThreadInfo
+struct ThreadInfo final
 {
 	void *(*entry)(void *);
 	void *param;

@@ -103,7 +103,7 @@ union CoreExport sockaddrs
 	void ntop(int type, const void *src);
 };
 
-class CoreExport cidr
+class CoreExport cidr final
 {
 	sockaddrs addr;
 	Anope::string cidr_ip;
@@ -120,13 +120,13 @@ public:
 	bool operator==(const cidr &other) const;
 	bool operator!=(const cidr &other) const;
 
-	struct CoreExport hash
+	struct CoreExport hash final
 	{
 		size_t operator()(const cidr &s) const;
 	};
 };
 
-class CoreExport SocketException
+class CoreExport SocketException final
 	: public CoreException
 {
 public:
@@ -339,7 +339,7 @@ class CoreExport BinarySocket
 	: public virtual Socket
 {
 protected:
-	struct DataBlock
+	struct DataBlock final
 	{
 		char *orig;
 		char *buf;

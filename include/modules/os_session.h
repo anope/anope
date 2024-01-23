@@ -8,7 +8,7 @@
 
 #pragma once
 
-struct Session
+struct Session final
 {
 	cidr addr;                      /* A cidr (sockaddrs + len) representing this session */
 	unsigned count = 1;             /* Number of clients with this host */
@@ -17,7 +17,7 @@ struct Session
 	Session(const sockaddrs &ip, int len) : addr(ip, len) { }
 };
 
-struct Exception
+struct Exception final
 	: Serializable
 {
 	Anope::string mask;		/* Hosts to which this exception applies */

@@ -22,7 +22,7 @@ namespace Anope
 	 * allow us to only require one type of string everywhere that can be converted
 	 * at any time to a specific type of string.
 	 */
-	class CoreExport string
+	class CoreExport string final
 	{
 	private:
 		/**
@@ -312,7 +312,7 @@ namespace Anope
 	inline const string operator+(const char *_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 	inline const string operator+(const std::string &_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 
-	struct hash_ci
+	struct hash_ci final
 	{
 		inline size_t operator()(const string &s) const
 		{
@@ -320,7 +320,7 @@ namespace Anope
 		}
 	};
 
-	struct hash_cs
+	struct hash_cs final
 	{
 		inline size_t operator()(const string &s) const
 		{
@@ -328,7 +328,7 @@ namespace Anope
 		}
 	};
 
-	struct compare
+	struct compare final
 	{
 		inline bool operator()(const string &s1, const string &s2) const
 		{
@@ -628,7 +628,7 @@ public:
 
 /** A derived form of sepstream, which separates on commas
  */
-class commasepstream
+class commasepstream final
 	: public sepstream
 {
 public:
@@ -639,7 +639,7 @@ public:
 
 /** A derived form of sepstream, which separates on spaces
  */
-class spacesepstream
+class spacesepstream final
 	: public sepstream
 {
 public:
@@ -712,7 +712,7 @@ public:
 	virtual ~ModuleException() noexcept = default;
 };
 
-class CoreExport ConvertException
+class CoreExport ConvertException final
 	: public CoreException
 {
 public:

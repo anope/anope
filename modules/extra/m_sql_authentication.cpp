@@ -11,7 +11,7 @@
 
 static Module *me;
 
-class SQLAuthenticationResult
+class SQLAuthenticationResult final
 	: public SQL::Interface
 {
 	Reference<User> user;
@@ -74,7 +74,7 @@ public:
 	}
 };
 
-class ModuleSQLAuthentication
+class ModuleSQLAuthentication final
 	: public Module
 {
 	Anope::string engine;

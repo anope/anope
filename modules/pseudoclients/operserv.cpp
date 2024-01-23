@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class SGLineManager
+class SGLineManager final
 	: public XLineManager
 {
 public:
@@ -64,7 +64,7 @@ public:
 	}
 };
 
-class SQLineManager
+class SQLineManager final
 	: public XLineManager
 {
 	ServiceReference<NickServService> nickserv;
@@ -144,7 +144,7 @@ public:
 	}
 };
 
-class SNLineManager
+class SNLineManager final
 	: public XLineManager
 {
 public:
@@ -183,7 +183,7 @@ public:
 	}
 };
 
-class OperServCore
+class OperServCore final
 	: public Module
 {
 	Reference<BotInfo> OperServ;

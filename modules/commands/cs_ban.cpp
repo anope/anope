@@ -13,7 +13,7 @@
 
 static Module *me;
 
-class TempBan
+class TempBan final
 	: public Timer
 {
 private:
@@ -32,7 +32,7 @@ public:
 	}
 };
 
-class CommandCSBan
+class CommandCSBan final
 	: public Command
 {
 public:
@@ -239,7 +239,7 @@ public:
 	}
 };
 
-class CSBan
+class CSBan final
 	: public Module
 {
 	CommandCSBan commandcsban;

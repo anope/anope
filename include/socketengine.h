@@ -14,7 +14,7 @@
 #include "services.h"
 #include "sockets.h"
 
-class CoreExport SocketEngine
+class CoreExport SocketEngine final
 {
 	static const int DefaultSize = 2; // Uplink, mode stacker
 public:

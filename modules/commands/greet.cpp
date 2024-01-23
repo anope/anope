@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandBSSetGreet
+class CommandBSSetGreet final
 	: public Command
 {
 public:
@@ -138,7 +138,7 @@ public:
 	}
 };
 
-class CommandNSSASetGreet
+class CommandNSSASetGreet final
 	: public CommandNSSetGreet
 {
 public:
@@ -165,7 +165,7 @@ public:
 	}
 };
 
-class Greet
+class Greet final
 	: public Module
 {
 	/* channel setting for whether or not greet should be shown */

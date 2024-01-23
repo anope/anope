@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSConfig
+class CommandOSConfig final
 	: public Command
 {
 public:
@@ -133,7 +133,7 @@ public:
 	}
 };
 
-class OSConfig
+class OSConfig final
 	: public Module
 {
 	CommandOSConfig commandosconfig;

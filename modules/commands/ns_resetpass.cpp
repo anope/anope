@@ -13,7 +13,7 @@
 
 static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi);
 
-class CommandNSResetPass
+class CommandNSResetPass final
 	: public Command
 {
 public:
@@ -55,13 +55,13 @@ public:
 	}
 };
 
-struct ResetInfo
+struct ResetInfo final
 {
 	Anope::string code;
 	time_t time;
 };
 
-class NSResetPass
+class NSResetPass final
 	: public Module
 {
 	CommandNSResetPass commandnsresetpass;

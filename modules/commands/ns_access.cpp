@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandNSAccess
+class CommandNSAccess final
 	: public Command
 {
 private:
@@ -187,7 +187,7 @@ public:
 	}
 };
 
-class NSAccess
+class NSAccess final
 	: public Module
 {
 	CommandNSAccess commandnsaccess;

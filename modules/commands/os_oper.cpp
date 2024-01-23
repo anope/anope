@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-struct MyOper
+struct MyOper final
 	: Oper
 	, Serializable
 {
@@ -48,7 +48,7 @@ struct MyOper
 	}
 };
 
-class CommandOSOper
+class CommandOSOper final
 	: public Command
 {
 	bool HasPrivs(CommandSource &source, OperType *ot) const
@@ -255,7 +255,7 @@ public:
 	}
 };
 
-class OSOper
+class OSOper final
 	: public Module
 {
 	Serialize::Type myoper_type;

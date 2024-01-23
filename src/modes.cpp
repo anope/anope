@@ -39,7 +39,7 @@ static std::vector<ChannelModeStatus *> ChannelModesByStatus;
 /* Number of generic modes we support */
 unsigned ModeManager::GenericChannelModes = 0, ModeManager::GenericUserModes = 0;
 
-struct StackerInfo
+struct StackerInfo final
 {
 	/* Modes to be added */
 	std::list<std::pair<Mode *, Anope::string> > AddModes;
@@ -300,7 +300,7 @@ void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 	list->emplace_back(mode, param);
 }
 
-static class ModePipe
+static class ModePipe final
 	: public Pipe
 {
 public:
@@ -580,7 +580,7 @@ const std::vector<ChannelModeStatus *> &ModeManager::GetStatusChannelModesByRank
 	return ChannelModesByStatus;
 }
 
-static struct StatusSort
+static struct StatusSort final
 {
 	bool operator()(ChannelModeStatus *cm1, ChannelModeStatus *cm2) const
 	{

@@ -108,7 +108,7 @@ public:
  * of class that inherits from Serializable. Used for unserializing objects
  * of this type, as it requires a function pointer to a static member function.
  */
-class CoreExport Serialize::Type
+class CoreExport Serialize::Type final
 	: public Base
 {
 	typedef Serializable* (*unserialize_func)(Serializable *obj, Serialize::Data &);
@@ -242,7 +242,7 @@ public:
  * destructed.
  */
 template<typename T>
-class Serialize::Reference
+class Serialize::Reference final
 	: public ReferenceBase
 {
 protected:

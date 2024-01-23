@@ -37,7 +37,7 @@ static Anope::string GetStatusFromCode(HTTPError err)
 	return "501 Not Implemented";
 }
 
-class MyHTTPClient
+class MyHTTPClient final
 	: public HTTPClient
 {
 	HTTPProvider *provider;
@@ -283,7 +283,7 @@ public:
 	}
 };
 
-class MyHTTPProvider
+class MyHTTPProvider final
 	: public HTTPProvider
 	, public Timer
 {
@@ -332,7 +332,7 @@ public:
 	}
 };
 
-class HTTPD
+class HTTPD final
 	: public Module
 {
 	ServiceReference<SSLService> sslref;

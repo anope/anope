@@ -15,7 +15,7 @@
 
 typedef std::map<char, unsigned> ListLimits;
 
-struct SASLUser
+struct SASLUser final
 {
 	Anope::string uid;
 	Anope::string acc;
@@ -44,7 +44,7 @@ static void ParseModule(const Anope::string &module, Anope::string &modname, Ano
 	Log(LOG_DEBUG) << "Parsed module: " << "name=" << modname << " data=" << moddata;
 }
 
-class InspIRCdProto
+class InspIRCdProto final
 	: public IRCDProto
 {
 private:
@@ -537,7 +537,7 @@ public:
 	}
 };
 
-class InspIRCdAutoOpMode
+class InspIRCdAutoOpMode final
 	: public ChannelModeList
 {
 public:
@@ -582,7 +582,7 @@ public:
 
 namespace InspIRCdExtban
 {
-	class EntryMatcher
+	class EntryMatcher final
 		: public InspIRCdExtBan
 	{
 	public:
@@ -599,7 +599,7 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class ChannelMatcher
+	class ChannelMatcher final
 		: public InspIRCdExtBan
 	{
 	public:
@@ -636,7 +636,7 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class AccountMatcher
+	class AccountMatcher final
 		: public InspIRCdExtBan
 	{
 	public:
@@ -653,7 +653,7 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class RealnameMatcher
+	class RealnameMatcher final
 		: public InspIRCdExtBan
 	{
 	public:
@@ -669,7 +669,7 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class ServerMatcher
+	class ServerMatcher final
 		: public InspIRCdExtBan
 	{
 	public:
@@ -685,7 +685,7 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class FingerprintMatcher
+	class FingerprintMatcher final
 		: public InspIRCdExtBan
 	{
 	public:
@@ -701,7 +701,7 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class UnidentifiedMatcher
+	class UnidentifiedMatcher final
 		: public InspIRCdExtBan
 	{
 	public:
@@ -768,7 +768,7 @@ public:
 	}
 };
 
-class SimpleNumberParamMode
+class SimpleNumberParamMode final
 	: public ChannelModeParam
 {
 public:
@@ -794,7 +794,7 @@ public:
 	}
 };
 
-class ChannelModeFlood
+class ChannelModeFlood final
 	: public ColonDelimitedParamMode
 {
 public:
@@ -809,7 +809,7 @@ public:
 	}
 };
 
-class ChannelModeHistory
+class ChannelModeHistory final
 	: public ColonDelimitedParamMode
 {
 public:
@@ -821,7 +821,7 @@ public:
 	}
 };
 
-class ChannelModeRedirect
+class ChannelModeRedirect final
 	: public ChannelModeParam
 {
 public:
@@ -834,7 +834,7 @@ public:
 	}
 };
 
-struct IRCDMessageAway
+struct IRCDMessageAway final
 	: Message::Away
 {
 	IRCDMessageAway(Module *creator) : Message::Away(creator, "AWAY") { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
@@ -849,10 +849,10 @@ struct IRCDMessageAway
 	}
 };
 
-struct IRCDMessageCapab
+struct IRCDMessageCapab final
 	: Message::Capab
 {
-	struct ModeInfo
+	struct ModeInfo final
 	{
 		// The letter assigned to the mode (e.g. o).
 		char letter = 0;
@@ -1242,7 +1242,7 @@ struct IRCDMessageCapab
 	}
 };
 
-struct IRCDMessageEncap
+struct IRCDMessageEncap final
 	: IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1293,7 +1293,7 @@ struct IRCDMessageEncap
 	}
 };
 
-struct IRCDMessageFHost
+struct IRCDMessageFHost final
 	: IRCDMessage
 {
 	IRCDMessageFHost(Module *creator) : IRCDMessage(creator, "FHOST", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
@@ -1307,7 +1307,7 @@ struct IRCDMessageFHost
 	}
 };
 
-struct IRCDMessageFIdent
+struct IRCDMessageFIdent final
 	: IRCDMessage
 {
 	IRCDMessageFIdent(Module *creator) : IRCDMessage(creator, "FIDENT", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
@@ -1318,7 +1318,7 @@ struct IRCDMessageFIdent
 	}
 };
 
-struct IRCDMessageKick
+struct IRCDMessageKick final
 	: IRCDMessage
 {
 	IRCDMessageKick(Module *creator) : IRCDMessage(creator, "KICK", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1336,7 +1336,7 @@ struct IRCDMessageKick
 	}
 };
 
-struct IRCDMessageSave
+struct IRCDMessageSave final
 	: IRCDMessage
 {
 	time_t last_collide = 0;
@@ -1379,7 +1379,7 @@ struct IRCDMessageSave
 	}
 };
 
-class IRCDMessageMetadata
+class IRCDMessageMetadata final
 	: IRCDMessage
 {
 	const bool &do_topiclock;
@@ -1531,7 +1531,7 @@ public:
 	}
 };
 
-struct IRCDMessageEndburst
+struct IRCDMessageEndburst final
 	: IRCDMessage
 {
 	IRCDMessageEndburst(Module *creator) : IRCDMessage(creator, "ENDBURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -1546,7 +1546,7 @@ struct IRCDMessageEndburst
 	}
 };
 
-struct IRCDMessageFJoin
+struct IRCDMessageFJoin final
 	: IRCDMessage
 {
 	IRCDMessageFJoin(Module *creator) : IRCDMessage(creator, "FJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1603,7 +1603,7 @@ struct IRCDMessageFJoin
 	}
 };
 
-struct IRCDMessageFMode
+struct IRCDMessageFMode final
 	: IRCDMessage
 {
 	IRCDMessageFMode(Module *creator) : IRCDMessage(creator, "FMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1633,7 +1633,7 @@ struct IRCDMessageFMode
 	}
 };
 
-struct IRCDMessageFTopic
+struct IRCDMessageFTopic final
 	: IRCDMessage
 {
 	IRCDMessageFTopic(Module *creator) : IRCDMessage(creator, "FTOPIC", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT);  }
@@ -1652,7 +1652,7 @@ struct IRCDMessageFTopic
 	}
 };
 
-struct IRCDMessageIdle
+struct IRCDMessageIdle final
 	: IRCDMessage
 {
 	IRCDMessageIdle(Module *creator) : IRCDMessage(creator, "IDLE", 1) { }
@@ -1671,7 +1671,7 @@ struct IRCDMessageIdle
 	}
 };
 
-struct IRCDMessageIJoin
+struct IRCDMessageIJoin final
 	: IRCDMessage
 {
 	IRCDMessageIJoin(Module *creator) : IRCDMessage(creator, "IJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1708,7 +1708,7 @@ struct IRCDMessageIJoin
 	}
 };
 
-struct IRCDMessageMode
+struct IRCDMessageMode final
 	: IRCDMessage
 {
 	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1739,7 +1739,7 @@ struct IRCDMessageMode
 	}
 };
 
-struct IRCDMessageNick
+struct IRCDMessageNick final
 	: IRCDMessage
 {
 	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
@@ -1750,7 +1750,7 @@ struct IRCDMessageNick
 	}
 };
 
-struct IRCDMessageOperType
+struct IRCDMessageOperType final
 	: IRCDMessage
 {
 	IRCDMessageOperType(Module *creator) : IRCDMessage(creator, "OPERTYPE", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_USER); }
@@ -1765,7 +1765,7 @@ struct IRCDMessageOperType
 	}
 };
 
-struct IRCDMessagePing
+struct IRCDMessagePing final
 	: IRCDMessage
 {
 	IRCDMessagePing(Module *creator) : IRCDMessage(creator, "PING", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -1777,7 +1777,7 @@ struct IRCDMessagePing
 	}
 };
 
-struct IRCDMessageRSQuit
+struct IRCDMessageRSQuit final
 	: IRCDMessage
 {
 	IRCDMessageRSQuit(Module *creator) : IRCDMessage(creator, "RSQUIT", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1794,7 +1794,7 @@ struct IRCDMessageRSQuit
 	}
 };
 
-struct IRCDMessageServer
+struct IRCDMessageServer final
 	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1828,7 +1828,7 @@ struct IRCDMessageServer
 	}
 };
 
-struct IRCDMessageSQuit
+struct IRCDMessageSQuit final
 	: Message::SQuit
 {
 	IRCDMessageSQuit(Module *creator) : Message::SQuit(creator) { }
@@ -1851,7 +1851,7 @@ struct IRCDMessageSQuit
 	}
 };
 
-struct IRCDMessageTime
+struct IRCDMessageTime final
 	: IRCDMessage
 {
 	IRCDMessageTime(Module *creator) : IRCDMessage(creator, "TIME", 2) { }
@@ -1862,7 +1862,7 @@ struct IRCDMessageTime
 	}
 };
 
-struct IRCDMessageUID
+struct IRCDMessageUID final
 	: IRCDMessage
 {
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 8) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1911,7 +1911,7 @@ struct IRCDMessageUID
 	}
 };
 
-class ProtoInspIRCd
+class ProtoInspIRCd final
 	: public Module
 {
 	InspIRCdProto ircd_proto;

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandNSUpdate
+class CommandNSUpdate final
 	: public Command
 {
 public:
@@ -48,7 +48,7 @@ public:
 	}
 };
 
-class NSUpdate
+class NSUpdate final
 	: public Module
 {
 	CommandNSUpdate commandnsupdate;

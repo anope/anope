@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/ns_cert.h"
 
-class NSGroupRequest
+class NSGroupRequest final
 	: public IdentifyRequest
 {
 	CommandSource source;
@@ -84,7 +84,7 @@ public:
 	}
 };
 
-class CommandNSGroup
+class CommandNSGroup final
 	: public Command
 {
 public:
@@ -230,7 +230,7 @@ public:
 	}
 };
 
-class CommandNSUngroup
+class CommandNSUngroup final
 	: public Command
 {
 public:
@@ -294,7 +294,7 @@ public:
 	}
 };
 
-class CommandNSGList
+class CommandNSGList final
 	: public Command
 {
 public:
@@ -380,7 +380,7 @@ public:
 	}
 };
 
-class NSGroup
+class NSGroup final
 	: public Module
 {
 	CommandNSGroup commandnsgroup;

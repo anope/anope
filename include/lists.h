@@ -60,7 +60,7 @@ public:
 
 /** This class handles formatting LIST/VIEW replies.
  */
-class CoreExport ListFormatter
+class CoreExport ListFormatter final
 {
 public:
 	typedef std::map<Anope::string, Anope::string> ListEntry;
@@ -78,7 +78,7 @@ public:
 
 /** This class handles formatting INFO replies
  */
-class CoreExport InfoFormatter
+class CoreExport InfoFormatter final
 {
 	NickCore *nc;
 	std::vector<std::pair<Anope::string, Anope::string> > replies;

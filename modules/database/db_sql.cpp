@@ -34,7 +34,7 @@ public:
 	}
 };
 
-class ResultSQLSQLInterface
+class ResultSQLSQLInterface final
 	: public SQLSQLInterface
 {
 	Reference<Serializable> obj;
@@ -57,7 +57,7 @@ public:
 	}
 };
 
-class DBSQL
+class DBSQL final
 	: public Module
 	, public Pipe
 {

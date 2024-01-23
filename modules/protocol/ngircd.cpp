@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class ngIRCdProto
+class ngIRCdProto final
 	: public IRCDProto
 {
 	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
@@ -147,7 +147,7 @@ public:
 	}
 };
 
-struct IRCDMessage005
+struct IRCDMessage005 final
 	: IRCDMessage
 {
 	IRCDMessage005(Module *creator) : IRCDMessage(creator, "005", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -182,7 +182,7 @@ struct IRCDMessage005
 	}
 };
 
-struct IRCDMessage376
+struct IRCDMessage376 final
 	: IRCDMessage
 {
 	IRCDMessage376(Module *creator) : IRCDMessage(creator, "376", 2) { }
@@ -200,7 +200,7 @@ struct IRCDMessage376
 	}
 };
 
-struct IRCDMessageChaninfo
+struct IRCDMessageChaninfo final
 	: IRCDMessage
 {
 	IRCDMessageChaninfo(Module *creator) : IRCDMessage(creator, "CHANINFO", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -254,7 +254,7 @@ struct IRCDMessageChaninfo
 	}
 };
 
-struct IRCDMessageJoin
+struct IRCDMessageJoin final
 	: Message::Join
 {
 	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
@@ -295,7 +295,7 @@ struct IRCDMessageJoin
 	}
 };
 
-struct IRCDMessageMetadata
+struct IRCDMessageMetadata final
 	: IRCDMessage
 {
 	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -355,7 +355,7 @@ struct IRCDMessageMetadata
 	}
 };
 
-struct IRCDMessageMode
+struct IRCDMessageMode final
 	: IRCDMessage
 {
 	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -392,7 +392,7 @@ struct IRCDMessageMode
 	}
 };
 
-struct IRCDMessageNick
+struct IRCDMessageNick final
 	: IRCDMessage
 {
 	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -445,7 +445,7 @@ struct IRCDMessageNick
 	}
 };
 
-struct IRCDMessageNJoin
+struct IRCDMessageNJoin final
 	: IRCDMessage
 {
 	IRCDMessageNJoin(Module *creator) : IRCDMessage(creator, "NJOIN",2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); };
@@ -492,7 +492,7 @@ struct IRCDMessageNJoin
 	}
 };
 
-struct IRCDMessagePong
+struct IRCDMessagePong final
 	: IRCDMessage
 {
 	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -509,7 +509,7 @@ struct IRCDMessagePong
 	}
 };
 
-struct IRCDMessageServer
+struct IRCDMessageServer final
 	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -561,7 +561,7 @@ struct IRCDMessageServer
 	}
 };
 
-struct IRCDMessageTopic
+struct IRCDMessageTopic final
 	: IRCDMessage
 {
 	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -581,7 +581,7 @@ struct IRCDMessageTopic
 
 
 
-class ProtongIRCd
+class ProtongIRCd final
 	: public Module
 {
 	ngIRCdProto ircd_proto;

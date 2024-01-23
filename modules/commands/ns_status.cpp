@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandNSStatus
+class CommandNSStatus final
 	: public Command
 {
 public:
@@ -73,7 +73,7 @@ public:
 	}
 };
 
-class NSStatus
+class NSStatus final
 	: public Module
 {
 	CommandNSStatus commandnsstatus;

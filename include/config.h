@@ -78,7 +78,7 @@ namespace Configuration
 
 	/** Represents a configuration file
 	 */
-	class File
+	class File final
 	{
 		Anope::string name;
 		bool executable;
@@ -98,7 +98,7 @@ namespace Configuration
 
 	struct Uplink;
 
-	struct CoreExport Conf
+	struct CoreExport Conf final
 		: Block
 	{
 		/* options:readtimeout */
@@ -153,7 +153,7 @@ namespace Configuration
 		const Block *GetCommand(CommandSource &);
 	};
 
-	struct Uplink
+	struct Uplink final
 	{
 		Anope::string host;
 		unsigned port;
@@ -172,7 +172,7 @@ namespace Configuration
  * be loaded. If this happens, the error message returned by ModuleException::GetReason will be displayed to the user
  * attempting to load the module, or dumped to the console if the ircd is currently loading for the first time.
  */
-class CoreExport ConfigException
+class CoreExport ConfigException final
 	: public CoreException
 {
 public:

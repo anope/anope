@@ -14,7 +14,7 @@
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
-struct NSSuspendInfo
+struct NSSuspendInfo final
 	: SuspendInfo
 	, Serializable
 {
@@ -54,7 +54,7 @@ struct NSSuspendInfo
 	}
 };
 
-class CommandNSSuspend
+class CommandNSSuspend final
 	: public Command
 {
 public:
@@ -153,7 +153,7 @@ public:
 	}
 };
 
-class CommandNSUnSuspend
+class CommandNSUnSuspend final
 	: public Command
 {
 public:
@@ -203,7 +203,7 @@ public:
 	}
 };
 
-class NSSuspend
+class NSSuspend final
 	: public Module
 {
 	CommandNSSuspend commandnssuspend;
@@ -212,7 +212,7 @@ class NSSuspend
 	Serialize::Type suspend_type;
 	std::vector<Anope::string> show;
 
-	struct trim
+	struct trim final
 	{
 		Anope::string operator()(Anope::string s) const
 		{

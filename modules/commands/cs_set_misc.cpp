@@ -31,7 +31,7 @@ static ExtensibleItem<CSMiscData> *GetItem(const Anope::string &name)
 	return it;
 }
 
-struct CSMiscData
+struct CSMiscData final
 	: MiscData
 	, Serializable
 {
@@ -90,7 +90,7 @@ static Anope::string GetAttribute(const Anope::string &command)
 	return command;
 }
 
-class CommandCSSetMisc
+class CommandCSSetMisc final
 	: public Command
 {
 public:
@@ -167,7 +167,7 @@ public:
 	}
 };
 
-class CSSetMisc
+class CSSetMisc final
 	: public Module
 {
 	CommandCSSetMisc commandcssetmisc;

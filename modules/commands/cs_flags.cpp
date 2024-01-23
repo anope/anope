@@ -13,7 +13,7 @@
 
 static std::map<Anope::string, char> defaultFlags;
 
-class FlagsChanAccess
+class FlagsChanAccess final
 	: public ChanAccess
 {
 public:
@@ -60,7 +60,7 @@ public:
 	}
 };
 
-class FlagsAccessProvider
+class FlagsAccessProvider final
 	: public AccessProvider
 {
 public:
@@ -78,7 +78,7 @@ public:
 };
 FlagsAccessProvider* FlagsAccessProvider::ap;
 
-class CommandCSFlags
+class CommandCSFlags final
 	: public Command
 {
 	void DoModify(CommandSource &source, ChannelInfo *ci, Anope::string mask, const Anope::string &flags, const Anope::string &description)
@@ -478,7 +478,7 @@ public:
 	}
 };
 
-class CSFlags
+class CSFlags final
 	: public Module
 {
 	FlagsAccessProvider accessprovider;

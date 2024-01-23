@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSRegister
+class CommandCSRegister final
 	: public Command
 {
 public:
@@ -111,7 +111,7 @@ public:
 };
 
 
-class CSRegister
+class CSRegister final
 	: public Module
 {
 	CommandCSRegister commandcsregister;

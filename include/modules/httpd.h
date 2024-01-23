@@ -18,7 +18,7 @@ enum HTTPError
 };
 
 /* A message to someone */
-struct HTTPReply
+struct HTTPReply final
 {
 	HTTPError error = HTTP_ERROR_OK;
 	Anope::string content_type;
@@ -46,7 +46,7 @@ struct HTTPReply
 		out.clear();
 	}
 
-	struct Data
+	struct Data final
 	{
 		char *buf;
 		size_t len;
@@ -81,7 +81,7 @@ struct HTTPReply
 };
 
 /* A message from someone */
-struct HTTPMessage
+struct HTTPMessage final
 {
 	std::map<Anope::string, Anope::string> headers;
 	std::map<Anope::string, Anope::string> cookies;

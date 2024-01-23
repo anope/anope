@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSQuit
+class CommandOSQuit final
 	: public Command
 {
 public:
@@ -40,7 +40,7 @@ public:
 	}
 };
 
-class CommandOSRestart
+class CommandOSRestart final
 	: public Command
 {
 public:
@@ -67,7 +67,7 @@ public:
 	}
 };
 
-class CommandOSShutdown
+class CommandOSShutdown final
 	: public Command
 {
 public:
@@ -94,7 +94,7 @@ public:
 	}
 };
 
-class OSShutdown
+class OSShutdown final
 	: public Module
 {
 	CommandOSQuit commandosquit;

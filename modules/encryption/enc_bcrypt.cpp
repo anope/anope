@@ -13,7 +13,7 @@
 
 #include "bcrypt/crypt_blowfish.c"
 
-class EBCRYPT
+class EBCRYPT final
 	: public Module
 {
 	unsigned int rounds;

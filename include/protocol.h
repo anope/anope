@@ -245,7 +245,7 @@ public:
 	virtual Anope::string NormalizeMask(const Anope::string &mask);
 };
 
-class CoreExport MessageSource
+class CoreExport MessageSource final
 {
 	Anope::string source;
 	User *u = nullptr;
@@ -285,7 +285,7 @@ public:
 };
 
 /** MessageTokenizer allows tokens in the IRC wire format to be read from a string */
-class CoreExport MessageTokenizer
+class CoreExport MessageTokenizer final
 {
 private:
 	/** The message we are parsing tokens from. */

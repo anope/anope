@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSNOOP
+class CommandOSNOOP final
 	: public Command
 {
 public:
@@ -72,7 +72,7 @@ public:
 	}
 };
 
-class OSNOOP
+class OSNOOP final
 	: public Module
 {
 	CommandOSNOOP commandosnoop;

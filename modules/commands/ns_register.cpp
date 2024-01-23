@@ -13,7 +13,7 @@
 
 static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
 
-class CommandNSConfirm
+class CommandNSConfirm final
 	: public Command
 {
 public:
@@ -115,7 +115,7 @@ public:
 	}
 };
 
-class CommandNSRegister
+class CommandNSRegister final
 	: public Command
 {
 public:
@@ -311,7 +311,7 @@ public:
 	}
 };
 
-class CommandNSResend
+class CommandNSResend final
 	: public Command
 {
 public:
@@ -369,7 +369,7 @@ public:
 	}
 };
 
-class NSRegister
+class NSRegister final
 	: public Module
 {
 	CommandNSRegister commandnsregister;

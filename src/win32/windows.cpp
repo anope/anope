@@ -18,7 +18,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
-static struct WindowsLanguage
+static struct WindowsLanguage final
 {
 	Anope::string languageName;
 	USHORT windowsLanguageName;

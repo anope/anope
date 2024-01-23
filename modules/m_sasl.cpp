@@ -12,7 +12,7 @@
 
 using namespace SASL;
 
-class Plain
+class Plain final
 	: public Mechanism
 {
 public:
@@ -73,12 +73,12 @@ public:
 	}
 };
 
-class External
+class External final
 	: public Mechanism
 {
 	ServiceReference<CertService> certs;
 
-	struct Session
+	struct Session final
 		: SASL::Session
 	{
 		Anope::string cert;
@@ -137,7 +137,7 @@ public:
 	}
 };
 
-class Anonymous
+class Anonymous final
 	: public Mechanism
 {
 public:
@@ -174,7 +174,7 @@ public:
 	}
 };
 
-class SASLService
+class SASLService final
 	: public SASL::Service
 	, public Timer
 {
@@ -353,7 +353,7 @@ public:
 	}
 };
 
-class ModuleSASL
+class ModuleSASL final
 	: public Module
 {
 	SASLService sasl;

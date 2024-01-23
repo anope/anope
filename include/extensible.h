@@ -209,7 +209,7 @@ public:
 };
 
 template<typename T>
-struct ExtensibleRef
+struct ExtensibleRef final
 	: ServiceReference<BaseExtensibleItem<T> >
 {
 	ExtensibleRef(const Anope::string &n) : ServiceReference<BaseExtensibleItem<T> >("Extensible", n) { }

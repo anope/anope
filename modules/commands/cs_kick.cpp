@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSKick
+class CommandCSKick final
 	: public Command
 {
 public:
@@ -134,7 +134,7 @@ public:
 	}
 };
 
-class CSKick
+class CSKick final
 	: public Module
 {
 	CommandCSKick commandcskick;

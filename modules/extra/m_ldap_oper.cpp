@@ -12,7 +12,7 @@
 static std::set<Oper *> my_opers;
 static Anope::string opertype_attribute;
 
-class IdentifyInterface
+class IdentifyInterface final
 	: public LDAPInterface
 {
 	Reference<User> u;
@@ -76,7 +76,7 @@ public:
 	}
 };
 
-class LDAPOper
+class LDAPOper final
 	: public Module
 {
 	ServiceReference<LDAPProvider> ldap;

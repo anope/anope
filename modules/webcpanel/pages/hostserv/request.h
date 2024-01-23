@@ -13,7 +13,7 @@ namespace WebCPanel
 namespace HostServ
 {
 
-class Request
+class Request final
 	: public WebPanelProtectedPage
 {
 public:

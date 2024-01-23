@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandHSSet
+class CommandHSSet final
 	: public Command
 {
 public:
@@ -105,7 +105,7 @@ public:
 	}
 };
 
-class CommandHSSetAll
+class CommandHSSetAll final
 	: public Command
 {
 	void Sync(const NickAlias *na)
@@ -214,7 +214,7 @@ public:
 	}
 };
 
-class HSSet
+class HSSet final
 	: public Module
 {
 	CommandHSSet commandhsset;

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class NSIdentifyRequest
+class NSIdentifyRequest final
 	: public IdentifyRequest
 {
 	CommandSource source;
@@ -58,7 +58,7 @@ public:
 	}
 };
 
-class CommandNSIdentify
+class CommandNSIdentify final
 	: public Command
 {
 public:
@@ -115,7 +115,7 @@ public:
 	}
 };
 
-class NSIdentify
+class NSIdentify final
 	: public Module
 {
 	CommandNSIdentify commandnsidentify;

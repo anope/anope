@@ -19,7 +19,7 @@ inline static Anope::string BotModes()
 	);
 }
 
-class ChanServCore
+class ChanServCore final
 	: public Module
 	, public ChanServService
 {
@@ -40,7 +40,7 @@ public:
 		/** A timer used to keep the BotServ bot/ChanServ in the channel
 		 * after kicking the last user in a channel
 		 */
-		class ChanServTimer
+		class ChanServTimer final
 			: public Timer
 		{
 			Reference<BotInfo> &ChanServ;

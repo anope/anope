@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSModLoad
+class CommandOSModLoad final
 	: public Command
 {
 public:
@@ -49,7 +49,7 @@ public:
 	}
 };
 
-class CommandOSModReLoad
+class CommandOSModReLoad final
 	: public Command
 {
 public:
@@ -122,7 +122,7 @@ public:
 	}
 };
 
-class CommandOSModUnLoad
+class CommandOSModUnLoad final
 	: public Command
 {
 public:
@@ -173,7 +173,7 @@ public:
 	}
 };
 
-class OSModule
+class OSModule final
 	: public Module
 {
 	CommandOSModLoad commandosmodload;

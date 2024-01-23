@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/cs_mode.h"
 
-class CommandCSSetKeepTopic
+class CommandCSSetKeepTopic final
 	: public Command
 {
 public:
@@ -77,7 +77,7 @@ public:
 	}
 };
 
-class CommandCSTopic
+class CommandCSTopic final
 	: public Command
 {
 	ExtensibleRef<bool> topiclock;
@@ -204,7 +204,7 @@ public:
 	}
 };
 
-class CSTopic
+class CSTopic final
 	: public Module
 {
 	CommandCSTopic commandcstopic;

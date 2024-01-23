@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandNSAList
+class CommandNSAList final
 	: public Command
 {
 	static bool ChannelSort(ChannelInfo *ci1, ChannelInfo *ci2)
@@ -132,7 +132,7 @@ public:
 	}
 };
 
-class NSAList
+class NSAList final
 	: public Module
 {
 	CommandNSAList commandnsalist;

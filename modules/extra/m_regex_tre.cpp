@@ -11,7 +11,7 @@
 #include "module.h"
 #include <tre/regex.h>
 
-class TRERegex
+class TRERegex final
 	: public Regex
 {
 	regex_t regbuf;
@@ -40,7 +40,7 @@ public:
 	}
 };
 
-class TRERegexProvider
+class TRERegexProvider final
 	: public RegexProvider
 {
 public:
@@ -52,7 +52,7 @@ public:
 	}
 };
 
-class ModuleRegexTRE
+class ModuleRegexTRE final
 	: public Module
 {
 	TRERegexProvider tre_regex_provider;

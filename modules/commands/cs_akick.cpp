@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSAKick
+class CommandCSAKick final
 	: public Command
 {
 	void Enforce(CommandSource &source, ChannelInfo *ci)
@@ -204,7 +204,7 @@ class CommandCSAKick
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class AkickDelCallback
+			class AkickDelCallback final
 				: public NumberList
 			{
 				CommandSource &source;
@@ -282,7 +282,7 @@ class CommandCSAKick
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class AkickListCallback
+			class AkickListCallback final
 				: public NumberList
 			{
 				ListFormatter &list;
@@ -528,7 +528,7 @@ public:
 	}
 };
 
-class CSAKick
+class CSAKick final
 	: public Module
 {
 	CommandCSAKick commandcsakick;

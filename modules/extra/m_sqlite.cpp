@@ -19,7 +19,7 @@ using namespace SQL;
 
 /** A SQLite result
  */
-class SQLiteResult
+class SQLiteResult final
 	: public Result
 {
 public:
@@ -39,7 +39,7 @@ public:
 
 /** A SQLite database, there can be multiple
  */
-class SQLiteService
+class SQLiteService final
 	: public Provider
 {
 	std::map<Anope::string, std::set<Anope::string> > active_schema;
@@ -70,7 +70,7 @@ public:
 	Anope::string FromUnixtime(time_t) override;
 };
 
-class ModuleSQLite
+class ModuleSQLite final
 	: public Module
 {
 	/* SQL connections */

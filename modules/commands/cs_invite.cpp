@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSInvite
+class CommandCSInvite final
 	: public Command
 {
 public:
@@ -98,7 +98,7 @@ public:
 	}
 };
 
-class CSInvite
+class CSInvite final
 	: public Module
 {
 	CommandCSInvite commandcsinvite;

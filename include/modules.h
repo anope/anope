@@ -162,7 +162,7 @@ enum
 };
 typedef unsigned short ModType;
 
-struct ModuleVersionC
+struct ModuleVersionC final
 {
 	int version_major, version_minor, version_patch;
 };
@@ -170,7 +170,7 @@ struct ModuleVersionC
 /** Returned by Module::GetVersion, used to see what version of Anope
  * a module is compiled against.
  */
-class ModuleVersion
+class ModuleVersion final
 {
 private:
 	int version_major;
@@ -196,7 +196,7 @@ public:
 	int GetPatch() const;
 };
 
-class CoreExport NotImplementedException
+class CoreExport NotImplementedException final
 	: public CoreException
 {
 };
@@ -1113,7 +1113,7 @@ enum Implementation
 
 /** Used to manage modules.
  */
-class CoreExport ModuleManager
+class CoreExport ModuleManager final
 {
 public:
 	/** Event handler hooks.

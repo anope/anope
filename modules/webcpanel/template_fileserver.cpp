@@ -14,7 +14,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-struct ForLoop
+struct ForLoop final
 {
 	static std::vector<ForLoop> Stack;
 

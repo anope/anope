@@ -15,7 +15,7 @@
 #include <sys/wait.h>
 #endif
 
-class SaveData
+class SaveData final
 	: public Serialize::Data
 {
 public:
@@ -34,7 +34,7 @@ public:
 	}
 };
 
-class LoadData
+class LoadData final
 	: public Serialize::Data
 {
 public:
@@ -101,7 +101,7 @@ public:
 	}
 };
 
-class DBFlatFile
+class DBFlatFile final
 	: public Module
 	, public Pipe
 {

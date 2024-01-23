@@ -16,7 +16,7 @@ public:
 	virtual ~LDAPException() noexcept = default;
 };
 
-struct LDAPModification
+struct LDAPModification final
 {
 	enum LDAPOperation
 	{
@@ -31,7 +31,7 @@ struct LDAPModification
 };
 typedef std::vector<LDAPModification> LDAPMods;
 
-struct LDAPAttributes
+struct LDAPAttributes final
 	: public std::map<Anope::string, std::vector<Anope::string>>
 {
 	size_t size(const Anope::string &attr) const
@@ -75,7 +75,7 @@ enum QueryType
 	QUERY_MODIFY
 };
 
-struct LDAPResult
+struct LDAPResult final
 {
 	std::vector<LDAPAttributes> messages;
 	Anope::string error;

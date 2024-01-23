@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandBSSetFantasy
+class CommandBSSetFantasy final
 	: public Command
 {
 public:
@@ -81,7 +81,7 @@ public:
 	}
 };
 
-class Fantasy
+class Fantasy final
 	: public Module
 {
 	SerializableExtensibleItem<bool> fantasy;

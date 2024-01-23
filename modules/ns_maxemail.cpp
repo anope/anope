@@ -12,7 +12,7 @@
 
 #include "module.h"
 
-class NSMaxEmail
+class NSMaxEmail final
 	: public Module
 {
 	bool clean = false;

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandMSCancel
+class CommandMSCancel final
 	: public Command
 {
 public:
@@ -88,7 +88,7 @@ public:
 	}
 };
 
-class MSCancel
+class MSCancel final
 	: public Module
 {
 	CommandMSCancel commandmscancel;

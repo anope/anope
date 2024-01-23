@@ -13,7 +13,7 @@
 
 #include "module.h"
 
-class CommandCSEnforce
+class CommandCSEnforce final
 	: public Command
 {
 private:
@@ -263,7 +263,7 @@ public:
 	}
 };
 
-class CSEnforce
+class CSEnforce final
 	: public Module
 {
 	CommandCSEnforce commandcsenforce;

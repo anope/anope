@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandMSCheck
+class CommandMSCheck final
 	: public Command
 {
 public:
@@ -73,7 +73,7 @@ public:
 	}
 };
 
-class MSCheck
+class MSCheck final
 	: public Module
 {
 	CommandMSCheck commandmscheck;

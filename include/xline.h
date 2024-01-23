@@ -13,7 +13,7 @@
 #include "sockets.h"
 
 /* An Xline, eg, anything added with operserv/akill, or any of the operserv/sxline commands */
-class CoreExport XLine
+class CoreExport XLine final
 	: public Serializable
 {
 	void Init();

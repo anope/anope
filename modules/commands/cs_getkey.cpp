@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSGetKey
+class CommandCSGetKey final
 	: public Command
 {
 public:
@@ -60,7 +60,7 @@ public:
 	}
 };
 
-class CSGetKey
+class CSGetKey final
 	: public Module
 {
 	CommandCSGetKey commandcsgetkey;

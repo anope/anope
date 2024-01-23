@@ -17,7 +17,7 @@ static Anope::string UplinkSID;
 
 static ServiceReference<IRCDProto> ratbox("IRCDProto", "ratbox");
 
-class ChannelModeLargeBan
+class ChannelModeLargeBan final
 	: public ChannelMode
 {
 public:
@@ -30,7 +30,7 @@ public:
 };
 
 
-class SolanumProto
+class SolanumProto final
 	: public IRCDProto
 {
 public:
@@ -172,7 +172,7 @@ public:
 };
 
 
-struct IRCDMessageEncap
+struct IRCDMessageEncap final
 	: IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 3)
@@ -229,7 +229,7 @@ struct IRCDMessageEncap
 	}
 };
 
-struct IRCDMessageEUID
+struct IRCDMessageEUID final
 	: IRCDMessage
 {
 	IRCDMessageEUID(Module *creator) : IRCDMessage(creator, "EUID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -258,7 +258,7 @@ struct IRCDMessageEUID
 };
 
 // we can't use this function from ratbox because we set a local variable here
-struct IRCDMessageServer
+struct IRCDMessageServer final
 	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -275,7 +275,7 @@ struct IRCDMessageServer
 };
 
 // we can't use this function from ratbox because we set a local variable here
-struct IRCDMessagePass
+struct IRCDMessagePass final
 	: IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -287,7 +287,7 @@ struct IRCDMessagePass
 	}
 };
 
-struct IRCDMessageNotice
+struct IRCDMessageNotice final
 	: Message::Notice
 {
 	IRCDMessageNotice(Module *creator) : Message::Notice(creator) { }
@@ -301,7 +301,7 @@ struct IRCDMessageNotice
 	}
 };
 
-struct IRCDMessagePrivmsg
+struct IRCDMessagePrivmsg final
 	: Message::Privmsg
 {
 	IRCDMessagePrivmsg(Module *creator) : Message::Privmsg(creator) { }
@@ -315,7 +315,7 @@ struct IRCDMessagePrivmsg
 	}
 };
 
-class ProtoSolanum
+class ProtoSolanum final
 	: public Module
 {
 	Module *m_ratbox;

@@ -13,7 +13,7 @@ namespace WebCPanel
 namespace OperServ
 {
 
-class Akill
+class Akill final
 	: public WebPanelProtectedPage
 {
 public:

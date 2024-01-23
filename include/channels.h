@@ -18,7 +18,7 @@ typedef Anope::hash_map<Channel *> channel_map;
 extern CoreExport channel_map ChannelList;
 
 /* A user container, there is one of these per user per channel. */
-struct ChanUserContainer
+struct ChanUserContainer final
 	: public Extensible
 {
 	User *user;
@@ -29,7 +29,7 @@ struct ChanUserContainer
 	ChanUserContainer(User *u, Channel *c) : user(u), chan(c) { }
 };
 
-class CoreExport Channel
+class CoreExport Channel final
 	: public Base
 	, public Extensible
 {

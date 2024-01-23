@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandNSSet
+class CommandNSSet final
 	: public Command
 {
 public:
@@ -64,7 +64,7 @@ public:
 	}
 };
 
-class CommandNSSASet
+class CommandNSSASet final
 	: public Command
 {
 public:
@@ -107,7 +107,7 @@ public:
 	}
 };
 
-class CommandNSSetPassword
+class CommandNSSetPassword final
 	: public Command
 {
 public:
@@ -164,7 +164,7 @@ public:
 	}
 };
 
-class CommandNSSASetPassword
+class CommandNSSASetPassword final
 	: public Command
 {
 public:
@@ -299,7 +299,7 @@ public:
 	}
 };
 
-class CommandNSSASetAutoOp
+class CommandNSSASetAutoOp final
 	: public CommandNSSetAutoOp
 {
 public:
@@ -389,7 +389,7 @@ public:
 	}
 };
 
-class CommandNSSASetNeverOp
+class CommandNSSASetNeverOp final
 	: public CommandNSSetNeverOp
 {
 public:
@@ -483,7 +483,7 @@ public:
 	}
 };
 
-class CommandNSSASetDisplay
+class CommandNSSASetDisplay final
 	: public CommandNSSetDisplay
 {
 public:
@@ -632,7 +632,7 @@ public:
 	}
 };
 
-class CommandNSSASetEmail
+class CommandNSSASetEmail final
 	: public CommandNSSetEmail
 {
 public:
@@ -719,7 +719,7 @@ public:
 	}
 };
 
-class CommandNSSASetKeepModes
+class CommandNSSASetKeepModes final
 	: public CommandNSSetKeepModes
 {
 public:
@@ -850,7 +850,7 @@ public:
 	}
 };
 
-class CommandNSSASetKill
+class CommandNSSASetKill final
 	: public CommandNSSetKill
 {
 public:
@@ -964,7 +964,7 @@ public:
 	}
 };
 
-class CommandNSSASetLanguage
+class CommandNSSASetLanguage final
 	: public CommandNSSetLanguage
 {
 public:
@@ -1079,7 +1079,7 @@ public:
 	}
 };
 
-class CommandNSSASetMessage
+class CommandNSSASetMessage final
 	: public CommandNSSetMessage
 {
 public:
@@ -1172,7 +1172,7 @@ public:
 	}
 };
 
-class CommandNSSASetSecure
+class CommandNSSASetSecure final
 	: public CommandNSSetSecure
 {
 public:
@@ -1202,7 +1202,7 @@ public:
 	}
 };
 
-class CommandNSSASetNoexpire
+class CommandNSSASetNoexpire final
 	: public Command
 {
 public:
@@ -1255,7 +1255,7 @@ public:
 	}
 };
 
-class NSSet
+class NSSet final
 	: public Module
 {
 	CommandNSSet commandnsset;
@@ -1296,7 +1296,7 @@ class NSSet
 	SerializableExtensibleItem<bool> autoop, neverop, killprotect, kill_quick, kill_immed,
 		message, secure, noexpire;
 
-	struct KeepModes
+	struct KeepModes final
 		: SerializableExtensibleItem<bool>
 	{
 		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }

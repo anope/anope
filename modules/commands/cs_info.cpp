@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSInfo
+class CommandCSInfo final
 	: public Command
 {
 public:
@@ -84,7 +84,7 @@ public:
 	}
 };
 
-class CSInfo
+class CSInfo final
 	: public Module
 {
 	CommandCSInfo commandcsinfo;

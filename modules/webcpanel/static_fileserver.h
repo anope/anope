@@ -10,7 +10,7 @@
 #include "modules/httpd.h"
 
 /* A basic file server. Used for serving static content on disk. */
-class StaticFileServer
+class StaticFileServer final
 	: public HTTPPage
 {
 	Anope::string file_name;

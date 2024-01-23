@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandHelp
+class CommandHelp final
 	: public Command
 {
 	static const unsigned help_wrap_len = 40;
@@ -183,7 +183,7 @@ public:
 	}
 };
 
-class Help
+class Help final
 	: public Module
 {
 	CommandHelp commandhelp;

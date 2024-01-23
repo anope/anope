@@ -232,7 +232,7 @@ public:
 };
 
 /* The status a user has on a channel (+v, +h, +o) etc */
-class CoreExport ChannelStatus
+class CoreExport ChannelStatus final
 {
 	Anope::string modes;
 public:
@@ -305,7 +305,7 @@ public:
  * This also contains a mode stacker that will combine multiple modes and set
  * them on a channel or user at once
  */
-class CoreExport ModeManager
+class CoreExport ModeManager final
 {
 public:
 
@@ -401,7 +401,7 @@ public:
 
 /** Represents a mask set on a channel (b/e/I)
  */
-class CoreExport Entry
+class CoreExport Entry final
 {
 	Anope::string name;
 	Anope::string mask;

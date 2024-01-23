@@ -9,7 +9,7 @@
 
 #include "module.h"
 
-class BSAutoAssign
+class BSAutoAssign final
 	: public Module
 {
 public:

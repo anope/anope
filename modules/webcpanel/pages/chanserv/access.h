@@ -13,7 +13,7 @@ namespace WebCPanel
 namespace ChanServ
 {
 
-class Access
+class Access final
 	: public WebPanelProtectedPage
 {
 public:

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandHSOff
+class CommandHSOff final
 	: public Command
 {
 public:
@@ -54,7 +54,7 @@ public:
 	}
 };
 
-class HSOff
+class HSOff final
 	: public Module
 {
 	CommandHSOff commandhsoff;

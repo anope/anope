@@ -101,7 +101,7 @@ public:
  * This will ensure timers are not missed, as well as removing timers that have
  * expired and allowing the addition of new ones.
  */
-class CoreExport TimerManager
+class CoreExport TimerManager final
 {
 	/** A list of timers
 	 */

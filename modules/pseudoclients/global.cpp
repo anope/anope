@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class GlobalCore
+class GlobalCore final
 	: public Module
 	, public GlobalService
 {

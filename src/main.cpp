@@ -41,7 +41,7 @@ time_t Anope::CurTime = time(NULL);
 
 size_t Anope::CurrentUplink = -1;
 
-class UpdateTimer
+class UpdateTimer final
 	: public Timer
 {
 public:
@@ -53,7 +53,7 @@ public:
 	}
 };
 
-class ExpireTimer
+class ExpireTimer final
 	: public Timer
 {
 public:

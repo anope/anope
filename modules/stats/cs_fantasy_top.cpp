@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/sql.h"
 
-class MySQLInterface
+class MySQLInterface final
 	: public SQL::Interface
 {
 public:
@@ -31,7 +31,7 @@ public:
 	}
 };
 
-class CommandCSTop
+class CommandCSTop final
 	: public Command
 {
 public:
@@ -44,7 +44,7 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
 };
 
-class CommandCSTop10
+class CommandCSTop10 final
 	: public Command
 {
 public:
@@ -57,7 +57,7 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
 };
 
-class CommandCSGTop
+class CommandCSGTop final
 	: public Command
 {
 public:
@@ -69,7 +69,7 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
 };
 
-class CommandCSGTop10
+class CommandCSGTop10 final
 	: public Command
 {
 public:
@@ -84,7 +84,7 @@ public:
 
 class CSTop;
 static CSTop *me;
-class CSTop
+class CSTop final
 	: public Module
 {
 	CommandCSTop commandcstop;

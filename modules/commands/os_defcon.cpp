@@ -28,7 +28,7 @@ enum DefconLevel
 
 bool DefConModesSet = false;
 
-struct DefconConfig
+struct DefconConfig final
 {
 	std::vector<std::bitset<32> > DefCon;
 	std::set<Anope::string> DefConModesOn, DefConModesOff;
@@ -105,7 +105,7 @@ static ServiceReference<GlobalService> GlobalService("GlobalService", "Global");
 
 static Timer *timeout;
 
-class DefConTimeout
+class DefConTimeout final
 	: public Timer
 {
 	int level;
@@ -145,7 +145,7 @@ public:
 	}
 };
 
-class CommandOSDefcon
+class CommandOSDefcon final
 	: public Command
 {
 	void SendLevels(CommandSource &source)
@@ -246,7 +246,7 @@ public:
 	}
 };
 
-class OSDefcon
+class OSDefcon final
 	: public Module
 {
 	ServiceReference<SessionService> session_service;

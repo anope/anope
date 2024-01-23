@@ -13,7 +13,7 @@ namespace WebCPanel
 namespace NickServ
 {
 
-class Info
+class Info final
 	: public WebPanelProtectedPage
 {
 public:

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class ChannelModeFlood
+class ChannelModeFlood final
 	: public ChannelModeParam
 {
 public:
@@ -31,7 +31,7 @@ public:
 	}
 };
 
-class BahamutIRCdProto
+class BahamutIRCdProto final
 	: public IRCDProto
 {
 public:
@@ -292,7 +292,7 @@ public:
 	}
 };
 
-struct IRCDMessageBurst
+struct IRCDMessageBurst final
 	: IRCDMessage
 {
 	IRCDMessageBurst(Module *creator) : IRCDMessage(creator, "BURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -311,7 +311,7 @@ struct IRCDMessageBurst
 	}
 };
 
-struct IRCDMessageMode
+struct IRCDMessageMode final
 	: IRCDMessage
 {
 	IRCDMessageMode(Module *creator, const Anope::string &sname) : IRCDMessage(creator, sname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -363,7 +363,7 @@ struct IRCDMessageMode
  **	  parv[0] = new nickname
  **	  parv[1] = hopcount
  */
-struct IRCDMessageNick
+struct IRCDMessageNick final
 	: IRCDMessage
 {
 	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -397,7 +397,7 @@ struct IRCDMessageNick
 	}
 };
 
-struct IRCDMessageServer
+struct IRCDMessageServer final
 	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -409,7 +409,7 @@ struct IRCDMessageServer
 	}
 };
 
-struct IRCDMessageSJoin
+struct IRCDMessageSJoin final
 	: IRCDMessage
 {
 	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -466,7 +466,7 @@ struct IRCDMessageSJoin
 	}
 };
 
-struct IRCDMessageTopic
+struct IRCDMessageTopic final
 	: IRCDMessage
 {
 	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 4) { }
@@ -479,7 +479,7 @@ struct IRCDMessageTopic
 	}
 };
 
-class ProtoBahamut
+class ProtoBahamut final
 	: public Module
 {
 	BahamutIRCdProto ircd_proto;

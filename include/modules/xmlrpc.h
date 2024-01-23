@@ -10,7 +10,7 @@
 
 #include "httpd.h"
 
-class XMLRPCRequest
+class XMLRPCRequest final
 {
 	std::map<Anope::string, Anope::string> replies;
 

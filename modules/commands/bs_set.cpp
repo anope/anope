@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandBSSet
+class CommandBSSet final
 	: public Command
 {
 public:
@@ -65,11 +65,11 @@ public:
 	}
 };
 
-class CommandBSSetBanExpire
+class CommandBSSetBanExpire final
 	: public Command
 {
 public:
-	class UnbanTimer
+	class UnbanTimer final
 		: public Timer
 	{
 		Anope::string chname;
@@ -154,7 +154,7 @@ public:
 	}
 };
 
-class CommandBSSetPrivate
+class CommandBSSetPrivate final
 	: public Command
 {
 public:
@@ -205,7 +205,7 @@ public:
 	}
 };
 
-class BSSet
+class BSSet final
 	: public Module
 {
 	CommandBSSet commandbsset;

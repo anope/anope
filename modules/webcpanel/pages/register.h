@@ -12,7 +12,7 @@
 namespace WebCPanel
 {
 
-class Register
+class Register final
 	: public WebPanelPage
 {
 public:

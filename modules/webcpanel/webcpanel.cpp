@@ -10,7 +10,7 @@
 Module *me;
 Anope::string provider_name, template_name, template_base, page_title;
 
-class ModuleWebCPanel
+class ModuleWebCPanel final
 	: public Module
 {
 	ServiceReference<HTTPProvider> provider;
@@ -261,7 +261,7 @@ namespace WebPanel
 			bi = BotListByNick->begin()->second; // Pick one...
 		}
 
-		struct MyComandReply
+		struct MyComandReply final
 			: CommandReply
 		{
 			TemplateFileServer::Replacements &re;
@@ -302,7 +302,7 @@ namespace WebPanel
 		if (!info)
 			return;
 
-		struct MyComandReply
+		struct MyComandReply final
 			: CommandReply
 		{
 			TemplateFileServer::Replacements &re;

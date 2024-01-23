@@ -35,7 +35,7 @@ namespace
 	unsigned ipv6_cidr;
 }
 
-class MySessionService
+class MySessionService final
 	: public SessionService
 {
 	SessionMap Sessions;
@@ -127,7 +127,7 @@ public:
 	}
 };
 
-class ExceptionDelCallback
+class ExceptionDelCallback final
 	: public NumberList
 {
 protected:
@@ -170,7 +170,7 @@ public:
 	}
 };
 
-class CommandOSSession
+class CommandOSSession final
 	: public Command
 {
 private:
@@ -284,7 +284,7 @@ public:
 	}
 };
 
-class CommandOSException
+class CommandOSException final
 	: public Command
 {
 private:
@@ -435,7 +435,7 @@ private:
 
 		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class ExceptionListCallback
+			class ExceptionListCallback final
 				: public NumberList
 			{
 				CommandSource &source;
@@ -582,7 +582,7 @@ public:
 	}
 };
 
-class OSSession
+class OSSession final
 	: public Module
 {
 	Serialize::Type exception_type;

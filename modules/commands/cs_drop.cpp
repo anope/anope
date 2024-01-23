@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSDrop
+class CommandCSDrop final
 	: public Command
 {
 public:
@@ -82,7 +82,7 @@ public:
 	}
 };
 
-class CSDrop
+class CSDrop final
 	: public Module
 {
 	CommandCSDrop commandcsdrop;

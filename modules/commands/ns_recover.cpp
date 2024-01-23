@@ -16,14 +16,14 @@ static ServiceReference<NickServService> nickserv("NickServService", "NickServ")
 
 typedef std::map<Anope::string, ChannelStatus> NSRecoverInfo;
 
-class NSRecoverSvsnick
+class NSRecoverSvsnick final
 {
 public:
 	Reference<User> from;
 	Anope::string to;
 };
 
-class NSRecoverRequest
+class NSRecoverRequest final
 	: public IdentifyRequest
 {
 	CommandSource source;
@@ -142,7 +142,7 @@ public:
 	}
 };
 
-class CommandNSRecover
+class CommandNSRecover final
 	: public Command
 {
 public:
@@ -223,7 +223,7 @@ public:
 	}
 };
 
-class NSRecover
+class NSRecover final
 	: public Module
 {
 	CommandNSRecover commandnsrecover;

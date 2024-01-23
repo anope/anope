@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/os_ignore.h"
 
-struct IgnoreDataImpl
+struct IgnoreDataImpl final
 	: IgnoreData
 	, Serializable
 {
@@ -59,7 +59,7 @@ Serializable* IgnoreDataImpl::Unserialize(Serializable *obj, Serialize::Data &da
 }
 
 
-class OSIgnoreService
+class OSIgnoreService final
 	: public IgnoreService
 {
 	Serialize::Checker<std::vector<IgnoreData *> > ignores;
@@ -157,7 +157,7 @@ public:
 	}
 };
 
-class CommandOSIgnore
+class CommandOSIgnore final
 	: public Command
 {
 private:
@@ -395,7 +395,7 @@ public:
 	}
 };
 
-class OSIgnore
+class OSIgnore final
 	: public Module
 {
 	Serialize::Type ignoredata_type;

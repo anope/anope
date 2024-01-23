@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/cs_entrymsg.h"
 
-struct EntryMsgImpl
+struct EntryMsgImpl final
 	: EntryMsg
 	, Serializable
 {
@@ -41,7 +41,7 @@ struct EntryMsgImpl
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-struct EntryMessageListImpl
+struct EntryMessageListImpl final
 	: EntryMessageList
 {
 	EntryMessageListImpl(Extensible *) { }
@@ -100,7 +100,7 @@ Serializable* EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data
 	return m;
 }
 
-class CommandEntryMessage
+class CommandEntryMessage final
 	: public Command
 {
 private:
@@ -264,7 +264,7 @@ public:
 	}
 };
 
-class CSEntryMessage
+class CSEntryMessage final
 	: public Module
 {
 	CommandEntryMessage commandentrymsg;

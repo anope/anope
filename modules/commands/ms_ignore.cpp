@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandMSIgnore
+class CommandMSIgnore final
 	: public Command
 {
 public:
@@ -119,7 +119,7 @@ public:
 	}
 };
 
-class MSIgnore
+class MSIgnore final
 	: public Module
 {
 	CommandMSIgnore commandmsignore;

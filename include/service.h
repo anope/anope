@@ -160,7 +160,7 @@ public:
 	}
 };
 
-class ServiceAlias
+class ServiceAlias final
 {
 	Anope::string t, f;
 public:

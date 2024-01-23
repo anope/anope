@@ -10,7 +10,7 @@
 
 namespace Redis
 {
-	struct Reply
+	struct Reply final
 	{
 		enum Type
 		{

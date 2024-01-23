@@ -14,7 +14,7 @@
 #include "anope.h"
 #include "serialize.h"
 
-class CoreExport Memo
+class CoreExport Memo final
 	: public Serializable
 {
 public:
@@ -37,7 +37,7 @@ public:
 /* Memo info structures.  Since both nicknames and channels can have memos,
  * we encapsulate memo data in a MemoInfo to make it easier to handle.
  */
-struct CoreExport MemoInfo
+struct CoreExport MemoInfo final
 {
 	int16_t memomax = 0;
 	Serialize::Checker<std::vector<Memo *> > memos;

@@ -18,7 +18,7 @@
 # define SIGPIPE -1
 #endif
 
-struct sigaction
+struct sigaction final
 {
 	void (*sa_handler)(int);
 	int sa_flags;

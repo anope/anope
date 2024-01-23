@@ -8,7 +8,7 @@
 
 #include "module.h"
 
-class HelpChannel
+class HelpChannel final
 	: public Module
 {
 public:

@@ -17,7 +17,7 @@ extern Module *me;
 
 extern Anope::string provider_name, template_name, template_base, page_title;
 
-struct SubSection
+struct SubSection final
 {
 	Anope::string name;
 	Anope::string url;
@@ -30,7 +30,7 @@ struct Section
 };
 
 /* An interface for this webpanel used by other modules */
-class Panel
+class Panel final
 	: public Section
 	, public Service
 {

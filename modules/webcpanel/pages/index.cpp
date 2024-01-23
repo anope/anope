@@ -7,7 +7,7 @@
 
 #include "../webcpanel.h"
 
-class WebpanelRequest
+class WebpanelRequest final
 	: public IdentifyRequest
 {
 	HTTPReply reply;

@@ -34,7 +34,7 @@ class MySQLService;
 
 /** A query request
  */
-struct QueryRequest
+struct QueryRequest final
 {
 	/* The connection to the database */
 	MySQLService *service;
@@ -47,7 +47,7 @@ struct QueryRequest
 };
 
 /** A query result */
-struct QueryResult
+struct QueryResult final
 {
 	/* The interface to send the data back on */
 	Interface *sqlinterface;
@@ -59,7 +59,7 @@ struct QueryResult
 
 /** A MySQL result
  */
-class MySQLResult
+class MySQLResult final
 	: public Result
 {
 	MYSQL_RES *res = nullptr;
@@ -108,7 +108,7 @@ public:
 
 /** A MySQL connection, there can be multiple
  */
-class MySQLService
+class MySQLService final
 	: public Provider
 {
 	std::map<Anope::string, std::set<Anope::string> > active_schema;
@@ -158,7 +158,7 @@ public:
 
 /** The SQL thread used to execute queries
  */
-class DispatcherThread
+class DispatcherThread final
 	: public Thread
 	, public Condition
 {
@@ -171,7 +171,7 @@ public:
 class ModuleSQL;
 static ModuleSQL *me;
 
-class ModuleSQL
+class ModuleSQL final
 	: public Module
 	, public Pipe
 {

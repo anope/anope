@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSSet
+class CommandOSSet final
 	: public Command
 {
 private:
@@ -254,7 +254,7 @@ public:
 	}
 };
 
-class OSSet
+class OSSet final
 	: public Module
 {
 	CommandOSSet commandosset;

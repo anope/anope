@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/os_session.h"
 
-struct Stats
+struct Stats final
 	: Serializable
 {
 	static Stats *me;
@@ -59,7 +59,7 @@ static int stats_count_servers(Server *s)
 	return count;
 }
 
-class CommandOSStats
+class CommandOSStats final
 	: public Command
 {
 	ServiceReference<XLineManager> akills, snlines, sqlines;
@@ -257,7 +257,7 @@ public:
 	}
 };
 
-class OSStats
+class OSStats final
 	: public Module
 {
 	CommandOSStats commandosstats;

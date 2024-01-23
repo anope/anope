@@ -40,7 +40,7 @@ struct CoreExport Oper
 	static Oper *Find(const Anope::string &name);
 };
 
-class CoreExport OperType
+class CoreExport OperType final
 {
 private:
 	/** The name of this opertype, e.g. "sra".

@@ -13,7 +13,7 @@ using namespace Redis;
 
 class MyRedisService;
 
-class RedisSocket
+class RedisSocket final
 	: public BinarySocket
 	, public ConnectionSocket
 {
@@ -33,7 +33,7 @@ public:
 	bool Read(const char *buffer, size_t l) override;
 };
 
-class Transaction
+class Transaction final
 	: public Interface
 {
 public:
@@ -74,7 +74,7 @@ public:
 	}
 };
 
-class MyRedisService
+class MyRedisService final
 	: public Provider
 {
 public:
@@ -520,7 +520,7 @@ bool RedisSocket::Read(const char *buffer, size_t l)
 }
 
 
-class ModuleRedis
+class ModuleRedis final
 	: public Module
 {
 	std::map<Anope::string, MyRedisService *> services;

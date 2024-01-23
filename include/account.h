@@ -28,7 +28,7 @@ extern CoreExport nickcoreid_map NickCoreIdList;
 /* A registered nickname.
  * It matters that Base is here before Extensible (it is inherited by Serializable)
  */
-class CoreExport NickAlias
+class CoreExport NickAlias final
 	: public Serializable
 	, public Extensible
 {
@@ -106,7 +106,7 @@ public:
  * account's display.
  * It matters that Base is here before Extensible (it is inherited by Serializable)
  */
-class CoreExport NickCore
+class CoreExport NickCore final
 	: public Serializable
 	, public Extensible
 {

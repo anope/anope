@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandHSOn
+class CommandHSOn final
 	: public Command
 {
 public:
@@ -60,7 +60,7 @@ public:
 	}
 };
 
-class HSOn
+class HSOn final
 	: public Module
 {
 	CommandHSOn commandhson;

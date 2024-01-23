@@ -20,7 +20,7 @@ namespace Uplink
 }
 
 /* This is the socket to our uplink */
-class UplinkSocket
+class UplinkSocket final
 	: public ConnectionSocket
 	, public BufferedSocket
 {
@@ -33,7 +33,7 @@ public:
 	void OnError(const Anope::string &) override;
 
 	/* A message sent over the uplink socket */
-	class CoreExport Message
+	class CoreExport Message final
 	{
 		MessageSource source;
 		std::stringstream buffer;

@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/cs_log.h"
 
-struct LogSettingImpl
+struct LogSettingImpl final
 	: LogSetting
 	, Serializable
 {
@@ -79,7 +79,7 @@ struct LogSettingImpl
 	}
 };
 
-struct LogSettingsImpl
+struct LogSettingsImpl final
 	: LogSettings
 {
 	LogSettingsImpl(Extensible *) { }
@@ -100,7 +100,7 @@ struct LogSettingsImpl
 	}
 };
 
-class CommandCSLog
+class CommandCSLog final
 	: public Command
 {
 public:
@@ -285,7 +285,7 @@ public:
 	}
 };
 
-class CSLog
+class CSLog final
 	: public Module
 {
 	ServiceReference<MemoServService> MSService;
@@ -293,7 +293,7 @@ class CSLog
 	ExtensibleItem<LogSettingsImpl> logsettings;
 	Serialize::Type logsetting_type;
 
-	struct LogDefault
+	struct LogDefault final
 	{
 		Anope::string service, command, method;
 	};

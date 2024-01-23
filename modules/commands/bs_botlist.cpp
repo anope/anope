@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandBSBotList
+class CommandBSBotList final
 	: public Command
 {
 public:
@@ -66,7 +66,7 @@ public:
 	}
 };
 
-class BSBotList
+class BSBotList final
 	: public Module
 {
 	CommandBSBotList commandbsbotlist;

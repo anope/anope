@@ -19,7 +19,7 @@ static Serialize::Checker<std::vector<DNSServer *> > dns_servers("DNSServer");
 
 static std::map<Anope::string, std::list<time_t> > server_quit_times;
 
-struct DNSZone
+struct DNSZone final
 	: Serializable
 {
 	Anope::string name;
@@ -87,7 +87,7 @@ struct DNSZone
 	}
 };
 
-class DNSServer
+class DNSServer final
 	: public Serializable
 {
 	Anope::string server_name;
@@ -206,7 +206,7 @@ public:
 	}
 };
 
-class CommandOSDNS
+class CommandOSDNS final
 	: public Command
 {
 	void DisplayPoolState(CommandSource &source)
@@ -719,7 +719,7 @@ public:
 	}
 };
 
-class ModuleDNS
+class ModuleDNS final
 	: public Module
 {
 	Serialize::Type zone_type, dns_type;

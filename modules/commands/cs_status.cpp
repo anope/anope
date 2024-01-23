@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSStatus
+class CommandCSStatus final
 	: public Command
 {
 public:
@@ -111,7 +111,7 @@ public:
 	}
 };
 
-class CSStatus
+class CSStatus final
 	: public Module
 {
 	CommandCSStatus commandcsstatus;

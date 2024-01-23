@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSUpdate
+class CommandOSUpdate final
 	: public Command
 {
 public:
@@ -38,7 +38,7 @@ public:
 	}
 };
 
-class OSUpdate
+class OSUpdate final
 	: public Module
 {
 	CommandOSUpdate commandosupdate;

@@ -94,7 +94,7 @@ else \
 #define OLD_NEWS_OPER	1
 #define OLD_NEWS_RANDOM	2
 
-static struct mlock_info
+static struct mlock_info final
 {
 	char c;
 	uint32_t m;
@@ -309,7 +309,7 @@ static char *strscpy(char *d, const char *s, size_t len)
 	return d_orig;
 }
 
-struct dbFILE
+struct dbFILE final
 {
 	int mode;				/* 'r' for reading, 'w' for writing */
 	FILE *fp;				/* The normal file descriptor */
@@ -1297,7 +1297,7 @@ static void LoadNews()
 	close_db(f);
 }
 
-class DBOld
+class DBOld final
 	: public Module
 {
 	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit;

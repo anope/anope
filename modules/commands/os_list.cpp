@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSChanList
+class CommandOSChanList final
 	: public Command
 {
 public:
@@ -129,7 +129,7 @@ public:
 	}
 };
 
-class CommandOSUserList
+class CommandOSUserList final
 	: public Command
 {
 public:
@@ -272,7 +272,7 @@ public:
 	}
 };
 
-class OSList
+class OSList final
 	: public Module
 {
 	CommandOSChanList commandoschanlist;

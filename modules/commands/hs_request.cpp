@@ -20,7 +20,7 @@ static ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ")
 
 static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vIdent, const Anope::string &vHost);
 
-struct HostRequest
+struct HostRequest final
 	: Serializable
 {
 	Anope::string nick;
@@ -64,7 +64,7 @@ struct HostRequest
 	}
 };
 
-class CommandHSRequest
+class CommandHSRequest final
 	: public Command
 {
 	bool isvalidchar(char c)
@@ -187,7 +187,7 @@ public:
 	}
 };
 
-class CommandHSActivate
+class CommandHSActivate final
 	: public Command
 {
 public:
@@ -237,7 +237,7 @@ public:
 	}
 };
 
-class CommandHSReject
+class CommandHSReject final
 	: public Command
 {
 public:
@@ -294,7 +294,7 @@ public:
 	}
 };
 
-class CommandHSWaiting
+class CommandHSWaiting final
 	: public Command
 {
 public:
@@ -353,7 +353,7 @@ public:
 	}
 };
 
-class HSRequest
+class HSRequest final
 	: public Module
 {
 	CommandHSRequest commandhsrequest;

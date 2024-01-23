@@ -14,9 +14,9 @@ using namespace DNS;
 static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
 static ServiceReference<Manager> dnsmanager("DNS::Manager", "dns/manager");
 
-struct Blacklist
+struct Blacklist final
 {
-	struct Reply
+	struct Reply final
 	{
 		int code = 0;
 		Anope::string reason;
@@ -39,7 +39,7 @@ struct Blacklist
 	}
 };
 
-class DNSBLResolver
+class DNSBLResolver final
 	: public Request
 {
 	Reference<User> user;
@@ -95,7 +95,7 @@ public:
 	}
 };
 
-class ModuleDNSBL
+class ModuleDNSBL final
 	: public Module
 {
 	std::vector<Blacklist> blacklists;

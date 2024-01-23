@@ -13,7 +13,7 @@ namespace WebCPanel
 namespace MemoServ
 {
 
-class Memos
+class Memos final
 	: public WebPanelProtectedPage
 {
 public:

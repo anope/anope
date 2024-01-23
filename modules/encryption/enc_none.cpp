@@ -9,7 +9,7 @@
 
 #include "module.h"
 
-class ENone
+class ENone final
 	: public Module
 {
 public:

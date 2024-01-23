@@ -9,18 +9,18 @@
 #include "module.h"
 #include "modules/sql.h"
 
-struct SQLOper
+struct SQLOper final
 	: Oper
 {
 	SQLOper(const Anope::string &n, OperType *o) : Oper(n, o) { }
 };
 
-class SQLOperResult
+class SQLOperResult final
 	: public SQL::Interface
 {
 	Reference<User> user;
 
-	struct SQLOperResultDeleter
+	struct SQLOperResultDeleter final
 	{
 		SQLOperResult *res;
 		SQLOperResultDeleter(SQLOperResult *r) : res(r) { }
@@ -125,7 +125,7 @@ public:
 	}
 };
 
-class ModuleSQLOper
+class ModuleSQLOper final
 	: public Module
 {
 	Anope::string engine;

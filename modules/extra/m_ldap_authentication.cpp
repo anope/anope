@@ -17,7 +17,7 @@ static Anope::string object_class;
 static Anope::string email_attribute;
 static Anope::string username_attribute;
 
-struct IdentifyInfo
+struct IdentifyInfo final
 {
 	Reference<User> user;
 	IdentifyRequest *req;
@@ -36,7 +36,7 @@ struct IdentifyInfo
 	}
 };
 
-class IdentifyInterface
+class IdentifyInterface final
 	: public LDAPInterface
 {
 	IdentifyInfo *ii;
@@ -128,7 +128,7 @@ public:
 	}
 };
 
-class OnIdentifyInterface
+class OnIdentifyInterface final
 	: public LDAPInterface
 {
 	Anope::string uid;
@@ -174,7 +174,7 @@ public:
 	}
 };
 
-class OnRegisterInterface
+class OnRegisterInterface final
 	: public LDAPInterface
 {
 public:
@@ -191,7 +191,7 @@ public:
 	}
 };
 
-class ModuleLDAPAuthentication
+class ModuleLDAPAuthentication final
 	: public Module
 {
 	ServiceReference<LDAPProvider> ldap;

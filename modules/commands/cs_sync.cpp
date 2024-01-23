@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSSync
+class CommandCSSync final
 	: public Command
 {
 public:
@@ -53,7 +53,7 @@ public:
 	}
 };
 
-class CSSync
+class CSSync final
 	: public Module
 {
 	CommandCSSync commandcssync;

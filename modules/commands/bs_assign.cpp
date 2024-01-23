@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandBSAssign
+class CommandBSAssign final
 	: public Command
 {
 public:
@@ -83,7 +83,7 @@ public:
 	}
 };
 
-class CommandBSUnassign
+class CommandBSUnassign final
 	: public Command
 {
 public:
@@ -147,7 +147,7 @@ public:
 	}
 };
 
-class CommandBSSetNoBot
+class CommandBSSetNoBot final
 	: public Command
 {
 public:
@@ -205,7 +205,7 @@ public:
 	}
 };
 
-class BSAssign
+class BSAssign final
 	: public Module
 {
 	ExtensibleItem<bool> nobot;

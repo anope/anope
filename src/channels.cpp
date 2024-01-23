@@ -242,7 +242,7 @@ const Channel::ModeList &Channel::GetModes() const
 }
 
 template<typename F, typename S>
-struct second
+struct second final
 {
 	S operator()(const std::pair<F, S> &p)
 	{

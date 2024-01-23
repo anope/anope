@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSUp
+class CommandCSUp final
 	: public Command
 {
 	void SetModes(User *u, Channel *c)
@@ -130,7 +130,7 @@ public:
 	}
 };
 
-class CommandCSDown
+class CommandCSDown final
 	: public Command
 {
 	void RemoveAll(User *u, Channel *c)
@@ -228,7 +228,7 @@ public:
 	}
 };
 
-class CSUpDown
+class CSUpDown final
 	: public Module
 {
 	CommandCSUp commandcsup;

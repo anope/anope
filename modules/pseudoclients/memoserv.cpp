@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class MemoServCore
+class MemoServCore final
 	: public Module
 	, public MemoServService
 {

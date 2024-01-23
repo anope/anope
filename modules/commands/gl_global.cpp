@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandGLGlobal
+class CommandGLGlobal final
 	: public Command
 {
 	ServiceReference<GlobalService> GService;
@@ -52,7 +52,7 @@ public:
 	}
 };
 
-class GLGlobal
+class GLGlobal final
 	: public Module
 {
 	CommandGLGlobal commandglglobal;

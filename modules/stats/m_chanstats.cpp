@@ -9,7 +9,7 @@
 #include "module.h"
 #include "modules/sql.h"
 
-class CommandCSSetChanstats
+class CommandCSSetChanstats final
 	: public Command
 {
 public:
@@ -123,7 +123,7 @@ public:
 	}
 };
 
-class CommandNSSASetChanstats
+class CommandNSSASetChanstats final
 	: public CommandNSSetChanstats
 {
 public:
@@ -147,7 +147,7 @@ public:
 	}
 };
 
-class MySQLInterface
+class MySQLInterface final
 	: public SQL::Interface
 {
 public:
@@ -166,7 +166,7 @@ public:
 	}
 };
 
-class MChanstats
+class MChanstats final
 	: public Module
 {
 	SerializableExtensibleItem<bool> cs_stats, ns_stats;

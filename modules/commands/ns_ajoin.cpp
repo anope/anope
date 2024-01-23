@@ -13,14 +13,14 @@
 
 struct AJoinEntry;
 
-struct AJoinList
+struct AJoinList final
 	: Serialize::Checker<std::vector<AJoinEntry *> >
 {
 	AJoinList(Extensible *) : Serialize::Checker<std::vector<AJoinEntry *> >("AJoinEntry") { }
 	~AJoinList();
 };
 
-struct AJoinEntry
+struct AJoinEntry final
 	: Serializable
 {
 	Serialize::Reference<NickCore> owner;
@@ -88,7 +88,7 @@ AJoinList::~AJoinList()
 		delete ajoin;
 }
 
-class CommandNSAJoin
+class CommandNSAJoin final
 	: public Command
 {
 	void DoList(CommandSource &source, NickCore *nc)
@@ -300,7 +300,7 @@ public:
 	}
 };
 
-class NSAJoin
+class NSAJoin final
 	: public Module
 {
 	CommandNSAJoin commandnsajoin;

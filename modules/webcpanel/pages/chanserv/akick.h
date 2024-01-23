@@ -13,7 +13,7 @@ namespace WebCPanel
 namespace ChanServ
 {
 
-class Akick
+class Akick final
 	: public WebPanelProtectedPage
 {
 public:

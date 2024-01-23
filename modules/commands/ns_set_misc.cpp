@@ -31,7 +31,7 @@ static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name)
 	return it;
 }
 
-struct NSMiscData
+struct NSMiscData final
 	: MiscData
 	, Serializable
 {
@@ -164,7 +164,7 @@ public:
 	}
 };
 
-class CommandNSSASetMisc
+class CommandNSSASetMisc final
 	: public CommandNSSetMisc
 {
 public:
@@ -180,7 +180,7 @@ public:
 	}
 };
 
-class NSSetMisc
+class NSSetMisc final
 	: public Module
 {
 	CommandNSSetMisc commandnssetmisc;

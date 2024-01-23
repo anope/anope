@@ -10,7 +10,7 @@
 #include "modules/xmlrpc.h"
 #include "modules/httpd.h"
 
-static struct special_chars
+static struct special_chars final
 {
 	Anope::string character;
 	Anope::string replace;
@@ -32,7 +32,7 @@ special[] = {
 	special_chars("", "")
 };
 
-class MyXMLRPCServiceInterface
+class MyXMLRPCServiceInterface final
 	: public XMLRPCServiceInterface
 	, public HTTPPage
 {
@@ -196,7 +196,7 @@ public:
 	}
 };
 
-class ModuleXMLRPC
+class ModuleXMLRPC final
 	: public Module
 {
 	ServiceReference<HTTPProvider> httpref;

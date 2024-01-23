@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSKill
+class CommandOSKill final
 	: public Command
 {
 public:
@@ -53,7 +53,7 @@ public:
 	}
 };
 
-class OSKill
+class OSKill final
 	: public Module
 {
 	CommandOSKill commandoskill;

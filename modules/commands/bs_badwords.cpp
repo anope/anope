@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/bs_badwords.h"
 
-struct BadWordImpl
+struct BadWordImpl final
 	: BadWord
 	, Serializable
 {
@@ -29,7 +29,7 @@ struct BadWordImpl
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
-struct BadWordsImpl
+struct BadWordsImpl final
 	: BadWords
 {
 	Serialize::Reference<ChannelInfo> ci;
@@ -147,7 +147,7 @@ Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 	return bw;
 }
 
-class BadwordsDelCallback
+class BadwordsDelCallback final
 	: public NumberList
 {
 	CommandSource &source;
@@ -185,7 +185,7 @@ public:
 	}
 };
 
-class CommandBSBadwords
+class CommandBSBadwords final
 	: public Command
 {
 private:
@@ -205,7 +205,7 @@ private:
 		}
 		else if (!word.empty() && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class BadwordsListCallback
+			class BadwordsListCallback final
 				: public NumberList
 			{
 				ListFormatter &list;
@@ -459,7 +459,7 @@ public:
 	}
 };
 
-class BSBadwords
+class BSBadwords final
 	: public Module
 {
 	CommandBSBadwords commandbsbadwords;

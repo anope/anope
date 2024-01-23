@@ -8,7 +8,7 @@
 
 #include "module.h"
 
-struct ProxyCheck
+struct ProxyCheck final
 {
 	std::set<Anope::string, ci::less> types;
 	std::vector<unsigned short> ports;
@@ -21,10 +21,10 @@ static Anope::string target_ip;
 static unsigned short target_port;
 static bool add_to_akill;
 
-class ProxyCallbackListener
+class ProxyCallbackListener final
 	: public ListenSocket
 {
-	class ProxyCallbackClient
+	class ProxyCallbackClient final
 		: public ClientSocket
 		, public BufferedSocket
 	{
@@ -111,7 +111,7 @@ protected:
 ServiceReference<XLineManager> ProxyConnect::akills("XLineManager", "xlinemanager/sgline");
 std::set<ProxyConnect *> ProxyConnect::proxies;
 
-class HTTPProxyConnect
+class HTTPProxyConnect final
 	: public ProxyConnect
 	, public BufferedSocket
 {
@@ -145,7 +145,7 @@ public:
 	}
 };
 
-class SOCKS5ProxyConnect
+class SOCKS5ProxyConnect final
 	: public ProxyConnect
 	, public BinarySocket
 {
@@ -197,7 +197,7 @@ public:
 	}
 };
 
-class ModuleProxyScan
+class ModuleProxyScan final
 	: public Module
 {
 	Anope::string listen_ip;
@@ -207,7 +207,7 @@ class ModuleProxyScan
 
 	ProxyCallbackListener *listener;
 
-	class ConnectionTimeout
+	class ConnectionTimeout final
 		: public Timer
 	{
 	public:

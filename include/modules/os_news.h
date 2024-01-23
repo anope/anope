@@ -15,7 +15,7 @@ enum NewsType
 	NEWS_OPER
 };
 
-struct NewsMessages
+struct NewsMessages final
 {
 	NewsType type;
 	Anope::string name;

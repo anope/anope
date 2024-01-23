@@ -11,7 +11,7 @@
 namespace SQL
 {
 
-	class Data
+	class Data final
 		: public Serialize::Data
 	{
 	public:
@@ -93,13 +93,13 @@ namespace SQL
 	/** A SQL query
 	 */
 
-	struct QueryData
+	struct QueryData final
 	{
 		Anope::string data;
 		bool escape;
 	};
 
-	struct Query
+	struct Query final
 	{
 		Anope::string query;
 		std::map<Anope::string, QueryData> parameters;

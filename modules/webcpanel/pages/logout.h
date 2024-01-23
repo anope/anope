@@ -10,7 +10,7 @@
 namespace WebCPanel
 {
 
-class Logout
+class Logout final
 	: public WebPanelProtectedPage
 {
 public:

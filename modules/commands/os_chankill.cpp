@@ -13,7 +13,7 @@
 
 static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
 
-class CommandOSChanKill
+class CommandOSChanKill final
 	: public Command
 {
 public:
@@ -103,7 +103,7 @@ public:
 	}
 };
 
-class OSChanKill
+class OSChanKill final
 	: public Module
 {
 	CommandOSChanKill commandoschankill;

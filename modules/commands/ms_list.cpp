@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandMSList
+class CommandMSList final
 	: public Command
 {
 public:
@@ -66,7 +66,7 @@ public:
 
 			if (!param.empty() && isdigit(param[0]))
 			{
-				class MemoListCallback
+				class MemoListCallback final
 					: public NumberList
 				{
 					ListFormatter &list;
@@ -151,7 +151,7 @@ public:
 	}
 };
 
-class MSList
+class MSList final
 	: public Module
 {
 	CommandMSList commandmslist;

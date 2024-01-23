@@ -15,7 +15,7 @@
 
 static Module *me;
 
-struct KickerDataImpl
+struct KickerDataImpl final
 	: KickerData
 {
 	KickerDataImpl(Extensible *obj)
@@ -38,7 +38,7 @@ struct KickerDataImpl
 		ci->Shrink<KickerData>("kickerdata");
 	}
 
-	struct ExtensibleItem
+	struct ExtensibleItem final
 		: ::ExtensibleItem<KickerDataImpl>
 	{
 		ExtensibleItem(Module *m, const Anope::string &ename) : ::ExtensibleItem<KickerDataImpl>(m, ename) { }
@@ -117,7 +117,7 @@ struct KickerDataImpl
 	};
 };
 
-class CommandBSKick
+class CommandBSKick final
 	: public Command
 {
 public:
@@ -248,7 +248,7 @@ protected:
 	}
 };
 
-class CommandBSKickAMSG
+class CommandBSKickAMSG final
 	: public CommandBSKickBase
 {
 public:
@@ -285,7 +285,7 @@ public:
 	}
 };
 
-class CommandBSKickBadwords
+class CommandBSKickBadwords final
 	: public CommandBSKickBase
 {
 public:
@@ -325,7 +325,7 @@ public:
 	}
 };
 
-class CommandBSKickBolds
+class CommandBSKickBolds final
 	: public CommandBSKickBase
 {
 public:
@@ -360,7 +360,7 @@ public:
 	}
 };
 
-class CommandBSKickCaps
+class CommandBSKickCaps final
 	: public CommandBSKickBase
 {
 public:
@@ -457,7 +457,7 @@ public:
 	}
 };
 
-class CommandBSKickColors
+class CommandBSKickColors final
 	: public CommandBSKickBase
 {
 public:
@@ -492,7 +492,7 @@ public:
 	}
 };
 
-class CommandBSKickFlood
+class CommandBSKickFlood final
 	: public CommandBSKickBase
 {
 public:
@@ -591,7 +591,7 @@ public:
 	}
 };
 
-class CommandBSKickItalics
+class CommandBSKickItalics final
 	: public CommandBSKickBase
 {
 public:
@@ -626,7 +626,7 @@ public:
 	}
 };
 
-class CommandBSKickRepeat
+class CommandBSKickRepeat final
 	: public CommandBSKickBase
 {
 public:
@@ -728,7 +728,7 @@ public:
 	}
 };
 
-class CommandBSKickReverses
+class CommandBSKickReverses final
 	: public CommandBSKickBase
 {
 public:
@@ -763,7 +763,7 @@ public:
 	}
 };
 
-class CommandBSKickUnderlines
+class CommandBSKickUnderlines final
 	: public CommandBSKickBase
 {
 public:
@@ -798,7 +798,7 @@ public:
 	}
 };
 
-class CommandBSSetDontKickOps
+class CommandBSSetDontKickOps final
 	: public Command
 {
 public:
@@ -864,7 +864,7 @@ public:
 	}
 };
 
-class CommandBSSetDontKickVoices
+class CommandBSSetDontKickVoices final
 	: public Command
 {
 public:
@@ -930,9 +930,9 @@ public:
 	}
 };
 
-struct BanData
+struct BanData final
 {
-	struct Data
+	struct Data final
 	{
 		Anope::string mask;
 		time_t last_use;
@@ -978,7 +978,7 @@ public:
 	}
 };
 
-struct UserData
+struct UserData final
 {
 	UserData(Extensible *)
 	{
@@ -1001,7 +1001,7 @@ struct UserData
 	Anope::string lastline;
 };
 
-class BanDataPurger
+class BanDataPurger final
 	: public Timer
 {
 public:
@@ -1024,7 +1024,7 @@ public:
 	}
 };
 
-class BSKick
+class BSKick final
 	: public Module
 {
 	ExtensibleItem<BanData> bandata;

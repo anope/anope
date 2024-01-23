@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/sql.h"
 
-class MySQLInterface
+class MySQLInterface final
 	: public SQL::Interface
 {
 public:
@@ -32,7 +32,7 @@ public:
 };
 
 
-class CommandCSStats
+class CommandCSStats final
 	: public Command
 {
 public:
@@ -45,7 +45,7 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
 };
 
-class CommandCSGStats
+class CommandCSGStats final
 	: public Command
 {
 public:
@@ -61,7 +61,7 @@ public:
 
 class CSStats;
 static CSStats *me;
-class CSStats
+class CSStats final
 	: public Module
 {
 	CommandCSStats commandcsstats;

@@ -72,7 +72,7 @@ public:
 	virtual int run() = 0;
 };
 
-class LDAPBind
+class LDAPBind final
 	: public LDAPRequest
 {
 	Anope::string who, pass;
@@ -89,7 +89,7 @@ public:
 	int run() override;
 };
 
-class LDAPSearchRequest
+class LDAPSearchRequest final
 	: public LDAPRequest
 {
 	Anope::string base;
@@ -107,7 +107,7 @@ public:
 	int run() override;
 };
 
-class LDAPAdd
+class LDAPAdd final
 	: public LDAPRequest
 {
 	Anope::string dn;
@@ -125,7 +125,7 @@ public:
 	int run() override;
 };
 
-class LDAPDel
+class LDAPDel final
 	: public LDAPRequest
 {
 	Anope::string dn;
@@ -141,7 +141,7 @@ public:
 	int run() override;
 };
 
-class LDAPModify
+class LDAPModify final
 	: public LDAPRequest
 {
 	Anope::string base;
@@ -159,7 +159,7 @@ public:
 	int run() override;
 };
 
-class LDAPService
+class LDAPService final
 	: public LDAPProvider
 	, public Thread
 	, public Condition
@@ -509,7 +509,7 @@ public:
 	}
 };
 
-class ModuleLDAP
+class ModuleLDAP final
 	: public Module
 	, public Pipe
 {

@@ -54,7 +54,7 @@ static const uint32_t sha1_iv[5] =
 	0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0
 };
 
-class SHA1Context
+class SHA1Context final
 	: public Encryption::Context
 {
 	uint32_t state[5];
@@ -179,7 +179,7 @@ public:
 	}
 };
 
-class SHA1Provider
+class SHA1Provider final
 	: public Encryption::Provider
 {
 public:
@@ -199,7 +199,7 @@ public:
 	}
 };
 
-class ESHA1
+class ESHA1 final
 	: public Module
 {
 	SHA1Provider sha1provider;

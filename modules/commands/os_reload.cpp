@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSReload
+class CommandOSReload final
 	: public Command
 {
 public:
@@ -53,7 +53,7 @@ public:
 	}
 };
 
-class OSReload
+class OSReload final
 	: public Module
 {
 	CommandOSReload commandosreload;

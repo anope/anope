@@ -50,7 +50,7 @@ namespace Anope
 
 	/* rfc1459 case insensitive ctype, { = [, } = ], and | = \ */
 	template<typename char_type>
-	class rfc1459_ctype
+	class rfc1459_ctype final
 		: public ascii_ctype<char_type>
 	{
 	public:
@@ -80,7 +80,7 @@ namespace ci
 	 * This class is used to implement ci::string, a case-insensitive, ASCII-
 	 * comparing string class.
 	 */
-	struct CoreExport ci_char_traits
+	struct CoreExport ci_char_traits final
 		: std::char_traits<char>
 	{
 		/** Check if two chars match.
@@ -126,7 +126,7 @@ namespace ci
 	 */
 	typedef std::basic_string<char, ci_char_traits, std::allocator<char> > string;
 
-	struct CoreExport less
+	struct CoreExport less final
 	{
 		/** Compare two Anope::strings as ci::strings and find which one is less
 		 * @param s1 The first string

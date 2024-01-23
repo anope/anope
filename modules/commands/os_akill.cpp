@@ -13,7 +13,7 @@
 
 static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
 
-class AkillDelCallback
+class AkillDelCallback final
 	: public NumberList
 {
 	CommandSource &source;
@@ -56,7 +56,7 @@ public:
 	}
 };
 
-class CommandOSAKill
+class CommandOSAKill final
 	: public Command
 {
 private:
@@ -264,7 +264,7 @@ private:
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class ListCallback
+			class ListCallback final
 				: public NumberList
 			{
 				CommandSource &source;
@@ -471,7 +471,7 @@ public:
 	}
 };
 
-class OSAKill
+class OSAKill final
 	: public Module
 {
 	CommandOSAKill commandosakill;

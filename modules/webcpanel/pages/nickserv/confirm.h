@@ -11,7 +11,7 @@ namespace WebCPanel
 namespace NickServ
 {
 
-class Confirm
+class Confirm final
 	: public WebPanelProtectedPage
 {
 public:

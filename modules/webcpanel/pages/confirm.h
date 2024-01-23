@@ -12,7 +12,7 @@
 namespace WebCPanel
 {
 
-class Confirm
+class Confirm final
 	: public WebPanelPage
 {
 public:

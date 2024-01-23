@@ -37,7 +37,7 @@ enum LogType
 	LOG_DEBUG_4
 };
 
-struct LogFile
+struct LogFile final
 {
 	Anope::string filename;
 	std::ofstream stream;
@@ -48,7 +48,7 @@ struct LogFile
 };
 
 /* Represents a single log message */
-class CoreExport Log
+class CoreExport Log final
 {
 public:
 	/* Bot that should log this message */
@@ -109,7 +109,7 @@ public:
 };
 
 /* Configured in the configuration file, actually does the message logging */
-class CoreExport LogInfo
+class CoreExport LogInfo final
 {
 public:
 	BotInfo *bot = nullptr;

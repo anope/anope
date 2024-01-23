@@ -10,7 +10,7 @@
 
 namespace SASL
 {
-	struct Message
+	struct Message final
 	{
 		Anope::string source;
 		Anope::string target;

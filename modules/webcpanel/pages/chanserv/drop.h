@@ -13,7 +13,7 @@ namespace WebCPanel
 	namespace ChanServ
 	{
 
-		class Drop
+		class Drop final
 			: public WebPanelProtectedPage
 		{
 		public:

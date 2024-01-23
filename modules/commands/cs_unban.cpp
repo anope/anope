@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandCSUnban
+class CommandCSUnban final
 	: public Command
 {
 public:
@@ -116,7 +116,7 @@ public:
 	}
 };
 
-class CSUnban
+class CSUnban final
 	: public Module
 {
 	CommandCSUnban commandcsunban;

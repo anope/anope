@@ -15,7 +15,7 @@
 #include "anope.h"
 #include "service.h"
 
-class CoreExport RegexException
+class CoreExport RegexException final
 	: public CoreException
 {
 public:

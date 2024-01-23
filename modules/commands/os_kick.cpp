@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSKick
+class CommandOSKick final
 	: public Command
 {
 public:
@@ -70,7 +70,7 @@ public:
 	}
 };
 
-class OSKick
+class OSKick final
 	: public Module
 {
 	CommandOSKick commandoskick;

@@ -15,7 +15,7 @@
 static Anope::string UplinkSID;
 static bool UseSVSAccount = false;  // Temporary backwards compatibility hack until old proto is deprecated
 
-class HybridProto
+class HybridProto final
 	: public IRCDProto
 {
 	void SendSVSKillInternal(const MessageSource &source, User *u, const Anope::string &buf) override
@@ -318,7 +318,7 @@ public:
 	}
 };
 
-struct IRCDMessageBMask
+struct IRCDMessageBMask final
 	: IRCDMessage
 {
 	IRCDMessageBMask(Module *creator) : IRCDMessage(creator, "BMASK", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -341,7 +341,7 @@ struct IRCDMessageBMask
 	}
 };
 
-struct IRCDMessageCapab
+struct IRCDMessageCapab final
 	: Message::Capab
 {
 	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -382,7 +382,7 @@ struct IRCDMessageCertFP: IRCDMessage
 	}
 };
 
-struct IRCDMessageEOB
+struct IRCDMessageEOB final
 	: IRCDMessage
 {
 	IRCDMessageEOB(Module *creator) : IRCDMessage(creator, "EOB", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -393,7 +393,7 @@ struct IRCDMessageEOB
 	}
 };
 
-struct IRCDMessageJoin
+struct IRCDMessageJoin final
 	: Message::Join
 {
 	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { }
@@ -410,7 +410,7 @@ struct IRCDMessageJoin
 	}
 };
 
-struct IRCDMessageMetadata
+struct IRCDMessageMetadata final
 	: IRCDMessage
 {
 	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -437,7 +437,7 @@ struct IRCDMessageMetadata
 	}
 };
 
-struct IRCDMessageMLock
+struct IRCDMessageMLock final
 	: IRCDMessage
 {
 	IRCDMessageMLock(Module *creator) : IRCDMessage(creator, "MLOCK", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -463,7 +463,7 @@ struct IRCDMessageMLock
 	}
 };
 
-struct IRCDMessageNick
+struct IRCDMessageNick final
 	: IRCDMessage
 {
 	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
@@ -476,7 +476,7 @@ struct IRCDMessageNick
 	}
 };
 
-struct IRCDMessagePass
+struct IRCDMessagePass final
 	: IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 1) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -490,7 +490,7 @@ struct IRCDMessagePass
 	}
 };
 
-struct IRCDMessagePong
+struct IRCDMessagePong final
 	: IRCDMessage
 {
 	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -501,7 +501,7 @@ struct IRCDMessagePong
 	}
 };
 
-struct IRCDMessageServer
+struct IRCDMessageServer final
 	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -526,7 +526,7 @@ struct IRCDMessageServer
 	}
 };
 
-struct IRCDMessageSID
+struct IRCDMessageSID final
 	: IRCDMessage
 {
 	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 5) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -542,7 +542,7 @@ struct IRCDMessageSID
 	}
 };
 
-struct IRCDMessageSJoin
+struct IRCDMessageSJoin final
 	: IRCDMessage
 {
 	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -590,7 +590,7 @@ struct IRCDMessageSJoin
 	}
 };
 
-struct IRCDMessageSVSMode
+struct IRCDMessageSVSMode final
 	: IRCDMessage
 {
 	IRCDMessageSVSMode(Module *creator) : IRCDMessage(creator, "SVSMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -611,7 +611,7 @@ struct IRCDMessageSVSMode
 	}
 };
 
-struct IRCDMessageTBurst
+struct IRCDMessageTBurst final
 	: IRCDMessage
 {
 	IRCDMessageTBurst(Module *creator) : IRCDMessage(creator, "TBURST", 5) { }
@@ -630,7 +630,7 @@ struct IRCDMessageTBurst
 	}
 };
 
-struct IRCDMessageTMode
+struct IRCDMessageTMode final
 	: IRCDMessage
 {
 	IRCDMessageTMode(Module *creator) : IRCDMessage(creator, "TMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -658,7 +658,7 @@ struct IRCDMessageTMode
 	}
 };
 
-struct IRCDMessageUID
+struct IRCDMessageUID final
 	: IRCDMessage
 {
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -679,7 +679,7 @@ struct IRCDMessageUID
 	}
 };
 
-class ProtoHybrid
+class ProtoHybrid final
 	: public Module
 {
 	HybridProto ircd_proto;

@@ -15,13 +15,13 @@
 #include "anope.h"
 #include "channels.h"
 
-struct CommandGroup
+struct CommandGroup final
 {
 	Anope::string name, description;
 };
 
 /* Used in BotInfo::commands */
-struct CommandInfo
+struct CommandInfo final
 {
 	typedef Anope::map<CommandInfo> map;
 
@@ -47,7 +47,7 @@ struct CoreExport CommandReply
 };
 
 /* The source for a command */
-class CoreExport CommandSource
+class CoreExport CommandSource final
 {
 	/* The nick executing the command */
 	Anope::string nick;

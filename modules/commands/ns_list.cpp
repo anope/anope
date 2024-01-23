@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandNSList
+class CommandNSList final
 	: public Command
 {
 public:
@@ -243,7 +243,7 @@ public:
 	}
 };
 
-class CommandNSSASetPrivate
+class CommandNSSASetPrivate final
 	: public CommandNSSetPrivate
 {
 public:
@@ -273,7 +273,7 @@ public:
 };
 
 
-class NSList
+class NSList final
 	: public Module
 {
 	CommandNSList commandnslist;

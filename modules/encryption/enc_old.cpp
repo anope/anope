@@ -14,7 +14,7 @@
 
 static ServiceReference<Encryption::Provider> md5("Encryption::Provider", "md5");
 
-class OldMD5Provider
+class OldMD5Provider final
 	: public Encryption::Provider
 {
 public:
@@ -35,7 +35,7 @@ public:
 	}
 };
 
-class EOld
+class EOld final
 	: public Module
 {
 	OldMD5Provider oldmd5provider;

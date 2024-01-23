@@ -15,7 +15,7 @@
 
 #include "module.h"
 
-class CommandNSGetEMail
+class CommandNSGetEMail final
 	: public Command
 {
 public:
@@ -59,7 +59,7 @@ public:
 	}
 };
 
-class NSGetEMail
+class NSGetEMail final
 	: public Module
 {
 	CommandNSGetEMail commandnsgetemail;

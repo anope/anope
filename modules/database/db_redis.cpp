@@ -14,7 +14,7 @@ using namespace Redis;
 class DatabaseRedis;
 static DatabaseRedis *me;
 
-class Data
+class Data final
 	: public Serialize::Data
 {
 public:
@@ -52,7 +52,7 @@ public:
 	}
 };
 
-class TypeLoader
+class TypeLoader final
 	: public Interface
 {
 	Anope::string type;
@@ -62,7 +62,7 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class ObjectLoader
+class ObjectLoader final
 	: public Interface
 {
 	Anope::string type;
@@ -74,7 +74,7 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class IDInterface
+class IDInterface final
 	: public Interface
 {
 	Reference<Serializable> o;
@@ -84,7 +84,7 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class Deleter
+class Deleter final
 	: public Interface
 {
 	Anope::string type;
@@ -95,7 +95,7 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class Updater
+class Updater final
 	: public Interface
 {
 	Anope::string type;
@@ -106,7 +106,7 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class ModifiedObject
+class ModifiedObject final
 	: public Interface
 {
 	Anope::string type;
@@ -117,7 +117,7 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class SubscriptionListener
+class SubscriptionListener final
 	: public Interface
 {
 public:
@@ -126,7 +126,7 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class DatabaseRedis
+class DatabaseRedis final
 	: public Module
 	, public Pipe
 {

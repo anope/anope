@@ -20,7 +20,7 @@ static inline void reset_levels(ChannelInfo *ci)
 		ci->SetLevel(priv, level);
 }
 
-class AccessChanAccess
+class AccessChanAccess final
 	: public ChanAccess
 {
 public:
@@ -68,7 +68,7 @@ public:
 	}
 };
 
-class AccessAccessProvider
+class AccessAccessProvider final
 	: public AccessProvider
 {
 public:
@@ -86,7 +86,7 @@ public:
 };
 AccessAccessProvider* AccessAccessProvider::me;
 
-class CommandCSAccess
+class CommandCSAccess final
 	: public Command
 {
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -260,7 +260,7 @@ class CommandCSAccess
 			source.Reply(_("%s access list is empty."), ci->name.c_str());
 		else if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class AccessDelCallback
+			class AccessDelCallback final
 				: public NumberList
 			{
 				CommandSource &source;
@@ -365,7 +365,7 @@ class CommandCSAccess
 			source.Reply(_("%s access list is empty."), ci->name.c_str());
 		else if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class AccessListCallback
+			class AccessListCallback final
 				: public NumberList
 			{
 				ListFormatter &list;
@@ -638,7 +638,7 @@ public:
 	}
 };
 
-class CommandCSLevels
+class CommandCSLevels final
 	: public Command
 {
 	void DoSet(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -863,7 +863,7 @@ public:
 	}
 };
 
-class CSAccess
+class CSAccess final
 	: public Module
 {
 	AccessAccessProvider accessprovider;

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSJupe
+class CommandOSJupe final
 	: public Command
 {
 public:
@@ -66,7 +66,7 @@ public:
 	}
 };
 
-class OSJupe
+class OSJupe final
 	: public Module
 {
 	CommandOSJupe commandosjupe;

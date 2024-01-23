@@ -64,7 +64,7 @@ struct NewsMessages msgarray[] = {
 	 }
 };
 
-struct MyNewsItem
+struct MyNewsItem final
 	: NewsItem
 {
 	void Serialize(Serialize::Data &data) const override
@@ -99,7 +99,7 @@ struct MyNewsItem
 	}
 };
 
-class MyNewsService
+class MyNewsService final
 	: public NewsService
 {
 	std::vector<NewsItem *> newsItems[3];
@@ -299,7 +299,7 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 };
 
-class CommandOSLogonNews
+class CommandOSLogonNews final
 	: public NewsBase
 {
 public:
@@ -327,7 +327,7 @@ public:
 	}
 };
 
-class CommandOSOperNews
+class CommandOSOperNews final
 	: public NewsBase
 {
 public:
@@ -355,7 +355,7 @@ public:
 	}
 };
 
-class CommandOSRandomNews
+class CommandOSRandomNews final
 	: public NewsBase
 {
 public:
@@ -382,7 +382,7 @@ public:
 
 static unsigned cur_rand_news = 0;
 
-class OSNews
+class OSNews final
 	: public Module
 {
 	MyNewsService newsservice;

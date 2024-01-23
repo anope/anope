@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/suspend.h"
 
-struct CSSuspendInfo
+struct CSSuspendInfo final
 	: SuspendInfo
 	, Serializable
 {
@@ -52,7 +52,7 @@ struct CSSuspendInfo
 	}
 };
 
-class CommandCSSuspend
+class CommandCSSuspend final
 	: public Command
 {
 public:
@@ -145,7 +145,7 @@ public:
 	}
 };
 
-class CommandCSUnSuspend
+class CommandCSUnSuspend final
 	: public Command
 {
 public:
@@ -197,7 +197,7 @@ public:
 	}
 };
 
-class CSSuspend
+class CSSuspend final
 	: public Module
 {
 	CommandCSSuspend commandcssuspend;
@@ -206,7 +206,7 @@ class CSSuspend
 	Serialize::Type suspend_type;
 	std::vector<Anope::string> show;
 
-	struct trim
+	struct trim final
 	{
 		Anope::string operator()(Anope::string s) const
 		{

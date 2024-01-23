@@ -15,7 +15,7 @@ static Anope::string UplinkSID;
 
 static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
 
-class RatboxProto
+class RatboxProto final
 	: public IRCDProto
 {
 	BotInfo *FindIntroduced()
@@ -141,7 +141,7 @@ public:
 	}
 };
 
-struct IRCDMessageEncap
+struct IRCDMessageEncap final
 	: IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 3) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
@@ -167,7 +167,7 @@ struct IRCDMessageEncap
 	}
 };
 
-struct IRCDMessageJoin
+struct IRCDMessageJoin final
 	: Message::Join
 {
 	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { }
@@ -187,7 +187,7 @@ struct IRCDMessageJoin
 	}
 };
 
-struct IRCDMessagePass
+struct IRCDMessagePass final
 	: IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -198,7 +198,7 @@ struct IRCDMessagePass
 	}
 };
 
-struct IRCDMessageServer
+struct IRCDMessageServer final
 	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -214,7 +214,7 @@ struct IRCDMessageServer
 	}
 };
 
-struct IRCDMessageTBurst
+struct IRCDMessageTBurst final
 	: IRCDMessage
 {
 	IRCDMessageTBurst(Module *creator) : IRCDMessage(creator, "TB", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -240,7 +240,7 @@ struct IRCDMessageTBurst
 	}
 };
 
-struct IRCDMessageUID
+struct IRCDMessageUID final
 	: IRCDMessage
 {
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 9) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -253,7 +253,7 @@ struct IRCDMessageUID
 	}
 };
 
-class ProtoRatbox
+class ProtoRatbox final
 	: public Module
 {
 	Module *m_hybrid;

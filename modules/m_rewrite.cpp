@@ -8,7 +8,7 @@
 
 #include "module.h"
 
-struct Rewrite
+struct Rewrite final
 {
 	Anope::string client, source_message, target_message, desc;
 
@@ -97,7 +97,7 @@ struct Rewrite
 
 std::vector<Rewrite> Rewrite::rewrites;
 
-class RewriteCommand
+class RewriteCommand final
 	: public Command
 {
 public:
@@ -146,7 +146,7 @@ public:
 	}
 };
 
-class ModuleRewrite
+class ModuleRewrite final
 	: public Module
 {
 	RewriteCommand cmdrewrite;

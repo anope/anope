@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/cs_mode.h"
 
-class CommandCSSet
+class CommandCSSet final
 	: public Command
 {
 public:
@@ -65,7 +65,7 @@ public:
 	}
 };
 
-class CommandCSSetAutoOp
+class CommandCSSetAutoOp final
 	: public Command
 {
 public:
@@ -129,7 +129,7 @@ public:
 	}
 };
 
-class CommandCSSetBanType
+class CommandCSSetBanType final
 	: public Command
 {
 public:
@@ -197,7 +197,7 @@ public:
 	}
 };
 
-class CommandCSSetDescription
+class CommandCSSetDescription final
 	: public Command
 {
 public:
@@ -260,7 +260,7 @@ public:
 	}
 };
 
-class CommandCSSetFounder
+class CommandCSSetFounder final
 	: public Command
 {
 public:
@@ -330,7 +330,7 @@ public:
 	}
 };
 
-class CommandCSSetKeepModes
+class CommandCSSetKeepModes final
 	: public Command
 {
 public:
@@ -396,7 +396,7 @@ public:
 	}
 };
 
-class CommandCSSetPeace
+class CommandCSSetPeace final
 	: public Command
 {
 public:
@@ -469,7 +469,7 @@ inline static Anope::string BotModes()
 	);
 }
 
-class CommandCSSetPersist
+class CommandCSSetPersist final
 	: public Command
 {
 public:
@@ -619,7 +619,7 @@ public:
 	}
 };
 
-class CommandCSSetRestricted
+class CommandCSSetRestricted final
 	: public Command
 {
 public:
@@ -682,7 +682,7 @@ public:
 	}
 };
 
-class CommandCSSetSecure
+class CommandCSSetSecure final
 	: public Command
 {
 public:
@@ -746,7 +746,7 @@ public:
 	}
 };
 
-class CommandCSSetSecureFounder
+class CommandCSSetSecureFounder final
 	: public Command
 {
 public:
@@ -811,7 +811,7 @@ public:
 	}
 };
 
-class CommandCSSetSecureOps
+class CommandCSSetSecureOps final
 	: public Command
 {
 public:
@@ -874,7 +874,7 @@ public:
 	}
 };
 
-class CommandCSSetSignKick
+class CommandCSSetSignKick final
 	: public Command
 {
 public:
@@ -952,7 +952,7 @@ public:
 	}
 };
 
-class CommandCSSetSuccessor
+class CommandCSSetSuccessor final
 	: public Command
 {
 public:
@@ -1047,7 +1047,7 @@ public:
 	}
 };
 
-class CommandCSSetNoexpire
+class CommandCSSetNoexpire final
 	: public Command
 {
 public:
@@ -1106,14 +1106,14 @@ public:
 	}
 };
 
-class CSSet
+class CSSet final
 	: public Module
 {
 	SerializableExtensibleItem<bool> noautoop, peace, securefounder,
 		restricted, secure, secureops, signkick, signkick_level, noexpire,
 		persist;
 
-	struct KeepModes
+	struct KeepModes final
 		: SerializableExtensibleItem<bool>
 	{
 		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }

@@ -27,7 +27,7 @@ enum
  * backing each ChanAccess determines whether that ChanAccess has a given
  * privilege.
  */
-struct CoreExport Privilege
+struct CoreExport Privilege final
 {
 	Anope::string name;
 	Anope::string desc;
@@ -38,7 +38,7 @@ struct CoreExport Privilege
 	bool operator==(const Privilege &other) const;
 };
 
-class CoreExport PrivilegeManager
+class CoreExport PrivilegeManager final
 {
 	static std::vector<Privilege> Privileges;
 public:
@@ -135,7 +135,7 @@ public:
 /* A group of access entries. This is used commonly, for example with ChannelInfo::AccessFor,
  * to show what access a user has on a channel because users can match multiple access entries.
  */
-class CoreExport AccessGroup
+class CoreExport AccessGroup final
 {
 public:
 	/* access entries + paths */

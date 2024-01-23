@@ -17,7 +17,7 @@ namespace
 	std::map<Anope::string, std::vector<Anope::string> > permissions;
 }
 
-class XOPChanAccess
+class XOPChanAccess final
 	: public ChanAccess
 {
 public:
@@ -85,7 +85,7 @@ public:
 	}
 };
 
-class XOPAccessProvider
+class XOPAccessProvider final
 	: public AccessProvider
 {
 public:
@@ -99,7 +99,7 @@ public:
 	}
 };
 
-class CommandCSXOP
+class CommandCSXOP final
 	: public Command
 {
 private:
@@ -294,7 +294,7 @@ private:
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class XOPDelCallback
+			class XOPDelCallback final
 				: public NumberList
 			{
 				CommandSource &source;
@@ -398,7 +398,7 @@ private:
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class XOPListCallback
+			class XOPListCallback final
 				: public NumberList
 			{
 				ListFormatter &list;
@@ -600,7 +600,7 @@ public:
 	}
 };
 
-class CSXOP
+class CSXOP final
 	: public Module
 {
 	XOPAccessProvider accessprovider;

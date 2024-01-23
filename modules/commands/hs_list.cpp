@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandHSList
+class CommandHSList final
 	: public Command
 {
 public:
@@ -143,7 +143,7 @@ public:
 	}
 };
 
-class HSList
+class HSList final
 	: public Module
 {
 	CommandHSList commandhslist;

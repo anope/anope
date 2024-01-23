@@ -22,7 +22,7 @@ static GnuTLSModule *me;
 
 namespace GnuTLS { class X509CertCredentials; }
 
-class MySSLService
+class MySSLService final
 	: public SSLService
 {
 public:
@@ -34,7 +34,7 @@ public:
 	void Init(Socket *s) override;
 };
 
-class SSLSocketIO
+class SSLSocketIO final
 	: public SocketIO
 {
 public:
@@ -92,7 +92,7 @@ public:
 
 namespace GnuTLS
 {
-	class Init
+	class Init final
 	{
 	public:
 		Init() { gnutls_global_init(); }
@@ -101,7 +101,7 @@ namespace GnuTLS
 
 	/** Used to create a gnutls_datum_t* from an Anope::string
 	 */
-	class Datum
+	class Datum final
 	{
 		gnutls_datum_t datum;
 
@@ -115,7 +115,7 @@ namespace GnuTLS
 		const gnutls_datum_t *get() const { return &datum; }
 	};
 
-	class DHParams
+	class DHParams final
 	{
 		gnutls_dh_params_t dh_params = nullptr;
 
@@ -150,11 +150,11 @@ namespace GnuTLS
 		gnutls_dh_params_t get() const { return dh_params; }
 	};
 
-	class X509Key
+	class X509Key final
 	{
 		/** Ensure that the key is deinited in case the constructor of X509Key throws
 		 */
-		class RAIIKey
+		class RAIIKey final
 		{
 		public:
 			gnutls_x509_privkey_t key;
@@ -184,7 +184,7 @@ namespace GnuTLS
 		gnutls_x509_privkey_t& get() { return key.key; }
 	};
 
-	class X509CertList
+	class X509CertList final
 	{
 		std::vector<gnutls_x509_crt_t> certs;
 
@@ -223,7 +223,7 @@ namespace GnuTLS
 		unsigned int size() const { return certs.size(); }
 	};
 
-	class X509CertCredentials
+	class X509CertCredentials final
 	{
 		unsigned int refcount = 0;
 		gnutls_certificate_credentials_t cred;
@@ -286,7 +286,7 @@ namespace GnuTLS
 	};
 }
 
-class GnuTLSModule
+class GnuTLSModule final
 	: public Module
 {
 	GnuTLS::Init libinit;

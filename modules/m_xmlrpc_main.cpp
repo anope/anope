@@ -11,7 +11,7 @@
 
 static Module *me;
 
-class XMLRPCIdentifyRequest
+class XMLRPCIdentifyRequest final
 	: public IdentifyRequest
 {
 	XMLRPCRequest request;
@@ -51,7 +51,7 @@ public:
 	}
 };
 
-class MyXMLRPCEvent
+class MyXMLRPCEvent final
 	: public XMLRPCEvent
 {
 public:
@@ -97,7 +97,7 @@ private:
 
 				Anope::string out;
 
-				struct XMLRPCommandReply
+				struct XMLRPCommandReply final
 					: CommandReply
 				{
 					Anope::string &str;
@@ -278,7 +278,7 @@ private:
 	}
 };
 
-class ModuleXMLRPCMain
+class ModuleXMLRPCMain final
 	: public Module
 {
 	ServiceReference<XMLRPCServiceInterface> xmlrpc;

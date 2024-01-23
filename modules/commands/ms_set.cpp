@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandMSSet
+class CommandMSSet final
 	: public Command
 {
 private:
@@ -299,7 +299,7 @@ public:
 	}
 };
 
-class MSSet
+class MSSet final
 	: public Module
 {
 	CommandMSSet commandmsset;

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSModInfo
+class CommandOSModInfo final
 	: public Command
 {
 public:
@@ -69,7 +69,7 @@ public:
 	}
 };
 
-class CommandOSModList
+class CommandOSModList final
 	: public Command
 {
 public:
@@ -194,7 +194,7 @@ public:
 	}
 };
 
-class OSModInfo
+class OSModInfo final
 	: public Module
 {
 	CommandOSModInfo commandosmodinfo;

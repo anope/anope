@@ -79,7 +79,7 @@ namespace DNS
 		Question(const Anope::string &n, QueryType t, unsigned short c = 1) : name(n), type(t), qclass(c) { }
 		inline bool operator==(const Question & other) const { return name == other.name && type == other.type && qclass == other.qclass; }
 
-		struct hash
+		struct hash final
 		{
 			size_t operator()(const Question &q) const
 			{
@@ -88,7 +88,7 @@ namespace DNS
 		};
 	};
 
-	struct ResourceRecord
+	struct ResourceRecord final
 		: Question
 	{
 		unsigned int ttl = 0;

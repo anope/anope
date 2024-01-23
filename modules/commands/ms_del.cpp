@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class MemoDelCallback
+class MemoDelCallback final
 	: public NumberList
 {
 	CommandSource &source;
@@ -37,7 +37,7 @@ public:
 	}
 };
 
-class CommandMSDel
+class CommandMSDel final
 	: public Command
 {
 public:
@@ -146,7 +146,7 @@ public:
 	}
 };
 
-class MSDel
+class MSDel final
 	: public Module
 {
 	CommandMSDel commandmsdel;

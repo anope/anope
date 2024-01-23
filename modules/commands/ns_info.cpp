@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandNSInfo
+class CommandNSInfo final
 	: public Command
 {
 public:
@@ -234,7 +234,7 @@ public:
 	}
 };
 
-class CommandNSSASetHide
+class CommandNSSASetHide final
 	: public CommandNSSetHide
 {
 public:
@@ -264,7 +264,7 @@ public:
 	}
 };
 
-class NSInfo
+class NSInfo final
 	: public Module
 {
 	CommandNSInfo commandnsinfo;

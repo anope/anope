@@ -86,7 +86,7 @@ static const uint32_t md5_iv[4] =
 	0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476
 };
 
-class MD5Context
+class MD5Context final
 	: public Encryption::Context
 {
 	unsigned state[4]; /* state (ABCD) */
@@ -319,7 +319,7 @@ public:
 	}
 };
 
-class MD5Provider
+class MD5Provider final
 	: public Encryption::Provider
 {
 public:
@@ -339,7 +339,7 @@ public:
 	}
 };
 
-class EMD5
+class EMD5 final
 	: public Module
 {
 	MD5Provider md5provider;

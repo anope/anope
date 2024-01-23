@@ -22,7 +22,7 @@ namespace Mail
 	extern CoreExport bool Validate(const Anope::string &email);
 
 	/* A email message being sent */
-	class Message
+	class Message final
 		: public Thread
 	{
 	private:

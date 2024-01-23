@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/cs_mode.h"
 
-class CommandCSList
+class CommandCSList final
 	: public Command
 {
 public:
@@ -171,7 +171,7 @@ public:
 	}
 };
 
-class CommandCSSetPrivate
+class CommandCSSetPrivate final
 	: public Command
 {
 public:
@@ -240,7 +240,7 @@ public:
 	}
 };
 
-class CSList
+class CSList final
 	: public Module
 {
 	CommandCSList commandcslist;

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandHSDel
+class CommandHSDel final
 	: public Command
 {
 public:
@@ -52,7 +52,7 @@ public:
 	}
 };
 
-class CommandHSDelAll
+class CommandHSDelAll final
 	: public Command
 {
 public:
@@ -98,7 +98,7 @@ public:
 	}
 };
 
-class HSDel
+class HSDel final
 	: public Module
 {
 	CommandHSDel commandhsdel;

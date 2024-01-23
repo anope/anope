@@ -16,7 +16,7 @@ namespace
 	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
 }
 
-class CommandMSSendAll
+class CommandMSSendAll final
 	: public Command
 {
 public:
@@ -53,7 +53,7 @@ public:
 	}
 };
 
-class MSSendAll
+class MSSendAll final
 	: public Module
 {
 	CommandMSSendAll commandmssendall;

@@ -13,7 +13,7 @@ namespace WebCPanel
 namespace ChanServ
 {
 
-class Set
+class Set final
 	: public WebPanelProtectedPage
 {
 public:

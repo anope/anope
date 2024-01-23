@@ -8,7 +8,7 @@
 
 #include "module.h"
 
-class StatusUpdate
+class StatusUpdate final
 	: public Module
 {
 public:

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandOSLogin
+class CommandOSLogin final
 	: public Command
 {
 public:
@@ -62,7 +62,7 @@ public:
 	}
 };
 
-class CommandOSLogout
+class CommandOSLogout final
 	: public Command
 {
 public:
@@ -105,7 +105,7 @@ public:
 	}
 };
 
-class OSLogin
+class OSLogin final
 	: public Module
 {
 	CommandOSLogin commandoslogin;

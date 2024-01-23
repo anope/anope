@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandBSSay
+class CommandBSSay final
 	: public Command
 {
 public:
@@ -72,7 +72,7 @@ public:
 	}
 };
 
-class CommandBSAct
+class CommandBSAct final
 	: public Command
 {
 public:
@@ -132,7 +132,7 @@ public:
 	}
 };
 
-class BSControl
+class BSControl final
 	: public Module
 {
 	CommandBSSay commandbssay;

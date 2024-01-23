@@ -37,7 +37,16 @@ public:
 			return;
 		}
 
+		const NickCore *nc;
+		nc = source.GetAccount();
+
 		bool is_mine = source.GetAccount() == na->nc;
+
+		if (Config->GetModule("ns_drop")->Get<bool>("deny_dropping_display") && is_mine && (nc->aliases->size() > 1) && (na->nc->display == nick))
+		{
+			source.Reply(_("You must drop all aliases in the group before proceeding to delete your account."));
+			return;
+		}
 
 		if (!is_mine && !source.HasPriv("nickserv/drop"))
 			source.Reply(ACCESS_DENIED);

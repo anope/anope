@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSKick : public Command
+class CommandOSKick
+	: public Command
 {
 public:
 	CommandOSKick(Module *creator) : Command(creator, "operserv/kick", 3, 3)
@@ -69,7 +70,8 @@ public:
 	}
 };
 
-class OSKick : public Module
+class OSKick
+	: public Module
 {
 	CommandOSKick commandoskick;
 

@@ -13,7 +13,8 @@
 
 static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi);
 
-class CommandNSResetPass : public Command
+class CommandNSResetPass
+	: public Command
 {
 public:
 	CommandNSResetPass(Module *creator) : Command(creator, "nickserv/resetpass", 2, 2)
@@ -60,7 +61,8 @@ struct ResetInfo
 	time_t time;
 };
 
-class NSResetPass : public Module
+class NSResetPass
+	: public Module
 {
 	CommandNSResetPass commandnsresetpass;
 	PrimitiveExtensibleItem<ResetInfo> reset;

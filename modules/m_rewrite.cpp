@@ -97,7 +97,8 @@ struct Rewrite
 
 std::vector<Rewrite> Rewrite::rewrites;
 
-class RewriteCommand : public Command
+class RewriteCommand
+	: public Command
 {
 public:
 	RewriteCommand(Module *creator) : Command(creator, "rewrite", 0, 0) { }
@@ -145,7 +146,8 @@ public:
 	}
 };
 
-class ModuleRewrite : public Module
+class ModuleRewrite
+	: public Module
 {
 	RewriteCommand cmdrewrite;
 

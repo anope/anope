@@ -19,7 +19,9 @@ inline static Anope::string BotModes()
 	);
 }
 
-class ChanServCore : public Module, public ChanServService
+class ChanServCore
+	: public Module
+	, public ChanServService
 {
 	Reference<BotInfo> ChanServ;
 	std::vector<Anope::string> defaults;
@@ -38,7 +40,8 @@ public:
 		/** A timer used to keep the BotServ bot/ChanServ in the channel
 		 * after kicking the last user in a channel
 		 */
-		class ChanServTimer : public Timer
+		class ChanServTimer
+			: public Timer
 		{
 			Reference<BotInfo> &ChanServ;
 			ExtensibleItem<bool> &inhabit;

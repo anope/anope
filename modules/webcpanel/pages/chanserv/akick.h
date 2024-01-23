@@ -13,7 +13,8 @@ namespace WebCPanel
 namespace ChanServ
 {
 
-class Akick : public WebPanelProtectedPage
+class Akick
+	: public WebPanelProtectedPage
 {
 public:
 	Akick(const Anope::string &cat, const Anope::string &u);

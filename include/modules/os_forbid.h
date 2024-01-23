@@ -31,7 +31,8 @@ protected:
 	ForbidData() = default;
 };
 
-class ForbidService : public Service
+class ForbidService
+	: public Service
 {
 public:
 	ForbidService(Module *m) : Service(m, "ForbidService", "forbid") { }

@@ -13,7 +13,8 @@
 
 static unsigned int HARDMAX = 65536;
 
-class CommandOSLogSearch : public Command
+class CommandOSLogSearch
+	: public Command
 {
 	static inline Anope::string CreateLogName(const Anope::string &file, time_t t = Anope::CurTime)
 	{
@@ -171,7 +172,8 @@ public:
 	}
 };
 
-class OSLogSearch : public Module
+class OSLogSearch
+	: public Module
 {
 	CommandOSLogSearch commandoslogsearch;
 

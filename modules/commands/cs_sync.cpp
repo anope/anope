@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandCSSync : public Command
+class CommandCSSync
+	: public Command
 {
 public:
 	CommandCSSync(Module *creator) : Command(creator, "chanserv/sync", 1, 1)
@@ -52,7 +53,8 @@ public:
 	}
 };
 
-class CSSync : public Module
+class CSSync
+	: public Module
 {
 	CommandCSSync commandcssync;
 public:

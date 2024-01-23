@@ -22,7 +22,8 @@ static GnuTLSModule *me;
 
 namespace GnuTLS { class X509CertCredentials; }
 
-class MySSLService : public SSLService
+class MySSLService
+	: public SSLService
 {
 public:
 	MySSLService(Module *o, const Anope::string &n);
@@ -33,7 +34,8 @@ public:
 	void Init(Socket *s) override;
 };
 
-class SSLSocketIO : public SocketIO
+class SSLSocketIO
+	: public SocketIO
 {
 public:
 	gnutls_session_t sess = nullptr;
@@ -284,7 +286,8 @@ namespace GnuTLS
 	};
 }
 
-class GnuTLSModule : public Module
+class GnuTLSModule
+	: public Module
 {
 	GnuTLS::Init libinit;
 

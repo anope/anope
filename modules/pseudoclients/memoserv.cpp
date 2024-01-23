@@ -11,7 +11,9 @@
 
 #include "module.h"
 
-class MemoServCore : public Module, public MemoServService
+class MemoServCore
+	: public Module
+	, public MemoServService
 {
 	Reference<BotInfo> MemoServ;
 

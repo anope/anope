@@ -8,7 +8,8 @@
 
 #pragma once
 
-class GlobalService : public Service
+class GlobalService
+	: public Service
 {
 public:
 	GlobalService(Module *m) : Service(m, "GlobalService", "Global")

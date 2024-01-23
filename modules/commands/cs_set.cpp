@@ -12,7 +12,8 @@
 #include "module.h"
 #include "modules/cs_mode.h"
 
-class CommandCSSet : public Command
+class CommandCSSet
+	: public Command
 {
 public:
 	CommandCSSet(Module *creator) : Command(creator, "chanserv/set", 2, 3)
@@ -64,7 +65,8 @@ public:
 	}
 };
 
-class CommandCSSetAutoOp : public Command
+class CommandCSSetAutoOp
+	: public Command
 {
 public:
 	CommandCSSetAutoOp(Module *creator, const Anope::string &cname = "chanserv/set/autoop") : Command(creator, cname, 2, 2)
@@ -127,7 +129,8 @@ public:
 	}
 };
 
-class CommandCSSetBanType : public Command
+class CommandCSSetBanType
+	: public Command
 {
 public:
 	CommandCSSetBanType(Module *creator, const Anope::string &cname = "chanserv/set/bantype") : Command(creator, cname, 2, 2)
@@ -194,7 +197,8 @@ public:
 	}
 };
 
-class CommandCSSetDescription : public Command
+class CommandCSSetDescription
+	: public Command
 {
 public:
 	CommandCSSetDescription(Module *creator, const Anope::string &cname = "chanserv/set/description") : Command(creator, cname, 1, 2)
@@ -256,7 +260,8 @@ public:
 	}
 };
 
-class CommandCSSetFounder : public Command
+class CommandCSSetFounder
+	: public Command
 {
 public:
 	CommandCSSetFounder(Module *creator, const Anope::string &cname = "chanserv/set/founder") : Command(creator, cname, 2, 2)
@@ -325,7 +330,8 @@ public:
 	}
 };
 
-class CommandCSSetKeepModes : public Command
+class CommandCSSetKeepModes
+	: public Command
 {
 public:
 	CommandCSSetKeepModes(Module *creator, const Anope::string &cname = "chanserv/set/keepmodes") :  Command(creator, cname, 2, 2)
@@ -390,7 +396,8 @@ public:
 	}
 };
 
-class CommandCSSetPeace : public Command
+class CommandCSSetPeace
+	: public Command
 {
 public:
 	CommandCSSetPeace(Module *creator, const Anope::string &cname = "chanserv/set/peace") : Command(creator, cname, 2, 2)
@@ -462,7 +469,8 @@ inline static Anope::string BotModes()
 	);
 }
 
-class CommandCSSetPersist : public Command
+class CommandCSSetPersist
+	: public Command
 {
 public:
 	CommandCSSetPersist(Module *creator, const Anope::string &cname = "chanserv/set/persist") : Command(creator, cname, 2, 2)
@@ -611,7 +619,8 @@ public:
 	}
 };
 
-class CommandCSSetRestricted : public Command
+class CommandCSSetRestricted
+	: public Command
 {
 public:
 	CommandCSSetRestricted(Module *creator, const Anope::string &cname = "chanserv/set/restricted") : Command(creator, cname, 2, 2)
@@ -673,7 +682,8 @@ public:
 	}
 };
 
-class CommandCSSetSecure : public Command
+class CommandCSSetSecure
+	: public Command
 {
 public:
 	CommandCSSetSecure(Module *creator, const Anope::string &cname = "chanserv/set/secure") : Command(creator, cname, 2, 2)
@@ -736,7 +746,8 @@ public:
 	}
 };
 
-class CommandCSSetSecureFounder : public Command
+class CommandCSSetSecureFounder
+	: public Command
 {
 public:
 	CommandCSSetSecureFounder(Module *creator, const Anope::string &cname = "chanserv/set/securefounder") : Command(creator, cname, 2, 2)
@@ -800,7 +811,8 @@ public:
 	}
 };
 
-class CommandCSSetSecureOps : public Command
+class CommandCSSetSecureOps
+	: public Command
 {
 public:
 	CommandCSSetSecureOps(Module *creator, const Anope::string &cname = "chanserv/set/secureops") : Command(creator, cname, 2, 2)
@@ -862,7 +874,8 @@ public:
 	}
 };
 
-class CommandCSSetSignKick : public Command
+class CommandCSSetSignKick
+	: public Command
 {
 public:
 	CommandCSSetSignKick(Module *creator, const Anope::string &cname = "chanserv/set/signkick") : Command(creator, cname, 2, 2)
@@ -939,7 +952,8 @@ public:
 	}
 };
 
-class CommandCSSetSuccessor : public Command
+class CommandCSSetSuccessor
+	: public Command
 {
 public:
 	CommandCSSetSuccessor(Module *creator, const Anope::string &cname = "chanserv/set/successor") : Command(creator, cname, 1, 2)
@@ -1033,7 +1047,8 @@ public:
 	}
 };
 
-class CommandCSSetNoexpire : public Command
+class CommandCSSetNoexpire
+	: public Command
 {
 public:
 	CommandCSSetNoexpire(Module *creator) : Command(creator, "chanserv/saset/noexpire", 2, 2)
@@ -1091,13 +1106,15 @@ public:
 	}
 };
 
-class CSSet : public Module
+class CSSet
+	: public Module
 {
 	SerializableExtensibleItem<bool> noautoop, peace, securefounder,
 		restricted, secure, secureops, signkick, signkick_level, noexpire,
 		persist;
 
-	struct KeepModes : SerializableExtensibleItem<bool>
+	struct KeepModes
+		: SerializableExtensibleItem<bool>
 	{
 		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
 

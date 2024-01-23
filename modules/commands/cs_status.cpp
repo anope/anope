@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandCSStatus : public Command
+class CommandCSStatus
+	: public Command
 {
 public:
 	CommandCSStatus(Module *creator) : Command(creator, "chanserv/status", 1, 2)
@@ -110,7 +111,8 @@ public:
 	}
 };
 
-class CSStatus : public Module
+class CSStatus
+	: public Module
 {
 	CommandCSStatus commandcsstatus;
 

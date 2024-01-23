@@ -23,7 +23,8 @@
 
 static SSL_CTX *server_ctx, *client_ctx;
 
-class MySSLService : public SSLService
+class MySSLService
+	: public SSLService
 {
 public:
 	MySSLService(Module *o, const Anope::string &n);
@@ -34,7 +35,8 @@ public:
 	void Init(Socket *s) override;
 };
 
-class SSLSocketIO : public SocketIO
+class SSLSocketIO
+	: public SocketIO
 {
 public:
 	/* The SSL socket for this socket */
@@ -91,7 +93,8 @@ public:
 
 class SSLModule;
 static SSLModule *me;
-class SSLModule : public Module
+class SSLModule
+	: public Module
 {
 	Anope::string certfile, keyfile;
 

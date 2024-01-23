@@ -12,7 +12,8 @@
 #include "module.h"
 #include "modules/ns_cert.h"
 
-class NSGroupRequest : public IdentifyRequest
+class NSGroupRequest
+	: public IdentifyRequest
 {
 	CommandSource source;
 	Command *cmd;
@@ -83,7 +84,8 @@ public:
 	}
 };
 
-class CommandNSGroup : public Command
+class CommandNSGroup
+	: public Command
 {
 public:
 	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 0, 2)
@@ -228,7 +230,8 @@ public:
 	}
 };
 
-class CommandNSUngroup : public Command
+class CommandNSUngroup
+	: public Command
 {
 public:
 	CommandNSUngroup(Module *creator) : Command(creator, "nickserv/ungroup", 0, 1)
@@ -291,7 +294,8 @@ public:
 	}
 };
 
-class CommandNSGList : public Command
+class CommandNSGList
+	: public Command
 {
 public:
 	CommandNSGList(Module *creator) : Command(creator, "nickserv/glist", 0, 1)
@@ -376,7 +380,8 @@ public:
 	}
 };
 
-class NSGroup : public Module
+class NSGroup
+	: public Module
 {
 	CommandNSGroup commandnsgroup;
 	CommandNSUngroup commandnsungroup;

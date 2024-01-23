@@ -14,7 +14,8 @@
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
-class PCRERegex : public Regex
+class PCRERegex
+	: public Regex
 {
 	pcre2_code *regex;
 
@@ -47,7 +48,8 @@ public:
 	}
 };
 
-class PCRERegexProvider : public RegexProvider
+class PCRERegexProvider
+	: public RegexProvider
 {
 public:
 	PCRERegexProvider(Module *creator) : RegexProvider(creator, "regex/pcre") { }
@@ -58,7 +60,8 @@ public:
 	}
 };
 
-class ModuleRegexPCRE : public Module
+class ModuleRegexPCRE
+	: public Module
 {
 	PCRERegexProvider pcre_regex_provider;
 

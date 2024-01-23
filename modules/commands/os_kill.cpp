@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSKill : public Command
+class CommandOSKill
+	: public Command
 {
 public:
 	CommandOSKill(Module *creator) : Command(creator, "operserv/kill", 1, 2)
@@ -52,7 +53,8 @@ public:
 	}
 };
 
-class OSKill : public Module
+class OSKill
+	: public Module
 {
 	CommandOSKill commandoskill;
 

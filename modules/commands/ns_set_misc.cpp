@@ -31,7 +31,9 @@ static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name)
 	return it;
 }
 
-struct NSMiscData : MiscData, Serializable
+struct NSMiscData
+	: MiscData
+	, Serializable
 {
 	NSMiscData(Extensible *) : Serializable("NSMiscData") { }
 
@@ -88,7 +90,8 @@ static Anope::string GetAttribute(const Anope::string &command)
 	return command;
 }
 
-class CommandNSSetMisc : public Command
+class CommandNSSetMisc
+	: public Command
 {
 public:
 	CommandNSSetMisc(Module *creator, const Anope::string &cname = "nickserv/set/misc", size_t min = 0) : Command(creator, cname, min, min + 1)
@@ -161,7 +164,8 @@ public:
 	}
 };
 
-class CommandNSSASetMisc : public CommandNSSetMisc
+class CommandNSSASetMisc
+	: public CommandNSSetMisc
 {
 public:
 	CommandNSSASetMisc(Module *creator) : CommandNSSetMisc(creator, "nickserv/saset/misc", 1)
@@ -176,7 +180,8 @@ public:
 	}
 };
 
-class NSSetMisc : public Module
+class NSSetMisc
+	: public Module
 {
 	CommandNSSetMisc commandnssetmisc;
 	CommandNSSASetMisc commandnssasetmisc;

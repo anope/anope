@@ -111,7 +111,8 @@ static const uint32_t sha256_k[64] =
 
 /** An sha256 context
  */
-class SHA256Context : public Encryption::Context
+class SHA256Context
+	: public Encryption::Context
 {
 	void Transform(unsigned char *message, unsigned block_nb)
 	{
@@ -216,7 +217,8 @@ public:
 	}
 };
 
-class SHA256Provider : public Encryption::Provider
+class SHA256Provider
+	: public Encryption::Provider
 {
 public:
 	SHA256Provider(Module *creator) : Encryption::Provider(creator, "sha256") { }
@@ -235,7 +237,8 @@ public:
 	}
 };
 
-class ESHA256 : public Module
+class ESHA256
+	: public Module
 {
 	SHA256Provider sha256provider;
 

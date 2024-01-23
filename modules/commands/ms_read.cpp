@@ -47,7 +47,8 @@ static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Ano
 	m->receipt = false;
 }
 
-class MemoListCallback : public NumberList
+class MemoListCallback
+	: public NumberList
 {
 	CommandSource &source;
 	MemoInfo *mi;
@@ -104,7 +105,8 @@ public:
 	}
 };
 
-class CommandMSRead : public Command
+class CommandMSRead
+	: public Command
 {
 public:
 	CommandMSRead(Module *creator) : Command(creator, "memoserv/read", 1, 2)
@@ -209,7 +211,8 @@ public:
 	}
 };
 
-class MSRead : public Module
+class MSRead
+	: public Module
 {
 	CommandMSRead commandmsread;
 

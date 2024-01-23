@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSModInfo : public Command
+class CommandOSModInfo
+	: public Command
 {
 public:
 	CommandOSModInfo(Module *creator) : Command(creator, "operserv/modinfo", 1, 1)
@@ -68,7 +69,8 @@ public:
 	}
 };
 
-class CommandOSModList : public Command
+class CommandOSModList
+	: public Command
 {
 public:
 	CommandOSModList(Module *creator) : Command(creator, "operserv/modlist", 0, 1)
@@ -192,7 +194,8 @@ public:
 	}
 };
 
-class OSModInfo : public Module
+class OSModInfo
+	: public Module
 {
 	CommandOSModInfo commandosmodinfo;
 	CommandOSModList commandosmodlist;

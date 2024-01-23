@@ -12,7 +12,8 @@
 #include "module.h"
 #include "modules/cs_mode.h"
 
-class CommandCSSetKeepTopic : public Command
+class CommandCSSetKeepTopic
+	: public Command
 {
 public:
 	CommandCSSetKeepTopic(Module *creator, const Anope::string &cname = "chanserv/set/keeptopic") : Command(creator, cname, 2, 2)
@@ -76,7 +77,8 @@ public:
 	}
 };
 
-class CommandCSTopic : public Command
+class CommandCSTopic
+	: public Command
 {
 	ExtensibleRef<bool> topiclock;
 
@@ -202,7 +204,8 @@ public:
 	}
 };
 
-class CSTopic : public Module
+class CSTopic
+	: public Module
 {
 	CommandCSTopic commandcstopic;
 	CommandCSSetKeepTopic commandcssetkeeptopic;

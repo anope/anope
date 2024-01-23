@@ -9,7 +9,8 @@
 #include "module.h"
 #include "modules/sql.h"
 
-class SQLLog : public Module
+class SQLLog
+	: public Module
 {
 	std::set<Anope::string> inited;
 	Anope::string table;

@@ -39,7 +39,8 @@ struct Blacklist
 	}
 };
 
-class DNSBLResolver : public Request
+class DNSBLResolver
+	: public Request
 {
 	Reference<User> user;
 	Blacklist blacklist;
@@ -94,7 +95,8 @@ public:
 	}
 };
 
-class ModuleDNSBL : public Module
+class ModuleDNSBL
+	: public Module
 {
 	std::vector<Blacklist> blacklists;
 	std::set<cidr> exempts;

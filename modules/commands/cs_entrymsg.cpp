@@ -12,7 +12,9 @@
 #include "module.h"
 #include "modules/cs_entrymsg.h"
 
-struct EntryMsgImpl : EntryMsg, Serializable
+struct EntryMsgImpl
+	: EntryMsg
+	, Serializable
 {
 	EntryMsgImpl() : Serializable("EntryMsg")
 	{
@@ -39,7 +41,8 @@ struct EntryMsgImpl : EntryMsg, Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-struct EntryMessageListImpl : EntryMessageList
+struct EntryMessageListImpl
+	: EntryMessageList
 {
 	EntryMessageListImpl(Extensible *) { }
 
@@ -97,7 +100,8 @@ Serializable* EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data
 	return m;
 }
 
-class CommandEntryMessage : public Command
+class CommandEntryMessage
+	: public Command
 {
 private:
 	void DoList(CommandSource &source, ChannelInfo *ci)
@@ -260,7 +264,8 @@ public:
 	}
 };
 
-class CSEntryMessage : public Module
+class CSEntryMessage
+	: public Module
 {
 	CommandEntryMessage commandentrymsg;
 	ExtensibleItem<EntryMessageListImpl> eml;

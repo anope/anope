@@ -126,7 +126,8 @@ public:
 	};
 };
 
-class CoreExport SocketException : public CoreException
+class CoreExport SocketException
+	: public CoreException
 {
 public:
 	/** Constructor for socket exceptions
@@ -286,7 +287,8 @@ public:
 	virtual void ProcessError();
 };
 
-class CoreExport BufferedSocket : public virtual Socket
+class CoreExport BufferedSocket
+	: public virtual Socket
 {
 protected:
 	/* Things read from the socket */
@@ -333,7 +335,8 @@ public:
 	int WriteBufferLen() const;
 };
 
-class CoreExport BinarySocket : public virtual Socket
+class CoreExport BinarySocket
+	: public virtual Socket
 {
 protected:
 	struct DataBlock
@@ -378,7 +381,8 @@ public:
 	virtual bool Read(const char *buffer, size_t l);
 };
 
-class CoreExport ListenSocket : public virtual Socket
+class CoreExport ListenSocket
+	: public virtual Socket
 {
 public:
 	/** Constructor
@@ -402,7 +406,8 @@ public:
 	virtual ClientSocket *OnAccept(int fd, const sockaddrs &addr) = 0;
 };
 
-class CoreExport ConnectionSocket : public virtual Socket
+class CoreExport ConnectionSocket
+	: public virtual Socket
 {
 public:
 	/* Sockaddrs for connection ip/port */
@@ -435,7 +440,8 @@ public:
 	virtual void OnError(const Anope::string &error);
 };
 
-class CoreExport ClientSocket : public virtual Socket
+class CoreExport ClientSocket
+	: public virtual Socket
 {
 public:
 	/* Listen socket this connection came from */
@@ -469,7 +475,8 @@ public:
 	virtual void OnError(const Anope::string &error);
 };
 
-class CoreExport Pipe : public Socket
+class CoreExport Pipe
+	: public Socket
 {
 public:
 	/** The FD of the write pipe

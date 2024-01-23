@@ -16,7 +16,8 @@ namespace
 	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
 }
 
-class CommandMSStaff : public Command
+class CommandMSStaff
+	: public Command
 {
 public:
 	CommandMSStaff(Module *creator) : Command(creator, "memoserv/staff", 1, 1)
@@ -49,7 +50,8 @@ public:
 	}
 };
 
-class MSStaff : public Module
+class MSStaff
+	: public Module
 {
 	CommandMSStaff commandmsstaff;
 

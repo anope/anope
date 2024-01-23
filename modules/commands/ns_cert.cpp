@@ -14,7 +14,8 @@
 
 static Anope::hash_map<NickCore *> certmap;
 
-struct CertServiceImpl : CertService
+struct CertServiceImpl
+	: CertService
 {
 	CertServiceImpl(Module *o) : CertService(o) { }
 
@@ -27,7 +28,8 @@ struct CertServiceImpl : CertService
 	}
 };
 
-struct NSCertListImpl : NSCertList
+struct NSCertListImpl
+	: NSCertList
 {
 	Serialize::Reference<NickCore> nc;
 	std::vector<Anope::string> certs;
@@ -119,7 +121,8 @@ public:
 			nc->Shrink<NSCertList>("certificates");
 	}
 
-	struct ExtensibleItem : ::ExtensibleItem<NSCertListImpl>
+	struct ExtensibleItem
+		: ::ExtensibleItem<NSCertListImpl>
 	{
 		ExtensibleItem(Module *m, const Anope::string &ename) : ::ExtensibleItem<NSCertListImpl>(m, ename) { }
 
@@ -160,7 +163,8 @@ public:
 	};
 };
 
-class CommandNSCert : public Command
+class CommandNSCert
+	: public Command
 {
 private:
 	void DoAdd(CommandSource &source, NickCore *nc, Anope::string certfp)
@@ -338,7 +342,8 @@ public:
 	}
 };
 
-class NSCert : public Module
+class NSCert
+	: public Module
 {
 	CommandNSCert commandnscert;
 	NSCertListImpl::ExtensibleItem certs;

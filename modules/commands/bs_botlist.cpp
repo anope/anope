@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandBSBotList : public Command
+class CommandBSBotList
+	: public Command
 {
 public:
 	CommandBSBotList(Module *creator) : Command(creator, "botserv/botlist", 0, 0)
@@ -65,7 +66,8 @@ public:
 	}
 };
 
-class BSBotList : public Module
+class BSBotList
+	: public Module
 {
 	CommandBSBotList commandbsbotlist;
 

@@ -12,7 +12,8 @@
 #include "module.h"
 #include "modules/cs_mode.h"
 
-class CommandCSList : public Command
+class CommandCSList
+	: public Command
 {
 public:
 	CommandCSList(Module *creator) : Command(creator, "chanserv/list", 1, 2)
@@ -170,7 +171,8 @@ public:
 	}
 };
 
-class CommandCSSetPrivate : public Command
+class CommandCSSetPrivate
+	: public Command
 {
 public:
 	CommandCSSetPrivate(Module *creator, const Anope::string &cname = "chanserv/set/private") : Command(creator, cname, 2, 2)
@@ -238,7 +240,8 @@ public:
 	}
 };
 
-class CSList : public Module
+class CSList
+	: public Module
 {
 	CommandCSList commandcslist;
 	CommandCSSetPrivate commandcssetprivate;

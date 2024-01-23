@@ -44,7 +44,8 @@ static void ParseModule(const Anope::string &module, Anope::string &modname, Ano
 	Log(LOG_DEBUG) << "Parsed module: " << "name=" << modname << " data=" << moddata;
 }
 
-class InspIRCdProto : public IRCDProto
+class InspIRCdProto
+	: public IRCDProto
 {
 private:
 	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
@@ -536,7 +537,8 @@ public:
 	}
 };
 
-class InspIRCdAutoOpMode : public ChannelModeList
+class InspIRCdAutoOpMode
+	: public ChannelModeList
 {
 public:
 	InspIRCdAutoOpMode(char mode) : ChannelModeList("AUTOOP", mode)
@@ -551,7 +553,8 @@ public:
 	}
 };
 
-class InspIRCdExtBan : public ChannelModeVirtual<ChannelModeList>
+class InspIRCdExtBan
+	: public ChannelModeVirtual<ChannelModeList>
 {
 	char ext;
 
@@ -579,7 +582,8 @@ public:
 
 namespace InspIRCdExtban
 {
-	class EntryMatcher : public InspIRCdExtBan
+	class EntryMatcher
+		: public InspIRCdExtBan
 	{
 	public:
 		EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
@@ -595,7 +599,8 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class ChannelMatcher : public InspIRCdExtBan
+	class ChannelMatcher
+		: public InspIRCdExtBan
 	{
 	public:
 		ChannelMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
@@ -631,7 +636,8 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class AccountMatcher : public InspIRCdExtBan
+	class AccountMatcher
+		: public InspIRCdExtBan
 	{
 	public:
 		AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
@@ -647,7 +653,8 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class RealnameMatcher : public InspIRCdExtBan
+	class RealnameMatcher
+		: public InspIRCdExtBan
 	{
 	public:
 		RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
@@ -662,7 +669,8 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class ServerMatcher : public InspIRCdExtBan
+	class ServerMatcher
+		: public InspIRCdExtBan
 	{
 	public:
 		ServerMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
@@ -677,7 +685,8 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class FingerprintMatcher : public InspIRCdExtBan
+	class FingerprintMatcher
+		: public InspIRCdExtBan
 	{
 	public:
 		FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
@@ -692,7 +701,8 @@ namespace InspIRCdExtban
 		}
 	};
 
-	class UnidentifiedMatcher : public InspIRCdExtBan
+	class UnidentifiedMatcher
+		: public InspIRCdExtBan
 	{
 	public:
 		UnidentifiedMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
@@ -708,7 +718,8 @@ namespace InspIRCdExtban
 	};
 }
 
-class ColonDelimitedParamMode : public ChannelModeParam
+class ColonDelimitedParamMode
+	: public ChannelModeParam
 {
 public:
 	ColonDelimitedParamMode(const Anope::string &modename, char modeChar) : ChannelModeParam(modename, modeChar, true) { }
@@ -757,7 +768,8 @@ public:
 	}
 };
 
-class SimpleNumberParamMode : public ChannelModeParam
+class SimpleNumberParamMode
+	: public ChannelModeParam
 {
 public:
 	SimpleNumberParamMode(const Anope::string &modename, char modeChar) : ChannelModeParam(modename, modeChar, true) { }
@@ -782,7 +794,8 @@ public:
 	}
 };
 
-class ChannelModeFlood : public ColonDelimitedParamMode
+class ChannelModeFlood
+	: public ColonDelimitedParamMode
 {
 public:
 	ChannelModeFlood(char modeChar) : ColonDelimitedParamMode("FLOOD", modeChar) { }
@@ -796,7 +809,8 @@ public:
 	}
 };
 
-class ChannelModeHistory : public ColonDelimitedParamMode
+class ChannelModeHistory
+	: public ColonDelimitedParamMode
 {
 public:
 	ChannelModeHistory(char modeChar) : ColonDelimitedParamMode("HISTORY", modeChar) { }
@@ -807,7 +821,8 @@ public:
 	}
 };
 
-class ChannelModeRedirect : public ChannelModeParam
+class ChannelModeRedirect
+	: public ChannelModeParam
 {
 public:
 	ChannelModeRedirect(char modeChar) : ChannelModeParam("REDIRECT", modeChar, true) { }
@@ -819,7 +834,8 @@ public:
 	}
 };
 
-struct IRCDMessageAway : Message::Away
+struct IRCDMessageAway
+	: Message::Away
 {
 	IRCDMessageAway(Module *creator) : Message::Away(creator, "AWAY") { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
@@ -833,7 +849,8 @@ struct IRCDMessageAway : Message::Away
 	}
 };
 
-struct IRCDMessageCapab : Message::Capab
+struct IRCDMessageCapab
+	: Message::Capab
 {
 	struct ModeInfo
 	{
@@ -1225,7 +1242,8 @@ struct IRCDMessageCapab : Message::Capab
 	}
 };
 
-struct IRCDMessageEncap : IRCDMessage
+struct IRCDMessageEncap
+	: IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1275,7 +1293,8 @@ struct IRCDMessageEncap : IRCDMessage
 	}
 };
 
-struct IRCDMessageFHost : IRCDMessage
+struct IRCDMessageFHost
+	: IRCDMessage
 {
 	IRCDMessageFHost(Module *creator) : IRCDMessage(creator, "FHOST", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
@@ -1288,7 +1307,8 @@ struct IRCDMessageFHost : IRCDMessage
 	}
 };
 
-struct IRCDMessageFIdent : IRCDMessage
+struct IRCDMessageFIdent
+	: IRCDMessage
 {
 	IRCDMessageFIdent(Module *creator) : IRCDMessage(creator, "FIDENT", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
@@ -1298,7 +1318,8 @@ struct IRCDMessageFIdent : IRCDMessage
 	}
 };
 
-struct IRCDMessageKick : IRCDMessage
+struct IRCDMessageKick
+	: IRCDMessage
 {
 	IRCDMessageKick(Module *creator) : IRCDMessage(creator, "KICK", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1315,7 +1336,8 @@ struct IRCDMessageKick : IRCDMessage
 	}
 };
 
-struct IRCDMessageSave : IRCDMessage
+struct IRCDMessageSave
+	: IRCDMessage
 {
 	time_t last_collide = 0;
 
@@ -1357,7 +1379,8 @@ struct IRCDMessageSave : IRCDMessage
 	}
 };
 
-class IRCDMessageMetadata : IRCDMessage
+class IRCDMessageMetadata
+	: IRCDMessage
 {
 	const bool &do_topiclock;
 	const bool &do_mlock;
@@ -1508,7 +1531,8 @@ public:
 	}
 };
 
-struct IRCDMessageEndburst : IRCDMessage
+struct IRCDMessageEndburst
+	: IRCDMessage
 {
 	IRCDMessageEndburst(Module *creator) : IRCDMessage(creator, "ENDBURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -1522,7 +1546,8 @@ struct IRCDMessageEndburst : IRCDMessage
 	}
 };
 
-struct IRCDMessageFJoin : IRCDMessage
+struct IRCDMessageFJoin
+	: IRCDMessage
 {
 	IRCDMessageFJoin(Module *creator) : IRCDMessage(creator, "FJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1578,7 +1603,8 @@ struct IRCDMessageFJoin : IRCDMessage
 	}
 };
 
-struct IRCDMessageFMode : IRCDMessage
+struct IRCDMessageFMode
+	: IRCDMessage
 {
 	IRCDMessageFMode(Module *creator) : IRCDMessage(creator, "FMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1607,7 +1633,8 @@ struct IRCDMessageFMode : IRCDMessage
 	}
 };
 
-struct IRCDMessageFTopic : IRCDMessage
+struct IRCDMessageFTopic
+	: IRCDMessage
 {
 	IRCDMessageFTopic(Module *creator) : IRCDMessage(creator, "FTOPIC", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT);  }
 
@@ -1625,7 +1652,8 @@ struct IRCDMessageFTopic : IRCDMessage
 	}
 };
 
-struct IRCDMessageIdle : IRCDMessage
+struct IRCDMessageIdle
+	: IRCDMessage
 {
 	IRCDMessageIdle(Module *creator) : IRCDMessage(creator, "IDLE", 1) { }
 
@@ -1643,7 +1671,8 @@ struct IRCDMessageIdle : IRCDMessage
 	}
 };
 
-struct IRCDMessageIJoin : IRCDMessage
+struct IRCDMessageIJoin
+	: IRCDMessage
 {
 	IRCDMessageIJoin(Module *creator) : IRCDMessage(creator, "IJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1679,7 +1708,8 @@ struct IRCDMessageIJoin : IRCDMessage
 	}
 };
 
-struct IRCDMessageMode : IRCDMessage
+struct IRCDMessageMode
+	: IRCDMessage
 {
 	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1709,7 +1739,8 @@ struct IRCDMessageMode : IRCDMessage
 	}
 };
 
-struct IRCDMessageNick : IRCDMessage
+struct IRCDMessageNick
+	: IRCDMessage
 {
 	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
@@ -1719,7 +1750,8 @@ struct IRCDMessageNick : IRCDMessage
 	}
 };
 
-struct IRCDMessageOperType : IRCDMessage
+struct IRCDMessageOperType
+	: IRCDMessage
 {
 	IRCDMessageOperType(Module *creator) : IRCDMessage(creator, "OPERTYPE", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
@@ -1733,7 +1765,8 @@ struct IRCDMessageOperType : IRCDMessage
 	}
 };
 
-struct IRCDMessagePing : IRCDMessage
+struct IRCDMessagePing
+	: IRCDMessage
 {
 	IRCDMessagePing(Module *creator) : IRCDMessage(creator, "PING", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -1744,7 +1777,8 @@ struct IRCDMessagePing : IRCDMessage
 	}
 };
 
-struct IRCDMessageRSQuit : IRCDMessage
+struct IRCDMessageRSQuit
+	: IRCDMessage
 {
 	IRCDMessageRSQuit(Module *creator) : IRCDMessage(creator, "RSQUIT", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1760,7 +1794,8 @@ struct IRCDMessageRSQuit : IRCDMessage
 	}
 };
 
-struct IRCDMessageServer : IRCDMessage
+struct IRCDMessageServer
+	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1793,7 +1828,8 @@ struct IRCDMessageServer : IRCDMessage
 	}
 };
 
-struct IRCDMessageSQuit : Message::SQuit
+struct IRCDMessageSQuit
+	: Message::SQuit
 {
 	IRCDMessageSQuit(Module *creator) : Message::SQuit(creator) { }
 
@@ -1815,7 +1851,8 @@ struct IRCDMessageSQuit : Message::SQuit
 	}
 };
 
-struct IRCDMessageTime : IRCDMessage
+struct IRCDMessageTime
+	: IRCDMessage
 {
 	IRCDMessageTime(Module *creator) : IRCDMessage(creator, "TIME", 2) { }
 
@@ -1825,7 +1862,8 @@ struct IRCDMessageTime : IRCDMessage
 	}
 };
 
-struct IRCDMessageUID : IRCDMessage
+struct IRCDMessageUID
+	: IRCDMessage
 {
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 8) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1873,7 +1911,8 @@ struct IRCDMessageUID : IRCDMessage
 	}
 };
 
-class ProtoInspIRCd : public Module
+class ProtoInspIRCd
+	: public Module
 {
 	InspIRCdProto ircd_proto;
 	ExtensibleItem<bool> ssl;

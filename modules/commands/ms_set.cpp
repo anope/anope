@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandMSSet : public Command
+class CommandMSSet
+	: public Command
 {
 private:
 	void DoNotify(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
@@ -298,7 +299,8 @@ public:
 	}
 };
 
-class MSSet : public Module
+class MSSet
+	: public Module
 {
 	CommandMSSet commandmsset;
 	SerializableExtensibleItem<bool> memo_signon, memo_receive, memo_mail, memo_hardmax;

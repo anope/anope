@@ -8,7 +8,8 @@
 
 #include "module.h"
 
-class HelpChannel : public Module
+class HelpChannel
+	: public Module
 {
 public:
 	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)

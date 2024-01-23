@@ -11,7 +11,8 @@ namespace WebCPanel
 namespace NickServ
 {
 
-class Confirm : public WebPanelProtectedPage
+class Confirm
+	: public WebPanelProtectedPage
 {
 public:
 	Confirm(const Anope::string &cat, const Anope::string &u);

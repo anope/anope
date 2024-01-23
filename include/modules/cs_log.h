@@ -29,7 +29,8 @@ protected:
 	LogSetting() = default;
 };
 
-struct LogSettings : Serialize::Checker<std::vector<LogSetting *> >
+struct LogSettings
+	: Serialize::Checker<std::vector<LogSetting *> >
 {
 	typedef std::vector<LogSetting *>::iterator iterator;
 

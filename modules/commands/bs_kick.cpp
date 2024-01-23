@@ -15,7 +15,8 @@
 
 static Module *me;
 
-struct KickerDataImpl : KickerData
+struct KickerDataImpl
+	: KickerData
 {
 	KickerDataImpl(Extensible *obj)
 	{
@@ -37,7 +38,8 @@ struct KickerDataImpl : KickerData
 		ci->Shrink<KickerData>("kickerdata");
 	}
 
-	struct ExtensibleItem : ::ExtensibleItem<KickerDataImpl>
+	struct ExtensibleItem
+		: ::ExtensibleItem<KickerDataImpl>
 	{
 		ExtensibleItem(Module *m, const Anope::string &ename) : ::ExtensibleItem<KickerDataImpl>(m, ename) { }
 
@@ -115,7 +117,8 @@ struct KickerDataImpl : KickerData
 	};
 };
 
-class CommandBSKick : public Command
+class CommandBSKick
+	: public Command
 {
 public:
 	CommandBSKick(Module *creator) : Command(creator, "botserv/kick", 0)
@@ -159,7 +162,8 @@ public:
 	}
 };
 
-class CommandBSKickBase : public Command
+class CommandBSKickBase
+	: public Command
 {
 public:
 	CommandBSKickBase(Module *creator, const Anope::string &cname, int minarg, int maxarg) : Command(creator, cname, minarg, maxarg)
@@ -244,7 +248,8 @@ protected:
 	}
 };
 
-class CommandBSKickAMSG : public CommandBSKickBase
+class CommandBSKickAMSG
+	: public CommandBSKickBase
 {
 public:
 	CommandBSKickAMSG(Module *creator) : CommandBSKickBase(creator, "botserv/kick/amsg", 2, 3)
@@ -280,7 +285,8 @@ public:
 	}
 };
 
-class CommandBSKickBadwords : public CommandBSKickBase
+class CommandBSKickBadwords
+	: public CommandBSKickBase
 {
 public:
 	CommandBSKickBadwords(Module *creator) : CommandBSKickBase(creator, "botserv/kick/badwords", 2, 3)
@@ -319,7 +325,8 @@ public:
 	}
 };
 
-class CommandBSKickBolds : public CommandBSKickBase
+class CommandBSKickBolds
+	: public CommandBSKickBase
 {
 public:
 	CommandBSKickBolds(Module *creator) : CommandBSKickBase(creator, "botserv/kick/bolds", 2, 3)
@@ -353,7 +360,8 @@ public:
 	}
 };
 
-class CommandBSKickCaps : public CommandBSKickBase
+class CommandBSKickCaps
+	: public CommandBSKickBase
 {
 public:
 	CommandBSKickCaps(Module *creator) : CommandBSKickBase(creator, "botserv/kick/caps", 2, 5)
@@ -449,7 +457,8 @@ public:
 	}
 };
 
-class CommandBSKickColors : public CommandBSKickBase
+class CommandBSKickColors
+	: public CommandBSKickBase
 {
 public:
 	CommandBSKickColors(Module *creator) : CommandBSKickBase(creator, "botserv/kick/colors", 2, 3)
@@ -483,7 +492,8 @@ public:
 	}
 };
 
-class CommandBSKickFlood : public CommandBSKickBase
+class CommandBSKickFlood
+	: public CommandBSKickBase
 {
 public:
 	CommandBSKickFlood(Module *creator) : CommandBSKickBase(creator, "botserv/kick/flood", 2, 5)
@@ -581,7 +591,8 @@ public:
 	}
 };
 
-class CommandBSKickItalics : public CommandBSKickBase
+class CommandBSKickItalics
+	: public CommandBSKickBase
 {
 public:
 	CommandBSKickItalics(Module *creator) : CommandBSKickBase(creator, "botserv/kick/italics", 2, 3)
@@ -615,7 +626,8 @@ public:
 	}
 };
 
-class CommandBSKickRepeat : public CommandBSKickBase
+class CommandBSKickRepeat
+	: public CommandBSKickBase
 {
 public:
 	CommandBSKickRepeat(Module *creator) : CommandBSKickBase(creator, "botserv/kick/repeat", 2, 4)
@@ -716,7 +728,8 @@ public:
 	}
 };
 
-class CommandBSKickReverses : public CommandBSKickBase
+class CommandBSKickReverses
+	: public CommandBSKickBase
 {
 public:
 	CommandBSKickReverses(Module *creator) : CommandBSKickBase(creator, "botserv/kick/reverses", 2, 3)
@@ -750,7 +763,8 @@ public:
 	}
 };
 
-class CommandBSKickUnderlines : public CommandBSKickBase
+class CommandBSKickUnderlines
+	: public CommandBSKickBase
 {
 public:
 	CommandBSKickUnderlines(Module *creator) : CommandBSKickBase(creator, "botserv/kick/underlines", 2, 3)
@@ -784,7 +798,8 @@ public:
 	}
 };
 
-class CommandBSSetDontKickOps : public Command
+class CommandBSSetDontKickOps
+	: public Command
 {
 public:
 	CommandBSSetDontKickOps(Module *creator, const Anope::string &sname = "botserv/set/dontkickops") : Command(creator, sname, 2, 2)
@@ -849,7 +864,8 @@ public:
 	}
 };
 
-class CommandBSSetDontKickVoices : public Command
+class CommandBSSetDontKickVoices
+	: public Command
 {
 public:
 	CommandBSSetDontKickVoices(Module *creator, const Anope::string &sname = "botserv/set/dontkickvoices") : Command(creator, sname, 2, 2)
@@ -985,7 +1001,8 @@ struct UserData
 	Anope::string lastline;
 };
 
-class BanDataPurger : public Timer
+class BanDataPurger
+	: public Timer
 {
 public:
 	BanDataPurger(Module *o) : Timer(o, 300, Anope::CurTime, true) { }
@@ -1007,7 +1024,8 @@ public:
 	}
 };
 
-class BSKick : public Module
+class BSKick
+	: public Module
 {
 	ExtensibleItem<BanData> bandata;
 	ExtensibleItem<UserData> userdata;

@@ -25,7 +25,8 @@ namespace Encryption
 		virtual Hash GetFinalizedHash() = 0;
 	};
 
-	class Provider : public Service
+	class Provider
+		: public Service
 	{
 	public:
 		Provider(Module *creator, const Anope::string &sname) : Service(creator, "Encryption::Provider", sname) { }

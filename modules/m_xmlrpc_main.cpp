@@ -11,7 +11,8 @@
 
 static Module *me;
 
-class XMLRPCIdentifyRequest : public IdentifyRequest
+class XMLRPCIdentifyRequest
+	: public IdentifyRequest
 {
 	XMLRPCRequest request;
 	HTTPReply repl; /* Request holds a reference to the HTTPReply, because we might exist long enough to invalidate it
@@ -50,7 +51,8 @@ public:
 	}
 };
 
-class MyXMLRPCEvent : public XMLRPCEvent
+class MyXMLRPCEvent
+	: public XMLRPCEvent
 {
 public:
 	bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) override
@@ -95,7 +97,8 @@ private:
 
 				Anope::string out;
 
-				struct XMLRPCommandReply : CommandReply
+				struct XMLRPCommandReply
+					: CommandReply
 				{
 					Anope::string &str;
 
@@ -275,7 +278,8 @@ private:
 	}
 };
 
-class ModuleXMLRPCMain : public Module
+class ModuleXMLRPCMain
+	: public Module
 {
 	ServiceReference<XMLRPCServiceInterface> xmlrpc;
 

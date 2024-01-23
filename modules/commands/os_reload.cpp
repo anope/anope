@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSReload : public Command
+class CommandOSReload
+	: public Command
 {
 public:
 	CommandOSReload(Module *creator) : Command(creator, "operserv/reload", 0, 0)
@@ -52,7 +53,8 @@ public:
 	}
 };
 
-class OSReload : public Module
+class OSReload
+	: public Module
 {
 	CommandOSReload commandosreload;
 

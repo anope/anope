@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandMSIgnore : public Command
+class CommandMSIgnore
+	: public Command
 {
 public:
 	CommandMSIgnore(Module *creator) : Command(creator, "memoserv/ignore", 1, 3)
@@ -118,7 +119,8 @@ public:
 	}
 };
 
-class MSIgnore : public Module
+class MSIgnore
+	: public Module
 {
 	CommandMSIgnore commandmsignore;
 

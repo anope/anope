@@ -23,7 +23,8 @@ protected:
 	IgnoreData() = default;
 };
 
-class IgnoreService : public Service
+class IgnoreService
+	: public Service
 {
 protected:
 	IgnoreService(Module *c) : Service(c, "IgnoreService", "ignore") { }

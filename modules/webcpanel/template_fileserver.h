@@ -14,7 +14,8 @@ class TemplateFileServer
 {
 	Anope::string file_name;
 public:
-	struct Replacements : std::multimap<Anope::string, Anope::string>
+	struct Replacements
+		: std::multimap<Anope::string, Anope::string>
 	{
 		Anope::string& operator[](const Anope::string &key)
 		{

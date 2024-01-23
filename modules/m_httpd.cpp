@@ -37,7 +37,8 @@ static Anope::string GetStatusFromCode(HTTPError err)
 	return "501 Not Implemented";
 }
 
-class MyHTTPClient : public HTTPClient
+class MyHTTPClient
+	: public HTTPClient
 {
 	HTTPProvider *provider;
 	HTTPMessage message;
@@ -282,7 +283,9 @@ public:
 	}
 };
 
-class MyHTTPProvider : public HTTPProvider, public Timer
+class MyHTTPProvider
+	: public HTTPProvider
+	, public Timer
 {
 	int timeout;
 	std::map<Anope::string, HTTPPage *> pages;
@@ -329,7 +332,8 @@ public:
 	}
 };
 
-class HTTPD : public Module
+class HTTPD
+	: public Module
 {
 	ServiceReference<SSLService> sslref;
 	std::map<Anope::string, MyHTTPProvider *> providers;

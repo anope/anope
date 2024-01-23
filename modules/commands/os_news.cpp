@@ -64,7 +64,8 @@ struct NewsMessages msgarray[] = {
 	 }
 };
 
-struct MyNewsItem : NewsItem
+struct MyNewsItem
+	: NewsItem
 {
 	void Serialize(Serialize::Data &data) const override
 	{
@@ -98,7 +99,8 @@ struct MyNewsItem : NewsItem
 	}
 };
 
-class MyNewsService : public NewsService
+class MyNewsService
+	: public NewsService
 {
 	std::vector<NewsItem *> newsItems[3];
 public:
@@ -147,7 +149,8 @@ static const char **findmsgs(NewsType type)
 	return NULL;
 }
 
-class NewsBase : public Command
+class NewsBase
+	: public Command
 {
 	ServiceReference<NewsService> ns;
 
@@ -296,7 +299,8 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 };
 
-class CommandOSLogonNews : public NewsBase
+class CommandOSLogonNews
+	: public NewsBase
 {
 public:
 	CommandOSLogonNews(Module *creator) : NewsBase(creator, "operserv/logonnews")
@@ -323,7 +327,8 @@ public:
 	}
 };
 
-class CommandOSOperNews : public NewsBase
+class CommandOSOperNews
+	: public NewsBase
 {
 public:
 	CommandOSOperNews(Module *creator) : NewsBase(creator, "operserv/opernews")
@@ -350,7 +355,8 @@ public:
 	}
 };
 
-class CommandOSRandomNews : public NewsBase
+class CommandOSRandomNews
+	: public NewsBase
 {
 public:
 	CommandOSRandomNews(Module *creator) : NewsBase(creator, "operserv/randomnews")
@@ -376,7 +382,8 @@ public:
 
 static unsigned cur_rand_news = 0;
 
-class OSNews : public Module
+class OSNews
+	: public Module
 {
 	MyNewsService newsservice;
 	Serialize::Type newsitem_type;

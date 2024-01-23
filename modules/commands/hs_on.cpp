@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandHSOn : public Command
+class CommandHSOn
+	: public Command
 {
 public:
 	CommandHSOn(Module *creator) : Command(creator, "hostserv/on", 0, 0)
@@ -59,7 +60,8 @@ public:
 	}
 };
 
-class HSOn : public Module
+class HSOn
+	: public Module
 {
 	CommandHSOn commandhson;
 

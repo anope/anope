@@ -35,7 +35,8 @@ enum ModeClass
 
 /** This class is the basis of all modes in Anope
  */
-class CoreExport Mode : public Base
+class CoreExport Mode
+	: public Base
 {
 public:
 	/* Mode name */
@@ -64,7 +65,8 @@ public:
 
 /** This class is a user mode, all user modes use this/inherit from this
  */
-class CoreExport UserMode : public Mode
+class CoreExport UserMode
+	: public Mode
 {
 public:
 	/** constructor
@@ -74,7 +76,8 @@ public:
 	UserMode(const Anope::string &name, char mc);
 };
 
-class CoreExport UserModeParam : public UserMode
+class CoreExport UserModeParam
+	: public UserMode
 {
 public:
 	/** constructor
@@ -92,7 +95,8 @@ public:
 
 /** This class is a channel mode, all channel modes use this/inherit from this
  */
-class CoreExport ChannelMode : public Mode
+class CoreExport ChannelMode
+	: public Mode
 {
 public:
 	/* channel modes that can possibly unwrap this mode */
@@ -123,7 +127,8 @@ public:
 
 /** This is a mode for lists, eg b/e/I. These modes should inherit from this
  */
-class CoreExport ChannelModeList : public ChannelMode
+class CoreExport ChannelModeList
+	: public ChannelMode
 {
 public:
 	/** constructor
@@ -161,7 +166,8 @@ public:
 
 /** This is a mode with a parameter, eg +k/l. These modes should use/inherit from this
 */
-class CoreExport ChannelModeParam : public ChannelMode
+class CoreExport ChannelModeParam
+	: public ChannelMode
 {
 public:
 	/** constructor
@@ -183,7 +189,8 @@ public:
 
 /** This is a mode that is a channel status, eg +v/h/o/a/q.
 */
-class CoreExport ChannelModeStatus : public ChannelMode
+class CoreExport ChannelModeStatus
+	: public ChannelMode
 {
 public:
 	/* The symbol, eg @ % + */
@@ -206,7 +213,8 @@ public:
  * but we still have a representation for it.
  */
 template<typename T>
-class CoreExport ChannelModeVirtual : public T
+class CoreExport ChannelModeVirtual
+	: public T
 {
 	Anope::string base;
 	ChannelMode *basech;
@@ -239,7 +247,8 @@ public:
 	Anope::string BuildModePrefixList() const;
 };
 
-class CoreExport UserModeOperOnly : public UserMode
+class CoreExport UserModeOperOnly
+	: public UserMode
 {
 public:
 	UserModeOperOnly(const Anope::string &mname, char um) : UserMode(mname, um) { }
@@ -247,7 +256,8 @@ public:
 	bool CanSet(User *u) const override;
 };
 
-class CoreExport UserModeNoone : public UserMode
+class CoreExport UserModeNoone
+	: public UserMode
 {
 public:
 	UserModeNoone(const Anope::string &mname, char um) : UserMode(mname, um) { }
@@ -257,7 +267,8 @@ public:
 
 /** Channel mode +k (key)
  */
-class CoreExport ChannelModeKey : public ChannelModeParam
+class CoreExport ChannelModeKey
+	: public ChannelModeParam
 {
 public:
 	ChannelModeKey(char mc) : ChannelModeParam("KEY", mc) { }
@@ -267,7 +278,8 @@ public:
 
 /** This class is used for oper only channel modes
  */
-class CoreExport ChannelModeOperOnly : public ChannelMode
+class CoreExport ChannelModeOperOnly
+	: public ChannelMode
 {
 public:
 	ChannelModeOperOnly(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
@@ -278,7 +290,8 @@ public:
 
 /** This class is used for channel modes only servers may set
  */
-class CoreExport ChannelModeNoone : public ChannelMode
+class CoreExport ChannelModeNoone
+	: public ChannelMode
 {
 public:
 	ChannelModeNoone(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }

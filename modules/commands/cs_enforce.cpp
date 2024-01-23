@@ -13,7 +13,8 @@
 
 #include "module.h"
 
-class CommandCSEnforce : public Command
+class CommandCSEnforce
+	: public Command
 {
 private:
 	void DoSecureOps(CommandSource &source, ChannelInfo *ci)
@@ -262,7 +263,8 @@ public:
 	}
 };
 
-class CSEnforce : public Module
+class CSEnforce
+	: public Module
 {
 	CommandCSEnforce commandcsenforce;
 

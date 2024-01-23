@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandBSBot : public Command
+class CommandBSBot
+	: public Command
 {
 private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
@@ -370,7 +371,8 @@ public:
 	}
 };
 
-class BSBot : public Module
+class BSBot
+	: public Module
 {
 	CommandBSBot commandbsbot;
 

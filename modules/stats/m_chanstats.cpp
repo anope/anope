@@ -9,7 +9,8 @@
 #include "module.h"
 #include "modules/sql.h"
 
-class CommandCSSetChanstats : public Command
+class CommandCSSetChanstats
+	: public Command
 {
 public:
 	CommandCSSetChanstats(Module *creator) : Command(creator, "chanserv/set/chanstats", 2, 2)
@@ -63,7 +64,8 @@ public:
 	}
 };
 
-class CommandNSSetChanstats : public Command
+class CommandNSSetChanstats
+	: public Command
 {
 public:
 	CommandNSSetChanstats(Module *creator, const Anope::string &sname = "nickserv/set/chanstats", size_t min = 1 ) : Command(creator, sname, min, min + 1)
@@ -121,7 +123,8 @@ public:
 	}
 };
 
-class CommandNSSASetChanstats : public CommandNSSetChanstats
+class CommandNSSASetChanstats
+	: public CommandNSSetChanstats
 {
 public:
 	CommandNSSASetChanstats(Module *creator) : CommandNSSetChanstats(creator, "nickserv/saset/chanstats", 2)
@@ -144,7 +147,8 @@ public:
 	}
 };
 
-class MySQLInterface : public SQL::Interface
+class MySQLInterface
+	: public SQL::Interface
 {
 public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
@@ -162,7 +166,8 @@ public:
 	}
 };
 
-class MChanstats : public Module
+class MChanstats
+	: public Module
 {
 	SerializableExtensibleItem<bool> cs_stats, ns_stats;
 

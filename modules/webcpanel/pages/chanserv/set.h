@@ -13,7 +13,8 @@ namespace WebCPanel
 namespace ChanServ
 {
 
-class Set : public WebPanelProtectedPage
+class Set
+	: public WebPanelProtectedPage
 {
 public:
 	Set(const Anope::string &cat, const Anope::string &u);

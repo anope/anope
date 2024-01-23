@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class ChannelModeFlood : public ChannelModeParam
+class ChannelModeFlood
+	: public ChannelModeParam
 {
 public:
 	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
@@ -30,7 +31,8 @@ public:
 	}
 };
 
-class BahamutIRCdProto : public IRCDProto
+class BahamutIRCdProto
+	: public IRCDProto
 {
 public:
 	BahamutIRCdProto(Module *creator) : IRCDProto(creator, "Bahamut 1.8.x")
@@ -290,7 +292,8 @@ public:
 	}
 };
 
-struct IRCDMessageBurst : IRCDMessage
+struct IRCDMessageBurst
+	: IRCDMessage
 {
 	IRCDMessageBurst(Module *creator) : IRCDMessage(creator, "BURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -308,7 +311,8 @@ struct IRCDMessageBurst : IRCDMessage
 	}
 };
 
-struct IRCDMessageMode : IRCDMessage
+struct IRCDMessageMode
+	: IRCDMessage
 {
 	IRCDMessageMode(Module *creator, const Anope::string &sname) : IRCDMessage(creator, sname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -359,7 +363,8 @@ struct IRCDMessageMode : IRCDMessage
  **	  parv[0] = new nickname
  **	  parv[1] = hopcount
  */
-struct IRCDMessageNick : IRCDMessage
+struct IRCDMessageNick
+	: IRCDMessage
 {
 	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -392,7 +397,8 @@ struct IRCDMessageNick : IRCDMessage
 	}
 };
 
-struct IRCDMessageServer : IRCDMessage
+struct IRCDMessageServer
+	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -403,7 +409,8 @@ struct IRCDMessageServer : IRCDMessage
 	}
 };
 
-struct IRCDMessageSJoin : IRCDMessage
+struct IRCDMessageSJoin
+	: IRCDMessage
 {
 	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -459,7 +466,8 @@ struct IRCDMessageSJoin : IRCDMessage
 	}
 };
 
-struct IRCDMessageTopic : IRCDMessage
+struct IRCDMessageTopic
+	: IRCDMessage
 {
 	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 4) { }
 
@@ -471,7 +479,8 @@ struct IRCDMessageTopic : IRCDMessage
 	}
 };
 
-class ProtoBahamut : public Module
+class ProtoBahamut
+	: public Module
 {
 	BahamutIRCdProto ircd_proto;
 

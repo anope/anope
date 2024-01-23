@@ -17,7 +17,8 @@ struct Session
 	Session(const sockaddrs &ip, int len) : addr(ip, len) { }
 };
 
-struct Exception : Serializable
+struct Exception
+	: Serializable
 {
 	Anope::string mask;		/* Hosts to which this exception applies */
 	unsigned limit;			/* Session limit for exception */
@@ -31,7 +32,8 @@ struct Exception : Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-class SessionService : public Service
+class SessionService
+	: public Service
 {
 public:
 	typedef std::unordered_map<cidr, Session *, cidr::hash> SessionMap;

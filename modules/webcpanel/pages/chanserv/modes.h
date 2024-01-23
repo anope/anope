@@ -13,7 +13,8 @@ namespace WebCPanel
 namespace ChanServ
 {
 
-class Modes : public WebPanelProtectedPage
+class Modes
+	: public WebPanelProtectedPage
 {
 public:
 	Modes(const Anope::string &cat, const Anope::string &u);

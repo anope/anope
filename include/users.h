@@ -28,7 +28,10 @@ extern CoreExport unsigned MaxUserCount;
 extern CoreExport time_t MaxUserTime;
 
 /* Online user and channel data. */
-class CoreExport User : public virtual Base, public Extensible, public CommandReply
+class CoreExport User
+	: public virtual Base
+	, public Extensible
+	, public CommandReply
 {
 	/* true if the user was quit or killed */
 	bool quit;

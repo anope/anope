@@ -12,7 +12,8 @@
 #include "module.h"
 #include "modules/sql.h"
 
-class MySQLInterface : public SQL::Interface
+class MySQLInterface
+	: public SQL::Interface
 {
 public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
@@ -31,7 +32,8 @@ public:
 };
 
 
-class CommandCSStats : public Command
+class CommandCSStats
+	: public Command
 {
 public:
 	CommandCSStats(Module *creator) : Command (creator, "chanserv/stats", 0, 2)
@@ -43,7 +45,8 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
 };
 
-class CommandCSGStats : public Command
+class CommandCSGStats
+	: public Command
 {
 public:
 	CommandCSGStats(Module *creator) : Command (creator, "chanserv/gstats", 0, 2)
@@ -58,7 +61,8 @@ public:
 
 class CSStats;
 static CSStats *me;
-class CSStats : public Module
+class CSStats
+	: public Module
 {
 	CommandCSStats commandcsstats;
 	CommandCSGStats commandcsgstats;

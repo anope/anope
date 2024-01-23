@@ -22,7 +22,8 @@ namespace SASL
 	class Mechanism;
 	struct Session;
 
-	class Service : public ::Service
+	class Service
+		: public ::Service
 	{
 	public:
 		Service(Module *o) : ::Service(o, "SASL::Service", "sasl") { }
@@ -60,7 +61,8 @@ namespace SASL
 	};
 
 	/* PLAIN, EXTERNAL, etc */
-	class Mechanism : public ::Service
+	class Mechanism
+		: public ::Service
 	{
 	public:
 		Mechanism(Module *o, const Anope::string &sname) : Service(o, "SASL::Mechanism", sname) { }
@@ -76,7 +78,8 @@ namespace SASL
 		}
 	};
 
-	class IdentifyRequest : public ::IdentifyRequest
+	class IdentifyRequest
+		: public ::IdentifyRequest
 	{
 		Anope::string uid;
 		Anope::string hostname, ip;

@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandMSList : public Command
+class CommandMSList
+	: public Command
 {
 public:
 	CommandMSList(Module *creator) : Command(creator, "memoserv/list", 0, 2)
@@ -65,7 +66,8 @@ public:
 
 			if (!param.empty() && isdigit(param[0]))
 			{
-				class MemoListCallback : public NumberList
+				class MemoListCallback
+					: public NumberList
 				{
 					ListFormatter &list;
 					CommandSource &source;
@@ -149,7 +151,8 @@ public:
 	}
 };
 
-class MSList : public Module
+class MSList
+	: public Module
 {
 	CommandMSList commandmslist;
 

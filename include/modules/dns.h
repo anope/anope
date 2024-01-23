@@ -88,7 +88,8 @@ namespace DNS
 		};
 	};
 
-	struct ResourceRecord : Question
+	struct ResourceRecord
+		: Question
 	{
 		unsigned int ttl = 0;
 		Anope::string rdata;
@@ -113,7 +114,8 @@ namespace DNS
 
 	/** DNS manager
 	 */
-	class Manager : public Service
+	class Manager
+		: public Service
 	{
 	public:
 		Manager(Module *creator) : Service(creator, "DNS::Manager", "dns/manager") { }
@@ -131,7 +133,9 @@ namespace DNS
 
 	/** A DNS query.
 	 */
-	class Request : public Timer, public Question
+	class Request
+		: public Timer
+		, public Question
 	{
 		Manager *manager;
 	public:

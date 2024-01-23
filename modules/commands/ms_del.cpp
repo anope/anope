@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class MemoDelCallback : public NumberList
+class MemoDelCallback
+	: public NumberList
 {
 	CommandSource &source;
 	Command *cmd;
@@ -36,7 +37,8 @@ public:
 	}
 };
 
-class CommandMSDel : public Command
+class CommandMSDel
+	: public Command
 {
 public:
 	CommandMSDel(Module *creator) : Command(creator, "memoserv/del", 0, 2)
@@ -144,7 +146,8 @@ public:
 	}
 };
 
-class MSDel : public Module
+class MSDel
+	: public Module
 {
 	CommandMSDel commandmsdel;
 

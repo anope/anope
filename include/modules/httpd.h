@@ -93,7 +93,8 @@ struct HTTPMessage
 class HTTPClient;
 class HTTPProvider;
 
-class HTTPPage : public virtual Base
+class HTTPPage
+	: public virtual Base
 {
 	Anope::string url;
 	Anope::string content_type;
@@ -115,7 +116,10 @@ public:
 	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
 };
 
-class HTTPClient : public ClientSocket, public BinarySocket, public Base
+class HTTPClient
+	: public ClientSocket
+	, public BinarySocket
+	, public Base
 {
 protected:
 	void WriteClient(const Anope::string &message)
@@ -135,7 +139,9 @@ public:
 	virtual void SendReply(HTTPReply *) = 0;
 };
 
-class HTTPProvider : public ListenSocket, public Service
+class HTTPProvider
+	: public ListenSocket
+	, public Service
 {
 	Anope::string ip;
 	unsigned short port;

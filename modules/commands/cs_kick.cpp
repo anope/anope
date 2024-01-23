@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandCSKick : public Command
+class CommandCSKick
+	: public Command
 {
 public:
 	CommandCSKick(Module *creator) : Command(creator, "chanserv/kick", 2, 3)
@@ -133,7 +134,8 @@ public:
 	}
 };
 
-class CSKick : public Module
+class CSKick
+	: public Module
 {
 	CommandCSKick commandcskick;
 

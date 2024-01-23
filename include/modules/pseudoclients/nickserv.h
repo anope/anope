@@ -8,7 +8,8 @@
 
 #pragma once
 
-class NickServService : public Service
+class NickServService
+	: public Service
 {
 public:
 	NickServService(Module *m) : Service(m, "NickServService", "NickServ")

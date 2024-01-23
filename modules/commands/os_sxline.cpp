@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class SXLineDelCallback : public NumberList
+class SXLineDelCallback
+	: public NumberList
 {
 	XLineManager *xlm;
 	Command *command;
@@ -54,7 +55,8 @@ public:
 	}
 };
 
-class CommandOSSXLineBase : public Command
+class CommandOSSXLineBase
+	: public Command
 {
 private:
 	virtual XLineManager* xlm() = 0;
@@ -118,7 +120,8 @@ private:
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class SXLineListCallback : public NumberList
+			class SXLineListCallback
+				: public NumberList
 			{
 				XLineManager *xlm;
 				CommandSource &source;
@@ -256,7 +259,8 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 };
 
-class CommandOSSNLine : public CommandOSSXLineBase
+class CommandOSSNLine
+	: public CommandOSSXLineBase
 {
 	XLineManager *xlm() override
 	{
@@ -480,7 +484,8 @@ public:
 	}
 };
 
-class CommandOSSQLine : public CommandOSSXLineBase
+class CommandOSSQLine
+	: public CommandOSSXLineBase
 {
 	XLineManager *xlm() override
 	{
@@ -710,7 +715,8 @@ public:
 	}
 };
 
-class OSSXLine : public Module
+class OSSXLine
+	: public Module
 {
 	CommandOSSNLine commandossnline;
 	CommandOSSQLine commandossqline;

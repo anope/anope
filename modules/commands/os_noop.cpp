@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSNOOP : public Command
+class CommandOSNOOP
+	: public Command
 {
 public:
 	CommandOSNOOP(Module *creator) : Command(creator, "operserv/noop", 2, 2)
@@ -71,7 +72,8 @@ public:
 	}
 };
 
-class OSNOOP : public Module
+class OSNOOP
+	: public Module
 {
 	CommandOSNOOP commandosnoop;
 	PrimitiveExtensibleItem<Anope::string> noop;

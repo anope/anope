@@ -15,7 +15,8 @@
 #include "anope.h"
 #include "service.h"
 
-class CoreExport RegexException : public CoreException
+class CoreExport RegexException
+	: public CoreException
 {
 public:
 	RegexException(const Anope::string &reason = "") : CoreException(reason) { }
@@ -34,7 +35,8 @@ public:
 	virtual bool Matches(const Anope::string &str) = 0;
 };
 
-class CoreExport RegexProvider : public Service
+class CoreExport RegexProvider
+	: public Service
 {
 public:
 	RegexProvider(Module *o, const Anope::string &n) : Service(o, "Regex", n) { }

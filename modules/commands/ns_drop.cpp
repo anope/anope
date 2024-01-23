@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandNSDrop : public Command
+class CommandNSDrop
+	: public Command
 {
 public:
 	CommandNSDrop(Module *creator) : Command(creator, "nickserv/drop", 1, 1)
@@ -71,7 +72,8 @@ public:
 	}
 };
 
-class NSDrop : public Module
+class NSDrop
+	: public Module
 {
 	CommandNSDrop commandnsdrop;
 

@@ -59,7 +59,8 @@ struct QueryResult
 
 /** A MySQL result
  */
-class MySQLResult : public Result
+class MySQLResult
+	: public Result
 {
 	MYSQL_RES *res = nullptr;
 
@@ -107,7 +108,8 @@ public:
 
 /** A MySQL connection, there can be multiple
  */
-class MySQLService : public Provider
+class MySQLService
+	: public Provider
 {
 	std::map<Anope::string, std::set<Anope::string> > active_schema;
 
@@ -156,7 +158,9 @@ public:
 
 /** The SQL thread used to execute queries
  */
-class DispatcherThread : public Thread, public Condition
+class DispatcherThread
+	: public Thread
+	, public Condition
 {
 public:
 	DispatcherThread() : Thread() { }
@@ -166,7 +170,10 @@ public:
 
 class ModuleSQL;
 static ModuleSQL *me;
-class ModuleSQL : public Module, public Pipe
+
+class ModuleSQL
+	: public Module
+	, public Pipe
 {
 	/* SQL connections */
 	std::map<Anope::string, MySQLService *> MySQLServices;

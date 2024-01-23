@@ -12,7 +12,9 @@
 #include "module.h"
 #include "modules/os_ignore.h"
 
-struct IgnoreDataImpl : IgnoreData, Serializable
+struct IgnoreDataImpl
+	: IgnoreData
+	, Serializable
 {
 	IgnoreDataImpl() : Serializable("IgnoreData") { }
 	~IgnoreDataImpl() override;
@@ -57,7 +59,8 @@ Serializable* IgnoreDataImpl::Unserialize(Serializable *obj, Serialize::Data &da
 }
 
 
-class OSIgnoreService : public IgnoreService
+class OSIgnoreService
+	: public IgnoreService
 {
 	Serialize::Checker<std::vector<IgnoreData *> > ignores;
 
@@ -154,7 +157,8 @@ public:
 	}
 };
 
-class CommandOSIgnore : public Command
+class CommandOSIgnore
+	: public Command
 {
 private:
 	Anope::string RealMask(const Anope::string &mask)
@@ -391,7 +395,8 @@ public:
 	}
 };
 
-class OSIgnore : public Module
+class OSIgnore
+	: public Module
 {
 	Serialize::Type ignoredata_type;
 	OSIgnoreService osignoreservice;

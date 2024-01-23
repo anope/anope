@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandBSSet : public Command
+class CommandBSSet
+	: public Command
 {
 public:
 	CommandBSSet(Module *creator) : Command(creator, "botserv/set", 3, 3)
@@ -64,10 +65,12 @@ public:
 	}
 };
 
-class CommandBSSetBanExpire : public Command
+class CommandBSSetBanExpire
+	: public Command
 {
 public:
-	class UnbanTimer : public Timer
+	class UnbanTimer
+		: public Timer
 	{
 		Anope::string chname;
 		Anope::string mask;
@@ -151,7 +154,8 @@ public:
 	}
 };
 
-class CommandBSSetPrivate : public Command
+class CommandBSSetPrivate
+	: public Command
 {
 public:
 	CommandBSSetPrivate(Module *creator, const Anope::string &sname = "botserv/set/private") : Command(creator, sname, 2, 2)
@@ -201,7 +205,8 @@ public:
 	}
 };
 
-class BSSet : public Module
+class BSSet
+	: public Module
 {
 	CommandBSSet commandbsset;
 	CommandBSSetBanExpire commandbssetbanexpire;

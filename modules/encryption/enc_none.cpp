@@ -9,7 +9,8 @@
 
 #include "module.h"
 
-class ENone : public Module
+class ENone
+	: public Module
 {
 public:
 	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)

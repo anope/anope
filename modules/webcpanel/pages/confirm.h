@@ -12,7 +12,8 @@
 namespace WebCPanel
 {
 
-class Confirm : public WebPanelPage
+class Confirm
+	: public WebPanelPage
 {
 public:
 	Confirm(const Anope::string &u) : WebPanelPage(u) { }

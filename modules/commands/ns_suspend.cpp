@@ -14,7 +14,9 @@
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
-struct NSSuspendInfo : SuspendInfo, Serializable
+struct NSSuspendInfo
+	: SuspendInfo
+	, Serializable
 {
 	NSSuspendInfo(Extensible *) : Serializable("NSSuspendInfo") { }
 
@@ -52,7 +54,8 @@ struct NSSuspendInfo : SuspendInfo, Serializable
 	}
 };
 
-class CommandNSSuspend : public Command
+class CommandNSSuspend
+	: public Command
 {
 public:
 	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 3)
@@ -150,7 +153,8 @@ public:
 	}
 };
 
-class CommandNSUnSuspend : public Command
+class CommandNSUnSuspend
+	: public Command
 {
 public:
 	CommandNSUnSuspend(Module *creator) : Command(creator, "nickserv/unsuspend", 1, 1)
@@ -199,7 +203,8 @@ public:
 	}
 };
 
-class NSSuspend : public Module
+class NSSuspend
+	: public Module
 {
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;

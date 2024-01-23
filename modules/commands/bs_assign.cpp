@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandBSAssign : public Command
+class CommandBSAssign
+	: public Command
 {
 public:
 	CommandBSAssign(Module *creator) : Command(creator, "botserv/assign", 2, 2)
@@ -82,7 +83,8 @@ public:
 	}
 };
 
-class CommandBSUnassign : public Command
+class CommandBSUnassign
+	: public Command
 {
 public:
 	CommandBSUnassign(Module *creator) : Command(creator, "botserv/unassign", 1, 1)
@@ -145,7 +147,8 @@ public:
 	}
 };
 
-class CommandBSSetNoBot : public Command
+class CommandBSSetNoBot
+	: public Command
 {
 public:
 	CommandBSSetNoBot(Module *creator, const Anope::string &sname = "botserv/set/nobot") : Command(creator, sname, 2, 2)
@@ -202,7 +205,8 @@ public:
 	}
 };
 
-class BSAssign : public Module
+class BSAssign
+	: public Module
 {
 	ExtensibleItem<bool> nobot;
 

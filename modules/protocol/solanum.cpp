@@ -17,7 +17,8 @@ static Anope::string UplinkSID;
 
 static ServiceReference<IRCDProto> ratbox("IRCDProto", "ratbox");
 
-class ChannelModeLargeBan : public ChannelMode
+class ChannelModeLargeBan
+	: public ChannelMode
 {
 public:
 	ChannelModeLargeBan(const Anope::string &mname, char modeChar) : ChannelMode(mname, modeChar) { }
@@ -29,7 +30,8 @@ public:
 };
 
 
-class SolanumProto : public IRCDProto
+class SolanumProto
+	: public IRCDProto
 {
 public:
 
@@ -170,7 +172,8 @@ public:
 };
 
 
-struct IRCDMessageEncap : IRCDMessage
+struct IRCDMessageEncap
+	: IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 3)
 	{
@@ -226,7 +229,8 @@ struct IRCDMessageEncap : IRCDMessage
 	}
 };
 
-struct IRCDMessageEUID : IRCDMessage
+struct IRCDMessageEUID
+	: IRCDMessage
 {
 	IRCDMessageEUID(Module *creator) : IRCDMessage(creator, "EUID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -254,7 +258,8 @@ struct IRCDMessageEUID : IRCDMessage
 };
 
 // we can't use this function from ratbox because we set a local variable here
-struct IRCDMessageServer : IRCDMessage
+struct IRCDMessageServer
+	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -270,7 +275,8 @@ struct IRCDMessageServer : IRCDMessage
 };
 
 // we can't use this function from ratbox because we set a local variable here
-struct IRCDMessagePass : IRCDMessage
+struct IRCDMessagePass
+	: IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -281,7 +287,8 @@ struct IRCDMessagePass : IRCDMessage
 	}
 };
 
-struct IRCDMessageNotice : Message::Notice
+struct IRCDMessageNotice
+	: Message::Notice
 {
 	IRCDMessageNotice(Module *creator) : Message::Notice(creator) { }
 
@@ -294,7 +301,8 @@ struct IRCDMessageNotice : Message::Notice
 	}
 };
 
-struct IRCDMessagePrivmsg : Message::Privmsg
+struct IRCDMessagePrivmsg
+	: Message::Privmsg
 {
 	IRCDMessagePrivmsg(Module *creator) : Message::Privmsg(creator) { }
 
@@ -307,7 +315,8 @@ struct IRCDMessagePrivmsg : Message::Privmsg
 	}
 };
 
-class ProtoSolanum : public Module
+class ProtoSolanum
+	: public Module
 {
 	Module *m_ratbox;
 

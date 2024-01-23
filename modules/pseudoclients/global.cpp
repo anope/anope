@@ -11,7 +11,9 @@
 
 #include "module.h"
 
-class GlobalCore : public Module, public GlobalService
+class GlobalCore
+	: public Module
+	, public GlobalService
 {
 	Reference<BotInfo> Global;
 

@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandNSUpdate : public Command
+class CommandNSUpdate
+	: public Command
 {
 public:
 	CommandNSUpdate(Module *creator) : Command(creator, "nickserv/update", 0, 0)
@@ -47,7 +48,8 @@ public:
 	}
 };
 
-class NSUpdate : public Module
+class NSUpdate
+	: public Module
 {
 	CommandNSUpdate commandnsupdate;
 

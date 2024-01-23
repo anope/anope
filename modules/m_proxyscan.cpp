@@ -21,9 +21,12 @@ static Anope::string target_ip;
 static unsigned short target_port;
 static bool add_to_akill;
 
-class ProxyCallbackListener : public ListenSocket
+class ProxyCallbackListener
+	: public ListenSocket
 {
-	class ProxyCallbackClient : public ClientSocket, public BufferedSocket
+	class ProxyCallbackClient
+		: public ClientSocket
+		, public BufferedSocket
 	{
 	public:
 		ProxyCallbackClient(ListenSocket *l, int f, const sockaddrs &a) : Socket(f, l->GetFamily()), ClientSocket(l, a), BufferedSocket()
@@ -52,7 +55,8 @@ public:
 	}
 };
 
-class ProxyConnect : public ConnectionSocket
+class ProxyConnect
+	: public ConnectionSocket
 {
 	static ServiceReference<XLineManager> akills;
 
@@ -107,7 +111,9 @@ protected:
 ServiceReference<XLineManager> ProxyConnect::akills("XLineManager", "xlinemanager/sgline");
 std::set<ProxyConnect *> ProxyConnect::proxies;
 
-class HTTPProxyConnect : public ProxyConnect, public BufferedSocket
+class HTTPProxyConnect
+	: public ProxyConnect
+	, public BufferedSocket
 {
 public:
 	HTTPProxyConnect(ProxyCheck &p, unsigned short po) : Socket(-1), ProxyConnect(p, po), BufferedSocket()
@@ -139,7 +145,9 @@ public:
 	}
 };
 
-class SOCKS5ProxyConnect : public ProxyConnect, public BinarySocket
+class SOCKS5ProxyConnect
+	: public ProxyConnect
+	, public BinarySocket
 {
 public:
 	SOCKS5ProxyConnect(ProxyCheck &p, unsigned short po) : Socket(-1), ProxyConnect(p, po), BinarySocket()
@@ -189,7 +197,8 @@ public:
 	}
 };
 
-class ModuleProxyScan : public Module
+class ModuleProxyScan
+	: public Module
 {
 	Anope::string listen_ip;
 	unsigned short listen_port;
@@ -198,7 +207,8 @@ class ModuleProxyScan : public Module
 
 	ProxyCallbackListener *listener;
 
-	class ConnectionTimeout : public Timer
+	class ConnectionTimeout
+		: public Timer
 	{
 	public:
 		ConnectionTimeout(Module *c, long timeout) : Timer(c, timeout, Anope::CurTime, true)

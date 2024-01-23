@@ -23,7 +23,8 @@ namespace
 
 /** A full packet sent or received to/from the nameserver
  */
-class Packet : public Query
+class Packet
+	: public Query
 {
 	static bool IsValidName(const Anope::string &name)
 	{
@@ -448,7 +449,8 @@ public:
 
 namespace DNS
 {
-	class ReplySocket : public virtual Socket
+	class ReplySocket
+		: public virtual Socket
 	{
 	public:
 		~ReplySocket() override = default;
@@ -457,13 +459,17 @@ namespace DNS
 }
 
 /* Listens for TCP requests */
-class TCPSocket : public ListenSocket
+class TCPSocket
+	: public ListenSocket
 {
 	Manager *manager;
 
 public:
 	/* A TCP client */
-	class Client : public ClientSocket, public Timer, public ReplySocket
+	class Client
+		: public ClientSocket
+		, public Timer
+		, public ReplySocket
 	{
 		Manager *manager;
 		Packet *packet = nullptr;
@@ -550,7 +556,8 @@ public:
 };
 
 /* Listens for UDP requests */
-class UDPSocket : public ReplySocket
+class UDPSocket
+	: public ReplySocket
 {
 	Manager *manager;
 	std::deque<Packet *> packets;
@@ -610,7 +617,8 @@ public:
 	}
 };
 
-class NotifySocket : public Socket
+class NotifySocket
+	: public Socket
 {
 	Packet *packet;
 public:
@@ -643,7 +651,9 @@ public:
 	}
 };
 
-class MyManager : public Manager, public Timer
+class MyManager
+	: public Manager
+	, public Timer
 {
 	uint32_t serial;
 
@@ -997,7 +1007,8 @@ private:
 
 };
 
-class ModuleDNS : public Module
+class ModuleDNS
+	: public Module
 {
 	MyManager manager;
 

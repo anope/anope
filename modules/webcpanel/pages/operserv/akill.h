@@ -13,7 +13,8 @@ namespace WebCPanel
 namespace OperServ
 {
 
-class Akill : public WebPanelProtectedPage
+class Akill
+	: public WebPanelProtectedPage
 {
 public:
 	Akill(const Anope::string &cat, const Anope::string &u);

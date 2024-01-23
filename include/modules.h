@@ -196,11 +196,15 @@ public:
 	int GetPatch() const;
 };
 
-class CoreExport NotImplementedException : public CoreException { };
+class CoreExport NotImplementedException
+	: public CoreException
+{
+};
 
 /** Every module in Anope is actually a class.
  */
-class CoreExport Module : public Extensible
+class CoreExport Module
+	: public Extensible
 {
 private:
 	bool permanent;

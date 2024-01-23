@@ -16,7 +16,8 @@ static std::set<NickServCollide *> collides;
 
 /** Timer for colliding nicks to force people off of nicknames
  */
-class NickServCollide : public Timer
+class NickServCollide
+	: public Timer
 {
 	NickServService *service;
 	Reference<User> u;
@@ -58,7 +59,8 @@ public:
 
 /** Timer for removing HELD status from nicks.
  */
-class NickServHeld : public Timer
+class NickServHeld
+	: public Timer
 {
 	Reference<NickAlias> na;
 	Anope::string nick;
@@ -80,7 +82,9 @@ static Anope::map<NickServRelease *> NickServReleases;
 
 /** Timer for releasing nicks to be available for use
  */
-class NickServRelease : public User, public Timer
+class NickServRelease
+	: public User
+	, public Timer
 {
 	Anope::string nick;
 
@@ -110,7 +114,9 @@ public:
 	void Tick(time_t t) override { }
 };
 
-class NickServCore : public Module, public NickServService
+class NickServCore
+	: public Module
+	, public NickServService
 {
 	Reference<BotInfo> NickServ;
 	std::vector<Anope::string> defaults;

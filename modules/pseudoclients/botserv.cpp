@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class BotServCore : public Module
+class BotServCore
+	: public Module
 {
 	Reference<BotInfo> BotServ;
 	ExtensibleRef<bool> persist, inhabit;

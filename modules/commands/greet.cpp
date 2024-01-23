@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandBSSetGreet : public Command
+class CommandBSSetGreet
+	: public Command
 {
 public:
 	CommandBSSetGreet(Module *creator, const Anope::string &sname = "botserv/set/greet") : Command(creator, sname, 2, 2)
@@ -75,7 +76,8 @@ public:
 	}
 };
 
-class CommandNSSetGreet : public Command
+class CommandNSSetGreet
+	: public Command
 {
 public:
 	CommandNSSetGreet(Module *creator, const Anope::string &sname = "nickserv/set/greet", size_t min = 0) : Command(creator, sname, min, min + 1)
@@ -136,7 +138,8 @@ public:
 	}
 };
 
-class CommandNSSASetGreet : public CommandNSSetGreet
+class CommandNSSASetGreet
+	: public CommandNSSetGreet
 {
 public:
 	CommandNSSASetGreet(Module *creator) : CommandNSSetGreet(creator, "nickserv/saset/greet", 1)
@@ -162,7 +165,8 @@ public:
 	}
 };
 
-class Greet : public Module
+class Greet
+	: public Module
 {
 	/* channel setting for whether or not greet should be shown */
 	SerializableExtensibleItem<bool> bs_greet;

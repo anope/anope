@@ -19,7 +19,8 @@ using namespace SQL;
 
 /** A SQLite result
  */
-class SQLiteResult : public Result
+class SQLiteResult
+	: public Result
 {
 public:
 	SQLiteResult(unsigned int i, const Query &q, const Anope::string &fq) : Result(i, q, fq)
@@ -38,7 +39,8 @@ public:
 
 /** A SQLite database, there can be multiple
  */
-class SQLiteService : public Provider
+class SQLiteService
+	: public Provider
 {
 	std::map<Anope::string, std::set<Anope::string> > active_schema;
 
@@ -68,7 +70,8 @@ public:
 	Anope::string FromUnixtime(time_t) override;
 };
 
-class ModuleSQLite : public Module
+class ModuleSQLite
+	: public Module
 {
 	/* SQL connections */
 	std::map<Anope::string, SQLiteService *> SQLiteServices;

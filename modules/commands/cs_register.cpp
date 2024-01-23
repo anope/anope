@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandCSRegister : public Command
+class CommandCSRegister
+	: public Command
 {
 public:
 	CommandCSRegister(Module *creator) : Command(creator, "chanserv/register", 1, 2)
@@ -110,7 +111,8 @@ public:
 };
 
 
-class CSRegister : public Module
+class CSRegister
+	: public Module
 {
 	CommandCSRegister commandcsregister;
 

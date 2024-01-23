@@ -16,7 +16,8 @@
 typedef Anope::map<Anope::string> ModData;
 static Anope::string UplinkSID;
 
-class UnrealIRCdProto : public IRCDProto
+class UnrealIRCdProto
+	: public IRCDProto
 {
 public:
 	PrimitiveExtensibleItem<ModData> ClientModData;
@@ -432,7 +433,8 @@ private:
 	}
 };
 
-class UnrealExtBan : public ChannelModeVirtual<ChannelModeList>
+class UnrealExtBan
+	: public ChannelModeVirtual<ChannelModeList>
 {
 	char ext;
 
@@ -460,7 +462,8 @@ public:
 
 namespace UnrealExtban
 {
-	class ChannelMatcher : public UnrealExtBan
+	class ChannelMatcher
+		: public UnrealExtBan
 	{
 	public:
 		ChannelMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
@@ -495,7 +498,8 @@ namespace UnrealExtban
 		}
 	};
 
-	class EntryMatcher : public UnrealExtBan
+	class EntryMatcher
+		: public UnrealExtBan
 	{
 	public:
 		EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
@@ -511,7 +515,8 @@ namespace UnrealExtban
 		}
 	};
 
-	class RealnameMatcher : public UnrealExtBan
+	class RealnameMatcher
+		: public UnrealExtBan
 	{
 	public:
 		RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
@@ -527,7 +532,8 @@ namespace UnrealExtban
 		}
 	};
 
-	class RegisteredMatcher : public UnrealExtBan
+	class RegisteredMatcher
+		: public UnrealExtBan
 	{
 	public:
 		RegisteredMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
@@ -541,7 +547,8 @@ namespace UnrealExtban
 		}
 	};
 
-	class AccountMatcher : public UnrealExtBan
+	class AccountMatcher
+		: public UnrealExtBan
 	{
 	public:
 		AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
@@ -560,7 +567,8 @@ namespace UnrealExtban
 		}
 	};
 
-	class FingerprintMatcher : public UnrealExtBan
+	class FingerprintMatcher
+		: public UnrealExtBan
 	{
 	public:
 		FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
@@ -575,7 +583,8 @@ namespace UnrealExtban
 		}
 	};
 
-	class OperclassMatcher : public UnrealExtBan
+	class OperclassMatcher
+		: public UnrealExtBan
 	{
 	public:
 	 	OperclassMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
@@ -591,7 +600,8 @@ namespace UnrealExtban
 		}
 	};
 
-	class TimedBanMatcher : public UnrealExtBan
+	class TimedBanMatcher
+		: public UnrealExtBan
 	{
 	public:
 	 	TimedBanMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
@@ -608,7 +618,8 @@ namespace UnrealExtban
 		}
 	};
 
-	class CountryMatcher : public UnrealExtBan
+	class CountryMatcher
+		: public UnrealExtBan
 	{
 	public:
 	 	CountryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
@@ -635,7 +646,8 @@ namespace UnrealExtban
 	};
 }
 
-class ChannelModeFlood : public ChannelModeParam
+class ChannelModeFlood
+	: public ChannelModeParam
 {
 public:
 	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
@@ -686,7 +698,8 @@ public:
 	}
 };
 
-class ChannelModeHistory : public ChannelModeParam /* stolen from inspircd3's ColonDelimitedParamMode */
+class ChannelModeHistory
+	: public ChannelModeParam
 {
 public:
 	ChannelModeHistory(char modeChar) : ChannelModeParam("HISTORY", modeChar, true) { }
@@ -725,7 +738,8 @@ public:
 	}
 };
 
-class ChannelModeUnrealSSL : public ChannelMode
+class ChannelModeUnrealSSL
+	: public ChannelMode
 {
 public:
 	ChannelModeUnrealSSL(const Anope::string &n, char c) : ChannelMode(n, c)
@@ -738,7 +752,8 @@ public:
 	}
 };
 
-struct IRCDMessageCapab : Message::Capab
+struct IRCDMessageCapab
+	: Message::Capab
 {
 	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "PROTOCTL") { }
 
@@ -1021,7 +1036,8 @@ struct IRCDMessageCapab : Message::Capab
 	}
 };
 
-struct IRCDMessageChgHost : IRCDMessage
+struct IRCDMessageChgHost
+	: IRCDMessage
 {
 	IRCDMessageChgHost(Module *creator) : IRCDMessage(creator, "CHGHOST", 2) { }
 
@@ -1033,7 +1049,8 @@ struct IRCDMessageChgHost : IRCDMessage
 	}
 };
 
-struct IRCDMessageChgIdent : IRCDMessage
+struct IRCDMessageChgIdent
+	: IRCDMessage
 {
 	IRCDMessageChgIdent(Module *creator) : IRCDMessage(creator, "CHGIDENT", 2) { }
 
@@ -1045,7 +1062,8 @@ struct IRCDMessageChgIdent : IRCDMessage
 	}
 };
 
-struct IRCDMessageChgName : IRCDMessage
+struct IRCDMessageChgName
+	: IRCDMessage
 {
 	IRCDMessageChgName(Module *creator) : IRCDMessage(creator, "CHGNAME", 2) { }
 
@@ -1057,7 +1075,8 @@ struct IRCDMessageChgName : IRCDMessage
 	}
 };
 
-struct IRCDMessageMD : IRCDMessage
+struct IRCDMessageMD
+	: IRCDMessage
 {
 	PrimitiveExtensibleItem<ModData> &ClientModData;
 	PrimitiveExtensibleItem<ModData> &ChannelModData;
@@ -1123,7 +1142,8 @@ struct IRCDMessageMD : IRCDMessage
 	}
 };
 
-struct IRCDMessageMode : IRCDMessage
+struct IRCDMessageMode
+	: IRCDMessage
 {
 	IRCDMessageMode(Module *creator, const Anope::string &mname) : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1168,7 +1188,8 @@ struct IRCDMessageMode : IRCDMessage
  *  argv[6] = free(**)
  *  argv[7] = ircnet
  */
-struct IRCDMessageNetInfo : IRCDMessage
+struct IRCDMessageNetInfo
+	: IRCDMessage
 {
 	IRCDMessageNetInfo(Module *creator) : IRCDMessage(creator, "NETINFO", 8) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -1178,7 +1199,8 @@ struct IRCDMessageNetInfo : IRCDMessage
 	}
 };
 
-struct IRCDMessageNick : IRCDMessage
+struct IRCDMessageNick
+	: IRCDMessage
 {
 	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1264,7 +1286,8 @@ struct IRCDMessageNick : IRCDMessage
  * with their server "not syncing". We now send a PING immediately when receiving a new server
  * and then finish sync once we get a pong back from that server.
  */
-struct IRCDMessagePong : IRCDMessage
+struct IRCDMessagePong
+	: IRCDMessage
 {
 	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -1275,7 +1298,8 @@ struct IRCDMessagePong : IRCDMessage
 	}
 };
 
-struct IRCDMessageSASL : IRCDMessage
+struct IRCDMessageSASL
+	: IRCDMessage
 {
 	IRCDMessageSASL(Module *creator) : IRCDMessage(creator, "SASL", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -1295,7 +1319,8 @@ struct IRCDMessageSASL : IRCDMessage
 	}
 };
 
-struct IRCDMessageSDesc : IRCDMessage
+struct IRCDMessageSDesc
+	: IRCDMessage
 {
 	IRCDMessageSDesc(Module *creator) : IRCDMessage(creator, "SDESC", 1) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -1305,7 +1330,8 @@ struct IRCDMessageSDesc : IRCDMessage
 	}
 };
 
-struct IRCDMessageSetHost : IRCDMessage
+struct IRCDMessageSetHost
+	: IRCDMessage
 {
 	IRCDMessageSetHost(Module *creator) : IRCDMessage(creator, "SETHOST", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
@@ -1321,7 +1347,8 @@ struct IRCDMessageSetHost : IRCDMessage
 	}
 };
 
-struct IRCDMessageSetIdent : IRCDMessage
+struct IRCDMessageSetIdent
+	: IRCDMessage
 {
 	IRCDMessageSetIdent(Module *creator) : IRCDMessage(creator, "SETIDENT", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
@@ -1332,7 +1359,8 @@ struct IRCDMessageSetIdent : IRCDMessage
 	}
 };
 
-struct IRCDMessageSetName : IRCDMessage
+struct IRCDMessageSetName
+	: IRCDMessage
 {
 	IRCDMessageSetName(Module *creator) : IRCDMessage(creator, "SETNAME", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
@@ -1343,7 +1371,8 @@ struct IRCDMessageSetName : IRCDMessage
 	}
 };
 
-struct IRCDMessageServer : IRCDMessage
+struct IRCDMessageServer
+	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -1365,7 +1394,8 @@ struct IRCDMessageServer : IRCDMessage
 	}
 };
 
-struct IRCDMessageSID : IRCDMessage
+struct IRCDMessageSID
+	: IRCDMessage
 {
 	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -1392,7 +1422,8 @@ static char UnrealSjoinPrefixToModeChar(char sjoin_prefix)
 	}
 }
 
-struct IRCDMessageSJoin : IRCDMessage
+struct IRCDMessageSJoin
+	: IRCDMessage
 {
 	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -1485,7 +1516,8 @@ struct IRCDMessageSJoin : IRCDMessage
 	}
 };
 
-class IRCDMessageSVSLogin : IRCDMessage
+class IRCDMessageSVSLogin
+	: IRCDMessage
 {
 public:
 	IRCDMessageSVSLogin(Module *creator) : IRCDMessage(creator, "SVSLOGIN", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -1514,7 +1546,8 @@ public:
 	}
 };
 
-struct IRCDMessageTopic : IRCDMessage
+struct IRCDMessageTopic
+	: IRCDMessage
 {
 	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 4) { }
 
@@ -1547,7 +1580,8 @@ struct IRCDMessageTopic : IRCDMessage
  *      parv[10] = ip
  *      parv[11] = info
  */
-struct IRCDMessageUID : IRCDMessage
+struct IRCDMessageUID
+	: IRCDMessage
 {
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 12) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -1616,7 +1650,8 @@ struct IRCDMessageUID : IRCDMessage
 	}
 };
 
-struct IRCDMessageUmode2 : IRCDMessage
+struct IRCDMessageUmode2
+	: IRCDMessage
 {
 	IRCDMessageUmode2(Module *creator) : IRCDMessage(creator, "UMODE2", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
@@ -1626,7 +1661,8 @@ struct IRCDMessageUmode2 : IRCDMessage
 	}
 };
 
-class ProtoUnreal : public Module
+class ProtoUnreal
+	: public Module
 {
 	UnrealIRCdProto ircd_proto;
 

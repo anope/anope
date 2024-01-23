@@ -13,7 +13,8 @@ namespace WebCPanel
 namespace NickServ
 {
 
-class Cert : public WebPanelProtectedPage
+class Cert
+	: public WebPanelProtectedPage
 {
 public:
 	Cert(const Anope::string &cat, const Anope::string &u);

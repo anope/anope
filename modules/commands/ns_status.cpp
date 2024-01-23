@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandNSStatus : public Command
+class CommandNSStatus
+	: public Command
 {
 public:
 	CommandNSStatus(Module *creator) : Command(creator, "nickserv/status", 0, 16)
@@ -72,7 +73,8 @@ public:
 	}
 };
 
-class NSStatus : public Module
+class NSStatus
+	: public Module
 {
 	CommandNSStatus commandnsstatus;
 

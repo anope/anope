@@ -28,7 +28,9 @@ extern CoreExport nickcoreid_map NickCoreIdList;
 /* A registered nickname.
  * It matters that Base is here before Extensible (it is inherited by Serializable)
  */
-class CoreExport NickAlias : public Serializable, public Extensible
+class CoreExport NickAlias
+	: public Serializable
+	, public Extensible
 {
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_created;
@@ -104,7 +106,9 @@ public:
  * account's display.
  * It matters that Base is here before Extensible (it is inherited by Serializable)
  */
-class CoreExport NickCore : public Serializable, public Extensible
+class CoreExport NickCore
+	: public Serializable
+	, public Extensible
 {
 	/* Channels which reference this core in some way (this is on their access list, akick list, is founder, successor, etc) */
 	Serialize::Checker<std::map<ChannelInfo *, int> > chanaccess;

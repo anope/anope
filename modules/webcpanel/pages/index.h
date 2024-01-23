@@ -12,7 +12,8 @@
 namespace WebCPanel
 {
 
-class Index : public WebPanelPage
+class Index
+	: public WebPanelPage
 {
 	static const int FLUSH_TIME = 60;
 

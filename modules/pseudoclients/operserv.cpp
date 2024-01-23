@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class SGLineManager : public XLineManager
+class SGLineManager
+	: public XLineManager
 {
 public:
 	SGLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sgline", 'G') { }
@@ -63,7 +64,8 @@ public:
 	}
 };
 
-class SQLineManager : public XLineManager
+class SQLineManager
+	: public XLineManager
 {
 	ServiceReference<NickServService> nickserv;
 
@@ -142,7 +144,8 @@ public:
 	}
 };
 
-class SNLineManager : public XLineManager
+class SNLineManager
+	: public XLineManager
 {
 public:
 	SNLineManager(Module *creator) : XLineManager(creator, "xlinemanager/snline", 'N') { }
@@ -180,7 +183,8 @@ public:
 	}
 };
 
-class OperServCore : public Module
+class OperServCore
+	: public Module
 {
 	Reference<BotInfo> OperServ;
 	SGLineManager sglines;

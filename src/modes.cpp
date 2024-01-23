@@ -300,7 +300,8 @@ void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 	list->emplace_back(mode, param);
 }
 
-static class ModePipe : public Pipe
+static class ModePipe
+	: public Pipe
 {
 public:
 	void OnNotify() override

@@ -11,7 +11,8 @@
 #include "module.h"
 #include "modules/sql.h"
 
-class MySQLInterface : public SQL::Interface
+class MySQLInterface
+	: public SQL::Interface
 {
 public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
@@ -29,7 +30,8 @@ public:
 	}
 };
 
-class IRC2SQL : public Module
+class IRC2SQL
+	: public Module
 {
 	ServiceReference<SQL::Provider> sql;
 	MySQLInterface sqlinterface;

@@ -1297,7 +1297,8 @@ static void LoadNews()
 	close_db(f);
 }
 
-class DBOld : public Module
+class DBOld
+	: public Module
 {
 	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit;
 	PrimitiveExtensibleItem<Anope::string> mlock_key;

@@ -628,7 +628,8 @@ public:
 
 /** A derived form of sepstream, which separates on commas
  */
-class commasepstream : public sepstream
+class commasepstream
+	: public sepstream
 {
 public:
 	/** Initialize with comma separator
@@ -638,7 +639,8 @@ public:
 
 /** A derived form of sepstream, which separates on spaces
  */
-class spacesepstream : public sepstream
+class spacesepstream
+	: public sepstream
 {
 public:
 	/** Initialize with space separator
@@ -652,7 +654,8 @@ public:
  * be loaded. If this happens, the error message returned by ModuleException::GetReason will be displayed to the user
  * attempting to load the module, or dumped to the console if the ircd is currently loading for the first time.
  */
-class CoreExport CoreException : public std::exception
+class CoreExport CoreException
+	: public std::exception
 {
 protected:
 	/** Holds the error message to be displayed
@@ -691,7 +694,8 @@ public:
 	}
 };
 
-class CoreExport ModuleException : public CoreException
+class CoreExport ModuleException
+	: public CoreException
 {
 public:
 	/** Default constructor, just uses the error message 'Module threw an exception'.
@@ -708,7 +712,8 @@ public:
 	virtual ~ModuleException() noexcept = default;
 };
 
-class CoreExport ConvertException : public CoreException
+class CoreExport ConvertException
+	: public CoreException
 {
 public:
 	ConvertException(const Anope::string &reason = "") : CoreException(reason) { }

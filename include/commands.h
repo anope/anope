@@ -88,7 +88,8 @@ public:
 
 /** Every services command is a class, inheriting from Command.
  */
-class CoreExport Command : public Service
+class CoreExport Command
+	: public Service
 {
 	Anope::string desc;
 	std::vector<Anope::string> syntax;

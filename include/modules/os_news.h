@@ -22,7 +22,8 @@ struct NewsMessages
 	const char *msgs[10];
 };
 
-struct NewsItem : Serializable
+struct NewsItem
+	: Serializable
 {
 	NewsType type;
 	Anope::string text;
@@ -32,7 +33,8 @@ struct NewsItem : Serializable
 	NewsItem() : Serializable("NewsItem") { }
 };
 
-class NewsService : public Service
+class NewsService
+	: public Service
 {
 public:
 	NewsService(Module *m) : Service(m, "NewsService", "news") { }

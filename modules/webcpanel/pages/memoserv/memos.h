@@ -13,7 +13,8 @@ namespace WebCPanel
 namespace MemoServ
 {
 
-class Memos : public WebPanelProtectedPage
+class Memos
+	: public WebPanelProtectedPage
 {
 public:
 	Memos(const Anope::string &cat, const Anope::string &u);

@@ -11,7 +11,8 @@
 namespace SQL
 {
 
-	class Data : public Serialize::Data
+	class Data
+		: public Serialize::Data
 	{
 	public:
 		typedef std::map<Anope::string, std::stringstream *> Map;
@@ -199,7 +200,8 @@ namespace SQL
 
 	/** Class providing the SQL service, modules call this to execute queries
 	 */
-	class Provider : public Service
+	class Provider
+		: public Service
 	{
 	public:
 		Provider(Module *c, const Anope::string &n) : Service(c, "SQL::Provider", n) { }

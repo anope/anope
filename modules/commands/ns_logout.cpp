@@ -13,7 +13,8 @@
 
 static ServiceReference<NickServService> NickServService("NickServService", "NickServ");
 
-class CommandNSLogout : public Command
+class CommandNSLogout
+	: public Command
 {
 public:
 	CommandNSLogout(Module *creator) : Command(creator, "nickserv/logout", 0, 2)
@@ -76,7 +77,8 @@ public:
 	}
 };
 
-class NSLogout : public Module
+class NSLogout
+	: public Module
 {
 	CommandNSLogout commandnslogout;
 

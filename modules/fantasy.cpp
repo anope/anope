@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandBSSetFantasy : public Command
+class CommandBSSetFantasy
+	: public Command
 {
 public:
 	CommandBSSetFantasy(Module *creator, const Anope::string &sname = "botserv/set/fantasy") : Command(creator, sname, 2, 2)
@@ -80,7 +81,8 @@ public:
 	}
 };
 
-class Fantasy : public Module
+class Fantasy
+	: public Module
 {
 	SerializableExtensibleItem<bool> fantasy;
 

@@ -17,7 +17,8 @@
 #include "modes.h"
 
 /* Encapsulates the IRCd protocol we are speaking. */
-class CoreExport IRCDProto : public Service
+class CoreExport IRCDProto
+	: public Service
 {
 	Anope::string proto_name;
 
@@ -268,7 +269,8 @@ enum IRCDMessageFlag
 	IRCDMESSAGE_REQUIRE_USER
 };
 
-class CoreExport IRCDMessage : public Service
+class CoreExport IRCDMessage
+	: public Service
 {
 	Anope::string name;
 	unsigned param_count;

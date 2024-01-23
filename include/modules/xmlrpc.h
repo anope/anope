@@ -34,7 +34,8 @@ public:
 	virtual bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) = 0;
 };
 
-class XMLRPCServiceInterface : public Service
+class XMLRPCServiceInterface
+	: public Service
 {
 public:
 	XMLRPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, "XMLRPCServiceInterface", sname) { }

@@ -27,7 +27,8 @@ namespace Anope
 
 	/* ASCII case insensitive ctype. */
 	template<typename char_type>
-	class ascii_ctype : public std::ctype<char_type>
+	class ascii_ctype
+		: public std::ctype<char_type>
 	{
 	public:
 		char_type do_toupper(char_type c) const override
@@ -49,7 +50,8 @@ namespace Anope
 
 	/* rfc1459 case insensitive ctype, { = [, } = ], and | = \ */
 	template<typename char_type>
-	class rfc1459_ctype : public ascii_ctype<char_type>
+	class rfc1459_ctype
+		: public ascii_ctype<char_type>
 	{
 	public:
 		char_type do_toupper(char_type c) const override
@@ -78,7 +80,8 @@ namespace ci
 	 * This class is used to implement ci::string, a case-insensitive, ASCII-
 	 * comparing string class.
 	 */
-	struct CoreExport ci_char_traits : std::char_traits<char>
+	struct CoreExport ci_char_traits
+		: std::char_traits<char>
 	{
 		/** Check if two chars match.
 		 * @param c1st First character

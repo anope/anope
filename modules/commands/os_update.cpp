@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSUpdate : public Command
+class CommandOSUpdate
+	: public Command
 {
 public:
 	CommandOSUpdate(Module *creator) : Command(creator, "operserv/update", 0, 0)
@@ -37,7 +38,8 @@ public:
 	}
 };
 
-class OSUpdate : public Module
+class OSUpdate
+	: public Module
 {
 	CommandOSUpdate commandosupdate;
 

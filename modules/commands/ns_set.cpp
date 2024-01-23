@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandNSSet : public Command
+class CommandNSSet
+	: public Command
 {
 public:
 	CommandNSSet(Module *creator) : Command(creator, "nickserv/set", 1, 3)
@@ -63,7 +64,8 @@ public:
 	}
 };
 
-class CommandNSSASet : public Command
+class CommandNSSASet
+	: public Command
 {
 public:
 	CommandNSSASet(Module *creator) : Command(creator, "nickserv/saset", 2, 4)
@@ -105,7 +107,8 @@ public:
 	}
 };
 
-class CommandNSSetPassword : public Command
+class CommandNSSetPassword
+	: public Command
 {
 public:
 	CommandNSSetPassword(Module *creator) : Command(creator, "nickserv/set/password", 1)
@@ -161,7 +164,8 @@ public:
 	}
 };
 
-class CommandNSSASetPassword : public Command
+class CommandNSSASetPassword
+	: public Command
 {
 public:
 	CommandNSSASetPassword(Module *creator) : Command(creator, "nickserv/saset/password", 2, 2)
@@ -230,7 +234,8 @@ public:
 	}
 };
 
-class CommandNSSetAutoOp : public Command
+class CommandNSSetAutoOp
+	: public Command
 {
 public:
 	CommandNSSetAutoOp(Module *creator, const Anope::string &sname = "nickserv/set/autoop", size_t min = 1) : Command(creator, sname, min, min + 1)
@@ -294,7 +299,8 @@ public:
 	}
 };
 
-class CommandNSSASetAutoOp : public CommandNSSetAutoOp
+class CommandNSSASetAutoOp
+	: public CommandNSSetAutoOp
 {
 public:
 	CommandNSSASetAutoOp(Module *creator) : CommandNSSetAutoOp(creator, "nickserv/saset/autoop", 2)
@@ -322,7 +328,8 @@ public:
 	}
 };
 
-class CommandNSSetNeverOp : public Command
+class CommandNSSetNeverOp
+	: public Command
 {
 public:
 	CommandNSSetNeverOp(Module *creator, const Anope::string &sname = "nickserv/set/neverop", size_t min = 1) : Command(creator, sname, min, min + 1)
@@ -382,7 +389,8 @@ public:
 	}
 };
 
-class CommandNSSASetNeverOp : public CommandNSSetNeverOp
+class CommandNSSASetNeverOp
+	: public CommandNSSetNeverOp
 {
 public:
 	CommandNSSASetNeverOp(Module *creator) : CommandNSSetNeverOp(creator, "nickserv/saset/neverop", 2)
@@ -405,7 +413,8 @@ public:
 	}
 };
 
-class CommandNSSetDisplay : public Command
+class CommandNSSetDisplay
+	: public Command
 {
 public:
 	CommandNSSetDisplay(Module *creator, const Anope::string &sname = "nickserv/set/display", size_t min = 1) : Command(creator, sname, min, min + 1)
@@ -474,7 +483,8 @@ public:
 	}
 };
 
-class CommandNSSASetDisplay : public CommandNSSetDisplay
+class CommandNSSASetDisplay
+	: public CommandNSSetDisplay
 {
 public:
 	CommandNSSASetDisplay(Module *creator) : CommandNSSetDisplay(creator, "nickserv/saset/display", 2)
@@ -498,7 +508,8 @@ public:
 	}
 };
 
-class CommandNSSetEmail : public Command
+class CommandNSSetEmail
+	: public Command
 {
 	static bool SendConfirmMail(User *u, NickCore *nc, BotInfo *bi, const Anope::string &new_email)
 	{
@@ -621,7 +632,8 @@ public:
 	}
 };
 
-class CommandNSSASetEmail : public CommandNSSetEmail
+class CommandNSSASetEmail
+	: public CommandNSSetEmail
 {
 public:
 	CommandNSSASetEmail(Module *creator) : CommandNSSetEmail(creator, "nickserv/saset/email", 2)
@@ -644,7 +656,8 @@ public:
 	}
 };
 
-class CommandNSSetKeepModes : public Command
+class CommandNSSetKeepModes
+	: public Command
 {
 public:
 	CommandNSSetKeepModes(Module *creator, const Anope::string &sname = "nickserv/set/keepmodes", size_t min = 1) : Command(creator, sname, min, min + 1)
@@ -706,7 +719,8 @@ public:
 	}
 };
 
-class CommandNSSASetKeepModes : public CommandNSSetKeepModes
+class CommandNSSASetKeepModes
+	: public CommandNSSetKeepModes
 {
 public:
 	CommandNSSASetKeepModes(Module *creator) : CommandNSSetKeepModes(creator, "nickserv/saset/keepmodes", 2)
@@ -731,7 +745,8 @@ public:
 	}
 };
 
-class CommandNSSetKill : public Command
+class CommandNSSetKill
+	: public Command
 {
 public:
 	CommandNSSetKill(Module *creator, const Anope::string &sname = "nickserv/set/kill", size_t min = 1) : Command(creator, sname, min, min + 1)
@@ -835,7 +850,8 @@ public:
 	}
 };
 
-class CommandNSSASetKill : public CommandNSSetKill
+class CommandNSSASetKill
+	: public CommandNSSetKill
 {
 public:
 	CommandNSSASetKill(Module *creator) : CommandNSSetKill(creator, "nickserv/saset/kill", 2)
@@ -869,7 +885,8 @@ public:
 	}
 };
 
-class CommandNSSetLanguage : public Command
+class CommandNSSetLanguage
+	: public Command
 {
 public:
 	CommandNSSetLanguage(Module *creator, const Anope::string &sname = "nickserv/set/language", size_t min = 1) : Command(creator, sname, min, min + 1)
@@ -947,7 +964,8 @@ public:
 	}
 };
 
-class CommandNSSASetLanguage : public CommandNSSetLanguage
+class CommandNSSASetLanguage
+	: public CommandNSSetLanguage
 {
 public:
 	CommandNSSASetLanguage(Module *creator) : CommandNSSetLanguage(creator, "nickserv/saset/language", 2)
@@ -981,7 +999,8 @@ public:
 	}
 };
 
-class CommandNSSetMessage : public Command
+class CommandNSSetMessage
+	: public Command
 {
 public:
 	CommandNSSetMessage(Module *creator, const Anope::string &sname = "nickserv/set/message", size_t min = 1) : Command(creator, sname, min, min + 1)
@@ -1060,7 +1079,8 @@ public:
 	}
 };
 
-class CommandNSSASetMessage : public CommandNSSetMessage
+class CommandNSSASetMessage
+	: public CommandNSSetMessage
 {
 public:
 	CommandNSSASetMessage(Module *creator) : CommandNSSetMessage(creator, "nickserv/saset/message", 2)
@@ -1085,7 +1105,8 @@ public:
 	}
 };
 
-class CommandNSSetSecure : public Command
+class CommandNSSetSecure
+	: public Command
 {
 public:
 	CommandNSSetSecure(Module *creator, const Anope::string &sname = "nickserv/set/secure", size_t min = 1) : Command(creator, sname, min, min + 1)
@@ -1151,7 +1172,8 @@ public:
 	}
 };
 
-class CommandNSSASetSecure : public CommandNSSetSecure
+class CommandNSSASetSecure
+	: public CommandNSSetSecure
 {
 public:
 	CommandNSSASetSecure(Module *creator) : CommandNSSetSecure(creator, "nickserv/saset/secure", 2)
@@ -1180,7 +1202,8 @@ public:
 	}
 };
 
-class CommandNSSASetNoexpire : public Command
+class CommandNSSASetNoexpire
+	: public Command
 {
 public:
 	CommandNSSASetNoexpire(Module *creator) : Command(creator, "nickserv/saset/noexpire", 1, 2)
@@ -1232,7 +1255,8 @@ public:
 	}
 };
 
-class NSSet : public Module
+class NSSet
+	: public Module
 {
 	CommandNSSet commandnsset;
 	CommandNSSASet commandnssaset;
@@ -1272,7 +1296,8 @@ class NSSet : public Module
 	SerializableExtensibleItem<bool> autoop, neverop, killprotect, kill_quick, kill_immed,
 		message, secure, noexpire;
 
-	struct KeepModes : SerializableExtensibleItem<bool>
+	struct KeepModes
+		: SerializableExtensibleItem<bool>
 	{
 		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
 

@@ -63,7 +63,8 @@ public:
 	virtual void Check() = 0;
 };
 
-class CertService : public Service
+class CertService
+	: public Service
 {
 public:
 	CertService(Module *c) : Service(c, "CertService", "certs") { }

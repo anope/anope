@@ -13,7 +13,8 @@
 #include "sockets.h"
 
 /* An Xline, eg, anything added with operserv/akill, or any of the operserv/sxline commands */
-class CoreExport XLine : public Serializable
+class CoreExport XLine
+	: public Serializable
 {
 	void Init();
 	Anope::string nick, user, host, real;
@@ -48,7 +49,8 @@ public:
 };
 
 /* Managers XLines. There is one XLineManager per type of XLine. */
-class CoreExport XLineManager : public Service
+class CoreExport XLineManager
+	: public Service
 {
 	char type;
 	/* List of XLines in this XLineManager */

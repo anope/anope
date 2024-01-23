@@ -12,7 +12,9 @@
 #include "module.h"
 #include "modules/cs_log.h"
 
-struct LogSettingImpl : LogSetting, Serializable
+struct LogSettingImpl
+	: LogSetting
+	, Serializable
 {
 	LogSettingImpl() : Serializable("LogSetting")
 	{
@@ -77,7 +79,8 @@ struct LogSettingImpl : LogSetting, Serializable
 	}
 };
 
-struct LogSettingsImpl : LogSettings
+struct LogSettingsImpl
+	: LogSettings
 {
 	LogSettingsImpl(Extensible *) { }
 
@@ -97,7 +100,8 @@ struct LogSettingsImpl : LogSettings
 	}
 };
 
-class CommandCSLog : public Command
+class CommandCSLog
+	: public Command
 {
 public:
 	CommandCSLog(Module *creator) : Command(creator, "chanserv/log", 1, 4)
@@ -281,7 +285,8 @@ public:
 	}
 };
 
-class CSLog : public Module
+class CSLog
+	: public Module
 {
 	ServiceReference<MemoServService> MSService;
 	CommandCSLog commandcslog;

@@ -10,7 +10,8 @@
 #include <sys/types.h>
 #include <regex.h>
 
-class POSIXRegex : public Regex
+class POSIXRegex
+	: public Regex
 {
 	regex_t regbuf;
 
@@ -38,7 +39,8 @@ public:
 	}
 };
 
-class POSIXRegexProvider : public RegexProvider
+class POSIXRegexProvider
+	: public RegexProvider
 {
 public:
 	POSIXRegexProvider(Module *creator) : RegexProvider(creator, "regex/posix") { }
@@ -49,7 +51,8 @@ public:
 	}
 };
 
-class ModuleRegexPOSIX : public Module
+class ModuleRegexPOSIX
+	: public Module
 {
 	POSIXRegexProvider posix_regex_provider;
 

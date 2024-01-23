@@ -12,7 +12,9 @@
 #include "module.h"
 #include "modules/bs_badwords.h"
 
-struct BadWordImpl : BadWord, Serializable
+struct BadWordImpl
+	: BadWord
+	, Serializable
 {
 	BadWordImpl() : Serializable("BadWord") { }
 	~BadWordImpl() override;
@@ -27,7 +29,8 @@ struct BadWordImpl : BadWord, Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
-struct BadWordsImpl : BadWords
+struct BadWordsImpl
+	: BadWords
 {
 	Serialize::Reference<ChannelInfo> ci;
 	typedef std::vector<BadWordImpl *> list;
@@ -144,7 +147,8 @@ Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 	return bw;
 }
 
-class BadwordsDelCallback : public NumberList
+class BadwordsDelCallback
+	: public NumberList
 {
 	CommandSource &source;
 	ChannelInfo *ci;
@@ -181,7 +185,8 @@ public:
 	}
 };
 
-class CommandBSBadwords : public Command
+class CommandBSBadwords
+	: public Command
 {
 private:
 	void DoList(CommandSource &source, ChannelInfo *ci, const Anope::string &word)
@@ -200,7 +205,8 @@ private:
 		}
 		else if (!word.empty() && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class BadwordsListCallback : public NumberList
+			class BadwordsListCallback
+				: public NumberList
 			{
 				ListFormatter &list;
 				BadWords *bw;
@@ -453,7 +459,8 @@ public:
 	}
 };
 
-class BSBadwords : public Module
+class BSBadwords
+	: public Module
 {
 	CommandBSBadwords commandbsbadwords;
 	ExtensibleItem<BadWordsImpl> badwords;

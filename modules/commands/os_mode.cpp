@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSMode : public Command
+class CommandOSMode
+	: public Command
 {
 public:
 	CommandOSMode(Module *creator) : Command(creator, "operserv/mode", 2, 3)
@@ -135,7 +136,8 @@ public:
 	}
 };
 
-class CommandOSUMode : public Command
+class CommandOSUMode
+	: public Command
 {
 public:
 	CommandOSUMode(Module *creator) : Command(creator, "operserv/umode", 2, 2)
@@ -173,7 +175,8 @@ public:
 	}
 };
 
-class OSMode : public Module
+class OSMode
+	: public Module
 {
 	CommandOSMode commandosmode;
 	CommandOSUMode commandosumode;

@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandMSCheck : public Command
+class CommandMSCheck
+	: public Command
 {
 public:
 	CommandMSCheck(Module *creator) : Command(creator, "memoserv/check", 1, 1)
@@ -72,7 +73,8 @@ public:
 	}
 };
 
-class MSCheck : public Module
+class MSCheck
+	: public Module
 {
 	CommandMSCheck commandmscheck;
 

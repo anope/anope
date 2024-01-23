@@ -11,7 +11,9 @@
 
 using namespace SQL;
 
-class DBMySQL : public Module, public Pipe
+class DBMySQL
+	: public Module
+	, public Pipe
 {
 private:
 	Anope::string prefix;

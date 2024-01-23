@@ -8,7 +8,8 @@
 
 #include "module.h"
 
-class StatusUpdate : public Module
+class StatusUpdate
+	: public Module
 {
 public:
 	StatusUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)

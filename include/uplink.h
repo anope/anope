@@ -20,7 +20,9 @@ namespace Uplink
 }
 
 /* This is the socket to our uplink */
-class UplinkSocket : public ConnectionSocket, public BufferedSocket
+class UplinkSocket
+	: public ConnectionSocket
+	, public BufferedSocket
 {
 public:
 	bool error;

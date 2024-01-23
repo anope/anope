@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSQuit : public Command
+class CommandOSQuit
+	: public Command
 {
 public:
 	CommandOSQuit(Module *creator) : Command(creator, "operserv/quit", 0, 0)
@@ -39,7 +40,8 @@ public:
 	}
 };
 
-class CommandOSRestart : public Command
+class CommandOSRestart
+	: public Command
 {
 public:
 	CommandOSRestart(Module *creator) : Command(creator, "operserv/restart", 0, 0)
@@ -65,7 +67,8 @@ public:
 	}
 };
 
-class CommandOSShutdown : public Command
+class CommandOSShutdown
+	: public Command
 {
 public:
 	CommandOSShutdown(Module *creator) : Command(creator, "operserv/shutdown", 0, 0)
@@ -91,7 +94,8 @@ public:
 	}
 };
 
-class OSShutdown : public Module
+class OSShutdown
+	: public Module
 {
 	CommandOSQuit commandosquit;
 	CommandOSRestart commandosrestart;

@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSLogin : public Command
+class CommandOSLogin
+	: public Command
 {
 public:
 	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 1, 1)
@@ -61,7 +62,8 @@ public:
 	}
 };
 
-class CommandOSLogout : public Command
+class CommandOSLogout
+	: public Command
 {
 public:
 	CommandOSLogout(Module *creator) : Command(creator, "operserv/logout", 0, 0)
@@ -103,7 +105,8 @@ public:
 	}
 };
 
-class OSLogin : public Module
+class OSLogin
+	: public Module
 {
 	CommandOSLogin commandoslogin;
 	CommandOSLogout commandoslogout;

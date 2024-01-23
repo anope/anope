@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSModLoad : public Command
+class CommandOSModLoad
+	: public Command
 {
 public:
 	CommandOSModLoad(Module *creator) : Command(creator, "operserv/modload", 1, 1)
@@ -48,7 +49,8 @@ public:
 	}
 };
 
-class CommandOSModReLoad : public Command
+class CommandOSModReLoad
+	: public Command
 {
 public:
 	CommandOSModReLoad(Module *creator) : Command(creator, "operserv/modreload", 1, 1)
@@ -120,7 +122,8 @@ public:
 	}
 };
 
-class CommandOSModUnLoad : public Command
+class CommandOSModUnLoad
+	: public Command
 {
 public:
 	CommandOSModUnLoad(Module *creator) : Command(creator, "operserv/modunload", 1, 1)
@@ -170,7 +173,8 @@ public:
 	}
 };
 
-class OSModule : public Module
+class OSModule
+	: public Module
 {
 	CommandOSModLoad commandosmodload;
 	CommandOSModReLoad commandosmodreload;

@@ -12,7 +12,8 @@
 #include "module.h"
 #include "modules/sql.h"
 
-class MySQLInterface : public SQL::Interface
+class MySQLInterface
+	: public SQL::Interface
 {
 public:
 	MySQLInterface(Module *o) : SQL::Interface(o) { }
@@ -30,7 +31,8 @@ public:
 	}
 };
 
-class CommandCSTop : public Command
+class CommandCSTop
+	: public Command
 {
 public:
 	CommandCSTop(Module *creator) : Command (creator, "chanserv/top", 0, 2)
@@ -42,7 +44,8 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
 };
 
-class CommandCSTop10 : public Command
+class CommandCSTop10
+	: public Command
 {
 public:
 	CommandCSTop10(Module *creator) : Command (creator, "chanserv/top10", 0, 2)
@@ -54,7 +57,8 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
 };
 
-class CommandCSGTop : public Command
+class CommandCSGTop
+	: public Command
 {
 public:
 	CommandCSGTop(Module *creator) : Command (creator, "chanserv/gtop", 0, 1)
@@ -65,7 +69,8 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
 };
 
-class CommandCSGTop10 : public Command
+class CommandCSGTop10
+	: public Command
 {
 public:
 	CommandCSGTop10(Module *creator) : Command (creator, "chanserv/gtop10", 0, 1)
@@ -79,7 +84,8 @@ public:
 
 class CSTop;
 static CSTop *me;
-class CSTop : public Module
+class CSTop
+	: public Module
 {
 	CommandCSTop commandcstop;
 	CommandCSGTop commandcsgtop;

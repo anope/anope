@@ -20,7 +20,8 @@ protected:
 	EntryMsg() = default;
 };
 
-struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >
+struct EntryMessageList
+	: Serialize::Checker<std::vector<EntryMsg *> >
 {
 protected:
 	EntryMessageList() : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }

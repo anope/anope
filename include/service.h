@@ -20,7 +20,8 @@
  * such as commands, use this. This is also used for modules
  * that publish a service (m_ssl_openssl, etc).
  */
-class CoreExport Service : public virtual Base
+class CoreExport Service
+	: public virtual Base
 {
 	static std::map<Anope::string, std::map<Anope::string, Service *> > Services;
 	static std::map<Anope::string, std::map<Anope::string, Anope::string> > Aliases;
@@ -115,7 +116,8 @@ public:
 /** Like Reference, but used to refer to a Service.
  */
 template<typename T>
-class ServiceReference : public Reference<T>
+class ServiceReference
+	: public Reference<T>
 {
 	Anope::string type;
 	Anope::string name;

@@ -52,7 +52,8 @@ public:
 /* A provider of access. Only used for creating ChanAccesses, as
  * they contain pure virtual functions.
  */
-class CoreExport AccessProvider : public Service
+class CoreExport AccessProvider
+	: public Service
 {
 public:
 	AccessProvider(Module *owner, const Anope::string &name);
@@ -70,7 +71,8 @@ public:
 };
 
 /* Represents one entry of an access list on a channel. */
-class CoreExport ChanAccess : public Serializable
+class CoreExport ChanAccess
+	: public Serializable
 {
 	Anope::string mask;
 	/* account this access entry is for, if any */

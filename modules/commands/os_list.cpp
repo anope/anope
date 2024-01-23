@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSChanList : public Command
+class CommandOSChanList
+	: public Command
 {
 public:
 	CommandOSChanList(Module *creator) : Command(creator, "operserv/chanlist", 0, 2)
@@ -128,7 +129,8 @@ public:
 	}
 };
 
-class CommandOSUserList : public Command
+class CommandOSUserList
+	: public Command
 {
 public:
 	CommandOSUserList(Module *creator) : Command(creator, "operserv/userlist", 0, 2)
@@ -270,7 +272,8 @@ public:
 	}
 };
 
-class OSList : public Module
+class OSList
+	: public Module
 {
 	CommandOSChanList commandoschanlist;
 	CommandOSUserList commandosuserlist;

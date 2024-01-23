@@ -16,7 +16,8 @@ static Anope::string UplinkSID;
 
 static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
 
-class PlexusProto : public IRCDProto
+class PlexusProto
+	: public IRCDProto
 {
 public:
 	PlexusProto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
@@ -187,7 +188,8 @@ public:
 	}
 };
 
-struct IRCDMessageEncap : IRCDMessage
+struct IRCDMessageEncap
+	: IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
@@ -243,7 +245,8 @@ struct IRCDMessageEncap : IRCDMessage
 	}
 };
 
-struct IRCDMessagePass : IRCDMessage
+struct IRCDMessagePass
+	: IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -253,7 +256,8 @@ struct IRCDMessagePass : IRCDMessage
 	}
 };
 
-struct IRCDMessageServer : IRCDMessage
+struct IRCDMessageServer
+	: IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -269,7 +273,8 @@ struct IRCDMessageServer : IRCDMessage
 	}
 };
 
-struct IRCDMessageUID : IRCDMessage
+struct IRCDMessageUID
+	: IRCDMessage
 {
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
@@ -318,7 +323,8 @@ struct IRCDMessageUID : IRCDMessage
 	}
 };
 
-class ProtoPlexus : public Module
+class ProtoPlexus
+	: public Module
 {
 	Module *m_hybrid;
 

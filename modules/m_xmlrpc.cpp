@@ -32,7 +32,9 @@ special[] = {
 	special_chars("", "")
 };
 
-class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
+class MyXMLRPCServiceInterface
+	: public XMLRPCServiceInterface
+	, public HTTPPage
 {
 	std::deque<XMLRPCEvent *> events;
 
@@ -194,7 +196,8 @@ public:
 	}
 };
 
-class ModuleXMLRPC : public Module
+class ModuleXMLRPC
+	: public Module
 {
 	ServiceReference<HTTPProvider> httpref;
 public:

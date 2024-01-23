@@ -13,7 +13,8 @@ namespace WebCPanel
 namespace NickServ
 {
 
-class Alist : public WebPanelProtectedPage
+class Alist
+	: public WebPanelProtectedPage
 {
 public:
 	Alist(const Anope::string &cat, const Anope::string &u);

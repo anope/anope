@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSSet : public Command
+class CommandOSSet
+	: public Command
 {
 private:
 	void DoList(CommandSource &source)
@@ -253,7 +254,8 @@ public:
 	}
 };
 
-class OSSet : public Module
+class OSSet
+	: public Module
 {
 	CommandOSSet commandosset;
 

@@ -12,7 +12,8 @@
 namespace WebCPanel
 {
 
-class Register : public WebPanelPage
+class Register
+	: public WebPanelPage
 {
 public:
 	Register(const Anope::string &u) : WebPanelPage(u) { }

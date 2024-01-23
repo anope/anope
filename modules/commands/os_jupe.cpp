@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSJupe : public Command
+class CommandOSJupe
+	: public Command
 {
 public:
 	CommandOSJupe(Module *creator) : Command(creator, "operserv/jupe", 1, 2)
@@ -65,7 +66,8 @@ public:
 	}
 };
 
-class OSJupe : public Module
+class OSJupe
+	: public Module
 {
 	CommandOSJupe commandosjupe;
 

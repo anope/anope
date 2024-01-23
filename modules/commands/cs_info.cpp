@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandCSInfo : public Command
+class CommandCSInfo
+	: public Command
 {
 public:
 	CommandCSInfo(Module *creator) : Command(creator, "chanserv/info", 1, 2)
@@ -83,7 +84,8 @@ public:
 	}
 };
 
-class CSInfo : public Module
+class CSInfo
+	: public Module
 {
 	CommandCSInfo commandcsinfo;
 

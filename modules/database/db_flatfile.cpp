@@ -15,7 +15,8 @@
 #include <sys/wait.h>
 #endif
 
-class SaveData : public Serialize::Data
+class SaveData
+	: public Serialize::Data
 {
 public:
 	Anope::string last;
@@ -33,7 +34,8 @@ public:
 	}
 };
 
-class LoadData : public Serialize::Data
+class LoadData
+	: public Serialize::Data
 {
 public:
 	std::fstream *fs = nullptr;
@@ -99,7 +101,9 @@ public:
 	}
 };
 
-class DBFlatFile : public Module, public Pipe
+class DBFlatFile
+	: public Module
+	, public Pipe
 {
 	/* Day the last backup was on */
 	int last_day = 0;

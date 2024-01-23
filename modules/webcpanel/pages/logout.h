@@ -10,7 +10,8 @@
 namespace WebCPanel
 {
 
-class Logout : public WebPanelProtectedPage
+class Logout
+	: public WebPanelProtectedPage
 {
 public:
 	Logout(const Anope::string &u);

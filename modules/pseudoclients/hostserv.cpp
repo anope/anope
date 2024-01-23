@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class HostServCore : public Module
+class HostServCore
+	: public Module
 {
 	Reference<BotInfo> HostServ;
 public:

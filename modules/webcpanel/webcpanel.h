@@ -30,7 +30,9 @@ struct Section
 };
 
 /* An interface for this webpanel used by other modules */
-class Panel : public Section, public Service
+class Panel
+	: public Section
+	, public Service
 {
 public:
 	Panel(Module *c, const Anope::string &n) : Service(c, "Panel", n) { }
@@ -63,7 +65,8 @@ public:
 	}
 };
 
-class WebPanelPage : public HTTPPage
+class WebPanelPage
+	: public HTTPPage
 {
 public:
 	WebPanelPage(const Anope::string &u, const Anope::string &ct = "text/html") : HTTPPage(u, ct)
@@ -73,7 +76,8 @@ public:
 	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
 };
 
-class WebPanelProtectedPage : public WebPanelPage
+class WebPanelProtectedPage
+	: public WebPanelPage
 {
 	Anope::string category;
 

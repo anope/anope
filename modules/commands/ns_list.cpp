@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandNSList : public Command
+class CommandNSList
+	: public Command
 {
 public:
 	CommandNSList(Module *creator) : Command(creator, "nickserv/list", 1, 2)
@@ -176,7 +177,8 @@ public:
 };
 
 
-class CommandNSSetPrivate : public Command
+class CommandNSSetPrivate
+	: public Command
 {
 public:
 	CommandNSSetPrivate(Module *creator, const Anope::string &sname = "nickserv/set/private", size_t min = 1) : Command(creator, sname, min, min + 1)
@@ -241,7 +243,8 @@ public:
 	}
 };
 
-class CommandNSSASetPrivate : public CommandNSSetPrivate
+class CommandNSSASetPrivate
+	: public CommandNSSetPrivate
 {
 public:
 	CommandNSSASetPrivate(Module *creator) : CommandNSSetPrivate(creator, "nickserv/saset/private", 2)
@@ -270,7 +273,8 @@ public:
 };
 
 
-class NSList : public Module
+class NSList
+	: public Module
 {
 	CommandNSList commandnslist;
 

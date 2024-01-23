@@ -55,7 +55,8 @@ namespace Redis
 		virtual void OnError(const Anope::string &error) { Log(owner) << error; }
 	};
 
-	class Provider : public Service
+	class Provider
+		: public Service
 	{
 	public:
 		Provider(Module *c, const Anope::string &n) : Service(c, "Redis::Provider", n) { }

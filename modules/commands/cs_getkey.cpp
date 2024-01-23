@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandCSGetKey : public Command
+class CommandCSGetKey
+	: public Command
 {
 public:
 	CommandCSGetKey(Module *creator) : Command(creator, "chanserv/getkey", 1, 1)
@@ -59,7 +60,8 @@ public:
 	}
 };
 
-class CSGetKey : public Module
+class CSGetKey
+	: public Module
 {
 	CommandCSGetKey commandcsgetkey;
 

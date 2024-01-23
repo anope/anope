@@ -19,7 +19,9 @@ typedef Anope::map<BotInfo *> botinfo_map;
 extern CoreExport Serialize::Checker<botinfo_map> BotListByNick, BotListByUID;
 
 /* A service bot (NickServ, ChanServ, a BotServ bot, etc). */
-class CoreExport BotInfo : public User, public Serializable
+class CoreExport BotInfo
+	: public User
+	, public Serializable
 {
 	/* Channels this bot is assigned to */
 	Serialize::Checker<std::set<ChannelInfo *> > channels;

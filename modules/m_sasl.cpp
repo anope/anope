@@ -12,7 +12,8 @@
 
 using namespace SASL;
 
-class Plain : public Mechanism
+class Plain
+	: public Mechanism
 {
 public:
 	Plain(Module *o) : Mechanism(o, "PLAIN") { }
@@ -72,11 +73,13 @@ public:
 	}
 };
 
-class External : public Mechanism
+class External
+	: public Mechanism
 {
 	ServiceReference<CertService> certs;
 
-	struct Session : SASL::Session
+	struct Session
+		: SASL::Session
 	{
 		Anope::string cert;
 
@@ -134,7 +137,8 @@ public:
 	}
 };
 
-class Anonymous : public Mechanism
+class Anonymous
+	: public Mechanism
 {
 public:
 	Anonymous(Module *o) : Mechanism(o, "ANONYMOUS") { }
@@ -170,7 +174,9 @@ public:
 	}
 };
 
-class SASLService : public SASL::Service, public Timer
+class SASLService
+	: public SASL::Service
+	, public Timer
 {
 	std::map<Anope::string, SASL::Session *> sessions;
 
@@ -347,7 +353,8 @@ public:
 	}
 };
 
-class ModuleSASL : public Module
+class ModuleSASL
+	: public Module
 {
 	SASLService sasl;
 

@@ -13,7 +13,8 @@ namespace WebCPanel
 namespace NickServ
 {
 
-class Access : public WebPanelProtectedPage
+class Access
+	: public WebPanelProtectedPage
 {
 public:
 	Access(const Anope::string &cat, const Anope::string &u);

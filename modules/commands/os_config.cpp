@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSConfig : public Command
+class CommandOSConfig
+	: public Command
 {
 public:
 	CommandOSConfig(Module *creator) : Command(creator, "operserv/config", 1, 4)
@@ -132,7 +133,8 @@ public:
 	}
 };
 
-class OSConfig : public Module
+class OSConfig
+	: public Module
 {
 	CommandOSConfig commandosconfig;
 

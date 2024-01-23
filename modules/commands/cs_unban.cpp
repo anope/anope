@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandCSUnban : public Command
+class CommandCSUnban
+	: public Command
 {
 public:
 	CommandCSUnban(Module *creator) : Command(creator, "chanserv/unban", 0, 2)
@@ -115,7 +116,8 @@ public:
 	}
 };
 
-class CSUnban : public Module
+class CSUnban
+	: public Module
 {
 	CommandCSUnban commandcsunban;
 

@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandHSGroup : public Command
+class CommandHSGroup
+	: public Command
 {
 	bool setting = false;
 
@@ -75,7 +76,8 @@ public:
 	}
 };
 
-class HSGroup : public Module
+class HSGroup
+	: public Module
 {
 	CommandHSGroup commandhsgroup;
 	bool syncongroup;

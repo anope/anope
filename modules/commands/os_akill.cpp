@@ -13,7 +13,8 @@
 
 static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
 
-class AkillDelCallback : public NumberList
+class AkillDelCallback
+	: public NumberList
 {
 	CommandSource &source;
 	unsigned deleted = 0;
@@ -55,7 +56,8 @@ public:
 	}
 };
 
-class CommandOSAKill : public Command
+class CommandOSAKill
+	: public Command
 {
 private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
@@ -262,7 +264,8 @@ private:
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class ListCallback : public NumberList
+			class ListCallback
+				: public NumberList
 			{
 				CommandSource &source;
 				ListFormatter &list;
@@ -468,7 +471,8 @@ public:
 	}
 };
 
-class OSAKill : public Module
+class OSAKill
+	: public Module
 {
 	CommandOSAKill commandosakill;
 

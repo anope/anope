@@ -8,7 +8,8 @@
 
 #pragma once
 
-class MemoServService : public Service
+class MemoServService
+	: public Service
 {
 public:
 	enum MemoResult

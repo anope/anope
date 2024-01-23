@@ -36,7 +36,8 @@ struct IdentifyInfo
 	}
 };
 
-class IdentifyInterface : public LDAPInterface
+class IdentifyInterface
+	: public LDAPInterface
 {
 	IdentifyInfo *ii;
 
@@ -127,7 +128,8 @@ public:
 	}
 };
 
-class OnIdentifyInterface : public LDAPInterface
+class OnIdentifyInterface
+	: public LDAPInterface
 {
 	Anope::string uid;
 
@@ -172,7 +174,8 @@ public:
 	}
 };
 
-class OnRegisterInterface : public LDAPInterface
+class OnRegisterInterface
+	: public LDAPInterface
 {
 public:
 	OnRegisterInterface(Module *m) : LDAPInterface(m) { }
@@ -188,7 +191,8 @@ public:
 	}
 };
 
-class ModuleLDAPAuthentication : public Module
+class ModuleLDAPAuthentication
+	: public Module
 {
 	ServiceReference<LDAPProvider> ldap;
 	OnRegisterInterface orinterface;

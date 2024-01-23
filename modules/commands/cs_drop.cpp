@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandCSDrop : public Command
+class CommandCSDrop
+	: public Command
 {
 public:
 	CommandCSDrop(Module *creator) : Command(creator, "chanserv/drop", 1, 2)
@@ -81,7 +82,8 @@ public:
 	}
 };
 
-class CSDrop : public Module
+class CSDrop
+	: public Module
 {
 	CommandCSDrop commandcsdrop;
 

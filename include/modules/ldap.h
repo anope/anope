@@ -31,7 +31,8 @@ struct LDAPModification
 };
 typedef std::vector<LDAPModification> LDAPMods;
 
-struct LDAPAttributes : public std::map<Anope::string, std::vector<Anope::string> >
+struct LDAPAttributes
+	: public std::map<Anope::string, std::vector<Anope::string>>
 {
 	size_t size(const Anope::string &attr) const
 	{
@@ -122,7 +123,8 @@ public:
 	virtual void OnDelete() { }
 };
 
-class LDAPProvider : public Service
+class LDAPProvider
+	: public Service
 {
 public:
 	LDAPProvider(Module *c, const Anope::string &n) : Service(c, "LDAPProvider", n) { }

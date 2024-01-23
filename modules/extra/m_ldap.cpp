@@ -72,7 +72,8 @@ public:
 	virtual int run() = 0;
 };
 
-class LDAPBind : public LDAPRequest
+class LDAPBind
+	: public LDAPRequest
 {
 	Anope::string who, pass;
 
@@ -88,7 +89,8 @@ public:
 	int run() override;
 };
 
-class LDAPSearchRequest : public LDAPRequest
+class LDAPSearchRequest
+	: public LDAPRequest
 {
 	Anope::string base;
 	Anope::string filter;
@@ -105,7 +107,8 @@ public:
 	int run() override;
 };
 
-class LDAPAdd : public LDAPRequest
+class LDAPAdd
+	: public LDAPRequest
 {
 	Anope::string dn;
 	LDAPMods attributes;
@@ -122,7 +125,8 @@ public:
 	int run() override;
 };
 
-class LDAPDel : public LDAPRequest
+class LDAPDel
+	: public LDAPRequest
 {
 	Anope::string dn;
 
@@ -137,7 +141,8 @@ public:
 	int run() override;
 };
 
-class LDAPModify : public LDAPRequest
+class LDAPModify
+	: public LDAPRequest
 {
 	Anope::string base;
 	LDAPMods attributes;
@@ -154,7 +159,10 @@ public:
 	int run() override;
 };
 
-class LDAPService : public LDAPProvider, public Thread, public Condition
+class LDAPService
+	: public LDAPProvider
+	, public Thread
+	, public Condition
 {
 	Anope::string server;
 	Anope::string admin_binddn;
@@ -501,7 +509,9 @@ public:
 	}
 };
 
-class ModuleLDAP : public Module, public Pipe
+class ModuleLDAP
+	: public Module
+	, public Pipe
 {
 	std::map<Anope::string, LDAPService *> LDAPServices;
 

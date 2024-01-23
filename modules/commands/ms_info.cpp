@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandMSInfo : public Command
+class CommandMSInfo
+	: public Command
 {
 public:
 	CommandMSInfo(Module *creator) : Command(creator, "memoserv/info", 0, 1)
@@ -218,7 +219,8 @@ public:
 	}
 };
 
-class MSInfo : public Module
+class MSInfo
+	: public Module
 {
 	CommandMSInfo commandmsinfo;
 

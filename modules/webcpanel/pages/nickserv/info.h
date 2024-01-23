@@ -13,7 +13,8 @@ namespace WebCPanel
 namespace NickServ
 {
 
-class Info : public WebPanelProtectedPage
+class Info
+	: public WebPanelProtectedPage
 {
 public:
 	Info(const Anope::string &cat, const Anope::string &u);

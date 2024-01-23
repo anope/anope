@@ -14,7 +14,8 @@
 
 using namespace SQL;
 
-class SQLSQLInterface : public Interface
+class SQLSQLInterface
+	: public Interface
 {
 public:
 	SQLSQLInterface(Module *o) : Interface(o) { }
@@ -33,7 +34,8 @@ public:
 	}
 };
 
-class ResultSQLSQLInterface : public SQLSQLInterface
+class ResultSQLSQLInterface
+	: public SQLSQLInterface
 {
 	Reference<Serializable> obj;
 
@@ -55,7 +57,9 @@ public:
 	}
 };
 
-class DBSQL : public Module, public Pipe
+class DBSQL
+	: public Module
+	, public Pipe
 {
 	ServiceReference<Provider> sql;
 	SQLSQLInterface sqlinterface;

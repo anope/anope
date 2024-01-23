@@ -23,7 +23,8 @@ public:
 	Anope::string to;
 };
 
-class NSRecoverRequest : public IdentifyRequest
+class NSRecoverRequest
+	: public IdentifyRequest
 {
 	CommandSource source;
 	Command *cmd;
@@ -141,7 +142,8 @@ public:
 	}
 };
 
-class CommandNSRecover : public Command
+class CommandNSRecover
+	: public Command
 {
 public:
 	CommandNSRecover(Module *creator) : Command(creator, "nickserv/recover", 1, 2)
@@ -221,7 +223,8 @@ public:
 	}
 };
 
-class NSRecover : public Module
+class NSRecover
+	: public Module
 {
 	CommandNSRecover commandnsrecover;
 	PrimitiveExtensibleItem<NSRecoverInfo> recover;

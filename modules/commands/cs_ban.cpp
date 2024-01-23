@@ -13,7 +13,8 @@
 
 static Module *me;
 
-class TempBan : public Timer
+class TempBan
+	: public Timer
 {
 private:
 	Anope::string channel;
@@ -31,7 +32,8 @@ public:
 	}
 };
 
-class CommandCSBan : public Command
+class CommandCSBan
+	: public Command
 {
 public:
 	CommandCSBan(Module *creator) : Command(creator, "chanserv/ban", 2, 4)
@@ -237,7 +239,8 @@ public:
 	}
 };
 
-class CSBan : public Module
+class CSBan
+	: public Module
 {
 	CommandCSBan commandcsban;
 

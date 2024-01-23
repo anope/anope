@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandBSSay : public Command
+class CommandBSSay
+	: public Command
 {
 public:
 	CommandBSSay(Module *creator) : Command(creator, "botserv/say", 2, 2)
@@ -71,7 +72,8 @@ public:
 	}
 };
 
-class CommandBSAct : public Command
+class CommandBSAct
+	: public Command
 {
 public:
 	CommandBSAct(Module *creator) : Command(creator, "botserv/act", 2, 2)
@@ -130,7 +132,8 @@ public:
 	}
 };
 
-class BSControl : public Module
+class BSControl
+	: public Module
 {
 	CommandBSSay commandbssay;
 	CommandBSAct commandbsact;

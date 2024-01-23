@@ -15,7 +15,8 @@
 
 class Extensible;
 
-class CoreExport ExtensibleBase : public Service
+class CoreExport ExtensibleBase
+	: public Service
 {
 protected:
 	std::map<Extensible *, void *> items;
@@ -53,7 +54,8 @@ public:
 };
 
 template<typename T>
-class BaseExtensibleItem : public ExtensibleBase
+class BaseExtensibleItem
+	: public ExtensibleBase
 {
 protected:
 	virtual T *Create(Extensible *) = 0;
@@ -124,7 +126,8 @@ public:
 };
 
 template<typename T>
-class ExtensibleItem : public BaseExtensibleItem<T>
+class ExtensibleItem
+	: public BaseExtensibleItem<T>
 {
 protected:
 	T* Create(Extensible *obj) override
@@ -136,7 +139,8 @@ public:
 };
 
 template<typename T>
-class PrimitiveExtensibleItem : public BaseExtensibleItem<T>
+class PrimitiveExtensibleItem
+	: public BaseExtensibleItem<T>
 {
 protected:
 	T* Create(Extensible *obj) override
@@ -160,7 +164,8 @@ public:
 };
 
 template<typename T>
-class SerializableExtensibleItem : public PrimitiveExtensibleItem<T>
+class SerializableExtensibleItem
+	: public PrimitiveExtensibleItem<T>
 {
 public:
 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<T>(m, n) { }
@@ -204,7 +209,8 @@ public:
 };
 
 template<typename T>
-struct ExtensibleRef : ServiceReference<BaseExtensibleItem<T> >
+struct ExtensibleRef
+	: ServiceReference<BaseExtensibleItem<T> >
 {
 	ExtensibleRef(const Anope::string &n) : ServiceReference<BaseExtensibleItem<T> >("Extensible", n) { }
 };

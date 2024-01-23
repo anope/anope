@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandHSList : public Command
+class CommandHSList
+	: public Command
 {
 public:
 	CommandHSList(Module *creator) : Command(creator, "hostserv/list", 0, 1)
@@ -142,7 +143,8 @@ public:
 	}
 };
 
-class HSList : public Module
+class HSList
+	: public Module
 {
 	CommandHSList commandhslist;
 

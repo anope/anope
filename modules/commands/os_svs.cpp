@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandOSSVSNick : public Command
+class CommandOSSVSNick
+	: public Command
 {
 public:
 	CommandOSSVSNick(Module *creator) : Command(creator, "operserv/svsnick", 2, 2)
@@ -70,7 +71,8 @@ public:
 	}
 };
 
-class CommandOSSVSJoin : public Command
+class CommandOSSVSJoin
+	: public Command
 {
 public:
 	CommandOSSVSJoin(Module *creator) : Command(creator, "operserv/svsjoin", 2, 2)
@@ -114,7 +116,8 @@ public:
 	}
 };
 
-class CommandOSSVSPart : public Command
+class CommandOSSVSPart
+	: public Command
 {
 public:
 	CommandOSSVSPart(Module *creator) : Command(creator, "operserv/svspart", 2, 3)
@@ -162,7 +165,8 @@ public:
 	}
 };
 
-class OSSVS : public Module
+class OSSVS
+	: public Module
 {
 	CommandOSSVSNick commandossvsnick;
 	CommandOSSVSJoin commandossvsjoin;

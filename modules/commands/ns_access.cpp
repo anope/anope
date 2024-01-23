@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandNSAccess : public Command
+class CommandNSAccess
+	: public Command
 {
 private:
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
@@ -186,7 +187,8 @@ public:
 	}
 };
 
-class NSAccess : public Module
+class NSAccess
+	: public Module
 {
 	CommandNSAccess commandnsaccess;
 

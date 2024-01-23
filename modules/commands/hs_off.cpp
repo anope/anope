@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandHSOff : public Command
+class CommandHSOff
+	: public Command
 {
 public:
 	CommandHSOff(Module *creator) : Command(creator, "hostserv/off", 0, 0)
@@ -53,7 +54,8 @@ public:
 	}
 };
 
-class HSOff : public Module
+class HSOff
+	: public Module
 {
 	CommandHSOff commandhsoff;
 

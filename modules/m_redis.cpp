@@ -13,7 +13,9 @@ using namespace Redis;
 
 class MyRedisService;
 
-class RedisSocket : public BinarySocket, public ConnectionSocket
+class RedisSocket
+	: public BinarySocket
+	, public ConnectionSocket
 {
 	size_t ParseReply(Reply &r, const char *buf, size_t l);
 public:
@@ -31,7 +33,8 @@ public:
 	bool Read(const char *buffer, size_t l) override;
 };
 
-class Transaction : public Interface
+class Transaction
+	: public Interface
 {
 public:
 	std::deque<Interface *> interfaces;
@@ -71,7 +74,8 @@ public:
 	}
 };
 
-class MyRedisService : public Provider
+class MyRedisService
+	: public Provider
 {
 public:
 	Anope::string host;
@@ -516,7 +520,8 @@ bool RedisSocket::Read(const char *buffer, size_t l)
 }
 
 
-class ModuleRedis : public Module
+class ModuleRedis
+	: public Module
 {
 	std::map<Anope::string, MyRedisService *> services;
 

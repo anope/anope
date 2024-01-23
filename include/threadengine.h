@@ -14,7 +14,9 @@
 #include "sockets.h"
 #include "extensible.h"
 
-class CoreExport Thread : public Pipe, public Extensible
+class CoreExport Thread
+	: public Pipe
+	, public Extensible
 {
 private:
 	/* Set to true to tell the thread to finish and we are waiting for it */
@@ -88,7 +90,8 @@ public:
 	bool TryLock();
 };
 
-class CoreExport Condition : public Mutex
+class CoreExport Condition
+	: public Mutex
 {
 private:
 	/* A condition */

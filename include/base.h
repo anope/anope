@@ -43,7 +43,8 @@ public:
  * no longer be valid once the object it refers is destructed.
  */
 template<typename T>
-class Reference : public ReferenceBase
+class Reference
+	: public ReferenceBase
 {
 protected:
 	T *ref = nullptr;

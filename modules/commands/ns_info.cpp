@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandNSInfo : public Command
+class CommandNSInfo
+	: public Command
 {
 public:
 	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 0, 2)
@@ -134,7 +135,8 @@ public:
 };
 
 
-class CommandNSSetHide : public Command
+class CommandNSSetHide
+	: public Command
 {
 public:
 	CommandNSSetHide(Module *creator, const Anope::string &sname = "nickserv/set/hide", size_t min = 2) : Command(creator, sname, min, min + 1)
@@ -232,7 +234,8 @@ public:
 	}
 };
 
-class CommandNSSASetHide : public CommandNSSetHide
+class CommandNSSASetHide
+	: public CommandNSSetHide
 {
 public:
 	CommandNSSASetHide(Module *creator) : CommandNSSetHide(creator, "nickserv/saset/hide", 3)
@@ -261,7 +264,8 @@ public:
 	}
 };
 
-class NSInfo : public Module
+class NSInfo
+	: public Module
 {
 	CommandNSInfo commandnsinfo;
 

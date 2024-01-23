@@ -105,7 +105,8 @@ static ServiceReference<GlobalService> GlobalService("GlobalService", "Global");
 
 static Timer *timeout;
 
-class DefConTimeout : public Timer
+class DefConTimeout
+	: public Timer
 {
 	int level;
 
@@ -144,7 +145,8 @@ public:
 	}
 };
 
-class CommandOSDefcon : public Command
+class CommandOSDefcon
+	: public Command
 {
 	void SendLevels(CommandSource &source)
 	{
@@ -244,7 +246,8 @@ public:
 	}
 };
 
-class OSDefcon : public Module
+class OSDefcon
+	: public Module
 {
 	ServiceReference<SessionService> session_service;
 	ServiceReference<XLineManager> akills;

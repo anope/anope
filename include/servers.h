@@ -37,7 +37,8 @@ namespace Servers
 
 /** Class representing a server
  */
-class CoreExport Server : public Extensible
+class CoreExport Server
+	: public Extensible
 {
 private:
 	/* Server name */

@@ -14,7 +14,8 @@
 #include "anope.h"
 #include "serialize.h"
 
-class CoreExport Memo : public Serializable
+class CoreExport Memo
+	: public Serializable
 {
 public:
 	MemoInfo *mi;

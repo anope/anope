@@ -12,7 +12,9 @@
 #include "module.h"
 #include "modules/suspend.h"
 
-struct CSSuspendInfo : SuspendInfo, Serializable
+struct CSSuspendInfo
+	: SuspendInfo
+	, Serializable
 {
 	CSSuspendInfo(Extensible *) : Serializable("CSSuspendInfo") { }
 
@@ -50,7 +52,8 @@ struct CSSuspendInfo : SuspendInfo, Serializable
 	}
 };
 
-class CommandCSSuspend : public Command
+class CommandCSSuspend
+	: public Command
 {
 public:
 	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 2, 3)
@@ -142,7 +145,8 @@ public:
 	}
 };
 
-class CommandCSUnSuspend : public Command
+class CommandCSUnSuspend
+	: public Command
 {
 public:
 	CommandCSUnSuspend(Module *creator) : Command(creator, "chanserv/unsuspend", 1, 1)
@@ -193,7 +197,8 @@ public:
 	}
 };
 
-class CSSuspend : public Module
+class CSSuspend
+	: public Module
 {
 	CommandCSSuspend commandcssuspend;
 	CommandCSUnSuspend commandcsunsuspend;

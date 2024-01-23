@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandHSDel : public Command
+class CommandHSDel
+	: public Command
 {
 public:
 	CommandHSDel(Module *creator) : Command(creator, "hostserv/del", 1, 1)
@@ -51,7 +52,8 @@ public:
 	}
 };
 
-class CommandHSDelAll : public Command
+class CommandHSDelAll
+	: public Command
 {
 public:
 	CommandHSDelAll(Module *creator) : Command(creator, "hostserv/delall", 1, 1)
@@ -96,7 +98,8 @@ public:
 	}
 };
 
-class HSDel : public Module
+class HSDel
+	: public Module
 {
 	CommandHSDel commandhsdel;
 	CommandHSDelAll commandhsdelall;

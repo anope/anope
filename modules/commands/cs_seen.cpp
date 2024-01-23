@@ -22,7 +22,8 @@ static SeenInfo *FindInfo(const Anope::string &nick);
 typedef Anope::hash_map<SeenInfo *> database_map;
 database_map database;
 
-struct SeenInfo : Serializable
+struct SeenInfo
+	: Serializable
 {
 	Anope::string nick;
 	Anope::string vhost;
@@ -109,7 +110,8 @@ static bool ShouldHide(const Anope::string &channel, User *u)
 	return false;
 }
 
-class CommandOSSeen : public Command
+class CommandOSSeen
+	: public Command
 {
 public:
 	CommandOSSeen(Module *creator) : Command(creator, "operserv/seen", 1, 2)
@@ -180,7 +182,8 @@ public:
 	}
 };
 
-class CommandSeen : public Command
+class CommandSeen
+	: public Command
 {
 	void SimpleSeen(CommandSource &source, const std::vector<Anope::string> &params)
 	{
@@ -368,7 +371,8 @@ public:
 	}
 };
 
-class CSSeen : public Module
+class CSSeen
+	: public Module
 {
 	Serialize::Type seeninfo_type;
 	CommandSeen commandseen;

@@ -12,7 +12,9 @@
 #include "module.h"
 #include "modules/cs_mode.h"
 
-struct ModeLockImpl : ModeLock, Serializable
+struct ModeLockImpl
+	: ModeLock
+	, Serializable
 {
 	ModeLockImpl() : Serializable("ModeLock")
 	{
@@ -33,7 +35,8 @@ struct ModeLockImpl : ModeLock, Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-struct ModeLocksImpl : ModeLocks
+struct ModeLocksImpl
+	: ModeLocks
 {
 	Serialize::Reference<ChannelInfo> ci;
 	Serialize::Checker<ModeList> mlocks;
@@ -241,7 +244,8 @@ Serializable* ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data
 	return ml;
 }
 
-class CommandCSMode : public Command
+class CommandCSMode
+	: public Command
 {
 	bool CanSet(CommandSource &source, ChannelInfo *ci, ChannelMode *cm, bool self)
 	{
@@ -789,7 +793,8 @@ public:
 
 static Anope::map<std::pair<bool, Anope::string> > modes;
 
-class CommandCSModes : public Command
+class CommandCSModes
+	: public Command
 {
 public:
 	CommandCSModes(Module *creator) : Command(creator, "chanserv/modes", 1, 2)
@@ -906,7 +911,8 @@ public:
 	}
 };
 
-class CSMode : public Module
+class CSMode
+	: public Module
 {
 	CommandCSMode commandcsmode;
 	CommandCSModes commandcsmodes;

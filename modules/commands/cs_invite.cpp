@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandCSInvite : public Command
+class CommandCSInvite
+	: public Command
 {
 public:
 	CommandCSInvite(Module *creator) : Command(creator, "chanserv/invite", 1, 3)
@@ -97,7 +98,8 @@ public:
 	}
 };
 
-class CSInvite : public Module
+class CSInvite
+	: public Module
 {
 	CommandCSInvite commandcsinvite;
 

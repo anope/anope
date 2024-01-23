@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandMSCancel : public Command
+class CommandMSCancel
+	: public Command
 {
 public:
 	CommandMSCancel(Module *creator) : Command(creator, "memoserv/cancel", 1, 1)
@@ -87,7 +88,8 @@ public:
 	}
 };
 
-class MSCancel : public Module
+class MSCancel
+	: public Module
 {
 	CommandMSCancel commandmscancel;
 

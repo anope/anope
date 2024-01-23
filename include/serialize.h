@@ -49,7 +49,8 @@ namespace Serialize
  * abstract data types (Serialize::Data), and then reconstructed or
  * updated later at any time.
  */
-class CoreExport Serializable : public virtual Base
+class CoreExport Serializable
+	: public virtual Base
 {
 private:
 	/* A list of every serializable item in Anope.
@@ -107,7 +108,8 @@ public:
  * of class that inherits from Serializable. Used for unserializing objects
  * of this type, as it requires a function pointer to a static member function.
  */
-class CoreExport Serialize::Type : public Base
+class CoreExport Serialize::Type
+	: public Base
 {
 	typedef Serializable* (*unserialize_func)(Serializable *obj, Serialize::Data &);
 
@@ -240,7 +242,8 @@ public:
  * destructed.
  */
 template<typename T>
-class Serialize::Reference : public ReferenceBase
+class Serialize::Reference
+	: public ReferenceBase
 {
 protected:
 	T *ref = nullptr;

@@ -11,7 +11,8 @@
 
 #include "module.h"
 
-class CommandBSInfo : public Command
+class CommandBSInfo
+	: public Command
 {
 private:
 	void send_bot_channels(std::vector<Anope::string> &buffers, const BotInfo *bi)
@@ -117,7 +118,8 @@ public:
 	}
 };
 
-class BSInfo : public Module
+class BSInfo
+	: public Module
 {
 	CommandBSInfo commandbsinfo;
 

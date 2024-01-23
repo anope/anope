@@ -14,7 +14,8 @@ using namespace Redis;
 class DatabaseRedis;
 static DatabaseRedis *me;
 
-class Data : public Serialize::Data
+class Data
+	: public Serialize::Data
 {
 public:
 	std::map<Anope::string, std::stringstream *> data;
@@ -51,7 +52,8 @@ public:
 	}
 };
 
-class TypeLoader : public Interface
+class TypeLoader
+	: public Interface
 {
 	Anope::string type;
 public:
@@ -60,7 +62,8 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class ObjectLoader : public Interface
+class ObjectLoader
+	: public Interface
 {
 	Anope::string type;
 	int64_t id;
@@ -71,7 +74,8 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class IDInterface : public Interface
+class IDInterface
+	: public Interface
 {
 	Reference<Serializable> o;
 public:
@@ -80,7 +84,8 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class Deleter : public Interface
+class Deleter
+	: public Interface
 {
 	Anope::string type;
 	int64_t id;
@@ -90,7 +95,8 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class Updater : public Interface
+class Updater
+	: public Interface
 {
 	Anope::string type;
 	int64_t id;
@@ -100,7 +106,8 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class ModifiedObject : public Interface
+class ModifiedObject
+	: public Interface
 {
 	Anope::string type;
 	int64_t id;
@@ -110,7 +117,8 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class SubscriptionListener : public Interface
+class SubscriptionListener
+	: public Interface
 {
 public:
 	SubscriptionListener(Module *creator) : Interface(creator) { }
@@ -118,7 +126,9 @@ public:
 	void OnResult(const Reply &r) override;
 };
 
-class DatabaseRedis : public Module, public Pipe
+class DatabaseRedis
+	: public Module
+	, public Pipe
 {
 	SubscriptionListener sl;
 	std::set<Serializable *> updated_items;

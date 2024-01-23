@@ -8,7 +8,8 @@
 
 #pragma once
 
-class SSLService : public Service
+class SSLService
+	: public Service
 {
 public:
 	SSLService(Module *o, const Anope::string &n) : Service(o, "SSLService", n) { }

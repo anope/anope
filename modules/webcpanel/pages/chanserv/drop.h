@@ -13,7 +13,8 @@ namespace WebCPanel
 	namespace ChanServ
 	{
 
-		class Drop : public WebPanelProtectedPage
+		class Drop
+			: public WebPanelProtectedPage
 		{
 		public:
 			Drop(const Anope::string &cat, const Anope::string &u);

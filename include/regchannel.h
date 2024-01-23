@@ -21,7 +21,8 @@ typedef Anope::hash_map<ChannelInfo *> registered_channel_map;
 extern CoreExport Serialize::Checker<registered_channel_map> RegisteredChannelList;
 
 /* AutoKick data. */
-class CoreExport AutoKick : public Serializable
+class CoreExport AutoKick
+	: public Serializable
 {
 public:
 	/* Channel this autokick is on */
@@ -43,7 +44,9 @@ public:
 
 /* It matters that Base is here before Extensible (it is inherited by Serializable)
  */
-class CoreExport ChannelInfo : public Serializable, public Extensible
+class CoreExport ChannelInfo
+	: public Serializable
+	, public Extensible
 {
 	/* channels who reference this one */
 	Anope::map<int> references;

@@ -14,7 +14,9 @@
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
-struct ForbidDataImpl : ForbidData, Serializable
+struct ForbidDataImpl
+	: ForbidData
+	, Serializable
 {
 	ForbidDataImpl() : Serializable("ForbidData") { }
 	void Serialize(Serialize::Data &data) const override;
@@ -59,7 +61,8 @@ Serializable* ForbidDataImpl::Unserialize(Serializable *obj, Serialize::Data &da
 	return fb;
 }
 
-class MyForbidService : public ForbidService
+class MyForbidService
+	: public ForbidService
 {
 	Serialize::Checker<std::vector<ForbidData *>[FT_SIZE - 1]> forbid_data;
 
@@ -146,7 +149,8 @@ public:
 	}
 };
 
-class CommandOSForbid : public Command
+class CommandOSForbid
+	: public Command
 {
 	ServiceReference<ForbidService> fs;
 public:
@@ -430,7 +434,8 @@ public:
 	}
 };
 
-class OSForbid : public Module
+class OSForbid
+	: public Module
 {
 	MyForbidService forbidService;
 	Serialize::Type forbiddata_type;

@@ -35,7 +35,8 @@ namespace
 	unsigned ipv6_cidr;
 }
 
-class MySessionService : public SessionService
+class MySessionService
+	: public SessionService
 {
 	SessionMap Sessions;
 	Serialize::Checker<ExceptionVector> Exceptions;
@@ -126,7 +127,8 @@ public:
 	}
 };
 
-class ExceptionDelCallback : public NumberList
+class ExceptionDelCallback
+	: public NumberList
 {
 protected:
 	CommandSource &source;
@@ -168,7 +170,8 @@ public:
 	}
 };
 
-class CommandOSSession : public Command
+class CommandOSSession
+	: public Command
 {
 private:
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
@@ -281,7 +284,8 @@ public:
 	}
 };
 
-class CommandOSException : public Command
+class CommandOSException
+	: public Command
 {
 private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
@@ -431,7 +435,8 @@ private:
 
 		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class ExceptionListCallback : public NumberList
+			class ExceptionListCallback
+				: public NumberList
 			{
 				CommandSource &source;
 				ListFormatter &list;
@@ -577,7 +582,8 @@ public:
 	}
 };
 
-class OSSession : public Module
+class OSSession
+	: public Module
 {
 	Serialize::Type exception_type;
 	MySessionService ss;

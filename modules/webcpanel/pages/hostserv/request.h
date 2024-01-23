@@ -13,7 +13,8 @@ namespace WebCPanel
 namespace HostServ
 {
 
-class Request : public WebPanelProtectedPage
+class Request
+	: public WebPanelProtectedPage
 {
 public:
 	Request(const Anope::string &cat, const Anope::string &u);

@@ -71,6 +71,9 @@ public:
 				"is dropped you may lose all of your access and channels that\n"
 				"you may own. Any other user will be able to gain control of\n"
 				"this nick."));
+		if (Config->GetModule("ns_drop")->Get<bool>("deny_dropping_display"))
+			source.Reply(_("You must drop all aliases in the group\n"
+				before you can drop your display nick."));
 		if (!source.HasPriv("nickserv/drop"))
 			source.Reply(_("You may drop any nick within your group."));
 		else

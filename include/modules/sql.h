@@ -81,7 +81,7 @@ namespace SQL
 
 	/** A SQL exception, can be thrown at various points
 	 */
-	class CoreExport Exception : public ModuleException
+	class DllExport Exception : public ModuleException
 	{
 	public:
 		Exception(const Anope::string &reason) : ModuleException(reason) { }

@@ -72,7 +72,7 @@ public:
 				"this nick."));
 		if (Config->GetModule(this->module)->Get<bool>("deny_dropping_display"))
 			source.Reply(_("You must drop all aliases in the group\n"
-				before you can drop your display nick."));
+				"before you can drop your display nick."));
 		if (!source.HasPriv("nickserv/drop"))
 			source.Reply(_("You may drop any nick within your group."));
 		else

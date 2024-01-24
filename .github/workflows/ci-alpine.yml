@@ -1,0 +1,58 @@
+name: Alpine CI
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 0 * * 0'
+jobs:
+  build:
+    if: "!contains(github.event.head_commit.message, '[skip alpine ci]')"
+    container: alpine:edge
+    runs-on: ubuntu-latest
+    env:
+      CXX: ${{ matrix.compiler }}
+      CXXFLAGS: -Werror
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+          apk update
+          apk add \
+            clang \
+            cmake \
+            g++ \
+            gettext \
+            git \
+            gnutls-dev \
+            mariadb-dev \
+            openldap-dev \
+            openssl-dev \
+            pcre2-dev \
+            samurai \
+            sqlite-dev \
+            tre-dev
+
+      - name: Enable extras
+        run: |
+          for MODULE in ldap ldap_authentication ldap_oper mysql regex_pcre2 regex_posix regex_tre sql_authentication sql_log sql_oper sqlite ssl_gnutls ssl_openssl
+          do
+            ln -s $PWD/modules/extra/$MODULE.cpp $PWD/modules
+          done
+
+      - name: Run CMake
+        run: |
+          mkdir build && cd build
+          cmake -GNinja -DCMAKE_BUILD_TYPE:STRING=DEBUG -DINSTDIR:STRING=$(readlink -f ../run) ..
+
+      - name: Build Anope
+        run: |
+          ninja -C build install
+
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - clang++
+          - g++

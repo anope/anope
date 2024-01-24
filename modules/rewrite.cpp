@@ -112,14 +112,14 @@ public:
 		if (r != NULL)
 		{
 			Anope::string new_message = r->Process(source, full_params);
-			Log(LOG_DEBUG) << "m_rewrite: Rewrote '" << source.command << (!params.empty() ? " " + params[0] : "") << "' to '" << new_message << "' using '" << r->source_message << "'";
+			Log(LOG_DEBUG) << "rewrite: Rewrote '" << source.command << (!params.empty() ? " " + params[0] : "") << "' to '" << new_message << "' using '" << r->source_message << "'";
 			source.service = BotInfo::Find(r->client, true);
 			if (!source.service)
 				return;
 			Command::Run(source, new_message);
 		}
 		else
-			Log() << "m_rewrite: Unable to rewrite '" << source.command << (!params.empty() ? " " + params[0] : "") << "'";
+			Log() << "rewrite: Unable to rewrite '" << source.command << (!params.empty() ? " " + params[0] : "") << "'";
 	}
 
 	void OnServHelp(CommandSource &source) override

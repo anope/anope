@@ -37,7 +37,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     Ensuite, décompressez le package dans votre répertoire home, et allez
     dans le répértoire qui vient d'être créé.
 
-    Si il y a des modules facultatifs que vous voulez activer comme m_mysql,
+    Si il y a des modules facultatifs que vous voulez activer comme mysql,
     exécuter le script 'extras' pour les activer. Si vous ne savez pas, vous
     pouvez les activer plus tard.
 

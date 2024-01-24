@@ -67,7 +67,7 @@ public:
 
 		provider = ServiceReference<HTTPProvider>("HTTPProvider", provider_name);
 		if (!provider)
-			throw ModuleException("Unable to find HTTPD provider. Is m_httpd loaded?");
+			throw ModuleException("Unable to find HTTPD provider. Is httpd loaded?");
 
 		provider->RegisterPage(&this->style_css);
 		provider->RegisterPage(&this->logo_png);

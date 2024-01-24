@@ -37,7 +37,7 @@ Note: You should also read the README and FAQ files!
     Next, unpack the package in your home directory, and go into the created
     directory.
 
-    If there are any extra modules you want to enable, such as m_mysql, run
+    If there are any extra modules you want to enable, such as mysql, run
     the 'extras' script to enable them. If you do not know you can come back
     later and enable them.
 

@@ -350,7 +350,7 @@ public:
 				delete newcred;
 				throw;
 			}
-			Log(LOG_DEBUG) << "m_ssl_gnutls: Successfully loaded DH parameters from " << dhfile;
+			Log(LOG_DEBUG) << "ssl_gnutls: Successfully loaded DH parameters from " << dhfile;
 		}
 
 		if (cred)
@@ -358,7 +358,7 @@ public:
 		cred = newcred;
 		cred->incrref();
 
-		Log(LOG_DEBUG) << "m_ssl_gnutls: Successfully loaded certificate " << certfile << " and private key " << keyfile;
+		Log(LOG_DEBUG) << "ssl_gnutls: Successfully loaded certificate " << certfile << " and private key " << keyfile;
 	}
 
 	void OnPreServerConnect() override

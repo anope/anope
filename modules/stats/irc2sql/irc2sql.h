@@ -24,9 +24,9 @@ public:
 	void OnError(const SQL::Result &r) override
 	{
 		if (!r.GetQuery().query.empty())
-			Log(LOG_DEBUG) << "m_irc2sql: Error executing query " << r.finished_query << ": " << r.GetError();
+			Log(LOG_DEBUG) << "irc2sql: Error executing query " << r.finished_query << ": " << r.GetError();
 		else
-			Log(LOG_DEBUG) << "m_irc2sql: Error executing query: " << r.GetError();
+			Log(LOG_DEBUG) << "irc2sql: Error executing query: " << r.GetError();
 	}
 };
 

@@ -79,14 +79,14 @@ public:
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		prefix = conf->GetModule("m_chanstats")->Get<const Anope::string>("prefix", "anope_");
-		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("m_chanstats")->Get<const Anope::string>("engine"));
+		prefix = conf->GetModule("chanstats")->Get<const Anope::string>("prefix", "anope_");
+		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("chanstats")->Get<const Anope::string>("engine"));
 	}
 
 	SQL::Result RunQuery(const SQL::Query &query)
 	{
 		if (!this->sql)
-			throw SQL::Exception("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
+			throw SQL::Exception("Unable to locate SQL reference, is mysql loaded and configured correctly?");
 
 		SQL::Result res = this->sql->RunQuery(query);
 		if (!res.GetError().empty())

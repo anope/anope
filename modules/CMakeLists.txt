@@ -19,18 +19,18 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../conanbuildinfo.cmake")
     file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/extra/${NAME}.cpp" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}")
   endfunction()
 
-  enable_extra("m_mysql" "LIBMYSQLCLIENT")
-  enable_extra("m_regex_pcre2" "PCRE2")
-  enable_extra("m_sqlite" "SQLITE3")
-  enable_extra("m_ssl_openssl" "OPENSSL")
+  enable_extra("mysql" "LIBMYSQLCLIENT")
+  enable_extra("regex_pcre2" "PCRE2")
+  enable_extra("sqlite" "SQLITE3")
+  enable_extra("ssl_openssl" "OPENSSL")
   # this uses Wldap so should always be available
-  copy_extra("m_ldap")
+  copy_extra("ldap")
   # these don't actually have extra dependencies, but require a module which does
-  copy_extra("m_sql_authentication")
-  copy_extra("m_sql_log")
-  copy_extra("m_sql_oper")
-  copy_extra("m_ldap_authentication")
-  copy_extra("m_ldap_oper")
+  copy_extra("sql_authentication")
+  copy_extra("sql_log")
+  copy_extra("sql_oper")
+  copy_extra("ldap_authentication")
+  copy_extra("ldap_oper")
 
   # Package extra dlls
   file(GLOB EXTRA_DLLS "${Anope_SOURCE_DIR}/extradll/bin/*.dll" "${Anope_SOURCE_DIR}/extradll/lib/*.dll")

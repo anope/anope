@@ -154,7 +154,7 @@ public:
 			if (!SSL_CTX_use_certificate_chain_file(client_ctx, this->certfile.c_str()) || !SSL_CTX_use_certificate_chain_file(server_ctx, this->certfile.c_str()))
 				throw ConfigException("Error loading certificate");
 			else
-				Log(LOG_DEBUG) << "m_ssl_openssl: Successfully loaded certificate " << this->certfile;
+				Log(LOG_DEBUG) << "ssl_openssl: Successfully loaded certificate " << this->certfile;
 		}
 		else
 			Log() << "Unable to open certificate " << this->certfile;
@@ -164,7 +164,7 @@ public:
 			if (!SSL_CTX_use_PrivateKey_file(client_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_PrivateKey_file(server_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM))
 				throw ConfigException("Error loading private key");
 			else
-				Log(LOG_DEBUG) << "m_ssl_openssl: Successfully loaded private key " << this->keyfile;
+				Log(LOG_DEBUG) << "ssl_openssl: Successfully loaded private key " << this->keyfile;
 		}
 		else
 		{

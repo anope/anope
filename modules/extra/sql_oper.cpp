@@ -34,7 +34,7 @@ class SQLOperResult final
 			delete user->Account()->o;
 			user->Account()->o = NULL;
 
-			Log(this->owner) << "m_sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->display << ")";
+			Log(this->owner) << "sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->display << ")";
 
 			BotInfo *OperServ = Config->GetClient("OperServ");
 			user->RemoveMode(OperServ, "OPER"); // Probably not set, just incase
@@ -53,7 +53,7 @@ public:
 
 		if (r.Rows() == 0)
 		{
-			Log(LOG_DEBUG) << "m_sql_oper: Got 0 rows for " << user->nick;
+			Log(LOG_DEBUG) << "sql_oper: Got 0 rows for " << user->nick;
 			Deoper();
 			return;
 		}
@@ -69,7 +69,7 @@ public:
 			return;
 		}
 
-		Log(LOG_DEBUG) << "m_sql_oper: Got result for " << user->nick << ", opertype " << opertype;
+		Log(LOG_DEBUG) << "sql_oper: Got result for " << user->nick << ", opertype " << opertype;
 
 		Anope::string modes;
 		try
@@ -91,7 +91,7 @@ public:
 		OperType *ot = OperType::Find(opertype);
 		if (ot == NULL)
 		{
-			Log(this->owner) << "m_sql_oper: Oper " << user->nick << " has type " << opertype << ", but this opertype does not exist?";
+			Log(this->owner) << "sql_oper: Oper " << user->nick << " has type " << opertype << ", but this opertype does not exist?";
 			return;
 		}
 
@@ -103,7 +103,7 @@ public:
 
 		if (!user->Account()->o || user->Account()->o->ot != ot)
 		{
-			Log(this->owner) << "m_sql_oper: Tieing oper " << user->nick << " to type " << opertype;
+			Log(this->owner) << "sql_oper: Tieing oper " << user->nick << " to type " << opertype;
 
 			delete user->Account()->o;
 			user->Account()->o = new SQLOper(user->Account()->display, ot);
@@ -121,7 +121,7 @@ public:
 	void OnError(const SQL::Result &r) override
 	{
 		SQLOperResultDeleter d(this);
-		Log(this->owner) << "m_sql_oper: Error executing query " << r.GetQuery().query << ": " << r.GetError();
+		Log(this->owner) << "sql_oper: Error executing query " << r.GetQuery().query << ": " << r.GetError();
 	}
 };
 
@@ -174,7 +174,7 @@ public:
 
 		this->SQL->Run(new SQLOperResult(this, u), q);
 
-		Log(LOG_DEBUG) << "m_sql_oper: Checking authentication for " << u->Account()->display;
+		Log(LOG_DEBUG) << "sql_oper: Checking authentication for " << u->Account()->display;
 	}
 };
 

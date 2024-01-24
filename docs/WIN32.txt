@@ -70,7 +70,7 @@ Anope for Windows
        If you cannot find whats causing the error, please visit our forums or
        our IRC Support channel for assistance.
 
-       Some Anope modules require third party libraries, such as m_mysql and
+       Some Anope modules require third party libraries, such as mysql and
        the SSL modules. If these libraries are installed in nonstandard
        locations, cmake will probably not find them and should be told where
        they are by passing their location to Config.

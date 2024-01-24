@@ -69,7 +69,7 @@ public:
 					{
 						const LDAPAttributes &attr = r.get(0);
 						ii->dn = attr.get("dn");
-						Log(LOG_DEBUG) << "m_ldap_authenticationn: binding as " << ii->dn;
+						Log(LOG_DEBUG) << "ldap_authenticationn: binding as " << ii->dn;
 
 						ii->lprov->Bind(new IdentifyInterface(this->owner, ii), ii->dn, ii->req->GetPassword());
 						ii = NULL;
@@ -88,7 +88,7 @@ public:
 					Anope::string sf = search_filter.replace_all_cs("%account", ii->req->GetAccount()).replace_all_cs("%object_class", object_class);
 					try
 					{
-						Log(LOG_DEBUG) << "m_ldap_authentication: searching for " << sf;
+						Log(LOG_DEBUG) << "ldap_authentication: searching for " << sf;
 						ii->lprov->Search(new IdentifyInterface(this->owner, ii), basedn, sf);
 						ii->admin_bind = false;
 						ii = NULL;
@@ -113,7 +113,7 @@ public:
 					// encrypt and store the password in the nickcore
 					Anope::Encrypt(ii->req->GetPassword(), na->nc->pass);
 
-					na->nc->Extend<Anope::string>("m_ldap_authentication_dn", ii->dn);
+					na->nc->Extend<Anope::string>("ldap_authentication_dn", ii->dn);
 					ii->req->Success(me);
 				}
 				break;
@@ -205,7 +205,7 @@ class ModuleLDAPAuthentication final
 public:
 	ModuleLDAPAuthentication(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), orinterface(this),
-		dn(this, "m_ldap_authentication_dn")
+		dn(this, "ldap_authentication_dn")
 	{
 		me = this;
 	}

@@ -291,7 +291,7 @@ public:
 		me = this;
 
 		if (!xmlrpc)
-			throw ModuleException("Unable to find xmlrpc reference, is m_xmlrpc loaded?");
+			throw ModuleException("Unable to find xmlrpc reference, is xmlrpc loaded?");
 
 		xmlrpc->Register(&stats);
 	}

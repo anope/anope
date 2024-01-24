@@ -213,14 +213,14 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const 
 
 	if (known_cols.empty())
 	{
-		Log(LOG_DEBUG) << "m_sqlite: Fetching columns for " << table;
+		Log(LOG_DEBUG) << "sqlite: Fetching columns for " << table;
 
 		Result columns = this->RunQuery("PRAGMA table_info(" + table + ")");
 		for (int i = 0; i < columns.Rows(); ++i)
 		{
 			const Anope::string &column = columns.Get(i, "name");
 
-			Log(LOG_DEBUG) << "m_sqlite: Column #" << i << " for " << table << ": " << column;
+			Log(LOG_DEBUG) << "sqlite: Column #" << i << " for " << table << ": " << column;
 			known_cols.insert(column);
 		}
 	}

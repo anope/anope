@@ -32,12 +32,12 @@ public:
 	{
 		if (r.Rows() == 0)
 		{
-			Log(LOG_DEBUG) << "m_sql_authentication: Unsuccessful authentication for " << req->GetAccount();
+			Log(LOG_DEBUG) << "sql_authentication: Unsuccessful authentication for " << req->GetAccount();
 			delete this;
 			return;
 		}
 
-		Log(LOG_DEBUG) << "m_sql_authentication: Successful authentication for " << req->GetAccount();
+		Log(LOG_DEBUG) << "sql_authentication: Successful authentication for " << req->GetAccount();
 
 		Anope::string email;
 		try
@@ -69,7 +69,7 @@ public:
 
 	void OnError(const SQL::Result &r) override
 	{
-		Log(this->owner) << "m_sql_authentication: Error executing query " << r.GetQuery().query << ": " << r.GetError();
+		Log(this->owner) << "sql_authentication: Error executing query " << r.GetQuery().query << ": " << r.GetError();
 		delete this;
 	}
 };
@@ -143,7 +143,7 @@ public:
 
 		this->SQL->Run(new SQLAuthenticationResult(u, req), q);
 
-		Log(LOG_DEBUG) << "m_sql_authentication: Checking authentication for " << req->GetAccount();
+		Log(LOG_DEBUG) << "sql_authentication: Checking authentication for " << req->GetAccount();
 	}
 };
 

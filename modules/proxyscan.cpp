@@ -297,7 +297,7 @@ public:
 		}
 		catch (const SocketException &ex)
 		{
-			throw ConfigException("m_proxyscan: " + ex.GetReason());
+			throw ConfigException("proxyscan: " + ex.GetReason());
 		}
 
 		this->proxyscans.clear();
@@ -377,7 +377,7 @@ public:
 					}
 					catch (const SocketException &ex)
 					{
-						Log(LOG_DEBUG) << "m_proxyscan: " << ex.GetReason();
+						Log(LOG_DEBUG) << "proxyscan: " << ex.GetReason();
 					}
 				}
 			}

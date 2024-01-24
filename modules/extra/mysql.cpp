@@ -383,14 +383,14 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 
 	if (known_cols.empty())
 	{
-		Log(LOG_DEBUG) << "m_mysql: Fetching columns for " << table;
+		Log(LOG_DEBUG) << "mysql: Fetching columns for " << table;
 
 		Result columns = this->RunQuery("SHOW COLUMNS FROM `" + table + "`");
 		for (int i = 0; i < columns.Rows(); ++i)
 		{
 			const Anope::string &column = columns.Get(i, "Field");
 
-			Log(LOG_DEBUG) << "m_mysql: Column #" << i << " for " << table << ": " << column;
+			Log(LOG_DEBUG) << "mysql: Column #" << i << " for " << table << ": " << column;
 			known_cols.insert(column);
 		}
 	}

@@ -112,7 +112,7 @@ public:
 		try
 		{
 			if (!this->ldap)
-				throw LDAPException("No LDAP interface. Is m_ldap loaded and configured correctly?");
+				throw LDAPException("No LDAP interface. Is ldap loaded and configured correctly?");
 			else if (this->basedn.empty() || this->filter.empty() || opertype_attribute.empty())
 				throw LDAPException("Could not search LDAP for opertype settings, invalid configuration.");
 

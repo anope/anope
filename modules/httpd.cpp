@@ -75,13 +75,13 @@ class MyHTTPClient final
 				if (this->message.headers.count(token))
 				{
 					this->ip = this->message.headers[token];
-					Log(LOG_DEBUG, "httpd") << "m_httpd: IP for connection " << this->GetFD() << " changed to " << this->ip;
+					Log(LOG_DEBUG, "httpd") << "httpd: IP for connection " << this->GetFD() << " changed to " << this->ip;
 					break;
 				}
 			}
 		}
 
-		Log(LOG_DEBUG, "httpd") << "m_httpd: Serving page " << this->page_name << " to " << this->ip;
+		Log(LOG_DEBUG, "httpd") << "httpd: Serving page " << this->page_name << " to " << this->ip;
 
 		HTTPReply reply;
 		reply.content_type = this->page->GetContentType();

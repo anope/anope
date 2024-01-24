@@ -154,7 +154,7 @@ public:
 
 		while (GetData(content, tname, data))
 		{
-			Log(LOG_DEBUG) << "m_xmlrpc: Tag name: " << tname << ", data: " << data;
+			Log(LOG_DEBUG) << "xmlrpc: Tag name: " << tname << ", data: " << data;
 			if (tname == "methodName")
 				request.name = data;
 			else if (tname == "name" && data == "id")
@@ -221,7 +221,7 @@ public:
 			httpref->UnregisterPage(&xmlrpcinterface);
 		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf->GetModule(this)->Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)
-			throw ConfigException("Unable to find http reference, is m_httpd loaded?");
+			throw ConfigException("Unable to find http reference, is httpd loaded?");
 		httpref->RegisterPage(&xmlrpcinterface);
 	}
 };

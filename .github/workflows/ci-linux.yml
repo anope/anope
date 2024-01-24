@@ -1,24 +1,25 @@
-name: Linux CI
+name: Ubuntu CI
 on:
   - pull_request
   - push
 jobs:
   build:
+    if: "!contains(github.event.head_commit.message, '[skip ubuntu ci]')"
     runs-on: ubuntu-20.04
     env:
       CXX: ${{ matrix.compiler }}
       CXXFLAGS: -std=${{ matrix.standard }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Install dependencies
         run: |
           sudo apt-get update --assume-yes
           sudo apt-get install --assume-yes --no-install-recommends \
             clang \
             g++ \
+            gettext \
             git \
-            libc++-dev \
-            libc++abi-dev \
             libgnutls28-dev \
             libldap2-dev \
             libmysqlclient-dev \
@@ -27,20 +28,24 @@ jobs:
             libsqlite3-dev \
             libssl-dev \
             libtre-dev \
-            make
+            ninja-build
+
       - name: Enable extras
         run: |
           for MODULE in m_ldap.cpp m_ldap_authentication.cpp m_ldap_oper.cpp m_mysql.cpp m_regex_pcre.cpp m_regex_pcre2.cpp m_regex_posix.cpp m_regex_tre.cpp m_sql_authentication.cpp m_sql_log.cpp m_sql_oper.cpp m_sqlite.cpp m_ssl_gnutls.cpp m_ssl_openssl.cpp stats
           do
             ln -s ${{ github.workspace }}/modules/extra/$MODULE ${{ github.workspace }}/modules
           done
+
       - name: Run CMake
         run: |
           mkdir build && cd build
-          cmake -DCMAKE_BUILD_TYPE:STRING=DEBUG -DINSTDIR:STRING=${{ github.workspace }}/run ..
+          cmake -GNinja -DCMAKE_BUILD_TYPE:STRING=DEBUG -DINSTDIR:STRING=${{ github.workspace }}/run ..
+
       - name: Build Anope
         run: |
-          make --directory ${{ github.workspace }}/build --jobs $(nproc) --no-print-directory install
+          ninja -C ${{ github.workspace }}/build install
+
     strategy:
       fail-fast: false
       matrix:

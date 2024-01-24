@@ -203,7 +203,12 @@ Result SQLiteService::RunQuery(const Query &query)
 	if (err != SQLITE_DONE)
 		return SQLiteResult(query, real_query, sqlite3_errmsg(this->sql));
 
+	// GCC and clang disagree about whether this should be a move >:(
+#ifdef __clang__
 	return std::move(result);
+#else
+	return result;
+#endif
 }
 
 std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const Data &data)

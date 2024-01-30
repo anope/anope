@@ -75,7 +75,7 @@ namespace Language
 #define MORE_OBSCURE_PASSWORD		_("Please try again with a more obscure password. Passwords should not be\n" \
 						"something that could be easily guessed (e.g. your real name or your nick) and\n" \
 						"cannot contain the space or tab characters.\n")
-#define PASSWORD_TOO_SHORT		_("Your password is too short. It must must be longer than %u characters.")
+#define PASSWORD_TOO_SHORT		_("Your password is too short. It must be longer than %u characters.")
 #define PASSWORD_TOO_LONG		_("Your password is too long. It must be shorter than %u characters.")
 #define NICK_NOT_REGISTERED		_("Your nick isn't registered.")
 #define NICK_X_NOT_REGISTERED		_("Nick \002%s\002 isn't registered.")

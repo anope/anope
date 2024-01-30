@@ -8770,8 +8770,8 @@ msgid "Your password is too long. It must be shorter than %u characters."
 msgstr "Your password is too long. It must be shorter than %u characters."
 
 #, c-format
-msgid "Your password is too short. It must must be longer than %u characters."
-msgstr "Your password is too short. It must must be longer than %u characters."
+msgid "Your password is too short. It must be longer than %u characters."
+msgstr "Your password is too short. It must be longer than %u characters."
 
 msgid "Your password reset request has expired."
 msgstr "Your password reset request has expired."

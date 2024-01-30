@@ -150,7 +150,15 @@ macro(build_subdir)
 
   # Generate the module and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_library(${SO} MODULE ${MODULES_SUBDIR_SRCS})
-  set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX "" LINK_FLAGS "${SUBDIR_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
+  set_target_properties(${SO} PROPERTIES
+    BUILD_WITH_INSTALL_RPATH ON
+    FOLDER "Modules"
+    INSTALL_RPATH_USE_LINK_PATH ON
+    LINKER_LANGUAGE CXX
+    LINK_FLAGS "${SUBDIR_LDFLAGS}"
+    PREFIX ""
+    SUFFIX ""
+  )
   add_dependencies(${SO} ${PROGRAM_NAME})
   if(HAVE_LOCALIZATION)
     add_dependencies(${SO} module_language)

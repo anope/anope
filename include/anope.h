@@ -336,9 +336,14 @@ namespace Anope
 		}
 	};
 
-	template<typename T> class map : public std::map<string, T, ci::less> { };
-	template<typename T> class multimap : public std::multimap<string, T, ci::less> { };
-	template<typename T> class hash_map : public std::unordered_map<string, T, hash_ci, compare> { };
+	template<typename T>
+	using map = std::map<string, T, ci::less>;
+
+	template<typename T>
+	using multimap = std::multimap<string, T, ci::less>;
+
+	template<typename T>
+	using hash_map = std::unordered_map<string, T, hash_ci, compare>;
 
 #ifndef REPRODUCIBLE_BUILD
 	static const char *const compiled = __TIME__ " " __DATE__;

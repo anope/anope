@@ -1,4 +1,4 @@
-Starting with Anope 1.9.4 XMLRPC using PHP's xmlrpc_encode_request and xmlrpc_decode functions is supported.
+XMLRPC using PHP's xmlrpc_encode_request and xmlrpc_decode functions is supported.
 This allows external applications, such as websites, to execute remote procedure calls to Anope in real time.
 
 Currently there are 5 supported XMLRPC calls, provided by xmlrpc_main:

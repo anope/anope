@@ -1,4 +1,4 @@
-Starting in Anope 1.9.9, Anope has Redis database support (https://redis.io/).
+Anope has Redis database support (https://redis.io/).
 This document explains the data structure used by Anope, and explains how
 keyspace notification works.
 

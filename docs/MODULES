@@ -12,7 +12,7 @@ Anope Modules
 
 1) Introduction
 
-    Anope 1.6 onwards supports external modules. External modules are pieces
+    Anope supports external modules. External modules are pieces
     of code that can be attached to a running Anope process dynamically. These
     modules can serve several purposes, and perform all kind of operations to
     enhance your network.

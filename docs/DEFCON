@@ -10,7 +10,7 @@ Anope DefCon
 
 1) Introduction
 
-    Anope 1.6 onwards supports a unique protection mechanism based on the
+    Anope supports a unique protection mechanism based on the
     military "Defense Readiness Condition" (DefCon) system. It is based on
     5 levels of defense readiness defined as:
 

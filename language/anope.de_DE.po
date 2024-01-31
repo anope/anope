@@ -2540,7 +2540,7 @@ msgstr ""
 
 msgid ""
 "Alternative methods of modifying channel access lists are\n"
-"available. "
+"available."
 msgstr "Alternative Methoden zum Bearbeiten der Kanalzugangsliste sind verfügbar."
 
 msgid "Approve the requested vHost of a user"

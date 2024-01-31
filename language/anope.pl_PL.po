@@ -2436,7 +2436,7 @@ msgid ""
 "available."
 msgstr ""
 "Dostępne są alternatywne sposoby na modyfikację kanałowych\n"
-"list dostępu. "
+"list dostępu."
 
 msgid "Approve the requested vHost of a user"
 msgstr "Akceptuje prośbę o vhost wskazanego użytkownika"

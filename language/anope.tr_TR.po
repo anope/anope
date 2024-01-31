@@ -2426,10 +2426,10 @@ msgstr ""
 
 msgid ""
 "Alternative methods of modifying channel access lists are\n"
-"available. "
+"available."
 msgstr ""
 "Kanal erişim listelerini değiştirmenin alternatif yöntemleri\n"
-"mevcuttur. "
+"mevcuttur."
 
 msgid "Approve the requested vHost of a user"
 msgstr "Bir kullanıcının istenen vHost'unu onaylayın"

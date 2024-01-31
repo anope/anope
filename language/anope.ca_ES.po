@@ -2760,7 +2760,7 @@ msgstr ""
 
 msgid ""
 "Alternative methods of modifying channel access lists are\n"
-"available. "
+"available."
 msgstr ""
 
 #, fuzzy

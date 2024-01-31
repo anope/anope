@@ -2435,10 +2435,10 @@ msgstr ""
 
 msgid ""
 "Alternative methods of modifying channel access lists are\n"
-"available. "
+"available."
 msgstr ""
 "Sono disponibili metodi alternativi per la modifica delle\n"
-"liste di accesso dei canali. "
+"liste di accesso dei canali."
 
 msgid "Approve the requested vHost of a user"
 msgstr "Approva il vHost richiesto da un utente"

@@ -2437,7 +2437,7 @@ msgstr ""
 
 msgid ""
 "Alternative methods of modifying channel access lists are\n"
-"available. "
+"available."
 msgstr ""
 "Des méthodes alternatives de modification de la liste d'accès sont\n"
 "disponibles."

@@ -292,7 +292,13 @@ class MyHTTPProvider final
 	std::list<Reference<MyHTTPClient> > clients;
 
 public:
-	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t, bool s) : Socket(-1, i.find(':') == Anope::string::npos ? AF_INET : AF_INET6), HTTPProvider(c, n, i, p, s), Timer(c, 10, Anope::CurTime, true), timeout(t) { }
+	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t, bool s)
+		: Socket(-1, i.find(':') == Anope::string::npos ? AF_INET : AF_INET6)
+		, HTTPProvider(c, n, i, p, s)
+		, Timer(c, 10, true)
+		, timeout(t)
+	{
+	}
 
 	void Tick(time_t) override
 	{

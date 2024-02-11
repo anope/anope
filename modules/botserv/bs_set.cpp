@@ -76,7 +76,12 @@ public:
 		Anope::string mask;
 
 	public:
-		UnbanTimer(Module *creator, const Anope::string &ch, const Anope::string &bmask, time_t t) : Timer(creator, t), chname(ch), mask(bmask) { }
+		UnbanTimer(Module *creator, const Anope::string &ch, const Anope::string &bmask, time_t t)
+			: Timer(creator, t)
+			, chname(ch)
+			, mask(bmask)
+		{
+		}
 
 		void Tick(time_t) override
 		{

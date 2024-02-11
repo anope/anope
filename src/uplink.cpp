@@ -21,7 +21,10 @@ class ReconnectTimer final
 	: public Timer
 {
 public:
-	ReconnectTimer(int wait) : Timer(wait) { }
+	ReconnectTimer(int wait)
+		: Timer(wait)
+	{
+	}
 
 	void Tick(time_t) override
 	{

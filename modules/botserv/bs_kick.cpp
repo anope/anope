@@ -1005,7 +1005,10 @@ class BanDataPurger final
 	: public Timer
 {
 public:
-	BanDataPurger(Module *o) : Timer(o, 300, Anope::CurTime, true) { }
+	BanDataPurger(Module *o)
+		: Timer(o, 300, true)
+	{
+	}
 
 	void Tick(time_t) override
 	{

@@ -211,7 +211,8 @@ class ModuleProxyScan final
 		: public Timer
 	{
 	public:
-		ConnectionTimeout(Module *c, long timeout) : Timer(c, timeout, Anope::CurTime, true)
+		ConnectionTimeout(Module *c, long timeout)
+			: Timer(c, timeout, true)
 		{
 		}
 

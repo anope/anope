@@ -111,7 +111,9 @@ class DefConTimeout final
 	int level;
 
 public:
-	DefConTimeout(Module *mod, int newlevel) : Timer(mod, DConfig.timeout), level(newlevel)
+	DefConTimeout(Module *mod, int newlevel)
+		: Timer(mod, DConfig.timeout)
+		, level(newlevel)
 	{
 		timeout = this;
 	}

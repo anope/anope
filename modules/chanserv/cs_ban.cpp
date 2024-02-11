@@ -22,7 +22,13 @@ private:
 	Anope::string mode;
 
 public:
-	TempBan(time_t seconds, Channel *c, const Anope::string &banmask, const Anope::string &mod) : Timer(me, seconds), channel(c->name), mask(banmask), mode(mod) { }
+	TempBan(time_t seconds, Channel *c, const Anope::string &banmask, const Anope::string &mod)
+		: Timer(me, seconds)
+		, channel(c->name)
+		, mask(banmask)
+		, mode(mod)
+	{
+	}
 
 	void Tick(time_t ctime) override
 	{

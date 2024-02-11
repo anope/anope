@@ -51,7 +51,11 @@ public:
 			/** Constructor
 			 * @param chan The channel
 			 */
-			ChanServTimer(Reference<BotInfo> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan) : Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s")), ChanServ(cs), inhabit(i), c(chan)
+			ChanServTimer(Reference<BotInfo> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan)
+				: Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s"))
+				, ChanServ(cs)
+				, inhabit(i)
+				, c(chan)
 			{
 				if (!ChanServ || !c)
 					return;

@@ -20,10 +20,6 @@ private:
 	 */
 	Module *owner;
 
-	/** The time this was created
-	 */
-	time_t settime;
-
 	/** The triggering time
 	 */
 	time_t trigger;
@@ -39,18 +35,16 @@ private:
 public:
 	/** Constructor, initializes the triggering time
 	 * @param time_from_now The number of seconds from now to trigger the timer
-	 * @param now The time now
 	 * @param repeating Repeat this timer every time_from_now if this is true
 	 */
-	Timer(long time_from_now, time_t now = Anope::CurTime, bool repeating = false);
+	Timer(long time_from_now, bool repeating = false);
 
 	/** Constructor, initializes the triggering time
 	 * @param creator The creator of the timer
 	 * @param time_from_now The number of seconds from now to trigger the timer
-	 * @param now The time now
 	 * @param repeating Repeat this timer every time_from_now if this is true
 	 */
-	Timer(Module *creator, long time_from_now, time_t now = Anope::CurTime, bool repeating = false);
+	Timer(Module *creator, long time_from_now, bool repeating = false);
 
 	/** Destructor, removes the timer from the list
 	 */
@@ -80,11 +74,6 @@ public:
 	 * @return The interval
 	 */
 	long GetSecs() const;
-
-	/** Returns the time this timer was created
-	 * @return The time this timer was created
-	 */
-	time_t GetSetTime() const;
 
 	/** Returns the owner of this timer, if any
 	 * @return The owner of the timer

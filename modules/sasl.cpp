@@ -181,7 +181,11 @@ class SASLService final
 	std::map<Anope::string, SASL::Session *> sessions;
 
 public:
-	SASLService(Module *o) : SASL::Service(o), Timer(o, 60, Anope::CurTime, true) { }
+	SASLService(Module *o)
+		: SASL::Service(o)
+		, Timer(o, 60, true)
+		{
+		}
 
 	~SASLService() override
 	{

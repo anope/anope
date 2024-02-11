@@ -146,8 +146,14 @@ namespace DNS
 		/* Creator of this request */
 		Module *creator;
 
-		Request(Manager *mgr, Module *c, const Anope::string &addr, QueryType qt, bool cache = false) : Timer(0), Question(addr, qt), manager(mgr),
-			use_cache(cache), creator(c) { }
+		Request(Manager *mgr, Module *c, const Anope::string &addr, QueryType qt, bool cache = false)
+			: Timer(0)
+			, Question(addr, qt)
+			, manager(mgr)
+			, use_cache(cache)
+			, creator(c)
+		{
+		}
 
 		virtual ~Request()
 		{

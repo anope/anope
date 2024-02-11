@@ -45,7 +45,10 @@ class UpdateTimer final
 	: public Timer
 {
 public:
-	UpdateTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
+	UpdateTimer(time_t timeout)
+		: Timer(timeout, true)
+	{
+	}
 
 	void Tick(time_t) override
 	{
@@ -57,7 +60,10 @@ class ExpireTimer final
 	: public Timer
 {
 public:
-	ExpireTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
+	ExpireTimer(time_t timeout)
+		: Timer(timeout, true)
+	{
+	}
 
 	void Tick(time_t) override
 	{

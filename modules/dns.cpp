@@ -477,8 +477,11 @@ public:
 		int length = 0;
 
 	public:
-		Client(Manager *m, TCPSocket *l, int fd, const sockaddrs &addr) : Socket(fd, l->GetFamily()), ClientSocket(l, addr), Timer(5),
-			manager(m)
+		Client(Manager *m, TCPSocket *l, int fd, const sockaddrs &addr)
+			: Socket(fd, l->GetFamily())
+			, ClientSocket(l, addr)
+			, Timer(5)
+			, manager(m)
 		{
 			Log(LOG_DEBUG_2) << "Resolver: New client from " << addr.addr();
 		}
@@ -670,7 +673,11 @@ class MyManager final
 public:
 	std::map<unsigned short, Request *> requests;
 
-	MyManager(Module *creator) : Manager(creator), Timer(300, Anope::CurTime, true), serial(Anope::CurTime), cur_id(rand())
+	MyManager(Module *creator)
+		: Manager(creator)
+		, Timer(300, true)
+		, serial(Anope::CurTime)
+		, cur_id(rand())
 	{
 	}
 

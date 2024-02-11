@@ -25,7 +25,12 @@ class NickServCollide final
 	Reference<NickAlias> na;
 
 public:
-	NickServCollide(Module *me, NickServService *nss, User *user, NickAlias *nick, time_t delay) : Timer(me, delay), service(nss), u(user), ts(user->timestamp), na(nick)
+	NickServCollide(Module *me, NickServService *nss, User *user, NickAlias *nick, time_t delay)
+		: Timer(me, delay)
+		, service(nss)
+		, u(user)
+		, ts(user->timestamp)
+		, na(nick)
 	{
 		collides.insert(this);
 	}
@@ -65,7 +70,10 @@ class NickServHeld final
 	Reference<NickAlias> na;
 	Anope::string nick;
 public:
-	NickServHeld(Module *me, NickAlias *n, long l) : Timer(me, l), na(n), nick(na->nick)
+	NickServHeld(Module *me, NickAlias *n, long l)
+		: Timer(me, l)
+		, na(n)
+		, nick(na->nick)
 	{
 		n->Extend<bool>("HELD");
 	}
@@ -89,8 +97,10 @@ class NickServRelease final
 	Anope::string nick;
 
 public:
-	NickServRelease(Module *me, NickAlias *na, time_t delay) : User(na->nick, Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser", "user"),
-		Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost", Me->GetName()), "", "", Me, "Services Enforcer", Anope::CurTime, "", IRCD->UID_Retrieve(), NULL), Timer(me, delay), nick(na->nick)
+	NickServRelease(Module *me, NickAlias *na, time_t delay)
+		: User(na->nick, Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser", "user"), Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost", Me->GetName()), "", "", Me, "Services Enforcer", Anope::CurTime, "", IRCD->UID_Retrieve(), NULL)
+		, Timer(me, delay)
+		, nick(na->nick)
 	{
 		/* Erase the current release timer and use the new one */
 		Anope::map<NickServRelease *>::iterator nit = NickServReleases.find(this->nick);

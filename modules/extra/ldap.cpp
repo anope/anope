@@ -14,6 +14,9 @@
 #include "module.h"
 #include "modules/ldap.h"
 
+#include <condition_variable>
+#include <mutex>
+
 #ifdef _WIN32
 # include <Winldap.h>
 # include <WinBer.h>
@@ -162,7 +165,6 @@ public:
 class LDAPService final
 	: public LDAPProvider
 	, public Thread
-	, public Condition
 {
 	Anope::string server;
 	Anope::string admin_binddn;
@@ -173,6 +175,9 @@ class LDAPService final
 	time_t last_connect = 0;
 
 public:
+	std::condition_variable_any condvar;
+	std::mutex mutex;
+
 	static LDAPMod **BuildMods(const LDAPMods &attributes)
 	{
 		LDAPMod **mods = new LDAPMod*[attributes.size() + 1];
@@ -301,16 +306,16 @@ private:
 
 	void QueueRequest(LDAPRequest *r)
 	{
-		this->Lock();
+		this->mutex.lock();
 		this->queries.push_back(r);
-		this->Wakeup();
-		this->Unlock();
+		this->condvar.notify_all();
+		this->mutex.unlock();
 	}
 
 public:
 	typedef std::vector<LDAPRequest *> query_queue;
 	query_queue queries, results;
-	Mutex process_mutex; /* held when processing requests not in either queue */
+	std::mutex process_mutex; /* held when processing requests not in either queue */
 
 	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, n), server(s), admin_binddn(b), admin_pass(p)
 	{
@@ -321,7 +326,7 @@ public:
 	{
 		/* At this point the thread has stopped so we don't need to hold process_mutex */
 
-		this->Lock();
+		this->mutex.lock();
 
 		for (auto *req : this->queries)
 		{
@@ -346,7 +351,7 @@ public:
 			delete req;
 		}
 
-		this->Unlock();
+		this->mutex.unlock();
 
 		ldap_unbind_ext(this->con, NULL, NULL);
 	}
@@ -445,16 +450,16 @@ private:
 
 	void SendRequests()
 	{
-		process_mutex.Lock();
+		process_mutex.lock();
 
 		query_queue q;
-		this->Lock();
+		this->mutex.lock();
 		queries.swap(q);
-		this->Unlock();
+		this->mutex.unlock();
 
 		if (q.empty())
 		{
-			process_mutex.Unlock();
+			process_mutex.unlock();
 			return;
 		}
 
@@ -478,14 +483,14 @@ private:
 
 			BuildReply(ret, req);
 
-			this->Lock();
+			this->mutex.lock();
 			results.push_back(req);
-			this->Unlock();
+			this->mutex.unlock();
 		}
 
 		me->Notify();
 
-		process_mutex.Unlock();
+		process_mutex.unlock();
 	}
 
 public:
@@ -493,11 +498,11 @@ public:
 	{
 		while (!this->GetExitState())
 		{
-			this->Lock();
+			this->mutex.lock();
 			/* Queries can be non empty if one is pushed during SendRequests() */
 			if (queries.empty())
-				this->Wait();
-			this->Unlock();
+				this->condvar.wait(this->mutex);
+			this->mutex.unlock();
 
 			SendRequests();
 		}
@@ -527,7 +532,7 @@ public:
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end(); ++it)
 		{
 			it->second->SetExitState();
-			it->second->Wakeup();
+			it->second->condvar.notify_all();
 			it->second->Join();
 			delete it->second;
 		}
@@ -555,7 +560,7 @@ public:
 				Log(LOG_NORMAL, "ldap") << "LDAP: Removing server connection " << cname;
 
 				s->SetExitState();
-				s->Wakeup();
+				s->condvar.notify_all();
 				s->Join();
 				delete s;
 				this->LDAPServices.erase(cname);
@@ -596,8 +601,8 @@ public:
 		{
 			LDAPService *s = it->second;
 
-			s->process_mutex.Lock();
-			s->Lock();
+			s->process_mutex.lock();
+			s->mutex.lock();
 
 			for (unsigned int i = s->queries.size(); i > 0; --i)
 			{
@@ -622,8 +627,8 @@ public:
 				}
 			}
 
-			s->Unlock();
-			s->process_mutex.Unlock();
+			s->mutex.unlock();
+			s->process_mutex.unlock();
 		}
 	}
 
@@ -634,9 +639,9 @@ public:
 			LDAPService *s = it->second;
 
 			LDAPService::query_queue results;
-			s->Lock();
+			s->mutex.lock();
 			results.swap(s->results);
-			s->Unlock();
+			s->mutex.unlock();
 
 			for (const auto *req : results)
 			{

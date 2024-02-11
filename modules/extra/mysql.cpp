@@ -18,6 +18,9 @@
 # include <mysql/mysql.h>
 #endif
 
+#include <condition_variable>
+#include <mutex>
+
 using namespace SQL;
 
 /** Non blocking threaded MySQL API, based loosely from InspIRCd's m_mysql.cpp
@@ -131,7 +134,7 @@ public:
 	 * prevents us from deleting a connection while a query is executing
 	 * in the thread
 	 */
-	Mutex Lock;
+	std::mutex Lock;
 
 	MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, unsigned int po);
 
@@ -160,9 +163,11 @@ public:
  */
 class DispatcherThread final
 	: public Thread
-	, public Condition
 {
 public:
+	std::condition_variable_any condvar;
+	std::mutex mutex;
+
 	DispatcherThread() : Thread() { }
 
 	void Run() override;
@@ -201,7 +206,7 @@ public:
 		MySQLServices.clear();
 
 		DThread->SetExitState();
-		DThread->Wakeup();
+		DThread->condvar.notify_all();
 		DThread->Join();
 		delete DThread;
 	}
@@ -261,7 +266,7 @@ public:
 
 	void OnModuleUnload(User *, Module *m) override
 	{
-		this->DThread->Lock();
+		this->DThread->mutex.lock();
 
 		for (unsigned i = this->QueryRequests.size(); i > 0; --i)
 		{
@@ -271,25 +276,25 @@ public:
 			{
 				if (i == 1)
 				{
-					r.service->Lock.Lock();
-					r.service->Lock.Unlock();
+					r.service->Lock.lock();
+					r.service->Lock.unlock();
 				}
 
 				this->QueryRequests.erase(this->QueryRequests.begin() + i - 1);
 			}
 		}
 
-		this->DThread->Unlock();
+		this->DThread->mutex.unlock();
 
 		this->OnNotify();
 	}
 
 	void OnNotify() override
 	{
-		this->DThread->Lock();
+		this->DThread->mutex.lock();
 		std::deque<QueryResult> finishedRequests = this->FinishedRequests;
 		this->FinishedRequests.clear();
-		this->DThread->Unlock();
+		this->DThread->mutex.unlock();
 
 		for (const auto &qr : finishedRequests)
 		{
@@ -317,8 +322,8 @@ MySQLService::MySQLService(Module *o, const Anope::string &n, const Anope::strin
 
 MySQLService::~MySQLService()
 {
-	me->DThread->Lock();
-	this->Lock.Lock();
+	me->DThread->mutex.lock();
+	this->Lock.lock();
 	mysql_close(this->sql);
 	this->sql = NULL;
 
@@ -333,21 +338,21 @@ MySQLService::~MySQLService()
 			me->QueryRequests.erase(me->QueryRequests.begin() + i - 1);
 		}
 	}
-	this->Lock.Unlock();
-	me->DThread->Unlock();
+	this->Lock.unlock();
+	me->DThread->mutex.unlock();
 }
 
 void MySQLService::Run(Interface *i, const Query &query)
 {
-	me->DThread->Lock();
+	me->DThread->mutex.lock();
 	me->QueryRequests.push_back(QueryRequest(this, i, query));
-	me->DThread->Unlock();
-	me->DThread->Wakeup();
+	me->DThread->mutex.unlock();
+	me->DThread->condvar.notify_all();
 }
 
 Result MySQLService::RunQuery(const Query &query)
 {
-	this->Lock.Lock();
+	this->Lock.lock();
 
 	Anope::string real_query = this->BuildQuery(query);
 
@@ -365,13 +370,13 @@ Result MySQLService::RunQuery(const Query &query)
 		while (!mysql_next_result(this->sql))
 			mysql_free_result(mysql_store_result(this->sql));
 
-		this->Lock.Unlock();
+		this->Lock.unlock();
 		return MySQLResult(id, query, real_query, res);
 	}
 	else
 	{
 		Anope::string error = mysql_error(this->sql);
-		this->Lock.Unlock();
+		this->Lock.unlock();
 		return MySQLResult(query, real_query, error);
 	}
 }
@@ -536,18 +541,18 @@ Anope::string MySQLService::FromUnixtime(time_t t)
 
 void DispatcherThread::Run()
 {
-	this->Lock();
+	this->mutex.lock();
 
 	while (!this->GetExitState())
 	{
 		if (!me->QueryRequests.empty())
 		{
 			QueryRequest &r = me->QueryRequests.front();
-			this->Unlock();
+			this->mutex.unlock();
 
 			Result sresult = r.service->RunQuery(r.query);
 
-			this->Lock();
+			this->mutex.lock();
 			if (!me->QueryRequests.empty() && me->QueryRequests.front().query == r.query)
 			{
 				if (r.sqlinterface)
@@ -559,11 +564,11 @@ void DispatcherThread::Run()
 		{
 			if (!me->FinishedRequests.empty())
 				me->Notify();
-			this->Wait();
+			this->condvar.wait(this->mutex);
 		}
 	}
 
-	this->Unlock();
+	this->mutex.unlock();
 }
 
 MODULE_INIT(ModuleSQL)

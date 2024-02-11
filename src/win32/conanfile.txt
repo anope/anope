@@ -1,10 +1,10 @@
 [requires]
-libmysqlclient/8.0.31
-openssl/1.1.1t
+libmysqlclient/8.1.0
+openssl/3.2.1
 pcre2/10.42
-sqlite3/3.41.1
+sqlite3/3.45.1
 gettext/0.21
-libgettext/0.21
+libgettext/0.22
 
 [options]
 libmysqlclient/*:shared=True

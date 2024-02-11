@@ -13,41 +13,21 @@
 #include "threadengine.h"
 #include "anope.h"
 
-#ifndef _WIN32
-#include <pthread.h>
-#endif
-
-static inline pthread_attr_t *get_engine_attr()
-{
-	/* Threadengine attributes used by this thread engine */
-	static pthread_attr_t attr;
-	static bool inited = false;
-
-	if (inited == false)
-	{
-		if (pthread_attr_init(&attr))
-			throw CoreException("Error calling pthread_attr_init");
-		if (pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE))
-			throw CoreException("Unable to mark threads as joinable");
-		inited = true;
-	}
-
-	return &attr;
-}
-
 static void *entry_point(void *parameter)
 {
 	Thread *thread = static_cast<Thread *>(parameter);
 	thread->Run();
 	thread->SetExitState();
-	pthread_exit(0);
+	delete thread->handle;
+	thread->handle = nullptr;
 	return NULL;
 }
 
 void Thread::Join()
 {
 	this->SetExitState();
-	pthread_join(handle, NULL);
+	if (this->handle)
+		this->handle->join();
 }
 
 void Thread::SetExitState()
@@ -59,15 +39,24 @@ void Thread::SetExitState()
 void Thread::Exit()
 {
 	this->SetExitState();
-	pthread_exit(0);
+	if (this->handle)
+	{
+		delete this->handle;
+		this->handle = nullptr;
+	}
 }
 
 void Thread::Start()
 {
-	if (pthread_create(&this->handle, get_engine_attr(), entry_point, this))
+	try
+	{
+		if (!this->handle)
+			this->handle = new std::thread(entry_point, this);
+	}
+	catch (const std::system_error& err)
 	{
 		this->flags[SF_DEAD] = true;
-		throw CoreException("Unable to create thread: " + Anope::LastError());
+		throw CoreException("Unable to create thread: " + std::string(err.what()));
 	}
 }
 

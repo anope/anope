@@ -14,6 +14,8 @@
 #include "sockets.h"
 #include "extensible.h"
 
+#include <thread>
+
 class CoreExport Thread
 	: public Pipe
 	, public Extensible
@@ -24,7 +26,7 @@ private:
 
 public:
 	/* Handle for this thread */
-	pthread_t handle;
+	std::thread *handle = nullptr;
 
 	/** Threads destructor
 	 */

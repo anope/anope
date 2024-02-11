@@ -6,7 +6,6 @@ if(WIN32)
   list(APPEND SRC_SRCS win32/windows.cpp)
   list(APPEND SRC_SRCS win32/dl/dl.cpp)
   list(APPEND SRC_SRCS win32/pipe/pipe.cpp)
-  list(APPEND SRC_SRCS win32/pthread/pthread.cpp)
   list(APPEND SRC_SRCS win32/sigaction/sigaction.cpp)
 endif()
 

@@ -493,7 +493,9 @@ public:
 		}
 
 		/* Times out after a few seconds */
-		void Tick(time_t) override { }
+		void Tick() override
+		{
+		}
 
 		void Reply(Packet *p) override
 		{
@@ -968,7 +970,7 @@ public:
 		return serial;
 	}
 
-	void Tick(time_t now) override
+	void Tick() override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Purging DNS cache";
 
@@ -979,7 +981,7 @@ public:
 			it_next = it;
 			++it_next;
 
-			if (req.created + static_cast<time_t>(req.ttl) < now)
+			if (req.created + static_cast<time_t>(req.ttl) < Anope::CurTime)
 				this->cache.erase(it);
 		}
 	}

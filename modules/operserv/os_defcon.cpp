@@ -123,7 +123,7 @@ public:
 		timeout = NULL;
 	}
 
-	void Tick(time_t) override
+	void Tick() override
 	{
 		if (DConfig.defaultlevel != level)
 		{

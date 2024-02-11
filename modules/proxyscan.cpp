@@ -216,7 +216,7 @@ class ModuleProxyScan final
 		{
 		}
 
-		void Tick(time_t) override
+		void Tick() override
 		{
 			for (std::set<ProxyConnect *>::iterator it = ProxyConnect::proxies.begin(), it_end = ProxyConnect::proxies.end(); it != it_end;)
 			{

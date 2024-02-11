@@ -50,7 +50,7 @@ public:
 	{
 	}
 
-	void Tick(time_t) override
+	void Tick() override
 	{
 		Anope::SaveDatabases();
 	}
@@ -65,7 +65,7 @@ public:
 	{
 	}
 
-	void Tick(time_t) override
+	void Tick() override
 	{
 		FOREACH_MOD(OnExpireTick, ());
 	}
@@ -176,7 +176,7 @@ int main(int ac, char **av, char **envp)
 		/* Process timers */
 		if (Anope::CurTime - last_check >= Config->TimeoutCheck)
 		{
-			TimerManager::TickTimers(Anope::CurTime);
+			TimerManager::TickTimers();
 			last_check = Anope::CurTime;
 		}
 

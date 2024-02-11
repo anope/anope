@@ -340,7 +340,7 @@ public:
 		this->SendMessage(session, "M", buf.empty() ? "" : buf.substr(1));
 	}
 
-	void Tick(time_t) override
+	void Tick() override
 	{
 		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end();)
 		{

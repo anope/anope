@@ -30,7 +30,7 @@ public:
 	{
 	}
 
-	void Tick(time_t ctime) override
+	void Tick() override
 	{
 		Channel *c = Channel::Find(this->channel);
 		if (c)

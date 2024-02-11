@@ -83,7 +83,7 @@ public:
 		{
 		}
 
-		void Tick(time_t) override
+		void Tick() override
 		{
 			Channel *c = Channel::Find(chname);
 			if (c)

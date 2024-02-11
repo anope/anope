@@ -26,7 +26,7 @@ public:
 	{
 	}
 
-	void Tick(time_t) override
+	void Tick() override
 	{
 		try
 		{

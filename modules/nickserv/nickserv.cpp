@@ -50,7 +50,7 @@ public:
 		return na;
 	}
 
-	void Tick(time_t t) override
+	void Tick() override
 	{
 		if (!u || !na)
 			return;
@@ -78,7 +78,7 @@ public:
 		n->Extend<bool>("HELD");
 	}
 
-	void Tick(time_t) override
+	void Tick() override
 	{
 		if (na)
 			na->Shrink<bool>("HELD");
@@ -121,7 +121,9 @@ public:
 		NickServReleases.erase(this->nick);
 	}
 
-	void Tick(time_t t) override { }
+	void Tick() override
+	{
+	}
 };
 
 class NickServCore final

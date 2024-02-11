@@ -83,7 +83,7 @@ public:
 	/** Called when the timer ticks
 	 * This should be overridden with something useful
 	 */
-	virtual void Tick(time_t ctime) = 0;
+	virtual void Tick() = 0;
 };
 
 /** This class manages sets of Timers, and triggers them at their defined times.
@@ -109,7 +109,7 @@ public:
 	/** Tick all pending timers
 	 * @param ctime The current time
 	 */
-	static void TickTimers(time_t ctime = Anope::CurTime);
+	static void TickTimers();
 
 	/** Deletes all timers owned by the given module
 	 */

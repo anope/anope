@@ -89,20 +89,20 @@ void TimerManager::DelTimer(Timer *t)
 	}
 }
 
-void TimerManager::TickTimers(time_t ctime)
+void TimerManager::TickTimers()
 {
 	while (!Timers.empty())
 	{
 		std::multimap<time_t, Timer *>::iterator it = Timers.begin();
 		Timer *t = it->second;
 
-		if (t->GetTimer() > ctime)
+		if (t->GetTimer() > Anope::CurTime)
 			break;
 
-		t->Tick(ctime);
+		t->Tick();
 
 		if (t->GetRepeat())
-			t->SetTimer(ctime + t->GetSecs());
+			t->SetTimer(Anope::CurTime + t->GetSecs());
 		else
 			delete t;
 	}

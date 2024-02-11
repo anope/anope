@@ -1010,7 +1010,7 @@ public:
 	{
 	}
 
-	void Tick(time_t) override
+	void Tick() override
 	{
 		Log(LOG_DEBUG) << "bs_main: Running bandata purger";
 

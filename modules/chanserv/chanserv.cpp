@@ -75,7 +75,7 @@ public:
 			/** Called when the delay is up
 			 * @param The current time
 			 */
-			void Tick(time_t) override
+			void Tick() override
 			{
 				if (!c)
 					return;

@@ -21,7 +21,7 @@ class ReconnectTimer final
 	: public Timer
 {
 public:
-	ReconnectTimer(int wait)
+	ReconnectTimer(time_t wait)
 		: Timer(wait)
 	{
 	}

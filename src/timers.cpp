@@ -11,20 +11,20 @@
 
 std::multimap<time_t, Timer *> TimerManager::Timers;
 
-Timer::Timer(long time_from_now, bool repeating)
+Timer::Timer(time_t time_from_now, bool repeating)
 {
 	owner = NULL;
-	trigger = Anope::CurTime + time_from_now;
+	trigger = Anope::CurTime + std::abs(time_from_now);
 	secs = time_from_now;
 	repeat = repeating;
 
 	TimerManager::AddTimer(this);
 }
 
-Timer::Timer(Module *creator, long time_from_now, bool repeating)
+Timer::Timer(Module *creator, time_t time_from_now, bool repeating)
 {
 	owner = creator;
-	trigger = Anope::CurTime + time_from_now;
+	trigger = Anope::CurTime + std::abs(time_from_now);
 	secs = time_from_now;
 	repeat = repeating;
 

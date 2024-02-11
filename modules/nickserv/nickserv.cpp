@@ -70,7 +70,7 @@ class NickServHeld final
 	Reference<NickAlias> na;
 	Anope::string nick;
 public:
-	NickServHeld(Module *me, NickAlias *n, long l)
+	NickServHeld(Module *me, NickAlias *n, time_t l)
 		: Timer(me, l)
 		, na(n)
 		, nick(na->nick)

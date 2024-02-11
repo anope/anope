@@ -211,7 +211,7 @@ class ModuleProxyScan final
 		: public Timer
 	{
 	public:
-		ConnectionTimeout(Module *c, long timeout)
+		ConnectionTimeout(Module *c, time_t timeout)
 			: Timer(c, timeout, true)
 		{
 		}

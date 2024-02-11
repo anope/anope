@@ -24,9 +24,9 @@ private:
 	 */
 	time_t trigger;
 
-	/** Numer of seconds between triggers
+	/** Number of seconds between triggers
 	 */
-	long secs;
+	time_t secs;
 
 	/** True if this is a repeating timer
 	 */
@@ -37,14 +37,14 @@ public:
 	 * @param time_from_now The number of seconds from now to trigger the timer
 	 * @param repeating Repeat this timer every time_from_now if this is true
 	 */
-	Timer(long time_from_now, bool repeating = false);
+	Timer(time_t time_from_now, bool repeating = false);
 
 	/** Constructor, initializes the triggering time
 	 * @param creator The creator of the timer
 	 * @param time_from_now The number of seconds from now to trigger the timer
 	 * @param repeating Repeat this timer every time_from_now if this is true
 	 */
-	Timer(Module *creator, long time_from_now, bool repeating = false);
+	Timer(Module *creator, time_t time_from_now, bool repeating = false);
 
 	/** Destructor, removes the timer from the list
 	 */

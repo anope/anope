@@ -1,5 +1,5 @@
-Anope Version 2.0.15-git
-------------------------
+Anope Version 2.0.15
+--------------------
 Fixed a race condition in changing the nick of a user.
 Fixed being able to reset the password of suspended accounts.
 Fixed chanserv/suspend info not being visible to regular users.

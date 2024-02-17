@@ -29,6 +29,8 @@ class CommandNSResetPass : public Command
 
 		if (!(na = NickAlias::Find(params[0])))
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
+		else if (na->nc->HasExt("NS_SUSPENDED"))
+			source.Reply(NICK_X_SUSPENDED, na->nc->display.c_str());
 		else if (!na->nc->email.equals_ci(params[1]))
 			source.Reply(_("Incorrect email address."));
 		else
@@ -89,6 +91,12 @@ class NSResetPass : public Module
 			if (na && ri)
 			{
 				NickCore *nc = na->nc;
+				if (nc->HasExt("NS_SUSPENDED"))
+				{
+					source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
+					return EVENT_STOP;
+				}
+
 				const Anope::string &passcode = params[1];
 				if (ri->time < Anope::CurTime - 3600)
 				{

@@ -1,6 +1,14 @@
 Anope Version 2.0.15-git
 ------------------------
-No significant changes.
+Fixed a race condition in changing the nick of a user.
+Fixed being able to reset the password of suspended accounts.
+Fixed chanserv/suspend info not being visible to regular users.
+Fixed removing entries by an alias in chanserv/access and chanserv/xop.
+Fixed various grammar issues in messages.
+Made the SASL PLAIN implementation more robust.
+Updated the Dutch translation.
+Updated the French translation.
+Updated the Turkish translation.
 
 Anope Version 2.0.14
 --------------------

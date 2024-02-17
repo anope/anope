@@ -1,6 +1,6 @@
 /* ircd-hybrid protocol module. Minimum supported version of ircd-hybrid is 8.2.23.
  *
- * (C) 2003-2023 Anope Team <team@anope.org>
+ * (C) 2003-2024 Anope Team <team@anope.org>
  * (C) 2012-2022 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.

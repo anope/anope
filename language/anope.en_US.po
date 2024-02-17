@@ -1,5 +1,5 @@
 # Anope IRC Services language file
-# Copyright (C) 2014-2020
+# Copyright (C) 2014-2024
 # This file is distributed under the same license as the Anope IRC Services package.
 # Adam <adam@anope.org>, 2014.
 #

@@ -14,11 +14,16 @@
 class CommandCSDrop final
 	: public Command
 {
+private:
+	PrimitiveExtensibleItem<Anope::string> dropcode;
+
 public:
-	CommandCSDrop(Module *creator) : Command(creator, "chanserv/drop", 1, 2)
+	CommandCSDrop(Module *creator)
+		: Command(creator, "chanserv/drop", 1, 2)
+		, dropcode(creator, "dropcode")
 	{
 		this->SetDesc(_("Cancel the registration of a channel"));
-		this->SetSyntax(_("\037channel\037 \037channel\037"));
+		this->SetSyntax(_("\037channel\037 [\037code\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -38,22 +43,33 @@ public:
 			return;
 		}
 
-		if (params.size() < 2 || !chan.equals_ci(params[1]))
-		{
-			source.Reply(_("You must enter the channel name twice as a confirmation that you wish to drop \002%s\002."), chan.c_str());
-			return;
-		}
-
 		if ((ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && !source.HasCommand("chanserv/drop"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
+		auto *code = dropcode.Get(ci);
+		if (params.size() < 2 || !code || !code->equals_ci(params[1]))
+		{
+			if (!code)
+			{
+				code = ci->Extend<Anope::string>("dropcode");
+				*code = Anope::Random(15);
+			}
+
+			source.Reply(_("Please confirm that you want to drop \002%s\002 with with \002DROP %s %s\002."),
+				chan.c_str(), chan.c_str(), code->c_str());
+			return;
+		}
+
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnChanDrop, MOD_RESULT, (source, ci));
 		if (MOD_RESULT == EVENT_STOP)
+		{
+			dropcode.Unset(ci);
 			return;
+		}
 
 		bool override = (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"));
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "(founder was: " << (ci->GetFounder() ? ci->GetFounder()->display : "none") << ")";

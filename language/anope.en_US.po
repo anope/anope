@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-08 13:20+0000\n"
-"PO-Revision-Date: 2024-01-08 13:26+0000\n"
+"POT-Creation-Date: 2024-02-19 22:16+0000\n"
+"PO-Revision-Date: 2024-02-19 22:17+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -496,9 +496,6 @@ msgstr "channel"
 msgid "channel bantype"
 msgstr "channel bantype"
 
-msgid "channel channel"
-msgstr "channel channel"
-
 msgid "channel command method [status]"
 msgstr "channel command method [status]"
 
@@ -600,6 +597,9 @@ msgstr "channel VIEW [mask | entry-num | list]"
 
 msgid "channel VIEW [mask | list]"
 msgstr "channel VIEW [mask | list]"
+
+msgid "channel [code]"
+msgstr "channel [code]"
 
 msgid "channel [description]"
 msgstr "channel [description]"
@@ -5399,6 +5399,10 @@ msgstr "Peace option for %s is now on."
 msgid "Persistent"
 msgstr "Persistent"
 
+#, c-format
+msgid "Please confirm that you want to drop %s with with DROP %s %s."
+msgstr "Please confirm that you want to drop %s with with DROP %s %s."
+
 msgid "Please contact an Operator to get a vHost assigned to this nick."
 msgstr "Please contact an Operator to get a vHost assigned to this nick."
 
@@ -8621,10 +8625,6 @@ msgstr "You must confirm your account before you may request a vhost."
 
 msgid "You must confirm your account before you may send a memo."
 msgstr "You must confirm your account before you may send a memo."
-
-#, c-format
-msgid "You must enter the channel name twice as a confirmation that you wish to drop %s."
-msgstr "You must enter the channel name twice as a confirmation that you wish to drop %s."
 
 #, c-format
 msgid "You must have been using this nick for at least %lu seconds to register."

@@ -425,7 +425,7 @@ static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi)
 	if (code == NULL)
 	{
 		code = na->nc->Extend<Anope::string>("passcode");
-		*code = Anope::Random(9);
+		*code = Anope::Random(15);
 	}
 
 	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("registration_subject").c_str()),

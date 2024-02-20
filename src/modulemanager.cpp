@@ -435,43 +435,62 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 	{
 		/* Dummy value */
 		case PRIORITY_DONTCARE:
+		{
 			swap = false;
 			break;
+		}
 		/* Module wants to be first, sod everything else */
 		case PRIORITY_FIRST:
+		{
 			swap_pos = 0;
 			break;
+		}
 		/* Module is submissive and wants to be last... awww. */
 		case PRIORITY_LAST:
+		{
 			if (EventHandlers[i].empty())
 				swap_pos = 0;
 			else
 				swap_pos = EventHandlers[i].size() - 1;
 			break;
+		}
 		/* Place this module after a set of other modules */
 		case PRIORITY_AFTER:
+		{
 			/* Find the latest possible position */
 			swap_pos = 0;
 			swap = false;
 			for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
+			{
 				for (size_t n = 0; n < sz; ++n)
+				{
 					if (modules[n] && EventHandlers[i][x] == modules[n] && x >= swap_pos && source <= swap_pos)
 					{
 						swap_pos = x;
 						swap = true;
 					}
+				}
+			}
 			break;
+		}
 		/* Place this module before a set of other modules */
 		case PRIORITY_BEFORE:
+		{
 			swap_pos = EventHandlers[i].size() - 1;
 			swap = false;
 			for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
+			{
 				for (size_t n = 0; n < sz; ++n)
+				{
 					if (modules[n] && EventHandlers[i][x] == modules[n] && x <= swap_pos && source >= swap_pos)
 					{
 						swap = true;
 						swap_pos = x;
 					}
+				}
+			}
+			break;
+		}
 	}
 
 	/* Do we need to swap? */

@@ -450,6 +450,16 @@ Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 	return Entry("", mask).GetNUHMask();
 }
 
+bool IRCDProto::IsExtban(const Anope::string &mname, const Anope::string &mmask)
+{
+	return std::find(extbanNames.begin(), extbanNames.end(), mname) != extbanNames.end();
+}
+
+void IRCDProto::AddExtban(const Anope::string &mname)
+{
+	extbanNames.push_back(mname);
+}
+
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
 {
 	/* no source for incoming message is our uplink */

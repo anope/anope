@@ -299,6 +299,15 @@ class ModuleLDAPAuthentication : public Module
 		Anope::string new_dn = username_attribute + "=" + na->nick + "," + basedn;
 		this->ldap->Add(&this->orinterface, new_dn, attributes);
 	}
+
+	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
+	{
+		// We can't let nicks expire if they still have a group or
+		// there will be a zombie account left over that can't be
+		// authenticated to.
+		if (na->nick == na->nc->display && na->nc->aliases->size() > 1)
+			expire = false;
+	}
 };
 
 MODULE_INIT(ModuleLDAPAuthentication)

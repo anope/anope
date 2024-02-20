@@ -143,6 +143,15 @@ class ModuleSQLAuthentication : public Module
 
 		Log(LOG_DEBUG) << "m_sql_authentication: Checking authentication for " << req->GetAccount();
 	}
+
+	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
+	{
+		// We can't let nicks expire if they still have a group or
+		// there will be a zombie account left over that can't be
+		// authenticated to.
+		if (na->nick == na->nc->display && na->nc->aliases->size() > 1)
+			expire = false;
+	}
 };
 
 MODULE_INIT(ModuleSQLAuthentication)

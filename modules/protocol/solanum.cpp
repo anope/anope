@@ -75,12 +75,13 @@ public:
 		for (const auto &mechanism : mechanisms)
 			mechlist += "," + mechanism;
 
-		UplinkSocket::Message(Me) << "ENCAP * MECHLIST :" << (mechanisms.empty() ? "" : mechlist.substr(1));
+		Uplink::Send("ENCAP", '*', "MECHLIST", mechanisms.empty() ? "" : mechlist.substr(1));
 	}
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
+
 		/*
 		 * Received: CAPAB :BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN
 		 *           KNOCK MLOCK QS RSFNC SAVE SERVICES TB UNKLN
@@ -105,7 +106,7 @@ public:
 		 * UNKLN    - Can do UNKLINE (encap only)
 		 * QS       - Can handle quit storm removal
 		*/
-		UplinkSocket::Message() << "CAPAB :BAN CHW CLUSTER ECHO ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN";
+		Uplink::Send("CAPAB", "BAN CHW CLUSTER ECHO ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN");
 
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
@@ -117,34 +118,32 @@ public:
 		 *  arg[2] = '0'
 		 *  arg[3] = server's idea of UTC time
 		 */
-		UplinkSocket::Message() << "SVINFO 6 6 0 :" << Anope::CurTime;
+		Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
 	}
 
 	void SendClientIntroduction(User *u) override
 	{
-		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me) << "EUID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " * * :" << u->realname;
+		Uplink::Send("EUID", u->nick, 1, u->timestamp, "+" + u->GetModes(), u->GetIdent(), u->host, 0, u->GetUID(), '*', '*', u->realname);
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP " << u->server->GetName() << " RSFNC " << u->GetUID()
-						<< " " << newnick << " " << when << " " << u->timestamp;
+		Uplink::Send("ENCAP", u->server->GetName(), "RSFNC", u->GetUID(), newnick, when, u->timestamp);
 	}
 
 	void SendSVSHold(const Anope::string &nick, time_t delay) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * NICKDELAY " << delay << " " << nick;
+		Uplink::Send("ENCAP", '*', "NICKDELAY", delay, nick);
 	}
 
 	void SendSVSHoldDel(const Anope::string &nick) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * NICKDELAY 0 " << nick;
+		Uplink::Send("ENCAP", '*', "NICKDELAY", 0, nick);
 	}
 
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * CHGHOST " << u->GetUID() << " :" << host;
+		Uplink::Send("ENCAP", '*', "CHGHOST", u->GetUID(), host);
 	}
 
 	void SendVhostDel(User *u) override
@@ -155,19 +154,21 @@ public:
 	void SendSASLMessage(const SASL::Message &message) override
 	{
 		Server *s = Server::Find(message.target.substr(0, 3));
-		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : message.target.substr(0, 3)) << " SASL " << message.source << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : (" " + message.ext));
+		auto target = s ? s->GetName() : message.target.substr(0, 3);
+		if (message.ext.empty())
+			Uplink::Send("ENCAP", target, "SASL", message.source, message.target, message.type, message.data);
+		else
+			Uplink::Send("ENCAP", target, "SASL", message.source, message.target, message.type, message.data, message.ext);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
 	{
 		Server *s = Server::Find(uid.substr(0, 3));
 
-		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : uid.substr(0, 3)) << " SVSLOGIN " << uid << " * "
-			<< (na && !na->GetVhostIdent().empty() ? na->GetVhostIdent() : '*')
-			<< " "
-			<< (na && !na->GetVhostHost().empty() ? na->GetVhostHost() : '*')
-			<< " "
-			<< (na ? na->nc->display : "0");
+		Uplink::Send("ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, '*',
+			na && !na->GetVhostIdent().empty() ? na->GetVhostIdent() : '*',
+			na && !na->GetVhostHost().empty() ? na->GetVhostHost() : '*',
+			na ? na->nc->display : "0");
 	}
 };
 
@@ -295,7 +296,7 @@ struct IRCDMessageNotice final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		if (Servers::Capab.count("ECHO"))
-			UplinkSocket::Message(Me) << "ECHO N " << source.GetSource() << " :"  << params[1];
+			Uplink::Send("ECHO", 'N', source.GetSource(), params[1]);
 
 		Message::Notice::Run(source, params, tags);
 	}
@@ -309,7 +310,7 @@ struct IRCDMessagePrivmsg final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		if (Servers::Capab.count("ECHO"))
-			UplinkSocket::Message(Me) << "ECHO P " << source.GetSource() << " :"  << params[1];
+			Uplink::Send("ECHO", 'P', source.GetSource(), params[1]);
 
 		Message::Privmsg::Run(source, params, tags);
 	}
@@ -424,15 +425,15 @@ public:
 		// If the user has logged into their current nickname then mark them as such.
 		NickAlias *na = NickAlias::Find(u->nick);
 		if (na && na->nc == u->Account())
-			UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " " << u->nick;
+			Uplink::Send("ENCAP", '*', "IDENTIFIED", u->GetUID(), u->nick);
 		else
-			UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " " << u->nick << " OFF";
+			Uplink::Send("ENCAP", '*', "IDENTIFIED", u->GetUID(), u->nick, "OFF");
 	}
 
 	void OnNickLogout(User *u) override
 	{
 		// We don't know what account the user was logged into so send in all cases.
-		UplinkSocket::Message(Me) << "ENCAP * IDENTIFIED " << u->GetUID() << " " << u->nick << " OFF";
+		Uplink::Send("ENCAP", '*', "IDENTIFIED", u->GetUID(), u->nick, "OFF");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) override
@@ -457,7 +458,7 @@ public:
 		if (use_server_side_mlock && modelocks && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(c->creation_time) << " " << c->ci->name << " " << modes;
+			Uplink::Send("MLOCK", c->creation_time, c->ci->name, modes);
 		}
 	}
 
@@ -468,7 +469,7 @@ public:
 		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
+			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -481,7 +482,7 @@ public:
 		if (use_server_side_mlock && cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
+			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
 		}
 
 		return EVENT_CONTINUE;

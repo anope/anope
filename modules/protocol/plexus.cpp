@@ -52,12 +52,12 @@ public:
 
 	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "OPERWALL :" << buf;
+		Uplink::Send(source, "OPERWALL", buf);
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << user->GetUID();
+		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), user->GetUID());
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -80,14 +80,15 @@ public:
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP " << u->server->GetName() << " SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
+		Uplink::Send("ENCAP", u->server->GetName(), "SVSNICK", u->GetUID(), u->timestamp, newnick, when);
 	}
 
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
 	{
 		if (!ident.empty())
-			UplinkSocket::Message(Me) << "ENCAP * CHGIDENT " << u->GetUID() << " " << ident;
-		UplinkSocket::Message(Me) << "ENCAP * CHGHOST " << u->GetUID() << " " << host;
+			Uplink::Send("ENCAP", '*', "CHGIDENT", u->GetUID(), ident);
+
+		Uplink::Send("ENCAP", '*', "CHGHOST", u->GetUID(), host);
 		u->SetMode(Config->GetClient("HostServ"), "CLOAK");
 	}
 
@@ -98,7 +99,8 @@ public:
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
+
 		/* CAPAB
 		 * QS     - Can handle quit storm removal
 		 * EX     - Can do channel +e exemptions
@@ -119,7 +121,8 @@ public:
 		 * ENCAP  - Supports encapsulation of protocol messages
 		 * SVS    - Supports services protocol extensions
 		 */
-		UplinkSocket::Message() << "CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS";
+		Uplink::Send("CAPAB", "QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS");
+
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
 		/*
@@ -130,13 +133,12 @@ public:
 		 *	  parv[3] = server is standalone or connected to non-TS only
 		 *	  parv[4] = server's idea of UTC time
 		 */
-		UplinkSocket::Message() << "SVINFO 6 5 0 :" << Anope::CurTime;
+		Uplink::Send("SVINFO", 6, 5, 0, Anope::CurTime);
 	}
 
 	void SendClientIntroduction(User *u) override
 	{
-		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 255.255.255.255 " << u->GetUID() << " 0 " << u->host << " :" << u->realname;
+		Uplink::Send("UID", u->nick, 1, u->timestamp, "+" + u->GetModes(), u->GetIdent(), u->host, "255.255.255.255", u->GetUID(), 0, u->host, u->realname);
 	}
 
 	void SendModeInternal(const MessageSource &source, User* u, const Anope::string &modes, const std::vector<Anope::string> &values) override
@@ -148,45 +150,48 @@ public:
 
 	void SendLogin(User *u, NickAlias *na) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->nc->display;
+		Uplink::Send("ENCAP", '*', "SU", u->GetUID(), na->nc->display);
 	}
 
 	void SendLogout(User *u) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
+		Uplink::Send("ENCAP", '*', "SU", u->GetUID());
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		UplinkSocket::Message(source) << "ENCAP * TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
+		Uplink::Send(source, "ENCAP", '*', "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
 	}
 
 	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
 	{
-		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSJOIN " << user->GetUID() << " " << chan;
+		Uplink::Send(source, "ENCAP", '*', "SVSJOIN", user->GetUID(), chan);
 	}
 
 	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
 	{
-		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSPART " << user->GetUID() << " " << chan;
+		Uplink::Send(source, "ENCAP", '*', "SVSPART", user->GetUID(), chan);
 	}
 
 	void SendSASLMessage(const SASL::Message &message) override
 	{
 		Server *s = Server::Find(message.target.substr(0, 3));
-		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : message.target.substr(0, 3)) << " SASL " << message.source << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : (" " + message.ext));
+		auto target = s ? s->GetName() : message.target.substr(0, 3);
+		if (message.ext.empty())
+			Uplink::Send("ENCAP", target, "SASL", message.source, message.target, message.type, message.data);
+		else
+			Uplink::Send("ENCAP", target, "SASL", message.source, message.target, message.type, message.data, message.ext);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
 	{
 		Server *s = Server::Find(uid.substr(0, 3));
-		UplinkSocket::Message(Me) << "ENCAP " << (s ? s->GetName() : uid.substr(0, 3)) << " SVSLOGIN " << uid << " * * "
-			<< (na->GetVhostHost().empty() ? "*" : na->GetVhostHost()) << " " << na->nc->display;
+		Uplink::Send("ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, '*', '*', na->GetVhostHost().empty() ? "*" : na->GetVhostHost(), na->nc->display);
 	}
 
 	void SendSVSNOOP(const Server *server, bool set) override
 	{
-		UplinkSocket::Message() << "ENCAP " << server->GetName() << " SVSNOOP " << (set ? "+" : "-");
+		Uplink::Send("ENCAP", '*', "SVSNOOP", set ? '+' : '-');
 	}
 };
 

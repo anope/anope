@@ -35,58 +35,59 @@ public:
 	{
 		// Calculate the time left before this would expire
 		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
-		UplinkSocket::Message(Me) << "GLINE " << x->mask << " " << timeleft << " :" << x->GetReason() << " (" << x->by << ")";
+		Uplink::Send("GLINE", x->mask, timeleft, x->GetReason() + " (" + x->by + ")");
 	}
 
 	void SendAkillDel(const XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "GLINE " << x->mask;
+		Uplink::Send("GLINE", x->mask);
 	}
 
 	void SendChannel(Channel *c) override
 	{
-		UplinkSocket::Message(Me) << "CHANINFO " << c->name << " +" << c->GetModes(true, true);
+		Uplink::Send("CHANINFO", c->name, "+" + c->GetModes(true, true));
 	}
 
 	// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
 	void SendClientIntroduction(User *u) override
 	{
-		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me) << "NICK " << u->nick << " 1 " << u->GetIdent() << " " << u->host << " 1 " << modes << " :" << u->realname;
+		Uplink::Send("NICK", u->nick, 1, u->GetIdent(), u->host, 1, "+" + u->GetModes(), u->realname);
 	}
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " 0210-IRC+ Anope|" << Anope::VersionShort() << ":CLHMSo P";
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "0210-IRC+", "Anope|" + Anope::VersionShort(), "CLHMSo P");
+
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
+
 		/* finish the enhanced server handshake and register the connection */
 		this->SendNumeric(376, "*", "End of MOTD command");
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
-		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick;
+		Uplink::Send("SVSNICK", u->nick, newnick);
 	}
 
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
 	}
 
 	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
 
 	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "WALLOPS :" << buf;
+		Uplink::Send(source, "WALLOPS", buf);
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		UplinkSocket::Message(user) << "JOIN " << c->name;
+		Uplink::Send(user, "JOIN", c->name);
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -109,26 +110,26 @@ public:
 
 	void SendLogin(User *u, NickAlias *na) override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
+		Uplink::Send("METADATA", u->GetUID(), "accountname", na->nc->display);
 	}
 
 	void SendLogout(User *u) override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
+		Uplink::Send("METADATA", u->GetUID(), "accountname", "");
 	}
 
 	/* SERVER name hop descript */
 	void SendServer(const Server *server) override
 	{
-		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
+		Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
 	}
 
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
 	{
 		if (!vIdent.empty())
-			UplinkSocket::Message(Me) << "METADATA " << u->nick << " user :" << vIdent;
+			Uplink::Send("METADATA", u->nick, "user", vIdent);
 
-		UplinkSocket::Message(Me) << "METADATA " << u->nick << " cloakhost :" << vhost;
+		Uplink::Send("METADATA", u->nick, "cloakhost", vhost);
 		if (!u->HasMode("CLOAK"))
 		{
 			u->SetMode(Config->GetClient("HostServ"), "CLOAK");

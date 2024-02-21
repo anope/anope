@@ -43,45 +43,44 @@ public:
 
 	void SendInvite(const MessageSource &source, const Channel *c, User *u) override
 	{
-		UplinkSocket::Message(source) << "INVITE " << u->GetUID() << " " << c->name << " " << c->creation_time;
+		Uplink::Send(source, "INVITE", u->GetUID(), c->name, c->creation_time);
 	}
 
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "NOTICE $$" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "NOTICE", "$$" + dest->GetName(), msg);
 	}
 
 	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "PRIVMSG $$" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "PRIVMSG", "$$" + dest->GetName(), msg);
 	}
 
 	void SendSQLine(User *, const XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "RESV * " << (x->expires ? x->expires - Anope::CurTime : 0) << " " << x->mask << " :" << x->reason;
+		Uplink::Send("RESV", '*', x->expires ? x->expires - Anope::CurTime : 0, x->mask, x->reason);
 	}
 
 	void SendSGLineDel(const XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "UNXLINE * " << x->mask;
+		Uplink::Send("UNXLINE", '*', x->mask);
 	}
 
 	void SendSGLine(User *, const XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "XLINE * " << x->mask << " " << (x->expires ? x->expires - Anope::CurTime : 0) << " :" << x->GetReason();
+		Uplink::Send("XLINE", '*', x->mask, x->expires ? x->expires - Anope::CurTime : 0, x->GetReason());
 	}
 
 	void SendSZLineDel(const XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "UNDLINE * " << x->GetHost();
+		Uplink::Send("UNDLINE", '*', x->GetHost());
 	}
 
 	void SendSZLine(User *, const XLine *x) override
 	{
 		/* Calculate the time left before this would expire */
 		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
-
-		UplinkSocket::Message(Me) << "DLINE * " << timeleft << " " << x->GetHost() << " :" << x->GetReason();
+		Uplink::Send("DLINE", '*', timeleft, x->GetHost(), x->GetReason());
 	}
 
 	void SendAkillDel(const XLine *x) override
@@ -89,17 +88,17 @@ public:
 		if (x->IsRegex() || x->HasNickOrReal())
 			return;
 
-		UplinkSocket::Message(Me) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
+		Uplink::Send("UNKLINE", '*', x->GetUser(), x->GetHost());
 	}
 
 	void SendSQLineDel(const XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "UNRESV * " << x->mask;
+		Uplink::Send("UNRESV", '*', x->mask);
 	}
 
 	void SendJoin(User *u, Channel *c, const ChannelStatus *status) override
 	{
-		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << u->GetUID();
+		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), u->GetUID());
 
 		/*
 		 * Note that we can send this with the SJOIN but choose not to
@@ -162,21 +161,20 @@ public:
 
 		/* Calculate the time left before this would expire */
 		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
-
-		UplinkSocket::Message(Me) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
+		Uplink::Send("KLINE", '*', timeleft, x->GetUser(), x->GetHost(), x->GetReason());
 	}
 
 	void SendServer(const Server *server) override
 	{
 		if (server == Me)
-			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() + 1 << " " << server->GetSID() << " +" << " :" << server->GetDescription();
+			Uplink::Send("SERVER", server->GetName(), server->GetHops() + 1, server->GetSID(), '+', server->GetDescription());
 		else
-			UplinkSocket::Message(Me) << "SID " << server->GetName() << " " << server->GetHops() + 1 << " " << server->GetSID() << " +" << " :" << server->GetDescription();
+			Uplink::Send("SID", server->GetName(), server->GetHops() + 1, server->GetSID(), '+', server->GetDescription());
 	}
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password;
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password);
 
 		/*
 		 * TBURST - Supports topic burst
@@ -185,24 +183,21 @@ public:
 		 * RHOST  - Supports UID message with realhost information
 		 * MLOCK  - Supports MLOCK
 		 */
-		UplinkSocket::Message() << "CAPAB :ENCAP TBURST EOB RHOST MLOCK";
+		Uplink::Send("CAPAB", "ENCAP", "TBURST", "EOB", "RHOST", "MLOCK");
 
 		SendServer(Me);
 
-		UplinkSocket::Message(Me) << "SVINFO 6 6 0 :" << Anope::CurTime;
+		Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
 	}
 
 	void SendClientIntroduction(User *u) override
 	{
-		Anope::string modes = "+" + u->GetModes();
-
-		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " "
-						<< u->host << " " << u->host << " 0.0.0.0 " << u->GetUID() << " * :" << u->realname;
+		Uplink::Send("UID", u->nick, 1, u->timestamp, "+" + u->GetModes(), u->GetIdent(), u->host, u->host, "0.0.0.0", u->GetUID(), '*', u->realname);
 	}
 
 	void SendEOB() override
 	{
-		UplinkSocket::Message(Me) << "EOB";
+		Uplink::Send("EOB");
 	}
 
 	void SendModeInternal(const MessageSource &source, User* u, const Anope::string &modes, const std::vector<Anope::string> &values) override
@@ -217,7 +212,7 @@ public:
 		if (UseSVSAccount == false)
 			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", na->nc->display);
 		else
-			UplinkSocket::Message(Me) << "SVSACCOUNT " << u->GetUID() << " " << u->timestamp << " " << na->nc->display;
+			Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, na->nc->display);
 	}
 
 	void SendLogout(User *u) override
@@ -225,41 +220,40 @@ public:
 		if (UseSVSAccount == false)
 			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", '*');
 		else
-			UplinkSocket::Message(Me) << "SVSACCOUNT " << u->GetUID() << " " << u->timestamp << " *";
+			Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, '*');
 	}
 
 	void SendChannel(Channel *c) override
 	{
-		Anope::string modes = "+" + c->GetModes(true, true);
-		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
+		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), "");
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		UplinkSocket::Message(source) << "TBURST " << c->creation_time << " " << c->name << " " << c->topic_ts << " " << c->topic_setter << " :" << c->topic;
+		Uplink::Send(source, "TBURST", c->creation_time, c->name, c->topic_ts, c->topic_setter, c->topic);
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
-		UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
+		Uplink::Send("SVSNICK", u->GetUID(), u->timestamp, newnick, when);
 	}
 
 	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) override
 	{
-		UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
+		Uplink::Send(source, "SVSJOIN", u->GetUID(), chan);
 	}
 
 	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) override
 	{
 		if (!param.empty())
-			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan << " :" << param;
+			Uplink::Send("SVSPART", u->GetUID(), chan, param);
 		else
-			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan;
+			Uplink::Send("SVSPART", u->GetUID(), chan);
 	}
 
 	void SendSVSHold(const Anope::string &nick, time_t t) override
 	{
-		XLine x(nick, Me->GetName(), Anope::CurTime + t, "Being held for registered user");
+		XLine x(nick, Me->GetName(), Anope::CurTime + t, "Being held for a registered user");
 		this->SendSQLine(NULL, &x);
 	}
 
@@ -271,12 +265,12 @@ public:
 
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
 	{
-		UplinkSocket::Message(Me) << "SVSHOST " << u->GetUID() << " " << u->timestamp << " " << host;
+		Uplink::Send("SVSHOST", u->GetUID(), u->timestamp, host);
 	}
 
 	void SendVhostDel(User *u) override
 	{
-		UplinkSocket::Message(Me) << "SVSHOST " << u->GetUID() << " " << u->timestamp << " " << u->host;
+		Uplink::Send("SVSHOST", u->GetUID(), u->timestamp, u->host);
 	}
 
 	bool IsExtbanValid(const Anope::string &mask) override
@@ -460,7 +454,7 @@ struct IRCDMessageMLock final
 
 			// Mode lock string is not what we say it is?
 			if (modes != params[3])
-				UplinkSocket::Message(Me) << "MLOCK " << c->creation_time << " " << c->name << " " << Anope::CurTime << " :" << modes;
+				Uplink::Send("MLOCK", c->creation_time, c->name, Anope::CurTime, modes);
 		}
 	}
 };
@@ -847,14 +841,14 @@ public:
 		if (use_server_side_mlock && modelocks && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-			UplinkSocket::Message(Me) << "MLOCK " << c->creation_time << " " << c->ci->name << " " << Anope::CurTime << " :" << modes;
+			Uplink::Send("MLOCK", c->creation_time, c->ci->name, Anope::CurTime, modes);
 		}
 	}
 
 	void OnDelChan(ChannelInfo *ci) override
 	{
 		if (use_server_side_mlock && ci->c && Servers::Capab.count("MLOCK"))
-			UplinkSocket::Message(Me) << "MLOCK " << ci->c->creation_time << " " << ci->name << " " << Anope::CurTime << " :";
+			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, "");
 	}
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
@@ -864,7 +858,7 @@ public:
 		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			UplinkSocket::Message(Me) << "MLOCK " << ci->c->creation_time << " " << ci->name << " " << Anope::CurTime << " :" << modes;
+			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -877,7 +871,7 @@ public:
 		if (use_server_side_mlock && cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			UplinkSocket::Message(Me) << "MLOCK " << ci->c->creation_time << " " << ci->name << " " << Anope::CurTime << " :" << modes;
+			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, modes);
 		}
 
 		return EVENT_CONTINUE;

@@ -59,25 +59,25 @@ public:
 
 	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "OPERWALL :" << buf;
+		Uplink::Send(source, "OPERWALL", buf);
 	}
 
 	void SendSQLine(User *, const XLine *x) override
 	{
 		// Calculate the time left before this would expire
 		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
-
-		UplinkSocket::Message(FindIntroduced()) << "ENCAP * RESV " << timeleft << " " << x->mask << " 0 :" << x->GetReason();
+		Uplink::Send("ENCAP", '*', "RESV", timeleft, x->mask, 0, x->GetReason());
 	}
 
 	void SendSQLineDel(const XLine *x) override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "ENCAP * UNRESV " << x->mask;
+		Uplink::Send(Config->GetClient("OperServ"), "ENCAP", '*', "UNRESV", x->mask);
 	}
 
 	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS", 6, Me->GetSID());
+
 		/*
 		  QS     - Can handle quit storm removal
 		  EX     - Can do channel +e exemptions
@@ -88,9 +88,11 @@ public:
 		  TB     - supports topic burst
 		  ENCAP  - supports ENCAP
 		*/
-		UplinkSocket::Message() << "CAPAB :QS EX CHW IE GLN TB ENCAP";
+		Uplink::Send("CAPAB", "QS EX CHW IE GLN TB ENCAP");
+
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
+
 		/*
 		 * SVINFO
 		 *	  parv[0] = sender prefix
@@ -99,13 +101,12 @@ public:
 		 *	  parv[3] = server is standalone or connected to non-TS only
 		 *	  parv[4] = server's idea of UTC time
 		 */
-		UplinkSocket::Message() << "SVINFO 6 3 0 :" << Anope::CurTime;
+		Uplink::Send("SVINFO", 6, 3, 0, Anope::CurTime);
 	}
 
 	void SendClientIntroduction(User *u) override
 	{
-		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " :" << u->realname;
+		Uplink::Send("UID", u->nick, 1, u->timestamp, "+" + u->GetModes(), u->GetIdent(), u->host, 0, u->GetUID(), u->realname);
 	}
 
 	void SendLogin(User *u, NickAlias *na) override
@@ -113,12 +114,12 @@ public:
 		if (na->nc->HasExt("UNCONFIRMED"))
 			return;
 
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->nc->display;
+		Uplink::Send("ENCAP", '*', "SU", u->GetUID(), na->nc->display);
 	}
 
 	void SendLogout(User *u) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
+		Uplink::Send("ENCAP", '*', "SU", u->GetUID());
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override

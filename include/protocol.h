@@ -51,10 +51,20 @@ public:
 	 * @return If the message was well formed then true; otherwise, false.
 	 */
 	virtual bool Parse(const Anope::string &message, Anope::map<Anope::string> &tags, Anope::string &source, Anope::string &command, std::vector<Anope::string> &params);
-	virtual Anope::string Format(const Anope::string &source, const Anope::string &message);
+
+	/* Formats an outgoing message so it can be sent to the IRC server.
+	 * @param message The location to store the formatted message.
+	 * @param tags IRCv3 message tags.
+	 * @param source Source of the message.
+	 * @param command Command name.
+	 * @param params Any extra parameters.
+	 * @return If the message was formatted then true; otherwise, false.
+	 */
+	virtual bool Format(Anope::string &message, const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params);
 
 	/* Modes used by default by our clients */
 	Anope::string DefaultPseudoclientModes = "+io";
+
 	/* Can we force change a users's nick? */
 	bool CanSVSNick = false;
 
@@ -279,7 +289,7 @@ class CoreExport MessageSource final
 	Server *s = nullptr;
 
 public:
-	MessageSource(const Anope::string &);
+	explicit MessageSource(const Anope::string &);
 	MessageSource(User *u);
 	MessageSource(Server *s);
 	const Anope::string &GetName() const;

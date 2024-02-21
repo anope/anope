@@ -61,6 +61,22 @@ void Uplink::Connect()
 	UplinkSock->Connect(ip, u.port);
 }
 
+void Uplink::SendInternal(const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params)
+{
+	if (!UplinkSock)
+	{
+		Log(LOG_DEBUG) << "Attempted to send \"" << command << "\" from " << source.GetName() << " with a null uplink socket";
+		return;
+	}
+
+	Anope::string message;
+	if (!IRCD->Format(message, tags, source, command, params))
+		return;
+
+	UplinkSock->Write(message);
+	Log(LOG_RAWIO) << "Sent: " << message;
+}
+
 UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].protocol), ConnectionSocket(), BufferedSocket()
 {
 	error = false;
@@ -165,50 +181,11 @@ UplinkSocket::Message::Message(const MessageSource &src) : source(src)
 
 UplinkSocket::Message::~Message()
 {
-	Anope::string message_source;
-
-	if (this->source.GetServer() != NULL)
-	{
-		const Server *s = this->source.GetServer();
-
-		if (s != Me && !s->IsJuped())
-		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << s->GetName() << " who is not from me?";
-			return;
-		}
-
-		message_source = s->GetSID();
-	}
-	else if (this->source.GetUser() != NULL)
-	{
-		const User *u = this->source.GetUser();
-
-		if (u->server != Me && !u->server->IsJuped())
-		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << u->nick << " who is not from me?";
-			return;
-		}
-
-		const BotInfo *bi = this->source.GetBot();
-		if (bi != NULL && bi->introduced == false)
-		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << bi->nick << " when not introduced";
-			return;
-		}
-
-		message_source = u->GetUID();
-	}
-
-	if (!UplinkSock)
-	{
-		if (!message_source.empty())
-			Log(LOG_DEBUG) << "Attempted to send \"" << message_source << " " << this->buffer.str() << "\" with UplinkSock NULL";
-		else
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" with UplinkSock NULL";
-		return;
-	}
-
-	Anope::string sent = IRCD->Format(message_source, this->buffer.str());
-	UplinkSock->Write(sent);
-	Log(LOG_RAWIO) << "Sent: " << sent;
+	// This is all temporary as UplinkSocket::Message is going to to die as soon
+	// as everything is migrated to Uplink::Send.
+	Anope::map<Anope::string> tags;
+	Anope::string unused, command;
+	std::vector<Anope::string> params;
+	if (IRCD->Parse(this->buffer.str(), tags, unused, command, params))
+		Uplink::SendInternal(tags, source, command, params);
 }

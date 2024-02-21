@@ -728,6 +728,11 @@ public:
 
 /** Convert something to a string
  */
+inline Anope::string stringify(const Anope::string &x)
+{
+	return x;
+}
+
 template<typename T> inline Anope::string stringify(const T &x)
 {
 	std::ostringstream stream;

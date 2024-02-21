@@ -141,9 +141,9 @@ public:
 		this->SendVhost(u, u->GetIdent(), "");
 	}
 
-	Anope::string Format(const Anope::string &source, const Anope::string &message) override
+	bool Format(Anope::string &message, const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params) override
 	{
-		return IRCDProto::Format(source.empty() ? Me->GetSID() : source, message);
+		return IRCDProto::Format(message, tags, source.GetSource().empty() ? source : Me, command, params);
 	}
 };
 

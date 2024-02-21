@@ -123,12 +123,68 @@ bool IRCDProto::Parse(const Anope::string &buffer, Anope::map<Anope::string> &ta
 	return true;
 }
 
-Anope::string IRCDProto::Format(const Anope::string &source, const Anope::string &message)
+bool IRCDProto::Format(Anope::string &message, const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params)
 {
-	if (!source.empty())
-		return ":" + source + " " + message;
-	else
-		return message;
+	std::stringstream buffer;
+	if (CanSendTags && !tags.empty())
+	{
+		char separator = '@';
+		for (const auto &[tname, tvalue] : tags)
+		{
+			buffer << separator << tname;
+			if (!tvalue.empty())
+				buffer << '=' << tvalue;
+			separator = ';';
+		}
+		buffer << ' ';
+	}
+
+	if (source.GetServer())
+	{
+		const auto *s = source.GetServer();
+		if (s != Me && !s->IsJuped())
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << command << "\" from " << s->GetName() << " who is not from me";
+			return false;
+		}
+
+		buffer << ':' << s->GetSID() << ' ';
+	}
+	else if (source.GetUser())
+	{
+		const auto *u = source.GetUser();
+		if (u->server != Me && !u->server->IsJuped())
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << command << "\" from " << u->nick << " who is not from me";
+			return false;
+		}
+
+		const auto *bi = source.GetBot();
+		if (bi && !bi->introduced)
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << command << "\" from " << bi->nick << " when not introduced";
+			return false;
+		}
+
+		buffer << ':' << u->GetUID() << ' ';
+	}
+
+	buffer << command;
+	if (!params.empty())
+	{
+		buffer << ' ';
+		for (auto it = params.begin(); it != params.end() - 1; ++it)
+			buffer << *it << ' ';
+
+
+		const auto &last = params.back();
+		if (last.empty() || last[0] == ':' || last.find(' ') != std::string::npos)
+			buffer << ':';
+		buffer << last;
+	}
+
+	message = buffer.str();
+	return true;
 }
 
 MessageTokenizer::MessageTokenizer(const Anope::string &msg)

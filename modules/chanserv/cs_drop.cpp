@@ -58,7 +58,7 @@ public:
 				*code = Anope::Random(15);
 			}
 
-			source.Reply(_("Please confirm that you want to drop \002%s\002 with \002DROP %s %s\002."),
+			source.Reply(_("Please confirm that you want to drop \002%s\002 with \002DROP %s %s\002"),
 				chan.c_str(), chan.c_str(), code->c_str());
 			return;
 		}

@@ -21,14 +21,10 @@
 
 IRCDProto *IRCD = NULL;
 
-IRCDProto::IRCDProto(Module *creator, const Anope::string &p) : Service(creator, "IRCDProto", creator->name), proto_name(p)
+IRCDProto::IRCDProto(Module *creator, const Anope::string &p)
+	: Service(creator, "IRCDProto", creator->name)
+	, proto_name(p)
 {
-	DefaultPseudoclientModes = "+io";
-	CanSVSNick = CanSVSJoin = CanSetVHost = CanSetVIdent = CanSNLine = CanSQLine = CanSQLineChannel
-		= CanSZLine = CanSVSHold = CanCertFP = CanSendTags = CanSVSLogout = RequiresID = AmbiguousID = false;
-	MaxModes = 3;
-	MaxLine = 512;
-
 	if (IRCD == NULL)
 		IRCD = this;
 }

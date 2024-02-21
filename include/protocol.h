@@ -44,37 +44,54 @@ public:
 	virtual Anope::string Format(const Anope::string &source, const Anope::string &message);
 
 	/* Modes used by default by our clients */
-	Anope::string DefaultPseudoclientModes;
+	Anope::string DefaultPseudoclientModes = "+io";
 	/* Can we force change a users's nick? */
-	bool CanSVSNick;
+	bool CanSVSNick = false;
+
 	/* Can we force join or part users? */
-	bool CanSVSJoin;
-	/* Can we set vhosts/vidents on users? */
-	bool CanSetVHost, CanSetVIdent;
+	bool CanSVSJoin = false;
+
+	/* Can we set vhosts on users? */
+	bool CanSetVHost = false;
+
+	/* Can we set vidents on users? */
+	bool CanSetVIdent = false;
+
 	/* Can we ban specific gecos from being used? */
-	bool CanSNLine;
+	bool CanSNLine = false;
+
 	/* Can we ban specific nicknames from being used? */
-	bool CanSQLine;
+	bool CanSQLine = false;
+
 	/* Can we ban specific channel names from being used? */
-	bool CanSQLineChannel;
+	bool CanSQLineChannel = false;
+
 	/* Can we ban by IP? */
-	bool CanSZLine;
+	bool CanSZLine = false;
+
 	/* Can we place temporary holds on specific nicknames? */
-	bool CanSVSHold;
+	bool CanSVSHold = false;
+
 	/* See ns_cert */
-	bool CanCertFP;
+	bool CanCertFP = false;
+
 	/* Can we send arbitrary message tags? */
-	bool CanSendTags;
+	bool CanSendTags = false;
+
 	/* Can users log out before being fully connected? */
-	bool CanSVSLogout;
+	bool CanSVSLogout = false;
+
 	/* Whether this IRCd requires unique IDs for each user or server. See TS6/P10. */
-	bool RequiresID;
+	bool RequiresID = false;
+
 	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */
-	bool AmbiguousID;
+	bool AmbiguousID = false;
+
 	/* The maximum number of modes we are allowed to set with one MODE command */
-	unsigned MaxModes;
+	unsigned MaxModes = 3;
+
 	/* The maximum number of bytes a line may have */
-	unsigned MaxLine;
+	unsigned MaxLine = 512;
 
 	/* Retrieves the next free UID or SID */
 	virtual Anope::string UID_Retrieve();

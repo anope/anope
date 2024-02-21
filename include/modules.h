@@ -1051,9 +1051,10 @@ public:
 	 * @param source The source of the message
 	 * @param command The command being executed
 	 * @param params Parameters
+	 * @param tags Tags
 	 * @return EVENT_STOP to prevent the protocol module from processing this message
 	 */
-	virtual EventReturn OnMessage(MessageSource &source, Anope::string &command, std::vector<Anope::string> &param) { throw NotImplementedException(); }
+	virtual EventReturn OnMessage(MessageSource &source, Anope::string &command, std::vector<Anope::string> &params, Anope::map<Anope::string> &tagss) { throw NotImplementedException(); }
 
 	/** Called to determine if a channel mode can be set by a user
 	 * @param u The user

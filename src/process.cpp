@@ -54,7 +54,7 @@ void Anope::Process(const Anope::string &buffer)
 	MessageSource src(source);
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnMessage, MOD_RESULT, (src, command, params));
+	FOREACH_RESULT(OnMessage, MOD_RESULT, (src, command, params, tags));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 

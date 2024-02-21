@@ -42,7 +42,15 @@ public:
 	virtual void SendCTCPInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
 	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf);
 
-	virtual bool Parse(const Anope::string &, Anope::map<Anope::string> &, Anope::string &, Anope::string &, std::vector<Anope::string> &);
+	/** Parses an incoming message from the IRC server.
+	 * @param message The message to parse.
+	 * @param tags The location to store tags.
+	 * @param source The location to store the source.
+	 * @param command The location to store the command name.
+	 * @param params The location to store the parameters.
+	 * @return If the message was well formed then true; otherwise, false.
+	 */
+	virtual bool Parse(const Anope::string &message, Anope::map<Anope::string> &tags, Anope::string &source, Anope::string &command, std::vector<Anope::string> &params);
 	virtual Anope::string Format(const Anope::string &source, const Anope::string &message);
 
 	/* Modes used by default by our clients */

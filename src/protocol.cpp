@@ -150,14 +150,17 @@ void IRCDProto::SendCTCPInternal(const MessageSource &source, const Anope::strin
 	this->SendNoticeInternal(source, dest, "\1" + s + "\1");
 }
 
-void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf)
+void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params)
 {
 	Anope::string n = stringify(numeric);
 	if (numeric < 10)
 		n = "0" + n;
 	if (numeric < 100)
 		n = "0" + n;
-	UplinkSocket::Message(Me) << n << " " << dest << " " << buf;
+
+	auto newparams = params;
+	newparams.insert(newparams.begin(), dest);
+	Uplink::SendInternal({}, Me, n, newparams);
 }
 
 void IRCDProto::SendTopic(const MessageSource &source, Channel *c)
@@ -327,16 +330,6 @@ void IRCDProto::SendCTCP(const MessageSource &source, const Anope::string &dest,
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
 	SendCTCPInternal(source, dest, buf);
-}
-
-void IRCDProto::SendNumeric(int numeric, const Anope::string &dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendNumericInternal(numeric, dest, buf);
 }
 
 bool IRCDProto::IsNickValid(const Anope::string &nick)

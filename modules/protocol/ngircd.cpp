@@ -61,7 +61,7 @@ public:
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
 		/* finish the enhanced server handshake and register the connection */
-		this->SendNumeric(376, "*", ":End of MOTD command");
+		this->SendNumeric(376, "*", "End of MOTD command");
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override

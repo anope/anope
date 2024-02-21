@@ -296,9 +296,11 @@ public:
 		SendAddLine("G", x->GetUser() + "@" + x->GetHost(), timeleft, x->by, x->GetReason());
 	}
 
-	void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf) override
+	void SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params) override
 	{
-		UplinkSocket::Message() << "NUM " << Me->GetSID() << " " << dest << " " << numeric << " " << buf;
+		auto newparams = params;
+		newparams.insert(newparams.begin(), { Me->GetSID(), dest, numeric });
+		Uplink::SendInternal({}, Me, numeric, newparams);
 	}
 
 	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) override

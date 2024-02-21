@@ -40,7 +40,6 @@ public:
 	virtual void SendPartInternal(User *, const Channel *chan, const Anope::string &buf);
 	virtual void SendGlobopsInternal(const MessageSource &, const Anope::string &buf);
 	virtual void SendCTCPInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
-	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf);
 
 	/** Parses an incoming message from the IRC server.
 	 * @param message The message to parse.
@@ -248,7 +247,12 @@ public:
 	virtual void SendServer(const Server *) = 0;
 	virtual void SendSquit(Server *, const Anope::string &message);
 
-	virtual void SendNumeric(int numeric, const Anope::string &dest, const char *fmt, ...) ATTR_FORMAT(4, 5);
+	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params);
+	template <typename... Args>
+	void SendNumeric(int numeric, const Anope::string &dest, Args &&...args)
+	{
+		SendNumericInternal(numeric, dest, { stringify(args)... });
+	}
 
 	virtual void SendLogin(User *u, NickAlias *na) = 0;
 	virtual void SendLogout(User *u) = 0;

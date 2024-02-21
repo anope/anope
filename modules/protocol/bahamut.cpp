@@ -47,19 +47,23 @@ public:
 		MaxModes = 60;
 	}
 
-	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) override
+	void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
 		if (Servers::Capab.count("TSMODE") > 0)
 		{
-			UplinkSocket::Message(source) << "MODE " << dest->name << " " << dest->creation_time << " " << buf;
+			auto params = values;
+			params.insert(params.begin(), { chan->name, stringify(chan->creation_time), modes });
+			Uplink::SendInternal({}, source, "MODE", params);
 		}
 		else
-			IRCDProto::SendModeInternal(source, dest, buf);
+			IRCDProto::SendModeInternal(source, chan, modes, values);
 	}
 
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
+	void SendModeInternal(const MessageSource &source, User* u, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
-		UplinkSocket::Message(source) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
+		auto params = values;
+		params.insert(params.begin(), { u->nick, stringify(u->timestamp), modes });
+		Uplink::SendInternal({}, source, "SVSMODE", params);
 	}
 
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
@@ -283,12 +287,12 @@ public:
 
 	void SendLogin(User *u, NickAlias *) override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %ld", (unsigned long)u->signon);
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", u->signon);
 	}
 
 	void SendLogout(User *u) override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 1");
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", 1);
 	}
 };
 

@@ -31,8 +31,6 @@ public:
 	virtual ~IRCDProto();
 
 	virtual void SendSVSKillInternal(const MessageSource &, User *, const Anope::string &);
-	virtual void SendModeInternal(const MessageSource &, const Channel *, const Anope::string &);
-	virtual void SendModeInternal(const MessageSource &, User *, const Anope::string &);
 	virtual void SendKickInternal(const MessageSource &, const Channel *, User *, const Anope::string &);
 	virtual void SendNoticeInternal(const MessageSource &, const Anope::string &dest, const Anope::string &msg);
 	virtual void SendPrivmsgInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
@@ -167,8 +165,19 @@ public:
 	 */
 	virtual void SendSVSKill(const MessageSource &source, User *user, const char *fmt, ...) ATTR_FORMAT(4, 5);
 
-	virtual void SendMode(const MessageSource &source, const Channel *dest, const char *fmt, ...) ATTR_FORMAT(4, 5);
-	virtual void SendMode(const MessageSource &source, User *u, const char *fmt, ...) ATTR_FORMAT(4, 5);
+	virtual void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values);
+	template <typename... Args>
+	void SendMode(const MessageSource &source, Channel *chan, const Anope::string &modes, Args &&...args)
+	{
+		SendModeInternal(source, chan, modes, { stringify(args)... });
+	}
+
+	virtual void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values);
+	template <typename... Args>
+	void SendMode(const MessageSource &source, User *u, const Anope::string &modes, Args &&...args)
+	{
+		SendModeInternal(source, u, modes, { stringify(args)... });
+	}
 
 	/** Introduces a client to the rest of the network
 	 * @param u The client to introduce

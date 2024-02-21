@@ -134,10 +134,12 @@ private:
 		user->KillInternal(source, buf);
 	}
 
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
-		UplinkSocket::Message(source) << "SVS2MODE " << u->GetUID() <<" " << buf;
-	}
+		auto params = values;
+		params.insert(params.begin(), { u->GetUID(), modes });
+		Uplink::SendInternal({}, source, "SVS2MODE", params);
+}
 
 	void SendClientIntroduction(User *u) override
 	{
@@ -350,14 +352,14 @@ private:
 	{
 		/* 3.2.10.4+ treats users logged in with accounts as fully registered, even if -r, so we can not set this here. Just use the timestamp. */
 		if (Servers::Capab.count("ESVID") > 0 && !na->nc->HasExt("UNCONFIRMED"))
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", na->nc->display);
 		else
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %ld", (unsigned long)u->signon);
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", u->signon);
 	}
 
 	void SendLogout(User *u) override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 0");
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", 0);
 	}
 
 	void SendChannel(Channel *c) override

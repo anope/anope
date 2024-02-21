@@ -53,7 +53,7 @@ public:
 	void SendAkillDel(const XLine *x) override { hybrid->SendAkillDel(x); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { hybrid->SendJoin(user, c, status); }
 	void SendServer(const Server *server) override { hybrid->SendServer(server); }
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override { hybrid->SendModeInternal(source, u, buf); }
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values) override { hybrid->SendModeInternal(source, u, modes, values); }
 	void SendChannel(Channel *c) override { hybrid->SendChannel(c); }
 	bool IsIdentValid(const Anope::string &ident) override { return hybrid->IsIdentValid(ident); }
 

@@ -330,27 +330,33 @@ static StackerInfo *GetInfo(List &l, Object *o)
  * @param info The stacker info for a channel or user
  * @return a list of strings
  */
-static std::list<Anope::string> BuildModeStrings(StackerInfo *info)
+static auto BuildModeStrings(StackerInfo *info)
 {
-	std::list<Anope::string> ret;
+	std::list<std::pair<Anope::string, std::vector<Anope::string>>> ret;
 	std::list<std::pair<Mode *, Anope::string> >::iterator it, it_end;
-	Anope::string buf = "+", parambuf;
+	Anope::string buf = "+";
+	std::vector<Anope::string> parambuf;
 	unsigned NModes = 0;
+	size_t paramlen = 0;
 
 	for (it = info->AddModes.begin(), it_end = info->AddModes.end(); it != it_end; ++it)
 	{
-		if (++NModes > IRCD->MaxModes || (buf.length() + parambuf.length() > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
+		if (++NModes > IRCD->MaxModes || (buf.length() + paramlen > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
 		{
-			ret.push_back(buf + parambuf);
+			ret.push_back({buf, parambuf});
 			buf = "+";
 			parambuf.clear();
+			paramlen = 0;
 			NModes = 1;
 		}
 
 		buf += it->first->mchar;
 
 		if (!it->second.empty())
-			parambuf += " " + it->second;
+		{
+			parambuf.push_back(it->second);
+			paramlen += it->second.length() + 1;
+		}
 	}
 
 	if (buf[buf.length() - 1] == '+')
@@ -359,25 +365,29 @@ static std::list<Anope::string> BuildModeStrings(StackerInfo *info)
 	buf += "-";
 	for (it = info->DelModes.begin(), it_end = info->DelModes.end(); it != it_end; ++it)
 	{
-		if (++NModes > IRCD->MaxModes || (buf.length() + parambuf.length() > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
+		if (++NModes > IRCD->MaxModes || (buf.length() + paramlen > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
 		{
-			ret.push_back(buf + parambuf);
+			ret.push_back({buf, parambuf});
 			buf = "-";
 			parambuf.clear();
+			paramlen = 0;
 			NModes = 1;
 		}
 
 		buf += it->first->mchar;
 
 		if (!it->second.empty())
-			parambuf += " " + it->second;
+		{
+			parambuf.push_back(it->second);
+			paramlen += it->second.length() + 1;
+		}
 	}
 
 	if (buf[buf.length() - 1] == '-')
 		buf.erase(buf.length() - 1);
 
 	if (!buf.empty())
-		ret.push_back(buf + parambuf);
+		ret.push_back({buf, parambuf});
 
 	return ret;
 }
@@ -632,7 +642,7 @@ void ModeManager::ProcessModes()
 		for (const auto &[u, s] : UserStackerObjects)
 		{
 			for (const auto &modestr : BuildModeStrings(s))
-				IRCD->SendMode(s->bi, u, "%s", modestr.c_str());
+				IRCD->SendModeInternal(s->bi, u, modestr.first, modestr.second);
 			delete s;
 		}
 		UserStackerObjects.clear();
@@ -643,7 +653,7 @@ void ModeManager::ProcessModes()
 		for (const auto &[c, s] : ChannelStackerObjects)
 		{
 			for (const auto &modestr : BuildModeStrings(s))
-				IRCD->SendMode(s->bi, c, "%s", modestr.c_str());
+				IRCD->SendModeInternal(s->bi, c, modestr.first, modestr.second);
 			delete s;
 		}
 		ChannelStackerObjects.clear();
@@ -658,7 +668,7 @@ static void StackerDel(std::map<T *, StackerInfo *> &map, T *obj)
 	{
 		StackerInfo *si = it->second;
 		for (const auto &modestr : BuildModeStrings(si))
-			IRCD->SendMode(si->bi, obj, "%s", modestr.c_str());
+			IRCD->SendModeInternal(si->bi, obj, modestr.first, modestr.second);
 
 		delete si;
 		map.erase(it);

@@ -299,13 +299,15 @@ public:
 	void SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params) override
 	{
 		auto newparams = params;
-		newparams.insert(newparams.begin(), { Me->GetSID(), dest, numeric });
+		newparams.insert(newparams.begin(), { Me->GetSID(), dest, stringify(numeric) });
 		Uplink::SendInternal({}, Me, numeric, newparams);
 	}
 
-	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) override
+	void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
-		UplinkSocket::Message(source) << "FMODE " << dest->name << " " << dest->creation_time << " " << buf;
+		auto params = values;
+		params.insert(params.begin(), { chan->name, stringify(chan->creation_time), modes });
+		Uplink::SendInternal({}, source, "FMODE", params);
 	}
 
 	void SendClientIntroduction(User *u) override

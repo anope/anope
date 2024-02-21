@@ -95,14 +95,18 @@ void IRCDProto::SendSVSKillInternal(const MessageSource &source, User *user, con
 	Uplink::Send(source, "KILL", user->GetUID(), buf);
 }
 
-void IRCDProto::SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf)
+void IRCDProto::SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values)
 {
-	UplinkSocket::Message(source) << "MODE " << dest->name << " " << buf;
+	auto params = values;
+	params.insert(params.begin(), { chan->name, modes });
+	Uplink::SendInternal({}, source, "MODE", params);
 }
 
-void IRCDProto::SendModeInternal(const MessageSource &source, User *dest, const Anope::string &buf)
+void IRCDProto::SendModeInternal(const MessageSource &source, User *dest, const Anope::string &modes, const std::vector<Anope::string> &values)
 {
-	UplinkSocket::Message(source) << "MODE " << dest->GetUID() << " " << buf;
+	auto params = values;
+	params.insert(params.begin(), { dest->GetUID(), modes });
+	Uplink::SendInternal({}, source, "MODE", params);
 }
 
 void IRCDProto::SendKickInternal(const MessageSource &source, const Channel *c, User *u, const Anope::string &r)
@@ -179,26 +183,6 @@ void IRCDProto::SendSVSKill(const MessageSource &source, User *user, const char 
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
 	SendSVSKillInternal(source, user, buf);
-}
-
-void IRCDProto::SendMode(const MessageSource &source, const Channel *dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendModeInternal(source, dest, buf);
-}
-
-void IRCDProto::SendMode(const MessageSource &source, User *u, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendModeInternal(source, u, buf);
 }
 
 void IRCDProto::SendKick(const MessageSource &source, const Channel *chan, User *user, const char *fmt, ...)

@@ -205,15 +205,17 @@ public:
 		UplinkSocket::Message(Me) << "EOB";
 	}
 
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
+	void SendModeInternal(const MessageSource &source, User* u, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
-		UplinkSocket::Message(source) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
+		auto params = values;
+		params.insert(params.begin(), { u->GetUID(), stringify(u->timestamp), modes });
+		Uplink::SendInternal({}, source, "SVSMODE", params);
 	}
 
 	void SendLogin(User *u, NickAlias *na) override
 	{
 		if (UseSVSAccount == false)
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", na->nc->display);
 		else
 			UplinkSocket::Message(Me) << "SVSACCOUNT " << u->GetUID() << " " << u->timestamp << " " << na->nc->display;
 	}
@@ -221,7 +223,7 @@ public:
 	void SendLogout(User *u) override
 	{
 		if (UseSVSAccount == false)
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d *");
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", '*');
 		else
 			UplinkSocket::Message(Me) << "SVSACCOUNT " << u->GetUID() << " " << u->timestamp << " *";
 	}

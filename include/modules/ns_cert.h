@@ -54,6 +54,15 @@ public:
 	 */
 	virtual void EraseCert(const Anope::string &entry) = 0;
 
+	/** Replaces a fingerprint in the nick's certificate list
+	 *
+	 * @param oldentry The old fingerprint to remove
+	 * @param newentry The new fingerprint to add
+	 *
+	 * Replaces the specified fingerprint in the cert list.
+	 */
+	virtual void ReplaceCert(const Anope::string &oldentry, const Anope::string &newentry) = 0;
+
 	/** Clears the entire nick's cert list
 	 *
 	 * Deletes all the memory allocated in the certificate list vector and then clears the vector.

@@ -103,6 +103,19 @@ public:
 		}
 	}
 
+	void ReplaceCert(const Anope::string &oldentry, const Anope::string &newentry) override
+	{
+		auto it = std::find(this->certs.begin(), this->certs.end(), oldentry);
+		if (it == this->certs.end())
+			return; // We can't replace a non-existent cert.
+
+		FOREACH_MOD(OnNickEraseCert, (this->nc, oldentry));
+		certmap.erase(oldentry);
+		*it = newentry;
+		certmap[newentry] = nc;
+		FOREACH_MOD(OnNickAddCert, (this->nc, newentry));
+	}
+
 	/** Clears the entire nick's cert list
 	 *
 	 * Deletes all the memory allocated in the certificate list vector and then clears the vector.

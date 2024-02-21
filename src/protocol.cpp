@@ -35,11 +35,6 @@ IRCDProto::~IRCDProto()
 		IRCD = NULL;
 }
 
-const Anope::string &IRCDProto::GetProtocolName()
-{
-	return this->proto_name;
-}
-
 static inline char nextID(int pos, Anope::string &buf)
 {
 	char &c = buf[pos];

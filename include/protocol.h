@@ -25,6 +25,9 @@ class CoreExport IRCDProto
 protected:
 	IRCDProto(Module *creator, const Anope::string &proto_name);
 public:
+	/** Retrieves the protocol name. */
+	const Anope::string &GetProtocolName() const { return proto_name; }
+
 	virtual ~IRCDProto();
 
 	virtual void SendSVSKillInternal(const MessageSource &, User *, const Anope::string &);
@@ -39,7 +42,6 @@ public:
 	virtual void SendCTCPInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
 	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf);
 
-	const Anope::string &GetProtocolName();
 	virtual bool Parse(const Anope::string &, Anope::map<Anope::string> &, Anope::string &, Anope::string &, std::vector<Anope::string> &);
 	virtual Anope::string Format(const Anope::string &source, const Anope::string &message);
 

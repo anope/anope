@@ -5400,8 +5400,8 @@ msgid "Persistent"
 msgstr "Persistent"
 
 #, c-format
-msgid "Please confirm that you want to drop %s with with DROP %s %s."
-msgstr "Please confirm that you want to drop %s with with DROP %s %s."
+msgid "Please confirm that you want to drop %s with DROP %s %s"
+msgstr "Please confirm that you want to drop %s with DROP %s %s"
 
 msgid "Please contact an Operator to get a vHost assigned to this nick."
 msgstr "Please contact an Operator to get a vHost assigned to this nick."

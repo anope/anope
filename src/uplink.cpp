@@ -170,22 +170,3 @@ void UplinkSocket::OnError(const Anope::string &err)
 	Log(LOG_TERMINAL) << what << " uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << ")" << (!err.empty() ? (": " + err) : "");
 	error |= !err.empty();
 }
-
-UplinkSocket::Message::Message() : source(Me)
-{
-}
-
-UplinkSocket::Message::Message(const MessageSource &src) : source(src)
-{
-}
-
-UplinkSocket::Message::~Message()
-{
-	// This is all temporary as UplinkSocket::Message is going to to die as soon
-	// as everything is migrated to Uplink::Send.
-	Anope::map<Anope::string> tags;
-	Anope::string unused, command;
-	std::vector<Anope::string> params;
-	if (IRCD->Parse(this->buffer.str(), tags, unused, command, params))
-		Uplink::SendInternal(tags, source, command, params);
-}

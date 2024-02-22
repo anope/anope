@@ -57,22 +57,5 @@ public:
 	bool ProcessRead() override;
 	void OnConnect() override;
 	void OnError(const Anope::string &) override;
-
-	/* A message sent over the uplink socket */
-	class CoreExport [[deprecated]] Message final
-	{
-		MessageSource source;
-		std::stringstream buffer;
-
-	public:
-		Message();
-		Message(const MessageSource &);
-		~Message();
-		template<typename T> Message &operator<<(const T &val)
-		{
-			this->buffer << val;
-			return *this;
-		}
-	};
 };
 extern CoreExport UplinkSocket *UplinkSock;

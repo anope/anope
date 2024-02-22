@@ -193,6 +193,7 @@ public:
 	 */
 	void SendMessage(BotInfo *source, const char *fmt, ...) ATTR_FORMAT(3, 4);
 	void SendMessage(BotInfo *source, const Anope::string &msg) override;
+	void SendMessage(CommandSource& source, const Anope::string &msg) override;
 
 	/** Identify the user to a nick.
 	 * updates last_seen, logs the user in,

@@ -17,6 +17,11 @@
 #include "regchannel.h"
 #include "channels.h"
 
+void CommandReply::SendMessage(CommandSource& source, const Anope::string &msg)
+{
+	SendMessage(source.service, msg);
+}
+
 CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi, const Anope::string &m)
 	: nick(n)
 	, u(user)
@@ -119,7 +124,7 @@ void CommandSource::Reply(const Anope::string &message)
 	sepstream sep(translated_message, '\n', true);
 	Anope::string tok;
 	while (sep.GetToken(tok))
-		this->reply->SendMessage(this->service, tok);
+		this->reply->SendMessage(*this, tok);
 }
 
 Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(o)

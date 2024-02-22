@@ -352,6 +352,30 @@ void User::SendMessage(BotInfo *source, const Anope::string &msg)
 	}
 }
 
+void User::SendMessage(CommandSource& source, const Anope::string &msg)
+{
+	Anope::map<Anope::string> tags;
+	if (!source.msgid.empty())
+		tags["+draft/reply"] = source.msgid;
+
+	const char *translated_message = Language::Translate(this, msg.c_str());
+
+	/* Send privmsg instead of notice if:
+	* - UsePrivmsg is enabled
+	* - The user is not registered and NSDefMsg is enabled
+	* - The user is registered and has set /ns set msg on
+	*/
+	bool send_privmsg = Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasExt("MSG")));
+	sepstream sep(translated_message, '\n', true);
+	for (Anope::string tok; sep.GetToken(tok);)
+	{
+		if (send_privmsg)
+			IRCD->SendPrivmsgInternal(*source.service, this->GetUID(), tok, tags);
+		else
+			IRCD->SendNoticeInternal(*source.service, this->GetUID(), tok, tags);
+	}
+}
+
 void User::Identify(NickAlias *na)
 {
 	if (this->nick.equals_ci(na->nick))

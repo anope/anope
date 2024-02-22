@@ -44,6 +44,7 @@ struct CoreExport CommandReply
 {
 	virtual ~CommandReply() = default;
 	virtual void SendMessage(BotInfo *source, const Anope::string &msg) = 0;
+	virtual void SendMessage(CommandSource& source, const Anope::string &msg);
 };
 
 /* The source for a command */

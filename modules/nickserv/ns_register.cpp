@@ -195,8 +195,8 @@ public:
 			}
 		}
 
-		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "8");
-		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "32");
+		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
+		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
 
 		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
 			this->OnSyntaxError(source, "");

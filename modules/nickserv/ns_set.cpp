@@ -134,14 +134,14 @@ public:
 			return;
 		}
 
-		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "8");
+		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
 		if (len < minpasslen)
 		{
 			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
 			return;
 		}
 
-		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "32");
+		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
 		if (len > maxpasslen)
 		{
 			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
@@ -204,14 +204,14 @@ public:
 			return;
 		}
 
-		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "8");
+		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
 		if (len < minpasslen)
 		{
 			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
 			return;
 		}
 
-		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "32");
+		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
 		if (len > maxpasslen)
 		{
 			source.Reply(PASSWORD_TOO_LONG, maxpasslen);

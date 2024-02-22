@@ -114,7 +114,7 @@ public:
 		return maxhost ? maxhost : IRCDProto::GetMaxHost();
 	}
 
-	unsigned GetMaxListFor(Channel *c, ChannelMode *cm) override
+	size_t GetMaxListFor(Channel *c, ChannelMode *cm) override
 	{
 		ListLimits *limits = maxlist.Get(c);
 		if (limits)

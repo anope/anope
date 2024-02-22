@@ -399,14 +399,9 @@ void IRCDProto::SendOper(User *u)
 	u->SetMode(NULL, "OPER");
 }
 
-unsigned IRCDProto::GetMaxListFor(Channel *c)
+size_t IRCDProto::GetMaxListFor(Channel *c, ChannelMode *cm)
 {
-	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<int>("modelistsize");
-}
-
-unsigned IRCDProto::GetMaxListFor(Channel *c, ChannelMode *cm)
-{
-	return GetMaxListFor(c);
+	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<size_t>("modelistsize", "100");
 }
 
 Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)

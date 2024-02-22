@@ -289,8 +289,7 @@ public:
 	/** Retrieve the maximum number of list modes settable on this channel
 	 * Defaults to Config->ListSize
 	 */
-	virtual unsigned GetMaxListFor(Channel *c);
-	virtual unsigned GetMaxListFor(Channel *c, ChannelMode *cm);
+	virtual size_t GetMaxListFor(Channel *c, ChannelMode *cm);
 
 	virtual Anope::string NormalizeMask(const Anope::string &mask);
 

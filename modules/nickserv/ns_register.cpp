@@ -271,6 +271,7 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
+		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Registers your nickname in the %s database. Once\n"
@@ -288,9 +289,10 @@ public:
 				"your nickname as a password is a much worse idea ;) and,\n"
 				"in fact, %s will not allow it. Also, short\n"
 				"passwords are vulnerable to trial-and-error searches, so\n"
-				"you should choose a password at least 5 characters long.\n"
+				"you should choose a password at least %u characters long.\n"
 				"Finally, the space character cannot be used in passwords."),
-				source.service->nick.c_str(), source.service->nick.c_str());
+				source.service->nick.c_str(), source.service->nick.c_str(),
+				minpasslen);
 
 		if (!Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
 		{

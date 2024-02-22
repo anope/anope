@@ -117,14 +117,14 @@ void IRCDProto::SendKickInternal(const MessageSource &source, const Channel *c, 
 		Uplink::Send(source, "KICK", c->name, u->GetUID());
 }
 
-void IRCDProto::SendNoticeInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &msg)
+void IRCDProto::SendNoticeInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 {
-	Uplink::Send(source, "NOTICE", dest, msg);
+	Uplink::Send(tags, source, "NOTICE", dest, msg);
 }
 
-void IRCDProto::SendPrivmsgInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &buf)
+void IRCDProto::SendPrivmsgInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 {
-	Uplink::Send(source, "PRIVMSG", dest, buf);
+	Uplink::Send(tags, source, "PRIVMSG", dest, msg);
 }
 
 void IRCDProto::SendQuitInternal(User *u, const Anope::string &buf)

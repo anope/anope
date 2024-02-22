@@ -32,8 +32,8 @@ public:
 
 	virtual void SendSVSKillInternal(const MessageSource &, User *, const Anope::string &);
 	virtual void SendKickInternal(const MessageSource &, const Channel *, User *, const Anope::string &);
-	virtual void SendNoticeInternal(const MessageSource &, const Anope::string &dest, const Anope::string &msg);
-	virtual void SendPrivmsgInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendNoticeInternal(const MessageSource &, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
+	virtual void SendPrivmsgInternal(const MessageSource &, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
 	virtual void SendQuitInternal(User *, const Anope::string &buf);
 	virtual void SendPartInternal(User *, const Channel *chan, const Anope::string &buf);
 	virtual void SendGlobopsInternal(const MessageSource &, const Anope::string &buf);

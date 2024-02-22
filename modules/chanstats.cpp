@@ -581,7 +581,7 @@ public:
 		this->RunQuery(query);
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) override
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg, const Anope::map<Anope::string> &tags) override
 	{
 		if (!c->ci || !cs_stats.HasExt(c->ci))
 			return;

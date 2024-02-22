@@ -964,23 +964,26 @@ public:
 	 * @param u The user sending the PRIVMSG
 	 * @param bi The target of the PRIVMSG
 	 * @param message The message
+	 * @param tags Message tags
 	 * @return EVENT_STOP to halt processing
 	 */
-	virtual EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) { throw NotImplementedException(); }
+	virtual EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) { throw NotImplementedException(); }
 
 	/** Called when we receive a NOTICE for one of our clients
 	 * @param u The user sending the NOTICE
 	 * @param bi The target of the NOTICE
+	 * @param tags Message tags
 	 * @param message The message
 	 */
-	virtual void OnBotNotice(User *u, BotInfo *bi, Anope::string &message) { throw NotImplementedException(); }
+	virtual void OnBotNotice(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) { throw NotImplementedException(); }
 
 	/** Called when we receive a PRIVMSG for a registered channel we are in
 	 * @param u The source of the message
 	 * @param c The channel
 	 * @param msg The message
+	 * @param tags Message tags
 	 */
-	virtual void OnPrivmsg(User *u, Channel *c, Anope::string &msg) { throw NotImplementedException(); }
+	virtual void OnPrivmsg(User *u, Channel *c, Anope::string &msg, const Anope::map<Anope::string> &tags) { throw NotImplementedException(); }
 
 	/** Called when a message is logged
 	 * @param l The log message

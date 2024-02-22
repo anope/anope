@@ -297,7 +297,7 @@ void IRC2SQL::OnTopicUpdated(User *source, Channel *c, const Anope::string &user
 	this->RunQuery(query);
 }
 
-void IRC2SQL::OnBotNotice(User *u, BotInfo *bi, Anope::string &message)
+void IRC2SQL::OnBotNotice(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags)
 {
 	Anope::string versionstr;
 	if (bi != StatServ)

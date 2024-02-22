@@ -269,7 +269,7 @@ void Notice::Run(MessageSource &source, const std::vector<Anope::string> &params
 		BotInfo *bi = BotInfo::Find(params[0]);
 		if (!bi)
 			return;
-		FOREACH_MOD(OnBotNotice, (u, bi, message));
+		FOREACH_MOD(OnBotNotice, (u, bi, message, tags));
 	}
 }
 
@@ -312,7 +312,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 		Channel *c = Channel::Find(receiver);
 		if (c)
 		{
-			FOREACH_MOD(OnPrivmsg, (u, c, message));
+			FOREACH_MOD(OnPrivmsg, (u, c, message, tags));
 		}
 	}
 	else
@@ -362,11 +362,11 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			}
 
 			EventReturn MOD_RESULT;
-			FOREACH_RESULT(OnBotPrivmsg, MOD_RESULT, (u, bi, message));
+			FOREACH_RESULT(OnBotPrivmsg, MOD_RESULT, (u, bi, message, tags));
 			if (MOD_RESULT == EVENT_STOP)
 				return;
 
-			bi->OnMessage(u, message);
+			bi->OnMessage(u, message, tags);
 		}
 	}
 

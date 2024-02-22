@@ -346,9 +346,9 @@ void User::SendMessage(BotInfo *source, const Anope::string &msg)
 	for (Anope::string tok; sep.GetToken(tok);)
 	{
 		if (send_privmsg)
-			IRCD->SendPrivmsg(source, this->GetUID(), "%s", tok.c_str());
+			IRCD->SendPrivmsgInternal(source, this->GetUID(), tok);
 		else
-			IRCD->SendNotice(source, this->GetUID(), "%s", tok.c_str());
+			IRCD->SendNoticeInternal(source, this->GetUID(), tok);
 	}
 }
 

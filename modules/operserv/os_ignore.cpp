@@ -409,7 +409,7 @@ public:
 
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) override
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) override
 	{
 		if (!u->HasMode("OPER") && this->osignoreservice.Find(u->nick))
 			return EVENT_STOP;

@@ -94,7 +94,7 @@ public:
 	{
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) override
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg, const Anope::map<Anope::string> &tags) override
 	{
 		if (!u || !c || !c->ci || !c->ci->bi || msg.empty() || msg[0] == '\1')
 			return;

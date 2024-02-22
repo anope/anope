@@ -227,7 +227,7 @@ public:
 		OperServ = bi;
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) override
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) override
 	{
 		if (bi == OperServ && !u->HasMode("OPER") && Config->GetModule(this)->Get<bool>("opersonly"))
 		{

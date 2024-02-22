@@ -84,5 +84,5 @@ public:
 
 	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) override;
 
-	void OnBotNotice(User *u, BotInfo *bi, Anope::string &message) override;
+	void OnBotNotice(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) override;
 };

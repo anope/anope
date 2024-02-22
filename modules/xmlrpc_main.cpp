@@ -104,7 +104,7 @@ private:
 
 					XMLRPCommandReply(Anope::string &s) : str(s) { }
 
-					void SendMessage(BotInfo *, const Anope::string &msg) override
+					void SendMessage(BotInfo *source, const Anope::string &msg) override
 					{
 						str += msg + "\n";
 					};

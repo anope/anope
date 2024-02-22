@@ -1241,7 +1241,7 @@ public:
 			info.AddOption(_("Voices protection"));
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) override
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg, const Anope::map<Anope::string> &tags) override
 	{
 		/* Now we can make kicker stuff. We try to order the checks
 		 * from the fastest one to the slowest one, since there's

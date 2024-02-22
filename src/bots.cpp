@@ -223,7 +223,7 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 	FOREACH_MOD(OnPartChannel, (this, c, c->name, reason));
 }
 
-void BotInfo::OnMessage(User *u, const Anope::string &message)
+void BotInfo::OnMessage(User *u, const Anope::string &message, const Anope::map<Anope::string> &tags)
 {
 	if (this->commands.empty())
 		return;

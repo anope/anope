@@ -229,7 +229,7 @@ private:
 		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password);
 
 		Uplink::Send("PROTOCTL", "NICKv2", "VHP", "UMODE2", "NICKIP", "SJOIN", "SJOIN2", "SJ3", "NOQUIT", "TKLEXT", "MLOCK", "SID", "MTAGS");
-		Uplink::Send("PROTOCTL" "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
+		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
 		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
 
 		SendServer(Me);

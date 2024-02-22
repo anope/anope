@@ -66,7 +66,7 @@ public:
 
 	void SendConnect() override
 	{
-		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "0210-IRC+", "Anope|" + Anope::VersionShort(), "CLHMSo P");
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "0210-IRC+", "Anope|" + Anope::VersionShort() + ":CLHMSo P");
 
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);

@@ -66,12 +66,12 @@ public:
 	{
 		// Calculate the time left before this would expire
 		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
-		Uplink::Send("ENCAP", '*', "RESV", timeleft, x->mask, 0, x->GetReason());
+		Uplink::Send(FindIntroduced(), "ENCAP", '*', "RESV", timeleft, x->mask, 0, x->GetReason());
 	}
 
 	void SendSQLineDel(const XLine *x) override
 	{
-		Uplink::Send(Config->GetClient("OperServ"), "ENCAP", '*', "UNRESV", x->mask);
+		Uplink::Send(FindIntroduced(), "ENCAP", '*', "UNRESV", x->mask);
 	}
 
 	void SendConnect() override

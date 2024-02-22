@@ -237,7 +237,7 @@ public:
 	*/
 	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
-		Uplink::Send("SVSKILL", user->nick, buf);
+		Uplink::Send(source, "SVSKILL", user->nick, buf);
 	}
 
 	void SendBOB() override

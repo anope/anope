@@ -246,9 +246,9 @@ public:
 	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) override
 	{
 		if (!param.empty())
-			Uplink::Send("SVSPART", u->GetUID(), chan, param);
+			Uplink::Send(source, "SVSPART", u->GetUID(), chan, param);
 		else
-			Uplink::Send("SVSPART", u->GetUID(), chan);
+			Uplink::Send(source, "SVSPART", u->GetUID(), chan);
 	}
 
 	void SendSVSHold(const Anope::string &nick, time_t t) override

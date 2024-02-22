@@ -154,7 +154,7 @@ public:
 
 	bool Format(Anope::string &message, const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params) override
 	{
-		return IRCDProto::Format(message, tags, source.GetSource().empty() ? source : Me, command, params);
+		return IRCDProto::Format(message, tags, source.GetSource().empty() ? Me : source, command, params);
 	}
 };
 

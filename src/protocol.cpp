@@ -343,7 +343,7 @@ bool IRCDProto::IsNickValid(const Anope::string &nick)
 
 bool IRCDProto::IsChannelValid(const Anope::string &chan)
 {
-	if (chan.empty() || chan[0] != '#' || chan.length() > Config->GetBlock("networkinfo")->Get<unsigned>("chanlen"))
+	if (chan.empty() || chan[0] != '#' || chan.length() > IRCD->GetMaxChannel())
 		return false;
 
 	if (chan.find_first_of(" ,") != Anope::string::npos)
@@ -354,7 +354,7 @@ bool IRCDProto::IsChannelValid(const Anope::string &chan)
 
 bool IRCDProto::IsIdentValid(const Anope::string &ident)
 {
-	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
+	if (ident.empty() || ident.length() > IRCD->GetMaxUser())
 		return false;
 
 	for (auto c : ident)
@@ -370,7 +370,7 @@ bool IRCDProto::IsIdentValid(const Anope::string &ident)
 
 bool IRCDProto::IsHostValid(const Anope::string &host)
 {
-	if (host.empty() || host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
+	if (host.empty() || host.length() > IRCD->GetMaxHost())
 		return false;
 
 	const Anope::string &vhostdisablebe = Config->GetBlock("networkinfo")->Get<const Anope::string>("disallow_start_or_end"),
@@ -414,6 +414,34 @@ Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 	if (IsExtbanValid(mask))
 		return mask;
 	return Entry("", mask).GetNUHMask();
+}
+
+size_t IRCDProto::GetMaxChannel()
+{
+	// We can cache this as its not allowed to change on rehash.
+	static size_t chanlen = Config->GetBlock("networkinfo")->Get<unsigned>("chanlen", "32");
+	return chanlen;
+}
+
+size_t IRCDProto::GetMaxHost()
+{
+	// We can cache this as its not allowed to change on rehash.
+	static size_t hostlen = Config->GetBlock("networkinfo")->Get<unsigned>("hostlen", "64");
+	return hostlen;
+}
+
+size_t IRCDProto::GetMaxNick()
+{
+	// We can cache this as its not allowed to change on rehash.
+	static size_t nicklen = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen", "31");
+	return nicklen;
+}
+
+size_t IRCDProto::GetMaxUser()
+{
+	// We can cache this as its not allowed to change on rehash.
+	static size_t userlen = Config->GetBlock("networkinfo")->Get<unsigned>("userlen", "10");
+	return userlen;
 }
 
 MessageSource::MessageSource(const Anope::string &src) : source(src)

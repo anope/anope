@@ -28,23 +28,21 @@ private:
 			return;
 		}
 
-		Configuration::Block *networkinfo = Config->GetBlock("networkinfo");
-
-		if (nick.length() > networkinfo->Get<unsigned>("nicklen"))
+		if (nick.length() > IRCD->GetMaxNick())
 		{
-			source.Reply(_("Bot nicks may only be %d characters long."), networkinfo->Get<unsigned>("nicklen"));
+			source.Reply(_("Bot nicks may only be %zu characters long."), IRCD->GetMaxNick());
 			return;
 		}
 
-		if (user.length() > networkinfo->Get<unsigned>("userlen"))
+		if (user.length() > IRCD->GetMaxUser())
 		{
-			source.Reply(_("Bot idents may only be %d characters long."), networkinfo->Get<unsigned>("userlen"));
+			source.Reply(_("Bot idents may only be %zu characters long."), IRCD->GetMaxUser());
 			return;
 		}
 
-		if (host.length() > networkinfo->Get<unsigned>("hostlen"))
+		if (host.length() > IRCD->GetMaxHost())
 		{
-			source.Reply(_("Bot hosts may only be %d characters long."), networkinfo->Get<unsigned>("hostlen"));
+			source.Reply(_("Bot hosts may only be %zu characters long."), IRCD->GetMaxHost());
 			return;
 		}
 
@@ -120,23 +118,22 @@ private:
 			return;
 		}
 
-		Configuration::Block *networkinfo = Config->GetBlock("networkinfo");
-
-		if (nick.length() > networkinfo->Get<unsigned>("nicklen"))
+		if (nick.length() > IRCD->GetMaxNick())
 		{
-			source.Reply(_("Bot nicks may only be %d characters long."), networkinfo->Get<unsigned>("nicklen"));
+			source.Reply(_("Bot nicks may only be %zu characters long."), IRCD->GetMaxNick());
 			return;
 		}
 
-		if (user.length() > networkinfo->Get<unsigned>("userlen"))
+		if (user.length() > IRCD->GetMaxUser())
 		{
-			source.Reply(_("Bot idents may only be %d characters long."), networkinfo->Get<unsigned>("userlen"));
+			source.Reply(_("Bot idents may only be %zu characters long."), IRCD->GetMaxUser());
 			return;
 		}
 
-		if (host.length() > networkinfo->Get<unsigned>("hostlen"))
+		if (host.length() > IRCD->GetMaxHost())
 		{
-			source.Reply(_("Bot hosts may only be %d characters long."), networkinfo->Get<unsigned>("hostlen"));
+			source.Reply(_("Bot hosts may only be %zu characters long."), IRCD->GetMaxHost()
+				);
 			return;
 		}
 

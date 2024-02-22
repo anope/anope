@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-08 13:20+0000\n"
-"PO-Revision-Date: 2024-01-08 13:33+0000\n"
+"POT-Creation-Date: 2024-02-22 16:34+0000\n"
+"PO-Revision-Date: 2024-02-22 16:36+0000\n"
 "Last-Translator: Thomas Fargeix <t.fargeix@gmail.com>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -2640,15 +2640,15 @@ msgid "Bot bans will no longer automatically expire."
 msgstr "Le bans du bot n'expireront plus automatiquement."
 
 #, c-format
-msgid "Bot hosts may only be %d characters long."
-msgstr "Les hosts des bots ne doivent contenir que %d caractères."
+msgid "Bot hosts may only be %zu characters long."
+msgstr "Les hosts des bots ne doivent contenir que %zu caractères."
 
 msgid "Bot hosts may only contain valid host characters."
 msgstr "Les hosts des bots ne doivent contenir que des caractères valides pour un host."
 
 #, c-format
-msgid "Bot idents may only be %d characters long."
-msgstr "Les ident des bots ne doivent contenir que %d caractères."
+msgid "Bot idents may only be %zu characters long."
+msgstr "Les ident des bots ne doivent contenir que %zu caractères."
 
 msgid "Bot idents may only contain valid ident characters."
 msgstr "Les ident des bots ne doivent contenir que des caractères valides pour un ident."
@@ -2664,8 +2664,8 @@ msgid "Bot nick"
 msgstr "Pseudo du bot"
 
 #, c-format
-msgid "Bot nicks may only be %d characters long."
-msgstr "Les pseudos des bots ne doivent contenir que %d caractères."
+msgid "Bot nicks may only be %zu characters long."
+msgstr "Les pseudos des bots ne doivent contenir que %zu caractères."
 
 msgid "Bot nicks may only contain valid nick characters."
 msgstr "Les pseudos des bots ne peuvent contenir que des caractères valides."
@@ -3949,12 +3949,12 @@ msgid "Error reloading configuration file: %s"
 msgstr "Erreur en rechargeant le fichier de configuration : %s"
 
 #, c-format
-msgid "Error! The vHost ident is too long, please use an ident shorter than %d characters."
-msgstr "Erreur ! L'ident du vHost est trop long, merci d'utiliser un ident plus court que %d caractères."
+msgid "Error! The vHost ident is too long, please use an ident shorter than %zu characters."
+msgstr "Erreur ! L'ident du vHost est trop long, merci d'utiliser un ident plus court que %zu caractères."
 
 #, c-format
-msgid "Error! The vHost is too long, please use a hostname shorter than %d characters."
-msgstr "Erreur ! Le vHost est trop long, merci d'utiliser un hostname plus court que %d caractères."
+msgid "Error! The vHost is too long, please use a hostname shorter than %zu characters."
+msgstr "Erreur ! Le vHost est trop long, merci d'utiliser un hostname plus court que %zu caractères."
 
 msgid ""
 "Examples:\n"
@@ -5140,8 +5140,8 @@ msgid "Nick %s isn't registered."
 msgstr "Le pseudo %s n'est pas enregistré."
 
 #, c-format
-msgid "Nick %s was truncated to %u characters."
-msgstr "Le pseudo %s a été tronqué à %u caractères."
+msgid "Nick %s was truncated to %zu characters."
+msgstr "Le pseudo %s a été tronqué à %zu caractères."
 
 #, c-format
 msgid "Nick %s will expire."
@@ -5184,8 +5184,8 @@ msgid "Nick %s is now suspended."
 msgstr "Le pseudo %s a été suspendu."
 
 #, c-format
-msgid "Nick too long, max length is %u characters."
-msgstr "Pseudo trop long, la taille maximale est de %u caractères."
+msgid "Nick too long, max length is %zu characters."
+msgstr "Pseudo trop long, la taille maximale est de %zu caractères."
 
 #, c-format
 msgid "Nickname %s has been dropped."

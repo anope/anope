@@ -26,6 +26,8 @@ static std::list<SASLUser> saslusers;
 
 static Anope::string rsquit_server, rsquit_id;
 
+static size_t maxchannel = 0, maxhost = 0, maxnick = 0, maxuser = 0;
+
 static void ParseModule(const Anope::string &module, Anope::string &modname, Anope::string &moddata)
 {
 	size_t sep = module.find('=');
@@ -102,6 +104,16 @@ public:
 		MaxLine = 4096;
 	}
 
+	size_t GetMaxChannel() override
+	{
+		return maxchannel ? maxchannel : IRCDProto::GetMaxChannel();
+	}
+
+	size_t GetMaxHost() override
+	{
+		return maxhost ? maxhost : IRCDProto::GetMaxHost();
+	}
+
 	unsigned GetMaxListFor(Channel *c, ChannelMode *cm) override
 	{
 		ListLimits *limits = maxlist.Get(c);
@@ -114,6 +126,16 @@ public:
 
 		// Fall back to the config limit if we can't find the mode.
 		return IRCDProto::GetMaxListFor(c, cm);
+	}
+
+	size_t GetMaxNick() override
+	{
+		return maxnick ? maxnick : IRCDProto::GetMaxNick();
+	}
+
+	size_t GetMaxUser() override
+	{
+		return maxuser ? maxuser : IRCDProto::GetMaxUser();
 	}
 
 	void SendConnect() override
@@ -526,7 +548,7 @@ public:
 
 	bool IsIdentValid(const Anope::string &ident) override
 	{
-		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
+		if (ident.empty() || ident.length() > IRCD->GetMaxUser())
 			return false;
 
 		for (auto c : ident)
@@ -1212,13 +1234,33 @@ struct IRCDMessageCapab final
 			Anope::string capab;
 			while (ssep.GetToken(capab))
 			{
-				if (capab.find("MAXMODES=") != Anope::string::npos)
-				{
-					Anope::string maxmodes(capab.begin() + 9, capab.end());
-					IRCD->MaxModes = maxmodes.is_pos_number_only() ? convertTo<unsigned>(maxmodes) : 3;
-				}
-				else if (capab == "GLOBOPS=1")
+				if (capab == "GLOBOPS=1")
 					Servers::Capab.insert("GLOBOPS");
+				else if (capab.find("CHANMAX=") != Anope::string::npos)
+				{
+					Anope::string value(capab.begin() + 8, capab.end());
+					maxchannel = value.is_pos_number_only() ? convertTo<unsigned>(value) : 0;
+				}
+				else if (capab.find("IDENTMAX=") != Anope::string::npos)
+				{
+					Anope::string value(capab.begin() + 9, capab.end());
+					maxuser = value.is_pos_number_only() ? convertTo<unsigned>(value) : 0;
+				}
+				else if (capab.find("MAXMODES=") != Anope::string::npos)
+				{
+					Anope::string value(capab.begin() + 9, capab.end());
+					IRCD->MaxModes = value.is_pos_number_only() ? convertTo<unsigned>(value) : 3;
+				}
+				else if (capab.find("MAXHOST=") != Anope::string::npos)
+				{
+					Anope::string value(capab.begin() + 8, capab.end());
+					maxhost  = value.is_pos_number_only() ? convertTo<unsigned>(value) : 0;
+				}
+				else if (capab.find("NICKMAX=") != Anope::string::npos)
+				{
+					Anope::string value(capab.begin() + 8, capab.end());
+					maxnick = value.is_pos_number_only() ? convertTo<unsigned>(value) : 0;
+				}
 			}
 		}
 		else if (params[0].equals_cs("END"))

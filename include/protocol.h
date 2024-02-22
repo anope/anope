@@ -293,6 +293,18 @@ public:
 	virtual unsigned GetMaxListFor(Channel *c, ChannelMode *cm);
 
 	virtual Anope::string NormalizeMask(const Anope::string &mask);
+
+	/** Retrieves the maximum length of a channel name. */
+	virtual size_t GetMaxChannel();
+
+	/** Retrieves the maximum length of a hostname. */
+	virtual size_t GetMaxHost();
+
+	/** Retrieves the maximum length of a nickname. */
+	virtual size_t GetMaxNick();
+
+	/** Retrieves the maximum length of a username. */
+	virtual size_t GetMaxUser();
 };
 
 class CoreExport MessageSource final

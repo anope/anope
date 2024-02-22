@@ -71,9 +71,9 @@ public:
 			}
 		}
 
-		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
+		if (host.length() > IRCD->GetMaxHost())
 		{
-			source.Reply(HOST_SET_TOOLONG, Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
+			source.Reply(HOST_SET_TOOLONG, IRCD->GetMaxHost());
 			return;
 		}
 
@@ -177,9 +177,9 @@ public:
 			}
 		}
 
-		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
+		if (host.length() > IRCD->GetMaxHost())
 		{
-			source.Reply(HOST_SET_TOOLONG, Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
+			source.Reply(HOST_SET_TOOLONG, IRCD->GetMaxHost());
 			return;
 		}
 

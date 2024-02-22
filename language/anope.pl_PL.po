@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-08 13:20+0000\n"
-"PO-Revision-Date: 2024-01-08 13:46+0000\n"
+"POT-Creation-Date: 2024-02-22 16:34+0000\n"
+"PO-Revision-Date: 2024-02-22 16:42+0000\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -2632,15 +2632,15 @@ msgid "Bot bans will no longer automatically expire."
 msgstr "Bany zakładane przez bota nie będą już się przedawniały."
 
 #, c-format
-msgid "Bot hosts may only be %d characters long."
-msgstr "Host bota może się składać maksymalnie z %d znaków."
+msgid "Bot hosts may only be %zu characters long."
+msgstr "Host bota może się składać maksymalnie z %zu znaków."
 
 msgid "Bot hosts may only contain valid host characters."
 msgstr "Host bota może zawierać tylko prawidłowe znaki."
 
 #, c-format
-msgid "Bot idents may only be %d characters long."
-msgstr "Ident bota może się składać maksymalnie z %d znaków."
+msgid "Bot idents may only be %zu characters long."
+msgstr "Ident bota może się składać maksymalnie z %zu znaków."
 
 msgid "Bot idents may only contain valid ident characters."
 msgstr "Ident bota może zawierać tylko prawidłowe znaki."
@@ -2656,8 +2656,8 @@ msgid "Bot nick"
 msgstr "Nick bota"
 
 #, c-format
-msgid "Bot nicks may only be %d characters long."
-msgstr "Nick bota może się składać maksymalnie z %d znaków."
+msgid "Bot nicks may only be %zu characters long."
+msgstr "Nick bota może się składać maksymalnie z %zu znaków."
 
 msgid "Bot nicks may only contain valid nick characters."
 msgstr "Nick bota może zawierać tylko prawidłowe znaki."
@@ -3926,12 +3926,12 @@ msgid "Error reloading configuration file: %s"
 msgstr "Błąd przeładowywania pliku konfiguracyjnego: %s"
 
 #, c-format
-msgid "Error! The vHost ident is too long, please use an ident shorter than %d characters."
-msgstr "Błąd: podany wirtualny ident jest zbyt długi. Proszę użyć nazwy krótszej niż %d znaków."
+msgid "Error! The vHost ident is too long, please use an ident shorter than %zu characters."
+msgstr "Błąd: podany wirtualny ident jest zbyt długi. Proszę użyć nazwy krótszej niż %zu znaków."
 
 #, c-format
-msgid "Error! The vHost is too long, please use a hostname shorter than %d characters."
-msgstr "Błąd: podany vHost jest zbyt długi. Proszę użyć nazwy krótszej niż %d znaków."
+msgid "Error! The vHost is too long, please use a hostname shorter than %zu characters."
+msgstr "Błąd: podany vHost jest zbyt długi. Proszę użyć nazwy krótszej niż %zu znaków."
 
 msgid ""
 "Examples:\n"
@@ -5126,8 +5126,8 @@ msgid "Nick %s isn't registered."
 msgstr "Nick %s nie jest zarejestrowany."
 
 #, c-format
-msgid "Nick %s was truncated to %u characters."
-msgstr "Nick %s został skrócony do %u znaków."
+msgid "Nick %s was truncated to %zu characters."
+msgstr "Nick %s został skrócony do %zu znaków."
 
 #, c-format
 msgid "Nick %s will expire."
@@ -5170,8 +5170,8 @@ msgid "Nick %s is now suspended."
 msgstr "Nick %s został zawieszony."
 
 #, c-format
-msgid "Nick too long, max length is %u characters."
-msgstr "Zbyt długi nick. Maksymalna długość to %u znaków."
+msgid "Nick too long, max length is %zu characters."
+msgstr "Zbyt długi nick. Maksymalna długość to %zu znaków."
 
 #, c-format
 msgid "Nickname %s has been dropped."

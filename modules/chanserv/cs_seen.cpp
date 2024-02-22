@@ -270,9 +270,9 @@ public:
 		if (simple)
 			return this->SimpleSeen(source, params);
 
-		if (target.length() > Config->GetBlock("networkinfo")->Get<unsigned>("nicklen"))
+		if (target.length() > IRCD->GetMaxNick())
 		{
-			source.Reply(_("Nick too long, max length is %u characters."), Config->GetBlock("networkinfo")->Get<unsigned>("nicklen"));
+			source.Reply(_("Nick too long, max length is %zu characters."), IRCD->GetMaxNick());
 			return;
 		}
 

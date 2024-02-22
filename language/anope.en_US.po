@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-19 22:16+0000\n"
-"PO-Revision-Date: 2024-02-19 22:17+0000\n"
+"POT-Creation-Date: 2024-02-22 16:34+0000\n"
+"PO-Revision-Date: 2024-02-22 16:35+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -2627,15 +2627,15 @@ msgid "Bot bans will no longer automatically expire."
 msgstr "Bot bans will no longer automatically expire."
 
 #, c-format
-msgid "Bot hosts may only be %d characters long."
-msgstr "Bot hosts may only be %d characters long."
+msgid "Bot hosts may only be %zu characters long."
+msgstr ""
 
 msgid "Bot hosts may only contain valid host characters."
 msgstr "Bot hosts may only contain valid host characters."
 
 #, c-format
-msgid "Bot idents may only be %d characters long."
-msgstr "Bot idents may only be %d characters long."
+msgid "Bot idents may only be %zu characters long."
+msgstr "Bot idents may only be %zu characters long."
 
 msgid "Bot idents may only contain valid ident characters."
 msgstr "Bot idents may only contain valid ident characters."
@@ -2651,8 +2651,8 @@ msgid "Bot nick"
 msgstr "Bot nick"
 
 #, c-format
-msgid "Bot nicks may only be %d characters long."
-msgstr "Bot nicks may only be %d characters long."
+msgid "Bot nicks may only be %zu characters long."
+msgstr "Bot nicks may only be %zu characters long."
 
 msgid "Bot nicks may only contain valid nick characters."
 msgstr "Bot nicks may only contain valid nick characters."
@@ -3918,12 +3918,12 @@ msgid "Error reloading configuration file: %s"
 msgstr "Error reloading configuration file: %s"
 
 #, c-format
-msgid "Error! The vHost ident is too long, please use an ident shorter than %d characters."
-msgstr "Error! The vHost ident is too long, please use an ident shorter than %d characters."
+msgid "Error! The vHost ident is too long, please use an ident shorter than %zu characters."
+msgstr "Error! The vHost ident is too long, please use an ident shorter than %zu characters."
 
 #, c-format
-msgid "Error! The vHost is too long, please use a hostname shorter than %d characters."
-msgstr "Error! The vHost is too long, please use a hostname shorter than %d characters."
+msgid "Error! The vHost is too long, please use a hostname shorter than %zu characters."
+msgstr "Error! The vHost is too long, please use a hostname shorter than %zu characters."
 
 msgid ""
 "Examples:\n"
@@ -5107,8 +5107,8 @@ msgid "Nick %s isn't registered."
 msgstr "Nick %s isn't registered."
 
 #, c-format
-msgid "Nick %s was truncated to %u characters."
-msgstr "Nick %s was truncated to %u characters."
+msgid "Nick %s was truncated to %zu characters."
+msgstr "Nick %s was truncated to %zu characters."
 
 #, c-format
 msgid "Nick %s will expire."
@@ -5151,8 +5151,8 @@ msgid "Nick %s is now suspended."
 msgstr "Nick %s is now suspended."
 
 #, c-format
-msgid "Nick too long, max length is %u characters."
-msgstr "Nick too long, max length is %u characters."
+msgid "Nick too long, max length is %zu characters."
+msgstr "Nick too long, max length is %zu characters."
 
 #, c-format
 msgid "Nickname %s has been dropped."

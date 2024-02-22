@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-22 19:47+0000\n"
-"PO-Revision-Date: 2024-01-22 22:41+0300\n"
+"POT-Creation-Date: 2024-02-22 16:34+0000\n"
+"PO-Revision-Date: 2024-02-22 16:43+0000\n"
 "Last-Translator: CaPaCuL <capacul@gmail.com>\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.4\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -2626,15 +2626,15 @@ msgid "Bot bans will no longer automatically expire."
 msgstr "Bot banları artık otomatik olarak sona ermeyecek."
 
 #, c-format
-msgid "Bot hosts may only be %d characters long."
-msgstr "Bot hostları yalnızca %d karakter uzunluğunda olabilir."
+msgid "Bot hosts may only be %zu characters long."
+msgstr "Bot hostları yalnızca %zu karakter uzunluğunda olabilir."
 
 msgid "Bot hosts may only contain valid host characters."
 msgstr "Bot hostları yalnızca geçerli host karakterlerini içerebilir."
 
 #, c-format
-msgid "Bot idents may only be %d characters long."
-msgstr "Bot identleri yalnızca %d karakter uzunluğunda olabilir."
+msgid "Bot idents may only be %zu characters long."
+msgstr "Bot identleri yalnızca %zu karakter uzunluğunda olabilir."
 
 msgid "Bot idents may only contain valid ident characters."
 msgstr "Bot identleri yalnızca geçerli ident karakterlerini içerebilir."
@@ -2650,8 +2650,8 @@ msgid "Bot nick"
 msgstr "Bot rumuzu"
 
 #, c-format
-msgid "Bot nicks may only be %d characters long."
-msgstr "Bot rumuzları yalnızca %d karakter uzunluğunda olabilir."
+msgid "Bot nicks may only be %zu characters long."
+msgstr "Bot rumuzları yalnızca %zu karakter uzunluğunda olabilir."
 
 msgid "Bot nicks may only contain valid nick characters."
 msgstr "Bot rumuzları yalnızca geçerli rumuz karakterlerini içerebilir."
@@ -3917,12 +3917,12 @@ msgid "Error reloading configuration file: %s"
 msgstr "Yapılandırma dosyası yeniden yüklenirken hata oluştu: %s"
 
 #, c-format
-msgid "Error! The vHost ident is too long, please use an ident shorter than %d characters."
-msgstr "Hata! vHost kimliği çok uzun, lütfen %d karakterden daha kısa bir ident kullanın."
+msgid "Error! The vHost ident is too long, please use an ident shorter than %zu characters."
+msgstr "Hata! vHost kimliği çok uzun, lütfen %zu karakterden daha kısa bir ident kullanın."
 
 #, c-format
-msgid "Error! The vHost is too long, please use a hostname shorter than %d characters."
-msgstr "Hata! vHost çok uzun, lütfen %d karakterden kısa bir host adı kullanın."
+msgid "Error! The vHost is too long, please use a hostname shorter than %zu characters."
+msgstr "Hata! vHost çok uzun, lütfen %zu karakterden kısa bir host adı kullanın."
 
 msgid ""
 "Examples:\n"
@@ -5106,8 +5106,8 @@ msgid "Nick %s isn't registered."
 msgstr "%s rumuzu kayıtlı değil."
 
 #, c-format
-msgid "Nick %s was truncated to %u characters."
-msgstr "%s rumuzu, %u karaktere kısaltıldı."
+msgid "Nick %s was truncated to %zu characters."
+msgstr "%s rumuzu, %zu karaktere kısaltıldı."
 
 #, c-format
 msgid "Nick %s will expire."
@@ -5150,8 +5150,8 @@ msgid "Nick %s is now suspended."
 msgstr "%s rumuzu askıya alınmış."
 
 #, c-format
-msgid "Nick too long, max length is %u characters."
-msgstr "Rumuz çok uzun, maks uzunluk %u karakterdir."
+msgid "Nick too long, max length is %zu characters."
+msgstr "Rumuz çok uzun, maks uzunluk %zu karakterdir."
 
 #, c-format
 msgid "Nickname %s has been dropped."

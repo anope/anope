@@ -178,10 +178,10 @@ Conf::Conf() : Block("")
 	ValidateNotZero("options", "readtimeout", options->Get<time_t>("readtimeout"));
 	ValidateNotZero("options", "warningtimeout", options->Get<time_t>("warningtimeout"));
 
-	ValidateNotZero("networkinfo", "nicklen", networkinfo->Get<unsigned>("nicklen"));
-	ValidateNotZero("networkinfo", "userlen", networkinfo->Get<unsigned>("userlen"));
-	ValidateNotZero("networkinfo", "hostlen", networkinfo->Get<unsigned>("hostlen"));
-	ValidateNotZero("networkinfo", "chanlen", networkinfo->Get<unsigned>("chanlen"));
+	ValidateNotZero("networkinfo", "nicklen", networkinfo->Get<unsigned>("nicklen", "1"));
+	ValidateNotZero("networkinfo", "userlen", networkinfo->Get<unsigned>("userlen", "1"));
+	ValidateNotZero("networkinfo", "hostlen", networkinfo->Get<unsigned>("hostlen", "1"));
+	ValidateNotZero("networkinfo", "chanlen", networkinfo->Get<unsigned>("chanlen", "1"));
 
 	spacesepstream(options->Get<const Anope::string>("ulineservers")).GetTokens(this->Ulines);
 

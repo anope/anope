@@ -11,6 +11,11 @@
 
 #include "module.h"
 
+namespace
+{
+	size_t nicklen = 0;
+}
+
 class ngIRCdProto final
 	: public IRCDProto
 {
@@ -29,6 +34,11 @@ public:
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		MaxModes = 5;
+	}
+
+	size_t GetMaxNick() override
+	{
+		return nicklen ? nicklen : IRCDProto::GetMaxNick();
 	}
 
 	void SendAkill(User *u, XLine *x) override
@@ -172,11 +182,7 @@ struct IRCDMessage005 final
 				}
 				else if (parameter == "NICKLEN")
 				{
-					unsigned newlen = convertTo<unsigned>(data), len = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
-					if (len != newlen)
-					{
-						Log() << "Warning: NICKLEN is " << newlen << " but networkinfo:nicklen is " << len;
-					}
+					nicklen = data.is_pos_number_only() ? convertTo<size_t>(data) : 0;
 				}
 			}
 		}

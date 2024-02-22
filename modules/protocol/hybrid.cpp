@@ -280,7 +280,7 @@ public:
 
 	bool IsIdentValid(const Anope::string &ident) override
 	{
-		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
+		if (ident.empty() || ident.length() > IRCD->GetMaxUser())
 			return false;
 
 		/*

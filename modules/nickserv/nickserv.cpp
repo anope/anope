@@ -251,7 +251,7 @@ public:
 
 		if (IRCD->CanSVSNick)
 		{
-			unsigned nicklen = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
+			unsigned nicklen = IRCD->GetMaxNick();
 			const Anope::string &guestprefix = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
 
 			Anope::string guestnick;

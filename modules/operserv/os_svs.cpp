@@ -34,10 +34,10 @@ public:
 		}
 
 		/* Truncate long nicknames to nicklen characters */
-		unsigned nicklen = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
+		size_t nicklen = IRCD->GetMaxNick();
 		if (newnick.length() > nicklen)
 		{
-			source.Reply(_("Nick \002%s\002 was truncated to %u characters."), newnick.c_str(), nicklen);
+			source.Reply(_("Nick \002%s\002 was truncated to %zu characters."), newnick.c_str(), nicklen);
 			newnick = params[1].substr(0, nicklen);
 		}
 

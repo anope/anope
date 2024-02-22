@@ -22,28 +22,47 @@ struct SASLUser final
 	time_t created;
 };
 
-static std::list<SASLUser> saslusers;
-
-static Anope::string rsquit_server, rsquit_id;
-
-static size_t maxchannel = 0, maxhost = 0, maxnick = 0, maxuser = 0;
-
-static void ParseModule(const Anope::string &module, Anope::string &modname, Anope::string &moddata)
+namespace
 {
-	size_t sep = module.find('=');
+	// The maximum length of a channel name.
+	size_t maxchannel = 0;
 
-	// Extract and clean up the module name.
-	modname = module.substr(0, sep);
-	if (modname.compare(0, 2, "m_", 2) == 0)
-		modname.erase(0, 2);
+	// The maximum length of a hostname.
+	size_t maxhost = 0;
 
-	if (modname.length() > 3 && modname.compare(modname.length() - 3, 3, ".so", 3) == 0)
-		modname.erase(modname.length() - 3);
+	// The maximum length of a nickname.
+	size_t maxnick = 0;
 
-	// Extract the module link data (if any).
-	moddata = sep == Anope::string::npos ? "" : module.substr(sep);
+	// The maximum length of a username.
+	size_t maxuser = 0;
 
-	Log(LOG_DEBUG) << "Parsed module: " << "name=" << modname << " data=" << moddata;
+	// The SID of a server we are waiting to squit.
+	Anope::string rsquit_id;
+
+	// The hostname of a server we are waiting to squit.
+	Anope::string rsquit_server;
+
+	// Non-introduced users who have authenticated via SASL.
+	std::list<SASLUser> saslusers;
+
+	// Parses a module name in the format "m_foo.so=bar" to {foo, bar}.
+	void ParseModule(const Anope::string &module, Anope::string &modname, Anope::string &moddata)
+	{
+		size_t sep = module.find('=');
+
+		// Extract and clean up the module name.
+		modname = module.substr(0, sep);
+		if (modname.compare(0, 2, "m_", 2) == 0)
+			modname.erase(0, 2);
+
+		if (modname.length() > 3 && modname.compare(modname.length() - 3, 3, ".so", 3) == 0)
+			modname.erase(modname.length() - 3);
+
+		// Extract the module link data (if any).
+		moddata = (sep == Anope::string::npos) ? "" : module.substr(sep);
+
+		Log(LOG_DEBUG) << "Parsed module: " << "name=" << modname << " data=" << moddata;
+	}
 }
 
 class InspIRCdProto final

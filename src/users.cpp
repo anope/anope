@@ -332,24 +332,33 @@ void User::SendMessage(BotInfo *source, const char *fmt, ...)
 	va_end(args);
 }
 
+namespace
+{
+	void SendMessageInternal(BotInfo *source, User* target, const Anope::string &msg, const Anope::map<Anope::string> &tags)
+	{
+		const char *translated_message = Language::Translate(target, msg.c_str());
+
+		/* Send privmsg instead of notice if:
+		* - UsePrivmsg is enabled
+		* - The user is not registered and NSDefMsg is enabled
+		* - The user is registered and has set /ns set msg on
+		*/
+		auto account = target->Account();
+		bool send_privmsg = Config->UsePrivmsg && ((!account && Config->DefPrivmsg) || (account && account->HasExt("MSG")));
+		sepstream sep(translated_message, '\n', true);
+		for (Anope::string tok; sep.GetToken(tok);)
+		{
+			if (send_privmsg)
+				IRCD->SendPrivmsgInternal(source, target->GetUID(), tok, tags);
+			else
+				IRCD->SendNoticeInternal(source, target->GetUID(), tok, tags);
+		}
+	}
+}
+
 void User::SendMessage(BotInfo *source, const Anope::string &msg)
 {
-	const char *translated_message = Language::Translate(this, msg.c_str());
-
-	/* Send privmsg instead of notice if:
-	* - UsePrivmsg is enabled
-	* - The user is not registered and NSDefMsg is enabled
-	* - The user is registered and has set /ns set msg on
-	*/
-	bool send_privmsg = Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasExt("MSG")));
-	sepstream sep(translated_message, '\n', true);
-	for (Anope::string tok; sep.GetToken(tok);)
-	{
-		if (send_privmsg)
-			IRCD->SendPrivmsgInternal(source, this->GetUID(), tok);
-		else
-			IRCD->SendNoticeInternal(source, this->GetUID(), tok);
-	}
+	SendMessageInternal(source, this, msg, {});
 }
 
 void User::SendMessage(CommandSource& source, const Anope::string &msg)
@@ -358,22 +367,7 @@ void User::SendMessage(CommandSource& source, const Anope::string &msg)
 	if (!source.msgid.empty())
 		tags["+draft/reply"] = source.msgid;
 
-	const char *translated_message = Language::Translate(this, msg.c_str());
-
-	/* Send privmsg instead of notice if:
-	* - UsePrivmsg is enabled
-	* - The user is not registered and NSDefMsg is enabled
-	* - The user is registered and has set /ns set msg on
-	*/
-	bool send_privmsg = Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasExt("MSG")));
-	sepstream sep(translated_message, '\n', true);
-	for (Anope::string tok; sep.GetToken(tok);)
-	{
-		if (send_privmsg)
-			IRCD->SendPrivmsgInternal(*source.service, this->GetUID(), tok, tags);
-		else
-			IRCD->SendNoticeInternal(*source.service, this->GetUID(), tok, tags);
-	}
+	SendMessageInternal(*source.service, this, msg, tags);
 }
 
 void User::Identify(NickAlias *na)

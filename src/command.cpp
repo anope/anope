@@ -17,8 +17,13 @@
 #include "regchannel.h"
 #include "channels.h"
 
-CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi) : nick(n), u(user), nc(core), reply(r),
-	c(NULL), service(bi)
+CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi, const Anope::string &m)
+	: nick(n)
+	, u(user)
+	, nc(core)
+	, reply(r)
+	, service(bi)
+	, msgid(m)
 {
 }
 

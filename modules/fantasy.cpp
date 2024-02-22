@@ -175,7 +175,12 @@ public:
 		if (params.size() < cmd->min_params)
 			return;
 
-		CommandSource source(u->nick, u, u->Account(), u, c->ci->bi);
+		Anope::string msgid;
+		auto iter = tags.find("msgid");
+		if (iter != tags.end())
+			msgid = iter->second;
+
+		CommandSource source(u->nick, u, u->Account(), u, c->ci->bi, msgid);
 		source.c = c;
 		source.command = it->first;
 		source.permission = info.permission;

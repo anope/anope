@@ -228,7 +228,12 @@ void BotInfo::OnMessage(User *u, const Anope::string &message, const Anope::map<
 	if (this->commands.empty())
 		return;
 
-	CommandSource source(u->nick, u, u->Account(), u, this);
+	Anope::string msgid;
+	auto iter = tags.find("msgid");
+	if (iter != tags.end())
+		msgid = iter->second;
+
+	CommandSource source(u->nick, u, u->Account(), u, this, msgid);
 	Command::Run(source, message);
 }
 

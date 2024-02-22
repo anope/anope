@@ -61,15 +61,17 @@ public:
 	/* Where the reply should go */
 	CommandReply *reply;
 	/* Channel the command was executed on (fantasy) */
-	Reference<Channel> c;
+	Reference<Channel> c = nullptr;
 	/* The service this command is on */
 	Reference<BotInfo> service;
 	/* The actual name of the command being executed */
 	Anope::string command;
 	/* The permission of the command being executed */
 	Anope::string permission;
+	/* The unique identifier of the executing message. */
+	Anope::string msgid;
 
-	CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *reply, BotInfo *bi);
+	CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *reply, BotInfo *bi, const Anope::string &m = "");
 
 	const Anope::string &GetNick() const;
 	User *GetUser();

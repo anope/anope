@@ -45,14 +45,7 @@ namespace Configuration
 		const Block* GetBlock(const Anope::string &name, int num = 0) const;
 		Block* GetMutableBlock(const Anope::string &name, int num = 0);
 
-		template<typename T> inline T Get(const Anope::string &tag) const
-		{
-			return this->Get<T>(tag, "");
-		}
-		/* VS 2008 has an issue with having a default argument here (def = ""), which is why the above
-		 * function exists.
-		 */
-		template<typename T> T Get(const Anope::string &tag, const Anope::string &def) const
+		template<typename T> T Get(const Anope::string &tag, const Anope::string &def = "") const
 		{
 			const Anope::string &value = this->Get<const Anope::string>(tag, def);
 			if (!value.empty())

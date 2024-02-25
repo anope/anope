@@ -26,7 +26,7 @@ private:
 
 public:
 	/* Handle for this thread */
-	std::thread *handle = nullptr;
+	std::unique_ptr<std::thread> handle;
 
 	/** Threads destructor
 	 */

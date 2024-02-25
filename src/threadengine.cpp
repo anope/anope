@@ -18,8 +18,6 @@ static void *entry_point(void *parameter)
 	Thread *thread = static_cast<Thread *>(parameter);
 	thread->Run();
 	thread->SetExitState();
-	delete thread->handle;
-	thread->handle = nullptr;
 	return NULL;
 }
 
@@ -39,11 +37,6 @@ void Thread::SetExitState()
 void Thread::Exit()
 {
 	this->SetExitState();
-	if (this->handle)
-	{
-		delete this->handle;
-		this->handle = nullptr;
-	}
 }
 
 void Thread::Start()
@@ -51,7 +44,7 @@ void Thread::Start()
 	try
 	{
 		if (!this->handle)
-			this->handle = new std::thread(entry_point, this);
+			this->handle = std::make_unique<std::thread>(entry_point, this);
 	}
 	catch (const std::system_error& err)
 	{

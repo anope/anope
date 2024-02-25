@@ -418,11 +418,6 @@ bool Anope::Init(int ac, char **av)
 	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::VersionBuildString();
 
 #ifdef _WIN32
-	if (!SupportedWindowsVersion())
-		throw CoreException(GetWindowsVersion() + " is not a supported version of Windows");
-#endif
-
-#ifdef _WIN32
 	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "\\" << ServicesConf.GetName();
 #else
 	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "/" << ServicesConf.GetName();

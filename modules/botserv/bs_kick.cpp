@@ -1104,7 +1104,7 @@ class BSKick final
 		vsnprintf(buf, sizeof(buf), fmt.c_str(), args);
 		va_end(args);
 
-		ci->c->Kick(ci->bi, u, "%s", buf);
+		ci->c->Kick(ci->bi, u, Anope::string(buf));
 	}
 
 public:

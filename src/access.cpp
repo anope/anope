@@ -170,7 +170,7 @@ void ChanAccess::Serialize(Serialize::Data &data) const
 	data["data"] << this->AccessSerialize();
 }
 
-Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string provider, chan;
 
@@ -205,7 +205,7 @@ Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 	return access;
 }
 
-bool ChanAccess::Matches(const User *u, const NickCore *acc, ChannelInfo* &next) const
+bool ChanAccess::Matches(const User *u, const NickCore *acc, ChannelInfo *&next) const
 {
 	next = NULL;
 

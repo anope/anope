@@ -45,7 +45,7 @@ struct DNSZone final
 			data["server" + stringify(count++)] << server;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		DNSZone *zone;
 		Anope::string zone_name;
@@ -154,7 +154,7 @@ public:
 			data["zone" + stringify(count++)] << zone;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		DNSServer *req;
 		Anope::string server_name;
@@ -856,7 +856,7 @@ public:
 		if (req.questions.empty())
 			return;
 		/* Currently we reply to any QR for A/AAAA */
-		const DNS::Question& q = req.questions[0];
+		const DNS::Question &q = req.questions[0];
 		if (q.type != DNS::QUERY_A && q.type != DNS::QUERY_AAAA && q.type != DNS::QUERY_AXFR && q.type != DNS::QUERY_ANY)
 			return;
 

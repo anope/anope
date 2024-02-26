@@ -84,7 +84,7 @@ public:
 		return new AccessChanAccess(this);
 	}
 };
-AccessAccessProvider* AccessAccessProvider::me;
+AccessAccessProvider *AccessAccessProvider::me;
 
 class CommandCSAccess final
 	: public Command

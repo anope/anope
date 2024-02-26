@@ -29,7 +29,7 @@ struct NSSuspendInfo final
 		data["expires"] << expires;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		Anope::string snick;
 		data["nick"] >> snick;

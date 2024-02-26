@@ -42,8 +42,8 @@ namespace Configuration
 		Block(const Anope::string &);
 		const Anope::string &GetName() const;
 		int CountBlock(const Anope::string &name) const;
-		const Block* GetBlock(const Anope::string &name, int num = 0) const;
-		Block* GetMutableBlock(const Anope::string &name, int num = 0);
+		const Block *GetBlock(const Anope::string &name, int num = 0) const;
+		Block *GetMutableBlock(const Anope::string &name, int num = 0);
 
 		template<typename T> T Get(const Anope::string &tag, const Anope::string &def = "") const
 		{
@@ -61,7 +61,7 @@ namespace Configuration
 		const item_map &GetItems() const;
 	};
 
-	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const;
+	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	} // namespace Internal

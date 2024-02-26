@@ -918,7 +918,7 @@ struct IRCDMessageCapab final
 		Anope::string type;
 	};
 
-	static bool ParseMode(const Anope::string& token, ModeInfo& mode)
+	static bool ParseMode(const Anope::string &token, ModeInfo &mode)
 	{
 		// list:ban=b  param-set:limit=l  param:key=k  prefix:30000:op=@o  simple:noextmsg=n
 		//     A   C            A     C        A   C         A     B  C          A        C
@@ -1549,7 +1549,7 @@ public:
 			if (params[1].equals_cs("modules") && !params[2].empty())
 			{
 				// only interested when it comes from our uplink
-				Server* server = source.GetServer();
+				Server *server = source.GetServer();
 				if (!server || server->GetUplink() != Me)
 					return;
 

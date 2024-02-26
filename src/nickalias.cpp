@@ -20,7 +20,7 @@
 
 Serialize::Checker<nickalias_map> NickAliasList("NickAlias");
 
-NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serializable("NickAlias")
+NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore) : Serializable("NickAlias")
 {
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickAlias constructor");
@@ -153,7 +153,7 @@ void NickAlias::Serialize(Serialize::Data &data) const
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string snc, snick;
 

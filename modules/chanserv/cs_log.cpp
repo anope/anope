@@ -47,7 +47,7 @@ struct LogSettingImpl final
 		data.SetType("created", Serialize::Data::DT_INT); data["created"] << created;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		Anope::string sci;
 		data["ci"] >> sci;

@@ -41,7 +41,7 @@ public:
 
 	virtual void RemoveForbid(ForbidData *d) = 0;
 
-	virtual ForbidData* CreateForbid() = 0;
+	virtual ForbidData *CreateForbid() = 0;
 
 	virtual ForbidData *FindForbid(const Anope::string &mask, ForbidType type) = 0;
 

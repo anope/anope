@@ -116,7 +116,7 @@ public:
 		return this->Sessions.find(c);
 	}
 
-	Session* &FindOrCreateSession(const cidr &ip)
+	Session *&FindOrCreateSession(const cidr &ip)
 	{
 		return this->Sessions[ip];
 	}
@@ -632,7 +632,7 @@ public:
 		if (!u_ip.valid())
 			return;
 
-		Session* &session = this->ss.FindOrCreateSession(u_ip);
+		Session *&session = this->ss.FindOrCreateSession(u_ip);
 
 		if (session)
 		{

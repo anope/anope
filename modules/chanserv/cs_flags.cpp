@@ -76,7 +76,7 @@ public:
 		return new FlagsChanAccess(this);
 	}
 };
-FlagsAccessProvider* FlagsAccessProvider::ap;
+FlagsAccessProvider *FlagsAccessProvider::ap;
 
 class CommandCSFlags final
 	: public Command

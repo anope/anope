@@ -19,7 +19,7 @@ struct IgnoreDataImpl final
 	IgnoreDataImpl() : Serializable("IgnoreData") { }
 	~IgnoreDataImpl() override;
 	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 IgnoreDataImpl::~IgnoreDataImpl()
@@ -36,7 +36,7 @@ void IgnoreDataImpl::Serialize(Serialize::Data &data) const
 	data["time"] << this->time;
 }
 
-Serializable* IgnoreDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *IgnoreDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!ignore_service)
 		return NULL;

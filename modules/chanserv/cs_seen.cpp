@@ -55,7 +55,7 @@ struct SeenInfo final
 		data.SetType("last", Serialize::Data::DT_INT); data["last"] << last;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		Anope::string snick;
 
@@ -66,7 +66,7 @@ struct SeenInfo final
 			s = anope_dynamic_static_cast<SeenInfo *>(obj);
 		else
 		{
-			SeenInfo* &info = database[snick];
+			SeenInfo *&info = database[snick];
 			if (!info)
 				info = new SeenInfo();
 			s = info;
@@ -445,7 +445,7 @@ private:
 		if (simple || !u->server->IsSynced())
 			return;
 
-		SeenInfo* &info = database[nick];
+		SeenInfo *&info = database[nick];
 		if (!info)
 			info = new SeenInfo();
 		info->nick = nick;

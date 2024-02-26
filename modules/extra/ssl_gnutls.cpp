@@ -39,7 +39,7 @@ class SSLSocketIO final
 {
 public:
 	gnutls_session_t sess = nullptr;
-	GnuTLS::X509CertCredentials* mycreds;
+	GnuTLS::X509CertCredentials *mycreds;
 
 	/** Constructor
 	 */
@@ -181,7 +181,7 @@ namespace GnuTLS
 				throw ConfigException("Error loading private key: " + Anope::string(gnutls_strerror(ret)));
 		}
 
-		gnutls_x509_privkey_t& get() { return key.key; }
+		gnutls_x509_privkey_t &get() { return key.key; }
 	};
 
 	class X509CertList final
@@ -219,7 +219,7 @@ namespace GnuTLS
 				gnutls_x509_crt_deinit(*i);
 		}
 
-		gnutls_x509_crt_t* raw() { return &certs[0]; }
+		gnutls_x509_crt_t *raw() { return &certs[0]; }
 		unsigned int size() const { return certs.size(); }
 	};
 
@@ -236,7 +236,7 @@ namespace GnuTLS
 			return ret;
 		}
 
-		static int cert_callback(gnutls_session_t sess, const gnutls_datum_t* req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length, gnutls_retr2_st* st);
+		static int cert_callback(gnutls_session_t sess, const gnutls_datum_t *req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t *sign_algos, int sign_algos_length, gnutls_retr2_st *st);
 
 	public:
 		X509CertList certs;
@@ -628,7 +628,7 @@ SSLSocketIO::SSLSocketIO() : mycreds(me->cred)
 	mycreds->incrref();
 }
 
-int GnuTLS::X509CertCredentials::cert_callback(gnutls_session_t sess, const gnutls_datum_t* req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length, gnutls_retr2_st* st)
+int GnuTLS::X509CertCredentials::cert_callback(gnutls_session_t sess, const gnutls_datum_t *req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t *sign_algos, int sign_algos_length, gnutls_retr2_st *st)
 {
 	st->cert_type = GNUTLS_CRT_X509;
 	st->key_type = GNUTLS_PRIVKEY_X509;

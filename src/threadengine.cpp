@@ -46,7 +46,7 @@ void Thread::Start()
 		if (!this->handle)
 			this->handle = std::make_unique<std::thread>(entry_point, this);
 	}
-	catch (const std::system_error& err)
+	catch (const std::system_error &err)
 	{
 		this->flags[SF_DEAD] = true;
 		throw CoreException("Unable to create thread: " + std::string(err.what()));

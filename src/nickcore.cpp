@@ -86,7 +86,7 @@ void NickCore::Serialize(Serialize::Data &data) const
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	NickCore *nc;
 
@@ -257,7 +257,7 @@ void NickCore::AddChannelReference(ChannelInfo *ci)
 
 void NickCore::RemoveChannelReference(ChannelInfo *ci)
 {
-	int& i = (*this->chanaccess)[ci];
+	int &i = (*this->chanaccess)[ci];
 	if (--i <= 0)
 		this->chanaccess->erase(ci);
 }
@@ -269,7 +269,7 @@ void NickCore::GetChannelReferences(std::deque<ChannelInfo *> &queue)
 		queue.push_back(ci);
 }
 
-NickCore* NickCore::Find(const Anope::string &nick)
+NickCore *NickCore::Find(const Anope::string &nick)
 {
 	nickcore_map::const_iterator it = NickCoreList->find(nick);
 	if (it != NickCoreList->end())

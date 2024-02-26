@@ -313,7 +313,7 @@ public:
 		}
 	}
 
-	ClientSocket* OnAccept(int fd, const sockaddrs &addr) override
+	ClientSocket *OnAccept(int fd, const sockaddrs &addr) override
 	{
 		auto *c = new MyHTTPClient(this, fd, addr);
 		this->clients.emplace_back(c);
@@ -330,7 +330,7 @@ public:
 		this->pages.erase(page->GetURL());
 	}
 
-	HTTPPage* FindPage(const Anope::string &pname) override
+	HTTPPage *FindPage(const Anope::string &pname) override
 	{
 		if (this->pages.count(pname) == 0)
 			return NULL;

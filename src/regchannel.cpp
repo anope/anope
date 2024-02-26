@@ -51,7 +51,7 @@ void AutoKick::Serialize(Serialize::Data &data) const
 	data.SetType("last_used", Serialize::Data::DT_INT); data["last_used"] << this->last_used;
 }
 
-Serializable* AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sci, snc;
 
@@ -208,7 +208,7 @@ void ChannelInfo::Serialize(Serialize::Data &data) const
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sname, sfounder, ssuccessor, slevels, sbi;
 
@@ -644,7 +644,7 @@ Anope::string ChannelInfo::GetIdealBan(User *u) const
 	}
 }
 
-ChannelInfo* ChannelInfo::Find(const Anope::string &name)
+ChannelInfo *ChannelInfo::Find(const Anope::string &name)
 {
 	registered_channel_map::const_iterator it = RegisteredChannelList->find(name);
 	if (it != RegisteredChannelList->end())

@@ -38,7 +38,7 @@ struct HostRequest final
 		data.SetType("time", Serialize::Data::DT_INT); data["time"] << this->time;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		Anope::string snick;
 		data["nick"] >> snick;

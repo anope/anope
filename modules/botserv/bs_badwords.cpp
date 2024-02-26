@@ -26,7 +26,7 @@ struct BadWordImpl final
 		data.SetType("type", Serialize::Data::DT_INT); data["type"] << this->type;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 };
 
 struct BadWordsImpl final
@@ -40,7 +40,7 @@ struct BadWordsImpl final
 
 	~BadWordsImpl() override;
 
-	BadWord* AddBadWord(const Anope::string &word, BadWordType type) override
+	BadWord *AddBadWord(const Anope::string &word, BadWordType type) override
 	{
 		auto *bw = new BadWordImpl();
 		bw->chan = ci->name;
@@ -54,7 +54,7 @@ struct BadWordsImpl final
 		return bw;
 	}
 
-	BadWord* GetBadWord(unsigned index) const override
+	BadWord *GetBadWord(unsigned index) const override
 	{
 		if (this->badwords->empty() || index >= this->badwords->size())
 			return NULL;
@@ -117,7 +117,7 @@ BadWordImpl::~BadWordImpl()
 	}
 }
 
-Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sci, sword;
 

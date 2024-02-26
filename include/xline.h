@@ -45,7 +45,7 @@ public:
 	bool IsRegex() const;
 
 	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 /* Managers XLines. There is one XLineManager per type of XLine. */
@@ -125,7 +125,7 @@ public:
 	 * @param index The index
 	 * @return The XLine, or NULL if the index is out of bounds
 	 */
-	XLine* GetEntry(unsigned index);
+	XLine *GetEntry(unsigned index);
 
 	/** Clear the XLine vector
 	 * Note: This does not remove the XLines from the IRCd
@@ -145,7 +145,7 @@ public:
 	 * @param mask The mask
 	 * @return The XLine the user matches, or NULL
 	 */
-	XLine* HasEntry(const Anope::string &mask);
+	XLine *HasEntry(const Anope::string &mask);
 
 	/** Check a user against all of the xlines in this XLineManager
 	 * @param u The user

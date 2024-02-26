@@ -346,7 +346,7 @@ Server *Server::Find(const Anope::string &name, bool name_only)
 	return NULL;
 }
 
-Server* Servers::GetUplink()
+Server *Servers::GetUplink()
 {
 	for (auto *link : Me->GetLinks())
 	{

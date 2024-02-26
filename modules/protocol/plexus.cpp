@@ -141,7 +141,7 @@ public:
 		Uplink::Send("UID", u->nick, 1, u->timestamp, "+" + u->GetModes(), u->GetIdent(), u->host, "255.255.255.255", u->GetUID(), 0, u->host, u->realname);
 	}
 
-	void SendModeInternal(const MessageSource &source, User* u, const Anope::string &modes, const std::vector<Anope::string> &values) override
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
 		auto params = values;
 		params.insert(params.begin(), { "*", "SVSMODE", u->GetUID(), stringify(u->timestamp), modes });

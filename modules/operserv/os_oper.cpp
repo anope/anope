@@ -23,7 +23,7 @@ struct MyOper final
 		data["type"] << this->ot->GetName();
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		Anope::string stype, sname;
 

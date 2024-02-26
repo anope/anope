@@ -22,7 +22,7 @@ public:
 	Anope::string last;
 	std::fstream *fs = nullptr;
 
-	std::iostream& operator[](const Anope::string &key) override
+	std::iostream &operator[](const Anope::string &key) override
 	{
 		if (key != last)
 		{
@@ -44,7 +44,7 @@ public:
 	std::stringstream ss;
 	bool read = false;
 
-	std::iostream& operator[](const Anope::string &key) override
+	std::iostream &operator[](const Anope::string &key) override
 	{
 		if (!read)
 		{

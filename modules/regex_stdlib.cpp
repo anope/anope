@@ -24,7 +24,7 @@ public:
 		{
 			regex.assign(expr.str(), type | std::regex::optimize);
 		}
-		catch (const std::regex_error& error)
+		catch (const std::regex_error &error)
 		{
 			throw RegexException("Error in regex " + expr + ": " + error.what());
 		}

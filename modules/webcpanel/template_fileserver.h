@@ -17,7 +17,7 @@ public:
 	struct Replacements final
 		: std::multimap<Anope::string, Anope::string>
 	{
-		Anope::string& operator[](const Anope::string &key)
+		Anope::string &operator[](const Anope::string &key)
 		{
 			return emplace(key, "")->second;
 		}

@@ -21,7 +21,7 @@ static Anope::map<ExtensibleItem<CSMiscData> *> items;
 
 static ExtensibleItem<CSMiscData> *GetItem(const Anope::string &name)
 {
-	ExtensibleItem<CSMiscData>* &it = items[name];
+	ExtensibleItem<CSMiscData> *&it = items[name];
 	if (!it)
 		try
 		{
@@ -51,7 +51,7 @@ struct CSMiscData final
 		sdata["data"] << this->data;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		Anope::string sci, sname, sdata;
 

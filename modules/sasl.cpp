@@ -93,7 +93,7 @@ public:
 			throw ModuleException("No CertFP");
 	}
 
-	Session* CreateSession(const Anope::string &uid) override
+	Session *CreateSession(const Anope::string &uid) override
 	{
 		return new Session(this, uid);
 	}
@@ -206,7 +206,7 @@ public:
 			}
 		}
 
-		Session* session = GetSession(m.source);
+		Session *session = GetSession(m.source);
 
 		if (m.type == "S")
 		{
@@ -267,7 +267,7 @@ public:
 		return agent;
 	}
 
-	Session* GetSession(const Anope::string &uid) override
+	Session *GetSession(const Anope::string &uid) override
 	{
 		std::map<Anope::string, Session *>::iterator it = sessions.find(uid);
 		if (it != sessions.end())

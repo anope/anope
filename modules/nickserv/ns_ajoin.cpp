@@ -50,7 +50,7 @@ struct AJoinEntry final
 		sd["key"] << this->key;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &sd)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &sd)
 	{
 		Anope::string sowner;
 

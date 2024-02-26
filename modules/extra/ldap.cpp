@@ -220,7 +220,7 @@ public:
 private:
 #ifdef _WIN32
 	// Windows LDAP does not implement this so we need to do it.
-	int ldap_initialize(LDAP** ldap, const char* url)
+	int ldap_initialize(LDAP **ldap, const char *url)
 	{
 		URL_COMPONENTS urlComponents;
 		memset(&urlComponents, 0, sizeof(urlComponents));
@@ -508,7 +508,7 @@ public:
 		}
 	}
 
-	LDAP* GetConnection()
+	LDAP *GetConnection()
 	{
 		return con;
 	}

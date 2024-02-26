@@ -29,7 +29,7 @@ namespace Serialize
 
 		virtual ~Data() = default;
 
-		virtual std::iostream& operator[](const Anope::string &key) = 0;
+		virtual std::iostream &operator[](const Anope::string &key) = 0;
 		virtual std::set<Anope::string> KeySet() const { throw CoreException("Not supported"); }
 		virtual size_t Hash() const { throw CoreException("Not supported"); }
 
@@ -97,7 +97,7 @@ public:
 	/** Get the type of serializable object this is
 	 * @return The serializable object type
 	 */
-	Serialize::Type* GetSerializableType() const { return this->s_type; }
+	Serialize::Type *GetSerializableType() const { return this->s_type; }
 
 	virtual void Serialize(Serialize::Data &data) const = 0;
 
@@ -111,7 +111,7 @@ public:
 class CoreExport Serialize::Type final
 	: public Base
 {
-	typedef Serializable* (*unserialize_func)(Serializable *obj, Serialize::Data &);
+	typedef Serializable *(*unserialize_func)(Serializable *obj, Serialize::Data &);
 
 	static std::vector<Anope::string> TypeOrder;
 	static std::map<Anope::string, Serialize::Type *> Types;
@@ -168,7 +168,7 @@ public:
 	 */
 	void UpdateTimestamp();
 
-	Module* GetOwner() const { return this->owner; }
+	Module *GetOwner() const { return this->owner; }
 
 	static Serialize::Type *Find(const Anope::string &name);
 
@@ -201,23 +201,23 @@ class Serialize::Checker
 public:
 	Checker(const Anope::string &n) : name(n) { }
 
-	inline const T* operator->() const
+	inline const T *operator->() const
 	{
 		this->Check();
 		return &this->obj;
 	}
-	inline T* operator->()
+	inline T *operator->()
 	{
 		this->Check();
 		return &this->obj;
 	}
 
-	inline const T& operator*() const
+	inline const T &operator*() const
 	{
 		this->Check();
 		return this->obj;
 	}
-	inline T& operator*()
+	inline T &operator*()
 	{
 		this->Check();
 		return this->obj;
@@ -305,7 +305,7 @@ public:
 		return NULL;
 	}
 
-	inline T* operator*() const
+	inline T *operator*() const
 	{
 		if (!this->invalid)
 		{
@@ -318,7 +318,7 @@ public:
 		return NULL;
 	}
 
-	inline T* operator->() const
+	inline T *operator->() const
 	{
 		if (!this->invalid)
 		{

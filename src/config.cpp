@@ -40,7 +40,7 @@ int Block::CountBlock(const Anope::string &bname) const
 	return blocks.count(bname);
 }
 
-const Block* Block::GetBlock(const Anope::string &bname, int num) const
+const Block *Block::GetBlock(const Anope::string &bname, int num) const
 {
 	std::pair<block_map::const_iterator, block_map::const_iterator> it = blocks.equal_range(bname);
 
@@ -50,7 +50,7 @@ const Block* Block::GetBlock(const Anope::string &bname, int num) const
 	return &EmptyBlock;
 }
 
-Block* Block::GetMutableBlock(const Anope::string &bname, int num)
+Block *Block::GetMutableBlock(const Anope::string &bname, int num)
 {
 	std::pair<block_map::iterator, block_map::iterator> it = blocks.equal_range(bname);
 
@@ -71,7 +71,7 @@ const Block::item_map &Block::GetItems() const
 	return items;
 }
 
-template<> const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const
+template<> const Anope::string Block::Get(const Anope::string &tag, const Anope::string &def) const
 {
 	Anope::map<Anope::string>::const_iterator it = items.find(tag);
 	if (it != items.end())
@@ -635,7 +635,7 @@ Block *Conf::GetModule(const Anope::string &mname)
 	if (it != modules.end())
 		return it->second;
 
-	Block* &block = modules[mname];
+	Block *&block = modules[mname];
 
 	/* Search for the block */
 	for (std::pair<block_map::iterator, block_map::iterator> iters = blocks.equal_range("module"); iters.first != iters.second; ++iters.first)

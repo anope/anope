@@ -175,7 +175,7 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 
 protected:
-	bool CheckArguments(CommandSource &source, const std::vector<Anope::string> &params, ChannelInfo* &ci)
+	bool CheckArguments(CommandSource &source, const std::vector<Anope::string> &params, ChannelInfo *&ci)
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &option = params[1];

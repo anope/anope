@@ -56,7 +56,7 @@ public:
 	virtual ~BotInfo();
 
 	void Serialize(Serialize::Data &data) const;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	void GenerateUID();
 
@@ -118,7 +118,7 @@ public:
 	 * @param permission Permission required to execute the command, if any
 	 * @return The commandinfo for the newly created command
 	 */
-	CommandInfo& SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission = "");
+	CommandInfo &SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission = "");
 
 	/** Get command info for a command
 	 * @param cname The command name
@@ -131,5 +131,5 @@ public:
 	 * @param nick_only True to only look by nick, and not by UID
 	 * @return The bot, if it exists
 	 */
-	static BotInfo* Find(const Anope::string &nick, bool nick_only = false);
+	static BotInfo *Find(const Anope::string &nick, bool nick_only = false);
 };

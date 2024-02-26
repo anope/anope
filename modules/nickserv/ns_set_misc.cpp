@@ -21,7 +21,7 @@ static Anope::map<ExtensibleItem<NSMiscData> *> items;
 
 static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name)
 {
-	ExtensibleItem<NSMiscData>* &it = items[name];
+	ExtensibleItem<NSMiscData> *&it = items[name];
 	if (!it)
 		try
 		{
@@ -51,7 +51,7 @@ struct NSMiscData final
 		sdata["data"] << this->data;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		Anope::string snc, sname, sdata;
 

@@ -38,7 +38,7 @@ struct EntryMsgImpl final
 		data.SetType("when", Serialize::Data::DT_INT); data["when"] << this->when;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 struct EntryMessageListImpl final
@@ -46,7 +46,7 @@ struct EntryMessageListImpl final
 {
 	EntryMessageListImpl(Extensible *) { }
 
-	EntryMsg* Create() override
+	EntryMsg *Create() override
 	{
 		return new EntryMsgImpl();
 	}
@@ -68,7 +68,7 @@ EntryMsgImpl::~EntryMsgImpl()
 }
 
 
-Serializable* EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sci, screator, smessage;
 	time_t swhen;

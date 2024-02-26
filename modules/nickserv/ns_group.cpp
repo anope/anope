@@ -102,7 +102,7 @@ public:
 		Anope::string nick;
 		if (params.empty())
 		{
-			NickCore* core = source.GetAccount();
+			NickCore *core = source.GetAccount();
 			if (core)
 				nick = core->display;
 		}

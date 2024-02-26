@@ -228,7 +228,7 @@ void InfoFormatter::Process(std::vector<Anope::string> &buffer)
 	}
 }
 
-Anope::string& InfoFormatter::operator[](const Anope::string &key)
+Anope::string &InfoFormatter::operator[](const Anope::string &key)
 {
 	Anope::string tkey = Language::Translate(this->nc, key.c_str());
 	if (tkey.length() > this->longest)

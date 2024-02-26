@@ -28,7 +28,7 @@ struct Stats final
 		data["maxusertime"] << MaxUserTime;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		data["maxusercnt"] >> MaxUserCount;
 		data["maxusertime"] >> MaxUserTime;
@@ -160,7 +160,7 @@ private:
 		return;
 	}
 
-	template<typename T> void GetHashStats(const T& map, size_t& entries, size_t& buckets, size_t& max_chain)
+	template<typename T> void GetHashStats(const T &map, size_t &entries, size_t &buckets, size_t &max_chain)
 	{
 		entries = map.size(), buckets = map.bucket_count(), max_chain = 0;
 		for (size_t i = 0; i < buckets; ++i)

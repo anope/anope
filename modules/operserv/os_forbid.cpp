@@ -20,7 +20,7 @@ struct ForbidDataImpl final
 {
 	ForbidDataImpl() : Serializable("ForbidData") { }
 	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 void ForbidDataImpl::Serialize(Serialize::Data &data) const
@@ -33,7 +33,7 @@ void ForbidDataImpl::Serialize(Serialize::Data &data) const
 	data["type"] << this->type;
 }
 
-Serializable* ForbidDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ForbidDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!forbid_service)
 		return NULL;

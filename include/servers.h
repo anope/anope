@@ -25,7 +25,7 @@ namespace Servers
 	 * the only server whose uplink *is* Me that is not a juped server.
 	 * @return Our uplink, or NULL if not uplinked to anything
 	 */
-	extern CoreExport Server* GetUplink();
+	extern CoreExport Server *GetUplink();
 
 	/* Server maps by name and id */
 	extern CoreExport Anope::map<Server *> ByName;

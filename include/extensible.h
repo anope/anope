@@ -41,12 +41,12 @@ public:
 
 	void UnsetExtensibles();
 
-	template<typename T> T* GetExt(const Anope::string &name) const;
+	template<typename T> T *GetExt(const Anope::string &name) const;
 	bool HasExt(const Anope::string &name) const;
 
-	template<typename T> T* Extend(const Anope::string &name, const T &what);
-	template<typename T> T* Extend(const Anope::string &name);
-	template<typename T> T* Require(const Anope::string &name);
+	template<typename T> T *Extend(const Anope::string &name, const T &what);
+	template<typename T> T *Extend(const Anope::string &name);
+	template<typename T> T *Require(const Anope::string &name);
 	template<typename T> void Shrink(const Anope::string &name);
 
 	static void ExtensibleSerialize(const Extensible *, const Serializable *, Serialize::Data &data);
@@ -77,17 +77,17 @@ public:
 		}
 	}
 
-	T* Set(Extensible *obj, const T &value)
+	T *Set(Extensible *obj, const T &value)
 	{
-		T* t = Set(obj);
+		T *t = Set(obj);
 		if (t)
 			*t = value;
 		return t;
 	}
 
-	T* Set(Extensible *obj)
+	T *Set(Extensible *obj)
 	{
-		T* t = Create(obj);
+		T *t = Create(obj);
 		Unset(obj);
 		items[obj] = t;
 		obj->extension_items.insert(this);
@@ -102,7 +102,7 @@ public:
 		delete value;
 	}
 
-	T* Get(const Extensible *obj) const
+	T *Get(const Extensible *obj) const
 	{
 		std::map<Extensible *, void *>::const_iterator it = items.find(const_cast<Extensible *>(obj));
 		if (it != items.end())
@@ -115,9 +115,9 @@ public:
 		return items.find(const_cast<Extensible *>(obj)) != items.end();
 	}
 
-	T* Require(Extensible *obj)
+	T *Require(Extensible *obj)
 	{
-		T* t = Get(obj);
+		T *t = Get(obj);
 		if (t)
 			return t;
 
@@ -130,7 +130,7 @@ class ExtensibleItem
 	: public BaseExtensibleItem<T>
 {
 protected:
-	T* Create(Extensible *obj) override
+	T *Create(Extensible *obj) override
 	{
 		return new T(obj);
 	}
@@ -143,7 +143,7 @@ class PrimitiveExtensibleItem
 	: public BaseExtensibleItem<T>
 {
 protected:
-	T* Create(Extensible *obj) override
+	T *Create(Extensible *obj) override
 	{
 		return new T();
 	}
@@ -155,7 +155,7 @@ template<>
 class PrimitiveExtensibleItem<bool> : public BaseExtensibleItem<bool>
 {
 protected:
-	bool* Create(Extensible *) override
+	bool *Create(Extensible *) override
 	{
 		return NULL;
 	}
@@ -172,7 +172,7 @@ public:
 
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 	{
-		T* t = this->Get(e);
+		T *t = this->Get(e);
 		data[this->name] << *t;
 	}
 
@@ -216,7 +216,7 @@ struct ExtensibleRef final
 };
 
 template<typename T>
-T* Extensible::GetExt(const Anope::string &name) const
+T *Extensible::GetExt(const Anope::string &name) const
 {
 	ExtensibleRef<T> ref(name);
 	if (ref)
@@ -227,16 +227,16 @@ T* Extensible::GetExt(const Anope::string &name) const
 }
 
 template<typename T>
-T* Extensible::Extend(const Anope::string &name, const T &what)
+T *Extensible::Extend(const Anope::string &name, const T &what)
 {
-	T* t = Extend<T>(name);
+	T *t = Extend<T>(name);
 	if (t)
 		*t = what;
 	return t;
 }
 
 template<typename T>
-T* Extensible::Extend(const Anope::string &name)
+T *Extensible::Extend(const Anope::string &name)
 {
 	ExtensibleRef<T> ref(name);
 	if (ref)
@@ -247,7 +247,7 @@ T* Extensible::Extend(const Anope::string &name)
 }
 
 template<typename T>
-T* Extensible::Require(const Anope::string &name)
+T *Extensible::Require(const Anope::string &name)
 {
 	if (HasExt(name))
 		return GetExt<T>(name);

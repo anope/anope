@@ -98,7 +98,7 @@ public:
 	NickCore *GetAccount() const;
 
 	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	static const unsigned int MAX_DEPTH = 4;
 
@@ -107,7 +107,7 @@ public:
 	 * @param nc The account
 	 * @param next Next channel to check if any
 	 */
-	virtual bool Matches(const User *u, const NickCore *nc, ChannelInfo* &next) const;
+	virtual bool Matches(const User *u, const NickCore *nc, ChannelInfo *&next) const;
 
 	/** Check if this access entry has the given privilege.
 	 * @param name The privilege name

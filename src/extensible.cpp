@@ -59,7 +59,7 @@ void Extensible::ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize
 }
 
 template<>
-bool* Extensible::Extend(const Anope::string &name, const bool &what)
+bool *Extensible::Extend(const Anope::string &name, const bool &what)
 {
 	ExtensibleRef<bool> ref(name);
 	if (ref)

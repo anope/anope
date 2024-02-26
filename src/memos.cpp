@@ -44,7 +44,7 @@ void Memo::Serialize(Serialize::Data &data) const
 	data["receipt"] << this->receipt;
 }
 
-Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string owner;
 

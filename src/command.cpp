@@ -17,7 +17,7 @@
 #include "regchannel.h"
 #include "channels.h"
 
-void CommandReply::SendMessage(CommandSource& source, const Anope::string &msg)
+void CommandReply::SendMessage(CommandSource &source, const Anope::string &msg)
 {
 	SendMessage(source.service, msg);
 }
@@ -294,7 +294,7 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 	FOREACH_MOD(OnPostCommand, (source, this, params));
 }
 
-bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo* &bot, Anope::string &name)
+bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo *&bot, Anope::string &name)
 {
 	bot = NULL;
 

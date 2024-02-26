@@ -24,7 +24,7 @@ namespace SQL
 			Clear();
 		}
 
-		std::iostream& operator[](const Anope::string &key) override
+		std::iostream &operator[](const Anope::string &key) override
 		{
 			std::stringstream *&ss = data[key];
 			if (!ss)
@@ -107,7 +107,7 @@ namespace SQL
 		Query() { }
 		Query(const Anope::string &q) : query(q) { }
 
-		Query& operator=(const Anope::string &q)
+		Query &operator=(const Anope::string &q)
 		{
 			this->query = q;
 			this->parameters.clear();
@@ -124,7 +124,7 @@ namespace SQL
 			return !(*this == other);
 		}
 
-		template<typename T> void SetValue(const Anope::string &key, const T& value, bool escape = true)
+		template<typename T> void SetValue(const Anope::string &key, const T &value, bool escape = true)
 		{
 			try
 			{

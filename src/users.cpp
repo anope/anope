@@ -111,7 +111,7 @@ static void Collide(User *u, const Anope::string &id, const Anope::string &type)
 	CollideKill(u, type);
 }
 
-User* User::OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc)
+User *User::OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc)
 {
 	// How IRCds handle collisions varies a lot, for safety well just always kill both sides
 	// With properly set qlines, this can almost never happen anyway
@@ -160,7 +160,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 
 		this->nick = newnick;
 
-		User* &other = UserListByNick[this->nick];
+		User *&other = UserListByNick[this->nick];
 		if (other)
 		{
 			CollideKill(this, "Nick collision");
@@ -334,7 +334,7 @@ void User::SendMessage(BotInfo *source, const char *fmt, ...)
 
 namespace
 {
-	void SendMessageInternal(BotInfo *source, User* target, const Anope::string &msg, const Anope::map<Anope::string> &tags)
+	void SendMessageInternal(BotInfo *source, User *target, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 	{
 		const char *translated_message = Language::Translate(target, msg.c_str());
 
@@ -354,7 +354,7 @@ void User::SendMessage(BotInfo *source, const Anope::string &msg)
 	SendMessageInternal(source, this, msg, {});
 }
 
-void User::SendMessage(CommandSource& source, const Anope::string &msg)
+void User::SendMessage(CommandSource &source, const Anope::string &msg)
 {
 	Anope::map<Anope::string> tags;
 	if (!source.msgid.empty())
@@ -861,7 +861,7 @@ bool User::ShouldPrivmsg() const
 	return Config->UsePrivmsg && ((!nc && Config->DefPrivmsg) || (nc && nc->HasExt("MSG")));
 }
 
-User* User::Find(const Anope::string &name, bool nick_only)
+User *User::Find(const Anope::string &name, bool nick_only)
 {
 	if (!nick_only && IRCD && IRCD->RequiresID)
 	{

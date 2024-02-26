@@ -25,7 +25,7 @@ public:
 	~Memo();
 
 	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	Anope::string owner;
 	/* When it was sent */

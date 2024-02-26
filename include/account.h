@@ -56,7 +56,7 @@ public:
 	~NickAlias();
 
 	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Set a vhost for the user
 	 * @param ident The ident
@@ -153,7 +153,7 @@ public:
 	~NickCore();
 
 	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Changes the display for this account
 	 * @param na The new display, must be grouped to this account.
@@ -224,7 +224,7 @@ public:
 	 * @param nick The account name to find
 	 * @return The account, if it exists
 	 */
-	static NickCore* Find(const Anope::string &nick);
+	static NickCore *Find(const Anope::string &nick);
 
 	void AddChannelReference(ChannelInfo *ci);
 	void RemoveChannelReference(ChannelInfo *ci);

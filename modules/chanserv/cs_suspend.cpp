@@ -27,7 +27,7 @@ struct CSSuspendInfo final
 		data["expires"] << expires;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		Anope::string schan;
 		data["chan"] >> schan;

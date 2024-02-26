@@ -78,5 +78,5 @@ class CertService
 public:
 	CertService(Module *c) : Service(c, "CertService", "certs") { }
 
-	virtual NickCore* FindAccountFromCert(const Anope::string &cert) = 0;
+	virtual NickCore *FindAccountFromCert(const Anope::string &cert) = 0;
 };

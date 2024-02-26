@@ -21,7 +21,7 @@ class XMLRPCIdentifyRequest final
 	Reference<XMLRPCServiceInterface> xinterface;
 
 public:
-	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest& req, HTTPClient *c, XMLRPCServiceInterface* iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
+	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest &req, HTTPClient *c, XMLRPCServiceInterface *iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
 
 	void OnSuccess() override
 	{

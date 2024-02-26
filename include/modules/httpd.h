@@ -27,9 +27,9 @@ struct HTTPReply final
 	std::vector<cookie> cookies;
 
 	HTTPReply() = default;
-	HTTPReply& operator=(const HTTPReply &) = default;
+	HTTPReply &operator=(const HTTPReply &) = default;
 
-	HTTPReply(const HTTPReply& other) : error(other.error), length(other.length)
+	HTTPReply(const HTTPReply &other) : error(other.error), length(other.length)
 	{
 		content_type = other.content_type;
 		headers = other.headers;
@@ -169,7 +169,7 @@ public:
 
 	virtual bool RegisterPage(HTTPPage *page) = 0;
 	virtual void UnregisterPage(HTTPPage *page) = 0;
-	virtual HTTPPage* FindPage(const Anope::string &name) = 0;
+	virtual HTTPPage *FindPage(const Anope::string &name) = 0;
 };
 
 namespace HTTPUtils
@@ -180,7 +180,7 @@ namespace HTTPUtils
 
 		for (unsigned i = 0; i < url.length(); ++i)
 		{
-			const char& c = url[i];
+			const char &c = url[i];
 
 			if (c == '%' && i + 2 < url.length())
 			{

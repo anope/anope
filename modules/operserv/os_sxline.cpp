@@ -59,7 +59,7 @@ class CommandOSSXLineBase
 	: public Command
 {
 private:
-	virtual XLineManager* xlm() = 0;
+	virtual XLineManager *xlm() = 0;
 
 	virtual void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 

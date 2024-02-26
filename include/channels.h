@@ -110,7 +110,7 @@ public:
 	 * @param status The status to give the user, if any
 	 * @return The UserContainer for the user
 	 */
-	ChanUserContainer* JoinUser(User *u, const ChannelStatus *status);
+	ChanUserContainer *JoinUser(User *u, const ChannelStatus *status);
 
 	/** Remove a user internally from the channel
 	 * @param u The user
@@ -302,7 +302,7 @@ public:
 	 * @param name The channel to find
 	 * @return The channel, if found
 	 */
-	static Channel* Find(const Anope::string &name);
+	static Channel *Find(const Anope::string &name);
 
 	/** Finds or creates a channel
 	 * @param name The channel name

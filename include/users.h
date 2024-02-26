@@ -116,7 +116,7 @@ protected:
 	virtual ~User();
 
 public:
-	static User* OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
+	static User *OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
 
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
@@ -193,7 +193,7 @@ public:
 	 */
 	void SendMessage(BotInfo *source, const char *fmt, ...) ATTR_FORMAT(3, 4);
 	void SendMessage(BotInfo *source, const Anope::string &msg) override;
-	void SendMessage(CommandSource& source, const Anope::string &msg) override;
+	void SendMessage(CommandSource &source, const Anope::string &msg) override;
 
 	/** Identify the user to a nick.
 	 * updates last_seen, logs the user in,
@@ -377,7 +377,7 @@ public:
 	 * @param nick_only set to true to only look up by nick, not UID
 	 * @return the user, if they exist
 	 */
-	static User* Find(const Anope::string &name, bool nick_only = false);
+	static User *Find(const Anope::string &name, bool nick_only = false);
 
 	/** Quits all users who are pending to be quit
 	 */

@@ -32,7 +32,7 @@ namespace SASL
 
 		virtual Anope::string GetAgent() = 0;
 
-		virtual Session* GetSession(const Anope::string &uid) = 0;
+		virtual Session *GetSession(const Anope::string &uid) = 0;
 
 		virtual void SendMessage(SASL::Session *session, const Anope::string &type, const Anope::string &data) = 0;
 
@@ -67,7 +67,7 @@ namespace SASL
 	public:
 		Mechanism(Module *o, const Anope::string &sname) : Service(o, "SASL::Mechanism", sname) { }
 
-		virtual Session* CreateSession(const Anope::string &uid) { return new Session(this, uid); }
+		virtual Session *CreateSession(const Anope::string &uid) { return new Session(this, uid); }
 
 		virtual void ProcessMessage(Session *session, const Message &) = 0;
 

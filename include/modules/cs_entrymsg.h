@@ -33,5 +33,5 @@ public:
 			delete (*this)->at(i - 1);
 	}
 
-	virtual EntryMsg* Create() = 0;
+	virtual EntryMsg *Create() = 0;
 };

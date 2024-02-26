@@ -29,7 +29,7 @@ struct Exception final
 
 	Exception() : Serializable("Exception") { }
 	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class SessionService
@@ -70,7 +70,7 @@ void Exception::Serialize(Serialize::Data &data) const
 	data["expires"] << this->expires;
 }
 
-Serializable* Exception::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *Exception::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!session_service)
 		return NULL;

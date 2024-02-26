@@ -85,7 +85,7 @@ void BotInfo::Serialize(Serialize::Data &data) const
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string nick, user, host, realname, flags;
 
@@ -237,7 +237,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message, const Anope::map<
 	Command::Run(source, message);
 }
 
-CommandInfo& BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
+CommandInfo &BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
 {
 	CommandInfo ci;
 	ci.name = sname;
@@ -254,7 +254,7 @@ CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
 	return NULL;
 }
 
-BotInfo* BotInfo::Find(const Anope::string &nick, bool nick_only)
+BotInfo *BotInfo::Find(const Anope::string &nick, bool nick_only)
 {
 	if (!nick_only && IRCD != NULL && IRCD->RequiresID)
 	{

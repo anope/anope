@@ -19,7 +19,7 @@ struct CertServiceImpl final
 {
 	CertServiceImpl(Module *o) : CertService(o) { }
 
-	NickCore* FindAccountFromCert(const Anope::string &cert) override
+	NickCore *FindAccountFromCert(const Anope::string &cert) override
 	{
 		Anope::hash_map<NickCore *>::iterator it = certmap.find(cert);
 		if (it != certmap.end())

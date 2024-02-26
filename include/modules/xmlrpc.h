@@ -18,7 +18,7 @@ public:
 	Anope::string name;
 	Anope::string id;
 	std::deque<Anope::string> data;
-	HTTPReply& r;
+	HTTPReply &r;
 
 	XMLRPCRequest(HTTPReply &_r) : r(_r) { }
 	inline void reply(const Anope::string &dname, const Anope::string &ddata) { this->replies.emplace(dname, ddata); }

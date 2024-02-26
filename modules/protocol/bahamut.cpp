@@ -59,7 +59,7 @@ public:
 			IRCDProto::SendModeInternal(source, chan, modes, values);
 	}
 
-	void SendModeInternal(const MessageSource &source, User* u, const Anope::string &modes, const std::vector<Anope::string> &values) override
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
 		auto params = values;
 		params.insert(params.begin(), { u->nick, stringify(u->timestamp), modes });

@@ -32,7 +32,7 @@ struct ModeLockImpl final
 	}
 
 	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 struct ModeLocksImpl final
@@ -213,7 +213,7 @@ void ModeLockImpl::Serialize(Serialize::Data &data) const
 	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;
 }
 
-Serializable* ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sci;
 

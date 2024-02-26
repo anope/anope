@@ -137,7 +137,7 @@ bool Channel::CheckDelete()
 	return MOD_RESULT != EVENT_STOP && this->users.empty();
 }
 
-ChanUserContainer* Channel::JoinUser(User *user, const ChannelStatus *status)
+ChanUserContainer *Channel::JoinUser(User *user, const ChannelStatus *status)
 {
 	if (user->server && user->server->IsSynced())
 		Log(user, this, "join");
@@ -934,7 +934,7 @@ bool Channel::CheckKick(User *user)
 	return true;
 }
 
-BotInfo* Channel::WhoSends() const
+BotInfo *Channel::WhoSends() const
 {
 	if (ci)
 		return ci->WhoSends();
@@ -949,7 +949,7 @@ BotInfo* Channel::WhoSends() const
 	return NULL;
 }
 
-Channel* Channel::Find(const Anope::string &name)
+Channel *Channel::Find(const Anope::string &name)
 {
 	channel_map::const_iterator it = ChannelList.find(name);
 
@@ -960,7 +960,7 @@ Channel* Channel::Find(const Anope::string &name)
 
 Channel *Channel::FindOrCreate(const Anope::string &name, bool &created, time_t ts)
 {
-	Channel* &chan = ChannelList[name];
+	Channel *&chan = ChannelList[name];
 	created = chan == NULL;
 	if (!chan)
 		chan = new Channel(name, ts);

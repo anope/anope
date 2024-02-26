@@ -163,7 +163,7 @@ void XLine::Serialize(Serialize::Data &data) const
 		data["manager"] << this->manager->name;
 }
 
-Serializable* XLine::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *XLine::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string smanager;
 
@@ -344,7 +344,7 @@ bool XLineManager::DelXLine(XLine *x)
 	return false;
 }
 
-XLine* XLineManager::GetEntry(unsigned index)
+XLine *XLineManager::GetEntry(unsigned index)
 {
 	if (index >= this->xlines->size())
 		return NULL;
@@ -414,7 +414,7 @@ bool XLineManager::CanAdd(CommandSource &source, const Anope::string &mask, time
 	return true;
 }
 
-XLine* XLineManager::HasEntry(const Anope::string &mask)
+XLine *XLineManager::HasEntry(const Anope::string &mask)
 {
 	std::multimap<Anope::string, XLine *, ci::less>::iterator it = XLinesByUID->find(mask);
 	if (it != XLinesByUID->end())

@@ -26,9 +26,9 @@ public:
 			delete stream;
 	}
 
-	std::iostream& operator[](const Anope::string &key) override
+	std::iostream &operator[](const Anope::string &key) override
 	{
-		std::stringstream* &stream = data[key];
+		std::stringstream *&stream = data[key];
 		if (!stream)
 			stream = new std::stringstream();
 		return *stream;
@@ -318,7 +318,7 @@ void ObjectLoader::OnResult(const Reply &r)
 		data[key->bulk] << value->bulk;
 	}
 
-	Serializable* &obj = st->objects[this->id];
+	Serializable *&obj = st->objects[this->id];
 	obj = st->Unserialize(obj, data);
 	if (obj)
 	{
@@ -337,7 +337,7 @@ void IDInterface::OnResult(const Reply &r)
 		return;
 	}
 
-	Serializable* &obj = o->GetSerializableType()->objects[r.i];
+	Serializable *&obj = o->GetSerializableType()->objects[r.i];
 	if (obj)
 		/* This shouldn't be possible */
 		obj->id = 0;
@@ -537,7 +537,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 	}
 	else if (op == "del")
 	{
-		Serializable* &s = s_type->objects[obj_id];
+		Serializable *&s = s_type->objects[obj_id];
 		if (s == NULL)
 			return;
 
@@ -587,7 +587,7 @@ void ModifiedObject::OnResult(const Reply &r)
 		return;
 	}
 
-	Serializable* &obj = st->objects[this->id];
+	Serializable *&obj = st->objects[this->id];
 
 	/* Transaction start */
 	me->redis->StartTransaction();

@@ -140,8 +140,8 @@ namespace Anope
 		 */
 		inline void push_back(char c) { return this->_string.push_back(c); }
 
-		inline string& append(const string &s) { this->_string.append(s.str()); return *this; }
-		inline string& append(const char *s, size_t n) { this->_string.append(s, n); return *this; }
+		inline string &append(const string &s) { this->_string.append(s.str()); return *this; }
+		inline string &append(const char *s, size_t n) { this->_string.append(s, n); return *this; }
 
 		/**
 		 * Resizes the string content to n characters.
@@ -159,21 +159,21 @@ namespace Anope
 		 * Trim leading and trailing white spaces from the string.
 		 */
 
-		inline string& ltrim(const Anope::string &what = " \t\r\n")
+		inline string &ltrim(const Anope::string &what = " \t\r\n")
 		{
 			while (!this->_string.empty() && what.find(this->_string[0]) != Anope::string::npos)
 				this->_string.erase(this->_string.begin());
 			return *this;
 		}
 
-		inline string& rtrim(const Anope::string &what = " \t\r\n")
+		inline string &rtrim(const Anope::string &what = " \t\r\n")
 		{
 			while (!this->_string.empty() && what.find(this->_string[this->_string.length() - 1]) != Anope::string::npos)
 				this->_string.erase(this->_string.length() - 1);
 			return *this;
 		}
 
-		inline string& trim(const Anope::string &what = " \t\r\n")
+		inline string &trim(const Anope::string &what = " \t\r\n")
 		{
 			this->ltrim(what);
 			this->rtrim(what);
@@ -210,9 +210,9 @@ namespace Anope
 		inline size_type find_last_not_of(const string &_str, size_type pos = npos) const { return this->_string.find_last_not_of(_str._string, pos); }
 		inline size_type find_last_not_of_ci(const string &_str, size_type pos = npos) const { return ci::string(this->_string.c_str()).find_last_not_of(ci::string(_str._string.c_str()), pos); }
 
-		inline int compare(size_t pos, size_t len, const string& str) const { return ci::string(this->_string.c_str()).compare(pos, len, ci::string(str.c_str())); }
-		inline int compare(size_t pos, size_t len, const string& str, size_t subpos, size_type sublen = npos) const { return ci::string(this->_string.c_str()).compare(pos, len, ci::string(str.c_str()), subpos, sublen); }
-		inline int compare(size_t pos, size_t len, const char* s, size_type n = npos) const { return ci::string(this->_string.c_str()).compare(pos, len, s, n); }
+		inline int compare(size_t pos, size_t len, const string &str) const { return ci::string(this->_string.c_str()).compare(pos, len, ci::string(str.c_str())); }
+		inline int compare(size_t pos, size_t len, const string &str, size_t subpos, size_type sublen = npos) const { return ci::string(this->_string.c_str()).compare(pos, len, ci::string(str.c_str()), subpos, sublen); }
+		inline int compare(size_t pos, size_t len, const char *s, size_type n = npos) const { return ci::string(this->_string.c_str()).compare(pos, len, s, n); }
 
 		/**
 		 * Determine if string consists of only numbers.
@@ -600,7 +600,7 @@ public:
 	/** Gets every token from this stream
 	 * @param token Tokens are pushed back here
 	 */
-	template<typename T> void GetTokens(T& token)
+	template<typename T> void GetTokens(T &token)
 	{
 		token.clear();
 		Anope::string t;

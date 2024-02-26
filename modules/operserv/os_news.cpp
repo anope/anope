@@ -75,7 +75,7 @@ struct MyNewsItem final
 		data["time"] << this->time;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		if (!news_service)
 			return NULL;

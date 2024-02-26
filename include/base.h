@@ -103,14 +103,14 @@ public:
 		return NULL;
 	}
 
-	inline T* operator->()
+	inline T *operator->()
 	{
 		if (operator bool())
 			return this->ref;
 		return NULL;
 	}
 
-	inline T* operator*()
+	inline T *operator*()
 	{
 		if (operator bool())
 			return this->ref;

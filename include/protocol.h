@@ -194,6 +194,9 @@ public:
 	virtual void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) = 0;
 	virtual void SendGlobalPrivmsg(BotInfo *bi, const Server *desc, const Anope::string &msg) = 0;
 
+	virtual void SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg);
+	virtual void SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg);
+
 	virtual void SendQuit(User *u, const char *fmt, ...) ATTR_FORMAT(3, 4);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);

@@ -283,10 +283,16 @@ public:
 		if (u && c && c->ci && u->server->IsSynced())
 		{
 			EntryMessageList *messages = c->ci->GetExt<EntryMessageList>("entrymsg");
+			if (!messages)
+				return;
 
-			if (messages != NULL)
-				for (const auto &message : *(*messages))
-					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), message->message.c_str());
+			for (const auto &message : *(*messages))
+			{
+				if (u->ShouldPrivmsg())
+					IRCD->SendContextPrivmsg(c->ci->WhoSends(), u, c, message->message);
+				else
+					IRCD->SendContextNotice(c->ci->WhoSends(), u, c, message->message);
+			}
 		}
 	}
 };

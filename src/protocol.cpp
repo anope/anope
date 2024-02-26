@@ -411,6 +411,20 @@ Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 	return Entry("", mask).GetNUHMask();
 }
 
+void IRCDProto::SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg)
+{
+	IRCD->SendNoticeInternal(bi, target->GetUID(), Anope::printf("[%s] %s", context->name.c_str(), msg.c_str()), {
+		{ "+draft/channel-context", context->name },
+	});
+}
+
+void IRCDProto::SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg)
+{
+	IRCD->SendPrivmsgInternal(bi, target->GetUID(), Anope::printf("[%s] %s", context->name.c_str(), msg.c_str()), {
+		{ "+draft/channel-context", context->name },
+	});
+}
+
 size_t IRCDProto::GetMaxChannel()
 {
 	// We can cache this as its not allowed to change on rehash.

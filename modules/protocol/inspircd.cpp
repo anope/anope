@@ -340,7 +340,7 @@ public:
 	{
 		auto newparams = params;
 		newparams.insert(newparams.begin(), { Me->GetSID(), dest, stringify(numeric) });
-		Uplink::SendInternal({}, Me, numeric, newparams);
+		Uplink::SendInternal({}, Me, "NUM", newparams);
 	}
 
 	void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values) override

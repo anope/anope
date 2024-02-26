@@ -45,6 +45,9 @@ namespace
 	// Non-introduced users who have authenticated via SASL.
 	std::list<SASLUser> saslusers;
 
+	// The version of the InspIRCd protocol that we are using.
+	size_t spanningtree_proto_ver = 1205;
+
 	// Parses a module name in the format "m_foo.so=bar" to {foo, bar}.
 	void ParseModule(const Anope::string &module, Anope::string &modname, Anope::string &moddata)
 	{
@@ -1010,9 +1013,9 @@ struct IRCDMessageCapab final
 	{
 		if (params[0].equals_cs("START"))
 		{
-			unsigned int spanningtree_proto_ver = 0;
+			spanningtree_proto_ver = 0;
 			if (params.size() >= 2)
-				spanningtree_proto_ver = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+				spanningtree_proto_ver = params[1].is_pos_number_only() ? convertTo<size_t>(params[1]) : 0;
 
 			if (spanningtree_proto_ver < 1205)
 			{

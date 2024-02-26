@@ -471,9 +471,20 @@ bool User::IsServicesOper()
 		return false;
 	else if (this->nc->o->require_oper && !this->HasMode("OPER"))
 		return false;
-	else if (!this->nc->o->certfp.empty() && this->fingerprint != this->nc->o->certfp)
-		// Certfp mismatch
-		return false;
+	else if (!this->nc->o->certfp.empty())
+	{
+		bool match = false;
+		for (const auto &certfp : this->nc->o->certfp)
+		{
+			if (this->fingerprint == certfp)
+			{
+				match = true;
+				break;
+			}
+		}
+		if (!match)
+			return false;
+	}
 	else if (!this->nc->o->hosts.empty())
 	{
 		bool match = false;

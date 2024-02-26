@@ -319,7 +319,7 @@ Conf::Conf() : Block("")
 		auto *o = new Oper(nname, ot);
 		o->require_oper = require_oper;
 		o->password = password;
-		o->certfp = certfp;
+		spacesepstream(certfp).GetTokens(o->certfp);
 		spacesepstream(host).GetTokens(o->hosts);
 		o->vhost = vhost;
 

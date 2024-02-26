@@ -923,6 +923,19 @@ struct IRCDMessageCapab final
 		Anope::string type;
 	};
 
+	static std::pair<Anope::string, size_t> ParseCapability(const Anope::string &token)
+	{
+		auto sep = token.find(':');
+		if (sep == Anope::string::npos)
+			return { token, 0 };
+
+		auto value = token.substr(sep);
+		if (!value.is_pos_number_only())
+			return { token, 0 };
+
+		return { token.substr(0, sep), convertTo<size_t>(value) };
+	}
+
 	static bool ParseMode(const Anope::string &token, ModeInfo &mode)
 	{
 		// list:ban=b  param-set:limit=l  param:key=k  prefix:30000:op=@o  simple:noextmsg=n
@@ -1258,33 +1271,19 @@ struct IRCDMessageCapab final
 			Anope::string capab;
 			while (ssep.GetToken(capab))
 			{
-				if (capab == "GLOBOPS=1")
+				auto [tokname, tokvalue] = ParseCapability(capab);
+				if (tokname == "CHANMAX")
+					maxchannel = tokvalue;
+				else if (tokname == "GLOBOPS" && tokvalue)
 					Servers::Capab.insert("GLOBOPS");
-				else if (capab.find("CHANMAX=") != Anope::string::npos)
-				{
-					Anope::string value(capab.begin() + 8, capab.end());
-					maxchannel = value.is_pos_number_only() ? convertTo<unsigned>(value) : 0;
-				}
-				else if (capab.find("IDENTMAX=") != Anope::string::npos)
-				{
-					Anope::string value(capab.begin() + 9, capab.end());
-					maxuser = value.is_pos_number_only() ? convertTo<unsigned>(value) : 0;
-				}
-				else if (capab.find("MAXMODES=") != Anope::string::npos)
-				{
-					Anope::string value(capab.begin() + 9, capab.end());
-					IRCD->MaxModes = value.is_pos_number_only() ? convertTo<unsigned>(value) : 3;
-				}
-				else if (capab.find("MAXHOST=") != Anope::string::npos)
-				{
-					Anope::string value(capab.begin() + 8, capab.end());
-					maxhost  = value.is_pos_number_only() ? convertTo<unsigned>(value) : 0;
-				}
-				else if (capab.find("NICKMAX=") != Anope::string::npos)
-				{
-					Anope::string value(capab.begin() + 8, capab.end());
-					maxnick = value.is_pos_number_only() ? convertTo<unsigned>(value) : 0;
-				}
+				else if (tokname == "IDENTMAX")
+					maxuser = tokvalue;
+				else if (tokname == "MAXMODES")
+					IRCD->MaxModes = tokvalue;
+				else if (tokname == "MAXHOST")
+					maxhost = tokvalue;
+				else if (tokname == "MAXNICK")
+					maxnick = tokvalue;
 			}
 		}
 		else if (params[0].equals_cs("END"))

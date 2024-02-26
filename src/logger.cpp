@@ -380,7 +380,7 @@ void LogInfo::ProcessMessage(const Log *l)
 				if (!bi)
 					bi = this->bot;
 				if (bi)
-					IRCD->SendGlobops(bi, "%s", buffer.c_str());
+					IRCD->SendGlobops(bi, buffer);
 			}
 		}
 	}

@@ -30,13 +30,8 @@ public:
 
 	virtual ~IRCDProto();
 
-	virtual void SendSVSKillInternal(const MessageSource &, User *, const Anope::string &);
-	virtual void SendKickInternal(const MessageSource &, const Channel *, User *, const Anope::string &);
 	virtual void SendNoticeInternal(const MessageSource &, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
 	virtual void SendPrivmsgInternal(const MessageSource &, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
-	virtual void SendQuitInternal(User *, const Anope::string &buf);
-	virtual void SendPartInternal(User *, const Channel *chan, const Anope::string &buf);
-	virtual void SendGlobopsInternal(const MessageSource &, const Anope::string &buf);
 	virtual void SendCTCPInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
 
 	/** Parses an incoming message from the IRC server.
@@ -158,9 +153,9 @@ public:
 	/** Kills a user
 	 * @param source Who is doing the kill
 	 * @param user The user to be killed
-	 * @param fmt Kill reason
+	 * @param msg Kill reason
 	 */
-	virtual void SendSVSKill(const MessageSource &source, User *user, const char *fmt, ...) ATTR_FORMAT(4, 5);
+	virtual void SendSVSKill(const MessageSource &source, User *user, const Anope::string &msg);
 
 	virtual void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values);
 	template <typename... Args>
@@ -181,7 +176,7 @@ public:
 	 */
 	virtual void SendClientIntroduction(User *u) = 0;
 
-	virtual void SendKick(const MessageSource &source, const Channel *chan, User *user, const char *fmt, ...) ATTR_FORMAT(5, 6);
+	virtual void SendKick(const MessageSource &source, const Channel *chan, User *user, const Anope::string &msg);
 
 	virtual void SendNotice(const MessageSource &source, const Anope::string &dest, const char *fmt, ...) ATTR_FORMAT(4, 5);
 	virtual void SendPrivmsg(const MessageSource &source, const Anope::string &dest, const char *fmt, ...) ATTR_FORMAT(4, 5);
@@ -194,7 +189,7 @@ public:
 	virtual void SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg);
 	virtual void SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg);
 
-	virtual void SendQuit(User *u, const char *fmt, ...) ATTR_FORMAT(3, 4);
+	virtual void SendQuit(User *u, const Anope::string &msg);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
 
@@ -206,7 +201,7 @@ public:
 	 * stacker to be set "soon".
 	 */
 	virtual void SendJoin(User *u, Channel *c, const ChannelStatus *status) = 0;
-	virtual void SendPart(User *u, const Channel *chan, const char *fmt, ...) ATTR_FORMAT(4, 5);
+	virtual void SendPart(User *u, const Channel *chan, const Anope::string &msg);
 
 	/** Force joins a user that isn't ours to a channel.
 	 * @param bi The source of the message
@@ -225,7 +220,7 @@ public:
 	virtual void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) { }
 
 	virtual void SendInvite(const MessageSource &source, const Channel *c, User *u);
-	virtual void SendGlobops(const MessageSource &source, const char *fmt, ...) ATTR_FORMAT(3, 4);
+	virtual void SendGlobops(const MessageSource &source, const Anope::string &msg);
 
 	/** Sends a nick change of one of our clients.
 	 */

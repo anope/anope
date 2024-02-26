@@ -18,9 +18,9 @@ static bool UseSVSAccount = false;  // Temporary backwards compatibility hack un
 class HybridProto final
 	: public IRCDProto
 {
-	void SendSVSKillInternal(const MessageSource &source, User *u, const Anope::string &buf) override
+	void SendSVSKill(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
-		IRCDProto::SendSVSKillInternal(source, u, buf);
+		IRCDProto::SendSVSKill(source, u, buf);
 		u->KillInternal(source, buf);
 	}
 

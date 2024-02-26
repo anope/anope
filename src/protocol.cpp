@@ -90,7 +90,7 @@ void IRCDProto::SendKill(const MessageSource &source, const Anope::string &targe
 	Uplink::Send(source, "KILL", target, reason);
 }
 
-void IRCDProto::SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf)
+void IRCDProto::SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf)
 {
 	Uplink::Send(source, "KILL", user->GetUID(), buf);
 }
@@ -109,7 +109,7 @@ void IRCDProto::SendModeInternal(const MessageSource &source, User *dest, const 
 	Uplink::SendInternal({}, source, "MODE", params);
 }
 
-void IRCDProto::SendKickInternal(const MessageSource &source, const Channel *c, User *u, const Anope::string &r)
+void IRCDProto::SendKick(const MessageSource &source, const Channel *c, User *u, const Anope::string &r)
 {
 	if (!r.empty())
 		Uplink::Send(source, "KICK", c->name, u->GetUID(), r);
@@ -127,7 +127,7 @@ void IRCDProto::SendPrivmsgInternal(const MessageSource &source, const Anope::st
 	Uplink::Send(tags, source, "PRIVMSG", dest, msg);
 }
 
-void IRCDProto::SendQuitInternal(User *u, const Anope::string &buf)
+void IRCDProto::SendQuit(User *u, const Anope::string &buf)
 {
 	if (!buf.empty())
 		Uplink::Send(u, "QUIT", buf);
@@ -135,7 +135,7 @@ void IRCDProto::SendQuitInternal(User *u, const Anope::string &buf)
 		Uplink::Send(u, "QUIT");
 }
 
-void IRCDProto::SendPartInternal(User *u, const Channel *chan, const Anope::string &buf)
+void IRCDProto::SendPart(User *u, const Channel *chan, const Anope::string &buf)
 {
 	if (!buf.empty())
 		Uplink::Send(u, "PART", chan->name, buf);
@@ -143,7 +143,7 @@ void IRCDProto::SendPartInternal(User *u, const Channel *chan, const Anope::stri
 		Uplink::Send(u, "PART", chan->name);
 }
 
-void IRCDProto::SendGlobopsInternal(const MessageSource &source, const Anope::string &message)
+void IRCDProto::SendGlobops(const MessageSource &source, const Anope::string &message)
 {
 	Uplink::Send(source, "GLOBOPS", message);
 }
@@ -170,32 +170,6 @@ void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, cons
 void IRCDProto::SendTopic(const MessageSource &source, Channel *c)
 {
 	Uplink::Send(source, "TOPIC", c->name, c->topic);
-}
-
-void IRCDProto::SendSVSKill(const MessageSource &source, User *user, const char *fmt, ...)
-{
-	if (!user || !fmt)
-		return;
-
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendSVSKillInternal(source, user, buf);
-}
-
-void IRCDProto::SendKick(const MessageSource &source, const Channel *chan, User *user, const char *fmt, ...)
-{
-	if (!chan || !user)
-		return;
-
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendKickInternal(source, chan, user, buf);
 }
 
 void IRCDProto::SendNotice(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
@@ -229,16 +203,6 @@ void IRCDProto::SendPrivmsg(const MessageSource &source, const Anope::string &de
 	SendPrivmsgInternal(source, dest, buf);
 }
 
-void IRCDProto::SendQuit(User *u, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendQuitInternal(u, buf);
-}
-
 void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who)
 {
 	if (servname.empty())
@@ -264,31 +228,6 @@ void IRCDProto::SendPong(const Anope::string &servname, const Anope::string &who
 void IRCDProto::SendInvite(const MessageSource &source, const Channel *c, User *u)
 {
 	Uplink::Send(source, "INVITE", u->GetUID(), c->name);
-}
-
-void IRCDProto::SendPart(User *user, const Channel *chan, const char *fmt, ...)
-{
-	if (fmt)
-	{
-		va_list args;
-		char buf[BUFSIZE] = "";
-		va_start(args, fmt);
-		vsnprintf(buf, BUFSIZE - 1, fmt, args);
-		va_end(args);
-		SendPartInternal(user, chan, buf);
-	}
-	else
-		SendPartInternal(user, chan, "");
-}
-
-void IRCDProto::SendGlobops(const MessageSource &source, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendGlobopsInternal(source, buf);
 }
 
 void IRCDProto::SendSquit(Server *s, const Anope::string &message)

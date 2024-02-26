@@ -128,7 +128,7 @@ private:
 		Uplink::Send("TKL", '+', 'G', x->GetUser(), x->GetHost(), x->by, x->expires, x->created, x->GetReason());
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
 		Uplink::Send(source, "SVSKILL", user->GetUID(), buf);
 		user->KillInternal(source, buf);
@@ -313,7 +313,7 @@ private:
 			Uplink::Send("SVSPART", user->GetUID(), chan);
 	}
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
 	{
 		Uplink::Send("SENDUMODE", 'o', "From " + source.GetName() + ": " < buf);
 	}

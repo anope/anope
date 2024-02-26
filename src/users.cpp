@@ -93,7 +93,7 @@ static void CollideKill(User *target, const Anope::string &reason)
 	else
 	{
 		// Be sure my user is really dead
-		IRCD->SendQuit(target, "%s", reason.c_str());
+		IRCD->SendQuit(target, reason);
 
 		// Reintroduce my client
 		if (BotInfo *bi = dynamic_cast<BotInfo *>(target))
@@ -770,7 +770,7 @@ void User::Kill(const MessageSource &source, const Anope::string &reason)
 {
 	Anope::string real_reason = source.GetName() + " (" + reason + ")";
 
-	IRCD->SendSVSKill(source, this, "%s", real_reason.c_str());
+	IRCD->SendSVSKill(source, this, real_reason);
 }
 
 void User::KillInternal(const MessageSource &source, const Anope::string &reason)

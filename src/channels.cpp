@@ -799,7 +799,7 @@ bool Channel::Kick(BotInfo *bi, User *u, const Anope::string &reason)
 	FOREACH_RESULT(OnBotKick, MOD_RESULT, (bi, this, u, reason));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
-	IRCD->SendKick(bi, this, u, "%s", reason.c_str());
+	IRCD->SendKick(bi, this, u, reason);
 	this->KickInternal(bi, u->nick, reason);
 	return true;
 }

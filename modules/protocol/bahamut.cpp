@@ -235,7 +235,7 @@ public:
 	/*
 	  Note: if the stamp is null 0, the below usage is correct of Bahamut
 	*/
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
 		Uplink::Send(source, "SVSKILL", user->nick, buf);
 	}

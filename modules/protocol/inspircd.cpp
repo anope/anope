@@ -173,9 +173,9 @@ public:
 		Uplink::Send("METADATA", "*", "saslmechlist", mechanisms.empty() ? "" : mechlist.substr(1));
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
-		IRCDProto::SendSVSKillInternal(source, user, buf);
+		IRCDProto::SendSVSKill(source, user, buf);
 		user->KillInternal(source, buf);
 	}
 
@@ -495,7 +495,7 @@ public:
 		Uplink::Send("ENDBURST");
 	}
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
 	{
 		if (Servers::Capab.count("GLOBOPS"))
 			Uplink::Send(source, "SNONOTICE", 'g', buf);

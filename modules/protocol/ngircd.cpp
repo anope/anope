@@ -19,9 +19,9 @@ namespace
 class ngIRCdProto final
 	: public IRCDProto
 {
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
-		IRCDProto::SendSVSKillInternal(source, user, buf);
+		IRCDProto::SendSVSKill(source, user, buf);
 		user->KillInternal(source, buf);
 	}
 
@@ -90,7 +90,7 @@ public:
 		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
 	{
 		Uplink::Send(source, "WALLOPS", buf);
 	}

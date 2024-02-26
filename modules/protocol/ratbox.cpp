@@ -44,7 +44,7 @@ public:
 		MaxModes = 4;
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKillInternal(source, targ, reason); }
+	void SendSVSKill(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKill(source, targ, reason); }
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
 	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
 	void SendSGLine(User *u, const XLine *x) override { hybrid->SendSGLine(u, x); }
@@ -57,7 +57,7 @@ public:
 	void SendChannel(Channel *c) override { hybrid->SendChannel(c); }
 	bool IsIdentValid(const Anope::string &ident) override { return hybrid->IsIdentValid(ident); }
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
 	{
 		Uplink::Send(source, "OPERWALL", buf);
 	}

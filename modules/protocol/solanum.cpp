@@ -51,10 +51,10 @@ public:
 		MaxModes = 4;
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { ratbox->SendSVSKillInternal(source, targ, reason); }
+	void SendSVSKill(const MessageSource &source, User *targ, const Anope::string &reason) override { ratbox->SendSVSKill(source, targ, reason); }
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override { ratbox->SendGlobalNotice(bi, dest, msg); }
 	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override { ratbox->SendGlobopsInternal(source, buf); }
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override { ratbox->SendGlobops(source, buf); }
 	void SendSGLine(User *u, const XLine *x) override { ratbox->SendSGLine(u, x); }
 	void SendSGLineDel(const XLine *x) override { ratbox->SendSGLineDel(x); }
 	void SendAkill(User *u, XLine *x) override { ratbox->SendAkill(u, x); }

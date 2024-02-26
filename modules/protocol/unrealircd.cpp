@@ -315,7 +315,7 @@ private:
 
 	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
 	{
-		Uplink::Send("SENDUMODE", 'o', "From " + source.GetName() + ": " < buf);
+		Uplink::Send("SENDUMODE", 'o', "From " + source.GetName() + ": " + buf);
 	}
 
 	void SendSWhois(const MessageSource &source, const Anope::string &who, const Anope::string &mask) override

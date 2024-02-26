@@ -317,7 +317,7 @@ public:
 struct IRCDMessageBMask final
 	: IRCDMessage
 {
-	IRCDMessageBMask(Module *creator) : IRCDMessage(creator, "BMASK", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageBMask(Module *creator) : IRCDMessage(creator, "BMASK", 4) { SetFlag(FLAG_REQUIRE_SERVER); }
 
 	/*            0          1        2 3               */
 	/* :0MC BMASK 1350157102 #channel b :*!*@*.test.com */
@@ -340,7 +340,7 @@ struct IRCDMessageBMask final
 struct IRCDMessageCapab final
 	: Message::Capab
 {
-	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*       0                 */
 	/* CAPAB :TBURST EOB MLOCK */
@@ -365,7 +365,7 @@ struct IRCDMessageCapab final
 
 struct IRCDMessageCertFP: IRCDMessage
 {
-	IRCDMessageCertFP(Module *creator) : IRCDMessage(creator, "CERTFP", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+	IRCDMessageCertFP(Module *creator) : IRCDMessage(creator, "CERTFP", 1) { SetFlag(FLAG_REQUIRE_USER); }
 
 	/*                   0                                                                */
 	/* :0MCAAAAAB CERTFP 4C62287BA6776A89CD4F8FF10A62FFB35E79319F51AF6C62C674984974FCCB1D */
@@ -381,7 +381,7 @@ struct IRCDMessageCertFP: IRCDMessage
 struct IRCDMessageEOB final
 	: IRCDMessage
 {
-	IRCDMessageEOB(Module *creator) : IRCDMessage(creator, "EOB", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageEOB(Module *creator) : IRCDMessage(creator, "EOB", 0) { SetFlag(FLAG_REQUIRE_SERVER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
@@ -409,7 +409,7 @@ struct IRCDMessageJoin final
 struct IRCDMessageMetadata final
 	: IRCDMessage
 {
-	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3) { SetFlag(FLAG_REQUIRE_SERVER); }
 
 	/*               0      1         2      3                                                                 */
 	/* :0MC METADATA client 0MCAAAAAB certfp :4C62287BA6776A89CD4F8FF10A62FFB35E79319F51AF6C62C674984974FCCB1D */
@@ -436,7 +436,7 @@ struct IRCDMessageMetadata final
 struct IRCDMessageMLock final
 	: IRCDMessage
 {
-	IRCDMessageMLock(Module *creator) : IRCDMessage(creator, "MLOCK", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageMLock(Module *creator) : IRCDMessage(creator, "MLOCK", 4) { SetFlag(FLAG_REQUIRE_SERVER); }
 
 	/*            0          1        2          3   */
 	/* :0MC MLOCK 1350157102 #channel 1350158923 :nt */
@@ -462,7 +462,7 @@ struct IRCDMessageMLock final
 struct IRCDMessageNick final
 	: IRCDMessage
 {
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(FLAG_REQUIRE_USER); }
 
 	/*                 0       1          */
 	/* :0MCAAAAAB NICK newnick 1350157102 */
@@ -475,7 +475,7 @@ struct IRCDMessageNick final
 struct IRCDMessagePass final
 	: IRCDMessage
 {
-	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 1) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 1) { SetFlag(FLAG_REQUIRE_SERVER); SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*      0        */
 	/* PASS password */
@@ -489,7 +489,7 @@ struct IRCDMessagePass final
 struct IRCDMessagePong final
 	: IRCDMessage
 {
-	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(FLAG_REQUIRE_SERVER); SetFlag(FLAG_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
@@ -500,7 +500,7 @@ struct IRCDMessagePong final
 struct IRCDMessageServer final
 	: IRCDMessage
 {
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(FLAG_REQUIRE_SERVER); SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*        0          1 2   3 4                        */
 	/* SERVER hades.arpa 1 4XY + :ircd-hybrid test server */
@@ -525,7 +525,7 @@ struct IRCDMessageServer final
 struct IRCDMessageSID final
 	: IRCDMessage
 {
-	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 5) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 5) { SetFlag(FLAG_REQUIRE_SERVER); SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*          0          1 2   3 4                        */
 	/* :0MC SID hades.arpa 2 4XY + :ircd-hybrid test server */
@@ -541,7 +541,7 @@ struct IRCDMessageSID final
 struct IRCDMessageSJoin final
 	: IRCDMessage
 {
-	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 4) { SetFlag(FLAG_REQUIRE_SERVER); SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*            0          1       2   3                      */
 	/* :0MC SJOIN 1654877335 #nether +nt :@0MCAAAAAB +0MCAAAAAC */
@@ -589,7 +589,7 @@ struct IRCDMessageSJoin final
 struct IRCDMessageSVSMode final
 	: IRCDMessage
 {
-	IRCDMessageSVSMode(Module *creator) : IRCDMessage(creator, "SVSMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageSVSMode(Module *creator) : IRCDMessage(creator, "SVSMODE", 3) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*              0         1          2  */
 	/* :0MC SVSMODE 0MCAAAAAB 1350157102 +r */
@@ -629,7 +629,7 @@ struct IRCDMessageTBurst final
 struct IRCDMessageTMode final
 	: IRCDMessage
 {
-	IRCDMessageTMode(Module *creator) : IRCDMessage(creator, "TMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageTMode(Module *creator) : IRCDMessage(creator, "TMODE", 3) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*            0          1       2    */
 	/* :0MC TMODE 1654867975 #nether +ntR */
@@ -657,7 +657,7 @@ struct IRCDMessageTMode final
 struct IRCDMessageUID final
 	: IRCDMessage
 {
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 11) { SetFlag(FLAG_REQUIRE_SERVER); SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*          0     1 2          3   4      5            6         7        8         9     10                   */
 	/* :0MC UID Steve 1 1350157102 +oi ~steve virtual.host real.host 10.0.0.1 0MCAAAAAB Steve :Mining all the time */

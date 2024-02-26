@@ -178,7 +178,7 @@ struct IRCDMessageEncap final
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 3)
 	{
-		SetFlag(IRCDMESSAGE_SOFT_LIMIT);
+		SetFlag(FLAG_SOFT_LIMIT);
 	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
@@ -233,7 +233,7 @@ struct IRCDMessageEncap final
 struct IRCDMessageEUID final
 	: IRCDMessage
 {
-	IRCDMessageEUID(Module *creator) : IRCDMessage(creator, "EUID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageEUID(Module *creator) : IRCDMessage(creator, "EUID", 11) { SetFlag(FLAG_REQUIRE_SERVER); }
 
 	/*
 	 * :42X EUID DukePyrolator 1 1353240577 +Zi ~jens erft-5d80b00b.pool.mediaWays.net 93.128.176.11 42XAAAAAD * * :jens
@@ -262,7 +262,7 @@ struct IRCDMessageEUID final
 struct IRCDMessageServer final
 	: IRCDMessage
 {
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(FLAG_REQUIRE_SERVER); }
 
 	// SERVER dev.anope.de 1 :solanum test server
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
@@ -279,7 +279,7 @@ struct IRCDMessageServer final
 struct IRCDMessagePass final
 	: IRCDMessage
 {
-	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(FLAG_REQUIRE_SERVER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{

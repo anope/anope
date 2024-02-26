@@ -24,7 +24,7 @@ namespace Message
 	struct CoreExport Away
 		: IRCDMessage
 	{
-		Away(Module *creator, const Anope::string &mname = "AWAY") : IRCDMessage(creator, mname, 0) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Away(Module *creator, const Anope::string &mname = "AWAY") : IRCDMessage(creator, mname, 0) { SetFlag(FLAG_REQUIRE_USER); SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -32,7 +32,7 @@ namespace Message
 	struct CoreExport Capab
 		: IRCDMessage
 	{
-		Capab(Module *creator, const Anope::string &mname = "CAPAB") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Capab(Module *creator, const Anope::string &mname = "CAPAB") : IRCDMessage(creator, mname, 1) { SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -48,7 +48,7 @@ namespace Message
 	struct CoreExport Invite
 		: IRCDMessage
 	{
-		Invite(Module *creator, const Anope::string &mname = "INVITE") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Invite(Module *creator, const Anope::string &mname = "INVITE") : IRCDMessage(creator, mname, 2) { SetFlag(FLAG_REQUIRE_USER); SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -56,7 +56,7 @@ namespace Message
 	struct CoreExport Join
 		: IRCDMessage
 	{
-		Join(Module *creator, const Anope::string &mname = "JOIN") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Join(Module *creator, const Anope::string &mname = "JOIN") : IRCDMessage(creator, mname, 1) { SetFlag(FLAG_REQUIRE_USER); SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 
@@ -75,7 +75,7 @@ namespace Message
 	struct CoreExport Kick
 		: IRCDMessage
 	{
-		Kick(Module *creator, const Anope::string &mname = "KICK") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Kick(Module *creator, const Anope::string &mname = "KICK") : IRCDMessage(creator, mname, 2) { SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -91,7 +91,7 @@ namespace Message
 	struct CoreExport Mode
 		: IRCDMessage
 	{
-		Mode(Module *creator, const Anope::string &mname = "MODE") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Mode(Module *creator, const Anope::string &mname = "MODE") : IRCDMessage(creator, mname, 2) { SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -107,7 +107,7 @@ namespace Message
 	struct CoreExport Notice
 		: IRCDMessage
 	{
-		Notice(Module *creator, const Anope::string &mname = "NOTICE") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+		Notice(Module *creator, const Anope::string &mname = "NOTICE") : IRCDMessage(creator, mname, 2) { SetFlag(FLAG_REQUIRE_USER); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -115,7 +115,7 @@ namespace Message
 	struct CoreExport Part
 		: IRCDMessage
 	{
-		Part(Module *creator, const Anope::string &mname = "PART") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Part(Module *creator, const Anope::string &mname = "PART") : IRCDMessage(creator, mname, 1) { SetFlag(FLAG_REQUIRE_USER); SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -123,7 +123,7 @@ namespace Message
 	struct CoreExport Ping
 		: IRCDMessage
 	{
-		Ping(Module *creator, const Anope::string &mname = "PING") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Ping(Module *creator, const Anope::string &mname = "PING") : IRCDMessage(creator, mname, 1) { SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -131,7 +131,7 @@ namespace Message
 	struct CoreExport Privmsg
 		: IRCDMessage
 	{
-		Privmsg(Module *creator, const Anope::string &mname = "PRIVMSG") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+		Privmsg(Module *creator, const Anope::string &mname = "PRIVMSG") : IRCDMessage(creator, mname, 2) { SetFlag(FLAG_REQUIRE_USER); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -139,7 +139,7 @@ namespace Message
 	struct CoreExport Quit
 		: IRCDMessage
 	{
-		Quit(Module *creator, const Anope::string &mname = "QUIT") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+		Quit(Module *creator, const Anope::string &mname = "QUIT") : IRCDMessage(creator, mname, 1) { SetFlag(FLAG_REQUIRE_USER); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -155,7 +155,7 @@ namespace Message
 	struct CoreExport Stats
 		: IRCDMessage
 	{
-		Stats(Module *creator, const Anope::string &mname = "STATS") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Stats(Module *creator, const Anope::string &mname = "STATS") : IRCDMessage(creator, mname, 1) { SetFlag(FLAG_REQUIRE_USER); SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -163,7 +163,7 @@ namespace Message
 	struct CoreExport Time
 		: IRCDMessage
 	{
-		Time(Module *creator, const Anope::string &mname = "TIME") : IRCDMessage(creator, mname, 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Time(Module *creator, const Anope::string &mname = "TIME") : IRCDMessage(creator, mname, 0) { SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -171,7 +171,7 @@ namespace Message
 	struct CoreExport Topic
 		: IRCDMessage
 	{
-		Topic(Module *creator, const Anope::string &mname = "TOPIC") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+		Topic(Module *creator, const Anope::string &mname = "TOPIC") : IRCDMessage(creator, mname, 2) { SetFlag(FLAG_REQUIRE_USER); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -179,7 +179,7 @@ namespace Message
 	struct CoreExport Version
 		: IRCDMessage
 	{
-		Version(Module *creator, const Anope::string &mname = "VERSION") : IRCDMessage(creator, mname, 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Version(Module *creator, const Anope::string &mname = "VERSION") : IRCDMessage(creator, mname, 0) { SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
@@ -187,7 +187,7 @@ namespace Message
 	struct CoreExport Whois
 		: IRCDMessage
 	{
-		Whois(Module *creator, const Anope::string &mname = "WHOIS") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Whois(Module *creator, const Anope::string &mname = "WHOIS") : IRCDMessage(creator, mname, 1) { SetFlag(FLAG_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};

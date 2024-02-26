@@ -65,11 +65,11 @@ void Anope::Process(const Anope::string &buffer)
 		return;
 	}
 
-	if (m->HasFlag(IRCDMESSAGE_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
+	if (m->HasFlag(IRCDMessage::FLAG_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
 		Log(LOG_DEBUG) << "invalid parameters for " << command << ": " << params.size() << " != " << m->GetParamCount();
-	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_USER) && !src.GetUser())
+	else if (m->HasFlag(IRCDMessage::FLAG_REQUIRE_USER) && !src.GetUser())
 		Log(LOG_DEBUG) << "unexpected non-user source " << source << " for " << command;
-	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
+	else if (m->HasFlag(IRCDMessage::FLAG_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
 		Log(LOG_DEBUG) << "unexpected non-server source " << source << " for " << command;
 	else
 		m->Run(src, params, tags);

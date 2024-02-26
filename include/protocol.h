@@ -319,26 +319,57 @@ public:
 	Server *GetServer() const;
 };
 
-enum IRCDMessageFlag
-{
-	IRCDMESSAGE_SOFT_LIMIT,
-	IRCDMESSAGE_REQUIRE_SERVER,
-	IRCDMESSAGE_REQUIRE_USER
-};
 
+/** Base class for protocol module message handlers. */
 class CoreExport IRCDMessage
 	: public Service
 {
-	Anope::string name;
-	unsigned param_count;
-	std::set<IRCDMessageFlag> flags;
 public:
-	IRCDMessage(Module *owner, const Anope::string &n, unsigned p = 0);
-	unsigned GetParamCount() const;
-	virtual void Run(MessageSource &, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) = 0;
+	/** An enumeration of potential flags a command can have. */
+	enum Flag
+		: uint8_t
+	{
+		/** The parameter count is a minimum instead of an exact limit. */
+		FLAG_SOFT_LIMIT,
 
-	void SetFlag(IRCDMessageFlag f) { flags.insert(f); }
-	bool HasFlag(IRCDMessageFlag f) const { return flags.count(f); }
+		/** The message must come from a server. */
+		FLAG_REQUIRE_SERVER,
+
+		/** The message must come from a user. */
+		FLAG_REQUIRE_USER,
+
+		/** The highest flag possible. */
+		FLAG_MAX,
+	};
+
+private:
+	/** The name of the message (e.g. PRIVMSG). */
+	const Anope::string name;
+
+	/** The number of parameters this command takes. */
+	const size_t param_count;
+
+	/** The flags that are set on the command. */
+	std::bitset<FLAG_MAX> flags;
+
+public:
+	IRCDMessage(Module *o, const Anope::string &n, size_t pc = 0);
+
+	/** Retrieves the parameter count. */
+	inline size_t GetParamCount() const { return param_count; }
+
+	/** Runs the handler for this message.
+	 * @param source Entity that sent the message.
+	 * @param params Message parameters
+	 * @param tags Message tags
+	 */
+	virtual void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) = 0;
+
+	/** Sets the flags for this message. */
+	inline void SetFlag(Flag flag, bool value = true) { flags.set(flag, value); }
+
+	/** Determines if a flag is set. */
+	inline bool HasFlag(Flag flag) const { return flags[flag]; }
 };
 
 /** MessageTokenizer allows tokens in the IRC wire format to be read from a string */

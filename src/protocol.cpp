@@ -441,11 +441,9 @@ Server *MessageSource::GetServer() const
 	return this->s;
 }
 
-IRCDMessage::IRCDMessage(Module *o, const Anope::string &n, unsigned p) : Service(o, "IRCDMessage", o->name + "/" + n.lower()), name(n), param_count(p)
+IRCDMessage::IRCDMessage(Module *o, const Anope::string &n, size_t pc)
+	: Service(o, "IRCDMessage", o->name + "/" + n.lower())
+	, name(n)
+	, param_count(pc)
 {
-}
-
-unsigned IRCDMessage::GetParamCount() const
-{
-	return this->param_count;
 }

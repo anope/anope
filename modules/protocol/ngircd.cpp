@@ -161,7 +161,7 @@ public:
 struct IRCDMessage005 final
 	: IRCDMessage
 {
-	IRCDMessage005(Module *creator) : IRCDMessage(creator, "005", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessage005(Module *creator) : IRCDMessage(creator, "005", 1) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	// Please see <http://www.irc.org/tech_docs/005.html> for details.
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
@@ -210,7 +210,7 @@ struct IRCDMessage376 final
 struct IRCDMessageChaninfo final
 	: IRCDMessage
 {
-	IRCDMessageChaninfo(Module *creator) : IRCDMessage(creator, "CHANINFO", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageChaninfo(Module *creator) : IRCDMessage(creator, "CHANINFO", 2) { SetFlag(FLAG_SOFT_LIMIT); SetFlag(FLAG_REQUIRE_SERVER); }
 
 	/*
 	 * CHANINFO is used by servers to inform each other about a channel: its
@@ -264,7 +264,7 @@ struct IRCDMessageChaninfo final
 struct IRCDMessageJoin final
 	: Message::Join
 {
-	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { SetFlag(FLAG_REQUIRE_USER); }
 
 	/*
 	 * <@po||ux> DukeP: RFC 2813, 4.2.1: the JOIN command on server-server links
@@ -305,7 +305,7 @@ struct IRCDMessageJoin final
 struct IRCDMessageMetadata final
 	: IRCDMessage
 {
-	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3) { SetFlag(FLAG_REQUIRE_SERVER); }
 
 	/*
 	 * Received: :ngircd.dev.anope.de METADATA DukePyrolator host :anope-e2ee5c7d
@@ -365,7 +365,7 @@ struct IRCDMessageMetadata final
 struct IRCDMessageMode final
 	: IRCDMessage
 {
-	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*
 	 * Received: :DukeP MODE #anope +b *!*@*.aol.com
@@ -402,7 +402,7 @@ struct IRCDMessageMode final
 struct IRCDMessageNick final
 	: IRCDMessage
 {
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 1) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*
 	 * NICK - NEW
@@ -455,7 +455,7 @@ struct IRCDMessageNick final
 struct IRCDMessageNJoin final
 	: IRCDMessage
 {
-	IRCDMessageNJoin(Module *creator) : IRCDMessage(creator, "NJOIN",2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); };
+	IRCDMessageNJoin(Module *creator) : IRCDMessage(creator, "NJOIN",2) { SetFlag(FLAG_REQUIRE_SERVER); };
 
 	/*
 	 * RFC 2813, 4.2.2: Njoin Message:
@@ -502,7 +502,7 @@ struct IRCDMessageNJoin final
 struct IRCDMessagePong final
 	: IRCDMessage
 {
-	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(FLAG_SOFT_LIMIT); SetFlag(FLAG_REQUIRE_SERVER); }
 
 	/*
 	 * ngIRCd does not send an EOB, so we send a PING immediately
@@ -519,7 +519,7 @@ struct IRCDMessagePong final
 struct IRCDMessageServer final
 	: IRCDMessage
 {
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*
 	 * New directly linked server:
@@ -571,7 +571,7 @@ struct IRCDMessageServer final
 struct IRCDMessageTopic final
 	: IRCDMessage
 {
-	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 2) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	// Received: :DukeP TOPIC #anope :test
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override

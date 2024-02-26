@@ -240,21 +240,17 @@ void MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 	if (s != Me)
 		return;
 
-	FILE *f = fopen(Config->GetBlock("serverinfo")->Get<const Anope::string>("motd").c_str(), "r");
-	if (f)
+	std::ifstream stream(Config->GetBlock("serverinfo")->Get<const Anope::string>("motd").str());
+	if (!stream.is_open())
 	{
-		IRCD->SendNumeric(375, source.GetSource(), "- " + s->GetName() + " Message of the Day");
-		char buf[BUFSIZE];
-		while (fgets(buf, sizeof(buf), f))
-		{
-			buf[strlen(buf) - 1] = 0;
-			IRCD->SendNumeric(372, source.GetSource(), Anope::printf("- %s", buf));
-		}
-		fclose(f);
-		IRCD->SendNumeric(376, source.GetSource(), "End of /MOTD command.");
-	}
-	else
 		IRCD->SendNumeric(422, source.GetSource(), "- MOTD file not found!  Please contact your IRC administrator.");
+		return;
+	}
+
+	IRCD->SendNumeric(375, source.GetSource(), "- " + s->GetName() + " Message of the Day");
+	for (Anope::string line; std::getline(stream, line.str()); )
+		IRCD->SendNumeric(372, source.GetSource(), Anope::printf("- %s", line.c_str()));
+	IRCD->SendNumeric(376, source.GetSource(), "End of /MOTD command.");
 }
 
 void Notice::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)

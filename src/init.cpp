@@ -217,19 +217,12 @@ static void remove_pidfile()
 
 static void write_pidfile()
 {
-	FILE *pidfile = fopen(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid").c_str(), "w");
-	if (pidfile)
-	{
-#ifdef _WIN32
-		fprintf(pidfile, "%d\n", static_cast<int>(GetCurrentProcessId()));
-#else
-		fprintf(pidfile, "%d\n", static_cast<int>(getpid()));
-#endif
-		fclose(pidfile);
-		atexit(remove_pidfile);
-	}
-	else
-		throw CoreException("Can not write to PID file " + Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
+	const auto pidfile = Config->GetBlock("serverinfo")->Get<const Anope::string>("pid");
+	std::ofstream stream(pidfile.str());
+	if (!stream.is_open())
+		throw CoreException("Can not write to PID file " + pidfile);
+	stream << getpid() << std::endl;
+	atexit(remove_pidfile);
 }
 
 static void setuidgid()

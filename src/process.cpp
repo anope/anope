@@ -126,17 +126,21 @@ bool IRCDProto::Parse(const Anope::string &buffer, Anope::map<Anope::string> &ta
 bool IRCDProto::Format(Anope::string &message, const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params)
 {
 	std::stringstream buffer;
-	if (CanSendTags && !tags.empty())
+	if (!tags.empty())
 	{
 		char separator = '@';
 		for (const auto &[tname, tvalue] : tags)
 		{
-			buffer << separator << tname;
-			if (!tvalue.empty())
-				buffer << '=' << tvalue;
-			separator = ';';
+			if (IRCD->IsTagValid(tname, tvalue))
+			{
+				buffer << separator << tname;
+				if (!tvalue.empty())
+					buffer << '=' << tvalue;
+				separator = ';';
+			}
 		}
-		buffer << ' ';
+		if (separator != '@')
+			buffer << ' ';
 	}
 
 	if (source.GetServer())

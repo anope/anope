@@ -92,9 +92,6 @@ public:
 	/* See ns_cert */
 	bool CanCertFP = false;
 
-	/* Can we send arbitrary message tags? */
-	bool CanSendTags = false;
-
 	/* Can users log out before being fully connected? */
 	bool CanSVSLogout = false;
 
@@ -288,6 +285,7 @@ public:
 	virtual bool IsIdentValid(const Anope::string &);
 	virtual bool IsHostValid(const Anope::string &);
 	virtual bool IsExtbanValid(const Anope::string &) { return false; }
+	virtual bool IsTagValid(const Anope::string &, const Anope::string &) { return false; }
 
 	/** Retrieve the maximum number of list modes settable on this channel
 	 * Defaults to Config->ListSize

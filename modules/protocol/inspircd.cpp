@@ -117,7 +117,6 @@ public:
 		CanSVSHold = true;
 		CanSVSLogout = true;
 		CanCertFP = true;
-		CanSendTags = true;
 		RequiresID = true;
 		MaxModes = 20;
 		MaxLine = 4096;
@@ -581,6 +580,12 @@ public:
 			return false;
 		}
 
+		return true;
+	}
+
+	bool IsTagValid(const Anope::string &name, const Anope::string &tvalue)
+	{
+		// InspIRCd accepts arbitrary message tags.
 		return true;
 	}
 };

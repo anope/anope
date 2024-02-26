@@ -338,17 +338,10 @@ namespace
 	{
 		const char *translated_message = Language::Translate(target, msg.c_str());
 
-		/* Send privmsg instead of notice if:
-		* - UsePrivmsg is enabled
-		* - The user is not registered and NSDefMsg is enabled
-		* - The user is registered and has set /ns set msg on
-		*/
-		auto account = target->Account();
-		bool send_privmsg = Config->UsePrivmsg && ((!account && Config->DefPrivmsg) || (account && account->HasExt("MSG")));
 		sepstream sep(translated_message, '\n', true);
 		for (Anope::string tok; sep.GetToken(tok);)
 		{
-			if (send_privmsg)
+			if (target->ShouldPrivmsg())
 				IRCD->SendPrivmsgInternal(source, target->GetUID(), tok, tags);
 			else
 				IRCD->SendNoticeInternal(source, target->GetUID(), tok, tags);
@@ -857,6 +850,15 @@ bool User::BadPassword()
 	}
 
 	return false;
+}
+
+bool User::ShouldPrivmsg() const
+{
+	// Send a PRIVMSG instead of a NOTICE if:
+	// 1. options:useprivmsg is enabled.
+	// 2. The user is not registered and msg is in nickserv:defaults.
+	// 3. The user is registered and has set /ns set message on.
+	return Config->UsePrivmsg && ((!nc && Config->DefPrivmsg) || (nc && nc->HasExt("MSG")));
 }
 
 User* User::Find(const Anope::string &name, bool nick_only)

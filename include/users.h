@@ -369,6 +369,9 @@ public:
 	 */
 	bool BadPassword();
 
+	/** Determines whether this user should receive a PRIVMSG instead of a NOTICE. */
+	bool ShouldPrivmsg() const;
+
 	/** Finds a user by nick, or possibly UID
 	 * @param name The nick, or possibly UID, to lookup
 	 * @param nick_only set to true to only look up by nick, not UID

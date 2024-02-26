@@ -583,7 +583,7 @@ public:
 		return true;
 	}
 
-	bool IsTagValid(const Anope::string &name, const Anope::string &tvalue)
+	bool IsTagValid(const Anope::string &tname, const Anope::string &tvalue) override
 	{
 		// InspIRCd accepts arbitrary message tags.
 		return true;

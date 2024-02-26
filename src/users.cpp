@@ -467,14 +467,16 @@ bool User::IsSecurelyConnected() const
 bool User::IsServicesOper()
 {
 	if (!this->nc || !this->nc->IsServicesOper())
-		// No opertype.
-		return false;
-	else if (this->nc->o->require_oper && !this->HasMode("OPER"))
-		return false;
-	else if (!this->nc->o->certfp.empty())
+		return false; // Account isn't a services oper.
+
+	auto *oper = this->nc->o;
+	if (oper->require_oper && !this->HasMode("OPER"))
+		return false; // User isn't an ircd oper.
+
+	if (!oper->certfp.empty())
 	{
 		bool match = false;
-		for (const auto &certfp : this->nc->o->certfp)
+		for (const auto &certfp : oper->certfp)
 		{
 			if (this->fingerprint == certfp)
 			{
@@ -483,14 +485,15 @@ bool User::IsServicesOper()
 			}
 		}
 		if (!match)
-			return false;
+			return false; // Wrong TLS fingerprint.
 	}
-	else if (!this->nc->o->hosts.empty())
+
+	if (!oper->hosts.empty())
 	{
 		bool match = false;
 		Anope::string match_host = this->GetIdent() + "@" + this->host;
 		Anope::string match_ip = this->GetIdent() + "@" + this->ip.addr();
-		for (const auto &userhost : this->nc->o->hosts)
+		for (const auto &userhost : oper->hosts)
 		{
 			if (Anope::Match(match_host, userhost) || Anope::Match(match_ip, userhost))
 			{
@@ -498,16 +501,13 @@ bool User::IsServicesOper()
 				break;
 			}
 		}
-		if (match == false)
-			return false;
+		if (!match)
+			return false; // Wrong user@host/ip.
 	}
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(IsServicesOper, MOD_RESULT, (this));
-	if (MOD_RESULT == EVENT_STOP)
-		return false;
-
-	return true;
+	return MOD_RESULT != EVENT_STOP;
 }
 
 bool User::HasCommand(const Anope::string &command)

@@ -209,7 +209,7 @@ public:
 class CommandOSDNS final
 	: public Command
 {
-	void DisplayPoolState(CommandSource &source)
+	static void DisplayPoolState(CommandSource &source)
 	{
 		if (dns_servers->empty())
 		{
@@ -564,7 +564,7 @@ class CommandOSDNS final
 		source.Reply(_("IP %s does not exist for %s."), params[2].c_str(), s->GetName().c_str());
 	}
 
-	void OnSet(CommandSource &source, const std::vector<Anope::string> &params)
+	static void OnSet(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		DNSServer *s = DNSServer::Find(params[1]);
 

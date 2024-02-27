@@ -108,7 +108,7 @@ public:
 class CommandHSSetAll final
 	: public Command
 {
-	void Sync(const NickAlias *na)
+	static void Sync(const NickAlias *na)
 	{
 		if (!na || !na->HasVhost())
 			return;

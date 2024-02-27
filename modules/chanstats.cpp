@@ -189,14 +189,14 @@ class MChanstats final
 			sql->Run(&sqlinterface, q);
 	}
 
-	size_t CountWords(const Anope::string &msg)
+	static size_t CountWords(const Anope::string &msg)
 	{
 		size_t words = 0;
 		for (size_t pos = 0; pos != Anope::string::npos; pos = msg.find(" ", pos+1))
 			words++;
 		return words;
 	}
-	size_t CountSmileys(const Anope::string &msg, const Anope::string &smileylist)
+	static size_t CountSmileys(const Anope::string &msg, const Anope::string &smileylist)
 	{
 		size_t smileys = 0;
 		spacesepstream sep(smileylist);

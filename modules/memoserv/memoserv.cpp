@@ -17,7 +17,7 @@ class MemoServCore final
 {
 	Reference<BotInfo> MemoServ;
 
-	bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
+	static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 	{
 		Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<const Anope::string>("memo_subject").c_str()),
 			message = Language::Translate(Config->GetBlock("mail")->Get<const Anope::string>("memo_message").c_str());

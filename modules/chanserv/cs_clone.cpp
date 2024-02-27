@@ -15,13 +15,13 @@
 class CommandCSClone final
 	: public Command
 {
-	void CopySetting(ChannelInfo *ci, ChannelInfo *target_ci, const Anope::string &setting)
+	static void CopySetting(ChannelInfo *ci, ChannelInfo *target_ci, const Anope::string &setting)
 	{
 		if (ci->HasExt(setting))
 			target_ci->Extend<bool>(setting);
 	}
 
-	void CopyAccess(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
+	static void CopyAccess(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
 	{
 		std::set<Anope::string> masks;
 		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
@@ -58,7 +58,7 @@ class CommandCSClone final
 		source.Reply(_("%d access entries from \002%s\002 have been cloned to \002%s\002."), count, ci->name.c_str(), target_ci->name.c_str());
 	}
 
-	void CopyAkick(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
+	static void CopyAkick(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
 	{
 		target_ci->ClearAkick();
 		for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
@@ -73,7 +73,7 @@ class CommandCSClone final
 		source.Reply(_("All akick entries from \002%s\002 have been cloned to \002%s\002."), ci->name.c_str(), target_ci->name.c_str());
 	}
 
-	void CopyBadwords(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
+	static void CopyBadwords(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
 	{
 		BadWords *target_badwords = target_ci->Require<BadWords>("badwords"),
 			*badwords = ci->Require<BadWords>("badwords");
@@ -98,7 +98,7 @@ class CommandCSClone final
 		source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002."), ci->name.c_str(), target_ci->name.c_str());
 	}
 
-	void CopyLevels(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
+	static void CopyLevels(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
 	{
 		for (const auto &[priv, level] : ci->GetLevelEntries())
 		{

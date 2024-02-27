@@ -91,7 +91,7 @@ AJoinList::~AJoinList()
 class CommandNSAJoin final
 	: public Command
 {
-	void DoList(CommandSource &source, NickCore *nc)
+	static void DoList(CommandSource &source, NickCore *nc)
 	{
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 

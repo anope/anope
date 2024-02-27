@@ -356,7 +356,7 @@ class ProtoSolanum final
 
 	bool use_server_side_mlock;
 
-	void AddModes()
+	static void AddModes()
 	{
 		/* Add user modes */
 		ModeManager::AddUserMode(new UserMode("NOFORWARD", 'Q'));

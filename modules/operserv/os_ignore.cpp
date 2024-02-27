@@ -161,7 +161,7 @@ class CommandOSIgnore final
 	: public Command
 {
 private:
-	Anope::string RealMask(const Anope::string &mask)
+	static Anope::string RealMask(const Anope::string &mask)
 	{
 		/* If it s an existing user, we ignore the hostmask. */
 		User *u = User::Find(mask, true);
@@ -245,7 +245,7 @@ private:
 		}
 	}
 
-	void DoList(CommandSource &source)
+	static void DoList(CommandSource &source)
 	{
 		if (!ignore_service)
 			return;

@@ -713,7 +713,7 @@ class CommandCSLevels final
 		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 	}
 
-	void DoList(CommandSource &source, ChannelInfo *ci)
+	static void DoList(CommandSource &source, ChannelInfo *ci)
 	{
 		source.Reply(_("Access level settings for channel %s:"), ci->name.c_str());
 

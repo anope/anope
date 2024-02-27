@@ -514,7 +514,7 @@ class ProtoBahamut final
 	IRCDMessageSJoin message_sjoin;
 	IRCDMessageTopic message_topic;
 
-	void AddModes()
+	static void AddModes()
 	{
 		/* Add user modes */
 		ModeManager::AddUserMode(new UserModeOperOnly("SERV_ADMIN", 'A'));

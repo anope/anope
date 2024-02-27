@@ -208,7 +208,7 @@ class MD5Context final
 	/* Encodes input (unsigned) into output (unsigned char). Assumes len is
 	 * a multiple of 4.
 	 */
-	void Encode(unsigned char *output, unsigned *input, unsigned len)
+	static void Encode(unsigned char *output, unsigned *input, unsigned len)
 	{
 		for (unsigned i = 0, j = 0; j < len; ++i, j += 4)
 		{
@@ -222,7 +222,7 @@ class MD5Context final
 	/* Decodes input (unsigned char) into output (unsigned). Assumes len is
 	 * a multiple of 4.
 	 */
-	void Decode(unsigned *output, const unsigned char *input, unsigned len)
+	static void Decode(unsigned *output, const unsigned char *input, unsigned len)
 	{
 		for (unsigned i = 0, j = 0; j < len; ++i, j += 4)
 			output[i] = static_cast<unsigned>(input[j]) | (static_cast<unsigned>(input[j + 1]) << 8) | (static_cast<unsigned>(input[j + 2]) << 16) | (static_cast<unsigned>(input[j + 3]) << 24);

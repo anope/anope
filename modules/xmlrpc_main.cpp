@@ -121,7 +121,7 @@ private:
 		}
 	}
 
-	bool DoCheckAuthentication(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static bool DoCheckAuthentication(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
 		Anope::string username = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string password = request.data.size() > 1 ? request.data[1] : "";
@@ -139,7 +139,7 @@ private:
 		return true;
 	}
 
-	void DoStats(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static void DoStats(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
 		request.reply("uptime", stringify(Anope::CurTime - Anope::StartTime));
 		request.reply("uplinkname", Me->GetLinks().front()->GetName());
@@ -156,7 +156,7 @@ private:
 		request.reply("channelcount", stringify(ChannelList.size()));
 	}
 
-	void DoChannel(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static void DoChannel(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
 		if (request.data.empty())
 			return;
@@ -205,7 +205,7 @@ private:
 		}
 	}
 
-	void DoUser(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static void DoUser(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
 		if (request.data.empty())
 			return;
@@ -247,7 +247,7 @@ private:
 		}
 	}
 
-	void DoOperType(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static void DoOperType(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
 		for (auto *ot : Config->MyOperTypes)
 		{
@@ -260,7 +260,7 @@ private:
 		}
 	}
 
-	void DoNotice(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static void DoNotice(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
 		Anope::string from = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string to = request.data.size() > 1 ? request.data[1] : "";

@@ -129,14 +129,14 @@ private:
 		}
 	}
 
-	void DoStatsReset(CommandSource &source)
+	static void DoStatsReset(CommandSource &source)
 	{
 		MaxUserCount = UserListByNick.size();
 		source.Reply(_("Statistics reset."));
 		return;
 	}
 
-	void DoStatsUptime(CommandSource &source)
+	static void DoStatsUptime(CommandSource &source)
 	{
 		time_t uptime = Anope::CurTime - Anope::StartTime;
 		source.Reply(_("Current users: \002%zu\002 (\002%d\002 ops)"), UserListByNick.size(), OperCount);
@@ -146,7 +146,7 @@ private:
 		return;
 	}
 
-	void DoStatsUplink(CommandSource &source)
+	static void DoStatsUplink(CommandSource &source)
 	{
 		Anope::string buf;
 		for (const auto &capab : Servers::Capab)

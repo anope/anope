@@ -150,7 +150,7 @@ public:
 class CommandOSDefcon final
 	: public Command
 {
-	void SendLevels(CommandSource &source)
+	static void SendLevels(CommandSource &source)
 	{
 		if (DConfig.Check(DEFCON_NO_NEW_CHANNELS))
 			source.Reply(_("* No new channel registrations"));

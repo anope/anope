@@ -368,7 +368,7 @@ class ProtoPlexus final
 	IRCDMessageServer message_server;
 	IRCDMessageUID message_uid;
 
-	void AddModes()
+	static void AddModes()
 	{
 		/* Add user modes */
 		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));

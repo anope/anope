@@ -1091,7 +1091,7 @@ class BSKick final
 		}
 	}
 
-	void bot_kick(ChannelInfo *ci, User *u, const char *message, ...) ATTR_FORMAT(4, 5)
+	static void bot_kick(ChannelInfo *ci, User *u, const char *message, ...) ATTR_FORMAT(3, 4)
 	{
 		va_list args;
 		char buf[1024];

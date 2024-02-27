@@ -294,7 +294,7 @@ class CommandCSFlags final
 			source.Reply(_("Flags for \002%s\002 on %s set to +\002%s\002"), access->Mask().c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
 	}
 
-	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	static void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &arg = params.size() > 2 ? params[2] : "";
 

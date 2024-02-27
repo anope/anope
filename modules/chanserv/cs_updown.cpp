@@ -14,7 +14,7 @@
 class CommandCSUp final
 	: public Command
 {
-	void SetModes(User *u, Channel *c)
+	static void SetModes(User *u, Channel *c)
 	{
 		if (!c->ci)
 			return;
@@ -133,7 +133,7 @@ public:
 class CommandCSDown final
 	: public Command
 {
-	void RemoveAll(User *u, Channel *c)
+	static void RemoveAll(User *u, Channel *c)
 	{
 		ChanUserContainer *cu = c->FindUser(u);
 		if (cu != NULL)

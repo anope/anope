@@ -247,7 +247,7 @@ Serializable *ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data
 class CommandCSMode final
 	: public Command
 {
-	bool CanSet(CommandSource &source, ChannelInfo *ci, ChannelMode *cm, bool self)
+	static bool CanSet(CommandSource &source, ChannelInfo *ci, ChannelMode *cm, bool self)
 	{
 		if (!ci || !cm || cm->type != MODE_STATUS)
 			return false;

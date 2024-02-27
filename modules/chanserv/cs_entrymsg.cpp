@@ -104,7 +104,7 @@ class CommandEntryMessage final
 	: public Command
 {
 private:
-	void DoList(CommandSource &source, ChannelInfo *ci)
+	static void DoList(CommandSource &source, ChannelInfo *ci)
 	{
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 

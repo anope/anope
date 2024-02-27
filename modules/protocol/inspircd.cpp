@@ -69,7 +69,7 @@ class InspIRCdProto final
 	: public IRCDProto
 {
 private:
-	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
+	static void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
 	{
 		if (!Servers::Capab.count("CHGIDENT"))
 			Log() << "CHGIDENT not loaded!";
@@ -77,7 +77,7 @@ private:
 			Uplink::Send("CHGIDENT", nick, vIdent);
 	}
 
-	void SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
+	static void SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
 	{
 		if (!Servers::Capab.count("CHGHOST"))
 			Log() << "CHGHOST not loaded!";
@@ -85,17 +85,17 @@ private:
 			Uplink::Send("CHGHOST", nick, vhost);
 	}
 
-	void SendAddLine(const Anope::string &xtype, const Anope::string &mask, time_t duration, const Anope::string &addedby, const Anope::string &reason)
+	static void SendAddLine(const Anope::string &xtype, const Anope::string &mask, time_t duration, const Anope::string &addedby, const Anope::string &reason)
 	{
 		Uplink::Send("ADDLINE", xtype, mask, addedby, Anope::CurTime, duration, reason);
 	}
 
-	void SendDelLine(const Anope::string &xtype, const Anope::string &mask)
+	static void SendDelLine(const Anope::string &xtype, const Anope::string &mask)
 	{
 		Uplink::Send("DELLINE", xtype, mask);
 	}
 
-	void SendAccount(const Anope::string &uid, NickAlias *na)
+	static void SendAccount(const Anope::string &uid, NickAlias *na)
 	{
 		Uplink::Send("METADATA", uid, "accountid", na ? na->nc->GetId() : Anope::string());
 		Uplink::Send("METADATA", uid, "accountname", na ? na->nc->display : Anope::string());
@@ -782,7 +782,7 @@ public:
 		return IsValid(value, false);
 	}
 
-	bool IsValid(const Anope::string &value, bool historymode) const
+	static bool IsValid(const Anope::string &value, bool historymode) 
 	{
 		if (value.empty())
 			return false; // empty param is never valid
@@ -2027,7 +2027,7 @@ class ProtoInspIRCd final
 
 	bool use_server_side_topiclock, use_server_side_mlock;
 
-	void SendChannelMetadata(Channel *c, const Anope::string &metadataname, const Anope::string &value)
+	static void SendChannelMetadata(Channel *c, const Anope::string &metadataname, const Anope::string &value)
 	{
 		Uplink::Send("METADATA", c->name, c->creation_time, metadataname, value);
 	}

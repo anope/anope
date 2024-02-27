@@ -15,7 +15,7 @@ class CommandBSInfo final
 	: public Command
 {
 private:
-	void send_bot_channels(std::vector<Anope::string> &buffers, const BotInfo *bi)
+	static void send_bot_channels(std::vector<Anope::string> &buffers, const BotInfo *bi)
 	{
 		Anope::string buf;
 		for (const auto &[_, ci] : *RegisteredChannelList)

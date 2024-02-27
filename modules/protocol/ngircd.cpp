@@ -624,7 +624,7 @@ class ProtongIRCd final
 	IRCDMessageServer message_server;
 	IRCDMessageTopic message_topic;
 
-	void AddModes()
+	static void AddModes()
 	{
 		/* Add user modes */
 		ModeManager::AddUserMode(new UserMode("NOCTCP", 'b'));

@@ -174,7 +174,7 @@ class CommandOSSession final
 	: public Command
 {
 private:
-	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
+	static void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
 
@@ -216,7 +216,7 @@ private:
 		return;
 	}
 
-	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
+	static void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
 		Session *session = session_service->FindSession(param);

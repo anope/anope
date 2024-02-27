@@ -18,7 +18,7 @@ class NSMaxEmail final
 	bool clean = false;
 
 	/* strip dots from username, and remove anything after the first + */
-	Anope::string CleanMail(const Anope::string &email)
+	static Anope::string CleanMail(const Anope::string &email)
 	{
 		size_t host = email.find('@');
 		if (host == Anope::string::npos)

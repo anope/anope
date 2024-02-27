@@ -250,7 +250,7 @@ private:
 		source.Reply(_("\002%s\002 deleted from %s's certificate list."), certfp.c_str(), nc->display.c_str());
 	}
 
-	void DoList(CommandSource &source, const NickCore *nc)
+	static void DoList(CommandSource &source, const NickCore *nc)
 	{
 		NSCertList *cl = nc->GetExt<NSCertList>("certificates");
 

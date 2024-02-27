@@ -30,7 +30,7 @@ class EBCRYPT final
 		return salt;
 	}
 
-	Anope::string Generate(const Anope::string &data, const Anope::string &salt)
+	static Anope::string Generate(const Anope::string &data, const Anope::string &salt)
 	{
 		char hash[64];
 		_crypt_blowfish_rn(data.c_str(), salt.c_str(), hash, sizeof(hash));

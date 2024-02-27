@@ -75,7 +75,7 @@ private:
 		return;
 	}
 
-	void DoList(CommandSource &source, NickCore *nc, const Anope::string &mask)
+	static void DoList(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
 		unsigned i, end;
 

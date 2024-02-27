@@ -51,7 +51,7 @@ struct MyOper final
 class CommandOSOper final
 	: public Command
 {
-	bool HasPrivs(CommandSource &source, OperType *ot) const
+	static bool HasPrivs(CommandSource &source, OperType *ot) 
 	{
 		for (const auto &command : ot->GetCommands())
 		{

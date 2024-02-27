@@ -185,7 +185,7 @@ public:
 class CommandSeen final
 	: public Command
 {
-	void SimpleSeen(CommandSource &source, const std::vector<Anope::string> &params)
+	static void SimpleSeen(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!source.c || !source.c->ci)
 		{
@@ -440,7 +440,7 @@ public:
 	}
 
 private:
-	void UpdateUser(const User *u, const TypeInfo Type, const Anope::string &nick, const Anope::string &nick2, const Anope::string &channel, const Anope::string &message)
+	static void UpdateUser(const User *u, const TypeInfo Type, const Anope::string &nick, const Anope::string &nick2, const Anope::string &channel, const Anope::string &message)
 	{
 		if (simple || !u->server->IsSynced())
 			return;

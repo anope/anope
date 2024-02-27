@@ -112,7 +112,7 @@ public:
 	}
 
 private:
-	inline void Pack(std::vector<char> &buffer, const char *buf, size_t sz = 0)
+	static inline void Pack(std::vector<char> &buffer, const char *buf, size_t sz = 0)
 	{
 		if (!sz)
 			sz = strlen(buf);

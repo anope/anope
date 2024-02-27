@@ -18,7 +18,7 @@ static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
 class RatboxProto final
 	: public IRCDProto
 {
-	BotInfo *FindIntroduced()
+	static BotInfo *FindIntroduced()
 	{
 		BotInfo *bi = Config->GetClient("OperServ");
 
@@ -294,7 +294,7 @@ class ProtoRatbox final
 	IRCDMessageTBurst message_tburst;
 	IRCDMessageUID message_uid;
 
-	void AddModes()
+	static void AddModes()
 	{
 		/* user modes */
 		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));

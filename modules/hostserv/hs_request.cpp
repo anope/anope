@@ -67,7 +67,7 @@ struct HostRequest final
 class CommandHSRequest final
 	: public Command
 {
-	bool isvalidchar(char c)
+	static bool isvalidchar(char c)
 	{
 		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-';
 	}

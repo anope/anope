@@ -31,7 +31,7 @@ class Packet final
 		return name.find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-") == Anope::string::npos;
 	}
 
-	void PackName(unsigned char *output, unsigned short output_size, unsigned short &pos, const Anope::string &name)
+	static void PackName(unsigned char *output, unsigned short output_size, unsigned short &pos, const Anope::string &name)
 	{
 		if (pos + name.length() + 2 > output_size)
 			throw SocketException("Unable to pack name");
@@ -51,7 +51,7 @@ class Packet final
 		output[pos++] = 0;
 	}
 
-	Anope::string UnpackName(const unsigned char *input, unsigned short input_size, unsigned short &pos)
+	static Anope::string UnpackName(const unsigned char *input, unsigned short input_size, unsigned short &pos)
 	{
 		Anope::string name;
 		unsigned short pos_ptr = pos, lowest_ptr = input_size;

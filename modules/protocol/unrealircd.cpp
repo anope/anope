@@ -35,6 +35,7 @@ public:
 		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanSVSHold = true;
+		CanClearBans = true;
 		CanSVSLogout = true;
 		CanCertFP = true;
 		RequiresID = true;
@@ -437,6 +438,11 @@ private:
 		}
 
 		return true;
+	}
+
+	void SendClearBans(const MessageSource &user, Channel *c, User* u) override
+	{
+		Uplink::Send(user, "SVS2MODE", c->name, "-b", u->GetUID());
 	}
 };
 
@@ -1804,11 +1810,6 @@ public:
 		}
 
 		return EVENT_CONTINUE;
-	}
-
-	void OnChannelUnban(User *u, ChannelInfo *ci) override
-	{
-		Uplink::Send(ci->WhoSends(), "SVS2MODE", ci->c->name, "-b", u->GetUID());
 	}
 };
 

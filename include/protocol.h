@@ -96,6 +96,9 @@ public:
 	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */
 	bool AmbiguousID = false;
 
+	/** Can we ask the server to unban a user? */
+	bool CanClearBans = false;
+
 	/* The maximum number of modes we are allowed to set with one MODE command */
 	unsigned MaxModes = 3;
 
@@ -270,6 +273,8 @@ public:
 	 * Normally this is a simple +o, though some IRCds require us to send the oper type
 	 */
 	virtual void SendOper(User *u);
+
+	virtual void SendClearBans(const MessageSource &user, Channel *c, User* u) { }
 
 	virtual void SendSASLMechanisms(std::vector<Anope::string> &) { }
 	virtual void SendSASLMessage(const SASL::Message &) { }

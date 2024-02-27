@@ -1079,13 +1079,6 @@ public:
 	 * @return EVENT_STOP to force the user off of the nick
 	 */
 	virtual EventReturn OnNickValidate(User *u, NickAlias *na) { throw NotImplementedException(); }
-
-	/** Called when a certain user has to be unbanned on a certain channel.
-	 * May be used to send protocol-specific messages.
-	 * @param u The user to be unbanned
-	 * @param c The channel that user has to be unbanned on
-	 */
-	virtual void OnChannelUnban(User *u, ChannelInfo *ci) { throw NotImplementedException(); }
 };
 
 enum Implementation
@@ -1111,7 +1104,7 @@ enum Implementation
 	I_OnPrivmsg, I_OnLog, I_OnLogMessage, I_OnDnsRequest, I_OnCheckModes, I_OnChannelSync, I_OnSetCorrectModes,
 	I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate,
 	I_OnSerializeTypeCreate, I_OnSetChannelOption, I_OnSetNickOption, I_OnMessage, I_OnCanSet, I_OnCheckDelete,
-	I_OnExpireTick, I_OnNickValidate, I_OnChannelUnban,
+	I_OnExpireTick, I_OnNickValidate,
 	I_SIZE
 };
 

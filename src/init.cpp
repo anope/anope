@@ -221,7 +221,11 @@ static void write_pidfile()
 	std::ofstream stream(pidfile.str());
 	if (!stream.is_open())
 		throw CoreException("Can not write to PID file " + pidfile);
-	stream << getpid() << std::endl;
+#ifdef _WIN32
+		stream << GetCurrentProcessId() << std::endl;
+#else
+		stream << getpid() << std::endl;
+#endif
 	atexit(remove_pidfile);
 }
 

@@ -152,7 +152,7 @@ bool sepstream::GetTokenRemainder(Anope::string &token, int num)
 	return false;
 }
 
-const Anope::string sepstream::GetRemaining()
+Anope::string sepstream::GetRemaining()
 {
 	return !this->StreamEnd() ? this->tokens.substr(this->pos) : "";
 }

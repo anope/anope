@@ -806,12 +806,12 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 		this->real.clear();
 }
 
-const Anope::string Entry::GetMask() const
+Anope::string Entry::GetMask() const
 {
 	return this->mask;
 }
 
-const Anope::string Entry::GetNUHMask() const
+Anope::string Entry::GetNUHMask() const
 {
 	Anope::string n = nick.empty() ? "*" : nick,
 			u = user.empty() ? "*" : user,

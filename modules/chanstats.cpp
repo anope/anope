@@ -210,7 +210,7 @@ class MChanstats final
 		return smileys;
 	}
 
-	const Anope::string GetDisplay(User *u)
+	Anope::string GetDisplay(User *u)
 	{
 		if (u && u->Account() && ns_stats.HasExt(u->Account()))
 			return u->Account()->display;

@@ -108,7 +108,7 @@ void OperType::Inherits(OperType *ot)
 		this->inheritances.insert(ot);
 }
 
-const std::list<Anope::string> OperType::GetCommands() const
+std::list<Anope::string> OperType::GetCommands() const
 {
 	std::list<Anope::string> cmd_list = this->commands;
 	for (auto *ot : this->inheritances)
@@ -119,7 +119,7 @@ const std::list<Anope::string> OperType::GetCommands() const
 	return cmd_list;
 }
 
-const std::list<Anope::string> OperType::GetPrivs() const
+std::list<Anope::string> OperType::GetPrivs() const
 {
 	std::list<Anope::string> priv_list = this->privs;
 	for (auto *ot : this->inheritances)

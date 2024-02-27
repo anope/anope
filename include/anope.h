@@ -495,7 +495,7 @@ namespace Anope
 	/** Return the last error, uses errno/GetLastError() to determine this
 	 * @return An error message
 	 */
-	extern CoreExport const string LastError();
+	extern CoreExport string LastError();
 
 	/** Determines if a path is a file
 	 */
@@ -623,7 +623,7 @@ public:
 	/** Fetch the entire remaining stream, without tokenizing
 	 * @return The remaining part of the stream
 	 */
-	const Anope::string GetRemaining();
+	Anope::string GetRemaining();
 
 	/** Returns true if the end of the stream has been reached
 	 * @return True if the end of the stream has been reached, otherwise false

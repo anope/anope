@@ -313,7 +313,7 @@ public:
 
 	/** Gets the new line from the input buffer, if any
 	 */
-	const Anope::string GetLine();
+	Anope::string GetLine();
 
 	/** Write to the socket
 	* @param message The message

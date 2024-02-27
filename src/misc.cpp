@@ -576,7 +576,7 @@ int Anope::LastErrorCode()
 #endif
 }
 
-const Anope::string Anope::LastError()
+Anope::string Anope::LastError()
 {
 #ifndef _WIN32
 	return strerror(errno);

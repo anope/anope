@@ -419,9 +419,9 @@ public:
 	/** Get the banned mask for this entry
 	 * @return The mask
 	 */
-	const Anope::string GetMask() const;
+	Anope::string GetMask() const;
 
-	const Anope::string GetNUHMask() const;
+	Anope::string GetNUHMask() const;
 
 	/** Check if this entry matches a user
 	 * @param u The user

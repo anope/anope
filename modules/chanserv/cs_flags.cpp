@@ -26,9 +26,7 @@ public:
 	bool HasPriv(const Anope::string &priv) const override
 	{
 		std::map<Anope::string, char>::iterator it = defaultFlags.find(priv);
-		if (it != defaultFlags.end() && this->flags.count(it->second) > 0)
-			return true;
-		return false;
+		return it != defaultFlags.end() && this->flags.count(it->second) > 0;
 	}
 
 	Anope::string AccessSerialize() const override
@@ -324,7 +322,7 @@ class CommandCSFlags final
 					for (size_t j = 1; j < arg.length(); ++j)
 						if (flags.find(arg[j]) == Anope::string::npos)
 							pass = false;
-					if (pass == false)
+					if (!pass)
 						continue;
 				}
 				else if (!Anope::Match(access->Mask(), arg))

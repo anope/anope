@@ -69,9 +69,7 @@ class CommandHSRequest final
 {
 	bool isvalidchar(char c)
 	{
-		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
-			return true;
-		return false;
+		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-';
 	}
 
 public:

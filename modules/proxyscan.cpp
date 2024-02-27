@@ -40,7 +40,7 @@ class ProxyCallbackListener final
 
 		bool ProcessWrite() override
 		{
-			return !BufferedSocket::ProcessWrite() || this->write_buffer.empty() ? false : true;
+			return !(!BufferedSocket::ProcessWrite() || this->write_buffer.empty());
 		}
 	};
 

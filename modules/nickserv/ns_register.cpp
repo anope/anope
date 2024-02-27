@@ -35,7 +35,7 @@ public:
 			NickAlias *na = NickAlias::Find(nick);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-			else if (na->nc->HasExt("UNCONFIRMED") == false)
+			else if (!na->nc->HasExt("UNCONFIRMED"))
 				source.Reply(_("Nick \002%s\002 is already confirmed."), na->nick.c_str());
 			else
 			{

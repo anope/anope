@@ -93,7 +93,7 @@ public:
 		Log(LOG_ADMIN, source, this) << "for " << search_string;
 
 		bool wildcard = search_string.find_first_of("?*") != Anope::string::npos;
-		bool regex = search_string.empty() == false && search_string[0] == '/' && search_string[search_string.length() - 1] == '/';
+		bool regex = !search_string.empty() && search_string[0] == '/' && search_string[search_string.length() - 1] == '/';
 
 		const Anope::string &logfile_name = Config->GetModule(this->owner)->Get<const Anope::string>("logname");
 		std::vector<Anope::string> matches;

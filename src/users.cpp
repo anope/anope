@@ -443,7 +443,7 @@ bool User::IsIdentified(bool check_nick) const
 		return na && *na->nc == *this->nc;
 	}
 
-	return this->nc ? true : false;
+	return this->nc;
 }
 
 bool User::IsRecognized(bool check_secure) const

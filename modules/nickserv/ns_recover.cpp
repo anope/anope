@@ -192,7 +192,7 @@ public:
 		if (source.HasPriv("nickserv/recover"))
 			ok = true;
 
-		if (ok == false && !pass.empty())
+		if (!ok && !pass.empty())
 		{
 			auto *req = new NSRecoverRequest(owner, source, this, na->nick, pass);
 			FOREACH_MOD(OnCheckAuthentication, (source.GetUser(), req));

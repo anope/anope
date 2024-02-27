@@ -73,7 +73,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	ChannelMode *cm = ModeManager::FindChannelModeByChar(mode[0]);
 	if (cm)
 	{
-		if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
+		if (!message.get_data["del"].empty() && !message.get_data["mask"].empty())
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);
@@ -82,7 +82,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 			params.push_back(message.get_data["mask"]);
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
 		}
-		else if (message.post_data["mask"].empty() == false)
+		else if (!message.post_data["mask"].empty())
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);

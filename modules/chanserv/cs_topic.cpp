@@ -262,7 +262,7 @@ public:
 
 		ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
 		const ModeLock *secret = ml ? ml->GetMLock("SECRET") : NULL;
-		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode("SECRET")))))
+		if (!ci->last_topic.empty() && (show_all || ((!secret || !secret->set) && (!ci->c || !ci->c->HasMode("SECRET")))))
 		{
 			info[_("Last topic")] = ci->last_topic;
 			info[_("Topic set by")] = ci->last_topic_setter;

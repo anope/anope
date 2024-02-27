@@ -13,7 +13,7 @@ WebCPanel::NickServ::Info::Info(const Anope::string &cat, const Anope::string &u
 
 bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
-	if (message.post_data.empty() == false)
+	if (!message.post_data.empty())
 	{
 		if (message.post_data.count("email") > 0)
 		{
@@ -85,12 +85,12 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 	}
 
 	replacements["DISPLAY"] = na->nc->display;
-	if (na->nc->email.empty() == false)
+	if (!na->nc->email.empty())
 		replacements["EMAIL"] = na->nc->email;
 	replacements["TIME_REGISTERED"] = Anope::strftime(na->time_registered, na->nc);
 	if (na->HasVhost())
 	{
-		if (na->GetVhostIdent().empty() == false)
+		if (!na->GetVhostIdent().empty())
 			replacements["VHOST"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
 		else
 			replacements["VHOST"] = na->GetVhostHost();

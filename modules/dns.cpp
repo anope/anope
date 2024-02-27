@@ -72,7 +72,7 @@ class Packet final
 					throw SocketException("Unable to unpack name - bogus compression header");
 
 				/* Place pos at the second byte of the first (farthest) compression pointer */
-				if (compressed == false)
+				if (!compressed)
 				{
 					++pos;
 					compressed = true;
@@ -95,7 +95,7 @@ class Packet final
 					name += input[pos_ptr + i];
 
 				pos_ptr += offset + 1;
-				if (compressed == false)
+				if (!compressed)
 					/* Move up pos */
 					pos = pos_ptr;
 			}

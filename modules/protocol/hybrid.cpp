@@ -209,7 +209,7 @@ public:
 
 	void SendLogin(User *u, NickAlias *na) override
 	{
-		if (UseSVSAccount == false)
+		if (!UseSVSAccount)
 			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", na->nc->display);
 		else
 			Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, na->nc->display);
@@ -217,7 +217,7 @@ public:
 
 	void SendLogout(User *u) override
 	{
-		if (UseSVSAccount == false)
+		if (!UseSVSAccount)
 			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", '*');
 		else
 			Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, '*');

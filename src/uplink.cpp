@@ -148,7 +148,7 @@ UplinkSocket::~UplinkSocket()
 bool UplinkSocket::ProcessRead()
 {
 	bool b = BufferedSocket::ProcessRead();
-	for (Anope::string buf; (buf = this->GetLine()).empty() == false;)
+	for (Anope::string buf; !(buf = this->GetLine()).empty();)
 	{
 		Anope::Process(buf);
 		User::QuitUsers();

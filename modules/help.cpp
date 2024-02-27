@@ -173,7 +173,7 @@ public:
 				break;
 			}
 
-			if (helped == false)
+			if (!helped)
 				source.Reply(_("No help available for \002%s\002."), params[0].c_str());
 		}
 

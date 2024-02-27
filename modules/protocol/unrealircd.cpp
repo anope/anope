@@ -687,7 +687,7 @@ public:
 			size_t p = 0;
 			while (p < arg.length() && isdigit(arg[p]))
 				++p;
-			if (p == arg.length() || !(arg[p] == 'c' || arg[p] == 'j' || arg[p] == 'k' || arg[p] == 'm' || arg[p] == 'n' || arg[p] == 't'))
+			if (p == arg.length() || (arg[p] != 'c' && arg[p] != 'j' && arg[p] != 'k' && arg[p] != 'm' && arg[p] != 'n' && arg[p] != 't'))
 				continue; /* continue instead of break for forward compatibility. */
 			try
 			{

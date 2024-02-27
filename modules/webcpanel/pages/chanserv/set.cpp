@@ -42,7 +42,7 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 		can_set = true;
 	}
 
-	if (can_set && message.post_data.empty() == false)
+	if (can_set && !message.post_data.empty())
 	{
 		if (ci->HasExt("KEEPTOPIC") != message.post_data.count("keeptopic"))
 		{

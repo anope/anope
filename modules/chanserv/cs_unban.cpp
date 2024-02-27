@@ -81,7 +81,7 @@ public:
 		}
 
 		if (!source.AccessFor(ci).HasPriv("UNBAN") &&
-			!(u2 == source.GetUser() && source.AccessFor(ci).HasPriv("UNBANME")) &&
+			(u2 != source.GetUser() || !source.AccessFor(ci).HasPriv("UNBANME")) &&
 			!source.HasPriv("chanserv/kick"))
 		{
 			source.Reply(ACCESS_DENIED);

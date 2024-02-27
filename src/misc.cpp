@@ -260,10 +260,7 @@ void InfoFormatter::AddOption(const Anope::string &opt)
 bool Anope::IsFile(const Anope::string &filename)
 {
 	struct stat fileinfo;
-	if (!stat(filename.c_str(), &fileinfo))
-		return true;
-
-	return false;
+	return stat(filename.c_str(), &fileinfo) == 0;
 }
 
 time_t Anope::DoTime(const Anope::string &s)

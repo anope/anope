@@ -146,7 +146,7 @@ class CommandNSAJoin final
 			}
 			else if (i != (*channels)->size())
 				alreadyadded += chan + ", ";
-			else if (IRCD->IsChannelValid(chan) == false)
+			else if (!IRCD->IsChannelValid(chan))
 				source.Reply(CHAN_X_INVALID, chan.c_str());
 			else
 			{
@@ -361,9 +361,9 @@ public:
 					continue;
 				else if (c->HasMode("SSL") && !u->IsSecurelyConnected())
 					continue;
-				else if (c->MatchesList(u, "BAN") == true && c->MatchesList(u, "EXCEPT") == false)
+				else if (c->MatchesList(u, "BAN") && !c->MatchesList(u, "EXCEPT"))
 					need_invite = true;
-				else if (c->HasMode("INVITE") && c->MatchesList(u, "INVITEOVERRIDE") == false)
+				else if (c->HasMode("INVITE") && !c->MatchesList(u, "INVITEOVERRIDE"))
 					need_invite = true;
 
 				if (c->HasMode("KEY"))

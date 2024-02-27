@@ -23,7 +23,7 @@ bool WebCPanel::HostServ::Request::OnRequest(HTTPProvider *server, const Anope::
 
 	if (na->HasVhost())
 	{
-		if (na->GetVhostIdent().empty() == false)
+		if (!na->GetVhostIdent().empty())
 			replacements["VHOST"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
 		else
 			replacements["VHOST"] = na->GetVhostHost();

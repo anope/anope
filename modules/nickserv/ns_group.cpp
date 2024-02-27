@@ -178,7 +178,7 @@ public:
 			if (user != NULL && !user->fingerprint.empty() && cl && cl->FindCert(user->fingerprint))
 				ok = true;
 
-			if (ok == false && !pass.empty())
+			if (!ok && !pass.empty())
 			{
 				auto *req = new NSGroupRequest(owner, source, this, source.GetNick(), target, pass);
 				FOREACH_MOD(OnCheckAuthentication, (source.GetUser(), req));

@@ -48,7 +48,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 	if (u_access.HasPriv("ACCESS_CHANGE") || has_priv)
 	{
-		if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
+		if (!message.get_data["del"].empty() && !message.get_data["mask"].empty())
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);
@@ -57,7 +57,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/access", params, replacements);
 		}
-		else if (message.post_data["mask"].empty() == false && message.post_data["access"].empty() == false && message.post_data["provider"].empty() == false)
+		else if (!message.post_data["mask"].empty() && !message.post_data["access"].empty() && !message.post_data["provider"].empty())
 		{
 			const Anope::string &provider = message.post_data["provider"];
 

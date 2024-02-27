@@ -106,7 +106,7 @@ public:
 	/* Close connection once all data is written */
 	bool ProcessWrite() override
 	{
-		return !BinarySocket::ProcessWrite() || this->write_buffer.empty() ? false : true;
+		return !(!BinarySocket::ProcessWrite() || this->write_buffer.empty());
 	}
 
 	const Anope::string GetIP() override

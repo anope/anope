@@ -233,10 +233,7 @@ bool UserModeNoone::CanSet(User *u) const
 
 bool ChannelModeKey::IsValid(Anope::string &value) const
 {
-	if (!value.empty() && value.find(':') == Anope::string::npos && value.find(',') == Anope::string::npos)
-		return true;
-
-	return false;
+	return !value.empty() && value.find(':') == Anope::string::npos && value.find(',') == Anope::string::npos;
 }
 
 bool ChannelModeOperOnly::CanSet(User *u) const

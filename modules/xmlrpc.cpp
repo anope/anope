@@ -57,7 +57,7 @@ public:
 	Anope::string Sanitize(const Anope::string &string) override
 	{
 		Anope::string ret = string;
-		for (int i = 0; special[i].character.empty() == false; ++i)
+		for (int i = 0; !special[i].character.empty(); ++i)
 			ret = ret.replace_all_cs(special[i].character, special[i].replace);
 		return ret;
 	}
@@ -65,7 +65,7 @@ public:
 	static Anope::string Unescape(const Anope::string &string)
 	{
 		Anope::string ret = string;
-		for (int i = 0; special[i].character.empty() == false; ++i)
+		for (int i = 0; !special[i].character.empty(); ++i)
 			if (!special[i].replace.empty())
 				ret = ret.replace_all_cs(special[i].replace, special[i].character);
 

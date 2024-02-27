@@ -539,6 +539,12 @@ class InspIRCdAutoOpMode : public ChannelModeList
 	}
 };
 
+// NOTE: matchers for the following extbans have not been implemented:
+//
+// * class(n):    data not available
+// * country(G):  data not available
+// * gateway(w):  data not available in v3
+// * realmask(a): todo
 class InspIRCdExtBan : public ChannelModeVirtual<ChannelModeList>
 {
 	char ext;
@@ -577,7 +583,7 @@ namespace InspIRCdExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
+			Anope::string real_mask = mask.substr(2);
 
 			return Entry(this->name, real_mask).Matches(u);
 		}
@@ -594,7 +600,7 @@ namespace InspIRCdExtban
 		{
 			const Anope::string &mask = e->GetMask();
 
-			Anope::string channel = mask.substr(3);
+			Anope::string channel = mask.substr(2);
 
 			ChannelMode *cm = NULL;
 			if (channel[0] != '#')
@@ -692,6 +698,25 @@ namespace InspIRCdExtban
 			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(2);
 			return !u->Account() && Entry("BAN", real_mask).Matches(u);
+		}
+	};
+
+	class OperTypeMatcher : public InspIRCdExtBan
+	{
+	 public:
+		OperTypeMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+		{
+		}
+
+		bool Matches(User *u, const Entry *e) anope_override
+		{
+			Anope::string *opertype = u->GetExt<Anope::string>("opertype");
+			if (!opertype)
+				return false; // Not an operator.
+
+			const Anope::string &mask = e->GetMask();
+			Anope::string real_mask = mask.substr(2);
+			return Anope::Match(opertype->replace_all_cs(' ', '_'), real_mask);
 		}
 	};
 }
@@ -1012,7 +1037,10 @@ struct IRCDMessageCapab : Message::Capab
 				else if (mode.name.equals_cs("op"))
 					cm = new ChannelModeStatus("OP", mode.letter, mode.symbol, mode.level);
 				else if (mode.name.equals_cs("operonly"))
+				{
 					cm = new ChannelModeOperOnly("OPERONLY", mode.letter);
+					ModeManager::AddChannelMode(new InspIRCdExtban::OperTypeMatcher("OPERTYPEBAN", "BAN", 'O'));
+				}
 				else if (mode.name.equals_cs("operprefix"))
 					cm = new ChannelModeStatus("OPERPREFIX", mode.letter, mode.symbol, mode.level);
 				else if (mode.name.equals_cs("permanent"))
@@ -1702,7 +1730,9 @@ struct IRCDMessageNick : IRCDMessage
 
 struct IRCDMessageOperType : IRCDMessage
 {
-	IRCDMessageOperType(Module *creator) : IRCDMessage(creator, "OPERTYPE", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+	PrimitiveExtensibleItem<Anope::string> opertype;
+
+	IRCDMessageOperType(Module *creator) : IRCDMessage(creator, "OPERTYPE", 1), opertype(creator, "opertype") { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -1711,6 +1741,8 @@ struct IRCDMessageOperType : IRCDMessage
 		User *u = source.GetUser();
 		if (!u->HasMode("OPER"))
 			u->SetModesInternal(source, "+o");
+
+		opertype.Set(u, params[0]);
 	}
 };
 

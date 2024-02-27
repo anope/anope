@@ -139,7 +139,7 @@ namespace InspIRCdExtban
 		bool Matches(User *u, const Entry *e) anope_override
 		{
 			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
+			Anope::string real_mask = mask.substr(2);
 
 			return Entry(this->name, real_mask).Matches(u);
 		}
@@ -156,7 +156,7 @@ namespace InspIRCdExtban
 		{
 			const Anope::string &mask = e->GetMask();
 
-			Anope::string channel = mask.substr(3);
+			Anope::string channel = mask.substr(2);
 
 			ChannelMode *cm = NULL;
 			if (channel[0] != '#')

@@ -11,6 +11,7 @@
 
 #include "module.h"
 #include "modules/cs_mode.h"
+#include "modules/httpd.h"
 #include "modules/sasl.h"
 
 typedef std::map<char, unsigned> ListLimits;
@@ -66,12 +67,36 @@ namespace
 
 		Log(LOG_DEBUG) << "Parsed module: " << "name=" << modname << " data=" << moddata;
 	}
+
+	void ParseModuleData(const Anope::string &moddata, Anope::map<Anope::string> &modmap)
+	{
+		sepstream datastream(moddata, '&');
+		for (Anope::string datapair; datastream.GetToken(datapair); )
+		{
+			size_t split = datapair.find('=');
+			if (split == Anope::string::npos)
+				modmap.emplace(datapair, "");
+			else
+				modmap.emplace(datapair.substr(0, split), HTTPUtils::URLDecode(datapair.substr(split + 1)));
+		}
+	}
 }
 
 class InspIRCdProto final
 	: public IRCDProto
 {
 private:
+	static Anope::string GetAccountNicks(NickAlias* na)
+	{
+		if (!na)
+			return {};
+
+		Anope::string nicks;
+		for (const auto &na : *na->nc->aliases)
+			nicks += " " + na->nick;
+		return nicks.substr(1);
+	}
+
 	static void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
 	{
 		if (!Servers::Capab.count("CHGIDENT"))
@@ -102,6 +127,8 @@ private:
 	{
 		Uplink::Send("METADATA", uid, "accountid", na ? na->nc->GetId() : Anope::string());
 		Uplink::Send("METADATA", uid, "accountname", na ? na->nc->display : Anope::string());
+		if (spanningtree_proto_ver >= 1206)
+			Uplink::Send("METADATA", uid, "accountnicks", GetAccountNicks(na));
 	}
 
 public:
@@ -159,7 +186,7 @@ public:
 
 	void SendConnect() override
 	{
-		Uplink::Send("CAPAB", "START", 1205);
+		Uplink::Send("CAPAB", "START", 1206);
 		Uplink::Send("CAPAB", "CAPABILITIES", "CASEMAPPING=" + Config->GetBlock("options")->Get<const Anope::string>("casemap", "ascii"));
 		Uplink::Send("CAPAB", "END");
 		Uplink::Send("SERVER", Me->GetName(), Config->Uplinks[Anope::CurrentUplink].password, 0, Me->GetSID(), Me->GetDescription());
@@ -193,6 +220,35 @@ public:
 	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override
 	{
 		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
+	}
+
+	void SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg) override
+	{
+		if (spanningtree_proto_ver >= 1206)
+		{
+			IRCD->SendNoticeInternal(bi, target->GetUID(), msg, {
+				{ "~context", context->name },
+			});
+			return;
+		}
+		IRCDProto::SendContextNotice(bi, target, context, msg);
+	}
+
+	void SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg) override
+	{
+		if (spanningtree_proto_ver >= 1206)
+		{
+			IRCD->SendPrivmsgInternal(bi, target->GetUID(), msg, {
+				{ "~context", context->name },
+			});
+			return;
+		}
+		IRCDProto::SendContextPrivmsg(bi, target, context, msg);
+	}
+
+	void SendClearBans(const MessageSource &user, Channel *c, User* u) override
+	{
+		Uplink::Send(user, "SVSCMODE", u->GetUID(), c->name, 'b');
 	}
 
 	void SendPong(const Anope::string &servname, const Anope::string &who) override
@@ -353,7 +409,16 @@ public:
 
 	void SendClientIntroduction(User *u) override
 	{
-		Uplink::Send("UID", u->GetUID(), u->timestamp, u->nick, u->host, u->host, u->GetIdent(), "0.0.0.0", u->timestamp, "+" + u->GetModes(), u->realname);
+		if (spanningtree_proto_ver >= 1206)
+		{
+			Uplink::Send("UID", u->GetUID(), u->timestamp, u->nick, u->host, u->host, u->GetIdent(), u->GetIdent(),
+				"0.0.0.0", u->timestamp, "+" + u->GetModes(), u->realname);
+		}
+		else
+		{
+			Uplink::Send("UID", u->GetUID(), u->timestamp, u->nick, u->host, u->host, u->GetIdent(), "0.0.0.0",
+				u->timestamp, "+" + u->GetModes(), u->realname);
+		}
 
 		if (u->GetModes().find('o') != Anope::string::npos)
 		{
@@ -486,8 +551,16 @@ public:
 		Uplink::Send("BURST", Anope::CurTime);
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
 
-		Uplink::Send("SINFO", "version", Anope::printf("Anope-%s %s :%s -- (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
-		Uplink::Send("SINFO", "fullversion", Anope::printf("Anope-%s %s :[%s] %s -- (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), Me->GetSID().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
+		if (spanningtree_proto_ver >= 1206)
+		{
+			Uplink::Send("SINFO", "customversion", Anope::printf("%s -- (%s) -- %s", IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
+			Uplink::Send("SINFO", "rawbranch", "Anope-" + Anope::VersionShort());
+		}
+		else
+		{
+			Uplink::Send("SINFO", "version", Anope::printf("Anope-%s %s :%s -- (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
+			Uplink::Send("SINFO", "fullversion", Anope::printf("Anope-%s %s :[%s] %s -- (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), Me->GetSID().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
+		}
 		Uplink::Send("SINFO", "rawversion", "Anope-" + Anope::VersionShort());
 	}
 
@@ -612,41 +685,60 @@ public:
 // * class(n):    data not available
 // * country(G):  data not available
 // * gateway(w):  data not available in v3
+// * oper(o):     todo
 // * realmask(a): todo
-class InspIRCdExtBan
-	: public ChannelModeVirtual<ChannelModeList>
+namespace InspIRCdExtBan
 {
-	char ext;
-
-public:
-	InspIRCdExtBan(const Anope::string &mname, const Anope::string &basename, char extban) : ChannelModeVirtual<ChannelModeList>(mname, basename)
-		, ext(extban)
+	class Base
+		: public ChannelModeVirtual<ChannelModeList>
 	{
-	}
+	private:
+		unsigned char xbchar;
+		Anope::string xbname;
 
-	ChannelMode *Wrap(Anope::string &param) override
-	{
-		param = Anope::string(ext) + ":" + param;
-		return ChannelModeVirtual<ChannelModeList>::Wrap(param);
-	}
+	public:
+		Base(const Anope::string &mname, const Anope::string &xname, char xchar)
+			: ChannelModeVirtual<ChannelModeList>(mname, "BAN")
+			, xbchar(xchar)
+			, xbname(xname)
+		{
+		}
 
-	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) override
-	{
-		if (cm->type != MODE_LIST || param.length() < 3 || param[0] != ext || param[1] != ':')
-			return cm;
+		ChannelMode *Wrap(Anope::string &param) override
+		{
+			param = Anope::string(xbchar) + ":" + param;
+			return ChannelModeVirtual<ChannelModeList>::Wrap(param);
+		}
 
-		param = param.substr(2);
-		return this;
-	}
-};
+		ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) override
+		{
+			// The mask must be in the format [!]<letter>:<value> or [!]<name>:<value>.
+			if (cm->type != MODE_LIST)
+				return cm;
 
-namespace InspIRCdExtban
-{
+			auto startpos = 0;
+			if (param[0] == '!')
+				startpos++;
+
+			auto endpos = param.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", startpos);
+			if (endpos == Anope::string::npos || param[endpos] != ':')
+				return cm;
+
+			auto name = param.substr(startpos, endpos - startpos);
+			if (param.length() >= endpos || (name.length() == 1 ? name[0] != xbchar : name != xbname))
+				return cm;
+
+			param.erase(0, endpos);
+			return this;
+		}
+	};
+
 	class EntryMatcher final
-		: public InspIRCdExtBan
+		: public Base
 	{
 	public:
-		EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+		EntryMatcher(const Anope::string &mname, const Anope::string &xname, char xchar)
+			: Base(mname, xname, xchar)
 		{
 		}
 
@@ -660,10 +752,11 @@ namespace InspIRCdExtban
 	};
 
 	class ChannelMatcher final
-		: public InspIRCdExtBan
+		: public Base
 	{
 	public:
-		ChannelMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+		ChannelMatcher(const Anope::string &mname, const Anope::string &xname, char xchar)
+			: Base(mname, xname, xchar)
 		{
 		}
 
@@ -697,10 +790,11 @@ namespace InspIRCdExtban
 	};
 
 	class AccountMatcher final
-		: public InspIRCdExtBan
+		: public Base
 	{
 	public:
-		AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+		AccountMatcher(const Anope::string &mname, const Anope::string &xname, char xchar)
+			: Base(mname, xname, xchar)
 		{
 		}
 
@@ -714,10 +808,11 @@ namespace InspIRCdExtban
 	};
 
 	class RealnameMatcher final
-		: public InspIRCdExtBan
+		: public Base
 	{
 	public:
-		RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+		RealnameMatcher(const Anope::string &mname, const Anope::string &xname, char xchar)
+			: Base(mname, xname, xchar)
 		{
 		}
 
@@ -730,10 +825,11 @@ namespace InspIRCdExtban
 	};
 
 	class ServerMatcher final
-		: public InspIRCdExtBan
+		: public Base
 	{
 	public:
-		ServerMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+		ServerMatcher(const Anope::string &mname, const Anope::string &xname, char xchar)
+			: Base(mname, xname, xchar)
 		{
 		}
 
@@ -746,10 +842,11 @@ namespace InspIRCdExtban
 	};
 
 	class FingerprintMatcher final
-		: public InspIRCdExtBan
+		: public Base
 	{
 	public:
-		FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+		FingerprintMatcher(const Anope::string &mname, const Anope::string &xname, char xchar)
+			: Base(mname, xname, xchar)
 		{
 		}
 
@@ -762,10 +859,11 @@ namespace InspIRCdExtban
 	};
 
 	class UnidentifiedMatcher final
-		: public InspIRCdExtBan
+		: public Base
 	{
 	public:
-		UnidentifiedMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+		UnidentifiedMatcher(const Anope::string &mname, const Anope::string &xname, char xchar)
+			: Base(mname, xname, xchar)
 		{
 		}
 
@@ -778,10 +876,11 @@ namespace InspIRCdExtban
 	};
 
 	class OperTypeMatcher
-		: public InspIRCdExtBan
+		: public Base
 	{
 	 public:
-		OperTypeMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+		OperTypeMatcher(const Anope::string &mname, const Anope::string &xname, char xchar)
+			: Base(mname, xname, xchar)
 		{
 		}
 
@@ -932,9 +1031,21 @@ struct IRCDMessageAway final
 struct IRCDMessageCapab final
 	: Message::Capab
 {
+	struct ExtBanInfo final
+	{
+		// The letter assigned to the extban.
+		char letter = 0;
+
+		// The name of the extban.
+		Anope::string name;
+
+		// The type of extban.
+		Anope::string type;
+	};
+
 	struct ModeInfo final
 	{
-		// The letter assigned to the mode (e.g. o).
+		// The letter assigned to the mode.
 		char letter = 0;
 
 		// If a prefix mode then the rank of the prefix.
@@ -961,6 +1072,26 @@ struct IRCDMessageCapab final
 			return { token, 0 };
 
 		return { token.substr(0, sep), convertTo<size_t>(value) };
+	}
+
+	static bool ParseExtBan(const Anope::string &token, ExtBanInfo &extban)
+	{
+		// acting:foo=f  matching:foo=f
+		//       A   B           A   B
+		auto a = token.find(':');
+		if (a == Anope::string::npos)
+			return false;
+
+		auto b = token.find(':', a + 1);
+		if (b == Anope::string::npos)
+			return false;
+
+		extban.type = token.substr(0, a);
+		extban.name = token.substr(a + 1, b - a - 1);
+		extban.letter = token[b + 1];
+
+		Log(LOG_DEBUG) << "Parsed extban: " << "type=" << extban.type << " name=" << extban.name << " letter=" << extban.letter;
+		return true;
 	}
 
 	static bool ParseMode(const Anope::string &token, ModeInfo &mode)
@@ -1025,8 +1156,8 @@ struct IRCDMessageCapab final
 				return;
 			}
 
-			/* reset CAPAB */
 			Servers::Capab.clear();
+			IRCD->CanClearBans = false;
 			IRCD->CanSQLineChannel = false;
 			IRCD->CanSVSHold = false;
 			IRCD->DefaultPseudoclientModes = "+oI";
@@ -1048,7 +1179,8 @@ struct IRCDMessageCapab final
 				else if (mode.name.equals_cs("allowinvite"))
 				{
 					cm = new ChannelMode("ALLINVITE", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("INVITEBAN", "BAN", 'A'));
+					if (spanningtree_proto_ver < 1206)
+						ModeManager::AddChannelMode(new InspIRCdExtBan::EntryMatcher("INVITEBAN", "", 'A'));
 				}
 				else if (mode.name.equals_cs("auditorium"))
 					cm = new ChannelMode("AUDITORIUM", mode.letter);
@@ -1061,12 +1193,14 @@ struct IRCDMessageCapab final
 				else if (mode.name.equals_cs("blockcaps"))
 				{
 					cm = new ChannelMode("BLOCKCAPS", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("BLOCKCAPSBAN", "BAN", 'B'));
+					if (spanningtree_proto_ver < 1206)
+						ModeManager::AddChannelMode(new InspIRCdExtBan::EntryMatcher("BLOCKCAPSBAN", "", 'B'));
 				}
 				else if (mode.name.equals_cs("blockcolor"))
 				{
 					cm = new ChannelMode("BLOCKCOLOR", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("BLOCKCOLORBAN", "BAN", 'c'));
+					if (spanningtree_proto_ver < 1206)
+						ModeManager::AddChannelMode(new InspIRCdExtBan::EntryMatcher("BLOCKCOLORBAN", "", 'c'));
 				}
 				else if (mode.name.equals_cs("c_registered"))
 					cm = new ChannelModeNoone("REGISTERED", mode.letter);
@@ -1105,26 +1239,30 @@ struct IRCDMessageCapab final
 				else if (mode.name.equals_cs("noctcp"))
 				{
 					cm = new ChannelMode("NOCTCP", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("NOCTCPBAN", "BAN", 'C'));
+					if (spanningtree_proto_ver < 1206)
+						ModeManager::AddChannelMode(new InspIRCdExtBan::EntryMatcher("NOCTCPBAN", "", 'C'));
 				}
 				else if (mode.name.equals_cs("noextmsg"))
 					cm = new ChannelMode("NOEXTERNAL", mode.letter);
 				else if (mode.name.equals_cs("nokick"))
 				{
 					cm = new ChannelMode("NOKICK", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("NOKICKBAN", "BAN", 'Q'));
+					if (spanningtree_proto_ver < 1206)
+						ModeManager::AddChannelMode(new InspIRCdExtBan::EntryMatcher("NOKICKBAN", "", 'Q'));
 				}
 				else if (mode.name.equals_cs("noknock"))
 					cm = new ChannelMode("NOKNOCK", mode.letter);
 				else if (mode.name.equals_cs("nonick"))
 				{
 					cm = new ChannelMode("NONICK", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("NONICKBAN", "BAN", 'N'));
+					if (spanningtree_proto_ver < 1206)
+						ModeManager::AddChannelMode(new InspIRCdExtBan::EntryMatcher("NONICKBAN", "", 'N'));
 				}
 				else if (mode.name.equals_cs("nonotice"))
 				{
 					cm = new ChannelMode("NONOTICE", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("NONOTICEBAN", "BAN", 'T'));
+					if (spanningtree_proto_ver < 1206)
+						ModeManager::AddChannelMode(new InspIRCdExtBan::EntryMatcher("NONOTICEBAN", "", 'T'));
 				}
 				else if (mode.name.equals_cs("official-join"))
 					cm = new ChannelModeStatus("OFFICIALJOIN", mode.letter, mode.symbol, mode.level);
@@ -1133,7 +1271,8 @@ struct IRCDMessageCapab final
 				else if (mode.name.equals_cs("operonly"))
 				{
 					cm = new ChannelModeOperOnly("OPERONLY", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::OperTypeMatcher("OPERTYPEBAN", "BAN", 'O'));
+					if (spanningtree_proto_ver < 1206)
+						ModeManager::AddChannelMode(new InspIRCdExtBan::OperTypeMatcher("OPERTYPEBAN", "", 'O'));
 				}
 				else if (mode.name.equals_cs("operprefix"))
 					cm = new ChannelModeStatus("OPERPREFIX", mode.letter, mode.symbol, mode.level);
@@ -1152,12 +1291,14 @@ struct IRCDMessageCapab final
 				else if (mode.name.equals_cs("sslonly"))
 				{
 					cm = new ChannelMode("SSL", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::FingerprintMatcher("SSLBAN", "BAN", 'z'));
+					if (spanningtree_proto_ver < 1206)
+						ModeManager::AddChannelMode(new InspIRCdExtBan::FingerprintMatcher("SSLBAN", "", 'z'));
 				}
 				else if (mode.name.equals_cs("stripcolor"))
 				{
 					cm = new ChannelMode("STRIPCOLOR", mode.letter);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("STRIPCOLORBAN", "BAN", 'S'));
+					if (spanningtree_proto_ver < 1206)
+						ModeManager::AddChannelMode(new InspIRCdExtBan::EntryMatcher("STRIPCOLORBAN", "", 'S'));
 				}
 				else if (mode.name.equals_cs("topiclock"))
 					cm = new ChannelMode("TOPIC", mode.letter);
@@ -1249,50 +1390,158 @@ struct IRCDMessageCapab final
 					ModeManager::AddUserMode(um);
 			}
 		}
+		else if (params[0].equals_cs("EXTBANS"))
+		{
+			spacesepstream ssep(params[1]);
+			Anope::string capab;
+
+			while (ssep.GetToken(capab))
+			{
+				ExtBanInfo extban;
+				if (!ParseExtBan(capab, extban))
+					continue;
+
+				InspIRCdExtBan::Base *xb = nullptr;
+				if (extban.name.equals_cs("account"))
+					xb = new InspIRCdExtBan::AccountMatcher("ACCOUNTBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("blockcolor"))
+					xb = new InspIRCdExtBan::EntryMatcher("BLOCKCOLORBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("blockinvite"))
+					xb = new InspIRCdExtBan::EntryMatcher("INVITEBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("channel"))
+					xb = new InspIRCdExtBan::ChannelMatcher("CHANNELBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("fingerprint"))
+					xb = new InspIRCdExtBan::FingerprintMatcher("SSLBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("mute"))
+					xb = new InspIRCdExtBan::EntryMatcher("QUIET", extban.name, extban.letter);
+				else if (extban.name.equals_cs("noctcp"))
+					xb = new InspIRCdExtBan::EntryMatcher("NOCTCPBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("nokick"))
+					xb = new InspIRCdExtBan::EntryMatcher("NOKICKBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("nonick"))
+					xb = new InspIRCdExtBan::EntryMatcher("NONICKBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("nonotice"))
+					xb = new InspIRCdExtBan::EntryMatcher("NONOTICEBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("opertype"))
+					xb = new InspIRCdExtBan::OperTypeMatcher("OPERTYPEBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("opmoderated"))
+					xb = new InspIRCdExtBan::EntryMatcher("OPMODERATEDBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("realname"))
+					xb = new InspIRCdExtBan::RealnameMatcher("REALNAMEBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("server"))
+					xb = new InspIRCdExtBan::ServerMatcher("SERVERBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("stripcolor"))
+					xb = new InspIRCdExtBan::EntryMatcher("STRIPCOLORBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("unauthed"))
+					xb = new InspIRCdExtBan::UnidentifiedMatcher("UNREGISTEREDBAN", extban.name, extban.letter);
+
+				// Handle unknown extbans.
+				else if (extban.type.equals_cs("acting"))
+					xb = new InspIRCdExtBan::EntryMatcher(extban.name.upper() + "BAN", extban.name, extban.letter);
+				else
+					Log(LOG_DEBUG) << "Unknown extban: " << capab;
+
+				if (xb)
+					ModeManager::AddChannelMode(xb);
+			}
+		}
+
 		else if ((params[0].equals_cs("MODULES") || params[0].equals_cs("MODSUPPORT")) && params.size() > 1)
 		{
 			spacesepstream ssep(params[1]);
 			Anope::string module;
 
+			Anope::string inspircdregex;
 			while (ssep.GetToken(module))
 			{
 				Anope::string modname, moddata;
 				ParseModule(module, modname, moddata);
 
-				if (modname.equals_cs("svshold"))
-					IRCD->CanSVSHold = true;
-				else if (modname.equals_cs("rline"))
+				if (spanningtree_proto_ver >= 1206)
 				{
-					Servers::Capab.insert("RLINE");
-					const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
-					if (!regexengine.empty() && regexengine != moddata)
-						Log() << "Warning: InspIRCd is using regex engine " << modname << ", but we have " << regexengine << ". This may cause inconsistencies.";
+					// InspIRCd v4
+					Anope::map<Anope::string> modmap;
+					ParseModuleData(moddata, modmap);
+
+					if (modname.equals_cs("account"))
+						Servers::Capab.insert("ACCOUNT");
+
+					else if (modname.equals_cs("cban"))
+						IRCD->CanSQLineChannel = true;
+
+					else if (modname.equals_cs("globops"))
+						Servers::Capab.insert("GLOBOPS");
+
+					else if (modname.equals_cs("rline"))
+					{
+						Servers::Capab.insert("RLINE");
+						auto iter = modmap.find("regex");
+						if (iter != modmap.end())
+							inspircdregex = "regex/" + iter->second;
+					}
+
+					else if (modname.equals_cs("services"))
+					{
+						IRCD->CanClearBans = true;
+						IRCD->CanSVSHold = true;
+						Servers::Capab.insert("SERVICES");
+						Servers::Capab.insert("TOPICLOCK");
+					}
 				}
-				else if (modname.equals_cs("topiclock"))
-					Servers::Capab.insert("TOPICLOCK");
-				else if (modname.equals_cs("cban") && moddata.equals_cs("glob"))
-					IRCD->CanSQLineChannel = true;
-				else if (modname.equals_cs("services_account"))
+				else
 				{
-					Servers::Capab.insert("SERVICES");
-					ModeManager::AddChannelMode(new InspIRCdExtban::AccountMatcher("ACCOUNTBAN", "BAN", 'R'));
-					ModeManager::AddChannelMode(new InspIRCdExtban::UnidentifiedMatcher("UNREGISTEREDBAN", "BAN", 'U'));
+					// InspIRCd v3
+					if (modname.equals_cs("cban") && moddata.equals_cs("glob"))
+						IRCD->CanSQLineChannel = true;
+
+					else if (modname.equals_cs("channelban"))
+						ModeManager::AddChannelMode(new InspIRCdExtBan::ChannelMatcher("CHANNELBAN", "", 'j'));
+
+					else if (modname.equals_cs("gecosban"))
+						ModeManager::AddChannelMode(new InspIRCdExtBan::RealnameMatcher("REALNAMEBAN", "", 'r'));
+
+					else if (modname.equals_cs("muteban"))
+						ModeManager::AddChannelMode(new InspIRCdExtBan::EntryMatcher("QUIET", "", 'm'));
+
+					else if (modname.equals_cs("nopartmsg"))
+						ModeManager::AddChannelMode(new InspIRCdExtBan::EntryMatcher("PARTMESSAGEBAN", "", 'p'));
+
+					else if (modname.equals_cs("rline"))
+					{
+						Servers::Capab.insert("RLINE");
+						inspircdregex = moddata;
+					}
+
+					else if (modname.equals_cs("serverban"))
+						ModeManager::AddChannelMode(new InspIRCdExtBan::ServerMatcher("SERVERBAN", "", 's'));
+
+					else if (modname.equals_cs("services_account"))
+					{
+						Servers::Capab.insert("ACCOUNT");
+						Servers::Capab.insert("SERVICES");
+						ModeManager::AddChannelMode(new InspIRCdExtBan::AccountMatcher("ACCOUNTBAN", "", 'R'));
+						ModeManager::AddChannelMode(new InspIRCdExtBan::UnidentifiedMatcher("UNREGISTEREDBAN", "", 'U'));
+					}
+
+					else if (modname.equals_cs("svshold"))
+						IRCD->CanSVSHold = true;
+
+					else if (modname.equals_cs("topiclock"))
+						Servers::Capab.insert("TOPICLOCK");
 				}
-				else if (modname.equals_cs("chghost"))
+
+				// InspIRCd v3 and v4
+				if (modname.equals_cs("chghost"))
 					Servers::Capab.insert("CHGHOST");
+
 				else if (modname.equals_cs("chgident"))
 					Servers::Capab.insert("CHGIDENT");
-				else if (modname.equals_cs("channelban"))
-					ModeManager::AddChannelMode(new InspIRCdExtban::ChannelMatcher("CHANNELBAN", "BAN", 'j'));
-				else if (modname.equals_cs("gecosban"))
-					ModeManager::AddChannelMode(new InspIRCdExtban::RealnameMatcher("REALNAMEBAN", "BAN", 'r'));
-				else if (modname.equals_cs("nopartmsg"))
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("PARTMESSAGEBAN", "BAN", 'p'));
-				else if (modname.equals_cs("serverban"))
-					ModeManager::AddChannelMode(new InspIRCdExtban::ServerMatcher("SERVERBAN", "BAN", 's'));
-				else if (modname.equals_cs("muteban"))
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("QUIET", "BAN", 'm'));
+
 			}
+
+			const auto &anoperegex = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+			if (!anoperegex.empty() && !inspircdregex.empty() && anoperegex != inspircdregex)
+				Log() << "Warning: InspIRCd is using regex engine " << inspircdregex << ", but we have " << anoperegex << ". This may cause inconsistencies.";
 		}
 		else if (params[0].equals_cs("CAPABILITIES") && params.size() > 1)
 		{
@@ -1301,29 +1550,59 @@ struct IRCDMessageCapab final
 			while (ssep.GetToken(capab))
 			{
 				auto [tokname, tokvalue] = ParseCapability(capab);
-				if (tokname == "CHANMAX")
+				if (tokname == "MAXCHANNEL")
+					maxchannel = tokvalue;
+				else if (tokname == "MAXHOST")
+					maxhost = tokvalue;
+				else if (tokname == "MAXMODES")
+					IRCD->MaxModes = tokvalue;
+				else if (tokname == "MAXNICK")
+					maxnick = tokvalue;
+				else if (tokname == "MAXUSER")
+					maxuser = tokvalue;
+
+				// Deprecated 1205 keys.
+				else if (tokname == "CHANMAX")
 					maxchannel = tokvalue;
 				else if (tokname == "GLOBOPS" && tokvalue)
 					Servers::Capab.insert("GLOBOPS");
 				else if (tokname == "IDENTMAX")
 					maxuser = tokvalue;
-				else if (tokname == "MAXMODES")
-					IRCD->MaxModes = tokvalue;
-				else if (tokname == "MAXHOST")
-					maxhost = tokvalue;
-				else if (tokname == "MAXNICK")
+				else if (tokname == "NICKMAX")
 					maxnick = tokvalue;
 			}
 		}
 		else if (params[0].equals_cs("END"))
 		{
-			if (!Servers::Capab.count("SERVICES"))
+			if (spanningtree_proto_ver >= 1206)
 			{
-				Uplink::Send("ERROR", "The services_account module is not loaded. This is required by Anope.");
-				Anope::QuitReason = "ERROR: Remote server does not have the services_account module loaded, and this is required.";
-				Anope::Quitting = true;
-				return;
+				if (!Servers::Capab.count("ACCOUNT") || !Servers::Capab.count("SERVICES"))
+				{
+					Uplink::Send("ERROR", "The services_account module is not loaded. This is required by Anope.");
+					Anope::QuitReason = "ERROR: Remote server does not have the services_account module loaded, and this is required.";
+					Anope::Quitting = true;
+					return;
+				}
 			}
+			else
+			{
+				if (!Servers::Capab.count("ACCOUNT"))
+				{
+					Uplink::Send("ERROR", "The account module is not loaded. This is required by Anope.");
+					Anope::QuitReason = "ERROR: Remote server does not have the account module loaded, and this is required.";
+					Anope::Quitting = true;
+					return;
+				}
+
+				if (!Servers::Capab.count("SERVICES"))
+				{
+					Uplink::Send("ERROR", "The services module is not loaded. This is required by Anope.");
+					Anope::QuitReason = "ERROR: Remote server does not have the services module loaded, and this is required.";
+					Anope::Quitting = true;
+					return;
+				}
+			}
+
 			if (!ModeManager::FindUserModeByName("PRIV"))
 			{
 				Uplink::Send("ERROR", "The hidechans module is not loaded. This is required by Anope.");
@@ -1331,14 +1610,19 @@ struct IRCDMessageCapab final
 				Anope::Quitting = true;
 				return;
 			}
+
 			if (!IRCD->CanSVSHold)
 				Log() << "The remote server does not have the svshold module; fake users will be used for nick protection until the module is loaded.";
+
 			if (!IRCD->CanSQLineChannel)
 				Log() << "The remote server does not have the cban module; services will manually enforce forbidden channels until the module is loaded.";
+
 			if (!Servers::Capab.count("CHGHOST"))
 				Log() << "The remote server does not have the chghost module; vhosts are disabled until the module is loaded.";
+
 			if (!Servers::Capab.count("CHGIDENT"))
 				Log() << "The remote server does not have the chgident module; vidents are disabled until the module is loaded.";
+
 			if (!Servers::Capab.count("GLOBOPS"))
 				Log() << "The remote server does not have the globops module; oper notices will be sent as announcements until the module is loaded.";
 		}
@@ -1364,7 +1648,10 @@ struct IRCDMessageEncap final
 				return;
 
 			u->SetIdent(params[3]);
-			Uplink::Send(u, "FIDENT", params[3]);
+			if (spanningtree_proto_ver >= 1206)
+				Uplink::Send(u, "FIDENT", params[3], '*');
+			else
+				Uplink::Send(u, "FIDENT", params[3]);
 		}
 		else if (params[1] == "CHGHOST")
 		{
@@ -1373,7 +1660,10 @@ struct IRCDMessageEncap final
 				return;
 
 			u->SetDisplayedHost(params[3]);
-			Uplink::Send(u, "FHOST", params[3]);
+			if (spanningtree_proto_ver >= 1206)
+				Uplink::Send(u, "FHOST", params[3], '*');
+			else
+				Uplink::Send(u, "FHOST", params[3]);
 		}
 		else if (params[1] == "CHGNAME")
 		{
@@ -1401,25 +1691,43 @@ struct IRCDMessageEncap final
 struct IRCDMessageFHost final
 	: IRCDMessage
 {
-	IRCDMessageFHost(Module *creator) : IRCDMessage(creator, "FHOST", 1) { SetFlag(FLAG_REQUIRE_USER); }
+	IRCDMessageFHost(Module *creator)
+		: IRCDMessage(creator, "FHOST", 1)
+	{
+		SetFlag(FLAG_REQUIRE_USER);
+		SetFlag(FLAG_SOFT_LIMIT);
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		User *u = source.GetUser();
-		if (u->HasMode("CLOAK"))
-			u->RemoveModeInternal(source, ModeManager::FindUserModeByName("CLOAK"));
-		u->SetDisplayedHost(params[0]);
+		if (params[0] != "*")
+		{
+			if (u->HasMode("CLOAK"))
+				u->RemoveModeInternal(source, ModeManager::FindUserModeByName("CLOAK"));
+			u->SetDisplayedHost(params[0]);
+		}
+
+		if (params.size() > 1 && params[1] != "*")
+			u->host = params[1];
 	}
 };
 
 struct IRCDMessageFIdent final
 	: IRCDMessage
 {
-	IRCDMessageFIdent(Module *creator) : IRCDMessage(creator, "FIDENT", 1) { SetFlag(FLAG_REQUIRE_USER); }
+	IRCDMessageFIdent(Module *creator)
+		: IRCDMessage(creator, "FIDENT", 1)
+	{
+		SetFlag(FLAG_REQUIRE_USER);
+		SetFlag(FLAG_SOFT_LIMIT);
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		source.GetUser()->SetIdent(params[0]);
+		User *u = source.GetUser();
+		if (params[0] != "*")
+			u->SetDisplayedHost(params[0]);
 	}
 };
 
@@ -1598,29 +1906,55 @@ public:
 				Anope::string capab, modname, moddata;
 				ParseModule(params[2].substr(1), modname, moddata);
 
-				if (modname.equals_cs("services_account"))
+				if (modname.equals_cs("account"))
 					required = true;
-				else if (modname.equals_cs("hidechans"))
-					required = true;
-				else if (modname.equals_cs("cban") && moddata.equals_cs("glob"))
+
+				else if (modname.equals_cs("cban"))
+				{
+					if (plus && (spanningtree_proto_ver >= 1206 || moddata == "glob"))
+						IRCD->CanSQLineChannel = true;
+					else
+						IRCD->CanSQLineChannel = false;
+				}
+
+				else if (modname.equals_cs("cban") && spanningtree_proto_ver >= 1206)
 					IRCD->CanSQLineChannel = plus;
+
 				else if (modname.equals_cs("chghost"))
 					capab = "CHGHOST";
+
 				else if (modname.equals_cs("chgident"))
 					capab = "CHGIDENT";
-				else if (modname.equals_cs("svshold"))
-					IRCD->CanSVSHold = plus;
+
+				else if (modname.equals_cs("globops"))
+					capab = "GLOBOPS";
+
+				else if (modname.equals_cs("hidechans"))
+					required = true;
+
 				else if (modname.equals_cs("rline"))
 					capab = "RLINE";
+
+				else if (modname.equals_cs("services"))
+					required = true;
+
+				// Deprecated 1205 modules.
+				else if (modname.equals_cs("services_account"))
+					required = true;
+
+				else if (modname.equals_cs("svshold"))
+					IRCD->CanSVSHold = plus;
+
 				else if (modname.equals_cs("topiclock"))
 					capab = "TOPICLOCK";
+
 				else
 					return;
 
 				if (required)
 				{
-					if (!plus)
-						Log() << "Warning: InspIRCd unloaded module " << modname << ", Anope won't function correctly without it";
+					if (plus)
+						Log() << "Warning: InspIRCd unloaded the " << modname << " module. Anope won't function correctly without it.";
 				}
 				else
 				{
@@ -1629,7 +1963,7 @@ public:
 					else if (!capab.empty())
 						Servers::Capab.erase(capab);
 
-					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " module " << modname << ", adjusted functionality";
+					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " the " << modname << " module; adjusted functionality.";
 				}
 
 			}
@@ -1814,6 +2148,43 @@ struct IRCDMessageIJoin final
 	}
 };
 
+struct IRCDMessageLMode final
+	: IRCDMessage
+{
+	IRCDMessageLMode(Module *creator)
+		: IRCDMessage(creator, "LMODE", 3)
+	{
+		SetFlag(FLAG_SOFT_LIMIT);
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		// :<sid> LMODE <chan> <chants> <modechr> [<mask> <setts> <setter>]+
+		auto *chan = Channel::Find(params[0]);
+		if (!chan)
+			return; // Channel doesn't exist.
+
+		// If the TS is greater than ours, we drop the mode and don't pass it anywhere.
+		auto chants = convertTo<time_t>(params[1]);
+		if (chants > chan->creation_time)
+			return;
+
+		auto *cm = ModeManager::FindChannelModeByChar(params[2][0]);
+		if (!cm || cm->type != MODE_LIST)
+			return; // Mode doesn't exist or isn't a list mode.
+
+		if (params.size() % 3)
+			return; // Invalid parameter count.
+
+		for (auto it = params.begin() + 3; it != params.end(); it += 3)
+		{
+			// TODO: Anope doesn't store set time and setter for list modes yet.
+			chan->SetModeInternal(source, cm, *it);
+		}
+	}
+};
+
+
 struct IRCDMessageMode final
 	: IRCDMessage
 {
@@ -1990,13 +2361,15 @@ struct IRCDMessageUID final
 	 * 3: host
 	 * 4: dhost
 	 * 5: ident
-	 * 6: ip
-	 * 7: signon
-	 * 8+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
+	 * 6: dident (v4 only)
+	 * 7: ip
+	 * 8: signon
+	 * 9+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
 	 * last: realname
 	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
+		size_t offset = params[9][0] == '+' ? 1 : 0;
 		time_t ts = convertTo<time_t>(params[1]);
 
 		Anope::string modes = params[8];
@@ -2020,9 +2393,9 @@ struct IRCDMessageUID final
 					++it;
 			}
 
-		User *u = User::OnIntroduce(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? *na->nc : NULL);
+		User *u = User::OnIntroduce(params[2], params[5+offset], params[3], params[4], params[6+offset], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? *na->nc : NULL);
 		if (u)
-			u->signon = convertTo<time_t>(params[7]);
+			u->signon = convertTo<time_t>(params[7+offset]);
 	}
 };
 
@@ -2041,6 +2414,7 @@ class ProtoInspIRCd final
 	Message::Part message_part;
 	Message::Privmsg message_privmsg;
 	Message::Quit message_quit;
+	Message::Privmsg message_squery;
 	Message::Stats message_stats;
 
 	/* Our message handlers */
@@ -2056,6 +2430,7 @@ class ProtoInspIRCd final
 	IRCDMessageIdle message_idle;
 	IRCDMessageIJoin message_ijoin;
 	IRCDMessageKick message_kick;
+	IRCDMessageLMode message_lmode;
 	IRCDMessageMetadata message_metadata;
 	IRCDMessageMode message_mode;
 	IRCDMessageNick message_nick;
@@ -2076,15 +2451,43 @@ class ProtoInspIRCd final
 	}
 
 public:
-	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this), ssl(this, "ssl"),
-		message_error(this), message_invite(this), message_kill(this), message_motd(this), message_notice(this),
-		message_part(this), message_privmsg(this), message_quit(this), message_stats(this),
-		message_away(this), message_capab(this), message_encap(this), message_endburst(this), message_fhost(this),
-		message_fident(this), message_fjoin(this), message_fmode(this), message_ftopic(this), message_idle(this),
-		message_ijoin(this), message_kick(this), message_metadata(this, use_server_side_topiclock, use_server_side_mlock, ircd_proto.maxlist),
-		message_mode(this), message_nick(this), message_opertype(this), message_ping(this), message_rsquit(this),
-		message_save(this), message_server(this), message_squit(this), message_time(this), message_uid(this)
+	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, PROTOCOL | VENDOR)
+		, ircd_proto(this), ssl(this, "ssl")
+		, message_error(this)
+		, message_invite(this)
+		, message_kill(this)
+		, message_motd(this)
+		, message_notice(this)
+		, message_part(this)
+		, message_privmsg(this)
+		, message_quit(this)
+		, message_squery(this, "SQUERY")
+		, message_stats(this)
+		, message_away(this)
+		, message_capab(this)
+		, message_encap(this)
+		, message_endburst(this)
+		, message_fhost(this)
+		, message_fident(this)
+		, message_fjoin(this)
+		, message_fmode(this)
+		, message_ftopic(this)
+		, message_idle(this)
+		, message_ijoin(this)
+		, message_kick(this)
+		, message_lmode(this)
+		, message_metadata(this, use_server_side_topiclock, use_server_side_mlock, ircd_proto.maxlist)
+		, message_mode(this)
+		, message_nick(this)
+		, message_opertype(this)
+		, message_ping(this)
+		, message_rsquit(this)
+		, message_save(this)
+		, message_server(this)
+		, message_squit(this)
+		, message_time(this)
+		, message_uid(this)
 	{
 	}
 

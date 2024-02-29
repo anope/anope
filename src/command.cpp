@@ -201,11 +201,53 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 		source.Reply(MORE_INFO, Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
 }
 
+namespace
+{
+	void HandleUnknownCommand(CommandSource& source, const Anope::string &message)
+	{
+		// Try to find a similar command.
+		size_t distance = Config->GetBlock("options")->Get<size_t>("didyoumeandifference", "4");
+		Anope::string similar;
+		auto umessage = message.upper();
+		for (const auto &[command, info] : source.service->commands)
+		{
+			if (info.hide || command == message)
+				continue; // Don't suggest a hidden alias or a missing command.
+
+			size_t dist = Anope::Distance(umessage, command);
+			if (dist < distance)
+			{
+				distance = dist;
+				similar = command;
+			}
+		}
+
+		bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
+		if (has_help && similar.empty())
+		{
+			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(),
+				Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		}
+		else if (has_help)
+		{
+			source.Reply(_("Unknown command \002%s\002. Did you mean \002%s\002? \"%s%s HELP\" for help."),
+				message.c_str(), similar.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		}
+		else if (similar.empty())
+		{
+			source.Reply(_("Unknown command \002%s\002. Did you mean \002%s\002?"), message.c_str(), similar.c_str());
+		}
+		else
+		{
+			source.Reply(_("Unknown command \002%s\002."), message.c_str());
+		}
+	}
+}
+
 void Command::Run(CommandSource &source, const Anope::string &message)
 {
 	std::vector<Anope::string> params;
 	spacesepstream(message).GetTokens(params);
-	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 
 	CommandInfo::map::const_iterator it = source.service->commands.end();
 	unsigned count = 0;
@@ -222,10 +264,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 
 	if (it == source.service->commands.end())
 	{
-		if (has_help)
-			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
-		else
-			source.Reply(_("Unknown command \002%s\002."), message.c_str());
+		HandleUnknownCommand(source, message);
 		return;
 	}
 
@@ -233,10 +272,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	ServiceReference<Command> c("Command", info.name);
 	if (!c)
 	{
-		if (has_help)
-			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
-		else
-			source.Reply(_("Unknown command \002%s\002."), message.c_str());
+		HandleUnknownCommand(source, message);
 		Log(source.service) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";
 		return;
 	}

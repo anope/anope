@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-29 16:12+0000\n"
-"PO-Revision-Date: 2024-02-29 16:13+0000\n"
+"POT-Creation-Date: 2024-02-29 21:53+0000\n"
+"PO-Revision-Date: 2024-02-29 21:53+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -7953,6 +7953,14 @@ msgstr "Unknown command %s."
 #, c-format
 msgid "Unknown command %s. \"%s%s HELP\" for help."
 msgstr "Unknown command %s. \"%s%s HELP\" for help."
+
+#, c-format
+msgid "Unknown command %s. Did you mean %s?"
+msgstr "Unknown command %s. Did you mean %s?"
+
+#, c-format
+msgid "Unknown command %s. Did you mean %s? \"%s%s HELP\" for help."
+msgstr "Unknown command %s. Did you mean %s? \"%s%s HELP\" for help."
 
 #, c-format
 msgid "Unknown mode character %c ignored."

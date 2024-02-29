@@ -20,6 +20,7 @@
 #include "sockets.h"
 
 #include <cerrno>
+#include <numeric>
 #include <sys/stat.h>
 #include <sys/types.h>
 #ifndef _WIN32
@@ -746,4 +747,39 @@ Anope::string Anope::Random(size_t len)
 	for (size_t i = 0; i < len; ++i)
 		buf.append(chars[rand() % sizeof(chars)]);
 	return buf;
+}
+
+// Implementation of https://en.wikipedia.org/wiki/Levenshtein_distance
+size_t Anope::Distance(const Anope::string &s1, const Anope::string &s2)
+{
+	if (s1.empty())
+		return s2.length();
+	if (s2.empty())
+		return s1.length();
+
+	std::vector<size_t> costs(s2.length() + 1);
+	std::iota(costs.begin(), costs.end(), 0);
+
+	size_t i = 0;
+	for (const auto c1 : s1)
+	{
+		costs[0] = i + 1;
+		size_t corner = i;
+		size_t j = 0;
+		for (const auto &c2 : s2)
+		{
+			size_t upper = costs[j + 1];
+			if (c1 == c2)
+				costs[j + 1] = corner;
+			else
+			{
+				size_t t = upper < corner ? upper : corner;
+				costs[j + 1] = (costs[j] < t ? costs[j] : t) + 1;
+			}
+			corner = upper;
+			j++;
+		}
+		i++;
+	}
+	return costs[s2.length()];
 }

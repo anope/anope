@@ -7,21 +7,15 @@
 
 #pragma once
 
-namespace WebCPanel
+namespace WebCPanel::MemoServ
 {
+	class Memos;
+}
 
-namespace NickServ
-{
-
-class Info final
+class WebCPanel::MemoServ::Memos final
 	: public WebPanelProtectedPage
 {
 public:
-	Info(const Anope::string &cat, const Anope::string &u);
-
+	Memos(const Anope::string &cat, const Anope::string &u);
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
 };
-
-}
-
-}

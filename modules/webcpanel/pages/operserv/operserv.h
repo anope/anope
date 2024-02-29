@@ -7,21 +7,15 @@
 
 #pragma once
 
-namespace WebCPanel
+namespace WebCPanel::OperServ
 {
+	class Akill;
+}
 
-namespace ChanServ
-{
-
-class Info final
+class WebCPanel::OperServ::Akill final
 	: public WebPanelProtectedPage
 {
 public:
-	Info(const Anope::string &cat, const Anope::string &u);
-
+	Akill(const Anope::string &cat, const Anope::string &u);
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
 };
-
-}
-
-}

@@ -168,20 +168,8 @@ namespace WebPanel
 #include "pages/register.h"
 #include "pages/confirm.h"
 
-#include "pages/nickserv/info.h"
-#include "pages/nickserv/cert.h"
-#include "pages/nickserv/alist.h"
-#include "pages/nickserv/confirm.h"
-
-#include "pages/chanserv/info.h"
-#include "pages/chanserv/set.h"
-#include "pages/chanserv/access.h"
-#include "pages/chanserv/akick.h"
-#include "pages/chanserv/modes.h"
-#include "pages/chanserv/drop.h"
-
-#include "pages/memoserv/memos.h"
-
-#include "pages/hostserv/request.h"
-
-#include "pages/operserv/akill.h"
+#include "pages/chanserv/chanserv.h"
+#include "pages/hostserv/hostserv.h"
+#include "pages/memoserv/memoserv.h"
+#include "pages/nickserv/nickserv.h"
+#include "pages/operserv/operserv.h"

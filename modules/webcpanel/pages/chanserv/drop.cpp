@@ -6,7 +6,6 @@
  */
 
 #include "../../webcpanel.h"
-#include "utils.h"
 
 WebCPanel::ChanServ::Drop::Drop(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage (cat, u)
 {

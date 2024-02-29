@@ -6,7 +6,6 @@
  */
 
 #include "../../webcpanel.h"
-#include "utils.h"
 
 WebCPanel::ChanServ::Access::Access(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {

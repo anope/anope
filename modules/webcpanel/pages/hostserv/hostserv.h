@@ -7,21 +7,15 @@
 
 #pragma once
 
-namespace WebCPanel
+namespace WebCPanel::HostServ
 {
+	class Request;
+}
 
-namespace NickServ
-{
-
-class Alist final
+class WebCPanel::HostServ::Request final
 	: public WebPanelProtectedPage
 {
 public:
-	Alist(const Anope::string &cat, const Anope::string &u);
-
+	Request(const Anope::string &cat, const Anope::string &u);
 	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
 };
-
-}
-
-}

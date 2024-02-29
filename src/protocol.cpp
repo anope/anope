@@ -18,6 +18,7 @@
 #include "uplink.h"
 #include "bots.h"
 #include "channels.h"
+#include "numeric.h"
 
 IRCDProto *IRCD = NULL;
 
@@ -334,7 +335,7 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 
 void IRCDProto::SendOper(User *u)
 {
-	SendNumeric(381, u->GetUID(), "You are now an IRC operator (set by services)");
+	SendNumeric(RPL_YOUREOPER, u->GetUID(), "You are now an IRC operator (set by services)");
 	u->SetMode(NULL, "OPER");
 }
 

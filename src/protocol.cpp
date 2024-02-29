@@ -119,12 +119,12 @@ void IRCDProto::SendKick(const MessageSource &source, const Channel *c, User *u,
 
 void IRCDProto::SendNoticeInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 {
-	Uplink::Send(tags, source, "NOTICE", dest, msg);
+	Uplink::Send(tags, source, "NOTICE", dest, msg.empty() ? " " : msg);
 }
 
 void IRCDProto::SendPrivmsgInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 {
-	Uplink::Send(tags, source, "PRIVMSG", dest, msg);
+	Uplink::Send(tags, source, "PRIVMSG", dest, msg.empty() ? " " : msg);
 }
 
 void IRCDProto::SendQuit(User *u, const Anope::string &buf)

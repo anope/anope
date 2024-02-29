@@ -50,7 +50,7 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 				ci->Extend<bool>("KEEPTOPIC");
 			else
 				ci->Shrink<bool>("KEEPTOPIC");
-			replacements["MESSAGES"] = "Secure updated";
+			replacements["MESSAGES"] = "Keeptopic updated";
 		}
 		if (ci->HasExt("PEACE") != message.post_data.count("peace"))
 		{

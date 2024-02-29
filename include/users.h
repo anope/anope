@@ -243,8 +243,7 @@ public:
 	  */
 	bool HasPriv(const Anope::string &privstr);
 
-	/** Update the last usermask stored for a user, and check to see if they are recognized
-	 */
+	/** Update the last usermask stored for a user. */
 	void UpdateHost();
 
 	/** Check if the user has a mode

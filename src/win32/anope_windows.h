@@ -66,8 +66,6 @@ extern CoreExport void OnStartup();
 extern CoreExport void OnShutdown();
 extern CoreExport USHORT WindowsGetLanguage(const Anope::string &lang);
 extern CoreExport int gettimeofday(timeval *tv, void *);
-extern CoreExport Anope::string GetWindowsVersion();
-extern CoreExport bool SupportedWindowsVersion();
 extern int setenv(const char *name, const char *value, int overwrite);
 extern int unsetenv(const char *name);
 extern int mkstemp(char *input);

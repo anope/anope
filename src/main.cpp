@@ -84,13 +84,13 @@ void Anope::SaveDatabases()
  */
 static Anope::string GetFullProgDir(const Anope::string &argv0)
 {
-	char buffer[PATH_MAX];
 #ifdef _WIN32
 	/* Windows has specific API calls to get the EXE path that never fail.
 	 * For once, Windows has something of use, compared to the POSIX code
 	 * for this, this is positively neato.
 	 */
-	if (GetModuleFileName(NULL, buffer, PATH_MAX))
+	char buffer[MAX_PATH];
+	if (GetModuleFileName(NULL, buffer, MAX_PATH))
 	{
 		Anope::string fullpath = buffer;
 		Anope::string::size_type n = fullpath.rfind("\\");
@@ -99,6 +99,7 @@ static Anope::string GetFullProgDir(const Anope::string &argv0)
 	}
 #else
 	// Get the current working directory
+	char buffer[PATH_MAX];
 	if (getcwd(buffer, PATH_MAX))
 	{
 		Anope::string remainder = argv0;

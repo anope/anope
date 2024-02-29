@@ -28,6 +28,7 @@
 #include <pwd.h>
 #include <sys/types.h>
 #endif
+#include <thread>
 
 Anope::string Anope::ConfigDir = "conf", Anope::DataDir = "data", Anope::ModuleDir = "lib", Anope::LocaleDir = "locale", Anope::LogDir = "logs";
 
@@ -513,7 +514,7 @@ bool Anope::Init(int ac, char **av)
 			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
 			std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
 			std::cerr << "         as the root superuser." << std::endl;
-			sleep(3);
+			std::this_thread::sleep_for(std::chrono::seconds(3));
 		}
 	}
 

@@ -16,10 +16,7 @@
 #include "logger.h"
 #include "config.h"
 
-#ifdef _AIX
-# undef FD_ZERO
-# define FD_ZERO(p) memset((p), 0, sizeof(*(p)))
-#endif /* _AIX */
+#include <thread>
 
 static int MaxFD;
 static unsigned FDCount;
@@ -97,7 +94,7 @@ void SocketEngine::Process()
 	 */
 	if (FDCount == 0)
 	{
-		sleep(tval.tv_sec);
+		std::this_thread::sleep_for(std::chrono::seconds(tval.tv_sec));
 		return;
 	}
 #endif

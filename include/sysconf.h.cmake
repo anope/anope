@@ -29,10 +29,6 @@
 #ifdef _WIN32
 # define popen _popen
 # define pclose _pclose
-# ifdef _MSC_VER
-#  define PATH_MAX MAX_PATH
-# endif
-# define sleep(x) Sleep(x * 1000)
 #endif
 
 #if defined __GNUC__

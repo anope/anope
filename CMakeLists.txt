@@ -170,7 +170,7 @@ if(MSVC)
   string(REPLACE "/GX " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   string(REPLACE "/W3 " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   # Set the compile flags to have warnings on the max setting (but disable a few annoying ones), exception handling turned on, the proper defines
-  set(CXXFLAGS "${CXXFLAGS} /W4 /wd4100 /wd4127 /wd4250 /wd4251 /wd4355 /wd4706 /wd4800 /wd4996 /EHs")
+  set(CXXFLAGS "${CXXFLAGS} /W4 /wd4100 /wd4127 /wd4250 /wd4251 /wd4267 /wd4275 /wd4355 /wd4706 /wd4800 /wd4996 /EHs")
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 # Otherwise, we're not using Visual Studio
 else()
@@ -181,6 +181,12 @@ endif()
 # If CMake has found that the given system requires a special library for dl* calls, include it with the linker flags
 if(CMAKE_DL_LIBS)
   list(APPEND LINK_LIBS ${CMAKE_DL_LIBS})
+endif()
+
+# Find the linker flags required for using threads.
+find_package("Threads" REQUIRED)
+if(CMAKE_THREAD_LIBS_INIT)
+  list(APPEND LINK_LIBS ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 # Under MinGW, the -shared flag isn't properly set in the module-specific linker flags, add it from the C flags for shared libraries
@@ -199,29 +205,6 @@ if(NOT MSVC)
   # If the flag was accepted, add it to the list of flags
   if(HAVE_PIPE_FLAG)
     set(CXXFLAGS "${CXXFLAGS} -pipe")
-  endif()
-
-  # The following are additional library checks, they are not required for Windows
-  if(NOT WIN32)
-    # Check if socket is within the socket library (if the library exists), and add it to the linker flags if needed
-    check_library_exists(socket socket "" HAVE_SOCKET_LIB)
-    if(HAVE_SOCKET_LIB)
-      list(APPEND LINK_LIBS socket)
-    endif()
-    # Check if inet_addr is within the nsl library (if the library exists), and add it to the linker flags if needed
-    check_library_exists(nsl inet_addr "" HAVE_NSL_LIB)
-    if(HAVE_NSL_LIB)
-      list(APPEND LINK_LIBS nsl)
-    endif()
-    # Check if pthread_create is within the pthread library (if the library exists), and add it to the linker flags if needed
-    check_library_exists(pthread pthread_create "" HAVE_PTHREAD)
-    if(HAVE_PTHREAD)
-      if(NOT APPLE)
-        set(LDFLAGS "${LDFLAGS} -pthread")
-      endif()
-    else()
-      message(FATAL_ERROR "The pthread library is required to build Anope")
-    endif()
   endif()
 endif()
 

@@ -35,7 +35,6 @@ else \
 #define OLD_BI_PRIVATE	0x0001
 
 #define OLD_NI_KILLPROTECT	0x00000001 /* Kill others who take this nick */
-#define OLD_NI_SECURE		0x00000002 /* Don't recognize unless IDENTIFY'd */
 #define OLD_NI_MSG			0x00000004 /* Use PRIVMSGs instead of NOTICEs */
 #define OLD_NI_MEMO_HARDMAX	0x00000008 /* Don't allow user to change memo limit */
 #define OLD_NI_MEMO_SIGNON	0x00000010 /* Notify of memos at signon and un-away */
@@ -60,7 +59,6 @@ else \
 #define OLD_CI_TOPICLOCK		0x00000008
 #define OLD_CI_RESTRICTED		0x00000010
 #define OLD_CI_PEACE			0x00000020
-#define OLD_CI_SECURE			0x00000040
 #define OLD_CI_VERBOTEN			0x00000080
 #define OLD_CI_ENCRYPTEDPW		0x00000100
 #define OLD_CI_NO_EXPIRE		0x00000200
@@ -449,7 +447,7 @@ static void LoadNicks()
 			READ(read_string(buffer, f));
 			auto *nc = new NickCore(buffer);
 
-			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_secure", "ns_private", "hide_email",
+			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_private", "hide_email",
 				"hide_mask", "hide_quit", "memo_signon", "memo_receive", "autoop", "msg", "ns_keepmodes" };
 			for (const auto &setting : settings)
 				nc->Shrink<bool>(setting.upper());
@@ -483,8 +481,6 @@ static void LoadNicks()
 			READ(read_uint32(&u32, f));
 			if (u32 & OLD_NI_KILLPROTECT)
 				nc->Extend<bool>("KILLPROTECT");
-			if (u32 & OLD_NI_SECURE)
-				nc->Extend<bool>("NS_SECURE");
 			if (u32 & OLD_NI_MSG)
 				nc->Extend<bool>("MSG");
 			if (u32 & OLD_NI_MEMO_HARDMAX)
@@ -571,7 +567,6 @@ static void LoadNicks()
 			for (uint16_t j = 0; j < u16; ++j)
 			{
 				READ(read_string(buffer, f));
-				nc->access.push_back(buffer);
 			}
 
 			int16_t i16;
@@ -752,7 +747,7 @@ static void LoadChannels()
 			READ(read_buffer(namebuf, f));
 			auto *ci = new ChannelInfo(namebuf);
 
-			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "cs_secure", "secureops", "securefounder",
+			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "secureops", "securefounder",
 				"signkick", "signkick_level", "topiclock", "persist", "noautoop", "cs_keepmodes" };
 			for (const auto &setting : settings)
 				ci->Shrink<bool>(setting.upper());
@@ -801,8 +796,6 @@ static void LoadChannels()
 				ci->Extend<bool>("RESTRICTED");
 			if (tmpu32 & OLD_CI_PEACE)
 				ci->Extend<bool>("PEACE");
-			if (tmpu32 & OLD_CI_SECURE)
-				ci->Extend<bool>("CS_SECURE");
 			if (tmpu32 & OLD_CI_NO_EXPIRE)
 				ci->Extend<bool>("CS_NO_EXPIRE");
 			if (tmpu32 & OLD_CI_MEMO_HARDMAX)

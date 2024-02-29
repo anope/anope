@@ -777,23 +777,6 @@ public:
 	 */
 	virtual void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) { throw NotImplementedException(); }
 
-	/** called from NickCore::ClearAccess()
-	 * @param nc pointer to the NickCore
-	 */
-	virtual void OnNickClearAccess(NickCore *nc) { throw NotImplementedException(); }
-
-	/** Called when a user adds an entry to their access list
-	 * @param nc The nick
-	 * @param entry The entry
-	 */
-	virtual void OnNickAddAccess(NickCore *nc, const Anope::string &entry) { throw NotImplementedException(); }
-
-	/** Called from NickCore::EraseAccess()
-	 * @param nc pointer to the NickCore
-	 * @param entry The access mask
-	 */
-	virtual void OnNickEraseAccess(NickCore *nc, const Anope::string &entry) { throw NotImplementedException(); }
-
 	/** called from NickCore::ClearCert()
 	 * @param nc pointer to the NickCore
 	 */
@@ -1096,7 +1079,7 @@ enum Implementation
 	I_OnCreateChan, I_OnDelChan, I_OnChannelCreate, I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
 	I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnNickDrop, I_OnNickGroup, I_OnNickIdentify,
 	I_OnUserLogin, I_OnNickLogout, I_OnNickRegister, I_OnNickConfirm, I_OnNickSuspend, I_OnNickUnsuspended, I_OnDelNick, I_OnNickCoreCreate,
-	I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearCert,
+	I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickClearCert,
 	I_OnNickAddCert, I_OnNickEraseCert, I_OnNickInfo, I_OnBotInfo, I_OnCheckAuthentication, I_OnNickUpdate,
 	I_OnFingerprint, I_OnUserAway, I_OnInvite, I_OnDeleteVhost, I_OnSetVhost, I_OnSetDisplayedHost, I_OnMemoSend, I_OnMemoDel,
 	I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,

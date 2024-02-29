@@ -56,14 +56,6 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("NS_PRIVATE");
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (na->nc->HasExt("NS_SECURE") != message.post_data.count("secure"))
-		{
-			if (!na->nc->HasExt("NS_SECURE"))
-				na->nc->Extend<bool>("NS_SECURE");
-			else
-				na->nc->Shrink<bool>("NS_SECURE");
-			replacements["MESSAGES"] = "Secure updated";
-		}
 		if (message.post_data["kill"] == "on" && !na->nc->HasExt("KILLPROTECT"))
 		{
 			na->nc->Extend<bool>("KILLPROTECT");
@@ -102,8 +94,6 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		replacements["AUTOOP"];
 	if (na->nc->HasExt("NS_PRIVATE"))
 		replacements["PRIVATE"];
-	if (na->nc->HasExt("NS_SECURE"))
-		replacements["SECURE"];
 	if (na->nc->HasExt("KILLPROTECT"))
 		replacements["KILL_ON"];
 	if (na->nc->HasExt("KILL_QUICK"))

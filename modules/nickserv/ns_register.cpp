@@ -233,11 +233,7 @@ public:
 
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 
-			if (na->nc->GetAccessCount())
-				source.Reply(_("Nickname \002%s\002 registered under your user@host-mask: %s"), u_nick.c_str(), na->nc->GetAccess(0).c_str());
-			else
-				source.Reply(_("Nickname \002%s\002 registered."), u_nick.c_str());
-
+			source.Reply(_("Nickname \002%s\002 registered."), u_nick.c_str());
 			if (nsregister.equals_ci("admin"))
 			{
 				nc->Extend<bool>("UNCONFIRMED");

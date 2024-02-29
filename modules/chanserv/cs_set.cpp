@@ -682,70 +682,6 @@ public:
 	}
 };
 
-class CommandCSSetSecure final
-	: public Command
-{
-public:
-	CommandCSSetSecure(Module *creator, const Anope::string &cname = "chanserv/set/secure") : Command(creator, cname, 2, 2)
-	{
-		this->SetDesc(_("Activate security features"));
-		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
-			return;
-		}
-
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
-		if (ci == NULL)
-		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-			return;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
-
-		if (params[1].equals_ci("ON"))
-		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure";
-			ci->Extend<bool>("CS_SECURE");
-			source.Reply(_("Secure option for %s is now \002on\002."), ci->name.c_str());
-		}
-		else if (params[1].equals_ci("OFF"))
-		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure";
-			ci->Shrink<bool>("CS_SECURE");
-			source.Reply(_("Secure option for %s is now \002off\002."), ci->name.c_str());
-		}
-		else
-			this->OnSyntaxError(source, "SECURE");
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables security features for a\n"
-			"channel. When \002SECURE\002 is set, only users who have\n"
-			"identified to services, and are not only recognized, will be\n"
-			"given access to channels from account-based access entries."));
-		return true;
-	}
-};
-
 class CommandCSSetSecureFounder final
 	: public Command
 {
@@ -1110,7 +1046,7 @@ class CSSet final
 	: public Module
 {
 	SerializableExtensibleItem<bool> noautoop, peace, securefounder,
-		restricted, secure, secureops, signkick, signkick_level, noexpire,
+		restricted, secureops, signkick, signkick_level, noexpire,
 		persist;
 
 	struct KeepModes final
@@ -1169,7 +1105,6 @@ class CSSet final
 	CommandCSSetPeace commandcssetpeace;
 	CommandCSSetPersist commandcssetpersist;
 	CommandCSSetRestricted commandcssetrestricted;
-	CommandCSSetSecure commandcssetsecure;
 	CommandCSSetSecureFounder commandcssetsecurefounder;
 	CommandCSSetSecureOps commandcssetsecureops;
 	CommandCSSetSignKick commandcssetsignkick;
@@ -1184,7 +1119,7 @@ public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		noautoop(this, "NOAUTOOP"), peace(this, "PEACE"),
 		securefounder(this, "SECUREFOUNDER"), restricted(this, "RESTRICTED"),
-		secure(this, "CS_SECURE"), secureops(this, "SECUREOPS"), signkick(this, "SIGNKICK"),
+		secureops(this, "SECUREOPS"), signkick(this, "SIGNKICK"),
 		signkick_level(this, "SIGNKICK_LEVEL"), noexpire(this, "CS_NO_EXPIRE"),
 		persist(this, "PERSIST"),
 		keep_modes(this, "CS_KEEP_MODES"),
@@ -1192,7 +1127,7 @@ public:
 		commandcsset(this), commandcssetautoop(this), commandcssetbantype(this),
 		commandcssetdescription(this), commandcssetfounder(this), commandcssetkeepmodes(this),
 		commandcssetpeace(this), commandcssetpersist(this), commandcssetrestricted(this),
-		commandcssetsecure(this), commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
+		commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
 		commandcssetsuccessor(this), commandcssetnoexpire(this),
 
 		inhabit("inhabit")
@@ -1304,8 +1239,6 @@ public:
 			info.AddOption(_("Peace"));
 		if (restricted.HasExt(ci))
 			info.AddOption(_("Restricted access"));
-		if (secure.HasExt(ci))
-			info.AddOption(_("Security"));
 		if (securefounder.HasExt(ci))
 			info.AddOption(_("Secure founder"));
 		if (secureops.HasExt(ci))

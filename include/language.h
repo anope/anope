@@ -90,8 +90,6 @@ namespace Language
 #define UNKNOWN				_("<unknown>")
 #define NO_EXPIRE			_("does not expire")
 #define LIST_INCORRECT_RANGE		_("Incorrect range specified. The correct syntax is \002#\037from\037-\037to\037\002.")
-#define NICK_IS_REGISTERED		_("This nick is owned by someone else.  Please choose another.\n" \
-						"(If this is your nick, type \002%s%s IDENTIFY \037password\037\002.)")
 #define NICK_IS_SECURE			_("This nickname is registered and protected.  If it is your\n" \
 						"nick, type \002%s%s IDENTIFY \037password\037\002.  Otherwise,\n" \
 						"please choose a different nick.")

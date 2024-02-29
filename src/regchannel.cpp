@@ -268,10 +268,6 @@ Serializable *ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	/* compat */
 	bool b;
 	b = false;
-	data["extensible:SECURE"] >> b;
-	if (b)
-		ci->Extend<bool>("CS_SECURE");
-	b = false;
 	data["extensible:PRIVATE"] >> b;
 	if (b)
 		ci->Extend<bool>("CS_PRIVATE");
@@ -423,18 +419,10 @@ AccessGroup ChannelInfo::AccessFor(const User *u, bool updateLastUsed)
 	if (u == NULL)
 		return group;
 
-	const NickCore *nc = u->Account();
-	if (nc == NULL && !this->HasExt("NS_SECURE") && u->IsRecognized())
-	{
-		const NickAlias *na = NickAlias::Find(u->nick);
-		if (na != NULL)
-			nc = na->nc;
-	}
-
 	group.super_admin = u->super_admin;
 	group.founder = IsFounder(u, this);
 	group.ci = this;
-	group.nc = nc;
+	group.nc = u->Account();
 
 	FindMatches(group, this, u, u->Account());
 

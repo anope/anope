@@ -27,7 +27,6 @@ class ModuleWebCPanel final
 
 	WebCPanel::NickServ::Info nickserv_info;
 	WebCPanel::NickServ::Cert nickserv_cert;
-	WebCPanel::NickServ::Access nickserv_access;
 	WebCPanel::NickServ::Alist nickserv_alist;
 	WebCPanel::NickServ::Confirm nickserv_confirm;
 
@@ -51,7 +50,7 @@ public:
 		id(this, "webcpanel_id"), ip(this, "webcpanel_ip"), last_login(this, "webcpanel_last_login"),
 		style_css("style.css", "/static/style.css", "text/css"), logo_png("logo.png", "/static/logo.png", "image/png"), cubes_png("cubes.png", "/static/cubes.png", "image/png"), favicon_ico("favicon.ico", "/favicon.ico", "image/x-icon"),
 		index("/"), logout("/logout"), _register("/register"), confirm("/confirm"),
-		nickserv_info("NickServ", "/nickserv/info"), nickserv_cert("NickServ", "/nickserv/cert"), nickserv_access("NickServ", "/nickserv/access"), nickserv_alist("NickServ", "/nickserv/alist"), nickserv_confirm("NickServ", "/nickserv/confirm"),
+		nickserv_info("NickServ", "/nickserv/info"), nickserv_cert("NickServ", "/nickserv/cert"), nickserv_alist("NickServ", "/nickserv/alist"), nickserv_confirm("NickServ", "/nickserv/confirm"),
 		chanserv_info("ChanServ", "/chanserv/info"), chanserv_set("ChanServ", "/chanserv/set"), chanserv_access("ChanServ", "/chanserv/access"), chanserv_akick("ChanServ", "/chanserv/akick"),
 		chanserv_modes("ChanServ", "/chanserv/modes"), chanserv_drop("ChanServ", "/chanserv/drop"), memoserv_memos("MemoServ", "/memoserv/memos"), hostserv_request("HostServ", "/hostserv/request"),
 		operserv_akill("OperServ", "/operserv/akill")
@@ -98,11 +97,6 @@ public:
 				s.subsections.push_back(ss);
 				provider->RegisterPage(&this->nickserv_cert);
 			}
-
-			ss.name = "Access";
-			ss.url = "/nickserv/access";
-			s.subsections.push_back(ss);
-			provider->RegisterPage(&this->nickserv_access);
 
 			ss.name = "AList";
 			ss.url = "/nickserv/alist";
@@ -219,7 +213,6 @@ public:
 
 			provider->UnregisterPage(&this->nickserv_info);
 			provider->UnregisterPage(&this->nickserv_cert);
-			provider->UnregisterPage(&this->nickserv_access);
 			provider->UnregisterPage(&this->nickserv_alist);
 			provider->UnregisterPage(&this->nickserv_confirm);
 

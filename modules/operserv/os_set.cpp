@@ -214,7 +214,7 @@ public:
 					" \n"
 					"Sets read-only mode on or off.  In read-only mode, normal\n"
 					"users will not be allowed to modify any services data,\n"
-					"including channel and nickname access lists, etc.  IRCops\n"
+					"including channel access lists, etc.  Server operators\n"
 					"with sufficient services privileges will be able to modify\n"
 					"Services' AKILL, SQLINE, SNLINE and ignore lists, drop,\n"
 					"suspend or forbid nicknames and channels, and manage news,\n"

@@ -61,8 +61,6 @@ NickCore::~NickCore()
 	if (this->id)
 		NickCoreIdList.erase(this->id);
 
-	this->ClearAccess();
-
 	if (!this->memos.memos->empty())
 	{
 		for (unsigned i = 0, end = this->memos.memos->size(); i < end; ++i)
@@ -78,8 +76,6 @@ void NickCore::Serialize(Serialize::Data &data) const
 	data["pass"] << this->pass;
 	data["email"] << this->email;
 	data["language"] << this->language;
-	for (const auto &mask : this->access)
-		data["access"] << mask << " ";
 	data["memomax"] << this->memos.memomax;
 	for (const auto &ignore : this->memos.ignores)
 		data["memoignores"] << ignore << " ";
@@ -104,14 +100,6 @@ Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["pass"] >> nc->pass;
 	data["email"] >> nc->email;
 	data["language"] >> nc->language;
-	{
-		Anope::string buf;
-		data["access"] >> buf;
-		spacesepstream sep(buf);
-		nc->access.clear();
-		while (sep.GetToken(buf))
-			nc->access.push_back(buf);
-	}
 	data["memomax"] >> nc->memos.memomax;
 	{
 		Anope::string buf;
@@ -126,10 +114,6 @@ Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	/* compat */
 	bool b;
-	b = false;
-	data["extensible:SECURE"] >> b;
-	if (b)
-		nc->Extend<bool>("NS_SECURE");
 	b = false;
 	data["extensible:PRIVATE"] >> b;
 	if (b)
@@ -185,69 +169,6 @@ void NickCore::SetDisplay(const NickAlias *na)
 bool NickCore::IsServicesOper() const
 {
 	return this->o != NULL;
-}
-
-void NickCore::AddAccess(const Anope::string &entry)
-{
-	this->access.push_back(entry);
-	FOREACH_MOD(OnNickAddAccess, (this, entry));
-}
-
-Anope::string NickCore::GetAccess(unsigned entry) const
-{
-	if (this->access.empty() || entry >= this->access.size())
-		return "";
-	return this->access[entry];
-}
-
-unsigned NickCore::GetAccessCount() const
-{
-	return this->access.size();
-}
-
-bool NickCore::FindAccess(const Anope::string &entry)
-{
-	for (const auto &mask : this->access)
-	{
-		if (mask == entry)
-			return true;
-	}
-
-	return false;
-}
-
-void NickCore::EraseAccess(const Anope::string &entry)
-{
-	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-		if (this->access[i] == entry)
-		{
-			FOREACH_MOD(OnNickEraseAccess, (this, entry));
-			this->access.erase(this->access.begin() + i);
-			break;
-		}
-}
-
-void NickCore::ClearAccess()
-{
-	FOREACH_MOD(OnNickClearAccess, (this));
-	this->access.clear();
-}
-
-bool NickCore::IsOnAccess(const User *u) const
-{
-	Anope::string buf = u->GetIdent() + "@" + u->host, buf2, buf3;
-	if (!u->vhost.empty())
-		buf2 = u->GetIdent() + "@" + u->vhost;
-	if (!u->GetCloakedHost().empty())
-		buf3 = u->GetIdent() + "@" + u->GetCloakedHost();
-
-	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-	{
-		Anope::string a = this->GetAccess(i);
-		if (Anope::Match(buf, a) || (!buf2.empty() && Anope::Match(buf2, a)) || (!buf3.empty() && Anope::Match(buf3, a)))
-			return true;
-	}
-	return false;
 }
 
 void NickCore::AddChannelReference(ChannelInfo *ci)

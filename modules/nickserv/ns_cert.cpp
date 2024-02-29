@@ -299,7 +299,7 @@ public:
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 				return;
 			}
-			else if (na->nc != source.GetAccount() && !source.HasPriv("nickserv/access"))
+			else if (na->nc != source.GetAccount() && !source.HasPriv("nickserv/cert"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;

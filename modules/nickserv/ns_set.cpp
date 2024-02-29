@@ -1105,103 +1105,6 @@ public:
 	}
 };
 
-class CommandNSSetSecure
-	: public Command
-{
-public:
-	CommandNSSetSecure(Module *creator, const Anope::string &sname = "nickserv/set/secure", size_t min = 1) : Command(creator, sname, min, min + 1)
-	{
-		this->SetDesc(_("Turn nickname security on or off"));
-		this->SetSyntax("{ON | OFF}");
-	}
-
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
-	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
-			return;
-		}
-
-		const NickAlias *na = NickAlias::Find(user);
-		if (!na)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
-			return;
-		}
-		NickCore *nc = na->nc;
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (param.equals_ci("ON"))
-		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable secure for " << nc->display;
-			nc->Extend<bool>("NS_SECURE");
-			source.Reply(_("Secure option is now \002on\002 for \002%s\002."), nc->display.c_str());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable secure for " << nc->display;
-			nc->Shrink<bool>("NS_SECURE");
-			source.Reply(_("Secure option is now \002off\002 for \002%s\002."), nc->display.c_str());
-		}
-		else
-			this->OnSyntaxError(source, "SECURE");
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, source.nc->display, params[0]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns %s's security features on or off for your\n"
-				"nick. With \002SECURE\002 set, you must enter your password\n"
-				"before you will be recognized as the owner of the nick,\n"
-				"regardless of whether your address is on the access\n"
-				"list. However, if you are on the access list, %s\n"
-				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."), source.service->nick.c_str(), source.service->nick.c_str());
-		return true;
-	}
-};
-
-class CommandNSSASetSecure final
-	: public CommandNSSetSecure
-{
-public:
-	CommandNSSASetSecure(Module *creator) : CommandNSSetSecure(creator, "nickserv/saset/secure", 2)
-	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, params[0], params[1]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns %s's security features on or off for your\n"
-				"nick. With \002SECURE\002 set, you must enter your password\n"
-				"before you will be recognized as the owner of the nick,\n"
-				"regardless of whether your address is on the access\n"
-				"list. However, if you are on the access list, %s\n"
-				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."), source.service->nick.c_str(), source.service->nick.c_str());
-		return true;
-	}
-};
-
 class CommandNSSASetNoexpire final
 	: public Command
 {
@@ -1288,13 +1191,10 @@ class NSSet final
 	CommandNSSetPassword commandnssetpassword;
 	CommandNSSASetPassword commandnssasetpassword;
 
-	CommandNSSetSecure commandnssetsecure;
-	CommandNSSASetSecure commandnssasetsecure;
-
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
 	SerializableExtensibleItem<bool> autoop, neverop, killprotect, kill_quick, kill_immed,
-		message, secure, noexpire;
+		message, noexpire;
 
 	struct KeepModes final
 		: SerializableExtensibleItem<bool>
@@ -1358,13 +1258,12 @@ public:
 		commandnssetlanguage(this), commandnssasetlanguage(this),
 		commandnssetmessage(this), commandnssasetmessage(this),
 		commandnssetpassword(this), commandnssasetpassword(this),
-		commandnssetsecure(this), commandnssasetsecure(this),
 		commandnssasetnoexpire(this),
 
 		autoop(this, "AUTOOP"), neverop(this, "NEVEROP"),
 		killprotect(this, "KILLPROTECT"), kill_quick(this, "KILL_QUICK"),
 		kill_immed(this, "KILL_IMMED"), message(this, "MSG"),
-		secure(this, "NS_SECURE"), noexpire(this, "NS_NO_EXPIRE"),
+		noexpire(this, "NS_NO_EXPIRE"),
 
 		keep_modes(this, "NS_KEEP_MODES"), ns_set_email(this, "ns_set_email")
 	{
@@ -1420,8 +1319,6 @@ public:
 			info.AddOption(_("Quick protection"));
 		else if (killprotect.HasExt(na->nc))
 			info.AddOption(_("Protection"));
-		if (secure.HasExt(na->nc))
-			info.AddOption(_("Security"));
 		if (message.HasExt(na->nc))
 			info.AddOption(_("Message mode"));
 		if (autoop.HasExt(na->nc))

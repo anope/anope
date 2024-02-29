@@ -122,9 +122,6 @@ public:
 	Anope::string email;
 	/* Locale name of the language of the user. Empty means default language */
 	Anope::string language;
-	/* Access list, contains user@host masks of users who get certain privileges based
-	 * on if NI_SECURE is set and what (if any) kill protection is enabled. */
-	std::vector<Anope::string> access;
 	MemoInfo memos;
 	std::map<Anope::string, Anope::string> last_modes;
 
@@ -165,60 +162,8 @@ public:
 	 */
 	virtual bool IsServicesOper() const;
 
-	/** Add an entry to the nick's access list
-	 *
-	 * @param entry The nick!ident@host entry to add to the access list
-	 *
-	 * Adds a new entry into the access list.
-	 */
-	void AddAccess(const Anope::string &entry);
-
-	/** Get an entry from the nick's access list by index
-	 *
-	 * @param entry Index in the access list vector to retrieve
-	 * @return The access list entry of the given index if within bounds, an empty string if the vector is empty or the index is out of bounds
-	 *
-	 * Retrieves an entry from the access list corresponding to the given index.
-	 */
-	Anope::string GetAccess(unsigned entry) const;
-
-	/** Get the number of entries on the access list for this account.
-	 */
-	unsigned GetAccessCount() const;
-
 	/** Retrieves the account id for this user */
 	uint64_t GetId();
-
-	/** Find an entry in the nick's access list
-	 *
-	 * @param entry The nick!ident@host entry to search for
-	 * @return True if the entry is found in the access list, false otherwise
-	 *
-	 * Search for an entry within the access list.
-	 */
-	bool FindAccess(const Anope::string &entry);
-
-	/** Erase an entry from the nick's access list
-	 *
-	 * @param entry The nick!ident@host entry to remove
-	 *
-	 * Removes the specified access list entry from the access list.
-	 */
-	void EraseAccess(const Anope::string &entry);
-
-	/** Clears the entire nick's access list
-	 *
-	 * Deletes all the memory allocated in the access list vector and then clears the vector.
-	 */
-	void ClearAccess();
-
-	/** Is the given user on this accounts access list?
-	 *
-	 * @param u The user
-	 *
-	 * @return true if the user is on the access list
-	 */
-	bool IsOnAccess(const User *u) const;
 
 	/** Finds an account
 	 * @param nick The account name to find

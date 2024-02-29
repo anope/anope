@@ -40,7 +40,6 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	quit = false;
 	server = NULL;
 	invalid_pw_count = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
-	on_access = false;
 
 	this->nick = snick;
 	this->ident = sident;
@@ -153,7 +152,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 	else
 	{
 		NickAlias *old_na = NickAlias::Find(this->nick);
-		if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
+		if (old_na && this->IsIdentified(true))
 			old_na->last_seen = Anope::CurTime;
 
 		UserListByNick.erase(this->nick);
@@ -169,11 +168,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		}
 		other = this;
 
-		on_access = false;
 		NickAlias *na = NickAlias::Find(this->nick);
-		if (na)
-			on_access = na->nc->IsOnAccess(this);
-
 		if (na && na->nc == this->Account())
 		{
 			na->last_seen = Anope::CurTime;
@@ -282,7 +277,7 @@ void User::SetRealname(const Anope::string &srealname)
 	this->realname = srealname;
 	NickAlias *na = NickAlias::Find(this->nick);
 
-	if (na && (this->IsIdentified(true) || this->IsRecognized()))
+	if (na && this->IsIdentified(true))
 		na->last_realname = srealname;
 
 	Log(this, "realname") << "changed realname to " << srealname;
@@ -446,19 +441,6 @@ bool User::IsIdentified(bool check_nick) const
 	return this->nc;
 }
 
-bool User::IsRecognized(bool check_secure) const
-{
-	if (check_secure && on_access)
-	{
-		const NickAlias *na = NickAlias::Find(this->nick);
-
-		if (!na || na->nc->HasExt("NS_SECURE"))
-			return false;
-	}
-
-	return on_access;
-}
-
 bool User::IsSecurelyConnected() const
 {
 	return HasMode("SSL") || HasExt("ssl");
@@ -530,11 +512,7 @@ void User::UpdateHost()
 		return;
 
 	NickAlias *na = NickAlias::Find(this->nick);
-	on_access = false;
-	if (na)
-		on_access = na->nc->IsOnAccess(this);
-
-	if (na && (this->IsIdentified(true) || this->IsRecognized()))
+	if (na && this->IsIdentified(true))
 	{
 		Anope::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
 		Anope::string last_realhost = this->GetIdent() + "@" + this->host;

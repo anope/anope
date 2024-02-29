@@ -190,27 +190,14 @@ public:
 		else if (MOD_RESULT == EVENT_ALLOW)
 			return;
 
-		if (!na->nc->HasExt("NS_SECURE") && u->IsRecognized())
-		{
-			na->last_seen = Anope::CurTime;
-			na->last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
-			na->last_realname = u->realname;
-			return;
-		}
-
 		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 			return;
 
-		bool on_access = u->IsRecognized(false);
-
-		if (on_access || !na->nc->HasExt("KILL_IMMED"))
+		if (!na->nc->HasExt("KILL_IMMED"))
 		{
-			if (na->nc->HasExt("NS_SECURE"))
-				u->SendMessage(NickServ, NICK_IS_SECURE, Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
-			else
-				u->SendMessage(NickServ, NICK_IS_REGISTERED, Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
+			u->SendMessage(NickServ, NICK_IS_SECURE, Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
 		}
-		if (na->nc->HasExt("KILLPROTECT") && !on_access)
+		if (na->nc->HasExt("KILLPROTECT"))
 		{
 			if (na->nc->HasExt("KILL_IMMED"))
 			{
@@ -310,10 +297,9 @@ public:
 
 		NickServ = bi;
 
-		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "ns_secure memo_signon memo_receive")).GetTokens(defaults);
+		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "memo_signon memo_receive")).GetTokens(defaults);
 		if (defaults.empty())
 		{
-			defaults.emplace_back("NS_SECURE");
 			defaults.emplace_back("MEMO_SIGNON");
 			defaults.emplace_back("MEMO_RECEIVE");
 		}
@@ -523,7 +509,7 @@ public:
 
 		/* Update last quit and last seen for the user */
 		NickAlias *na = NickAlias::Find(u->nick);
-		if (na && !na->nc->HasExt("NS_SUSPENDED") && (u->IsRecognized() || u->IsIdentified(true)))
+		if (na && !na->nc->HasExt("NS_SUSPENDED") && u->IsIdentified(true))
 		{
 			na->last_seen = Anope::CurTime;
 			na->last_quit = msg;
@@ -543,7 +529,7 @@ public:
 			++it;
 
 			User *u = User::Find(na->nick, true);
-			if (u && (u->IsIdentified(true) || u->IsRecognized()))
+			if (u && u->IsIdentified(true))
 				na->last_seen = Anope::CurTime;
 
 			bool expire = false;

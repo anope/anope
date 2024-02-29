@@ -196,7 +196,7 @@ public:
 				target_ci->last_topic_setter = source.service->nick;
 
 			const Anope::string settings[] = { "NOAUTOOP", "CS_KEEP_MODES", "PEACE", "PERSIST", "RESTRICTED",
-				"CS_SECURE", "SECUREFOUNDER", "SECUREOPS", "SIGNKICK", "SIGNKICK_LEVEL", "CS_NO_EXPIRE" };
+				"SECUREFOUNDER", "SECUREOPS", "SIGNKICK", "SIGNKICK_LEVEL", "CS_NO_EXPIRE" };
 
 			for (const auto &setting : settings)
 				CopySetting(ci, target_ci, setting);

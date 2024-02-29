@@ -59,7 +59,7 @@ public:
 		// same person that is executing the command, so kill them off (old GHOST command).
 		else if (u->Account() == na->nc)
 		{
-			if (!source.GetAccount() && na->nc->HasExt("NS_SECURE"))
+			if (!source.GetAccount())
 			{
 				source.GetUser()->Login(u->Account());
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->display;
@@ -90,7 +90,7 @@ public:
 		/* User is not identified or not identified to the same account as the person using this command */
 		else
 		{
-			if (!source.GetAccount() && na->nc->HasExt("NS_SECURE"))
+			if (!source.GetAccount())
 			{
 				source.GetUser()->Login(na->nc); // Identify the user using the command if they arent identified
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->nick << " (" << na->nc->display << ")";
@@ -181,8 +181,6 @@ public:
 
 		bool ok = false;
 		if (source.GetAccount() == na->nc)
-			ok = true;
-		else if (!na->nc->HasExt("NS_SECURE") && source.GetUser() && na->nc->IsOnAccess(source.GetUser()))
 			ok = true;
 
 		NSCertList *cl = na->nc->GetExt<NSCertList>("certificates");

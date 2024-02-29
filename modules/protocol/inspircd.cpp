@@ -784,7 +784,7 @@ namespace InspIRCdExtban
 		{
 		}
 
-		bool Matches(User *u, const Entry *e) anope_override
+		bool Matches(User *u, const Entry *e) override
 		{
 			Anope::string *opertype = u->GetExt<Anope::string>("opertype");
 			if (!opertype)

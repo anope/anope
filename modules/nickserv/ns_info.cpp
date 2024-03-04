@@ -102,12 +102,7 @@ public:
 			if (show_hidden)
 			{
 				if (na->HasVhost())
-				{
-					if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
-						info[_("VHost")] = na->GetVhostIdent() + "@" + na->GetVhostHost();
-					else
-						info[_("VHost")] = na->GetVhostHost();
-				}
+					info[_("VHost")] = na->GetVhostMask();
 			}
 
 			FOREACH_MOD(OnNickInfo, (source, na, info, show_hidden));

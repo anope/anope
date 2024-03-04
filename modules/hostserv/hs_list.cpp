@@ -72,10 +72,7 @@ public:
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(display_counter);
 					entry["Nick"] = na->nick;
-					if (!na->GetVhostIdent().empty())
-						entry["Vhost"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
-					else
-						entry["Vhost"] = na->GetVhostHost();
+					entry["Vhost"] = na->GetVhostMask();
 					entry["Creator"] = na->GetVhostCreator();
 					entry["Created"] = Anope::strftime(na->GetVhostCreated(), NULL, true);
 					list.AddEntry(entry);
@@ -93,10 +90,7 @@ public:
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(display_counter);
 					entry["Nick"] = na->nick;
-					if (!na->GetVhostIdent().empty())
-						entry["Vhost"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
-					else
-						entry["Vhost"] = na->GetVhostHost();
+					entry["Vhost"] = na->GetVhostMask();
 					entry["Creator"] = na->GetVhostCreator();
 					entry["Created"] = Anope::strftime(na->GetVhostCreated(), NULL, true);
 					list.AddEntry(entry);

@@ -87,10 +87,7 @@ public:
 
 		na->SetVhost(user, host, source.GetNick());
 		FOREACH_MOD(OnSetVhost, (na));
-		if (!user.empty())
-			source.Reply(_("VHost for \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), user.c_str(), host.c_str());
-		else
-			source.Reply(_("VHost for \002%s\002 set to \002%s\002."), nick.c_str(), host.c_str());
+		source.Reply(_("VHost for \002%s\002 set to \002%s\002."), nick.c_str(), na->GetVhostMask().c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -194,10 +191,7 @@ public:
 		na->SetVhost(user, host, source.GetNick());
 		this->Sync(na);
 		FOREACH_MOD(OnSetVhost, (na));
-		if (!user.empty())
-			source.Reply(_("VHost for group \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), user.c_str(), host.c_str());
-		else
-			source.Reply(_("VHost for group \002%s\002 set to \002%s\002."), nick.c_str(), host.c_str());
+		source.Reply(_("VHost for group \002%s\002 set to \002%s\002."), nick.c_str(), na->GetVhostMask().c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

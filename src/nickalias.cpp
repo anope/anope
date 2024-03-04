@@ -109,6 +109,14 @@ const Anope::string &NickAlias::GetVhostHost() const
 	return this->vhost_host;
 }
 
+Anope::string NickAlias::GetVhostMask() const
+{
+	if (this->GetVhostIdent().empty())
+		return this->GetVhostHost();
+
+	return this->GetVhostIdent() + "@" + this->GetVhostHost();
+}
+
 const Anope::string &NickAlias::GetVhostCreator() const
 {
 	return this->vhost_creator;

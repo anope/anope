@@ -85,6 +85,11 @@ public:
 	 */
 	const Anope::string &GetVhostHost() const;
 
+	/** Retrieve the vhost mask
+	 * @param the mask
+	 */
+	Anope::string GetVhostMask() const;
+
 	/** Retrieve the vhost creator
 	 * @return the creator
 	 */

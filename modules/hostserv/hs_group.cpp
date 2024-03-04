@@ -54,10 +54,8 @@ public:
 		if (na && source.GetAccount() == na->nc && na->HasVhost())
 		{
 			this->Sync(na);
-			if (!na->GetVhostIdent().empty())
-				source.Reply(_("All vhosts in the group \002%s\002 have been set to \002%s\002@\002%s\002."), source.nc->display.c_str(), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
-			else
-				source.Reply(_("All vhosts in the group \002%s\002 have been set to \002%s\002."), source.nc->display.c_str(), na->GetVhostHost().c_str());
+			source.Reply(_("All vhosts in the group \002%s\002 have been set to \002%s\002."),
+				source.nc->display.c_str(), na->GetVhostMask().c_str());
 		}
 		else
 			source.Reply(HOST_NOT_ASSIGNED);

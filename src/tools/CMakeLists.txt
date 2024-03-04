@@ -29,6 +29,14 @@ endforeach()
 
 # If not on Windows, generate anoperc and install it along with mydbgen
 if(NOT WIN32)
+  if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    configure_file(${Anope_SOURCE_DIR}/src/tools/anope.service.in ${Anope_BINARY_DIR}/src/tools/anope.service)
+    install(
+      PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anope.service
+      DESTINATION ${BIN_DIR}
+    )
+  endif()
+
   configure_file(${Anope_SOURCE_DIR}/src/tools/anoperc.in ${Anope_BINARY_DIR}/src/tools/anoperc)
   install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anoperc
     DESTINATION ${BIN_DIR}

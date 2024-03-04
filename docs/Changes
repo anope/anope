@@ -1,5 +1,6 @@
 Anope Version 2.1.3-git
 -----------------------
+Added alternate command suggestions when a user runs an invalid command.
 Added support for the IRCv3 +draft/channel-context tag.
 Added support for the IRCv3 +draft/reply tag.
 Allow using more than one fingerprint in an oper block.

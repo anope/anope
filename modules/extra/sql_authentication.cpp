@@ -145,6 +145,15 @@ public:
 
 		Log(LOG_DEBUG) << "sql_authentication: Checking authentication for " << req->GetAccount();
 	}
+
+	void OnPreNickExpire(NickAlias *na, bool &expire) override
+	{
+		// We can't let nicks expire if they still have a group or
+		// there will be a zombie account left over that can't be
+		// authenticated to.
+		if (na->nick == na->nc->display && na->nc->aliases->size() > 1)
+			expire = false;
+	}
 };
 
 MODULE_INIT(ModuleSQLAuthentication)

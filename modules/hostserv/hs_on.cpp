@@ -32,11 +32,8 @@ public:
 			na = NickAlias::Find(u->Account()->display);
 		if (na && u->Account() == na->nc && na->HasVhost())
 		{
-			if (!na->GetVhostIdent().empty())
-				source.Reply(_("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
-			else
-				source.Reply(_("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
-			Log(LOG_COMMAND, source, this) << "to enable their vhost of " << (!na->GetVhostIdent().empty() ? na->GetVhostIdent() + "@" : "") << na->GetVhostHost();
+			source.Reply(_("Your vhost of \002%s\002 is now activated."), na->GetVhostMask().c_str());
+			Log(LOG_COMMAND, source, this) << "to enable their vhost of " << na->GetVhostMask();
 			IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
 			u->vhost = na->GetVhostHost();
 			if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())

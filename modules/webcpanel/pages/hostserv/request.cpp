@@ -22,12 +22,7 @@ bool WebCPanel::HostServ::Request::OnRequest(HTTPProvider *server, const Anope::
 	}
 
 	if (na->HasVhost())
-	{
-		if (!na->GetVhostIdent().empty())
-			replacements["VHOST"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
-		else
-			replacements["VHOST"] = na->GetVhostHost();
-	}
+		replacements["VHOST"] = na->GetVhostMask();
 	if (ServiceReference<Command>("Command", "hostserv/request"))
 		replacements["CAN_REQUEST"] = "YES";
 	TemplateFileServer page("hostserv/request.html");

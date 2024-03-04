@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-29 21:53+0000\n"
-"PO-Revision-Date: 2024-02-29 21:53+0000\n"
+"POT-Creation-Date: 2024-03-04 10:34+0000\n"
+"PO-Revision-Date: 2024-03-04 10:34+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1938,10 +1938,6 @@ msgstr "All user modes on %s have been synced."
 #, c-format
 msgid "All vhosts in the group %s have been set to %s."
 msgstr "All vhosts in the group %s have been set to %s."
-
-#, c-format
-msgid "All vhosts in the group %s have been set to %s@%s."
-msgstr "All vhosts in the group %s have been set to %s@%s."
 
 msgid "Allowed to (de)halfop themself"
 msgstr "Allowed to (de)halfop themself"
@@ -8077,16 +8073,8 @@ msgid "VHost for %s set to %s."
 msgstr "VHost for %s set to %s."
 
 #, c-format
-msgid "VHost for %s set to %s@%s."
-msgstr "VHost for %s set to %s@%s."
-
-#, c-format
 msgid "VHost for group %s set to %s."
 msgstr "VHost for group %s set to %s."
-
-#, c-format
-msgid "VHost for group %s set to %s@%s."
-msgstr "VHost for group %s set to %s@%s."
 
 msgid "VIEW host"
 msgstr "VIEW host"
@@ -8608,10 +8596,6 @@ msgstr "Your vHost has been requested."
 #, c-format
 msgid "Your vhost of %s is now activated."
 msgstr "Your vhost of %s is now activated."
-
-#, c-format
-msgid "Your vhost of %s@%s is now activated."
-msgstr "Your vhost of %s@%s is now activated."
 
 msgid "Your vhost was removed and the normal cloaking restored."
 msgstr "Your vhost was removed and the normal cloaking restored."

@@ -31,7 +31,7 @@ jobs:
 
       - name: Enable extras
         run: |
-          for MODULE in ldap ldap_authentication ldap_oper mysql regex_pcre2 regex_posix regex_tre sql_authentication sql_log sql_oper sqlite ssl_gnutls ssl_openssl
+          for MODULE in ldap mysql regex_pcre2 regex_posix regex_tre sqlite ssl_gnutls ssl_openssl
           do
             ln -s ${{ github.workspace }}/modules/extra/$MODULE.cpp ${{ github.workspace }}/modules
           done

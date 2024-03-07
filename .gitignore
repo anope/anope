@@ -2,15 +2,10 @@ build/
 config.cache
 include/sysconf.h
 modules/ldap.cpp
-modules/ldap_authentication.cpp
-modules/ldap_oper.cpp
 modules/mysql.cpp
 modules/regex_pcre2.cpp
 modules/regex_posix.cpp
 modules/regex_tre.cpp
-modules/sql_authentication.cpp
-modules/sql_log.cpp
-modules/sql_oper.cpp
 modules/sqlite.cpp
 modules/ssl_gnutls.cpp
 modules/ssl_openssl.cpp

@@ -25,12 +25,6 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../conanbuildinfo.cmake")
   enable_extra("ssl_openssl" "OPENSSL")
   # this uses Wldap so should always be available
   copy_extra("ldap")
-  # these don't actually have extra dependencies, but require a module which does
-  copy_extra("sql_authentication")
-  copy_extra("sql_log")
-  copy_extra("sql_oper")
-  copy_extra("ldap_authentication")
-  copy_extra("ldap_oper")
 
   # Package extra dlls
   file(GLOB EXTRA_DLLS "${Anope_SOURCE_DIR}/extradll/bin/*.dll" "${Anope_SOURCE_DIR}/extradll/lib/*.dll")

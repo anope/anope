@@ -14,10 +14,15 @@
 class CommandNSDrop final
 	: public Command
 {
+private:
+	PrimitiveExtensibleItem<Anope::string> dropcode;
+
 public:
-	CommandNSDrop(Module *creator) : Command(creator, "nickserv/drop", 1, 1)
+	CommandNSDrop(Module *creator)
+		: Command(creator, "nickserv/drop", 1, 2)
+		, dropcode(creator, "nickname-dropcode")
 	{
-		this->SetSyntax(_("\037nickname\037"));
+		this->SetSyntax(_("\037nickname\037 [\037code\037]"));
 		this->SetDesc(_("Cancel the registration of a nickname"));
 	}
 
@@ -41,18 +46,36 @@ public:
 		bool is_mine = source.GetAccount() == na->nc;
 
 		if (!is_mine && !source.HasPriv("nickserv/drop"))
-			source.Reply(ACCESS_DENIED);
-		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
-			source.Reply(_("You may not drop other Services Operators' nicknames."));
-		else
 		{
-			FOREACH_MOD(OnNickDrop, (source, na));
-
-			Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
-			delete na;
-
-			source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
+
+		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
+		{
+			source.Reply(_("You may not drop other Services Operators' nicknames."));
+			return;
+		}
+
+		auto *code = dropcode.Get(na);
+		if (params.size() < 2 || !code || !code->equals_ci(params[1]))
+		{
+			if (!code)
+			{
+				code = na->Extend<Anope::string>("nickname-dropcode");
+				*code = Anope::Random(15);
+			}
+
+			source.Reply(CONFIRM_DROP, na->nick.c_str(), na->nick.c_str(), code->c_str());
+			return;
+		}
+
+		FOREACH_MOD(OnNickDrop, (source, na));
+
+		Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
+		delete na;
+
+		source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

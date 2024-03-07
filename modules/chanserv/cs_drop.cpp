@@ -20,7 +20,7 @@ private:
 public:
 	CommandCSDrop(Module *creator)
 		: Command(creator, "chanserv/drop", 1, 2)
-		, dropcode(creator, "dropcode")
+		, dropcode(creator, "channel-dropcode")
 	{
 		this->SetDesc(_("Cancel the registration of a channel"));
 		this->SetSyntax(_("\037channel\037 [\037code\037]"));
@@ -54,12 +54,11 @@ public:
 		{
 			if (!code)
 			{
-				code = ci->Extend<Anope::string>("dropcode");
+				code = ci->Extend<Anope::string>("channel-dropcode");
 				*code = Anope::Random(15);
 			}
 
-			source.Reply(_("Please confirm that you want to drop \002%s\002 with \002DROP %s %s\002"),
-				chan.c_str(), chan.c_str(), code->c_str());
+			source.Reply(CONFIRM_DROP, ci->name.c_str(), ci->name.c_str(), code->c_str());
 			return;
 		}
 

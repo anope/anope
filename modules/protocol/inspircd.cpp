@@ -59,7 +59,7 @@ namespace
 			modname.erase(modname.length() - 3);
 
 		// Extract the module link data (if any).
-		moddata = (sep == Anope::string::npos) ? "" : module.substr(sep);
+		moddata = (sep == Anope::string::npos) ? "" : module.substr(sep + 1);
 
 		Log(LOG_DEBUG) << "Parsed module: " << "name=" << modname << " data=" << moddata;
 	}
@@ -112,9 +112,7 @@ public:
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSQLine = true;
-		CanSQLineChannel = true;
 		CanSZLine = true;
-		CanSVSHold = true;
 		CanSVSLogout = true;
 		CanCertFP = true;
 		RequiresID = true;
@@ -1270,7 +1268,7 @@ struct IRCDMessageCapab final
 				}
 				else if (modname.equals_cs("topiclock"))
 					Servers::Capab.insert("TOPICLOCK");
-				else if (module.equals_cs("cban" && moddata.equals_cs("glob")))
+				else if (modname.equals_cs("cban") && moddata.equals_cs("glob"))
 					IRCD->CanSQLineChannel = true;
 				else if (modname.equals_cs("services_account"))
 				{

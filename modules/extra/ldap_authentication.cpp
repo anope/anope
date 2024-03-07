@@ -227,10 +227,6 @@ public:
 		email_attribute = conf->Get<const Anope::string>("email_attribute");
 		this->disable_register_reason = conf->Get<const Anope::string>("disable_register_reason");
 		this->disable_email_reason = conf->Get<const Anope::string>("disable_email_reason");
-
-		if (!email_attribute.empty())
-			/* Don't complain to users about how they need to update their email, we will do it for them */
-			config->GetModule("nickserv")->Set("forceemail", "false");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override

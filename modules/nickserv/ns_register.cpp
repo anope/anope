@@ -119,13 +119,10 @@ class CommandNSRegister final
 	: public Command
 {
 public:
-	CommandNSRegister(Module *creator) : Command(creator, "nickserv/register", 1, 2)
+	CommandNSRegister(Module *creator) : Command(creator, "nickserv/register", 2, 2)
 	{
 		this->SetDesc(_("Register a nickname"));
-		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
-			this->SetSyntax(_("\037password\037 \037email\037"));
-		else
-			this->SetSyntax(_("\037password\037 \037[email]\037"));
+		this->SetSyntax(_("\037password\037 \037email\037"));
 		this->AllowUnregistered(true);
 	}
 
@@ -197,10 +194,7 @@ public:
 
 		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
 		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
-
-		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
-			this->OnSyntaxError(source, "");
-		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
+		if (u && Anope::CurTime < u->lastnickreg + reg_delay)
 		{
 			source.Reply(_("Please wait %lu seconds before using the REGISTER command again."),
 				(unsigned long)(u->lastnickreg + reg_delay) - Anope::CurTime);
@@ -289,16 +283,6 @@ public:
 				"Finally, the space character cannot be used in passwords."),
 				source.service->nick.c_str(), source.service->nick.c_str(),
 				minpasslen);
-
-		if (!Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
-		{
-			source.Reply(" ");
-			source.Reply(_("The \037email\037 parameter is optional and will set the email\n"
-					"for your nick immediately.\n"
-					"Your privacy is respected; this e-mail won't be given to\n"
-					"any third-party person. You may also wish to \002SET HIDE\002 it\n"
-					"after registering if it isn't the default setting already."));
-		}
 
 		source.Reply(" ");
 		source.Reply(_("This command also creates a new group for your nickname,\n"

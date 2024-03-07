@@ -357,7 +357,7 @@ public:
 		if (!modesonid.empty())
 			u->SetModes(NickServ, modesonid);
 
-		if (block->Get<bool>("forceemail", "yes") && u->Account()->email.empty())
+		if (u->Account()->email.empty())
 		{
 			u->SendMessage(NickServ, _("You must now supply an e-mail for your nick.\n"
 							"This e-mail will allow you to retrieve your password in\n"

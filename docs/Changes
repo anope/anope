@@ -1,6 +1,9 @@
 Anope Version 2.1.4-git
 -----------------------
-No significant changes.
+Changed nickserv/drop to use confirmation codes to confirm a nickname drop.
+Fixed various bugs in the inspircd module.
+Improved the randomness of randomly generated numbers.
+Removed support for registering accounts without an email address.
 
 Anope Version 2.1.3
 -------------------

@@ -359,11 +359,11 @@ public:
 
 		if (u->Account()->email.empty())
 		{
-			u->SendMessage(NickServ, _("You must now supply an e-mail for your nick.\n"
-							"This e-mail will allow you to retrieve your password in\n"
+			u->SendMessage(NickServ, _("You must now supply an email for your nick.\n"
+							"This email will allow you to retrieve your password in\n"
 							"case you forget it."));
-			u->SendMessage(NickServ, _("Type \002%s%s SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
-							"Your privacy is respected; this e-mail won't be given to\n"
+			u->SendMessage(NickServ, _("Type \002%s%s SET EMAIL \037email\037\002 in order to set your email.\n"
+							"Your privacy is respected; this email won't be given to\n"
 							"any third-party person."), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
 		}
 
@@ -541,7 +541,7 @@ public:
 
 			if (expire)
 			{
-				Log(LOG_NORMAL, "nickserv/expire", NickServ) << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
+				Log(LOG_NORMAL, "nickserv/expire", NickServ) << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
 				FOREACH_MOD(OnNickExpire, (na));
 				delete na;
 			}

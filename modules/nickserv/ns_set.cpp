@@ -544,7 +544,7 @@ class CommandNSSetEmail
 public:
 	CommandNSSetEmail(Module *creator, const Anope::string &cname = "nickserv/set/email", size_t min = 1) : Command(creator, cname, min, min + 1)
 	{
-		this->SetDesc(_("Associate an E-mail address with your nickname"));
+		this->SetDesc(_("Associate an email address with your nickname"));
 		this->SetSyntax(_("\037address\037"));
 	}
 
@@ -572,7 +572,7 @@ public:
 
 		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
-			source.Reply(_("You may not change the e-mail of other Services Operators."));
+			source.Reply(_("You may not change the email of other Services Operators."));
 			return;
 		}
 		else if (!Mail::Validate(param))
@@ -591,14 +591,14 @@ public:
 			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
 			{
 				Log(LOG_COMMAND, source, this) << "to request changing the email of " << nc->display << " to " << param;
-				source.Reply(_("A confirmation e-mail has been sent to \002%s\002. Follow the instructions in it to change your e-mail address."), param.c_str());
+				source.Reply(_("A confirmation email has been sent to \002%s\002. Follow the instructions in it to change your email address."), param.c_str());
 			}
 		}
 		else
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email of " << nc->display << " to " << param;
 			nc->email = param;
-			source.Reply(_("E-mail address for \002%s\002 changed to \002%s\002."), nc->display.c_str(), param.c_str());
+			source.Reply(_("Email address for \002%s\002 changed to \002%s\002."), nc->display.c_str(), param.c_str());
 		}
 	}
 
@@ -611,7 +611,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Associates the given E-mail address with your nickname.\n"
+		source.Reply(_("Associates the given email address with your nickname.\n"
 				"This address will be displayed whenever someone requests\n"
 				"information on the nickname with the \002INFO\002 command."));
 		return true;
@@ -637,7 +637,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Associates the given E-mail address with the nickname."));
+		source.Reply(_("Associates the given email address with the nickname."));
 		return true;
 	}
 };

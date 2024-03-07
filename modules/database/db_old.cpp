@@ -40,7 +40,7 @@ else \
 #define OLD_NI_MEMO_SIGNON	0x00000010 /* Notify of memos at signon and un-away */
 #define OLD_NI_MEMO_RECEIVE	0x00000020 /* Notify of new memos when sent */
 #define OLD_NI_PRIVATE		0x00000040 /* Don't show in LIST to non-servadmins */
-#define OLD_NI_HIDE_EMAIL	0x00000080 /* Don't show E-mail in INFO */
+#define OLD_NI_HIDE_EMAIL	0x00000080 /* Don't show email in INFO */
 #define OLD_NI_HIDE_MASK	0x00000100 /* Don't show last seen address in INFO */
 #define OLD_NI_HIDE_QUIT	0x00000200 /* Don't show last quit message in INFO */
 #define OLD_NI_KILL_QUICK	0x00000400 /* Kill in 20 seconds instead of 60 */

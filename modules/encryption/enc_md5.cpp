@@ -5,7 +5,7 @@
  * Contact us at team@anope.org
  *
  * Taken from IRC Services and is copyright (c) 1996-2002 Andrew Church.
- *	 E-mail: <achurch@achurch.org>
+ *	 Email: <achurch@achurch.org>
  * Parts written by Andrew Kempe and others.
  * This program is free but copyrighted software; see the file COPYING for
  * details.

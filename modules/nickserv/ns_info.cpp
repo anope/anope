@@ -166,8 +166,8 @@ public:
 		if (param.equals_ci("EMAIL"))
 		{
 			flag = "HIDE_EMAIL";
-			onmsg = _("The E-mail address of \002%s\002 will now be hidden from %s INFO displays.");
-			offmsg = _("The E-mail address of \002%s\002 will now be shown in %s INFO displays.");
+			onmsg = _("The email address of \002%s\002 will now be hidden from %s INFO displays.");
+			offmsg = _("The email address of \002%s\002 will now be shown in %s INFO displays.");
 		}
 		else if (param.equals_ci("USERMASK"))
 		{
@@ -220,7 +220,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_("Allows you to prevent certain pieces of information from\n"
 				"being displayed when someone does a %s \002INFO\002 on your\n"
-				"nick.  You can hide your E-mail address (\002EMAIL\002), last seen\n"
+				"nick.  You can hide your email address (\002EMAIL\002), last seen\n"
 				"user@host mask (\002USERMASK\002), your services access status\n"
 				"(\002STATUS\002) and last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
@@ -250,7 +250,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_("Allows you to prevent certain pieces of information from\n"
 				"being displayed when someone does a %s \002INFO\002 on the\n"
-				"nick.  You can hide the E-mail address (\002EMAIL\002), last seen\n"
+				"nick.  You can hide the email address (\002EMAIL\002), last seen\n"
 				"user@host mask (\002USERMASK\002), the services access status\n"
 				"(\002STATUS\002) and last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"

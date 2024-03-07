@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-07 21:18+0000\n"
-"PO-Revision-Date: 2024-03-07 21:19+0000\n"
+"POT-Creation-Date: 2024-03-07 22:40+0000\n"
+"PO-Revision-Date: 2024-03-07 22:40+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -283,8 +283,8 @@ msgid "%s is not a valid bot or registered channel."
 msgstr "%s is not a valid bot or registered channel."
 
 #, c-format
-msgid "%s is not a valid e-mail address."
-msgstr "%s is not a valid e-mail address."
+msgid "%s is not a valid email address."
+msgstr "%s is not a valid email address."
 
 #, c-format
 msgid "%s is not currently on channel %s."
@@ -1685,8 +1685,8 @@ msgid "<unknown>"
 msgstr "<unknown>"
 
 #, c-format
-msgid "A confirmation e-mail has been sent to %s. Follow the instructions in it to change your e-mail address."
-msgstr "A confirmation e-mail has been sent to %s. Follow the instructions in it to change your e-mail address."
+msgid "A confirmation email has been sent to %s. Follow the instructions in it to change your email address."
+msgstr "A confirmation email has been sent to %s. Follow the instructions in it to change your email address."
 
 msgid "A massmemo has been sent to all registered users."
 msgstr "A massmemo has been sent to all registered users."
@@ -2352,7 +2352,7 @@ msgstr ""
 msgid ""
 "Allows you to prevent certain pieces of information from\n"
 "being displayed when someone does a %s INFO on the\n"
-"nick.  You can hide the E-mail address (EMAIL), last seen\n"
+"nick.  You can hide the email address (EMAIL), last seen\n"
 "user@host mask (USERMASK), the services access status\n"
 "(STATUS) and last quit message (QUIT).\n"
 "The second parameter specifies whether the information should\n"
@@ -2360,7 +2360,7 @@ msgid ""
 msgstr ""
 "Allows you to prevent certain pieces of information from\n"
 "being displayed when someone does a %s INFO on the\n"
-"nick.  You can hide the E-mail address (EMAIL), last seen\n"
+"nick.  You can hide the email address (EMAIL), last seen\n"
 "user@host mask (USERMASK), the services access status\n"
 "(STATUS) and last quit message (QUIT).\n"
 "The second parameter specifies whether the information should\n"
@@ -2370,7 +2370,7 @@ msgstr ""
 msgid ""
 "Allows you to prevent certain pieces of information from\n"
 "being displayed when someone does a %s INFO on your\n"
-"nick.  You can hide your E-mail address (EMAIL), last seen\n"
+"nick.  You can hide your email address (EMAIL), last seen\n"
 "user@host mask (USERMASK), your services access status\n"
 "(STATUS) and last quit message (QUIT).\n"
 "The second parameter specifies whether the information should\n"
@@ -2378,7 +2378,7 @@ msgid ""
 msgstr ""
 "Allows you to prevent certain pieces of information from\n"
 "being displayed when someone does a %s INFO on your\n"
-"nick.  You can hide your E-mail address (EMAIL), last seen\n"
+"nick.  You can hide your email address (EMAIL), last seen\n"
 "user@host mask (USERMASK), your services access status\n"
 "(STATUS) and last quit message (QUIT).\n"
 "The second parameter specifies whether the information should\n"
@@ -2439,24 +2439,24 @@ msgstr "Associate a URL with your account"
 msgid "Associate a greet message with your nickname"
 msgstr "Associate a greet message with your nickname"
 
-msgid "Associate an E-mail address with the channel"
-msgstr "Associate an E-mail address with the channel"
+msgid "Associate an email address with the channel"
+msgstr "Associate an email address with the channel"
 
-msgid "Associate an E-mail address with your nickname"
-msgstr "Associate an E-mail address with your nickname"
+msgid "Associate an email address with your nickname"
+msgstr "Associate an email address with your nickname"
 
 msgid "Associate oper info with a nick or channel"
 msgstr "Associate oper info with a nick or channel"
 
-msgid "Associates the given E-mail address with the nickname."
-msgstr "Associates the given E-mail address with the nickname."
+msgid "Associates the given email address with the nickname."
+msgstr "Associates the given email address with the nickname."
 
 msgid ""
-"Associates the given E-mail address with your nickname.\n"
+"Associates the given email address with your nickname.\n"
 "This address will be displayed whenever someone requests\n"
 "information on the nickname with the INFO command."
 msgstr ""
-"Associates the given E-mail address with your nickname.\n"
+"Associates the given email address with your nickname.\n"
 "This address will be displayed whenever someone requests\n"
 "information on the nickname with the INFO command."
 
@@ -3538,14 +3538,6 @@ msgstr ""
 "this nick."
 
 #, c-format
-msgid "E-mail address for %s changed to %s."
-msgstr "E-mail address for %s changed to %s."
-
-#, c-format
-msgid "E-mail for %s is invalid."
-msgstr "E-mail for %s is invalid."
-
-#, c-format
 msgid ""
 "Edits or displays the list of logon news messages.  When a\n"
 "user connects to the network, these messages will be sent\n"
@@ -3584,6 +3576,14 @@ msgstr ""
 
 msgid "Email address"
 msgstr "Email address"
+
+#, c-format
+msgid "Email address for %s changed to %s."
+msgstr "Email address for %s changed to %s."
+
+#, c-format
+msgid "Email for %s is invalid."
+msgstr "Email for %s is invalid."
 
 #, c-format
 msgid "Email matched: %s (%s) to %s."
@@ -4135,8 +4135,8 @@ msgstr "Invalid hostmask. Only real hostmasks are valid, as exceptions are not m
 msgid "Invalid limit %s, using %d."
 msgstr "Invalid limit %s, using %d."
 
-msgid "Invalid passcode has been entered, please check the e-mail again, and retry."
-msgstr "Invalid passcode has been entered, please check the e-mail again, and retry."
+msgid "Invalid passcode has been entered, please check the email again, and retry."
+msgstr "Invalid passcode has been entered, please check the email again, and retry."
 
 msgid "Invalid passcode."
 msgstr "Invalid passcode."
@@ -7210,14 +7210,6 @@ msgstr "The AKILL list has been cleared."
 msgid "The Defcon level is now at: %d"
 msgstr "The Defcon level is now at: %d"
 
-#, c-format
-msgid "The E-mail address of %s will now be hidden from %s INFO displays."
-msgstr "The E-mail address of %s will now be hidden from %s INFO displays."
-
-#, c-format
-msgid "The E-mail address of %s will now be shown in %s INFO displays."
-msgstr "The E-mail address of %s will now be shown in %s INFO displays."
-
 msgid "The available flags are:"
 msgstr "The available flags are:"
 
@@ -7237,6 +7229,14 @@ msgstr "The email address %s has reached its usage limit of %d users."
 #, c-format
 msgid "The email address %s has reached its usage limit of 1 user."
 msgstr "The email address %s has reached its usage limit of 1 user."
+
+#, c-format
+msgid "The email address of %s will now be hidden from %s INFO displays."
+msgstr "The email address of %s will now be hidden from %s INFO displays."
+
+#, c-format
+msgid "The email address of %s will now be shown in %s INFO displays."
+msgstr "The email address of %s will now be shown in %s INFO displays."
 
 #, c-format
 msgid "The entry message list for %s is full."
@@ -7876,12 +7876,12 @@ msgstr ""
 
 #, c-format
 msgid ""
-"Type %s%s SET EMAIL e-mail in order to set your e-mail.\n"
-"Your privacy is respected; this e-mail won't be given to\n"
+"Type %s%s SET EMAIL email in order to set your email.\n"
+"Your privacy is respected; this email won't be given to\n"
 "any third-party person."
 msgstr ""
-"Type %s%s SET EMAIL e-mail in order to set your e-mail.\n"
-"Your privacy is respected; this e-mail won't be given to\n"
+"Type %s%s SET EMAIL email in order to set your email.\n"
+"Your privacy is respected; this email won't be given to\n"
 "any third-party person."
 
 msgid "Un-Load a module"
@@ -8376,11 +8376,11 @@ msgstr "You may drop any nick within your group."
 msgid "You may not (un)lock mode %c."
 msgstr "You may not (un)lock mode %c."
 
-msgid "You may not change the e-mail of other Services Operators."
-msgstr "You may not change the e-mail of other Services Operators."
-
 msgid "You may not change the email of an unconfirmed account."
 msgstr "You may not change the email of an unconfirmed account."
+
+msgid "You may not change the email of other Services Operators."
+msgstr "You may not change the email of other Services Operators."
 
 msgid "You may not change the password of other Services Operators."
 msgstr "You may not change the password of other Services Operators."
@@ -8429,12 +8429,12 @@ msgid "You must have the %s(ME) privilege on the channel to use this command."
 msgstr "You must have the %s(ME) privilege on the channel to use this command."
 
 msgid ""
-"You must now supply an e-mail for your nick.\n"
-"This e-mail will allow you to retrieve your password in\n"
+"You must now supply an email for your nick.\n"
+"This email will allow you to retrieve your password in\n"
 "case you forget it."
 msgstr ""
-"You must now supply an e-mail for your nick.\n"
-"This e-mail will allow you to retrieve your password in\n"
+"You must now supply an email for your nick.\n"
+"This email will allow you to retrieve your password in\n"
 "case you forget it."
 
 msgid "You need to be identified to use this command."

@@ -88,7 +88,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 		else if (Anope::CurTime - u->lastmail < b->Get<time_t>("delay"))
 			u->SendMessage(service, _("Please wait \002%lu\002 seconds and retry."), (unsigned long)b->Get<time_t>("delay") - (Anope::CurTime - u->lastmail));
 		else if (nc->email.empty())
-			u->SendMessage(service, _("E-mail for \002%s\002 is invalid."), nc->display.c_str());
+			u->SendMessage(service, _("Email for \002%s\002 is invalid."), nc->display.c_str());
 		else
 		{
 			u->lastmail = nc->lastmail = Anope::CurTime;
@@ -115,9 +115,9 @@ bool Mail::Send(NickCore *nc, const Anope::string &subject, const Anope::string 
 }
 
 /**
- * Checks whether we have a valid, common e-mail address.
+ * Checks whether we have a valid, common email address.
  * This is NOT entirely RFC compliant, and won't be so, because I said
- * *common* cases. ;) It is very unlikely that e-mail addresses that
+ * *common* cases. ;) It is very unlikely that email addresses that
  * are really being used will fail the check.
  *
  * @param email Email to Validate

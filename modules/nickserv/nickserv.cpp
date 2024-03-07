@@ -362,9 +362,8 @@ public:
 			u->SendMessage(NickServ, _("You must now supply an email for your nick.\n"
 							"This email will allow you to retrieve your password in\n"
 							"case you forget it."));
-			u->SendMessage(NickServ, _("Type \002%s%s SET EMAIL \037email\037\002 in order to set your email.\n"
-							"Your privacy is respected; this email won't be given to\n"
-							"any third-party person."), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
+			u->SendMessage(NickServ, _("Type \002%s%s SET EMAIL \037email\037\002 in order to set your email."),
+				Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
 		}
 
 		for (auto *c : collides)

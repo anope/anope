@@ -22,7 +22,7 @@ class EBCRYPT final
 	{
 		char entropy[16];
 		for (auto &chr : entropy)
-			chr = static_cast<char>(rand() % 0xFF);
+			chr = static_cast<char>(Anope::RandomNumber() % 0xFF);
 
 		char salt[32];
 		if (!_crypt_gensalt_blowfish_rn("$2a$", rounds, entropy, sizeof(entropy), salt, sizeof(salt)))

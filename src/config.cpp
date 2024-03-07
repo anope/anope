@@ -557,10 +557,6 @@ Conf::Conf() : Block("")
 		}
 	}
 	Anope::CaseMapRebuild();
-
-	/* Check the user keys */
-	if (!options->Get<unsigned>("seed"))
-		Log() << "Configuration option options:seed should be set. It's for YOUR safety! Remember that!";
 }
 
 Conf::~Conf()

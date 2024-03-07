@@ -558,6 +558,9 @@ namespace Anope
 	 */
 	extern CoreExport Anope::string Random(size_t len);
 
+	/** Generate a random number. */
+	extern CoreExport int RandomNumber();
+
 	/** Calculates the levenshtein distance between two strings.
 	 * @param s1 The first string.
 	 * @param s2 The second string.

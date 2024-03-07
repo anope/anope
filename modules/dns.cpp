@@ -679,7 +679,7 @@ public:
 		: Manager(creator)
 		, Timer(300, true)
 		, serial(Anope::CurTime)
-		, cur_id(rand())
+		, cur_id(Anope::RandomNumber())
 	{
 	}
 

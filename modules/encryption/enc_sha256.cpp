@@ -249,7 +249,7 @@ class ESHA256 final
 	void NewRandomIV()
 	{
 		for (auto &ivsegment : iv)
-			ivsegment = static_cast<uint32_t>(rand());
+			ivsegment = static_cast<uint32_t>(Anope::RandomNumber());
 	}
 
 	/* returns the IV as base64-encrypted string */

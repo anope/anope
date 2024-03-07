@@ -224,7 +224,7 @@ uint64_t NickCore::GetId()
 		// Generate a random key for SipHash.
 		char key[16];
 		for (auto &chr : key)
-			chr = rand() % CHAR_MAX;
+			chr = Anope::RandomNumber() % CHAR_MAX;
 
 		uint64_t newid = Anope::SipHash24(secretid.c_str(), secretid.length(), key);
 		nickcoreid_map::const_iterator it = NickCoreIdList.find(newid);

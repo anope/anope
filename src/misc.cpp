@@ -20,7 +20,9 @@
 #include "sockets.h"
 
 #include <cerrno>
+#include <climits>
 #include <numeric>
+#include <random>
 #include <sys/stat.h>
 #include <sys/types.h>
 #ifndef _WIN32
@@ -745,8 +747,16 @@ Anope::string Anope::Random(size_t len)
 	};
 	Anope::string buf;
 	for (size_t i = 0; i < len; ++i)
-		buf.append(chars[rand() % sizeof(chars)]);
+		buf.append(chars[Anope::RandomNumber() % sizeof(chars)]);
 	return buf;
+}
+
+int Anope::RandomNumber()
+{
+	static std::random_device device;
+	static std::mt19937 engine(device());
+	static std::uniform_int_distribution<int> dist(INT_MIN, INT_MAX);
+	return dist(engine);
 }
 
 // Implementation of https://en.wikipedia.org/wiki/Levenshtein_distance

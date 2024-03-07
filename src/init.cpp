@@ -494,10 +494,6 @@ bool Anope::Init(int ac, char **av)
 	/* Initialize multi-language support */
 	Language::InitLanguages();
 
-	/* Initialize random number generator */
-	block = Config->GetBlock("options");
-	srand(block->Get<unsigned>("seed") ^ time(NULL));
-
 	/* load modules */
 	Log() << "Loading modules...";
 	for (int i = 0; i < Config->CountBlock("module"); ++i)

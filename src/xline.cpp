@@ -249,7 +249,7 @@ Anope::string XLineManager::GenerateUID()
 		{
 			char c;
 			do
-				c = (rand() % 75) + 48;
+				c = (Anope::RandomNumber() % 75) + 48;
 			while (!isupper(c) && !isdigit(c));
 			id += c;
 		}

@@ -50,7 +50,7 @@ public:
 		{
 			char c;
 			do
-				c = 48 + (rand() % 75);
+				c = 48 + (Anope::RandomNumber() % 75);
 			while (!isalnum(c));
 			id += c;
 		}

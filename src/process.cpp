@@ -18,35 +18,40 @@
 
 void Anope::Process(const Anope::string &buffer)
 {
-	/* If debugging, log the buffer */
-	Log(LOG_RAWIO) << "Received: " << buffer;
-
 	if (buffer.empty())
 		return;
 
 	Anope::map<Anope::string> tags;
 	Anope::string source, command;
 	std::vector<Anope::string> params;
-
 	if (!IRCD->Parse(buffer, tags, source, command, params))
 		return;
 
+	Log(LOG_RAWIO) << "Received " << buffer;
 	if (Anope::ProtocolDebug)
 	{
 		if (tags.empty())
-			Log() << "No tags";
+			Log() << "\tNo tags";
 		else
-			for (Anope::map<Anope::string>::const_iterator it = tags.begin(); it != tags.end(); ++it)
-				Log() << "tags " << it->first << ": " << it->second;
+		{
+			for (const auto &[tname, tvalue] : tags)
+				Log() << "\tTag " << tname << ": " << tvalue;
+		}
 
-		Log() << "Source : " << (source.empty() ? "No source" : source);
-		Log() << "Command: " << command;
+		if (source.empty())
+			Log() << "\tNo source";
+		else
+			Log() << "\tSource: " << source;
+
+		Log() << "\tCommand: " << command;
 
 		if (params.empty())
-			Log() << "No params";
+			Log() << "\tNo params";
 		else
-			for (unsigned i = 0; i < params.size(); ++i)
-				Log() << "params " << i << ": " << params[i];
+		{
+			for (size_t i = 0; i < params.size(); ++i)
+				Log() << "\tParam " << i << ": " << params[i];
+		}
 	}
 
 	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";

@@ -74,7 +74,33 @@ void Uplink::SendInternal(const Anope::map<Anope::string> &tags, const MessageSo
 		return;
 
 	UplinkSock->Write(message);
-	Log(LOG_RAWIO) << "Sent: " << message;
+
+	Log(LOG_RAWIO) << "Sent " << message;
+	if (Anope::ProtocolDebug)
+	{
+		if (tags.empty())
+			Log() << "\tNo tags";
+		else
+		{
+			for (const auto &[tname, tvalue] : tags)
+				Log() << "\tTag " << tname << ": " << tvalue;
+		}
+
+		if (source.GetSource().empty())
+			Log() << "\tNo source";
+		else
+			Log() << "\tSource: " << source.GetSource();
+
+		Log() << "\tCommand: " << command;
+
+		if (params.empty())
+			Log() << "\tNo params";
+		else
+		{
+			for (size_t i = 0; i < params.size(); ++i)
+				Log() << "\tParam " << i << ": " << params[i];
+		}
+	}
 }
 
 UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].protocol), ConnectionSocket(), BufferedSocket()

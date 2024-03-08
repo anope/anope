@@ -65,7 +65,8 @@ namespace
 		// Extract the module link data (if any).
 		moddata = (sep == Anope::string::npos) ? "" : module.substr(sep + 1);
 
-		Log(LOG_DEBUG) << "Parsed module: " << "name=" << modname << " data=" << moddata;
+		if (Anope::ProtocolDebug)
+			Log(LOG_DEBUG) << "Parsed module: name=" << modname << " data=" << moddata;
 	}
 
 	void ParseModuleData(const Anope::string &moddata, Anope::map<Anope::string> &modmap)
@@ -74,10 +75,14 @@ namespace
 		for (Anope::string datapair; datastream.GetToken(datapair); )
 		{
 			size_t split = datapair.find('=');
+			std::pair<Anope::map<Anope::string>::iterator, bool> res;
 			if (split == Anope::string::npos)
-				modmap.emplace(datapair, "");
+				res = modmap.emplace(datapair, "");
 			else
-				modmap.emplace(datapair.substr(0, split), HTTPUtils::URLDecode(datapair.substr(split + 1)));
+				res = modmap.emplace(datapair.substr(0, split), HTTPUtils::URLDecode(datapair.substr(split + 1)));
+
+			if (Anope::ProtocolDebug && res.second)
+				Log(LOG_DEBUG) << "Parsed module data: key=" << res.first->first << " value=" << res.first->second;
 		}
 	}
 }
@@ -1090,7 +1095,8 @@ struct IRCDMessageCapab final
 		extban.name = token.substr(a + 1, b - a - 1);
 		extban.letter = token[b + 1];
 
-		Log(LOG_DEBUG) << "Parsed extban: " << "type=" << extban.type << " name=" << extban.name << " letter=" << extban.letter;
+		if (Anope::ProtocolDebug)
+			Log(LOG_DEBUG) << "Parsed extban: type=" << extban.type << " name=" << extban.name << " letter=" << extban.letter;
 		return true;
 	}
 
@@ -1133,8 +1139,11 @@ struct IRCDMessageCapab final
 				return false;
 		}
 
-		Log(LOG_DEBUG) << "Parsed mode: " << "type=" << mode.type << " name=" << mode.name << " level="
-			<< mode.level << " symbol=" << mode.symbol << " letter=" << mode.letter;
+		if (Anope::ProtocolDebug)
+		{
+			Log(LOG_DEBUG) << "Parsed mode: type=" << mode.type << " name=" << mode.name << " level="
+				<< mode.level << " symbol=" << mode.symbol << " letter=" << mode.letter;
+		}
 		return true;
 	}
 

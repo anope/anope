@@ -1026,8 +1026,7 @@ struct IRCDMessageCapab final
 			}
 
 			/* reset CAPAB */
-			Servers::Capab.insert("SERVERS");
-			Servers::Capab.insert("TOPICLOCK");
+			Servers::Capab.clear();
 			IRCD->CanSQLineChannel = false;
 			IRCD->CanSVSHold = false;
 			IRCD->DefaultPseudoclientModes = "+oI";
@@ -1333,11 +1332,15 @@ struct IRCDMessageCapab final
 				return;
 			}
 			if (!IRCD->CanSVSHold)
-				Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
+				Log() << "The remote server does not have the svshold module; fake users will be used for nick protection until the module is loaded.";
+			if (!IRCD->CanSQLineChannel)
+				Log() << "The remote server does not have the cban module; services will manually enforce forbidden channels until the module is loaded.";
 			if (!Servers::Capab.count("CHGHOST"))
-				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
+				Log() << "The remote server does not have the chghost module; vhosts are disabled until the module is loaded.";
 			if (!Servers::Capab.count("CHGIDENT"))
-				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
+				Log() << "The remote server does not have the chgident module; vidents are disabled until the module is loaded.";
+			if (!Servers::Capab.count("GLOBOPS"))
+				Log() << "The remote server does not have the globops module; oper notices will be sent as announcements until the module is loaded.";
 		}
 
 		Message::Capab::Run(source, params, tags);
@@ -1595,17 +1598,18 @@ public:
 				Anope::string capab, modname, moddata;
 				ParseModule(params[2].substr(1), modname, moddata);
 
-
 				if (modname.equals_cs("services_account"))
 					required = true;
 				else if (modname.equals_cs("hidechans"))
 					required = true;
+				else if (modname.equals_cs("cban") && moddata.equals_cs("glob"))
+					IRCD->CanSQLineChannel = plus;
 				else if (modname.equals_cs("chghost"))
 					capab = "CHGHOST";
 				else if (modname.equals_cs("chgident"))
 					capab = "CHGIDENT";
 				else if (modname.equals_cs("svshold"))
-					capab = "SVSHOLD";
+					IRCD->CanSVSHold = plus;
 				else if (modname.equals_cs("rline"))
 					capab = "RLINE";
 				else if (modname.equals_cs("topiclock"))
@@ -1620,9 +1624,9 @@ public:
 				}
 				else
 				{
-					if (plus)
+					if (plus && !capab.empty())
 						Servers::Capab.insert(capab);
-					else
+					else if (!capab.empty())
 						Servers::Capab.erase(capab);
 
 					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " module " << modname << ", adjusted functionality";

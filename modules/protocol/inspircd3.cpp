@@ -66,9 +66,7 @@ class InspIRCd3Proto : public IRCDProto
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSQLine = true;
-		CanSQLineChannel = true;
 		CanSZLine = true;
-		CanSVSHold = true;
 		CanCertFP = true;
 		RequiresID = true;
 		MaxModes = 20;
@@ -931,8 +929,7 @@ struct IRCDMessageCapab : Message::Capab
 			}
 
 			/* reset CAPAB */
-			Servers::Capab.insert("SERVERS");
-			Servers::Capab.insert("TOPICLOCK");
+			Servers::Capab.clear();
 			IRCD->CanSQLineChannel = false;
 			IRCD->CanSVSHold = false;
 			IRCD->DefaultPseudoclientModes = "+oI";
@@ -1238,11 +1235,15 @@ struct IRCDMessageCapab : Message::Capab
 				return;
 			}
 			if (!IRCD->CanSVSHold)
-				Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
+				Log() << "The remote server does not have the svshold module; fake users will be used for nick protection until the module is loaded.";
+			if (!IRCD->CanSQLineChannel)
+				Log() << "The remote server does not have the cban module; services will manually enforce forbidden channels until the module is loaded.";
 			if (!Servers::Capab.count("CHGHOST"))
-				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
+				Log() << "The remote server does not have the chghost module; vhosts are disabled until the module is loaded.";
 			if (!Servers::Capab.count("CHGIDENT"))
-				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
+				Log() << "The remote server does not have the chgident module; vidents are disabled until the module is loaded.";
+			if (!Servers::Capab.count("GLOBOPS"))
+				Log() << "The remote server does not have the globops module; oper notices will be sent as announcements until the module is loaded.";
 		}
 
 		Message::Capab::Run(source, params);
@@ -1484,12 +1485,16 @@ class IRCDMessageMetadata : IRCDMessage
 					required = true;
 				else if (module.equals_cs("m_hidechans.so"))
 					required = true;
+				else if (module.equals_cs("m_cban.so=glob") && plus)
+					IRCD->CanSQLineChannel = true;
+				if (module.equals_cs("m_cban.so") && !plus)
+					IRCD->CanSQLineChannel = false;
 				else if (module.equals_cs("m_chghost.so"))
 					capab = "CHGHOST";
 				else if (module.equals_cs("m_chgident.so"))
 					capab = "CHGIDENT";
 				else if (module.equals_cs("m_svshold.so"))
-					capab = "SVSHOLD";
+					IRCD->CanSVSHold = plus;
 				else if (module.equals_cs("m_rline.so"))
 					capab = "RLINE";
 				else if (module.equals_cs("m_topiclock.so"))
@@ -1504,9 +1509,9 @@ class IRCDMessageMetadata : IRCDMessage
 				}
 				else
 				{
-					if (plus)
+					if (plus && !capab.empty())
 						Servers::Capab.insert(capab);
-					else
+					else if (!capab.empty())
 						Servers::Capab.erase(capab);
 
 					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " module " << module << ", adjusted functionality";

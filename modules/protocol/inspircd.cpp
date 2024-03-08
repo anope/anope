@@ -1034,7 +1034,7 @@ struct IRCDMessageAway final
 };
 
 struct IRCDMessageCapab final
-	: Message::Capab
+	: IRCDMessage
 {
 	struct ExtBanInfo final
 	{
@@ -1147,7 +1147,11 @@ struct IRCDMessageCapab final
 		return true;
 	}
 
-	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(FLAG_SOFT_LIMIT); }
+	IRCDMessageCapab(Module *creator)
+		: IRCDMessage(creator, "CAPAB", 1)
+	{
+		SetFlag(FLAG_SOFT_LIMIT);
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
@@ -1545,7 +1549,6 @@ struct IRCDMessageCapab final
 
 				else if (modname.equals_cs("chgident"))
 					Servers::Capab.insert("CHGIDENT");
-
 			}
 
 			const auto &anoperegex = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
@@ -1635,8 +1638,6 @@ struct IRCDMessageCapab final
 			if (!Servers::Capab.count("GLOBOPS"))
 				Log() << "The remote server does not have the globops module; oper notices will be sent as announcements until the module is loaded.";
 		}
-
-		Message::Capab::Run(source, params, tags);
 	}
 };
 

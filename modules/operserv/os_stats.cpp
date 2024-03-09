@@ -200,12 +200,43 @@ private:
 		}
 	}
 
+	void DoStatsPassword(CommandSource &source)
+	{
+		Anope::map<size_t> counts;
+		size_t missing = 0;
+		size_t unknown = 0;
+		for (const auto &[_, nc] : *NickCoreList)
+		{
+			if (nc->pass.empty())
+			{
+				missing++;
+				continue;
+			}
+
+			auto sep = nc->pass.find(':');
+			if (sep == Anope::string::npos)
+			{
+				unknown++;
+				continue;
+			}
+
+			counts[nc->pass.substr(0, sep)]++;
+		}
+
+		for (const auto &[algo, count] : counts)
+			source.Reply(_("Passwords encrypted with %s: %zu"), algo.c_str(), count);
+		if (missing)
+			source.Reply(_("Missing passwords: %zu"), missing);
+		if (unknown)
+			source.Reply(_("Unknown passwords: %zu"), unknown);
+	}
+
 public:
 	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1),
 		akills("XLineManager", "xlinemanager/sgline"), snlines("XLineManager", "xlinemanager/snline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
 		this->SetDesc(_("Show status of services and network"));
-		this->SetSyntax("[AKILL | HASH | UPLINK | UPTIME | ALL | RESET]");
+		this->SetSyntax("[AKILL | HASH | PASSWORD | UPLINK | UPTIME | ALL | RESET]");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -217,19 +248,38 @@ public:
 		if (extra.equals_ci("RESET"))
 			return this->DoStatsReset(source);
 
+		bool handled = false;
 		if (extra.equals_ci("ALL") || extra.equals_ci("AKILL"))
+		{
 			this->DoStatsAkill(source);
+			handled = true;
+		}
 
 		if (extra.equals_ci("ALL") || extra.equals_ci("HASH"))
+		{
 			this->DoStatsHash(source);
+			handled = true;
+		}
+
+		if (extra.equals_ci("ALL") || extra.equals_ci("PASSWORD"))
+		{
+			this->DoStatsPassword(source);
+			handled = true;
+		}
 
 		if (extra.equals_ci("ALL") || extra.equals_ci("UPLINK"))
+		{
 			this->DoStatsUplink(source);
+			handled = true;
+		}
 
 		if (extra.empty() || extra.equals_ci("ALL") || extra.equals_ci("UPTIME"))
+		{
 			this->DoStatsUptime(source);
+			handled = true;
+		}
 
-		if (!extra.empty() && !extra.equals_ci("ALL") && !extra.equals_ci("AKILL") && !extra.equals_ci("HASH") && !extra.equals_ci("UPLINK") && !extra.equals_ci("UPTIME"))
+		if (!handled)
 			source.Reply(_("Unknown STATS option: \002%s\002"), extra.c_str());
 	}
 
@@ -246,6 +296,9 @@ public:
 				" \n"
 				"The \002RESET\002 option currently resets the maximum user count\n"
 				"to the number of users currently present on the network.\n"
+				" \n"
+				"The \002PASSWORD\002 option displays the encryption algorithms used\n"
+				"for user passwords.\n"
 				" \n"
 				"The \002UPLINK\002 option displays information about the current\n"
 				"server Anope uses as an uplink to the network.\n"

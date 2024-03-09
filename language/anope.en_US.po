@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-07 23:06+0000\n"
-"PO-Revision-Date: 2024-03-07 23:06+0000\n"
+"POT-Creation-Date: 2024-03-09 21:00+0000\n"
+"PO-Revision-Date: 2024-03-09 21:00+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -4860,6 +4860,10 @@ msgstr "Method"
 msgid "Missing parameter for mode %c."
 msgstr "Missing parameter for mode %c."
 
+#, c-format
+msgid "Missing passwords: %zu"
+msgstr "Missing passwords: %zu"
+
 msgid "Mode"
 msgstr "Mode"
 
@@ -5287,6 +5291,10 @@ msgstr "Password incorrect."
 #, c-format
 msgid "Password reset email for %s has been sent."
 msgstr "Password reset email for %s has been sent."
+
+#, c-format
+msgid "Passwords encrypted with %s: %zu"
+msgstr "Passwords encrypted with %s: %zu"
 
 msgid "Peace"
 msgstr "Peace"
@@ -7943,6 +7951,10 @@ msgstr "Unknown mode character %c ignored."
 msgid "Unknown parameter: %s"
 msgstr "Unknown parameter: %s"
 
+#, c-format
+msgid "Unknown passwords: %zu"
+msgstr "Unknown passwords: %zu"
+
 msgid "Unpooled"
 msgstr "Unpooled"
 
@@ -8152,6 +8164,9 @@ msgid ""
 "The RESET option currently resets the maximum user count\n"
 "to the number of users currently present on the network.\n"
 " \n"
+"The PASSWORD option displays the encryption algorithms used\n"
+"for user passwords.\n"
+" \n"
 "The UPLINK option displays information about the current\n"
 "server Anope uses as an uplink to the network.\n"
 " \n"
@@ -8168,6 +8183,9 @@ msgstr ""
 " \n"
 "The RESET option currently resets the maximum user count\n"
 "to the number of users currently present on the network.\n"
+" \n"
+"The PASSWORD option displays the encryption algorithms used\n"
+"for user passwords.\n"
 " \n"
 "The UPLINK option displays information about the current\n"
 "server Anope uses as an uplink to the network.\n"

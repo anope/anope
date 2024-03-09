@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/ns_cert.h"
 
-static Anope::hash_map<NickCore *> certmap;
+static Anope::unordered_map<NickCore *> certmap;
 
 struct CertServiceImpl final
 	: CertService
@@ -21,7 +21,7 @@ struct CertServiceImpl final
 
 	NickCore *FindAccountFromCert(const Anope::string &cert) override
 	{
-		Anope::hash_map<NickCore *>::iterator it = certmap.find(cert);
+		Anope::unordered_map<NickCore *>::iterator it = certmap.find(cert);
 		if (it != certmap.end())
 			return it->second;
 		return NULL;

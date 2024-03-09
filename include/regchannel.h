@@ -16,7 +16,7 @@
 #include "serialize.h"
 #include "bots.h"
 
-typedef Anope::hash_map<ChannelInfo *> registered_channel_map;
+typedef Anope::unordered_map<ChannelInfo *> registered_channel_map;
 
 extern CoreExport Serialize::Checker<registered_channel_map> RegisteredChannelList;
 

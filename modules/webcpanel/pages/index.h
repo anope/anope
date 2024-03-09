@@ -17,7 +17,7 @@ class Index final
 {
 	static const int FLUSH_TIME = 60;
 
-	Anope::hash_map<time_t> last_login_attempt;
+	Anope::unordered_map<time_t> last_login_attempt;
 	time_t last_clear = 0;
 
 public:

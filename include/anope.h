@@ -343,7 +343,7 @@ namespace Anope
 	using multimap = std::multimap<string, T, ci::less>;
 
 	template<typename T>
-	using hash_map = std::unordered_map<string, T, hash_ci, compare>;
+	using unordered_map = std::unordered_map<string, T, hash_ci, compare>;
 
 #ifndef REPRODUCIBLE_BUILD
 	static const char *const compiled = __TIME__ " " __DATE__;

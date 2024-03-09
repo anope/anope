@@ -19,7 +19,7 @@
 #include "account.h"
 #include "sockets.h"
 
-typedef Anope::hash_map<User *> user_map;
+typedef Anope::unordered_map<User *> user_map;
 
 extern CoreExport user_map UserListByNick, UserListByUID;
 

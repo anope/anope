@@ -19,7 +19,7 @@ enum TypeInfo
 static bool simple;
 struct SeenInfo;
 static SeenInfo *FindInfo(const Anope::string &nick);
-typedef Anope::hash_map<SeenInfo *> database_map;
+typedef Anope::unordered_map<SeenInfo *> database_map;
 database_map database;
 
 struct SeenInfo final

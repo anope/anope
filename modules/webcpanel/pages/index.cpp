@@ -103,7 +103,7 @@ bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 		// Rate limit check.
 		Anope::string ip = client->clientaddr.addr();
 
-		Anope::hash_map<time_t>::iterator it = last_login_attempt.find(ip);
+		Anope::unordered_map<time_t>::iterator it = last_login_attempt.find(ip);
 		if (it != last_login_attempt.end())
 		{
 			time_t last_time = it->second;

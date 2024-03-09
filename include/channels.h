@@ -13,7 +13,7 @@
 #include "modes.h"
 #include "serialize.h"
 
-typedef Anope::hash_map<Channel *> channel_map;
+typedef Anope::unordered_map<Channel *> channel_map;
 
 extern CoreExport channel_map ChannelList;
 

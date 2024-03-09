@@ -17,8 +17,8 @@
 #include "memo.h"
 #include "base.h"
 
-typedef Anope::hash_map<NickAlias *> nickalias_map;
-typedef Anope::hash_map<NickCore *> nickcore_map;
+typedef Anope::unordered_map<NickAlias *> nickalias_map;
+typedef Anope::unordered_map<NickCore *> nickcore_map;
 typedef std::unordered_map<uint64_t, NickCore *> nickcoreid_map;
 
 extern CoreExport Serialize::Checker<nickalias_map> NickAliasList;

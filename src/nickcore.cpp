@@ -73,6 +73,7 @@ void NickCore::Serialize(Serialize::Data &data) const
 	data["pass"] << this->pass;
 	data["email"] << this->email;
 	data["language"] << this->language;
+	data["lastmail"] << this->lastmail;
 	data["memomax"] << this->memos.memomax;
 	for (const auto &ignore : this->memos.ignores)
 		data["memoignores"] << ignore << " ";
@@ -97,6 +98,7 @@ Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["pass"] >> nc->pass;
 	data["email"] >> nc->email;
 	data["language"] >> nc->language;
+	data["lastmail"] >> nc->lastmail;
 	data["memomax"] >> nc->memos.memomax;
 	{
 		Anope::string buf;

@@ -128,6 +128,8 @@ public:
 	Anope::string email;
 	/* Locale name of the language of the user. Empty means default language */
 	Anope::string language;
+	/* Last time an email was sent to this user */
+	time_t lastmail = 0;
 	MemoInfo memos;
 	std::map<Anope::string, Anope::string> last_modes;
 
@@ -143,8 +145,6 @@ public:
 
 	/* Number of channels registered by this account */
 	uint16_t channelcount = 0;
-	/* Last time an email was sent to this user */
-	time_t lastmail = 0;
 	/* Users online now logged into this account */
 	std::list<User *> users;
 

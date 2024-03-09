@@ -16,3 +16,12 @@ license = "Cut-down BSD License"
 tarball = "https://www.openwall.com/blists/blists-2.0.tar.gz"
 version = "v2.0"
 website = "https://openwall.info/wiki/people/solar/software/public-domain-source-code/md5"
+
+[sha2]
+author  = "Olivier Gay"
+email   = "olivier.gay@a3.epfl.ch"
+files   = "sha2.[ch]"
+license = "3-clause BSD License"
+tarball = "http://www.ouah.org/ogay/sha2/sha2.tar.gz"
+version = "2007-02-02"
+website = "http://www.ouah.org/ogay/sha2/"

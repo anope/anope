@@ -48,7 +48,6 @@
  */
 
 #include "module.h"
-#include "modules/encryption.h"
 
 static const unsigned SHA256_DIGEST_SIZE = 256 / 8;
 static const unsigned SHA256_BLOCK_SIZE = 512 / 8;
@@ -112,7 +111,6 @@ static const uint32_t sha256_k[64] =
 /** An sha256 context
  */
 class SHA256Context final
-	: public Encryption::Context
 {
 	void Transform(unsigned char *message, unsigned block_nb)
 	{
@@ -169,7 +167,7 @@ public:
 			this->h[i] = iv[i];
 	}
 
-	void Update(const unsigned char *message, size_t mlen) override
+	void Update(const unsigned char *message, size_t mlen)
 	{
 		unsigned tmp_len = SHA256_BLOCK_SIZE - this->len, rem_len = mlen < tmp_len ? mlen : tmp_len;
 
@@ -191,7 +189,7 @@ public:
 		this->tot_len += (block_nb + 1) << 6;
 	}
 
-	Anope::string Finalize() override
+	Anope::string Finalize()
 	{
 		unsigned block_nb = 1 + ((SHA256_BLOCK_SIZE - 9) < (this->len % SHA256_BLOCK_SIZE));
 		unsigned len_b = (this->tot_len + this->len) << 3;
@@ -213,8 +211,6 @@ class ESHA256 final
 	: public Module
 {
 private:
-	Encryption::SimpleProvider<SHA256Context> sha256provider;
-
 	unsigned iv[8];
 	bool use_iv;
 
@@ -250,9 +246,10 @@ private:
 public:
 	ESHA256(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, ENCRYPTION | VENDOR)
-		, sha256provider(this, "sha256", SHA256_BLOCK_SIZE, SHA256_DIGEST_SIZE)
 	{
 		use_iv = false;
+		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			throw ModuleException("enc_sha256 is deprecated and can not be used as a primary encryption method");
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override

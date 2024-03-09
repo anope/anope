@@ -21,3 +21,13 @@ This directory contains vendored dependencies that are shipped with Anope to avo
 **Version** &mdash; v2.0
 
 **Website** &mdash; [https://openwall.info/wiki/people/solar/software/public-domain-source-code/md5](https://openwall.info/wiki/people/solar/software/public-domain-source-code/md5)
+
+## sha2
+
+**Author** &mdash; [Olivier Gay](mailto:olivier.gay@a3.epfl.ch)
+
+**License** &mdash; 3-clause BSD License
+
+**Version** &mdash; 2007-02-02
+
+**Website** &mdash; [http://www.ouah.org/ogay/sha2/](http://www.ouah.org/ogay/sha2/)

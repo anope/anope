@@ -60,7 +60,6 @@ class SHA1Context final
 	uint32_t state[5];
 	uint32_t count[2];
 	unsigned char buffer[64];
-	unsigned char digest[20];
 
 	void Transform(const unsigned char buf[64])
 	{
@@ -108,22 +107,13 @@ class SHA1Context final
 	}
 
 public:
-	SHA1Context(Encryption::IV *iv = NULL)
+	SHA1Context()
 	{
-		if (iv != NULL)
-		{
-			if (iv->second != 5)
-				throw CoreException("Invalid IV size");
-			for (int i = 0; i < 5; ++i)
-				this->state[i] = iv->first[i];
-		}
-		else
-			for (int i = 0; i < 5; ++i)
-				this->state[i] = sha1_iv[i];
+		for (int i = 0; i < 5; ++i)
+			this->state[i] = sha1_iv[i];
 
 		this->count[0] = this->count[1] = 0;
 		memset(this->buffer, 0, sizeof(this->buffer));
-		memset(this->digest, 0, sizeof(this->digest));
 	}
 
 	void Update(const unsigned char *data, size_t len) override
@@ -147,7 +137,7 @@ public:
 		memcpy(&this->buffer[j], &data[i], len - i);
 	}
 
-	void Finalize() override
+	Anope::string Finalize() override
 	{
 		uint32_t i;
 		unsigned char finalcount[8];
@@ -158,8 +148,10 @@ public:
 		while ((this->count[0] & 504) != 448)
 			this->Update(reinterpret_cast<const unsigned char *>("\0"), 1);
 		this->Update(finalcount, 8); /* Should cause a SHA1Transform() */
+		unsigned char digest[20];
+		memset(digest, 0, sizeof(digest));
 		for (i = 0; i < 20; ++i)
-			this->digest[i] = static_cast<unsigned char>((this->state[i>>2] >> ((3 - (i & 3)) * 8)) & 255);
+			digest[i] = static_cast<unsigned char>((this->state[i>>2] >> ((3 - (i & 3)) * 8)) & 255);
 
 		/* Wipe variables */
 		memset(this->buffer, 0, sizeof(this->buffer));
@@ -168,45 +160,21 @@ public:
 		memset(&finalcount, 0, sizeof(finalcount));
 
 		this->Transform(this->buffer);
-	}
 
-	Encryption::Hash GetFinalizedHash() override
-	{
-		Encryption::Hash hash;
-		hash.first = this->digest;
-		hash.second = sizeof(this->digest);
-		return hash;
-	}
-};
-
-class SHA1Provider final
-	: public Encryption::Provider
-{
-public:
-	SHA1Provider(Module *creator) : Encryption::Provider(creator, "sha1") { }
-
-	Encryption::Context *CreateContext(Encryption::IV *iv) override
-	{
-		return new SHA1Context(iv);
-	}
-
-	Encryption::IV GetDefaultIV() override
-	{
-		Encryption::IV iv;
-		iv.first = sha1_iv;
-		iv.second = sizeof(sha1_iv) / sizeof(uint32_t);
-		return iv;
+		return Anope::string(reinterpret_cast<const char *>(&digest), sizeof(digest));
 	}
 };
 
 class ESHA1 final
 	: public Module
 {
-	SHA1Provider sha1provider;
+private:
+	Encryption::SimpleProvider<SHA1Context> sha1provider;
 
 public:
-	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
-		sha1provider(this)
+	ESHA1(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, ENCRYPTION | VENDOR)
+		, sha1provider(this, "sha1", 20, 64)
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
 			throw ModuleException("enc_sha1 is deprecated and can not be used as a primary encryption method");
@@ -214,14 +182,7 @@ public:
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
-		SHA1Context context;
-
-		context.Update(reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
-		context.Finalize();
-
-		Encryption::Hash hash = context.GetFinalizedHash();
-
-		Anope::string buf = "sha1:" + Anope::Hex(reinterpret_cast<const char *>(hash.first), hash.second);
+		Anope::string buf = "sha1:" + Anope::Hex(sha1provider.Encrypt(src));
 
 		Log(LOG_DEBUG_2) << "(enc_sha1) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;

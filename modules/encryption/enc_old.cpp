@@ -18,20 +18,16 @@ class OldMD5Provider final
 	: public Encryption::Provider
 {
 public:
-	OldMD5Provider(Module *creator) : Encryption::Provider(creator, "oldmd5") { }
-
-	Encryption::Context *CreateContext(Encryption::IV *iv) override
+	OldMD5Provider(Module *creator)
+		: Encryption::Provider(creator, "oldmd5", 16, 64)
 	{
-		if (md5)
-			return md5->CreateContext(iv);
-		return NULL;
 	}
 
-	Encryption::IV GetDefaultIV() override
+	std::unique_ptr<Encryption::Context> CreateContext() override
 	{
 		if (md5)
-			return md5->GetDefaultIV();
-		return Encryption::IV(static_cast<const uint32_t *>(NULL), 0);
+			return md5->CreateContext();
+		return nullptr;
 	}
 };
 
@@ -60,17 +56,12 @@ public:
 		if (!md5)
 			return EVENT_CONTINUE;
 
-		Encryption::Context *context = md5->CreateContext();
-		context->Update(reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
-		context->Finalize();
-
-		Encryption::Hash hash = context->GetFinalizedHash();
-
 		char digest[32], digest2[16];
 		memset(digest, 0, sizeof(digest));
-		if (hash.second > sizeof(digest))
+		auto hash = md5->Encrypt(src);
+		if (hash.length() > sizeof(digest))
 			throw CoreException("Hash too large");
-		memcpy(digest, hash.first, hash.second);
+		memcpy(digest, hash.data(), hash.length());
 
 		for (int i = 0; i < 32; i += 2)
 			digest2[i / 2] = XTOI(digest[i]) << 4 | XTOI(digest[i + 1]);
@@ -79,7 +70,6 @@ public:
 
 		Log(LOG_DEBUG_2) << "(enc_old) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
-		delete context;
 		return EVENT_ALLOW;
 	}
 

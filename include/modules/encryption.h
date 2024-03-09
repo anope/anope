@@ -13,26 +13,89 @@
 
 namespace Encryption
 {
-	typedef std::pair<const unsigned char *, size_t> Hash;
-	typedef std::pair<const uint32_t *, size_t> IV;
-
+	/** Base class for encryption contexts. */
 	class Context
 	{
 	public:
 		virtual ~Context() = default;
+
+		/** Updates the encryption context with the specified data.
+		 * @param str The data to update the context with.
+		 */
+		inline void Update(const Anope::string &str)
+		{
+			Update(reinterpret_cast<const unsigned char *>(str.c_str()), str.length());
+		}
+
+		/** Updates the encryption context with the specified data.
+		 * @param data The data to update the context with.
+		 * @param len The length of the data.
+		 */
 		virtual void Update(const unsigned char *data, size_t len) = 0;
-		virtual void Finalize() = 0;
-		virtual Hash GetFinalizedHash() = 0;
+
+		/** Finalises the encryption context and returns the digest. */
+		virtual Anope::string Finalize() = 0;
 	};
 
+	/** Provider of encryption contexts. */
 	class Provider
 		: public Service
 	{
 	public:
-		Provider(Module *creator, const Anope::string &sname) : Service(creator, "Encryption::Provider", sname) { }
+		/** The byte size of the block cipher. */
+		const size_t block_size;
+
+		/** The byte size of the resulting digest. */
+		const size_t digest_size;
+
+		/** Creates a provider of encryption contexts.
+		 * @param creator The module that created this provider.
+		 * @param algorithm The name of the encryption algorithm.
+		 * @param bs The byte size of the block cipher.
+		 * @param ds The byte size of the resulting digest.
+		 */
+		Provider(Module *creator, const Anope::string &algorithm, size_t bs, size_t ds)
+			: Service(creator, "Encryption::Provider", algorithm)
+			, block_size(bs)
+			, digest_size(ds)
+		{
+		}
+
 		virtual ~Provider() = default;
 
-		virtual Context *CreateContext(IV * = NULL) = 0;
-		virtual IV GetDefaultIV() = 0;
+		/** Creates a new encryption context. */
+		virtual std::unique_ptr<Context> CreateContext() = 0;
+
+		template<typename... Args>
+		Anope::string Encrypt(Args &&...args)
+		{
+			auto context = CreateContext();
+			context->Update(std::forward<Args>(args)...);
+			return context->Finalize();
+		}
+	};
+
+	/** Helper template for creating simple providers of encryption contexts. */
+	template <typename T>
+	class SimpleProvider final
+		: public Provider
+	{
+	public:
+		/** Creates a simple provider of encryption contexts.
+		 * @param creator The module that created this provider.
+		 * @param algorithm The name of the encryption algorithm.
+		 * @param bs The byte size of the block cipher.
+		 * @param ds The byte size of the resulting digest.
+		 */
+		SimpleProvider(Module *creator, const Anope::string &algorithm, size_t bs, size_t ds)
+			: Provider(creator, algorithm, bs, ds)
+		{
+		}
+
+		/** @copydoc Encryption::Provider::CreateContext. */
+		std::unique_ptr<Context> CreateContext() override
+		{
+			return std::make_unique<T>();
+		}
 	};
 }

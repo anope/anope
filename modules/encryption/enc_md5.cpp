@@ -92,7 +92,6 @@ class MD5Context final
 	unsigned state[4]; /* state (ABCD) */
 	unsigned count[2]; /* number of bits, modulo 2^64 (lsb first) */
 	unsigned char buffer[64]; /* input buffer */
-	unsigned char digest[16]; /* final digest */
 
 	/* Constants for MD5Transform routine.
 	 */
@@ -229,19 +228,10 @@ class MD5Context final
 	}
 
 public:
-	MD5Context(Encryption::IV *iv = NULL)
+	MD5Context()
 	{
-		if (iv != NULL)
-		{
-			if (iv->second != 4)
-				throw CoreException("Invalid IV size");
-			/* Load magic initialization constants. */
-			for (int i = 0; i < 4; ++i)
-				this->state[i] = iv->first[i];
-		}
-		else
-			for (int i = 0; i < 4; ++i)
-				this->state[i] = md5_iv[i];
+		for (int i = 0; i < 4; ++i)
+			this->state[i] = md5_iv[i];
 
 		this->count[0] = this->count[1] = 0;
 		memset(this->buffer, 0, sizeof(this->buffer));
@@ -286,7 +276,7 @@ public:
 	/* MD5 finalization. Ends an MD5 message-digest opera
 	 * the message digest and zeroizing the context.
 	 */
-	void Finalize() override
+	Anope::string Finalize() override
 	{
 		unsigned char bits[8];
 		unsigned index, padLen;
@@ -301,6 +291,7 @@ public:
 
 		/* Append length (before padding) */
 		this->Update(bits, 8);
+		unsigned char digest[16]; /* final digest */
 		/* Store state in digest */
 		this->Encode(digest, this->state, 16);
 
@@ -308,45 +299,21 @@ public:
 		memset(this->state, 0, sizeof(this->state));
 		memset(this->count, 0, sizeof(this->count));
 		memset(this->buffer, 0, sizeof(this->buffer));
-	}
 
-	Encryption::Hash GetFinalizedHash() override
-	{
-		Encryption::Hash hash;
-		hash.first = this->digest;
-		hash.second = sizeof(this->digest);
-		return hash;
-	}
-};
-
-class MD5Provider final
-	: public Encryption::Provider
-{
-public:
-	MD5Provider(Module *creator) : Encryption::Provider(creator, "md5") { }
-
-	Encryption::Context *CreateContext(Encryption::IV *iv) override
-	{
-		return new MD5Context(iv);
-	}
-
-	Encryption::IV GetDefaultIV() override
-	{
-		Encryption::IV iv;
-		iv.first = md5_iv;
-		iv.second = sizeof(md5_iv) / sizeof(uint32_t);
-		return iv;
+		return Anope::string(reinterpret_cast<const char *>(&digest), sizeof(digest));
 	}
 };
 
 class EMD5 final
 	: public Module
 {
-	MD5Provider md5provider;
+private:
+	Encryption::SimpleProvider<MD5Context> md5provider;
 
 public:
-	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
-		md5provider(this)
+	EMD5(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, ENCRYPTION | VENDOR)
+		, md5provider(this, "md5", 16, 64)
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
 			throw ModuleException("enc_md5 is deprecated and can not be used as a primary encryption method");
@@ -354,14 +321,7 @@ public:
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
-		MD5Context context;
-
-		context.Update(reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
-		context.Finalize();
-
-		Encryption::Hash hash = context.GetFinalizedHash();
-
-		Anope::string buf = "md5:" + Anope::Hex(reinterpret_cast<const char *>(hash.first), hash.second);
+		Anope::string buf = "md5:" + Anope::Hex(md5provider.Encrypt(src));
 
 		Log(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;

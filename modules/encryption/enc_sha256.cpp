@@ -151,26 +151,22 @@ class SHA256Context final
 	unsigned len;
 	unsigned char block[2 * SHA256_BLOCK_SIZE];
 	uint32_t h[8];
-	unsigned char digest[SHA256_DIGEST_SIZE];
 
 public:
-	SHA256Context(Encryption::IV *iv)
+	SHA256Context()
 	{
-		if (iv != NULL)
-		{
-			if (iv->second != 8)
-				throw CoreException("Invalid IV size");
-			for (int i = 0; i < 8; ++i)
-				this->h[i] = iv->first[i];
-		}
-		else
-			for (int i = 0; i < 8; ++i)
-				this->h[i] = sha256_h0[i];
+		for (int i = 0; i < 8; ++i)
+			this->h[i] = sha256_h0[i];
 
 		this->tot_len = 0;
 		this->len = 0;
 		memset(this->block, 0, sizeof(this->block));
-		memset(this->digest, 0, sizeof(this->digest));
+	}
+
+	void SetIV(uint32_t* iv)
+	{
+		for (int i = 0; i < 8; ++i)
+			this->h[i] = iv[i];
 	}
 
 	void Update(const unsigned char *message, size_t mlen) override
@@ -195,7 +191,7 @@ public:
 		this->tot_len += (block_nb + 1) << 6;
 	}
 
-	void Finalize() override
+	Anope::string Finalize() override
 	{
 		unsigned block_nb = 1 + ((SHA256_BLOCK_SIZE - 9) < (this->len % SHA256_BLOCK_SIZE));
 		unsigned len_b = (this->tot_len + this->len) << 3;
@@ -204,43 +200,20 @@ public:
 		this->block[this->len] = 0x80;
 		UNPACK32(len_b, this->block + pm_len - 4);
 		this->Transform(this->block, block_nb);
+		unsigned char digest[SHA256_DIGEST_SIZE];
+		memset(digest, 0, sizeof(digest));
 		for (int i = 0 ; i < 8; ++i)
-			UNPACK32(this->h[i], &this->digest[i << 2]);
-	}
+			UNPACK32(this->h[i], &digest[i << 2]);
 
-	Encryption::Hash GetFinalizedHash() override
-	{
-		Encryption::Hash hash;
-		hash.first = this->digest;
-		hash.second = SHA256_DIGEST_SIZE;
-		return hash;
-	}
-};
-
-class SHA256Provider final
-	: public Encryption::Provider
-{
-public:
-	SHA256Provider(Module *creator) : Encryption::Provider(creator, "sha256") { }
-
-	Encryption::Context *CreateContext(Encryption::IV *iv) override
-	{
-		return new SHA256Context(iv);
-	}
-
-	Encryption::IV GetDefaultIV() override
-	{
-		Encryption::IV iv;
-		iv.first = sha256_h0;
-		iv.second = sizeof(sha256_h0) / sizeof(uint32_t);
-		return iv;
+		return Anope::string(reinterpret_cast<const char *>(&digest), sizeof(digest));
 	}
 };
 
 class ESHA256 final
 	: public Module
 {
-	SHA256Provider sha256provider;
+private:
+	Encryption::SimpleProvider<SHA256Context> sha256provider;
 
 	unsigned iv[8];
 	bool use_iv;
@@ -275,8 +248,9 @@ class ESHA256 final
 	}
 
 public:
-	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
-		sha256provider(this)
+	ESHA256(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, ENCRYPTION | VENDOR)
+		, sha256provider(this, "sha256", SHA256_BLOCK_SIZE, SHA256_DIGEST_SIZE)
 	{
 		use_iv = false;
 	}
@@ -288,15 +262,13 @@ public:
 		else
 			use_iv = false;
 
-		Encryption::IV initialization(this->iv, 8);
-		SHA256Context ctx(&initialization);
+		SHA256Context ctx;
+		ctx.SetIV(this->iv);
 		ctx.Update(reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
-		ctx.Finalize();
-
-		Encryption::Hash hash = ctx.GetFinalizedHash();
+		auto hash = ctx.Finalize();
 
 		std::stringstream buf;
-		buf << "sha256:" << Anope::Hex(reinterpret_cast<const char *>(hash.first), hash.second) << ":" << GetIVString();
+		buf << "sha256:" << Anope::Hex(hash) << ":" << GetIVString();
 		Log(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
 		dest = buf.str();
 		return EVENT_ALLOW;

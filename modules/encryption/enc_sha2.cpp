@@ -100,24 +100,6 @@ private:
 		return nullptr;
 	}
 
-	Anope::string HMAC(Encryption::Provider *provider, const Anope::string &key, const Anope::string &data)
-	{
-		auto keybuf = key.length() > provider->block_size ? provider->Encrypt(key) : key;
-		keybuf.resize(provider->block_size);
-
-		Anope::string hmac1;
-		Anope::string hmac2;
-		for (size_t i = 0; i < provider->block_size; ++i)
-		{
-			hmac1.push_back(static_cast<char>(keybuf[i] ^ 0x5C));
-			hmac2.push_back(static_cast<char>(keybuf[i] ^ 0x36));
-		}
-		hmac2.append(data);
-		hmac1.append(provider->Encrypt(hmac2));
-
-		return provider->Encrypt(hmac1);
-	}
-
 public:
 	ESHA2(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, ENCRYPTION | VENDOR)
@@ -139,7 +121,7 @@ public:
 			return EVENT_CONTINUE;
 
 		auto key = GenerateKey(defaultprovider->digest_size);
-		auto hmac = HMAC(defaultprovider, key, src);
+		auto hmac = defaultprovider->HMAC(key, src);
 		auto enc = "hmac-" + defaultprovider->name + ":" + Anope::Hex(hmac) + ":" + Anope::Hex(key);
 		Log(LOG_DEBUG_2) << "(enc_sha2) hashed password from [" << src << "] to [" << enc << "]";
 		dest = enc;
@@ -174,7 +156,7 @@ public:
 		Anope::string key;
 		Anope::Unhex(key_hex, key);
 
-		auto enc = Anope::Hex(HMAC(provider, key, req->GetPassword()));
+		auto enc = Anope::Hex(provider->HMAC(key, req->GetPassword()));
 		if (pass_hex.equals_cs(enc))
 		{
 			// If we are NOT the first encryption module or the algorithm is

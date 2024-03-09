@@ -73,6 +73,27 @@ namespace Encryption
 			context->Update(std::forward<Args>(args)...);
 			return context->Finalize();
 		}
+
+		inline Anope::string HMAC(const Anope::string &key, const Anope::string &data)
+		{
+			if (!block_size)
+				return {};
+
+			auto keybuf = key.length() > block_size ? Encrypt(key) : key;
+			keybuf.resize(block_size);
+
+			Anope::string hmac1;
+			Anope::string hmac2;
+			for (size_t i = 0; i < block_size; ++i)
+			{
+				hmac1.push_back(static_cast<char>(keybuf[i] ^ 0x5C));
+				hmac2.push_back(static_cast<char>(keybuf[i] ^ 0x36));
+			}
+			hmac2.append(data);
+			hmac1.append(Encrypt(hmac2));
+
+			return Encrypt(hmac1);
+		}
 	};
 
 	/** Helper template for creating simple providers of encryption contexts. */

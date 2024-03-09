@@ -444,6 +444,13 @@ private:
 	{
 		Uplink::Send(user, "SVS2MODE", c->name, "-b", u->GetUID());
 	}
+
+	bool IsTagValid(const Anope::string &tname, const Anope::string &tvalue) override
+	{
+		if (Servers::Capab.count("MTAGS"))
+			return true;
+		return false;
+	}
 };
 
 class UnrealExtBan

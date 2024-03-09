@@ -17,6 +17,9 @@
 #include "channels.h"
 #include "hashcomp.h"
 
+#include <stack>
+#include <stdexcept>
+
 using Configuration::File;
 using Configuration::Conf;
 using Configuration::Internal::Block;

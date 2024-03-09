@@ -13,6 +13,8 @@
 #include "threadengine.h"
 #include "anope.h"
 
+#include <stdexcept>
+
 static void *entry_point(void *parameter)
 {
 	Thread *thread = static_cast<Thread *>(parameter);

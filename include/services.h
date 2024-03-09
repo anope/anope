@@ -11,38 +11,32 @@
 
 #pragma once
 
+#include <cstdarg>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+
+#include <algorithm>
+#include <bitset>
+#include <deque>
+#include <exception>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <map>
+#include <set>
+#include <sstream>
+#include <vector>
+
+#ifndef _WIN32
+# include <unistd.h>
+#endif
+
+#include "defs.h"
 #include "sysconf.h"
 
 #define BUFSIZE 1024
-
-#include <cstdio>
-#include <cstdlib>
-#include <cstdarg>
-#include <stdexcept>
-
-#include <cstring>
-
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-
-/* Pull in the various bits of STL */
-#include <cstdint>
-#include <cstddef>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <map>
-#include <exception>
-#include <list>
-#include <vector>
-#include <deque>
-#include <bitset>
-#include <set>
-#include <algorithm>
-#include <iterator>
-
-#include "defs.h"
 
 #define _(x) x
 

@@ -15,7 +15,6 @@
 #include "regchannel.h"
 #include "users.h"
 #include "opertype.h"
-#include <stack>
 
 namespace Configuration
 {

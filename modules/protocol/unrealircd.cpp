@@ -194,7 +194,7 @@ private:
 	*/
 	void SendSQLine(User *, const XLine *x) override
 	{
-		Uplink::Send("SQLINE", x->mask, x->GetReason());
+		Uplink::Send("TKL", '+', 'Q', "*", x->mask, x->by, x->expires, x->created, x->GetReason());
 	}
 
 	/* Functions that use serval cmd functions */

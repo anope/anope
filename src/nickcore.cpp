@@ -18,25 +18,22 @@
 Serialize::Checker<nickcore_map> NickCoreList("NickCore");
 nickcoreid_map NickCoreIdList;
 
-NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid) : Serializable("NickCore"), chanaccess("ChannelInfo"), aliases("NickAlias")
+NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid)
+	: Serializable("NickCore")
+	, chanaccess("ChannelInfo")
+	, id(coreid)
+	, display(coredisplay)
+	, aliases("NickAlias")
 {
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
 
-	this->o = NULL;
-	this->channelcount = 0;
-	this->lastmail = 0;
+	if (!NickCoreList->insert_or_assign(this->display, this).second)
+		Log(LOG_DEBUG) << "Duplicate account " << this->display << " in NickCore table";
 
-	this->display = coredisplay;
-	this->id = coreid;
-
-	size_t old = NickCoreList->size();
-	(*NickCoreList)[this->display] = this;
-	if (old == NickCoreList->size())
-		Log(LOG_DEBUG) << "Duplicate account " << coredisplay << " in nickcore table?";
-
-	if (this->id)
-		NickCoreIdList[this->id] = this;
+	// Upgrading users may not have an account identifier.
+	if (this->id && !NickCoreIdList.insert_or_assign(this->id, this).second)
+		Log(LOG_DEBUG) << "Duplicate account id " << this->id << " in NickCore table";
 
 	FOREACH_MOD(OnNickCoreCreate, (this));
 }

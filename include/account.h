@@ -33,7 +33,7 @@ class CoreExport NickAlias final
 	, public Extensible
 {
 	Anope::string vhost_ident, vhost_host, vhost_creator;
-	time_t vhost_created;
+	time_t vhost_created = 0;
 
 public:
 	Anope::string nick;
@@ -43,8 +43,9 @@ public:
 	Anope::string last_usermask;
 	/* Last uncloaked usermask, requires nickserv/auspex to see */
 	Anope::string last_realhost;
-	time_t time_registered;
-	time_t last_seen;
+	time_t time_registered = Anope::CurTime;
+	time_t last_seen = Anope::CurTime;
+
 	/* Account this nick is tied to. Multiple nicks can be tied to a single account. */
 	Serialize::Reference<NickCore> nc;
 
@@ -136,14 +137,14 @@ public:
 	Serialize::Checker<std::vector<NickAlias *> > aliases;
 
 	/* Set if this user is a services operator. o->ot must exist. */
-	Oper *o;
+	Oper *o = nullptr;
 
 	/* Unsaved data */
 
 	/* Number of channels registered by this account */
-	uint16_t channelcount;
+	uint16_t channelcount = 0;
 	/* Last time an email was sent to this user */
-	time_t lastmail;
+	time_t lastmail = 0;
 	/* Users online now logged into this account */
 	std::list<User *> users;
 

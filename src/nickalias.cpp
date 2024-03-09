@@ -20,22 +20,20 @@
 
 Serialize::Checker<nickalias_map> NickAliasList("NickAlias");
 
-NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore) : Serializable("NickAlias")
+NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
+	: Serializable("NickAlias")
+	, nick(nickname)
+	, nc(nickcore)
 {
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickAlias constructor");
 	else if (!nickcore)
 		throw CoreException("Empty nickcore passed to NickAlias constructor");
 
-	this->time_registered = this->last_seen = Anope::CurTime;
-	this->nick = nickname;
-	this->nc = nickcore;
 	nickcore->aliases->push_back(this);
 
-	size_t old = NickAliasList->size();
-	(*NickAliasList)[this->nick] = this;
-	if (old == NickAliasList->size())
-		Log(LOG_DEBUG) << "Duplicate nick " << nickname << " in nickalias table";
+	if (!NickAliasList->insert_or_assign(this->nick, this).second)
+		Log(LOG_DEBUG) << "Duplicate nick " << this->nick << " in NickAlias table";
 
 	if (this->nc->o == NULL)
 	{

@@ -285,7 +285,7 @@ public:
 						BotInfo *OperServ = Config->GetClient("OperServ");
 						if (IRCD->CanSQLineChannel && OperServ)
 						{
-							time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "15s");
+							time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "1m");
 							XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
 							IRCD->SendSQLine(NULL, &x);
 						}
@@ -486,7 +486,7 @@ public:
 			ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 			if (IRCD->CanSQLineChannel)
 			{
-				time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "15s");
+				time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "1m");
 				XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
 				IRCD->SendSQLine(NULL, &x);
 			}

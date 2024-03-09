@@ -336,7 +336,7 @@ class CommandCSMode final
 							continue;
 						}
 
-						if (modelocks->GetMLock().size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "32"))
+						if (modelocks->GetMLock().size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "50"))
 						{
 							source.Reply(_("The mode lock list of \002%s\002 is full."), ci->name.c_str());
 							continue;

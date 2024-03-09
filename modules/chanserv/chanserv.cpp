@@ -52,7 +52,7 @@ public:
 			 * @param chan The channel
 			 */
 			ChanServTimer(Reference<BotInfo> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan)
-				: Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s"))
+				: Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "1m"))
 				, ChanServ(cs)
 				, inhabit(i)
 				, c(chan)

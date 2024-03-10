@@ -196,7 +196,7 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message() << "SQLINE " << x->mask << " :" << x->GetReason();
+		UplinkSocket::Message() << "TKL + Q * " << x->mask << " " << x->by << " " << x->expires << " " << x->created << " :" << x->GetReason();
 	}
 
 	/* Functions that use serval cmd functions */

@@ -72,6 +72,7 @@ namespace Encryption
 		/** Creates a new encryption context. */
 		virtual std::unique_ptr<Context> CreateContext() = 0;
 
+		/** Quickly encrypts the specified values and returns the digest. */
 		template<typename... Args>
 		Anope::string Encrypt(Args &&...args)
 		{
@@ -80,6 +81,7 @@ namespace Encryption
 			return context->Finalize();
 		}
 
+		/** Calculates the  RFC 2104 hash-based message authentication code for the specified data. */
 		inline Anope::string HMAC(const Anope::string &key, const Anope::string &data)
 		{
 			if (!block_size)

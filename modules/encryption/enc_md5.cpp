@@ -61,18 +61,10 @@ public:
 		});
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
-	{
-		auto enc = "md5:" + Anope::Hex(md5provider.Encrypt(src));
-		Log(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << enc << "]";
-		dest = enc;
-		return EVENT_ALLOW;
-	}
-
 	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const auto *na = NickAlias::Find(req->GetAccount());
-		if (na == NULL)
+		if (!na)
 			return;
 
 		NickCore *nc = na->nc;
@@ -84,8 +76,7 @@ public:
 		if (!hash_method.equals_cs("md5"))
 			return;
 
-		Anope::string enc;
-		this->OnEncrypt(req->GetPassword(), enc);
+		auto enc = "md5:" + Anope::Hex(md5provider.Encrypt(req->GetPassword()));
 		if (nc->pass.equals_cs(enc))
 		{
 			// If we are NOT the first encryption module we want to re-encrypt

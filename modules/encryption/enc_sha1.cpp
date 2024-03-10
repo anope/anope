@@ -185,33 +185,26 @@ public:
 		});
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
-	{
-		Anope::string buf = "sha1:" + Anope::Hex(sha1provider.Encrypt(src));
-
-		Log(LOG_DEBUG_2) << "(enc_sha1) hashed password from [" << src << "] to [" << buf << "]";
-		dest = buf;
-		return EVENT_ALLOW;
-	}
-
 	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
-		const NickAlias *na = NickAlias::Find(req->GetAccount());
-		if (na == NULL)
+		const auto *na = NickAlias::Find(req->GetAccount());
+		if (!na)
 			return;
-		NickCore *nc = na->nc;
 
-		size_t pos = nc->pass.find(':');
+		NickCore *nc = na->nc;
+		auto pos = nc->pass.find(':');
 		if (pos == Anope::string::npos)
 			return;
+
 		Anope::string hash_method(nc->pass.begin(), nc->pass.begin() + pos);
 		if (!hash_method.equals_cs("sha1"))
 			return;
 
-		Anope::string buf;
-		this->OnEncrypt(req->GetPassword(), buf);
-		if (nc->pass.equals_cs(buf))
+		auto enc = "sha1:" + Anope::Hex(sha1provider.Encrypt(req->GetPassword()));
+		if (nc->pass.equals_cs(enc))
 		{
+			// If we are NOT the first encryption module we want to re-encrypt
+			// the password with the primary encryption method.
 			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
 				Anope::Encrypt(req->GetPassword(), nc->pass);
 			req->Success(this);

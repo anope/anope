@@ -48,16 +48,7 @@ private:
 			PACK32(reinterpret_cast<unsigned char *>(&buf2[i << 2]), &iv[i]);
 	}
 
-public:
-	ESHA256(const Anope::string &modname, const Anope::string &creator)
-		: Module(modname, creator, ENCRYPTION | VENDOR)
-	{
-		use_iv = false;
-		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
-			throw ModuleException("enc_sha256 is deprecated and can not be used as a primary encryption method");
-	}
-
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
+	Anope::string EncryptInternal(const Anope::string &src)
 	{
 		if (!use_iv)
 			NewRandomIV();
@@ -73,36 +64,40 @@ public:
 		sha256_final(&ctx, digest);
 		Anope::string hash(reinterpret_cast<const char *>(&digest), sizeof(digest));
 
-		std::stringstream buf;
-		buf << "sha256:" << Anope::Hex(hash) << ":" << GetIVString();
-		Log(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
-		dest = buf.str();
-		return EVENT_ALLOW;
+		return Anope::Hex(hash) + ":" + GetIVString();
+	}
+
+public:
+	ESHA256(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, ENCRYPTION | VENDOR)
+	{
+		use_iv = false;
+		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			throw ModuleException("enc_sha256 is deprecated and can not be used as a primary encryption method");
 	}
 
 	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
-		const NickAlias *na = NickAlias::Find(req->GetAccount());
-		if (na == NULL)
+		const auto *na = NickAlias::Find(req->GetAccount());
+		if (!na)
 			return;
-		NickCore *nc = na->nc;
 
-		size_t pos = nc->pass.find(':');
+		NickCore *nc = na->nc;
+		auto pos = nc->pass.find(':');
 		if (pos == Anope::string::npos)
 			return;
+
 		Anope::string hash_method(nc->pass.begin(), nc->pass.begin() + pos);
 		if (!hash_method.equals_cs("sha256"))
 			return;
 
 		GetIVFromPass(nc->pass);
 		use_iv = true;
-		Anope::string buf;
-		this->OnEncrypt(req->GetPassword(), buf);
-		if (nc->pass.equals_cs(buf))
+		auto enc = EncryptInternal(req->GetPassword());
+		if (nc->pass.equals_cs(enc))
 		{
-			/* if we are NOT the first module in the list or we are using a default IV
-			 * we want to re-encrypt the pass with the new encryption
-			 */
+			// If we are NOT the first encryption module we want to re-encrypt
+			// the password with the primary encryption method.
 			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
 				Anope::Encrypt(req->GetPassword(), nc->pass);
 			req->Success(this);

@@ -104,6 +104,13 @@ public:
 	{
 		return std::make_unique<Argon2Context>(this->type);
 	}
+
+	Anope::string ToPrintable(const Anope::string &hash) override
+	{
+		// We have no way to make this printable without the creating context
+		// so we always return the printed form.
+		return hash;
+	}
 };
 
 

@@ -66,7 +66,18 @@ namespace Encryption
 		/** Checks whether a plain text value matches a hash created by this provider. */
 		virtual bool Compare(const Anope::string &hash, const Anope::string &plain)
 		{
-			return hash.equals_cs(plain);
+			return !hash.empty() && hash.equals_cs(ToPrintable(Encrypt(plain)));
+		}
+
+		/** Called on initialising a encryption provider to check it works properly. */
+		void Check(const Anope::map<Anope::string> &checks)
+		{
+			for (const auto &[hash, plain] : checks)
+			{
+				if (!Compare(hash, plain))
+					throw ModuleException("BUG: unable to generate " + this->name + " hashes safely! Please report this!");
+			}
+			Log(LOG_DEBUG) << "The " << this->name << " encryption provider appears to be working correctly.";
 		}
 
 		/** Creates a new encryption context. */
@@ -101,6 +112,12 @@ namespace Encryption
 			hmac1.append(Encrypt(hmac2));
 
 			return Encrypt(hmac1);
+		}
+
+		/** Converts a hash to its printable form. */
+		virtual Anope::string ToPrintable(const Anope::string &hash)
+		{
+			return Anope::Hex(hash);
 		}
 	};
 

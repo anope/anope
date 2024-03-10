@@ -156,29 +156,41 @@ public:
 			return;
 
 		Anope::string hash_method(nc->pass.begin(), nc->pass.begin() + apos);
-		if (hash_method.compare(0, 5, "hmac-", 5))
-			return; // Not a HMAC hash.
+		bool is_hmac = !hash_method.compare(0, 5, "hmac-", 5);
+		if (!is_hmac && hash_method.compare(0, 4, "raw-", 4))
+			return; // Not a SHA-2 password.
 
 		auto provider = GetAlgorithm(hash_method.substr(5));
 		if (!provider)
 			return; // Not a hash for this module.
 
-		auto bpos = nc->pass.find(':', apos + 1);
-		if (bpos == Anope::string::npos)
-			return; // No HMAC key.
-
-		Anope::string pass_hex(nc->pass.begin() + apos + 1, nc->pass.begin() + bpos);
-		Anope::string key_hex(nc->pass.begin() + bpos + 1, nc->pass.end());
-		Anope::string key;
-		Anope::Unhex(key_hex, key);
-
-		auto enc = Anope::Hex(provider->HMAC(key, req->GetPassword()));
-		if (pass_hex.equals_cs(enc))
+		auto valid = false;
+		if (is_hmac)
 		{
-			// If we are NOT the first encryption module or the algorithm is
-			// different we want to re-encrypt the password with the primary
-			// encryption method.
-			if (ModuleManager::FindFirstOf(ENCRYPTION) != this || provider != defaultprovider)
+			auto bpos = nc->pass.find(':', apos + 1);
+			if (bpos == Anope::string::npos)
+				return; // No HMAC key.
+
+			Anope::string pass_hex(nc->pass.begin() + apos + 1, nc->pass.begin() + bpos);
+			Anope::string key_hex(nc->pass.begin() + bpos + 1, nc->pass.end());
+			Anope::string key;
+			Anope::Unhex(key_hex, key);
+
+			auto enc = Anope::Hex(provider->HMAC(key, req->GetPassword()));
+			valid = pass_hex.equals_cs(enc);
+		}
+		else
+		{
+			Anope::string pass_hex(nc->pass.begin() + apos + 1, nc->pass.end());
+			valid = provider->Compare(pass_hex, req->GetPassword());
+		}
+
+		if (valid)
+		{
+			// If we are NOT the first encryption module, the password is a raw
+			// hash, or the algorithm is different we want to re-encrypt the
+			// password with the primary encryption method.
+			if (ModuleManager::FindFirstOf(ENCRYPTION) != this || !is_hmac || provider != defaultprovider)
 				Anope::Encrypt(req->GetPassword(), nc->pass);
 			req->Success(this);
 		}

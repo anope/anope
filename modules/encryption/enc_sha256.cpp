@@ -103,7 +103,7 @@ public:
 			/* if we are NOT the first module in the list or we are using a default IV
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (ModuleManager::FindFirstOf(ENCRYPTION) != this || !memcmp(iv, sha256_h0, 8))
+			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
 				Anope::Encrypt(req->GetPassword(), nc->pass);
 			req->Success(this);
 		}

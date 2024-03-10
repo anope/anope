@@ -428,8 +428,8 @@ private:
 		// pbkdf2v2          NO
 		// rawmd5            Converted to enc_md5
 		// rawsha1           Converted to enc_sha1
-		// rawsha2-256       Converted to enc_sha256
-		// rawsha2-512       NO
+		// rawsha2-256       Converted to enc_sha2
+		// rawsha2-512       Converted to enc_sha2
 		// scrypt            NO
 		if (pass.compare(0, 18, "$anope$enc_sha256$", 18) == 0)
 		{
@@ -466,7 +466,10 @@ private:
 			nc->pass = "sha1:" + pass.substr(9);
 
 		else if (pass.compare(0, 11, "$rawsha256$", 11) == 0)
-			nc->pass = "sha256:" + pass.substr(11) + ":6a09e667bb67ae853c6ef372a54ff53a510e527f9b05688c1f83d9ab5be0cd19";
+			nc->pass = "raw-sha256:" + pass.substr(11);
+
+		else if (pass.compare(0, 11, "$rawsha512$", 11) == 0)
+			nc->pass = "raw-sha512:" + pass.substr(11);
 
 		else if (pass.compare(0, 4, "$2a$", 4) == 0 || pass.compare(0, 4, "$2b$", 4) == 0)
 			nc->pass = "bcrypt:" + pass;

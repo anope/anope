@@ -39,6 +39,29 @@
  * }
  * 
  * 
+ * method: validate 
+ * this is a quick method to check current ticket validity.
+ * 
+ * 
+ * [REQUEST]:
+ * Headers:
+ *  Content-Type: "application/json"
+ * 
+ * Body:
+ * {
+ *   "method": "auth",
+ *   "ticket": {
+ *       "ticket": "brEJHU976XlOLikD2q0ky5EHbwDdb2Jb",
+ *       "username": "synmuffin"
+ *   }
+ * }
+ * 
+ * [RESPONSE]:
+ * {
+ *  "valid": "true|false"
+ * }
+ * 
+ * 
  * method: command
  * this is just like running any other services command. give the service, the command name
  * an array of parameters and lastly the ticket object that consistest of the ticket and
@@ -50,14 +73,14 @@
  * 
  * Body:
  * {
- *   "method": "command",
- *   "service": "chanserv",
- *   "command": "op",
- *   "params": ["#help", "some_user"],
  *   "ticket": {
  *       "ticket": "brEJHU976XlOLikD2q0ky5EHbwDdb2Jb",
  *       "username": "irc_nickname"
- *   }
+ *   },
+ *   "method": "command",
+ *   "service": "chanserv",
+ *   "command": "op",
+ *   "params": ["#help", "some_user"]
  * }
  * 
  * [RESPONSE]:

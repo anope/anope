@@ -1,4 +1,5 @@
 [requires]
+argon2/20190702
 libmysqlclient/8.1.0
 openssl/3.2.1
 pcre2/10.42
@@ -7,6 +8,7 @@ gettext/0.21
 libgettext/0.22
 
 [options]
+argon2/*:shared=True
 libmysqlclient/*:shared=True
 openssl/*:shared=True
 pcre2/*:shared=True

@@ -63,6 +63,12 @@ namespace Encryption
 
 		virtual ~Provider() = default;
 
+		/** Checks whether a plain text value matches a hash created by this provider. */
+		virtual bool Compare(const Anope::string &hash, const Anope::string &plain)
+		{
+			return hash.equals_cs(plain);
+		}
+
 		/** Creates a new encryption context. */
 		virtual std::unique_ptr<Context> CreateContext() = 0;
 

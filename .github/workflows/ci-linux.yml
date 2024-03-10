@@ -20,6 +20,7 @@ jobs:
             g++ \
             gettext \
             git \
+            libargon2-dev \
             libgnutls28-dev \
             libldap2-dev \
             libmysqlclient-dev \

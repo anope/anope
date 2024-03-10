@@ -19,6 +19,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../conanbuildinfo.cmake")
     file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/extra/${NAME}.cpp" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}")
   endfunction()
 
+  enable_extra("enc_argon2" "ARGON2")
   enable_extra("mysql" "LIBMYSQLCLIENT")
   enable_extra("regex_pcre2" "PCRE2")
   enable_extra("sqlite" "SQLITE3")

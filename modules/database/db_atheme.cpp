@@ -416,7 +416,7 @@ private:
 		// some of them currently.
 		//
 		// anope-enc-sha256  Converted to enc_sha256
-		// argon2            NO
+		// argon2            Converted to enc_argon2
 		// base64            Converted to the first encryption algorithm
 		// bcrypt            Converted to enc_bcrypt
 		// crypt3-des        NO
@@ -439,6 +439,15 @@ private:
 			Anope::B64Decode(pass.substr(sep + 1), pass);
 			nc->pass = "sha256:" + Anope::Hex(pass) + ":" + Anope::Hex(iv);
 		}
+
+		else if (pass.compare(0, 9, "$argon2d$", 9) == 0)
+			nc->pass = "argon2d:" + pass;
+
+		else if (pass.compare(0, 9, "$argon2i$", 9) == 0)
+			nc->pass = "argon2i:" + pass;
+
+		else if (pass.compare(0, 10, "$argon2id$", 10) == 0)
+			nc->pass = "argon2id:" + pass;
 
 		else if (pass.compare(0, 8, "$base64$", 8) == 0)
 		{

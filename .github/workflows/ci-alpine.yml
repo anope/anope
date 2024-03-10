@@ -20,6 +20,7 @@ jobs:
           echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
           apk update
           apk add \
+            argon2-dev \
             clang \
             cmake \
             g++ \
@@ -36,7 +37,7 @@ jobs:
 
       - name: Enable extras
         run: |
-          for MODULE in ldap mysql regex_pcre2 regex_posix regex_tre sqlite ssl_gnutls ssl_openssl
+          for MODULE in enc_argon2 ldap mysql regex_pcre2 regex_posix regex_tre sqlite ssl_gnutls ssl_openssl
           do
             ln -s $PWD/modules/extra/$MODULE.cpp $PWD/modules
           done

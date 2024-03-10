@@ -1,4 +1,4 @@
-/* Module for providing bcrypt hashing
+/* Module for providing SHA-2 hashing
  *
  * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org

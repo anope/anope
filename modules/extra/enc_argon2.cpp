@@ -113,7 +113,6 @@ public:
 	}
 };
 
-
 class EArgon2 final
 	: public Module
 {

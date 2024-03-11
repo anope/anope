@@ -211,10 +211,17 @@ public:
 			source.Reply(MAIL_X_INVALID, email.c_str());
 		else
 		{
+			Anope::string encpass;
+			if (!Anope::Encrypt(pass, encpass))
+			{
+				source.Reply(_("Accounts can not be registered right now. Please try again later."));
+				return;
+			}
+
 			auto *nc = new NickCore(u_nick);
 			auto *na = new NickAlias(u_nick, nc);
-			Anope::Encrypt(pass, nc->pass);
 			nc->email = email;
+			nc->pass = encpass;
 
 			if (u)
 			{

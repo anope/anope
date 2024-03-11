@@ -148,9 +148,13 @@ public:
 			return;
 		}
 
-		Log(LOG_COMMAND, source, this) << "to change their password";
+		if (!Anope::Encrypt(param, source.nc->pass))
+		{
+			source.Reply(_("Passwords can not be changed right now. Please try again later."));
+			return;
+		}
 
-		Anope::Encrypt(param, source.nc->pass);
+		Log(LOG_COMMAND, source, this) << "to change their password";
 		source.Reply(_("Password for \002%s\002 changed."), source.nc->display.c_str());
 	}
 
@@ -218,10 +222,13 @@ public:
 			return;
 		}
 
-		Log(LOG_ADMIN, source, this) << "to change the password of " << nc->display;
+		if (!Anope::Encrypt(params[1], nc->pass))
+		{
+			source.Reply(_("Passwords can not be changed right now. Please try again later."));
+			return;
+		}
 
-		Anope::Encrypt(params[1], nc->pass);
-		Anope::string tmp_pass;
+		Log(LOG_ADMIN, source, this) << "to change the password of " << nc->display;
 		source.Reply(_("Password for \002%s\002 changed."), nc->display.c_str());
 	}
 

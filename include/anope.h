@@ -470,7 +470,7 @@ namespace Anope
 	 * @param src The source string to encrypt
 	 * @param dest The destination where the encrypted string is placed
 	 */
-	extern CoreExport void Encrypt(const Anope::string &src, Anope::string &dest);
+	extern CoreExport bool Encrypt(const Anope::string &src, Anope::string &dest);
 
 	/** Hashes a buffer with SipHash-2-4
 	 * @param src The start of the buffer to hash

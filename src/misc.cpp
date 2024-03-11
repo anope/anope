@@ -494,11 +494,11 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 	return m == mask_len;
 }
 
-void Anope::Encrypt(const Anope::string &src, Anope::string &dest)
+bool Anope::Encrypt(const Anope::string &src, Anope::string &dest)
 {
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(OnEncrypt, MOD_RESULT, (src, dest));
-	static_cast<void>(MOD_RESULT);
+	return MOD_RESULT == EVENT_ALLOW &&!dest.empty();
 }
 
 Anope::string Anope::printf(const char *fmt, ...)

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-09 21:00+0000\n"
-"PO-Revision-Date: 2024-03-09 21:00+0000\n"
+"POT-Creation-Date: 2024-03-11 19:36+0000\n"
+"PO-Revision-Date: 2024-03-11 19:36+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1802,6 +1802,9 @@ msgstr "Account"
 #, c-format
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "Account %s has already reached the maximum number of simultaneous logins (%u)."
+
+msgid "Accounts can not be registered right now. Please try again later."
+msgstr "Accounts can not be registered right now. Please try again later."
 
 msgid "Activate the requested vHost for the given nick."
 msgstr "Activate the requested vHost for the given nick."
@@ -5291,6 +5294,9 @@ msgstr "Password incorrect."
 #, c-format
 msgid "Password reset email for %s has been sent."
 msgstr "Password reset email for %s has been sent."
+
+msgid "Passwords can not be changed right now. Please try again later."
+msgstr "Passwords can not be changed right now. Please try again later."
 
 #, c-format
 msgid "Passwords encrypted with %s: %zu"

@@ -2304,17 +2304,6 @@ struct IRCDMessageSQuit final
 	}
 };
 
-struct IRCDMessageTime final
-	: IRCDMessage
-{
-	IRCDMessageTime(Module *creator) : IRCDMessage(creator, "TIME", 2) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
-	{
-		Uplink::Send("TIME", source.GetSource(), params[1], Anope::CurTime);
-	}
-};
-
 struct IRCDMessageUID final
 	: IRCDMessage
 {
@@ -2383,6 +2372,7 @@ class ProtoInspIRCd final
 	Message::Quit message_quit;
 	Message::Privmsg message_squery;
 	Message::Stats message_stats;
+	Message::Time message_time;
 
 	/* Our message handlers */
 	IRCDMessageAway message_away;
@@ -2407,7 +2397,6 @@ class ProtoInspIRCd final
 	IRCDMessageSave message_save;
 	IRCDMessageServer message_server;
 	IRCDMessageSQuit message_squit;
-	IRCDMessageTime message_time;
 	IRCDMessageUID message_uid;
 
 	bool use_server_side_topiclock, use_server_side_mlock;
@@ -2431,6 +2420,7 @@ public:
 		, message_quit(this)
 		, message_squery(this, "SQUERY")
 		, message_stats(this)
+		, message_time(this)
 		, message_away(this)
 		, message_capab(this)
 		, message_encap(this)
@@ -2453,7 +2443,6 @@ public:
 		, message_save(this)
 		, message_server(this)
 		, message_squit(this)
-		, message_time(this)
 		, message_uid(this)
 	{
 	}

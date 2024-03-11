@@ -1563,7 +1563,7 @@ struct IRCDMessageCapab final
 		}
 		else if (params[0].equals_cs("END"))
 		{
-			if (spanningtree_proto_ver >= 1206)
+			if (spanningtree_proto_ver < 1206)
 			{
 				if (!Servers::Capab.count("ACCOUNT") || !Servers::Capab.count("SERVICES"))
 				{
@@ -2336,11 +2336,11 @@ struct IRCDMessageUID final
 	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		size_t offset = params[9][0] == '+' ? 1 : 0;
+		size_t offset = params[8][0] == '+' ? 0 : 1;
 		time_t ts = Anope::Convert<time_t>(params[1], 0);
 
-		Anope::string modes = params[8];
-		for (unsigned i = 9; i < params.size() - 1; ++i)
+		Anope::string modes = params[8+offset];
+		for (unsigned i = 9+offset; i < params.size() - 1; ++i)
 			modes += " " + params[i];
 
 		NickAlias *na = NULL;

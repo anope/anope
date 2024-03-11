@@ -1833,16 +1833,6 @@ struct IRCDMessageSQuit : Message::SQuit
 	}
 };
 
-struct IRCDMessageTime : IRCDMessage
-{
-	IRCDMessageTime(Module *creator) : IRCDMessage(creator, "TIME", 2) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
-	{
-		UplinkSocket::Message(Me) << "TIME " << source.GetSource() << " " << params[1] << " " << Anope::CurTime;
-	}
-};
-
 struct IRCDMessageUID : IRCDMessage
 {
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 8) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1906,6 +1896,7 @@ class ProtoInspIRCd3 : public Module
 	Message::Privmsg message_privmsg;
 	Message::Quit message_quit;
 	Message::Stats message_stats;
+	Message::Time message_time;
 
 	/* Our message handlers */
 	IRCDMessageAway message_away;
@@ -1929,7 +1920,6 @@ class ProtoInspIRCd3 : public Module
 	IRCDMessageSave message_save;
 	IRCDMessageServer message_server;
 	IRCDMessageSQuit message_squit;
-	IRCDMessageTime message_time;
 	IRCDMessageUID message_uid;
 
 	bool use_server_side_topiclock, use_server_side_mlock;
@@ -1943,12 +1933,12 @@ class ProtoInspIRCd3 : public Module
 	ProtoInspIRCd3(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this), ssl(this, "ssl"),
 		message_error(this), message_invite(this), message_kill(this), message_motd(this), message_notice(this),
-		message_part(this), message_privmsg(this), message_quit(this), message_stats(this),
+		message_part(this), message_privmsg(this), message_quit(this), message_stats(this), message_time(this),
 		message_away(this), message_capab(this), message_encap(this), message_endburst(this), message_fhost(this),
 		message_fident(this), message_fjoin(this), message_fmode(this), message_ftopic(this), message_idle(this),
 		message_ijoin(this), message_kick(this), message_metadata(this, use_server_side_topiclock, use_server_side_mlock, ircd_proto.maxlist),
 		message_mode(this), message_nick(this), message_opertype(this), message_ping(this), message_rsquit(this),
-		message_save(this), message_server(this), message_squit(this), message_time(this), message_uid(this)
+		message_save(this), message_server(this), message_squit(this), message_uid(this)
 	{
 	}
 

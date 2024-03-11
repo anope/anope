@@ -64,7 +64,7 @@ private:
 		sha256_final(&ctx, digest);
 		Anope::string hash(reinterpret_cast<const char *>(&digest), sizeof(digest));
 
-		return Anope::Hex(hash) + ":" + GetIVString();
+		return "sha256:" + Anope::Hex(hash) + ":" + GetIVString();
 	}
 
 public:

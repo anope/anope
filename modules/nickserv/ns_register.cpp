@@ -132,7 +132,7 @@ public:
 		Anope::string u_nick = source.GetNick();
 		size_t nicklen = u_nick.length();
 		Anope::string pass = params[0];
-		Anope::string email = params.size() > 1 ? params[1] : "";
+		Anope::string email = params[1];
 		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<const Anope::string>("registration");
 
 		if (Anope::ReadOnly)
@@ -207,15 +207,14 @@ public:
 			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
 		else if (pass.length() > maxpasslen)
 			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
-		else if (!email.empty() && !Mail::Validate(email))
+		else if (!Mail::Validate(email))
 			source.Reply(MAIL_X_INVALID, email.c_str());
 		else
 		{
 			auto *nc = new NickCore(u_nick);
 			auto *na = new NickAlias(u_nick, nc);
 			Anope::Encrypt(pass, nc->pass);
-			if (!email.empty())
-				nc->email = email;
+			nc->email = email;
 
 			if (u)
 			{
@@ -225,7 +224,7 @@ public:
 			else
 				na->last_realname = source.GetNick();
 
-			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
+			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << na->nc->email << ")";
 
 			source.Reply(_("Nickname \002%s\002 registered."), u_nick.c_str());
 			if (nsregister.equals_ci("admin"))
@@ -234,11 +233,8 @@ public:
 			}
 			else if (nsregister.equals_ci("mail"))
 			{
-				if (!email.empty())
-				{
-					nc->Extend<bool>("UNCONFIRMED");
-					SendRegmail(NULL, na, source.service);
-				}
+				nc->Extend<bool>("UNCONFIRMED");
+				SendRegmail(NULL, na, source.service);
 			}
 
 			FOREACH_MOD(OnNickRegister, (source.GetUser(), na, pass));

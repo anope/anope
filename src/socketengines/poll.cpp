@@ -71,7 +71,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 	{
 		std::map<int, unsigned>::iterator pos = socket_positions.find(s->GetFD());
 		if (pos == socket_positions.end())
-			throw SocketException("Unable to remove fd " + stringify(s->GetFD()) + " from poll, it does not exist?");
+			throw SocketException("Unable to remove fd " + Anope::ToString(s->GetFD()) + " from poll, it does not exist?");
 
 		if (pos->second != events.size() - 1)
 		{
@@ -90,7 +90,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 	{
 		std::map<int, unsigned>::iterator pos = socket_positions.find(s->GetFD());
 		if (pos == socket_positions.end())
-			throw SocketException("Unable to modify fd " + stringify(s->GetFD()) + " in poll, it does not exist?");
+			throw SocketException("Unable to modify fd " + Anope::ToString(s->GetFD()) + " in poll, it does not exist?");
 
 		pollfd &ev = events[pos->second];
 		ev.events = (s->flags[SF_READABLE] ? POLLIN : 0) | (s->flags[SF_WRITABLE] ? POLLOUT : 0);

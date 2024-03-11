@@ -178,13 +178,7 @@ private:
 	{
 		Anope::string param = params[1];
 
-		unsigned mincount = 0;
-		try
-		{
-			mincount = convertTo<unsigned>(param);
-		}
-		catch (const ConvertException &) { }
-
+		auto mincount = Anope::Convert<unsigned>(param, 0);
 		if (mincount <= 1)
 			source.Reply(_("Invalid threshold value. It must be a valid integer greater than 1."));
 		else
@@ -197,7 +191,7 @@ private:
 				if (session->count >= mincount)
 				{
 					ListFormatter::ListEntry entry;
-					entry["Session"] = stringify(session->count);
+					entry["Session"] = Anope::ToString(session->count);
 					entry["Host"] = session->addr.mask();
 					list.AddEntry(entry);
 				}
@@ -327,13 +321,7 @@ private:
 		else if (expires > 0)
 			expires += Anope::CurTime;
 
-		unsigned limit = -1;
-		try
-		{
-			limit = convertTo<unsigned>(limitstr);
-		}
-		catch (const ConvertException &) { }
-
+		auto limit = Anope::Convert<unsigned>(limitstr, -1);
 		if (limit > max_exception_limit)
 		{
 			source.Reply(_("Invalid session limit. It must be a valid integer greater than or equal to zero and less than \002%d\002."), max_exception_limit);
@@ -453,12 +441,12 @@ private:
 					Exception *e = session_service->GetExceptions()[Number - 1];
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(Number);
+					entry["Number"] = Anope::ToString(Number);
 					entry["Mask"] = e->mask;
 					entry["By"] = e->who;
 					entry["Created"] = Anope::strftime(e->time, NULL, true);
 					entry["Expires"] = Anope::Expires(e->expires, source.GetAccount());
-					entry["Limit"] = stringify(e->limit);
+					entry["Limit"] = Anope::ToString(e->limit);
 					entry["Reason"] = e->reason;
 					this->list.AddEntry(entry);
 				}
@@ -474,12 +462,12 @@ private:
 				if (mask.empty() || Anope::Match(e->mask, mask))
 				{
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(i + 1);
+					entry["Number"] = Anope::ToString(i + 1);
 					entry["Mask"] = e->mask;
 					entry["By"] = e->who;
 					entry["Created"] = Anope::strftime(e->time, NULL, true);
 					entry["Expires"] = Anope::Expires(e->expires, source.GetAccount());
-					entry["Limit"] = stringify(e->limit);
+					entry["Limit"] = Anope::ToString(e->limit);
 					entry["Reason"] = e->reason;
 					list.AddEntry(entry);
 				}

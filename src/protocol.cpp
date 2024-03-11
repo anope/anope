@@ -157,7 +157,7 @@ void IRCDProto::SendCTCPInternal(const MessageSource &source, const Anope::strin
 
 void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params)
 {
-	Anope::string n = stringify(numeric);
+	Anope::string n = Anope::ToString(numeric);
 	if (numeric < 10)
 		n = "0" + n;
 	if (numeric < 100)

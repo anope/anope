@@ -209,7 +209,7 @@ public:
 			return;
 		Serialize::Type *s_type = obj->GetSerializableType();
 		if (s_type && obj->id > 0)
-			this->RunBackground("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
+			this->RunBackground("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + Anope::ToString(obj->id));
 		this->updated_items.erase(obj);
 	}
 
@@ -240,18 +240,14 @@ public:
 				data[key] << value;
 
 			Serializable *obj = sb->Unserialize(NULL, data);
-			try
-			{
-				if (obj)
-					obj->id = convertTo<unsigned int>(res.Get(j, "id"));
-			}
-			catch (const ConvertException &)
-			{
-				Log(this) << "Unable to convert id for object #" << j << " of type " << sb->GetName();
-			}
-
 			if (obj)
 			{
+				auto oid = Anope::TryConvert<unsigned int>(res.Get(j, "id"));
+				if (oid.has_value())
+					obj->id = oid.value();
+				else
+					Log(this) << "Unable to convert id for object #" << j << " of type " << sb->GetName();
+
 				/* The Unserialize operation is destructive so rebuild the data for UpdateCache.
 				 * Also the old data may contain columns that we don't use, so we reserialize the
 				 * object to know for sure our cache is consistent

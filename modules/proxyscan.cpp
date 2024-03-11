@@ -88,7 +88,7 @@ protected:
 
 		reason = reason.replace_all_cs("%t", this->GetType());
 		reason = reason.replace_all_cs("%i", this->conaddr.addr());
-		reason = reason.replace_all_cs("%p", stringify(this->conaddr.port()));
+		reason = reason.replace_all_cs("%p", Anope::ToString(this->conaddr.port()));
 
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		Log(OperServ) << "PROXYSCAN: Open " << this->GetType() << " proxy found on " << this->conaddr.str() << " (" << reason << ")";
@@ -321,12 +321,8 @@ public:
 			commasepstream sep2(block->Get<const Anope::string>("port"));
 			while (sep2.GetToken(token))
 			{
-				try
-				{
-					unsigned short port = convertTo<unsigned short>(token);
-					p.ports.push_back(port);
-				}
-				catch (const ConvertException &) { }
+				if (auto port = Anope::TryConvert<unsigned short>(token))
+					p.ports.push_back(port.value());
 			}
 			if (p.ports.empty())
 				continue;

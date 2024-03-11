@@ -716,7 +716,7 @@ class CommandCSMode final
 		std::vector<Anope::string> new_params;
 		new_params.push_back(params[0]);
 		new_params.emplace_back("SET");
-		new_params.push_back("-" + stringify(cm->mchar));
+		new_params.push_back("-" + Anope::ToString(cm->mchar));
 		new_params.emplace_back("*");
 		this->DoSet(source, ci, new_params);
 	}

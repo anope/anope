@@ -297,7 +297,7 @@ Query SQLiteService::BuildInsert(const Anope::string &table, unsigned int id, Da
 	query_text.erase(query_text.length() - 1);
 	query_text += ") VALUES (";
 	if (id > 0)
-		query_text += stringify(id) + ",";
+		query_text += Anope::ToString(id) + ",";
 	for (const auto &[field, _] : data.data)
 		query_text += "@" + field + "@,";
 	query_text.erase(query_text.length() - 1);
@@ -339,7 +339,7 @@ Anope::string SQLiteService::BuildQuery(const Query &q)
 
 Anope::string SQLiteService::FromUnixtime(time_t t)
 {
-	return "datetime('" + stringify(t) + "', 'unixepoch')";
+	return "datetime('" + Anope::ToString(t) + "', 'unixepoch')";
 }
 
 MODULE_INIT(ModuleSQLite)

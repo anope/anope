@@ -52,12 +52,7 @@ public:
 			{
 				if (token.find("ID ") == 0)
 				{
-					try
-					{
-						this->id = convertTo<unsigned int>(token.substr(3));
-					}
-					catch (const ConvertException &) { }
-
+					this->id = Anope::Convert(token.substr(3), 0);
 					continue;
 				}
 				else if (token.find("DATA ") != 0)
@@ -136,7 +131,7 @@ class DBFlatFile final
 			for (const auto &db : dbs)
 			{
 				const Anope::string &oldname = Anope::DataDir + "/" + db;
-				Anope::string newname = Anope::DataDir + "/backups/" + db + "-" + stringify(tm->tm_year + 1900) + Anope::printf("-%02i-", tm->tm_mon + 1) + Anope::printf("%02i", tm->tm_mday);
+				Anope::string newname = Anope::DataDir + "/backups/" + db + "-" + Anope::ToString(tm->tm_year + 1900) + Anope::printf("-%02i-", tm->tm_mon + 1) + Anope::printf("%02i", tm->tm_mday);
 
 				/* Backup already exists or no database to backup */
 				if (Anope::IsFile(newname) || !Anope::IsFile(oldname))

@@ -135,7 +135,7 @@ public:
 					const LogSetting *log = (*ls)->at(i);
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(i + 1);
+					entry["Number"] = Anope::ToString(i + 1);
 					entry["Service"] = log->command_service;
 					entry["Command"] = !log->command_name.empty() ? log->command_name : log->service_name;
 					entry["Method"] = log->method;

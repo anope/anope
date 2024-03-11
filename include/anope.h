@@ -39,6 +39,7 @@ namespace Anope
 		typedef std::string::reverse_iterator reverse_iterator;
 		typedef std::string::const_reverse_iterator const_reverse_iterator;
 		typedef std::string::size_type size_type;
+		typedef std::string::value_type value_type;
 		static const size_type npos = static_cast<size_type>(-1);
 
 		/**
@@ -729,72 +730,6 @@ public:
 	virtual ~ModuleException() noexcept = default;
 };
 
-class CoreExport ConvertException final
-	: public CoreException
-{
-public:
-	ConvertException(const Anope::string &reason = "") : CoreException(reason) { }
-
-	virtual ~ConvertException() noexcept = default;
-};
-
-/** Convert something to a string
- */
-inline Anope::string stringify(const Anope::string &x)
-{
-	return x;
-}
-
-template<typename T> inline Anope::string stringify(const T &x)
-{
-	std::ostringstream stream;
-
-	if (!(stream << x))
-		throw ConvertException("Stringify fail");
-
-	return stream.str();
-}
-
-template<typename T> inline void convert(const Anope::string &s, T &x, Anope::string &leftover, bool failIfLeftoverChars = true)
-{
-	leftover.clear();
-	std::istringstream i(s.str());
-	char c;
-	if (!(i >> x))
-		throw ConvertException("Convert fail");
-	if (failIfLeftoverChars)
-	{
-		if (i.get(c))
-			throw ConvertException("Convert fail");
-	}
-	else
-	{
-		std::string left;
-		getline(i, left);
-		leftover = left;
-	}
-}
-
-template<typename T> inline void convert(const Anope::string &s, T &x, bool failIfLeftoverChars = true)
-{
-	Anope::string Unused;
-	convert(s, x, Unused, failIfLeftoverChars);
-}
-
-template<typename T> inline T convertTo(const Anope::string &s, Anope::string &leftover, bool failIfLeftoverChars = true)
-{
-	T x;
-	convert(s, x, leftover, failIfLeftoverChars);
-	return x;
-}
-
-template<typename T> inline T convertTo(const Anope::string &s, bool failIfLeftoverChars = true)
-{
-	T x;
-	convert(s, x, failIfLeftoverChars);
-	return x;
-}
-
 /** Casts to be used instead of dynamic_cast, this uses dynamic_cast
  * for debug builds and static_cast on release builds
  * to speed up the program because dynamic_cast relies on RTTI.
@@ -814,3 +749,5 @@ template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
 	return static_cast<T>(ptr);
 }
 #endif
+
+#include "convert.h"

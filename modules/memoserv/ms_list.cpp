@@ -85,7 +85,7 @@ public:
 						const Memo *m = mi->GetMemo(number - 1);
 
 						ListFormatter::ListEntry entry;
-						entry["Number"] = (m->unread ? "* " : "  ") + stringify(number);
+						entry["Number"] = (m->unread ? "* " : "  ") + Anope::ToString(number);
 						entry["Sender"] = m->sender;
 						entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
 						this->list.AddEntry(entry);
@@ -120,7 +120,7 @@ public:
 					const Memo *m = mi->GetMemo(i);
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = (m->unread ? "* " : "  ") + stringify(i + 1);
+					entry["Number"] = (m->unread ? "* " : "  ") + Anope::ToString(i + 1);
 					entry["Sender"] = m->sender;
 					entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
 					list.AddEntry(entry);

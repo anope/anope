@@ -162,7 +162,7 @@ public:
 
 			std::vector<Anope::string> args;
 			args.emplace_back("HGETALL");
-			args.push_back("hash:" + t->GetName() + ":" + stringify(obj->id));
+			args.push_back("hash:" + t->GetName() + ":" + Anope::ToString(obj->id));
 
 			/* Get object attrs to clear before updating */
 			redis->SendCommand(new Updater(this, t->GetName(), obj->id), args);
@@ -248,7 +248,7 @@ public:
 
 		std::vector<Anope::string> args;
 		args.emplace_back("HGETALL");
-		args.push_back("hash:" + t->GetName() + ":" + stringify(obj->id));
+		args.push_back("hash:" + t->GetName() + ":" + Anope::ToString(obj->id));
 
 		/* Get all of the attributes for this object */
 		redis->SendCommand(new Deleter(this, t->GetName(), obj->id), args);
@@ -278,19 +278,14 @@ void TypeLoader::OnResult(const Reply &r)
 		if (reply->type != Reply::BULK)
 			continue;
 
-		int64_t id;
-		try
-		{
-			id = convertTo<int64_t>(reply->bulk);
-		}
-		catch (const ConvertException &)
-		{
+		auto i = Anope::TryConvert<int64_t>(reply->bulk);
+		if (!i)
 			continue;
-		}
 
+		auto id = i.value();
 		std::vector<Anope::string> args;
 		args.emplace_back("HGETALL");
-		args.push_back("hash:" + this->type + ":" + stringify(id));
+		args.push_back("hash:" + this->type + ":" + Anope::ToString(id));
 
 		me->redis->SendCommand(new ObjectLoader(me, this->type, id), args);
 	}
@@ -364,7 +359,7 @@ void Deleter::OnResult(const Reply &r)
 
 	std::vector<Anope::string> args;
 	args.emplace_back("DEL");
-	args.push_back("hash:" + this->type + ":" + stringify(this->id));
+	args.push_back("hash:" + this->type + ":" + Anope::ToString(this->id));
 
 	/* Delete hash object */
 	me->redis->SendCommand(NULL, args);
@@ -372,7 +367,7 @@ void Deleter::OnResult(const Reply &r)
 	args.clear();
 	args.emplace_back("SREM");
 	args.push_back("ids:" + this->type);
-	args.push_back(stringify(this->id));
+	args.push_back(Anope::ToString(this->id));
 
 	/* Delete id from ids set */
 	me->redis->SendCommand(NULL, args);
@@ -385,7 +380,7 @@ void Deleter::OnResult(const Reply &r)
 		args.clear();
 		args.emplace_back("SREM");
 		args.push_back("value:" + this->type + ":" + key->bulk + ":" + value->bulk);
-		args.push_back(stringify(this->id));
+		args.push_back(Anope::ToString(this->id));
 
 		/* Delete value -> object id */
 		me->redis->SendCommand(NULL, args);
@@ -428,7 +423,7 @@ void Updater::OnResult(const Reply &r)
 		std::vector<Anope::string> args;
 		args.emplace_back("SREM");
 		args.push_back("value:" + this->type + ":" + key->bulk + ":" + value->bulk);
-		args.push_back(stringify(this->id));
+		args.push_back(Anope::ToString(this->id));
 
 		/* Delete value -> object id */
 		me->redis->SendCommand(NULL, args);
@@ -438,12 +433,12 @@ void Updater::OnResult(const Reply &r)
 	std::vector<Anope::string> args;
 	args.emplace_back("SADD");
 	args.push_back("ids:" + this->type);
-	args.push_back(stringify(obj->id));
+	args.push_back(Anope::ToString(obj->id));
 	me->redis->SendCommand(NULL, args);
 
 	args.clear();
 	args.emplace_back("HMSET");
-	args.push_back("hash:" + this->type + ":" + stringify(obj->id));
+	args.push_back("hash:" + this->type + ":" + Anope::ToString(obj->id));
 
 	for (const auto &[key, value] : data.data)
 	{
@@ -454,7 +449,7 @@ void Updater::OnResult(const Reply &r)
 
 		args2.emplace_back("SADD");
 		args2.push_back("value:" + this->type + ":" + key + ":" + value->str());
-		args2.push_back(stringify(obj->id));
+		args2.push_back(Anope::ToString(obj->id));
 
 		/* Add to value -> object id set */
 		me->redis->SendCommand(NULL, args2);
@@ -505,16 +500,11 @@ void SubscriptionListener::OnResult(const Reply &r)
 	if (s_type == NULL)
 		return;
 
-	uint64_t obj_id;
-	try
-	{
-		obj_id = convertTo<uint64_t>(id);
-	}
-	catch (const ConvertException &)
-	{
+	auto oid = Anope::TryConvert<uint64_t>(id);
+	if (!oid.has_value())
 		return;
-	}
 
+	auto obj_id = oid.value();
 	if (op == "hset" || op == "hdel")
 	{
 		Serializable *s = s_type->objects[obj_id];
@@ -564,7 +554,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 		std::vector<Anope::string> args;
 		args.emplace_back("SREM");
 		args.push_back("ids:" + type);
-		args.push_back(stringify(s->id));
+		args.push_back(Anope::ToString(s->id));
 
 		/* Delete object from id set */
 		me->redis->SendCommand(NULL, args);
@@ -604,7 +594,7 @@ void ModifiedObject::OnResult(const Reply &r)
 			std::vector<Anope::string> args;
 			args.emplace_back("SREM");
 			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());
-			args.push_back(stringify(this->id));
+			args.push_back(Anope::ToString(this->id));
 
 			/* Delete value -> object id */
 			me->redis->SendCommand(NULL, args);
@@ -633,7 +623,7 @@ void ModifiedObject::OnResult(const Reply &r)
 			std::vector<Anope::string> args;
 			args.emplace_back("SADD");
 			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());
-			args.push_back(stringify(obj->id));
+			args.push_back(Anope::ToString(obj->id));
 
 			/* Add to value -> object id set */
 			me->redis->SendCommand(NULL, args);
@@ -642,7 +632,7 @@ void ModifiedObject::OnResult(const Reply &r)
 		std::vector<Anope::string> args;
 		args.emplace_back("SADD");
 		args.push_back("ids:" + st->GetName());
-		args.push_back(stringify(obj->id));
+		args.push_back(Anope::ToString(obj->id));
 
 		/* Add to type -> id set */
 		me->redis->SendCommand(NULL, args);

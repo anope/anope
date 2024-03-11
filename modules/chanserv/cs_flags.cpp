@@ -331,7 +331,7 @@ class CommandCSFlags final
 
 			ListFormatter::ListEntry entry;
 			++count;
-			entry["Number"] = stringify(i + 1);
+			entry["Number"] = Anope::ToString(i + 1);
 			entry["Mask"] = access->Mask();
 			entry["Flags"] = flags;
 			entry["Creator"] = access->creator;

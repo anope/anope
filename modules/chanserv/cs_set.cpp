@@ -165,19 +165,16 @@ public:
 			return;
 		}
 
-		try
-		{
-			int16_t new_type = convertTo<int16_t>(params[1]);
-			if (new_type < 0 || new_type > 3)
-				throw ConvertException("Invalid range");
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the ban type to " << new_type;
-			ci->bantype = new_type;
-			source.Reply(_("Ban type for channel %s is now #%d."), ci->name.c_str(), ci->bantype);
-		}
-		catch (const ConvertException &)
+		auto new_type = Anope::Convert<int16_t>(params[1], -1);
+		if (new_type < 0 || new_type > 3)
 		{
 			source.Reply(_("\002%s\002 is not a valid ban type."), params[1].c_str());
+			return;
 		}
+
+		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the ban type to " << new_type;
+		ci->bantype = new_type;
+		source.Reply(_("Ban type for channel %s is now #%d."), ci->name.c_str(), ci->bantype);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

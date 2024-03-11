@@ -824,12 +824,12 @@ void Conf::LoadConf(File &file)
 				if (block_stack.empty() || itemname.empty())
 				{
 					file.Close();
-					throw ConfigException("Unexpected quoted string: " + file.GetName() + ":" + stringify(linenumber));
+					throw ConfigException("Unexpected quoted string: " + file.GetName() + ":" + Anope::ToString(linenumber));
 				}
 				if (in_word || !wordbuffer.empty())
 				{
 					file.Close();
-					throw ConfigException("Unexpected quoted string (prior unhandled words): " + file.GetName() + ":" + stringify(linenumber));
+					throw ConfigException("Unexpected quoted string (prior unhandled words): " + file.GetName() + ":" + Anope::ToString(linenumber));
 				}
 				in_quote = in_word = true;
 			}
@@ -838,13 +838,13 @@ void Conf::LoadConf(File &file)
 				if (block_stack.empty())
 				{
 					file.Close();
-					throw ConfigException("Config item outside of section (or stray '='): " + file.GetName() + ":" + stringify(linenumber));
+					throw ConfigException("Config item outside of section (or stray '='): " + file.GetName() + ":" + Anope::ToString(linenumber));
 				}
 
 				if (!itemname.empty() || wordbuffer.empty())
 				{
 					file.Close();
-					throw ConfigException("Stray '=' sign or item without value: " + file.GetName() + ":" + stringify(linenumber));
+					throw ConfigException("Stray '=' sign or item without value: " + file.GetName() + ":" + Anope::ToString(linenumber));
 				}
 
 				in_word = false;
@@ -891,7 +891,7 @@ void Conf::LoadConf(File &file)
 				if (!in_word && !wordbuffer.empty())
 				{
 					file.Close();
-					throw ConfigException("Unexpected word: " + file.GetName() + ":" + stringify(linenumber));
+					throw ConfigException("Unexpected word: " + file.GetName() + ":" + Anope::ToString(linenumber));
 				}
 				wordbuffer += ch;
 				in_word = true;
@@ -918,7 +918,7 @@ void Conf::LoadConf(File &file)
 					if (block_stack.empty())
 					{
 						file.Close();
-						throw ConfigException("Stray ';' outside of block: " + file.GetName() + ":" + stringify(linenumber));
+						throw ConfigException("Stray ';' outside of block: " + file.GetName() + ":" + Anope::ToString(linenumber));
 					}
 
 					Block *b = block_stack.top();
@@ -949,7 +949,7 @@ void Conf::LoadConf(File &file)
 					if (block_stack.empty())
 					{
 						file.Close();
-						throw ConfigException("Stray '}': " + file.GetName() + ":" + stringify(linenumber));
+						throw ConfigException("Stray '}': " + file.GetName() + ":" + Anope::ToString(linenumber));
 					}
 
 					block_stack.pop();
@@ -969,7 +969,7 @@ void Conf::LoadConf(File &file)
 	if (!block_stack.empty())
 	{
 		if (block_stack.top())
-			throw ConfigException("Unterminated block at end of file: " + file.GetName() + ". Block was opened on line " + stringify(block_stack.top()->linenum));
+			throw ConfigException("Unterminated block at end of file: " + file.GetName() + ". Block was opened on line " + Anope::ToString(block_stack.top()->linenum));
 		else
 			throw ConfigException("Unterminated commented block at end of file: " + file.GetName());
 	}

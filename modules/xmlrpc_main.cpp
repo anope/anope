@@ -141,7 +141,7 @@ private:
 
 	static void DoStats(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
-		request.reply("uptime", stringify(Anope::CurTime - Anope::StartTime));
+		request.reply("uptime", Anope::ToString(Anope::CurTime - Anope::StartTime));
 		request.reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
 			Anope::string buf;
@@ -151,9 +151,9 @@ private:
 				buf.erase(buf.begin());
 			request.reply("uplinkcapab", buf);
 		}
-		request.reply("usercount", stringify(UserListByNick.size()));
-		request.reply("maxusercount", stringify(MaxUserCount));
-		request.reply("channelcount", stringify(ChannelList.size()));
+		request.reply("usercount", Anope::ToString(UserListByNick.size()));
+		request.reply("maxusercount", Anope::ToString(MaxUserCount));
+		request.reply("channelcount", Anope::ToString(ChannelList.size()));
 	}
 
 	static void DoChannel(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
@@ -167,20 +167,20 @@ private:
 
 		if (c)
 		{
-			request.reply("bancount", stringify(c->HasMode("BAN")));
+			request.reply("bancount", Anope::ToString(c->HasMode("BAN")));
 			int count = 0;
 			for (auto &ban : c->GetModeList("BAN"))
-				request.reply("ban" + stringify(++count), iface->Sanitize(ban));
+				request.reply("ban" + Anope::ToString(++count), iface->Sanitize(ban));
 
-			request.reply("exceptcount", stringify(c->HasMode("EXCEPT")));
+			request.reply("exceptcount", Anope::ToString(c->HasMode("EXCEPT")));
 			count = 0;
 			for (auto &except : c->GetModeList("EXCEPT"))
-				request.reply("except" + stringify(++count), iface->Sanitize(except));
+				request.reply("except" + Anope::ToString(++count), iface->Sanitize(except));
 
-			request.reply("invitecount", stringify(c->HasMode("INVITEOVERRIDE")));
+			request.reply("invitecount", Anope::ToString(c->HasMode("INVITEOVERRIDE")));
 			count = 0;
 			for (auto &invite : c->GetModeList("INVITEOVERRIDE"))
-				request.reply("invite" + stringify(++count), iface->Sanitize(invite));
+				request.reply("invite" + Anope::ToString(++count), iface->Sanitize(invite));
 
 			Anope::string users;
 			for (Channel::ChanUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
@@ -200,8 +200,8 @@ private:
 			if (!c->topic_setter.empty())
 				request.reply("topicsetter", iface->Sanitize(c->topic_setter));
 
-			request.reply("topictime", stringify(c->topic_time));
-			request.reply("topicts", stringify(c->topic_ts));
+			request.reply("topictime", Anope::ToString(c->topic_time));
+			request.reply("topicts", Anope::ToString(c->topic_ts));
 		}
 	}
 
@@ -224,8 +224,8 @@ private:
 			if (!u->chost.empty())
 				request.reply("chost", iface->Sanitize(u->chost));
 			request.reply("ip", u->ip.addr());
-			request.reply("timestamp", stringify(u->timestamp));
-			request.reply("signon", stringify(u->signon));
+			request.reply("timestamp", Anope::ToString(u->timestamp));
+			request.reply("signon", Anope::ToString(u->signon));
 			if (u->Account())
 			{
 				request.reply("account", iface->Sanitize(u->Account()->display));

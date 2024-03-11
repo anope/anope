@@ -311,7 +311,7 @@ class CommandCSAKick final
 						lastused = UNKNOWN;
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(number);
+					entry["Number"] = Anope::ToString(number);
 					if (akick->nc)
 						entry["Mask"] = akick->nc->display;
 					else
@@ -351,7 +351,7 @@ class CommandCSAKick final
 					lastused = UNKNOWN;
 
 				ListFormatter::ListEntry entry;
-				entry["Number"] = stringify(i + 1);
+				entry["Number"] = Anope::ToString(i + 1);
 				if (akick->nc)
 					entry["Mask"] = akick->nc->display;
 				else

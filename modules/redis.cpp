@@ -127,13 +127,13 @@ private:
 		std::vector<char> buffer;
 
 		Pack(buffer, "*");
-		Pack(buffer, stringify(args.size()).c_str());
+		Pack(buffer, Anope::ToString(args.size()).c_str());
 		Pack(buffer, "\r\n");
 
 		for (const auto &[key, value] : args)
 		{
 			Pack(buffer, "$");
-			Pack(buffer, stringify(value).c_str());
+			Pack(buffer, Anope::ToString(value).c_str());
 			Pack(buffer, "\r\n");
 
 			Pack(buffer, key, value);
@@ -278,7 +278,7 @@ void RedisSocket::OnConnect()
 	Log() << "redis: Successfully connected to " << provider->name << (this == this->provider->sub ? " (sub)" : "");
 
 	this->provider->SendCommand(NULL, "CLIENT SETNAME Anope");
-	this->provider->SendCommand(NULL, "SELECT " + stringify(provider->db));
+	this->provider->SendCommand(NULL, "SELECT " + Anope::ToString(provider->db));
 
 	if (this != this->provider->sub)
 	{
@@ -333,11 +333,8 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 			size_t nl = ibuf.find("\r\n");
 			if (nl != Anope::string::npos)
 			{
-				try
-				{
-					r.i = convertTo<int64_t>(ibuf.substr(0, nl));
-				}
-				catch (const ConvertException &) { }
+				if (auto i = Anope::TryConvert<int64_t>(ibuf.substr(0, nl)))
+					r.i = i.value();
 
 				r.type = Reply::INT;
 				used = 1 + nl + 2;
@@ -351,10 +348,9 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 			size_t nl = reply.find("\r\n");
 			if (nl != Anope::string::npos)
 			{
-				int len;
-				try
+				if (auto l = Anope::TryConvert<int>(reply.substr(0, nl)))
 				{
-					len = convertTo<int>(reply.substr(0, nl));
+					int len = l.value();
 					if (len >= 0)
 					{
 						if (1 + nl + 2 + len + 2 <= l)
@@ -370,7 +366,6 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 						r.type = Reply::BULK;
 					}
 				}
-				catch (const ConvertException &) { }
 			}
 			break;
 		}
@@ -384,12 +379,8 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 				if (nl != Anope::string::npos)
 				{
 					r.type = Reply::MULTI_BULK;
-					try
-					{
-						r.multi_bulk_size = convertTo<int>(reply.substr(0, nl));
-					}
-					catch (const ConvertException &) { }
-
+					if (auto size = Anope::TryConvert<int>(reply.substr(0, nl)))
+						r.multi_bulk_size = size.value();
 					used = 1 + nl + 2;
 				}
 				else

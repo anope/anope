@@ -128,13 +128,12 @@ namespace SQL
 
 		template<typename T> void SetValue(const Anope::string &key, const T &value, bool escape = true)
 		{
-			try
-			{
-				Anope::string string_value = stringify(value);
-				this->parameters[key].data = string_value;
-				this->parameters[key].escape = escape;
-			}
-			catch (const ConvertException &ex) { }
+			auto str = Anope::TryString(value);
+			if (!str.has_value())
+				return;
+
+			this->parameters[key].data = str.value();
+			this->parameters[key].escape = escape;
 		}
 	};
 

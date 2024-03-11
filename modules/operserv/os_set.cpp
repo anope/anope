@@ -122,14 +122,14 @@ private:
 		}
 		else
 		{
-			try
+			auto debug = Anope::TryConvert<int>(setting);
+			if (debug.has_value())
 			{
-				Anope::Debug = convertTo<int>(setting);
+				Anope::Debug = debug.value();
 				Log(LOG_ADMIN, source, this) << "DEBUG " << Anope::Debug;
 				source.Reply(_("Services are now in \002debug\002 mode (level %d)."), Anope::Debug);
 				return;
 			}
-			catch (const ConvertException &) { }
 
 			source.Reply(_("Setting for DEBUG must be \002ON\002, \002OFF\002, or a positive number."));
 		}

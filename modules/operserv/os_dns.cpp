@@ -42,7 +42,7 @@ struct DNSZone final
 		data["name"] << name;
 		unsigned count = 0;
 		for (const auto &server : servers)
-			data["server" + stringify(count++)] << server;
+			data["server" + Anope::ToString(count++)] << server;
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
@@ -64,7 +64,7 @@ struct DNSZone final
 		for (unsigned count = 0; true; ++count)
 		{
 			Anope::string server_str;
-			data["server" + stringify(count)] >> server_str;
+			data["server" + Anope::ToString(count)] >> server_str;
 			if (server_str.empty())
 				break;
 			zone->servers.insert(server_str);
@@ -146,12 +146,12 @@ public:
 	{
 		data["server_name"] << server_name;
 		for (unsigned i = 0; i < ips.size(); ++i)
-			data["ip" + stringify(i)] << ips[i];
+			data["ip" + Anope::ToString(i)] << ips[i];
 		data["limit"] << limit;
 		data["pooled"] << pooled;
 		unsigned count = 0;
 		for (const auto &zone : zones)
-			data["zone" + stringify(count++)] << zone;
+			data["zone" + Anope::ToString(count++)] << zone;
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
@@ -172,7 +172,7 @@ public:
 		for (unsigned i = 0; true; ++i)
 		{
 			Anope::string ip_str;
-			data["ip" + stringify(i)] >> ip_str;
+			data["ip" + Anope::ToString(i)] >> ip_str;
 			if (ip_str.empty())
 				break;
 			req->ips.push_back(ip_str);
@@ -185,7 +185,7 @@ public:
 		for (unsigned i = 0; true; ++i)
 		{
 			Anope::string zone_str;
-			data["zone" + stringify(i)] >> zone_str;
+			data["zone" + Anope::ToString(i)] >> zone_str;
 			if (zone_str.empty())
 				break;
 			req->zones.insert(zone_str);
@@ -225,7 +225,7 @@ class CommandOSDNS final
 
 			ListFormatter::ListEntry entry;
 			entry["Server"] = s->GetName();
-			entry["Limit"] = s->GetLimit() ? stringify(s->GetLimit()) : Language::Translate(source.GetAccount(), _("None"));
+			entry["Limit"] = s->GetLimit() ? Anope::ToString(s->GetLimit()) : Language::Translate(source.GetAccount(), _("None"));
 
 			Anope::string ip_str;
 			for (const auto &ip : s->GetIPs())
@@ -579,16 +579,15 @@ class CommandOSDNS final
 
 		if (params[2].equals_ci("LIMIT"))
 		{
-			try
+			if (auto l = Anope::TryConvert<unsigned>(params[3]))
 			{
-				unsigned l = convertTo<unsigned>(params[3]);
-				s->SetLimit(l);
-				if (l)
-					source.Reply(_("User limit for %s set to %d."), s->GetName().c_str(), l);
+				s->SetLimit(l.value());
+				if (s->GetLimit())
+					source.Reply(_("User limit for %s set to %d."), s->GetName().c_str(), s->GetLimit());
 				else
 					source.Reply(_("User limit for %s removed."), s->GetName().c_str());
 			}
-			catch (const ConvertException &ex)
+			else
 			{
 				source.Reply(_("Invalid value for LIMIT. Must be numerical."));
 			}

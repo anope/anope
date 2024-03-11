@@ -195,7 +195,7 @@ void ChannelInfo::Serialize(Serialize::Data &data) const
 	{
 		Anope::string levels_buffer;
 		for (const auto &[name, level] : this->levels)
-			levels_buffer += name + " " + stringify(level) + " ";
+			levels_buffer += name + " " + Anope::ToString(level) + " ";
 		data["levels"] << levels_buffer;
 	}
 	if (this->bi)
@@ -238,11 +238,10 @@ Serializable *ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		std::vector<Anope::string> v;
 		spacesepstream(slevels).GetTokens(v);
 		for (unsigned i = 0; i + 1 < v.size(); i += 2)
-			try
-			{
-				ci->levels[v[i]] = convertTo<int16_t>(v[i + 1]);
-			}
-			catch (const ConvertException &) { }
+		{
+			if (auto level = Anope::TryConvert<int16_t>(v[i + 1]))
+				ci->levels[v[i]] = level.value();
+		}
 	}
 	BotInfo *bi = BotInfo::Find(sbi, true);
 	if (*ci->bi != bi)

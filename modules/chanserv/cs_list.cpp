@@ -36,12 +36,10 @@ public:
 			sepstream(pattern.substr(1), '-').GetToken(n1, 0);
 			sepstream(pattern, '-').GetToken(n2, 1);
 
-			try
-			{
-				from = convertTo<int>(n1);
-				to = convertTo<int>(n2);
-			}
-			catch (const ConvertException &)
+			auto num1 = Anope::TryConvert<int>(n1);
+			auto num2 = Anope::TryConvert<int>(n2);
+
+			if (!num1.has_value() || !num2.has_value())
 			{
 				source.Reply(LIST_INCORRECT_RANGE);
 				source.Reply(_("To search for channels starting with #, search for the channel\n"
@@ -49,6 +47,8 @@ public:
 				return;
 			}
 
+			from = num1.value();
+			to = num2.value();
 			pattern = "*";
 		}
 

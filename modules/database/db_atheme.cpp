@@ -56,16 +56,7 @@ public:
 	template<typename Numeric>
 	std::enable_if_t<std::is_arithmetic_v<Numeric>, Numeric> GetNum()
 	{
-		try
-		{
-			auto token = Get();
-			std::stringstream stream(token.str());
-			Numeric ntoken = 0;
-			stream >> ntoken;
-			return ntoken;
-		}
-		catch (const ConvertException &) { }
-		return 0;
+		return Anope::Convert<Numeric>(Get(), 0);
 	}
 
 	// Retrieves the entire row.
@@ -869,7 +860,7 @@ private:
 		else if (key == "private:close:reason")
 			data->suspend_reason = value;
 		else if (key == "private:close:timestamp")
-			data->suspend_ts = convertTo<time_t>(value);
+			data->suspend_ts = Anope::Convert<time_t>(value, 0);
 		else if (key == "private:entrymsg")
 		{
 			auto *eml = ci->Require<EntryMessageList>("entrymsg");
@@ -891,19 +882,19 @@ private:
 		else if (key == "private:klinechan:reason")
 			data->suspend_reason = value;
 		else if (key == "private:klinechan:timestamp")
-			data->suspend_ts = convertTo<time_t>(value);
+			data->suspend_ts = Anope::Convert<time_t>(value, 0);
 		else if (key == "private:mark:reason")
 			data->info_message = value;
 		else if (key == "private:mark:setter")
 			data->info_adder = value;
 		else if (key == "private:mark:timestamp")
-			data->info_ts = convertTo<time_t>(value);
+			data->info_ts = Anope::Convert<time_t>(value, 0);
 		else if (key == "private:topic:setter")
 			ci->last_topic_setter = value;
 		else if (key == "private:topic:text")
 			ci->last_topic = value;
 		else if (key == "private:topic:ts")
-			ci->last_topic_time = convertTo<time_t>(value);
+			ci->last_topic_time = Anope::Convert<time_t>(value, 0);
 		else
 			Log(this) << "Unknown channel metadata " << key << " = " << value;
 
@@ -953,7 +944,7 @@ private:
 
 			auto kill = Config->GetModule("nickserv")->Get<time_t>("kill", "60s");
 			auto killquick = Config->GetModule("nickserv")->Get<time_t>("killquick", "20s");
-			auto secs = convertTo<unsigned>(value);
+			auto secs = Anope::Convert<time_t>(value, kill);
 			if (secs >= kill)
 				nc->Extend<bool>("KILLPROTECT");
 			else if (secs >= killquick)
@@ -966,7 +957,7 @@ private:
 		else if (key == "private:freeze:reason")
 			data->suspend_reason = value;
 		else if (key == "private:freeze:timestamp")
-			data->suspend_ts = convertTo<time_t>(value);
+			data->suspend_ts = Anope::Convert<time_t>(value, 0);
 		else if (key == "private:host:actual")
 			data->last_real_mask = value;
 		else if (key == "private:host:vhost")
@@ -978,13 +969,13 @@ private:
 		else if (key == "private:mark:setter")
 			data->info_adder = value;
 		else if (key == "private:mark:timestamp")
-			data->info_ts = convertTo<time_t>(value);
+			data->info_ts = Anope::Convert<time_t>(value, 0);
 		else if (key == "private:usercloak")
 			data->vhost = value;
 		else if (key == "private:usercloak-assigner")
 			data->vhost_creator = value;
 		else if (key == "private:usercloak-timestamp")
-			data->vhost_ts = convertTo<time_t>(value);
+			data->vhost_ts = Anope::Convert<time_t>(value, 0);
 		else if (key.compare(0, 18, "private:usercloak:", 18) == 0)
 			data->vhost_nick[key.substr(18)] = value;
 		else

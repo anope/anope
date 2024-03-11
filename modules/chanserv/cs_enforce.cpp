@@ -166,14 +166,8 @@ private:
 			return;
 		}
 
-		int l;
-		try
-		{
-			l = convertTo<int>(l_str);
-			if (l < 0)
-				throw ConvertException();
-		}
-		catch (const ConvertException &)
+		auto l = Anope::Convert<int>(l_str, -1);
+		if (l < 0)
 		{
 			source.Reply(_("The limit on %s is not valid."), ci->name.c_str());
 			return;

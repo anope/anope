@@ -420,7 +420,7 @@ private:
 						return;
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(Number);
+					entry["Number"] = Anope::ToString(Number);
 					entry["Mask"] = a->Mask();
 					entry["Description"] = a->description;
 					this->list.AddEntry(entry);
@@ -440,7 +440,7 @@ private:
 					continue;
 
 				ListFormatter::ListEntry entry;
-				entry["Number"] = stringify(i + 1);
+				entry["Number"] = Anope::ToString(i + 1);
 				entry["Mask"] = a->Mask();
 				entry["Description"] = a->description;
 				list.AddEntry(entry);

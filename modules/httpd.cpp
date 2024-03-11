@@ -216,11 +216,8 @@ public:
 		}
 		else if (buf.find_ci("Content-Length: ") == 0)
 		{
-			try
-			{
-				this->content_length = convertTo<unsigned>(buf.substr(16));
-			}
-			catch (const ConvertException &ex) { }
+			if (auto len = Anope::TryConvert<unsigned>(buf.substr(16)))
+				this->content_length = len.value();
 		}
 		else if (buf.find(':') != Anope::string::npos)
 		{
@@ -252,7 +249,7 @@ public:
 			this->WriteClient("Content-Type: text/html");
 		else
 			this->WriteClient("Content-Type: " + msg->content_type);
-		this->WriteClient("Content-Length: " + stringify(msg->length));
+		this->WriteClient("Content-Length: " + Anope::ToString(msg->length));
 
 		for (const auto &cookie : msg->cookies)
 		{

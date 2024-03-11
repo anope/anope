@@ -222,7 +222,7 @@ private:
 
 					const BadWord *b = bw->GetBadWord(Number - 1);
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(Number);
+					entry["Number"] = Anope::ToString(Number);
 					entry["Word"] = b->word;
 					entry["Type"] = b->type == BW_SINGLE ? "(SINGLE)" : (b->type == BW_START ? "(START)" : (b->type == BW_END ? "(END)" : ""));
 					this->list.AddEntry(entry);
@@ -241,7 +241,7 @@ private:
 					continue;
 
 				ListFormatter::ListEntry entry;
-				entry["Number"] = stringify(i + 1);
+				entry["Number"] = Anope::ToString(i + 1);
 				entry["Word"] = b->word;
 				entry["Type"] = b->type == BW_SINGLE ? "(SINGLE)" : (b->type == BW_START ? "(START)" : (b->type == BW_END ? "(END)" : ""));
 				list.AddEntry(entry);

@@ -67,7 +67,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 		return;
 
 	if (epoll_ctl(EngineHandle, mod, ev.data.fd, &ev) == -1)
-		 throw SocketException("Unable to epoll_ctl() fd " + stringify(ev.data.fd) + " to epoll: " + Anope::LastError());
+		 throw SocketException("Unable to epoll_ctl() fd " + Anope::ToString(ev.data.fd) + " to epoll: " + Anope::LastError());
 }
 
 void SocketEngine::Process()

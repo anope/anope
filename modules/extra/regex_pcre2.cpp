@@ -30,7 +30,7 @@ public:
 		{
 			PCRE2_UCHAR error[128];
 			pcre2_get_error_message(errcode, error, sizeof error);
-			throw RegexException("Error in regex " + expr + " at offset " + stringify(erroffset) + ": " + reinterpret_cast<const char*>(error));
+			throw RegexException("Error in regex " + expr + " at offset " + Anope::ToString(erroffset) + ": " + reinterpret_cast<const char*>(error));
 		}
 	}
 

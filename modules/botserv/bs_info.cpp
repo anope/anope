@@ -55,7 +55,7 @@ public:
 			info[_("Real name")] = bi->realname;
 			info[_("Created")] = Anope::strftime(bi->created, source.GetAccount());
 			info[_("Options")] = bi->oper_only ? _("Private") : _("None");
-			info[_("Used on")] = stringify(bi->GetChannelCount()) + " channel(s)";
+			info[_("Used on")] = Anope::ToString(bi->GetChannelCount()) + " channel(s)";
 
 			FOREACH_MOD(OnBotInfo, (source, bi, ci, info));
 

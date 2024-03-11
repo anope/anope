@@ -452,7 +452,7 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 
 	for (const auto &[field, _] : data.data)
 		query_text += ",`" + field + "`";
-	query_text += ") VALUES (" + stringify(id);
+	query_text += ") VALUES (" + Anope::ToString(id);
 	for (const auto &[field, _] : data.data)
 		query_text += ",@" + field + "@";
 	query_text += ") ON DUPLICATE KEY UPDATE ";
@@ -536,7 +536,7 @@ Anope::string MySQLService::BuildQuery(const Query &q)
 
 Anope::string MySQLService::FromUnixtime(time_t t)
 {
-	return "FROM_UNIXTIME(" + stringify(t) + ")";
+	return "FROM_UNIXTIME(" + Anope::ToString(t) + ")";
 }
 
 void DispatcherThread::Run()

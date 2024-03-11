@@ -135,12 +135,8 @@ private:
 				else
 					nc->Shrink<bool>("MEMO_HARDMAX");
 			}
-			limit = -1;
-			try
-			{
-				limit = convertTo<int16_t>(p1);
-			}
-			catch (const ConvertException &) { }
+
+			limit = Anope::Convert<int16_t>(p1, -1);
 		}
 		else
 		{
@@ -160,12 +156,8 @@ private:
 				return;
 			}
 			int max_memos = Config->GetModule("memoserv")->Get<int>("maxmemos");
-			limit = -1;
-			try
-			{
-				limit = convertTo<int16_t>(p1);
-			}
-			catch (const ConvertException &) { }
+			limit = Anope::Convert<int16_t>(p1, -1);
+
 			/* The first character is a digit, but we could still go negative
 			 * from overflow... watch out! */
 			if (limit < 0 || (max_memos > 0 && limit > max_memos))

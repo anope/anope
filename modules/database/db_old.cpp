@@ -152,7 +152,7 @@ static void process_mlock(ChannelInfo *ci, uint32_t lock, bool status, uint32_t 
 			if (cm && ml)
 			{
 				if (limit && mlock_info.c == 'l')
-					ml->SetMLock(cm, status, stringify(*limit));
+					ml->SetMLock(cm, status, Anope::ToString(*limit));
 				else if (key && mlock_info.c == 'k')
 					ml->SetMLock(cm, status, *key);
 				else
@@ -889,7 +889,7 @@ static void LoadChannels()
 							}
 						}
 						else
-							access->AccessUnserialize(stringify(level));
+							access->AccessUnserialize(Anope::ToString(level));
 					}
 
 					Anope::string mask;

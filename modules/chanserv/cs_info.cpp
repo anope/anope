@@ -58,7 +58,7 @@ public:
 
 		if (show_all)
 		{
-			info[_("Ban type")] = stringify(ci->bantype);
+			info[_("Ban type")] = Anope::ToString(ci->bantype);
 		}
 
 		FOREACH_MOD(OnChanInfo, (source, ci, info, show_all));

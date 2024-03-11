@@ -37,18 +37,13 @@ public:
 
 	Anope::string AccessSerialize() const override
 	{
-		return stringify(this->level);
+		return Anope::ToString(this->level);
 	}
 
 	void AccessUnserialize(const Anope::string &data) override
 	{
-		try
-		{
-			this->level = convertTo<int>(data);
-		}
-		catch (const ConvertException &)
-		{
-		}
+		if (auto l = Anope::TryConvert<int>(data))
+			this->level = l.value();
 	}
 
 	bool operator>(const ChanAccess &other) const override
@@ -95,11 +90,9 @@ class CommandCSAccess final
 		Privilege *p = NULL;
 		int level = ACCESS_INVALID;
 
-		try
-		{
-			level = convertTo<int>(params[3]);
-		}
-		catch (const ConvertException &)
+		if (auto lvl = Anope::TryConvert<int>(params[3]))
+			level = lvl.value();
+		else
 		{
 			p = PrivilegeManager::FindPrivilege(params[3]);
 			if (p != NULL && defaultLevels[p->name])
@@ -402,7 +395,7 @@ class CommandCSAccess final
 					}
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(number);
+					entry["Number"] = Anope::ToString(number);
 					entry["Level"] = access->AccessSerialize();
 					entry["Mask"] = access->Mask();
 					entry["By"] = access->creator;
@@ -442,7 +435,7 @@ class CommandCSAccess final
 				}
 
 				ListFormatter::ListEntry entry;
-				entry["Number"] = stringify(i + 1);
+				entry["Number"] = Anope::ToString(i + 1);
 				entry["Level"] = access->AccessSerialize();
 				entry["Mask"] = access->Mask();
 				entry["By"] = access->creator;
@@ -652,11 +645,9 @@ class CommandCSLevels final
 			level = ACCESS_FOUNDER;
 		else
 		{
-			try
-			{
-				level = convertTo<int>(lev);
-			}
-			catch (const ConvertException &)
+			if (auto lvl = Anope::TryConvert<int>(lev))
+				level = lvl.value();
+			else
 			{
 				this->OnSyntaxError(source, "SET");
 				return;
@@ -734,7 +725,7 @@ class CommandCSLevels final
 			else if (j == ACCESS_FOUNDER)
 				entry["Level"] = Language::Translate(source.GetAccount(), _("(founder only)"));
 			else
-				entry["Level"] = stringify(j);
+				entry["Level"] = Anope::ToString(j);
 
 			list.AddEntry(entry);
 		}

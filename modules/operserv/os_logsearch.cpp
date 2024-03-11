@@ -47,32 +47,22 @@ public:
 					if (params[i].length() > 2)
 					{
 						Anope::string dur = params[i].substr(1, params[i].length() - 2);
-						try
-						{
-							days = convertTo<int>(dur);
-							if (days <= 0)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
+						auto d = Anope::Convert<int>(dur, 0);
+						if (d > 0)
+							days = d;
+						else
 							source.Reply(_("Invalid duration %s, using %d days."), dur.c_str(), days);
-						}
 					}
 					break;
 				case 'l':
 					if (params[i].length() > 2)
 					{
 						Anope::string dur = params[i].substr(1, params[i].length() - 2);
-						try
-						{
-							replies = convertTo<int>(dur);
-							if (replies <= 0)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
+						auto r = Anope::Convert<int>(dur, 0);
+						if (r > 0)
+							replies = r;
+						else
 							source.Reply(_("Invalid limit %s, using %d."), dur.c_str(), replies);
-						}
 					}
 					break;
 				default:

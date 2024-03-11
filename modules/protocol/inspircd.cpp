@@ -130,7 +130,7 @@ private:
 
 	static void SendAccount(const Anope::string &uid, NickAlias *na)
 	{
-		Uplink::Send("METADATA", uid, "accountid", na ? na->nc->GetId() : Anope::string());
+		Uplink::Send("METADATA", uid, "accountid", na ? Anope::ToString(na->nc->GetId()) : Anope::string());
 		Uplink::Send("METADATA", uid, "accountname", na ? na->nc->display : Anope::string());
 		if (spanningtree_proto_ver >= 1206)
 			Uplink::Send("METADATA", uid, "accountnicks", GetAccountNicks(na));
@@ -401,14 +401,14 @@ public:
 	void SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params) override
 	{
 		auto newparams = params;
-		newparams.insert(newparams.begin(), { Me->GetSID(), dest, stringify(numeric) });
+		newparams.insert(newparams.begin(), { Me->GetSID(), dest, Anope::ToString(numeric) });
 		Uplink::SendInternal({}, Me, "NUM", newparams);
 	}
 
 	void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
 		auto params = values;
-		params.insert(params.begin(), { chan->name, stringify(chan->creation_time), modes });
+		params.insert(params.begin(), { chan->name, Anope::ToString(chan->creation_time), modes });
 		Uplink::SendInternal({}, source, "FMODE", params);
 	}
 
@@ -923,32 +923,20 @@ public:
 			return false; // no ':' or it's the first char, both are invalid
 
 		Anope::string rest;
-		try
+		if (Anope::Convert<int>(value, 0, &rest) <= 0)
+			return false; // negative numbers and zero are invalid
+
+		rest = rest.substr(1);
+		if (historymode)
 		{
-			if (convertTo<int>(value, rest, false) <= 0)
-				return false; // negative numbers and zero are invalid
-
-			rest = rest.substr(1);
-			int n;
-			if (historymode)
-			{
-				// For the history mode, the part after the ':' is a duration and it
-				// can be in the user friendly "1d3h20m" format, make sure we accept that
-				n = Anope::DoTime(rest);
-			}
-			else
-				n = convertTo<int>(rest);
-
-			if (n <= 0)
-				return false;
+			// For the history mode, the part after the ':' is a duration and it
+			// can be in the user friendly "1d3h20m" format, make sure we accept that
+			return Anope::DoTime(rest) <= 0;
 		}
-		catch (const ConvertException &e)
+		else
 		{
-			// conversion error, invalid
-			return false;
+			return Anope::Convert(rest, 0) <= 0;
 		}
-
-		return true;
 	}
 };
 
@@ -963,18 +951,7 @@ public:
 		if (value.empty())
 			return false; // empty param is never valid
 
-		try
-		{
-			if (convertTo<int>(value) <= 0)
-				return false;
-		}
-		catch (const ConvertException &e)
-		{
-			// conversion error, invalid
-			return false;
-		}
-
-		return true;
+		return Anope::Convert<int>(value, 0) <= 0;
 	}
 };
 
@@ -1068,15 +1045,15 @@ struct IRCDMessageCapab final
 
 	static std::pair<Anope::string, size_t> ParseCapability(const Anope::string &token)
 	{
-		auto sep = token.find(':');
+		auto sep = token.find('=');
 		if (sep == Anope::string::npos)
 			return { token, 0 };
 
-		auto value = token.substr(sep);
+		auto value = token.substr(sep + 1);
 		if (!value.is_pos_number_only())
 			return { token, 0 };
 
-		return { token.substr(0, sep), convertTo<size_t>(value) };
+		return { token.substr(0, sep), Anope::Convert<size_t>(value, 0) };
 	}
 
 	static bool ParseExtBan(const Anope::string &token, ExtBanInfo &extban)
@@ -1117,7 +1094,7 @@ struct IRCDMessageCapab final
 				return false;
 
 			const Anope::string modelevel = token.substr(a + 1, b - a - 1);
-			mode.level = modelevel.is_pos_number_only() ? convertTo<unsigned>(modelevel) : 0;
+			mode.level = Anope::Convert<unsigned>(modelevel, 0);
 			a = b;
 		}
 
@@ -1159,7 +1136,7 @@ struct IRCDMessageCapab final
 		{
 			spanningtree_proto_ver = 0;
 			if (params.size() >= 2)
-				spanningtree_proto_ver = params[1].is_pos_number_only() ? convertTo<size_t>(params[1]) : 0;
+				spanningtree_proto_ver = Anope::Convert<size_t>(params[1], 0);
 
 			if (spanningtree_proto_ver < 1205)
 			{
@@ -1769,18 +1746,8 @@ struct IRCDMessageSave final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		User *targ = User::Find(params[0]);
-		time_t ts;
-
-		try
-		{
-			ts = convertTo<time_t>(params[1]);
-		}
-		catch (const ConvertException &)
-		{
-			return;
-		}
-
-		if (!targ || targ->timestamp != ts)
+		auto ts = Anope::Convert<time_t>(params[1], 0);
+		if (!targ || !ts || targ->timestamp != ts)
 			return;
 
 		BotInfo *bi;
@@ -1847,7 +1814,7 @@ public:
 					Anope::string modechr, modelimit;
 					while (limitstream.GetToken(modechr) && limitstream.GetToken(modelimit))
 					{
-						limits.emplace(modechr[0], convertTo<unsigned>(modelimit));
+						limits.emplace(modechr[0], Anope::Convert<unsigned>(modelimit, 0));
 					}
 					maxlist.Set(c, limits);
 				}
@@ -2048,7 +2015,7 @@ struct IRCDMessageFJoin final
 			users.push_back(sju);
 		}
 
-		time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
+		auto ts = Anope::Convert<time_t>(params[0], Anope::CurTime);
 		Message::Join::SJoin(source, params[0], ts, modes, users);
 	}
 };
@@ -2067,17 +2034,7 @@ struct IRCDMessageFMode final
 			modes += " " + params[n];
 
 		Channel *c = Channel::Find(params[0]);
-		time_t ts;
-
-		try
-		{
-			ts = convertTo<time_t>(params[1]);
-		}
-		catch (const ConvertException &)
-		{
-			ts = 0;
-		}
-
+		auto ts = Anope::Convert<time_t>(params[1], 0);
 		if (c)
 			c->SetModesInternal(source, modes, ts);
 	}
@@ -2098,7 +2055,7 @@ struct IRCDMessageFTopic final
 
 		Channel *c = Channel::Find(params[0]);
 		if (c)
-			c->ChangeTopicInternal(NULL, setby, topic, params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
+			c->ChangeTopicInternal(NULL, setby, topic, Anope::Convert<time_t>(params[2], Anope::CurTime));
 	}
 };
 
@@ -2147,7 +2104,7 @@ struct IRCDMessageIJoin final
 		time_t chants = Anope::CurTime;
 		if (params.size() >= 4)
 		{
-			chants = params[2].is_pos_number_only() ? convertTo<unsigned>(params[2]) : 0;
+			chants = Anope::Convert<time_t>(params[2], 0);
 			for (auto mode : params[3])
 				user.first.AddMode(mode);
 		}
@@ -2175,7 +2132,7 @@ struct IRCDMessageLMode final
 			return; // Channel doesn't exist.
 
 		// If the TS is greater than ours, we drop the mode and don't pass it anywhere.
-		auto chants = convertTo<time_t>(params[1]);
+		auto chants = Anope::Convert<time_t>(params[1], Anope::CurTime);
 		if (chants > chan->creation_time)
 			return;
 
@@ -2307,7 +2264,7 @@ struct IRCDMessageServer final
 			 * 3: numeric
 			 * 4: desc
 			 */
-			unsigned int hops = Anope::string(params[2]).is_pos_number_only() ? convertTo<unsigned>(params[2]) : 0;
+			auto hops = Anope::Convert<unsigned>(params[2], 0);
 			new Server(Me, params[0], hops, params[4], params[3]);
 		}
 		else if (source.GetServer())
@@ -2380,7 +2337,7 @@ struct IRCDMessageUID final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		size_t offset = params[9][0] == '+' ? 1 : 0;
-		time_t ts = convertTo<time_t>(params[1]);
+		time_t ts = Anope::Convert<time_t>(params[1], 0);
 
 		Anope::string modes = params[8];
 		for (unsigned i = 9; i < params.size() - 1; ++i)
@@ -2405,7 +2362,7 @@ struct IRCDMessageUID final
 
 		User *u = User::OnIntroduce(params[2], params[5+offset], params[3], params[4], params[6+offset], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? *na->nc : NULL);
 		if (u)
-			u->signon = convertTo<time_t>(params[7+offset]);
+			u->signon = Anope::Convert<time_t>(params[7+offset], 0);
 	}
 };
 

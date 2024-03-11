@@ -48,7 +48,7 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 		for (unsigned i = 0, end = akills->GetCount(); i < end; ++i)
 		{
 			const XLine *x = akills->GetEntry(i);
-			replacements["NUMBER"] = stringify(i + 1);
+			replacements["NUMBER"] = Anope::ToString(i + 1);
 			replacements["HOST"] = x->mask;
 			replacements["SETTER"] = x->by;
 			replacements["TIME"] = Anope::strftime(x->created, NULL, true);

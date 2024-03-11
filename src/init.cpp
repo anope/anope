@@ -148,10 +148,10 @@ void Anope::HandleSignal()
 		case SIGINT:
 #ifndef _WIN32
 			Log() << "Received " << strsignal(Signal) << " signal (" << Signal << "), exiting.";
-			Anope::QuitReason = Anope::string("Services terminating via signal ") + strsignal(Signal) + " (" + stringify(Signal) + ")";
+			Anope::QuitReason = Anope::string("Services terminating via signal ") + strsignal(Signal) + " (" + Anope::ToString(Signal) + ")";
 #else
 			Log() << "Received signal " << Signal << ", exiting.";
-			Anope::QuitReason = Anope::string("Services terminating via signal ") + stringify(Signal);
+			Anope::QuitReason = Anope::string("Services terminating via signal ") + Anope::ToString(Signal);
 #endif
 			Anope::Quitting = true;
 			Anope::SaveDatabases();
@@ -355,7 +355,7 @@ bool Anope::Init(int ac, char **av)
 	{
 		if (!arg.empty())
 		{
-			int level = arg.is_number_only() ? convertTo<int>(arg) : -1;
+			auto level = Anope::Convert<int>(arg, -1);
 			if (level > 0)
 				Anope::Debug = level;
 			else

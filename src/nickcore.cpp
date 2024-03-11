@@ -213,7 +213,7 @@ uint64_t NickCore::GetId()
 		return 0;
 	}
 
-	Anope::string secretid = this->display + "\0" + stringify(na->time_registered);
+	Anope::string secretid = this->display + "\0" + Anope::ToString(na->time_registered);
 
 	// Generate the account id. This should almost always only have one
 	// iteration but in the rare case that we generate a duplicate id we try

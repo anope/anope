@@ -348,7 +348,7 @@ void ModuleManager::RequireVersion(int major, int minor, int patch)
 		}
 	}
 
-	throw ModuleException("This module requires version " + stringify(major) + "." + stringify(minor) + "." + stringify(patch) + " - this is " + Anope::VersionShort());
+	throw ModuleException("This module requires version " + Anope::ToString(major) + "." + Anope::ToString(minor) + "." + Anope::ToString(patch) + " - this is " + Anope::VersionShort());
 }
 
 ModuleReturn ModuleManager::DeleteModule(Module *m)

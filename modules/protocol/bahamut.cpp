@@ -19,15 +19,15 @@ public:
 
 	bool IsValid(Anope::string &value) const override
 	{
-		try
-		{
-			Anope::string rest;
-			if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
-				return true;
-		}
-		catch (const ConvertException &) { }
+		if (value.empty() || value[0] == ':')
+			return false;
 
-		return false;
+		Anope::string rest;
+		auto num1 = Anope::Convert<int>(value[0] == '*' ? value.substr(1) : value, 0, &rest);
+		if (num1 <= 0 || rest[0] != ':' || rest.length() <= 1)
+			return false;
+
+		return Anope::Convert<int>(rest.substr(1), 0, &rest) > 0 && rest.empty();
 	}
 };
 
@@ -52,7 +52,7 @@ public:
 		if (Servers::Capab.count("TSMODE") > 0)
 		{
 			auto params = values;
-			params.insert(params.begin(), { chan->name, stringify(chan->creation_time), modes });
+			params.insert(params.begin(), { chan->name, Anope::ToString(chan->creation_time), modes });
 			Uplink::SendInternal({}, source, "MODE", params);
 		}
 		else
@@ -62,7 +62,7 @@ public:
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
 		auto params = values;
-		params.insert(params.begin(), { u->nick, stringify(u->timestamp), modes });
+		params.insert(params.begin(), { u->nick, Anope::ToString(u->timestamp), modes });
 		Uplink::SendInternal({}, source, "SVSMODE", params);
 	}
 
@@ -323,13 +323,7 @@ struct IRCDMessageMode final
 		if (params.size() > 2 && IRCD->IsChannelValid(params[0]))
 		{
 			Channel *c = Channel::Find(params[0]);
-			time_t ts = 0;
-
-			try
-			{
-				ts = convertTo<time_t>(params[1]);
-			}
-			catch (const ConvertException &) { }
+			auto ts = Anope::Convert<time_t>(params[1], 0);
 
 			Anope::string modes = params[2];
 			for (unsigned int i = 3; i < params.size(); ++i)
@@ -382,8 +376,8 @@ struct IRCDMessageNick final
 			}
 
 			NickAlias *na = NULL;
-			time_t signon = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
-				stamp = params[7].is_pos_number_only() ? convertTo<time_t>(params[7]) : 0;
+			auto signon = Anope::Convert<time_t>(params[2], 0);
+			auto stamp = Anope::Convert<time_t>(params[7], 0);
 			if (signon && signon == stamp)
 				na = NickAlias::Find(params[0]);
 
@@ -406,7 +400,7 @@ struct IRCDMessageServer final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		unsigned int hops = Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+		auto hops = Anope::Convert<unsigned>(params[1], 0);
 		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[2]);
 	}
 };
@@ -463,7 +457,7 @@ struct IRCDMessageSJoin final
 			}
 		}
 
-		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
+		auto ts = Anope::Convert<time_t>(params[0], Anope::CurTime);
 		Message::Join::SJoin(source, params[1], ts, modes, users);
 	}
 };
@@ -477,7 +471,7 @@ struct IRCDMessageTopic final
 	{
 		Channel *c = Channel::Find(params[0]);
 		if (c)
-			c->ChangeTopicInternal(source.GetUser(), params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
+			c->ChangeTopicInternal(source.GetUser(), params[1], params[3], Anope::Convert<time_t>(params[2], Anope::CurTime));
 	}
 };
 

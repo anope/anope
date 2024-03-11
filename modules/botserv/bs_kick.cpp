@@ -106,11 +106,10 @@ struct KickerDataImpl final
 			data["ttb"] >> ttb;
 			spacesepstream sep(ttb);
 			for (int i = 0; sep.GetToken(tok) && i < TTB_SIZE; ++i)
-				try
-				{
-					kd->ttb[i] = convertTo<int16_t>(tok);
-				}
-				catch (const ConvertException &) { }
+			{
+				if (auto n = Anope::TryConvert<int16_t>(tok))
+					kd->ttb[i] = n.value();
+			}
 
 			kd->Check(ci);
 		}
@@ -206,21 +205,13 @@ protected:
 		{
 			if (!ttb.empty())
 			{
-				int16_t i;
-
-				try
+				kd->ttb[ttb_idx] = Anope::Convert<int16_t>(ttb, -1);
+				if (kd->ttb[ttb_idx] < 0)
 				{
-					i = convertTo<int16_t>(ttb);
-					if (i < 0)
-						throw ConvertException();
-				}
-				catch (const ConvertException &)
-				{
+					kd->ttb[ttb_idx] = 0;
 					source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 					return;
 				}
-
-				kd->ttb[ttb_idx] = i;
 			}
 			else
 				kd->ttb[ttb_idx] = 0;
@@ -386,13 +377,8 @@ public:
 
 			if (!ttb.empty())
 			{
-				try
-				{
-					kd->ttb[TTB_CAPS] = convertTo<int16_t>(ttb);
-					if (kd->ttb[TTB_CAPS] < 0)
-						throw ConvertException();
-				}
-				catch (const ConvertException &)
+				kd->ttb[TTB_CAPS] = Anope::Convert<int16_t>(ttb, -1);
+				if (kd->ttb[TTB_CAPS] < 0)
 				{
 					kd->ttb[TTB_CAPS] = 0;
 					source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
@@ -402,21 +388,11 @@ public:
 			else
 				kd->ttb[TTB_CAPS] = 0;
 
-			kd->capsmin = 10;
-			try
-			{
-				kd->capsmin = convertTo<int16_t>(min);
-			}
-			catch (const ConvertException &) { }
+			kd->capsmin = Anope::Convert(min, 0);
 			if (kd->capsmin < 1)
 				kd->capsmin = 10;
 
-			kd->capspercent = 25;
-			try
-			{
-				kd->capspercent = convertTo<int16_t>(percent);
-			}
-			catch (const ConvertException &) { }
+			kd->capspercent = Anope::Convert(percent, 0);
 			if (kd->capspercent < 1 || kd->capspercent > 100)
 				kd->capspercent = 25;
 
@@ -518,42 +494,25 @@ public:
 
 			if (!ttb.empty())
 			{
-				int16_t i;
-
-				try
+				kd->ttb[TTB_FLOOD] = Anope::Convert<int16_t>(ttb, -1);
+				if (kd->ttb[TTB_FLOOD] < 0)
 				{
-					i = convertTo<int16_t>(ttb);
-					if (i < 0)
-						throw ConvertException();
-				}
-				catch (const ConvertException &)
-				{
+					kd->ttb[TTB_FLOOD] = 0;
 					source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 					return;
 				}
-
-				kd->ttb[TTB_FLOOD] = i;
 			}
 			else
 				kd->ttb[TTB_FLOOD] = 0;
 
-			kd->floodlines = 6;
-			try
-			{
-				kd->floodlines = convertTo<int16_t>(lines);
-			}
-			catch (const ConvertException &) { }
+			kd->floodlines = Anope::Convert(lines, -1);
 			if (kd->floodlines < 2)
 				kd->floodlines = 6;
 
-			kd->floodsecs = 10;
-			try
-			{
-				kd->floodsecs = convertTo<int16_t>(secs);
-			}
-			catch (const ConvertException &) { }
+			kd->floodsecs = Anope::Convert(secs, -1);
 			if (kd->floodsecs < 1)
 				kd->floodsecs = 10;
+
 			if (kd->floodsecs > Config->GetModule(me)->Get<time_t>("keepdata"))
 				kd->floodsecs = Config->GetModule(me)->Get<time_t>("keepdata");
 
@@ -651,31 +610,18 @@ public:
 
 			if (!ttb.empty())
 			{
-				int16_t i;
-
-				try
+				kd->ttb[TTB_REPEAT] = Anope::Convert(ttb, -1);
+				if (kd->ttb[TTB_REPEAT] < 0)
 				{
-					i = convertTo<int16_t>(ttb);
-					if (i < 0)
-						throw ConvertException();
-				}
-				catch (const ConvertException &)
-				{
+					kd->ttb[TTB_REPEAT] = 0;
 					source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 					return;
 				}
-
-				kd->ttb[TTB_REPEAT] = i;
 			}
 			else
 				kd->ttb[TTB_REPEAT] = 0;
 
-			kd->repeattimes = 3;
-			try
-			{
-				kd->repeattimes = convertTo<int16_t>(times);
-			}
-			catch (const ConvertException &) { }
+			kd->repeattimes = Anope::Convert<int16_t>(times, -1);
 			if (kd->repeattimes < 1)
 				kd->repeattimes = 3;
 

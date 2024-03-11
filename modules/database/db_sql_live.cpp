@@ -163,7 +163,7 @@ public:
 		if (s_type)
 		{
 			if (obj->id > 0)
-				this->RunQuery("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
+				this->RunQuery("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + Anope::ToString(obj->id));
 			s_type->objects.erase(obj->id);
 		}
 		this->updated_items.erase(obj);
@@ -185,17 +185,16 @@ public:
 		{
 			const std::map<Anope::string, Anope::string> &row = res.Row(i);
 
-			unsigned int id;
-			try
-			{
-				id = convertTo<unsigned int>(res.Get(i, "id"));
-			}
-			catch (const ConvertException &)
+
+
+			auto oid = Anope::TryConvert<unsigned int>(res.Get(i, "id"));
+			if (!oid.has_value())
 			{
 				Log(LOG_DEBUG) << "Unable to convert id from " << obj->GetName();
 				continue;
 			}
 
+			auto id = oid.value();
 			if (res.Get(i, "timestamp").empty())
 			{
 				clear_null = true;
@@ -237,7 +236,7 @@ public:
 				else
 				{
 					if (!s)
-						this->RunQuery("UPDATE `" + prefix + obj->GetName() + "` SET `timestamp` = " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " WHERE `id` = " + stringify(id));
+						this->RunQuery("UPDATE `" + prefix + obj->GetName() + "` SET `timestamp` = " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " WHERE `id` = " + Anope::ToString(id));
 					else
 						delete s;
 				}

@@ -168,7 +168,7 @@ protected:
 			for (unsigned i = 0, end = list.size(); i < end; ++i)
 			{
 				ListFormatter::ListEntry entry;
-				entry["Number"] = stringify(i + 1);
+				entry["Number"] = Anope::ToString(i + 1);
 				entry["Creator"] = list[i]->who;
 				entry["Created"] = Anope::strftime(list[i]->time, NULL, true);
 				entry["Text"] = list[i]->text;
@@ -232,18 +232,14 @@ protected:
 					source.Reply(READ_ONLY_MODE);
 				if (!text.equals_ci("ALL"))
 				{
-					try
+					unsigned num = Anope::Convert<unsigned>(text, 0);
+					if (num > 0 && num <= list.size())
 					{
-						unsigned num = convertTo<unsigned>(text);
-						if (num > 0 && num <= list.size())
-						{
-							this->ns->DelNewsItem(list[num - 1]);
-							source.Reply(msgs[MSG_DELETED], num);
-							Log(LOG_ADMIN, source, this) << "to delete a news item";
-							return;
-						}
+						this->ns->DelNewsItem(list[num - 1]);
+						source.Reply(msgs[MSG_DELETED], num);
+						Log(LOG_ADMIN, source, this) << "to delete a news item";
+						return;
 					}
-					catch (const ConvertException &) { }
 
 					source.Reply(msgs[MSG_DEL_NOT_FOUND], text.c_str());
 				}

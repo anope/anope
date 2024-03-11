@@ -144,7 +144,7 @@ public:
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
 		auto params = values;
-		params.insert(params.begin(), { "*", "SVSMODE", u->GetUID(), stringify(u->timestamp), modes });
+		params.insert(params.begin(), { "*", "SVSMODE", u->GetUID(), Anope::ToString(u->timestamp), modes });
 		Uplink::SendInternal({}, source, "ENCAP", params);
 	}
 
@@ -306,23 +306,11 @@ struct IRCDMessageUID final
 		if (ip == "0")
 			ip.clear();
 
-		time_t ts;
-		try
-		{
-			ts = convertTo<time_t>(params[2]);
-		}
-		catch (const ConvertException &)
-		{
-			ts = Anope::CurTime;
-		}
-
+		auto ts = Anope::Convert<time_t>(params[2], Anope::CurTime);
 		NickAlias *na = NULL;
-		try
-		{
-			if (params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == ts)
-				na = NickAlias::Find(params[0]);
-		}
-		catch (const ConvertException &) { }
+		if (Anope::Convert<time_t>(params[8], 0) == ts)
+			na = NickAlias::Find(params[0]);
+
 		if (params[8] != "0" && !na)
 			na = NickAlias::Find(params[8]);
 

@@ -320,7 +320,7 @@ public:
 				++display_counter;
 
 				ListFormatter::ListEntry entry;
-				entry["Number"] = stringify(display_counter);
+				entry["Number"] = Anope::ToString(display_counter);
 				entry["Nick"] = nick;
 				if (!hr->ident.empty())
 					entry["Vhost"] = hr->ident + "@" + hr->host;

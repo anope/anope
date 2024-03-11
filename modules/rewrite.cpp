@@ -38,27 +38,34 @@ struct Rewrite final
 			else
 			{
 				int num = -1, end = -1;
-				try
+				Anope::string num_str = token.substr(1);
+				size_t hy = num_str.find('-');
+				if (hy == Anope::string::npos)
 				{
-					Anope::string num_str = token.substr(1);
-					size_t hy = num_str.find('-');
-					if (hy == Anope::string::npos)
-					{
-						num = convertTo<int>(num_str);
-						end = num + 1;
-					}
+					auto n = Anope::TryConvert<int>(num_str);
+					if (!n.has_value())
+						continue;
+
+					num = n.value();
+					end = num + 1;
+				}
+				else
+				{
+					auto n = Anope::TryConvert<int>(num_str.substr(0, hy));
+					if (!n.has_value())
+						continue;
+
+					num = n.value();
+					if (hy == num_str.length() - 1)
+						end = params.size();
 					else
 					{
-						num = convertTo<int>(num_str.substr(0, hy));
-						if (hy == num_str.length() - 1)
-							end = params.size();
-						else
-							end = convertTo<int>(num_str.substr(hy + 1)) + 1;
+						n = Anope::TryConvert<int>(num_str.substr(hy + 1));
+						if (!n.has_value())
+							continue;
+
+						end = n.value() + 1;
 					}
-				}
-				catch (const ConvertException &)
-				{
-					continue;
 				}
 
 				for (int i = num; i < end && static_cast<unsigned>(i) < params.size(); ++i)

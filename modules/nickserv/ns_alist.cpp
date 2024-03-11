@@ -59,7 +59,7 @@ public:
 			if (ci->GetFounder() == nc)
 			{
 				++chan_count;
-				entry["Number"] = stringify(chan_count);
+				entry["Number"] = Anope::ToString(chan_count);
 				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 				entry["Access"] = Language::Translate(source.GetAccount(), _("Founder"));
 				entry["Description"] = ci->desc;
@@ -70,7 +70,7 @@ public:
 			if (ci->GetSuccessor() == nc)
 			{
 				++chan_count;
-				entry["Number"] = stringify(chan_count);
+				entry["Number"] = Anope::ToString(chan_count);
 				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 				entry["Access"] = Language::Translate(source.GetAccount(), _("Successor"));
 				entry["Description"] = ci->desc;
@@ -84,7 +84,7 @@ public:
 
 			++chan_count;
 
-			entry["Number"] = stringify(chan_count);
+			entry["Number"] = Anope::ToString(chan_count);
 			entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 			for (auto &p : access.paths)
 			{

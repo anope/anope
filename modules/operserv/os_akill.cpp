@@ -285,7 +285,7 @@ private:
 						return;
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(number);
+					entry["Number"] = Anope::ToString(number);
 					entry["Mask"] = x->mask;
 					entry["Creator"] = x->by;
 					entry["Created"] = Anope::strftime(x->created, NULL, true);
@@ -307,7 +307,7 @@ private:
 				if (mask.empty() || mask.equals_ci(x->mask) || mask == x->id || Anope::Match(x->mask, mask, false, true))
 				{
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(i + 1);
+					entry["Number"] = Anope::ToString(i + 1);
 					entry["Mask"] = x->mask;
 					entry["Creator"] = x->by;
 					entry["Created"] = Anope::strftime(x->created, NULL, true);

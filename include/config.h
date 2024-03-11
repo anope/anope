@@ -46,14 +46,7 @@ namespace Configuration
 
 		template<typename T> T Get(const Anope::string &tag, const Anope::string &def = "") const
 		{
-			const Anope::string &value = this->Get<const Anope::string>(tag, def);
-			if (!value.empty())
-				try
-				{
-					return convertTo<T>(value);
-				}
-				catch (const ConvertException &) { }
-			return T();
+			return Anope::TryConvert<T>(this->Get<const Anope::string>(tag, def)).value_or(T());
 		}
 
 		bool Set(const Anope::string &tag, const Anope::string &value);

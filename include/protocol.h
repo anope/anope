@@ -164,14 +164,14 @@ public:
 	template <typename... Args>
 	void SendMode(const MessageSource &source, Channel *chan, const Anope::string &modes, Args &&...args)
 	{
-		SendModeInternal(source, chan, modes, { stringify(args)... });
+		SendModeInternal(source, chan, modes, { Anope::ToString(args)... });
 	}
 
 	virtual void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values);
 	template <typename... Args>
 	void SendMode(const MessageSource &source, User *u, const Anope::string &modes, Args &&...args)
 	{
-		SendModeInternal(source, u, modes, { stringify(args)... });
+		SendModeInternal(source, u, modes, { Anope::ToString(args)... });
 	}
 
 	/** Introduces a client to the rest of the network
@@ -258,7 +258,7 @@ public:
 	template <typename... Args>
 	void SendNumeric(int numeric, const Anope::string &dest, Args &&...args)
 	{
-		SendNumericInternal(numeric, dest, { stringify(args)... });
+		SendNumericInternal(numeric, dest, { Anope::ToString(args)... });
 	}
 
 	virtual void SendLogin(User *u, NickAlias *na) = 0;

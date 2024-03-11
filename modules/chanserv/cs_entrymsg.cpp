@@ -123,7 +123,7 @@ private:
 			EntryMsg *msg = (*messages)->at(i);
 
 			ListFormatter::ListEntry entry;
-			entry["Number"] = stringify(i + 1);
+			entry["Number"] = Anope::ToString(i + 1);
 			entry["Creator"] = msg->creator;
 			entry["Created"] = Anope::strftime(msg->when, NULL, true);
 			entry["Message"] = msg->message;
@@ -162,21 +162,16 @@ private:
 			source.Reply(_("Entry message list for \002%s\002 is empty."), ci->name.c_str());
 		else
 		{
-			try
+			auto i = Anope::Convert<unsigned>(message, 0);
+			if (i > 0 && i <= (*messages)->size())
 			{
-				unsigned i = convertTo<unsigned>(message);
-				if (i > 0 && i <= (*messages)->size())
-				{
-					delete (*messages)->at(i - 1);
-					if ((*messages)->empty())
-						ci->Shrink<EntryMessageList>("entrymsg");
-					Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
-					source.Reply(_("Entry message \002%i\002 for \002%s\002 deleted."), i, ci->name.c_str());
-				}
-				else
-					throw ConvertException();
+				delete (*messages)->at(i - 1);
+				if ((*messages)->empty())
+					ci->Shrink<EntryMessageList>("entrymsg");
+				Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
+				source.Reply(_("Entry message \002%i\002 for \002%s\002 deleted."), i, ci->name.c_str());
 			}
-			catch (const ConvertException &)
+			else
 			{
 				source.Reply(_("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
 			}

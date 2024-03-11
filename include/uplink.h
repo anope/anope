@@ -23,25 +23,25 @@ namespace Uplink
 	template<typename... Args>
 	void Send(const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, Args &&...args)
 	{
-		SendInternal(tags, source, command, { stringify(args)... });
+		SendInternal(tags, source, command, { Anope::ToString(args)... });
 	}
 
 	template<typename... Args>
 	void Send(const Anope::map<Anope::string> &tags, const Anope::string &command, Args &&...args)
 	{
-		SendInternal(tags, Me, command, { stringify(args)... });
+		SendInternal(tags, Me, command, { Anope::ToString(args)... });
 	}
 
 	template<typename... Args>
 	void Send(const MessageSource &source, const Anope::string &command, Args &&...args)
 	{
-		SendInternal({}, source, command, { stringify(args)... });
+		SendInternal({}, source, command, { Anope::ToString(args)... });
 	}
 
 	template<typename... Args>
 	void Send(const Anope::string &command, Args &&...args)
 	{
-		SendInternal({}, Me, command, { stringify(args)... });
+		SendInternal({}, Me, command, { Anope::ToString(args)... });
 	}
 }
 

@@ -178,12 +178,11 @@ struct IRCDMessage005 final
 				data = param.substr(pos+1, param.length());
 				if (parameter == "MODES")
 				{
-					unsigned maxmodes = convertTo<unsigned>(data);
-					IRCD->MaxModes = maxmodes;
+					IRCD->MaxModes = Anope::Convert<unsigned>(data, IRCD->MaxModes);
 				}
 				else if (parameter == "NICKLEN")
 				{
-					nicklen = data.is_pos_number_only() ? convertTo<size_t>(data) : 0;
+					nicklen = Anope::Convert<size_t>(data, 0);
 				}
 			}
 		}
@@ -557,7 +556,7 @@ struct IRCDMessageServer final
 		else
 		{
 			// our uplink is introducing a new server
-			unsigned int hops = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+			auto hops = Anope::Convert<unsigned>(params[1], 0);
 			new Server(source.GetServer(), params[0], hops, params[3], params[2]);
 		}
 		/*

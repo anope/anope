@@ -45,13 +45,12 @@ NumberList::NumberList(const Anope::string &list, bool descending) : desc(descen
 
 		if (t == Anope::string::npos)
 		{
-			try
+			if (auto num = Anope::TryConvert<unsigned>(token, &error))
 			{
-				unsigned num = convertTo<unsigned>(token, error, false);
 				if (error.empty())
-					numbers.insert(num);
+					numbers.insert(num.value());
 			}
-			catch (const ConvertException &)
+			else
 			{
 				error = "1";
 			}
@@ -68,15 +67,17 @@ NumberList::NumberList(const Anope::string &list, bool descending) : desc(descen
 		else
 		{
 			Anope::string error2;
-			try
+			auto n1 = Anope::TryConvert<unsigned>(token.substr(0, t), &error);
+			auto n2 = Anope::TryConvert<unsigned>(token.substr(t + 1), &error);
+			if (n1.has_value() && n2.has_value())
 			{
-				unsigned num1 = convertTo<unsigned>(token.substr(0, t), error, false);
-				unsigned num2 = convertTo<unsigned>(token.substr(t + 1), error2, false);
+				auto num1 = n1.value();
+				auto num2 = n2.value();
 				if (error.empty() && error2.empty())
 					for (unsigned i = num1; i <= num2; ++i)
 						numbers.insert(i);
 			}
-			catch (const ConvertException &)
+			else
 			{
 				error = "1";
 			}
@@ -271,36 +272,27 @@ time_t Anope::DoTime(const Anope::string &s)
 	if (s.empty())
 		return 0;
 
-	int amount = 0;
 	Anope::string end;
-
-	try
+	auto amount = Anope::Convert<int>(s, -1, &end);
+	if (!end.empty())
 	{
-		amount = convertTo<int>(s, end, false);
-		if (!end.empty())
+		switch (end[0])
 		{
-			switch (end[0])
-			{
-				case 's':
-					return amount;
-				case 'm':
-					return amount * 60;
-				case 'h':
-					return amount * 3600;
-				case 'd':
-					return amount * 86400;
-				case 'w':
-					return amount * 86400 * 7;
-				case 'y':
-					return amount * 86400 * 365;
-				default:
-					break;
-			}
+			case 's':
+				return amount;
+			case 'm':
+				return amount * 60;
+			case 'h':
+				return amount * 3600;
+			case 'd':
+				return amount * 86400;
+			case 'w':
+				return amount * 86400 * 7;
+			case 'y':
+				return amount * 86400 * 365;
+			default:
+				break;
 		}
-	}
-	catch (const ConvertException &)
-	{
-		amount = -1;
 	}
 
 	return amount;
@@ -316,32 +308,32 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc)
 	time_t seconds = (t) % 60;
 
 	if (!years && !days && !hours && !minutes)
-		return stringify(seconds) + " " + (seconds != 1 ? Language::Translate(nc, _("seconds")) : Language::Translate(nc, _("second")));
+		return Anope::ToString(seconds) + " " + (seconds != 1 ? Language::Translate(nc, _("seconds")) : Language::Translate(nc, _("second")));
 	else
 	{
 		bool need_comma = false;
 		Anope::string buffer;
 		if (years)
 		{
-			buffer = stringify(years) + " " + (years != 1 ? Language::Translate(nc, _("years")) : Language::Translate(nc, _("year")));
+			buffer = Anope::ToString(years) + " " + (years != 1 ? Language::Translate(nc, _("years")) : Language::Translate(nc, _("year")));
 			need_comma = true;
 		}
 		if (days)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(days) + " " + (days != 1 ? Language::Translate(nc, _("days")) : Language::Translate(nc, _("day")));
+			buffer += Anope::ToString(days) + " " + (days != 1 ? Language::Translate(nc, _("days")) : Language::Translate(nc, _("day")));
 			need_comma = true;
 		}
 		if (hours)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(hours) + " " + (hours != 1 ? Language::Translate(nc, _("hours")) : Language::Translate(nc, _("hour")));
+			buffer += Anope::ToString(hours) + " " + (hours != 1 ? Language::Translate(nc, _("hours")) : Language::Translate(nc, _("hour")));
 			need_comma = true;
 		}
 		if (minutes)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(minutes) + " " + (minutes != 1 ? Language::Translate(nc, _("minutes")) : Language::Translate(nc, _("minute")));
+			buffer += Anope::ToString(minutes) + " " + (minutes != 1 ? Language::Translate(nc, _("minutes")) : Language::Translate(nc, _("minute")));
 		}
 		return buffer;
 	}
@@ -596,23 +588,23 @@ Anope::string Anope::LastError()
 Anope::string Anope::Version()
 {
 #ifdef VERSION_GIT
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA + " (" + VERSION_GIT + ")";
+	return Anope::ToString(VERSION_MAJOR) + "." + Anope::ToString(VERSION_MINOR) + "." + Anope::ToString(VERSION_PATCH) + VERSION_EXTRA + " (" + VERSION_GIT + ")";
 #else
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA;
+	return Anope::ToString(VERSION_MAJOR) + "." + Anope::ToString(VERSION_MINOR) + "." + Anope::ToString(VERSION_PATCH) + VERSION_EXTRA;
 #endif
 }
 
 Anope::string Anope::VersionShort()
 {
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH);
+	return Anope::ToString(VERSION_MAJOR) + "." + Anope::ToString(VERSION_MINOR) + "." + Anope::ToString(VERSION_PATCH);
 }
 
 Anope::string Anope::VersionBuildString()
 {
 #ifdef REPRODUCIBLE_BUILD
-	Anope::string s = "build #" + stringify(BUILD);
+	Anope::string s = "build #" + Anope::ToString(BUILD);
 #else
-	Anope::string s = "build #" + stringify(BUILD) + ", compiled " + Anope::compiled;
+	Anope::string s = "build #" + Anope::ToString(BUILD) + ", compiled " + Anope::compiled;
 #endif
 	Anope::string flags;
 

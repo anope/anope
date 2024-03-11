@@ -60,7 +60,7 @@ public:
 
 				ListFormatter::ListEntry entry;
 				entry["Name"] = cc->chan->name;
-				entry["Users"] = stringify(cc->chan->users.size());
+				entry["Users"] = Anope::ToString(cc->chan->users.size());
 				entry["Modes"] = cc->chan->GetModes(true, true);
 				entry["Topic"] = cc->chan->topic;
 				list.AddEntry(entry);
@@ -87,7 +87,7 @@ public:
 
 				ListFormatter::ListEntry entry;
 				entry["Name"] = c->name;
-				entry["Users"] = stringify(c->users.size());
+				entry["Users"] = Anope::ToString(c->users.size());
 				entry["Modes"] = c->GetModes(true, true);
 				entry["Topic"] = c->topic;
 				list.AddEntry(entry);

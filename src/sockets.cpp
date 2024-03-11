@@ -282,13 +282,7 @@ cidr::cidr(const Anope::string &ip)
 		Anope::string cidr_range = ip.substr(sl + 1);
 
 		this->cidr_ip = real_ip;
-		this->cidr_len = ipv6 ? 128 : 32;
-		try
-		{
-			if (cidr_range.is_pos_number_only())
-				this->cidr_len = convertTo<unsigned int>(cidr_range);
-		}
-		catch (const ConvertException &) { }
+		this->cidr_len = Anope::Convert<unsigned int>(cidr_range, ipv6 ? 128 : 32);
 		this->addr.pton(ipv6 ? AF_INET6 : AF_INET, real_ip);
 	}
 }

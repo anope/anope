@@ -398,7 +398,7 @@ bool ModeManager::AddUserMode(UserMode *um)
 
 	if (um->name.empty())
 	{
-		um->name = stringify(++GenericUserModes);
+		um->name = Anope::ToString(++GenericUserModes);
 		Log() << "ModeManager: Added generic support for user mode " << um->mchar;
 	}
 
@@ -425,7 +425,7 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 
 	if (cm->name.empty())
 	{
-		cm->name = stringify(++GenericChannelModes);
+		cm->name = Anope::ToString(++GenericChannelModes);
 		Log() << "ModeManager: Added generic support for channel mode " << cm->mchar;
 	}
 
@@ -783,22 +783,15 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 						&cidr_range = this->host.substr(sl + 1);
 
 			sockaddrs addr(cidr_ip);
-
-			try
+			auto range = Anope::TryConvert<unsigned short>(cidr_range);
+			if (addr.valid() && range.has_value())
 			{
-				if (addr.valid() && cidr_range.is_pos_number_only())
-				{
-					this->cidr_len = convertTo<unsigned short>(cidr_range);
+				this->cidr_len = range.value();
+				this->host = cidr_ip;
+				this->family = addr.family();
 
-					/* If we got here, cidr_len is a valid number. */
-
-					this->host = cidr_ip;
-					this->family = addr.family();
-
-					Log(LOG_DEBUG) << "Ban " << mask << " has cidr " << this->cidr_len;
-				}
+				Log(LOG_DEBUG) << "Ban " << mask << " has cidr " << this->cidr_len;
 			}
-			catch (const ConvertException &) { }
 		}
 	}
 
@@ -822,11 +815,11 @@ Anope::string Entry::GetNUHMask() const
 	{
 		case AF_INET:
 			if (cidr_len <= 32)
-				c = "/" + stringify(cidr_len);
+				c = "/" + Anope::ToString(cidr_len);
 			break;
 		case AF_INET6:
 			if (cidr_len <= 128)
-				c = "/" + stringify(cidr_len);
+				c = "/" + Anope::ToString(cidr_len);
 			break;
 	}
 

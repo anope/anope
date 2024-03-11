@@ -142,19 +142,15 @@ public:
 		if (bcryptprovider.Compare(hash_value, req->GetPassword()))
 		{
 			unsigned long rounds = 0;
-			try
-			{
-				// Try to extract the rounds count to cher
-				pos = hash_value.find('$', 4);
-				if (pos == Anope::string::npos)
-					throw ConvertException("Malformed BCrypt hash?!");
 
-				rounds = convertTo<unsigned long>(hash_value.substr(4, pos - 4));
-			}
-			catch (const ConvertException &)
-			{
+			// Try to extract the rounds count to check if we need to
+			// re-encrypt the password.
+			pos = hash_value.find('$', 4);
+			if (pos != Anope::string::npos)
+				rounds = Anope::Convert<unsigned long>(hash_value.substr(4, pos - 4), 0);
+
+			if (!rounds)
 				Log(LOG_DEBUG) << "Unable to determine the rounds of a bcrypt hash: " << hash_value;
-			}
 
 			// If we are NOT the first encryption module or the Bcrypt rounds
 			// are different we want to re-encrypt the password with the primary

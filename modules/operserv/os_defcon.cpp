@@ -192,13 +192,7 @@ public:
 			return;
 		}
 
-		int newLevel = 0;
-		try
-		{
-			newLevel = convertTo<int>(lvl);
-		}
-		catch (const ConvertException &) { }
-
+		auto newLevel = Anope::Convert<int>(lvl, 0);
 		if (newLevel < 1 || newLevel > 5)
 		{
 			this->OnSyntaxError(source, "");

@@ -67,12 +67,8 @@ public:
 
 			Anope::string Limit;
 			unsigned limit = 0;
-			try
-			{
-				if (c->GetParam("LIMIT", Limit))
-					limit = convertTo<unsigned>(Limit);
-			}
-			catch (const ConvertException &) { }
+			if (c->GetParam("LIMIT", Limit))
+				limit = Anope::Convert<unsigned>(Limit, limit);
 
 			/* Should we be invited? */
 			if (c->HasMode("INVITE") || (limit && c->users.size() >= limit))

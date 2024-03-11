@@ -105,7 +105,7 @@ class CommandNSAJoin final
 			{
 				AJoinEntry *aj = (*channels)->at(i);
 				ListFormatter::ListEntry entry;
-				entry["Number"] = stringify(i + 1);
+				entry["Number"] = Anope::ToString(i + 1);
 				entry["Channel"] = aj->channel;
 				entry["Key"] = aj->key;
 				list.AddEntry(entry);
@@ -382,13 +382,11 @@ public:
 					Anope::string l;
 					if (c->GetParam("LIMIT", l))
 					{
-						try
+						if (auto limit = Anope::TryConvert<unsigned>(l))
 						{
-							unsigned limit = convertTo<unsigned>(l);
-							if (c->users.size() >= limit)
+							if (c->users.size() >= limit.value())
 								need_invite = true;
 						}
-						catch (const ConvertException &) { }
 					}
 				}
 			}

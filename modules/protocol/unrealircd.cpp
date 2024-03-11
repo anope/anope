@@ -675,15 +675,16 @@ public:
 	/* Borrowed part of this check from UnrealIRCd */
 	bool IsValid(Anope::string &value) const override
 	{
-		if (value.empty())
+		if (value.empty() || value[0] == ':')
 			return false;
-		try
-		{
-			Anope::string rest;
-			if (value[0] != ':' && convertTo<unsigned>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<unsigned>(rest.substr(1), rest, false) > 0 && rest.empty())
-				return true;
-		}
-		catch (const ConvertException &) { }
+
+		Anope::string rest;
+		auto num1 = Anope::Convert<unsigned>(value[0] == '*' ? value.substr(1) : value, 0, &rest);
+		if (!num1 || rest[0] != ':' || rest.length() <= 1)
+			return false;
+
+		if (Anope::Convert<int>(rest.substr(1), 0, &rest) > 0 && rest.empty())
+			return true;
 
 		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
 		size_t end_bracket = value.find(']', 1);
@@ -702,16 +703,10 @@ public:
 				++p;
 			if (p == arg.length() || (arg[p] != 'c' && arg[p] != 'j' && arg[p] != 'k' && arg[p] != 'm' && arg[p] != 'n' && arg[p] != 't'))
 				continue; /* continue instead of break for forward compatibility. */
-			try
-			{
-				int v = arg.substr(0, p).is_number_only() ? convertTo<int>(arg.substr(0, p)) : 0;
-				if (v < 1 || v > 999)
-					return false;
-			}
-			catch (const ConvertException &)
-			{
+
+			auto v = Anope::Convert<int>(arg.substr(0, p), 0);
+			if (v < 1 || v > 999)
 				return false;
-			}
 		}
 
 		return true;
@@ -734,27 +729,14 @@ public:
 			return false; // no ':' or it's the first char, both are invalid
 
 		Anope::string rest;
-		try
-		{
-			if (convertTo<int>(value, rest, false) <= 0)
-				return false; // negative numbers and zero are invalid
+		if (Anope::Convert<int>(value, 0, &rest) <= 0)
+			return false; // negative numbers and zero are invalid
 
-			rest = rest.substr(1);
-			int n;
-			// The part after the ':' is a duration and it
-			// can be in the user friendly "1d3h20m" format, make sure we accept that
-			n = Anope::DoTime(rest);
-
-			if (n <= 0)
-				return false;
-		}
-		catch (const ConvertException &e)
-		{
-			// conversion error, invalid
+		// The part after the ':' is a duration and it
+		// can be in the user friendly "1d3h20m" format, make sure we accept that
+		auto n = Anope::DoTime(rest.substr(1));
+		return n <= 0;
 			return false;
-		}
-
-		return true;
 	}
 };
 
@@ -1177,14 +1159,7 @@ struct IRCDMessageMode final
 		if (IRCD->IsChannelValid(params[0]))
 		{
 			Channel *c = Channel::Find(params[0]);
-			time_t ts = 0;
-
-			try
-			{
-				if (server_source)
-					ts = convertTo<time_t>(params[params.size() - 1]);
-			}
-			catch (const ConvertException &) { }
+			auto ts = Anope::Convert<time_t>(params[params.size() - 1], 0);
 
 			if (c)
 				c->SetModesInternal(source, modes, ts);
@@ -1215,7 +1190,7 @@ struct IRCDMessageNetInfo final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		Uplink::Send("NETINFO", MaxUserCount, Anope::CurTime, convertTo<int>(params[2]), params[3], 0, 0, 0, params[7]);
+		Uplink::Send("NETINFO", MaxUserCount, Anope::CurTime, params[2], params[3], 0, 0, 0, params[7]);
 	}
 };
 
@@ -1263,8 +1238,7 @@ struct IRCDMessageNick final
 			if (vhost.equals_cs("*"))
 				vhost.clear();
 
-			time_t user_ts = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime;
-
+			auto user_ts = Anope::Convert<time_t>(params[2], Anope::CurTime);
 			Server *s = Server::Find(params[5]);
 			if (s == NULL)
 			{
@@ -1278,7 +1252,7 @@ struct IRCDMessageNick final
 				;
 			else if (params[6].is_pos_number_only())
 			{
-				if (convertTo<time_t>(params[6]) == user_ts)
+				if (Anope::Convert<time_t>(params[6], 0) == user_ts)
 					na = NickAlias::Find(params[0]);
 			}
 			else
@@ -1398,7 +1372,7 @@ struct IRCDMessageServer final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		unsigned int hops = Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+		auto hops = Anope::Convert<unsigned>(params[1], 0);
 
 		if (params[1].equals_cs("1"))
 		{
@@ -1421,7 +1395,7 @@ struct IRCDMessageSID final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		unsigned int hops = Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+		auto hops = Anope::Convert<unsigned>(params[1], 0);
 
 		new Server(source.GetServer(), params[0], hops, params[3], params[2]);
 
@@ -1503,7 +1477,7 @@ struct IRCDMessageSJoin final
 			}
 		}
 
-		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
+		auto ts = Anope::Convert<time_t>(params[0], Anope::CurTime);
 		Message::Join::SJoin(source, params[1], ts, modes, users);
 
 		if (!bans.empty() || !excepts.empty() || !invites.empty())
@@ -1582,7 +1556,7 @@ struct IRCDMessageTopic final
 	{
 		Channel *c = Channel::Find(params[0]);
 		if (c)
-			c->ChangeTopicInternal(source.GetUser(), params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
+			c->ChangeTopicInternal(source.GetUser(), params[1], params[3], Anope::Convert<time_t>(params[2], Anope::CurTime));
 	}
 };
 
@@ -1637,16 +1611,7 @@ struct IRCDMessageUID final
 		if (chost == "*")
 			chost.clear();
 
-		time_t user_ts;
-		try
-		{
-			user_ts = convertTo<time_t>(timestamp);
-		}
-		catch (const ConvertException &)
-		{
-			user_ts = Anope::CurTime;
-		}
-
+		auto user_ts = Anope::Convert<time_t>(timestamp, Anope::CurTime);
 		NickAlias *na = NULL;
 
 		if (account == "0")
@@ -1655,7 +1620,7 @@ struct IRCDMessageUID final
 		}
 		else if (account.is_pos_number_only())
 		{
-			if (convertTo<time_t>(account) == user_ts)
+			if (Anope::Convert<time_t>(account, 0) == user_ts)
 				na = NickAlias::Find(nickname);
 		}
 		else

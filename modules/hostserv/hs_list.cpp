@@ -45,12 +45,9 @@ public:
 					source.Reply(LIST_INCORRECT_RANGE);
 					return;
 				}
-				try
-				{
-					from = convertTo<int>(key.substr(1, tmp - 1));
-					to = convertTo<int>(key.substr(tmp + 1));
-				}
-				catch (const ConvertException &) { }
+
+				from = Anope::Convert<int>(key.substr(1, tmp - 1), 0);
+				to = Anope::Convert<int>(key.substr(tmp + 1), 0);
 			}
 		}
 
@@ -70,7 +67,7 @@ public:
 					++display_counter;
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(display_counter);
+					entry["Number"] = Anope::ToString(display_counter);
 					entry["Nick"] = na->nick;
 					entry["Vhost"] = na->GetVhostMask();
 					entry["Creator"] = na->GetVhostCreator();
@@ -88,7 +85,7 @@ public:
 				{
 					++display_counter;
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(display_counter);
+					entry["Number"] = Anope::ToString(display_counter);
 					entry["Nick"] = na->nick;
 					entry["Vhost"] = na->GetVhostMask();
 					entry["Creator"] = na->GetVhostCreator();

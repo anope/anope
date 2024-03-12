@@ -535,10 +535,18 @@ namespace Anope
 	 */
 	extern CoreExport Anope::string NormalizeBuffer(const Anope::string &);
 
-	/** Main processing routine. Parses the message and takes the appropriate action.
-	 * @param Raw message from the uplink
+	/** Parses a raw message from the uplink and calls its command handler.
+	 * @param message Raw message from the uplink
 	 */
-	extern void Process(const Anope::string &);
+	extern void Process(const Anope::string &message);
+
+	/** Calls the command handler for an already parsed message.
+	 * @param source Source of the message.
+	 * @param command Command name.
+	 * @param params Any extra parameters.
+	 * @param tags IRCv3 message tags.
+	 */
+	extern CoreExport void ProcessInternal(MessageSource &src, const Anope::string &command, const std::vector<Anope::string> &params, const Anope::map<Anope::string> & tags);
 
 	/** Does a blocking dns query and returns the first IP.
 	 * @param host host to look up

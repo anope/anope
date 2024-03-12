@@ -54,28 +54,31 @@ void Anope::Process(const Anope::string &buffer)
 		}
 	}
 
-	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
-
 	MessageSource src(source);
-
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(OnMessage, MOD_RESULT, (src, command, params, tags));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
+	ProcessInternal(src, command, params, tags);
+}
+
+void Anope::ProcessInternal(MessageSource &src, const Anope::string &command, const std::vector<Anope::string> &params, const Anope::map<Anope::string> & tags)
+{
+	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
 	ServiceReference<IRCDMessage> m("IRCDMessage", proto_name + "/" + command.lower());
 	if (!m)
 	{
-		Log(LOG_DEBUG) << "unknown message from server (" << buffer << ")";
+		Log(LOG_DEBUG) << "unknown message from server: " << command;
 		return;
 	}
 
 	if (m->HasFlag(IRCDMessage::FLAG_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
 		Log(LOG_DEBUG) << "invalid parameters for " << command << ": " << params.size() << " != " << m->GetParamCount();
 	else if (m->HasFlag(IRCDMessage::FLAG_REQUIRE_USER) && !src.GetUser())
-		Log(LOG_DEBUG) << "unexpected non-user source " << source << " for " << command;
-	else if (m->HasFlag(IRCDMessage::FLAG_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
-		Log(LOG_DEBUG) << "unexpected non-server source " << source << " for " << command;
+		Log(LOG_DEBUG) << "unexpected non-user source " << src.GetSource() << " for " << command;
+	else if (m->HasFlag(IRCDMessage::FLAG_REQUIRE_SERVER) && !src.GetSource().empty() && !src.GetServer())
+		Log(LOG_DEBUG) << "unexpected non-server source " << src.GetSource() << " for " << command;
 	else
 	{
 		try

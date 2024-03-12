@@ -1597,60 +1597,87 @@ struct IRCDMessageCapab final
 	}
 };
 
+struct IRCDMessageChgHost final
+	: IRCDMessage
+{
+	IRCDMessageChgHost(Module *creator)
+		: IRCDMessage(creator, "CHGHOST", 2)
+	{
+		SetFlag(FLAG_REQUIRE_USER);
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		auto *u = User::Find(params[0]);
+		if (!u || u->server != Me)
+			return;
+
+		u->SetDisplayedHost(params[1]);
+		if (spanningtree_proto_ver >= 1206)
+			Uplink::Send(u, "FHOST", u->GetDisplayedHost(), '*');
+		else
+			Uplink::Send(u, "FHOST", u->GetDisplayedHost());
+	}
+};
+
+struct IRCDMessageChgIdent final
+	: IRCDMessage
+{
+	IRCDMessageChgIdent(Module *creator)
+		: IRCDMessage(creator, "CHGIDENT", 2)
+	{
+		SetFlag(FLAG_REQUIRE_USER);
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		auto *u = User::Find(params[0]);
+		if (!u || u->server != Me)
+			return;
+
+		u->SetIdent(params[1]);
+		if (spanningtree_proto_ver >= 1206)
+			Uplink::Send(u, "FIDENT", u->GetIdent(), '*');
+		else
+			Uplink::Send(u, "FIDENT", u->GetIdent());
+	}
+};
+
+struct IRCDMessageChgName final
+	: IRCDMessage
+{
+	IRCDMessageChgName(Module *creator)
+		: IRCDMessage(creator, "CHGNAME", 2)
+	{
+		SetFlag(FLAG_REQUIRE_USER);
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		auto *u = User::Find(params[0]);
+		if (!u || u->server != Me)
+			return;
+
+		u->SetRealname(params[1]);
+		Uplink::Send(u, "FNAME", u->realname);
+	}
+};
+
 struct IRCDMessageEncap final
 	: IRCDMessage
 {
-	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(FLAG_SOFT_LIMIT); }
+	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 2)
+	{
+		SetFlag(FLAG_SOFT_LIMIT);
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		if (!Anope::Match(Me->GetSID(), params[0]) && !Anope::Match(Me->GetName(), params[0]))
 			return;
 
-		if (params[1] == "CHGIDENT")
-		{
-			User *u = User::Find(params[2]);
-			if (!u || u->server != Me)
-				return;
-
-			u->SetIdent(params[3]);
-			if (spanningtree_proto_ver >= 1206)
-				Uplink::Send(u, "FIDENT", params[3], '*');
-			else
-				Uplink::Send(u, "FIDENT", params[3]);
-		}
-		else if (params[1] == "CHGHOST")
-		{
-			User *u = User::Find(params[2]);
-			if (!u || u->server != Me)
-				return;
-
-			u->SetDisplayedHost(params[3]);
-			if (spanningtree_proto_ver >= 1206)
-				Uplink::Send(u, "FHOST", params[3], '*');
-			else
-				Uplink::Send(u, "FHOST", params[3]);
-		}
-		else if (params[1] == "CHGNAME")
-		{
-			User *u = User::Find(params[2]);
-			if (!u || u->server != Me)
-				return;
-
-			u->SetRealname(params[3]);
-			Uplink::Send(u, "FNAME", params[3]);
-		}
-		else if (SASL::sasl && params[1] == "SASL" && params.size() >= 6)
-		{
-			SASL::Message m;
-			m.source = params[2];
-			m.target = params[3];
-			m.type = params[4];
-			m.data = params[5];
-			m.ext = params.size() > 6 ? params[6] : "";
-
-			SASL::sasl->ProcessMessage(m);
-		}
+		std::vector<Anope::string> newparams(params.begin() + 2, params.end());
+		Anope::ProcessInternal(source, params[1], newparams, tags);
 	}
 };
 
@@ -1712,6 +1739,30 @@ struct IRCDMessageKick final
 
 		const Anope::string &reason = params.size() > 3 ? params[3] : params[2];
 		c->KickInternal(source, params[1], reason);
+	}
+};
+
+struct IRCDMessageSASL final
+	: IRCDMessage
+{
+	IRCDMessageSASL(Module *creator)
+		: IRCDMessage(creator, "SASL", 4)
+	{
+		SetFlag(FLAG_SOFT_LIMIT);
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		if (!SASL::sasl)
+			return;
+
+		SASL::Message m;
+		m.source = params[0];
+		m.target = params[1];
+		m.type = params[2];
+		m.data = params[3];
+		m.ext = params.size() > 4 ? params[4] : "";
+		SASL::sasl->ProcessMessage(m);
 	}
 };
 
@@ -2357,6 +2408,9 @@ class ProtoInspIRCd final
 	/* Our message handlers */
 	IRCDMessageAway message_away;
 	IRCDMessageCapab message_capab;
+	IRCDMessageChgHost message_chghost;
+	IRCDMessageChgIdent message_chgident;
+	IRCDMessageChgName message_chgname;
 	IRCDMessageEncap message_encap;
 	IRCDMessageEndburst message_endburst;
 	IRCDMessageFHost message_fhost;
@@ -2374,6 +2428,7 @@ class ProtoInspIRCd final
 	IRCDMessageOperType message_opertype;
 	IRCDMessagePing message_ping;
 	IRCDMessageRSQuit message_rsquit;
+	IRCDMessageSASL message_sasl;
 	IRCDMessageSave message_save;
 	IRCDMessageServer message_server;
 	IRCDMessageSQuit message_squit;
@@ -2403,6 +2458,9 @@ public:
 		, message_time(this)
 		, message_away(this)
 		, message_capab(this)
+		, message_chghost(this)
+		, message_chgident(this)
+		, message_chgname(this)
 		, message_encap(this)
 		, message_endburst(this)
 		, message_fhost(this)
@@ -2420,6 +2478,7 @@ public:
 		, message_opertype(this)
 		, message_ping(this)
 		, message_rsquit(this)
+		, message_sasl(this)
 		, message_save(this)
 		, message_server(this)
 		, message_squit(this)

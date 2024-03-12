@@ -315,7 +315,7 @@ public:
 
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		if (Servers::Capab.count("SVSTOPIC"))
+		if (Servers::Capab.count("TOPICLOCK"))
 		{
 			Uplink::Send(c->WhoSends(), "SVSTOPIC", c->name, c->topic_ts, c->topic_setter, c->topic);
 		}

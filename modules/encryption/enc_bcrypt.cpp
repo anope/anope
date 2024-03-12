@@ -63,7 +63,7 @@ public:
 	Anope::string Finalize() override
 	{
 		auto salt = GenerateSalt();
-		if (!salt.empty())
+		if (salt.empty())
 			return {};
 		return Hash(this->buffer, salt);
 	}

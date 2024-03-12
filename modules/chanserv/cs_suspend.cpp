@@ -214,6 +214,13 @@ class CSSuspend final
 		}
 	};
 
+	void Expire(ChannelInfo *ci)
+	{
+		suspend.Unset(ci);
+		Log(this) << "Expiring suspend for " << ci->name;
+	}
+
+
 	bool Show(CommandSource &source, const Anope::string &what) const
 	{
 		return source.IsOper() || std::find(show.begin(), show.end(), what) != show.end();
@@ -259,22 +266,27 @@ public:
 
 		expire = false;
 
-		if (!si->expires)
-			return;
-
-		if (si->expires < Anope::CurTime)
+		if (!Anope::NoExpire && si->expires && si->expires < Anope::CurTime)
 		{
 			ci->last_used = Anope::CurTime;
-			suspend.Unset(ci);
-
-			Log(this) << "Expiring suspend for " << ci->name;
+			Expire(ci);
 		}
 	}
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
-		if (u->HasMode("OPER") || !c->ci || !suspend.HasExt(c->ci))
+		if (u->HasMode("OPER") || !c->ci)
 			return EVENT_CONTINUE;
+
+		CSSuspendInfo *si = suspend.Get(c->ci);
+		if (!si)
+			return EVENT_CONTINUE;
+
+		if (!Anope::NoExpire && si->expires && si->expires < Anope::CurTime)
+		{
+			Expire(c->ci);
+			return EVENT_CONTINUE;
+		}
 
 		reason = Language::Translate(u, _("This channel may not be used."));
 		return EVENT_STOP;

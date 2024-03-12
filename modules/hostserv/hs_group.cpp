@@ -28,7 +28,7 @@ public:
 		setting = true;
 		for (auto *nick : *na->nc->aliases)
 		{
-			if (nick)
+			if (nick && nick != na)
 			{
 				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 				FOREACH_MOD(OnSetVhost, (nick));

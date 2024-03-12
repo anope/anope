@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/encryption.h"
 #include "modules/cs_mode.h"
 #include "modules/httpd.h"
 #include "modules/sasl.h"
@@ -33,6 +34,9 @@ namespace
 
 	// Non-introduced users who have authenticated via SASL.
 	std::list<SASLUser> saslusers;
+
+	// A reference to the SHA-2 algorithm provider.
+	static ServiceReference<Encryption::Provider> sha256("Encryption::Provider", "sha256");
 
 	// The version of the InspIRCd protocol that we are using.
 	size_t spanningtree_proto_ver = 1205;
@@ -165,9 +169,8 @@ public:
 	void SendConnect() override
 	{
 		Uplink::Send("CAPAB", "START", 1206);
-		Uplink::Send("CAPAB", "CAPABILITIES", "CASEMAPPING=" + Config->GetBlock("options")->Get<const Anope::string>("casemap", "ascii"));
+		Uplink::Send("CAPAB", "CAPABILITIES", "CASEMAPPING=" + Config->GetBlock("options")->Get<const Anope::string>("casemap", "ascii") + (sha256 ? " CHALLENGE=*" : ""));
 		Uplink::Send("CAPAB", "END");
-		Uplink::Send("SERVER", Me->GetName(), Config->Uplinks[Anope::CurrentUplink].password, 0, Me->GetSID(), Me->GetDescription());
 	}
 
 	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override
@@ -1017,17 +1020,42 @@ struct IRCDMessageCapab final
 		Anope::string type;
 	};
 
-	static std::pair<Anope::string, size_t> ParseCapability(const Anope::string &token)
+	// The HMAC challenge sent by the remote server.
+	Anope::string challenge;
+
+	Anope::string GetPassword()
 	{
+		if (challenge.empty() || !sha256)
+			return Config->Uplinks[Anope::CurrentUplink].password;
+
+		Anope::string b64challenge;
+		Anope::B64Encode(sha256->HMAC(Config->Uplinks[Anope::CurrentUplink].password, challenge), b64challenge);
+		challenge.clear();
+
+		return "AUTH:" + b64challenge.rtrim('=');
+	}
+
+	static std::pair<Anope::string, Anope::string> ParseCapability(const Anope::string &token)
+	{
+		Anope::string key;
+		Anope::string value;
 		auto sep = token.find('=');
 		if (sep == Anope::string::npos)
-			return { token, 0 };
+		{
+			// FOO
+			key = token;
+		}
+		else
+		{
+			// FOO=bar
+			key = token.substr(0, sep);
+			value = token.substr(sep + 1);
+		}
 
-		auto value = token.substr(sep + 1);
-		if (!value.is_pos_number_only())
-			return { token, 0 };
+		if (Anope::ProtocolDebug)
+			Log(LOG_DEBUG) << "Parsed capability: key=" << key << " value=" << value;
 
-		return { token.substr(0, sep), Anope::Convert<size_t>(value, 0) };
+		return { key, value };
 	}
 
 	static bool ParseExtBan(const Anope::string &token, ExtBanInfo &extban)
@@ -1508,24 +1536,26 @@ struct IRCDMessageCapab final
 			while (ssep.GetToken(capab))
 			{
 				auto [tokname, tokvalue] = ParseCapability(capab);
-				if (tokname == "MAXCHANNEL")
-					IRCD->MaxChannel = tokvalue;
+				if (tokname == "CHALLENGE")
+					challenge = tokvalue;
+				else if (tokname == "MAXCHANNEL")
+					IRCD->MaxChannel = Anope::Convert<size_t>(tokvalue, IRCD->MaxChannel);
 				else if (tokname == "MAXHOST")
-					IRCD->MaxHost = tokvalue;
+					IRCD->MaxHost = Anope::Convert<size_t>(tokvalue, IRCD->MaxHost);
 				else if (tokname == "MAXNICK")
-					IRCD->MaxNick = tokvalue;
+					IRCD->MaxNick = Anope::Convert<size_t>(tokvalue, IRCD->MaxNick);
 				else if (tokname == "MAXUSER")
-					IRCD->MaxUser = tokvalue;
+					IRCD->MaxUser = Anope::Convert<size_t>(tokvalue, IRCD->MaxUser);
 
 				// Deprecated 1205 keys.
 				else if (tokname == "CHANMAX")
-					IRCD->MaxChannel = tokvalue;
-				else if (tokname == "GLOBOPS" && tokvalue)
+					IRCD->MaxChannel = Anope::Convert<size_t>(tokvalue, IRCD->MaxChannel);
+				else if (tokname == "GLOBOPS" && Anope::Convert<bool>(tokvalue, false))
 					Servers::Capab.insert("GLOBOPS");
 				else if (tokname == "IDENTMAX")
-					IRCD->MaxUser = tokvalue;
+					IRCD->MaxUser = Anope::Convert<size_t>(tokvalue, IRCD->MaxUser);
 				else if (tokname == "NICKMAX")
-					IRCD->MaxNick = tokvalue;
+					IRCD->MaxNick = Anope::Convert<size_t>(tokvalue, IRCD->MaxNick);
 			}
 		}
 		else if (params[0].equals_cs("END"))
@@ -1561,6 +1591,8 @@ struct IRCDMessageCapab final
 
 			if (!Servers::Capab.count("GLOBOPS"))
 				Log() << "The remote server does not have the globops module; oper notices will be sent as announcements until the module is loaded.";
+
+			Uplink::Send("SERVER", Me->GetName(), GetPassword(), 0, Me->GetSID(), Me->GetDescription());
 		}
 	}
 };

@@ -65,6 +65,33 @@ class MyForbidService : public ForbidService
 
 	inline std::vector<ForbidData *>& forbids(unsigned t) { return (*this->forbid_data)[t - 1]; }
 
+	void Expire(ForbidData *fd, unsigned ft, size_t idx)
+	{
+		Anope::string typestr;
+		switch (ft)
+		{
+			case FT_NICK:
+				typestr = "nick";
+				break;
+			case FT_CHAN:
+				typestr = "chan";
+				break;
+			case FT_EMAIL:
+				typestr = "email";
+				break;
+			case FT_REGISTER:
+				typestr = "register";
+				break;
+			default:
+				typestr = "unknown";
+				break;
+		}
+
+		Log(LOG_NORMAL, "expire/forbid", Config->GetClient("OperServ")) << "Expiring forbid for " << fd->mask << " type " << typestr;
+		this->forbids(ft).erase(this->forbids(ft).begin() + idx);
+		delete fd;
+	}
+
  public:
 	MyForbidService(Module *m) : ForbidService(m), forbid_data("ForbidData") { }
 
@@ -99,6 +126,12 @@ class MyForbidService : public ForbidService
 		{
 			ForbidData *d = this->forbids(ftype)[i - 1];
 
+			if (!Anope::NoExpire && d->expires && Anope::CurTime >= d->expires)
+			{
+				Expire(d, ftype, i - 1);
+				continue;
+			}
+
 			if (Anope::Match(mask, d->mask, false, true))
 				return d;
 		}
@@ -110,6 +143,12 @@ class MyForbidService : public ForbidService
 		for (unsigned i = this->forbids(ftype).size(); i > 0; --i)
 		{
 			ForbidData *d = this->forbids(ftype)[i - 1];
+
+			if (!Anope::NoExpire && d->expires && Anope::CurTime >= d->expires)
+			{
+				Expire(d, ftype, i - 1);
+				continue;
+			}
 
 			if (d->mask.equals_ci(mask))
 				return d;
@@ -126,19 +165,7 @@ class MyForbidService : public ForbidService
 				ForbidData *d = this->forbids(j).at(i - 1);
 
 				if (d->expires && !Anope::NoExpire && Anope::CurTime >= d->expires)
-				{
-					Anope::string ftype = "none";
-					if (d->type == FT_NICK)
-						ftype = "nick";
-					else if (d->type == FT_CHAN)
-						ftype = "chan";
-					else if (d->type == FT_EMAIL)
-						ftype = "email";
-
-					Log(LOG_NORMAL, "expire/forbid", Config->GetClient("OperServ")) << "Expiring forbid for " << d->mask << " type " << ftype;
-					this->forbids(j).erase(this->forbids(j).begin() + i - 1);
-					delete d;
-				}
+					Expire(d, j, i - 1);
 				else
 					f.push_back(d);
 			}

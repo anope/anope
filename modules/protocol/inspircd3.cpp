@@ -180,7 +180,7 @@ class InspIRCd3Proto : public IRCDProto
 
 	void SendTopic(const MessageSource &source, Channel *c) anope_override
 	{
-		if (Servers::Capab.count("SVSTOPIC"))
+		if (Servers::Capab.count("TOPICLOCK"))
 		{
 			UplinkSocket::Message(c->WhoSends()) << "SVSTOPIC " << c->name << " " << c->topic_ts << " " << c->topic_setter << " :" << c->topic;
 		}

@@ -102,20 +102,24 @@ private:
 		return nicks.substr(1);
 	}
 
-	static void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
+	static void SendChgIdentInternal(const Anope::string &uid, const Anope::string &vIdent)
 	{
 		if (!Servers::Capab.count("CHGIDENT"))
-			Log() << "CHGIDENT not loaded!";
-		else
-			Uplink::Send("CHGIDENT", nick, vIdent);
+		{
+			Log() << "Unable to change the vident of " << uid << " as the remote server does not have the chgident module loaded.";
+			return;
+		}
+		Uplink::Send("ENCAP", uid.substr(0, 3), "CHGIDENT", uid, vIdent);
 	}
 
-	static void SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
+	static void SendChgHostInternal(const Anope::string &uid, const Anope::string &vhost)
 	{
 		if (!Servers::Capab.count("CHGHOST"))
-			Log() << "CHGHOST not loaded!";
-		else
-			Uplink::Send("CHGHOST", nick, vhost);
+		{
+			Log() << "Unable to change the vhost of " << uid << " as the remote server does not have the chghost module loaded.";
+			return;
+		}
+		Uplink::Send("ENCAP", uid.substr(0, 3), "CHGHOST", uid, vhost);
 	}
 
 	static void SendAddLine(const Anope::string &xtype, const Anope::string &mask, time_t duration, const Anope::string &addedby, const Anope::string &reason)
@@ -504,9 +508,10 @@ public:
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
 	{
 		if (!vIdent.empty())
-			this->SendChgIdentInternal(u->nick, vIdent);
+			this->SendChgIdentInternal(u->GetUID(), vIdent);
+
 		if (!vhost.empty())
-			this->SendChgHostInternal(u->nick, vhost);
+			this->SendChgHostInternal(u->GetUID(), vhost);
 	}
 
 	void SendSVSHold(const Anope::string &nick, time_t t) override
@@ -624,10 +629,10 @@ public:
 		if (na)
 		{
 			if (!na->GetVhostIdent().empty())
-				Uplink::Send("ENCAP", uid.substr(0, 3), "CHGIDENT", uid, na->GetVhostIdent());
+				SendChgHostInternal(uid, na->GetVhostIdent());
 
 			if (!na->GetVhostHost().empty())
-				Uplink::Send("ENCAP", uid.substr(0, 3), "CHGHOST", uid, na->GetVhostHost());
+				SendChgHostInternal(uid, na->GetVhostHost());
 
 			// Mark this SASL session as pending user introduction.
 			SASLUser su;

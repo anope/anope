@@ -25,18 +25,6 @@ struct SASLUser final
 
 namespace
 {
-	// The maximum length of a channel name.
-	size_t maxchannel = 0;
-
-	// The maximum length of a hostname.
-	size_t maxhost = 0;
-
-	// The maximum length of a nickname.
-	size_t maxnick = 0;
-
-	// The maximum length of a username.
-	size_t maxuser = 0;
-
 	// The SID of a server we are waiting to squit.
 	Anope::string rsquit_id;
 
@@ -159,16 +147,6 @@ public:
 		MaxLine = 4096;
 	}
 
-	size_t GetMaxChannel() override
-	{
-		return maxchannel ? maxchannel : IRCDProto::GetMaxChannel();
-	}
-
-	size_t GetMaxHost() override
-	{
-		return maxhost ? maxhost : IRCDProto::GetMaxHost();
-	}
-
 	size_t GetMaxListFor(Channel *c, ChannelMode *cm) override
 	{
 		ListLimits *limits = maxlist.Get(c);
@@ -183,15 +161,6 @@ public:
 		return IRCDProto::GetMaxListFor(c, cm);
 	}
 
-	size_t GetMaxNick() override
-	{
-		return maxnick ? maxnick : IRCDProto::GetMaxNick();
-	}
-
-	size_t GetMaxUser() override
-	{
-		return maxuser ? maxuser : IRCDProto::GetMaxUser();
-	}
 
 	void SendConnect() override
 	{
@@ -650,7 +619,7 @@ public:
 
 	bool IsIdentValid(const Anope::string &ident) override
 	{
-		if (ident.empty() || ident.length() > IRCD->GetMaxUser())
+		if (ident.empty() || ident.length() > IRCD->MaxUser)
 			return false;
 
 		for (auto c : ident)
@@ -1540,25 +1509,25 @@ struct IRCDMessageCapab final
 			{
 				auto [tokname, tokvalue] = ParseCapability(capab);
 				if (tokname == "MAXCHANNEL")
-					maxchannel = tokvalue;
+					IRCD->MaxChannel = tokvalue;
 				else if (tokname == "MAXHOST")
-					maxhost = tokvalue;
+					IRCD->MaxHost = tokvalue;
 				else if (tokname == "MAXMODES")
 					IRCD->MaxModes = tokvalue;
 				else if (tokname == "MAXNICK")
-					maxnick = tokvalue;
+					IRCD->MaxNick = tokvalue;
 				else if (tokname == "MAXUSER")
-					maxuser = tokvalue;
+					IRCD->MaxUser = tokvalue;
 
 				// Deprecated 1205 keys.
 				else if (tokname == "CHANMAX")
-					maxchannel = tokvalue;
+					IRCD->MaxChannel = tokvalue;
 				else if (tokname == "GLOBOPS" && tokvalue)
 					Servers::Capab.insert("GLOBOPS");
 				else if (tokname == "IDENTMAX")
-					maxuser = tokvalue;
+					IRCD->MaxUser = tokvalue;
 				else if (tokname == "NICKMAX")
-					maxnick = tokvalue;
+					IRCD->MaxNick = tokvalue;
 			}
 		}
 		else if (params[0].equals_cs("END"))
@@ -1995,7 +1964,7 @@ struct IRCDMessageFJoin final
 			users.push_back(sju);
 		}
 
-		auto ts = IRCD->ExtractTimestamp(params[0]);
+		auto ts = IRCD->ExtractTimestamp(params[1]);
 		Message::Join::SJoin(source, params[0], ts, modes, users);
 	}
 };

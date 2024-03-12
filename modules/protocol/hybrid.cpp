@@ -280,7 +280,7 @@ public:
 
 	bool IsIdentValid(const Anope::string &ident) override
 	{
-		if (ident.empty() || ident.length() > IRCD->GetMaxUser())
+		if (ident.empty() || ident.length() > IRCD->MaxUser)
 			return false;
 
 		/*

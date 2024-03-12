@@ -34,7 +34,7 @@ public:
 		}
 
 		/* Truncate long nicknames to nicklen characters */
-		size_t nicklen = IRCD->GetMaxNick();
+		size_t nicklen = IRCD->MaxNick;
 		if (newnick.length() > nicklen)
 		{
 			source.Reply(_("Nick \002%s\002 was truncated to %zu characters."), newnick.c_str(), nicklen);

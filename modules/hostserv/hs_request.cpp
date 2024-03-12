@@ -122,9 +122,9 @@ public:
 
 		if (!user.empty())
 		{
-			if (user.length() > IRCD->GetMaxUser())
+			if (user.length() > IRCD->MaxUser)
 			{
-				source.Reply(HOST_SET_IDENTTOOLONG, IRCD->GetMaxUser());
+				source.Reply(HOST_SET_IDENTTOOLONG, IRCD->MaxUser);
 				return;
 			}
 			else if (!IRCD->CanSetVIdent)
@@ -142,9 +142,9 @@ public:
 			}
 		}
 
-		if (host.length() > IRCD->GetMaxHost())
+		if (host.length() > IRCD->MaxHost)
 		{
-			source.Reply(HOST_SET_TOOLONG, IRCD->GetMaxHost());
+			source.Reply(HOST_SET_TOOLONG, IRCD->MaxHost);
 			return;
 		}
 

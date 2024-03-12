@@ -110,11 +110,24 @@ public:
 	/** Can we ask the server to unban a user? */
 	bool CanClearBans = false;
 
-	/* The maximum number of modes we are allowed to set with one MODE command */
-	unsigned MaxModes = 3;
+	/* The maximum length of a channel name. */
+	size_t MaxChannel = 0;
+
+	/* The maximum length of a hostname. */
+	size_t MaxHost = 0;
 
 	/* The maximum number of bytes a line may have */
 	unsigned MaxLine = 512;
+
+	/* The maximum number of modes we are allowed to set with one MODE command */
+	unsigned MaxModes = 3;
+
+	/* The maximum length of a nickname. */
+	size_t MaxNick = 0;
+
+	/* The maximum length of a username. */
+	size_t MaxUser = 0;
+
 
 	/* Retrieves the next free UID or SID */
 	virtual Anope::string UID_Retrieve();
@@ -313,17 +326,6 @@ public:
 
 	virtual Anope::string NormalizeMask(const Anope::string &mask);
 
-	/** Retrieves the maximum length of a channel name. */
-	virtual size_t GetMaxChannel();
-
-	/** Retrieves the maximum length of a hostname. */
-	virtual size_t GetMaxHost();
-
-	/** Retrieves the maximum length of a nickname. */
-	virtual size_t GetMaxNick();
-
-	/** Retrieves the maximum length of a username. */
-	virtual size_t GetMaxUser();
 };
 
 class CoreExport MessageSource final

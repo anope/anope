@@ -28,21 +28,21 @@ private:
 			return;
 		}
 
-		if (nick.length() > IRCD->GetMaxNick())
+		if (nick.length() > IRCD->MaxNick)
 		{
-			source.Reply(_("Bot nicks may only be %zu characters long."), IRCD->GetMaxNick());
+			source.Reply(_("Bot nicks may only be %zu characters long."), IRCD->MaxNick);
 			return;
 		}
 
-		if (user.length() > IRCD->GetMaxUser())
+		if (user.length() > IRCD->MaxUser)
 		{
-			source.Reply(_("Bot idents may only be %zu characters long."), IRCD->GetMaxUser());
+			source.Reply(_("Bot idents may only be %zu characters long."), IRCD->MaxUser);
 			return;
 		}
 
-		if (host.length() > IRCD->GetMaxHost())
+		if (host.length() > IRCD->MaxHost)
 		{
-			source.Reply(_("Bot hosts may only be %zu characters long."), IRCD->GetMaxHost());
+			source.Reply(_("Bot hosts may only be %zu characters long."), IRCD->MaxHost);
 			return;
 		}
 
@@ -118,21 +118,21 @@ private:
 			return;
 		}
 
-		if (nick.length() > IRCD->GetMaxNick())
+		if (nick.length() > IRCD->MaxNick)
 		{
-			source.Reply(_("Bot nicks may only be %zu characters long."), IRCD->GetMaxNick());
+			source.Reply(_("Bot nicks may only be %zu characters long."), IRCD->MaxNick);
 			return;
 		}
 
-		if (user.length() > IRCD->GetMaxUser())
+		if (user.length() > IRCD->MaxUser)
 		{
-			source.Reply(_("Bot idents may only be %zu characters long."), IRCD->GetMaxUser());
+			source.Reply(_("Bot idents may only be %zu characters long."), IRCD->MaxUser);
 			return;
 		}
 
-		if (host.length() > IRCD->GetMaxHost())
+		if (host.length() > IRCD->MaxHost)
 		{
-			source.Reply(_("Bot hosts may only be %zu characters long."), IRCD->GetMaxHost()
+			source.Reply(_("Bot hosts may only be %zu characters long."), IRCD->MaxHost
 				);
 			return;
 		}

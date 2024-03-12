@@ -143,8 +143,8 @@ public:
 		CanSVSLogout = true;
 		CanCertFP = true;
 		RequiresID = true;
-		MaxModes = 20;
-		MaxLine = 4096;
+		MaxModes = 0;
+		MaxLine = 0;
 	}
 
 	size_t GetMaxListFor(Channel *c, ChannelMode *cm) override
@@ -1512,8 +1512,6 @@ struct IRCDMessageCapab final
 					IRCD->MaxChannel = tokvalue;
 				else if (tokname == "MAXHOST")
 					IRCD->MaxHost = tokvalue;
-				else if (tokname == "MAXMODES")
-					IRCD->MaxModes = tokvalue;
 				else if (tokname == "MAXNICK")
 					IRCD->MaxNick = tokvalue;
 				else if (tokname == "MAXUSER")

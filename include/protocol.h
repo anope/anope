@@ -117,10 +117,10 @@ public:
 	size_t MaxHost = 0;
 
 	/* The maximum number of bytes a line may have */
-	unsigned MaxLine = 512;
+	size_t MaxLine = 512;
 
 	/* The maximum number of modes we are allowed to set with one MODE command */
-	unsigned MaxModes = 3;
+	size_t MaxModes = 3;
 
 	/* The maximum length of a nickname. */
 	size_t MaxNick = 0;

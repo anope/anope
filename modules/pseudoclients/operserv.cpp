@@ -126,6 +126,9 @@ class SQLineManager : public XLineManager
 		{
 			XLine *x = *it;
 
+			if (!Anope::NoExpire && x->expires && x->expires < Anope::CurTime)
+				continue; // Skip expired lines.
+
 			if (x->regex)
 			{
 				if (x->regex->Matches(c->name))

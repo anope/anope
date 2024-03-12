@@ -323,7 +323,7 @@ struct IRCDMessageMode final
 		if (params.size() > 2 && IRCD->IsChannelValid(params[0]))
 		{
 			Channel *c = Channel::Find(params[0]);
-			auto ts = Anope::Convert<time_t>(params[1], 0);
+			auto ts = IRCD->ExtractTimestamp(params[1]);
 
 			Anope::string modes = params[2];
 			for (unsigned int i = 3; i < params.size(); ++i)
@@ -376,8 +376,8 @@ struct IRCDMessageNick final
 			}
 
 			NickAlias *na = NULL;
-			auto signon = Anope::Convert<time_t>(params[2], 0);
-			auto stamp = Anope::Convert<time_t>(params[7], 0);
+			auto signon = IRCD->ExtractTimestamp(params[2]);
+			auto stamp = IRCD->ExtractTimestamp(params[7]);
 			if (signon && signon == stamp)
 				na = NickAlias::Find(params[0]);
 
@@ -457,7 +457,7 @@ struct IRCDMessageSJoin final
 			}
 		}
 
-		auto ts = Anope::Convert<time_t>(params[0], Anope::CurTime);
+		auto ts = IRCD->ExtractTimestamp(params[0]);
 		Message::Join::SJoin(source, params[1], ts, modes, users);
 	}
 };
@@ -471,7 +471,7 @@ struct IRCDMessageTopic final
 	{
 		Channel *c = Channel::Find(params[0]);
 		if (c)
-			c->ChangeTopicInternal(source.GetUser(), params[1], params[3], Anope::Convert<time_t>(params[2], Anope::CurTime));
+			c->ChangeTopicInternal(source.GetUser(), params[1], params[3], IRCD->ExtractTimestamp(params[2]));
 	}
 };
 

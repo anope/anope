@@ -306,9 +306,9 @@ struct IRCDMessageUID final
 		if (ip == "0")
 			ip.clear();
 
-		auto ts = Anope::Convert<time_t>(params[2], Anope::CurTime);
+		auto ts = IRCD->ExtractTimestamp(params[2]);
 		NickAlias *na = NULL;
-		if (Anope::Convert<time_t>(params[8], 0) == ts)
+		if (IRCD->ExtractTimestamp(params[8]) == ts)
 			na = NickAlias::Find(params[0]);
 
 		if (params[8] != "0" && !na)

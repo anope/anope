@@ -1159,7 +1159,7 @@ struct IRCDMessageMode final
 		if (IRCD->IsChannelValid(params[0]))
 		{
 			Channel *c = Channel::Find(params[0]);
-			auto ts = Anope::Convert<time_t>(params[params.size() - 1], 0);
+			auto ts = IRCD->ExtractTimestamp(params.back());
 
 			if (c)
 				c->SetModesInternal(source, modes, ts);
@@ -1238,7 +1238,7 @@ struct IRCDMessageNick final
 			if (vhost.equals_cs("*"))
 				vhost.clear();
 
-			auto user_ts = Anope::Convert<time_t>(params[2], Anope::CurTime);
+			auto user_ts = IRCD->ExtractTimestamp(params[2]);
 			Server *s = Server::Find(params[5]);
 			if (s == NULL)
 			{
@@ -1252,7 +1252,7 @@ struct IRCDMessageNick final
 				;
 			else if (params[6].is_pos_number_only())
 			{
-				if (Anope::Convert<time_t>(params[6], 0) == user_ts)
+				if (IRCD->ExtractTimestamp(params[6]) == user_ts)
 					na = NickAlias::Find(params[0]);
 			}
 			else
@@ -1477,7 +1477,7 @@ struct IRCDMessageSJoin final
 			}
 		}
 
-		auto ts = Anope::Convert<time_t>(params[0], Anope::CurTime);
+		auto ts = IRCD->ExtractTimestamp(params[0]);
 		Message::Join::SJoin(source, params[1], ts, modes, users);
 
 		if (!bans.empty() || !excepts.empty() || !invites.empty())
@@ -1556,7 +1556,7 @@ struct IRCDMessageTopic final
 	{
 		Channel *c = Channel::Find(params[0]);
 		if (c)
-			c->ChangeTopicInternal(source.GetUser(), params[1], params[3], Anope::Convert<time_t>(params[2], Anope::CurTime));
+			c->ChangeTopicInternal(source.GetUser(), params[1], params[3], IRCD->ExtractTimestamp(params[2]));
 	}
 };
 
@@ -1611,7 +1611,7 @@ struct IRCDMessageUID final
 		if (chost == "*")
 			chost.clear();
 
-		auto user_ts = Anope::Convert<time_t>(timestamp, Anope::CurTime);
+		auto user_ts = IRCD->ExtractTimestamp(timestamp);
 		NickAlias *na = NULL;
 
 		if (account == "0")
@@ -1620,7 +1620,7 @@ struct IRCDMessageUID final
 		}
 		else if (account.is_pos_number_only())
 		{
-			if (Anope::Convert<time_t>(account, 0) == user_ts)
+			if (IRCD->ExtractTimestamp(account) == user_ts)
 				na = NickAlias::Find(nickname);
 		}
 		else

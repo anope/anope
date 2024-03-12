@@ -1721,7 +1721,7 @@ struct IRCDMessageSave final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		User *targ = User::Find(params[0]);
-		auto ts = Anope::Convert<time_t>(params[1], 0);
+		auto ts = IRCD->ExtractTimestamp(params[1]);
 		if (!targ || !ts || targ->timestamp != ts)
 			return;
 
@@ -1990,7 +1990,7 @@ struct IRCDMessageFJoin final
 			users.push_back(sju);
 		}
 
-		auto ts = Anope::Convert<time_t>(params[0], Anope::CurTime);
+		auto ts = IRCD->ExtractTimestamp(params[0]);
 		Message::Join::SJoin(source, params[0], ts, modes, users);
 	}
 };
@@ -2009,7 +2009,7 @@ struct IRCDMessageFMode final
 			modes += " " + params[n];
 
 		Channel *c = Channel::Find(params[0]);
-		auto ts = Anope::Convert<time_t>(params[1], 0);
+		auto ts = IRCD->ExtractTimestamp(params[1]);
 		if (c)
 			c->SetModesInternal(source, modes, ts);
 	}
@@ -2025,12 +2025,13 @@ struct IRCDMessageFTopic final
 		// :source FTOPIC channel ts topicts :topic
 		// :source FTOPIC channel ts topicts setby :topic (burst or RESYNC)
 
+		auto ts = IRCD->ExtractTimestamp(params[2]);
 		const Anope::string &setby = params.size() > 4 ? params[3] : source.GetName();
 		const Anope::string &topic = params.size() > 4 ? params[4] : params[3];
 
 		Channel *c = Channel::Find(params[0]);
 		if (c)
-			c->ChangeTopicInternal(NULL, setby, topic, Anope::Convert<time_t>(params[2], Anope::CurTime));
+			c->ChangeTopicInternal(NULL, setby, topic, ts);
 	}
 };
 
@@ -2079,7 +2080,7 @@ struct IRCDMessageIJoin final
 		time_t chants = Anope::CurTime;
 		if (params.size() >= 4)
 		{
-			chants = Anope::Convert<time_t>(params[2], 0);
+			chants = IRCD->ExtractTimestamp(params[2]);
 			for (auto mode : params[3])
 				user.first.AddMode(mode);
 		}
@@ -2107,7 +2108,7 @@ struct IRCDMessageLMode final
 			return; // Channel doesn't exist.
 
 		// If the TS is greater than ours, we drop the mode and don't pass it anywhere.
-		auto chants = Anope::Convert<time_t>(params[1], Anope::CurTime);
+		auto chants = IRCD->ExtractTimestamp(params[1]);
 		if (chants > chan->creation_time)
 			return;
 
@@ -2301,7 +2302,7 @@ struct IRCDMessageUID final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		size_t offset = params[8][0] == '+' ? 0 : 1;
-		time_t ts = Anope::Convert<time_t>(params[1], 0);
+		auto ts = IRCD->ExtractTimestamp(params[1]);
 
 		Anope::string modes = params[8+offset];
 		for (unsigned i = 9+offset; i < params.size() - 1; ++i)
@@ -2326,7 +2327,7 @@ struct IRCDMessageUID final
 
 		User *u = User::OnIntroduce(params[2], params[5+offset], params[3], params[4], params[6+offset], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? *na->nc : NULL);
 		if (u)
-			u->signon = Anope::Convert<time_t>(params[7+offset], 0);
+			u->signon = IRCD->ExtractTimestamp(params[7+offset]);
 	}
 };
 

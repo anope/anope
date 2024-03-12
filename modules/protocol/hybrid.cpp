@@ -468,7 +468,7 @@ struct IRCDMessageNick final
 	/* :0MCAAAAAB NICK newnick 1350157102 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		source.GetUser()->ChangeNick(params[0], Anope::Convert<time_t>(params[1], Anope::CurTime));
+		source.GetUser()->ChangeNick(params[0], IRCD->ExtractTimestamp(params[1]));
 	}
 };
 
@@ -581,7 +581,7 @@ struct IRCDMessageSJoin final
 			users.push_back(sju);
 		}
 
-		auto ts = Anope::Convert<time_t>(params[0], Anope::CurTime);
+		auto ts = IRCD->ExtractTimestamp(params[0]);
 		Message::Join::SJoin(source, params[1], ts, modes, users);
 	}
 };
@@ -600,7 +600,7 @@ struct IRCDMessageSVSMode final
 		if (!u)
 			return;
 
-		if (Anope::Convert<time_t>(params[1], 0) != u->timestamp)
+		if (IRCD->ExtractTimestamp(params[1]) != u->timestamp)
 			return;
 
 		u->SetModesInternal(source, params[2]);
@@ -618,7 +618,7 @@ struct IRCDMessageTBurst final
 	{
 		Anope::string setter;
 		sepstream(params[3], '!').GetToken(setter, 0);
-		auto topic_time = Anope::Convert<time_t>(params[2], Anope::CurTime);
+		auto topic_time = IRCD->ExtractTimestamp(params[2]);
 		Channel *c = Channel::Find(params[1]);
 
 		if (c)
@@ -635,7 +635,7 @@ struct IRCDMessageTMode final
 	/* :0MC TMODE 1654867975 #nether +ntR */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		auto ts = Anope::Convert<time_t>(params[0], 0);
+		auto ts = IRCD->ExtractTimestamp(params[0]);
 		Channel *c = Channel::Find(params[1]);
 		Anope::string modes = params[2];
 
@@ -663,7 +663,7 @@ struct IRCDMessageUID final
 
 		/* Source is always the server */
 		User::OnIntroduce(params[0], params[4], params[6], params[5], params[7], source.GetServer(), params[10],
-				Anope::Convert<time_t>(params[2], 0), params[3], params[8], na ? *na->nc : NULL);
+				IRCD->ExtractTimestamp(params[2]), params[3], params[8], na ? *na->nc : NULL);
 	}
 };
 

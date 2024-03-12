@@ -86,6 +86,14 @@ Anope::string IRCDProto::SID_Retrieve()
 	return current_sid;
 }
 
+time_t IRCDProto::ExtractTimestamp(const Anope::string &str)
+{
+	auto ts = Anope::TryConvert<time_t>(str);
+	if (!ts.has_value())
+		throw ProtocolException("Invalid timestamp: " + str);
+	return ts.value();
+}
+
 void IRCDProto::SendError(const Anope::string &reason)
 {
 	Uplink::Send("ERROR", reason);

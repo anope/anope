@@ -120,6 +120,9 @@ public:
 	virtual Anope::string UID_Retrieve();
 	virtual Anope::string SID_Retrieve();
 
+	/** Extracts a timestamp from a string. */
+	virtual time_t ExtractTimestamp(const Anope::string &str);
+
 	/** Sends an error to the uplink before disconnecting.
 	 * @param reason The error message.
 	 */

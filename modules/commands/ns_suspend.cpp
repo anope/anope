@@ -268,7 +268,7 @@ class NSSuspend : public Module
 
 		expire = false;
 
-		if (s->expires && s->expires < Anope::CurTime)
+		if (!Anope::NoExpire && s->expires && s->expires < Anope::CurTime)
 		{
 			na->last_seen = Anope::CurTime;
 			Expire(na);
@@ -281,7 +281,7 @@ class NSSuspend : public Module
 		if (!s)
 			return EVENT_CONTINUE;
 
-		if (s->expires && s->expires < Anope::CurTime)
+		if (!Anope::NoExpire && s->expires && s->expires < Anope::CurTime)
 		{
 			Expire(na);
 			return EVENT_CONTINUE;

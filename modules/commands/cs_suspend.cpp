@@ -262,7 +262,7 @@ class CSSuspend : public Module
 
 		expire = false;
 
-		if (si->expires && si->expires < Anope::CurTime)
+		if (!Anope::NoExpire && si->expires && si->expires < Anope::CurTime)
 		{
 			ci->last_used = Anope::CurTime;
 			Expire(ci);
@@ -278,7 +278,7 @@ class CSSuspend : public Module
 		if (!si)
 			return EVENT_CONTINUE;
 
-		if (si->expires && si->expires < Anope::CurTime)
+		if (!Anope::NoExpire && si->expires && si->expires < Anope::CurTime)
 		{
 			Expire(c->ci);
 			return EVENT_CONTINUE;

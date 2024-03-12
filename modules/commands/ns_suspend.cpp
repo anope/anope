@@ -222,6 +222,12 @@ class NSSuspend : public Module
 		return source.IsOper() || std::find(show.begin(), show.end(), what) != show.end();
 	}
 
+	void Expire(NickAlias *na)
+	{
+		suspend.Unset(na->nc);
+		Log(LOG_NORMAL, "nickserv/expire", Config->GetClient("NickServ")) << "Expiring suspend for " << na->nick;
+	}
+
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnssuspend(this), commandnsunsuspend(this), suspend(this, "NS_SUSPENDED"),
@@ -262,15 +268,10 @@ class NSSuspend : public Module
 
 		expire = false;
 
-		if (!s->expires)
-			return;
-
-		if (s->expires < Anope::CurTime)
+		if (s->expires && s->expires < Anope::CurTime)
 		{
 			na->last_seen = Anope::CurTime;
-			suspend.Unset(na->nc);
-
-			Log(LOG_NORMAL, "nickserv/expire", Config->GetClient("NickServ")) << "Expiring suspend for " << na->nick;
+			Expire(na);
 		}
 	}
 
@@ -279,6 +280,12 @@ class NSSuspend : public Module
 		NSSuspendInfo *s = suspend.Get(na->nc);
 		if (!s)
 			return EVENT_CONTINUE;
+
+		if (s->expires && s->expires < Anope::CurTime)
+		{
+			Expire(na);
+			return EVENT_CONTINUE;
+		}
 
 		u->SendMessage(Config->GetClient("NickServ"), NICK_X_SUSPENDED, u->nick.c_str());
 		return EVENT_STOP;

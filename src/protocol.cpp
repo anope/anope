@@ -86,6 +86,11 @@ Anope::string IRCDProto::SID_Retrieve()
 	return current_sid;
 }
 
+void IRCDProto::SendError(const Anope::string &reason)
+{
+	Uplink::Send("ERROR", reason);
+}
+
 void IRCDProto::SendKill(const MessageSource &source, const Anope::string &target, const Anope::string &reason)
 {
 	Uplink::Send(source, "KILL", target, reason);

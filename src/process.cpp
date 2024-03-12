@@ -77,7 +77,19 @@ void Anope::Process(const Anope::string &buffer)
 	else if (m->HasFlag(IRCDMessage::FLAG_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
 		Log(LOG_DEBUG) << "unexpected non-server source " << source << " for " << command;
 	else
-		m->Run(src, params, tags);
+	{
+		try
+		{
+			m->Run(src, params, tags);
+		}
+		catch (const ProtocolException &err)
+		{
+			IRCD->SendError(err.GetReason());
+			Anope::QuitReason = "Protocol error: " + err.GetReason();
+			Anope::Quitting = true;
+			Anope::ReturnValue = EXIT_FAILURE;
+		}
+	}
 }
 
 bool IRCDProto::Parse(const Anope::string &buffer, Anope::map<Anope::string> &tags, Anope::string &source, Anope::string &command, std::vector<Anope::string> &params)

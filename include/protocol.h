@@ -16,6 +16,17 @@
 #include "service.h"
 #include "modes.h"
 
+/** Thrown when a protocol error happens. */
+class CoreExport ProtocolException final
+	: public ModuleException
+{
+public:
+	ProtocolException(const Anope::string &message)
+		: ModuleException(message)
+	{
+	}
+};
+
 /* Encapsulates the IRCd protocol we are speaking. */
 class CoreExport IRCDProto
 	: public Service
@@ -108,6 +119,11 @@ public:
 	/* Retrieves the next free UID or SID */
 	virtual Anope::string UID_Retrieve();
 	virtual Anope::string SID_Retrieve();
+
+	/** Sends an error to the uplink before disconnecting.
+	 * @param reason The error message.
+	 */
+	virtual void SendError(const Anope::string &reason);
 
 	/** Sets the server in NOOP mode. If NOOP mode is enabled, no users
 	 * will be able to oper on the server.

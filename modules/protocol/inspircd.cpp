@@ -1139,12 +1139,7 @@ struct IRCDMessageCapab final
 				spanningtree_proto_ver = Anope::Convert<size_t>(params[1], 0);
 
 			if (spanningtree_proto_ver < 1205)
-			{
-				Uplink::Send("ERROR", "Protocol mismatch, no or invalid protocol version given in CAPAB START.");
-				Anope::QuitReason = "Protocol mismatch, no or invalid protocol version given in CAPAB START";
-				Anope::Quitting = true;
-				return;
-			}
+				throw ProtocolException("Protocol mismatch, no or invalid protocol version given in CAPAB START.");
 
 			Servers::Capab.clear();
 			IRCD->CanClearBans = false;
@@ -1566,39 +1561,19 @@ struct IRCDMessageCapab final
 			if (spanningtree_proto_ver < 1206)
 			{
 				if (!Servers::Capab.count("ACCOUNT") || !Servers::Capab.count("SERVICES"))
-				{
-					Uplink::Send("ERROR", "The services_account module is not loaded. This is required by Anope.");
-					Anope::QuitReason = "ERROR: Remote server does not have the services_account module loaded, and this is required.";
-					Anope::Quitting = true;
-					return;
-				}
+					throw ProtocolException("The services_account module is not loaded. This is required by Anope.");
 			}
 			else
 			{
 				if (!Servers::Capab.count("ACCOUNT"))
-				{
-					Uplink::Send("ERROR", "The account module is not loaded. This is required by Anope.");
-					Anope::QuitReason = "ERROR: Remote server does not have the account module loaded, and this is required.";
-					Anope::Quitting = true;
-					return;
-				}
+					throw ProtocolException("The account module is not loaded. This is required by Anope.");
 
 				if (!Servers::Capab.count("SERVICES"))
-				{
-					Uplink::Send("ERROR", "The services module is not loaded. This is required by Anope.");
-					Anope::QuitReason = "ERROR: Remote server does not have the services module loaded, and this is required.";
-					Anope::Quitting = true;
-					return;
-				}
+					throw ProtocolException("The services module is not loaded. This is required by Anope.");
 			}
 
 			if (!ModeManager::FindUserModeByName("PRIV"))
-			{
-				Uplink::Send("ERROR", "The hidechans module is not loaded. This is required by Anope.");
-				Anope::QuitReason = "ERROR: Remote server does not have the hidechans module loaded, and this is required.";
-				Anope::Quitting = true;
-				return;
-			}
+				throw ProtocolException("The hidechans module is not loaded. This is required by Anope.");
 
 			if (!IRCD->CanSVSHold)
 				Log() << "The remote server does not have the svshold module; fake users will be used for nick protection until the module is loaded.";

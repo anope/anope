@@ -783,7 +783,7 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	vsnprintf(buf, BUFSIZE - 1, reason, args);
 	va_end(args);
 
-	return Kick(bi, u, Anope::string(reason));
+	return Kick(bi, u, Anope::string(buf));
 }
 
 bool Channel::Kick(BotInfo *bi, User *u, const Anope::string &reason)

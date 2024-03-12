@@ -519,8 +519,12 @@ bool Anope::Init(int ac, char **av)
 		setuidgid();
 #endif
 
-	Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
-	if (protocol == NULL)
+	auto *encryption = ModuleManager::FindFirstOf(ENCRYPTION);
+	if (!encryption)
+		throw CoreException("You must load an encryption module!");
+
+	auto *protocol = ModuleManager::FindFirstOf(PROTOCOL);
+	if (!protocol)
 		throw CoreException("You must load a protocol module!");
 
 	/* Write our PID to the PID file. */

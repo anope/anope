@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-14 21:31+0000\n"
-"PO-Revision-Date: 2024-03-14 21:31+0000\n"
+"POT-Creation-Date: 2024-03-14 22:53+0000\n"
+"PO-Revision-Date: 2024-03-14 22:54+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -744,6 +744,9 @@ msgstr "passcode"
 
 msgid "password"
 msgstr "password"
+
+msgid "password [email]"
+msgstr "password [email]"
 
 msgid "password email"
 msgstr "password email"
@@ -3636,6 +3639,10 @@ msgstr "Email address"
 #, c-format
 msgid "Email address for %s changed to %s."
 msgstr "Email address for %s changed to %s."
+
+#, c-format
+msgid "Email address for %s unset."
+msgstr "Email address for %s unset."
 
 #, c-format
 msgid "Email for %s is invalid."
@@ -7237,6 +7244,15 @@ msgstr ""
 msgid "The STATS command prints out statistics about stored nicks and memory usage."
 msgstr "The STATS command prints out statistics about stored nicks and memory usage."
 
+msgid ""
+"The email parameter is optional and will set the email\n"
+"for your nick immediately. You may also wish to SET HIDE it\n"
+"after registering if it isn't the default setting already."
+msgstr ""
+"The email parameter is optional and will set the email\n"
+"for your nick immediately. You may also wish to SET HIDE it\n"
+"after registering if it isn't the default setting already."
+
 #, c-format
 msgid ""
 "The %s command allows users to configure logging settings\n"
@@ -8367,6 +8383,9 @@ msgstr "You cannot set your memo limit higher than %d."
 
 msgid "You cannot unassign bots while persist is set on the channel."
 msgstr "You cannot unassign bots while persist is set on the channel."
+
+msgid "You cannot unset the email on this network."
+msgstr "You cannot unset the email on this network."
 
 msgid "You cannot use this command."
 msgstr "You cannot use this command."

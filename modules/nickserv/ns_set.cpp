@@ -549,7 +549,7 @@ class CommandNSSetEmail
 	}
 
 public:
-	CommandNSSetEmail(Module *creator, const Anope::string &cname = "nickserv/set/email", size_t min = 1) : Command(creator, cname, min, min + 1)
+	CommandNSSetEmail(Module *creator, const Anope::string &cname = "nickserv/set/email", size_t min = 0) : Command(creator, cname, min, min + 1)
 	{
 		this->SetDesc(_("Associate an email address with your nickname"));
 		this->SetSyntax(_("\037address\037"));
@@ -577,12 +577,17 @@ public:
 			return;
 		}
 
+		if (param.empty() && Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+		{
+			source.Reply(_("You cannot unset the email on this network."));
+			return;
+		}
 		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the email of other Services Operators."));
 			return;
 		}
-		else if (!Mail::Validate(param))
+		else if (!param.empty() && !Mail::Validate(param))
 		{
 			source.Reply(MAIL_X_INVALID, param.c_str());
 			return;
@@ -593,7 +598,7 @@ public:
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
+		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
 		{
 			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
 			{
@@ -603,15 +608,24 @@ public:
 		}
 		else
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email of " << nc->display << " to " << param;
-			nc->email = param;
-			source.Reply(_("Email address for \002%s\002 changed to \002%s\002."), nc->display.c_str(), param.c_str());
+			if (!param.empty())
+			{
+				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email of " << nc->display << " to " << param;
+				nc->email = param;
+				source.Reply(_("Email address for \002%s\002 changed to \002%s\002."), nc->display.c_str(), param.c_str());
+			}
+			else
+			{
+				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the email of " << nc->display;
+				nc->email.clear();
+				source.Reply(_("Email address for \002%s\002 unset."), nc->display.c_str());
+			}
 		}
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->Run(source, source.nc->display, params[0]);
+		this->Run(source, source.nc->display, params.size() ? params[0] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -637,7 +651,7 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->Run(source, params[0], params[1]);
+		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

@@ -119,10 +119,13 @@ class CommandNSRegister final
 	: public Command
 {
 public:
-	CommandNSRegister(Module *creator) : Command(creator, "nickserv/register", 2, 2)
+	CommandNSRegister(Module *creator) : Command(creator, "nickserv/register", 1, 2)
 	{
 		this->SetDesc(_("Register a nickname"));
-		this->SetSyntax(_("\037password\037 \037email\037"));
+		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+			this->SetSyntax(_("\037password\037 \037email\037"));
+		else
+			this->SetSyntax(_("\037password\037 \037[email]\037"));
 		this->AllowUnregistered(true);
 	}
 
@@ -132,7 +135,7 @@ public:
 		Anope::string u_nick = source.GetNick();
 		size_t nicklen = u_nick.length();
 		Anope::string pass = params[0];
-		Anope::string email = params[1];
+		Anope::string email = params.size() > 1 ? params[1] : "";
 		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<const Anope::string>("registration");
 
 		if (Anope::ReadOnly)
@@ -194,7 +197,10 @@ public:
 
 		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
 		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
-		if (u && Anope::CurTime < u->lastnickreg + reg_delay)
+
+		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
+			this->OnSyntaxError(source, "");
+		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
 		{
 			source.Reply(_("Please wait %lu seconds before using the REGISTER command again."),
 				(unsigned long)(u->lastnickreg + reg_delay) - Anope::CurTime);
@@ -207,7 +213,7 @@ public:
 			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
 		else if (pass.length() > maxpasslen)
 			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
-		else if (!Mail::Validate(email))
+		else if (!email.empty() && !Mail::Validate(email))
 			source.Reply(MAIL_X_INVALID, email.c_str());
 		else
 		{
@@ -220,7 +226,8 @@ public:
 
 			auto *nc = new NickCore(u_nick);
 			auto *na = new NickAlias(u_nick, nc);
-			nc->email = email;
+			if (!email.empty())
+				nc->email = email;
 			nc->pass = encpass;
 
 			if (u)
@@ -231,7 +238,7 @@ public:
 			else
 				na->last_realname = source.GetNick();
 
-			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << na->nc->email << ")";
+			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 
 			source.Reply(_("Nickname \002%s\002 registered."), u_nick.c_str());
 			if (nsregister.equals_ci("admin"))
@@ -240,8 +247,11 @@ public:
 			}
 			else if (nsregister.equals_ci("mail"))
 			{
-				nc->Extend<bool>("UNCONFIRMED");
-				SendRegmail(NULL, na, source.service);
+				if (!email.empty())
+				{
+					nc->Extend<bool>("UNCONFIRMED");
+					SendRegmail(NULL, na, source.service);
+				}
 			}
 
 			FOREACH_MOD(OnNickRegister, (source.GetUser(), na, pass));
@@ -286,6 +296,14 @@ public:
 				"Finally, the space character cannot be used in passwords."),
 				source.service->nick.c_str(), source.service->nick.c_str(),
 				minpasslen);
+
+		if (!Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+		{
+			source.Reply(" ");
+			source.Reply(_("The \037email\037 parameter is optional and will set the email\n"
+					"for your nick immediately. You may also wish to \002SET HIDE\002 it\n"
+					"after registering if it isn't the default setting already."));
+		}
 
 		source.Reply(" ");
 		source.Reply(_("This command also creates a new group for your nickname,\n"

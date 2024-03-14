@@ -12,22 +12,19 @@
 std::multimap<time_t, Timer *> TimerManager::Timers;
 
 Timer::Timer(time_t time_from_now, bool repeating)
+	: trigger(Anope::CurTime + std::abs(time_from_now))
+	, secs(time_from_now)
+	, repeat(repeating)
 {
-	owner = NULL;
-	trigger = Anope::CurTime + std::abs(time_from_now);
-	secs = time_from_now;
-	repeat = repeating;
-
 	TimerManager::AddTimer(this);
 }
 
 Timer::Timer(Module *creator, time_t time_from_now, bool repeating)
+	: owner(creator)
+	, trigger(Anope::CurTime + std::abs(time_from_now))
+	, secs(time_from_now)
+	, repeat(repeating)
 {
-	owner = creator;
-	trigger = Anope::CurTime + std::abs(time_from_now);
-	secs = time_from_now;
-	repeat = repeating;
-
 	TimerManager::AddTimer(this);
 }
 

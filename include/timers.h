@@ -18,7 +18,7 @@ class CoreExport Timer
 private:
 	/** The owner of the timer, if any
 	 */
-	Module *owner;
+	Module *owner = nullptr;
 
 	/** The triggering time
 	 */

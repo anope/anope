@@ -15,87 +15,161 @@ class GlobalCore final
 	: public Module
 	, public GlobalService
 {
-	Reference<BotInfo> Global;
+private:
+	Reference<BotInfo> global;
+	PrimitiveExtensibleItem<std::vector<Anope::string>> queue;
 
-	void ServerGlobal(BotInfo *sender, Server *s, const Anope::string &message)
+	void ServerGlobal(BotInfo *sender, Server *server, bool children, const Anope::string &message)
 	{
-		if (s != Me && !s->IsJuped())
-			s->Notice(sender, message);
-		for (auto *link : s->GetLinks())
-			this->ServerGlobal(sender, link, message);
+		if (server != Me && !server->IsJuped())
+			server->Notice(sender, message);
+
+		if (children)
+		{
+			for (auto *link : server->GetLinks())
+				this->ServerGlobal(sender, link, true, message);
+		}
 	}
 
 public:
-	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		GlobalService(this)
+	GlobalCore(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, GlobalService(this)
+		, queue(this, "global-queue")
 	{
 	}
 
-	Reference<BotInfo> GetDefaultSender() override
+	void ClearQueue(NickCore *nc) override
 	{
-		return Global;
+		queue.Unset(nc);
 	}
 
-	void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) override
+	Reference<BotInfo> GetDefaultSender() const override
 	{
-		if (Me->GetLinks().empty())
-			return;
-		if (!sender)
-			sender = Global;
-		if (!sender)
-			return;
+		return global;
+	}
 
-		Anope::string rmessage;
+	const std::vector<Anope::string> *GetQueue(NickCore* nc) const override
+	{
+		return queue.Get(nc);
+	}
 
-		if (!source.empty() && !Config->GetModule("global")->Get<bool>("anonymousglobal"))
-			rmessage = "[" + source + "] " + message;
-		else
-			rmessage = message;
-
-		this->ServerGlobal(sender, Servers::GetUplink(), rmessage);
+	size_t Queue(NickCore *nc, const Anope::string &message) override
+	{
+		auto *q = queue.Require(nc);
+		q->push_back(message);
+		return q->size();
 	}
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		const Anope::string &glnick = conf->GetModule(this)->Get<const Anope::string>("client");
-
+		const auto glnick = conf->GetModule(this)->Get<const Anope::string>("client");
 		if (glnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
 
-		BotInfo *bi = BotInfo::Find(glnick, true);
+		auto *bi = BotInfo::Find(glnick, true);
 		if (!bi)
 			throw ConfigException(Module::name + ": no bot named " + glnick);
 
-		Global = bi;
+		global = bi;
 	}
 
 	void OnRestart() override
 	{
-		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
-		if (!gl.empty())
-			this->SendGlobal(Global, "", gl);
+		const auto msg = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
+		if (!msg.empty())
+			this->SendSingle(msg, nullptr, nullptr, nullptr);
 	}
 
 	void OnShutdown() override
 	{
-		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
-		if (!gl.empty())
-			this->SendGlobal(Global, "", gl);
+		const auto msg = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
+		if (!msg.empty())
+			this->SendSingle(msg, nullptr, nullptr, nullptr);
 	}
 
 	void OnNewServer(Server *s) override
 	{
-		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycleup");
-		if (!gl.empty() && !Me->IsSynced())
-			s->Notice(Global, gl);
+		const auto msg = Config->GetModule(this)->Get<const Anope::string>("globaloncycleup");
+		if (!msg.empty() && !Me->IsSynced())
+			s->Notice(global, msg);
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (!params.empty() || source.c || source.service != *Global)
+		if (!params.empty() || source.c || source.service != *global)
 			return EVENT_CONTINUE;
-		source.Reply(_("%s commands:"), Global->nick.c_str());
+
+		source.Reply(_("%s commands:"), global->nick.c_str());
 		return EVENT_CONTINUE;
+	}
+
+	bool SendQueue(CommandSource &source, BotInfo *sender, Server *server) override
+	{
+		// We MUST have an account.
+		if (!source.nc)
+			return false;
+
+		// We MUST have a message queue.
+		auto *q = queue.Get(source.nc);
+		if (!q || q->empty())
+			return false;
+
+		auto success = true;
+		for (const auto &message : *q)
+		{
+			if (!SendSingle(message, &source, sender, server))
+			{
+				success = false;
+				break;
+			}
+		}
+
+		queue.Unset(source.nc);
+		return success;
+	}
+
+	bool SendSingle(const Anope::string &message, CommandSource *source, BotInfo* sender, Server* server) override
+	{
+		// We MUST have a sender.
+		if (sender)
+			sender = global;
+		if (!sender)
+			return false;
+
+		if (!server)
+			server = Servers::GetUplink();
+
+		Anope::string line;
+		if (source && !Config->GetModule(this)->Get<bool>("anonymousglobal"))
+		{
+			// A source is available and they're not anonymous.
+			line = Anope::printf("[%s] %s", source->GetNick().c_str(), message.c_str());
+		}
+		else
+		{
+			// A source isn't available or they're anonymous.
+			line = message.empty() ? " " : message;
+		}
+
+		if (server)
+			this->ServerGlobal(sender, Servers::GetUplink(), true, line);
+		else
+			this->ServerGlobal(sender, server, false, line);
+		return true;
+	}
+
+	bool Unqueue(NickCore *nc, size_t idx)
+	{
+		auto *q = queue.Get(nc);
+		if (!q || idx > q->size())
+			return false;
+
+		q->erase(q->begin() + idx);
+		if (q->empty())
+			queue.Unset(nc);
+
+		return true;
 	}
 };
 

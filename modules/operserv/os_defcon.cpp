@@ -134,12 +134,12 @@ public:
 			if (DConfig.globalondefcon)
 			{
 				if (!DConfig.offmessage.empty())
-					GlobalService->SendGlobal(NULL, "", DConfig.offmessage);
+					GlobalService->SendSingle(DConfig.offmessage);
 				else
-					GlobalService->SendGlobal(NULL, "", Anope::printf(Language::Translate(_("The Defcon level is now at: \002%d\002")), DConfig.defaultlevel));
+					GlobalService->SendSingle(Anope::printf(Language::Translate(_("The Defcon level is now at: \002%d\002")), DConfig.defaultlevel));
 
 				if (!DConfig.message.empty())
-					GlobalService->SendGlobal(NULL, "", DConfig.message);
+					GlobalService->SendSingle(DConfig.message);
 			}
 
 			runDefCon();
@@ -217,12 +217,12 @@ public:
 		if (DConfig.globalondefcon)
 		{
 			if (DConfig.defaultlevel == 5 && !DConfig.offmessage.empty())
-				GlobalService->SendGlobal(NULL, "", DConfig.offmessage);
+				GlobalService->SendSingle(DConfig.offmessage);
 			else if (DConfig.defaultlevel != 5)
 			{
-				GlobalService->SendGlobal(NULL, "", Anope::printf(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
+				GlobalService->SendSingle(Anope::printf(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
 				if (!DConfig.message.empty())
-					GlobalService->SendGlobal(NULL, "", DConfig.message);
+					GlobalService->SendSingle(DConfig.message);
 			}
 		}
 

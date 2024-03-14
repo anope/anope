@@ -66,6 +66,7 @@ namespace Language
 
 /* Commonly used language strings */
 #define CONFIRM_DROP			_("Please confirm that you want to drop \002%s\002 with \002%s%s DROP %s %s\002")
+#define SERVICE_UNAVAILABLE		_("Sorry, %s is temporarily unavailable.")
 #define MORE_INFO			_("\002%s%s HELP %s\002 for more information.")
 #define BAD_USERHOST_MASK		_("Mask must be in the form \037user\037@\037host\037.")
 #define BAD_EXPIRY_TIME			_("Invalid expiry time.")

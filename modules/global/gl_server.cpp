@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-class CommandGLGlobal final
+class CommandGLServer final
 	: public Command
 {
 private:
@@ -28,12 +28,12 @@ private:
 	}
 
 public:
-	CommandGLGlobal(Module *creator)
-		: Command(creator, "global/global", 0)
+	CommandGLServer(Module *creator)
+		: Command(creator, "global/server", 1)
 		, global("GlobalService", "Global")
 	{
-		this->SetDesc(_("Send a message to all users"));
-		this->SetSyntax(_("[\037message\037]"));
+		this->SetDesc(_("Send a message to all users on a server"));
+		this->SetSyntax(_("\037server\037 [\037message\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -44,14 +44,21 @@ public:
 			return;
 		}
 
+		auto *server = Server::Find(params[0]);
+		if (!server || server == Me || server->IsJuped())
+		{
+			source.Reply(_("Server \002%s\002 is not linked to the network."), params[0].c_str());
+			return;
+		}
+
 		auto queuesize = global->CountQueue(source.nc);
-		if (!queuesize && params.empty())
+		if (!queuesize && params.size() < 2)
 		{
 			source.Reply(GLOBAL_NO_MESSAGE);
 			return;
 		}
 
-		if (queuesize && !params.empty())
+		if (queuesize && params.size() > 1)
 		{
 			source.Reply(GLOBAL_QUEUE_CONFLICT);
 			return;
@@ -60,16 +67,16 @@ public:
 		if (params.empty())
 		{
 			// We are sending the message queue.
-			global->SendQueue(source, GetSender(source));
+			global->SendQueue(source, GetSender(source), server);
 		}
 		else
 		{
 			// We are sending a single message.
-			global->SendSingle(params[0], &source, GetSender(source));
+			global->SendSingle(params[1], &source, GetSender(source), server);
 			queuesize = 1;
 		}
 
-		Log(LOG_ADMIN, source, this) << "to send " << queuesize << " messages to all users";
+		Log(LOG_ADMIN, source, this) << "to send " << queuesize << " messages to users on " << server->GetName();
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -77,7 +84,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Allows sending messages to all users on the network. The message will be sent\n"
+			"Allows sending messages to all users on a server. The message will be sent\n"
 			"from \002%s\002.\n"
 			"\n"
 			"You can either send a message by specifying it as a parameter or provide no\n"
@@ -87,19 +94,19 @@ public:
 	}
 };
 
-class GLGlobal final
+class GLServer final
 	: public Module
 {
 private:
-	CommandGLGlobal commandglglobal;
+	CommandGLServer commandglserver;
 
 public:
-	GLGlobal(const Anope::string &modname, const Anope::string &creator)
+	GLServer(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, VENDOR)
-		, commandglglobal(this)
+		, commandglserver(this)
 	{
 
 	}
 };
 
-MODULE_INIT(GLGlobal)
+MODULE_INIT(GLServer)

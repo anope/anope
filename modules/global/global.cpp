@@ -159,7 +159,7 @@ public:
 		return true;
 	}
 
-	bool Unqueue(NickCore *nc, size_t idx)
+	bool Unqueue(NickCore *nc, size_t idx) override
 	{
 		auto *q = queue.Get(nc);
 		if (!q || idx > q->size())

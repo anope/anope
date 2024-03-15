@@ -4,4 +4,4 @@ updates:
     directory: /
     schedule:
       interval: monthly
-    target-branch: 2.1
+    target-branch: "2.1"

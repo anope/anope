@@ -182,7 +182,7 @@ protected:
 		ci = ChannelInfo::Find(chan);
 
 		if (Anope::ReadOnly)
-			source.Reply(_("Sorry, kicker configuration is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 		else if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 		else if (option.empty())
@@ -772,7 +772,7 @@ public:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 
@@ -838,7 +838,7 @@ public:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 

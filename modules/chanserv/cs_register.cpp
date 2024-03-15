@@ -33,7 +33,7 @@ public:
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 
 		if (Anope::ReadOnly)
-			source.Reply(_("Sorry, channel registration is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 		else if (nc->HasExt("UNCONFIRMED"))
 			source.Reply(_("You must confirm your account before you can register a channel."));
 		else if (chan[0] == '&')

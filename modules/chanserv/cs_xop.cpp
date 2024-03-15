@@ -116,7 +116,7 @@ private:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
+			source.Reply(READ_ONLY_MODE, source.command.c_str());
 			return;
 		}
 
@@ -246,7 +246,7 @@ private:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
+			source.Reply(READ_ONLY_MODE, source.command.c_str());
 			return;
 		}
 
@@ -464,7 +464,7 @@ private:
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
+			source.Reply(READ_ONLY_MODE, source.command.c_str());
 			return;
 		}
 

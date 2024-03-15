@@ -407,7 +407,7 @@ public:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, bad words list modification is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 

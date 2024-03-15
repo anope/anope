@@ -71,7 +71,7 @@ namespace Language
 #define BAD_USERHOST_MASK		_("Mask must be in the form \037user\037@\037host\037.")
 #define BAD_EXPIRY_TIME			_("Invalid expiry time.")
 #define USERHOST_MASK_TOO_WIDE		_("%s coverage is too wide; Please use a more specific mask.")
-#define READ_ONLY_MODE			_("Services are in read-only mode!")
+#define READ_ONLY_MODE			_("Services are temporarily in read-only mode.")
 #define PASSWORD_INCORRECT		_("Password incorrect.")
 #define ACCESS_DENIED			_("Access denied.")
 #define MORE_OBSCURE_PASSWORD		_("Please try again with a more obscure password. Passwords should not be\n" \
@@ -116,7 +116,6 @@ namespace Language
 						"Type \002%s%s READ %zu\002 to read it.")
 #define MEMO_HAVE_NO_MEMOS		_("You have no memos.")
 #define MEMO_X_HAS_NO_MEMOS		_("%s has no memos.")
-#define MEMO_SEND_DISABLED		_("Sorry, memo sending is temporarily disabled.")
 #define MEMO_HAVE_NO_NEW_MEMOS		_("You have no new memos.")
 #define MEMO_X_HAS_NO_NEW_MEMOS		_("%s has no new memos.")
 #define BOT_DOES_NOT_EXIST		_("Bot \002%s\002 does not exist.")

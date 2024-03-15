@@ -36,7 +36,7 @@ public:
 
 		if (Anope::ReadOnly && !source.IsOper())
 		{
-			source.Reply(MEMO_SEND_DISABLED);
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 

@@ -32,7 +32,7 @@ public:
 
 		if (Anope::ReadOnly && !source.HasPriv("nickserv/drop"))
 		{
-			source.Reply(_("Sorry, nickname de-registration is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 

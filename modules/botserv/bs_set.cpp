@@ -118,7 +118,7 @@ public:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, changing bot options is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 

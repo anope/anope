@@ -466,7 +466,7 @@ public:
 		else if (!has_access)
 			source.Reply(ACCESS_DENIED);
 		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && Anope::ReadOnly)
-			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 		else if (cmd.equals_ci("ADD"))
 			this->DoAdd(source, ci, params);
 		else if (cmd.equals_ci("DEL"))

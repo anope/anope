@@ -6050,9 +6050,6 @@ msgstr "Services Operator commands"
 msgid "Services are in DefCon mode, please try again later."
 msgstr "Services are in DefCon mode, please try again later."
 
-msgid "Services are in read-only mode!"
-msgstr "Services are in read-only mode!"
-
 #, c-format
 msgid "Services are now at DEFCON %d."
 msgstr "Services are now at DEFCON %d."
@@ -6078,6 +6075,9 @@ msgstr "Services are now in read-only mode."
 
 msgid "Services are now in read-write mode."
 msgstr "Services are now in read-write mode."
+
+msgid "Services are temporarily in read-only mode."
+msgstr "Services are temporarily in read-only mode."
 
 msgid "Services have been configured to not send mail."
 msgstr "Services have been configured to not send mail."

@@ -119,7 +119,7 @@ public:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, nickname grouping is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 

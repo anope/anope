@@ -32,7 +32,7 @@ public:
 
 		if (Anope::ReadOnly && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Sorry, channel de-registration is temporarily disabled.")); // XXX: READ_ONLY_MODE?
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 

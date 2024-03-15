@@ -140,7 +140,7 @@ public:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, nickname registration is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 

@@ -411,7 +411,7 @@ public:
 		if (!has_access)
 			source.Reply(ACCESS_DENIED);
 		else if (Anope::ReadOnly && !is_list)
-			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 		else if (is_list)
 			this->DoList(source, ci, params);
 		else if (cmd.equals_ci("CLEAR"))

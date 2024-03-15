@@ -206,7 +206,7 @@ public:
 		MemoInfo *mi = &source.nc->memos;
 
 		if (Anope::ReadOnly)
-			source.Reply(_("Sorry, memo option setting is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 		else if (cmd.equals_ci("NOTIFY"))
 			return this->DoNotify(source, params, mi);
 		else if (cmd.equals_ci("LIMIT"))

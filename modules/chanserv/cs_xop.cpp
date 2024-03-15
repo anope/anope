@@ -116,7 +116,7 @@ private:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE, source.command.c_str());
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 
@@ -246,7 +246,7 @@ private:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE, source.command.c_str());
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 
@@ -464,7 +464,7 @@ private:
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE, source.command.c_str());
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 

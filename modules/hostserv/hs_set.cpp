@@ -85,9 +85,9 @@ public:
 
 		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
 
-		na->SetVhost(user, host, source.GetNick());
-		FOREACH_MOD(OnSetVhost, (na));
-		source.Reply(_("VHost for \002%s\002 set to \002%s\002."), nick.c_str(), na->GetVhostMask().c_str());
+		na->SetVHost(user, host, source.GetNick());
+		FOREACH_MOD(OnSetVHost, (na));
+		source.Reply(_("VHost for \002%s\002 set to \002%s\002."), nick.c_str(), na->GetVHostMask().c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -95,7 +95,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Sets the vhost for the given nick to that of the given\n"
-				"hostmask.  If your IRCD supports vIdents, then using\n"
+				"hostmask.  If your IRCD supports vidents, then using\n"
 				"SET <nick> <ident>@<hostmask> set idents for users as\n"
 				"well as vhosts."));
 		return true;
@@ -107,13 +107,13 @@ class CommandHSSetAll final
 {
 	static void Sync(const NickAlias *na)
 	{
-		if (!na || !na->HasVhost())
+		if (!na || !na->HasVHost())
 			return;
 
 		for (auto *nick : *na->nc->aliases)
 		{
 			if (nick && nick != na)
-				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
+				nick->SetVHost(na->GetVHostIdent(), na->GetVHostHost(), na->GetVHostCreator());
 		}
 	}
 
@@ -188,10 +188,10 @@ public:
 
 		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
 
-		na->SetVhost(user, host, source.GetNick());
+		na->SetVHost(user, host, source.GetNick());
 		this->Sync(na);
-		FOREACH_MOD(OnSetVhost, (na));
-		source.Reply(_("VHost for group \002%s\002 set to \002%s\002."), nick.c_str(), na->GetVhostMask().c_str());
+		FOREACH_MOD(OnSetVHost, (na));
+		source.Reply(_("VHost for group \002%s\002 set to \002%s\002."), nick.c_str(), na->GetVHostMask().c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -199,7 +199,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Sets the vhost for all nicks in the same group as that\n"
-				"of the given nick.  If your IRCD supports vIdents, then\n"
+				"of the given nick.  If your IRCD supports vidents, then\n"
 				"using SETALL <nick> <ident>@<hostmask> will set idents\n"
 				"for users as well as vhosts.\n"
 				"* NOTE, this will not update the vhost for any nicks\n"

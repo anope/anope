@@ -42,35 +42,35 @@ public:
 			return;
 
 		const NickAlias *na = NickAlias::Find(u->nick);
-		if (!na || na->nc != u->Account() || !na->HasVhost())
+		if (!na || na->nc != u->Account() || !na->HasVHost())
 			na = NickAlias::Find(u->Account()->display);
-		if (!na || !na->HasVhost())
+		if (!na || !na->HasVHost())
 			return;
 
-		if (u->vhost.empty() || !u->vhost.equals_cs(na->GetVhostHost()) || (!na->GetVhostIdent().empty() && !u->GetVIdent().equals_cs(na->GetVhostIdent())))
+		if (u->vhost.empty() || !u->vhost.equals_cs(na->GetVHostHost()) || (!na->GetVHostIdent().empty() && !u->GetVIdent().equals_cs(na->GetVHostIdent())))
 		{
-			IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
+			IRCD->SendVHost(u, na->GetVHostIdent(), na->GetVHostHost());
 
-			u->vhost = na->GetVhostHost();
+			u->vhost = na->GetVHostHost();
 			u->UpdateHost();
 
-			if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
-				u->SetVIdent(na->GetVhostIdent());
+			if (IRCD->CanSetVIdent && !na->GetVHostIdent().empty())
+				u->SetVIdent(na->GetVHostIdent());
 
 			if (HostServ)
 			{
 				u->SendMessage(HostServ, _("Your vhost of \002%s\002 is now activated."),
-					na->GetVhostMask().c_str());
+					na->GetVHostMask().c_str());
 			}
 		}
 	}
 
 	void OnNickDrop(CommandSource &source, NickAlias *na) override
 	{
-		if (na->HasVhost())
+		if (na->HasVHost())
 		{
-			FOREACH_MOD(OnDeleteVhost, (na));
-			na->RemoveVhost();
+			FOREACH_MOD(OnDeleteVHost, (na));
+			na->RemoveVHost();
 		}
 	}
 
@@ -87,7 +87,7 @@ public:
 		return EVENT_CONTINUE;
 	}
 
-	void OnSetVhost(NickAlias *na) override
+	void OnSetVHost(NickAlias *na) override
 	{
 		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
 		{
@@ -95,31 +95,31 @@ public:
 
 			if (u && u->Account() == na->nc)
 			{
-				IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
+				IRCD->SendVHost(u, na->GetVHostIdent(), na->GetVHostHost());
 
-				u->vhost = na->GetVhostHost();
+				u->vhost = na->GetVHostHost();
 				u->UpdateHost();
 
-				if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
-					u->SetVIdent(na->GetVhostIdent());
+				if (IRCD->CanSetVIdent && !na->GetVHostIdent().empty())
+					u->SetVIdent(na->GetVHostIdent());
 
 				if (HostServ)
 				{
 					u->SendMessage(HostServ, _("Your vhost of \002%s\002 is now activated."),
-						na->GetVhostMask().c_str());
+						na->GetVHostMask().c_str());
 				}
 			}
 		}
 	}
 
-	void OnDeleteVhost(NickAlias *na) override
+	void OnDeleteVHost(NickAlias *na) override
 	{
 		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
 		{
 			User *u = User::Find(na->nick);
 
 			if (u && u->Account() == na->nc)
-				IRCD->SendVhostDel(u);
+				IRCD->SendVHostDel(u);
 		}
 	}
 };

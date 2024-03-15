@@ -101,8 +101,8 @@ public:
 
 			if (show_hidden)
 			{
-				if (na->HasVhost())
-					info[_("VHost")] = na->GetVhostMask();
+				if (na->HasVHost())
+					info[_("VHost")] = na->GetVHostMask();
 			}
 
 			FOREACH_MOD(OnNickInfo, (source, na, info, show_hidden));

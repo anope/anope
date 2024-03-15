@@ -34,9 +34,9 @@ public:
 		if (na)
 		{
 			Log(LOG_ADMIN, source, this) << "for user " << na->nick;
-			FOREACH_MOD(OnDeleteVhost, (na));
-			na->RemoveVhost();
-			source.Reply(_("Vhost for \002%s\002 removed."), nick.c_str());
+			FOREACH_MOD(OnDeleteVHost, (na));
+			na->RemoveVHost();
+			source.Reply(_("VHost for \002%s\002 removed."), nick.c_str());
 		}
 		else
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -74,15 +74,15 @@ public:
 		NickAlias *na = NickAlias::Find(nick);
 		if (na)
 		{
-			FOREACH_MOD(OnDeleteVhost, (na));
+			FOREACH_MOD(OnDeleteVHost, (na));
 			const NickCore *nc = na->nc;
 			for (auto *alias : *nc->aliases)
 			{
 				na = alias;
-				na->RemoveVhost();
+				na->RemoveVHost();
 			}
 			Log(LOG_ADMIN, source, this) << "for all nicks in group " << nc->display;
-			source.Reply(_("vhosts for group \002%s\002 have been removed."), nc->display.c_str());
+			source.Reply(_("VHosts for group \002%s\002 have been removed."), nc->display.c_str());
 		}
 		else
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());

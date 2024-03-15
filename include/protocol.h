@@ -159,8 +159,8 @@ public:
 	 * @param vident The ident to set
 	 * @param vhost The vhost to set
 	 */
-	virtual void SendVhost(User *u, const Anope::string &vident, const Anope::string &vhost) { }
-	virtual void SendVhostDel(User *) { }
+	virtual void SendVHost(User *u, const Anope::string &vident, const Anope::string &vhost) { }
+	virtual void SendVHostDel(User *) { }
 
 	/** Sets an akill. This is a recursive function that can be called multiple times
 	 * for the same xline, but for different users, if the xline is not one that can be

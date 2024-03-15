@@ -1115,7 +1115,7 @@ private:
 			if (nick_vhost != data->vhost_nick.end())
 				vhost = nick_vhost->second;
 			if (!vhost.empty())
-				na->SetVhost("", vhost, data->vhost_creator, data->vhost_ts);
+				na->SetVHost("", vhost, data->vhost_creator, data->vhost_ts);
 		}
 
 		return true;

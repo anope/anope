@@ -125,10 +125,10 @@ public:
 		Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
 	}
 
-	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
+	void SendVHost(User *u, const Anope::string &vident, const Anope::string &vhost) override
 	{
-		if (!vIdent.empty())
-			Uplink::Send("METADATA", u->nick, "user", vIdent);
+		if (!vident.empty())
+			Uplink::Send("METADATA", u->nick, "user", vident);
 
 		Uplink::Send("METADATA", u->nick, "cloakhost", vhost);
 		if (!u->HasMode("CLOAK"))
@@ -138,9 +138,9 @@ public:
 		}
 	}
 
-	void SendVhostDel(User *u) override
+	void SendVHostDel(User *u) override
 	{
-		this->SendVhost(u, u->GetIdent(), "");
+		this->SendVHost(u, u->GetIdent(), "");
 	}
 
 	bool Format(Anope::string &message, const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params) override

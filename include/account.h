@@ -65,41 +65,41 @@ public:
 	 * @param creator Who created the vhost
 	 * @param time When the vhost was created
 	 */
-	void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime);
+	void SetVHost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime);
 
 	/** Remove a users vhost
 	 **/
-	void RemoveVhost();
+	void RemoveVHost();
 
 	/** Check if the user has a vhost
 	 * @return true or false
 	 */
-	bool HasVhost() const;
+	bool HasVHost() const;
 
 	/** Retrieve the vhost ident
 	 * @return the ident
 	 */
-	const Anope::string &GetVhostIdent() const;
+	const Anope::string &GetVHostIdent() const;
 
 	/** Retrieve the vhost host
 	 * @return the host
 	 */
-	const Anope::string &GetVhostHost() const;
+	const Anope::string &GetVHostHost() const;
 
 	/** Retrieve the vhost mask
 	 * @param the mask
 	 */
-	Anope::string GetVhostMask() const;
+	Anope::string GetVHostMask() const;
 
 	/** Retrieve the vhost creator
 	 * @return the creator
 	 */
-	const Anope::string &GetVhostCreator() const;
+	const Anope::string &GetVHostCreator() const;
 
 	/** Retrieve when the vhost was created
 	 * @return the time it was created
 	 */
-	time_t GetVhostCreated() const;
+	time_t GetVHostCreated() const;
 
 	/** Finds a registered nick
 	 * @param nick The nick to lookup

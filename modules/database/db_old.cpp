@@ -690,7 +690,7 @@ static void LoadVHosts()
 			continue;
 		}
 
-		na->SetVhost(ident, host, creator, vtime);
+		na->SetVHost(ident, host, creator, vtime);
 
 		Log() << "Loaded vhost for " << na->nick;
 	}

@@ -94,14 +94,14 @@ private:
 		return nicks.substr(1);
 	}
 
-	static void SendChgIdentInternal(const Anope::string &uid, const Anope::string &vIdent)
+	static void SendChgIdentInternal(const Anope::string &uid, const Anope::string &vident)
 	{
 		if (!Servers::Capab.count("CHGIDENT"))
 		{
 			Log() << "Unable to change the vident of " << uid << " as the remote server does not have the chgident module loaded.";
 			return;
 		}
-		Uplink::Send("ENCAP", uid.substr(0, 3), "CHGIDENT", uid, vIdent);
+		Uplink::Send("ENCAP", uid.substr(0, 3), "CHGIDENT", uid, vident);
 	}
 
 	static void SendChgHostInternal(const Anope::string &uid, const Anope::string &vhost)
@@ -302,7 +302,7 @@ public:
 		}
 	}
 
-	void SendVhostDel(User *u) override
+	void SendVHostDel(User *u) override
 	{
 		UserMode *um = ModeManager::FindUserModeByName("CLOAK");
 
@@ -477,10 +477,10 @@ public:
 			SendAddLine("Q", x->mask, timeleft, x->by, x->GetReason());
 	}
 
-	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
+	void SendVHost(User *u, const Anope::string &vident, const Anope::string &vhost) override
 	{
-		if (!vIdent.empty())
-			this->SendChgIdentInternal(u->GetUID(), vIdent);
+		if (!vident.empty())
+			this->SendChgIdentInternal(u->GetUID(), vident);
 
 		if (!vhost.empty())
 			this->SendChgHostInternal(u->GetUID(), vhost);
@@ -600,11 +600,11 @@ public:
 
 		if (na)
 		{
-			if (!na->GetVhostIdent().empty())
-				SendChgHostInternal(uid, na->GetVhostIdent());
+			if (!na->GetVHostIdent().empty())
+				SendChgHostInternal(uid, na->GetVHostIdent());
 
-			if (!na->GetVhostHost().empty())
-				SendChgHostInternal(uid, na->GetVhostHost());
+			if (!na->GetVHostHost().empty())
+				SendChgHostInternal(uid, na->GetVHostHost());
 
 			// Mark this SASL session as pending user introduction.
 			SASLUser su;

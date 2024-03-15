@@ -838,12 +838,12 @@ public:
 	/** Called when a vhost is deleted
 	 * @param na The nickalias of the vhost
 	 */
-	virtual void OnDeleteVhost(NickAlias *na) { throw NotImplementedException(); }
+	virtual void OnDeleteVHost(NickAlias *na) { throw NotImplementedException(); }
 
 	/** Called when a vhost is set
 	 * @param na The nickalias of the vhost
 	 */
-	virtual void OnSetVhost(NickAlias *na) { throw NotImplementedException(); }
+	virtual void OnSetVHost(NickAlias *na) { throw NotImplementedException(); }
 
 	/** Called when a users host changes
 	 * @param u The user
@@ -1081,7 +1081,7 @@ enum Implementation
 	I_OnUserLogin, I_OnNickLogout, I_OnNickRegister, I_OnNickConfirm, I_OnNickSuspend, I_OnNickUnsuspended, I_OnDelNick, I_OnNickCoreCreate,
 	I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickClearCert,
 	I_OnNickAddCert, I_OnNickEraseCert, I_OnNickInfo, I_OnBotInfo, I_OnCheckAuthentication, I_OnNickUpdate,
-	I_OnFingerprint, I_OnUserAway, I_OnInvite, I_OnDeleteVhost, I_OnSetVhost, I_OnSetDisplayedHost, I_OnMemoSend, I_OnMemoDel,
+	I_OnFingerprint, I_OnUserAway, I_OnInvite, I_OnDeleteVHost, I_OnSetVHost, I_OnSetDisplayedHost, I_OnMemoSend, I_OnMemoDel,
 	I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
 	I_OnMLock, I_OnUnMLock, I_OnModuleLoad, I_OnModuleUnload, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnBotNotice,
 	I_OnPrivmsg, I_OnLog, I_OnLogMessage, I_OnDnsRequest, I_OnCheckModes, I_OnChannelSync, I_OnSetCorrectModes,

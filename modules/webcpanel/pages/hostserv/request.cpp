@@ -21,8 +21,8 @@ bool WebCPanel::HostServ::Request::OnRequest(HTTPProvider *server, const Anope::
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "HostServ", "hostserv/request", params, replacements, "CMDR");
 	}
 
-	if (na->HasVhost())
-		replacements["VHOST"] = na->GetVhostMask();
+	if (na->HasVHost())
+		replacements["VHOST"] = na->GetVHostMask();
 	if (ServiceReference<Command>("Command", "hostserv/request"))
 		replacements["CAN_REQUEST"] = "YES";
 	TemplateFileServer page("hostserv/request.html");

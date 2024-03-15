@@ -141,14 +141,14 @@ public:
 		Uplink::Send("ENCAP", '*', "NICKDELAY", 0, nick);
 	}
 
-	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
+	void SendVHost(User *u, const Anope::string &ident, const Anope::string &host) override
 	{
 		Uplink::Send("ENCAP", '*', "CHGHOST", u->GetUID(), host);
 	}
 
-	void SendVhostDel(User *u) override
+	void SendVHostDel(User *u) override
 	{
-		this->SendVhost(u, "", u->host);
+		this->SendVHost(u, "", u->host);
 	}
 
 	void SendSASLMessage(const SASL::Message &message) override
@@ -166,8 +166,8 @@ public:
 		Server *s = Server::Find(uid.substr(0, 3));
 
 		Uplink::Send("ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, '*',
-			na && !na->GetVhostIdent().empty() ? na->GetVhostIdent() : '*',
-			na && !na->GetVhostHost().empty() ? na->GetVhostHost() : '*',
+			na && !na->GetVHostIdent().empty() ? na->GetVHostIdent() : '*',
+			na && !na->GetVHostHost().empty() ? na->GetVHostHost() : '*',
 			na ? na->nc->display : "0");
 	}
 };

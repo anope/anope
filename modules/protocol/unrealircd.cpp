@@ -83,7 +83,7 @@ private:
 		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
 
-	void SendVhostDel(User *u) override
+	void SendVHostDel(User *u) override
 	{
 		BotInfo *HostServ = Config->GetClient("HostServ");
 		u->RemoveMode(HostServ, "VHOST");
@@ -199,10 +199,10 @@ private:
 
 	/* Functions that use serval cmd functions */
 
-	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
+	void SendVHost(User *u, const Anope::string &vident, const Anope::string &vhost) override
 	{
-		if (!vIdent.empty())
-			Uplink::Send("CHGIDENT", u->GetUID(), vIdent);
+		if (!vident.empty())
+			Uplink::Send("CHGIDENT", u->GetUID(), vident);
 
 		if (!vhost.empty())
 			Uplink::Send("CHGHOST", u->GetUID(), vhost);
@@ -411,11 +411,11 @@ private:
 
 		if (na)
 		{
-			if (!na->GetVhostIdent().empty())
-				Uplink::Send("CHGIDENT", uid, na->GetVhostIdent());
+			if (!na->GetVHostIdent().empty())
+				Uplink::Send("CHGIDENT", uid, na->GetVHostIdent());
 
-			if (!na->GetVhostHost().empty())
-				Uplink::Send("CHGHOST", uid, na->GetVhostHost());
+			if (!na->GetVHostHost().empty())
+				Uplink::Send("CHGHOST", uid, na->GetVHostHost());
 		}
 
 		Uplink::Send("SVSLOGIN", distmask, uid, na ? na->nc->display : "0");

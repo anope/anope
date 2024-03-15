@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-14 22:53+0000\n"
-"PO-Revision-Date: 2024-03-14 22:54+0000\n"
+"POT-Creation-Date: 2024-03-15 12:41+0000\n"
+"PO-Revision-Date: 2024-03-15 12:41+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1711,11 +1711,11 @@ msgstr ""
 "A notification memo has been sent to %s informing them you have\n"
 "read their memo."
 
-msgid "A vHost ident must be in the format of a valid ident."
-msgstr "A vHost ident must be in the format of a valid ident."
+msgid "A vhost must be in the format of a valid hostname."
+msgstr "A vhost must be in the format of a valid hostname."
 
-msgid "A vHost must be in the format of a valid hostname."
-msgstr "A vHost must be in the format of a valid hostname."
+msgid "A vident must be in the format of a valid ident."
+msgstr "A vident must be in the format of a valid ident."
 
 msgid "ADD expiry {nick|mask} [reason]"
 msgstr "ADD expiry {nick|mask} [reason]"
@@ -1815,8 +1815,8 @@ msgstr "Account %s has already reached the maximum number of simultaneous logi
 msgid "Accounts can not be registered right now. Please try again later."
 msgstr "Accounts can not be registered right now. Please try again later."
 
-msgid "Activate the requested vHost for the given nick."
-msgstr "Activate the requested vHost for the given nick."
+msgid "Activate the requested vhost for the given nick."
+msgstr "Activate the requested vhost for the given nick."
 
 msgid ""
 "Activates the vhost currently assigned to the nick in use.\n"
@@ -2458,8 +2458,8 @@ msgstr ""
 "Alternative methods of modifying channel access lists are\n"
 "available."
 
-msgid "Approve the requested vHost of a user"
-msgstr "Approve the requested vHost of a user"
+msgid "Approve the requested vhost of a user"
+msgstr "Approve the requested vhost of a user"
 
 msgid "As a Services Operator, you may drop any nick."
 msgstr "As a Services Operator, you may drop any nick."
@@ -3937,12 +3937,12 @@ msgid "Error reloading configuration file: %s"
 msgstr "Error reloading configuration file: %s"
 
 #, c-format
-msgid "Error! The vHost ident is too long, please use an ident shorter than %zu characters."
-msgstr "Error! The vHost ident is too long, please use an ident shorter than %zu characters."
+msgid "Error! The vhost is too long, please use a hostname shorter than %zu characters."
+msgstr "Error! The vhost is too long, please use a hostname shorter than %zu characters."
 
 #, c-format
-msgid "Error! The vHost is too long, please use a hostname shorter than %zu characters."
-msgstr "Error! The vHost is too long, please use a hostname shorter than %zu characters."
+msgid "Error! The vident is too long, please use an ident shorter than %zu characters."
+msgstr "Error! The vident is too long, please use an ident shorter than %zu characters."
 
 msgid ""
 "Examples:\n"
@@ -5386,8 +5386,8 @@ msgstr "Persistent"
 msgid "Please confirm that you want to drop %s with %s%s DROP %s %s"
 msgstr "Please confirm that you want to drop %s with %s%s DROP %s %s"
 
-msgid "Please contact an Operator to get a vHost assigned to this nick."
-msgstr "Please contact an Operator to get a vHost assigned to this nick."
+msgid "Please contact an Operator to get a vhost assigned to this nick."
+msgstr "Please contact an Operator to get a vhost assigned to this nick."
 
 msgid ""
 "Please try again with a more obscure password. Passwords should not be\n"
@@ -5409,8 +5409,8 @@ msgid "Please wait %lu seconds and retry."
 msgstr "Please wait %lu seconds and retry."
 
 #, c-format
-msgid "Please wait %lu seconds before requesting a new vHost."
-msgstr "Please wait %lu seconds before requesting a new vHost."
+msgid "Please wait %lu seconds before requesting a new vhost."
+msgstr "Please wait %lu seconds before requesting a new vhost."
 
 #, c-format
 msgid "Please wait %lu seconds before using the %s command again."
@@ -5695,11 +5695,11 @@ msgstr "Registration is currently disabled."
 msgid "Regulate the use of critical commands"
 msgstr "Regulate the use of critical commands"
 
-msgid "Reject the requested vHost for the given nick."
-msgstr "Reject the requested vHost for the given nick."
+msgid "Reject the requested vhost for the given nick."
+msgstr "Reject the requested vhost for the given nick."
 
-msgid "Reject the requested vHost of a user"
-msgstr "Reject the requested vHost of a user"
+msgid "Reject the requested vhost of a user"
+msgstr "Reject the requested vhost of a user"
 
 msgid "Releases a suspended channel"
 msgstr "Releases a suspended channel"
@@ -5769,15 +5769,15 @@ msgstr "Removing %s because %s covers it."
 msgid "Repeat kicker"
 msgstr "Repeat kicker"
 
-msgid "Request a vHost for your nick"
-msgstr "Request a vHost for your nick"
+msgid "Request a vhost for your nick"
+msgstr "Request a vhost for your nick"
 
 msgid ""
-"Request the given vHost to be activated for your nick by the\n"
+"Request the given vhost to be activated for your nick by the\n"
 "network administrators. Please be patient while your request\n"
 "is being considered."
 msgstr ""
-"Request the given vHost to be activated for your nick by the\n"
+"Request the given vhost to be activated for your nick by the\n"
 "network administrators. Please be patient while your request\n"
 "is being considered."
 
@@ -6392,14 +6392,14 @@ msgstr ""
 
 msgid ""
 "Sets the vhost for all nicks in the same group as that\n"
-"of the given nick.  If your IRCD supports vIdents, then\n"
+"of the given nick.  If your IRCD supports vidents, then\n"
 "using SETALL <nick> <ident>@<hostmask> will set idents\n"
 "for users as well as vhosts.\n"
 "* NOTE, this will not update the vhost for any nicks\n"
 "added to the group after this command was used."
 msgstr ""
 "Sets the vhost for all nicks in the same group as that\n"
-"of the given nick.  If your IRCD supports vIdents, then\n"
+"of the given nick.  If your IRCD supports vidents, then\n"
 "using SETALL <nick> <ident>@<hostmask> will set idents\n"
 "for users as well as vhosts.\n"
 "* NOTE, this will not update the vhost for any nicks\n"
@@ -6407,12 +6407,12 @@ msgstr ""
 
 msgid ""
 "Sets the vhost for the given nick to that of the given\n"
-"hostmask.  If your IRCD supports vIdents, then using\n"
+"hostmask.  If your IRCD supports vidents, then using\n"
 "SET <nick> <ident>@<hostmask> set idents for users as\n"
 "well as vhosts."
 msgstr ""
 "Sets the vhost for the given nick to that of the given\n"
-"hostmask.  If your IRCD supports vIdents, then using\n"
+"hostmask.  If your IRCD supports vidents, then using\n"
 "SET <nick> <ident>@<hostmask> set idents for users as\n"
 "well as vhosts."
 
@@ -6566,55 +6566,6 @@ msgstr "Sorry, %s is temporarily unavailable."
 #, c-format
 msgid "Sorry, I have not seen %s."
 msgstr "Sorry, I have not seen %s."
-
-msgid "Sorry, bad words list modification is temporarily disabled."
-msgstr "Sorry, bad words list modification is temporarily disabled."
-
-msgid "Sorry, bot assignment is temporarily disabled."
-msgstr "Sorry, bot assignment is temporarily disabled."
-
-msgid "Sorry, bot modification is temporarily disabled."
-msgstr "Sorry, bot modification is temporarily disabled."
-
-msgid "Sorry, bot option setting is temporarily disabled."
-msgstr "Sorry, bot option setting is temporarily disabled."
-
-msgid "Sorry, changing bot options is temporarily disabled."
-msgstr "Sorry, changing bot options is temporarily disabled."
-
-#, c-format
-msgid "Sorry, channel %s list modification is temporarily disabled."
-msgstr "Sorry, channel %s list modification is temporarily disabled."
-
-msgid "Sorry, channel access list modification is temporarily disabled."
-msgstr "Sorry, channel access list modification is temporarily disabled."
-
-msgid "Sorry, channel autokick list modification is temporarily disabled."
-msgstr "Sorry, channel autokick list modification is temporarily disabled."
-
-msgid "Sorry, channel de-registration is temporarily disabled."
-msgstr "Sorry, channel de-registration is temporarily disabled."
-
-msgid "Sorry, channel registration is temporarily disabled."
-msgstr "Sorry, channel registration is temporarily disabled."
-
-msgid "Sorry, kicker configuration is temporarily disabled."
-msgstr "Sorry, kicker configuration is temporarily disabled."
-
-msgid "Sorry, memo option setting is temporarily disabled."
-msgstr "Sorry, memo option setting is temporarily disabled."
-
-msgid "Sorry, memo sending is temporarily disabled."
-msgstr "Sorry, memo sending is temporarily disabled."
-
-msgid "Sorry, nickname de-registration is temporarily disabled."
-msgstr "Sorry, nickname de-registration is temporarily disabled."
-
-msgid "Sorry, nickname grouping is temporarily disabled."
-msgstr "Sorry, nickname grouping is temporarily disabled."
-
-msgid "Sorry, nickname registration is temporarily disabled."
-msgstr "Sorry, nickname registration is temporarily disabled."
 
 #, c-format
 msgid "Sorry, the maximum of %d auto join entries has been reached."
@@ -8150,12 +8101,28 @@ msgid "VHost"
 msgstr "VHost"
 
 #, c-format
+msgid "VHost for %s removed."
+msgstr "VHost for %s removed."
+
+#, c-format
 msgid "VHost for %s set to %s."
 msgstr "VHost for %s set to %s."
 
 #, c-format
+msgid "VHost for %s has been activated."
+msgstr "VHost for %s has been activated."
+
+#, c-format
+msgid "VHost for %s has been rejected."
+msgstr "VHost for %s has been rejected."
+
+#, c-format
 msgid "VHost for group %s set to %s."
 msgstr "VHost for group %s set to %s."
+
+#, c-format
+msgid "VHosts for group %s have been removed."
+msgstr "VHosts for group %s have been removed."
 
 msgid "VIEW host"
 msgstr "VIEW host"
@@ -8172,13 +8139,6 @@ msgstr "Value"
 #, c-format
 msgid "Value of %s:%s changed to %s"
 msgstr "Value of %s:%s changed to %s"
-
-msgid "Vhost"
-msgstr "Vhost"
-
-#, c-format
-msgid "Vhost for %s removed."
-msgstr "Vhost for %s removed."
 
 msgid "View and change Services Operators"
 msgstr "View and change Services Operators"
@@ -8601,8 +8561,8 @@ msgstr "Your IRCd does not support SVSNICK."
 msgid "Your IRCd does not support SVSPART."
 msgstr "Your IRCd does not support SVSPART."
 
-msgid "Your IRCd does not support vIdent's, if this is incorrect, please report this as a possible bug"
-msgstr "Your IRCd does not support vIdent's, if this is incorrect, please report this as a possible bug"
+msgid "Your IRCd does not support vidents. If this is incorrect please report this as a possible bug."
+msgstr "Your IRCd does not support vidents. If this is incorrect please report this as a possible bug."
 
 #, c-format
 msgid "Your account %s has been successfully created."
@@ -8698,8 +8658,8 @@ msgstr "Your password is too short. It must be longer than %u characters."
 msgid "Your password reset request has expired."
 msgstr "Your password reset request has expired."
 
-msgid "Your vHost has been requested."
-msgstr "Your vHost has been requested."
+msgid "Your vhost has been requested."
+msgstr "Your vhost has been requested."
 
 #, c-format
 msgid "Your vhost of %s is now activated."
@@ -8801,19 +8761,19 @@ msgstr "[Suspended]"
 msgid "[Unconfirmed]"
 msgstr "[Unconfirmed]"
 
-msgid "[auto memo] Your requested vHost has been approved."
-msgstr "[auto memo] Your requested vHost has been approved."
+#, c-format
+msgid "[auto memo] VHost %s has been requested by %s."
+msgstr "[auto memo] VHost %s has been requested by %s."
 
-msgid "[auto memo] Your requested vHost has been rejected."
-msgstr "[auto memo] Your requested vHost has been rejected."
+msgid "[auto memo] Your requested vhost has been approved."
+msgstr "[auto memo] Your requested vhost has been approved."
+
+msgid "[auto memo] Your requested vhost has been rejected."
+msgstr "[auto memo] Your requested vhost has been rejected."
 
 #, c-format
-msgid "[auto memo] Your requested vHost has been rejected. Reason: %s"
-msgstr "[auto memo] Your requested vHost has been rejected. Reason: %s"
-
-#, c-format
-msgid "[auto memo] vHost %s has been requested by %s."
-msgstr "[auto memo] vHost %s has been requested by %s."
+msgid "[auto memo] Your requested vhost has been rejected. Reason: %s"
+msgstr "[auto memo] Your requested vhost has been rejected. Reason: %s"
 
 msgid "[{pattern | channel} [INVISIBLE]]"
 msgstr "[{pattern | channel} [INVISIBLE]]"
@@ -8890,20 +8850,8 @@ msgstr "second"
 msgid "seconds"
 msgstr "seconds"
 
-#, c-format
-msgid "vHost for %s has been activated."
-msgstr "vHost for %s has been activated."
-
-#, c-format
-msgid "vHost for %s has been rejected."
-msgstr "vHost for %s has been rejected."
-
 msgid "vhost"
 msgstr "vhost"
-
-#, c-format
-msgid "vhosts for group %s have been removed."
-msgstr "vhosts for group %s have been removed."
 
 msgid "year"
 msgstr "year"

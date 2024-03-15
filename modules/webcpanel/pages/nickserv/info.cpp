@@ -80,8 +80,8 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 	if (!na->nc->email.empty())
 		replacements["EMAIL"] = na->nc->email;
 	replacements["TIME_REGISTERED"] = Anope::strftime(na->time_registered, na->nc);
-	if (na->HasVhost())
-		replacements["VHOST"] = na->GetVhostMask();
+	if (na->HasVHost())
+		replacements["VHOST"] = na->GetVHostMask();
 	Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
 	if (greet)
 		replacements["GREET"] = *greet;

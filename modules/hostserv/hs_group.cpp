@@ -22,7 +22,7 @@ public:
 		if (setting)
 			return;
 
-		if (!na || !na->HasVhost())
+		if (!na || !na->HasVHost())
 			return;
 
 		setting = true;
@@ -30,8 +30,8 @@ public:
 		{
 			if (nick && nick != na)
 			{
-				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
-				FOREACH_MOD(OnSetVhost, (nick));
+				nick->SetVHost(na->GetVHostIdent(), na->GetVHostHost(), na->GetVHostCreator());
+				FOREACH_MOD(OnSetVHost, (nick));
 			}
 		}
 		setting = false;
@@ -51,11 +51,11 @@ public:
 		}
 
 		NickAlias *na = NickAlias::Find(source.GetNick());
-		if (na && source.GetAccount() == na->nc && na->HasVhost())
+		if (na && source.GetAccount() == na->nc && na->HasVHost())
 		{
 			this->Sync(na);
 			source.Reply(_("All vhosts in the group \002%s\002 have been set to \002%s\002."),
-				source.nc->display.c_str(), na->GetVhostMask().c_str());
+				source.nc->display.c_str(), na->GetVHostMask().c_str());
 		}
 		else
 			source.Reply(HOST_NOT_ASSIGNED);
@@ -89,7 +89,7 @@ public:
 			throw ModuleException("Your IRCd does not support vhosts");
 	}
 
-	void OnSetVhost(NickAlias *na) override
+	void OnSetVHost(NickAlias *na) override
 	{
 		if (!synconset)
 			return;

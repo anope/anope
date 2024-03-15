@@ -263,12 +263,12 @@ public:
 		this->SendSQLineDel(&x);
 	}
 
-	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
+	void SendVHost(User *u, const Anope::string &ident, const Anope::string &host) override
 	{
 		Uplink::Send("SVSHOST", u->GetUID(), u->timestamp, host);
 	}
 
-	void SendVhostDel(User *u) override
+	void SendVHostDel(User *u) override
 	{
 		Uplink::Send("SVSHOST", u->GetUID(), u->timestamp, u->host);
 	}

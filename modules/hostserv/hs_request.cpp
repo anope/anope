@@ -19,7 +19,7 @@
 
 static ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
 
-static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vIdent, const Anope::string &vHost);
+static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vident, const Anope::string &vhost);
 
 struct HostRequestImpl final
 	: HostRequest
@@ -75,7 +75,7 @@ class CommandHSRequest final
 public:
 	CommandHSRequest(Module *creator) : Command(creator, "hostserv/request", 1, 1)
 	{
-		this->SetDesc(_("Request a vHost for your nick"));
+		this->SetDesc(_("Request a vhost for your nick"));
 		this->SetSyntax(_("vhost"));
 	}
 
@@ -157,7 +157,7 @@ public:
 		time_t send_delay = Config->GetModule("memoserv")->Get<time_t>("senddelay");
 		if (Config->GetModule(this->owner)->Get<bool>("memooper") && send_delay > 0 && u && u->lastmemosend + send_delay > Anope::CurTime)
 		{
-			source.Reply(_("Please wait %lu seconds before requesting a new vHost."), (unsigned long)send_delay);
+			source.Reply(_("Please wait %lu seconds before requesting a new vhost."), (unsigned long)send_delay);
 			u->lastmemosend = Anope::CurTime;
 			return;
 		}
@@ -169,7 +169,7 @@ public:
 		req.time = Anope::CurTime;
 		na->Extend<HostRequestImpl>("hostrequest", req);
 
-		source.Reply(_("Your vHost has been requested."));
+		source.Reply(_("Your vhost has been requested."));
 		req_send_memos(owner, source, user, host);
 		Log(LOG_COMMAND, source, this) << "to request new vhost " << (!user.empty() ? user + "@" : "") << host;
 	}
@@ -178,7 +178,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Request the given vHost to be activated for your nick by the\n"
+		source.Reply(_("Request the given vhost to be activated for your nick by the\n"
 			"network administrators. Please be patient while your request\n"
 			"is being considered."));
 		return true;
@@ -191,7 +191,7 @@ class CommandHSActivate final
 public:
 	CommandHSActivate(Module *creator) : Command(creator, "hostserv/activate", 1, 1)
 	{
-		this->SetDesc(_("Approve the requested vHost of a user"));
+		this->SetDesc(_("Approve the requested vhost of a user"));
 		this->SetSyntax(_("\037nick\037"));
 	}
 
@@ -209,13 +209,13 @@ public:
 		HostRequestImpl *req = na ? na->GetExt<HostRequestImpl>("hostrequest") : NULL;
 		if (req)
 		{
-			na->SetVhost(req->ident, req->host, source.GetNick(), req->time);
-			FOREACH_MOD(OnSetVhost, (na));
+			na->SetVHost(req->ident, req->host, source.GetNick(), req->time);
+			FOREACH_MOD(OnSetVHost, (na));
 
 			if (Config->GetModule(this->owner)->Get<bool>("memouser") && memoserv)
-				memoserv->Send(source.service->nick, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
+				memoserv->Send(source.service->nick, na->nick, _("[auto memo] Your requested vhost has been approved."), true);
 
-			source.Reply(_("vHost for %s has been activated."), na->nick.c_str());
+			source.Reply(_("VHost for %s has been activated."), na->nick.c_str());
 			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
 			na->Shrink<HostRequestImpl>("hostrequest");
 		}
@@ -227,7 +227,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Activate the requested vHost for the given nick."));
+		source.Reply(_("Activate the requested vhost for the given nick."));
 		if (Config->GetModule(this->owner)->Get<bool>("memouser"))
 			source.Reply(_("A memo informing the user will also be sent."));
 
@@ -241,7 +241,7 @@ class CommandHSReject final
 public:
 	CommandHSReject(Module *creator) : Command(creator, "hostserv/reject", 1, 2)
 	{
-		this->SetDesc(_("Reject the requested vHost of a user"));
+		this->SetDesc(_("Reject the requested vhost of a user"));
 		this->SetSyntax(_("\037nick\037 [\037reason\037]"));
 	}
 
@@ -266,14 +266,14 @@ public:
 			{
 				Anope::string message;
 				if (!reason.empty())
-					message = Anope::printf(_("[auto memo] Your requested vHost has been rejected. Reason: %s"), reason.c_str());
+					message = Anope::printf(_("[auto memo] Your requested vhost has been rejected. Reason: %s"), reason.c_str());
 				else
-					message = _("[auto memo] Your requested vHost has been rejected.");
+					message = _("[auto memo] Your requested vhost has been rejected.");
 
 				memoserv->Send(source.service->nick, nick, Language::Translate(source.GetAccount(), message.c_str()), true);
 			}
 
-			source.Reply(_("vHost for %s has been rejected."), nick.c_str());
+			source.Reply(_("VHost for %s has been rejected."), nick.c_str());
 			Log(LOG_COMMAND, source, this) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "no reason") << ")";
 		}
 		else
@@ -284,7 +284,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Reject the requested vHost for the given nick."));
+		source.Reply(_("Reject the requested vhost for the given nick."));
 		if (Config->GetModule(this->owner)->Get<bool>("memouser"))
 			source.Reply(_("A memo informing the user will also be sent, which includes the reason for the rejection if supplied."));
 
@@ -307,7 +307,7 @@ public:
 		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
 		ListFormatter list(source.GetAccount());
 
-		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Created"));
+		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("VHost")).AddColumn(_("Created"));
 
 		for (const auto &[nick, na] : *NickAliasList)
 		{
@@ -323,9 +323,9 @@ public:
 				entry["Number"] = Anope::ToString(display_counter);
 				entry["Nick"] = nick;
 				if (!hr->ident.empty())
-					entry["Vhost"] = hr->ident + "@" + hr->host;
+					entry["VHost"] = hr->ident + "@" + hr->host;
 				else
-					entry["Vhost"] = hr->host;
+					entry["VHost"] = hr->host;
 				entry["Created"] = Anope::strftime(hr->time, NULL, true);
 				list.AddEntry(entry);
 			}
@@ -371,13 +371,13 @@ public:
 	}
 };
 
-static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vIdent, const Anope::string &vHost)
+static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vident, const Anope::string &vhost)
 {
 	Anope::string host;
-	if (!vIdent.empty())
-		host = vIdent + "@" + vHost;
+	if (!vident.empty())
+		host = vident + "@" + vhost;
 	else
-		host = vHost;
+		host = vhost;
 
 	if (Config->GetModule(me)->Get<bool>("memooper") && memoserv)
 	{
@@ -387,7 +387,7 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 			if (!na)
 				continue;
 
-			Anope::string message = Anope::printf(_("[auto memo] vHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
+			Anope::string message = Anope::printf(_("[auto memo] VHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
 
 			memoserv->Send(source.service->nick, na->nick, message, true);
 		}

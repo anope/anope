@@ -173,7 +173,7 @@ public:
 			s.name = HostServ->nick;
 
 			SubSection ss;
-			ss.name = "vHost Request";
+			ss.name = "VHost Request";
 			ss.url = "/hostserv/request";
 			s.subsections.push_back(ss);
 			provider->RegisterPage(&this->hostserv_request);

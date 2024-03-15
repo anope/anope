@@ -28,16 +28,16 @@ public:
 
 		User *u = source.GetUser();
 		const NickAlias *na = NickAlias::Find(u->nick);
-		if (!na || na->nc != u->Account() || !na->HasVhost())
+		if (!na || na->nc != u->Account() || !na->HasVHost())
 			na = NickAlias::Find(u->Account()->display);
-		if (na && u->Account() == na->nc && na->HasVhost())
+		if (na && u->Account() == na->nc && na->HasVHost())
 		{
-			source.Reply(_("Your vhost of \002%s\002 is now activated."), na->GetVhostMask().c_str());
-			Log(LOG_COMMAND, source, this) << "to enable their vhost of " << na->GetVhostMask();
-			IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
-			u->vhost = na->GetVhostHost();
-			if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
-				u->SetVIdent(na->GetVhostIdent());
+			source.Reply(_("Your vhost of \002%s\002 is now activated."), na->GetVHostMask().c_str());
+			Log(LOG_COMMAND, source, this) << "to enable their vhost of " << na->GetVHostMask();
+			IRCD->SendVHost(u, na->GetVHostIdent(), na->GetVHostHost());
+			u->vhost = na->GetVHostHost();
+			if (IRCD->CanSetVIdent && !na->GetVHostIdent().empty())
+				u->SetVIdent(na->GetVHostIdent());
 			u->UpdateHost();
 		}
 		else

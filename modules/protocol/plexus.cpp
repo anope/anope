@@ -83,7 +83,7 @@ public:
 		Uplink::Send("ENCAP", u->server->GetName(), "SVSNICK", u->GetUID(), u->timestamp, newnick, when);
 	}
 
-	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) override
+	void SendVHost(User *u, const Anope::string &ident, const Anope::string &host) override
 	{
 		if (!ident.empty())
 			Uplink::Send("ENCAP", '*', "CHGIDENT", u->GetUID(), ident);
@@ -92,7 +92,7 @@ public:
 		u->SetMode(Config->GetClient("HostServ"), "CLOAK");
 	}
 
-	void SendVhostDel(User *u) override
+	void SendVHostDel(User *u) override
 	{
 		u->RemoveMode(Config->GetClient("HostServ"), "CLOAK");
 	}
@@ -186,7 +186,7 @@ public:
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
 	{
 		Server *s = Server::Find(uid.substr(0, 3));
-		Uplink::Send("ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, '*', '*', na->GetVhostHost().empty() ? "*" : na->GetVhostHost(), na->nc->display);
+		Uplink::Send("ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, '*', '*', na->GetVHostHost().empty() ? "*" : na->GetVHostHost(), na->nc->display);
 	}
 
 	void SendSVSNOOP(const Server *server, bool set) override

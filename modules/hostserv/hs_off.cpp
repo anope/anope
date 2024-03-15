@@ -26,15 +26,15 @@ public:
 		User *u = source.GetUser();
 
 		const NickAlias *na = NickAlias::Find(u->nick);
-		if (!na || na->nc != u->Account() || !na->HasVhost())
+		if (!na || na->nc != u->Account() || !na->HasVHost())
 			na = NickAlias::Find(u->Account()->display);
 
-		if (!na || !na->HasVhost())
+		if (!na || !na->HasVHost())
 			source.Reply(HOST_NOT_ASSIGNED);
 		else
 		{
 			u->vhost.clear();
-			IRCD->SendVhostDel(u);
+			IRCD->SendVHostDel(u);
 			u->UpdateHost();
 			Log(LOG_COMMAND, source, this) << "to disable their vhost";
 			source.Reply(_("Your vhost was removed and the normal cloaking restored."));

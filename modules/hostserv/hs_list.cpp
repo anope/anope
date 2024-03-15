@@ -53,25 +53,25 @@ public:
 
 		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Creator")).AddColumn(_("Created"));
+		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("VHost")).AddColumn(_("Creator")).AddColumn(_("Created"));
 
 		for (const auto &[_, na] : *NickAliasList)
 		{
-			if (!na->HasVhost())
+			if (!na->HasVHost())
 				continue;
 
 			if (!key.empty() && key[0] != '#')
 			{
-				if ((Anope::Match(na->nick, key) || Anope::Match(na->GetVhostHost(), key)) && display_counter < listmax)
+				if ((Anope::Match(na->nick, key) || Anope::Match(na->GetVHostHost(), key)) && display_counter < listmax)
 				{
 					++display_counter;
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(display_counter);
 					entry["Nick"] = na->nick;
-					entry["Vhost"] = na->GetVhostMask();
-					entry["Creator"] = na->GetVhostCreator();
-					entry["Created"] = Anope::strftime(na->GetVhostCreated(), NULL, true);
+					entry["VHost"] = na->GetVHostMask();
+					entry["Creator"] = na->GetVHostCreator();
+					entry["Created"] = Anope::strftime(na->GetVHostCreated(), NULL, true);
 					list.AddEntry(entry);
 				}
 			}
@@ -87,9 +87,9 @@ public:
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(display_counter);
 					entry["Nick"] = na->nick;
-					entry["Vhost"] = na->GetVhostMask();
-					entry["Creator"] = na->GetVhostCreator();
-					entry["Created"] = Anope::strftime(na->GetVhostCreated(), NULL, true);
+					entry["VHost"] = na->GetVHostMask();
+					entry["Creator"] = na->GetVHostCreator();
+					entry["Created"] = Anope::strftime(na->GetVHostCreated(), NULL, true);
 					list.AddEntry(entry);
 				}
 			}

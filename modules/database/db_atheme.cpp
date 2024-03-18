@@ -411,9 +411,9 @@ private:
 		// base64            Converted to the first encryption algorithm
 		// bcrypt            Converted to enc_bcrypt
 		// crypt3-des        NO
-		// crypt3-md5        NO
-		// crypt3-sha2-256   NO
-		// crypt3-sha2-512   NO
+		// crypt3-md5        Converted to enc_posix
+		// crypt3-sha2-256   Converted to enc_posix
+		// crypt3-sha2-512   Converted to enc_posix
 		// ircservices       Converted to enc_old
 		// pbkdf2            NO
 		// pbkdf2v2          NO
@@ -461,6 +461,9 @@ private:
 
 		else if (pass.compare(0, 11, "$rawsha512$", 11) == 0)
 			nc->pass = "raw-sha512:" + pass.substr(11);
+
+		else if (pass.compare(0, 3, "$1$", 3) == 0 || pass.compare(0, 3, "$5", 3) == 0 || pass.compare(0, 3, "$6", 3) == 0)
+			nc->pass = "posix:" + pass;
 
 		else if (pass.compare(0, 4, "$2a$", 4) == 0 || pass.compare(0, 4, "$2b$", 4) == 0)
 			nc->pass = "bcrypt:" + pass;

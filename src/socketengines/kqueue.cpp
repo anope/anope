@@ -77,7 +77,7 @@ void SocketEngine::Process()
 	static timespec kq_timespec = { Config->ReadTimeout, 0 };
 	int total = kevent(kq_fd, &change_events.front(), change_count, &event_events.front(), event_events.size(), &kq_timespec);
 	change_count = 0;
-	Anope::CurTime = time(NULL);
+	Anope::UpdateTime();
 
 	/* EINTR can be given if the read timeout expires */
 	if (total == -1)

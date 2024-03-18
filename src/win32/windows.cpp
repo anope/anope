@@ -64,22 +64,6 @@ USHORT WindowsGetLanguage(const Anope::string &lang)
 	return LANG_NEUTRAL;
 }
 
-/** Like gettimeofday(), but it works on Windows.
- * @param tv A timeval struct
- * @param tz Should be NULL, it is not used
- * @return 0 on success
- */
-int gettimeofday(timeval *tv, void *)
-{
-	SYSTEMTIME st;
-	GetSystemTime(&st);
-
-	tv->tv_sec = Anope::CurTime;
-	tv->tv_usec = st.wMilliseconds;
-
-	return 0;
-}
-
 int setenv(const char *name, const char *value, int overwrite)
 {
 	return SetEnvironmentVariable(name, value);

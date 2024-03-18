@@ -100,7 +100,7 @@ void SocketEngine::Process()
 #endif
 
 	int sresult = select(MaxFD + 1, &rfdset, &wfdset, &efdset, &tval);
-	Anope::CurTime = time(NULL);
+	Anope::UpdateTime();
 
 	if (sresult == -1)
 	{

@@ -29,20 +29,15 @@
 static Anope::string GetTimeStamp()
 {
 	char tbuf[256];
-	time_t t;
 
-	if (time(&t) < 0)
-		t = Anope::CurTime;
-
-	tm tm = *localtime(&t);
+	Anope::UpdateTime();
+	auto tm = *localtime(&Anope::CurTime);
 	if (Anope::Debug)
 	{
 		char *s;
-		struct timeval tv;
-		gettimeofday(&tv, NULL);
 		strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S", &tm);
 		s = tbuf + strlen(tbuf);
-		s += snprintf(s, sizeof(tbuf) - (s - tbuf), ".%06d", static_cast<int>(tv.tv_usec));
+		s += snprintf(s, sizeof(tbuf) - (s - tbuf), ".%06lld", static_cast<long long>(Anope::CurTimeNs / 1000));
 		strftime(s, sizeof(tbuf) - (s - tbuf) - 1, " %Y]", &tm);
 	}
 	else

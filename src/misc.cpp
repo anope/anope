@@ -785,3 +785,26 @@ size_t Anope::Distance(const Anope::string &s1, const Anope::string &s2)
 	}
 	return costs[s2.length()];
 }
+
+void Anope::UpdateTime()
+{
+#ifdef _WIN32
+	SYSTEMTIME st;
+	GetSystemTime(&st);
+
+	CurTime = time(nullptr);
+	CurTimeNs = st.wMilliseconds;
+#elif HAVE_CLOCK_GETTIME
+	struct timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+
+	CurTime = ts.tv_sec;
+	CurTimeNs = ts.tv_nsec;
+#else
+	struct timeval tv;
+	gettimeofday(&tv, nullptr);
+
+	CurTime = tv.tv_sec;
+	CurTimeNs = tv.tv_usec * 1000;
+#endif
+}

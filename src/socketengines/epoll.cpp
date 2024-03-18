@@ -76,7 +76,7 @@ void SocketEngine::Process()
 		events.resize(events.size() * 2);
 
 	int total = epoll_wait(EngineHandle, &events.front(), events.size(), Config->ReadTimeout * 1000);
-	Anope::CurTime = time(NULL);
+	Anope::UpdateTime();
 
 	/* EINTR can be given if the read timeout expires */
 	if (total == -1)

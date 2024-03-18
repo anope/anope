@@ -224,6 +224,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINF
 endif()
 
 # Check for the existence of the following functions
+check_function_exists(clock_gettime HAVE_CLOCK_GETTIME)
 check_function_exists(umask HAVE_UMASK)
 check_function_exists(epoll_wait HAVE_EPOLL)
 check_function_exists(poll HAVE_POLL)

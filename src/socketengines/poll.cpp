@@ -100,7 +100,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 void SocketEngine::Process()
 {
 	int total = poll(&events.front(), events.size(), Config->ReadTimeout * 1000);
-	Anope::CurTime = time(NULL);
+	Anope::UpdateTime();
 
 	/* EINTR can be given if the read timeout expires */
 	if (total < 0)

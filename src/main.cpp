@@ -36,8 +36,9 @@ Anope::string Anope::QuitReason;
 
 static Anope::string BinaryDir;       /* Full path to services bin directory */
 
-time_t Anope::StartTime = time(NULL);
-time_t Anope::CurTime = time(NULL);
+time_t Anope::StartTime = 0;
+time_t Anope::CurTime = 0;
+long long Anope::CurTimeNs = 0;
 
 size_t Anope::CurrentUplink = -1;
 

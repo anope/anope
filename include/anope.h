@@ -367,6 +367,7 @@ namespace Anope
 	 * Use this unless you need very specific time checks
 	 */
 	extern CoreExport time_t CurTime;
+	extern CoreExport long long CurTimeNs;
 
 	/** The debug level we are running at.
 	 */
@@ -575,6 +576,9 @@ namespace Anope
 	 * @param s2 The second string.
 	 */
 	extern CoreExport size_t Distance(const Anope::string &s1, const Anope::string &s2);
+
+	/** Update the current time. */
+	extern CoreExport void UpdateTime();
 }
 
 /** sepstream allows for splitting token separated lists.

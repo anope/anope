@@ -290,6 +290,7 @@ bool Anope::Init(int ac, char **av)
 	umask(DEFUMASK);
 #endif
 
+	Anope::UpdateTime();
 	Serialize::RegisterTypes();
 
 	/* Parse command line arguments */

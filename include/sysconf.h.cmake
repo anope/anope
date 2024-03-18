@@ -20,6 +20,9 @@
 // Whether Anope was built in debug mode.
 #cmakedefine01 DEBUG_BUILD
 
+// Whether the clock_gettime() function is available.
+#cmakedefine01 HAVE_CLOCK_GETTIME
+
 // Whether Anope was built with localization support.
 #cmakedefine01 HAVE_LOCALIZATION
 

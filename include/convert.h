@@ -29,9 +29,8 @@ namespace Anope
 
 		if (leftover)
 		{
-			std::string extra;
-			std::getline(tmp, extra);
-			*leftover = extra;
+			leftover->clear();
+			std::getline(tmp, leftover->str());
 		}
 		else
 		{

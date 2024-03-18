@@ -51,7 +51,7 @@ void Thread::Start()
 	catch (const std::system_error &err)
 	{
 		this->flags[SF_DEAD] = true;
-		throw CoreException("Unable to create thread: " + std::string(err.what()));
+		throw CoreException("Unable to create thread: " + Anope::string(err.what()));
 	}
 }
 

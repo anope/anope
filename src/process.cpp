@@ -202,7 +202,7 @@ bool IRCDProto::Format(Anope::string &message, const Anope::map<Anope::string> &
 
 
 		const auto &last = params.back();
-		if (last.empty() || last[0] == ':' || last.find(' ') != std::string::npos)
+		if (last.empty() || last[0] == ':' || last.find(' ') != Anope::string::npos)
 			buffer << ':';
 		buffer << last;
 	}

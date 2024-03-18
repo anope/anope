@@ -205,7 +205,7 @@ static Anope::string Hex(const char *data, size_t l)
 {
 	const char hextable[] = "0123456789abcdef";
 
-	std::string rv;
+	Anope::string rv;
 	for (size_t i = 0; i < l; ++i)
 	{
 		unsigned char c = data[i];

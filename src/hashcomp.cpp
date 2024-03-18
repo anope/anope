@@ -106,7 +106,7 @@ bool sepstream::GetToken(Anope::string &token)
 	if (!this->allow_empty)
 	{
 		this->pos = this->tokens.find_first_not_of(this->sep, this->pos);
-		if (this->pos == std::string::npos)
+		if (this->pos == Anope::string::npos)
 		{
 			this->pos = this->tokens.length() + 1;
 			token.clear();
@@ -115,7 +115,7 @@ bool sepstream::GetToken(Anope::string &token)
 	}
 
 	size_t p = this->tokens.find(this->sep, this->pos);
-	if (p == std::string::npos)
+	if (p == Anope::string::npos)
 		p = this->tokens.length();
 
 	token = this->tokens.substr(this->pos, p - this->pos);

@@ -291,6 +291,8 @@ bool Anope::Init(int ac, char **av)
 #endif
 
 	Anope::UpdateTime();
+	Anope::StartTime = Anope::CurTime;
+
 	Serialize::RegisterTypes();
 
 	/* Parse command line arguments */

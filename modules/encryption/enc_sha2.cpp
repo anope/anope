@@ -160,7 +160,7 @@ public:
 		if (!is_hmac && hash_method.compare(0, 4, "raw-", 4))
 			return; // Not a SHA-2 password.
 
-		auto provider = GetAlgorithm(hash_method.substr(5));
+		auto provider = GetAlgorithm(hash_method.substr(is_hmac ? 5 : 4));
 		if (!provider)
 			return; // Not a hash for this module.
 

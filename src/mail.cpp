@@ -28,18 +28,18 @@ Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, con
 
 Mail::Message::~Message()
 {
-	if (success)
+	if (error.empty())
 		Log(LOG_NORMAL, "mail") << "Successfully delivered mail for " << mail_to << " (" << addr << ")";
 	else
-		Log(LOG_NORMAL, "mail") << "Error delivering mail for " << mail_to << " (" << addr << ")";
+		Log(LOG_NORMAL, "mail") << "Error delivering mail for " << mail_to << " (" << addr << "): " << error;
 }
 
 void Mail::Message::Run()
 {
-	FILE *pipe = popen(sendmail_path.c_str(), "w");
-
+	auto *pipe = popen(sendmail_path.c_str(), "w");
 	if (!pipe)
 	{
+		error = strerror(errno);
 		SetExitState();
 		return;
 	}
@@ -53,12 +53,16 @@ void Mail::Message::Run()
 	fprintf(pipe, "Content-Type: %s\r\n", content_type.c_str());
 	fprintf(pipe, "Content-Transfer-Encoding: 8bit\r\n");
 	fprintf(pipe, "\r\n");
-	fprintf(pipe, "%s", message.c_str());
-	fprintf(pipe, "\r\n.\r\n");
 
-	pclose(pipe);
+	std::stringstream stream(message.str());
+	for (Anope::string line; std::getline(stream, line.str()); )
+		fprintf(pipe, "%s\r\n", line.c_str());
+	fprintf(pipe, "\r\n");
 
-	success = true;
+	auto result = pclose(pipe);
+	if (result > 0)
+		error = "Sendmail exited with code " + Anope::ToString(result);
+
 	SetExitState();
 }
 

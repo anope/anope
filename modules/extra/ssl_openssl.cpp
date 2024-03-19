@@ -146,8 +146,8 @@ public:
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
-		this->certfile = config->Get<const Anope::string>("cert", "data/fullchain.pem");
-		this->keyfile = config->Get<const Anope::string>("key", "data/privkey.pem");
+		this->certfile = Anope::ExpandConfig(config->Get<const Anope::string>("cert", "fullchain.pem"));
+		this->keyfile = Anope::ExpandConfig(config->Get<const Anope::string>("key", "privkey.pem"));
 
 		if (Anope::IsFile(this->certfile.c_str()))
 		{

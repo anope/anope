@@ -241,10 +241,11 @@ void MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 	if (s != Me)
 		return;
 
-	std::ifstream stream(Config->GetBlock("serverinfo")->Get<const Anope::string>("motd").str());
+	auto motdfile = Anope::ExpandConfig(Config->GetBlock("serverinfo")->Get<const Anope::string>("motd"));
+	std::ifstream stream(motdfile.str());
 	if (!stream.is_open())
 	{
-		IRCD->SendNumeric(ERR_NOSUCHNICK, source.GetSource(), "- MOTD file not found!  Please contact your IRC administrator.");
+		IRCD->SendNumeric(ERR_NOSUCHNICK, source.GetSource(), "- MOTD file not readable!  Please contact your IRC administrator.");
 		return;
 	}
 

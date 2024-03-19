@@ -218,7 +218,10 @@ static void remove_pidfile()
 
 static void write_pidfile()
 {
-	const auto pidfile = Config->GetBlock("serverinfo")->Get<const Anope::string>("pid");
+	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
+	if (pidfile.empty())
+		return;
+
 	std::ofstream stream(pidfile.str());
 	if (!stream.is_open())
 		throw CoreException("Can not write to PID file " + pidfile);

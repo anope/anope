@@ -810,8 +810,11 @@ void Anope::UpdateTime()
 #endif
 }
 
-Anope::string Anope::Expand(const Anope::string& base, const Anope::string& fragment)
+Anope::string Anope::Expand(const Anope::string &base, const Anope::string &fragment)
 {
+	if (fragment.empty())
+		return ""; // We can't expand an empty fragment.
+
 	// The fragment is an absolute path, don't modify it.
 	if (std::filesystem::path(fragment.str()).is_absolute())
 		return fragment;

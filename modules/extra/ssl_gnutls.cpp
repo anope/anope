@@ -329,9 +329,9 @@ public:
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
-		const Anope::string certfile = config->Get<const Anope::string>("cert", "data/fullchain.pem");
-		const Anope::string keyfile = config->Get<const Anope::string>("key", "data/privkey.pem");
-		const Anope::string dhfile = config->Get<const Anope::string>("dh", "data/dhparams.pem");
+		const Anope::string certfile = Anope::ExpandConfig(config->Get<const Anope::string>("cert", "fullchain.pem"));
+		const Anope::string keyfile = Anope::ExpandConfig(config->Get<const Anope::string>("key", "privkey.pem"));
+		const Anope::string dhfile = Anope::ExpandConfig(config->Get<const Anope::string>("dh", "dhparams.pem"));
 
 		CheckFile(certfile);
 		CheckFile(keyfile);

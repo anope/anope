@@ -27,7 +27,7 @@ std::vector<Module *> ModuleManager::EventHandlers[I_SIZE];
 #ifdef _WIN32
 void ModuleManager::CleanupRuntimeDirectory()
 {
-	Anope::string dirbuf = Anope::DataDir + "/runtime";
+	Anope::string dirbuf = Anope::ExpandData("runtime");
 
 	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment, please wait";
 	try
@@ -55,7 +55,7 @@ void ModuleManager::CleanupRuntimeDirectory()
  */
 static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
-	Anope::string input = Anope::ModuleDir + "/modules/" + name + DLL_EXT;
+	const auto input = Anope::ExpandModule("modules/" + name + DLL_EXT);
 
 	struct stat s;
 	if (stat(input.c_str(), &s) == -1)
@@ -133,7 +133,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 #ifdef _WIN32
 	/* Generate the filename for the temporary copy of the module */
-	Anope::string pbuf = Anope::DataDir + "/runtime/" + modname + DLL_EXT ".XXXXXX";
+	const auto pbuf = Anope::ExpandData("runtime/" + modname + DLL_EXT ".XXXXXX");
 
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);
@@ -146,7 +146,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		return ret;
 	}
 #else
-	Anope::string pbuf = Anope::ModuleDir + "/modules/" + modname + DLL_EXT;
+	const auto pbuf = Anope::ExpandModule("modules/" + modname + DLL_EXT);
 #endif
 
 	dlerror();

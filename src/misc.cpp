@@ -23,6 +23,7 @@
 #include <climits>
 #include <numeric>
 #include <random>
+#include <filesystem>
 #include <sys/stat.h>
 #include <sys/types.h>
 #ifndef _WIN32
@@ -807,4 +808,27 @@ void Anope::UpdateTime()
 	CurTime = tv.tv_sec;
 	CurTimeNs = tv.tv_usec * 1000;
 #endif
+}
+
+Anope::string Anope::Expand(const Anope::string& base, const Anope::string& fragment)
+{
+	// The fragment is an absolute path, don't modify it.
+	if (std::filesystem::path(fragment.str()).is_absolute())
+		return fragment;
+
+#ifdef _WIN32
+	static constexpr const char separator = '\\';
+#else
+	static constexpr const char separator = '/';
+#endif
+
+	// The fragment is relative to a home directory, expand that.
+	if (!fragment.compare(0, 2, "~/", 2))
+	{
+		const auto *homedir = getenv("HOME");
+		if (homedir && *homedir)
+			return Anope::printf("%s%c%s", homedir, separator, fragment.c_str() + 2);
+	}
+
+	return Anope::printf("%s%c%s", base.c_str(), separator, fragment.c_str());
 }

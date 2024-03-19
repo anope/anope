@@ -52,7 +52,7 @@ static inline Anope::string CreateLogName(const Anope::string &file, time_t t = 
 	tm *tm = localtime(&t);
 	strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
 
-	return Anope::LogDir + "/" + file + "." + timestamp;
+	return Anope::ExpandLog(file + "." + timestamp);
 }
 
 LogFile::LogFile(const Anope::string &name) : filename(name), stream(name.c_str(), std::ios_base::out | std::ios_base::app)

@@ -46,7 +46,7 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 		Anope::string lang;
 		sepstream(language, '.').GetToken(lang);
 
-		if (Anope::IsFile(Anope::LocaleDir + "/" + lang + "/LC_MESSAGES/" + modname + ".mo"))
+		if (Anope::IsFile(Anope::ExpandLocale(lang + "/LC_MESSAGES/" + modname + ".mo")))
 		{
 			if (!bindtextdomain(this->name.c_str(), Anope::LocaleDir.c_str()))
 				Log() << "Error calling bindtextdomain, " << Anope::LastError();

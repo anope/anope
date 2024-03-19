@@ -417,12 +417,9 @@ bool Anope::Init(int ac, char **av)
 	}
 
 	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::VersionBuildString();
+	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ExpandConfig(ServicesConf.GetName());
 
-#ifdef _WIN32
-	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "\\" << ServicesConf.GetName();
-#else
-	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "/" << ServicesConf.GetName();
-
+#ifndef _WIN32
 	/* Fork to background */
 	if (!Anope::NoFork)
 	{

@@ -130,8 +130,8 @@ class DBFlatFile final
 
 			for (const auto &db : dbs)
 			{
-				const Anope::string &oldname = Anope::DataDir + "/" + db;
-				Anope::string newname = Anope::DataDir + "/backups/" + db + "-" + Anope::ToString(tm->tm_year + 1900) + Anope::printf("-%02i-", tm->tm_mon + 1) + Anope::printf("%02i", tm->tm_mday);
+				const auto oldname = Anope::ExpandData(db);
+				const auto newname = Anope::ExpandData("backups/" + db + "-" + Anope::ToString(tm->tm_year + 1900) + Anope::printf("-%02i-", tm->tm_mon + 1) + Anope::printf("%02i", tm->tm_mday));
 
 				/* Backup already exists or no database to backup */
 				if (Anope::IsFile(newname) || !Anope::IsFile(oldname))
@@ -216,7 +216,7 @@ public:
 	{
 		std::set<Anope::string> tried_dbs;
 
-		const Anope::string &db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
+		const auto db_name = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
 
 		std::fstream fd(db_name.c_str(), std::ios_base::in | std::ios_base::binary);
 		if (!fd.is_open())
@@ -296,9 +296,9 @@ public:
 
 				Anope::string db_name;
 				if (s_type->GetOwner())
-					db_name = Anope::DataDir + "/module_" + s_type->GetOwner()->name + ".db";
+					db_name = Anope::ExpandData("module_" + s_type->GetOwner()->name + ".db");
 				else
-					db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
+					db_name = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
 
 				std::fstream *fs = databases[s_type->GetOwner()] = new std::fstream((db_name + ".tmp").c_str(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
 
@@ -325,7 +325,7 @@ public:
 
 			for (auto &[mod, f] : databases)
 			{
-				const Anope::string &db_name = Anope::DataDir + "/" + (mod ? (mod->name + ".db") : Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+				const auto db_name = Anope::ExpandData((mod ? (mod->name + ".db") : Config->GetModule(this)->Get<const Anope::string>("database", "anope.db")));
 
 				if (!f->is_open() || !f->good())
 				{
@@ -367,9 +367,9 @@ public:
 
 		Anope::string db_name;
 		if (stype->GetOwner())
-			db_name = Anope::DataDir + "/module_" + stype->GetOwner()->name + ".db";
+			db_name = Anope::ExpandData("module_" + stype->GetOwner()->name + ".db");
 		else
-			db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
+			db_name = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
 
 		std::fstream fd(db_name.c_str(), std::ios_base::in | std::ios_base::binary);
 		if (!fd.is_open())

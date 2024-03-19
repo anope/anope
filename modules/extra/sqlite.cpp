@@ -118,8 +118,7 @@ public:
 
 			if (this->SQLiteServices.find(connname) == this->SQLiteServices.end())
 			{
-				Anope::string database = Anope::DataDir + "/" + block->Get<const Anope::string>("database", "anope");
-
+				auto database = Anope::ExpandData(block->Get<const Anope::string>("database", "anope"));
 				try
 				{
 					auto *ss = new SQLiteService(this, connname, database);

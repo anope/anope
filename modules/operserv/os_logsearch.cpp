@@ -24,7 +24,7 @@ class CommandOSLogSearch final
 
 		strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
 
-		return Anope::LogDir + "/" + file + "." + timestamp;
+		return Anope::ExpandLog(file + "." + timestamp);
 	}
 
 public:

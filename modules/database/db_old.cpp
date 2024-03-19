@@ -321,7 +321,7 @@ static dbFILE *open_db_read(const char *service, const char *filename, int versi
 	int myversion;
 
 	f = new dbFILE;
-	strscpy(f->filename, (Anope::DataDir + "/" + filename).c_str(), sizeof(f->filename));
+	strscpy(f->filename, Anope::ExpandData(filename).c_str(), sizeof(f->filename));
 	f->mode = 'r';
 	fp = fopen(f->filename, "rb");
 	if (!fp)

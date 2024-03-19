@@ -697,7 +697,7 @@ const Anope::string &File::GetName() const
 
 Anope::string File::GetPath() const
 {
-	return (this->executable ? "" : Anope::ConfigDir + "/") + this->name;
+	return this->executable ? this->name : Anope::ExpandConfig(this->name);
 }
 
 bool File::IsOpen() const
@@ -708,7 +708,7 @@ bool File::IsOpen() const
 bool File::Open()
 {
 	this->Close();
-	this->fp = (this->executable ? popen(this->name.c_str(), "r") : fopen((Anope::ConfigDir + "/" + this->name).c_str(), "r"));
+	this->fp = (this->executable ? popen(GetPath().c_str(), "r") : fopen(GetPath().c_str(), "r"));
 	return this->fp != NULL;
 }
 

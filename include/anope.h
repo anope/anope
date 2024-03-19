@@ -579,6 +579,28 @@ namespace Anope
 
 	/** Update the current time. */
 	extern CoreExport void UpdateTime();
+
+	/** Expands a path fragment that is relative to the base directory.
+	 * @param base The base directory that it is relative to.
+	 * @param fragment The fragment to expand.
+	 */
+	extern CoreExport Anope::string Expand(const Anope::string &base, const Anope::string &fragment);
+
+	/** Expands a config path. */
+	inline auto ExpandConfig(const Anope::string &path) { return Expand(ConfigDir, path); }
+
+	/** Expands a data path. */
+	inline auto ExpandData(const Anope::string &path) { return Expand(DataDir, path); }
+
+	/** Expands a locale path. */
+	inline auto ExpandLocale(const Anope::string &path) { return Expand(LocaleDir, path); }
+
+	/** Expands a log path. */
+	inline auto ExpandLog(const Anope::string &path) { return Expand(LogDir, path); }
+
+	/** Expands a module path. */
+	inline auto ExpandModule(const Anope::string &path) { return Expand(ModuleDir, path); }
+
 }
 
 /** sepstream allows for splitting token separated lists.

@@ -1290,7 +1290,7 @@ public:
 
 	EventReturn OnLoadDatabase() override
 	{
-		const auto dbname = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "atheme.db");
+		const auto dbname = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "atheme.db"));
 		std::ifstream fd(dbname.str());
 		if (!fd.is_open())
 		{

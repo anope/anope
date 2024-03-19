@@ -133,7 +133,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 #ifdef _WIN32
 	/* Generate the filename for the temporary copy of the module */
-	const auto pbuf = Anope::ExpandData("runtime/" + modname + DLL_EXT ".XXXXXX");
+	auto pbuf = Anope::ExpandData("runtime/" + modname + DLL_EXT ".XXXXXX");
 
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);

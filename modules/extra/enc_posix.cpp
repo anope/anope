@@ -19,6 +19,8 @@ public:
 	EPOSIX(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, ENCRYPTION | VENDOR)
 	{
+		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			throw ModuleException("enc_posix can not be used as a primary encryption method");
 	}
 
 	void OnCheckAuthentication(User *, IdentifyRequest *req) override

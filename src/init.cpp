@@ -211,7 +211,9 @@ static void InitSignals()
 
 static void remove_pidfile()
 {
-	remove(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid").c_str());
+	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
+	if (!pidfile.empty())
+		remove(pidfile.c_str());
 }
 
 /* Create our PID file and write the PID to it. */

@@ -375,7 +375,7 @@ namespace Anope
 
 	/** Other command line options.
 	 */
-	extern CoreExport bool ReadOnly, NoFork, NoThird, NoExpire, ProtocolDebug;
+	extern CoreExport bool ReadOnly, NoFork, NoThird, NoPID, NoExpire, ProtocolDebug;
 
 	/** The root of the Anope installation. Usually ~/anope
 	 */

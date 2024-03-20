@@ -221,7 +221,7 @@ static void remove_pidfile()
 static void write_pidfile()
 {
 	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
-	if (pidfile.empty())
+	if (Anope::NoPID || pidfile.empty())
 		return;
 
 	std::ofstream stream(pidfile.str());
@@ -325,6 +325,7 @@ bool Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "    --modulesdir=modules directory";
 		Log(LOG_TERMINAL) << "-e, --noexpire";
 		Log(LOG_TERMINAL) << "-n, --nofork";
+		Log(LOG_TERMINAL) << "-p, --nopid";
 		Log(LOG_TERMINAL) << "    --nothird";
 		Log(LOG_TERMINAL) << "    --protocoldebug";
 		Log(LOG_TERMINAL) << "-r, --readonly";
@@ -351,6 +352,9 @@ bool Anope::Init(int ac, char **av)
 
 	if (GetCommandLineArgument("nothird"))
 		Anope::NoThird = true;
+
+	if (GetCommandLineArgument("nopid", 'p'))
+		Anope::NoPID = true;
 
 	if (GetCommandLineArgument("noexpire", 'e'))
 		Anope::NoExpire = true;

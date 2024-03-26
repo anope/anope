@@ -1,5 +1,5 @@
 build_subdir(${CMAKE_CURRENT_SOURCE_DIR})
 
-install(DIRECTORY templates
-  DESTINATION "${DB_DIR}/webcpanel"
+install(DIRECTORY "templates/"
+  DESTINATION "${DB_DIR}/webcpanel/templates/default"
 )

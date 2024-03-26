@@ -74,6 +74,30 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 			na->nc->Shrink<bool>("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}
+		if (na->nc->HasExt("NS_KEEP_MODES") != message.post_data.count("keepmodes"))
+		{
+			if (!na->nc->HasExt("NS_KEEP_MODES"))
+				na->nc->Extend<bool>("NS_KEEP_MODES");
+			else
+				na->nc->Shrink<bool>("NS_KEEP_MODES");
+			replacements["MESSAGES"] = "Keepmodes updated";
+		}
+		if (na->nc->HasExt("MSG") != message.post_data.count("msg"))
+		{
+			if (!na->nc->HasExt("MSG"))
+				na->nc->Extend<bool>("MSG");
+			else
+				na->nc->Shrink<bool>("MSG");
+			replacements["MESSAGES"] = "Message updated";
+		}
+		if (na->nc->HasExt("NEVEROP") != message.post_data.count("neverop"))
+		{
+			if (!na->nc->HasExt("NEVEROP"))
+				na->nc->Extend<bool>("NEVEROP");
+			else
+				na->nc->Shrink<bool>("NEVEROP");
+			replacements["MESSAGES"] = "Neverop updated";
+		}
 	}
 
 	replacements["DISPLAY"] = na->nc->display;
@@ -95,6 +119,12 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		replacements["KILL_QUICK"];
 	if (!na->nc->HasExt("KILLPROTECT") && !na->nc->HasExt("KILL_QUICK"))
 		replacements["KILL_OFF"];
+	if (na->nc->HasExt("NS_KEEP_MODES"))
+		replacements["KEEPMODES"];
+	if (na->nc->HasExt("MSG"))
+		replacements["MSG"];
+	if (na->nc->HasExt("NEVEROP"))
+		replacements["NEVEROP"];
 
 	TemplateFileServer page("nickserv/info.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

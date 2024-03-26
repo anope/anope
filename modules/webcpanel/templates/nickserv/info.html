@@ -32,7 +32,7 @@
 						</tr>
 						{IF EXISTS VHOST}
 						<tr>
-							<td>Vhost:</td>
+							<td>VHost:</td>
 							<td>{VHOST}</td>
 						</tr>
 						{END IF}
@@ -43,6 +43,18 @@
 						<tr>
 							<td>Auto op:</td>
 							<td><input type="checkbox" name="autoop" value="on" {IF EXISTS AUTOOP}checked{END IF}></td>
+						</tr>
+						<tr>
+							<td>Keep modes:</td>
+							<td><input type="checkbox" name="keepmodes" value="on" {IF EXISTS KEEPMODES}checked{END IF}></td>
+						</tr>
+						<tr>
+							<td>Message:</td>
+							<td><input type="checkbox" name="msg" value="on" {IF EXISTS MSG}checked{END IF}></td>
+						</tr>
+						<tr>
+							<td>Never op:</td>
+							<td><input type="checkbox" name="neverop" value="on" {IF EXISTS NEVEROP}checked{END IF}></td>
 						</tr>
 						<tr>
 							<td>Private:</td>

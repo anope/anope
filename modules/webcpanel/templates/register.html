@@ -1,19 +1,4 @@
-<!DOCTYPE html>
-<!--[if IE 7]> <html lang="en" class="ie7"> <![endif]-->
-<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
-<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
-<!--[if !IE]><!-->
-<html lang="en">
-	<!--<![endif]-->
-	<head>
-		<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/static/style.css" media="screen" rel="stylesheet" type="text/css" />
-		<!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script><![endif]-->
-
-		<title>{TITLE}</title>
-	</head>
-	<body>
-		<div id="frontPages" class="container">
+{INCLUDE layout/header.html}
 			<div class="row">
 				<div class="col-lg-offset-4 col-lg-4">
 					<a href="/">
@@ -48,18 +33,4 @@
 					</form>
 				</div>
 			</div>
-
-			<br>
-			<div class="row">
-				<div class="col-lg-offset-3 col-lg-6">
-					<div class="footer text-center">
-						Anope IRC Services - &copy; 2013-2024 Anope Team - <a href="https://www.anope.org/">https://www.anope.org/</a>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-	</body>
-</html>
+{INCLUDE layout/footer.html}

@@ -108,18 +108,18 @@ h4 {
 	font-weight: normal;
 }
 
-#tableNSAccess td {
+#tableAccess td {
 	vertical-align: middle;
 }
-#tableNSAccess td:first-child {
+#tableAccess td:first-child {
 	padding-right: 10px;
 	text-align: left;
 }
-#tableNSAccess td:last-child {
+#tableAccess td:last-child {
 	padding-right: 10px;
 	text-align: right;
 }
-#tableNSAccess th small {
+#tableAccess th small {
 	font-weight: normal;
 }
 

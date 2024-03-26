@@ -15,7 +15,7 @@
 
 extern Module *me;
 
-extern Anope::string provider_name, template_name, template_base, page_title;
+extern Anope::string provider_name, template_base, page_title;
 
 struct SubSection final
 {

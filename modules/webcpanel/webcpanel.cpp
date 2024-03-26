@@ -8,7 +8,7 @@
 #include "webcpanel.h"
 
 Module *me;
-Anope::string provider_name, template_name, template_base, page_title;
+Anope::string provider_name, template_base, page_title;
 
 class ModuleWebCPanel final
 	: public Module
@@ -60,8 +60,7 @@ public:
 
 		Configuration::Block *block = Config->GetModule(this);
 		provider_name = block->Get<const Anope::string>("server", "httpd/main");
-		template_name = block->Get<const Anope::string>("template", "default");
-		template_base = Anope::ExpandData("webcpanel/templates/" + template_name);
+		template_base = Anope::ExpandData(block->Get<const Anope::string>("template_dir", "webcpanel/templates/default"));
 		page_title = block->Get<const Anope::string>("title", "Anope IRC Services");
 
 		provider = ServiceReference<HTTPProvider>("HTTPProvider", provider_name);

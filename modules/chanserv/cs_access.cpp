@@ -200,7 +200,7 @@ class CommandCSAccess final
 			}
 		}
 
-		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
+		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1000");
 		if (access_max && ci->GetDeepAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);

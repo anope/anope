@@ -1,9 +1,37 @@
 Anope Version 2.1.4-git
 -----------------------
+Added a check for a non-deprecated encryption module on start.
+Added a way for protocol modules to report an error to the uplink.
+Added more account settings to the webcpanel.
+Added self-test functionality for all encryption modules.
+Added support for challenge authentication on InspIRCd.
+Added support for importing databases from Atheme.
+Added support for sending client tags on UnrealIRCd.
+Added support for the InspIRCd 1206 (v4) protocol.
+Added the --nopid option to disable writing a pid file.
+Added the enc_argon2 module to encrypt passwords with Argon2.
+Added the enc_sha2 module to encrypt passwords with HMAC-SHA-2.
+Added the global/queue command for queueing multi-line messages.
+Added the global/server command for sending messages to an individual server.
+Added the PASSWORD category to operserv/stats to view password encryption methods.
+Added the verify-only enc_posix module to validate passwords from Atheme that were encrypted with Argon2.
 Changed nickserv/drop to use confirmation codes to confirm a nickname drop.
+Changed various paths to be relative to the data and config directories.
+Converted some IRCDProto member functions to variables.
+Converted the enc_md5, enc_none, enc_old, enc_sha1, and enc_sha256 modules to be verify-only.
+Deduplicated page headers and footers in the webcpanel templates.
+Deprecated the enc_sha256 module.
+Fixed inconsistent spelling/casing of email, vhost, and vident.
 Fixed various bugs in the inspircd module.
+Improved portability of email sending.
+Improved protocol debug messages.
+Improved the performance and reliability of internal conversion logic.
 Improved the randomness of randomly generated numbers.
-Removed support for registering accounts without an email address.
+Refactored the enc_bcrypt module and exposed it as an encryption context.
+Removed several duplicate translation strings.
+Replaced the custom MD5 implementation in enc_md5 with a vendored one.
+Replaced the custom SHA256 implementation in enc_sha256 with a vendored one.
+The ldap_authentication, ldap_opewr, sql_authentication, sql_log, and sql_oper modules are now always enabled.
 
 Anope Version 2.1.3
 -------------------

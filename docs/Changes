@@ -31,7 +31,7 @@ Refactored the enc_bcrypt module and exposed it as an encryption context.
 Removed several duplicate translation strings.
 Replaced the custom MD5 implementation in enc_md5 with a vendored one.
 Replaced the custom SHA256 implementation in enc_sha256 with a vendored one.
-The ldap_authentication, ldap_opewr, sql_authentication, sql_log, and sql_oper modules are now always enabled.
+The ldap_authentication, ldap_oper, sql_authentication, sql_log, and sql_oper modules are now always enabled.
 
 Anope Version 2.1.3
 -------------------
@@ -53,7 +53,7 @@ Reworked how messages are sent in protocol modules to allow sending message tags
 Anope Version 2.1.2
 -------------------
 Bumped the minimum OpenSSL version to 1.1.0.
-Bumped the minumum GnuTLS version to 3.0.0.
+Bumped the minimum GnuTLS version to 3.0.0.
 Disabled SSLv3 support in the m_ssl_openssl module.
 Modernized mutex and thread code to use Modern C++.
 Normalised the program exit codes.

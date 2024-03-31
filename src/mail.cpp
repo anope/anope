@@ -15,7 +15,7 @@
 
 Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m)
 	: Thread()
-	, sendmail_path(Config->GetBlock("mail")->Get<const Anope::string>("sendmailpath"))
+	, sendmail_path(Config->GetBlock("mail")->Get<const Anope::string>("sendmailpath", "/usr/sbin/sendmail -it"))
 	, send_from(sf)
 	, mail_to(mailto)
 	, addr(a)

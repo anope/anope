@@ -1,5 +1,5 @@
-Anope Version 2.1.4-git
------------------------
+Anope Version 2.1.4
+-------------------
 Added a check for a non-deprecated encryption module on start.
 Added a way for protocol modules to report an error to the uplink.
 Added more account settings to the webcpanel.

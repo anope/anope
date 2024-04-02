@@ -55,7 +55,7 @@ void ModuleManager::CleanupRuntimeDirectory()
  */
 static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
-	const auto input = Anope::ExpandModule("modules/" + name + DLL_EXT);
+	const auto input = Anope::ExpandModule(name + DLL_EXT);
 
 	struct stat s;
 	if (stat(input.c_str(), &s) == -1)
@@ -146,7 +146,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		return ret;
 	}
 #else
-	const auto pbuf = Anope::ExpandModule("modules/" + modname + DLL_EXT);
+	const auto pbuf = Anope::ExpandModule(modname + DLL_EXT);
 #endif
 
 	dlerror();

@@ -20,6 +20,21 @@
 // Whether Anope was built in debug mode.
 #cmakedefine01 DEBUG_BUILD
 
+// The default config directory.
+#define DEFAULT_CONF_DIR "@CONF_DIR@"
+
+// The default data directory.
+#define DEFAULT_DATA_DIR "@DB_DIR@"
+
+// The default locale directory.
+#define DEFAULT_LOCALE_DIR "@LOCALE_DIR@"
+
+// The default log directory.
+#define DEFAULT_LOG_DIR "@LOGS_DIR@"
+
+// The default module directory.
+#define DEFAULT_MODULE_DIR "@LIB_DIR@"
+
 // Whether the clock_gettime() function is available.
 #cmakedefine01 HAVE_CLOCK_GETTIME
 

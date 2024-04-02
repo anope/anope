@@ -30,7 +30,11 @@
 #endif
 #include <thread>
 
-Anope::string Anope::ConfigDir = "conf", Anope::DataDir = "data", Anope::ModuleDir = "lib", Anope::LocaleDir = "locale", Anope::LogDir = "logs";
+Anope::string Anope::ConfigDir = DEFAULT_CONF_DIR;
+Anope::string Anope::DataDir = DEFAULT_DATA_DIR;
+Anope::string Anope::LocaleDir = DEFAULT_LOCALE_DIR;
+Anope::string Anope::LogDir = DEFAULT_LOG_DIR;
+Anope::string Anope::ModuleDir = DEFAULT_MODULE_DIR;
 
 /* Vector of pairs of command line arguments and their params */
 static std::vector<std::pair<Anope::string, Anope::string> > CommandLineArguments;

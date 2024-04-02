@@ -190,7 +190,7 @@ Conf::Conf() : Block("")
 
 	if (mail->Get<bool>("usemail"))
 	{
-		Anope::string check[] = { "sendmailpath", "sendfrom", "registration_subject", "registration_message", "emailchange_subject", "emailchange_message", "memo_subject", "memo_message" };
+		Anope::string check[] = { "sendfrom", "registration_subject", "registration_message", "emailchange_subject", "emailchange_message", "memo_subject", "memo_message" };
 		for (const auto &field : check)
 			ValidateNotEmpty("mail", field, mail->Get<const Anope::string>(field));
 	}

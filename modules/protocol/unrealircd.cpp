@@ -1159,7 +1159,7 @@ struct IRCDMessageMode final
 		if (IRCD->IsChannelValid(params[0]))
 		{
 			Channel *c = Channel::Find(params[0]);
-			auto ts = IRCD->ExtractTimestamp(params.back());
+			auto ts = server_source ? IRCD->ExtractTimestamp(params.back()) : 0;
 
 			if (c)
 				c->SetModesInternal(source, modes, ts);

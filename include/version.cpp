@@ -42,7 +42,7 @@ static std::string get_git_hash(const std::string &git_dir)
 	}
 	fd.close();
 
-	return "g" + filebuf.substr(0, 7);
+	return filebuf.substr(0, 7);
 }
 
 static bool read_version_sh(const std::string &version_sh, std::map<std::string, std::string> &versions)

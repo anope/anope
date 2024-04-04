@@ -48,7 +48,7 @@ void Mail::Message::Run()
 	if (this->dont_quote_addresses)
 		fprintf(pipe, "To: %s <%s>\r\n", mail_to.c_str(), addr.c_str());
 	else
-		fprintf(pipe, "To: \"%s\" <%s>\r\n", mail_to.c_str(), addr.c_str());
+		fprintf(pipe, "To: \"%s\" <%s>\r\n", mail_to.replace_all_cs("\\", "\\\\").c_str(), addr.c_str());
 	fprintf(pipe, "Subject: %s\r\n", subject.c_str());
 	fprintf(pipe, "Content-Type: %s\r\n", content_type.c_str());
 	fprintf(pipe, "Content-Transfer-Encoding: 8bit\r\n");

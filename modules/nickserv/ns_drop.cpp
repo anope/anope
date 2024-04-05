@@ -58,7 +58,7 @@ public:
 		}
 
 		auto *code = dropcode.Get(na);
-		if (params.size() < 2 || !code || !code->equals_ci(params[1]))
+		if (params.size() < 2 || ((!code || !code->equals_ci(params[1])) && (!source.HasPriv("nickserv/drop/override") || params[1] != "override")))
 		{
 			if (!code)
 			{

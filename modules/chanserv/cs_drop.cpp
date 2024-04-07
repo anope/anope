@@ -50,7 +50,7 @@ public:
 		}
 
 		auto *code = dropcode.Get(ci);
-		if (params.size() < 2 || ((!code || !code->equals_ci(params[1])) && (!source.HasPriv("chanserv/drop/override") || params[1] != "override")))
+		if (params.size() < 2 || ((!code || !code->equals_ci(params[1])) && (!source.HasPriv("chanserv/drop/override") || params[1] != "OVERRIDE")))
 		{
 			if (!code)
 			{
@@ -94,6 +94,10 @@ public:
 			source.Reply(_("Unregisters the named channel.  Can only be used by\n"
 					"the \002channel founder\002."));
 
+		source.Reply(" ");
+		if (source.HasPriv("chanserv/drop/override"))
+			source.Reply(_("Additionally, Services Operators with the \037chanserv/drop/override\037 permission can\n"
+				"replace \037code\037 with \002OVERRIDE\002 to drop without a confirmation code."));
 		return true;
 	}
 };

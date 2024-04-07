@@ -58,7 +58,7 @@ public:
 		}
 
 		auto *code = dropcode.Get(na);
-		if (params.size() < 2 || ((!code || !code->equals_ci(params[1])) && (!source.HasPriv("nickserv/drop/override") || params[1] != "override")))
+		if (params.size() < 2 || ((!code || !code->equals_ci(params[1])) && (!source.HasPriv("nickserv/drop/override") || params[1] != "OVERRIDE")))
 		{
 			if (!code)
 			{
@@ -87,11 +87,17 @@ public:
 				"is dropped you may lose all of your access and channels that\n"
 				"you may own. Any other user will be able to gain control of\n"
 				"this nick."));
+
+		source.Reply(" ");
 		if (!source.HasPriv("nickserv/drop"))
 			source.Reply(_("You may drop any nick within your group."));
 		else
 			source.Reply(_("As a Services Operator, you may drop any nick."));
 
+		source.Reply(" ");
+		if (source.HasPriv("nickserv/drop/override"))
+			source.Reply(_("Additionally, Services Operators with the \037nickserv/drop/override\037 permission can\n"
+				"replace \037code\037 with \002OVERRIDE\002 to drop without a confirmation code."));
 		return true;
 	}
 };

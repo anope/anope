@@ -111,6 +111,14 @@ public:
 
 		FOREACH_MOD(OnNickEraseCert, (this->nc, oldentry));
 		certmap.erase(oldentry);
+
+		if (std::find(this->certs.begin(), this->certs.end(), newentry) != this->certs.end())
+		{
+			// The cert we're upgrading to already exists.
+			this->certs.erase(it);
+			return;
+		}
+
 		*it = newentry;
 		certmap[newentry] = nc;
 		FOREACH_MOD(OnNickAddCert, (this->nc, newentry));

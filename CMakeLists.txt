@@ -350,15 +350,17 @@ set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 
 # At install time, create the following additional directories
-install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${DATA_DIR}/backups\")")
-install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${LOG_DIR}\")")
+get_filename_component(ABSOLUTE_DATA_DIR ${DATA_DIR} REALPATH BASE_DIR ${CMAKE_INSTALL_PREFIX})
+get_filename_component(ABSOLUTE_LOG_DIR ${LOG_DIR} REALPATH BASE_DIR ${CMAKE_INSTALL_PREFIX})
+install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${ABSOLUTE_DATA_DIR}/backups\")")
+install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${ABSOLUTE_LOG_DIR}\")")
 if(WIN32)
-  install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${DATA_DIR}/runtime\")")
+  install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${ABSOLUTE_DATA_DIR}/runtime\")")
 endif()
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the below directories, as well as the group of the data directory
 if(NOT WIN32 AND RUNGROUP)
-  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/\${DATA_DIR}/backups\")")
-  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/\${LOG_DIR}\")")
+  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\$ENV{DESTDIR}${ABSOLUTE_DATA_DIR}/backups\")")
+  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\$ENV{DESTDIR}${ABSOLUTE_LOG_DIR}\")")
   install(CODE "execute_process(COMMAND ${CHGRP} -R ${RUNGROUP} \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}\")")
 endif()
 # On Windows platforms, install extra files
@@ -368,7 +370,8 @@ if(WIN32)
   )
 endif()
 
-install(CODE "file(REMOVE_RECURSE \"$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${MODULE_DIR}\")")
+get_filename_component(ABSOLUTE_MODULE_DIR ${MODULE_DIR} REALPATH BASE_DIR ${CMAKE_INSTALL_PREFIX})
+install(CODE "file(REMOVE_RECURSE \"$ENV{DESTDIR}${ABSOLUTE_MODULE_DIR}\")")
 
 # Only process the CPack section if we have CPack
 if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")

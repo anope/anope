@@ -229,7 +229,7 @@ private:
 		*/
 		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password);
 
-		Uplink::Send("PROTOCTL", "NICKv2", "VHP", "UMODE2", "NICKIP", "SJOIN", "SJOIN2", "SJ3", "NOQUIT", "TKLEXT", "MLOCK", "SID", "MTAGS");
+		Uplink::Send("PROTOCTL", "NICKv2", "VHP", "UMODE2", "NICKIP", "SJOIN", "SJOIN2", "SJ3", "NOQUIT", "TKLEXT", "MLOCK", "SID", "MTAGS", "BIGLINES");
 		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
 		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
 
@@ -1032,6 +1032,8 @@ struct IRCDMessageCapab final
 					ModeManager::AddChannelMode(new ChannelModeStatus(mode_name, mode_chars[t], mode_prefixes[t], t));
 				}
 			}
+			else if (capab.equals_ci("BIGLINES"))
+				IRCD->MaxLine = 16384;
 		}
 
 		Message::Capab::Run(source, params, tags);

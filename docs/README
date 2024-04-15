@@ -166,7 +166,7 @@ Table of Contents
 
     Anope currently works with:
 
-        * Bahamut 1.4.27 or later (including 1.8)
+        * Bahamut 2.0 or later
         * ircd-hybrid 8.2.23 or later
         * InspIRCd 3 or later
         * ngIRCd 19.2 or later

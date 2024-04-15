@@ -35,7 +35,7 @@ class BahamutIRCdProto final
 	: public IRCDProto
 {
 public:
-	BahamutIRCdProto(Module *creator) : IRCDProto(creator, "Bahamut 1.8.x")
+	BahamutIRCdProto(Module *creator) : IRCDProto(creator, "Bahamut 2+")
 	{
 		DefaultPseudoclientModes = "+";
 		CanSVSNick = true;
@@ -49,14 +49,9 @@ public:
 
 	void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
-		if (Servers::Capab.count("TSMODE") > 0)
-		{
-			auto params = values;
-			params.insert(params.begin(), { chan->name, Anope::ToString(chan->creation_time), modes });
-			Uplink::SendInternal({}, source, "MODE", params);
-		}
-		else
-			IRCDProto::SendModeInternal(source, chan, modes, values);
+		auto params = values;
+		params.insert(params.begin(), { chan->name, Anope::ToString(chan->creation_time), modes });
+		Uplink::SendInternal({}, source, "MODE", params);
 	}
 
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values) override
@@ -103,10 +98,6 @@ public:
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x) override
 	{
-		/* this will likely fail so its only here for legacy */
-		Uplink::Send("UNSZLINE", 0, x->GetHost());
-
-		/* this is how we are supposed to deal with it */
 		Uplink::Send("RAKILL", x->GetHost(), '*');
 	}
 
@@ -115,11 +106,6 @@ public:
 	{
 		// Calculate the time left before this would expire
 		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
-
-		/* this will likely fail so its only here for legacy */
-		Uplink::Send("SZLINE", x->GetHost(), x->GetReason());
-
-		/* this is how we are supposed to deal with it */
 		Uplink::Send("AKILL", x->GetHost(), '*', timeleft, x->by, Anope::CurTime, x->GetReason());
 	}
 
@@ -252,7 +238,7 @@ public:
 
 	void SendClientIntroduction(User *u) override
 	{
-		Uplink::Send("NICK", u->nick, 1, u->timestamp, "+" + u->GetModes(), u->GetIdent(), u->host, u->server->GetName(), 0, 0, u->realname);
+		Uplink::Send("NICK", u->nick, 1, u->timestamp, "+" + u->GetModes(), u->GetIdent(), u->host, u->server->GetName(), 0, "0.0.0.0", u->realname);
 	}
 
 	/* SERVER */
@@ -264,7 +250,7 @@ public:
 	void SendConnect() override
 	{
 		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "TS");
-		Uplink::Send("CAPAB", "SSJOIN", "NOQUIT", "BURST", "UNCONNECT", "NICKIP", "TSMODE", "TS3");
+		Uplink::Send("CAPAB", "BURST", "NICKIPSTR", "SSJOIN", "UNCONNECT");
 		SendServer(Me);
 		/*
 		 * SVINFO
@@ -274,7 +260,7 @@ public:
 		 *	   parv[3] = server is standalone or connected to non-TS only
 		 *	   parv[4] = server's idea of UTC time
 		 */
-		Uplink::Send("SVINFO", 3, 1, 0, Anope::CurTime);
+		Uplink::Send("SVINFO", 5, 5, 0, Anope::CurTime);
 		this->SendBOB();
 	}
 
@@ -557,9 +543,7 @@ public:
 		message_burst(this), message_mode(this, "MODE"), message_svsmode(this, "SVSMODE"),
 		message_nick(this), message_server(this), message_sjoin(this), message_topic(this)
 	{
-
 		this->AddModes();
-
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) override

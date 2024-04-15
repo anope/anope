@@ -28,6 +28,7 @@ public:
 		DefaultPseudoclientModes = "+BioqS";
 		CanSVSNick = true;
 		CanSVSJoin = true;
+		CanSVSNOOP = true;
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSNLine = true;

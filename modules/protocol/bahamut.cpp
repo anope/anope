@@ -39,6 +39,7 @@ public:
 	{
 		DefaultPseudoclientModes = "+";
 		CanSVSNick = true;
+		CanSVSNOOP = true;
 		CanSNLine = true;
 		CanSQLine = true;
 		CanSQLineChannel = true;

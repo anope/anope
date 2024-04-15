@@ -74,6 +74,9 @@ public:
 	/* Can we force join or part users? */
 	bool CanSVSJoin = false;
 
+	/** Can we force servers to remove opers? */
+	bool CanSVSNOOP = false;
+
 	/* Can we set vhosts on users? */
 	bool CanSetVHost = false;
 

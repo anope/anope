@@ -25,6 +25,7 @@ public:
 		DefaultPseudoclientModes = "+iU";
 		CanSVSNick = true;
 		CanSVSJoin = true;
+		CanSVSNOOP = true;
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSNLine = true;

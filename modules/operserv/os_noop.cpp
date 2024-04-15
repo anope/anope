@@ -82,7 +82,8 @@ public:
 	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosnoop(this), noop(this, "noop")
 	{
-
+		if (!IRCD || !IRCD->CanSVSNOOP)
+			throw ModuleException("Your IRCd does not support SVSNOOP.");
 	}
 
 	void OnUserModeSet(const MessageSource &, User *u, const Anope::string &mname) override

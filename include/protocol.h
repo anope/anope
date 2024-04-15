@@ -299,7 +299,7 @@ public:
 	/** Send a channel creation message to the uplink.
 	 * On most TS6 IRCds this is a SJOIN with no nick
 	 */
-	virtual void SendChannel(Channel *c) { }
+	virtual void SendChannel(Channel *c) = 0;
 
 	/** Make the user an IRC operator
 	 * Normally this is a simple +o, though some IRCds require us to send the oper type

@@ -18,6 +18,7 @@ foreach(SRC ${TOOLS_SRCS})
     # Set the executable to be installed to the bin directory under the main directory
     install(TARGETS ${EXE}
       DESTINATION ${BIN_DIR}
+      RUNTIME
     )
     # Add the executable to the list of files for CPack to ignore
     set(EXE_BINARY "$<TARGET_FILE:${EXE}>")

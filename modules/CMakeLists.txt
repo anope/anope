@@ -94,7 +94,9 @@ macro(build_modules SRC)
             target_link_libraries(${SO} ${PROGRAM_NAME})
           endif()
           # Set the module to be installed to the module directory under the data directory
-          install(TARGETS ${SO} DESTINATION ${MODULE_DIR})
+          install(TARGETS ${SO}
+            DESTINATION ${MODULE_DIR}
+            LIBRARY)
         endif()
       endif()
     endforeach()
@@ -168,7 +170,9 @@ macro(build_subdir)
   endif()
 
   # Set the module to be installed to the module directory under the data directory
-  install(TARGETS ${SO} DESTINATION ${MODULE_DIR})
+  install(TARGETS ${SO}
+    DESTINATION ${MODULE_DIR}
+    LIBRARY)
 endmacro()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

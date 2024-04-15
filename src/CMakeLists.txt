@@ -95,4 +95,5 @@ endif()
 # Set Anope to be installed to the bin directory
 install(TARGETS ${PROGRAM_NAME}
   DESTINATION ${BIN_DIR}
+  RUNTIME
 )

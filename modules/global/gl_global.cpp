@@ -29,7 +29,7 @@ private:
 
 public:
 	CommandGLGlobal(Module *creator)
-		: Command(creator, "global/global", 0)
+		: Command(creator, "global/global", 0, 1)
 		, global("GlobalService", "Global")
 	{
 		this->SetDesc(_("Send a message to all users"));

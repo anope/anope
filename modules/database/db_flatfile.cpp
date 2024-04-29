@@ -311,6 +311,8 @@ public:
 			for (auto *base : items)
 			{
 				Serialize::Type *s_type = base->GetSerializableType();
+				if (!s_type)
+					continue;
 
 				data.fs = databases[s_type->GetOwner()];
 				if (!data.fs || !data.fs->is_open())

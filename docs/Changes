@@ -1,6 +1,11 @@
 Anope Version 2.1.5-git
 -----------------------
-No significant changes.
+Added an example systemd unit file.
+Added support for BIGLINES on UnrealIRCd.
+Bumped the minimum supported version of Bahamut to 2.0.
+Fixed truncating messages in global/global and global/server.
+Improved building Anope for use as a system package.
+Updated the Turkish translation.
 
 Anope Version 2.1.4
 -------------------

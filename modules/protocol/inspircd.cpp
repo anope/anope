@@ -10,9 +10,10 @@
  */
 
 #include "module.h"
-#include "modules/encryption.h"
 #include "modules/cs_mode.h"
+#include "modules/encryption.h"
 #include "modules/httpd.h"
+#include "modules/ns_cert.h"
 #include "modules/sasl.h"
 
 typedef std::map<char, unsigned> ListLimits;
@@ -1807,10 +1808,21 @@ class IRCDMessageMetadata final
 {
 	const bool &do_topiclock;
 	const bool &do_mlock;
+	ServiceReference<CertService> certs;
 	PrimitiveExtensibleItem<ListLimits> &maxlist;
 
+
 public:
-	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock, PrimitiveExtensibleItem<ListLimits> &listlimits) : IRCDMessage(creator, "METADATA", 3), do_topiclock(handle_topiclock), do_mlock(handle_mlock), maxlist(listlimits) { SetFlag(FLAG_REQUIRE_SERVER); SetFlag(FLAG_SOFT_LIMIT); }
+	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock, PrimitiveExtensibleItem<ListLimits> &listlimits)
+		: IRCDMessage(creator, "METADATA", 3)
+		, do_topiclock(handle_topiclock)
+		, do_mlock(handle_mlock)
+		, certs("CertService", "certs")
+		, maxlist(listlimits)
+	{
+		SetFlag(FLAG_REQUIRE_SERVER);
+		SetFlag(FLAG_SOFT_LIMIT);
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
@@ -1884,14 +1896,21 @@ public:
 			else if (params[1].equals_cs("ssl_cert"))
 			{
 				u->Extend<bool>("ssl");
-				Anope::string data = params[2].c_str();
-				size_t pos1 = data.find(' ') + 1;
-				size_t pos2 = data.find(' ', pos1);
-				if ((pos2 - pos1) >= 32) // inspircd supports md5 and sha1 fingerprint hashes -> size 32 or 40 bytes.
-				{
-					u->fingerprint = data.substr(pos1, pos2 - pos1);
-				}
+
+				Anope::string data;
+				spacesepstream tokens(params[2]);
+				if (!tokens.GetToken(data) || data.find('E') != Anope::string::npos || !tokens.GetToken(data))
+					return; // Malformed or no client certificate.
+
+				commasepstream fingerprints(data);
+				if (!fingerprints.GetToken(data))
+					return; // Should never happen?
+
+				u->fingerprint = data;
 				FOREACH_MOD(OnFingerprint, (u));
+
+				while (certs && fingerprints.GetToken(data))
+					certs->ReplaceCert(data, u->fingerprint);
 			}
 		}
 		else if (params[0] == "*")

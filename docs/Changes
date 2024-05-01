@@ -1,5 +1,5 @@
-Anope Version 2.1.5-git
------------------------
+Anope Version 2.1.5
+-------------------
 Added an example systemd unit file.
 Added support for BIGLINES on UnrealIRCd.
 Bumped the minimum supported version of Bahamut to 2.0.

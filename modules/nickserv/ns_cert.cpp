@@ -405,6 +405,15 @@ public:
 		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->display << " via SSL certificate fingerprint";
 	}
 
+	void OnNickRegister(User *u, NickAlias *na, const Anope::string &pass) override
+	{
+		if (!Config->GetModule(this)->Get<bool>("automatic", "yes") || u->fingerprint.empty())
+			return;
+
+		auto *cl = certs.Require(na->nc);
+		cl->AddCert(u->fingerprint);
+	}
+
 	EventReturn OnNickValidate(User *u, NickAlias *na) override
 	{
 		NSCertList *cl = certs.Get(na->nc);

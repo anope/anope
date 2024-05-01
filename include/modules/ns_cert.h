@@ -79,4 +79,5 @@ public:
 	CertService(Module *c) : Service(c, "CertService", "certs") { }
 
 	virtual NickCore *FindAccountFromCert(const Anope::string &cert) = 0;
+	virtual void ReplaceCert(const Anope::string &oldcert, const Anope::string &newcert) = 0;
 };

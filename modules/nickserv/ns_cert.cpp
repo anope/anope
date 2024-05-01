@@ -26,6 +26,17 @@ struct CertServiceImpl final
 			return it->second;
 		return NULL;
 	}
+
+	void ReplaceCert(const Anope::string &oldcert, const Anope::string &newcert) override
+	{
+		auto *nc = FindAccountFromCert(oldcert);
+		if (!nc)
+			return;
+
+		auto *cl = nc->GetExt<NSCertList>("certificates");
+		if (cl)
+			cl->ReplaceCert(oldcert, newcert);
+	}
 };
 
 struct NSCertListImpl final

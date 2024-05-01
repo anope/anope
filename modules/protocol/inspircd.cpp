@@ -1855,12 +1855,12 @@ public:
 		}
 		else if (isdigit(params[0][0]))
 		{
+			auto *u = User::Find(params[0]);
+			if (!u)
+				return;
+
 			if (params[1].equals_cs("accountname"))
 			{
-				User *u = User::Find(params[0]);
-				if (!u)
-					return; // Should never happen.
-
 				if (params[2].empty())
 				{
 					// The user has been logged out by the IRC server.
@@ -1883,9 +1883,6 @@ public:
 			 */
 			else if (params[1].equals_cs("ssl_cert"))
 			{
-				User *u = User::Find(params[0]);
-				if (!u)
-					return;
 				u->Extend<bool>("ssl");
 				Anope::string data = params[2].c_str();
 				size_t pos1 = data.find(' ') + 1;

@@ -1592,7 +1592,10 @@ struct IRCDMessageCapab final
 			if (!Servers::Capab.count("GLOBOPS"))
 				Log() << "The remote server does not have the globops module; oper notices will be sent as announcements until the module is loaded.";
 
-			Uplink::Send("SERVER", Me->GetName(), GetPassword(), 0, Me->GetSID(), Me->GetDescription());
+			if (spanningtree_proto_ver < 1206)
+				Uplink::Send("SERVER", Me->GetName(), GetPassword(), 0, Me->GetSID(), Me->GetDescription());
+			else
+				Uplink::Send("SERVER", Me->GetName(), GetPassword(), Me->GetSID(), Me->GetDescription());
 		}
 	}
 };
@@ -2285,18 +2288,18 @@ struct IRCDMessageServer final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		if (!source.GetServer() && params.size() == 5)
+		size_t paramcount = spanningtree_proto_ver < 1206 ? 5 : 4;
+		if (!source.GetServer() && params.size() == paramcount)
 		{
 			/*
 			 * SERVER testnet.inspircd.org hunter7 0 123 :InspIRCd Test Network
 			 * 0: name
 			 * 1: pass
-			 * 2: hops
-			 * 3: numeric
-			 * 4: desc
+			 * 2: unused (v3 only)
+			 * 3(2): numeric
+			 * 4(3): desc
 			 */
-			auto hops = Anope::Convert<unsigned>(params[2], 0);
-			new Server(Me, params[0], hops, params[4], params[3]);
+			new Server(Me, params[0], 0, params.back(), params[spanningtree_proto_ver < 1206 ? 3 : 2]);
 		}
 		else if (source.GetServer())
 		{

@@ -825,14 +825,14 @@ Anope::string User::Mask() const
 
 bool User::BadPassword()
 {
-	if (!Config->GetBlock("options")->Get<int>("badpasslimit"))
+	if (!Config->GetBlock("options")->Get<unsigned int>("badpasslimit"))
 		return false;
 
 	if (Config->GetBlock("options")->Get<time_t>("badpasstimeout") > 0 && this->invalid_pw_time > 0 && this->invalid_pw_time < Anope::CurTime - Config->GetBlock("options")->Get<time_t>("badpasstimeout"))
 		this->invalid_pw_count = 0;
 	++this->invalid_pw_count;
 	this->invalid_pw_time = Anope::CurTime;
-	if (this->invalid_pw_count >= Config->GetBlock("options")->Get<int>("badpasslimit"))
+	if (this->invalid_pw_count >= Config->GetBlock("options")->Get<unsigned int>("badpasslimit"))
 	{
 		this->Kill(Me, "Too many invalid passwords");
 		return true;

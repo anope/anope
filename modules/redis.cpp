@@ -237,7 +237,7 @@ public:
 	void StartTransaction() override
 	{
 		if (in_transaction)
-			throw CoreException();
+			throw ModuleException("Tried to start a transaction while one was already in progress");
 
 		this->SendCommand(NULL, "MULTI");
 		in_transaction = true;

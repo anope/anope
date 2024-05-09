@@ -199,6 +199,8 @@ public:
 class CoreExport NotImplementedException final
 	: public CoreException
 {
+public:
+	NotImplementedException() : CoreException("") { }
 };
 
 /** Every module in Anope is actually a class.

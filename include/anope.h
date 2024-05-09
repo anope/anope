@@ -717,9 +717,6 @@ protected:
 	 */
 	Anope::string source;
 public:
-	/** Default constructor, just uses the error message 'Core threw an exception'.
-	 */
-	CoreException() : err("Core threw an exception"), source("The core") { }
 	/** This constructor can be used to specify an error message before throwing.
 	 */
 	CoreException(const Anope::string &message) : err(message), source("The core") { }
@@ -750,10 +747,6 @@ class CoreExport ModuleException
 	: public CoreException
 {
 public:
-	/** Default constructor, just uses the error message 'Module threw an exception'.
-	 */
-	ModuleException() : CoreException("Module threw an exception", "A Module") { }
-
 	/** This constructor can be used to specify an error message before throwing.
 	 */
 	ModuleException(const Anope::string &message) : CoreException(message, "A Module") { }

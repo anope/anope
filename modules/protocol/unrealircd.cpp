@@ -37,7 +37,6 @@ public:
 		CanSZLine = true;
 		CanSVSHold = true;
 		CanClearBans = true;
-		CanSVSLogout = true;
 		CanCertFP = true;
 		RequiresID = true;
 		MaxModes = 12;

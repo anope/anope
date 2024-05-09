@@ -145,14 +145,6 @@ public:
 
 	void ProcessMessage(Session *sess, const SASL::Message &m) override
 	{
-		if (!IRCD->CanSVSLogout && !User::Find(sess->uid))
-		{
-			// This IRCd can't log users out yet.
-			sasl->Fail(sess);
-			delete sess;
-			return;
-		}
-
 		if (m.type == "S")
 		{
 			sasl->SendMessage(sess, "C", "+");

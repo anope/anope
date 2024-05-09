@@ -145,7 +145,6 @@ public:
 		CanSetVIdent = true;
 		CanSQLine = true;
 		CanSZLine = true;
-		CanSVSLogout = true;
 		CanCertFP = true;
 		RequiresID = true;
 		MaxModes = 0;

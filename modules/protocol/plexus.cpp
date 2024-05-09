@@ -187,7 +187,15 @@ public:
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
 	{
 		Server *s = Server::Find(uid.substr(0, 3));
-		Uplink::Send("ENCAP", s ? s->GetName() : uid.substr(0, 3), "SVSLOGIN", uid, '*', '*', na->GetVHostHost().empty() ? "*" : na->GetVHostHost(), na->nc->display);
+		Anope::string target = s ? s->GetName() : uid.substr(0, 3);
+		if (na)
+		{
+			Uplink::Send("ENCAP", target, "SVSLOGIN", uid, '*', '*', na->GetVHostHost().empty() ? "*" : na->GetVHostHost(), na->nc->display);
+		}
+		else
+		{
+			Uplink::Send("ENCAP", target, "SU", uid, "");
+		}
 	}
 
 	void SendSVSNOOP(const Server *server, bool set) override

@@ -101,9 +101,6 @@ public:
 	/* See ns_cert */
 	bool CanCertFP = false;
 
-	/* Can users log out before being fully connected? */
-	bool CanSVSLogout = false;
-
 	/* Whether this IRCd requires unique IDs for each user or server. See TS6/P10. */
 	bool RequiresID = false;
 

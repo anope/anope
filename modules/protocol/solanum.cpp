@@ -45,7 +45,6 @@ public:
 		CanSZLine = true;
 		CanSVSNick = true;
 		CanSVSHold = true;
-		CanSVSLogout = true;
 		CanSetVHost = true;
 		RequiresID = true;
 		MaxModes = 4;

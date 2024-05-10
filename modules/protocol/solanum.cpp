@@ -354,8 +354,6 @@ class ProtoSolanum final
 	IRCDMessagePrivmsg message_privmsg;
 	IRCDMessageServer message_server;
 
-	bool use_server_side_mlock;
-
 	static void AddModes()
 	{
 		/* Add user modes */
@@ -444,18 +442,13 @@ public:
 			OnUserLogin(u);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
-	{
-		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
-	}
-
 	void OnChannelSync(Channel *c) override
 	{
 		if (!c->ci)
 			return;
 
 		ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
-		if (use_server_side_mlock && modelocks && Servers::Capab.count("MLOCK") > 0)
+		if (modelocks && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 			Uplink::Send("MLOCK", c->creation_time, c->ci->name, modes);
@@ -466,7 +459,7 @@ public:
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
+		if (cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
 			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
@@ -479,7 +472,7 @@ public:
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
+		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
 			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);

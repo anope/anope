@@ -711,8 +711,6 @@ class ProtoHybrid final
 	IRCDMessageTMode message_tmode;
 	IRCDMessageUID message_uid;
 
-	bool use_server_side_mlock;
-
 	static void AddModes()
 	{
 		/* Add user modes */
@@ -819,18 +817,13 @@ public:
 		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
 	}
 
-	void OnReload(Configuration::Conf *conf) override
-	{
-		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
-	}
-
 	void OnChannelSync(Channel *c) override
 	{
 		if (!c->ci)
 			return;
 
 		ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
-		if (use_server_side_mlock && modelocks && Servers::Capab.count("MLOCK"))
+		if (modelocks && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 			Uplink::Send("MLOCK", c->creation_time, c->ci->name, Anope::CurTime, modes);
@@ -839,7 +832,7 @@ public:
 
 	void OnDelChan(ChannelInfo *ci) override
 	{
-		if (use_server_side_mlock && ci->c && Servers::Capab.count("MLOCK"))
+		if (ci->c && Servers::Capab.count("MLOCK"))
 			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, "");
 	}
 
@@ -847,7 +840,7 @@ public:
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
+		if (cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
 			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, modes);
@@ -860,7 +853,7 @@ public:
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
+		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
 			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, modes);

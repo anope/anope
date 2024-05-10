@@ -1805,17 +1805,14 @@ struct IRCDMessageSave final
 class IRCDMessageMetadata final
 	: IRCDMessage
 {
-	const bool &do_topiclock;
-	const bool &do_mlock;
+private:
 	ServiceReference<CertService> certs;
 	PrimitiveExtensibleItem<ListLimits> &maxlist;
 
 
 public:
-	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock, PrimitiveExtensibleItem<ListLimits> &listlimits)
+	IRCDMessageMetadata(Module *creator, PrimitiveExtensibleItem<ListLimits> &listlimits)
 		: IRCDMessage(creator, "METADATA", 3)
-		, do_topiclock(handle_topiclock)
-		, do_mlock(handle_mlock)
 		, certs("CertService", "certs")
 		, maxlist(listlimits)
 	{
@@ -1833,7 +1830,7 @@ public:
 			Channel *c = Channel::Find(params[0]);
 			if (c)
 			{
-				if ((c->ci) && (do_mlock) && (params[2] == "mlock"))
+				if (c->ci && params[2] == "mlock")
 				{
 					ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
 					Anope::string modes;
@@ -1844,7 +1841,7 @@ public:
 					if (modes != params[3])
 						Uplink::Send("METADATA", c->name, c->creation_time, "mlock", modes);
 				}
-				else if ((c->ci) && (do_topiclock) && (params[2] == "topiclock"))
+				else if (c->ci && params[2] == "topiclock")
 				{
 					bool mystate = c->ci->HasExt("TOPICLOCK");
 					bool serverstate = (params[3] == "1");
@@ -2452,8 +2449,6 @@ class ProtoInspIRCd final
 	IRCDMessageSQuit message_squit;
 	IRCDMessageUID message_uid;
 
-	bool use_server_side_topiclock, use_server_side_mlock;
-
 	static void SendChannelMetadata(Channel *c, const Anope::string &metadataname, const Anope::string &value)
 	{
 		Uplink::Send("METADATA", c->name, c->creation_time, metadataname, value);
@@ -2490,7 +2485,7 @@ public:
 		, message_ijoin(this)
 		, message_kick(this)
 		, message_lmode(this)
-		, message_metadata(this, use_server_side_topiclock, use_server_side_mlock, ircd_proto.maxlist)
+		, message_metadata(this, ircd_proto.maxlist)
 		, message_mode(this)
 		, message_nick(this)
 		, message_opertype(this)
@@ -2502,12 +2497,6 @@ public:
 		, message_squit(this)
 		, message_uid(this)
 	{
-	}
-
-	void OnReload(Configuration::Conf *conf) override
-	{
-		use_server_side_topiclock = conf->GetModule(this)->Get<bool>("use_server_side_topiclock");
-		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) override
@@ -2524,13 +2513,13 @@ public:
 	void OnChanRegistered(ChannelInfo *ci) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
-		if (use_server_side_mlock && ci->c && modelocks && !modelocks->GetMLockAsString(false).empty())
+		if (ci->c && modelocks && !modelocks->GetMLockAsString(false).empty())
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
-		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && ci->c)
+		if (Servers::Capab.count("TOPICLOCK") && ci->c)
 		{
 			if (ci->HasExt("TOPICLOCK"))
 				SendChannelMetadata(ci->c, "topiclock", "1");
@@ -2539,10 +2528,11 @@ public:
 
 	void OnDelChan(ChannelInfo *ci) override
 	{
-		if (use_server_side_mlock && ci->c)
-			SendChannelMetadata(ci->c, "mlock", "");
+		if (!ci->c)
+			return;
 
-		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && ci->c)
+		SendChannelMetadata(ci->c, "mlock", "");
+		if (Servers::Capab.count("TOPICLOCK"))
 			SendChannelMetadata(ci->c, "topiclock", "");
 	}
 
@@ -2550,7 +2540,7 @@ public:
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
+		if (cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
 			SendChannelMetadata(ci->c, "mlock", modes);
@@ -2563,7 +2553,7 @@ public:
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
+		if (cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
 			SendChannelMetadata(ci->c, "mlock", modes);

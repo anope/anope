@@ -216,6 +216,9 @@ Serializable *NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["extensible:NO_EXPIRE"] >> b;
 	if (b)
 		na->Extend<bool>("NS_NO_EXPIRE");
+
+	if (na->time_registered < na->nc->time_registered)
+		na->nc->time_registered = na->time_registered;
 	/* end compat */
 
 	return na;

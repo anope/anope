@@ -1131,7 +1131,7 @@ private:
 		auto display = row.Get();
 		auto pass = row.Get();
 		auto email = row.Get();
-		/* auto regtime = */ row.GetNum<time_t>();
+		auto regtime = row.GetNum<time_t>();
 		/* auto lastlogin = */ row.Get();
 		auto flags = row.Get();
 		auto language = row.Get();
@@ -1141,6 +1141,7 @@ private:
 
 		auto *nc = new NickCore(display);
 		nc->email = email;
+		nc->time_registered = regtime;
 		ApplyPassword(nc, flags, pass);
 
 		// No equivalent: bglmNQrS

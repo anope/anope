@@ -73,7 +73,9 @@ void NickCore::Serialize(Serialize::Data &data) const
 	data["pass"] << this->pass;
 	data["email"] << this->email;
 	data["language"] << this->language;
-	data["lastmail"] << this->lastmail;
+	data.SetType("lastmail", Serialize::Data::DT_INT); data["lastmail"] << this->lastmail;
+	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
+
 	data["memomax"] << this->memos.memomax;
 	for (const auto &ignore : this->memos.ignores)
 		data["memoignores"] << ignore << " ";
@@ -99,6 +101,7 @@ Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["email"] >> nc->email;
 	data["language"] >> nc->language;
 	data["lastmail"] >> nc->lastmail;
+	data["time_registered"] >> nc->time_registered;
 	data["memomax"] >> nc->memos.memomax;
 	{
 		Anope::string buf;
@@ -206,14 +209,7 @@ uint64_t NickCore::GetId()
 	if (this->id)
 		return this->id;
 
-	NickAlias *na = NickAlias::Find(this->display);
-	if (!na)
-	{
-		Log(LOG_DEBUG) << "Unable to find the display NickAlias for NickCore: " << this->display;
-		return 0;
-	}
-
-	Anope::string secretid = this->display + "\0" + Anope::ToString(na->time_registered);
+	Anope::string secretid = this->display + "\0" + Anope::ToString(this->time_registered);
 
 	// Generate the account id. This should almost always only have one
 	// iteration but in the rare case that we generate a duplicate id we try

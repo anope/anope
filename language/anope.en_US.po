@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-07 15:51+0100\n"
-"PO-Revision-Date: 2024-04-07 15:51+0100\n"
+"POT-Creation-Date: 2024-05-11 17:38+0100\n"
+"PO-Revision-Date: 2024-05-11 17:39+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -1811,6 +1811,9 @@ msgstr "Account"
 #, c-format
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "Account %s has already reached the maximum number of simultaneous logins (%u)."
+
+msgid "Account registered"
+msgstr "Account registered"
 
 msgid "Accounts can not be registered right now. Please try again later."
 msgstr "Accounts can not be registered right now. Please try again later."
@@ -5140,6 +5143,9 @@ msgstr "Nick %s is now released."
 #, c-format
 msgid "Nick %s is now suspended."
 msgstr "Nick %s is now suspended."
+
+msgid "Nick registered"
+msgstr "Nick registered"
 
 #, c-format
 msgid "Nick too long, max length is %zu characters."

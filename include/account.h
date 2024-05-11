@@ -130,6 +130,8 @@ public:
 	Anope::string language;
 	/* Last time an email was sent to this user */
 	time_t lastmail = 0;
+	/* The time this account was registered */
+	time_t time_registered = Anope::CurTime;
 	MemoInfo memos;
 	std::map<Anope::string, Anope::string> last_modes;
 

@@ -339,9 +339,14 @@ Result MySQLService::RunQuery(const Query &query)
 {
 	this->Lock.Lock();
 
-	Anope::string real_query = this->BuildQuery(query);
+	if (!this->CheckConnection())
+	{
+		this->Lock.Unlock();
+		return MySQLResult(query, query.query, mysql_error(this->sql));
+	}
 
-	if (this->CheckConnection() && !mysql_real_query(this->sql, real_query.c_str(), real_query.length()))
+	Anope::string real_query = this->BuildQuery(query);
+	if (!mysql_real_query(this->sql, real_query.c_str(), real_query.length()))
 	{
 		MYSQL_RES *res = mysql_store_result(this->sql);
 		unsigned int id = mysql_insert_id(this->sql);

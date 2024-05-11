@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-15 15:31+0100\n"
-"PO-Revision-Date: 2024-04-15 15:32+0100\n"
+"PO-Revision-Date: 2024-05-11 18:28+0100\n"
 "Last-Translator: CaPaCuL <capacul@gmail.com>\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -2282,13 +2282,6 @@ msgid ""
 "message number can be obtained from the output of the QUEUE LIST command.\n"
 "The QUEUE LIST command lists all messages that are currently in the message queue."
 msgstr ""
-"Allows queueing messages to send to users on the network.\n"
-"\n"
-"The QUEUE ADD command adds the given message to the message queue.\n"
-"The QUEUE CLEAR command clears the message queue.\n"
-"The QUEUE DEL command removes the specified message from the message queue. The\n"
-"message number can be obtained from the output of the QUEUE LIST command.\n"
-"The QUEUE LIST command lists all messages that are currently in the message queue."
 
 #, c-format
 msgid ""
@@ -2298,11 +2291,6 @@ msgid ""
 "You can either send a message by specifying it as a parameter or provide no\n"
 "parameters to send a previously queued message.\n"
 msgstr ""
-"Allows sending messages to all users on a server. The message will be sent\n"
-"from %s.\n"
-"\n"
-"You can either send a message by specifying it as a parameter or provide no\n"
-"parameters to send a previously queued message.\n"
 
 #, c-format
 msgid ""
@@ -2312,11 +2300,6 @@ msgid ""
 "You can either send a message by specifying it as a parameter or provide no\n"
 "parameters to send a previously queued message.\n"
 msgstr ""
-"Allows sending messages to all users on the network. The message will be sent\n"
-"from %s.\n"
-"\n"
-"You can either send a message by specifying it as a parameter or provide no\n"
-"parameters to send a previously queued message.\n"
 
 #, c-format
 msgid ""
@@ -4345,7 +4328,7 @@ msgid "Level must be between %d and %d inclusive."
 msgstr "Seviye %d ile %d dahil arasında olmalıdır."
 
 msgid "Limit"
-msgstr "Limit"
+msgstr ""
 
 msgid "List all registered nicknames that match a given pattern"
 msgstr "Belirtilen şablonla eşleşen tüm rumuzları listeler"
@@ -4856,7 +4839,7 @@ msgid "Manage your auto join list"
 msgstr "Oto-gir listenizi yönetin"
 
 msgid "Manages your pending message queue."
-msgstr "Manages your pending message queue."
+msgstr ""
 
 #, c-format
 msgid "Manipulate the %s list"
@@ -4941,7 +4924,7 @@ msgstr "%c modu için eksik parametre."
 
 #, c-format
 msgid "Missing passwords: %zu"
-msgstr "Missing passwords: %zu"
+msgstr ""
 
 msgid "Mode"
 msgstr "Mod"
@@ -5379,7 +5362,7 @@ msgstr "Şifreler şu anda değiştirilemez. Lütfen daha sonra tekrar deneyiniz
 
 #, c-format
 msgid "Passwords encrypted with %s: %zu"
-msgstr "Passwords encrypted with %s: %zu"
+msgstr ""
 
 msgid "Peace"
 msgstr "Barış"
@@ -5397,7 +5380,7 @@ msgstr "Kalıcı"
 
 #, c-format
 msgid "Please confirm that you want to drop %s with %s%s DROP %s %s"
-msgstr "Please confirm that you want to drop %s with %s%s DROP %s %s"
+msgstr ""
 
 msgid "Please contact an Operator to get a vhost assigned to this nick."
 msgstr "Bu rumuza atanan bir vHost almak için lütfen bir operle iletişime geçin."
@@ -7939,7 +7922,7 @@ msgstr ""
 
 #, c-format
 msgid "Type %s%s SET EMAIL email in order to set your email."
-msgstr "Type %s%s SET EMAIL email in order to set your email."
+msgstr ""
 
 msgid "Un-Load a module"
 msgstr "Bir modülün yüklemesini kaldır"
@@ -8324,7 +8307,7 @@ msgid "You can not request a receipt when sending a memo to yourself."
 msgstr "Kendinize memo gönderirken makbuz talep edemezsiniz."
 
 msgid "You can not send a single message while you have messages queued."
-msgstr "You can not send a single message while you have messages queued."
+msgstr ""
 
 #, c-format
 msgid "You can't %s yourself!"
@@ -8392,7 +8375,7 @@ msgid "You do not have access to set mode %c."
 msgstr "%c modunu ayarlama erişiminiz yok."
 
 msgid "You do not have any messages queued and did not specify a message to send."
-msgstr "You do not have any messages queued and did not specify a message to send."
+msgstr ""
 
 msgid "You do not have any queued messages."
 msgstr "Sıraya alınmış mesajınız yok."

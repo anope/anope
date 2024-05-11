@@ -537,24 +537,18 @@ static void LoadNicks()
 				case LANG_DE:
 					nc->language = "de_DE.UTF-8";
 					break;
-				case LANG_CAT:
-					nc->language = "ca_ES.UTF-8"; // yes, iso639 defines catalan as CA
-					break;
 				case LANG_GR:
 					nc->language = "el_GR.UTF-8";
 					break;
 				case LANG_NL:
 					nc->language = "nl_NL.UTF-8";
 					break;
-				case LANG_RU:
-					nc->language = "ru_RU.UTF-8";
-					break;
-				case LANG_HUN:
-					nc->language = "hu_HU.UTF-8";
-					break;
 				case LANG_PL:
 					nc->language = "pl_PL.UTF-8";
 					break;
+				case LANG_CAT:
+				case LANG_HUN:
+				case LANG_RU:
 				case LANG_EN_US:
 				case LANG_JA_JIS:
 				case LANG_JA_EUC:

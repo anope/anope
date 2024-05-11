@@ -23,18 +23,15 @@ static struct WindowsLanguage final
 	Anope::string languageName;
 	USHORT windowsLanguageName;
 } WindowsLanguages[] = {
-	{"ca_ES", LANG_CATALAN},
 	{"de_DE", LANG_GERMAN},
 	{"el_GR", LANG_GREEK},
 	{"en_US", LANG_ENGLISH},
 	{"es_ES", LANG_SPANISH},
 	{"fr_FR", LANG_FRENCH},
-	{"hu_HU", LANG_HUNGARIAN},
 	{"it_IT", LANG_ITALIAN},
 	{"nl_NL", LANG_DUTCH},
 	{"pl_PL", LANG_POLISH},
 	{"pt_PT", LANG_PORTUGUESE},
-	{"ru_RU", LANG_RUSSIAN},
 	{"tr_TR", LANG_TURKISH},
 };
 

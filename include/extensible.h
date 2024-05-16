@@ -194,6 +194,7 @@ public:
 
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 	{
+		data.SetType(this->name, Serialize::Data::DT_INT);
 		data[this->name] << true;
 	}
 

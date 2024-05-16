@@ -415,11 +415,11 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 
 			query_text += ", `" + column + "` ";
 			if (data.GetType(column) == Serialize::Data::DT_INT)
-				query_text += "int(11)";
+				query_text += "int";
 			else
 				query_text += "text";
 		}
-		query_text += ", PRIMARY KEY (`id`), KEY `timestamp_idx` (`timestamp`))";
+		query_text += ", PRIMARY KEY (`id`), KEY `timestamp_idx` (`timestamp`)) ROW_FORMAT=DYNAMIC";
 		queries.push_back(query_text);
 	}
 	else
@@ -433,7 +433,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 
 			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` ";
 			if (data.GetType(column) == Serialize::Data::DT_INT)
-				query_text += "int(11)";
+				query_text += "int";
 			else
 				query_text += "text";
 

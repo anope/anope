@@ -400,7 +400,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 
 			query_text += ", `" + it->first + "` ";
 			if (data.GetType(it->first) == Serialize::Data::DT_INT)
-				query_text += "int(11)";
+				query_text += "int";
 			else
 				query_text += "text";
 		}
@@ -417,7 +417,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 
 			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
 			if (data.GetType(it->first) == Serialize::Data::DT_INT)
-				query_text += "int(11)";
+				query_text += "int";
 			else
 				query_text += "text";
 

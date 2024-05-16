@@ -51,17 +51,16 @@ struct KickerDataImpl : KickerData
 			if (kd == NULL)
 				return;
 
-			data["kickerdata:amsgs"] << kd->amsgs;
-			data["kickerdata:badwords"] << kd->badwords;
-			data["kickerdata:bolds"] << kd->bolds;
-			data["kickerdata:caps"] << kd->caps;
-			data["kickerdata:colors"] << kd->colors;
-			data["kickerdata:flood"] << kd->flood;
-			data["kickerdata:italics"] << kd->italics;
-			data["kickerdata:repeat"] << kd->repeat;
-			data["kickerdata:reverses"] << kd->reverses;
-			data["kickerdata:underlines"] << kd->underlines;
-
+			data.SetType("kickerdata:amsgs", Serialize::Data::DT_INT); data["kickerdata:amsgs"] << kd->amsgs;
+			data.SetType("kickerdata:badwords", Serialize::Data::DT_INT); data["kickerdata:badwords"] << kd->badwords;
+			data.SetType("kickerdata:bolds", Serialize::Data::DT_INT); data["kickerdata:bolds"] << kd->bolds;
+			data.SetType("kickerdata:caps", Serialize::Data::DT_INT); data["kickerdata:caps"] << kd->caps;
+			data.SetType("kickerdata:colors", Serialize::Data::DT_INT); data["kickerdata:colors"] << kd->colors;
+			data.SetType("kickerdata:flood", Serialize::Data::DT_INT); data["kickerdata:flood"] << kd->flood;
+			data.SetType("kickerdata:italics", Serialize::Data::DT_INT); data["kickerdata:italics"] << kd->italics;
+			data.SetType("kickerdata:repeat", Serialize::Data::DT_INT); data["kickerdata:repeat"] << kd->repeat;
+			data.SetType("kickerdata:reverses", Serialize::Data::DT_INT); data["kickerdata:reverses"] << kd->reverses;
+			data.SetType("kickerdata:underlines", Serialize::Data::DT_INT); data["kickerdata:underlines"] << kd->underlines;
 			data.SetType("capsmin", Serialize::Data::DT_INT); data["capsmin"] << kd->capsmin;
 			data.SetType("capspercent", Serialize::Data::DT_INT); data["capspercent"] << kd->capspercent;
 			data.SetType("floodlines", Serialize::Data::DT_INT); data["floodlines"] << kd->floodlines;

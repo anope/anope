@@ -404,7 +404,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 			else
 				query_text += "text";
 		}
-		query_text += ", PRIMARY KEY (`id`), KEY `timestamp_idx` (`timestamp`))";
+		query_text += ", PRIMARY KEY (`id`), KEY `timestamp_idx` (`timestamp`)) ROW_FORMAT=DYNAMIC";
 		queries.push_back(query_text);
 	}
 	else

@@ -676,23 +676,40 @@ public:
 	bool IsValid(Anope::string &value) const override
 	{
 		if (value.empty() || value[0] == ':')
+		{
+			Log() << "IsValid: 1";
 			return false;
+		}
 
 		Anope::string rest;
 		auto num1 = Anope::Convert<unsigned>(value[0] == '*' ? value.substr(1) : value, 0, &rest);
 		if (!num1 || rest[0] != ':' || rest.length() <= 1)
+		{
+			Log() << "IsValid: 2";
 			return false;
+		}
 
 		if (Anope::Convert<int>(rest.substr(1), 0, &rest) > 0 && rest.empty())
+		{
+			Log() << "IsValid: 3";
 			return true;
+		}
 
 		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
 		size_t end_bracket = value.find(']', 1);
 		if (end_bracket == Anope::string::npos)
+		{
+			Log() << "IsValid: 4";
 			return false;
+		}
+
 		Anope::string xbuf = value.substr(0, end_bracket);
 		if (value[end_bracket + 1] != ':')
+		{
+			Log() << "IsValid: 5";
 			return false;
+		}
+
 		commasepstream args(xbuf.substr(1));
 		Anope::string arg;
 		while (args.GetToken(arg))
@@ -706,9 +723,13 @@ public:
 
 			auto v = Anope::Convert<int>(arg.substr(0, p), 0);
 			if (v < 1 || v > 999)
+			{
+				Log() << "IsValid: 6";
 				return false;
+			}
 		}
 
+		Log() << "IsValid: 7";
 		return true;
 	}
 };

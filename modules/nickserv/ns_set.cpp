@@ -1354,7 +1354,8 @@ public:
 	{
 		if (keep_modes.HasExt(u->Account()))
 		{
-			for (const auto &[last_mode, last_value] : u->Account()->last_modes)
+			User::ModeList modes = u->Account()->last_modes;
+			for (const auto &[last_mode, last_value] : modes)
 			{
 				UserMode *um = ModeManager::FindUserModeByName(last_mode);
 				/* if the null user can set the mode, then it's probably safe */

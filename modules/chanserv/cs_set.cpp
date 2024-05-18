@@ -1146,7 +1146,7 @@ public:
 		if (c->ci && keep_modes.HasExt(c->ci))
 		{
 			Channel::ModeList ml = c->ci->last_modes;
-			for (const auto &[last_mode, last_value] : c->ci->last_modes)
+			for (const auto &[last_mode, last_value] : ml)
 				c->SetMode(c->ci->WhoSends(), last_mode, last_value);
 		}
 	}

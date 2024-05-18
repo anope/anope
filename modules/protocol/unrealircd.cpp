@@ -675,24 +675,18 @@ public:
 	/* Borrowed part of this check from UnrealIRCd */
 	bool IsValid(Anope::string &value) const override
 	{
-		if (value.empty() || value[0] == ':')
+		if (value.empty() || value[0] != '[')
 			return false;
-
-		Anope::string rest;
-		auto num1 = Anope::Convert<unsigned>(value[0] == '*' ? value.substr(1) : value, 0, &rest);
-		if (!num1 || rest[0] != ':' || rest.length() <= 1)
-			return false;
-
-		if (Anope::Convert<int>(rest.substr(1), 0, &rest) > 0 && rest.empty())
-			return true;
 
 		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
 		size_t end_bracket = value.find(']', 1);
 		if (end_bracket == Anope::string::npos)
 			return false;
+
 		Anope::string xbuf = value.substr(0, end_bracket);
 		if (value[end_bracket + 1] != ':')
 			return false;
+
 		commasepstream args(xbuf.substr(1));
 		Anope::string arg;
 		while (args.GetToken(arg))

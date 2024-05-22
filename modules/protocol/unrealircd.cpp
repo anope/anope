@@ -729,8 +729,7 @@ public:
 		// The part after the ':' is a duration and it
 		// can be in the user friendly "1d3h20m" format, make sure we accept that
 		auto n = Anope::DoTime(rest.substr(1));
-		return n <= 0;
-			return false;
+		return n > 0;
 	}
 };
 

@@ -325,8 +325,8 @@ bool Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "-d, --debug[=level]";
 		Log(LOG_TERMINAL) << "-h, --help";
 		Log(LOG_TERMINAL) << "    --localedir=locale directory";
-		Log(LOG_TERMINAL) << "    --logdir=logs directory";
-		Log(LOG_TERMINAL) << "    --modulesdir=modules directory";
+		Log(LOG_TERMINAL) << "    --logdir=log directory";
+		Log(LOG_TERMINAL) << "    --moduledir=module directory";
 		Log(LOG_TERMINAL) << "-e, --noexpire";
 		Log(LOG_TERMINAL) << "-n, --nofork";
 		Log(LOG_TERMINAL) << "-p, --nopid";
@@ -409,10 +409,10 @@ bool Anope::Init(int ac, char **av)
 		Anope::LocaleDir = arg;
 	}
 
-	if (GetCommandLineArgument("modulesdir", 0, arg))
+	if (GetCommandLineArgument("moduledir", 0, arg))
 	{
 		if (arg.empty())
-			throw CoreException("The --modulesdir option requires a path");
+			throw CoreException("The --moduledir option requires a path");
 		Anope::ModuleDir = arg;
 	}
 

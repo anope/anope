@@ -658,7 +658,8 @@ class CommandCSMode final
 							}
 							else
 							{
-								for (const auto &mode :  ci->c->GetModeList(cm->name))
+								std::vector<Anope::string> v = ci->c->GetModeList(cm->name);
+								for (const auto &mode :  v)
 								{
 									if (Anope::Match(mode, param))
 										ci->c->RemoveMode(NULL, cm, mode);

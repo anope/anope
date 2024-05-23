@@ -536,7 +536,7 @@ bool Anope::Init(int ac, char **av)
 
 	auto *encryption = ModuleManager::FindFirstOf(ENCRYPTION);
 	if (!encryption)
-		throw CoreException("You must load an encryption module!");
+		throw CoreException("You must load a non-deprecated encryption module!");
 
 	auto *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 	if (!protocol)

@@ -1,3 +1,19 @@
+Anope Version 2.1.6-dev
+-----------------------
+Added opportunistic upgrading of TLS fingerprints to more secure algorithms on InspIRCd.
+Added support for logging out partially connected users on Plexus.
+Added the account registration time to nickserv/info.
+Changed ns_cert to automatically add a TLS fingerprint to new accounts if available.
+Clarified that a non-deprecated encryption module must be loaded.
+Fixed mistakenly allowing badpasslimit to be set to a negative value.
+Fixed parsing backup TLS fingerprints on InspIRCd.
+Fixed parsing the flood mode on UnrealIRCd.
+Fixed parsing the history mode on UnrealIRCd.
+Fixed various iterator invalidation issues.
+Partially rewrote the Portuguese translation.
+Removed some incorrect strings from the Turkish translation.
+Renamed the --modulesdir option to --moduledir to match the name of other path options.
+
 Anope Version 2.1.5
 -------------------
 Added an example systemd unit file.

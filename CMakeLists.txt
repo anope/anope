@@ -355,7 +355,7 @@ get_filename_component(ABSOLUTE_LOG_DIR ${LOG_DIR} REALPATH BASE_DIR ${CMAKE_INS
 install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${ABSOLUTE_DATA_DIR}/backups\")")
 install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${ABSOLUTE_LOG_DIR}\")")
 if(WIN32)
-  install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${ABSOLUTE_DATA_DIR}/runtime\")")
+  install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${ABSOLUTE_DATA_DIR}/runtime\")")
 endif()
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the below directories, as well as the group of the data directory
 if(NOT WIN32 AND RUNGROUP)

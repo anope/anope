@@ -1,3 +1,7 @@
+Anope Version 2.1.7-git
+-----------------------
+No significant changes.
+
 Anope Version 2.1.6
 -------------------
 Added opportunistic upgrading of TLS fingerprints to more secure algorithms on InspIRCd.

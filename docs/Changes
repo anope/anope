@@ -1,5 +1,5 @@
-Anope Version 2.1.6-dev
------------------------
+Anope Version 2.1.6
+-------------------
 Added opportunistic upgrading of TLS fingerprints to more secure algorithms on InspIRCd.
 Added support for logging out partially connected users on Plexus.
 Added the account registration time to nickserv/info.

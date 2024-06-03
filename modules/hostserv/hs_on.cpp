@@ -29,7 +29,7 @@ public:
 		User *u = source.GetUser();
 		const NickAlias *na = NickAlias::Find(u->nick);
 		if (!na || na->nc != u->Account() || !na->HasVHost())
-			na = NickAlias::Find(u->Account()->display);
+			na = u->AccountNick();
 		if (na && u->Account() == na->nc && na->HasVHost())
 		{
 			source.Reply(_("Your vhost of \002%s\002 is now activated."), na->GetVHostMask().c_str());

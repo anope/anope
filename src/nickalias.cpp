@@ -31,6 +31,8 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
 		throw CoreException("Empty nickcore passed to NickAlias constructor");
 
 	nickcore->aliases->push_back(this);
+	if (this->nick.equals_ci(nickcore->display))
+		nickcore->na = this;
 
 	if (!NickAliasList->insert_or_assign(this->nick, this).second)
 		Log(LOG_DEBUG) << "Duplicate nick " << this->nick << " in NickAlias table";

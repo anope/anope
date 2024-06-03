@@ -43,7 +43,7 @@ public:
 
 		const NickAlias *na = NickAlias::Find(u->nick);
 		if (!na || na->nc != u->Account() || !na->HasVHost())
-			na = NickAlias::Find(u->Account()->display);
+			na = u->AccountNick();
 		if (!na || !na->HasVHost())
 			return;
 

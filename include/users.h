@@ -215,6 +215,11 @@ public:
 	 */
 	NickCore *Account() const;
 
+	/** Get the account nick the user is logged in using
+	 * @return The account nick or NULL
+	 */
+	NickAlias *AccountNick() const;
+
 	/** Check if the user is identified for their nick
 	 * @param check_nick True to check if the user is identified to the nickname they are on too
 	 * @return true or false

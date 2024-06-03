@@ -149,7 +149,7 @@ Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	return nc;
 }
 
-void NickCore::SetDisplay(const NickAlias *na)
+void NickCore::SetDisplay(NickAlias *na)
 {
 	if (na->nc != this || na->nick == this->display)
 		return;
@@ -164,6 +164,7 @@ void NickCore::SetDisplay(const NickAlias *na)
 	NickCoreList->erase(this->display);
 
 	this->display = na->nick;
+	this->na = na;
 
 	(*NickCoreList)[this->display] = this;
 }

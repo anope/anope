@@ -145,6 +145,8 @@ public:
 
 	/* Unsaved data */
 
+	/** The display nick for this account. */
+	NickAlias *na = nullptr;
 	/* Number of channels registered by this account */
 	uint16_t channelcount = 0;
 	/* Users online now logged into this account */
@@ -163,7 +165,7 @@ public:
 	/** Changes the display for this account
 	 * @param na The new display, must be grouped to this account.
 	 */
-	void SetDisplay(const NickAlias *na);
+	void SetDisplay(NickAlias *na);
 
 	/** Checks whether this account is a services oper or not.
 	 * @return True if this account is a services oper, false otherwise.

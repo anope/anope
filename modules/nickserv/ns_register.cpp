@@ -401,7 +401,7 @@ public:
 				u->SendMessage(NickServ, _("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
 			else
 				u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."));
-			const NickAlias *this_na = NickAlias::Find(u->Account()->display);
+			const NickAlias *this_na = u->AccountNick();
 			time_t time_registered = Anope::CurTime - this_na->time_registered;
 			time_t unconfirmed_expire = Config->GetModule(this)->Get<time_t>("unconfirmedexpire", "1d");
 			if (unconfirmed_expire > time_registered)

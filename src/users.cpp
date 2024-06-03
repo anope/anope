@@ -430,6 +430,11 @@ NickCore *User::Account() const
 	return this->nc;
 }
 
+NickAlias *User::AccountNick() const
+{
+	return this->nc ? this->nc->na : nullptr;
+}
+
 bool User::IsIdentified(bool check_nick) const
 {
 	if (check_nick && this->nc)

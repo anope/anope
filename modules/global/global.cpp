@@ -153,9 +153,9 @@ public:
 		}
 
 		if (server)
-			this->ServerGlobal(sender, Servers::GetUplink(), true, line);
-		else
 			this->ServerGlobal(sender, server, false, line);
+		else
+			this->ServerGlobal(sender, Servers::GetUplink(), true, line);
 		return true;
 	}
 

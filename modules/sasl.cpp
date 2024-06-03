@@ -302,7 +302,7 @@ public:
 		// If the user is already introduced then we log them in now.
 		// Otherwise, we send an SVSLOGIN to log them in later.
 		User *user = User::Find(session->uid);
-		NickAlias *na = NickAlias::Find(nc->display);
+		NickAlias *na = nc ? NickAlias::Find(nc->display) : nullptr;
 		if (user)
 		{
 			if (na)

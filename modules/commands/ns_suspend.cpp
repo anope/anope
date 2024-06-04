@@ -127,6 +127,8 @@ class CommandNSSuspend : public Command
 				User *u2 = User::Find(na2->nick, true);
 				if (u2)
 				{
+					IRCD->SendLogout(u2);
+					u2->RemoveMode(source.service, "REGISTERED");
 					u2->Logout();
 					if (nickserv)
 						nickserv->Collide(u2, na2);

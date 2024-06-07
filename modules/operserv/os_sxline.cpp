@@ -389,7 +389,10 @@ class CommandOSSNLine final
 		}
 
 		if (!this->xlm()->CanAdd(source, mask, expires, reason))
+		{
+			delete x;
 			return;
+		}
 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnAddXLine, MOD_RESULT, (source, x, this->xlm()));

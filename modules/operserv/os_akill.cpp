@@ -188,7 +188,10 @@ private:
 		}
 
 		if (!akills->CanAdd(source, mask, expires, reason))
+		{
+			delete x;
 			return;
+		}
 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnAddXLine, MOD_RESULT, (source, x, akills));

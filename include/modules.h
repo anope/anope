@@ -290,7 +290,7 @@ public:
 	 * @param cu The user, channel, and status of the user being kicked
 	 * @param kickmsg The reason for the kick.
 	 */
-	virtual void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) { throw NotImplementedException(); }
+	virtual void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a user has been kicked from a channel.
 	 * @param source The kicker
@@ -299,13 +299,13 @@ public:
 	 * @param status The status the kicked user had on the channel before they were kicked
 	 * @param kickmsg The reason for the kick.
 	 */
-	virtual void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) { throw NotImplementedException(); }
+	virtual void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when the configuration is being (re)loaded.
 	 * @param conf The config that is being built now and will replace the global Config object
 	 * @throws A ConfigException to abort the config (re)loading process.
 	 */
-	virtual void OnReload(Configuration::Conf *conf) { throw NotImplementedException(); }
+	virtual void OnReload(Configuration::Conf *conf) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called before a bot is assigned to a channel.
 	 * @param sender The user assigning the bot
@@ -313,35 +313,35 @@ public:
 	 * @param bi The bot being assigned.
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the assign.
 	 */
-	virtual EventReturn OnPreBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) { throw NotImplementedException(); }
+	virtual EventReturn OnPreBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) ATTR_NOT_NULL(2, 3, 4) { throw NotImplementedException(); }
 
 	/** Called when a bot is assigned ot a channel
 	 */
-	virtual void OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) { throw NotImplementedException(); }
+	virtual void OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) ATTR_NOT_NULL(2, 3, 4) { throw NotImplementedException(); }
 
 	/** Called before a bot is unassigned from a channel.
 	 * @param sender The user unassigning the bot
 	 * @param ci The channel the bot is being removed from
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the unassign.
 	 */
-	virtual EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) { throw NotImplementedException(); }
+	virtual EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a new user connects to the network.
 	 * @param u The connecting user.
 	 * @param exempt set to true/is true if the user should be excepted from bans etc
 	 */
-	virtual void OnUserConnect(User *u, bool &exempt) { throw NotImplementedException(); }
+	virtual void OnUserConnect(User *u, bool &exempt) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a new server connects to the network.
 	 * @param s The server that has connected to the network
 	 */
-	virtual void OnNewServer(Server *s) { throw NotImplementedException(); }
+	virtual void OnNewServer(Server *s) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called after a user changed the nick
 	 * @param u The user.
 	 * @param oldnick The old nick of the user
 	 */
-	virtual void OnUserNickChange(User *u, const Anope::string &oldnick) { throw NotImplementedException(); }
+	virtual void OnUserNickChange(User *u, const Anope::string &oldnick) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when someone uses the generic/help command
 	 * @param source Command source
@@ -362,14 +362,14 @@ public:
 	 * @param params The parameters the user is sending
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) { throw NotImplementedException(); }
+	virtual EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called after a command has been executed.
 	 * @param source The source of the command
 	 * @param command The command the user executed
 	 * @param params The parameters the user sent
 	 */
-	virtual void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params) { throw NotImplementedException(); }
+	virtual void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when the databases are saved
 	 */
@@ -391,7 +391,7 @@ public:
 	 * @param params The params
 	 * @return EVENT_STOP to halt processing and not run the command, EVENT_ALLOW to allow the command to be executed
 	 */
-	virtual EventReturn OnBotFantasy(CommandSource &source, Command *c, ChannelInfo *ci, const std::vector<Anope::string> &params) { throw NotImplementedException(); }
+	virtual EventReturn OnBotFantasy(CommandSource &source, Command *c, ChannelInfo *ci, const std::vector<Anope::string> &params) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
 
 	/** Called on fantasy command without access
 	 * @param source The source of the command
@@ -400,31 +400,31 @@ public:
 	 * @param params The params
 	 * @return EVENT_STOP to halt processing and not run the command, EVENT_ALLOW to allow the command to be executed
 	 */
-	virtual EventReturn OnBotNoFantasyAccess(CommandSource &source, Command *c, ChannelInfo *ci, const std::vector<Anope::string> &params) { throw NotImplementedException(); }
+	virtual EventReturn OnBotNoFantasyAccess(CommandSource &source, Command *c, ChannelInfo *ci, const std::vector<Anope::string> &params) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
 
 	/** Called when a bot places a ban
 	 * @param u User being banned
 	 * @param ci Channel the ban is placed on
 	 * @param mask The mask being banned
 	 */
-	virtual void OnBotBan(User *u, ChannelInfo *ci, const Anope::string &mask) { throw NotImplementedException(); }
+	virtual void OnBotBan(User *u, ChannelInfo *ci, const Anope::string &mask) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called before a badword is added to the badword list
 	 * @param ci The channel
 	 * @param bw The badword
 	 */
-	virtual void OnBadWordAdd(ChannelInfo *ci, const BadWord *bw) { throw NotImplementedException(); }
+	virtual void OnBadWordAdd(ChannelInfo *ci, const BadWord *bw) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called before a badword is deleted from a channel
 	 * @param ci The channel
 	 * @param bw The badword
 	 */
-	virtual void OnBadWordDel(ChannelInfo *ci, const BadWord *bw) { throw NotImplementedException(); }
+	virtual void OnBadWordDel(ChannelInfo *ci, const BadWord *bw) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a bot is created or destroyed
 	 */
-	virtual void OnCreateBot(BotInfo *bi) { throw NotImplementedException(); }
-	virtual void OnDelBot(BotInfo *bi) { throw NotImplementedException(); }
+	virtual void OnCreateBot(BotInfo *bi) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+	virtual void OnDelBot(BotInfo *bi) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called before a bot kicks a user
 	 * @param bi The bot sending the kick
@@ -433,13 +433,13 @@ public:
 	 * @param reason The reason
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnBotKick(BotInfo *bi, Channel *c, User *u, const Anope::string &reason) { throw NotImplementedException(); }
+	virtual EventReturn OnBotKick(BotInfo *bi, Channel *c, User *u, const Anope::string &reason) ATTR_NOT_NULL(2, 3, 4) { throw NotImplementedException(); }
 
 	/** Called before a user parts a channel
 	 * @param u The user
 	 * @param c The channel
 	 */
-	virtual void OnPrePartChannel(User *u, Channel *c) {}
+	virtual void OnPrePartChannel(User *u, Channel *c)  ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a user parts a channel
 	 * @param u The user
@@ -447,14 +447,14 @@ public:
 	 * @param channel The channel name
 	 * @param msg The part reason
 	 */
-	virtual void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg) { throw NotImplementedException(); }
+	virtual void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a user leaves a channel.
 	 * From either parting, being kicked, or quitting/killed!
 	 * @param u The user
 	 * @param c The channel
 	 */
-	virtual void OnLeaveChannel(User *u, Channel *c) { throw NotImplementedException(); }
+	virtual void OnLeaveChannel(User *u, Channel *c) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called after a user joins a channel
 	 * If this event triggers the user is allowed to be in the channel, and will
@@ -463,7 +463,7 @@ public:
 	 * @param u The user
 	 * @param channel The channel
 	 */
-	virtual void OnJoinChannel(User *u, Channel *c) { throw NotImplementedException(); }
+	virtual void OnJoinChannel(User *u, Channel *c) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a new topic is set
 	 * @param source The user changing the topic, if any
@@ -471,18 +471,18 @@ public:
 	 * @param setter The user who set the new topic, if there is no source
 	 * @param topic The new topic
 	 */
-	virtual void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) { throw NotImplementedException(); }
+	virtual void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called before a channel expires
 	 * @param ci The channel
 	 * @param expire Set to true to allow the chan to expire
 	 */
-	virtual void OnPreChanExpire(ChannelInfo *ci, bool &expire) { throw NotImplementedException(); }
+	virtual void OnPreChanExpire(ChannelInfo *ci, bool &expire) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called before a channel expires
 	 * @param ci The channel
 	 */
-	virtual void OnChanExpire(ChannelInfo *ci) { throw NotImplementedException(); }
+	virtual void OnChanExpire(ChannelInfo *ci) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called before Anope connects to its uplink
 	 */
@@ -494,7 +494,7 @@ public:
 
 	/** Called when we are almost done synching with the uplink, just before we send the EOB
 	 */
-	virtual void OnPreUplinkSync(Server *serv) { throw NotImplementedException(); }
+	virtual void OnPreUplinkSync(Server *serv) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when Anope disconnects from its uplink, before it tries to reconnect
 	 */
@@ -512,12 +512,12 @@ public:
 	 * @param na The nick
 	 * @param expire Set to true to allow the nick to expire
 	 */
-	virtual void OnPreNickExpire(NickAlias *na, bool &expire) { throw NotImplementedException(); }
+	virtual void OnPreNickExpire(NickAlias *na, bool &expire) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a nick drops
 	 * @param na The nick
 	 */
-	virtual void OnNickExpire(NickAlias *na) { throw NotImplementedException(); }
+	virtual void OnNickExpire(NickAlias *na) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when defcon level changes
 	 * @param level The level
@@ -528,13 +528,13 @@ public:
 	 * @param ex The exception
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnExceptionAdd(Exception *ex) { throw NotImplementedException(); }
+	virtual EventReturn OnExceptionAdd(Exception *ex) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called before an exception is deleted
 	 * @param source The source deleting it
 	 * @param ex The exception
 	 */
-	virtual void OnExceptionDel(CommandSource &source, Exception *ex) { throw NotImplementedException(); }
+	virtual void OnExceptionDel(CommandSource &source, Exception *ex) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called before a XLine is added
 	 * @param source The source of the XLine
@@ -542,31 +542,31 @@ public:
 	 * @param xlm The xline manager it was added to
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnAddXLine(CommandSource &source, const XLine *x, XLineManager *xlm) { throw NotImplementedException(); }
+	virtual EventReturn OnAddXLine(CommandSource &source, const XLine *x, XLineManager *xlm) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
 
 	/** Called before a XLine is deleted
 	 * @param source The source of the XLine
 	 * @param x The XLine
 	 * @param xlm The xline manager it was deleted from
 	 */
-	virtual void OnDelXLine(CommandSource &source, const XLine *x, XLineManager *xlm) { throw NotImplementedException(); }
+	virtual void OnDelXLine(CommandSource &source, const XLine *x, XLineManager *xlm) ATTR_NOT_NULL(4) { throw NotImplementedException(); }
 
 	/** Called when a user is checked for whether they are a services oper
 	 * @param u The user
 	 * @return EVENT_ALLOW to allow, anything else to deny
 	 */
-	virtual EventReturn IsServicesOper(User *u) { throw NotImplementedException(); }
+	virtual EventReturn IsServicesOper(User *u) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a server quits
 	 * @param server The server
 	 */
-	virtual void OnServerQuit(Server *server) { throw NotImplementedException(); }
+	virtual void OnServerQuit(Server *server) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a user quits, or is killed
 	 * @param u The user
 	 * @param msg The quit message
 	 */
-	virtual void OnUserQuit(User *u, const Anope::string &msg) { throw NotImplementedException(); }
+	virtual void OnUserQuit(User *u, const Anope::string &msg) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a user is quit, before and after being internally removed from
 	 * This is different from OnUserQuit, which takes place at the time of the quit.
@@ -574,43 +574,43 @@ public:
 	 * all lists (channels, user list, etc)
 	 * @param u The user
 	 */
-	virtual void OnPreUserLogoff(User *u) { throw NotImplementedException(); }
-	virtual void OnPostUserLogoff(User *u) { throw NotImplementedException(); }
+	virtual void OnPreUserLogoff(User *u) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+	virtual void OnPostUserLogoff(User *u) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a new bot is made
 	 * @param bi The bot
 	 */
-	virtual void OnBotCreate(BotInfo *bi) { throw NotImplementedException(); }
+	virtual void OnBotCreate(BotInfo *bi) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a bot is changed
 	 * @param bi The bot
 	 */
-	virtual void OnBotChange(BotInfo *bi) { throw NotImplementedException(); }
+	virtual void OnBotChange(BotInfo *bi) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a bot is deleted
 	 * @param bi The bot
 	 */
-	virtual void OnBotDelete(BotInfo *bi) { throw NotImplementedException(); }
+	virtual void OnBotDelete(BotInfo *bi) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called after an access entry is deleted from a channel
 	 * @param ci The channel
 	 * @param source The source of the command
 	 * @param access The access entry that was removed
 	 */
-	virtual void OnAccessDel(ChannelInfo *ci, CommandSource &source, ChanAccess *access) { throw NotImplementedException(); }
+	virtual void OnAccessDel(ChannelInfo *ci, CommandSource &source, ChanAccess *access) ATTR_NOT_NULL(2, 4) { throw NotImplementedException(); }
 
 	/** Called when access is added
 	 * @param ci The channel
 	 * @param source The source of the command
 	 * @param access The access changed
 	 */
-	virtual void OnAccessAdd(ChannelInfo *ci, CommandSource &source, ChanAccess *access) { throw NotImplementedException(); }
+	virtual void OnAccessAdd(ChannelInfo *ci, CommandSource &source, ChanAccess *access) ATTR_NOT_NULL(2, 4) { throw NotImplementedException(); }
 
 	/** Called when the access list is cleared
 	 * @param ci The channel
 	 * @param u The user who cleared the access
 	 */
-	virtual void OnAccessClear(ChannelInfo *ci, CommandSource &source) { throw NotImplementedException(); }
+	virtual void OnAccessClear(ChannelInfo *ci, CommandSource &source) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a level for a channel is changed
 	 * @param source The source of the command
@@ -618,63 +618,63 @@ public:
 	 * @param priv The privilege changed
 	 * @param what The new level
 	 */
-	virtual void OnLevelChange(CommandSource &source, ChannelInfo *ci, const Anope::string &priv, int16_t what) { throw NotImplementedException(); }
+	virtual void OnLevelChange(CommandSource &source, ChannelInfo *ci, const Anope::string &priv, int16_t what) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called right before a channel is dropped
 	 * @param source The user dropping the channel
 	 * @param ci The channel
 	 */
-	virtual EventReturn OnChanDrop(CommandSource &source, ChannelInfo *ci) { throw NotImplementedException(); }
+	virtual EventReturn OnChanDrop(CommandSource &source, ChannelInfo *ci) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a channel is registered
 	 * @param ci The channel
 	 */
-	virtual void OnChanRegistered(ChannelInfo *ci) { throw NotImplementedException(); }
+	virtual void OnChanRegistered(ChannelInfo *ci) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a channel is suspended
 	 * @param ci The channel
 	 */
-	virtual void OnChanSuspend(ChannelInfo *ci) { throw NotImplementedException(); }
+	virtual void OnChanSuspend(ChannelInfo *ci) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a channel is unsuspended
 	 * @param ci The channel
 	 */
-	virtual void OnChanUnsuspend(ChannelInfo *ci) { throw NotImplementedException(); }
+	virtual void OnChanUnsuspend(ChannelInfo *ci) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a channel is being created, for any reason
 	 * @param ci The channel
 	 */
-	virtual void OnCreateChan(ChannelInfo *ci) { throw NotImplementedException(); }
+	virtual void OnCreateChan(ChannelInfo *ci) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a channel is being deleted, for any reason
 	 * @param ci The channel
 	 */
-	virtual void OnDelChan(ChannelInfo *ci) { throw NotImplementedException(); }
+	virtual void OnDelChan(ChannelInfo *ci) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a new channel is created
 	 * Note that this channel may not be introduced to the uplink at this point.
 	 * @param c The channel
 	 */
-	virtual void OnChannelCreate(Channel *c) { throw NotImplementedException(); }
+	virtual void OnChannelCreate(Channel *c) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a channel is deleted
 	 * @param c The channel
 	 */
-	virtual void OnChannelDelete(Channel *c) { throw NotImplementedException(); }
+	virtual void OnChannelDelete(Channel *c) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called after adding an akick to a channel
 	 * @param source The source of the command
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickAdd(CommandSource &source, ChannelInfo *ci, const AutoKick *ak) { throw NotImplementedException(); }
+	virtual void OnAkickAdd(CommandSource &source, ChannelInfo *ci, const AutoKick *ak) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
 
 	/** Called before removing an akick from a channel
 	 * @param source The source of the command
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickDel(CommandSource &source, ChannelInfo *ci, const AutoKick *ak) { throw NotImplementedException(); }
+	virtual void OnAkickDel(CommandSource &source, ChannelInfo *ci, const AutoKick *ak) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
 
 	/** Called after a user join a channel when we decide whether to kick them or not
 	 * @param u The user
@@ -684,7 +684,7 @@ public:
 	 * @param reason The reason for the kick
 	 * @return EVENT_STOP to prevent the user from joining by kicking/banning the user
 	 */
-	virtual EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) { throw NotImplementedException(); }
+	virtual EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a user requests info for a channel
 	 * @param source The user requesting info
@@ -692,109 +692,109 @@ public:
 	 * @param info Data to show the user requesting information
 	 * @param show_hidden true if we should show the user everything
 	 */
-	virtual void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) { throw NotImplementedException(); }
+	virtual void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Checks if access has the channel privilege 'priv'.
 	 * @param access THe access struct
 	 * @param priv The privilege being checked for
 	 * @return EVENT_ALLOW for yes, EVENT_STOP to stop all processing
 	 */
-	virtual EventReturn OnCheckPriv(const ChanAccess *access, const Anope::string &priv) { throw NotImplementedException(); }
+	virtual EventReturn OnCheckPriv(const ChanAccess *access, const Anope::string &priv) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Check whether an access group has a privilege
 	 * @param group The group
 	 * @param priv The privilege
 	 * @return MOD_ALLOW to allow, MOD_STOP to stop
 	 */
-	virtual EventReturn OnGroupCheckPriv(const AccessGroup *group, const Anope::string &priv) { throw NotImplementedException(); }
+	virtual EventReturn OnGroupCheckPriv(const AccessGroup *group, const Anope::string &priv) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a nick is dropped
 	 * @param source The source of the command
 	 * @param na The nick
 	 */
-	virtual void OnNickDrop(CommandSource &source, NickAlias *na) { throw NotImplementedException(); }
+	virtual void OnNickDrop(CommandSource &source, NickAlias *na) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a user groups their nick
 	 * @param u The user grouping
 	 * @param target The target they're grouping to
 	 */
-	virtual void OnNickGroup(User *u, NickAlias *target) { throw NotImplementedException(); }
+	virtual void OnNickGroup(User *u, NickAlias *target) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a user identifies to a nick
 	 * @param u The user
 	 */
-	virtual void OnNickIdentify(User *u) { throw NotImplementedException(); }
+	virtual void OnNickIdentify(User *u) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a user is logged into an account
 	 * @param u The user
 	 */
-	virtual void OnUserLogin(User *u) { throw NotImplementedException(); }
+	virtual void OnUserLogin(User *u) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a nick logs out
 	 * @param u The nick
 	 */
-	virtual void OnNickLogout(User *u) { throw NotImplementedException(); }
+	virtual void OnNickLogout(User *u) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a nick is registered
 	 * @param user The user registering the nick, of any
 	 * @param The nick
 	 * @param pass The password of the newly registered nick
 	 */
-	virtual void OnNickRegister(User *user, NickAlias *na, const Anope::string &pass) { throw NotImplementedException(); }
+	virtual void OnNickRegister(User *user, NickAlias *na, const Anope::string &pass) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a nick is confirmed. This will never be called if registration confirmation is not enabled.
 	 * @param user The user confirming the nick
-	 * @param The account being confirmed
+	 * @param nc The account being confirmed
 	 */
-	virtual void OnNickConfirm(User *user, NickCore *) { throw NotImplementedException(); }
+	virtual void OnNickConfirm(User *user, NickCore *nc) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a nick is suspended
 	 * @param na The nick alias
 	 */
-	virtual void OnNickSuspend(NickAlias *na) { throw NotImplementedException(); }
+	virtual void OnNickSuspend(NickAlias *na) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a nick is unsuspended
 	 * @param na The nick alias
 	 */
-	virtual void OnNickUnsuspended(NickAlias *na) { throw NotImplementedException(); }
+	virtual void OnNickUnsuspended(NickAlias *na) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called on delnick()
 	 * @ param na pointer to the nickalias
 	 */
-	virtual void OnDelNick(NickAlias *na) { throw NotImplementedException(); }
+	virtual void OnDelNick(NickAlias *na) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a nickcore is created
 	 * @param nc The nickcore
 	 */
-	virtual void OnNickCoreCreate(NickCore *nc) { throw NotImplementedException(); }
+	virtual void OnNickCoreCreate(NickCore *nc) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called on delcore()
 	 * @param nc pointer to the NickCore
 	 */
-	virtual void OnDelCore(NickCore *nc) { throw NotImplementedException(); }
+	virtual void OnDelCore(NickCore *nc) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called on change_core_display()
 	 * @param nc pointer to the NickCore
 	 * @param newdisplay the new display
 	 */
-	virtual void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) { throw NotImplementedException(); }
+	virtual void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** called from NickCore::ClearCert()
 	 * @param nc pointer to the NickCore
 	 */
-	virtual void OnNickClearCert(NickCore *nc) { throw NotImplementedException(); }
+	virtual void OnNickClearCert(NickCore *nc) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a user adds an entry to their cert list
 	 * @param nc The nick
 	 * @param entry The entry
 	 */
-	virtual void OnNickAddCert(NickCore *nc, const Anope::string &entry) { throw NotImplementedException(); }
+	virtual void OnNickAddCert(NickCore *nc, const Anope::string &entry) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called from NickCore::EraseCert()
 	 * @param nc pointer to the NickCore
 	 * @param entry The fingerprint
 	 */
-	virtual void OnNickEraseCert(NickCore *nc, const Anope::string &entry) { throw NotImplementedException(); }
+	virtual void OnNickEraseCert(NickCore *nc, const Anope::string &entry) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a user requests info for a nick
 	 * @param source The user requesting info
@@ -802,55 +802,55 @@ public:
 	 * @param info Data to show the user requesting information
 	 * @param show_hidden true if we should show the user everything
 	 */
-	virtual void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) { throw NotImplementedException(); }
+	virtual void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a user uses botserv/info on a bot or channel.
 	 */
-	virtual void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) { throw NotImplementedException(); }
+	virtual void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) ATTR_NOT_NULL(4) { throw NotImplementedException(); }
 
 	/** Check whether a username and password is correct
 	 * @param u The user trying to identify, if applicable.
 	 * @param req The login request
 	 */
-	virtual void OnCheckAuthentication(User *u, IdentifyRequest *req) { throw NotImplementedException(); }
+	virtual void OnCheckAuthentication(User *u, IdentifyRequest *req) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a user does /ns update
 	 * @param u The user
 	 */
-	virtual void OnNickUpdate(User *u) { throw NotImplementedException(); }
+	virtual void OnNickUpdate(User *u) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when we get informed about a users SSL fingerprint
 	 *  when we call this, the fingerprint should already be stored in the user struct
 	 * @param u pointer to the user
 	 */
-	virtual void OnFingerprint(User *u) { throw NotImplementedException(); }
+	virtual void OnFingerprint(User *u) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a user becomes (un)away
 	 * @param message The message, is .empty() if unaway
 	 */
-	virtual void OnUserAway(User *u, const Anope::string &message) { throw NotImplementedException(); }
+	virtual void OnUserAway(User *u, const Anope::string &message) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a user invites one of our users to a channel
 	 * @param source The user doing the inviting
 	 * @param c The channel the user is inviting to
 	 * @param targ The user being invited
 	 */
-	virtual void OnInvite(User *source, Channel *c, User *targ) { throw NotImplementedException(); }
+	virtual void OnInvite(User *source, Channel *c, User *targ) ATTR_NOT_NULL(2, 3, 4) { throw NotImplementedException(); }
 
 	/** Called when a vhost is deleted
 	 * @param na The nickalias of the vhost
 	 */
-	virtual void OnDeleteVHost(NickAlias *na) { throw NotImplementedException(); }
+	virtual void OnDeleteVHost(NickAlias *na) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a vhost is set
 	 * @param na The nickalias of the vhost
 	 */
-	virtual void OnSetVHost(NickAlias *na) { throw NotImplementedException(); }
+	virtual void OnSetVHost(NickAlias *na) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a users host changes
 	 * @param u The user
 	 */
-	virtual void OnSetDisplayedHost(User *) { throw NotImplementedException(); }
+	virtual void OnSetDisplayedHost(User *u) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a memo is sent
 	 * @param source The source of the memo
@@ -858,14 +858,14 @@ public:
 	 * @param mi Memo info for target
 	 * @param m The memo
 	 */
-	virtual void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m) { throw NotImplementedException(); }
+	virtual void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m) ATTR_NOT_NULL(4, 5) { throw NotImplementedException(); }
 
 	/** Called when a memo is deleted
 	 * @param target The target the memo is being deleted from (nick or channel)
 	 * @param mi The memo info
 	 * @param m The memo
 	 */
-	virtual void OnMemoDel(const Anope::string &target, MemoInfo *mi, const Memo *m) { throw NotImplementedException(); }
+	virtual void OnMemoDel(const Anope::string &target, MemoInfo *mi, const Memo *m) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
 
 	/** Called when a mode is set on a channel
 	 * @param c The channel
@@ -874,7 +874,7 @@ public:
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) { throw NotImplementedException(); }
+	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) ATTR_NOT_NULL(2, 4) { throw NotImplementedException(); }
 
 	/** Called when a mode is unset on a channel
 	 * @param c The channel
@@ -883,67 +883,67 @@ public:
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) { throw NotImplementedException(); }
+	virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) ATTR_NOT_NULL(2, 4) { throw NotImplementedException(); }
 
 	/** Called when a mode is set on a user
 	 * @param setter who/what is setting the mode
 	 * @param u The user
 	 * @param mname The mode name
 	 */
-	virtual void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) { throw NotImplementedException(); }
+	virtual void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a mode is unset from a user
 	 * @param setter who/what is setting the mode
 	 * @param u The user
 	 * @param mname The mode name
 	 */
-	virtual void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) { throw NotImplementedException(); }
+	virtual void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a channel mode is introduced into Anope
 	 * @param cm The mode
 	 */
-	virtual void OnChannelModeAdd(ChannelMode *cm) { throw NotImplementedException(); }
+	virtual void OnChannelModeAdd(ChannelMode *cm) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a user mode is introduced into Anope
 	 * @param um The mode
 	 */
-	virtual void OnUserModeAdd(UserMode *um) { throw NotImplementedException(); }
+	virtual void OnUserModeAdd(UserMode *um) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a mode is about to be mlocked
 	 * @param ci The channel the mode is being locked on
 	 * @param lock The mode lock
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
 	 */
-	virtual EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) { throw NotImplementedException(); }
+	virtual EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a mode is about to be unlocked
 	 * @param ci The channel the mode is being unlocked from
 	 * @param lock The mode lock
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
 	 */
-	virtual EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) { throw NotImplementedException(); }
+	virtual EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called after a module is loaded
 	 * @param u The user loading the module, can be NULL
 	 * @param m The module
 	 */
-	virtual void OnModuleLoad(User *u, Module *m) { throw NotImplementedException(); }
+	virtual void OnModuleLoad(User *u, Module *m) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called before a module is unloaded
 	 * @param u The user, can be NULL
 	 * @param m The module
 	 */
-	virtual void OnModuleUnload(User *u, Module *m) { throw NotImplementedException(); }
+	virtual void OnModuleUnload(User *u, Module *m) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a server is synced
 	 * @param s The server, can be our uplink server
 	 */
-	virtual void OnServerSync(Server *s) { throw NotImplementedException(); }
+	virtual void OnServerSync(Server *s) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when we sync with our uplink
 	 * @param s Our uplink
 	 */
-	virtual void OnUplinkSync(Server *s) { throw NotImplementedException(); }
+	virtual void OnUplinkSync(Server *s) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when we receive a PRIVMSG for one of our clients
 	 * @param u The user sending the PRIVMSG
@@ -952,7 +952,7 @@ public:
 	 * @param tags Message tags
 	 * @return EVENT_STOP to halt processing
 	 */
-	virtual EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) { throw NotImplementedException(); }
+	virtual EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when we receive a NOTICE for one of our clients
 	 * @param u The user sending the NOTICE
@@ -960,7 +960,7 @@ public:
 	 * @param tags Message tags
 	 * @param message The message
 	 */
-	virtual void OnBotNotice(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) { throw NotImplementedException(); }
+	virtual void OnBotNotice(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when we receive a PRIVMSG for a registered channel we are in
 	 * @param u The source of the message
@@ -968,12 +968,12 @@ public:
 	 * @param msg The message
 	 * @param tags Message tags
 	 */
-	virtual void OnPrivmsg(User *u, Channel *c, Anope::string &msg, const Anope::map<Anope::string> &tags) { throw NotImplementedException(); }
+	virtual void OnPrivmsg(User *u, Channel *c, Anope::string &msg, const Anope::map<Anope::string> &tags) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a message is logged
 	 * @param l The log message
 	 */
-	virtual void OnLog(Log *l) { throw NotImplementedException(); }
+	virtual void OnLog(Log *l) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a log message is actually logged to a given log info
 	 * The message has already passed validation checks by the LogInfo
@@ -981,13 +981,13 @@ public:
 	 * @param l The log message
 	 * @param msg The final formatted message, derived from 'l'
 	 */
-	virtual void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) { throw NotImplementedException(); }
+	virtual void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a DNS request (question) is received.
 	 * @param req The dns request
 	 * @param reply The reply that will be sent
 	 */
-	virtual void OnDnsRequest(DNS::Query &req, DNS::Query *reply) { throw NotImplementedException(); }
+	virtual void OnDnsRequest(DNS::Query &req, DNS::Query *reply) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a channels modes are being checked to see if they are allowed,
 	 * mostly to ensure mlock/+r are set.
@@ -1000,7 +1000,7 @@ public:
 	 * for a newly created channel to set the correct modes, topic,
 	 * set.
 	 */
-	virtual void OnChannelSync(Channel *c) { throw NotImplementedException(); }
+	virtual void OnChannelSync(Channel *c) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called to set the correct modes on the user on the given channel
 	 * @param user The user
@@ -1009,13 +1009,13 @@ public:
 	 * @param give_modes If giving modes is desired
 	 * @param take_modes If taking modes is desired
 	 */
-	virtual void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) { throw NotImplementedException(); }
+	virtual void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
-	virtual void OnSerializeCheck(Serialize::Type *) { throw NotImplementedException(); }
-	virtual void OnSerializableConstruct(Serializable *) { throw NotImplementedException(); }
-	virtual void OnSerializableDestruct(Serializable *) { throw NotImplementedException(); }
-	virtual void OnSerializableUpdate(Serializable *) { throw NotImplementedException(); }
-	virtual void OnSerializeTypeCreate(Serialize::Type *) { throw NotImplementedException(); }
+	virtual void OnSerializeCheck(Serialize::Type *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+	virtual void OnSerializableConstruct(Serializable *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+	virtual void OnSerializableDestruct(Serializable *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+	virtual void OnSerializableUpdate(Serializable *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+	virtual void OnSerializeTypeCreate(Serialize::Type *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a chanserv/set command is used
 	 * @param source The source of the command
@@ -1024,7 +1024,7 @@ public:
 	 * @param setting The setting passed to the command. Probably ON/OFF.
 	 * @return EVENT_ALLOW to bypass access checks, EVENT_STOP to halt immediately.
 	 */
-	virtual EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChannelInfo *ci, const Anope::string &setting) { throw NotImplementedException(); }
+	virtual EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChannelInfo *ci, const Anope::string &setting) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
 
 	/** Called when a nickserv/set command is used.
 	 * @param source The source of the command
@@ -1033,7 +1033,7 @@ public:
 	 * @param setting The setting passed to the command. Probably ON/OFF.
 	 * @return EVENT_STOP to halt immediately
 	 */
-	virtual EventReturn OnSetNickOption(CommandSource &source, Command *cmd, NickCore *nc, const Anope::string &setting) { throw NotImplementedException(); }
+	virtual EventReturn OnSetNickOption(CommandSource &source, Command *cmd, NickCore *nc, const Anope::string &setting) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
 
 	/** Called whenever a message is received from the uplink
 	 * @param source The source of the message
@@ -1048,9 +1048,9 @@ public:
 	 * @param u The user
 	 * @param cm The mode
 	 */
-	virtual EventReturn OnCanSet(User *u, const ChannelMode *cm) { throw NotImplementedException(); }
+	virtual EventReturn OnCanSet(User *u, const ChannelMode *cm) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
-	virtual EventReturn OnCheckDelete(Channel *) { throw NotImplementedException(); }
+	virtual EventReturn OnCheckDelete(Channel *c)  ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called every options:expiretimeout seconds. Should be used to expire nicks,
 	 * channels, etc.
@@ -1063,7 +1063,7 @@ public:
 	 * @param na The nick they are on
 	 * @return EVENT_STOP to force the user off of the nick
 	 */
-	virtual EventReturn OnNickValidate(User *u, NickAlias *na) { throw NotImplementedException(); }
+	virtual EventReturn OnNickValidate(User *u, NickAlias *na) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 };
 
 enum Implementation

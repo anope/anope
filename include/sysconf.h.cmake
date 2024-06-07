@@ -51,6 +51,8 @@
 
 #if defined __GNUC__
 # define ATTR_FORMAT(STRINGPOS, FIRSTPOS) __attribute__((format(printf, STRINGPOS, FIRSTPOS)))
+# define ATTR_NOT_NULL(...) __attribute__((nonnull(__VA_ARGS__)))
 #else
 # define ATTR_FORMAT(STRINGPOS, FIRSTPOS)
+# define ATTR_NOT_NULL(...)
 #endif

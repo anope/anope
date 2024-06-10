@@ -324,7 +324,7 @@ public:
 	 * @param ci The channel the bot is being removed from
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the unassign.
 	 */
-	virtual EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
+	virtual EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a new user connects to the network.
 	 * @param u The connecting user.

@@ -740,7 +740,7 @@ public:
 	 * @param The nick
 	 * @param pass The password of the newly registered nick
 	 */
-	virtual void OnNickRegister(User *user, NickAlias *na, const Anope::string &pass) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
+	virtual void OnNickRegister(User *user, NickAlias *na, const Anope::string &pass) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a nick is confirmed. This will never be called if registration confirmation is not enabled.
 	 * @param user The user confirming the nick

@@ -418,7 +418,7 @@ public:
 
 	void OnNickRegister(User *u, NickAlias *na, const Anope::string &pass) override
 	{
-		if (!Config->GetModule(this)->Get<bool>("automatic", "yes") || u->fingerprint.empty())
+		if (!Config->GetModule(this)->Get<bool>("automatic", "yes") || !u || u->fingerprint.empty())
 			return;
 
 		auto *cl = certs.Require(na->nc);

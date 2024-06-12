@@ -532,7 +532,7 @@ public:
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
-		if (command->name == "nickserv/info" && params.size() > 0)
+		if (command->name == "nickserv/info" && !params.empty() && params[0][0] != '=')
 		{
 			ForbidData *d = this->forbidService.FindForbid(params[0], FT_NICK);
 			if (d != NULL)

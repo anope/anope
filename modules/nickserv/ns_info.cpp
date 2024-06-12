@@ -24,8 +24,35 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		Anope::string nick;
+		if (params.empty())
+		{
+			// Use the display of the source if logged in; otherwise, use their nick.
+			nick = source.nc ? source.nc->na->nick : source.GetNick();
+		}
+		else if (params[0][0] == '=' && params[0].length() > 1)
+		{
+			// Look up the account of the specified user.
+			nick = params[0].substr(1);
+			auto *u = User::Find(nick);
+			if (!u)
+			{
+				source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+				return;
+			}
+			if (!u->AccountNick())
+			{
+				source.Reply("User \002%s\002 isn't currently logged in to an account.", nick.c_str());
+				return;
+			}
+			nick = u->AccountNick()->nick;
+		}
+		else
+		{
+			// Just use the nick the user specified.
+			nick = params[0];
+		}
 
-		const Anope::string &nick = params.size() ? params[0] : (source.nc ? source.nc->display : source.GetNick());
 		NickAlias *na = NickAlias::Find(nick);
 		bool has_auspex = source.HasPriv("nickserv/auspex");
 

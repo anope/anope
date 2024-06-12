@@ -42,7 +42,7 @@ public:
 			}
 			if (!u->AccountNick())
 			{
-				source.Reply("User \002%s\002 isn't currently logged in to an account.", nick.c_str());
+				source.Reply(_("User \002%s\002 isn't currently logged in to an account."), nick.c_str());
 				return;
 			}
 			nick = u->AccountNick()->nick;

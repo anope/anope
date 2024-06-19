@@ -37,7 +37,7 @@ private:
 		}
 		else
 		{
-			if (Anope::CurTime - Config->GetBlock("options")->Get<time_t>("updatetimeout", "5m") > lastwarn)
+			if (Anope::CurTime - Config->GetBlock("options")->Get<time_t>("updatetimeout", "2m") > lastwarn)
 			{
 				Log() << "Unable to locate SQL reference, going to readonly...";
 				Anope::ReadOnly = this->ro = true;

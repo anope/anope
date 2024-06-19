@@ -687,7 +687,7 @@ private:
 	bool HandleDBV(AthemeRow &row)
 	{
 		// DBV <version>
-		unsigned version = row.GetNum<unsigned>();
+		auto version = row.GetNum<unsigned>();
 		if (version != 12)
 		{
 			Log(this) << "Database is version " << version << " which is not supported!";
@@ -699,7 +699,7 @@ private:
 	bool HandleGRVER(AthemeRow &row)
 	{
 		// GRVER <version>
-		unsigned version = row.GetNum<unsigned>();
+		auto version = row.GetNum<unsigned>();
 		if (version != 1)
 		{
 			Log(this) << "Database grammar is version " << version << " which is not supported!";

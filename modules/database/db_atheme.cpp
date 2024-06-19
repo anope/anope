@@ -20,6 +20,7 @@
 #include "modules/info.h"
 #include "modules/ns_cert.h"
 #include "modules/os_forbid.h"
+#include "modules/os_oper.h"
 #include "modules/os_session.h"
 #include "modules/suspend.h"
 
@@ -202,7 +203,7 @@ private:
 		{ "RR",         &DBAtheme::HandleIgnore    },
 		{ "RW",         &DBAtheme::HandleIgnore    },
 		{ "SI",         &DBAtheme::HandleIgnore    },
-		{ "SO",         &DBAtheme::HandleIgnore    },
+		{ "SO",         &DBAtheme::HandleSO        },
 		{ "TS",         &DBAtheme::HandleIgnore    },
 		{ "XID",        &DBAtheme::HandleIgnore    },
 		{ "XL",         &DBAtheme::HandleXL        },
@@ -1325,6 +1326,43 @@ private:
 
 		auto *xl = new XLine(nick, setby, settime + duration, reason);
 		sqlinemgr->AddXLine(xl);
+		return true;
+	}
+
+	bool HandleSO(AthemeRow &row)
+	{
+		// SO <display> <type> <flags>
+		auto display = row.Get();
+		auto type = row.Get();
+		auto flags = row.Get();
+
+		if (!row)
+			return row.LogError(this);
+
+		auto *nc = NickCore::Find(display);
+		if (!nc)
+		{
+			Log(this) << "Missing NickCore for SO: " << display;
+			return false;
+		}
+
+		auto ot = OperType::Find(type);
+		if (!ot)
+		{
+			// Attempt to convert oper types.
+			if (type == "sra")
+				ot = OperType::Find("Services Root");
+			else if (type == "ircop")
+				ot = OperType::Find("Services Operator");
+		}
+
+		if (!ot)
+		{
+			Log(this) << "Unable to convert operator status for " << nc->display << " as there is no equivalent oper type: " << type;
+			return true;
+		}
+
+		nc->o = new MyOper(nc->display, ot);
 		return true;
 	}
 

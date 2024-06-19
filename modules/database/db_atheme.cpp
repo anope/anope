@@ -1420,7 +1420,7 @@ public:
 				auto mh = ModeManager::FindChannelModeByName(mlock.name);
 				if (!mh)
 				{
-					Log(this) << "Unable to find mode while importing mode lock: " << mlock.name;
+					Log(this) << "Unable to find mode while importing mode lock on " << ci->name << ": " << mlock.name;
 					continue;
 				}
 

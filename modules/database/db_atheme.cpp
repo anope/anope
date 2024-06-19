@@ -1427,6 +1427,7 @@ public:
 				ml->SetMLock(mh, mlock.set, mlock.value, "Unknown");
 			}
 		}
+		Anope::SaveDatabases();
 	}
 };
 

@@ -1342,6 +1342,7 @@ public:
 			if (ci->c)
 				ci->c->CheckModes();
 		}
+		Anope::SaveDatabases();
 	}
 };
 

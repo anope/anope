@@ -97,6 +97,7 @@ struct ModeData final
 
 struct ChannelData final
 {
+	Anope::unordered_map<AutoKick *> akicks;
 	Anope::string bot;
 	Anope::string info_adder;
 	Anope::string info_message;
@@ -583,10 +584,11 @@ private:
 		auto *nc = NickCore::Find(mask);
 		if (flags.find('b') != Anope::string::npos)
 		{
+			auto *data = chandata.Require(ci);
 			if (nc)
-				ci->AddAkick(setter, nc, "", modifiedtime, modifiedtime);
+				data->akicks[mask] = ci->AddAkick(setter, nc, "", modifiedtime, modifiedtime);
 			else
-				ci->AddAkick(setter, mask, "", modifiedtime, modifiedtime);
+				data->akicks[mask] = ci->AddAkick(setter, mask, "", modifiedtime, modifiedtime);
 			return true;
 		}
 
@@ -822,7 +824,7 @@ private:
 	bool HandleMDA(AthemeRow &row)
 	{
 		// MDA <channel> <account/mask> <key> <value>
-		auto display = row.Get();
+		auto channel = row.Get();
 		auto mask = row.Get();
 		auto key = row.Get();
 		auto value = row.GetRemaining();
@@ -830,7 +832,23 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		Log(this) << "Unknown channel access metadata " << key << " = " << value;
+		auto *ci = ChannelInfo::Find(channel);
+		if (!ci)
+		{
+			Log(this) << "Missing ChannelInfo for MDA: " << channel;
+			return false;
+		}
+
+		if (key == "reason")
+		{
+			auto *data = chandata.Require(ci);
+			auto akick = data->akicks.find(mask);
+			if (akick != data->akicks.end())
+				akick->second->reason = value;
+		}
+		else
+			Log(this) << "Unknown channel access metadata " << key << " = " << value;
+
 		return true;
 	}
 

@@ -142,7 +142,6 @@ private:
 	ServiceReference<AccessProvider> accessprov;
 	PrimitiveExtensibleItem<ChannelData> chandata;
 	std::map<Anope::string, char> flags;
-	ServiceReference<ForbidService> forbidsvc;
 	PrimitiveExtensibleItem<UserData> userdata;
 	ServiceReference<XLineManager> sglinemgr;
 	ServiceReference<XLineManager> snlinemgr;
@@ -498,19 +497,19 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		if (!forbidsvc)
+		if (!forbid_service)
 		{
 			Log(this) << "Unable to convert forbidden email " << email << " as os_forbid is not loaded";
 			return true;
 		}
 
-		auto *forbid = forbidsvc->CreateForbid();
+		auto *forbid = forbid_service->CreateForbid();
 		forbid->created = created;
 		forbid->creator = creator;
 		forbid->mask = email;
 		forbid->reason = reason;
 		forbid->type = FT_EMAIL;
-		forbidsvc->AddForbid(forbid);
+		forbid_service->AddForbid(forbid);
 		return true;
 	}
 
@@ -984,13 +983,13 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		if (!forbidsvc)
+		if (!forbid_service)
 		{
 			Log(this) << "Unable to convert forbidden nick " << nick << " metadata as os_forbid is not loaded";
 			return true;
 		}
 
-		auto *forbid = forbidsvc->FindForbidExact(nick, FT_NICK);
+		auto *forbid = forbid_service->FindForbidExact(nick, FT_NICK);
 		if (!forbid)
 		{
 			Log(this) << "Missing forbid for MDN: " << nick;
@@ -1290,18 +1289,18 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		if (!forbidsvc)
+		if (!forbid_service)
 		{
 			Log(this) << "Unable to convert forbidden nick " << nick << " as os_forbid is not loaded";
 			return true;
 		}
 
-		auto *forbid = forbidsvc->CreateForbid();
+		auto *forbid = forbid_service->CreateForbid();
 		forbid->creator = "Unknown";
 		forbid->mask = nick;
 		forbid->reason = "Unknown";
 		forbid->type = FT_NICK;
-		forbidsvc->AddForbid(forbid);
+		forbid_service->AddForbid(forbid);
 		return true;
 	}
 
@@ -1395,7 +1394,6 @@ public:
 		: Module(modname, creator, DATABASE | VENDOR)
 		, accessprov("AccessProvider", "access/flags")
 		, chandata(this, "ATHEME_CHANDATA")
-		, forbidsvc("ForbidService", "forbid")
 		, userdata(this, "ATHEME_USERDATA")
 		, sglinemgr("XLineManager","xlinemanager/sgline")
 		, snlinemgr("XLineManager","xlinemanager/snline")

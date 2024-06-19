@@ -635,7 +635,7 @@ private:
 		}
 
 		if (flags != "+")
-			Log(this) << "Unable to convert channel access flags " << flags << " for " << ci->name;
+			Log(this) << "Unable to convert channel access flags " << flags << " for " << mask << " on " << ci->name;
 
 		return true;
 	}
@@ -768,6 +768,12 @@ private:
 	bool HandleIgnore(AthemeRow &row)
 	{
 		Log(LOG_DEBUG_3) << "Intentionally ignoring Atheme database row: " << row.GetRow();
+		return true;
+	}
+
+	bool HandleIgnoreMetadata(const Anope::string &target, const Anope::string &key, const Anope::string &value)
+	{
+		Log(LOG_DEBUG_3) << "Intentionally ignoring Atheme database metadata for " << target << ": " << key << " = " << value;
 		return true;
 	}
 
@@ -927,6 +933,8 @@ private:
 			ci->Extend<bool>("BS_FANTASY");
 		else if (key == "private:botserv:no-bot")
 			ci->Extend<bool>("BS_NOBOT");
+		else if (key == "private:channelts")
+			return HandleIgnoreMetadata(ci->name, key, value);
 		else if (key == "private:close:closer")
 			data->suspend_by = value;
 		else if (key == "private:close:reason")
@@ -961,6 +969,8 @@ private:
 			data->info_adder = value;
 		else if (key == "private:mark:timestamp")
 			data->info_ts = Anope::Convert<time_t>(value, 0);
+		else if (key == "private:templates")
+			return HandleIgnoreMetadata(ci->name, key, value);
 		else if (key == "private:topic:setter")
 			ci->last_topic_setter = value;
 		else if (key == "private:topic:text")
@@ -1056,6 +1066,12 @@ private:
 			data->last_mask = value;
 		else if (key == "private:lastquit:message")
 			data->last_quit = value;
+		else if (key == "private:loginfail:failnum")
+			return HandleIgnoreMetadata(nc->display, key, value);
+		else if (key == "private:loginfail:lastfailaddr")
+			return HandleIgnoreMetadata(nc->display, key, value);
+		else if (key == "private:loginfail:lastfailtime")
+			return HandleIgnoreMetadata(nc->display, key, value);
 		else if (key == "private:mark:reason")
 			data->info_message = value;
 		else if (key == "private:mark:setter")

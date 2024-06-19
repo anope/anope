@@ -128,6 +128,12 @@ struct UserData final
 	time_t vhost_ts = 0;
 };
 
+namespace
+{
+	// Whether we can safely import clones.
+	bool import_clones = true;
+}
+
 class DBAtheme final
 	: public Module
 {
@@ -142,64 +148,64 @@ private:
 	ServiceReference<XLineManager> sqlinemgr;
 
 	Anope::map<std::function<bool(DBAtheme*,AthemeRow&)>> rowhandlers = {
-		{ "AC",         &DBAtheme::HandleIgnore   },
-		{ "AR",         &DBAtheme::HandleIgnore   },
-		{ "BE",         &DBAtheme::HandleBE       },
-		{ "BLE",        &DBAtheme::HandleIgnore   },
-		{ "BOT",        &DBAtheme::HandleBOT      },
-		{ "BOT-COUNT",  &DBAtheme::HandleIgnore   },
-		{ "BW",         &DBAtheme::HandleBW       },
-		{ "CA",         &DBAtheme::HandleCA       },
-		{ "CF",         &DBAtheme::HandleIgnore   },
-		{ "CFCHAN",     &DBAtheme::HandleIgnore   },
-		{ "CFDBV",      &DBAtheme::HandleIgnore   },
-		{ "CFMD",       &DBAtheme::HandleIgnore   },
-		{ "CFOP",       &DBAtheme::HandleIgnore   },
-		{ "CLONES-CD",  &DBAtheme::HandleIgnore   },
-		{ "CLONES-CK",  &DBAtheme::HandleIgnore   },
-		{ "CLONES-DBV", &DBAtheme::HandleIgnore   },
-		{ "CLONES-EX",  &DBAtheme::HandleCLONESEX },
-		{ "CLONES-GR",  &DBAtheme::HandleIgnore   },
-		{ "CSREQ",      &DBAtheme::HandleIgnore   },
-		{ "CSREQ",      &DBAtheme::HandleIgnore   },
-		{ "DBV",        &DBAtheme::HandleDBV      },
-		{ "GACL",       &DBAtheme::HandleIgnore   },
-		{ "GDBV",       &DBAtheme::HandleIgnore   },
-		{ "GE",         &DBAtheme::HandleIgnore   },
-		{ "GFA",        &DBAtheme::HandleIgnore   },
-		{ "GRP",        &DBAtheme::HandleIgnore   },
-		{ "GRVER",      &DBAtheme::HandleGRVER    },
-		{ "HE",         &DBAtheme::HandleIgnore   },
-		{ "HO",         &DBAtheme::HandleIgnore   },
-		{ "HR",         &DBAtheme::HandleHR       },
-		{ "JM",         &DBAtheme::HandleIgnore   },
-		{ "KID",        &DBAtheme::HandleIgnore   },
-		{ "KL",         &DBAtheme::HandleKL       },
-		{ "LUID",       &DBAtheme::HandleIgnore   },
-		{ "MC",         &DBAtheme::HandleMC       },
-		{ "MCFP",       &DBAtheme::HandleMCFP     },
-		{ "MDA",        &DBAtheme::HandleMDA      },
-		{ "MDC",        &DBAtheme::HandleMDC      },
-		{ "MDEP",       &DBAtheme::HandleIgnore   },
-		{ "MDG",        &DBAtheme::HandleIgnore   },
-		{ "MDN",        &DBAtheme::HandleMDN      },
-		{ "MDU",        &DBAtheme::HandleMDU      },
-		{ "ME",         &DBAtheme::HandleME       },
-		{ "MI",         &DBAtheme::HandleMI       },
-		{ "MM",         &DBAtheme::HandleMM       },
-		{ "MN",         &DBAtheme::HandleMN       },
-		{ "MU",         &DBAtheme::HandleMU       },
-		{ "NAM",        &DBAtheme::HandleNAM      },
-		{ "QID",        &DBAtheme::HandleIgnore   },
-		{ "QL",         &DBAtheme::HandleQL       },
-		{ "RM",         &DBAtheme::HandleIgnore   },
-		{ "RR",         &DBAtheme::HandleIgnore   },
-		{ "RW",         &DBAtheme::HandleIgnore   },
-		{ "SI",         &DBAtheme::HandleIgnore   },
-		{ "SO",         &DBAtheme::HandleIgnore   },
-		{ "TS",         &DBAtheme::HandleIgnore   },
-		{ "XID",        &DBAtheme::HandleIgnore   },
-		{ "XL",         &DBAtheme::HandleXL       },
+		{ "AC",         &DBAtheme::HandleIgnore    },
+		{ "AR",         &DBAtheme::HandleIgnore    },
+		{ "BE",         &DBAtheme::HandleBE        },
+		{ "BLE",        &DBAtheme::HandleIgnore    },
+		{ "BOT",        &DBAtheme::HandleBOT       },
+		{ "BOT-COUNT",  &DBAtheme::HandleIgnore    },
+		{ "BW",         &DBAtheme::HandleBW        },
+		{ "CA",         &DBAtheme::HandleCA        },
+		{ "CF",         &DBAtheme::HandleIgnore    },
+		{ "CFCHAN",     &DBAtheme::HandleIgnore    },
+		{ "CFDBV",      &DBAtheme::HandleIgnore    },
+		{ "CFMD",       &DBAtheme::HandleIgnore    },
+		{ "CFOP",       &DBAtheme::HandleIgnore    },
+		{ "CLONES-CD",  &DBAtheme::HandleIgnore    },
+		{ "CLONES-CK",  &DBAtheme::HandleIgnore    },
+		{ "CLONES-DBV", &DBAtheme::HandleCLONESDBV },
+		{ "CLONES-EX",  &DBAtheme::HandleCLONESEX  },
+		{ "CLONES-GR",  &DBAtheme::HandleIgnore    },
+		{ "CSREQ",      &DBAtheme::HandleIgnore    },
+		{ "CSREQ",      &DBAtheme::HandleIgnore    },
+		{ "DBV",        &DBAtheme::HandleDBV       },
+		{ "GACL",       &DBAtheme::HandleIgnore    },
+		{ "GDBV",       &DBAtheme::HandleIgnore    },
+		{ "GE",         &DBAtheme::HandleIgnore    },
+		{ "GFA",        &DBAtheme::HandleIgnore    },
+		{ "GRP",        &DBAtheme::HandleIgnore    },
+		{ "GRVER",      &DBAtheme::HandleGRVER     },
+		{ "HE",         &DBAtheme::HandleIgnore    },
+		{ "HO",         &DBAtheme::HandleIgnore    },
+		{ "HR",         &DBAtheme::HandleHR        },
+		{ "JM",         &DBAtheme::HandleIgnore    },
+		{ "KID",        &DBAtheme::HandleIgnore    },
+		{ "KL",         &DBAtheme::HandleKL        },
+		{ "LUID",       &DBAtheme::HandleIgnore    },
+		{ "MC",         &DBAtheme::HandleMC        },
+		{ "MCFP",       &DBAtheme::HandleMCFP      },
+		{ "MDA",        &DBAtheme::HandleMDA       },
+		{ "MDC",        &DBAtheme::HandleMDC       },
+		{ "MDEP",       &DBAtheme::HandleIgnore    },
+		{ "MDG",        &DBAtheme::HandleIgnore    },
+		{ "MDN",        &DBAtheme::HandleMDN       },
+		{ "MDU",        &DBAtheme::HandleMDU       },
+		{ "ME",         &DBAtheme::HandleME        },
+		{ "MI",         &DBAtheme::HandleMI        },
+		{ "MM",         &DBAtheme::HandleMM        },
+		{ "MN",         &DBAtheme::HandleMN        },
+		{ "MU",         &DBAtheme::HandleMU        },
+		{ "NAM",        &DBAtheme::HandleNAM       },
+		{ "QID",        &DBAtheme::HandleIgnore    },
+		{ "QL",         &DBAtheme::HandleQL        },
+		{ "RM",         &DBAtheme::HandleIgnore    },
+		{ "RR",         &DBAtheme::HandleIgnore    },
+		{ "RW",         &DBAtheme::HandleIgnore    },
+		{ "SI",         &DBAtheme::HandleIgnore    },
+		{ "SO",         &DBAtheme::HandleIgnore    },
+		{ "TS",         &DBAtheme::HandleIgnore    },
+		{ "XID",        &DBAtheme::HandleIgnore    },
+		{ "XL",         &DBAtheme::HandleXL        },
 	};
 
 	void ApplyAccess(Anope::string &in, char flag, Anope::string &out, std::initializer_list<const char*> privs)
@@ -634,8 +640,23 @@ private:
 		return true;
 	}
 
+	bool HandleCLONESDBV(AthemeRow &row)
+	{
+		// CLONES-DBV <version>
+		auto version = row.GetNum<unsigned>();
+		if (version != 3)
+		{
+			Log(this) << "Clones database is version " << version << " which is not supported!";
+			import_clones = false;
+		}
+		return true;
+	}
+
 	bool HandleCLONESEX(AthemeRow &row)
 	{
+		if (!import_clones)
+			return HandleIgnore(row);
+
 		// CLONES-EX <ip> <allowed> <warn> <expires> <reason>
 		auto ip = row.Get();
 		auto allowed = row.GetNum<unsigned>();

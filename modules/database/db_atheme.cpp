@@ -924,15 +924,35 @@ private:
 
 	bool HandleMDN(AthemeRow &row)
 	{
-		// MDN <display> <key> <value>
-		auto display = row.Get();
+		// MDN <nick> <key> <value>
+		auto nick = row.Get();
 		auto key = row.Get();
 		auto value = row.GetRemaining();
 
 		if (!row)
 			return row.LogError(this);
 
-		Log(this) << "Unknown nick metadata " << key << " = " << value;
+		if (!forbidsvc)
+		{
+			Log(this) << "Unable to convert forbidden nick " << nick << " metadata as os_forbid is not loaded";
+			return true;
+		}
+
+		auto *forbid = forbidsvc->FindForbidExact(nick, FT_NICK);
+		if (!forbid)
+		{
+			Log(this) << "Missing forbid for MDN: " << nick;
+			return false;
+		}
+
+		if (key == "private:mark:reason")
+			forbid->reason = value;
+		else if (key == "private:mark:setter")
+			forbid->creator = value;
+		else if (key == "private:mark:timestamp")
+			forbid->created = Anope::Convert<time_t>(value, 0);
+		else
+			Log(this) << "Unknown forbidden nick metadata " << key << " = " << value;
 		return true;
 	}
 

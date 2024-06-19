@@ -20,6 +20,7 @@
 #include "modules/info.h"
 #include "modules/ns_cert.h"
 #include "modules/os_forbid.h"
+#include "modules/os_session.h"
 #include "modules/suspend.h"
 
 // Handles reading from an Atheme database row.
@@ -141,64 +142,64 @@ private:
 	ServiceReference<XLineManager> sqlinemgr;
 
 	Anope::map<std::function<bool(DBAtheme*,AthemeRow&)>> rowhandlers = {
-		{ "AC",         &DBAtheme::HandleIgnore },
-		{ "AR",         &DBAtheme::HandleIgnore },
-		{ "BE",         &DBAtheme::HandleBE     },
-		{ "BLE",        &DBAtheme::HandleIgnore },
-		{ "BOT",        &DBAtheme::HandleBOT    },
-		{ "BOT-COUNT",  &DBAtheme::HandleIgnore },
-		{ "BW",         &DBAtheme::HandleBW     },
-		{ "CA",         &DBAtheme::HandleCA     },
-		{ "CF",         &DBAtheme::HandleIgnore },
-		{ "CFCHAN",     &DBAtheme::HandleIgnore },
-		{ "CFDBV",      &DBAtheme::HandleIgnore },
-		{ "CFMD",       &DBAtheme::HandleIgnore },
-		{ "CFOP",       &DBAtheme::HandleIgnore },
-		{ "CLONES-CD",  &DBAtheme::HandleIgnore },
-		{ "CLONES-CK",  &DBAtheme::HandleIgnore },
-		{ "CLONES-DBV", &DBAtheme::HandleIgnore },
-		{ "CLONES-EX",  &DBAtheme::HandleIgnore },
-		{ "CLONES-GR",  &DBAtheme::HandleIgnore },
-		{ "CSREQ",      &DBAtheme::HandleIgnore },
-		{ "CSREQ",      &DBAtheme::HandleIgnore },
-		{ "DBV",        &DBAtheme::HandleDBV    },
-		{ "GACL",       &DBAtheme::HandleIgnore },
-		{ "GDBV",       &DBAtheme::HandleIgnore },
-		{ "GE",         &DBAtheme::HandleIgnore },
-		{ "GFA",        &DBAtheme::HandleIgnore },
-		{ "GRP",        &DBAtheme::HandleIgnore },
-		{ "GRVER",      &DBAtheme::HandleGRVER  },
-		{ "HE",         &DBAtheme::HandleIgnore },
-		{ "HO",         &DBAtheme::HandleIgnore },
-		{ "HR",         &DBAtheme::HandleHR     },
-		{ "JM",         &DBAtheme::HandleIgnore },
-		{ "KID",        &DBAtheme::HandleIgnore },
-		{ "KL",         &DBAtheme::HandleKL     },
-		{ "LUID",       &DBAtheme::HandleIgnore },
-		{ "MC",         &DBAtheme::HandleMC     },
-		{ "MCFP",       &DBAtheme::HandleMCFP   },
-		{ "MDA",        &DBAtheme::HandleMDA    },
-		{ "MDC",        &DBAtheme::HandleMDC    },
-		{ "MDEP",       &DBAtheme::HandleIgnore },
-		{ "MDG",        &DBAtheme::HandleIgnore },
-		{ "MDN",        &DBAtheme::HandleMDN    },
-		{ "MDU",        &DBAtheme::HandleMDU    },
-		{ "ME",         &DBAtheme::HandleME     },
-		{ "MI",         &DBAtheme::HandleMI     },
-		{ "MM",         &DBAtheme::HandleMM     },
-		{ "MN",         &DBAtheme::HandleMN     },
-		{ "MU",         &DBAtheme::HandleMU     },
-		{ "NAM",        &DBAtheme::HandleNAM    },
-		{ "QID",        &DBAtheme::HandleIgnore },
-		{ "QL",         &DBAtheme::HandleQL     },
-		{ "RM",         &DBAtheme::HandleIgnore },
-		{ "RR",         &DBAtheme::HandleIgnore },
-		{ "RW",         &DBAtheme::HandleIgnore },
-		{ "SI",         &DBAtheme::HandleIgnore },
-		{ "SO",         &DBAtheme::HandleIgnore },
-		{ "TS",         &DBAtheme::HandleIgnore },
-		{ "XID",        &DBAtheme::HandleIgnore },
-		{ "XL",         &DBAtheme::HandleXL     },
+		{ "AC",         &DBAtheme::HandleIgnore   },
+		{ "AR",         &DBAtheme::HandleIgnore   },
+		{ "BE",         &DBAtheme::HandleBE       },
+		{ "BLE",        &DBAtheme::HandleIgnore   },
+		{ "BOT",        &DBAtheme::HandleBOT      },
+		{ "BOT-COUNT",  &DBAtheme::HandleIgnore   },
+		{ "BW",         &DBAtheme::HandleBW       },
+		{ "CA",         &DBAtheme::HandleCA       },
+		{ "CF",         &DBAtheme::HandleIgnore   },
+		{ "CFCHAN",     &DBAtheme::HandleIgnore   },
+		{ "CFDBV",      &DBAtheme::HandleIgnore   },
+		{ "CFMD",       &DBAtheme::HandleIgnore   },
+		{ "CFOP",       &DBAtheme::HandleIgnore   },
+		{ "CLONES-CD",  &DBAtheme::HandleIgnore   },
+		{ "CLONES-CK",  &DBAtheme::HandleIgnore   },
+		{ "CLONES-DBV", &DBAtheme::HandleIgnore   },
+		{ "CLONES-EX",  &DBAtheme::HandleCLONESEX },
+		{ "CLONES-GR",  &DBAtheme::HandleIgnore   },
+		{ "CSREQ",      &DBAtheme::HandleIgnore   },
+		{ "CSREQ",      &DBAtheme::HandleIgnore   },
+		{ "DBV",        &DBAtheme::HandleDBV      },
+		{ "GACL",       &DBAtheme::HandleIgnore   },
+		{ "GDBV",       &DBAtheme::HandleIgnore   },
+		{ "GE",         &DBAtheme::HandleIgnore   },
+		{ "GFA",        &DBAtheme::HandleIgnore   },
+		{ "GRP",        &DBAtheme::HandleIgnore   },
+		{ "GRVER",      &DBAtheme::HandleGRVER    },
+		{ "HE",         &DBAtheme::HandleIgnore   },
+		{ "HO",         &DBAtheme::HandleIgnore   },
+		{ "HR",         &DBAtheme::HandleHR       },
+		{ "JM",         &DBAtheme::HandleIgnore   },
+		{ "KID",        &DBAtheme::HandleIgnore   },
+		{ "KL",         &DBAtheme::HandleKL       },
+		{ "LUID",       &DBAtheme::HandleIgnore   },
+		{ "MC",         &DBAtheme::HandleMC       },
+		{ "MCFP",       &DBAtheme::HandleMCFP     },
+		{ "MDA",        &DBAtheme::HandleMDA      },
+		{ "MDC",        &DBAtheme::HandleMDC      },
+		{ "MDEP",       &DBAtheme::HandleIgnore   },
+		{ "MDG",        &DBAtheme::HandleIgnore   },
+		{ "MDN",        &DBAtheme::HandleMDN      },
+		{ "MDU",        &DBAtheme::HandleMDU      },
+		{ "ME",         &DBAtheme::HandleME       },
+		{ "MI",         &DBAtheme::HandleMI       },
+		{ "MM",         &DBAtheme::HandleMM       },
+		{ "MN",         &DBAtheme::HandleMN       },
+		{ "MU",         &DBAtheme::HandleMU       },
+		{ "NAM",        &DBAtheme::HandleNAM      },
+		{ "QID",        &DBAtheme::HandleIgnore   },
+		{ "QL",         &DBAtheme::HandleQL       },
+		{ "RM",         &DBAtheme::HandleIgnore   },
+		{ "RR",         &DBAtheme::HandleIgnore   },
+		{ "RW",         &DBAtheme::HandleIgnore   },
+		{ "SI",         &DBAtheme::HandleIgnore   },
+		{ "SO",         &DBAtheme::HandleIgnore   },
+		{ "TS",         &DBAtheme::HandleIgnore   },
+		{ "XID",        &DBAtheme::HandleIgnore   },
+		{ "XL",         &DBAtheme::HandleXL       },
 	};
 
 	void ApplyAccess(Anope::string &in, char flag, Anope::string &out, std::initializer_list<const char*> privs)
@@ -630,6 +631,35 @@ private:
 		if (flags != "+")
 			Log(this) << "Unable to convert channel access flags " << flags << " for " << ci->name;
 
+		return true;
+	}
+
+	bool HandleCLONESEX(AthemeRow &row)
+	{
+		// CLONES-EX <ip> <allowed> <warn> <expires> <reason>
+		auto ip = row.Get();
+		auto allowed = row.GetNum<unsigned>();
+		/* auto warn = */ row.GetNum<unsigned>();
+		auto expires = row.GetNum<time_t>();
+		auto reason = row.GetRemaining();
+
+		if (!row)
+			return row.LogError(this);
+
+		if (!session_service)
+		{
+			Log(this) << "Unable to import session limit for " << ip << " as os_session is not loaded";
+			return true;
+		}
+
+		auto *exception = session_service->CreateException();
+		exception->mask = ip;
+		exception->limit = allowed;
+		exception->who = "Unknown";
+		exception->time = Anope::CurTime;
+		exception->expires = expires;
+		exception->reason = reason;
+		session_service->AddException(exception);
 		return true;
 	}
 

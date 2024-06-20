@@ -85,15 +85,33 @@ public:
 
 struct ModeData final
 {
+	char letter;
 	Anope::string name;
 	Anope::string value;
 	bool set;
 
 	ModeData(const Anope::string &n, bool s, const Anope::string &v = "")
-		: name(n)
+		: letter(0)
+		, name(n)
 		, value(v)
 		, set(s)
 	{
+	}
+
+	ModeData(char l, const Anope::string &v = "")
+		: letter(l)
+		, value(v)
+		, set(true)
+	{
+	}
+
+	Anope::string str() const
+	{
+		std::stringstream buf;
+		buf << '+' << (name.empty() ? letter : name);
+		if (value.empty())
+			buf << ' ' << value;
+		return buf.str();
 	}
 };
 
@@ -969,6 +987,12 @@ private:
 			data->info_adder = value;
 		else if (key == "private:mark:timestamp")
 			data->info_ts = Anope::Convert<time_t>(value, 0);
+		else if (key == "private:mlockext")
+		{
+			spacesepstream mlocks(value);
+			for (Anope::string mlock; mlocks.GetToken(mlock); )
+				data->mlocks.emplace_back(mlock[0], mlock.substr(1));
+		}
 		else if (key == "private:templates")
 			return HandleIgnoreMetadata(ci->name, key, value);
 		else if (key == "private:topic:setter")
@@ -1558,10 +1582,14 @@ public:
 
 			for (const auto &mlock : data->mlocks)
 			{
-				auto mh = ModeManager::FindChannelModeByName(mlock.name);
+				ChannelMode *mh;
+				if (mlock.name.empty())
+					mh = ModeManager::FindChannelModeByChar(mlock.letter);
+				else
+					mh = ModeManager::FindChannelModeByName(mlock.name);
 				if (!mh)
 				{
-					Log(this) << "Unable to find mode while importing mode lock on " << ci->name << ": " << mlock.name;
+					Log(this) << "Unable to find mode while importing mode lock on " << ci->name << ": " << mlock.str();
 					continue;
 				}
 

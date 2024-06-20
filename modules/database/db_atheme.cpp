@@ -429,6 +429,9 @@ private:
 			return;
 		}
 
+		// We are processing an encrypted password.
+		flags.erase(pos, 1);
+
 		// Atheme supports several password hashing methods. We can only import
 		// some of them currently.
 		//
@@ -506,7 +509,7 @@ private:
 
 	bool HandleBE(AthemeRow &row)
 	{
-		// BE <email <created> <creator> <reason>
+		// BE <email> <created> <creator> <reason>
 		auto email = row.Get();
 		auto created = row.GetNum<time_t>();
 		auto creator = row.Get();
@@ -922,7 +925,7 @@ private:
 				akick->second->reason = value;
 		}
 		else
-			Log(this) << "Unknown channel access metadata " << key << " = " << value;
+			Log(this) << "Unknown channel access metadata for " << mask << " on " << ci->name << ": " << key << " = " << value;
 
 		return true;
 	}
@@ -1001,8 +1004,10 @@ private:
 			ci->last_topic = value;
 		else if (key == "private:topic:ts")
 			ci->last_topic_time = Anope::Convert<time_t>(value, 0);
+		else if (key.compare(0, 14, "private:stats:", 14) == 0)
+			return HandleIgnoreMetadata(ci->name, key, value);
 		else
-			Log(this) << "Unknown channel metadata " << key << " = " << value;
+			Log(this) << "Unknown channel metadata for " << ci->name << ": " << key << " = " << value;
 
 		return true;
 	}
@@ -1037,7 +1042,8 @@ private:
 		else if (key == "private:mark:timestamp")
 			forbid->created = Anope::Convert<time_t>(value, 0);
 		else
-			Log(this) << "Unknown forbidden nick metadata " << key << " = " << value;
+			Log(this) << "Unknown forbidden nick metadata for " << forbid->mask << ": " << key << " = " << value;
+
 		return true;
 	}
 
@@ -1102,6 +1108,8 @@ private:
 			data->info_adder = value;
 		else if (key == "private:mark:timestamp")
 			data->info_ts = Anope::Convert<time_t>(value, 0);
+		else if (key == "private:swhois")
+			return HandleIgnoreMetadata(nc->display, key, value);
 		else if (key == "private:usercloak")
 			data->vhost = value;
 		else if (key == "private:usercloak-assigner")
@@ -1111,7 +1119,7 @@ private:
 		else if (key.compare(0, 18, "private:usercloak:", 18) == 0)
 			data->vhost_nick[key.substr(18)] = value;
 		else
-			Log(this) << "Unknown account metadata " << key << " = " << value;
+			Log(this) << "Unknown account metadata for " << nc->display << ": " << key << " = " << value;
 
 		return true;
 	}

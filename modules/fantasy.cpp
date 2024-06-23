@@ -17,7 +17,7 @@ class CommandBSSetFantasy final
 public:
 	CommandBSSetFantasy(Module *creator, const Anope::string &sname = "botserv/set/fantasy") : Command(creator, sname, 2, 2)
 	{
-		this->SetDesc(_("Enable fantaisist commands"));
+		this->SetDesc(_("Enable fantasy commands"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037}"));
 	}
 
@@ -73,9 +73,9 @@ public:
 				"fantasy commands on a channel when prefixed\n"
 				"with one of the following fantasy characters: \002%s\002\n"
 				" \n"
-				"Note that users wanting to use fantaisist\n"
-				"commands MUST have enough access for both\n"
-				"the FANTASIA and the command they are executing."),
+				"Note that users wanting to use fantasy commands\n"
+				"MUST have enough access for both the FANTASY\n"
+				"privilege and the command they are executing."),
 				Config->GetModule(this->owner)->Get<const Anope::string>("fantasycharacter", "!").c_str());
 		return true;
 	}
@@ -186,10 +186,10 @@ public:
 		source.permission = info.permission;
 
 		AccessGroup ag = c->ci->AccessFor(u);
-		bool has_fantasia = ag.HasPriv("FANTASIA") || source.HasPriv("botserv/fantasy");
+		bool has_fantasy = ag.HasPriv("FANTASY") || source.HasPriv("botserv/fantasy");
 
 		EventReturn MOD_RESULT;
-		if (has_fantasia)
+		if (has_fantasy)
 		{
 			FOREACH_RESULT(OnBotFantasy, MOD_RESULT, (source, cmd, c->ci, params));
 		}
@@ -198,7 +198,7 @@ public:
 			FOREACH_RESULT(OnBotNoFantasyAccess, MOD_RESULT, (source, cmd, c->ci, params));
 		}
 
-		if (MOD_RESULT == EVENT_STOP || !has_fantasia)
+		if (MOD_RESULT == EVENT_STOP || !has_fantasy)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !info.permission.empty() && !source.HasCommand(info.permission))

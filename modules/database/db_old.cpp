@@ -252,7 +252,7 @@ static Anope::string GetLevelName(int level)
 		case 15:
 			return "NOKICK";
 		case 16:
-			return "FANTASIA";
+			return "FANTASY";
 		case 17:
 			return "SAY";
 		case 18:

@@ -239,6 +239,10 @@ Serializable *ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		spacesepstream(slevels).GetTokens(v);
 		for (unsigned i = 0; i + 1 < v.size(); i += 2)
 		{
+			// Begin 2.0 database compatibility.
+			if (v[i] == "FANTASIA")
+				v[i] = "FANTASY";
+			// End 2.0 database compatibility.
 			if (auto level = Anope::TryConvert<int16_t>(v[i + 1]))
 				ci->levels[v[i]] = level.value();
 		}

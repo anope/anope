@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-15 15:31+0100\n"
-"PO-Revision-Date: 2024-05-11 18:28+0100\n"
+"POT-Creation-Date: 2024-06-23 18:32+0100\n"
+"PO-Revision-Date: 2024-06-23 16:07+0300\n"
 "Last-Translator: CaPaCuL <capacul@gmail.com>\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.4.4\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -1811,6 +1811,9 @@ msgstr "Hesap"
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "%s hesabı zaten maksimum eşzamanlı oturum açma sayısına (%u) ulaştı."
 
+msgid "Account registered"
+msgstr "Hesap kaydedildi"
+
 msgid "Accounts can not be registered right now. Please try again later."
 msgstr "Hesaplar şu anda kaydedilemiyor. Lütfen daha sonra tekrar deneyiniz."
 
@@ -2282,6 +2285,13 @@ msgid ""
 "message number can be obtained from the output of the QUEUE LIST command.\n"
 "The QUEUE LIST command lists all messages that are currently in the message queue."
 msgstr ""
+"Ağdaki kullanıcılara gönderilecek mesajların sıraya alınmasına izin verir.\n"
+"\n"
+"QUEUE ADD komutu verilen mesajı mesaj kuyruğuna ekler.\n"
+"QUEUE CLEAR komutu mesaj kuyruğunu temizler.\n"
+"QUEUE DEL komutu belirtilen mesajı mesaj kuyruğundan kaldırır.\n"
+"mesaj numarası QUEUE LIST komutunun çıktısından alınabilir.\n"
+"QUEUE LIST komutu, o anda mesaj kuyruğunda bulunan tüm mesajları listeler."
 
 #, c-format
 msgid ""
@@ -2291,6 +2301,11 @@ msgid ""
 "You can either send a message by specifying it as a parameter or provide no\n"
 "parameters to send a previously queued message.\n"
 msgstr ""
+"Bir sunucudaki tüm kullanıcılara mesaj gönderilmesine izin verir. Mesaj\n"
+"%s kullanıcısından gönderilecek.\n"
+"\n"
+"Bir mesajı parametre olarak belirterek gönderebilir veya önceden kuyruğa alınmış\n"
+"bir mesajı göndermek için hiçbir parametre belirtmeyebilirsiniz.\n"
 
 #, c-format
 msgid ""
@@ -2300,6 +2315,11 @@ msgid ""
 "You can either send a message by specifying it as a parameter or provide no\n"
 "parameters to send a previously queued message.\n"
 msgstr ""
+"Ağdaki tüm kullanıcılara mesaj gönderilmesine izin verir. Mesaj\n"
+"%s kullanıcısından gidecek.\n"
+"\n"
+"Bir mesajı parametre olarak belirterek gönderebilir veya daha önce kuyruğa\n"
+"alınmış bir mesajı göndermek için hiçbir parametre belirtmeyebilirsiniz.\n"
 
 #, c-format
 msgid ""
@@ -3066,7 +3086,7 @@ msgid ""
 "or changing nick on the network and tells you when and, depending\n"
 "on channel or user settings, where it was."
 msgstr ""
-"Rumuz'un ağa katıldığı, ayrıldığı veya rumuz değiştirdiği\n"
+"Bu ayar, rumuz'un ağa katıldığı, ayrıldığı veya rumuz değiştirdiği\n"
 "son zamanı kontrol eder ve bunun ne zaman ve kanal veya kullanıcı\n"
 "ayarlarına bağlı olarak nerede olduğunu size bildirir."
 
@@ -3077,7 +3097,7 @@ msgid ""
 "Checks whether the _last_ memo you sent to nick has been read\n"
 "or not. Note that this only works with nicks, not with channels."
 msgstr ""
-"Rumuz'a gönderdiğiniz _son_ memonun okunup okunmadığını kontrol eder\n"
+"Bu ayar, rumuz'a gönderdiğiniz _son_ memonun okunup okunmadığını kontrol eder\n"
 "Bunun kanallarla değil, yalnızca rumuzlarla işe yaradığını unutmayın."
 
 #, c-format
@@ -4328,7 +4348,7 @@ msgid "Level must be between %d and %d inclusive."
 msgstr "Seviye %d ile %d dahil arasında olmalıdır."
 
 msgid "Limit"
-msgstr ""
+msgstr "Limit"
 
 msgid "List all registered nicknames that match a given pattern"
 msgstr "Belirtilen şablonla eşleşen tüm rumuzları listeler"
@@ -4839,7 +4859,7 @@ msgid "Manage your auto join list"
 msgstr "Oto-gir listenizi yönetin"
 
 msgid "Manages your pending message queue."
-msgstr ""
+msgstr "Bekleyen mesaj sıranızı yönetir."
 
 #, c-format
 msgid "Manipulate the %s list"
@@ -4924,7 +4944,7 @@ msgstr "%c modu için eksik parametre."
 
 #, c-format
 msgid "Missing passwords: %zu"
-msgstr ""
+msgstr "Eksik şifreler: %zu"
 
 msgid "Mode"
 msgstr "Mod"
@@ -5122,6 +5142,9 @@ msgstr "%s rumuzu şuan serbest bırakıldı."
 #, c-format
 msgid "Nick %s is now suspended."
 msgstr "%s rumuzu askıya alınmış."
+
+msgid "Nick registered"
+msgstr "Rumuz kaydedildi"
 
 #, c-format
 msgid "Nick too long, max length is %zu characters."
@@ -5362,7 +5385,7 @@ msgstr "Şifreler şu anda değiştirilemez. Lütfen daha sonra tekrar deneyiniz
 
 #, c-format
 msgid "Passwords encrypted with %s: %zu"
-msgstr ""
+msgstr "%s ile şifrelenen şifreler: %zu"
 
 msgid "Peace"
 msgstr "Barış"
@@ -5380,7 +5403,7 @@ msgstr "Kalıcı"
 
 #, c-format
 msgid "Please confirm that you want to drop %s with %s%s DROP %s %s"
-msgstr ""
+msgstr "Lütfen %s rumuzunu droplamak isteğinizi %s%s DROP %s %s ile onaylayın"
 
 msgid "Please contact an Operator to get a vhost assigned to this nick."
 msgstr "Bu rumuza atanan bir vHost almak için lütfen bir operle iletişime geçin."
@@ -7196,7 +7219,7 @@ msgid ""
 "for your nick immediately. You may also wish to SET HIDE it\n"
 "after registering if it isn't the default setting already."
 msgstr ""
-"email parametresi isteğe bağlıdır ve rumuzunuzun e-postasını\n"
+"Bu email parametresi isteğe bağlıdır ve rumuzunuzun e-postasını\n"
 "hemen ayarlayacaktır. Zaten varsayılan ayar değilse, kayıttan sonra\n"
 "bunu SET HIDE yapmak da isteyebilirsiniz."
 
@@ -7922,7 +7945,7 @@ msgstr ""
 
 #, c-format
 msgid "Type %s%s SET EMAIL email in order to set your email."
-msgstr ""
+msgstr "E-Postanızı ayarlamak için %s%s SET EMAIL e-posta yazın."
 
 msgid "Un-Load a module"
 msgstr "Bir modülün yüklemesini kaldır"
@@ -8066,6 +8089,10 @@ msgstr "Ayrıcalıklı kullanıcıların listesini yönetmek için kullanılır"
 
 msgid "Used to modify the channel status of you or other users"
 msgstr "Sizin veya diğer kullanıcıların kanal durumunu değiştirmek için kullanılır"
+
+#, c-format
+msgid "User %s isn't currently logged in to an account."
+msgstr "%s kullanıcısı şuan hesabına giriş yapmış değil."
 
 msgid "User has been banned from the channel"
 msgstr "Kullanıcı kanaldan banlandı"
@@ -8307,7 +8334,7 @@ msgid "You can not request a receipt when sending a memo to yourself."
 msgstr "Kendinize memo gönderirken makbuz talep edemezsiniz."
 
 msgid "You can not send a single message while you have messages queued."
-msgstr ""
+msgstr "Sıraya alınmış mesajlarınız varken tek bir mesaj gönderemezsiniz."
 
 #, c-format
 msgid "You can't %s yourself!"
@@ -8375,7 +8402,7 @@ msgid "You do not have access to set mode %c."
 msgstr "%c modunu ayarlama erişiminiz yok."
 
 msgid "You do not have any messages queued and did not specify a message to send."
-msgstr ""
+msgstr "Sıraya alınmış herhangi bir mesajınız yok ve gönderilecek mesajı belirtmediniz."
 
 msgid "You do not have any queued messages."
 msgstr "Sıraya alınmış mesajınız yok."

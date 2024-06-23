@@ -67,7 +67,7 @@ public:
 		const Anope::string &chan = params[0];
 		Anope::string expiry = params[1];
 		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("expire");
+		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("suspendexpire");
 
 		if (!expiry.empty() && expiry[0] != '+')
 		{

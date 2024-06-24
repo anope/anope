@@ -364,7 +364,7 @@ void LogInfo::ProcessMessage(const Log *l)
 				if (!bi)
 					bi = c->WhoSends();
 				if (bi)
-					IRCD->SendPrivmsg(bi, c->name, "%s", buffer.c_str());
+					IRCD->SendPrivmsg(bi, c->name, buffer);
 			}
 		}
 		else if (target == "globops")

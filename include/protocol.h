@@ -41,8 +41,8 @@ public:
 
 	virtual ~IRCDProto();
 
-	virtual void SendNoticeInternal(const MessageSource &, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
-	virtual void SendPrivmsgInternal(const MessageSource &, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
+	virtual void SendNotice(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
+	virtual void SendPrivmsg(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
 	virtual void SendCTCPInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
 
 	/** Parses an incoming message from the IRC server.
@@ -213,8 +213,6 @@ public:
 
 	virtual void SendKick(const MessageSource &source, const Channel *chan, User *user, const Anope::string &msg);
 
-	virtual void SendNotice(const MessageSource &source, const Anope::string &dest, const char *fmt, ...) ATTR_FORMAT(4, 5);
-	virtual void SendPrivmsg(const MessageSource &source, const Anope::string &dest, const char *fmt, ...) ATTR_FORMAT(4, 5);
 	virtual void SendAction(const MessageSource &source, const Anope::string &dest, const char *fmt, ...) ATTR_FORMAT(4, 5);
 	virtual void SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...) ATTR_FORMAT(4, 5);
 

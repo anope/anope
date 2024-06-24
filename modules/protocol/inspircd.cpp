@@ -207,7 +207,7 @@ public:
 	{
 		if (spanningtree_proto_ver >= 1206)
 		{
-			IRCD->SendNoticeInternal(bi, target->GetUID(), msg, {
+			IRCD->SendNotice(bi, target->GetUID(), msg, {
 				{ "~context", context->name },
 			});
 			return;
@@ -219,7 +219,7 @@ public:
 	{
 		if (spanningtree_proto_ver >= 1206)
 		{
-			IRCD->SendPrivmsgInternal(bi, target->GetUID(), msg, {
+			IRCD->SendPrivmsg(bi, target->GetUID(), msg, {
 				{ "~context", context->name },
 			});
 			return;

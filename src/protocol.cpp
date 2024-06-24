@@ -135,12 +135,12 @@ void IRCDProto::SendKick(const MessageSource &source, const Channel *c, User *u,
 		Uplink::Send(source, "KICK", c->name, u->GetUID());
 }
 
-void IRCDProto::SendNoticeInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags)
+void IRCDProto::SendNotice(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 {
 	Uplink::Send(tags, source, "NOTICE", dest, msg.empty() ? " " : msg);
 }
 
-void IRCDProto::SendPrivmsgInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags)
+void IRCDProto::SendPrivmsg(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 {
 	Uplink::Send(tags, source, "PRIVMSG", dest, msg.empty() ? " " : msg);
 }
@@ -169,7 +169,7 @@ void IRCDProto::SendGlobops(const MessageSource &source, const Anope::string &me
 void IRCDProto::SendCTCPInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &buf)
 {
 	Anope::string s = Anope::NormalizeBuffer(buf);
-	this->SendNoticeInternal(source, dest, "\1" + s + "\1");
+	this->SendNotice(source, dest, "\1" + s + "\1");
 }
 
 void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params)
@@ -190,16 +190,6 @@ void IRCDProto::SendTopic(const MessageSource &source, Channel *c)
 	Uplink::Send(source, "TOPIC", c->name, c->topic);
 }
 
-void IRCDProto::SendNotice(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendNoticeInternal(source, dest, buf);
-}
-
 void IRCDProto::SendAction(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;
@@ -208,17 +198,7 @@ void IRCDProto::SendAction(const MessageSource &source, const Anope::string &des
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
 	Anope::string actionbuf = Anope::string("\1ACTION ") + buf + '\1';
-	SendPrivmsgInternal(source, dest, actionbuf);
-}
-
-void IRCDProto::SendPrivmsg(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendPrivmsgInternal(source, dest, buf);
+	SendPrivmsg(source, dest, actionbuf);
 }
 
 void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who)
@@ -370,14 +350,14 @@ Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 
 void IRCDProto::SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg)
 {
-	IRCD->SendNoticeInternal(bi, target->GetUID(), Anope::printf("[%s] %s", context->name.c_str(), msg.c_str()), {
+	IRCD->SendNotice(bi, target->GetUID(), Anope::printf("[%s] %s", context->name.c_str(), msg.c_str()), {
 		{ "+draft/channel-context", context->name },
 	});
 }
 
 void IRCDProto::SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg)
 {
-	IRCD->SendPrivmsgInternal(bi, target->GetUID(), Anope::printf("[%s] %s", context->name.c_str(), msg.c_str()), {
+	IRCD->SendPrivmsg(bi, target->GetUID(), Anope::printf("[%s] %s", context->name.c_str(), msg.c_str()), {
 		{ "+draft/channel-context", context->name },
 	});
 }

@@ -391,11 +391,11 @@ public:
 					/* Sending a channel message or notice in response to a fantasy command */;
 				else if (log->method.equals_ci("MESSAGE") && l->ci->c)
 				{
-					IRCD->SendPrivmsg(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());
+					IRCD->SendPrivmsg(l->ci->WhoSends(), log->extra + l->ci->c->name, buffer);
 					l->ci->WhoSends()->lastmsg = Anope::CurTime;
 				}
 				else if (log->method.equals_ci("NOTICE") && l->ci->c)
-					IRCD->SendNotice(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());
+					IRCD->SendNotice(l->ci->WhoSends(), log->extra + l->ci->c->name, buffer);
 			}
 		}
 	}

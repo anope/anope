@@ -56,7 +56,7 @@ public:
 			return;
 		}
 
-		IRCD->SendPrivmsg(*ci->bi, ci->name, "%s", text.c_str());
+		IRCD->SendPrivmsg(*ci->bi, ci->name, text);
 		ci->bi->lastmsg = Anope::CurTime;
 
 		bool override = !source.AccessFor(ci).HasPriv("SAY");

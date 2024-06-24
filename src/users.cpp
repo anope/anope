@@ -337,9 +337,9 @@ namespace
 		for (Anope::string tok; sep.GetToken(tok);)
 		{
 			if (target->ShouldPrivmsg())
-				IRCD->SendPrivmsgInternal(source, target->GetUID(), tok, tags);
+				IRCD->SendPrivmsg(source, target->GetUID(), tok, tags);
 			else
-				IRCD->SendNoticeInternal(source, target->GetUID(), tok, tags);
+				IRCD->SendNotice(source, target->GetUID(), tok, tags);
 		}
 	}
 }

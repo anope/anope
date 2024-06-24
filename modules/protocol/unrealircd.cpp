@@ -38,6 +38,7 @@ public:
 		CanSVSHold = true;
 		CanClearBans = true;
 		CanCertFP = true;
+		CanTagMessage = true;
 		RequiresID = true;
 		MaxModes = 12;
 	}

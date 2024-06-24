@@ -43,6 +43,7 @@ public:
 
 	virtual void SendNotice(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
 	virtual void SendPrivmsg(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
+	virtual void SendTagmsg(const MessageSource &source, const Anope::string &dest, const Anope::map<Anope::string> &tags);
 
 	/** Parses an incoming message from the IRC server.
 	 * @param message The message to parse.
@@ -108,6 +109,9 @@ public:
 
 	/** Can we ask the server to unban a user? */
 	bool CanClearBans = false;
+
+	/** Can we send tag messages? */
+	bool CanTagMessage = false;
 
 	/* The maximum length of a channel name. */
 	size_t MaxChannel = 0;

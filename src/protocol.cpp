@@ -145,6 +145,12 @@ void IRCDProto::SendPrivmsg(const MessageSource &source, const Anope::string &de
 	Uplink::Send(tags, source, "PRIVMSG", dest, msg.empty() ? " " : msg);
 }
 
+void IRCDProto::SendTagmsg(const MessageSource &source, const Anope::string &dest, const Anope::map<Anope::string> &tags)
+{
+	if (CanTagMessage)
+		Uplink::Send(tags, source, "TAGMSG", dest);
+}
+
 void IRCDProto::SendQuit(User *u, const Anope::string &buf)
 {
 	if (!buf.empty())

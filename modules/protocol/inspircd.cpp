@@ -1147,6 +1147,7 @@ struct IRCDMessageCapab final
 			IRCD->CanClearBans = false;
 			IRCD->CanSQLineChannel = false;
 			IRCD->CanSVSHold = false;
+			IRCD->CanTagMessage = false;
 			IRCD->DefaultPseudoclientModes = "+oI";
 		}
 		else if (params[0].equals_cs("CHANMODES") && params.size() > 1)
@@ -1523,6 +1524,9 @@ struct IRCDMessageCapab final
 
 				else if (modname.equals_cs("chgident"))
 					Servers::Capab.insert("CHGIDENT");
+
+				else if (modname.equals_cs("ircv3_ctctags"))
+					IRCD->CanTagMessage = true;
 			}
 
 			const auto &anoperegex = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
@@ -1582,6 +1586,9 @@ struct IRCDMessageCapab final
 
 			if (!IRCD->CanSQLineChannel)
 				Log() << "The remote server does not have the cban module; services will manually enforce forbidden channels until the module is loaded.";
+
+			if (!IRCD->CanTagMessage)
+				Log() << "The remote server does not have the ircv3_ctctags module; sending tag messages is disabled until the module is loaded.";
 
 			if (!Servers::Capab.count("CHGHOST"))
 				Log() << "The remote server does not have the chghost module; vhosts are disabled until the module is loaded.";
@@ -1953,6 +1960,9 @@ public:
 
 				else if (modname.equals_cs("hidechans"))
 					required = true;
+
+				else if (modname.equals_cs("ircv3_ctctags"))
+					IRCD->CanTagMessage = plus;
 
 				else if (modname.equals_cs("rline"))
 					capab = "RLINE";

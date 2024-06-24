@@ -43,7 +43,6 @@ public:
 
 	virtual void SendNotice(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
 	virtual void SendPrivmsg(const MessageSource &source, const Anope::string &dest, const Anope::string &msg, const Anope::map<Anope::string> &tags = {});
-	virtual void SendCTCPInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
 
 	/** Parses an incoming message from the IRC server.
 	 * @param message The message to parse.
@@ -212,9 +211,6 @@ public:
 	virtual void SendClientIntroduction(User *u) = 0;
 
 	virtual void SendKick(const MessageSource &source, const Channel *chan, User *user, const Anope::string &msg);
-
-	virtual void SendAction(const MessageSource &source, const Anope::string &dest, const char *fmt, ...) ATTR_FORMAT(4, 5);
-	virtual void SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...) ATTR_FORMAT(4, 5);
 
 	virtual void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) = 0;
 	virtual void SendGlobalPrivmsg(BotInfo *bi, const Server *desc, const Anope::string &msg) = 0;

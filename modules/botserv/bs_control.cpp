@@ -111,11 +111,7 @@ public:
 			return;
 		}
 
-		message = message.replace_all_cs("\1", "");
-		if (message.empty())
-			return;
-
-		IRCD->SendAction(*ci->bi, ci->name, "%s", message.c_str());
+		IRCD->SendPrivmsg(*ci->bi, ci->name, Anope::FormatCTCP("ACTION", message));
 		ci->bi->lastmsg = Anope::CurTime;
 
 		bool override = !source.AccessFor(ci).HasPriv("SAY");

@@ -601,6 +601,20 @@ namespace Anope
 	/** Expands a module path. */
 	inline auto ExpandModule(const Anope::string &path) { return Expand(ModuleDir, path); }
 
+	/** Formats a CTCP message for sending to a client.
+	 * @param name The name of the CTCP.
+	 * @param body If present then the body of the CTCP.
+	 * @return A formatted CTCP ready to send to a client.
+	 */
+	extern CoreExport Anope::string FormatCTCP(const Anope::string &name, const Anope::string &body = "");
+
+	/** Parses a CTCP message received from a client.
+	 * @param text The raw message to parse.
+	 * @param name The location to store the name of the CTCP.
+	 * @param body The location to store body of the CTCP if one is present.
+	 * @return True if the message was a well formed CTCP; otherwise, false.
+	 */
+	extern CoreExport bool ParseCTCP(const Anope::string &text, Anope::string &name, Anope::string &body);
 }
 
 /** sepstream allows for splitting token separated lists.

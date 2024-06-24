@@ -342,19 +342,17 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 
 		if (bi)
 		{
-			if (message[0] == '\1' && message[message.length() - 1] == '\1')
+			Anope::string ctcpname, ctcpbody;
+			if (Anope::ParseCTCP(message, ctcpname, ctcpbody))
 			{
-				if (message.substr(0, 6).equals_ci("\1PING "))
+				if (ctcpname.equals_ci("PING"))
 				{
-					Anope::string buf = message;
-					buf.erase(buf.begin());
-					buf.erase(buf.end() - 1);
-					IRCD->SendCTCP(bi, u->nick, "%s", buf.c_str());
+					IRCD->SendNotice(bi, u->nick, Anope::FormatCTCP("PING", ctcpbody));
 				}
-				else if (message.substr(0, 9).equals_ci("\1VERSION\1"))
+				else if (ctcpname.equals_ci("VERSION"))
 				{
 					Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-					IRCD->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str());
+					IRCD->SendNotice(bi, u->nick, Anope::FormatCTCP("VERSION", Anope::printf("Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str())));
 				}
 				return;
 			}

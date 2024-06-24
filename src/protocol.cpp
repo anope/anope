@@ -166,12 +166,6 @@ void IRCDProto::SendGlobops(const MessageSource &source, const Anope::string &me
 	Uplink::Send(source, "GLOBOPS", message);
 }
 
-void IRCDProto::SendCTCPInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &buf)
-{
-	Anope::string s = Anope::NormalizeBuffer(buf);
-	this->SendNotice(source, dest, "\1" + s + "\1");
-}
-
 void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params)
 {
 	Anope::string n = Anope::ToString(numeric);
@@ -188,17 +182,6 @@ void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, cons
 void IRCDProto::SendTopic(const MessageSource &source, Channel *c)
 {
 	Uplink::Send(source, "TOPIC", c->name, c->topic);
-}
-
-void IRCDProto::SendAction(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	Anope::string actionbuf = Anope::string("\1ACTION ") + buf + '\1';
-	SendPrivmsg(source, dest, actionbuf);
 }
 
 void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who)
@@ -241,16 +224,6 @@ void IRCDProto::SendNickChange(User *u, const Anope::string &newnick)
 void IRCDProto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
 {
 	Uplink::Send("SVSNICK", u->GetUID(), newnick, when);
-}
-
-void IRCDProto::SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendCTCPInternal(source, dest, buf);
 }
 
 bool IRCDProto::IsNickValid(const Anope::string &nick)

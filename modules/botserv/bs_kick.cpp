@@ -1215,11 +1215,9 @@ public:
 		/* If it's a /me, cut the CTCP part because the ACTION will cause
 		 * problems with the caps or badwords kicker
 		 */
-		if (realbuf.substr(0, 8).equals_ci("\1ACTION ") && realbuf[realbuf.length() - 1] == '\1')
-		{
-			realbuf.erase(0, 8);
-			realbuf.erase(realbuf.length() - 1);
-		}
+		Anope::string ctcpname, ctcpbody;
+		if (Anope::ParseCTCP(msg, ctcpname, ctcpbody) && ctcpname.equals_ci("ACTION"))
+			realbuf = ctcpbody;
 
 		if (realbuf.empty())
 			return;

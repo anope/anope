@@ -117,7 +117,7 @@ void IRC2SQL::OnUserConnect(User *u, bool &exempt)
 	this->RunQuery(query);
 
 	if (ctcpuser && (Me->IsSynced() || ctcpeob) && u->server != Me)
-		IRCD->SendPrivmsg(StatServ, u->GetUID(), "\1VERSION\1");
+		IRCD->SendPrivmsg(StatServ, u->GetUID(), Anope::FormatCTCP("VERSION"));
 
 }
 
@@ -299,28 +299,27 @@ void IRC2SQL::OnTopicUpdated(User *source, Channel *c, const Anope::string &user
 
 void IRC2SQL::OnBotNotice(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags)
 {
-	Anope::string versionstr;
 	if (bi != StatServ)
 		return;
-	if (message[0] == '\1' && message[message.length() - 1] == '\1')
-	{
-		if (message.substr(0, 9).equals_ci("\1VERSION "))
-		{
-			if (u->HasExt("CTCPVERSION"))
-				return;
-			u->Extend<bool>("CTCPVERSION");
 
-			versionstr = Anope::NormalizeBuffer(message.substr(9, message.length() - 10));
-			if (versionstr.empty())
-				return;
-			query = "UPDATE `" + prefix + "user` "
-				"SET version=@version@ "
-				"WHERE nick=@nick@";
-			query.SetValue("version", versionstr);
-			query.SetValue("nick", u->nick);
-			this->RunQuery(query);
-		}
-	}
+	Anope::string ctcpname, ctcpbody;
+	if (!Anope::ParseCTCP(message, ctcpname, ctcpbody) || ctcpname != "VERSION")
+		return;
+
+	if (u->HasExt("CTCPVERSION"))
+		return;
+
+	u->Extend<bool>("CTCPVERSION");
+	auto versionstr = Anope::NormalizeBuffer(message.substr(9, message.length() - 10));
+	if (versionstr.empty())
+		return;
+
+	query = "UPDATE `" + prefix + "user` "
+		"SET version=@version@ "
+		"WHERE nick=@nick@";
+	query.SetValue("version", versionstr);
+	query.SetValue("nick", u->nick);
+	this->RunQuery(query);
 }
 
 MODULE_INIT(IRC2SQL)

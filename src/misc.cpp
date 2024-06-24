@@ -835,3 +835,50 @@ Anope::string Anope::Expand(const Anope::string &base, const Anope::string &frag
 
 	return Anope::printf("%s%c%s", base.c_str(), separator, fragment.c_str());
 }
+
+Anope::string Anope::FormatCTCP(const Anope::string &name, const Anope::string &value)
+{
+	if (value.empty())
+		return Anope::printf("\1%s\1", name.c_str());
+
+	return Anope::printf("\1%s %s\1", name.c_str(), value.c_str());
+}
+
+bool Anope::ParseCTCP(const Anope::string &text, Anope::string &name, Anope::string &body)
+{
+	// According to draft-oakley-irc-ctcp-02 a valid CTCP must begin with SOH and
+	// contain at least one octet which is not NUL, SOH, CR, LF, or SPACE. As most
+	// of these are restricted at the protocol level we only need to check for SOH
+	// and SPACE.
+	if (text.length() < 2 || text[0] != '\x1' || text[1] == '\x1' || text[1] == ' ')
+	{
+		name.clear();
+		body.clear();
+		return false;
+	}
+
+	auto end_of_name = text.find(' ', 2);
+	auto end_of_ctcp = *text.rbegin() == '\x1' ? 1 : 0;
+	if (end_of_name == std::string::npos)
+	{
+		// The CTCP only contains a name.
+		name = text.substr(1, text.length() - 1 - end_of_ctcp);
+		body.clear();
+		return true;
+	}
+
+	// The CTCP contains a name and a body.
+	name = text.substr(1, end_of_name - 1);
+
+	auto start_of_body = text.find_first_not_of(' ', end_of_name + 1);
+	if (start_of_body == std::string::npos)
+	{
+		// The CTCP body is provided but empty.
+		body.clear();
+		return true;
+	}
+
+	// The CTCP body provided was non-empty.
+	body = text.substr(start_of_body, text.length() - start_of_body - end_of_ctcp);
+	return true;
+}

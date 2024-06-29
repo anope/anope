@@ -1,12 +1,15 @@
 Anope Version 2.1.7-git
 -----------------------
 Added importing of akick reasons, forbid reasons, opers and session exceptions to db_atheme.
+Added support for sending tag messages.
 Added the ability to look up account information of an authenticated user.
 Fixed a crash in ns_cert when an IRC user is not present during a nick registration.
 Fixed a null pointer dereference in the global module.
 Fixed a rare memory leak in os_akill and os_sxline.
 Improved the performance of some code that looks up the primary nick from an account.
 Removed the broken Catalan, Hungarian, and Russian translations.
+Reworked the protocol interface for sending messages.
+Updated the Turkish translation.
 
 Anope Version 2.1.6
 -------------------

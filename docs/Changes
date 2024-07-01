@@ -1,5 +1,5 @@
-Anope Version 2.1.7-git
------------------------
+Anope Version 2.1.7
+-------------------
 Added importing of akick reasons, forbid reasons, opers and session exceptions to db_atheme.
 Added support for sending tag messages.
 Added the ability to look up account information of an authenticated user.

@@ -1,3 +1,7 @@
+Anope Version 2.1.8-git
+-----------------------
+No significant changes.
+
 Anope Version 2.1.7
 -------------------
 Added importing of akick reasons, forbid reasons, opers and session exceptions to db_atheme.

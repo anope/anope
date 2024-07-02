@@ -13,10 +13,6 @@
 #
 ###########################################################################
 
-echo2 () {
-	$ECHO2 "$*$ECHO2SUF" # these are defined later
-}
-
 exists () { # because some shells don't have test -e
 	if [ -f $1 -o -d $1 -o -p $1 -o -c $1 -o -b $1 ] ; then
 		return 0
@@ -95,19 +91,6 @@ Run_Build_System () {
 		echo "Now run make to build Anope."
 	fi
 }
-
-ECHO2SUF=''
-if [ "`echo -n a ; echo -n b`" = "ab" ] ; then
-	ECHO2='echo -n'
-elif [ "`echo 'a\c' ; echo 'b\c'`" = "ab" ] ; then
-	ECHO2='echo' ; ECHO2SUF='\c'
-elif [ "`printf 'a' 2>&1 ; printf 'b' 2>&1`" = "ab" ] ; then
-	ECHO2='printf "%s"'
-else
-	# oh well...
-	ECHO2='echo'
-fi
-export ECHO2 ECHO2SUF
 
 ###########################################################################
 # Init values
@@ -199,7 +182,7 @@ export ok INPUT
 ok=0
 echo "In what directory should Anope be installed?"
 while [ $ok -eq 0 ] ; do
-	echo2 "[$INSTDIR] "
+	echo -n "[$INSTDIR] "
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 	if [ ! "$INPUT" ] ; then
 		INPUT=$INSTDIR
@@ -209,7 +192,7 @@ while [ $ok -eq 0 ] ; do
 			echo "$INPUT exists, but is not a directory!"
 		else
 			echo "$INPUT does not exist.  Create it?"
-			echo2 "[y] "
+			echo -n "[y] "
 			read YN
 			if [ "$YN" != "n" ] ; then
 				if mkdir -p $INPUT ; then
@@ -238,7 +221,7 @@ else
 	echo "should not force files to be owned by a particular group, just press"
 	echo "Return.)"
 fi
-echo2 "[$RUNGROUP] "
+echo -n "[$RUNGROUP] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then
 	if [ "$INPUT" = "none" ] ; then
@@ -263,7 +246,7 @@ ok=0
 echo "What should the default umask for data files be (in octal)?"
 echo "(077 = only accessible by owner; 007 = accessible by owner and group)"
 while [ $ok -eq 0 ] ; do
-	echo2 "[$UMASK] "
+	echo -n "[$UMASK] "
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 	if [ ! "$INPUT" ] ; then
 		INPUT=$UMASK
@@ -287,7 +270,7 @@ if [ "$DEBUG" = "yes" ] ; then
 	TEMP_YN="y"
 fi
 echo "Would you like to build a debug version of Anope?"
-echo2 "[$TEMP_YN] "
+echo -n "[$TEMP_YN] "
 read YN
 if [ "$YN" ] ; then
 	if [ "$YN" = "y" ] ; then
@@ -305,7 +288,7 @@ echo "You may only need to do this if CMake is unable to locate"
 echo "missing dependencies without hints."
 echo "Separate directories with semicolons."
 echo "If you need no extra include directories, enter NONE in all caps."
-echo2 "[$EXTRA_INCLUDE_DIRS] "
+echo -n "[$EXTRA_INCLUDE_DIRS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then
 	if [ "$INPUT" = "NONE" ] ; then
@@ -323,7 +306,7 @@ echo "You may only need to do this if CMake is unable to locate"
 echo "missing dependencies without hints."
 echo "Separate directories with semicolons."
 echo "If you need no extra library directories, enter NONE in all caps."
-echo2 "[$EXTRA_LIB_DIRS] "
+echo -n "[$EXTRA_LIB_DIRS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then
 	if [ "$INPUT" = "NONE" ] ; then
@@ -338,7 +321,7 @@ echo ""
 
 echo "Are there any extra arguments you wish to pass to CMake?"
 echo "If you need no extra arguments to CMake, enter NONE in all caps."
-echo2 "[$EXTRA_CONFIG_ARGS] "
+echo -n "[$EXTRA_CONFIG_ARGS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then
 	if [ "$INPUT" = "NONE" ] ; then
@@ -355,7 +338,7 @@ echo ""
 # Store values
 ################################################################################
 
-echo2 "Saving configuration results in config.cache... "
+echo -n "Saving configuration results in config.cache... "
 
 cat <<EOT >$SOURCE_DIR/config.cache
 INSTDIR="$INSTDIR"

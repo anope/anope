@@ -249,7 +249,7 @@ public:
 				const Anope::string &user = block->Get<const Anope::string>("username", "anope");
 				const Anope::string &password = block->Get<const Anope::string>("password");
 				unsigned int port = block->Get<unsigned int>("port", "3306");
-				const Anope::string &socket = block->Get<const Anope::string>("socket", "");
+				const Anope::string &socket = block->Get<const Anope::string>("socket");
 
 				try
 				{
@@ -499,7 +499,7 @@ void MySQLService::Connect()
 	const unsigned int timeout = 1;
 	mysql_options(this->sql, MYSQL_OPT_CONNECT_TIMEOUT, reinterpret_cast<const char *>(&timeout));
 
-	bool connect = mysql_real_connect(this->sql, this->server.c_str(), this->user.c_str(), this->password.c_str(), this->database.c_str(), this->port, this->socket.empty() ? NULL : this->socket.c_str(), CLIENT_MULTI_RESULTS);
+	bool connect = mysql_real_connect(this->sql, this->server.c_str(), this->user.c_str(), this->password.c_str(), this->database.c_str(), this->port, this->socket.empty() ? nullptr : this->socket.c_str(), CLIENT_MULTI_RESULTS);
 
 	if (!connect)
 		throw SQL::Exception("Unable to connect to MySQL service " + this->name + ": " + mysql_error(this->sql));

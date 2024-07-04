@@ -121,6 +121,7 @@ class MySQLService final
 	Anope::string user;
 	Anope::string password;
 	unsigned int port;
+	Anope::string socket;
 
 	MYSQL *sql = nullptr;
 
@@ -136,7 +137,7 @@ public:
 	 */
 	std::mutex Lock;
 
-	MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, unsigned int po);
+	MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, unsigned int po, const Anope::string &so);
 
 	~MySQLService();
 
@@ -248,13 +249,14 @@ public:
 				const Anope::string &user = block->Get<const Anope::string>("username", "anope");
 				const Anope::string &password = block->Get<const Anope::string>("password");
 				unsigned int port = block->Get<unsigned int>("port", "3306");
+				const Anope::string &socket = block->Get<const Anope::string>("socket");
 
 				try
 				{
-					auto *ss = new MySQLService(this, connname, database, server, user, password, port);
+					auto *ss = new MySQLService(this, connname, database, server, user, password, port, socket);
 					this->MySQLServices.emplace(connname, ss);
 
-					Log(LOG_NORMAL, "mysql") << "MySQL: Successfully connected to server " << connname << " (" << server << ")";
+					Log(LOG_NORMAL, "mysql") << "MySQL: Successfully connected to server " << connname << " (" << (socket.empty() ? server + ":" + port : socket) << ")";
 				}
 				catch (const SQL::Exception &ex)
 				{
@@ -309,13 +311,14 @@ public:
 	}
 };
 
-MySQLService::MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, unsigned int po)
+MySQLService::MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, unsigned int po, const Anope::string &so)
 	: Provider(o, n)
 	, database(d)
 	, server(s)
 	, user(u)
 	, password(p)
 	, port(po)
+	, socket(so)
 {
 	Connect();
 }
@@ -496,12 +499,15 @@ void MySQLService::Connect()
 	const unsigned int timeout = 1;
 	mysql_options(this->sql, MYSQL_OPT_CONNECT_TIMEOUT, reinterpret_cast<const char *>(&timeout));
 
-	bool connect = mysql_real_connect(this->sql, this->server.c_str(), this->user.c_str(), this->password.c_str(), this->database.c_str(), this->port, NULL, CLIENT_MULTI_RESULTS);
+	bool connect = mysql_real_connect(this->sql, this->server.c_str(), this->user.c_str(), this->password.c_str(), this->database.c_str(), this->port, this->socket.empty() ? nullptr : this->socket.c_str(), CLIENT_MULTI_RESULTS);
 
 	if (!connect)
 		throw SQL::Exception("Unable to connect to MySQL service " + this->name + ": " + mysql_error(this->sql));
 
-	Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->name << " at " << this->server << ":" << this->port;
+	if (this->socket.empty())
+		Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->name << " at " << this->server << ":" << this->port;
+	else
+		Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->name << " at " << this->socket;
 }
 
 

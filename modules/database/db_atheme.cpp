@@ -1393,7 +1393,7 @@ private:
 			return false;
 		}
 
-		auto ot = OperType::Find(type);
+		auto *ot = OperType::Find(type);
 		if (!ot)
 		{
 			// Attempt to convert oper types.

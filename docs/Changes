@@ -1,6 +1,25 @@
 Anope Version 2.0.16-git
 ------------------------
-No significant changes.
+Added a workaround for users matching expired sqlines.
+Fixed a copy/paste error in webcpanel.
+Fixed a crash in db_flatfile caused by trying to serialize data without a type.
+Fixed duplicate messages when synconset/syncongroup is set.
+Fixed expiring channel suspensions.
+Fixed expiring forbids.
+Fixed expiring nick suspensions.
+Fixed feature detection on InspIRCd.
+Fixed logging users out fully when their nick gets suspended.
+Fixed marking boolean columns in SQL as TEXT instead of INT.
+Fixed matching extbans on InspIRCd and implement missing matchers.
+Fixed operserv/sqline expiry on UnrealIRCd
+Fixed respecting --noexpire in cs_suspend and ns_suspend.
+Fixed sending emails to nicks ending with a backslash.
+Fixed sending SVSTOPIC when topiclock is loaded on InspIRCd.
+Fixed some SQL tables taking up too much space on disk.
+Fixed the default config for channel suspensions.
+Fixed the TIME message on InspIRCd.
+Fixed trying to escape SQL data when not connected to MySQL.
+Fixed {ldap,sql}_authentication creating zombie accounts on expiry.
 
 Anope Version 2.0.15
 --------------------

@@ -394,9 +394,12 @@ class InspIRCd3Proto : public IRCDProto
 		SendAddLine("Z", x->GetHost(), timeleft, x->by, x->GetReason());
 	}
 
-	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &other) anope_override
+	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &key) anope_override
 	{
-		UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
+		if (key.empty())
+			UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
+		else
+			UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan << " :" << key;
 	}
 
 	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) anope_override

@@ -240,9 +240,9 @@ public:
 	 * @param bi The source of the message
 	 * @param u The user to join
 	 * @param chan The channel to join the user to
-	 * @param param Channel key?
+	 * @param key Channel key
 	 */
-	virtual void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) { }
+	virtual void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &key) { }
 
 	/** Force parts a user that isn't ours from a channel.
 	 * @param source The source of the message

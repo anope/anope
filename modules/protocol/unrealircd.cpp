@@ -299,12 +299,12 @@ private:
 	/* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
 	   when coming from a none TOKEN'd server
 	*/
-	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
+	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &key) override
 	{
-		if (!param.empty())
-			Uplink::Send("SVSJOIN", user->GetUID(), chan, param);
-		else
+		if (key.empty())
 			Uplink::Send("SVSJOIN", user->GetUID(), chan);
+		else
+			Uplink::Send("SVSJOIN", user->GetUID(), chan, key);
 	}
 
 	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override

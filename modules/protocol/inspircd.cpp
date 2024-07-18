@@ -509,9 +509,12 @@ public:
 		SendAddLine("Z", x->GetHost(), timeleft, x->by, x->GetReason());
 	}
 
-	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &other) override
+	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &key) override
 	{
-		Uplink::Send(source, "SVSJOIN", u->GetUID(), chan);
+		if (key.empty())
+			Uplink::Send(source, "SVSJOIN", u->GetUID(), chan);
+		else
+			Uplink::Send(source, "SVSJOIN", u->GetUID(), chan, key);
 	}
 
 	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) override

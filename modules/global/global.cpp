@@ -137,9 +137,6 @@ public:
 		if (!sender)
 			return false;
 
-		if (!server)
-			server = Servers::GetUplink();
-
 		Anope::string line;
 		if (source && !Config->GetModule(this)->Get<bool>("anonymousglobal"))
 		{

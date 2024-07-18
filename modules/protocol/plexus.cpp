@@ -164,7 +164,7 @@ public:
 		Uplink::Send(source, "ENCAP", '*', "TOPIC", c->name, c->topic_setter, c->topic_ts, c->topic);
 	}
 
-	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) override
+	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &key) override
 	{
 		Uplink::Send(source, "ENCAP", '*', "SVSJOIN", user->GetUID(), chan);
 	}

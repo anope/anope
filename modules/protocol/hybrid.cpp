@@ -238,7 +238,7 @@ public:
 		Uplink::Send("SVSNICK", u->GetUID(), u->timestamp, newnick, when);
 	}
 
-	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) override
+	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &key) override
 	{
 		Uplink::Send(source, "SVSJOIN", u->GetUID(), chan);
 	}

@@ -1,5 +1,5 @@
-Anope Version 2.0.16-git
-------------------------
+Anope Version 2.0.16
+--------------------
 Added a workaround for users matching expired sqlines.
 Fixed a copy/paste error in webcpanel.
 Fixed a crash in db_flatfile caused by trying to serialize data without a type.

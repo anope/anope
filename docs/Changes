@@ -8,6 +8,7 @@ Fixed expiring channel suspensions.
 Fixed expiring forbids.
 Fixed expiring nick suspensions.
 Fixed feature detection on InspIRCd.
+Fixed InspIRCd account cloaks causing CHGHOST spam when a user also has a services vhost.
 Fixed joining users to channels with a key set on InspIRCd.
 Fixed logging users out fully when their nick gets suspended.
 Fixed marking boolean columns in SQL as TEXT instead of INT.

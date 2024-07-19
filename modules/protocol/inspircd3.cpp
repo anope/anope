@@ -445,6 +445,7 @@ class InspIRCd3Proto : public IRCDProto
 		if (na->nc->HasExt("UNCONFIRMED"))
 			return;
 
+		IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountid :" << na->nc->GetId();
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
 	}

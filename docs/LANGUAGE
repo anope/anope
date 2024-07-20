@@ -19,6 +19,8 @@ Anope Multi Language Support
         Then execute:
         dpkg-reconfigure locales
 
+    If you have already built Anope you will need to delete the build directory and rebuild from scratch.
+
     Building Anope on Windows with gettext support is explained in docs/WIN32.txt
 
 2) Adding a new language

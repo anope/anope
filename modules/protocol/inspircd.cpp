@@ -565,8 +565,11 @@ public:
 	void SendLogin(User *u, NickAlias *na) override
 	{
 		/* InspIRCd uses an account to bypass chmode +R, not umode +r, so we can't send this here */
-		if (!na->nc->HasExt("UNCONFIRMED"))
-			SendAccount(u->GetUID(), na);
+		if (na->nc->HasExt("UNCONFIRMED"))
+			return;
+
+		IRCD->SendVHost(u, na->GetVHostIdent(), na->GetVHostHost());
+		SendAccount(u->GetUID(), na);
 	}
 
 	void SendLogout(User *u) override

@@ -1143,19 +1143,27 @@ struct IRCDMessageMD final
 struct IRCDMessageMode final
 	: IRCDMessage
 {
-	IRCDMessageMode(Module *creator, const Anope::string &mname) : IRCDMessage(creator, mname, 2) { SetFlag(FLAG_SOFT_LIMIT); }
+	bool server_ts;
+
+	IRCDMessageMode(Module *creator, const Anope::string &mname, bool sts)
+		: IRCDMessage(creator, mname, 2)
+		, server_ts(sts)
+	{
+		SetFlag(FLAG_SOFT_LIMIT);
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		bool server_source = source.GetServer() != NULL;
+		auto final_is_ts = server_ts && source.GetServer() != NULL;
+
 		Anope::string modes = params[1];
-		for (unsigned i = 2; i < params.size() - (server_source ? 1 : 0); ++i)
+		for (unsigned i = 2; i < params.size() - (final_is_ts ? 1 : 0); ++i)
 			modes += " " + params[i];
 
 		if (IRCD->IsChannelValid(params[0]))
 		{
 			Channel *c = Channel::Find(params[0]);
-			auto ts = server_source ? IRCD->ExtractTimestamp(params.back()) : 0;
+			auto ts = final_is_ts ? IRCD->ExtractTimestamp(params.back()) : 0;
 
 			if (c)
 				c->SetModesInternal(source, modes, ts);
@@ -1690,20 +1698,51 @@ class ProtoUnreal final
 	IRCDMessageUmode2 message_umode2;
 
 public:
-	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this),
-		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this),
-		message_kill(this), message_svskill(this, "SVSKILL"), message_motd(this), message_notice(this), message_part(this), message_ping(this),
-		message_privmsg(this), message_quit(this), message_squit(this), message_stats(this), message_time(this),
-		message_version(this), message_whois(this),
-
-		message_capab(this), message_chghost(this), message_chgident(this), message_chgname(this),
-		message_md(this, ircd_proto.ClientModData, ircd_proto.ChannelModData),message_mode(this, "MODE"),
-		message_svsmode(this, "SVSMODE"), message_svs2mode(this, "SVS2MODE"), message_netinfo(this), message_nick(this), message_pong(this),
-		message_sasl(this), message_sdesc(this), message_sethost(this), message_setident(this), message_setname(this), message_server(this),
-		message_sid(this), message_sjoin(this), message_svslogin(this), message_topic(this), message_uid(this), message_umode2(this)
+	ProtoUnreal(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, PROTOCOL | VENDOR)
+		, ircd_proto(this)
+		, message_away(this)
+		, message_error(this)
+		, message_invite(this)
+		, message_join(this)
+		, message_kick(this)
+		, message_kill(this)
+		, message_svskill(this, "SVSKILL")
+		, message_motd(this)
+		, message_notice(this)
+		, message_part(this)
+		, message_ping(this)
+		, message_privmsg(this)
+		, message_quit(this)
+		, message_squit(this)
+		, message_stats(this)
+		, message_time(this)
+		, message_version(this)
+		, message_whois(this)
+		, message_capab(this)
+		, message_chghost(this)
+		, message_chgident(this)
+		, message_chgname(this)
+		, message_md(this, ircd_proto.ClientModData, ircd_proto.ChannelModData)
+		, message_mode(this, "MODE", true)
+		, message_svsmode(this, "SVSMODE", false)
+		, message_svs2mode(this, "SVS2MODE", false)
+		, message_netinfo(this)
+		, message_nick(this)
+		, message_pong(this)
+		, message_sasl(this)
+		, message_sdesc(this)
+		, message_sethost(this)
+		, message_setident(this)
+		, message_setname(this)
+		, message_server(this)
+		, message_sid(this)
+		, message_sjoin(this)
+		, message_svslogin(this)
+		, message_topic(this)
+		, message_uid(this)
+		, message_umode2(this)
 	{
-
 	}
 
 	void Prioritize() override

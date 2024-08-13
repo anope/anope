@@ -30,7 +30,6 @@ namespace Serialize
 		virtual ~Data() = default;
 
 		virtual std::iostream &operator[](const Anope::string &key) = 0;
-		virtual std::set<Anope::string> KeySet() const { throw CoreException("Not supported"); }
 		virtual size_t Hash() const { throw CoreException("Not supported"); }
 
 		virtual void SetType(const Anope::string &key, Type t) { }

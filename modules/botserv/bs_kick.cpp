@@ -53,25 +53,28 @@ struct KickerDataImpl final
 			if (kd == NULL)
 				return;
 
-			data.SetType("kickerdata:amsgs", Serialize::Data::DT_INT); data["kickerdata:amsgs"] << kd->amsgs;
-			data.SetType("kickerdata:badwords", Serialize::Data::DT_INT); data["kickerdata:badwords"] << kd->badwords;
-			data.SetType("kickerdata:bolds", Serialize::Data::DT_INT); data["kickerdata:bolds"] << kd->bolds;
-			data.SetType("kickerdata:caps", Serialize::Data::DT_INT); data["kickerdata:caps"] << kd->caps;
-			data.SetType("kickerdata:colors", Serialize::Data::DT_INT); data["kickerdata:colors"] << kd->colors;
-			data.SetType("kickerdata:flood", Serialize::Data::DT_INT); data["kickerdata:flood"] << kd->flood;
-			data.SetType("kickerdata:italics", Serialize::Data::DT_INT); data["kickerdata:italics"] << kd->italics;
-			data.SetType("kickerdata:repeat", Serialize::Data::DT_INT); data["kickerdata:repeat"] << kd->repeat;
-			data.SetType("kickerdata:reverses", Serialize::Data::DT_INT); data["kickerdata:reverses"] << kd->reverses;
-			data.SetType("kickerdata:underlines", Serialize::Data::DT_INT); data["kickerdata:underlines"] << kd->underlines;
-			data.SetType("capsmin", Serialize::Data::DT_INT); data["capsmin"] << kd->capsmin;
-			data.SetType("capspercent", Serialize::Data::DT_INT); data["capspercent"] << kd->capspercent;
-			data.SetType("floodlines", Serialize::Data::DT_INT); data["floodlines"] << kd->floodlines;
-			data.SetType("floodsecs", Serialize::Data::DT_INT); data["floodsecs"] << kd->floodsecs;
-			data.SetType("repeattimes", Serialize::Data::DT_INT); data["repeattimes"] << kd->repeattimes;
-			data.SetType("dontkickops", Serialize::Data::DT_INT); data["dontkickops"] << kd->dontkickops;
-			data.SetType("dontkickvoices", Serialize::Data::DT_INT); data["dontkickvoices"] << kd->dontkickvoices;
+			data.Store("kickerdata:amsgs", kd->amsgs);
+			data.Store("kickerdata:badwords", kd->badwords);
+			data.Store("kickerdata:bolds", kd->bolds);
+			data.Store("kickerdata:caps", kd->caps);
+			data.Store("kickerdata:colors", kd->colors);
+			data.Store("kickerdata:flood", kd->flood);
+			data.Store("kickerdata:italics", kd->italics);
+			data.Store("kickerdata:repeat", kd->repeat);
+			data.Store("kickerdata:reverses", kd->reverses);
+			data.Store("kickerdata:underlines", kd->underlines);
+			data.Store("capsmin", kd->capsmin);
+			data.Store("capspercent", kd->capspercent);
+			data.Store("floodlines", kd->floodlines);
+			data.Store("floodsecs", kd->floodsecs);
+			data.Store("repeattimes", kd->repeattimes);
+			data.Store("dontkickops", kd->dontkickops);
+			data.Store("dontkickvoices", kd->dontkickvoices);
+
+			std::ostringstream oss;
 			for (auto ttbtype : kd->ttb)
-				data["ttb"] << ttbtype << " ";
+				oss << ttbtype << " ";
+			data.Store("ttb", oss.str());
 		}
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override

@@ -160,14 +160,14 @@ NickCore *ChanAccess::GetAccount() const
 
 void ChanAccess::Serialize(Serialize::Data &data) const
 {
-	data["provider"] << this->provider->name;
-	data["ci"] << this->ci->name;
-	data["mask"] << this->Mask();
-	data["creator"] << this->creator;
-	data["description"] << this->description;
-	data.SetType("last_seen", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
-	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;
-	data["data"] << this->AccessSerialize();
+	data.Store("provider", this->provider->name);
+	data.Store("ci", this->ci->name);
+	data.Store("mask", this->Mask());
+	data.Store("creator", this->creator);
+	data.Store("description", this->description);
+	data.Store("last_seen", this->last_seen);
+	data.Store("created", this->created);
+	data.Store("data", this->AccessSerialize());
 }
 
 Serializable *ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)

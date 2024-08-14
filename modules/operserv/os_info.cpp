@@ -28,10 +28,10 @@ struct OperInfoImpl final
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["target"] << target;
-		data["info"] << info;
-		data["adder"] << adder;
-		data["created"] << created;
+		data.Store("target", target);
+		data.Store("info", info);
+		data.Store("adder", adder);
+		data.Store("created", created);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);

@@ -37,14 +37,14 @@ struct LogSettingImpl final
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["ci"] << chan;
-		data["service_name"] << service_name;
-		data["command_service"] << command_service;
-		data["command_name"] << command_name;
-		data["method"] << method;
-		data["extra"] << extra;
-		data["creator"] << creator;
-		data.SetType("created", Serialize::Data::DT_INT); data["created"] << created;
+		data.Store("ci", chan);
+		data.Store("service_name", service_name);
+		data.Store("command_service", command_service);
+		data.Store("command_name", command_name);
+		data.Store("method", method);
+		data.Store("extra", extra);
+		data.Store("creator", creator);
+		data.Store("created", created);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)

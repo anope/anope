@@ -153,14 +153,14 @@ bool XLine::IsRegex() const
 
 void XLine::Serialize(Serialize::Data &data) const
 {
-	data["mask"] << this->mask;
-	data["by"] << this->by;
-	data["created"] << this->created;
-	data["expires"] << this->expires;
-	data["reason"] << this->reason;
-	data["uid"] << this->id;
+	data.Store("mask", this->mask);
+	data.Store("by", this->by);
+	data.Store("created", this->created);
+	data.Store("expires", this->expires);
+	data.Store("reason", this->reason);
+	data.Store("uid", this->id);
 	if (this->manager)
-		data["manager"] << this->manager->name;
+		data.Store("manager", this->manager->name);
 }
 
 Serializable *XLine::Unserialize(Serializable *obj, Serialize::Data &data)

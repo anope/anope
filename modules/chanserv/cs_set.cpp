@@ -1068,7 +1068,7 @@ class CSSet final
 				if (!last_value.empty())
 					modes += "," + last_value;
 			}
-			data["last_modes"] << modes;
+			data.Store("last_modes", modes);
 		}
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override

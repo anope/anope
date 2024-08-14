@@ -40,14 +40,14 @@ struct AJoinEntry final
 		}
 	}
 
-	void Serialize(Serialize::Data &sd) const override
+	void Serialize(Serialize::Data &data) const override
 	{
 		if (!this->owner)
 			return;
 
-		sd["owner"] << this->owner->display;
-		sd["channel"] << this->channel;
-		sd["key"] << this->key;
+		data.Store("owner", this->owner->display);
+		data.Store("channel", this->channel);
+		data.Store("key", this->key);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &sd)

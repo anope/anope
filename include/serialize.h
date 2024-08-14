@@ -18,23 +18,44 @@
 
 namespace Serialize
 {
+	enum class DataType
+		: uint8_t
+	{
+		BOOL,
+		FLOAT,
+		INT,
+		TEXT,
+		UINT,
+	};
+
 	class Data
 	{
 	public:
-		enum Type
-		{
-			DT_TEXT,
-			DT_INT
-		};
-
 		virtual ~Data() = default;
 
 		virtual std::iostream &operator[](const Anope::string &key) = 0;
-		virtual std::set<Anope::string> KeySet() const { throw CoreException("Not supported"); }
+
+		template <typename T>
+		void Store(const Anope::string &key, const T &value)
+		{
+			using Type = std::remove_cv_t<std::remove_reference_t<T>>;
+
+			if constexpr (std::is_same_v<Type, bool>)
+				SetType(key, DataType::BOOL);
+			else if constexpr (std::is_floating_point_v<Type>)
+				SetType(key, DataType::FLOAT);
+			else if constexpr (std::is_integral_v<Type> && std::is_signed_v<Type>)
+				SetType(key, DataType::INT);
+			else if constexpr (std::is_integral_v<Type> && std::is_unsigned_v<Type>)
+				SetType(key, DataType::UINT);
+
+			this->operator[](key) << value;
+		}
+
 		virtual size_t Hash() const { throw CoreException("Not supported"); }
 
-		virtual void SetType(const Anope::string &key, Type t) { }
-		virtual Type GetType(const Anope::string &key) const { return DT_TEXT; }
+		virtual void SetType(const Anope::string &key, DataType dt) { }
+		virtual DataType GetType(const Anope::string &key) const { return DataType::TEXT; }
 	};
 
 	extern void RegisterTypes();

@@ -68,6 +68,31 @@ public:
 	Anope::string BuildQuery(const Query &q);
 
 	Anope::string FromUnixtime(time_t) override;
+
+	Anope::string GetColumnType(Serialize::DataType dt)
+	{
+		switch (dt)
+		{
+			case Serialize::DataType::BOOL:
+				return "INTEGER";
+
+			case Serialize::DataType::FLOAT:
+				return "REAL";
+
+			case Serialize::DataType::INT:
+				return "INTEGER";
+
+			case Serialize::DataType::TEXT:
+				return "TEXT";
+
+			// SQLite lacks support for 64-bit unsigned integers so we have to
+			// store them as text columns instead.
+			case Serialize::DataType::UINT:
+				return "TEXT";
+		}
+
+		return "TEXT"; // Should never be reached
+	}
 };
 
 class ModuleSQLite final
@@ -237,11 +262,7 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const 
 		{
 			known_cols.insert(column);
 
-			query_text += ", `" + column + "` ";
-			if (data.GetType(column) == Serialize::Data::DT_INT)
-				query_text += "int(11)";
-			else
-				query_text += "text";
+			query_text += ", `" + column + "` " + GetColumnType(data.GetType(column));
 		}
 
 		query_text += ")";
@@ -266,11 +287,7 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const 
 
 			known_cols.insert(column);
 
-			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` ";
-			if (data.GetType(column) == Serialize::Data::DT_INT)
-				query_text += "int(11)";
-			else
-				query_text += "text";
+			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` " + GetColumnType(data.GetType(column));;
 
 			queries.push_back(query_text);
 		}
@@ -307,7 +324,33 @@ Query SQLiteService::BuildInsert(const Anope::string &table, unsigned int id, Da
 	{
 		Anope::string buf;
 		*value >> buf;
-		query.SetValue(field, buf);
+
+		auto escape = true;
+		switch (data.GetType(field))
+		{
+			case Serialize::DataType::BOOL:
+			case Serialize::DataType::FLOAT:
+			case Serialize::DataType::INT:
+			{
+				if (buf.empty())
+					buf = "0";
+				escape = false;
+				break;
+			}
+
+			case Serialize::DataType::TEXT:
+			case Serialize::DataType::UINT:
+			{
+				if (buf.empty())
+				{
+					buf = "NULL";
+					escape = false;
+				}
+				break;
+			}
+		}
+
+		query.SetValue(field, buf, escape);
 	}
 
 	return query;

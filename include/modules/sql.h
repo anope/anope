@@ -19,7 +19,7 @@ namespace SQL
 	public:
 		typedef std::map<Anope::string, std::stringstream *> Map;
 		Map data;
-		std::map<Anope::string, Type> types;
+		std::map<Anope::string, Serialize::DataType> types;
 
 		~Data()
 		{
@@ -32,14 +32,6 @@ namespace SQL
 			if (!ss)
 				ss = new std::stringstream();
 			return *ss;
-		}
-
-		std::set<Anope::string> KeySet() const override
-		{
-			std::set<Anope::string> keys;
-			for (const auto &[key, _] : this->data)
-				keys.insert(key);
-			return keys;
 		}
 
 		size_t Hash() const override
@@ -68,17 +60,17 @@ namespace SQL
 			this->data.clear();
 		}
 
-		void SetType(const Anope::string &key, Type t) override
+		void SetType(const Anope::string &key, Serialize::DataType dt) override
 		{
-			this->types[key] = t;
+			this->types[key] = dt;
 		}
 
-		Type GetType(const Anope::string &key) const override
+		Serialize::DataType GetType(const Anope::string &key) const override
 		{
-			std::map<Anope::string, Type>::const_iterator it = this->types.find(key);
+			auto it = this->types.find(key);
 			if (it != this->types.end())
 				return it->second;
-			return DT_TEXT;
+			return Serialize::DataType::TEXT;
 		}
 	};
 

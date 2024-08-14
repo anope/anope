@@ -32,10 +32,10 @@ struct HostRequestImpl final
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["nick"] << this->nick;
-		data["ident"] << this->ident;
-		data["host"] << this->host;
-		data.SetType("time", Serialize::Data::DT_INT); data["time"] << this->time;
+		data.Store("nick", this->nick);
+		data.Store("ident", this->ident);
+		data.Store("host", this->host);
+		data.Store("time", this->time);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)

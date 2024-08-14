@@ -173,7 +173,7 @@ public:
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 	{
 		T *t = this->Get(e);
-		data[this->name] << *t;
+		data.Store(this->name, *t);
 	}
 
 	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
@@ -194,8 +194,7 @@ public:
 
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 	{
-		data.SetType(this->name, Serialize::Data::DT_INT);
-		data[this->name] << true;
+		data.Store(this->name, true);
 	}
 
 	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override

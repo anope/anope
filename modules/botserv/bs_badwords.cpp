@@ -21,9 +21,9 @@ struct BadWordImpl final
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["ci"] << this->chan;
-		data["word"] << this->word;
-		data.SetType("type", Serialize::Data::DT_INT); data["type"] << this->type;
+		data.Store("ci", this->chan);
+		data.Store("word", this->word);
+		data.Store("type", this->type);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);

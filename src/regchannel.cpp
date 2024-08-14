@@ -40,15 +40,15 @@ AutoKick::~AutoKick()
 
 void AutoKick::Serialize(Serialize::Data &data) const
 {
-	data["ci"] << this->ci->name;
+	data.Store("ci", this->ci->name);
 	if (this->nc)
-		data["nc"] << this->nc->display;
+		data.Store("nc", this->nc->display);
 	else
-		data["mask"] << this->mask;
-	data["reason"] << this->reason;
-	data["creator"] << this->creator;
-	data.SetType("addtime", Serialize::Data::DT_INT); data["addtime"] << this->addtime;
-	data.SetType("last_used", Serialize::Data::DT_INT); data["last_used"] << this->last_used;
+		data.Store("mask", this->mask);
+	data.Store("reason", this->reason);
+	data.Store("creator", this->creator);
+	data.Store("addtime", this->addtime);
+	data.Store("last_used", this->last_used);
 }
 
 Serializable *AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
@@ -180,30 +180,33 @@ ChannelInfo::~ChannelInfo()
 
 void ChannelInfo::Serialize(Serialize::Data &data) const
 {
-	data["name"] << this->name;
+	data.Store("name", this->name);
 	if (this->founder)
-		data["founder"] << this->founder->display;
+		data.Store("founder", this->founder->display);
 	if (this->successor)
-		data["successor"] << this->successor->display;
-	data["description"] << this->desc;
-	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
-	data.SetType("last_used", Serialize::Data::DT_INT); data["last_used"] << this->last_used;
-	data["last_topic"] << this->last_topic;
-	data["last_topic_setter"] << this->last_topic_setter;
-	data.SetType("last_topic_time", Serialize::Data::DT_INT); data["last_topic_time"] << this->last_topic_time;
-	data.SetType("bantype", Serialize::Data::DT_INT); data["bantype"] << this->bantype;
+		data.Store("successor", this->successor->display);
+	data.Store("description", this->desc);
+	data.Store("time_registered", this->time_registered);
+	data.Store("last_used", this->last_used);
+	data.Store("last_topic", this->last_topic);
+	data.Store("last_topic_setter", this->last_topic_setter);
+	data.Store("last_topic_time", this->last_topic_time);
+	data.Store("bantype", this->bantype);
 	{
 		Anope::string levels_buffer;
 		for (const auto &[name, level] : this->levels)
 			levels_buffer += name + " " + Anope::ToString(level) + " ";
-		data["levels"] << levels_buffer;
+		data.Store("levels", levels_buffer);
 	}
 	if (this->bi)
-		data["bi"] << this->bi->nick;
-	data.SetType("banexpire", Serialize::Data::DT_INT); data["banexpire"] << this->banexpire;
-	data["memomax"] << this->memos.memomax;
+		data.Store("bi", this->bi->nick);
+	data.Store("banexpire", this->banexpire);
+	data.Store("memomax", this->memos.memomax);
+
+	std::ostringstream oss;
 	for (const auto &ignore : this->memos.ignores)
-		data["memoignores"] << ignore << " ";
+		oss << ignore << " ";
+	data.Store("memoignores", oss.str());
 
 	Extensible::ExtensibleSerialize(this, this, data);
 }

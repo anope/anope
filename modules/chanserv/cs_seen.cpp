@@ -46,13 +46,13 @@ struct SeenInfo final
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["nick"] << nick;
-		data["vhost"] << vhost;
-		data["type"] << type;
-		data["nick2"] << nick2;
-		data["channel"] << channel;
-		data["message"] << message;
-		data.SetType("last", Serialize::Data::DT_INT); data["last"] << last;
+		data.Store("nick", nick);
+		data.Store("vhost", vhost);
+		data.Store("type", type);
+		data.Store("nick2", nick2);
+		data.Store("channel", channel);
+		data.Store("message", message);
+		data.Store("last", last);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)

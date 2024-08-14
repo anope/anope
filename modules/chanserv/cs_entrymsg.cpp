@@ -32,10 +32,10 @@ struct EntryMsgImpl final
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["ci"] << this->chan;
-		data["creator"] << this->creator;
-		data["message"] << this->message;
-		data.SetType("when", Serialize::Data::DT_INT); data["when"] << this->when;
+		data.Store("ci", this->chan);
+		data.Store("creator", this->creator);
+		data.Store("message", this->message);
+		data.Store("when", this->when);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);

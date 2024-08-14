@@ -30,10 +30,10 @@ IgnoreDataImpl::~IgnoreDataImpl()
 
 void IgnoreDataImpl::Serialize(Serialize::Data &data) const
 {
-	data["mask"] << this->mask;
-	data["creator"] << this->creator;
-	data["reason"] << this->reason;
-	data["time"] << this->time;
+	data.Store("mask", this->mask);
+	data.Store("creator", this->creator);
+	data.Store("reason", this->reason);
+	data.Store("time", this->time);
 }
 
 Serializable *IgnoreDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)

@@ -34,14 +34,6 @@ public:
 		return *stream;
 	}
 
-	std::set<Anope::string> KeySet() const override
-	{
-		std::set<Anope::string> keys;
-		for (const auto &[key, _] : this->data)
-			keys.insert(key);
-		return keys;
-	}
-
 	size_t Hash() const override
 	{
 		size_t hash = 0;

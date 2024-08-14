@@ -16,8 +16,8 @@ struct MyOper final
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["name"] << this->name;
-		data["type"] << this->ot->GetName();
+		data.Store("name", this->name);
+		data.Store("type", this->ot->GetName());
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)

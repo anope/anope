@@ -46,9 +46,9 @@ struct CSMiscData final
 
 	void Serialize(Serialize::Data &sdata) const override
 	{
-		sdata["ci"] << this->object;
-		sdata["name"] << this->name;
-		sdata["data"] << this->data;
+		sdata.Store("ci", this->object);
+		sdata.Store("name", this->name);
+		sdata.Store("data", this->data);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)

@@ -75,12 +75,12 @@ BotInfo::~BotInfo()
 
 void BotInfo::Serialize(Serialize::Data &data) const
 {
-	data["nick"] << this->nick;
-	data["user"] << this->ident;
-	data["host"] << this->host;
-	data["realname"] << this->realname;
-	data["created"] << this->created;
-	data["oper_only"] << this->oper_only;
+	data.Store("nick", this->nick);
+	data.Store("user", this->ident);
+	data.Store("host", this->host);
+	data.Store("realname", this->realname);
+	data.Store("created", this->created);
+	data.Store("oper_only", this->oper_only);
 
 	Extensible::ExtensibleSerialize(this, this, data);
 }

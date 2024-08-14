@@ -68,17 +68,20 @@ NickCore::~NickCore()
 
 void NickCore::Serialize(Serialize::Data &data) const
 {
-	data["display"] << this->display;
-	data["uniqueid"] << this->id;
-	data["pass"] << this->pass;
-	data["email"] << this->email;
-	data["language"] << this->language;
-	data.SetType("lastmail", Serialize::Data::DT_INT); data["lastmail"] << this->lastmail;
-	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
+	data.Store("display", this->display);
+	data.Store("uniqueid", this->id);
+	data.Store("pass", this->pass);
+	data.Store("email", this->email);
+	data.Store("language", this->language);
+	data.Store("lastmail", this->lastmail);
+	data.Store("time_registered", this->time_registered);
+	data.Store("memomax", this->memos.memomax);
 
-	data["memomax"] << this->memos.memomax;
+	std::ostringstream oss;
 	for (const auto &ignore : this->memos.ignores)
-		data["memoignores"] << ignore << " ";
+		oss << ignore << " ";
+	data.Store("memoignores", oss.str());
+
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 

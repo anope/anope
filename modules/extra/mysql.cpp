@@ -158,6 +158,29 @@ public:
 	Anope::string BuildQuery(const Query &q);
 
 	Anope::string FromUnixtime(time_t) override;
+
+	Anope::string GetColumnType(Serialize::DataType dt)
+	{
+		switch (dt)
+		{
+			case Serialize::DataType::BOOL:
+				return "TINYINT NOT NULL";
+
+			case Serialize::DataType::FLOAT:
+				return "DOUBLE PRECISION NOT NULL";
+
+			case Serialize::DataType::INT:
+				return "BIGINT NOT NULL";
+
+			case Serialize::DataType::TEXT:
+				return "TEXT";
+
+			case Serialize::DataType::UINT:
+				return "BIGINT UNSIGNED NOT NULL";
+		}
+
+		return "TEXT"; // Should never be reached
+	}
 };
 
 /** The SQL thread used to execute queries
@@ -410,17 +433,13 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 
 	if (known_cols.empty())
 	{
-		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
+		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE,"
 			" `timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
 		for (const auto &[column, _] : data.data)
 		{
 			known_cols.insert(column);
 
-			query_text += ", `" + column + "` ";
-			if (data.GetType(column) == Serialize::Data::DT_INT)
-				query_text += "int";
-			else
-				query_text += "text";
+			query_text += ", `" + column + "` " + GetColumnType(data.GetType(column));
 		}
 		query_text += ", PRIMARY KEY (`id`), KEY `timestamp_idx` (`timestamp`)) ROW_FORMAT=DYNAMIC";
 		queries.push_back(query_text);
@@ -434,11 +453,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 
 			known_cols.insert(column);
 
-			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` ";
-			if (data.GetType(column) == Serialize::Data::DT_INT)
-				query_text += "int";
-			else
-				query_text += "text";
+			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` " + GetColumnType(data.GetType(column));
 
 			queries.push_back(query_text);
 		}
@@ -474,11 +489,29 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 		Anope::string buf;
 		*value >> buf;
 
-		bool escape = true;
-		if (buf.empty())
+		auto escape = true;
+		switch (data.GetType(field))
 		{
-			buf = "NULL";
-			escape = false;
+			case Serialize::DataType::BOOL:
+			case Serialize::DataType::FLOAT:
+			case Serialize::DataType::INT:
+			case Serialize::DataType::UINT:
+			{
+				if (buf.empty())
+					buf = "0";
+				escape = false;
+				break;
+			}
+
+			case Serialize::DataType::TEXT:
+			{
+				if (buf.empty())
+				{
+					buf = "NULL";
+					escape = false;
+				}
+				break;
+			}
 		}
 
 		query.SetValue(field, buf, escape);

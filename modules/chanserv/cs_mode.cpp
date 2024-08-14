@@ -205,12 +205,12 @@ struct ModeLocksImpl final
 
 void ModeLockImpl::Serialize(Serialize::Data &data) const
 {
-	data["ci"] << this->ci;
-	data["set"] << this->set;
-	data["name"] << this->name;
-	data["param"] << this->param;
-	data["setter"] << this->setter;
-	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;
+	data.Store("ci", this->ci);
+	data.Store("set", this->set);
+	data.Store("name", this->name);
+	data.Store("param", this->param);
+	data.Store("setter", this->setter);
+	data.Store("created", this->created);
 }
 
 Serializable *ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data)

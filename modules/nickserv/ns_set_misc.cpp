@@ -46,9 +46,9 @@ struct NSMiscData final
 
 	void Serialize(Serialize::Data &sdata) const override
 	{
-		sdata["nc"] << this->object;
-		sdata["name"] << this->name;
-		sdata["data"] << this->data;
+		sdata.Store("nc", this->object);
+		sdata.Store("name", this->name);
+		sdata.Store("data", this->data);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)

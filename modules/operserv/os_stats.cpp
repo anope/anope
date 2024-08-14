@@ -24,8 +24,8 @@ struct Stats final
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["maxusercnt"] << MaxUserCount;
-		data["maxusertime"] << MaxUserTime;
+		data.Store("maxusercnt", MaxUserCount);
+		data.Store("maxusertime", MaxUserTime);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)

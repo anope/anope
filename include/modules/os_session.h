@@ -62,12 +62,12 @@ static ServiceReference<SessionService> session_service("SessionService", "sessi
 
 void Exception::Serialize(Serialize::Data &data) const
 {
-	data["mask"] << this->mask;
-	data["limit"] << this->limit;
-	data["who"] << this->who;
-	data["reason"] << this->reason;
-	data["time"] << this->time;
-	data["expires"] << this->expires;
+	data.Store("mask", this->mask);
+	data.Store("limit", this->limit);
+	data.Store("who", this->who);
+	data.Store("reason", this->reason);
+	data.Store("time", this->time);
+	data.Store("expires", this->expires);
 }
 
 Serializable *Exception::Unserialize(Serializable *obj, Serialize::Data &data)

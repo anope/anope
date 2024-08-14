@@ -168,8 +168,10 @@ public:
 			if (c == NULL || !c->GetCertCount())
 				return;
 
+			std::ostringstream oss;
 			for (unsigned i = 0; i < c->GetCertCount(); ++i)
-				data["cert"] << c->GetCert(i) << " ";
+				oss << c->GetCert(i) << " ";
+			data.Store("cert", oss.str());
 		}
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override

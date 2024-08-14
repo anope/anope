@@ -36,12 +36,12 @@ Memo::~Memo()
 
 void Memo::Serialize(Serialize::Data &data) const
 {
-	data["owner"] << this->owner;
-	data.SetType("time", Serialize::Data::DT_INT); data["time"] << this->time;
-	data["sender"] << this->sender;
-	data["text"] << this->text;
-	data["unread"] << this->unread;
-	data["receipt"] << this->receipt;
+	data.Store("owner", this->owner);
+	data.Store("time", this->time);
+	data.Store("sender", this->sender);
+	data.Store("text", this->text);
+	data.Store("unread", this->unread);
+	data.Store("receipt", this->receipt);
 }
 
 Serializable *Memo::Unserialize(Serializable *obj, Serialize::Data &data)

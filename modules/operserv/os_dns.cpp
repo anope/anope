@@ -39,10 +39,10 @@ struct DNSZone final
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["name"] << name;
+		data.Store("name", name);
 		unsigned count = 0;
 		for (const auto &server : servers)
-			data["server" + Anope::ToString(count++)] << server;
+			data.Store("server" + Anope::ToString(count++), server);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
@@ -144,14 +144,14 @@ public:
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["server_name"] << server_name;
+		data.Store("server_name", server_name);
 		for (unsigned i = 0; i < ips.size(); ++i)
-			data["ip" + Anope::ToString(i)] << ips[i];
-		data["limit"] << limit;
-		data["pooled"] << pooled;
+			data.Store("ip" + Anope::ToString(i), ips[i]);
+		data.Store("limit", limit);
+		data.Store("pooled", pooled);
 		unsigned count = 0;
 		for (const auto &zone : zones)
-			data["zone" + Anope::ToString(count++)] << zone;
+			data.Store("zone" + Anope::ToString(count++), zone);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)

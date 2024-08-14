@@ -69,10 +69,10 @@ struct MyNewsItem final
 {
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["type"] << this->type;
-		data["text"] << this->text;
-		data["who"] << this->who;
-		data["time"] << this->time;
+		data.Store("type", this->type);
+		data.Store("text", this->text);
+		data.Store("who", this->who);
+		data.Store("time", this->time);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)

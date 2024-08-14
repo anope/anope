@@ -25,12 +25,12 @@ struct ForbidDataImpl final
 
 void ForbidDataImpl::Serialize(Serialize::Data &data) const
 {
-	data["mask"] << this->mask;
-	data["creator"] << this->creator;
-	data["reason"] << this->reason;
-	data["created"] << this->created;
-	data["expires"] << this->expires;
-	data["type"] << this->type;
+	data.Store("mask", this->mask);
+	data.Store("creator", this->creator);
+	data.Store("reason", this->reason);
+	data.Store("created", this->created);
+	data.Store("expires", this->expires);
+	data.Store("type", this->type);
 }
 
 Serializable *ForbidDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)

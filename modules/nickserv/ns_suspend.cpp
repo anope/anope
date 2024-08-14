@@ -22,11 +22,11 @@ struct NSSuspendInfo final
 
 	void Serialize(Serialize::Data &data) const override
 	{
-		data["nick"] << what;
-		data["by"] << by;
-		data["reason"] << reason;
-		data["time"] << when;
-		data["expires"] << expires;
+		data.Store("nick", what);
+		data.Store("by", by);
+		data.Store("reason", reason);
+		data.Store("time", when);
+		data.Store("expires", expires);
 	}
 
 	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)

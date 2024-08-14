@@ -141,21 +141,21 @@ NickAlias *NickAlias::Find(const Anope::string &nick)
 
 void NickAlias::Serialize(Serialize::Data &data) const
 {
-	data["nick"] << this->nick;
-	data["last_quit"] << this->last_quit;
-	data["last_realname"] << this->last_realname;
-	data["last_usermask"] << this->last_usermask;
-	data["last_realhost"] << this->last_realhost;
-	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
-	data.SetType("last_seen", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
-	data["nc"] << this->nc->display;
+	data.Store("nick", this->nick);
+	data.Store("last_quit", this->last_quit);
+	data.Store("last_realname", this->last_realname);
+	data.Store("last_usermask", this->last_usermask);
+	data.Store("last_realhost", this->last_realhost);
+	data.Store("time_registered", this->time_registered);
+	data.Store("last_seen", this->last_seen);
+	data.Store("nc", this->nc->display);
 
 	if (this->HasVHost())
 	{
-		data["vhost_ident"] << this->GetVHostIdent();
-		data["vhost_host"] << this->GetVHostHost();
-		data["vhost_creator"] << this->GetVHostCreator();
-		data["vhost_time"] << this->GetVHostCreated();
+		data.Store("vhost_ident", this->GetVHostIdent());
+		data.Store("vhost_host", this->GetVHostHost());
+		data.Store("vhost_creator", this->GetVHostCreator());
+		data.Store("vhost_time", this->GetVHostCreated());
 	}
 
 	Extensible::ExtensibleSerialize(this, this, data);

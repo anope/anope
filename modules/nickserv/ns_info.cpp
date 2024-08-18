@@ -89,6 +89,7 @@ public:
 			InfoFormatter info(source.nc);
 
 			info[_("Account")] = na->nc->display;
+			info[_("Account id")] = Anope::ToString(na->nc->GetId());
 			if (nick_online)
 			{
 				bool shown = false;

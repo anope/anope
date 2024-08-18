@@ -31,12 +31,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang$")
   execute_process(COMMAND ${CMAKE_C_COMPILER} -print-search-dirs OUTPUT_VARIABLE LINES OUTPUT_STRIP_TRAILING_WHITESPACE)
   # Find only the part after "libraries: "
   string(REGEX REPLACE ".*\nlibraries: (.*)$" "\\1" LINE "${LINES}")
-  # Replace the colons in the list with semicolons (only when not on MinGW, which uses semicolons already), and if on MinGW, just copy the line
-  if(NOT MINGW)
-    string(REGEX REPLACE ":" ";" LIBRARIES ${LINE})
-  else()
-    set(LIBRARIES "${LINE}")
-  endif()
+  # Replace the colons in the list with semicolons
+  string(REGEX REPLACE ":" ";" LIBRARIES ${LINE})
   # Iterate through the libraries
   foreach(LIBRARY ${LIBRARIES})
     # Check if the first character is an equal sign, and skip that library directory as it is (I believe) the primary default and shows up later in the list anyways
@@ -104,13 +100,6 @@ if(NOT MSVC)
   else()
     set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
   endif()
-endif()
-
-# If running under MinGW, we have to force the resource compiler settings (hopefully this will be fixed in a later version of CMake)
-if(MINGW)
-  set(CMAKE_RC_COMPILER_INIT windres)
-  enable_language(RC)
-  set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> <DEFINES> -o <OBJECT> <SOURCE>")
 endif()
 
 # Include the checking functions used later in this CMakeLists.txt
@@ -187,11 +176,6 @@ endif()
 find_package("Threads" REQUIRED)
 if(CMAKE_THREAD_LIBS_INIT)
   list(APPEND LINK_LIBS ${CMAKE_THREAD_LIBS_INIT})
-endif()
-
-# Under MinGW, the -shared flag isn't properly set in the module-specific linker flags, add it from the C flags for shared libraries
-if(MINGW)
-  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS}")
 endif()
 
 if(NOT PROGRAM_NAME)

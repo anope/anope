@@ -30,18 +30,8 @@ if(WIN32)
   set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc LANGUAGE RC)
   # Add the resource file to the list of sources
   list(APPEND SRC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc)
-  # For MinGW, we have to change the compile flags
-  if(MINGW)
-    set(RC_CFLAGS "-DMINGW -Ocoff -I${Anope_SOURCE_DIR}/include")
-    # If any sort of debugging is being enabled, add a _DEBUG define to the flags for the resource compiler
-    if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
-      set(RC_CFLAGS "${RC_CFLAGS} -D_DEBUG")
-    endif()
-    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc COMPILE_FLAGS "${RC_CFLAGS}")
-  # For anything else, assumingly Visual Studio at this point, use a different set of compile flags
-  else()
-    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc COMPILE_FLAGS "/i\"${Anope_SOURCE_DIR}/include\"")
-  endif()
+
+  set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc COMPILE_FLAGS "/i\"${Anope_SOURCE_DIR}/include\"")
 endif()
 
 # If compiling with Visual Studio, create a static library out of win32/win32_memory.cpp to be included with everything else, needed to override its override of new/delete operators

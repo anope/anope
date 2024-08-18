@@ -50,7 +50,7 @@ public:
 
 		if (bi)
 		{
-			source.Reply(_("Information for bot \002%s\002:"), bi->nick.c_str());
+			source.Reply(_("Information about bot \002%s\002:"), bi->nick.c_str());
 			info[_("Mask")] = bi->GetIdent() + "@" + bi->host;
 			info[_("Real name")] = bi->realname;
 			info[_("Created")] = Anope::strftime(bi->created, source.GetAccount());

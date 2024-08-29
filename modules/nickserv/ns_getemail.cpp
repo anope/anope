@@ -15,11 +15,12 @@
 
 #include "module.h"
 
-class CommandNSGetEMail final
+class CommandNSGetEmail final
 	: public Command
 {
 public:
-	CommandNSGetEMail(Module *creator) : Command(creator, "nickserv/getemail", 1, 1)
+	CommandNSGetEmail(Module *creator)
+		: Command(creator, "nickserv/getemail", 1, 1)
 	{
 		this->SetDesc(_("Matches and returns all users that registered using given email"));
 		this->SetSyntax(_("\037email\037"));
@@ -59,16 +60,19 @@ public:
 	}
 };
 
-class NSGetEMail final
+class NSGetEmail final
 	: public Module
 {
-	CommandNSGetEMail commandnsgetemail;
+private:
+	CommandNSGetEmail commandnsgetemail;
+
 public:
-	NSGetEMail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsgetemail(this)
+	NSGetEmail(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnsgetemail(this)
 	{
 
 	}
 };
 
-MODULE_INIT(NSGetEMail)
+MODULE_INIT(NSGetEmail)

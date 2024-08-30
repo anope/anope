@@ -1,6 +1,15 @@
 Anope Version 2.1.8-git
 -----------------------
-No significant changes.
+Added account identifiers to the nickserv/info output.
+Added support for bool, float, and uint SQL columns.
+Added the ability to automatically determine SQL column types based on the native type.
+Added UNIX socket support to mysql module.
+Changed smartjoin to use SendClearBans where available.
+Dropped support for MinGW in favour of native builds.
+Fixed parsing named extbans on InspIRCd.
+Fixed parsing SVSMODE and SVS2MODE from UnrealIRCd.
+Fixed sending global messages to remotely linked servers.
+Removed the services server name from the CTCP version response.
 
 Anope Version 2.1.7
 -------------------

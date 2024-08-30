@@ -38,7 +38,6 @@ Run_Build_System () {
 	WITH_PERM=""
 	EXTRA_INCLUDE=""
 	EXTRA_LIBS=""
-	GEN_TYPE=""
 
 	if [ "$INSTDIR" != "" ] ; then
 		WITH_INST="-DINSTDIR:STRING=$INSTDIR"
@@ -66,29 +65,22 @@ Run_Build_System () {
 		EXTRA_LIBS="-DEXTRA_LIBS:STRING=$EXTRA_LIB_DIRS"
 	fi
 
-	if [ "$SOURCE_DIR" = "." ] ; then
-		pwdsave=`pwd`
-		test -d build || mkdir build
-		cd "build"
-		REAL_SOURCE_DIR=".."
-	else
-		REAL_SOURCE_DIR="$SOURCE_DIR"
-	fi
+	BUILD_PATHS="-B ${SOURCE_DIR}/build ${SOURCE_DIR}"
 
-	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
+	CMAKE="cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $BUILD_PATHS"
+	echo $CMAKE
+	$CMAKE
 
-	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
 	if [ $? -ne 0 ]; then
 		echo "You should fix these issues and then run ./Config -quick to rerun CMake."
 		exit 1
 	fi
 
 	echo ""
-	if [ "$SOURCE_DIR" = "." ] ; then
-		echo "Now cd build, then run make to build Anope."
-		cd "$pwdsave"
-	else
+	if [ "$PWD" = "${SOURCE_DIR}/build" ]; then
 		echo "Now run make to build Anope."
+	else
+		echo "Now cd build, then run make to build Anope."
 	fi
 }
 
@@ -104,7 +96,7 @@ EXTRA_INCLUDE_DIRS=
 EXTRA_LIB_DIRS=
 EXTRA_CONFIG_ARGS=
 CAN_QUICK="no"
-SOURCE_DIR=`dirname $0`
+SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 ###########################################################################
 # Check out the options
@@ -121,7 +113,7 @@ while [ $# -ge 1 ] ; do
 		exit 0
 	elif [ $1 = "-devel" ] ; then
 		DEBUG="yes"
-		INSTDIR="$PWD/run"
+		INSTDIR="$SOURCE_DIR/run"
 	elif [ $1 = "-nocache" ] ; then
 		IGNORE_CACHE="1"
 	elif [ $1 = "-nointro" ] ; then

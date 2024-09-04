@@ -139,8 +139,19 @@ public:
 		, argon2dprovider(this, Argon2_d)
 		, argon2iprovider(this, Argon2_i)
 		, argon2idprovider(this, Argon2_id)
-
 	{
+		argon2dprovider.Check({
+			{ "$argon2d$v=19$m=10,t=10,p=1$VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw$fNS8JrvE8EqKwQ", "" },
+			{ "$argon2d$v=19$m=10,t=10,p=1$VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw$hTvpprMF0TwszQ", "The quick brown fox jumps over the lazy dog" },
+		});
+		argon2iprovider.Check({
+			{ "$argon2i$v=19$m=10,t=10,p=1$VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw$neE6hYxRp4TCJA", "" },
+			{ "$argon2i$v=19$m=10,t=10,p=1$VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw$/JAt4FdP1MFD+A", "The quick brown fox jumps over the lazy dog" },
+		});
+		argon2idprovider.Check({
+			{ "$argon2id$v=19$m=10,t=10,p=1$VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw$wuNeHixFDS6Tkg", "" },
+			{ "$argon2id$v=19$m=10,t=10,p=1$VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw$Po8RcmxZ7vHmdg", "The quick brown fox jumps over the lazy dog" },
+		});
 	}
 
 	void OnReload(Configuration::Conf *conf) override

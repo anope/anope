@@ -536,6 +536,9 @@ public:
 			if (nickserv_expire && Anope::CurTime - na->last_seen >= nickserv_expire)
 				expire = true;
 
+			if (na->nc->na == na && na->nc->aliases->size() > 1 && Config->GetModule("nickserv")->Get<bool>("preservedisplay"))
+				expire = false;
+
 			FOREACH_MOD(OnPreNickExpire, (na, expire));
 
 			if (expire)

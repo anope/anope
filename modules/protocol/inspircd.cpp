@@ -42,6 +42,22 @@ namespace
 	// The version of the InspIRCd protocol that we are using.
 	size_t spanningtree_proto_ver = 1205;
 
+	bool IsExtBan(const Anope::string &str, bool &inverted, Anope::string &name, Anope::string &value)
+	{
+		auto startpos = 0;
+		if (!str.empty() && str[0] == '!')
+			startpos++;
+
+		auto endpos = str.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", startpos);
+		if (endpos == Anope::string::npos || str[endpos] != ':' || endpos+1 == str.length())
+			return false;
+
+		inverted = !!startpos;
+		name = str.substr(startpos, endpos - startpos);
+		value = str.substr(endpos + 1);
+		return true;
+	}
+
 	// Parses a module name in the format "m_foo.so=bar" to {foo, bar}.
 	void ParseModule(const Anope::string &module, Anope::string &modname, Anope::string &moddata)
 	{
@@ -623,7 +639,9 @@ public:
 
 	bool IsExtbanValid(const Anope::string &mask) override
 	{
-		return mask.length() >= 3 && mask[1] == ':';
+		bool inverted;
+		Anope::string name, value;
+		return IsExtBan(mask, inverted, name, value);
 	}
 
 	bool IsIdentValid(const Anope::string &ident) override
@@ -704,19 +722,15 @@ namespace InspIRCdExtBan
 			if (cm->type != MODE_LIST)
 				return cm;
 
-			auto startpos = 0;
-			if (param[0] == '!')
-				startpos++;
-
-			auto endpos = param.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", startpos);
-			if (endpos == Anope::string::npos || param[endpos] != ':')
+			bool inverted;
+			Anope::string name, value;
+			if (!IsExtBan(param, inverted, name, value))
 				return cm;
 
-			auto name = param.substr(startpos, endpos - startpos);
-			if (param.length() >= endpos || (name.length() == 1 ? name[0] != xbchar : name != xbname))
+			if (name.length() == 1 ? name[0] != xbchar : name != xbname)
 				return cm;
 
-			param.erase(0, endpos);
+			param = value;
 			return this;
 		}
 	};

@@ -57,12 +57,20 @@ public:
 		BotInfo *bi = user->server == Me ? dynamic_cast<BotInfo *>(user) : NULL;
 		if (bi && Config->GetModule(this)->Get<bool>("smartjoin"))
 		{
-			/* We check for bans */
-			for (const auto &entry : c->GetModeList("BAN"))
+			if (IRCD->CanClearBans)
 			{
-				Entry ban("BAN", entry);
-				if (ban.Matches(user))
-					c->RemoveMode(NULL, "BAN", ban.GetMask());
+				// We can ask the IRCd to clear bans.
+				IRCD->SendClearBans(bi, c, bi);
+			}
+			else
+			{
+				// We have to check for bans.
+				for (const auto &entry : c->GetModeList("BAN"))
+				{
+					Entry ban("BAN", entry);
+					if (ban.Matches(user))
+						c->RemoveMode(NULL, "BAN", ban.GetMask());
+				}
 			}
 
 			Anope::string Limit;

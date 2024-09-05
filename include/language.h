@@ -108,7 +108,7 @@ namespace Language
 #define CHAN_SETTING_CHANGED		_("%s for %s set to %s.")
 #define CHAN_SETTING_UNSET		_("%s for %s unset.")
 #define CHAN_ACCESS_LEVEL_RANGE		_("Access level must be between %d and %d inclusive.")
-#define CHAN_INFO_HEADER		_("Information for channel \002%s\002:")
+#define CHAN_INFO_HEADER		_("Information about channel \002%s\002:")
 #define CHAN_EXCEPTED			_("\002%s\002 matches an except on %s and cannot be banned until the except has been removed.")
 #define MEMO_NEW_X_MEMO_ARRIVED		_("There is a new memo on channel %s.\n" \
 						"Type \002%s%s READ %s %zu\002 to read it.")

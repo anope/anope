@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-23 14:15+0100\n"
-"PO-Revision-Date: 2024-06-23 14:16+0100\n"
+"POT-Creation-Date: 2024-08-18 03:16+0100\n"
+"PO-Revision-Date: 2024-08-18 03:17+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1811,6 +1811,9 @@ msgstr "Account"
 #, c-format
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "Account %s has already reached the maximum number of simultaneous logins (%u)."
+
+msgid "Account id"
+msgstr "Account id"
 
 msgid "Account registered"
 msgstr "Account registered"
@@ -4194,12 +4197,12 @@ msgid "Info about a loaded module"
 msgstr "Info about a loaded module"
 
 #, c-format
-msgid "Information for bot %s:"
-msgstr "Information for bot %s:"
+msgid "Information about bot %s:"
+msgstr "Information about bot %s:"
 
 #, c-format
-msgid "Information for channel %s:"
-msgstr "Information for channel %s:"
+msgid "Information about channel %s:"
+msgstr "Information about channel %s:"
 
 #, c-format
 msgid "Invalid duration %s, using %d days."

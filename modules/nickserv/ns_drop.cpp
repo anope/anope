@@ -57,6 +57,12 @@ public:
 			return;
 		}
 
+		if (na->nc->na == na && na->nc->aliases->size() > 1 && Config->GetModule("nickserv")->Get<bool>("preservedisplay") && !source.HasPriv("nickserv/drop/display"))
+		{
+			source.Reply(_("You may not drop \002%s\002 as it is the display nick for the account."), na->nick.c_str());
+			return;
+		}
+
 		auto *code = dropcode.Get(na);
 		if (params.size() < 2 || ((!code || !code->equals_ci(params[1])) && (!source.HasPriv("nickserv/drop/override") || params[1] != "OVERRIDE")))
 		{

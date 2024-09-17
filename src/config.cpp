@@ -174,7 +174,6 @@ Conf::Conf() : Block("")
 	ValidateNotEmpty("serverinfo", "motd", serverinfo->Get<const Anope::string>("motd"));
 
 	ValidateNotZero("options", "readtimeout", options->Get<time_t>("readtimeout"));
-	ValidateNotZero("options", "warningtimeout", options->Get<time_t>("warningtimeout"));
 
 	ValidateNotZero("networkinfo", "nicklen", networkinfo->Get<unsigned>("nicklen"));
 	ValidateNotZero("networkinfo", "userlen", networkinfo->Get<unsigned>("userlen"));

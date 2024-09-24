@@ -6,9 +6,11 @@
  * Please read COPYING and README for further details.
  */
 
+#pragma once
+
 namespace SASL
 {
-	struct Message
+	struct Message final
 	{
 		Anope::string source;
 		Anope::string target;
@@ -20,16 +22,17 @@ namespace SASL
 	class Mechanism;
 	struct Session;
 
-	class Service : public ::Service
+	class Service
+		: public ::Service
 	{
-	 public:
+	public:
 		Service(Module *o) : ::Service(o, "SASL::Service", "sasl") { }
 
 		virtual void ProcessMessage(const Message &) = 0;
 
 		virtual Anope::string GetAgent() = 0;
 
-		virtual Session* GetSession(const Anope::string &uid) = 0;
+		virtual Session *GetSession(const Anope::string &uid) = 0;
 
 		virtual void SendMessage(SASL::Session *session, const Anope::string &type, const Anope::string &data) = 0;
 
@@ -58,12 +61,13 @@ namespace SASL
 	};
 
 	/* PLAIN, EXTERNAL, etc */
-	class Mechanism : public ::Service
+	class Mechanism
+		: public ::Service
 	{
-	 public:
+	public:
 		Mechanism(Module *o, const Anope::string &sname) : Service(o, "SASL::Mechanism", sname) { }
 
-		virtual Session* CreateSession(const Anope::string &uid) { return new Session(this, uid); }
+		virtual Session *CreateSession(const Anope::string &uid) { return new Session(this, uid); }
 
 		virtual void ProcessMessage(Session *session, const Message &) = 0;
 
@@ -74,15 +78,16 @@ namespace SASL
 		}
 	};
 
-	class IdentifyRequest : public ::IdentifyRequest
+	class IdentifyRequest
+		: public ::IdentifyRequest
 	{
 		Anope::string uid;
 		Anope::string hostname, ip;
 
-	 public:
+	public:
 		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass, const Anope::string &h, const Anope::string &i) : ::IdentifyRequest(m, acc, pass), uid(id), hostname(h), ip(i) { }
 
-		void OnSuccess() anope_override
+		void OnSuccess() override
 		{
 			if (!sasl)
 				return;
@@ -108,7 +113,7 @@ namespace SASL
 			}
 		}
 
-		void OnFail() anope_override
+		void OnFail() override
 		{
 			if (!sasl)
 				return;

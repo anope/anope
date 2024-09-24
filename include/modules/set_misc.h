@@ -6,12 +6,15 @@
  * Please read COPYING and README for further details.
  */
 
+#pragma once
+
 struct MiscData
 {
 	Anope::string object;
 	Anope::string name;
 	Anope::string data;
 
-	MiscData() { }
-	virtual ~MiscData() { }
+	virtual ~MiscData() = default;
+protected:
+	MiscData() = default;
 };

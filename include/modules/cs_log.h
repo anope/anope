@@ -9,6 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#pragma once
+
 struct LogSetting
 {
 	Anope::string chan;
@@ -22,21 +24,22 @@ struct LogSetting
 	Anope::string creator;
 	time_t created;
 
-	virtual ~LogSetting() { }
- protected:
-	LogSetting() { }
+	virtual ~LogSetting() = default;
+protected:
+	LogSetting() = default;
 };
 
-struct LogSettings : Serialize::Checker<std::vector<LogSetting *> >
+struct LogSettings
+	: Serialize::Checker<std::vector<LogSetting *> >
 {
 	typedef std::vector<LogSetting *>::iterator iterator;
 
- protected:
+protected:
 	LogSettings() : Serialize::Checker<std::vector<LogSetting *> >("LogSetting")
 	{
 	}
 
- public:
-	virtual ~LogSettings() { }
+public:
+	virtual ~LogSettings() = default;
 	virtual LogSetting *Create() = 0;
 };

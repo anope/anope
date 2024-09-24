@@ -9,23 +9,23 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef MEMO_H
-#define MEMO_H
+#pragma once
 
 #include "anope.h"
 #include "serialize.h"
 
-class CoreExport Memo : public Serializable
+class CoreExport Memo final
+	: public Serializable
 {
- public:
+public:
 	MemoInfo *mi;
 	bool unread;
 	bool receipt;
 	Memo();
 	~Memo();
 
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	void Serialize(Serialize::Data &data) const override;
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	Anope::string owner;
 	/* When it was sent */
@@ -37,9 +37,9 @@ class CoreExport Memo : public Serializable
 /* Memo info structures.  Since both nicknames and channels can have memos,
  * we encapsulate memo data in a MemoInfo to make it easier to handle.
  */
-struct CoreExport MemoInfo
+struct CoreExport MemoInfo final
 {
-	int16_t memomax;
+	int16_t memomax = 0;
 	Serialize::Checker<std::vector<Memo *> > memos;
 	std::vector<Anope::string> ignores;
 
@@ -51,5 +51,3 @@ struct CoreExport MemoInfo
 
 	static MemoInfo *GetMemoInfo(const Anope::string &targ, bool &is_chan);
 };
-
-#endif // MEMO_H

@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef BASE_H
-#define BASE_H
+#pragma once
 
 #include "services.h"
 
@@ -16,9 +15,8 @@
 class CoreExport Base
 {
 	/* References to this base class */
-	std::set<ReferenceBase *> *references;
- public:
-	Base();
+	std::set<ReferenceBase *> *references = nullptr;
+public:
 	virtual ~Base();
 
 	/** Adds a reference to this object. Eg, when a Reference
@@ -32,12 +30,12 @@ class CoreExport Base
 
 class ReferenceBase
 {
- protected:
-	bool invalid;
- public:
-	ReferenceBase() : invalid(false) { }
+protected:
+	bool invalid = false;
+public:
+	ReferenceBase() = default;
 	ReferenceBase(const ReferenceBase &other) : invalid(other.invalid) { }
-	virtual ~ReferenceBase() { }
+	virtual ~ReferenceBase() = default;
 	inline void Invalidate() { this->invalid = true; }
 };
 
@@ -45,14 +43,13 @@ class ReferenceBase
  * no longer be valid once the object it refers is destructed.
  */
 template<typename T>
-class Reference : public ReferenceBase
+class Reference
+	: public ReferenceBase
 {
- protected:
-	T *ref;
- public:
-	Reference() : ref(NULL)
-	{
-	}
+protected:
+	T *ref = nullptr;
+public:
+	Reference() = default;
 
 	Reference(T *obj) : ref(obj)
 	{
@@ -106,14 +103,14 @@ class Reference : public ReferenceBase
 		return NULL;
 	}
 
-	inline T* operator->()
+	inline T *operator->()
 	{
 		if (operator bool())
 			return this->ref;
 		return NULL;
 	}
 
-	inline T* operator*()
+	inline T *operator*()
 	{
 		if (operator bool())
 			return this->ref;
@@ -139,5 +136,3 @@ class Reference : public ReferenceBase
 		return false;
 	}
 };
-
-#endif // BASE_H

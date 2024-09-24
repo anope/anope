@@ -7,20 +7,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-22 16:25+0000\n"
-"PO-Revision-Date: 2024-01-22 16:28+0000\n"
-"Last-Translator: CaPaCuL\n"
+"POT-Creation-Date: 2024-06-23 18:32+0100\n"
+"PO-Revision-Date: 2024-06-23 16:07+0300\n"
+"Last-Translator: CaPaCuL <capacul@gmail.com>\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.4\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
-msgstr "%d kanal temizlendi ve %d kanal bırakıldı."
+msgstr "%d kanal temizlendi ve %d kanal düşürüldü."
 
 #, c-format
 msgid "%d nickname(s) dropped."
@@ -40,15 +40,11 @@ msgstr "%s, %s ayrıcalığına sahip %s erişim listesine eklendi (seviye %d)
 
 #, c-format
 msgid "%s added to %s autokick list."
-msgstr "%s, %s otomatik atma listesine eklendi."
+msgstr "%s, %s oto-at listesine eklendi."
 
 #, c-format
 msgid "%s added to %s bad words list."
-msgstr "%s, %s kötü kelimeler listesine eklendi."
-
-#, c-format
-msgid "%s added to %s's access list."
-msgstr "%s, %s kullanıcısının erişim listesine eklendi."
+msgstr "%s, %s küfür listesine eklendi."
 
 #, c-format
 msgid "%s added to %s's certificate list."
@@ -147,11 +143,11 @@ msgstr ""
 
 #, c-format
 msgid "%s already exists in %s bad words list."
-msgstr "%s zaten %s'in kötü kelimeler listesinde mevcut."
+msgstr "%s zaten %s'in küfür listesinde mevcut."
 
 #, c-format
 msgid "%s already exists on %s autokick list."
-msgstr "%s zaten %s otomatik atma listesinde mevcut."
+msgstr "%s zaten %s oto-at listesinde mevcut."
 
 #, c-format
 msgid "%s already exists on the EXCEPTION list."
@@ -179,15 +175,11 @@ msgstr "%s, %s erişim listesinden silindi."
 
 #, c-format
 msgid "%s deleted from %s autokick list."
-msgstr "%s, %s otomatik atma listesinden silindi."
+msgstr "%s, %s oto-at listesinden silindi."
 
 #, c-format
 msgid "%s deleted from %s bad words list."
-msgstr "%s, %s kötü kelimeler listesinden silindi."
-
-#, c-format
-msgid "%s deleted from %s's access list."
-msgstr "%s, %s'in erişim listesinden silindi."
+msgstr "%s, %s küfür listesinden silindi."
 
 #, c-format
 msgid "%s deleted from %s's certificate list."
@@ -208,6 +200,10 @@ msgstr "%s AKILL listesinden silindi."
 #, c-format
 msgid "%s disabled on channel %s."
 msgstr "%s %s kanalında devre dışı bırakıldı."
+
+#, c-format
+msgid "%s does not wish to be added to channel access lists."
+msgstr "%s kanal erişim listelerine eklenmek istemiyor."
 
 #, c-format
 msgid "%s has been invited to %s."
@@ -286,7 +282,7 @@ msgid "%s is not a valid bot or registered channel."
 msgstr "%s geçerli bir bot veya kayıtlı kanal değil."
 
 #, c-format
-msgid "%s is not a valid e-mail address."
+msgid "%s is not a valid email address."
 msgstr "%s geçerli bir e-posta adresi değil."
 
 #, c-format
@@ -303,7 +299,7 @@ msgstr "%s yoksayılanlar listesinde değil."
 
 #, c-format
 msgid "%s is on the auto kick list of %s (%s)."
-msgstr "%s, %s (%s) otomatik atma listesinde."
+msgstr "%s, %s (%s) oto-at listesinde."
 
 #, c-format
 msgid "%s is the founder of %s."
@@ -323,7 +319,7 @@ msgstr "%s, %s üzerinde bir istisnayla eşleşiyor ve istisna kaldırılınca
 
 #, c-format
 msgid "%s matches auto kick entry %s on %s (%s)."
-msgstr "%s, %s (%s) üzerindeki %s otomatik atma girdisiyle eşleşir."
+msgstr "%s, %s (%s) üzerindeki %s oto-at girdisiyle eşleşir."
 
 #, c-format
 msgid "%s not found on %s %s list."
@@ -335,15 +331,11 @@ msgstr "%s %s erişim listesinde bulunamadı."
 
 #, c-format
 msgid "%s not found on %s autokick list."
-msgstr "%s %s otomatik atma listesinde bulunamadı."
+msgstr "%s %s oto-at listesinde bulunamadı."
 
 #, c-format
 msgid "%s not found on %s bad words list."
-msgstr "%s %s'in kötü kelimeler listesinde bulunamadı."
-
-#, c-format
-msgid "%s not found on %s's access list."
-msgstr "%s %s'in erişim listesinde bulunamadı."
+msgstr "%s %s'in küfür listesinde bulunamadı."
 
 #, c-format
 msgid "%s not found on %s's certificate list."
@@ -491,9 +483,6 @@ msgstr "kanal"
 msgid "channel bantype"
 msgstr "kanal ban_tipi"
 
-msgid "channel channel"
-msgstr "kanal kanal"
-
 msgid "channel command method [status]"
 msgstr "kanal komut metot [durum]"
 
@@ -524,11 +513,11 @@ msgstr "kanal kullanıcı sebep"
 msgid "channel what"
 msgstr "kanal ne?"
 
-msgid "channel ADD mask"
-msgstr "kanal ADD maske"
+msgid "channel ADD mask level [description]"
+msgstr "kanal ADD maske seviye [açıklama]"
 
-msgid "channel ADD mask level"
-msgstr "kanal ADD maske seviye"
+msgid "channel ADD mask [description]"
+msgstr "kanall ADD maske [açıklama]"
 
 msgid "channel ADD message"
 msgstr "kanal ADD mesaj"
@@ -596,6 +585,9 @@ msgstr "kanal VIEW [maske | girdi-no | liste]"
 msgid "channel VIEW [mask | list]"
 msgstr "kanal VIEW [maske | liste]"
 
+msgid "channel [code]"
+msgstr "kanall [kod]"
+
 msgid "channel [description]"
 msgstr "kanal [açıklama]"
 
@@ -614,8 +606,8 @@ msgstr "kanal [+sona-erme] [sebep]"
 msgid "channel [+expiry] {nick | mask} [reason]"
 msgstr "kanal [+sona-erme] {rumuz | maske} [sebep]"
 
-msgid "channel [MODIFY] mask changes"
-msgstr "kanal [MODIFY] maske değişiklikler"
+msgid "channel [MODIFY] mask changes [description]"
+msgstr "kanal [MODIFY] maske değişiklikler [açıklama]"
 
 msgid "channel [SET] [topic]"
 msgstr "kanal [SET] [başlık]"
@@ -677,9 +669,6 @@ msgstr "rumuz kanal"
 msgid "nick channel [reason]"
 msgstr "rumuz kanal [sebep]"
 
-msgid "nick flags"
-msgstr "rumuz bayraklar"
-
 msgid "nick hostmask"
 msgstr "rumuz host_maskesi"
 
@@ -709,6 +698,9 @@ msgstr "rumuz yeni-afiş"
 
 msgid "nickname new-password"
 msgstr "rumuz yeni-şifre"
+
+msgid "nickname [code]"
+msgstr "rumuz [kod]"
 
 msgid "nickname [parameter]"
 msgstr "rumuz [parametre]"
@@ -763,6 +755,9 @@ msgstr "şablon [SUSPENDED] [NOEXPIRE]"
 
 msgid "pattern [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"
 msgstr "şablon [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"
+
+msgid "server [message]"
+msgstr "sunucu [mesaj]"
 
 msgid "server [reason]"
 msgstr "sunucu [sebep]"
@@ -838,12 +833,12 @@ msgid ""
 " \n"
 "Accounts that are not used anymore are subject to\n"
 "the automatic expiration, i.e. they will be deleted\n"
-"after %d days if not used."
+"after %lu days if not used."
 msgstr ""
 " \n"
 "Artık kullanılmayan hesaplar otomatik\n"
 "olarak sona erecektir; yani kullanılmadıkları\n"
-"takdirde %d gün sonra silineceklerdir."
+"takdirde %lu gün sonra silineceklerdir."
 
 msgid ""
 " \n"
@@ -939,14 +934,14 @@ msgstr ""
 #, c-format
 msgid ""
 " \n"
-"Note that any channel which is not used for %d days\n"
+"Note that any channel which is not used for %lu days\n"
 "(i.e. which no user on the channel's access list enters\n"
 "for that period of time) will be automatically dropped."
 msgstr ""
 " \n"
-"%d gün boyunca kullanılmayan herhangi bir kanalın\n"
+"%lu gün boyunca kullanılmayan herhangi bir kanalın\n"
 "(yani bu süre boyunca kanalın erişim listesindeki hiçbir\n"
-"kullanıcının girmediği) otomatik olarak bırakılacağını unutmayın."
+"kullanıcının girmediği) otomatik olarak düşürüleceğini unutmayın."
 
 #, c-format
 msgid ""
@@ -1265,11 +1260,11 @@ msgid "%-8s %s"
 msgstr "%-8s %s"
 
 #, c-format
-msgid "%2lu %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
-msgstr "%2lu %-16s harf: %s, kelime: %s, satır: %s, smiley: %s, eylem: %s"
+msgid "%2d %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
+msgstr "%2d %-16s harf: %s, kelime: %s, satır: %s, smiley: %s, eylem: %s"
 
-msgid "%b %d %H:%M:%S %Y %Z"
-msgstr "%b %d %H:%M:%S %Y %Z"
+msgid "%b %d %Y %H:%M:%S %Z"
+msgstr "%b %d %Y %H:%M:%S %Z"
 
 #, c-format
 msgid "%c is an unknown status mode."
@@ -1294,10 +1289,6 @@ msgstr "%d bot mevcut."
 #, c-format
 msgid "%d modules loaded."
 msgstr "%d modül yüklendi."
-
-#, c-format
-msgid "%d nickname(s) in the group."
-msgstr "Grupta %d rumuz."
 
 #, c-format
 msgid "%lu nicks are stored in the database, using %.2Lf kB of memory."
@@ -1396,6 +1387,14 @@ msgid "%s bad words list is empty."
 msgstr "%s küfür listesi boş."
 
 #, c-format
+msgid "%s can no longer be added to channel access lists."
+msgstr "%s artık kanal erişim listelerine eklenemez."
+
+#, c-format
+msgid "%s can now be added to channel access lists."
+msgstr "%s artık kanal erişim listelerine eklenebilir."
+
+#, c-format
 msgid "%s cannot be the successor on channel %s as they are the founder."
 msgstr "%s, %s kanalının halefi olamaz, çünkü o zaten kurucusu."
 
@@ -1408,20 +1407,20 @@ msgid "%s coverage is too wide; Please use a more specific mask."
 msgstr "%s kapsamı çok geniş; Lütfen daha spesifik bir maske kullanın."
 
 #, c-format
-msgid "%s currently has %d memos, of which %d are unread."
-msgstr "%s şu anda %d nota sahip ve bunların %d'si okunmamış."
+msgid "%s currently has %zu memos, of which %zu are unread."
+msgstr "%s şu anda %zu nota sahip ve bunların %zu'si okunmamış."
 
 #, c-format
-msgid "%s currently has %d memos, of which 1 is unread."
-msgstr "%s şu anda %d memoya sahip ve bunların 1'i okunmamış."
+msgid "%s currently has %zu memos, of which 1 is unread."
+msgstr "%s şu anda %zu memoya sahip ve bunların 1'i okunmamış."
 
 #, c-format
-msgid "%s currently has %d memos."
-msgstr "%s şuan %d memoya sahip."
+msgid "%s currently has %zu memos."
+msgstr "%s şuan %zu memoya sahip."
 
 #, c-format
-msgid "%s currently has %d memos; all of them are unread."
-msgstr "%s şuan %d memoya sahip; hiç biri de okunmamış."
+msgid "%s currently has %zu memos; all of them are unread."
+msgstr "%s şuan %zu memoya sahip; hiç biri de okunmamış."
 
 #, c-format
 msgid "%s currently has 1 memo, and it has not yet been read."
@@ -1600,10 +1599,6 @@ msgid "%s!%s@%s (%s) added to the bot list."
 msgstr "%s!%s@%s (%s) bot listesine eklendi."
 
 #, c-format
-msgid "%s's access list is empty."
-msgstr "%s erişim listesi boş."
-
-#, c-format
 msgid "%s's auto join list is empty."
 msgstr "%s oto-gir listesi boş."
 
@@ -1622,6 +1617,10 @@ msgstr "%s memo sınırı %d ve değiştirilemez."
 #, c-format
 msgid "%s's memo limit is %d."
 msgstr "%s memo sınırı %d."
+
+#, c-format
+msgid "%zu nickname(s) in the group."
+msgstr "Grupta %zu rumuz."
 
 #, c-format
 msgid "(%s ago)"
@@ -1691,7 +1690,7 @@ msgid "<unknown>"
 msgstr "<bilinmiyor>"
 
 #, c-format
-msgid "A confirmation e-mail has been sent to %s. Follow the instructions in it to change your e-mail address."
+msgid "A confirmation email has been sent to %s. Follow the instructions in it to change your email address."
 msgstr "%s adresine bir onay e-postası gönderildi. E-posta adresinizi değiştirmek için içindeki talimatları izleyin."
 
 msgid "A massmemo has been sent to all registered users."
@@ -1708,17 +1707,20 @@ msgid ""
 "A notification memo has been sent to %s informing them you have\n"
 "read their memo."
 msgstr ""
-"%s rumuzlu kişiye, notunu okuduğunuzu bildiren bir\n"
-"bildirim notu gönderildi."
+"%s adlı kullanıcıya, memolarını okuduğunuzu bildiren\n"
+"bir bildirim memosu gönderildi."
 
-msgid "A vHost ident must be in the format of a valid ident."
-msgstr "Bir vHost kimliği geçerli bir kimlik biçiminde olmalıdır."
-
-msgid "A vHost must be in the format of a valid hostname."
+msgid "A vhost must be in the format of a valid hostname."
 msgstr "Bir vHost, geçerli bir host adı biçiminde olmalıdır."
+
+msgid "A vident must be in the format of a valid ident."
+msgstr "Bir vIdent kimliği geçerli bir ident biçiminde olmalıdır."
 
 msgid "ADD expiry {nick|mask} [reason]"
 msgstr "ADD sona-erme {rumuz|maske} [sebep]"
+
+msgid "ADD message"
+msgstr "ADD mesaj"
 
 msgid "ADD oper type"
 msgstr "ADD oper tip"
@@ -1734,9 +1736,6 @@ msgstr "ADD [+sona-erme] maske limit sebep"
 
 msgid "ADD [nickname] channel [key]"
 msgstr "ADD [rumuz] kanal [anahtar]"
-
-msgid "ADD [nickname] mask"
-msgstr "ADD [rumuz] maske"
 
 msgid "ADD [nickname] [fingerprint]"
 msgstr "ADD [rumuz] [parmak-izi]"
@@ -1812,10 +1811,13 @@ msgstr "Hesap"
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "%s hesabı zaten maksimum eşzamanlı oturum açma sayısına (%u) ulaştı."
 
-msgid "Activate security features"
-msgstr "Güvenlik özelliklerini etkinleştirin"
+msgid "Account registered"
+msgstr "Hesap kaydedildi"
 
-msgid "Activate the requested vHost for the given nick."
+msgid "Accounts can not be registered right now. Please try again later."
+msgstr "Hesaplar şu anda kaydedilemiyor. Lütfen daha sonra tekrar deneyiniz."
+
+msgid "Activate the requested vhost for the given nick."
 msgstr "Belirtilen rumuz için istenen vHost'u etkinleştirin."
 
 msgid ""
@@ -1876,8 +1878,22 @@ msgstr ""
 "SET iznini gerektirir."
 
 msgid ""
+"Additionally, Services Operators with the chanserv/drop/override permission can\n"
+"replace code with OVERRIDE to drop without a confirmation code."
+msgstr ""
+"Ek olarak, nickserv/confirm iznine sahip Servis Operatörleri,\n"
+"doğrulamayı zorlamak için passcode'yi bir kullanıcı rumuzu ile değiştirebilir."
+
+msgid ""
 "Additionally, Services Operators with the nickserv/confirm permission can\n"
 "replace passcode with a users nick to force validate them."
+msgstr ""
+"Ek olarak, nickserv/confirm iznine sahip Servis Operatörleri,\n"
+"doğrulamayı zorlamak için passcode'yi bir kullanıcı rumuzu ile değiştirebilir."
+
+msgid ""
+"Additionally, Services Operators with the nickserv/drop/override permission can\n"
+"replace code with OVERRIDE to drop without a confirmation code."
 msgstr ""
 "Ek olarak, nickserv/confirm iznine sahip Servis Operatörleri,\n"
 "doğrulamayı zorlamak için passcode'yi bir kullanıcı rumuzu ile değiştirebilir."
@@ -1906,7 +1922,7 @@ msgstr "%s için tüm kullanılabilir komutlar:"
 
 #, c-format
 msgid "All badword entries from %s have been cloned to %s."
-msgstr "%s'deki tüm kötü kelime girişleri %s'ye kopyalandı."
+msgstr "%s'deki tüm küfür girdileri %s'ye kopyalandı."
 
 #, c-format
 msgid "All level entries from %s have been cloned into %s."
@@ -1951,35 +1967,31 @@ msgstr "%s'deki tüm kullanıcı modları senkronize edildi."
 msgid "All vhosts in the group %s have been set to %s."
 msgstr "%s grubundaki tüm vhostlar %s olarak ayarlandı."
 
-#, c-format
-msgid "All vhosts in the group %s have been set to %s@%s."
-msgstr "%s grubundaki tüm vhostlar %s@%s olarak ayarlandı."
-
-msgid "Allowed to (de)halfop him/herself"
+msgid "Allowed to (de)halfop themself"
 msgstr "Kendisini (de)halfop izni var"
 
 msgid "Allowed to (de)halfop users"
 msgstr "Kullnıcıları (de)halfop izni var"
 
-msgid "Allowed to (de)op him/herself"
+msgid "Allowed to (de)op themself"
 msgstr "Kendisini (de)op izni var"
 
 msgid "Allowed to (de)op users"
 msgstr "Kullanıcıları (de)op izni var"
 
-msgid "Allowed to (de)owner him/herself"
+msgid "Allowed to (de)owner themself"
 msgstr "Kendisini (de)owner izni var"
 
 msgid "Allowed to (de)owner users"
 msgstr "Kullanıcıları (de)owner izni var"
 
-msgid "Allowed to (de)protect him/herself"
+msgid "Allowed to (de)protect themself"
 msgstr "Kendisini (de)protect izni var"
 
 msgid "Allowed to (de)protect users"
 msgstr "Kullanıcıları (de)protect izni var"
 
-msgid "Allowed to (de)voice him/herself"
+msgid "Allowed to (de)voice themself"
 msgstr "Kendisini (de)voice izni var"
 
 msgid "Allowed to (de)voice users"
@@ -2012,6 +2024,9 @@ msgstr "Kanal memolarını okuma izni var"
 msgid "Allowed to set channel settings"
 msgstr "Kanal ayarlarını yapma izni var"
 
+msgid "Allowed to unban themself"
+msgstr "Kendisini unban yapma izni var"
+
 msgid "Allowed to unban users"
 msgstr "Kullanıcıları unban yapma izni var"
 
@@ -2038,14 +2053,6 @@ msgstr "MODE komutunu kullanma izni var"
 
 msgid "Allowed to view the access list"
 msgstr "Erişim listesini görüntüleme izni var"
-
-#, c-format
-msgid ""
-"Allows Administrators to send messages to all users on the\n"
-"network. The message will be sent from the nick %s."
-msgstr ""
-"Yöneticilerin ağdaki tüm kullanıcılara mesaj göndermesine izin verir.\n"
-"Mesaj %s rumuzundan gönderilecektir."
 
 msgid ""
 "Allows Services Operators to change modes for any channel.\n"
@@ -2103,22 +2110,13 @@ msgstr ""
 "bu kullanıcı killenecektir."
 
 msgid ""
-"Allows Services Operators to give Operflags to any user.\n"
-"Flags have to be prefixed with a \"+\" or a \"-\". To\n"
-"remove all flags simply type a \"-\" instead of any flags."
-msgstr ""
-"Servis Operatörlerinin herhangi bir kullanıcıya Operflag vermesine izin verir.\n"
-"Bayrakların önüne \"+\" veya \"-\" konulmalıdır. Tüm bayrakları kaldırmak\n"
-"için herhangi bir bayrak yerine \"-\" yazmanız yeterlidir."
-
-msgid ""
-"Allows Services Operators to make Services ignore a nick or mask\n"
+"Allows Services Operators to make services ignore a nick or mask\n"
 "for a certain time or until the next restart. The default\n"
 "time format is seconds. You can specify it by using units.\n"
 "Valid units are: s for seconds, m for minutes,\n"
 "h for hours and d for days.\n"
 "Combinations of these units are not permitted.\n"
-"To make Services permanently ignore the user, type 0 as time.\n"
+"To make services permanently ignore the user, type 0 as time.\n"
 "When adding a mask, it should be in the format nick!user@host,\n"
 "everything else will be considered a nick. Wildcards are permitted.\n"
 " \n"
@@ -2138,7 +2136,7 @@ msgstr ""
 
 msgid ""
 "Allows Services Operators to manipulate the AKILL list. If\n"
-"a user matching an AKILL mask attempts to connect, Services\n"
+"a user matching an AKILL mask attempts to connect, services\n"
 "will issue a KILL for that user and, on supported server\n"
 "types, will instruct all servers to add a ban for the mask\n"
 "which the user matched.\n"
@@ -2182,7 +2180,7 @@ msgstr ""
 msgid ""
 "Allows Services Operators to manipulate the SNLINE list.  If\n"
 "a user with a realname matching an SNLINE mask attempts to\n"
-"connect, Services will not allow them to pursue their IRC\n"
+"connect, services will not allow them to pursue their IRC\n"
 "session."
 msgstr ""
 "Servis Operatörlerinin SNLINE listesini değiştirmesine izin verir.\n"
@@ -2193,7 +2191,7 @@ msgstr ""
 msgid ""
 "Allows Services Operators to manipulate the SQLINE list.  If\n"
 "a user with a nick matching an SQLINE mask attempts to\n"
-"connect, Services will not allow them to pursue their IRC\n"
+"connect, services will not allow them to pursue their IRC\n"
 "session.\n"
 "If the first character of the mask is #, services will\n"
 "prevent the use of matching channels. If the mask is a\n"
@@ -2278,6 +2276,51 @@ msgstr ""
 "kullanılabilir. Başlık kilidi ayarlandığında kanal başlığı TOPIC\n"
 "ayrıcalığına sahip olmayan kullanıcılar tarafından değiştirilemez."
 
+msgid ""
+"Allows queueing messages to send to users on the network.\n"
+"\n"
+"The QUEUE ADD command adds the given message to the message queue.\n"
+"The QUEUE CLEAR command clears the message queue.\n"
+"The QUEUE DEL command removes the specified message from the message queue. The\n"
+"message number can be obtained from the output of the QUEUE LIST command.\n"
+"The QUEUE LIST command lists all messages that are currently in the message queue."
+msgstr ""
+"Ağdaki kullanıcılara gönderilecek mesajların sıraya alınmasına izin verir.\n"
+"\n"
+"QUEUE ADD komutu verilen mesajı mesaj kuyruğuna ekler.\n"
+"QUEUE CLEAR komutu mesaj kuyruğunu temizler.\n"
+"QUEUE DEL komutu belirtilen mesajı mesaj kuyruğundan kaldırır.\n"
+"mesaj numarası QUEUE LIST komutunun çıktısından alınabilir.\n"
+"QUEUE LIST komutu, o anda mesaj kuyruğunda bulunan tüm mesajları listeler."
+
+#, c-format
+msgid ""
+"Allows sending messages to all users on a server. The message will be sent\n"
+"from %s.\n"
+"\n"
+"You can either send a message by specifying it as a parameter or provide no\n"
+"parameters to send a previously queued message.\n"
+msgstr ""
+"Bir sunucudaki tüm kullanıcılara mesaj gönderilmesine izin verir. Mesaj\n"
+"%s kullanıcısından gönderilecek.\n"
+"\n"
+"Bir mesajı parametre olarak belirterek gönderebilir veya önceden kuyruğa alınmış\n"
+"bir mesajı göndermek için hiçbir parametre belirtmeyebilirsiniz.\n"
+
+#, c-format
+msgid ""
+"Allows sending messages to all users on the network. The message will be sent\n"
+"from %s.\n"
+"\n"
+"You can either send a message by specifying it as a parameter or provide no\n"
+"parameters to send a previously queued message.\n"
+msgstr ""
+"Ağdaki tüm kullanıcılara mesaj gönderilmesine izin verir. Mesaj\n"
+"%s kullanıcısından gidecek.\n"
+"\n"
+"Bir mesajı parametre olarak belirterek gönderebilir veya daha önce kuyruğa\n"
+"alınmış bir mesajı göndermek için hiçbir parametre belirtmeyebilirsiniz.\n"
+
 #, c-format
 msgid ""
 "Allows staff to kick a user from any channel.\n"
@@ -2332,8 +2375,8 @@ msgstr ""
 "     MODIFY nickserv forcemail no"
 
 msgid ""
-"Allows you to choose the way Services are communicating with\n"
-"the given user. With MSG set, Services will use messages,\n"
+"Allows you to choose the way services are communicating with\n"
+"the given user. With MSG set, services will use messages,\n"
 "else they'll use notices."
 msgstr ""
 "Servislerin belirli bir kullanıcıyla iletişim kurma şeklini seçmenizi\n"
@@ -2342,8 +2385,8 @@ msgstr ""
 
 #, c-format
 msgid ""
-"Allows you to choose the way Services are communicating with\n"
-"you. With %s set, Services will use messages, else they'll\n"
+"Allows you to choose the way services are communicating with\n"
+"you. With %s set, services will use messages, else they'll\n"
 "use notices."
 msgstr ""
 "Servislerin sizinle iletişim kurma şeklini seçmenizi sağlar.\n"
@@ -2374,7 +2417,7 @@ msgstr ""
 msgid ""
 "Allows you to prevent certain pieces of information from\n"
 "being displayed when someone does a %s INFO on the\n"
-"nick.  You can hide the E-mail address (EMAIL), last seen\n"
+"nick.  You can hide the email address (EMAIL), last seen\n"
 "user@host mask (USERMASK), the services access status\n"
 "(STATUS) and last quit message (QUIT).\n"
 "The second parameter specifies whether the information should\n"
@@ -2392,7 +2435,7 @@ msgstr ""
 msgid ""
 "Allows you to prevent certain pieces of information from\n"
 "being displayed when someone does a %s INFO on your\n"
-"nick.  You can hide your E-mail address (EMAIL), last seen\n"
+"nick.  You can hide your email address (EMAIL), last seen\n"
 "user@host mask (USERMASK), your services access status\n"
 "(STATUS) and last quit message (QUIT).\n"
 "The second parameter specifies whether the information should\n"
@@ -2431,7 +2474,7 @@ msgstr ""
 "Kanal erişim listelerini değiştirmenin alternatif yöntemleri\n"
 "mevcuttur."
 
-msgid "Approve the requested vHost of a user"
+msgid "Approve the requested vhost of a user"
 msgstr "Bir kullanıcının istenen vHost'unu onaylayın"
 
 msgid "As a Services Operator, you may drop any nick."
@@ -2461,20 +2504,20 @@ msgstr "Hesabınızla bir URL ilişkilendirin"
 msgid "Associate a greet message with your nickname"
 msgstr "Bir karşılama mesajını rumuzunuzla ilişkilendirin"
 
-msgid "Associate an E-mail address with the channel"
-msgstr "Bir E-posta adresini kanalla ilişkilendirme"
+msgid "Associate an email address with the channel"
+msgstr "Bir e-posta adresini kanalla ilişkilendirin"
 
-msgid "Associate an E-mail address with your nickname"
+msgid "Associate an email address with your nickname"
 msgstr "Bir E-posta adresini rumuzunuzla ilişkilendirin"
 
 msgid "Associate oper info with a nick or channel"
 msgstr "Bir rumuz veya kanala ilişkin bir \"info\" ekler, bunu operler görür"
 
-msgid "Associates the given E-mail address with the nickname."
-msgstr "Belirtilen E-posta adresini rumuzla ilişkilendirir."
+msgid "Associates the given email address with the nickname."
+msgstr "Belirtilen e-posta adresini rumuzla ilişkilendirir."
 
 msgid ""
-"Associates the given E-mail address with your nickname.\n"
+"Associates the given email address with your nickname.\n"
 "This address will be displayed whenever someone requests\n"
 "information on the nickname with the INFO command."
 msgstr ""
@@ -2623,15 +2666,15 @@ msgid "Bot bans will no longer automatically expire."
 msgstr "Bot banları artık otomatik olarak sona ermeyecek."
 
 #, c-format
-msgid "Bot hosts may only be %d characters long."
-msgstr "Bot hostları yalnızca %d karakter uzunluğunda olabilir."
+msgid "Bot hosts may only be %zu characters long."
+msgstr "Bot hostları yalnızca %zu karakter uzunluğunda olabilir."
 
 msgid "Bot hosts may only contain valid host characters."
 msgstr "Bot hostları yalnızca geçerli host karakterlerini içerebilir."
 
 #, c-format
-msgid "Bot idents may only be %d characters long."
-msgstr "Bot identleri yalnızca %d karakter uzunluğunda olabilir."
+msgid "Bot idents may only be %zu characters long."
+msgstr "Bot identleri yalnızca %zu karakter uzunluğunda olabilir."
 
 msgid "Bot idents may only contain valid ident characters."
 msgstr "Bot identleri yalnızca geçerli ident karakterlerini içerebilir."
@@ -2647,8 +2690,8 @@ msgid "Bot nick"
 msgstr "Bot rumuzu"
 
 #, c-format
-msgid "Bot nicks may only be %d characters long."
-msgstr "Bot rumuzları yalnızca %d karakter uzunluğunda olabilir."
+msgid "Bot nicks may only be %zu characters long."
+msgstr "Bot rumuzları yalnızca %zu karakter uzunluğunda olabilir."
 
 msgid "Bot nicks may only contain valid nick characters."
 msgstr "Bot rumuzları yalnızca geçerli rumuz karakterlerini içerebilir."
@@ -2780,7 +2823,7 @@ msgid "Caps kicker"
 msgstr "CAPS yazı atma"
 
 msgid ""
-"Causes Services to do an immediate shutdown; databases are\n"
+"Causes services to do an immediate shutdown; databases are\n"
 "not saved.  This command should not be used unless\n"
 "damage to the in-memory copies of the databases is feared\n"
 "and they should not be saved."
@@ -2791,9 +2834,9 @@ msgstr ""
 "bu komut kullanılmamalı ve kaydedilmemelidir."
 
 msgid ""
-"Causes Services to reload the configuration file. Note that\n"
-"some directives still need the restart of the Services to\n"
-"take effect (such as Services' nicknames, activation of the\n"
+"Causes services to reload the configuration file. Note that\n"
+"some directives still need the restart of the services to\n"
+"take effect (such as services' nicknames, activation of the\n"
 "session limitation, etc.)."
 msgstr ""
 "Servislerin yapılandırma dosyasını yeniden yüklemesini sağlar.\n"
@@ -2802,17 +2845,17 @@ msgstr ""
 "rumuzları, oturum sınırlamasının etkinleştirilmesi vb.)."
 
 msgid ""
-"Causes Services to save all databases and then restart\n"
+"Causes services to save all databases and then restart\n"
 "(i.e. exit and immediately re-run the executable)."
 msgstr ""
 "Servislerin tüm veritabanlarını kaydetmesini ve ardından yeniden başlatılmasını\n"
 "(yani, yürütülebilir dosyadan çıkıp hemen yeniden çalıştırmasına) sağlar."
 
-msgid "Causes Services to save all databases and then shut down."
+msgid "Causes services to save all databases and then shut down."
 msgstr "Servislerin tüm veritabanlarını kaydetmesini ve ardından kapanmasını sağlar."
 
 msgid ""
-"Causes Services to update all database files as soon as you\n"
+"Causes services to update all database files as soon as you\n"
 "send the command."
 msgstr ""
 "Komutu gönderdiğiniz anda Servislerin tüm veritabanı dosyalarını\n"
@@ -2828,7 +2871,7 @@ msgstr "Bu ağda kalıcılığı etkinleştirmek için ChanServ gereklidir."
 msgid "Change channel modes"
 msgstr "Kanal modlarını değiştir"
 
-msgid "Change the communication method of Services"
+msgid "Change the communication method of services"
 msgstr "Servislerin iletişim yöntemini değiştirme"
 
 msgid "Change user modes"
@@ -2840,14 +2883,14 @@ msgstr "%s kullanıcı modları %s olarak değiştirildi."
 
 msgid ""
 "Changes the display used to refer to the nickname group in\n"
-"Services. The new display MUST be a nick of the group."
+"services. The new display MUST be a nick of the group."
 msgstr ""
 "Servislerdeki rumuz grubuna atıfta bulunmak için kullanılan\n"
 "afişi değiştirir. Yeni afiş grubun bir rumuzu OLMALIDIR."
 
 msgid ""
 "Changes the display used to refer to your nickname group in\n"
-"Services. The new display MUST be a nick of your group."
+"services. The new display MUST be a nick of your group."
 msgstr ""
 "Servislerdeki rumuz grubunuza atıfta bulunmak için kullanılan\n"
 "afişi değiştirir. Yeni afiş grubunuzun bir rumuzu OLMALIDIR."
@@ -2860,7 +2903,7 @@ msgstr ""
 "olması gerekir.."
 
 msgid ""
-"Changes the language Services uses when sending messages to\n"
+"Changes the language services uses when sending messages to\n"
 "the given user (for example, when responding to a command they send).\n"
 "language should be chosen from the following list of\n"
 "supported languages:"
@@ -2871,7 +2914,7 @@ msgstr ""
 "seçilmelidir:"
 
 msgid ""
-"Changes the language Services uses when sending messages to\n"
+"Changes the language services uses when sending messages to\n"
 "you (for example, when responding to a command you send).\n"
 "language should be chosen from the following list of\n"
 "supported languages:"
@@ -3012,8 +3055,8 @@ msgid "Channels that %s has access on:"
 msgstr "%s tarafından erişilebilen kanallar:"
 
 #, c-format
-msgid "Channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Kanallar: %lu girdi, %lu buckets, en uzun zincir %d"
+msgid "Channels: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Kanallar: %zu girdi, %zu buckets, en uzun zincir %zu"
 
 msgid "Chanstats"
 msgstr "Kanal İstatistikleri"
@@ -3043,7 +3086,7 @@ msgid ""
 "or changing nick on the network and tells you when and, depending\n"
 "on channel or user settings, where it was."
 msgstr ""
-"rumuz'un ağa katıldığı, ayrıldığı veya rumuz değiştirdiği\n"
+"Bu ayar, rumuz'un ağa katıldığı, ayrıldığı veya rumuz değiştirdiği\n"
 "son zamanı kontrol eder ve bunun ne zaman ve kanal veya kullanıcı\n"
 "ayarlarına bağlı olarak nerede olduğunu size bildirir."
 
@@ -3054,7 +3097,7 @@ msgid ""
 "Checks whether the _last_ memo you sent to nick has been read\n"
 "or not. Note that this only works with nicks, not with channels."
 msgstr ""
-"rumuz'a gönderdiğiniz _son_ memonun okunup okunmadığını kontrol eder\n"
+"Bu ayar, rumuz'a gönderdiğiniz _son_ memonun okunup okunmadığını kontrol eder\n"
 "Bunun kanallarla değil, yalnızca rumuzlarla işe yaradığını unutmayın."
 
 #, c-format
@@ -3164,20 +3207,23 @@ msgid "Current module list:"
 msgstr "Geçerli modül listesi:"
 
 #, c-format
-msgid "Current number of AKILLs: %d"
-msgstr "Geçerli AKILL sayısı: %d"
+msgid "Current number of AKILLs: %zu"
+msgstr "Geçerli AKILL sayısı: %zu"
 
 #, c-format
-msgid "Current number of SNLINEs: %d"
-msgstr "Geçerli SNLINE sayısı: %d"
+msgid "Current number of SNLINEs: %zu"
+msgstr "Geçerli SNLINE sayısı: %zu"
 
 #, c-format
-msgid "Current number of SQLINEs: %d"
-msgstr "Geçerli SQLINE sayısı: %d"
+msgid "Current number of SQLINEs: %zu"
+msgstr "Geçerli SQLINE sayısı: %zu"
 
 #, c-format
-msgid "Current users: %d (%d ops)"
-msgstr "Geçerli kullanıcılar: %d (%d oper)"
+msgid "Current users: %zu (%d ops)"
+msgstr "Geçerli kullanıcılar: %zu (%d oper)"
+
+msgid "DEL entry-num"
+msgstr "DEL girdi-no"
 
 msgid "DEL oper"
 msgstr "DEL oper"
@@ -3190,9 +3236,6 @@ msgstr "DEL [rumuz] kanal"
 
 msgid "DEL [nickname] fingerprint"
 msgstr "DEL [rumuz] parmak-izi"
-
-msgid "DEL [nickname] mask"
-msgstr "DEL [rumuz] maske"
 
 msgid "DEL {mask | entry-num | list | id}"
 msgstr "DEL {maske | girdi-no | liste | id}"
@@ -3356,6 +3399,10 @@ msgid "Deleted %d entries from the AKILL list."
 msgstr "%d girdi AKILL listesinden silindi."
 
 #, c-format
+msgid "Deleted %u entries from your message queue."
+msgstr "%u girdi mesaj kuyruğunuzdan silindi."
+
+#, c-format
 msgid "Deleted 1 entry from %s access list."
 msgstr "1 girdi %s erişim listesinden silindi."
 
@@ -3384,6 +3431,9 @@ msgstr "Bilgiler %s'den silindi."
 #, c-format
 msgid "Deleted one entry from %s %s list."
 msgstr "1 girdi %s %s listesinden silindi."
+
+msgid "Deleted one entry from your message queue."
+msgstr "1 girdi mesaj kuyruğunuzdan silindi."
 
 msgid ""
 "Deletes the specified memo or memos. You can supply\n"
@@ -3563,18 +3613,6 @@ msgstr ""
 "geçirebilecektir."
 
 #, c-format
-msgid "E-mail address for %s changed to %s."
-msgstr "%s için e-posta adresi %s olarak değiştirildi."
-
-#, c-format
-msgid "E-mail address for %s unset."
-msgstr "%s için e-posta adresi ayarlanmadı."
-
-#, c-format
-msgid "E-mail for %s is invalid."
-msgstr "%s için e-posta geçersiz."
-
-#, c-format
 msgid ""
 "Edits or displays the list of logon news messages.  When a\n"
 "user connects to the network, these messages will be sent\n"
@@ -3613,6 +3651,18 @@ msgstr ""
 
 msgid "Email address"
 msgstr "Eposta adresi"
+
+#, c-format
+msgid "Email address for %s changed to %s."
+msgstr "%s için e-posta adresi %s olarak değiştirildi."
+
+#, c-format
+msgid "Email address for %s unset."
+msgstr "%s için e-posta adresi ayarlanmadı."
+
+#, c-format
+msgid "Email for %s is invalid."
+msgstr "%s için e-posta geçersiz."
 
 #, c-format
 msgid "Email matched: %s (%s) to %s."
@@ -3666,17 +3716,6 @@ msgstr ""
 "Rumuzunuz için saklama modlarını etkinleştirir veya devre dışı bırakır. Saklama\n"
 "modları etkinleştirilirse servisler, kullanıcı modlarınızı hatırlayacak\n"
 "ve bir sonraki kimlik doğrulama işleminizde bunları yeniden ayarlamaya çalışacaktır."
-
-msgid ""
-"Enables or disables security features for a\n"
-"channel. When SECURE is set, only users who have\n"
-"identified to services, and are not only recognized, will be\n"
-"given access to channels from account-based access entries."
-msgstr ""
-"Bir kanal için güvenlik özelliklerini etkinleştirir veya devre dışı bırakır.\n"
-"SECURE ayarlandığında, yalnızca servislerle tanımlanan ve yalnızca\n"
-"tanınmayan kullanıcılara, hesap tabanlı erişim girişlerinden kanallara\n"
-"erişim izni verilecektir."
 
 msgid ""
 "Enables or disables signed kicks for a\n"
@@ -3829,8 +3868,8 @@ msgid "End of entry message list."
 msgstr "Giriş mesajı listesi sonu."
 
 #, c-format
-msgid "End of forbid list - %d/%d entries shown."
-msgstr "Yasak listesi sonu - %d/%d girdi gösterildi."
+msgid "End of forbid list - %zu/%zu entries shown."
+msgstr "Yasak listesi sonu - %zu/%zu girdi gösterildi."
 
 msgid "End of forbid list."
 msgstr "Yasak listesi sonu."
@@ -3914,12 +3953,12 @@ msgid "Error reloading configuration file: %s"
 msgstr "Yapılandırma dosyası yeniden yüklenirken hata oluştu: %s"
 
 #, c-format
-msgid "Error! The vHost ident is too long, please use an ident shorter than %d characters."
-msgstr "Hata! vHost kimliği çok uzun, lütfen %d karakterden daha kısa bir ident kullanın."
+msgid "Error! The vhost is too long, please use a hostname shorter than %zu characters."
+msgstr "Hata! vHost çok uzun, lütfen %zu karakterden kısa bir host adı kullanın."
 
 #, c-format
-msgid "Error! The vHost is too long, please use a hostname shorter than %d characters."
-msgstr "Hata! vHost çok uzun, lütfen %d karakterden kısa bir host adı kullanın."
+msgid "Error! The vident is too long, please use an ident shorter than %zu characters."
+msgstr "Hata! vIdent kimliği çok uzun, lütfen %zu karakterden daha kısa bir ident kullanın."
 
 msgid ""
 "Examples:\n"
@@ -4019,7 +4058,7 @@ msgstr "%s üzerinde yasaklama bulunamadı."
 msgid "Forbid usage of nicknames, channels, and emails"
 msgstr "Rumuzların, kanalların ve e-postaların kullanımını yasaklayın"
 
-msgid "Force the Services databases to be updated immediately"
+msgid "Force the services databases to be updated immediately"
 msgstr "Servislerin veritabanlarının hemen güncelleştirilmesini zorunlu kılın"
 
 msgid "Forcefully change a user's nickname"
@@ -4047,14 +4086,8 @@ msgstr "Kurucu"
 msgid "Founder of %s changed to %s."
 msgstr "%s kanalının kurucusu %s olarak değiştirildi."
 
-msgid "GETPASS command unavailable because encryption is in use."
-msgstr "Şifreleme kullanımda olduğundan GETPASS komutu kullanılamıyor."
-
 msgid "Ghost with your nick has been killed."
 msgstr "Rumuzunuzu taşıyan ghost killendi."
-
-msgid "Give Operflags to a certain user"
-msgstr "Belirli bir kullanıcıya Operflags (Oper Bayrakları) verin"
 
 #, c-format
 msgid ""
@@ -4181,7 +4214,7 @@ msgstr "Geçersiz host maskesi. İstisnalar, rumuzlar veya kullanıcı adlarıyl
 msgid "Invalid limit %s, using %d."
 msgstr "Geçersiz limit %s, %d kullanılıyor."
 
-msgid "Invalid passcode has been entered, please check the e-mail again, and retry."
+msgid "Invalid passcode has been entered, please check the email again, and retry."
 msgstr "Geçersiz geçiş kodu girildi, lütfen e-postayı tekrar kontrol edin ve tekrar deneyin."
 
 msgid "Invalid passcode."
@@ -4252,8 +4285,8 @@ msgid "LIMIT enforced by "
 msgstr "LIMIT uygulandı. Uygulayan: "
 
 #, c-format
-msgid "LIMIT enforced on %s, %d users removed."
-msgstr "%s kanalında LIMIT uygulandı, %d kullanıcı kaldırıldı."
+msgid "LIMIT enforced on %s, %zu users removed."
+msgstr "%s kanalında LIMIT uygulandı, %zu kullanıcı kaldırıldı."
 
 msgid "LIST threshold"
 msgstr "LIST eşik"
@@ -4757,17 +4790,17 @@ msgid ""
 "be issued every time word is said by a user.\n"
 " \n"
 msgstr ""
-"Bir kanal için kötü kelimeler listesini (küfür) düzenler.\n"
-"Kötü kelimeler listesi, küfür atıcı etkinleştirildiğinde\n"
+"Bir kanal için küfür listesini düzenler.\n"
+"küfür listesi, küfürlü konuşanları atma etkinleştirildiğinde\n"
 "hangi kelimelerin atılacağını belirler. Daha fazla bilgi\n"
 "için %s%s HELP KICK %s yazın.\n"
 " \n"
-"ADD komutu belirtilen kelimeyi kötü kelimeler\n"
+"ADD komutu belirtilen kelimeyi küfür\n"
 "listesine ekler. SINGLE belirtilirse, yalnızca kullanıcı\n"
 "kelimenin tamamını söylediğinde atış yapılacaktır. START\n"
-"belirtilirse, kullanıcı word ile başlayan bir\n"
+"belirtilirse, kullanıcı kelime ile başlayan bir\n"
 "kelime söylerse atış yapılacaktır. END belirtilirse,\n"
-"kullanıcı word ile biten bir kelime söylerse\n"
+"kullanıcı kelime ile biten bir kelime söylerse\n"
 "atış yapılacaktır. Herhangi bir şey belirtmezseniz, kullanıcı\n"
 "tarafından kelime her söylendiğinde bir atış yapılır.\n"
 " \n"
@@ -4825,6 +4858,9 @@ msgstr "Memo yoksayma listesini yönetin"
 msgid "Manage your auto join list"
 msgstr "Oto-gir listenizi yönetin"
 
+msgid "Manages your pending message queue."
+msgstr "Bekleyen mesaj sıranızı yönetir."
+
 #, c-format
 msgid "Manipulate the %s list"
 msgstr "%s listesini düzenleme"
@@ -4840,10 +4876,6 @@ msgstr "Belirtilen kanalın başlığını değiştirin"
 
 msgid "Mask"
 msgstr "Maske"
-
-#, c-format
-msgid "Mask %s already present on %s's access list."
-msgstr "%s maskesi zaten %s'in erişim listesinde mevcut."
 
 msgid "Mask must be in the form user@host."
 msgstr "Maske ident@host biçiminde olmalıdır."
@@ -4869,6 +4901,10 @@ msgstr "%d memosu, %s (%s) adlı kişiden."
 #, c-format
 msgid "Memo %d has been deleted."
 msgstr "%d memosu silindi."
+
+#, c-format
+msgid "Memo %zu has been deleted."
+msgstr "%zu memosu silindi."
 
 msgid "Memo ignore list is empty."
 msgstr "Memo yoksayma listesi boş."
@@ -4906,6 +4942,10 @@ msgstr "Metod"
 msgid "Missing parameter for mode %c."
 msgstr "%c modu için eksik parametre."
 
+#, c-format
+msgid "Missing passwords: %zu"
+msgstr "Eksik şifreler: %zu"
+
 msgid "Mode"
 msgstr "Mod"
 
@@ -4931,48 +4971,6 @@ msgstr "Modlar"
 msgid "Modes cleared on %s and the channel destroyed."
 msgstr "%s'de modlar temizlendi ve kanal yok edildi."
 
-#, c-format
-msgid ""
-"Modifies or displays the access list for your nick.  This\n"
-"is the list of addresses which will be automatically\n"
-"recognized by %s as allowed to use the nick.  If\n"
-"you want to use the nick from a different address, you\n"
-"need to send an IDENTIFY command to make %s\n"
-"recognize you. Services Operators may provide a nick\n"
-"to modify other users' access lists.\n"
-" \n"
-"Examples:\n"
-" \n"
-"    ACCESS ADD anyone@*.bepeg.com\n"
-"        Allows access to user anyone from any machine in\n"
-"        the bepeg.com domain.\n"
-" \n"
-"    ACCESS DEL anyone@*.bepeg.com\n"
-"        Reverses the previous command.\n"
-" \n"
-"    ACCESS LIST\n"
-"        Displays the current access list."
-msgstr ""
-"Rumuzunuzun erişim listesini değiştirir veya görüntüler. Bu,\n"
-"%s tarafından otomatik olarak tanınacak ve rumuzun kullanılmasına\n"
-"izin verilen adreslerin listesidir. Eğer farklı bir adresten rumuzu\n"
-"kullanmak istiyorsanız, %s tarafından tanınmanızı sağlayacak\n"
-"bir IDENTIFY komutu göndermeniz gerekmektedir.\n"
-"Servis Operatörleri, diğer kullanıcıların erişim listelerini\n"
-"değiştirmek için bir rumuz sağlayabilir.\n"
-" \n"
-"Örnekler:\n"
-" \n"
-"    ACCESS ADD herkes@*.bepeg.com\n"
-"        bepeg.com etki alanındaki herhangi bir makineden\n"
-"        herkes kullanıcısına erişim sağlar.\n"
-" \n"
-"    ACCESS DEL herkes@*.bepeg.com\n"
-"        Önceki komutu tersine çevirir.\n"
-" \n"
-"    ACCESS LIST\n"
-"        Geçerli erişim listesini görüntüler."
-
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
 "If you connect to IRC and provide a client certificate with a\n"
@@ -4988,21 +4986,18 @@ msgstr ""
 "sertifika listelerini değiştirmek için bir rumuz sağlayabilir.\n"
 " \n"
 
-msgid "Modify the Services ignore list"
-msgstr "Servislerin yoksayma listesini değiştirin"
-
 #, c-format
 msgid "Modify the list of %s users"
 msgstr "%s kullanıcı listesini değiştirin"
-
-msgid "Modify the list of authorized addresses"
-msgstr "Yetkili adresler listesini değiştirin"
 
 msgid "Modify the list of privileged users"
 msgstr "Ayrıcalıklı kullanıcıların listesini değiştirin"
 
 msgid "Modify the nickname client certificate list"
 msgstr "Rumuz istemci sertifikası listesini değiştirin"
+
+msgid "Modify the services ignore list"
+msgstr "Servislerin yoksayma listesini değiştirin"
 
 msgid "Modify the session-limit exception list"
 msgstr "Oturum sınırı istisna listesini değiştirin"
@@ -5054,6 +5049,9 @@ msgstr "%s için ağ istatistikleri:"
 msgid "Never"
 msgstr "Hiç"
 
+msgid "Never-op"
+msgstr "Hiç"
+
 msgid "Nick"
 msgstr "Rumuz"
 
@@ -5102,8 +5100,8 @@ msgid "Nick %s isn't registered."
 msgstr "%s rumuzu kayıtlı değil."
 
 #, c-format
-msgid "Nick %s was truncated to %d characters."
-msgstr "%s rumuzu, %d karaktere kısaltıldı."
+msgid "Nick %s was truncated to %zu characters."
+msgstr "%s rumuzu, %zu karaktere kısaltıldı."
 
 #, c-format
 msgid "Nick %s will expire."
@@ -5145,9 +5143,12 @@ msgstr "%s rumuzu şuan serbest bırakıldı."
 msgid "Nick %s is now suspended."
 msgstr "%s rumuzu askıya alınmış."
 
+msgid "Nick registered"
+msgstr "Rumuz kaydedildi"
+
 #, c-format
-msgid "Nick too long, max length is %u characters."
-msgstr "Rumuz çok uzun, maks uzunluk %u karakterdir."
+msgid "Nick too long, max length is %zu characters."
+msgstr "Rumuz çok uzun, maks uzunluk %zu karakterdir."
 
 #, c-format
 msgid "Nickname %s has been dropped."
@@ -5160,10 +5161,6 @@ msgstr "%s rumuzu zaten kayıtlı!"
 #, c-format
 msgid "Nickname %s may not be registered."
 msgstr "%s kayıtlı olmayabilir."
-
-#, c-format
-msgid "Nickname %s registered under your user@host-mask: %s"
-msgstr "%s rumuzu ident@host-maskeniz'e kayıtlı: %s"
 
 #, c-format
 msgid "Nickname %s registered."
@@ -5196,6 +5193,9 @@ msgstr "Silinecek oturum açma haberi yok!"
 #, c-format
 msgid "No matches for %s found."
 msgstr "%s için eşleşme bulunamadı."
+
+msgid "No matching entries in your message queue."
+msgstr "Mesaj kuyruğunuzda eşleşen girdi yok."
 
 #, c-format
 msgid "No matching entries on %s %s list."
@@ -5340,14 +5340,6 @@ msgid "Oper type %s has not been configured."
 msgstr "Oper türü %s yapılandırılmadı."
 
 #, c-format
-msgid "Operflags %s have been added for %s."
-msgstr "%s oper bayrakları, %s için eklendi."
-
-#, c-format
-msgid "Operflags %s have been removed from %s."
-msgstr "%s oper bayrakları, %s'den kaldırıldı."
-
-#, c-format
 msgid "Opertype %s has no allowed commands."
 msgstr "%s oper türünde izin verilen komut yok."
 
@@ -5378,16 +5370,8 @@ msgid "Password accepted."
 msgstr "Şifre kabul edildi."
 
 #, c-format
-msgid "Password for %s changed to %s."
-msgstr "%s şifresi, %s olarak değiştirildi."
-
-#, c-format
 msgid "Password for %s changed."
 msgstr "%s şifresi değiştirildi."
-
-#, c-format
-msgid "Password for %s is %s."
-msgstr "%s şifresi %s'dir."
 
 msgid "Password incorrect."
 msgstr "Şifre doğru değil."
@@ -5395,6 +5379,13 @@ msgstr "Şifre doğru değil."
 #, c-format
 msgid "Password reset email for %s has been sent."
 msgstr "%s için şifre sıfırlama e-postası gönderildi."
+
+msgid "Passwords can not be changed right now. Please try again later."
+msgstr "Şifreler şu anda değiştirilemez. Lütfen daha sonra tekrar deneyiniz."
+
+#, c-format
+msgid "Passwords encrypted with %s: %zu"
+msgstr "%s ile şifrelenen şifreler: %zu"
 
 msgid "Peace"
 msgstr "Barış"
@@ -5410,17 +5401,21 @@ msgstr "%s için barış seçeneği artık on açık."
 msgid "Persistent"
 msgstr "Kalıcı"
 
-msgid "Please contact an Operator to get a vHost assigned to this nick."
+#, c-format
+msgid "Please confirm that you want to drop %s with %s%s DROP %s %s"
+msgstr "Lütfen %s rumuzunu droplamak isteğinizi %s%s DROP %s %s ile onaylayın"
+
+msgid "Please contact an Operator to get a vhost assigned to this nick."
 msgstr "Bu rumuza atanan bir vHost almak için lütfen bir operle iletişime geçin."
 
 msgid ""
-"Please try again with a more obscure password. Passwords should be at least\n"
-"five characters long, should not be something easily guessed\n"
-"(e.g. your real name or your nick), and cannot contain the space or tab characters."
+"Please try again with a more obscure password. Passwords should not be\n"
+"something that could be easily guessed (e.g. your real name or your nick) and\n"
+"cannot contain the space or tab characters.\n"
 msgstr ""
 "Lütfen daha belirsiz bir şifreyle tekrar deneyin. Şifreler en az beş karakter\n"
 "uzunluğunda olmalı, kolay tahmin edilebilir olmamalı (örneğin gerçek adınız \n"
-"veya rumuzunuz) ve boşluk veya sekme karakterlerini içermemelidir."
+"veya rumuzunuz) ve boşluk veya sekme karakterlerini içermemelidir.\n"
 
 msgid "Please use a valid server name when juping."
 msgstr "Lütfen atlama yaparken geçerli bir sunucu adı kullanın."
@@ -5429,24 +5424,24 @@ msgid "Please use the symbol of # when attempting to register."
 msgstr "Lütfen kaydolmaya çalışırken # sembolünü kullanın."
 
 #, c-format
-msgid "Please wait %d seconds and retry."
-msgstr "Lütfen %d saniye bekleyip yeniden deneyin."
+msgid "Please wait %lu seconds and retry."
+msgstr "Lütfen %lu saniye bekleyip yeniden deneyin."
 
 #, c-format
-msgid "Please wait %d seconds before requesting a new vHost."
-msgstr "Yeni bir vHost istemeden önce lütfen %d saniye bekleyin."
+msgid "Please wait %lu seconds before requesting a new vhost."
+msgstr "Yeni bir vHost istemeden önce lütfen %lu saniye bekleyin."
 
 #, c-format
-msgid "Please wait %d seconds before using the %s command again."
-msgstr "Lütfen %d saniye bekleyin (%s komutunu tekrar kullanmadan önce)."
+msgid "Please wait %lu seconds before using the %s command again."
+msgstr "Lütfen %lu saniye bekleyin (%s komutunu tekrar kullanmadan önce)."
 
 #, c-format
-msgid "Please wait %d seconds before using the GROUP command again."
-msgstr "GROUP komutunu tekrar kullanmadan önce lütfen %d saniye bekleyin."
+msgid "Please wait %lu seconds before using the GROUP command again."
+msgstr "GROUP komutunu tekrar kullanmadan önce lütfen %lu saniye bekleyin."
 
 #, c-format
-msgid "Please wait %d seconds before using the REGISTER command again."
-msgstr "REGISTER komutunu tekrar kullanmadan önce lütfen %d saniye bekleyin."
+msgid "Please wait %lu seconds before using the REGISTER command again."
+msgstr "REGISTER komutunu tekrar kullanmadan önce lütfen %lu saniye bekleyin."
 
 #, c-format
 msgid "Pooled %s."
@@ -5476,7 +5471,7 @@ msgstr "Rumuzun LIST komutunda görünmesini önleyin"
 msgid "Prevent the nickname from expiring"
 msgstr "Rumuzun süresinin dolmasını önleyin"
 
-msgid "Prevents users being kicked by Services"
+msgid "Prevents users being kicked by services"
 msgstr "Kullanıcıların Servisler tarafından atılmasını önler"
 
 msgid "Private"
@@ -5634,16 +5629,16 @@ msgid "Registered"
 msgstr "Kayıt Tarihi"
 
 #, c-format
-msgid "Registered channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Kayıtlı kanallar: %lu girdi, %lu buckets, en uzun zincir %d"
+msgid "Registered channels: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Kayıtlı kanallar: %zu girdi, %zu buckets, en uzun zincir %zu"
 
 #, c-format
-msgid "Registered nick groups: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Kayıtlı rumuz grupları: %lu girdi, %lu buckets, en uzun zincir %d"
+msgid "Registered nick groups: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Kayıtlı rumuz grupları: %zu girdi, %zu buckets, en uzun zincir %zu"
 
 #, c-format
-msgid "Registered nicknames: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Kayıtlı rumuzlar: %lu girdi, %lu buckets, en uzun zincir %d"
+msgid "Registered nicknames: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Kayıtlı rumuzlar: %zu girdi, %zu buckets, en uzun zincir %zu"
 
 #, c-format
 msgid "Registered only enforced on %s."
@@ -5692,7 +5687,7 @@ msgid ""
 "your nickname as a password is a much worse idea ;) and,\n"
 "in fact, %s will not allow it. Also, short\n"
 "passwords are vulnerable to trial-and-error searches, so\n"
-"you should choose a password at least 5 characters long.\n"
+"you should choose a password at least %u characters long.\n"
 "Finally, the space character cannot be used in passwords."
 msgstr ""
 "Rumuzunuzu %s veritabanına kaydedin. Rumuzunuz kaydedildikten\n"
@@ -5709,7 +5704,7 @@ msgstr ""
 "gerçek adınızı şifre olarak kullanmak kötü bir fikirdir.\n"
 "Rumuzunuzu şifre olarak kullanmak çok daha kötü bir fikir ;)\n"
 "ve aslında %s buna izin vermeyecektir. Ayrıca kısa şifreler\n"
-"deneme yanılma yoluyla aranmaya açık olduğundan en az 5\n"
+"deneme yanılma yoluyla aranmaya açık olduğundan en az %u\n"
 "karakter uzunluğunda bir şifre seçmelisiniz. Son\n"
 "olarak boşluk karakteri şifrelerde kullanılamaz."
 
@@ -5719,11 +5714,11 @@ msgstr "Kayıt şu anda devre dışı."
 msgid "Regulate the use of critical commands"
 msgstr "Kritik komutların kullanımını düzenleyin"
 
-msgid "Reject the requested vHost for the given nick."
+msgid "Reject the requested vhost for the given nick."
 msgstr "Belirtilen rumuz için istenen vHost'u reddedin."
 
-msgid "Reject the requested vHost of a user"
-msgstr "Bir kullanıcının talep edilen vhostunu reddeder"
+msgid "Reject the requested vhost of a user"
+msgstr "Bir kullanıcının talep edilen vHostunu reddeder"
 
 msgid "Releases a suspended channel"
 msgstr "Suspend edilmiş bir kanalı serbest bırakır"
@@ -5793,11 +5788,11 @@ msgstr "%s kaldırılıyor (%s kapsadığı için)."
 msgid "Repeat kicker"
 msgstr "Tekrar yazı atma"
 
-msgid "Request a vHost for your nick"
+msgid "Request a vhost for your nick"
 msgstr "Rumuzunuz için bir vhost talep edin"
 
 msgid ""
-"Request the given vHost to be activated for your nick by the\n"
+"Request the given vhost to be activated for your nick by the\n"
 "network administrators. Please be patient while your request\n"
 "is being considered."
 msgstr ""
@@ -5820,7 +5815,7 @@ msgstr "%s için kısıtlı erişim seçeneği artık off (kapalı)."
 
 #, c-format
 msgid "Restricted access option for %s is now on."
-msgstr "%s için kısıtlı erişim seçeneği artık "
+msgstr "%s için kısıtlı erişim seçeneği artık on (açık)."
 
 #, c-format
 msgid "Restricted enforced on %s."
@@ -5831,9 +5826,6 @@ msgstr "Kanal kullanılmadığında modları koruma"
 
 msgid "Retain topic when channel is not in use"
 msgstr "Kanal kullanılmadığında başlığı koruma"
-
-msgid "Retrieve the password for a nickname"
-msgstr "Bir rumuzun şifresini alın"
 
 msgid "Retrieves the vhost requests"
 msgstr "Vhost taleplerini alır"
@@ -5846,55 +5838,6 @@ msgstr "Belirtilen kanalın anahtarını gösterir."
 
 msgid "Returns the matching accounts that used given email."
 msgstr "Belirtilen e-postayı kullanan eşleşen hesapları gösterir."
-
-msgid "Returns the owner status of the given nickname"
-msgstr "Belirtilen rumuzun sahiplik durumunu gösterir"
-
-msgid ""
-"Returns the password for the given nickname.  Note that\n"
-"whenever this command is used, a message including the\n"
-"person who issued the command and the nickname it was used\n"
-"on will be logged and sent out as a WALLOPS/GLOBOPS."
-msgstr ""
-"Belirtilen rumuzun şifresini döndürür. Not Bu komut her\n"
-"kullanıldığında, komutu veren kişiyi ve komutun kullanıldığı\n"
-"rumuzu içeren bir mesajın günlüğe kaydedileceğini ve\n"
-"WALLOPS/GLOBOPS olarak gönderileceğini unutmayın."
-
-msgid ""
-"Returns whether the user using the given nickname is\n"
-"recognized as the owner of the nickname. The response has\n"
-"this format:\n"
-" \n"
-"    nickname status-code account\n"
-" \n"
-"where nickname is the nickname sent with the command,\n"
-"status-code is one of the following, and account\n"
-"is the account they are logged in as.\n"
-" \n"
-"    0 - no such user online or nickname not registered\n"
-"    1 - user not recognized as nickname's owner\n"
-"    2 - user recognized as owner via access list only\n"
-"    3 - user recognized as owner via password identification\n"
-" \n"
-"If no nickname is given, your status will be returned."
-msgstr ""
-"Belirtilen rumuzu kullanan kullanıcının, rumuzun sahibi\n"
-"olarak tanınıp tanınmadığını döndürür. Yanıt şu\n"
-"formattadır:\n"
-" \n"
-"    rumuz durum-kodu hesap\n"
-" \n"
-"burada rumuz komutla gönderilen rumuzdur, durum-kodu\n"
-"aşağıdakilerden biridir ve hesap oturum\n"
-"açtıkları hesaptır.\n"
-" \n"
-"    0 - böyle bir çevrimiçi kullanıcı yokveya rumuzu kayıtlı değil\n"
-"    1 - kullanıcı rumuzun sahibi olarak tanınmadı\n"
-"    2 - kullanıcı yalnızca erişim listesi aracılığıyla sahip olarak tanındı\n"
-"    3 - kullanıcı, şifre tanımlama yoluyla sahip olarak tanındı\n"
-" \n"
-"Rumuz belirtilmezse kendi durumunuzu geri döndürecektir."
 
 msgid "Reverses kicker"
 msgstr "Reverse yazı atma"
@@ -5922,7 +5865,7 @@ msgstr "SSL yalnızca %s üzerinde uygulandı."
 msgid "SSLONLY enforced by "
 msgstr "SSLONLY, uygulayan: "
 
-msgid "Save databases and restart Services"
+msgid "Save databases and restart services"
 msgstr "Veritabanlarını kaydedin ve Servisleri yeniden başlatın"
 
 msgid "Searches logs for a matching pattern"
@@ -5951,27 +5894,8 @@ msgid "Secure ops option for %s is now on."
 msgstr "%s için OPları koruma seçeneği artık on (açık)."
 
 #, c-format
-msgid "Secure option for %s is now off."
-msgstr "%s için Güvenlik seçeneği artık off (kapalı)."
-
-#, c-format
-msgid "Secure option for %s is now on."
-msgstr "%s için Güvenlik seçeneği artık on (açık)."
-
-#, c-format
-msgid "Secure option is now off for %s."
-msgstr "%s için Güvenlik seçeneği artık off (kapalı)."
-
-#, c-format
-msgid "Secure option is now on for %s."
-msgstr "%s için Güvenlik seçeneği artık on (açık)."
-
-#, c-format
 msgid "Secureops enforced on %s."
 msgstr "OPları koruma %s'de uygulandı."
-
-msgid "Security"
-msgstr "Güvenlik"
 
 #, c-format
 msgid ""
@@ -6000,6 +5924,9 @@ msgstr "Kayıtlı tüm kullanıcılara bir memo gönderin"
 
 msgid "Send a message to all users"
 msgstr "Tüm kullanıcılara bir mesaj gönderin"
+
+msgid "Send a message to all users on a server"
+msgstr "Sunucudaki tüm kullanıcılara bir mesaj gönderin"
 
 msgid "Sender"
 msgstr "Gönderen"
@@ -6075,6 +6002,10 @@ msgid "Server"
 msgstr "Sunucu"
 
 #, c-format
+msgid "Server %s is not linked to the network."
+msgstr "%s sunucusu ağa bağlı değil."
+
+#, c-format
 msgid "Server %s added to zone %s."
 msgstr "%s sunucusu %s bölgesine eklendi."
 
@@ -6138,9 +6069,6 @@ msgstr "Servis Operatörü komutları"
 msgid "Services are in DefCon mode, please try again later."
 msgstr "Servisler DefCon modunda, lütfen daha sonra tekrar deneyin."
 
-msgid "Services are in read-only mode!"
-msgstr "Servisler salt okunur modunda!"
-
 #, c-format
 msgid "Services are now at DEFCON %d."
 msgstr "Servisler artık DEFCON %d modunda."
@@ -6166,6 +6094,9 @@ msgstr "Servisler artık salt-okunur modundadır."
 
 msgid "Services are now in read-write mode."
 msgstr "Servisler artık okunur-yazılır modunda."
+
+msgid "Services are temporarily in read-only mode."
+msgstr "Servisler artık salt-okunur modundadır."
 
 msgid "Services have been configured to not send mail."
 msgstr "Servisler posta göndermeyecek şekilde yapılandırıldı."
@@ -6218,8 +6149,8 @@ msgid "Session limiting is disabled."
 msgstr "Oturum limitleme devre dışı."
 
 #, c-format
-msgid "Sessions: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Oturumlar: %lu girdi, %lu buckets, en uzun zincir %d"
+msgid "Sessions: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Oturumlar: %zu girdi, %zu buckets, en uzun zincir %zu"
 
 msgid "Set SET-options on another nickname"
 msgstr "Başka bir rumuzda SET-seçeneklerini ayarlayın"
@@ -6227,7 +6158,7 @@ msgstr "Başka bir rumuzda SET-seçeneklerini ayarlayın"
 msgid "Set channel options and information"
 msgstr "Kanal seçeneklerini ve bilgilerini ayarlayın"
 
-msgid "Set how Services make bans on the channel"
+msgid "Set how services make bans on the channel"
 msgstr "Servislerin kanalda nasıl banlama yapacağını ayarlayın"
 
 msgid "Set options related to memos"
@@ -6242,13 +6173,13 @@ msgstr "Kanalı kalıcı olarak ayarla"
 msgid "Set the channel description"
 msgstr "Kanal açıklamasını ayarlayın"
 
-msgid "Set the display of your group in Services"
+msgid "Set the display of your group in services"
 msgstr "Servislerde grubunuzun afişini ayarlayın"
 
 msgid "Set the founder of a channel"
 msgstr "Kanalın founderını (kurucusunu )ayarlama"
 
-msgid "Set the language Services will use when messaging you"
+msgid "Set the language services will use when messaging you"
 msgstr "Servislerin size mesaj gönderirken kullanacağı dili ayarlayın"
 
 msgid "Set the nickname password"
@@ -6263,7 +6194,7 @@ msgstr "Bir gruptaki tüm rumuzların vhostunu ayarlayın"
 msgid "Set the vhost of another user"
 msgstr "Başka bir kullanıcının vhostunu ayarlayın"
 
-msgid "Set various global Services options"
+msgid "Set various global services options"
 msgstr "Çeşitli genel Servis seçeneklerini ayarlama"
 
 msgid "Set your nickname password"
@@ -6480,7 +6411,7 @@ msgstr ""
 
 msgid ""
 "Sets the vhost for all nicks in the same group as that\n"
-"of the given nick.  If your IRCD supports vIdents, then\n"
+"of the given nick.  If your IRCD supports vidents, then\n"
 "using SETALL <nick> <ident>@<hostmask> will set idents\n"
 "for users as well as vhosts.\n"
 "* NOTE, this will not update the vhost for any nicks\n"
@@ -6495,7 +6426,7 @@ msgstr ""
 
 msgid ""
 "Sets the vhost for the given nick to that of the given\n"
-"hostmask.  If your IRCD supports vIdents, then using\n"
+"hostmask.  If your IRCD supports vidents, then using\n"
 "SET <nick> <ident>@<hostmask> set idents for users as\n"
 "well as vhosts."
 msgstr ""
@@ -6505,7 +6436,7 @@ msgstr ""
 "hem de vhostlar için identleri ayarlayın."
 
 msgid ""
-"Sets various global Services options.  Option names\n"
+"Sets various global services options.  Option names\n"
 "currently defined are:\n"
 "    READONLY   Set read-only or read-write mode\n"
 "    DEBUG      Activate or deactivate debug mode\n"
@@ -6556,6 +6487,9 @@ msgstr ""
 "Belirtilen kanalın süresinin dolup dolmayacağını ayarlar. Bunu ON \n"
 "(AÇIK) olarak ayarlamak kanalın süresinin dolmasını önler."
 
+msgid "Sets whether the given nickname can be added to a channel access list."
+msgstr "Belirtilen rumuzun kanal erişim listesine eklenip eklenemeyeceğini ayarlar."
+
 #, c-format
 msgid ""
 "Sets whether the given nickname will be given its status modes\n"
@@ -6576,6 +6510,9 @@ msgid ""
 msgstr ""
 "Belirtilen rumuzun süresinin dolup dolmayacağını ayarlar. Bunu ON\n"
 "(AÇIK) olarak ayarlamak rumuzun süresinin dolmasını önler."
+
+msgid "Sets whether you can be added to a channel access list."
+msgstr "Bir kanalı, onun kendi erişim listesine ekleyemezsiniz."
 
 #, c-format
 msgid ""
@@ -6608,12 +6545,12 @@ msgstr "Super Admin  ayarı ON veya OFF olmalıdır."
 msgid "Should services automatically give status to users"
 msgstr "Servisler kullanıcılara otomatik olarak durum vermeli mi"
 
-msgid "Show status of Services and network"
+msgid "Show status of services and network"
 msgstr "Servislerin ve ağın durumunu göster"
 
 #, c-format
-msgid "Showed %d/%d matches for %s."
-msgstr "%d/%d eşleşme (%s için) gösteriliyor."
+msgid "Showed %zu/%zu matches for %s."
+msgstr "%zu/%zu eşleşme (%s için) gösteriliyor."
 
 msgid "Sign kicks that are done with the KICK command"
 msgstr "KICK komutuyla yapılan atmaları işaretleme"
@@ -6642,61 +6579,12 @@ msgid "Sorry, %s currently has too many memos and cannot receive more."
 msgstr "Üzgünüz, %s'de şu anda çok fazla memo var ve daha fazlasını alamıyor."
 
 #, c-format
+msgid "Sorry, %s is temporarily unavailable."
+msgstr "Üzgünüz, %s geçici olarak devre dışı bırakıldı."
+
+#, c-format
 msgid "Sorry, I have not seen %s."
 msgstr "Üzgünüz, %s'i görmedim."
-
-msgid "Sorry, bad words list modification is temporarily disabled."
-msgstr "Üzgünüz, küdür listesi değişikliği geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, bot assignment is temporarily disabled."
-msgstr "Üzgünüz, bot ataması geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, bot modification is temporarily disabled."
-msgstr "Üzgünüz, bot düzenleme geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, bot option setting is temporarily disabled."
-msgstr "Üzgünüz, bot seçeneği ayarı geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, changing bot options is temporarily disabled."
-msgstr "Üzgünüz, bot seçeneklerini değiştirmek geçici olarak devre dışı bırakıldı."
-
-#, c-format
-msgid "Sorry, channel %s list modification is temporarily disabled."
-msgstr "Üzgünüz, %s kanalının liste değişikliği geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, channel access list modification is temporarily disabled."
-msgstr "Üzgünüz, kanal erişim listesi değişikliği geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, channel autokick list modification is temporarily disabled."
-msgstr "Üzgünüz, kanal oto-at listesi değişikliği geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, channel de-registration is temporarily disabled."
-msgstr "Üzgünüz, kanal kaydının silinmesi geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, channel registration is temporarily disabled."
-msgstr "Üzgünüz, kanal kaydetme geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, kicker configuration is temporarily disabled."
-msgstr "Üzgünüz, kicker (atma) yapılandırması geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, memo option setting is temporarily disabled."
-msgstr "Üzgünüz, memo seçeneği ayarı geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, memo sending is temporarily disabled."
-msgstr "Üzgünüz, memo gönderimi geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, nickname de-registration is temporarily disabled."
-msgstr "Üzgünüz, rumuz kaydının silinmesi geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, nickname grouping is temporarily disabled."
-msgstr "Üzgünüz, rumuz gruplaması geçici olarak devre dışı bırakıldı."
-
-msgid "Sorry, nickname registration is temporarily disabled."
-msgstr "Üzgünüz, rumuz kaydetme geçici olarak devre dışı bırakıldı."
-
-#, c-format
-msgid "Sorry, the maximum of %d access entries has been reached."
-msgstr "Üzgünüz, maksimum %d erişim girdisine ulaşıldı."
 
 #, c-format
 msgid "Sorry, the maximum of %d auto join entries has been reached."
@@ -6986,13 +6874,13 @@ msgid ""
 "Syntax: READONLY {ON | OFF}\n"
 " \n"
 "Sets read-only mode on or off.  In read-only mode, normal\n"
-"users will not be allowed to modify any Services data,\n"
-"including channel and nickname access lists, etc.  IRCops\n"
-"with sufficient Services privileges will be able to modify\n"
+"users will not be allowed to modify any services data,\n"
+"including channel access lists, etc.  Server operators\n"
+"with sufficient services privileges will be able to modify\n"
 "Services' AKILL, SQLINE, SNLINE and ignore lists, drop,\n"
 "suspend or forbid nicknames and channels, and manage news,\n"
 "oper info and DNS, but any such changes will not be saved\n"
-"unless read-only mode is deactivated before Services are\n"
+"unless read-only mode is deactivated before services are\n"
 "terminated or restarted.\n"
 " \n"
 "This option is equivalent to the command-line option\n"
@@ -7077,8 +6965,8 @@ msgstr ""
 "sahip olanlarla sınırlıdır."
 
 msgid ""
-"Tells Services to jupiter a server -- that is, to create\n"
-"a fake \"server\" connected to Services which prevents\n"
+"Tells services to jupiter a server -- that is, to create\n"
+"a fake \"server\" connected to services which prevents\n"
 "the real server of that name from connecting.  The jupe\n"
 "may be removed using a standard SQUIT. If a reason is\n"
 "given, it is placed in the server information field;\n"
@@ -7098,7 +6986,7 @@ msgstr ""
 msgid "Tells you about the last time a user was seen"
 msgstr "Bir kullanıcının en son ne zaman görüldüğünü size bildirir"
 
-msgid "Terminate Services WITHOUT saving"
+msgid "Terminate services WITHOUT saving"
 msgstr "Servisleri KAYDETMEDEN sonlandırın"
 
 msgid "Terminate services with save"
@@ -7328,15 +7216,11 @@ msgstr "STATS komutu, depolanan rumuzlar ve hafıza kullanımıyla ilgili ista
 
 msgid ""
 "The email parameter is optional and will set the email\n"
-"for your nick immediately.\n"
-"Your privacy is respected; this e-mail won't be given to\n"
-"any third-party person. You may also wish to SET HIDE it\n"
+"for your nick immediately. You may also wish to SET HIDE it\n"
 "after registering if it isn't the default setting already."
 msgstr ""
-"email parametresi isteğe bağlıdır ve rumuzunuzun e-postasını\n"
-"hemen ayarlayacaktır.\n"
-"Gizliliğinize saygı duyulur; bu e-posta hiçbir üçüncü tarafa\n"
-"verilmeyecektir. Zaten varsayılan ayar değilse, kayıttan sonra\n"
+"Bu email parametresi isteğe bağlıdır ve rumuzunuzun e-postasını\n"
+"hemen ayarlayacaktır. Zaten varsayılan ayar değilse, kayıttan sonra\n"
 "bunu SET HIDE yapmak da isteyebilirsiniz."
 
 #, c-format
@@ -7396,14 +7280,6 @@ msgstr "AKILL listesi temizlendi."
 msgid "The Defcon level is now at: %d"
 msgstr "Defcon seviyesi şu anda: %d"
 
-#, c-format
-msgid "The E-mail address of %s will now be hidden from %s INFO displays."
-msgstr "%s e-posta adresi artık %s BİLGİ ekranlarında gizlenecek."
-
-#, c-format
-msgid "The E-mail address of %s will now be shown in %s INFO displays."
-msgstr "%s e-posta adresi artık %s BİLGİ ekranlarında gösterilecektir."
-
 msgid "The available flags are:"
 msgstr "Mevcut bayraklar şunlardır:"
 
@@ -7423,6 +7299,14 @@ msgstr "%s e-posta adresi %d kullanıcılık kullanım sınırına ulaştı."
 #, c-format
 msgid "The email address %s has reached its usage limit of 1 user."
 msgstr "%s e-posta adresi 1 kullanıcılık kullanım sınırına ulaştı."
+
+#, c-format
+msgid "The email address of %s will now be hidden from %s INFO displays."
+msgstr "%s e-posta adresi artık %s BİLGİ ekranlarında gizlenecek."
+
+#, c-format
+msgid "The email address of %s will now be shown in %s INFO displays."
+msgstr "%s e-posta adresi artık %s BİLGİ ekranlarında gösterilecektir."
 
 #, c-format
 msgid "The entry message list for %s is full."
@@ -7523,8 +7407,8 @@ msgstr ""
 "üzerindeki beklemesini kaldırmak için bu komutu tekrar kullanın."
 
 #, c-format
-msgid "There are %d memos on channel %s."
-msgstr "%d memo (%s kanalında) var."
+msgid "There are %zu memos on channel %s."
+msgstr "%zu memo (%s kanalında) var."
 
 msgid ""
 "There are no bots available at this time.\n"
@@ -7548,16 +7432,16 @@ msgid "There currently are no logging configurations for %s."
 msgstr "Şu anda %s için günlük kaydı yapılandırması yok."
 
 #, c-format
-msgid "There is %d memo on channel %s."
-msgstr "%d memo (%s kanalında) var."
+msgid "There is %zu memo on channel %s."
+msgstr "%zu memo (%s kanalında) var."
 
 #, c-format
 msgid ""
 "There is a new memo on channel %s.\n"
-"Type %s%s READ %s %d to read it."
+"Type %s%s READ %s %zu to read it."
 msgstr ""
 "%s kanalında yeni bir memo var. Okumak için\n"
-"%s%s READ %s %d yazın."
+"%s%s READ %s %zu yazın."
 
 #, c-format
 msgid "There is no bot assigned to %s anymore."
@@ -7773,7 +7657,7 @@ msgid "This command retrieves the vhost requests."
 msgstr "Bu komut, vhost isteklerini alır."
 
 msgid ""
-"This command searches the Services logfiles for messages\n"
+"This command searches the services logfiles for messages\n"
 "that match the given pattern. The day and limit argument\n"
 "may be used to specify how many days of logs to search\n"
 "and the number of replies to limit to. By default this\n"
@@ -7828,14 +7712,6 @@ msgstr "Bu komut mod-adı adlı modülü kaldırır."
 
 msgid "This command will resend you the registration confirmation email."
 msgstr "Bu komut size kayıt onay e-postasını tekrar gönderecektir."
-
-#, c-format
-msgid ""
-"This nick is owned by someone else.  Please choose another.\n"
-"(If this is your nick, type %s%s IDENTIFY password.)"
-msgstr ""
-"Bu rumuz başkasına aittir.  Lütfen başka bir tane seçin.\n"
-"(Eğer bu rumuz sizinse, %s%s IDENTIFY password yazıp kendinizi tanıtın.)"
 
 #, c-format
 msgid "This nickname has been forbidden: %s"
@@ -7932,9 +7808,6 @@ msgstr "Büyük harf kilidini KAPALI konuma getirin!"
 msgid "Turn chanstats statistics on or off"
 msgstr "Chanstats istatistiklerini açma veya kapatma"
 
-msgid "Turn nickname security on or off"
-msgstr "Rumuz güvenliğini açma veya kapatma"
-
 msgid "Turn protection on or off"
 msgstr "Korumayı açma veya kapatma"
 
@@ -7965,24 +7838,6 @@ msgstr ""
 "oluşturulan rumuz listelerinde görünmez. (Ancak, rumuzunuzu\n"
 "bilen herkes INFO komutunu kullanarak yine de onun\n"
 "hakkında bilgi alabilir.)"
-
-#, c-format
-msgid ""
-"Turns %s's security features on or off for your\n"
-"nick. With SECURE set, you must enter your password\n"
-"before you will be recognized as the owner of the nick,\n"
-"regardless of whether your address is on the access\n"
-"list. However, if you are on the access list, %s\n"
-"will not auto-kill you regardless of the setting of the\n"
-"KILL option."
-msgstr ""
-"Nickiniz için %s'in güvenlik özelliklerini açar veya kapatır.\n"
-"SECURE ayarlandığında, adresinizin erişim listesinde\n"
-"olup olmadığına bakılmaksızın, rumuzun sahibi olarak tanınmadan\n"
-"önce şifrenizi girmelisiniz. Ancak erişim listesindeyseniz,\n"
-"KILL seçeneğinin ayarına bakılmaksızın\n"
-"%s sizi otomatik olarak\n"
-"killemez."
 
 msgid "Turns chanstats channel statistics ON or OFF for this user."
 msgstr "Bu kullanıcı için kanal istatistiklerini AÇIK veya KAPALI duruma getirir."
@@ -8089,14 +7944,8 @@ msgstr ""
 "%s%s HELP %s seçenek yazın."
 
 #, c-format
-msgid ""
-"Type %s%s SET EMAIL e-mail in order to set your e-mail.\n"
-"Your privacy is respected; this e-mail won't be given to\n"
-"any third-party person."
-msgstr ""
-"E-postanızı ayarlamak için %s%s SET EMAIL e-posta yazın.\n"
-"Gizliliğinize saygı duyulur; Bu e-posta hiçbir üçüncü tarafa\n"
-"verilmeyecektir."
+msgid "Type %s%s SET EMAIL email in order to set your email."
+msgstr "E-Postanızı ayarlamak için %s%s SET EMAIL e-posta yazın."
 
 msgid "Un-Load a module"
 msgstr "Bir modülün yüklemesini kaldır"
@@ -8148,12 +7997,24 @@ msgid "Unknown command %s. \"%s%s HELP\" for help."
 msgstr "Bilinmeyen komut %s. Yardım için: \"%s%s HELP\"."
 
 #, c-format
+msgid "Unknown command %s. Did you mean %s?"
+msgstr "Bilinmeyen komut %s. %s mi demek istediniz?"
+
+#, c-format
+msgid "Unknown command %s. Did you mean %s? \"%s%s HELP\" for help."
+msgstr "Bilinmeyen komut %s. %s mi demek istediniz? Yardım için: \"%s%s HELP\"."
+
+#, c-format
 msgid "Unknown mode character %c ignored."
 msgstr "Bilinmeyen mod karakteri %c yok sayıldı."
 
 #, c-format
 msgid "Unknown parameter: %s"
 msgstr "Bilinmeyen parametre: %s"
+
+#, c-format
+msgid "Unknown passwords: %zu"
+msgstr "Bilinmeyen parametre: %zu"
 
 msgid "Unpooled"
 msgstr "Havuzdan çıkarılmış"
@@ -8229,6 +8090,10 @@ msgstr "Ayrıcalıklı kullanıcıların listesini yönetmek için kullanılır"
 msgid "Used to modify the channel status of you or other users"
 msgstr "Sizin veya diğer kullanıcıların kanal durumunu değiştirmek için kullanılır"
 
+#, c-format
+msgid "User %s isn't currently logged in to an account."
+msgstr "%s kullanıcısı şuan hesabına giriş yapmış değil."
+
 msgid "User has been banned from the channel"
 msgstr "Kullanıcı kanaldan banlandı"
 
@@ -8244,12 +8109,12 @@ msgid "Users"
 msgstr "Kullanıcılar"
 
 #, c-format
-msgid "Users (nick): %lu entries, %lu buckets, longest chain is %d"
-msgstr "Kullanıcılar (rumuz): %lu girdi, %lu buckets, en uzun zincir %d"
+msgid "Users (nick): %lu entries, %lu buckets, longest chain is %zu"
+msgstr "Kullanıcılar (rumuz): %lu girdi, %lu buckets, en uzun zincir %zu"
 
 #, c-format
-msgid "Users (uid): %lu entries, %lu buckets, longest chain is %d"
-msgstr "Kullanıcılar (uid): %lu girdi, %lu buckets, en uzun zincir %d"
+msgid "Users (uid): %lu entries, %lu buckets, longest chain is %zu"
+msgstr "Kullanıcılar (uid): %lu girdi, %lu buckets, en uzun zincir %zu"
 
 msgid "Users list:"
 msgstr "Kullanıcı listesi:"
@@ -8258,20 +8123,28 @@ msgid "VHost"
 msgstr "VHost"
 
 #, c-format
+msgid "VHost for %s removed."
+msgstr "%s için olan vHost kaldırıldı."
+
+#, c-format
 msgid "VHost for %s set to %s."
 msgstr "%s için vHost, %s olarak ayarlandı."
 
 #, c-format
-msgid "VHost for %s set to %s@%s."
-msgstr "%s için vHost, %s@%s olarak ayarlandı."
+msgid "VHost for %s has been activated."
+msgstr "%s için olan vHost etkinleştirildi."
+
+#, c-format
+msgid "VHost for %s has been rejected."
+msgstr "%s için olan vHost reddedildi."
 
 #, c-format
 msgid "VHost for group %s set to %s."
 msgstr "%s grubu için vHost, %s olarak ayarlandı."
 
 #, c-format
-msgid "VHost for group %s set to %s@%s."
-msgstr "%s grubu için vHost, %s@%s olarak ayarlandı."
+msgid "VHosts for group %s have been removed."
+msgstr "%s grubunun vHostları kaldırıldı."
 
 msgid "VIEW host"
 msgstr "VIEW host"
@@ -8288,13 +8161,6 @@ msgstr "Değer"
 #, c-format
 msgid "Value of %s:%s changed to %s"
 msgstr "%s:%s'in değeri %s olarak değiştirildi"
-
-msgid "Vhost"
-msgstr "Vhost"
-
-#, c-format
-msgid "Vhost for %s removed."
-msgstr "%s için olan vhost kaldırıldı."
 
 msgid "View and change Services Operators"
 msgstr "Servis Operatörlerini görüntüleme ve değiştirme"
@@ -8349,7 +8215,7 @@ msgid ""
 "yourself.\n"
 " \n"
 "With a parameter, does the same for the given nick. If you\n"
-"specify REVALIDATE as well, Services will ask the given nick\n"
+"specify REVALIDATE as well, services will ask the given nick\n"
 "to re-identify. This is limited to Services Operators."
 msgstr ""
 "Parametre olmadan IDENTIFY komutunun etkisini tersine çevirir,\n"
@@ -8363,14 +8229,17 @@ msgstr ""
 
 msgid ""
 "Without any option, shows the current number of users online,\n"
-"and the highest number of users online since Services was\n"
-"started, and the length of time Services has been running.\n"
+"and the highest number of users online since services was\n"
+"started, and the length of time services has been running.\n"
 " \n"
 "With the AKILL option, displays the current size of the\n"
 "AKILL list and the current default expiry time.\n"
 " \n"
 "The RESET option currently resets the maximum user count\n"
 "to the number of users currently present on the network.\n"
+" \n"
+"The PASSWORD option displays the encryption algorithms used\n"
+"for user passwords.\n"
 " \n"
 "The UPLINK option displays information about the current\n"
 "server Anope uses as an uplink to the network.\n"
@@ -8389,6 +8258,9 @@ msgstr ""
 "RESET seçeneği şu anda maksimum kullanıcı sayısını ağda\n"
 "o anda mevcut olan kullanıcı sayısına sıfırlamaktadır.\n"
 " \n"
+"PASSWORD seçeneği, kullanıcı şifreleri için kullanılan şifreleme\n"
+"algoritmalarını görüntüler.\n"
+"\n"
 "UPLINK seçeneği, Anope'nin ağa uplink olarak bağlandığı\n"
 "geçerli sunucu hakkındaki bilgileri görüntüler.\n"
 " \n"
@@ -8428,9 +8300,6 @@ msgstr "İstemci sertifikası kullanmıyorsunuz."
 msgid "You are now a super admin."
 msgstr "Şuan bir süper adminsiniz."
 
-msgid "You are now an IRC Operator."
-msgstr "Şuan bir IRC Operatörsünüz."
-
 msgid "You are now identified for your nick. Change your password now."
 msgstr "Artık rumuzunuz ile tanınıyorsunuz. Şimdi şifrenizi değiştirin."
 
@@ -8442,7 +8311,7 @@ msgstr "Artık %s grubundasınız."
 msgid "You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."
 msgstr "Maksimum memo sayınızı (%d) aştınız. Mevcut memolarınızdan bazılarını silene kadar yeni memo alamayacaksınız."
 
-msgid "You can not NOOP Services."
+msgid "You can not NOOP services."
 msgstr "NOOP Servislerini kullanamazsınız."
 
 msgid "You can not disable the founder privilege because it would be impossible to re-enable it at a later time."
@@ -8451,8 +8320,11 @@ msgstr "Founder ayrıcalığını devre dışı bırakamazsınız çünkü daha 
 msgid "You can not jupe an already juped server."
 msgstr "Zaten atlanmış bir sunucuyu jupe edemezsiniz."
 
-msgid "You can not jupe your Services' pseudoserver or your uplink server."
+msgid "You can not jupe your services' pseudoserver or your uplink server."
 msgstr "Servislerinizin sahte sunucusunu veya uplink sunucunuzu çalıştıramazsınız."
+
+msgid "You can not queue any more messages."
+msgstr "Daha fazla mesajı sıraya koyamazsınız."
 
 #, c-format
 msgid "You can not reload this module directly, instead reload %s."
@@ -8460,6 +8332,9 @@ msgstr "Bu modülü doğrudan yeniden yükleyemezsiniz, bunun yerine %s dosyası
 
 msgid "You can not request a receipt when sending a memo to yourself."
 msgstr "Kendinize memo gönderirken makbuz talep edemezsiniz."
+
+msgid "You can not send a single message while you have messages queued."
+msgstr "Sıraya alınmış mesajlarınız varken tek bir mesaj gönderemezsiniz."
 
 #, c-format
 msgid "You can't %s yourself!"
@@ -8491,27 +8366,27 @@ msgstr "Memo sınırınızı %d'den daha yükseğe ayarlayamazsınız."
 msgid "You cannot unassign bots while persist is set on the channel."
 msgstr "Kanalda kalıcılık ayarı ayarlanmışken botların atamasını kaldıramazsınız."
 
-msgid "You cannot unset the e-mail on this network."
-msgstr "Bu ağda e-posta ayarını kaldıramazsınız."
+msgid "You cannot unset the email on this network."
+msgstr "Bu ağdaki e-postanın ayarını kaldıramazsınız."
 
 msgid "You cannot use this command."
 msgstr "Bu komutu kullanamazsınız."
 
 #, c-format
-msgid "You currently have %d memos, of which %d are unread."
-msgstr "Şu anda %d memonuz var ve bunların %d tanesi okunmamış."
+msgid "You currently have %zu memos, of which %zu are unread."
+msgstr "Şu anda %zu memonuz var ve bunların %zu tanesi okunmamış."
 
 #, c-format
-msgid "You currently have %d memos, of which 1 is unread."
-msgstr "Şu anda %d memonuz var ve bunların 1 tanesi okunmamış."
+msgid "You currently have %zu memos, of which 1 is unread."
+msgstr "Şu anda %zu memonuz var ve bunların 1 tanesi okunmamış."
 
 #, c-format
-msgid "You currently have %d memos."
-msgstr "Şu anda %d memonuz var."
+msgid "You currently have %zu memos."
+msgstr "Şu anda %zu memonuz var."
 
 #, c-format
-msgid "You currently have %d memos; all of them are unread."
-msgstr "Şu anda %d memonuz var; hepsi okunmamış."
+msgid "You currently have %zu memos; all of them are unread."
+msgstr "Şu anda %zu memonuz var; hepsi okunmamış."
 
 msgid "You currently have 1 memo, and it has not yet been read."
 msgstr "Şu anda 1 memonuz var ve henüz okunmadı."
@@ -8525,6 +8400,12 @@ msgstr "Şu anda herhangi bir memonuz yok."
 #, c-format
 msgid "You do not have access to set mode %c."
 msgstr "%c modunu ayarlama erişiminiz yok."
+
+msgid "You do not have any messages queued and did not specify a message to send."
+msgstr "Sıraya alınmış herhangi bir mesajınız yok ve gönderilecek mesajı belirtmediniz."
+
+msgid "You do not have any queued messages."
+msgstr "Sıraya alınmış mesajınız yok."
 
 #, c-format
 msgid "You do not have the access to change %s's modes."
@@ -8544,10 +8425,10 @@ msgstr "1 yeni memonuz var."
 #, c-format
 msgid ""
 "You have a new memo from %s.\n"
-"Type %s%s READ %d to read it."
+"Type %s%s READ %zu to read it."
 msgstr ""
 "%s size yeni bir memo gönderdi.\n"
-"okumak için %s%s READ %d yazın."
+"okumak için %s%s READ %zu yazın."
 
 #, c-format
 msgid "You have been invited to %s by %s."
@@ -8578,6 +8459,9 @@ msgstr "Saklayabileceğiniz memo sayısında herhangi bir sınırlama yoktur."
 msgid "You have no memos."
 msgstr "Hiç memonuz yok."
 
+msgid "You have no messages queued."
+msgstr "Sıraya alınmış mesajınız yok."
+
 msgid "You have no new memos."
 msgstr "Yeni memonuz yok."
 
@@ -8596,11 +8480,11 @@ msgstr "Grubunuzdaki herhangi bir rumuzu bırakabilirsiniz."
 msgid "You may not (un)lock mode %c."
 msgstr "%c modunun kilidini açamaz/kapatamazsınız."
 
-msgid "You may not change the e-mail of other Services Operators."
-msgstr "Diğer Servis Operatörlerinin e-postasını değiştiremezsiniz."
-
 msgid "You may not change the email of an unconfirmed account."
 msgstr "Onaylanmamış bir hesabın e-postasını değiştiremezsiniz."
+
+msgid "You may not change the email of other Services Operators."
+msgstr "Diğer Servis Operatörlerinin e-postasını değiştiremezsiniz."
 
 msgid "You may not change the password of other Services Operators."
 msgstr "Diğer Servis Operatörlerinin şifresini değiştiremezsiniz."
@@ -8608,14 +8492,8 @@ msgstr "Diğer Servis Operatörlerinin şifresini değiştiremezsiniz."
 msgid "You may not drop other Services Operators' nicknames."
 msgstr "Diğer Servis Operatörlerinin rumuzlarını düşüremezsiniz."
 
-msgid "You may not get the password of other Services Operators."
-msgstr "Diğer Servis Operatörlerinin şifresini alamazsınız."
-
 msgid "You may not suspend other Services Operators' nicknames."
 msgstr "Diğer Servis Operatörlerinin rumuzlarını askıya alamazsınız."
-
-msgid "You may view but not modify the access list of other Services Operators."
-msgstr "Diğer Servis Operatörlerinin erişim listesini görüntüleyebilir ancak değiştiremezsiniz."
 
 msgid "You may view but not modify the certificate list of other Services Operators."
 msgstr "Diğer Servis Operatörlerinin sertifika listesini görüntüleyebilir ancak değiştiremezsiniz."
@@ -8647,20 +8525,16 @@ msgid "You must confirm your account before you may send a memo."
 msgstr "Not göndermeden önce hesabınızı onaylamanız gerekir."
 
 #, c-format
-msgid "You must enter the channel name twice as a confirmation that you wish to drop %s."
-msgstr "%s'yi düşürmek istediğinizi onaylamak için kanal adını iki kez girmelisiniz."
-
-#, c-format
-msgid "You must have been using this nick for at least %d seconds to register."
-msgstr "Kayıt olabilmek için bu rumuzu en az %d saniyedir kullanıyor olmanız gerekmektedir."
+msgid "You must have been using this nick for at least %lu seconds to register."
+msgstr "Kayıt olmak için bu rumuzu en az %lu saniyedir kullanıyor olmalısınız."
 
 #, c-format
 msgid "You must have the %s(ME) privilege on the channel to use this command."
 msgstr "Bu komutu kullanmak için kanalda %s(ME) ayrıcalığına sahip olmanız gerekir."
 
 msgid ""
-"You must now supply an e-mail for your nick.\n"
-"This e-mail will allow you to retrieve your password in\n"
+"You must now supply an email for your nick.\n"
+"This email will allow you to retrieve your password in\n"
 "case you forget it."
 msgstr ""
 "Şimdi rumuzunuz için bir e-posta girmelisiniz.\n"
@@ -8709,8 +8583,8 @@ msgstr "IRCd'niz SVSNICK'i desteklemiyor."
 msgid "Your IRCd does not support SVSPART."
 msgstr "IRCd'niz SVSPART'ı desteklemiyor."
 
-msgid "Your IRCd does not support vIdent's, if this is incorrect, please report this as a possible bug"
-msgstr "IRCd'niz vIdent'i desteklemiyor, eğer bu yanlışsa lütfen bunu olası bir hata olarak bildirin"
+msgid "Your IRCd does not support vidents. If this is incorrect please report this as a possible bug."
+msgstr "IRCd'niz vIdent'i desteklemiyor, eğer bu yanlışsa lütfen bunu olası bir hata olarak bildirin."
 
 #, c-format
 msgid "Your account %s has been successfully created."
@@ -8766,6 +8640,12 @@ msgstr "Memo sınırınız 0; yeni memo almayacaksınız."
 msgid "Your memo limit is 0; you will not receive any new memos. You cannot change this limit."
 msgstr "Memo sınırınız 0; yeni memo almayacaksınız. Bu limiti değiştiremezsiniz."
 
+msgid "Your message has been queued."
+msgstr "Mesajınız sıraya alındı."
+
+msgid "Your message queue has been cleared."
+msgstr "Mesaj kuyruğunuz temizlendi."
+
 msgid "Your nick has been logged out."
 msgstr "Rumuzunuzun çıkışı yapıldı."
 
@@ -8790,26 +8670,22 @@ msgid "Your passcode has been re-sent to %s."
 msgstr "Şifreniz %s adresine yeniden gönderildi."
 
 #, c-format
-msgid "Your password is %s - remember this for later use."
-msgstr "Şifreniz %s - bunu daha sonra kullanacaksınız, unutmayın."
+msgid "Your password is too long. It must be shorter than %u characters."
+msgstr "Şifreniz çok uzun. %u karakteri geçmemelidir."
 
 #, c-format
-msgid "Your password is too long. It must not exceed %u characters."
-msgstr "Şifreniz çok uzun. %u karakteri geçmemelidir."
+msgid "Your password is too short. It must be longer than %u characters."
+msgstr "Şifreniz çok kısa. %u karakterden uzun olmalıdır."
 
 msgid "Your password reset request has expired."
 msgstr "Şifre sıfırlama isteğinizin süresi doldu."
 
-msgid "Your vHost has been requested."
+msgid "Your vhost has been requested."
 msgstr "VHost'unuz talep edildi."
 
 #, c-format
 msgid "Your vhost of %s is now activated."
 msgstr "%s vhostunuz artık etkinleştirildi."
-
-#, c-format
-msgid "Your vhost of %s@%s is now activated."
-msgstr "%s@%s vhostunuz artık etkinleştirildi."
 
 msgid "Your vhost was removed and the normal cloaking restored."
 msgstr "Vhostunuz kaldırıldı ve normal gizleme geri getirildi."
@@ -8874,6 +8750,9 @@ msgstr "[kanal] {num | liste | LAST | NEW | ALL}"
 msgid "[key|#X-Y]"
 msgstr "[anahtar|#X-Y]"
 
+msgid "[message]"
+msgstr "[mesaj]"
+
 msgid "[nick | channel]"
 msgstr "[rumuz | kanal]"
 
@@ -8904,19 +8783,19 @@ msgstr "[Askıya alındı]"
 msgid "[Unconfirmed]"
 msgstr "[Onaylanmadı]"
 
-msgid "[auto memo] Your requested vHost has been approved."
+#, c-format
+msgid "[auto memo] VHost %s has been requested by %s."
+msgstr "[oto-memo] %s vHostu, %s tarafından talep edildi."
+
+msgid "[auto memo] Your requested vhost has been approved."
 msgstr "[oto-memo] Talep ettiğiniz vHost kabul edildi."
 
-msgid "[auto memo] Your requested vHost has been rejected."
+msgid "[auto memo] Your requested vhost has been rejected."
 msgstr "[oto-memo] Talep ettiğiniz vHost reddedildi."
 
 #, c-format
-msgid "[auto memo] Your requested vHost has been rejected. Reason: %s"
+msgid "[auto memo] Your requested vhost has been rejected. Reason: %s"
 msgstr "[oto-memo] Talep ettiğiniz vHost reddedildi. Sebep: %s"
-
-#, c-format
-msgid "[auto memo] vHost %s has been requested by %s."
-msgstr "[auto memo] vHost %s has been requested by %s."
 
 msgid "[{pattern | channel} [INVISIBLE]]"
 msgstr "[{şablon | kanal} [INVISIBLE]]"
@@ -8993,20 +8872,8 @@ msgstr "saniye"
 msgid "seconds"
 msgstr "saniye"
 
-#, c-format
-msgid "vHost for %s has been activated."
-msgstr "%s için olan vHost etkinleştirildi."
-
-#, c-format
-msgid "vHost for %s has been rejected."
-msgstr "%s için olan vHost reddedildi."
-
 msgid "vhost"
 msgstr "vhost"
-
-#, c-format
-msgid "vhosts for group %s have been removed."
-msgstr "%s grubunun vhostu kaldırıldı."
 
 msgid "year"
 msgstr "yıl"

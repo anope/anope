@@ -14,17 +14,18 @@
 
 using namespace SQL;
 
-class SQLSQLInterface : public Interface
+class SQLSQLInterface
+	: public Interface
 {
- public:
+public:
 	SQLSQLInterface(Module *o) : Interface(o) { }
 
-	void OnResult(const Result &r) anope_override
+	void OnResult(const Result &r) override
 	{
 		Log(LOG_DEBUG) << "SQL successfully executed query: " << r.finished_query;
 	}
 
-	void OnError(const Result &r) anope_override
+	void OnError(const Result &r) override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Error executing query " << r.finished_query << ": " << r.GetError();
@@ -33,14 +34,15 @@ class SQLSQLInterface : public Interface
 	}
 };
 
-class ResultSQLSQLInterface : public SQLSQLInterface
+class ResultSQLSQLInterface final
+	: public SQLSQLInterface
 {
 	Reference<Serializable> obj;
 
 public:
 	ResultSQLSQLInterface(Module *o, Serializable *ob) : SQLSQLInterface(o), obj(ob) { }
 
-	void OnResult(const Result &r) anope_override
+	void OnResult(const Result &r) override
 	{
 		SQLSQLInterface::OnResult(r);
 		if (r.GetID() > 0 && this->obj)
@@ -48,14 +50,16 @@ public:
 		delete this;
 	}
 
-	void OnError(const Result &r) anope_override
+	void OnError(const Result &r) override
 	{
 		SQLSQLInterface::OnError(r);
 		delete this;
 	}
 };
 
-class DBSQL : public Module, public Pipe
+class DBSQL final
+	: public Module
+	, public Pipe
 {
 	ServiceReference<Provider> sql;
 	SQLSQLInterface sqlinterface;
@@ -63,10 +67,10 @@ class DBSQL : public Module, public Pipe
 	bool import;
 
 	std::set<Serializable *> updated_items;
-	bool shutting_down;
-	bool loading_databases;
-	bool loaded;
-	bool imported;
+	bool shutting_down = false;
+	bool loading_databases = false;
+	bool loaded = false;
+	bool imported = false;
 
 	void RunBackground(const Query &q, Interface *iface = NULL)
 	{
@@ -89,8 +93,8 @@ class DBSQL : public Module, public Pipe
 			this->sql->RunQuery(q);
 	}
 
- public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sql("", ""), sqlinterface(this), shutting_down(false), loading_databases(false), loaded(false), imported(false)
+public:
+	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sql("", ""), sqlinterface(this)
 	{
 
 
@@ -98,12 +102,10 @@ class DBSQL : public Module, public Pipe
 			throw ModuleException("db_sql can not be loaded after db_sql_live");
 	}
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
-		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
+		for (auto *obj : this->updated_items)
 		{
-			Serializable *obj = *it;
-
 			if (this->sql)
 			{
 				Data data;
@@ -127,15 +129,15 @@ class DBSQL : public Module, public Pipe
 
 				if (this->imported)
 				{
-					for (unsigned i = 0; i < create.size(); ++i)
-						this->RunBackground(create[i]);
+					for (const auto &query : create)
+						this->RunBackground(query);
 
 					this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
 				}
 				else
 				{
-					for (unsigned i = 0; i < create.size(); ++i)
-						this->sql->RunQuery(create[i]);
+					for (const auto &query : create)
+						this->sql->RunQuery(query);
 
 					/* We are importing objects from another database module, so don't do asynchronous
 					 * queries in case the core has to shut down, it will cut short the import
@@ -151,7 +153,7 @@ class DBSQL : public Module, public Pipe
 		this->imported = true;
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		this->sql = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
@@ -159,18 +161,18 @@ class DBSQL : public Module, public Pipe
 		this->import = block->Get<bool>("import");
 	}
 
-	void OnShutdown() anope_override
+	void OnShutdown() override
 	{
 		this->shutting_down = true;
 		this->OnNotify();
 	}
 
-	void OnRestart() anope_override
+	void OnRestart() override
 	{
 		this->OnShutdown();
 	}
 
-	EventReturn OnLoadDatabase() anope_override
+	EventReturn OnLoadDatabase() override
 	{
 		if (!this->sql)
 		{
@@ -180,10 +182,9 @@ class DBSQL : public Module, public Pipe
 
 		this->loading_databases = true;
 
-		const std::vector<Anope::string> type_order = Serialize::Type::GetTypeOrder();
-		for (unsigned i = 0; i < type_order.size(); ++i)
+		for (const auto &type_order : Serialize::Type::GetTypeOrder())
 		{
-			Serialize::Type *sb = Serialize::Type::Find(type_order[i]);
+			Serialize::Type *sb = Serialize::Type::Find(type_order);
 			this->OnSerializeTypeCreate(sb);
 		}
 
@@ -193,7 +194,7 @@ class DBSQL : public Module, public Pipe
 		return EVENT_STOP;
 	}
 
-	void OnSerializableConstruct(Serializable *obj) anope_override
+	void OnSerializableConstruct(Serializable *obj) override
 	{
 		if (this->shutting_down || this->loading_databases)
 			return;
@@ -202,17 +203,17 @@ class DBSQL : public Module, public Pipe
 		this->Notify();
 	}
 
-	void OnSerializableDestruct(Serializable *obj) anope_override
+	void OnSerializableDestruct(Serializable *obj) override
 	{
 		if (this->shutting_down)
 			return;
 		Serialize::Type *s_type = obj->GetSerializableType();
 		if (s_type && obj->id > 0)
-			this->RunBackground("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
+			this->RunBackground("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + Anope::ToString(obj->id));
 		this->updated_items.erase(obj);
 	}
 
-	void OnSerializableUpdate(Serializable *obj) anope_override
+	void OnSerializableUpdate(Serializable *obj) override
 	{
 		if (this->shutting_down || obj->IsTSCached())
 			return;
@@ -223,7 +224,7 @@ class DBSQL : public Module, public Pipe
 		this->Notify();
 	}
 
-	void OnSerializeTypeCreate(Serialize::Type *sb) anope_override
+	void OnSerializeTypeCreate(Serialize::Type *sb) override
 	{
 		if (!this->loading_databases && !this->loaded)
 			return;
@@ -235,23 +236,18 @@ class DBSQL : public Module, public Pipe
 		{
 			Data data;
 
-			const std::map<Anope::string, Anope::string> &row = res.Row(j);
-			for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
-				data[rit->first] << rit->second;
+			for (const auto &[key, value] : res.Row(j))
+				data[key] << value;
 
 			Serializable *obj = sb->Unserialize(NULL, data);
-			try
-			{
-				if (obj)
-					obj->id = convertTo<unsigned int>(res.Get(j, "id"));
-			}
-			catch (const ConvertException &)
-			{
-				Log(this) << "Unable to convert id for object #" << j << " of type " << sb->GetName();
-			}
-
 			if (obj)
 			{
+				auto oid = Anope::TryConvert<unsigned int>(res.Get(j, "id"));
+				if (oid.has_value())
+					obj->id = oid.value();
+				else
+					Log(this) << "Unable to convert id for object #" << j << " of type " << sb->GetName();
+
 				/* The Unserialize operation is destructive so rebuild the data for UpdateCache.
 				 * Also the old data may contain columns that we don't use, so we reserialize the
 				 * object to know for sure our cache is consistent

@@ -18,9 +18,9 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 	const MemoInfo *mi;
 	Memo *m;
 
-	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+	for (const auto &[_, ci2] : *RegisteredChannelList)
 	{
-		ci = it->second;
+		ci = ci2;
 
 		if (ci->AccessFor(na->nc).HasPriv("MEMO"))
 		{
@@ -73,14 +73,10 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 		std::vector<Anope::string> params;
 		int number = -1;
 
-		try
-		{
-			number = convertTo<int>(message.get_data["number"]);
-		}
-		catch (const ConvertException &ex)
-		{
+		if (auto num = Anope::TryConvert<int>(message.get_data["number"]))
+			number = num.value();
+		else
 			replacements["MESSAGES"] = "ERROR - invalid parameter for NUMBER";
-		}
 
 		if (number > 0)
 		{
@@ -98,7 +94,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 	for (unsigned i = 0; i < mi->memos->size(); ++i)
 	{
 		m = mi->GetMemo(i);
-		replacements["NUMBER"] = stringify(i+1);
+		replacements["NUMBER"] = Anope::ToString(i+1);
 		replacements["SENDER"] = m->sender;
 		replacements["TIME"] = Anope::strftime(m->time);
 		replacements["TEXT"] = m->text;

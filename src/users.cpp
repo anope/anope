@@ -40,7 +40,6 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	quit = false;
 	server = NULL;
 	invalid_pw_count = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
-	on_access = false;
 
 	this->nick = snick;
 	this->ident = sident;
@@ -50,7 +49,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->server = sserver;
 	this->realname = srealname;
 	this->timestamp = this->signon = ts;
-	this->SetModesInternal(sserver, "%s", smodes.c_str());
+	this->SetModesInternal(sserver, smodes);
 	this->uid = suid;
 	this->super_admin = false;
 	this->nc = NULL;
@@ -93,7 +92,7 @@ static void CollideKill(User *target, const Anope::string &reason)
 	else
 	{
 		// Be sure my user is really dead
-		IRCD->SendQuit(target, "%s", reason.c_str());
+		IRCD->SendQuit(target, reason);
 
 		// Reintroduce my client
 		if (BotInfo *bi = dynamic_cast<BotInfo *>(target))
@@ -111,7 +110,7 @@ static void Collide(User *u, const Anope::string &id, const Anope::string &type)
 	CollideKill(u, type);
 }
 
-User* User::OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc)
+User *User::OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc)
 {
 	// How IRCds handle collisions varies a lot, for safety well just always kill both sides
 	// With properly set qlines, this can almost never happen anyway
@@ -153,14 +152,14 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 	else
 	{
 		NickAlias *old_na = NickAlias::Find(this->nick);
-		if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
+		if (old_na && this->IsIdentified(true))
 			old_na->last_seen = Anope::CurTime;
 
 		UserListByNick.erase(this->nick);
 
 		this->nick = newnick;
 
-		User* &other = UserListByNick[this->nick];
+		User *&other = UserListByNick[this->nick];
 		if (other)
 		{
 			CollideKill(this, "Nick collision");
@@ -169,11 +168,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		}
 		other = this;
 
-		on_access = false;
 		NickAlias *na = NickAlias::Find(this->nick);
-		if (na)
-			on_access = na->nc->IsOnAccess(this);
-
 		if (na && na->nc == this->Account())
 		{
 			na->last_seen = Anope::CurTime;
@@ -282,7 +277,7 @@ void User::SetRealname(const Anope::string &srealname)
 	this->realname = srealname;
 	NickAlias *na = NickAlias::Find(this->nick);
 
-	if (na && (this->IsIdentified(true) || this->IsRecognized()))
+	if (na && this->IsIdentified(true))
 		na->last_realname = srealname;
 
 	Log(this, "realname") << "changed realname to " << srealname;
@@ -332,24 +327,35 @@ void User::SendMessage(BotInfo *source, const char *fmt, ...)
 	va_end(args);
 }
 
+namespace
+{
+	void SendMessageInternal(BotInfo *source, User *target, const Anope::string &msg, const Anope::map<Anope::string> &tags)
+	{
+		const char *translated_message = Language::Translate(target, msg.c_str());
+
+		sepstream sep(translated_message, '\n', true);
+		for (Anope::string tok; sep.GetToken(tok);)
+		{
+			if (target->ShouldPrivmsg())
+				IRCD->SendPrivmsg(source, target->GetUID(), tok, tags);
+			else
+				IRCD->SendNotice(source, target->GetUID(), tok, tags);
+		}
+	}
+}
+
 void User::SendMessage(BotInfo *source, const Anope::string &msg)
 {
-	const char *translated_message = Language::Translate(this, msg.c_str());
+	SendMessageInternal(source, this, msg, {});
+}
 
-	/* Send privmsg instead of notice if:
-	* - UsePrivmsg is enabled
-	* - The user is not registered and NSDefMsg is enabled
-	* - The user is registered and has set /ns set msg on
-	*/
-	bool send_privmsg = Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasExt("MSG")));
-	sepstream sep(translated_message, '\n', true);
-	for (Anope::string tok; sep.GetToken(tok);)
-	{
-		if (send_privmsg)
-			IRCD->SendPrivmsg(source, this->GetUID(), "%s", tok.c_str());
-		else
-			IRCD->SendNotice(source, this->GetUID(), "%s", tok.c_str());
-	}
+void User::SendMessage(CommandSource &source, const Anope::string &msg)
+{
+	Anope::map<Anope::string> tags;
+	if (!source.msgid.empty())
+		tags["+draft/reply"] = source.msgid;
+
+	SendMessageInternal(*source.service, this, msg, tags);
 }
 
 void User::Identify(NickAlias *na)
@@ -372,7 +378,7 @@ void User::Identify(NickAlias *na)
 	{
 		if (!this->nc->o->ot->modes.empty())
 		{
-			this->SetModes(NULL, "%s", this->nc->o->ot->modes.c_str());
+			this->SetModes(NULL, this->nc->o->ot->modes);
 			this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
 			UserMode *um = ModeManager::FindUserModeByName("OPER");
 			if (um && !this->HasMode("OPER") && this->nc->o->ot->modes.find(um->mchar) != Anope::string::npos)
@@ -382,7 +388,7 @@ void User::Identify(NickAlias *na)
 		{
 			this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
 			this->SetDisplayedHost(this->nc->o->vhost);
-			IRCD->SendVhost(this, "", this->nc->o->vhost);
+			IRCD->SendVHost(this, "", this->nc->o->vhost);
 		}
 	}
 }
@@ -424,6 +430,11 @@ NickCore *User::Account() const
 	return this->nc;
 }
 
+NickAlias *User::AccountNick() const
+{
+	return this->nc ? this->nc->na : nullptr;
+}
+
 bool User::IsIdentified(bool check_nick) const
 {
 	if (check_nick && this->nc)
@@ -432,56 +443,58 @@ bool User::IsIdentified(bool check_nick) const
 		return na && *na->nc == *this->nc;
 	}
 
-	return this->nc ? true : false;
+	return this->nc;
 }
 
-bool User::IsRecognized(bool check_secure) const
+bool User::IsSecurelyConnected() const
 {
-	if (check_secure && on_access)
-	{
-		const NickAlias *na = NickAlias::Find(this->nick);
-
-		if (!na || na->nc->HasExt("NS_SECURE"))
-			return false;
-	}
-
-	return on_access;
+	return HasMode("SSL") || HasExt("ssl");
 }
 
 bool User::IsServicesOper()
 {
 	if (!this->nc || !this->nc->IsServicesOper())
-		// No opertype.
-		return false;
-	else if (this->nc->o->require_oper && !this->HasMode("OPER"))
-		return false;
-	else if (!this->nc->o->certfp.empty() && this->fingerprint != this->nc->o->certfp)
-		// Certfp mismatch
-		return false;
-	else if (!this->nc->o->hosts.empty())
+		return false; // Account isn't a services oper.
+
+	auto *oper = this->nc->o;
+	if (oper->require_oper && !this->HasMode("OPER"))
+		return false; // User isn't an ircd oper.
+
+	if (!oper->certfp.empty())
+	{
+		bool match = false;
+		for (const auto &certfp : oper->certfp)
+		{
+			if (this->fingerprint == certfp)
+			{
+				match = true;
+				break;
+			}
+		}
+		if (!match)
+			return false; // Wrong TLS fingerprint.
+	}
+
+	if (!oper->hosts.empty())
 	{
 		bool match = false;
 		Anope::string match_host = this->GetIdent() + "@" + this->host;
 		Anope::string match_ip = this->GetIdent() + "@" + this->ip.addr();
-		for (unsigned i = 0; i < this->nc->o->hosts.size(); ++i)
+		for (const auto &userhost : oper->hosts)
 		{
-			const Anope::string &userhost = this->nc->o->hosts[i];
 			if (Anope::Match(match_host, userhost) || Anope::Match(match_ip, userhost))
 			{
 				match = true;
 				break;
 			}
 		}
-		if (match == false)
-			return false;
+		if (!match)
+			return false; // Wrong user@host/ip.
 	}
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(IsServicesOper, MOD_RESULT, (this));
-	if (MOD_RESULT == EVENT_STOP)
-		return false;
-
-	return true;
+	return MOD_RESULT != EVENT_STOP;
 }
 
 bool User::HasCommand(const Anope::string &command)
@@ -504,11 +517,7 @@ void User::UpdateHost()
 		return;
 
 	NickAlias *na = NickAlias::Find(this->nick);
-	on_access = false;
-	if (na)
-		on_access = na->nc->IsOnAccess(this);
-
-	if (na && (this->IsIdentified(true) || this->IsRecognized()))
+	if (na && this->IsIdentified(true))
 	{
 		Anope::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
 		Anope::string last_realhost = this->GetIdent() + "@" + this->host;
@@ -539,7 +548,7 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 		{
 			if (!this->nc->o->ot->modes.empty())
 			{
-				this->SetModes(NULL, "%s", this->nc->o->ot->modes.c_str());
+				this->SetModes(NULL, this->nc->o->ot->modes);
 				this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
 				UserMode *oper = ModeManager::FindUserModeByName("OPER");
 				if (oper && !this->HasMode("OPER") && this->nc->o->ot->modes.find(oper->mchar) != Anope::string::npos)
@@ -549,7 +558,7 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 			{
 				this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
 				this->SetDisplayedHost(this->nc->o->vhost);
-				IRCD->SendVhost(this, "", this->nc->o->vhost);
+				IRCD->SendVHost(this, "", this->nc->o->vhost);
 			}
 		}
 	}
@@ -616,19 +625,24 @@ void User::SetModes(BotInfo *bi, const char *umodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
-	Anope::string modebuf, sbuf;
-	int add = -1;
 	va_start(args, umodes);
 	vsnprintf(buf, BUFSIZE - 1, umodes, args);
 	va_end(args);
 
-	spacesepstream sep(buf);
+	SetModes(bi, Anope::string(buf));
+}
+
+void User::SetModes(BotInfo *bi, const Anope::string &umodes)
+{
+	Anope::string modebuf, sbuf;
+	int add = -1;
+	spacesepstream sep(umodes);
 	sep.GetToken(modebuf);
-	for (unsigned i = 0, end = modebuf.length(); i < end; ++i)
+	for (auto mode : modebuf)
 	{
 		UserMode *um;
 
-		switch (modebuf[i])
+		switch (mode)
 		{
 			case '+':
 				add = 1;
@@ -639,7 +653,7 @@ void User::SetModes(BotInfo *bi, const char *umodes, ...)
 			default:
 				if (add == -1)
 					continue;
-				um = ModeManager::FindUserModeByChar(modebuf[i]);
+				um = ModeManager::FindUserModeByChar(mode);
 				if (!um)
 					continue;
 		}
@@ -660,22 +674,27 @@ void User::SetModesInternal(const MessageSource &source, const char *umodes, ...
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
-	Anope::string modebuf, sbuf;
-	int add = -1;
 	va_start(args, umodes);
 	vsnprintf(buf, BUFSIZE - 1, umodes, args);
 	va_end(args);
 
-	if (this->server && this->server->IsSynced() && Anope::string(buf) != "+")
-		Log(this, "mode") << "changes modes to " << buf;
+	SetModesInternal(source, Anope::string(buf));
+}
 
-	spacesepstream sep(buf);
+void User::SetModesInternal(const MessageSource &source, const Anope::string &umodes)
+{
+	if (this->server && this->server->IsSynced() && Anope::string(umodes) != "+")
+		Log(this, "mode") << "changes modes to " << umodes;
+
+	int add = -1;
+	Anope::string modebuf;
+	spacesepstream sep(umodes);
 	sep.GetToken(modebuf);
-	for (unsigned i = 0, end = modebuf.length(); i < end; ++i)
+	for (auto mode : modebuf)
 	{
 		UserMode *um;
 
-		switch (modebuf[i])
+		switch (mode)
 		{
 			case '+':
 				add = 1;
@@ -686,13 +705,14 @@ void User::SetModesInternal(const MessageSource &source, const char *umodes, ...
 			default:
 				if (add == -1)
 					continue;
-				um = ModeManager::FindUserModeByChar(modebuf[i]);
+				um = ModeManager::FindUserModeByChar(mode);
 				if (!um)
 					continue;
 		}
 
 		if (add)
 		{
+			Anope::string sbuf;
 			if (um->type == MODE_PARAM && sep.GetToken(sbuf))
 				this->SetModeInternal(source, um, sbuf);
 			else
@@ -707,16 +727,16 @@ Anope::string User::GetModes() const
 {
 	Anope::string m, params;
 
-	for (ModeList::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
+	for (const auto &[mode, value] : this->modes)
 	{
-		UserMode *um = ModeManager::FindUserModeByName(it->first);
+		UserMode *um = ModeManager::FindUserModeByName(mode);
 		if (um == NULL)
 			continue;
 
 		m += um->mchar;
 
-		if (!it->second.empty())
-			params += " " + it->second;
+		if (!value.empty())
+			params += " " + value;
 	}
 
 	return m + params;
@@ -744,7 +764,7 @@ void User::Kill(const MessageSource &source, const Anope::string &reason)
 {
 	Anope::string real_reason = source.GetName() + " (" + reason + ")";
 
-	IRCD->SendSVSKill(source, this, "%s", real_reason.c_str());
+	IRCD->SendSVSKill(source, this, real_reason);
 }
 
 void User::KillInternal(const MessageSource &source, const Anope::string &reason)
@@ -810,14 +830,14 @@ Anope::string User::Mask() const
 
 bool User::BadPassword()
 {
-	if (!Config->GetBlock("options")->Get<int>("badpasslimit"))
+	if (!Config->GetBlock("options")->Get<unsigned int>("badpasslimit"))
 		return false;
 
 	if (Config->GetBlock("options")->Get<time_t>("badpasstimeout") > 0 && this->invalid_pw_time > 0 && this->invalid_pw_time < Anope::CurTime - Config->GetBlock("options")->Get<time_t>("badpasstimeout"))
 		this->invalid_pw_count = 0;
 	++this->invalid_pw_count;
 	this->invalid_pw_time = Anope::CurTime;
-	if (this->invalid_pw_count >= Config->GetBlock("options")->Get<int>("badpasslimit"))
+	if (this->invalid_pw_count >= Config->GetBlock("options")->Get<unsigned int>("badpasslimit"))
 	{
 		this->Kill(Me, "Too many invalid passwords");
 		return true;
@@ -826,7 +846,16 @@ bool User::BadPassword()
 	return false;
 }
 
-User* User::Find(const Anope::string &name, bool nick_only)
+bool User::ShouldPrivmsg() const
+{
+	// Send a PRIVMSG instead of a NOTICE if:
+	// 1. options:useprivmsg is enabled.
+	// 2. The user is not registered and msg is in nickserv:defaults.
+	// 3. The user is registered and has set /ns set message on.
+	return Config->UsePrivmsg && ((!nc && Config->DefPrivmsg) || (nc && nc->HasExt("MSG")));
+}
+
+User *User::Find(const Anope::string &name, bool nick_only)
 {
 	if (!nick_only && IRCD && IRCD->RequiresID)
 	{
@@ -847,7 +876,7 @@ User* User::Find(const Anope::string &name, bool nick_only)
 
 void User::QuitUsers()
 {
-	for (std::list<User *>::iterator it = quitting_users.begin(), it_end = quitting_users.end(); it != it_end; ++it)
-		delete *it;
+	for (const auto *quitting_user : quitting_users)
+		delete quitting_user;
 	quitting_users.clear();
 }

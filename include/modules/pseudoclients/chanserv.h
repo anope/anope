@@ -6,12 +6,12 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef CHANSERV_H
-#define CHANSERV_H
+#pragma once
 
-class ChanServService : public Service
+class ChanServService
+	: public Service
 {
- public:
+public:
 	ChanServService(Module *m) : Service(m, "ChanServService", "ChanServ")
 	{
 	}
@@ -21,5 +21,3 @@ class ChanServService : public Service
 	 */
 	virtual void Hold(Channel *c) = 0;
 };
-
-#endif // CHANSERV_H

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Configuration script for Services
+# Configuration script for Anope
 #
 # (C) 2003-2024 Anope Team
 # Contact us at team@anope.org
@@ -14,8 +14,8 @@
 
 
 
-ANOPEPID="@INSTDIR@/data/services.pid"
-ANOPROG="@INSTDIR@/bin/services"
+ANOPEPID="@INSTDIR@/data/anope.pid"
+ANOPROG="@INSTDIR@/bin/anope"
 LOG="@INSTDIR@/logs/"
 ARCVERSION="2"
 

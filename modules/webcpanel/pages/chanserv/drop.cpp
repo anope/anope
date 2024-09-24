@@ -6,7 +6,6 @@
  */
 
 #include "../../webcpanel.h"
-#include "utils.h"
 
 WebCPanel::ChanServ::Drop::Drop(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage (cat, u)
 {
@@ -33,9 +32,8 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 
 	std::deque<ChannelInfo *> queue;
 	na->nc->GetChannelReferences(queue);
-	for (unsigned i = 0; i < queue.size(); ++i)
+	for (auto *ci : queue)
 	{
-		ChannelInfo *ci = queue[i];
 		if ((ci->HasExt("SECUREFOUNDER") ? ci->AccessFor(na->nc).founder : ci->AccessFor(na->nc).HasPriv("FOUNDER")) || (na->nc->IsServicesOper() && na->nc->o->ot->HasCommand("chanserv/drop")))
 		{
 			replacements["CHANNEL_NAMES"] = ci->name;

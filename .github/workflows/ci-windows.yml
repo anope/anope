@@ -1,0 +1,46 @@
+name: Windows CI
+on:
+  pull_request:
+  push:
+  release:
+    types:
+      - published
+  schedule:
+    - cron: '0 0 * * 0'
+jobs:
+  build:
+    if: "!contains(github.event.head_commit.message, '[skip windows ci]')"
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup Conan
+        uses: turtlebrowser/get-conan@v1.2
+        with:
+          version: 1.64.0
+
+      - name: Install libraries
+        run: |
+          conan install ${{ github.workspace }}\src\win32 --build=missing
+
+      - name: Run CMake
+        run: |
+          mkdir ${{ github.workspace }}\build
+          cd ${{ github.workspace }}\build
+          cmake -A "x64" -D "CMAKE_BUILD_TYPE=${{ github.event_name == 'release' && 'Release' || 'Debug' }}" -G "Visual Studio 16 2019" ..
+
+      - name: Build Anope
+        working-directory: ${{ github.workspace }}\build
+        run: |
+          msbuild PACKAGE.vcxproj /M:3 /P:Configuration=${{ github.event_name == 'release' && 'Release' || 'Debug' }} /P:Platform=x64 /VERBOSITY:MINIMAL
+
+      - name: Upload installer
+        if: "${{ github.event_name == 'release' }}"
+        working-directory: ${{ github.workspace }}\build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} $(Get-ChildItem anope-*.exe)

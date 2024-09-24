@@ -9,14 +9,12 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include "account.h"
 #include "regchannel.h"
 #include "users.h"
 #include "opertype.h"
-#include <stack>
 
 namespace Configuration
 {
@@ -26,11 +24,11 @@ namespace Configuration
 	{
 		friend struct Configuration::Conf;
 
-	 public:
+	public:
 		typedef Anope::map<Anope::string> item_map;
 		typedef Anope::multimap<Block> block_map;
 
-	 private:
+	private:
 		Anope::string name;
 		item_map items;
 		block_map blocks;
@@ -39,37 +37,23 @@ namespace Configuration
 		/* Represents a missing tag. */
 		static Block EmptyBlock;
 
-	 public:
+	public:
 		Block(const Anope::string &);
 		const Anope::string &GetName() const;
 		int CountBlock(const Anope::string &name) const;
-		const Block* GetBlock(const Anope::string &name, int num = 0) const;
-		Block* GetMutableBlock(const Anope::string &name, int num = 0);
+		const Block *GetBlock(const Anope::string &name, int num = 0) const;
+		Block *GetMutableBlock(const Anope::string &name, int num = 0);
 
-		template<typename T> inline T Get(const Anope::string &tag) const
+		template<typename T> T Get(const Anope::string &tag, const Anope::string &def = "") const
 		{
-			return this->Get<T>(tag, "");
-		}
-		/* VS 2008 has an issue with having a default argument here (def = ""), which is why the above
-		 * function exists.
-		 */
-		template<typename T> T Get(const Anope::string &tag, const Anope::string &def) const
-		{
-			const Anope::string &value = this->Get<const Anope::string>(tag, def);
-			if (!value.empty())
-				try
-				{
-					return convertTo<T>(value);
-				}
-				catch (const ConvertException &) { }
-			return T();
+			return Anope::TryConvert<T>(this->Get<const Anope::string>(tag, def)).value_or(T());
 		}
 
 		bool Set(const Anope::string &tag, const Anope::string &value);
-		const item_map* GetItems() const;
+		const item_map &GetItems() const;
 	};
 
-	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const;
+	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	} // namespace Internal
@@ -79,12 +63,12 @@ namespace Configuration
 
 	/** Represents a configuration file
 	 */
-	class File
+	class File final
 	{
 		Anope::string name;
 		bool executable;
-		FILE *fp;
-	 public:
+		FILE *fp = nullptr;
+	public:
 		File(const Anope::string &, bool);
 		~File();
 		const Anope::string &GetName() const;
@@ -99,7 +83,8 @@ namespace Configuration
 
 	struct Uplink;
 
-	struct CoreExport Conf : Block
+	struct CoreExport Conf final
+		: Block
 	{
 		/* options:readtimeout */
 		time_t ReadTimeout;
@@ -153,15 +138,15 @@ namespace Configuration
 		const Block *GetCommand(CommandSource &);
 	};
 
-	struct Uplink
+	struct Uplink final
 	{
 		Anope::string host;
 		unsigned port;
 		Anope::string password;
-		bool ipv6;
+		int protocol;
 
-		Uplink(const Anope::string &_host, int _port, const Anope::string &_password, bool _ipv6) : host(_host), port(_port), password(_password), ipv6(_ipv6) { }
-		inline bool operator==(const Uplink &other) const { return host == other.host && port == other.port && password == other.password && ipv6 == other.ipv6; }
+		Uplink(const Anope::string &_host, int _port, const Anope::string &_password, int _protocol) : host(_host), port(_port), password(_password), protocol(_protocol) { }
+		inline bool operator==(const Uplink &other) const { return host == other.host && port == other.port && password == other.password && protocol == other.protocol; }
 		inline bool operator!=(const Uplink &other) const { return !(*this == other); }
 	};
 }
@@ -172,9 +157,10 @@ namespace Configuration
  * be loaded. If this happens, the error message returned by ModuleException::GetReason will be displayed to the user
  * attempting to load the module, or dumped to the console if the ircd is currently loading for the first time.
  */
-class ConfigException : public CoreException
+class CoreExport ConfigException final
+	: public CoreException
 {
- public:
+public:
 	/** Default constructor, just uses the error message 'Config threw an exception'.
 	 */
 	ConfigException() : CoreException("Config threw an exception", "Config Parser") { }
@@ -185,10 +171,8 @@ class ConfigException : public CoreException
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~ConfigException() throw() { }
+	virtual ~ConfigException() noexcept = default;
 };
 
 extern Configuration::File ServicesConf;
 extern CoreExport Configuration::Conf *Config;
-
-#endif // CONFIG_H

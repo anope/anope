@@ -24,15 +24,13 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 
 	int chan_count = 0;
 
-	for (unsigned q = 0; q < queue.size(); ++q)
+	for (auto *ci : queue)
 	{
-		ChannelInfo *ci = queue[q];
-
 		if (ci->GetFounder() == na->nc)
 		{
 			++chan_count;
 
-			replacements["NUMBERS"] = stringify(chan_count);
+			replacements["NUMBERS"] = Anope::ToString(chan_count);
 			replacements["CHANNELS"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 			replacements["ACCESSES"] = "Founder";
 			continue;
@@ -44,7 +42,7 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 
 		++chan_count;
 
-		replacements["NUMBERS"] = stringify(chan_count);
+		replacements["NUMBERS"] = Anope::ToString(chan_count);
 		replacements["CHANNELS"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 
 		const ChanAccess *highest = access.Highest();

@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef BOTS_H
-#define BOTS_H
+#pragma once
 
 #include "users.h"
 #include "anope.h"
@@ -20,11 +19,13 @@ typedef Anope::map<BotInfo *> botinfo_map;
 extern CoreExport Serialize::Checker<botinfo_map> BotListByNick, BotListByUID;
 
 /* A service bot (NickServ, ChanServ, a BotServ bot, etc). */
-class CoreExport BotInfo : public User, public Serializable
+class CoreExport BotInfo final
+	: public User
+	, public Serializable
 {
 	/* Channels this bot is assigned to */
 	Serialize::Checker<std::set<ChannelInfo *> > channels;
- public:
+public:
 	time_t created;
 	/* Last time this bot said something (via privmsg) */
 	time_t lastmsg;
@@ -55,7 +56,7 @@ class CoreExport BotInfo : public User, public Serializable
 	virtual ~BotInfo();
 
 	void Serialize(Serialize::Data &data) const;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	void GenerateUID();
 
@@ -107,8 +108,9 @@ class CoreExport BotInfo : public User, public Serializable
 	/** Called when a user messages this bot
 	 * @param u The user
 	 * @param message The users' message
+	 * @params tags Message tags
 	 */
-	virtual void OnMessage(User *u, const Anope::string &message);
+	virtual void OnMessage(User *u, const Anope::string &message, const Anope::map<Anope::string> &tags);
 
 	/** Link a command name to a command in services
 	 * @param cname The command name
@@ -116,7 +118,7 @@ class CoreExport BotInfo : public User, public Serializable
 	 * @param permission Permission required to execute the command, if any
 	 * @return The commandinfo for the newly created command
 	 */
-	CommandInfo& SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission = "");
+	CommandInfo &SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission = "");
 
 	/** Get command info for a command
 	 * @param cname The command name
@@ -129,7 +131,5 @@ class CoreExport BotInfo : public User, public Serializable
 	 * @param nick_only True to only look by nick, and not by UID
 	 * @return The bot, if it exists
 	 */
-	static BotInfo* Find(const Anope::string &nick, bool nick_only = false);
+	static BotInfo *Find(const Anope::string &nick, bool nick_only = false);
 };
-
-#endif // BOTS_H

@@ -1,0 +1,36 @@
+{INCLUDE layout/header.html}
+			<div class="row">
+				<div class="col-lg-offset-4 col-lg-4">
+					<a href="/">
+						<img src="/static/logo.png" class="img-responsive">
+					</a>
+					<a href="/" class="btn btn-lg btn-default btn-block">Back Home</a>
+
+					<h1 class="form-signin-heading">Register</h1>
+
+					{IF EXISTS MESSAGES}
+					<div class="alert alert-danger">
+						{MESSAGES}
+					</div>
+					{END IF}
+
+					<form class="form-horizontal form-signin" action="/confirm" method="post">
+						<input type="text" name="username" class="form-control" placeholder="Username" required="required" autofocus
+							style="margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
+						<input type="password" name="password" class="form-control" placeholder="Password" required="required"
+							style="margin-bottom: -1px; border-radius: 0;">
+
+					{IF EXISTS FORCE_EMAIL}
+						<input type="email" name="email" class="form-control" placeholder="Email" required="required"
+							style="margin-bottom: 15px; border-top-left-radius: 0; border-top-right-radius: 0;">
+					{ELSE}
+						<h4>Optional</h4>
+						<input type="email" name="email" class="form-control" placeholder="Email"
+							style="margin-bottom: 15px;">
+					{END IF}
+
+						<button class="btn btn-lg btn-warning btn-block" type="submit">Register</button>
+					</form>
+				</div>
+			</div>
+{INCLUDE layout/footer.html}

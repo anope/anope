@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef MODES_H
-#define MODES_H
+#pragma once
 
 #include "anope.h"
 #include "base.h"
@@ -36,9 +35,10 @@ enum ModeClass
 
 /** This class is the basis of all modes in Anope
  */
-class CoreExport Mode : public Base
+class CoreExport Mode
+	: public Base
 {
- public:
+public:
 	/* Mode name */
 	Anope::string name;
 	/* Class of mode this is (user/channel) */
@@ -55,7 +55,7 @@ class CoreExport Mode : public Base
 	 * @param type The mode type
 	 */
 	Mode(const Anope::string &mname, ModeClass mclass, char mc, ModeType type);
-	virtual ~Mode();
+	virtual ~Mode() = default;
 
 	/** Can a user set this mode, used for mlock
 	 * @param u The user
@@ -65,9 +65,10 @@ class CoreExport Mode : public Base
 
 /** This class is a user mode, all user modes use this/inherit from this
  */
-class CoreExport UserMode : public Mode
+class CoreExport UserMode
+	: public Mode
 {
- public:
+public:
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
@@ -75,9 +76,10 @@ class CoreExport UserMode : public Mode
 	UserMode(const Anope::string &name, char mc);
 };
 
-class CoreExport UserModeParam : public UserMode
+class CoreExport UserModeParam
+	: public UserMode
 {
- public:
+public:
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
@@ -93,9 +95,10 @@ class CoreExport UserModeParam : public UserMode
 
 /** This class is a channel mode, all channel modes use this/inherit from this
  */
-class CoreExport ChannelMode : public Mode
+class CoreExport ChannelMode
+	: public Mode
 {
- public:
+public:
 	/* channel modes that can possibly unwrap this mode */
 	std::vector<ChannelMode *> listeners;
 
@@ -105,7 +108,7 @@ class CoreExport ChannelMode : public Mode
 	 */
 	ChannelMode(const Anope::string &name, char mc);
 
-	bool CanSet(User *u) const anope_override;
+	bool CanSet(User *u) const override;
 
 	virtual void Check() { }
 
@@ -124,9 +127,10 @@ class CoreExport ChannelMode : public Mode
 
 /** This is a mode for lists, eg b/e/I. These modes should inherit from this
  */
-class CoreExport ChannelModeList : public ChannelMode
+class CoreExport ChannelModeList
+	: public ChannelMode
 {
- public:
+public:
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
@@ -162,9 +166,10 @@ class CoreExport ChannelModeList : public ChannelMode
 
 /** This is a mode with a parameter, eg +k/l. These modes should use/inherit from this
 */
-class CoreExport ChannelModeParam : public ChannelMode
+class CoreExport ChannelModeParam
+	: public ChannelMode
 {
- public:
+public:
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
@@ -184,9 +189,10 @@ class CoreExport ChannelModeParam : public ChannelMode
 
 /** This is a mode that is a channel status, eg +v/h/o/a/q.
 */
-class CoreExport ChannelModeStatus : public ChannelMode
+class CoreExport ChannelModeStatus
+	: public ChannelMode
 {
- public:
+public:
 	/* The symbol, eg @ % + */
 	char symbol;
 	/* The "level" of the mode, used to compare with other modes.
@@ -207,29 +213,30 @@ class CoreExport ChannelModeStatus : public ChannelMode
  * but we still have a representation for it.
  */
 template<typename T>
-class CoreExport ChannelModeVirtual : public T
+class CoreExport ChannelModeVirtual
+	: public T
 {
 	Anope::string base;
 	ChannelMode *basech;
 
- public:
+public:
 	ChannelModeVirtual(const Anope::string &mname, const Anope::string &basename);
 
 	~ChannelModeVirtual();
 
-	void Check() anope_override;
+	void Check() override;
 
-	ChannelMode *Wrap(Anope::string &param) anope_override;
+	ChannelMode *Wrap(Anope::string &param) override;
 
-	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) anope_override = 0;
+	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) override = 0;
 };
 
 /* The status a user has on a channel (+v, +h, +o) etc */
-class CoreExport ChannelStatus
+class CoreExport ChannelStatus final
 {
 	Anope::string modes;
- public:
-	ChannelStatus();
+public:
+	ChannelStatus() = default;
 	ChannelStatus(const Anope::string &modes);
 	void AddMode(char c);
 	void DelMode(char c);
@@ -240,51 +247,56 @@ class CoreExport ChannelStatus
 	Anope::string BuildModePrefixList() const;
 };
 
-class CoreExport UserModeOperOnly : public UserMode
+class CoreExport UserModeOperOnly
+	: public UserMode
 {
- public:
+public:
 	UserModeOperOnly(const Anope::string &mname, char um) : UserMode(mname, um) { }
 
-	bool CanSet(User *u) const anope_override;
+	bool CanSet(User *u) const override;
 };
 
-class CoreExport UserModeNoone : public UserMode
+class CoreExport UserModeNoone
+	: public UserMode
 {
- public:
+public:
 	UserModeNoone(const Anope::string &mname, char um) : UserMode(mname, um) { }
 
-	bool CanSet(User *u) const anope_override;
+	bool CanSet(User *u) const override;
 };
 
 /** Channel mode +k (key)
  */
-class CoreExport ChannelModeKey : public ChannelModeParam
+class CoreExport ChannelModeKey
+	: public ChannelModeParam
 {
- public:
+public:
 	ChannelModeKey(char mc) : ChannelModeParam("KEY", mc) { }
 
-	bool IsValid(Anope::string &value) const anope_override;
+	bool IsValid(Anope::string &value) const override;
 };
 
 /** This class is used for oper only channel modes
  */
-class CoreExport ChannelModeOperOnly : public ChannelMode
+class CoreExport ChannelModeOperOnly
+	: public ChannelMode
 {
- public:
+public:
 	ChannelModeOperOnly(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
 
 	/* Opers only */
-	bool CanSet(User *u) const anope_override;
+	bool CanSet(User *u) const override;
 };
 
 /** This class is used for channel modes only servers may set
  */
-class CoreExport ChannelModeNoone : public ChannelMode
+class CoreExport ChannelModeNoone
+	: public ChannelMode
 {
- public:
+public:
 	ChannelModeNoone(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
 
-	bool CanSet(User *u) const anope_override;
+	bool CanSet(User *u) const override;
 };
 
 /** This is the mode manager
@@ -293,9 +305,9 @@ class CoreExport ChannelModeNoone : public ChannelMode
  * This also contains a mode stacker that will combine multiple modes and set
  * them on a channel or user at once
  */
-class CoreExport ModeManager
+class CoreExport ModeManager final
 {
- public:
+public:
 
 	/* Number of generic channel and user modes we are tracking */
 	static unsigned GenericChannelModes;
@@ -389,13 +401,13 @@ class CoreExport ModeManager
 
 /** Represents a mask set on a channel (b/e/I)
  */
-class CoreExport Entry
+class CoreExport Entry final
 {
 	Anope::string name;
 	Anope::string mask;
- public:
-	unsigned short cidr_len;
-	int family;
+public:
+	unsigned short cidr_len = 0;
+	int family = 0;
 	Anope::string nick, user, host, real;
 
 	/** Constructor
@@ -407,9 +419,9 @@ class CoreExport Entry
 	/** Get the banned mask for this entry
 	 * @return The mask
 	 */
-	const Anope::string GetMask() const;
+	Anope::string GetMask() const;
 
-	const Anope::string GetNUHMask() const;
+	Anope::string GetNUHMask() const;
 
 	/** Check if this entry matches a user
 	 * @param u The user
@@ -418,5 +430,3 @@ class CoreExport Entry
 	 */
 	bool Matches(User *u, bool full = false) const;
 };
-
-#endif // MODES_H

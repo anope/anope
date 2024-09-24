@@ -1,452 +1,142 @@
-Anope Version 2.0.16-git
-------------------------
+Anope Version 2.1.9-git
+-----------------------
 No significant changes.
 
-Anope Version 2.0.15
---------------------
-Fixed a race condition in changing the nick of a user.
-Fixed being able to reset the password of suspended accounts.
-Fixed chanserv/suspend info not being visible to regular users.
-Fixed removing entries by an alias in chanserv/access and chanserv/xop.
-Fixed various grammar issues in messages.
-Made the SASL PLAIN implementation more robust.
-Updated the Dutch translation.
-Updated the French translation.
+Anope Version 2.1.8
+-------------------
+Added account identifiers to the nickserv/info output.
+Added support for bool, float, and uint SQL columns.
+Added the ability to automatically determine SQL column types based on the native type.
+Added UNIX socket support to mysql module.
+Changed smartjoin to use SendClearBans where available.
+Dropped support for MinGW in favour of native builds.
+Fixed parsing named extbans on InspIRCd.
+Fixed parsing SVSMODE and SVS2MODE from UnrealIRCd.
+Fixed sending global messages to remotely linked servers.
+Removed the services server name from the CTCP version response.
+
+Anope Version 2.1.7
+-------------------
+Added importing of akick reasons, forbid reasons, opers and session exceptions to db_atheme.
+Added support for sending tag messages.
+Added the ability to look up account information of an authenticated user.
+Fixed a crash in ns_cert when an IRC user is not present during a nick registration.
+Fixed a null pointer dereference in the global module.
+Fixed a rare memory leak in os_akill and os_sxline.
+Improved the performance of some code that looks up the primary nick from an account.
+Removed the broken Catalan, Hungarian, and Russian translations.
+Reworked the protocol interface for sending messages.
 Updated the Turkish translation.
 
-Anope Version 2.0.14
---------------------
-Added support for sqlining channels on UnrealIRCd.
-Fixed a crash when trying to access config for non-loaded modules.
-Fixed detection of the InspIRCd nopartmsg module.
-Fixed not getting memo notifications when authing with SASL.
-Fixed not serialising dontkickops/dontkickvoices in botserv/kick.
-Fixed sending emails with the wrong kind of line terminator.
-Fixed sending log messages from a renamed pseudoclient.
-Fixed telling users their passcode is incorrect when they need to authenticate in nickserv/confirm.
-Fixed the Config script freezing on some versions of util-linux.
-Updated the Windows packaging scripts to use dependencies from Conan.
-
-Anope Version 2.0.13
---------------------
-Fixed a crash on some compilers when trying to call methods on a null pointer
-Fixed a crash when encountering an unterminated commented config block
-Fixed erroneously rejecting spaces in fantasy:name
-Fixed marking services pseudoclients as an oper on InspIRCd
-Fixed not checking user@ip as well as user@host when logging into an operator account
-Fixed setting the vhost/vident during SASL on UnrealIRCd
-Updated the German translation
-Updated the Italian translation
-
-Anope Version 2.0.12
---------------------
-Added account confirmation to the web panel
-Added the regex_pcre2 module which provides regex/pcre with PCRE2
-Documented the cs_no_expire channel default
-Fixed config validation mistakenly allowing spaces in some fields
-Fixed the bahamut protocol module not knowing about halfops
-Fixed writing a flatfile database not being atomic
-Updated the hybrid protocol module for recent protocol changes
-
-Anope Version 2.0.11
---------------------
-Fixed ldap on OpenLDAP 2.5+
-Fixed not using utf-8 encoding for outgoing email
-Fixed ns_resetpass not returning a response for XMLRPC
-Fixed some message params being sent as <middle> instead of <trailing>
-Fixed unsetting vhosts on unreal4
-Fixed username validity checking on ircd-hybrid
-Send the oper mode for services pseudoclients on InspIRCd
-Updated the pl_PL translation
-Updated unreal4 for various protocol changes
-
-Anope Version 2.0.10
---------------------
-Add support for channel SQLines on InspIRCd
-Change default protocol module from inspircd20 to inspircd3
-Change the character set used by chanstats and irc2sql to utf8mb4
-Fix a ton of typos in messages
-Fix being able to override MAXLIST on InspIRCd
-Fix blocking on boot when trying to upgrade SQL databases without account identifiers
-Fix not flushing the ERROR message on squit
-Fix using an invalidated iterator when deleting bots
-Fix various harmless compiler warnings
-Fix webcpanel not using the forwarded IP
-Show the account name in nickserv/info
-
-Anope Version 2.0.9
+Anope Version 2.1.6
 -------------------
-Fix a regression from 2.0.8 that prevented serialising to MySQL
-Send account identifiers to InspIRCd on SASL logins too
-Fix a query bug in irc2sql
+Added opportunistic upgrading of TLS fingerprints to more secure algorithms on InspIRCd.
+Added support for logging out partially connected users on Plexus.
+Added the account registration time to nickserv/info.
+Changed ns_cert to automatically add a TLS fingerprint to new accounts if available.
+Clarified that a non-deprecated encryption module must be loaded.
+Fixed creating the runtime directory on Windows.
+Fixed mistakenly allowing badpasslimit to be set to a negative value.
+Fixed parsing backup TLS fingerprints on InspIRCd.
+Fixed parsing the flood mode on UnrealIRCd.
+Fixed parsing the history mode on UnrealIRCd.
+Fixed various iterator invalidation issues.
+Partially rewrote the Portuguese translation.
+Removed some incorrect strings from the Turkish translation.
+Renamed the --modulesdir option to --moduledir to match the name of other path options.
 
-Anope Version 2.0.8
+Anope Version 2.1.5
 -------------------
-Add +K channel mode for ircd-hybrid
-Add immutable identifiers to user accounts
-Fix build on systems that use musl libc
-Fix help of global/global not showing the correct origin nick
-Fix not removing vhosts when an nick is dropped
-Fix parsing channel metadata on InspIRCd 3+
-Fix parsing kicks on InspIRCd 3+
-Fix parsing topic changes on InspIRCd 3+
-Fix topiclock on InspIRCd
-Modernize the ircd-hybrid protocol module
+Added an example systemd unit file.
+Added support for BIGLINES on UnrealIRCd.
+Bumped the minimum supported version of Bahamut to 2.0.
+Fixed truncating messages in global/global and global/server.
+Improved building Anope for use as a system package.
+Updated the Turkish translation.
 
-
-Anope Version 2.0.7
+Anope Version 2.1.4
 -------------------
-Fix not sending login data on successful NickServ GROUP
-Fix m_httpd to not consider headers to be case sensitive
-Add InspIRCd 3 protocol support
-Add 'n' email token for use in the email change template
-Add logging for NickServ UNGROUP
-Fix setting swhois on UnrealIRCd
-Add nickserv/recover permission to allow opers to recover other users
-Fix superadmin not being removed when deopering
-Fix setting nickserv access list in webcpanel
-Add support for post-handshake SASL in Unreal 4.2.2+
-Add logging for channel memo deletionso
+Added a check for a non-deprecated encryption module on start.
+Added a way for protocol modules to report an error to the uplink.
+Added more account settings to the webcpanel.
+Added self-test functionality for all encryption modules.
+Added support for challenge authentication on InspIRCd.
+Added support for importing databases from Atheme.
+Added support for sending client tags on UnrealIRCd.
+Added support for the InspIRCd 1206 (v4) protocol.
+Added the --nopid option to disable writing a pid file.
+Added the enc_argon2 module to encrypt passwords with Argon2.
+Added the enc_sha2 module to encrypt passwords with HMAC-SHA-2.
+Added the global/queue command for queueing multi-line messages.
+Added the global/server command for sending messages to an individual server.
+Added the PASSWORD category to operserv/stats to view password encryption methods.
+Added the verify-only enc_posix module to validate passwords from Atheme that were encrypted with Argon2.
+Changed nickserv/drop to use confirmation codes to confirm a nickname drop.
+Changed various paths to be relative to the data and config directories.
+Converted some IRCDProto member functions to variables.
+Converted the enc_md5, enc_none, enc_old, enc_sha1, and enc_sha256 modules to be verify-only.
+Deduplicated page headers and footers in the webcpanel templates.
+Deprecated the enc_sha256 module.
+Fixed inconsistent spelling/casing of email, vhost, and vident.
+Fixed various bugs in the inspircd module.
+Improved portability of email sending.
+Improved protocol debug messages.
+Improved the performance and reliability of internal conversion logic.
+Improved the randomness of randomly generated numbers.
+Refactored the enc_bcrypt module and exposed it as an encryption context.
+Removed several duplicate translation strings.
+Replaced the custom MD5 implementation in enc_md5 with a vendored one.
+Replaced the custom SHA256 implementation in enc_sha256 with a vendored one.
+The ldap_authentication, ldap_oper, sql_authentication, sql_log, and sql_oper modules are now always enabled.
 
-Anope Version 2.0.6
+Anope Version 2.1.3
 -------------------
-Log client IP for web clients running commands via webcpanel
-Fix log file path for the config file could not be opened log message
-Allow nickserv/group to be used via XMLRPC
-Fix logsearch without wildcards
-Support cidr exempts in m_dnsbl
-Add support for IPv6 dnsbls
-Add +u and +L channel modes for ircd-hybrid
-Set +x after hostserv/off on InspIRCd and UnrealIRCd
-Fix chanserv/mode not being able to set extbans
-Send CHGIDENT/CHGHOST on SVSLOGIN on InspIRCd
-Fix escaping replies from commands in webcpanel
-Enable require_oper for all opers added via operserv/oper
-Advertise SASL mechanisms to UnrealIRCd servers
+Added alternate command suggestions when a user runs an invalid command.
+Added support for the IRCv3 +draft/channel-context tag.
+Added support for the IRCv3 +draft/reply tag.
+Allow using more than one fingerprint in an oper block.
+Changed chanserv/drop to use confirmation codes to confirm a channel drop.
+Cleaned up more of the codebase to use Modern C++17.
+Enabled using more field limits sent by the IRC server instead of requiring the user to configure them.
+Fixed NickServ lying about the minimum password length.
+Fixed a crash when sending emails.
+Fixed bs_kick not using the correct kick message for automatic kicks.
+Increased the security of randomly generated confirmation codes.
+Removed the ns_access module and associated cs_secure and ns_secure options.
+Removed the ns_status module.
+Reworked how messages are sent in protocol modules to allow sending message tags.
 
-Anope Version 2.0.5
+Anope Version 2.1.2
 -------------------
-Fix negative levels to not match users with negative access
-Fix memo sender to always be the account name of the sender
-Allow unregistered users to use the ChanServ seen command
-Fix secureops to not be enforced on operators with the chanserv/administration privilege
-Fix command name in HELP syntax messages to always be upper case
-Show unconfirmed nickname messages on registration in webcpanel
-Fix NickServ SET EMAIL to be executable via XMLRPC
-Fix OperServ USERLIST/CHANLIST to accept regexes
-Allow OperServ USERLIST to also match realname syntax (n!u@h#r)
-Fix db_old importing languages to use the UTF-8 version
-Fix m_dns to return REFUSED if no answers could be found
-Fix ns_maxemail to be case insensitive
-Add MemoServ READ ALL command
-Add support for NickServ GROUP to be executed via XMLRPC
-Add support for logging hostname/ip of SASL authentication attempts, if supported by IRCd
+Bumped the minimum OpenSSL version to 1.1.0.
+Bumped the minimum GnuTLS version to 3.0.0.
+Disabled SSLv3 support in the m_ssl_openssl module.
+Modernized mutex and thread code to use Modern C++.
+Normalised the program exit codes.
+Updated the Dutch translation.
+Updated the French translation.
 
-Anope Version 2.0.4
+Anope Version 2.1.1
 -------------------
-Add notice rpc method to XMLRPC
-Fix access check in cs_updown to not allow actions on users with equal access
-Fix randomnews to work when there are more than 'newscount' random news
-Fix crash from handling nick introduction collisions on unreal4
-Add support for GCC6
-Fix handling /join 0 on ratbox
-Fix saset display to update the account of the proper user
-Fix nickserv/confirm to send account and +r when appropriate
-Fix chankill to not add duplicate akills
-Allow nickserv/maxemail to disregard gmail style aliases when comparing emails
-Fix chanserv/mode when setting listmodes with CIDR ranges
-Fix reported expiry time when the time is divisible by 1 year
-Clarify botserv repeat kicker help and allow setting repeat times to 1
-Send vident/vhost with SASL login
-Add support for SASL reauth
-Fix log and database backup directories to be properly created by the installer
+Added the UNBANME privilege to allow users to unban themselves.
+Fixed building on Windows systems without chgrp/chmod.
+Fixed creating sockets in the m_dns, m_httpd, m_proxyscan, and m_redis modules.
+Fixed reading the values of command line arguments.
+Moved core privilege descriptions to the example configs.
+Updated the Italian translation.
+Updated the Polish translation.
 
-Anope Version 2.0.3
+Anope Version 2.1.0
 -------------------
-Add support for UnrealIRCd 4
-Fix cs_access to respect chanserv/access/list privilege
-Fix cs_access to match level -1 as every user, not any level <0
-Fix problems related to object destruction order when using db_sql_live
-Show memo notify settings in ms_info
-Fix some actions bumping channels last used time that shouldn't have
-Add maxlogins configuration directive to limit the number of concurrent logins to one account
-Fix race with auto svsnick on ghost sometimes causing nick collisions instead
-Fix saset language reply
-Show akill/sxlines ids in VIEW
-Fix crash when an oper is configured in both the configuration and via os_oper
-Fix m_ldap reconnect logic not properly setting protocol and network timeout settings
-Fix crash from unloading regex modules when regex xlines exist
-Fix irc2sql to store away messages
-Add notice method to m_xmlrpc_main
-Fix numerics on InspIRCd from being sent to user UID
-Fix usermode +I on UnrealIRCd to be considered oper only
-Fix crash in webcpanel when deleting your own access on a channel
-Fix webcpanel allowing suspended users to login
-Fix hs_off on InspIRCd to not desync active user host
-Fix bs_bot to not allow colliding bots into users
-Don't allow hostserv modules to load if there is no hostserv
-Fix ns_register allowing bot nicks to be registered through webcpanel
-Don't update chanserv keepmodes during inhabit
-Fix build on cmake 2.4
-Allow searching emails by wildcard in ns_getemail
-
-Anope Version 2.0.2
--------------------
-Fix keepmodes preventing the first user of a channel from being deopped
-Fix SQlines that don't begin with # from matching channels
-Made cs_clone behave like the help describes, copying many settings and lists by default
-Allow cs_clone to clone levels, too
-Update Hybrid protocol module for 8.2
-Fix not unescaping all characters sent over XMLRPC
-Fix crash when os_mode is used to destroy channels, like when unsetting permanent channel mode from an empty channel
-Allow users with topic change privilege to change the topic instead of requiring them to use ChanServ's topic command
-Fix negatively locking param modes in default mlock
-Change entrymsg to check for the SET privilege, not real founder
-Allow configuring characters allowed in nicknames
-Fix crash when non users register channels externally (like XMLRPC)
-Remove operserv/exception MOVE, it did not function correctly. Instead reorder the list by deleting/adding entries.
-Allow flood ttb to be 0.
-Enforce mlock when disabling defcon modes
-Fix cs_mode not being able to apply mlock on register
-Add log message when users send memos
-Fix old collide timers from staying around after successful identify. Fixes being able to identify and logout and still being hit by the old timers.
-Fix undefined behavior in cs_mode which usually crashes when clearing large list modes
-Show all opertypes in operserv/info, even if no opers use them
-
-Anope Version 2.0.1
--------------------
-Fix access entries on accounts sometimes not updating when a user's display name changes
-Fix ns_group to properly validate the account of the user against the target
-Fix os_stats not saving max user count and time when using SQL
-Fix nickalias's 'nc' field sometimes not being updated when using SQL
-Fix several crashes on Windows related to being unable to load modules
-Fix bs_bot change not properly reintroducing bots after changing their ident, host, or realname
-
-Add English language file to allow users to easily modify language strings
-Add configuring which mode cs_ban sets, and added a MUTE command to BotServ's fantasy
-Allow SVSPART to take an optional reason
-Allow cs_list to search channel topics and descriptions
-
-Anope Version 2.0.0
--------------------
-Added irc2sql stats module
-
-Anope Version 1.9.9
--------------------
-A Added a better webpanel template, removed the old one
-A Added SQL logging support
-A Added Redis database support
-A Added ability to configure what privileges XOP commands give
-U Updated Dutch language file, from Robby <robby@chat.be>
-U Updated Spanish language file, from Isaac Fontal <i_fontal@hotmail.com>
-F Fix build on Solaris and OSX
-F Fixed setting BotServ's default settings in the config
-F Fixed some names of config items, including NickServ's kill protect
-
-Anope Version 1.9.8
--------------------
-A Ability to configure fantasy commands in the config
-A Add SVSJOIN and SVSPART commands
-F Fix "leave" channel log level from not logging
-F Fix users able to "resend" their registration mail with registration set to admin only
-F Fix build on OpenBSD
-F Fix not logging debug logs to the logfile when debug mode is enabled
-F Fix defcon timeout timer
-F Fix crash in os_forbid with expiring entries
-F Fix several issues with db_sql_live
-
-Anope Version 1.9.7
--------------------
-A Added ability for using regex as patterns for various commands
-A Extended ability of operserv/akill to also match against nick and realname
-A Added chanserv:require configuration option
-A Added nickserv:unregistered_notice and nickserv:registration configuration option
-A Added options:casemap configuration option
-A Added a web panel
-A db_sql_live now allows all tables to be "live", not just a select few
-
-Anope Version 1.9.6
--------------------
-A Added ability to configure emails sent by services
-A Added chanserv/up and chanserv/down
-A Added m_proxyscan
-A Added more configurability for what vhosts are valid
-A Added chanserv/log
-A Added ability to configure ChanServ privileges
-A Added a new database format
-A Added SQLite support
-A Added more verbose messages on startup
-A Added ability for chanserv/suspend and nickserv/suspend to take an expiry time
-A Added no nickname ownership config option
-A Added m_rewrite
-A Added akill IDs
-F Fixed crash in clearusers
-F Fixed crash in /os oper info
-F Fixed eventfd Config check to work properly on OpenVZ
-
-Anope Version 1.9.5
--------------------
-A Extended LDAP support
-A Added os_oper, os_kill, os_forbid, m_statusupdate, cs_sync, and bs_autoassign
-A Added a new configuration file format
-A Added a new commands system
-A Added a new access system, and cs_flags
-F Fixed not logging debug logs to file
-F Fixed the mail delay time
-F Fixed sending account data for unconfirmed nicks
-F Fixed poll() engine build on FreeBSD
-F Fixed really large HELP replies being truncated
-F Fixed sometimes appending !*@* to valid hosts on access lists
-F Fixed m_ssl sometimes failing connecting for no reason
-F Fixed crash in cs_entrymsg
-F Fixed setting -P on channels with only a botserv bot in it
-F Fixed modemanager complaining about prefixless modes on InspIRCd
-
-Anope Version 1.9.4
--------------------
-A Automatically set channel founder to the user with the highest access if there is no successor
-A /chanserv clone command to copy settings from one channel to another.
-A /chanserv mode command
-A Ability for users to delete their own access in channels
-A Added support for Plexus 3
-A Readded in support for /cs op/deop/etc to op/deop you in all channels
-A Added LDAP support
-A Added live SQL support
-A Added support for learning tracking/storing/locking all modes at runtime
-A Added m_alias
-A Added support for XMLRPC queries
-A Added /botserv set msg
-A Added /operserv config
-A Added /ns cert
-A Added /operserv login
-F Changed the GHOST command to not allow ghosting unidentified users if the RECOVER command exists
-F Some failed logic in /operserv exception that prevents proper exceptions from being added
-F Fixed the anope_os_sxlines MySQL table and code to work after restarting
-
-Anope Version 1.9.3
--------------------
-A Added italics BotServ kicks support
-A Tell users when their nicks expire in /ns glist and /ns info
-A Added SSL support
-A Prevent negative mode changes, kicks, bans, and autokicks from affecting people with the 'god' user mode (On UnrealIRCd, usermode +q)
-A Added nickserv/auxpex permission
-A Added nickserv ungroup command
-A Renamed the SGLINE to be SNLINE
-A Added /chanserv saset command
-A Added threads for mail sending
-A Added m_dnsbl and an asynchronous DNS system
-A Added a new language system that uses gettext
-A Added m_mysql which uses threads to execute queries
-A Added many subcommand modules for some commands, eg ns_set_autoop, ns_set_email, etc
-A Added a new logging system that is a bit more flexible
-A Added cs_set_misc and ns_set_misc to add miscellaneous set commands
-A Added os_modreload, which allows reloading some modules not normally unloadable, like the protocol module
-A Added FOUNDER access level
-A Made OperServ, Global, MemoServ, and ChanServ optional
-F Shutting down if a config reload fails
-F Autoid to live through restarts on Unreal
-F Storing vhosts in MySQL
-F Not flushing the anope_extra table before rewriting database
-F Anoperc start/stop to send the globaloncycle global, and fixed anoperc rehash to really rehash
-F Fixed a potential crash if HostServ or BotServ was disabled
-
-Anope Version 1.9.2
--------------------
-A K alias to chanserv kick command
-A KB alias to chanserv ban command
-A The ability to register empty nonregistered channels
-A Flatfile plaintext databases and removed old binary ones
-A Added in live updating SQL and the ability to execute commands through SQL (see docs/MYSQL)
-A Added support for many more modes into Anope and the ability to have generic support for modes unknown to Anope
-A Added a mode stacker to combine many mode changes into fewer
-A Added in the CS SET PERSIST command which can be used to keep service bots in channels even when the channel is empty
-A Added AUTOOWNER OWNER and OWNERME into CS LEVELS
-A Added ns_resetpass module to the core
-A CS ACCESS VIEW which shows who added the access and last time used
-A Last used time to CS AKICK VIEW
-A Added a sha_256 encryption module
-A Added the ability to load multiple encryption modules, and the ability to seamlessly convert your database between different encryptions
-A Added configuration options to allow Anope to reconnect if it disconnects from the uplink instead of dying
-A Added support for linking with IPv6
-F Unban command to accept an optional nick arg
-F Some typos in services.conf
-F Crash when users change their host that are identified to a group, but not a nick
-F Host length checking in HS SET(ALL) and HS REQUEST
-F Only show if a user is online in NS INFO if they are really identified for the group of the nick they are on
-F Crash when using BSSmartJoin
-F Converting access entries to access from xop when a users access is below voice
-F A bad pointer passed to the OnDelEvent which could cause some 3rd party modules to crash
-F CS FORBID allows to you forbid unregistered channels
-F The -nothird command line option to work
-F ms_rsend to really work
-F SQUITing juped servers on InspIRCd1.2+
-
-Anope Version 1.9.1
--------------------
-F Don't enforce akick/forbidden/etc.-restrictions on clients on ulined servers.
-F Remove modules_unload_all fini + hack that goes with it.
-F Signal handling cleanup.
-A Seamless fantasy support on all ChanServ commands, instead of requiring bs_fantasy_*.
-F Allow fantasy to be disabled on some commands (e.g. FORBID).
-F Some commands (e.g. !help) need to strip the pre-provided channelname from them.
-D HelpServ removed
-F Command parser cleanup: mod_current_buffer removed and replaced with proper parser. Commands now indicate how they want the buffer split.
-F Make NS ENFORCE/RELEASE stuff more sane, redo timers.
-A Opertypes (similar to InspIRCd's opertypes)
-
-Provided by Ankit <ankit@nevitus.com> - 2009
-F Segfault on shutdown
-
-Provided by Adam <adam@anope.org> - 2009
-F NickServ registration is sometimes denied.
-F Applied patch from Adam to fix some potential screwups
-F More fixes to bs_bot from Adam, plus an extra fix within DoAdd not covered in Adam's patch.
-F Fix bs_bot to use the correct parameters, patch from Adam.
-F Fix for bug #1004, based from second half of patch from Adam.
-F Partial patch by Adam, commenting fix for #1006 for future reference.
-F Forward-port r1946:  Patch by Adam fixing #1006 (originally caused by #922): modes set by ChanServ are reversed. Thanks!
-
-Provided by DukePyrolator <dukepyrolator@gmx.de> - 2009
-F Patch converting all match calls to new method, thanks!
-F Add 'w' and 'y' support to dotime(), also prevent an overflow.
-F Allow NS STATUS from unregistered users, thanks DP!
-F Wild pointers do not a happy Anope make. Thanks DP :)
-F Allow NS REGISTER to unregistered nicks, silly oversight. Thanks DP! :)
-F Fix call order, thanks to DP
-F Pass the right array to do_umode(), fixes mode tracking on Unreal. Thanks to DukePyrolator (yet again :P)
-F Fix bs_set help, thanks to DukePyrolator! :)
-F Fix two segfaults, noted by DukePyrolator. Thanks!
-F Fix part one of #1010, reported by DukePyrolator. (Language settings are not respected in message sending.) Thanks!
-F Memory leak on +beI modes.
-
-Provided by Liber <Liber@jasonirc.net> - 2009
-F Support operoverride and such things (stop reversing changes from nonopped people where unnecessary)
-
-Anope Version 1.9.0
--------------------
-F Modified compile to use g++
-F Improve protocol modules support (classes, virtual methods, etc)
-F Move core services to use BotInfo
-F Move BotInfo and related methods into a class
-F Move modules into a class
-F Fixed ns resending of passcode issue
-F Modules now delete themselves
-F additional field where users' masked host can be stored so both masked IP and vhost are available instead of just one.
-F No struct Uid, ugly, and, unnecessary that we store UID in BotInfo.
-F Prevent deletion of core services via /bs bot
-F Module subsystem cleanup ('modules' branch)
-F Move modules to use classes somewhat (AnopeInit, AnopeFini)
-F Change MODULE_INIT to return a pointer
-F Remove duplicate module creation.. have loadModule return a pointer rather than creating one
-F Remove buffered loading/unloading, this makes os_modunload perm, but who cares
-F Remove 'delayed' loading, this is necessary because of before/after connected to ircd (ircd is before, rest after), I'm sure this can be done better.
-A Remove old config, replace with insp-inspired (albeit bind format) config (CBX)
-F Clean up protocol modules a bit
-A InspIRCd 1.2 support
-F Remove old (prior to 1.8.0) db compat
-F Establish a proper base for services pseudoclients
-F Add ss_main StatServ Hal9000 to play with :)
-F Burn automake with fire (CBX)
-
-Provided by mooncup <mooncup@anonnet.org> - 2009
-F Automatically reapply vhost on hs off for unreal.
+Added support for access list entry descriptions.
+Added support for linking over a UNIX socket.
+Added support for server-initiated logins and logouts on UnrealIRCd.
+Added support for server-initiated logouts on InspIRCd.
+Added support for the ANONYMOUS SASL mechanism.
+Allowed users to opt-out of being added to channel access lists.
+Cleaned up the codebase to use Modern C++17.
+Modernized the build system to use a modern version of CMake.
+Removed support for using insecure encryption methods as the primary method.
+Removed the Windows-only anopesmtp tool.
+Removed the two day X-line cap.
+Updated all references to IRCServices to refer to Anope instead.

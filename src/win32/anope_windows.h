@@ -29,9 +29,7 @@
 # define DllExport __declspec(dllimport)
 #endif
 
-#define MARK_DEPRECATED
-
-#if GETTEXT_FOUND
+#if HAVE_LOCALIZATION
 /* Undefine some functions libintl defines */
 # undef snprintf
 # undef vsnprintf
@@ -53,10 +51,8 @@
 #define EINPROGRESS WSAEWOULDBLOCK
 
 #include "socket.h"
-#include "dir/dir.h"
 #include "dl/dl.h"
 #include "pipe/pipe.h"
-#include "pthread/pthread.h"
 #include "sigaction/sigaction.h"
 
 typedef int ssize_t;
@@ -69,9 +65,6 @@ namespace Anope
 extern CoreExport void OnStartup();
 extern CoreExport void OnShutdown();
 extern CoreExport USHORT WindowsGetLanguage(const Anope::string &lang);
-extern CoreExport int gettimeofday(timeval *tv, void *);
-extern CoreExport Anope::string GetWindowsVersion();
-extern CoreExport bool SupportedWindowsVersion();
 extern int setenv(const char *name, const char *value, int overwrite);
 extern int unsetenv(const char *name);
 extern int mkstemp(char *input);

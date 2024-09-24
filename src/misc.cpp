@@ -19,15 +19,19 @@
 #include "regexpr.h"
 #include "sockets.h"
 
-#include <errno.h>
-#include <sys/types.h>
+#include <cerrno>
+#include <climits>
+#include <numeric>
+#include <random>
+#include <filesystem>
 #include <sys/stat.h>
+#include <sys/types.h>
 #ifndef _WIN32
 #include <sys/socket.h>
 #include <netdb.h>
 #endif
 
-NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(true), desc(descending)
+NumberList::NumberList(const Anope::string &list, bool descending) : desc(descending)
 {
 	Anope::string error;
 	commasepstream sep(list);
@@ -42,13 +46,12 @@ NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(tr
 
 		if (t == Anope::string::npos)
 		{
-			try
+			if (auto num = Anope::TryConvert<unsigned>(token, &error))
 			{
-				unsigned num = convertTo<unsigned>(token, error, false);
 				if (error.empty())
-					numbers.insert(num);
+					numbers.insert(num.value());
 			}
-			catch (const ConvertException &)
+			else
 			{
 				error = "1";
 			}
@@ -65,15 +68,17 @@ NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(tr
 		else
 		{
 			Anope::string error2;
-			try
+			auto n1 = Anope::TryConvert<unsigned>(token.substr(0, t), &error);
+			auto n2 = Anope::TryConvert<unsigned>(token.substr(t + 1), &error);
+			if (n1.has_value() && n2.has_value())
 			{
-				unsigned num1 = convertTo<unsigned>(token.substr(0, t), error, false);
-				unsigned num2 = convertTo<unsigned>(token.substr(t + 1), error2, false);
+				auto num1 = n1.value();
+				auto num2 = n2.value();
 				if (error.empty() && error2.empty())
 					for (unsigned i = num1; i <= num2; ++i)
 						numbers.insert(i);
 			}
-			catch (const ConvertException &)
+			else
 			{
 				error = "1";
 			}
@@ -90,10 +95,6 @@ NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(tr
 	} while (sep.GetToken(token));
 }
 
-NumberList::~NumberList()
-{
-}
-
 void NumberList::Process()
 {
 	if (!is_valid)
@@ -106,8 +107,8 @@ void NumberList::Process()
 	}
 	else
 	{
-		for (std::set<unsigned>::iterator it = numbers.begin(), it_end = numbers.end(); it != it_end; ++it)
-			this->HandleNumber(*it);
+		for (unsigned int number : numbers)
+			this->HandleNumber(number);
 	}
 }
 
@@ -145,29 +146,30 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 	std::vector<Anope::string> tcolumns;
 	std::map<Anope::string, size_t> lengths;
 	std::set<Anope::string> breaks;
-	for (unsigned i = 0; i < this->columns.size(); ++i)
+	for (const auto &column : this->columns)
 	{
-		tcolumns.push_back(Language::Translate(this->nc, this->columns[i].c_str()));
-		lengths[this->columns[i]] = tcolumns[i].length();
+		tcolumns.emplace_back(Language::Translate(this->nc, column.c_str()));
+		lengths[column] = column.length();
 	}
-	for (unsigned i = 0; i < this->entries.size(); ++i)
+	for (auto &entry : this->entries)
 	{
-		ListEntry &e = this->entries[i];
-		for (unsigned j = 0; j < this->columns.size(); ++j)
-			if (e[this->columns[j]].length() > lengths[this->columns[j]])
-				lengths[this->columns[j]] = e[this->columns[j]].length();
+		for (const auto &column : this->columns)
+		{
+			if (entry[column].length() > lengths[column])
+				lengths[column] = entry[column].length();
+		}
 	}
-	unsigned length = 0;
-	for (std::map<Anope::string, size_t>::iterator it = lengths.begin(), it_end = lengths.end(); it != it_end; ++it)
+	unsigned total_length = 0;
+	for (const auto &[column, length] : lengths)
 	{
 		/* Break lines at 80 chars */
-		if (length > 80)
+		if (total_length > 80)
 		{
-			breaks.insert(it->first);
-			length = 0;
+			breaks.insert(column);
+			total_length = 0;
 		}
 		else
-			length += it->second;
+			total_length += length;
 	}
 
 	/* Only put a list header if more than 1 column */
@@ -191,10 +193,8 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 		buffer.push_back(s);
 	}
 
-	for (unsigned i = 0; i < this->entries.size(); ++i)
+	for (auto &entry : this->entries)
 	{
-		ListEntry &e = this->entries[i];
-
 		Anope::string s;
 		for (unsigned j = 0; j < this->columns.size(); ++j)
 		{
@@ -205,16 +205,16 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 			}
 			else if (!s.empty())
 				s += "  ";
-			s += e[this->columns[j]];
+			s += entry[this->columns[j]];
 			if (j + 1 != this->columns.size())
-				for (unsigned k = e[this->columns[j]].length(); k < lengths[this->columns[j]]; ++k)
+				for (unsigned k = entry[this->columns[j]].length(); k < lengths[this->columns[j]]; ++k)
 					s += " ";
 		}
 		buffer.push_back(s);
 	}
 }
 
-InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc), longest(0)
+InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc)
 {
 }
 
@@ -222,23 +222,23 @@ void InfoFormatter::Process(std::vector<Anope::string> &buffer)
 {
 	buffer.clear();
 
-	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = this->replies.begin(), it_end = this->replies.end(); it != it_end; ++it)
+	for (const auto &[key, value] : this->replies)
 	{
 		Anope::string s;
-		for (unsigned i = it->first.length(); i < this->longest; ++i)
+		for (unsigned i = key.length(); i < this->longest; ++i)
 			s += " ";
-		s += it->first + ": " + Language::Translate(this->nc, it->second.c_str());
+		s += key + ": " + Language::Translate(this->nc, value.c_str());
 
 		buffer.push_back(s);
 	}
 }
 
-Anope::string& InfoFormatter::operator[](const Anope::string &key)
+Anope::string &InfoFormatter::operator[](const Anope::string &key)
 {
 	Anope::string tkey = Language::Translate(this->nc, key.c_str());
 	if (tkey.length() > this->longest)
 		this->longest = tkey.length();
-	this->replies.push_back(std::make_pair(tkey, ""));
+	this->replies.emplace_back(tkey, "");
 	return this->replies.back().second;
 }
 
@@ -246,11 +246,11 @@ void InfoFormatter::AddOption(const Anope::string &opt)
 {
 	Anope::string options = Language::Translate(this->nc, "Options");
 	Anope::string *optstr = NULL;
-	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = this->replies.begin(), it_end = this->replies.end(); it != it_end; ++it)
+	for (auto &[option, value] : this->replies)
 	{
-		if (it->first == options)
+		if (option == options)
 		{
-			optstr = &it->second;
+			optstr = &value;
 			break;
 		}
 	}
@@ -265,10 +265,7 @@ void InfoFormatter::AddOption(const Anope::string &opt)
 bool Anope::IsFile(const Anope::string &filename)
 {
 	struct stat fileinfo;
-	if (!stat(filename.c_str(), &fileinfo))
-		return true;
-
-	return false;
+	return stat(filename.c_str(), &fileinfo) == 0;
 }
 
 time_t Anope::DoTime(const Anope::string &s)
@@ -276,36 +273,27 @@ time_t Anope::DoTime(const Anope::string &s)
 	if (s.empty())
 		return 0;
 
-	int amount = 0;
 	Anope::string end;
-
-	try
+	auto amount = Anope::Convert<int>(s, -1, &end);
+	if (!end.empty())
 	{
-		amount = convertTo<int>(s, end, false);
-		if (!end.empty())
+		switch (end[0])
 		{
-			switch (end[0])
-			{
-				case 's':
-					return amount;
-				case 'm':
-					return amount * 60;
-				case 'h':
-					return amount * 3600;
-				case 'd':
-					return amount * 86400;
-				case 'w':
-					return amount * 86400 * 7;
-				case 'y':
-					return amount * 86400 * 365;
-				default:
-					break;
-			}
+			case 's':
+				return amount;
+			case 'm':
+				return amount * 60;
+			case 'h':
+				return amount * 3600;
+			case 'd':
+				return amount * 86400;
+			case 'w':
+				return amount * 86400 * 7;
+			case 'y':
+				return amount * 86400 * 365;
+			default:
+				break;
 		}
-	}
-	catch (const ConvertException &)
-	{
-		amount = -1;
 	}
 
 	return amount;
@@ -321,32 +309,32 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc)
 	time_t seconds = (t) % 60;
 
 	if (!years && !days && !hours && !minutes)
-		return stringify(seconds) + " " + (seconds != 1 ? Language::Translate(nc, _("seconds")) : Language::Translate(nc, _("second")));
+		return Anope::ToString(seconds) + " " + (seconds != 1 ? Language::Translate(nc, _("seconds")) : Language::Translate(nc, _("second")));
 	else
 	{
 		bool need_comma = false;
 		Anope::string buffer;
 		if (years)
 		{
-			buffer = stringify(years) + " " + (years != 1 ? Language::Translate(nc, _("years")) : Language::Translate(nc, _("year")));
+			buffer = Anope::ToString(years) + " " + (years != 1 ? Language::Translate(nc, _("years")) : Language::Translate(nc, _("year")));
 			need_comma = true;
 		}
 		if (days)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(days) + " " + (days != 1 ? Language::Translate(nc, _("days")) : Language::Translate(nc, _("day")));
+			buffer += Anope::ToString(days) + " " + (days != 1 ? Language::Translate(nc, _("days")) : Language::Translate(nc, _("day")));
 			need_comma = true;
 		}
 		if (hours)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(hours) + " " + (hours != 1 ? Language::Translate(nc, _("hours")) : Language::Translate(nc, _("hour")));
+			buffer += Anope::ToString(hours) + " " + (hours != 1 ? Language::Translate(nc, _("hours")) : Language::Translate(nc, _("hour")));
 			need_comma = true;
 		}
 		if (minutes)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(minutes) + " " + (minutes != 1 ? Language::Translate(nc, _("minutes")) : Language::Translate(nc, _("minute")));
+			buffer += Anope::ToString(minutes) + " " + (minutes != 1 ? Language::Translate(nc, _("minutes")) : Language::Translate(nc, _("minute")));
 		}
 		return buffer;
 	}
@@ -356,7 +344,7 @@ Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 {
 	tm tm = *localtime(&t);
 	char buf[BUFSIZE];
-	strftime(buf, sizeof(buf), Language::Translate(nc, _("%b %d %H:%M:%S %Y %Z")), &tm);
+	strftime(buf, sizeof(buf), Language::Translate(nc, _("%b %d %Y %H:%M:%S %Z")), &tm);
 	if (short_output)
 		return buf;
 	if (t < Anope::CurTime)
@@ -507,29 +495,11 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 	return m == mask_len;
 }
 
-void Anope::Encrypt(const Anope::string &src, Anope::string &dest)
+bool Anope::Encrypt(const Anope::string &src, Anope::string &dest)
 {
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(OnEncrypt, MOD_RESULT, (src, dest));
-	static_cast<void>(MOD_RESULT);
-}
-
-bool Anope::Decrypt(const Anope::string &src, Anope::string &dest)
-{
-	size_t pos = src.find(':');
-	if (pos == Anope::string::npos)
-	{
-		Log() << "Error: Anope::Decrypt() called with invalid password string (" << src << ")";
-		return false;
-	}
-	Anope::string hashm(src.begin(), src.begin() + pos);
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnDecrypt, MOD_RESULT, (hashm, src, dest));
-	if (MOD_RESULT == EVENT_ALLOW)
-		return true;
-
-	return false;
+	return MOD_RESULT == EVENT_ALLOW &&!dest.empty();
 }
 
 Anope::string Anope::printf(const char *fmt, ...)
@@ -602,7 +572,7 @@ int Anope::LastErrorCode()
 #endif
 }
 
-const Anope::string Anope::LastError()
+Anope::string Anope::LastError()
 {
 #ifndef _WIN32
 	return strerror(errno);
@@ -619,27 +589,27 @@ const Anope::string Anope::LastError()
 Anope::string Anope::Version()
 {
 #ifdef VERSION_GIT
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA + " (" + VERSION_GIT + ")";
+	return Anope::ToString(VERSION_MAJOR) + "." + Anope::ToString(VERSION_MINOR) + "." + Anope::ToString(VERSION_PATCH) + VERSION_EXTRA + " (" + VERSION_GIT + ")";
 #else
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA;
+	return Anope::ToString(VERSION_MAJOR) + "." + Anope::ToString(VERSION_MINOR) + "." + Anope::ToString(VERSION_PATCH) + VERSION_EXTRA;
 #endif
 }
 
 Anope::string Anope::VersionShort()
 {
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH);
+	return Anope::ToString(VERSION_MAJOR) + "." + Anope::ToString(VERSION_MINOR) + "." + Anope::ToString(VERSION_PATCH);
 }
 
 Anope::string Anope::VersionBuildString()
 {
 #ifdef REPRODUCIBLE_BUILD
-	Anope::string s = "build #" + stringify(BUILD);
+	Anope::string s = "build #" + Anope::ToString(BUILD);
 #else
-	Anope::string s = "build #" + stringify(BUILD) + ", compiled " + Anope::compiled;
+	Anope::string s = "build #" + Anope::ToString(BUILD) + ", compiled " + Anope::compiled;
 #endif
 	Anope::string flags;
 
-#ifdef DEBUG_BUILD
+#if DEBUG_BUILD
 	flags += "D";
 #endif
 #ifdef VERSION_GIT
@@ -770,6 +740,145 @@ Anope::string Anope::Random(size_t len)
 	};
 	Anope::string buf;
 	for (size_t i = 0; i < len; ++i)
-		buf.append(chars[rand() % sizeof(chars)]);
+		buf.append(chars[Anope::RandomNumber() % sizeof(chars)]);
 	return buf;
+}
+
+int Anope::RandomNumber()
+{
+	static std::random_device device;
+	static std::mt19937 engine(device());
+	static std::uniform_int_distribution<int> dist(INT_MIN, INT_MAX);
+	return dist(engine);
+}
+
+// Implementation of https://en.wikipedia.org/wiki/Levenshtein_distance
+size_t Anope::Distance(const Anope::string &s1, const Anope::string &s2)
+{
+	if (s1.empty())
+		return s2.length();
+	if (s2.empty())
+		return s1.length();
+
+	std::vector<size_t> costs(s2.length() + 1);
+	std::iota(costs.begin(), costs.end(), 0);
+
+	size_t i = 0;
+	for (const auto c1 : s1)
+	{
+		costs[0] = i + 1;
+		size_t corner = i;
+		size_t j = 0;
+		for (const auto &c2 : s2)
+		{
+			size_t upper = costs[j + 1];
+			if (c1 == c2)
+				costs[j + 1] = corner;
+			else
+			{
+				size_t t = upper < corner ? upper : corner;
+				costs[j + 1] = (costs[j] < t ? costs[j] : t) + 1;
+			}
+			corner = upper;
+			j++;
+		}
+		i++;
+	}
+	return costs[s2.length()];
+}
+
+void Anope::UpdateTime()
+{
+#ifdef _WIN32
+	SYSTEMTIME st;
+	GetSystemTime(&st);
+
+	CurTime = time(nullptr);
+	CurTimeNs = st.wMilliseconds;
+#elif HAVE_CLOCK_GETTIME
+	struct timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+
+	CurTime = ts.tv_sec;
+	CurTimeNs = ts.tv_nsec;
+#else
+	struct timeval tv;
+	gettimeofday(&tv, nullptr);
+
+	CurTime = tv.tv_sec;
+	CurTimeNs = tv.tv_usec * 1000;
+#endif
+}
+
+Anope::string Anope::Expand(const Anope::string &base, const Anope::string &fragment)
+{
+	if (fragment.empty())
+		return ""; // We can't expand an empty fragment.
+
+	// The fragment is an absolute path, don't modify it.
+	if (std::filesystem::path(fragment.str()).is_absolute())
+		return fragment;
+
+#ifdef _WIN32
+	static constexpr const char separator = '\\';
+#else
+	static constexpr const char separator = '/';
+#endif
+
+	// The fragment is relative to a home directory, expand that.
+	if (!fragment.compare(0, 2, "~/", 2))
+	{
+		const auto *homedir = getenv("HOME");
+		if (homedir && *homedir)
+			return Anope::printf("%s%c%s", homedir, separator, fragment.c_str() + 2);
+	}
+
+	return Anope::printf("%s%c%s", base.c_str(), separator, fragment.c_str());
+}
+
+Anope::string Anope::FormatCTCP(const Anope::string &name, const Anope::string &value)
+{
+	if (value.empty())
+		return Anope::printf("\1%s\1", name.c_str());
+
+	return Anope::printf("\1%s %s\1", name.c_str(), value.c_str());
+}
+
+bool Anope::ParseCTCP(const Anope::string &text, Anope::string &name, Anope::string &body)
+{
+	// According to draft-oakley-irc-ctcp-02 a valid CTCP must begin with SOH and
+	// contain at least one octet which is not NUL, SOH, CR, LF, or SPACE. As most
+	// of these are restricted at the protocol level we only need to check for SOH
+	// and SPACE.
+	if (text.length() < 2 || text[0] != '\x1' || text[1] == '\x1' || text[1] == ' ')
+	{
+		name.clear();
+		body.clear();
+		return false;
+	}
+
+	auto end_of_name = text.find(' ', 2);
+	auto end_of_ctcp = *text.rbegin() == '\x1' ? 1 : 0;
+	if (end_of_name == std::string::npos)
+	{
+		// The CTCP only contains a name.
+		name = text.substr(1, text.length() - 1 - end_of_ctcp);
+		body.clear();
+		return true;
+	}
+
+	// The CTCP contains a name and a body.
+	name = text.substr(1, end_of_name - 1);
+
+	auto start_of_body = text.find_first_not_of(' ', end_of_name + 1);
+	if (start_of_body == std::string::npos)
+	{
+		// The CTCP body is provided but empty.
+		body.clear();
+		return true;
+	}
+
+	// The CTCP body provided was non-empty.
+	body = text.substr(start_of_body, text.length() - start_of_body - end_of_ctcp);
+	return true;
 }

@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef ANOPE_H
-#define ANOPE_H
+#pragma once
 
 #include <signal.h>
 
@@ -23,15 +22,15 @@ namespace Anope
 	 * allow us to only require one type of string everywhere that can be converted
 	 * at any time to a specific type of string.
 	 */
-	class CoreExport string
+	class CoreExport string final
 	{
-	 private:
+	private:
 		/**
 		 * The actual string is stored in an std::string as it can be converted to
 		 * ci::string, or a C-style string at any time.
 		 */
 		std::string _string;
-	 public:
+	public:
 		/**
 		 * Extras.
 		 */
@@ -40,6 +39,7 @@ namespace Anope
 		typedef std::string::reverse_iterator reverse_iterator;
 		typedef std::string::const_reverse_iterator const_reverse_iterator;
 		typedef std::string::size_type size_type;
+		typedef std::string::value_type value_type;
 		static const size_type npos = static_cast<size_type>(-1);
 
 		/**
@@ -54,9 +54,7 @@ namespace Anope
 		string(const ci::string &_str) : _string(_str.c_str()) { }
 		string(const string &_str, size_type pos, size_type n = npos) : _string(_str._string, pos, n) { }
 		template <class InputIterator> string(InputIterator first, InputIterator last) : _string(first, last) { }
-#if __cplusplus >= 201103L
 		string(const string &) = default;
-#endif
 
 		/**
 		 * Assignment operators, so any type of string can be assigned to this class.
@@ -143,8 +141,8 @@ namespace Anope
 		 */
 		inline void push_back(char c) { return this->_string.push_back(c); }
 
-		inline string& append(const string &s) { this->_string.append(s.str()); return *this; }
-		inline string& append(const char *s, size_t n) { this->_string.append(s, n); return *this; }
+		inline string &append(const string &s) { this->_string.append(s.str()); return *this; }
+		inline string &append(const char *s, size_t n) { this->_string.append(s, n); return *this; }
 
 		/**
 		 * Resizes the string content to n characters.
@@ -162,21 +160,21 @@ namespace Anope
 		 * Trim leading and trailing white spaces from the string.
 		 */
 
-		inline string& ltrim(const Anope::string &what = " \t\r\n")
+		inline string &ltrim(const Anope::string &what = " \t\r\n")
 		{
 			while (!this->_string.empty() && what.find(this->_string[0]) != Anope::string::npos)
 				this->_string.erase(this->_string.begin());
 			return *this;
 		}
 
-		inline string& rtrim(const Anope::string &what = " \t\r\n")
+		inline string &rtrim(const Anope::string &what = " \t\r\n")
 		{
 			while (!this->_string.empty() && what.find(this->_string[this->_string.length() - 1]) != Anope::string::npos)
 				this->_string.erase(this->_string.length() - 1);
 			return *this;
 		}
 
-		inline string& trim(const Anope::string &what = " \t\r\n")
+		inline string &trim(const Anope::string &what = " \t\r\n")
 		{
 			this->ltrim(what);
 			this->rtrim(what);
@@ -212,6 +210,10 @@ namespace Anope
 
 		inline size_type find_last_not_of(const string &_str, size_type pos = npos) const { return this->_string.find_last_not_of(_str._string, pos); }
 		inline size_type find_last_not_of_ci(const string &_str, size_type pos = npos) const { return ci::string(this->_string.c_str()).find_last_not_of(ci::string(_str._string.c_str()), pos); }
+
+		inline int compare(size_t pos, size_t len, const string &str) const { return ci::string(this->_string.c_str()).compare(pos, len, ci::string(str.c_str())); }
+		inline int compare(size_t pos, size_t len, const string &str, size_t subpos, size_type sublen = npos) const { return ci::string(this->_string.c_str()).compare(pos, len, ci::string(str.c_str()), subpos, sublen); }
+		inline int compare(size_t pos, size_t len, const char *s, size_type n = npos) const { return ci::string(this->_string.c_str()).compare(pos, len, s, n); }
 
 		/**
 		 * Determine if string consists of only numbers.
@@ -257,8 +259,8 @@ namespace Anope
 		inline string lower() const
 		{
 			Anope::string new_string = *this;
-			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = Anope::tolower(new_string[i]);
+			for (auto &chr : new_string)
+				chr = Anope::tolower(chr);
 			return new_string;
 		}
 
@@ -268,8 +270,8 @@ namespace Anope
 		inline string upper() const
 		{
 			Anope::string new_string = *this;
-			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = Anope::toupper(new_string[i]);
+			for (auto &chr : new_string)
+				chr = Anope::toupper(chr);
 			return new_string;
 		}
 
@@ -311,23 +313,23 @@ namespace Anope
 	inline const string operator+(const char *_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 	inline const string operator+(const std::string &_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 
-	struct hash_ci
+	struct hash_ci final
 	{
 		inline size_t operator()(const string &s) const
 		{
-			return TR1NS::hash<std::string>()(s.lower().str());
+			return std::hash<std::string>()(s.lower().str());
 		}
 	};
 
-	struct hash_cs
+	struct hash_cs final
 	{
 		inline size_t operator()(const string &s) const
 		{
-			return TR1NS::hash<std::string>()(s.str());
+			return std::hash<std::string>()(s.str());
 		}
 	};
 
-	struct compare
+	struct compare final
 	{
 		inline bool operator()(const string &s1, const string &s2) const
 		{
@@ -335,9 +337,14 @@ namespace Anope
 		}
 	};
 
-	template<typename T> class map : public std::map<string, T, ci::less> { };
-	template<typename T> class multimap : public std::multimap<string, T, ci::less> { };
-	template<typename T> class hash_map : public TR1NS::unordered_map<string, T, hash_ci, compare> { };
+	template<typename T>
+	using map = std::map<string, T, ci::less>;
+
+	template<typename T>
+	using multimap = std::multimap<string, T, ci::less>;
+
+	template<typename T>
+	using unordered_map = std::unordered_map<string, T, hash_ci, compare>;
 
 #ifndef REPRODUCIBLE_BUILD
 	static const char *const compiled = __TIME__ " " __DATE__;
@@ -360,6 +367,7 @@ namespace Anope
 	 * Use this unless you need very specific time checks
 	 */
 	extern CoreExport time_t CurTime;
+	extern CoreExport long long CurTimeNs;
 
 	/** The debug level we are running at.
 	 */
@@ -367,13 +375,13 @@ namespace Anope
 
 	/** Other command line options.
 	 */
-	extern CoreExport bool ReadOnly, NoFork, NoThird, NoExpire, ProtocolDebug;
+	extern CoreExport bool ReadOnly, NoFork, NoThird, NoPID, NoExpire, ProtocolDebug;
 
-	/** The root of the services installation. Usually ~/services
+	/** The root of the Anope installation. Usually ~/anope
 	 */
 	extern CoreExport Anope::string ServicesDir;
 
-	/** Services binary name (eg services)
+	/** Anope binary name (eg anope)
 	 */
 	extern CoreExport Anope::string ServicesBin;
 
@@ -387,7 +395,7 @@ namespace Anope
 
 	/** The uplink we are currently connected to
 	 */
-	extern CoreExport int CurrentUplink;
+	extern CoreExport size_t CurrentUplink;
 
 	/** Various methods to determine the Anope version running
 	 */
@@ -419,7 +427,7 @@ namespace Anope
 	 * initializing language support, loading modules, and loading databases.
 	 * @throws CoreException if something bad went wrong
 	 */
-	extern void Init(int ac, char **av);
+	extern bool Init(int ac, char **av);
 
 	/** Calls the save database event
 	 */
@@ -463,15 +471,7 @@ namespace Anope
 	 * @param src The source string to encrypt
 	 * @param dest The destination where the encrypted string is placed
 	 */
-	extern CoreExport void Encrypt(const Anope::string &src, Anope::string &dest);
-
-	/** Decrypts what is in 'src' to 'dest'.
-	 * @param src The source string to decrypt
-	 * @param dest The destination where the decrypted string is placed
-	 * @return true if decryption was successful. This is usually not the case
-	 * as most encryption methods we use are one way.
-	 */
-	extern CoreExport bool Decrypt(const Anope::string &src, Anope::string &dest);
+	extern CoreExport bool Encrypt(const Anope::string &src, Anope::string &dest);
 
 	/** Hashes a buffer with SipHash-2-4
 	 * @param src The start of the buffer to hash
@@ -487,7 +487,7 @@ namespace Anope
 	 * @param ... any number of parameters
 	 * @return a Anope::string
 	 */
-	extern CoreExport string printf(const char *fmt, ...);
+	extern CoreExport string printf(const char *fmt, ...) ATTR_FORMAT(1, 2);
 
 	/** Return the last error code
 	 * @return The error code
@@ -497,7 +497,7 @@ namespace Anope
 	/** Return the last error, uses errno/GetLastError() to determine this
 	 * @return An error message
 	 */
-	extern CoreExport const string LastError();
+	extern CoreExport string LastError();
 
 	/** Determines if a path is a file
 	 */
@@ -536,10 +536,18 @@ namespace Anope
 	 */
 	extern CoreExport Anope::string NormalizeBuffer(const Anope::string &);
 
-	/** Main processing routine. Parses the message and takes the appropriate action.
-	 * @param Raw message from the uplink
+	/** Parses a raw message from the uplink and calls its command handler.
+	 * @param message Raw message from the uplink
 	 */
-	extern void Process(const Anope::string &);
+	extern void Process(const Anope::string &message);
+
+	/** Calls the command handler for an already parsed message.
+	 * @param source Source of the message.
+	 * @param command Command name.
+	 * @param params Any extra parameters.
+	 * @param tags IRCv3 message tags.
+	 */
+	extern CoreExport void ProcessInternal(MessageSource &src, const Anope::string &command, const std::vector<Anope::string> &params, const Anope::map<Anope::string> & tags);
 
 	/** Does a blocking dns query and returns the first IP.
 	 * @param host host to look up
@@ -559,6 +567,54 @@ namespace Anope
 	 * @param len The length of the string returned
 	 */
 	extern CoreExport Anope::string Random(size_t len);
+
+	/** Generate a random number. */
+	extern CoreExport int RandomNumber();
+
+	/** Calculates the levenshtein distance between two strings.
+	 * @param s1 The first string.
+	 * @param s2 The second string.
+	 */
+	extern CoreExport size_t Distance(const Anope::string &s1, const Anope::string &s2);
+
+	/** Update the current time. */
+	extern CoreExport void UpdateTime();
+
+	/** Expands a path fragment that is relative to the base directory.
+	 * @param base The base directory that it is relative to.
+	 * @param fragment The fragment to expand.
+	 */
+	extern CoreExport Anope::string Expand(const Anope::string &base, const Anope::string &fragment);
+
+	/** Expands a config path. */
+	inline auto ExpandConfig(const Anope::string &path) { return Expand(ConfigDir, path); }
+
+	/** Expands a data path. */
+	inline auto ExpandData(const Anope::string &path) { return Expand(DataDir, path); }
+
+	/** Expands a locale path. */
+	inline auto ExpandLocale(const Anope::string &path) { return Expand(LocaleDir, path); }
+
+	/** Expands a log path. */
+	inline auto ExpandLog(const Anope::string &path) { return Expand(LogDir, path); }
+
+	/** Expands a module path. */
+	inline auto ExpandModule(const Anope::string &path) { return Expand(ModuleDir, path); }
+
+	/** Formats a CTCP message for sending to a client.
+	 * @param name The name of the CTCP.
+	 * @param body If present then the body of the CTCP.
+	 * @return A formatted CTCP ready to send to a client.
+	 */
+	extern CoreExport Anope::string FormatCTCP(const Anope::string &name, const Anope::string &body = "");
+
+	/** Parses a CTCP message received from a client.
+	 * @param text The raw message to parse.
+	 * @param name The location to store the name of the CTCP.
+	 * @param body The location to store body of the CTCP if one is present.
+	 * @return True if the message was a well formed CTCP; otherwise, false.
+	 */
+	extern CoreExport bool ParseCTCP(const Anope::string &text, Anope::string &name, Anope::string &body);
 }
 
 /** sepstream allows for splitting token separated lists.
@@ -568,7 +624,7 @@ namespace Anope
  */
 class CoreExport sepstream
 {
- private:
+private:
 	/** Original string.
 	 */
 	Anope::string tokens;
@@ -577,14 +633,17 @@ class CoreExport sepstream
 	char sep;
 	/** Current string position
 	 */
-	size_t pos;
+	size_t pos = 0;
 	/** If set then GetToken() can return an empty string
 	 */
 	bool allow_empty;
- public:
+public:
 	/** Create a sepstream and fill it with the provided data
 	 */
 	sepstream(const Anope::string &source, char separator, bool allowempty = false);
+
+	/** Retrieves the underlying string. */
+	const auto &GetString() const { return tokens; }
 
 	/** Fetch the next token from the stream
 	 * @param token The next token from the stream is placed here
@@ -602,7 +661,7 @@ class CoreExport sepstream
 	/** Gets every token from this stream
 	 * @param token Tokens are pushed back here
 	 */
-	template<typename T> void GetTokens(T& token)
+	template<typename T> void GetTokens(T &token)
 	{
 		token.clear();
 		Anope::string t;
@@ -625,7 +684,7 @@ class CoreExport sepstream
 	/** Fetch the entire remaining stream, without tokenizing
 	 * @return The remaining part of the stream
 	 */
-	const Anope::string GetRemaining();
+	Anope::string GetRemaining();
 
 	/** Returns true if the end of the stream has been reached
 	 * @return True if the end of the stream has been reached, otherwise false
@@ -635,9 +694,10 @@ class CoreExport sepstream
 
 /** A derived form of sepstream, which separates on commas
  */
-class commasepstream : public sepstream
+class commasepstream final
+	: public sepstream
 {
- public:
+public:
 	/** Initialize with comma separator
 	 */
 	commasepstream(const Anope::string &source, bool allowempty = false) : sepstream(source, ',', allowempty) { }
@@ -645,9 +705,10 @@ class commasepstream : public sepstream
 
 /** A derived form of sepstream, which separates on spaces
  */
-class spacesepstream : public sepstream
+class spacesepstream final
+	: public sepstream
 {
- public:
+public:
 	/** Initialize with space separator
 	 */
 	spacesepstream(const Anope::string &source) : sepstream(source, ' ') { }
@@ -659,19 +720,17 @@ class spacesepstream : public sepstream
  * be loaded. If this happens, the error message returned by ModuleException::GetReason will be displayed to the user
  * attempting to load the module, or dumped to the console if the ircd is currently loading for the first time.
  */
-class CoreException : public std::exception
+class CoreExport CoreException
+	: public std::exception
 {
- protected:
+protected:
 	/** Holds the error message to be displayed
 	 */
 	Anope::string err;
 	/** Source of the exception
 	 */
 	Anope::string source;
- public:
-	/** Default constructor, just uses the error message 'Core threw an exception'.
-	 */
-	CoreException() : err("Core threw an exception"), source("The core") { }
+public:
 	/** This constructor can be used to specify an error message before throwing.
 	 */
 	CoreException(const Anope::string &message) : err(message), source("The core") { }
@@ -683,7 +742,7 @@ class CoreException : public std::exception
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~CoreException() throw() { }
+	virtual ~CoreException() noexcept = default;
 	/** Returns the reason for the exception.
 	 * The module should probably put something informative here as the user will see this upon failure.
 	 */
@@ -698,13 +757,10 @@ class CoreException : public std::exception
 	}
 };
 
-class ModuleException : public CoreException
+class CoreExport ModuleException
+	: public CoreException
 {
- public:
-	/** Default constructor, just uses the error message 'Module threw an exception'.
-	 */
-	ModuleException() : CoreException("Module threw an exception", "A Module") { }
-
+public:
 	/** This constructor can be used to specify an error message before throwing.
 	 */
 	ModuleException(const Anope::string &message) : CoreException(message, "A Module") { }
@@ -712,68 +768,8 @@ class ModuleException : public CoreException
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~ModuleException() throw() { }
+	virtual ~ModuleException() noexcept = default;
 };
-
-class ConvertException : public CoreException
-{
- public:
-	ConvertException(const Anope::string &reason = "") : CoreException(reason) { }
-
-	virtual ~ConvertException() throw() { }
-};
-
-/** Convert something to a string
- */
-template<typename T> inline Anope::string stringify(const T &x)
-{
-	std::ostringstream stream;
-
-	if (!(stream << x))
-		throw ConvertException("Stringify fail");
-
-	return stream.str();
-}
-
-template<typename T> inline void convert(const Anope::string &s, T &x, Anope::string &leftover, bool failIfLeftoverChars = true)
-{
-	leftover.clear();
-	std::istringstream i(s.str());
-	char c;
-	if (!(i >> x))
-		throw ConvertException("Convert fail");
-	if (failIfLeftoverChars)
-	{
-		if (i.get(c))
-			throw ConvertException("Convert fail");
-	}
-	else
-	{
-		std::string left;
-		getline(i, left);
-		leftover = left;
-	}
-}
-
-template<typename T> inline void convert(const Anope::string &s, T &x, bool failIfLeftoverChars = true)
-{
-	Anope::string Unused;
-	convert(s, x, Unused, failIfLeftoverChars);
-}
-
-template<typename T> inline T convertTo(const Anope::string &s, Anope::string &leftover, bool failIfLeftoverChars = true)
-{
-	T x;
-	convert(s, x, leftover, failIfLeftoverChars);
-	return x;
-}
-
-template<typename T> inline T convertTo(const Anope::string &s, bool failIfLeftoverChars = true)
-{
-	T x;
-	convert(s, x, failIfLeftoverChars);
-	return x;
-}
 
 /** Casts to be used instead of dynamic_cast, this uses dynamic_cast
  * for debug builds and static_cast on release builds
@@ -795,4 +791,4 @@ template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
 }
 #endif
 
-#endif // ANOPE_H
+#include "convert.h"

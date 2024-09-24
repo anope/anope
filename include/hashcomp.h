@@ -6,19 +6,11 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef HASHCOMP_H
-#define HASHCOMP_H
+#pragma once
 
 #include <string>
 #include <locale>
-
-#if defined _LIBCPP_VERSION || defined _WIN32
 #include <unordered_map>
-#define TR1NS std
-#else
-#include <tr1/unordered_map>
-#define TR1NS std::tr1
-#endif
 
 #include "services.h"
 
@@ -29,16 +21,17 @@ namespace Anope
 	/* Casemap in use by Anope. ci::string's comparison functions use this (and thus Anope::string) */
 	extern std::locale casemap;
 
-	extern void CaseMapRebuild();
-	extern unsigned char tolower(unsigned char);
-	extern unsigned char toupper(unsigned char);
+	extern CoreExport void CaseMapRebuild();
+	extern CoreExport unsigned char tolower(unsigned char);
+	extern CoreExport unsigned char toupper(unsigned char);
 
 	/* ASCII case insensitive ctype. */
 	template<typename char_type>
-	class ascii_ctype : public std::ctype<char_type>
+	class ascii_ctype
+		: public std::ctype<char_type>
 	{
-	 public:
-		char_type do_toupper(char_type c) const anope_override
+	public:
+		char_type do_toupper(char_type c) const override
 		{
 			if (c >= 'a' && c <= 'z')
 				return c - 32;
@@ -46,7 +39,7 @@ namespace Anope
 				return c;
 		}
 
-		char_type do_tolower(char_type c) const anope_override
+		char_type do_tolower(char_type c) const override
 		{
 			if (c >= 'A' && c <= 'Z')
 				return c + 32;
@@ -57,10 +50,11 @@ namespace Anope
 
 	/* rfc1459 case insensitive ctype, { = [, } = ], and | = \ */
 	template<typename char_type>
-	class rfc1459_ctype : public ascii_ctype<char_type>
+	class rfc1459_ctype final
+		: public ascii_ctype<char_type>
 	{
-	 public:
-		char_type do_toupper(char_type c) const anope_override
+	public:
+		char_type do_toupper(char_type c) const override
 		{
 			if (c == '{' || c == '}' || c == '|')
 				return c - 32;
@@ -68,7 +62,7 @@ namespace Anope
 				return ascii_ctype<char_type>::do_toupper(c);
 		}
 
-		char_type do_tolower(char_type c) const anope_override
+		char_type do_tolower(char_type c) const override
 		{
 			if (c == '[' || c == ']' || c == '\\')
 				return c + 32;
@@ -86,7 +80,8 @@ namespace ci
 	 * This class is used to implement ci::string, a case-insensitive, ASCII-
 	 * comparing string class.
 	 */
-	struct CoreExport ci_char_traits : std::char_traits<char>
+	struct CoreExport ci_char_traits final
+		: std::char_traits<char>
 	{
 		/** Check if two chars match.
 		 * @param c1st First character
@@ -131,7 +126,7 @@ namespace ci
 	 */
 	typedef std::basic_string<char, ci_char_traits, std::allocator<char> > string;
 
-	struct CoreExport less
+	struct CoreExport less final
 	{
 		/** Compare two Anope::strings as ci::strings and find which one is less
 		 * @param s1 The first string
@@ -195,5 +190,3 @@ inline bool operator!=(const std::string &leftval, const ci::string &rightval)
 {
 	return !(leftval.c_str() == rightval);
 }
-
-#endif // HASHCOMP_H

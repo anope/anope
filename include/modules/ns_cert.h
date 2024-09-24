@@ -9,12 +9,14 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#pragma once
+
 struct NSCertList
 {
- protected:
-	NSCertList() { }
- public:
-	virtual ~NSCertList() { }
+protected:
+	NSCertList() = default;
+public:
+	virtual ~NSCertList() = default;
 
 	/** Add an entry to the nick's certificate list
 	 *
@@ -52,6 +54,15 @@ struct NSCertList
 	 */
 	virtual void EraseCert(const Anope::string &entry) = 0;
 
+	/** Replaces a fingerprint in the nick's certificate list
+	 *
+	 * @param oldentry The old fingerprint to remove
+	 * @param newentry The new fingerprint to add
+	 *
+	 * Replaces the specified fingerprint in the cert list.
+	 */
+	virtual void ReplaceCert(const Anope::string &oldentry, const Anope::string &newentry) = 0;
+
 	/** Clears the entire nick's cert list
 	 *
 	 * Deletes all the memory allocated in the certificate list vector and then clears the vector.
@@ -61,10 +72,12 @@ struct NSCertList
 	virtual void Check() = 0;
 };
 
-class CertService : public Service
+class CertService
+	: public Service
 {
- public:
+public:
 	CertService(Module *c) : Service(c, "CertService", "certs") { }
 
-	virtual NickCore* FindAccountFromCert(const Anope::string &cert) = 0;
+	virtual NickCore *FindAccountFromCert(const Anope::string &cert) = 0;
+	virtual void ReplaceCert(const Anope::string &oldcert, const Anope::string &newcert) = 0;
 };

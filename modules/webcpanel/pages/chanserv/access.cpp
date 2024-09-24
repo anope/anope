@@ -6,7 +6,6 @@
  */
 
 #include "../../webcpanel.h"
-#include "utils.h"
 
 WebCPanel::ChanServ::Access::Access(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
@@ -48,16 +47,16 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 	if (u_access.HasPriv("ACCESS_CHANGE") || has_priv)
 	{
-		if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
+		if (!message.get_data["del"].empty() && !message.get_data["mask"].empty())
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);
-			params.push_back("DEL");
+			params.emplace_back("DEL");
 			params.push_back(message.get_data["mask"]);
 
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/access", params, replacements);
 		}
-		else if (message.post_data["mask"].empty() == false && message.post_data["access"].empty() == false && message.post_data["provider"].empty() == false)
+		else if (!message.post_data["mask"].empty() && !message.post_data["access"].empty() && !message.post_data["provider"].empty())
 		{
 			const Anope::string &provider = message.post_data["provider"];
 
@@ -65,7 +64,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 			{
 				std::vector<Anope::string> params;
 				params.push_back(ci->name);
-				params.push_back("ADD");
+				params.emplace_back("ADD");
 				params.push_back(message.post_data["mask"]);
 				params.push_back(message.post_data["access"]);
 
@@ -75,7 +74,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 			{
 				std::vector<Anope::string> params;
 				params.push_back(ci->name);
-				params.push_back("ADD");
+				params.emplace_back("ADD");
 				params.push_back(message.post_data["mask"]);
 
 				WebPanel::RunCommandWithName(client, na->nc, "ChanServ", "chanserv/xop", message.post_data["access"], params, replacements);
@@ -84,7 +83,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 			{
 				std::vector<Anope::string> params;
 				params.push_back(ci->name);
-				params.push_back("MODIFY");
+				params.emplace_back("MODIFY");
 				params.push_back(message.post_data["mask"]);
 				params.push_back(message.post_data["access"]);
 

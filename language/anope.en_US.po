@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-17 19:24+0000\n"
-"PO-Revision-Date: 2023-12-17 19:27+0000\n"
+"POT-Creation-Date: 2024-08-18 03:16+0100\n"
+"PO-Revision-Date: 2024-08-18 03:17+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -45,10 +45,6 @@ msgstr "%s added to %s autokick list."
 #, c-format
 msgid "%s added to %s bad words list."
 msgstr "%s added to %s bad words list."
-
-#, c-format
-msgid "%s added to %s's access list."
-msgstr "%s added to %s's access list."
 
 #, c-format
 msgid "%s added to %s's certificate list."
@@ -187,10 +183,6 @@ msgid "%s deleted from %s bad words list."
 msgstr "%s deleted from %s bad words list."
 
 #, c-format
-msgid "%s deleted from %s's access list."
-msgstr "%s deleted from %s's access list."
-
-#, c-format
 msgid "%s deleted from %s's certificate list."
 msgstr "%s deleted from %s's certificate list."
 
@@ -209,6 +201,10 @@ msgstr "%s deleted from the AKILL list."
 #, c-format
 msgid "%s disabled on channel %s."
 msgstr "%s disabled on channel %s."
+
+#, c-format
+msgid "%s does not wish to be added to channel access lists."
+msgstr "%s does not wish to be added to channel access lists."
 
 #, c-format
 msgid "%s has been invited to %s."
@@ -287,8 +283,8 @@ msgid "%s is not a valid bot or registered channel."
 msgstr "%s is not a valid bot or registered channel."
 
 #, c-format
-msgid "%s is not a valid e-mail address."
-msgstr "%s is not a valid e-mail address."
+msgid "%s is not a valid email address."
+msgstr "%s is not a valid email address."
 
 #, c-format
 msgid "%s is not currently on channel %s."
@@ -341,10 +337,6 @@ msgstr "%s not found on %s autokick list."
 #, c-format
 msgid "%s not found on %s bad words list."
 msgstr "%s not found on %s bad words list."
-
-#, c-format
-msgid "%s not found on %s's access list."
-msgstr "%s not found on %s's access list."
 
 #, c-format
 msgid "%s not found on %s's certificate list."
@@ -492,9 +484,6 @@ msgstr "channel"
 msgid "channel bantype"
 msgstr "channel bantype"
 
-msgid "channel channel"
-msgstr "channel channel"
-
 msgid "channel command method [status]"
 msgstr "channel command method [status]"
 
@@ -525,11 +514,11 @@ msgstr "channel user reason"
 msgid "channel what"
 msgstr "channel what"
 
-msgid "channel ADD mask"
-msgstr "channel ADD mask"
+msgid "channel ADD mask level [description]"
+msgstr "channel ADD mask level [description]"
 
-msgid "channel ADD mask level"
-msgstr "channel ADD mask level"
+msgid "channel ADD mask [description]"
+msgstr "channel ADD mask [description]"
 
 msgid "channel ADD message"
 msgstr "channel ADD message"
@@ -597,6 +586,9 @@ msgstr "channel VIEW [mask | entry-num | list]"
 msgid "channel VIEW [mask | list]"
 msgstr "channel VIEW [mask | list]"
 
+msgid "channel [code]"
+msgstr "channel [code]"
+
 msgid "channel [description]"
 msgstr "channel [description]"
 
@@ -615,8 +607,8 @@ msgstr "channel [+expiry] [reason]"
 msgid "channel [+expiry] {nick | mask} [reason]"
 msgstr "channel [+expiry] {nick | mask} [reason]"
 
-msgid "channel [MODIFY] mask changes"
-msgstr "channel [MODIFY] mask changes"
+msgid "channel [MODIFY] mask changes [description]"
+msgstr "channel [MODIFY] mask changes [description]"
 
 msgid "channel [SET] [topic]"
 msgstr "channel [SET] [topic]"
@@ -678,9 +670,6 @@ msgstr "nick channel"
 msgid "nick channel [reason]"
 msgstr "nick channel [reason]"
 
-msgid "nick flags"
-msgstr "nick flags"
-
 msgid "nick hostmask"
 msgstr "nick hostmask"
 
@@ -710,6 +699,9 @@ msgstr "nickname new-display"
 
 msgid "nickname new-password"
 msgstr "nickname new-password"
+
+msgid "nickname [code]"
+msgstr "nickname [code]"
 
 msgid "nickname [parameter]"
 msgstr "nickname [parameter]"
@@ -764,6 +756,9 @@ msgstr "pattern [SUSPENDED] [NOEXPIRE]"
 
 msgid "pattern [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"
 msgstr "pattern [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"
+
+msgid "server [message]"
+msgstr "server [message]"
 
 msgid "server [reason]"
 msgstr "server [reason]"
@@ -839,12 +834,12 @@ msgid ""
 " \n"
 "Accounts that are not used anymore are subject to\n"
 "the automatic expiration, i.e. they will be deleted\n"
-"after %d days if not used."
+"after %lu days if not used."
 msgstr ""
 " \n"
 "Accounts that are not used anymore are subject to\n"
 "the automatic expiration, i.e. they will be deleted\n"
-"after %d days if not used."
+"after %lu days if not used."
 
 msgid ""
 " \n"
@@ -871,9 +866,9 @@ msgid ""
 "fantasy commands on a channel when prefixed\n"
 "with one of the following fantasy characters: %s\n"
 " \n"
-"Note that users wanting to use fantaisist\n"
-"commands MUST have enough access for both\n"
-"the FANTASIA and the command they are executing."
+"Note that users wanting to use fantasy commands\n"
+"MUST have enough access for both the FANTASY\n"
+"privilege and the command they are executing."
 msgstr ""
 " \n"
 "Enables or disables fantasy mode on a channel.\n"
@@ -881,9 +876,9 @@ msgstr ""
 "fantasy commands on a channel when prefixed\n"
 "with one of the following fantasy characters: %s\n"
 " \n"
-"Note that users wanting to use fantaisist\n"
-"commands MUST have enough access for both\n"
-"the FANTASIA and the command they are executing."
+"Note that users wanting to use fantasy commands\n"
+"MUST have enough access for both the FANTASY\n"
+"privilege and the command they are executing."
 
 msgid ""
 " \n"
@@ -940,12 +935,12 @@ msgstr ""
 #, c-format
 msgid ""
 " \n"
-"Note that any channel which is not used for %d days\n"
+"Note that any channel which is not used for %lu days\n"
 "(i.e. which no user on the channel's access list enters\n"
 "for that period of time) will be automatically dropped."
 msgstr ""
 " \n"
-"Note that any channel which is not used for %d days\n"
+"Note that any channel which is not used for %lu days\n"
 "(i.e. which no user on the channel's access list enters\n"
 "for that period of time) will be automatically dropped."
 
@@ -1266,11 +1261,11 @@ msgid "%-8s %s"
 msgstr "%-8s %s"
 
 #, c-format
-msgid "%2lu %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
-msgstr "%2lu %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
+msgid "%2d %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
+msgstr "%2d %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
 
-msgid "%b %d %H:%M:%S %Y %Z"
-msgstr "%b %d %H:%M:%S %Y %Z"
+msgid "%b %d %Y %H:%M:%S %Z"
+msgstr "%b %d %Y %H:%M:%S %Z"
 
 #, c-format
 msgid "%c is an unknown status mode."
@@ -1295,10 +1290,6 @@ msgstr "%d bots available."
 #, c-format
 msgid "%d modules loaded."
 msgstr "%d modules loaded."
-
-#, c-format
-msgid "%d nickname(s) in the group."
-msgstr "%d nickname(s) in the group."
 
 #, c-format
 msgid "%lu nicks are stored in the database, using %.2Lf kB of memory."
@@ -1397,6 +1388,14 @@ msgid "%s bad words list is empty."
 msgstr "%s bad words list is empty."
 
 #, c-format
+msgid "%s can no longer be added to channel access lists."
+msgstr "%s can no longer be added to channel access lists."
+
+#, c-format
+msgid "%s can now be added to channel access lists."
+msgstr "%s can now be added to channel access lists."
+
+#, c-format
 msgid "%s cannot be the successor on channel %s as they are the founder."
 msgstr "%s cannot be the successor on channel %s as they are the founder."
 
@@ -1409,20 +1408,20 @@ msgid "%s coverage is too wide; Please use a more specific mask."
 msgstr "%s coverage is too wide; Please use a more specific mask."
 
 #, c-format
-msgid "%s currently has %d memos, of which %d are unread."
-msgstr "%s currently has %d memos, of which %d are unread."
+msgid "%s currently has %zu memos, of which %zu are unread."
+msgstr "%s currently has %zu memos, of which %zu are unread."
 
 #, c-format
-msgid "%s currently has %d memos, of which 1 is unread."
-msgstr "%s currently has %d memos, of which 1 is unread."
+msgid "%s currently has %zu memos, of which 1 is unread."
+msgstr "%s currently has %zu memos, of which 1 is unread."
 
 #, c-format
-msgid "%s currently has %d memos."
-msgstr "%s currently has %d memos."
+msgid "%s currently has %zu memos."
+msgstr "%s currently has %zu memos."
 
 #, c-format
-msgid "%s currently has %d memos; all of them are unread."
-msgstr "%s currently has %d memos; all of them are unread."
+msgid "%s currently has %zu memos; all of them are unread."
+msgstr "%s currently has %zu memos; all of them are unread."
 
 #, c-format
 msgid "%s currently has 1 memo, and it has not yet been read."
@@ -1601,10 +1600,6 @@ msgid "%s!%s@%s (%s) added to the bot list."
 msgstr "%s!%s@%s (%s) added to the bot list."
 
 #, c-format
-msgid "%s's access list is empty."
-msgstr "%s's access list is empty."
-
-#, c-format
 msgid "%s's auto join list is empty."
 msgstr "%s's auto join list is empty."
 
@@ -1623,6 +1618,10 @@ msgstr "%s's memo limit is %d, and may not be changed."
 #, c-format
 msgid "%s's memo limit is %d."
 msgstr "%s's memo limit is %d."
+
+#, c-format
+msgid "%zu nickname(s) in the group."
+msgstr "%zu nickname(s) in the group."
 
 #, c-format
 msgid "(%s ago)"
@@ -1692,8 +1691,8 @@ msgid "<unknown>"
 msgstr "<unknown>"
 
 #, c-format
-msgid "A confirmation e-mail has been sent to %s. Follow the instructions in it to change your e-mail address."
-msgstr "A confirmation e-mail has been sent to %s. Follow the instructions in it to change your e-mail address."
+msgid "A confirmation email has been sent to %s. Follow the instructions in it to change your email address."
+msgstr "A confirmation email has been sent to %s. Follow the instructions in it to change your email address."
 
 msgid "A massmemo has been sent to all registered users."
 msgstr "A massmemo has been sent to all registered users."
@@ -1712,14 +1711,17 @@ msgstr ""
 "A notification memo has been sent to %s informing them you have\n"
 "read their memo."
 
-msgid "A vHost ident must be in the format of a valid ident."
-msgstr "A vHost ident must be in the format of a valid ident."
+msgid "A vhost must be in the format of a valid hostname."
+msgstr "A vhost must be in the format of a valid hostname."
 
-msgid "A vHost must be in the format of a valid hostname."
-msgstr "A vHost must be in the format of a valid hostname."
+msgid "A vident must be in the format of a valid ident."
+msgstr "A vident must be in the format of a valid ident."
 
 msgid "ADD expiry {nick|mask} [reason]"
 msgstr "ADD expiry {nick|mask} [reason]"
+
+msgid "ADD message"
+msgstr "ADD message"
 
 msgid "ADD oper type"
 msgstr "ADD oper type"
@@ -1735,9 +1737,6 @@ msgstr "ADD [+expiry] mask limit reason"
 
 msgid "ADD [nickname] channel [key]"
 msgstr "ADD [nickname] channel [key]"
-
-msgid "ADD [nickname] mask"
-msgstr "ADD [nickname] mask"
 
 msgid "ADD [nickname] [fingerprint]"
 msgstr "ADD [nickname] [fingerprint]"
@@ -1813,11 +1812,17 @@ msgstr "Account"
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "Account %s has already reached the maximum number of simultaneous logins (%u)."
 
-msgid "Activate security features"
-msgstr "Activate security features"
+msgid "Account id"
+msgstr "Account id"
 
-msgid "Activate the requested vHost for the given nick."
-msgstr "Activate the requested vHost for the given nick."
+msgid "Account registered"
+msgstr "Account registered"
+
+msgid "Accounts can not be registered right now. Please try again later."
+msgstr "Accounts can not be registered right now. Please try again later."
+
+msgid "Activate the requested vhost for the given nick."
+msgstr "Activate the requested vhost for the given nick."
 
 msgid ""
 "Activates the vhost currently assigned to the nick in use.\n"
@@ -1877,11 +1882,25 @@ msgstr ""
 "SET permission."
 
 msgid ""
+"Additionally, Services Operators with the chanserv/drop/override permission can\n"
+"replace code with OVERRIDE to drop without a confirmation code."
+msgstr ""
+"Additionally, Services Operators with the chanserv/drop/override permission can\n"
+"replace code with OVERRIDE to drop without a confirmation code."
+
+msgid ""
 "Additionally, Services Operators with the nickserv/confirm permission can\n"
 "replace passcode with a users nick to force validate them."
 msgstr ""
 "Additionally, Services Operators with the nickserv/confirm permission can\n"
 "replace passcode with a users nick to force validate them."
+
+msgid ""
+"Additionally, Services Operators with the nickserv/drop/override permission can\n"
+"replace code with OVERRIDE to drop without a confirmation code."
+msgstr ""
+"Additionally, Services Operators with the nickserv/drop/override permission can\n"
+"replace code with OVERRIDE to drop without a confirmation code."
 
 #, c-format
 msgid ""
@@ -1952,36 +1971,32 @@ msgstr "All user modes on %s have been synced."
 msgid "All vhosts in the group %s have been set to %s."
 msgstr "All vhosts in the group %s have been set to %s."
 
-#, c-format
-msgid "All vhosts in the group %s have been set to %s@%s."
-msgstr "All vhosts in the group %s have been set to %s@%s."
-
-msgid "Allowed to (de)halfop him/herself"
-msgstr "Allowed to (de)halfop him/herself"
+msgid "Allowed to (de)halfop themself"
+msgstr "Allowed to (de)halfop themself"
 
 msgid "Allowed to (de)halfop users"
 msgstr "Allowed to (de)halfop users"
 
-msgid "Allowed to (de)op him/herself"
-msgstr "Allowed to (de)op him/herself"
+msgid "Allowed to (de)op themself"
+msgstr "Allowed to (de)op themself"
 
 msgid "Allowed to (de)op users"
 msgstr "Allowed to (de)op users"
 
-msgid "Allowed to (de)owner him/herself"
-msgstr "Allowed to (de)owner him/herself"
+msgid "Allowed to (de)owner themself"
+msgstr "Allowed to (de)owner themself"
 
 msgid "Allowed to (de)owner users"
 msgstr "Allowed to (de)owner users"
 
-msgid "Allowed to (de)protect him/herself"
-msgstr "Allowed to (de)protect him/herself"
+msgid "Allowed to (de)protect themself"
+msgstr "Allowed to (de)protect themself"
 
 msgid "Allowed to (de)protect users"
 msgstr "Allowed to (de)protect users"
 
-msgid "Allowed to (de)voice him/herself"
-msgstr "Allowed to (de)voice him/herself"
+msgid "Allowed to (de)voice themself"
+msgstr "Allowed to (de)voice themself"
 
 msgid "Allowed to (de)voice users"
 msgstr "Allowed to (de)voice users"
@@ -2013,6 +2028,9 @@ msgstr "Allowed to read channel memos"
 msgid "Allowed to set channel settings"
 msgstr "Allowed to set channel settings"
 
+msgid "Allowed to unban themself"
+msgstr "Allowed to unban themself"
+
 msgid "Allowed to unban users"
 msgstr "Allowed to unban users"
 
@@ -2040,14 +2058,6 @@ msgstr "Allowed to use the MODE command"
 msgid "Allowed to view the access list"
 msgstr "Allowed to view the access list"
 
-#, c-format
-msgid ""
-"Allows Administrators to send messages to all users on the\n"
-"network. The message will be sent from the nick %s."
-msgstr ""
-"Allows Administrators to send messages to all users on the\n"
-"network. The message will be sent from the nick %s."
-
 msgid ""
 "Allows Services Operators to change modes for any channel.\n"
 "Parameters are the same as for the standard /MODE command.\n"
@@ -2104,34 +2114,25 @@ msgstr ""
 "using the nick, they will be killed."
 
 msgid ""
-"Allows Services Operators to give Operflags to any user.\n"
-"Flags have to be prefixed with a \"+\" or a \"-\". To\n"
-"remove all flags simply type a \"-\" instead of any flags."
-msgstr ""
-"Allows Services Operators to give Operflags to any user.\n"
-"Flags have to be prefixed with a \"+\" or a \"-\". To\n"
-"remove all flags simply type a \"-\" instead of any flags."
-
-msgid ""
-"Allows Services Operators to make Services ignore a nick or mask\n"
+"Allows Services Operators to make services ignore a nick or mask\n"
 "for a certain time or until the next restart. The default\n"
 "time format is seconds. You can specify it by using units.\n"
 "Valid units are: s for seconds, m for minutes,\n"
 "h for hours and d for days.\n"
 "Combinations of these units are not permitted.\n"
-"To make Services permanently ignore the user, type 0 as time.\n"
+"To make services permanently ignore the user, type 0 as time.\n"
 "When adding a mask, it should be in the format nick!user@host,\n"
 "everything else will be considered a nick. Wildcards are permitted.\n"
 " \n"
 "Ignores will not be enforced on IRC Operators."
 msgstr ""
-"Allows Services Operators to make Services ignore a nick or mask\n"
+"Allows Services Operators to make services ignore a nick or mask\n"
 "for a certain time or until the next restart. The default\n"
 "time format is seconds. You can specify it by using units.\n"
 "Valid units are: s for seconds, m for minutes,\n"
 "h for hours and d for days.\n"
 "Combinations of these units are not permitted.\n"
-"To make Services permanently ignore the user, type 0 as time.\n"
+"To make services permanently ignore the user, type 0 as time.\n"
 "When adding a mask, it should be in the format nick!user@host,\n"
 "everything else will be considered a nick. Wildcards are permitted.\n"
 " \n"
@@ -2139,7 +2140,7 @@ msgstr ""
 
 msgid ""
 "Allows Services Operators to manipulate the AKILL list. If\n"
-"a user matching an AKILL mask attempts to connect, Services\n"
+"a user matching an AKILL mask attempts to connect, services\n"
 "will issue a KILL for that user and, on supported server\n"
 "types, will instruct all servers to add a ban for the mask\n"
 "which the user matched.\n"
@@ -2160,7 +2161,7 @@ msgid ""
 "STATS AKILL command."
 msgstr ""
 "Allows Services Operators to manipulate the AKILL list. If\n"
-"a user matching an AKILL mask attempts to connect, Services\n"
+"a user matching an AKILL mask attempts to connect, services\n"
 "will issue a KILL for that user and, on supported server\n"
 "types, will instruct all servers to add a ban for the mask\n"
 "which the user matched.\n"
@@ -2183,18 +2184,18 @@ msgstr ""
 msgid ""
 "Allows Services Operators to manipulate the SNLINE list.  If\n"
 "a user with a realname matching an SNLINE mask attempts to\n"
-"connect, Services will not allow them to pursue their IRC\n"
+"connect, services will not allow them to pursue their IRC\n"
 "session."
 msgstr ""
 "Allows Services Operators to manipulate the SNLINE list.  If\n"
 "a user with a realname matching an SNLINE mask attempts to\n"
-"connect, Services will not allow them to pursue their IRC\n"
+"connect, services will not allow them to pursue their IRC\n"
 "session."
 
 msgid ""
 "Allows Services Operators to manipulate the SQLINE list.  If\n"
 "a user with a nick matching an SQLINE mask attempts to\n"
-"connect, Services will not allow them to pursue their IRC\n"
+"connect, services will not allow them to pursue their IRC\n"
 "session.\n"
 "If the first character of the mask is #, services will\n"
 "prevent the use of matching channels. If the mask is a\n"
@@ -2203,7 +2204,7 @@ msgid ""
 msgstr ""
 "Allows Services Operators to manipulate the SQLINE list.  If\n"
 "a user with a nick matching an SQLINE mask attempts to\n"
-"connect, Services will not allow them to pursue their IRC\n"
+"connect, services will not allow them to pursue their IRC\n"
 "session.\n"
 "If the first character of the mask is #, services will\n"
 "prevent the use of matching channels. If the mask is a\n"
@@ -2279,6 +2280,51 @@ msgstr ""
 "topic lock is set, the channel topic will be unchangeable by users who do not have\n"
 "the TOPIC privilege."
 
+msgid ""
+"Allows queueing messages to send to users on the network.\n"
+"\n"
+"The QUEUE ADD command adds the given message to the message queue.\n"
+"The QUEUE CLEAR command clears the message queue.\n"
+"The QUEUE DEL command removes the specified message from the message queue. The\n"
+"message number can be obtained from the output of the QUEUE LIST command.\n"
+"The QUEUE LIST command lists all messages that are currently in the message queue."
+msgstr ""
+"Allows queueing messages to send to users on the network.\n"
+"\n"
+"The QUEUE ADD command adds the given message to the message queue.\n"
+"The QUEUE CLEAR command clears the message queue.\n"
+"The QUEUE DEL command removes the specified message from the message queue. The\n"
+"message number can be obtained from the output of the QUEUE LIST command.\n"
+"The QUEUE LIST command lists all messages that are currently in the message queue."
+
+#, c-format
+msgid ""
+"Allows sending messages to all users on a server. The message will be sent\n"
+"from %s.\n"
+"\n"
+"You can either send a message by specifying it as a parameter or provide no\n"
+"parameters to send a previously queued message.\n"
+msgstr ""
+"Allows sending messages to all users on a server. The message will be sent\n"
+"from %s.\n"
+"\n"
+"You can either send a message by specifying it as a parameter or provide no\n"
+"parameters to send a previously queued message.\n"
+
+#, c-format
+msgid ""
+"Allows sending messages to all users on the network. The message will be sent\n"
+"from %s.\n"
+"\n"
+"You can either send a message by specifying it as a parameter or provide no\n"
+"parameters to send a previously queued message.\n"
+msgstr ""
+"Allows sending messages to all users on the network. The message will be sent\n"
+"from %s.\n"
+"\n"
+"You can either send a message by specifying it as a parameter or provide no\n"
+"parameters to send a previously queued message.\n"
+
 #, c-format
 msgid ""
 "Allows staff to kick a user from any channel.\n"
@@ -2333,22 +2379,22 @@ msgstr ""
 "     MODIFY nickserv forcemail no"
 
 msgid ""
-"Allows you to choose the way Services are communicating with\n"
-"the given user. With MSG set, Services will use messages,\n"
+"Allows you to choose the way services are communicating with\n"
+"the given user. With MSG set, services will use messages,\n"
 "else they'll use notices."
 msgstr ""
-"Allows you to choose the way Services are communicating with\n"
-"the given user. With MSG set, Services will use messages,\n"
+"Allows you to choose the way services are communicating with\n"
+"the given user. With MSG set, services will use messages,\n"
 "else they'll use notices."
 
 #, c-format
 msgid ""
-"Allows you to choose the way Services are communicating with\n"
-"you. With %s set, Services will use messages, else they'll\n"
+"Allows you to choose the way services are communicating with\n"
+"you. With %s set, services will use messages, else they'll\n"
 "use notices."
 msgstr ""
-"Allows you to choose the way Services are communicating with\n"
-"you. With %s set, Services will use messages, else they'll\n"
+"Allows you to choose the way services are communicating with\n"
+"you. With %s set, services will use messages, else they'll\n"
 "use notices."
 
 msgid ""
@@ -2375,7 +2421,7 @@ msgstr ""
 msgid ""
 "Allows you to prevent certain pieces of information from\n"
 "being displayed when someone does a %s INFO on the\n"
-"nick.  You can hide the E-mail address (EMAIL), last seen\n"
+"nick.  You can hide the email address (EMAIL), last seen\n"
 "user@host mask (USERMASK), the services access status\n"
 "(STATUS) and last quit message (QUIT).\n"
 "The second parameter specifies whether the information should\n"
@@ -2383,7 +2429,7 @@ msgid ""
 msgstr ""
 "Allows you to prevent certain pieces of information from\n"
 "being displayed when someone does a %s INFO on the\n"
-"nick.  You can hide the E-mail address (EMAIL), last seen\n"
+"nick.  You can hide the email address (EMAIL), last seen\n"
 "user@host mask (USERMASK), the services access status\n"
 "(STATUS) and last quit message (QUIT).\n"
 "The second parameter specifies whether the information should\n"
@@ -2393,7 +2439,7 @@ msgstr ""
 msgid ""
 "Allows you to prevent certain pieces of information from\n"
 "being displayed when someone does a %s INFO on your\n"
-"nick.  You can hide your E-mail address (EMAIL), last seen\n"
+"nick.  You can hide your email address (EMAIL), last seen\n"
 "user@host mask (USERMASK), your services access status\n"
 "(STATUS) and last quit message (QUIT).\n"
 "The second parameter specifies whether the information should\n"
@@ -2401,7 +2447,7 @@ msgid ""
 msgstr ""
 "Allows you to prevent certain pieces of information from\n"
 "being displayed when someone does a %s INFO on your\n"
-"nick.  You can hide your E-mail address (EMAIL), last seen\n"
+"nick.  You can hide your email address (EMAIL), last seen\n"
 "user@host mask (USERMASK), your services access status\n"
 "(STATUS) and last quit message (QUIT).\n"
 "The second parameter specifies whether the information should\n"
@@ -2432,8 +2478,8 @@ msgstr ""
 "Alternative methods of modifying channel access lists are\n"
 "available."
 
-msgid "Approve the requested vHost of a user"
-msgstr "Approve the requested vHost of a user"
+msgid "Approve the requested vhost of a user"
+msgstr "Approve the requested vhost of a user"
 
 msgid "As a Services Operator, you may drop any nick."
 msgstr "As a Services Operator, you may drop any nick."
@@ -2462,24 +2508,24 @@ msgstr "Associate a URL with your account"
 msgid "Associate a greet message with your nickname"
 msgstr "Associate a greet message with your nickname"
 
-msgid "Associate an E-mail address with the channel"
-msgstr "Associate an E-mail address with the channel"
+msgid "Associate an email address with the channel"
+msgstr "Associate an email address with the channel"
 
-msgid "Associate an E-mail address with your nickname"
-msgstr "Associate an E-mail address with your nickname"
+msgid "Associate an email address with your nickname"
+msgstr "Associate an email address with your nickname"
 
 msgid "Associate oper info with a nick or channel"
 msgstr "Associate oper info with a nick or channel"
 
-msgid "Associates the given E-mail address with the nickname."
-msgstr "Associates the given E-mail address with the nickname."
+msgid "Associates the given email address with the nickname."
+msgstr "Associates the given email address with the nickname."
 
 msgid ""
-"Associates the given E-mail address with your nickname.\n"
+"Associates the given email address with your nickname.\n"
 "This address will be displayed whenever someone requests\n"
 "information on the nickname with the INFO command."
 msgstr ""
-"Associates the given E-mail address with your nickname.\n"
+"Associates the given email address with your nickname.\n"
 "This address will be displayed whenever someone requests\n"
 "information on the nickname with the INFO command."
 
@@ -2624,15 +2670,15 @@ msgid "Bot bans will no longer automatically expire."
 msgstr "Bot bans will no longer automatically expire."
 
 #, c-format
-msgid "Bot hosts may only be %d characters long."
-msgstr "Bot hosts may only be %d characters long."
+msgid "Bot hosts may only be %zu characters long."
+msgstr "Bot hosts may only be %zu characters long."
 
 msgid "Bot hosts may only contain valid host characters."
 msgstr "Bot hosts may only contain valid host characters."
 
 #, c-format
-msgid "Bot idents may only be %d characters long."
-msgstr "Bot idents may only be %d characters long."
+msgid "Bot idents may only be %zu characters long."
+msgstr "Bot idents may only be %zu characters long."
 
 msgid "Bot idents may only contain valid ident characters."
 msgstr "Bot idents may only contain valid ident characters."
@@ -2648,8 +2694,8 @@ msgid "Bot nick"
 msgstr "Bot nick"
 
 #, c-format
-msgid "Bot nicks may only be %d characters long."
-msgstr "Bot nicks may only be %d characters long."
+msgid "Bot nicks may only be %zu characters long."
+msgstr "Bot nicks may only be %zu characters long."
 
 msgid "Bot nicks may only contain valid nick characters."
 msgstr "Bot nicks may only contain valid nick characters."
@@ -2781,42 +2827,42 @@ msgid "Caps kicker"
 msgstr "Caps kicker"
 
 msgid ""
-"Causes Services to do an immediate shutdown; databases are\n"
+"Causes services to do an immediate shutdown; databases are\n"
 "not saved.  This command should not be used unless\n"
 "damage to the in-memory copies of the databases is feared\n"
 "and they should not be saved."
 msgstr ""
-"Causes Services to do an immediate shutdown; databases are\n"
+"Causes services to do an immediate shutdown; databases are\n"
 "not saved.  This command should not be used unless\n"
 "damage to the in-memory copies of the databases is feared\n"
 "and they should not be saved."
 
 msgid ""
-"Causes Services to reload the configuration file. Note that\n"
-"some directives still need the restart of the Services to\n"
-"take effect (such as Services' nicknames, activation of the\n"
+"Causes services to reload the configuration file. Note that\n"
+"some directives still need the restart of the services to\n"
+"take effect (such as services' nicknames, activation of the\n"
 "session limitation, etc.)."
 msgstr ""
-"Causes Services to reload the configuration file. Note that\n"
-"some directives still need the restart of the Services to\n"
-"take effect (such as Services' nicknames, activation of the\n"
+"Causes services to reload the configuration file. Note that\n"
+"some directives still need the restart of the services to\n"
+"take effect (such as services' nicknames, activation of the\n"
 "session limitation, etc.)."
 
 msgid ""
-"Causes Services to save all databases and then restart\n"
+"Causes services to save all databases and then restart\n"
 "(i.e. exit and immediately re-run the executable)."
 msgstr ""
-"Causes Services to save all databases and then restart\n"
+"Causes services to save all databases and then restart\n"
 "(i.e. exit and immediately re-run the executable)."
 
-msgid "Causes Services to save all databases and then shut down."
-msgstr "Causes Services to save all databases and then shut down."
+msgid "Causes services to save all databases and then shut down."
+msgstr "Causes services to save all databases and then shut down."
 
 msgid ""
-"Causes Services to update all database files as soon as you\n"
+"Causes services to update all database files as soon as you\n"
 "send the command."
 msgstr ""
-"Causes Services to update all database files as soon as you\n"
+"Causes services to update all database files as soon as you\n"
 "send the command."
 
 #, c-format
@@ -2829,8 +2875,8 @@ msgstr "ChanServ is required to enable persist on this network."
 msgid "Change channel modes"
 msgstr "Change channel modes"
 
-msgid "Change the communication method of Services"
-msgstr "Change the communication method of Services"
+msgid "Change the communication method of services"
+msgstr "Change the communication method of services"
 
 msgid "Change user modes"
 msgstr "Change user modes"
@@ -2841,17 +2887,17 @@ msgstr "Changed usermodes of %s to %s."
 
 msgid ""
 "Changes the display used to refer to the nickname group in\n"
-"Services. The new display MUST be a nick of the group."
+"services. The new display MUST be a nick of the group."
 msgstr ""
 "Changes the display used to refer to the nickname group in\n"
-"Services. The new display MUST be a nick of the group."
+"services. The new display MUST be a nick of the group."
 
 msgid ""
 "Changes the display used to refer to your nickname group in\n"
-"Services. The new display MUST be a nick of your group."
+"services. The new display MUST be a nick of your group."
 msgstr ""
 "Changes the display used to refer to your nickname group in\n"
-"Services. The new display MUST be a nick of your group."
+"services. The new display MUST be a nick of your group."
 
 msgid ""
 "Changes the founder of a channel. The new nickname must\n"
@@ -2861,23 +2907,23 @@ msgstr ""
 "be a registered one."
 
 msgid ""
-"Changes the language Services uses when sending messages to\n"
+"Changes the language services uses when sending messages to\n"
 "the given user (for example, when responding to a command they send).\n"
 "language should be chosen from the following list of\n"
 "supported languages:"
 msgstr ""
-"Changes the language Services uses when sending messages to\n"
+"Changes the language services uses when sending messages to\n"
 "the given user (for example, when responding to a command they send).\n"
 "language should be chosen from the following list of\n"
 "supported languages:"
 
 msgid ""
-"Changes the language Services uses when sending messages to\n"
+"Changes the language services uses when sending messages to\n"
 "you (for example, when responding to a command you send).\n"
 "language should be chosen from the following list of\n"
 "supported languages:"
 msgstr ""
-"Changes the language Services uses when sending messages to\n"
+"Changes the language services uses when sending messages to\n"
 "you (for example, when responding to a command you send).\n"
 "language should be chosen from the following list of\n"
 "supported languages:"
@@ -3013,8 +3059,8 @@ msgid "Channels that %s has access on:"
 msgstr "Channels that %s has access on:"
 
 #, c-format
-msgid "Channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Channels: %lu entries, %lu buckets, longest chain is %d"
+msgid "Channels: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Channels: %zu entries, %zu buckets, longest chain is %zu"
 
 msgid "Chanstats"
 msgstr "Chanstats"
@@ -3165,20 +3211,23 @@ msgid "Current module list:"
 msgstr "Current module list:"
 
 #, c-format
-msgid "Current number of AKILLs: %d"
-msgstr "Current number of AKILLs: %d"
+msgid "Current number of AKILLs: %zu"
+msgstr "Current number of AKILLs: %zu"
 
 #, c-format
-msgid "Current number of SNLINEs: %d"
-msgstr "Current number of SNLINEs: %d"
+msgid "Current number of SNLINEs: %zu"
+msgstr "Current number of SNLINEs: %zu"
 
 #, c-format
-msgid "Current number of SQLINEs: %d"
-msgstr "Current number of SQLINEs: %d"
+msgid "Current number of SQLINEs: %zu"
+msgstr "Current number of SQLINEs: %zu"
 
 #, c-format
-msgid "Current users: %d (%d ops)"
-msgstr "Current users: %d (%d ops)"
+msgid "Current users: %zu (%d ops)"
+msgstr "Current users: %zu (%d ops)"
+
+msgid "DEL entry-num"
+msgstr "DEL entry-num"
 
 msgid "DEL oper"
 msgstr "DEL oper"
@@ -3191,9 +3240,6 @@ msgstr "DEL [nickname] channel"
 
 msgid "DEL [nickname] fingerprint"
 msgstr "DEL [nickname] fingerprint"
-
-msgid "DEL [nickname] mask"
-msgstr "DEL [nickname] mask"
 
 msgid "DEL {mask | entry-num | list | id}"
 msgstr "DEL {mask | entry-num | list | id}"
@@ -3357,6 +3403,10 @@ msgid "Deleted %d entries from the AKILL list."
 msgstr "Deleted %d entries from the AKILL list."
 
 #, c-format
+msgid "Deleted %u entries from your message queue."
+msgstr "Deleted %u entries from your message queue."
+
+#, c-format
 msgid "Deleted 1 entry from %s access list."
 msgstr "Deleted 1 entry from %s access list."
 
@@ -3385,6 +3435,9 @@ msgstr "Deleted info from %s."
 #, c-format
 msgid "Deleted one entry from %s %s list."
 msgstr "Deleted one entry from %s %s list."
+
+msgid "Deleted one entry from your message queue."
+msgstr "Deleted one entry from your message queue."
 
 msgid ""
 "Deletes the specified memo or memos. You can supply\n"
@@ -3564,18 +3617,6 @@ msgstr ""
 "this nick."
 
 #, c-format
-msgid "E-mail address for %s changed to %s."
-msgstr "E-mail address for %s changed to %s."
-
-#, c-format
-msgid "E-mail address for %s unset."
-msgstr "E-mail address for %s unset."
-
-#, c-format
-msgid "E-mail for %s is invalid."
-msgstr "E-mail for %s is invalid."
-
-#, c-format
 msgid ""
 "Edits or displays the list of logon news messages.  When a\n"
 "user connects to the network, these messages will be sent\n"
@@ -3616,11 +3657,23 @@ msgid "Email address"
 msgstr "Email address"
 
 #, c-format
+msgid "Email address for %s changed to %s."
+msgstr "Email address for %s changed to %s."
+
+#, c-format
+msgid "Email address for %s unset."
+msgstr "Email address for %s unset."
+
+#, c-format
+msgid "Email for %s is invalid."
+msgstr "Email for %s is invalid."
+
+#, c-format
 msgid "Email matched: %s (%s) to %s."
 msgstr "Email matched: %s (%s) to %s."
 
-msgid "Enable fantaisist commands"
-msgstr "Enable fantaisist commands"
+msgid "Enable fantasy commands"
+msgstr "Enable fantasy commands"
 
 msgid "Enable greet messages"
 msgstr "Enable greet messages"
@@ -3667,17 +3720,6 @@ msgstr ""
 "Enables or disables keepmodes for your nick. If keep\n"
 "modes is enabled, services will remember your usermodes\n"
 "and attempt to re-set them the next time you authenticate."
-
-msgid ""
-"Enables or disables security features for a\n"
-"channel. When SECURE is set, only users who have\n"
-"identified to services, and are not only recognized, will be\n"
-"given access to channels from account-based access entries."
-msgstr ""
-"Enables or disables security features for a\n"
-"channel. When SECURE is set, only users who have\n"
-"identified to services, and are not only recognized, will be\n"
-"given access to channels from account-based access entries."
 
 msgid ""
 "Enables or disables signed kicks for a\n"
@@ -3830,8 +3872,8 @@ msgid "End of entry message list."
 msgstr "End of entry message list."
 
 #, c-format
-msgid "End of forbid list - %d/%d entries shown."
-msgstr "End of forbid list - %d/%d entries shown."
+msgid "End of forbid list - %zu/%zu entries shown."
+msgstr "End of forbid list - %zu/%zu entries shown."
 
 msgid "End of forbid list."
 msgstr "End of forbid list."
@@ -3915,12 +3957,12 @@ msgid "Error reloading configuration file: %s"
 msgstr "Error reloading configuration file: %s"
 
 #, c-format
-msgid "Error! The vHost ident is too long, please use an ident shorter than %d characters."
-msgstr "Error! The vHost ident is too long, please use an ident shorter than %d characters."
+msgid "Error! The vhost is too long, please use a hostname shorter than %zu characters."
+msgstr "Error! The vhost is too long, please use a hostname shorter than %zu characters."
 
 #, c-format
-msgid "Error! The vHost is too long, please use a hostname shorter than %d characters."
-msgstr "Error! The vHost is too long, please use a hostname shorter than %d characters."
+msgid "Error! The vident is too long, please use an ident shorter than %zu characters."
+msgstr "Error! The vident is too long, please use an ident shorter than %zu characters."
 
 msgid ""
 "Examples:\n"
@@ -4020,8 +4062,8 @@ msgstr "Forbid on %s was not found."
 msgid "Forbid usage of nicknames, channels, and emails"
 msgstr "Forbid usage of nicknames, channels, and emails"
 
-msgid "Force the Services databases to be updated immediately"
-msgstr "Force the Services databases to be updated immediately"
+msgid "Force the services databases to be updated immediately"
+msgstr "Force the services databases to be updated immediately"
 
 msgid "Forcefully change a user's nickname"
 msgstr "Forcefully change a user's nickname"
@@ -4048,14 +4090,8 @@ msgstr "Founder"
 msgid "Founder of %s changed to %s."
 msgstr "Founder of %s changed to %s."
 
-msgid "GETPASS command unavailable because encryption is in use."
-msgstr "GETPASS command unavailable because encryption is in use."
-
 msgid "Ghost with your nick has been killed."
 msgstr "Ghost with your nick has been killed."
-
-msgid "Give Operflags to a certain user"
-msgstr "Give Operflags to a certain user"
 
 #, c-format
 msgid ""
@@ -4161,12 +4197,12 @@ msgid "Info about a loaded module"
 msgstr "Info about a loaded module"
 
 #, c-format
-msgid "Information for bot %s:"
-msgstr "Information for bot %s:"
+msgid "Information about bot %s:"
+msgstr "Information about bot %s:"
 
 #, c-format
-msgid "Information for channel %s:"
-msgstr "Information for channel %s:"
+msgid "Information about channel %s:"
+msgstr "Information about channel %s:"
 
 #, c-format
 msgid "Invalid duration %s, using %d days."
@@ -4182,8 +4218,8 @@ msgstr "Invalid hostmask. Only real hostmasks are valid, as exceptions are not m
 msgid "Invalid limit %s, using %d."
 msgstr "Invalid limit %s, using %d."
 
-msgid "Invalid passcode has been entered, please check the e-mail again, and retry."
-msgstr "Invalid passcode has been entered, please check the e-mail again, and retry."
+msgid "Invalid passcode has been entered, please check the email again, and retry."
+msgstr "Invalid passcode has been entered, please check the email again, and retry."
 
 msgid "Invalid passcode."
 msgstr "Invalid passcode."
@@ -4253,8 +4289,8 @@ msgid "LIMIT enforced by "
 msgstr "LIMIT enforced by "
 
 #, c-format
-msgid "LIMIT enforced on %s, %d users removed."
-msgstr "LIMIT enforced on %s, %d users removed."
+msgid "LIMIT enforced on %s, %zu users removed."
+msgstr "LIMIT enforced on %s, %zu users removed."
 
 msgid "LIST threshold"
 msgstr "LIST threshold"
@@ -4826,6 +4862,9 @@ msgstr "Manage the memo ignore list"
 msgid "Manage your auto join list"
 msgstr "Manage your auto join list"
 
+msgid "Manages your pending message queue."
+msgstr "Manages your pending message queue."
+
 #, c-format
 msgid "Manipulate the %s list"
 msgstr "Manipulate the %s list"
@@ -4841,10 +4880,6 @@ msgstr "Manipulate the topic of the specified channel"
 
 msgid "Mask"
 msgstr "Mask"
-
-#, c-format
-msgid "Mask %s already present on %s's access list."
-msgstr "Mask %s already present on %s's access list."
 
 msgid "Mask must be in the form user@host."
 msgstr "Mask must be in the form user@host."
@@ -4870,6 +4905,10 @@ msgstr "Memo %d from %s (%s)."
 #, c-format
 msgid "Memo %d has been deleted."
 msgstr "Memo %d has been deleted."
+
+#, c-format
+msgid "Memo %zu has been deleted."
+msgstr "Memo %zu has been deleted."
 
 msgid "Memo ignore list is empty."
 msgstr "Memo ignore list is empty."
@@ -4907,6 +4946,10 @@ msgstr "Method"
 msgid "Missing parameter for mode %c."
 msgstr "Missing parameter for mode %c."
 
+#, c-format
+msgid "Missing passwords: %zu"
+msgstr "Missing passwords: %zu"
+
 msgid "Mode"
 msgstr "Mode"
 
@@ -4932,48 +4975,6 @@ msgstr "Modes"
 msgid "Modes cleared on %s and the channel destroyed."
 msgstr "Modes cleared on %s and the channel destroyed."
 
-#, c-format
-msgid ""
-"Modifies or displays the access list for your nick.  This\n"
-"is the list of addresses which will be automatically\n"
-"recognized by %s as allowed to use the nick.  If\n"
-"you want to use the nick from a different address, you\n"
-"need to send an IDENTIFY command to make %s\n"
-"recognize you. Services Operators may provide a nick\n"
-"to modify other users' access lists.\n"
-" \n"
-"Examples:\n"
-" \n"
-"    ACCESS ADD anyone@*.bepeg.com\n"
-"        Allows access to user anyone from any machine in\n"
-"        the bepeg.com domain.\n"
-" \n"
-"    ACCESS DEL anyone@*.bepeg.com\n"
-"        Reverses the previous command.\n"
-" \n"
-"    ACCESS LIST\n"
-"        Displays the current access list."
-msgstr ""
-"Modifies or displays the access list for your nick.  This\n"
-"is the list of addresses which will be automatically\n"
-"recognized by %s as allowed to use the nick.  If\n"
-"you want to use the nick from a different address, you\n"
-"need to send an IDENTIFY command to make %s\n"
-"recognize you. Services Operators may provide a nick\n"
-"to modify other users' access lists.\n"
-" \n"
-"Examples:\n"
-" \n"
-"    ACCESS ADD anyone@*.bepeg.com\n"
-"        Allows access to user anyone from any machine in\n"
-"        the bepeg.com domain.\n"
-" \n"
-"    ACCESS DEL anyone@*.bepeg.com\n"
-"        Reverses the previous command.\n"
-" \n"
-"    ACCESS LIST\n"
-"        Displays the current access list."
-
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
 "If you connect to IRC and provide a client certificate with a\n"
@@ -4988,22 +4989,19 @@ msgstr ""
 "automatically identified to services. Services Operators\n"
 "may provide a nick to modify other users' certificate lists.\n"
 " \n"
-
-msgid "Modify the Services ignore list"
-msgstr "Modify the Services ignore list"
 
 #, c-format
 msgid "Modify the list of %s users"
 msgstr "Modify the list of %s users"
-
-msgid "Modify the list of authorized addresses"
-msgstr "Modify the list of authorized addresses"
 
 msgid "Modify the list of privileged users"
 msgstr "Modify the list of privileged users"
 
 msgid "Modify the nickname client certificate list"
 msgstr "Modify the nickname client certificate list"
+
+msgid "Modify the services ignore list"
+msgstr "Modify the services ignore list"
 
 msgid "Modify the session-limit exception list"
 msgstr "Modify the session-limit exception list"
@@ -5055,6 +5053,9 @@ msgstr "Network stats for %s:"
 msgid "Never"
 msgstr "Never"
 
+msgid "Never-op"
+msgstr "Never-op"
+
 msgid "Nick"
 msgstr "Nick"
 
@@ -5103,8 +5104,8 @@ msgid "Nick %s isn't registered."
 msgstr "Nick %s isn't registered."
 
 #, c-format
-msgid "Nick %s was truncated to %d characters."
-msgstr "Nick %s was truncated to %d characters."
+msgid "Nick %s was truncated to %zu characters."
+msgstr "Nick %s was truncated to %zu characters."
 
 #, c-format
 msgid "Nick %s will expire."
@@ -5146,9 +5147,12 @@ msgstr "Nick %s is now released."
 msgid "Nick %s is now suspended."
 msgstr "Nick %s is now suspended."
 
+msgid "Nick registered"
+msgstr "Nick registered"
+
 #, c-format
-msgid "Nick too long, max length is %u characters."
-msgstr "Nick too long, max length is %u characters."
+msgid "Nick too long, max length is %zu characters."
+msgstr "Nick too long, max length is %zu characters."
 
 #, c-format
 msgid "Nickname %s has been dropped."
@@ -5161,10 +5165,6 @@ msgstr "Nickname %s is already registered!"
 #, c-format
 msgid "Nickname %s may not be registered."
 msgstr "Nickname %s may not be registered."
-
-#, c-format
-msgid "Nickname %s registered under your user@host-mask: %s"
-msgstr "Nickname %s registered under your user@host-mask: %s"
 
 #, c-format
 msgid "Nickname %s registered."
@@ -5197,6 +5197,9 @@ msgstr "No logon news items to delete!"
 #, c-format
 msgid "No matches for %s found."
 msgstr "No matches for %s found."
+
+msgid "No matching entries in your message queue."
+msgstr "No matching entries in your message queue."
 
 #, c-format
 msgid "No matching entries on %s %s list."
@@ -5341,14 +5344,6 @@ msgid "Oper type %s has not been configured."
 msgstr "Oper type %s has not been configured."
 
 #, c-format
-msgid "Operflags %s have been added for %s."
-msgstr "Operflags %s have been added for %s."
-
-#, c-format
-msgid "Operflags %s have been removed from %s."
-msgstr "Operflags %s have been removed from %s."
-
-#, c-format
 msgid "Opertype %s has no allowed commands."
 msgstr "Opertype %s has no allowed commands."
 
@@ -5379,16 +5374,8 @@ msgid "Password accepted."
 msgstr "Password accepted."
 
 #, c-format
-msgid "Password for %s changed to %s."
-msgstr "Password for %s changed to %s."
-
-#, c-format
 msgid "Password for %s changed."
 msgstr "Password for %s changed."
-
-#, c-format
-msgid "Password for %s is %s."
-msgstr "Password for %s is %s."
 
 msgid "Password incorrect."
 msgstr "Password incorrect."
@@ -5396,6 +5383,13 @@ msgstr "Password incorrect."
 #, c-format
 msgid "Password reset email for %s has been sent."
 msgstr "Password reset email for %s has been sent."
+
+msgid "Passwords can not be changed right now. Please try again later."
+msgstr "Passwords can not be changed right now. Please try again later."
+
+#, c-format
+msgid "Passwords encrypted with %s: %zu"
+msgstr "Passwords encrypted with %s: %zu"
 
 msgid "Peace"
 msgstr "Peace"
@@ -5411,17 +5405,21 @@ msgstr "Peace option for %s is now on."
 msgid "Persistent"
 msgstr "Persistent"
 
-msgid "Please contact an Operator to get a vHost assigned to this nick."
-msgstr "Please contact an Operator to get a vHost assigned to this nick."
+#, c-format
+msgid "Please confirm that you want to drop %s with %s%s DROP %s %s"
+msgstr "Please confirm that you want to drop %s with %s%s DROP %s %s"
+
+msgid "Please contact an Operator to get a vhost assigned to this nick."
+msgstr "Please contact an Operator to get a vhost assigned to this nick."
 
 msgid ""
-"Please try again with a more obscure password. Passwords should be at least\n"
-"five characters long, should not be something easily guessed\n"
-"(e.g. your real name or your nick), and cannot contain the space or tab characters."
+"Please try again with a more obscure password. Passwords should not be\n"
+"something that could be easily guessed (e.g. your real name or your nick) and\n"
+"cannot contain the space or tab characters.\n"
 msgstr ""
-"Please try again with a more obscure password. Passwords should be at least\n"
-"five characters long, should not be something easily guessed\n"
-"(e.g. your real name or your nick), and cannot contain the space or tab characters."
+"Please try again with a more obscure password. Passwords should not be\n"
+"something that could be easily guessed (e.g. your real name or your nick) and\n"
+"cannot contain the space or tab characters.\n"
 
 msgid "Please use a valid server name when juping."
 msgstr "Please use a valid server name when juping."
@@ -5430,24 +5428,24 @@ msgid "Please use the symbol of # when attempting to register."
 msgstr "Please use the symbol of # when attempting to register."
 
 #, c-format
-msgid "Please wait %d seconds and retry."
-msgstr "Please wait %d seconds and retry."
+msgid "Please wait %lu seconds and retry."
+msgstr "Please wait %lu seconds and retry."
 
 #, c-format
-msgid "Please wait %d seconds before requesting a new vHost."
-msgstr "Please wait %d seconds before requesting a new vHost."
+msgid "Please wait %lu seconds before requesting a new vhost."
+msgstr "Please wait %lu seconds before requesting a new vhost."
 
 #, c-format
-msgid "Please wait %d seconds before using the %s command again."
-msgstr "Please wait %d seconds before using the %s command again."
+msgid "Please wait %lu seconds before using the %s command again."
+msgstr "Please wait %lu seconds before using the %s command again."
 
 #, c-format
-msgid "Please wait %d seconds before using the GROUP command again."
-msgstr "Please wait %d seconds before using the GROUP command again."
+msgid "Please wait %lu seconds before using the GROUP command again."
+msgstr "Please wait %lu seconds before using the GROUP command again."
 
 #, c-format
-msgid "Please wait %d seconds before using the REGISTER command again."
-msgstr "Please wait %d seconds before using the REGISTER command again."
+msgid "Please wait %lu seconds before using the REGISTER command again."
+msgstr "Please wait %lu seconds before using the REGISTER command again."
 
 #, c-format
 msgid "Pooled %s."
@@ -5477,8 +5475,8 @@ msgstr "Prevent the nickname from appearing in the LIST command"
 msgid "Prevent the nickname from expiring"
 msgstr "Prevent the nickname from expiring"
 
-msgid "Prevents users being kicked by Services"
-msgstr "Prevents users being kicked by Services"
+msgid "Prevents users being kicked by services"
+msgstr "Prevents users being kicked by services"
 
 msgid "Private"
 msgstr "Private"
@@ -5635,16 +5633,16 @@ msgid "Registered"
 msgstr "Registered"
 
 #, c-format
-msgid "Registered channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Registered channels: %lu entries, %lu buckets, longest chain is %d"
+msgid "Registered channels: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Registered channels: %zu entries, %zu buckets, longest chain is %zu"
 
 #, c-format
-msgid "Registered nick groups: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Registered nick groups: %lu entries, %lu buckets, longest chain is %d"
+msgid "Registered nick groups: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Registered nick groups: %zu entries, %zu buckets, longest chain is %zu"
 
 #, c-format
-msgid "Registered nicknames: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Registered nicknames: %lu entries, %lu buckets, longest chain is %d"
+msgid "Registered nicknames: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Registered nicknames: %zu entries, %zu buckets, longest chain is %zu"
 
 #, c-format
 msgid "Registered only enforced on %s."
@@ -5693,7 +5691,7 @@ msgid ""
 "your nickname as a password is a much worse idea ;) and,\n"
 "in fact, %s will not allow it. Also, short\n"
 "passwords are vulnerable to trial-and-error searches, so\n"
-"you should choose a password at least 5 characters long.\n"
+"you should choose a password at least %u characters long.\n"
 "Finally, the space character cannot be used in passwords."
 msgstr ""
 "Registers your nickname in the %s database. Once\n"
@@ -5711,7 +5709,7 @@ msgstr ""
 "your nickname as a password is a much worse idea ;) and,\n"
 "in fact, %s will not allow it. Also, short\n"
 "passwords are vulnerable to trial-and-error searches, so\n"
-"you should choose a password at least 5 characters long.\n"
+"you should choose a password at least %u characters long.\n"
 "Finally, the space character cannot be used in passwords."
 
 msgid "Registration is currently disabled."
@@ -5720,11 +5718,11 @@ msgstr "Registration is currently disabled."
 msgid "Regulate the use of critical commands"
 msgstr "Regulate the use of critical commands"
 
-msgid "Reject the requested vHost for the given nick."
-msgstr "Reject the requested vHost for the given nick."
+msgid "Reject the requested vhost for the given nick."
+msgstr "Reject the requested vhost for the given nick."
 
-msgid "Reject the requested vHost of a user"
-msgstr "Reject the requested vHost of a user"
+msgid "Reject the requested vhost of a user"
+msgstr "Reject the requested vhost of a user"
 
 msgid "Releases a suspended channel"
 msgstr "Releases a suspended channel"
@@ -5794,15 +5792,15 @@ msgstr "Removing %s because %s covers it."
 msgid "Repeat kicker"
 msgstr "Repeat kicker"
 
-msgid "Request a vHost for your nick"
-msgstr "Request a vHost for your nick"
+msgid "Request a vhost for your nick"
+msgstr "Request a vhost for your nick"
 
 msgid ""
-"Request the given vHost to be activated for your nick by the\n"
+"Request the given vhost to be activated for your nick by the\n"
 "network administrators. Please be patient while your request\n"
 "is being considered."
 msgstr ""
-"Request the given vHost to be activated for your nick by the\n"
+"Request the given vhost to be activated for your nick by the\n"
 "network administrators. Please be patient while your request\n"
 "is being considered."
 
@@ -5833,9 +5831,6 @@ msgstr "Retain modes when channel is not in use"
 msgid "Retain topic when channel is not in use"
 msgstr "Retain topic when channel is not in use"
 
-msgid "Retrieve the password for a nickname"
-msgstr "Retrieve the password for a nickname"
-
 msgid "Retrieves the vhost requests"
 msgstr "Retrieves the vhost requests"
 
@@ -5847,55 +5842,6 @@ msgstr "Returns the key of the given channel."
 
 msgid "Returns the matching accounts that used given email."
 msgstr "Returns the matching accounts that used given email."
-
-msgid "Returns the owner status of the given nickname"
-msgstr "Returns the owner status of the given nickname"
-
-msgid ""
-"Returns the password for the given nickname.  Note that\n"
-"whenever this command is used, a message including the\n"
-"person who issued the command and the nickname it was used\n"
-"on will be logged and sent out as a WALLOPS/GLOBOPS."
-msgstr ""
-"Returns the password for the given nickname.  Note that\n"
-"whenever this command is used, a message including the\n"
-"person who issued the command and the nickname it was used\n"
-"on will be logged and sent out as a WALLOPS/GLOBOPS."
-
-msgid ""
-"Returns whether the user using the given nickname is\n"
-"recognized as the owner of the nickname. The response has\n"
-"this format:\n"
-" \n"
-"    nickname status-code account\n"
-" \n"
-"where nickname is the nickname sent with the command,\n"
-"status-code is one of the following, and account\n"
-"is the account they are logged in as.\n"
-" \n"
-"    0 - no such user online or nickname not registered\n"
-"    1 - user not recognized as nickname's owner\n"
-"    2 - user recognized as owner via access list only\n"
-"    3 - user recognized as owner via password identification\n"
-" \n"
-"If no nickname is given, your status will be returned."
-msgstr ""
-"Returns whether the user using the given nickname is\n"
-"recognized as the owner of the nickname. The response has\n"
-"this format:\n"
-" \n"
-"    nickname status-code account\n"
-" \n"
-"where nickname is the nickname sent with the command,\n"
-"status-code is one of the following, and account\n"
-"is the account they are logged in as.\n"
-" \n"
-"    0 - no such user online or nickname not registered\n"
-"    1 - user not recognized as nickname's owner\n"
-"    2 - user recognized as owner via access list only\n"
-"    3 - user recognized as owner via password identification\n"
-" \n"
-"If no nickname is given, your status will be returned."
 
 msgid "Reverses kicker"
 msgstr "Reverses kicker"
@@ -5923,8 +5869,8 @@ msgstr "SSL only enforced on %s."
 msgid "SSLONLY enforced by "
 msgstr "SSLONLY enforced by "
 
-msgid "Save databases and restart Services"
-msgstr "Save databases and restart Services"
+msgid "Save databases and restart services"
+msgstr "Save databases and restart services"
 
 msgid "Searches logs for a matching pattern"
 msgstr "Searches logs for a matching pattern"
@@ -5952,27 +5898,8 @@ msgid "Secure ops option for %s is now on."
 msgstr "Secure ops option for %s is now on."
 
 #, c-format
-msgid "Secure option for %s is now off."
-msgstr "Secure option for %s is now off."
-
-#, c-format
-msgid "Secure option for %s is now on."
-msgstr "Secure option for %s is now on."
-
-#, c-format
-msgid "Secure option is now off for %s."
-msgstr "Secure option is now off for %s."
-
-#, c-format
-msgid "Secure option is now on for %s."
-msgstr "Secure option is now on for %s."
-
-#, c-format
 msgid "Secureops enforced on %s."
 msgstr "Secureops enforced on %s."
-
-msgid "Security"
-msgstr "Security"
 
 #, c-format
 msgid ""
@@ -6001,6 +5928,9 @@ msgstr "Send a memo to all registered users"
 
 msgid "Send a message to all users"
 msgstr "Send a message to all users"
+
+msgid "Send a message to all users on a server"
+msgstr "Send a message to all users on a server"
 
 msgid "Sender"
 msgstr "Sender"
@@ -6076,6 +6006,10 @@ msgid "Server"
 msgstr "Server"
 
 #, c-format
+msgid "Server %s is not linked to the network."
+msgstr "Server %s is not linked to the network."
+
+#, c-format
 msgid "Server %s added to zone %s."
 msgstr "Server %s added to zone %s."
 
@@ -6139,9 +6073,6 @@ msgstr "Services Operator commands"
 msgid "Services are in DefCon mode, please try again later."
 msgstr "Services are in DefCon mode, please try again later."
 
-msgid "Services are in read-only mode!"
-msgstr "Services are in read-only mode!"
-
 #, c-format
 msgid "Services are now at DEFCON %d."
 msgstr "Services are now at DEFCON %d."
@@ -6167,6 +6098,9 @@ msgstr "Services are now in read-only mode."
 
 msgid "Services are now in read-write mode."
 msgstr "Services are now in read-write mode."
+
+msgid "Services are temporarily in read-only mode."
+msgstr "Services are temporarily in read-only mode."
 
 msgid "Services have been configured to not send mail."
 msgstr "Services have been configured to not send mail."
@@ -6219,8 +6153,8 @@ msgid "Session limiting is disabled."
 msgstr "Session limiting is disabled."
 
 #, c-format
-msgid "Sessions: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Sessions: %lu entries, %lu buckets, longest chain is %d"
+msgid "Sessions: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Sessions: %zu entries, %zu buckets, longest chain is %zu"
 
 msgid "Set SET-options on another nickname"
 msgstr "Set SET-options on another nickname"
@@ -6228,8 +6162,8 @@ msgstr "Set SET-options on another nickname"
 msgid "Set channel options and information"
 msgstr "Set channel options and information"
 
-msgid "Set how Services make bans on the channel"
-msgstr "Set how Services make bans on the channel"
+msgid "Set how services make bans on the channel"
+msgstr "Set how services make bans on the channel"
 
 msgid "Set options related to memos"
 msgstr "Set options related to memos"
@@ -6243,14 +6177,14 @@ msgstr "Set the channel as permanent"
 msgid "Set the channel description"
 msgstr "Set the channel description"
 
-msgid "Set the display of your group in Services"
-msgstr "Set the display of your group in Services"
+msgid "Set the display of your group in services"
+msgstr "Set the display of your group in services"
 
 msgid "Set the founder of a channel"
 msgstr "Set the founder of a channel"
 
-msgid "Set the language Services will use when messaging you"
-msgstr "Set the language Services will use when messaging you"
+msgid "Set the language services will use when messaging you"
+msgstr "Set the language services will use when messaging you"
 
 msgid "Set the nickname password"
 msgstr "Set the nickname password"
@@ -6264,8 +6198,8 @@ msgstr "Set the vhost for all nicks in a group"
 msgid "Set the vhost of another user"
 msgstr "Set the vhost of another user"
 
-msgid "Set various global Services options"
-msgstr "Set various global Services options"
+msgid "Set various global services options"
+msgstr "Set various global services options"
 
 msgid "Set your nickname password"
 msgstr "Set your nickname password"
@@ -6481,14 +6415,14 @@ msgstr ""
 
 msgid ""
 "Sets the vhost for all nicks in the same group as that\n"
-"of the given nick.  If your IRCD supports vIdents, then\n"
+"of the given nick.  If your IRCD supports vidents, then\n"
 "using SETALL <nick> <ident>@<hostmask> will set idents\n"
 "for users as well as vhosts.\n"
 "* NOTE, this will not update the vhost for any nicks\n"
 "added to the group after this command was used."
 msgstr ""
 "Sets the vhost for all nicks in the same group as that\n"
-"of the given nick.  If your IRCD supports vIdents, then\n"
+"of the given nick.  If your IRCD supports vidents, then\n"
 "using SETALL <nick> <ident>@<hostmask> will set idents\n"
 "for users as well as vhosts.\n"
 "* NOTE, this will not update the vhost for any nicks\n"
@@ -6496,17 +6430,17 @@ msgstr ""
 
 msgid ""
 "Sets the vhost for the given nick to that of the given\n"
-"hostmask.  If your IRCD supports vIdents, then using\n"
+"hostmask.  If your IRCD supports vidents, then using\n"
 "SET <nick> <ident>@<hostmask> set idents for users as\n"
 "well as vhosts."
 msgstr ""
 "Sets the vhost for the given nick to that of the given\n"
-"hostmask.  If your IRCD supports vIdents, then using\n"
+"hostmask.  If your IRCD supports vidents, then using\n"
 "SET <nick> <ident>@<hostmask> set idents for users as\n"
 "well as vhosts."
 
 msgid ""
-"Sets various global Services options.  Option names\n"
+"Sets various global services options.  Option names\n"
 "currently defined are:\n"
 "    READONLY   Set read-only or read-write mode\n"
 "    DEBUG      Activate or deactivate debug mode\n"
@@ -6514,7 +6448,7 @@ msgid ""
 "    SUPERADMIN Activate or deactivate super admin mode\n"
 "    LIST       List the options"
 msgstr ""
-"Sets various global Services options.  Option names\n"
+"Sets various global services options.  Option names\n"
 "currently defined are:\n"
 "    READONLY   Set read-only or read-write mode\n"
 "    DEBUG      Activate or deactivate debug mode\n"
@@ -6557,6 +6491,9 @@ msgstr ""
 "Sets whether the given channel will expire.  Setting this\n"
 "to ON prevents the channel from expiring."
 
+msgid "Sets whether the given nickname can be added to a channel access list."
+msgstr "Sets whether the given nickname can be added to a channel access list."
+
 #, c-format
 msgid ""
 "Sets whether the given nickname will be given its status modes\n"
@@ -6577,6 +6514,9 @@ msgid ""
 msgstr ""
 "Sets whether the given nickname will expire.  Setting this\n"
 "to ON prevents the nickname from expiring."
+
+msgid "Sets whether you can be added to a channel access list."
+msgstr "Sets whether you can be added to a channel access list."
 
 #, c-format
 msgid ""
@@ -6609,12 +6549,12 @@ msgstr "Setting for super admin must be ON or OFF."
 msgid "Should services automatically give status to users"
 msgstr "Should services automatically give status to users"
 
-msgid "Show status of Services and network"
-msgstr "Show status of Services and network"
+msgid "Show status of services and network"
+msgstr "Show status of services and network"
 
 #, c-format
-msgid "Showed %d/%d matches for %s."
-msgstr "Showed %d/%d matches for %s."
+msgid "Showed %zu/%zu matches for %s."
+msgstr "Showed %zu/%zu matches for %s."
 
 msgid "Sign kicks that are done with the KICK command"
 msgstr "Sign kicks that are done with the KICK command"
@@ -6643,61 +6583,12 @@ msgid "Sorry, %s currently has too many memos and cannot receive more."
 msgstr "Sorry, %s currently has too many memos and cannot receive more."
 
 #, c-format
+msgid "Sorry, %s is temporarily unavailable."
+msgstr "Sorry, %s is temporarily unavailable."
+
+#, c-format
 msgid "Sorry, I have not seen %s."
 msgstr "Sorry, I have not seen %s."
-
-msgid "Sorry, bad words list modification is temporarily disabled."
-msgstr "Sorry, bad words list modification is temporarily disabled."
-
-msgid "Sorry, bot assignment is temporarily disabled."
-msgstr "Sorry, bot assignment is temporarily disabled."
-
-msgid "Sorry, bot modification is temporarily disabled."
-msgstr "Sorry, bot modification is temporarily disabled."
-
-msgid "Sorry, bot option setting is temporarily disabled."
-msgstr "Sorry, bot option setting is temporarily disabled."
-
-msgid "Sorry, changing bot options is temporarily disabled."
-msgstr "Sorry, changing bot options is temporarily disabled."
-
-#, c-format
-msgid "Sorry, channel %s list modification is temporarily disabled."
-msgstr "Sorry, channel %s list modification is temporarily disabled."
-
-msgid "Sorry, channel access list modification is temporarily disabled."
-msgstr "Sorry, channel access list modification is temporarily disabled."
-
-msgid "Sorry, channel autokick list modification is temporarily disabled."
-msgstr "Sorry, channel autokick list modification is temporarily disabled."
-
-msgid "Sorry, channel de-registration is temporarily disabled."
-msgstr "Sorry, channel de-registration is temporarily disabled."
-
-msgid "Sorry, channel registration is temporarily disabled."
-msgstr "Sorry, channel registration is temporarily disabled."
-
-msgid "Sorry, kicker configuration is temporarily disabled."
-msgstr "Sorry, kicker configuration is temporarily disabled."
-
-msgid "Sorry, memo option setting is temporarily disabled."
-msgstr "Sorry, memo option setting is temporarily disabled."
-
-msgid "Sorry, memo sending is temporarily disabled."
-msgstr "Sorry, memo sending is temporarily disabled."
-
-msgid "Sorry, nickname de-registration is temporarily disabled."
-msgstr "Sorry, nickname de-registration is temporarily disabled."
-
-msgid "Sorry, nickname grouping is temporarily disabled."
-msgstr "Sorry, nickname grouping is temporarily disabled."
-
-msgid "Sorry, nickname registration is temporarily disabled."
-msgstr "Sorry, nickname registration is temporarily disabled."
-
-#, c-format
-msgid "Sorry, the maximum of %d access entries has been reached."
-msgstr "Sorry, the maximum of %d access entries has been reached."
 
 #, c-format
 msgid "Sorry, the maximum of %d auto join entries has been reached."
@@ -6987,13 +6878,13 @@ msgid ""
 "Syntax: READONLY {ON | OFF}\n"
 " \n"
 "Sets read-only mode on or off.  In read-only mode, normal\n"
-"users will not be allowed to modify any Services data,\n"
-"including channel and nickname access lists, etc.  IRCops\n"
-"with sufficient Services privileges will be able to modify\n"
+"users will not be allowed to modify any services data,\n"
+"including channel access lists, etc.  Server operators\n"
+"with sufficient services privileges will be able to modify\n"
 "Services' AKILL, SQLINE, SNLINE and ignore lists, drop,\n"
 "suspend or forbid nicknames and channels, and manage news,\n"
 "oper info and DNS, but any such changes will not be saved\n"
-"unless read-only mode is deactivated before Services are\n"
+"unless read-only mode is deactivated before services are\n"
 "terminated or restarted.\n"
 " \n"
 "This option is equivalent to the command-line option\n"
@@ -7002,13 +6893,13 @@ msgstr ""
 "Syntax: READONLY {ON | OFF}\n"
 " \n"
 "Sets read-only mode on or off.  In read-only mode, normal\n"
-"users will not be allowed to modify any Services data,\n"
-"including channel and nickname access lists, etc.  IRCops\n"
-"with sufficient Services privileges will be able to modify\n"
+"users will not be allowed to modify any services data,\n"
+"including channel access lists, etc.  Server operators\n"
+"with sufficient services privileges will be able to modify\n"
 "Services' AKILL, SQLINE, SNLINE and ignore lists, drop,\n"
 "suspend or forbid nicknames and channels, and manage news,\n"
 "oper info and DNS, but any such changes will not be saved\n"
-"unless read-only mode is deactivated before Services are\n"
+"unless read-only mode is deactivated before services are\n"
 "terminated or restarted.\n"
 " \n"
 "This option is equivalent to the command-line option\n"
@@ -7078,8 +6969,8 @@ msgstr ""
 "on the channel."
 
 msgid ""
-"Tells Services to jupiter a server -- that is, to create\n"
-"a fake \"server\" connected to Services which prevents\n"
+"Tells services to jupiter a server -- that is, to create\n"
+"a fake \"server\" connected to services which prevents\n"
 "the real server of that name from connecting.  The jupe\n"
 "may be removed using a standard SQUIT. If a reason is\n"
 "given, it is placed in the server information field;\n"
@@ -7087,8 +6978,8 @@ msgid ""
 "text \"Juped by <nick>\", showing the nickname of the\n"
 "person who jupitered the server."
 msgstr ""
-"Tells Services to jupiter a server -- that is, to create\n"
-"a fake \"server\" connected to Services which prevents\n"
+"Tells services to jupiter a server -- that is, to create\n"
+"a fake \"server\" connected to services which prevents\n"
 "the real server of that name from connecting.  The jupe\n"
 "may be removed using a standard SQUIT. If a reason is\n"
 "given, it is placed in the server information field;\n"
@@ -7099,8 +6990,8 @@ msgstr ""
 msgid "Tells you about the last time a user was seen"
 msgstr "Tells you about the last time a user was seen"
 
-msgid "Terminate Services WITHOUT saving"
-msgstr "Terminate Services WITHOUT saving"
+msgid "Terminate services WITHOUT saving"
+msgstr "Terminate services WITHOUT saving"
 
 msgid "Terminate services with save"
 msgstr "Terminate services with save"
@@ -7329,15 +7220,11 @@ msgstr "The STATS command prints out statistics about stored nicks and memory 
 
 msgid ""
 "The email parameter is optional and will set the email\n"
-"for your nick immediately.\n"
-"Your privacy is respected; this e-mail won't be given to\n"
-"any third-party person. You may also wish to SET HIDE it\n"
+"for your nick immediately. You may also wish to SET HIDE it\n"
 "after registering if it isn't the default setting already."
 msgstr ""
 "The email parameter is optional and will set the email\n"
-"for your nick immediately.\n"
-"Your privacy is respected; this e-mail won't be given to\n"
-"any third-party person. You may also wish to SET HIDE it\n"
+"for your nick immediately. You may also wish to SET HIDE it\n"
 "after registering if it isn't the default setting already."
 
 #, c-format
@@ -7397,14 +7284,6 @@ msgstr "The AKILL list has been cleared."
 msgid "The Defcon level is now at: %d"
 msgstr "The Defcon level is now at: %d"
 
-#, c-format
-msgid "The E-mail address of %s will now be hidden from %s INFO displays."
-msgstr "The E-mail address of %s will now be hidden from %s INFO displays."
-
-#, c-format
-msgid "The E-mail address of %s will now be shown in %s INFO displays."
-msgstr "The E-mail address of %s will now be shown in %s INFO displays."
-
 msgid "The available flags are:"
 msgstr "The available flags are:"
 
@@ -7424,6 +7303,14 @@ msgstr "The email address %s has reached its usage limit of %d users."
 #, c-format
 msgid "The email address %s has reached its usage limit of 1 user."
 msgstr "The email address %s has reached its usage limit of 1 user."
+
+#, c-format
+msgid "The email address of %s will now be hidden from %s INFO displays."
+msgstr "The email address of %s will now be hidden from %s INFO displays."
+
+#, c-format
+msgid "The email address of %s will now be shown in %s INFO displays."
+msgstr "The email address of %s will now be shown in %s INFO displays."
 
 #, c-format
 msgid "The entry message list for %s is full."
@@ -7524,8 +7411,8 @@ msgstr ""
 "to release services's hold on your nick."
 
 #, c-format
-msgid "There are %d memos on channel %s."
-msgstr "There are %d memos on channel %s."
+msgid "There are %zu memos on channel %s."
+msgstr "There are %zu memos on channel %s."
 
 msgid ""
 "There are no bots available at this time.\n"
@@ -7549,16 +7436,16 @@ msgid "There currently are no logging configurations for %s."
 msgstr "There currently are no logging configurations for %s."
 
 #, c-format
-msgid "There is %d memo on channel %s."
-msgstr "There is %d memo on channel %s."
+msgid "There is %zu memo on channel %s."
+msgstr "There is %zu memo on channel %s."
 
 #, c-format
 msgid ""
 "There is a new memo on channel %s.\n"
-"Type %s%s READ %s %d to read it."
+"Type %s%s READ %s %zu to read it."
 msgstr ""
 "There is a new memo on channel %s.\n"
-"Type %s%s READ %s %d to read it."
+"Type %s%s READ %s %zu to read it."
 
 #, c-format
 msgid "There is no bot assigned to %s anymore."
@@ -7774,7 +7661,7 @@ msgid "This command retrieves the vhost requests."
 msgstr "This command retrieves the vhost requests."
 
 msgid ""
-"This command searches the Services logfiles for messages\n"
+"This command searches the services logfiles for messages\n"
 "that match the given pattern. The day and limit argument\n"
 "may be used to specify how many days of logs to search\n"
 "and the number of replies to limit to. By default this\n"
@@ -7786,7 +7673,7 @@ msgid ""
 "      Searches the last 21 days worth of logs for messages\n"
 "      containing Anope and lists the most recent 500 of them."
 msgstr ""
-"This command searches the Services logfiles for messages\n"
+"This command searches the services logfiles for messages\n"
 "that match the given pattern. The day and limit argument\n"
 "may be used to specify how many days of logs to search\n"
 "and the number of replies to limit to. By default this\n"
@@ -7829,14 +7716,6 @@ msgstr "This command unloads the module named modname."
 
 msgid "This command will resend you the registration confirmation email."
 msgstr "This command will resend you the registration confirmation email."
-
-#, c-format
-msgid ""
-"This nick is owned by someone else.  Please choose another.\n"
-"(If this is your nick, type %s%s IDENTIFY password.)"
-msgstr ""
-"This nick is owned by someone else.  Please choose another.\n"
-"(If this is your nick, type %s%s IDENTIFY password.)"
 
 #, c-format
 msgid "This nickname has been forbidden: %s"
@@ -7933,9 +7812,6 @@ msgstr "Turn caps lock OFF!"
 msgid "Turn chanstats statistics on or off"
 msgstr "Turn chanstats statistics on or off"
 
-msgid "Turn nickname security on or off"
-msgstr "Turn nickname security on or off"
-
 msgid "Turn protection on or off"
 msgstr "Turn protection on or off"
 
@@ -7966,24 +7842,6 @@ msgstr ""
 "nickname lists generated with %s's LIST command.\n"
 "(However, anyone who knows your nickname can still get\n"
 "information on it using the INFO command.)"
-
-#, c-format
-msgid ""
-"Turns %s's security features on or off for your\n"
-"nick. With SECURE set, you must enter your password\n"
-"before you will be recognized as the owner of the nick,\n"
-"regardless of whether your address is on the access\n"
-"list. However, if you are on the access list, %s\n"
-"will not auto-kill you regardless of the setting of the\n"
-"KILL option."
-msgstr ""
-"Turns %s's security features on or off for your\n"
-"nick. With SECURE set, you must enter your password\n"
-"before you will be recognized as the owner of the nick,\n"
-"regardless of whether your address is on the access\n"
-"list. However, if you are on the access list, %s\n"
-"will not auto-kill you regardless of the setting of the\n"
-"KILL option."
 
 msgid "Turns chanstats channel statistics ON or OFF for this user."
 msgstr "Turns chanstats channel statistics ON or OFF for this user."
@@ -8091,14 +7949,8 @@ msgstr ""
 "particular option."
 
 #, c-format
-msgid ""
-"Type %s%s SET EMAIL e-mail in order to set your e-mail.\n"
-"Your privacy is respected; this e-mail won't be given to\n"
-"any third-party person."
-msgstr ""
-"Type %s%s SET EMAIL e-mail in order to set your e-mail.\n"
-"Your privacy is respected; this e-mail won't be given to\n"
-"any third-party person."
+msgid "Type %s%s SET EMAIL email in order to set your email."
+msgstr "Type %s%s SET EMAIL email in order to set your email."
 
 msgid "Un-Load a module"
 msgstr "Un-Load a module"
@@ -8150,12 +8002,24 @@ msgid "Unknown command %s. \"%s%s HELP\" for help."
 msgstr "Unknown command %s. \"%s%s HELP\" for help."
 
 #, c-format
+msgid "Unknown command %s. Did you mean %s?"
+msgstr "Unknown command %s. Did you mean %s?"
+
+#, c-format
+msgid "Unknown command %s. Did you mean %s? \"%s%s HELP\" for help."
+msgstr "Unknown command %s. Did you mean %s? \"%s%s HELP\" for help."
+
+#, c-format
 msgid "Unknown mode character %c ignored."
 msgstr "Unknown mode character %c ignored."
 
 #, c-format
 msgid "Unknown parameter: %s"
 msgstr "Unknown parameter: %s"
+
+#, c-format
+msgid "Unknown passwords: %zu"
+msgstr "Unknown passwords: %zu"
 
 msgid "Unpooled"
 msgstr "Unpooled"
@@ -8231,6 +8095,10 @@ msgstr "Used to manage the list of privileged users"
 msgid "Used to modify the channel status of you or other users"
 msgstr "Used to modify the channel status of you or other users"
 
+#, c-format
+msgid "User %s isn't currently logged in to an account."
+msgstr "User %s isn't currently logged in to an account."
+
 msgid "User has been banned from the channel"
 msgstr "User has been banned from the channel"
 
@@ -8246,12 +8114,12 @@ msgid "Users"
 msgstr "Users"
 
 #, c-format
-msgid "Users (nick): %lu entries, %lu buckets, longest chain is %d"
-msgstr "Users (nick): %lu entries, %lu buckets, longest chain is %d"
+msgid "Users (nick): %lu entries, %lu buckets, longest chain is %zu"
+msgstr "Users (nick): %lu entries, %lu buckets, longest chain is %zu"
 
 #, c-format
-msgid "Users (uid): %lu entries, %lu buckets, longest chain is %d"
-msgstr "Users (uid): %lu entries, %lu buckets, longest chain is %d"
+msgid "Users (uid): %lu entries, %lu buckets, longest chain is %zu"
+msgstr "Users (uid): %lu entries, %lu buckets, longest chain is %zu"
 
 msgid "Users list:"
 msgstr "Users list:"
@@ -8260,20 +8128,28 @@ msgid "VHost"
 msgstr "VHost"
 
 #, c-format
+msgid "VHost for %s removed."
+msgstr "VHost for %s removed."
+
+#, c-format
 msgid "VHost for %s set to %s."
 msgstr "VHost for %s set to %s."
 
 #, c-format
-msgid "VHost for %s set to %s@%s."
-msgstr "VHost for %s set to %s@%s."
+msgid "VHost for %s has been activated."
+msgstr "VHost for %s has been activated."
+
+#, c-format
+msgid "VHost for %s has been rejected."
+msgstr "VHost for %s has been rejected."
 
 #, c-format
 msgid "VHost for group %s set to %s."
 msgstr "VHost for group %s set to %s."
 
 #, c-format
-msgid "VHost for group %s set to %s@%s."
-msgstr "VHost for group %s set to %s@%s."
+msgid "VHosts for group %s have been removed."
+msgstr "VHosts for group %s have been removed."
 
 msgid "VIEW host"
 msgstr "VIEW host"
@@ -8290,13 +8166,6 @@ msgstr "Value"
 #, c-format
 msgid "Value of %s:%s changed to %s"
 msgstr "Value of %s:%s changed to %s"
-
-msgid "Vhost"
-msgstr "Vhost"
-
-#, c-format
-msgid "Vhost for %s removed."
-msgstr "Vhost for %s removed."
 
 msgid "View and change Services Operators"
 msgstr "View and change Services Operators"
@@ -8351,7 +8220,7 @@ msgid ""
 "yourself.\n"
 " \n"
 "With a parameter, does the same for the given nick. If you\n"
-"specify REVALIDATE as well, Services will ask the given nick\n"
+"specify REVALIDATE as well, services will ask the given nick\n"
 "to re-identify. This is limited to Services Operators."
 msgstr ""
 "Without a parameter, reverses the effect of the IDENTIFY\n"
@@ -8360,19 +8229,22 @@ msgstr ""
 "yourself.\n"
 " \n"
 "With a parameter, does the same for the given nick. If you\n"
-"specify REVALIDATE as well, Services will ask the given nick\n"
+"specify REVALIDATE as well, services will ask the given nick\n"
 "to re-identify. This is limited to Services Operators."
 
 msgid ""
 "Without any option, shows the current number of users online,\n"
-"and the highest number of users online since Services was\n"
-"started, and the length of time Services has been running.\n"
+"and the highest number of users online since services was\n"
+"started, and the length of time services has been running.\n"
 " \n"
 "With the AKILL option, displays the current size of the\n"
 "AKILL list and the current default expiry time.\n"
 " \n"
 "The RESET option currently resets the maximum user count\n"
 "to the number of users currently present on the network.\n"
+" \n"
+"The PASSWORD option displays the encryption algorithms used\n"
+"for user passwords.\n"
 " \n"
 "The UPLINK option displays information about the current\n"
 "server Anope uses as an uplink to the network.\n"
@@ -8382,14 +8254,17 @@ msgid ""
 "The ALL option displays all of the above statistics."
 msgstr ""
 "Without any option, shows the current number of users online,\n"
-"and the highest number of users online since Services was\n"
-"started, and the length of time Services has been running.\n"
+"and the highest number of users online since services was\n"
+"started, and the length of time services has been running.\n"
 " \n"
 "With the AKILL option, displays the current size of the\n"
 "AKILL list and the current default expiry time.\n"
 " \n"
 "The RESET option currently resets the maximum user count\n"
 "to the number of users currently present on the network.\n"
+" \n"
+"The PASSWORD option displays the encryption algorithms used\n"
+"for user passwords.\n"
 " \n"
 "The UPLINK option displays information about the current\n"
 "server Anope uses as an uplink to the network.\n"
@@ -8430,9 +8305,6 @@ msgstr "You are not using a client certificate."
 msgid "You are now a super admin."
 msgstr "You are now a super admin."
 
-msgid "You are now an IRC Operator."
-msgstr "You are now an IRC Operator."
-
 msgid "You are now identified for your nick. Change your password now."
 msgstr "You are now identified for your nick. Change your password now."
 
@@ -8444,8 +8316,8 @@ msgstr "You are now in the group of %s."
 msgid "You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."
 msgstr "You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."
 
-msgid "You can not NOOP Services."
-msgstr "You can not NOOP Services."
+msgid "You can not NOOP services."
+msgstr "You can not NOOP services."
 
 msgid "You can not disable the founder privilege because it would be impossible to re-enable it at a later time."
 msgstr "You can not disable the founder privilege because it would be impossible to re-enable it at a later time."
@@ -8453,8 +8325,11 @@ msgstr "You can not disable the founder privilege because it would be impossible
 msgid "You can not jupe an already juped server."
 msgstr "You can not jupe an already juped server."
 
-msgid "You can not jupe your Services' pseudoserver or your uplink server."
-msgstr "You can not jupe your Services' pseudoserver or your uplink server."
+msgid "You can not jupe your services' pseudoserver or your uplink server."
+msgstr "You can not jupe your services' pseudoserver or your uplink server."
+
+msgid "You can not queue any more messages."
+msgstr "You can not queue any more messages."
 
 #, c-format
 msgid "You can not reload this module directly, instead reload %s."
@@ -8462,6 +8337,9 @@ msgstr "You can not reload this module directly, instead reload %s."
 
 msgid "You can not request a receipt when sending a memo to yourself."
 msgstr "You can not request a receipt when sending a memo to yourself."
+
+msgid "You can not send a single message while you have messages queued."
+msgstr "You can not send a single message while you have messages queued."
 
 #, c-format
 msgid "You can't %s yourself!"
@@ -8493,27 +8371,27 @@ msgstr "You cannot set your memo limit higher than %d."
 msgid "You cannot unassign bots while persist is set on the channel."
 msgstr "You cannot unassign bots while persist is set on the channel."
 
-msgid "You cannot unset the e-mail on this network."
-msgstr "You cannot unset the e-mail on this network."
+msgid "You cannot unset the email on this network."
+msgstr "You cannot unset the email on this network."
 
 msgid "You cannot use this command."
 msgstr "You cannot use this command."
 
 #, c-format
-msgid "You currently have %d memos, of which %d are unread."
-msgstr "You currently have %d memos, of which %d are unread."
+msgid "You currently have %zu memos, of which %zu are unread."
+msgstr "You currently have %zu memos, of which %zu are unread."
 
 #, c-format
-msgid "You currently have %d memos, of which 1 is unread."
-msgstr "You currently have %d memos, of which 1 is unread."
+msgid "You currently have %zu memos, of which 1 is unread."
+msgstr "You currently have %zu memos, of which 1 is unread."
 
 #, c-format
-msgid "You currently have %d memos."
-msgstr "You currently have %d memos."
+msgid "You currently have %zu memos."
+msgstr "You currently have %zu memos."
 
 #, c-format
-msgid "You currently have %d memos; all of them are unread."
-msgstr "You currently have %d memos; all of them are unread."
+msgid "You currently have %zu memos; all of them are unread."
+msgstr "You currently have %zu memos; all of them are unread."
 
 msgid "You currently have 1 memo, and it has not yet been read."
 msgstr "You currently have 1 memo, and it has not yet been read."
@@ -8527,6 +8405,12 @@ msgstr "You currently have no memos."
 #, c-format
 msgid "You do not have access to set mode %c."
 msgstr "You do not have access to set mode %c."
+
+msgid "You do not have any messages queued and did not specify a message to send."
+msgstr "You do not have any messages queued and did not specify a message to send."
+
+msgid "You do not have any queued messages."
+msgstr "You do not have any queued messages."
 
 #, c-format
 msgid "You do not have the access to change %s's modes."
@@ -8546,10 +8430,10 @@ msgstr "You have 1 new memo."
 #, c-format
 msgid ""
 "You have a new memo from %s.\n"
-"Type %s%s READ %d to read it."
+"Type %s%s READ %zu to read it."
 msgstr ""
 "You have a new memo from %s.\n"
-"Type %s%s READ %d to read it."
+"Type %s%s READ %zu to read it."
 
 #, c-format
 msgid "You have been invited to %s by %s."
@@ -8580,6 +8464,9 @@ msgstr "You have no limit on the number of memos you may keep."
 msgid "You have no memos."
 msgstr "You have no memos."
 
+msgid "You have no messages queued."
+msgstr "You have no messages queued."
+
 msgid "You have no new memos."
 msgstr "You have no new memos."
 
@@ -8598,11 +8485,11 @@ msgstr "You may drop any nick within your group."
 msgid "You may not (un)lock mode %c."
 msgstr "You may not (un)lock mode %c."
 
-msgid "You may not change the e-mail of other Services Operators."
-msgstr "You may not change the e-mail of other Services Operators."
-
 msgid "You may not change the email of an unconfirmed account."
 msgstr "You may not change the email of an unconfirmed account."
+
+msgid "You may not change the email of other Services Operators."
+msgstr "You may not change the email of other Services Operators."
 
 msgid "You may not change the password of other Services Operators."
 msgstr "You may not change the password of other Services Operators."
@@ -8610,14 +8497,8 @@ msgstr "You may not change the password of other Services Operators."
 msgid "You may not drop other Services Operators' nicknames."
 msgstr "You may not drop other Services Operators' nicknames."
 
-msgid "You may not get the password of other Services Operators."
-msgstr "You may not get the password of other Services Operators."
-
 msgid "You may not suspend other Services Operators' nicknames."
 msgstr "You may not suspend other Services Operators' nicknames."
-
-msgid "You may view but not modify the access list of other Services Operators."
-msgstr "You may view but not modify the access list of other Services Operators."
 
 msgid "You may view but not modify the certificate list of other Services Operators."
 msgstr "You may view but not modify the certificate list of other Services Operators."
@@ -8649,24 +8530,20 @@ msgid "You must confirm your account before you may send a memo."
 msgstr "You must confirm your account before you may send a memo."
 
 #, c-format
-msgid "You must enter the channel name twice as a confirmation that you wish to drop %s."
-msgstr "You must enter the channel name twice as a confirmation that you wish to drop %s."
-
-#, c-format
-msgid "You must have been using this nick for at least %d seconds to register."
-msgstr "You must have been using this nick for at least %d seconds to register."
+msgid "You must have been using this nick for at least %lu seconds to register."
+msgstr "You must have been using this nick for at least %lu seconds to register."
 
 #, c-format
 msgid "You must have the %s(ME) privilege on the channel to use this command."
 msgstr "You must have the %s(ME) privilege on the channel to use this command."
 
 msgid ""
-"You must now supply an e-mail for your nick.\n"
-"This e-mail will allow you to retrieve your password in\n"
+"You must now supply an email for your nick.\n"
+"This email will allow you to retrieve your password in\n"
 "case you forget it."
 msgstr ""
-"You must now supply an e-mail for your nick.\n"
-"This e-mail will allow you to retrieve your password in\n"
+"You must now supply an email for your nick.\n"
+"This email will allow you to retrieve your password in\n"
 "case you forget it."
 
 msgid "You need to be identified to use this command."
@@ -8711,8 +8588,8 @@ msgstr "Your IRCd does not support SVSNICK."
 msgid "Your IRCd does not support SVSPART."
 msgstr "Your IRCd does not support SVSPART."
 
-msgid "Your IRCd does not support vIdent's, if this is incorrect, please report this as a possible bug"
-msgstr "Your IRCd does not support vIdent's, if this is incorrect, please report this as a possible bug"
+msgid "Your IRCd does not support vidents. If this is incorrect please report this as a possible bug."
+msgstr "Your IRCd does not support vidents. If this is incorrect please report this as a possible bug."
 
 #, c-format
 msgid "Your account %s has been successfully created."
@@ -8768,6 +8645,12 @@ msgstr "Your memo limit is 0; you will not receive any new memos."
 msgid "Your memo limit is 0; you will not receive any new memos. You cannot change this limit."
 msgstr "Your memo limit is 0; you will not receive any new memos. You cannot change this limit."
 
+msgid "Your message has been queued."
+msgstr "Your message has been queued."
+
+msgid "Your message queue has been cleared."
+msgstr "Your message queue has been cleared."
+
 msgid "Your nick has been logged out."
 msgstr "Your nick has been logged out."
 
@@ -8792,26 +8675,22 @@ msgid "Your passcode has been re-sent to %s."
 msgstr "Your passcode has been re-sent to %s."
 
 #, c-format
-msgid "Your password is %s - remember this for later use."
-msgstr "Your password is %s - remember this for later use."
+msgid "Your password is too long. It must be shorter than %u characters."
+msgstr "Your password is too long. It must be shorter than %u characters."
 
 #, c-format
-msgid "Your password is too long. It must not exceed %u characters."
-msgstr "Your password is too long. It must not exceed %u characters."
+msgid "Your password is too short. It must be longer than %u characters."
+msgstr "Your password is too short. It must be longer than %u characters."
 
 msgid "Your password reset request has expired."
 msgstr "Your password reset request has expired."
 
-msgid "Your vHost has been requested."
-msgstr "Your vHost has been requested."
+msgid "Your vhost has been requested."
+msgstr "Your vhost has been requested."
 
 #, c-format
 msgid "Your vhost of %s is now activated."
 msgstr "Your vhost of %s is now activated."
-
-#, c-format
-msgid "Your vhost of %s@%s is now activated."
-msgstr "Your vhost of %s@%s is now activated."
 
 msgid "Your vhost was removed and the normal cloaking restored."
 msgstr "Your vhost was removed and the normal cloaking restored."
@@ -8876,6 +8755,9 @@ msgstr "[channel] {num | list | LAST | NEW | ALL}"
 msgid "[key|#X-Y]"
 msgstr "[key|#X-Y]"
 
+msgid "[message]"
+msgstr "[message]"
+
 msgid "[nick | channel]"
 msgstr "[nick | channel]"
 
@@ -8906,19 +8788,19 @@ msgstr "[Suspended]"
 msgid "[Unconfirmed]"
 msgstr "[Unconfirmed]"
 
-msgid "[auto memo] Your requested vHost has been approved."
-msgstr "[auto memo] Your requested vHost has been approved."
+#, c-format
+msgid "[auto memo] VHost %s has been requested by %s."
+msgstr "[auto memo] VHost %s has been requested by %s."
 
-msgid "[auto memo] Your requested vHost has been rejected."
-msgstr "[auto memo] Your requested vHost has been rejected."
+msgid "[auto memo] Your requested vhost has been approved."
+msgstr "[auto memo] Your requested vhost has been approved."
+
+msgid "[auto memo] Your requested vhost has been rejected."
+msgstr "[auto memo] Your requested vhost has been rejected."
 
 #, c-format
-msgid "[auto memo] Your requested vHost has been rejected. Reason: %s"
-msgstr "[auto memo] Your requested vHost has been rejected. Reason: %s"
-
-#, c-format
-msgid "[auto memo] vHost %s has been requested by %s."
-msgstr "[auto memo] vHost %s has been requested by %s."
+msgid "[auto memo] Your requested vhost has been rejected. Reason: %s"
+msgstr "[auto memo] Your requested vhost has been rejected. Reason: %s"
 
 msgid "[{pattern | channel} [INVISIBLE]]"
 msgstr "[{pattern | channel} [INVISIBLE]]"
@@ -8995,20 +8877,8 @@ msgstr "second"
 msgid "seconds"
 msgstr "seconds"
 
-#, c-format
-msgid "vHost for %s has been activated."
-msgstr "vHost for %s has been activated."
-
-#, c-format
-msgid "vHost for %s has been rejected."
-msgstr "vHost for %s has been rejected."
-
 msgid "vhost"
 msgstr "vhost"
-
-#, c-format
-msgid "vhosts for group %s have been removed."
-msgstr "vhosts for group %s have been removed."
 
 msgid "year"
 msgstr "year"

@@ -1,4 +1,4 @@
-/* Services -- main source file.
+/* Anope -- main source file.
  *
  * (C) 2003-2024 Anope Team
  * Contact us at team@anope.org
@@ -17,14 +17,14 @@
 #include "uplink.h"
 
 #ifndef _WIN32
-#include <limits.h>
+#include <climits>
 #else
 #include <process.h>
 #endif
 
 /* Command-line options: */
 int Anope::Debug = 0;
-bool Anope::ReadOnly = false, Anope::NoFork = false, Anope::NoThird = false, Anope::NoExpire = false, Anope::ProtocolDebug = false;
+bool Anope::ReadOnly = false, Anope::NoFork = false, Anope::NoThird = false, Anope::NoPID = false, Anope::NoExpire = false, Anope::ProtocolDebug = false;
 Anope::string Anope::ServicesDir;
 Anope::string Anope::ServicesBin;
 
@@ -36,28 +36,37 @@ Anope::string Anope::QuitReason;
 
 static Anope::string BinaryDir;       /* Full path to services bin directory */
 
-time_t Anope::StartTime = time(NULL);
-time_t Anope::CurTime = time(NULL);
+time_t Anope::StartTime = 0;
+time_t Anope::CurTime = 0;
+long long Anope::CurTimeNs = 0;
 
-int Anope::CurrentUplink = -1;
+size_t Anope::CurrentUplink = -1;
 
-class UpdateTimer : public Timer
+class UpdateTimer final
+	: public Timer
 {
- public:
-	UpdateTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
+public:
+	UpdateTimer(time_t timeout)
+		: Timer(timeout, true)
+	{
+	}
 
-	void Tick(time_t) anope_override
+	void Tick() override
 	{
 		Anope::SaveDatabases();
 	}
 };
 
-class ExpireTimer : public Timer
+class ExpireTimer final
+	: public Timer
 {
- public:
-	ExpireTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
+public:
+	ExpireTimer(time_t timeout)
+		: Timer(timeout, true)
+	{
+	}
 
-	void Tick(time_t) anope_override
+	void Tick() override
 	{
 		FOREACH_MOD(OnExpireTick, ());
 	}
@@ -76,13 +85,13 @@ void Anope::SaveDatabases()
  */
 static Anope::string GetFullProgDir(const Anope::string &argv0)
 {
-	char buffer[PATH_MAX];
 #ifdef _WIN32
 	/* Windows has specific API calls to get the EXE path that never fail.
 	 * For once, Windows has something of use, compared to the POSIX code
 	 * for this, this is positively neato.
 	 */
-	if (GetModuleFileName(NULL, buffer, PATH_MAX))
+	char buffer[MAX_PATH];
+	if (GetModuleFileName(NULL, buffer, MAX_PATH))
 	{
 		Anope::string fullpath = buffer;
 		Anope::string::size_type n = fullpath.rfind("\\");
@@ -91,6 +100,7 @@ static Anope::string GetFullProgDir(const Anope::string &argv0)
 	}
 #else
 	// Get the current working directory
+	char buffer[PATH_MAX];
 	if (getcwd(buffer, PATH_MAX))
 	{
 		Anope::string remainder = argv0;
@@ -137,12 +147,13 @@ int main(int ac, char **av, char **envp)
 	try
 	{
 		/* General initialization first */
-		Anope::Init(ac, av);
+		if (!Anope::Init(ac, av))
+			return Anope::ReturnValue;
 	}
 	catch (const CoreException &ex)
 	{
 		Log() << ex.GetReason();
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	try
@@ -156,7 +167,7 @@ int main(int ac, char **av, char **envp)
 
 	/* Set up timers */
 	time_t last_check = Anope::CurTime;
-	UpdateTimer updateTimer(Config->GetBlock("options")->Get<time_t>("updatetimeout", "5m"));
+	UpdateTimer updateTimer(Config->GetBlock("options")->Get<time_t>("updatetimeout", "2m"));
 	ExpireTimer expireTimer(Config->GetBlock("options")->Get<time_t>("expiretimeout", "30m"));
 
 	/*** Main loop. ***/
@@ -167,7 +178,7 @@ int main(int ac, char **av, char **envp)
 		/* Process timers */
 		if (Anope::CurTime - last_check >= Config->TimeoutCheck)
 		{
-			TimerManager::TickTimers(Anope::CurTime);
+			TimerManager::TickTimers();
 			last_check = Anope::CurTime;
 		}
 

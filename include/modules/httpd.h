@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef ANOPE_HTTPD_H
-#define ANOPE_HTTPD_H
+#pragma once
 
 enum HTTPError
 {
@@ -19,34 +18,35 @@ enum HTTPError
 };
 
 /* A message to someone */
-struct HTTPReply
+struct HTTPReply final
 {
-	HTTPError error;
+	HTTPError error = HTTP_ERROR_OK;
 	Anope::string content_type;
 	std::map<Anope::string, Anope::string, ci::less> headers;
 	typedef std::list<std::pair<Anope::string, Anope::string> > cookie;
 	std::vector<cookie> cookies;
 
-	HTTPReply() : error(HTTP_ERROR_OK), length(0) { }
+	HTTPReply() = default;
+	HTTPReply &operator=(const HTTPReply &) = default;
 
-	HTTPReply(const HTTPReply& other) : error(other.error), length(other.length)
+	HTTPReply(const HTTPReply &other) : error(other.error), length(other.length)
 	{
 		content_type = other.content_type;
 		headers = other.headers;
 		cookies = other.cookies;
 
-		for (unsigned i = 0; i < other.out.size(); ++i)
-			out.push_back(new Data(other.out[i]->buf, other.out[i]->len));
+		for (const auto &datum : other.out)
+			out.push_back(new Data(datum->buf, datum->len));
 	}
 
 	~HTTPReply()
 	{
-		for (unsigned i = 0; i < out.size(); ++i)
-			delete out[i];
+		for (const auto *datum : out)
+			delete datum;
 		out.clear();
 	}
 
-	struct Data
+	struct Data final
 	{
 		char *buf;
 		size_t len;
@@ -65,7 +65,7 @@ struct HTTPReply
 	};
 
 	std::deque<Data *> out;
-	size_t length;
+	size_t length = 0;
 
 	void Write(const Anope::string &message)
 	{
@@ -81,7 +81,7 @@ struct HTTPReply
 };
 
 /* A message from someone */
-struct HTTPMessage
+struct HTTPMessage final
 {
 	std::map<Anope::string, Anope::string> headers;
 	std::map<Anope::string, Anope::string> cookies;
@@ -93,12 +93,13 @@ struct HTTPMessage
 class HTTPClient;
 class HTTPProvider;
 
-class HTTPPage : public Base
+class HTTPPage
+	: public virtual Base
 {
 	Anope::string url;
 	Anope::string content_type;
 
- public:
+public:
 	HTTPPage(const Anope::string &u, const Anope::string &ct = "text/html") : url(u), content_type(ct) { }
 
 	const Anope::string &GetURL() const { return this->url; }
@@ -115,15 +116,18 @@ class HTTPPage : public Base
 	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
 };
 
-class HTTPClient : public ClientSocket, public BinarySocket, public Base
+class HTTPClient
+	: public ClientSocket
+	, public BinarySocket
+	, public Base
 {
- protected:
+protected:
 	void WriteClient(const Anope::string &message)
 	{
 		BinarySocket::Write(message + "\r\n");
 	}
 
- public:
+public:
 	HTTPClient(ListenSocket *l, int f, const sockaddrs &a) : ClientSocket(l, a), BinarySocket() { }
 
 	virtual const Anope::string GetIP()
@@ -135,12 +139,14 @@ class HTTPClient : public ClientSocket, public BinarySocket, public Base
 	virtual void SendReply(HTTPReply *) = 0;
 };
 
-class HTTPProvider : public ListenSocket, public Service
+class HTTPProvider
+	: public ListenSocket
+	, public Service
 {
 	Anope::string ip;
 	unsigned short port;
 	bool ssl;
- public:
+public:
 	std::vector<Anope::string> ext_ips;
 	std::vector<Anope::string> ext_headers;
 
@@ -163,7 +169,7 @@ class HTTPProvider : public ListenSocket, public Service
 
 	virtual bool RegisterPage(HTTPPage *page) = 0;
 	virtual void UnregisterPage(HTTPPage *page) = 0;
-	virtual HTTPPage* FindPage(const Anope::string &name) = 0;
+	virtual HTTPPage *FindPage(const Anope::string &name) = 0;
 };
 
 namespace HTTPUtils
@@ -174,7 +180,7 @@ namespace HTTPUtils
 
 		for (unsigned i = 0; i < url.length(); ++i)
 		{
-			const char& c = url[i];
+			const char &c = url[i];
 
 			if (c == '%' && i + 2 < url.length())
 			{
@@ -196,10 +202,8 @@ namespace HTTPUtils
 	{
 		Anope::string encoded;
 
-		for (unsigned i = 0; i < url.length(); ++i)
+		for (const auto c : url)
 		{
-			const char& c = url[i];
-
 			if (isalnum(c) || c == '.' || c == '-' || c == '*' || c == '_')
 				encoded += c;
 			else if (c == ' ')
@@ -215,9 +219,9 @@ namespace HTTPUtils
 	{
 		Anope::string dst;
 
-		for (unsigned i = 0; i < src.length(); ++i)
+		for (const auto c : src)
 		{
-			switch (src[i])
+			switch (c)
 			{
 				case '<':
 					dst += "&lt;";
@@ -232,12 +236,10 @@ namespace HTTPUtils
 					dst += "&amp;";
 					break;
 				default:
-					dst += src[i];
+					dst += c;
 			}
 		}
 
 		return dst;
 	}
 }
-
-#endif // ANOPE_HTTPD_H

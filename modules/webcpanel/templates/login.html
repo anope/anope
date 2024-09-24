@@ -1,0 +1,26 @@
+{INCLUDE layout/header.html}
+			<div class="row">
+				<div class="col-lg-offset-4 col-lg-4">
+					<a href="/">
+						<img src="/static/logo.png" class="img-responsive">
+					</a>
+
+					<h1 class="form-signin-heading">Login <small>to continue</small></h1>
+
+					{IF EXISTS INVALID_LOGIN}
+					<div class="alert alert-danger">
+						{INVALID_LOGIN}
+					</div>
+					{END IF}
+
+					<form class="form-horizontal form-signin" action="/" method="post">
+						<input type="text" name="username" class="form-control" placeholder="Username" required="required" autofocus
+							style="margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
+						<input type="password" name="password" class="form-control" placeholder="Password" required="required"
+							style="margin-bottom: 10px; border-top-left-radius: 0; border-top-right-radius: 0;">
+						<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+						<a class="btn btn-lg btn-warning btn-block" href="/register">Register</a>
+					</form>
+				</div>
+			</div>
+{INCLUDE layout/footer.html}

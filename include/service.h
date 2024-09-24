@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SERVICE_H
-#define SERVICE_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -21,7 +20,8 @@
  * such as commands, use this. This is also used for modules
  * that publish a service (m_ssl_openssl, etc).
  */
-class CoreExport Service : public virtual Base
+class CoreExport Service
+	: public virtual Base
 {
 	static std::map<Anope::string, std::map<Anope::string, Service *> > Services;
 	static std::map<Anope::string, std::map<Anope::string, Anope::string> > Aliases;
@@ -42,7 +42,7 @@ class CoreExport Service : public virtual Base
 		return NULL;
 	}
 
- public:
+public:
 	static Service *FindService(const Anope::string &t, const Anope::string &n)
 	{
 		std::map<Anope::string, std::map<Anope::string, Service *> >::const_iterator it = Services.find(t);
@@ -113,16 +113,17 @@ class CoreExport Service : public virtual Base
 	}
 };
 
-/** Like Reference, but used to refer to Services.
+/** Like Reference, but used to refer to a Service.
  */
 template<typename T>
-class ServiceReference : public Reference<T>
+class ServiceReference
+	: public Reference<T>
 {
 	Anope::string type;
 	Anope::string name;
 
- public:
-	ServiceReference() { }
+public:
+	ServiceReference() = default;
 
 	ServiceReference(const Anope::string &t, const Anope::string &n) : type(t), name(n)
 	{
@@ -138,7 +139,7 @@ class ServiceReference : public Reference<T>
 		this->invalid = true;
 	}
 
-	operator bool() anope_override
+	operator bool() override
 	{
 		if (this->invalid)
 		{
@@ -159,10 +160,10 @@ class ServiceReference : public Reference<T>
 	}
 };
 
-class ServiceAlias
+class ServiceAlias final
 {
 	Anope::string t, f;
- public:
+public:
 	ServiceAlias(const Anope::string &type, const Anope::string &from, const Anope::string &to) : t(type), f(from)
 	{
 		Service::AddAlias(type, from, to);
@@ -173,5 +174,3 @@ class ServiceAlias
 		Service::DelAlias(t, f);
 	}
 };
-
-#endif // SERVICE_H

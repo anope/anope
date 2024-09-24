@@ -40,18 +40,18 @@ AutoKick::~AutoKick()
 
 void AutoKick::Serialize(Serialize::Data &data) const
 {
-	data["ci"] << this->ci->name;
+	data.Store("ci", this->ci->name);
 	if (this->nc)
-		data["nc"] << this->nc->display;
+		data.Store("nc", this->nc->display);
 	else
-		data["mask"] << this->mask;
-	data["reason"] << this->reason;
-	data["creator"] << this->creator;
-	data.SetType("addtime", Serialize::Data::DT_INT); data["addtime"] << this->addtime;
-	data.SetType("last_used", Serialize::Data::DT_INT); data["last_used"] << this->last_used;
+		data.Store("mask", this->mask);
+	data.Store("reason", this->reason);
+	data.Store("creator", this->creator);
+	data.Store("addtime", this->addtime);
+	data.Store("last_used", this->last_used);
 }
 
-Serializable* AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sci, snc;
 
@@ -180,35 +180,38 @@ ChannelInfo::~ChannelInfo()
 
 void ChannelInfo::Serialize(Serialize::Data &data) const
 {
-	data["name"] << this->name;
+	data.Store("name", this->name);
 	if (this->founder)
-		data["founder"] << this->founder->display;
+		data.Store("founder", this->founder->display);
 	if (this->successor)
-		data["successor"] << this->successor->display;
-	data["description"] << this->desc;
-	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
-	data.SetType("last_used", Serialize::Data::DT_INT); data["last_used"] << this->last_used;
-	data["last_topic"] << this->last_topic;
-	data["last_topic_setter"] << this->last_topic_setter;
-	data.SetType("last_topic_time", Serialize::Data::DT_INT); data["last_topic_time"] << this->last_topic_time;
-	data.SetType("bantype", Serialize::Data::DT_INT); data["bantype"] << this->bantype;
+		data.Store("successor", this->successor->display);
+	data.Store("description", this->desc);
+	data.Store("time_registered", this->time_registered);
+	data.Store("last_used", this->last_used);
+	data.Store("last_topic", this->last_topic);
+	data.Store("last_topic_setter", this->last_topic_setter);
+	data.Store("last_topic_time", this->last_topic_time);
+	data.Store("bantype", this->bantype);
 	{
 		Anope::string levels_buffer;
-		for (Anope::map<int16_t>::const_iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
-			levels_buffer += it->first + " " + stringify(it->second) + " ";
-		data["levels"] << levels_buffer;
+		for (const auto &[name, level] : this->levels)
+			levels_buffer += name + " " + Anope::ToString(level) + " ";
+		data.Store("levels", levels_buffer);
 	}
 	if (this->bi)
-		data["bi"] << this->bi->nick;
-	data.SetType("banexpire", Serialize::Data::DT_INT); data["banexpire"] << this->banexpire;
-	data["memomax"] << this->memos.memomax;
-	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
-		data["memoignores"] << this->memos.ignores[i] << " ";
+		data.Store("bi", this->bi->nick);
+	data.Store("banexpire", this->banexpire);
+	data.Store("memomax", this->memos.memomax);
+
+	std::ostringstream oss;
+	for (const auto &ignore : this->memos.ignores)
+		oss << ignore << " ";
+	data.Store("memoignores", oss.str());
 
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sname, sfounder, ssuccessor, slevels, sbi;
 
@@ -238,11 +241,14 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		std::vector<Anope::string> v;
 		spacesepstream(slevels).GetTokens(v);
 		for (unsigned i = 0; i + 1 < v.size(); i += 2)
-			try
-			{
-				ci->levels[v[i]] = convertTo<int16_t>(v[i + 1]);
-			}
-			catch (const ConvertException &) { }
+		{
+			// Begin 2.0 database compatibility.
+			if (v[i] == "FANTASIA")
+				v[i] = "FANTASY";
+			// End 2.0 database compatibility.
+			if (auto level = Anope::TryConvert<int16_t>(v[i + 1]))
+				ci->levels[v[i]] = level.value();
+		}
 	}
 	BotInfo *bi = BotInfo::Find(sbi, true);
 	if (*ci->bi != bi)
@@ -267,10 +273,6 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	/* compat */
 	bool b;
-	b = false;
-	data["extensible:SECURE"] >> b;
-	if (b)
-		ci->Extend<bool>("CS_SECURE");
 	b = false;
 	data["extensible:PRIVATE"] >> b;
 	if (b)
@@ -423,18 +425,10 @@ AccessGroup ChannelInfo::AccessFor(const User *u, bool updateLastUsed)
 	if (u == NULL)
 		return group;
 
-	const NickCore *nc = u->Account();
-	if (nc == NULL && !this->HasExt("NS_SECURE") && u->IsRecognized())
-	{
-		const NickAlias *na = NickAlias::Find(u->nick);
-		if (na != NULL)
-			nc = na->nc;
-	}
-
 	group.super_admin = u->super_admin;
 	group.founder = IsFounder(u, this);
 	group.ci = this;
-	group.nc = nc;
+	group.nc = u->Account();
 
 	FindMatches(group, this, u, u->Account());
 
@@ -443,12 +437,10 @@ AccessGroup ChannelInfo::AccessFor(const User *u, bool updateLastUsed)
 		if (updateLastUsed)
 			this->last_used = Anope::CurTime;
 
-		for (unsigned i = 0; i < group.paths.size(); ++i)
+		for (auto &p : group.paths)
 		{
-			ChanAccess::Path &p = group.paths[i];
-
-			for (unsigned int j = 0; j < p.size(); ++j)
-				p[j]->last_seen = Anope::CurTime;
+			for (auto *ca : p)
+				ca->last_seen = Anope::CurTime;
 		}
 	}
 
@@ -527,7 +519,7 @@ void ChannelInfo::ClearAccess()
 
 AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t, time_t lu)
 {
-	AutoKick *autokick = new AutoKick();
+	auto *autokick = new AutoKick();
 	autokick->ci = this;
 	autokick->nc = akicknc;
 	autokick->reason = reason;
@@ -544,7 +536,7 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, co
 
 AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t, time_t lu)
 {
-	AutoKick *autokick = new AutoKick();
+	auto *autokick = new AutoKick();
 	autokick->ci = this;
 	autokick->mask = mask;
 	autokick->nc = NULL;
@@ -646,7 +638,7 @@ Anope::string ChannelInfo::GetIdealBan(User *u) const
 	}
 }
 
-ChannelInfo* ChannelInfo::Find(const Anope::string &name)
+ChannelInfo *ChannelInfo::Find(const Anope::string &name)
 {
 	registered_channel_map::const_iterator it = RegisteredChannelList->find(name);
 	if (it != RegisteredChannelList->end())
@@ -688,6 +680,6 @@ void ChannelInfo::RemoveChannelReference(const Anope::string &what)
 void ChannelInfo::GetChannelReferences(std::deque<Anope::string> &chans)
 {
 	chans.clear();
-	for (Anope::map<int>::iterator it = references.begin(); it != references.end(); ++it)
-		chans.push_back(it->first);
+	for (auto &[chan, _] : references)
+		chans.push_back(chan);
 }

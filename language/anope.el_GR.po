@@ -4012,7 +4012,7 @@ msgstr ""
 "(Παρόλα αυτά, δεν θα του στέλνονται παραπάνω από #%d# μηνύματα\n"
 "για να αποφευχθεί το flood του χρήστη. Αν υπάρχουν\n"
 "περισσότερα μηνύματα, θα φαίνονται τα πιο πρόσφατα.)\n"
-"Το NewsCount μπορεί να ρυθμιστεί στο services.conf.\n"
+"Το NewsCount μπορεί να ρυθμιστεί στο anope.conf.\n"
 "\n"
 "Η εντολή LOGONNEWS μπορεί να χρησιμοποιηθεί μόνο από IRC Operators."
 
@@ -4034,7 +4034,7 @@ msgstr ""
 "μηνύματα\n"
 "για να αποφευχθεί flood στον χρήστη. Αν υπάρχουν \n"
 "περισσότερα μηνύματα, θα φαίνονται τα πιο πρόσφατα.)\n"
-"Το NewsCount μπορεί να ρυθμιστεί στο services.conf.\n"
+"Το NewsCount μπορεί να ρυθμιστεί στο anope.conf.\n"
 " \n"
 "Το OPERNEWS μπορεί να χρησιμοποιηθεί μόνο από Services Operators."
 
@@ -7580,7 +7580,7 @@ msgstr "Ο Successor του #%s# δεν έχει οριστεί."
 #, fuzzy
 msgid ""
 "Super admin can not be set because it is not enabled in the configuration."
-msgstr "H ρύθμιση SuperAdmin δεν έχει ενεργοποιηθεί στο services.conf"
+msgstr "H ρύθμιση SuperAdmin δεν έχει ενεργοποιηθεί στο anope.conf"
 
 #
 msgid "Suspend a given nick"

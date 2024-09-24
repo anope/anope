@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef MODULE_H
-#define MODULE_H
+#pragma once
 
 #include "access.h"
 #include "account.h"
@@ -50,5 +49,3 @@
 #include "modules/pseudoclients/global.h"
 #include "modules/pseudoclients/memoserv.h"
 #include "modules/pseudoclients/nickserv.h"
-
-#endif // MODULE_H

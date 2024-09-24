@@ -13,7 +13,7 @@ WebCPanel::NickServ::Info::Info(const Anope::string &cat, const Anope::string &u
 
 bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
-	if (message.post_data.empty() == false)
+	if (!message.post_data.empty())
 	{
 		if (message.post_data.count("email") > 0)
 		{
@@ -56,14 +56,6 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("NS_PRIVATE");
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (na->nc->HasExt("NS_SECURE") != message.post_data.count("secure"))
-		{
-			if (!na->nc->HasExt("NS_SECURE"))
-				na->nc->Extend<bool>("NS_SECURE");
-			else
-				na->nc->Shrink<bool>("NS_SECURE");
-			replacements["MESSAGES"] = "Secure updated";
-		}
 		if (message.post_data["kill"] == "on" && !na->nc->HasExt("KILLPROTECT"))
 		{
 			na->nc->Extend<bool>("KILLPROTECT");
@@ -82,19 +74,38 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 			na->nc->Shrink<bool>("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}
+		if (na->nc->HasExt("NS_KEEP_MODES") != message.post_data.count("keepmodes"))
+		{
+			if (!na->nc->HasExt("NS_KEEP_MODES"))
+				na->nc->Extend<bool>("NS_KEEP_MODES");
+			else
+				na->nc->Shrink<bool>("NS_KEEP_MODES");
+			replacements["MESSAGES"] = "Keepmodes updated";
+		}
+		if (na->nc->HasExt("MSG") != message.post_data.count("msg"))
+		{
+			if (!na->nc->HasExt("MSG"))
+				na->nc->Extend<bool>("MSG");
+			else
+				na->nc->Shrink<bool>("MSG");
+			replacements["MESSAGES"] = "Message updated";
+		}
+		if (na->nc->HasExt("NEVEROP") != message.post_data.count("neverop"))
+		{
+			if (!na->nc->HasExt("NEVEROP"))
+				na->nc->Extend<bool>("NEVEROP");
+			else
+				na->nc->Shrink<bool>("NEVEROP");
+			replacements["MESSAGES"] = "Neverop updated";
+		}
 	}
 
 	replacements["DISPLAY"] = na->nc->display;
-	if (na->nc->email.empty() == false)
+	if (!na->nc->email.empty())
 		replacements["EMAIL"] = na->nc->email;
-	replacements["TIME_REGISTERED"] = Anope::strftime(na->time_registered, na->nc);
-	if (na->HasVhost())
-	{
-		if (na->GetVhostIdent().empty() == false)
-			replacements["VHOST"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
-		else
-			replacements["VHOST"] = na->GetVhostHost();
-	}
+	replacements["TIME_REGISTERED"] = Anope::strftime(na->nc->time_registered, na->nc);
+	if (na->HasVHost())
+		replacements["VHOST"] = na->GetVHostMask();
 	Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
 	if (greet)
 		replacements["GREET"] = *greet;
@@ -102,14 +113,18 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		replacements["AUTOOP"];
 	if (na->nc->HasExt("NS_PRIVATE"))
 		replacements["PRIVATE"];
-	if (na->nc->HasExt("NS_SECURE"))
-		replacements["SECURE"];
 	if (na->nc->HasExt("KILLPROTECT"))
 		replacements["KILL_ON"];
 	if (na->nc->HasExt("KILL_QUICK"))
 		replacements["KILL_QUICK"];
 	if (!na->nc->HasExt("KILLPROTECT") && !na->nc->HasExt("KILL_QUICK"))
 		replacements["KILL_OFF"];
+	if (na->nc->HasExt("NS_KEEP_MODES"))
+		replacements["KEEPMODES"];
+	if (na->nc->HasExt("MSG"))
+		replacements["MSG"];
+	if (na->nc->HasExt("NEVEROP"))
+		replacements["NEVEROP"];
 
 	TemplateFileServer page("nickserv/info.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

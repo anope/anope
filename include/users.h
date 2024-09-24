@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef USERS_H
-#define USERS_H
+#pragma once
 
 #include "anope.h"
 #include "modes.h"
@@ -20,7 +19,7 @@
 #include "account.h"
 #include "sockets.h"
 
-typedef Anope::hash_map<User *> user_map;
+typedef Anope::unordered_map<User *> user_map;
 
 extern CoreExport user_map UserListByNick, UserListByUID;
 
@@ -29,21 +28,22 @@ extern CoreExport unsigned MaxUserCount;
 extern CoreExport time_t MaxUserTime;
 
 /* Online user and channel data. */
-class CoreExport User : public virtual Base, public Extensible, public CommandReply
+class CoreExport User
+	: public virtual Base
+	, public Extensible
+	, public CommandReply
 {
 	/* true if the user was quit or killed */
 	bool quit;
 	/* Users that are in the process of quitting */
 	static std::list<User *> quitting_users;
 
- public:
+public:
 	typedef std::map<Anope::string, Anope::string> ModeList;
- protected:
+protected:
 	Anope::string vident;
 	Anope::string ident;
 	Anope::string uid;
-	/* If the user is on the access list of the nick they're on */
-	bool on_access;
 	/* Map of user modes and the params this user has (if any) */
 	ModeList modes;
 	/* NickCore account the user is currently logged in as, if they are logged in */
@@ -55,7 +55,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	time_t invalid_pw_time;
 
 
- public: // XXX: exposing a tiny bit too much
+public: // XXX: exposing a tiny bit too much
 	/* User's current nick */
 	Anope::string nick;
 
@@ -91,7 +91,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/* Last time this user sent an email */
 	time_t lastmail;
 
- protected:
+protected:
 	/** Create a new user object, initialising necessary fields and
 	 * adds it to the hash
 	 *
@@ -113,8 +113,8 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	virtual ~User();
 
- public:
-	static User* OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
+public:
+	static User *OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
 
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
@@ -189,8 +189,9 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param fmt Format of the Message
 	 * @param ... any number of parameters
 	 */
-	void SendMessage(BotInfo *source, const char *fmt, ...);
-	void SendMessage(BotInfo *source, const Anope::string &msg) anope_override;
+	void SendMessage(BotInfo *source, const char *fmt, ...) ATTR_FORMAT(3, 4);
+	void SendMessage(BotInfo *source, const Anope::string &msg) override;
+	void SendMessage(CommandSource &source, const Anope::string &msg) override;
 
 	/** Identify the user to a nick.
 	 * updates last_seen, logs the user in,
@@ -214,17 +215,21 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	NickCore *Account() const;
 
+	/** Get the account nick the user is logged in using
+	 * @return The account nick or NULL
+	 */
+	NickAlias *AccountNick() const;
+
 	/** Check if the user is identified for their nick
 	 * @param check_nick True to check if the user is identified to the nickname they are on too
 	 * @return true or false
 	 */
 	bool IsIdentified(bool check_nick = false) const;
 
-	/** Check if the user is recognized for their nick (on the nicks access list)
-	 * @param check_secure Only returns true if the user has secure off
-	 * @return true or false
+	/** Check if the user is connected securely.
+	 * @return True if the user is connected securely; otherwise, false.
 	 */
-	bool IsRecognized(bool check_secure = true) const;
+	bool IsSecurelyConnected() const;
 
 	/** Check if the user is a services oper
 	 * @return true if they are an oper
@@ -243,8 +248,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	  */
 	bool HasPriv(const Anope::string &privstr);
 
-	/** Update the last usermask stored for a user, and check to see if they are recognized
-	 */
+	/** Update the last usermask stored for a user. */
 	void UpdateHost();
 
 	/** Check if the user has a mode
@@ -298,13 +302,15 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param bi The client setting the modes
 	 * @param umodes The modes
 	 */
-	void SetModes(BotInfo *bi, const char *umodes, ...);
+	void SetModes(BotInfo *bi, const char *umodes, ...) ATTR_FORMAT(3, 4);
+	void SetModes(BotInfo *bi, const Anope::string &umodes);
 
 	/** Set a string of modes on a user internally
 	 * @param setter who/what is setting the mode
 	 * @param umodes The modes
 	 */
-	void SetModesInternal(const MessageSource &source, const char *umodes, ...);
+	void SetModesInternal(const MessageSource &source, const char *umodes, ...) ATTR_FORMAT(3, 4);
+	void SetModesInternal(const MessageSource &source, const Anope::string &umodes);
 
 	/** Get modes set for this user.
 	 * @return A string of modes set on the user
@@ -359,16 +365,17 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	bool BadPassword();
 
+	/** Determines whether this user should receive a PRIVMSG instead of a NOTICE. */
+	bool ShouldPrivmsg() const;
+
 	/** Finds a user by nick, or possibly UID
 	 * @param name The nick, or possibly UID, to lookup
 	 * @param nick_only set to true to only look up by nick, not UID
 	 * @return the user, if they exist
 	 */
-	static User* Find(const Anope::string &name, bool nick_only = false);
+	static User *Find(const Anope::string &name, bool nick_only = false);
 
 	/** Quits all users who are pending to be quit
 	 */
 	static void QuitUsers();
 };
-
-#endif // USERS_H

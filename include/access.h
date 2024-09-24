@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef ACCESS_H
-#define ACCESS_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -28,7 +27,7 @@ enum
  * backing each ChanAccess determines whether that ChanAccess has a given
  * privilege.
  */
-struct CoreExport Privilege
+struct CoreExport Privilege final
 {
 	Anope::string name;
 	Anope::string desc;
@@ -39,10 +38,10 @@ struct CoreExport Privilege
 	bool operator==(const Privilege &other) const;
 };
 
-class CoreExport PrivilegeManager
+class CoreExport PrivilegeManager final
 {
 	static std::vector<Privilege> Privileges;
- public:
+public:
 	static void AddPrivilege(Privilege p);
 	static void RemovePrivilege(Privilege &p);
 	static Privilege *FindPrivilege(const Anope::string &name);
@@ -53,9 +52,10 @@ class CoreExport PrivilegeManager
 /* A provider of access. Only used for creating ChanAccesses, as
  * they contain pure virtual functions.
  */
-class CoreExport AccessProvider : public Service
+class CoreExport AccessProvider
+	: public Service
 {
- public:
+public:
 	AccessProvider(Module *owner, const Anope::string &name);
 	virtual ~AccessProvider();
 
@@ -64,20 +64,21 @@ class CoreExport AccessProvider : public Service
 	 */
 	virtual ChanAccess *Create() = 0;
 
- private:
+private:
 	static std::list<AccessProvider *> Providers;
- public:
+public:
 	static const std::list<AccessProvider *>& GetProviders();
 };
 
 /* Represents one entry of an access list on a channel. */
-class CoreExport ChanAccess : public Serializable
+class CoreExport ChanAccess
+	: public Serializable
 {
 	Anope::string mask;
 	/* account this access entry is for, if any */
 	Serialize::Reference<NickCore> nc;
 
- public:
+public:
 	typedef std::vector<ChanAccess *> Path;
 
 	/* The provider that created this access entry */
@@ -85,6 +86,7 @@ class CoreExport ChanAccess : public Serializable
 	/* Channel this access entry is on */
 	Serialize::Reference<ChannelInfo> ci;
 	Anope::string creator;
+	Anope::string description;
 	time_t last_seen;
 	time_t created;
 
@@ -95,8 +97,8 @@ class CoreExport ChanAccess : public Serializable
 	const Anope::string &Mask() const;
 	NickCore *GetAccount() const;
 
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	void Serialize(Serialize::Data &data) const override;
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	static const unsigned int MAX_DEPTH = 4;
 
@@ -105,7 +107,7 @@ class CoreExport ChanAccess : public Serializable
 	 * @param nc The account
 	 * @param next Next channel to check if any
 	 */
-	virtual bool Matches(const User *u, const NickCore *nc, ChannelInfo* &next) const;
+	virtual bool Matches(const User *u, const NickCore *nc, ChannelInfo *&next) const;
 
 	/** Check if this access entry has the given privilege.
 	 * @param name The privilege name
@@ -133,9 +135,9 @@ class CoreExport ChanAccess : public Serializable
 /* A group of access entries. This is used commonly, for example with ChannelInfo::AccessFor,
  * to show what access a user has on a channel because users can match multiple access entries.
  */
-class CoreExport AccessGroup
+class CoreExport AccessGroup final
 {
- public:
+public:
 	/* access entries + paths */
 	std::vector<ChanAccess::Path> paths;
 	/* Channel these access entries are on */
@@ -170,5 +172,3 @@ class CoreExport AccessGroup
 
 	inline bool empty() const { return paths.empty(); }
 };
-
-#endif

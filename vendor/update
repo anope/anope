@@ -1,0 +1,111 @@
+#!/usr/bin/env perl
+#
+# (C) 2003-2024 Anope Team
+# Contact us at team@anope.org
+#
+# Please read COPYING and README for further details.
+#
+# Based on the original code of Epona by Lara.
+# Based on the original code of Services by Andy Church.
+
+use v5.26.0;
+use strict;
+use warnings FATAL => qw(all);
+
+use File::Basename        qw(basename dirname);
+use File::Copy            qw(move);
+use File::Spec::Functions qw(abs2rel catdir catfile);
+use File::Temp            qw(tempdir);
+use FindBin               qw($RealDir);
+use File::Path            qw(mkpath);
+use POSIX                 qw(strftime);
+use TOML                  qw(from_toml);
+
+use constant {
+	CC_BOLD  => -t STDOUT ? "\e[1m"    : '',
+	CC_RESET => -t STDOUT ? "\e[0m"    : '',
+	CC_GREEN => -t STDOUT ? "\e[1;32m" : '',
+	CC_RED   => -t STDOUT ? "\e[1;31m" : '',
+};
+
+sub execute(@) {
+	say "${\CC_BOLD}\$${\CC_RESET} @_";
+	return system @_;
+}
+
+sub print_error {
+	print STDERR "${\CC_BOLD}Error:${\CC_RESET} ";
+	for my $line (@_) {
+		say STDERR $line;
+	}
+	exit 1;
+}
+
+my $config = catfile $RealDir, 'update.toml';
+open(my $fh, $config) or print_error "unable to read $config: $!";
+my $contents = do { local $/; <$fh> };
+close $fh;
+
+my ($data, $error) = from_toml $contents;
+print_error "unable to parse $config: $!" if $error;
+
+while (my ($name, $info) = each %{$data}) {
+	say "Updating ${\CC_GREEN}$name${\CC_RESET} ...";
+
+	my $unpackdir = File::Temp->newdir;
+	my $vendordir = catdir $RealDir, $name;
+	my $success = 0;
+	if (defined $info->{git}) {
+		my @extra_args;
+		push @extra_args, '--branch', $info->{branch} if defined $info->{branch};
+		$success ||= execute 'git', 'clone', @extra_args, $info->{git}, $unpackdir;
+		chomp(my $tag = `git -C $unpackdir describe --abbrev=0 --tags HEAD 2>/dev/null`) unless $success;
+		$success ||= execute 'git', '-C', $unpackdir, 'checkout', $tag if $tag;
+		chomp($info->{version} = `git -C $unpackdir describe --always --tags HEAD 2>/dev/null`);
+		if (defined $info->{patches}) {
+			my $patches = catfile($unpackdir, $info->{patches});
+			for my $patch (glob $patches) {
+				$success |= execute 'git', '-C', $unpackdir, 'apply', $patch;
+			}
+		}
+	} elsif (defined $info->{tarball}) {
+		my $tarball = catfile $unpackdir, basename $info->{tarball};
+		$success ||= execute 'wget', '--output-document', $tarball, $info->{tarball};
+		$success ||= execute 'tar', 'fx', $tarball, '-C', $unpackdir, '--strip-components', 1;
+	} else {
+		print_error "unable to update $name; no git or tarball specified!";
+	}
+	print_error "unable to update $name: download failed!" if $success;
+
+	unlink $vendordir;
+	my $glob = $info->{files} or print_error "unable to update $name: no file glob specified!";
+	for my $file (glob catfile $unpackdir, $glob) {
+		my $pathname = abs2rel $file, $unpackdir;
+		for (my $i = 0; $i < ($info->{depth} // 0); ++$i) {
+			$pathname =~ s/[^\/]+\///;
+		}
+		my $filename = catfile $vendordir, $pathname;
+		my $dirname = dirname $filename;
+		mkdir $dirname, 0750 or print_error "unable to create $dirname: $!." unless -e $dirname;
+		move $file, $filename;
+	}
+}
+
+my $readme = catfile $RealDir, 'README.md';
+open($fh, $readme) or print_error "unable to read $readme: $!";
+$contents = do { local $/; <$fh> };
+close $fh;
+
+open($fh, '>', $readme) or print_error "unable to write $readme: $!";
+print $fh $contents =~ s/\n\#\#.*//rs;
+for my $name (sort keys %{$data}) {
+	my $info = $data->{$name};
+	printf $fh "\n## %s\n\n", $name;
+	printf $fh "**Author** &mdash; [%s](mailto:%s)\n\n", $info->{author}, $info->{email} if $info->{email};
+	printf $fh "**Author** &mdash; %s\n\n", $info->{author} unless $info->{email};
+	printf $fh "**License** &mdash; %s\n\n", $info->{license};
+	printf $fh "**Version** &mdash; %s\n\n", $info->{version};
+	my $website = $info->{website} // $info->{git};
+	printf $fh "**Website** &mdash; [%s](%s)\n", $website, $website;
+}
+close $fh;

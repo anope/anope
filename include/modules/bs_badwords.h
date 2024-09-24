@@ -9,6 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#pragma once
+
 /** Flags for badwords
  */
 enum BadWordType
@@ -30,27 +32,27 @@ struct BadWord
 	Anope::string word;
 	BadWordType type;
 
-	virtual ~BadWord() { }
- protected:
-	BadWord() { }
+	virtual ~BadWord() = default;
+protected:
+	BadWord() = default;
 };
 
 struct BadWords
 {
-	virtual ~BadWords() { }
+	virtual ~BadWords() = default;
 
 	/** Add a badword to the badword list
 	 * @param word The badword
 	 * @param type The type (SINGLE START END)
 	 * @return The badword
 	 */
-	virtual BadWord* AddBadWord(const Anope::string &word, BadWordType type) = 0;
+	virtual BadWord *AddBadWord(const Anope::string &word, BadWordType type) = 0;
 
 	/** Get a badword structure by index
 	 * @param index The index
 	 * @return The badword
 	 */
-	virtual BadWord* GetBadWord(unsigned index) const = 0;
+	virtual BadWord *GetBadWord(unsigned index) const = 0;
 
 	/** Get how many badwords are on this channel
 	 * @return The number of badwords in the vector

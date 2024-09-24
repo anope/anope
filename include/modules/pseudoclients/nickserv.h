@@ -6,12 +6,12 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef NICKSERV_H
-#define NICKSERV_H
+#pragma once
 
-class NickServService : public Service
+class NickServService
+	: public Service
 {
- public:
+public:
 	NickServService(Module *m) : Service(m, "NickServService", "NickServ")
 	{
 	}
@@ -20,5 +20,3 @@ class NickServService : public Service
 	virtual void Collide(User *u, NickAlias *na) = 0;
 	virtual void Release(NickAlias *na) = 0;
 };
-
-#endif // NICKSERV_H

@@ -10,16 +10,18 @@
  */
 
 #include "module.h"
+#include "numeric.h"
 
-class ngIRCdProto : public IRCDProto
+class ngIRCdProto final
+	: public IRCDProto
 {
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) anope_override
+	void SendSVSKill(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
-		IRCDProto::SendSVSKillInternal(source, user, buf);
+		IRCDProto::SendSVSKill(source, user, buf);
 		user->KillInternal(source, buf);
 	}
 
- public:
+public:
 	ngIRCdProto(Module *creator) : IRCDProto(creator, "ngIRCd")
 	{
 		DefaultPseudoclientModes = "+oi";
@@ -30,64 +32,63 @@ class ngIRCdProto : public IRCDProto
 		MaxModes = 5;
 	}
 
-	void SendAkill(User *u, XLine *x) anope_override
+	void SendAkill(User *u, XLine *x) override
 	{
-		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
-			timeleft = 172800;
-		UplinkSocket::Message(Me) << "GLINE " << x->mask << " " << timeleft << " :" << x->GetReason() << " (" << x->by << ")";
+		// Calculate the time left before this would expire
+		time_t timeleft = x->expires ? x->expires - Anope::CurTime : x->expires;
+		Uplink::Send("GLINE", x->mask, timeleft, x->GetReason() + " (" + x->by + ")");
 	}
 
-	void SendAkillDel(const XLine *x) anope_override
+	void SendAkillDel(const XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "GLINE " << x->mask;
+		Uplink::Send("GLINE", x->mask);
 	}
 
-	void SendChannel(Channel *c) anope_override
+	void SendChannel(Channel *c) override
 	{
-		UplinkSocket::Message(Me) << "CHANINFO " << c->name << " +" << c->GetModes(true, true);
+		Uplink::Send("CHANINFO", c->name, "+" + c->GetModes(true, true));
 	}
 
 	// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
-	void SendClientIntroduction(User *u) anope_override
+	void SendClientIntroduction(User *u) override
 	{
-		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me) << "NICK " << u->nick << " 1 " << u->GetIdent() << " " << u->host << " 1 " << modes << " :" << u->realname;
+		Uplink::Send("NICK", u->nick, 1, u->GetIdent(), u->host, 1, "+" + u->GetModes(), u->realname);
 	}
 
-	void SendConnect() anope_override
+	void SendConnect() override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " 0210-IRC+ Anope|" << Anope::VersionShort() << ":CLHMSo P";
+		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password, "0210-IRC+", "Anope|" + Anope::VersionShort() + ":CLHMSo P");
+
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
+
 		/* finish the enhanced server handshake and register the connection */
-		this->SendNumeric(376, "*", ":End of MOTD command");
+		this->SendNumeric(RPL_ENDOFMOTD, "*", "End of MOTD command");
 	}
 
-	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
+	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
-		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick;
+		Uplink::Send("SVSNICK", u->nick, newnick);
 	}
 
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "NOTICE", "$" + dest->GetName(), msg);
 	}
 
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override
 	{
-		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
+		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
+	void SendGlobops(const MessageSource &source, const Anope::string &buf) override
 	{
-		UplinkSocket::Message(source) << "WALLOPS :" << buf;
+		Uplink::Send(source, "WALLOPS", buf);
 	}
 
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		UplinkSocket::Message(user) << "JOIN " << c->name;
+		Uplink::Send(user, "JOIN", c->name);
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -100,36 +101,36 @@ class ngIRCdProto : public IRCDProto
 				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->GetUID());
-			for (size_t i = 0; i < cs.Modes().length(); ++i)
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+			for (auto mode : cs.Modes())
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(mode), user->GetUID(), false);
 
 			if (uc != NULL)
 				uc->status = cs;
 		}
 	}
 
-	void SendLogin(User *u, NickAlias *na) anope_override
+	void SendLogin(User *u, NickAlias *na) override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
+		Uplink::Send("METADATA", u->GetUID(), "accountname", na->nc->display);
 	}
 
-	void SendLogout(User *u) anope_override
+	void SendLogout(User *u) override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
+		Uplink::Send("METADATA", u->GetUID(), "accountname", "");
 	}
 
 	/* SERVER name hop descript */
-	void SendServer(const Server *server) anope_override
+	void SendServer(const Server *server) override
 	{
-		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
+		Uplink::Send("SERVER", server->GetName(), server->GetHops(), server->GetDescription());
 	}
 
-	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) anope_override
+	void SendVHost(User *u, const Anope::string &vident, const Anope::string &vhost) override
 	{
-		if (!vIdent.empty())
-			UplinkSocket::Message(Me) << "METADATA " << u->nick << " user :" << vIdent;
+		if (!vident.empty())
+			Uplink::Send("METADATA", u->nick, "user", vident);
 
-		UplinkSocket::Message(Me) << "METADATA " << u->nick << " cloakhost :" << vhost;
+		Uplink::Send("METADATA", u->nick, "cloakhost", vhost);
 		if (!u->HasMode("CLOAK"))
 		{
 			u->SetMode(Config->GetClient("HostServ"), "CLOAK");
@@ -137,52 +138,49 @@ class ngIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendVhostDel(User *u) anope_override
+	void SendVHostDel(User *u) override
 	{
-		this->SendVhost(u, u->GetIdent(), "");
+		this->SendVHost(u, u->GetIdent(), "");
 	}
 
-	Anope::string Format(const Anope::string &source, const Anope::string &message) anope_override
+	bool Format(Anope::string &message, const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params) override
 	{
-		return IRCDProto::Format(source.empty() ? Me->GetSID() : source, message);
+		return IRCDProto::Format(message, tags, source.GetSource().empty() ? Me : source, command, params);
 	}
 };
 
-struct IRCDMessage005 : IRCDMessage
+struct IRCDMessage005 final
+	: IRCDMessage
 {
-	IRCDMessage005(Module *creator) : IRCDMessage(creator, "005", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessage005(Module *creator) : IRCDMessage(creator, "005", 1) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	// Please see <http://www.irc.org/tech_docs/005.html> for details.
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		size_t pos;
 		Anope::string parameter, data;
-		for (unsigned i = 0, end = params.size(); i < end; ++i)
+		for (const auto &param : params)
 		{
-			pos = params[i].find('=');
+			pos = param.find('=');
 			if (pos != Anope::string::npos)
 			{
-				parameter = params[i].substr(0, pos);
-				data = params[i].substr(pos+1, params[i].length());
+				parameter = param.substr(0, pos);
+				data = param.substr(pos+1, param.length());
 				if (parameter == "MODES")
 				{
-					unsigned maxmodes = convertTo<unsigned>(data);
-					IRCD->MaxModes = maxmodes;
+					IRCD->MaxModes = Anope::Convert<unsigned>(data, IRCD->MaxModes);
 				}
 				else if (parameter == "NICKLEN")
 				{
-					unsigned newlen = convertTo<unsigned>(data), len = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
-					if (len != newlen)
-					{
-						Log() << "Warning: NICKLEN is " << newlen << " but networkinfo:nicklen is " << len;
-					}
+					IRCD->MaxNick = Anope::Convert<size_t>(data, IRCD->MaxNick);
 				}
 			}
 		}
 	}
 };
 
-struct IRCDMessage376 : IRCDMessage
+struct IRCDMessage376 final
+	: IRCDMessage
 {
 	IRCDMessage376(Module *creator) : IRCDMessage(creator, "376", 2) { }
 
@@ -194,14 +192,15 @@ struct IRCDMessage376 : IRCDMessage
 	 *
 	 */
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 	}
 };
 
-struct IRCDMessageChaninfo : IRCDMessage
+struct IRCDMessageChaninfo final
+	: IRCDMessage
 {
-	IRCDMessageChaninfo(Module *creator) : IRCDMessage(creator, "CHANINFO", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageChaninfo(Module *creator) : IRCDMessage(creator, "CHANINFO", 2) { SetFlag(FLAG_SOFT_LIMIT); SetFlag(FLAG_REQUIRE_SERVER); }
 
 	/*
 	 * CHANINFO is used by servers to inform each other about a channel: its
@@ -220,7 +219,7 @@ struct IRCDMessageChaninfo : IRCDMessage
 	 * a channel has no user limit (the parameter <modes> doesn't list the "l"
 	 * channel mode). In this case <limit> should be "0".
 	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		bool created;
 		Channel *c = Channel::FindOrCreate(params[0], created);
@@ -252,9 +251,10 @@ struct IRCDMessageChaninfo : IRCDMessage
 	}
 };
 
-struct IRCDMessageJoin : Message::Join
+struct IRCDMessageJoin final
+	: Message::Join
 {
-	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+	IRCDMessageJoin(Module *creator) : Message::Join(creator, "JOIN") { SetFlag(FLAG_REQUIRE_USER); }
 
 	/*
 	 * <@po||ux> DukeP: RFC 2813, 4.2.1: the JOIN command on server-server links
@@ -262,7 +262,7 @@ struct IRCDMessageJoin : Message::Join
 	 *
 	 * if a user joins a new channel, the ircd sends <channelname>\7<umode>
 	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		User *user = source.GetUser();
 		size_t pos = params[0].find('\7');
@@ -281,7 +281,7 @@ struct IRCDMessageJoin : Message::Join
 		std::vector<Anope::string> new_params;
 		new_params.push_back(channel);
 
-		Message::Join::Run(source, new_params);
+		Message::Join::Run(source, new_params, tags);
 
 		if (!modes.empty())
 		{
@@ -292,9 +292,10 @@ struct IRCDMessageJoin : Message::Join
 	}
 };
 
-struct IRCDMessageMetadata : IRCDMessage
+struct IRCDMessageMetadata final
+	: IRCDMessage
 {
-	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3) { SetFlag(FLAG_REQUIRE_SERVER); }
 
 	/*
 	 * Received: :ngircd.dev.anope.de METADATA DukePyrolator host :anope-e2ee5c7d
@@ -312,7 +313,7 @@ struct IRCDMessageMetadata : IRCDMessage
 	 *  - "user": the user name (ident) of a client (can't be empty)
 	 */
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		User *u = User::Find(params[0]);
 		if (!u)
@@ -351,9 +352,10 @@ struct IRCDMessageMetadata : IRCDMessage
 	}
 };
 
-struct IRCDMessageMode : IRCDMessage
+struct IRCDMessageMode final
+	: IRCDMessage
 {
-	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*
 	 * Received: :DukeP MODE #anope +b *!*@*.aol.com
@@ -363,7 +365,7 @@ struct IRCDMessageMode : IRCDMessage
 	 * params[n] = parameters
 	 */
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		Anope::string modes = params[1];
 
@@ -382,14 +384,15 @@ struct IRCDMessageMode : IRCDMessage
 			User *u = User::Find(params[0]);
 
 			if (u)
-				u->SetModesInternal(source, "%s", params[1].c_str());
+				u->SetModesInternal(source, params[1]);
 		}
 	}
 };
 
-struct IRCDMessageNick : IRCDMessage
+struct IRCDMessageNick final
+	: IRCDMessage
 {
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 1) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*
 	 * NICK - NEW
@@ -410,7 +413,7 @@ struct IRCDMessageNick : IRCDMessage
 	 * params[0] = newnick
 	 *
 	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		if (params.size() == 1)
 		{
@@ -439,9 +442,10 @@ struct IRCDMessageNick : IRCDMessage
 	}
 };
 
-struct IRCDMessageNJoin : IRCDMessage
+struct IRCDMessageNJoin final
+	: IRCDMessage
 {
-	IRCDMessageNJoin(Module *creator) : IRCDMessage(creator, "NJOIN",2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); };
+	IRCDMessageNJoin(Module *creator) : IRCDMessage(creator, "NJOIN",2) { SetFlag(FLAG_REQUIRE_SERVER); };
 
 	/*
 	 * RFC 2813, 4.2.2: Njoin Message:
@@ -454,7 +458,7 @@ struct IRCDMessageNJoin : IRCDMessage
 	 *
 	 * Received: :dev.anope.de NJOIN #test :DukeP2,@DukeP,%test,+test2
 	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		std::list<Message::Join::SJoinUser> users;
 
@@ -485,25 +489,27 @@ struct IRCDMessageNJoin : IRCDMessage
 	}
 };
 
-struct IRCDMessagePong : IRCDMessage
+struct IRCDMessagePong final
+	: IRCDMessage
 {
-	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessagePong(Module *creator) : IRCDMessage(creator, "PONG", 0) { SetFlag(FLAG_SOFT_LIMIT); SetFlag(FLAG_REQUIRE_SERVER); }
 
 	/*
 	 * ngIRCd does not send an EOB, so we send a PING immediately
 	 * when receiving a new server and then finish sync once we
 	 * get a pong back from that server.
 	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		if (!source.GetServer()->IsSynced())
 			source.GetServer()->Sync(false);
 	}
 };
 
-struct IRCDMessageServer : IRCDMessage
+struct IRCDMessageServer final
+	: IRCDMessage
 {
-	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	/*
 	 * New directly linked server:
@@ -530,7 +536,7 @@ struct IRCDMessageServer : IRCDMessage
 	 * params[3] = server description
 	 */
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		if (params.size() == 3)
 		{
@@ -540,7 +546,7 @@ struct IRCDMessageServer : IRCDMessage
 		else
 		{
 			// our uplink is introducing a new server
-			unsigned int hops = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+			auto hops = Anope::Convert<unsigned>(params[1], 0);
 			new Server(source.GetServer(), params[0], hops, params[3], params[2]);
 		}
 		/*
@@ -552,12 +558,13 @@ struct IRCDMessageServer : IRCDMessage
 	}
 };
 
-struct IRCDMessageTopic : IRCDMessage
+struct IRCDMessageTopic final
+	: IRCDMessage
 {
-	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 2) { SetFlag(FLAG_SOFT_LIMIT); }
 
 	// Received: :DukeP TOPIC #anope :test
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		Channel *c = Channel::Find(params[0]);
 		if (!c)
@@ -571,7 +578,8 @@ struct IRCDMessageTopic : IRCDMessage
 
 
 
-class ProtongIRCd : public Module
+class ProtongIRCd final
+	: public Module
 {
 	ngIRCdProto ircd_proto;
 
@@ -606,7 +614,7 @@ class ProtongIRCd : public Module
 	IRCDMessageServer message_server;
 	IRCDMessageTopic message_topic;
 
-	void AddModes()
+	static void AddModes()
 	{
 		/* Add user modes */
 		ModeManager::AddUserMode(new UserMode("NOCTCP", 'b'));
@@ -651,7 +659,7 @@ class ProtongIRCd : public Module
 		ModeManager::AddChannelMode(new ChannelMode("SSL", 'z'));
 	}
 
- public:
+public:
 	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_capab(this), message_error(this), message_invite(this), message_kick(this), message_kill(this),
@@ -670,7 +678,7 @@ class ProtongIRCd : public Module
 
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &) anope_override
+	void OnUserNickChange(User *u, const Anope::string &) override
 	{
 		u->RemoveMode(Config->GetClient("NickServ"), "REGISTERED");
 	}

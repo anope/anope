@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef OPERTYPE_H
-#define OPERTYPE_H
+#pragma once
 
 #include "services.h"
 #include "account.h"
@@ -22,9 +21,9 @@ struct CoreExport Oper
 	/* The type of operator this operator is */
 	OperType *ot;
 	/* Whether the user must be an IRC operator (umode +o) to be considered a services operator */
-	bool require_oper;
+	bool require_oper = true;
 	Anope::string password;
-	Anope::string certfp;
+	std::vector<Anope::string> certfp;
 	/* Hosts allowed to use this operator block */
 	std::vector<Anope::string> hosts;
 	Anope::string vhost;
@@ -41,9 +40,9 @@ struct CoreExport Oper
 	static Oper *Find(const Anope::string &name);
 };
 
-class CoreExport OperType
+class CoreExport OperType final
 {
- private:
+private:
 	/** The name of this opertype, e.g. "sra".
 	 */
 	Anope::string name;
@@ -66,7 +65,7 @@ class CoreExport OperType
 	/** Set of opertypes we inherit from
 	 */
 	std::set<OperType *> inheritances;
- public:
+public:
 	/** Modes to set when someone identifies using this opertype
 	 */
 	Anope::string modes;
@@ -116,12 +115,10 @@ class CoreExport OperType
 	/** Gets the icommands for this opertype
 	 * @return A list of commands
 	 */
-	const std::list<Anope::string> GetCommands() const;
+	std::list<Anope::string> GetCommands() const;
 
 	/** Gets the privileges for this opertype
 	 * @return A list of privileges
 	 */
-	const std::list<Anope::string> GetPrivs() const;
+	std::list<Anope::string> GetPrivs() const;
 };
-
-#endif // OPERTYPE_H

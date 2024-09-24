@@ -29,18 +29,18 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 		{
 			std::vector<Anope::string> params;
 			std::stringstream cmdstr;
-			params.push_back("ADD");
+			params.emplace_back("ADD");
 			cmdstr << "+" << HTTPUtils::URLDecode(message.post_data["expiry"]);
 			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["mask"]);
 			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["reason"]);
-			params.push_back(cmdstr.str());
+			params.emplace_back(cmdstr.str());
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "OperServ", "operserv/akill", params, replacements);
 		}
 
 		if (message.get_data["del"] == "1" && message.get_data.count("number") > 0)
 		{
 			std::vector<Anope::string> params;
-			params.push_back("DEL");
+			params.emplace_back("DEL");
 			params.push_back(HTTPUtils::URLDecode(message.get_data["number"]));
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "OperServ", "operserv/akill", params, replacements);
 		}
@@ -48,7 +48,7 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 		for (unsigned i = 0, end = akills->GetCount(); i < end; ++i)
 		{
 			const XLine *x = akills->GetEntry(i);
-			replacements["NUMBER"] = stringify(i + 1);
+			replacements["NUMBER"] = Anope::ToString(i + 1);
 			replacements["HOST"] = x->mask;
 			replacements["SETTER"] = x->by;
 			replacements["TIME"] = Anope::strftime(x->created, NULL, true);

@@ -70,7 +70,7 @@ Anope for Windows
        If you cannot find whats causing the error, please visit our forums or
        our IRC Support channel for assistance.
 
-       Some Anope modules require third party libraries, such as m_mysql and
+       Some Anope modules require third party libraries, such as mysql and
        the SSL modules. If these libraries are installed in nonstandard
        locations, cmake will probably not find them and should be told where
        they are by passing their location to Config.
@@ -103,7 +103,7 @@ Anope for Windows
        INSTALL within the Solution Explorer. Right-click on INSTALL and choose Build.
 
        When you have done this, all the files will be installed to where they belong.
-       The only thing you need to do is rename "data/example.conf" to be "data/services.conf",
+       The only thing you need to do is rename "data/anope.example.conf" to be "data/anope.conf",
        and then follow the steps to set up Anope.
 
     You have now completed the building phase of Anope for Windows. You can
@@ -120,7 +120,7 @@ Anope for Windows
     Notepad will cause strange characters to appear, and you may not be able to
     edit the file correctly.
 
-    Open services.conf, and read through it carefully and adjust the settings
+    Open anope.conf, and read through it carefully and adjust the settings
     you think you need to adjust.
 
     If you are unsure of the settings, you can go to the dos command prompt

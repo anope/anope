@@ -9,6 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#pragma once
+
 /* Indices for TTB (Times To Ban) */
 enum
 {
@@ -35,10 +37,10 @@ struct KickerData
 
 	bool dontkickops, dontkickvoices;
 
- protected:
-	KickerData() { }
+protected:
+	KickerData() = default;
 
- public:
-	virtual ~KickerData() { }
+public:
+	virtual ~KickerData() = default;
 	virtual void Check(ChannelInfo *ci) = 0;
 };

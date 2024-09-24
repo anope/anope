@@ -6,22 +6,27 @@
  * Please read COPYING and README for further details.
  */
 
+#pragma once
+
+#include <stdexcept>
+
 namespace SQL
 {
 
-	class Data : public Serialize::Data
+	class Data final
+		: public Serialize::Data
 	{
-	 public:
+	public:
 		typedef std::map<Anope::string, std::stringstream *> Map;
 		Map data;
-		std::map<Anope::string, Type> types;
+		std::map<Anope::string, Serialize::DataType> types;
 
 		~Data()
 		{
 			Clear();
 		}
 
-		std::iostream& operator[](const Anope::string &key) anope_override
+		std::iostream &operator[](const Anope::string &key) override
 		{
 			std::stringstream *&ss = data[key];
 			if (!ss)
@@ -29,72 +34,66 @@ namespace SQL
 			return *ss;
 		}
 
-		std::set<Anope::string> KeySet() const anope_override
-		{
-			std::set<Anope::string> keys;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				keys.insert(it->first);
-			return keys;
-		}
-
-		size_t Hash() const anope_override
+		size_t Hash() const override
 		{
 			size_t hash = 0;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				if (!it->second->str().empty())
-					hash ^= Anope::hash_cs()(it->second->str());
+			for (const auto &[_, value] : this->data)
+			{
+				if (!value->str().empty())
+					hash ^= Anope::hash_cs()(value->str());
+			}
 			return hash;
 		}
 
 		std::map<Anope::string, std::iostream *> GetData() const
 		{
 			std::map<Anope::string, std::iostream *> d;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				d[it->first] = it->second;
+			for (const auto &[key, value] : this->data)
+				d[key] = value;
 			return d;
 		}
 
 		void Clear()
 		{
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				delete it->second;
+			for (const auto &[_, value] : this->data)
+				delete value;
 			this->data.clear();
 		}
 
-		void SetType(const Anope::string &key, Type t) anope_override
+		void SetType(const Anope::string &key, Serialize::DataType dt) override
 		{
-			this->types[key] = t;
+			this->types[key] = dt;
 		}
 
-		Type GetType(const Anope::string &key) const anope_override
+		Serialize::DataType GetType(const Anope::string &key) const override
 		{
-			std::map<Anope::string, Type>::const_iterator it = this->types.find(key);
+			auto it = this->types.find(key);
 			if (it != this->types.end())
 				return it->second;
-			return DT_TEXT;
+			return Serialize::DataType::TEXT;
 		}
 	};
 
 	/** A SQL exception, can be thrown at various points
 	 */
-	class Exception : public ModuleException
+	class DllExport Exception : public ModuleException
 	{
-	 public:
+	public:
 		Exception(const Anope::string &reason) : ModuleException(reason) { }
 
-		virtual ~Exception() throw() { }
+		virtual ~Exception() noexcept = default;
 	};
 
 	/** A SQL query
 	 */
 
-	struct QueryData
+	struct QueryData final
 	{
 		Anope::string data;
 		bool escape;
 	};
 
-	struct Query
+	struct Query final
 	{
 		Anope::string query;
 		std::map<Anope::string, QueryData> parameters;
@@ -102,7 +101,7 @@ namespace SQL
 		Query() { }
 		Query(const Anope::string &q) : query(q) { }
 
-		Query& operator=(const Anope::string &q)
+		Query &operator=(const Anope::string &q)
 		{
 			this->query = q;
 			this->parameters.clear();
@@ -119,15 +118,14 @@ namespace SQL
 			return !(*this == other);
 		}
 
-		template<typename T> void SetValue(const Anope::string &key, const T& value, bool escape = true)
+		template<typename T> void SetValue(const Anope::string &key, const T &value, bool escape = true)
 		{
-			try
-			{
-				Anope::string string_value = stringify(value);
-				this->parameters[key].data = string_value;
-				this->parameters[key].escape = escape;
-			}
-			catch (const ConvertException &ex) { }
+			auto str = Anope::TryString(value);
+			if (!str.has_value())
+				return;
+
+			this->parameters[key].data = str.value();
+			this->parameters[key].escape = escape;
 		}
 	};
 
@@ -135,16 +133,16 @@ namespace SQL
 	 */
 	class Result
 	{
-	 protected:
+	protected:
 		/* Rows, column, item */
 		std::vector<std::map<Anope::string, Anope::string> > entries;
 		Query query;
 		Anope::string error;
-	 public:
-		unsigned int id;
+	public:
+		unsigned int id = 0;
 		Anope::string finished_query;
 
-		Result() : id(0) { }
+		Result() = default;
 		Result(unsigned int i, const Query &q, const Anope::string &fq, const Anope::string &err = "") : query(q), error(err), id(i), finished_query(fq) { }
 
 		inline operator bool() const { return this->error.empty(); }
@@ -183,11 +181,11 @@ namespace SQL
 	 */
 	class Interface
 	{
-	 public:
+	public:
 		Module *owner;
 
 		Interface(Module *m) : owner(m) { }
-		virtual ~Interface() { }
+		virtual ~Interface() = default;
 
 		virtual void OnResult(const Result &r) = 0;
 		virtual void OnError(const Result &r) = 0;
@@ -195,9 +193,10 @@ namespace SQL
 
 	/** Class providing the SQL service, modules call this to execute queries
 	 */
-	class Provider : public Service
+	class Provider
+		: public Service
 	{
-	 public:
+	public:
 		Provider(Module *c, const Anope::string &n) : Service(c, "SQL::Provider", n) { }
 
 		virtual void Run(Interface *i, const Query &query) = 0;

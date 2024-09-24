@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef LISTS_H
-#define LISTS_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -24,13 +23,13 @@
  */
 class CoreExport NumberList
 {
- private:
-	bool is_valid;
+private:
+	bool is_valid = true;
 
 	std::set<unsigned> numbers;
 
 	bool desc;
- public:
+public:
 	/** Processes a numbered list
 	 * @param list The list
 	 * @param descending True to make HandleNumber get called with numbers in descending order
@@ -39,7 +38,7 @@ class CoreExport NumberList
 
 	/** Destructor, does nothing
 	 */
-	virtual ~NumberList();
+	virtual ~NumberList() = default;
 
 	/** Should be called after the constructors are done running. This calls the callbacks.
 	 */
@@ -61,15 +60,15 @@ class CoreExport NumberList
 
 /** This class handles formatting LIST/VIEW replies.
  */
-class CoreExport ListFormatter
+class CoreExport ListFormatter final
 {
- public:
+public:
 	typedef std::map<Anope::string, Anope::string> ListEntry;
- private:
+private:
 	NickCore *nc;
 	std::vector<Anope::string> columns;
 	std::vector<ListEntry> entries;
- public:
+public:
 	ListFormatter(NickCore *nc);
 	ListFormatter &AddColumn(const Anope::string &name);
 	void AddEntry(const ListEntry &entry);
@@ -79,16 +78,14 @@ class CoreExport ListFormatter
 
 /** This class handles formatting INFO replies
  */
-class CoreExport InfoFormatter
+class CoreExport InfoFormatter final
 {
 	NickCore *nc;
 	std::vector<std::pair<Anope::string, Anope::string> > replies;
-	unsigned longest;
- public:
+	unsigned longest = 0;
+public:
 	InfoFormatter(NickCore *nc);
 	void Process(std::vector<Anope::string> &);
 	Anope::string &operator[](const Anope::string &key);
 	void AddOption(const Anope::string &opt);
 };
-
-#endif // LISTS_H

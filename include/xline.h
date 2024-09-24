@@ -6,25 +6,25 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef XLINE_H
-#define XLINE_H
+#pragma once
 
 #include "serialize.h"
 #include "service.h"
 #include "sockets.h"
 
 /* An Xline, eg, anything added with operserv/akill, or any of the operserv/sxline commands */
-class CoreExport XLine : public Serializable
+class CoreExport XLine final
+	: public Serializable
 {
 	void Init();
 	Anope::string nick, user, host, real;
- public:
+public:
 	cidr *c;
 	Anope::string mask;
 	Regex *regex;
 	Anope::string by;
-	time_t created;
-	time_t expires;
+	time_t created = 0;
+	time_t expires = 0;
 	Anope::string reason;
 	XLineManager *manager;
 	Anope::string id;
@@ -44,19 +44,20 @@ class CoreExport XLine : public Serializable
 	bool HasNickOrReal() const;
 	bool IsRegex() const;
 
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+	void Serialize(Serialize::Data &data) const override;
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 /* Managers XLines. There is one XLineManager per type of XLine. */
-class CoreExport XLineManager : public Service
+class CoreExport XLineManager
+	: public Service
 {
 	char type;
 	/* List of XLines in this XLineManager */
 	Serialize::Checker<std::vector<XLine *> > xlines;
 	/* Akills can have the same IDs, sometimes */
 	static Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLinesByUID;
- public:
+public:
 	/* List of XLine managers we check users against in XLineManager::CheckAll */
 	static std::list<XLineManager *> XLineManagers;
 
@@ -124,7 +125,7 @@ class CoreExport XLineManager : public Service
 	 * @param index The index
 	 * @return The XLine, or NULL if the index is out of bounds
 	 */
-	XLine* GetEntry(unsigned index);
+	XLine *GetEntry(unsigned index);
 
 	/** Clear the XLine vector
 	 * Note: This does not remove the XLines from the IRCd
@@ -144,7 +145,7 @@ class CoreExport XLineManager : public Service
 	 * @param mask The mask
 	 * @return The XLine the user matches, or NULL
 	 */
-	XLine* HasEntry(const Anope::string &mask);
+	XLine *HasEntry(const Anope::string &mask);
 
 	/** Check a user against all of the xlines in this XLineManager
 	 * @param u The user
@@ -180,5 +181,3 @@ class CoreExport XLineManager : public Service
 	 */
 	virtual void SendDel(XLine *x) = 0;
 };
-
-#endif // XLINE_H

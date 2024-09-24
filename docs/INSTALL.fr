@@ -37,7 +37,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     Ensuite, décompressez le package dans votre répertoire home, et allez
     dans le répértoire qui vient d'être créé.
 
-    Si il y a des modules facultatifs que vous voulez activer comme m_mysql,
+    Si il y a des modules facultatifs que vous voulez activer comme mysql,
     exécuter le script 'extras' pour les activer. Si vous ne savez pas, vous
     pouvez les activer plus tard.
 
@@ -49,15 +49,15 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     Allez dans le dossier build (cd build) et tapez make et make install.
     Ceci va installer tous les fichiers nécessaires dans les dossiers que
     vous avez indiqués avec le script Config et régler les permissions des
-    fichiers. Vous devez vous assurer que le répertoire data n'est pas 
+    fichiers. Vous devez vous assurer que le répertoire data n'est pas
     accessible par les autres utilisateurs, car des utilisateurs
     malveillants pourraient causer des problèmes sur votre réseau, si les
     mots de passe ne sont pas chiffrés, ou lire les mémos de tous les
     utilisateurs.
 
-    Allez maintenant dans le répertoire conf (par défaut, ~/services/conf).
-    Copiez l'exemple de fichier de configuration (example.conf) en
-    services.conf et ouvrez ce dernier avec votre éditeur de texte favori.
+    Allez maintenant dans le répertoire conf (par défaut, ~/anope/conf).
+    Copiez l'exemple de fichier de configuration (anope.example.conf) en
+    anope.conf et ouvrez ce dernier avec votre éditeur de texte favori.
     Il contient toutes les directives de configuration qu'Anope va utiliser
     en démarrant. Lisez attentivement les instructions contenues dans le
     fichier. L'utilisation des valeurs par défaut n'est pas toujours
@@ -78,11 +78,11 @@ Note : Vous devrez également lire les fichiers README et FAQ !
         * IMPORTANT : Sauvegardez vos anciennes bases de données !
         * Si vous mettez à jour vers une nouvelle version majeure,
           recommencez *toujours* toute votre configuration à partir du
-          fichier example.conf.
+          fichier anope.example.conf.
 
 3) Configuration de l'IRCd
 
-    Les Services agissent comme un serveur IRC avec des pseudo-clients.
+    Anope agit comme un serveur IRC avec des pseudo-clients.
     Pour les relier à votre réseau, vous aurez besoin de configurer votre
     IRCd pour permettre aux services de se connecter.
 
@@ -92,14 +92,14 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     sur le port donné dans le bloc link.
 
     Des exemples de configurations de bloc link peuvent être trouvés dans
-    le fichier example.conf pour certains des IRCd les plus populaires.
+    le fichier anope.example.conf pour certains des IRCd les plus populaires.
 
     Souvenez-vous de /rehash votre IRCd pour appliquer les changements.
 
 4) Mettre en route Anope
 
     Allez dans le répertoire où les fichiers binaires ont été installés
-    (par défaut, ~/services/bin). Tapez ./services pour lancer Anope.
+    (par défaut, ~/anope/bin). Tapez ./anope pour lancer Anope.
 
     S'il y a des erreurs de syntaxe dans le fichier de configuration, elles
     seront affichées à l'écran. Corrigez-les jusqu'à ce qu'il n'y en ait
@@ -109,7 +109,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     réseau, car certains IRCds sur certains systèmes peuvent être très
     lents pour le processus de liaison. Si rien ne se passe après environ
     une minute, il y a probablement un problème de configuration. Essayez
-    de lancer Anope en mode debug avec ./services -debug -nofork pour voir
+    de lancer Anope en mode debug avec ./anope -debug -nofork pour voir
     toutes les erreurs rencontrées et essayez de les corriger.
 
     Si vous avez besoin d'aide pour résoudre des erreurs, n'hésitez pas à
@@ -122,10 +122,10 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     est toujours en cours d'exécution et de le redémarrer s'il n'est pas.
 
     D'abord renommez le script example.chk qui est dans les dossiers
-    d'Anope (par défaut, ~/services/conf) en services.chk et modifiez-le.
+    d'Anope (par défaut, ~/anope/conf) en anope.chk et modifiez-le.
     Vous aurez besoin de modifier la partie CONFIGURATION du fichier.
     Assurez-vous ensuite que le fichier est marqué comme exécutable en
-    tapant chmod +x services.chk et essayez de lancer le script pour voir
+    tapant chmod +x anope.chk et essayez de lancer le script pour voir
     si cela fonctionne (Anope ne doit pas être en marche lorsque vous
     testez cela ;))
 
@@ -133,7 +133,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     crontab -e. Cela va ouvrir l'éditeur de texte par défaut avec le
     fichier crontab. Entrez la ligne suivante (avec le chemin correct) :
 
-        */5 * * * * /home/ircd/services/conf/services.chk > /dev/null 2>&1
+        */5 * * * * /home/ircd/anope/conf/anope.chk > /dev/null 2>&1
 
     Le */5 au début signifie "vérifier toutes les 5 minutes". Vous pouvez
     remplacer le 5 par un autre numéro si vous voulez (mais moins de 60).

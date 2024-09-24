@@ -6,8 +6,8 @@
  */
 
 #include "webcpanel.h"
+#include <cerrno>
 #include <fstream>
-#include <errno.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>

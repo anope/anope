@@ -6,19 +6,19 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef OS_SESSION_H
-#define OS_SESSION_H
+#pragma once
 
-struct Session
+struct Session final
 {
 	cidr addr;                      /* A cidr (sockaddrs + len) representing this session */
-	unsigned count;                 /* Number of clients with this host */
-	unsigned hits;                  /* Number of subsequent kills for a host */
+	unsigned count = 1;             /* Number of clients with this host */
+	unsigned hits = 0;              /* Number of subsequent kills for a host */
 
-	Session(const sockaddrs &ip, int len) : addr(ip, len), count(1), hits(0) { }
+	Session(const sockaddrs &ip, int len) : addr(ip, len) { }
 };
 
-struct Exception : Serializable
+struct Exception final
+	: Serializable
 {
 	Anope::string mask;		/* Hosts to which this exception applies */
 	unsigned limit;			/* Session limit for exception */
@@ -28,14 +28,15 @@ struct Exception : Serializable
 	time_t expires;			/* Time when it expires. 0 == no expiry */
 
 	Exception() : Serializable("Exception") { }
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+	void Serialize(Serialize::Data &data) const override;
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-class SessionService : public Service
+class SessionService
+	: public Service
 {
- public:
-	typedef TR1NS::unordered_map<cidr, Session *, cidr::hash> SessionMap;
+public:
+	typedef std::unordered_map<cidr, Session *, cidr::hash> SessionMap;
 	typedef std::vector<Exception *> ExceptionVector;
 
 	SessionService(Module *m) : Service(m, "SessionService", "session") { }
@@ -61,15 +62,15 @@ static ServiceReference<SessionService> session_service("SessionService", "sessi
 
 void Exception::Serialize(Serialize::Data &data) const
 {
-	data["mask"] << this->mask;
-	data["limit"] << this->limit;
-	data["who"] << this->who;
-	data["reason"] << this->reason;
-	data["time"] << this->time;
-	data["expires"] << this->expires;
+	data.Store("mask", this->mask);
+	data.Store("limit", this->limit);
+	data.Store("who", this->who);
+	data.Store("reason", this->reason);
+	data.Store("time", this->time);
+	data.Store("expires", this->expires);
 }
 
-Serializable* Exception::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *Exception::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!session_service)
 		return NULL;
@@ -90,5 +91,3 @@ Serializable* Exception::Unserialize(Serializable *obj, Serialize::Data &data)
 		session_service->AddException(ex);
 	return ex;
 }
-
-#endif

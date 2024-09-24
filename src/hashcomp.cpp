@@ -91,7 +91,7 @@ bool ci::less::operator()(const Anope::string &s1, const Anope::string &s2) cons
 	return s1.ci_str().compare(s2.ci_str()) < 0;
 }
 
-sepstream::sepstream(const Anope::string &source, char separator, bool ae) : tokens(source), sep(separator), pos(0), allow_empty(ae)
+sepstream::sepstream(const Anope::string &source, char separator, bool ae) : tokens(source), sep(separator), allow_empty(ae)
 {
 }
 
@@ -106,7 +106,7 @@ bool sepstream::GetToken(Anope::string &token)
 	if (!this->allow_empty)
 	{
 		this->pos = this->tokens.find_first_not_of(this->sep, this->pos);
-		if (this->pos == std::string::npos)
+		if (this->pos == Anope::string::npos)
 		{
 			this->pos = this->tokens.length() + 1;
 			token.clear();
@@ -115,7 +115,7 @@ bool sepstream::GetToken(Anope::string &token)
 	}
 
 	size_t p = this->tokens.find(this->sep, this->pos);
-	if (p == std::string::npos)
+	if (p == Anope::string::npos)
 		p = this->tokens.length();
 
 	token = this->tokens.substr(this->pos, p - this->pos);
@@ -152,7 +152,7 @@ bool sepstream::GetTokenRemainder(Anope::string &token, int num)
 	return false;
 }
 
-const Anope::string sepstream::GetRemaining()
+Anope::string sepstream::GetRemaining()
 {
 	return !this->StreamEnd() ? this->tokens.substr(this->pos) : "";
 }

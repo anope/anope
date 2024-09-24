@@ -17,12 +17,16 @@
 
 UplinkSocket *UplinkSock = NULL;
 
-class ReconnectTimer : public Timer
+class ReconnectTimer final
+	: public Timer
 {
- public:
-	ReconnectTimer(int wait) : Timer(wait) { }
+public:
+	ReconnectTimer(time_t wait)
+		: Timer(wait)
+	{
+	}
 
-	void Tick(time_t)
+	void Tick() override
 	{
 		try
 		{
@@ -43,7 +47,7 @@ void Uplink::Connect()
 		return;
 	}
 
-	if (static_cast<unsigned>(++Anope::CurrentUplink) >= Config->Uplinks.size())
+	if (++Anope::CurrentUplink >= Config->Uplinks.size())
 		Anope::CurrentUplink = 0;
 
 	Configuration::Uplink &u = Config->Uplinks[Anope::CurrentUplink];
@@ -52,12 +56,54 @@ void Uplink::Connect()
 	if (!Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost").empty())
 		UplinkSock->Bind(Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost"));
 	FOREACH_MOD(OnPreServerConnect, ());
-	Anope::string ip = Anope::Resolve(u.host, u.ipv6 ? AF_INET6 : AF_INET);
+	Anope::string ip = Anope::Resolve(u.host, u.protocol);
 	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u.host << " (" << ip << '/' << u.port << ") with protocol " << IRCD->GetProtocolName();
 	UplinkSock->Connect(ip, u.port);
 }
 
-UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].ipv6), ConnectionSocket(), BufferedSocket()
+void Uplink::SendInternal(const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params)
+{
+	if (!UplinkSock)
+	{
+		Log(LOG_DEBUG) << "Attempted to send \"" << command << "\" from " << source.GetName() << " with a null uplink socket";
+		return;
+	}
+
+	Anope::string message;
+	if (!IRCD->Format(message, tags, source, command, params))
+		return;
+
+	UplinkSock->Write(message);
+
+	Log(LOG_RAWIO) << "Sent " << message;
+	if (Anope::ProtocolDebug)
+	{
+		if (tags.empty())
+			Log() << "\tNo tags";
+		else
+		{
+			for (const auto &[tname, tvalue] : tags)
+				Log() << "\tTag " << tname << ": " << tvalue;
+		}
+
+		if (source.GetSource().empty())
+			Log() << "\tNo source";
+		else
+			Log() << "\tSource: " << source.GetSource();
+
+		Log() << "\tCommand: " << command;
+
+		if (params.empty())
+			Log() << "\tNo params";
+		else
+		{
+			for (size_t i = 0; i < params.size(); ++i)
+				Log() << "\tParam " << i << ": " << params[i];
+		}
+	}
+}
+
+UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].protocol), ConnectionSocket(), BufferedSocket()
 {
 	error = false;
 	UplinkSock = this;
@@ -79,15 +125,13 @@ UplinkSocket::~UplinkSocket()
 	{
 		FOREACH_MOD(OnServerDisconnect, ());
 
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (const auto &[_, u] : UserListByNick)
 		{
-			User *u = it->second;
-
 			if (u->server == Me)
 			{
 				/* Don't use quitmsg here, it may contain information you don't want people to see */
 				IRCD->SendQuit(u, "Shutting down");
-				BotInfo* bi = BotInfo::Find(u->GetUID());
+				BotInfo *bi = BotInfo::Find(u->GetUID());
 				if (bi != NULL)
 					bi->introduced = false;
 			}
@@ -130,7 +174,7 @@ UplinkSocket::~UplinkSocket()
 bool UplinkSocket::ProcessRead()
 {
 	bool b = BufferedSocket::ProcessRead();
-	for (Anope::string buf; (buf = this->GetLine()).empty() == false;)
+	for (Anope::string buf; !(buf = this->GetLine()).empty();)
 	{
 		Anope::Process(buf);
 		User::QuitUsers();
@@ -151,62 +195,4 @@ void UplinkSocket::OnError(const Anope::string &err)
 	Anope::string what = !this->flags[SF_CONNECTED] ? "Unable to connect to" : "Lost connection from";
 	Log(LOG_TERMINAL) << what << " uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << ")" << (!err.empty() ? (": " + err) : "");
 	error |= !err.empty();
-}
-
-UplinkSocket::Message::Message() : source(Me)
-{
-}
-
-UplinkSocket::Message::Message(const MessageSource &src) : source(src)
-{
-}
-
-UplinkSocket::Message::~Message()
-{
-	Anope::string message_source;
-
-	if (this->source.GetServer() != NULL)
-	{
-		const Server *s = this->source.GetServer();
-
-		if (s != Me && !s->IsJuped())
-		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << s->GetName() << " who is not from me?";
-			return;
-		}
-
-		message_source = s->GetSID();
-	}
-	else if (this->source.GetUser() != NULL)
-	{
-		const User *u = this->source.GetUser();
-
-		if (u->server != Me && !u->server->IsJuped())
-		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << u->nick << " who is not from me?";
-			return;
-		}
-
-		const BotInfo *bi = this->source.GetBot();
-		if (bi != NULL && bi->introduced == false)
-		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << bi->nick << " when not introduced";
-			return;
-		}
-
-		message_source = u->GetUID();
-	}
-
-	if (!UplinkSock)
-	{
-		if (!message_source.empty())
-			Log(LOG_DEBUG) << "Attempted to send \"" << message_source << " " << this->buffer.str() << "\" with UplinkSock NULL";
-		else
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" with UplinkSock NULL";
-		return;
-	}
-
-	Anope::string sent = IRCD->Format(message_source, this->buffer.str());
-	UplinkSock->Write(sent);
-	Log(LOG_RAWIO) << "Sent: " << sent;
 }

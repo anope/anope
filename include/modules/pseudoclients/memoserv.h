@@ -6,12 +6,12 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef MEMOSERV_H
-#define MEMOSERV_H
+#pragma once
 
-class MemoServService : public Service
+class MemoServService
+	: public Service
 {
- public:
+public:
 	enum MemoResult
 	{
 		MEMO_SUCCESS,
@@ -37,5 +37,3 @@ class MemoServService : public Service
 	 */
 	virtual void Check(User *u) = 0;
 };
-
-#endif // MEMOSERV_H

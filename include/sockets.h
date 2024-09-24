@@ -9,16 +9,21 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SOCKETS_H
-#define SOCKETS_H
+#pragma once
 
 #ifndef _WIN32
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/un.h>
 #endif
 
 #include "anope.h"
+
+// This has to be after anope.h
+#ifdef _WIN32
+# include <afunix.h>
+#endif
 
 #define NET_BUFSIZE 65535
 
@@ -29,6 +34,7 @@ union CoreExport sockaddrs
 	sockaddr sa;
 	sockaddr_in sa4;
 	sockaddr_in6 sa6;
+	sockaddr_un saun;
 
 	/** Construct the object, sets everything to 0
 	 */
@@ -56,6 +62,11 @@ union CoreExport sockaddrs
 	 * @return The address
 	 */
 	Anope::string addr() const;
+
+	/** Gets the endpoint represented by this addr.
+	 * @return The endpoint.
+	 */
+	Anope::string str() const;
 
 	/** Get the reverse address represented by this addr
 	 * @return The reverse address
@@ -92,12 +103,12 @@ union CoreExport sockaddrs
 	void ntop(int type, const void *src);
 };
 
-class CoreExport cidr
+class CoreExport cidr final
 {
 	sockaddrs addr;
 	Anope::string cidr_ip;
 	unsigned short cidr_len;
- public:
+public:
 	cidr(const Anope::string &ip);
 	cidr(const Anope::string &ip, unsigned char len);
 	cidr(const sockaddrs &ip, unsigned char len);
@@ -109,15 +120,16 @@ class CoreExport cidr
 	bool operator==(const cidr &other) const;
 	bool operator!=(const cidr &other) const;
 
-	struct CoreExport hash
+	struct CoreExport hash final
 	{
 		size_t operator()(const cidr &s) const;
 	};
 };
 
-class SocketException : public CoreException
+class CoreExport SocketException final
+	: public CoreException
 {
- public:
+public:
 	/** Constructor for socket exceptions
 	 * @param message Error message
 	 */
@@ -126,7 +138,7 @@ class SocketException : public CoreException
 	/** Destructor
 	 * @throws Nothing
 	 */
-	virtual ~SocketException() throw() { }
+	virtual ~SocketException() noexcept = default;
 };
 
 enum SocketFlag
@@ -143,8 +155,8 @@ enum SocketFlag
 
 class CoreExport SocketIO
 {
- public:
-	virtual ~SocketIO() { }
+public:
+	virtual ~SocketIO() = default;
 
 	/** Receive something from the buffer
 	 * @param s The socket
@@ -201,13 +213,14 @@ class CoreExport SocketIO
 
 class CoreExport Socket
 {
- protected:
+protected:
 	/* Socket FD */
 	int sock;
-	/* Is this an IPv6 socket? */
-	bool ipv6;
 
- public:
+	/* The family of this socket FD */
+	int family;
+
+public:
 	std::bitset<SF_SIZE> flags;
 
 	/* Sockaddrs for bind() (if it's bound) */
@@ -222,24 +235,24 @@ class CoreExport Socket
 
 	/** Constructor, possibly creates the socket and adds it to the engine
 	 * @param sock The socket to use, -1 if we need to create our own
-	 * @param ipv6 true if using ipv6
+	 * @param family The family of the socket
 	 * @param type The socket type, defaults to SOCK_STREAM
 	 */
-	Socket(int sock, bool ipv6 = false, int type = SOCK_STREAM);
+	Socket(int sock, int family = AF_INET, int type = SOCK_STREAM);
 
 	/** Destructor, closes the socket and removes it from the engine
 	 */
 	virtual ~Socket();
 
+	/** Get the socket family for this socket
+	 * @return the family
+	 */
+	int GetFamily() const;
+
 	/** Get the socket FD for this socket
 	 * @return the fd
 	 */
 	int GetFD() const;
-
-	/** Check if this socket is IPv6
-	 * @return true or false
-	 */
-	bool IsIPv6() const;
 
 	/** Mark a socket as (non)blocking
 	 * @param state true to enable blocking, false to disable blocking
@@ -274,9 +287,10 @@ class CoreExport Socket
 	virtual void ProcessError();
 };
 
-class CoreExport BufferedSocket : public virtual Socket
+class CoreExport BufferedSocket
+	: public virtual Socket
 {
- protected:
+protected:
 	/* Things read from the socket */
 	Anope::string read_buffer;
 	/* Things to be written to the socket */
@@ -284,31 +298,30 @@ class CoreExport BufferedSocket : public virtual Socket
 	/* How much data was received from this socket on this recv() */
 	int recv_len;
 
- public:
-	BufferedSocket();
-	virtual ~BufferedSocket();
+public:
+	virtual ~BufferedSocket() = default;
 
 	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessRead() anope_override;
+	bool ProcessRead() override;
 
 	/** Called when the socket is ready to be written to
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessWrite() anope_override;
+	bool ProcessWrite() override;
 
 	/** Gets the new line from the input buffer, if any
 	 */
-	const Anope::string GetLine();
+	Anope::string GetLine();
 
 	/** Write to the socket
 	* @param message The message
 	*/
- protected:
+protected:
 	virtual void Write(const char *buffer, size_t l);
- public:
-	void Write(const char *message, ...);
+public:
+	void Write(const char *message, ...) ATTR_FORMAT(2, 3);
 	void Write(const Anope::string &message);
 
 	/** Get the length of the read buffer
@@ -322,10 +335,11 @@ class CoreExport BufferedSocket : public virtual Socket
 	int WriteBufferLen() const;
 };
 
-class CoreExport BinarySocket : public virtual Socket
+class CoreExport BinarySocket
+	: public virtual Socket
 {
- protected:
-	struct DataBlock
+protected:
+	struct DataBlock final
 	{
 		char *orig;
 		char *buf;
@@ -338,26 +352,25 @@ class CoreExport BinarySocket : public virtual Socket
 	/* Data to be written out */
 	std::deque<DataBlock *> write_buffer;
 
- public:
-	BinarySocket();
-	virtual ~BinarySocket();
+public:
+	virtual ~BinarySocket() = default;
 
 	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessRead() anope_override;
+	bool ProcessRead() override;
 
 	/** Called when the socket is ready to be written to
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessWrite() anope_override;
+	bool ProcessWrite() override;
 
 	/** Write data to the socket
 	 * @param buffer The data to write
 	 * @param l The length of the data; if 0 then this function returns without doing anything
 	 */
 	virtual void Write(const char *buffer, size_t l);
-	void Write(const char *message, ...);
+	void Write(const char *message, ...) ATTR_FORMAT(2, 3);
 	void Write(const Anope::string &message);
 
 	/** Called with data from the socket
@@ -368,16 +381,17 @@ class CoreExport BinarySocket : public virtual Socket
 	virtual bool Read(const char *buffer, size_t l);
 };
 
-class CoreExport ListenSocket : public virtual Socket
+class CoreExport ListenSocket
+	: public virtual Socket
 {
- public:
+public:
 	/** Constructor
 	 * @param bindip The IP to bind to
 	 * @param port The port to listen on
 	 * @param ipv6 true for ipv6
 	 */
 	ListenSocket(const Anope::string &bindip, int port, bool ipv6);
-	virtual ~ListenSocket();
+	virtual ~ListenSocket() = default;
 
 	/** Process what has come in from the connection
 	 * @return false to destroy this socket
@@ -392,9 +406,10 @@ class CoreExport ListenSocket : public virtual Socket
 	virtual ClientSocket *OnAccept(int fd, const sockaddrs &addr) = 0;
 };
 
-class CoreExport ConnectionSocket : public virtual Socket
+class CoreExport ConnectionSocket
+	: public virtual Socket
 {
- public:
+public:
 	/* Sockaddrs for connection ip/port */
 	sockaddrs conaddr;
 
@@ -408,12 +423,12 @@ class CoreExport ConnectionSocket : public virtual Socket
 	 * Used to determine whether or not this socket is connected yet.
 	 * @return true to continue to call ProcessRead/ProcessWrite, false to not continue
 	 */
-	bool Process() anope_override;
+	bool Process() override;
 
 	/** Called when there is an error for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	void ProcessError() anope_override;
+	void ProcessError() override;
 
 	/** Called on a successful connect
 	 */
@@ -425,9 +440,10 @@ class CoreExport ConnectionSocket : public virtual Socket
 	virtual void OnError(const Anope::string &error);
 };
 
-class CoreExport ClientSocket : public virtual Socket
+class CoreExport ClientSocket
+	: public virtual Socket
 {
- public:
+public:
 	/* Listen socket this connection came from */
 	ListenSocket *ls;
 	/* Clients address */
@@ -443,12 +459,12 @@ class CoreExport ClientSocket : public virtual Socket
 	 * Used to determine whether or not this socket is connected yet.
 	 * @return true to continue to call ProcessRead/ProcessWrite, false to not continue
 	 */
-	bool Process() anope_override;
+	bool Process() override;
 
 	/** Called when there is an error for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	void ProcessError() anope_override;
+	void ProcessError() override;
 
 	/** Called when a client has been accepted() successfully.
 	 */
@@ -459,9 +475,10 @@ class CoreExport ClientSocket : public virtual Socket
 	virtual void OnError(const Anope::string &error);
 };
 
-class CoreExport Pipe : public Socket
+class CoreExport Pipe
+	: public Socket
 {
- public:
+public:
 	/** The FD of the write pipe
 	 * this->sock is the readfd
 	 */
@@ -472,7 +489,7 @@ class CoreExport Pipe : public Socket
 
 	/** Called when data is to be read, reads the data then calls OnNotify
 	 */
-	bool ProcessRead() anope_override;
+	bool ProcessRead() override;
 
 	/** Write data to this pipe
 	 * @param data The data to write
@@ -507,5 +524,3 @@ class CoreExport Pipe : public Socket
 extern CoreExport uint32_t TotalRead;
 extern CoreExport uint32_t TotalWritten;
 extern CoreExport SocketIO NormalSocketIO;
-
-#endif // SOCKET_H

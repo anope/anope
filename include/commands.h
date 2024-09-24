@@ -9,24 +9,21 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef COMMAND_H
-#define COMMAND_H
+#pragma once
 
 #include "service.h"
 #include "anope.h"
 #include "channels.h"
 
-struct CommandGroup
+struct CommandGroup final
 {
 	Anope::string name, description;
 };
 
 /* Used in BotInfo::commands */
-struct CommandInfo
+struct CommandInfo final
 {
 	typedef Anope::map<CommandInfo> map;
-
-	CommandInfo() : hide(false), prepend_channel(false) { }
 
 	/* Service name of the command */
 	Anope::string name;
@@ -35,9 +32,9 @@ struct CommandInfo
 	/* Group this command is in */
 	Anope::string group;
 	/* whether or not to hide this command in help output */
-	bool hide;
+	bool hide = false;
 	/* Only used with fantasy */
-	bool prepend_channel;
+	bool prepend_channel = false;
 };
 
 /* Where the replies from commands go to. User inherits from this and is the normal
@@ -45,18 +42,19 @@ struct CommandInfo
  */
 struct CoreExport CommandReply
 {
-	virtual ~CommandReply() { }
+	virtual ~CommandReply() = default;
 	virtual void SendMessage(BotInfo *source, const Anope::string &msg) = 0;
+	virtual void SendMessage(CommandSource &source, const Anope::string &msg);
 };
 
 /* The source for a command */
-class CoreExport CommandSource
+class CoreExport CommandSource final
 {
 	/* The nick executing the command */
 	Anope::string nick;
 	/* User executing the command, may be NULL */
 	Reference<User> u;
- public:
+public:
 	/* The account executing the command */
 	Reference<NickCore> nc;
 	/* for web clients */
@@ -64,15 +62,17 @@ class CoreExport CommandSource
 	/* Where the reply should go */
 	CommandReply *reply;
 	/* Channel the command was executed on (fantasy) */
-	Reference<Channel> c;
+	Reference<Channel> c = nullptr;
 	/* The service this command is on */
 	Reference<BotInfo> service;
 	/* The actual name of the command being executed */
 	Anope::string command;
 	/* The permission of the command being executed */
 	Anope::string permission;
+	/* The unique identifier of the executing message. */
+	Anope::string msgid;
 
-	CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *reply, BotInfo *bi);
+	CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *reply, BotInfo *bi, const Anope::string &m = "");
 
 	const Anope::string &GetNick() const;
 	User *GetUser();
@@ -80,7 +80,7 @@ class CoreExport CommandSource
 	AccessGroup AccessFor(ChannelInfo *ci);
 	bool IsFounder(ChannelInfo *ci);
 
-	void Reply(const char *message, ...);
+	void Reply(const char *message, ...) ATTR_FORMAT(2, 3);
 	void Reply(const Anope::string &message);
 
 	bool HasCommand(const Anope::string &cmd);
@@ -91,7 +91,8 @@ class CoreExport CommandSource
 
 /** Every services command is a class, inheriting from Command.
  */
-class CoreExport Command : public Service
+class CoreExport Command
+	: public Service
 {
 	Anope::string desc;
 	std::vector<Anope::string> syntax;
@@ -100,7 +101,7 @@ class CoreExport Command : public Service
 	/* Command requires that a user is executing it */
 	bool require_user;
 
- public:
+public:
 	/* Maximum parameters accepted by this command */
 	size_t max_params;
 	/* Minimum parameters required to use this command */
@@ -109,7 +110,7 @@ class CoreExport Command : public Service
 	/* Module which owns us */
 	Module *module;
 
- protected:
+protected:
 	/** Create a new command.
 	 * @param owner The owner of the command
 	 * @param sname The command name
@@ -119,10 +120,10 @@ class CoreExport Command : public Service
 	 */
 	Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params = 0);
 
- public:
-	virtual ~Command();
+public:
+	virtual ~Command() = default;
 
- protected:
+protected:
 	void SetDesc(const Anope::string &d);
 
 	void ClearSyntax();
@@ -132,7 +133,7 @@ class CoreExport Command : public Service
 	void AllowUnregistered(bool b);
 	void RequireUser(bool b);
 
- public:
+public:
 	bool AllowUnregistered() const;
 	bool RequireUser() const;
 
@@ -181,7 +182,5 @@ class CoreExport Command : public Service
 	 * @param name If found, is set to the command name, eg REGISTER
 	 * @return true if the given command service exists
 	 */
-	static bool FindCommandFromService(const Anope::string &command_service, BotInfo* &bi, Anope::string &name);
+	static bool FindCommandFromService(const Anope::string &command_service, BotInfo *&bi, Anope::string &name);
 };
-
-#endif // COMMANDS_H

@@ -13,14 +13,6 @@
 #include "sockets.h"
 #include "socketengine.h"
 
-BufferedSocket::BufferedSocket()
-{
-}
-
-BufferedSocket::~BufferedSocket()
-{
-}
-
 bool BufferedSocket::ProcessRead()
 {
 	char tbuffer[NET_BUFSIZE];
@@ -55,7 +47,7 @@ bool BufferedSocket::ProcessWrite()
 	return true;
 }
 
-const Anope::string BufferedSocket::GetLine()
+Anope::string BufferedSocket::GetLine()
 {
 	size_t s = this->read_buffer.find('\n');
 	if (s == Anope::string::npos)
@@ -113,14 +105,6 @@ BinarySocket::DataBlock::DataBlock(const char *b, size_t l)
 BinarySocket::DataBlock::~DataBlock()
 {
 	delete [] this->orig;
-}
-
-BinarySocket::BinarySocket()
-{
-}
-
-BinarySocket::~BinarySocket()
-{
 }
 
 bool BinarySocket::ProcessRead()

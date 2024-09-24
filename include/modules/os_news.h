@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef OS_NEWS
-#define OS_NEWS
+#pragma once
 
 enum NewsType
 {
@@ -16,14 +15,15 @@ enum NewsType
 	NEWS_OPER
 };
 
-struct NewsMessages
+struct NewsMessages final
 {
 	NewsType type;
 	Anope::string name;
 	const char *msgs[10];
 };
 
-struct NewsItem : Serializable
+struct NewsItem
+	: Serializable
 {
 	NewsType type;
 	Anope::string text;
@@ -33,9 +33,10 @@ struct NewsItem : Serializable
 	NewsItem() : Serializable("NewsItem") { }
 };
 
-class NewsService : public Service
+class NewsService
+	: public Service
 {
- public:
+public:
 	NewsService(Module *m) : Service(m, "NewsService", "news") { }
 
 	virtual NewsItem *CreateNewsItem() = 0;
@@ -48,5 +49,3 @@ class NewsService : public Service
 };
 
 static ServiceReference<NewsService> news_service("NewsService", "news");
-
-#endif // OS_NEWS

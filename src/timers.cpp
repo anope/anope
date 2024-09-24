@@ -11,25 +11,20 @@
 
 std::multimap<time_t, Timer *> TimerManager::Timers;
 
-Timer::Timer(long time_from_now, time_t now, bool repeating)
+Timer::Timer(time_t time_from_now, bool repeating)
+	: trigger(Anope::CurTime + std::abs(time_from_now))
+	, secs(time_from_now)
+	, repeat(repeating)
 {
-	owner = NULL;
-	trigger = now + time_from_now;
-	secs = time_from_now;
-	repeat = repeating;
-	settime = now;
-
 	TimerManager::AddTimer(this);
 }
 
-Timer::Timer(Module *creator, long time_from_now, time_t now, bool repeating)
+Timer::Timer(Module *creator, time_t time_from_now, bool repeating)
+	: owner(creator)
+	, trigger(Anope::CurTime + std::abs(time_from_now))
+	, secs(time_from_now)
+	, repeat(repeating)
 {
-	owner = creator;
-	trigger = now + time_from_now;
-	secs = time_from_now;
-	repeat = repeating;
-	settime = now;
-
 	TimerManager::AddTimer(this);
 }
 
@@ -55,11 +50,6 @@ bool Timer::GetRepeat() const
 	return repeat;
 }
 
-time_t Timer::GetSetTime() const
-{
-	return settime;
-}
-
 void Timer::SetSecs(time_t t)
 {
 	TimerManager::DelTimer(this);
@@ -80,7 +70,7 @@ Module *Timer::GetOwner() const
 
 void TimerManager::AddTimer(Timer *t)
 {
-	Timers.insert(std::make_pair(t->GetTimer(), t));
+	Timers.emplace(t->GetTimer(), t);
 }
 
 void TimerManager::DelTimer(Timer *t)
@@ -96,20 +86,20 @@ void TimerManager::DelTimer(Timer *t)
 	}
 }
 
-void TimerManager::TickTimers(time_t ctime)
+void TimerManager::TickTimers()
 {
 	while (!Timers.empty())
 	{
 		std::multimap<time_t, Timer *>::iterator it = Timers.begin();
 		Timer *t = it->second;
 
-		if (t->GetTimer() > ctime)
+		if (t->GetTimer() > Anope::CurTime)
 			break;
 
-		t->Tick(ctime);
+		t->Tick();
 
 		if (t->GetRepeat())
-			t->SetTimer(ctime + t->GetSecs());
+			t->SetTimer(Anope::CurTime + t->GetSecs());
 		else
 			delete t;
 	}

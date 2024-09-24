@@ -5,6 +5,8 @@
  * Please read COPYING and README for further details.
  */
 
+#pragma once
+
 #include "module.h"
 #include "modules/httpd.h"
 
@@ -13,9 +15,9 @@
 
 extern Module *me;
 
-extern Anope::string provider_name, template_name, template_base, page_title;
+extern Anope::string provider_name, template_base, page_title;
 
-struct SubSection
+struct SubSection final
 {
 	Anope::string name;
 	Anope::string url;
@@ -28,9 +30,11 @@ struct Section
 };
 
 /* An interface for this webpanel used by other modules */
-class Panel : public Section, public Service
+class Panel final
+	: public Section
+	, public Service
 {
- public:
+public:
 	Panel(Module *c, const Anope::string &n) : Service(c, "Panel", n) { }
 
 	std::vector<Section> sections;
@@ -61,9 +65,10 @@ class Panel : public Section, public Service
 	}
 };
 
-class WebPanelPage : public HTTPPage
+class WebPanelPage
+	: public HTTPPage
 {
- public:
+public:
 	WebPanelPage(const Anope::string &u, const Anope::string &ct = "text/html") : HTTPPage(u, ct)
 	{
 	}
@@ -71,16 +76,17 @@ class WebPanelPage : public HTTPPage
 	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
 };
 
-class WebPanelProtectedPage : public WebPanelPage
+class WebPanelProtectedPage
+	: public WebPanelPage
 {
 	Anope::string category;
 
- public:
+public:
 	WebPanelProtectedPage(const Anope::string &cat, const Anope::string &u, const Anope::string &ct = "text/html") : WebPanelPage(u, ct), category(cat)
 	{
 	}
 
-	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) anope_override anope_final
+	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override final
 	{
 		ServiceReference<Panel> panel("Panel", "webcpanel");
 		NickAlias *na;
@@ -103,16 +109,17 @@ class WebPanelProtectedPage : public WebPanelPage
 
 		Anope::string sections, get;
 
-		for (std::map<Anope::string, Anope::string>::iterator it = message.get_data.begin(), it_end = message.get_data.end(); it != it_end; ++it)
-			if (this->GetData().count(it->first) > 0)
-				get += "&" + it->first + "=" + HTTPUtils::URLEncode(it->second);
+		for (const auto &[key, value] : message.get_data)
+		{
+			if (this->GetData().count(key) > 0)
+				get += "&" + key + "=" + HTTPUtils::URLEncode(value);
+		}
 		if (get.empty() == false)
 			get = "?" + get.substr(1);
 
 		Section *ns = NULL;
-		for (unsigned i = 0; i < panel->sections.size(); ++i)
+		for (auto &s : panel->sections)
 		{
-			Section& s = panel->sections[i];
 			if (s.name == this->category)
 				ns = &s;
 			replacements["CATEGORY_URLS"] = s.subsections[0].url;
@@ -122,9 +129,8 @@ class WebPanelProtectedPage : public WebPanelPage
 		if (ns)
 		{
 			sections = "";
-			for (unsigned i = 0; i < ns->subsections.size(); ++i)
+			for (const auto &ss : ns->subsections)
 			{
-				SubSection& ss = ns->subsections[i];
 				replacements["SUBCATEGORY_URLS"] = ss.url;
 				replacements["SUBCATEGORY_GETS"] = get;
 				replacements["SUBCATEGORY_NAMES"] = ss.name;
@@ -162,21 +168,8 @@ namespace WebPanel
 #include "pages/register.h"
 #include "pages/confirm.h"
 
-#include "pages/nickserv/info.h"
-#include "pages/nickserv/cert.h"
-#include "pages/nickserv/access.h"
-#include "pages/nickserv/alist.h"
-#include "pages/nickserv/confirm.h"
-
-#include "pages/chanserv/info.h"
-#include "pages/chanserv/set.h"
-#include "pages/chanserv/access.h"
-#include "pages/chanserv/akick.h"
-#include "pages/chanserv/modes.h"
-#include "pages/chanserv/drop.h"
-
-#include "pages/memoserv/memos.h"
-
-#include "pages/hostserv/request.h"
-
-#include "pages/operserv/akill.h"
+#include "pages/chanserv/chanserv.h"
+#include "pages/hostserv/hostserv.h"
+#include "pages/memoserv/memoserv.h"
+#include "pages/nickserv/nickserv.h"
+#include "pages/operserv/operserv.h"

@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef DNS_H
-#define DNS_H
+#pragma once
 
 namespace DNS
 {
@@ -73,14 +72,14 @@ namespace DNS
 	struct Question
 	{
 		Anope::string name;
-		QueryType type;
-		unsigned short qclass;
+		QueryType type = QUERY_NONE;
+		unsigned short qclass = 0;
 
-		Question() : type(QUERY_NONE), qclass(0) { }
+		Question() = default;
 		Question(const Anope::string &n, QueryType t, unsigned short c = 1) : name(n), type(t), qclass(c) { }
 		inline bool operator==(const Question & other) const { return name == other.name && type == other.type && qclass == other.qclass; }
 
-		struct hash
+		struct hash final
 		{
 			size_t operator()(const Question &q) const
 			{
@@ -89,14 +88,15 @@ namespace DNS
 		};
 	};
 
-	struct ResourceRecord : Question
+	struct ResourceRecord final
+		: Question
 	{
-		unsigned int ttl;
+		unsigned int ttl = 0;
 		Anope::string rdata;
 		time_t created;
 
-		ResourceRecord(const Anope::string &n, QueryType t, unsigned short c = 1) : Question(n, t, c), ttl(0), created(Anope::CurTime) { }
-		ResourceRecord(const Question &q) : Question(q), ttl(0), created(Anope::CurTime) { }
+		ResourceRecord(const Anope::string &n, QueryType t, unsigned short c = 1) : Question(n, t, c), created(Anope::CurTime) { }
+		ResourceRecord(const Question &q) : Question(q), created(Anope::CurTime) { }
 	};
 
 	struct Query
@@ -114,11 +114,12 @@ namespace DNS
 
 	/** DNS manager
 	 */
-	class Manager : public Service
+	class Manager
+		: public Service
 	{
-	 public:
+	public:
 		Manager(Module *creator) : Service(creator, "DNS::Manager", "dns/manager") { }
-		virtual ~Manager() { }
+		virtual ~Manager() = default;
 
 		virtual void Process(Request *req) = 0;
 		virtual void RemoveRequest(Request *req) = 0;
@@ -132,19 +133,27 @@ namespace DNS
 
 	/** A DNS query.
 	 */
-	class Request : public Timer, public Question
+	class Request
+		: public Timer
+		, public Question
 	{
 		Manager *manager;
-	 public:
+	public:
 		/* Use result cache if available */
 		bool use_cache;
 		/* Request id */
-		unsigned short id;
+		unsigned short id = 0;
 		/* Creator of this request */
 		Module *creator;
 
-		Request(Manager *mgr, Module *c, const Anope::string &addr, QueryType qt, bool cache = false) : Timer(0), Question(addr, qt), manager(mgr),
-			use_cache(cache), id(0), creator(c) { }
+		Request(Manager *mgr, Module *c, const Anope::string &addr, QueryType qt, bool cache = false)
+			: Timer(0)
+			, Question(addr, qt)
+			, manager(mgr)
+			, use_cache(cache)
+			, creator(c)
+		{
+		}
 
 		virtual ~Request()
 		{
@@ -164,7 +173,7 @@ namespace DNS
 		/** Used to time out the query, xalls OnError and lets the TimerManager
 		 * delete this request.
 		 */
-		void Tick(time_t) anope_override
+		void Tick() override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: timeout for query " << this->name;
 			Query rr(*this);
@@ -174,5 +183,3 @@ namespace DNS
 	};
 
 } // namespace DNS
-
-#endif // DNS_H

@@ -15,10 +15,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifndef _WIN32
-#include <dirent.h>
 #include <sys/types.h>
 #include <dlfcn.h>
 #endif
+
+#include <filesystem>
 
 std::list<Module *> ModuleManager::Modules;
 std::vector<Module *> ModuleManager::EventHandlers[I_SIZE];
@@ -26,28 +27,21 @@ std::vector<Module *> ModuleManager::EventHandlers[I_SIZE];
 #ifdef _WIN32
 void ModuleManager::CleanupRuntimeDirectory()
 {
-	Anope::string dirbuf = Anope::DataDir + "/runtime";
+	Anope::string dirbuf = Anope::ExpandData("runtime");
 
 	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment, please wait";
-
-	DIR *dirp = opendir(dirbuf.c_str());
-	if (!dirp)
+	try
 	{
-		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << ")";
-		return;
+		for (const auto &entry : std::filesystem::directory_iterator(dirbuf.str()))
+		{
+			if (entry.is_regular_file())
+				std::filesystem::remove(entry);
+		}
 	}
-
-	for (dirent *dp; (dp = readdir(dirp));)
+	catch (const std::filesystem::filesystem_error &err)
 	{
-		if (!dp->d_ino)
-			continue;
-		if (Anope::string(dp->d_name).equals_cs(".") || Anope::string(dp->d_name).equals_cs(".."))
-			continue;
-		Anope::string filebuf = dirbuf + "/" + dp->d_name;
-		unlink(filebuf.c_str());
+		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << "): " << err.what();
 	}
-
-	closedir(dirp);
 }
 
 /**
@@ -61,7 +55,7 @@ void ModuleManager::CleanupRuntimeDirectory()
  */
 static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
-	Anope::string input = Anope::ModuleDir + "/modules/" + name + ".so";
+	const auto input = Anope::ExpandModule(name + DLL_EXT);
 
 	struct stat s;
 	if (stat(input.c_str(), &s) == -1)
@@ -139,7 +133,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 #ifdef _WIN32
 	/* Generate the filename for the temporary copy of the module */
-	Anope::string pbuf = Anope::DataDir + "/runtime/" + modname + ".so.XXXXXX";
+	auto pbuf = Anope::ExpandData("runtime/" + modname + DLL_EXT ".XXXXXX");
 
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);
@@ -152,7 +146,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		return ret;
 	}
 #else
-	Anope::string pbuf = Anope::ModuleDir + "/modules/" + modname + ".so";
+	const auto pbuf = Anope::ExpandModule(modname + DLL_EXT);
 #endif
 
 	dlerror();
@@ -273,8 +267,8 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	Log(LOG_DEBUG) << "Module " << modname << " loaded.";
 
 	/* Attach module to all events */
-	for (unsigned i = 0; i < I_SIZE; ++i)
-		EventHandlers[i].push_back(m);
+	for (auto &mods : EventHandlers)
+		mods.push_back(m);
 
 	m->Prioritize();
 
@@ -313,10 +307,8 @@ ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)
 
 Module *ModuleManager::FindModule(const Anope::string &name)
 {
-	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	for (auto *m : Modules)
 	{
-		Module *m = *it;
-
 		if (m->name.equals_ci(name))
 			return m;
 	}
@@ -326,10 +318,8 @@ Module *ModuleManager::FindModule(const Anope::string &name)
 
 Module *ModuleManager::FindFirstOf(ModType type)
 {
-	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	for (auto *m : Modules)
 	{
-		Module *m = *it;
-
 		if (m->type & type)
 			return m;
 	}
@@ -358,7 +348,7 @@ void ModuleManager::RequireVersion(int major, int minor, int patch)
 		}
 	}
 
-	throw ModuleException("This module requires version " + stringify(major) + "." + stringify(minor) + "." + stringify(patch) + " - this is " + Anope::VersionShort());
+	throw ModuleException("This module requires version " + Anope::ToString(major) + "." + Anope::ToString(minor) + "." + Anope::ToString(patch) + " - this is " + Anope::VersionShort());
 }
 
 ModuleReturn ModuleManager::DeleteModule(Module *m)
@@ -395,9 +385,8 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 
 void ModuleManager::DetachAll(Module *mod)
 {
-	for (unsigned i = 0; i < I_SIZE; ++i)
+	for (auto &mods : EventHandlers)
 	{
-		std::vector<Module *> &mods = EventHandlers[i];
 		std::vector<Module *>::iterator it2 = std::find(mods.begin(), mods.end(), mod);
 		if (it2 != mods.end())
 			mods.erase(it2);
@@ -446,43 +435,62 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 	{
 		/* Dummy value */
 		case PRIORITY_DONTCARE:
+		{
 			swap = false;
 			break;
+		}
 		/* Module wants to be first, sod everything else */
 		case PRIORITY_FIRST:
+		{
 			swap_pos = 0;
 			break;
+		}
 		/* Module is submissive and wants to be last... awww. */
 		case PRIORITY_LAST:
+		{
 			if (EventHandlers[i].empty())
 				swap_pos = 0;
 			else
 				swap_pos = EventHandlers[i].size() - 1;
 			break;
+		}
 		/* Place this module after a set of other modules */
 		case PRIORITY_AFTER:
+		{
 			/* Find the latest possible position */
 			swap_pos = 0;
 			swap = false;
 			for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
+			{
 				for (size_t n = 0; n < sz; ++n)
+				{
 					if (modules[n] && EventHandlers[i][x] == modules[n] && x >= swap_pos && source <= swap_pos)
 					{
 						swap_pos = x;
 						swap = true;
 					}
+				}
+			}
 			break;
+		}
 		/* Place this module before a set of other modules */
 		case PRIORITY_BEFORE:
+		{
 			swap_pos = EventHandlers[i].size() - 1;
 			swap = false;
 			for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
+			{
 				for (size_t n = 0; n < sz; ++n)
+				{
 					if (modules[n] && EventHandlers[i][x] == modules[n] && x <= swap_pos && source >= swap_pos)
 					{
 						swap = true;
 						swap_pos = x;
 					}
+				}
+			}
+			break;
+		}
 	}
 
 	/* Do we need to swap? */
@@ -510,16 +518,17 @@ void ModuleManager::UnloadAll()
 {
 	std::vector<Anope::string> modules;
 	for (size_t i = 1, j = 0; i != MT_END; j |= i, i <<= 1)
-		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	{
+		for (auto *m : Modules)
 		{
-			Module *m = *it;
 			if ((m->type & j) == m->type)
 				modules.push_back(m->name);
 		}
+	}
 
-	for (unsigned i = 0; i < modules.size(); ++i)
+	for (auto &module : modules)
 	{
-		Module *m = FindModule(modules[i]);
+		Module *m = FindModule(module);
 		if (m != NULL)
 			UnloadModule(m, NULL);
 	}

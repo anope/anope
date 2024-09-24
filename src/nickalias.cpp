@@ -20,22 +20,22 @@
 
 Serialize::Checker<nickalias_map> NickAliasList("NickAlias");
 
-NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serializable("NickAlias")
+NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
+	: Serializable("NickAlias")
+	, nick(nickname)
+	, nc(nickcore)
 {
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickAlias constructor");
 	else if (!nickcore)
 		throw CoreException("Empty nickcore passed to NickAlias constructor");
 
-	this->time_registered = this->last_seen = Anope::CurTime;
-	this->nick = nickname;
-	this->nc = nickcore;
 	nickcore->aliases->push_back(this);
+	if (this->nick.equals_ci(nickcore->display))
+		nickcore->na = this;
 
-	size_t old = NickAliasList->size();
-	(*NickAliasList)[this->nick] = this;
-	if (old == NickAliasList->size())
-		Log(LOG_DEBUG) << "Duplicate nick " << nickname << " in nickalias table";
+	if (!NickAliasList->insert_or_assign(this->nick, this).second)
+		Log(LOG_DEBUG) << "Duplicate nick " << this->nick << " in NickAlias table";
 
 	if (this->nc->o == NULL)
 	{
@@ -78,7 +78,7 @@ NickAlias::~NickAlias()
 	NickAliasList->erase(this->nick);
 }
 
-void NickAlias::SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created)
+void NickAlias::SetVHost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created)
 {
 	this->vhost_ident = ident;
 	this->vhost_host = host;
@@ -86,7 +86,7 @@ void NickAlias::SetVhost(const Anope::string &ident, const Anope::string &host, 
 	this->vhost_created = created;
 }
 
-void NickAlias::RemoveVhost()
+void NickAlias::RemoveVHost()
 {
 	this->vhost_ident.clear();
 	this->vhost_host.clear();
@@ -94,27 +94,35 @@ void NickAlias::RemoveVhost()
 	this->vhost_created = 0;
 }
 
-bool NickAlias::HasVhost() const
+bool NickAlias::HasVHost() const
 {
 	return !this->vhost_host.empty();
 }
 
-const Anope::string &NickAlias::GetVhostIdent() const
+const Anope::string &NickAlias::GetVHostIdent() const
 {
 	return this->vhost_ident;
 }
 
-const Anope::string &NickAlias::GetVhostHost() const
+const Anope::string &NickAlias::GetVHostHost() const
 {
 	return this->vhost_host;
 }
 
-const Anope::string &NickAlias::GetVhostCreator() const
+Anope::string NickAlias::GetVHostMask() const
+{
+	if (this->GetVHostIdent().empty())
+		return this->GetVHostHost();
+
+	return this->GetVHostIdent() + "@" + this->GetVHostHost();
+}
+
+const Anope::string &NickAlias::GetVHostCreator() const
 {
 	return this->vhost_creator;
 }
 
-time_t NickAlias::GetVhostCreated() const
+time_t NickAlias::GetVHostCreated() const
 {
 	return this->vhost_created;
 }
@@ -133,27 +141,27 @@ NickAlias *NickAlias::Find(const Anope::string &nick)
 
 void NickAlias::Serialize(Serialize::Data &data) const
 {
-	data["nick"] << this->nick;
-	data["last_quit"] << this->last_quit;
-	data["last_realname"] << this->last_realname;
-	data["last_usermask"] << this->last_usermask;
-	data["last_realhost"] << this->last_realhost;
-	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
-	data.SetType("last_seen", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
-	data["nc"] << this->nc->display;
+	data.Store("nick", this->nick);
+	data.Store("last_quit", this->last_quit);
+	data.Store("last_realname", this->last_realname);
+	data.Store("last_usermask", this->last_usermask);
+	data.Store("last_realhost", this->last_realhost);
+	data.Store("time_registered", this->time_registered);
+	data.Store("last_seen", this->last_seen);
+	data.Store("nc", this->nc->display);
 
-	if (this->HasVhost())
+	if (this->HasVHost())
 	{
-		data["vhost_ident"] << this->GetVhostIdent();
-		data["vhost_host"] << this->GetVhostHost();
-		data["vhost_creator"] << this->GetVhostCreator();
-		data["vhost_time"] << this->GetVhostCreated();
+		data.Store("vhost_ident", this->GetVHostIdent());
+		data.Store("vhost_host", this->GetVHostHost());
+		data.Store("vhost_creator", this->GetVHostCreator());
+		data.Store("vhost_time", this->GetVHostCreated());
 	}
 
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string snc, snick;
 
@@ -200,7 +208,7 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["vhost_creator"] >> vhost_creator;
 	data["vhost_time"] >> vhost_time;
 
-	na->SetVhost(vhost_ident, vhost_host, vhost_creator, vhost_time);
+	na->SetVHost(vhost_ident, vhost_host, vhost_creator, vhost_time);
 
 	Extensible::ExtensibleUnserialize(na, na, data);
 
@@ -210,6 +218,9 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["extensible:NO_EXPIRE"] >> b;
 	if (b)
 		na->Extend<bool>("NS_NO_EXPIRE");
+
+	if (na->time_registered < na->nc->time_registered)
+		na->nc->time_registered = na->time_registered;
 	/* end compat */
 
 	return na;

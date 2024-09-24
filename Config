@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Configuration script for Services.
+# Configuration script for Anope.
 #
 # Anope (C) 2003-2024 Anope Team
 # Contact us at team@anope.org
@@ -12,10 +12,6 @@
 # Based on the original code of Services by Andy Church.
 #
 ###########################################################################
-
-echo2 () {
-	$ECHO2 "$*$ECHO2SUF" # these are defined later
-}
 
 exists () { # because some shells don't have test -e
 	if [ -f $1 -o -d $1 -o -p $1 -o -c $1 -o -b $1 ] ; then
@@ -42,7 +38,6 @@ Run_Build_System () {
 	WITH_PERM=""
 	EXTRA_INCLUDE=""
 	EXTRA_LIBS=""
-	GEN_TYPE=""
 
 	if [ "$INSTDIR" != "" ] ; then
 		WITH_INST="-DINSTDIR:STRING=$INSTDIR"
@@ -62,12 +57,6 @@ Run_Build_System () {
 		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=RELEASE"
 	fi
 
-	if [ "$USE_PCH" = "yes" ] ; then
-		PCH="-DUSE_PCH:BOOLEAN=ON"
-	else
-		PCH="-DUSE_PCH:BOOLEAN=OFF"
-	fi
-
 	if [ "$EXTRA_INCLUDE_DIRS" != "" ] ; then
 		EXTRA_INCLUDE="-DEXTRA_INCLUDE:STRING=$EXTRA_INCLUDE_DIRS"
 	fi
@@ -76,65 +65,38 @@ Run_Build_System () {
 		EXTRA_LIBS="-DEXTRA_LIBS:STRING=$EXTRA_LIB_DIRS"
 	fi
 
-	case `uname -s` in
-		MINGW*)
-			GEN_TYPE="-G\"MSYS Makefiles\""
-			;;
-	esac
+	BUILD_PATHS="-B ${SOURCE_DIR}/build ${SOURCE_DIR}"
 
-	if [ "$SOURCE_DIR" = "." ] ; then
-		pwdsave=`pwd`
-		test -d build || mkdir build
-		cd "build"
-		REAL_SOURCE_DIR=".."
-	else
-		REAL_SOURCE_DIR="$SOURCE_DIR"
-	fi
+	CMAKE="cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $BUILD_PATHS"
+	echo $CMAKE
+	$CMAKE
 
-	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $PCH $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
-
-	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $PCH $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
 	if [ $? -ne 0 ]; then
 		echo "You should fix these issues and then run ./Config -quick to rerun CMake."
 		exit 1
 	fi
 
 	echo ""
-	if [ "$SOURCE_DIR" = "." ] ; then
-		echo "Now cd build, then run make to build Anope."
-		cd "$pwdsave"
-	else
+	if [ "$PWD" = "${SOURCE_DIR}/build" ]; then
 		echo "Now run make to build Anope."
+	else
+		echo "Now cd build, then run make to build Anope."
 	fi
 }
-
-ECHO2SUF=''
-if [ "`echo -n a ; echo -n b`" = "ab" ] ; then
-	ECHO2='echo -n'
-elif [ "`echo 'a\c' ; echo 'b\c'`" = "ab" ] ; then
-	ECHO2='echo' ; ECHO2SUF='\c'
-elif [ "`printf 'a' 2>&1 ; printf 'b' 2>&1`" = "ab" ] ; then
-	ECHO2='printf "%s"'
-else
-	# oh well...
-	ECHO2='echo'
-fi
-export ECHO2 ECHO2SUF
 
 ###########################################################################
 # Init values
 ###########################################################################
 
-INSTDIR=$HOME/services
+INSTDIR=$HOME/anope
 RUNGROUP=
 UMASK=
 DEBUG="no"
-USE_PCH="no"
 EXTRA_INCLUDE_DIRS=
 EXTRA_LIB_DIRS=
 EXTRA_CONFIG_ARGS=
 CAN_QUICK="no"
-SOURCE_DIR=`dirname $0`
+SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 ###########################################################################
 # Check out the options
@@ -151,7 +113,7 @@ while [ $# -ge 1 ] ; do
 		exit 0
 	elif [ $1 = "-devel" ] ; then
 		DEBUG="yes"
-		INSTDIR="$PWD/run"
+		INSTDIR="$SOURCE_DIR/run"
 	elif [ $1 = "-nocache" ] ; then
 		IGNORE_CACHE="1"
 	elif [ $1 = "-nointro" ] ; then
@@ -176,7 +138,7 @@ done
 cmake --version 2>&1 > /dev/null
 if [ $? -ne 0 ] ; then
 	clear
-	echo "Anope requires CMake 2.4 or newer, which can be downloaded at https://cmake.org/ or through your system's package manager."
+	echo "Anope requires CMake 3.8 or newer, which can be downloaded at https://cmake.org/ or through your system's package manager."
 	echo "If you have installed CMake already, ensure it is in your PATH environment variable."
 	exit 0
 fi
@@ -184,24 +146,15 @@ fi
 ###########################################################################
 
 if [ ! "$NO_INTRO" ] ; then
-	case `uname -s` in
-		MINGW*)
-			PAGER=less
-			;;
-		*)
-			PAGER=more
-			clear
-			;;
-	esac
 	export MORE='-e'
 	. $SOURCE_DIR/src/version.sh
-	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | $PAGER
+	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | more
 	echo ""
 else
 	echo ""
 fi
 
-echo "Beginning Services configuration."
+echo "Beginning Anope configuration."
 echo ""
 
 ###########################################################################
@@ -221,7 +174,7 @@ export ok INPUT
 ok=0
 echo "In what directory should Anope be installed?"
 while [ $ok -eq 0 ] ; do
-	echo2 "[$INSTDIR] "
+	echo -n "[$INSTDIR] "
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 	if [ ! "$INPUT" ] ; then
 		INPUT=$INSTDIR
@@ -231,7 +184,7 @@ while [ $ok -eq 0 ] ; do
 			echo "$INPUT exists, but is not a directory!"
 		else
 			echo "$INPUT does not exist.  Create it?"
-			echo2 "[y] "
+			echo -n "[y] "
 			read YN
 			if [ "$YN" != "n" ] ; then
 				if mkdir -p $INPUT ; then
@@ -240,7 +193,7 @@ while [ $ok -eq 0 ] ; do
 			fi
 		fi
 	elif exists "$INPUT/include/services.h" ; then
-		echo "You cannot use the Services source directory as a target directory."
+		echo "You cannot use the Anope source directory as a target directory."
 	else
 		ok=1
 	fi
@@ -252,15 +205,15 @@ echo ""
 
 OLD_RUNGROUP="$RUNGROUP"
 if [ "$RUNGROUP" ] ; then
-	echo "Which group should all Services data files be owned by?  (If Services"
+	echo "Which group should all Anope data files be owned by?  (If Anope"
 	echo "should not force files to be owned by a particular group, type \"none\""
 	echo "(without the quotes) and press Return.)"
 else
-	echo "Which group should all Services data files be owned by?  (If Services"
+	echo "Which group should all Anope data files be owned by?  (If Anope"
 	echo "should not force files to be owned by a particular group, just press"
 	echo "Return.)"
 fi
-echo2 "[$RUNGROUP] "
+echo -n "[$RUNGROUP] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then
 	if [ "$INPUT" = "none" ] ; then
@@ -285,7 +238,7 @@ ok=0
 echo "What should the default umask for data files be (in octal)?"
 echo "(077 = only accessible by owner; 007 = accessible by owner and group)"
 while [ $ok -eq 0 ] ; do
-	echo2 "[$UMASK] "
+	echo -n "[$UMASK] "
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 	if [ ! "$INPUT" ] ; then
 		INPUT=$UMASK
@@ -309,7 +262,7 @@ if [ "$DEBUG" = "yes" ] ; then
 	TEMP_YN="y"
 fi
 echo "Would you like to build a debug version of Anope?"
-echo2 "[$TEMP_YN] "
+echo -n "[$TEMP_YN] "
 read YN
 if [ "$YN" ] ; then
 	if [ "$YN" = "y" ] ; then
@@ -322,31 +275,12 @@ echo ""
 
 ####
 
-TEMP_YN="n"
-if [ "$USE_PCH" = "yes" ] ; then
-	TEMP_YN="y"
-fi
-echo "Do you want to build using precompiled headers? This can speed up"
-echo "the build, but uses more disk space."
-echo2 "[$TEMP_YN] "
-read YN
-if [ "$YN" ] ; then
-	if [ "$YN" = "y" ] ; then
-		USE_PCH="yes"
-	else
-		USE_PCH="no"
-	fi
-fi
-echo ""
-
-####
-
 echo "Are there any extra include directories you wish to use?"
 echo "You may only need to do this if CMake is unable to locate"
 echo "missing dependencies without hints."
 echo "Separate directories with semicolons."
 echo "If you need no extra include directories, enter NONE in all caps."
-echo2 "[$EXTRA_INCLUDE_DIRS] "
+echo -n "[$EXTRA_INCLUDE_DIRS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then
 	if [ "$INPUT" = "NONE" ] ; then
@@ -364,7 +298,7 @@ echo "You may only need to do this if CMake is unable to locate"
 echo "missing dependencies without hints."
 echo "Separate directories with semicolons."
 echo "If you need no extra library directories, enter NONE in all caps."
-echo2 "[$EXTRA_LIB_DIRS] "
+echo -n "[$EXTRA_LIB_DIRS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then
 	if [ "$INPUT" = "NONE" ] ; then
@@ -379,7 +313,7 @@ echo ""
 
 echo "Are there any extra arguments you wish to pass to CMake?"
 echo "If you need no extra arguments to CMake, enter NONE in all caps."
-echo2 "[$EXTRA_CONFIG_ARGS] "
+echo -n "[$EXTRA_CONFIG_ARGS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then
 	if [ "$INPUT" = "NONE" ] ; then
@@ -396,14 +330,13 @@ echo ""
 # Store values
 ################################################################################
 
-echo2 "Saving configuration results in config.cache... "
+echo -n "Saving configuration results in config.cache... "
 
 cat <<EOT >$SOURCE_DIR/config.cache
 INSTDIR="$INSTDIR"
 RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
 DEBUG="$DEBUG"
-USE_PCH="$USE_PCH"
 EXTRA_INCLUDE_DIRS="$EXTRA_INCLUDE_DIRS"
 EXTRA_LIB_DIRS="$EXTRA_LIB_DIRS"
 EXTRA_CONFIG_ARGS="$EXTRA_CONFIG_ARGS"

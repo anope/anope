@@ -6,20 +6,20 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef CHANNELS_H
-#define CHANNELS_H
+#pragma once
 
 #include "anope.h"
 #include "extensible.h"
 #include "modes.h"
 #include "serialize.h"
 
-typedef Anope::hash_map<Channel *> channel_map;
+typedef Anope::unordered_map<Channel *> channel_map;
 
 extern CoreExport channel_map ChannelList;
 
 /* A user container, there is one of these per user per channel. */
-struct ChanUserContainer : public Extensible
+struct ChanUserContainer final
+	: public Extensible
 {
 	User *user;
 	Channel *chan;
@@ -29,18 +29,20 @@ struct ChanUserContainer : public Extensible
 	ChanUserContainer(User *u, Channel *c) : user(u), chan(c) { }
 };
 
-class CoreExport Channel : public Base, public Extensible
+class CoreExport Channel final
+	: public Base
+	, public Extensible
 {
 	static std::vector<Channel *> deleting;
 
- public:
+public:
 	typedef std::multimap<Anope::string, Anope::string> ModeList;
- private:
+private:
 	/** A map of channel modes with their parameters set on this channel
 	 */
 	ModeList modes;
 
- public:
+public:
 	/* Channel name */
 	Anope::string name;
 	/* Set if this channel is registered. ci->c == this. Contains information relevant to the registered channel */
@@ -74,14 +76,14 @@ class CoreExport Channel : public Base, public Extensible
 	int16_t chanserv_modecount;	/* Number of check_mode()'s this sec */
 	int16_t bouncy_modes;		/* Did we fail to set modes here? */
 
- private:
+private:
 	/** Constructor
 	 * @param name The channel name
 	 * @param ts The time the channel was created
 	 */
 	Channel(const Anope::string &nname, time_t ts = Anope::CurTime);
 
- public:
+public:
 	/** Destructor
 	 */
 	~Channel();
@@ -108,7 +110,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param status The status to give the user, if any
 	 * @return The UserContainer for the user
 	 */
-	ChanUserContainer* JoinUser(User *u, const ChannelStatus *status);
+	ChanUserContainer *JoinUser(User *u, const ChannelStatus *status);
 
 	/** Remove a user internally from the channel
 	 * @param u The user
@@ -205,7 +207,8 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param enforce_mlock Should mlock be enforced on this mode change
 	 * @param cmodes The modes to set
 	 */
-	void SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...);
+	void SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...) ATTR_FORMAT(4, 5);
+	void SetModes(BotInfo *bi, bool enforce_mlock, const Anope::string &cmodes);
 
 	/** Set a string of modes internally on a channel
 	 * @param source The setter
@@ -234,7 +237,8 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param reason The reason for the kick
 	 * @return true if the kick was successful, false if a module blocked the kick
 	 */
-	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...);
+	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...) ATTR_FORMAT(4, 5);
+	bool Kick(BotInfo *bi, User *u, const Anope::string &reason);
 
 	/** Get all modes set on this channel, excluding status modes.
 	 * @return a map of modes and their optional parameters.
@@ -298,7 +302,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param name The channel to find
 	 * @return The channel, if found
 	 */
-	static Channel* Find(const Anope::string &name);
+	static Channel *Find(const Anope::string &name);
 
 	/** Finds or creates a channel
 	 * @param name The channel name
@@ -311,5 +315,3 @@ class CoreExport Channel : public Base, public Extensible
 
 	static void DeleteChannels();
 };
-
-#endif // CHANNELS_H

@@ -7,17 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-03 18:52+0100\n"
-"PO-Revision-Date: 2022-01-03 19:01+0100\n"
-"Last-Translator: Adam <adam@anope.org>\n"
+"POT-Creation-Date: 2024-02-22 16:34+0000\n"
+"PO-Revision-Date: 2024-02-22 16:42+0000\n"
+"Last-Translator: k4be <k4be@pirc.pl>\n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n"
-"%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 2.2.4\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.4\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -218,6 +217,10 @@ msgid "%s disabled on channel %s."
 msgstr "%s wyłączono na kanale %s."
 
 #, c-format
+msgid "%s does not wish to be added to channel access lists."
+msgstr "%s nie życzy sobie bycia dodawanym do list dostępowych na kanałach."
+
+#, c-format
 msgid "%s has been invited to %s."
 msgstr "%s został zaproszony na %s."
 
@@ -321,20 +324,15 @@ msgstr "%s jest założycielem %s."
 
 #, c-format
 msgid "%s matches access entry %s (from entry %s), which has privilege %s."
-msgstr ""
-"%s pasuje do wpisu %s (na podstawie %s) na liście dostępu, posiadającego "
-"uprawnienia %s."
+msgstr "%s pasuje do wpisu %s (na podstawie %s) na liście dostępu, posiadającego uprawnienia %s."
 
 #, c-format
 msgid "%s matches access entry %s, which has privilege %s."
 msgstr "%s pasuje do wpisu %s na liście dostępu, posiadającego uprawnienia %s."
 
 #, c-format
-msgid ""
-"%s matches an except on %s and cannot be banned until the except has been removed."
-msgstr ""
-"%s pasuje do wyjątku na %s i nie może być zbanowany, dopóki ten wyjątek nie "
-"zostanie usunięty."
+msgid "%s matches an except on %s and cannot be banned until the except has been removed."
+msgstr "%s pasuje do wyjątku na %s i nie może być zbanowany, dopóki ten wyjątek nie zostanie usunięty."
 
 #, c-format
 msgid "%s matches auto kick entry %s on %s (%s)."
@@ -369,11 +367,8 @@ msgid "%s not found on ignore list."
 msgstr "%s nie znaleziono na liście ignorowanych."
 
 #, c-format
-msgid ""
-"%s not found on session list, but has a limit of %d because it matches entry: %s."
-msgstr ""
-"%s nie został znaleziony na liście sesji, ale jego limit to %d z uwagi na to, że "
-"pasuje do wpisu: %s."
+msgid "%s not found on session list, but has a limit of %d because it matches entry: %s."
+msgstr "%s nie został znaleziony na liście sesji, ale jego limit to %d z uwagi na to, że pasuje do wpisu: %s."
 
 #, c-format
 msgid "%s not found on session-limit exception list."
@@ -538,11 +533,11 @@ msgstr "kanał nick powód"
 msgid "channel what"
 msgstr "kanał co"
 
-msgid "channel ADD mask"
-msgstr "kanał ADD maska"
+msgid "channel ADD mask level [description]"
+msgstr "kanał ADD maska poziom [opis]"
 
-msgid "channel ADD mask level"
-msgstr "kanał ADD maska poziom"
+msgid "channel ADD mask [description]"
+msgstr "kanał ADD maska [opis]"
 
 msgid "channel ADD message"
 msgstr "kanał ADD wiadomość"
@@ -628,8 +623,8 @@ msgstr "kanał [+czas] [powód]"
 msgid "channel [+expiry] {nick | mask} [reason]"
 msgstr "kanał [+czas] {nick | maska} [powód]"
 
-msgid "channel [MODIFY] mask changes"
-msgstr "kanał [MODIFY] maska zmiany"
+msgid "channel [MODIFY] mask changes [description]"
+msgstr "kanał [MODIFY] maska zmiany [opis]"
 
 msgid "channel [SET] [topic]"
 msgstr "kanał [SET] [temat]"
@@ -690,9 +685,6 @@ msgstr "nick kanał"
 
 msgid "nick channel [reason]"
 msgstr "nick kanał [powód]"
-
-msgid "nick flags"
-msgstr "nick flagi"
 
 msgid "nick hostmask"
 msgstr "nick maska-hosta"
@@ -822,7 +814,7 @@ msgstr ""
 
 msgid ""
 " \n"
-"SQLINE ADD adds the given (nick's) mask to the SQLINE\n"
+"SQLINE ADD adds the given (nick/channel) mask to the SQLINE\n"
 "list for the given reason (which must be given).\n"
 "expiry is specified as an integer followed by one of d\n"
 "(days), h (hours), or m (minutes). Combinations (such as\n"
@@ -835,28 +827,29 @@ msgid ""
 "STATS AKILL command."
 msgstr ""
 " \n"
-"SQLINE ADD adds the given (nick's) mask to the SQLINE\n"
-"list for the given reason (which must be given).\n"
-"expiry is specified as an integer followed by one of d\n"
-"(days), h (hours), or m (minutes). Combinations (such as\n"
-"1h30m) are not permitted. If a unit specifier is not\n"
-"included, the default is days (so +30 by itself means 30\n"
-"days). To add an SQLINE which does not expire, use +0.\n"
-"If the mask to be added starts with a +, an expiry time\n"
-"must be given, even if it is the same as the default. The\n"
-"current SQLINE default expiry time can be found with the\n"
-"STATS AKILL command."
+"SQLINE ADD dodaje podaną maskę nicka/kanału do listy\n"
+"SQLINE, z podanym powodem (którego wpisanie jest wymagane).\n"
+"wygasa - jest to czas wprowadzany jako liczba całkowita,\n"
+"po której należy określić jednostkę, jedną z następujących: d\n"
+"(dni), h (godziny), or m (minuty). Kombinacje, typu \n"
+"1h30m, nie są dozwolone. Jeśli jednostka nie zostanie wpisana,\n"
+"domyślnie użyty zostaje dzień (więc samo +30 oznacza 30 dni).\n"
+"Aby dodać SQLINE, który nie wygaśnie, należy użyć +0.\n"
+"Jeśli dodawana maska zaczyna się od znaku +, czas wygaśnięcia\n"
+"musi zostać podany, nawet, jeśli ma być on taki sam, jak wartość\n"
+"domyślna. Aktualną domyślną wartość czasu wygasania SQLINE\n"
+"można sprawdzić za pomocą komendy STATS AKILL"
 
 #, c-format
 msgid ""
 " \n"
 "Accounts that are not used anymore are subject to\n"
 "the automatic expiration, i.e. they will be deleted\n"
-"after %d days if not used."
+"after %lu days if not used."
 msgstr ""
 " \n"
 "Konta nieużywane przez dłuższy czas są automatycznie\n"
-"usuwane po %d dniach od ostatniej identyfikacji.\n"
+"usuwane po %lu dniach od ostatniej identyfikacji.\n"
 "Wszelkie ustawienia oraz uprawnienia zostają usunięte."
 
 msgid ""
@@ -952,12 +945,12 @@ msgstr ""
 #, c-format
 msgid ""
 " \n"
-"Note that any channel which is not used for %d days\n"
+"Note that any channel which is not used for %lu days\n"
 "(i.e. which no user on the channel's access list enters\n"
 "for that period of time) will be automatically dropped."
 msgstr ""
 " \n"
-"Uwaga! Kanał który nie był używany przez %d dni\n"
+"Uwaga! Kanał który nie był używany przez %lu dni\n"
 "(np. nie odwiedził go żaden użytkownik umieszczony\n"
 "na liście dostępu kanału w tym czasie) zostanie\n"
 "automatycznie odrejestrowany."
@@ -1276,11 +1269,11 @@ msgid "%-8s %s"
 msgstr "%-8s %s"
 
 #, c-format
-msgid "%2lu %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
-msgstr "%2lu %-16s liter: %s, słów: %s, linii: %s, emotikon: %s, akcji: %s"
+msgid "%2d %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
+msgstr "%2d  %-16s liter: %s, słów: %s, linii: %s, emotikon: %s, akcji: %s"
 
-msgid "%b %d %H:%M:%S %Y %Z"
-msgstr "%b %d %H:%M:%S %Y %Z"
+msgid "%b %d %Y %H:%M:%S %Z"
+msgstr "%d %b %Y %H:%M:%S %Z"
 
 #, c-format
 msgid "%c is an unknown status mode."
@@ -1307,13 +1300,8 @@ msgid "%d modules loaded."
 msgstr "Załadowanych modułów: %d."
 
 #, c-format
-msgid "%d nickname(s) in the group."
-msgstr "%d nicków w grupie."
-
-#, c-format
 msgid "%lu nicks are stored in the database, using %.2Lf kB of memory."
-msgstr ""
-"%lu nicków jest zapisanych w bazie danych, zajmując przy tym %.2Lf kB pamięci."
+msgstr "%lu nicków jest zapisanych w bazie danych, zajmując przy tym %.2Lf kB pamięci."
 
 #, c-format
 msgid "%s %s list is empty."
@@ -1408,6 +1396,14 @@ msgid "%s bad words list is empty."
 msgstr "Lista zakazanych słów dla kanału %s jest pusta."
 
 #, c-format
+msgid "%s can no longer be added to channel access lists."
+msgstr "Od teraz %s nie można już dodać do kanałowych list dostępu."
+
+#, c-format
+msgid "%s can now be added to channel access lists."
+msgstr "%s można teraz dodawać do kanałowych list dostępu."
+
+#, c-format
 msgid "%s cannot be the successor on channel %s as they are the founder."
 msgstr "%s nie może być zastępcą na kanale %s, ponieważ jest jego właścicielem."
 
@@ -1420,20 +1416,20 @@ msgid "%s coverage is too wide; Please use a more specific mask."
 msgstr "Zakres %s jest zbyt szeroki; proszę użyć dokładniejszej maski."
 
 #, c-format
-msgid "%s currently has %d memos, of which %d are unread."
-msgstr "%s ma aktualnie %d wiadomości, z czego %d jest nieprzeczytanych."
+msgid "%s currently has %zu memos, of which %zu are unread."
+msgstr "%s ma aktualnie %zu wiadomości, z czego %zu jest nieprzeczytanych."
 
 #, c-format
-msgid "%s currently has %d memos, of which 1 is unread."
-msgstr "%s ma aktualnie %d wiadomości, w tym jedną nieprzeczytaną."
+msgid "%s currently has %zu memos, of which 1 is unread."
+msgstr "%s ma aktualnie %zu wiadomości, w tym jedną nieprzeczytaną."
 
 #, c-format
-msgid "%s currently has %d memos."
-msgstr "%s ma aktualnie %d wiadomości."
+msgid "%s currently has %zu memos."
+msgstr "%s ma aktualnie %zu wiadomości."
 
 #, c-format
-msgid "%s currently has %d memos; all of them are unread."
-msgstr "%s ma aktualnie %d nieprzeczytanych wiadomości."
+msgid "%s currently has %zu memos; all of them are unread."
+msgstr "%s ma aktualnie %zu nieprzeczytanych wiadomości."
 
 #, c-format
 msgid "%s currently has 1 memo, and it has not yet been read."
@@ -1602,15 +1598,12 @@ msgid "%s will now notify you of memos when they are sent to you."
 msgstr "%s będzie powiadamiał Cię o nowych wiadomościach w momencie ich nadejścia."
 
 #, c-format
-msgid ""
-"%s will now notify you of memos when you log on and when they are sent to you."
-msgstr ""
-"%s powiadomi Cię o wiadomościach podczas logowania i w momencie ich nadejścia."
+msgid "%s will now notify you of memos when you log on and when they are sent to you."
+msgstr "%s powiadomi Cię o wiadomościach podczas logowania i w momencie ich nadejścia."
 
 #, c-format
 msgid "%s will now notify you of memos when you log on or unset /AWAY."
-msgstr ""
-"%s powiadomi Cię o wiadomościach podczas logowania oraz po wyłączeniu /away."
+msgstr "%s powiadomi Cię o wiadomościach podczas logowania oraz po wyłączeniu /away."
 
 #, c-format
 msgid "%s!%s@%s (%s) added to the bot list."
@@ -1639,6 +1632,10 @@ msgstr "%s ma limit wiadomości %d i nie może być zmieniony."
 #, c-format
 msgid "%s's memo limit is %d."
 msgstr "%s ma limit wiadomości %d."
+
+#, c-format
+msgid "%zu nickname(s) in the group."
+msgstr "%zu nicków w grupie."
 
 #, c-format
 msgid "(%s ago)"
@@ -1708,9 +1705,7 @@ msgid "<unknown>"
 msgstr "<nieznany>"
 
 #, c-format
-msgid ""
-"A confirmation e-mail has been sent to %s. Follow the instructions in it to "
-"change your e-mail address."
+msgid "A confirmation e-mail has been sent to %s. Follow the instructions in it to change your e-mail address."
 msgstr ""
 "Wiadomość potwierdzająca została wysłana na e-mail %s.\n"
 "Postępuj według instrukcji w niej, aby dokończyć procedurę rejestracji."
@@ -1718,20 +1713,16 @@ msgstr ""
 msgid "A massmemo has been sent to all registered users."
 msgstr "Wiadomość została wysłana do wszystkich zarejestrowanych użytkowników."
 
-msgid ""
-"A memo informing the user will also be sent, which includes the reason for the "
-"rejection if supplied."
-msgstr ""
-"Wysłana zostanie także wiadomość informująca użytkownika. Jeśli podano przyczynę "
-"odrzucenia, informacja ta zostanie dołączona."
+msgid "A memo informing the user will also be sent, which includes the reason for the rejection if supplied."
+msgstr "Wysłana zostanie także wiadomość informująca użytkownika. Jeśli podano przyczynę odrzucenia, informacja ta zostanie dołączona."
 
 msgid "A memo informing the user will also be sent."
 msgstr "Wysłana zostanie także wiadomość informująca użytkownika."
 
 #, c-format
 msgid ""
-"A notification memo has been sent to %s informing him/her you have\n"
-"read his/her memo."
+"A notification memo has been sent to %s informing them you have\n"
+"read their memo."
 msgstr "Powiadomienie o przeczytaniu wiadomości zostało wysłane do %s."
 
 msgid "A vHost ident must be in the format of a valid ident."
@@ -1829,17 +1820,14 @@ msgid "Access list for %s:"
 msgstr "Lista dostępu dla %s:"
 
 #, c-format
-msgid ""
-"Access to this command requires the permission %s to be present in your opertype."
-msgstr ""
-"Dostęp do tego polecenia wymaga ustawienia uprawnienia %s w twoim bloku operatora."
+msgid "Access to this command requires the permission %s to be present in your opertype."
+msgstr "Dostęp do tego polecenia wymaga ustawienia uprawnienia %s w twoim bloku operatora."
 
 msgid "Account"
 msgstr "Konto"
 
 #, c-format
-msgid ""
-"Account %s has already reached the maximum number of simultaneous logins (%u)."
+msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "Konto %s już osiągnęło maksymalną ilość równoczesnych logowań (%u)."
 
 msgid "Activate security features"
@@ -1954,12 +1942,8 @@ msgstr "Wszystkie wiadomości kanału %s zostały usunięte."
 msgid "All modes cleared on %s."
 msgstr "Skasowano wszystkie tryby na %s."
 
-msgid ""
-"All new accounts must be validated by an administrator. Please wait for your "
-"registration to be confirmed."
-msgstr ""
-"Wszystkie nowe konta muszą zostać zweryfikowane przez administratora. Poczekaj "
-"proszę na potwierdzenie Twojej rejestracji."
+msgid "All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."
+msgstr "Wszystkie nowe konta muszą zostać zweryfikowane przez administratora. Poczekaj proszę na potwierdzenie Twojej rejestracji."
 
 msgid "All of your memos have been deleted."
 msgstr "Wszystkie Twoje wiadomości zostały usunięte."
@@ -1990,36 +1974,31 @@ msgstr "Wszystkie vhosty w grupie %s zostały zmienione na %s."
 msgid "All vhosts in the group %s have been set to %s@%s."
 msgstr "Wszystkie vhosty w grupie %s zostały zmienione na %s@%s."
 
-msgid "Allowed to (de)halfop him/herself"
+msgid "Allowed to (de)halfop themself"
 msgstr "Uprawniony do ustawiania/kasowania własnego statusu półoperatora (halfop)"
 
 msgid "Allowed to (de)halfop users"
-msgstr ""
-"Uprawniony do ustawiania/kasowania statusu półoperatora (halfop) użytkowników"
+msgstr "Uprawniony do ustawiania/kasowania statusu półoperatora (halfop) użytkowników"
 
-msgid "Allowed to (de)op him/herself"
+msgid "Allowed to (de)op themself"
 msgstr "Uprawniony do ustawiania/kasowania własnego statusu operatora (op)"
 
 msgid "Allowed to (de)op users"
 msgstr "Uprawniony do ustawiania/kasowania statusu operatora (op) użytkowników"
 
-msgid "Allowed to (de)owner him/herself"
+msgid "Allowed to (de)owner themself"
 msgstr "Uprawniony do ustawiania/kasowania własnego statusu właściciela (owner)"
 
 msgid "Allowed to (de)owner users"
 msgstr "Uprawniony do ustawiania/kasowania statusu właściciela (owner) użytkowników"
 
-msgid "Allowed to (de)protect him/herself"
-msgstr ""
-"Uprawniony do ustawiania/kasowania własnego statusu administratora/chronionego "
-"(protect)"
+msgid "Allowed to (de)protect themself"
+msgstr "Uprawniony do ustawiania/kasowania własnego statusu administratora/chronionego (protect)"
 
 msgid "Allowed to (de)protect users"
-msgstr ""
-"Uprawniony do ustawiania/kasowania statusu administratora/chronionego (protect) "
-"użytkowników"
+msgstr "Uprawniony do ustawiania/kasowania statusu administratora/chronionego (protect) użytkowników"
 
-msgid "Allowed to (de)voice him/herself"
+msgid "Allowed to (de)voice themself"
 msgstr "Uprawniony do ustawiania/kasowania własnego prawa głosu (voice)"
 
 msgid "Allowed to (de)voice users"
@@ -2051,6 +2030,9 @@ msgstr "Uprawniony do czytania wiadomości MEMO dla kanału"
 
 msgid "Allowed to set channel settings"
 msgstr "Uprawniony do zmiany ustawień kanału"
+
+msgid "Allowed to unban themself"
+msgstr "Uprawniony do usuwania banów"
 
 msgid "Allowed to unban users"
 msgstr "Uprawniony do usuwania banów"
@@ -2143,23 +2125,13 @@ msgstr ""
 "zostanie on wtedy skillowany."
 
 msgid ""
-"Allows Services Operators to give Operflags to any user.\n"
-"Flags have to be prefixed with a \"+\" or a \"-\". To\n"
-"remove all flags simply type a \"-\" instead of any flags."
-msgstr ""
-"Pozwala Services Operators na nadanie wskazanemu\n"
-"użytkownikowi uprawnień irc operatora z określonymi\n"
-"flagami. Flagi powinny być poprzedzone znakami \"+\" lub \"-\". \n"
-"Aby usunąć wszystkie flagi wystarczy podać \"-\"."
-
-msgid ""
-"Allows Services Operators to make Services ignore a nick or mask\n"
+"Allows Services Operators to make services ignore a nick or mask\n"
 "for a certain time or until the next restart. The default\n"
 "time format is seconds. You can specify it by using units.\n"
 "Valid units are: s for seconds, m for minutes,\n"
 "h for hours and d for days.\n"
 "Combinations of these units are not permitted.\n"
-"To make Services permanently ignore the user, type 0 as time.\n"
+"To make services permanently ignore the user, type 0 as time.\n"
 "When adding a mask, it should be in the format nick!user@host,\n"
 "everything else will be considered a nick. Wildcards are permitted.\n"
 " \n"
@@ -2179,7 +2151,7 @@ msgstr ""
 
 msgid ""
 "Allows Services Operators to manipulate the AKILL list. If\n"
-"a user matching an AKILL mask attempts to connect, Services\n"
+"a user matching an AKILL mask attempts to connect, services\n"
 "will issue a KILL for that user and, on supported server\n"
 "types, will instruct all servers to add a ban for the mask\n"
 "which the user matched.\n"
@@ -2218,7 +2190,7 @@ msgstr ""
 msgid ""
 "Allows Services Operators to manipulate the SNLINE list.  If\n"
 "a user with a realname matching an SNLINE mask attempts to\n"
-"connect, Services will not allow it to pursue his IRC\n"
+"connect, services will not allow them to pursue their IRC\n"
 "session."
 msgstr ""
 "Pozwala Operatorom Serwisów manipulować listą SNLINE.\n"
@@ -2228,7 +2200,7 @@ msgstr ""
 msgid ""
 "Allows Services Operators to manipulate the SQLINE list.  If\n"
 "a user with a nick matching an SQLINE mask attempts to\n"
-"connect, Services will not allow it to pursue his IRC\n"
+"connect, services will not allow them to pursue their IRC\n"
 "session.\n"
 "If the first character of the mask is #, services will\n"
 "prevent the use of matching channels. If the mask is a\n"
@@ -2236,7 +2208,7 @@ msgid ""
 "channels too."
 msgstr ""
 "Pozwala Operatorom Serwisów na manipulowanie listą SQLINE.\n"
-"Jeżeli użytkownik, którego nick pasuje do maski SQLINE próbuje\n"
+"Jeżeli użytkownik, którego nick pasuje do maski SQLINE, próbuje\n"
 "się połączyć, serwisy nie pozwolą na stworzenie tej sesji IRC.\n"
 "Jeśli pierwszy znak maski to #, serwisy zabronią używania pasujących\n"
 "kanałów. Jeśli maska jest wyrażeniem regularnym, wyrażenie to będzie\n"
@@ -2295,8 +2267,7 @@ msgid ""
 "the given topic to the existing topic.\n"
 " \n"
 "LOCK and UNLOCK may be used to enable and disable topic lock. When\n"
-"topic lock is set, the channel topic will be unchangeable by users who do not "
-"have\n"
+"topic lock is set, the channel topic will be unchangeable by users who do not have\n"
 "the TOPIC privilege."
 msgstr ""
 "Pozwala na manipulowanie tematem określonego kanału.\n"
@@ -2365,19 +2336,19 @@ msgstr ""
 "     MODIFY nickserv forcemail no"
 
 msgid ""
-"Allows you to choose the way Services are communicating with\n"
-"the given user. With MSG set, Services will use messages,\n"
+"Allows you to choose the way services are communicating with\n"
+"the given user. With MSG set, services will use messages,\n"
 "else they'll use notices."
 msgstr ""
 "Pozwala wybrać sposób, w jaki serwisy będą pisać do\n"
-"Ciebie. Kiedy opcja MSG jest włączona, serwisy będą\n"
-"wysyłać wiadomości prywatne (query), w przeciwnym\n"
-"wypadku będą wysyłać powiadomienia (notice)."
+"podanego użytkownika. Kiedy opcja MSG jest włączona,\n"
+"serwisy będą wysyłać wiadomości prywatne (query),\n"
+"w przeciwnym wypadku będą to powiadomienia (notice)."
 
 #, c-format
 msgid ""
-"Allows you to choose the way Services are communicating with\n"
-"you. With %s set, Services will use messages, else they'll\n"
+"Allows you to choose the way services are communicating with\n"
+"you. With %s set, services will use messages, else they'll\n"
 "use notices."
 msgstr ""
 "Pozwala wybrać sposób, w jaki serwisy będą pisać do\n"
@@ -2464,8 +2435,8 @@ msgid ""
 "Alternative methods of modifying channel access lists are\n"
 "available."
 msgstr ""
-"Alternatywne sposoby na modyfikację kanałowych list dostępu\n"
-"są dostępne."
+"Dostępne są alternatywne sposoby na modyfikację kanałowych\n"
+"list dostępu."
 
 msgid "Approve the requested vHost of a user"
 msgstr "Akceptuje prośbę o vhost wskazanego użytkownika"
@@ -2661,15 +2632,15 @@ msgid "Bot bans will no longer automatically expire."
 msgstr "Bany zakładane przez bota nie będą już się przedawniały."
 
 #, c-format
-msgid "Bot hosts may only be %d characters long."
-msgstr "Host bota może się składać maksymalnie z %d znaków."
+msgid "Bot hosts may only be %zu characters long."
+msgstr "Host bota może się składać maksymalnie z %zu znaków."
 
 msgid "Bot hosts may only contain valid host characters."
 msgstr "Host bota może zawierać tylko prawidłowe znaki."
 
 #, c-format
-msgid "Bot idents may only be %d characters long."
-msgstr "Ident bota może się składać maksymalnie z %d znaków."
+msgid "Bot idents may only be %zu characters long."
+msgstr "Ident bota może się składać maksymalnie z %zu znaków."
 
 msgid "Bot idents may only contain valid ident characters."
 msgstr "Ident bota może zawierać tylko prawidłowe znaki."
@@ -2685,8 +2656,8 @@ msgid "Bot nick"
 msgstr "Nick bota"
 
 #, c-format
-msgid "Bot nicks may only be %d characters long."
-msgstr "Nick bota może się składać maksymalnie z %d znaków."
+msgid "Bot nicks may only be %zu characters long."
+msgstr "Nick bota może się składać maksymalnie z %zu znaków."
 
 msgid "Bot nicks may only contain valid nick characters."
 msgstr "Nick bota może zawierać tylko prawidłowe znaki."
@@ -2820,7 +2791,7 @@ msgid "Caps kicker"
 msgstr "Kopanie za capsa"
 
 msgid ""
-"Causes Services to do an immediate shutdown; databases are\n"
+"Causes services to do an immediate shutdown; databases are\n"
 "not saved.  This command should not be used unless\n"
 "damage to the in-memory copies of the databases is feared\n"
 "and they should not be saved."
@@ -2828,13 +2799,12 @@ msgstr ""
 "Wymusza na serwisach natychmiastowe zakończenie pracy bez\n"
 "zapisywania baz. To polecenie powinno być użyte jedynie,\n"
 "gdy zachodzi podejrzenie uszkodzenia baz, które serwisy\n"
-"przechowują w pamięci. Do normalnego zakończenia pracy\n"
-"serwisów należy użyć polecenia SHUTDOWN."
+"przechowują w pamięci, pozwalając uniknąć ich zapisania."
 
 msgid ""
-"Causes Services to reload the configuration file. Note that\n"
-"some directives still need the restart of the Services to\n"
-"take effect (such as Services' nicknames, activation of the\n"
+"Causes services to reload the configuration file. Note that\n"
+"some directives still need the restart of the services to\n"
+"take effect (such as services' nicknames, activation of the\n"
 "session limitation, etc.)."
 msgstr ""
 "Wymusza ponowne załadowanie pliku konfiguracyjnego.\n"
@@ -2842,15 +2812,15 @@ msgstr ""
 "(zmiana nicków serwisów, aktywacja limitów sesji itd.)."
 
 msgid ""
-"Causes Services to save all databases and then restart\n"
+"Causes services to save all databases and then restart\n"
 "(i.e. exit and immediately re-run the executable)."
 msgstr "Wymusza zapisanie baz, a następnie restartuje serwisy."
 
-msgid "Causes Services to save all databases and then shut down."
+msgid "Causes services to save all databases and then shut down."
 msgstr "Wymusza zapisanie baz danych, a następnie wyłącza serwisy."
 
 msgid ""
-"Causes Services to update all database files as soon as you\n"
+"Causes services to update all database files as soon as you\n"
 "send the command."
 msgstr "Wymusza natychmiastowy zapis baz danych na dysku."
 
@@ -2864,7 +2834,7 @@ msgstr "ChanServ jest wymagany, aby włączyć nieusuwalność w tej sieci."
 msgid "Change channel modes"
 msgstr "Zmienia flagi kanału"
 
-msgid "Change the communication method of Services"
+msgid "Change the communication method of services"
 msgstr "Zmienia sposób komunikacji serwisów"
 
 msgid "Change user modes"
@@ -2876,7 +2846,7 @@ msgstr "Zmieniono flagi użytkownika dla %s na %s."
 
 msgid ""
 "Changes the display used to refer to the nickname group in\n"
-"Services. The new display MUST be a nick of the group."
+"services. The new display MUST be a nick of the group."
 msgstr ""
 "Zmienia nazwę reprezentującą grupę nicków w\n"
 "serwisach na nową. Nazwa MUSI być jednym z nicków\n"
@@ -2884,7 +2854,7 @@ msgstr ""
 
 msgid ""
 "Changes the display used to refer to your nickname group in\n"
-"Services. The new display MUST be a nick of your group."
+"services. The new display MUST be a nick of your group."
 msgstr ""
 "Zmienia nazwę reprezentującą Twoją grupę nicków w\n"
 "serwisach na nową. Nazwa MUSI być jednym z nicków\n"
@@ -2898,7 +2868,7 @@ msgstr ""
 "Nowy nick musi być zarejestrowany."
 
 msgid ""
-"Changes the language Services uses when sending messages to\n"
+"Changes the language services uses when sending messages to\n"
 "the given user (for example, when responding to a command they send).\n"
 "language should be chosen from the following list of\n"
 "supported languages:"
@@ -2909,7 +2879,7 @@ msgstr ""
 "wybrany z poniższej listy obsługiwanych języków:"
 
 msgid ""
-"Changes the language Services uses when sending messages to\n"
+"Changes the language services uses when sending messages to\n"
 "you (for example, when responding to a command you send).\n"
 "language should be chosen from the following list of\n"
 "supported languages:"
@@ -3051,8 +3021,8 @@ msgid "Channels that %s has access on:"
 msgstr "Kanały, na których %s jest na liście dostępu:"
 
 #, c-format
-msgid "Channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Kanały: %lu wpisów, %lu pakietów, najdłuższy łańcuch to %d"
+msgid "Channels: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Kanały: %zu wpisów, %zu pakietów, najdłuższy łańcuch to %zu"
 
 msgid "Chanstats"
 msgstr "Statystyki kanałów"
@@ -3204,20 +3174,20 @@ msgid "Current module list:"
 msgstr "Aktualna lista modułów:"
 
 #, c-format
-msgid "Current number of AKILLs: %d"
-msgstr "Aktualna ilość wpisów AKILL: %d"
+msgid "Current number of AKILLs: %zu"
+msgstr "Aktualna ilość wpisów AKILL: %zu"
 
 #, c-format
-msgid "Current number of SNLINEs: %d"
-msgstr "Aktualna ilość wpisów SNLINE: %d"
+msgid "Current number of SNLINEs: %zu"
+msgstr "Aktualna ilość wpisów SNLINE: %zu"
 
 #, c-format
-msgid "Current number of SQLINEs: %d"
-msgstr "Aktualna ilość wpisów SQLINE: %d"
+msgid "Current number of SQLINEs: %zu"
+msgstr "Aktualna ilość wpisów SQLINE: %zu"
 
 #, c-format
-msgid "Current users: %d (%d ops)"
-msgstr "Użytkowników  : %d (%d operatorów)"
+msgid "Current users: %zu (%d ops)"
+msgstr "Użytkowników  : %zu (%d operatorów)"
 
 msgid "DEL oper"
 msgstr "DEL oper"
@@ -3739,7 +3709,7 @@ msgid ""
 "Enables or disables the peace option for a channel.\n"
 "When peace is set, a user won't be able to kick,\n"
 "ban or remove a channel status of a user that has\n"
-"a level superior or equal to his via %s commands."
+"a level superior or equal to theirs via %s commands."
 msgstr ""
 "Włącza lub wyłącza opcję PEACE dla kanału.\n"
 "Włączenie tej opcji uniemożliwia wykopanie,\n"
@@ -3870,8 +3840,8 @@ msgid "End of entry message list."
 msgstr "Koniec listy wiadomości powitalnych."
 
 #, c-format
-msgid "End of forbid list - %d/%d entries shown."
-msgstr "Koniec listy zakazów - %d/%d wpisów wyświetlono."
+msgid "End of forbid list - %zu/%zu entries shown."
+msgstr "Koniec listy zakazów - %zu/%zu wpisów wyświetlono."
 
 msgid "End of forbid list."
 msgstr "Koniec listy zakazów."
@@ -3956,18 +3926,12 @@ msgid "Error reloading configuration file: %s"
 msgstr "Błąd przeładowywania pliku konfiguracyjnego: %s"
 
 #, c-format
-msgid ""
-"Error! The vHost ident is too long, please use an ident shorter than %d "
-"characters."
-msgstr ""
-"Błąd: podany wirtualny ident jest zbyt długi. Proszę użyć nazwy krótszej niż %d "
-"znaków."
+msgid "Error! The vHost ident is too long, please use an ident shorter than %zu characters."
+msgstr "Błąd: podany wirtualny ident jest zbyt długi. Proszę użyć nazwy krótszej niż %zu znaków."
 
 #, c-format
-msgid ""
-"Error! The vHost is too long, please use a hostname shorter than %d characters."
-msgstr ""
-"Błąd: podany vHost jest zbyt długi. Proszę użyć nazwy krótszej niż %d znaków."
+msgid "Error! The vHost is too long, please use a hostname shorter than %zu characters."
+msgstr "Błąd: podany vHost jest zbyt długi. Proszę użyć nazwy krótszej niż %zu znaków."
 
 msgid ""
 "Examples:\n"
@@ -4068,7 +4032,7 @@ msgstr "Zakaz %s nie znaleziony."
 msgid "Forbid usage of nicknames, channels, and emails"
 msgstr "Zakaz użycia nicków, kanałów i adresów e-mail"
 
-msgid "Force the Services databases to be updated immediately"
+msgid "Force the services databases to be updated immediately"
 msgstr "Wymusza natychmiastowy zapis baz na dysku"
 
 msgid "Forcefully change a user's nickname"
@@ -4096,14 +4060,8 @@ msgstr "Właściciel"
 msgid "Founder of %s changed to %s."
 msgstr "Właścicielem kanału %s jest teraz %s."
 
-msgid "GETPASS command unavailable because encryption is in use."
-msgstr "Komenda GETPASS nie działa, bo hasła są szyfrowane."
-
 msgid "Ghost with your nick has been killed."
 msgstr "Nick został usunięty z sieci."
-
-msgid "Give Operflags to a certain user"
-msgstr "Daje flagi operatora wybranemu użytkownikowi"
 
 #, c-format
 msgid ""
@@ -4223,9 +4181,7 @@ msgstr "Niewłaściwy czas trwania %s, używam %d dni."
 msgid "Invalid expiry time."
 msgstr "Błędny czas przedawnienia."
 
-msgid ""
-"Invalid hostmask. Only real hostmasks are valid, as exceptions are not matched "
-"against nicks or usernames."
+msgid "Invalid hostmask. Only real hostmasks are valid, as exceptions are not matched against nicks or usernames."
 msgstr "Nieprawidłowa maska. Tylko rzeczywiste maski są prawidłowe jako wyjątki."
 
 #, c-format
@@ -4233,16 +4189,13 @@ msgid "Invalid limit %s, using %d."
 msgstr "Błędny limit %s, stosuję %d."
 
 msgid "Invalid passcode has been entered, please check the e-mail again, and retry."
-msgstr ""
-"Wpisano niewłaściwy kod. Proszę o ponowne sprawdzenie e-mail i ponowną próbę."
+msgstr "Wpisano niewłaściwy kod. Proszę o ponowne sprawdzenie e-mail i ponowną próbę."
 
 msgid "Invalid passcode."
 msgstr "Niewłaściwy kod."
 
 #, c-format
-msgid ""
-"Invalid session limit. It must be a valid integer greater than or equal to zero "
-"and less than %d."
+msgid "Invalid session limit. It must be a valid integer greater than or equal to zero and less than %d."
 msgstr "Nieprawidłowy limit sesji. Musi być liczbą nieujemną i mniejszą niż %d."
 
 msgid "Invalid threshold value. It must be a valid integer greater than 1."
@@ -4307,8 +4260,8 @@ msgid "LIMIT enforced by "
 msgstr "LIMIT wymuszony przez "
 
 #, c-format
-msgid "LIMIT enforced on %s, %d users removed."
-msgstr "LIMIT wymuszony na %s, wyrzucono %d użytkowników."
+msgid "LIMIT enforced on %s, %zu users removed."
+msgstr "LIMIT wymuszony na %s, wyrzucono %zu użytkowników."
 
 msgid "LIST threshold"
 msgstr "LIST wartość-progowa"
@@ -4648,8 +4601,7 @@ msgstr "Logowanie dla polecenia %s na %s metodą %s%s%s zostało usunięte."
 
 #, c-format
 msgid "Logging is now active for command %s on %s, using log method %s%s%s."
-msgstr ""
-"Logowanie jest teraz aktywne dla polecenia %s na %s, przy użyciu metody %s%s%s."
+msgstr "Logowanie jest teraz aktywne dla polecenia %s na %s, przy użyciu metody %s%s%s."
 
 #, c-format
 msgid "Login to %s"
@@ -4696,21 +4648,17 @@ msgstr "Ej, szukasz siebie, %s?"
 
 #, c-format
 msgid ""
-"Mainly controls mode locks and mode access (which is different from channel "
-"access)\n"
+"Mainly controls mode locks and mode access (which is different from channel access)\n"
 "on a channel.\n"
 " \n"
 "The %s LOCK command allows you to add, delete, and view mode locks on a channel.\n"
-"If a mode is locked on or off, services will not allow that mode to be changed. "
-"The SET\n"
-"command will clear all existing mode locks and set the new one given, while ADD "
-"and DEL\n"
+"If a mode is locked on or off, services will not allow that mode to be changed. The SET\n"
+"command will clear all existing mode locks and set the new one given, while ADD and DEL\n"
 "modify the existing mode lock.\n"
 "Example:\n"
 "     MODE #channel LOCK ADD +bmnt *!*@*aol*\n"
 " \n"
-"The %s SET command allows you to set modes through services. Wildcards * and ? "
-"may\n"
+"The %s SET command allows you to set modes through services. Wildcards * and ? may\n"
 "be given as parameters for list and status modes.\n"
 "Example:\n"
 "     MODE #channel SET +v *\n"
@@ -4720,26 +4668,20 @@ msgid ""
 "       Clears all extended bans that start with ~c:\n"
 " \n"
 "The %s CLEAR command is an easy way to clear modes on a channel. what may be\n"
-"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and "
-"voices. If what\n"
+"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If what\n"
 "is not given then all basic modes are removed."
 msgstr ""
-"Kontroluje przede wszystkim blokady trybów i uprawnienia do trybów (które różnią "
-"się od uprawnień\n"
+"Kontroluje przede wszystkim blokady trybów i uprawnienia do trybów (które różnią się od uprawnień\n"
 "do kanałów).\n"
 " \n"
-"Polecenie %s LOCK pozwala na dodawanie, usuwanie i podglądanie blokad trybów na "
-"kanale.\n"
-"Gdy flaga jest zablokowana jako włączona lub wyłączona, serwisy uniemożliwią jej "
-"zmianę.\n"
-"Polecenie SET usunie wszystkie aktualne blokady trybów, i ustawi tylko podane, "
-"natomiast\n"
+"Polecenie %s LOCK pozwala na dodawanie, usuwanie i podglądanie blokad trybów na kanale.\n"
+"Gdy flaga jest zablokowana jako włączona lub wyłączona, serwisy uniemożliwią jej zmianę.\n"
+"Polecenie SET usunie wszystkie aktualne blokady trybów, i ustawi tylko podane, natomiast\n"
 "komendy ADD i DEL zmodyfikują istniejącą blokadę.\n"
 "Przykład:\n"
 "     MODE #kanał LOCK ADD +bmnt *!*@*neostrada*\n"
 " \n"
-"Komenda %s SET pozwala na ustawianie trybów za pomocą serwisów. Znaki * oraz ? "
-"mogą\n"
+"Komenda %s SET pozwala na ustawianie trybów za pomocą serwisów. Znaki * oraz ? mogą\n"
 "być podawane jako parametry dla list i trybów użytkowników.\n"
 "Przykład:\n"
 "     MODE #kanał SET +v *\n"
@@ -4748,10 +4690,8 @@ msgstr ""
 "     MODE #kanał SET -b ~c:*\n"
 "       Kasuje wszystkie bany rozszerzone, zaczynające się od ~c:\n"
 " \n"
-"Komenda %s CLEAR jest łatwą metodą na usunięcie trybów kanałowych. Opcją co może "
-"być\n"
-"dowolna flaga. Do przykładów można zaliczyć bany, wyjątki banów, wyjątki "
-"zaproszeń, statusy opa, halfopa,\n"
+"Komenda %s CLEAR jest łatwą metodą na usunięcie trybów kanałowych. Opcją co może być\n"
+"dowolna flaga. Do przykładów można zaliczyć bany, wyjątki banów, wyjątki zaproszeń, statusy opa, halfopa,\n"
 "Jeśli nie podano co, zostaną wyczyszczone wszystkie podstawowe tryby."
 
 msgid "Maintain the AutoKick list"
@@ -4927,8 +4867,7 @@ msgid "Mask must be in the form user@host."
 msgstr "Maska musi mieć postać user@host."
 
 msgid "Masks and unregistered users may not be on access lists."
-msgstr ""
-"Maski ani niezarejestrowane nicki nie mogą znajdować się na listach dostępowych."
+msgstr "Maski ani niezarejestrowane nicki nie mogą znajdować się na listach dostępowych."
 
 msgid "Matches and returns all users that registered using given email"
 msgstr "Wyświetla użytkowników zarejestrowanych z podanym adresem e-mail"
@@ -4948,6 +4887,10 @@ msgstr "Wiadomość %d od %s (%s)."
 #, c-format
 msgid "Memo %d has been deleted."
 msgstr "Wiadomość %d została usunięta."
+
+#, c-format
+msgid "Memo %zu has been deleted."
+msgstr "Wiadomość %zu została usunięta."
 
 msgid "Memo ignore list is empty."
 msgstr "Lista ignorowanych jest pusta."
@@ -5066,9 +5009,6 @@ msgstr ""
 "zalogowany. Operatorzy serwisów mogą podać nick, aby modyfikować\n"
 "listy certyfikatów innych użytkowników. \n"
 
-msgid "Modify the Services ignore list"
-msgstr "Zarządza listą ignorowanych przez serwisy"
-
 #, c-format
 msgid "Modify the list of %s users"
 msgstr "Zarządza listą %s"
@@ -5081,6 +5021,9 @@ msgstr "Zarządza listą uprawnionych użytkowników"
 
 msgid "Modify the nickname client certificate list"
 msgstr "Modyfikuje listę certyfikatów klienta dla nicka"
+
+msgid "Modify the services ignore list"
+msgstr "Zarządza listą ignorowanych przez serwisy"
 
 msgid "Modify the session-limit exception list"
 msgstr "Zarządza listą wyjątków dla limitów sesji"
@@ -5132,6 +5075,9 @@ msgstr "Statystyki sieciowe dla %s:"
 msgid "Never"
 msgstr "Nigdy"
 
+msgid "Never-op"
+msgstr "Nigdy"
+
 msgid "Nick"
 msgstr "Nick"
 
@@ -5180,8 +5126,8 @@ msgid "Nick %s isn't registered."
 msgstr "Nick %s nie jest zarejestrowany."
 
 #, c-format
-msgid "Nick %s was truncated to %d characters."
-msgstr "Nick %s został skrócony do %d znaków."
+msgid "Nick %s was truncated to %zu characters."
+msgstr "Nick %s został skrócony do %zu znaków."
 
 #, c-format
 msgid "Nick %s will expire."
@@ -5224,8 +5170,8 @@ msgid "Nick %s is now suspended."
 msgstr "Nick %s został zawieszony."
 
 #, c-format
-msgid "Nick too long, max length is %u characters."
-msgstr "Zbyt długi nick. Maksymalna długość to %u znaków."
+msgid "Nick too long, max length is %zu characters."
+msgstr "Zbyt długi nick. Maksymalna długość to %zu znaków."
 
 #, c-format
 msgid "Nickname %s has been dropped."
@@ -5388,12 +5334,8 @@ msgid "Online from"
 msgstr "Jest online z"
 
 #, c-format
-msgid ""
-"Oper %s is configured in the configuration file(s) and can not be removed by this "
-"command."
-msgstr ""
-"Operator %s jest dodany w pliku konfiguracyjnym, więc nie można usunąć go tym "
-"poleceniem."
+msgid "Oper %s is configured in the configuration file(s) and can not be removed by this command."
+msgstr "Operator %s jest dodany w pliku konfiguracyjnym, więc nie można usunąć go tym poleceniem."
 
 msgid "Oper Info"
 msgstr "Informacje Oper"
@@ -5420,14 +5362,6 @@ msgstr "Uprawnienia operatora zostały odebrane użytkownikowi %s (%s)."
 #, c-format
 msgid "Oper type %s has not been configured."
 msgstr "Typ operatora %s nie jest skonfigurowany."
-
-#, c-format
-msgid "Operflags %s have been added for %s."
-msgstr "Flagi operatora %s zostały przyznane dla %s."
-
-#, c-format
-msgid "Operflags %s have been removed from %s."
-msgstr "Flagi operatora %s zostały zabrane %s."
 
 #, c-format
 msgid "Opertype %s has no allowed commands."
@@ -5460,16 +5394,8 @@ msgid "Password accepted."
 msgstr "Hasło przyjęte."
 
 #, c-format
-msgid "Password for %s changed to %s."
-msgstr "Hasło dla %s zmieniono na %s"
-
-#, c-format
 msgid "Password for %s changed."
 msgstr "Hasło dla %s zmienione."
-
-#, c-format
-msgid "Password for %s is %s."
-msgstr "Hasło dla %s to %s."
 
 msgid "Password incorrect."
 msgstr "Nieprawidłowe hasło."
@@ -5496,14 +5422,13 @@ msgid "Please contact an Operator to get a vHost assigned to this nick."
 msgstr "Proszę o kontakt z operatorem, aby uzyskać vHosta dla tego nicka."
 
 msgid ""
-"Please try again with a more obscure password. Passwords should be at least\n"
-"five characters long, should not be something easily guessed\n"
-"(e.g. your real name or your nick), and cannot contain the space or tab "
-"characters."
+"Please try again with a more obscure password. Passwords should not be\n"
+"something that could be easily guessed (e.g. your real name or your nick) and\n"
+"cannot contain the space or tab characters.\n"
 msgstr ""
-"Proszę spróbować ponownie, używając trudniejszego hasła. Hasło powinno\n"
-"składać się co najmniej z 5 znaków, nie powinno być łatwe do odgadnięcia\n"
-"(na przykład Twoje imię bądź nick), i nie może zawierać spacji albo znaków Tab."
+"Proszę spróbować ponownie, używając trudniejszego hasła. Hasło nie powinno\n"
+"być łatwe do odgadnięcia (na przykład Twoje imię bądź nick), i nie może zawierać\n"
+"spacji, ani znaków Tab.\n"
 
 msgid "Please use a valid server name when juping."
 msgstr "Proszę użyć prawidłowej nazwy serwera."
@@ -5512,24 +5437,24 @@ msgid "Please use the symbol of # when attempting to register."
 msgstr "Proszę używać symbolu # przy próbie rejestracji."
 
 #, c-format
-msgid "Please wait %d seconds and retry."
-msgstr "Proszę odczekać %d sekund(y) i ponowić próbę."
+msgid "Please wait %lu seconds and retry."
+msgstr "Proszę odczekać %lu sekund(y) i ponowić próbę."
 
 #, c-format
-msgid "Please wait %d seconds before requesting a new vHost."
-msgstr "Odczekaj %d sekund(y) przed ponowną prośbą o vHosta."
+msgid "Please wait %lu seconds before requesting a new vHost."
+msgstr "Odczekaj %lu sekund(y) przed ponowną prośbą o vHosta."
 
 #, c-format
-msgid "Please wait %d seconds before using the %s command again."
-msgstr "Odczekaj %d sekund(y) przed ponownym użyciem komendy %s."
+msgid "Please wait %lu seconds before using the %s command again."
+msgstr "Odczekaj %lu sekund(y) przed ponownym użyciem komendy %s."
 
 #, c-format
-msgid "Please wait %d seconds before using the GROUP command again."
-msgstr "Odczekaj %d sekund przed ponownym użyciem komendy GROUP."
+msgid "Please wait %lu seconds before using the GROUP command again."
+msgstr "Odczekaj %lu sekund przed ponownym użyciem komendy GROUP."
 
 #, c-format
-msgid "Please wait %d seconds before using the REGISTER command again."
-msgstr "Odczekaj %d sekund przed ponownym użyciem komendy REGISTER."
+msgid "Please wait %lu seconds before using the REGISTER command again."
+msgstr "Odczekaj %lu sekund przed ponownym użyciem komendy REGISTER."
 
 #, c-format
 msgid "Pooled %s."
@@ -5559,7 +5484,7 @@ msgstr "Zapobiega wyświetlaniu nicka po wydaniu polecenia LIST"
 msgid "Prevent the nickname from expiring"
 msgstr "Zapobiega wygaśnięciu nicka"
 
-msgid "Prevents users being kicked by Services"
+msgid "Prevents users being kicked by services"
 msgstr "Zabrania kopania użytkowników przez serwisy"
 
 msgid "Private"
@@ -5717,17 +5642,16 @@ msgid "Registered"
 msgstr "Zarejestrowano"
 
 #, c-format
-msgid "Registered channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Zarejestrowane kanały: %lu wpisów, %lu pakietów, najdłuższy łańcuch to %d"
+msgid "Registered channels: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Zarejestrowane kanały: %zu wpisów, %zu pakietów, najdłuższy łańcuch to %zu"
 
 #, c-format
-msgid "Registered nick groups: %lu entries, %lu buckets, longest chain is %d"
-msgstr ""
-"Zarejestrowane grupy nicków: %lu wpisów, %lu pakietów, najdłuższy łańcuch to %d"
+msgid "Registered nick groups: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Zarejestrowane grupy nicków: %zu wpisów, %zu pakietów, najdłuższy łańcuch to %zu"
 
 #, c-format
-msgid "Registered nicknames: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Zarejestrowane nicki: %lu wpisów, %lu pakietów, najdłuższy łańcuch to %d"
+msgid "Registered nicknames: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Zarejestrowane nicki: %zu wpisów, %zu pakietów, najdłuższy łańcuch to %zu"
 
 #, c-format
 msgid "Registered only enforced on %s."
@@ -5745,7 +5669,7 @@ msgid ""
 "\"founder\" of the channel. The channel founder is allowed\n"
 "to change all of the channel settings for the channel;\n"
 "%s will also automatically give the founder\n"
-"channel-operator privileges when s/he enters the channel."
+"channel operator privileges when they enter the channel."
 msgstr ""
 "Rejestruje kanał w bazie %s. Aby użyć tego polecenia,\n"
 "musisz być operatorem na kanale, który chcesz zarejestrować.\n"
@@ -5773,7 +5697,7 @@ msgid ""
 "your nickname as a password is a much worse idea ;) and,\n"
 "in fact, %s will not allow it. Also, short\n"
 "passwords are vulnerable to trial-and-error searches, so\n"
-"you should choose a password at least 5 characters long.\n"
+"you should choose a password at least %u characters long.\n"
 "Finally, the space character cannot be used in passwords."
 msgstr ""
 "Rejestruje aktualnie używany nick w bazie %s.\n"
@@ -5790,7 +5714,7 @@ msgstr ""
 "jako haseł jest niewskazane. Nie wolno użyć hasła takiego\n"
 "samego, jak nick (a %s na to nie pozwoli). Bardzo krótkie\n"
 "hasło może zostać odgadnięte metodą prób i błędów.\n"
-"Twoje hasło musi mieć długość co najmniej 5 znaków.\n"
+"Twoje hasło musi mieć długość co najmniej %u znaków.\n"
 "Znak spacji nie może być użyty w haśle."
 
 msgid "Registration is currently disabled."
@@ -5913,9 +5837,6 @@ msgstr "Zapamiętuje flagi kiedy kanał jest pusty"
 msgid "Retain topic when channel is not in use"
 msgstr "Zapamiętuje temat kiedy kanał jest pusty"
 
-msgid "Retrieve the password for a nickname"
-msgstr "Podaje hasło do wskazanego nicka"
-
 msgid "Retrieves the vhost requests"
 msgstr "Wyświetla prośby o vHosta"
 
@@ -5930,16 +5851,6 @@ msgstr "Podaje konta, które używają wskazanego e-maila."
 
 msgid "Returns the owner status of the given nickname"
 msgstr "Podaje status właściciela podanego nicka"
-
-msgid ""
-"Returns the password for the given nickname.  Note that\n"
-"whenever this command is used, a message including the\n"
-"person who issued the command and the nickname it was used\n"
-"on will be logged and sent out as a WALLOPS/GLOBOPS."
-msgstr ""
-"Zwraca hasło dla wskazanego nicka.\n"
-"UWAGA: użycie tej komendy powoduje wysłanie\n"
-"informacji o jej użyciu przy pomocy WALLOP/GLOBOP."
 
 msgid ""
 "Returns whether the user using the given nickname is\n"
@@ -6004,7 +5915,7 @@ msgstr "Wymuszono SSL na %s."
 msgid "SSLONLY enforced by "
 msgstr "SSLONLY wymuszony przez "
 
-msgid "Save databases and restart Services"
+msgid "Save databases and restart services"
 msgstr "Zapisuje bazy i restartuje serwisy"
 
 msgid "Searches logs for a matching pattern"
@@ -6109,7 +6020,7 @@ msgstr ""
 msgid ""
 "Sends the named nick or channel a memo containing\n"
 "memo-text. When sending to a nickname, the recipient will\n"
-"receive a notice that he/she has a new memo. The target\n"
+"receive a notice that they have a new memo. The target\n"
 "nickname/channel must be registered."
 msgstr ""
 "Wysyła wiadomość wskazanej osobie lub na podany kanał.\n"
@@ -6120,10 +6031,10 @@ msgstr ""
 msgid ""
 "Sends the named nick or channel a memo containing\n"
 "memo-text. When sending to a nickname, the recipient will\n"
-"receive a notice that he/she has a new memo. The target\n"
+"receive a notice that they have a new memo. The target\n"
 "nickname/channel must be registered.\n"
 "Once the memo is read by its recipient, an automatic notification\n"
-"memo will be sent to the sender informing him/her that the memo\n"
+"memo will be sent to the sender informing them that the memo\n"
 "has been read."
 msgstr ""
 "Wysyła wiadomość wskazanej osobie lub na podany kanał.\n"
@@ -6256,11 +6167,8 @@ msgstr "Serwisy zostały skonfigurowane tak, aby nie wysyłać poczty."
 msgid "Services ignore list:"
 msgstr "Lista ignorowanych przez serwisy:"
 
-msgid ""
-"Services is unable to change modes. Are your servers' U:lines configured "
-"correctly?"
-msgstr ""
-"Serwisy nie mogą zmieniać trybów. Czy U-linie serwerów są dobrze skonfigurowane?"
+msgid "Services is unable to change modes. Are your servers' U:lines configured correctly?"
+msgstr "Serwisy nie mogą zmieniać trybów. Czy U-linie serwerów są dobrze skonfigurowane?"
 
 #, c-format
 msgid "Services up %s."
@@ -6268,14 +6176,11 @@ msgstr "Serwisy uruchomione: %s."
 
 #, c-format
 msgid "Services will from now on set status modes on %s in channels."
-msgstr ""
-"Serwisy będą teraz automatycznie nadawały uprawnienia na kanałach dla użytkownika "
-"%s."
+msgstr "Serwisy będą teraz automatycznie nadawały uprawnienia na kanałach dla użytkownika %s."
 
 #, c-format
 msgid "Services will no longer automatically give modes to users in %s."
-msgstr ""
-"Serwisy nie będą już automatycznie nadawały uprawnień dla użytkowników na %s."
+msgstr "Serwisy nie będą już automatycznie nadawały uprawnień dla użytkowników na %s."
 
 #, c-format
 msgid "Services will no longer set status modes on %s in channels."
@@ -6307,8 +6212,8 @@ msgid "Session limiting is disabled."
 msgstr "Limitowanie sesji jest wyłączone."
 
 #, c-format
-msgid "Sessions: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Sesje: %lu wpisów, %lu pakietów, najdłuższy łańcuch to %d"
+msgid "Sessions: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Sesje: %zu wpisów, %zu pakietów, najdłuższy łańcuch to %zu"
 
 msgid "Set SET-options on another nickname"
 msgstr "Ustawia opcje wskazanemu nickowi"
@@ -6316,7 +6221,7 @@ msgstr "Ustawia opcje wskazanemu nickowi"
 msgid "Set channel options and information"
 msgstr "Modyfikuje ustawienia kanału"
 
-msgid "Set how Services make bans on the channel"
+msgid "Set how services make bans on the channel"
 msgstr "Ustawia sposób banowania przez serwisy"
 
 msgid "Set options related to memos"
@@ -6331,13 +6236,13 @@ msgstr "Ustawia kanał jako \"wieczny\""
 msgid "Set the channel description"
 msgstr "Ustawia opis kanału"
 
-msgid "Set the display of your group in Services"
+msgid "Set the display of your group in services"
 msgstr "Ustawia nick reprezentujący grupę nicków"
 
 msgid "Set the founder of a channel"
 msgstr "Ustawia nick właściciela kanału"
 
-msgid "Set the language Services will use when messaging you"
+msgid "Set the language services will use when messaging you"
 msgstr "Ustawia język, w którym serwisy będą wysyłały komunikaty"
 
 msgid "Set the nickname password"
@@ -6352,7 +6257,7 @@ msgstr "Zmienia vhosty wszystkich nicków w grupie"
 msgid "Set the vhost of another user"
 msgstr "Zmienia vhost wskazanemu użytkownikowi"
 
-msgid "Set various global Services options"
+msgid "Set various global services options"
 msgstr "Ustawia różne globalne opcje serwisów"
 
 msgid "Set your nickname password"
@@ -6588,7 +6493,7 @@ msgstr ""
 "można zmieniać także ident."
 
 msgid ""
-"Sets various global Services options.  Option names\n"
+"Sets various global services options.  Option names\n"
 "currently defined are:\n"
 "    READONLY   Set read-only or read-write mode\n"
 "    DEBUG      Activate or deactivate debug mode\n"
@@ -6627,14 +6532,10 @@ msgstr ""
 "%s%s HELP %s opcja"
 
 msgid "Sets various nickname options. option can be one of:"
-msgstr ""
-"Ustawia różne opcje nicka. Dostępne opcje to (jeśli nie widzisz żadnych, zaloguj "
-"się):"
+msgstr "Ustawia różne opcje nicka. Dostępne opcje to (jeśli nie widzisz żadnych, zaloguj się):"
 
 msgid "Sets whether services should set channel status modes on you automatically."
-msgstr ""
-"Pozwala na wybór, czy serwisy będą ustawiały automatycznie Twoje uprawnienia na "
-"kanale."
+msgstr "Pozwala na wybór, czy serwisy będą ustawiały automatycznie Twoje uprawnienia na kanale."
 
 msgid ""
 "Sets whether the given channel will expire.  Setting this\n"
@@ -6642,6 +6543,9 @@ msgid ""
 msgstr ""
 "Włącza lub wyłącza automatyczne usunięcie kanału,\n"
 "jeśli nie będzie on używany."
+
+msgid "Sets whether the given nickname can be added to a channel access list."
+msgstr "Ustawia, czy podany nick może zostać dodany do kanałowych list dostępu."
 
 #, c-format
 msgid ""
@@ -6662,6 +6566,9 @@ msgid ""
 msgstr ""
 "Włącza lub wyłącza automatyczne usunięcie nicka,\n"
 "jeśli nie będzie on używany."
+
+msgid "Sets whether you can be added to a channel access list."
+msgstr "Ustawia, czy możesz być dodany/a do kanałowych list dostępu."
 
 #, c-format
 msgid ""
@@ -6696,12 +6603,12 @@ msgstr "Parametrem opcji SUPERADMIN musi być ON albo OFF."
 msgid "Should services automatically give status to users"
 msgstr "Włącza lub wyłącza automatyczne opowanie"
 
-msgid "Show status of Services and network"
+msgid "Show status of services and network"
 msgstr "Pokazuje informacje o serwisach i sieci"
 
 #, c-format
-msgid "Showed %d/%d matches for %s."
-msgstr "Wyświetlono %d/%d dopasowań dla %s."
+msgid "Showed %zu/%zu matches for %s."
+msgstr "Wyświetlono %zu/%zu dopasowań dla %s."
 
 msgid "Sign kicks that are done with the KICK command"
 msgstr "Podpisuje kicki kiedy użyto komendy KICK"
@@ -6788,9 +6695,7 @@ msgstr "Możesz mieć tylko %d wpisów na kanałowej liście dostępu."
 
 #, c-format
 msgid "Sorry, the maximum of %d auto join entries has been reached."
-msgstr ""
-"Przepraszamy, maksymalna liczba %d wpisów automatycznego dołączania została "
-"osiągnięta."
+msgstr "Przepraszamy, maksymalna liczba %d wpisów automatycznego dołączania została osiągnięta."
 
 #, c-format
 msgid "Sorry, the maximum of %d certificate entries has been reached."
@@ -6801,11 +6706,8 @@ msgid "Sorry, the memo ignore list for %s is full."
 msgstr "Lista ignorowania dla %s jest już pełna."
 
 #, c-format
-msgid ""
-"Sorry, you can only have %d access entries on a channel, including access entries "
-"from other channels."
-msgstr ""
-"Możesz mieć tylko %d wpisów na kanałowej liście dostępu, wliczając inne kanały."
+msgid "Sorry, you can only have %d access entries on a channel, including access entries from other channels."
+msgstr "Możesz mieć tylko %d wpisów na kanałowej liście dostępu, wliczając inne kanały."
 
 #, c-format
 msgid "Sorry, you can only have %d autokick masks on a channel."
@@ -7076,13 +6978,13 @@ msgid ""
 "Syntax: READONLY {ON | OFF}\n"
 " \n"
 "Sets read-only mode on or off.  In read-only mode, normal\n"
-"users will not be allowed to modify any Services data,\n"
+"users will not be allowed to modify any services data,\n"
 "including channel and nickname access lists, etc.  IRCops\n"
-"with sufficient Services privileges will be able to modify\n"
+"with sufficient services privileges will be able to modify\n"
 "Services' AKILL, SQLINE, SNLINE and ignore lists, drop,\n"
 "suspend or forbid nicknames and channels, and manage news,\n"
 "oper info and DNS, but any such changes will not be saved\n"
-"unless read-only mode is deactivated before Services are\n"
+"unless read-only mode is deactivated before services are\n"
 "terminated or restarted.\n"
 " \n"
 "This option is equivalent to the command-line option\n"
@@ -7094,12 +6996,13 @@ msgstr ""
 "opcji powoduje zablokowanie wykonywania zmian w ustawieniach\n"
 "serwisów, dotyczy to list dostępu kanału oraz nicka itd.\n"
 "Operatorzy serwisów z odpowiednimi uprawnieniami będą\n"
-"mogli modyfikować listę AKILL, usuwać lub blokować nicki\n"
-"oraz kanały, ale żadne z tych zmian nie zostaną zapisane\n"
-"dopóki tryb tylko-do-odczytu nie zostanie wyłączony przed\n"
+"mogli modyfikować listę AKILL, SQLINE, SNLINE, ignore,\n"
+"usuwać lub blokować nicki oraz kanały, zarządzać wiadomościami\n"
+"NEWS,ale żadne z tych zmian nie zostaną zapisane,\n"
+"chyba, że tryb tylko-do-odczytu zostanie wyłączony przed\n"
 "restartem lub wyłączeniem serwisów.\n"
 "\n"
-"Ta opcja ma taki sam efekt jak argument linii poleceń -readonly."
+"Ta opcja ma taki sam efekt jak argument linii poleceń --readonly."
 
 msgid ""
 "Syntax: SUPERADMIN {ON | OFF}\n"
@@ -7166,8 +7069,8 @@ msgstr ""
 "uprawnienie AOP, lub tych o poziomie dostępu 5 lub wyższym."
 
 msgid ""
-"Tells Services to jupiter a server -- that is, to create\n"
-"a fake \"server\" connected to Services which prevents\n"
+"Tells services to jupiter a server -- that is, to create\n"
+"a fake \"server\" connected to services which prevents\n"
 "the real server of that name from connecting.  The jupe\n"
 "may be removed using a standard SQUIT. If a reason is\n"
 "given, it is placed in the server information field;\n"
@@ -7179,13 +7082,13 @@ msgstr ""
 "sztucznego serwera, co zapobiega podłączaniu prawdziwego\n"
 "serwera o tej samej nazwie. Blokadę można zdjąć używając\n"
 "standardowego polecenia SQUIT. Jeśli zostanie podany\n"
-"powód będzie on wyświetlany w polu informacyjnym serwera,\n"
+"powód, będzie on wyświetlany w polu informacyjnym serwera,\n"
 "w przeciwnym wypadku wyświetlane będzie \"Juped by <nick>\"."
 
 msgid "Tells you about the last time a user was seen"
 msgstr "Informuje, kiedy ostatnio widziano użytkownika"
 
-msgid "Terminate Services WITHOUT saving"
+msgid "Terminate services WITHOUT saving"
 msgstr "Wyłącza serwisy NIE zapisując baz"
 
 msgid "Terminate services with save"
@@ -7251,12 +7154,8 @@ msgstr ""
 " \n"
 "Polecenie ACCESS CLEAR usuwa wszystkie wpisy z listy dostępowej."
 
-msgid ""
-"The CLEAR command clears the channel access list. This requires channel founder "
-"access."
-msgstr ""
-"Polecenie CLEAR usuwa wszystkie wpisy z listy dostępów kanału. Wymaga to "
-"uprawnień założyciela."
+msgid "The CLEAR command clears the channel access list. This requires channel founder access."
+msgstr "Polecenie CLEAR usuwa wszystkie wpisy z listy dostępów kanału. Wymaga to uprawnień założyciela."
 
 #, c-format
 msgid ""
@@ -7355,7 +7254,7 @@ msgid ""
 "functions to be changed. LEVELS DISABLE (or DIS for short)\n"
 "disables an automatic feature or disallows access to a\n"
 "function by anyone, INCLUDING the founder (although, the founder\n"
-"can always reenable it). Use LEVELS SET founder to make a level\n"
+"can always re-enable it). Use LEVELS SET founder to make a level\n"
 "founder only.\n"
 " \n"
 "LEVELS LIST shows the current levels for each function or\n"
@@ -7378,6 +7277,7 @@ msgstr ""
 "dla wszystkich, wraz Z WŁAŚCICIELEM (ale właściciel może ją włączyć\n"
 "ponownie). Użyj komendy LEVELS SET founder aby przydzielić\n"
 "podane uprawnienie tylko właścicielowi. \n"
+"\n"
 "LEVELS LIST wyświetla bieżącą listę poziomów dla każdej funkcji\n"
 "lub grupy funkcji. LEVELS RESET przywraca ustawienia poziomów\n"
 "do domyślnych, takich, jakie są one na świeżo stworzonych kanałach.\n"
@@ -7387,10 +7287,8 @@ msgstr ""
 
 msgid ""
 "The LIST command allows you to list existing entries on the channel access list.\n"
-"If a mask is given, the mask is wildcard matched against all existing entries on "
-"the\n"
-"access list, and only those entries are returned. If a set of flags is given, "
-"only those\n"
+"If a mask is given, the mask is wildcard matched against all existing entries on the\n"
+"access list, and only those entries are returned. If a set of flags is given, only those\n"
 "on the access list with the specified flags are returned."
 msgstr ""
 "Polecenie LIST pozwala na przeglądanie zawartości kanałowej listy dostępu.\n"
@@ -7401,12 +7299,9 @@ msgid ""
 "The MODIFY command allows you to modify the access list. If the mask is\n"
 "not already on the access list it is added, then the changes are applied.\n"
 "If the mask has no more flags, then the mask is removed from the access list.\n"
-"Additionally, you may use +* or -* to add or remove all flags, respectively. You "
-"are\n"
-"only able to modify the access list if you have the proper permission on the "
-"channel,\n"
-"and even then you can only give other people access to the equivalent of what "
-"your access is."
+"Additionally, you may use +* or -* to add or remove all flags, respectively. You are\n"
+"only able to modify the access list if you have the proper permission on the channel,\n"
+"and even then you can only give other people access to the equivalent of what your access is."
 msgstr ""
 "Polecenie MODIFY pozwala na zmianę kanałowej listy dostępu.\n"
 "Gdy podana maska nie znajduje się już na liście dostępowej, zostanie ona\n"
@@ -7418,9 +7313,7 @@ msgstr ""
 "użytkowników na poziomie wyższym niż Twoje."
 
 msgid "The STATS command prints out statistics about stored nicks and memory usage."
-msgstr ""
-"Komenda STATS wyświetla statystyki dotyczące zapisanych nicków i wykorzystania "
-"pamięci."
+msgstr "Komenda STATS wyświetla statystyki dotyczące zapisanych nicków i wykorzystania pamięci."
 
 msgid ""
 "The email parameter is optional and will set the email\n"
@@ -7540,11 +7433,8 @@ msgstr ""
 "poziomu włącznie."
 
 #, c-format
-msgid ""
-"The host %s currently has %d sessions with a limit of %d because it matches entry:"
-" %s."
-msgstr ""
-"Host %s aktualnie posiada %d sesji z limitem %d, ponieważ pasuje do wpisu: %s."
+msgid "The host %s currently has %d sessions with a limit of %d because it matches entry: %s."
+msgstr "Host %s aktualnie posiada %d sesji z limitem %d, ponieważ pasuje do wpisu: %s."
 
 #, c-format
 msgid "The last memo you sent to %s (sent on %s) has been read."
@@ -7630,8 +7520,8 @@ msgstr ""
 "przez serwisy."
 
 #, c-format
-msgid "There are %d memos on channel %s."
-msgstr "Jest %d wiadomości dla kanału %s."
+msgid "There are %zu memos on channel %s."
+msgstr "Jest %zu wiadomości dla kanału %s."
 
 msgid ""
 "There are no bots available at this time.\n"
@@ -7655,16 +7545,16 @@ msgid "There currently are no logging configurations for %s."
 msgstr "Aktualnie nie ma logowania skonfigurowanego dla %s."
 
 #, c-format
-msgid "There is %d memo on channel %s."
-msgstr "Jest %d wiadomość dla kanału %s."
+msgid "There is %zu memo on channel %s."
+msgstr "Jest %zu wiadomość dla kanału %s."
 
 #, c-format
 msgid ""
 "There is a new memo on channel %s.\n"
-"Type %s%s READ %s %d to read it."
+"Type %s%s READ %s %zu to read it."
 msgstr ""
 "Jest nowa wiadomość dla kanału %s.\n"
-"Napisz %s%s READ %s %d aby przeczytać."
+"Napisz %s%s READ %s %zu aby przeczytać."
 
 #, c-format
 msgid "There is no bot assigned to %s anymore."
@@ -7705,16 +7595,14 @@ msgstr "Ten kanał nie może być używany."
 
 msgid ""
 "This command allows managing DNS zones used for controlling what servers users\n"
-"are directed to when connecting. Omitting all parameters prints out the status "
-"of\n"
+"are directed to when connecting. Omitting all parameters prints out the status of\n"
 "the DNS zone.\n"
 " \n"
 "ADDZONE adds a zone, eg us.yournetwork.tld. Servers can then be added to this\n"
 "zone with the ADDSERVER command.\n"
 " \n"
 "The ADDSERVER command adds a server to the given zone. When a query is done, the\n"
-"zone in question is served if it exists, else all servers in all zones are "
-"served.\n"
+"zone in question is served if it exists, else all servers in all zones are served.\n"
 "A server may be in more than one zone.\n"
 " \n"
 "The ADDIP command associates an IP with a server.\n"
@@ -7722,18 +7610,14 @@ msgid ""
 "The POOL and DEPOOL commands actually add and remove servers to their given zones."
 msgstr ""
 "To polecenie pozwala na zarządzanie strefami DNS, używanych do sprawdzania,\n"
-"na które serwery trafiają łączący się użytkownicy. Pominięcie wszystkich "
-"parametrów\n"
+"na które serwery trafiają łączący się użytkownicy. Pominięcie wszystkich parametrów\n"
 "wyświetli status strefy DNS.\n"
 "\n"
-"ADDZONE dodaje strefę, np. pl.twojasiec.net. Następnie do stworzonej strefy "
-"można\n"
+"ADDZONE dodaje strefę, np. pl.twojasiec.net. Następnie do stworzonej strefy można\n"
 "dodawać serwery używając komendy ADDSERVER.\n"
 " \n"
-"Komenda ADDSERVER dodaje serwer do podanej strefy. Gdy otrzymane zostanie "
-"zapytanie,\n"
-"to gdy strefa istnieje, zostanie ona wykorzystana, a w przeciwnym przypadku "
-"przesłane zostaną\n"
+"Komenda ADDSERVER dodaje serwer do podanej strefy. Gdy otrzymane zostanie zapytanie,\n"
+"to gdy strefa istnieje, zostanie ona wykorzystana, a w przeciwnym przypadku przesłane zostaną\n"
 "wszystkie serwery ze wszystkich stref.\n"
 " Serwer może znajdować się we więcej niż jednej strefie.\n"
 " \n"
@@ -7878,12 +7762,8 @@ msgstr ""
 "Operatorzy serwisów mogą podać nicka, aby modyfikować listy\n"
 "innych użytkowników."
 
-msgid ""
-"This command may not be used on this network because nickname ownership is "
-"disabled."
-msgstr ""
-"Tego polecenia nie można użyć w tej sieci, gdyż rejestracja nicków nie jest "
-"dostępna."
+msgid "This command may not be used on this network because nickname ownership is disabled."
+msgstr "Tego polecenia nie można użyć w tej sieci, gdyż rejestracja nicków nie jest dostępna."
 
 msgid "This command reloads the module named modname."
 msgstr "To polecenie ponownie ładuje wskazany moduł z katalogu modułów."
@@ -7892,7 +7772,7 @@ msgid "This command retrieves the vhost requests."
 msgstr "Ta komenda powoduje wyświetlenie próśb o vHosta."
 
 msgid ""
-"This command searches the Services logfiles for messages\n"
+"This command searches the services logfiles for messages\n"
 "that match the given pattern. The day and limit argument\n"
 "may be used to specify how many days of logs to search\n"
 "and the number of replies to limit to. By default this\n"
@@ -7946,8 +7826,7 @@ msgid "This command unloads the module named modname."
 msgstr "To polecenie wyładowuje wskazany moduł."
 
 msgid "This command will resend you the registration confirmation email."
-msgstr ""
-"To polecenie spowoduje ponowne wysłanie e-maila potwierdzającego rejestrację."
+msgstr "To polecenie spowoduje ponowne wysłanie e-maila potwierdzającego rejestrację."
 
 #, c-format
 msgid ""
@@ -8370,12 +8249,12 @@ msgid "Users"
 msgstr "Użytkownicy"
 
 #, c-format
-msgid "Users (nick): %lu entries, %lu buckets, longest chain is %d"
-msgstr "Użytkownicy (nicki): %lu wpisów, %lu pakietów, najdłuższy łańcuch to %d"
+msgid "Users (nick): %lu entries, %lu buckets, longest chain is %zu"
+msgstr "Użytkownicy (nicki): %lu wpisów, %lu pakietów, najdłuższy łańcuch to %zu"
 
 #, c-format
-msgid "Users (uid): %lu entries, %lu buckets, longest chain is %d"
-msgstr "Użytkownicy (uid): %lu wpisów, %lu pakietów, najdłuższy łańcuch to %d"
+msgid "Users (uid): %lu entries, %lu buckets, longest chain is %zu"
+msgstr "Użytkownicy (uid): %lu wpisów, %lu pakietów, najdłuższy łańcuch to %zu"
 
 msgid "Users list:"
 msgstr "Lista użytkowników:"
@@ -8474,22 +8353,23 @@ msgid ""
 "yourself.\n"
 " \n"
 "With a parameter, does the same for the given nick. If you\n"
-"specify REVALIDATE as well, Services will ask the given nick\n"
+"specify REVALIDATE as well, services will ask the given nick\n"
 "to re-identify. This is limited to Services Operators."
 msgstr ""
 "Polecenie wydane bez parametrów odwraca działanie\n"
 "komendy IDENTIFY - nie będziesz rozpoznawany jako\n"
-"właściciel nicka.\n"
+"właściciel nicka. Zwróć uwagę, że nie otrzymasz wtedy prośby\n"
+"o ponowne zalogowanie.\n"
 "\n"
 "Administrator serwisów może podać jako parametr nick\n"
 "użytkownika, który ma zostać wylogowany. Parametr\n"
-"REVALIDATE powoduje informowanie przez serwisy\n"
+"REVALIDATE powoduje informowanie przez serwisy\n"
 "użytkownika o potrzebie ponownej identyfikacji."
 
 msgid ""
 "Without any option, shows the current number of users online,\n"
-"and the highest number of users online since Services was\n"
-"started, and the length of time Services has been running.\n"
+"and the highest number of users online since services was\n"
+"started, and the length of time services has been running.\n"
 " \n"
 "With the AKILL option, displays the current size of the\n"
 "AKILL list and the current default expiry time.\n"
@@ -8505,9 +8385,8 @@ msgid ""
 "The ALL option displays all of the above statistics."
 msgstr ""
 "Polecenie bez parametrów wyświetla bieżącą liczbę \n"
-"użytkowników oraz operatorów podłączonych do sieci (nie\n"
-"licząc serwisów), największą liczbę użytkowników licząc od \n"
-"startu serwisów oraz czas pracy serwisów.\n"
+"użytkowników podłączonych do sieci, największą liczbę\n"
+"użytkowników licząc od startu serwisów, oraz czas pracy serwisów.\n"
 "\n"
 "Parametr AKILL wyświetla informacje o rozmiarze listy\n"
 "AKILL oraz domyślnym czasie wygasania wpisów.\n"
@@ -8554,9 +8433,6 @@ msgstr "Nie korzystasz z certyfikatu klienta."
 msgid "You are now a super admin."
 msgstr "Jesteś teraz super-administratorem."
 
-msgid "You are now an IRC Operator."
-msgstr "Jesteś teraz IRC operatorem."
-
 msgid "You are now identified for your nick. Change your password now."
 msgstr "Jesteś zidentyfikowany. Zmień teraz swoje hasło."
 
@@ -8565,33 +8441,26 @@ msgid "You are now in the group of %s."
 msgstr "Należysz teraz do grupy %s."
 
 #, c-format
-msgid ""
-"You are over your maximum number of memos (%d). You will be unable to receive any "
-"new memos until you delete some of your current ones."
+msgid "You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."
 msgstr ""
 "Uwaga: Maksymalny limit wiadomości (%d) został osiągnięty.\n"
 "Nie będziesz otrzymywać nowych wiadomości jeśli kilku nie usuniesz."
 
-msgid "You can not NOOP Services."
+msgid "You can not NOOP services."
 msgstr "Nie możesz użyć NOOP na serwisach."
 
-msgid ""
-"You can not disable the founder privilege because it would be impossible to "
-"reenable it at a later time."
-msgstr ""
-"Nie możesz wyłączyć uprawnienia właściciela, gdyż nie dałoby się wtedy ustawić go "
-"ponownie w przyszłości."
+msgid "You can not disable the founder privilege because it would be impossible to re-enable it at a later time."
+msgstr "Nie możesz wyłączyć uprawnienia właściciela, gdyż nie dałoby się wtedy ustawić go ponownie w przyszłości."
 
 msgid "You can not jupe an already juped server."
 msgstr "Nie można wykluczyć serwera, ponieważ już to zrobiono."
 
-msgid "You can not jupe your Services' pseudoserver or your uplink server."
+msgid "You can not jupe your services' pseudoserver or your uplink server."
 msgstr "Nie można wykluczyć samych serwisów lub uplinka serwisów."
 
 #, c-format
 msgid "You can not reload this module directly, instead reload %s."
-msgstr ""
-"Nie możesz bezpośrednio przeładować podanego modułu. Zamiast tego przeładuj %s."
+msgstr "Nie możesz bezpośrednio przeładować podanego modułu. Zamiast tego przeładuj %s."
 
 msgid "You can not request a receipt when sending a memo to yourself."
 msgstr "Nie możesz wysyłać wiadomości z potwierdzeniem odbioru do siebie!"
@@ -8633,20 +8502,20 @@ msgid "You cannot use this command."
 msgstr "Nie możesz użyć tego polecenia."
 
 #, c-format
-msgid "You currently have %d memos, of which %d are unread."
-msgstr "Aktualnie masz %d wiadomości, z czego %d jest nieprzeczytanych."
+msgid "You currently have %zu memos, of which %zu are unread."
+msgstr "Aktualnie masz %zu wiadomości, z czego %zu jest nieprzeczytanych."
 
 #, c-format
-msgid "You currently have %d memos, of which 1 is unread."
-msgstr "Aktualnie masz %d wiadomości, w tym jedną nieprzeczytaną."
+msgid "You currently have %zu memos, of which 1 is unread."
+msgstr "Aktualnie masz %zu wiadomości, w tym jedną nieprzeczytaną."
 
 #, c-format
-msgid "You currently have %d memos."
-msgstr "Aktualnie masz %d wiadomości."
+msgid "You currently have %zu memos."
+msgstr "Aktualnie masz %zu wiadomości."
 
 #, c-format
-msgid "You currently have %d memos; all of them are unread."
-msgstr "Aktualnie masz %d nieprzeczytanych wiadomości."
+msgid "You currently have %zu memos; all of them are unread."
+msgstr "Aktualnie masz %zu nieprzeczytanych wiadomości."
 
 msgid "You currently have 1 memo, and it has not yet been read."
 msgstr "Aktualnie masz jedną wiadomość i jest ona nieprzeczytana."
@@ -8679,10 +8548,10 @@ msgstr "Masz jedną nową wiadomość."
 #, c-format
 msgid ""
 "You have a new memo from %s.\n"
-"Type %s%s READ %d to read it."
+"Type %s%s READ %zu to read it."
 msgstr ""
 "Masz nową wiadomość od %s.\n"
-"Napisz %s%s READ %d aby przeczytać."
+"Napisz %s%s READ %zu aby przeczytać."
 
 #, c-format
 msgid "You have been invited to %s by %s."
@@ -8717,9 +8586,7 @@ msgid "You have no new memos."
 msgstr "Nie masz nowych wiadomości."
 
 #, c-format
-msgid ""
-"You have reached your maximum number of memos (%d). You will be unable to receive "
-"any new memos until you delete some of your current ones."
+msgid "You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."
 msgstr ""
 "Uwaga: Osiągnięto już limit wiadomości (%d).\n"
 "Nie będziesz otrzymywać nowych wiadomości dopóki\n"
@@ -8748,21 +8615,14 @@ msgstr "Nie możesz zmienić hasła innych operatorów serwisów."
 msgid "You may not drop other Services Operators' nicknames."
 msgstr "Nie możesz skasować nicków innych operatorów serwisów."
 
-msgid "You may not get the password of other Services Operators."
-msgstr "Nie możesz odczytać hasła innych operatorów serwisów."
-
 msgid "You may not suspend other Services Operators' nicknames."
 msgstr "Nie możesz zawiesić nicków innych operatorów serwisów."
 
 msgid "You may view but not modify the access list of other Services Operators."
-msgstr ""
-"Możesz podglądać, ale nie modyfikować list dostępowych innych operatorów serwisów."
+msgstr "Możesz podglądać, ale nie modyfikować list dostępowych innych operatorów serwisów."
 
-msgid ""
-"You may view but not modify the certificate list of other Services Operators."
-msgstr ""
-"Możesz podglądać, ale nie modyfikować list certyfikatów innych operatorów "
-"serwisów."
+msgid "You may view but not modify the certificate list of other Services Operators."
+msgstr "Możesz podglądać, ale nie modyfikować list certyfikatów innych operatorów serwisów."
 
 #, c-format
 msgid "You might see yourself in the mirror, %s."
@@ -8791,16 +8651,12 @@ msgid "You must confirm your account before you may send a memo."
 msgstr "Musisz potwierdzić swoje konto przed wysłaniem wiadomości."
 
 #, c-format
-msgid ""
-"You must enter the channel name twice as a confirmation that you wish to drop %s."
-msgstr ""
-"Musisz dwukrotnie podać nazwę kanału, aby potwierdzić, że na pewno chcesz "
-"odrejestrować %s."
+msgid "You must enter the channel name twice as a confirmation that you wish to drop %s."
+msgstr "Musisz dwukrotnie podać nazwę kanału, aby potwierdzić, że na pewno chcesz odrejestrować %s."
 
 #, c-format
-msgid "You must have been using this nick for at least %d seconds to register."
-msgstr ""
-"Musisz być połączony(a) dłużej niż %d sekund(y), aby móc zarejestrować nick."
+msgid "You must have been using this nick for at least %lu seconds to register."
+msgstr "Musisz być połączony(a) dłużej niż %lu sekund(y), aby móc zarejestrować nick."
 
 #, c-format
 msgid "You must have the %s(ME) privilege on the channel to use this command."
@@ -8822,9 +8678,7 @@ msgstr ""
 "Będziesz otrzymywać powiadomienie o nowych wiadomościach\n"
 "na IRC i przez e-mail."
 
-msgid ""
-"You will be notified of new memos at logon and when they arrive, and by mail when "
-"they arrive."
+msgid "You will be notified of new memos at logon and when they arrive, and by mail when they arrive."
 msgstr ""
 "Będziesz powiadomienie informacje o nowych wiadomościach\n"
 "podczas logowania i w momencie ich nadejścia (bezpośrednio\n"
@@ -8867,11 +8721,8 @@ msgstr "Ten IRCd nie obsługuje SVSNICK."
 msgid "Your IRCd does not support SVSPART."
 msgstr "Ten IRCd nie obsługuje SVSPART."
 
-msgid ""
-"Your IRCd does not support vIdent's, if this is incorrect, please report this as "
-"a possible bug"
-msgstr ""
-"Ten IRCd nie obsługuje vIdentów. Jeżeli to nieprawda, wyślij zgłoszenie o błędzie."
+msgid "Your IRCd does not support vIdent's, if this is incorrect, please report this as a possible bug"
+msgstr "Ten IRCd nie obsługuje vIdentów. Jeżeli to nieprawda, wyślij zgłoszenie o błędzie."
 
 #, c-format
 msgid "Your account %s has been successfully created."
@@ -8891,12 +8742,8 @@ msgstr "Twój adres e-mail został zmieniony na %s."
 msgid "Your email address is not allowed, choose a different one."
 msgstr "Twój e-mail nie jest dozwolony. Użyj innego."
 
-msgid ""
-"Your email address is not confirmed. To confirm it, follow the instructions that "
-"were emailed to you."
-msgstr ""
-"Twój adres e-mail nie jest potwierdzony. Aby to zrobić, postępuj według wysłanych "
-"Tobie instrukcji."
+msgid "Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."
+msgstr "Twój adres e-mail nie jest potwierdzony. Aby to zrobić, postępuj według wysłanych Tobie instrukcji."
 
 #, c-format
 msgid "Your email address of %s has been confirmed."
@@ -8928,12 +8775,8 @@ msgstr "Twój limit wiadomości wynosi %d."
 msgid "Your memo limit is 0; you will not receive any new memos."
 msgstr "Twój limit wiadomości wynosi 0, nie będziesz otrzymywać nowych."
 
-msgid ""
-"Your memo limit is 0; you will not receive any new memos. You cannot change this "
-"limit."
-msgstr ""
-"Twój limit wiadomości wynosi 0, nie będziesz odbierać nowych i nie możesz zmienić "
-"tego limitu."
+msgid "Your memo limit is 0; you will not receive any new memos. You cannot change this limit."
+msgstr "Twój limit wiadomości wynosi 0, nie będziesz odbierać nowych i nie możesz zmienić tego limitu."
 
 msgid "Your nick has been logged out."
 msgstr "Twój nick został pomyślnie wylogowany."
@@ -8942,8 +8785,7 @@ msgid "Your nick is already registered."
 msgstr "Twój nick jest już zarejestrowany."
 
 msgid "Your nick is not grouped to anything, you can't ungroup it."
-msgstr ""
-"Nie możesz usunąć swojego nicka z grupy, ponieważ w żadnej się nie znajduje."
+msgstr "Nie możesz usunąć swojego nicka z grupy, ponieważ w żadnej się nie znajduje."
 
 msgid "Your nick isn't registered."
 msgstr "Twój nick nie jest zarejestrowany."
@@ -8960,12 +8802,12 @@ msgid "Your passcode has been re-sent to %s."
 msgstr "Twój kod rejestracyjny został ponownie wysłany na %s."
 
 #, c-format
-msgid "Your password is %s - remember this for later use."
-msgstr "Twoje hasło do nicka to %s"
+msgid "Your password is too long. It must be shorter than %u characters."
+msgstr "Twoje hasło jest zbyt długie (max %u znaków)."
 
 #, c-format
-msgid "Your password is too long. It must not exceed %u characters."
-msgstr "Twoje hasło jest zbyt długie (max %u znaków)."
+msgid "Your password is too short. It must be longer than %u characters."
+msgstr "Twoje hasło jest zbyt krótkie. Musi mieć więcej, niż %u znaków."
 
 msgid "Your password reset request has expired."
 msgstr "Twoja prośba o reset hasła jest nieaktualna."
@@ -9082,8 +8924,7 @@ msgstr "[wiadomość automatyczna] Twój vHost został odrzucony."
 
 #, c-format
 msgid "[auto memo] Your requested vHost has been rejected. Reason: %s"
-msgstr ""
-"[wiadomość automatyczna] Twoja prośba o vHosta została odrzucona. Podany powód: %s"
+msgstr "[wiadomość automatyczna] Twoja prośba o vHosta została odrzucona. Podany powód: %s"
 
 #, c-format
 msgid "[auto memo] vHost %s has been requested by %s."
@@ -9196,6 +9037,3 @@ msgstr "{nick | kanał}"
 
 msgid "{nick | channel} memo-text"
 msgstr "{nick | kanał} treść"
-
-#~ msgid "Password authentication required for that command."
-#~ msgstr "Ta komenda wymaga zalogowania do zarejestrowanego nicka."

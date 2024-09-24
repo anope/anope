@@ -9,24 +9,27 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#pragma once
+
 struct IgnoreData
 {
 	Anope::string mask;
 	Anope::string creator;
 	Anope::string reason;
-	time_t time; /* When do we stop ignoring them? */
+	time_t time = 0; /* When do we stop ignoring them? */
 
-	virtual ~IgnoreData() { }
- protected:
-	IgnoreData() : time(0) { }
+	virtual ~IgnoreData() = default;
+protected:
+	IgnoreData() = default;
 };
 
-class IgnoreService : public Service
+class IgnoreService
+	: public Service
 {
- protected:
+protected:
 	IgnoreService(Module *c) : Service(c, "IgnoreService", "ignore") { }
 
- public:
+public:
 	virtual void AddIgnore(IgnoreData *) = 0;
 
 	virtual void DelIgnore(IgnoreData *) = 0;

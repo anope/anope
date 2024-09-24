@@ -7,7 +7,8 @@
 
 #include "../webcpanel.h"
 
-class WebpanelRequest : public IdentifyRequest
+class WebpanelRequest final
+	: public IdentifyRequest
 {
 	HTTPReply reply;
 	HTTPMessage message;
@@ -16,10 +17,10 @@ class WebpanelRequest : public IdentifyRequest
 	Reference<HTTPClient> client;
 	TemplateFileServer::Replacements replacements;
 
- public:
+public:
 	WebpanelRequest(Module *o, HTTPReply &r, HTTPMessage &m, HTTPProvider *s, const Anope::string &p_n, HTTPClient *c, TemplateFileServer::Replacements &re, const Anope::string &user, const Anope::string &pass) : IdentifyRequest(o, user, pass), reply(r), message(m), server(s), page_name(p_n), client(c), replacements(re) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		if (!client || !server)
 			return;
@@ -49,7 +50,7 @@ class WebpanelRequest : public IdentifyRequest
 		{
 			char c;
 			do
-				c = 48 + (rand() % 75);
+				c = 48 + (Anope::RandomNumber() % 75);
 			while (!isalnum(c));
 			id += c;
 		}
@@ -60,15 +61,15 @@ class WebpanelRequest : public IdentifyRequest
 
 		{
 			HTTPReply::cookie c;
-			c.push_back(std::make_pair("account", na->nick));
-			c.push_back(std::make_pair("Path", "/"));
+			c.emplace_back("account", na->nick);
+			c.emplace_back("Path", "/");
 			reply.cookies.push_back(c);
 		}
 
 		{
 			HTTPReply::cookie c;
-			c.push_back(std::make_pair("id", id));
-			c.push_back(std::make_pair("Path", "/"));
+			c.emplace_back("id", id);
+			c.emplace_back("Path", "/");
 			reply.cookies.push_back(c);
 		}
 
@@ -78,7 +79,7 @@ class WebpanelRequest : public IdentifyRequest
 		client->SendReply(&reply);
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		if (!client || !server)
 			return;
@@ -102,7 +103,7 @@ bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 		// Rate limit check.
 		Anope::string ip = client->clientaddr.addr();
 
-		Anope::hash_map<time_t>::iterator it = last_login_attempt.find(ip);
+		Anope::unordered_map<time_t>::iterator it = last_login_attempt.find(ip);
 		if (it != last_login_attempt.end())
 		{
 			time_t last_time = it->second;
@@ -125,7 +126,7 @@ bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 
 		last_login_attempt[ip] = Anope::CurTime;
 
-		WebpanelRequest *req = new WebpanelRequest(me, reply, message, server, page_name, client, replacements, user, pass);
+		auto *req = new WebpanelRequest(me, reply, message, server, page_name, client, replacements, user, pass);
 		FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 		req->Dispatch();
 		return false;

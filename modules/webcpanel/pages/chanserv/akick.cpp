@@ -6,7 +6,6 @@
  */
 
 #include "../../webcpanel.h"
-#include "utils.h"
 
 WebCPanel::ChanServ::Akick::Akick(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
@@ -46,22 +45,22 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 
 	replacements["AKICK"] = "YES";
 
-	if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
+	if (!message.get_data["del"].empty() && !message.get_data["mask"].empty())
 	{
 		std::vector<Anope::string> params;
 		params.push_back(ci->name);
-		params.push_back("DEL");
+		params.emplace_back("DEL");
 		params.push_back(message.get_data["mask"]);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/akick", params, replacements);
 	}
-	else if (message.post_data["mask"].empty() == false)
+	else if (!message.post_data["mask"].empty())
 	{
 		std::vector<Anope::string> params;
 		params.push_back(ci->name);
-		params.push_back("ADD");
+		params.emplace_back("ADD");
 		params.push_back(message.post_data["mask"]);
-		if (message.post_data["reason"].empty() == false)
+		if (!message.post_data["reason"].empty())
 			params.push_back(message.post_data["reason"]);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/akick", params, replacements);

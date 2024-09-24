@@ -14,7 +14,7 @@
 #include "logger.h"
 #include "sockets.h"
 
-#include <errno.h>
+#include <cerrno>
 
 void ConnectionSocket::Connect(const Anope::string &TargetHost, int Port)
 {

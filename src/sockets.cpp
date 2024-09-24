@@ -16,7 +16,7 @@
 
 #ifndef _WIN32
 #include <arpa/inet.h>
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>
 #endif
 
@@ -52,6 +52,8 @@ size_t sockaddrs::size() const
 			return sizeof(sa4);
 		case AF_INET6:
 			return sizeof(sa6);
+		case AF_UNIX:
+			return sizeof(saun);
 		default:
 			break;
 	}
@@ -67,6 +69,8 @@ int sockaddrs::port() const
 			return ntohs(sa4.sin_port);
 		case AF_INET6:
 			return ntohs(sa6.sin6_port);
+		case AF_UNIX:
+			return 0;
 		default:
 			break;
 	}
@@ -76,18 +80,51 @@ int sockaddrs::port() const
 
 Anope::string sockaddrs::addr() const
 {
-	char address[INET6_ADDRSTRLEN];
-
 	switch (sa.sa_family)
 	{
 		case AF_INET:
-			if (inet_ntop(AF_INET, &sa4.sin_addr, address, sizeof(address)))
-				return address;
+		{
+			char v4address[INET_ADDRSTRLEN];
+			if (inet_ntop(AF_INET, &sa4.sin_addr, v4address, sizeof(v4address)))
+				return v4address;
 			break;
+		}
 		case AF_INET6:
-			if (inet_ntop(AF_INET6, &sa6.sin6_addr, address, sizeof(address)))
-				return address;
+		{
+			char v6address[INET6_ADDRSTRLEN];
+			if (inet_ntop(AF_INET6, &sa6.sin6_addr, v6address, sizeof(v6address)))
+				return v6address;
 			break;
+		}
+		case AF_UNIX:
+			return saun.sun_path;
+		default:
+			break;
+	}
+
+	return "";
+}
+
+Anope::string sockaddrs::str() const
+{
+	switch (sa.sa_family)
+	{
+		case AF_INET:
+		{
+			char v4address[INET_ADDRSTRLEN];
+			if (!inet_ntop(AF_INET, &sa4.sin_addr, v4address, sizeof(v4address)))
+				strcpy(v4address, "0.0.0.0");
+			return Anope::printf("%s:%u", v4address, sa4.sin_port);
+		}
+		case AF_INET6:
+		{
+			char v6address[INET6_ADDRSTRLEN];
+			if (!inet_ntop(AF_INET6, &sa6.sin6_addr, v6address, sizeof(v6address)))
+				strcpy(v6address, "0:0:0:0:0:0:0:0");
+			return Anope::printf("[%s]:%u", v6address, sa6.sin6_port);
+		}
+		case AF_UNIX:
+			return saun.sun_path;
 		default:
 			break;
 	}
@@ -187,6 +224,15 @@ void sockaddrs::pton(int type, const Anope::string &address, int pport)
 			}
 			break;
 		}
+		case AF_UNIX:
+		{
+			if (address.length() < sizeof(saun.sun_path))
+			{
+				saun.sun_family = AF_UNIX;
+				memcpy(&saun.sun_path, address.c_str(), address.length() + 1);
+			}
+			break;
+		}
 		default:
 			break;
 	}
@@ -236,13 +282,7 @@ cidr::cidr(const Anope::string &ip)
 		Anope::string cidr_range = ip.substr(sl + 1);
 
 		this->cidr_ip = real_ip;
-		this->cidr_len = ipv6 ? 128 : 32;
-		try
-		{
-			if (cidr_range.is_pos_number_only())
-				this->cidr_len = convertTo<unsigned int>(cidr_range);
-		}
-		catch (const ConvertException &) { }
+		this->cidr_len = Anope::Convert<unsigned int>(cidr_range, ipv6 ? 128 : 32);
 		this->addr.pton(ipv6 ? AF_INET6 : AF_INET, real_ip);
 	}
 }
@@ -306,7 +346,7 @@ bool cidr::match(const sockaddrs &other)
 	byte = len % 8;
 	if (byte)
 	{
-		uint8_t m = ~0 << (8 - byte);
+		uint8_t m = ~0u << (8 - byte);
 		return (*ip & m) == (*their_ip & m);
 	}
 
@@ -432,7 +472,7 @@ SocketFlag SocketIO::FinishAccept(ClientSocket *cs)
 
 void SocketIO::Bind(Socket *s, const Anope::string &ip, int port)
 {
-	s->bindaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, ip, port);
+	s->bindaddr.pton(s->GetFamily(), ip, port);
 	if (bind(s->GetFD(), &s->bindaddr.sa, s->bindaddr.size()) == -1)
 		throw SocketException("Unable to bind to address: " + Anope::LastError());
 }
@@ -440,7 +480,7 @@ void SocketIO::Bind(Socket *s, const Anope::string &ip, int port)
 void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int port)
 {
 	s->flags[SF_CONNECTING] = s->flags[SF_CONNECTED] = false;
-	s->conaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, target, port);
+	s->conaddr.pton(s->GetFamily(), target, port);
 	int c = connect(s->GetFD(), &s->conaddr.sa, s->conaddr.size());
 	if (c == -1)
 	{
@@ -488,12 +528,12 @@ Socket::Socket()
 	throw CoreException("Socket::Socket() ?");
 }
 
-Socket::Socket(int s, bool i, int type)
+Socket::Socket(int s, int f, int type)
 {
 	this->io = &NormalSocketIO;
-	this->ipv6 = i;
+	this->family = f;
 	if (s == -1)
-		this->sock = socket(this->ipv6 ? AF_INET6 : AF_INET, type, 0);
+		this->sock = socket(this->family, type, 0);
 	else
 		this->sock = s;
 	this->SetBlocking(false);
@@ -510,14 +550,14 @@ Socket::~Socket()
 	SocketEngine::Sockets.erase(this->sock);
 }
 
+int Socket::GetFamily() const
+{
+	return family;
+}
+
 int Socket::GetFD() const
 {
 	return sock;
-}
-
-bool Socket::IsIPv6() const
-{
-	return ipv6;
 }
 
 bool Socket::SetBlocking(bool state)
@@ -565,10 +605,6 @@ ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool i)
 
 	if (listen(sock, SOMAXCONN) == -1)
 		throw SocketException("Unable to listen: " + Anope::LastError());
-}
-
-ListenSocket::~ListenSocket()
-{
 }
 
 bool ListenSocket::ProcessRead()

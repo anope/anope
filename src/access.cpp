@@ -16,55 +16,8 @@
 #include "account.h"
 #include "protocol.h"
 
-static struct
-{
-	Anope::string name;
-	Anope::string desc;
-} descriptions[] = {
-	{"ACCESS_CHANGE", _("Allowed to modify the access list")},
-	{"ACCESS_LIST", _("Allowed to view the access list")},
-	{"AKICK", _("Allowed to use the AKICK command")},
-	{"ASSIGN", _("Allowed to assign/unassign a bot")},
-	{"AUTOHALFOP", _("Automatic halfop upon join")},
-	{"AUTOOP", _("Automatic channel operator status upon join")},
-	{"AUTOOWNER", _("Automatic owner upon join")},
-	{"AUTOPROTECT", _("Automatic protect upon join")},
-	{"AUTOVOICE", _("Automatic voice on join")},
-	{"BADWORDS", _("Allowed to modify channel badwords list")},
-	{"BAN", _("Allowed to ban users")},
-	{"FANTASIA", _("Allowed to use fantasy commands")},
-	{"FOUNDER", _("Allowed to issue commands restricted to channel founders")},
-	{"GETKEY", _("Allowed to use GETKEY command")},
-	{"GREET", _("Greet message displayed on join")},
-	{"HALFOP", _("Allowed to (de)halfop users")},
-	{"HALFOPME", _("Allowed to (de)halfop him/herself")},
-	{"INFO", _("Allowed to get full INFO output")},
-	{"INVITE", _("Allowed to use the INVITE command")},
-	{"KICK", _("Allowed to use the KICK command")},
-	{"MEMO", _("Allowed to read channel memos")},
-	{"MODE", _("Allowed to use the MODE command")},
-	{"NOKICK", _("Prevents users being kicked by Services")},
-	{"OP", _("Allowed to (de)op users")},
-	{"OPME", _("Allowed to (de)op him/herself")},
-	{"OWNER", _("Allowed to (de)owner users")},
-	{"OWNERME", _("Allowed to (de)owner him/herself")},
-	{"PROTECT", _("Allowed to (de)protect users")},
-	{"PROTECTME", _("Allowed to (de)protect him/herself")},
-	{"SAY", _("Allowed to use SAY and ACT commands")},
-	{"SET", _("Allowed to set channel settings")},
-	{"SIGNKICK", _("No signed kick when SIGNKICK LEVEL is used")},
-	{"TOPIC", _("Allowed to change channel topics")},
-	{"UNBAN", _("Allowed to unban users")},
-	{"VOICE", _("Allowed to (de)voice users")},
-	{"VOICEME", _("Allowed to (de)voice him/herself")}
-};
-
 Privilege::Privilege(const Anope::string &n, const Anope::string &d, int r) : name(n), desc(d), rank(r)
 {
-	if (this->desc.empty())
-		for (unsigned j = 0; j < sizeof(descriptions) / sizeof(*descriptions); ++j)
-			if (descriptions[j].name.equals_ci(name))
-				this->desc = descriptions[j].desc;
 }
 
 bool Privilege::operator==(const Privilege &other) const
@@ -94,10 +47,10 @@ void PrivilegeManager::RemovePrivilege(Privilege &p)
 	if (it != Privileges.end())
 		Privileges.erase(it);
 
-	for (registered_channel_map::const_iterator cit = RegisteredChannelList->begin(), cit_end = RegisteredChannelList->end(); cit != cit_end; ++cit)
+	for (const auto &[_, ci] : *RegisteredChannelList)
 	{
-		cit->second->QueueUpdate();
-		cit->second->RemoveLevel(p.name);
+		ci->QueueUpdate();
+		ci->RemoveLevel(p.name);
 	}
 }
 
@@ -207,16 +160,17 @@ NickCore *ChanAccess::GetAccount() const
 
 void ChanAccess::Serialize(Serialize::Data &data) const
 {
-	data["provider"] << this->provider->name;
-	data["ci"] << this->ci->name;
-	data["mask"] << this->Mask();
-	data["creator"] << this->creator;
-	data.SetType("last_seen", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
-	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;
-	data["data"] << this->AccessSerialize();
+	data.Store("provider", this->provider->name);
+	data.Store("ci", this->ci->name);
+	data.Store("mask", this->Mask());
+	data.Store("creator", this->creator);
+	data.Store("description", this->description);
+	data.Store("last_seen", this->last_seen);
+	data.Store("created", this->created);
+	data.Store("data", this->AccessSerialize());
 }
 
-Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string provider, chan;
 
@@ -238,6 +192,7 @@ Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["mask"] >> m;
 	access->SetMask(m, ci);
 	data["creator"] >> access->creator;
+	data["description"] >> access->description;
 	data["last_seen"] >> access->last_seen;
 	data["created"] >> access->created;
 
@@ -250,7 +205,7 @@ Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 	return access;
 }
 
-bool ChanAccess::Matches(const User *u, const NickCore *acc, ChannelInfo* &next) const
+bool ChanAccess::Matches(const User *u, const NickCore *acc, ChannelInfo *&next) const
 {
 	next = NULL;
 
@@ -268,9 +223,8 @@ bool ChanAccess::Matches(const User *u, const NickCore *acc, ChannelInfo* &next)
 
 	if (acc)
 	{
-		for (unsigned i = 0; i < acc->aliases->size(); ++i)
+		for (auto *na : *acc->aliases)
 		{
-			const NickAlias *na = acc->aliases->at(i);
 			if (Anope::Match(na->nick, this->mask))
 				return true;
 		}
@@ -340,10 +294,8 @@ static bool HasPriv(const ChanAccess::Path &path, const Anope::string &name)
 	if (path.empty())
 		return false;
 
-	for (unsigned int i = 0; i < path.size(); ++i)
+	for (auto *access : path)
 	{
-		ChanAccess *access = path[i];
-
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnCheckPriv, MOD_RESULT, (access, name));
 
@@ -390,9 +342,9 @@ static ChanAccess *HighestInPath(const ChanAccess::Path &path)
 {
 	ChanAccess *highest = NULL;
 
-	for (unsigned int i = 0; i < path.size(); ++i)
-		if (highest == NULL || *path[i] > *highest)
-			highest = path[i];
+	for (auto *ca : path)
+		if (highest == NULL || *ca > *highest)
+			highest = ca;
 
 	return highest;
 }
@@ -401,9 +353,9 @@ const ChanAccess *AccessGroup::Highest() const
 {
 	ChanAccess *highest = NULL;
 
-	for (unsigned int i = 0; i < paths.size(); ++i)
+	for (const auto &path : paths)
 	{
-		ChanAccess *hip = HighestInPath(paths[i]);
+		ChanAccess *hip = HighestInPath(path);
 
 		if (highest == NULL || *hip > *highest)
 			highest = hip;

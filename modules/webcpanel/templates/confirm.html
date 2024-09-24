@@ -1,0 +1,22 @@
+{INCLUDE layout/header.html}
+			<div class="row">
+				<div class="col-lg-offset-4 col-lg-4">
+					<a href="/">
+						<img src="/static/logo.png" class="img-responsive">
+					</a>
+					<a href="/" class="btn btn-lg btn-default btn-block">Back Home</a>
+
+					<h1 class="form-signin-heading">Register</h1>
+
+					{IF EXISTS MESSAGES}
+					<div class="alert alert-warning">
+						{FOR M IN MESSAGES}
+							{M}<br/>
+						{END FOR}
+					</div>
+					{END IF}
+
+					<a href="/register" class="btn btn-lg btn-default btn-block">Retry</a>
+				</div>
+			</div>
+{INCLUDE layout/footer.html}

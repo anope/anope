@@ -5,17 +5,20 @@
  * Please read COPYING and README for further details.
  */
 
+#pragma once
+
 #include "modules/httpd.h"
 
 namespace WebCPanel
 {
 
-class Register : public WebPanelPage
+class Register final
+	: public WebPanelPage
 {
- public:
+public:
 	Register(const Anope::string &u) : WebPanelPage(u) { }
 
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) anope_override;
+	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) override;
 };
 
 }

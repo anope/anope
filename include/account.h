@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef ACCOUNT_H
-#define ACCOUNT_H
+#pragma once
 
 #include "extensible.h"
 #include "serialize.h"
@@ -18,9 +17,9 @@
 #include "memo.h"
 #include "base.h"
 
-typedef Anope::hash_map<NickAlias *> nickalias_map;
-typedef Anope::hash_map<NickCore *> nickcore_map;
-typedef TR1NS::unordered_map<uint64_t, NickCore *> nickcoreid_map;
+typedef Anope::unordered_map<NickAlias *> nickalias_map;
+typedef Anope::unordered_map<NickCore *> nickcore_map;
+typedef std::unordered_map<uint64_t, NickCore *> nickcoreid_map;
 
 extern CoreExport Serialize::Checker<nickalias_map> NickAliasList;
 extern CoreExport Serialize::Checker<nickcore_map> NickCoreList;
@@ -29,12 +28,14 @@ extern CoreExport nickcoreid_map NickCoreIdList;
 /* A registered nickname.
  * It matters that Base is here before Extensible (it is inherited by Serializable)
  */
-class CoreExport NickAlias : public Serializable, public Extensible
+class CoreExport NickAlias final
+	: public Serializable
+	, public Extensible
 {
 	Anope::string vhost_ident, vhost_host, vhost_creator;
-	time_t vhost_created;
+	time_t vhost_created = 0;
 
- public:
+public:
 	Anope::string nick;
 	Anope::string last_quit;
 	Anope::string last_realname;
@@ -42,8 +43,9 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	Anope::string last_usermask;
 	/* Last uncloaked usermask, requires nickserv/auspex to see */
 	Anope::string last_realhost;
-	time_t time_registered;
-	time_t last_seen;
+	time_t time_registered = Anope::CurTime;
+	time_t last_seen = Anope::CurTime;
+
 	/* Account this nick is tied to. Multiple nicks can be tied to a single account. */
 	Serialize::Reference<NickCore> nc;
 
@@ -54,8 +56,8 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	NickAlias(const Anope::string &nickname, NickCore *nickcore);
 	~NickAlias();
 
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	void Serialize(Serialize::Data &data) const override;
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Set a vhost for the user
 	 * @param ident The ident
@@ -63,36 +65,41 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	 * @param creator Who created the vhost
 	 * @param time When the vhost was created
 	 */
-	void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime);
+	void SetVHost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime);
 
 	/** Remove a users vhost
 	 **/
-	void RemoveVhost();
+	void RemoveVHost();
 
 	/** Check if the user has a vhost
 	 * @return true or false
 	 */
-	bool HasVhost() const;
+	bool HasVHost() const;
 
 	/** Retrieve the vhost ident
 	 * @return the ident
 	 */
-	const Anope::string &GetVhostIdent() const;
+	const Anope::string &GetVHostIdent() const;
 
 	/** Retrieve the vhost host
 	 * @return the host
 	 */
-	const Anope::string &GetVhostHost() const;
+	const Anope::string &GetVHostHost() const;
+
+	/** Retrieve the vhost mask
+	 * @param the mask
+	 */
+	Anope::string GetVHostMask() const;
 
 	/** Retrieve the vhost creator
 	 * @return the creator
 	 */
-	const Anope::string &GetVhostCreator() const;
+	const Anope::string &GetVHostCreator() const;
 
 	/** Retrieve when the vhost was created
 	 * @return the time it was created
 	 */
-	time_t GetVhostCreated() const;
+	time_t GetVHostCreated() const;
 
 	/** Finds a registered nick
 	 * @param nick The nick to lookup
@@ -105,13 +112,15 @@ class CoreExport NickAlias : public Serializable, public Extensible
  * account's display.
  * It matters that Base is here before Extensible (it is inherited by Serializable)
  */
-class CoreExport NickCore : public Serializable, public Extensible
+class CoreExport NickCore final
+	: public Serializable
+	, public Extensible
 {
 	/* Channels which reference this core in some way (this is on their access list, akick list, is founder, successor, etc) */
 	Serialize::Checker<std::map<ChannelInfo *, int> > chanaccess;
 	/* Unique identifier for the account. */
 	uint64_t id;
- public:
+public:
 	/* Name of the account. Find(display)->nc == this. */
 	Anope::string display;
 	/* User password in form of hashm:data */
@@ -119,9 +128,10 @@ class CoreExport NickCore : public Serializable, public Extensible
 	Anope::string email;
 	/* Locale name of the language of the user. Empty means default language */
 	Anope::string language;
-	/* Access list, contains user@host masks of users who get certain privileges based
-	 * on if NI_SECURE is set and what (if any) kill protection is enabled. */
-	std::vector<Anope::string> access;
+	/* Last time an email was sent to this user */
+	time_t lastmail = 0;
+	/* The time this account was registered */
+	time_t time_registered = Anope::CurTime;
 	MemoInfo memos;
 	std::map<Anope::string, Anope::string> last_modes;
 
@@ -131,14 +141,14 @@ class CoreExport NickCore : public Serializable, public Extensible
 	Serialize::Checker<std::vector<NickAlias *> > aliases;
 
 	/* Set if this user is a services operator. o->ot must exist. */
-	Oper *o;
+	Oper *o = nullptr;
 
 	/* Unsaved data */
 
+	/** The display nick for this account. */
+	NickAlias *na = nullptr;
 	/* Number of channels registered by this account */
-	uint16_t channelcount;
-	/* Last time an email was sent to this user */
-	time_t lastmail;
+	uint16_t channelcount = 0;
 	/* Users online now logged into this account */
 	std::list<User *> users;
 
@@ -149,79 +159,27 @@ class CoreExport NickCore : public Serializable, public Extensible
 	NickCore(const Anope::string &nickdisplay, uint64_t nickid = 0);
 	~NickCore();
 
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	void Serialize(Serialize::Data &data) const override;
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Changes the display for this account
 	 * @param na The new display, must be grouped to this account.
 	 */
-	void SetDisplay(const NickAlias *na);
+	void SetDisplay(NickAlias *na);
 
 	/** Checks whether this account is a services oper or not.
 	 * @return True if this account is a services oper, false otherwise.
 	 */
 	virtual bool IsServicesOper() const;
 
-	/** Add an entry to the nick's access list
-	 *
-	 * @param entry The nick!ident@host entry to add to the access list
-	 *
-	 * Adds a new entry into the access list.
-	 */
-	void AddAccess(const Anope::string &entry);
-
-	/** Get an entry from the nick's access list by index
-	 *
-	 * @param entry Index in the access list vector to retrieve
-	 * @return The access list entry of the given index if within bounds, an empty string if the vector is empty or the index is out of bounds
-	 *
-	 * Retrieves an entry from the access list corresponding to the given index.
-	 */
-	Anope::string GetAccess(unsigned entry) const;
-
-	/** Get the number of entries on the access list for this account.
-	 */
-	unsigned GetAccessCount() const;
-
 	/** Retrieves the account id for this user */
 	uint64_t GetId();
-
-	/** Find an entry in the nick's access list
-	 *
-	 * @param entry The nick!ident@host entry to search for
-	 * @return True if the entry is found in the access list, false otherwise
-	 *
-	 * Search for an entry within the access list.
-	 */
-	bool FindAccess(const Anope::string &entry);
-
-	/** Erase an entry from the nick's access list
-	 *
-	 * @param entry The nick!ident@host entry to remove
-	 *
-	 * Removes the specified access list entry from the access list.
-	 */
-	void EraseAccess(const Anope::string &entry);
-
-	/** Clears the entire nick's access list
-	 *
-	 * Deletes all the memory allocated in the access list vector and then clears the vector.
-	 */
-	void ClearAccess();
-
-	/** Is the given user on this accounts access list?
-	 *
-	 * @param u The user
-	 *
-	 * @return true if the user is on the access list
-	 */
-	bool IsOnAccess(const User *u) const;
 
 	/** Finds an account
 	 * @param nick The account name to find
 	 * @return The account, if it exists
 	 */
-	static NickCore* Find(const Anope::string &nick);
+	static NickCore *Find(const Anope::string &nick);
 
 	void AddChannelReference(ChannelInfo *ci);
 	void RemoveChannelReference(ChannelInfo *ci);
@@ -240,16 +198,16 @@ class CoreExport IdentifyRequest
 	Anope::string password;
 
 	std::set<Module *> holds;
-	bool dispatched;
-	bool success;
+	bool dispatched = false;
+	bool success = false;
 
 	static std::set<IdentifyRequest *> Requests;
 
- protected:
+protected:
 	IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass);
 	virtual ~IdentifyRequest();
 
- public:
+public:
 	/* One of these is called when the request goes through */
 	virtual void OnSuccess() = 0;
 	virtual void OnFail() = 0;
@@ -286,5 +244,3 @@ class CoreExport IdentifyRequest
 
 	static void ModuleUnload(Module *m);
 };
-
-#endif // ACCOUNT_H

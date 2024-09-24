@@ -9,16 +9,15 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SOCKETENGINE_H
-#define SOCKETENGINE_H
+#pragma once
 
 #include "services.h"
 #include "sockets.h"
 
-class CoreExport SocketEngine
+class CoreExport SocketEngine final
 {
 	static const int DefaultSize = 2; // Uplink, mode stacker
- public:
+public:
 	/* Map of sockets */
 	static std::map<int, Socket *> Sockets;
 
@@ -46,5 +45,3 @@ class CoreExport SocketEngine
 
 	static bool IgnoreErrno();
 };
-
-#endif // SOCKETENGINE_H

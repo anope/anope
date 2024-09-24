@@ -6,7 +6,6 @@
  */
 
 #include "../../webcpanel.h"
-#include "utils.h"
 
 WebCPanel::ChanServ::Modes::Modes(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
@@ -57,10 +56,8 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	replacements["MODE"] = "YES";
 
 	/* build a list with the names of all listmodes */
-	for (unsigned i = 0; i < ModeManager::GetChannelModes().size(); ++i)
+	for (auto *cm : ModeManager::GetChannelModes())
 	{
-		ChannelMode *cm = ModeManager::GetChannelModes()[i];
-
 		if (cm->type == MODE_LIST && cm->mchar)
 			replacements["LISTMODES"] = cm->mchar;
 	}
@@ -75,28 +72,27 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	ChannelMode *cm = ModeManager::FindChannelModeByChar(mode[0]);
 	if (cm)
 	{
-		if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
+		if (!message.get_data["del"].empty() && !message.get_data["mask"].empty())
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);
-			params.push_back("SET");
+			params.emplace_back("SET");
 			params.push_back("-" + Anope::string(cm->mchar));
 			params.push_back(message.get_data["mask"]);
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
 		}
-		else if (message.post_data["mask"].empty() == false)
+		else if (!message.post_data["mask"].empty())
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);
-			params.push_back("SET");
+			params.emplace_back("SET");
 			params.push_back("+" + Anope::string(cm->mchar));
 			params.push_back(message.post_data["mask"]);
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
 		}
 
-		std::vector<Anope::string> v = c->GetModeList(cm->name);
-		for (unsigned int i = 0; i < v.size(); ++i)
-			replacements["MASKS"] = v[i];
+		for (const auto &mask : c->GetModeList(cm->name))
+			replacements["MASKS"] = mask;
 	}
 
 	Page.Serve(server, page_name, client, message, reply, replacements);

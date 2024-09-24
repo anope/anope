@@ -37,7 +37,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	{
 		Anope::string tmodes = !this->botmodes.empty() ? ("+" + this->botmodes) : IRCD->DefaultPseudoclientModes;
 		if (!tmodes.empty())
-			this->SetModesInternal(this, tmodes.c_str());
+			this->SetModesInternal(this, tmodes);
 
 		XLine x(this->nick, "Reserved for services");
 		IRCD->SendSQLine(NULL, &x);
@@ -75,17 +75,17 @@ BotInfo::~BotInfo()
 
 void BotInfo::Serialize(Serialize::Data &data) const
 {
-	data["nick"] << this->nick;
-	data["user"] << this->ident;
-	data["host"] << this->host;
-	data["realname"] << this->realname;
-	data["created"] << this->created;
-	data["oper_only"] << this->oper_only;
+	data.Store("nick", this->nick);
+	data.Store("user", this->ident);
+	data.Store("host", this->host);
+	data.Store("realname", this->realname);
+	data.Store("created", this->created);
+	data.Store("oper_only", this->oper_only);
 
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string nick, user, host, realname, flags;
 
@@ -131,8 +131,8 @@ void BotInfo::OnKill()
 	IRCD->SendClientIntroduction(this);
 	this->introduced = true;
 
-	for (User::ChanUserList::const_iterator cit = this->chans.begin(), cit_end = this->chans.end(); cit != cit_end; ++cit)
-		IRCD->SendJoin(this, cit->second->chan, &cit->second->status);
+	for (const auto &[_, chan] : this->chans)
+		IRCD->SendJoin(this, chan->chan, &chan->status);
 }
 
 void BotInfo::SetNewNick(const Anope::string &newnick)
@@ -216,23 +216,28 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 
 	FOREACH_MOD(OnPrePartChannel, (this, c));
 
-	IRCD->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
+	IRCD->SendPart(this, c, reason);
 
 	c->DeleteUser(this);
 
 	FOREACH_MOD(OnPartChannel, (this, c, c->name, reason));
 }
 
-void BotInfo::OnMessage(User *u, const Anope::string &message)
+void BotInfo::OnMessage(User *u, const Anope::string &message, const Anope::map<Anope::string> &tags)
 {
 	if (this->commands.empty())
 		return;
 
-	CommandSource source(u->nick, u, u->Account(), u, this);
+	Anope::string msgid;
+	auto iter = tags.find("msgid");
+	if (iter != tags.end())
+		msgid = iter->second;
+
+	CommandSource source(u->nick, u, u->Account(), u, this, msgid);
 	Command::Run(source, message);
 }
 
-CommandInfo& BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
+CommandInfo &BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
 {
 	CommandInfo ci;
 	ci.name = sname;
@@ -249,7 +254,7 @@ CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
 	return NULL;
 }
 
-BotInfo* BotInfo::Find(const Anope::string &nick, bool nick_only)
+BotInfo *BotInfo::Find(const Anope::string &nick, bool nick_only)
 {
 	if (!nick_only && IRCD != NULL && IRCD->RequiresID)
 	{

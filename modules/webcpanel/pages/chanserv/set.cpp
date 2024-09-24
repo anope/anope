@@ -6,7 +6,6 @@
  */
 
 #include "../../webcpanel.h"
-#include "utils.h"
 
 WebCPanel::ChanServ::Set::Set(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
@@ -42,7 +41,7 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 		can_set = true;
 	}
 
-	if (can_set && message.post_data.empty() == false)
+	if (can_set && !message.post_data.empty())
 	{
 		if (ci->HasExt("KEEPTOPIC") != message.post_data.count("keeptopic"))
 		{
@@ -75,14 +74,6 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 			else
 				ci->Shrink<bool>("RESTRICTED");
 			replacements["MESSAGES"] = "Restricted updated";
-		}
-		if (ci->HasExt("CS_SECURE") != message.post_data.count("secure"))
-		{
-			if (!ci->HasExt("CS_SECURE"))
-				ci->Extend<bool>("CS_SECURE");
-			else
-				ci->Shrink<bool>("CS_SECURE");
-			replacements["MESSAGES"] = "Secure updated";
 		}
 		if (ci->HasExt("SECUREOPS") != message.post_data.count("secureops"))
 		{
@@ -131,9 +122,6 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 
 		if (ci->HasExt("RESTRICTED"))
 			replacements["RESTRICTED"];
-
-		if (ci->HasExt("CS_SECURE"))
-			replacements["SECURE"];
 
 		if (ci->HasExt("SECUREOPS"))
 			replacements["SECUREOPS"];

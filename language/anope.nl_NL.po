@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-30 03:35+0100\n"
-"PO-Revision-Date: 2024-01-31 05:26+0100\n"
+"POT-Creation-Date: 2024-02-22 16:34+0000\n"
+"PO-Revision-Date: 2024-02-22 16:39+0000\n"
 "Last-Translator: Robby <robby@chatbelgie.be>\n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -16,6 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.4\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -208,6 +209,10 @@ msgstr "%s verwijderd van de AKILL lijst."
 #, c-format
 msgid "%s disabled on channel %s."
 msgstr "%s uitgeschakeld op kanaal %s."
+
+#, c-format
+msgid "%s does not wish to be added to channel access lists."
+msgstr "%s wenst niet toegevoegd te worden aan kanaal toegangslijsten."
 
 #, c-format
 msgid "%s has been invited to %s."
@@ -527,11 +532,11 @@ msgstr "kanaal nick reden"
 msgid "channel what"
 msgstr "kanaal wat"
 
-msgid "channel ADD mask"
-msgstr "kanaal ADD masker"
+msgid "channel ADD mask level [description]"
+msgstr "kanaal ADD masker niveau [beschrijving]"
 
-msgid "channel ADD mask level"
-msgstr "kanaal ADD masker niveau"
+msgid "channel ADD mask [description]"
+msgstr "kanaal ADD masker [beschrijving]"
 
 msgid "channel ADD message"
 msgstr "kanaal ADD bericht"
@@ -617,8 +622,8 @@ msgstr "kanaal [+verlooptijd] [reden]"
 msgid "channel [+expiry] {nick | mask} [reason]"
 msgstr "kanaal [+verlooptijd] {nick | masker} [reden]"
 
-msgid "channel [MODIFY] mask changes"
-msgstr "kanaal [MODIFY] masker wijzigingen"
+msgid "channel [MODIFY] mask changes [description]"
+msgstr "kanaal [MODIFY] masker wijzigingen [beschrijving]"
 
 msgid "channel [SET] [topic]"
 msgstr "kanaal [SET] [topic]"
@@ -679,9 +684,6 @@ msgstr "nick kanaal"
 
 msgid "nick channel [reason]"
 msgstr "nick kanaal [reden]"
-
-msgid "nick flags"
-msgstr "nick vlaggen"
 
 msgid "nick hostmask"
 msgstr "nick hostmasker"
@@ -841,12 +843,12 @@ msgid ""
 " \n"
 "Accounts that are not used anymore are subject to\n"
 "the automatic expiration, i.e. they will be deleted\n"
-"after %d days if not used."
+"after %lu days if not used."
 msgstr ""
 " \n"
 "Nicknames die niet meer gebruikt worden zullen na een tijd\n"
 "automatisch verlopen, oftewel: ze zullen verwijderd worden na\n"
-"%d dagen van onbruik."
+"%lu dagen van onbruik."
 
 msgid ""
 " \n"
@@ -944,12 +946,12 @@ msgstr ""
 #, c-format
 msgid ""
 " \n"
-"Note that any channel which is not used for %d days\n"
+"Note that any channel which is not used for %lu days\n"
 "(i.e. which no user on the channel's access list enters\n"
 "for that period of time) will be automatically dropped."
 msgstr ""
 " \n"
-"Merk op dat elk kanaal dat %d dagen ongebruikt is (d.w.z. dat\n"
+"Merk op dat elk kanaal dat %lu dagen ongebruikt is (d.w.z. dat\n"
 "er geen gebruiker die op de toegangslijst staat in die periode\n"
 "het kanaal binnen is gekomen) automatisch zal worden verwijderd."
 
@@ -1269,11 +1271,11 @@ msgid "%-8s %s"
 msgstr "%-8s %s"
 
 #, c-format
-msgid "%2lu %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
-msgstr "%2lu %-16s letters: %s, woorden: %s, lijnen: %s, smileys: %s, acties: %s"
+msgid "%2d %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
+msgstr "%2d %-16s letters: %s, woorden: %s, lijnen: %s, smileys: %s, acties: %s"
 
-msgid "%b %d %H:%M:%S %Y %Z"
-msgstr "%b %d %H:%M:%S %Y %Z"
+msgid "%b %d %Y %H:%M:%S %Z"
+msgstr "%b %d %Y %H:%M:%S %Z"
 
 #, c-format
 msgid "%c is an unknown status mode."
@@ -1298,10 +1300,6 @@ msgstr "%d bots beschikbaar."
 #, c-format
 msgid "%d modules loaded."
 msgstr "%d modules geladen."
-
-#, c-format
-msgid "%d nickname(s) in the group."
-msgstr "%d nick(s) in de groep."
 
 #, c-format
 msgid "%lu nicks are stored in the database, using %.2Lf kB of memory."
@@ -1400,6 +1398,14 @@ msgid "%s bad words list is empty."
 msgstr "%s slechtewoordenlijst is leeg."
 
 #, c-format
+msgid "%s can no longer be added to channel access lists."
+msgstr "%s kan niet langer meer toegevoegd worden aan kanaal toegangslijsten."
+
+#, c-format
+msgid "%s can now be added to channel access lists."
+msgstr "%s kan vanaf nu toegevoegd worden aan kanaal toegangslijsten."
+
+#, c-format
 msgid "%s cannot be the successor on channel %s as they are the founder."
 msgstr "%s kan de opvolger niet zijn op kanaal %s omdat die de stichter is."
 
@@ -1412,20 +1418,20 @@ msgid "%s coverage is too wide; Please use a more specific mask."
 msgstr "%s is te breed; gelieve een meer specifiek masker te gebruiken."
 
 #, c-format
-msgid "%s currently has %d memos, of which %d are unread."
-msgstr "%s heeft momenteel %d memo's, waarvan er %d ongelezen zijn."
+msgid "%s currently has %zu memos, of which %zu are unread."
+msgstr "%s heeft momenteel %zu memo's, waarvan er %zu ongelezen zijn."
 
 #, c-format
-msgid "%s currently has %d memos, of which 1 is unread."
-msgstr "%s heeft momenteel %d memo's, waarvan er 1 ongelezen is."
+msgid "%s currently has %zu memos, of which 1 is unread."
+msgstr "%s heeft momenteel %zu memo's, waarvan er 1 ongelezen is."
 
 #, c-format
-msgid "%s currently has %d memos."
-msgstr "%s heeft momenteel %d memo's."
+msgid "%s currently has %zu memos."
+msgstr "%s heeft momenteel %zu memo's."
 
 #, c-format
-msgid "%s currently has %d memos; all of them are unread."
-msgstr "%s heeft momenteel %d memo's; allemaal zijn ze ongelezen."
+msgid "%s currently has %zu memos; all of them are unread."
+msgstr "%s heeft momenteel %zu memo's; allemaal zijn ze ongelezen."
 
 #, c-format
 msgid "%s currently has 1 memo, and it has not yet been read."
@@ -1626,6 +1632,10 @@ msgstr "%s's memolimiet is %d, en mag niet worden veranderd."
 #, c-format
 msgid "%s's memo limit is %d."
 msgstr "%s's memolimiet is %d."
+
+#, c-format
+msgid "%zu nickname(s) in the group."
+msgstr "%zu nick(s) in de groep."
 
 #, c-format
 msgid "(%s ago)"
@@ -1960,31 +1970,31 @@ msgstr "Alle vHosts in de groep %s zijn gewijzigd naar %s."
 msgid "All vhosts in the group %s have been set to %s@%s."
 msgstr "Alle vHosts in de groep %s zijn gewijzigd naar %s@%s."
 
-msgid "Allowed to (de)halfop him/herself"
+msgid "Allowed to (de)halfop themself"
 msgstr "Kan zichzelf (de)halfop'en"
 
 msgid "Allowed to (de)halfop users"
 msgstr "Kan gebruikers (de)halfop'en"
 
-msgid "Allowed to (de)op him/herself"
+msgid "Allowed to (de)op themself"
 msgstr "Kan zichzelf (de)op'en"
 
 msgid "Allowed to (de)op users"
 msgstr "Kan gebruikers (de)op'en"
 
-msgid "Allowed to (de)owner him/herself"
+msgid "Allowed to (de)owner themself"
 msgstr "Kan zichzelf (de)owner'en"
 
 msgid "Allowed to (de)owner users"
 msgstr "Kan gebruikers (de)owner'en"
 
-msgid "Allowed to (de)protect him/herself"
+msgid "Allowed to (de)protect themself"
 msgstr "Kan zichzelf (de)protect'en"
 
 msgid "Allowed to (de)protect users"
 msgstr "Kan gebruikers (de)protect'en"
 
-msgid "Allowed to (de)voice him/herself"
+msgid "Allowed to (de)voice themself"
 msgstr "Kan zichzelf (de)voice'en"
 
 msgid "Allowed to (de)voice users"
@@ -2016,6 +2026,9 @@ msgstr "Kan kanaalmemo's lezen"
 
 msgid "Allowed to set channel settings"
 msgstr "Kan kanaalinstellingen wijzigen"
+
+msgid "Allowed to unban themself"
+msgstr "Kan bans op zichzelf verwijderen"
 
 msgid "Allowed to unban users"
 msgstr "Kan bans op gebruikers verwijderen"
@@ -2113,23 +2126,13 @@ msgstr ""
 "gebruiker worden gekillt."
 
 msgid ""
-"Allows Services Operators to give Operflags to any user.\n"
-"Flags have to be prefixed with a \"+\" or a \"-\". To\n"
-"remove all flags simply type a \"-\" instead of any flags."
-msgstr ""
-"Stelt Services Operators in staat om Opervlaggen te geven\n"
-"aan een gebruiker. Vlaggen moeten worden vooraf\n"
-"gegaan door een \"+\" of een \"-\". Om alle vlaggen te verwijderen\n"
-"kun je simpelweg een \"-\" typen in de plaats van de vlaggen."
-
-msgid ""
-"Allows Services Operators to make Services ignore a nick or mask\n"
+"Allows Services Operators to make services ignore a nick or mask\n"
 "for a certain time or until the next restart. The default\n"
 "time format is seconds. You can specify it by using units.\n"
 "Valid units are: s for seconds, m for minutes,\n"
 "h for hours and d for days.\n"
 "Combinations of these units are not permitted.\n"
-"To make Services permanently ignore the user, type 0 as time.\n"
+"To make services permanently ignore the user, type 0 as time.\n"
 "When adding a mask, it should be in the format nick!user@host,\n"
 "everything else will be considered a nick. Wildcards are permitted.\n"
 " \n"
@@ -2151,7 +2154,7 @@ msgstr ""
 
 msgid ""
 "Allows Services Operators to manipulate the AKILL list. If\n"
-"a user matching an AKILL mask attempts to connect, Services\n"
+"a user matching an AKILL mask attempts to connect, services\n"
 "will issue a KILL for that user and, on supported server\n"
 "types, will instruct all servers to add a ban for the mask\n"
 "which the user matched.\n"
@@ -2197,7 +2200,7 @@ msgstr ""
 msgid ""
 "Allows Services Operators to manipulate the SNLINE list.  If\n"
 "a user with a realname matching an SNLINE mask attempts to\n"
-"connect, Services will not allow them to pursue their IRC\n"
+"connect, services will not allow them to pursue their IRC\n"
 "session."
 msgstr ""
 "Stelt Services Operators in staat de SNLINE lijst te beheren.\n"
@@ -2208,7 +2211,7 @@ msgstr ""
 msgid ""
 "Allows Services Operators to manipulate the SQLINE list.  If\n"
 "a user with a nick matching an SQLINE mask attempts to\n"
-"connect, Services will not allow them to pursue their IRC\n"
+"connect, services will not allow them to pursue their IRC\n"
 "session.\n"
 "If the first character of the mask is #, services will\n"
 "prevent the use of matching channels. If the mask is a\n"
@@ -2350,8 +2353,8 @@ msgstr ""
 "     MODIFY nickserv forcemail no"
 
 msgid ""
-"Allows you to choose the way Services are communicating with\n"
-"the given user. With MSG set, Services will use messages,\n"
+"Allows you to choose the way services are communicating with\n"
+"the given user. With MSG set, services will use messages,\n"
 "else they'll use notices."
 msgstr ""
 "Laat je toe te bepalen hoe services berichten naar de gegeven\n"
@@ -2360,8 +2363,8 @@ msgstr ""
 
 #, c-format
 msgid ""
-"Allows you to choose the way Services are communicating with\n"
-"you. With %s set, Services will use messages, else they'll\n"
+"Allows you to choose the way services are communicating with\n"
+"you. With %s set, services will use messages, else they'll\n"
 "use notices."
 msgstr ""
 "Laat je toe te bepalen hoe services berichten naar jou\n"
@@ -2641,15 +2644,15 @@ msgid "Bot bans will no longer automatically expire."
 msgstr "Bot bans zullen niet langer automatisch verlopen."
 
 #, c-format
-msgid "Bot hosts may only be %d characters long."
-msgstr "Bot hosts mogen maximaal %d karakters bevatten."
+msgid "Bot hosts may only be %zu characters long."
+msgstr "Bot hosts mogen maximaal %zu karakters bevatten."
 
 msgid "Bot hosts may only contain valid host characters."
 msgstr "Bot hosts mogen alleen geldige host-karakters bevatten."
 
 #, c-format
-msgid "Bot idents may only be %d characters long."
-msgstr "Bot idents mogen maximaal %d karakters bevatten."
+msgid "Bot idents may only be %zu characters long."
+msgstr "Bot idents mogen maximaal %zu karakters bevatten."
 
 msgid "Bot idents may only contain valid ident characters."
 msgstr "Bot idents mogen alleen geldige ident-karakters bevatten."
@@ -2665,8 +2668,8 @@ msgid "Bot nick"
 msgstr "Bot nick"
 
 #, c-format
-msgid "Bot nicks may only be %d characters long."
-msgstr "Bot nicks mogen maximaal %d karakters bevatten."
+msgid "Bot nicks may only be %zu characters long."
+msgstr "Bot nicks mogen maximaal %zu karakters bevatten."
 
 msgid "Bot nicks may only contain valid nick characters."
 msgstr "Bot nicks mogen alleen geldige nick-karakters bevatten."
@@ -2799,7 +2802,7 @@ msgid "Caps kicker"
 msgstr "Hoofdletterskicker"
 
 msgid ""
-"Causes Services to do an immediate shutdown; databases are\n"
+"Causes services to do an immediate shutdown; databases are\n"
 "not saved.  This command should not be used unless\n"
 "damage to the in-memory copies of the databases is feared\n"
 "and they should not be saved."
@@ -2810,9 +2813,9 @@ msgstr ""
 "wordt gevreesd en ze niet moeten worden opgeslagen."
 
 msgid ""
-"Causes Services to reload the configuration file. Note that\n"
-"some directives still need the restart of the Services to\n"
-"take effect (such as Services' nicknames, activation of the\n"
+"Causes services to reload the configuration file. Note that\n"
+"some directives still need the restart of the services to\n"
+"take effect (such as services' nicknames, activation of the\n"
 "session limitation, etc.)."
 msgstr ""
 "Zorgt ervoor dat services het configuratiebestand opnieuw\n"
@@ -2821,17 +2824,17 @@ msgstr ""
 "services' nicknames, activatie van de sessielimiet, etc.)."
 
 msgid ""
-"Causes Services to save all databases and then restart\n"
+"Causes services to save all databases and then restart\n"
 "(i.e. exit and immediately re-run the executable)."
 msgstr ""
 "Zorgt ervoor dat services alle databases opslaat en dan\n"
 "zichzelf opnieuw opstart."
 
-msgid "Causes Services to save all databases and then shut down."
+msgid "Causes services to save all databases and then shut down."
 msgstr "Zorgt ervoor dat services alle databases opslaat en dan afsluit."
 
 msgid ""
-"Causes Services to update all database files as soon as you\n"
+"Causes services to update all database files as soon as you\n"
 "send the command."
 msgstr ""
 "Zorgt ervoor dat services alle database bestanden bijwerkt zodra je\n"
@@ -2847,7 +2850,7 @@ msgstr "ChanServ is vereist om PERSIST te activeren op dit netwerk."
 msgid "Change channel modes"
 msgstr "Wijzig kanaalmodes"
 
-msgid "Change the communication method of Services"
+msgid "Change the communication method of services"
 msgstr "Verander de communicatiemethode van services"
 
 msgid "Change user modes"
@@ -2859,14 +2862,14 @@ msgstr "Gebruikersmodes van %s veranderd naar %s."
 
 msgid ""
 "Changes the display used to refer to the nickname group in\n"
-"Services. The new display MUST be a nick of the group."
+"services. The new display MUST be a nick of the group."
 msgstr ""
 "Verandert de weergegeven nick van de nick-groep in services.\n"
 "De nieuwe weergave MOET een nick in de groep zijn."
 
 msgid ""
 "Changes the display used to refer to your nickname group in\n"
-"Services. The new display MUST be a nick of your group."
+"services. The new display MUST be a nick of your group."
 msgstr ""
 "Verandert de weergegeven nick van je nick-groep in services.\n"
 "De nieuwe weergave MOET een nick in je groep zijn."
@@ -2879,7 +2882,7 @@ msgstr ""
 "een geregistreerde nick zijn."
 
 msgid ""
-"Changes the language Services uses when sending messages to\n"
+"Changes the language services uses when sending messages to\n"
 "the given user (for example, when responding to a command they send).\n"
 "language should be chosen from the following list of\n"
 "supported languages:"
@@ -2890,7 +2893,7 @@ msgstr ""
 "worden uit de volgende lijst van ondersteunde talen:"
 
 msgid ""
-"Changes the language Services uses when sending messages to\n"
+"Changes the language services uses when sending messages to\n"
 "you (for example, when responding to a command you send).\n"
 "language should be chosen from the following list of\n"
 "supported languages:"
@@ -3034,8 +3037,8 @@ msgid "Channels that %s has access on:"
 msgstr "Kanalen waar %s toegang op heeft:"
 
 #, c-format
-msgid "Channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Kanalen: %lu vermeldingen, %lu emmers, langste ketting is %d"
+msgid "Channels: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Kanalen: %zu vermeldingen, %zu emmers, langste ketting is %zu"
 
 msgid "Chanstats"
 msgstr "Kanaalstatistieken"
@@ -3188,20 +3191,20 @@ msgid "Current module list:"
 msgstr "Huidige modulelijst:"
 
 #, c-format
-msgid "Current number of AKILLs: %d"
-msgstr "Huidig aantal AKILLs: %d"
+msgid "Current number of AKILLs: %zu"
+msgstr "Huidig aantal AKILLs: %zu"
 
 #, c-format
-msgid "Current number of SNLINEs: %d"
-msgstr "Huidig aantal SNLINEs: %d"
+msgid "Current number of SNLINEs: %zu"
+msgstr "Huidig aantal SNLINEs: %zu"
 
 #, c-format
-msgid "Current number of SQLINEs: %d"
-msgstr "Huidig aantal SQLINEs: %d"
+msgid "Current number of SQLINEs: %zu"
+msgstr "Huidig aantal SQLINEs: %zu"
 
 #, c-format
-msgid "Current users: %d (%d ops)"
-msgstr "Huidig aantal gebruikers: %d (%d ops)"
+msgid "Current users: %zu (%d ops)"
+msgstr "Huidig aantal gebruikers: %zu (%d ops)"
 
 msgid "DEL oper"
 msgstr "DEL oper"
@@ -3865,8 +3868,8 @@ msgid "End of entry message list."
 msgstr "Einde van berichtenlijst."
 
 #, c-format
-msgid "End of forbid list - %d/%d entries shown."
-msgstr "Einde van verbodslijst - %d/%d resultaten weergegeven."
+msgid "End of forbid list - %zu/%zu entries shown."
+msgstr "Einde van verbodslijst - %zu/%zu resultaten weergegeven."
 
 msgid "End of forbid list."
 msgstr "Einde van verbodslijst."
@@ -3951,12 +3954,12 @@ msgid "Error reloading configuration file: %s"
 msgstr "Fout bij laden configuratiebestand: %s"
 
 #, c-format
-msgid "Error! The vHost ident is too long, please use an ident shorter than %d characters."
-msgstr "Fout! De vHost ident is te lang, gelieve een ident korter dan %d karakters op te geven."
+msgid "Error! The vHost ident is too long, please use an ident shorter than %zu characters."
+msgstr "Fout! De vHost ident is te lang, gelieve een ident korter dan %zu karakters op te geven."
 
 #, c-format
-msgid "Error! The vHost is too long, please use a hostname shorter than %d characters."
-msgstr "Fout! De vHost is te lang, gelieve een host korter dan %d karakters op te geven."
+msgid "Error! The vHost is too long, please use a hostname shorter than %zu characters."
+msgstr "Fout! De vHost is te lang, gelieve een host korter dan %zu karakters op te geven."
 
 msgid ""
 "Examples:\n"
@@ -4056,7 +4059,7 @@ msgstr "Verbod op %s werd niet gevonden."
 msgid "Forbid usage of nicknames, channels, and emails"
 msgstr "Verbied gebruik van nicks, kanalen en e-mails"
 
-msgid "Force the Services databases to be updated immediately"
+msgid "Force the services databases to be updated immediately"
 msgstr "Forceer dat de services databases onmiddellijk worden geüpdatet"
 
 msgid "Forcefully change a user's nickname"
@@ -4084,14 +4087,8 @@ msgstr "Stichter"
 msgid "Founder of %s changed to %s."
 msgstr "Stichter van %s veranderd naar %s."
 
-msgid "GETPASS command unavailable because encryption is in use."
-msgstr "GETPASS commando is onbeschikbaar omdat encryptie aan staat."
-
 msgid "Ghost with your nick has been killed."
 msgstr "Ghost met jouw nick is gekilld."
-
-msgid "Give Operflags to a certain user"
-msgstr "Geef Operflags aan een bepaalde gebruiker"
 
 #, c-format
 msgid ""
@@ -4290,8 +4287,8 @@ msgid "LIMIT enforced by "
 msgstr "LIMIT afgedwongen door "
 
 #, c-format
-msgid "LIMIT enforced on %s, %d users removed."
-msgstr "LIMIT afgedwongen op %s, %d gebruikers werden verwijderd."
+msgid "LIMIT enforced on %s, %zu users removed."
+msgstr "LIMIT afgedwongen op %s, %zu gebruikers werden verwijderd."
 
 msgid "LIST threshold"
 msgstr "LIST aantal"
@@ -4921,6 +4918,10 @@ msgstr "Memo %d van %s (%s)."
 msgid "Memo %d has been deleted."
 msgstr "Memo %d werd verwijderd."
 
+#, c-format
+msgid "Memo %zu has been deleted."
+msgstr "Memo %zu werd verwijderd."
+
 msgid "Memo ignore list is empty."
 msgstr "Memo-negeerlijst is leeg."
 
@@ -5039,9 +5040,6 @@ msgstr ""
 "anderen hun certificaatlijst aan te passen.\n"
 " \n"
 
-msgid "Modify the Services ignore list"
-msgstr "Wijzig de services negeerlijst"
-
 #, c-format
 msgid "Modify the list of %s users"
 msgstr "Wijzig de lijst van %s's"
@@ -5054,6 +5052,9 @@ msgstr "Wijzig de lijst van gebruikers met privileges"
 
 msgid "Modify the nickname client certificate list"
 msgstr "Wijzig de certificaatlijst"
+
+msgid "Modify the services ignore list"
+msgstr "Wijzig de services negeerlijst"
 
 msgid "Modify the session-limit exception list"
 msgstr "Wijzig de uitzonderingenlijst voor sessielimieten"
@@ -5105,6 +5106,9 @@ msgstr "Netwerkstatistieken voor %s:"
 msgid "Never"
 msgstr "Nooit"
 
+msgid "Never-op"
+msgstr "Nooit-op"
+
 msgid "Nick"
 msgstr "Nick"
 
@@ -5153,8 +5157,8 @@ msgid "Nick %s isn't registered."
 msgstr "Nick %s is niet geregistreerd."
 
 #, c-format
-msgid "Nick %s was truncated to %d characters."
-msgstr "Nick %s werd verkort naar %d tekens."
+msgid "Nick %s was truncated to %zu characters."
+msgstr "Nick %s werd verkort naar %zu karakters."
 
 #, c-format
 msgid "Nick %s will expire."
@@ -5197,8 +5201,8 @@ msgid "Nick %s is now suspended."
 msgstr "Nick %s is nu geschorst."
 
 #, c-format
-msgid "Nick too long, max length is %u characters."
-msgstr "Nick te lang, maximum lengte is %u karakters."
+msgid "Nick too long, max length is %zu characters."
+msgstr "Nick te lang, maximum lengte is %zu karakters."
 
 #, c-format
 msgid "Nickname %s has been dropped."
@@ -5391,14 +5395,6 @@ msgid "Oper type %s has not been configured."
 msgstr "Opertype %s werd niet ingesteld."
 
 #, c-format
-msgid "Operflags %s have been added for %s."
-msgstr "Opervlaggen %s zijn toegevoegd voor %s."
-
-#, c-format
-msgid "Operflags %s have been removed from %s."
-msgstr "Opervlaggen %s zijn verwijderd van %s."
-
-#, c-format
 msgid "Opertype %s has no allowed commands."
 msgstr "Opertype %s heeft geen toegestane commando's."
 
@@ -5429,16 +5425,8 @@ msgid "Password accepted."
 msgstr "Wachtwoord aanvaard."
 
 #, c-format
-msgid "Password for %s changed to %s."
-msgstr "Wachtwoord voor %s gewijzigd naar %s."
-
-#, c-format
 msgid "Password for %s changed."
 msgstr "Wachtwoord voor %s gewijzigd."
-
-#, c-format
-msgid "Password for %s is %s."
-msgstr "Wachtwoord voor %s is %s."
 
 msgid "Password incorrect."
 msgstr "Fout wachtwoord."
@@ -5465,14 +5453,13 @@ msgid "Please contact an Operator to get a vHost assigned to this nick."
 msgstr "Gelieve een Operator te contacteren om een vHost aan je nick toegewezen te krijgen."
 
 msgid ""
-"Please try again with a more obscure password. Passwords should be at least\n"
-"five characters long, should not be something easily guessed\n"
-"(e.g. your real name or your nick), and cannot contain the space or tab characters."
+"Please try again with a more obscure password. Passwords should not be\n"
+"something that could be easily guessed (e.g. your real name or your nick) and\n"
+"cannot contain the space or tab characters.\n"
 msgstr ""
 "Gelieve opnieuw te proberen met een moeilijker wachtwoord. Wachtwoorden\n"
-"moeten tenminste 5 karakters lang zijn, iets dat niet makkelijk geraden kan\n"
-"worden (zoals bijvoorbeeld je echte naam of nick), en kan geen spaties of tab-\n"
-"karakters bevatten."
+"mogen niet iets zijn dat makkelijk geraden kan worden (zoals bijvoorbeeld je\n"
+"echte naam of nick), en kan geen spaties of tab-karakters bevatten.\n"
 
 msgid "Please use a valid server name when juping."
 msgstr "Gelieve een geldige servernaam te gebruiken bij het blokkeren."
@@ -5481,24 +5468,24 @@ msgid "Please use the symbol of # when attempting to register."
 msgstr "Gelieve het #-symbool te gebruiken bij het registreren."
 
 #, c-format
-msgid "Please wait %d seconds and retry."
-msgstr "Gelieve %d seconden te wachten en opnieuw te proberen."
+msgid "Please wait %lu seconds and retry."
+msgstr "Gelieve %lu seconden te wachten en opnieuw te proberen."
 
 #, c-format
-msgid "Please wait %d seconds before requesting a new vHost."
-msgstr "Gelieve %d seconden te wachten alvorens een nieuwe vHost aan te vragen."
+msgid "Please wait %lu seconds before requesting a new vHost."
+msgstr "Gelieve %lu seconden te wachten alvorens een nieuwe vHost aan te vragen."
 
 #, c-format
-msgid "Please wait %d seconds before using the %s command again."
-msgstr "Gelieve %d seconden te wachten alvorens het %s commando opnieuw te gebruiken."
+msgid "Please wait %lu seconds before using the %s command again."
+msgstr "Gelieve %lu seconden te wachten alvorens het %s commando opnieuw te gebruiken."
 
 #, c-format
-msgid "Please wait %d seconds before using the GROUP command again."
-msgstr "Gelieve %d seconden te wachten alvorens het GROUP commando opnieuw te gebruiken."
+msgid "Please wait %lu seconds before using the GROUP command again."
+msgstr "Gelieve %lu seconden te wachten alvorens het GROUP commando opnieuw te gebruiken."
 
 #, c-format
-msgid "Please wait %d seconds before using the REGISTER command again."
-msgstr "Gelieve %d seconden te wachten alvorens het REGISTER commando opnieuw te gebruiken."
+msgid "Please wait %lu seconds before using the REGISTER command again."
+msgstr "Gelieve %lu seconden te wachten alvorens het REGISTER commando opnieuw te gebruiken."
 
 #, c-format
 msgid "Pooled %s."
@@ -5528,7 +5515,7 @@ msgstr "Voorkom dat de nick in het LIST commando verschijnt"
 msgid "Prevent the nickname from expiring"
 msgstr "Voorkom dat de nick verloopt"
 
-msgid "Prevents users being kicked by Services"
+msgid "Prevents users being kicked by services"
 msgstr "Voorkomt dat gebruikers gekickt worden door services"
 
 msgid "Private"
@@ -5686,16 +5673,16 @@ msgid "Registered"
 msgstr "Geregistreerd"
 
 #, c-format
-msgid "Registered channels: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Geregistreerde kanalen: %lu vermeldingen, %lu emmers, langste ketting is %d"
+msgid "Registered channels: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Geregistreerde kanalen: %zu vermeldingen, %zu emmers, langste ketting is %zu"
 
 #, c-format
-msgid "Registered nick groups: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Geregistreerde nickgroepen: %lu vermeldingen, %lu emmers, langste ketting is %d"
+msgid "Registered nick groups: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Geregistreerde nickgroepen: %zu vermeldingen, %zu emmers, langste ketting is %zu"
 
 #, c-format
-msgid "Registered nicknames: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Geregistreerde nicks: %lu vermeldingen, %lu emmers, langste ketting is %d"
+msgid "Registered nicknames: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Geregistreerde nicks: %zu vermeldingen, %zu emmers, langste ketting is %zu"
 
 #, c-format
 msgid "Registered only enforced on %s."
@@ -5744,7 +5731,7 @@ msgid ""
 "your nickname as a password is a much worse idea ;) and,\n"
 "in fact, %s will not allow it. Also, short\n"
 "passwords are vulnerable to trial-and-error searches, so\n"
-"you should choose a password at least 5 characters long.\n"
+"you should choose a password at least %u characters long.\n"
 "Finally, the space character cannot be used in passwords."
 msgstr ""
 "Registreert je nick in de %s database. Wanneer je nick\n"
@@ -5763,7 +5750,7 @@ msgstr ""
 "nick als een wachtwoord gebruiken is een veel slechter idee ;)\n"
 "en in feite, %s staat het niet toe. Bovendien zijn korte wachtwoorden\n"
 "kwetsbaar voor zoekacties, dus kies je best een wachtwoord\n"
-"dat minstens 5 karakters lang is. Als laatste, de spatie kan niet\n"
+"dat minstens %u karakters lang is. Als laatste, de spatie kan niet\n"
 "gebruikt worden in wachtwoorden."
 
 msgid "Registration is currently disabled."
@@ -5886,9 +5873,6 @@ msgstr "Onthoud modes wanneer het kanaal niet in gebruik is"
 msgid "Retain topic when channel is not in use"
 msgstr "Onthoud het topic wanneer het kanaal niet in gebruik is"
 
-msgid "Retrieve the password for a nickname"
-msgstr "Vraag het wachtwoord van een nick op"
-
 msgid "Retrieves the vhost requests"
 msgstr "Vraag de vHost-aanvraaglijst op"
 
@@ -5903,18 +5887,6 @@ msgstr "Geeft geregistreerde gebruikers weer die het gegeven e-mailadres gebruik
 
 msgid "Returns the owner status of the given nickname"
 msgstr "Geeft de eigenaarsstatus van de gegeven nick weer"
-
-msgid ""
-"Returns the password for the given nickname.  Note that\n"
-"whenever this command is used, a message including the\n"
-"person who issued the command and the nickname it was used\n"
-"on will be logged and sent out as a WALLOPS/GLOBOPS."
-msgstr ""
-"Geeft het wachtwoord van de opgegeven nick weer. Merk op\n"
-"dat wanneer je dit commando gebruikt er een bericht met de\n"
-"persoon die het commando heeft uitgevoerd en de nick waarop\n"
-"het is gebruikt zal worden gelogd en verstuurd zal worden\n"
-"als WALLOPS/GLOBOPS."
 
 msgid ""
 "Returns whether the user using the given nickname is\n"
@@ -5976,7 +5948,7 @@ msgstr "SSLONLY afgedwongen op %s."
 msgid "SSLONLY enforced by "
 msgstr "SSLONLY afgedwongen door "
 
-msgid "Save databases and restart Services"
+msgid "Save databases and restart services"
 msgstr "Sla de databases op en herstart services"
 
 msgid "Searches logs for a matching pattern"
@@ -6272,8 +6244,8 @@ msgid "Session limiting is disabled."
 msgstr "Sessielimitering is uitgeschakeld."
 
 #, c-format
-msgid "Sessions: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Sessies: %lu vermeldingen, %lu emmers, langste ketting is %d"
+msgid "Sessions: %zu entries, %zu buckets, longest chain is %zu"
+msgstr "Sessies: %zu vermeldingen, %zu emmers, langste ketting is %zu"
 
 msgid "Set SET-options on another nickname"
 msgstr "Stel SET-opties in op een andere nick"
@@ -6281,7 +6253,7 @@ msgstr "Stel SET-opties in op een andere nick"
 msgid "Set channel options and information"
 msgstr "Stel kanaalopties en informatie in"
 
-msgid "Set how Services make bans on the channel"
+msgid "Set how services make bans on the channel"
 msgstr "Stelt in hoe services bans op het kanaal maken"
 
 msgid "Set options related to memos"
@@ -6296,13 +6268,13 @@ msgstr "Stel het kanaal als permanent in"
 msgid "Set the channel description"
 msgstr "Stelt de kanaalbeschrijving in"
 
-msgid "Set the display of your group in Services"
+msgid "Set the display of your group in services"
 msgstr "Stel de weergave van je groep in services in"
 
 msgid "Set the founder of a channel"
 msgstr "Stelt de stichter van een kanaal in"
 
-msgid "Set the language Services will use when messaging you"
+msgid "Set the language services will use when messaging you"
 msgstr "Selecteer de taal die services zal gebruiken voor het versturen van berichten naar jou"
 
 msgid "Set the nickname password"
@@ -6317,7 +6289,7 @@ msgstr "Stel de vHost voor alle nicks in een groep in"
 msgid "Set the vhost of another user"
 msgstr "Stel de vHost van een andere gebruiker in"
 
-msgid "Set various global Services options"
+msgid "Set various global services options"
 msgstr "Stel verschillende globale services opties in"
 
 msgid "Set your nickname password"
@@ -6561,7 +6533,7 @@ msgstr ""
 "voor een gebruiker aan te passen tegelijk met de host."
 
 msgid ""
-"Sets various global Services options.  Option names\n"
+"Sets various global services options.  Option names\n"
 "currently defined are:\n"
 "    READONLY   Set read-only or read-write mode\n"
 "    DEBUG      Activate or deactivate debug mode\n"
@@ -6612,6 +6584,9 @@ msgstr ""
 "Stelt in of het gegeven kanaal zal verlopen. Door deze optie\n"
 "AAN te zetten kun je verhinderen dat het kanaal verloopt."
 
+msgid "Sets whether the given nickname can be added to a channel access list."
+msgstr "Stelt in of de gegeven nick kan toegevoegd worden aan een kanaal toegangslijst."
+
 #, c-format
 msgid ""
 "Sets whether the given nickname will be given its status modes\n"
@@ -6631,6 +6606,9 @@ msgid ""
 msgstr ""
 "Stelt in of de gegeven nick zal verlopen of niet.\n"
 "Dit aan zetten voorkomt dat de nick zal verlopen."
+
+msgid "Sets whether you can be added to a channel access list."
+msgstr "Stelt in of je toegevoegd kan worden aan een kanaal toegangslijst."
 
 #, c-format
 msgid ""
@@ -6663,12 +6641,12 @@ msgstr "Instelling voor super administrator moet ON of OFF zijn."
 msgid "Should services automatically give status to users"
 msgstr "Moet services automatisch status modes geven aan gebruikers"
 
-msgid "Show status of Services and network"
+msgid "Show status of services and network"
 msgstr "Geef de status van services en het netwerk weer"
 
 #, c-format
-msgid "Showed %d/%d matches for %s."
-msgstr "%d/%d overeenkomsten getoond voor %s."
+msgid "Showed %zu/%zu matches for %s."
+msgstr "%zu/%zu overeenkomsten getoond voor %s."
 
 msgid "Sign kicks that are done with the KICK command"
 msgstr "Onderteken kicks die worden uitgevoerd met het KICK commando"
@@ -7040,13 +7018,13 @@ msgid ""
 "Syntax: READONLY {ON | OFF}\n"
 " \n"
 "Sets read-only mode on or off.  In read-only mode, normal\n"
-"users will not be allowed to modify any Services data,\n"
+"users will not be allowed to modify any services data,\n"
 "including channel and nickname access lists, etc.  IRCops\n"
-"with sufficient Services privileges will be able to modify\n"
+"with sufficient services privileges will be able to modify\n"
 "Services' AKILL, SQLINE, SNLINE and ignore lists, drop,\n"
 "suspend or forbid nicknames and channels, and manage news,\n"
 "oper info and DNS, but any such changes will not be saved\n"
-"unless read-only mode is deactivated before Services are\n"
+"unless read-only mode is deactivated before services are\n"
 "terminated or restarted.\n"
 " \n"
 "This option is equivalent to the command-line option\n"
@@ -7130,8 +7108,8 @@ msgstr ""
 "niveau 5 of hoger op het kanaal."
 
 msgid ""
-"Tells Services to jupiter a server -- that is, to create\n"
-"a fake \"server\" connected to Services which prevents\n"
+"Tells services to jupiter a server -- that is, to create\n"
+"a fake \"server\" connected to services which prevents\n"
 "the real server of that name from connecting.  The jupe\n"
 "may be removed using a standard SQUIT. If a reason is\n"
 "given, it is placed in the server information field;\n"
@@ -7151,7 +7129,7 @@ msgstr ""
 msgid "Tells you about the last time a user was seen"
 msgstr "Vertelt je wanneer iemand het laatst gezien is"
 
-msgid "Terminate Services WITHOUT saving"
+msgid "Terminate services WITHOUT saving"
 msgstr "Sluit services af ZONDER de databases op te slaan"
 
 msgid "Terminate services with save"
@@ -7585,8 +7563,8 @@ msgstr ""
 "opnieuw om services' blokkade op jouw nick op te heffen."
 
 #, c-format
-msgid "There are %d memos on channel %s."
-msgstr "Er zijn %d memo's op kanaal %s."
+msgid "There are %zu memos on channel %s."
+msgstr "Er zijn %zu memo's op kanaal %s."
 
 msgid ""
 "There are no bots available at this time.\n"
@@ -7610,16 +7588,16 @@ msgid "There currently are no logging configurations for %s."
 msgstr "Er zijn momenteel geen log instellingen voor %s."
 
 #, c-format
-msgid "There is %d memo on channel %s."
-msgstr "Er is %d memo op kanaal %s."
+msgid "There is %zu memo on channel %s."
+msgstr "Er is %zu memo op kanaal %s."
 
 #, c-format
 msgid ""
 "There is a new memo on channel %s.\n"
-"Type %s%s READ %s %d to read it."
+"Type %s%s READ %s %zu to read it."
 msgstr ""
 "Er is een nieuwe memo op kanaal %s.\n"
-"Typ %s%s READ %s %d om het te lezen."
+"Typ %s%s READ %s %zu om het te lezen."
 
 #, c-format
 msgid "There is no bot assigned to %s anymore."
@@ -7834,7 +7812,7 @@ msgid "This command retrieves the vhost requests."
 msgstr "Dit commando toont de aangevraagde vHosts."
 
 msgid ""
-"This command searches the Services logfiles for messages\n"
+"This command searches the services logfiles for messages\n"
 "that match the given pattern. The day and limit argument\n"
 "may be used to specify how many days of logs to search\n"
 "and the number of replies to limit to. By default this\n"
@@ -8309,12 +8287,12 @@ msgid "Users"
 msgstr "Gebruikers"
 
 #, c-format
-msgid "Users (nick): %lu entries, %lu buckets, longest chain is %d"
-msgstr "Gebruikers (nick): %lu vermeldingen, %lu emmers, langste ketting is %d"
+msgid "Users (nick): %lu entries, %lu buckets, longest chain is %zu"
+msgstr "Gebruikers (nick): %lu vermeldingen, %lu emmers, langste ketting is %zu"
 
 #, c-format
-msgid "Users (uid): %lu entries, %lu buckets, longest chain is %d"
-msgstr "Gebruikers (uid): %lu vermeldingen, %lu emmers, langste ketting is %d"
+msgid "Users (uid): %lu entries, %lu buckets, longest chain is %zu"
+msgstr "Gebruikers (uid): %lu vermeldingen, %lu emmers, langste ketting is %zu"
 
 msgid "Users list:"
 msgstr "Gebruikerslijst:"
@@ -8414,7 +8392,7 @@ msgid ""
 "yourself.\n"
 " \n"
 "With a parameter, does the same for the given nick. If you\n"
-"specify REVALIDATE as well, Services will ask the given nick\n"
+"specify REVALIDATE as well, services will ask the given nick\n"
 "to re-identify. This is limited to Services Operators."
 msgstr ""
 "Zonder een parameter keert dit command het effect van het\n"
@@ -8429,8 +8407,8 @@ msgstr ""
 
 msgid ""
 "Without any option, shows the current number of users online,\n"
-"and the highest number of users online since Services was\n"
-"started, and the length of time Services has been running.\n"
+"and the highest number of users online since services was\n"
+"started, and the length of time services has been running.\n"
 " \n"
 "With the AKILL option, displays the current size of the\n"
 "AKILL list and the current default expiry time.\n"
@@ -8494,9 +8472,6 @@ msgstr "Je gebruikt geen certificaat."
 msgid "You are now a super admin."
 msgstr "Je bent nu een super administrator."
 
-msgid "You are now an IRC Operator."
-msgstr "Je bent nu een IRC Operator."
-
 msgid "You are now identified for your nick. Change your password now."
 msgstr "Je bent nu geïdentificeerd voor je nick. Wijzig nu je wachtwoord."
 
@@ -8508,7 +8483,7 @@ msgstr "Je zit nu in de groep van %s."
 msgid "You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."
 msgstr "Je hebt je maximum aantal memo's overschreden (%d). Je kan geen nieuwe memo's ontvangen totdat je enkele van je huidige memo's verwijdert."
 
-msgid "You can not NOOP Services."
+msgid "You can not NOOP services."
 msgstr "Je kan geen NOOP doen op services."
 
 msgid "You can not disable the founder privilege because it would be impossible to re-enable it at a later time."
@@ -8517,7 +8492,7 @@ msgstr "Je kan de stichter privilege niet uitschakelen, want het zou onmogelijk 
 msgid "You can not jupe an already juped server."
 msgstr "Je kan geen reeds geblokkeerde server blokkeren."
 
-msgid "You can not jupe your Services' pseudoserver or your uplink server."
+msgid "You can not jupe your services' pseudoserver or your uplink server."
 msgstr "Je kan services' pseudoserver of je uplink server niet blokkeren."
 
 #, c-format
@@ -8564,20 +8539,20 @@ msgid "You cannot use this command."
 msgstr "Je kan dit commando niet gebruiken."
 
 #, c-format
-msgid "You currently have %d memos, of which %d are unread."
-msgstr "Je hebt momenteel %d memo's, waarvan er %d ongelezen zijn."
+msgid "You currently have %zu memos, of which %zu are unread."
+msgstr "Je hebt momenteel %zu memo's, waarvan er %zu ongelezen zijn."
 
 #, c-format
-msgid "You currently have %d memos, of which 1 is unread."
-msgstr "Je hebt momenteel %d memo's, waarvan er 1 ongelezen is."
+msgid "You currently have %zu memos, of which 1 is unread."
+msgstr "Je hebt momenteel %zu memo's, waarvan er 1 ongelezen is."
 
 #, c-format
-msgid "You currently have %d memos."
-msgstr "Je hebt momenteel %d memo's."
+msgid "You currently have %zu memos."
+msgstr "Je hebt momenteel %zu memo's."
 
 #, c-format
-msgid "You currently have %d memos; all of them are unread."
-msgstr "Je hebt momenteel %d memo's; allemaal zijn ze ongelezen."
+msgid "You currently have %zu memos; all of them are unread."
+msgstr "Je hebt momenteel %zu memo's; allemaal zijn ze ongelezen."
 
 msgid "You currently have 1 memo, and it has not yet been read."
 msgstr "Je hebt momenteel 1 memo, en deze is nog niet gelezen."
@@ -8610,10 +8585,10 @@ msgstr "Je hebt 1 nieuwe memo."
 #, c-format
 msgid ""
 "You have a new memo from %s.\n"
-"Type %s%s READ %d to read it."
+"Type %s%s READ %zu to read it."
 msgstr ""
 "Je hebt een nieuwe memo van %s.\n"
-"Typ %s%s READ %d om het te lezen."
+"Typ %s%s READ %zu om het te lezen."
 
 #, c-format
 msgid "You have been invited to %s by %s."
@@ -8674,9 +8649,6 @@ msgstr "Je mag het wachtwoord van andere Services Operators niet wijzigen."
 msgid "You may not drop other Services Operators' nicknames."
 msgstr "Je mag de nickregistraties van andere Services Operators niet verwijderen."
 
-msgid "You may not get the password of other Services Operators."
-msgstr "Je mag het wachtwoord van andere Services Operators niet opvragen."
-
 msgid "You may not suspend other Services Operators' nicknames."
 msgstr "Je kan de nicks van andere Services Operators niet schorsen."
 
@@ -8717,8 +8689,8 @@ msgid "You must enter the channel name twice as a confirmation that you wish to 
 msgstr "Je moet de kanaalnaam twee keer opgeven als bevestiging dat je de registratie van %s wenst ongedaan te maken."
 
 #, c-format
-msgid "You must have been using this nick for at least %d seconds to register."
-msgstr "Je moet deze nick tenminste %d seconden gebruiken om te registreren."
+msgid "You must have been using this nick for at least %lu seconds to register."
+msgstr "Je moet deze nick tenminste %lu seconden gebruiken om te registreren."
 
 #, c-format
 msgid "You must have the %s(ME) privilege on the channel to use this command."
@@ -8856,12 +8828,12 @@ msgid "Your passcode has been re-sent to %s."
 msgstr "Je bevestingscode is opnieuw gestuurd naar %s."
 
 #, c-format
-msgid "Your password is %s - remember this for later use."
-msgstr "Je wachtwoord is %s - onthoudt dit voor later gebruik."
+msgid "Your password is too long. It must be shorter than %u characters."
+msgstr "Je wachtwoord is te lang. Het moet korter zijn dan %u karakters."
 
 #, c-format
-msgid "Your password is too long. It must not exceed %u characters."
-msgstr "Je wachtwoord is te lang. Het mag niet langer zijn dan %u karakters."
+msgid "Your password is too short. It must be longer than %u characters."
+msgstr "Je wachtwoord is te kort. Het moet langer zijn dan %u karakters."
 
 msgid "Your password reset request has expired."
 msgstr "Je wachtwoord-reset aanvraag is verlopen."

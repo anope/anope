@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef MAIL_H
-#define MAIL_H
+#pragma once
 
 #include "anope.h"
 #include "threadengine.h"
@@ -23,9 +22,11 @@ namespace Mail
 	extern CoreExport bool Validate(const Anope::string &email);
 
 	/* A email message being sent */
-	class Message : public Thread
+	class Message final
+		: public Thread
 	{
-	 private:
+	private:
+		Anope::string error;
 		Anope::string sendmail_path;
 		Anope::string send_from;
 		Anope::string mail_to;
@@ -35,8 +36,7 @@ namespace Mail
 		Anope::string content_type;
 		bool dont_quote_addresses;
 
-		bool success;
-	 public:
+	public:
 		/** Construct this message. Once constructed call Thread::Start to launch the mail sending.
 		 * @param sf Config->SendFrom
 		 * @param mailto Name of person being mailed (u->nick, nc->display, etc)
@@ -49,9 +49,7 @@ namespace Mail
 		~Message();
 
 		/* Called from within the thread to actually send the mail */
-		void Run() anope_override;
+		void Run() override;
 	};
 
 } // namespace Mail
-
-#endif // MAIL_H

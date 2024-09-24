@@ -11,16 +11,17 @@
 
 #include "module.h"
 
-class CommandBSSetFantasy : public Command
+class CommandBSSetFantasy final
+	: public Command
 {
- public:
+public:
 	CommandBSSetFantasy(Module *creator, const Anope::string &sname = "botserv/set/fantasy") : Command(creator, sname, 2, 2)
 	{
-		this->SetDesc(_("Enable fantaisist commands"));
+		this->SetDesc(_("Enable fantasy commands"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		const Anope::string &value = params[1];
@@ -39,7 +40,7 @@ class CommandBSSetFantasy : public Command
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 
@@ -63,7 +64,7 @@ class CommandBSSetFantasy : public Command
 			this->OnSyntaxError(source, source.command);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -72,27 +73,28 @@ class CommandBSSetFantasy : public Command
 				"fantasy commands on a channel when prefixed\n"
 				"with one of the following fantasy characters: \002%s\002\n"
 				" \n"
-				"Note that users wanting to use fantaisist\n"
-				"commands MUST have enough access for both\n"
-				"the FANTASIA and the command they are executing."),
+				"Note that users wanting to use fantasy commands\n"
+				"MUST have enough access for both the FANTASY\n"
+				"privilege and the command they are executing."),
 				Config->GetModule(this->owner)->Get<const Anope::string>("fantasycharacter", "!").c_str());
 		return true;
 	}
 };
 
-class Fantasy : public Module
+class Fantasy final
+	: public Module
 {
 	SerializableExtensibleItem<bool> fantasy;
 
 	CommandBSSetFantasy commandbssetfantasy;
 
- public:
+public:
 	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		fantasy(this, "BS_FANTASY"), commandbssetfantasy(this)
 	{
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg, const Anope::map<Anope::string> &tags) override
 	{
 		if (!u || !c || !c->ci || !c->ci->bi || msg.empty() || msg[0] == '\1')
 			return;
@@ -173,16 +175,21 @@ class Fantasy : public Module
 		if (params.size() < cmd->min_params)
 			return;
 
-		CommandSource source(u->nick, u, u->Account(), u, c->ci->bi);
+		Anope::string msgid;
+		auto iter = tags.find("msgid");
+		if (iter != tags.end())
+			msgid = iter->second;
+
+		CommandSource source(u->nick, u, u->Account(), u, c->ci->bi, msgid);
 		source.c = c;
 		source.command = it->first;
 		source.permission = info.permission;
 
 		AccessGroup ag = c->ci->AccessFor(u);
-		bool has_fantasia = ag.HasPriv("FANTASIA") || source.HasPriv("botserv/fantasy");
+		bool has_fantasy = ag.HasPriv("FANTASY") || source.HasPriv("botserv/fantasy");
 
 		EventReturn MOD_RESULT;
-		if (has_fantasia)
+		if (has_fantasy)
 		{
 			FOREACH_RESULT(OnBotFantasy, MOD_RESULT, (source, cmd, c->ci, params));
 		}
@@ -191,7 +198,7 @@ class Fantasy : public Module
 			FOREACH_RESULT(OnBotNoFantasyAccess, MOD_RESULT, (source, cmd, c->ci, params));
 		}
 
-		if (MOD_RESULT == EVENT_STOP || !has_fantasia)
+		if (MOD_RESULT == EVENT_STOP || !has_fantasy)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !info.permission.empty() && !source.HasCommand(info.permission))
@@ -208,7 +215,7 @@ class Fantasy : public Module
 		FOREACH_MOD(OnPostCommand, (source, cmd, params));
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
 	{
 		if (fantasy.HasExt(ci))
 			info.AddOption(_("Fantasy"));

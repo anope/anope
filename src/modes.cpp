@@ -39,16 +39,14 @@ static std::vector<ChannelModeStatus *> ChannelModesByStatus;
 /* Number of generic modes we support */
 unsigned ModeManager::GenericChannelModes = 0, ModeManager::GenericUserModes = 0;
 
-struct StackerInfo
+struct StackerInfo final
 {
 	/* Modes to be added */
 	std::list<std::pair<Mode *, Anope::string> > AddModes;
 	/* Modes to be deleted */
 	std::list<std::pair<Mode *, Anope::string> > DelModes;
 	/* Bot this is sent from */
-	BotInfo *bi;
-
-	StackerInfo() : bi(NULL) { }
+	BotInfo *bi = nullptr;
 
 	/** Add a mode to this object
 	 * @param mode The mode
@@ -57,10 +55,6 @@ struct StackerInfo
 	 */
 	void AddMode(Mode *mode, bool set, const Anope::string &param);
 };
-
-ChannelStatus::ChannelStatus()
-{
-}
 
 ChannelStatus::ChannelStatus(const Anope::string &m) : modes(m)
 {
@@ -101,9 +95,9 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 {
 	Anope::string ret;
 
-	for (size_t i = 0; i < modes.length(); ++i)
+	for (auto mode : modes)
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
+		ChannelMode *cm = ModeManager::FindChannelModeByChar(mode);
 		if (cm != NULL && cm->type == MODE_STATUS)
 		{
 			ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
@@ -115,10 +109,6 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 }
 
 Mode::Mode(const Anope::string &mname, ModeClass mcl, char mch, ModeType mt) : name(mname), mclass(mcl), mchar(mch), type(mt)
-{
-}
-
-Mode::~Mode()
 {
 }
 
@@ -154,9 +144,9 @@ ChannelMode *ChannelMode::Wrap(Anope::string &param)
 
 ChannelMode *ChannelMode::Unwrap(Anope::string &param)
 {
-	for (unsigned i = 0; i < listeners.size(); ++i)
+	for (auto *listener : listeners)
 	{
-		ChannelMode *cm = listeners[i]->Unwrap(this, param);
+		ChannelMode *cm = listener->Unwrap(this, param);
 		if (cm != this)
 			return cm;
 	}
@@ -243,10 +233,7 @@ bool UserModeNoone::CanSet(User *u) const
 
 bool ChannelModeKey::IsValid(Anope::string &value) const
 {
-	if (!value.empty() && value.find(':') == Anope::string::npos && value.find(',') == Anope::string::npos)
-		return true;
-
-	return false;
+	return !value.empty() && value.find(':') == Anope::string::npos && value.find(',') == Anope::string::npos;
 }
 
 bool ChannelModeOperOnly::CanSet(User *u) const
@@ -307,13 +294,14 @@ void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 	}
 
 	/* Add this mode and its param to our list */
-	list->push_back(std::make_pair(mode, param));
+	list->emplace_back(mode, param);
 }
 
-static class ModePipe : public Pipe
+static class ModePipe final
+	: public Pipe
 {
- public:
-	void OnNotify()
+public:
+	void OnNotify() override
 	{
 		ModeManager::ProcessModes();
 	}
@@ -330,7 +318,7 @@ static StackerInfo *GetInfo(List &l, Object *o)
 	if (it != l.end())
 		return it->second;
 
-	StackerInfo *s = new StackerInfo();
+	auto *s = new StackerInfo();
 	l[o] = s;
 	return s;
 }
@@ -339,27 +327,33 @@ static StackerInfo *GetInfo(List &l, Object *o)
  * @param info The stacker info for a channel or user
  * @return a list of strings
  */
-static std::list<Anope::string> BuildModeStrings(StackerInfo *info)
+static auto BuildModeStrings(StackerInfo *info)
 {
-	std::list<Anope::string> ret;
+	std::list<std::pair<Anope::string, std::vector<Anope::string>>> ret;
 	std::list<std::pair<Mode *, Anope::string> >::iterator it, it_end;
-	Anope::string buf = "+", parambuf;
+	Anope::string buf = "+";
+	std::vector<Anope::string> parambuf;
 	unsigned NModes = 0;
+	size_t paramlen = 0;
 
 	for (it = info->AddModes.begin(), it_end = info->AddModes.end(); it != it_end; ++it)
 	{
-		if (++NModes > IRCD->MaxModes || (buf.length() + parambuf.length() > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
+		if ((IRCD->MaxModes && ++NModes > IRCD->MaxModes) || (IRCD->MaxLine && buf.length() + paramlen > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
 		{
-			ret.push_back(buf + parambuf);
+			ret.push_back({buf, parambuf});
 			buf = "+";
 			parambuf.clear();
+			paramlen = 0;
 			NModes = 1;
 		}
 
 		buf += it->first->mchar;
 
 		if (!it->second.empty())
-			parambuf += " " + it->second;
+		{
+			parambuf.push_back(it->second);
+			paramlen += it->second.length() + 1;
+		}
 	}
 
 	if (buf[buf.length() - 1] == '+')
@@ -368,25 +362,29 @@ static std::list<Anope::string> BuildModeStrings(StackerInfo *info)
 	buf += "-";
 	for (it = info->DelModes.begin(), it_end = info->DelModes.end(); it != it_end; ++it)
 	{
-		if (++NModes > IRCD->MaxModes || (buf.length() + parambuf.length() > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
+		if ((IRCD->MaxModes && ++NModes > IRCD->MaxModes) || (IRCD->MaxLine && buf.length() + paramlen > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
 		{
-			ret.push_back(buf + parambuf);
+			ret.push_back({buf, parambuf});
 			buf = "-";
 			parambuf.clear();
+			paramlen = 0;
 			NModes = 1;
 		}
 
 		buf += it->first->mchar;
 
 		if (!it->second.empty())
-			parambuf += " " + it->second;
+		{
+			parambuf.push_back(it->second);
+			paramlen += it->second.length() + 1;
+		}
 	}
 
 	if (buf[buf.length() - 1] == '-')
 		buf.erase(buf.length() - 1);
 
 	if (!buf.empty())
-		ret.push_back(buf + parambuf);
+		ret.push_back({buf, parambuf});
 
 	return ret;
 }
@@ -400,7 +398,7 @@ bool ModeManager::AddUserMode(UserMode *um)
 
 	if (um->name.empty())
 	{
-		um->name = stringify(++GenericUserModes);
+		um->name = Anope::ToString(++GenericUserModes);
 		Log() << "ModeManager: Added generic support for user mode " << um->mchar;
 	}
 
@@ -427,7 +425,7 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 
 	if (cm->name.empty())
 	{
-		cm->name = stringify(++GenericChannelModes);
+		cm->name = Anope::ToString(++GenericChannelModes);
 		Log() << "ModeManager: Added generic support for channel mode " << cm->mchar;
 	}
 
@@ -456,8 +454,8 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 
 	FOREACH_MOD(OnChannelModeAdd, (cm));
 
-	for (unsigned int i = 0; i < ChannelModes.size(); ++i)
-		ChannelModes[i]->Check();
+	for (auto *cmode : ChannelModes)
+		cmode->Check();
 
 	return true;
 }
@@ -589,7 +587,7 @@ const std::vector<ChannelModeStatus *> &ModeManager::GetStatusChannelModesByRank
 	return ChannelModesByStatus;
 }
 
-static struct StatusSort
+static struct StatusSort final
 {
 	bool operator()(ChannelModeStatus *cm1, ChannelModeStatus *cm2) const
 	{
@@ -600,10 +598,8 @@ static struct StatusSort
 void ModeManager::RebuildStatusModes()
 {
 	ChannelModesByStatus.clear();
-	for (unsigned j = 0; j < ChannelModesIdx.size(); ++j)
+	for (auto *cm : ChannelModesIdx)
 	{
-		ChannelMode *cm = ChannelModesIdx[j];
-
 		if (cm && cm->type == MODE_STATUS && std::find(ChannelModesByStatus.begin(), ChannelModesByStatus.end(), cm) == ChannelModesByStatus.end())
 			ChannelModesByStatus.push_back(anope_dynamic_static_cast<ChannelModeStatus *>(cm));
 	}
@@ -640,30 +636,22 @@ void ModeManager::ProcessModes()
 {
 	if (!UserStackerObjects.empty())
 	{
-		for (std::map<User *, StackerInfo *>::const_iterator it = UserStackerObjects.begin(), it_end = UserStackerObjects.end(); it != it_end; ++it)
+		for (const auto &[u, s] : UserStackerObjects)
 		{
-			User *u = it->first;
-			StackerInfo *s = it->second;
-
-			std::list<Anope::string> ModeStrings = BuildModeStrings(s);
-			for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
-				IRCD->SendMode(s->bi, u, "%s", lit->c_str());
-			delete it->second;
+			for (const auto &modestr : BuildModeStrings(s))
+				IRCD->SendModeInternal(s->bi, u, modestr.first, modestr.second);
+			delete s;
 		}
 		UserStackerObjects.clear();
 	}
 
 	if (!ChannelStackerObjects.empty())
 	{
-		for (std::map<Channel *, StackerInfo *>::const_iterator it = ChannelStackerObjects.begin(), it_end = ChannelStackerObjects.end(); it != it_end; ++it)
+		for (const auto &[c, s] : ChannelStackerObjects)
 		{
-			Channel *c = it->first;
-			StackerInfo *s = it->second;
-
-			std::list<Anope::string> ModeStrings = BuildModeStrings(s);
-			for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
-				IRCD->SendMode(s->bi, c, "%s", lit->c_str());
-			delete it->second;
+			for (const auto &modestr : BuildModeStrings(s))
+				IRCD->SendModeInternal(s->bi, c, modestr.first, modestr.second);
+			delete s;
 		}
 		ChannelStackerObjects.clear();
 	}
@@ -676,9 +664,8 @@ static void StackerDel(std::map<T *, StackerInfo *> &map, T *obj)
 	if (it != map.end())
 	{
 		StackerInfo *si = it->second;
-		std::list<Anope::string> ModeStrings = BuildModeStrings(si);
-		for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
-			IRCD->SendMode(si->bi, obj, "%s", lit->c_str());
+		for (const auto &modestr : BuildModeStrings(si))
+			IRCD->SendModeInternal(si->bi, obj, modestr.first, modestr.second);
 
 		delete si;
 		map.erase(it);
@@ -742,7 +729,7 @@ void ModeManager::StackerDel(Mode *m)
 	}
 }
 
-Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh), cidr_len(0), family(0)
+Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh)
 {
 	Anope::string n, u, h;
 
@@ -796,22 +783,15 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 						&cidr_range = this->host.substr(sl + 1);
 
 			sockaddrs addr(cidr_ip);
-
-			try
+			auto range = Anope::TryConvert<unsigned short>(cidr_range);
+			if (addr.valid() && range.has_value())
 			{
-				if (addr.valid() && cidr_range.is_pos_number_only())
-				{
-					this->cidr_len = convertTo<unsigned short>(cidr_range);
+				this->cidr_len = range.value();
+				this->host = cidr_ip;
+				this->family = addr.family();
 
-					/* If we got here, cidr_len is a valid number. */
-
-					this->host = cidr_ip;
-					this->family = addr.family();
-
-					Log(LOG_DEBUG) << "Ban " << mask << " has cidr " << this->cidr_len;
-				}
+				Log(LOG_DEBUG) << "Ban " << mask << " has cidr " << this->cidr_len;
 			}
-			catch (const ConvertException &) { }
 		}
 	}
 
@@ -819,12 +799,12 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 		this->real.clear();
 }
 
-const Anope::string Entry::GetMask() const
+Anope::string Entry::GetMask() const
 {
 	return this->mask;
 }
 
-const Anope::string Entry::GetNUHMask() const
+Anope::string Entry::GetNUHMask() const
 {
 	Anope::string n = nick.empty() ? "*" : nick,
 			u = user.empty() ? "*" : user,
@@ -835,11 +815,11 @@ const Anope::string Entry::GetNUHMask() const
 	{
 		case AF_INET:
 			if (cidr_len <= 32)
-				c = "/" + stringify(cidr_len);
+				c = "/" + Anope::ToString(cidr_len);
 			break;
 		case AF_INET6:
 			if (cidr_len <= 128)
-				c = "/" + stringify(cidr_len);
+				c = "/" + Anope::ToString(cidr_len);
 			break;
 	}
 

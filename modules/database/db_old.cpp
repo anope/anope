@@ -35,13 +35,12 @@ else \
 #define OLD_BI_PRIVATE	0x0001
 
 #define OLD_NI_KILLPROTECT	0x00000001 /* Kill others who take this nick */
-#define OLD_NI_SECURE		0x00000002 /* Don't recognize unless IDENTIFY'd */
 #define OLD_NI_MSG			0x00000004 /* Use PRIVMSGs instead of NOTICEs */
 #define OLD_NI_MEMO_HARDMAX	0x00000008 /* Don't allow user to change memo limit */
 #define OLD_NI_MEMO_SIGNON	0x00000010 /* Notify of memos at signon and un-away */
 #define OLD_NI_MEMO_RECEIVE	0x00000020 /* Notify of new memos when sent */
 #define OLD_NI_PRIVATE		0x00000040 /* Don't show in LIST to non-servadmins */
-#define OLD_NI_HIDE_EMAIL	0x00000080 /* Don't show E-mail in INFO */
+#define OLD_NI_HIDE_EMAIL	0x00000080 /* Don't show email in INFO */
 #define OLD_NI_HIDE_MASK	0x00000100 /* Don't show last seen address in INFO */
 #define OLD_NI_HIDE_QUIT	0x00000200 /* Don't show last quit message in INFO */
 #define OLD_NI_KILL_QUICK	0x00000400 /* Kill in 20 seconds instead of 60 */
@@ -60,7 +59,6 @@ else \
 #define OLD_CI_TOPICLOCK		0x00000008
 #define OLD_CI_RESTRICTED		0x00000010
 #define OLD_CI_PEACE			0x00000020
-#define OLD_CI_SECURE			0x00000040
 #define OLD_CI_VERBOTEN			0x00000080
 #define OLD_CI_ENCRYPTEDPW		0x00000100
 #define OLD_CI_NO_EXPIRE		0x00000200
@@ -94,7 +92,7 @@ else \
 #define OLD_NEWS_OPER	1
 #define OLD_NEWS_RANDOM	2
 
-static struct mlock_info
+static struct mlock_info final
 {
 	char c;
 	uint32_t m;
@@ -146,20 +144,22 @@ enum
 static void process_mlock(ChannelInfo *ci, uint32_t lock, bool status, uint32_t *limit, Anope::string *key)
 {
 	ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
-	for (unsigned i = 0; i < (sizeof(mlock_infos) / sizeof(mlock_info)); ++i)
-		if (lock & mlock_infos[i].m)
+	for (auto &mlock_info : mlock_infos)
+	{
+		if (lock & mlock_info.m)
 		{
-			ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock_infos[i].c);
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock_info.c);
 			if (cm && ml)
 			{
-				if (limit && mlock_infos[i].c == 'l')
-					ml->SetMLock(cm, status, stringify(*limit));
-				else if (key && mlock_infos[i].c == 'k')
+				if (limit && mlock_info.c == 'l')
+					ml->SetMLock(cm, status, Anope::ToString(*limit));
+				else if (key && mlock_info.c == 'k')
 					ml->SetMLock(cm, status, *key);
 				else
 					ml->SetMLock(cm, status);
 			}
 		}
+	}
 }
 
 static const char Base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -205,7 +205,7 @@ static Anope::string Hex(const char *data, size_t l)
 {
 	const char hextable[] = "0123456789abcdef";
 
-	std::string rv;
+	Anope::string rv;
 	for (size_t i = 0; i < l; ++i)
 	{
 		unsigned char c = data[i];
@@ -252,7 +252,7 @@ static Anope::string GetLevelName(int level)
 		case 15:
 			return "NOKICK";
 		case 16:
-			return "FANTASIA";
+			return "FANTASY";
 		case 17:
 			return "SAY";
 		case 18:
@@ -307,7 +307,7 @@ static char *strscpy(char *d, const char *s, size_t len)
 	return d_orig;
 }
 
-struct dbFILE
+struct dbFILE final
 {
 	int mode;				/* 'r' for reading, 'w' for writing */
 	FILE *fp;				/* The normal file descriptor */
@@ -321,7 +321,7 @@ static dbFILE *open_db_read(const char *service, const char *filename, int versi
 	int myversion;
 
 	f = new dbFILE;
-	strscpy(f->filename, (Anope::DataDir + "/" + filename).c_str(), sizeof(f->filename));
+	strscpy(f->filename, Anope::ExpandData(filename).c_str(), sizeof(f->filename));
 	f->mode = 'r';
 	fp = fopen(f->filename, "rb");
 	if (!fp)
@@ -390,7 +390,7 @@ static int read_string(Anope::string &str, dbFILE *f)
 		return -1;
 	if (len == 0)
 		return 0;
-	char *s = new char[len];
+	auto *s = new char[len];
 	if (len != fread(s, 1, len, f->fp))
 	{
 		delete [] s;
@@ -445,12 +445,12 @@ static void LoadNicks()
 			Anope::string buffer;
 
 			READ(read_string(buffer, f));
-			NickCore *nc = new NickCore(buffer);
+			auto *nc = new NickCore(buffer);
 
-			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_secure", "ns_private", "hide_email",
+			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_private", "hide_email",
 				"hide_mask", "hide_quit", "memo_signon", "memo_receive", "autoop", "msg", "ns_keepmodes" };
-			for (unsigned j = 0; j < sizeof(settings) / sizeof(Anope::string); ++j)
-				nc->Shrink<bool>(settings[j].upper());
+			for (const auto &setting : settings)
+				nc->Shrink<bool>(setting.upper());
 
 			char pwbuf[32];
 			READ(read_buffer(pwbuf, f));
@@ -481,8 +481,6 @@ static void LoadNicks()
 			READ(read_uint32(&u32, f));
 			if (u32 & OLD_NI_KILLPROTECT)
 				nc->Extend<bool>("KILLPROTECT");
-			if (u32 & OLD_NI_SECURE)
-				nc->Extend<bool>("NS_SECURE");
 			if (u32 & OLD_NI_MSG)
 				nc->Extend<bool>("MSG");
 			if (u32 & OLD_NI_MEMO_HARDMAX)
@@ -539,24 +537,18 @@ static void LoadNicks()
 				case LANG_DE:
 					nc->language = "de_DE.UTF-8";
 					break;
-				case LANG_CAT:
-					nc->language = "ca_ES.UTF-8"; // yes, iso639 defines catalan as CA
-					break;
 				case LANG_GR:
 					nc->language = "el_GR.UTF-8";
 					break;
 				case LANG_NL:
 					nc->language = "nl_NL.UTF-8";
 					break;
-				case LANG_RU:
-					nc->language = "ru_RU.UTF-8";
-					break;
-				case LANG_HUN:
-					nc->language = "hu_HU.UTF-8";
-					break;
 				case LANG_PL:
 					nc->language = "pl_PL.UTF-8";
 					break;
+				case LANG_CAT:
+				case LANG_HUN:
+				case LANG_RU:
 				case LANG_EN_US:
 				case LANG_JA_JIS:
 				case LANG_JA_EUC:
@@ -569,7 +561,6 @@ static void LoadNicks()
 			for (uint16_t j = 0; j < u16; ++j)
 			{
 				READ(read_string(buffer, f));
-				nc->access.push_back(buffer);
 			}
 
 			int16_t i16;
@@ -577,7 +568,7 @@ static void LoadNicks()
 			READ(read_int16(&nc->memos.memomax, f));
 			for (int16_t j = 0; j < i16; ++j)
 			{
-				Memo *m = new Memo;
+				auto *m = new Memo;
 				READ(read_uint32(&u32, f));
 				uint16_t flags;
 				READ(read_uint16(&flags, f));
@@ -653,7 +644,7 @@ static void LoadNicks()
 				continue;
 			}
 
-			NickAlias *na = new NickAlias(nick, nc);
+			auto *na = new NickAlias(nick, nc);
 			na->last_usermask = last_usermask;
 			na->last_realname = last_realname;
 			na->last_quit = last_quit;
@@ -693,7 +684,7 @@ static void LoadVHosts()
 			continue;
 		}
 
-		na->SetVhost(ident, host, creator, vtime);
+		na->SetVHost(ident, host, creator, vtime);
 
 		Log() << "Loaded vhost for " << na->nick;
 	}
@@ -748,12 +739,12 @@ static void LoadChannels()
 			Anope::string buffer;
 			char namebuf[64];
 			READ(read_buffer(namebuf, f));
-			ChannelInfo *ci = new ChannelInfo(namebuf);
+			auto *ci = new ChannelInfo(namebuf);
 
-			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "cs_secure", "secureops", "securefounder",
+			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "secureops", "securefounder",
 				"signkick", "signkick_level", "topiclock", "persist", "noautoop", "cs_keepmodes" };
-			for (unsigned j = 0; j < sizeof(settings) / sizeof(Anope::string); ++j)
-				ci->Shrink<bool>(settings[j].upper());
+			for (const auto &setting : settings)
+				ci->Shrink<bool>(setting.upper());
 
 			READ(read_string(buffer, f));
 			ci->SetFounder(NickCore::Find(buffer));
@@ -799,8 +790,6 @@ static void LoadChannels()
 				ci->Extend<bool>("RESTRICTED");
 			if (tmpu32 & OLD_CI_PEACE)
 				ci->Extend<bool>("PEACE");
-			if (tmpu32 & OLD_CI_SECURE)
-				ci->Extend<bool>("CS_SECURE");
 			if (tmpu32 & OLD_CI_NO_EXPIRE)
 				ci->Extend<bool>("CS_NO_EXPIRE");
 			if (tmpu32 & OLD_CI_MEMO_HARDMAX)
@@ -894,7 +883,7 @@ static void LoadChannels()
 							}
 						}
 						else
-							access->AccessUnserialize(stringify(level));
+							access->AccessUnserialize(Anope::ToString(level));
 					}
 
 					Anope::string mask;
@@ -948,7 +937,7 @@ static void LoadChannels()
 			{
 				READ(read_uint32(&tmpu32, f));
 				READ(read_uint16(&tmpu16, f));
-				Memo *m = new Memo;
+				auto *m = new Memo;
 				READ(read_int32(&tmp32, f));
 				m->time = tmp32;
 				char sbuf[32];
@@ -1104,9 +1093,8 @@ static void LoadOper()
 	XLineManager *akill, *sqline, *snline, *szline;
 	akill = sqline = snline = szline = NULL;
 
-	for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(), it_end = XLineManager::XLineManagers.end(); it != it_end; ++it)
+	for (auto *xl : XLineManager::XLineManagers)
 	{
-		XLineManager *xl = *it;
 		if (xl->Type() == 'G')
 			akill = xl;
 		else if (xl->Type() == 'Q')
@@ -1138,7 +1126,7 @@ static void LoadOper()
 		if (!akill)
 			continue;
 
-		XLine *x = new XLine(user + "@" + host, by, expires, reason, XLineManager::GenerateUID());
+		auto *x = new XLine(user + "@" + host, by, expires, reason, XLineManager::GenerateUID());
 		x->created = seton;
 		akill->AddXLine(x);
 	}
@@ -1158,7 +1146,7 @@ static void LoadOper()
 		if (!snline)
 			continue;
 
-		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		auto *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
 		x->created = seton;
 		snline->AddXLine(x);
 	}
@@ -1178,7 +1166,7 @@ static void LoadOper()
 		if (!sqline)
 			continue;
 
-		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		auto *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
 		x->created = seton;
 		sqline->AddXLine(x);
 	}
@@ -1198,7 +1186,7 @@ static void LoadOper()
 		if (!szline)
 			continue;
 
-		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		auto *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
 		x->created = seton;
 		szline->AddXLine(x);
 	}
@@ -1296,12 +1284,13 @@ static void LoadNews()
 	close_db(f);
 }
 
-class DBOld : public Module
+class DBOld final
+	: public Module
 {
 	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit;
 	PrimitiveExtensibleItem<Anope::string> mlock_key;
 
- public:
+public:
 	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR),
 		mlock_on(this, "mlock_on"), mlock_off(this, "mlock_off"), mlock_limit(this, "mlock_limit"), mlock_key(this, "mlock_key")
 	{
@@ -1313,7 +1302,7 @@ class DBOld : public Module
 			throw ModuleException("Invalid hash method");
 	}
 
-	EventReturn OnLoadDatabase() anope_override
+	EventReturn OnLoadDatabase() override
 	{
 		LoadNicks();
 		LoadVHosts();
@@ -1326,11 +1315,10 @@ class DBOld : public Module
 		return EVENT_STOP;
 	}
 
-	void OnUplinkSync(Server *s) anope_override
+	void OnUplinkSync(Server *s) override
 	{
-		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+		for (auto &[_, ci] : *RegisteredChannelList)
 		{
-			ChannelInfo *ci = it->second;
 			uint32_t *limit = mlock_limit.Get(ci);
 			Anope::string *key = mlock_key.Get(ci);
 
@@ -1354,6 +1342,7 @@ class DBOld : public Module
 			if (ci->c)
 				ci->c->CheckModes();
 		}
+		Anope::SaveDatabases();
 	}
 };
 

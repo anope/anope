@@ -27,10 +27,8 @@ void BuildChanList(NickAlias *na, TemplateFileServer::Replacements &replacements
 	na->nc->GetChannelReferences(queue);
 	std::sort(queue.begin(), queue.end(), ChannelSort);
 
-	for (unsigned i = 0; i < queue.size(); ++i)
+	for (auto *ci : queue)
 	{
-		ChannelInfo *ci = queue[i];
-
 		if (na->nc != ci->GetFounder() && ci->AccessFor(na->nc).empty())
 			continue;
 

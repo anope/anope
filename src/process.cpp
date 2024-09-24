@@ -18,61 +18,81 @@
 
 void Anope::Process(const Anope::string &buffer)
 {
-	/* If debugging, log the buffer */
-	Log(LOG_RAWIO) << "Received: " << buffer;
-
 	if (buffer.empty())
 		return;
 
 	Anope::map<Anope::string> tags;
 	Anope::string source, command;
 	std::vector<Anope::string> params;
-
 	if (!IRCD->Parse(buffer, tags, source, command, params))
 		return;
 
+	Log(LOG_RAWIO) << "Received " << buffer;
 	if (Anope::ProtocolDebug)
 	{
 		if (tags.empty())
-			Log() << "No tags";
+			Log() << "\tNo tags";
 		else
-			for (Anope::map<Anope::string>::const_iterator it = tags.begin(); it != tags.end(); ++it)
-				Log() << "tags " << it->first << ": " << it->second;
+		{
+			for (const auto &[tname, tvalue] : tags)
+				Log() << "\tTag " << tname << ": " << tvalue;
+		}
 
-		Log() << "Source : " << (source.empty() ? "No source" : source);
-		Log() << "Command: " << command;
+		if (source.empty())
+			Log() << "\tNo source";
+		else
+			Log() << "\tSource: " << source;
+
+		Log() << "\tCommand: " << command;
 
 		if (params.empty())
-			Log() << "No params";
+			Log() << "\tNo params";
 		else
-			for (unsigned i = 0; i < params.size(); ++i)
-				Log() << "params " << i << ": " << params[i];
+		{
+			for (size_t i = 0; i < params.size(); ++i)
+				Log() << "\tParam " << i << ": " << params[i];
+		}
 	}
 
-	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
-
 	MessageSource src(source);
-
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnMessage, MOD_RESULT, (src, command, params));
+	FOREACH_RESULT(OnMessage, MOD_RESULT, (src, command, params, tags));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
+	ProcessInternal(src, command, params, tags);
+}
+
+void Anope::ProcessInternal(MessageSource &src, const Anope::string &command, const std::vector<Anope::string> &params, const Anope::map<Anope::string> & tags)
+{
+	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
 	ServiceReference<IRCDMessage> m("IRCDMessage", proto_name + "/" + command.lower());
 	if (!m)
 	{
-		Log(LOG_DEBUG) << "unknown message from server (" << buffer << ")";
+		Log(LOG_DEBUG) << "unknown message from server: " << command;
 		return;
 	}
 
-	if (m->HasFlag(IRCDMESSAGE_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
+	if (m->HasFlag(IRCDMessage::FLAG_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
 		Log(LOG_DEBUG) << "invalid parameters for " << command << ": " << params.size() << " != " << m->GetParamCount();
-	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_USER) && !src.GetUser())
-		Log(LOG_DEBUG) << "unexpected non-user source " << source << " for " << command;
-	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
-		Log(LOG_DEBUG) << "unexpected non-server source " << source << " for " << command;
+	else if (m->HasFlag(IRCDMessage::FLAG_REQUIRE_USER) && !src.GetUser())
+		Log(LOG_DEBUG) << "unexpected non-user source " << src.GetSource() << " for " << command;
+	else if (m->HasFlag(IRCDMessage::FLAG_REQUIRE_SERVER) && !src.GetSource().empty() && !src.GetServer())
+		Log(LOG_DEBUG) << "unexpected non-server source " << src.GetSource() << " for " << command;
 	else
-		m->Run(src, params, tags);
+	{
+		try
+		{
+			m->Run(src, params, tags);
+		}
+		catch (const ProtocolException &err)
+		{
+			IRCD->SendError(err.GetReason());
+			Anope::QuitReason = "Protocol error: " + err.GetReason();
+			Anope::Quitting = true;
+			Anope::ReturnValue = EXIT_FAILURE;
+		}
+	}
 }
 
 bool IRCDProto::Parse(const Anope::string &buffer, Anope::map<Anope::string> &tags, Anope::string &source, Anope::string &command, std::vector<Anope::string> &params)
@@ -123,17 +143,76 @@ bool IRCDProto::Parse(const Anope::string &buffer, Anope::map<Anope::string> &ta
 	return true;
 }
 
-Anope::string IRCDProto::Format(const Anope::string &source, const Anope::string &message)
+bool IRCDProto::Format(Anope::string &message, const Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params)
 {
-	if (!source.empty())
-		return ":" + source + " " + message;
-	else
-		return message;
+	std::stringstream buffer;
+	if (!tags.empty())
+	{
+		char separator = '@';
+		for (const auto &[tname, tvalue] : tags)
+		{
+			if (IRCD->IsTagValid(tname, tvalue))
+			{
+				buffer << separator << tname;
+				if (!tvalue.empty())
+					buffer << '=' << tvalue;
+				separator = ';';
+			}
+		}
+		if (separator != '@')
+			buffer << ' ';
+	}
+
+	if (source.GetServer())
+	{
+		const auto *s = source.GetServer();
+		if (s != Me && !s->IsJuped())
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << command << "\" from " << s->GetName() << " who is not from me";
+			return false;
+		}
+
+		buffer << ':' << s->GetSID() << ' ';
+	}
+	else if (source.GetUser())
+	{
+		const auto *u = source.GetUser();
+		if (u->server != Me && !u->server->IsJuped())
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << command << "\" from " << u->nick << " who is not from me";
+			return false;
+		}
+
+		const auto *bi = source.GetBot();
+		if (bi && !bi->introduced)
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << command << "\" from " << bi->nick << " when not introduced";
+			return false;
+		}
+
+		buffer << ':' << u->GetUID() << ' ';
+	}
+
+	buffer << command;
+	if (!params.empty())
+	{
+		buffer << ' ';
+		for (auto it = params.begin(); it != params.end() - 1; ++it)
+			buffer << *it << ' ';
+
+
+		const auto &last = params.back();
+		if (last.empty() || last[0] == ':' || last.find(' ') != Anope::string::npos)
+			buffer << ':';
+		buffer << last;
+	}
+
+	message = buffer.str();
+	return true;
 }
 
 MessageTokenizer::MessageTokenizer(const Anope::string &msg)
 	: message(msg)
-	, position(0)
 {
 }
 

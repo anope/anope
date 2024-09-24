@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef SERVERS_H
-#define SERVERS_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -26,7 +25,7 @@ namespace Servers
 	 * the only server whose uplink *is* Me that is not a juped server.
 	 * @return Our uplink, or NULL if not uplinked to anything
 	 */
-	extern CoreExport Server* GetUplink();
+	extern CoreExport Server *GetUplink();
 
 	/* Server maps by name and id */
 	extern CoreExport Anope::map<Server *> ByName;
@@ -38,9 +37,10 @@ namespace Servers
 
 /** Class representing a server
  */
-class CoreExport Server : public Extensible
+class CoreExport Server final
+	: public Extensible
 {
- private:
+private:
 	/* Server name */
 	Anope::string name;
 	/* Hops between services and server */
@@ -62,7 +62,7 @@ class CoreExport Server : public Extensible
 	/* Reason this server was quit */
 	Anope::string quit_reason;
 
- public:
+public:
 	/** Constructor
 	 * @param uplink The uplink this server is from, is only NULL when creating Me
 	 * @param name The server name
@@ -73,14 +73,14 @@ class CoreExport Server : public Extensible
 	 */
 	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid = "", bool jupe = false);
 
- private:
+private:
 	/** Destructor
 	 */
 	~Server();
 
- public:
+public:
 	/* Number of users on the server */
-	unsigned users;
+	unsigned users = 0;
 
 	/** Delete this server with a reason
 	 * @param reason The reason
@@ -183,5 +183,3 @@ class CoreExport Server : public Extensible
 	 */
 	static Server *Find(const Anope::string &name, bool name_only = false);
 };
-
-#endif // SERVERS_H

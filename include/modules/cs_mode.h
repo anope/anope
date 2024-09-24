@@ -9,6 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#pragma once
+
 struct ModeLock
 {
 	Anope::string ci;
@@ -18,16 +20,16 @@ struct ModeLock
 	Anope::string setter;
 	time_t created;
 
-	virtual ~ModeLock() { }
- protected:
-	ModeLock() { }
+	virtual ~ModeLock() = default;
+protected:
+	ModeLock() = default;
 };
 
 struct ModeLocks
 {
 	typedef std::vector<ModeLock *> ModeList;
 
-	virtual ~ModeLocks() { }
+	virtual ~ModeLocks() = default;
 
 	/** Check if a mode is mlocked
 	 * @param mode The mode

@@ -6,9 +6,12 @@
  * Please read COPYING and README for further details.
  */
 
-class SSLService : public Service
+#pragma once
+
+class SSLService
+	: public Service
 {
- public:
+public:
 	SSLService(Module *o, const Anope::string &n) : Service(o, "SSLService", n) { }
 
 	virtual void Init(Socket *s) = 0;

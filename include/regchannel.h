@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef REGCHANNEL_H
-#define REGCHANNEL_H
+#pragma once
 
 #include "memo.h"
 #include "modes.h"
@@ -17,14 +16,15 @@
 #include "serialize.h"
 #include "bots.h"
 
-typedef Anope::hash_map<ChannelInfo *> registered_channel_map;
+typedef Anope::unordered_map<ChannelInfo *> registered_channel_map;
 
 extern CoreExport Serialize::Checker<registered_channel_map> RegisteredChannelList;
 
 /* AutoKick data. */
-class CoreExport AutoKick : public Serializable
+class CoreExport AutoKick final
+	: public Serializable
 {
- public:
+public:
 	/* Channel this autokick is on */
 	Serialize::Reference<ChannelInfo> ci;
 
@@ -38,24 +38,26 @@ class CoreExport AutoKick : public Serializable
 
 	AutoKick();
 	~AutoKick();
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	void Serialize(Serialize::Data &data) const override;
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 };
 
 /* It matters that Base is here before Extensible (it is inherited by Serializable)
  */
-class CoreExport ChannelInfo : public Serializable, public Extensible
+class CoreExport ChannelInfo final
+	: public Serializable
+	, public Extensible
 {
 	/* channels who reference this one */
 	Anope::map<int> references;
- private:
+private:
 	Serialize::Reference<NickCore> founder;					/* Channel founder */
 	Serialize::Reference<NickCore> successor;                               /* Who gets the channel if the founder nick is dropped or expires */
 	Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
 	Serialize::Checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
 	Anope::map<int16_t> levels;
 
- public:
+public:
 	friend class ChanAccess;
 	friend class AutoKick;
 
@@ -93,9 +95,10 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	ChannelInfo(const ChannelInfo &ci);
 
 	~ChannelInfo();
+	ChannelInfo &operator=(const ChannelInfo &) = default;
 
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	void Serialize(Serialize::Data &data) const override;
+	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Change the founder of the channel
 	 * @params nc The new founder
@@ -166,7 +169,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 * @param t The time the akick was added, defaults to now
 	 * @param lu The time the akick was last used, defaults to never
 	 */
-	AutoKick* AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
+	AutoKick *AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
 
 	/** Add an akick entry to the channel by reason
 	 * @param user The user who added the akick
@@ -175,13 +178,13 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 * @param t The time the akick was added, defaults to now
 	 * @param lu The time the akick was last used, defaults to never
 	 */
-	AutoKick* AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
+	AutoKick *AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
 
 	/** Get an entry from the channel akick list
 	 * @param index The index in the akick vector
 	 * @return The akick structure, or NULL if not found
 	 */
-	AutoKick* GetAkick(unsigned index) const;
+	AutoKick *GetAkick(unsigned index) const;
 
 	/** Get the size of the akick vector for this channel
 	 * @return The akick vector size
@@ -235,7 +238,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 * @param name channel name to lookup
 	 * @return the ChannelInfo associated with the channel
 	 */
-	static ChannelInfo* Find(const Anope::string &name);
+	static ChannelInfo *Find(const Anope::string &name);
 
 	void AddChannelReference(const Anope::string &what);
 	void RemoveChannelReference(const Anope::string &what);
@@ -248,5 +251,3 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
  * @return true or false
  */
 extern CoreExport bool IsFounder(const User *user, const ChannelInfo *ci);
-
-#endif // REGCHANNEL_H

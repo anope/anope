@@ -9,29 +9,28 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef THREADENGINE_H
-#define THREADENGINE_H
+#pragma once
 
 #include "sockets.h"
 #include "extensible.h"
 
-class CoreExport Thread : public Pipe, public Extensible
+#include <thread>
+
+class CoreExport Thread
+	: public Pipe
+	, public Extensible
 {
- private:
+private:
 	/* Set to true to tell the thread to finish and we are waiting for it */
-	bool exit;
+	bool exit = false;
 
- public:
+public:
 	/* Handle for this thread */
-	pthread_t handle;
-
-	/** Threads constructor
-	 */
-	Thread();
+	std::unique_ptr<std::thread> handle;
 
 	/** Threads destructor
 	 */
-	virtual ~Thread();
+	virtual ~Thread() = default;
 
 	/** Join to the thread, sets the exit state to true
 	 */
@@ -62,59 +61,3 @@ class CoreExport Thread : public Pipe, public Extensible
 	 */
 	virtual void Run() = 0;
 };
-
-class CoreExport Mutex
-{
- protected:
-	/* A mutex, used to keep threads in sync */
-	pthread_mutex_t mutex;
-
- public:
-	/** Constructor
-	 */
-	Mutex();
-
-	/** Destructor
-	 */
-	~Mutex();
-
-	/** Attempt to lock the mutex, will hang until a lock can be achieved
-	 */
-	void Lock();
-
-	/** Unlock the mutex, it must be locked first
-	 */
-	void Unlock();
-
-	/** Attempt to lock the mutex, will return true on success and false on fail
-	 * Does not block
-	 * @return true or false
-	 */
-	bool TryLock();
-};
-
-class CoreExport Condition : public Mutex
-{
- private:
-	/* A condition */
-	pthread_cond_t cond;
-
- public:
-	/** Constructor
-	 */
-	Condition();
-
-	/** Destructor
-	 */
-	~Condition();
-
-	/** Called to wakeup the waiter
-	 */
-	void Wakeup();
-
-	/** Called to wait for a Wakeup() call
-	 */
-	void Wait();
-};
-
-#endif // THREADENGINE_H

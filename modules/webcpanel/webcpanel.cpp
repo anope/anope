@@ -8,9 +8,10 @@
 #include "webcpanel.h"
 
 Module *me;
-Anope::string provider_name, template_name, template_base, page_title;
+Anope::string provider_name, template_base, page_title;
 
-class ModuleWebCPanel : public Module
+class ModuleWebCPanel final
+	: public Module
 {
 	ServiceReference<HTTPProvider> provider;
 	Panel panel;
@@ -26,7 +27,6 @@ class ModuleWebCPanel : public Module
 
 	WebCPanel::NickServ::Info nickserv_info;
 	WebCPanel::NickServ::Cert nickserv_cert;
-	WebCPanel::NickServ::Access nickserv_access;
 	WebCPanel::NickServ::Alist nickserv_alist;
 	WebCPanel::NickServ::Confirm nickserv_confirm;
 
@@ -44,13 +44,13 @@ class ModuleWebCPanel : public Module
 	WebCPanel::OperServ::Akill operserv_akill;
 
 
- public:
+public:
 	ModuleWebCPanel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		panel(this, "webcpanel"),
 		id(this, "webcpanel_id"), ip(this, "webcpanel_ip"), last_login(this, "webcpanel_last_login"),
 		style_css("style.css", "/static/style.css", "text/css"), logo_png("logo.png", "/static/logo.png", "image/png"), cubes_png("cubes.png", "/static/cubes.png", "image/png"), favicon_ico("favicon.ico", "/favicon.ico", "image/x-icon"),
 		index("/"), logout("/logout"), _register("/register"), confirm("/confirm"),
-		nickserv_info("NickServ", "/nickserv/info"), nickserv_cert("NickServ", "/nickserv/cert"), nickserv_access("NickServ", "/nickserv/access"), nickserv_alist("NickServ", "/nickserv/alist"), nickserv_confirm("NickServ", "/nickserv/confirm"),
+		nickserv_info("NickServ", "/nickserv/info"), nickserv_cert("NickServ", "/nickserv/cert"), nickserv_alist("NickServ", "/nickserv/alist"), nickserv_confirm("NickServ", "/nickserv/confirm"),
 		chanserv_info("ChanServ", "/chanserv/info"), chanserv_set("ChanServ", "/chanserv/set"), chanserv_access("ChanServ", "/chanserv/access"), chanserv_akick("ChanServ", "/chanserv/akick"),
 		chanserv_modes("ChanServ", "/chanserv/modes"), chanserv_drop("ChanServ", "/chanserv/drop"), memoserv_memos("MemoServ", "/memoserv/memos"), hostserv_request("HostServ", "/hostserv/request"),
 		operserv_akill("OperServ", "/operserv/akill")
@@ -60,13 +60,12 @@ class ModuleWebCPanel : public Module
 
 		Configuration::Block *block = Config->GetModule(this);
 		provider_name = block->Get<const Anope::string>("server", "httpd/main");
-		template_name = block->Get<const Anope::string>("template", "default");
-		template_base = Anope::DataDir + "/modules/webcpanel/templates/" + template_name;
+		template_base = Anope::ExpandData(block->Get<const Anope::string>("template_dir", "webcpanel/templates/default"));
 		page_title = block->Get<const Anope::string>("title", "Anope IRC Services");
 
 		provider = ServiceReference<HTTPProvider>("HTTPProvider", provider_name);
 		if (!provider)
-			throw ModuleException("Unable to find HTTPD provider. Is m_httpd loaded?");
+			throw ModuleException("Unable to find HTTPD provider. Is httpd loaded?");
 
 		provider->RegisterPage(&this->style_css);
 		provider->RegisterPage(&this->logo_png);
@@ -97,11 +96,6 @@ class ModuleWebCPanel : public Module
 				s.subsections.push_back(ss);
 				provider->RegisterPage(&this->nickserv_cert);
 			}
-
-			ss.name = "Access";
-			ss.url = "/nickserv/access";
-			s.subsections.push_back(ss);
-			provider->RegisterPage(&this->nickserv_access);
 
 			ss.name = "AList";
 			ss.url = "/nickserv/alist";
@@ -178,7 +172,7 @@ class ModuleWebCPanel : public Module
 			s.name = HostServ->nick;
 
 			SubSection ss;
-			ss.name = "vHost Request";
+			ss.name = "VHost Request";
 			ss.url = "/hostserv/request";
 			s.subsections.push_back(ss);
 			provider->RegisterPage(&this->hostserv_request);
@@ -202,7 +196,7 @@ class ModuleWebCPanel : public Module
 		}
 	}
 
-	~ModuleWebCPanel()
+	~ModuleWebCPanel() override
 	{
 		if (provider)
 		{
@@ -218,7 +212,6 @@ class ModuleWebCPanel : public Module
 
 			provider->UnregisterPage(&this->nickserv_info);
 			provider->UnregisterPage(&this->nickserv_cert);
-			provider->UnregisterPage(&this->nickserv_access);
 			provider->UnregisterPage(&this->nickserv_alist);
 			provider->UnregisterPage(&this->nickserv_confirm);
 
@@ -260,14 +253,15 @@ namespace WebPanel
 			bi = BotListByNick->begin()->second; // Pick one...
 		}
 
-		struct MyComandReply : CommandReply
+		struct MyComandReply final
+			: CommandReply
 		{
 			TemplateFileServer::Replacements &re;
 			const Anope::string &k;
 
 			MyComandReply(TemplateFileServer::Replacements &_r, const Anope::string &_k) : re(_r), k(_k) { }
 
-			void SendMessage(BotInfo *source, const Anope::string &msg) anope_override
+			void SendMessage(BotInfo *source, const Anope::string &msg) override
 			{
 				re[k] = msg;
 			}
@@ -300,14 +294,15 @@ namespace WebPanel
 		if (!info)
 			return;
 
-		struct MyComandReply : CommandReply
+		struct MyComandReply final
+			: CommandReply
 		{
 			TemplateFileServer::Replacements &re;
 			const Anope::string &k;
 
 			MyComandReply(TemplateFileServer::Replacements &_r, const Anope::string &_k) : re(_r), k(_k) { }
 
-			void SendMessage(BotInfo *source, const Anope::string &msg) anope_override
+			void SendMessage(BotInfo *source, const Anope::string &msg) override
 			{
 				re[k] = msg;
 			}

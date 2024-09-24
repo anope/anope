@@ -17,8 +17,19 @@
 #include "regchannel.h"
 #include "channels.h"
 
-CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi) : nick(n), u(user), nc(core), reply(r),
-	c(NULL), service(bi)
+void CommandReply::SendMessage(CommandSource &source, const Anope::string &msg)
+{
+	SendMessage(source.service, msg);
+}
+
+CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi, const Anope::string &m)
+	: nick(n)
+	, u(user)
+	, nc(core)
+	, ip(user ? user->ip.str() : "")
+	, reply(r)
+	, service(bi)
+	, msgid(m)
 {
 }
 
@@ -114,16 +125,12 @@ void CommandSource::Reply(const Anope::string &message)
 	sepstream sep(translated_message, '\n', true);
 	Anope::string tok;
 	while (sep.GetToken(tok))
-		this->reply->SendMessage(this->service, tok);
+		this->reply->SendMessage(*this, tok);
 }
 
 Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(o)
 {
 	allow_unregistered = require_user = false;
-}
-
-Command::~Command()
-{
 }
 
 void Command::SetDesc(const Anope::string &d)
@@ -195,11 +202,53 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 		source.Reply(MORE_INFO, Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
 }
 
+namespace
+{
+	void HandleUnknownCommand(CommandSource& source, const Anope::string &message)
+	{
+		// Try to find a similar command.
+		size_t distance = Config->GetBlock("options")->Get<size_t>("didyoumeandifference", "4");
+		Anope::string similar;
+		auto umessage = message.upper();
+		for (const auto &[command, info] : source.service->commands)
+		{
+			if (info.hide || command == message)
+				continue; // Don't suggest a hidden alias or a missing command.
+
+			size_t dist = Anope::Distance(umessage, command);
+			if (dist < distance)
+			{
+				distance = dist;
+				similar = command;
+			}
+		}
+
+		bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
+		if (has_help && similar.empty())
+		{
+			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(),
+				Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		}
+		else if (has_help)
+		{
+			source.Reply(_("Unknown command \002%s\002. Did you mean \002%s\002? \"%s%s HELP\" for help."),
+				message.c_str(), similar.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		}
+		else if (similar.empty())
+		{
+			source.Reply(_("Unknown command \002%s\002. Did you mean \002%s\002?"), message.c_str(), similar.c_str());
+		}
+		else
+		{
+			source.Reply(_("Unknown command \002%s\002."), message.c_str());
+		}
+	}
+}
+
 void Command::Run(CommandSource &source, const Anope::string &message)
 {
 	std::vector<Anope::string> params;
 	spacesepstream(message).GetTokens(params);
-	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 
 	CommandInfo::map::const_iterator it = source.service->commands.end();
 	unsigned count = 0;
@@ -216,10 +265,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 
 	if (it == source.service->commands.end())
 	{
-		if (has_help)
-			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
-		else
-			source.Reply(_("Unknown command \002%s\002."), message.c_str());
+		HandleUnknownCommand(source, message);
 		return;
 	}
 
@@ -227,10 +273,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	ServiceReference<Command> c("Command", info.name);
 	if (!c)
 	{
-		if (has_help)
-			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
-		else
-			source.Reply(_("Unknown command \002%s\002."), message.c_str());
+		HandleUnknownCommand(source, message);
 		Log(source.service) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";
 		return;
 	}
@@ -288,19 +331,14 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 	FOREACH_MOD(OnPostCommand, (source, this, params));
 }
 
-bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo* &bot, Anope::string &name)
+bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo *&bot, Anope::string &name)
 {
 	bot = NULL;
 
-	for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	for (const auto &[_, bi] : *BotListByNick)
 	{
-		BotInfo *bi = it->second;
-
-		for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
+		for (const auto &[c_name, info] : bi->commands)
 		{
-			const Anope::string &c_name = cit->first;
-			const CommandInfo &info = cit->second;
-
 			if (info.name != command_service)
 				continue;
 

@@ -36,15 +36,15 @@ Memo::~Memo()
 
 void Memo::Serialize(Serialize::Data &data) const
 {
-	data["owner"] << this->owner;
-	data.SetType("time", Serialize::Data::DT_INT); data["time"] << this->time;
-	data["sender"] << this->sender;
-	data["text"] << this->text;
-	data["unread"] << this->unread;
-	data["receipt"] << this->receipt;
+	data.Store("owner", this->owner);
+	data.Store("time", this->time);
+	data.Store("sender", this->sender);
+	data.Store("text", this->text);
+	data.Store("unread", this->unread);
+	data.Store("receipt", this->receipt);
 }
 
-Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string owner;
 
@@ -76,7 +76,7 @@ Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 	return m;
 }
 
-MemoInfo::MemoInfo() : memomax(0), memos("Memo")
+MemoInfo::MemoInfo() : memos("Memo")
 {
 }
 
@@ -113,9 +113,11 @@ void MemoInfo::Del(unsigned index)
 
 bool MemoInfo::HasIgnore(User *u)
 {
-	for (unsigned i = 0; i < this->ignores.size(); ++i)
-		if (u->nick.equals_ci(this->ignores[i]) || (u->Account() && u->Account()->display.equals_ci(this->ignores[i])) || Anope::Match(u->GetMask(), Anope::string(this->ignores[i])))
+	for (const auto &ignore : this->ignores)
+	{
+		if (u->nick.equals_ci(ignore) || (u->Account() && u->Account()->display.equals_ci(ignore)) || Anope::Match(u->GetMask(), Anope::string(ignore)))
 			return true;
+	}
 	return false;
 }
 

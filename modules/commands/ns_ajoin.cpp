@@ -118,6 +118,75 @@ class CommandNSAJoin : public Command
 		}
 	}
 
+    void DoAddAll(CommandSource &source, NickCore *nc)
+    {
+        AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
+		Anope::string addedchans;
+		Anope::string alreadyadded;
+		Anope::string haskey;
+
+        User *u = source.GetUser();
+
+        int current_list_size = (*channels)->size();
+        int current_channel_count = u->chans.size();
+        int total = current_list_size + current_channel_count;
+
+        if (total >= static_cast<int>(Config->GetModule(this->owner)->Get<unsigned>("ajoinmax")))
+        {
+            source.Reply(_("Sorry, you're in too many channels. It would make your auto join list greater than the maximum of %d."), Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"));
+            return;
+        }
+        
+        for (User::ChanUserList::iterator it = u->chans.begin() ; it != u->chans.end() ; ++it)
+        {
+            Channel *chan = it->second->chan;
+
+            unsigned i = 0;
+			for (; i < (*channels)->size(); ++i)
+                if ((*channels)->at(i)->channel.equals_ci(chan->name))
+                    break;
+
+            if (i != (*channels)->size())
+            {
+                alreadyadded += chan->name + ", ";
+                continue;
+            }
+            
+            Anope::string k;
+            if (chan && chan->GetParam("KEY", k))
+            {
+                haskey += chan->name + ", ";
+                continue;
+            }
+
+            // we should be good to add channel here
+            AJoinEntry *entry = new AJoinEntry(nc);
+            entry->owner = nc;
+            entry->channel = chan->name;
+            (*channels)->push_back(entry);
+            addedchans += chan->name + ", ";
+        }
+
+        if (!alreadyadded.empty())
+		{
+			alreadyadded = alreadyadded.substr(0, alreadyadded.length() - 2);
+			source.Reply(_("%s is already on %s's auto join list."), alreadyadded.c_str(), nc->display.c_str());
+		}
+
+		if (!haskey.empty())
+		{
+			haskey = haskey.substr(0, haskey.length() - 2);
+			source.Reply(_("%s had an invalid key specified, and was thus ignored."), haskey.c_str());
+		}
+
+		if (addedchans.empty())
+			return;
+
+		addedchans = addedchans.substr(0, addedchans.length() - 2);
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD channel " << addedchans << " to " << nc->display;
+		source.Reply(_("%s added to %s's auto join list."), addedchans.c_str(), nc->display.c_str());
+    }
+
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &chans, const Anope::string &keys)
 	{
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
@@ -228,6 +297,7 @@ class CommandNSAJoin : public Command
 	CommandNSAJoin(Module *creator) : Command(creator, "nickserv/ajoin", 1, 4)
 	{
 		this->SetDesc(_("Manage your auto join list"));
+        this->SetSyntax(_("ADDALL"));
 		this->SetSyntax(_("ADD [\037nickname\037] \037channel\037 [\037key\037]"));
 		this->SetSyntax(_("DEL [\037nickname\037] \037channel\037"));
 		this->SetSyntax(_("LIST [\037nickname\037]"));
@@ -273,6 +343,8 @@ class CommandNSAJoin : public Command
 			return this->DoList(source, nc);
 		else if (nc->HasExt("NS_SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
+        else if (cmd.equals_ci("ADDALL"))
+            return this->DoAddAll(source, nc);
 		else if (param.empty())
 			this->OnSyntaxError(source, "");
 		else if (Anope::ReadOnly)

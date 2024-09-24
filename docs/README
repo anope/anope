@@ -173,7 +173,7 @@ Table of Contents
         * Plexus 3 or later
         * Ratbox 2.0.6 or later
         * Solanum (all versions)
-        * UnrealIRCd 4 or later
+        * UnrealIRCd 6 or later
 
     Anope could also work with some of the daemons derived by the ones listed
     above, but there's no support for them if they work or don't work.

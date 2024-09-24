@@ -225,9 +225,10 @@ private:
 		// EAUTH: communicates information about the local server.
 		// MLOCK: enable receiving the MLOCK message when a mode lock changes.
 		// MTAGS: enable receiving IRCv3 message tags.
+		// NEXTBANS: enables receiving named extended bans.
 		// SID: communicates the unique identifier of the local server.
 		// VHP: enable receiving the vhost in UID.
-		Uplink::Send("PROTOCTL", "BIGLINES", "MLOCK", "MTAGS", "VHP");
+		Uplink::Send("PROTOCTL", "BIGLINES", "MLOCK", "MTAGS", "NEXTBANS", "VHP");
 		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
 		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
 
@@ -446,40 +447,69 @@ private:
 	}
 };
 
-class UnrealExtBan
-	: public ChannelModeVirtual<ChannelModeList>
+namespace UnrealExtBan
 {
-	char ext;
-
-public:
-	UnrealExtBan(const Anope::string &mname, const Anope::string &basename, char extban) : ChannelModeVirtual<ChannelModeList>(mname, basename)
-		, ext(extban)
+	bool IsExtBan(const Anope::string &str, Anope::string &name, Anope::string &value)
 	{
+		if (str[0] != '~')
+			return false;
+
+		auto endpos = str.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", 1);
+		if (endpos == Anope::string::npos || str[endpos] != ':' || endpos+1 == str.length())
+			return false;
+
+		name = str.substr(1, endpos - 1);
+		value = str.substr(endpos + 1);
+		return true;
 	}
 
-	ChannelMode *Wrap(Anope::string &param) override
+	class Base
+		: public ChannelModeVirtual<ChannelModeList>
 	{
-		param = "~" + Anope::string(ext) + ":" + param;
-		return ChannelModeVirtual<ChannelModeList>::Wrap(param);
-	}
+	private:
+		char xbchar;
+		Anope::string xbname;
 
-	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) override
-	{
-		if (cm->type != MODE_LIST || param.length() < 4 || param[0] != '~' || param[1] != ext || param[2] != ':')
-			return cm;
+	public:
+		Base(const Anope::string &mname, const Anope::string& uname, char uchar)
+			: ChannelModeVirtual<ChannelModeList>(mname, "BAN")
+			, xbchar(uchar)
+			, xbname(uname)
+		{
+		}
 
-		param = param.substr(3);
-		return this;
-	}
-};
+		ChannelMode *Wrap(Anope::string &param) override
+		{
+			auto prefix = Servers::Capab.count("NEXTBANS") ? xbname : Anope::string(xbchar);
+			param = Anope::printf("~%s:%s", prefix.c_str(), param.c_str());
+			return ChannelModeVirtual<ChannelModeList>::Wrap(param);
+		}
 
-namespace UnrealExtban
-{
+		ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) override
+		{
+			// The mask must be in the format ~<letter>:<value> or ~<name>:<value>.
+			if (cm->type != MODE_LIST)
+				return cm;
+
+			Anope::string name, value;
+			if (!IsExtBan(param, name, value))
+				return cm;
+
+			if (name.length() == 1 ? name[0] != xbchar : name != xbname)
+				return cm;
+
+			param = value;
+			return this;
+
+		}
+	};
+
 	class ChannelMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-		ChannelMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		ChannelMatcher()
+			: Base("CHANNELBAN", "channel", 'c')
 		{
 		}
 
@@ -510,10 +540,11 @@ namespace UnrealExtban
 	};
 
 	class EntryMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-		EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		EntryMatcher(const Anope::string &mname, const Anope::string &uname, char uchar)
+			: Base(mname, uname, uchar)
 		{
 		}
 
@@ -524,10 +555,11 @@ namespace UnrealExtban
 	};
 
 	class RealnameMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-		RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		RealnameMatcher()
+			: Base("REALNAMEBAN", "realname", 'r')
 		{
 		}
 
@@ -537,25 +569,12 @@ namespace UnrealExtban
 		}
 	};
 
-	class RegisteredMatcher final
-		: public UnrealExtBan
-	{
-	public:
-		RegisteredMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
-		{
-		}
-
-		bool Matches(User *u, const Entry *e) override
-		{
-			return u->HasMode("REGISTERED") && e->GetMask().equals_ci(u->nick);
-		}
-	};
-
 	class AccountMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-		AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		AccountMatcher()
+			: Base("ACCOUNTBAN", "account", 'a')
 		{
 		}
 
@@ -569,10 +588,11 @@ namespace UnrealExtban
 	};
 
 	class FingerprintMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-		FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		FingerprintMatcher()
+			: Base("SSLBAN", "certfp", 'S')
 		{
 		}
 
@@ -583,10 +603,11 @@ namespace UnrealExtban
 	};
 
 	class OperclassMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-	 	OperclassMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		OperclassMatcher()
+			: Base("OPERCLASSBAN", "operclass", 'O')
 		{
 		}
 
@@ -598,10 +619,11 @@ namespace UnrealExtban
 	};
 
 	class TimedBanMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-	 	TimedBanMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		TimedBanMatcher()
+			: Base("TIMEDBAN", "time", 't')
 		{
 		}
 
@@ -615,10 +637,11 @@ namespace UnrealExtban
 	};
 
 	class CountryMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-	 	CountryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+	 	CountryMatcher()
+	 		: Base("COUNTRYBAN", "country", 'C')
 		{
 		}
 
@@ -819,17 +842,16 @@ struct IRCDMessageCapab final
 						case 'b':
 							ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
 
-							ModeManager::AddChannelMode(new UnrealExtban::ChannelMatcher("CHANNELBAN", "BAN", 'c'));
-							ModeManager::AddChannelMode(new UnrealExtban::EntryMatcher("JOINBAN", "BAN", 'j'));
-							ModeManager::AddChannelMode(new UnrealExtban::EntryMatcher("NONICKBAN", "BAN", 'n'));
-							ModeManager::AddChannelMode(new UnrealExtban::EntryMatcher("QUIET", "BAN", 'q'));
-							ModeManager::AddChannelMode(new UnrealExtban::RealnameMatcher("REALNAMEBAN", "BAN", 'r'));
-							ModeManager::AddChannelMode(new UnrealExtban::RegisteredMatcher("REGISTEREDBAN", "BAN", 'R'));
-							ModeManager::AddChannelMode(new UnrealExtban::AccountMatcher("ACCOUNTBAN", "BAN", 'a'));
-							ModeManager::AddChannelMode(new UnrealExtban::FingerprintMatcher("SSLBAN", "BAN", 'S'));
-							ModeManager::AddChannelMode(new UnrealExtban::TimedBanMatcher("TIMEDBAN", "BAN", 't'));
-							ModeManager::AddChannelMode(new UnrealExtban::OperclassMatcher("OPERCLASSBAN", "BAN", 'O'));
-							ModeManager::AddChannelMode(new UnrealExtban::CountryMatcher("COUNTRYBAN", "BAN", 'C'));
+							ModeManager::AddChannelMode(new UnrealExtBan::ChannelMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("JOINBAN", "join", 'j'));
+							ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("NONICKBAN", "nickchange", 'n'));
+							ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("QUIET", "quiet", 'q'));
+							ModeManager::AddChannelMode(new UnrealExtBan::RealnameMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::AccountMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::FingerprintMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::TimedBanMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::OperclassMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::CountryMatcher());
 							continue;
 						case 'e':
 							ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));

@@ -637,6 +637,17 @@ public:
 		}
 	}
 
+	void SendOper(User *u) override
+	{
+		if (spanningtree_proto_ver < 1206)
+			return; // We can't force an oper on this version.
+
+		const Anope::map<Anope::string> tags = {
+			{ "~automatic", "" },
+		};
+		Uplink::Send(tags, "SVSOPER", u->GetUID(), u->Account()->o->ot->GetName());
+	}
+
 	bool IsExtbanValid(const Anope::string &mask) override
 	{
 		bool inverted;

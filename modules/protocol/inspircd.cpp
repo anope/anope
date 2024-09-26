@@ -102,7 +102,7 @@ class InspIRCdProto final
 private:
 	static Anope::string GetAccountNicks(NickAlias* na)
 	{
-		if (!na)
+		if (!na || Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 			return {};
 
 		Anope::string nicks;

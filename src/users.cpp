@@ -383,11 +383,11 @@ void User::Identify(NickAlias *na)
 				IRCD->SendOper(this);
 
 			this->SetModes(NULL, this->nc->o->ot->modes);
-			this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
+			this->SendMessage(NULL, _("Changing your usermodes to \002%s\002"), this->nc->o->ot->modes.c_str());
 		}
 		if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 		{
-			this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
+			this->SendMessage(NULL, _("Changing your vhost to \002%s\002"), this->nc->o->vhost.c_str());
 			this->SetDisplayedHost(this->nc->o->vhost);
 			IRCD->SendVHost(this, "", this->nc->o->vhost);
 		}
@@ -554,11 +554,11 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 					IRCD->SendOper(this);
 
 				this->SetModes(NULL, this->nc->o->ot->modes);
-				this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
+				this->SendMessage(NULL, _("Changing your usermodes to \002%s\002"), this->nc->o->ot->modes.c_str());
 			}
 			if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 			{
-				this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
+				this->SendMessage(NULL, _("Changing your vhost to \002%s\002"), this->nc->o->vhost.c_str());
 				this->SetDisplayedHost(this->nc->o->vhost);
 				IRCD->SendVHost(this, "", this->nc->o->vhost);
 			}

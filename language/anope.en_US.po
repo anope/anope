@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-18 03:16+0100\n"
-"PO-Revision-Date: 2024-08-18 03:17+0100\n"
+"POT-Creation-Date: 2024-09-26 13:24+0100\n"
+"PO-Revision-Date: 2024-09-26 13:25+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -2956,6 +2956,14 @@ msgstr ""
 "access list (with the highest access, if applicable) will\n"
 "become the new founder, but if the access list is empty, the\n"
 "channel will be dropped."
+
+#, c-format
+msgid "Changing your usermodes to %s"
+msgstr "Changing your usermodes to %s"
+
+#, c-format
+msgid "Changing your vhost to %s"
+msgstr "Changing your vhost to %s"
 
 msgid "Channel"
 msgstr "Channel"
@@ -8493,6 +8501,10 @@ msgstr "You may not change the email of other Services Operators."
 
 msgid "You may not change the password of other Services Operators."
 msgstr "You may not change the password of other Services Operators."
+
+#, c-format
+msgid "You may not drop %s as it is the display nick for the account."
+msgstr "You may not drop %s as it is the display nick for the account."
 
 msgid "You may not drop other Services Operators' nicknames."
 msgstr "You may not drop other Services Operators' nicknames."

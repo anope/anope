@@ -102,36 +102,36 @@ class JSONIdentifyRequest : public IdentifyRequest
 	Reference<HTTPClient> client;
 	Reference<JSONServiceInterface> xinterface;
 
- public:
+public:
 	JSONIdentifyRequest(Module *m, JSONRequest& req, HTTPClient *c, JSONServiceInterface* iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() 
 	{
 		if (!xinterface || !client)
-        {
+    {
 			return;
-        }
+    }
 
 		JSONTicket new_ticket;
-        request.r = this->repl;
+    request.r = this->repl;
 
-        xinterface->ticketiface.createTicket(new_ticket, GetAccount().c_str());
+    xinterface->ticketiface.createTicket(new_ticket, GetAccount().c_str());
 
 		request.reply("result", "success");
 		request.reply("account", GetAccount());
-        request.reply("ticket", new_ticket.ticket.c_str());
-        request.reply("expires", std::to_string((long)new_ticket.expire));
+    request.reply("ticket", new_ticket.ticket.c_str());
+    request.reply("expires", std::to_string((long)new_ticket.expire));
 
 		xinterface->Reply(request);
 		client->SendReply(&request.r);
 	}
 
-	void OnFail() anope_override
+	void OnFail() 
 	{
 		if (!xinterface || !client)
-        {
+    {
 			return;
-        }
+    }
 
 		request.r = this->repl;
 
@@ -145,55 +145,55 @@ class JSONIdentifyRequest : public IdentifyRequest
 class MyJSONEvent : public JSONEvent
 {
 public:
-	bool Run(JSONServiceInterface *iface, HTTPClient *client, JSONRequest &request) anope_override
+	bool Run(JSONServiceInterface *iface, HTTPClient *client, JSONRequest &request) 
 	{
-        // we at the very least need a method
-        if (!request.data.contains("method"))
-        {
-            request.reply("error", "Missing or malformed data.");
-            return false;
-        }
+    // we at the very least need a method
+    if (!request.data.contains("method"))
+    {
+      request.reply("error", "Missing or malformed data.");
+      return false;
+    }
 
-        if (request.data["method"] == "auth")
+    if (request.data["method"] == "auth")
+    {
+      // don't worry about ticket check we are authing
+      return this->DoCheckAuthentication(iface, client, request);
+    }
+    else
+  {
+      // make sure we have ticket object with both ticket id, and nickname
+      if (!request.data.contains("ticket") 
+        || request.data["ticket"]["ticket"].empty() 
+        || request.data["ticket"]["username"].empty())
+      {
+        request.reply("error", "Invalid auth ticket.");
+        return true;
+      }
+
+      if (request.data["method"] == "validate")
+      {
+        this->DoAuthValidation(iface, client, request);
+      }
+      else
+    {
+        Anope::string user = request.data["ticket"]["username"].get_ref<std::string&>().c_str();
+
+        // validate the ticket
+        if (iface->ticketiface.validateTicket(request.data["ticket"]["ticket"], request.data["ticket"]["username"]))
         {
-            // don't worry about ticket check we we are authing
-            return this->DoCheckAuthentication(iface, client, request);
+          // run the command
+          if (request.data["method"] == "command")
+          {
+            this->DoCommand(iface, client, request);
+          }
         }
         else
-        {
-            // make sure we have ticket object with both ticket id, and nickname
-            if (!request.data.contains("ticket") 
-                || request.data["ticket"]["ticket"].empty() 
-                || request.data["ticket"]["username"].empty())
-            {
-                request.reply("error", "Invalid auth ticket.");
-                return true;
-            }
-
-            if (request.data["method"] == "validate")
-            {
-                this->DoAuthValidation(iface, client, request);
-            }
-            else
-            {
-                Anope::string user = request.data["ticket"]["username"].get_ref<std::string&>().c_str();
-
-                // validate the ticket
-                if (iface->ticketiface.validateTicket(request.data["ticket"]["ticket"], request.data["ticket"]["username"]))
-                {
-                    // run the command
-                    if (request.data["method"] == "command")
-                    {
-                        this->DoCommand(iface, client, request);
-                    }
-                }
-                else
-                {
-                    request.reply("error", "Invalid auth ticket.");
-                    return true;
-                }
-            }
+      {
+          request.reply("error", "Invalid auth ticket.");
+          return true;
         }
+      }
+    }
 
 		return true;
 	}
@@ -201,33 +201,33 @@ public:
 private:
 	void DoCommand(JSONServiceInterface *iface, HTTPClient *client, JSONRequest &request)
 	{
-        Anope::string service = request.data.contains("service") ? request.data["service"].get_ref<std::string&>().c_str() : "";
+    Anope::string service = request.data.contains("service") ? request.data["service"].get_ref<std::string&>().c_str() : "";
 		Anope::string command = request.data.contains("command") ? request.data["command"].get_ref<std::string&>().c_str() : "";
-        Anope::string user = request.data.contains("ticket") ? request.data["ticket"]["username"].get_ref<std::string&>().c_str() : "";
-        Anope::string params = "";
+    Anope::string user = request.data.contains("ticket") ? request.data["ticket"]["username"].get_ref<std::string&>().c_str() : "";
+    Anope::string params = "";
 
-        // if we have params
-        if (request.data.contains("params") && request.data["params"].is_array())
-        {
-            std::string p = " " + std::accumulate(request.data["params"].begin(), request.data["params"].end(), std::string(),
-                [](const std::string& a, const std::string& b) {
-                    return a + (a.empty() ? "" : " ") + b;
-                });
+    // if we have params
+    if (request.data.contains("params") && request.data["params"].is_array())
+    {
+      std::string p = " " + std::accumulate(request.data["params"].begin(), request.data["params"].end(), std::string(),
+                														[](const std::string& a, const std::string& b) {
+                    												return a + (a.empty() ? "" : " ") + b;
+                														});
 
-            params = p.c_str();
-        }
+      params = p.c_str();
+    }
 
 		if (service.empty() || user.empty() || command.empty())
-        {
+    {
 			request.reply("error", "Invalid parameters");
-        }
+    }
 		else
 		{
 			BotInfo *bi = BotInfo::Find(service, true);
 			if (!bi)
-            {
+      {
 				request.reply("error", "Invalid service");
-            }
+      }
 			else
 			{
 				request.reply("result", "success");
@@ -235,62 +235,62 @@ private:
 				NickAlias *na = NickAlias::Find(user);
 				Anope::string out;
 
-				struct JSONommandReply : CommandReply
+				struct JSONCommandReply : CommandReply
 				{
 					Anope::string &str;
-					JSONommandReply(Anope::string &s) : str(s) { }
+					JSONCommandReply(Anope::string &s) : str(s) { }
 
-					void SendMessage(BotInfo *, const Anope::string &msg) anope_override
+					void SendMessage(BotInfo *, const Anope::string &msg) 
 					{
 						str += msg + "\n";
 					};
 				}
 				reply(out);
 
-                User *u = User::Find(user, true);
+        User *u = User::Find(user, true);
 				CommandSource source(user, u, na ? *na->nc : NULL, &reply, bi);
 				Command::Run(source, command + params);
 
 				if (!out.empty())
-                {
+        {
 					request.reply("return", iface->Sanitize(out));
-                }
+        }
 			}
 		}
 	}
 
 	bool DoCheckAuthentication(JSONServiceInterface *iface, HTTPClient *client, JSONRequest &request)
 	{
-        Anope::string username = request.data.contains("username") ? request.data["username"].get_ref<std::string&>().c_str() : "";
+    Anope::string username = request.data.contains("username") ? request.data["username"].get_ref<std::string&>().c_str() : "";
 		Anope::string password = request.data.contains("password") ? request.data["password"].get_ref<std::string&>().c_str() : "";
 
 		if (username.empty() || password.empty())
-        {
+    {
 			request.reply("error", "Invalid parameters");
-        }
+    }
 		else
-		{
+	{
 			JSONIdentifyRequest *req = new JSONIdentifyRequest(me, request, client, iface, username, password);
 			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
-            req->Dispatch();
+      req->Dispatch();
 			return false;
 		}
 
 		return true;
 	}
 
-    void DoAuthValidation(JSONServiceInterface *iface, HTTPClient *client, JSONRequest &request)
+  void DoAuthValidation(JSONServiceInterface *iface, HTTPClient *client, JSONRequest &request)
+  {
+    Anope::string ticket = request.data["ticket"]["ticket"].get_ref<std::string&>().c_str();
+    Anope::string username = request.data["ticket"]["username"].get_ref<std::string&>().c_str();
+
+    if (iface->ticketiface.validateTicket(ticket.c_str(), username.c_str()))
     {
-        Anope::string ticket = request.data["ticket"]["ticket"].get_ref<std::string&>().c_str();
-        Anope::string username = request.data["ticket"]["username"].get_ref<std::string&>().c_str();
-
-        if (iface->ticketiface.validateTicket(ticket.c_str(), username.c_str()))
-        {
-            request.reply("valid", "true");
-        }
-
-        request.reply("valid", "false");
+      request.reply("valid", "true");
     }
+
+    request.reply("valid", "false");
+  }
 };
 
 class ModuleJSONMain : public Module
@@ -304,9 +304,9 @@ public:
 		me = this;
 
 		if (!json)
-        {
+    {
 			throw ModuleException("Unable to find api reference, is m_api loaded?");
-        }
+    }
 
 		json->Register(&stats);
 	}
@@ -314,9 +314,9 @@ public:
 	~ModuleJSONMain()
 	{
 		if (json)
-        {
-            json->Unregister(&stats);
-        }
+    {
+      json->Unregister(&stats);
+    }
 	}
 };
 

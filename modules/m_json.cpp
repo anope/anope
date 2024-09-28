@@ -97,51 +97,51 @@
 
 class MyJSONServiceInterface : public JSONServiceInterface, public HTTPPage
 {
-    std::deque<JSONEvent *> events;
+  std::deque<JSONEvent *> events;
 
 public:
 
 	MyJSONServiceInterface(Module *creator, const Anope::string &sname) :
-        JSONServiceInterface(creator, sname),
-        HTTPPage("/api", "application/json")
-    {}
+    JSONServiceInterface(creator, sname),
+    HTTPPage("/api", "application/json")
+  {}
 
-	void Register(JSONEvent *event) anope_override
+	void Register(JSONEvent *event)
 	{
 		this->events.push_back(event);
 	}
 
-	void Unregister(JSONEvent *event) anope_override
+	void Unregister(JSONEvent *event)
 	{
 		std::deque<JSONEvent *>::iterator it = std::find(this->events.begin(), this->events.end(), event);
 
 		if (it != this->events.end())
-        {
-		    this->events.erase(it);
-        }
+    {
+		  this->events.erase(it);
+    }
 	}
 
-	Anope::string Sanitize(const Anope::string &string) anope_override
+	Anope::string Sanitize(const Anope::string &string)
 	{
 		Anope::string ret = string;
 		return ret;
 	}
-    
-	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) anope_override
+
+	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
 	{
 		Anope::string content = message.content;
 		JSONRequest request(reply);
 
-        GetData(content, request.data);
+    GetData(content, request.data);
 
 		for (unsigned i = 0; i < this->events.size(); ++i)
 		{
 			JSONEvent *e = this->events[i];
 
 			if (!e->Run(this, client, request))
-            {
+      {
 				return false;
-            }
+      }
 			else if (!request.get_replies().empty())
 			{
 				this->Reply(request);
@@ -154,34 +154,34 @@ public:
 		return true;
 	}
 
-	void Reply(JSONRequest &request) anope_override
+	void Reply(JSONRequest &request)
 	{
-        nlohmann::json r;
-        
+    nlohmann::json r;
+
 		if (!request.id.empty())
-        {
-            r["id"] = request.id.c_str();
-        }
+    {
+      r["id"] = request.id.c_str();
+    }
 
-        for (auto const& [k, v]: request.get_replies())
-        {
-            r[k.c_str()] = v.c_str();
-        }
+    for (auto const& [k, v]: request.get_replies())
+    {
+      r[k.c_str()] = v.c_str();
+    }
 
-        request.r.Write(r.dump());
+    request.r.Write(r.dump());
 	}
 
 private:
 
-    static bool GetData(Anope::string &content, nlohmann::json &data)
+  static bool GetData(Anope::string &content, nlohmann::json &data)
 	{
 		if (content.empty())
-        {
+    {
 			return false;
-        }
+    }
 
-        data = nlohmann::json::parse(content);
-        return true;
+    data = nlohmann::json::parse(content);
+    return true;
 	}
 };
 
@@ -193,31 +193,31 @@ public:
 	MyJSONServiceInterface jsoninterface;
 
 	ModuleJSON(const Anope::string &modname, const Anope::string &creator) :
-        Module(modname, creator, EXTRA),
+    Module(modname, creator, EXTRA),
 		jsoninterface(this, "json")
 	{}
 
 	~ModuleJSON()
 	{
 		if (httpref)
-        {
+    {
 			httpref->UnregisterPage(&jsoninterface);
-        }
+    }
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf)
 	{
 		if (httpref)
-        {
+    {
 			httpref->UnregisterPage(&jsoninterface);
-        }
+    }
 
 		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf->GetModule(this)->Get<const Anope::string>("server", "httpd/main"));
 
 		if (!httpref)
-        {
+    {
 			throw ConfigException("Unable to find http reference, is m_httpd loaded?");
-        }
+    }
 
 		httpref->RegisterPage(&jsoninterface);
 	}

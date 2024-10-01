@@ -1,6 +1,12 @@
 Anope Version 2.1.9-git
 -----------------------
-No significant changes.
+Bumped the minimum supported version of UnrealIRCd to 6.
+Fixed granting IRC operator status to services operators.
+Fixed making users an IRC operator on InspIRCd.
+Fixed nonicknameownership on InspIRCd v4.
+Fixed some messages not being translatable.
+Fixed the Argon2 module not having test vectors.
+Increased the default nickname expiry period to one year.
 
 Anope Version 2.1.8
 -------------------

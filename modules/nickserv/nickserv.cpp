@@ -486,7 +486,7 @@ public:
 				"Services Operators can also drop any nickname without needing\n"
 				"to identify for the nick, and may view the access list for\n"
 				"any nickname."));
-		time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire", "90d");
+		time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire", "1y");
 		if (nickserv_expire >= 86400)
 			source.Reply(_(" \n"
 				"Accounts that are not used anymore are subject to\n"
@@ -554,7 +554,7 @@ public:
 	{
 		if (!na->nc->HasExt("UNCONFIRMED"))
 		{
-			time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire", "90d");
+			time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire", "1y");
 			if (!na->HasExt("NS_NO_EXPIRE") && nickserv_expire && !Anope::NoExpire && (source.HasPriv("nickserv/auspex") || na->last_seen != Anope::CurTime))
 				info[_("Expires")] = Anope::strftime(na->last_seen + nickserv_expire, source.GetAccount());
 		}

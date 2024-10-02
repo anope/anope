@@ -2056,15 +2056,6 @@ struct IRCDMessageFJoin final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		Anope::string modes;
-		if (params.size() >= 3)
-		{
-			for (unsigned i = 2; i < params.size() - 1; ++i)
-				modes += " " + params[i];
-			if (!modes.empty())
-				modes.erase(modes.begin());
-		}
-
 		std::list<Message::Join::SJoinUser> users;
 
 		spacesepstream sep(params[params.size() - 1]);
@@ -2102,7 +2093,7 @@ struct IRCDMessageFJoin final
 		}
 
 		auto ts = IRCD->ExtractTimestamp(params[1]);
-		Message::Join::SJoin(source, params[0], ts, modes, users);
+		Message::Join::SJoin(source, params[0], ts, params[2], { params.begin() + 3, params.end() - 1 }, users);
 	}
 };
 
@@ -2114,15 +2105,10 @@ struct IRCDMessageFMode final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		/* :source FMODE #test 12345678 +nto foo */
-
-		Anope::string modes = params[2];
-		for (unsigned n = 3; n < params.size(); ++n)
-			modes += " " + params[n];
-
 		Channel *c = Channel::Find(params[0]);
 		auto ts = IRCD->ExtractTimestamp(params[1]);
 		if (c)
-			c->SetModesInternal(source, modes, ts);
+			c->SetModesInternal(source, params[2], { params.begin() + 3, params.end() }, ts);
 	}
 };
 
@@ -2198,7 +2184,7 @@ struct IRCDMessageIJoin final
 
 		std::list<Message::Join::SJoinUser> users;
 		users.push_back(user);
-		Message::Join::SJoin(source, params[0], chants, "", users);
+		Message::Join::SJoin(source, params[0], chants, "", {}, users);
 	}
 };
 
@@ -2250,12 +2236,8 @@ struct IRCDMessageMode final
 		{
 			Channel *c = Channel::Find(params[0]);
 
-			Anope::string modes = params[1];
-			for (unsigned n = 2; n < params.size(); ++n)
-				modes += " " + params[n];
-
 			if (c)
-				c->SetModesInternal(source, modes);
+				c->SetModesInternal(source, params[2], { params.begin() + 3, params.end() });
 		}
 		else
 		{

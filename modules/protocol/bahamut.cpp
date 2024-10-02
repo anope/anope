@@ -312,12 +312,8 @@ struct IRCDMessageMode final
 			Channel *c = Channel::Find(params[0]);
 			auto ts = IRCD->ExtractTimestamp(params[1]);
 
-			Anope::string modes = params[2];
-			for (unsigned int i = 3; i < params.size(); ++i)
-				modes += " " + params[i];
-
 			if (c)
-				c->SetModesInternal(source, modes, ts);
+				c->SetModesInternal(source, params[2], { params.begin() + 3, params.end() }, ts);
 		}
 		else
 		{
@@ -400,11 +396,12 @@ struct IRCDMessageSJoin final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		Anope::string modes;
+		std::vector<Anope::string> modeparams;
 		if (params.size() >= 4)
-			for (unsigned i = 2; i < params.size(); ++i)
-				modes += " " + params[i];
-		if (!modes.empty())
-			modes.erase(modes.begin());
+		{
+			modes = params[2];
+			modeparams = { params.begin() + 3, params.end() };
+		}
 
 		std::list<Message::Join::SJoinUser> users;
 
@@ -445,7 +442,7 @@ struct IRCDMessageSJoin final
 		}
 
 		auto ts = IRCD->ExtractTimestamp(params[0]);
-		Message::Join::SJoin(source, params[1], ts, modes, users);
+		Message::Join::SJoin(source, params[1], ts, modes, modeparams, users);
 	}
 };
 

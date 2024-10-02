@@ -1147,10 +1147,7 @@ struct IRCDMessageMode final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		auto final_is_ts = server_ts && source.GetServer() != NULL;
-
-		Anope::string modes = params[1];
-		for (unsigned i = 2; i < params.size() - (final_is_ts ? 1 : 0); ++i)
-			modes += " " + params[i];
+		auto last_param = params.end() - (final_is_ts ? 1 : 0);
 
 		if (IRCD->IsChannelValid(params[0]))
 		{
@@ -1158,7 +1155,7 @@ struct IRCDMessageMode final
 			auto ts = final_is_ts ? IRCD->ExtractTimestamp(params.back()) : 0;
 
 			if (c)
-				c->SetModesInternal(source, modes, ts);
+				c->SetModesInternal(source, params[2], { params.begin() + 3, last_param }, ts);
 		}
 		else
 		{
@@ -1420,11 +1417,12 @@ struct IRCDMessageSJoin final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		Anope::string modes;
+		std::vector<Anope::string> modeparams;
 		if (params.size() >= 4)
-			for (unsigned i = 2; i < params.size() - 1; ++i)
-				modes += " " + params[i];
-		if (!modes.empty())
-			modes.erase(modes.begin());
+		{
+			modes = params[2];
+			modeparams = { params.begin() + 3, params.end() };
+		}
 
 		std::list<Anope::string> bans, excepts, invites;
 		std::list<Message::Join::SJoinUser> users;
@@ -1474,7 +1472,7 @@ struct IRCDMessageSJoin final
 		}
 
 		auto ts = IRCD->ExtractTimestamp(params[0]);
-		Message::Join::SJoin(source, params[1], ts, modes, users);
+		Message::Join::SJoin(source, params[1], ts, modes, modeparams, users);
 
 		if (!bans.empty() || !excepts.empty() || !invites.empty())
 		{

@@ -611,13 +611,13 @@ void Channel::SetModes(BotInfo *bi, bool enforce_mlock, const Anope::string &cmo
 	}
 }
 
-void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode, time_t ts, bool enforce_mlock)
+void Channel::SetModesInternal(MessageSource &source, const Anope::string &modes, const std::vector<Anope::string> &params, time_t ts, bool enforce_mlock)
 {
 	if (!ts)
 		;
 	else if (ts > this->creation_time)
 	{
-		Log(LOG_DEBUG) << "Dropping mode " << mode << " on " << this->name << ", " << ts << " > " << this->creation_time;
+		Log(LOG_DEBUG) << "Dropping mode " << modes << " on " << this->name << ", " << ts << " > " << this->creation_time;
 		return;
 	}
 	else if (ts < this->creation_time)
@@ -631,20 +631,18 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 	/* Removing channel modes *may* delete this channel */
 	Reference<Channel> this_reference(this);
 
-	spacesepstream sep_modes(mode);
-	Anope::string m;
-
-	sep_modes.GetToken(m);
-
 	Anope::string modestring;
 	Anope::string paramstring;
 	int add = -1;
 	bool changed = false;
-	for (unsigned int i = 0, end = m.length(); i < end && this_reference; ++i)
+	auto paramit = params.begin();
+	for (const auto mchar : modes)
 	{
-		ChannelMode *cm;
+		if (!this_reference)
+			break;
 
-		switch (m[i])
+		ChannelMode *cm;
+		switch (mchar)
 		{
 			case '+':
 				modestring += '+';
@@ -657,10 +655,10 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 			default:
 				if (add == -1)
 					continue;
-				cm = ModeManager::FindChannelModeByChar(m[i]);
+				cm = ModeManager::FindChannelModeByChar(mchar);
 				if (!cm)
 				{
-					Log(LOG_DEBUG) << "Channel::SetModeInternal: Unknown mode char " << m[i];
+					Log(LOG_DEBUG) << "Channel::SetModeInternal: Unknown mode char " << mchar;
 					continue;
 				}
 				modestring += cm->mchar;
@@ -686,9 +684,9 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 				continue;
 			}
 		}
-		Anope::string token;
-		if (sep_modes.GetToken(token))
+		if (paramit != params.end())
 		{
+			auto token = *paramit++;
 			User *u = NULL;
 			if (cm->type == MODE_STATUS && (u = User::Find(token)))
 				paramstring += " " + u->nick;
@@ -703,7 +701,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 				this->RemoveModeInternal(source, cm, token, enforce_mlock);
 		}
 		else
-			Log() << "warning: Channel::SetModesInternal() received more modes requiring params than params, modes: " << mode;
+			Log() << "warning: Channel::SetModesInternal() received more modes requiring params than params, modes: " << modes;
 	}
 
 	if (!this_reference)

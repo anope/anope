@@ -98,11 +98,11 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 		users.emplace_back(ChannelStatus(), user);
 
 		Channel *chan = Channel::Find(channel);
-		SJoin(source, channel, chan ? chan->creation_time : Anope::CurTime, "", users);
+		SJoin(source, channel, chan ? chan->creation_time : Anope::CurTime, "", {}, users);
 	}
 }
 
-void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, const Anope::string &modes, const std::list<SJoinUser> &users)
+void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, const Anope::string &modes, const std::vector<Anope::string> &modeparams, const std::list<SJoinUser> &users)
 {
 	bool created;
 	Channel *c = Channel::FindOrCreate(chan, created, ts ? ts : Anope::CurTime);
@@ -128,7 +128,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		/* If we are syncing, mlock is checked later in Channel::Sync. It is important to not check it here
 		 * so that Channel::SetCorrectModes can correctly detect the presence of channel mode +r.
 		 */
-		c->SetModesInternal(source, modes, ts, !c->syncing);
+		c->SetModesInternal(source, modes, modeparams, ts, !c->syncing);
 
 	for (const auto &[status, u] : users)
 	{
@@ -223,7 +223,7 @@ void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> 
 		Channel *c = Channel::Find(params[0]);
 
 		if (c)
-			c->SetModesInternal(source, buf.substr(1), 0);
+			c->SetModesInternal(source, params[1], { params.begin() + 2, params.end() });
 	}
 	else
 	{

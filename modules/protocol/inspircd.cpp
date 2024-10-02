@@ -102,7 +102,7 @@ class InspIRCdProto final
 private:
 	static Anope::string GetAccountNicks(NickAlias* na)
 	{
-		if (!na)
+		if (!na || Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 			return {};
 
 		Anope::string nicks;
@@ -635,6 +635,17 @@ public:
 			su.created = Anope::CurTime;
 			saslusers.push_back(su);
 		}
+	}
+
+	void SendOper(User *u) override
+	{
+		if (spanningtree_proto_ver < 1206)
+			return; // We can't force an oper on this version.
+
+		const Anope::map<Anope::string> tags = {
+			{ "~automatic", "" },
+		};
+		Uplink::Send(tags, "SVSOPER", u->GetUID(), u->Account()->o->ot->GetName());
 	}
 
 	bool IsExtbanValid(const Anope::string &mask) override

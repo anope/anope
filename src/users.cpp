@@ -378,15 +378,16 @@ void User::Identify(NickAlias *na)
 	{
 		if (!this->nc->o->ot->modes.empty())
 		{
-			this->SetModes(NULL, this->nc->o->ot->modes);
-			this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
-			UserMode *um = ModeManager::FindUserModeByName("OPER");
+			auto *um = ModeManager::FindUserModeByName("OPER");
 			if (um && !this->HasMode("OPER") && this->nc->o->ot->modes.find(um->mchar) != Anope::string::npos)
 				IRCD->SendOper(this);
+
+			this->SetModes(NULL, this->nc->o->ot->modes);
+			this->SendMessage(NULL, _("Changing your usermodes to \002%s\002"), this->nc->o->ot->modes.c_str());
 		}
 		if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 		{
-			this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
+			this->SendMessage(NULL, _("Changing your vhost to \002%s\002"), this->nc->o->vhost.c_str());
 			this->SetDisplayedHost(this->nc->o->vhost);
 			IRCD->SendVHost(this, "", this->nc->o->vhost);
 		}
@@ -548,15 +549,16 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 		{
 			if (!this->nc->o->ot->modes.empty())
 			{
-				this->SetModes(NULL, this->nc->o->ot->modes);
-				this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
-				UserMode *oper = ModeManager::FindUserModeByName("OPER");
+				auto *oper = ModeManager::FindUserModeByName("OPER");
 				if (oper && !this->HasMode("OPER") && this->nc->o->ot->modes.find(oper->mchar) != Anope::string::npos)
 					IRCD->SendOper(this);
+
+				this->SetModes(NULL, this->nc->o->ot->modes);
+				this->SendMessage(NULL, _("Changing your usermodes to \002%s\002"), this->nc->o->ot->modes.c_str());
 			}
 			if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 			{
-				this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
+				this->SendMessage(NULL, _("Changing your vhost to \002%s\002"), this->nc->o->vhost.c_str());
 				this->SetDisplayedHost(this->nc->o->vhost);
 				IRCD->SendVHost(this, "", this->nc->o->vhost);
 			}

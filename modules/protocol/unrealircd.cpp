@@ -23,7 +23,10 @@ public:
 	PrimitiveExtensibleItem<ModData> ClientModData;
 	PrimitiveExtensibleItem<ModData> ChannelModData;
 
-	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4+"), ClientModData(creator, "ClientModData"), ChannelModData(creator, "ChannelModData")
+	UnrealIRCdProto(Module *creator)
+		: IRCDProto(creator, "UnrealIRCd 6+")
+		, ClientModData(creator, "ClientModData")
+		, ChannelModData(creator, "ChannelModData")
 	{
 		DefaultPseudoclientModes = "+BioqS";
 		CanSVSNick = true;
@@ -216,21 +219,15 @@ private:
 
 	void SendConnect() override
 	{
-		/*
-		   NICKv2 = Nick Version 2
-		   VHP    = Sends hidden host
-		   UMODE2 = sends UMODE2 on user modes
-		   NICKIP = Sends IP on NICK
-		   SJ3    = Supports SJOIN
-		   NOQUIT = No Quit
-		   TKLEXT = Extended TKL we don't use it but best to have it
-		   MLOCK  = Supports the MLOCK server command
-		   VL     = Version Info
-		   SID    = SID/UID mode
-		*/
 		Uplink::Send("PASS", Config->Uplinks[Anope::CurrentUplink].password);
 
-		Uplink::Send("PROTOCTL", "NICKv2", "VHP", "UMODE2", "NICKIP", "SJOIN", "SJOIN2", "SJ3", "NOQUIT", "TKLEXT", "MLOCK", "SID", "MTAGS", "BIGLINES");
+		// BIGLINES: enable sending lines up to 16384 characters in length.
+		// EAUTH: communicates information about the local server.
+		// MLOCK: enable receiving the MLOCK message when a mode lock changes.
+		// MTAGS: enable receiving IRCv3 message tags.
+		// SID: communicates the unique identifier of the local server.
+		// VHP: enable receiving the vhost in UID.
+		Uplink::Send("PROTOCTL", "BIGLINES", "MLOCK", "MTAGS", "VHP");
 		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
 		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
 
@@ -353,11 +350,8 @@ private:
 
 	void SendLogin(User *u, NickAlias *na) override
 	{
-		/* 3.2.10.4+ treats users logged in with accounts as fully registered, even if -r, so we can not set this here. Just use the timestamp. */
-		if (Servers::Capab.count("ESVID") > 0 && !na->nc->HasExt("UNCONFIRMED"))
+		if (!na->nc->HasExt("UNCONFIRMED"))
 			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", na->nc->display);
-		else
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", u->signon);
 	}
 
 	void SendLogout(User *u) override
@@ -448,9 +442,7 @@ private:
 
 	bool IsTagValid(const Anope::string &tname, const Anope::string &tvalue) override
 	{
-		if (Servers::Capab.count("MTAGS"))
-			return true;
-		return false;
+		return !!Servers::Capab.count("MTAGS");
 	}
 };
 
@@ -1753,8 +1745,6 @@ public:
 	void OnUserNickChange(User *u, const Anope::string &) override
 	{
 		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
-		if (Servers::Capab.count("ESVID") == 0)
-			IRCD->SendLogout(u);
 	}
 
 	void OnChannelSync(Channel *c) override

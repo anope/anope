@@ -107,14 +107,14 @@ protected:
 	 * @param suid The unique identifier of the user.
 	 * @param nc The account the user is identified as, if any
 	 */
-	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
+	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const std::vector<Anope::string> &smodeparams, const Anope::string &suid, NickCore *nc);
 
 	/** Destroy a user.
 	 */
 	virtual ~User();
 
 public:
-	static User *OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
+	static User *OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc, const std::vector<Anope::string> &smodeparams = {});
 
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
@@ -307,9 +307,10 @@ public:
 
 	/** Set a string of modes on a user internally
 	 * @param setter who/what is setting the mode
-	 * @param umodes The modes
+	 * @param umodes The mode letters
+	 * @param umodeparams The mode values
 	 */
-	void SetModesInternal(const MessageSource &source, const Anope::string &umodes);
+	void SetModesInternal(const MessageSource &source, const Anope::string &umodes, const std::vector<Anope::string> &umodeparams = {});
 
 	/** Get modes set for this user.
 	 * @return A string of modes set on the user

@@ -214,10 +214,6 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 
 void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
-	Anope::string buf;
-	for (unsigned i = 1; i < params.size(); ++i)
-		buf += " " + params[i];
-
 	if (IRCD->IsChannelValid(params[0]))
 	{
 		Channel *c = Channel::Find(params[0]);
@@ -230,7 +226,7 @@ void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> 
 		User *u = User::Find(params[0]);
 
 		if (u)
-			u->SetModesInternal(source, buf.substr(1));
+			u->SetModesInternal(source, params[1], { params.begin() + 2, params.end() });
 	}
 }
 

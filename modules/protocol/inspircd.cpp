@@ -2397,10 +2397,6 @@ struct IRCDMessageUID final
 		size_t offset = params[8][0] == '+' ? 0 : 1;
 		auto ts = IRCD->ExtractTimestamp(params[1]);
 
-		Anope::string modes = params[8+offset];
-		for (unsigned i = 9+offset; i < params.size() - 1; ++i)
-			modes += " " + params[i];
-
 		NickAlias *na = NULL;
 		if (SASL::sasl)
 			for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
@@ -2418,7 +2414,7 @@ struct IRCDMessageUID final
 					++it;
 			}
 
-		User *u = User::OnIntroduce(params[2], params[5+offset], params[3], params[4], params[6+offset], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? *na->nc : NULL);
+		auto *u = User::OnIntroduce(params[2], params[5+offset], params[3], params[4], params[6+offset], source.GetServer(), params[params.size() - 1], ts, params[8 + offset], params[0], na ? *na->nc : NULL, { params.begin() + 9 + offset, params.end() - 1 });
 		if (u)
 			u->signon = IRCD->ExtractTimestamp(params[7+offset]);
 	}

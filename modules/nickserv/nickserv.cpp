@@ -98,7 +98,7 @@ class NickServRelease final
 
 public:
 	NickServRelease(Module *me, NickAlias *na, time_t delay)
-		: User(na->nick, Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser", "user"), Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost", Me->GetName()), "", "", Me, "Services Enforcer", Anope::CurTime, "", IRCD->UID_Retrieve(), NULL)
+		: User(na->nick, Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser", "user"), Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost", Me->GetName()), "", "", Me, "Services Enforcer", Anope::CurTime, "", {}, IRCD->UID_Retrieve(), NULL)
 		, Timer(me, delay)
 		, nick(na->nick)
 	{

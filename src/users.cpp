@@ -672,17 +672,6 @@ void User::SetModes(BotInfo *bi, const Anope::string &umodes)
 	}
 }
 
-void User::SetModesInternal(const MessageSource &source, const char *umodes, ...)
-{
-	char buf[BUFSIZE] = "";
-	va_list args;
-	va_start(args, umodes);
-	vsnprintf(buf, BUFSIZE - 1, umodes, args);
-	va_end(args);
-
-	SetModesInternal(source, Anope::string(buf));
-}
-
 void User::SetModesInternal(const MessageSource &source, const Anope::string &umodes)
 {
 	if (this->server && this->server->IsSynced() && Anope::string(umodes) != "+")

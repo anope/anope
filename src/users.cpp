@@ -31,7 +31,8 @@ time_t MaxUserTime = 0;
 
 std::list<User *> User::quitting_users;
 
-User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &uip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *account) : ip(uip)
+User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &uip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const std::vector<Anope::string> &smodeparams, const Anope::string &suid, NickCore *account)
+	: ip(uip)
 {
 	if (snick.empty() || sident.empty() || shost.empty())
 		throw CoreException("Bad args passed to User::User");
@@ -49,7 +50,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->server = sserver;
 	this->realname = srealname;
 	this->timestamp = this->signon = ts;
-	this->SetModesInternal(sserver, smodes);
+	this->SetModesInternal(sserver, smodes, smodeparams);
 	this->uid = suid;
 	this->super_admin = false;
 	this->nc = NULL;
@@ -110,7 +111,7 @@ static void Collide(User *u, const Anope::string &id, const Anope::string &type)
 	CollideKill(u, type);
 }
 
-User *User::OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc)
+User *User::OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc, const std::vector<Anope::string> &smodeparams)
 {
 	// How IRCds handle collisions varies a lot, for safety well just always kill both sides
 	// With properly set qlines, this can almost never happen anyway
@@ -132,7 +133,7 @@ User *User::OnIntroduce(const Anope::string &snick, const Anope::string &sident,
 		}
 	}
 
-	return new User(snick, sident, shost, svhost, sip, sserver, srealname, ts, smodes, suid, nc);
+	return new User(snick, sident, shost, svhost, sip, sserver, srealname, ts, smodes, smodeparams, suid, nc);
 }
 
 void User::ChangeNick(const Anope::string &newnick, time_t ts)
@@ -672,27 +673,14 @@ void User::SetModes(BotInfo *bi, const Anope::string &umodes)
 	}
 }
 
-void User::SetModesInternal(const MessageSource &source, const char *umodes, ...)
-{
-	char buf[BUFSIZE] = "";
-	va_list args;
-	va_start(args, umodes);
-	vsnprintf(buf, BUFSIZE - 1, umodes, args);
-	va_end(args);
-
-	SetModesInternal(source, Anope::string(buf));
-}
-
-void User::SetModesInternal(const MessageSource &source, const Anope::string &umodes)
+void User::SetModesInternal(const MessageSource &source, const Anope::string &umodes, const std::vector<Anope::string> &umodeparams)
 {
 	if (this->server && this->server->IsSynced() && Anope::string(umodes) != "+")
 		Log(this, "mode") << "changes modes to " << umodes;
 
 	int add = -1;
-	Anope::string modebuf;
-	spacesepstream sep(umodes);
-	sep.GetToken(modebuf);
-	for (auto mode : modebuf)
+	auto paramit = umodeparams.begin();
+	for (const auto mode : umodes)
 	{
 		UserMode *um;
 
@@ -715,8 +703,8 @@ void User::SetModesInternal(const MessageSource &source, const Anope::string &um
 		if (add)
 		{
 			Anope::string sbuf;
-			if (um->type == MODE_PARAM && sep.GetToken(sbuf))
-				this->SetModeInternal(source, um, sbuf);
+			if (um->type == MODE_PARAM && paramit != umodeparams.end())
+				this->SetModeInternal(source, um, *paramit++);
 			else
 				this->SetModeInternal(source, um);
 		}

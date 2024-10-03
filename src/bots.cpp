@@ -20,7 +20,11 @@
 
 Serialize::Checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", IRCD ? IRCD->UID_Retrieve() : "", NULL), Serializable("BotInfo"), channels("ChannelInfo"), botmodes(bmodes)
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes)
+	: User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", {}, IRCD ? IRCD->UID_Retrieve() : "", NULL)
+	, Serializable("BotInfo")
+	, channels("ChannelInfo")
+	, botmodes(bmodes)
 {
 	this->lastmsg = this->created = Anope::CurTime;
 	this->introduced = false;
@@ -35,9 +39,16 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{
-		Anope::string tmodes = !this->botmodes.empty() ? ("+" + this->botmodes) : IRCD->DefaultPseudoclientModes;
-		if (!tmodes.empty())
-			this->SetModesInternal(this, tmodes);
+		spacesepstream modesep(this->botmodes.empty() ? IRCD->DefaultPseudoclientModes : "+" + this->botmodes);
+
+		Anope::string modechars;
+		modesep.GetToken(modechars);
+
+		std::vector<Anope::string> modeparams;
+		modesep.GetTokens(modeparams);
+
+		if (!modechars.empty())
+			this->SetModesInternal(this, modechars, modeparams);
 
 		XLine x(this->nick, "Reserved for services");
 		IRCD->SendSQLine(NULL, &x);

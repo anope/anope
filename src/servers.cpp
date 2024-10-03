@@ -50,9 +50,15 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 			/* Now do mode related stuff as we know what modes exist .. */
 			for (auto &[_, bi] : *BotListByNick)
 			{
-				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : IRCD->DefaultPseudoclientModes;
+				spacesepstream modesep(bi->botmodes.empty() ? IRCD->DefaultPseudoclientModes : "+" + bi->botmodes);
 
-				bi->SetModesInternal(bi, modes);
+				Anope::string modechars;
+				modesep.GetToken(modechars);
+
+				std::vector<Anope::string> modeparams;
+				modesep.GetTokens(modeparams);
+
+				bi->SetModesInternal(bi, modechars, modeparams);
 				for (const auto &botchannel : bi->botchannels)
 				{
 					size_t h = botchannel.find('#');

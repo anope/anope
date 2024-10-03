@@ -215,7 +215,7 @@ public:
 	 * @param mode the modes
 	 * @param enforce_mlock true to enforce mlock
 	 */
-	void SetModesInternal(MessageSource &source, const Anope::string &mode, time_t ts = 0, bool enforce_mlock = true);
+	void SetModesInternal(MessageSource &source, const Anope::string &modes, const std::vector<Anope::string> &params, time_t ts = 0, bool enforce_mlock = true);
 
 	/** Does the given user match the given list? (CMODE_BAN, CMODE_EXCEPT, etc, a list mode)
 	 * @param u The user

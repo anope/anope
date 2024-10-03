@@ -224,7 +224,7 @@ struct IRCDMessageChaninfo final
 		bool created;
 		Channel *c = Channel::FindOrCreate(params[0], created);
 
-		Anope::string modes = params[1];
+		std::vector<Anope::string> modeparams;
 
 		if (params.size() == 3)
 		{
@@ -237,17 +237,17 @@ struct IRCDMessageChaninfo final
 				switch(params[1][i])
 				{
 					case 'k':
-						modes += " " + params[2];
+						modeparams.push_back(params[2]);
 						continue;
 					case 'l':
-						modes += " " + params[3];
+						modeparams.push_back(params[3]);
 						continue;
 				}
 			}
 			c->ChangeTopicInternal(NULL, source.GetName(), params[4], Anope::CurTime);
 		}
 
-		c->SetModesInternal(source, modes);
+		c->SetModesInternal(source, params[1], modeparams);
 	}
 };
 
@@ -267,11 +267,13 @@ struct IRCDMessageJoin final
 		User *user = source.GetUser();
 		size_t pos = params[0].find('\7');
 		Anope::string channel, modes;
+		std::vector<Anope::string> modeparams;
 
 		if (pos != Anope::string::npos)
 		{
 			channel = params[0].substr(0, pos);
-			modes = '+' + params[0].substr(pos+1, params[0].length()) + " " + user->nick;
+			modes = '+' + params[0].substr(pos+1, params[0].length());
+			modeparams.push_back(user->nick);
 		}
 		else
 		{
@@ -287,7 +289,7 @@ struct IRCDMessageJoin final
 		{
 			Channel *c = Channel::Find(channel);
 			if (c)
-				c->SetModesInternal(source, modes);
+				c->SetModesInternal(source, modes, modeparams);
 		}
 	}
 };
@@ -367,17 +369,12 @@ struct IRCDMessageMode final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		Anope::string modes = params[1];
-
-		for (size_t i = 2; i < params.size(); ++i)
-			modes += " " + params[i];
-
 		if (IRCD->IsChannelValid(params[0]))
 		{
 			Channel *c = Channel::Find(params[0]);
 
 			if (c)
-				c->SetModesInternal(source, modes);
+				c->SetModesInternal(source, params[1], { params.begin() + 2, params.end() });
 		}
 		else
 		{
@@ -485,7 +482,7 @@ struct IRCDMessageNJoin final
 			users.push_back(sju);
 		}
 
-		Message::Join::SJoin(source, params[0], 0, "", users);
+		Message::Join::SJoin(source, params[0], 0, "", {}, users);
 	}
 };
 

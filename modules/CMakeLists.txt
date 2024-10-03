@@ -32,6 +32,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../conanbuildinfo.cmake")
   install(FILES ${EXTRA_DLLS} DESTINATION ${BIN_DIR})
 endif()
 
+# m_api needs this
+find_package(OpenSSL REQUIRED)
+
 macro(build_modules SRC)
   if(NOT ${SRC} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR} AND EXISTS "${SRC}/CMakeLists.txt")
     add_subdirectory("${SRC}")
@@ -72,6 +75,7 @@ macro(build_modules SRC)
           else()
             set(WIN32_NO_LIBS)
           endif()
+
           set_target_properties(${SO} PROPERTIES
             BUILD_WITH_INSTALL_RPATH ON
             FOLDER "Modules"
@@ -85,7 +89,16 @@ macro(build_modules SRC)
           if(HAVE_LOCALIZATION)
             add_dependencies(${SO} module_language)
           endif()
-          target_link_libraries(${SO} ${TEMP_DEPENDENCIES})
+
+          #target_link_libraries(${SO} ${TEMP_DEPENDENCIES})
+          # Conditionally link OpenSSL only for m_api module
+          if(${SO} STREQUAL "anopeapi${CMAKE_SHARED_LIBRARY_SUFFIX}")
+            target_link_libraries(${SO} OpenSSL::SSL OpenSSL::Crypto)
+          else()
+            target_link_libraries(${SO} ${TEMP_DEPENDENCIES})
+          endif()
+          
+
           # For Windows only, have the module link to the export library of Anope as well as wsock32 and Ws2_32 libraries (most of the modules probably don't need this, but this is to be on the safe side), also set its version
           if(WIN32)
             target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY})

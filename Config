@@ -62,7 +62,8 @@ Run_Build_System () {
 	fi
 
 	if [ "$EXTRA_LIB_DIRS" != "" ] ; then
-		EXTRA_LIBS="-DEXTRA_LIBS:STRING=$EXTRA_LIB_DIRS"
+		#EXTRA_LIBS="-DEXTRA_LIBS:STRING=$EXTRA_LIB_DIRS"
+		EXTRA_LIBS="-DEXTRA_LIBS=-lssl -lcrypto"
 	fi
 
 	BUILD_PATHS="-B ${SOURCE_DIR}/build ${SOURCE_DIR}"

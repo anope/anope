@@ -44,6 +44,10 @@ else()
   set(WIN32_MEMORY)
 endif()
 
+# My Addons
+find_package(OpenSSL REQUIRED)
+#target_link_libraries(${PROGRAM_NAME} OpenSSL::SSL OpenSSL::Crypto)
+
 # Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
 add_executable(${PROGRAM_NAME} ${SRC_SRCS})
 set_target_properties(${PROGRAM_NAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS} ${EXTRA_LDFLAGS}" ENABLE_EXPORTS ON INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)

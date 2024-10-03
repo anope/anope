@@ -180,9 +180,11 @@ class AnopeAPIModule final : public Module
   bool allow_registration;
   std::string base_uri;
 
+  const Anope::string& nsregister;
+
 public:
   AnopeAPIModule(const Anope::string& modname, const Anope::string& creator)
-  : Module(modname, creator, VENDOR | EXTRA), router(atoken)
+  : Module(modname, creator, EXTRA), router(atoken)
   {
     server_thread = std::thread([this]() { this->StartServer(); });
     server_thread.detach();
@@ -190,18 +192,24 @@ public:
     Log(LOG_NORMAL, "module") << "Anope API Module - Loaded and API HTTP server started.";
   }
 
-  ~AnopeAPIModule() { api_server.stop(); }
+  ~AnopeAPIModule() override
+  { 
+    api_server.stop();
+  }
 
-  void OnReload(Configuration::Conf* conf)
+  void OnReload(Configuration::Conf* conf) override
   {
     Configuration::Block* block = conf->GetModule(this);
-    this->bind_ip = block->Get<std::string>("bind_ip", "0.0.0.0");
-    this->port = block->Get<int>("port", "8118");
-    this->allow_registration = block->Get<bool>("allow_registration", false);
-    this->base_uri = block->Get<std::string>("base_uri", "");
 
-    // if we need to have a value
-    // throw ConfigException(this->name + " target_ip may not be empty");
+    bind_ip = block->Get<std::string>("bind_ip");
+    if (bind_ip.empty())
+      throw ConfigException(this->name + "bind_ip cannot be empty.");
+
+    port = block->Get<int>("port", "8118");
+    allow_registration = block->Get<bool>("allow_registration", false);
+    base_uri = block->Get<std::string>("base_uri", "");
+    
+    nsregister = Config->GetModule("nickserv")->Get<const Anope::string>("registration");
 
   }
 
@@ -243,6 +251,11 @@ public:
 
     // route: /register
     api_server.Post(base_uri + "/register", [this](const httplib::Request& req, httplib::Response& resp) {
+      if (!allow_registration) {
+        router.SendUnauthorizedResponse(resp);
+        return;
+      }
+
       try {
         nlohmann::json request_data = nlohmann::json::parse(req.body);
 
@@ -254,6 +267,18 @@ public:
           router.SendClientErrorResponse(resp, "Missing required data.");
           return;
         }
+
+        if (Anope::ReadOnly) {
+          router.SendClientErrorResponse(resp, "Anope in read only mode.");
+          return;
+        }
+
+        if (nsregister.equals_ci("disable")) {
+          router.SendClientErrorResponse(resp, "Registration is currently disabled.");
+          return;
+        }
+
+        // stop users from registering Guest nicks
 
 
       } catch(nlohmann::json::exception &e) {

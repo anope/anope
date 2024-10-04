@@ -22,17 +22,11 @@ namespace
 	bool IsExtBan(const Anope::string &str, Anope::string &name, Anope::string &value)
 	{
 		if (str[0] != '~')
-		{
-			Log() << "missing prefix: " << str;
 			return false;
-		}
 
 		auto endpos = str.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", 1);
 		if (endpos == Anope::string::npos || str[endpos] != ':' || endpos+1 == str.length())
-		{
-			Log() << "wrong format: " << str;
 			return false;
-		}
 
 		name = str.substr(1, endpos - 1);
 		value = str.substr(endpos + 1);

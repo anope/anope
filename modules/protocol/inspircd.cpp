@@ -761,10 +761,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-
-			return Entry(this->name, real_mask).Matches(u);
+			return Entry(this->name, e->GetMask()).Matches(u);
 		}
 	};
 
@@ -779,10 +776,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-
-			Anope::string channel = mask.substr(2);
-
+			auto channel = e->GetMask();
 			ChannelMode *cm = NULL;
 			if (channel[0] != '#')
 			{
@@ -817,10 +811,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-
-			return u->IsIdentified() && real_mask.equals_ci(u->Account()->display);
+			return u->IsIdentified() && e->GetMask().equals_ci(u->Account()->display);
 		}
 	};
 
@@ -835,9 +826,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-			return Anope::Match(u->realname, real_mask);
+			return Anope::Match(u->realname, e->GetMask());
 		}
 	};
 
@@ -852,9 +841,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-			return Anope::Match(u->server->GetName(), real_mask);
+			return Anope::Match(u->server->GetName(), e->GetMask());
 		}
 	};
 
@@ -869,9 +856,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, real_mask);
+			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, e->GetMask());
 		}
 	};
 
@@ -886,9 +871,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-			return !u->Account() && Entry("BAN", real_mask).Matches(u);
+			return !u->Account() && Entry("BAN", e->GetMask()).Matches(u);
 		}
 	};
 
@@ -907,9 +890,7 @@ namespace InspIRCdExtBan
 			if (!opertype)
 				return false; // Not an operator.
 
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-			return Anope::Match(opertype->replace_all_cs(' ', '_'), real_mask);
+			return Anope::Match(opertype->replace_all_cs(' ', '_'), e->GetMask());
 		}
 	};
 }

@@ -8,15 +8,18 @@
 #include <thread>
 #include <unordered_map>
 
-class AccessTokens {
-  std::string issuer;
-  std::string secret;
+
+class AccessTokens
+{
+  std::string issuer, secret;
+  int token_life;
 
 public:
   AccessTokens()
   {
-    this->issuer = Config->GetModule("anopeapi")->Get<std::string>("issuer", "AnopeAPI");
-    this->secret = Config->GetModule("anopeapi")->Get<std::string>("secret", "oh-no");
+    issuer = Config->GetModule("anopeapi")->Get<std::string>("issuer", "AnopeAPI");
+    secret = Config->GetModule("anopeapi")->Get<std::string>("secret", "oh-no");
+    token_life = Config->GetModule("anopeapi")->Get<int>("token_life", "36000");
   }
 
   std::string GrantUserToken(const std::string& nickname)
@@ -26,11 +29,10 @@ public:
       .set_issuer(issuer)
       .set_type("JWT")
       .set_issued_now()
-      .set_expires_in(std::chrono::seconds{36000})
+      .set_expires_in(std::chrono::seconds{token_life})
       .set_payload_claim("nickname", jwt::claim(nickname))
       .sign(jwt::algorithm::hs256{generateSecret(nickname)});
-      //.sign(jwt::algorithm::hs256{secret});
-    
+
     return token;
   }
 
@@ -43,7 +45,6 @@ public:
         .with_issuer(issuer)
         .with_type("JWT")
         .allow_algorithm(jwt::algorithm::hs256{generateSecret(nickname)})
-        //.allow_algorithm(jwt::algorithm::hs256{secret})
         .with_claim("nickname", jwt::claim(nickname));
 
       auto decoded_token = jwt::decode(token);
@@ -180,8 +181,6 @@ class AnopeAPIModule final : public Module
   bool allow_registration;
   std::string base_uri;
 
-  const Anope::string& nsregister;
-
 public:
   AnopeAPIModule(const Anope::string& modname, const Anope::string& creator)
   : Module(modname, creator, EXTRA), router(atoken)
@@ -207,9 +206,7 @@ public:
 
     port = block->Get<int>("port", "8118");
     allow_registration = block->Get<bool>("allow_registration", false);
-    base_uri = block->Get<std::string>("base_uri", "");
-    
-    nsregister = Config->GetModule("nickserv")->Get<const Anope::string>("registration");
+    base_uri = block->Get<std::string>("base_uri", "/api");
 
   }
 
@@ -242,44 +239,6 @@ public:
         auto *apireq = new APIIdentifyRequest(this, request_data, resp, nickname, password);
         FOREACH_MOD(OnCheckAuthentication, (NULL, apireq));
         apireq->Dispatch();
-
-      } catch(nlohmann::json::exception &e) {
-        router.SendClientErrorResponse(resp);
-
-      }
-    });
-
-    // route: /register
-    api_server.Post(base_uri + "/register", [this](const httplib::Request& req, httplib::Response& resp) {
-      if (!allow_registration) {
-        router.SendUnauthorizedResponse(resp);
-        return;
-      }
-
-      try {
-        nlohmann::json request_data = nlohmann::json::parse(req.body);
-
-        std::string nickname = request_data.value("nickname", "");
-        std::string password = request_data.value("password", "");
-        std::string email = request_data.value("email", "");
-
-        if (nickname.empty() || password.empty() || email.empty()) {
-          router.SendClientErrorResponse(resp, "Missing required data.");
-          return;
-        }
-
-        if (Anope::ReadOnly) {
-          router.SendClientErrorResponse(resp, "Anope in read only mode.");
-          return;
-        }
-
-        if (nsregister.equals_ci("disable")) {
-          router.SendClientErrorResponse(resp, "Registration is currently disabled.");
-          return;
-        }
-
-        // stop users from registering Guest nicks
-
 
       } catch(nlohmann::json::exception &e) {
         router.SendClientErrorResponse(resp);
@@ -321,7 +280,7 @@ public:
 				Anope::string out;
 
 				struct APICommandReply final
-					: CommandReply
+				: CommandReply
 				{
 					Anope::string& str;
 
@@ -350,10 +309,18 @@ public:
       }
     }));
 
-    Log(LOG_NORMAL, "module") << "Anope API server listening on 0.0.0.0:8118";
-    api_server.listen("0.0.0.0", 8118);
+    try {
+      if (!api_server.listen(bind_ip, port)) {
+        throw std::runtime_error("Failed to bind " + bind_ip + " to port " + std::to_string(port) + ". Another process might be using it.");
+      }
+
+      Log(LOG_NORMAL, "module") << "Anope API server listening on " << bind_ip << ":" << port;
+    } catch (const std::exception &e) {
+      Log(LOG_NORMAL, "module") << "Error starting server: " << e.what();
+    }
   }
 
+  // trim removes whitespace's from anope server respones
   std::string trim(const std::string& str)
   {
     const std::string whitespace = "\n\r\t\f\v";
@@ -363,15 +330,18 @@ public:
     return (start == std::string::npos || end == std::string::npos) ? "" : str.substr(start, end - start + 1);
   }
 
+  // we also have to remove STX characters
   std::string removeControlChars(const std::string& str)
   {
     std::string result;
     std::copy_if(str.begin(), str.end(), std::back_inserter(result),
                  [](char c) { return std::isprint(static_cast<unsigned char>(c)); });
-   
+
     return result;
   }
 
+  // no we split the response by new lines so we can make the vector into
+  // a json array.
   std::vector<std::string> splitAndTrim(const std::string& input)
   {
     std::vector<std::string> result;

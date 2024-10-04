@@ -14,7 +14,31 @@
 #include "modules/sasl.h"
 
 typedef Anope::map<Anope::string> ModData;
-static Anope::string UplinkSID;
+
+namespace
+{
+	Anope::string UplinkSID;
+
+	bool IsExtBan(const Anope::string &str, Anope::string &name, Anope::string &value)
+	{
+		if (str[0] != '~')
+		{
+			Log() << "missing prefix: " << str;
+			return false;
+		}
+
+		auto endpos = str.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", 1);
+		if (endpos == Anope::string::npos || str[endpos] != ':' || endpos+1 == str.length())
+		{
+			Log() << "wrong format: " << str;
+			return false;
+		}
+
+		name = str.substr(1, endpos - 1);
+		value = str.substr(endpos + 1);
+		return true;
+	}
+}
 
 class UnrealIRCdProto final
 	: public IRCDProto
@@ -346,7 +370,8 @@ private:
 
 	bool IsExtbanValid(const Anope::string &mask) override
 	{
-		return mask.length() >= 4 && mask[0] == '~' && mask[2] == ':';
+		Anope::string name, value;
+		return IsExtBan(mask, name, value);
 	}
 
 	void SendLogin(User *u, NickAlias *na) override
@@ -449,20 +474,6 @@ private:
 
 namespace UnrealExtBan
 {
-	bool IsExtBan(const Anope::string &str, Anope::string &name, Anope::string &value)
-	{
-		if (str[0] != '~')
-			return false;
-
-		auto endpos = str.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", 1);
-		if (endpos == Anope::string::npos || str[endpos] != ':' || endpos+1 == str.length())
-			return false;
-
-		name = str.substr(1, endpos - 1);
-		value = str.substr(endpos + 1);
-		return true;
-	}
-
 	class Base
 		: public ChannelModeVirtual<ChannelModeList>
 	{

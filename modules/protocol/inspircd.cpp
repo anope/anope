@@ -1101,7 +1101,7 @@ struct IRCDMessageCapab final
 		if (a == Anope::string::npos)
 			return false;
 
-		auto b = token.find(':', a + 1);
+		auto b = token.find('=', a + 1);
 		if (b == Anope::string::npos)
 			return false;
 

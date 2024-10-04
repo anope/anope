@@ -27,6 +27,9 @@ struct SASLUser final
 
 namespace
 {
+	/** Whether we should send extbans using their named form. */
+	bool named_extbans = false;
+
 	// The SID of a server we are waiting to squit.
 	Anope::string rsquit_id;
 
@@ -723,7 +726,8 @@ namespace InspIRCdExtBan
 
 		ChannelMode *Wrap(Anope::string &param) override
 		{
-			param = Anope::string(xbchar) + ":" + param;
+			auto xbprefix = named_extbans ? xbname : Anope::string(xbchar);
+			param = xbprefix + ":" + param;
 			return ChannelModeVirtual<ChannelModeList>::Wrap(param);
 		}
 
@@ -1573,6 +1577,8 @@ struct IRCDMessageCapab final
 				auto [tokname, tokvalue] = ParseCapability(capab);
 				if (tokname == "CHALLENGE")
 					challenge = tokvalue;
+				if (tokname == "EXTBANFORMAT")
+					named_extbans = tokvalue.equals_ci("any") || tokvalue.equals_ci("name");
 				else if (tokname == "MAXCHANNEL")
 					IRCD->MaxChannel = Anope::Convert<size_t>(tokvalue, IRCD->MaxChannel);
 				else if (tokname == "MAXHOST")

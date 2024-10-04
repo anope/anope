@@ -871,7 +871,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			return !u->Account() && Entry("BAN", e->GetMask()).Matches(u);
+			return !u->Account() && Entry(this->base, e->GetMask()).Matches(u);
 		}
 	};
 

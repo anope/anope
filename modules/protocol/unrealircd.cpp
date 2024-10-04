@@ -1128,7 +1128,7 @@ struct IRCDMessageMode final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		auto final_is_ts = server_ts && source.GetServer() != NULL;
-		auto last_param = params.end() - (final_is_ts ? 1 : 0);
+		auto last_param = params.end() - (params.size() > 3 && final_is_ts ? 1 : 0);
 
 		if (IRCD->IsChannelValid(params[0]))
 		{

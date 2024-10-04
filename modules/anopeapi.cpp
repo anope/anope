@@ -201,7 +201,7 @@ public:
     Log(LOG_NORMAL, "module") << "AnopeAPI: Loaded and API HTTP server starting...";
   }
 
-  ~AnopeAPIModule() override
+  ~AnopeAPIModule()
   { 
     api_server->stop();
   }
@@ -227,6 +227,16 @@ public:
       throw ConfigException(this->name + " if SSL is enabled cert and pkey MUST be set.");
 
     Log(LOG_NORMAL, "module") << "AnopeAPI: Finished OnReload enable_ssl: " << enable_ssl << " cert: " << cert.c_str() << " private_key: " << pkey.c_str();
+  }
+
+  void OnRestart() override
+  {
+    api_server->stop();
+  }
+
+  void OnShutdown() override
+  {
+    api_server->stop();
   }
 
   void StartServer()
@@ -355,28 +365,24 @@ public:
     }
   }
 
-  // trim removes whitespace's from anope server respones
-  std::string trim(const std::string& str)
+  // clean up the string
+  std::string cleanString(const std::string& str)
   {
     const std::string whitespace = "\n\r\t\f\v";
-    size_t start = str.find_first_not_of(whitespace);
-    size_t end = str.find_last_not_of(whitespace);
-
-    return (start == std::string::npos || end == std::string::npos) ? "" : str.substr(start, end - start + 1);
-  }
-
-  // we also have to remove STX characters
-  std::string removeControlChars(const std::string& str)
-  {
     std::string result;
-    std::copy_if(str.begin(), str.end(), std::back_inserter(result),
+
+    // Process the string in one pass: remove control characters and trim.
+    size_t start = str.find_first_not_of(whitespace);
+    if (start == std::string::npos) return ""; // Empty string after trimming.
+
+    size_t end = str.find_last_not_of(whitespace);
+    std::copy_if(str.begin() + start, str.begin() + end + 1, std::back_inserter(result),
                  [](char c) { return std::isprint(static_cast<unsigned char>(c)); });
 
     return result;
   }
 
-  // no we split the response by new lines so we can make the vector into
-  // a json array.
+  // split the response by nl into vector.
   std::vector<std::string> splitAndTrim(const std::string& input)
   {
     std::vector<std::string> result;
@@ -385,7 +391,8 @@ public:
 
     // split and trim each line
     while (std::getline(stream, line)) {
-      std::string trimmedLine = trim(removeControlChars(line));
+      //std::string trimmedLine = trim(removeControlChars(line));
+      std::string trimmedLine = cleanString(line);
       if (!trimmedLine.empty()) {
         result.push_back(trimmedLine);
       }

@@ -1,12 +1,16 @@
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+
 #include "module.h"
 #include "modules/httplib.h"
 #include "modules/ssl.h"
+
 #include <algorithm>
 #include <iostream>
-#include <jwt-cpp/traits/nlohmann-json/defaults.h>
-#include <nlohmann/json.hpp>
 #include <thread>
 #include <unordered_map>
+
+#include <jwt-cpp/traits/nlohmann-json/defaults.h>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -173,52 +177,80 @@ public:
 
 class AnopeAPIModule final : public Module
 {
-  httplib::Server api_server;
+  std::unique_ptr<httplib::Server> api_server;
   std::thread server_thread;
   TokenProtectedRoute router;
 
   std::string bind_ip;
   unsigned int port;
-  bool allow_registration;
   std::string base_uri;
+  
+  bool enable_ssl;
+  std::string cert;
+  std::string pkey;
 
 public:
   AnopeAPIModule(const Anope::string& modname, const Anope::string& creator)
   : Module(modname, creator, EXTRA), router(atoken)
   {
-    server_thread = std::thread([this]() { this->StartServer(); });
+    Log(LOG_NORMAL, "module") << "AnopeAPI: Construct...";
+
+    server_thread = std::thread([this]() { StartServer(); });
     server_thread.detach();
 
-    Log(LOG_NORMAL, "module") << "Anope API Module - Loaded and API HTTP server started.";
+    Log(LOG_NORMAL, "module") << "AnopeAPI: Loaded and API HTTP server starting...";
   }
 
   ~AnopeAPIModule() override
   { 
-    api_server.stop();
+    api_server->stop();
   }
 
   void OnReload(Configuration::Conf* conf) override
   {
-    Configuration::Block* block = conf->GetModule(this);
+    Log(LOG_NORMAL, "module") << "AnopeAPI: OnReload...";
 
-    bind_ip = block->Get<std::string>("bind_ip");
+    Configuration::Block *block = Config->GetModule(this);
+
+    // read info we need with defaults
+    bind_ip = block->Get<std::string>("bind_ip", "");
+    port = block->Get<int>("port", "8118");
+    base_uri = block->Get<std::string>("base_uri", "");
+    enable_ssl = block->Get<bool>("enable_ssl", true);
+    cert = block->Get<std::string>("cert", "");
+    pkey = block->Get<std::string>("pkey", "");
+    
     if (bind_ip.empty())
       throw ConfigException(this->name + "bind_ip cannot be empty.");
 
-    port = block->Get<int>("port", "8118");
-    allow_registration = block->Get<bool>("allow_registration", false);
-    base_uri = block->Get<std::string>("base_uri", "/api");
+    if (enable_ssl && (cert.empty() || pkey.empty()))
+      throw ConfigException(this->name + " if SSL is enabled cert and pkey MUST be set.");
 
+    Log(LOG_NORMAL, "module") << "AnopeAPI: Finished OnReload enable_ssl: " << enable_ssl << " cert: " << cert.c_str() << " private_key: " << pkey.c_str();
   }
 
   void StartServer()
   {
+    
+    // =============================================================
+    // httplib Server 
+    // =============================================================
+    api_server = (enable_ssl) ? 
+      std::make_unique<httplib::SSLServer>(cert.c_str(), pkey.c_str()) :
+      std::make_unique<httplib::Server>();
+
+    if (!api_server) {
+      throw std::runtime_error("Failed to create AnopeAPI server instance.");
+    }
+
+    Log(LOG_NORMAL, "module") << "AnopeAPI: Starting " << (enable_ssl ? "SSL-enabled server." : "non-SSL server.");
+
     // =============================================================
     // API Routes
     // =============================================================
 
     // route: /auth
-    api_server.Post(base_uri + "/auth", [this](const httplib::Request& req, httplib::Response& resp) {
+    api_server->Post(base_uri + "/auth", [this](const httplib::Request& req, httplib::Response& resp) {
       try {
         json request_data = json::parse(req.body);
 
@@ -249,7 +281,7 @@ public:
 
     // route: /cmd
     // notes: requires a token
-    api_server.Post(base_uri + "/cmd", router.Wrap([this](const httplib::Request& req, httplib::Response& resp) {
+    api_server->Post(base_uri + "/cmd", router.Wrap([this](const httplib::Request& req, httplib::Response& resp) {
       try {
         json request_data = json::parse(req.body);
 
@@ -311,13 +343,15 @@ public:
     }));
 
     try {
-      if (!api_server.listen(bind_ip, port)) {
+      if (!api_server->listen(bind_ip, port)) {
         throw std::runtime_error("Failed to bind " + bind_ip + " to port " + std::to_string(port) + ". Another process might be using it.");
       }
 
       Log(LOG_NORMAL, "module") << "Anope API server listening on " << bind_ip << ":" << port;
+
     } catch (const std::exception &e) {
       Log(LOG_NORMAL, "module") << "Error starting server: " << e.what();
+
     }
   }
 

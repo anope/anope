@@ -8,6 +8,7 @@
 #include <thread>
 #include <unordered_map>
 
+using json = nlohmann::json;
 
 class AccessTokens
 {
@@ -50,7 +51,7 @@ public:
       auto decoded_token = jwt::decode(token);
       verifier.verify(decoded_token);
 
-      nlohmann::json payload = decoded_token.get_payload_json();
+      json payload = decoded_token.get_payload_json();
 
       return true;
 
@@ -103,7 +104,7 @@ public:
   void SendUnauthorizedResponse(httplib::Response& resp)
   {
     resp.status = 401;
-    resp.set_content(nlohmann::json{
+    resp.set_content(json{
       {"error", "Unauthorized"},
       {"message", "Authentication required or token invalid"}
     }.dump(), "application/json");
@@ -112,7 +113,7 @@ public:
   void SendClientErrorResponse(httplib::Response& resp, const std::string& msg = "Request body could not be read properly.")
   {
     resp.status = 400;
-    resp.set_content(nlohmann::json{
+    resp.set_content(json{
       {"error", "Bad Request"},
       {"message", msg},
     }.dump(), "application/json");
@@ -141,20 +142,20 @@ private:
 
 class APIIdentifyRequest final : public IdentifyRequest
 {
-  nlohmann::json request_data;
+  json request_data;
   httplib::Response* response;
 
   std::string acc, pass;
 
 public:
-  APIIdentifyRequest(Module* o, const nlohmann::json& req, httplib::Response& resp, const std::string& acc, const std::string& pass)
+  APIIdentifyRequest(Module* o, const json& req, httplib::Response& resp, const std::string& acc, const std::string& pass)
   : IdentifyRequest(o, acc, pass), request_data(req), response(&resp), acc(acc)
   {
   }
 
   void OnSuccess() override
   {
-    response->set_content(nlohmann::json{
+    response->set_content(json{
       {"token", atoken.GrantUserToken(acc)}
     }.dump(), "application/json");
   }
@@ -162,7 +163,7 @@ public:
   void OnFail() override
   {
     response->status = 401;
-    response->set_content(nlohmann::json{
+    response->set_content(json{
       {"error", "Unauthorized"},
       {"message", "Invalid nickname or password."}
     }.dump(), "application/json");
@@ -219,7 +220,7 @@ public:
     // route: /auth
     api_server.Post(base_uri + "/auth", [this](const httplib::Request& req, httplib::Response& resp) {
       try {
-        nlohmann::json request_data = nlohmann::json::parse(req.body);
+        json request_data = json::parse(req.body);
 
         std::string nickname = request_data.value("nickname", "");
         std::string password = request_data.value("password", "");
@@ -228,7 +229,7 @@ public:
 
         if (na && na->nc->HasExt("NS_SUSPENDED")) {
           resp.status = 401;
-          resp.set_content(nlohmann::json{
+          resp.set_content(json{
             {"error", "Unauthorized"},
             {"message", "Nickname suspended."}
           }.dump(), "application/json");
@@ -240,7 +241,7 @@ public:
         FOREACH_MOD(OnCheckAuthentication, (NULL, apireq));
         apireq->Dispatch();
 
-      } catch(nlohmann::json::exception &e) {
+      } catch(json::exception &e) {
         router.SendClientErrorResponse(resp);
 
       }
@@ -250,7 +251,7 @@ public:
     // notes: requires a token
     api_server.Post(base_uri + "/cmd", router.Wrap([this](const httplib::Request& req, httplib::Response& resp) {
       try {
-        nlohmann::json request_data = nlohmann::json::parse(req.body);
+        json request_data = json::parse(req.body);
 
         // make sure we have "service" and "cmd" at the very least.
         if (!request_data.contains("service") || !request_data.contains("cmd")) {
@@ -298,12 +299,12 @@ public:
 				Command::Run(source, cmd + params);
 
 				if (!out.empty()) {
-          resp.set_content(nlohmann::json{
+          resp.set_content(json{
             {"response", splitAndTrim(out.c_str())}
           }.dump(), "application/json");
 				}
 
-      } catch(nlohmann::json::exception &e) {
+      } catch(json::exception &e) {
         router.SendClientErrorResponse(resp);
 
       }

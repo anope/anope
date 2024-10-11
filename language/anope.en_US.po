@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 13:24+0100\n"
-"PO-Revision-Date: 2024-09-26 13:25+0100\n"
+"POT-Creation-Date: 2024-10-11 18:54+0100\n"
+"PO-Revision-Date: 2024-10-11 18:54+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -8602,6 +8602,10 @@ msgstr "Your IRCd does not support SVSPART."
 
 msgid "Your IRCd does not support vidents. If this is incorrect please report this as a possible bug."
 msgstr "Your IRCd does not support vidents. If this is incorrect please report this as a possible bug."
+
+#, c-format
+msgid "Your SSL certificate fingerprint %s has been automatically added to your certificate list."
+msgstr "Your SSL certificate fingerprint %s has been automatically added to your certificate list."
 
 #, c-format
 msgid "Your account %s has been successfully created."

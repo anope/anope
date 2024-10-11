@@ -510,12 +510,13 @@ class CommandCSSetPersist : public Command
 				/* Set the perm mode */
 				if (cm)
 				{
-					if (ci->c && !ci->c->HasMode("PERM"))
-						ci->c->SetMode(NULL, cm);
 					/* Add it to the channels mlock */
 					ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
 					if (ml)
 						ml->SetMLock(cm, true, "", source.GetNick());
+
+					if (ci->c && !ci->c->HasMode("PERM"))
+						ci->c->SetMode(NULL, cm);
 				}
 				/* No botserv bot, no channel mode, give them ChanServ.
 				 * Yes, this works fine with no BotServ.
@@ -553,12 +554,13 @@ class CommandCSSetPersist : public Command
 				/* Unset perm mode */
 				if (cm)
 				{
-					if (ci->c && ci->c->HasMode("PERM"))
-						ci->c->RemoveMode(NULL, cm);
 					/* Remove from mlock */
 					ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
 					if (ml)
 						ml->RemoveMLock(cm, true);
+
+					if (ci->c && ci->c->HasMode("PERM"))
+						ci->c->RemoveMode(NULL, cm);
 				}
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on

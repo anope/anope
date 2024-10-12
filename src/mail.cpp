@@ -36,6 +36,7 @@ Mail::Message::~Message()
 
 void Mail::Message::Run()
 {
+	errno = 0;
 	auto *pipe = popen(sendmail_path.c_str(), "w");
 	if (!pipe)
 	{

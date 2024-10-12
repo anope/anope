@@ -24,8 +24,8 @@ die="yes"
 ###########################
 
 # The GeoIP data is created by MaxMind, available from www.maxmind.com.
-geoip_country_source="https://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip"
-geoip_city_source="https://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip"
+geoip_country_source="https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip"
+geoip_city_source="https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoLiteCity-latest.zip"
 geoip_region_source="https://www.maxmind.com/download/geoip/misc/region_codes.csv"
 
 ###########################

@@ -14,6 +14,6 @@ Version | Supported
 
 ## Reporting a Vulnerability
 
-Please do not report security vulnerabilities on GitHub. Instead, email the details to team@anope.org or get the attention of a developer in our development IRC channel at irc.anope.org #anope-devel and PM them the details.
+Please do not report security vulnerabilities on GitHub. Instead, email the details to team@anope.org or get the attention of a developer in our development IRC channel at irc.teranova.net #anope-devel and PM them the details.
 
 We will triage your issue as soon as possible and try to release a fixed version within a week of receiving your report.

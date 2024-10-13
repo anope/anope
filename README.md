@@ -4,7 +4,7 @@ Anope is an open source set of IRC services. It is highly modular, with a vast n
 
 * [Website](https://anope.org)
 * [GitHub](https://github.com/anope)
-* IRC \#anope on irc.anope.org
+* IRC \#anope on irc.teranova.net
 
 ## Installation
 
@@ -33,7 +33,7 @@ Copy conf/anope.example.conf to conf/anope.conf
 $ cp conf/anope.example.conf conf/anope.conf
 ```
 
-Edit anope.conf, configuring the uplink, serverinfo, and protocol module configurations. Example link blocks for popular IRCds are included in the anope.example.conf documentation. The [Anope wiki](https://wiki.anope.org) is also a good source of information. Our support channel is located at #anope on [irc.anope.org](irc://irc.anope.org/#anope).
+Edit anope.conf, configuring the uplink, serverinfo, and protocol module configurations. Example link blocks for popular IRCds are included in the the example.conf documentation. The [Anope wiki](https://wiki.anope.org) is also a good source of information. Our support channel is located at #anope on [irc.teranova.net](ircs://irc.teranova.net/anope).
 
 Note that the example configuration file includes other example configuration files. If you want to modify the other example configuration files, copy them (e.g. `modules.example.conf` to `modules.conf`) and modify the `include` directive in `anope.conf` to include the new file.
 

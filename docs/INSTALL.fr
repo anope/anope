@@ -64,7 +64,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     recommandée, et Anope ne fonctionnera probablement pas !
 
     Si vous avez besoin d'aide, vous pouvez aller sur le site
-    https://forum.anope.org/ ou le canal #anope sur irc.anope.org.
+    https://forum.anope.org/ ou le canal #anope sur irc.teranova.net.
     Fournissez *l'essemble* des erreurs qui apparaîssent, en plus de
     toutes informations utiles, comme les versions de votre OS, du
     compilateur utilisé et de la librairie C++. Lisez le fichier README

@@ -726,7 +726,7 @@ namespace InspIRCdExtBan
 
 		ChannelMode *Wrap(Anope::string &param) override
 		{
-			auto xbprefix = named_extbans ? xbname : Anope::string(xbchar);
+			auto xbprefix = named_extbans || !xbchar ? xbname : Anope::string(xbchar);
 			param = xbprefix + ":" + param;
 			return ChannelModeVirtual<ChannelModeList>::Wrap(param);
 		}
@@ -1076,19 +1076,25 @@ struct IRCDMessageCapab final
 
 	static bool ParseExtBan(const Anope::string &token, ExtBanInfo &extban)
 	{
-		// acting:foo=f  matching:foo=f
-		//       A   B           A   B
+		// acting:foo=f  matching:bar=b matching:baz
+		//       A   B           A   B          A
 		auto a = token.find(':');
 		if (a == Anope::string::npos)
 			return false;
 
 		auto b = token.find('=', a + 1);
 		if (b == Anope::string::npos)
-			return false;
-
+		{
+			// ExtBan only has a name.
+			extban.name = token.substr(a + 1);
+		}
+		else
+		{
+			// ExtBan has a name and letter.
+			extban.name = token.substr(a + 1, b - a - 1);
+			extban.letter = token[b + 1];
+		}
 		extban.type = token.substr(0, a);
-		extban.name = token.substr(a + 1, b - a - 1);
-		extban.letter = token[b + 1];
 
 		if (Anope::ProtocolDebug)
 			Log(LOG_DEBUG) << "Parsed extban: type=" << extban.type << " name=" << extban.name << " letter=" << extban.letter;

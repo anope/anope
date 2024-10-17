@@ -33,7 +33,7 @@ class RatboxProto final
 	}
 
 public:
-	RatboxProto(Module *creator) : IRCDProto(creator, "Ratbox 3.0+")
+	RatboxProto(Module *creator) : IRCDProto(creator, "ircd-ratbox 3+")
 	{
 		DefaultPseudoclientModes = "+oiS";
 		CanSNLine = true;

@@ -378,7 +378,7 @@ class ChanServCore : public Module, public ChanServService
 		return EVENT_CONTINUE;
 	}
 
-	void OnUplinkSync() anope_override
+	void OnUplinkSync(Server* s) anope_override
 	{
 		// We need to do this when the uplink is synced as we may not know if
 		// the mode exists before then on some IRCds (e.g. InspIRCd).

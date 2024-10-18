@@ -382,8 +382,11 @@ public:
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostInit() override
+	void OnUplinkSync() override
 	{
+		// We need to do this when the uplink is synced as we may not know if
+		// the mode exists before then on some IRCds (e.g. InspIRCd).
+
 		if (!persist)
 			return;
 

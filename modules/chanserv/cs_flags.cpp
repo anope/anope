@@ -79,7 +79,7 @@ FlagsAccessProvider *FlagsAccessProvider::ap;
 class CommandCSFlags final
 	: public Command
 {
-	void DoModify(CommandSource &source, ChannelInfo *ci, Anope::string mask, const Anope::string &flags, const Anope::string &description)
+	void DoModify(CommandSource &source, ChannelInfo *ci, Anope::string mask, const Anope::string &flags, Anope::string description)
 	{
 		if (flags.empty())
 		{
@@ -131,7 +131,11 @@ class CommandCSFlags final
 			{
 				User *targ = User::Find(mask, true);
 				if (targ != NULL)
+				{
 					mask = "*!*@" + targ->GetDisplayedHost();
+					if (description.empty())
+						description = targ->nick;
+				}
 				else
 				{
 					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());

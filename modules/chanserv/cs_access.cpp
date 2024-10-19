@@ -87,6 +87,7 @@ class CommandCSAccess final
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params[2];
+		Anope::string description = params.size() > 4 ? params[4] : "";
 		Privilege *p = NULL;
 		int level = ACCESS_INVALID;
 
@@ -172,7 +173,11 @@ class CommandCSAccess final
 			{
 				User *targ = User::Find(mask, true);
 				if (targ != NULL)
+				{
 					mask = "*!*@" + targ->GetDisplayedHost();
+					if (description.empty())
+						description = targ->nick;
+				}
 				else
 				{
 					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
@@ -216,7 +221,7 @@ class CommandCSAccess final
 		access->level = level;
 		access->last_seen = 0;
 		access->created = Anope::CurTime;
-		access->description = params.size() > 4 ? params[4] : "";
+		access->description = description;
 		ci->AddAccess(access);
 
 		FOREACH_MOD(OnAccessAdd, (ci, source, access));

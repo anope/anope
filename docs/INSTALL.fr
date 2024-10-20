@@ -121,11 +121,11 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     Une entrée crontab vous permettra de vérifier périodiquement si Anope
     est toujours en cours d'exécution et de le redémarrer s'il n'est pas.
 
-    D'abord renommez le script example.chk qui est dans les dossiers
-    d'Anope (par défaut, ~/anope/conf) en anope.chk et modifiez-le.
+    D'abord renommez le script cron.example.sh qui est dans les dossiers
+    d'Anope (par défaut, ~/anope/conf) en cron.sh et modifiez-le.
     Vous aurez besoin de modifier la partie CONFIGURATION du fichier.
     Assurez-vous ensuite que le fichier est marqué comme exécutable en
-    tapant chmod +x anope.chk et essayez de lancer le script pour voir
+    tapant chmod +x cron.sh et essayez de lancer le script pour voir
     si cela fonctionne (Anope ne doit pas être en marche lorsque vous
     testez cela ;))
 
@@ -133,7 +133,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     crontab -e. Cela va ouvrir l'éditeur de texte par défaut avec le
     fichier crontab. Entrez la ligne suivante (avec le chemin correct) :
 
-        */5 * * * * /home/ircd/anope/conf/anope.chk > /dev/null 2>&1
+        */5 * * * * /home/ircd/anope/conf/cron.sh > /dev/null 2>&1
 
     Le */5 au début signifie "vérifier toutes les 5 minutes". Vous pouvez
     remplacer le 5 par un autre numéro si vous voulez (mais moins de 60).

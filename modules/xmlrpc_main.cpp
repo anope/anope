@@ -38,17 +38,24 @@ public:
 	}
 
 	void OnFail() override
-	{
-		if (!xinterface || !client)
-			return;
+    {
+        if (!xinterface || !client)
+            return;
 
-		request.r = this->repl;
+        request.r = this->repl;
 
-		request.reply("error", "Invalid password");
+        if (!NickAlias::Find(this->GetAccount()))
+        {
+            request.reply("error", "Account does not exist");
+        }
+        else
+        {
+            request.reply("error", "Invalid password");
+        }
 
-		xinterface->Reply(request);
-		client->SendReply(&request.r);
-	}
+        xinterface->Reply(request);
+        client->SendReply(&request.r);
+    }
 };
 
 class MyXMLRPCEvent final

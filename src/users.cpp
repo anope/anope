@@ -839,10 +839,10 @@ bool User::BadPassword()
 bool User::ShouldPrivmsg() const
 {
 	// Send a PRIVMSG instead of a NOTICE if:
-	// 1. options:useprivmsg is enabled.
-	// 2. The user is not registered and msg is in nickserv:defaults.
-	// 3. The user is registered and has set /ns set message on.
-	return Config->UsePrivmsg && ((!nc && Config->DefPrivmsg) || (nc && nc->HasExt("MSG")));
+	// 1. The user is not registered and msg is in nickserv:defaults.
+	// 2. The user is registered and has set /ns set message on.
+	static ExtensibleRef<bool> msg("MSG");
+	return (!nc && Config->DefPrivmsg) || (nc && msg && msg->HasExt(nc));
 }
 
 User *User::Find(const Anope::string &name, bool nick_only)

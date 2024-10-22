@@ -121,7 +121,7 @@ template<typename T> static void ValidateNotZero(const Anope::string &block, con
 Conf::Conf() : Block("")
 {
 	ReadTimeout = 0;
-	UsePrivmsg = DefPrivmsg = false;
+	DefPrivmsg = false;
 
 	this->LoadConf(ServicesConf);
 
@@ -195,7 +195,6 @@ Conf::Conf() : Block("")
 	}
 
 	this->ReadTimeout = options->Get<time_t>("readtimeout");
-	this->UsePrivmsg = options->Get<bool>("useprivmsg");
 	this->UseStrictPrivmsg = options->Get<bool>("usestrictprivmsg");
 	this->StrictPrivmsg = !UseStrictPrivmsg ? "/msg " : "/";
 	{

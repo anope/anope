@@ -892,112 +892,6 @@ public:
 	}
 };
 
-class CommandNSSetMessage
-	: public Command
-{
-public:
-	CommandNSSetMessage(Module *creator, const Anope::string &sname = "nickserv/set/message", size_t min = 1) : Command(creator, sname, min, min + 1)
-	{
-		this->SetDesc(_("Change the communication method of services"));
-		this->SetSyntax("{ON | OFF}");
-	}
-
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
-	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
-			return;
-		}
-
-		const NickAlias *na = NickAlias::Find(user);
-		if (!na)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
-			return;
-		}
-		NickCore *nc = na->nc;
-
-		if (!Config->GetBlock("options")->Get<bool>("useprivmsg"))
-		{
-			source.Reply(_("You cannot %s on this network."), source.command.c_str());
-			return;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (param.equals_ci("ON"))
-		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable " << source.command << " for " << nc->display;
-			nc->Extend<bool>("MSG");
-			source.Reply(_("Services will now reply to \002%s\002 with \002messages\002."), nc->display.c_str());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable " << source.command << " for " << nc->display;
-			nc->Shrink<bool>("MSG");
-			source.Reply(_("Services will now reply to \002%s\002 with \002notices\002."), nc->display.c_str());
-		}
-		else
-			this->OnSyntaxError(source, "MSG");
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, source.nc->display, params[0]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		Anope::string cmd = source.command;
-		size_t i = cmd.find_last_of(' ');
-		if (i != Anope::string::npos)
-			cmd = cmd.substr(i + 1);
-
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way services are communicating with\n"
-				"you. With \002%s\002 set, services will use messages, else they'll\n"
-				"use notices."), cmd.upper().c_str());
-		return true;
-	}
-
-	void OnServHelp(CommandSource &source) override
-	{
-		if (Config->GetBlock("options")->Get<bool>("useprivmsg"))
-			Command::OnServHelp(source);
-	}
-};
-
-class CommandNSSASetMessage final
-	: public CommandNSSetMessage
-{
-public:
-	CommandNSSASetMessage(Module *creator) : CommandNSSetMessage(creator, "nickserv/saset/message", 2)
-	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way services are communicating with\n"
-				"the given user. With \002MSG\002 set, services will use messages,\n"
-				"else they'll use notices."));
-		return true;
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, params[0], params[1]);
-	}
-};
-
 class CommandNSSASetNoexpire final
 	: public Command
 {
@@ -1075,16 +969,13 @@ class NSSet final
 	CommandNSSetKill commandnssetkill;
 	CommandNSSASetKill commandnssasetkill;
 
-	CommandNSSetMessage commandnssetmessage;
-	CommandNSSASetMessage commandnssasetmessage;
-
 	CommandNSSetPassword commandnssetpassword;
 	CommandNSSASetPassword commandnssasetpassword;
 
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
 	SerializableExtensibleItem<bool> autoop, neverop, killprotect, kill_quick, kill_immed,
-		message, noexpire;
+		noexpire;
 
 	struct KeepModes final
 		: SerializableExtensibleItem<bool>
@@ -1145,13 +1036,12 @@ public:
 		commandnssetemail(this), commandnssasetemail(this),
 		commandnssetkeepmodes(this), commandnssasetkeepmodes(this),
 		commandnssetkill(this), commandnssasetkill(this),
-		commandnssetmessage(this), commandnssasetmessage(this),
 		commandnssetpassword(this), commandnssasetpassword(this),
 		commandnssasetnoexpire(this),
 
 		autoop(this, "AUTOOP"), neverop(this, "NEVEROP"),
 		killprotect(this, "KILLPROTECT"), kill_quick(this, "KILL_QUICK"),
-		kill_immed(this, "KILL_IMMED"), message(this, "MSG"),
+		kill_immed(this, "KILL_IMMED"),
 		noexpire(this, "NS_NO_EXPIRE"),
 
 		keep_modes(this, "NS_KEEP_MODES"), ns_set_email(this, "ns_set_email")
@@ -1208,8 +1098,6 @@ public:
 			info.AddOption(_("Quick protection"));
 		else if (killprotect.HasExt(na->nc))
 			info.AddOption(_("Protection"));
-		if (message.HasExt(na->nc))
-			info.AddOption(_("Message mode"));
 		if (autoop.HasExt(na->nc))
 			info.AddOption(_("Auto-op"));
 		if (neverop.HasExt(na->nc))

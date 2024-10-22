@@ -88,8 +88,6 @@ namespace Configuration
 	{
 		/* options:readtimeout */
 		time_t ReadTimeout;
-		/* options:useprivmsg */
-		bool UsePrivmsg;
 		/* If we should default to privmsging clients */
 		bool DefPrivmsg;
 		/* Default language */

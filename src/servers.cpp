@@ -328,7 +328,7 @@ bool Server::IsQuitting() const
 
 void Server::Notice(BotInfo *source, const Anope::string &message)
 {
-	if (Config->UsePrivmsg && Config->DefPrivmsg)
+	if (Config->DefPrivmsg)
 		IRCD->SendGlobalPrivmsg(source, this, message);
 	else
 		IRCD->SendGlobalNotice(source, this, message);

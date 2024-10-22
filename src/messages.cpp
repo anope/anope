@@ -324,18 +324,8 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			if (!servername.equals_ci(Me->GetName()))
 				return;
 		}
-		else if (!IRCD->RequiresID && Config->UseStrictPrivmsg)
-		{
-			BotInfo *bi = BotInfo::Find(receiver);
-			if (!bi)
-				return;
-			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << u->nick;
-			u->SendMessage(bi, _("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."), bi->nick.c_str(), bi->nick.c_str(), Me->GetName().c_str(), bi->nick.c_str());
-			return;
-		}
 
 		BotInfo *bi = BotInfo::Find(botname, nick_only);
-
 		if (bi)
 		{
 			Anope::string ctcpname, ctcpbody;

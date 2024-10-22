@@ -630,8 +630,8 @@ public:
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/levels", bi, cmd))
 			source.Reply(_("\002User access levels\002 can be seen by using the\n"
-					"\002%s\002 command; type \002%s%s HELP LEVELS\002 for\n"
-					"information."), cmd.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str());
+					"\002%s\002 command; type \002%s HELP LEVELS\002 for\n"
+					"information."), cmd.c_str(), bi->GetQueryCommand().c_str());
 		return true;
 	}
 };
@@ -665,7 +665,10 @@ class CommandCSLevels final
 		{
 			Privilege *p = PrivilegeManager::FindPrivilege(what);
 			if (p == NULL)
-				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			{
+				source.Reply(_("Setting \002%s\002 not known.  Type \002%s HELP LEVELS\002 for a list of valid settings."),
+					what.c_str(), source.service->GetQueryCommand().c_str());
+			}
 			else
 			{
 				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
@@ -706,7 +709,8 @@ class CommandCSLevels final
 			return;
 		}
 
-		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		source.Reply(_("Setting \002%s\002 not known.  Type \002%s HELP LEVELS\002 for a list of valid settings."),
+			what.c_str(), source.service->GetQueryCommand().c_str());
 	}
 
 	static void DoList(CommandSource &source, ChannelInfo *ci)

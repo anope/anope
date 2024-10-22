@@ -58,8 +58,8 @@ public:
 				}
 			}
 		}
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information on a\n"
-				"particular option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
+		source.Reply(_("Type \002%s HELP %s \037option\037\002 for more information on a\n"
+				"particular option."), source.service->GetQueryCommand().c_str(), this_name.c_str());
 
 		return true;
 	}

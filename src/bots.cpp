@@ -265,6 +265,13 @@ CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
 	return NULL;
 }
 
+Anope::string BotInfo::GetQueryCommand() const
+{
+	if (Config->ServiceAlias && !this->alias.empty())
+		return Anope::printf("/%s", this->alias.c_str());
+	return Anope::printf("/msg %s", this->nick.c_str());
+}
+
 BotInfo *BotInfo::Find(const Anope::string &nick, bool nick_only)
 {
 	if (!nick_only && IRCD != NULL && IRCD->RequiresID)

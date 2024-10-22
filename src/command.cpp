@@ -199,7 +199,7 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 	this->SendSyntax(source);
 	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 	if (has_help)
-		source.Reply(MORE_INFO, Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
+		source.Reply(MORE_INFO, source.service->GetQueryCommand().c_str(), source.command.c_str());
 }
 
 namespace
@@ -226,13 +226,13 @@ namespace
 		bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 		if (has_help && similar.empty())
 		{
-			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(),
-				Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			source.Reply(_("Unknown command \002%s\002. \"%s HELP\" for help."), message.c_str(),
+				source.service->GetQueryCommand().c_str());
 		}
 		else if (has_help)
 		{
-			source.Reply(_("Unknown command \002%s\002. Did you mean \002%s\002? \"%s%s HELP\" for help."),
-				message.c_str(), similar.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			source.Reply(_("Unknown command \002%s\002. Did you mean \002%s\002? \"%s HELP\" for help."),
+				message.c_str(), similar.c_str(), source.service->GetQueryCommand().c_str());
 		}
 		else if (similar.empty())
 		{

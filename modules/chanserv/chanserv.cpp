@@ -262,9 +262,9 @@ public:
 			"malicious users from \"taking over\" channels by limiting\n"
 			"who is allowed channel operator privileges. Available\n"
 			"commands are listed below; to use them, type\n"
-			"\002%s%s \037command\037\002. For more information on a\n"
-			"specific command, type \002%s%s HELP \037command\037\002.\n"),
-			ChanServ->nick.c_str(), ChanServ->nick.c_str(),  Config->StrictPrivmsg.c_str(), ChanServ->nick.c_str(), Config->StrictPrivmsg.c_str(), ChanServ->nick.c_str());
+			"\002%s \037command\037\002. For more information on a\n"
+			"specific command, type \002%s HELP \037command\037\002.\n"),
+			ChanServ->nick.c_str(), ChanServ->nick.c_str(), ChanServ->GetQueryCommand().c_str(), ChanServ->GetQueryCommand().c_str());
 		return EVENT_CONTINUE;
 	}
 

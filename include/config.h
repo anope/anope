@@ -94,13 +94,11 @@ namespace Configuration
 		Anope::string DefLanguage;
 		/* options:timeoutcheck */
 		time_t TimeoutCheck;
-		/* options:usestrictprivmsg */
-		bool UseStrictPrivmsg;
+		/* options:servicealias */
+		bool ServiceAlias;
 		/* networkinfo:nickchars */
 		Anope::string NickChars;
 
-		/* either "/msg " or "/" */
-		Anope::string StrictPrivmsg;
 		/* List of uplink servers to try and connect to */
 		std::vector<Uplink> Uplinks;
 		/* A vector of our logfile options */

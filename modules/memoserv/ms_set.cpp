@@ -232,8 +232,8 @@ public:
 					"    LIMIT       Sets the maximum number of memos you can\n"
 					"                   receive\n"
 					" \n"
-					"Type \002%s%s HELP %s \037option\037\002 for more information\n"
-					"on a specific option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
+					"Type \002%s HELP %s \037option\037\002 for more information\n"
+					"on a specific option."), source.service->GetQueryCommand().c_str(), source.command.c_str());
 		}
 		else if (subcommand.equals_ci("NOTIFY"))
 			source.Reply(_("Syntax: \002NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"

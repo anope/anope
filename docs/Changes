@@ -1,6 +1,15 @@
 Anope Version 2.1.10-git
 ------------------------
-No significant changes.
+Added support for NEXTBANS on UnrealIRCd.
+Changed hostmask access entries added by nick to use that nick as the default description.
+Changed modes to be handled internally in their split form.
+Changed ns_cert to notify a user that their certificate is being automatically added to their account.
+Fixed matching users against extended bans.
+Fixed parsing name-only extended bans on InspIRCd.
+Fixed respecting the preferred extended ban format on InspIRCd.
+Fixed the name of the cron script in the docs.
+Updated the list of supported IRCds.
+Updated the location of the Anope IRC channels
 
 Anope Version 2.1.9
 -------------------

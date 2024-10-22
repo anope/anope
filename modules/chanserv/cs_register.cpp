@@ -100,9 +100,9 @@ public:
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/access", bi, cmd))
 			source.Reply(_(" \n"
-				"See the \002%s\002 command (\002%s%s HELP ACCESS\002) for\n"
+				"See the \002%s\002 command (\002%s HELP ACCESS\002) for\n"
 				"information on giving a subset of these privileges to\n"
-				"other channel users.\n"), cmd.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str());
+				"other channel users.\n"), cmd.c_str(), bi->GetQueryCommand().c_str());
 		source.Reply(_(" \n"
 			"NOTICE: In order to register a channel, you must have\n"
 			"first registered your nickname."));

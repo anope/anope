@@ -31,6 +31,8 @@ public:
 	time_t lastmsg;
 	/* Map of actual command names -> service name/permission required */
 	CommandInfo::map commands;
+	/* The server-side alias used to message this bot. */
+	Anope::string alias;
 	/* Modes the bot should have as configured in service:modes */
 	Anope::string botmodes;
 	/* Channels the bot should be in as configured in service:channels */
@@ -125,6 +127,9 @@ public:
 	 * @return A struct containing service name and permission
 	 */
 	CommandInfo *GetCommand(const Anope::string &cname);
+
+	/** Get the command that users can use to send a message to this bot. */
+	Anope::string GetQueryCommand() const;
 
 	/** Find a bot by nick
 	 * @param nick The nick

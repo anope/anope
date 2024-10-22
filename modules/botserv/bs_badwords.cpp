@@ -430,7 +430,7 @@ public:
 		source.Reply(_("Maintains the \002bad words list\002 for a channel. The bad\n"
 				"words list determines which words are to be kicked\n"
 				"when the bad words kicker is enabled. For more information,\n"
-				"type \002%s%s HELP KICK %s\002.\n"
+				"type \002%s HELP KICK %s\002.\n"
 				" \n"
 				"The \002ADD\002 command adds the given word to the\n"
 				"bad words list. If SINGLE is specified, a kick will be\n"
@@ -440,7 +440,7 @@ public:
 				"will be done if a user says a word that ends with\n"
 				"\037word\037. If you don't specify anything, a kick will\n"
 				"be issued every time \037word\037 is said by a user.\n"
-				" \n"), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
+				" \n"), source.service->GetQueryCommand().c_str(), source.command.c_str());
 		source.Reply(_("The \002DEL\002 command removes the given word from the\n"
 				"bad words list.  If a list of entry numbers is given, those\n"
 				"entries are deleted.  (See the example for LIST below.)\n"

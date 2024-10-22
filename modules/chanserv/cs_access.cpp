@@ -87,6 +87,7 @@ class CommandCSAccess final
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params[2];
+		Anope::string description = params.size() > 4 ? params[4] : "";
 		Privilege *p = NULL;
 		int level = ACCESS_INVALID;
 
@@ -172,7 +173,11 @@ class CommandCSAccess final
 			{
 				User *targ = User::Find(mask, true);
 				if (targ != NULL)
+				{
 					mask = "*!*@" + targ->GetDisplayedHost();
+					if (description.empty())
+						description = targ->nick;
+				}
 				else
 				{
 					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
@@ -216,7 +221,7 @@ class CommandCSAccess final
 		access->level = level;
 		access->last_seen = 0;
 		access->created = Anope::CurTime;
-		access->description = params.size() > 4 ? params[4] : "";
+		access->description = description;
 		ci->AddAccess(access);
 
 		FOREACH_MOD(OnAccessAdd, (ci, source, access));
@@ -625,8 +630,8 @@ public:
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/levels", bi, cmd))
 			source.Reply(_("\002User access levels\002 can be seen by using the\n"
-					"\002%s\002 command; type \002%s%s HELP LEVELS\002 for\n"
-					"information."), cmd.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str());
+					"\002%s\002 command; type \002%s HELP LEVELS\002 for\n"
+					"information."), cmd.c_str(), bi->GetQueryCommand().c_str());
 		return true;
 	}
 };
@@ -660,7 +665,10 @@ class CommandCSLevels final
 		{
 			Privilege *p = PrivilegeManager::FindPrivilege(what);
 			if (p == NULL)
-				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			{
+				source.Reply(_("Setting \002%s\002 not known.  Type \002%s HELP LEVELS\002 for a list of valid settings."),
+					what.c_str(), source.service->GetQueryCommand().c_str());
+			}
 			else
 			{
 				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
@@ -701,7 +709,8 @@ class CommandCSLevels final
 			return;
 		}
 
-		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		source.Reply(_("Setting \002%s\002 not known.  Type \002%s HELP LEVELS\002 for a list of valid settings."),
+			what.c_str(), source.service->GetQueryCommand().c_str());
 	}
 
 	static void DoList(CommandSource &source, ChannelInfo *ci)

@@ -72,8 +72,8 @@ public:
 				*code = Anope::Random(15);
 			}
 
-			source.Reply(CONFIRM_DROP, na->nick.c_str(), Config->StrictPrivmsg.c_str(),
-				source.service->nick.c_str(), na->nick.c_str(), code->c_str());
+			source.Reply(CONFIRM_DROP, na->nick.c_str(), source.service->GetQueryCommand().c_str(),
+				na->nick.c_str(), code->c_str());
 			return;
 		}
 

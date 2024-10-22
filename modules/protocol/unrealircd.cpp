@@ -14,7 +14,25 @@
 #include "modules/sasl.h"
 
 typedef Anope::map<Anope::string> ModData;
-static Anope::string UplinkSID;
+
+namespace
+{
+	Anope::string UplinkSID;
+
+	bool IsExtBan(const Anope::string &str, Anope::string &name, Anope::string &value)
+	{
+		if (str[0] != '~')
+			return false;
+
+		auto endpos = str.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", 1);
+		if (endpos == Anope::string::npos || str[endpos] != ':' || endpos+1 == str.length())
+			return false;
+
+		name = str.substr(1, endpos - 1);
+		value = str.substr(endpos + 1);
+		return true;
+	}
+}
 
 class UnrealIRCdProto final
 	: public IRCDProto
@@ -225,9 +243,10 @@ private:
 		// EAUTH: communicates information about the local server.
 		// MLOCK: enable receiving the MLOCK message when a mode lock changes.
 		// MTAGS: enable receiving IRCv3 message tags.
+		// NEXTBANS: enables receiving named extended bans.
 		// SID: communicates the unique identifier of the local server.
 		// VHP: enable receiving the vhost in UID.
-		Uplink::Send("PROTOCTL", "BIGLINES", "MLOCK", "MTAGS", "VHP");
+		Uplink::Send("PROTOCTL", "BIGLINES", "MLOCK", "MTAGS", "NEXTBANS", "VHP");
 		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
 		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
 
@@ -345,7 +364,8 @@ private:
 
 	bool IsExtbanValid(const Anope::string &mask) override
 	{
-		return mask.length() >= 4 && mask[0] == '~' && mask[2] == ':';
+		Anope::string name, value;
+		return IsExtBan(mask, name, value);
 	}
 
 	void SendLogin(User *u, NickAlias *na) override
@@ -446,48 +466,61 @@ private:
 	}
 };
 
-class UnrealExtBan
-	: public ChannelModeVirtual<ChannelModeList>
+namespace UnrealExtBan
 {
-	char ext;
-
-public:
-	UnrealExtBan(const Anope::string &mname, const Anope::string &basename, char extban) : ChannelModeVirtual<ChannelModeList>(mname, basename)
-		, ext(extban)
+	class Base
+		: public ChannelModeVirtual<ChannelModeList>
 	{
-	}
+	private:
+		char xbchar;
+		Anope::string xbname;
 
-	ChannelMode *Wrap(Anope::string &param) override
-	{
-		param = "~" + Anope::string(ext) + ":" + param;
-		return ChannelModeVirtual<ChannelModeList>::Wrap(param);
-	}
+	public:
+		Base(const Anope::string &mname, const Anope::string& uname, char uchar)
+			: ChannelModeVirtual<ChannelModeList>(mname, "BAN")
+			, xbchar(uchar)
+			, xbname(uname)
+		{
+		}
 
-	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) override
-	{
-		if (cm->type != MODE_LIST || param.length() < 4 || param[0] != '~' || param[1] != ext || param[2] != ':')
-			return cm;
+		ChannelMode *Wrap(Anope::string &param) override
+		{
+			auto prefix = Servers::Capab.count("NEXTBANS") ? xbname : Anope::string(xbchar);
+			param = Anope::printf("~%s:%s", prefix.c_str(), param.c_str());
+			return ChannelModeVirtual<ChannelModeList>::Wrap(param);
+		}
 
-		param = param.substr(3);
-		return this;
-	}
-};
+		ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) override
+		{
+			// The mask must be in the format ~<letter>:<value> or ~<name>:<value>.
+			if (cm->type != MODE_LIST)
+				return cm;
 
-namespace UnrealExtban
-{
+			Anope::string name, value;
+			if (!IsExtBan(param, name, value))
+				return cm;
+
+			if (name.length() == 1 ? name[0] != xbchar : name != xbname)
+				return cm;
+
+			param = value;
+			return this;
+
+		}
+	};
+
 	class ChannelMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-		ChannelMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		ChannelMatcher()
+			: Base("CHANNELBAN", "channel", 'c')
 		{
 		}
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string channel = mask.substr(3);
-
+			auto channel = e->GetMask();
 			ChannelMode *cm = NULL;
 			if (channel[0] != '#')
 			{
@@ -512,137 +545,113 @@ namespace UnrealExtban
 	};
 
 	class EntryMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-		EntryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		EntryMatcher(const Anope::string &mname, const Anope::string &uname, char uchar)
+			: Base(mname, uname, uchar)
 		{
 		}
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
-
-			return Entry(this->name, real_mask).Matches(u);
+			return Entry(this->base, e->GetMask()).Matches(u);
 		}
 	};
 
 	class RealnameMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-		RealnameMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		RealnameMatcher()
+			: Base("REALNAMEBAN", "realname", 'r')
 		{
 		}
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
-
-			return Anope::Match(u->realname, real_mask);
-		}
-	};
-
-	class RegisteredMatcher final
-		: public UnrealExtBan
-	{
-	public:
-		RegisteredMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
-		{
-		}
-
-		bool Matches(User *u, const Entry *e) override
-		{
-			const Anope::string &mask = e->GetMask();
-			return u->HasMode("REGISTERED") && mask.equals_ci(u->nick);
+			return Anope::Match(u->realname, e->GetMask());
 		}
 	};
 
 	class AccountMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-		AccountMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		AccountMatcher()
+			: Base("ACCOUNTBAN", "account", 'a')
 		{
 		}
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
-
-			if (real_mask == "0" && !u->Account()) /* ~a:0 is special and matches all unauthenticated users */
+			if (e->GetMask() == "0" && !u->Account()) /* ~a:0 is special and matches all unauthenticated users */
 				return true;
 
-			return u->Account() && Anope::Match(u->Account()->display, real_mask);
+			return u->Account() && Anope::Match(u->Account()->display, e->GetMask());
 		}
 	};
 
 	class FingerprintMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-		FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		FingerprintMatcher()
+			: Base("SSLBAN", "certfp", 'S')
 		{
 		}
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
-			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, real_mask);
+			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, e->GetMask());
 		}
 	};
 
 	class OperclassMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-	 	OperclassMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		OperclassMatcher()
+			: Base("OPERCLASSBAN", "operclass", 'O')
 		{
 		}
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
 			ModData *moddata = u->GetExt<ModData>("ClientModData");
-			return moddata != NULL && moddata->find("operclass") != moddata->end() && Anope::Match((*moddata)["operclass"], real_mask);
+			return moddata != NULL && moddata->find("operclass") != moddata->end() && Anope::Match((*moddata)["operclass"], e->GetMask());
 		}
 	};
 
 	class TimedBanMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-	 	TimedBanMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		TimedBanMatcher()
+			: Base("TIMEDBAN", "time", 't')
 		{
 		}
 
 		bool Matches(User *u, const Entry *e) override
 		{
 			/* strip down the time (~t:1234:) and call other matchers */
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
+			auto real_mask = e->GetMask();
 			real_mask = real_mask.substr(real_mask.find(":") + 1);
 			return Entry("BAN", real_mask).Matches(u);
 		}
 	};
 
 	class CountryMatcher final
-		: public UnrealExtBan
+		: public Base
 	{
 	public:
-	 	CountryMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+	 	CountryMatcher()
+	 		: Base("COUNTRYBAN", "country", 'C')
 		{
 		}
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(3);
 			ModData *moddata = u->GetExt<ModData>("ClientModData");
 			if (moddata == NULL || moddata->find("geoip") == moddata->end())
 				return false;
@@ -652,7 +661,7 @@ namespace UnrealExtban
 			while (sep.GetToken(tokenbuf))
 			{
 				if (tokenbuf.rfind("cc=", 0) == 0)
-					return (tokenbuf.substr(3, 2) == real_mask);
+					return (tokenbuf.substr(3, 2) == e->GetMask());
 			}
 			return false;
 		}
@@ -838,17 +847,16 @@ struct IRCDMessageCapab final
 						case 'b':
 							ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
 
-							ModeManager::AddChannelMode(new UnrealExtban::ChannelMatcher("CHANNELBAN", "BAN", 'c'));
-							ModeManager::AddChannelMode(new UnrealExtban::EntryMatcher("JOINBAN", "BAN", 'j'));
-							ModeManager::AddChannelMode(new UnrealExtban::EntryMatcher("NONICKBAN", "BAN", 'n'));
-							ModeManager::AddChannelMode(new UnrealExtban::EntryMatcher("QUIET", "BAN", 'q'));
-							ModeManager::AddChannelMode(new UnrealExtban::RealnameMatcher("REALNAMEBAN", "BAN", 'r'));
-							ModeManager::AddChannelMode(new UnrealExtban::RegisteredMatcher("REGISTEREDBAN", "BAN", 'R'));
-							ModeManager::AddChannelMode(new UnrealExtban::AccountMatcher("ACCOUNTBAN", "BAN", 'a'));
-							ModeManager::AddChannelMode(new UnrealExtban::FingerprintMatcher("SSLBAN", "BAN", 'S'));
-							ModeManager::AddChannelMode(new UnrealExtban::TimedBanMatcher("TIMEDBAN", "BAN", 't'));
-							ModeManager::AddChannelMode(new UnrealExtban::OperclassMatcher("OPERCLASSBAN", "BAN", 'O'));
-							ModeManager::AddChannelMode(new UnrealExtban::CountryMatcher("COUNTRYBAN", "BAN", 'C'));
+							ModeManager::AddChannelMode(new UnrealExtBan::ChannelMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("JOINBAN", "join", 'j'));
+							ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("NONICKBAN", "nickchange", 'n'));
+							ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("QUIET", "quiet", 'q'));
+							ModeManager::AddChannelMode(new UnrealExtBan::RealnameMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::AccountMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::FingerprintMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::TimedBanMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::OperclassMatcher());
+							ModeManager::AddChannelMode(new UnrealExtBan::CountryMatcher());
 							continue;
 						case 'e':
 							ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
@@ -1147,10 +1155,7 @@ struct IRCDMessageMode final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		auto final_is_ts = server_ts && source.GetServer() != NULL;
-
-		Anope::string modes = params[1];
-		for (unsigned i = 2; i < params.size() - (final_is_ts ? 1 : 0); ++i)
-			modes += " " + params[i];
+		auto last_param = params.end() - (params.size() > 3 && final_is_ts ? 1 : 0);
 
 		if (IRCD->IsChannelValid(params[0]))
 		{
@@ -1158,7 +1163,7 @@ struct IRCDMessageMode final
 			auto ts = final_is_ts ? IRCD->ExtractTimestamp(params.back()) : 0;
 
 			if (c)
-				c->SetModesInternal(source, modes, ts);
+				c->SetModesInternal(source, params[2], { params.begin() + 3, last_param }, ts);
 		}
 		else
 		{
@@ -1420,11 +1425,12 @@ struct IRCDMessageSJoin final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		Anope::string modes;
+		std::vector<Anope::string> modeparams;
 		if (params.size() >= 4)
-			for (unsigned i = 2; i < params.size() - 1; ++i)
-				modes += " " + params[i];
-		if (!modes.empty())
-			modes.erase(modes.begin());
+		{
+			modes = params[2];
+			modeparams = { params.begin() + 3, params.end() };
+		}
 
 		std::list<Anope::string> bans, excepts, invites;
 		std::list<Message::Join::SJoinUser> users;
@@ -1474,7 +1480,7 @@ struct IRCDMessageSJoin final
 		}
 
 		auto ts = IRCD->ExtractTimestamp(params[0]);
-		Message::Join::SJoin(source, params[1], ts, modes, users);
+		Message::Join::SJoin(source, params[1], ts, modes, modeparams, users);
 
 		if (!bans.empty() || !excepts.empty() || !invites.empty())
 		{

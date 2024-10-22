@@ -425,6 +425,9 @@ public:
 
 		auto *cl = certs.Require(na->nc);
 		cl->AddCert(u->fingerprint);
+
+		auto *NickServ = Config->GetClient("NickServ");
+		u->SendMessage(NickServ, _("Your SSL certificate fingerprint \002%s\002 has been automatically added to your certificate list."), u->fingerprint.c_str());
 	}
 
 	EventReturn OnNickValidate(User *u, NickAlias *na) override

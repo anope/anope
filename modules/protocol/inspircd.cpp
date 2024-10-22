@@ -27,6 +27,9 @@ struct SASLUser final
 
 namespace
 {
+	/** Whether we should send extbans using their named form. */
+	bool named_extbans = false;
+
 	// The SID of a server we are waiting to squit.
 	Anope::string rsquit_id;
 
@@ -723,7 +726,8 @@ namespace InspIRCdExtBan
 
 		ChannelMode *Wrap(Anope::string &param) override
 		{
-			param = Anope::string(xbchar) + ":" + param;
+			auto xbprefix = named_extbans || !xbchar ? xbname : Anope::string(xbchar);
+			param = xbprefix + ":" + param;
 			return ChannelModeVirtual<ChannelModeList>::Wrap(param);
 		}
 
@@ -757,10 +761,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-
-			return Entry(this->name, real_mask).Matches(u);
+			return Entry(this->name, e->GetMask()).Matches(u);
 		}
 	};
 
@@ -775,10 +776,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-
-			Anope::string channel = mask.substr(2);
-
+			auto channel = e->GetMask();
 			ChannelMode *cm = NULL;
 			if (channel[0] != '#')
 			{
@@ -813,10 +811,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-
-			return u->IsIdentified() && real_mask.equals_ci(u->Account()->display);
+			return u->IsIdentified() && e->GetMask().equals_ci(u->Account()->display);
 		}
 	};
 
@@ -831,9 +826,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-			return Anope::Match(u->realname, real_mask);
+			return Anope::Match(u->realname, e->GetMask());
 		}
 	};
 
@@ -848,9 +841,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-			return Anope::Match(u->server->GetName(), real_mask);
+			return Anope::Match(u->server->GetName(), e->GetMask());
 		}
 	};
 
@@ -865,9 +856,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, real_mask);
+			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, e->GetMask());
 		}
 	};
 
@@ -882,9 +871,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-			return !u->Account() && Entry("BAN", real_mask).Matches(u);
+			return !u->Account() && Entry(this->base, e->GetMask()).Matches(u);
 		}
 	};
 
@@ -903,9 +890,7 @@ namespace InspIRCdExtBan
 			if (!opertype)
 				return false; // Not an operator.
 
-			const Anope::string &mask = e->GetMask();
-			Anope::string real_mask = mask.substr(2);
-			return Anope::Match(opertype->replace_all_cs(' ', '_'), real_mask);
+			return Anope::Match(opertype->replace_all_cs(' ', '_'), e->GetMask());
 		}
 	};
 }
@@ -1091,19 +1076,25 @@ struct IRCDMessageCapab final
 
 	static bool ParseExtBan(const Anope::string &token, ExtBanInfo &extban)
 	{
-		// acting:foo=f  matching:foo=f
-		//       A   B           A   B
+		// acting:foo=f  matching:bar=b matching:baz
+		//       A   B           A   B          A
 		auto a = token.find(':');
 		if (a == Anope::string::npos)
 			return false;
 
-		auto b = token.find(':', a + 1);
+		auto b = token.find('=', a + 1);
 		if (b == Anope::string::npos)
-			return false;
-
+		{
+			// ExtBan only has a name.
+			extban.name = token.substr(a + 1);
+		}
+		else
+		{
+			// ExtBan has a name and letter.
+			extban.name = token.substr(a + 1, b - a - 1);
+			extban.letter = token[b + 1];
+		}
 		extban.type = token.substr(0, a);
-		extban.name = token.substr(a + 1, b - a - 1);
-		extban.letter = token[b + 1];
 
 		if (Anope::ProtocolDebug)
 			Log(LOG_DEBUG) << "Parsed extban: type=" << extban.type << " name=" << extban.name << " letter=" << extban.letter;
@@ -1573,6 +1564,8 @@ struct IRCDMessageCapab final
 				auto [tokname, tokvalue] = ParseCapability(capab);
 				if (tokname == "CHALLENGE")
 					challenge = tokvalue;
+				if (tokname == "EXTBANFORMAT")
+					named_extbans = tokvalue.equals_ci("any") || tokvalue.equals_ci("name");
 				else if (tokname == "MAXCHANNEL")
 					IRCD->MaxChannel = Anope::Convert<size_t>(tokvalue, IRCD->MaxChannel);
 				else if (tokname == "MAXHOST")
@@ -2056,15 +2049,6 @@ struct IRCDMessageFJoin final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		Anope::string modes;
-		if (params.size() >= 3)
-		{
-			for (unsigned i = 2; i < params.size() - 1; ++i)
-				modes += " " + params[i];
-			if (!modes.empty())
-				modes.erase(modes.begin());
-		}
-
 		std::list<Message::Join::SJoinUser> users;
 
 		spacesepstream sep(params[params.size() - 1]);
@@ -2102,7 +2086,7 @@ struct IRCDMessageFJoin final
 		}
 
 		auto ts = IRCD->ExtractTimestamp(params[1]);
-		Message::Join::SJoin(source, params[0], ts, modes, users);
+		Message::Join::SJoin(source, params[0], ts, params[2], { params.begin() + 3, params.end() - 1 }, users);
 	}
 };
 
@@ -2114,15 +2098,10 @@ struct IRCDMessageFMode final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		/* :source FMODE #test 12345678 +nto foo */
-
-		Anope::string modes = params[2];
-		for (unsigned n = 3; n < params.size(); ++n)
-			modes += " " + params[n];
-
 		Channel *c = Channel::Find(params[0]);
 		auto ts = IRCD->ExtractTimestamp(params[1]);
 		if (c)
-			c->SetModesInternal(source, modes, ts);
+			c->SetModesInternal(source, params[2], { params.begin() + 3, params.end() }, ts);
 	}
 };
 
@@ -2198,7 +2177,7 @@ struct IRCDMessageIJoin final
 
 		std::list<Message::Join::SJoinUser> users;
 		users.push_back(user);
-		Message::Join::SJoin(source, params[0], chants, "", users);
+		Message::Join::SJoin(source, params[0], chants, "", {}, users);
 	}
 };
 
@@ -2250,12 +2229,8 @@ struct IRCDMessageMode final
 		{
 			Channel *c = Channel::Find(params[0]);
 
-			Anope::string modes = params[1];
-			for (unsigned n = 2; n < params.size(); ++n)
-				modes += " " + params[n];
-
 			if (c)
-				c->SetModesInternal(source, modes);
+				c->SetModesInternal(source, params[2], { params.begin() + 3, params.end() });
 		}
 		else
 		{
@@ -2415,10 +2390,6 @@ struct IRCDMessageUID final
 		size_t offset = params[8][0] == '+' ? 0 : 1;
 		auto ts = IRCD->ExtractTimestamp(params[1]);
 
-		Anope::string modes = params[8+offset];
-		for (unsigned i = 9+offset; i < params.size() - 1; ++i)
-			modes += " " + params[i];
-
 		NickAlias *na = NULL;
 		if (SASL::sasl)
 			for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
@@ -2436,7 +2407,7 @@ struct IRCDMessageUID final
 					++it;
 			}
 
-		User *u = User::OnIntroduce(params[2], params[5+offset], params[3], params[4], params[6+offset], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? *na->nc : NULL);
+		auto *u = User::OnIntroduce(params[2], params[5+offset], params[3], params[4], params[6+offset], source.GetServer(), params[params.size() - 1], ts, params[8 + offset], params[0], na ? *na->nc : NULL, { params.begin() + 9 + offset, params.end() - 1 });
 		if (u)
 			u->signon = IRCD->ExtractTimestamp(params[7+offset]);
 	}

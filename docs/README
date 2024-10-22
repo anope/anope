@@ -167,11 +167,11 @@ Table of Contents
     Anope currently works with:
 
         * Bahamut 2.0 or later
-        * ircd-hybrid 8.2.23 or later
         * InspIRCd 3 or later
+        * ircd-hybrid 8.2.23 or later
+        * ircd-ratbox 3 or later
         * ngIRCd 19.2 or later
         * Plexus 3 or later
-        * Ratbox 2.0.6 or later
         * Solanum (all versions)
         * UnrealIRCd 6 or later
 
@@ -245,7 +245,7 @@ Table of Contents
 
     If you read the documentation carefully, and didn't find the answer to
     your question, feel free to post on the website forums or join our irc
-    channel (irc.anope.org #anope). Once you join our Support channel be as
+    channel (irc.teranova.net #anope). Once you join our Support channel be as
     precise as possible when asking a question, because we have no extraordinary
     powers and can't guess things if they aren't provided.
 

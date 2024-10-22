@@ -179,7 +179,11 @@ private:
 			{
 				User *targ = User::Find(mask, true);
 				if (targ != NULL)
+				{
 					mask = "*!*@" + targ->GetDisplayedHost();
+					if (description.empty())
+						description = targ->nick;
+				}
 				else
 				{
 					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
@@ -590,11 +594,11 @@ public:
 			source.Reply(_("Alternative methods of modifying channel access lists are\n"
 					"available."));
 			if (!access_cmd.empty())
-				source.Reply(_("See \002%s%s HELP %s\002 for more information\n"
-						"about the access list."), Config->StrictPrivmsg.c_str(), access_bi->nick.c_str(), access_cmd.c_str());
+				source.Reply(_("See \002%s HELP %s\002 for more information\n"
+						"about the access list."), access_bi->GetQueryCommand().c_str(), access_cmd.c_str());
 			if (!flags_cmd.empty())
-				source.Reply(_("See \002%s%s HELP %s\002 for more information\n"
-						"about the flags system."), Config->StrictPrivmsg.c_str(), flags_bi->nick.c_str(), flags_cmd.c_str());
+				source.Reply(_("See \002%s HELP %s\002 for more information\n"
+						"about the flags system."), flags_bi->GetQueryCommand().c_str(), flags_cmd.c_str());
 		}
 		return true;
 	}

@@ -66,10 +66,11 @@ namespace Message
 		 * @param source The source of the SJOIN
 		 * @param chan The channel the users are joining to
 		 * @param ts The TS for the channel
-		 * @param modes The modes sent with the SJOIN, if any
+		 * @param modes The mode letters sent with the SJOIN, if any
+		 * @param modeparams The mode parameters sent with the SJOIN, if any
 		 * @param users The users and their status, if any
 		 */
-		static void SJoin(MessageSource &source, const Anope::string &chan, time_t ts, const Anope::string &modes, const std::list<SJoinUser> &users);
+		static void SJoin(MessageSource &source, const Anope::string &chan, time_t ts, const Anope::string &modes, const std::vector<Anope::string> &modeparams, const std::list<SJoinUser> &users);
 	};
 
 	struct CoreExport Kick

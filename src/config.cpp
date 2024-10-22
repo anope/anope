@@ -121,7 +121,7 @@ template<typename T> static void ValidateNotZero(const Anope::string &block, con
 Conf::Conf() : Block("")
 {
 	ReadTimeout = 0;
-	UsePrivmsg = DefPrivmsg = false;
+	DefPrivmsg = false;
 
 	this->LoadConf(ServicesConf);
 
@@ -195,9 +195,7 @@ Conf::Conf() : Block("")
 	}
 
 	this->ReadTimeout = options->Get<time_t>("readtimeout");
-	this->UsePrivmsg = options->Get<bool>("useprivmsg");
-	this->UseStrictPrivmsg = options->Get<bool>("usestrictprivmsg");
-	this->StrictPrivmsg = !UseStrictPrivmsg ? "/msg " : "/";
+	this->ServiceAlias = options->Get<bool>("servicealias");
 	{
 		std::vector<Anope::string> defaults;
 		spacesepstream(this->GetModule("nickserv")->Get<const Anope::string>("defaults")).GetTokens(defaults);
@@ -339,7 +337,8 @@ Conf::Conf() : Block("")
 					&host = service->Get<const Anope::string>("host"),
 					&gecos = service->Get<const Anope::string>("gecos"),
 					&modes = service->Get<const Anope::string>("modes"),
-					&channels = service->Get<const Anope::string>("channels");
+					&channels = service->Get<const Anope::string>("channels"),
+					&alias = service->Get<const Anope::string>("alias", nick.upper());
 
 		ValidateNotEmptyOrSpaces("service", "nick", nick);
 		ValidateNotEmptyOrSpaces("service", "user", user);
@@ -350,6 +349,8 @@ Conf::Conf() : Block("")
 		BotInfo *bi = BotInfo::Find(nick, true);
 		if (!bi)
 			bi = new BotInfo(nick, user, host, gecos, modes);
+
+		bi->alias = alias;
 		bi->conf = true;
 
 		std::vector<Anope::string> oldchannels = bi->botchannels;

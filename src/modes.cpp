@@ -835,8 +835,7 @@ bool Entry::Matches(User *u, bool full) const
 		if (cm != NULL && cm->type == MODE_LIST)
 		{
 			ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
-			if (cml->Matches(u, this))
-				return true;
+			return cml->Matches(u, this);
 		}
 	}
 

@@ -153,11 +153,11 @@ public:
 			}
 		}
 
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
+		source.Reply(_("Type \002%s HELP %s \037option\037\002 for more information\n"
 				"on a specific option.\n"
 				" \n"
 				"Note: access to this command is controlled by the\n"
-				"level SET."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
+				"level SET."), source.service->GetQueryCommand().c_str(), this_name.c_str());
 
 		return true;
 	}
@@ -308,12 +308,12 @@ public:
 				"option tells the bot to kick users who say certain words\n"
 				"on the channels.\n"
 				"You can define bad words for your channel using the\n"
-				"\002BADWORDS\002 command. Type \002%s%s HELP BADWORDS\002 for\n"
+				"\002BADWORDS\002 command. Type \002%s HELP BADWORDS\002 for\n"
 				"more information.\n"
 				" \n"
 				"\037ttb\037 is the number of times a user can be kicked\n"
 				"before it gets banned. Don't give ttb to disable\n"
-				"the ban system once activated."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+				"the ban system once activated."), source.service->GetQueryCommand().c_str());
 		return true;
 	}
 };

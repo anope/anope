@@ -98,11 +98,11 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 		users.emplace_back(ChannelStatus(), user);
 
 		Channel *chan = Channel::Find(channel);
-		SJoin(source, channel, chan ? chan->creation_time : Anope::CurTime, "", users);
+		SJoin(source, channel, chan ? chan->creation_time : Anope::CurTime, "", {}, users);
 	}
 }
 
-void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, const Anope::string &modes, const std::list<SJoinUser> &users)
+void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, const Anope::string &modes, const std::vector<Anope::string> &modeparams, const std::list<SJoinUser> &users)
 {
 	bool created;
 	Channel *c = Channel::FindOrCreate(chan, created, ts ? ts : Anope::CurTime);
@@ -128,7 +128,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		/* If we are syncing, mlock is checked later in Channel::Sync. It is important to not check it here
 		 * so that Channel::SetCorrectModes can correctly detect the presence of channel mode +r.
 		 */
-		c->SetModesInternal(source, modes, ts, !c->syncing);
+		c->SetModesInternal(source, modes, modeparams, ts, !c->syncing);
 
 	for (const auto &[status, u] : users)
 	{
@@ -214,23 +214,19 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 
 void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
-	Anope::string buf;
-	for (unsigned i = 1; i < params.size(); ++i)
-		buf += " " + params[i];
-
 	if (IRCD->IsChannelValid(params[0]))
 	{
 		Channel *c = Channel::Find(params[0]);
 
 		if (c)
-			c->SetModesInternal(source, buf.substr(1), 0);
+			c->SetModesInternal(source, params[1], { params.begin() + 2, params.end() });
 	}
 	else
 	{
 		User *u = User::Find(params[0]);
 
 		if (u)
-			u->SetModesInternal(source, buf.substr(1));
+			u->SetModesInternal(source, params[1], { params.begin() + 2, params.end() });
 	}
 }
 
@@ -328,18 +324,8 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			if (!servername.equals_ci(Me->GetName()))
 				return;
 		}
-		else if (!IRCD->RequiresID && Config->UseStrictPrivmsg)
-		{
-			BotInfo *bi = BotInfo::Find(receiver);
-			if (!bi)
-				return;
-			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << u->nick;
-			u->SendMessage(bi, _("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."), bi->nick.c_str(), bi->nick.c_str(), Me->GetName().c_str(), bi->nick.c_str());
-			return;
-		}
 
 		BotInfo *bi = BotInfo::Find(botname, nick_only);
-
 		if (bi)
 		{
 			Anope::string ctcpname, ctcpbody;

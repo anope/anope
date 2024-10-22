@@ -337,7 +337,7 @@ bool Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "-v, --version";
 		Log(LOG_TERMINAL) << "";
 		Log(LOG_TERMINAL) << "Further support is available from https://www.anope.org/";
-		Log(LOG_TERMINAL) << "Or visit us on IRC at irc.anope.org #anope";
+		Log(LOG_TERMINAL) << "Or visit us on IRC at irc.teranova.net #anope";
 		Anope::ReturnValue = EXIT_SUCCESS;
 		return false;
 	}
@@ -488,7 +488,7 @@ bool Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "*** Support resources: Read through the anope.conf self-contained";
 		Log(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
 		Log(LOG_TERMINAL) << "*** folder. Visit our portal located at https://www.anope.org/. Join";
-		Log(LOG_TERMINAL) << "*** our support channel on /server irc.anope.org channel #anope.";
+		Log(LOG_TERMINAL) << "*** our support channel on /server irc.teranova.net channel #anope.";
 		throw CoreException("Configuration file failed to validate");
 	}
 

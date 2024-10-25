@@ -1163,7 +1163,7 @@ struct IRCDMessageMode final
 			auto ts = final_is_ts ? IRCD->ExtractTimestamp(params.back()) : 0;
 
 			if (c)
-				c->SetModesInternal(source, params[2], { params.begin() + 3, last_param }, ts);
+				c->SetModesInternal(source, params[1], { params.begin() + 2, last_param }, ts);
 		}
 		else
 		{

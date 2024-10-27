@@ -25,7 +25,7 @@ die="yes"
 
 # The GeoIP data is created by MaxMind, available from www.maxmind.com.
 geoip_country_source="https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip"
-geoip_city_source="https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoLiteCity-latest.zip"
+geoip_city_source="https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoLiteCity-latest.tar.xz"
 geoip_region_source="https://www.maxmind.com/download/geoip/misc/region_codes.csv"
 
 ###########################
@@ -65,17 +65,17 @@ elif test $geoip_database = "city"; then
 	download "$geoip_city_source" "City Database:"
 	download "$geoip_region_source" "Region Database:"
 	echo "Unpacking..."
-	unzip -jo GeoLiteCity-latest.zip
-	rm GeoLiteCity-latest.zip
+	tar -xf GeoLiteCity-latest.tar.xz --strip-components 1
+	rm GeoLiteCity-latest.tar.xz
 	echo "Converting to utf-8..."
 	iconv -f ISO-8859-1 -t UTF-8 GeoLiteCity-Blocks.csv -o $prefix"geoip_city_blocks.csv"
 	iconv -f ISO-8859-1 -t UTF-8 GeoLiteCity-Location.csv -o $prefix"geoip_city_location.csv"
-	iconv -f ISO-8859-1 -t UTF-8 region.csv -o $prefix"geoip_city_region.csv"
-	rm GeoLiteCity-Blocks.csv GeoLiteCity-Location.csv region.csv
+	iconv -f ISO-8859-1 -t UTF-8 region_codes.csv -o $prefix"geoip_city_region.csv"
+	rm GeoLiteCity-Blocks.csv GeoLiteCity-Location.csv region_codes.csv
 	echo "Importing..."
 	mysqlimport --columns=start,end,locID --ignore-lines=2 $PARAMS $prefix"geoip_city_blocks.csv"
 	mysqlimport --columns=locID,country,region,city,@x,latitude,longitude,@x,areaCode --ignore-lines=2 $PARAMS $prefix"geoip_city_location.csv"
 	mysqlimport --columns=country,region,regionname $PARAMS $prefix"geoip_city_region.csv"
-	rm $prefix"geoip_city_blocks.csv" $prefix"geoip_city_location.csv" $prefix"geoip_city_region.csv" $prefix"geoip_country6.csv"
+	rm $prefix"geoip_city_blocks.csv" $prefix"geoip_city_location.csv" $prefix"geoip_city_region.csv"
 	echo "Done..."
 fi

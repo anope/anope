@@ -1,5 +1,5 @@
-Anope Version 2.1.10-git
-------------------------
+Anope Version 2.1.10
+--------------------
 Added support for NEXTBANS on UnrealIRCd.
 Changed hostmask access entries added by nick to use that nick as the default description.
 Changed modes to be handled internally in their split form.

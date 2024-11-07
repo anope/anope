@@ -213,24 +213,18 @@ uint64_t NickCore::GetId()
 	if (this->id)
 		return this->id;
 
-	Anope::string secretid = this->display + "\0" + Anope::ToString(this->time_registered);
-
-	// Generate the account id. This should almost always only have one
-	// iteration but in the rare case that we generate a duplicate id we try
-	// again with a new key.
+	// We base the account identifier on the account display at registration and
+	// when the account was first registered. This should be unique enough that
+	// it never collides. In the extremely rare case that it does generate a
+	// duplicate id we try with a new suffix.
+	uint64_t attempt = 0;
 	while (!this->id)
 	{
-		// Generate a random key for SipHash.
-		char key[16];
-		for (auto &chr : key)
-			chr = Anope::RandomNumber() % CHAR_MAX;
-
-		uint64_t newid = Anope::SipHash24(secretid.c_str(), secretid.length(), key);
-		nickcoreid_map::const_iterator it = NickCoreIdList.find(newid);
-		if (it == NickCoreIdList.end())
+		const auto newidstr = this->display + "\0" + Anope::ToString(this->time_registered) + "\0" + Anope::ToString(attempt++);
+		const auto newid = Anope::hash_cs()(newidstr);
+		if (NickCoreIdList.emplace(newid, this).second)
 		{
 			this->id = newid;
-			NickCoreIdList[this->id] = this;
 			this->QueueUpdate();
 			break;
 		}

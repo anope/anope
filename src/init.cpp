@@ -427,7 +427,7 @@ bool Anope::Init(int ac, char **av)
 
 	/* Chdir to Anope data directory. */
 	Log() << "Moving to " << Anope::ServicesDir;
-	if (chdir(Anope::ServicesDir.c_str()) < 0)
+	if (chdir(Anope::ServicesDir.c_str()) != 0)
 	{
 		throw CoreException("Unable to chdir to " + Anope::ServicesDir + ": " + Anope::LastError());
 	}

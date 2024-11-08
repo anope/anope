@@ -7948,7 +7948,3 @@ msgstr "{nick | canal}"
 
 msgid "{nick | channel} memo-text"
 msgstr "{nick | canal} texto-do-memo"
-
-#, c-format
-#~ msgid "\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."
-#~ msgstr "\"/msg %s\" não é mais suportado. Use \"/msg %s@%s\" ou \"/%s\" em vez disso."

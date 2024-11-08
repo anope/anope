@@ -318,7 +318,7 @@ public:
 
 	static void CheckFile(const Anope::string &filename)
 	{
-		if (!Anope::IsFile(filename.c_str()))
+		if (!Anope::IsFile(filename))
 		{
 			Log() << "File does not exist: " << filename;
 			throw ConfigException("Error loading certificate/private key");
@@ -339,7 +339,7 @@ public:
 		GnuTLS::X509CertCredentials *newcred = new GnuTLS::X509CertCredentials(certfile, keyfile);
 
 		// DH params is not mandatory
-		if (Anope::IsFile(dhfile.c_str()))
+		if (Anope::IsFile(dhfile))
 		{
 			try
 			{

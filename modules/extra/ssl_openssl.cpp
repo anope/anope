@@ -149,7 +149,7 @@ public:
 		this->certfile = Anope::ExpandConfig(config->Get<const Anope::string>("cert", "fullchain.pem"));
 		this->keyfile = Anope::ExpandConfig(config->Get<const Anope::string>("key", "privkey.pem"));
 
-		if (Anope::IsFile(this->certfile.c_str()))
+		if (Anope::IsFile(this->certfile))
 		{
 			if (!SSL_CTX_use_certificate_chain_file(client_ctx, this->certfile.c_str()) || !SSL_CTX_use_certificate_chain_file(server_ctx, this->certfile.c_str()))
 				throw ConfigException("Error loading certificate");
@@ -159,7 +159,7 @@ public:
 		else
 			Log() << "Unable to open certificate " << this->certfile;
 
-		if (Anope::IsFile(this->keyfile.c_str()))
+		if (Anope::IsFile(this->keyfile))
 		{
 			if (!SSL_CTX_use_PrivateKey_file(client_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_PrivateKey_file(server_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM))
 				throw ConfigException("Error loading private key");
@@ -168,7 +168,7 @@ public:
 		}
 		else
 		{
-			if (Anope::IsFile(this->certfile.c_str()))
+			if (Anope::IsFile(this->certfile))
 				throw ConfigException("Error loading private key " + this->keyfile + " - file not found");
 			else
 				Log() << "Unable to open private key " << this->keyfile;

@@ -191,7 +191,7 @@ class SerializableExtensibleItem<bool> : public PrimitiveExtensibleItem<bool>
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
 	{
 		data.SetType(this->name, Serialize::Data::DT_INT);
-		data[this->name] << true;
+		data[this->name] << this->HasExt(e);
 	}
 
 	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override

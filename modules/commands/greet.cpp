@@ -188,7 +188,7 @@ class Greet : public Module
 		 * to has synced, or we'll get greet-floods when the net
 		 * recovers from a netsplit. -GD
 		 */
-		if (!c->ci || !c->ci->bi || !user->server->IsSynced() || !user->Account())
+		if (!c->ci || !c->ci->bi || !user->server->IsSynced() || !user->IsIdentified())
 			return;
 
 		Anope::string *greet = ns_greet.Get(user->Account());

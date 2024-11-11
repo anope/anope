@@ -23,7 +23,7 @@ class IdentifyInterface : public LDAPInterface
 
 	void OnResult(const LDAPResult &r) anope_override
 	{
-		if (!u || !u->Account())
+		if (!u || !u->IsIdentified())
 			return;
 
 		NickCore *nc = u->Account();

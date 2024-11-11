@@ -108,7 +108,7 @@ void IRC2SQL::OnUserConnect(User *u, bool &exempt)
 	query.SetValue("ident", u->GetIdent());
 	query.SetValue("vident", u->GetVIdent());
 	query.SetValue("secure", u->HasMode("SSL") || u->HasExt("ssl") ? "Y" : "N");
-	query.SetValue("account", u->Account() ? u->Account()->display : "");
+	query.SetValue("account", u->IsIdentified() ? u->Account()->display : "");
 	query.SetValue("fingerprint", u->fingerprint);
 	query.SetValue("signon", u->signon);
 	query.SetValue("server", u->server->GetName());
@@ -176,7 +176,7 @@ void IRC2SQL::OnUserLogin(User *u)
 {
 	query = "UPDATE `" + prefix + "user` SET account=@account@ WHERE nick=@nick@";
 	query.SetValue("nick", u->nick);
-	query.SetValue("account", u->Account() ? u->Account()->display : "");
+	query.SetValue("account", u->IsIdentified() ? u->Account()->display : "");
 	this->RunQuery(query);
 }
 

@@ -114,7 +114,7 @@ void MemoInfo::Del(unsigned index)
 bool MemoInfo::HasIgnore(User *u)
 {
 	for (unsigned i = 0; i < this->ignores.size(); ++i)
-		if (u->nick.equals_ci(this->ignores[i]) || (u->Account() && u->Account()->display.equals_ci(this->ignores[i])) || Anope::Match(u->GetMask(), Anope::string(this->ignores[i])))
+		if (u->nick.equals_ci(this->ignores[i]) || (u->IsIdentified() && u->Account()->display.equals_ci(this->ignores[i])) || Anope::Match(u->GetMask(), Anope::string(this->ignores[i])))
 			return true;
 	return false;
 }

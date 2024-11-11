@@ -399,7 +399,7 @@ class NickServCore : public Module, public NickServService
 		const NickAlias *na = NickAlias::Find(u->nick);
 
 		const Anope::string &unregistered_notice = Config->GetModule(this)->Get<const Anope::string>("unregistered_notice");
-		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na && !u->Account())
+		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na && !u->IsIdentified())
 			u->SendMessage(NickServ, unregistered_notice.replace_all_cs("%n", u->nick));
 		else if (na && !u->IsIdentified(true))
 			this->Validate(u);

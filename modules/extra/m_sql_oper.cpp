@@ -46,7 +46,7 @@ class SQLOperResult : public SQL::Interface
 	{
 		SQLOperResultDeleter d(this);
 
-		if (!user || !user->Account())
+		if (!user || !user->IsIdentified())
 			return;
 
 		if (r.Rows() == 0)

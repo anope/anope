@@ -167,7 +167,7 @@ class Fantasy : public Module
 		}
 
 		// Command requires registered users only
-		if (!cmd->AllowUnregistered() && !u->Account())
+		if (!cmd->AllowUnregistered() && !u->IsIdentified())
 			return;
 
 		if (params.size() < cmd->min_params)

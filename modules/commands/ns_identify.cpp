@@ -82,7 +82,7 @@ class CommandNSIdentify : public Command
 			return;
 		}
 
-		if (u->Account() && na && u->Account() == na->nc)
+		if (u->IsIdentified() && na && u->Account() == na->nc)
 		{
 			source.Reply(_("You are already identified."));
 			return;

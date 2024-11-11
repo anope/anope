@@ -62,7 +62,7 @@ const char *Language::Translate(const char *string)
 
 const char *Language::Translate(User *u, const char *string)
 {
-	if (u && u->Account())
+	if (u && u->IsIdentified())
 		return Translate(u->Account(), string);
 	else
 		return Translate("", string);

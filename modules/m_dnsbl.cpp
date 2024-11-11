@@ -68,7 +68,7 @@ class DNSBLResolver : public Request
 		if (!blacklist.replies.empty() && !reply)
 			return;
 
-		if (reply && reply->allow_account && user->Account())
+		if (reply && reply->allow_account && user->IsIdentified())
 			return;
 
 		Anope::string reason = this->blacklist.reason, addr = user->ip.addr();

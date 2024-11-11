@@ -207,7 +207,7 @@ class MChanstats : public Module
 
 	const Anope::string GetDisplay(User *u)
 	{
-		if (u && u->Account() && ns_stats.HasExt(u->Account()))
+		if (u && u->IsIdentified() && ns_stats.HasExt(u->Account()))
 			return u->Account()->display;
 		else
 			return "";
@@ -527,7 +527,7 @@ class MChanstats : public Module
 
 	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
 	{
-		if (!source || !source->Account() || !c->ci || !cs_stats.HasExt(c->ci))
+		if (!source || !source->IsIdentified() || !c->ci || !cs_stats.HasExt(c->ci))
 			return;
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);";
 		query.SetValue("channel", c->name);
@@ -550,7 +550,7 @@ class MChanstats : public Module
  private:
 	void OnModeChange(Channel *c, User *u)
 	{
-		if (!u || !u->Account() || !c->ci || !cs_stats.HasExt(c->ci))
+		if (!u || !u->IsIdentified() || !c->ci || !cs_stats.HasExt(c->ci))
 			return;
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);";

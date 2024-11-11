@@ -537,7 +537,7 @@ namespace UnrealExtban
 			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(3);
 
-			return u->Account() && Anope::Match(u->Account()->display, real_mask);
+			return u->IsIdentified() && Anope::Match(u->Account()->display, real_mask);
 		}
 	};
 }

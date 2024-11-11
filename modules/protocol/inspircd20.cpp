@@ -253,7 +253,7 @@ namespace InspIRCdExtban
 		{
 			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(2);
-			return !u->Account() && Entry("BAN", real_mask).Matches(u);
+			return !u->IsIdentified() && Entry("BAN", real_mask).Matches(u);
 		}
 	};
 }

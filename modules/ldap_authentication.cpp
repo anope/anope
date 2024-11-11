@@ -145,7 +145,7 @@ public:
 	{
 		User *u = User::Find(uid);
 
-		if (!u || !u->Account() || r.empty())
+		if (!u || !u->IsIdentified() || r.empty())
 			return;
 
 		try

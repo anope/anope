@@ -1077,7 +1077,7 @@ public:
 		if (chan->ci)
 		{
 			/* Only give modes if autoop is set */
-			give_modes &= !user->Account() || autoop.HasExt(user->Account());
+			give_modes &= !user->IsIdentified() || autoop.HasExt(user->Account());
 		}
 	}
 
@@ -1110,13 +1110,13 @@ public:
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
-		if (u->Account() && setter.GetUser() == u)
+		if (u->IsIdentified() && setter.GetUser() == u)
 			u->Account()->last_modes = u->GetModeList();
 	}
 
 	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
-		if (u->Account() && setter.GetUser() == u)
+		if (u->IsIdentified() && setter.GetUser() == u)
 			u->Account()->last_modes = u->GetModeList();
 	}
 

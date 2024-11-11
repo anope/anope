@@ -100,7 +100,7 @@ public:
 				{
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
-						if (cu->user->Account() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
+						if (cu->user->IsIdentified() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
 							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), MemoServ->GetQueryCommand().c_str(), ci->name.c_str(), mi->memos->size());
 					}
 				}

@@ -588,7 +588,7 @@ namespace UnrealExtBan
 			if (e->GetMask() == "0" && !u->Account()) /* ~a:0 is special and matches all unauthenticated users */
 				return true;
 
-			return u->Account() && Anope::Match(u->Account()->display, e->GetMask());
+			return u->IsIdentified() && Anope::Match(u->Account()->display, e->GetMask());
 		}
 	};
 

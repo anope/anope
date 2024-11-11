@@ -115,7 +115,7 @@ bool MemoInfo::HasIgnore(User *u)
 {
 	for (const auto &ignore : this->ignores)
 	{
-		if (u->nick.equals_ci(ignore) || (u->Account() && u->Account()->display.equals_ci(ignore)) || Anope::Match(u->GetMask(), Anope::string(ignore)))
+		if (u->nick.equals_ci(ignore) || (u->IsIdentified() && u->Account()->display.equals_ci(ignore)) || Anope::Match(u->GetMask(), Anope::string(ignore)))
 			return true;
 	}
 	return false;

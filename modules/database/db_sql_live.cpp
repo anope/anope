@@ -58,13 +58,7 @@ private:
 		return this->prefix + s_type->GetName();
 	}
 
-	void RunQuery(const Query &query)
-	{
-		/* Can this be threaded? */
-		this->RunQueryResult(query);
-	}
-
-	Result RunQueryResult(const Query &query)
+	Result RunQuery(const Query &query)
 	{
 		if (this->CheckSQL())
 		{
@@ -113,9 +107,9 @@ public:
 
 				auto create = this->SQL->CreateTable(GetTableName(s_type), data);
 				for (const auto &query : create)
-					this->RunQueryResult(query);
+					this->RunQuery(query);
 
-				auto res = this->RunQueryResult(this->SQL->BuildInsert(GetTableName(s_type), obj->id, data));
+				auto res = this->RunQuery(this->SQL->BuildInsert(GetTableName(s_type), obj->id, data));
 				if (res.GetID() && obj->id != res.GetID())
 				{
 					/* In this case obj is new, so place it into the object map */
@@ -183,7 +177,7 @@ public:
 
 		obj->UpdateTimestamp();
 
-		Result res = this->RunQueryResult(query);
+		Result res = this->RunQuery(query);
 
 		bool clear_null = false;
 		for (int i = 0; i < res.Rows(); ++i)

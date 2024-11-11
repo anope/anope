@@ -53,6 +53,11 @@ private:
 		return init && SQL;
 	}
 
+	Anope::string GetTableName(Serialize::Type *s_type)
+	{
+		return this->prefix + s_type->GetName();
+	}
+
 	void RunQuery(const Query &query)
 	{
 		/* Can this be threaded? */
@@ -106,11 +111,11 @@ public:
 				if (!s_type)
 					continue;
 
-				std::vector<Query> create = this->SQL->CreateTable(this->prefix + s_type->GetName(), data);
+				auto create = this->SQL->CreateTable(GetTableName(s_type), data);
 				for (const auto &query : create)
 					this->RunQueryResult(query);
 
-				Result res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + s_type->GetName(), obj->id, data));
+				auto res = this->RunQueryResult(this->SQL->BuildInsert(GetTableName(s_type), obj->id, data));
 				if (res.GetID() && obj->id != res.GetID())
 				{
 					/* In this case obj is new, so place it into the object map */
@@ -163,7 +168,7 @@ public:
 		if (s_type)
 		{
 			if (obj->id > 0)
-				this->RunQuery("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + Anope::ToString(obj->id));
+				this->RunQuery("DELETE FROM `" + GetTableName(s_type) + "` WHERE `id` = " + Anope::ToString(obj->id));
 			s_type->objects.erase(obj->id);
 		}
 		this->updated_items.erase(obj);
@@ -174,7 +179,7 @@ public:
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
 
-		Query query("SELECT * FROM `" + this->prefix + obj->GetName() + "` WHERE (`timestamp` >= " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " OR `timestamp` IS NULL)");
+		Query query("SELECT * FROM `" + GetTableName(obj) + "` WHERE (`timestamp` >= " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " OR `timestamp` IS NULL)");
 
 		obj->UpdateTimestamp();
 
@@ -236,7 +241,7 @@ public:
 				else
 				{
 					if (!s)
-						this->RunQuery("UPDATE `" + prefix + obj->GetName() + "` SET `timestamp` = " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " WHERE `id` = " + Anope::ToString(id));
+						this->RunQuery("UPDATE `" + GetTableName(obj) + "` SET `timestamp` = " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " WHERE `id` = " + Anope::ToString(id));
 					else
 						delete s;
 				}
@@ -245,7 +250,7 @@ public:
 
 		if (clear_null)
 		{
-			query = "DELETE FROM `" + this->prefix + obj->GetName() + "` WHERE `timestamp` IS NULL";
+			query = "DELETE FROM `" + GetTableName(obj) + "` WHERE `timestamp` IS NULL";
 			this->RunQuery(query);
 		}
 	}

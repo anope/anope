@@ -202,8 +202,9 @@ public:
 			this->OnSyntaxError(source, "");
 		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
 		{
-			source.Reply(_("Please wait %lu seconds before using the REGISTER command again."),
-				(unsigned long)(u->lastnickreg + reg_delay) - Anope::CurTime);
+			auto waitperiod = (unsigned long)(u->lastnickreg + reg_delay) - Anope::CurTime;
+			source.Reply(_("Please wait %s before using the REGISTER command again."),
+				Anope::Duration(waitperiod, source.GetAccount()).c_str());
 		}
 		else if (NickAlias::Find(u_nick) != NULL)
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());

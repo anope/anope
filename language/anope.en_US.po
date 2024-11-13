@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-13 02:41+0000\n"
+"POT-Creation-Date: 2024-11-13 11:56+0000\n"
 "PO-Revision-Date: 2024-11-13 02:45+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -4627,19 +4627,19 @@ msgid "Please wait %lu seconds and retry."
 msgstr ""
 
 #, c-format
-msgid "Please wait %lu seconds before requesting a new vhost."
+msgid "Please wait %s before requesting a new vhost."
 msgstr ""
 
 #, c-format
-msgid "Please wait %lu seconds before using the %s command again."
+msgid "Please wait %s before using the %s command again."
 msgstr ""
 
 #, c-format
-msgid "Please wait %lu seconds before using the GROUP command again."
+msgid "Please wait %s before using the GROUP command again."
 msgstr ""
 
 #, c-format
-msgid "Please wait %lu seconds before using the REGISTER command again."
+msgid "Please wait %s before using the REGISTER command again."
 msgstr ""
 
 #, c-format

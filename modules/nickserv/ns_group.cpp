@@ -148,7 +148,10 @@ public:
 		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (user && Anope::CurTime < user->lastnickreg + reg_delay)
-			source.Reply(_("Please wait %lu seconds before using the GROUP command again."), (unsigned long)(reg_delay + user->lastnickreg) - Anope::CurTime);
+		{
+			auto waitperiod = (unsigned long)(reg_delay + user->lastnickreg) - Anope::CurTime;
+			source.Reply(_("Please wait %s before using the GROUP command again."), Anope::Duration(waitperiod, source.GetAccount()).c_str());
+		}
 		else if (target->nc->HasExt("NS_SUSPENDED"))
 		{
 			Log(LOG_COMMAND, source, this) << "and tried to group to SUSPENDED nick " << target->nick;

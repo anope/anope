@@ -308,36 +308,32 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc)
 	time_t minutes = (t / 60) % 60;
 	time_t seconds = (t) % 60;
 
-	if (!years && !days && !hours && !minutes)
-		return Anope::ToString(seconds) + " " + (seconds != 1 ? Language::Translate(nc, _("seconds")) : Language::Translate(nc, _("second")));
-	else
+	Anope::string buffer;
+	if (years)
 	{
-		bool need_comma = false;
-		Anope::string buffer;
-		if (years)
-		{
-			buffer = Anope::ToString(years) + " " + (years != 1 ? Language::Translate(nc, _("years")) : Language::Translate(nc, _("year")));
-			need_comma = true;
-		}
-		if (days)
-		{
-			buffer += need_comma ? ", " : "";
-			buffer += Anope::ToString(days) + " " + (days != 1 ? Language::Translate(nc, _("days")) : Language::Translate(nc, _("day")));
-			need_comma = true;
-		}
-		if (hours)
-		{
-			buffer += need_comma ? ", " : "";
-			buffer += Anope::ToString(hours) + " " + (hours != 1 ? Language::Translate(nc, _("hours")) : Language::Translate(nc, _("hour")));
-			need_comma = true;
-		}
-		if (minutes)
-		{
-			buffer += need_comma ? ", " : "";
-			buffer += Anope::ToString(minutes) + " " + (minutes != 1 ? Language::Translate(nc, _("minutes")) : Language::Translate(nc, _("minute")));
-		}
-		return buffer;
+		buffer = Anope::printf(Language::Translate(nc, years, N_("1 year", "%lld years")), (long long)years);
 	}
+	if (days)
+	{
+		buffer += buffer.empty() ? "" : ", ";
+		buffer += Anope::printf(Language::Translate(nc, days, N_("1 day", "%lld days")), (long long)days);
+	}
+	if (hours)
+	{
+		buffer += buffer.empty() ? "" : ", ";
+		buffer += Anope::printf(Language::Translate(nc, hours, N_("1 hour", "%lld hours")), (long long)hours);
+	}
+	if (minutes)
+	{
+		buffer += buffer.empty() ? "" : ", ";
+		buffer += Anope::printf(Language::Translate(nc, minutes, N_("1 minute", "%lld minutes")), (long long)minutes);
+	}
+	if (seconds || buffer.empty())
+	{
+		buffer += buffer.empty() ? "" : ", ";
+		buffer += Anope::printf(Language::Translate(nc, seconds, N_("1 second", "%lld seconds")), (long long)seconds);
+	}
+	return buffer;
 }
 
 Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)

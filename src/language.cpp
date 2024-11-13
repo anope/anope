@@ -73,11 +73,66 @@ const char *Language::Translate(const NickCore *nc, const char *string)
 	return Translate(nc ? nc->language.c_str() : "", string);
 }
 
+const char *Language::Translate(int count, const char *singular, const char *plural)
+{
+	return Translate("", count, singular, plural);
+}
+
+const char *Language::Translate(User *u, int count, const char *singular, const char *plural)
+{
+	if (u && u->IsIdentified())
+		return Translate(u->Account(), count, singular, plural);
+	else
+		return Translate("", count, singular, plural);
+}
+
+const char *Language::Translate(const NickCore *nc, int count, const char *singular, const char *plural)
+{
+	return Translate(nc ? nc->language.c_str() : "", count, singular, plural);
+}
+
 #if HAVE_LOCALIZATION
 
 #if defined(__GLIBC__) && defined(__USE_GNU_GETTEXT)
 extern "C" int _nl_msg_cat_cntr;
 #endif
+
+namespace
+{
+	void PreTranslate(const char* lang)
+	{
+#if defined(__GLIBC__) && defined(__USE_GNU_GETTEXT)
+		++_nl_msg_cat_cntr;
+#endif
+
+#ifdef _WIN32
+		SetThreadLocale(MAKELCID(MAKELANGID(WindowsGetLanguage(lang), SUBLANG_DEFAULT), SORT_DEFAULT));
+#else
+		/* First, set LANG and LANGUAGE env variables.
+		 * Some systems (Debian) don't care about this, so we must setlocale LC_ALL as well.
+		 * BUT if this call fails because the LANGUAGE env variable is set, setlocale resets
+		 * the locale to "C", which short circuits gettext and causes it to fail on systems that
+		 * use the LANGUAGE env variable. We must reset the locale to en_US (or, anything not
+		 * C or POSIX) then.
+		 */
+		setenv("LANG", lang, 1);
+		setenv("LANGUAGE", lang, 1);
+		if (setlocale(LC_ALL, lang) == NULL)
+			setlocale(LC_ALL, "en_US");
+#endif
+	}
+
+	void PostTranslate()
+	{
+#ifdef _WIN32
+		SetThreadLocale(MAKELCID(MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), SORT_DEFAULT));
+#else
+		unsetenv("LANGUAGE");
+		unsetenv("LANG");
+		setlocale(LC_ALL, "");
+#endif
+	}
+}
 
 const char *Language::Translate(const char *lang, const char *string)
 {
@@ -87,36 +142,31 @@ const char *Language::Translate(const char *lang, const char *string)
 	if (!lang || !*lang)
 		lang = Config->DefLanguage.c_str();
 
-#if defined(__GLIBC__) && defined(__USE_GNU_GETTEXT)
-	++_nl_msg_cat_cntr;
-#endif
+	PreTranslate(lang);
 
-#ifdef _WIN32
-	SetThreadLocale(MAKELCID(MAKELANGID(WindowsGetLanguage(lang), SUBLANG_DEFAULT), SORT_DEFAULT));
-#else
-	/* First, set LANG and LANGUAGE env variables.
-	 * Some systems (Debian) don't care about this, so we must setlocale LC_ALL as well.
-	 * BUT if this call fails because the LANGUAGE env variable is set, setlocale resets
-	 * the locale to "C", which short circuits gettext and causes it to fail on systems that
-	 * use the LANGUAGE env variable. We must reset the locale to en_US (or, anything not
-	 * C or POSIX) then.
-	 */
-	setenv("LANG", lang, 1);
-	setenv("LANGUAGE", lang, 1);
-	if (setlocale(LC_ALL, lang) == NULL)
-		setlocale(LC_ALL, "en_US");
-#endif
 	const char *translated_string = dgettext("anope", string);
 	for (unsigned i = 0; translated_string == string && i < Domains.size(); ++i)
 		translated_string = dgettext(Domains[i].c_str(), string);
-#ifdef _WIN32
-	SetThreadLocale(MAKELCID(MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), SORT_DEFAULT));
-#else
-	unsetenv("LANGUAGE");
-	unsetenv("LANG");
-	setlocale(LC_ALL, "");
-#endif
 
+	PostTranslate();
+	return translated_string;
+}
+
+const char *Language::Translate(const char *lang, int count, const char *singular, const char *plural)
+{
+	if (!singular || !*singular || !plural || !*plural)
+		return "";
+
+	if (!lang || !*lang)
+		lang = Config->DefLanguage.c_str();
+
+	PreTranslate(lang);
+
+	const char *translated_string = dngettext("anope", singular, plural, count);
+	for (unsigned i = 0; (translated_string == singular || translated_string == plural) && i < Domains.size(); ++i)
+		translated_string = dngettext(Domains[i].c_str(), singular, plural, count);
+
+	PostTranslate();
 	return translated_string;
 }
 #else
@@ -124,4 +174,10 @@ const char *Language::Translate(const char *lang, const char *string)
 {
 	return string != NULL ? string : "";
 }
+const char *Language::Translate(const char *lang, int count, const char *singular, const char *plural)
+{
+	return Language::Translate("", count == 1 ? singular : plural);
+}
 #endif
+
+

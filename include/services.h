@@ -40,6 +40,7 @@
 #define BUFSIZE 1024
 
 #define _(x) x
+#define N_(x, y) x, y
 
 #ifndef _WIN32
 # define DllExport __attribute__ ((visibility ("default")))

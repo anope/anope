@@ -30,6 +30,7 @@ find ../ \
 			--from-code=utf-8 \
 			--keyword \
 			--keyword=_ \
+			--keyword=N_:1,2 \
 			{} +
 
 for f in *.po

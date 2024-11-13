@@ -7082,10 +7082,6 @@ msgid "You must confirm your account before you may send a memo."
 msgstr ""
 
 #, c-format
-msgid "You must have been using this nick for at least %lu seconds to register."
-msgstr ""
-
-#, c-format
 msgid "You must have the %s(ME) privilege on the channel to use this command."
 msgstr ""
 
@@ -7093,6 +7089,10 @@ msgid ""
 "You must now supply an email for your nick.\n"
 "This email will allow you to retrieve your password in\n"
 "case you forget it."
+msgstr ""
+
+#, c-format
+msgid "You must wait %s before registering your nick."
 msgstr ""
 
 msgid "You need to be identified to use this command."

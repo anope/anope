@@ -154,8 +154,9 @@ public:
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		if (u && !u->HasMode("OPER") && nickregdelay && Anope::CurTime - u->timestamp < nickregdelay)
 		{
-			source.Reply(_("You must have been using this nick for at least %lu seconds to register."),
-				(unsigned long)nickregdelay);
+			auto waitperiod = (u->timestamp + nickregdelay) -  Anope::CurTime;
+			source.Reply(_("You must wait %s before registering your nick."),
+				Anope::Duration(waitperiod, source.GetAccount()).c_str());
 			return;
 		}
 

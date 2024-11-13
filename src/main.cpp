@@ -217,7 +217,7 @@ int main(int ac, char **av, char **envp)
 
 	if (Anope::Restarting)
 	{
-		if (chdir(BinaryDir.c_str()) != 0)
+		if (chdir(BinaryDir.c_str()) == 0)
 		{
 			Anope::string sbin = "./" + Anope::ServicesBin;
 			av[0] = const_cast<char *>(sbin.c_str());

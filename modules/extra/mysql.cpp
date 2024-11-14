@@ -164,19 +164,19 @@ public:
 		switch (dt)
 		{
 			case Serialize::DataType::BOOL:
-				return "TINYINT NOT NULL";
+				return "TINYINT NOT NULL DEFAULT 0";
 
 			case Serialize::DataType::FLOAT:
-				return "DOUBLE PRECISION NOT NULL";
+				return "DOUBLE PRECISION NOT NULL DEFAULT 0.0";
 
 			case Serialize::DataType::INT:
-				return "BIGINT NOT NULL";
+				return "BIGINT NOT NULL DEFAULT 0";
 
 			case Serialize::DataType::TEXT:
-				return "TEXT";
+				return "TEXT DEFAULT NULL";
 
 			case Serialize::DataType::UINT:
-				return "BIGINT UNSIGNED NOT NULL";
+				return "BIGINT UNSIGNED NOT NULL DEFAULT 0";
 		}
 
 		return "TEXT"; // Should never be reached
@@ -498,7 +498,7 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 			case Serialize::DataType::UINT:
 			{
 				if (buf.empty())
-					buf = "0";
+					buf = "DEFAULT";
 				escape = false;
 				break;
 			}
@@ -507,7 +507,7 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 			{
 				if (buf.empty())
 				{
-					buf = "NULL";
+					buf = "DEFAULT";
 					escape = false;
 				}
 				break;

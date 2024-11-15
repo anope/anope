@@ -16,7 +16,7 @@
 #include <climits>
 
 Serialize::Checker<nickcore_map> NickCoreList("NickCore");
-nickcoreid_map NickCoreIdList;
+Serialize::Checker<nickcoreid_map> NickCoreIdList("NickCore");
 
 NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid)
 	: Serializable("NickCore")
@@ -32,7 +32,7 @@ NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid)
 		Log(LOG_DEBUG) << "Duplicate account " << this->display << " in NickCore table";
 
 	// Upgrading users may not have an account identifier.
-	if (this->id && !NickCoreIdList.insert_or_assign(this->id, this).second)
+	if (this->id && !NickCoreIdList->insert_or_assign(this->id, this).second)
 		Log(LOG_DEBUG) << "Duplicate account id " << this->id << " in NickCore table";
 
 	FOREACH_MOD(OnNickCoreCreate, (this));
@@ -56,7 +56,7 @@ NickCore::~NickCore()
 
 	NickCoreList->erase(this->display);
 	if (this->id)
-		NickCoreIdList.erase(this->id);
+		NickCoreIdList->erase(this->id);
 
 	if (!this->memos.memos->empty())
 	{
@@ -222,7 +222,7 @@ uint64_t NickCore::GetId()
 	{
 		const auto newidstr = this->display + "\0" + Anope::ToString(this->time_registered) + "\0" + Anope::ToString(attempt++);
 		const auto newid = Anope::hash_cs()(newidstr);
-		if (NickCoreIdList.emplace(newid, this).second)
+		if (NickCoreIdList->emplace(newid, this).second)
 		{
 			this->id = newid;
 			this->QueueUpdate();

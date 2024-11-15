@@ -23,7 +23,7 @@ typedef std::unordered_map<uint64_t, NickCore *> nickcoreid_map;
 
 extern CoreExport Serialize::Checker<nickalias_map> NickAliasList;
 extern CoreExport Serialize::Checker<nickcore_map> NickCoreList;
-extern CoreExport nickcoreid_map NickCoreIdList;
+extern CoreExport Serialize::Checker<nickcoreid_map> NickCoreIdList;
 
 /* A registered nickname.
  * It matters that Base is here before Extensible (it is inherited by Serializable)

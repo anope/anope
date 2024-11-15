@@ -159,27 +159,51 @@ public:
 
 	Anope::string FromUnixtime(time_t) override;
 
-	Anope::string GetColumnType(Serialize::DataType dt)
+	const char* GetColumnDefault(Serialize::DataType dt)
 	{
 		switch (dt)
 		{
 			case Serialize::DataType::BOOL:
-				return "TINYINT NOT NULL DEFAULT 0";
-
-			case Serialize::DataType::FLOAT:
-				return "DOUBLE PRECISION NOT NULL DEFAULT 0.0";
-
 			case Serialize::DataType::INT:
-				return "BIGINT NOT NULL DEFAULT 0";
-
-			case Serialize::DataType::TEXT:
-				return "TEXT DEFAULT NULL";
-
 			case Serialize::DataType::UINT:
-				return "BIGINT UNSIGNED NOT NULL DEFAULT 0";
+				return "0";
+			case Serialize::DataType::FLOAT:
+				return "0.0";
+			case Serialize::DataType::TEXT:
+				return "NULL";
 		}
+		return "NULL"; // Should never be reached
+	}
 
+	bool GetColumnNull(Serialize::DataType dt)
+	{
+		return dt == Serialize::DataType::TEXT;
+	}
+
+	const char* GetColumnType(Serialize::DataType dt)
+	{
+		switch (dt)
+		{
+			case Serialize::DataType::BOOL:
+				return "TINYINT";
+			case Serialize::DataType::FLOAT:
+				return "DOUBLE";
+			case Serialize::DataType::INT:
+				return "BIGINT";
+			case Serialize::DataType::TEXT:
+				return "TEXT";
+			case Serialize::DataType::UINT:
+				return "BIGINT UNSIGNED";
+		}
 		return "TEXT"; // Should never be reached
+	}
+
+	Anope::string GetColumn(Serialize::DataType dt)
+	{
+		return Anope::printf("%s %s DEFAULT %s",
+				GetColumnType(dt),
+				GetColumnNull(dt) ? "NULL" : "NOT NULL",
+				GetColumnDefault(dt));
 	}
 };
 
@@ -424,10 +448,62 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 		Result columns = this->RunQuery("SHOW COLUMNS FROM `" + table + "`");
 		for (int i = 0; i < columns.Rows(); ++i)
 		{
-			const Anope::string &column = columns.Get(i, "Field");
 
+			const auto column = columns.Get(i, "Field");
 			Log(LOG_DEBUG) << "mysql: Column #" << i << " for " << table << ": " << column;
+
+			if (column == "id" || column == "timestamp")
+				continue; // These columns are special and aren't part of the data.
+
 			known_cols.insert(column);
+
+			// We know the column exists but is the type correct?
+			auto update = false;
+			const auto stype = data.GetType(column);
+
+			auto coldef = columns.Get(i, "Default");
+			if (coldef.empty())
+				coldef = "NULL";
+
+			const auto *newcoldef = GetColumnDefault(stype);
+			if (!coldef.equals_ci(newcoldef))
+			{
+				Log(LOG_DEBUG) << "mysql: Updating the default of " << column << " from " << coldef << " to " << newcoldef;
+				update = true;
+			}
+
+			const auto colnull = columns.Get(i, "Null");
+			const auto newcolnull = GetColumnNull(stype) ? "YES" : "NO";
+			if (!colnull.equals_ci(newcolnull))
+			{
+				Log(LOG_DEBUG) << "mysql: Updating the nullability of " << column << " from " << colnull << " to " << newcolnull;
+				update = true;
+			}
+
+			const auto coltype = columns.Get(i, "Type");
+			const auto *newcoltype = GetColumnType(stype);
+			if (!coltype.equals_ci(newcoltype))
+			{
+				Log(LOG_DEBUG) << "mysql: Updating the type of " << column << " from " << coltype << " to " << newcoltype;
+				update = true;
+			}
+
+			if (update)
+			{
+				// We an't just use MODIFY COLUMN here because the value may not
+				// be valid and we may need to replace with the default.
+				this->RunQuery(Anope::printf("ALTER TABLE `%s` ADD COLUMN `%s_new` %s; ",
+					table.c_str(), column.c_str(), GetColumn(stype).c_str()));
+
+				this->RunQuery(Anope::printf("UPDATE IGNORE `%s` SET `%s_new` = %s; ",
+					table.c_str(), column.c_str(), column.c_str()));
+
+				this->RunQuery(Anope::printf("ALTER TABLE `%s` DROP COLUMN `%s`; ",
+					table.c_str(), column.c_str()));
+
+				res = this->RunQuery(Anope::printf("ALTER TABLE `%s` RENAME COLUMN `%s_new` TO `%s`; ",
+					table.c_str(), column.c_str(), column.c_str()));
+			}
 		}
 	}
 
@@ -439,7 +515,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 		{
 			known_cols.insert(column);
 
-			query_text += ", `" + column + "` " + GetColumnType(data.GetType(column));
+			query_text += ", `" + column + "` " + GetColumn(data.GetType(column));
 		}
 		query_text += ", PRIMARY KEY (`id`), KEY `timestamp_idx` (`timestamp`)) ROW_FORMAT=DYNAMIC";
 		queries.push_back(query_text);
@@ -453,7 +529,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 
 			known_cols.insert(column);
 
-			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` " + GetColumnType(data.GetType(column));
+			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` " + GetColumn(data.GetType(column));
 
 			queries.push_back(query_text);
 		}
@@ -467,7 +543,7 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 	/* Empty columns not present in the data set */
 	for (const auto &known_col : this->active_schema[table])
 	{
-		if (known_col != "id" && known_col != "timestamp" && data.data.count(known_col) == 0)
+		if (data.data.count(known_col) == 0)
 			data[known_col] << "";
 	}
 

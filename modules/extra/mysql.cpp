@@ -490,19 +490,31 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 
 			if (update)
 			{
-				// We an't just use MODIFY COLUMN here because the value may not
+				// We can't just use MODIFY COLUMN here because the value may not
 				// be valid and we may need to replace with the default.
-				this->RunQuery(Anope::printf("ALTER TABLE `%s` ADD COLUMN `%s_new` %s; ",
+				auto res = this->RunQuery(Anope::printf("ALTER TABLE `%s` ADD COLUMN `%s_new` %s; ",
 					table.c_str(), column.c_str(), GetColumn(stype).c_str()));
 
-				this->RunQuery(Anope::printf("UPDATE IGNORE `%s` SET `%s_new` = %s; ",
-					table.c_str(), column.c_str(), column.c_str()));
+				if (res)
+				{
+					res = this->RunQuery(Anope::printf("UPDATE IGNORE `%s` SET `%s_new` = %s; ",
+						table.c_str(), column.c_str(), column.c_str()));
+				}
 
-				this->RunQuery(Anope::printf("ALTER TABLE `%s` DROP COLUMN `%s`; ",
-					table.c_str(), column.c_str()));
+				if (res)
+				{
+					res = this->RunQuery(Anope::printf("ALTER TABLE `%s` DROP COLUMN `%s`; ",
+						table.c_str(), column.c_str()));
+				}
 
-				res = this->RunQuery(Anope::printf("ALTER TABLE `%s` RENAME COLUMN `%s_new` TO `%s`; ",
-					table.c_str(), column.c_str(), column.c_str()));
+				if (res)
+				{
+					res = this->RunQuery(Anope::printf("ALTER TABLE `%s` RENAME COLUMN `%s_new` TO `%s`; ",
+						table.c_str(), column.c_str(), column.c_str()));
+				}
+
+				if (!res)
+					Log(LOG_DEBUG) << "Failed to migrate the " << column << " column: " << res.GetError();
 			}
 		}
 	}

@@ -98,10 +98,8 @@ public:
 
 	void Register()
 	{
-		std::map<Anope::string, Service *> &smap = Services[this->type];
-		if (smap.find(this->name) != smap.end())
+		if (!Services[this->type].emplace(this->name, this).second)
 			throw ModuleException("Service " + this->type + " with name " + this->name + " already exists");
-		smap[this->name] = this;
 	}
 
 	void Unregister()

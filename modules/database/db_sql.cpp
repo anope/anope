@@ -159,6 +159,14 @@ class DBSQL : public Module, public Pipe
 		this->import = block->Get<bool>("import");
 	}
 
+	void OnPostInit() anope_override
+	{
+		// If we are importing from flatfile we need to force a socket engine
+		// flush to ensure it actually gets written to the database before we
+		// connect to the uplink.
+		SocketEngine::Process();
+	}
+
 	void OnShutdown() anope_override
 	{
 		this->shutting_down = true;

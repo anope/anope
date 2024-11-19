@@ -556,7 +556,6 @@ void Anope::Init(int ac, char **av)
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(OnLoadDatabase, MOD_RESULT, ());
 	static_cast<void>(MOD_RESULT);
-	SocketEngine::Process();
 	Log() << "Databases loaded";
 
 	FOREACH_MOD(OnPostInit, ());

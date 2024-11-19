@@ -166,6 +166,14 @@ public:
 		this->import = block->Get<bool>("import");
 	}
 
+	void OnPostInit() override
+	{
+		// If we are importing from flatfile we need to force a socket engine
+		// flush to ensure it actually gets written to the database before we
+		// connect to the uplink.
+		SocketEngine::Process();
+	}
+
 	void OnShutdown() override
 	{
 		this->shutting_down = true;

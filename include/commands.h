@@ -81,6 +81,7 @@ public:
 	bool IsFounder(ChannelInfo *ci);
 
 	void Reply(const char *message, ...) ATTR_FORMAT(2, 3);
+	void Reply(int count, const char *singular, const char *plural, ...) ATTR_FORMAT(4, 5);
 	void Reply(const Anope::string &message);
 
 	bool HasCommand(const Anope::string &cmd);

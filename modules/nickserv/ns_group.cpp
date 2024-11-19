@@ -359,7 +359,7 @@ public:
 		for (const auto &reply : replies)
 			source.Reply(reply);
 
-		source.Reply(_("%zu nickname(s) in the group."), nc->aliases->size());
+		source.Reply(nc->aliases->size(), N_("1 nickname in the group.", "%zu nicknames in the group."), nc->aliases->size());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -292,7 +292,7 @@ public:
 						delete na;
 					}
 
-					source.Reply(_("\002%d\002 nickname(s) dropped."), na_matches);
+					source.Reply(na_matches, N_("\0021\002 nickname dropped.", "\002%d\002 nicknames dropped."), na_matches);
 					break;
 				}
 				case FT_CHAN:

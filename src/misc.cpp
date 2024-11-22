@@ -365,14 +365,14 @@ Anope::string Anope::Expires(time_t expires, const NickCore *nc)
 		if (diff >= 86400)
 		{
 			int days = diff / 86400;
-			snprintf(buf, sizeof(buf), Language::Translate(nc, days == 1 ? _("expires in %d day") : _("expires in %d days")), days);
+			snprintf(buf, sizeof(buf), Language::Translate(nc, days,  N_("expires in 1 day", "expires in %d days")), days);
 		}
 		else
 		{
 			if (diff <= 3600)
 			{
 				int minutes = diff / 60;
-				snprintf(buf, sizeof(buf), Language::Translate(nc, minutes == 1 ? _("expires in %d minute") : _("expires in %d minutes")), minutes);
+				snprintf(buf, sizeof(buf), Language::Translate(nc, minutes, N_("expires in 1 minute", "expires in %d minutes")), minutes);
 			}
 			else
 			{

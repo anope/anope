@@ -456,6 +456,11 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 				continue; // These columns are special and aren't part of the data.
 
 			known_cols.insert(column);
+			if (data.data.count(column) == 0)
+			{
+				Log(LOG_DEBUG) << "mysql: Column has been removed from the data set: " << column;
+				continue;
+			}
 
 			// We know the column exists but is the type correct?
 			auto update = false;

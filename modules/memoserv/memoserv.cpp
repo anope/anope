@@ -139,7 +139,7 @@ public:
 			if (nc->memos.GetMemo(i)->unread)
 				++newcnt;
 		if (newcnt > 0)
-			u->SendMessage(MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
+			u->SendMessage(MemoServ, newcnt, N_("You have 1 new memo.", "You have %d new memos."), newcnt);
 		if (nc->memos.memomax > 0 && nc->memos.memos->size() >= static_cast<unsigned>(nc->memos.memomax))
 		{
 			if (nc->memos.memos->size() > static_cast<unsigned>(nc->memos.memomax))

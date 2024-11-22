@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-22 13:00+0000\n"
+"POT-Creation-Date: 2024-11-22 15:21+0000\n"
 "PO-Revision-Date: 2024-11-13 02:45+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -6986,11 +6986,10 @@ msgid "You found me, %s!"
 msgstr ""
 
 #, c-format
-msgid "You have %d new memos."
-msgstr ""
-
 msgid "You have 1 new memo."
-msgstr ""
+msgid_plural "You have %d new memos."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
 msgid ""

@@ -21,7 +21,6 @@ find ../ \
 	\) \
 	-exec \
 		xgettext \
-			--escape \
 			--language=C++ \
 			--sort-output \
 			--default-domain=Anope \

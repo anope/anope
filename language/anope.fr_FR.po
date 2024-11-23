@@ -393,8 +393,8 @@ msgstr "%s HELP %s pour plus d'informations."
 #, c-format
 msgid "1 nickname dropped."
 msgid_plural "%d nicknames dropped."
-msgstr[0] "%d pseudo(s) effacé(s)."
-msgstr[1] "%d pseudo(s) effacé(s)."
+msgstr[0] "1 pseudo effacé."
+msgstr[1] "%d pseudos effacés."
 
 msgid "ADD nick user host real"
 msgstr "ADD pseudo user host realname"

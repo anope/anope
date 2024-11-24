@@ -19,4 +19,5 @@ public:
 	virtual void Validate(User *u) = 0;
 	virtual void Collide(User *u, NickAlias *na) = 0;
 	virtual void Release(NickAlias *na) = 0;
+	virtual bool IsGuestNick(const Anope::string &nick) const = 0;
 };

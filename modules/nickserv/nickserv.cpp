@@ -174,6 +174,24 @@ public:
 		OnShutdown();
 	}
 
+	bool IsGuestNick(const Anope::string &nick) const
+	{
+		const auto guestnick = Config->GetModule(this)->Get<Anope::string>("guestnick", "Guest####");
+		if (guestnick.empty())
+			return false; // No guest nick.
+
+		const auto minlen = std::min(nick.length(), guestnick.length());
+		for (size_t idx = 0; idx < minlen; ++idx)
+		{
+			if (guestnick[idx] == '#' && !isdigit(nick[idx]))
+				return false;
+
+			if (Anope::tolower(guestnick[idx]) != Anope::tolower(nick[idx]))
+				return false;
+		}
+		return true;
+	}
+
 	void Validate(User *u) override
 	{
 		NickAlias *na = NickAlias::Find(u->nick);
@@ -238,30 +256,47 @@ public:
 
 		if (IRCD->CanSVSNick)
 		{
-			unsigned nicklen = IRCD->MaxNick;
-			const Anope::string &guestprefix = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
-
+			auto guestnickok = false;
 			Anope::string guestnick;
-
-			int i = 0;
-			do
+			for (auto i = 0; i < 10; ++i)
 			{
-				guestnick = guestprefix + Anope::ToString(static_cast<uint16_t>(Anope::RandomNumber()));
-				if (guestnick.length() > nicklen)
-					guestnick = guestnick.substr(0, nicklen);
-			}
-			while (User::Find(guestnick) && i++ < 10);
+				guestnick.clear();
+				for (auto guestnickchr : Config->GetModule(this)->Get<Anope::string>("guestnick", "Guest####").substr(0, IRCD->MaxNick))
+				{
+					if (guestnickchr == '#')
+						guestnick.append(Anope::ToString(abs(Anope::RandomNumber()) % 10));
+					else
+						guestnick.push_back(guestnickchr);
+				}
 
-			if (i == 11)
-				u->Kill(*NickServ, "Services nickname-enforcer kill");
-			else
+				// A guest nick is valid if it is non-empty and is not in use.
+				if (!guestnick.empty() && !User::Find(guestnick, true))
+				{
+					guestnickok = true;
+					break;
+				}
+			}
+
+			// If we can't find a guest nick and the IRCd supports
+			// uids then we should use that as the backup guest
+			// nickname.
+			if (!guestnickok && IRCD->RequiresID)
+			{
+				guestnickok = true;
+				guestnick = u->GetUID();
+			}
+
+			if (guestnickok)
 			{
 				u->SendMessage(*NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
 				IRCD->SendForceNickChange(u, guestnick, Anope::CurTime);
+				return;
 			}
 		}
-		else
-			u->Kill(*NickServ, "Services nickname-enforcer kill");
+
+		// We can't change the user's nickname or we can't find an
+		// acceptable guest nick, give them the boot.
+		u->Kill(*NickServ, "Enforcement of services protected nickname");
 	}
 
 	void Release(NickAlias *na) override

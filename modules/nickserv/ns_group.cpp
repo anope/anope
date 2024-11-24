@@ -12,6 +12,8 @@
 #include "module.h"
 #include "modules/ns_cert.h"
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class NSGroupRequest final
 	: public IdentifyRequest
 {
@@ -142,7 +144,6 @@ public:
 		}
 
 		NickAlias *target, *na = NickAlias::Find(source.GetNick());
-		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		unsigned maxaliases = Config->GetModule(this->owner)->Get<unsigned>("maxaliases");
 		if (!(target = NickAlias::Find(nick)))
@@ -165,12 +166,8 @@ public:
 			source.Reply(NICK_IDENTIFY_REQUIRED);
 		else if (maxaliases && target->nc->aliases->size() >= maxaliases && !target->nc->IsServicesOper())
 			source.Reply(_("There are too many nicks in your group."));
-		else if (source.GetNick().length() <= guestnick.length() + 7 &&
-			source.GetNick().length() >= guestnick.length() + 1 &&
-			!source.GetNick().find_ci(guestnick) && !source.GetNick().substr(guestnick.length()).find_first_not_of("1234567890"))
-		{
+		else if (nickserv && nickserv->IsGuestNick(source.GetNick()))
 			source.Reply(NICK_CANNOT_BE_REGISTERED, source.GetNick().c_str());
-		}
 		else
 		{
 			bool ok = false;

@@ -3929,7 +3929,7 @@ msgstr ""
 "kullanıcıları atacaktır."
 
 msgid "English"
-msgstr "İngilizce"
+msgstr "Türkçe"
 
 #, c-format
 msgid "Entry message %i for %s deleted."
@@ -4311,7 +4311,7 @@ msgid "LOGONNEWS {ADD|DEL|LIST} [text|num]"
 msgstr "LOGONNEWS {ADD|DEL|LIST} [metin|nu.]"
 
 msgid "Language changed to English."
-msgstr "Dil İngilizce olarak değiştirildi."
+msgstr "Dil Türkçe olarak değiştirildi."
 
 #, c-format
 msgid "Language for %s changed to %s."

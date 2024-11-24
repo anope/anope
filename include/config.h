@@ -126,7 +126,7 @@ namespace Configuration
 		void LoadConf(File &file);
 		void Post(Conf *old);
 
-		Block *GetModule(Module *);
+		Block *GetModule(const Module *);
 		Block *GetModule(const Anope::string &name);
 
 		BotInfo *GetClient(const Anope::string &name);

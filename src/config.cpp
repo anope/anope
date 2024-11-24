@@ -620,7 +620,7 @@ void Conf::Post(Conf *old)
 	}
 }
 
-Block *Conf::GetModule(Module *m)
+Block *Conf::GetModule(const Module *m)
 {
 	if (!m)
 		return NULL;

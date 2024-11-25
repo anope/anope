@@ -98,7 +98,7 @@ class NickServRelease final
 
 public:
 	NickServRelease(Module *me, NickAlias *na, time_t delay)
-		: User(na->nick, Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser", "user"), Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost", Me->GetName()), "", "", Me, "Services Enforcer", Anope::CurTime, "", {}, IRCD->UID_Retrieve(), NULL)
+		: User(na->nick, Config->GetModule(me)->Get<const Anope::string>("enforceruser", "user"), Config->GetModule(me)->Get<const Anope::string>("enforcerhost", Me->GetName()), "", "", Me, "Services Enforcer", Anope::CurTime, "", {}, IRCD->UID_Retrieve(), NULL)
 		, Timer(me, delay)
 		, nick(na->nick)
 	{
@@ -140,12 +140,12 @@ class NickServCore final
 		{
 			collided.Unset(na);
 
-			new NickServHeld(this, na, Config->GetModule("nickserv")->Get<time_t>("releasetimeout", "1m"));
+			new NickServHeld(this, na, Config->GetModule(this)->Get<time_t>("releasetimeout", "1m"));
 
 			if (IRCD->CanSVSHold)
-				IRCD->SendSVSHold(na->nick, Config->GetModule("nickserv")->Get<time_t>("releasetimeout", "1m"));
+				IRCD->SendSVSHold(na->nick, Config->GetModule(this)->Get<time_t>("releasetimeout", "1m"));
 			else
-				new NickServRelease(this, na, Config->GetModule("nickserv")->Get<time_t>("releasetimeout", "1m"));
+				new NickServRelease(this, na, Config->GetModule(this)->Get<time_t>("releasetimeout", "1m"));
 		}
 	}
 

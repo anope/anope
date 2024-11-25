@@ -52,14 +52,14 @@ public:
 	 * @param sz How much to read
 	 * @return Number of bytes received
 	 */
-	int Recv(Socket *s, char *buf, size_t sz) override;
+	ssize_t Recv(Socket *s, char *buf, size_t sz) override;
 
 	/** Write something to the socket
 	 * @param s The socket
 	 * @param buf The data to write
 	 * @param size The length of the data
 	 */
-	int Send(Socket *s, const char *buf, size_t sz) override;
+	ssize_t Send(Socket *s, const char *buf, size_t sz) override;
 
 	/** Accept a connection from a socket
 	 * @param s The socket
@@ -237,7 +237,7 @@ SSLSocketIO::SSLSocketIO()
 	this->sslsock = NULL;
 }
 
-int SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
+ssize_t SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
 {
 	int i = SSL_read(this->sslsock, buf, sz);
 	if (i > 0)
@@ -256,7 +256,7 @@ int SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
 	return i;
 }
 
-int SSLSocketIO::Send(Socket *s, const char *buf, size_t sz)
+ssize_t SSLSocketIO::Send(Socket *s, const char *buf, size_t sz)
 {
 	int i = SSL_write(this->sslsock, buf, sz);
 	if (i > 0)

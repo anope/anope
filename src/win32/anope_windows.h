@@ -55,7 +55,7 @@
 #include "pipe/pipe.h"
 #include "sigaction/sigaction.h"
 
-typedef int ssize_t;
+typedef SSIZE_T ssize_t;
 
 namespace Anope
 {

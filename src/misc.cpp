@@ -311,27 +311,27 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc)
 	Anope::string buffer;
 	if (years)
 	{
-		buffer = Anope::printf(Language::Translate(nc, years, N_("1 year", "%lld years")), (long long)years);
+		buffer = Anope::printf(Language::Translate(nc, years, N_("%lld year", "%lld years")), (long long)years);
 	}
 	if (days)
 	{
 		buffer += buffer.empty() ? "" : ", ";
-		buffer += Anope::printf(Language::Translate(nc, days, N_("1 day", "%lld days")), (long long)days);
+		buffer += Anope::printf(Language::Translate(nc, days, N_("%lld day", "%lld days")), (long long)days);
 	}
 	if (hours)
 	{
 		buffer += buffer.empty() ? "" : ", ";
-		buffer += Anope::printf(Language::Translate(nc, hours, N_("1 hour", "%lld hours")), (long long)hours);
+		buffer += Anope::printf(Language::Translate(nc, hours, N_("%lld hour", "%lld hours")), (long long)hours);
 	}
 	if (minutes)
 	{
 		buffer += buffer.empty() ? "" : ", ";
-		buffer += Anope::printf(Language::Translate(nc, minutes, N_("1 minute", "%lld minutes")), (long long)minutes);
+		buffer += Anope::printf(Language::Translate(nc, minutes, N_("%lld minute", "%lld minutes")), (long long)minutes);
 	}
 	if (seconds || buffer.empty())
 	{
 		buffer += buffer.empty() ? "" : ", ";
-		buffer += Anope::printf(Language::Translate(nc, seconds, N_("1 second", "%lld seconds")), (long long)seconds);
+		buffer += Anope::printf(Language::Translate(nc, seconds, N_("%lld second", "%lld seconds")), (long long)seconds);
 	}
 	return buffer;
 }
@@ -365,14 +365,14 @@ Anope::string Anope::Expires(time_t expires, const NickCore *nc)
 		if (diff >= 86400)
 		{
 			int days = diff / 86400;
-			snprintf(buf, sizeof(buf), Language::Translate(nc, days,  N_("expires in 1 day", "expires in %d days")), days);
+			snprintf(buf, sizeof(buf), Language::Translate(nc, days,  N_("expires in %d day", "expires in %d days")), days);
 		}
 		else
 		{
 			if (diff <= 3600)
 			{
 				int minutes = diff / 60;
-				snprintf(buf, sizeof(buf), Language::Translate(nc, minutes, N_("expires in 1 minute", "expires in %d minutes")), minutes);
+				snprintf(buf, sizeof(buf), Language::Translate(nc, minutes, N_("expires in %d minute", "expires in %d minutes")), minutes);
 			}
 			else
 			{

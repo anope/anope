@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-22 15:31+0000\n"
+"POT-Creation-Date: 2024-11-25 01:18+0000\n"
 "PO-Revision-Date: 2024-11-13 02:45+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -21,6 +21,12 @@ msgstr ""
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
 msgstr ""
+
+#, c-format
+msgid "%d nickname dropped."
+msgid_plural "%d nicknames dropped."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
 msgid "%s added to %s %s list."
@@ -349,12 +355,6 @@ msgstr ""
 #, c-format
 msgid "%s HELP %s for more information."
 msgstr ""
-
-#, c-format
-msgid "1 nickname dropped."
-msgid_plural "%d nicknames dropped."
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "ADD nick user host real"
 msgstr ""
@@ -1038,6 +1038,36 @@ msgid "%d modules loaded."
 msgstr ""
 
 #, c-format
+msgid "%lld day"
+msgid_plural "%lld days"
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
+msgid "%lld hour"
+msgid_plural "%lld hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
+msgid "%lld minute"
+msgid_plural "%lld minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
+msgid "%lld second"
+msgid_plural "%lld seconds"
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
+msgid "%lld year"
+msgid_plural "%lld years"
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
 msgid "%lu nicks are stored in the database, using %.2Lf kB of memory."
 msgstr ""
 
@@ -1364,6 +1394,18 @@ msgid "%s's memo limit is %d."
 msgstr ""
 
 #, c-format
+msgid "%u channel"
+msgid_plural "%u channels"
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
+msgid "%zu nickname in the group."
+msgid_plural "%zu nicknames in the group."
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
 msgid "(%s ago)"
 msgstr ""
 
@@ -1426,48 +1468,6 @@ msgstr ""
 #, c-format
 msgid ". %s is still online."
 msgstr ""
-
-#, c-format
-msgid "1 channel"
-msgid_plural "%u channels"
-msgstr[0] ""
-msgstr[1] ""
-
-#, c-format
-msgid "1 day"
-msgid_plural "%lld days"
-msgstr[0] ""
-msgstr[1] ""
-
-#, c-format
-msgid "1 hour"
-msgid_plural "%lld hours"
-msgstr[0] ""
-msgstr[1] ""
-
-#, c-format
-msgid "1 minute"
-msgid_plural "%lld minutes"
-msgstr[0] ""
-msgstr[1] ""
-
-#, c-format
-msgid "1 nickname in the group."
-msgid_plural "%zu nicknames in the group."
-msgstr[0] ""
-msgstr[1] ""
-
-#, c-format
-msgid "1 second"
-msgid_plural "%lld seconds"
-msgstr[0] ""
-msgstr[1] ""
-
-#, c-format
-msgid "1 year"
-msgid_plural "%lld years"
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "<unknown>"
 msgstr ""
@@ -6986,7 +6986,7 @@ msgid "You found me, %s!"
 msgstr ""
 
 #, c-format
-msgid "You have 1 new memo."
+msgid "You have %d new memo."
 msgid_plural "You have %d new memos."
 msgstr[0] ""
 msgstr[1] ""
@@ -7379,6 +7379,12 @@ msgid "does not expire"
 msgstr ""
 
 #, c-format
+msgid "expires in %d day"
+msgid_plural "expires in %d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
 msgid "expires in %d hour, %d minute"
 msgstr ""
 
@@ -7395,13 +7401,7 @@ msgid "expires in %d hours, %d minutes"
 msgstr ""
 
 #, c-format
-msgid "expires in 1 day"
-msgid_plural "expires in %d days"
-msgstr[0] ""
-msgstr[1] ""
-
-#, c-format
-msgid "expires in 1 minute"
+msgid "expires in %d minute"
 msgid_plural "expires in %d minutes"
 msgstr[0] ""
 msgstr[1] ""

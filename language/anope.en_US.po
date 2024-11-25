@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-25 01:18+0000\n"
-"PO-Revision-Date: 2024-11-13 02:45+0000\n"
+"POT-Creation-Date: 2024-11-25 01:30+0000\n"
+"PO-Revision-Date: 2024-11-25 01:32+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -7379,32 +7379,8 @@ msgid "does not expire"
 msgstr ""
 
 #, c-format
-msgid "expires in %d day"
-msgid_plural "expires in %d days"
-msgstr[0] ""
-msgstr[1] ""
-
-#, c-format
-msgid "expires in %d hour, %d minute"
+msgid "expires in %s"
 msgstr ""
-
-#, c-format
-msgid "expires in %d hour, %d minutes"
-msgstr ""
-
-#, c-format
-msgid "expires in %d hours, %d minute"
-msgstr ""
-
-#, c-format
-msgid "expires in %d hours, %d minutes"
-msgstr ""
-
-#, c-format
-msgid "expires in %d minute"
-msgid_plural "expires in %d minutes"
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "expires momentarily"
 msgstr ""

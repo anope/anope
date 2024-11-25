@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-25 01:18+0000\n"
-"PO-Revision-Date: 2024-11-22 21:32+0100\n"
+"POT-Creation-Date: 2024-11-25 01:30+0000\n"
+"PO-Revision-Date: 2024-11-25 01:32+0000\n"
 "Last-Translator: Val Lorentz <progval+git@progval.net>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -8937,32 +8937,8 @@ msgid "does not expire"
 msgstr "n'expire pas"
 
 #, c-format
-msgid "expires in %d day"
-msgid_plural "expires in %d days"
-msgstr[0] "expire dans %d jour"
-msgstr[1] "expire dans %d jours"
-
-#, c-format
-msgid "expires in %d hour, %d minute"
-msgstr "expire dans %d heure, %d minute"
-
-#, c-format
-msgid "expires in %d hour, %d minutes"
-msgstr "expire dans %d heure, %d minutes"
-
-#, c-format
-msgid "expires in %d hours, %d minute"
-msgstr "expire dans %d heures, %d minute"
-
-#, c-format
-msgid "expires in %d hours, %d minutes"
-msgstr "expire dans %d heures, %d minutes"
-
-#, c-format
-msgid "expires in %d minute"
-msgid_plural "expires in %d minutes"
-msgstr[0] "expire dans %d minute"
-msgstr[1] "expire dans %d minutes"
+msgid "expires in %s"
+msgstr "expire dans %s"
 
 msgid "expires momentarily"
 msgstr "expire d'un instant à l'autre"

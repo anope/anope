@@ -355,36 +355,28 @@ Anope::string Anope::Expires(time_t expires, const NickCore *nc)
 {
 	if (!expires)
 		return Language::Translate(nc, NO_EXPIRE);
-	else if (expires <= Anope::CurTime)
+
+	if (expires <= Anope::CurTime)
 		return Language::Translate(nc, _("expires momentarily"));
-	else
-	{
-		char buf[256];
-		time_t diff = expires - Anope::CurTime + 59;
 
-		if (diff >= 86400)
-		{
-			int days = diff / 86400;
-			snprintf(buf, sizeof(buf), Language::Translate(nc, days,  N_("expires in %d day", "expires in %d days")), days);
-		}
-		else
-		{
-			if (diff <= 3600)
-			{
-				int minutes = diff / 60;
-				snprintf(buf, sizeof(buf), Language::Translate(nc, minutes, N_("expires in %d minute", "expires in %d minutes")), minutes);
-			}
-			else
-			{
-				int hours = diff / 3600, minutes;
-				diff -= hours * 3600;
-				minutes = diff / 60;
-				snprintf(buf, sizeof(buf), Language::Translate(nc, hours == 1 && minutes == 1 ? _("expires in %d hour, %d minute") : (hours == 1 && minutes != 1 ? _("expires in %d hour, %d minutes") : (hours != 1 && minutes == 1 ? _("expires in %d hours, %d minute") : _("expires in %d hours, %d minutes")))), hours, minutes);
-			}
-		}
+	// This will get inlined when compiled with optimisations.
+	auto nearest = [](auto timeleft, auto roundto) {
+		if ((timeleft % roundto) <= (roundto / 2))
+			return timeleft - (timeleft % roundto);
+		return timeleft - (timeleft % roundto) + roundto;
+	};
 
-		return buf;
-	}
+	// In order to get a shorter result we round to the nearest period.
+	auto timeleft = expires - Anope::CurTime;
+	if (timeleft >= 31536000)
+		timeleft = nearest(timeleft, 86400); // Nearest day if its more than a year
+	else if (timeleft >= 86400)
+		timeleft = nearest(timeleft, 3600); // Nearest hour if its more than a day
+	else if (timeleft >= 3600)
+		timeleft = nearest(timeleft, 60); // Nearest minute if its more than an hour
+
+	auto duration = Anope::Duration(timeleft, nc);
+	return Anope::printf(Language::Translate(nc, _("expires in %s")), duration.c_str());
 }
 
 bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive, bool use_regex)

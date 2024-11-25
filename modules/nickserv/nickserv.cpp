@@ -174,7 +174,7 @@ public:
 		OnShutdown();
 	}
 
-	bool IsGuestNick(const Anope::string &nick) const
+	bool IsGuestNick(const Anope::string &nick) const override
 	{
 		const auto guestnick = Config->GetModule(this)->Get<Anope::string>("guestnick", "Guest####");
 		if (guestnick.empty())

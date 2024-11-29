@@ -1,6 +1,13 @@
 Anope Version 2.1.11-git
 ------------------------
-No significant changes.
+Added support for database migrations to the mysql module.
+Added support for renicking users to their UID when enforcing nickname protection.
+Allowed selecting languages using a shorter version of their name.
+Changed various messages to use human-readable durations instead of seconds.
+Improved the creation of expiry and duration messages.
+Improved the translation system with support for plural forms.
+Reworked how guest nicknames are generated.
+Simplified how account identifiers are allocated.
 
 Anope Version 2.1.10
 --------------------

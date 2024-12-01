@@ -1,5 +1,5 @@
-Anope Version 2.1.11-git
-------------------------
+Anope Version 2.1.11
+--------------------
 Added support for database migrations to the mysql module.
 Added support for renicking users to their UID when enforcing nickname protection.
 Added support for sending channel URLs to joining users.

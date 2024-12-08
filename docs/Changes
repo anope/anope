@@ -1,6 +1,15 @@
 Anope Version 2.0.17-git
 ------------------------
-No significant changes.
+Fixed importing large flatfile databases into SQL.
+Fixed marking channels as permanent.
+Fixed serialising unset boolean extension items.
+Fixed the documentation about how to import SQL databases.
+Fixed the documentation of options:usemail.
+Fixed the location of the geoipupdate CSV files.
+Fixed translating memo emails.
+Fixed unnecessary SQL updates caused by dereferencing user accounts.
+Increased the size of the chanstats letter and word count columns.
+Updated the location of the Anope IRC channels.
 
 Anope Version 2.0.16-git
 ------------------------

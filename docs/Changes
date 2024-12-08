@@ -1,5 +1,5 @@
-Anope Version 2.0.17-git
-------------------------
+Anope Version 2.0.17
+--------------------
 Fixed importing large flatfile databases into SQL.
 Fixed marking channels as permanent.
 Fixed serialising unset boolean extension items.

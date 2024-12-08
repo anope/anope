@@ -1,3 +1,7 @@
+Anope Version 2.0.18-git
+------------------------
+No significant changes.
+
 Anope Version 2.0.17
 --------------------
 Fixed importing large flatfile databases into SQL.
@@ -11,8 +15,8 @@ Fixed unnecessary SQL updates caused by dereferencing user accounts.
 Increased the size of the chanstats letter and word count columns.
 Updated the location of the Anope IRC channels.
 
-Anope Version 2.0.16-git
-------------------------
+Anope Version 2.0.16
+--------------------
 Added a workaround for users matching expired sqlines.
 Fixed a copy/paste error in webcpanel.
 Fixed a crash in db_flatfile caused by trying to serialize data without a type.

@@ -128,7 +128,7 @@ public:
 				"restarted, or the configuration is reloaded.\n"
 				" \n"
 				"Example:\n"
-				"     \002MODIFY nickserv forcemail no\002"));
+				"     \002MODIFY nickserv regdelay 15m\002"));
 		return true;
 	}
 };

@@ -68,6 +68,18 @@ public:
 		return keys;
 	}
 
+	static std::vector<Service *> GetServices(const Anope::string &t)
+	{
+		std::vector<Service *> values;
+		const auto it = Services.find(t);
+		if (it != Services.end())
+		{
+			for (const auto &[_, value] : it->second)
+				values.push_back(value);
+		}
+		return values;
+	}
+
 	static void AddAlias(const Anope::string &t, const Anope::string &n, const Anope::string &v)
 	{
 		std::map<Anope::string, Anope::string> &smap = Aliases[t];

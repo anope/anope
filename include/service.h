@@ -59,10 +59,12 @@ public:
 	static std::vector<Anope::string> GetServiceKeys(const Anope::string &t)
 	{
 		std::vector<Anope::string> keys;
-		std::map<Anope::string, std::map<Anope::string, Service *> >::iterator it = Services.find(t);
+		const auto it = Services.find(t);
 		if (it != Services.end())
-			for (std::map<Anope::string, Service *>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-				keys.push_back(it2->first);
+		{
+			for (const auto &[key, _] : it->second)
+				keys.push_back(key);
+		}
 		return keys;
 	}
 

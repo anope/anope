@@ -171,6 +171,21 @@ public:
 			if (bpos == Anope::string::npos)
 				return; // No HMAC key.
 
+			// If you are using PHP you can validate passwords like this:
+			//
+			// <?php
+			// function check_pass($user_pass, $anope_pass) {
+			// 	[$algo, $hash, $key] = explode(':', $anope_pass);
+			// 	$hash_algo           = substr($algo, 5);
+			// 	$unhex_key           = hex2bin($key);
+			// 	$user_hash           = hash_hmac($hash_algo, $user_pass, $unhex_key);
+			// 	return hash_equals($hash, $user_hash);
+			// }
+			//
+			// $anope_pass  = "hmac-sha256:5f7f039818f6e10be84dab0f49610a387d3818b2c883eacdc1778c66a7cecf3b:1a924a3b05a11d7bf3c752d820391dbe01fb7e5d83f7400765de987c3fbb0ec3";
+			// var_dump(check_pass("test12345", $anope_pass));     // valid
+			// var_dump(check_pass("test123456789", $anope_pass)); // invalid
+
 			Anope::string pass_hex(nc->pass.begin() + apos + 1, nc->pass.begin() + bpos);
 			Anope::string key_hex(nc->pass.begin() + bpos + 1, nc->pass.end());
 			Anope::string key;

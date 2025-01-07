@@ -14,9 +14,13 @@
 class CommandNSSetLanguage
 	: public Command
 {
+protected:
+	Anope::map<Anope::string> &languages;
+
 public:
-	CommandNSSetLanguage(Module *creator, const Anope::string &sname = "nickserv/set/language", size_t min = 1)
+	CommandNSSetLanguage(Module *creator, Anope::map<Anope::string> &langs, const Anope::string &sname = "nickserv/set/language", size_t min = 1)
 		: Command(creator, sname, min, min + 1)
+		, languages(langs)
 	{
 		this->SetDesc(_("Set the language services will use when messaging you"));
 		this->SetSyntax(_("\037language\037"));
@@ -43,27 +47,35 @@ public:
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (param != "en_US")
+		auto lang = languages.end();
+		for (auto it = languages.begin(); it != languages.end(); ++it)
 		{
-			for (unsigned j = 0; j < Language::Languages.size(); ++j)
+			auto &[langcode, langname] = *it;
+			if (langcode.find_ci(param) != 0)
+				continue; // Language does not match.
+
+			if (lang != languages.end())
 			{
-				if (Language::Languages[j] == param)
-					break;
-				else if (j + 1 == Language::Languages.size())
-				{
-					this->OnSyntaxError(source, "");
-					return;
-				}
+				source.Reply(_("Multiple languages matched \002%s\002. Please be more specific."), param.c_str());
+				return;
 			}
+
+			lang = it;
 		}
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the language of " << nc->display << " to " << param;
+		if (lang == languages.end())
+		{
+			this->OnSyntaxError(source, "");
+			return;
+		}
 
-		nc->language = param;
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the language of " << nc->display << " to " << lang->first;
+
+		nc->language = lang->first;
 		if (source.GetAccount() == nc)
-			source.Reply(_("Language changed to \002English\002."));
+			source.Reply(_("Language changed to \002%s\002."), lang->second.c_str());
 		else
-			source.Reply(_("Language for \002%s\002 changed to \002%s\002."), nc->display.c_str(), Language::Translate(param.c_str(), _("English")));
+			source.Reply(_("Language for \002%s\002 changed to \002%s\002."), nc->display.c_str(), lang->second.c_str());
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &param) override
@@ -80,13 +92,8 @@ public:
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
 
-		source.Reply("         en_US (English)");
-		for (const auto &language : Language::Languages)
-		{
-			const Anope::string &langname = Language::Translate(language.c_str(), _("English"));
-			if (langname != "English")
-				source.Reply("         %s (%s)", language.c_str(), langname.c_str());
-		}
+		for (const auto &[langcode, langname] : languages)
+			source.Reply("    %s (%s)", langcode.c_str(), langname.c_str());
 
 		return true;
 	}
@@ -96,8 +103,8 @@ class CommandNSSASetLanguage final
 	: public CommandNSSetLanguage
 {
 public:
-	CommandNSSASetLanguage(Module *creator)
-		: CommandNSSetLanguage(creator, "nickserv/saset/language", 2)
+	CommandNSSASetLanguage(Module *creator, Anope::map<Anope::string> &langs)
+		: CommandNSSetLanguage(creator, langs, "nickserv/saset/language", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 \037language\037"));
@@ -116,13 +123,10 @@ public:
 				"the given user (for example, when responding to a command they send).\n"
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
-		source.Reply("         en_US (English)");
-		for (const auto &language : Language::Languages)
-		{
-			const Anope::string &langname = Language::Translate(language.c_str(), _("English"));
-			if (langname != "English")
-				source.Reply("         %s (%s)", language.c_str(), langname.c_str());
-		}
+
+		for (const auto &[langcode, langname] : languages)
+			source.Reply("    %s (%s)", langcode.c_str(), langname.c_str());
+
 		return true;
 	}
 };
@@ -133,16 +137,23 @@ class NSSetLanguage final
 private:
 	CommandNSSetLanguage commandnssetlanguage;
 	CommandNSSASetLanguage commandnssasetlanguage;
+	Anope::map<Anope::string> languages;
 
 public:
 	NSSetLanguage(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, VENDOR)
-		, commandnssetlanguage(this)
-		, commandnssasetlanguage(this)
+		, commandnssetlanguage(this, languages)
+		, commandnssasetlanguage(this, languages)
 	{
 #ifndef HAVE_LOCALIZATION
 		throw ModuleException("Anope was not built with localization support");
 #endif
+
+		// Build a list of languages. This only needs to happen once as we
+		// only load the languages on boot.
+		languages.emplace("en_US.UTF-8", "English");
+		for (const auto &language : Language::Languages)
+			languages.emplace(language, Language::Translate(language.c_str(), _("English")));
 	}
 };
 

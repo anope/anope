@@ -13,6 +13,8 @@
 
 static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class CommandNSConfirm final
 	: public Command
 {
@@ -133,7 +135,6 @@ public:
 	{
 		User *u = source.GetUser();
 		Anope::string u_nick = source.GetNick();
-		size_t nicklen = u_nick.length();
 		Anope::string pass = params[0];
 		Anope::string email = params.size() > 1 ? params[1] : "";
 		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<const Anope::string>("registration");
@@ -154,18 +155,13 @@ public:
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		if (u && !u->HasMode("OPER") && nickregdelay && Anope::CurTime - u->timestamp < nickregdelay)
 		{
-			source.Reply(_("You must have been using this nick for at least %lu seconds to register."),
-				(unsigned long)nickregdelay);
+			auto waitperiod = (u->timestamp + nickregdelay) -  Anope::CurTime;
+			source.Reply(_("You must wait %s before registering your nick."),
+				Anope::Duration(waitperiod, source.GetAccount()).c_str());
 			return;
 		}
 
-		/* Prevent "Guest" nicks from being registered. -TheShadow */
-
-		/* Guest nick can now have a series of between 1 and 7 digits.
-		 *   --lara
-		 */
-		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
-		if (nicklen <= guestnick.length() + 7 && nicklen >= guestnick.length() + 1 && !u_nick.find_ci(guestnick) && u_nick.substr(guestnick.length()).find_first_not_of("1234567890") == Anope::string::npos)
+		if (nickserv && nickserv->IsGuestNick(u_nick))
 		{
 			source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
 			return;
@@ -202,8 +198,9 @@ public:
 			this->OnSyntaxError(source, "");
 		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
 		{
-			source.Reply(_("Please wait %lu seconds before using the REGISTER command again."),
-				(unsigned long)(u->lastnickreg + reg_delay) - Anope::CurTime);
+			auto waitperiod = (unsigned long)(u->lastnickreg + reg_delay) - Anope::CurTime;
+			source.Reply(_("Please wait %s before using the REGISTER command again."),
+				Anope::Duration(waitperiod, source.GetAccount()).c_str());
 		}
 		else if (NickAlias::Find(u_nick) != NULL)
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());

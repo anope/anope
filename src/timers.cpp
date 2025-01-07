@@ -16,7 +16,8 @@ Timer::Timer(time_t time_from_now, bool repeating)
 	, secs(time_from_now)
 	, repeat(repeating)
 {
-	TimerManager::AddTimer(this);
+	if (time_from_now)
+		TimerManager::AddTimer(this);
 }
 
 Timer::Timer(Module *creator, time_t time_from_now, bool repeating)
@@ -25,7 +26,8 @@ Timer::Timer(Module *creator, time_t time_from_now, bool repeating)
 	, secs(time_from_now)
 	, repeat(repeating)
 {
-	TimerManager::AddTimer(this);
+	if (time_from_now)
+		TimerManager::AddTimer(this);
 }
 
 Timer::~Timer()

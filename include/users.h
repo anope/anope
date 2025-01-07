@@ -190,6 +190,7 @@ public:
 	 * @param ... any number of parameters
 	 */
 	void SendMessage(BotInfo *source, const char *fmt, ...) ATTR_FORMAT(3, 4);
+	void SendMessage(BotInfo *source, int count, const char *singular, const char *plural, ...) ATTR_FORMAT(5, 6);
 	void SendMessage(BotInfo *source, const Anope::string &msg) override;
 	void SendMessage(CommandSource &source, const Anope::string &msg) override;
 

@@ -2134,12 +2134,12 @@ struct IRCDMessageIdle final
 	{
 		BotInfo *bi = BotInfo::Find(params[0]);
 		if (bi)
-			Uplink::Send(bi, "IDLE", source.GetSource(), Anope::StartTime, Anope::CurTime - bi->lastmsg);
+			Uplink::Send(bi, "IDLE", source.GetSource(), bi->signon, Anope::CurTime - bi->lastmsg);
 		else
 		{
 			User *u = User::Find(params[0]);
 			if (u && u->server == Me)
-				Uplink::Send(u, "IDLE", source.GetSource(), Anope::StartTime, 0);
+				Uplink::Send(u, "IDLE", source.GetSource(), u->signon, 0);
 		}
 	}
 };

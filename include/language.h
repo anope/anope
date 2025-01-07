@@ -55,12 +55,47 @@ namespace Language
 	 */
 	extern CoreExport const char *Translate(const NickCore *nc, const char *string);
 
-	/** Translatesa string to the given language.
+	/** Translates a string to the given language.
 	 * @param lang The language to translate to
 	 * @param string The string to translate
 	 * @return The translated string if found, else the original string.
 	 */
 	extern CoreExport const char *Translate(const char *lang, const char *string);
+
+	/** Translates a plural string to the default language.
+	 * @param count The number of items the string is counting.
+	 * @param singular The string to translate if there is one of \p count
+	 * @param plural The string to translate if there is multiple of \p count
+	 * @return The translated string if found, else the original string.
+	 */
+	extern CoreExport const char *Translate(int count, const char *singular, const char *plural);
+
+	/** Translates a plural string to the language of the given user.
+	 * @param u The user to translate the string for
+	 * @param count The number of items the string is counting.
+	 * @param singular The string to translate if there is one of \p count
+	 * @param plural The string to translate if there is multiple of \p count
+	 * @return The translated string if found, else the original string.
+	 */
+	extern CoreExport const char *Translate(User *u, int count, const char *singular, const char *plural);
+
+	/** Translates a plural string to the language of the given account.
+	 * @param nc The account to translate the string for
+	 * @param count The number of items the string is counting.
+	 * @param singular The string to translate if there is one of \p count
+	 * @param plural The string to translate if there is multiple of \p count
+	 * @return The translated string if count, else the original string
+	 */
+	extern CoreExport const char *Translate(const NickCore *nc, int count, const char *singular, const char *plural);
+
+	/** Translates a plural string to the given language.
+	 * @param lang The language to translate to
+	 * @param count The number of items the string is counting.
+	 * @param singular The string to translate if there is one of \p count
+	 * @param plural The string to translate if there is multiple of \p count
+	 * @return The translated string if found, else the original string.
+	 */
+	extern CoreExport const char *Translate(const char *lang, int count, const char *singular, const char *plural);
 
 } // namespace Language
 

@@ -328,6 +328,21 @@ void User::SendMessage(BotInfo *source, const char *fmt, ...)
 	va_end(args);
 }
 
+void User::SendMessage(BotInfo *source, int count, const char *singular, const char *plural, ...)
+{
+	va_list args;
+	char buf[BUFSIZE] = "";
+
+	const char *translated_message = Language::Translate(this, count, singular, plural);
+
+	va_start(args, plural);
+	vsnprintf(buf, BUFSIZE - 1, translated_message, args);
+
+	this->SendMessage(source, Anope::string(buf));
+
+	va_end(args);
+}
+
 namespace
 {
 	void SendMessageInternal(BotInfo *source, User *target, const Anope::string &msg, const Anope::map<Anope::string> &tags)

@@ -426,23 +426,23 @@ size_t cidr::hash::operator()(const cidr &s) const
 	}
 }
 
-int SocketIO::Recv(Socket *s, char *buf, size_t sz)
+ssize_t SocketIO::Recv(Socket *s, char *buf, size_t sz)
 {
-	int i = recv(s->GetFD(), buf, sz, 0);
+	ssize_t i = recv(s->GetFD(), buf, sz, 0);
 	if (i > 0)
 		TotalRead += i;
 	return i;
 }
 
-int SocketIO::Send(Socket *s, const char *buf, size_t sz)
+ssize_t SocketIO::Send(Socket *s, const char *buf, size_t sz)
 {
-	int i = send(s->GetFD(), buf, sz, 0);
+	ssize_t i = send(s->GetFD(), buf, sz, 0);
 	if (i > 0)
 		TotalWritten += i;
 	return i;
 }
 
-int SocketIO::Send(Socket *s, const Anope::string &buf)
+ssize_t SocketIO::Send(Socket *s, const Anope::string &buf)
 {
 	return this->Send(s, buf.c_str(), buf.length());
 }

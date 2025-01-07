@@ -217,11 +217,13 @@ int main(int ac, char **av, char **envp)
 
 	if (Anope::Restarting)
 	{
-		chdir(BinaryDir.c_str());
-		Anope::string sbin = "./" + Anope::ServicesBin;
-		av[0] = const_cast<char *>(sbin.c_str());
-		execve(Anope::ServicesBin.c_str(), av, envp);
-		Log() << "Restart failed";
+		if (chdir(BinaryDir.c_str()) == 0)
+		{
+			Anope::string sbin = "./" + Anope::ServicesBin;
+			av[0] = const_cast<char *>(sbin.c_str());
+			execve(Anope::ServicesBin.c_str(), av, envp);
+		}
+		Log() << "Restart failed: " << strerror(errno);
 		Anope::ReturnValue = -1;
 	}
 

@@ -194,7 +194,7 @@ public:
 
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 	{
-		data.Store(this->name, true);
+		data.Store(this->name, this->HasExt(e));
 	}
 
 	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override

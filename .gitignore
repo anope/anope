@@ -14,3 +14,4 @@ modules/ssl_openssl.cpp
 modules/stats
 run/
 *.mo
+*.pot

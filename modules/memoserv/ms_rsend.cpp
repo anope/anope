@@ -56,7 +56,11 @@ public:
 			if (result == MemoServService::MEMO_INVALID_TARGET)
 				source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
 			else if (result == MemoServService::MEMO_TOO_FAST)
-				source.Reply(_("Please wait %lu seconds before using the %s command again."), Config->GetModule("memoserv")->Get<unsigned long>("senddelay"), source.command.c_str());
+			{
+				auto lastmemosend = source.GetUser() ? source.GetUser()->lastmemosend : 0;
+				auto waitperiod = (lastmemosend + Config->GetModule("memoserv")->Get<unsigned long>("senddelay")) -  Anope::CurTime;
+				source.Reply(_("Please wait %s before using the %s command again."), Anope::Duration(waitperiod, source.GetAccount()).c_str(), source.command.c_str());
+			}
 			else if (result == MemoServService::MEMO_TARGET_FULL)
 				source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
 			else

@@ -72,6 +72,11 @@ class DBSQL final
 	bool loaded = false;
 	bool imported = false;
 
+	Anope::string GetTableName(Serialize::Type *s_type)
+	{
+		return this->prefix + s_type->GetName();
+	}
+
 	void RunBackground(const Query &q, Interface *iface = NULL)
 	{
 		if (!this->sql)
@@ -124,8 +129,8 @@ public:
 				if (!s_type)
 					continue;
 
-				std::vector<Query> create = this->sql->CreateTable(this->prefix + s_type->GetName(), data);
-				Query insert = this->sql->BuildInsert(this->prefix + s_type->GetName(), obj->id, data);
+				auto create = this->sql->CreateTable(GetTableName(s_type), data);
+				auto insert = this->sql->BuildInsert(GetTableName(s_type), obj->id, data);
 
 				if (this->imported)
 				{
@@ -159,6 +164,14 @@ public:
 		this->sql = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
 		this->prefix = block->Get<const Anope::string>("prefix", "anope_db_");
 		this->import = block->Get<bool>("import");
+	}
+
+	void OnPostInit() override
+	{
+		// If we are importing from flatfile we need to force a socket engine
+		// flush to ensure it actually gets written to the database before we
+		// connect to the uplink.
+		SocketEngine::Process();
 	}
 
 	void OnShutdown() override
@@ -209,7 +222,7 @@ public:
 			return;
 		Serialize::Type *s_type = obj->GetSerializableType();
 		if (s_type && obj->id > 0)
-			this->RunBackground("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + Anope::ToString(obj->id));
+			this->RunBackground("DELETE FROM `" + GetTableName(s_type) + "` WHERE `id` = " + Anope::ToString(obj->id));
 		this->updated_items.erase(obj);
 	}
 
@@ -229,7 +242,7 @@ public:
 		if (!this->loading_databases && !this->loaded)
 			return;
 
-		Query query("SELECT * FROM `" + this->prefix + sb->GetName() + "`");
+		Query query("SELECT * FROM `" + GetTableName(sb) + "`");
 		Result res = this->sql->RunQuery(query);
 
 		for (int j = 0; j < res.Rows(); ++j)

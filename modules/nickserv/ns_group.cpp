@@ -12,6 +12,8 @@
 #include "module.h"
 #include "modules/ns_cert.h"
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class NSGroupRequest final
 	: public IdentifyRequest
 {
@@ -142,13 +144,15 @@ public:
 		}
 
 		NickAlias *target, *na = NickAlias::Find(source.GetNick());
-		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		unsigned maxaliases = Config->GetModule(this->owner)->Get<unsigned>("maxaliases");
 		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (user && Anope::CurTime < user->lastnickreg + reg_delay)
-			source.Reply(_("Please wait %lu seconds before using the GROUP command again."), (unsigned long)(reg_delay + user->lastnickreg) - Anope::CurTime);
+		{
+			auto waitperiod = (unsigned long)(reg_delay + user->lastnickreg) - Anope::CurTime;
+			source.Reply(_("Please wait %s before using the GROUP command again."), Anope::Duration(waitperiod, source.GetAccount()).c_str());
+		}
 		else if (target->nc->HasExt("NS_SUSPENDED"))
 		{
 			Log(LOG_COMMAND, source, this) << "and tried to group to SUSPENDED nick " << target->nick;
@@ -162,12 +166,8 @@ public:
 			source.Reply(NICK_IDENTIFY_REQUIRED);
 		else if (maxaliases && target->nc->aliases->size() >= maxaliases && !target->nc->IsServicesOper())
 			source.Reply(_("There are too many nicks in your group."));
-		else if (source.GetNick().length() <= guestnick.length() + 7 &&
-			source.GetNick().length() >= guestnick.length() + 1 &&
-			!source.GetNick().find_ci(guestnick) && !source.GetNick().substr(guestnick.length()).find_first_not_of("1234567890"))
-		{
+		else if (nickserv && nickserv->IsGuestNick(source.GetNick()))
 			source.Reply(NICK_CANNOT_BE_REGISTERED, source.GetNick().c_str());
-		}
 		else
 		{
 			bool ok = false;
@@ -356,7 +356,7 @@ public:
 		for (const auto &reply : replies)
 			source.Reply(reply);
 
-		source.Reply(_("%zu nickname(s) in the group."), nc->aliases->size());
+		source.Reply(nc->aliases->size(), N_("%zu nickname in the group.", "%zu nicknames in the group."), nc->aliases->size());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

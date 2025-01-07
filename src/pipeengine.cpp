@@ -60,7 +60,7 @@ void Pipe::Write(const char *data, size_t sz)
 	write(this->write_pipe, data, sz);
 }
 
-int Pipe::Read(char *data, size_t sz)
+ssize_t Pipe::Read(char *data, size_t sz)
 {
 	return read(this->GetFD(), data, sz);
 }

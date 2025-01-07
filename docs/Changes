@@ -1,5 +1,21 @@
-Anope Version 2.1.10-git
+Anope Version 2.1.12-git
 ------------------------
+No significant changes.
+
+Anope Version 2.1.11
+--------------------
+Added support for database migrations to the mysql module.
+Added support for renicking users to their UID when enforcing nickname protection.
+Added support for sending channel URLs to joining users.
+Allowed selecting languages using a shorter version of their name.
+Changed various messages to use human-readable durations instead of seconds.
+Improved the creation of expiry and duration messages.
+Improved the translation system with support for plural forms.
+Reworked how guest nicknames are generated.
+Simplified how account identifiers are allocated.
+
+Anope Version 2.1.10
+--------------------
 Added support for NEXTBANS on UnrealIRCd.
 Changed hostmask access entries added by nick to use that nick as the default description.
 Changed modes to be handled internally in their split form.

@@ -15,6 +15,7 @@
 static Module *me;
 
 static Anope::map<Anope::string> descriptions;
+static Anope::map<uint16_t> numerics;
 
 struct CSMiscData;
 static Anope::map<ExtensibleItem<CSMiscData> *> items;
@@ -189,6 +190,7 @@ public:
 	void OnReload(Configuration::Conf *conf) override
 	{
 		descriptions.clear();
+		numerics.clear();
 
 		for (int i = 0; i < conf->CountBlock("command"); ++i)
 		{
@@ -204,8 +206,30 @@ public:
 				continue;
 
 			descriptions[cname] = desc;
+
+			auto numeric = block->Get<unsigned>("misc_numeric");
+			if (numeric >= 1 && numeric <= 999)
+				numerics["cs_set_misc:" + GetAttribute(cname)] = numeric;
 		}
 	}
+
+	void OnJoinChannel(User *user, Channel *c) override
+	{
+		if (!c->ci || !user->server->IsSynced() || numerics.empty())
+			return;
+
+		for (const auto &[name, ext] : items)
+		{
+			auto *data = ext->Get(c->ci);
+			if (!data)
+				continue;
+
+			auto numeric = numerics.find(name);
+			if (numeric != numerics.end())
+				IRCD->SendNumeric(numeric->second, user->GetUID(), c->ci->name, data->data);
+		}
+	}
+
 
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool) override
 	{

@@ -233,7 +233,7 @@ private:
 			request.reply("ip", u->ip.addr());
 			request.reply("timestamp", Anope::ToString(u->timestamp));
 			request.reply("signon", Anope::ToString(u->signon));
-			if (u->Account())
+			if (u->IsIdentified())
 			{
 				request.reply("account", iface->Sanitize(u->Account()->display));
 				if (u->Account()->o)

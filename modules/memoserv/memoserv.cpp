@@ -100,7 +100,7 @@ public:
 				{
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
-						if (cu->user->Account() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
+						if (cu->user->IsIdentified() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
 							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), MemoServ->GetQueryCommand().c_str(), ci->name.c_str(), mi->memos->size());
 					}
 				}
@@ -139,7 +139,7 @@ public:
 			if (nc->memos.GetMemo(i)->unread)
 				++newcnt;
 		if (newcnt > 0)
-			u->SendMessage(MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
+			u->SendMessage(MemoServ, newcnt, N_("You have %d new memo.", "You have %d new memos."), newcnt);
 		if (nc->memos.memomax > 0 && nc->memos.memos->size() >= static_cast<unsigned>(nc->memos.memomax))
 		{
 			if (nc->memos.memos->size() > static_cast<unsigned>(nc->memos.memomax))

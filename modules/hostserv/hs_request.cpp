@@ -157,7 +157,8 @@ public:
 		time_t send_delay = Config->GetModule("memoserv")->Get<time_t>("senddelay");
 		if (Config->GetModule(this->owner)->Get<bool>("memooper") && send_delay > 0 && u && u->lastmemosend + send_delay > Anope::CurTime)
 		{
-			source.Reply(_("Please wait %lu seconds before requesting a new vhost."), (unsigned long)send_delay);
+			auto waitperiod = (u->lastmemosend + send_delay) -  Anope::CurTime;
+			source.Reply(_("Please wait %s before requesting a new vhost."), Anope::Duration(waitperiod, source.GetAccount()).c_str());
 			u->lastmemosend = Anope::CurTime;
 			return;
 		}

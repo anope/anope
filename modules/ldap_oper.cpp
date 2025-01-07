@@ -24,7 +24,7 @@ public:
 
 	void OnResult(const LDAPResult &r) override
 	{
-		if (!u || !u->Account())
+		if (!u || !u->IsIdentified())
 			return;
 
 		NickCore *nc = u->Account();

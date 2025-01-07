@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-23 18:32+0100\n"
-"PO-Revision-Date: 2024-06-23 16:07+0300\n"
+"POT-Creation-Date: 2024-11-11 21:27+0000\n"
+"PO-Revision-Date: 2024-11-11 22:30+0300\n"
 "Last-Translator: CaPaCuL <capacul@gmail.com>\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.5\n"
 
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
@@ -81,47 +81,47 @@ msgid ""
 "It has been created for users that can't host or\n"
 "configure a bot, or for use on networks that don't\n"
 "allow user bots. Available commands are listed\n"
-"below; to use them, type %s%s command. For\n"
+"below; to use them, type %s command. For\n"
 "more information on a specific command, type\n"
-"%s%s %s command.\n"
+"%s %s command.\n"
 msgstr ""
 "%s kendi kanalınızda bir bot bulundurmanıza olanak tanır.\n"
 "Bir botu barındıramayan veya yapılandıramayan kullanıcılar için ya da\n"
 "kullanıcı botlarına izin vermeyen ağlarda kullanılmak üzere\n"
 "oluşturulmuştur. Mevcut komutlar aşağıdaki listelendi;\n"
-"bunları kullanmak için %s%s komut yazın.\n"
-"Belirli bir komut hakkında daha fazla bilgi için şunu yazın:\n"
-"%s%s %s komut.\n"
+"bunları kullanmak için %s komut yazın.\n"
+"Belirli bir komut hakkında daha fazla bilgi için,\n"
+"%s %s komut yazın.\n"
 
 #, c-format
 msgid ""
 "%s allows you to register a nickname and\n"
 "prevent others from using it. The following\n"
 "commands allow for registration and maintenance of\n"
-"nicknames; to use them, type %s%s command.\n"
+"nicknames; to use them, type %s command.\n"
 "For more information on a specific command, type\n"
-"%s%s %s command.\n"
+"%s %s command.\n"
 msgstr ""
 "%s bir rumuz kaydetmenizi ve başkalarının\n"
 "bunu kullanmasının engellenmesini sağlar. Aşağıdaki\n"
 "komutlar rumuz kaydı ve düzenlemesşne izin verir;\n"
-"bunları kullanmak için %s%s komut yazın.\n"
+"bunları kullanmak için %s komut yazın.\n"
 "Belirli bir komut hakkında daha fazla bilgi için şunu yazın:\n"
-"%s%s %s komut.\n"
+"%s %s komut.\n"
 
 #, c-format
 msgid ""
 "%s allows you to register an account.\n"
 "The following commands allow for registration and maintenance of\n"
-"accounts; to use them, type %s%s command.\n"
+"accounts; to use them, type %s command.\n"
 "For more information on a specific command, type\n"
-"%s%s %s command.\n"
+"%s %s command.\n"
 msgstr ""
 "%s bir hesap kaydetmenizi sağlar. Aşağıdaki komutlar\n"
 "hesap kaydı ve düzenlenmesine yapılmasına izin verir; bunları\n"
-"kullanmak için %s%s komut yazın. Belirli bir\n"
+"kullanmak için %s komut yazın. Belirli bir\n"
 "komut hakkında daha fazla bilgi için şunu yazın:\n"
-"%s%s %s komut.\n"
+"%s %s komut.\n"
 
 #, c-format
 msgid ""
@@ -130,16 +130,16 @@ msgid ""
 "malicious users from \"taking over\" channels by limiting\n"
 "who is allowed channel operator privileges. Available\n"
 "commands are listed below; to use them, type\n"
-"%s%s command. For more information on a\n"
-"specific command, type %s%s HELP command.\n"
+"%s command. For more information on a\n"
+"specific command, type %s HELP command.\n"
 msgstr ""
 "%s kanalların çeşitli yönlerini kaydetmenize ve kontrol\n"
 "etmenize olanak tanır. %s, kanal operatörü ayrıcalıklarına izin verilen\n"
 "kişileri sınırlayarak, genellikle kötü niyetli kullanıcıların kanalları\n"
 "\"ele geçirmesini\" engelleyebilir. Mevcut komutlar aşağıda listelenmiştir;\n"
-"bunları kullanmak için %s%s komut yazın.\n"
+"bunları kullanmak için %s komut yazın.\n"
 "Belirli bir komut hakkında daha fazla bilgi için\n"
-"%s%s HELP komut yazın.\n"
+"%s HELP komut yazın.\n"
 
 #, c-format
 msgid "%s already exists in %s bad words list."
@@ -386,8 +386,8 @@ msgid "%s will now permanently be ignored."
 msgstr "%s artık kalıcı olarak yok sayılacak."
 
 #, c-format
-msgid "%s%s HELP %s for more information."
-msgstr "Daha fazla bilgi için %s%s HELP %s."
+msgid "%s HELP %s for more information."
+msgstr "Daha fazla bilgi için %s HELP %s."
 
 msgid "ADD nick user host real"
 msgstr "ADD rumuz kullanıcı host gerçek_ad"
@@ -457,11 +457,11 @@ msgstr ""
 #, c-format
 msgid ""
 "User access levels can be seen by using the\n"
-"%s command; type %s%s HELP LEVELS for\n"
+"%s command; type %s HELP LEVELS for\n"
 "information."
 msgstr ""
 "Kullanıcı erişim düzeyleri %s komutu\n"
-"kullanılarak görülebilir; bilgi için %s%s HELP LEVELS\n"
+"kullanılarak görülebilir; bilgi için %s HELP LEVELS\n"
 "yazın."
 
 #, c-format
@@ -865,9 +865,9 @@ msgid ""
 "fantasy commands on a channel when prefixed\n"
 "with one of the following fantasy characters: %s\n"
 " \n"
-"Note that users wanting to use fantaisist\n"
-"commands MUST have enough access for both\n"
-"the FANTASIA and the command they are executing."
+"Note that users wanting to use fantasy commands\n"
+"MUST have enough access for both the FANTASY\n"
+"privilege and the command they are executing."
 msgstr ""
 " \n"
 "Bir kanalda fantezi modunu etkinleştirir veya devre dışı bırakır.\n"
@@ -946,14 +946,14 @@ msgstr ""
 #, c-format
 msgid ""
 " \n"
-"See the %s command (%s%s HELP ACCESS) for\n"
+"See the %s command (%s HELP ACCESS) for\n"
 "information on giving a subset of these privileges to\n"
 "other channel users.\n"
 msgstr ""
 " \n"
 "Bu ayrıcalıkların bir alt kümesini diğer kanal kullanıcılarına verme\n"
 "hakkında bilgi için %s komutuna\n"
-"(%s%s HELP ACCESS) bakın.\n"
+"(%s HELP ACCESS) bakın.\n"
 
 msgid ""
 " \n"
@@ -1218,12 +1218,12 @@ msgstr ""
 #, c-format
 msgid ""
 " \n"
-"Type %s%s HELP command for help on any of the\n"
+"Type %s HELP command for help on any of the\n"
 "above commands."
 msgstr ""
 " \n"
 "Yukarıdaki komutlardan herhangi biri hakkında yardım almak için\n"
-"%s%s HELP komut yazın."
+"%s HELP komut yazın."
 
 #, c-format
 msgid "   %s is online using this oper block."
@@ -1247,10 +1247,6 @@ msgstr " Yüklenme zamanı: %p"
 #, c-format
 msgid " but %s mysteriously dematerialized."
 msgstr " ama nedendir bilinmez %s artık yok."
-
-#, c-format
-msgid "\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."
-msgstr "\"/msg %s\" artık desteklenmiyor. Bunun yerine \"/msg %s@%s\" ve ya \"/%s\" kullanın."
 
 msgid "\"Jupiter\" a server"
 msgstr "Bir sunucuyu \"Jupiter\" yapın"
@@ -1811,6 +1807,9 @@ msgstr "Hesap"
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "%s hesabı zaten maksimum eşzamanlı oturum açma sayısına (%u) ulaştı."
 
+msgid "Account id"
+msgstr "Hesap ID"
+
 msgid "Account registered"
 msgstr "Hesap kaydedildi"
 
@@ -2015,14 +2014,14 @@ msgstr "Kanal kurucularıyla sınırlı komutlar verme izni var"
 msgid "Allowed to modify channel badwords list"
 msgstr "Kanalın küfür listesini değiştirme izni var"
 
+msgid "Allowed to modify channel settings"
+msgstr "Kanal ayarlarını yapma izni var"
+
 msgid "Allowed to modify the access list"
 msgstr "Erişim listesini değiştirme izni var"
 
 msgid "Allowed to read channel memos"
 msgstr "Kanal memolarını okuma izni var"
-
-msgid "Allowed to set channel settings"
-msgstr "Kanal ayarlarını yapma izni var"
 
 msgid "Allowed to unban themself"
 msgstr "Kendisini unban yapma izni var"
@@ -2953,6 +2952,14 @@ msgstr ""
 "erişim listesi boşsa\n"
 "kanal düşürülür."
 
+#, c-format
+msgid "Changing your usermodes to %s"
+msgstr "Kullanıcı modlarınız %s olarak değiştiriliyor"
+
+#, c-format
+msgid "Changing your vhost to %s"
+msgstr "Vhostunuz %s olarak değiştiriliyor"
+
 msgid "Channel"
 msgstr "Kanal"
 
@@ -3668,7 +3675,7 @@ msgstr "%s için e-posta geçersiz."
 msgid "Email matched: %s (%s) to %s."
 msgstr "E-posta eşleşti: %s (%s) - %s."
 
-msgid "Enable fantaisist commands"
+msgid "Enable fantasy commands"
 msgstr "Fantezi komutlarını etkinleştir"
 
 msgid "Enable greet messages"
@@ -3922,7 +3929,7 @@ msgstr ""
 "kullanıcıları atacaktır."
 
 msgid "English"
-msgstr "İngilizce"
+msgstr "Türkçe"
 
 #, c-format
 msgid "Entry message %i for %s deleted."
@@ -4193,11 +4200,11 @@ msgid "Info about a loaded module"
 msgstr "Yüklü bir modül hakkında bilgi"
 
 #, c-format
-msgid "Information for bot %s:"
+msgid "Information about bot %s:"
 msgstr "%s botu ile ilgili bilgiler:"
 
 #, c-format
-msgid "Information for channel %s:"
+msgid "Information about channel %s:"
 msgstr "%s kanalı ile ilgili bilgiler:"
 
 #, c-format
@@ -4304,7 +4311,7 @@ msgid "LOGONNEWS {ADD|DEL|LIST} [text|num]"
 msgstr "LOGONNEWS {ADD|DEL|LIST} [metin|nu.]"
 
 msgid "Language changed to English."
-msgstr "Dil İngilizce olarak değiştirildi."
+msgstr "Dil Türkçe olarak değiştirildi."
 
 #, c-format
 msgid "Language for %s changed to %s."
@@ -4778,7 +4785,7 @@ msgid ""
 "Maintains the bad words list for a channel. The bad\n"
 "words list determines which words are to be kicked\n"
 "when the bad words kicker is enabled. For more information,\n"
-"type %s%s HELP KICK %s.\n"
+"type %s HELP KICK %s.\n"
 " \n"
 "The ADD command adds the given word to the\n"
 "bad words list. If SINGLE is specified, a kick will be\n"
@@ -4793,7 +4800,7 @@ msgstr ""
 "Bir kanal için küfür listesini düzenler.\n"
 "küfür listesi, küfürlü konuşanları atma etkinleştirildiğinde\n"
 "hangi kelimelerin atılacağını belirler. Daha fazla bilgi\n"
-"için %s%s HELP KICK %s yazın.\n"
+"için %s HELP KICK %s yazın.\n"
 " \n"
 "ADD komutu belirtilen kelimeyi küfür\n"
 "listesine ekler. SINGLE belirtilirse, yalnızca kullanıcı\n"
@@ -5402,8 +5409,8 @@ msgid "Persistent"
 msgstr "Kalıcı"
 
 #, c-format
-msgid "Please confirm that you want to drop %s with %s%s DROP %s %s"
-msgstr "Lütfen %s rumuzunu droplamak isteğinizi %s%s DROP %s %s ile onaylayın"
+msgid "Please confirm that you want to drop %s with %s DROP %s %s"
+msgstr "Lütfen %s rumuzunu droplamak isteğinizi %s DROP %s %s ile onaylayın"
 
 msgid "Please contact an Operator to get a vhost assigned to this nick."
 msgstr "Bu rumuza atanan bir vHost almak için lütfen bir operle iletişime geçin."
@@ -5899,18 +5906,18 @@ msgstr "OPları koruma %s'de uygulandı."
 
 #, c-format
 msgid ""
-"See %s%s HELP %s for more information\n"
+"See %s HELP %s for more information\n"
 "about the access list."
 msgstr ""
-"Erişim listesi hakkında detaylı bilgi için %s%s HELP %s\n"
+"Erişim listesi hakkında detaylı bilgi için %s HELP %s\n"
 "komut çıktısına bakın."
 
 #, c-format
 msgid ""
-"See %s%s HELP %s for more information\n"
+"See %s HELP %s for more information\n"
 "about the flags system."
 msgstr ""
-"Bayrak sistemi hakkında detaylı bilgi için %s%s HELP %s\n"
+"Bayrak sistemi hakkında detaylı bilgi için %s HELP %s\n"
 "komut çıktısına bakın."
 
 msgid "Send a memo to a nick or channel"
@@ -6224,7 +6231,7 @@ msgid ""
 "option tells the bot to kick users who say certain words\n"
 "on the channels.\n"
 "You can define bad words for your channel using the\n"
-"BADWORDS command. Type %s%s HELP BADWORDS for\n"
+"BADWORDS command. Type %s HELP BADWORDS for\n"
 "more information.\n"
 " \n"
 "ttb is the number of times a user can be kicked\n"
@@ -6236,7 +6243,7 @@ msgstr ""
 "söyleyen kullanıcıları atmasını söyler.\n"
 "BADWORDS komutunu kullanarak kanalınıza küfür\n"
 "tanımlayabilirsiniz. Daha fazla bilgi için\n"
-"%s%s HELP BADWORDS yazın.\n"
+"%s HELP BADWORDS yazın.\n"
 " \n"
 "ttb, bir kullanıcının banlanmadan önce atılabileceği\n"
 "sayıdır. Ban sistemini aktif hale getirdikten sonra devre dışı\n"
@@ -6461,7 +6468,7 @@ msgid ""
 "    LIMIT       Sets the maximum number of memos you can\n"
 "                   receive\n"
 " \n"
-"Type %s%s HELP %s option for more information\n"
+"Type %s HELP %s option for more information\n"
 "on a specific option."
 msgstr ""
 "Çeşitli memo seçeneklerini ayarlar. seçenek şunlardan biri olabilir:\n"
@@ -6472,7 +6479,7 @@ msgstr ""
 "                   ayarlar\n"
 " \n"
 "Belirli bir seçenek hakkında daha fazla bilgi için\n"
-"%s%s HELP %s seçenek yazın."
+"%s HELP %s seçenek yazın."
 
 msgid "Sets various nickname options. option can be one of:"
 msgstr "Çeşitli rumuz seçeneklerini ayarlar. seçenek şunlardan biri olabilir:"
@@ -6527,8 +6534,8 @@ msgstr ""
 "modların otomatik olarak ayarlanamayacağını unutmayın."
 
 #, c-format
-msgid "Setting %s not known.  Type %s%s HELP LEVELS for a list of valid settings."
-msgstr "%s ayarı bilinmiyor. Geçerli ayarların listesi için %s%s HELP LEVELS yazın."
+msgid "Setting %s not known.  Type %s HELP LEVELS for a list of valid settings."
+msgstr "%s ayarı bilinmiyor. Geçerli ayarların listesi için %s HELP LEVELS yazın."
 
 msgid "Setting for DEBUG must be ON, OFF, or a positive number."
 msgstr "DEBUG ayarı ON, OFF veya pozitif bir sayı olmalıdır."
@@ -7438,10 +7445,10 @@ msgstr "%zu memo (%s kanalında) var."
 #, c-format
 msgid ""
 "There is a new memo on channel %s.\n"
-"Type %s%s READ %s %zu to read it."
+"Type %s READ %s %zu to read it."
 msgstr ""
 "%s kanalında yeni bir memo var. Okumak için\n"
-"%s%s READ %s %zu yazın."
+"%s READ %s %zu yazın."
 
 #, c-format
 msgid "There is no bot assigned to %s anymore."
@@ -7738,20 +7745,20 @@ msgstr "Bu rumuz askıya alındı."
 #, c-format
 msgid ""
 "This nickname is registered and protected.  If it is your\n"
-"nick, type %s%s IDENTIFY password.  Otherwise,\n"
+"nick, type %s IDENTIFY password.  Otherwise,\n"
 "please choose a different nick."
 msgstr ""
 "Bu rumuz kayıtlı ve korumalıdır. Eğer sizin\n"
-"rumuzunuzsa, %s%s IDENTIFY şifreniz yazın. Aksi halde,\n"
+"rumuzunuzsa, %s IDENTIFY şifreniz yazın. Aksi halde,\n"
 "kendinize başka bir rumuz seçin."
 
 #, c-format
-msgid "To delete, type: %s%s %s %d"
-msgstr "Silmek için şunu yazın: %s%s %s %d"
+msgid "To delete, type: %s %s %d"
+msgstr "Silmek için şunu yazın: %s %s %d"
 
 #, c-format
-msgid "To delete, type: %s%s %s %s %d"
-msgstr "Silmek için şunu yazın: %s%s %s %s %d"
+msgid "To delete, type: %s %s %s %d"
+msgstr "Silmek için şunu yazın: %s%s %s %d"
 
 msgid "To protect ops against bot kicks"
 msgstr "Opları bot atmalarına karşı korumak için"
@@ -7906,46 +7913,46 @@ msgstr "Türü"
 
 #, c-format
 msgid ""
-"Type %s%s HELP %s option for more information\n"
+"Type %s HELP %s option for more information\n"
 "on a specific option."
 msgstr ""
 "Belirli bir seçenek hakkında daha fazla bilgi için\n"
-"%s%s HELP %s seçenek yazın."
+"%s HELP %s seçenek yazın."
 
 #, c-format
 msgid ""
-"Type %s%s HELP %s option for more information\n"
+"Type %s HELP %s option for more information\n"
 "on a specific option.\n"
 " \n"
 "Note: access to this command is controlled by the\n"
 "level SET."
 msgstr ""
 "Belirli bir seçenek hakkında daha fazla bilgi için\n"
-"%s%s HELP %s seçenek yazın. \n"
+"%s HELP %s seçenek yazın. \n"
 "Not: Bu komuta erişim SET seviyesi tarafından\n"
 "kontrol edilir."
 
 #, c-format
 msgid ""
-"Type %s%s HELP %s option for more information\n"
+"Type %s HELP %s option for more information\n"
 "on a specific option. The options will be set on the given\n"
 "nickname."
 msgstr ""
 "Belirli bir seçenek hakkında daha fazla bilgi için\n"
-"%s%s HELP %s seçenek yazın. Seçenekler belirtilen\n"
+"%s HELP %s seçenek yazın. Seçenekler belirtilen\n"
 "rumuz'a göre ayarlanacaktır."
 
 #, c-format
 msgid ""
-"Type %s%s HELP %s option for more information on a\n"
+"Type %s HELP %s option for more information on a\n"
 "particular option."
 msgstr ""
-"Belirli bir seçenek hakkında daha fazla bilgi için\n"
-"%s%s HELP %s seçenek yazın."
+"Özel bir seçenek hakkında daha fazla bilgi için\n"
+"%s HELP %s seçenek yazın."
 
 #, c-format
-msgid "Type %s%s SET EMAIL email in order to set your email."
-msgstr "E-Postanızı ayarlamak için %s%s SET EMAIL e-posta yazın."
+msgid "Type %s SET EMAIL email in order to set your email."
+msgstr "E-Postanızı ayarlamak için %s SET EMAIL e-posta yazın."
 
 msgid "Un-Load a module"
 msgstr "Bir modülün yüklemesini kaldır"
@@ -7993,16 +8000,16 @@ msgid "Unknown command %s."
 msgstr "Bilinmeyen komut %s."
 
 #, c-format
-msgid "Unknown command %s. \"%s%s HELP\" for help."
-msgstr "Bilinmeyen komut %s. Yardım için: \"%s%s HELP\"."
+msgid "Unknown command %s. \"%s HELP\" for help."
+msgstr "Bilinmeyen komut %s. Yardım için: \"%s HELP\"."
 
 #, c-format
 msgid "Unknown command %s. Did you mean %s?"
 msgstr "Bilinmeyen komut %s. %s mi demek istediniz?"
 
 #, c-format
-msgid "Unknown command %s. Did you mean %s? \"%s%s HELP\" for help."
-msgstr "Bilinmeyen komut %s. %s mi demek istediniz? Yardım için: \"%s%s HELP\"."
+msgid "Unknown command %s. Did you mean %s? \"%s HELP\" for help."
+msgstr "Bilinmeyen komut %s. %s mi demek istediniz? Yardım için: \"%s HELP\"."
 
 #, c-format
 msgid "Unknown mode character %c ignored."
@@ -8348,10 +8355,6 @@ msgid "You can't logout %s, they are a Services Operator."
 msgstr "%s oturumunu kapatamazsınız, o bir Servis Operatörü."
 
 #, c-format
-msgid "You cannot %s on this network."
-msgstr "Bu ağda %s yapamazsınız."
-
-#, c-format
 msgid "You cannot set the %c flag."
 msgstr "%c bayrağını ayarlayamazsınız."
 
@@ -8425,10 +8428,10 @@ msgstr "1 yeni memonuz var."
 #, c-format
 msgid ""
 "You have a new memo from %s.\n"
-"Type %s%s READ %zu to read it."
+"Type %s READ %zu to read it."
 msgstr ""
 "%s size yeni bir memo gönderdi.\n"
-"okumak için %s%s READ %zu yazın."
+"okumak için %s READ %zu yazın."
 
 #, c-format
 msgid "You have been invited to %s by %s."
@@ -8488,6 +8491,10 @@ msgstr "Diğer Servis Operatörlerinin e-postasını değiştiremezsiniz."
 
 msgid "You may not change the password of other Services Operators."
 msgstr "Diğer Servis Operatörlerinin şifresini değiştiremezsiniz."
+
+#, c-format
+msgid "You may not drop %s as it is the display nick for the account."
+msgstr "Hesabın görüntülenen rumuzu olduğu için %s rumuzunu droplayamazsınız."
 
 msgid "You may not drop other Services Operators' nicknames."
 msgstr "Diğer Servis Operatörlerinin rumuzlarını düşüremezsiniz."
@@ -8585,6 +8592,10 @@ msgstr "IRCd'niz SVSPART'ı desteklemiyor."
 
 msgid "Your IRCd does not support vidents. If this is incorrect please report this as a possible bug."
 msgstr "IRCd'niz vIdent'i desteklemiyor, eğer bu yanlışsa lütfen bunu olası bir hata olarak bildirin."
+
+#, c-format
+msgid "Your SSL certificate fingerprint %s has been automatically added to your certificate list."
+msgstr "SSL sertifika parmak iziniz %s otomatik olarak sertifika listenize eklendi."
 
 #, c-format
 msgid "Your account %s has been successfully created."

@@ -573,7 +573,7 @@ public:
 		Uplink::Send("ENDBURST");
 
 		if (spanningtree_proto_ver < 1206)
-			SendGlobops(nullptr, "Support for InspIRCd v3 is deprecated and will be removed in a future release. Please consider upgrading to InspIRCd v4.")
+			SendGlobops(Me, "Support for InspIRCd v3 is deprecated and will be removed in a future release. Please consider upgrading to InspIRCd v4.");
 	}
 
 	void SendGlobops(const MessageSource &source, const Anope::string &buf) override

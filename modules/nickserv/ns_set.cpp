@@ -663,95 +663,6 @@ public:
 	}
 };
 
-class CommandNSSetKeepModes
-	: public Command
-{
-public:
-	CommandNSSetKeepModes(Module *creator, const Anope::string &sname = "nickserv/set/keepmodes", size_t min = 1) : Command(creator, sname, min, min + 1)
-	{
-		this->SetDesc(_("Enable or disable keep modes"));
-		this->SetSyntax("{ON | OFF}");
-	}
-
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
-	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
-			return;
-		}
-
-		const NickAlias *na = NickAlias::Find(user);
-		if (!na)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
-			return;
-		}
-		NickCore *nc = na->nc;
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (param.equals_ci("ON"))
-		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable keepmodes for " << nc->display;
-			nc->Extend<bool>("NS_KEEP_MODES");
-			source.Reply(_("Keep modes for %s is now \002on\002."), nc->display.c_str());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable keepmodes for " << nc->display;
-			nc->Shrink<bool>("NS_KEEP_MODES");
-			source.Reply(_("Keep modes for %s is now \002off\002."), nc->display.c_str());
-		}
-		else
-			this->OnSyntaxError(source, "");
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, source.nc->display, params[0]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for your nick. If keep\n"
-				"modes is enabled, services will remember your usermodes\n"
-				"and attempt to re-set them the next time you authenticate."));
-		return true;
-	}
-};
-
-class CommandNSSASetKeepModes final
-	: public CommandNSSetKeepModes
-{
-public:
-	CommandNSSASetKeepModes(Module *creator) : CommandNSSetKeepModes(creator, "nickserv/saset/keepmodes", 2)
-	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, params[0], params[1]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for the given nick. If keep\n"
-				"modes is enabled, services will remember users' usermodes\n"
-				"and attempt to re-set them the next time they authenticate."));
-		return true;
-	}
-};
-
 class CommandNSSASetNoexpire final
 	: public Command
 {
@@ -823,63 +734,12 @@ class NSSet final
 	CommandNSSetEmail commandnssetemail;
 	CommandNSSASetEmail commandnssasetemail;
 
-	CommandNSSetKeepModes commandnssetkeepmodes;
-	CommandNSSASetKeepModes commandnssasetkeepmodes;
-
-
 	CommandNSSetPassword commandnssetpassword;
 	CommandNSSASetPassword commandnssasetpassword;
 
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
 	SerializableExtensibleItem<bool> autoop, neverop, noexpire;
-
-	struct KeepModes final
-		: SerializableExtensibleItem<bool>
-	{
-		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
-
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
-		{
-			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
-
-			if (s->GetSerializableType()->GetName() != "NickCore")
-				return;
-
-			const NickCore *nc = anope_dynamic_static_cast<const NickCore *>(s);
-			Anope::string modes;
-			for (const auto &[last_mode, last_value] : nc->last_modes)
-			{
-				if (!modes.empty())
-					modes += " ";
-				modes += last_mode;
-				if (!last_value.empty())
-					modes += "," + last_value;
-			}
-			data.Store("last_modes", modes);
-		}
-
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
-		{
-			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
-
-			if (s->GetSerializableType()->GetName() != "NickCore")
-				return;
-
-			NickCore *nc = anope_dynamic_static_cast<NickCore *>(s);
-			Anope::string modes;
-			data["last_modes"] >> modes;
-			nc->last_modes.clear();
-			for (spacesepstream sep(modes); sep.GetToken(modes);)
-			{
-				size_t c = modes.find(',');
-				if (c == Anope::string::npos)
-					nc->last_modes.emplace(modes, "");
-				else
-					nc->last_modes.emplace(modes.substr(0, c), modes.substr(c + 1));
-			}
-		}
-	} keep_modes;
 
 	/* email, passcode */
 	PrimitiveExtensibleItem<std::pair<Anope::string, Anope::string > > ns_set_email;
@@ -891,13 +751,12 @@ public:
 		commandnssetneverop(this), commandnssasetneverop(this),
 		commandnssetdisplay(this), commandnssasetdisplay(this),
 		commandnssetemail(this), commandnssasetemail(this),
-		commandnssetkeepmodes(this), commandnssasetkeepmodes(this),
 		commandnssetpassword(this), commandnssasetpassword(this),
 		commandnssasetnoexpire(this),
 
 		autoop(this, "AUTOOP"), neverop(this, "NEVEROP"),
 		noexpire(this, "NS_NO_EXPIRE"),
-		keep_modes(this, "NS_KEEP_MODES"), ns_set_email(this, "ns_set_email")
+		ns_set_email(this, "ns_set_email")
 	{
 	}
 
@@ -950,8 +809,6 @@ public:
 			info.AddOption(_("Never-op"));
 		if (noexpire.HasExt(na))
 			info.AddOption(_("No expire"));
-		if (keep_modes.HasExt(na->nc))
-			info.AddOption(_("Keep modes"));
 	}
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
@@ -964,21 +821,6 @@ public:
 	{
 		if (u->IsIdentified() && setter.GetUser() == u)
 			u->Account()->last_modes = u->GetModeList();
-	}
-
-	void OnUserLogin(User *u) override
-	{
-		if (keep_modes.HasExt(u->Account()))
-		{
-			User::ModeList modes = u->Account()->last_modes;
-			for (const auto &[last_mode, last_value] : modes)
-			{
-				UserMode *um = ModeManager::FindUserModeByName(last_mode);
-				/* if the null user can set the mode, then it's probably safe */
-				if (um && um->CanSet(NULL))
-					u->SetMode(NULL, last_mode, last_value);
-			}
-		}
 	}
 };
 

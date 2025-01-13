@@ -191,13 +191,13 @@ public:
 	{
 		if (keep_modes.HasExt(u->Account()))
 		{
+			const auto norestore = Config->GetModule(this)->Get<const Anope::string>("norestore");
 			User::ModeList modes = u->Account()->last_modes;
 			for (const auto &[last_mode, last_value] : modes)
 			{
-				UserMode *um = ModeManager::FindUserModeByName(last_mode);
-				/* if the null user can set the mode, then it's probably safe */
-				if (um && um->CanSet(NULL))
-					u->SetMode(NULL, last_mode, last_value);
+				auto *um = ModeManager::FindUserModeByName(last_mode);
+				if (um && um->CanSet(nullptr) && norestore.find(um->mchar) == Anope::string::npos)
+					u->SetMode(nullptr,  last_mode, last_value);
 			}
 		}
 	}

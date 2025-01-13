@@ -95,7 +95,7 @@ public:
 
 	void OnSetVHost(NickAlias *na) override
 	{
-		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
+		if (Config->GetModule(this)->Get<bool>("activate_on_set", "yes"))
 		{
 			User *u = User::Find(na->nick);
 
@@ -120,7 +120,7 @@ public:
 
 	void OnDeleteVHost(NickAlias *na) override
 	{
-		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
+		if (Config->GetModule(this)->Get<bool>("activate_on_set", "yes"))
 		{
 			User *u = User::Find(na->nick);
 

@@ -79,6 +79,12 @@ public:
 		this->OnUserLogin(u);
 	}
 
+	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override
+	{
+		if (mname == "OPER" && Config->GetModule(this)->Get<bool>("activate_on_deoper", "yes"))
+			this->OnUserLogin(u);
+	}
+
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!params.empty() || source.c || source.service != *HostServ)

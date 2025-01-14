@@ -1,6 +1,6 @@
 /* This module generates and compares password hashes using SHA256 algorithms.
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * This program is free but copyrighted software; see the file COPYING for

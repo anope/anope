@@ -3,7 +3,7 @@
 /**
  * XMLRPC Functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  */
 

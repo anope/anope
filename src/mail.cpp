@@ -22,24 +22,25 @@ Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, con
 	, message(m)
 	, content_type(Config->GetBlock("mail")->Get<const Anope::string>("content_type", "text/plain; charset=UTF-8"))
 	, dont_quote_addresses(Config->GetBlock("mail")->Get<bool>("dontquoteaddresses"))
-	, success(false)
 {
 }
 
 Mail::Message::~Message()
 {
-	if (success)
+	if (error.empty())
 		Log(LOG_NORMAL, "mail") << "Successfully delivered mail for " << mail_to << " (" << addr << ")";
 	else
-		Log(LOG_NORMAL, "mail") << "Error delivering mail for " << mail_to << " (" << addr << ")";
+		Log(LOG_NORMAL, "mail") << "Error delivering mail for " << mail_to << " (" << addr << "): " << error;
 }
 
 void Mail::Message::Run()
 {
+	errno = 0;
 	FILE *pipe = popen(sendmail_path.c_str(), "w");
 
 	if (!pipe)
 	{
+		error = strerror(errno);
 		SetExitState();
 		return;
 	}
@@ -56,9 +57,10 @@ void Mail::Message::Run()
 	fprintf(pipe, "%s", message.c_str());
 	fprintf(pipe, "\r\n.\r\n");
 
-	pclose(pipe);
+	int result = pclose(pipe);
 
-	success = true;
+	if (result > 0)
+		error = "Sendmail exited with code " + stringify(result);
 	SetExitState();
 }
 

@@ -26,6 +26,7 @@ namespace Mail
 	class Message : public Thread
 	{
 	 private:
+		Anope::string error;
 		Anope::string sendmail_path;
 		Anope::string send_from;
 		Anope::string mail_to;
@@ -35,7 +36,6 @@ namespace Mail
 		Anope::string content_type;
 		bool dont_quote_addresses;
 
-		bool success;
 	 public:
 		/** Construct this message. Once constructed call Thread::Start to launch the mail sending.
 		 * @param sf Config->SendFrom

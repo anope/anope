@@ -118,6 +118,10 @@ public:
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
+		// Bcrypt can not generate passwords longer than 71 characters.
+		if (src.length() > 71)
+			return EVENT_CONTINUE;
+
 		dest = "bcrypt:" + bcryptprovider.Encrypt(src);
 		Log(LOG_DEBUG_2) << "(enc_bcrypt) hashed password from [" << src << "] to [" << dest << "]";
 		return EVENT_ALLOW;

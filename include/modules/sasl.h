@@ -69,7 +69,7 @@ namespace SASL
 
 		virtual Session *CreateSession(const Anope::string &uid) { return new Session(this, uid); }
 
-		virtual void ProcessMessage(Session *session, const Message &) = 0;
+		virtual bool ProcessMessage(Session *session, const Message &) = 0;
 
 		virtual ~Mechanism()
 		{

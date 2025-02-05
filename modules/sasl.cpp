@@ -18,7 +18,7 @@ class Plain final
 public:
 	Plain(Module *o) : Mechanism(o, "PLAIN") { }
 
-	void ProcessMessage(Session *sess, const SASL::Message &m) override
+	bool ProcessMessage(Session *sess, const SASL::Message &m) override
 	{
 		if (m.type == "S")
 		{
@@ -32,44 +32,29 @@ public:
 
 			size_t zcsep = message.find('\0');
 			if (zcsep == Anope::string::npos)
-			{
-				sasl->Fail(sess);
-				delete sess;
-				return;
-			}
+				return false;
 
 			size_t cpsep = message.find('\0', zcsep + 1);
 			if (cpsep == Anope::string::npos)
-			{
-				sasl->Fail(sess);
-				delete sess;
-				return;
-			}
+				return false;
 
 			Anope::string authzid = message.substr(0, zcsep);
 			Anope::string authcid = message.substr(zcsep + 1, cpsep - zcsep - 1);
 
 			// We don't support having an authcid that is different to the authzid.
 			if (!authzid.empty() && authzid != authcid)
-			{
-				sasl->Fail(sess);
-				delete sess;
-				return;
-			}
+				return false;
 
 			Anope::string passwd = message.substr(cpsep + 1);
 
 			if (authcid.empty() || passwd.empty() || !IRCD->IsNickValid(authcid) || passwd.find_first_of("\r\n\0") != Anope::string::npos)
-			{
-				sasl->Fail(sess);
-				delete sess;
-				return;
-			}
+				return false;
 
 			SASL::IdentifyRequest *req = new SASL::IdentifyRequest(this->owner, m.source, authcid, passwd, sess->hostname, sess->ip);
 			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 			req->Dispatch();
 		}
+		return true;
 	}
 };
 
@@ -98,7 +83,7 @@ public:
 		return new Session(this, uid);
 	}
 
-	void ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
+	bool ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
 	{
 		Session *mysess = anope_dynamic_static_cast<Session *>(sess);
 
@@ -111,11 +96,7 @@ public:
 		else if (m.type == "C")
 		{
 			if (!certs || mysess->cert.empty())
-			{
-				sasl->Fail(sess);
-				delete sess;
-				return;
-			}
+				return false;
 
 			Anope::string user = "A user";
 			if (!mysess->hostname.empty() && !mysess->ip.empty())
@@ -125,15 +106,14 @@ public:
 			if (!nc || nc->HasExt("NS_SUSPENDED") || nc->HasExt("UNCONFIRMED"))
 			{
 				Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " failed to identify using certificate " << mysess->cert << " using SASL EXTERNAL";
-				sasl->Fail(sess);
-				delete sess;
-				return;
+				return false;
 			}
 
 			Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " identified to account " << nc->display << " using SASL EXTERNAL";
 			sasl->Succeed(sess, nc);
 			delete sess;
 		}
+		return true;
 	}
 };
 
@@ -143,7 +123,7 @@ class Anonymous final
 public:
 	Anonymous(Module *o) : Mechanism(o, "ANONYMOUS") { }
 
-	void ProcessMessage(Session *sess, const SASL::Message &m) override
+	bool ProcessMessage(Session *sess, const SASL::Message &m) override
 	{
 		if (m.type == "S")
 		{
@@ -163,6 +143,7 @@ public:
 			Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " unidentified using SASL ANONYMOUS";
 			sasl->Succeed(sess, nullptr);
 		}
+		return true;
 	}
 };
 
@@ -247,7 +228,13 @@ public:
 		}
 
 		if (session && session->mech)
-			session->mech->ProcessMessage(session, m);
+		{
+			if (!session->mech->ProcessMessage(session, m))
+			{
+				Fail(session);
+				delete session;
+			}
+		}
 	}
 
 	Anope::string GetAgent() override

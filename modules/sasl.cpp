@@ -28,7 +28,7 @@ public:
 		{
 			// message = [authzid] UTF8NUL authcid UTF8NUL passwd
 			Anope::string message;
-			Anope::B64Decode(m.data, message);
+			Anope::B64Decode(m.data[0], message);
 
 			size_t zcsep = message.find('\0');
 			if (zcsep == Anope::string::npos)
@@ -89,7 +89,7 @@ public:
 
 		if (m.type == "S")
 		{
-			mysess->cert = m.ext;
+			mysess->cert = m.data.size() > 1 ? "" : m.data[1];
 
 			sasl->SendMessage(sess, "C", "+");
 		}
@@ -132,7 +132,7 @@ public:
 		else if (m.type == "C")
 		{
 			Anope::string decoded;
-			Anope::B64Decode(m.data, decoded);
+			Anope::B64Decode(m.data[0], decoded);
 
 			Anope::string user = "A user";
 			if (!sess->hostname.empty() && !sess->ip.empty())
@@ -168,6 +168,9 @@ public:
 
 	void ProcessMessage(const SASL::Message &m) override
 	{
+		if (m.data.empty())
+			return; // Malformed.
+
 		if (m.target != "*")
 		{
 			Server *s = Server::Find(m.target);
@@ -183,7 +186,7 @@ public:
 
 		if (m.type == "S")
 		{
-			ServiceReference<Mechanism> mech("SASL::Mechanism", m.data);
+			ServiceReference<Mechanism> mech("SASL::Mechanism", m.data[0]);
 			if (!mech)
 			{
 				Session tmp(NULL, m.source);
@@ -223,8 +226,8 @@ public:
 				session = new Session(NULL, m.source);
 				sessions[m.source] = session;
 			}
-			session->hostname = m.data;
-			session->ip = m.ext;
+			session->hostname = m.data[0];
+			session->ip = m.data.size() > 1 ? m.data[1] : "";
 		}
 
 		if (session && session->mech)
@@ -279,7 +282,7 @@ public:
 		msg.source = this->GetAgent();
 		msg.target = session->uid;
 		msg.type = mtype;
-		msg.data = data;
+		msg.data.push_back(data);
 
 		IRCD->SendSASLMessage(msg);
 	}

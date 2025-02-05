@@ -15,8 +15,7 @@ namespace SASL
 		Anope::string source;
 		Anope::string target;
 		Anope::string type;
-		Anope::string data;
-		Anope::string ext;
+		std::vector<Anope::string> data;
 	};
 
 	class Mechanism;

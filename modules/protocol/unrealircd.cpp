@@ -401,10 +401,9 @@ private:
 			distmask = message.target.substr(0, p);
 		}
 
-		if (message.ext.empty())
-			Uplink::Send(BotInfo::Find(message.source), "SASL", distmask, message.target, message.type, message.data);
-		else
-			Uplink::Send(BotInfo::Find(message.source), "SASL", distmask, message.target, message.type, message.data, message.ext);
+		auto newparams = message.data;
+		newparams.insert(newparams.begin(), { distmask, message.target, message.type });
+		Uplink::SendInternal({}, BotInfo::Find(message.source), "ENCAP", newparams);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
@@ -1307,9 +1306,7 @@ struct IRCDMessageSASL final
 		m.source = params[1];
 		m.target = params[0];
 		m.type = params[2];
-		m.data = params[3];
-		m.ext = params.size() > 4 ? params[4] : "";
-
+		m.data.assign(params.begin() + 3, params.end());
 		SASL::sasl->ProcessMessage(m);
 	}
 };

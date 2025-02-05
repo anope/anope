@@ -154,10 +154,10 @@ public:
 	{
 		Server *s = Server::Find(message.target.substr(0, 3));
 		auto target = s ? s->GetName() : message.target.substr(0, 3);
-		if (message.ext.empty())
-			Uplink::Send("ENCAP", target, "SASL", message.source, message.target, message.type, message.data);
-		else
-			Uplink::Send("ENCAP", target, "SASL", message.source, message.target, message.type, message.data, message.ext);
+
+		auto newparams = message.data;
+		newparams.insert(newparams.begin(), { target, "SASL", message.source, message.target, message.type });
+		Uplink::SendInternal({}, Me, "ENCAP", newparams);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
@@ -221,9 +221,7 @@ struct IRCDMessageEncap final
 			m.source = params[2];
 			m.target = params[3];
 			m.type = params[4];
-			m.data = params[5];
-			m.ext = params.size() > 6 ? params[6] : "";
-
+			m.data.assign(params.begin() + 5, params.end());
 			SASL::sasl->ProcessMessage(m);
 		}
 	}

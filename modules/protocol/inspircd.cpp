@@ -606,10 +606,9 @@ public:
 
 	void SendSASLMessage(const SASL::Message &message) override
 	{
-		if (message.ext.empty())
-			Uplink::Send("ENCAP", message.target.substr(0, 3), "SASL", message.source, message.target, message.type, message.data);
-		else
-			Uplink::Send("ENCAP", message.target.substr(0, 3), "SASL", message.source, message.target, message.type, message.data, message.ext);
+		auto newparams = message.data;
+		newparams.insert(newparams.begin(), { message.target.substr(0, 3), "SASL", message.source, message.target, message.type });
+		Uplink::SendInternal({}, Me, "ENCAP", newparams);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
@@ -1797,8 +1796,7 @@ struct IRCDMessageSASL final
 		m.source = params[0];
 		m.target = params[1];
 		m.type = params[2];
-		m.data = params[3];
-		m.ext = params.size() > 4 ? params[4] : "";
+		m.data.assign(params.begin() + 3, params.end());
 		SASL::sasl->ProcessMessage(m);
 	}
 };

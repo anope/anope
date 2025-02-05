@@ -764,7 +764,7 @@ private:
 	bool HandleKL(AthemeRow &row)
 	{
 		// KL <id> <user> <host> <duration> <settime> <setby> <reason>
-		/* auto id = */ row.GetNum<unsigned>();
+		auto id = row.Get();
 		auto user = row.Get();
 		auto host = row.Get();
 		auto duration = row.GetNum<unsigned>();
@@ -782,6 +782,7 @@ private:
 		}
 
 		auto *xl = new XLine(user + "@" + host, setby, settime + duration, reason);
+		xl->id = id;
 		sglinemgr->AddXLine(xl);
 		return true;
 	}
@@ -803,7 +804,7 @@ private:
 		// MC <channel> <regtime> <used> <flags> <mlock-on> <mlock-off> <mlock-limit> [<mlock-key>]
 		auto channel = row.Get();
 		auto regtime = row.GetNum<time_t>();
-		/* auto used = */ row.GetNum<time_t>();
+		auto used = row.GetNum<time_t>();
 		auto flags = row.Get();
 		auto mlock_on = row.GetNum<unsigned>();
 		auto mlock_off = row.GetNum<unsigned>();
@@ -816,6 +817,7 @@ private:
 
 		auto *ci = new ChannelInfo(channel);
 		ci->time_registered = regtime;
+		ci->last_used = used;
 
 		// No equivalent: elnv
 		ApplyFlags(ci, flags, 'h', "CS_NO_EXPIRE");
@@ -1355,7 +1357,7 @@ private:
 	bool HandleQL(AthemeRow &row)
 	{
 		// QL <nick> <host> <duration> <settime> <setby> <reason>
-		/* auto id = */ row.GetNum<unsigned>();
+		auto id = row.Get();
 		auto nick = row.Get();
 		auto duration = row.GetNum<unsigned>();
 		auto settime = row.GetNum<time_t>();
@@ -1372,6 +1374,7 @@ private:
 		}
 
 		auto *xl = new XLine(nick, setby, settime + duration, reason);
+		xl->id = id;
 		sqlinemgr->AddXLine(xl);
 		return true;
 	}
@@ -1416,7 +1419,7 @@ private:
 	bool HandleXL(AthemeRow &row)
 	{
 		// XL <id> <real> <duration> <settime> <setby> <reason>
-		/* auto id = */ row.GetNum<unsigned>();
+		auto id = row.Get();
 		auto real = row.Get();
 		auto duration = row.GetNum<unsigned>();
 		auto settime = row.GetNum<time_t>();
@@ -1433,6 +1436,7 @@ private:
 		}
 
 		auto *xl = new XLine(real, setby, settime + duration, reason);
+		xl->id = id;
 		snlinemgr->AddXLine(xl);
 		return true;
 	}

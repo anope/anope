@@ -66,7 +66,7 @@ class External final
 	struct Session final
 		: SASL::Session
 	{
-		Anope::string cert;
+		std::vector<Anope::string> certs;
 
 		Session(Mechanism *m, const Anope::string &u) : SASL::Session(m, u) { }
 	};
@@ -89,29 +89,42 @@ public:
 
 		if (m.type == "S")
 		{
-			mysess->cert = m.data.size() > 1 ? "" : m.data[1];
+			mysess->certs.assign(m.data.begin() + 1, m.data.end());
 
 			sasl->SendMessage(sess, "C", "+");
 		}
 		else if (m.type == "C")
 		{
-			if (!certs || mysess->cert.empty())
+			if (!certs || mysess->certs.empty())
 				return false;
 
 			Anope::string user = "A user";
 			if (!mysess->hostname.empty() && !mysess->ip.empty())
 				user = mysess->hostname + " (" + mysess->ip + ")";
 
-			NickCore *nc = certs->FindAccountFromCert(mysess->cert);
-			if (!nc || nc->HasExt("NS_SUSPENDED") || nc->HasExt("UNCONFIRMED"))
+
+			for (auto it = mysess->certs.begin(); it != mysess->certs.end(); ++it)
 			{
-				Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " failed to identify using certificate " << mysess->cert << " using SASL EXTERNAL";
-				return false;
+				auto *nc = certs->FindAccountFromCert(*it);
+				if (nc && !nc->HasExt("NS_SUSPENDED") && !nc->HasExt("UNCONFIRMED"))
+				{
+					// If we are using a fallback cert then upgrade it.
+					if (it != mysess->certs.begin())
+					{
+						auto *cl = nc->GetExt<NSCertList>("certificates");
+						if (cl)
+							cl->ReplaceCert(*it, mysess->certs[0]);
+					}
+
+					Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " identified to account " << nc->display << " using SASL EXTERNAL";
+					sasl->Succeed(sess, nc);
+					delete sess;
+					return true;
+				}
 			}
 
-			Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " identified to account " << nc->display << " using SASL EXTERNAL";
-			sasl->Succeed(sess, nc);
-			delete sess;
+			Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " failed to identify using certificate " << mysess->certs.front() << " using SASL EXTERNAL";
+			return false;
 		}
 		return true;
 	}

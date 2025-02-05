@@ -25,7 +25,7 @@ public:
 		unsigned count = 0;
 		ListFormatter list(source.GetAccount());
 
-		list.AddColumn(_("Nick")).AddColumn(_("Mask"));
+		list.AddColumn(_("Nick")).AddColumn(_("Mask")).AddColumn(_("Real name"));
 
 		for (const auto &[_, bi] : *BotListByNick)
 		{
@@ -35,6 +35,7 @@ public:
 				ListFormatter::ListEntry entry;
 				entry["Nick"] = (bi->oper_only ? "* " : "") + bi->nick;
 				entry["Mask"] = bi->GetIdent() + "@" + bi->host;
+				entry["Real name"] = bi->realname;
 				list.AddEntry(entry);
 			}
 		}

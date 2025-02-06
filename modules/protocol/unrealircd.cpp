@@ -403,7 +403,7 @@ private:
 
 		auto newparams = message.data;
 		newparams.insert(newparams.begin(), { distmask, message.target, message.type });
-		Uplink::SendInternal({}, BotInfo::Find(message.source), "ENCAP", newparams);
+		Uplink::SendInternal({}, BotInfo::Find(message.source), "SASL", newparams);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override

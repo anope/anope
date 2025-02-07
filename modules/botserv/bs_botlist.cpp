@@ -15,13 +15,32 @@ class CommandBSBotList final
 	: public Command
 {
 public:
-	CommandBSBotList(Module *creator) : Command(creator, "botserv/botlist", 0, 0)
+	CommandBSBotList(Module *creator) : Command(creator, "botserv/botlist", 0, 1)
 	{
 		this->SetDesc(_("Lists available bots"));
+		this->SetSyntax("[OPERONLY] [UNUSED] [VANITY]");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const bool is_admin = source.HasCommand("botserv/administration");
+		auto operonly = false;
+		auto unused = false;
+		auto vanity = false;
+		if (is_admin && !params.empty())
+		{
+			spacesepstream keywords(params[0]);
+			for (Anope::string keyword; keywords.GetToken(keyword); )
+			{
+				if (keyword.equals_ci("OPERONLY"))
+					operonly = true;
+				if (keyword.equals_ci("UNUSED"))
+					unused = true;
+				if (keyword.equals_ci("VANITY"))
+					vanity = true;
+			}
+		}
+
 		unsigned count = 0;
 		ListFormatter list(source.GetAccount());
 
@@ -29,11 +48,18 @@ public:
 
 		for (const auto &[_, bi] : *BotListByNick)
 		{
-			if (source.HasPriv("botserv/administration") || !bi->oper_only)
+			if (is_admin || !bi->oper_only)
 			{
+				if (operonly && !bi->oper_only)
+					continue;
+				if (unused && bi->GetChannelCount())
+					continue;
+				if (vanity && bi->conf)
+					continue;
+
 				++count;
 				ListFormatter::ListEntry entry;
-				entry["Nick"] = (bi->oper_only ? "* " : "") + bi->nick;
+				entry["Nick"] = bi->nick;
 				entry["Mask"] = bi->GetIdent() + "@" + bi->host;
 				entry["Real name"] = bi->realname;
 				list.AddEntry(entry);
@@ -62,7 +88,14 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Lists all available bots on this network.\n"
-				"Bots prefixed by a * are reserved for IRC Operators."));
+				"\n"
+				"If the OPERONLY, UNUSED or VANITY options are given only\n"
+				"bots which, respectively, are oper-only, unused or were\n"
+				"added at runtime will be displayed. If multiple options are\n"
+				"given, all nicks matching at least one option will be\n"
+				"displayed.\n"
+				"\n"
+				"Note that these options are limited to \037Services Operators\037."));
 		return true;
 	}
 };

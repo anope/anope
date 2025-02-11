@@ -409,6 +409,11 @@ public:
 
 	}
 
+	void Prioritize() override
+	{
+		ModuleManager::SetPriority(this, I_OnBotPrivmsg, PRIORITY_FIRST);
+	}
+
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) override
 	{
 		if (!u->HasMode("OPER") && this->osignoreservice.Find(u->nick))

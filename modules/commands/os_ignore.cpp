@@ -404,6 +404,11 @@ class OSIgnore : public Module
 
 	}
 
+	void Prioritize() anope_override
+	{
+		ModuleManager::SetPriority(this, I_OnBotPrivmsg, PRIORITY_FIRST);
+	}
+
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
 		if (!u->HasMode("OPER") && this->osignoreservice.Find(u->nick))

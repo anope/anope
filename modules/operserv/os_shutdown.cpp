@@ -15,13 +15,23 @@ class CommandOSQuit final
 	: public Command
 {
 public:
-	CommandOSQuit(Module *creator) : Command(creator, "operserv/quit", 0, 0)
+	CommandOSQuit(Module *creator) : Command(creator, "operserv/quit", 0, 1)
 	{
 		this->SetDesc(_("Terminate services WITHOUT saving"));
+		if (Config->GetModule(this->owner)->Get<bool>("requirename"))
+			this->SetSyntax(_("\037network-name\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const auto requirename = Config->GetModule(this->owner)->Get<bool>("requirename");
+		const auto networkname = Config->GetBlock("networkinfo")->Get<Anope::string>("networkname");
+		if (requirename && (params.empty() || !params[0].equals_cs(networkname)))
+		{
+			OnSyntaxError(source, source.command);
+			return;
+		}
+
 		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
 		Anope::Quitting = true;
@@ -44,13 +54,23 @@ class CommandOSRestart final
 	: public Command
 {
 public:
-	CommandOSRestart(Module *creator) : Command(creator, "operserv/restart", 0, 0)
+	CommandOSRestart(Module *creator) : Command(creator, "operserv/restart", 0, 1)
 	{
 		this->SetDesc(_("Save databases and restart services"));
+		if (Config->GetModule(this->owner)->Get<bool>("requirename"))
+			this->SetSyntax(_("\037network-name\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const auto requirename = Config->GetModule(this->owner)->Get<bool>("requirename");
+		const auto networkname = Config->GetBlock("networkinfo")->Get<Anope::string>("networkname");
+		if (requirename && (params.empty() || !params[0].equals_cs(networkname)))
+		{
+			OnSyntaxError(source, source.command);
+			return;
+		}
+
 		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
 		Anope::Quitting = Anope::Restarting = true;
@@ -71,13 +91,23 @@ class CommandOSShutdown final
 	: public Command
 {
 public:
-	CommandOSShutdown(Module *creator) : Command(creator, "operserv/shutdown", 0, 0)
+	CommandOSShutdown(Module *creator) : Command(creator, "operserv/shutdown", 0, 1)
 	{
 		this->SetDesc(_("Terminate services with save"));
+		if (Config->GetModule(this->owner)->Get<bool>("requirename"))
+			this->SetSyntax(_("\037network-name\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const auto requirename = Config->GetModule(this->owner)->Get<bool>("requirename");
+		const auto networkname = Config->GetBlock("networkinfo")->Get<Anope::string>("networkname");
+		if (requirename && (params.empty() || !params[0].equals_cs(networkname)))
+		{
+			OnSyntaxError(source, source.command);
+			return;
+		}
+
 		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
 		Anope::Quitting = true;

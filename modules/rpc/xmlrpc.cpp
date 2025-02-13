@@ -7,7 +7,7 @@
  */
 
 #include "module.h"
-#include "modules/xmlrpc.h"
+#include "modules/rpc.h"
 #include "modules/httpd.h"
 
 static struct special_chars final
@@ -33,22 +33,22 @@ special[] = {
 };
 
 class MyXMLRPCServiceInterface final
-	: public XMLRPCServiceInterface
+	: public RPCServiceInterface
 	, public HTTPPage
 {
-	std::deque<XMLRPCEvent *> events;
+	std::deque<RPCEvent *> events;
 
 public:
-	MyXMLRPCServiceInterface(Module *creator, const Anope::string &sname) : XMLRPCServiceInterface(creator, sname), HTTPPage("/xmlrpc", "text/xml") { }
+	MyXMLRPCServiceInterface(Module *creator, const Anope::string &sname) : RPCServiceInterface(creator, sname), HTTPPage("/xmlrpc", "text/xml") { }
 
-	void Register(XMLRPCEvent *event) override
+	void Register(RPCEvent *event) override
 	{
 		this->events.push_back(event);
 	}
 
-	void Unregister(XMLRPCEvent *event) override
+	void Unregister(RPCEvent *event) override
 	{
-		std::deque<XMLRPCEvent *>::iterator it = std::find(this->events.begin(), this->events.end(), event);
+		std::deque<RPCEvent *>::iterator it = std::find(this->events.begin(), this->events.end(), event);
 
 		if (it != this->events.end())
 			this->events.erase(it);
@@ -150,7 +150,7 @@ public:
 	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
 	{
 		Anope::string content = message.content, tname, data;
-		XMLRPCRequest request(reply);
+		RPCRequest request(reply);
 
 		while (GetData(content, tname, data))
 		{
@@ -182,7 +182,7 @@ public:
 		return true;
 	}
 
-	void Reply(XMLRPCRequest &request) override
+	void Reply(RPCRequest &request) override
 	{
 		if (!request.id.empty())
 			request.reply("id", request.id);
@@ -204,7 +204,7 @@ public:
 	MyXMLRPCServiceInterface xmlrpcinterface;
 
 	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-		xmlrpcinterface(this, "xmlrpc")
+		xmlrpcinterface(this, "rpc")
 	{
 
 	}

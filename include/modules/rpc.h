@@ -10,7 +10,7 @@
 
 #include "httpd.h"
 
-class XMLRPCRequest final
+class RPCRequest final
 {
 	std::map<Anope::string, Anope::string> replies;
 
@@ -20,31 +20,31 @@ public:
 	std::deque<Anope::string> data;
 	HTTPReply &r;
 
-	XMLRPCRequest(HTTPReply &_r) : r(_r) { }
+	RPCRequest(HTTPReply &_r) : r(_r) { }
 	inline void reply(const Anope::string &dname, const Anope::string &ddata) { this->replies.emplace(dname, ddata); }
 	inline const std::map<Anope::string, Anope::string> &get_replies() { return this->replies; }
 };
 
-class XMLRPCServiceInterface;
+class RPCServiceInterface;
 
-class XMLRPCEvent
+class RPCEvent
 {
 public:
-	virtual ~XMLRPCEvent() = default;
-	virtual bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) = 0;
+	virtual ~RPCEvent() = default;
+	virtual bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) = 0;
 };
 
-class XMLRPCServiceInterface
+class RPCServiceInterface
 	: public Service
 {
 public:
-	XMLRPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, "XMLRPCServiceInterface", sname) { }
+	RPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, "RPCServiceInterface", sname) { }
 
-	virtual void Register(XMLRPCEvent *event) = 0;
+	virtual void Register(RPCEvent *event) = 0;
 
-	virtual void Unregister(XMLRPCEvent *event) = 0;
+	virtual void Unregister(RPCEvent *event) = 0;
 
 	virtual Anope::string Sanitize(const Anope::string &string) = 0;
 
-	virtual void Reply(XMLRPCRequest &request) = 0;
+	virtual void Reply(RPCRequest &request) = 0;
 };

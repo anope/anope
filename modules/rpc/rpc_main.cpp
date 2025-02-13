@@ -7,21 +7,21 @@
  */
 
 #include "module.h"
-#include "modules/xmlrpc.h"
+#include "modules/rpc.h"
 
 static Module *me;
 
-class XMLRPCIdentifyRequest final
+class RPCIdentifyRequest final
 	: public IdentifyRequest
 {
-	XMLRPCRequest request;
+	RPCRequest request;
 	HTTPReply repl; /* Request holds a reference to the HTTPReply, because we might exist long enough to invalidate it
 	                   we'll copy it here then reset the reference before we use it */
 	Reference<HTTPClient> client;
-	Reference<XMLRPCServiceInterface> xinterface;
+	Reference<RPCServiceInterface> xinterface;
 
 public:
-	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest &req, HTTPClient *c, XMLRPCServiceInterface *iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
+	RPCIdentifyRequest(Module *m, RPCRequest &req, HTTPClient *c, RPCServiceInterface *iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
 
 	void OnSuccess() override
 	{
@@ -51,11 +51,11 @@ public:
 	}
 };
 
-class MyXMLRPCEvent final
-	: public XMLRPCEvent
+class MyRPCEvent final
+	: public RPCEvent
 {
 public:
-	bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) override
+	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		if (request.name == "command")
 			this->DoCommand(iface, client, request);
@@ -76,7 +76,7 @@ public:
 	}
 
 private:
-	void DoCommand(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	void DoCommand(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
 	{
 		Anope::string service = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string user = request.data.size() > 1 ? request.data[1] : "";
@@ -97,12 +97,12 @@ private:
 
 				Anope::string out;
 
-				struct XMLRPCommandReply final
+				struct RPCommandReply final
 					: CommandReply
 				{
 					Anope::string &str;
 
-					XMLRPCommandReply(Anope::string &s) : str(s) { }
+					RPCommandReply(Anope::string &s) : str(s) { }
 
 					void SendMessage(BotInfo *source, const Anope::string &msg) override
 					{
@@ -121,7 +121,7 @@ private:
 		}
 	}
 
-	static bool DoCheckAuthentication(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static bool DoCheckAuthentication(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
 	{
 		Anope::string username = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string password = request.data.size() > 1 ? request.data[1] : "";
@@ -130,7 +130,7 @@ private:
 			request.reply("error", "Invalid parameters");
 		else
 		{
-			auto *req = new XMLRPCIdentifyRequest(me, request, client, iface, username, password);
+			auto *req = new RPCIdentifyRequest(me, request, client, iface, username, password);
 			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 			req->Dispatch();
 			return false;
@@ -139,7 +139,7 @@ private:
 		return true;
 	}
 
-	static void DoStats(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static void DoStats(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
 	{
 		request.reply("uptime", Anope::ToString(Anope::CurTime - Anope::StartTime));
 		request.reply("uplinkname", Me->GetLinks().front()->GetName());
@@ -156,7 +156,7 @@ private:
 		request.reply("channelcount", Anope::ToString(ChannelList.size()));
 	}
 
-	static void DoChannel(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static void DoChannel(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
 	{
 		if (request.data.empty())
 			return;
@@ -205,7 +205,7 @@ private:
 		}
 	}
 
-	static void DoUser(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static void DoUser(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
 	{
 		if (request.data.empty())
 			return;
@@ -247,7 +247,7 @@ private:
 		}
 	}
 
-	static void DoOperType(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static void DoOperType(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
 	{
 		for (auto *ot : Config->MyOperTypes)
 		{
@@ -260,7 +260,7 @@ private:
 		}
 	}
 
-	static void DoNotice(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
+	static void DoNotice(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
 	{
 		Anope::string from = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string to = request.data.size() > 1 ? request.data[1] : "";
@@ -278,29 +278,29 @@ private:
 	}
 };
 
-class ModuleXMLRPCMain final
+class ModuleRPCMain final
 	: public Module
 {
-	ServiceReference<XMLRPCServiceInterface> xmlrpc;
+	ServiceReference<RPCServiceInterface> rpc;
 
-	MyXMLRPCEvent stats;
+	MyRPCEvent stats;
 
 public:
-	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), xmlrpc("XMLRPCServiceInterface", "xmlrpc")
+	ModuleRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), rpc("RPCServiceInterface", "rpc")
 	{
 		me = this;
 
-		if (!xmlrpc)
-			throw ModuleException("Unable to find xmlrpc reference, is xmlrpc loaded?");
+		if (!rpc)
+			throw ModuleException("Unable to find RPC interface, is xmlrpc loaded?");
 
-		xmlrpc->Register(&stats);
+		rpc->Register(&stats);
 	}
 
-	~ModuleXMLRPCMain() override
+	~ModuleRPCMain() override
 	{
-		if (xmlrpc)
-			xmlrpc->Unregister(&stats);
+		if (rpc)
+			rpc->Unregister(&stats);
 	}
 };
 
-MODULE_INIT(ModuleXMLRPCMain)
+MODULE_INIT(ModuleRPCMain)

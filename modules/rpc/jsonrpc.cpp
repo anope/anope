@@ -115,9 +115,6 @@ public:
 			request.data.push_back(str ? str : "");
 		}
 
-		Log() << "id " << request.id;
-		Log() << "name " << request.name;
-
 		yyjson_doc_free(doc);
 
 		for (auto *e : this->events)

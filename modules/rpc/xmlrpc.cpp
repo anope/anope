@@ -54,7 +54,7 @@ public:
 			this->events.erase(it);
 	}
 
-	Anope::string Sanitize(const Anope::string &string) override
+	static Anope::string Sanitize(const Anope::string &string)
 	{
 		Anope::string ret = string;
 		for (int i = 0; !special[i].character.empty(); ++i)
@@ -189,7 +189,7 @@ public:
 
 		Anope::string r = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<methodResponse>\n<params>\n<param>\n<value>\n<struct>\n";
 		for (const auto &[name, value] : request.get_replies())
-			r += "<member>\n<name>" + name + "</name>\n<value>\n<string>" + this->Sanitize(value) + "</string>\n</value>\n</member>\n";
+			r += "<member>\n<name>" + this->Sanitize(name) + "</name>\n<value>\n<string>" + this->Sanitize(value) + "</string>\n</value>\n</member>\n";
 		r += "</struct>\n</value>\n</param>\n</params>\n</methodResponse>";
 
 		request.r.Write(r);

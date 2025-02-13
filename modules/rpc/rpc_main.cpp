@@ -116,7 +116,7 @@ private:
 				Command::Run(source, command);
 
 				if (!out.empty())
-					request.reply("return", iface->Sanitize(out));
+					request.reply("return", out);
 			}
 		}
 	}
@@ -163,24 +163,24 @@ private:
 
 		Channel *c = Channel::Find(request.data[0]);
 
-		request.reply("name", iface->Sanitize(c ? c->name : request.data[0]));
+		request.reply("name", c ? c->name : request.data[0]);
 
 		if (c)
 		{
 			request.reply("bancount", Anope::ToString(c->HasMode("BAN")));
 			int count = 0;
 			for (auto &ban : c->GetModeList("BAN"))
-				request.reply("ban" + Anope::ToString(++count), iface->Sanitize(ban));
+				request.reply("ban" + Anope::ToString(++count), ban);
 
 			request.reply("exceptcount", Anope::ToString(c->HasMode("EXCEPT")));
 			count = 0;
 			for (auto &except : c->GetModeList("EXCEPT"))
-				request.reply("except" + Anope::ToString(++count), iface->Sanitize(except));
+				request.reply("except" + Anope::ToString(++count), except);
 
 			request.reply("invitecount", Anope::ToString(c->HasMode("INVITEOVERRIDE")));
 			count = 0;
 			for (auto &invite : c->GetModeList("INVITEOVERRIDE"))
-				request.reply("invite" + Anope::ToString(++count), iface->Sanitize(invite));
+				request.reply("invite" + Anope::ToString(++count), invite);
 
 			Anope::string users;
 			for (Channel::ChanUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
@@ -191,14 +191,14 @@ private:
 			if (!users.empty())
 			{
 				users.erase(users.length() - 1);
-				request.reply("users", iface->Sanitize(users));
+				request.reply("users", users);
 			}
 
 			if (!c->topic.empty())
-				request.reply("topic", iface->Sanitize(c->topic));
+				request.reply("topic", c->topic);
 
 			if (!c->topic_setter.empty())
-				request.reply("topicsetter", iface->Sanitize(c->topic_setter));
+				request.reply("topicsetter", c->topic_setter);
 
 			request.reply("topictime", Anope::ToString(c->topic_time));
 			request.reply("topicts", Anope::ToString(c->topic_ts));
@@ -212,25 +212,25 @@ private:
 
 		User *u = User::Find(request.data[0]);
 
-		request.reply("nick", iface->Sanitize(u ? u->nick : request.data[0]));
+		request.reply("nick", u ? u->nick : request.data[0]);
 
 		if (u)
 		{
-			request.reply("ident", iface->Sanitize(u->GetIdent()));
-			request.reply("vident", iface->Sanitize(u->GetVIdent()));
-			request.reply("host", iface->Sanitize(u->host));
+			request.reply("ident", u->GetIdent());
+			request.reply("vident", u->GetVIdent());
+			request.reply("host", u->host);
 			if (!u->vhost.empty())
-				request.reply("vhost", iface->Sanitize(u->vhost));
+				request.reply("vhost", u->vhost);
 			if (!u->chost.empty())
-				request.reply("chost", iface->Sanitize(u->chost));
+				request.reply("chost", u->chost);
 			request.reply("ip", u->ip.addr());
 			request.reply("timestamp", Anope::ToString(u->timestamp));
 			request.reply("signon", Anope::ToString(u->signon));
 			if (u->IsIdentified())
 			{
-				request.reply("account", iface->Sanitize(u->Account()->display));
+				request.reply("account", u->Account()->display);
 				if (u->Account()->o)
-					request.reply("opertype", iface->Sanitize(u->Account()->o->ot->GetName()));
+					request.reply("opertype", u->Account()->o->ot->GetName());
 			}
 
 			Anope::string channels;

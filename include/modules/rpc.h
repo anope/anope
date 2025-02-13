@@ -44,7 +44,5 @@ public:
 
 	virtual void Unregister(RPCEvent *event) = 0;
 
-	virtual Anope::string Sanitize(const Anope::string &string) = 0;
-
 	virtual void Reply(RPCRequest &request) = 0;
 };

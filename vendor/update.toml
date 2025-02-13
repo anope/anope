@@ -25,3 +25,10 @@ license = "3-clause BSD License"
 tarball = "http://www.ouah.org/ogay/sha2/sha2.tar.gz"
 version = "2007-02-02"
 website = "http://www.ouah.org/ogay/sha2/"
+
+[yyjson]
+author  = "Yaoyuan Guo"
+depth   = 1
+git     = "https://github.com/ibireme/yyjson"
+files   = "{LICENSE,src/yyjson.[ch]}"
+license = "MIT License"

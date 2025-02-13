@@ -31,3 +31,13 @@ This directory contains vendored dependencies that are shipped with Anope to avo
 **Version** &mdash; 2007-02-02
 
 **Website** &mdash; [http://www.ouah.org/ogay/sha2/](http://www.ouah.org/ogay/sha2/)
+
+## yyjson
+
+**Author** &mdash; Yaoyuan Guo
+
+**License** &mdash; MIT License
+
+**Version** &mdash; 0.10.0
+
+**Website** &mdash; [https://github.com/ibireme/yyjson](https://github.com/ibireme/yyjson)

@@ -170,7 +170,7 @@ public:
 		{
 			if (!e->Run(this, client, request))
 				return false;
-			else if (!request.get_replies().empty())
+			else if (!request.GetReplies().empty())
 			{
 				this->Reply(request);
 				return true;
@@ -185,10 +185,10 @@ public:
 	void Reply(RPCRequest &request) override
 	{
 		if (!request.id.empty())
-			request.reply("id", request.id);
+			request.Reply("id", request.id);
 
 		Anope::string r = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<methodResponse>\n<params>\n<param>\n<value>\n<struct>\n";
-		for (const auto &[name, value] : request.get_replies())
+		for (const auto &[name, value] : request.GetReplies())
 			r += "<member>\n<name>" + this->Sanitize(name) + "</name>\n<value>\n<string>" + this->Sanitize(value) + "</string>\n</value>\n</member>\n";
 		r += "</struct>\n</value>\n</param>\n</params>\n</methodResponse>";
 

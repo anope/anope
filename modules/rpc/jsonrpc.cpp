@@ -122,7 +122,7 @@ public:
 			if (!e->Run(this, client, request))
 				return false;
 
-			else if (!request.get_replies().empty())
+			else if (!request.GetReplies().empty())
 			{
 				this->Reply(request);
 				return true;
@@ -147,10 +147,10 @@ public:
 		else
 			yyjson_mut_obj_add_strn(doc, root, "id", request.id.c_str(), request.id.length());
 
-		if (!request.get_replies().empty())
+		if (!request.GetReplies().empty())
 		{
 			auto *result = yyjson_mut_obj(doc);
-			for (const auto &[k, v] : request.get_replies())
+			for (const auto &[k, v] : request.GetReplies())
 				yyjson_mut_obj_add_strn(doc, result, k.c_str(), v.c_str(), v.length());
 			yyjson_mut_obj_add_val(doc, root, "result", result);
 		}

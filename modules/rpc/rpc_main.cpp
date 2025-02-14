@@ -30,8 +30,8 @@ public:
 
 		request.r = this->repl;
 
-		request.reply("result", "Success");
-		request.reply("account", GetAccount());
+		request.Reply("result", "Success");
+		request.Reply("account", GetAccount());
 
 		xinterface->Reply(request);
 		client->SendReply(&request.r);
@@ -44,7 +44,7 @@ public:
 
 		request.r = this->repl;
 
-		request.reply("error", "Invalid password");
+		request.Reply("error", "Invalid password");
 
 		xinterface->Reply(request);
 		client->SendReply(&request.r);
@@ -83,15 +83,15 @@ private:
 		Anope::string command = request.data.size() > 2 ? request.data[2] : "";
 
 		if (service.empty() || user.empty() || command.empty())
-			request.reply("error", "Invalid parameters");
+			request.Reply("error", "Invalid parameters");
 		else
 		{
 			BotInfo *bi = BotInfo::Find(service, true);
 			if (!bi)
-				request.reply("error", "Invalid service");
+				request.Reply("error", "Invalid service");
 			else
 			{
-				request.reply("result", "Success");
+				request.Reply("result", "Success");
 
 				NickAlias *na = NickAlias::Find(user);
 
@@ -116,7 +116,7 @@ private:
 				Command::Run(source, command);
 
 				if (!out.empty())
-					request.reply("return", out);
+					request.Reply("return", out);
 			}
 		}
 	}
@@ -127,7 +127,7 @@ private:
 		Anope::string password = request.data.size() > 1 ? request.data[1] : "";
 
 		if (username.empty() || password.empty())
-			request.reply("error", "Invalid parameters");
+			request.Reply("error", "Invalid parameters");
 		else
 		{
 			auto *req = new RPCIdentifyRequest(me, request, client, iface, username, password);
@@ -141,19 +141,19 @@ private:
 
 	static void DoStats(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
 	{
-		request.reply("uptime", Anope::ToString(Anope::CurTime - Anope::StartTime));
-		request.reply("uplinkname", Me->GetLinks().front()->GetName());
+		request.Reply("uptime", Anope::ToString(Anope::CurTime - Anope::StartTime));
+		request.Reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
 			Anope::string buf;
 			for (const auto &capab : Servers::Capab)
 				buf += " " + capab;
 			if (!buf.empty())
 				buf.erase(buf.begin());
-			request.reply("uplinkcapab", buf);
+			request.Reply("uplinkcapab", buf);
 		}
-		request.reply("usercount", Anope::ToString(UserListByNick.size()));
-		request.reply("maxusercount", Anope::ToString(MaxUserCount));
-		request.reply("channelcount", Anope::ToString(ChannelList.size()));
+		request.Reply("usercount", Anope::ToString(UserListByNick.size()));
+		request.Reply("maxusercount", Anope::ToString(MaxUserCount));
+		request.Reply("channelcount", Anope::ToString(ChannelList.size()));
 	}
 
 	static void DoChannel(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
@@ -163,24 +163,24 @@ private:
 
 		Channel *c = Channel::Find(request.data[0]);
 
-		request.reply("name", c ? c->name : request.data[0]);
+		request.Reply("name", c ? c->name : request.data[0]);
 
 		if (c)
 		{
-			request.reply("bancount", Anope::ToString(c->HasMode("BAN")));
+			request.Reply("bancount", Anope::ToString(c->HasMode("BAN")));
 			int count = 0;
 			for (auto &ban : c->GetModeList("BAN"))
-				request.reply("ban" + Anope::ToString(++count), ban);
+				request.Reply("ban" + Anope::ToString(++count), ban);
 
-			request.reply("exceptcount", Anope::ToString(c->HasMode("EXCEPT")));
+			request.Reply("exceptcount", Anope::ToString(c->HasMode("EXCEPT")));
 			count = 0;
 			for (auto &except : c->GetModeList("EXCEPT"))
-				request.reply("except" + Anope::ToString(++count), except);
+				request.Reply("except" + Anope::ToString(++count), except);
 
-			request.reply("invitecount", Anope::ToString(c->HasMode("INVITEOVERRIDE")));
+			request.Reply("invitecount", Anope::ToString(c->HasMode("INVITEOVERRIDE")));
 			count = 0;
 			for (auto &invite : c->GetModeList("INVITEOVERRIDE"))
-				request.reply("invite" + Anope::ToString(++count), invite);
+				request.Reply("invite" + Anope::ToString(++count), invite);
 
 			Anope::string users;
 			for (Channel::ChanUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
@@ -191,17 +191,17 @@ private:
 			if (!users.empty())
 			{
 				users.erase(users.length() - 1);
-				request.reply("users", users);
+				request.Reply("users", users);
 			}
 
 			if (!c->topic.empty())
-				request.reply("topic", c->topic);
+				request.Reply("topic", c->topic);
 
 			if (!c->topic_setter.empty())
-				request.reply("topicsetter", c->topic_setter);
+				request.Reply("topicsetter", c->topic_setter);
 
-			request.reply("topictime", Anope::ToString(c->topic_time));
-			request.reply("topicts", Anope::ToString(c->topic_ts));
+			request.Reply("topictime", Anope::ToString(c->topic_time));
+			request.Reply("topicts", Anope::ToString(c->topic_ts));
 		}
 	}
 
@@ -212,25 +212,25 @@ private:
 
 		User *u = User::Find(request.data[0]);
 
-		request.reply("nick", u ? u->nick : request.data[0]);
+		request.Reply("nick", u ? u->nick : request.data[0]);
 
 		if (u)
 		{
-			request.reply("ident", u->GetIdent());
-			request.reply("vident", u->GetVIdent());
-			request.reply("host", u->host);
+			request.Reply("ident", u->GetIdent());
+			request.Reply("vident", u->GetVIdent());
+			request.Reply("host", u->host);
 			if (!u->vhost.empty())
-				request.reply("vhost", u->vhost);
+				request.Reply("vhost", u->vhost);
 			if (!u->chost.empty())
-				request.reply("chost", u->chost);
-			request.reply("ip", u->ip.addr());
-			request.reply("timestamp", Anope::ToString(u->timestamp));
-			request.reply("signon", Anope::ToString(u->signon));
+				request.Reply("chost", u->chost);
+			request.Reply("ip", u->ip.addr());
+			request.Reply("timestamp", Anope::ToString(u->timestamp));
+			request.Reply("signon", Anope::ToString(u->signon));
 			if (u->IsIdentified())
 			{
-				request.reply("account", u->Account()->display);
+				request.Reply("account", u->Account()->display);
 				if (u->Account()->o)
-					request.reply("opertype", u->Account()->o->ot->GetName());
+					request.Reply("opertype", u->Account()->o->ot->GetName());
 			}
 
 			Anope::string channels;
@@ -242,7 +242,7 @@ private:
 			if (!channels.empty())
 			{
 				channels.erase(channels.length() - 1);
-				request.reply("channels", channels);
+				request.Reply("channels", channels);
 			}
 		}
 	}
@@ -256,7 +256,7 @@ private:
 				perms += " " + priv;
 			for (const auto &command : ot->GetCommands())
 				perms += " " + command;
-			request.reply(ot->GetName(), perms);
+			request.Reply(ot->GetName(), perms);
 		}
 	}
 
@@ -274,7 +274,7 @@ private:
 
 		u->SendMessage(bi, message);
 
-		request.reply("result", "Success");
+		request.Reply("result", "Success");
 	}
 };
 
@@ -291,7 +291,7 @@ public:
 		me = this;
 
 		if (!rpc)
-			throw ModuleException("Unable to find RPC interface, is xmlrpc loaded?");
+			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
 
 		rpc->Register(&stats);
 	}

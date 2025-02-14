@@ -187,12 +187,58 @@ public:
 		if (!request.id.empty())
 			request.Reply("id", request.id);
 
-		Anope::string r = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<methodResponse>\n<params>\n<param>\n<value>\n<struct>\n";
-		for (const auto &[name, value] : request.GetReplies())
-			r += "<member>\n<name>" + this->Sanitize(name) + "</name>\n<value>\n<string>" + this->Sanitize(value) + "</string>\n</value>\n</member>\n";
-		r += "</struct>\n</value>\n</param>\n</params>\n</methodResponse>";
+		Anope::string xml =
+			"<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n"
+			"<methodResponse>\n";
 
-		request.r.Write(r);
+		if (request.GetError())
+		{
+			xml +=
+				"<fault>\n"
+				"	<value>\n"
+				"		<struct>\n"
+				"			<member>\n"
+				"				<name>faultCode</name>\n"
+				"				<value>\n"
+				"					<int>" + Anope::ToString(request.GetError()->first) + "</int>\n"
+				"				</value>\n"
+				"			</member>\n"
+				"			<member>\n"
+				"				<name>faultString</name>\n"
+				"				<value>\n"
+				"					<string>" + this->Sanitize(request.GetError()->second) + "</string>\n"
+				"				</value>\n"
+				"			</member>\n"
+				"		</struct>\n"
+				"	</value>\n"
+				"</fault>\n";
+		}
+		else
+		{
+			xml +=
+				"<params>\n"
+				"	<param>\n"
+				"		<value>\n"
+				"			<struct>\n";
+			for (const auto &[name, value] : request.GetReplies())
+			{
+				xml +=
+					"<member>\n"
+					"	<name>" + this->Sanitize(name) + "</name>\n"
+					"	<value>\n"
+					"		<string>" + this->Sanitize(value) + "</string>\n"
+					"	</value>\n"
+					"</member>\n";
+			}
+			xml +=
+				"			</struct>\n"
+				"		</value>\n"
+				"	</param>\n"
+				"</params>\n";
+		}
+		xml += "</methodResponse>";
+
+		request.reply.Write(xml);
 	}
 };
 

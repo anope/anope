@@ -25,7 +25,7 @@ class MyJSONRPCServiceInterface final
 private:
 	std::deque<RPCEvent *> events;
 
-	void SendError(HTTPReply &reply, int64_t code, const char *message, const Anope::string &id)
+	void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id)
 	{
 		Log(LOG_DEBUG) << "JSON-RPC error " << code << ": " << message;
 
@@ -37,7 +37,7 @@ private:
 
 		auto *error = yyjson_mut_obj(doc);
 		yyjson_mut_obj_add_sint(doc, error, "code", code);
-		yyjson_mut_obj_add_str(doc, error, "message", message);
+		yyjson_mut_obj_add_strn(doc, error, "message", message.c_str(), message.length());
 
 		yyjson_mut_obj_add_val(doc, root, "error", error);
 		yyjson_mut_obj_add_str(doc, root, "jsonrpc", "2.0");
@@ -122,6 +122,12 @@ public:
 			if (!e->Run(this, client, request))
 				return false;
 
+			else if (request.GetError())
+			{
+				SendError(reply, request.GetError()->first, request.GetError()->second, id);
+				return true;
+			}
+
 			else if (!request.GetReplies().empty())
 			{
 				this->Reply(request);
@@ -160,7 +166,7 @@ public:
 		auto *json = yyjson_mut_write(doc, YYJSON_WRITE_ALLOW_INVALID_UNICODE | YYJSON_WRITE_NEWLINE_AT_END, nullptr);
 		if (json)
 		{
-			request.r.Write(json);
+			request.reply.Write(json);
 			free(json);
 		}
 		yyjson_mut_doc_free(doc);

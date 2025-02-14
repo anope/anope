@@ -21,20 +21,26 @@ class RPCIdentifyRequest final
 	Reference<RPCServiceInterface> xinterface;
 
 public:
-	RPCIdentifyRequest(Module *m, RPCRequest &req, HTTPClient *c, RPCServiceInterface *iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
+	RPCIdentifyRequest(Module *m, RPCRequest &req, HTTPClient *c, RPCServiceInterface *iface, const Anope::string &acc, const Anope::string &pass)
+		: IdentifyRequest(m, acc, pass)
+		, request(req)
+		, repl(request.reply)
+		, client(c)
+		, xinterface(iface)
+	{
+	}
 
 	void OnSuccess() override
 	{
 		if (!xinterface || !client)
 			return;
 
-		request.r = this->repl;
+		request.reply = this->repl;
 
-		request.Reply("result", "Success");
 		request.Reply("account", GetAccount());
 
 		xinterface->Reply(request);
-		client->SendReply(&request.r);
+		client->SendReply(&request.reply);
 	}
 
 	void OnFail() override
@@ -42,12 +48,12 @@ public:
 		if (!xinterface || !client)
 			return;
 
-		request.r = this->repl;
+		request.reply = this->repl;
 
-		request.Reply("error", "Invalid password");
+		request.Error(-32000, "Invalid password");
 
 		xinterface->Reply(request);
-		client->SendReply(&request.r);
+		client->SendReply(&request.reply);
 	}
 };
 
@@ -83,16 +89,14 @@ private:
 		Anope::string command = request.data.size() > 2 ? request.data[2] : "";
 
 		if (service.empty() || user.empty() || command.empty())
-			request.Reply("error", "Invalid parameters");
+			request.Error(-32602, "Invalid parameters");
 		else
 		{
 			BotInfo *bi = BotInfo::Find(service, true);
 			if (!bi)
-				request.Reply("error", "Invalid service");
+				request.Error(-32000, "Invalid service");
 			else
 			{
-				request.Reply("result", "Success");
-
 				NickAlias *na = NickAlias::Find(user);
 
 				Anope::string out;
@@ -127,7 +131,7 @@ private:
 		Anope::string password = request.data.size() > 1 ? request.data[1] : "";
 
 		if (username.empty() || password.empty())
-			request.Reply("error", "Invalid parameters");
+			request.Error(-32602, "Invalid parameters");
 		else
 		{
 			auto *req = new RPCIdentifyRequest(me, request, client, iface, username, password);
@@ -273,8 +277,6 @@ private:
 			return;
 
 		u->SendMessage(bi, message);
-
-		request.Reply("result", "Success");
 	}
 };
 

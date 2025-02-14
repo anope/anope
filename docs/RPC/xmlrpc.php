@@ -85,7 +85,7 @@ class AnopeXMLRPC
     {
         $ret = $this->run("checkAuthentication", [$account, $pass]);
 
-        if ($ret && $ret["result"] == "Success") {
+        if ($ret && array_key_exists("account", $ret)) {
             return $ret["account"];
         }
 

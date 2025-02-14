@@ -13,16 +13,32 @@
 class RPCRequest final
 {
 private:
+	std::optional<std::pair<int64_t, Anope::string>> error;
 	std::map<Anope::string, Anope::string> replies;
 
 public:
 	Anope::string name;
 	Anope::string id;
 	std::deque<Anope::string> data;
-	HTTPReply &r;
+	HTTPReply &reply;
 
-	RPCRequest(HTTPReply &_r) : r(_r) { }
-	inline void Reply(const Anope::string &dname, const Anope::string &ddata) { this->replies.emplace(dname, ddata); }
+	RPCRequest(HTTPReply &r)
+		: reply(r)
+	{
+	}
+
+	inline void Error(uint64_t errcode, const Anope::string &errstr)
+	{
+		this->error.emplace(errcode, errstr);
+	}
+
+	inline void Reply(const Anope::string &dname, const Anope::string &ddata)
+	{
+		this->replies.emplace(dname, ddata);
+	}
+
+	inline const auto &GetError() { return this->error; }
+
 	inline const auto &GetReplies() { return this->replies; }
 };
 

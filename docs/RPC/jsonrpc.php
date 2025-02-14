@@ -1,23 +1,23 @@
 <?php
 
 /**
- * XMLRPC Functions
+ * JSON-RPC functions
  *
  * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  */
 
-class AnopeXMLRPC
+class AnopeRPC
 {
     /**
-     * The XMLRPC host
+     * The RPC host
      *
      * @var string
      */
     private $host;
 
     /**
-     * Initiate a new AnopeXMLRPC instance
+     * Initiate a new AnopeRPC instance
      *
      * @param $host
      */
@@ -27,7 +27,7 @@ class AnopeXMLRPC
     }
 
     /**
-     * Run an XMLRPC command. Name should be a query name and params an array of parameters, eg:
+     * Run an RPC command. Name should be a query name and params an array of parameters, eg:
      * $this->raw("checkAuthentication", ["adam", "qwerty"]);
      * If successful returns back an array of useful information.
      *
@@ -40,14 +40,19 @@ class AnopeXMLRPC
      */
     public function run($name, $params)
     {
-        $xmlquery = xmlrpc_encode_request($name, $params);
+        $request = json_encode([
+            "jsonrpc" => "2.0",
+            "id" => uniqid(),
+            "method" => $name,
+            "params" => $params,
+        ]);
         $context = stream_context_create(["http" => [
             "method" => "POST",
-            "header" => "Content-Type: text/xml",
-            "content" => $xmlquery]]);
+            "header" => "Content-Type: application/json",
+            "content" => $request]]);
 
         $inbuf = file_get_contents($this->host, false, $context);
-        $response = xmlrpc_decode($inbuf);
+        $response = json_decode($inbuf, true);
 
         if ($response) {
             return $response;
@@ -142,4 +147,4 @@ class AnopeXMLRPC
     }
 }
 
-$anope = new AnopeXMLRPC("http://127.0.0.1:8080/xmlrpc");
+$anope = new AnopeRPC("http://127.0.0.1:8080/jsonrpc");

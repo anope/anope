@@ -886,7 +886,7 @@ public:
 			if (!targ)
 			{
 				source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
-				return;
+				continue;
 			}
 			DoMode(source, ci, targ);
 		}

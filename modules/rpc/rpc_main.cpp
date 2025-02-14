@@ -85,44 +85,46 @@ private:
 	void DoCommand(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
 	{
 		Anope::string service = request.data.size() > 0 ? request.data[0] : "";
-		Anope::string user = request.data.size() > 1 ? request.data[1] : "";
+		Anope::string user    = request.data.size() > 1 ? request.data[1] : "";
 		Anope::string command = request.data.size() > 2 ? request.data[2] : "";
 
 		if (service.empty() || user.empty() || command.empty())
-			request.Error(-32602, "Invalid parameters");
-		else
 		{
-			BotInfo *bi = BotInfo::Find(service, true);
-			if (!bi)
-				request.Error(-32000, "Invalid service");
-			else
-			{
-				NickAlias *na = NickAlias::Find(user);
-
-				Anope::string out;
-
-				struct RPCommandReply final
-					: CommandReply
-				{
-					Anope::string &str;
-
-					RPCommandReply(Anope::string &s) : str(s) { }
-
-					void SendMessage(BotInfo *source, const Anope::string &msg) override
-					{
-						str += msg + "\n";
-					};
-				}
-				reply(out);
-
-				User *u = User::Find(user, true);
-				CommandSource source(user, u, na ? *na->nc : NULL, &reply, bi);
-				Command::Run(source, command);
-
-				if (!out.empty())
-					request.Reply("return", out);
-			}
+			request.Error(-32602, "Invalid parameters");
+			return;
 		}
+
+		BotInfo *bi = BotInfo::Find(service, true);
+		if (!bi)
+		{
+			request.Error(-32000, "Invalid service");
+			return;
+		}
+
+		NickAlias *na = NickAlias::Find(user);
+
+		Anope::string out;
+
+		struct RPCommandReply final
+			: CommandReply
+		{
+			Anope::string &str;
+
+			RPCommandReply(Anope::string &s) : str(s) { }
+
+			void SendMessage(BotInfo *source, const Anope::string &msg) override
+			{
+				str += msg + "\n";
+			};
+		}
+		reply(out);
+
+		User *u = User::Find(user, true);
+		CommandSource source(user, u, na ? *na->nc : NULL, &reply, bi);
+		Command::Run(source, command);
+
+		if (!out.empty())
+			request.Reply("return", out);
 	}
 
 	static bool DoCheckAuthentication(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
@@ -131,16 +133,15 @@ private:
 		Anope::string password = request.data.size() > 1 ? request.data[1] : "";
 
 		if (username.empty() || password.empty())
-			request.Error(-32602, "Invalid parameters");
-		else
 		{
-			auto *req = new RPCIdentifyRequest(me, request, client, iface, username, password);
-			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
-			req->Dispatch();
-			return false;
+			request.Error(-32602, "Invalid parameters");
+			return true;
 		}
 
-		return true;
+		auto *req = new RPCIdentifyRequest(me, request, client, iface, username, password);
+		FOREACH_MOD(OnCheckAuthentication, (NULL, req));
+		req->Dispatch();
+		return false;
 	}
 
 	static void DoStats(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
@@ -266,8 +267,8 @@ private:
 
 	static void DoNotice(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
 	{
-		Anope::string from = request.data.size() > 0 ? request.data[0] : "";
-		Anope::string to = request.data.size() > 1 ? request.data[1] : "";
+		Anope::string from    = request.data.size() > 0 ? request.data[0] : "";
+		Anope::string to      = request.data.size() > 1 ? request.data[1] : "";
 		Anope::string message = request.data.size() > 2 ? request.data[2] : "";
 
 		BotInfo *bi = BotInfo::Find(from, true);

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-07 01:13+0000\n"
+"POT-Creation-Date: 2025-02-14 14:57+0000\n"
 "PO-Revision-Date: 2024-11-25 01:32+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -539,6 +539,9 @@ msgstr ""
 msgid "channel [user]"
 msgstr ""
 
+msgid "channel [user]+"
+msgstr ""
+
 msgid "channel [+expiry] [reason]"
 msgstr ""
 
@@ -591,6 +594,9 @@ msgid "message"
 msgstr ""
 
 msgid "modname"
+msgstr ""
+
+msgid "network-name"
 msgstr ""
 
 msgid "new-display"
@@ -3481,7 +3487,7 @@ msgstr ""
 
 #, c-format
 msgid ""
-"Gives %s status to the selected nick on a channel. If nick is\n"
+"Gives %s status to the selected nicks on a channel. If nick is\n"
 "not given, it will %s you."
 msgstr ""
 
@@ -4937,7 +4943,7 @@ msgstr ""
 
 #, c-format
 msgid ""
-"Removes %s status from the selected nick on a channel. If nick is\n"
+"Removes %s status from the selected nicks on a channel. If nick is\n"
 "not given, it will de%s you."
 msgstr ""
 

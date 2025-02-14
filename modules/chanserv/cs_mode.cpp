@@ -797,35 +797,10 @@ static Anope::map<std::pair<bool, Anope::string> > modes;
 class CommandCSModes final
 	: public Command
 {
-public:
-	CommandCSModes(Module *creator) : Command(creator, "chanserv/modes", 1, 2)
+private:
+	void DoMode(CommandSource &source, ChannelInfo *ci, User *targ)
 	{
-		this->SetSyntax(_("\037channel\037 [\037user\037]"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = source.GetUser(),
-			*targ = params.size() > 1 ? User::Find(params[1], true) : u;
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
-
-		if (!targ)
-		{
-			if (params.size() > 1)
-				source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
-			return;
-		}
-
-		if (!ci)
-		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-			return;
-		}
-		else if (!ci->c)
-		{
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
-			return;
-		}
+		auto *u = source.GetUser();
 
 		AccessGroup u_access = source.AccessFor(ci), targ_access = ci->AccessFor(targ);
 		const std::pair<bool, Anope::string> &m = modes[source.command];
@@ -875,6 +850,48 @@ public:
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "on " << targ->nick;
 	}
 
+public:
+	CommandCSModes(Module *creator) : Command(creator, "chanserv/modes", 1)
+	{
+		this->SetSyntax(_("\037channel\037 [\037user\037]+"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		auto *ci = ChannelInfo::Find(params[0]);
+		if (!ci)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+		if (!ci->c)
+		{
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			return;
+		}
+
+		if (params.size() == 1)
+		{
+			// The source is executing the command on themself.
+			if (source.GetUser())
+				DoMode(source, ci, source.GetUser());
+			return;
+		}
+
+		// The source has provided list of nicks.
+		for (size_t i = 1; i < params.size(); ++i)
+		{
+			auto &nick = params[i];
+			auto *targ = User::Find(nick, true);
+			if (!targ)
+			{
+				source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+				return;
+			}
+			DoMode(source, ci, targ);
+		}
+	}
+
 	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		const std::pair<bool, Anope::string> &m = modes[source.command];
@@ -898,11 +915,11 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		if (m.first)
-			source.Reply(_("Gives %s status to the selected nick on a channel. If \037nick\037 is\n"
+			source.Reply(_("Gives %s status to the selected nicks on a channel. If \037nick\037 is\n"
 					"not given, it will %s you."),
 					m.second.upper().c_str(), m.second.lower().c_str());
 		else
-			source.Reply(_("Removes %s status from the selected nick on a channel. If \037nick\037 is\n"
+			source.Reply(_("Removes %s status from the selected nicks on a channel. If \037nick\037 is\n"
 					"not given, it will de%s you."),
 					 m.second.upper().c_str(), m.second.lower().c_str());
 		source.Reply(" ");

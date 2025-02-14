@@ -132,6 +132,8 @@ private:
 	static void DoStatsReset(CommandSource &source)
 	{
 		MaxUserCount = UserListByNick.size();
+		MaxUserTime = Anope::CurTime;
+		Stats::me->QueueUpdate();
 		source.Reply(_("Statistics reset."));
 		return;
 	}

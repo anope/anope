@@ -15,7 +15,7 @@ class CommandOSLogin final
 	: public Command
 {
 public:
-	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 1, 1)
+	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 0, 1)
 	{
 		this->SetSyntax(_("\037password\037"));
 		this->RequireUser(true);
@@ -23,8 +23,6 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const Anope::string &password = params[0];
-
 		User *u = source.GetUser();
 		Oper *o = source.nc->o;
 		if (o == NULL)
@@ -33,7 +31,7 @@ public:
 			source.Reply(_("Your oper block doesn't require logging in."));
 		else if (u->HasExt("os_login"))
 			source.Reply(_("You are already identified."));
-		else if (o->password != password)
+		else if (params.empty() || o->password != params[0])
 		{
 			source.Reply(PASSWORD_INCORRECT);
 			u->BadPassword();

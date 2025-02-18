@@ -12,6 +12,7 @@ modules/sqlite.cpp
 modules/ssl_gnutls.cpp
 modules/ssl_openssl.cpp
 modules/stats
+modules/xmlrpc.cpp
 run/
 *.mo
 *.pot

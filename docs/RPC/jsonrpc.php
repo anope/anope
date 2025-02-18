@@ -90,8 +90,8 @@ class AnopeRPC
     {
         $ret = $this->run("checkAuthentication", [$account, $pass]);
 
-        if ($ret && array_key_exists("account", $ret)) {
-            return $ret["account"];
+        if ($ret && array_key_exists("result", $ret) && array_key_exists("account", $ret["result"])) {
+            return $ret["result"]["account"];
         }
 
         return null;

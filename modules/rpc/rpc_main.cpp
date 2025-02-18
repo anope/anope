@@ -66,7 +66,7 @@ public:
 	{
 	}
 
-	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		Anope::string service = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string user    = request.data.size() > 1 ? request.data[1] : "";
@@ -75,14 +75,14 @@ public:
 		if (service.empty() || user.empty() || command.empty())
 		{
 			request.Error(-32602, "Invalid parameters");
-			return;
+			return true;
 		}
 
 		BotInfo *bi = BotInfo::Find(service, true);
 		if (!bi)
 		{
 			request.Error(-32000, "Invalid service");
-			return;
+			return true;
 		}
 
 		NickAlias *na = NickAlias::Find(user);
@@ -109,6 +109,8 @@ public:
 
 		if (!out.empty())
 			request.Reply("return", out);
+
+		return true;
 	}
 };
 
@@ -121,7 +123,7 @@ public:
 	{
 	}
 
-	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		Anope::string username = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string password = request.data.size() > 1 ? request.data[1] : "";
@@ -129,12 +131,13 @@ public:
 		if (username.empty() || password.empty())
 		{
 			request.Error(-32602, "Invalid parameters");
-			return;
+			return true;
 		}
 
 		auto *req = new RPCIdentifyRequest(me, request, client, iface, username, password);
 		FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 		req->Dispatch();
+		return false;
 	}
 };
 
@@ -147,7 +150,7 @@ public:
 	{
 	}
 
-	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		request.Reply("uptime", Anope::ToString(Anope::CurTime - Anope::StartTime));
 		request.Reply("uplinkname", Me->GetLinks().front()->GetName());
@@ -162,6 +165,7 @@ public:
 		request.Reply("usercount", Anope::ToString(UserListByNick.size()));
 		request.Reply("maxusercount", Anope::ToString(MaxUserCount));
 		request.Reply("channelcount", Anope::ToString(ChannelList.size()));
+		return true;
 	}
 };
 
@@ -174,10 +178,13 @@ public:
 	{
 	}
 
-	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		if (request.data.empty())
-			return;
+		{
+			request.Error(-32602, "Invalid parameters");
+			return true;
+		}
 
 		Channel *c = Channel::Find(request.data[0]);
 
@@ -221,6 +228,7 @@ public:
 			request.Reply("topictime", Anope::ToString(c->topic_time));
 			request.Reply("topicts", Anope::ToString(c->topic_ts));
 		}
+		return true;
 	}
 };
 
@@ -233,10 +241,13 @@ public:
 	{
 	}
 
-	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		if (request.data.empty())
-			return;
+		{
+			request.Error(-32602, "Invalid parameters");
+			return true;
+		}
 
 		User *u = User::Find(request.data[0]);
 
@@ -273,6 +284,7 @@ public:
 				request.Reply("channels", channels);
 			}
 		}
+		return true;
 	}
 };
 
@@ -285,7 +297,7 @@ public:
 	{
 	}
 
-	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		for (auto *ot : Config->MyOperTypes)
 		{
@@ -296,6 +308,7 @@ public:
 				perms += " " + command;
 			request.Reply(ot->GetName(), perms);
 		}
+		return true;
 	}
 };
 
@@ -308,7 +321,7 @@ public:
 	{
 	}
 
-	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		Anope::string from    = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string to      = request.data.size() > 1 ? request.data[1] : "";
@@ -320,10 +333,11 @@ public:
 		if (!bi || !u || message.empty())
 		{
 			request.Error(-32602, "Invalid parameters");
-			return;
+			return true;
 		}
 
 		u->SendMessage(bi, message);
+		return true;
 	}
 };
 

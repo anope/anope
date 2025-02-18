@@ -122,13 +122,8 @@ public:
 			return true;
 		}
 
-		event->second->Run(this, client, request);
-
-		if (request.GetError())
-		{
-			SendError(reply, request.GetError()->first, request.GetError()->second, id);
-			return true;
-		}
+		if (!event->second->Run(this, client, request))
+			return false;
 
 		this->Reply(request);
 		return true;
@@ -136,6 +131,12 @@ public:
 
 	void Reply(RPCRequest &request) override
 	{
+		if (request.GetError())
+		{
+			SendError(request.reply, request.GetError()->first, request.GetError()->second, request.id);
+			return;
+		}
+
 		// {"jsonrpc": "2.0", "method": "update", "params": [1,2,3,4,5]}
 		auto* doc = yyjson_mut_doc_new(nullptr);
 

@@ -60,7 +60,7 @@ public:
 
 	const auto &GetEvent() const { return event; }
 
-	virtual void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) = 0;
+	virtual bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) = 0;
 };
 
 class RPCServiceInterface

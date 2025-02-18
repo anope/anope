@@ -118,14 +118,8 @@ public:
 		}
 		xmlrpc_DECREF(params);
 
-		event->second->Run(this, client, request);
-
-		if (request.GetError())
-		{
-			xmlrpc_env_set_fault(&env, request.GetError()->first, request.GetError()->second.c_str());
-			SendError(reply, env);
-			return true;
-		}
+		if (!event->second->Run(this, client, request))
+			return false;
 
 		this->Reply(request);
 		return true;

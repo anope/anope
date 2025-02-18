@@ -57,32 +57,16 @@ public:
 	}
 };
 
-class MyRPCEvent final
+class CommandRPCEvent final
 	: public RPCEvent
 {
 public:
-	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	CommandRPCEvent()
+		: RPCEvent("command")
 	{
-		if (request.name == "command")
-			this->DoCommand(iface, client, request);
-		else if (request.name == "checkAuthentication")
-			return this->DoCheckAuthentication(iface, client, request);
-		else if (request.name == "stats")
-			this->DoStats(iface, client, request);
-		else if (request.name == "channel")
-			this->DoChannel(iface, client, request);
-		else if (request.name == "user")
-			this->DoUser(iface, client, request);
-		else if (request.name == "opers")
-			this->DoOperType(iface, client, request);
-		else if (request.name == "notice")
-			this->DoNotice(iface, client, request);
-
-		return true;
 	}
 
-private:
-	void DoCommand(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
+	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		Anope::string service = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string user    = request.data.size() > 1 ? request.data[1] : "";
@@ -126,8 +110,18 @@ private:
 		if (!out.empty())
 			request.Reply("return", out);
 	}
+};
 
-	static bool DoCheckAuthentication(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
+class CheckAuthenticationRPCEvent final
+	: public RPCEvent
+{
+public:
+	CheckAuthenticationRPCEvent()
+		: RPCEvent("checkAuthentication")
+	{
+	}
+
+	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		Anope::string username = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string password = request.data.size() > 1 ? request.data[1] : "";
@@ -135,16 +129,25 @@ private:
 		if (username.empty() || password.empty())
 		{
 			request.Error(-32602, "Invalid parameters");
-			return true;
+			return;
 		}
 
 		auto *req = new RPCIdentifyRequest(me, request, client, iface, username, password);
 		FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 		req->Dispatch();
-		return false;
+	}
+};
+
+class StatsRPCEvent final
+	: public RPCEvent
+{
+public:
+	StatsRPCEvent()
+		: RPCEvent("stats")
+	{
 	}
 
-	static void DoStats(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
+	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		request.Reply("uptime", Anope::ToString(Anope::CurTime - Anope::StartTime));
 		request.Reply("uplinkname", Me->GetLinks().front()->GetName());
@@ -160,8 +163,18 @@ private:
 		request.Reply("maxusercount", Anope::ToString(MaxUserCount));
 		request.Reply("channelcount", Anope::ToString(ChannelList.size()));
 	}
+};
 
-	static void DoChannel(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
+class ChannelRPCEvent final
+	: public RPCEvent
+{
+public:
+	ChannelRPCEvent()
+		: RPCEvent("channel")
+	{
+	}
+
+	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		if (request.data.empty())
 			return;
@@ -209,8 +222,18 @@ private:
 			request.Reply("topicts", Anope::ToString(c->topic_ts));
 		}
 	}
+};
 
-	static void DoUser(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
+class UserRPCEvent final
+	: public RPCEvent
+{
+public:
+	UserRPCEvent()
+		: RPCEvent("user")
+	{
+	}
+
+	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		if (request.data.empty())
 			return;
@@ -251,8 +274,18 @@ private:
 			}
 		}
 	}
+};
 
-	static void DoOperType(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
+class OpersRPCEvent final
+	: public RPCEvent
+{
+public:
+	OpersRPCEvent()
+		: RPCEvent("opers")
+	{
+	}
+
+	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		for (auto *ot : Config->MyOperTypes)
 		{
@@ -264,8 +297,18 @@ private:
 			request.Reply(ot->GetName(), perms);
 		}
 	}
+};
 
-	static void DoNotice(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request)
+class NoticeRPCEvent final
+	: public RPCEvent
+{
+public:
+	NoticeRPCEvent()
+		: RPCEvent("notice")
+	{
+	}
+
+	void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
 		Anope::string from    = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string to      = request.data.size() > 1 ? request.data[1] : "";
@@ -275,7 +318,10 @@ private:
 		User *u = User::Find(to, true);
 
 		if (!bi || !u || message.empty())
+		{
+			request.Error(-32602, "Invalid parameters");
 			return;
+		}
 
 		u->SendMessage(bi, message);
 	}
@@ -284,25 +330,47 @@ private:
 class ModuleRPCMain final
 	: public Module
 {
+private:
 	ServiceReference<RPCServiceInterface> rpc;
-
-	MyRPCEvent stats;
+	CommandRPCEvent commandrpcevent;
+	CheckAuthenticationRPCEvent checkauthenticationrpcevent;
+	StatsRPCEvent statsrpcevent;
+	ChannelRPCEvent channelrpcevent;
+	UserRPCEvent userrpcevent;
+	OpersRPCEvent opersrpcevent;
+	NoticeRPCEvent noticerpcevent;
 
 public:
-	ModuleRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), rpc("RPCServiceInterface", "rpc")
+	ModuleRPCMain(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, EXTRA | VENDOR)
+		, rpc("RPCServiceInterface", "rpc")
 	{
 		me = this;
 
 		if (!rpc)
 			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
 
-		rpc->Register(&stats);
+		rpc->Register(&commandrpcevent);
+		rpc->Register(&checkauthenticationrpcevent);
+		rpc->Register(&statsrpcevent);
+		rpc->Register(&channelrpcevent);
+		rpc->Register(&userrpcevent);
+		rpc->Register(&opersrpcevent);
+		rpc->Register(&noticerpcevent);
 	}
 
 	~ModuleRPCMain() override
 	{
-		if (rpc)
-			rpc->Unregister(&stats);
+		if (!rpc)
+			return;
+
+		rpc->Unregister(&commandrpcevent);
+		rpc->Unregister(&checkauthenticationrpcevent);
+		rpc->Unregister(&statsrpcevent);
+		rpc->Unregister(&channelrpcevent);
+		rpc->Unregister(&userrpcevent);
+		rpc->Unregister(&opersrpcevent);
+		rpc->Unregister(&noticerpcevent);
 	}
 };
 

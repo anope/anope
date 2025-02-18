@@ -23,7 +23,7 @@ class MyJSONRPCServiceInterface final
 	, public HTTPPage
 {
 private:
-	std::deque<RPCEvent *> events;
+	Anope::map<RPCEvent *> events;
 
 	void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id)
 	{
@@ -63,16 +63,14 @@ public:
 	{
 	}
 
-	void Register(RPCEvent *event) override
+	bool Register(RPCEvent *event) override
 	{
-		this->events.push_back(event);
+		return this->events.emplace(event->GetEvent(), event).second;
 	}
 
-	void Unregister(RPCEvent *event) override
+	bool Unregister(RPCEvent *event) override
 	{
-		auto it = std::find(this->events.begin(), this->events.end(), event);
-		if (it != this->events.end())
-			this->events.erase(it);
+		return this->events.erase(event->GetEvent()) != 0;
 	}
 
 	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
@@ -117,26 +115,22 @@ public:
 
 		yyjson_doc_free(doc);
 
-		for (auto *e : this->events)
+		auto event = this->events.find(request.name);
+		if (event == this->events.end())
 		{
-			if (!e->Run(this, client, request))
-				return false;
-
-			else if (request.GetError())
-			{
-				SendError(reply, request.GetError()->first, request.GetError()->second, id);
-				return true;
-			}
-
-			else if (!request.GetReplies().empty())
-			{
-				this->Reply(request);
-				return true;
-			}
+			SendError(reply, -32601, "Method not found", id);
+			return true;
 		}
 
-		// If we reached this point nobody handled the event.
-		SendError(reply, -32601, "Method not found", id);
+		event->second->Run(this, client, request);
+
+		if (request.GetError())
+		{
+			SendError(reply, request.GetError()->first, request.GetError()->second, id);
+			return true;
+		}
+
+		this->Reply(request);
 		return true;
 	}
 

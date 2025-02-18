@@ -20,7 +20,7 @@ class MyXMLRPCServiceInterface final
 	, public HTTPPage
 {
 private:
-	std::deque<RPCEvent *> events;
+	Anope::map<RPCEvent *> events;
 
 	void SendError(HTTPReply &reply, xmlrpc_env &env)
 	{
@@ -46,17 +46,14 @@ public:
 	{
 	}
 
-	void Register(RPCEvent *event) override
+	bool Register(RPCEvent *event) override
 	{
-		this->events.push_back(event);
+		return this->events.emplace(event->GetEvent(), event).second;
 	}
 
-	void Unregister(RPCEvent *event) override
+	bool Unregister(RPCEvent *event) override
 	{
-		std::deque<RPCEvent *>::iterator it = std::find(this->events.begin(), this->events.end(), event);
-
-		if (it != this->events.end())
-			this->events.erase(it);
+		return this->events.erase(event->GetEvent()) != 0;
 	}
 
 	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
@@ -78,6 +75,14 @@ public:
 
 		request.name = method;
 		delete method;
+
+		auto event = this->events.find(request.name);
+		if (event == this->events.end())
+		{
+			xmlrpc_env_set_fault(&env, -32601, "Method not found");
+			SendError(reply, env);
+			return true;
+		}
 
 		auto paramcount = xmlrpc_array_size(&env, params);
 		for (auto idx = 0; idx < paramcount; ++idx)
@@ -113,28 +118,16 @@ public:
 		}
 		xmlrpc_DECREF(params);
 
-		for (auto *e : this->events)
+		event->second->Run(this, client, request);
+
+		if (request.GetError())
 		{
-			if (!e->Run(this, client, request))
-				return false;
-
-			if (request.GetError())
-			{
-				xmlrpc_env_set_fault(&env, request.GetError()->first, request.GetError()->second.c_str());
-				SendError(reply, env);
-				return true;
-			}
-
-			if (!request.GetReplies().empty())
-			{
-				this->Reply(request);
-				return true;
-			}
+			xmlrpc_env_set_fault(&env, request.GetError()->first, request.GetError()->second.c_str());
+			SendError(reply, env);
+			return true;
 		}
 
-		// If we reached this point nobody handled the event.
-		xmlrpc_env_set_fault(&env, -32601, "Method not found");
-		SendError(reply, env);
+		this->Reply(request);
 		return true;
 	}
 

@@ -46,9 +46,21 @@ class RPCServiceInterface;
 
 class RPCEvent
 {
+private:
+	Anope::string event;
+
+protected:
+	RPCEvent(const Anope::string& e)
+		: event(e)
+	{
+	}
+
 public:
 	virtual ~RPCEvent() = default;
-	virtual bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) = 0;
+
+	const auto &GetEvent() const { return event; }
+
+	virtual void Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) = 0;
 };
 
 class RPCServiceInterface
@@ -57,9 +69,9 @@ class RPCServiceInterface
 public:
 	RPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, "RPCServiceInterface", sname) { }
 
-	virtual void Register(RPCEvent *event) = 0;
+	virtual bool Register(RPCEvent *event) = 0;
 
-	virtual void Unregister(RPCEvent *event) = 0;
+	virtual bool Unregister(RPCEvent *event) = 0;
 
 	virtual void Reply(RPCRequest &request) = 0;
 };

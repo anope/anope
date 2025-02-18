@@ -70,6 +70,10 @@ public:
 		pcre_regex_provider(this)
 	{
 		this->SetPermanent(true);
+
+		std::vector<char> pcre_version(16);
+		if (pcre2_config(PCRE2_CONFIG_VERSION, pcre_version.data()) >= 0)
+			Log() << "Module was compiled against PCRE2 version " << PCRE2_MAJOR << "." << PCRE2_MINOR << " and is running against version " << pcre_version.data();
 	}
 
 	~ModuleRegexPCRE()

@@ -299,6 +299,8 @@ public:
 	{
 		me = this;
 		this->SetPermanent(true);
+
+		Log() << "Module was compiled against GnuTLS version " << GNUTLS_VERSION << " and is running against version " << gnutls_check_version(nullptr);
 	}
 
 	~GnuTLSModule()

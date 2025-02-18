@@ -525,6 +525,8 @@ public:
 	ModuleLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 		me = this;
+
+		Log() << "Module was compiled against LDAP (" << LDAP_VENDOR_NAME << ") version " << LDAP_VENDOR_VERSION_MAJOR << "." << LDAP_VENDOR_VERSION_MINOR << "." << LDAP_VENDOR_VERSION_PATCH;
 	}
 
 	~ModuleLDAP()

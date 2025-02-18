@@ -62,6 +62,8 @@ public:
 		tre_regex_provider(this)
 	{
 		this->SetPermanent(true);
+
+		Log() << "Module was compiled against TRE version " << TRE_VERSION << " and is running against version " << tre_version();
 	}
 
 	~ModuleRegexTRE()

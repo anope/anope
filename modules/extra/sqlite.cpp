@@ -103,6 +103,7 @@ class ModuleSQLite final
 public:
 	ModuleSQLite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
+		Log() << "Module was compiled against SQLite version " << SQLITE_VERSION << " and is running against version " << sqlite3_libversion();
 	}
 
 	~ModuleSQLite()

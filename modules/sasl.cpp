@@ -99,9 +99,11 @@ public:
 				return false;
 
 			Anope::string user = "A user";
-			if (!mysess->hostname.empty() && !mysess->ip.empty())
+			auto *u = User::Find(sess->uid);
+			if (u)
+				user = u->GetMask();
+			else if (!mysess->hostname.empty() && !mysess->ip.empty())
 				user = mysess->hostname + " (" + mysess->ip + ")";
-
 
 			for (auto it = mysess->certs.begin(); it != mysess->certs.end(); ++it)
 			{

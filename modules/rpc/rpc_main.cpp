@@ -74,7 +74,7 @@ public:
 
 		if (service.empty() || user.empty() || command.empty())
 		{
-			request.Error(-32602, "Invalid parameters");
+			request.Error(RPC::ERR_INVALID_PARAMS, "Invalid parameters");
 			return true;
 		}
 
@@ -130,7 +130,7 @@ public:
 
 		if (username.empty() || password.empty())
 		{
-			request.Error(-32602, "Invalid parameters");
+			request.Error(RPC::ERR_INVALID_PARAMS, "Invalid parameters");
 			return true;
 		}
 
@@ -182,7 +182,7 @@ public:
 	{
 		if (request.data.empty())
 		{
-			request.Error(-32602, "Invalid parameters");
+			request.Error(RPC::ERR_INVALID_PARAMS, "Invalid parameters");
 			return true;
 		}
 
@@ -248,7 +248,7 @@ public:
 	{
 		if (request.data.empty())
 		{
-			request.Error(-32602, "Invalid parameters");
+			request.Error(RPC::ERR_INVALID_PARAMS, "Invalid parameters");
 			return true;
 		}
 
@@ -335,7 +335,7 @@ public:
 
 		if (!bi || !u || message.empty())
 		{
-			request.Error(-32602, "Invalid parameters");
+			request.Error(RPC::ERR_INVALID_PARAMS, "Invalid parameters");
 			return true;
 		}
 

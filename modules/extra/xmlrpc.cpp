@@ -135,7 +135,7 @@ public:
 		auto event = this->events.find(request.name);
 		if (event == this->events.end())
 		{
-			xmlrpc_env_set_fault(&env, -32601, "Method not found");
+			xmlrpc_env_set_fault(&env, RPC::ERR_METHOD_NOT_FOUND, "Method not found");
 			SendError(reply, env);
 			return true;
 		}
@@ -150,7 +150,7 @@ public:
 			if (xmlrpc_value_type(value) != XMLRPC_TYPE_STRING)
 			{
 				// TODO: error;
-				xmlrpc_env_set_fault(&env, 0, "Anope XML-RPC only supports strings");
+				xmlrpc_env_set_fault(&env, RPC::ERR_INVALID_REQUEST, "Anope XML-RPC only supports strings");
 				SendError(reply, env);
 				xmlrpc_DECREF(value);
 				xmlrpc_DECREF(params);

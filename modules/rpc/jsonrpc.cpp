@@ -123,7 +123,7 @@ public:
 		auto *doc = yyjson_read(message.content.c_str(), message.content.length(), YYJSON_READ_ALLOW_TRAILING_COMMAS | YYJSON_READ_ALLOW_INVALID_UNICODE);
 		if (!doc)
 		{
-			SendError(reply, -32700, "JSON parse error", "");
+			SendError(reply, RPC::ERR_PARSE_ERROR, "JSON parse error", "");
 			return true;
 		}
 
@@ -132,7 +132,7 @@ public:
 		{
 			// TODO: handle an array of JSON-RPC requests
 			yyjson_doc_free(doc);
-			SendError(reply, -32600, "Wrong JSON root element", "");
+			SendError(reply, RPC::ERR_INVALID_REQUEST, "Wrong JSON root element", "");
 			return true;
 		}
 
@@ -141,7 +141,7 @@ public:
 		if (!jsonrpc.empty() && jsonrpc != "2.0")
 		{
 			yyjson_doc_free(doc);
-			SendError(reply, -32600, "Unsupported JSON-RPC version", id);
+			SendError(reply, RPC::ERR_INVALID_REQUEST, "Unsupported JSON-RPC version", id);
 			return true;
 		}
 
@@ -163,7 +163,7 @@ public:
 		auto event = this->events.find(request.name);
 		if (event == this->events.end())
 		{
-			SendError(reply, -32601, "Method not found", id);
+			SendError(reply, RPC::ERR_METHOD_NOT_FOUND, "Method not found", id);
 			return true;
 		}
 

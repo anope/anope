@@ -12,6 +12,19 @@
 
 #include <variant>
 
+namespace RPC
+{
+	/** Represents standard RPC errors from the JSON-RPC and XML-RPC specifications. */
+	enum Error
+		: int64_t
+	{
+		ERR_PARSE_ERROR      = -32700,
+		ERR_INVALID_REQUEST  = -32600,
+		ERR_METHOD_NOT_FOUND = -32601,
+		ERR_INVALID_PARAMS   = -32602,
+	};
+}
+
 class RPCBlock
 {
 public:

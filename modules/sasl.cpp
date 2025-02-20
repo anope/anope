@@ -165,6 +165,7 @@ class SASLService final
 	, public Timer
 {
 private:
+	Anope::map<std::pair<time_t, unsigned short>> badpasswords;
 	Anope::map<SASL::Session *> sessions;
 
 public:
@@ -324,6 +325,27 @@ public:
 	void Fail(Session *session) override
 	{
 		this->SendMessage(session, "D", "F");
+
+		const auto badpasslimit = Config->GetBlock("options")->Get<int>("badpasslimit");
+		if (!badpasslimit)
+			return;
+
+		auto it = badpasswords.find(session->uid);
+		if (it == badpasswords.end())
+			it = badpasswords.emplace(session->uid, std::make_pair(Anope::CurTime, 0)).first;
+		auto &[invalid_pw_time, invalid_pw_count] = it->second;
+
+		const auto badpasstimeout = Config->GetBlock("options")->Get<time_t>("badpasstimeout");
+		if (badpasstimeout > 0 && invalid_pw_time > 0 && invalid_pw_time < Anope::CurTime - badpasstimeout)
+			badpasswords.erase(it);
+
+		invalid_pw_count++;
+		invalid_pw_time = Anope::CurTime;
+		if (invalid_pw_count >= badpasslimit)
+		{
+			IRCD->SendKill(BotInfo::Find(GetAgent()), session->uid, "Too many invalid passwords");
+			badpasswords.erase(it);
+		}
 	}
 
 	void SendMechs(Session *session) override
@@ -338,6 +360,15 @@ public:
 
 	void Tick() override
 	{
+		const auto badpasstimeout = Config->GetBlock("options")->Get<time_t>("badpasstimeout");
+		for (auto it = badpasswords.begin(); it != badpasswords.end(); )
+		{
+			if (it->second.first + badpasstimeout < Anope::CurTime)
+				it = badpasswords.erase(it);
+			else
+				it++;
+		}
+
 		for (auto it = sessions.begin(); it != sessions.end(); )
 		{
 			const auto *sess = it->second;

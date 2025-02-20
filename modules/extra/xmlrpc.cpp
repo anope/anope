@@ -15,6 +15,9 @@
 #include "modules/rpc.h"
 #include "modules/httpd.h"
 
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
 class MyXMLRPCServiceInterface final
 	: public RPCServiceInterface
 	, public HTTPPage
@@ -22,7 +25,7 @@ class MyXMLRPCServiceInterface final
 private:
 	Anope::map<RPCEvent *> events;
 
-	void SendError(HTTPReply &reply, xmlrpc_env &env)
+	static void SendError(HTTPReply &reply, xmlrpc_env &env)
 	{
 		Log(LOG_DEBUG) << "XML-RPC error " << env.fault_code << ": " << env.fault_string;
 
@@ -37,6 +40,59 @@ private:
 		xmlrpc_mem_block_free(error);
 		xmlrpc_env_clean(&fault);
 		xmlrpc_env_clean(&env);
+	}
+
+	static void SerializeObject(xmlrpc_env &env, xmlrpc_value *value, const RPCBlock &block)
+	{
+		for (const auto &[k, v] : block.GetReplies())
+		{
+			xmlrpc_value *elem;
+			std::visit(overloaded
+			{
+				[&env, &elem](const RPCBlock &b)
+				{
+					elem = xmlrpc_struct_new(&env);
+					SerializeObject(env, elem, b);
+				},
+				[&env, &elem](const Anope::string &s)
+				{
+					elem = xmlrpc_string_new_lp(&env, s.length(), s.c_str());
+				},
+				[&env, &elem](std::nullptr_t)
+				{
+					elem = xmlrpc_nil_new(&env);
+				},
+				[&env, &elem](bool b)
+				{
+					elem = xmlrpc_bool_new(&env, b);
+				},
+				[&env, &elem](double d)
+				{
+					elem = xmlrpc_double_new(&env, d);
+				},
+				[&env, &elem](int64_t i)
+				{
+					elem = xmlrpc_i8_new(&env, i);
+				},
+				[&env, &elem](uint64_t u)
+				{
+					// XML-RPC does not support unsigned data types.
+					if (u > INT64_MAX)
+					{
+						// We need to convert this to a string.
+						auto s = Anope::ToString(u);
+						elem = xmlrpc_string_new_lp(&env, s.length(), s.c_str());
+					}
+					else
+					{
+						// We can fit this into a i8.
+						elem = xmlrpc_i8_new(&env, u);
+					}
+				},
+			}, v);
+
+			xmlrpc_struct_set_value_n(&env, value, k.c_str(), k.length(), elem);
+		}
 	}
 
 public:
@@ -138,11 +194,7 @@ public:
 		}
 
 		auto *value = xmlrpc_struct_new(&env);
-		for (const auto &[k, v] : request.GetReplies())
-		{
-			auto *str = xmlrpc_string_new_lp(&env, v.length(), v.c_str());
-			xmlrpc_struct_set_value_n(&env, value, k.c_str(), k.length(), str);
-		}
+		SerializeObject(env, value, request);
 
 		auto *response = xmlrpc_mem_block_new(&env, 0);
 		xmlrpc_serialize_response(&env, response, value);

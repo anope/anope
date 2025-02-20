@@ -10,11 +10,69 @@
 
 #include "httpd.h"
 
+#include <variant>
+
+class RPCBlock
+{
+public:
+	/** Represents possible types of RPC value. */
+	using RPCValue = std::variant<RPCBlock, Anope::string, std::nullptr_t, bool, double, int64_t, uint64_t>;
+
+	/** Retrieves the list of RPC replies. */
+	inline const auto &GetReplies() const { return this->replies; }
+
+	template <typename Stringable>
+	inline RPCBlock &Reply(const Anope::string &key, const Stringable &value)
+	{
+		this->replies.emplace(key, Anope::ToString(value));
+		return *this;
+	}
+
+	inline RPCBlock &ReplyBlock(const Anope::string &key)
+	{
+		auto it = this->replies.emplace(key, RPCBlock());
+		return std::get<RPCBlock>(it.first->second);
+	}
+
+	inline RPCBlock &ReplyBool(const Anope::string &key, bool value)
+	{
+		this->replies.emplace(key, value);
+		return *this;
+	}
+
+	inline RPCBlock &ReplyFloat(const Anope::string &key, double value)
+	{
+		this->replies.emplace(key, value);
+		return *this;
+	}
+
+	inline RPCBlock &ReplyInt(const Anope::string &key, int64_t value)
+	{
+		this->replies.emplace(key, value);
+		return *this;
+	}
+
+	inline RPCBlock &ReplyNull(const Anope::string &key)
+	{
+		this->replies.emplace(key, nullptr);
+		return *this;
+	}
+
+	inline RPCBlock &ReplyUInt(const Anope::string &key, uint64_t value)
+	{
+		this->replies.emplace(key, value);
+		return *this;
+	}
+
+private:
+	Anope::map<RPCValue> replies;
+};
+
 class RPCRequest final
+	: public RPCBlock
 {
 private:
 	std::optional<std::pair<int64_t, Anope::string>> error;
-	std::map<Anope::string, Anope::string> replies;
 
 public:
 	Anope::string name;
@@ -32,14 +90,7 @@ public:
 		this->error.emplace(errcode, errstr);
 	}
 
-	inline void Reply(const Anope::string &dname, const Anope::string &ddata)
-	{
-		this->replies.emplace(dname, ddata);
-	}
-
-	inline const auto &GetError() { return this->error; }
-
-	inline const auto &GetReplies() { return this->replies; }
+	inline const auto &GetError() const { return this->error; }
 };
 
 class RPCServiceInterface;

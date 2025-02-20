@@ -12,6 +12,9 @@
 
 #include "yyjson/yyjson.c"
 
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
 inline Anope::string yyjson_get_astr(yyjson_val *val, const char *key)
 {
 	const auto *str = yyjson_get_str(yyjson_obj_get(val, key));
@@ -25,7 +28,7 @@ class MyJSONRPCServiceInterface final
 private:
 	Anope::map<RPCEvent *> events;
 
-	void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id)
+	static void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id)
 	{
 		Log(LOG_DEBUG) << "JSON-RPC error " << code << ": " << message;
 
@@ -54,6 +57,48 @@ private:
 			free(json);
 		}
 		yyjson_mut_doc_free(doc);
+	}
+
+	static void SerializeObject(yyjson_mut_doc *doc, yyjson_mut_val *root, const char *key, const RPCBlock &block)
+	{
+		auto *result = yyjson_mut_obj(doc);
+		for (const auto &reply : block.GetReplies())
+		{
+			// Captured structured bindings are a C++20 extension.
+			const auto &k = reply.first;
+			std::visit(overloaded
+			{
+				[&doc, &result, &k](const RPCBlock &b)
+				{
+					SerializeObject(doc, result, k.c_str(), b);
+				},
+				[&doc, &result, &k](const Anope::string &s)
+				{
+					yyjson_mut_obj_add_strn(doc, result, k.c_str(), s.c_str(), s.length());
+				},
+				[&doc, &result, &k](std::nullptr_t)
+				{
+					yyjson_mut_obj_add_null(doc, result, k.c_str());
+				},
+				[&doc, &result, &k](bool b)
+				{
+					yyjson_mut_obj_add_bool(doc, result, k.c_str(), b);
+				},
+				[&doc, &result, &k](double d)
+				{
+					yyjson_mut_obj_add_real(doc, result, k.c_str(), d);
+				},
+				[&doc, &result, &k](int64_t i)
+				{
+					yyjson_mut_obj_add_int(doc, result, k.c_str(), i);
+				},
+				[&doc, &result, &k](uint64_t u)
+				{
+					yyjson_mut_obj_add_uint(doc, result, k.c_str(), u);
+				},
+			}, reply.second);
+		}
+		yyjson_mut_obj_add_val(doc, root, key, result);
 	}
 
 public:
@@ -149,12 +194,7 @@ public:
 			yyjson_mut_obj_add_strn(doc, root, "id", request.id.c_str(), request.id.length());
 
 		if (!request.GetReplies().empty())
-		{
-			auto *result = yyjson_mut_obj(doc);
-			for (const auto &[k, v] : request.GetReplies())
-				yyjson_mut_obj_add_strn(doc, result, k.c_str(), v.c_str(), v.length());
-			yyjson_mut_obj_add_val(doc, root, "result", result);
-		}
+			SerializeObject(doc, root, "result", request);
 
 		yyjson_mut_obj_add_str(doc, root, "jsonrpc", "2.0");
 

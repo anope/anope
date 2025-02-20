@@ -152,7 +152,7 @@ public:
 
 	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
 	{
-		request.Reply("uptime", Anope::ToString(Anope::CurTime - Anope::StartTime));
+		request.ReplyInt("uptime", Anope::CurTime - Anope::StartTime);
 		request.Reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
 			Anope::string buf;
@@ -162,9 +162,9 @@ public:
 				buf.erase(buf.begin());
 			request.Reply("uplinkcapab", buf);
 		}
-		request.Reply("usercount", Anope::ToString(UserListByNick.size()));
-		request.Reply("maxusercount", Anope::ToString(MaxUserCount));
-		request.Reply("channelcount", Anope::ToString(ChannelList.size()));
+		request.ReplyUInt("usercount", UserListByNick.size());
+		request.ReplyUInt("maxusercount", MaxUserCount);
+		request.ReplyUInt("channelcount", ChannelList.size());
 		return true;
 	}
 };
@@ -192,20 +192,23 @@ public:
 
 		if (c)
 		{
-			request.Reply("bancount", Anope::ToString(c->HasMode("BAN")));
+			auto &bans = request.ReplyBlock("bans");
+			bans.ReplyUInt("count", c->HasMode("BAN"));
 			int count = 0;
 			for (auto &ban : c->GetModeList("BAN"))
-				request.Reply("ban" + Anope::ToString(++count), ban);
+				bans.Reply(Anope::ToString(++count), ban);
 
-			request.Reply("exceptcount", Anope::ToString(c->HasMode("EXCEPT")));
+			auto &excepts = request.ReplyBlock("excepts");
+			excepts.ReplyUInt("count", c->HasMode("EXCEPT"));
 			count = 0;
 			for (auto &except : c->GetModeList("EXCEPT"))
-				request.Reply("except" + Anope::ToString(++count), except);
+				excepts.Reply(Anope::ToString(++count), except);
 
-			request.Reply("invitecount", Anope::ToString(c->HasMode("INVITEOVERRIDE")));
+			auto &invites = request.ReplyBlock("invites");
+			invites.ReplyUInt("count", c->HasMode("INVITEOVERRIDE"));
 			count = 0;
 			for (auto &invite : c->GetModeList("INVITEOVERRIDE"))
-				request.Reply("invite" + Anope::ToString(++count), invite);
+				invites.Reply(Anope::ToString(++count), invite);
 
 			Anope::string users;
 			for (Channel::ChanUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
@@ -225,8 +228,8 @@ public:
 			if (!c->topic_setter.empty())
 				request.Reply("topicsetter", c->topic_setter);
 
-			request.Reply("topictime", Anope::ToString(c->topic_time));
-			request.Reply("topicts", Anope::ToString(c->topic_ts));
+			request.ReplyInt("topictime", c->topic_time);
+			request.ReplyInt("topicts", c->topic_ts);
 		}
 		return true;
 	}
@@ -263,8 +266,8 @@ public:
 			if (!u->chost.empty())
 				request.Reply("chost", u->chost);
 			request.Reply("ip", u->ip.addr());
-			request.Reply("timestamp", Anope::ToString(u->timestamp));
-			request.Reply("signon", Anope::ToString(u->signon));
+			request.ReplyUInt("timestamp", u->timestamp);
+			request.ReplyUInt("signon", u->signon);
 			if (u->IsIdentified())
 			{
 				request.Reply("account", u->Account()->display);

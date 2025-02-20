@@ -174,7 +174,11 @@ class DBMySQL : public Module, public Pipe
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
 
-		Query query("SELECT * FROM `" + this->prefix + obj->GetName() + "` WHERE (`timestamp` >= " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " OR `timestamp` IS NULL)");
+		Anope::string sql = Anope::printf("SELECT * from `%s%s`", this->prefix.c_str(), obj->GetName().c_str());
+		if (obj->GetTimestamp())
+			sql += Anope::printf(" WHERE (`timestamp` >= %s OR `timestamp` IS NULL)", this->SQL->FromUnixtime(obj->GetTimestamp()).c_str());
+
+		Query query(sql);
 
 		obj->UpdateTimestamp();
 

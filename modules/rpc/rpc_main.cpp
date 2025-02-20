@@ -50,7 +50,7 @@ public:
 
 		request.reply = this->repl;
 
-		request.Error(-32000, "Invalid password");
+		request.Error(RPC::ERR_CUSTOM_START, "Invalid password");
 
 		xinterface->Reply(request);
 		client->SendReply(&request.reply);
@@ -81,7 +81,7 @@ public:
 		BotInfo *bi = BotInfo::Find(service, true);
 		if (!bi)
 		{
-			request.Error(-32000, "Invalid service");
+			request.Error(RPC::ERR_CUSTOM_START, "Invalid service");
 			return true;
 		}
 

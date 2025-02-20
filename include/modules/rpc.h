@@ -26,6 +26,8 @@ namespace RPC
 	enum Error
 		: int64_t
 	{
+		ERR_CUSTOM_END       = -32000,
+		ERR_CUSTOM_START     = -32099,
 		ERR_PARSE_ERROR      = -32700,
 		ERR_INVALID_REQUEST  = -32600,
 		ERR_METHOD_NOT_FOUND = -32601,

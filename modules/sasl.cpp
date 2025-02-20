@@ -164,7 +164,8 @@ class SASLService final
 	: public SASL::Service
 	, public Timer
 {
-	std::map<Anope::string, SASL::Session *> sessions;
+private:
+	Anope::map<SASL::Session *> sessions;
 
 public:
 	SASLService(Module *o)
@@ -337,17 +338,16 @@ public:
 
 	void Tick() override
 	{
-		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end();)
+		for (auto it = sessions.begin(); it != sessions.end(); )
 		{
-			Anope::string key = it->first;
-			Session *s = it->second;
-			++it;
-
-			if (!s || s->created + 60 < Anope::CurTime)
+			const auto *sess = it->second;
+			if (!sess || sess->created + 60 < Anope::CurTime)
 			{
-				delete s;
-				sessions.erase(key);
+				delete sess;
+				it = sessions.erase(it);
 			}
+			else
+				it++;
 		}
 	}
 };

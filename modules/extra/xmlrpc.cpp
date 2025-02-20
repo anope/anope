@@ -221,12 +221,16 @@ public:
 		xmlrpc_env env;
 		xmlrpc_env_init(&env);
 		xmlrpc_init(&env);
-		if (!env.fault_occurred)
-			return	;
+		if (env.fault_occurred)
+		{
+			Anope::string fault(env.fault_string);
+			xmlrpc_env_clean(&env);
+			throw ModuleException("Failed to initialise libxmlrpc: " + fault);
+		}
 
-		Anope::string fault(env.fault_string);
-		xmlrpc_env_clean(&env);
-		throw ModuleException("Failed to initialise libxmlrpc: " + fault);
+		unsigned int xmlrpc_major, xmlrpc_minor, xmlrpc_point;
+		xmlrpc_version(&xmlrpc_major, &xmlrpc_minor, &xmlrpc_point);
+		Log() << "Module is running against xmlrpc-c version " << xmlrpc_major << '.' << xmlrpc_minor << '.' << xmlrpc_point;
 	}
 
 	~ModuleXMLRPC() override

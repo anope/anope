@@ -19,11 +19,11 @@ template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 class MyXMLRPCServiceInterface final
-	: public RPCServiceInterface
+	: public RPC::ServiceInterface
 	, public HTTPPage
 {
 private:
-	Anope::map<RPCEvent *> events;
+	Anope::map<RPC::Event *> events;
 
 	static void SendError(HTTPReply &reply, xmlrpc_env &env)
 	{
@@ -42,14 +42,14 @@ private:
 		xmlrpc_env_clean(&env);
 	}
 
-	static void SerializeObject(xmlrpc_env &env, xmlrpc_value *value, const RPCBlock &block)
+	static void SerializeObject(xmlrpc_env &env, xmlrpc_value *value, const RPC::Block &block)
 	{
 		for (const auto &[k, v] : block.GetReplies())
 		{
 			xmlrpc_value *elem;
 			std::visit(overloaded
 			{
-				[&env, &elem](const RPCBlock &b)
+				[&env, &elem](const RPC::Block &b)
 				{
 					elem = xmlrpc_struct_new(&env);
 					SerializeObject(env, elem, b);
@@ -97,17 +97,17 @@ private:
 
 public:
 	MyXMLRPCServiceInterface(Module *creator, const Anope::string &sname)
-		: RPCServiceInterface(creator, sname)
+		: RPC::ServiceInterface(creator, sname)
 		, HTTPPage("/xmlrpc", "text/xml")
 	{
 	}
 
-	bool Register(RPCEvent *event) override
+	bool Register(RPC::Event *event) override
 	{
 		return this->events.emplace(event->GetEvent(), event).second;
 	}
 
-	bool Unregister(RPCEvent *event) override
+	bool Unregister(RPC::Event *event) override
 	{
 		return this->events.erase(event->GetEvent()) != 0;
 	}
@@ -127,7 +127,7 @@ public:
 			return true;
 		}
 
-		RPCRequest request(reply);
+		RPC::Request request(reply);
 
 		request.name = method;
 		delete method;
@@ -181,7 +181,7 @@ public:
 		return true;
 	}
 
-	void Reply(RPCRequest &request) override
+	void Reply(RPC::Request &request) override
 	{
 		xmlrpc_env env;
 		xmlrpc_env_init(&env);

@@ -22,11 +22,11 @@ inline Anope::string yyjson_get_astr(yyjson_val *val, const char *key)
 }
 
 class MyJSONRPCServiceInterface final
-	: public RPCServiceInterface
+	: public RPC::ServiceInterface
 	, public HTTPPage
 {
 private:
-	Anope::map<RPCEvent *> events;
+	Anope::map<RPC::Event *> events;
 
 	static void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id)
 	{
@@ -59,7 +59,7 @@ private:
 		yyjson_mut_doc_free(doc);
 	}
 
-	static void SerializeObject(yyjson_mut_doc *doc, yyjson_mut_val *root, const char *key, const RPCBlock &block)
+	static void SerializeObject(yyjson_mut_doc *doc, yyjson_mut_val *root, const char *key, const RPC::Block &block)
 	{
 		auto *result = yyjson_mut_obj(doc);
 		for (const auto &reply : block.GetReplies())
@@ -68,7 +68,7 @@ private:
 			const auto &k = reply.first;
 			std::visit(overloaded
 			{
-				[&doc, &result, &k](const RPCBlock &b)
+				[&doc, &result, &k](const RPC::Block &b)
 				{
 					SerializeObject(doc, result, k.c_str(), b);
 				},
@@ -103,17 +103,17 @@ private:
 
 public:
 	MyJSONRPCServiceInterface(Module *creator, const Anope::string &sname)
-		: RPCServiceInterface(creator, sname)
+		: RPC::ServiceInterface(creator, sname)
 		, HTTPPage("/jsonrpc", "application/json")
 	{
 	}
 
-	bool Register(RPCEvent *event) override
+	bool Register(RPC::Event *event) override
 	{
 		return this->events.emplace(event->GetEvent(), event).second;
 	}
 
-	bool Unregister(RPCEvent *event) override
+	bool Unregister(RPC::Event *event) override
 	{
 		return this->events.erase(event->GetEvent()) != 0;
 	}
@@ -145,7 +145,7 @@ public:
 			return true;
 		}
 
-		RPCRequest request(reply);
+		RPC::Request request(reply);
 		request.id = id;
 		request.name = yyjson_get_astr(root, "method");
 
@@ -174,7 +174,7 @@ public:
 		return true;
 	}
 
-	void Reply(RPCRequest &request) override
+	void Reply(RPC::Request &request) override
 	{
 		if (request.GetError())
 		{

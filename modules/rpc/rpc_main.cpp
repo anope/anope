@@ -14,14 +14,14 @@ static Module *me;
 class RPCIdentifyRequest final
 	: public IdentifyRequest
 {
-	RPCRequest request;
+	RPC::Request request;
 	HTTPReply repl; /* Request holds a reference to the HTTPReply, because we might exist long enough to invalidate it
 	                   we'll copy it here then reset the reference before we use it */
 	Reference<HTTPClient> client;
-	Reference<RPCServiceInterface> xinterface;
+	Reference<RPC::ServiceInterface> xinterface;
 
 public:
-	RPCIdentifyRequest(Module *m, RPCRequest &req, HTTPClient *c, RPCServiceInterface *iface, const Anope::string &acc, const Anope::string &pass)
+	RPCIdentifyRequest(Module *m, RPC::Request &req, HTTPClient *c, RPC::ServiceInterface *iface, const Anope::string &acc, const Anope::string &pass)
 		: IdentifyRequest(m, acc, pass)
 		, request(req)
 		, repl(request.reply)
@@ -58,15 +58,15 @@ public:
 };
 
 class CommandRPCEvent final
-	: public RPCEvent
+	: public RPC::Event
 {
 public:
 	CommandRPCEvent()
-		: RPCEvent("command")
+		: RPC::Event("command")
 	{
 	}
 
-	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
 		Anope::string service = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string user    = request.data.size() > 1 ? request.data[1] : "";
@@ -115,15 +115,15 @@ public:
 };
 
 class CheckAuthenticationRPCEvent final
-	: public RPCEvent
+	: public RPC::Event
 {
 public:
 	CheckAuthenticationRPCEvent()
-		: RPCEvent("checkAuthentication")
+		: RPC::Event("checkAuthentication")
 	{
 	}
 
-	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
 		Anope::string username = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string password = request.data.size() > 1 ? request.data[1] : "";
@@ -142,15 +142,15 @@ public:
 };
 
 class StatsRPCEvent final
-	: public RPCEvent
+	: public RPC::Event
 {
 public:
 	StatsRPCEvent()
-		: RPCEvent("stats")
+		: RPC::Event("stats")
 	{
 	}
 
-	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
 		request.ReplyInt("uptime", Anope::CurTime - Anope::StartTime);
 		request.Reply("uplinkname", Me->GetLinks().front()->GetName());
@@ -170,15 +170,15 @@ public:
 };
 
 class ChannelRPCEvent final
-	: public RPCEvent
+	: public RPC::Event
 {
 public:
 	ChannelRPCEvent()
-		: RPCEvent("channel")
+		: RPC::Event("channel")
 	{
 	}
 
-	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
 		if (request.data.empty())
 		{
@@ -236,15 +236,15 @@ public:
 };
 
 class UserRPCEvent final
-	: public RPCEvent
+	: public RPC::Event
 {
 public:
 	UserRPCEvent()
-		: RPCEvent("user")
+		: RPC::Event("user")
 	{
 	}
 
-	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
 		if (request.data.empty())
 		{
@@ -292,15 +292,15 @@ public:
 };
 
 class OpersRPCEvent final
-	: public RPCEvent
+	: public RPC::Event
 {
 public:
 	OpersRPCEvent()
-		: RPCEvent("opers")
+		: RPC::Event("opers")
 	{
 	}
 
-	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
 		for (auto *ot : Config->MyOperTypes)
 		{
@@ -316,15 +316,15 @@ public:
 };
 
 class NoticeRPCEvent final
-	: public RPCEvent
+	: public RPC::Event
 {
 public:
 	NoticeRPCEvent()
-		: RPCEvent("notice")
+		: RPC::Event("notice")
 	{
 	}
 
-	bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
 		Anope::string from    = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string to      = request.data.size() > 1 ? request.data[1] : "";
@@ -348,7 +348,7 @@ class ModuleRPCMain final
 	: public Module
 {
 private:
-	ServiceReference<RPCServiceInterface> rpc;
+	ServiceReference<RPC::ServiceInterface> rpc;
 	CommandRPCEvent commandrpcevent;
 	CheckAuthenticationRPCEvent checkauthenticationrpcevent;
 	StatsRPCEvent statsrpcevent;

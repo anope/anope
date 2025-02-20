@@ -14,6 +14,14 @@
 
 namespace RPC
 {
+	class Block;
+	class Event;
+	class Request;
+	class ServiceInterface;
+
+	/** Represents possible types of RPC value. */
+	using Value = std::variant<Block, Anope::string, std::nullptr_t, bool, double, int64_t, uint64_t>;
+
 	/** Represents standard RPC errors from the JSON-RPC and XML-RPC specifications. */
 	enum Error
 		: int64_t
@@ -25,64 +33,61 @@ namespace RPC
 	};
 }
 
-class RPCBlock
+class RPC::Block
 {
 public:
-	/** Represents possible types of RPC value. */
-	using RPCValue = std::variant<RPCBlock, Anope::string, std::nullptr_t, bool, double, int64_t, uint64_t>;
-
 	/** Retrieves the list of RPC replies. */
 	inline const auto &GetReplies() const { return this->replies; }
 
 	template <typename Stringable>
-	inline RPCBlock &Reply(const Anope::string &key, const Stringable &value)
+	inline Block &Reply(const Anope::string &key, const Stringable &value)
 	{
 		this->replies.emplace(key, Anope::ToString(value));
 		return *this;
 	}
 
-	inline RPCBlock &ReplyBlock(const Anope::string &key)
+	inline Block &ReplyBlock(const Anope::string &key)
 	{
-		auto it = this->replies.emplace(key, RPCBlock());
-		return std::get<RPCBlock>(it.first->second);
+		auto it = this->replies.emplace(key, Block());
+		return std::get<Block>(it.first->second);
 	}
 
-	inline RPCBlock &ReplyBool(const Anope::string &key, bool value)
-	{
-		this->replies.emplace(key, value);
-		return *this;
-	}
-
-	inline RPCBlock &ReplyFloat(const Anope::string &key, double value)
+	inline Block &ReplyBool(const Anope::string &key, bool value)
 	{
 		this->replies.emplace(key, value);
 		return *this;
 	}
 
-	inline RPCBlock &ReplyInt(const Anope::string &key, int64_t value)
+	inline Block &ReplyFloat(const Anope::string &key, double value)
 	{
 		this->replies.emplace(key, value);
 		return *this;
 	}
 
-	inline RPCBlock &ReplyNull(const Anope::string &key)
+	inline Block &ReplyInt(const Anope::string &key, int64_t value)
+	{
+		this->replies.emplace(key, value);
+		return *this;
+	}
+
+	inline Block &ReplyNull(const Anope::string &key)
 	{
 		this->replies.emplace(key, nullptr);
 		return *this;
 	}
 
-	inline RPCBlock &ReplyUInt(const Anope::string &key, uint64_t value)
+	inline Block &ReplyUInt(const Anope::string &key, uint64_t value)
 	{
 		this->replies.emplace(key, value);
 		return *this;
 	}
 
 private:
-	Anope::map<RPCValue> replies;
+	Anope::map<Value> replies;
 };
 
-class RPCRequest final
-	: public RPCBlock
+class RPC::Request final
+	: public RPC::Block
 {
 private:
 	std::optional<std::pair<int64_t, Anope::string>> error;
@@ -93,7 +98,7 @@ public:
 	std::deque<Anope::string> data;
 	HTTPReply &reply;
 
-	RPCRequest(HTTPReply &r)
+	Request(HTTPReply &r)
 		: reply(r)
 	{
 	}
@@ -106,36 +111,37 @@ public:
 	inline const auto &GetError() const { return this->error; }
 };
 
-class RPCServiceInterface;
-
-class RPCEvent
+class RPC::Event
 {
 private:
 	Anope::string event;
 
 protected:
-	RPCEvent(const Anope::string& e)
+	Event(const Anope::string& e)
 		: event(e)
 	{
 	}
 
 public:
-	virtual ~RPCEvent() = default;
+	virtual ~Event() = default;
 
 	const auto &GetEvent() const { return event; }
 
-	virtual bool Run(RPCServiceInterface *iface, HTTPClient *client, RPCRequest &request) = 0;
+	virtual bool Run(ServiceInterface *iface, HTTPClient *client, Request &request) = 0;
 };
 
-class RPCServiceInterface
+class RPC::ServiceInterface
 	: public Service
 {
 public:
-	RPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, "RPCServiceInterface", sname) { }
+	ServiceInterface(Module *creator, const Anope::string &sname)
+		: Service(creator, "RPCServiceInterface", sname)
+	{
+	}
 
-	virtual bool Register(RPCEvent *event) = 0;
+	virtual bool Register(Event *event) = 0;
 
-	virtual bool Unregister(RPCEvent *event) = 0;
+	virtual bool Unregister(Event *event) = 0;
 
-	virtual void Reply(RPCRequest &request) = 0;
+	virtual void Reply(Request &request) = 0;
 };

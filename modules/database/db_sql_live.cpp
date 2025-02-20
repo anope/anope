@@ -173,7 +173,11 @@ public:
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
 
-		Query query("SELECT * FROM `" + GetTableName(obj) + "` WHERE (`timestamp` >= " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " OR `timestamp` IS NULL)");
+		Anope::string sql = Anope::printf("SELECT * from `%s`", GetTableName(obj).c_str());
+		if (obj->GetTimestamp())
+			sql += Anope::printf(" WHERE (`timestamp` >= %s OR `timestamp` IS NULL)", this->SQL->FromUnixtime(obj->GetTimestamp()).c_str());
+
+		Query query(sql);
 
 		obj->UpdateTimestamp();
 

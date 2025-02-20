@@ -128,18 +128,9 @@ public:
 
 		SQL::Query q(this->query);
 		q.SetValue("a", req->GetAccount());
+		q.SetValue("i", req->GetAddress().str());
+		q.SetValue("n", u ? u->nick : "");
 		q.SetValue("p", req->GetPassword());
-		if (u)
-		{
-			q.SetValue("n", u->nick);
-			q.SetValue("i", u->ip.addr());
-		}
-		else
-		{
-			q.SetValue("n", "");
-			q.SetValue("i", "");
-		}
-
 
 		this->SQL->Run(new SQLAuthenticationResult(u, req), q);
 

@@ -18,7 +18,11 @@
 
 std::set<IdentifyRequest *> IdentifyRequest::Requests;
 
-IdentifyRequest::IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass) : owner(o), account(acc), password(pass)
+IdentifyRequest::IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass, const Anope::string &ip)
+	: owner(o)
+	, account(acc)
+	, password(pass)
+	, address(ip)
 {
 	Requests.insert(this);
 }

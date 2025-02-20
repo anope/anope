@@ -23,7 +23,14 @@ class NSGroupRequest final
 	Reference<NickAlias> target;
 
 public:
-	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(o, targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
+	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass)
+		: IdentifyRequest(o, targ->nc->display, pass, src.ip)
+		, source(src)
+		, cmd(c)
+		, nick(n)
+		, target(targ)
+	{
+	}
 
 	void OnSuccess() override
 	{

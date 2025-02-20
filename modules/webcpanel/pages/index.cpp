@@ -18,7 +18,16 @@ class WebpanelRequest final
 	TemplateFileServer::Replacements replacements;
 
 public:
-	WebpanelRequest(Module *o, HTTPReply &r, HTTPMessage &m, HTTPProvider *s, const Anope::string &p_n, HTTPClient *c, TemplateFileServer::Replacements &re, const Anope::string &user, const Anope::string &pass) : IdentifyRequest(o, user, pass), reply(r), message(m), server(s), page_name(p_n), client(c), replacements(re) { }
+	WebpanelRequest(Module *o, HTTPReply &r, HTTPMessage &m, HTTPProvider *s, const Anope::string &p_n, HTTPClient *c, TemplateFileServer::Replacements &re, const Anope::string &user, const Anope::string &pass)
+		: IdentifyRequest(o, user, pass, c->GetIP())
+		, reply(r)
+		, message(m)
+		, server(s)
+		, page_name(p_n)
+		, client(c)
+		, replacements(re)
+	{
+	}
 
 	void OnSuccess() override
 	{

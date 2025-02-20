@@ -22,7 +22,7 @@ class RPCIdentifyRequest final
 
 public:
 	RPCIdentifyRequest(Module *m, RPC::Request &req, HTTPClient *c, RPC::ServiceInterface *iface, const Anope::string &acc, const Anope::string &pass)
-		: IdentifyRequest(m, acc, pass)
+		: IdentifyRequest(m, acc, pass, c->GetIP())
 		, request(req)
 		, repl(request.reply)
 		, client(c)

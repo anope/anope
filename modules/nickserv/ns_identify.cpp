@@ -18,7 +18,12 @@ class NSIdentifyRequest final
 	Command *cmd;
 
 public:
-	NSIdentifyRequest(Module *o, CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(o, acc, pass), source(s), cmd(c) { }
+	NSIdentifyRequest(Module *o, CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass)
+		: IdentifyRequest(o, acc, pass, s.ip)
+		, source(s)
+		, cmd(c)
+	{
+	}
 
 	void OnSuccess() override
 	{

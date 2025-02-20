@@ -196,6 +196,7 @@ class CoreExport IdentifyRequest
 	Module *owner;
 	Anope::string account;
 	Anope::string password;
+	Anope::string address;
 
 	std::set<Module *> holds;
 	bool dispatched = false;
@@ -204,7 +205,7 @@ class CoreExport IdentifyRequest
 	static std::set<IdentifyRequest *> Requests;
 
 protected:
-	IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass);
+	IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass, const Anope::string &ip);
 	virtual ~IdentifyRequest();
 
 public:
@@ -215,6 +216,7 @@ public:
 	Module *GetOwner() const { return owner; }
 	const Anope::string &GetAccount() const { return account; }
 	const Anope::string &GetPassword() const { return password; }
+	const Anope::string &GetAddress() const { return address; }
 
 	/* Holds this request. When a request is held it must be Released later
 	 * for the request to complete. Multiple modules may hold a request at any time,

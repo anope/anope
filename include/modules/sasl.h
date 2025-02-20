@@ -81,10 +81,15 @@ namespace SASL
 		: public ::IdentifyRequest
 	{
 		Anope::string uid;
-		Anope::string hostname, ip;
+		Anope::string hostname;
 
 	public:
-		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass, const Anope::string &h, const Anope::string &i) : ::IdentifyRequest(m, acc, pass), uid(id), hostname(h), ip(i) { }
+		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass, const Anope::string &h, const Anope::string &i)
+			: ::IdentifyRequest(m, acc, pass, i)
+			, uid(id)
+			, hostname(h)
+		{
+		}
 
 		void OnSuccess() override
 		{
@@ -103,8 +108,8 @@ namespace SASL
 			if (s)
 			{
 				Anope::string user = "A user";
-				if (!hostname.empty() && !ip.empty())
-					user = hostname + " (" + ip + ")";
+				if (!hostname.empty() && !GetAddress().empty())
+					user = hostname + " (" + GetAddress() + ")";
 
 				Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << user << " identified to account " << this->GetAccount() << " using SASL";
 				sasl->Succeed(s, na->nc);
@@ -134,8 +139,8 @@ namespace SASL
 				accountstatus = "unconfirmed ";
 
 			Anope::string user = "A user";
-			if (!hostname.empty() && !ip.empty())
-				user = hostname + " (" + ip + ")";
+			if (!hostname.empty() && !GetAddress().empty())
+				user = hostname + " (" + GetAddress() + ")";
 
 			Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << user << " failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
 		}

@@ -145,7 +145,7 @@ public:
 		, commandnssetlanguage(this, languages)
 		, commandnssasetlanguage(this, languages)
 	{
-#ifndef HAVE_LOCALIZATION
+#if !HAVE_LOCALIZATION
 		throw ModuleException("Anope was not built with localization support");
 #endif
 

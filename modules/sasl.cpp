@@ -334,12 +334,12 @@ public:
 
 		auto it = badpasswords.find(session->uid);
 		if (it == badpasswords.end())
-			it = badpasswords.emplace(session->uid, std::make_pair(Anope::CurTime, 0)).first;
+			it = badpasswords.emplace(session->uid, std::make_pair(0, 0)).first;
 		auto &[invalid_pw_time, invalid_pw_count] = it->second;
 
 		const auto badpasstimeout = Config->GetBlock("options")->Get<time_t>("badpasstimeout");
 		if (badpasstimeout > 0 && invalid_pw_time > 0 && invalid_pw_time < Anope::CurTime - badpasstimeout)
-			badpasswords.erase(it);
+			invalid_pw_count = 0;
 
 		invalid_pw_count++;
 		invalid_pw_time = Anope::CurTime;

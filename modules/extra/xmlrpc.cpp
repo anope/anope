@@ -42,56 +42,23 @@ private:
 		xmlrpc_env_clean(&env);
 	}
 
+	static xmlrpc_value *SerializeElement(xmlrpc_env &env, const RPC::Value &value);
+
+	static void SerializeArray(xmlrpc_env &env, xmlrpc_value *value, const RPC::Array &array)
+	{
+		for (const auto &elem : array.GetReplies())
+		{
+			auto *obj = SerializeElement(env, elem);
+			xmlrpc_array_append_item(&env, value, obj);
+		}
+	}
+
 	static void SerializeMap(xmlrpc_env &env, xmlrpc_value *value, const RPC::Map &map)
 	{
 		for (const auto &[k, v] : map.GetReplies())
 		{
-			xmlrpc_value *elem;
-			std::visit(overloaded
-			{
-				[&env, &elem](const RPC::Map &m)
-				{
-					elem = xmlrpc_struct_new(&env);
-					SerializeMap(env, elem, m);
-				},
-				[&env, &elem](const Anope::string &s)
-				{
-					elem = xmlrpc_string_new_lp(&env, s.length(), s.c_str());
-				},
-				[&env, &elem](std::nullptr_t)
-				{
-					elem = xmlrpc_nil_new(&env);
-				},
-				[&env, &elem](bool b)
-				{
-					elem = xmlrpc_bool_new(&env, b);
-				},
-				[&env, &elem](double d)
-				{
-					elem = xmlrpc_double_new(&env, d);
-				},
-				[&env, &elem](int64_t i)
-				{
-					elem = xmlrpc_i8_new(&env, i);
-				},
-				[&env, &elem](uint64_t u)
-				{
-					// XML-RPC does not support unsigned data types.
-					if (u > INT64_MAX)
-					{
-						// We need to convert this to a string.
-						auto s = Anope::ToString(u);
-						elem = xmlrpc_string_new_lp(&env, s.length(), s.c_str());
-					}
-					else
-					{
-						// We can fit this into a i8.
-						elem = xmlrpc_i8_new(&env, u);
-					}
-				},
-			}, v);
-
-			xmlrpc_struct_set_value_n(&env, value, k.c_str(), k.length(), elem);
+			auto *obj = SerializeElement(env, v);
+			xmlrpc_struct_set_value_n(&env, value, k.c_str(), k.length(), obj);
 		}
 	}
 
@@ -205,6 +172,60 @@ public:
 		xmlrpc_mem_block_free(response);
 	}
 };
+
+xmlrpc_value *MyXMLRPCServiceInterface::SerializeElement(xmlrpc_env &env, const RPC::Value &value)
+{
+	xmlrpc_value *elem;
+	std::visit(overloaded
+	{
+		[&env, &elem](const RPC::Array &a)
+		{
+			elem = xmlrpc_array_new(&env);
+			SerializeArray(env, elem, a);
+		},
+		[&env, &elem](const RPC::Map &m)
+		{
+			elem = xmlrpc_struct_new(&env);
+			SerializeMap(env, elem, m);
+		},
+		[&env, &elem](const Anope::string &s)
+		{
+			elem = xmlrpc_string_new_lp(&env, s.length(), s.c_str());
+		},
+		[&env, &elem](std::nullptr_t)
+		{
+			elem = xmlrpc_nil_new(&env);
+		},
+		[&env, &elem](bool b)
+		{
+			elem = xmlrpc_bool_new(&env, b);
+		},
+		[&env, &elem](double d)
+		{
+			elem = xmlrpc_double_new(&env, d);
+		},
+		[&env, &elem](int64_t i)
+		{
+			elem = xmlrpc_i8_new(&env, i);
+		},
+		[&env, &elem](uint64_t u)
+		{
+			// XML-RPC does not support unsigned data types.
+			if (u > INT64_MAX)
+			{
+				// We need to convert this to a string.
+				auto s = Anope::ToString(u);
+				elem = xmlrpc_string_new_lp(&env, s.length(), s.c_str());
+			}
+			else
+			{
+				// We can fit this into a i8.
+				elem = xmlrpc_i8_new(&env, u);
+			}
+		},
+	}, value.Get());
+	return elem;
+}
 
 class ModuleXMLRPC final
 	: public Module

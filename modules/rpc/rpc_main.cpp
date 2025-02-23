@@ -152,19 +152,16 @@ public:
 
 	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
-		request.ReplyInt("uptime", Anope::CurTime - Anope::StartTime);
+		request.Reply("uptime", Anope::CurTime - Anope::StartTime);
 		request.Reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
-			Anope::string buf;
+			auto &uplinkcapab = request.ReplyArray("uplinkcapab");
 			for (const auto &capab : Servers::Capab)
-				buf += " " + capab;
-			if (!buf.empty())
-				buf.erase(buf.begin());
-			request.Reply("uplinkcapab", buf);
+				uplinkcapab.Reply(capab);
 		}
-		request.ReplyUInt("usercount", UserListByNick.size());
-		request.ReplyUInt("maxusercount", MaxUserCount);
-		request.ReplyUInt("channelcount", ChannelList.size());
+		request.Reply("usercount", UserListByNick.size());
+		request.Reply("maxusercount", MaxUserCount);
+		request.Reply("channelcount", ChannelList.size());
 		return true;
 	}
 };
@@ -192,35 +189,24 @@ public:
 
 		if (c)
 		{
-			auto &bans = request.ReplyMap("bans");
-			bans.ReplyUInt("count", c->HasMode("BAN"));
-			int count = 0;
+			request.Reply("bancount", c->HasMode("BAN"));
+			auto &bans = request.ReplyArray("bans");
 			for (auto &ban : c->GetModeList("BAN"))
-				bans.Reply(Anope::ToString(++count), ban);
+				bans.Reply(ban);
 
-			auto &excepts = request.ReplyMap("excepts");
-			excepts.ReplyUInt("count", c->HasMode("EXCEPT"));
-			count = 0;
+			request.Reply("exceptcount", c->HasMode("EXCEPT"));
+			auto &excepts = request.ReplyArray("excepts");
 			for (auto &except : c->GetModeList("EXCEPT"))
-				excepts.Reply(Anope::ToString(++count), except);
+				excepts.Reply(except);
 
-			auto &invites = request.ReplyMap("invites");
-			invites.ReplyUInt("count", c->HasMode("INVITEOVERRIDE"));
-			count = 0;
+			request.Reply("invitecount", c->HasMode("INVITEOVERRIDE"));
+			auto &invites = request.ReplyArray("invites");
 			for (auto &invite : c->GetModeList("INVITEOVERRIDE"))
-				invites.Reply(Anope::ToString(++count), invite);
+				invites.Reply(invite);
 
-			Anope::string users;
-			for (Channel::ChanUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
-			{
-				ChanUserContainer *uc = it->second;
-				users += uc->status.BuildModePrefixList() + uc->user->nick + " ";
-			}
-			if (!users.empty())
-			{
-				users.erase(users.length() - 1);
-				request.Reply("users", users);
-			}
+			auto &users = request.ReplyArray("users");
+			for (const auto &[_, uc] : c->users)
+				users.Reply(uc->status.BuildModePrefixList() + uc->user->nick);
 
 			if (!c->topic.empty())
 				request.Reply("topic", c->topic);
@@ -228,8 +214,8 @@ public:
 			if (!c->topic_setter.empty())
 				request.Reply("topicsetter", c->topic_setter);
 
-			request.ReplyInt("topictime", c->topic_time);
-			request.ReplyInt("topicts", c->topic_ts);
+			request.Reply("topictime", c->topic_time);
+			request.Reply("topicts", c->topic_ts);
 		}
 		return true;
 	}
@@ -266,8 +252,8 @@ public:
 			if (!u->chost.empty())
 				request.Reply("chost", u->chost);
 			request.Reply("ip", u->ip.addr());
-			request.ReplyUInt("timestamp", u->timestamp);
-			request.ReplyUInt("signon", u->signon);
+			request.Reply("timestamp", u->timestamp);
+			request.Reply("signon", u->signon);
 			if (u->IsIdentified())
 			{
 				request.Reply("account", u->Account()->display);
@@ -275,17 +261,9 @@ public:
 					request.Reply("opertype", u->Account()->o->ot->GetName());
 			}
 
-			Anope::string channels;
-			for (User::ChanUserList::const_iterator it = u->chans.begin(); it != u->chans.end(); ++it)
-			{
-				ChanUserContainer *cc = it->second;
-				channels += cc->status.BuildModePrefixList() + cc->chan->name + " ";
-			}
-			if (!channels.empty())
-			{
-				channels.erase(channels.length() - 1);
-				request.Reply("channels", channels);
-			}
+			auto &channels = request.ReplyArray("channels");
+			for (const auto &[_, cc] : u->chans)
+				channels.Reply(cc->status.BuildModePrefixList() + cc->chan->name);
 		}
 		return true;
 	}

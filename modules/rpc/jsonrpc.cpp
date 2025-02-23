@@ -59,46 +59,24 @@ private:
 		yyjson_mut_doc_free(doc);
 	}
 
-	static void SerializeMap(yyjson_mut_doc *doc, yyjson_mut_val *root, const char *key, const RPC::Map &map)
+	static yyjson_mut_val *SerializeElement(yyjson_mut_doc *doc, const RPC::Value &value);
+
+	static void SerializeArray(yyjson_mut_doc *doc, yyjson_mut_val *value, const RPC::Array &array)
 	{
-		auto *result = yyjson_mut_obj(doc);
-		for (const auto &reply : map.GetReplies())
+		for (const auto &elem : array.GetReplies())
 		{
-			// Captured structured bindings are a C++20 extension.
-			const auto &k = reply.first;
-			std::visit(overloaded
-			{
-				[&doc, &result, &k](const RPC::Map &m)
-				{
-					SerializeMap(doc, result, k.c_str(), m);
-				},
-				[&doc, &result, &k](const Anope::string &s)
-				{
-					yyjson_mut_obj_add_strn(doc, result, k.c_str(), s.c_str(), s.length());
-				},
-				[&doc, &result, &k](std::nullptr_t)
-				{
-					yyjson_mut_obj_add_null(doc, result, k.c_str());
-				},
-				[&doc, &result, &k](bool b)
-				{
-					yyjson_mut_obj_add_bool(doc, result, k.c_str(), b);
-				},
-				[&doc, &result, &k](double d)
-				{
-					yyjson_mut_obj_add_real(doc, result, k.c_str(), d);
-				},
-				[&doc, &result, &k](int64_t i)
-				{
-					yyjson_mut_obj_add_int(doc, result, k.c_str(), i);
-				},
-				[&doc, &result, &k](uint64_t u)
-				{
-					yyjson_mut_obj_add_uint(doc, result, k.c_str(), u);
-				},
-			}, reply.second);
+			auto *obj = SerializeElement(doc, elem);
+			yyjson_mut_arr_add_val(value, obj);
 		}
-		yyjson_mut_obj_add_val(doc, root, key, result);
+	}
+
+	static void SerializeMap(yyjson_mut_doc *doc, yyjson_mut_val *value, const RPC::Map &map)
+	{
+		for (const auto &[k, v] : map.GetReplies())
+		{
+			auto *obj = SerializeElement(doc, v);
+			yyjson_mut_obj_add_val(doc, value, k.c_str(), obj);
+		}
 	}
 
 public:
@@ -194,7 +172,11 @@ public:
 			yyjson_mut_obj_add_strn(doc, root, "id", request.id.c_str(), request.id.length());
 
 		if (!request.GetReplies().empty())
-			SerializeMap(doc, root, "result", request);
+		{
+			auto *result = yyjson_mut_obj(doc);
+			SerializeMap(doc, result, request);
+			yyjson_mut_obj_add_val(doc, root, "result", result);
+		}
 
 		yyjson_mut_obj_add_str(doc, root, "jsonrpc", "2.0");
 
@@ -207,6 +189,50 @@ public:
 		yyjson_mut_doc_free(doc);
 	}
 };
+
+yyjson_mut_val *MyJSONRPCServiceInterface::SerializeElement(yyjson_mut_doc *doc, const RPC::Value &value)
+{
+	yyjson_mut_val *elem;
+	std::visit(overloaded
+	{
+		[&doc, &elem](const RPC::Array &a)
+		{
+			elem = yyjson_mut_arr(doc);
+			SerializeArray(doc, elem, a);
+		},
+		[&doc, &elem](const RPC::Map &m)
+		{
+			elem = yyjson_mut_obj(doc);
+			SerializeMap(doc, elem, m);
+		},
+		[&doc, &elem](const Anope::string &s)
+		{
+			elem = yyjson_mut_strn(doc, s.c_str(), s.length());
+		},
+		[&doc, &elem](std::nullptr_t)
+		{
+			elem = yyjson_mut_null(doc);
+		},
+		[&doc, &elem](bool b)
+		{
+			elem = yyjson_mut_bool(doc, b);
+		},
+		[&doc, &elem](double d)
+		{
+			elem = yyjson_mut_real(doc, d);
+		},
+		[&doc, &elem](int64_t i)
+		{
+			elem = yyjson_mut_int(doc, i);
+		},
+		[&doc, &elem](uint64_t u)
+		{
+			elem = yyjson_mut_uint(doc, u);
+		},
+	}, value.Get());
+	return elem;
+}
+
 
 class ModuleJSONRPC final
 	: public Module

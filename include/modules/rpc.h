@@ -14,13 +14,15 @@
 
 namespace RPC
 {
+	class Array;
 	class Event;
 	class Map;
 	class Request;
 	class ServiceInterface;
+	class Value;
 
 	/** Represents possible types of RPC value. */
-	using Value = std::variant<Map, Anope::string, std::nullptr_t, bool, double, int64_t, uint64_t>;
+	using ValueUnion = std::variant<Array, Map, Anope::string, std::nullptr_t, bool, double, int64_t, uint64_t>;
 
 	/** Represents standard RPC errors from the JSON-RPC and XML-RPC specifications. */
 	enum Error
@@ -35,57 +37,103 @@ namespace RPC
 	};
 }
 
-class RPC::Map
+class RPC::Array final
 {
+private:
+	std::vector<Value> replies;
+
 public:
 	/** Retrieves the list of RPC replies. */
 	inline const auto &GetReplies() const { return this->replies; }
 
-	template <typename Stringable>
-	inline Map &Reply(const Anope::string &key, const Stringable &value)
+	template <typename T>
+	inline Array &Reply(const T &t)
 	{
-		this->replies.emplace(key, Anope::ToString(value));
+		this->replies.emplace_back(RPC::Value(t));
 		return *this;
 	}
 
-	inline Map &ReplyMap(const Anope::string &key)
-	{
-		auto it = this->replies.emplace(key, Map());
-		return std::get<Map>(it.first->second);
-	}
+	inline Array &ReplyArray();
 
-	inline Map &ReplyBool(const Anope::string &key, bool value)
-	{
-		this->replies.emplace(key, value);
-		return *this;
-	}
+	inline Map &ReplyMap();
+};
 
-	inline Map &ReplyFloat(const Anope::string &key, double value)
-	{
-		this->replies.emplace(key, value);
-		return *this;
-	}
-
-	inline Map &ReplyInt(const Anope::string &key, int64_t value)
-	{
-		this->replies.emplace(key, value);
-		return *this;
-	}
-
-	inline Map &ReplyNull(const Anope::string &key)
-	{
-		this->replies.emplace(key, nullptr);
-		return *this;
-	}
-
-	inline Map &ReplyUInt(const Anope::string &key, uint64_t value)
-	{
-		this->replies.emplace(key, value);
-		return *this;
-	}
-
+class RPC::Map
+{
 private:
 	Anope::map<Value> replies;
+
+public:
+	/** Retrieves the list of RPC replies. */
+	inline const auto &GetReplies() const { return this->replies; }
+
+	template <typename T>
+	inline Map &Reply(const Anope::string &key, const T &t)
+	{
+		this->replies.emplace(key, RPC::Value(t));
+		return *this;
+	}
+
+	inline Array &ReplyArray(const Anope::string &key);
+
+	inline Map &ReplyMap(const Anope::string &key);
+};
+
+class RPC::Value final
+{
+private:
+	RPC::ValueUnion value;
+
+public:
+	explicit Value(const ValueUnion &v)
+		: value(v)
+	{
+	}
+
+	explicit Value(const Array &a)
+		: value(a)
+	{
+	}
+
+	explicit Value(const Map &m)
+		: value(m)
+	{
+	}
+
+	explicit Value(std::nullptr_t)
+		: value(nullptr)
+	{
+	}
+
+	explicit Value(bool b)
+		: value(b)
+	{
+	}
+
+	Value(double d)
+		: value(d)
+	{
+	}
+
+	Value(int64_t i)
+		: value(i)
+	{
+	}
+
+	Value(uint64_t u)
+		: value(u)
+	{
+	}
+
+	template <typename T>
+	Value(const T &t)
+		: value(Anope::ToString(t))
+	{
+	}
+
+	inline auto &Get() { return this->value; }
+
+	inline const auto &Get() const { return this->value; }
 };
 
 class RPC::Request final
@@ -147,3 +195,27 @@ public:
 
 	virtual void Reply(Request &request) = 0;
 };
+
+inline RPC::Array &RPC::Array::ReplyArray()
+{
+	auto &reply = this->replies.emplace_back(RPC::Array());
+	return std::get<RPC::Array>(reply.Get());
+}
+
+inline RPC::Map &RPC::Array::ReplyMap()
+{
+	auto &reply = this->replies.emplace_back(RPC::Map());
+	return std::get<RPC::Map>(reply.Get());
+}
+
+inline RPC::Array &RPC::Map::ReplyArray(const Anope::string &key)
+{
+	auto it = this->replies.emplace(key, RPC::Array());
+	return std::get<RPC::Array>(it.first->second.Get());
+}
+
+inline RPC::Map &RPC::Map::ReplyMap(const Anope::string &key)
+{
+	auto it = this->replies.emplace(key, RPC::Map());
+	return std::get<RPC::Map>(it.first->second.Get());
+}

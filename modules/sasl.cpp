@@ -328,6 +328,13 @@ public:
 	{
 		this->SendMessage(session, "D", "F");
 
+		auto *u = User::Find(session->uid);
+		if (u)
+		{
+			u->BadPassword();
+			return;
+		}
+
 		const auto badpasslimit = Config->GetBlock("options")->Get<int>("badpasslimit");
 		if (!badpasslimit)
 			return;

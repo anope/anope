@@ -59,18 +59,18 @@ private:
 		yyjson_mut_doc_free(doc);
 	}
 
-	static void SerializeObject(yyjson_mut_doc *doc, yyjson_mut_val *root, const char *key, const RPC::Block &block)
+	static void SerializeMap(yyjson_mut_doc *doc, yyjson_mut_val *root, const char *key, const RPC::Map &map)
 	{
 		auto *result = yyjson_mut_obj(doc);
-		for (const auto &reply : block.GetReplies())
+		for (const auto &reply : map.GetReplies())
 		{
 			// Captured structured bindings are a C++20 extension.
 			const auto &k = reply.first;
 			std::visit(overloaded
 			{
-				[&doc, &result, &k](const RPC::Block &b)
+				[&doc, &result, &k](const RPC::Map &m)
 				{
-					SerializeObject(doc, result, k.c_str(), b);
+					SerializeMap(doc, result, k.c_str(), m);
 				},
 				[&doc, &result, &k](const Anope::string &s)
 				{
@@ -194,7 +194,7 @@ public:
 			yyjson_mut_obj_add_strn(doc, root, "id", request.id.c_str(), request.id.length());
 
 		if (!request.GetReplies().empty())
-			SerializeObject(doc, root, "result", request);
+			SerializeMap(doc, root, "result", request);
 
 		yyjson_mut_obj_add_str(doc, root, "jsonrpc", "2.0");
 

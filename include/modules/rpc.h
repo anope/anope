@@ -14,13 +14,13 @@
 
 namespace RPC
 {
-	class Block;
 	class Event;
+	class Map;
 	class Request;
 	class ServiceInterface;
 
 	/** Represents possible types of RPC value. */
-	using Value = std::variant<Block, Anope::string, std::nullptr_t, bool, double, int64_t, uint64_t>;
+	using Value = std::variant<Map, Anope::string, std::nullptr_t, bool, double, int64_t, uint64_t>;
 
 	/** Represents standard RPC errors from the JSON-RPC and XML-RPC specifications. */
 	enum Error
@@ -35,50 +35,50 @@ namespace RPC
 	};
 }
 
-class RPC::Block
+class RPC::Map
 {
 public:
 	/** Retrieves the list of RPC replies. */
 	inline const auto &GetReplies() const { return this->replies; }
 
 	template <typename Stringable>
-	inline Block &Reply(const Anope::string &key, const Stringable &value)
+	inline Map &Reply(const Anope::string &key, const Stringable &value)
 	{
 		this->replies.emplace(key, Anope::ToString(value));
 		return *this;
 	}
 
-	inline Block &ReplyBlock(const Anope::string &key)
+	inline Map &ReplyMap(const Anope::string &key)
 	{
-		auto it = this->replies.emplace(key, Block());
-		return std::get<Block>(it.first->second);
+		auto it = this->replies.emplace(key, Map());
+		return std::get<Map>(it.first->second);
 	}
 
-	inline Block &ReplyBool(const Anope::string &key, bool value)
-	{
-		this->replies.emplace(key, value);
-		return *this;
-	}
-
-	inline Block &ReplyFloat(const Anope::string &key, double value)
+	inline Map &ReplyBool(const Anope::string &key, bool value)
 	{
 		this->replies.emplace(key, value);
 		return *this;
 	}
 
-	inline Block &ReplyInt(const Anope::string &key, int64_t value)
+	inline Map &ReplyFloat(const Anope::string &key, double value)
 	{
 		this->replies.emplace(key, value);
 		return *this;
 	}
 
-	inline Block &ReplyNull(const Anope::string &key)
+	inline Map &ReplyInt(const Anope::string &key, int64_t value)
+	{
+		this->replies.emplace(key, value);
+		return *this;
+	}
+
+	inline Map &ReplyNull(const Anope::string &key)
 	{
 		this->replies.emplace(key, nullptr);
 		return *this;
 	}
 
-	inline Block &ReplyUInt(const Anope::string &key, uint64_t value)
+	inline Map &ReplyUInt(const Anope::string &key, uint64_t value)
 	{
 		this->replies.emplace(key, value);
 		return *this;
@@ -89,7 +89,7 @@ private:
 };
 
 class RPC::Request final
-	: public RPC::Block
+	: public RPC::Map
 {
 private:
 	std::optional<std::pair<int64_t, Anope::string>> error;

@@ -192,19 +192,19 @@ public:
 
 		if (c)
 		{
-			auto &bans = request.ReplyBlock("bans");
+			auto &bans = request.ReplyMap("bans");
 			bans.ReplyUInt("count", c->HasMode("BAN"));
 			int count = 0;
 			for (auto &ban : c->GetModeList("BAN"))
 				bans.Reply(Anope::ToString(++count), ban);
 
-			auto &excepts = request.ReplyBlock("excepts");
+			auto &excepts = request.ReplyMap("excepts");
 			excepts.ReplyUInt("count", c->HasMode("EXCEPT"));
 			count = 0;
 			for (auto &except : c->GetModeList("EXCEPT"))
 				excepts.Reply(Anope::ToString(++count), except);
 
-			auto &invites = request.ReplyBlock("invites");
+			auto &invites = request.ReplyMap("invites");
 			invites.ReplyUInt("count", c->HasMode("INVITEOVERRIDE"));
 			count = 0;
 			for (auto &invite : c->GetModeList("INVITEOVERRIDE"))

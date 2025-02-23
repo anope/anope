@@ -42,17 +42,17 @@ private:
 		xmlrpc_env_clean(&env);
 	}
 
-	static void SerializeObject(xmlrpc_env &env, xmlrpc_value *value, const RPC::Block &block)
+	static void SerializeMap(xmlrpc_env &env, xmlrpc_value *value, const RPC::Map &map)
 	{
-		for (const auto &[k, v] : block.GetReplies())
+		for (const auto &[k, v] : map.GetReplies())
 		{
 			xmlrpc_value *elem;
 			std::visit(overloaded
 			{
-				[&env, &elem](const RPC::Block &b)
+				[&env, &elem](const RPC::Map &m)
 				{
 					elem = xmlrpc_struct_new(&env);
-					SerializeObject(env, elem, b);
+					SerializeMap(env, elem, m);
 				},
 				[&env, &elem](const Anope::string &s)
 				{
@@ -194,7 +194,7 @@ public:
 		}
 
 		auto *value = xmlrpc_struct_new(&env);
-		SerializeObject(env, value, request);
+		SerializeMap(env, value, request);
 
 		auto *response = xmlrpc_mem_block_new(&env, 0);
 		xmlrpc_serialize_response(&env, response, value);

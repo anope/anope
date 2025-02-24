@@ -117,7 +117,7 @@ class AnopeRPC
      */
     public function channel($channel)
     {
-        return $this->run("channel", [$channel]);
+        return $this->run("anope.channel", [$channel]);
     }
 
     /**
@@ -143,7 +143,7 @@ class AnopeRPC
      */
     public function user($user)
     {
-        return $this->run("user", [$user]);
+        return $this->run("anope.user", [$user]);
     }
 }
 

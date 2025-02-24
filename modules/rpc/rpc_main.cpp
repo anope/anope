@@ -167,136 +167,6 @@ public:
 	}
 };
 
-class ChannelRPCEvent final
-	: public RPC::Event
-{
-public:
-	ChannelRPCEvent()
-		: RPC::Event("channel")
-	{
-	}
-
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
-	{
-		if (request.data.empty())
-		{
-			request.Error(RPC::ERR_INVALID_PARAMS, "Invalid parameters");
-			return true;
-		}
-
-		Channel *c = Channel::Find(request.data[0]);
-
-		auto &root = request.Root();
-		root.Reply("name", c ? c->name : request.data[0]);
-
-		if (c)
-		{
-			root.Reply("bancount", c->HasMode("BAN"));
-			auto &bans = root.ReplyArray("bans");
-			for (auto &ban : c->GetModeList("BAN"))
-				bans.Reply(ban);
-
-			root.Reply("exceptcount", c->HasMode("EXCEPT"));
-			auto &excepts = root.ReplyArray("excepts");
-			for (auto &except : c->GetModeList("EXCEPT"))
-				excepts.Reply(except);
-
-			root.Reply("invitecount", c->HasMode("INVITEOVERRIDE"));
-			auto &invites = root.ReplyArray("invites");
-			for (auto &invite : c->GetModeList("INVITEOVERRIDE"))
-				invites.Reply(invite);
-
-			auto &users = root.ReplyArray("users");
-			for (const auto &[_, uc] : c->users)
-				users.Reply(uc->status.BuildModePrefixList() + uc->user->nick);
-
-			if (!c->topic.empty())
-				root.Reply("topic", c->topic);
-
-			if (!c->topic_setter.empty())
-				root.Reply("topicsetter", c->topic_setter);
-
-			root.Reply("topictime", c->topic_time);
-			root.Reply("topicts", c->topic_ts);
-		}
-		return true;
-	}
-};
-
-class UserRPCEvent final
-	: public RPC::Event
-{
-public:
-	UserRPCEvent()
-		: RPC::Event("user")
-	{
-	}
-
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
-	{
-		if (request.data.empty())
-		{
-			request.Error(RPC::ERR_INVALID_PARAMS, "Invalid parameters");
-			return true;
-		}
-
-		User *u = User::Find(request.data[0]);
-
-		auto &root = request.Root();
-		root.Reply("nick", u ? u->nick : request.data[0]);
-
-		if (u)
-		{
-			root.Reply("ident", u->GetIdent());
-			root.Reply("vident", u->GetVIdent());
-			root.Reply("host", u->host);
-			if (!u->vhost.empty())
-				root.Reply("vhost", u->vhost);
-			if (!u->chost.empty())
-				root.Reply("chost", u->chost);
-			root.Reply("ip", u->ip.addr());
-			root.Reply("timestamp", u->timestamp);
-			root.Reply("signon", u->signon);
-			if (u->IsIdentified())
-			{
-				root.Reply("account", u->Account()->display);
-				if (u->Account()->o)
-					root.Reply("opertype", u->Account()->o->ot->GetName());
-			}
-
-			auto &channels = root.ReplyArray("channels");
-			for (const auto &[_, cc] : u->chans)
-				channels.Reply(cc->status.BuildModePrefixList() + cc->chan->name);
-		}
-		return true;
-	}
-};
-
-class OpersRPCEvent final
-	: public RPC::Event
-{
-public:
-	OpersRPCEvent()
-		: RPC::Event("opers")
-	{
-	}
-
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
-	{
-		auto &root = request.Root();
-		for (auto *ot : Config->MyOperTypes)
-		{
-			Anope::string perms;
-			for (const auto &priv : ot->GetPrivs())
-				perms += " " + priv;
-			for (const auto &command : ot->GetCommands())
-				perms += " " + command;
-			root.Reply(ot->GetName(), perms);
-		}
-		return true;
-	}
-};
-
 class NoticeRPCEvent final
 	: public RPC::Event
 {
@@ -334,9 +204,6 @@ private:
 	CommandRPCEvent commandrpcevent;
 	CheckAuthenticationRPCEvent checkauthenticationrpcevent;
 	StatsRPCEvent statsrpcevent;
-	ChannelRPCEvent channelrpcevent;
-	UserRPCEvent userrpcevent;
-	OpersRPCEvent opersrpcevent;
 	NoticeRPCEvent noticerpcevent;
 
 public:
@@ -352,9 +219,6 @@ public:
 		rpc->Register(&commandrpcevent);
 		rpc->Register(&checkauthenticationrpcevent);
 		rpc->Register(&statsrpcevent);
-		rpc->Register(&channelrpcevent);
-		rpc->Register(&userrpcevent);
-		rpc->Register(&opersrpcevent);
 		rpc->Register(&noticerpcevent);
 	}
 
@@ -366,9 +230,6 @@ public:
 		rpc->Unregister(&commandrpcevent);
 		rpc->Unregister(&checkauthenticationrpcevent);
 		rpc->Unregister(&statsrpcevent);
-		rpc->Unregister(&channelrpcevent);
-		rpc->Unregister(&userrpcevent);
-		rpc->Unregister(&opersrpcevent);
 		rpc->Unregister(&noticerpcevent);
 	}
 };

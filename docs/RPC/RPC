@@ -13,13 +13,6 @@ command - Takes three parameters, a service name (BotServ, ChanServ, NickServ), 
 
 stats - Takes no parameters, returns miscellaneous stats that can be found in the /operserv stats command.
 
-channel - Takes one parameter, a channel name, and returns real time information regarding that channel, such as users, modes
-          (ban lists and such), topic etc.
-
-user - Takes one parameter, a user name, and returns real time information regarding that user.
-
-opers - Takes no parameters, returns opertypes, their privileges and commands.
-
 notice - Takes three parameters, source user, target user, and message. Sends a message to the user.
 
 RPC was designed to be used with db_sql, and will not return any information that can be pulled from the SQL

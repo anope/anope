@@ -116,7 +116,6 @@ public:
 			Anope::string param;
 			if (xmlrpc_value_type(value) != XMLRPC_TYPE_STRING)
 			{
-				// TODO: error;
 				xmlrpc_env_set_fault(&env, RPC::ERR_INVALID_REQUEST, "Anope XML-RPC only supports strings");
 				SendError(reply, env);
 				xmlrpc_DECREF(value);
@@ -160,8 +159,11 @@ public:
 			return;
 		}
 
-		auto *value = xmlrpc_struct_new(&env);
-		SerializeMap(env, value, request);
+		xmlrpc_value *value;
+		if (request.GetRoot())
+			value = SerializeElement(env, request.GetRoot().value());
+		else
+			value = xmlrpc_nil_new(&env);
 
 		auto *response = xmlrpc_mem_block_new(&env, 0);
 		xmlrpc_serialize_response(&env, response, value);

@@ -37,7 +37,7 @@ public:
 
 		request.reply = this->repl;
 
-		request.Reply("account", GetAccount());
+		request.Root().Reply("account", GetAccount());
 
 		xinterface->Reply(request);
 		client->SendReply(&request.reply);
@@ -108,7 +108,7 @@ public:
 		Command::Run(source, command);
 
 		if (!out.empty())
-			request.Reply("return", out);
+			request.Root().Reply("return", out);
 
 		return true;
 	}
@@ -152,16 +152,17 @@ public:
 
 	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
-		request.Reply("uptime", Anope::CurTime - Anope::StartTime);
-		request.Reply("uplinkname", Me->GetLinks().front()->GetName());
+		auto &root = request.Root();
+		root.Reply("uptime", Anope::CurTime - Anope::StartTime);
+		root.Reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
-			auto &uplinkcapab = request.ReplyArray("uplinkcapab");
+			auto &uplinkcapab = root.ReplyArray("uplinkcapab");
 			for (const auto &capab : Servers::Capab)
 				uplinkcapab.Reply(capab);
 		}
-		request.Reply("usercount", UserListByNick.size());
-		request.Reply("maxusercount", MaxUserCount);
-		request.Reply("channelcount", ChannelList.size());
+		root.Reply("usercount", UserListByNick.size());
+		root.Reply("maxusercount", MaxUserCount);
+		root.Reply("channelcount", ChannelList.size());
 		return true;
 	}
 };
@@ -185,37 +186,38 @@ public:
 
 		Channel *c = Channel::Find(request.data[0]);
 
-		request.Reply("name", c ? c->name : request.data[0]);
+		auto &root = request.Root();
+		root.Reply("name", c ? c->name : request.data[0]);
 
 		if (c)
 		{
-			request.Reply("bancount", c->HasMode("BAN"));
-			auto &bans = request.ReplyArray("bans");
+			root.Reply("bancount", c->HasMode("BAN"));
+			auto &bans = root.ReplyArray("bans");
 			for (auto &ban : c->GetModeList("BAN"))
 				bans.Reply(ban);
 
-			request.Reply("exceptcount", c->HasMode("EXCEPT"));
-			auto &excepts = request.ReplyArray("excepts");
+			root.Reply("exceptcount", c->HasMode("EXCEPT"));
+			auto &excepts = root.ReplyArray("excepts");
 			for (auto &except : c->GetModeList("EXCEPT"))
 				excepts.Reply(except);
 
-			request.Reply("invitecount", c->HasMode("INVITEOVERRIDE"));
-			auto &invites = request.ReplyArray("invites");
+			root.Reply("invitecount", c->HasMode("INVITEOVERRIDE"));
+			auto &invites = root.ReplyArray("invites");
 			for (auto &invite : c->GetModeList("INVITEOVERRIDE"))
 				invites.Reply(invite);
 
-			auto &users = request.ReplyArray("users");
+			auto &users = root.ReplyArray("users");
 			for (const auto &[_, uc] : c->users)
 				users.Reply(uc->status.BuildModePrefixList() + uc->user->nick);
 
 			if (!c->topic.empty())
-				request.Reply("topic", c->topic);
+				root.Reply("topic", c->topic);
 
 			if (!c->topic_setter.empty())
-				request.Reply("topicsetter", c->topic_setter);
+				root.Reply("topicsetter", c->topic_setter);
 
-			request.Reply("topictime", c->topic_time);
-			request.Reply("topicts", c->topic_ts);
+			root.Reply("topictime", c->topic_time);
+			root.Reply("topicts", c->topic_ts);
 		}
 		return true;
 	}
@@ -240,28 +242,29 @@ public:
 
 		User *u = User::Find(request.data[0]);
 
-		request.Reply("nick", u ? u->nick : request.data[0]);
+		auto &root = request.Root();
+		root.Reply("nick", u ? u->nick : request.data[0]);
 
 		if (u)
 		{
-			request.Reply("ident", u->GetIdent());
-			request.Reply("vident", u->GetVIdent());
-			request.Reply("host", u->host);
+			root.Reply("ident", u->GetIdent());
+			root.Reply("vident", u->GetVIdent());
+			root.Reply("host", u->host);
 			if (!u->vhost.empty())
-				request.Reply("vhost", u->vhost);
+				root.Reply("vhost", u->vhost);
 			if (!u->chost.empty())
-				request.Reply("chost", u->chost);
-			request.Reply("ip", u->ip.addr());
-			request.Reply("timestamp", u->timestamp);
-			request.Reply("signon", u->signon);
+				root.Reply("chost", u->chost);
+			root.Reply("ip", u->ip.addr());
+			root.Reply("timestamp", u->timestamp);
+			root.Reply("signon", u->signon);
 			if (u->IsIdentified())
 			{
-				request.Reply("account", u->Account()->display);
+				root.Reply("account", u->Account()->display);
 				if (u->Account()->o)
-					request.Reply("opertype", u->Account()->o->ot->GetName());
+					root.Reply("opertype", u->Account()->o->ot->GetName());
 			}
 
-			auto &channels = request.ReplyArray("channels");
+			auto &channels = root.ReplyArray("channels");
 			for (const auto &[_, cc] : u->chans)
 				channels.Reply(cc->status.BuildModePrefixList() + cc->chan->name);
 		}
@@ -280,6 +283,7 @@ public:
 
 	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
+		auto &root = request.Root();
 		for (auto *ot : Config->MyOperTypes)
 		{
 			Anope::string perms;
@@ -287,7 +291,7 @@ public:
 				perms += " " + priv;
 			for (const auto &command : ot->GetCommands())
 				perms += " " + command;
-			request.Reply(ot->GetName(), perms);
+			root.Reply(ot->GetName(), perms);
 		}
 		return true;
 	}

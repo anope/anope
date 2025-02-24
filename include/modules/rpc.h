@@ -58,7 +58,7 @@ public:
 	inline Map &ReplyMap();
 };
 
-class RPC::Map
+class RPC::Map final
 {
 private:
 	Anope::map<Value> replies;
@@ -137,10 +137,10 @@ public:
 };
 
 class RPC::Request final
-	: public RPC::Map
 {
 private:
 	std::optional<std::pair<int64_t, Anope::string>> error;
+	std::optional<Value> root;
 
 public:
 	Anope::string name;
@@ -158,7 +158,12 @@ public:
 		this->error.emplace(errcode, errstr);
 	}
 
+	template<typename T = Map>
+	inline T &Root();
+
 	inline const auto &GetError() const { return this->error; }
+
+	inline const auto &GetRoot() const { return this->root; }
 };
 
 class RPC::Event
@@ -218,4 +223,12 @@ inline RPC::Map &RPC::Map::ReplyMap(const Anope::string &key)
 {
 	auto it = this->replies.emplace(key, RPC::Map());
 	return std::get<RPC::Map>(it.first->second.Get());
+}
+
+template<typename T>
+inline T &RPC::Request::Root()
+{
+	if (!this->root.has_value())
+		this->root = RPC::Value(T());
+	return std::get<T>(this->root.value().Get());
 }

@@ -171,10 +171,9 @@ public:
 		else
 			yyjson_mut_obj_add_strn(doc, root, "id", request.id.c_str(), request.id.length());
 
-		if (!request.GetReplies().empty())
+		if (request.GetRoot())
 		{
-			auto *result = yyjson_mut_obj(doc);
-			SerializeMap(doc, result, request);
+			auto *result = SerializeElement(doc, request.GetRoot().value());
 			yyjson_mut_obj_add_val(doc, root, "result", result);
 		}
 

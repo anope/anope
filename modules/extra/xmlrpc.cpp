@@ -23,7 +23,7 @@ class MyXMLRPCServiceInterface final
 	, public HTTPPage
 {
 private:
-	Anope::map<RPC::Event *> events;
+	RPC::Events events;
 
 	static void SendError(HTTPReply &reply, xmlrpc_env &env)
 	{
@@ -67,6 +67,11 @@ public:
 		: RPC::ServiceInterface(creator, sname)
 		, HTTPPage("/xmlrpc", "text/xml")
 	{
+	}
+
+	const RPC::Events &GetEvents() override
+	{
+		return events;
 	}
 
 	bool Register(RPC::Event *event) override

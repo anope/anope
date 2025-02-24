@@ -21,6 +21,9 @@ namespace RPC
 	class ServiceInterface;
 	class Value;
 
+	/** Represents a list of registered events. */
+	using Events = Anope::map<Event *>;
+
 	/** Represents possible types of RPC value. */
 	using ValueUnion = std::variant<Array, Map, Anope::string, std::nullptr_t, bool, double, int64_t, uint64_t>;
 
@@ -193,6 +196,8 @@ public:
 		: Service(creator, "RPCServiceInterface", sname)
 	{
 	}
+
+	virtual const Events &GetEvents() = 0;
 
 	virtual bool Register(Event *event) = 0;
 

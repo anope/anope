@@ -26,7 +26,7 @@ class MyJSONRPCServiceInterface final
 	, public HTTPPage
 {
 private:
-	Anope::map<RPC::Event *> events;
+	RPC::Events events;
 
 	static void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id)
 	{
@@ -84,6 +84,11 @@ public:
 		: RPC::ServiceInterface(creator, sname)
 		, HTTPPage("/jsonrpc", "application/json")
 	{
+	}
+
+	const RPC::Events &GetEvents() override
+	{
+		return events;
 	}
 
 	bool Register(RPC::Event *event) override

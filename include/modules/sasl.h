@@ -52,6 +52,17 @@ namespace SASL
 		Reference<Mechanism> mech;
 
 		Session(Mechanism *m, const Anope::string &u) : created(Anope::CurTime), uid(u), mech(m) { }
+
+		inline Anope::string GetUserInfo()
+		{
+			auto *u = User::Find(uid);
+			if (u)
+				return u->GetMask();
+			if (!hostname.empty() && !ip.empty())
+				return Anope::printf("%s (%s)", hostname.c_str(), ip.c_str());
+			return "A user";
+		};
+
 		virtual ~Session()
 		{
 			if (sasl)
@@ -83,6 +94,16 @@ namespace SASL
 		Anope::string uid;
 		Anope::string hostname;
 
+		inline Anope::string GetUserInfo()
+		{
+			auto *u = User::Find(uid);
+			if (u)
+				return u->GetMask();
+			if (!hostname.empty() && !GetAddress().empty())
+				return Anope::printf("%s (%s)", hostname.c_str(), GetAddress().c_str());
+			return "A user";
+		};
+
 	public:
 		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass, const Anope::string &h, const Anope::string &i)
 			: ::IdentifyRequest(m, acc, pass, i)
@@ -107,11 +128,7 @@ namespace SASL
 			Session *s = sasl->GetSession(uid);
 			if (s)
 			{
-				Anope::string user = "A user";
-				if (!hostname.empty() && !GetAddress().empty())
-					user = hostname + " (" + GetAddress() + ")";
-
-				Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << user << " identified to account " << this->GetAccount() << " using SASL";
+				Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << GetUserInfo() << " identified to account " << this->GetAccount() << " using SASL";
 				sasl->Succeed(s, na->nc);
 				delete s;
 			}
@@ -138,11 +155,7 @@ namespace SASL
 			else if (na->nc->HasExt("UNCONFIRMED"))
 				accountstatus = "unconfirmed ";
 
-			Anope::string user = "A user";
-			if (!hostname.empty() && !GetAddress().empty())
-				user = hostname + " (" + GetAddress() + ")";
-
-			Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << user << " failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
+			Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << GetUserInfo() << " failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
 		}
 	};
 }

@@ -98,13 +98,6 @@ public:
 			if (!certs || mysess->certs.empty())
 				return false;
 
-			Anope::string user = "A user";
-			auto *u = User::Find(sess->uid);
-			if (u)
-				user = u->GetMask();
-			else if (!mysess->hostname.empty() && !mysess->ip.empty())
-				user = mysess->hostname + " (" + mysess->ip + ")";
-
 			for (auto it = mysess->certs.begin(); it != mysess->certs.end(); ++it)
 			{
 				auto *nc = certs->FindAccountFromCert(*it);
@@ -118,14 +111,14 @@ public:
 							cl->ReplaceCert(*it, mysess->certs[0]);
 					}
 
-					Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " identified to account " << nc->display << " using SASL EXTERNAL";
+					Log(this->owner, "sasl", Config->GetClient("NickServ")) << sess->GetUserInfo() << " identified to account " << nc->display << " using SASL EXTERNAL";
 					sasl->Succeed(sess, nc);
 					delete sess;
 					return true;
 				}
 			}
 
-			Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " failed to identify using certificate " << mysess->certs.front() << " using SASL EXTERNAL";
+			Log(this->owner, "sasl", Config->GetClient("NickServ")) << sess->GetUserInfo() << " failed to identify using certificate " << mysess->certs.front() << " using SASL EXTERNAL";
 			return false;
 		}
 		return true;
@@ -149,9 +142,7 @@ public:
 			Anope::string decoded;
 			Anope::B64Decode(m.data[0], decoded);
 
-			Anope::string user = "A user";
-			if (!sess->hostname.empty() && !sess->ip.empty())
-				user = sess->hostname + " (" + sess->ip + ")";
+			auto user = sess->GetUserInfo();
 			if (!decoded.empty())
 				user += " [" + decoded + "]";
 

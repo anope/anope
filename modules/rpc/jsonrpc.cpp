@@ -150,7 +150,16 @@ public:
 			return true;
 		}
 
-		if (!event->second->Run(this, client, request))
+		auto *eh = event->second;
+		if (request.data.size() < eh->GetMinParams())
+		{
+			auto error = Anope::printf("Not enough parameters (given %zu, expected %zu)",
+				request.data.size(), eh->GetMinParams());
+			SendError(reply, RPC::ERR_INVALID_PARAMS, error, id);
+			return true;
+		}
+
+		if (!eh->Run(this, client, request))
 			return false;
 
 		this->Reply(request);

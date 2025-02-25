@@ -38,18 +38,12 @@ class AnopeChannelRPCEvent final
 {
 public:
 	AnopeChannelRPCEvent()
-		: RPC::Event("anope.channel")
+		: RPC::Event("anope.channel", 1)
 	{
 	}
 
 	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
-		if (request.data.empty())
-		{
-			request.Error(RPC::ERR_INVALID_PARAMS, "Not enough parameters");
-			return true;
-		}
-
 		auto *c = Channel::Find(request.data[0]);
 		if (!c)
 		{
@@ -137,18 +131,12 @@ class AnopeOperRPCEvent final
 {
 public:
 	AnopeOperRPCEvent()
-		: RPC::Event("anope.oper")
+		: RPC::Event("anope.oper", 1)
 	{
 	}
 
 	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
-		if (request.data.empty())
-		{
-			request.Error(RPC::ERR_INVALID_PARAMS, "Not enough parameters");
-			return true;
-		}
-
 		auto *o = Oper::Find(request.data[0]);
 		if (!o)
 		{
@@ -230,12 +218,6 @@ public:
 
 	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
-		if (request.data.empty())
-		{
-			request.Error(RPC::ERR_INVALID_PARAMS, "Not enough parameters");
-			return true;
-		}
-
 		auto *s = Server::Find(request.data[0]);
 		if (!s)
 		{
@@ -291,18 +273,12 @@ class AnopeUserRPCEvent final
 {
 public:
 	AnopeUserRPCEvent()
-		: RPC::Event("anope.user")
+		: RPC::Event("anope.user", 1)
 	{
 	}
 
 	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
-		if (request.data.empty())
-		{
-			request.Error(RPC::ERR_INVALID_PARAMS, "Not enough parameters");
-			return true;
-		}
-
 		auto *u = User::Find(request.data[0]);
 		if (!u)
 		{

@@ -173,10 +173,12 @@ class RPC::Event
 {
 private:
 	Anope::string event;
+	size_t minparams;
 
 protected:
-	Event(const Anope::string& e)
+	Event(const Anope::string& e, size_t mp = 0)
 		: event(e)
+		, minparams(mp)
 	{
 	}
 
@@ -184,6 +186,8 @@ public:
 	virtual ~Event() = default;
 
 	const auto &GetEvent() const { return event; }
+
+	const auto &GetMinParams() const { return minparams; }
 
 	virtual bool Run(ServiceInterface *iface, HTTPClient *client, Request &request) = 0;
 };

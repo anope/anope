@@ -145,7 +145,17 @@ public:
 		}
 		xmlrpc_DECREF(params);
 
-		if (!event->second->Run(this, client, request))
+		auto *eh = event->second;
+		if (request.data.size() < eh->GetMinParams())
+		{
+			auto error = Anope::printf("Not enough parameters (given %zu, expected %zu)",
+				request.data.size(), eh->GetMinParams());
+			xmlrpc_env_set_fault(&env, RPC::ERR_INVALID_PARAMS, error.c_str());
+			SendError(reply, env);
+			return true;
+		}
+
+		if (!eh->Run(this, client, request))
 			return false;
 
 		this->Reply(request);

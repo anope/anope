@@ -1,5 +1,5 @@
-Anope Version 2.1.12-git
-------------------------
+Anope Version 2.1.12
+--------------------
 Added an example JavaScript library for accessing the RPC interface.
 Added an option to require specifying the server name when running destructive network commands like restart or shutdown.
 Added support for importing X-line identifiers from Atheme.

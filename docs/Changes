@@ -1,6 +1,25 @@
 Anope Version 2.1.12-git
 ------------------------
-No significant changes.
+Added an example JavaScript library for accessing the RPC interface.
+Added an option to require specifying the server name when running destructive network commands like restart or shutdown.
+Added support for importing X-line identifiers from Atheme.
+Added support for JSON-RPC to the RPC interface.
+Added support for killing SASL users that fail to log in repeatedly.
+Added support for more RPC response types to the RPC interface.
+Added support for multiple targets in chanserv/modes.
+Added support for SSL client certificate fallback fingerprints on InspIRCd.
+Added the anope. prefix to the channel and user RPC events and moved them to the rpc_data module.
+Added the anope.listChannels, anope.listServers, anope.listUsers, and anope.server RPC events to the new rpc_data module.
+Added the OPERONLY, UNUSED and VANITY filters to botserv/botlist.
+Added the system.listMethods RPC event to the new rpc_system module.
+Deprecated support for InspIRCd v3 (scheduled to be removed in around a year).
+Fixed enc_bcrypt silently truncating passwords longer than 71 characters.
+Fixed ns_set_language being able to be loaded when Anope was built without language support.
+Fixed sql_authentication not being able to use the IP address of a RPC, SASL, or web user in SQL queries.
+Made modules that use third-party libraries log the version in use on load.
+Redesigned the RPC interface to add support for emitting multiple data types.
+Replaced the opers RPC event with rpc.listOpers and rpc.oper events in the new rpc_data module.
+Updated the Dutch translation.
 
 Anope Version 2.1.11
 --------------------

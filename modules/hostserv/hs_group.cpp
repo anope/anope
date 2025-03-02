@@ -105,11 +105,11 @@ public:
 		commandhsgroup.Sync(na);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		syncongroup = block->Get<bool>("syncongroup");
-		synconset = block->Get<bool>("synconset");
+		Configuration::Block &block = conf.GetModule(this);
+		syncongroup = block.Get<bool>("syncongroup");
+		synconset = block.Get<bool>("synconset");
 	}
 };
 

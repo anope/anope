@@ -67,7 +67,7 @@ public:
 		const Anope::string &chan = params[0];
 		Anope::string expiry = params[1];
 		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("suspendexpire");
+		time_t expiry_secs = Config->GetModule(this->owner).Get<time_t>("suspendexpire");
 
 		if (!expiry.empty() && expiry[0] != '+')
 		{
@@ -233,9 +233,9 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Anope::string s = conf->GetModule(this)->Get<Anope::string>("show");
+		Anope::string s = conf.GetModule(this).Get<Anope::string>("show");
 		commasepstream(s).GetTokens(show);
 		std::transform(show.begin(), show.end(), show.begin(), trim());
 	}

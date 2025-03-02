@@ -90,13 +90,13 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
-		this->engine = config->Get<const Anope::string>("engine");
-		this->query =  config->Get<const Anope::string>("query");
-		this->disable_reason = config->Get<const Anope::string>("disable_reason");
-		this->disable_email_reason = config->Get<Anope::string>("disable_email_reason");
+		Configuration::Block &config = conf.GetModule(this);
+		this->engine = config.Get<const Anope::string>("engine");
+		this->query =  config.Get<const Anope::string>("query");
+		this->disable_reason = config.Get<const Anope::string>("disable_reason");
+		this->disable_email_reason = config.Get<Anope::string>("disable_email_reason");
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}

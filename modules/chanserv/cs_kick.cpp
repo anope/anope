@@ -44,11 +44,11 @@ public:
 			return;
 		}
 
-		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		unsigned reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 
-		Anope::string signkickformat = Config->GetModule("chanserv")->Get<Anope::string>("signkickformat", "%m (%n)");
+		Anope::string signkickformat = Config->GetModule("chanserv").Get<Anope::string>("signkickformat", "%m (%n)");
 		signkickformat = signkickformat.replace_all_cs("%n", source.GetNick());
 
 		AccessGroup u_access = source.AccessFor(ci);

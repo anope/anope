@@ -51,13 +51,13 @@ public:
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
+		if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
 		{
 			source.Reply(_("You may not drop other Services Operators' nicknames."));
 			return;
 		}
 
-		if (na->nc->na == na && na->nc->aliases->size() > 1 && Config->GetModule("nickserv")->Get<bool>("preservedisplay") && !source.HasPriv("nickserv/drop/display"))
+		if (na->nc->na == na && na->nc->aliases->size() > 1 && Config->GetModule("nickserv").Get<bool>("preservedisplay") && !source.HasPriv("nickserv/drop/display"))
 		{
 			source.Reply(_("You may not drop \002%s\002 as it is the display nick for the account."), na->nick.c_str());
 			return;

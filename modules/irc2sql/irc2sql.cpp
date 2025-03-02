@@ -17,21 +17,21 @@ void IRC2SQL::OnShutdown()
 	quitting = true;
 }
 
-void IRC2SQL::OnReload(Configuration::Conf *conf)
+void IRC2SQL::OnReload(Configuration::Conf &conf)
 {
-	Configuration::Block *block = Config->GetModule(this);
-	prefix = block->Get<const Anope::string>("prefix", "anope_");
-	GeoIPDB = block->Get<const Anope::string>("geoip_database");
-	ctcpuser = block->Get<bool>("ctcpuser", "no");
-	ctcpeob = block->Get<bool>("ctcpeob", "yes");
-	Anope::string engine = block->Get<const Anope::string>("engine");
+	Configuration::Block &block = Config->GetModule(this);
+	prefix = block.Get<const Anope::string>("prefix", "anope_");
+	GeoIPDB = block.Get<const Anope::string>("geoip_database");
+	ctcpuser = block.Get<bool>("ctcpuser", "no");
+	ctcpeob = block.Get<bool>("ctcpeob", "yes");
+	Anope::string engine = block.Get<const Anope::string>("engine");
 	this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 	if (sql)
 		this->CheckTables();
 	else
 		Log() << "IRC2SQL: no database connection to " << engine;
 
-	const Anope::string &snick = block->Get<const Anope::string>("client");
+	const Anope::string &snick = block.Get<const Anope::string>("client");
 	if (snick.empty())
 		throw ConfigException(Module::name + ": <client> must be defined");
 	StatServ = BotInfo::Find(snick, true);

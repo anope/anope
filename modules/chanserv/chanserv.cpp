@@ -14,8 +14,8 @@
 
 inline static Anope::string BotModes()
 {
-	return Config->GetModule("botserv")->Get<Anope::string>("botmodes",
-		Config->GetModule("chanserv")->Get<Anope::string>("botmodes", "o")
+	return Config->GetModule("botserv").Get<Anope::string>("botmodes",
+		Config->GetModule("chanserv").Get<Anope::string>("botmodes", "o")
 	);
 }
 
@@ -52,7 +52,7 @@ public:
 			 * @param chan The channel
 			 */
 			ChanServTimer(Reference<BotInfo> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan)
-				: Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "1m"))
+				: Timer(m, Config->GetModule(m).Get<time_t>("inhabit", "1m"))
 				, ChanServ(cs)
 				, inhabit(i)
 				, c(chan)
@@ -103,9 +103,9 @@ public:
 		new ChanServTimer(ChanServ, inhabit, this->owner, c);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		const Anope::string &channick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &channick = conf.GetModule(this).Get<const Anope::string>("client");
 
 		if (channick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
@@ -116,7 +116,7 @@ public:
 
 		ChanServ = bi;
 
-		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "keeptopic peace securefounder signkick")).GetTokens(defaults);
+		spacesepstream(conf.GetModule(this).Get<const Anope::string>("defaults", "keeptopic peace securefounder signkick")).GetTokens(defaults);
 		if (defaults.empty())
 		{
 			defaults.emplace_back("KEEPTOPIC");
@@ -127,7 +127,7 @@ public:
 		else if (defaults[0].equals_ci("none"))
 			defaults.clear();
 
-		always_lower = conf->GetModule(this)->Get<bool>("always_lower_ts");
+		always_lower = conf.GetModule(this).Get<bool>("always_lower_ts");
 	}
 
 	void OnBotDelete(BotInfo *bi) override
@@ -138,7 +138,7 @@ public:
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) override
 	{
-		if (bi == ChanServ && Config->GetModule(this)->Get<bool>("opersonly") && !u->HasMode("OPER"))
+		if (bi == ChanServ && Config->GetModule(this).Get<bool>("opersonly") && !u->HasMode("OPER"))
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
 			return EVENT_STOP;
@@ -151,7 +151,7 @@ public:
 	{
 		std::deque<ChannelInfo *> chans;
 		nc->GetChannelReferences(chans);
-		int max_reg = Config->GetModule(this)->Get<int>("maxregistered");
+		int max_reg = Config->GetModule(this).Get<int>("maxregistered");
 
 		for (auto *ci : chans)
 		{
@@ -247,7 +247,7 @@ public:
 		{
 			ci->c->RemoveMode(ci->WhoSends(), "REGISTERED", "", false);
 
-			const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require");
+			const Anope::string &require = Config->GetModule(this).Get<const Anope::string>("require");
 			if (!require.empty())
 				ci->c->SetModes(ci->WhoSends(), false, "-%s", require.c_str());
 		}
@@ -272,7 +272,7 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *ChanServ)
 			return;
-		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "30d");
+		time_t chanserv_expire = Config->GetModule(this).Get<time_t>("expire", "30d");
 		if (chanserv_expire >= 86400)
 			source.Reply(_(" \n"
 				"Note that any channel which is not used for %lu days\n"
@@ -295,7 +295,7 @@ public:
 		else
 			c->RemoveMode(c->WhoSends(), "REGISTERED", "", false);
 
-		const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require");
+		const Anope::string &require = Config->GetModule(this).Get<const Anope::string>("require");
 		if (!require.empty())
 		{
 			if (c->ci)
@@ -314,8 +314,8 @@ public:
 
 	EventReturn OnCanSet(User *u, const ChannelMode *cm) override
 	{
-		if (Config->GetModule(this)->Get<const Anope::string>("nomlock").find(cm->mchar) != Anope::string::npos
-			|| Config->GetModule(this)->Get<const Anope::string>("require").find(cm->mchar) != Anope::string::npos)
+		if (Config->GetModule(this).Get<const Anope::string>("nomlock").find(cm->mchar) != Anope::string::npos
+			|| Config->GetModule(this).Get<const Anope::string>("require").find(cm->mchar) != Anope::string::npos)
 			return EVENT_STOP;
 		return EVENT_CONTINUE;
 	}
@@ -337,7 +337,7 @@ public:
 
 	void OnExpireTick() override
 	{
-		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "30d");
+		time_t chanserv_expire = Config->GetModule(this).Get<time_t>("expire", "30d");
 
 		if (!chanserv_expire || Anope::NoExpire || Anope::ReadOnly)
 			return;
@@ -467,7 +467,7 @@ public:
 		if (!show_all)
 			return;
 
-		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "30d");
+		time_t chanserv_expire = Config->GetModule(this).Get<time_t>("expire", "30d");
 		if (!ci->HasExt("CS_NO_EXPIRE") && chanserv_expire && !Anope::NoExpire && ci->last_used != Anope::CurTime)
 			info[_("Expires")] = Anope::strftime(ci->last_used + chanserv_expire, source.GetAccount());
 	}

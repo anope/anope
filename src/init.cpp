@@ -215,7 +215,7 @@ static void InitSignals()
 
 static void remove_pidfile()
 {
-	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
+	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo").Get<const Anope::string>("pid"));
 	if (!pidfile.empty())
 		remove(pidfile.c_str());
 }
@@ -224,7 +224,7 @@ static void remove_pidfile()
 
 static void write_pidfile()
 {
-	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
+	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo").Get<const Anope::string>("pid"));
 	if (Anope::NoPID || pidfile.empty())
 		return;
 
@@ -242,25 +242,25 @@ static void write_pidfile()
 static void setuidgid()
 {
 #ifndef _WIN32
-	Configuration::Block *options = Config->GetBlock("options");
+	Configuration::Block &options = Config->GetBlock("options");
 	uid_t uid = -1;
 	gid_t gid = -1;
 
-	if (!options->Get<const Anope::string>("user").empty())
+	if (!options.Get<const Anope::string>("user").empty())
 	{
 		errno = 0;
-		struct passwd *u = getpwnam(options->Get<const Anope::string>("user").c_str());
+		struct passwd *u = getpwnam(options.Get<const Anope::string>("user").c_str());
 		if (u == NULL)
-			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
+			Log() << "Unable to setuid to " << options.Get<const Anope::string>("user") << ": " << Anope::LastError();
 		else
 			uid = u->pw_uid;
 	}
-	if (!options->Get<const Anope::string>("group").empty())
+	if (!options.Get<const Anope::string>("group").empty())
 	{
 		errno = 0;
-		struct group *g = getgrnam(options->Get<const Anope::string>("group").c_str());
+		struct group *g = getgrnam(options.Get<const Anope::string>("group").c_str());
 		if (g == NULL)
-			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
+			Log() << "Unable to setgid to " << options.Get<const Anope::string>("group") << ": " << Anope::LastError();
 		else
 			gid = g->gr_gid;
 	}
@@ -278,16 +278,16 @@ static void setuidgid()
 	if (static_cast<int>(gid) != -1)
 	{
 		if (setgid(gid) == -1)
-			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
+			Log() << "Unable to setgid to " << options.Get<const Anope::string>("group") << ": " << Anope::LastError();
 		else
-			Log() << "Successfully set group to " << options->Get<const Anope::string>("group");
+			Log() << "Successfully set group to " << options.Get<const Anope::string>("group");
 	}
 	if (static_cast<int>(uid) != -1)
 	{
 		if (setuid(uid) == -1)
-			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
+			Log() << "Unable to setuid to " << options.Get<const Anope::string>("user") << ": " << Anope::LastError();
 		else
-			Log() << "Successfully set user to " << options->Get<const Anope::string>("user");
+			Log() << "Successfully set user to " << options.Get<const Anope::string>("user");
 	}
 #endif
 }
@@ -493,8 +493,8 @@ bool Anope::Init(int ac, char **av)
 	}
 
 	/* Create me */
-	Configuration::Block *block = Config->GetBlock("serverinfo");
-	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), block->Get<const Anope::string>("id"));
+	Configuration::Block &block = Config->GetBlock("serverinfo");
+	Me = new Server(NULL, block.Get<const Anope::string>("name"), 0, block.Get<const Anope::string>("description"), block.Get<const Anope::string>("id"));
 	for (const auto &[_, bi] : *BotListByNick)
 	{
 		bi->server = Me;
@@ -512,15 +512,15 @@ bool Anope::Init(int ac, char **av)
 	/* load modules */
 	Log() << "Loading modules...";
 	for (int i = 0; i < Config->CountBlock("module"); ++i)
-		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<const Anope::string>("name"), NULL);
+		ModuleManager::LoadModule(Config->GetBlock("module", i).Get<const Anope::string>("name"), NULL);
 
 #ifndef _WIN32
 	/* If we're root, issue a warning now */
 	if (!getuid() && !getgid())
 	{
 		/* If we are configured to setuid later, don't issue a warning */
-		Configuration::Block *options = Config->GetBlock("options");
-		if (options->Get<const Anope::string>("user").empty())
+		Configuration::Block &options = Config->GetBlock("options");
+		if (options.Get<const Anope::string>("user").empty())
 		{
 			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
 			std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;

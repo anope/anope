@@ -1296,7 +1296,7 @@ public:
 	{
 
 
-		hashm = Config->GetModule(this)->Get<const Anope::string>("hash");
+		hashm = Config->GetModule(this).Get<const Anope::string>("hash");
 
 		if (hashm != "md5" && hashm != "oldmd5" && hashm != "sha1" && hashm != "plain" && hashm != "sha256")
 			throw ModuleException("Invalid hash method");

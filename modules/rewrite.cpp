@@ -163,23 +163,23 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		Rewrite::rewrites.clear();
 
-		for (int i = 0; i < conf->CountBlock("command"); ++i)
+		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("command", i);
+			Configuration::Block &block = conf.GetBlock("command", i);
 
-			if (!block->Get<bool>("rewrite"))
+			if (!block.Get<bool>("rewrite"))
 				continue;
 
 			Rewrite rw;
 
-			rw.client = block->Get<const Anope::string>("service");
-			rw.source_message = block->Get<const Anope::string>("rewrite_source");
-			rw.target_message = block->Get<const Anope::string>("rewrite_target");
-			rw.desc = block->Get<const Anope::string>("rewrite_description");
+			rw.client = block.Get<const Anope::string>("service");
+			rw.source_message = block.Get<const Anope::string>("rewrite_source");
+			rw.target_message = block.Get<const Anope::string>("rewrite_target");
+			rw.desc = block.Get<const Anope::string>("rewrite_description");
 
 			if (rw.client.empty() || rw.source_message.empty() || rw.target_message.empty())
 				continue;

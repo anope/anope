@@ -23,9 +23,9 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		const Anope::string &bsnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &bsnick = conf.GetModule(this).Get<const Anope::string>("client");
 		BotServ = BotInfo::Find(bsnick, true);
 	}
 
@@ -34,7 +34,7 @@ public:
 		/* Do not allow removing bot modes on our service bots */
 		if (chan->ci && chan->ci->bi == user)
 		{
-			const Anope::string &botmodes = Config->GetModule(this)->Get<const Anope::string>("botmodes");
+			const Anope::string &botmodes = Config->GetModule(this).Get<const Anope::string>("botmodes");
 			for (auto botmode : botmodes)
 				chan->SetMode(chan->ci->bi, ModeManager::FindChannelModeByChar(botmode), chan->ci->bi->GetUID());
 		}
@@ -42,9 +42,9 @@ public:
 
 	void OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) override
 	{
-		if (ci->c && ci->c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
+		if (ci->c && ci->c->users.size() >= Config->GetModule(this).Get<unsigned>("minusers"))
 		{
-			ChannelStatus status(Config->GetModule(this)->Get<const Anope::string>("botmodes"));
+			ChannelStatus status(Config->GetModule(this).Get<const Anope::string>("botmodes"));
 			bi->Join(ci->c, &status);
 		}
 	}
@@ -55,7 +55,7 @@ public:
 			return;
 
 		BotInfo *bi = user->server == Me ? dynamic_cast<BotInfo *>(user) : NULL;
-		if (bi && Config->GetModule(this)->Get<bool>("smartjoin"))
+		if (bi && Config->GetModule(this).Get<bool>("smartjoin"))
 		{
 			if (IRCD->CanClearBans)
 			{
@@ -99,9 +99,9 @@ public:
 			 * legit users - Rob
 			 **/
 			/* This is before the user has joined the channel, so check usercount + 1 */
-			if (c->users.size() + 1 >= Config->GetModule(this)->Get<unsigned>("minusers") && !c->FindUser(c->ci->bi))
+			if (c->users.size() + 1 >= Config->GetModule(this).Get<unsigned>("minusers") && !c->FindUser(c->ci->bi))
 			{
-				ChannelStatus status(Config->GetModule(this)->Get<const Anope::string>("botmodes"));
+				ChannelStatus status(Config->GetModule(this).Get<const Anope::string>("botmodes"));
 				c->ci->bi->Join(c, &status);
 			}
 		}
@@ -124,7 +124,7 @@ public:
 			return;
 
 		/* This is called prior to removing the user from the channel, so c->users.size() - 1 should be safe */
-		if (c->ci && c->ci->bi && u != *c->ci->bi && c->users.size() - 1 <= Config->GetModule(this)->Get<unsigned>("minusers") && c->FindUser(c->ci->bi))
+		if (c->ci && c->ci->bi && u != *c->ci->bi && c->users.size() - 1 <= Config->GetModule(this).Get<unsigned>("minusers") && c->FindUser(c->ci->bi))
 			c->ci->bi->Part(c->ci->c);
 	}
 
@@ -140,7 +140,7 @@ public:
 					"channel, and provide a more convenient way to execute commands. Commands that\n"
 					"require a channel as a parameter will automatically have that parameter\n"
 					"given.\n"), source.service->nick.c_str());
-			const Anope::string &fantasycharacters = Config->GetModule("fantasy")->Get<const Anope::string>("fantasycharacter", "!");
+			const Anope::string &fantasycharacters = Config->GetModule("fantasy").Get<const Anope::string>("fantasycharacter", "!");
 			if (!fantasycharacters.empty())
 				source.Reply(_(" \n"
 						"Fantasy commands may be prefixed with one of the following characters: %s\n"), fantasycharacters.c_str());
@@ -170,8 +170,8 @@ public:
 
 		source.Reply(_(" \n"
 			"Bot will join a channel whenever there is at least\n"
-			"\002%d\002 user(s) on it."), Config->GetModule(this)->Get<unsigned>("minusers"));
-		const Anope::string &fantasycharacters = Config->GetModule("fantasy")->Get<const Anope::string>("fantasycharacter", "!");
+			"\002%d\002 user(s) on it."), Config->GetModule(this).Get<unsigned>("minusers"));
+		const Anope::string &fantasycharacters = Config->GetModule("fantasy").Get<const Anope::string>("fantasycharacter", "!");
 		if (!fantasycharacters.empty())
 			source.Reply(_("Additionally, if fantasy is enabled fantasy commands\n"
 				"can be executed by prefixing the command name with\n"
@@ -180,7 +180,7 @@ public:
 
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) override
 	{
-		if (source.GetUser() && !source.GetBot() && Config->GetModule(this)->Get<bool>("smartjoin") && mode->name == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
+		if (source.GetUser() && !source.GetBot() && Config->GetModule(this).Get<bool>("smartjoin") && mode->name == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{
 			BotInfo *bi = c->ci->bi;
 
@@ -195,7 +195,7 @@ public:
 	void OnCreateChan(ChannelInfo *ci) override
 	{
 		/* Set default bot flags */
-		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy"));
+		spacesepstream sep(Config->GetModule(this).Get<const Anope::string>("defaults", "greet fantasy"));
 		for (Anope::string token; sep.GetToken(token);)
 			ci->Extend<bool>("BS_" + token.upper());
 	}
@@ -211,7 +211,7 @@ public:
 	void OnCreateBot(BotInfo *bi) override
 	{
 		if (bi->botmodes.empty())
-			bi->botmodes = Config->GetModule(this)->Get<const Anope::string>("botumodes");
+			bi->botmodes = Config->GetModule(this).Get<const Anope::string>("botumodes");
 	}
 };
 

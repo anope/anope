@@ -25,10 +25,10 @@ IRCDProto *IRCD = NULL;
 IRCDProto::IRCDProto(Module *creator, const Anope::string &p)
 	: Service(creator, "IRCDProto", creator->name)
 	, proto_name(p)
-	, MaxChannel(Config->GetBlock("networkinfo")->Get<unsigned>("chanlen", "32"))
-	, MaxHost(Config->GetBlock("networkinfo")->Get<unsigned>("hostlen", "64"))
-	, MaxNick(Config->GetBlock("networkinfo")->Get<unsigned>("nicklen", "31"))
-	, MaxUser(Config->GetBlock("networkinfo")->Get<unsigned>("userlen", "10"))
+	, MaxChannel(Config->GetBlock("networkinfo").Get<unsigned>("chanlen", "32"))
+	, MaxHost(Config->GetBlock("networkinfo").Get<unsigned>("hostlen", "64"))
+	, MaxNick(Config->GetBlock("networkinfo").Get<unsigned>("nicklen", "31"))
+	, MaxUser(Config->GetBlock("networkinfo").Get<unsigned>("userlen", "10"))
 {
 	if (IRCD == NULL)
 		IRCD = this;
@@ -76,7 +76,7 @@ Anope::string IRCDProto::SID_Retrieve()
 	if (!IRCD || !IRCD->RequiresID)
 		return "";
 
-	static Anope::string current_sid = Config->GetBlock("serverinfo")->Get<const Anope::string>("id");
+	static Anope::string current_sid = Config->GetBlock("serverinfo").Get<const Anope::string>("id");
 	if (current_sid.empty())
 		current_sid = "00A";
 
@@ -289,8 +289,8 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 	if (host.empty() || host.length() > IRCD->MaxHost)
 		return false;
 
-	const Anope::string &vhostdisablebe = Config->GetBlock("networkinfo")->Get<const Anope::string>("disallow_start_or_end"),
-		vhostchars = Config->GetBlock("networkinfo")->Get<const Anope::string>("vhost_chars");
+	const Anope::string &vhostdisablebe = Config->GetBlock("networkinfo").Get<const Anope::string>("disallow_start_or_end"),
+		vhostchars = Config->GetBlock("networkinfo").Get<const Anope::string>("vhost_chars");
 
 	if (vhostdisablebe.find_first_of(host[0]) != Anope::string::npos)
 		return false;
@@ -306,7 +306,7 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 			return false;
 	}
 
-	return dots > 0 || Config->GetBlock("networkinfo")->Get<bool>("allow_undotted_vhosts");
+	return dots > 0 || Config->GetBlock("networkinfo").Get<bool>("allow_undotted_vhosts");
 }
 
 void IRCDProto::SendOper(User *u)
@@ -317,7 +317,7 @@ void IRCDProto::SendOper(User *u)
 
 size_t IRCDProto::GetMaxListFor(Channel *c, ChannelMode *cm)
 {
-	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<size_t>("modelistsize", "100");
+	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo").Get<size_t>("modelistsize", "100");
 }
 
 Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)

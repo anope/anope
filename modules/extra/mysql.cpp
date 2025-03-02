@@ -260,9 +260,9 @@ public:
 		delete DThread;
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
+		Configuration::Block &config = conf.GetModule(this);
 
 		for (std::map<Anope::string, MySQLService *>::iterator it = this->MySQLServices.begin(); it != this->MySQLServices.end();)
 		{
@@ -272,11 +272,11 @@ public:
 
 			++it;
 
-			for (i = 0; i < config->CountBlock("mysql"); ++i)
-				if (config->GetBlock("mysql", i)->Get<const Anope::string>("name", "mysql/main") == cname)
+			for (i = 0; i < Config->CountBlock("mysql"); ++i)
+				if (config.GetBlock("mysql", i).Get<const Anope::string>("name", "mysql/main") == cname)
 					break;
 
-			if (i == config->CountBlock("mysql"))
+			if (i == Config->CountBlock("mysql"))
 			{
 				Log(LOG_NORMAL, "mysql") << "MySQL: Removing server connection " << cname;
 
@@ -285,19 +285,19 @@ public:
 			}
 		}
 
-		for (int i = 0; i < config->CountBlock("mysql"); ++i)
+		for (int i = 0; i < Config->CountBlock("mysql"); ++i)
 		{
-			Configuration::Block *block = config->GetBlock("mysql", i);
-			const Anope::string &connname = block->Get<const Anope::string>("name", "mysql/main");
+			Configuration::Block &block = config.GetBlock("mysql", i);
+			const Anope::string &connname = block.Get<const Anope::string>("name", "mysql/main");
 
 			if (this->MySQLServices.find(connname) == this->MySQLServices.end())
 			{
-				const Anope::string &database = block->Get<const Anope::string>("database", "anope");
-				const Anope::string &server = block->Get<const Anope::string>("server", "127.0.0.1");
-				const Anope::string &user = block->Get<const Anope::string>("username", "anope");
-				const Anope::string &password = block->Get<const Anope::string>("password");
-				unsigned int port = block->Get<unsigned int>("port", "3306");
-				const Anope::string &socket = block->Get<const Anope::string>("socket");
+				const Anope::string &database = block.Get<const Anope::string>("database", "anope");
+				const Anope::string &server = block.Get<const Anope::string>("server", "127.0.0.1");
+				const Anope::string &user = block.Get<const Anope::string>("username", "anope");
+				const Anope::string &password = block.Get<const Anope::string>("password");
+				unsigned int port = block.Get<unsigned int>("port", "3306");
+				const Anope::string &socket = block.Get<const Anope::string>("socket");
 
 				try
 				{

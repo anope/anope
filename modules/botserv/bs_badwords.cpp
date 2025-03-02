@@ -286,14 +286,14 @@ private:
 			realword = word.substr(0, pos);
 		}
 
-		unsigned badwordsmax = Config->GetModule(this->module)->Get<unsigned>("badwordsmax");
+		unsigned badwordsmax = Config->GetModule(this->module).Get<unsigned>("badwordsmax");
 		if (badwords->GetBadWordCount() >= badwordsmax)
 		{
 			source.Reply(_("Sorry, you can only have %d bad words entries on a channel."), badwordsmax);
 			return;
 		}
 
-		bool casesensitive = Config->GetModule(this->module)->Get<bool>("casesensitive");
+		bool casesensitive = Config->GetModule(this->module).Get<bool>("casesensitive");
 
 		for (unsigned i = 0, end = badwords->GetBadWordCount(); i < end; ++i)
 		{

@@ -318,7 +318,7 @@ public:
 				"to them.  However, no more than \002%d\002 messages will be\n"
 				"sent in order to avoid flooding the user.  If there are\n"
 				"more news messages, only the most recent will be sent."),
-				Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
+				Config->GetModule(this->owner).Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };
@@ -346,7 +346,7 @@ public:
 				"be sent to them.  However, no more than \002%d\002 messages will\n"
 				"be sent in order to avoid flooding the user.  If there are\n"
 				"more news messages, only the most recent will be sent."),
-				Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
+				Config->GetModule(this->owner).Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };
@@ -399,9 +399,9 @@ class OSNews final
 
 		BotInfo *bi = NULL;
 		if (Type == NEWS_OPER)
-			bi = BotInfo::Find(Config->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ"), true);
+			bi = BotInfo::Find(Config->GetModule(this).Get<const Anope::string>("oper_announcer", "OperServ"), true);
 		else
-			bi = BotInfo::Find(Config->GetModule(this)->Get<const Anope::string>("announcer", "Global"), true);
+			bi = BotInfo::Find(Config->GetModule(this).Get<const Anope::string>("announcer", "Global"), true);
 		if (bi == NULL)
 			return;
 
@@ -448,11 +448,11 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		oper_announcer = conf->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ");
-		announcer = conf->GetModule(this)->Get<const Anope::string>("announcer", "Global");
-		news_count = conf->GetModule(this)->Get<unsigned>("newscount", "3");
+		oper_announcer = conf.GetModule(this).Get<const Anope::string>("oper_announcer", "OperServ");
+		announcer = conf.GetModule(this).Get<const Anope::string>("announcer", "Global");
+		news_count = conf.GetModule(this).Get<unsigned>("newscount", "3");
 	}
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override

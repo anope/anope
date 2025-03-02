@@ -34,8 +34,8 @@ public:
 		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
 
 		Anope::string this_name = source.command;
-		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
-		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
+		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options").Get<bool>("hideregisteredcommands");
 		for (const auto &[c_name, info] : source.service->commands)
 		{
 			if (c_name.find_ci(this_name + " ") == 0)
@@ -134,14 +134,14 @@ public:
 			return;
 		}
 
-		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
+		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
 		if (len < minpasslen)
 		{
 			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
 			return;
 		}
 
-		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
+		unsigned int maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
 		if (len > maxpasslen)
 		{
 			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
@@ -196,7 +196,7 @@ public:
 
 		size_t len = params[1].length();
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
+		if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the password of other Services Operators."));
 			return;
@@ -208,14 +208,14 @@ public:
 			return;
 		}
 
-		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
+		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
 		if (len < minpasslen)
 		{
 			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
 			return;
 		}
 
-		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
+		unsigned int maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
 		if (len > maxpasslen)
 		{
 			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
@@ -440,7 +440,7 @@ public:
 
 		NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
 
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;
@@ -526,19 +526,19 @@ class CommandNSSetEmail
 		n->first = new_email;
 		n->second = code;
 
-		Anope::string subject = Config->GetBlock("mail")->Get<const Anope::string>("emailchange_subject"),
-			message = Config->GetBlock("mail")->Get<const Anope::string>("emailchange_message");
+		Anope::string subject = Config->GetBlock("mail").Get<const Anope::string>("emailchange_subject"),
+			message = Config->GetBlock("mail").Get<const Anope::string>("emailchange_message");
 
 		subject = subject.replace_all_cs("%e", nc->email);
 		subject = subject.replace_all_cs("%E", new_email);
 		subject = subject.replace_all_cs("%n", nc->display);
-		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
 		subject = subject.replace_all_cs("%c", code);
 
 		message = message.replace_all_cs("%e", nc->email);
 		message = message.replace_all_cs("%E", new_email);
 		message = message.replace_all_cs("%n", nc->display);
-		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
 		message = message.replace_all_cs("%c", code);
 
 		Anope::string old = nc->email;
@@ -577,12 +577,12 @@ public:
 			return;
 		}
 
-		if (param.empty() && Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+		if (param.empty() && Config->GetModule("nickserv").Get<bool>("forceemail", "yes"))
 		{
 			source.Reply(_("You cannot unset the email on this network."));
 			return;
 		}
-		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
+		else if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the email of other Services Operators."));
 			return;
@@ -598,8 +598,8 @@ public:
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		const auto nsmailreg = Config->GetModule("ns_register")->Get<const Anope::string>("registration").equals_ci("mail");
-		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("confirmemailchanges", nsmailreg ? "yes" : "no") && !source.IsServicesOper())
+		const auto nsmailreg = Config->GetModule("ns_register").Get<const Anope::string>("registration").equals_ci("mail");
+		if (!param.empty() && Config->GetModule("nickserv").Get<bool>("confirmemailchanges", nsmailreg ? "yes" : "no") && !source.IsServicesOper())
 		{
 			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
 			{

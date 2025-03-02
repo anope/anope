@@ -105,7 +105,7 @@ class InspIRCdProto final
 private:
 	static Anope::string GetAccountNicks(NickAlias* na)
 	{
-		if (!na || Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (!na || Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 			return {};
 
 		Anope::string nicks;
@@ -188,7 +188,7 @@ public:
 	void SendConnect() override
 	{
 		Uplink::Send("CAPAB", "START", 1206);
-		Uplink::Send("CAPAB", "CAPABILITIES", "CASEMAPPING=" + Config->GetBlock("options")->Get<const Anope::string>("casemap", "ascii") + (sha256 ? " CHALLENGE=*" : ""));
+		Uplink::Send("CAPAB", "CAPABILITIES", "CASEMAPPING=" + Config->GetBlock("options").Get<const Anope::string>("casemap", "ascii") + (sha256 ? " CHALLENGE=*" : ""));
 		Uplink::Send("CAPAB", "END");
 	}
 
@@ -1553,7 +1553,7 @@ struct IRCDMessageCapab final
 					IRCD->CanTagMessage = true;
 			}
 
-			const auto &anoperegex = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+			const auto &anoperegex = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 			if (!anoperegex.empty() && !inspircdregex.empty() && anoperegex != inspircdregex)
 				Log() << "Warning: InspIRCd is using regex engine " << inspircdregex << ", but we have " << anoperegex << ". This may cause inconsistencies.";
 		}

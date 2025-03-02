@@ -515,8 +515,8 @@ public:
 			if (kd->floodsecs < 1)
 				kd->floodsecs = 10;
 
-			if (kd->floodsecs > Config->GetModule(me)->Get<time_t>("keepdata"))
-				kd->floodsecs = Config->GetModule(me)->Get<time_t>("keepdata");
+			if (kd->floodsecs > Config->GetModule(me).Get<time_t>("keepdata"))
+				kd->floodsecs = Config->GetModule(me).Get<time_t>("keepdata");
 
 			kd->flood = true;
 			if (kd->ttb[TTB_FLOOD])
@@ -913,7 +913,7 @@ public:
 
 	void purge()
 	{
-		time_t keepdata = Config->GetModule(me)->Get<time_t>("keepdata");
+		time_t keepdata = Config->GetModule(me).Get<time_t>("keepdata");
 		for (data_type::iterator it = data_map.begin(), it_end = data_map.end(); it != it_end;)
 		{
 			const Anope::string &user = it->first;
@@ -1299,7 +1299,7 @@ public:
 
 			/* Normalize the buffer */
 			Anope::string nbuf = Anope::NormalizeBuffer(realbuf);
-			bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
+			bool casesensitive = Config->GetModule("botserv").Get<bool>("casesensitive");
 
 			/* Normalize can return an empty string if this only contains control codes etc */
 			if (badwords && !nbuf.empty())
@@ -1368,7 +1368,7 @@ public:
 					if (mustkick)
 					{
 						check_ban(ci, u, kd, TTB_BADWORDS);
-						if (Config->GetModule(me)->Get<bool>("gentlebadwordreason"))
+						if (Config->GetModule(me).Get<bool>("gentlebadwordreason"))
 							bot_kick(ci, u, _("Watch your language!"));
 						else
 							bot_kick(ci, u, _("Don't use the word \"%s\" on this channel!"), bw->word.c_str());

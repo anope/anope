@@ -544,9 +544,9 @@ public:
 		LDAPServices.clear();
 	}
 
-	void OnReload(Configuration::Conf *config) override
+	void OnReload(Configuration::Conf &config) override
 	{
-		Configuration::Block *conf = config->GetModule(this);
+		Configuration::Block &conf = config.GetModule(this);
 
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end();)
 		{
@@ -556,11 +556,11 @@ public:
 
 			++it;
 
-			for (i = 0; i < conf->CountBlock("ldap"); ++i)
-				if (conf->GetBlock("ldap", i)->Get<const Anope::string>("name", "ldap/main") == cname)
+			for (i = 0; i < conf.CountBlock("ldap"); ++i)
+				if (conf.GetBlock("ldap", i).Get<const Anope::string>("name", "ldap/main") == cname)
 					break;
 
-			if (i == conf->CountBlock("ldap"))
+			if (i == conf.CountBlock("ldap"))
 			{
 				Log(LOG_NORMAL, "ldap") << "LDAP: Removing server connection " << cname;
 
@@ -572,17 +572,17 @@ public:
 			}
 		}
 
-		for (int i = 0; i < conf->CountBlock("ldap"); ++i)
+		for (int i = 0; i < conf.CountBlock("ldap"); ++i)
 		{
-			Configuration::Block *ldap = conf->GetBlock("ldap", i);
+			Configuration::Block &ldap = conf.GetBlock("ldap", i);
 
-			const Anope::string &connname = ldap->Get<const Anope::string>("name", "ldap/main");
+			const Anope::string &connname = ldap.Get<const Anope::string>("name", "ldap/main");
 
 			if (this->LDAPServices.find(connname) == this->LDAPServices.end())
 			{
-				const Anope::string &server = ldap->Get<const Anope::string>("server", "127.0.0.1");
-				const Anope::string &admin_binddn = ldap->Get<const Anope::string>("admin_binddn");
-				const Anope::string &admin_password = ldap->Get<const Anope::string>("admin_password");
+				const Anope::string &server = ldap.Get<const Anope::string>("server", "127.0.0.1");
+				const Anope::string &admin_binddn = ldap.Get<const Anope::string>("admin_binddn");
+				const Anope::string &admin_password = ldap.Get<const Anope::string>("admin_password");
 
 				try
 				{

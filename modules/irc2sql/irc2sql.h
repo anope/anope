@@ -61,7 +61,7 @@ public:
 	}
 
 	void OnShutdown() override;
-	void OnReload(Configuration::Conf *config) override;
+	void OnReload(Configuration::Conf &config) override;
 	void OnNewServer(Server *server) override;
 	void OnServerQuit(Server *server) override;
 	void OnUserConnect(User *u, bool &exempt) override;

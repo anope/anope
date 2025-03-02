@@ -38,7 +38,7 @@ class NSMaxEmail final
 
 	bool CheckLimitReached(CommandSource &source, const Anope::string &email)
 	{
-		int NSEmailMax = Config->GetModule(this)->Get<int>("maxemails");
+		int NSEmailMax = Config->GetModule(this).Get<int>("maxemails");
 
 		if (NSEmailMax < 1 || email.empty())
 			return false;
@@ -79,9 +79,9 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		clean = conf->GetModule(this)->Get<bool>("remove_aliases", "true");
+		clean = conf.GetModule(this).Get<bool>("remove_aliases", "true");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override

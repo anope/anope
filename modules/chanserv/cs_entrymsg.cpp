@@ -142,7 +142,7 @@ private:
 	{
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
-		if ((*messages)->size() >= Config->GetModule(this->owner)->Get<unsigned>("maxentries"))
+		if ((*messages)->size() >= Config->GetModule(this->owner).Get<unsigned>("maxentries"))
 			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
 		else
 		{

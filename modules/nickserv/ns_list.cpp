@@ -30,7 +30,7 @@ public:
 		bool is_servadmin = source.HasCommand("nickserv/list");
 		int count = 0, from = 0, to = 0;
 		bool suspended, nsnoexpire, unconfirmed;
-		unsigned listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
+		unsigned listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
 
 		suspended = nsnoexpire = unconfirmed = false;
 
@@ -164,7 +164,7 @@ public:
 				"    \002LIST #51-100\002\n"
 				"        Lists all registered nicks within the given range (51-100)."));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");

@@ -141,7 +141,7 @@ private:
 
 		if (IRCD->IsChannelValid(mask))
 		{
-			if (Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
+			if (Config->GetModule("chanserv").Get<bool>("disallow_channel_access"))
 			{
 				source.Reply(_("Channels may not be on access lists."));
 				return;
@@ -164,7 +164,7 @@ private:
 		else
 		{
 			na = NickAlias::Find(mask);
-			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+			if (!na && Config->GetModule("chanserv").Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
@@ -212,7 +212,7 @@ private:
 			}
 		}
 
-		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1000");
+		unsigned access_max = Config->GetModule("chanserv").Get<unsigned>("accessmax", "1000");
 		if (access_max && ci->GetDeepAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
@@ -618,32 +618,32 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		order.clear();
 		permissions.clear();
 
-		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
+		for (int i = 0; i < conf.CountBlock("privilege"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("privilege", i);
-			const Anope::string &pname = block->Get<const Anope::string>("name");
+			Configuration::Block &block = conf.GetBlock("privilege", i);
+			const Anope::string &pname = block.Get<const Anope::string>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &xop = block->Get<const Anope::string>("xop");
+			const Anope::string &xop = block.Get<const Anope::string>("xop");
 			if (pname.empty() || xop.empty())
 				continue;
 
 			permissions[xop].push_back(pname);
 		}
 
-		for (int i = 0; i < conf->CountBlock("command"); ++i)
+		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("command", i);
-			const Anope::string &cname = block->Get<const Anope::string>("name"),
-				&cserv = block->Get<const Anope::string>("command");
+			Configuration::Block &block = conf.GetBlock("command", i);
+			const Anope::string &cname = block.Get<const Anope::string>("name"),
+				&cserv = block.Get<const Anope::string>("command");
 			if (cname.empty() || cserv != "chanserv/xop")
 				continue;
 

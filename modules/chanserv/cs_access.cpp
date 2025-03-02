@@ -134,7 +134,7 @@ class CommandCSAccess final
 
 		if (IRCD->IsChannelValid(mask))
 		{
-			if (Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
+			if (Config->GetModule("chanserv").Get<bool>("disallow_channel_access"))
 			{
 				source.Reply(_("Channels may not be on access lists."));
 				return;
@@ -158,7 +158,7 @@ class CommandCSAccess final
 		{
 			na = NickAlias::Find(mask);
 
-			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+			if (!na && Config->GetModule("chanserv").Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
@@ -205,7 +205,7 @@ class CommandCSAccess final
 			}
 		}
 
-		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1000");
+		unsigned access_max = Config->GetModule("chanserv").Get<unsigned>("accessmax", "1000");
 		if (access_max && ci->GetDeepAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
@@ -601,7 +601,7 @@ public:
 				"may be a numerical level or the name of a privilege (eg AUTOOP).\n"
 				"When a user joins the channel the access they receive is from the\n"
 				"highest level entry in the access list."));
-		if (!Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
+		if (!Config->GetModule("chanserv").Get<bool>("disallow_channel_access"))
 			source.Reply(_("The given mask may also be a channel, which will use the\n"
 					"access list from the other channel up to the given \037level\037."));
 		source.Reply(" ");
@@ -878,21 +878,21 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		defaultLevels.clear();
 
-		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
+		for (int i = 0; i < conf.CountBlock("privilege"); ++i)
 		{
-			Configuration::Block *priv = conf->GetBlock("privilege", i);
+			Configuration::Block &priv = conf.GetBlock("privilege", i);
 
-			const Anope::string &pname = priv->Get<const Anope::string>("name");
+			const Anope::string &pname = priv.Get<const Anope::string>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &value = priv->Get<const Anope::string>("level");
+			const Anope::string &value = priv.Get<const Anope::string>("level");
 			if (value.empty())
 				continue;
 			else if (value.equals_ci("founder"))
@@ -900,7 +900,7 @@ public:
 			else if (value.equals_ci("disabled"))
 				defaultLevels[p->name] = ACCESS_INVALID;
 			else
-				defaultLevels[p->name] = priv->Get<int16_t>("level");
+				defaultLevels[p->name] = priv.Get<int16_t>("level");
 		}
 	}
 

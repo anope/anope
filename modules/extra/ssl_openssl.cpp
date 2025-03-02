@@ -144,12 +144,12 @@ public:
 		SSL_CTX_free(server_ctx);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
+		Configuration::Block &config = conf.GetModule(this);
 
-		this->certfile = Anope::ExpandConfig(config->Get<const Anope::string>("cert", "fullchain.pem"));
-		this->keyfile = Anope::ExpandConfig(config->Get<const Anope::string>("key", "privkey.pem"));
+		this->certfile = Anope::ExpandConfig(config.Get<const Anope::string>("cert", "fullchain.pem"));
+		this->keyfile = Anope::ExpandConfig(config.Get<const Anope::string>("key", "privkey.pem"));
 
 		if (Anope::IsFile(this->certfile))
 		{
@@ -177,7 +177,7 @@ public:
 		}
 
 		// Allow disabling old versions of TLS
-		if (config->Get<bool>("tlsv10", "false"))
+		if (config.Get<bool>("tlsv10", "false"))
 		{
 			SSL_CTX_clear_options(client_ctx, SSL_OP_NO_TLSv1);
 			SSL_CTX_clear_options(server_ctx, SSL_OP_NO_TLSv1);
@@ -188,7 +188,7 @@ public:
 			SSL_CTX_set_options(server_ctx, SSL_OP_NO_TLSv1);
 		}
 
-		if (config->Get<bool>("tlsv11", "true"))
+		if (config.Get<bool>("tlsv11", "true"))
 		{
 			SSL_CTX_clear_options(client_ctx, SSL_OP_NO_TLSv1_1);
 			SSL_CTX_clear_options(server_ctx, SSL_OP_NO_TLSv1_1);
@@ -199,7 +199,7 @@ public:
 			SSL_CTX_set_options(server_ctx, SSL_OP_NO_TLSv1_1);
 		}
 
-		if (config->Get<bool>("tlsv12", "true"))
+		if (config.Get<bool>("tlsv12", "true"))
 		{
 			SSL_CTX_clear_options(client_ctx, SSL_OP_NO_TLSv1_2);
 			SSL_CTX_clear_options(server_ctx, SSL_OP_NO_TLSv1_2);
@@ -213,9 +213,9 @@ public:
 
 	void OnPreServerConnect() override
 	{
-		Configuration::Block *config = Config->GetBlock("uplink", Anope::CurrentUplink);
+		Configuration::Block &config = Config->GetBlock("uplink", Anope::CurrentUplink);
 
-		if (config->Get<bool>("ssl"))
+		if (config.Get<bool>("ssl"))
 		{
 			this->service.Init(UplinkSock);
 		}

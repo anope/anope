@@ -204,7 +204,7 @@ private:
 	void DoAdd(CommandSource &source, NickCore *nc, Anope::string certfp)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
-		unsigned max = Config->GetModule(this->owner)->Get<unsigned>("max", "5");
+		unsigned max = Config->GetModule(this->owner).Get<unsigned>("max", "5");
 
 		if (cl->GetCertCount() >= max)
 		{
@@ -325,7 +325,7 @@ public:
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
-			else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
+			else if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
 			{
 				source.Reply(_("You may view but not modify the certificate list of other Services Operators."));
 				return;
@@ -401,7 +401,7 @@ public:
 		if (!nc || nc->HasExt("NS_SUSPENDED"))
 			return;
 
-		unsigned int maxlogins = Config->GetModule("ns_identify")->Get<unsigned int>("maxlogins");
+		unsigned int maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
 		if (maxlogins && nc->users.size() >= maxlogins)
 		{
 			u->SendMessage(NickServ, _("Account \002%s\002 has already reached the maximum number of simultaneous logins (%u)."), nc->display.c_str(), maxlogins);
@@ -420,7 +420,7 @@ public:
 
 	void OnNickRegister(User *u, NickAlias *na, const Anope::string &pass) override
 	{
-		if (!Config->GetModule(this)->Get<bool>("automatic", "yes") || !u || u->fingerprint.empty())
+		if (!Config->GetModule(this).Get<bool>("automatic", "yes") || !u || u->fingerprint.empty())
 			return;
 
 		auto *cl = certs.Require(na->nc);
@@ -437,7 +437,7 @@ public:
 		{
 			BotInfo *NickServ = Config->GetClient("NickServ");
 
-			unsigned int maxlogins = Config->GetModule("ns_identify")->Get<unsigned int>("maxlogins");
+			unsigned int maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
 			if (maxlogins && na->nc->users.size() >= maxlogins)
 			{
 				u->SendMessage(NickServ, _("Account \002%s\002 has already reached the maximum number of simultaneous logins (%u)."), na->nc->display.c_str(), maxlogins);

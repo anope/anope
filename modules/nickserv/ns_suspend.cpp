@@ -70,7 +70,7 @@ public:
 		const Anope::string &nick = params[0];
 		Anope::string expiry = params[1];
 		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("suspendexpire");
+		time_t expiry_secs = Config->GetModule(this->owner).Get<time_t>("suspendexpire");
 
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
@@ -98,7 +98,7 @@ public:
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && na->nc->IsServicesOper())
+		if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && na->nc->IsServicesOper())
 		{
 			source.Reply(_("You may not suspend other Services Operators' nicknames."));
 			return;
@@ -240,9 +240,9 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Anope::string s = conf->GetModule(this)->Get<Anope::string>("show");
+		Anope::string s = conf.GetModule(this).Get<Anope::string>("show");
 		commasepstream(s).GetTokens(show);
 		std::transform(show.begin(), show.end(), show.begin(), trim());
 	}

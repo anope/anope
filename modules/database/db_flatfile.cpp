@@ -109,7 +109,7 @@ class DBFlatFile final
 			last_day = tm->tm_mday;
 
 			std::set<Anope::string> dbs;
-			dbs.insert(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+			dbs.insert(Config->GetModule(this).Get<const Anope::string>("database", "anope.db"));
 
 			for (const auto &type_order : Serialize::Type::GetTypeOrder())
 			{
@@ -135,7 +135,7 @@ class DBFlatFile final
 					Anope::string err = Anope::LastError();
 					Log(this) << "Unable to back up database " << db << " (" << err << ")!";
 
-					if (!Config->GetModule(this)->Get<bool>("nobackupokay"))
+					if (!Config->GetModule(this).Get<bool>("nobackupokay"))
 					{
 						Anope::Quitting = true;
 						Anope::QuitReason = "Unable to back up database " + db + " (" + err + ")";
@@ -146,7 +146,7 @@ class DBFlatFile final
 
 				backups[db].push_back(newname);
 
-				unsigned keepbackups = Config->GetModule(this)->Get<unsigned>("keepbackups");
+				unsigned keepbackups = Config->GetModule(this).Get<unsigned>("keepbackups");
 				if (keepbackups > 0 && backups[db].size() > keepbackups)
 				{
 					unlink(backups[db].front().c_str());
@@ -200,7 +200,7 @@ public:
 
 		Log(this) << "Error saving databases: " << buf;
 
-		if (!Config->GetModule(this)->Get<bool>("nobackupokay"))
+		if (!Config->GetModule(this).Get<bool>("nobackupokay"))
 			Anope::Quitting = true;
 	}
 
@@ -208,7 +208,7 @@ public:
 	{
 		std::set<Anope::string> tried_dbs;
 
-		const auto db_name = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+		const auto db_name = Anope::ExpandData(Config->GetModule(this).Get<const Anope::string>("database", "anope.db"));
 
 		std::fstream fd(db_name.c_str(), std::ios_base::in | std::ios_base::binary);
 		if (!fd.is_open())
@@ -263,7 +263,7 @@ public:
 
 		int i = -1;
 #ifndef _WIN32
-		if (!Anope::Quitting && Config->GetModule(this)->Get<bool>("fork"))
+		if (!Anope::Quitting && Config->GetModule(this).Get<bool>("fork"))
 		{
 			i = fork();
 			if (i > 0)
@@ -290,7 +290,7 @@ public:
 				if (s_type->GetOwner())
 					db_name = Anope::ExpandData("module_" + s_type->GetOwner()->name + ".db");
 				else
-					db_name = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+					db_name = Anope::ExpandData(Config->GetModule(this).Get<const Anope::string>("database", "anope.db"));
 
 				std::fstream *fs = databases[s_type->GetOwner()] = new std::fstream((db_name + ".tmp").c_str(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
 
@@ -319,7 +319,7 @@ public:
 
 			for (auto &[mod, f] : databases)
 			{
-				const auto db_name = Anope::ExpandData((mod ? (mod->name + ".db") : Config->GetModule(this)->Get<const Anope::string>("database", "anope.db")));
+				const auto db_name = Anope::ExpandData((mod ? (mod->name + ".db") : Config->GetModule(this).Get<const Anope::string>("database", "anope.db")));
 
 				if (!f->is_open() || !f->good())
 				{
@@ -363,7 +363,7 @@ public:
 		if (stype->GetOwner())
 			db_name = Anope::ExpandData("module_" + stype->GetOwner()->name + ".db");
 		else
-			db_name = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+			db_name = Anope::ExpandData(Config->GetModule(this).Get<const Anope::string>("database", "anope.db"));
 
 		std::fstream fd(db_name.c_str(), std::ios_base::in | std::ios_base::binary);
 		if (!fd.is_open())

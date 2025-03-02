@@ -239,7 +239,7 @@ public:
 			}
 
 			NickAlias *target = NickAlias::Find(entry);
-			if (target != NULL && Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && target->nc->IsServicesOper())
+			if (target != NULL && Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && target->nc->IsServicesOper())
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -312,7 +312,7 @@ public:
 						BotInfo *OperServ = Config->GetClient("OperServ");
 						if (IRCD->CanSQLineChannel && OperServ)
 						{
-							time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "1m");
+							time_t inhabit = Config->GetModule("chanserv").Get<time_t>("inhabit", "1m");
 							XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
 							IRCD->SendSQLine(NULL, &x);
 						}
@@ -449,7 +449,7 @@ public:
 		source.Reply(_("Forbid allows you to forbid usage of certain nicknames, channels,\n"
 				"and email addresses. Wildcards are accepted for all entries."));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
@@ -513,7 +513,7 @@ public:
 			ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 			if (IRCD->CanSQLineChannel)
 			{
-				time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "1m");
+				time_t inhabit = Config->GetModule("chanserv").Get<time_t>("inhabit", "1m");
 				XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
 				IRCD->SendSQLine(NULL, &x);
 			}

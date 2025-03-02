@@ -154,8 +154,8 @@ public:
 			return;
 		}
 
-		time_t send_delay = Config->GetModule("memoserv")->Get<time_t>("senddelay");
-		if (Config->GetModule(this->owner)->Get<bool>("memooper") && send_delay > 0 && u && u->lastmemosend + send_delay > Anope::CurTime)
+		time_t send_delay = Config->GetModule("memoserv").Get<time_t>("senddelay");
+		if (Config->GetModule(this->owner).Get<bool>("memooper") && send_delay > 0 && u && u->lastmemosend + send_delay > Anope::CurTime)
 		{
 			auto waitperiod = (u->lastmemosend + send_delay) -  Anope::CurTime;
 			source.Reply(_("Please wait %s before requesting a new vhost."), Anope::Duration(waitperiod, source.GetAccount()).c_str());
@@ -213,7 +213,7 @@ public:
 			na->SetVHost(req->ident, req->host, source.GetNick(), req->time);
 			FOREACH_MOD(OnSetVHost, (na));
 
-			if (Config->GetModule(this->owner)->Get<bool>("memouser") && memoserv)
+			if (Config->GetModule(this->owner).Get<bool>("memouser") && memoserv)
 				memoserv->Send(source.service->nick, na->nick, _("[auto memo] Your requested vhost has been approved."), true);
 
 			source.Reply(_("VHost for %s has been activated."), na->nick.c_str());
@@ -229,7 +229,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Activate the requested vhost for the given nick."));
-		if (Config->GetModule(this->owner)->Get<bool>("memouser"))
+		if (Config->GetModule(this->owner).Get<bool>("memouser"))
 			source.Reply(_("A memo informing the user will also be sent."));
 
 		return true;
@@ -263,7 +263,7 @@ public:
 		{
 			na->Shrink<HostRequestImpl>("hostrequest");
 
-			if (Config->GetModule(this->owner)->Get<bool>("memouser") && memoserv)
+			if (Config->GetModule(this->owner).Get<bool>("memouser") && memoserv)
 			{
 				Anope::string message;
 				if (!reason.empty())
@@ -286,7 +286,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Reject the requested vhost for the given nick."));
-		if (Config->GetModule(this->owner)->Get<bool>("memouser"))
+		if (Config->GetModule(this->owner).Get<bool>("memouser"))
 			source.Reply(_("A memo informing the user will also be sent, which includes the reason for the rejection if supplied."));
 
 		return true;
@@ -305,7 +305,7 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		unsigned counter = 0;
-		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
+		unsigned display_counter = 0, listmax = Config->GetModule(this->owner).Get<unsigned>("listmax");
 		ListFormatter list(source.GetAccount());
 
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("VHost")).AddColumn(_("Created"));
@@ -380,7 +380,7 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 	else
 		host = vhost;
 
-	if (Config->GetModule(me)->Get<bool>("memooper") && memoserv)
+	if (Config->GetModule(me).Get<bool>("memooper") && memoserv)
 	{
 		for (auto *o : Oper::opers)
 		{

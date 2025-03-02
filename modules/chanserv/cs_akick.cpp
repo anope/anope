@@ -46,7 +46,7 @@ class CommandCSAKick final
 		const NickAlias *na = NickAlias::Find(mask);
 		NickCore *nc = NULL;
 		const AutoKick *akick;
-		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		unsigned reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
 
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
@@ -170,9 +170,9 @@ class CommandCSAKick final
 			}
 		}
 
-		if (ci->GetAkickCount() >= Config->GetModule(this->owner)->Get<unsigned>("autokickmax"))
+		if (ci->GetAkickCount() >= Config->GetModule(this->owner).Get<unsigned>("autokickmax"))
 		{
-			source.Reply(_("Sorry, you can only have %d autokick masks on a channel."), Config->GetModule(this->owner)->Get<unsigned>("autokickmax"));
+			source.Reply(_("Sorry, you can only have %d autokick masks on a channel."), Config->GetModule(this->owner).Get<unsigned>("autokickmax"));
 			return;
 		}
 
@@ -568,7 +568,7 @@ public:
 				reason = autokick->reason;
 				if (reason.empty())
 				{
-					reason = Language::Translate(u, Config->GetModule(this)->Get<const Anope::string>("autokickreason").c_str());
+					reason = Language::Translate(u, Config->GetModule(this).Get<const Anope::string>("autokickreason").c_str());
 					reason = reason.replace_all_cs("%n", u->nick)
 							.replace_all_cs("%c", c->name);
 				}

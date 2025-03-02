@@ -308,20 +308,20 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
+		Configuration::Block &block = conf.GetModule(this);
 		defaults.clear();
 
-		for (int i = 0; i < block->CountBlock("default"); ++i)
+		for (int i = 0; i < block.CountBlock("default"); ++i)
 		{
-			Configuration::Block *def = block->GetBlock("default", i);
+			Configuration::Block &def = block.GetBlock("default", i);
 
 			LogDefault ld;
 
-			ld.service = def->Get<const Anope::string>("service");
-			ld.command = def->Get<const Anope::string>("command");
-			ld.method = def->Get<const Anope::string>("method");
+			ld.service = def.Get<const Anope::string>("service");
+			ld.command = def.Get<const Anope::string>("command");
+			ld.method = def.Get<const Anope::string>("method");
 
 			defaults.push_back(ld);
 		}

@@ -150,12 +150,12 @@ public:
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
+		Configuration::Block &config = conf.GetModule(this);
 
-		this->engine = config->Get<const Anope::string>("engine");
-		this->query = config->Get<const Anope::string>("query");
+		this->engine = config.Get<const Anope::string>("engine");
+		this->query = config.Get<const Anope::string>("query");
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}

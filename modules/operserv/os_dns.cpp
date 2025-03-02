@@ -752,15 +752,15 @@ public:
 			delete dns_servers->at(i - 1);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		this->ttl = block->Get<time_t>("ttl");
-		this->user_drop_mark =  block->Get<int>("user_drop_mark");
-		this->user_drop_time = block->Get<time_t>("user_drop_time");
-		this->user_drop_readd_time = block->Get<time_t>("user_drop_readd_time");
-		this->remove_split_servers = block->Get<bool>("remove_split_servers");
-		this->readd_connected_servers = block->Get<bool>("readd_connected_servers");
+		Configuration::Block &block = conf.GetModule(this);
+		this->ttl = block.Get<time_t>("ttl");
+		this->user_drop_mark =  block.Get<int>("user_drop_mark");
+		this->user_drop_time = block.Get<time_t>("user_drop_time");
+		this->user_drop_readd_time = block.Get<time_t>("user_drop_readd_time");
+		this->remove_split_servers = block.Get<bool>("remove_split_servers");
+		this->readd_connected_servers = block.Get<bool>("readd_connected_servers");
 	}
 
 	void OnNewServer(Server *s) override

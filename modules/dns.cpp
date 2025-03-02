@@ -1045,23 +1045,23 @@ public:
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
+		Configuration::Block &block = conf.GetModule(this);
 
-		nameserver = block->Get<const Anope::string>("nameserver", "127.0.0.1");
-		timeout =  block->Get<time_t>("timeout", "5");
-		ip = block->Get<const Anope::string>("ip", "0.0.0.0");
-		port = block->Get<int>("port", "53");
-		admin = block->Get<const Anope::string>("admin", "admin@example.com");
-		nameservers = block->Get<const Anope::string>("nameservers", "ns1.example.com");
-		refresh = block->Get<int>("refresh", "3600");
+		nameserver = block.Get<const Anope::string>("nameserver", "127.0.0.1");
+		timeout =  block.Get<time_t>("timeout", "5");
+		ip = block.Get<const Anope::string>("ip", "0.0.0.0");
+		port = block.Get<int>("port", "53");
+		admin = block.Get<const Anope::string>("admin", "admin@example.com");
+		nameservers = block.Get<const Anope::string>("nameservers", "ns1.example.com");
+		refresh = block.Get<int>("refresh", "3600");
 
-		for (int i = 0; i < block->CountBlock("notify"); ++i)
+		for (int i = 0; i < block.CountBlock("notify"); ++i)
 		{
-			Configuration::Block *n = block->GetBlock("notify", i);
-			Anope::string nip = n->Get<Anope::string>("ip");
-			short nport = n->Get<short>("port");
+			Configuration::Block &n = block.GetBlock("notify", i);
+			Anope::string nip = n.Get<Anope::string>("ip");
+			short nport = n.Get<short>("port");
 
 			notify.emplace_back(nip, nport);
 		}

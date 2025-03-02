@@ -48,7 +48,7 @@ public:
 			return;
 		}
 
-		if (Config->GetModule(this->owner)->Get<bool>("operonly") && !source.IsServicesOper())
+		if (Config->GetModule(this->owner).Get<bool>("operonly") && !source.IsServicesOper())
 			source.Reply(ACCESS_DENIED);
 		else
 		{
@@ -58,7 +58,7 @@ public:
 			else if (result == MemoServService::MEMO_TOO_FAST)
 			{
 				auto lastmemosend = source.GetUser() ? source.GetUser()->lastmemosend : 0;
-				auto waitperiod = (lastmemosend + Config->GetModule("memoserv")->Get<unsigned long>("senddelay")) -  Anope::CurTime;
+				auto waitperiod = (lastmemosend + Config->GetModule("memoserv").Get<unsigned long>("senddelay")) -  Anope::CurTime;
 				source.Reply(_("Please wait %s before using the %s command again."), Anope::Duration(waitperiod, source.GetAccount()).c_str(), source.command.c_str());
 			}
 			else if (result == MemoServService::MEMO_TARGET_FULL)

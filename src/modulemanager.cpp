@@ -242,7 +242,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	/* Initialize config */
 	try
 	{
-		m->OnReload(Config);
+		m->OnReload(*Config);
 	}
 	catch (const ModuleException &ex)
 	{

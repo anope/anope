@@ -41,7 +41,7 @@ namespace Configuration
 		Block(const Anope::string &);
 		const Anope::string &GetName() const;
 		int CountBlock(const Anope::string &name) const;
-		const Block *GetBlock(const Anope::string &name, int num = 0) const;
+		const Block &GetBlock(const Anope::string &name, int num = 0) const;
 		Block *GetMutableBlock(const Anope::string &name, int num = 0);
 
 		template<typename T> T Get(const Anope::string &tag, const Anope::string &def = "") const
@@ -126,12 +126,12 @@ namespace Configuration
 		void LoadConf(File &file);
 		void Post(Conf *old);
 
-		Block *GetModule(const Module *);
-		Block *GetModule(const Anope::string &name);
+		Block &GetModule(const Module *);
+		Block &GetModule(const Anope::string &name);
 
 		BotInfo *GetClient(const Anope::string &name);
 
-		const Block *GetCommand(CommandSource &);
+		const Block &GetCommand(CommandSource &);
 	};
 
 	struct Uplink final

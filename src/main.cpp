@@ -167,8 +167,8 @@ int main(int ac, char **av, char **envp)
 
 	/* Set up timers */
 	time_t last_check = Anope::CurTime;
-	UpdateTimer updateTimer(Config->GetBlock("options")->Get<time_t>("updatetimeout", "2m"));
-	ExpireTimer expireTimer(Config->GetBlock("options")->Get<time_t>("expiretimeout", "30m"));
+	UpdateTimer updateTimer(Config->GetBlock("options").Get<time_t>("updatetimeout", "2m"));
+	ExpireTimer expireTimer(Config->GetBlock("options").Get<time_t>("expiretimeout", "30m"));
 
 	/*** Main loop. ***/
 	while (!Anope::Quitting)

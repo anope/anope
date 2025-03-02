@@ -250,7 +250,7 @@ public:
 
 	Anope::string GetAgent() override
 	{
-		Anope::string agent = Config->GetModule(Service::owner)->Get<Anope::string>("agent", "NickServ");
+		Anope::string agent = Config->GetModule(Service::owner).Get<Anope::string>("agent", "NickServ");
 		BotInfo *bi = Config->GetClient(agent);
 		if (bi)
 			agent = bi->GetUID();
@@ -326,7 +326,7 @@ public:
 			return;
 		}
 
-		const auto badpasslimit = Config->GetBlock("options")->Get<int>("badpasslimit");
+		const auto badpasslimit = Config->GetBlock("options").Get<int>("badpasslimit");
 		if (!badpasslimit)
 			return;
 
@@ -335,7 +335,7 @@ public:
 			it = badpasswords.emplace(session->uid, std::make_pair(0, 0)).first;
 		auto &[invalid_pw_time, invalid_pw_count] = it->second;
 
-		const auto badpasstimeout = Config->GetBlock("options")->Get<time_t>("badpasstimeout");
+		const auto badpasstimeout = Config->GetBlock("options").Get<time_t>("badpasstimeout");
 		if (badpasstimeout > 0 && invalid_pw_time > 0 && invalid_pw_time < Anope::CurTime - badpasstimeout)
 			invalid_pw_count = 0;
 
@@ -360,7 +360,7 @@ public:
 
 	void Tick() override
 	{
-		const auto badpasstimeout = Config->GetBlock("options")->Get<time_t>("badpasstimeout");
+		const auto badpasstimeout = Config->GetBlock("options").Get<time_t>("badpasstimeout");
 		for (auto it = badpasswords.begin(); it != badpasswords.end(); )
 		{
 			if (it->second.first + badpasstimeout < Anope::CurTime)

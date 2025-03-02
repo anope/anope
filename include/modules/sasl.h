@@ -121,7 +121,7 @@ namespace SASL
 			if (!na || na->nc->HasExt("NS_SUSPENDED") || na->nc->HasExt("UNCONFIRMED"))
 				return OnFail();
 
-			unsigned int maxlogins = Config->GetModule("ns_identify")->Get<unsigned int>("maxlogins");
+			unsigned int maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
 			if (maxlogins && na->nc->users.size() >= maxlogins)
 				return OnFail();
 

@@ -53,8 +53,8 @@ void Uplink::Connect()
 	Configuration::Uplink &u = Config->Uplinks[Anope::CurrentUplink];
 
 	new UplinkSocket();
-	if (!Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost").empty())
-		UplinkSock->Bind(Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost"));
+	if (!Config->GetBlock("serverinfo").Get<const Anope::string>("localhost").empty())
+		UplinkSock->Bind(Config->GetBlock("serverinfo").Get<const Anope::string>("localhost"));
 	FOREACH_MOD(OnPreServerConnect, ());
 	Anope::string ip = Anope::Resolve(u.host, u.protocol);
 	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u.host << " (" << ip << '/' << u.port << ") with protocol " << IRCD->GetProtocolName();
@@ -164,7 +164,7 @@ UplinkSocket::~UplinkSocket()
 	}
 	else if (!Anope::Quitting)
 	{
-		time_t retry = Config->GetBlock("options")->Get<time_t>("retrywait");
+		time_t retry = Config->GetBlock("options").Get<time_t>("retrywait");
 
 		Log() << "Disconnected, retrying in " << retry << " seconds";
 		new ReconnectTimer(retry);

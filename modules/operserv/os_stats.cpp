@@ -71,7 +71,7 @@ private:
 		{
 			/* AKILLs */
 			source.Reply(_("Current number of AKILLs: \002%zu\002"), akills->GetCount());
-			timeout = Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d") + 59;
+			timeout = Config->GetModule("operserv").Get<time_t>("autokillexpiry", "30d") + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default AKILL expiry time: \002%d days\002"), timeout / 86400);
 			else if (timeout >= 86400)
@@ -91,7 +91,7 @@ private:
 		{
 			/* SNLINEs */
 			source.Reply(_("Current number of SNLINEs: \002%zu\002"), snlines->GetCount());
-			timeout = Config->GetModule("operserv")->Get<time_t>("snlineexpiry", "30d") + 59;
+			timeout = Config->GetModule("operserv").Get<time_t>("snlineexpiry", "30d") + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default SNLINE expiry time: \002%d days\002"), timeout / 86400);
 			else if (timeout >= 86400)
@@ -111,7 +111,7 @@ private:
 		{
 			/* SQLINEs */
 			source.Reply(_("Current number of SQLINEs: \002%zu\002"), sqlines->GetCount());
-			timeout = Config->GetModule("operserv")->Get<time_t>("sglineexpiry", "30d") + 59;
+			timeout = Config->GetModule("operserv").Get<time_t>("sglineexpiry", "30d") + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default SQLINE expiry time: \002%d days\002"), timeout / 86400);
 			else if (timeout >= 86400)

@@ -336,7 +336,7 @@ class CommandCSMode final
 							continue;
 						}
 
-						if (modelocks->GetMLock().size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "50"))
+						if (modelocks->GetMLock().size() >= Config->GetModule(this->owner).Get<unsigned>("max", "50"))
 						{
 							source.Reply(_("The mode lock list of \002%s\002 is full."), ci->name.c_str());
 							continue;
@@ -946,22 +946,22 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		modes.clear();
 
-		for (int i = 0; i < conf->CountBlock("command"); ++i)
+		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("command", i);
+			Configuration::Block &block = conf.GetBlock("command", i);
 
-			const Anope::string &cname = block->Get<const Anope::string>("name"),
-					&cmd = block->Get<const Anope::string>("command");
+			const Anope::string &cname = block.Get<const Anope::string>("name"),
+					&cmd = block.Get<const Anope::string>("command");
 
 			if (cname.empty() || cmd != "chanserv/modes")
 				continue;
 
-			const Anope::string &set = block->Get<const Anope::string>("set"),
-					&unset = block->Get<const Anope::string>("unset");
+			const Anope::string &set = block.Get<const Anope::string>("set"),
+					&unset = block.Get<const Anope::string>("unset");
 
 			if (set.empty() && unset.empty())
 				continue;
@@ -1024,7 +1024,7 @@ public:
 	{
 		ModeLocks *ml = modelocks.Require(ci);
 		Anope::string mlock;
-		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("mlock", "+nt"));
+		spacesepstream sep(Config->GetModule(this).Get<const Anope::string>("mlock", "+nt"));
 		if (sep.GetToken(mlock))
 		{
 			bool add = true;

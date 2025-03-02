@@ -79,7 +79,7 @@ private:
 			sep.GetToken(mask);
 		}
 
-		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d");
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv").Get<time_t>("autokillexpiry", "30d");
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -124,7 +124,7 @@ private:
 
 		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
 		{
-			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+			const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 
 			if (regexengine.empty())
 			{
@@ -155,7 +155,7 @@ private:
 		if (targ)
 			mask = "*@" + targ->host;
 
-		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+		if (Config->GetModule("operserv").Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
 		if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
@@ -170,7 +170,7 @@ private:
 		}
 
 		auto *x = new XLine(mask, source.GetNick(), expires, reason);
-		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+		if (Config->GetModule("operserv").Get<bool>("akillids"))
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
@@ -202,7 +202,7 @@ private:
 		}
 
 		akills->AddXLine(x);
-		if (Config->GetModule("operserv")->Get<bool>("akillonadd"))
+		if (Config->GetModule("operserv").Get<bool>("akillonadd"))
 			akills->Send(NULL, x);
 
 		source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
@@ -362,7 +362,7 @@ private:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Expires"));
-		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+		if (Config->GetModule("operserv").Get<bool>("akillids"))
 			list.AddColumn(_("ID"));
 		list.AddColumn(_("Reason"));
 
@@ -443,7 +443,7 @@ public:
 				"be given, even if it is the same as the default. The\n"
 				"current AKILL default expiry time can be found with the\n"
 				"\002STATS AKILL\002 command."));
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");

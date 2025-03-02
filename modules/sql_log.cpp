@@ -20,10 +20,10 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
-		this->table = config->Get<const Anope::string>("table", "logs");
+		Configuration::Block &config = conf.GetModule(this);
+		this->table = config.Get<const Anope::string>("table", "logs");
 	}
 
 	void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) override

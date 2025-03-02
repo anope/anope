@@ -279,12 +279,12 @@ public:
 		xmlrpc_term();
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		if (httpref)
 			httpref->UnregisterPage(&xmlrpcinterface);
 
-		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf->GetModule(this)->Get<const Anope::string>("server", "httpd/main"));
+		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf.GetModule(this).Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)
 			throw ConfigException("Unable to find http reference, is httpd loaded?");
 

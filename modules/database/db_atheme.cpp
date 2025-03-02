@@ -500,7 +500,7 @@ private:
 		else
 		{
 			// Generate a new password as we can't use the old one.
-			auto maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
+			auto maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
 			Anope::Encrypt(Anope::Random(maxpasslen), nc->pass);
 			Log(this) << "Unable to convert the password for " << nc->display << " as Anope does not support the format!";
 		}
@@ -1076,8 +1076,8 @@ private:
 			if (!data->kill)
 				return true; // Don't apply this.
 
-			auto kill = Config->GetModule("nickserv")->Get<time_t>("kill", "60s");
-			auto killquick = Config->GetModule("nickserv")->Get<time_t>("killquick", "20s");
+			auto kill = Config->GetModule("nickserv").Get<time_t>("kill", "60s");
+			auto killquick = Config->GetModule("nickserv").Get<time_t>("killquick", "20s");
 			auto secs = Anope::Convert<time_t>(value, kill);
 			if (secs >= kill)
 				nc->Extend<bool>("KILLPROTECT");
@@ -1295,7 +1295,7 @@ private:
 
 		// If an Atheme account was awaiting confirmation but Anope is not
 		// configured to use confirmation then autoconfirm it.
-		const auto &nsregister = Config->GetModule("ns_register")->Get<const Anope::string>("registration");
+		const auto &nsregister = Config->GetModule("ns_register").Get<const Anope::string>("registration");
 		if (nsregister.equals_ci("none"))
 			nc->Shrink<bool>("UNCONFIRMED");
 
@@ -1453,14 +1453,14 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		flags.clear();
 		for (int i = 0; i < Config->CountBlock("privilege"); ++i)
 		{
-			Configuration::Block *priv = Config->GetBlock("privilege", i);
-			const Anope::string &name = priv->Get<const Anope::string>("name");
-			const Anope::string &value = priv->Get<const Anope::string>("flag");
+			Configuration::Block &priv = Config->GetBlock("privilege", i);
+			const Anope::string &name = priv.Get<const Anope::string>("name");
+			const Anope::string &value = priv.Get<const Anope::string>("flag");
 			if (!name.empty() && !value.empty())
 				flags[name] = value[0];
 		}
@@ -1468,7 +1468,7 @@ public:
 
 	EventReturn OnLoadDatabase() override
 	{
-		const auto dbname = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "atheme.db"));
+		const auto dbname = Anope::ExpandData(Config->GetModule(this).Get<const Anope::string>("database", "atheme.db"));
 		std::ifstream fd(dbname.str());
 		if (!fd.is_open())
 		{

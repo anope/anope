@@ -138,7 +138,7 @@ public:
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
+		if (Config->GetModule("nickserv").Get<bool>("restrictopernicks"))
 		{
 			for (auto *o : Oper::opers)
 			{
@@ -151,8 +151,8 @@ public:
 		}
 
 		NickAlias *target, *na = NickAlias::Find(source.GetNick());
-		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
-		unsigned maxaliases = Config->GetModule(this->owner)->Get<unsigned>("maxaliases");
+		time_t reg_delay = Config->GetModule("nickserv").Get<time_t>("regdelay");
+		unsigned maxaliases = Config->GetModule(this->owner).Get<unsigned>("maxaliases");
 		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (user && Anope::CurTime < user->lastnickreg + reg_delay)
@@ -165,7 +165,7 @@ public:
 			Log(LOG_COMMAND, source, this) << "and tried to group to SUSPENDED nick " << target->nick;
 			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
 		}
-		else if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
+		else if (na && Config->GetModule(this->owner).Get<bool>("nogroupchange"))
 			source.Reply(_("Your nick is already registered."));
 		else if (na && *target->nc == *na->nc)
 			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
@@ -336,8 +336,8 @@ public:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
-		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire", "90d"),
-		       unconfirmed_expire = Config->GetModule("ns_register")->Get<time_t>("unconfirmedexpire", "1d");
+		time_t nickserv_expire = Config->GetModule("nickserv").Get<time_t>("expire", "90d"),
+		       unconfirmed_expire = Config->GetModule("ns_register").Get<time_t>("unconfirmedexpire", "1d");
 		for (auto *na2 : *nc->aliases)
 		{
 			Anope::string expires;
@@ -398,7 +398,7 @@ public:
 	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsgroup(this), commandnsungroup(this), commandnsglist(this)
 	{
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 	}
 };

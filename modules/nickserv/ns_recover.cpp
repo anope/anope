@@ -71,7 +71,7 @@ public:
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->display;
 			}
 
-			if (Config->GetModule("ns_recover")->Get<bool>("restoreonrecover"))
+			if (Config->GetModule("ns_recover").Get<bool>("restoreonrecover"))
 			{
 				if (!u->chans.empty())
 				{
@@ -239,14 +239,14 @@ public:
 		commandnsrecover(this), recover(this, "recover"), svsnick(this, "svsnick")
 	{
 
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &oldnick) override
 	{
-		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
+		if (Config->GetModule(this).Get<bool>("restoreonrecover"))
 		{
 			NSRecoverInfo *ei = recover.Get(u);
 			BotInfo *NickServ = Config->GetClient("NickServ");
@@ -281,7 +281,7 @@ public:
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
+		if (Config->GetModule(this).Get<bool>("restoreonrecover"))
 		{
 			NSRecoverInfo *ei = recover.Get(u);
 

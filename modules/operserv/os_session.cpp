@@ -591,21 +591,21 @@ public:
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = Config->GetModule(this);
+		Configuration::Block &block = Config->GetModule(this);
 
-		session_limit = block->Get<int>("defaultsessionlimit");
-		max_session_kill = block->Get<int>("maxsessionkill");
-		session_autokill_expiry = block->Get<time_t>("sessionautokillexpiry");
-		sle_reason = block->Get<const Anope::string>("sessionlimitexceeded");
-		sle_detailsloc = block->Get<const Anope::string>("sessionlimitdetailsloc");
+		session_limit = block.Get<int>("defaultsessionlimit");
+		max_session_kill = block.Get<int>("maxsessionkill");
+		session_autokill_expiry = block.Get<time_t>("sessionautokillexpiry");
+		sle_reason = block.Get<const Anope::string>("sessionlimitexceeded");
+		sle_detailsloc = block.Get<const Anope::string>("sessionlimitdetailsloc");
 
-		max_exception_limit = block->Get<int>("maxsessionlimit");
-		exception_expiry = block->Get<time_t>("exceptionexpiry");
+		max_exception_limit = block.Get<int>("maxsessionlimit");
+		exception_expiry = block.Get<time_t>("exceptionexpiry");
 
-		ipv4_cidr = block->Get<unsigned>("session_ipv4_cidr", "32");
-		ipv6_cidr = block->Get<unsigned>("session_ipv6_cidr", "128");
+		ipv4_cidr = block.Get<unsigned>("session_ipv4_cidr", "32");
+		ipv6_cidr = block.Get<unsigned>("session_ipv6_cidr", "128");
 
 		if (ipv4_cidr > 32 || ipv6_cidr > 128)
 			throw ConfigException(this->name + ": session CIDR value out of range");

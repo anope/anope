@@ -148,7 +148,7 @@ public:
 
 			OperInfos *oi = e->Require<OperInfos>("operinfo");
 
-			if ((*oi)->size() >= Config->GetModule(this->module)->Get<unsigned>("max", "10"))
+			if ((*oi)->size() >= Config->GetModule(this->module).Get<unsigned>("max", "10"))
 			{
 				source.Reply(_("The oper info list for \002%s\002 is full."), target.c_str());
 				return;

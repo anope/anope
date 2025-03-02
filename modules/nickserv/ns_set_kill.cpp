@@ -30,7 +30,7 @@ public:
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;
@@ -67,7 +67,7 @@ public:
 		}
 		else if (param.equals_ci("IMMED"))
 		{
-			if (Config->GetModule(this->owner)->Get<bool>("allowkillimmed"))
+			if (Config->GetModule(this->owner).Get<bool>("allowkillimmed"))
 			{
 				nc->Extend<bool>("KILLPROTECT");
 				nc->Shrink<bool>("KILL_QUICK");

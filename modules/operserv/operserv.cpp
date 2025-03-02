@@ -216,9 +216,9 @@ public:
 		XLineManager::UnregisterXLineManager(&snlines);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		const Anope::string &osnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &osnick = conf.GetModule(this).Get<const Anope::string>("client");
 
 		if (osnick.empty())
 			throw ConfigException(this->name + ": <client> must be defined");
@@ -232,7 +232,7 @@ public:
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) override
 	{
-		if (bi == OperServ && !u->HasMode("OPER") && Config->GetModule(this)->Get<bool>("opersonly"))
+		if (bi == OperServ && !u->HasMode("OPER") && Config->GetModule(this).Get<bool>("opersonly"))
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
 			Log(bi, "bados") << "Denied access to " << bi->nick << " from " << u->GetMask() << " (non-oper)";

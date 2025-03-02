@@ -171,10 +171,10 @@ public:
 		this->updated_items.clear();
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		this->redis = ServiceReference<Provider>("Redis::Provider", block->Get<const Anope::string>("engine", "redis/main"));
+		Configuration::Block &block = conf.GetModule(this);
+		this->redis = ServiceReference<Provider>("Redis::Provider", block.Get<const Anope::string>("engine", "redis/main"));
 	}
 
 	EventReturn OnLoadDatabase() override

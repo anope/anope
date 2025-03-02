@@ -222,7 +222,7 @@ namespace
 	void HandleUnknownCommand(CommandSource& source, const Anope::string &message)
 	{
 		// Try to find a similar command.
-		size_t distance = Config->GetBlock("options")->Get<size_t>("didyoumeandifference", "4");
+		size_t distance = Config->GetBlock("options").Get<size_t>("didyoumeandifference", "4");
 		Anope::string similar;
 		auto umessage = message.upper();
 		for (const auto &[command, info] : source.service->commands)

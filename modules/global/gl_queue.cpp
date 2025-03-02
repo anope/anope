@@ -69,7 +69,7 @@ private:
 			return;
 		}
 
-		auto maxqueue = Config->GetModule(this->module)->Get<size_t>("maxqueue", "10");
+		auto maxqueue = Config->GetModule(this->module).Get<size_t>("maxqueue", "10");
 		if (global->CountQueue(source.nc) >= maxqueue)
 		{
 			source.Reply(_("You can not queue any more messages."));

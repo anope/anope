@@ -77,7 +77,7 @@ private:
 		 *
 		 * Rob
 		 **/
-		bool super_admin = Config->GetModule(this->owner)->Get<bool>("superadmin");
+		bool super_admin = Config->GetModule(this->owner).Get<bool>("superadmin");
 		if (!super_admin)
 			source.Reply(_("Super admin can not be set because it is not enabled in the configuration."));
 		else if (setting.equals_ci("ON"))

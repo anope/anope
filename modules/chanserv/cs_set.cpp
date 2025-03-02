@@ -36,8 +36,8 @@ public:
 			" \n"
 			"Available options:"));
 		Anope::string this_name = source.command;
-		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
-		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
+		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options").Get<bool>("hideregisteredcommands");
 		for (const auto &[c_name, info] : source.service->commands)
 		{
 			if (c_name.find_ci(this_name + " ") == 0)
@@ -301,7 +301,7 @@ public:
 		}
 
 		NickCore *nc = na->nc;
-		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
+		unsigned max_reg = Config->GetModule("chanserv").Get<unsigned>("maxregistered");
 		if (max_reg && nc->channelcount >= max_reg && !source.HasPriv("chanserv/no-register-limit"))
 		{
 			source.Reply(_("\002%s\002 has too many channels registered."), na->nick.c_str());
@@ -461,8 +461,8 @@ public:
 
 inline static Anope::string BotModes()
 {
-	return Config->GetModule("botserv")->Get<Anope::string>("botmodes",
-		Config->GetModule("chanserv")->Get<Anope::string>("botmodes", "o")
+	return Config->GetModule("botserv").Get<Anope::string>("botmodes",
+		Config->GetModule("chanserv").Get<Anope::string>("botmodes", "o")
 	);
 }
 
@@ -969,7 +969,7 @@ public:
 				"access list (with the highest access, if applicable) will\n"
 				"become the new founder, but if the access list is empty, the\n"
 				"channel will be dropped."));
-		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
+		unsigned max_reg = Config->GetModule("chanserv").Get<unsigned>("maxregistered");
 		if (max_reg)
 		{
 			source.Reply(" ");
@@ -1133,14 +1133,14 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		persist_lower_ts = conf->GetModule(this)->Get<bool>("persist_lower_ts");
+		persist_lower_ts = conf.GetModule(this).Get<bool>("persist_lower_ts");
 	}
 
 	void OnCreateChan(ChannelInfo *ci) override
 	{
-		ci->bantype = Config->GetModule(this)->Get<int>("defbantype", "2");
+		ci->bantype = Config->GetModule(this).Get<int>("defbantype", "2");
 	}
 
 	void OnChannelSync(Channel *c) override

@@ -61,9 +61,9 @@ public:
 		return q->size();
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		const auto glnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const auto glnick = conf.GetModule(this).Get<const Anope::string>("client");
 		if (glnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
 
@@ -76,21 +76,21 @@ public:
 
 	void OnRestart() override
 	{
-		const auto msg = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
+		const auto msg = Config->GetModule(this).Get<const Anope::string>("globaloncycledown");
 		if (!msg.empty())
 			this->SendSingle(msg, nullptr, nullptr, nullptr);
 	}
 
 	void OnShutdown() override
 	{
-		const auto msg = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
+		const auto msg = Config->GetModule(this).Get<const Anope::string>("globaloncycledown");
 		if (!msg.empty())
 			this->SendSingle(msg, nullptr, nullptr, nullptr);
 	}
 
 	void OnNewServer(Server *s) override
 	{
-		const auto msg = Config->GetModule(this)->Get<const Anope::string>("globaloncycleup");
+		const auto msg = Config->GetModule(this).Get<const Anope::string>("globaloncycleup");
 		if (!msg.empty() && !Me->IsSynced())
 			s->Notice(global, msg);
 	}
@@ -138,7 +138,7 @@ public:
 			return false;
 
 		Anope::string line;
-		if (source && !Config->GetModule(this)->Get<bool>("anonymousglobal"))
+		if (source && !Config->GetModule(this).Get<bool>("anonymousglobal"))
 		{
 			// A source is available and they're not anonymous.
 			line = Anope::printf("[%s] %s", source->GetNick().c_str(), message.c_str());

@@ -237,7 +237,7 @@ void MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 	if (s != Me)
 		return;
 
-	auto motdfile = Anope::ExpandConfig(Config->GetBlock("serverinfo")->Get<const Anope::string>("motd"));
+	auto motdfile = Anope::ExpandConfig(Config->GetBlock("serverinfo").Get<const Anope::string>("motd"));
 	std::ifstream stream(motdfile.str());
 	if (!stream.is_open())
 	{
@@ -405,7 +405,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 		case 'o':
 		case 'O':
 			/* Check whether the user is an operator */
-			if (!u->HasMode("OPER") && Config->GetBlock("options")->Get<bool>("hidestatso"))
+			if (!u->HasMode("OPER") && Config->GetBlock("options").Get<bool>("hidestatso"))
 				IRCD->SendNumeric(RPL_STATSLINKINFO, source.GetSource(), params[0][0], "End of /STATS report.");
 			else
 			{
@@ -473,7 +473,7 @@ void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params,
 		IRCD->SendNumeric(RPL_WHOISUSER, source.GetSource(), u->nick, u->GetIdent(), u->host, '*', u->realname);
 		if (bi)
 			IRCD->SendNumeric(RPL_WHOISREGNICK, source.GetSource(), bi->nick, "is a registered nick");
-		IRCD->SendNumeric(RPL_WHOISSERVER, source.GetSource(), u->nick, Me->GetName(), Config->GetBlock("serverinfo")->Get<const Anope::string>("description"));
+		IRCD->SendNumeric(RPL_WHOISSERVER, source.GetSource(), u->nick, Me->GetName(), Config->GetBlock("serverinfo").Get<const Anope::string>("description"));
 		if (bi)
 			IRCD->SendNumeric(RPL_WHOISIDLE, source.GetSource(), bi->nick, Anope::CurTime - bi->lastmsg, bi->signon, "seconds idle, signon time");
 		IRCD->SendNumeric(RPL_WHOISOPERATOR, source.GetSource(), u->nick, "is a Network Service");

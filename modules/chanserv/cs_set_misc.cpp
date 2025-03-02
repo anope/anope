@@ -187,27 +187,27 @@ public:
 			delete item;
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		descriptions.clear();
 		numerics.clear();
 
-		for (int i = 0; i < conf->CountBlock("command"); ++i)
+		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("command", i);
+			Configuration::Block &block = conf.GetBlock("command", i);
 
-			if (block->Get<const Anope::string>("command") != "chanserv/set/misc")
+			if (block.Get<const Anope::string>("command") != "chanserv/set/misc")
 				continue;
 
-			Anope::string cname = block->Get<const Anope::string>("name");
-			Anope::string desc = block->Get<const Anope::string>("misc_description");
+			Anope::string cname = block.Get<const Anope::string>("name");
+			Anope::string desc = block.Get<const Anope::string>("misc_description");
 
 			if (cname.empty() || desc.empty())
 				continue;
 
 			descriptions[cname] = desc;
 
-			auto numeric = block->Get<unsigned>("misc_numeric");
+			auto numeric = block.Get<unsigned>("misc_numeric");
 			if (numeric >= 1 && numeric <= 999)
 				numerics["cs_set_misc:" + GetAttribute(cname)] = numeric;
 		}

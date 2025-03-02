@@ -22,9 +22,9 @@ public:
 			throw ModuleException("Your IRCd does not support vhosts");
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		const Anope::string &hsnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &hsnick = conf.GetModule(this).Get<const Anope::string>("client");
 
 		if (hsnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
@@ -81,7 +81,7 @@ public:
 
 	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
-		if (mname == "OPER" && Config->GetModule(this)->Get<bool>("activate_on_deoper", "yes"))
+		if (mname == "OPER" && Config->GetModule(this).Get<bool>("activate_on_deoper", "yes"))
 			this->OnUserLogin(u);
 	}
 
@@ -95,7 +95,7 @@ public:
 
 	void OnSetVHost(NickAlias *na) override
 	{
-		if (Config->GetModule(this)->Get<bool>("activate_on_set", "yes"))
+		if (Config->GetModule(this).Get<bool>("activate_on_set", "yes"))
 		{
 			User *u = User::Find(na->nick);
 
@@ -120,7 +120,7 @@ public:
 
 	void OnDeleteVHost(NickAlias *na) override
 	{
-		if (Config->GetModule(this)->Get<bool>("activate_on_set", "yes"))
+		if (Config->GetModule(this).Get<bool>("activate_on_set", "yes"))
 		{
 			User *u = User::Find(na->nick);
 

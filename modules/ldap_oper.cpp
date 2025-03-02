@@ -92,15 +92,15 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = Config->GetModule(this);
+		Configuration::Block &config = Config->GetModule(this);
 
-		this->binddn = config->Get<const Anope::string>("binddn");
-		this->password = config->Get<const Anope::string>("password");
-		this->basedn = config->Get<const Anope::string>("basedn");
-		this->filter = config->Get<const Anope::string>("filter");
-		opertype_attribute = config->Get<const Anope::string>("opertype_attribute");
+		this->binddn = config.Get<const Anope::string>("binddn");
+		this->password = config.Get<const Anope::string>("password");
+		this->basedn = config.Get<const Anope::string>("basedn");
+		this->filter = config.Get<const Anope::string>("filter");
+		opertype_attribute = config.Get<const Anope::string>("opertype_attribute");
 
 		for (const auto *oper : my_opers)
 			delete oper;

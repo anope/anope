@@ -77,7 +77,7 @@ public:
 		reason = reason.replace_all_cs("%h", user->host);
 		reason = reason.replace_all_cs("%i", addr);
 		reason = reason.replace_all_cs("%r", reply ? reply->reason : "");
-		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
 
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		Log(creator, "dnsbl", OperServ) << user->GetMask() << " (" << addr << ") appears in " << this->blacklist.name;
@@ -110,33 +110,33 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		this->check_on_connect = block->Get<bool>("check_on_connect");
-		this->check_on_netburst = block->Get<bool>("check_on_netburst");
-		this->add_to_akill = block->Get<bool>("add_to_akill", "yes");
+		Configuration::Block &block = conf.GetModule(this);
+		this->check_on_connect = block.Get<bool>("check_on_connect");
+		this->check_on_netburst = block.Get<bool>("check_on_netburst");
+		this->add_to_akill = block.Get<bool>("add_to_akill", "yes");
 
 		this->blacklists.clear();
-		for (int i = 0; i < block->CountBlock("blacklist"); ++i)
+		for (int i = 0; i < block.CountBlock("blacklist"); ++i)
 		{
-			Configuration::Block *bl = block->GetBlock("blacklist", i);
+			Configuration::Block &bl = block.GetBlock("blacklist", i);
 			Blacklist blacklist;
 
-			blacklist.name = bl->Get<Anope::string>("name");
+			blacklist.name = bl.Get<Anope::string>("name");
 			if (blacklist.name.empty())
 				continue;
-			blacklist.bantime = bl->Get<time_t>("time", "4h");
-			blacklist.reason = bl->Get<Anope::string>("reason");
+			blacklist.bantime = bl.Get<time_t>("time", "4h");
+			blacklist.reason = bl.Get<Anope::string>("reason");
 
-			for (int j = 0; j < bl->CountBlock("reply"); ++j)
+			for (int j = 0; j < bl.CountBlock("reply"); ++j)
 			{
-				Configuration::Block *reply = bl->GetBlock("reply", j);
+				Configuration::Block &reply = bl.GetBlock("reply", j);
 				Blacklist::Reply r;
 
-				r.code = reply->Get<int>("code");
-				r.reason = reply->Get<Anope::string>("reason");
-				r.allow_account = reply->Get<bool>("allow_account");
+				r.code = reply.Get<int>("code");
+				r.reason = reply.Get<Anope::string>("reason");
+				r.allow_account = reply.Get<bool>("allow_account");
 
 				blacklist.replies.push_back(r);
 			}
@@ -145,10 +145,10 @@ public:
 		}
 
 		this->exempts.clear();
-		for (int i = 0; i < block->CountBlock("exempt"); ++i)
+		for (int i = 0; i < block.CountBlock("exempt"); ++i)
 		{
-			Configuration::Block *bl = block->GetBlock("exempt", i);
-			this->exempts.insert(bl->Get<Anope::string>("ip"));
+			Configuration::Block &bl = block.GetBlock("exempt", i);
+			this->exempts.insert(bl.Get<Anope::string>("ip"));
 		}
 	}
 

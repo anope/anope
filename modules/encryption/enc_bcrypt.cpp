@@ -165,11 +165,11 @@ public:
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		auto *block = conf->GetModule(this);
+		auto &block = conf.GetModule(this);
 
-		auto rounds = block->Get<unsigned long>("rounds", "10");
+		auto rounds = block.Get<unsigned long>("rounds", "10");
 		if (rounds < 10 || rounds > 32)
 		{
 			Log(this) << "Bcrypt rounds MUST be between 10 and 32 inclusive; using 10 instead of " << rounds << '.';

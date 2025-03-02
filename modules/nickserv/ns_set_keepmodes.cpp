@@ -191,7 +191,7 @@ public:
 	{
 		if (keep_modes.HasExt(u->Account()))
 		{
-			const auto norestore = Config->GetModule(this)->Get<const Anope::string>("norestore");
+			const auto norestore = Config->GetModule(this).Get<const Anope::string>("norestore");
 			User::ModeList modes = u->Account()->last_modes;
 			for (const auto &[last_mode, last_value] : modes)
 			{

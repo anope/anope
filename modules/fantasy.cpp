@@ -76,7 +76,7 @@ public:
 				"Note that users wanting to use fantasy commands\n"
 				"MUST have enough access for both the FANTASY\n"
 				"privilege and the command they are executing."),
-				Config->GetModule(this->owner)->Get<const Anope::string>("fantasycharacter", "!").c_str());
+				Config->GetModule(this->owner).Get<const Anope::string>("fantasycharacter", "!").c_str());
 		return true;
 	}
 };
@@ -109,7 +109,7 @@ public:
 			return;
 
 		Anope::string normalized_param0 = Anope::NormalizeBuffer(params[0]);
-		Anope::string fantasy_chars = Config->GetModule(this)->Get<Anope::string>("fantasycharacter", "!");
+		Anope::string fantasy_chars = Config->GetModule(this).Get<Anope::string>("fantasycharacter", "!");
 
 		if (!normalized_param0.find(c->ci->bi->nick))
 		{

@@ -51,7 +51,7 @@ public:
 			}
 		}
 
-		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
+		unsigned display_counter = 0, listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("VHost")).AddColumn(_("Creator")).AddColumn(_("Created"));
 

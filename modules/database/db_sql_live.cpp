@@ -37,7 +37,7 @@ private:
 		}
 		else
 		{
-			if (Anope::CurTime - Config->GetBlock("options")->Get<time_t>("updatetimeout", "2m") > lastwarn)
+			if (Anope::CurTime - Config->GetBlock("options").Get<time_t>("updatetimeout", "2m") > lastwarn)
 			{
 				Log() << "Unable to locate SQL reference, going to readonly...";
 				Anope::ReadOnly = this->ro = true;
@@ -138,11 +138,11 @@ public:
 		init = false;
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		this->SQL = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
-		this->prefix = block->Get<const Anope::string>("prefix", "anope_db_");
+		Configuration::Block &block = conf.GetModule(this);
+		this->SQL = ServiceReference<Provider>("SQL::Provider", block.Get<const Anope::string>("engine"));
+		this->prefix = block.Get<const Anope::string>("prefix", "anope_db_");
 	}
 
 	void OnSerializableConstruct(Serializable *obj) override

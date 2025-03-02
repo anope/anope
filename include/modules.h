@@ -305,7 +305,7 @@ public:
 	 * @param conf The config that is being built now and will replace the global Config object
 	 * @throws A ConfigException to abort the config (re)loading process.
 	 */
-	virtual void OnReload(Configuration::Conf *conf) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+	virtual void OnReload(Configuration::Conf &conf) { throw NotImplementedException(); }
 
 	/** Called before a bot is assigned to a channel.
 	 * @param sender The user assigning the bot

@@ -68,7 +68,7 @@ public:
 		}
 
 		Anope::string spattern = "#" + pattern;
-		unsigned listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
+		unsigned listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
 
 		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
 
@@ -160,11 +160,11 @@ public:
 				"    \002LIST #51-100\002\n"
 				"        Lists all registered channels within the given range (51-100)."));
 
-		if (!Config->GetBlock("options")->Get<const Anope::string>("regexengine").empty())
+		if (!Config->GetBlock("options").Get<const Anope::string>("regexengine").empty())
 		{
 			source.Reply(" ");
 			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), Config->GetBlock("options")->Get<const Anope::string>("regexengine").c_str());
+					"Enclose your pattern in // if this is desired."), Config->GetBlock("options").Get<const Anope::string>("regexengine").c_str());
 		}
 
 		return true;

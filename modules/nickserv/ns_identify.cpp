@@ -95,7 +95,7 @@ public:
 			return;
 		}
 
-		unsigned int maxlogins = Config->GetModule(this->owner)->Get<unsigned int>("maxlogins");
+		unsigned int maxlogins = Config->GetModule(this->owner).Get<unsigned int>("maxlogins");
 		if (na && maxlogins && na->nc->users.size() >= maxlogins)
 		{
 			source.Reply(_("Account \002%s\002 has already reached the maximum number of simultaneous logins (%u)."), na->nc->display.c_str(), maxlogins);

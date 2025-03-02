@@ -327,13 +327,13 @@ public:
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
+		Configuration::Block &config = conf.GetModule(this);
 
-		const Anope::string certfile = Anope::ExpandConfig(config->Get<const Anope::string>("cert", "fullchain.pem"));
-		const Anope::string keyfile = Anope::ExpandConfig(config->Get<const Anope::string>("key", "privkey.pem"));
-		const Anope::string dhfile = Anope::ExpandConfig(config->Get<const Anope::string>("dh", "dhparams.pem"));
+		const Anope::string certfile = Anope::ExpandConfig(config.Get<const Anope::string>("cert", "fullchain.pem"));
+		const Anope::string keyfile = Anope::ExpandConfig(config.Get<const Anope::string>("key", "privkey.pem"));
+		const Anope::string dhfile = Anope::ExpandConfig(config.Get<const Anope::string>("dh", "dhparams.pem"));
 
 		CheckFile(certfile);
 		CheckFile(keyfile);
@@ -365,9 +365,9 @@ public:
 
 	void OnPreServerConnect() override
 	{
-		Configuration::Block *config = Config->GetBlock("uplink", Anope::CurrentUplink);
+		Configuration::Block &config = Config->GetBlock("uplink", Anope::CurrentUplink);
 
-		if (config->Get<bool>("ssl"))
+		if (config.Get<bool>("ssl"))
 		{
 			this->service.Init(UplinkSock);
 		}

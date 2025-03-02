@@ -50,8 +50,8 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		Configuration::Block *block = Config->GetCommand(source);
-		const Anope::string &mode = block->Get<Anope::string>("mode", "BAN");
+		Configuration::Block &block = Config->GetCommand(source);
+		const Anope::string &mode = block.Get<Anope::string>("mode", "BAN");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
 		if (cm == NULL)
 			return;
@@ -107,11 +107,11 @@ public:
 				reason += " " + params[3];
 		}
 
-		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		unsigned reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 
-		Anope::string signkickformat = Config->GetModule("chanserv")->Get<Anope::string>("signkickformat", "%m (%n)");
+		Anope::string signkickformat = Config->GetModule("chanserv").Get<Anope::string>("signkickformat", "%m (%n)");
 		signkickformat = signkickformat.replace_all_cs("%n", source.GetNick());
 
 		User *u = source.GetUser();
@@ -156,7 +156,7 @@ public:
 				if (!c->FindUser(u2))
 					return;
 
-				if (block->Get<bool>("kick", "yes"))
+				if (block.Get<bool>("kick", "yes"))
 				{
 					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
 					{
@@ -209,7 +209,7 @@ public:
 					else if (uc->user->IsProtected())
 						continue;
 
-					if (block->Get<bool>("kick", "yes"))
+					if (block.Get<bool>("kick", "yes"))
 					{
 						++kicked;
 						if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))

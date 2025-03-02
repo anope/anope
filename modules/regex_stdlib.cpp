@@ -67,11 +67,11 @@ public:
 		this->SetPermanent(true);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
+		Configuration::Block &block = conf.GetModule(this);
 
-		const Anope::string syntax = block->Get<const Anope::string>("syntax", "ecmascript");
+		const Anope::string syntax = block.Get<const Anope::string>("syntax", "ecmascript");
 		if (syntax == "awk")
 			stdlib_regex_provider.type = std::regex::awk;
 		else if (syntax == "basic")

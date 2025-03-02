@@ -796,7 +796,7 @@ public:
 		message_tmode(this),
 		message_uid(this)
 	{
-		if (Config->GetModule(this))
+		if (IRCD == &ircd_proto)
 			this->AddModes();
 	}
 

@@ -144,6 +144,7 @@ namespace Configuration
 		Uplink(const Anope::string &_host, int _port, const Anope::string &_password, int _protocol) : host(_host), port(_port), password(_password), protocol(_protocol) { }
 		inline bool operator==(const Uplink &other) const { return host == other.host && port == other.port && password == other.password && protocol == other.protocol; }
 		inline bool operator!=(const Uplink &other) const { return !(*this == other); }
+		Anope::string str() const;
 	};
 }
 

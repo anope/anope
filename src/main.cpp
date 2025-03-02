@@ -162,7 +162,7 @@ int main(int ac, char **av, char **envp)
 	}
 	catch (const SocketException &ex)
 	{
-		Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << "): " << ex.GetReason();
+		Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].str() << "): " << ex.GetReason();
 	}
 
 	/* Set up timers */

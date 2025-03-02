@@ -34,7 +34,7 @@ public:
 		}
 		catch (const SocketException &ex)
 		{
-			Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << "): " << ex.GetReason();
+			Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].str() << "): " << ex.GetReason();
 		}
 	}
 };
@@ -57,7 +57,7 @@ void Uplink::Connect()
 		UplinkSock->Bind(Config->GetBlock("serverinfo").Get<const Anope::string>("localhost"));
 	FOREACH_MOD(OnPreServerConnect, ());
 	Anope::string ip = Anope::Resolve(u.host, u.protocol);
-	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u.host << " (" << ip << '/' << u.port << ") with protocol " << IRCD->GetProtocolName();
+	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << ip << " (" << u.str() << ") with protocol " << IRCD->GetProtocolName();
 	UplinkSock->Connect(ip, u.port);
 }
 
@@ -185,7 +185,7 @@ bool UplinkSocket::ProcessRead()
 
 void UplinkSocket::OnConnect()
 {
-	Log(LOG_TERMINAL) << "Successfully connected to uplink #" << (Anope::CurrentUplink + 1) << " " << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port;
+	Log(LOG_TERMINAL) << "Successfully connected to uplink #" << (Anope::CurrentUplink + 1) << " " << Config->Uplinks[Anope::CurrentUplink].str();
 	IRCD->SendConnect();
 	FOREACH_MOD(OnServerConnect, ());
 }
@@ -193,6 +193,6 @@ void UplinkSocket::OnConnect()
 void UplinkSocket::OnError(const Anope::string &err)
 {
 	Anope::string what = !this->flags[SF_CONNECTED] ? "Unable to connect to" : "Lost connection from";
-	Log(LOG_TERMINAL) << what << " uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << ")" << (!err.empty() ? (": " + err) : "");
+	Log(LOG_TERMINAL) << what << " uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].str() << ")" << (!err.empty() ? (": " + err) : "");
 	error |= !err.empty();
 }

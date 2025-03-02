@@ -23,6 +23,7 @@
 using Configuration::File;
 using Configuration::Conf;
 using Configuration::Internal::Block;
+using Configuration::Uplink;
 
 File ServicesConf("anope.conf", false); // Configuration file name
 Conf *Config = NULL;
@@ -618,6 +619,23 @@ void Conf::Post(Conf *old)
 		}
 	}
 }
+
+Anope::string Uplink::str() const
+{
+	switch (protocol)
+	{
+	case AF_INET:
+		return Anope::printf("%s:%u", this->host.c_str(), this->port);
+	case AF_INET6:
+		return Anope::printf("[%s]:%u", this->host.c_str(), this->port);
+	case AF_UNIX:
+		return this->host;
+	}
+
+	// Should never be reached.
+	return "";
+}
+
 
 Block &Conf::GetModule(const Module *m)
 {

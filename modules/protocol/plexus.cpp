@@ -18,9 +18,12 @@ static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
 
 class PlexusProto final
 	: public IRCDProto
+	, SASL::ProtocolInterface
 {
 public:
-	PlexusProto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
+	PlexusProto(Module *creator)
+		: IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
+		, SASL::ProtocolInterface(creator)
 	{
 		DefaultPseudoclientModes = "+iU";
 		CanSVSNick = true;

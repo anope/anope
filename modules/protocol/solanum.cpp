@@ -32,10 +32,12 @@ public:
 
 class SolanumProto final
 	: public IRCDProto
+	, public SASL::ProtocolInterface
 {
 public:
-
-	SolanumProto(Module *creator) : IRCDProto(creator, "Solanum")
+	SolanumProto(Module *creator)
+		: IRCDProto(creator, "Solanum")
+		, SASL::ProtocolInterface(creator)
 	{
 		DefaultPseudoclientModes = "+oiS";
 		CanCertFP = true;

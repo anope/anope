@@ -36,6 +36,7 @@ namespace
 
 class UnrealIRCdProto final
 	: public IRCDProto
+	, public SASL::ProtocolInterface
 {
 public:
 	PrimitiveExtensibleItem<ModData> ClientModData;
@@ -43,6 +44,7 @@ public:
 
 	UnrealIRCdProto(Module *creator)
 		: IRCDProto(creator, "UnrealIRCd 6+")
+		, SASL::ProtocolInterface(creator)
 		, ClientModData(creator, "ClientModData")
 		, ChannelModData(creator, "ChannelModData")
 	{

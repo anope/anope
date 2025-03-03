@@ -292,7 +292,7 @@ public:
 		msg.type = mtype;
 		msg.data.push_back(data);
 
-		IRCD->SendSASLMessage(msg);
+		protocol_interface->SendSASLMessage(msg);
 	}
 
 	void Succeed(Session *session, NickCore *nc) override
@@ -310,7 +310,7 @@ public:
 		}
 		else
 		{
-			IRCD->SendSVSLogin(session->uid, na);
+			protocol_interface->SendSVSLogin(session->uid, na);
 		}
 		this->SendMessage(session, "D", "S");
 	}
@@ -397,20 +397,23 @@ class ModuleSASL final
 	void CheckMechs()
 	{
 		std::vector<Anope::string> newmechs = ::Service::GetServiceKeys("SASL::Mechanism");
-		if (newmechs == mechs)
+		if (newmechs == mechs || !protocol_interface)
 			return;
 
 		mechs = newmechs;
 
 		// If we are connected to the network then broadcast the mechlist.
 		if (Me && Me->IsSynced())
-			IRCD->SendSASLMechanisms(mechs);
+			protocol_interface->SendSASLMechanisms(mechs);
 	}
 
 public:
 	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		sasl(this), anonymous(this), plain(this)
 	{
+		if (!protocol_interface)
+			throw ModuleException("Your IRCd does not support SASL");
+
 		try
 		{
 			external = new External(this);
@@ -437,7 +440,8 @@ public:
 	void OnPreUplinkSync(Server *) override
 	{
 		// We have not yet sent a mechanism list so always do it here.
-		IRCD->SendSASLMechanisms(mechs);
+		if (!protocol_interface)
+			protocol_interface->SendSASLMechanisms(mechs);
 	}
 };
 

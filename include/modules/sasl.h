@@ -158,4 +158,34 @@ namespace SASL
 			Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << GetUserInfo() << " failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
 		}
 	};
+
+	/** Sends IRCd messages used by the SASL module. */
+	class CoreExport ProtocolInterface
+		: public ::Service
+	{
+	protected:
+		ProtocolInterface(Module *o)
+			: ::Service(o, "SASL::ProtocolInterface", "sasl")
+		{
+		}
+
+	public:
+		/** Sends the list of SASL mechanisms to the IRCd
+		 * @param mechs The list of SASL mechanisms.
+		 */
+		virtual void SendSASLMechanisms(std::vector<Anope::string> &mechs) { };
+
+		/** Sends a SASL message to the IRCd.
+		 * @param message The SASL message to send.
+		 */
+		virtual void SendSASLMessage(const SASL::Message &message) = 0;
+
+		/** Sends a login or logout for \p uid to \p na.
+		 * @param uid The uid of the user to log in.
+		 * @param na The nick alias to log the user in as or logout if nullptr.
+		 */
+		virtual void SendSVSLogin(const Anope::string &uid, NickAlias *na) = 0;
+	};
+
+	static ServiceReference<SASL::ProtocolInterface> protocol_interface("SASL::ProtocolInterface", "sasl");
 }

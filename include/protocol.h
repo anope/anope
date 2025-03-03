@@ -306,10 +306,6 @@ public:
 
 	virtual void SendClearBans(const MessageSource &user, Channel *c, User* u) { }
 
-	virtual void SendSASLMechanisms(std::vector<Anope::string> &) { }
-	virtual void SendSASLMessage(const SASL::Message &) { }
-	virtual void SendSVSLogin(const Anope::string &uid, NickAlias *na) { }
-
 	virtual bool IsNickValid(const Anope::string &);
 	virtual bool IsChannelValid(const Anope::string &);
 	virtual bool IsIdentValid(const Anope::string &);

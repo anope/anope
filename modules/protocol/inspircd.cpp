@@ -101,6 +101,7 @@ namespace
 
 class InspIRCdProto final
 	: public IRCDProto
+	, public SASL::ProtocolInterface
 {
 private:
 	static Anope::string GetAccountNicks(NickAlias* na)
@@ -155,7 +156,10 @@ private:
 public:
 	PrimitiveExtensibleItem<ListLimits> maxlist;
 
-	InspIRCdProto(Module *creator) : IRCDProto(creator, "InspIRCd 3+"), maxlist(creator, "maxlist")
+	InspIRCdProto(Module *creator)
+		: IRCDProto(creator, "InspIRCd 3+")
+		, SASL::ProtocolInterface(creator)
+		, maxlist(creator, "maxlist")
 	{
 		DefaultPseudoclientModes = "+oI";
 		CanSVSNick = true;

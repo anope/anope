@@ -248,14 +248,14 @@ struct IRCDMessageEncap final
 			}
 		}
 
-		else if (params[1] == "SASL" && SASL::sasl && params.size() >= 6)
+		else if (params[1] == "SASL" && SASL::service && params.size() >= 6)
 		{
 			SASL::Message m;
 			m.source = params[2];
 			m.target = params[3];
 			m.type = params[4];
 			m.data.assign(params.begin() + 5, params.end());
-			SASL::sasl->ProcessMessage(m);
+			SASL::service->ProcessMessage(m);
 		}
 
 		return;

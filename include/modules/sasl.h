@@ -42,7 +42,7 @@ namespace SASL
 		virtual void RemoveSession(Session *) = 0;
 	};
 
-	static ServiceReference<SASL::Service> sasl("SASL::Service", "sasl");
+	static ServiceReference<SASL::Service> service("SASL::Service", "sasl");
 
 	struct Session
 	{
@@ -65,8 +65,8 @@ namespace SASL
 
 		virtual ~Session()
 		{
-			if (sasl)
-				sasl->RemoveSession(this);
+			if (service)
+				service->RemoveSession(this);
 		}
 	};
 
@@ -83,8 +83,8 @@ namespace SASL
 
 		virtual ~Mechanism()
 		{
-			if (sasl)
-				sasl->DeleteSessions(this, true);
+			if (service)
+				service->DeleteSessions(this, true);
 		}
 	};
 
@@ -114,7 +114,7 @@ namespace SASL
 
 		void OnSuccess() override
 		{
-			if (!sasl)
+			if (!service)
 				return;
 
 			NickAlias *na = NickAlias::Find(GetAccount());
@@ -125,24 +125,24 @@ namespace SASL
 			if (maxlogins && na->nc->users.size() >= maxlogins)
 				return OnFail();
 
-			Session *s = sasl->GetSession(uid);
+			Session *s = service->GetSession(uid);
 			if (s)
 			{
 				Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << GetUserInfo() << " identified to account " << this->GetAccount() << " using SASL";
-				sasl->Succeed(s, na->nc);
+				service->Succeed(s, na->nc);
 				delete s;
 			}
 		}
 
 		void OnFail() override
 		{
-			if (!sasl)
+			if (!service)
 				return;
 
-			Session *s = sasl->GetSession(uid);
+			Session *s = service->GetSession(uid);
 			if (s)
 			{
-				sasl->Fail(s);
+				service->Fail(s);
 				delete s;
 			}
 

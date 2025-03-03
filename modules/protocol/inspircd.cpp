@@ -1793,7 +1793,7 @@ struct IRCDMessageSASL final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		if (!SASL::sasl)
+		if (!SASL::service)
 			return;
 
 		SASL::Message m;
@@ -1801,7 +1801,7 @@ struct IRCDMessageSASL final
 		m.target = params[1];
 		m.type = params[2];
 		m.data.assign(params.begin() + 3, params.end());
-		SASL::sasl->ProcessMessage(m);
+		SASL::service->ProcessMessage(m);
 	}
 };
 
@@ -2396,7 +2396,7 @@ struct IRCDMessageUID final
 		auto ts = IRCD->ExtractTimestamp(params[1]);
 
 		NickAlias *na = NULL;
-		if (SASL::sasl)
+		if (SASL::service)
 			for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
 			{
 				SASLUser &u = *it;

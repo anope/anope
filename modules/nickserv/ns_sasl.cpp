@@ -10,19 +10,20 @@
 #include "modules/sasl.h"
 #include "modules/ns_cert.h"
 
-using namespace SASL;
-
 class Plain final
-	: public Mechanism
+	: public SASL::Mechanism
 {
 public:
-	Plain(Module *o) : Mechanism(o, "PLAIN") { }
+	Plain(Module *o)
+		: SASL::Mechanism(o, "PLAIN")
+	{
+	}
 
-	bool ProcessMessage(Session *sess, const SASL::Message &m) override
+	bool ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
 	{
 		if (m.type == "S")
 		{
-			sasl->SendMessage(sess, "C", "+");
+			SASL::service->SendMessage(sess, "C", "+");
 		}
 		else if (m.type == "C")
 		{
@@ -59,8 +60,9 @@ public:
 };
 
 class External final
-	: public Mechanism
+	: public SASL::Mechanism
 {
+private:
 	ServiceReference<CertService> certs;
 
 	struct Session final
@@ -68,11 +70,13 @@ class External final
 	{
 		std::vector<Anope::string> certs;
 
-		Session(Mechanism *m, const Anope::string &u) : SASL::Session(m, u) { }
+		Session(SASL::Mechanism *m, const Anope::string &u) : SASL::Session(m, u) { }
 	};
 
 public:
-	External(Module *o) : Mechanism(o, "EXTERNAL"), certs("CertService", "certs")
+	External(Module *o)
+		: SASL::Mechanism(o, "EXTERNAL")
+		, certs("CertService", "certs")
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("No CertFP");
@@ -91,7 +95,7 @@ public:
 		{
 			mysess->certs.assign(m.data.begin() + 1, m.data.end());
 
-			sasl->SendMessage(sess, "C", "+");
+			SASL::service->SendMessage(sess, "C", "+");
 		}
 		else if (m.type == "C")
 		{
@@ -112,7 +116,7 @@ public:
 					}
 
 					Log(this->owner, "sasl", Config->GetClient("NickServ")) << sess->GetUserInfo() << " identified to account " << nc->display << " using SASL EXTERNAL";
-					sasl->Succeed(sess, nc);
+					SASL::service->Succeed(sess, nc);
 					delete sess;
 					return true;
 				}
@@ -126,16 +130,19 @@ public:
 };
 
 class Anonymous final
-	: public Mechanism
+	: public SASL::Mechanism
 {
 public:
-	Anonymous(Module *o) : Mechanism(o, "ANONYMOUS") { }
+	Anonymous(Module *o)
+		: SASL::Mechanism(o, "ANONYMOUS")
+	{
+	}
 
-	bool ProcessMessage(Session *sess, const SASL::Message &m) override
+	bool ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
 	{
 		if (m.type == "S")
 		{
-			sasl->SendMessage(sess, "C", "+");
+			SASL::service->SendMessage(sess, "C", "+");
 		}
 		else if (m.type == "C")
 		{
@@ -147,7 +154,7 @@ public:
 				user += " [" + decoded + "]";
 
 			Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " unidentified using SASL ANONYMOUS";
-			sasl->Succeed(sess, nullptr);
+			SASL::service->Succeed(sess, nullptr);
 		}
 		return true;
 	}
@@ -165,8 +172,8 @@ public:
 	SASLService(Module *o)
 		: SASL::Service(o)
 		, Timer(o, 60, true)
-		{
-		}
+	{
+	}
 
 	~SASLService() override
 	{
@@ -190,17 +197,17 @@ public:
 			}
 		}
 
-		Session *session = GetSession(m.source);
+		auto *session = GetSession(m.source);
 
 		if (m.type == "S")
 		{
-			ServiceReference<Mechanism> mech("SASL::Mechanism", m.data[0]);
+			ServiceReference<SASL::Mechanism> mech("SASL::Mechanism", m.data[0]);
 			if (!mech)
 			{
-				Session tmp(NULL, m.source);
+				SASL::Session tmp(NULL, m.source);
 
-				sasl->SendMechs(&tmp);
-				sasl->Fail(&tmp);
+				SASL::service->SendMechs(&tmp);
+				SASL::service->Fail(&tmp);
 				return;
 			}
 
@@ -231,7 +238,7 @@ public:
 		{
 			if (!session)
 			{
-				session = new Session(NULL, m.source);
+				session = new SASL::Session(NULL, m.source);
 				sessions[m.source] = session;
 			}
 			session->hostname = m.data[0];
@@ -257,24 +264,24 @@ public:
 		return agent;
 	}
 
-	Session *GetSession(const Anope::string &uid) override
+	SASL::Session *GetSession(const Anope::string &uid) override
 	{
-		std::map<Anope::string, Session *>::iterator it = sessions.find(uid);
+		auto it = sessions.find(uid);
 		if (it != sessions.end())
 			return it->second;
 		return NULL;
 	}
 
-	void RemoveSession(Session *sess) override
+	void RemoveSession(SASL::Session *sess) override
 	{
 		sessions.erase(sess->uid);
 	}
 
-	void DeleteSessions(Mechanism *mech, bool da) override
+	void DeleteSessions(SASL::Mechanism *mech, bool da) override
 	{
-		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end();)
+		for (auto it = sessions.begin(); it != sessions.end();)
 		{
-			std::map<Anope::string, Session *>::iterator del = it++;
+			auto del = it++;
 			if (*del->second->mech == mech)
 			{
 				if (da)
@@ -284,7 +291,7 @@ public:
 		}
 	}
 
-	void SendMessage(Session *session, const Anope::string &mtype, const Anope::string &data) override
+	void SendMessage(SASL::Session *session, const Anope::string &mtype, const Anope::string &data) override
 	{
 		SASL::Message msg;
 		msg.source = this->GetAgent();
@@ -292,10 +299,10 @@ public:
 		msg.type = mtype;
 		msg.data.push_back(data);
 
-		protocol_interface->SendSASLMessage(msg);
+		SASL::protocol_interface->SendSASLMessage(msg);
 	}
 
-	void Succeed(Session *session, NickCore *nc) override
+	void Succeed(SASL::Session *session, NickCore *nc) override
 	{
 		// If the user is already introduced then we log them in now.
 		// Otherwise, we send an SVSLOGIN to log them in later.
@@ -310,12 +317,12 @@ public:
 		}
 		else
 		{
-			protocol_interface->SendSVSLogin(session->uid, na);
+			SASL::protocol_interface->SendSVSLogin(session->uid, na);
 		}
 		this->SendMessage(session, "D", "S");
 	}
 
-	void Fail(Session *session) override
+	void Fail(SASL::Session *session) override
 	{
 		this->SendMessage(session, "D", "F");
 
@@ -348,7 +355,7 @@ public:
 		}
 	}
 
-	void SendMechs(Session *session) override
+	void SendMechs(SASL::Session *session) override
 	{
 		std::vector<Anope::string> mechs = Service::GetServiceKeys("SASL::Mechanism");
 		Anope::string buf;
@@ -397,21 +404,24 @@ class ModuleSASL final
 	void CheckMechs()
 	{
 		std::vector<Anope::string> newmechs = ::Service::GetServiceKeys("SASL::Mechanism");
-		if (newmechs == mechs || !protocol_interface)
+		if (newmechs == mechs || !SASL::protocol_interface)
 			return;
 
 		mechs = newmechs;
 
 		// If we are connected to the network then broadcast the mechlist.
 		if (Me && Me->IsSynced())
-			protocol_interface->SendSASLMechanisms(mechs);
+			SASL::protocol_interface->SendSASLMechanisms(mechs);
 	}
 
 public:
-	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		sasl(this), anonymous(this), plain(this)
+	ModuleSASL(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, sasl(this)
+		, anonymous(this)
+		, plain(this)
 	{
-		if (!protocol_interface)
+		if (!SASL::protocol_interface)
 			throw ModuleException("Your IRCd does not support SASL");
 
 		try
@@ -440,8 +450,8 @@ public:
 	void OnPreUplinkSync(Server *) override
 	{
 		// We have not yet sent a mechanism list so always do it here.
-		if (!protocol_interface)
-			protocol_interface->SendSASLMechanisms(mechs);
+		if (SASL::protocol_interface)
+			SASL::protocol_interface->SendSASLMechanisms(mechs);
 	}
 };
 

@@ -113,6 +113,7 @@ while [ $# -ge 1 ] ; do
 		exit 0
 	elif [ $1 = "-devel" ] ; then
 		DEBUG="yes"
+		DEVEL="yes"
 		INSTDIR="$SOURCE_DIR/run"
 	elif [ $1 = "-nocache" ] ; then
 		IGNORE_CACHE="1"
@@ -168,6 +169,33 @@ fi
 # Ask the user anything we need to know ahead of time.
 
 export ok INPUT
+
+####
+
+TEMP_YN="n"
+if [ "$DEVEL" = "yes" ] ; then
+	TEMP_YN="y"
+fi
+echo "You are building the 2.1 development branch. This branch is not as well tested"
+echo "as the 2.0 stable branch and may have compatibility breaks without notice. Are"
+echo "you sure you want to use this version?"
+echo -n "[$TEMP_YN] "
+read YN
+if [ "$YN" ] ; then
+	if [ "$YN" = "y" ] ; then
+		DEVEL="yes"
+	else
+		DEVEL="no"
+	fi
+fi
+echo ""
+
+if [ "$DEVEL" != "yes" ] ; then
+	echo "If you are building from Git you can run \`git checkout 2.0\` to get the latest"
+	echo "stable code. Otherwise, you can download the latest 2.0 release tarball from"
+	echo "https://github.com/anope/anope/releases/latest"
+	exit 1
+fi
 
 ####
 
@@ -337,6 +365,7 @@ INSTDIR="$INSTDIR"
 RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
 DEBUG="$DEBUG"
+DEVEL="$DEVEL"
 EXTRA_INCLUDE_DIRS="$EXTRA_INCLUDE_DIRS"
 EXTRA_LIB_DIRS="$EXTRA_LIB_DIRS"
 EXTRA_CONFIG_ARGS="$EXTRA_CONFIG_ARGS"

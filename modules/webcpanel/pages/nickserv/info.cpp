@@ -40,7 +40,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 
 			replacements["MESSAGES"] = "Greet updated";
 		}
-		if (na->nc->HasExt("AUTOOP") != message.post_data.count("autoop"))
+		if (na->nc->HasExt("AUTOOP") != !!message.post_data.count("autoop"))
 		{
 			if (!na->nc->HasExt("AUTOOP"))
 				na->nc->Extend<bool>("AUTOOP");
@@ -48,7 +48,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("AUTOOP");
 			replacements["MESSAGES"] = "Autoop updated";
 		}
-		if (na->nc->HasExt("NS_PRIVATE") != message.post_data.count("private"))
+		if (na->nc->HasExt("NS_PRIVATE") != !!message.post_data.count("private"))
 		{
 			if (!na->nc->HasExt("NS_PRIVATE"))
 				na->nc->Extend<bool>("NS_PRIVATE");
@@ -56,7 +56,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("NS_PRIVATE");
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (na->nc->HasExt("NS_SECURE") != message.post_data.count("secure"))
+		if (na->nc->HasExt("NS_SECURE") != !!message.post_data.count("secure"))
 		{
 			if (!na->nc->HasExt("NS_SECURE"))
 				na->nc->Extend<bool>("NS_SECURE");

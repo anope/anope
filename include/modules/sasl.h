@@ -160,7 +160,7 @@ namespace SASL
 	};
 
 	/** Sends IRCd messages used by the SASL module. */
-	class CoreExport ProtocolInterface
+	class ProtocolInterface
 		: public ::Service
 	{
 	protected:

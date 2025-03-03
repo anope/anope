@@ -40,7 +40,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 
 			replacements["MESSAGES"] = "Greet updated";
 		}
-		if (na->nc->HasExt("AUTOOP") != message.post_data.count("autoop"))
+		if (na->nc->HasExt("AUTOOP") != !!message.post_data.count("autoop"))
 		{
 			if (!na->nc->HasExt("AUTOOP"))
 				na->nc->Extend<bool>("AUTOOP");
@@ -48,7 +48,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("AUTOOP");
 			replacements["MESSAGES"] = "Autoop updated";
 		}
-		if (na->nc->HasExt("NS_PRIVATE") != message.post_data.count("private"))
+		if (na->nc->HasExt("NS_PRIVATE") != !!message.post_data.count("private"))
 		{
 			if (!na->nc->HasExt("NS_PRIVATE"))
 				na->nc->Extend<bool>("NS_PRIVATE");
@@ -68,13 +68,13 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 			na->nc->Extend<bool>("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}
-		else if (message.post_data["kill"] == "off" && (na->nc->HasExt("KILLPROTECT") || na->nc->HasExt("KILL_QUICK")))
+		else if (message.post_data["kill"] == "off" && (!!na->nc->HasExt("KILLPROTECT") || !!na->nc->HasExt("KILL_QUICK")))
 		{
 			na->nc->Shrink<bool>("KILLPROTECT");
 			na->nc->Shrink<bool>("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}
-		if (na->nc->HasExt("NS_KEEP_MODES") != message.post_data.count("keepmodes"))
+		if (na->nc->HasExt("NS_KEEP_MODES") != !!message.post_data.count("keepmodes"))
 		{
 			if (!na->nc->HasExt("NS_KEEP_MODES"))
 				na->nc->Extend<bool>("NS_KEEP_MODES");
@@ -82,7 +82,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("NS_KEEP_MODES");
 			replacements["MESSAGES"] = "Keepmodes updated";
 		}
-		if (na->nc->HasExt("MSG") != message.post_data.count("msg"))
+		if (na->nc->HasExt("MSG") != !!message.post_data.count("msg"))
 		{
 			if (!na->nc->HasExt("MSG"))
 				na->nc->Extend<bool>("MSG");
@@ -90,7 +90,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("MSG");
 			replacements["MESSAGES"] = "Message updated";
 		}
-		if (na->nc->HasExt("NEVEROP") != message.post_data.count("neverop"))
+		if (na->nc->HasExt("NEVEROP") != !!message.post_data.count("neverop"))
 		{
 			if (!na->nc->HasExt("NEVEROP"))
 				na->nc->Extend<bool>("NEVEROP");

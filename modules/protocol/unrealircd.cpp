@@ -1511,6 +1511,38 @@ struct IRCDMessageSJoin final
 	}
 };
 
+class IRCDMessageSMod final
+	: IRCDMessage
+{
+public:
+	IRCDMessageSMod(Module *creator)
+		: IRCDMessage(creator, "SMOD", 1)
+	{
+		SetFlag(FLAG_REQUIRE_SERVER); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		spacesepstream modules(params[0]);
+		for (Anope::string module; modules.GetToken(module); )
+		{
+			sepstream modinfo(module, ':');
+			if (!modinfo.GetToken(module) || !modinfo.GetToken(module))
+				continue; // Malformed token.
+
+			if (module.equals_ci("third/helpop"))
+			{
+				// Before version 1.5 this module sent malformed MODE messages
+				// that would break Anope and result in mysterious errors from
+				// ExtractTimestamp.
+				//
+				// https://github.com/unrealircd/unrealircd-contrib/pull/125
+				if (modinfo.GetToken(module) && Anope::Convert(module, 9.9) < 1.5)
+					throw ProtocolException("UnrealIRCd contrib module third/helpop version 1.4 or older is known to break Anope. Please unload or upgrade it.");
+			}
+		}
+	}
+};
+
 class IRCDMessageSVSLogin final
 	: IRCDMessage
 {
@@ -1689,6 +1721,7 @@ class ProtoUnreal final
 	IRCDMessageServer message_server;
 	IRCDMessageSID message_sid;
 	IRCDMessageSJoin message_sjoin;
+	IRCDMessageSMod message_smod;
 	IRCDMessageSVSLogin message_svslogin;
 	IRCDMessageTopic message_topic;
 	IRCDMessageUID message_uid;
@@ -1735,6 +1768,7 @@ public:
 		, message_server(this)
 		, message_sid(this)
 		, message_sjoin(this)
+		, message_smod(this)
 		, message_svslogin(this)
 		, message_topic(this)
 		, message_uid(this)

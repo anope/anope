@@ -29,15 +29,12 @@ namespace SASL
 
 		virtual void ProcessMessage(const Message &) = 0;
 
-		virtual Anope::string GetAgent() = 0;
-
 		virtual Session *GetSession(const Anope::string &uid) = 0;
 
 		virtual void SendMessage(SASL::Session *session, const Anope::string &type, const Anope::string &data) = 0;
 
 		virtual void Succeed(Session *, NickCore *) = 0;
 		virtual void Fail(Session *) = 0;
-		virtual void SendMechs(Session *) = 0;
 		virtual void DeleteSessions(Mechanism *, bool = false) = 0;
 		virtual void RemoveSession(Session *) = 0;
 	};

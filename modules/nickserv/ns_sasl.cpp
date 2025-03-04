@@ -206,8 +206,8 @@ public:
 			{
 				SASL::Session tmp(NULL, m.source);
 
-				SASL::service->SendMechs(&tmp);
-				SASL::service->Fail(&tmp);
+				this->SendMechs(&tmp);
+				this->Fail(&tmp);
 				return;
 			}
 
@@ -255,7 +255,7 @@ public:
 		}
 	}
 
-	Anope::string GetAgent() override
+	Anope::string GetAgent()
 	{
 		Anope::string agent = Config->GetModule(Service::owner).Get<Anope::string>("agent", "NickServ");
 		BotInfo *bi = Config->GetClient(agent);
@@ -355,7 +355,7 @@ public:
 		}
 	}
 
-	void SendMechs(SASL::Session *session) override
+	void SendMechs(SASL::Session *session)
 	{
 		std::vector<Anope::string> mechs = Service::GetServiceKeys("SASL::Mechanism");
 		Anope::string buf;

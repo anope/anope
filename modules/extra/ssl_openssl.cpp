@@ -126,7 +126,7 @@ public:
 		SSL_CTX_set_session_id_context(client_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());
 		SSL_CTX_set_session_id_context(server_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());
 
-		Log() << "Module was compiled against OpenSSL version " << OPENSSL_VERSION_STR << " and is running against version " << OpenSSL_version(OPENSSL_VERSION_STRING);
+		Log(this) << "Module was compiled against OpenSSL version " << OPENSSL_VERSION_STR << " and is running against version " << OpenSSL_version(OPENSSL_VERSION_STRING);
 	}
 
 	~SSLModule()

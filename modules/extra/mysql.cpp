@@ -245,7 +245,7 @@ public:
 		DThread = new DispatcherThread();
 		DThread->Start();
 
-		Log() << "Module was compiled against MySQL version " << (MYSQL_VERSION_ID / 10000) << "." << (MYSQL_VERSION_ID / 100 % 100) << "." << (MYSQL_VERSION_ID % 100) << " and is running against version " << mysql_get_client_info();
+		Log(this) << "Module was compiled against MySQL version " << (MYSQL_VERSION_ID / 10000) << "." << (MYSQL_VERSION_ID / 100 % 100) << "." << (MYSQL_VERSION_ID % 100) << " and is running against version " << mysql_get_client_info();
 	}
 
 	~ModuleSQL()
@@ -273,7 +273,7 @@ public:
 			++it;
 
 			for (i = 0; i < Config->CountBlock("mysql"); ++i)
-				if (config.GetBlock("mysql", i).Get<const Anope::string>("name", "mysql/main") == cname)
+					if (config.GetBlock("mysql", i).Get<const Anope::string>("name", "mysql/main") == cname)
 					break;
 
 			if (i == Config->CountBlock("mysql"))

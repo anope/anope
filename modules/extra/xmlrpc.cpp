@@ -268,7 +268,7 @@ public:
 
 		unsigned int xmlrpc_major, xmlrpc_minor, xmlrpc_point;
 		xmlrpc_version(&xmlrpc_major, &xmlrpc_minor, &xmlrpc_point);
-		Log() << "Module is running against xmlrpc-c version " << xmlrpc_major << '.' << xmlrpc_minor << '.' << xmlrpc_point;
+		Log(this) << "Module is running against xmlrpc-c version " << xmlrpc_major << '.' << xmlrpc_minor << '.' << xmlrpc_point;
 	}
 
 	~ModuleXMLRPC() override

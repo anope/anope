@@ -529,7 +529,7 @@ public:
 	{
 		me = this;
 
-		Log() << "Module was compiled against LDAP (" << LDAP_VENDOR_NAME << ") version " << LDAP_VENDOR_VERSION_MAJOR << "." << LDAP_VENDOR_VERSION_MINOR << "." << LDAP_VENDOR_VERSION_PATCH;
+		Log(this) << "Module was compiled against LDAP (" << LDAP_VENDOR_NAME << ") version " << LDAP_VENDOR_VERSION_MAJOR << "." << LDAP_VENDOR_VERSION_MINOR << "." << LDAP_VENDOR_VERSION_PATCH;
 	}
 
 	~ModuleLDAP()

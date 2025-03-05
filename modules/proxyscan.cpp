@@ -302,7 +302,7 @@ public:
 		}
 
 		this->proxyscans.clear();
-		for (int i = 0; i < Config->CountBlock("proxyscan"); ++i)
+		for (int i = 0; i < config.CountBlock("proxyscan"); ++i)
 		{
 			Configuration::Block &block = config.GetBlock("proxyscan", i);
 			ProxyCheck p;

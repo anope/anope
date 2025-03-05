@@ -272,11 +272,11 @@ public:
 
 			++it;
 
-			for (i = 0; i < Config->CountBlock("mysql"); ++i)
-					if (config.GetBlock("mysql", i).Get<const Anope::string>("name", "mysql/main") == cname)
+			for (i = 0; i < config.CountBlock("mysql"); ++i)
+				if (config.GetBlock("mysql", i).Get<const Anope::string>("name", "mysql/main") == cname)
 					break;
 
-			if (i == Config->CountBlock("mysql"))
+			if (i == config.CountBlock("mysql"))
 			{
 				Log(LOG_NORMAL, "mysql") << "MySQL: Removing server connection " << cname;
 
@@ -285,7 +285,7 @@ public:
 			}
 		}
 
-		for (int i = 0; i < Config->CountBlock("mysql"); ++i)
+		for (int i = 0; i < config.CountBlock("mysql"); ++i)
 		{
 			Configuration::Block &block = config.GetBlock("mysql", i);
 			const Anope::string &connname = block.Get<const Anope::string>("name", "mysql/main");

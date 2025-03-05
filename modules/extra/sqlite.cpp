@@ -124,7 +124,7 @@ public:
 			int i, num;
 			++it;
 
-			for (i = 0, num = Config->CountBlock("sqlite"); i < num; ++i)
+			for (i = 0, num = config.CountBlock("sqlite"); i < num; ++i)
 				if (config.GetBlock("sqlite", i).Get<const Anope::string>("name", "sqlite/main") == cname)
 					break;
 
@@ -137,7 +137,7 @@ public:
 			}
 		}
 
-		for (int i = 0; i < Config->CountBlock("sqlite"); ++i)
+		for (int i = 0; i < config.CountBlock("sqlite"); ++i)
 		{
 			Configuration::Block &block = config.GetBlock("sqlite", i);
 			Anope::string connname = block.Get<const Anope::string>("name", "sqlite/main");

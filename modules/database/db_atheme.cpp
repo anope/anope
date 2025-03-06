@@ -20,6 +20,7 @@
 #include "modules/info.h"
 #include "modules/ns_cert.h"
 #include "modules/os_forbid.h"
+#include "modules/os_news.h"
 #include "modules/os_oper.h"
 #include "modules/os_session.h"
 #include "modules/suspend.h"
@@ -199,6 +200,8 @@ private:
 		{ "JM",         &DBAtheme::HandleIgnore    },
 		{ "KID",        &DBAtheme::HandleIgnore    },
 		{ "KL",         &DBAtheme::HandleKL        },
+		{ "LI",         &DBAtheme::HandleLI        },
+		{ "LIO",        &DBAtheme::HandleLIO       },
 		{ "LUID",       &DBAtheme::HandleIgnore    },
 		{ "MC",         &DBAtheme::HandleMC        },
 		{ "MCFP",       &DBAtheme::HandleMCFP      },
@@ -784,6 +787,58 @@ private:
 		auto *xl = new XLine(user + "@" + host, setby, settime + duration, reason);
 		xl->id = id;
 		sglinemgr->AddXLine(xl);
+		return true;
+	}
+
+	bool HandleLI(AthemeRow &row)
+	{
+		// LI <setter> <subject> <ts> <body>
+		auto setter = row.Get();
+		auto subject = row.Get();
+		auto ts = row.GetNum<time_t>();
+		auto body = row.GetRemaining();
+
+		if (!row)
+			return row.LogError(this);
+
+		if (!news_service)
+		{
+			Log(this) << "Unable to convert logon news as os_news is not loaded";
+			return true;
+		}
+
+		auto *ni = news_service->CreateNewsItem();
+		ni->type = NEWS_LOGON;
+		ni->text = Anope::printf("[%s] %s", subject.c_str(), body.c_str());
+		ni->who = setter;
+		ni->time = ts;
+		news_service->AddNewsItem(ni);
+		return true;
+	}
+
+	bool HandleLIO(AthemeRow &row)
+	{
+		// LIO <setter> <subject> <ts> <body>
+		auto setter = row.Get();
+		auto subject = row.Get();
+		auto ts = row.GetNum<time_t>();
+		auto body = row.GetRemaining();
+
+		if (!row)
+			return row.LogError(this);
+
+		if (!news_service)
+		{
+			Log(this) << "Unable to convert oper news as os_news is not loaded";
+			return true;
+		}
+
+		auto *ni = news_service->CreateNewsItem();
+		ni->type = NEWS_OPER;
+		ni->text = Anope::printf("[%s] %s", subject.c_str(), body.c_str());
+		ni->who = setter;
+		ni->time = ts;
+		news_service->AddNewsItem(ni);
 		return true;
 	}
 

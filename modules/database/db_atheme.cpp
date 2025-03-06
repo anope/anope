@@ -505,7 +505,10 @@ private:
 			// Generate a new password as we can't use the old one.
 			auto maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
 			Anope::Encrypt(Anope::Random(maxpasslen), nc->pass);
-			Log(this) << "Unable to convert the password for " << nc->display << " as Anope does not support the format!";
+
+			// If the password is set to * then an external service is being used for authentication.
+			if (pass != "*")
+				Log(this) << "Unable to convert the password for " << nc->display << " as Anope does not support the format!";
 		}
 
 	}

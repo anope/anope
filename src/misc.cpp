@@ -590,7 +590,7 @@ Anope::string Anope::VersionShort()
 
 Anope::string Anope::VersionBuildString()
 {
-#ifdef REPRODUCIBLE_BUILD
+#if REPRODUCIBLE_BUILD
 	Anope::string s = "build #" + Anope::ToString(BUILD);
 #else
 	Anope::string s = "build #" + Anope::ToString(BUILD) + ", compiled " + Anope::compiled;
@@ -602,6 +602,9 @@ Anope::string Anope::VersionBuildString()
 #endif
 #ifdef VERSION_GIT
 	flags += "G";
+#endif
+#if REPRODUCIBLE_BUILD
+	flags += "R"
 #endif
 #ifdef _WIN32
 	flags += "W";

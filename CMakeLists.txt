@@ -142,11 +142,6 @@ include_directories(
   ${Anope_SOURCE_DIR}/vendor
 )
 
-# Pass on REPRODUCIBLE_BUILD
-if(REPRODUCIBLE_BUILD)
-  add_definitions(-DREPRODUCIBLE_BUILD)
-endif()
-
 if(WIN32)
   # If using Windows, include the windows specific folder for anope_windows.h
   include_directories(${Anope_SOURCE_DIR}/src/win32)

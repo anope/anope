@@ -23,6 +23,7 @@
 #include "modules/os_news.h"
 #include "modules/os_oper.h"
 #include "modules/os_session.h"
+#include "modules/set_misc.h"
 #include "modules/suspend.h"
 
 // Handles reading from an Atheme database row.
@@ -1066,6 +1067,20 @@ private:
 			ci->last_topic_time = Anope::Convert<time_t>(value, 0);
 		else if (key.compare(0, 14, "private:stats:", 14) == 0)
 			return HandleIgnoreMetadata(ci->name, key, value);
+		else if (key.find(':') == Anope::string::npos)
+		{
+			ExtensibleRef<MiscData> extref("cs_set_misc:" + key.upper());
+			if (!extref)
+			{
+				Log(this) << "Unknown public metadata for " << ci->name << ": " << key << " = " << value;
+				return true;
+			}
+
+			auto *data = extref->Set(ci);
+			data->object = ci->name;
+			data->name = key;
+			data->data = value;
+		}
 		else
 			Log(this) << "Unknown channel metadata for " << ci->name << ": " << key << " = " << value;
 
@@ -1178,6 +1193,20 @@ private:
 			data->vhost_ts = Anope::Convert<time_t>(value, 0);
 		else if (key.compare(0, 18, "private:usercloak:", 18) == 0)
 			data->vhost_nick[key.substr(18)] = value;
+		else if (key.find(':') == Anope::string::npos)
+		{
+			ExtensibleRef<MiscData> extref("ns_set_misc:" + key.upper());
+			if (!extref)
+			{
+				Log(this) << "Unknown public channel metadata for " << nc->display << ": " << key << " = " << value;
+				return true;
+			}
+
+			auto *data = extref->Set(nc);
+			data->object = nc->display;
+			data->name = key;
+			data->data = value;
+		}
 		else
 			Log(this) << "Unknown account metadata for " << nc->display << ": " << key << " = " << value;
 

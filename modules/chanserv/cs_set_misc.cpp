@@ -207,9 +207,13 @@ public:
 
 			descriptions[cname] = desc;
 
+			// Force creation of the extension item.
+			const auto extname = "cs_set_misc:" + GetAttribute(cname);
+			GetItem(extname);
+
 			auto numeric = block.Get<unsigned>("misc_numeric");
 			if (numeric >= 1 && numeric <= 999)
-				numerics["cs_set_misc:" + GetAttribute(cname)] = numeric;
+				numerics[extname] = numeric;
 		}
 	}
 

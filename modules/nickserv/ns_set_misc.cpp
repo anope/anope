@@ -220,6 +220,9 @@ public:
 				continue;
 
 			descriptions[cname] = desc;
+
+			// Force creation of the extension item.
+			GetItem("ns_set_misc:" + GetAttribute(cname));
 		}
 	}
 

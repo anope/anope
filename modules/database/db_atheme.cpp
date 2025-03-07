@@ -1072,7 +1072,7 @@ private:
 			ExtensibleRef<MiscData> extref("cs_set_misc:" + key.upper());
 			if (!extref)
 			{
-				Log(this) << "Unknown public metadata for " << ci->name << ": " << key << " = " << value;
+				Log(this) << "Unknown public channel metadata for " << ci->name << ": " << key << " = " << value;
 				return true;
 			}
 
@@ -1198,7 +1198,7 @@ private:
 			ExtensibleRef<MiscData> extref("ns_set_misc:" + key.upper());
 			if (!extref)
 			{
-				Log(this) << "Unknown public channel metadata for " << nc->display << ": " << key << " = " << value;
+				Log(this) << "Unknown public account metadata for " << nc->display << ": " << key << " = " << value;
 				return true;
 			}
 

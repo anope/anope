@@ -58,7 +58,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		}
 		if (na->nc->HasExt("PROTECT") != !!message.post_data.count("protect"))
 		{
-			if (!na->nc->HasExt("PROTECT"))
+			if (na->nc->HasExt("PROTECT"))
 			{
 				na->nc->Shrink<bool>("PROTECT");
 				na->nc->Shrink<time_t>("PROTECT_AFTER");
@@ -75,20 +75,22 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 			auto minprotect = block.Get<time_t>("minprotect", "10s");
 			auto maxprotect = block.Get<time_t>("maxprotect", "10m");
 
-			auto secs = Anope::TryConvert<time_t>(message.post_data["greet"]);
+			auto secs = Anope::TryConvert<time_t>(message.post_data["protect_after"]);
 			if (!secs)
-				replacements["ERRORS"] = "Protection after seconds are not valid";
+				replacements["ERRORS"] = "Protection delay must be a number of seconds";
 			else if (*secs < minprotect || *secs > maxprotect)
 			{
 				replacements["ERRORS"] = Anope::printf("Protection delay must be between %ld and %ld seconds.",
 					minprotect, maxprotect);
 			}
-			else
+			else if (!na->nc->HasExt("PROTECT_AFTER") || *secs != *na->nc->GetExt<time_t>("PROTECT_AFTER"))
 			{
 				na->nc->Extend<time_t>("PROTECT_AFTER", *secs);
 				replacements["MESSAGES"] = "Protect after updated";
 			}
 		}
+		else if (na->nc->HasExt("PROTECT") && !message.post_data.count("protect_after"))
+			na->nc->Shrink<time_t>("PROTECT_AFTER");
 		if (na->nc->HasExt("NS_KEEP_MODES") != !!message.post_data.count("keepmodes"))
 		{
 			if (!na->nc->HasExt("NS_KEEP_MODES"))
@@ -133,7 +135,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		replacements["PROTECT"];
 		auto *protectafter = na->nc->GetExt<time_t>("PROTECT_AFTER");
 		if (protectafter)
-			replacements["PROTECT_AFTER"] = *protectafter;
+			replacements["PROTECT_AFTER"] = Anope::ToString(*protectafter);
 	}
 	if (na->nc->HasExt("NS_KEEP_MODES"))
 		replacements["KEEPMODES"];

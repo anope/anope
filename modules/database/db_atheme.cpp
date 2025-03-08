@@ -132,7 +132,6 @@ struct ChannelData final
 
 struct UserData final
 {
-	bool kill = false;
 	Anope::string info_adder;
 	Anope::string info_message;
 	time_t info_ts = 0;
@@ -140,6 +139,8 @@ struct UserData final
 	Anope::string last_quit;
 	Anope::string last_real_mask;
 	bool noexpire = false;
+	bool protect = false;
+	std::optional<time_t> protectafter;
 	Anope::string suspend_by;
 	Anope::string suspend_reason;
 	time_t suspend_ts = 0;
@@ -1143,22 +1144,9 @@ private:
 		if (key == "private:autojoin")
 			return true; // TODO
 		else if (key == "private:doenforce")
-			data->kill = true;
+			data->protect = true;
 		else if (key == "private:enforcetime")
-		{
-			if (!data->kill)
-				return true; // Don't apply this.
-
-			auto kill = Config->GetModule("nickserv").Get<time_t>("kill", "60s");
-			auto killquick = Config->GetModule("nickserv").Get<time_t>("killquick", "20s");
-			auto secs = Anope::Convert<time_t>(value, kill);
-			if (secs >= kill)
-				nc->Extend<bool>("KILLPROTECT");
-			else if (secs >= killquick)
-				nc->Shrink<bool>("KILL_QUICK");
-			else
-				nc->Shrink<bool>("KILL_IMMED");
-		}
+			data->protectafter = Anope::TryConvert<time_t>(value);
 		else if (key == "private:freeze:freezer")
 			data->suspend_by = value;
 		else if (key == "private:freeze:reason")
@@ -1371,7 +1359,7 @@ private:
 		ApplyPassword(nc, flags, pass);
 
 		// No equivalent: bglmNQrS
-		ApplyFlags(nc, flags, 'E', "KILLPROTECT");
+		ApplyFlags(nc, flags, 'E', "PROTECT");
 		ApplyFlags(nc, flags, 'e', "MEMO_MAIL");
 		ApplyFlags(nc, flags, 'n', "NEVEROP");
 		ApplyFlags(nc, flags, 'o', "AUTOOP", false);
@@ -1647,6 +1635,13 @@ public:
 				{
 					Log(this) << "Unable to convert oper info for " << nc->display << " as os_info is not loaded";
 				}
+			}
+
+			if (data->protect)
+			{
+				nc->Extend<bool>("PROTECT");
+				if (data->protectafter)
+					nc->Extend("PROTECT_AFTER", data->protectafter.value());
 			}
 
 			if (!data->suspend_reason.empty())

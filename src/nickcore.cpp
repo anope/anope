@@ -146,7 +146,29 @@ Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	b = false;
 	data["extensible:KILLPROTECT"] >> b;
 	if (b)
-		nc->Extend<bool>("KILLPROTECT");
+		nc->Extend<bool>("PROTECT");
+
+	b = false;
+	data["KILLPROTECT"] >> b;
+	if (b)
+	{
+		nc->Extend<bool>("PROTECT");
+		nc->Extend("PROTECT_AFTER", Config->GetModule("nickserv").Get<time_t>("kill", "60s"));
+	}
+	b = false;
+	data["KILL_QUICK"] >> b;
+	if (b)
+	{
+		nc->Extend<bool>("PROTECT");
+		nc->Extend("PROTECT_AFTER", Config->GetModule("nickserv").Get<time_t>("killquick", "20s"));
+	}
+	b = false;
+	data["KILL_IMMED"] >> b;
+	if (b)
+	{
+		nc->Extend<bool>("PROTECT");
+		nc->Extend("PROTECT_AFTER", 0);
+	}
 	/* end compat */
 
 	return nc;

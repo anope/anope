@@ -211,31 +211,27 @@ public:
 		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 			return;
 
-		if (!na->nc->HasExt("KILL_IMMED"))
+		if (na->nc->HasExt("PROTECT"))
 		{
-			u->SendMessage(NickServ, NICK_IS_SECURE, NickServ->GetQueryCommand().c_str());
-		}
-		if (na->nc->HasExt("KILLPROTECT"))
-		{
-			if (na->nc->HasExt("KILL_IMMED"))
+			auto &block = Config->GetModule(this);
+			auto protectafter = na->nc->GetExt<time_t>("PROTECT_AFTER");
+
+			auto protect = protectafter ? *protectafter : block.Get<time_t>("defaultprotect", "1m");
+			protect = std::clamp(protect, block.Get<time_t>("minprotect", "10s"), block.Get<time_t>("maxprotect", "10m"));
+
+			if (protect)
+			{
+				u->SendMessage(NickServ, NICK_IS_SECURE, NickServ->GetQueryCommand().c_str());
+				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."),
+					Anope::Duration(protect, u->Account()).c_str());
+				new NickServCollide(this, this, u, na, protect);
+			}
+			else
 			{
 				u->SendMessage(NickServ, FORCENICKCHANGE_NOW);
 				this->Collide(u, na);
 			}
-			else if (na->nc->HasExt("KILL_QUICK"))
-			{
-				time_t killquick = Config->GetModule("nickserv").Get<time_t>("killquick", "20s");
-				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(killquick, u->Account()).c_str());
-				new NickServCollide(this, this, u, na, killquick);
-			}
-			else
-			{
-				time_t kill = Config->GetModule("nickserv").Get<time_t>("kill", "60s");
-				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(kill, u->Account()).c_str());
-				new NickServCollide(this, this, u, na, kill);
-			}
 		}
-
 	}
 
 	void OnUserLogin(User *u) override

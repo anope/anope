@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-14 14:57+0000\n"
-"PO-Revision-Date: 2024-11-25 01:32+0000\n"
+"POT-Creation-Date: 2025-03-08 13:33+0000\n"
+"PO-Revision-Date: 2025-03-08 13:33+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -659,10 +659,10 @@ msgstr ""
 msgid "nickname {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"
 msgstr ""
 
-msgid "nickname {ON | OFF}"
+msgid "nickname {ON | delay | OFF}"
 msgstr ""
 
-msgid "nickname {ON | QUICK | IMMED | OFF}"
+msgid "nickname {ON | OFF}"
 msgstr ""
 
 msgid "option (channel | bot) settings"
@@ -3574,9 +3574,6 @@ msgstr ""
 msgid "Ignore list:"
 msgstr ""
 
-msgid "Immediate protection"
-msgstr ""
-
 msgid "Incorrect email address."
 msgstr ""
 
@@ -4740,15 +4737,15 @@ msgid "Protection"
 msgstr ""
 
 #, c-format
+msgid "Protection delay must be between %s and %s."
+msgstr ""
+
+#, c-format
 msgid "Protection is now off for %s."
 msgstr ""
 
 #, c-format
-msgid "Protection is now on for %s, with a reduced delay."
-msgstr ""
-
-#, c-format
-msgid "Protection is now on for %s, with no delay."
+msgid "Protection is now on after %lu seconds for %s."
 msgstr ""
 
 #, c-format
@@ -4759,9 +4756,6 @@ msgid ""
 "Puts an AKILL for every nick on the specified channel. It\n"
 "uses the entire real ident@host for every nick, and\n"
 "then enforces the AKILL."
-msgstr ""
-
-msgid "Quick protection"
 msgstr ""
 
 msgid "RANDOMNEWS {ADD|DEL|LIST} [text|num]"
@@ -5984,9 +5978,6 @@ msgid ""
 "shown to users when they join the channel."
 msgstr ""
 
-msgid "The IMMED option is not available on this network."
-msgstr ""
-
 #, c-format
 msgid ""
 "The LEVELS command allows fine control over the meaning of\n"
@@ -6515,42 +6506,26 @@ msgid ""
 "information on it using the INFO command.)"
 msgstr ""
 
+#, c-format
+msgid ""
+"Turns automatic protection for the nick on or off. With\n"
+"protection on if a user tries to use a nickname from the\n"
+"nick's group they will be given some time to change their\n"
+"nick after which %s will forcibly change their nick."
+msgstr ""
+
+#, c-format
+msgid ""
+"Turns automatic protection for your account on or off. With\n"
+"protection on if another user tries to use a nickname from\n"
+"your group they will be given some time to change their nick\n"
+"after which %s will forcibly change their nick."
+msgstr ""
+
 msgid "Turns chanstats channel statistics ON or OFF for this user."
 msgstr ""
 
 msgid "Turns chanstats statistics ON or OFF."
-msgstr ""
-
-#, c-format
-msgid ""
-"Turns the automatic protection option for the nick\n"
-"on or off. With protection on, if another user\n"
-"tries to take the nick, they will be given one minute to\n"
-"change to another nick, after which %s will forcibly change\n"
-"their nick.\n"
-" \n"
-"If you select QUICK, the user will be given only 20 seconds\n"
-"to change nicks instead of the usual 60. If you select\n"
-"IMMED, the user's nick will be changed immediately without being\n"
-"warned first or given a chance to change their nick; please\n"
-"do not use this option unless necessary. Also, your\n"
-"network's administrators may have disabled this option."
-msgstr ""
-
-#, c-format
-msgid ""
-"Turns the automatic protection option for your nick\n"
-"on or off. With protection on, if another user\n"
-"tries to take your nick, they will be given one minute to\n"
-"change to another nick, after which %s will forcibly change\n"
-"their nick.\n"
-" \n"
-"If you select QUICK, the user will be given only 20 seconds\n"
-"to change nicks instead of the usual 60. If you select\n"
-"IMMED, the user's nick will be changed immediately without being\n"
-"warned first or given a chance to change their nick; please\n"
-"do not use this option unless necessary. Also, your\n"
-"network's administrators may have disabled this option."
 msgstr ""
 
 msgid "Type"
@@ -7418,4 +7393,7 @@ msgid "{nick | channel}"
 msgstr ""
 
 msgid "{nick | channel} memo-text"
+msgstr ""
+
+msgid "{ON | delay | OFF}"
 msgstr ""

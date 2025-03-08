@@ -56,23 +56,38 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("NS_PRIVATE");
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (message.post_data["kill"] == "on" && !na->nc->HasExt("KILLPROTECT"))
+		if (na->nc->HasExt("PROTECT") != !!message.post_data.count("protect"))
 		{
-			na->nc->Extend<bool>("KILLPROTECT");
-			na->nc->Shrink<bool>("KILL_QUICK");
-			replacements["MESSAGES"] = "Kill updated";
+			if (!na->nc->HasExt("PROTECT"))
+			{
+				na->nc->Shrink<bool>("PROTECT");
+				na->nc->Shrink<time_t>("PROTECT_AFTER");
+			}
+			else
+			{
+				na->nc->Extend<bool>("PROTECT");
+			}
+			replacements["MESSAGES"] = "Protect updated";
 		}
-		else if (message.post_data["kill"] == "quick" && !na->nc->HasExt("KILL_QUICK"))
+		if (na->nc->HasExt("PROTECT") && message.post_data.count("protect_after") > 0)
 		{
-			na->nc->Extend<bool>("KILLPROTECT");
-			na->nc->Extend<bool>("KILL_QUICK");
-			replacements["MESSAGES"] = "Kill updated";
-		}
-		else if (message.post_data["kill"] == "off" && (!!na->nc->HasExt("KILLPROTECT") || !!na->nc->HasExt("KILL_QUICK")))
-		{
-			na->nc->Shrink<bool>("KILLPROTECT");
-			na->nc->Shrink<bool>("KILL_QUICK");
-			replacements["MESSAGES"] = "Kill updated";
+			auto &block = Config->GetModule("nickserv");
+			auto minprotect = block.Get<time_t>("minprotect", "10s");
+			auto maxprotect = block.Get<time_t>("maxprotect", "10m");
+
+			auto secs = Anope::TryConvert<time_t>(message.post_data["greet"]);
+			if (!secs)
+				replacements["ERRORS"] = "Protection after seconds are not valid";
+			else if (*secs < minprotect || *secs > maxprotect)
+			{
+				replacements["ERRORS"] = Anope::printf("Protection delay must be between %ld and %ld seconds.",
+					minprotect, maxprotect);
+			}
+			else
+			{
+				na->nc->Extend<time_t>("PROTECT_AFTER", *secs);
+				replacements["MESSAGES"] = "Protect after updated";
+			}
 		}
 		if (na->nc->HasExt("NS_KEEP_MODES") != !!message.post_data.count("keepmodes"))
 		{
@@ -113,12 +128,13 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		replacements["AUTOOP"];
 	if (na->nc->HasExt("NS_PRIVATE"))
 		replacements["PRIVATE"];
-	if (na->nc->HasExt("KILLPROTECT"))
-		replacements["KILL_ON"];
-	if (na->nc->HasExt("KILL_QUICK"))
-		replacements["KILL_QUICK"];
-	if (!na->nc->HasExt("KILLPROTECT") && !na->nc->HasExt("KILL_QUICK"))
-		replacements["KILL_OFF"];
+	if (na->nc->HasExt("PROTECT"))
+	{
+		replacements["PROTECT"];
+		auto *protectafter = na->nc->GetExt<time_t>("PROTECT_AFTER");
+		if (protectafter)
+			replacements["PROTECT_AFTER"] = *protectafter;
+	}
 	if (na->nc->HasExt("NS_KEEP_MODES"))
 		replacements["KEEPMODES"];
 	if (na->nc->HasExt("MSG"))

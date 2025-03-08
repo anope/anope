@@ -480,7 +480,10 @@ static void LoadNicks()
 
 			READ(read_uint32(&u32, f));
 			if (u32 & OLD_NI_KILLPROTECT)
-				nc->Extend<bool>("KILLPROTECT");
+			{
+				nc->Extend<bool>("PROTECT");
+				nc->Extend("PROTECT_AFTER", 60);
+			}
 			if (u32 & OLD_NI_MSG)
 				nc->Extend<bool>("MSG");
 			if (u32 & OLD_NI_MEMO_HARDMAX)
@@ -498,9 +501,15 @@ static void LoadNicks()
 			if (u32 & OLD_NI_HIDE_QUIT)
 				nc->Extend<bool>("HIDE_QUIT");
 			if (u32 & OLD_NI_KILL_QUICK)
-				nc->Extend<bool>("KILL_QUICK");
+			{
+				nc->Extend<bool>("PROTECT");
+				nc->Extend("PROTECT_AFTER", 20);
+			}
 			if (u32 & OLD_NI_KILL_IMMED)
-				nc->Extend<bool>("KILL_IMMED");
+			{
+				nc->Extend<bool>("PROTECT");
+				nc->Extend<time_t>("PROTECT_AFTER", 0);
+			}
 			if (u32 & OLD_NI_MEMO_MAIL)
 				nc->Extend<bool>("MEMO_MAIL");
 			if (u32 & OLD_NI_HIDE_STATUS)

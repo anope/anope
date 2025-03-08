@@ -61,14 +61,12 @@
 							<td><input type="checkbox" name="private" value="on" {IF EXISTS PRIVATE}checked{END IF}></td>
 						</tr>
 						<tr>
-							<td>Kill:</td>
-							<td>
-								<select name="kill" class="form-control input-sm">
-									<option value="on" {IF EXISTS KILL_ON}selected{END IF}>On</option>
-									<option value="quick" {IF EXISTS KILL_QUICK}selected{END IF}>Quick</option>
-									<option value="off" {IF EXISTS KILL_OFF}selected{END IF}>Off</option>
-								</select>
-							</td>
+							<td>Protect:</td>
+							<td><input type="checkbox" name="protect" value="on" {IF EXISTS PROTECT}checked{END IF}></td>
+						</tr>
+						<tr>
+							<td>Protect after:</td>
+							<td><input name="protect_after" value="{PROTECT_AFTER}" class="form-control input-sm"></td>
 						</tr>
 					</tbody>
 				</table>

@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_news.h"
+#include "modules/operserv/news.h"
 
 // TODO: msgarray breaks the format string checking
 #ifdef __GNUC__

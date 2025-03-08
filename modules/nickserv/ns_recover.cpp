@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/ns_cert.h"
+#include "modules/nickserv/cert.h"
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 

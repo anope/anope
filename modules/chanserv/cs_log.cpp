@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_log.h"
+#include "modules/chanserv/log.h"
 
 struct LogSettingImpl final
 	: LogSetting

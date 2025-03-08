@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_forbid.h"
+#include "modules/operserv/forbid.h"
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 

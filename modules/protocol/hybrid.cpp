@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
+#include "modules/chanserv/mode.h"
 
 static Anope::string UplinkSID;
 static bool UseSVSAccount = false;  // Temporary backwards compatibility hack until old proto is deprecated

@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/sasl.h"
+#include "modules/nickserv/sasl.h"
 
 static Anope::string UplinkSID;
 

@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
+#include "modules/chanserv/mode.h"
 
 class CommandCSSet final
 	: public Command

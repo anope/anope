@@ -10,11 +10,11 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
+#include "modules/chanserv/mode.h"
 #include "modules/encryption.h"
 #include "modules/httpd.h"
-#include "modules/ns_cert.h"
-#include "modules/sasl.h"
+#include "modules/nickserv/cert.h"
+#include "modules/nickserv/sasl.h"
 
 typedef std::map<char, unsigned> ListLimits;
 

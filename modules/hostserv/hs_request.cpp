@@ -15,7 +15,7 @@
  */
 
 #include "module.h"
-#include "modules/hs_request.h"
+#include "modules/hostserv/request.h"
 
 static ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
 

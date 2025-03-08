@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_oper.h"
+#include "modules/operserv/oper.h"
 
 class CommandOSOper final
 	: public Command

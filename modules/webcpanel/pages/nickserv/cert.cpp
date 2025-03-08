@@ -6,7 +6,7 @@
  */
 
 #include "../../webcpanel.h"
-#include "modules/ns_cert.h"
+#include "modules/nickserv/cert.h"
 
 WebCPanel::NickServ::Cert::Cert(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {

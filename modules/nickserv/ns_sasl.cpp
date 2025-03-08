@@ -7,8 +7,8 @@
  */
 
 #include "module.h"
-#include "modules/sasl.h"
-#include "modules/ns_cert.h"
+#include "modules/nickserv/cert.h"
+#include "modules/nickserv/sasl.h"
 
 class Plain final
 	: public SASL::Mechanism

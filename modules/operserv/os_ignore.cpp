@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_ignore.h"
+#include "modules/operserv/ignore.h"
 
 struct IgnoreDataImpl final
 	: IgnoreData

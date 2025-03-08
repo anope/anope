@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/bs_badwords.h"
+#include "modules/botserv/badwords.h"
 
 struct BadWordImpl final
 	: BadWord

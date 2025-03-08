@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_entrymsg.h"
+#include "modules/chanserv/entrymsg.h"
 
 struct EntryMsgImpl final
 	: EntryMsg

@@ -7,14 +7,6 @@
 
 #include "../../webcpanel.h"
 
-namespace
-{
-	bool ChannelSort(ChannelInfo *ci1, ChannelInfo *ci2)
-	{
-		return ci::less()(ci1->name, ci2->name);
-	}
-}
-
 namespace WebCPanel
 {
 
@@ -25,7 +17,9 @@ void BuildChanList(NickAlias *na, TemplateFileServer::Replacements &replacements
 {
 	std::deque<ChannelInfo *> queue;
 	na->nc->GetChannelReferences(queue);
-	std::sort(queue.begin(), queue.end(), ChannelSort);
+	std::sort(queue.begin(), queue.end(), [](auto *lhs, auto *rhs) {
+		return ci::less()(lhs->name, rhs->name);
+	});
 
 	for (auto *ci : queue)
 	{

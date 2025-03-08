@@ -7,11 +7,6 @@
 
 #include "../../webcpanel.h"
 
-static bool ChannelSort(ChannelInfo *ci1, ChannelInfo *ci2)
-{
-	return ci::less()(ci1->name, ci2->name);
-}
-
 WebCPanel::NickServ::Alist::Alist(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
 }
@@ -20,7 +15,9 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 {
 	std::deque<ChannelInfo *> queue;
 	na->nc->GetChannelReferences(queue);
-	std::sort(queue.begin(), queue.end(), ChannelSort);
+	std::sort(queue.begin(), queue.end(), [](auto *lhs, auto *rhs) {
+		return ci::less()(lhs->name, rhs->name);
+	});
 
 	int chan_count = 0;
 

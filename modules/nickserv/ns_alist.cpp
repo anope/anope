@@ -14,11 +14,6 @@
 class CommandNSAList final
 	: public Command
 {
-	static bool ChannelSort(ChannelInfo *ci1, ChannelInfo *ci2)
-	{
-		return ci::less()(ci1->name, ci2->name);
-	}
-
 public:
 	CommandNSAList(Module *creator) : Command(creator, "nickserv/alist", 0, 2)
 	{
@@ -50,7 +45,9 @@ public:
 
 		std::deque<ChannelInfo *> queue;
 		nc->GetChannelReferences(queue);
-		std::sort(queue.begin(), queue.end(), ChannelSort);
+		std::sort(queue.begin(), queue.end(), [](auto *lhs, auto *rhs) {
+			return ci::less()(lhs->name, rhs->name);
+		});
 
 		for (auto *ci : queue)
 		{

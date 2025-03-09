@@ -142,7 +142,10 @@ private:
 		* And we must finally check that the nick is not already
 		* taken by another bot.
 		*/
-		if (nick.equals_cs(bi->nick) && (!user.empty() ? user.equals_cs(bi->GetIdent()) : 1) && (!host.empty() ? host.equals_cs(bi->host) : 1) && (!real.empty() ? real.equals_cs(bi->realname) : 1))
+		if (nick.equals_cs(bi->nick)
+			&& (user.empty() || user.equals_cs(bi->GetIdent()))
+			&& (host.empty() || host.equals_cs(bi->host))
+			&& (real.empty() || real.equals_cs(bi->realname)))
 		{
 			source.Reply(_("The old information is the same as the new information specified."));
 			return;
@@ -179,10 +182,7 @@ private:
 				source.Reply(_("Nick \002%s\002 is currently in use."), nick.c_str());
 				return;
 			}
-		}
 
-		if (!nick.equals_ci(bi->nick))
-		{
 			/* We check whether the nick is registered, and inform the user
 			* if so. You need to drop the nick manually before you can use
 			* it as a bot nick from now on -GD

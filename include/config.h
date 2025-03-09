@@ -22,7 +22,7 @@ namespace Configuration
 	{
 	class CoreExport Block
 	{
-		friend struct Configuration::Conf;
+		friend class Configuration::Conf;
 
 	public:
 		typedef Anope::map<Anope::string> item_map;

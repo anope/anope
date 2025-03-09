@@ -116,13 +116,16 @@ public:
 
 		ChanServ = bi;
 
-		spacesepstream(conf.GetModule(this).Get<const Anope::string>("defaults", "keeptopic peace securefounder signkick")).GetTokens(defaults);
+		spacesepstream(conf.GetModule(this).Get<const Anope::string>("defaults")).GetTokens(defaults);
 		if (defaults.empty())
 		{
-			defaults.emplace_back("KEEPTOPIC");
-			defaults.emplace_back("PEACE");
-			defaults.emplace_back("SECUREFOUNDER");
-			defaults.emplace_back("SIGNKICK");
+			defaults = {
+				"CS_KEEP_MODES",
+				"KEEPTOPIC",
+				"PEACE",
+				"SECUREFOUNDER",
+				"SIGNKICK",
+			};
 		}
 		else if (defaults[0].equals_ci("none"))
 			defaults.clear();

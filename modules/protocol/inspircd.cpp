@@ -255,7 +255,7 @@ public:
 		Uplink::Send(user, "SVSCMODE", u->GetUID(), c->name, 'b');
 	}
 
-	void SendQuit(User *u, const Anope::string &buf, const Anope::string &operbuf)
+	void SendQuit(User *u, const Anope::string &buf, const Anope::string &operbuf) override
 	{
 		if (!operbuf.empty())
 			Uplink::Send("METADATA", u->GetUID(), "operquit", operbuf);

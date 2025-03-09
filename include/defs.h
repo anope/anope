@@ -23,7 +23,7 @@ struct ChanUserContainer;
 class ClientSocket;
 class Command;
 class CommandSource;
-namespace Configuration { struct Conf; }
+namespace Configuration { class Conf; }
 class ConnectionSocket;
 namespace DNS { struct Query; }
 class Entry;

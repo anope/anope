@@ -255,6 +255,14 @@ public:
 		Uplink::Send(user, "SVSCMODE", u->GetUID(), c->name, 'b');
 	}
 
+	void SendQuit(User *u, const Anope::string &buf, const Anope::string &operbuf)
+	{
+		if (!operbuf.empty())
+			Uplink::Send("METADATA", u->GetUID(), "operquit", operbuf);
+
+		IRCDProto::SendQuit(u, buf, operbuf);
+	}
+
 	void SendPong(const Anope::string &servname, const Anope::string &who) override
 	{
 		Server *serv = servname.empty() ? NULL : Server::Find(servname);

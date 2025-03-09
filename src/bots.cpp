@@ -66,7 +66,7 @@ BotInfo::~BotInfo()
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{
-		IRCD->SendQuit(this, "");
+		IRCD->SendQuit(this);
 		FOREACH_MOD(OnUserQuit, (this, ""));
 		this->introduced = false;
 		XLine x(this->nick);

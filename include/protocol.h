@@ -222,7 +222,7 @@ public:
 	virtual void SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg);
 	virtual void SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg);
 
-	virtual void SendQuit(User *u, const Anope::string &msg);
+	virtual void SendQuit(User *u, const Anope::string &msg = "", const Anope::string &opermsg = "");
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
 

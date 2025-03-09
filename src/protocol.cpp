@@ -151,7 +151,7 @@ void IRCDProto::SendTagmsg(const MessageSource &source, const Anope::string &des
 		Uplink::Send(tags, source, "TAGMSG", dest);
 }
 
-void IRCDProto::SendQuit(User *u, const Anope::string &buf)
+void IRCDProto::SendQuit(User *u, const Anope::string &buf, const Anope::string &operbuf)
 {
 	if (!buf.empty())
 		Uplink::Send(u, "QUIT", buf);

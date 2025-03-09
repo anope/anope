@@ -130,7 +130,7 @@ UplinkSocket::~UplinkSocket()
 			if (u->server == Me)
 			{
 				/* Don't use quitmsg here, it may contain information you don't want people to see */
-				IRCD->SendQuit(u, "Shutting down");
+				IRCD->SendQuit(u, "Shutting down", Anope::QuitReason);
 				BotInfo *bi = BotInfo::Find(u->GetUID());
 				if (bi != NULL)
 					bi->introduced = false;

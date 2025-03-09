@@ -106,7 +106,7 @@ public:
 		Anope::map<NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
 		if (nit != NickServReleases.end())
 		{
-			IRCD->SendQuit(nit->second, "");
+			IRCD->SendQuit(nit->second);
 			delete nit->second;
 		}
 
@@ -117,7 +117,7 @@ public:
 
 	~NickServRelease() override
 	{
-		IRCD->SendQuit(this, "");
+		IRCD->SendQuit(this);
 		NickServReleases.erase(this->nick);
 	}
 

@@ -83,9 +83,14 @@ namespace Configuration
 
 	struct Uplink;
 
-	struct CoreExport Conf final
-		: Block
+	class CoreExport Conf final
+		: public Block
 	{
+	private:
+		/** Replaces defined variables within a string. */
+		Anope::string ReplaceVars(const Anope::string &str, const File &file, int linenumber);
+
+	public:
 		/* options:readtimeout */
 		time_t ReadTimeout;
 		/* If we should default to privmsging clients */

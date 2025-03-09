@@ -939,23 +939,11 @@ void Conf::LoadConf(File &file)
 					}
 
 					Block *b = block_stack.top();
-
 					if (b)
-						Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << b->name << "' '" << itemname << "' set to '" << wordbuffer << "'";
-
-					/* Check defines */
-					for (int i = 0; i < this->CountBlock("define"); ++i)
 					{
-						const Block &define = this->GetBlock("define", i);
-
-						const Anope::string &dname = define.Get<const Anope::string>("name");
-
-						if (dname == wordbuffer && &define != b)
-							wordbuffer = define.Get<const Anope::string>("value");
+						Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << b->name << "' '" << itemname << "' set to '" << wordbuffer << "'";
+						b->items[itemname] = ReplaceVars(wordbuffer, file, linenumber);
 					}
-
-					if (b)
-						b->items[itemname] = wordbuffer;
 
 					wordbuffer.clear();
 					itemname.clear();
@@ -990,4 +978,53 @@ void Conf::LoadConf(File &file)
 		else
 			throw ConfigException("Unterminated commented block at end of file: " + file.GetName());
 	}
+}
+
+Anope::string Conf::ReplaceVars(const Anope::string &str, const File &file, int linenumber)
+{
+	Anope::string ret;
+	for (auto it = str.begin(); it != str.end(); )
+	{
+		if (*it != '$')
+		{
+			ret.push_back(*it++);
+			continue;
+		}
+
+		if (++it == str.end() || *it != '{')
+			continue;
+
+		it++;
+		Anope::string var;
+		while (it != str.end() && *it != '}')
+			var.push_back(*it++);
+
+		if (it == str.end())
+			throw ConfigException("Unterminated variable: " + file.GetName() + ":" + Anope::ToString(linenumber));
+
+		it++;
+		if (var.compare(0, 4, "env.", 4) == 0)
+		{
+			// This is an environment variable rather than a defined variable
+			const char* envstr = getenv(var.c_str() + 4);
+			if (envstr && envstr)
+				ret.append(envstr);
+			continue;
+		}
+
+		for (int i = 0; i < this->CountBlock("define"); ++i)
+		{
+			const auto &define = this->GetBlock("define", i);
+			const auto defname = define.Get<const Anope::string>("name");
+			if (defname == var)
+			{
+				ret.append(define.Get<const Anope::string>("value"));
+				break;
+			}
+		}
+	}
+
+	if (!str.equals_cs(ret))
+		Log(LOG_DEBUG) << "Expanded \"" << str << "\" to \"" << ret << "\"";
+	return ret;
 }

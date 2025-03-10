@@ -109,6 +109,7 @@ public:
 		{
 			xmlrpc_env_set_fault(&env, RPC::ERR_METHOD_NOT_FOUND, "Method not found");
 			SendError(reply, env);
+			xmlrpc_DECREF(params);
 			return true;
 		}
 

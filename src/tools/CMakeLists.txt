@@ -27,7 +27,7 @@ foreach(SRC ${TOOLS_SRCS})
   endif()
 endforeach()
 
-# If not on Windows, generate anoperc and install it along with mydbgen
+# If not on Windows, generate anope.service and anoperc
 if(NOT WIN32)
   if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     configure_file(${Anope_SOURCE_DIR}/src/tools/anope.service.in ${Anope_BINARY_DIR}/src/tools/anope.service)

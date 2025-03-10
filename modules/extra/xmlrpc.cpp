@@ -63,6 +63,9 @@ private:
 	}
 
 public:
+	// Whether we should use the nil XML-RPC extension.
+	static bool enable_nil;
+
 	MyXMLRPCServiceInterface(Module *creator, const Anope::string &sname)
 		: RPC::ServiceInterface(creator, sname)
 		, HTTPPage("/xmlrpc", "text/xml")
@@ -178,8 +181,10 @@ public:
 		xmlrpc_value *value;
 		if (request.GetRoot())
 			value = SerializeElement(env, request.GetRoot().value());
-		else
+		else if (enable_nil)
 			value = xmlrpc_nil_new(&env);
+		else
+			value = xmlrpc_struct_new(&env);
 
 		auto *response = xmlrpc_mem_block_new(&env, 0);
 		xmlrpc_serialize_response(&env, response, value);
@@ -212,7 +217,7 @@ xmlrpc_value *MyXMLRPCServiceInterface::SerializeElement(xmlrpc_env &env, const 
 		},
 		[&env, &elem](std::nullptr_t)
 		{
-			elem = xmlrpc_nil_new(&env);
+			elem = enable_nil ? xmlrpc_nil_new(&env) : xmlrpc_struct_new(&env);
 		},
 		[&env, &elem](bool b)
 		{
@@ -244,6 +249,8 @@ xmlrpc_value *MyXMLRPCServiceInterface::SerializeElement(xmlrpc_env &env, const 
 	}, value.Get());
 	return elem;
 }
+
+bool MyXMLRPCServiceInterface::enable_nil = true;
 
 class ModuleXMLRPC final
 	: public Module
@@ -285,11 +292,14 @@ public:
 		if (httpref)
 			httpref->UnregisterPage(&xmlrpcinterface);
 
-		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf.GetModule(this).Get<const Anope::string>("server", "httpd/main"));
+		auto &modconf = conf.GetModule(this);
+		MyXMLRPCServiceInterface::enable_nil = modconf.Get<bool>("enable_nil", "yes");
+
+		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", modconf.Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)
 			throw ConfigException("Unable to find http reference, is httpd loaded?");
-
 		httpref->RegisterPage(&xmlrpcinterface);
+
 	}
 };
 

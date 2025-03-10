@@ -63,6 +63,9 @@ private:
 	}
 
 public:
+	// Whether we should use the i8 XML-RPC extension.
+	static bool enable_i8;
+
 	// Whether we should use the nil XML-RPC extension.
 	static bool enable_nil;
 
@@ -229,27 +232,51 @@ xmlrpc_value *MyXMLRPCServiceInterface::SerializeElement(xmlrpc_env &env, const 
 		},
 		[&env, &elem](int64_t i)
 		{
-			elem = xmlrpc_i8_new(&env, i);
+			// XML-RPC does not support 64-bit integers without the use of an
+			// extension.
+			if (!enable_i8 && (i <= INT32_MAX && i >= INT32_MIN))
+			{
+				// We can fit this into a int.
+				elem = xmlrpc_int_new(&env, i);
+			}
+			else if (enable_i8)
+			{
+				// We can fit this into a i8.
+				elem = xmlrpc_i8_new(&env, i);
+			}
+			else
+			{
+				// We need to convert this to a string.
+				auto s = Anope::ToString(i);
+				elem = xmlrpc_string_new_lp(&env, s.length(), s.c_str());
+			}
 		},
 		[&env, &elem](uint64_t u)
 		{
-			// XML-RPC does not support unsigned data types.
-			if (u > INT64_MAX)
+			// XML-RPC does not support unsigned data types or 64-bit integers
+			// without the use of an extension.
+			if (!enable_i8 && u <= INT32_MAX)
+			{
+				// We can fit this into a int.
+				elem = xmlrpc_int_new(&env, u);
+			}
+			else if (enable_i8 && u <= INT64_MAX)
+			{
+				// We can fit this into a i8.
+				elem = xmlrpc_i8_new(&env, u);
+			}
+			else
 			{
 				// We need to convert this to a string.
 				auto s = Anope::ToString(u);
 				elem = xmlrpc_string_new_lp(&env, s.length(), s.c_str());
-			}
-			else
-			{
-				// We can fit this into a i8.
-				elem = xmlrpc_i8_new(&env, u);
 			}
 		},
 	}, value.Get());
 	return elem;
 }
 
+bool MyXMLRPCServiceInterface::enable_i8 = true;
 bool MyXMLRPCServiceInterface::enable_nil = true;
 
 class ModuleXMLRPC final
@@ -293,6 +320,7 @@ public:
 			httpref->UnregisterPage(&xmlrpcinterface);
 
 		auto &modconf = conf.GetModule(this);
+		MyXMLRPCServiceInterface::enable_i8 = modconf.Get<bool>("enable_i8", "yes");
 		MyXMLRPCServiceInterface::enable_nil = modconf.Get<bool>("enable_nil", "yes");
 
 		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", modconf.Get<const Anope::string>("server", "httpd/main"));

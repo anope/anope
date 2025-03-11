@@ -160,6 +160,11 @@ void Anope::HandleSignal()
 			Anope::Quitting = true;
 			Anope::SaveDatabases();
 			break;
+#ifndef _WIN32
+		case SIGUSR1:
+			Anope::SaveDatabases();
+			break;
+#endif
 	}
 
 	Signal = 0;
@@ -198,8 +203,10 @@ static void InitSignals()
 
 	sa.sa_handler = SignalHandler;
 
+#ifndef _WIN32
+	sigaction(SIGUSR1, &sa, NULL);
+#endif
 	sigaction(SIGHUP, &sa, NULL);
-
 	sigaction(SIGTERM, &sa, NULL);
 	sigaction(SIGINT, &sa, NULL);
 

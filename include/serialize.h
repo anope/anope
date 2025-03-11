@@ -28,8 +28,11 @@ namespace Serialize
 		UINT,
 	};
 
-	class Data
+	class CoreExport Data
 	{
+	protected:
+		std::map<Anope::string, Serialize::DataType> types;
+
 	public:
 		virtual ~Data() = default;
 
@@ -54,8 +57,8 @@ namespace Serialize
 
 		virtual size_t Hash() const { throw CoreException("Not supported"); }
 
-		virtual void SetType(const Anope::string &key, DataType dt) { }
-		virtual DataType GetType(const Anope::string &key) const { return DataType::TEXT; }
+		Serialize::DataType GetType(const Anope::string &key) const;
+		void SetType(const Anope::string &key, Serialize::DataType dt);
 	};
 
 	extern void RegisterTypes();

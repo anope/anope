@@ -111,6 +111,19 @@ const std::list<Serializable *> &Serializable::GetItems()
 	return *SerializableItems;
 }
 
+Serialize::DataType Serialize::Data::GetType(const Anope::string &key) const
+{
+	auto it = this->types.find(key);
+	if (it != this->types.end())
+		return it->second;
+	return Serialize::DataType::TEXT;
+}
+
+void Serialize::Data::SetType(const Anope::string &key, Serialize::DataType dt)
+{
+	this->types[key] = dt;
+}
+
 Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o)
 {
 	TypeOrder.push_back(this->name);

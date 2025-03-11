@@ -19,7 +19,6 @@ namespace SQL
 	public:
 		typedef std::map<Anope::string, std::stringstream *> Map;
 		Map data;
-		std::map<Anope::string, Serialize::DataType> types;
 
 		~Data()
 		{
@@ -58,19 +57,6 @@ namespace SQL
 			for (const auto &[_, value] : this->data)
 				delete value;
 			this->data.clear();
-		}
-
-		void SetType(const Anope::string &key, Serialize::DataType dt) override
-		{
-			this->types[key] = dt;
-		}
-
-		Serialize::DataType GetType(const Anope::string &key) const override
-		{
-			auto it = this->types.find(key);
-			if (it != this->types.end())
-				return it->second;
-			return Serialize::DataType::TEXT;
 		}
 	};
 

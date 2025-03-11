@@ -378,14 +378,12 @@ public:
 
 		for (auto it = sessions.begin(); it != sessions.end(); )
 		{
-			const auto *sess = it->second;
+			const auto [uid, sess] = *it++;
 			if (!sess || sess->created + 60 < Anope::CurTime)
 			{
 				delete sess;
-				it = sessions.erase(it);
+				sessions.erase(uid);
 			}
-			else
-				it++;
 		}
 	}
 };

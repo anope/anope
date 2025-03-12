@@ -169,7 +169,7 @@ public:
 	/** Gets the name for this type
 	 * @return The name, eg "NickAlias"
 	 */
-	const Anope::string &GetName() { return this->name; }
+	const Anope::string &GetName() const { return this->name; }
 
 	/** Unserialized an object.
 	 * @param obj NULL if this object doesn't yet exist. If this isn't NULL, instead

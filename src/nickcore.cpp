@@ -15,15 +15,15 @@
 #include "config.h"
 #include <climits>
 
-Serialize::Checker<nickcore_map> NickCoreList("NickCore");
-Serialize::Checker<nickcoreid_map> NickCoreIdList("NickCore");
+Serialize::Checker<nickcore_map> NickCoreList(NICKCORE_TYPE);
+Serialize::Checker<nickcoreid_map> NickCoreIdList(NICKCORE_TYPE);
 
 NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid)
-	: Serializable("NickCore")
-	, chanaccess("ChannelInfo")
+	: Serializable(NICKCORE_TYPE)
+	, chanaccess(CHANNELINFO_TYPE)
 	, id(coreid)
 	, display(coredisplay)
-	, aliases("NickAlias")
+	, aliases(NICKALIAS_TYPE)
 {
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
@@ -67,7 +67,7 @@ NickCore::~NickCore()
 }
 
 NickCore::Type::Type()
-	: Serialize::Type("NickCore")
+	: Serialize::Type(NICKCORE_TYPE)
 {
 }
 

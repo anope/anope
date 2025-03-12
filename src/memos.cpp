@@ -17,7 +17,8 @@
 #include "account.h"
 #include "regchannel.h"
 
-Memo::Memo() : Serializable("Memo")
+Memo::Memo()
+	: Serializable(MEMO_TYPE)
 {
 	mi = NULL;
 	unread = receipt = false;
@@ -35,7 +36,7 @@ Memo::~Memo()
 }
 
 Memo::Type::Type()
-	: Serialize::Type("Memo")
+	: Serialize::Type(MEMO_TYPE)
 {
 }
 
@@ -82,7 +83,8 @@ Serializable *Memo::Type::Unserialize(Serializable *obj, Serialize::Data &data) 
 	return m;
 }
 
-MemoInfo::MemoInfo() : memos("Memo")
+MemoInfo::MemoInfo()
+	: memos(MEMO_TYPE)
 {
 }
 

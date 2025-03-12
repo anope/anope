@@ -21,7 +21,7 @@
 
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
-Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLineManager::XLinesByUID("XLine");
+Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLineManager::XLinesByUID(XLINE_TYPE);
 
 void XLine::Init()
 {
@@ -86,7 +86,12 @@ void XLine::Init()
 	}
 }
 
-XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(Me->GetName()), reason(r), id(uid)
+XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid)
+	: Serializable(XLINE_TYPE)
+	, mask(ma)
+	, by(Me->GetName())
+	, reason(r)
+	, id(uid)
 {
 	regex = NULL;
 	manager = NULL;
@@ -95,7 +100,14 @@ XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::strin
 	this->Init();
 }
 
-XLine::XLine(const Anope::string &ma, const Anope::string &b, const time_t ex, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(b), created(Anope::CurTime), expires(ex), reason(r), id(uid)
+XLine::XLine(const Anope::string &ma, const Anope::string &b, const time_t ex, const Anope::string &r, const Anope::string &uid)
+	: Serializable(XLINE_TYPE)
+	, mask(ma)
+	, by(b)
+	, created(Anope::CurTime)
+	, expires(ex)
+	, reason(r)
+	, id(uid)
 {
 	regex = NULL;
 	manager = NULL;
@@ -152,7 +164,7 @@ bool XLine::IsRegex() const
 }
 
 XLine::Type::Type()
-	: Serialize::Type("XLine")
+	: Serialize::Type(XLINE_TYPE)
 {
 }
 
@@ -266,7 +278,10 @@ Anope::string XLineManager::GenerateUID()
 	return id;
 }
 
-XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service(creator, "XLineManager", xname), type(t), xlines("XLine")
+XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t)
+	: Service(creator, "XLineManager", xname)
+	, type(t)
+	, xlines(XLINE_TYPE)
 {
 }
 

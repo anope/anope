@@ -160,7 +160,7 @@ public:
 
 		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
-			if (s->GetSerializableType()->GetName() != "NickCore")
+			if (s->GetSerializableType()->GetName() != NICKCORE_TYPE)
 				return;
 
 			const NickCore *n = anope_dynamic_static_cast<const NickCore *>(e);
@@ -176,7 +176,7 @@ public:
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
-			if (s->GetSerializableType()->GetName() != "NickCore")
+			if (s->GetSerializableType()->GetName() != NICKCORE_TYPE)
 				return;
 
 			NickCore *n = anope_dynamic_static_cast<NickCore *>(e);

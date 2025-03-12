@@ -18,10 +18,10 @@
 #include "servers.h"
 #include "config.h"
 
-Serialize::Checker<nickalias_map> NickAliasList("NickAlias");
+Serialize::Checker<nickalias_map> NickAliasList(NICKALIAS_TYPE);
 
 NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
-	: Serializable("NickAlias")
+	: Serializable(NICKALIAS_TYPE)
 	, nick(nickname)
 	, nc(nickcore)
 {
@@ -140,7 +140,7 @@ NickAlias *NickAlias::Find(const Anope::string &nick)
 }
 
 NickAlias::Type::Type()
-	: Serialize::Type("NickAlias")
+	: Serialize::Type(NICKALIAS_TYPE)
 {
 }
 

@@ -19,9 +19,10 @@
 #include "bots.h"
 #include "servers.h"
 
-Serialize::Checker<registered_channel_map> RegisteredChannelList("ChannelInfo");
+Serialize::Checker<registered_channel_map> RegisteredChannelList(CHANNELINFO_TYPE);
 
-AutoKick::AutoKick() : Serializable("AutoKick")
+AutoKick::AutoKick()
+	: Serializable(AUTOKICK_TYPE)
 {
 }
 
@@ -39,7 +40,7 @@ AutoKick::~AutoKick()
 }
 
 AutoKick::Type::Type()
-	: Serialize::Type("AutoKick")
+	: Serialize::Type(AUTOKICK_TYPE)
 {
 }
 
@@ -101,8 +102,10 @@ Serializable *AutoKick::Type::Unserialize(Serializable *obj, Serialize::Data &da
 	return ak;
 }
 
-ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInfo"),
-	access("ChanAccess"), akick("AutoKick")
+ChannelInfo::ChannelInfo(const Anope::string &chname)
+	: Serializable(CHANNELINFO_TYPE)
+	, access(CHANACCESS_TYPE)
+	, akick(AUTOKICK_TYPE)
 {
 	if (chname.empty())
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
@@ -130,8 +133,10 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInf
 	FOREACH_MOD(OnCreateChan, (this));
 }
 
-ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
-	access("ChanAccess"), akick("AutoKick")
+ChannelInfo::ChannelInfo(const ChannelInfo &ci)
+	: Serializable(CHANNELINFO_TYPE)
+	, access(CHANACCESS_TYPE)
+	, akick(AUTOKICK_TYPE)
 {
 	*this = ci;
 
@@ -185,7 +190,7 @@ ChannelInfo::~ChannelInfo()
 }
 
 ChannelInfo::Type::Type()
-	: Serialize::Type("ChannelInfo")
+	: Serialize::Type(CHANNELINFO_TYPE)
 {
 }
 

@@ -1057,7 +1057,7 @@ class CSSet final
 		{
 			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
 			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(s);
@@ -1077,7 +1077,7 @@ class CSSet final
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
 			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(s);

@@ -91,7 +91,9 @@ const std::list<AccessProvider *>& AccessProvider::GetProviders()
 	return Providers;
 }
 
-ChanAccess::ChanAccess(AccessProvider *p) : Serializable("ChanAccess"), provider(p)
+ChanAccess::ChanAccess(AccessProvider *p)
+	: Serializable(CHANACCESS_TYPE)
+	, provider(p)
 {
 }
 
@@ -160,7 +162,7 @@ NickCore *ChanAccess::GetAccount() const
 
 
 ChanAccess::Type::Type()
-	: Serialize::Type("ChanAccess")
+	: Serialize::Type(CHANACCESS_TYPE)
 {
 }
 

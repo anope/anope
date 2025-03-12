@@ -45,7 +45,7 @@ struct KickerDataImpl final
 
 		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
 			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(e);
@@ -79,7 +79,7 @@ struct KickerDataImpl final
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
 			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(e);

@@ -18,12 +18,12 @@
 #include "language.h"
 #include "serialize.h"
 
-Serialize::Checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
+Serialize::Checker<botinfo_map> BotListByNick(BOTINFO_TYPE), BotListByUID(BOTINFO_TYPE);
 
 BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes)
 	: User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", {}, IRCD ? IRCD->UID_Retrieve() : "", NULL)
-	, Serializable("BotInfo")
-	, channels("ChannelInfo")
+	, Serializable(BOTINFO_TYPE)
+	, channels(CHANNELINFO_TYPE)
 	, botmodes(bmodes)
 {
 	this->lastmsg = this->created = Anope::CurTime;
@@ -85,7 +85,7 @@ BotInfo::~BotInfo()
 }
 
 BotInfo::Type::Type()
-	: Serialize::Type("BotInfo")
+	: Serialize::Type(BOTINFO_TYPE)
 {
 }
 

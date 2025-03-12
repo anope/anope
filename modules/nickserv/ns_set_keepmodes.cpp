@@ -119,7 +119,7 @@ private:
 		{
 			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "NickCore")
+			if (s->GetSerializableType()->GetName() != NICKCORE_TYPE)
 				return;
 
 			const NickCore *nc = anope_dynamic_static_cast<const NickCore *>(s);
@@ -139,7 +139,7 @@ private:
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "NickCore")
+			if (s->GetSerializableType()->GetName() != NICKCORE_TYPE)
 				return;
 
 			NickCore *nc = anope_dynamic_static_cast<NickCore *>(s);

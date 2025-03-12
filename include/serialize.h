@@ -16,6 +16,16 @@
 #include "anope.h"
 #include "base.h"
 
+/** Names of serialization types implemented in the core. */
+#define AUTOKICK_TYPE    "AutoKick"
+#define BOTINFO_TYPE     "BotInfo"
+#define CHANACCESS_TYPE  "ChanAccess"
+#define CHANNELINFO_TYPE "ChannelInfo"
+#define MEMO_TYPE        "Memo"
+#define NICKALIAS_TYPE   "NickAlias"
+#define NICKCORE_TYPE    "NickCore"
+#define XLINE_TYPE       "XLine"
+
 namespace Serialize
 {
 	enum class DataType

@@ -162,11 +162,6 @@ void Type::Check()
 	FOREACH_MOD(OnSerializeCheck, (this));
 }
 
-time_t Type::GetTimestamp() const
-{
-	return this->timestamp;
-}
-
 void Type::UpdateTimestamp()
 {
 	this->timestamp = Anope::CurTime;
@@ -178,14 +173,4 @@ Type *Serialize::Type::Find(const Anope::string &name)
 	if (it != Types.end())
 		return it->second;
 	return NULL;
-}
-
-const std::vector<Anope::string> &Type::GetTypeOrder()
-{
-	return TypeOrder;
-}
-
-const std::map<Anope::string, Serialize::Type *>& Type::GetTypes()
-{
-	return Types;
 }

@@ -37,15 +37,38 @@ struct DNSZone final
 			zones->erase(it);
 	}
 
-	void Serialize(Serialize::Data &data) const override
+	static DNSZone *Find(const Anope::string &name)
 	{
-		data.Store("name", name);
+		for (auto *zone : *zones)
+		{
+			if (zone->name.equals_ci(name))
+			{
+				zone->QueueUpdate();
+				return zone;
+			}
+		}
+		return NULL;
+	}
+};
+
+struct DNSZoneType final
+	: Serialize::Type
+{
+	DNSZoneType()
+		: Serialize::Type("DNSZone")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *zone = static_cast<const DNSZone *>(obj);
+		data.Store("name", zone->name);
 		unsigned count = 0;
-		for (const auto &server : servers)
+		for (const auto &server : zone->servers)
 			data.Store("server" + Anope::ToString(count++), server);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		DNSZone *zone;
 		Anope::string zone_name;
@@ -72,19 +95,6 @@ struct DNSZone final
 
 		return zone;
 	}
-
-	static DNSZone *Find(const Anope::string &name)
-	{
-		for (auto *zone : *zones)
-		{
-			if (zone->name.equals_ci(name))
-			{
-				zone->QueueUpdate();
-				return zone;
-			}
-		}
-		return NULL;
-	}
 };
 
 class DNSServer final
@@ -99,6 +109,8 @@ class DNSServer final
 	bool active = false;
 
 public:
+	friend class DNSServerType;
+
 	std::set<Anope::string, ci::less> zones;
 	time_t repool = 0;
 
@@ -142,19 +154,40 @@ public:
 		}
 	}
 
-	void Serialize(Serialize::Data &data) const override
+	static DNSServer *Find(const Anope::string &s)
 	{
-		data.Store("server_name", server_name);
-		for (unsigned i = 0; i < ips.size(); ++i)
-			data.Store("ip" + Anope::ToString(i), ips[i]);
-		data.Store("limit", limit);
-		data.Store("pooled", pooled);
+		for (auto *serv : *dns_servers)
+			if (serv->GetName().equals_ci(s))
+			{
+				serv->QueueUpdate();
+				return serv;
+			}
+		return NULL;
+	}
+};
+
+struct DNSServerType final
+	: Serialize::Type
+{
+	DNSServerType()
+		: Serialize::Type("DNSServer")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *req = static_cast<const DNSServer *>(obj);
+		data.Store("server_name", req->server_name);
+		for (unsigned i = 0; i < req->ips.size(); ++i)
+			data.Store("ip" + Anope::ToString(i), req->ips[i]);
+		data.Store("limit", req->limit);
+		data.Store("pooled", req->pooled);
 		unsigned count = 0;
-		for (const auto &zone : zones)
+		for (const auto &zone : req->zones)
 			data.Store("zone" + Anope::ToString(count++), zone);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		DNSServer *req;
 		Anope::string server_name;
@@ -192,17 +225,6 @@ public:
 		}
 
 		return req;
-	}
-
-	static DNSServer *Find(const Anope::string &s)
-	{
-		for (auto *serv : *dns_servers)
-			if (serv->GetName().equals_ci(s))
-			{
-				serv->QueueUpdate();
-				return serv;
-			}
-		return NULL;
 	}
 };
 
@@ -721,7 +743,8 @@ public:
 class ModuleDNS final
 	: public Module
 {
-	Serialize::Type zone_type, dns_type;
+	DNSZoneType zone_type;
+	DNSServerType dns_type;
 	CommandOSDNS commandosdns;
 
 	time_t ttl;
@@ -734,8 +757,9 @@ class ModuleDNS final
 	time_t last_warn = 0;
 
 public:
-	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-		zone_type("DNSZone", DNSZone::Unserialize), dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this)
+	ModuleDNS(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, EXTRA | VENDOR)
+		, commandosdns(this)
 	{
 		for (auto *s : *dns_servers)
 		{

@@ -43,19 +43,29 @@ struct SeenInfo final
 		if (iter != database.end() && iter->second == this)
 			database.erase(iter);
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct SeenInfoType final
+	: Serialize::Type
+{
+	SeenInfoType()
+		: Serialize::Type("SeenInfo")
 	{
-		data.Store("nick", nick);
-		data.Store("vhost", vhost);
-		data.Store("type", type);
-		data.Store("nick2", nick2);
-		data.Store("channel", channel);
-		data.Store("message", message);
-		data.Store("last", last);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *s = static_cast<const SeenInfo *>(obj);
+		data.Store("nick", s->nick);
+		data.Store("vhost", s->vhost);
+		data.Store("type", s->type);
+		data.Store("nick2", s->nick2);
+		data.Store("channel", s->channel);
+		data.Store("message", s->message);
+		data.Store("last", s->last);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string snick;
 
@@ -374,11 +384,14 @@ public:
 class CSSeen final
 	: public Module
 {
-	Serialize::Type seeninfo_type;
+	SeenInfoType seeninfo_type;
 	CommandSeen commandseen;
 	CommandOSSeen commandosseen;
 public:
-	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this)
+	CSSeen(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandseen(this)
+		, commandosseen(this)
 	{
 	}
 

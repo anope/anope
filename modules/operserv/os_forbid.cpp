@@ -19,21 +19,32 @@ struct ForbidDataImpl final
 	, Serializable
 {
 	ForbidDataImpl() : Serializable("ForbidData") { }
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-void ForbidDataImpl::Serialize(Serialize::Data &data) const
+struct ForbidDataTypeImpl final
+	: Serialize::Type
 {
-	data.Store("mask", this->mask);
-	data.Store("creator", this->creator);
-	data.Store("reason", this->reason);
-	data.Store("created", this->created);
-	data.Store("expires", this->expires);
-	data.Store("type", this->type);
+	ForbidDataTypeImpl()
+		: Serialize::Type("ForbidData")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+};
+
+void ForbidDataTypeImpl::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *fb = static_cast<const ForbidDataImpl *>(obj);
+	data.Store("mask", fb->mask);
+	data.Store("creator", fb->creator);
+	data.Store("reason", fb->reason);
+	data.Store("created", fb->created);
+	data.Store("expires", fb->expires);
+	data.Store("type", fb->type);
 }
 
-Serializable *ForbidDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ForbidDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	if (!forbid_service)
 		return NULL;
@@ -465,14 +476,15 @@ class OSForbid final
 	: public Module
 {
 	MyForbidService forbidService;
-	Serialize::Type forbiddata_type;
+	ForbidDataTypeImpl forbiddata_type;
 	CommandOSForbid commandosforbid;
 
 public:
-	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		forbidService(this), forbiddata_type("ForbidData", ForbidDataImpl::Unserialize), commandosforbid(this)
+	OSForbid(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, forbidService(this)
+		, commandosforbid(this)
 	{
-
 	}
 
 	void OnUserConnect(User *u, bool &exempt) override

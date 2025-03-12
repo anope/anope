@@ -145,7 +145,7 @@ public:
 		else
 		{
 			Data data;
-			obj->Serialize(data);
+			t->Serialize(obj, data);
 
 			if (obj->IsCached(data))
 				return;
@@ -402,7 +402,7 @@ void Updater::OnResult(const Reply &r)
 	}
 
 	Data data;
-	obj->Serialize(data);
+	st->Serialize(obj, data);
 
 	/* Transaction start */
 	me->redis->StartTransaction();
@@ -526,8 +526,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 		Log(LOG_DEBUG) << "redis: notify: deleting object id " << obj_id << " of type " << type;
 
 		Data data;
-
-		s->Serialize(data);
+		s_type->Serialize(s, data);
 
 		/* Transaction start */
 		me->redis->StartTransaction();
@@ -578,8 +577,7 @@ void ModifiedObject::OnResult(const Reply &r)
 	if (obj)
 	{
 		Data data;
-
-		obj->Serialize(data);
+		st->Serialize(obj, data);
 
 		for (auto &[key, value] : data.data)
 		{

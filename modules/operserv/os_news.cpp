@@ -64,18 +64,24 @@ struct NewsMessages msgarray[] = {
 	 }
 };
 
-struct MyNewsItem final
-	: NewsItem
+struct NewsItemType final
+	: Serialize::Type
 {
-	void Serialize(Serialize::Data &data) const override
+	NewsItemType()
+		: Serialize::Type("NewsItem")
 	{
-		data.Store("type", this->type);
-		data.Store("text", this->text);
-		data.Store("who", this->who);
-		data.Store("time", this->time);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *ni = static_cast<const NewsItem *>(obj);
+		data.Store("type", ni->type);
+		data.Store("text", ni->text);
+		data.Store("who", ni->who);
+		data.Store("time", ni->time);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		if (!news_service)
 			return NULL;
@@ -84,7 +90,7 @@ struct MyNewsItem final
 		if (obj)
 			ni = anope_dynamic_static_cast<NewsItem *>(obj);
 		else
-			ni = new MyNewsItem();
+			ni = new NewsItem();
 
 		unsigned int t;
 		data["type"] >> t;
@@ -117,7 +123,7 @@ public:
 
 	NewsItem *CreateNewsItem() override
 	{
-		return new MyNewsItem();
+		return new NewsItem();
 	}
 
 	void AddNewsItem(NewsItem *n) override
@@ -200,7 +206,7 @@ protected:
 			if (Anope::ReadOnly)
 				source.Reply(READ_ONLY_MODE);
 
-			NewsItem *news = new MyNewsItem();
+			NewsItem *news = new NewsItem();
 			news->type = ntype;
 			news->text = text;
 			news->time = Anope::CurTime;
@@ -382,7 +388,7 @@ class OSNews final
 	: public Module
 {
 	MyNewsService newsservice;
-	Serialize::Type newsitem_type;
+	NewsItemType newsitem_type;
 
 	CommandOSLogonNews commandoslogonnews;
 	CommandOSOperNews commandosopernews;
@@ -442,9 +448,12 @@ class OSNews final
 	}
 
 public:
-	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		newsservice(this), newsitem_type("NewsItem", MyNewsItem::Unserialize),
-		commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
+	OSNews(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, newsservice(this)
+		, commandoslogonnews(this)
+		, commandosopernews(this)
+		, commandosrandomnews(this)
 	{
 	}
 

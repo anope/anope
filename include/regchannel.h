@@ -25,6 +25,14 @@ class CoreExport AutoKick final
 	: public Serializable
 {
 public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
 	/* Channel this autokick is on */
 	Serialize::Reference<ChannelInfo> ci;
 
@@ -38,8 +46,6 @@ public:
 
 	AutoKick();
 	~AutoKick();
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 };
 
 /* It matters that Base is here before Extensible (it is inherited by Serializable)
@@ -48,9 +54,18 @@ class CoreExport ChannelInfo final
 	: public Serializable
 	, public Extensible
 {
+public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
+private:
 	/* channels who reference this one */
 	Anope::map<int> references;
-private:
 	Serialize::Reference<NickCore> founder;					/* Channel founder */
 	Serialize::Reference<NickCore> successor;                               /* Who gets the channel if the founder nick is dropped or expires */
 	Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
@@ -96,9 +111,6 @@ public:
 
 	~ChannelInfo();
 	ChannelInfo &operator=(const ChannelInfo &) = default;
-
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Change the founder of the channel
 	 * @params nc The new founder

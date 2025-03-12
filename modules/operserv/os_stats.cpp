@@ -21,18 +21,27 @@ struct Stats final
 	{
 		me = this;
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct StatsType final
+	: Serialize::Type
+{
+	StatsType()
+		: Serialize::Type("Stats")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
 	{
 		data.Store("maxusercnt", MaxUserCount);
 		data.Store("maxusertime", MaxUserTime);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		data["maxusercnt"] >> MaxUserCount;
 		data["maxusertime"] >> MaxUserTime;
-		return me;
+		return obj;
 	}
 };
 
@@ -316,14 +325,14 @@ class OSStats final
 	: public Module
 {
 	CommandOSStats commandosstats;
-	Serialize::Type stats_type;
+	StatsType stats_type;
 	Stats stats_saver;
 
 public:
-	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosstats(this), stats_type("Stats", Stats::Unserialize)
+	OSStats(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandosstats(this)
 	{
-
 	}
 
 	void OnUserConnect(User *u, bool &exempt) override

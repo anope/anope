@@ -35,6 +35,47 @@ namespace
 	unsigned ipv6_cidr;
 }
 
+struct ExceptionType final
+	: public Serialize::Type
+{
+	ExceptionType()
+		: Serialize::Type("Exception")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *ex = static_cast<const Exception *>(obj);
+		data.Store("mask", ex->mask);
+		data.Store("limit", ex->limit);
+		data.Store("who", ex->who);
+		data.Store("reason", ex->reason);
+		data.Store("time", ex->time);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
+	{
+		if (!session_service)
+			return NULL;
+
+		Exception *ex;
+		if (obj)
+			ex = anope_dynamic_static_cast<Exception *>(obj);
+		else
+			ex = new Exception;
+		data["mask"] >> ex->mask;
+		data["limit"] >> ex->limit;
+		data["who"] >> ex->who;
+		data["reason"] >> ex->reason;
+		data["time"] >> ex->time;
+		data["expires"] >> ex->expires;
+
+		if (!obj)
+			session_service->AddException(ex);
+		return ex;
+	}
+};
+
 class MySessionService final
 	: public SessionService
 {
@@ -573,15 +614,19 @@ public:
 class OSSession final
 	: public Module
 {
-	Serialize::Type exception_type;
+	ExceptionType exception_type;
 	MySessionService ss;
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
 	ServiceReference<XLineManager> akills;
 
 public:
-	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		exception_type("Exception", Exception::Unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
+	OSSession(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, ss(this)
+		, commandossession(this)
+		, commandosexception(this)
+		, akills("XLineManager", "xlinemanager/sgline")
 	{
 		this->SetPermanent(true);
 	}

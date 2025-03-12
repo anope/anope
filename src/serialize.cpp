@@ -27,9 +27,14 @@ std::list<Serializable *> *Serializable::SerializableItems;
 
 void Serialize::RegisterTypes()
 {
-	static Type nc("NickCore", NickCore::Unserialize), na("NickAlias", NickAlias::Unserialize), bi("BotInfo", BotInfo::Unserialize),
-		ci("ChannelInfo", ChannelInfo::Unserialize), access("ChanAccess", ChanAccess::Unserialize),
-		akick("AutoKick", AutoKick::Unserialize), memo("Memo", Memo::Unserialize), xline("XLine", XLine::Unserialize);
+	static NickCore::Type nc;
+	static NickAlias::Type na;
+	static BotInfo::Type bi;
+	static ChannelInfo::Type ci;
+	static ChanAccess::Type access;
+	static AutoKick::Type akick;
+	static Memo::Type memo;
+	static XLine::Type xline;
 }
 
 void Serialize::CheckTypes()
@@ -124,7 +129,9 @@ void Serialize::Data::SetType(const Anope::string &key, Serialize::DataType dt)
 	this->types[key] = dt;
 }
 
-Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o)
+Type::Type(const Anope::string &n, Module *o)
+	: name(n)
+	, owner(o)
 {
 	TypeOrder.push_back(this->name);
 	Types[this->name] = this;
@@ -148,11 +155,6 @@ Type::~Type()
 	if (it != TypeOrder.end())
 		TypeOrder.erase(it);
 	Types.erase(this->name);
-}
-
-Serializable *Type::Unserialize(Serializable *obj, Serialize::Data &data)
-{
-	return this->unserialize(obj, data);
 }
 
 void Type::Check()

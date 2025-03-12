@@ -29,16 +29,26 @@ struct EntryMsgImpl final
 	}
 
 	~EntryMsgImpl() override;
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct EntryMsgTypeImpl final
+	: Serialize::Type
+{
+	EntryMsgTypeImpl()
+		: Serialize::Type("EntryMsg")
 	{
-		data.Store("ci", this->chan);
-		data.Store("creator", this->creator);
-		data.Store("message", this->message);
-		data.Store("when", this->when);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *msg = static_cast<const EntryMsgImpl *>(obj);
+		data.Store("ci", msg->chan);
+		data.Store("creator", msg->creator);
+		data.Store("message", msg->message);
+		data.Store("when", msg->when);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
 };
 
 struct EntryMessageListImpl final
@@ -68,7 +78,7 @@ EntryMsgImpl::~EntryMsgImpl()
 }
 
 
-Serializable *EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *EntryMsgTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string sci, screator, smessage;
 	time_t swhen;
@@ -264,12 +274,13 @@ class CSEntryMessage final
 {
 	CommandEntryMessage commandentrymsg;
 	ExtensibleItem<EntryMessageListImpl> eml;
-	Serialize::Type entrymsg_type;
+	EntryMsgTypeImpl entrymsg_type;
 
 public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-	commandentrymsg(this),
-	eml(this, "entrymsg"), entrymsg_type("EntryMsg", EntryMsgImpl::Unserialize)
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandentrymsg(this)
+		, eml(this, "entrymsg")
 	{
 	}
 

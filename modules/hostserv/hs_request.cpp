@@ -29,16 +29,26 @@ struct HostRequestImpl final
 		: Serializable("HostRequest")
 	{
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct HostRequestTypeImpl final
+	: Serialize::Type
+{
+	HostRequestTypeImpl()
+		: Serialize::Type("HostRequest")
 	{
-		data.Store("nick", this->nick);
-		data.Store("ident", this->ident);
-		data.Store("host", this->host);
-		data.Store("time", this->time);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *req = static_cast<const HostRequestImpl *>(obj);
+		data.Store("nick", req->nick);
+		data.Store("ident", req->ident);
+		data.Store("host", req->host);
+		data.Store("time", req->time);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string snick;
 		data["nick"] >> snick;
@@ -360,12 +370,16 @@ class HSRequest final
 	CommandHSReject commandhsreject;
 	CommandHSWaiting commandhswaiting;
 	ExtensibleItem<HostRequestImpl> hostrequest;
-	Serialize::Type request_type;
+	HostRequestTypeImpl request_type;
 
 public:
-	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandhsrequest(this), commandhsactive(this),
-		commandhsreject(this), commandhswaiting(this), hostrequest(this, "hostrequest"), request_type("HostRequest", HostRequestImpl::Unserialize)
+	HSRequest(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandhsrequest(this)
+		, commandhsactive(this)
+		, commandhsreject(this)
+		, commandhswaiting(this)
+		, hostrequest(this, "hostrequest")
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");

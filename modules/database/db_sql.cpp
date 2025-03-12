@@ -113,8 +113,12 @@ public:
 		{
 			if (this->sql)
 			{
+				Serialize::Type *s_type = obj->GetSerializableType();
+				if (!s_type)
+					continue;
+
 				Data data;
-				obj->Serialize(data);
+				s_type->Serialize(obj, data);
 
 				if (obj->IsCached(data))
 					continue;
@@ -123,10 +127,6 @@ public:
 
 				/* If we didn't load these objects and we don't want to import just update the cache and continue */
 				if (!this->loaded && !this->imported && !this->import)
-					continue;
-
-				Serialize::Type *s_type = obj->GetSerializableType();
-				if (!s_type)
 					continue;
 
 				auto create = this->sql->CreateTable(GetTableName(s_type), data);
@@ -267,7 +267,7 @@ public:
 				 */
 
 				Data data2;
-				obj->Serialize(data2);
+				sb->Serialize(obj, data2);
 				obj->UpdateCache(data2); /* We know this is the most up to date copy */
 			}
 		}

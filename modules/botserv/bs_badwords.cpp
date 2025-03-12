@@ -18,15 +18,25 @@ struct BadWordImpl final
 {
 	BadWordImpl() : Serializable("BadWord") { }
 	~BadWordImpl() override;
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct BadWordTypeImpl final
+	: Serialize::Type
+{
+	BadWordTypeImpl()
+		: Serialize::Type("BadWord")
 	{
-		data.Store("ci", this->chan);
-		data.Store("word", this->word);
-		data.Store("type", this->type);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *bw = static_cast<const BadWordImpl *>(obj);
+		data.Store("ci", bw->chan);
+		data.Store("word", bw->word);
+		data.Store("type", bw->type);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &) const override;
 };
 
 struct BadWordsImpl final
@@ -117,7 +127,7 @@ BadWordImpl::~BadWordImpl()
 	}
 }
 
-Serializable *BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *BadWordTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string sci, sword;
 
@@ -464,11 +474,13 @@ class BSBadwords final
 {
 	CommandBSBadwords commandbsbadwords;
 	ExtensibleItem<BadWordsImpl> badwords;
-	Serialize::Type badword_type;
+	BadWordTypeImpl badword_type;
 
 public:
-	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandbsbadwords(this), badwords(this, "badwords"), badword_type("BadWord", BadWordImpl::Unserialize)
+	BSBadwords(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandbsbadwords(this)
+		, badwords(this, "badwords")
 	{
 	}
 };

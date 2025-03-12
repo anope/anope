@@ -43,15 +43,25 @@ struct NSMiscData final
 		name = n;
 		data = d;
 	}
+};
 
-	void Serialize(Serialize::Data &sdata) const override
+struct NSMiscDataType final
+	: Serialize::Type
+{
+	NSMiscDataType()
+		: Serialize::Type("NSMiscData")
 	{
-		sdata.Store("nc", this->object);
-		sdata.Store("name", this->name);
-		sdata.Store("data", this->data);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &sdata) const override
+	{
+		const auto *d = static_cast<const NSMiscData *>(obj);
+		sdata.Store("nc", d->object);
+		sdata.Store("name", d->name);
+		sdata.Store("data", d->data);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string snc, sname, sdata;
 
@@ -185,11 +195,13 @@ class NSSetMisc final
 {
 	CommandNSSetMisc commandnssetmisc;
 	CommandNSSASetMisc commandnssasetmisc;
-	Serialize::Type nsmiscdata_type;
+	NSMiscDataType nsmiscdata_type;
 
 public:
-	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnssetmisc(this), commandnssasetmisc(this), nsmiscdata_type("NSMiscData", NSMiscData::Unserialize)
+	NSSetMisc(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnssetmisc(this)
+		, commandnssasetmisc(this)
 	{
 		me = this;
 	}

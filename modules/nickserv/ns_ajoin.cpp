@@ -39,18 +39,28 @@ struct AJoinEntry final
 				(*channels)->erase(it);
 		}
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct AJoinEntryType final
+	: public Serialize::Type
+{
+	AJoinEntryType()
+		: Serialize::Type("AJoinEntry")
 	{
-		if (!this->owner)
-			return;
-
-		data.Store("owner", this->owner->display);
-		data.Store("channel", this->channel);
-		data.Store("key", this->key);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &sd)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *aj = static_cast<const AJoinEntry *>(obj);
+		if (!aj->owner)
+			return;
+
+		data.Store("owner", aj->owner->display);
+		data.Store("channel", aj->channel);
+		data.Store("key", aj->key);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &sd) const override
 	{
 		Anope::string sowner;
 
@@ -305,17 +315,16 @@ class NSAJoin final
 {
 	CommandNSAJoin commandnsajoin;
 	ExtensibleItem<AJoinList> ajoinlist;
-	Serialize::Type ajoinentry_type;
+	AJoinEntryType ajoinentry_type;
 
 public:
-	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsajoin(this), ajoinlist(this, "ajoinlist"),
-		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize)
+	NSAJoin(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnsajoin(this)
+		, ajoinlist(this, "ajoinlist")
 	{
-
 		if (!IRCD || !IRCD->CanSVSJoin)
 			throw ModuleException("Your IRCd does not support SVSJOIN");
-
 	}
 
 	void OnUserLogin(User *u) override

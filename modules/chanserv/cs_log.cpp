@@ -34,20 +34,30 @@ struct LogSettingImpl final
 			}
 		}
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct LogSettingTypeImpl final
+	: Serialize::Type
+{
+	LogSettingTypeImpl()
+		: Serialize::Type("LogSetting")
 	{
-		data.Store("ci", chan);
-		data.Store("service_name", service_name);
-		data.Store("command_service", command_service);
-		data.Store("command_name", command_name);
-		data.Store("method", method);
-		data.Store("extra", extra);
-		data.Store("creator", creator);
-		data.Store("created", created);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *ls = static_cast<const LogSettingImpl *>(obj);
+		data.Store("ci", ls->chan);
+		data.Store("service_name", ls->service_name);
+		data.Store("command_service", ls->command_service);
+		data.Store("command_name", ls->command_name);
+		data.Store("method", ls->method);
+		data.Store("extra", ls->extra);
+		data.Store("creator", ls->creator);
+		data.Store("created", ls->created);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string sci;
 		data["ci"] >> sci;
@@ -291,7 +301,7 @@ class CSLog final
 	ServiceReference<MemoServService> MSService;
 	CommandCSLog commandcslog;
 	ExtensibleItem<LogSettingsImpl> logsettings;
-	Serialize::Type logsetting_type;
+	LogSettingTypeImpl logsetting_type;
 
 	struct LogDefault final
 	{
@@ -301,11 +311,12 @@ class CSLog final
 	std::vector<LogDefault> defaults;
 
 public:
-	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		MSService("MemoServService", "MemoServ"), commandcslog(this),
-		logsettings(this, "logsettings"), logsetting_type("LogSetting", LogSettingImpl::Unserialize)
+	CSLog(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, MSService("MemoServService", "MemoServ")
+		, commandcslog(this)
+		, logsettings(this, "logsettings")
 	{
-
 	}
 
 	void OnReload(Configuration::Conf &conf) override

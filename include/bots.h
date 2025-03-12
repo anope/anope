@@ -23,6 +23,16 @@ class CoreExport BotInfo final
 	: public User
 	, public Serializable
 {
+public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
+private:
 	/* Channels this bot is assigned to */
 	Serialize::Checker<std::set<ChannelInfo *> > channels;
 public:

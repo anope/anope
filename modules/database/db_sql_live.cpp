@@ -93,17 +93,17 @@ public:
 		{
 			if (obj && this->SQL)
 			{
+				Serialize::Type *s_type = obj->GetSerializableType();
+				if (!s_type)
+					continue;
+
 				Data data;
-				obj->Serialize(data);
+				s_type->Serialize(obj, data);
 
 				if (obj->IsCached(data))
 					continue;
 
 				obj->UpdateCache(data);
-
-				Serialize::Type *s_type = obj->GetSerializableType();
-				if (!s_type)
-					continue;
 
 				auto create = this->SQL->CreateTable(GetTableName(s_type), data);
 				for (const auto &query : create)
@@ -232,7 +232,7 @@ public:
 						 */
 
 						Data data2;
-						new_s->Serialize(data2);
+						obj->Serialize(new_s, data2);
 						new_s->UpdateCache(data2); /* We know this is the most up to date copy */
 					}
 				}

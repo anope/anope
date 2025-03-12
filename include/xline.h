@@ -16,6 +16,16 @@
 class CoreExport XLine final
 	: public Serializable
 {
+public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
+private:
 	void Init();
 	Anope::string nick, user, host, real;
 public:
@@ -43,9 +53,6 @@ public:
 
 	bool HasNickOrReal() const;
 	bool IsRegex() const;
-
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 /* Managers XLines. There is one XLineManager per type of XLine. */

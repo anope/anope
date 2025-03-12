@@ -19,17 +19,27 @@ struct NSSuspendInfo final
 	, Serializable
 {
 	NSSuspendInfo(Extensible *) : Serializable("NSSuspendInfo") { }
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct NSSuspendInfoType final
+	: Serialize::Type
+{
+	NSSuspendInfoType()
+		: Serialize::Type("NSSuspendInfo")
 	{
-		data.Store("nick", what);
-		data.Store("by", by);
-		data.Store("reason", reason);
-		data.Store("time", when);
-		data.Store("expires", expires);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *si = static_cast<const NSSuspendInfo *>(obj);
+		data.Store("nick", si->what);
+		data.Store("by", si->by);
+		data.Store("reason", si->reason);
+		data.Store("time", si->when);
+		data.Store("expires", si->expires);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string snick;
 		data["nick"] >> snick;
@@ -211,7 +221,7 @@ class NSSuspend final
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;
 	ExtensibleItem<NSSuspendInfo> suspend;
-	Serialize::Type suspend_type;
+	NSSuspendInfoType suspend_type;
 	std::vector<Anope::string> show;
 
 	struct trim final
@@ -234,9 +244,11 @@ class NSSuspend final
 	}
 
 public:
-	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnssuspend(this), commandnsunsuspend(this), suspend(this, "NS_SUSPENDED"),
-		suspend_type("NSSuspendInfo", NSSuspendInfo::Unserialize)
+	NSSuspend(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnssuspend(this)
+		, commandnsunsuspend(this)
+		, suspend(this, "NS_SUSPENDED")
 	{
 	}
 

@@ -17,17 +17,27 @@ struct CSSuspendInfo final
 	, Serializable
 {
 	CSSuspendInfo(Extensible *) : Serializable("CSSuspendInfo") { }
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct CSSuspendInfoType final
+	: Serialize::Type
+{
+	CSSuspendInfoType()
+		: Serialize::Type("CSSuspendInfo")
 	{
-		data.Store("chan", what);
-		data.Store("by", by);
-		data.Store("reason", reason);
-		data.Store("time", when);
-		data.Store("expires", expires);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *si = static_cast<const CSSuspendInfo *>(obj);
+		data.Store("chan", si->what);
+		data.Store("by", si->by);
+		data.Store("reason", si->reason);
+		data.Store("time", si->when);
+		data.Store("expires", si->expires);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string schan;
 		data["chan"] >> schan;
@@ -203,7 +213,7 @@ class CSSuspend final
 	CommandCSSuspend commandcssuspend;
 	CommandCSUnSuspend commandcsunsuspend;
 	ExtensibleItem<CSSuspendInfo> suspend;
-	Serialize::Type suspend_type;
+	CSSuspendInfoType suspend_type;
 	std::vector<Anope::string> show;
 
 	struct trim final
@@ -227,9 +237,11 @@ class CSSuspend final
 	}
 
 public:
-	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcssuspend(this), commandcsunsuspend(this), suspend(this, "CS_SUSPENDED"),
-		suspend_type("CSSuspendInfo", CSSuspendInfo::Unserialize)
+	CSSuspend(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandcssuspend(this)
+		, commandcsunsuspend(this)
+		, suspend(this, "CS_SUSPENDED")
 	{
 	}
 

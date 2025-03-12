@@ -44,15 +44,25 @@ struct CSMiscData final
 		name = n;
 		data = d;
 	}
+};
 
-	void Serialize(Serialize::Data &sdata) const override
+struct CSMiscDataType
+	: Serialize::Type
+{
+	CSMiscDataType()
+		: Serialize::Type("CSMiscData")
 	{
-		sdata.Store("ci", this->object);
-		sdata.Store("name", this->name);
-		sdata.Store("data", this->data);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &sdata) const override
+	{
+		const auto *d = static_cast<const CSMiscData *>(obj);
+		sdata.Store("ci", d->object);
+		sdata.Store("name", d->name);
+		sdata.Store("data", d->data);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string sci, sname, sdata;
 
@@ -172,11 +182,12 @@ class CSSetMisc final
 	: public Module
 {
 	CommandCSSetMisc commandcssetmisc;
-	Serialize::Type csmiscdata_type;
+	CSMiscDataType csmiscdata_type;
 
 public:
-	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcssetmisc(this), csmiscdata_type("CSMiscData", CSMiscData::Unserialize)
+	CSSetMisc(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandcssetmisc(this)
 	{
 		me = this;
 	}

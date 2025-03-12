@@ -66,26 +66,32 @@ NickCore::~NickCore()
 	}
 }
 
-void NickCore::Serialize(Serialize::Data &data) const
+NickCore::Type::Type()
+	: Serialize::Type("NickCore")
 {
-	data.Store("display", this->display);
-	data.Store("uniqueid", this->id);
-	data.Store("pass", this->pass);
-	data.Store("email", this->email);
-	data.Store("language", this->language);
-	data.Store("lastmail", this->lastmail);
-	data.Store("time_registered", this->time_registered);
-	data.Store("memomax", this->memos.memomax);
+}
+
+void NickCore::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *nc = static_cast<const NickCore *>(obj);
+	data.Store("display", nc->display);
+	data.Store("uniqueid", nc->id);
+	data.Store("pass", nc->pass);
+	data.Store("email", nc->email);
+	data.Store("language", nc->language);
+	data.Store("lastmail", nc->lastmail);
+	data.Store("time_registered", nc->time_registered);
+	data.Store("memomax", nc->memos.memomax);
 
 	std::ostringstream oss;
-	for (const auto &ignore : this->memos.ignores)
+	for (const auto &ignore : nc->memos.ignores)
 		oss << ignore << " ";
 	data.Store("memoignores", oss.str());
 
-	Extensible::ExtensibleSerialize(this, this, data);
+	Extensible::ExtensibleSerialize(nc, nc, data);
 }
 
-Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	NickCore *nc;
 

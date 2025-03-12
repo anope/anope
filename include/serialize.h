@@ -123,8 +123,6 @@ public:
 	 */
 	Serialize::Type *GetSerializableType() const { return this->s_type; }
 
-	virtual void Serialize(Serialize::Data &data) const = 0;
-
 	static const std::list<Serializable *> &GetItems();
 };
 
@@ -132,17 +130,14 @@ public:
  * of class that inherits from Serializable. Used for unserializing objects
  * of this type, as it requires a function pointer to a static member function.
  */
-class CoreExport Serialize::Type final
+class CoreExport Serialize::Type
 	: public Base
 {
-	typedef Serializable *(*unserialize_func)(Serializable *obj, Serialize::Data &);
-
 	static std::vector<Anope::string> TypeOrder;
 	static std::map<Anope::string, Serialize::Type *> Types;
 
 	/* The name of this type, should be a class name */
 	Anope::string name;
-	unserialize_func unserialize;
 	/* Owner of this type. Used for placing objects of this type in separate databases
 	 * based on what module, if any, owns it.
 	 */
@@ -160,10 +155,9 @@ public:
 
 	/** Creates a new serializable type
 	 * @param n Type name
-	 * @param f Func to unserialize objects
 	 * @param owner Owner of this type. Leave NULL for the core.
 	 */
-	Type(const Anope::string &n, unserialize_func f, Module *owner = NULL);
+	Type(const Anope::string &n, Module *owner = NULL);
 	~Type();
 
 	/** Gets the name for this type
@@ -177,7 +171,8 @@ public:
 	 * @param data The data to unserialize
 	 * @return The unserialized object. If obj != NULL this should be obj.
 	 */
-	Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
+	virtual void Serialize(const Serializable *obj, Serialize::Data &data) const = 0;
+	virtual Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const = 0;
 
 	/** Check if this object type has any pending changes and update them.
 	 */

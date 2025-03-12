@@ -28,8 +28,6 @@ struct Exception final
 	time_t expires;			/* Time when it expires. 0 == no expiry */
 
 	Exception() : Serializable("Exception") { }
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class SessionService
@@ -59,35 +57,3 @@ public:
 };
 
 static ServiceReference<SessionService> session_service("SessionService", "session");
-
-void Exception::Serialize(Serialize::Data &data) const
-{
-	data.Store("mask", this->mask);
-	data.Store("limit", this->limit);
-	data.Store("who", this->who);
-	data.Store("reason", this->reason);
-	data.Store("time", this->time);
-	data.Store("expires", this->expires);
-}
-
-Serializable *Exception::Unserialize(Serializable *obj, Serialize::Data &data)
-{
-	if (!session_service)
-		return NULL;
-
-	Exception *ex;
-	if (obj)
-		ex = anope_dynamic_static_cast<Exception *>(obj);
-	else
-		ex = new Exception;
-	data["mask"] >> ex->mask;
-	data["limit"] >> ex->limit;
-	data["who"] >> ex->who;
-	data["reason"] >> ex->reason;
-	data["time"] >> ex->time;
-	data["expires"] >> ex->expires;
-
-	if (!obj)
-		session_service->AddException(ex);
-	return ex;
-}

@@ -74,6 +74,16 @@ public:
 class CoreExport ChanAccess
 	: public Serializable
 {
+public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
+private:
 	Anope::string mask;
 	/* account this access entry is for, if any */
 	Serialize::Reference<NickCore> nc;
@@ -96,9 +106,6 @@ public:
 	void SetMask(const Anope::string &mask, ChannelInfo *ci);
 	const Anope::string &Mask() const;
 	NickCore *GetAccount() const;
-
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	static const unsigned int MAX_DEPTH = 4;
 

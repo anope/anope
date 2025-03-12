@@ -18,8 +18,6 @@ struct IgnoreDataImpl final
 {
 	IgnoreDataImpl() : Serializable("IgnoreData") { }
 	~IgnoreDataImpl() override;
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 IgnoreDataImpl::~IgnoreDataImpl()
@@ -28,15 +26,27 @@ IgnoreDataImpl::~IgnoreDataImpl()
 		ignore_service->DelIgnore(this);
 }
 
-void IgnoreDataImpl::Serialize(Serialize::Data &data) const
+struct IgnoreDataTypeImpl final
+	: public Serialize::Type
 {
-	data.Store("mask", this->mask);
-	data.Store("creator", this->creator);
-	data.Store("reason", this->reason);
-	data.Store("time", this->time);
+	IgnoreDataTypeImpl()
+		: Serialize::Type("IgnoreData")
+	{
+	}
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+};
+
+void IgnoreDataTypeImpl::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *ign = static_cast<const IgnoreDataImpl *>(obj);
+	data.Store("mask", ign->mask);
+	data.Store("creator", ign->creator);
+	data.Store("reason", ign->reason);
+	data.Store("time", ign->time);
 }
 
-Serializable *IgnoreDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *IgnoreDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	if (!ignore_service)
 		return NULL;
@@ -398,15 +408,16 @@ public:
 class OSIgnore final
 	: public Module
 {
-	Serialize::Type ignoredata_type;
+	IgnoreDataTypeImpl ignoredata_type;
 	OSIgnoreService osignoreservice;
 	CommandOSIgnore commandosignore;
 
 public:
-	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		ignoredata_type("IgnoreData", IgnoreDataImpl::Unserialize), osignoreservice(this), commandosignore(this)
+	OSIgnore(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, osignoreservice(this)
+		, commandosignore(this)
 	{
-
 	}
 
 	void Prioritize() override

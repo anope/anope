@@ -18,14 +18,19 @@ class CoreExport Memo final
 	: public Serializable
 {
 public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
 	MemoInfo *mi;
 	bool unread;
 	bool receipt;
 	Memo();
 	~Memo();
-
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	Anope::string owner;
 	/* When it was sent */

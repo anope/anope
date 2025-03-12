@@ -84,19 +84,25 @@ BotInfo::~BotInfo()
 		BotListByUID->erase(this->uid);
 }
 
-void BotInfo::Serialize(Serialize::Data &data) const
+BotInfo::Type::Type()
+	: Serialize::Type("BotInfo")
 {
-	data.Store("nick", this->nick);
-	data.Store("user", this->ident);
-	data.Store("host", this->host);
-	data.Store("realname", this->realname);
-	data.Store("created", this->created);
-	data.Store("oper_only", this->oper_only);
-
-	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable *BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
+void BotInfo::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *bi = static_cast<const BotInfo *>(obj);
+	data.Store("nick", bi->nick);
+	data.Store("user", bi->ident);
+	data.Store("host", bi->host);
+	data.Store("realname", bi->realname);
+	data.Store("created", bi->created);
+	data.Store("oper_only", bi->oper_only);
+
+	Extensible::ExtensibleSerialize(bi, bi, data);
+}
+
+Serializable *BotInfo::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string nick, user, host, realname, flags;
 

@@ -151,19 +151,26 @@ bool XLine::IsRegex() const
 	return !this->mask.empty() && this->mask[0] == '/' && this->mask[this->mask.length() - 1] == '/';
 }
 
-void XLine::Serialize(Serialize::Data &data) const
+XLine::Type::Type()
+	: Serialize::Type("XLine")
 {
-	data.Store("mask", this->mask);
-	data.Store("by", this->by);
-	data.Store("created", this->created);
-	data.Store("expires", this->expires);
-	data.Store("reason", this->reason);
-	data.Store("uid", this->id);
-	if (this->manager)
-		data.Store("manager", this->manager->name);
 }
 
-Serializable *XLine::Unserialize(Serializable *obj, Serialize::Data &data)
+void XLine::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *xl = static_cast<const XLine *>(obj);
+
+	data.Store("mask", xl->mask);
+	data.Store("by", xl->by);
+	data.Store("created", xl->created);
+	data.Store("expires", xl->expires);
+	data.Store("reason", xl->reason);
+	data.Store("uid", xl->id);
+	if (xl->manager)
+		data.Store("manager", xl->manager->name);
+}
+
+Serializable *XLine::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string smanager;
 

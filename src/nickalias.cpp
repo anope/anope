@@ -139,29 +139,35 @@ NickAlias *NickAlias::Find(const Anope::string &nick)
 	return NULL;
 }
 
-void NickAlias::Serialize(Serialize::Data &data) const
+NickAlias::Type::Type()
+	: Serialize::Type("NickAlias")
 {
-	data.Store("nick", this->nick);
-	data.Store("last_quit", this->last_quit);
-	data.Store("last_realname", this->last_realname);
-	data.Store("last_usermask", this->last_usermask);
-	data.Store("last_realhost", this->last_realhost);
-	data.Store("time_registered", this->time_registered);
-	data.Store("last_seen", this->last_seen);
-	data.Store("nc", this->nc->display);
-
-	if (this->HasVHost())
-	{
-		data.Store("vhost_ident", this->GetVHostIdent());
-		data.Store("vhost_host", this->GetVHostHost());
-		data.Store("vhost_creator", this->GetVHostCreator());
-		data.Store("vhost_time", this->GetVHostCreated());
-	}
-
-	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable *NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
+void NickAlias::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *na = static_cast<const NickAlias *>(obj);
+	data.Store("nick", na->nick);
+	data.Store("last_quit", na->last_quit);
+	data.Store("last_realname", na->last_realname);
+	data.Store("last_usermask", na->last_usermask);
+	data.Store("last_realhost", na->last_realhost);
+	data.Store("time_registered", na->time_registered);
+	data.Store("last_seen", na->last_seen);
+	data.Store("nc", na->nc->display);
+
+	if (na->HasVHost())
+	{
+		data.Store("vhost_ident", na->GetVHostIdent());
+		data.Store("vhost_host", na->GetVHostHost());
+		data.Store("vhost_creator", na->GetVHostCreator());
+		data.Store("vhost_time", na->GetVHostCreated());
+	}
+
+	Extensible::ExtensibleSerialize(na, na, data);
+}
+
+Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string snc, snick;
 

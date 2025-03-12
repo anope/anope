@@ -30,9 +30,17 @@ struct ModeLockImpl final
 				ml->RemoveMLock(this);
 		}
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
+struct ModeLockTypeImpl final
+	: Serialize::Type
+{
+	ModeLockTypeImpl()
+		: Serialize::Type("ModeLock")
+	{
+	}
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
 };
 
 struct ModeLocksImpl final
@@ -203,17 +211,18 @@ struct ModeLocksImpl final
 	}
 };
 
-void ModeLockImpl::Serialize(Serialize::Data &data) const
+void ModeLockTypeImpl::Serialize(const Serializable *obj, Serialize::Data &data) const
 {
-	data.Store("ci", this->ci);
-	data.Store("set", this->set);
-	data.Store("name", this->name);
-	data.Store("param", this->param);
-	data.Store("setter", this->setter);
-	data.Store("created", this->created);
+	const auto *ml = static_cast<const ModeLockImpl *>(obj);
+	data.Store("ci", ml->ci);
+	data.Store("set", ml->set);
+	data.Store("name", ml->name);
+	data.Store("param", ml->param);
+	data.Store("setter", ml->setter);
+	data.Store("created", ml->created);
 }
 
-Serializable *ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ModeLockTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string sci;
 
@@ -935,15 +944,15 @@ class CSMode final
 	CommandCSMode commandcsmode;
 	CommandCSModes commandcsmodes;
 	ExtensibleItem<ModeLocksImpl> modelocks;
-	Serialize::Type modelocks_type;
+	ModeLockTypeImpl modelocks_type;
 
 public:
-	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsmode(this), commandcsmodes(this),
-		modelocks(this, "modelocks"),
-		modelocks_type("ModeLock", ModeLockImpl::Unserialize)
+	CSMode(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandcsmode(this)
+		, commandcsmodes(this)
+		, modelocks(this, "modelocks")
 	{
-
 	}
 
 	void OnReload(Configuration::Conf &conf) override

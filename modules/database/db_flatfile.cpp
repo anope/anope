@@ -313,7 +313,7 @@ public:
 				*data.fs << "OBJECT " << s_type->GetName();
 				if (base->id)
 					*data.fs << "\nID " << base->id;
-				base->Serialize(data);
+				s_type->Serialize(base, data);
 				*data.fs << "\nEND\n";
 			}
 

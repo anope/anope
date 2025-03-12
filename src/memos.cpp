@@ -34,17 +34,23 @@ Memo::~Memo()
 	}
 }
 
-void Memo::Serialize(Serialize::Data &data) const
+Memo::Type::Type()
+	: Serialize::Type("Memo")
 {
-	data.Store("owner", this->owner);
-	data.Store("time", this->time);
-	data.Store("sender", this->sender);
-	data.Store("text", this->text);
-	data.Store("unread", this->unread);
-	data.Store("receipt", this->receipt);
 }
 
-Serializable *Memo::Unserialize(Serializable *obj, Serialize::Data &data)
+void Memo::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *m = static_cast<const Memo *>(obj);
+	data.Store("owner", m->owner);
+	data.Store("time", m->time);
+	data.Store("sender", m->sender);
+	data.Store("text", m->text);
+	data.Store("unread", m->unread);
+	data.Store("receipt", m->receipt);
+}
+
+Serializable *Memo::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string owner;
 

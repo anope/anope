@@ -32,6 +32,16 @@ class CoreExport NickAlias final
 	: public Serializable
 	, public Extensible
 {
+public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
+private:
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_created = 0;
 
@@ -55,9 +65,6 @@ public:
 	 */
 	NickAlias(const Anope::string &nickname, NickCore *nickcore);
 	~NickAlias();
-
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Set a vhost for the user
 	 * @param ident The ident
@@ -116,6 +123,16 @@ class CoreExport NickCore final
 	: public Serializable
 	, public Extensible
 {
+public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
+private:
 	/* Channels which reference this core in some way (this is on their access list, akick list, is founder, successor, etc) */
 	Serialize::Checker<std::map<ChannelInfo *, int> > chanaccess;
 	/* Unique identifier for the account. */
@@ -158,9 +175,6 @@ public:
 	 */
 	NickCore(const Anope::string &nickdisplay, uint64_t nickid = 0);
 	~NickCore();
-
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Changes the display for this account
 	 * @param na The new display, must be grouped to this account.

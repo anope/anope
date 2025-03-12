@@ -39,7 +39,7 @@ class LoadData final
 {
 public:
 	std::fstream *fs = nullptr;
-	unsigned int id = 0;
+	uint64_t id = 0;
 	std::map<Anope::string, Anope::string> data;
 	std::stringstream ss;
 	bool read = false;
@@ -52,7 +52,7 @@ public:
 			{
 				if (token.find("ID ") == 0)
 				{
-					this->id = Anope::Convert(token.substr(3), 0);
+					this->id = Anope::Convert<uint64_t>(token.substr(3), 0);
 					continue;
 				}
 				else if (token.find("DATA ") != 0)

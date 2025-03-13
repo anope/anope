@@ -190,6 +190,8 @@ public:
 			auto *result = SerializeElement(doc, request.GetRoot().value());
 			yyjson_mut_obj_add_val(doc, root, "result", result);
 		}
+		else
+			yyjson_mut_obj_add_null(doc, root, "result");
 
 		yyjson_mut_obj_add_str(doc, root, "jsonrpc", "2.0");
 

@@ -2,6 +2,9 @@ Anope Version 2.1.13-git
 ------------------------
 Added a Config check to ensure users actually want to use the development branch.
 Added a flag to the version string when Anope is compiled in reproducible mode.
+Added an ALLTIME handler on InspIRCd.
+Added an opt-out for extended XML-RPC types.
+Added RPC messages for sending global messages.
 Added support for importing cs_set_misc and ns_set_misc data from Atheme.
 Added support for importing news from Atheme.
 Added support for oper-only quit messages.
@@ -10,9 +13,12 @@ Added support for using defines within the value of a variable.
 Blacklisted an old version of an UnrealIRCd module that is known to send malformed S2S messages.
 Changed the syntax of defines from "foo" to "${foo}".
 Fixed a warning when importing an Atheme account that uses external authentication.
+Fixed deleting old database backups after Anope has been restarted.
 Fixed including a port in uplink messages when connecting to a UNIX socket endpoint.
 Fixed modules with third-party dependencies writing generic log messages instead of module log messages.
+Fixed sending global messages with the default sender.
 Moved around a bunch of module headers.
+Moved database serialization from the serializable to the serializable type.
 Moved the SASL protocol interface to its own service.
 
 Anope Version 2.1.12

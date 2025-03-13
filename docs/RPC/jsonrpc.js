@@ -169,7 +169,7 @@ class AnopeRPC {
 	 * @param {...*} messages One or more messages to send.
 	 */
 	messageUser(source, target, ...messages) {
-		return this.run("anope.messageServer", source, target, ...messages);
+		return this.run("anope.messageUser", source, target, ...messages);
 	}
 }
 

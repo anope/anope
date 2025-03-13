@@ -109,7 +109,7 @@ class DNSServer final
 	bool active = false;
 
 public:
-	friend class DNSServerType;
+	friend struct DNSServerType;
 
 	std::set<Anope::string, ci::less> zones;
 	time_t repool = 0;

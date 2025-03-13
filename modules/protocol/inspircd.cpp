@@ -2433,6 +2433,7 @@ class ProtoInspIRCd final
 	ExtensibleItem<bool> ssl;
 
 	/* Core message handlers */
+	Message::Time message_alltime;
 	Message::Error message_error;
 	Message::Invite message_invite;
 	Message::Kill message_kill;
@@ -2483,6 +2484,7 @@ public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, PROTOCOL | VENDOR)
 		, ircd_proto(this), ssl(this, "ssl")
+		, message_alltime(this, "ALLTIME")
 		, message_error(this)
 		, message_invite(this)
 		, message_kill(this)

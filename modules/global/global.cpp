@@ -132,7 +132,7 @@ public:
 	bool SendSingle(const Anope::string &message, CommandSource *source, BotInfo* sender, Server* server) override
 	{
 		// We MUST have a sender.
-		if (sender)
+		if (!sender)
 			sender = global;
 		if (!sender)
 			return false;

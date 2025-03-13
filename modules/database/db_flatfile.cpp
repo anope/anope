@@ -15,6 +15,8 @@
 #include <sys/wait.h>
 #endif
 
+#include <filesystem>
+
 class SaveData final
 	: public Serialize::Data
 {
@@ -94,8 +96,6 @@ class DBFlatFile final
 {
 	/* Day the last backup was on */
 	int last_day = 0;
-	/* Backup file names */
-	std::map<Anope::string, std::list<Anope::string> > backups;
 	bool loaded = false;
 
 	int child_pid = -1;
@@ -119,11 +119,12 @@ class DBFlatFile final
 					dbs.insert("module_" + stype->GetOwner()->name + ".db");
 			}
 
-
+			const auto backupdir = Anope::ExpandData("backups");
 			for (const auto &db : dbs)
 			{
 				const auto oldname = Anope::ExpandData(db);
-				const auto newname = Anope::ExpandData("backups/" + db + "-" + Anope::ToString(tm->tm_year + 1900) + Anope::printf("-%02i-", tm->tm_mon + 1) + Anope::printf("%02i", tm->tm_mday));
+				const auto basename = Anope::Expand(backupdir, db + "-");
+				const auto newname = Anope::printf("%s%04i-%02i-%02i", basename.c_str(), tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 
 				/* Backup already exists or no database to backup */
 				if (Anope::IsFile(newname) || !Anope::IsFile(oldname))
@@ -144,13 +145,26 @@ class DBFlatFile final
 					continue;
 				}
 
-				backups[db].push_back(newname);
-
-				unsigned keepbackups = Config->GetModule(this).Get<unsigned>("keepbackups");
-				if (keepbackups > 0 && backups[db].size() > keepbackups)
+				std::error_code ec;
+				std::set<Anope::string> old_backups;
+				const auto keepbackups = Config->GetModule(this).Get<unsigned>("keepbackups", "7");
+				for (const auto &entry : std::filesystem::directory_iterator(backupdir.str(), ec))
 				{
-					unlink(backups[db].front().c_str());
-					backups[db].pop_front();
+					Anope::string entryname = entry.path().string();
+					if (entryname.compare(0, basename.length(), basename) != 0)
+						continue;
+
+					old_backups.insert(entryname);
+					if (old_backups.size() <= keepbackups)
+						continue;
+
+					Log(LOG_DEBUG) << "Deleting expired backup " << *old_backups.begin();
+					if (!std::filesystem::remove(old_backups.begin()->str(), ec))
+					{
+						Log(this) << "Failed to delete expired backup " << *old_backups.begin() << ": " << ec.message();
+						continue;
+					}
+					old_backups.erase(old_backups.begin());
 				}
 			}
 		}

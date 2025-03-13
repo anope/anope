@@ -132,7 +132,7 @@ class AnopeRPC
      */
     public function notice($source, $target, $message)
     {
-        return $this->run("notice", [$source, $target, $message]);
+        return $this->run("anope.messageUser", [$source, $target, $message]);
     }
 
     /**

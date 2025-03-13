@@ -167,35 +167,6 @@ public:
 	}
 };
 
-class NoticeRPCEvent final
-	: public RPC::Event
-{
-public:
-	NoticeRPCEvent()
-		: RPC::Event("notice")
-	{
-	}
-
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
-	{
-		Anope::string from    = request.data.size() > 0 ? request.data[0] : "";
-		Anope::string to      = request.data.size() > 1 ? request.data[1] : "";
-		Anope::string message = request.data.size() > 2 ? request.data[2] : "";
-
-		BotInfo *bi = BotInfo::Find(from, true);
-		User *u = User::Find(to, true);
-
-		if (!bi || !u || message.empty())
-		{
-			request.Error(RPC::ERR_INVALID_PARAMS, "Invalid parameters");
-			return true;
-		}
-
-		u->SendMessage(bi, message);
-		return true;
-	}
-};
-
 class ModuleRPCMain final
 	: public Module
 {
@@ -204,7 +175,6 @@ private:
 	CommandRPCEvent commandrpcevent;
 	CheckAuthenticationRPCEvent checkauthenticationrpcevent;
 	StatsRPCEvent statsrpcevent;
-	NoticeRPCEvent noticerpcevent;
 
 public:
 	ModuleRPCMain(const Anope::string &modname, const Anope::string &creator)
@@ -219,7 +189,6 @@ public:
 		rpc->Register(&commandrpcevent);
 		rpc->Register(&checkauthenticationrpcevent);
 		rpc->Register(&statsrpcevent);
-		rpc->Register(&noticerpcevent);
 	}
 
 	~ModuleRPCMain() override
@@ -230,7 +199,6 @@ public:
 		rpc->Unregister(&commandrpcevent);
 		rpc->Unregister(&checkauthenticationrpcevent);
 		rpc->Unregister(&statsrpcevent);
-		rpc->Unregister(&noticerpcevent);
 	}
 };
 

@@ -119,6 +119,33 @@ class AnopeRPC {
 	user(nick) {
 		return this.run("anope.user", nick);
 	}
+
+	/**
+	 * Sends a message to every user on the network.
+	 * @param {...*} messages One or more messages to send.
+	 */
+	messageNetwork(...messages) {
+		return this.run("anope.messageNetwork", ...messages);
+	}
+
+	/**
+	 * Sends a message to every user on the specified server.
+	 * @param {string} name The name of the server.
+	 * @param {...*} messages One or more messages to send.
+	 */
+	messageServer(server, ...messages) {
+		return this.run("anope.messageServer", server, ...messages);
+	}
+
+	/**
+	 * Sends a message to the specified user.
+	 * @param {string} source The source pseudoclient to send the message from.
+	 * @param {string} target The target user to send the message to.
+	 * @param {...*} messages One or more messages to send.
+	 */
+	messageUser(source, target, ...messages) {
+		return this.run("anope.messageServer", source, target, ...messages);
+	}
 }
 
 /*

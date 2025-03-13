@@ -47,6 +47,8 @@ class AnopeRPC {
 	/**
 	 * Retrieves a list of channels.
 	 *
+	 * Requires the rpc_data module to be loaded.
+	 *
 	 * @returns {array} An array of channel names.
 	 */
 	listChannels() {
@@ -55,6 +57,8 @@ class AnopeRPC {
 
 	/**
 	 * Retrieves information about the specified channel.
+	 *
+	 * Requires the rpc_data module to be loaded.
 	 *
 	 * @param {string} name The name of the channel.
 	 * @returns {object} An object containing information about the channel.
@@ -66,6 +70,8 @@ class AnopeRPC {
 	/**
 	 * Retrieves a list of services operators.
 	 *
+	 * Requires the rpc_data module to be loaded.
+	 *
 	 * @returns {array} An array of channel names.
 	 */
 	listOpers() {
@@ -74,6 +80,8 @@ class AnopeRPC {
 
 	/**
 	 * Retrieves information about the specified services operator.
+	 *
+	 * Requires the rpc_data module to be loaded.
 	 *
 	 * @param {string} name The name of the services operator.
 	 * @returns {object} An object containing information about the services operator.
@@ -85,6 +93,8 @@ class AnopeRPC {
 	/**
 	 * Retrieves a list of servers.
 	 *
+	 * Requires the rpc_data module to be loaded.
+	 *
 	 * @returns {array} An array of servers names.
 	 */
 	listServers() {
@@ -93,6 +103,8 @@ class AnopeRPC {
 
 	/**
 	 * Retrieves information about the specified server.
+	 *
+	 * Requires the rpc_data module to be loaded.
 	 *
 	 * @param {string} name The name of the server.
 	 * @returns {object} An object containing information about the server.
@@ -104,6 +116,8 @@ class AnopeRPC {
 	/**
 	 * Retrieves a list of users.
 	 *
+	 * Requires the rpc_data module to be loaded.
+	 *
 	 * @returns {array} An array of channel names.
 	 */
 	listUsers() {
@@ -112,6 +126,8 @@ class AnopeRPC {
 
 	/**
 	 * Retrieves information about the specified user.
+	 *
+	 * Requires the rpc_data module to be loaded.
 	 *
 	 * @param {string} nick The nick of the user.
 	 * @returns {object} An object containing information about the user.
@@ -122,6 +138,9 @@ class AnopeRPC {
 
 	/**
 	 * Sends a message to every user on the network.
+	 *
+	 * Requires the rpc_message module to be loaded.
+	 *
 	 * @param {...*} messages One or more messages to send.
 	 */
 	messageNetwork(...messages) {
@@ -130,6 +149,9 @@ class AnopeRPC {
 
 	/**
 	 * Sends a message to every user on the specified server.
+	 *
+	 * Requires the rpc_message module to be loaded.
+	 *
 	 * @param {string} name The name of the server.
 	 * @param {...*} messages One or more messages to send.
 	 */
@@ -139,6 +161,9 @@ class AnopeRPC {
 
 	/**
 	 * Sends a message to the specified user.
+	 *
+	 * Requires the rpc_message module to be loaded.
+	 *
 	 * @param {string} source The source pseudoclient to send the message from.
 	 * @param {string} target The target user to send the message to.
 	 * @param {...*} messages One or more messages to send.

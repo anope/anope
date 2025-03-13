@@ -145,9 +145,12 @@ class DBFlatFile final
 					continue;
 				}
 
+				const auto keepbackups = Config->GetModule(this).Get<unsigned>("keepbackups", "7");
+				if (!keepbackups)
+					continue;
+
 				std::error_code ec;
 				std::set<Anope::string> old_backups;
-				const auto keepbackups = Config->GetModule(this).Get<unsigned>("keepbackups", "7");
 				for (const auto &entry : std::filesystem::directory_iterator(backupdir.str(), ec))
 				{
 					Anope::string entryname = entry.path().string();

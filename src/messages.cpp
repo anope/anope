@@ -438,13 +438,11 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 
 void Time::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
-	time_t t;
-	time(&t);
-	struct tm *tm = localtime(&t);
-	char buf[64];
-	strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
-	IRCD->SendNumeric(RPL_TIME, source.GetSource(), Me->GetName(), buf);
-	return;
+	const auto *tm = localtime(&Anope::CurTime);
+	char timebuf[64];
+	strftime(timebuf, sizeof(timebuf), "%A, %d %B %Y @ %H:%M:%S %Z", tm);
+	const auto timestr = Anope::printf("%s (%lu)", timebuf, Anope::CurTime);
+	IRCD->SendNumeric(RPL_TIME, source.GetSource(), Me->GetName(), timestr);
 }
 
 void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)

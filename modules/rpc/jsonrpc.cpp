@@ -28,27 +28,35 @@ class MyJSONRPCServiceInterface final
 private:
 	RPC::Events events;
 
-	static void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id)
+	static std::pair<yyjson_mut_doc *, yyjson_mut_val *> CreateReply(const Anope::string &id)
 	{
-		Log(LOG_DEBUG) << "JSON-RPC error " << code << ": " << message;
-
-		// {"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found"}, "id": "1"}
 		auto* doc = yyjson_mut_doc_new(nullptr);
 
 		auto* root = yyjson_mut_obj(doc);
 		yyjson_mut_doc_set_root(doc, root);
 
-		auto *error = yyjson_mut_obj(doc);
-		yyjson_mut_obj_add_sint(doc, error, "code", code);
-		yyjson_mut_obj_add_strn(doc, error, "message", message.c_str(), message.length());
-
-		yyjson_mut_obj_add_val(doc, root, "error", error);
 		yyjson_mut_obj_add_str(doc, root, "jsonrpc", "2.0");
 
 		if (id.empty())
 			yyjson_mut_obj_add_null(doc, root, "id");
 		else
 			yyjson_mut_obj_add_strn(doc, root, "id", id.c_str(), id.length());
+
+		return { doc, root };
+	}
+
+	static void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id)
+	{
+		Log(LOG_DEBUG) << "JSON-RPC error " << code << ": " << message;
+
+		// {"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found"}, "id": "1"}
+		auto [doc, root] = CreateReply(id);
+
+		auto *error = yyjson_mut_obj(doc);
+		yyjson_mut_obj_add_sint(doc, error, "code", code);
+		yyjson_mut_obj_add_strn(doc, error, "message", message.c_str(), message.length());
+
+		yyjson_mut_obj_add_val(doc, root, "error", error);
 
 		auto *json = yyjson_mut_write(doc, YYJSON_WRITE_ALLOW_INVALID_UNICODE | YYJSON_WRITE_NEWLINE_AT_END, nullptr);
 		if (json)
@@ -175,15 +183,7 @@ public:
 		}
 
 		// {"jsonrpc": "2.0", "method": "update", "params": [1,2,3,4,5]}
-		auto* doc = yyjson_mut_doc_new(nullptr);
-
-		auto* root = yyjson_mut_obj(doc);
-		yyjson_mut_doc_set_root(doc, root);
-
-		if (request.id.empty())
-			yyjson_mut_obj_add_null(doc, root, "id");
-		else
-			yyjson_mut_obj_add_strn(doc, root, "id", request.id.c_str(), request.id.length());
+		auto [doc, root] = CreateReply(request.id);
 
 		if (request.GetRoot())
 		{
@@ -192,8 +192,6 @@ public:
 		}
 		else
 			yyjson_mut_obj_add_null(doc, root, "result");
-
-		yyjson_mut_obj_add_str(doc, root, "jsonrpc", "2.0");
 
 		auto *json = yyjson_mut_write(doc, YYJSON_WRITE_ALLOW_INVALID_UNICODE | YYJSON_WRITE_NEWLINE_AT_END, nullptr);
 		if (json)

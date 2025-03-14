@@ -104,6 +104,7 @@ class EBCrypt final
 {
 private:
 	BCryptProvider bcryptprovider;
+	static const size_t BCRYPT_MAX_LEN = 72;
 
 public:
 	EBCrypt(const Anope::string &modname, const Anope::string &creator)
@@ -118,8 +119,7 @@ public:
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
-		// Bcrypt can not generate passwords longer than 71 characters.
-		if (src.length() > 71)
+		if (src.length() > BCRYPT_MAX_LEN)
 			return EVENT_CONTINUE;
 
 		dest = "bcrypt:" + bcryptprovider.Encrypt(src);
@@ -167,6 +167,10 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
+		const auto maxpasslen = conf.GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
+		if (maxpasslen > BCRYPT_MAX_LEN && ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			Log(this) << "Warning: {nickserv}:maxpasslen is set to " << maxpasslen << " which is longer than the bcrypt maximum length of " << BCRYPT_MAX_LEN;
+
 		auto &block = conf.GetModule(this);
 
 		auto rounds = block.Get<unsigned long>("rounds", "10");

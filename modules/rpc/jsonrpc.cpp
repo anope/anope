@@ -45,7 +45,7 @@ private:
 		return { doc, root };
 	}
 
-	static void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id)
+	static void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id = "")
 	{
 		Log(LOG_DEBUG) << "JSON-RPC error " << code << ": " << message;
 
@@ -111,10 +111,12 @@ public:
 
 	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
 	{
-		auto *doc = yyjson_read(message.content.c_str(), message.content.length(), YYJSON_READ_ALLOW_TRAILING_COMMAS | YYJSON_READ_ALLOW_INVALID_UNICODE);
+		yyjson_read_err error;
+		const auto flags = YYJSON_READ_ALLOW_TRAILING_COMMAS | YYJSON_READ_ALLOW_INVALID_UNICODE;
+		auto *doc = yyjson_read_opts(const_cast<char *>(message.content.c_str()), message.content.length(), flags, nullptr, &error);
 		if (!doc)
 		{
-			SendError(reply, RPC::ERR_PARSE_ERROR, "JSON parse error", "");
+			SendError(reply, RPC::ERR_PARSE_ERROR, Anope::printf("JSON parse error #%u: %s", error.code, 	error.msg));
 			return true;
 		}
 
@@ -123,7 +125,7 @@ public:
 		{
 			// TODO: handle an array of JSON-RPC requests
 			yyjson_doc_free(doc);
-			SendError(reply, RPC::ERR_INVALID_REQUEST, "Wrong JSON root element", "");
+			SendError(reply, RPC::ERR_INVALID_REQUEST, "Wrong JSON root element");
 			return true;
 		}
 
@@ -132,13 +134,19 @@ public:
 		if (!jsonrpc.empty() && jsonrpc != "2.0")
 		{
 			yyjson_doc_free(doc);
-			SendError(reply, RPC::ERR_INVALID_REQUEST, "Unsupported JSON-RPC version", id);
+			SendError(reply, RPC::ERR_INVALID_REQUEST, "Unsupported JSON-RPC version: " + jsonrpc, id);
 			return true;
 		}
 
 		RPC::Request request(reply);
 		request.id = id;
 		request.name = yyjson_get_astr(root, "method");
+		if (request.name.empty())
+		{
+			yyjson_doc_free(doc);
+			SendError(reply, RPC::ERR_INVALID_REQUEST, "No JSON-RPC method was specified", id);
+			return true;
+		}
 
 		auto *params = yyjson_obj_get(root, "params");
 		size_t idx, max;
@@ -154,15 +162,15 @@ public:
 		auto event = this->events.find(request.name);
 		if (event == this->events.end())
 		{
-			SendError(reply, RPC::ERR_METHOD_NOT_FOUND, "Method not found", id);
+			SendError(reply, RPC::ERR_METHOD_NOT_FOUND, "Method not found: " + request.name, id);
 			return true;
 		}
 
 		auto *eh = event->second;
 		if (request.data.size() < eh->GetMinParams())
 		{
-			auto error = Anope::printf("Not enough parameters (given %zu, expected %zu)",
-				request.data.size(), eh->GetMinParams());
+			auto error = Anope::printf("Not enough parameters for %s (given %zu, expected %zu)",
+				request.name.c_str(), request.data.size(), eh->GetMinParams());
 			SendError(reply, RPC::ERR_INVALID_PARAMS, error, id);
 			return true;
 		}

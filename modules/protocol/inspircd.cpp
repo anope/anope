@@ -510,6 +510,17 @@ public:
 
 	void SendVHost(User *u, const Anope::string &vident, const Anope::string &vhost) override
 	{
+		if (Servers::Capab.count("CLOAK"))
+		{
+			Anope::string cloak;
+			if (!vident.empty())
+				cloak.append(vident).push_back('@');
+			cloak.append(vhost);
+
+			Uplink::Send("METADATA", u->GetUID(), "custom-cloak", cloak);
+			return;
+		}
+
 		if (!vident.empty())
 			this->SendChgIdentInternal(u->GetUID(), vident);
 
@@ -2034,7 +2045,24 @@ public:
 
 					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " the " << modname << " module; adjusted functionality.";
 				}
+			}
 
+			else if (params[1].equals_cs("cloakmethods"))
+			{
+				spacesepstream tokens(params[2]);
+				for (Anope::string token; tokens.GetToken(token); )
+				{
+					const auto idx = token.find('=');
+					if (token.compare(0, idx, "custom", 6) == 0)
+					{
+						Log() << "The remote server has the custom cloak method; this will be used for setting vhosts.";
+						Servers::Capab.insert("CLOAK");
+						return;
+					}
+				}
+
+				Log() << "The remote server does not have the custom cloak method; CHGIDENT and CHGHOST will be used until the module is loaded.";
+				Servers::Capab.erase("CLOAK");
 			}
 		}
 	}

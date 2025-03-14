@@ -153,6 +153,24 @@ private:
 			Uplink::Send("METADATA", uid, "accountnicks", GetAccountNicks(na));
 	}
 
+	static void SendVHostInternal(const Anope::string &uid, const Anope::string &vident, const Anope::string &vhost)
+	{
+		if (Servers::Capab.count("CLOAK"))
+		{
+			Anope::string cloak;
+			if (!vident.empty())
+				cloak.append(vident).push_back('@');
+			cloak.append(vhost);
+
+			Uplink::Send("METADATA", uid, "custom-cloak", cloak);
+			return;
+		}
+
+		if (!vident.empty())
+			SendChgIdentInternal(uid, vident);
+		SendChgHostInternal(uid, vhost);
+	}
+
 public:
 	PrimitiveExtensibleItem<ListLimits> maxlist;
 
@@ -510,22 +528,7 @@ public:
 
 	void SendVHost(User *u, const Anope::string &vident, const Anope::string &vhost) override
 	{
-		if (Servers::Capab.count("CLOAK"))
-		{
-			Anope::string cloak;
-			if (!vident.empty())
-				cloak.append(vident).push_back('@');
-			cloak.append(vhost);
-
-			Uplink::Send("METADATA", u->GetUID(), "custom-cloak", cloak);
-			return;
-		}
-
-		if (!vident.empty())
-			this->SendChgIdentInternal(u->GetUID(), vident);
-
-		if (!vhost.empty())
-			this->SendChgHostInternal(u->GetUID(), vhost);
+		SendVHostInternal(u->GetUID(), vident, vhost);
 	}
 
 	void SendSVSHold(const Anope::string &nick, time_t t) override
@@ -650,11 +653,8 @@ public:
 
 		if (na)
 		{
-			if (!na->GetVHostIdent().empty())
-				SendChgHostInternal(uid, na->GetVHostIdent());
-
 			if (!na->GetVHostHost().empty())
-				SendChgHostInternal(uid, na->GetVHostHost());
+				SendVHostInternal(uid, na->GetVHostIdent(), na->GetVHostHost());
 
 			// Mark this SASL session as pending user introduction.
 			SASLUser su;
@@ -1897,7 +1897,7 @@ private:
 			const auto idx = token.find('=');
 			if (token.compare(0, idx, "custom", 6) == 0)
 			{
-				if (!Servers::Capab.count("TOPICLOCK"))
+				if (!Servers::Capab.count("CLOAK"))
 				{
 					Log() << "The remote server has the custom cloak method; this will be used for setting vhosts.";
 					Servers::Capab.insert("CLOAK");
@@ -1906,7 +1906,7 @@ private:
 			}
 		}
 
-		if (Servers::Capab.count("TOPICLOCK"))
+		if (Servers::Capab.count("CLOAK"))
 		{
 			Log() << "The remote server does not have the custom cloak method; CHGIDENT and CHGHOST will be used until the module is loaded.";
 			Servers::Capab.erase("CLOAK");

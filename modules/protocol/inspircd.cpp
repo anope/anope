@@ -1864,10 +1864,204 @@ private:
 	ServiceReference<CertService> certs;
 	PrimitiveExtensibleItem<ListLimits> &maxlist;
 
+	static void HandleAccountName(User *u, const Anope::string &value)
+	{
+		// :36D METADATA 9TSAAAAAA accountname
+		// :36D METADATA 9TSAAAAAA accountname Sadie
+		if (value.empty())
+		{
+			// The user has been logged out by the IRC server.
+			u->Logout();
+		}
+		else
+		{
+			// If we're bursting then then the user was probably logged in
+			// during a previous connection.
+			auto *nc = NickCore::Find(value);
+			if (nc)
+				u->Login(nc);
+		}
+	}
+
+	static void HandleCloakMethods(Server *s, const Anope::string &value)
+	{
+		// :9TS METADATA * cloakmethods :foo bar=baz bax
+
+		// We are only interested when it comes from our uplink.
+		if (s->GetUplink() != Me)
+			return;
+
+		spacesepstream tokens(value);
+		for (Anope::string token; tokens.GetToken(token); )
+		{
+			const auto idx = token.find('=');
+			if (token.compare(0, idx, "custom", 6) == 0)
+			{
+				if (!Servers::Capab.count("TOPICLOCK"))
+				{
+					Log() << "The remote server has the custom cloak method; this will be used for setting vhosts.";
+					Servers::Capab.insert("CLOAK");
+				}
+				return;
+			}
+		}
+
+		if (Servers::Capab.count("TOPICLOCK"))
+		{
+			Log() << "The remote server does not have the custom cloak method; CHGIDENT and CHGHOST will be used until the module is loaded.";
+			Servers::Capab.erase("CLOAK");
+		}
+	}
+
+	void HandleMaxList(Channel *c, const Anope::string &value)
+	{
+		ListLimits limits;
+		spacesepstream limitstream(value);
+		Anope::string modechr, modelimit;
+		while (limitstream.GetToken(modechr) && limitstream.GetToken(modelimit))
+		{
+			limits.emplace(modechr[0], Anope::Convert<unsigned>(modelimit, 0));
+		}
+		maxlist.Set(c, limits);
+	}
+
+	static void HandleMLock(Channel *c, const Anope::string &value)
+	{
+		// :36D METADATA #chan 69 nts
+		if (!c->ci)
+			return; // Not registered.
+
+		Anope::string modes;
+		const auto *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
+		if (modelocks)
+			modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+
+		// Mode lock string is not what we say it is?
+		if (!modes.equals_cs(value))
+			Uplink::Send("METADATA", c->name, c->creation_time, "mlock", modes);
+	}
+
+	static void HandleModules(Server *s, const Anope::string &value)
+	{
+		// :20D METADATA * modules +cloak=custom
+		// :20D METADATA * modules -cloak
+
+		// We are only interested when it comes from our uplink.
+		if (s->GetUplink() != Me)
+			return;
+
+		auto plus = (value[0] == '+');
+		if (!plus && value[0] != '-')
+			return; // Malformed.
+
+		bool required = false;
+		Anope::string capab, modname, moddata;
+		ParseModule(value.substr(1), modname, moddata);
+
+		if (modname.equals_cs("account"))
+			required = true;
+
+		else if (modname.equals_cs("cban"))
+		{
+			if (plus && (spanningtree_proto_ver >= 1206 || moddata == "glob"))
+				IRCD->CanSQLineChannel = true;
+			else
+				IRCD->CanSQLineChannel = false;
+		}
+
+		else if (modname.equals_cs("cban") && spanningtree_proto_ver >= 1206)
+			IRCD->CanSQLineChannel = plus;
+
+		else if (modname.equals_cs("chghost"))
+			capab = "CHGHOST";
+
+		else if (modname.equals_cs("chgident"))
+			capab = "CHGIDENT";
+
+		else if (modname.equals_cs("globops"))
+			capab = "GLOBOPS";
+
+		else if (modname.equals_cs("hidechans"))
+			required = true;
+
+		else if (modname.equals_cs("ircv3_ctctags"))
+			IRCD->CanTagMessage = plus;
+
+		else if (modname.equals_cs("rline"))
+			capab = "RLINE";
+
+		else if (modname.equals_cs("services"))
+			required = true;
+
+		// Deprecated 1205 modules.
+		else if (modname.equals_cs("services_account"))
+			required = true;
+
+		else if (modname.equals_cs("svshold"))
+			IRCD->CanSVSHold = plus;
+
+		else if (modname.equals_cs("topiclock"))
+			capab = "TOPICLOCK";
+
+		else
+			return;
+
+		if (required)
+		{
+			if (plus)
+				Log() << "Warning: InspIRCd unloaded the " << modname << " module. Anope won't function correctly without it.";
+		}
+		else
+		{
+			if (plus && !capab.empty())
+				Servers::Capab.insert(capab);
+
+			else if (!capab.empty())
+				Servers::Capab.erase(capab);
+
+			Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " the " << modname << " module; adjusted functionality.";
+		}
+	}
+
+	void HandleSSLCert(User *u, const Anope::string &value)
+	{
+		// :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
+		// :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
+		u->Extend<bool>("ssl");
+
+		Anope::string data;
+		spacesepstream tokens(value);
+		if (!tokens.GetToken(data) || data.find('E') != Anope::string::npos || !tokens.GetToken(data))
+			return; // Malformed or no client certificate.
+
+		commasepstream fingerprints(data);
+		if (!fingerprints.GetToken(data))
+			return; // Should never happen?
+
+		// The first fingerprint is always the current one.
+		u->fingerprint = data;
+		FOREACH_MOD(OnFingerprint, (u));
+
+		// Any extra fingerprints are using backup algorithms.
+		while (certs && fingerprints.GetToken(data))
+			certs->ReplaceCert(data, u->fingerprint);
+	}
+
+	static void HandleTopicLock(Channel *c, const Anope::string &value)
+	{
+		// :36D METADATA #chan 69 1
+		if (!c->ci)
+			return; // Not registered.
+
+		auto localstate = c->ci->HasExt("TOPICLOCK");
+		auto remotestate = Anope::Convert<bool>(value, false);
+		if (localstate != remotestate)
+			Uplink::Send("METADATA", c->name, c->creation_time, "topiclock", !!localstate);
+	}
 
 public:
 	IRCDMessageMetadata(Module *creator, PrimitiveExtensibleItem<ListLimits> &listlimits)
-		: IRCDMessage(creator, "METADATA", 3)
+		: IRCDMessage(creator, "METADATA", 2)
 		, certs("CertService", "certs")
 		, maxlist(listlimits)
 	{
@@ -1877,193 +2071,62 @@ public:
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		// We deliberately ignore non-bursting servers to avoid pseudoserver fights
-		// Channel METADATA has an additional parameter: the channel TS
-		// Received: :715 METADATA #chan 1572026333 mlock :nt
-		if ((params[0][0] == '#') && (params.size() > 3) && (!source.GetServer()->IsSynced()))
+		if (params[0][0] == '#')
 		{
-			Channel *c = Channel::Find(params[0]);
-			if (c)
-			{
-				if (c->ci && params[2] == "mlock")
-				{
-					ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
-					Anope::string modes;
-					if (modelocks)
-						modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+			// :<sid> METADATA <chan> <ts> <key> [<value>]
 
-					// Mode lock string is not what we say it is?
-					if (modes != params[3])
-						Uplink::Send("METADATA", c->name, c->creation_time, "mlock", modes);
-				}
-				else if (c->ci && params[2] == "topiclock")
-				{
-					bool mystate = c->ci->HasExt("TOPICLOCK");
-					bool serverstate = (params[3] == "1");
-					if (mystate != serverstate)
-						Uplink::Send("METADATA", c->name, c->creation_time, "topiclock", !!mystate);
-				}
-				else if (params[2] == "maxlist")
-				{
-					ListLimits limits;
-					spacesepstream limitstream(params[3]);
-					Anope::string modechr, modelimit;
-					while (limitstream.GetToken(modechr) && limitstream.GetToken(modelimit))
-					{
-						limits.emplace(modechr[0], Anope::Convert<unsigned>(modelimit, 0));
-					}
-					maxlist.Set(c, limits);
-				}
+			// Channel METADATA has an additional parameter: the channel ts.
+			// We ignore non-bursting servers to avoid pseudoserver fights.
+			if (params.size() < 3 || source.GetServer()->IsSynced())
+				return;
+
+			auto *c = Channel::Find(params[0]);
+			if (!c)
+			{
+				Log(LOG_DEBUG) << "Received a METADATA " << params[2] << " message for unintroduced channel " << params[0];
+				return;
 			}
+
+			const auto &value = params.size() > 3 ? params[3] : "";
+			if (params[1].equals_ci("maxlist"))
+				HandleMaxList(c, value);
+
+			else if (params[1].equals_ci("mlock"))
+				HandleMLock(c, value);
 		}
 		else if (isdigit(params[0][0]))
 		{
+			// :<sid> METADATA <uuid> <key> [<value>]
 			auto *u = User::Find(params[0]);
 			if (!u)
+			{
+				Log(LOG_DEBUG) << "Received a METADATA " << params[1] << " message for unintroduced user " << params[0];
 				return;
-
-			if (params[1].equals_cs("accountname"))
-			{
-				if (params[2].empty())
-				{
-					// The user has been logged out by the IRC server.
-					u->Logout();
-				}
-				else
-				{
-					// If we're bursting then then the user was probably logged
-					// in during a previous connection.
-					NickCore *nc = NickCore::Find(params[2]);
-					if (nc)
-						u->Login(nc);
-				}
 			}
 
-			/*
-			 *   possible incoming ssl_cert messages:
-			 *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
-			 *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
-			 */
-			else if (params[1].equals_cs("ssl_cert"))
-			{
-				u->Extend<bool>("ssl");
+			const auto &value = params.size() > 2 ? params[2] : "";
+			if (params[1].equals_ci("accountname"))
+				HandleAccountName(u, value);
 
-				Anope::string data;
-				spacesepstream tokens(params[2]);
-				if (!tokens.GetToken(data) || data.find('E') != Anope::string::npos || !tokens.GetToken(data))
-					return; // Malformed or no client certificate.
-
-				commasepstream fingerprints(data);
-				if (!fingerprints.GetToken(data))
-					return; // Should never happen?
-
-				u->fingerprint = data;
-				FOREACH_MOD(OnFingerprint, (u));
-
-				while (certs && fingerprints.GetToken(data))
-					certs->ReplaceCert(data, u->fingerprint);
-			}
+			else if (params[1].equals_ci("ssl_cert"))
+				HandleSSLCert(u, value);
 		}
 		else if (params[0] == "*")
 		{
-			// Wed Oct  3 15:40:27 2012: S[14] O :20D METADATA * modules :-m_svstopic.so
-
-			if (params[1].equals_cs("modules") && !params[2].empty())
+			// :<sid> METADATA * <key> [<value>]
+			auto *s = source.GetServer();
+			if (!s)
 			{
-				// only interested when it comes from our uplink
-				Server *server = source.GetServer();
-				if (!server || server->GetUplink() != Me)
-					return;
-
-				bool plus = (params[2][0] == '+');
-				if (!plus && params[2][0] != '-')
-					return;
-
-				bool required = false;
-				Anope::string capab, modname, moddata;
-				ParseModule(params[2].substr(1), modname, moddata);
-
-				if (modname.equals_cs("account"))
-					required = true;
-
-				else if (modname.equals_cs("cban"))
-				{
-					if (plus && (spanningtree_proto_ver >= 1206 || moddata == "glob"))
-						IRCD->CanSQLineChannel = true;
-					else
-						IRCD->CanSQLineChannel = false;
-				}
-
-				else if (modname.equals_cs("cban") && spanningtree_proto_ver >= 1206)
-					IRCD->CanSQLineChannel = plus;
-
-				else if (modname.equals_cs("chghost"))
-					capab = "CHGHOST";
-
-				else if (modname.equals_cs("chgident"))
-					capab = "CHGIDENT";
-
-				else if (modname.equals_cs("globops"))
-					capab = "GLOBOPS";
-
-				else if (modname.equals_cs("hidechans"))
-					required = true;
-
-				else if (modname.equals_cs("ircv3_ctctags"))
-					IRCD->CanTagMessage = plus;
-
-				else if (modname.equals_cs("rline"))
-					capab = "RLINE";
-
-				else if (modname.equals_cs("services"))
-					required = true;
-
-				// Deprecated 1205 modules.
-				else if (modname.equals_cs("services_account"))
-					required = true;
-
-				else if (modname.equals_cs("svshold"))
-					IRCD->CanSVSHold = plus;
-
-				else if (modname.equals_cs("topiclock"))
-					capab = "TOPICLOCK";
-
-				else
-					return;
-
-				if (required)
-				{
-					if (plus)
-						Log() << "Warning: InspIRCd unloaded the " << modname << " module. Anope won't function correctly without it.";
-				}
-				else
-				{
-					if (plus && !capab.empty())
-						Servers::Capab.insert(capab);
-					else if (!capab.empty())
-						Servers::Capab.erase(capab);
-
-					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " the " << modname << " module; adjusted functionality.";
-				}
+				Log(LOG_DEBUG) << "Received a METADATA " << params[1] << " message from unintroduced server " << source.GetName();
+				return;
 			}
 
-			else if (params[1].equals_cs("cloakmethods"))
-			{
-				spacesepstream tokens(params[2]);
-				for (Anope::string token; tokens.GetToken(token); )
-				{
-					const auto idx = token.find('=');
-					if (token.compare(0, idx, "custom", 6) == 0)
-					{
-						Log() << "The remote server has the custom cloak method; this will be used for setting vhosts.";
-						Servers::Capab.insert("CLOAK");
-						return;
-					}
-				}
+			const auto &value = params.size() > 2 ? params[2] : "";
+			if (params[1].equals_ci("cloakmethods"))
+				HandleCloakMethods(s, value);
 
-				Log() << "The remote server does not have the custom cloak method; CHGIDENT and CHGHOST will be used until the module is loaded.";
-				Servers::Capab.erase("CLOAK");
-			}
+			else if (params[1].equals_ci("modules"))
+				HandleModules(s, value);
 		}
 	}
 };

@@ -194,6 +194,7 @@ public:
 	 * @return The account, if it exists
 	 */
 	static NickCore *Find(const Anope::string &nick);
+	static NickCore *FindId(uint64_t id);
 
 	void AddChannelReference(ChannelInfo *ci);
 	void RemoveChannelReference(ChannelInfo *ci);

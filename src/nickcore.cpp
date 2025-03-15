@@ -236,6 +236,17 @@ NickCore *NickCore::Find(const Anope::string &nick)
 	return NULL;
 }
 
+NickCore *NickCore::FindId(uint64_t id)
+{
+	auto it = NickCoreIdList->find(id);
+	if (it != NickCoreIdList->end())
+	{
+		it->second->QueueUpdate();
+		return it->second;
+	}
+	return nullptr;
+}
+
 uint64_t NickCore::GetId()
 {
 	if (this->id)

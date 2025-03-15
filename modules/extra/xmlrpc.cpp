@@ -18,7 +18,7 @@
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
-class MyXMLRPCServiceInterface final
+class XMLRPCServiceInterface final
 	: public RPC::ServiceInterface
 	, public HTTPPage
 {
@@ -69,8 +69,8 @@ public:
 	// Whether we should use the nil XML-RPC extension.
 	static bool enable_nil;
 
-	MyXMLRPCServiceInterface(Module *creator, const Anope::string &sname)
-		: RPC::ServiceInterface(creator, sname)
+	XMLRPCServiceInterface(Module *creator)
+		: RPC::ServiceInterface(creator)
 		, HTTPPage("/xmlrpc", "text/xml")
 	{
 	}
@@ -199,7 +199,7 @@ public:
 	}
 };
 
-xmlrpc_value *MyXMLRPCServiceInterface::SerializeElement(xmlrpc_env &env, const RPC::Value &value)
+xmlrpc_value *XMLRPCServiceInterface::SerializeElement(xmlrpc_env &env, const RPC::Value &value)
 {
 	xmlrpc_value *elem;
 	std::visit(overloaded
@@ -276,20 +276,20 @@ xmlrpc_value *MyXMLRPCServiceInterface::SerializeElement(xmlrpc_env &env, const 
 	return elem;
 }
 
-bool MyXMLRPCServiceInterface::enable_i8 = true;
-bool MyXMLRPCServiceInterface::enable_nil = true;
+bool XMLRPCServiceInterface::enable_i8 = true;
+bool XMLRPCServiceInterface::enable_nil = true;
 
 class ModuleXMLRPC final
 	: public Module
 {
 private:
 	ServiceReference<HTTPProvider> httpref;
-	MyXMLRPCServiceInterface xmlrpcinterface;
+	XMLRPCServiceInterface xmlrpcinterface;
 
 public:
 	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
-		, xmlrpcinterface(this, "rpc")
+		, xmlrpcinterface(this)
 	{
 		xmlrpc_env env;
 		xmlrpc_env_init(&env);
@@ -320,8 +320,8 @@ public:
 			httpref->UnregisterPage(&xmlrpcinterface);
 
 		auto &modconf = conf.GetModule(this);
-		MyXMLRPCServiceInterface::enable_i8 = modconf.Get<bool>("enable_i8", "yes");
-		MyXMLRPCServiceInterface::enable_nil = modconf.Get<bool>("enable_nil", "yes");
+		XMLRPCServiceInterface::enable_i8 = modconf.Get<bool>("enable_i8", "yes");
+		XMLRPCServiceInterface::enable_nil = modconf.Get<bool>("enable_nil", "yes");
 
 		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", modconf.Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)

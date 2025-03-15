@@ -21,7 +21,7 @@ inline Anope::string yyjson_get_astr(yyjson_val *val, const char *key)
 	return str ? str : "";
 }
 
-class MyJSONRPCServiceInterface final
+class JSONRPCServiceInterface final
 	: public RPC::ServiceInterface
 	, public HTTPPage
 {
@@ -88,8 +88,8 @@ private:
 	}
 
 public:
-	MyJSONRPCServiceInterface(Module *creator, const Anope::string &sname)
-		: RPC::ServiceInterface(creator, sname)
+	JSONRPCServiceInterface(Module *creator)
+		: RPC::ServiceInterface(creator)
 		, HTTPPage("/jsonrpc", "application/json")
 	{
 	}
@@ -211,7 +211,7 @@ public:
 	}
 };
 
-yyjson_mut_val *MyJSONRPCServiceInterface::SerializeElement(yyjson_mut_doc *doc, const RPC::Value &value)
+yyjson_mut_val *JSONRPCServiceInterface::SerializeElement(yyjson_mut_doc *doc, const RPC::Value &value)
 {
 	yyjson_mut_val *elem;
 	std::visit(overloaded
@@ -260,12 +260,12 @@ class ModuleJSONRPC final
 {
 private:
 	ServiceReference<HTTPProvider> httpref;
-	MyJSONRPCServiceInterface jsonrpcinterface;
+	JSONRPCServiceInterface jsonrpcinterface;
 
 public:
 	ModuleJSONRPC(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
-		, jsonrpcinterface(this, "rpc")
+		, jsonrpcinterface(this)
 	{
 	}
 

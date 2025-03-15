@@ -98,33 +98,31 @@ class ModuleRPCSystem final
 	: public Module
 {
 private:
-	ServiceReference<RPC::ServiceInterface> rpc;
 	AnopeDebugTypesRPCEvent anopedebugtypesrpcevent;
 	SystemListMethodsRPCEvent systemlistmethodsrpcevent;
 
 public:
 	ModuleRPCSystem(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
-		, rpc("RPCServiceInterface", "rpc")
 	{
-		if (!rpc)
+		if (!RPC::service)
 			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
 
 #if DEBUG_BUILD
-		rpc->Register(&anopedebugtypesrpcevent);
+		RPC::service->Register(&anopedebugtypesrpcevent);
 #endif
-		rpc->Register(&systemlistmethodsrpcevent);
+		RPC::service->Register(&systemlistmethodsrpcevent);
 	}
 
 	~ModuleRPCSystem() override
 	{
-		if (!rpc)
+		if (!RPC::service)
 			return;
 
 #if DEBUG_BUILD
-		rpc->Unregister(&anopedebugtypesrpcevent);
+		RPC::service->Unregister(&anopedebugtypesrpcevent);
 #endif
-		rpc->Unregister(&systemlistmethodsrpcevent);
+		RPC::service->Unregister(&systemlistmethodsrpcevent);
 	}
 };
 

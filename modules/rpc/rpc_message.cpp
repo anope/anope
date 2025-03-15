@@ -129,26 +129,25 @@ public:
 	ModuleRPCSystem(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
 		, global("GlobalService", "Global")
-		, rpc("RPCServiceInterface", "rpc")
 		, messagenetworkrpcevent(global)
 		, messageserverrpcevent(global)
 	{
-		if (!rpc)
+		if (!RPC::service)
 			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
 
-		rpc->Register(&messagenetworkrpcevent);
-		rpc->Register(&messageserverrpcevent);
-		rpc->Register(&messageuserrpcevent);
+		RPC::service->Register(&messagenetworkrpcevent);
+		RPC::service->Register(&messageserverrpcevent);
+		RPC::service->Register(&messageuserrpcevent);
 	}
 
 	~ModuleRPCSystem() override
 	{
-		if (!rpc)
+		if (!RPC::service)
 			return;
 
-		rpc->Unregister(&messagenetworkrpcevent);
-		rpc->Unregister(&messageserverrpcevent);
-		rpc->Unregister(&messageuserrpcevent);
+		RPC::service->Unregister(&messagenetworkrpcevent);
+		RPC::service->Unregister(&messageserverrpcevent);
+		RPC::service->Unregister(&messageuserrpcevent);
 	}
 };
 

@@ -171,7 +171,6 @@ class ModuleRPCMain final
 	: public Module
 {
 private:
-	ServiceReference<RPC::ServiceInterface> rpc;
 	CommandRPCEvent commandrpcevent;
 	CheckAuthenticationRPCEvent checkauthenticationrpcevent;
 	StatsRPCEvent statsrpcevent;
@@ -179,26 +178,25 @@ private:
 public:
 	ModuleRPCMain(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
-		, rpc("RPCServiceInterface", "rpc")
 	{
 		me = this;
 
-		if (!rpc)
+		if (!RPC::service)
 			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
 
-		rpc->Register(&commandrpcevent);
-		rpc->Register(&checkauthenticationrpcevent);
-		rpc->Register(&statsrpcevent);
+		RPC::service->Register(&commandrpcevent);
+		RPC::service->Register(&checkauthenticationrpcevent);
+		RPC::service->Register(&statsrpcevent);
 	}
 
 	~ModuleRPCMain() override
 	{
-		if (!rpc)
+		if (!RPC::service)
 			return;
 
-		rpc->Unregister(&commandrpcevent);
-		rpc->Unregister(&checkauthenticationrpcevent);
-		rpc->Unregister(&statsrpcevent);
+		RPC::service->Unregister(&commandrpcevent);
+		RPC::service->Unregister(&checkauthenticationrpcevent);
+		RPC::service->Unregister(&statsrpcevent);
 	}
 };
 

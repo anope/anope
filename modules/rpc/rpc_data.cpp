@@ -364,8 +364,6 @@ class ModuleRPCData final
 	: public Module
 {
 private:
-	ServiceReference<RPC::ServiceInterface> rpc;
-
 	AnopeListChannelsRPCEvent anopelistchannelsrpcevent;
 	AnopeChannelRPCEvent anopechannelrpcevent;
 
@@ -381,41 +379,40 @@ private:
 public:
 	ModuleRPCData(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
-		, rpc("RPCServiceInterface", "rpc")
 	{
-		if (!rpc)
+		if (!RPC::service)
 			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
 
-		rpc->Register(&anopelistchannelsrpcevent);
-		rpc->Register(&anopechannelrpcevent);
+		RPC::service->Register(&anopelistchannelsrpcevent);
+		RPC::service->Register(&anopechannelrpcevent);
 
-		rpc->Register(&anopelistopersrpcevent);
-		rpc->Register(&anopeoperrpcevent);
+		RPC::service->Register(&anopelistopersrpcevent);
+		RPC::service->Register(&anopeoperrpcevent);
 
-		rpc->Register(&anopelistserversrpcevent);
-		rpc->Register(&anopeserverrpcevent);
+		RPC::service->Register(&anopelistserversrpcevent);
+		RPC::service->Register(&anopeserverrpcevent);
 
-		rpc->Register(&anopelistusersrpcevent);
-		rpc->Register(&anopeuserrpcevent);
+		RPC::service->Register(&anopelistusersrpcevent);
+		RPC::service->Register(&anopeuserrpcevent);
 
 	}
 
 	~ModuleRPCData() override
 	{
-		if (!rpc)
+		if (!RPC::service)
 			return;
 
-		rpc->Unregister(&anopelistchannelsrpcevent);
-		rpc->Unregister(&anopechannelrpcevent);
+		RPC::service->Unregister(&anopelistchannelsrpcevent);
+		RPC::service->Unregister(&anopechannelrpcevent);
 
-		rpc->Unregister(&anopelistopersrpcevent);
-		rpc->Unregister(&anopeoperrpcevent);
+		RPC::service->Unregister(&anopelistopersrpcevent);
+		RPC::service->Unregister(&anopeoperrpcevent);
 
-		rpc->Unregister(&anopelistserversrpcevent);
-		rpc->Unregister(&anopeserverrpcevent);
+		RPC::service->Unregister(&anopelistserversrpcevent);
+		RPC::service->Unregister(&anopeserverrpcevent);
 
-		rpc->Unregister(&anopelistusersrpcevent);
-		rpc->Unregister(&anopeuserrpcevent);
+		RPC::service->Unregister(&anopelistusersrpcevent);
+		RPC::service->Unregister(&anopeuserrpcevent);
 	}
 };
 

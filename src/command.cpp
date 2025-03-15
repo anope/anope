@@ -26,7 +26,7 @@ CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core,
 	: nick(n)
 	, u(user)
 	, nc(core)
-	, ip(user ? user->ip.str() : "")
+	, ip(user ? user->ip.addr() : "")
 	, reply(r)
 	, service(bi)
 	, msgid(m)

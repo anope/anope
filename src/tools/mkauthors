@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+#
+# (C) 2003-2025 Anope Team
+# Contact us at team@anope.org
+#
+# Please read COPYING and README for further details.
+#
+# Based on the original code of Epona by Lara.
+# Based on the original code of Services by Andy Church.
+
+use v5.26.0;
+use strict;
+use warnings FATAL => qw(all);
+
+use File::Basename        qw(dirname);
+use File::Spec::Functions qw(catfile);
+use FindBin               qw($RealDir);
+
+my %committers;
+for my $committer (split /\n+/, `git log --pretty='%an <%ae>%n%(trailers:key=Co-Authored-By,valueonly)' HEAD`) {
+	$committers{$committer} ||= 0;
+	$committers{$committer} += 1;
+}
+
+my %authors;
+for my $committer (keys %committers) {
+	open(my $fh, '-|', 'git', 'check-mailmap', $committer);
+	chomp(my $author = <$fh>);
+	close $fh;
+
+	$author = $1 if $author =~ /^(.+) <(?:\S+\@localhost|\S+\@users.noreply.github.com)>$/;
+	next if $author =~ /\[bot\]$/;
+	next if $author =~ /^\(svnadmin\)$/;
+
+	$authors{$author} ||= 0;
+	$authors{$author} += $committers{$committer};
+}
+
+
+my $author_file = catfile dirname(dirname($RealDir)), 'docs', 'AUTHORS.txt';
+open(my $fh, '>', $author_file) or die "Unable to write $author_file: $!";
+say $fh <<"EOH";
+Since the first commit in March 2004 ${\scalar %authors} people have submitted patches, commits,
+and other useful contributions to Anope. These people, ordered by the number of
+contributions they have made, are:
+EOH
+
+for my $author (sort { $authors{$b} <=> $authors{$a} or lc($a) cmp lc($b) } keys %authors) {
+	say $fh "  * $author";
+}
+close $fh;
+
+if ($ENV{MKAUTHORS_COMMIT} // 1) {
+	system 'git', 'commit',
+		'--message', 'Update author list.',
+		'--', $author_file;
+}

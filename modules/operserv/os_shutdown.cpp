@@ -11,6 +11,8 @@
 
 #include "module.h"
 
+#define WRONG_NETWORK _("The network name you specified is incorrect. Did you mean to run %s on a different network?")
+
 class CommandOSQuit final
 	: public Command
 {
@@ -28,7 +30,10 @@ public:
 		const auto networkname = Config->GetBlock("networkinfo").Get<Anope::string>("networkname");
 		if (requirename && (params.empty() || !params[0].equals_cs(networkname)))
 		{
-			OnSyntaxError(source, source.command);
+			if (!params.empty())
+				source.Reply(WRONG_NETWORK, source.command.c_str());
+			else
+				OnSyntaxError(source, source.command);
 			return;
 		}
 
@@ -67,7 +72,10 @@ public:
 		const auto networkname = Config->GetBlock("networkinfo").Get<Anope::string>("networkname");
 		if (requirename && (params.empty() || !params[0].equals_cs(networkname)))
 		{
-			OnSyntaxError(source, source.command);
+			if (!params.empty())
+				source.Reply(WRONG_NETWORK, source.command.c_str());
+			else
+				OnSyntaxError(source, source.command);
 			return;
 		}
 
@@ -104,7 +112,10 @@ public:
 		const auto networkname = Config->GetBlock("networkinfo").Get<Anope::string>("networkname");
 		if (requirename && (params.empty() || !params[0].equals_cs(networkname)))
 		{
-			OnSyntaxError(source, source.command);
+			if (!params.empty())
+				source.Reply(WRONG_NETWORK, source.command.c_str());
+			else
+				OnSyntaxError(source, source.command);
 			return;
 		}
 

@@ -26,14 +26,12 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const auto requirename = Config->GetModule(this->owner).Get<bool>("requirename");
-		const auto networkname = Config->GetBlock("networkinfo").Get<Anope::string>("networkname");
-		if (requirename && (params.empty() || !params[0].equals_cs(networkname)))
+		if (Config->GetModule(this->owner).Get<bool>("requirename"))
 		{
-			if (!params.empty())
-				source.Reply(WRONG_NETWORK, source.command.c_str());
-			else
+			if (params.empty())
 				OnSyntaxError(source, source.command);
+			else if (!params[0].equals_cs(Config->GetBlock("networkinfo").Get<Anope::string>("networkname")))
+				source.Reply(WRONG_NETWORK, source.command.c_str());
 			return;
 		}
 
@@ -68,14 +66,12 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const auto requirename = Config->GetModule(this->owner).Get<bool>("requirename");
-		const auto networkname = Config->GetBlock("networkinfo").Get<Anope::string>("networkname");
-		if (requirename && (params.empty() || !params[0].equals_cs(networkname)))
+		if (Config->GetModule(this->owner).Get<bool>("requirename"))
 		{
-			if (!params.empty())
-				source.Reply(WRONG_NETWORK, source.command.c_str());
-			else
+			if (params.empty())
 				OnSyntaxError(source, source.command);
+			else if (!params[0].equals_cs(Config->GetBlock("networkinfo").Get<Anope::string>("networkname")))
+				source.Reply(WRONG_NETWORK, source.command.c_str());
 			return;
 		}
 
@@ -108,14 +104,12 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const auto requirename = Config->GetModule(this->owner).Get<bool>("requirename");
-		const auto networkname = Config->GetBlock("networkinfo").Get<Anope::string>("networkname");
-		if (requirename && (params.empty() || !params[0].equals_cs(networkname)))
+		if (Config->GetModule(this->owner).Get<bool>("requirename"))
 		{
-			if (!params.empty())
-				source.Reply(WRONG_NETWORK, source.command.c_str());
-			else
+			if (params.empty())
 				OnSyntaxError(source, source.command);
+			else if (!params[0].equals_cs(Config->GetBlock("networkinfo").Get<Anope::string>("networkname")))
+				source.Reply(WRONG_NETWORK, source.command.c_str());
 			return;
 		}
 

@@ -35,8 +35,6 @@ namespace RPC
 		ERR_METHOD_NOT_FOUND = -32601,
 		ERR_INVALID_PARAMS   = -32602,
 	};
-
-	static ServiceReference<RPC::ServiceInterface> service("RPC::ServiceInterface", "rpc");
 }
 
 class RPC::Array final

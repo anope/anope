@@ -183,9 +183,6 @@ public:
 		, statsrpcevent(this)
 	{
 		me = this;
-
-		if (!RPC::service)
-			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
 	}
 };
 

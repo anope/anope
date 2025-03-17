@@ -110,8 +110,6 @@ public:
 		, anopedebugtypesrpcevent(this)
 		, systemlistmethodsrpcevent(this)
 	{
-		if (!RPC::service)
-			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
 	}
 };
 

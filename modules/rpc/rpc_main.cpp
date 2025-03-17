@@ -61,8 +61,8 @@ class CommandRPCEvent final
 	: public RPC::Event
 {
 public:
-	CommandRPCEvent()
-		: RPC::Event("command")
+	CommandRPCEvent(Module *o)
+		: RPC::Event(o, "command")
 	{
 	}
 
@@ -118,8 +118,8 @@ class CheckAuthenticationRPCEvent final
 	: public RPC::Event
 {
 public:
-	CheckAuthenticationRPCEvent()
-		: RPC::Event("checkAuthentication")
+	CheckAuthenticationRPCEvent(Module *o)
+		: RPC::Event(o, "checkAuthentication")
 	{
 	}
 
@@ -145,8 +145,8 @@ class StatsRPCEvent final
 	: public RPC::Event
 {
 public:
-	StatsRPCEvent()
-		: RPC::Event("stats")
+	StatsRPCEvent(Module *o)
+		: RPC::Event(o, "stats")
 	{
 	}
 
@@ -178,25 +178,14 @@ private:
 public:
 	ModuleRPCMain(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
+		, commandrpcevent(this)
+		, checkauthenticationrpcevent(this)
+		, statsrpcevent(this)
 	{
 		me = this;
 
 		if (!RPC::service)
 			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
-
-		RPC::service->Register(&commandrpcevent);
-		RPC::service->Register(&checkauthenticationrpcevent);
-		RPC::service->Register(&statsrpcevent);
-	}
-
-	~ModuleRPCMain() override
-	{
-		if (!RPC::service)
-			return;
-
-		RPC::service->Unregister(&commandrpcevent);
-		RPC::service->Unregister(&checkauthenticationrpcevent);
-		RPC::service->Unregister(&statsrpcevent);
 	}
 };
 

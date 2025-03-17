@@ -23,8 +23,6 @@ class XMLRPCServiceInterface final
 	, public HTTPPage
 {
 private:
-	RPC::Events events;
-
 	static void SendError(HTTPReply &reply, xmlrpc_env &env)
 	{
 		Log(LOG_DEBUG) << "XML-RPC error " << env.fault_code << ": " << env.fault_string;
@@ -75,21 +73,6 @@ public:
 	{
 	}
 
-	const RPC::Events &GetEvents() override
-	{
-		return events;
-	}
-
-	bool Register(RPC::Event *event) override
-	{
-		return this->events.emplace(event->GetEvent(), event).second;
-	}
-
-	bool Unregister(RPC::Event *event) override
-	{
-		return this->events.erase(event->GetEvent()) != 0;
-	}
-
 	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
 	{
 		xmlrpc_env env;
@@ -110,8 +93,8 @@ public:
 		request.name = method;
 		delete method;
 
-		auto event = this->events.find(request.name);
-		if (event == this->events.end())
+		ServiceReference<RPC::Event> event(RPC_EVENT, request.name);
+		if (!event)
 		{
 			xmlrpc_env_set_fault(&env, RPC::ERR_METHOD_NOT_FOUND, "Method not found");
 			SendError(reply, env);
@@ -152,17 +135,16 @@ public:
 		}
 		xmlrpc_DECREF(params);
 
-		auto *eh = event->second;
-		if (request.data.size() < eh->GetMinParams())
+		if (request.data.size() < event->GetMinParams())
 		{
 			auto error = Anope::printf("Not enough parameters (given %zu, expected %zu)",
-				request.data.size(), eh->GetMinParams());
+				request.data.size(), event->GetMinParams());
 			xmlrpc_env_set_fault(&env, RPC::ERR_INVALID_PARAMS, error.c_str());
 			SendError(reply, env);
 			return true;
 		}
 
-		if (!eh->Run(this, client, request))
+		if (!event->Run(this, client, request))
 			return false;
 
 		this->Reply(request);

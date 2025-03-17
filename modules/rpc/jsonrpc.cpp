@@ -26,8 +26,6 @@ class JSONRPCServiceInterface final
 	, public HTTPPage
 {
 private:
-	RPC::Events events;
-
 	static std::pair<yyjson_mut_doc *, yyjson_mut_val *> CreateReply(const Anope::string &id)
 	{
 		auto* doc = yyjson_mut_doc_new(nullptr);
@@ -94,21 +92,6 @@ public:
 	{
 	}
 
-	const RPC::Events &GetEvents() override
-	{
-		return events;
-	}
-
-	bool Register(RPC::Event *event) override
-	{
-		return this->events.emplace(event->GetEvent(), event).second;
-	}
-
-	bool Unregister(RPC::Event *event) override
-	{
-		return this->events.erase(event->GetEvent()) != 0;
-	}
-
 	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
 	{
 		yyjson_read_err error;
@@ -159,23 +142,22 @@ public:
 
 		yyjson_doc_free(doc);
 
-		auto event = this->events.find(request.name);
-		if (event == this->events.end())
+		ServiceReference<RPC::Event> event(RPC_EVENT, request.name);
+		if (!event)
 		{
 			SendError(reply, RPC::ERR_METHOD_NOT_FOUND, "Method not found: " + request.name, id);
 			return true;
 		}
 
-		auto *eh = event->second;
-		if (request.data.size() < eh->GetMinParams())
+		if (request.data.size() < event->GetMinParams())
 		{
 			auto error = Anope::printf("Not enough parameters for %s (given %zu, expected %zu)",
-				request.name.c_str(), request.data.size(), eh->GetMinParams());
+				request.name.c_str(), request.data.size(), event->GetMinParams());
 			SendError(reply, RPC::ERR_INVALID_PARAMS, error, id);
 			return true;
 		}
 
-		if (!eh->Run(this, client, request))
+		if (!event->Run(this, client, request))
 			return false;
 
 		this->Reply(request);

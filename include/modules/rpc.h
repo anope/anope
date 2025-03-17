@@ -21,9 +21,6 @@ namespace RPC
 	class ServiceInterface;
 	class Value;
 
-	/** Represents a list of registered events. */
-	using Events = Anope::map<Event *>;
-
 	/** Represents possible types of RPC value. */
 	using ValueUnion = std::variant<Array, Map, Anope::string, std::nullptr_t, bool, double, int64_t, uint64_t>;
 
@@ -171,23 +168,23 @@ public:
 	inline const auto &GetRoot() const { return this->root; }
 };
 
+#define RPC_EVENT "RPC::Event"
+
 class RPC::Event
+	: public Service
 {
 private:
-	Anope::string event;
 	size_t minparams;
 
 protected:
-	Event(const Anope::string& e, size_t mp = 0)
-		: event(e)
+	Event(Module *o, const Anope::string& e, size_t mp = 0)
+		: Service(o, RPC_EVENT, e)
 		, minparams(mp)
 	{
 	}
 
 public:
 	virtual ~Event() = default;
-
-	const auto &GetEvent() const { return event; }
 
 	const auto &GetMinParams() const { return minparams; }
 
@@ -202,12 +199,6 @@ public:
 		: Service(creator, "RPC::ServiceInterface", "rpc")
 	{
 	}
-
-	virtual const Events &GetEvents() = 0;
-
-	virtual bool Register(Event *event) = 0;
-
-	virtual bool Unregister(Event *event) = 0;
 
 	virtual void Reply(Request &request) = 0;
 };

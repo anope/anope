@@ -19,8 +19,8 @@ class AnopeListChannelsRPCEvent final
 	: public RPC::Event
 {
 public:
-	AnopeListChannelsRPCEvent()
-		: RPC::Event("anope.listChannels")
+	AnopeListChannelsRPCEvent(Module *o)
+		: RPC::Event(o, "anope.listChannels")
 	{
 	}
 
@@ -37,8 +37,8 @@ class AnopeChannelRPCEvent final
 	: public RPC::Event
 {
 public:
-	AnopeChannelRPCEvent()
-		: RPC::Event("anope.channel", 1)
+	AnopeChannelRPCEvent(Module *o)
+		: RPC::Event(o, "anope.channel", 1)
 	{
 	}
 
@@ -112,8 +112,8 @@ class AnopeListOpersRPCEvent final
 	: public RPC::Event
 {
 public:
-	AnopeListOpersRPCEvent()
-		: RPC::Event("anope.listOpers")
+	AnopeListOpersRPCEvent(Module *o)
+		: RPC::Event(o, "anope.listOpers")
 	{
 	}
 
@@ -130,8 +130,8 @@ class AnopeOperRPCEvent final
 	: public RPC::Event
 {
 public:
-	AnopeOperRPCEvent()
-		: RPC::Event("anope.oper", 1)
+	AnopeOperRPCEvent(Module *o)
+		: RPC::Event(o, "anope.oper", 1)
 	{
 	}
 
@@ -193,8 +193,8 @@ class AnopeListServersRPCEvent final
 	: public RPC::Event
 {
 public:
-	AnopeListServersRPCEvent()
-		: RPC::Event("anope.listServers")
+	AnopeListServersRPCEvent(Module *o)
+		: RPC::Event(o, "anope.listServers")
 	{
 	}
 
@@ -211,8 +211,8 @@ class AnopeServerRPCEvent final
 	: public RPC::Event
 {
 public:
-	AnopeServerRPCEvent()
-		: RPC::Event("anope.server")
+	AnopeServerRPCEvent(Module *o)
+		: RPC::Event(o, "anope.server")
 	{
 	}
 
@@ -254,8 +254,8 @@ class AnopeListUsersRPCEvent final
 	: public RPC::Event
 {
 public:
-	AnopeListUsersRPCEvent()
-		: RPC::Event("anope.listUsers")
+	AnopeListUsersRPCEvent(Module *o)
+		: RPC::Event(0, "anope.listUsers")
 	{
 	}
 
@@ -272,8 +272,8 @@ class AnopeUserRPCEvent final
 	: public RPC::Event
 {
 public:
-	AnopeUserRPCEvent()
-		: RPC::Event("anope.user", 1)
+	AnopeUserRPCEvent(Module *o)
+		: RPC::Event(o, "anope.user", 1)
 	{
 	}
 
@@ -379,41 +379,19 @@ private:
 public:
 	ModuleRPCData(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
+		, anopelistchannelsrpcevent(this)
+		, anopechannelrpcevent(this)
+		, anopelistopersrpcevent(this)
+		, anopeoperrpcevent(this)
+		, anopelistserversrpcevent(this)
+		, anopeserverrpcevent(this)
+		, anopelistusersrpcevent(this)
+		, anopeuserrpcevent(this)
 	{
 		if (!RPC::service)
 			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
-
-		RPC::service->Register(&anopelistchannelsrpcevent);
-		RPC::service->Register(&anopechannelrpcevent);
-
-		RPC::service->Register(&anopelistopersrpcevent);
-		RPC::service->Register(&anopeoperrpcevent);
-
-		RPC::service->Register(&anopelistserversrpcevent);
-		RPC::service->Register(&anopeserverrpcevent);
-
-		RPC::service->Register(&anopelistusersrpcevent);
-		RPC::service->Register(&anopeuserrpcevent);
-
 	}
 
-	~ModuleRPCData() override
-	{
-		if (!RPC::service)
-			return;
-
-		RPC::service->Unregister(&anopelistchannelsrpcevent);
-		RPC::service->Unregister(&anopechannelrpcevent);
-
-		RPC::service->Unregister(&anopelistopersrpcevent);
-		RPC::service->Unregister(&anopeoperrpcevent);
-
-		RPC::service->Unregister(&anopelistserversrpcevent);
-		RPC::service->Unregister(&anopeserverrpcevent);
-
-		RPC::service->Unregister(&anopelistusersrpcevent);
-		RPC::service->Unregister(&anopeuserrpcevent);
-	}
 };
 
 MODULE_INIT(ModuleRPCData)

@@ -19,9 +19,12 @@ class AnopeDebugTypesRPCEvent final
 	: public RPC::Event
 {
 public:
-	AnopeDebugTypesRPCEvent()
-		: RPC::Event("anope.debugTypes")
+	AnopeDebugTypesRPCEvent(Module *o)
+		: RPC::Event(o, "anope.debugTypes")
 	{
+#if !DEBUG_BUILD
+		Unregister();
+#endif
 	}
 
 	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
@@ -80,15 +83,15 @@ class SystemListMethodsRPCEvent final
 	: public RPC::Event
 {
 public:
-	SystemListMethodsRPCEvent()
-		: RPC::Event("system.listMethods")
+	SystemListMethodsRPCEvent(Module *o)
+		: RPC::Event(o, "system.listMethods")
 	{
 	}
 
 	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
 		auto &root = request.Root<RPC::Array>();
-		for (const auto &[event, _] : iface->GetEvents())
+		for (const auto &event : Service::GetServiceKeys(RPC_EVENT))
 			root.Reply(event);
 		return true;
 	}
@@ -104,25 +107,11 @@ private:
 public:
 	ModuleRPCSystem(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
+		, anopedebugtypesrpcevent(this)
+		, systemlistmethodsrpcevent(this)
 	{
 		if (!RPC::service)
 			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
-
-#if DEBUG_BUILD
-		RPC::service->Register(&anopedebugtypesrpcevent);
-#endif
-		RPC::service->Register(&systemlistmethodsrpcevent);
-	}
-
-	~ModuleRPCSystem() override
-	{
-		if (!RPC::service)
-			return;
-
-#if DEBUG_BUILD
-		RPC::service->Unregister(&anopedebugtypesrpcevent);
-#endif
-		RPC::service->Unregister(&systemlistmethodsrpcevent);
 	}
 };
 

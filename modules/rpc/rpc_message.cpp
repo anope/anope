@@ -30,8 +30,8 @@ private:
 	ServiceReference<GlobalService> &global;
 
 public:
-	MessageNetworkRPCEvent(ServiceReference<GlobalService> &g)
-		: RPC::Event("anope.messageNetwork", 1)
+	MessageNetworkRPCEvent(Module *o, ServiceReference<GlobalService> &g)
+		: RPC::Event(o, "anope.messageNetwork", 1)
 		, global(g)
 	{
 	}
@@ -57,8 +57,8 @@ private:
 	ServiceReference<GlobalService> &global;
 
 public:
-	MessageServerRPCEvent(ServiceReference<GlobalService> &g)
-		: RPC::Event("anope.messageServer", 2)
+	MessageServerRPCEvent(Module *o, ServiceReference<GlobalService> &g)
+		: RPC::Event(o, "anope.messageServer", 2)
 		, global(g)
 	{
 	}
@@ -89,8 +89,8 @@ class MessageUserRPCEvent final
 	: public RPC::Event
 {
 public:
-	MessageUserRPCEvent()
-		: RPC::Event("anope.messageUser", 3)
+	MessageUserRPCEvent(Module *o)
+		: RPC::Event(o, "anope.messageUser", 3)
 	{
 	}
 
@@ -129,25 +129,12 @@ public:
 	ModuleRPCSystem(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
 		, global("GlobalService", "Global")
-		, messagenetworkrpcevent(global)
-		, messageserverrpcevent(global)
+		, messagenetworkrpcevent(this, global)
+		, messageserverrpcevent(this, global)
+		, messageuserrpcevent(this)
 	{
 		if (!RPC::service)
 			throw ModuleException("Unable to find RPC interface, is jsonrpc/xmlrpc loaded?");
-
-		RPC::service->Register(&messagenetworkrpcevent);
-		RPC::service->Register(&messageserverrpcevent);
-		RPC::service->Register(&messageuserrpcevent);
-	}
-
-	~ModuleRPCSystem() override
-	{
-		if (!RPC::service)
-			return;
-
-		RPC::service->Unregister(&messagenetworkrpcevent);
-		RPC::service->Unregister(&messageserverrpcevent);
-		RPC::service->Unregister(&messageuserrpcevent);
 	}
 };
 

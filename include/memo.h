@@ -46,7 +46,7 @@ struct CoreExport MemoInfo final
 {
 	int16_t memomax = 0;
 	Serialize::Checker<std::vector<Memo *> > memos;
-	std::vector<Anope::string> ignores;
+	std::set<Anope::string, ci::less> ignores;
 
 	MemoInfo();
 	Memo *GetMemo(unsigned index) const;

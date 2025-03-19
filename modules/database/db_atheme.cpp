@@ -1247,7 +1247,7 @@ private:
 			return false;
 		}
 
-		nc->memos.ignores.push_back(ignored);
+		nc->memos.ignores.insert(ignored);
 		return true;
 	}
 

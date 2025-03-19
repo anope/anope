@@ -118,7 +118,7 @@ Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &da
 		spacesepstream sep(buf);
 		nc->memos.ignores.clear();
 		while (sep.GetToken(buf))
-			nc->memos.ignores.push_back(buf);
+			nc->memos.ignores.insert(buf);
 	}
 
 	Extensible::ExtensibleUnserialize(nc, nc, data);

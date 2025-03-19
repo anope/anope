@@ -284,7 +284,7 @@ Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data 
 		spacesepstream sep(buf);
 		ci->memos.ignores.clear();
 		while (sep.GetToken(buf))
-			ci->memos.ignores.push_back(buf);
+			ci->memos.ignores.insert(buf);
 	}
 
 	Extensible::ExtensibleUnserialize(ci, ci, data);

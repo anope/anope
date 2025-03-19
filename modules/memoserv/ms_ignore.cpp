@@ -57,23 +57,15 @@ public:
 				return;
 			}
 
-			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
-			{
-				mi->ignores.emplace_back(param.ci_str());
+			if (mi->ignores.insert(param).second)
 				source.Reply(_("\002%s\002 added to ignore list."), param.c_str());
-			}
 			else
 				source.Reply(_("\002%s\002 is already on the ignore list."), param.c_str());
 		}
 		else if (command.equals_ci("DEL") && !param.empty())
 		{
-			std::vector<Anope::string>::iterator it = std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str());
-
-			if (it != mi->ignores.end())
-			{
-				mi->ignores.erase(it);
+			if (mi->ignores.erase(param))
 				source.Reply(_("\002%s\002 removed from the ignore list."), param.c_str());
-			}
 			else
 				source.Reply(_("\002%s\002 is not on the ignore list."), param.c_str());
 		}

@@ -57,7 +57,7 @@ void Uplink::Connect()
 		UplinkSock->Bind(Config->GetBlock("serverinfo").Get<const Anope::string>("localhost"));
 	FOREACH_MOD(OnPreServerConnect, ());
 	Anope::string ip = Anope::Resolve(u.host, u.protocol);
-	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << ip << " (" << u.str() << ") with protocol " << IRCD->GetProtocolName();
+	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << ip << " (" << u.str() << ")";
 	UplinkSock->Connect(ip, u.port);
 }
 

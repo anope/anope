@@ -545,14 +545,13 @@ bool Anope::Init(int ac, char **av)
 	if (!encryption)
 		throw CoreException("You must load a non-deprecated encryption module!");
 
-	auto *protocol = ModuleManager::FindFirstOf(PROTOCOL);
-	if (!protocol)
+	if (!IRCD)
 		throw CoreException("You must load a protocol module!");
 
 	/* Write our PID to the PID file. */
 	write_pidfile();
 
-	Log() << "Using IRCd protocol " << protocol->name;
+	Log(LOG_TERMINAL) << "Using IRCd protocol " << IRCD->GetProtocolName() << " (" << IRCD->owner->name << ")";
 
 	/* Auto assign sid if applicable */
 	if (IRCD->RequiresID)

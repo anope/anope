@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 20:14+0000\n"
+"POT-Creation-Date: 2025-03-19 09:55+0000\n"
 "PO-Revision-Date: 2025-03-08 13:33+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -3571,9 +3571,6 @@ msgstr ""
 msgid "Ignore list is empty."
 msgstr ""
 
-msgid "Ignore list:"
-msgstr ""
-
 msgid "Incorrect email address."
 msgstr ""
 
@@ -4140,6 +4137,9 @@ msgid "Memo %zu has been deleted."
 msgstr ""
 
 msgid "Memo ignore list is empty."
+msgstr ""
+
+msgid "Memo ignore list:"
 msgstr ""
 
 #, c-format
@@ -6144,7 +6144,8 @@ msgstr ""
 msgid "The mode lock list of %s is full."
 msgstr ""
 
-msgid "The network name you specified is incorrect."
+#, c-format
+msgid "The network name you specified is incorrect. Did you mean to run %s on a different network?"
 msgstr ""
 
 #, c-format

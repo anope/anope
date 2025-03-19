@@ -92,7 +92,7 @@ public:
 					list.AddEntry(entry);
 				}
 
-				source.Reply(_("Ignore list:"));
+				source.Reply(_("Memo ignore list:"));
 
 				std::vector<Anope::string> replies;
 				list.Process(replies);

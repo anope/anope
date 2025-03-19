@@ -17,6 +17,7 @@
 #include "modules/operserv/forbid.h"
 #include "modules/operserv/news.h"
 #include "modules/operserv/session.h"
+#include "modules/set_misc.h"
 #include "modules/suspend.h"
 
 #define READ(x) \
@@ -473,10 +474,24 @@ static void LoadNicks()
 
 			uint32_t u32;
 			READ(read_uint32(&u32, f));
-			//nc->icq = u32;
+			ExtensibleRef<MiscData> icqref("ns_set_misc:ICQ");
+			if (icqref && u32 > 0)
+			{
+				MiscData *data = icqref->Set(nc);
+				data->object = nc->display;
+				data->name = "ns_set_misc:ICQ";
+				data->data = Anope::ToString(u32);
+			}
 
 			READ(read_string(buffer, f));
-			//nc->url = buffer;
+			ExtensibleRef<MiscData> urlref("ns_set_misc:URL");
+			if (urlref && !buffer.empty())
+			{
+				MiscData *data = icqref->Set(nc);
+				data->object = nc->display;
+				data->name = "ns_set_misc:URL";
+				data->data = buffer;
+			}
 
 			READ(read_uint32(&u32, f));
 			if (u32 & OLD_NI_KILLPROTECT)

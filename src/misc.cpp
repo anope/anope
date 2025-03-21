@@ -159,11 +159,12 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 				lengths[column] = entry[column].length();
 		}
 	}
+	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "120");
 	unsigned total_length = 0;
 	for (const auto &[column, length] : lengths)
 	{
-		/* Break lines at 80 chars */
-		if (total_length > 80)
+		// Break lines that are getting too long.
+		if (total_length > max_length)
 		{
 			breaks.insert(column);
 			total_length = 0;

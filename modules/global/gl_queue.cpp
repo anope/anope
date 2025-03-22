@@ -91,7 +91,7 @@ private:
 
 		global->ClearQueue(source.nc);
 		source.Reply(_("Your message queue has been cleared."));
-		Log(LOG_ADMIN, source, this);
+		Log(LOG_ADMIN, source, this) << "to clear their queue."
 	}
 
 	void DoDel(CommandSource &source, const Anope::string &what)

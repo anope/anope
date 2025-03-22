@@ -26,12 +26,10 @@ public:
 
 	~AkillDelCallback() override
 	{
-		if (!deleted)
-			source.Reply(_("No matching entries on the AKILL list."));
-		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from the AKILL list."));
+		if (deleted)
+			source.Reply(deleted, N_("Deleted %d entry from the AKILL list.", "Deleted %d entries from the AKILL list."), deleted);
 		else
-			source.Reply(_("Deleted %d entries from the AKILL list."), deleted);
+			source.Reply(_("No matching entries on the AKILL list."));
 	}
 
 	void HandleNumber(unsigned number) override

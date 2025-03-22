@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 09:55+0000\n"
+"POT-Creation-Date: 2025-03-22 08:57+0000\n"
 "PO-Revision-Date: 2025-03-08 13:33+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -2901,68 +2901,55 @@ msgid "Delete the vhost of another user"
 msgstr ""
 
 #, c-format
-msgid "Deleted %d entries from %s %s list."
-msgstr ""
+msgid "Deleted %d entry from %s %s list."
+msgid_plural "Deleted %d entries from %s %s list."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
-msgid "Deleted %d entries from %s access list."
-msgstr ""
+msgid "Deleted %d entry from %s access list."
+msgid_plural "Deleted %d entries from %s access list."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
-msgid "Deleted %d entries from %s autokick list."
-msgstr ""
+msgid "Deleted %d entry from %s autokick list."
+msgid_plural "Deleted %d entries from %s autokick list."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
-msgid "Deleted %d entries from %s bad words list."
-msgstr ""
+msgid "Deleted %d entry from %s bad words list."
+msgid_plural "Deleted %d entries from %s bad words list."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
-msgid "Deleted %d entries from session-limit exception list."
-msgstr ""
+msgid "Deleted %d entry from session-limit exception list."
+msgid_plural "Deleted %d entries from session-limit exception list."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
-msgid "Deleted %d entries from the %s list."
-msgstr ""
+msgid "Deleted %d entry from the %s list."
+msgid_plural "Deleted %d entries from the %s list."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
-msgid "Deleted %d entries from the AKILL list."
-msgstr ""
+msgid "Deleted %d entry from the AKILL list."
+msgid_plural "Deleted %d entries from the AKILL list."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
-msgid "Deleted %u entries from your message queue."
-msgstr ""
-
-#, c-format
-msgid "Deleted 1 entry from %s access list."
-msgstr ""
-
-#, c-format
-msgid "Deleted 1 entry from %s autokick list."
-msgstr ""
-
-#, c-format
-msgid "Deleted 1 entry from %s bad words list."
-msgstr ""
-
-msgid "Deleted 1 entry from session-limit exception list."
-msgstr ""
-
-#, c-format
-msgid "Deleted 1 entry from the %s list."
-msgstr ""
-
-msgid "Deleted 1 entry from the AKILL list."
-msgstr ""
+msgid "Deleted %u entry from your message queue."
+msgid_plural "Deleted %u entries from your message queue."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
 msgid "Deleted info from %s."
-msgstr ""
-
-#, c-format
-msgid "Deleted one entry from %s %s list."
-msgstr ""
-
-msgid "Deleted one entry from your message queue."
 msgstr ""
 
 msgid ""

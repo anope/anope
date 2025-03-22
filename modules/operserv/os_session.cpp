@@ -182,12 +182,10 @@ public:
 
 	~ExceptionDelCallback() override
 	{
-		if (!deleted)
-			source.Reply(_("No matching entries on session-limit exception list."));
-		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from session-limit exception list."));
+		if (deleted)
+			source.Reply(deleted, N_("Deleted %d entry from session-limit exception list.", "Deleted %d entries from session-limit exception list."), deleted);
 		else
-			source.Reply(_("Deleted %d entries from session-limit exception list."), deleted);
+			source.Reply(_("No matching entries on session-limit exception list."));
 	}
 
 	void HandleNumber(unsigned number) override

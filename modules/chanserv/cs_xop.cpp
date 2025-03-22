@@ -319,11 +319,7 @@ private:
 					else
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << nicks;
-
-						if (deleted == 1)
-							source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
-						else
-							source.Reply(_("Deleted %d entries from %s %s list."), deleted, ci->name.c_str(), source.command.c_str());
+						source.Reply(deleted, N_("Deleted %d entry from %s %s list.", "Deleted %d entries from %s %s list."), deleted, ci->name.c_str(), source.command.c_str());
 					}
 				}
 

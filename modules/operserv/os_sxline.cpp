@@ -25,12 +25,10 @@ public:
 
 	~SXLineDelCallback() override
 	{
-		if (!deleted)
-			source.Reply(_("No matching entries on the %s list."), source.command.c_str());
-		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from the %s list."), source.command.c_str());
+		if (deleted)
+			source.Reply(deleted, N_("Deleted %d entry from the %s list.", "Deleted %d entries from the %s list."), deleted, source.command.c_str());
 		else
-			source.Reply(_("Deleted %d entries from the %s list."), deleted, source.command.c_str());
+			source.Reply(_("No matching entries on the %s list."), source.command.c_str());
 	}
 
 	void HandleNumber(unsigned number) override

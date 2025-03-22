@@ -176,12 +176,10 @@ public:
 
 	~BadwordsDelCallback() override
 	{
-		if (!deleted)
-			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
-		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from %s bad words list."), ci->name.c_str());
+		if (deleted)
+			source.Reply(deleted, N_("Deleted %d entry from %s bad words list.", "Deleted %d entries from %s bad words list."), deleted, ci->name.c_str());
 		else
-			source.Reply(_("Deleted %d entries from %s bad words list."), deleted, ci->name.c_str());
+			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
 	}
 
 	void HandleNumber(unsigned Number) override

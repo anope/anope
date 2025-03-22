@@ -31,18 +31,10 @@ public:
 
 	~QueueDelCallback() override
 	{
-		switch (deleted)
-		{
-			case 0:
-				source.Reply(_("No matching entries in your message queue."));
-				break;
-			case 1:
-				source.Reply(_("Deleted one entry from your message queue."));
-				break;
-			default:
-				source.Reply(_("Deleted %u entries from your message queue."), deleted);
-				break;
-		}
+		if (deleted)
+			source.Reply(deleted, N_("Deleted %u entry from your message queue.", "Deleted %u entries from your message queue."), deleted);
+		else
+			source.Reply(_("No matching entries in your message queue."));
 	}
 
 	void HandleNumber(unsigned number) override

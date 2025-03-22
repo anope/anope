@@ -38,8 +38,7 @@ class NSMaxEmail final
 
 	bool CheckLimitReached(CommandSource &source, const Anope::string &email, bool ignoreself)
 	{
-		int NSEmailMax = Config->GetModule(this).Get<int>("maxemails");
-
+		const auto NSEmailMax = Config->GetModule(this).Get<unsigned>("maxemails");
 		if (NSEmailMax < 1 || email.empty())
 			return false;
 
@@ -54,9 +53,9 @@ class NSMaxEmail final
 		return true;
 	}
 
-	int CountEmail(const Anope::string &email, NickCore *unc)
+	unsigned CountEmail(const Anope::string &email, NickCore *unc)
 	{
-		int count = 0;
+		unsigned count = 0;
 
 		if (email.empty())
 			return 0;

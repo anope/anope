@@ -2,24 +2,32 @@ Anope Version 2.1.13-git
 ------------------------
 Added a Config check to ensure users actually want to use the development branch.
 Added a flag to the version string when Anope is compiled in reproducible mode.
+Added a warning on rehash when the max password is longer than the maximum bcrypt password length.
 Added an ALLTIME handler on InspIRCd.
 Added an opt-out for extended XML-RPC types.
 Added RPC messages for sending global messages.
 Added support for importing cs_set_misc and ns_set_misc data from Atheme.
 Added support for importing news from Atheme.
 Added support for oper-only quit messages.
+Added support for the experimental "services cloak" system from the InspIRCd development branch.
 Added support for using defines from the environment.
 Added support for using defines within the value of a variable.
 Blacklisted an old version of an UnrealIRCd module that is known to send malformed S2S messages.
+Changed RPC events to be registered as core services.
 Changed the syntax of defines from "foo" to "${foo}".
+Deduplicated JSON generation code in the jsonrpc module.
 Fixed a warning when importing an Atheme account that uses external authentication.
 Fixed deleting old database backups after Anope has been restarted.
+Fixed importing user metadata from Anope 1.8.
 Fixed including a port in uplink messages when connecting to a UNIX socket endpoint.
+Fixed memo ignores being erroneously case sensitive.
 Fixed modules with third-party dependencies writing generic log messages instead of module log messages.
 Fixed sending global messages with the default sender.
+Imported mkauthors from InspIRCd and used it to generate docs/AUTHORS.txt
 Moved around a bunch of module headers.
 Moved database serialization from the serializable to the serializable type.
 Moved the SASL protocol interface to its own service.
+Refactored handling S2S metadata on InspIRCd.
 
 Anope Version 2.1.12
 --------------------

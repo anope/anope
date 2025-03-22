@@ -35,14 +35,14 @@ class NSMaxEmail : public Module
 		return cleaned;
 	}
 
-	bool CheckLimitReached(CommandSource &source, const Anope::string &email)
+	bool CheckLimitReached(CommandSource &source, const Anope::string &email, bool ignoreself)
 	{
 		int NSEmailMax = Config->GetModule(this)->Get<int>("maxemails");
 
 		if (NSEmailMax < 1 || email.empty())
 			return false;
 
-		if (this->CountEmail(email, source.nc) < NSEmailMax)
+		if (this->CountEmail(email, ignoreself ? source.GetAccount() : NULL) < NSEmailMax)
 			return false;
 
 		if (NSEmailMax == 1)
@@ -93,17 +93,17 @@ class NSMaxEmail : public Module
 
 		if (command->name == "nickserv/register")
 		{
-			if (this->CheckLimitReached(source, params.size() > 1 ? params[1] : ""))
+			if (this->CheckLimitReached(source, params.size() > 1 ? params[1] : "", false))
 				return EVENT_STOP;
 		}
 		else if (command->name == "nickserv/set/email")
 		{
-			if (this->CheckLimitReached(source, params.size() > 0 ? params[0] : ""))
+			if (this->CheckLimitReached(source, params.size() > 0 ? params[0] : "", true))
 				return EVENT_STOP;
 		}
 		else if (command->name == "nickserv/ungroup" && source.GetAccount())
 		{
-			if (this->CheckLimitReached(source, source.GetAccount()->email))
+			if (this->CheckLimitReached(source, source.GetAccount()->email, false))
 				return EVENT_STOP;
 		}
 

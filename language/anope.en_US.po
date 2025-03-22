@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-22 08:57+0000\n"
+"POT-Creation-Date: 2025-03-22 21:04+0000\n"
 "PO-Revision-Date: 2025-03-08 13:33+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -6061,12 +6061,10 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "The email address %s has reached its usage limit of %d users."
-msgstr ""
-
-#, c-format
-msgid "The email address %s has reached its usage limit of 1 user."
-msgstr ""
+msgid "The email address %s has reached its usage limit of %u user."
+msgid_plural "The email address %s has reached its usage limit of %u users."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
 msgid "The email address of %s will now be hidden from %s INFO displays."

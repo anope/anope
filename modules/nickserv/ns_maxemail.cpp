@@ -45,11 +45,7 @@ class NSMaxEmail final
 		if (this->CountEmail(email, ignoreself ? source.GetAccount() : NULL) < NSEmailMax)
 			return false;
 
-		if (NSEmailMax == 1)
-			source.Reply(_("The email address \002%s\002 has reached its usage limit of 1 user."), email.c_str());
-		else
-			source.Reply(_("The email address \002%s\002 has reached its usage limit of %d users."), email.c_str(), NSEmailMax);
-
+		source.Reply(NSEmailMax, N_("The email address \002%s\002 has reached its usage limit of %u user.", "The email address \002%s\002 has reached its usage limit of %u users."), email.c_str());
 		return true;
 	}
 

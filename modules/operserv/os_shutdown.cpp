@@ -11,7 +11,22 @@
 
 #include "module.h"
 
-#define WRONG_NETWORK _("The network name you specified is incorrect. Did you mean to run %s on a different network?")
+namespace
+{
+	bool NetworkNameGiven(Command *cmd, CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!Config->GetModule(cmd->owner).Get<bool>("requirename"))
+			return true; // Not necesary.
+
+		if (params.empty())
+			cmd->OnSyntaxError(source, source.command);
+		else if (!params[0].equals_cs(Config->GetBlock("networkinfo").Get<Anope::string>("networkname")))
+			source.Reply(_("The network name you specified is incorrect. Did you mean to run %s on a different network?"), source.command.c_str());
+		else
+			return true; // Name was specified correctly
+		return false; // Network name was wrong or not specified.
+	}
+}
 
 class CommandOSQuit final
 	: public Command
@@ -26,14 +41,8 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (Config->GetModule(this->owner).Get<bool>("requirename"))
-		{
-			if (params.empty())
-				OnSyntaxError(source, source.command);
-			else if (!params[0].equals_cs(Config->GetBlock("networkinfo").Get<Anope::string>("networkname")))
-				source.Reply(WRONG_NETWORK, source.command.c_str());
+		if (!NetworkNameGiven(this, source, params))
 			return;
-		}
 
 		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
@@ -66,14 +75,8 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (Config->GetModule(this->owner).Get<bool>("requirename"))
-		{
-			if (params.empty())
-				OnSyntaxError(source, source.command);
-			else if (!params[0].equals_cs(Config->GetBlock("networkinfo").Get<Anope::string>("networkname")))
-				source.Reply(WRONG_NETWORK, source.command.c_str());
+		if (!NetworkNameGiven(this, source, params))
 			return;
-		}
 
 		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
@@ -104,14 +107,8 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (Config->GetModule(this->owner).Get<bool>("requirename"))
-		{
-			if (params.empty())
-				OnSyntaxError(source, source.command);
-			else if (!params[0].equals_cs(Config->GetBlock("networkinfo").Get<Anope::string>("networkname")))
-				source.Reply(WRONG_NETWORK, source.command.c_str());
+		if (!NetworkNameGiven(this, source, params))
 			return;
-		}
 
 		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();

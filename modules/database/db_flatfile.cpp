@@ -40,11 +40,16 @@ class LoadData final
 	: public Serialize::Data
 {
 public:
-	std::fstream *fs = nullptr;
+	std::fstream *fs;
 	uint64_t id = 0;
 	std::map<Anope::string, Anope::string> data;
 	std::stringstream ss;
 	bool read = false;
+
+	LoadData(std::fstream &fsref)
+		: fs(&fsref)
+	{
+	}
 
 	std::iostream &operator[](const Anope::string &key) override
 	{
@@ -240,9 +245,7 @@ public:
 			if (buf.find("OBJECT ") == 0)
 				positions[buf.substr(7)].push_back(fd.tellg());
 
-		LoadData ld;
-		ld.fs = &fd;
-
+		LoadData ld(fd);
 		for (const auto &type_order : Serialize::Type::GetTypeOrder())
 		{
 			Serialize::Type *stype = Serialize::Type::Find(type_order);
@@ -389,9 +392,7 @@ public:
 			return;
 		}
 
-		LoadData ld;
-		ld.fs = &fd;
-
+		LoadData ld(fd);
 		for (Anope::string buf; std::getline(fd, buf.str());)
 		{
 			if (buf == "OBJECT " + stype->GetName())

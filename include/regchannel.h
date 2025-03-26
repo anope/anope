@@ -84,11 +84,11 @@ public:
 
 	Anope::string last_topic;                 /* The last topic that was set on this channel */
 	Anope::string last_topic_setter;          /* Setter */
-	time_t last_topic_time;	                  /* Time */
+	time_t last_topic_time = 0;               /* Time */
 
 	Channel::ModeList last_modes;             /* The last modes set on this channel */
 
-	int16_t bantype;
+	int16_t bantype = 2;
 
 	MemoInfo memos;
 
@@ -97,7 +97,7 @@ public:
 	/* For BotServ */
 	Serialize::Reference<BotInfo> bi;         /* Bot used on this channel */
 
-	time_t banexpire;                       /* Time bans expire in */
+	time_t banexpire = 0;                     /* Time bans expire in */
 
 	/** Constructor
 	 * @param chname The channel name

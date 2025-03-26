@@ -106,24 +106,16 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 	: Serializable(CHANNELINFO_TYPE)
 	, access(CHANACCESS_TYPE)
 	, akick(AUTOKICK_TYPE)
+	, name(chname)
+	, time_registered(Anope::CurTime)
+	, last_used(Anope::CurTime)
 {
 	if (chname.empty())
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
 
-	this->founder = NULL;
-	this->successor = NULL;
 	this->c = Channel::Find(chname);
 	if (this->c)
 		this->c->ci = this;
-	this->banexpire = 0;
-	this->bi = NULL;
-	this->last_topic_time = 0;
-
-	this->name = chname;
-
-	this->bantype = 2;
-	this->memos.memomax = 0;
-	this->last_used = this->time_registered = Anope::CurTime;
 
 	size_t old = RegisteredChannelList->size();
 	(*RegisteredChannelList)[this->name] = this;

@@ -255,7 +255,7 @@ public:
 			Serializable *obj = sb->Unserialize(NULL, data);
 			if (obj)
 			{
-				auto oid = Anope::TryConvert<unsigned int>(res.Get(j, "id"));
+				auto oid = Anope::TryConvert<Serializable::Id>(res.Get(j, "id"));
 				if (oid.has_value())
 					obj->id = oid.value();
 				else

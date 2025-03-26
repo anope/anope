@@ -492,7 +492,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 	if (s_type == NULL)
 		return;
 
-	auto oid = Anope::TryConvert<uint64_t>(id);
+	auto oid = Anope::TryConvert<Serializable::Id>(id);
 	if (!oid.has_value())
 		return;
 

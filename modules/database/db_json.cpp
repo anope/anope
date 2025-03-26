@@ -41,7 +41,7 @@ class Data final
 {
 public:
 	// If non-zero then the id of the database entry.
-	uint64_t id = 0;
+	Serializable::Id id = 0;
 
 	// Data in this database entry.
 	Anope::map<std::stringstream> data;

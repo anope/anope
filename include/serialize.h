@@ -110,10 +110,11 @@ protected:
 	Serializable &operator=(const Serializable &);
 
 public:
+	using Id = uint64_t;
 	virtual ~Serializable();
 
 	/* Unique ID (per type, not globally) for this object */
-	uint64_t id = 0;
+	Id id = 0;
 
 	/* Only used by redis, to ignore updates */
 	unsigned short redis_ignore = 0;
@@ -175,7 +176,7 @@ protected:
 
 public:
 	/* Map of Serializable objects of this type keyed by their object id. */
-	std::map<uint64_t, Serializable *> objects;
+	std::map<Serializable::Id, Serializable *> objects;
 
 	/** Destroys a serializable type. */
 	~Type();

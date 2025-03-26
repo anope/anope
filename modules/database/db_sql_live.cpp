@@ -190,7 +190,7 @@ public:
 
 
 
-			auto oid = Anope::TryConvert<unsigned int>(res.Get(i, "id"));
+			auto oid = Anope::TryConvert<Serializable::Id>(res.Get(i, "id"));
 			if (!oid.has_value())
 			{
 				Log(LOG_DEBUG) << "Unable to convert id from " << obj->GetName();
@@ -201,7 +201,7 @@ public:
 			if (res.Get(i, "timestamp").empty())
 			{
 				clear_null = true;
-				std::map<uint64_t, Serializable *>::iterator it = obj->objects.find(id);
+				auto it = obj->objects.find(id);
 				if (it != obj->objects.end())
 					delete it->second; // This also removes this object from the map
 			}
@@ -213,7 +213,7 @@ public:
 					data[key] << value;
 
 				Serializable *s = NULL;
-				std::map<uint64_t, Serializable *>::iterator it = obj->objects.find(id);
+				auto it = obj->objects.find(id);
 				if (it != obj->objects.end())
 					s = it->second;
 

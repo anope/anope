@@ -17,6 +17,7 @@ Changed RPC events to be registered as core services.
 Changed the syntax of defines from "foo" to "${foo}".
 Deduplicated JSON generation code in the jsonrpc module.
 Fixed a warning when importing an Atheme account that uses external authentication.
+Fixed counting email addresses in ns_maxemail.
 Fixed deleting old database backups after Anope has been restarted.
 Fixed importing user metadata from Anope 1.8.
 Fixed including a port in uplink messages when connecting to a UNIX socket endpoint.
@@ -28,6 +29,7 @@ Moved around a bunch of module headers.
 Moved database serialization from the serializable to the serializable type.
 Moved the SASL protocol interface to its own service.
 Refactored handling S2S metadata on InspIRCd.
+Updated more messages to use gettext plural forms.
 
 Anope Version 2.1.12
 --------------------

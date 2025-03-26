@@ -29,16 +29,11 @@ channel_map ChannelList;
 std::vector<Channel *> Channel::deleting;
 
 Channel::Channel(const Anope::string &nname, time_t ts)
+	: name(nname)
+	, creation_time(ts)
 {
 	if (nname.empty())
 		throw CoreException("A channel without a name ?");
-
-	this->name = nname;
-
-	this->creation_time = ts;
-	this->syncing = this->botchannel = false;
-	this->server_modetime = this->chanserv_modetime = 0;
-	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_ts = this->topic_time = 0;
 
 	this->ci = ChannelInfo::Find(this->name);
 	if (this->ci)
@@ -111,7 +106,7 @@ void Channel::CheckModes()
 	if (this->chanserv_modetime == Anope::CurTime && this->server_modetime == Anope::CurTime && this->server_modecount >= 3 && this->chanserv_modecount >= 3)
 	{
 		Log() << "Warning: unable to set modes on channel " << this->name << ". Are your servers' U:lines configured correctly?";
-		this->bouncy_modes = 1;
+		this->bouncy_modes = true;
 		return;
 	}
 

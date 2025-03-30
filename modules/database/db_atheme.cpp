@@ -555,7 +555,14 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		auto *bi = new BotInfo(nick, user, host, real);
+		auto *bi = BotInfo::Find(nick);
+		if (bi)
+		{
+			Log(this) << "Refusing to import duplicate bot: " << nick;
+			return true;
+		}
+
+		bi = new BotInfo(nick, user, host, real);
 		bi->oper_only = operonly;
 		bi->created = created;
 		return true;
@@ -1308,7 +1315,14 @@ private:
 			return false;
 		}
 
-		auto *na = new NickAlias(nick, nc);
+		auto *na = NickAlias::Find(nick);
+		if (na)
+		{
+			Log(this) << "Refusing to import duplicate nick: " << nick;
+			return true;
+		}
+
+		na = new NickAlias(nick, nc);
 		na->time_registered = regtime;
 		na->last_seen = lastseen ? regtime : na->time_registered;
 
@@ -1353,7 +1367,14 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		auto *nc = new NickCore(display);
+		auto *nc = NickCore::Find(display);
+		if (nc)
+		{
+			Log(this) << "Refusing to import duplicate account: " << display;
+			return true;
+		}
+
+		nc = new NickCore(display);
 		nc->email = email;
 		nc->time_registered = regtime;
 		ApplyPassword(nc, flags, pass);

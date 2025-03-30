@@ -89,7 +89,10 @@ public:
 		if (!this->CheckInit())
 			return;
 
-		for (auto *obj : this->updated_items)
+		std::set<Serializable *> items;
+		std::swap(this->updated_items, items);
+
+		for (auto *obj : items)
 		{
 			if (obj && this->SQL)
 			{
@@ -118,8 +121,6 @@ public:
 				}
 			}
 		}
-
-		this->updated_items.clear();
 	}
 
 	EventReturn OnLoadDatabase() override

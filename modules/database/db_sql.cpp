@@ -109,7 +109,10 @@ public:
 
 	void OnNotify() override
 	{
-		for (auto *obj : this->updated_items)
+		std::set<Serializable *> items;
+		std::swap(this->updated_items, items);
+
+		for (auto *obj : items)
 		{
 			if (this->sql)
 			{
@@ -154,7 +157,6 @@ public:
 			}
 		}
 
-		this->updated_items.clear();
 		this->imported = true;
 	}
 

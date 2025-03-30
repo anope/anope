@@ -49,7 +49,7 @@ void AutoKick::Type::Serialize(const Serializable *obj, Serialize::Data &data) c
 	const auto *ak = static_cast<const AutoKick *>(obj);
 	data.Store("ci", ak->ci->name);
 	if (ak->nc)
-		data.Store("nc", ak->nc->display);
+		data.Store("ncid", ak->nc->GetId());
 	else
 		data.Store("mask", ak->mask);
 	data.Store("reason", ak->reason);
@@ -61,16 +61,18 @@ void AutoKick::Type::Serialize(const Serializable *obj, Serialize::Data &data) c
 Serializable *AutoKick::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string sci, snc;
+	uint64_t sncid = 0;
 
 	data["ci"] >> sci;
-	data["nc"] >> snc;
+	data["nc"] >> snc; // Deprecated 2.0 field
+	data["ncid"] >> sncid;
 
 	ChannelInfo *ci = ChannelInfo::Find(sci);
 	if (!ci)
 		return NULL;
 
 	AutoKick *ak;
-	NickCore *nc = NickCore::Find(snc);
+	auto *nc = sncid ? NickCore::FindId(sncid) : NickCore::Find(snc);
 	if (obj)
 	{
 		ak = anope_dynamic_static_cast<AutoKick *>(obj);
@@ -192,9 +194,9 @@ void ChannelInfo::Type::Serialize(const Serializable *obj, Serialize::Data &data
 
 	data.Store("name", ci->name);
 	if (ci->founder)
-		data.Store("founder", ci->founder->display);
+		data.Store("founderid", ci->founder->GetId());
 	if (ci->successor)
-		data.Store("successor", ci->successor->display);
+		data.Store("successorid", ci->successor->GetId());
 	data.Store("description", ci->desc);
 	data.Store("time_registered", ci->time_registered);
 	data.Store("last_used", ci->last_used);
@@ -224,10 +226,13 @@ void ChannelInfo::Type::Serialize(const Serializable *obj, Serialize::Data &data
 Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string sname, sfounder, ssuccessor, slevels, sbi;
+	uint64_t sfounderid = 0, ssuccessorid = 0;
 
 	data["name"] >> sname;
-	data["founder"] >> sfounder;
-	data["successor"] >> ssuccessor;
+	data["founder"] >> sfounder; // Deprecated 2.0 field
+	data["founderid"] >> sfounderid;
+	data["successor"] >> ssuccessor; // Deprecated 2.0 field
+	data["successorid"] >> ssuccessorid;
 	data["levels"] >> slevels;
 	data["bi"] >> sbi;
 
@@ -237,8 +242,8 @@ Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data 
 	else
 		ci = new ChannelInfo(sname);
 
-	ci->SetFounder(NickCore::Find(sfounder));
-	ci->SetSuccessor(NickCore::Find(ssuccessor));
+	ci->SetFounder(sfounderid ? NickCore::FindId(sfounderid) : NickCore::Find(sfounder));
+	ci->SetSuccessor(ssuccessorid ? NickCore::FindId(ssuccessorid) : NickCore::Find(ssuccessor));
 
 	data["description"] >> ci->desc;
 	data["time_registered"] >> ci->time_registered;

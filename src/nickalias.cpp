@@ -160,7 +160,7 @@ void NickAlias::Type::Serialize(const Serializable *obj, Serialize::Data &data) 
 	data.Store("last_realhost", na->last_realhost);
 	data.Store("time_registered", na->time_registered);
 	data.Store("last_seen", na->last_seen);
-	data.Store("nc", na->nc->display);
+	data.Store("ncid", na->nc->GetId());
 
 	if (na->HasVHost())
 	{
@@ -176,11 +176,13 @@ void NickAlias::Type::Serialize(const Serializable *obj, Serialize::Data &data) 
 Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string snc, snick;
+	uint64_t sncid = 0;
 
-	data["nc"] >> snc;
+	data["nc"] >> snc; // Deprecated 2.0 field
+	data["ncid"] >> sncid;
 	data["nick"] >> snick;
 
-	NickCore *core = NickCore::Find(snc);
+	auto *core = sncid ? NickCore::FindId(sncid) : NickCore::Find(snc);
 	if (core == NULL)
 		return NULL;
 

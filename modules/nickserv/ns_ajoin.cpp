@@ -55,7 +55,7 @@ struct AJoinEntryType final
 		if (!aj->owner)
 			return;
 
-		data.Store("owner", aj->owner->display);
+		data.Store("ownerid", aj->owner->GetId());
 		data.Store("channel", aj->channel);
 		data.Store("key", aj->key);
 	}
@@ -63,10 +63,12 @@ struct AJoinEntryType final
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &sd) const override
 	{
 		Anope::string sowner;
+		uint64_t sownerid = 0;
 
-		sd["owner"] >> sowner;
+		sd["owner"] >> sowner; // Deprecated 2.0 field
+		sd["ownerid"] >> sownerid;
 
-		NickCore *nc = NickCore::Find(sowner);
+		auto *nc = sownerid ? NickCore::FindId(sownerid) : NickCore::Find(sowner);
 		if (nc == NULL)
 			return NULL;
 

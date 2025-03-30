@@ -113,6 +113,7 @@ public:
 	 * @return the nick, if found
 	 */
 	static NickAlias *Find(const Anope::string &nick);
+	static NickAlias *FindId(uint64_t id);
 };
 
 /* A registered account. Each account must have a NickAlias with the same nick as the

@@ -139,6 +139,12 @@ NickAlias *NickAlias::Find(const Anope::string &nick)
 	return NULL;
 }
 
+NickAlias *NickAlias::FindId(uint64_t id)
+{
+	const auto *nc = NickCore::FindId(id);
+	return nc ? nc->na : nullptr;
+}
+
 NickAlias::Type::Type()
 	: Serialize::Type(NICKALIAS_TYPE)
 {

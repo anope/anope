@@ -119,9 +119,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 	if (this->c)
 		this->c->ci = this;
 
-	size_t old = RegisteredChannelList->size();
-	(*RegisteredChannelList)[this->name] = this;
-	if (old == RegisteredChannelList->size())
+	if (!RegisteredChannelList->insert_or_assign(this->name, this).second)
 		Log(LOG_DEBUG) << "Duplicate channel " << this->name << " in registered channel table?";
 
 	FOREACH_MOD(OnCreateChan, (this));

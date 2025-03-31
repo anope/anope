@@ -10,6 +10,78 @@
 #include "modules/nickserv/cert.h"
 #include "modules/nickserv/sasl.h"
 
+class SASLIdentifyRequest final
+	: public IdentifyRequest
+{
+private:
+	Anope::string uid;
+	Anope::string hostname;
+
+	inline Anope::string GetUserInfo()
+	{
+		auto *u = User::Find(uid);
+		if (u)
+			return u->GetMask();
+		if (!hostname.empty() && !GetAddress().empty())
+			return Anope::printf("%s (%s)", hostname.c_str(), GetAddress().c_str());
+		return "A user";
+	};
+
+public:
+	SASLIdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass, const Anope::string &h, const Anope::string &i)
+		: IdentifyRequest(m, acc, pass, i)
+		, uid(id)
+		, hostname(h)
+	{
+	}
+
+	void OnSuccess() override
+	{
+		if (!SASL::service)
+			return;
+
+		auto *na = NickAlias::Find(GetAccount());
+		if (!na || na->nc->HasExt("NS_SUSPENDED") || na->nc->HasExt("UNCONFIRMED"))
+			return OnFail();
+
+		auto maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
+		if (maxlogins && na->nc->users.size() >= maxlogins)
+			return OnFail();
+
+		auto *s = SASL::service->GetSession(uid);
+		if (s)
+		{
+			Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << GetUserInfo() << " identified to account " << this->GetAccount() << " using SASL";
+			SASL::service->Succeed(s, na->nc);
+			delete s;
+		}
+	}
+
+	void OnFail() override
+	{
+		if (!SASL::service)
+			return;
+
+		auto *s = SASL::service->GetSession(uid);
+		if (s)
+		{
+			SASL::service->Fail(s);
+			delete s;
+		}
+
+		Anope::string accountstatus;
+		auto *na = NickAlias::Find(GetAccount());
+		if (!na)
+			accountstatus = "nonexistent ";
+		else if (na->nc->HasExt("NS_SUSPENDED"))
+			accountstatus = "suspended ";
+		else if (na->nc->HasExt("UNCONFIRMED"))
+			accountstatus = "unconfirmed ";
+
+		Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << GetUserInfo() << " failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
+	}
+};
+
 class Plain final
 	: public SASL::Mechanism
 {
@@ -51,7 +123,7 @@ public:
 			if (authcid.empty() || passwd.empty() || !IRCD->IsNickValid(authcid) || passwd.find_first_of("\r\n\0") != Anope::string::npos)
 				return false;
 
-			SASL::IdentifyRequest *req = new SASL::IdentifyRequest(this->owner, m.source, authcid, passwd, sess->hostname, sess->ip);
+			auto *req = new SASLIdentifyRequest(this->owner, m.source, authcid, passwd, sess->hostname, sess->ip);
 			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 			req->Dispatch();
 		}

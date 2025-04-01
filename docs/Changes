@@ -1,5 +1,5 @@
-Anope Version 2.1.13-git
-------------------------
+Anope Version 2.1.13
+--------------------
 Added a Config check to ensure users actually want to use the development branch.
 Added a flag to the version string when Anope is compiled in reproducible mode.
 Added a warning on rehash when the max password is longer than the maximum bcrypt password length.

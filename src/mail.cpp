@@ -9,6 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#include <cerrno>
+
 #include "services.h"
 #include "mail.h"
 #include "config.h"

@@ -310,7 +310,7 @@ void IRC2SQL::OnBotNotice(User *u, BotInfo *bi, Anope::string &message, const An
 		return;
 
 	u->Extend<bool>("CTCPVERSION");
-	auto versionstr = Anope::NormalizeBuffer(message.substr(9, message.length() - 10));
+	auto versionstr = Anope::NormalizeBuffer(ctcpbody);
 	if (versionstr.empty())
 		return;
 

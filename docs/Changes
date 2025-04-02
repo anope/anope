@@ -1,6 +1,13 @@
 Anope Version 2.0.18-git
 ------------------------
-No significant changes.
+Backported better sendmail error messages from 2.1.
+Fixed building Anope with CMake 4.
+Fixed compatibility with MariaDB.
+Fixed counting email addresses in ns_maxemail.
+Fixed importing user ICQ and URL data from 1.8.
+Fixed operserv/ignore not being prioritised first.
+Fixed resetting the stats with operserv/stats.
+Updated the Dutch translation.
 
 Anope Version 2.0.17
 --------------------

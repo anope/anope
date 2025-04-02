@@ -316,14 +316,6 @@ if(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
   endif()
 endif()
 
-# Go into the following directories and run their CMakeLists.txt as well
-add_subdirectory(data)
-add_subdirectory(docs)
-add_subdirectory(language)
-add_subdirectory(src)
-add_subdirectory(modules)
-add_subdirectory(include)
-
 # Get the filename of the Anope binary, to use later
 set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
@@ -396,3 +388,11 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   set(CPACK_MONOLITHIC_INSTALL TRUE)
   include(CPack)
 endif()
+
+# Go into the following directories and run their CMakeLists.txt as well
+add_subdirectory(data)
+add_subdirectory(docs)
+add_subdirectory(language)
+add_subdirectory(src)
+add_subdirectory(modules)
+add_subdirectory(include)

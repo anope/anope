@@ -1,5 +1,5 @@
-# This usage of CMake requires at least version 3.8
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+# This usage of CMake requires at least version 3.20
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)

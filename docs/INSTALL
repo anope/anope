@@ -27,7 +27,7 @@ Note: You should also read the README and FAQ files!
         cmake --version
 
     If it's installed, you will get a line that says something similar to
-    "cmake version 3.28.3". If the version is less than 3.8.0 or you get
+    "cmake version 3.28.3". If the version is less than 3.20.0 or you get
     an error saying the command was not found, you will not be able to use
     CMake unless you install it yourself into your home directory. CMake
     can be downloaded from:

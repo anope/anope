@@ -624,66 +624,48 @@ int Anope::VersionPatch() { return VERSION_PATCH; }
 Anope::string Anope::NormalizeBuffer(const Anope::string &buf)
 {
 	Anope::string newbuf;
-
-	for (unsigned i = 0, end = buf.length(); i < end; ++i)
+	for (size_t idx = 0; idx < buf.length(); )
 	{
-		switch (buf[i])
+		switch (buf[idx])
 		{
-			/* ctrl char */
-			case 1:
-			/* Bold ctrl char */
-			case 2:
+			case '\x02': // Bold
+			case '\x1D': // Italic
+			case '\x11': // Monospace
+			case '\x16': // Reverse
+			case '\x1E': // Strikethrough
+			case '\x1F': // Underline
+			case '\x0F': // Reset
+				idx++;
 				break;
-			/* Color ctrl char */
-			case 3:
-				/* If the next character is a digit, its also removed */
-				if (isdigit(buf[i + 1]))
+
+			case '\x03': // Color
+			{
+				const auto start = idx;
+				while (++idx < buf.length() && idx - start < 6)
 				{
-					++i;
-
-					/* not the best way to remove colors
-					 * which are two digit but no worse then
-					 * how the Unreal does with +S - TSL
-					 */
-					if (isdigit(buf[i + 1]))
-						++i;
-
-					/* Check for background color code
-					 * and remove it as well
-					 */
-					if (buf[i + 1] == ',')
-					{
-						++i;
-
-						if (isdigit(buf[i + 1]))
-							++i;
-						/* not the best way to remove colors
-						 * which are two digit but no worse then
-						 * how the Unreal does with +S - TSL
-						 */
-						if (isdigit(buf[i + 1]))
-							++i;
-					}
+					const auto chr = buf[idx];
+					if (chr != ',' && (chr < '0' || chr > '9'))
+						break;
 				}
+				break;
+			}
+			case '\x04': // Hex Color
+			{
+				const auto start = idx;
+				while (++idx < buf.length() && idx - start < 14)
+				{
+					const auto chr = buf[idx];
+					if (chr != ',' && (chr < '0' || chr > '9') && (chr < 'A' || chr > 'F') && (chr < 'a' || chr > 'f'))
+						break;
+				}
+				break;
+			}
 
+			default: // Non-formatting character.
+				newbuf.push_back(buf[idx++]);
 				break;
-			/* line feed char */
-			case 10:
-			/* carriage returns char */
-			case 13:
-			/* Reverse ctrl char */
-			case 22:
-			/* Italic ctrl char */
-			case 29:
-			/* Underline ctrl char */
-			case 31:
-				break;
-			/* A valid char gets copied into the new buffer */
-			default:
-				newbuf += buf[i];
 		}
 	}
-
 	return newbuf;
 }
 

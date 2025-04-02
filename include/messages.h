@@ -45,6 +45,13 @@ namespace Message
 		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
 	};
 
+	struct CoreExport Ignore final
+		: IRCDMessage
+	{
+		Ignore(Module *creator, const Anope::string &mname);
+		void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override;
+	};
+
 	struct CoreExport Invite
 		: IRCDMessage
 	{

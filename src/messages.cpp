@@ -57,6 +57,18 @@ void Error::Run(MessageSource &source, const std::vector<Anope::string> &params,
 	Anope::Quitting = true;
 }
 
+Ignore::Ignore(Module *creator, const Anope::string &mname)
+	: IRCDMessage(creator, mname, 0)
+{
+	SetFlag(FLAG_SOFT_LIMIT);
+}
+
+void Ignore::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+{
+	Log(LOG_DEBUG_3) << "Intentionally ignoring " << name << " message";
+}
+
+
 void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	User *targ = User::Find(params[0]);

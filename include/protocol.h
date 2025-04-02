@@ -362,7 +362,7 @@ public:
 		FLAG_MAX,
 	};
 
-private:
+protected:
 	/** The name of the message (e.g. PRIVMSG). */
 	const Anope::string name;
 

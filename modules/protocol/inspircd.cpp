@@ -2537,6 +2537,10 @@ class ProtoInspIRCd final
 	Message::Stats message_stats;
 	Message::Time message_time;
 
+	/* Ignored message handlers. */
+	Message::Ignore message_burst;
+	Message::Ignore message_sinfo;
+
 	/* Our message handlers */
 	IRCDMessageAway message_away;
 	IRCDMessageCapab message_capab;
@@ -2587,6 +2591,8 @@ public:
 		, message_squery(this, "SQUERY")
 		, message_stats(this)
 		, message_time(this)
+		, message_burst(this, "BURST")
+		, message_sinfo(this, "SINFO")
 		, message_away(this)
 		, message_capab(this)
 		, message_chghost(this)

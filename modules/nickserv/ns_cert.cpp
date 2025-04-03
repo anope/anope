@@ -383,6 +383,23 @@ class NSCert final
 	NSCertListImpl::ExtensibleItem certs;
 	CertServiceImpl cs;
 
+	bool CanLogin(User *u, NickCore *nc)
+	{
+		if (!nc || nc->HasExt("NS_SUSPENDED"))
+			return false; // Account suspended.
+
+		const auto maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
+		if (maxlogins && nc->users.size() >= maxlogins)
+		{
+			auto *nickserv = Config->GetClient("NickServ");
+			u->SendMessage(nickserv, _("Account \002%s\002 has already reached the maximum number of simultaneous logins (%u)."),
+				nc->display.c_str(), maxlogins);
+			return false;
+		}
+
+		return true;
+	}
+
 public:
 	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnscert(this), certs(this, "certificates"), cs(this)
@@ -393,20 +410,12 @@ public:
 
 	void OnFingerprint(User *u) override
 	{
-		BotInfo *NickServ = Config->GetClient("NickServ");
-		if (!NickServ || u->IsIdentified())
+		if (u->IsIdentified())
 			return;
 
 		NickCore *nc = cs.FindAccountFromCert(u->fingerprint);
-		if (!nc || nc->HasExt("NS_SUSPENDED"))
+		if (!CanLogin(u, nc))
 			return;
-
-		unsigned int maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
-		if (maxlogins && nc->users.size() >= maxlogins)
-		{
-			u->SendMessage(NickServ, _("Account \002%s\002 has already reached the maximum number of simultaneous logins (%u)."), nc->display.c_str(), maxlogins);
-			return;
-		}
 
 		NickAlias *na = NickAlias::Find(u->nick);
 		if (na && na->nc == nc)
@@ -414,6 +423,7 @@ public:
 		else
 			u->Login(nc);
 
+		auto *NickServ = Config->GetClient("NickServ");
 		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified to \002%s\002."), nc->display.c_str());
 		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->display << " via SSL certificate fingerprint";
 	}
@@ -435,17 +445,12 @@ public:
 		NSCertList *cl = certs.Get(na->nc);
 		if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))
 		{
-			BotInfo *NickServ = Config->GetClient("NickServ");
-
-			unsigned int maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
-			if (maxlogins && na->nc->users.size() >= maxlogins)
-			{
-				u->SendMessage(NickServ, _("Account \002%s\002 has already reached the maximum number of simultaneous logins (%u)."), na->nc->display.c_str(), maxlogins);
+			if (!CanLogin(u, na->nc))
 				return EVENT_CONTINUE;
-			}
 
 			u->Identify(na);
 
+			auto *NickServ = Config->GetClient("NickServ");
 			u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified."));
 			Log(NickServ) << u->GetMask() << " automatically identified for account " << na->nc->display << " via SSL certificate fingerprint";
 			return EVENT_ALLOW;

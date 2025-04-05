@@ -1703,6 +1703,9 @@ class ProtoUnreal final
 	Message::Version message_version;
 	Message::Whois message_whois;
 
+	/* Ignored message handlers. */
+	Message::Ignore message_slog;
+
 	/* Our message handlers */
 	IRCDMessageCapab message_capab;
 	IRCDMessageChgHost message_chghost;
@@ -1749,6 +1752,7 @@ public:
 		, message_time(this)
 		, message_version(this)
 		, message_whois(this)
+		, message_slog(this, "SLOG")
 		, message_capab(this)
 		, message_chghost(this)
 		, message_chgident(this)

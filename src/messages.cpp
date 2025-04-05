@@ -334,7 +334,10 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			botname = botname.substr(0, s);
 			nick_only = true;
 			if (!servername.equals_ci(Me->GetName()))
+			{
+				Log(LOG_DEBUG) << "Received a " << name << " message for " << servername << " which is not " << Me->GetName() << ", ignoring.";
 				return;
+			}
 		}
 
 		BotInfo *bi = BotInfo::Find(botname, nick_only);

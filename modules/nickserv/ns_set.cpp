@@ -57,8 +57,9 @@ public:
 			}
 		}
 
-		source.Reply(_("Type \002%s HELP %s \037option\037\002 for more information\n"
-			"on a specific option."), source.service->GetQueryCommand().c_str(), this_name.c_str());
+		source.Reply(_("Type \002%s \037option\037\002 for more information\n"
+			"on a specific option."),
+			source.service->GetQueryCommand("generic/help", this_name).c_str());
 
 		return true;
 	}
@@ -100,9 +101,10 @@ public:
 			}
 		}
 
-		source.Reply(_("Type \002%s HELP %s \037option\037\002 for more information\n"
+		source.Reply(_("Type \002%s \037option\037\002 for more information\n"
 				"on a specific option. The options will be set on the given\n"
-				"\037nickname\037."), source.service->GetQueryCommand().c_str(), this_name.c_str());
+				"\037nickname\037."),
+			source.service->GetQueryCommand("generic/help", this_name).c_str());
 		return true;
 	}
 };

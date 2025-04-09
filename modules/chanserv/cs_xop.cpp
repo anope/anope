@@ -590,11 +590,11 @@ public:
 			source.Reply(_("Alternative methods of modifying channel access lists are\n"
 					"available."));
 			if (!access_cmd.empty())
-				source.Reply(_("See \002%s HELP %s\002 for more information\n"
-						"about the access list."), access_bi->GetQueryCommand().c_str(), access_cmd.c_str());
+				source.Reply(_("See \002%s\002 for more information\n"
+						"about the access list."), access_bi->GetQueryCommand("generic/help", access_cmd).c_str());
 			if (!flags_cmd.empty())
-				source.Reply(_("See \002%s HELP %s\002 for more information\n"
-						"about the flags system."), flags_bi->GetQueryCommand().c_str(), flags_cmd.c_str());
+				source.Reply(_("See \002%s\002 for more information\n"
+						"about the flags system."), flags_bi->GetQueryCommand("generic/help", flags_cmd).c_str());
 		}
 		return true;
 	}

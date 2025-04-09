@@ -139,7 +139,7 @@ public:
 	CommandInfo *GetCommand(const Anope::string &cname);
 
 	/** Get the command that users can use to send a message to this bot. */
-	Anope::string GetQueryCommand() const;
+	Anope::string GetQueryCommand(const Anope::string &command = "", const Anope::string &extra = "") const;
 
 	/** Find a bot by nick
 	 * @param nick The nick

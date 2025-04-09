@@ -155,9 +155,9 @@ public:
 				"allow user bots. Available commands are listed\n"
 				"below; to use them, type \002%s \037command\037\002. For\n"
 				"more information on a specific command, type\n"
-				"\002%s %s \037command\037\002.\n"),
+				"\002%s \037command\037\002.\n"),
 				BotServ->nick.c_str(), BotServ->GetQueryCommand().c_str(),
-				BotServ->GetQueryCommand().c_str(), source.command.c_str());
+				BotServ->GetQueryCommand({}, source.command).c_str());
 		}
 
 		return EVENT_CONTINUE;

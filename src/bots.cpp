@@ -271,11 +271,35 @@ CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
 	return NULL;
 }
 
-Anope::string BotInfo::GetQueryCommand() const
+Anope::string BotInfo::GetQueryCommand(const Anope::string &command, const Anope::string &extra) const
 {
+	Anope::string buf;
 	if (Config->ServiceAlias && !this->alias.empty())
-		return Anope::printf("/%s", this->alias.c_str());
-	return Anope::printf("/msg %s", this->nick.c_str());
+		buf.append("/").append(this->alias);
+	else
+		buf.append("/msg ").append(this->nick);
+
+	if (!command.empty())
+	{
+		Anope::string actual_command = "\036(MISSING)\036";
+		for (const auto &[c_name, info] : this->commands)
+		{
+			if (info.name != command)
+				continue; // Wrong command.
+
+			actual_command = c_name;
+			if (!info.hide)
+				break; // Keep going to find a non-hidden alternative.
+		}
+
+		if (!actual_command.empty())
+			buf.append(" ").append(actual_command);
+	}
+
+	if (!extra.empty())
+		buf.append(" ").append(extra);
+
+	return buf;
 }
 
 BotInfo *BotInfo::Find(const Anope::string &nick, bool nick_only)

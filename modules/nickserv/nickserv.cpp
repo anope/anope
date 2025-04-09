@@ -221,7 +221,7 @@ public:
 
 			if (protect)
 			{
-				u->SendMessage(NickServ, NICK_IS_SECURE, NickServ->GetQueryCommand().c_str());
+				u->SendMessage(NickServ, NICK_IS_SECURE, NickServ->GetQueryCommand("nickserv/identify").c_str());
 				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."),
 					Anope::Duration(protect, u->Account()).c_str());
 				new NickServCollide(this, this, u, na, protect);
@@ -393,8 +393,8 @@ public:
 			u->SendMessage(NickServ, _("You must now supply an email for your nick.\n"
 							"This email will allow you to retrieve your password in\n"
 							"case you forget it."));
-			u->SendMessage(NickServ, _("Type \002%s SET EMAIL \037email\037\002 in order to set your email."),
-				NickServ->GetQueryCommand().c_str());
+			u->SendMessage(NickServ, _("Type \002%s \037email\037\002 in order to set your email."),
+				NickServ->GetQueryCommand("nickserv/set/email").c_str());
 		}
 
 		for (auto *c : collides)
@@ -498,13 +498,14 @@ public:
 				"commands allow for registration and maintenance of\n"
 				"nicknames; to use them, type \002%s \037command\037\002.\n"
 				"For more information on a specific command, type\n"
-				"\002%s %s \037command\037\002.\n"), NickServ->nick.c_str(), NickServ->GetQueryCommand().c_str(), NickServ->GetQueryCommand().c_str(), source.command.c_str());
+				"\002%s \037command\037\002.\n"), NickServ->nick.c_str(), NickServ->GetQueryCommand().c_str(), NickServ->GetQueryCommand({}, source.command).c_str());
 		else
 			source.Reply(_("\002%s\002 allows you to register an account.\n"
 				"The following commands allow for registration and maintenance of\n"
 				"accounts; to use them, type \002%s \037command\037\002.\n"
 				"For more information on a specific command, type\n"
-				"\002%s %s \037command\037\002.\n"), NickServ->nick.c_str(), NickServ->GetQueryCommand().c_str(), NickServ->GetQueryCommand().c_str(), source.command.c_str());
+				"\002%s \037command\037\002.\n"),
+				NickServ->nick.c_str(), NickServ->GetQueryCommand().c_str(), NickServ->GetQueryCommand({}, source.command.c_str()).c_str());
 		return EVENT_CONTINUE;
 	}
 

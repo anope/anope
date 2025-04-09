@@ -72,7 +72,7 @@ public:
 				*code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
 			}
 
-			source.Reply(CONFIRM_DROP, na->nick.c_str(), source.service->GetQueryCommand().c_str(),
+			source.Reply(CONFIRM_DROP, na->nick.c_str(), source.service->GetQueryCommand("nickserv/drop").c_str(),
 				na->nick.c_str(), code->c_str());
 			return;
 		}

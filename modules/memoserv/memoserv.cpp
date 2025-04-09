@@ -101,7 +101,10 @@ public:
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
 						if (cu->user->IsIdentified() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
-							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), MemoServ->GetQueryCommand().c_str(), ci->name.c_str(), mi->memos->size());
+						{
+							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), MemoServ->GetQueryCommand("memoserv/read").c_str(),
+								ci->name.c_str(), mi->memos->size());
+						}
 					}
 				}
 			}
@@ -116,7 +119,7 @@ public:
 				{
 					User *user = User::Find(na->nick, true);
 					if (user && user->IsIdentified())
-						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), MemoServ->GetQueryCommand().c_str(), mi->memos->size());
+						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), MemoServ->GetQueryCommand("memoserv/read").c_str(), mi->memos->size());
 				}
 			}
 
@@ -229,8 +232,9 @@ public:
 		if (!params.empty() || source.c || source.service != *MemoServ)
 			return;
 		source.Reply(_(" \n"
-			"Type \002%s HELP \037command\037\002 for help on any of the\n"
-			"above commands."), MemoServ->GetQueryCommand().c_str());
+			"Type \002%s \037command\037\002 for help on any of the\n"
+			"above commands."),
+			MemoServ->GetQueryCommand("generic/help").c_str());
 	}
 };
 

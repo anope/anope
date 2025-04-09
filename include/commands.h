@@ -150,7 +150,7 @@ public:
 	 */
 	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
-	/** Called when HELP is requested for the client this command is on.
+	/** Called when help is requested for the client this command is on.
 	 * @param source The source
 	 */
 	virtual void OnServHelp(CommandSource &source);

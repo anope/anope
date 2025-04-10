@@ -113,7 +113,7 @@ void CommandSource::Reply(const char *message, ...)
 	va_start(args, message);
 	vsnprintf(buf, sizeof(buf), translated_message, args);
 
-	this->Reply(Anope::string(buf));
+	this->reply->SendMessage(*this, buf);
 
 	va_end(args);
 }
@@ -128,7 +128,7 @@ void CommandSource::Reply(int count, const char *single, const char *plural, ...
 	va_start(args, plural);
 	vsnprintf(buf, sizeof(buf), translated_message, args);
 
-	this->Reply(Anope::string(buf));
+	this->reply->SendMessage(*this, buf);
 
 	va_end(args);
 }
@@ -136,11 +136,7 @@ void CommandSource::Reply(int count, const char *single, const char *plural, ...
 void CommandSource::Reply(const Anope::string &message)
 {
 	const char *translated_message = Language::Translate(this->nc, message.c_str());
-
-	sepstream sep(translated_message, '\n', true);
-	Anope::string tok;
-	while (sep.GetToken(tok))
-		this->reply->SendMessage(*this, tok);
+	this->reply->SendMessage(*this, translated_message);
 }
 
 Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(o)

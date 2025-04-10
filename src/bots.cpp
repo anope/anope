@@ -299,7 +299,10 @@ Anope::string BotInfo::GetQueryCommand(const Anope::string &command, const Anope
 	if (!extra.empty())
 		buf.append(" ").append(extra);
 
-	return buf;
+	// We use a substitute (ASCII 0x1A) instead of a space (ASCII 0x20) so it
+	// doesn't get line wrapped when put into a message. The line wrapper will
+	// convert this to a space before it is sent to clients.
+	return buf.replace_all_cs("\x20", "\x1A");
 }
 
 BotInfo *BotInfo::Find(const Anope::string &nick, bool nick_only)

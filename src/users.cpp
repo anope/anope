@@ -21,6 +21,7 @@
 #include "opertype.h"
 #include "language.h"
 #include "sockets.h"
+#include "textproc.h"
 #include "uplink.h"
 
 user_map UserListByNick, UserListByUID;
@@ -347,15 +348,13 @@ namespace
 {
 	void SendMessageInternal(BotInfo *source, User *target, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 	{
-		const char *translated_message = Language::Translate(target, msg.c_str());
-
-		sepstream sep(translated_message, '\n', true);
-		for (Anope::string tok; sep.GetToken(tok);)
+		TextSplitter ts(Language::Translate(target, msg.c_str()));
+		for (Anope::string line; ts.GetLine(line); )
 		{
 			if (target->ShouldPrivmsg())
-				IRCD->SendPrivmsg(source, target->GetUID(), tok, tags);
+				IRCD->SendPrivmsg(source, target->GetUID(), line, tags);
 			else
-				IRCD->SendNotice(source, target->GetUID(), tok, tags);
+				IRCD->SendNotice(source, target->GetUID(), line, tags);
 		}
 	}
 }

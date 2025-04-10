@@ -18,6 +18,7 @@
 #include "language.h"
 #include "regexpr.h"
 #include "sockets.h"
+#include "textproc.h"
 
 #include <cerrno>
 #include <climits>
@@ -262,6 +263,185 @@ void InfoFormatter::AddOption(const Anope::string &opt)
 		*optstr += ", ";
 	*optstr += Language::Translate(nc, opt.c_str());
 }
+
+TextSplitter::TextSplitter(const Anope::string &t)
+	: text(t)
+{
+}
+
+bool TextSplitter::GetLine(Anope::string &out)
+{
+	out.clear();
+	if (text.empty())
+		return false;
+
+	// Start by copying all of the formatting from the previous line
+	// onto this one.
+	for (const auto &fmt : formatting)
+		out.append(fmt);
+
+	// The maximum length of a line.
+	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "120");
+
+	// The current printable length of the output.
+	size_t current_length = 0;
+
+	// Whether a newline was encountered or we hit the max line length.
+	bool forced_linebreak = false;
+
+	// The index of the last space we can split on.
+	size_t last_space = 0;
+
+	// Formatting which has been seen since the last space.
+	std::vector<Anope::string> uncertain_formatting;
+
+	size_t idx = 0;
+	auto toggle_formatting = [this, &idx, &uncertain_formatting](const Anope::string &fmt)
+	{
+		auto it = std::find_if(formatting.begin(), formatting.end(), [&fmt](const auto& f) {
+			return f[0] == fmt[0];
+		});
+		if (it == formatting.end())
+		{
+			formatting.push_back(fmt);
+			uncertain_formatting.push_back(fmt);
+		}
+		else
+		{
+			formatting.erase(it);
+			uncertain_formatting.push_back(*it);
+		}
+	};
+
+	for (idx = 0; idx < text.length(); ++idx)
+	{
+		if (current_length >= max_length)
+		{
+			for (const auto &uf : uncertain_formatting)
+				toggle_formatting(uf);
+
+			forced_linebreak = true;
+			break; // Max length reached.
+		}
+
+		auto chr = text[idx];
+		switch (chr)
+		{
+			case '\x02': // IRC bold
+			case '\x1D': // IRC italic
+			case '\x11': // IRC monospace
+			case '\x16': // IRC reverse
+			case '\x1E': // IRC strikethrough
+			case '\x1F': // IRC underline
+			{
+				// These formatting characters are a simple toggle.
+				toggle_formatting(chr);
+				out.push_back(chr);
+				break;
+			}
+
+			case '\x03': // Color
+			{
+				const auto start = idx;
+				while (++idx < text.length() && idx - start < 6)
+				{
+					chr = text[idx];
+					if (chr != ',' && (chr < '0' || chr > '9'))
+					{
+						idx--;
+						break;
+					}
+				}
+
+				auto color = text.substr(start, start - idx);
+				toggle_formatting(color);
+				out.append(color);
+				break;
+			}
+			case '\x04': // Hex color
+			{
+				const auto start = idx;
+				while (++idx < text.length() && idx - start < 14)
+				{
+					chr = text[idx];
+					if (chr != ',' && (chr < '0' || chr > '9') && (chr < 'A' || chr > 'F') && (chr < 'a' || chr > 'f'))
+					{
+						idx--;
+						break;
+					}
+
+					auto color = text.substr(start, start - idx);
+					toggle_formatting(color);
+					out.append(color);
+				}
+
+				break;
+			}
+
+			case '\x0A': // Forced newline (line feed)
+			case '\x0D': // Forced newline (carriage return)
+			{
+				formatting.clear();
+				last_space = idx;
+				forced_linebreak = true;
+				break;
+			}
+
+			case '\x0F': // IRC reset.
+			{
+				formatting.clear();
+				out.push_back(chr);
+				break;
+			}
+
+			case '\x1A': // Non-breaking space
+			{
+				// There aren't any single byte non-breaking spaces so we use
+				// a substitute for that purpose.
+				current_length++;
+				out.push_back(' ');
+				break;
+			}
+
+			case '\x20': // Breaking space.
+			{
+
+				// Unlike above we can split on this.
+				last_space = idx;
+				uncertain_formatting.clear();
+				current_length++;
+				out.push_back(' ');
+				break;
+			}
+
+			default: // Non-formatting character.
+				current_length++;
+				out.push_back(chr);
+				break;
+		}
+
+		if (forced_linebreak)
+			break;
+	}
+
+	if (forced_linebreak)
+	{
+		if (!last_space)
+			last_space = idx;
+
+		text.erase(0, last_space + 1);
+		out.erase(last_space);
+	}
+	else
+	{
+		// We either reached to the end of the text without needing to line wrap or
+		// we encountered a word so big that it couldn't be linewrapped.
+		text.clear();
+	}
+
+	return true;
+}
+
 
 bool Anope::IsFile(const Anope::string &filename)
 {

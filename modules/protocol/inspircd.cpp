@@ -730,7 +730,6 @@ public:
 // * class(n):    data not available
 // * country(G):  data not available
 // * gateway(w):  data not available in v3
-// * oper(o):     todo
 // * realmask(a): todo
 namespace InspIRCdExtBan
 {
@@ -900,22 +899,26 @@ namespace InspIRCdExtBan
 		}
 	};
 
-	class OperTypeMatcher
+	class OperMatcher
 		: public Base
 	{
-	 public:
-		OperTypeMatcher(const Anope::string &mname, const Anope::string &xname, char xchar)
+	private:
+		const Anope::string extname;
+
+	public:
+		OperMatcher(const Anope::string &mname, const Anope::string &xname, char xchar, const Anope::string &ename)
 			: Base(mname, xname, xchar)
+			, extname(ename)
 		{
 		}
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			Anope::string *opertype = u->GetExt<Anope::string>("opertype");
-			if (!opertype)
+			const auto *oper = u->GetExt<Anope::string>(extname);
+			if (!oper)
 				return false; // Not an operator.
 
-			return Anope::Match(opertype->replace_all_cs(' ', '_'), e->GetMask());
+			return Anope::Match(oper->replace_all_cs(' ', '_'), e->GetMask());
 		}
 	};
 }
@@ -1307,7 +1310,7 @@ struct IRCDMessageCapab final
 				{
 					cm = new ChannelModeOperOnly("OPERONLY", mode.letter);
 					if (spanningtree_proto_ver < 1206)
-						ModeManager::AddChannelMode(new InspIRCdExtBan::OperTypeMatcher("OPERTYPEBAN", "", 'O'));
+						ModeManager::AddChannelMode(new InspIRCdExtBan::OperMatcher("OPERTYPEBAN", "", 'O', "opertype"));
 				}
 				else if (mode.name.equals_cs("operprefix"))
 					cm = new ChannelModeStatus("OPERPREFIX", mode.letter, mode.symbol, mode.level);
@@ -1457,8 +1460,10 @@ struct IRCDMessageCapab final
 					xb = new InspIRCdExtBan::EntryMatcher("NONICKBAN", extban.name, extban.letter);
 				else if (extban.name.equals_cs("nonotice"))
 					xb = new InspIRCdExtBan::EntryMatcher("NONOTICEBAN", extban.name, extban.letter);
+				else if (extban.name.equals_cs("oper"))
+					xb = new InspIRCdExtBan::OperMatcher("OPERBAN", extban.name, extban.letter, "opername");
 				else if (extban.name.equals_cs("opertype"))
-					xb = new InspIRCdExtBan::OperTypeMatcher("OPERTYPEBAN", extban.name, extban.letter);
+					xb = new InspIRCdExtBan::OperMatcher("OPERTYPEBAN", extban.name, extban.letter, "opertype");
 				else if (extban.name.equals_cs("opmoderated"))
 					xb = new InspIRCdExtBan::EntryMatcher("OPMODERATEDBAN", extban.name, extban.letter);
 				else if (extban.name.equals_cs("realname"))
@@ -2363,10 +2368,12 @@ struct IRCDMessageNick final
 struct IRCDMessageOperType final
 	: IRCDMessage
 {
+	PrimitiveExtensibleItem<Anope::string> opername;
 	PrimitiveExtensibleItem<Anope::string> opertype;
 
 	IRCDMessageOperType(Module *creator)
 		: IRCDMessage(creator, "OPERTYPE", 1)
+		, opername(creator, "opername")
 		, opertype(creator, "opertype")
 	{
 		SetFlag(FLAG_REQUIRE_USER);
@@ -2381,6 +2388,12 @@ struct IRCDMessageOperType final
 			u->SetModesInternal(source, "+o");
 
 		opertype.Set(u, params[0]);
+
+		const auto it = tags.find("~name");
+		if (it == tags.end())
+			opername.Unset(u);
+		else
+			opername.Set(u, it->second);
 	}
 };
 

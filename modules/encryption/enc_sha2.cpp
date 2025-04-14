@@ -128,7 +128,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		this->defaultprovider = GetAlgorithm(Config->GetModule(this).Get<const Anope::string>("algorithm", "sha256"));
+		this->defaultprovider = GetAlgorithm(Config->GetModule(this).Get<const Anope::string>("algorithm", "sha512"));
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override

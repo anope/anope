@@ -1,6 +1,10 @@
 Anope Version 2.1.14-git
 ------------------------
-No significant changes.
+Added a matcher for the InspIRCd oper extban.
+Bumped the minimum required CMake version to 3.20.
+Fixed stripping IRC formatting codes from messages.
+Redocumented the ns_sasl module.
+Removed hardcoded command names from several messages.
 
 Anope Version 2.1.13
 --------------------

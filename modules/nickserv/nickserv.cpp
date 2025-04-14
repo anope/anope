@@ -432,7 +432,12 @@ public:
 
 		const Anope::string &unregistered_notice = Config->GetModule(this).Get<const Anope::string>("unregistered_notice");
 		if (!Config->GetModule("nickserv").Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na && !u->IsIdentified())
-			u->SendMessage(NickServ, unregistered_notice.replace_all_cs("%n", u->nick));
+		{
+			auto msg = Anope::Template(unregistered_notice, {
+				{ "nick", u->nick },
+			});
+			u->SendMessage(NickServ, msg);
+		}
 		else if (na && !u->IsIdentified(true))
 			this->Validate(u);
 	}

@@ -19,20 +19,16 @@ class MemoServCore final
 
 	static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 	{
-		Anope::string subject = Language::Translate(nc, Config->GetBlock("mail").Get<const Anope::string>("memo_subject").c_str()),
-			message = Language::Translate(nc, Config->GetBlock("mail").Get<const Anope::string>("memo_message").c_str());
+		Anope::map<Anope::string> vars = {
+			{ "receiver", nc->display                                                             },
+			{ "sender",   m->sender                                                               },
+			{ "number",   Anope::ToString(mi->GetIndex(m) + 1)                                    },
+			{ "text",     m->text                                                                 },
+			{ "network",  Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
+		};
 
-		subject = subject.replace_all_cs("%n", nc->display);
-		subject = subject.replace_all_cs("%s", m->sender);
-		subject = subject.replace_all_cs("%d", Anope::ToString(mi->GetIndex(m) + 1));
-		subject = subject.replace_all_cs("%t", m->text);
-		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
-
-		message = message.replace_all_cs("%n", nc->display);
-		message = message.replace_all_cs("%s", m->sender);
-		message = message.replace_all_cs("%d", Anope::ToString(mi->GetIndex(m) + 1));
-		message = message.replace_all_cs("%t", m->text);
-		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
+		auto subject = Anope::Template(Language::Translate(nc, Config->GetBlock("mail").Get<const Anope::string>("memo_subject").c_str()), vars);
+		auto message = Anope::Template(Language::Translate(nc, Config->GetBlock("mail").Get<const Anope::string>("memo_message").c_str()), vars);
 
 		return Mail::Send(nc, subject, message);
 	}

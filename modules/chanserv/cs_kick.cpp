@@ -48,8 +48,7 @@ public:
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 
-		Anope::string signkickformat = Config->GetModule("chanserv").Get<Anope::string>("signkickformat", "%m (%n)");
-		signkickformat = signkickformat.replace_all_cs("%n", source.GetNick());
+		auto signkickformat = Config->GetModule("chanserv").Get<Anope::string>("signkickformat", "{message} ({nick})");
 
 		AccessGroup u_access = source.AccessFor(ci);
 
@@ -71,7 +70,10 @@ public:
 
 				if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
 				{
-					signkickformat = signkickformat.replace_all_cs("%m", reason);
+					signkickformat = Anope::Template(signkickformat, {
+						{ "message", reason           },
+						{ "nick",    source.GetNick() },
+					});
 					c->Kick(ci->WhoSends(), u2, signkickformat);
 				}
 				else
@@ -105,7 +107,10 @@ public:
 					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
 					{
 						reason += " (Matches " + mask + ")";
-						signkickformat = signkickformat.replace_all_cs("%m", reason);
+						signkickformat = Anope::Template(signkickformat, {
+							{ "message", reason           },
+							{ "nick",    source.GetNick() },
+						});
 						c->Kick(ci->WhoSends(), uc->user, signkickformat);
 					}
 					else

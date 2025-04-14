@@ -513,7 +513,9 @@ public:
 			{
 				if (!DConfig.sle_reason.empty())
 				{
-					Anope::string message = DConfig.sle_reason.replace_all_cs("%IP%", u->ip.addr());
+					auto message = Anope::Template(DConfig.sle_reason, {
+						{ "ip", u->ip.addr() },
+					});
 					u->SendMessage(OperServ, message);
 				}
 				if (!DConfig.sle_detailsloc.empty())

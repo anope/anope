@@ -117,8 +117,17 @@ public:
 				throw LDAPException("Could not search LDAP for opertype settings, invalid configuration.");
 
 			if (!this->binddn.empty())
-				this->ldap->Bind(NULL, this->binddn.replace_all_cs("%a", u->Account()->display), this->password.c_str());
-			this->ldap->Search(new IdentifyInterface(this, u), this->basedn, this->filter.replace_all_cs("%a", u->Account()->display));
+			{
+				auto bdn = Anope::Template(this->binddn, {
+					{ "account", u->Account()->display },
+				});
+				this->ldap->Bind(NULL, bdn, this->password.c_str());
+			}
+
+			auto af = Anope::Template(this->filter, {
+				{ "account", u->Account()->display },
+			});
+			this->ldap->Search(new IdentifyInterface(this, u), this->basedn, af);
 		}
 		catch (const LDAPException &ex)
 		{

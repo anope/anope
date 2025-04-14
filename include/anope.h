@@ -608,6 +608,13 @@ namespace Anope
 	 * @return True if the message was a well formed CTCP; otherwise, false.
 	 */
 	extern CoreExport bool ParseCTCP(const Anope::string &text, Anope::string &name, Anope::string &body);
+
+	/** Replaces template variables within a string with values from a map.
+	 * @param str The string to template from.
+	 * @param vars The variables to replace within the string.
+	 * @return The specified string with all variables replaced within it.
+	 */
+	extern CoreExport Anope::string Template(const Anope::string &str, const Anope::map<Anope::string> &vars);
 }
 
 /** sepstream allows for splitting token separated lists.

@@ -567,8 +567,10 @@ public:
 				if (reason.empty())
 				{
 					reason = Language::Translate(u, Config->GetModule(this).Get<const Anope::string>("autokickreason").c_str());
-					reason = reason.replace_all_cs("%n", u->nick)
-							.replace_all_cs("%c", c->name);
+					reason = Anope::Template(reason, {
+						{ "channel", c->name },
+						{ "nick",    u->nick },
+					});
 				}
 				if (reason.empty())
 					reason = Language::Translate(u, _("User has been banned from the channel"));

@@ -85,7 +85,10 @@ public:
 			{
 				if (ii->admin_bind)
 				{
-					Anope::string sf = search_filter.replace_all_cs("%account", ii->req->GetAccount()).replace_all_cs("%object_class", object_class);
+					auto sf = Anope::Template(search_filter, {
+						{ "account",      ii->req->GetAccount() },
+						{ "object_class", object_class          },
+					});
 					try
 					{
 						Log(LOG_DEBUG) << "ldap_authentication: searching for " << sf;

@@ -132,21 +132,18 @@ public:
 
 static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi)
 {
-	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("reset_subject").c_str()),
-		message = Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("reset_message").c_str()),
-		passcode = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
-
-	subject = subject.replace_all_cs("%n", na->nick);
-	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
-	subject = subject.replace_all_cs("%c", passcode);
-
-	message = message.replace_all_cs("%n", na->nick);
-	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
-	message = message.replace_all_cs("%c", passcode);
-
-	ResetInfo *ri = na->nc->Extend<ResetInfo>("reset");
-	ri->code = passcode;
+	auto *ri = na->nc->Extend<ResetInfo>("reset");
+	ri->code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
 	ri->time = Anope::CurTime;
+
+	Anope::map<Anope::string> vars = {
+		{ "nick",    na->nick                                                                },
+		{ "network", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
+		{ "code",    ri->code                                                                },
+	};
+
+	auto subject = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("reset_subject").c_str()), vars);
+	auto message = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("reset_message").c_str()), vars);
 
 	return Mail::Send(u, na->nc, bi, subject, message);
 }

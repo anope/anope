@@ -856,3 +856,41 @@ bool Anope::ParseCTCP(const Anope::string &text, Anope::string &name, Anope::str
 	body = text.substr(start_of_body, text.length() - start_of_body - end_of_ctcp);
 	return true;
 }
+
+Anope::string Anope::Template(const Anope::string &str, const Anope::map<Anope::string> &vars)
+{
+	Anope::string out;
+	for (size_t idx = 0; idx < str.length(); ++idx)
+	{
+		if (str[idx] != '{')
+		{
+			out.push_back(str[idx]);
+			continue;
+		}
+
+		for (size_t endidx = idx + 1; endidx < str.length(); ++endidx)
+		{
+			if (str[endidx] == '}')
+			{
+				if (endidx - idx == 1)
+				{
+					// foo{{bar is an escape of foo{bar
+					out.push_back('{');
+					idx = endidx;
+					break;
+				}
+
+				auto var = vars.find(str.substr(idx + 1, endidx - idx - 1));
+				if (var != vars.end())
+				{
+					// We have a variable, replace it in the string.
+					out.append(var->second);
+				}
+
+				idx = endidx;
+				break;
+			}
+		}
+	}
+	return out;
+}

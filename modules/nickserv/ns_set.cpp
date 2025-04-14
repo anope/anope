@@ -528,20 +528,16 @@ class CommandNSSetEmail
 		n->first = new_email;
 		n->second = code;
 
-		Anope::string subject = Config->GetBlock("mail").Get<const Anope::string>("emailchange_subject"),
-			message = Config->GetBlock("mail").Get<const Anope::string>("emailchange_message");
+		Anope::map<Anope::string> vars = {
+			{ "old_email", nc->email                                                               },
+			{ "new_email", new_email                                                               },
+			{ "account",   nc->display                                                             },
+			{ "network",   Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
+			{ "code",      code                                                                    },
+		};
 
-		subject = subject.replace_all_cs("%e", nc->email);
-		subject = subject.replace_all_cs("%E", new_email);
-		subject = subject.replace_all_cs("%n", nc->display);
-		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
-		subject = subject.replace_all_cs("%c", code);
-
-		message = message.replace_all_cs("%e", nc->email);
-		message = message.replace_all_cs("%E", new_email);
-		message = message.replace_all_cs("%n", nc->display);
-		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
-		message = message.replace_all_cs("%c", code);
+		auto subject = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_subject"), vars);
+		auto message = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_message"), vars);
 
 		Anope::string old = nc->email;
 		nc->email = new_email;

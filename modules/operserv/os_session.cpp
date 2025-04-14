@@ -696,7 +696,9 @@ public:
 				{
 					if (!sle_reason.empty())
 					{
-						Anope::string message = sle_reason.replace_all_cs("%IP%", u->ip.addr());
+						auto message = Anope::Template(sle_reason, {
+							{ "ip", u->ip.addr() },
+						});
 						u->SendMessage(OperServ, message);
 					}
 					if (!sle_detailsloc.empty())

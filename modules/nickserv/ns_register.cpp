@@ -428,16 +428,14 @@ static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi)
 		*code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
 	}
 
-	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("registration_subject").c_str()),
-		message = Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("registration_message").c_str());
+	Anope::map<Anope::string> vars = {
+		{ "nick",    na->nick                                                                },
+		{ "network", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
+		{ "code",    *code                                                                   },
+	};
 
-	subject = subject.replace_all_cs("%n", na->nick);
-	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
-	subject = subject.replace_all_cs("%c", *code);
-
-	message = message.replace_all_cs("%n", na->nick);
-	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
-	message = message.replace_all_cs("%c", *code);
+	auto subject = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("registration_subject").c_str()), vars);
+	auto message = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("registration_message").c_str()), vars);
 
 	return Mail::Send(u, nc, bi, subject, message);
 }

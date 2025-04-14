@@ -84,11 +84,11 @@ public:
 protected:
 	void Ban()
 	{
-		Anope::string reason = this->proxy.reason;
-
-		reason = reason.replace_all_cs("%t", this->GetType());
-		reason = reason.replace_all_cs("%i", this->conaddr.addr());
-		reason = reason.replace_all_cs("%p", Anope::ToString(this->conaddr.port()));
+		auto reason = Anope::Template(this->proxy.reason, {
+			{ "ip",    this->conaddr.addr()                  },
+			{ "port",  Anope::ToString(this->conaddr.port()) },
+			{ "type",  this->GetType()                       },
+		});
 
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		Log(OperServ) << "PROXYSCAN: Open " << this->GetType() << " proxy found on " << this->conaddr.str() << " (" << reason << ")";

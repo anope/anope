@@ -70,14 +70,16 @@ public:
 		if (reply && reply->allow_account && user->IsIdentified())
 			return;
 
-		Anope::string reason = this->blacklist.reason, addr = user->ip.addr();
-		reason = reason.replace_all_cs("%n", user->nick);
-		reason = reason.replace_all_cs("%u", user->GetIdent());
-		reason = reason.replace_all_cs("%g", user->realname);
-		reason = reason.replace_all_cs("%h", user->host);
-		reason = reason.replace_all_cs("%i", addr);
-		reason = reason.replace_all_cs("%r", reply ? reply->reason : "");
-		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname"));
+		auto addr = user->ip.addr();
+		auto reason = Anope::Template(this->blacklist.reason, {
+			{ "nick",    user->nick                                                              },
+			{ "user",    user->GetIdent()                                                        },
+			{ "real",    user->realname                                                          },
+			{ "host",    user->host                                                              },
+			{ "ip",      addr                                                                    },
+			{ "reply",   reply ? reply->reason : ""                                              },
+			{ "network", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
+		});
 
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		Log(creator, "dnsbl", OperServ) << user->GetMask() << " (" << addr << ") appears in " << this->blacklist.name;

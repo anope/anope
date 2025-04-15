@@ -268,9 +268,13 @@ public:
 		IRCDProto::SendContextPrivmsg(bi, target, context, msg);
 	}
 
-	void SendClearBans(const MessageSource &user, Channel *c, User* u) override
+	void SendClearModes(const MessageSource &user, Channel *c, User* u, const Anope::string &mode) override
 	{
-		Uplink::Send(user, "SVSCMODE", u->GetUID(), c->name, 'b');
+		auto *cm = ModeManager::FindChannelModeByName(mode);
+		if (!cm || !cm->mchar)
+			return;
+
+		Uplink::Send(user, "SVSCMODE", u->GetUID(), c->name, cm->mchar);
 	}
 
 	void SendQuit(User *u, const Anope::string &buf, const Anope::string &operbuf) override
@@ -1194,7 +1198,7 @@ struct IRCDMessageCapab final
 				throw ProtocolException("Protocol mismatch, no or invalid protocol version given in CAPAB START.");
 
 			Servers::Capab.clear();
-			IRCD->CanClearBans = false;
+			IRCD->CanClearModes.clear();
 			IRCD->CanSQLineChannel = false;
 			IRCD->CanSVSHold = false;
 			IRCD->CanTagMessage = false;
@@ -1522,7 +1526,6 @@ struct IRCDMessageCapab final
 
 					else if (modname.equals_cs("services"))
 					{
-						IRCD->CanClearBans = true;
 						IRCD->CanSVSHold = true;
 						Servers::Capab.insert("SERVICES");
 						Servers::Capab.insert("TOPICLOCK");
@@ -1630,6 +1633,12 @@ struct IRCDMessageCapab final
 
 				if (!Servers::Capab.count("SERVICES"))
 					throw ProtocolException("The services module is not loaded. This is required by Anope.");
+
+				for (auto *cm : ModeManager::GetChannelModes())
+				{
+					if (cm->type == MODE_LIST && cm->mchar)
+						IRCD->CanClearModes.insert(cm->name);
+				}
 			}
 
 			if (!ModeManager::FindUserModeByName("PRIV"))

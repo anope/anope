@@ -57,10 +57,10 @@ public:
 		BotInfo *bi = user->server == Me ? dynamic_cast<BotInfo *>(user) : NULL;
 		if (bi && Config->GetModule(this).Get<bool>("smartjoin"))
 		{
-			if (IRCD->CanClearBans)
+			if (IRCD->CanClearModes.count("BAN"))
 			{
 				// We can ask the IRCd to clear bans.
-				IRCD->SendClearBans(bi, c, bi);
+				IRCD->SendClearModes(bi, c, bi, "BAN");
 			}
 			else
 			{

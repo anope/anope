@@ -59,7 +59,7 @@ public:
 		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanSVSHold = true;
-		CanClearBans = true;
+		CanClearModes.insert("BAN");
 		CanCertFP = true;
 		CanTagMessage = true;
 		RequiresID = true;
@@ -456,9 +456,13 @@ private:
 		return true;
 	}
 
-	void SendClearBans(const MessageSource &user, Channel *c, User* u) override
+	void SendClearModes(const MessageSource &user, Channel *c, User* u, const Anope::string &mode) override
 	{
-		Uplink::Send(user, "SVS2MODE", c->name, "-b", u->GetUID());
+		auto *cm = ModeManager::FindChannelModeByName(mode);
+		if (!cm || !cm->mchar)
+			return;
+
+		Uplink::Send(user, "SVS2MODE", c->name, Anope::printf("-%c", cm->mchar), u->GetUID());
 	}
 
 	bool IsTagValid(const Anope::string &tname, const Anope::string &tvalue) override

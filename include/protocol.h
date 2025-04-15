@@ -107,8 +107,8 @@ public:
 	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */
 	bool AmbiguousID = false;
 
-	/** Can we ask the server to unban a user? */
-	bool CanClearBans = false;
+	/** Can we ask the server to remove list modes matching a user? */
+	std::set<Anope::string> CanClearModes;
 
 	/** Can we send tag messages? */
 	bool CanTagMessage = false;
@@ -304,7 +304,7 @@ public:
 	 */
 	virtual void SendOper(User *u);
 
-	virtual void SendClearBans(const MessageSource &user, Channel *c, User* u) { }
+	virtual void SendClearModes(const MessageSource &user, Channel *c, User* u, const Anope::string &mode) { }
 
 	virtual bool IsNickValid(const Anope::string &);
 	virtual bool IsChannelValid(const Anope::string &);

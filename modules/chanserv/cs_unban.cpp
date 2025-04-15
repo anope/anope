@@ -102,7 +102,7 @@ public:
 		{
 			if (IRCD->CanClearModes.count(mode->name))
 			{
-				IRCD->SendClearModes(ci->WhoSends(), ci->c, source.GetUser(), mode->name);
+				IRCD->SendClearModes(ci->WhoSends(), ci->c, u2, mode->name);
 				continue;
 			}
 

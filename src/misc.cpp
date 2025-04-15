@@ -160,7 +160,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 				lengths[column] = entry[column].length();
 		}
 	}
-	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "120");
+	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "100");
 	unsigned total_length = 0;
 	for (const auto &[column, length] : lengths)
 	{
@@ -281,7 +281,7 @@ bool TextSplitter::GetLine(Anope::string &out)
 		out.append(fmt);
 
 	// The maximum length of a line.
-	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "120");
+	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "100");
 
 	// The current printable length of the output.
 	size_t current_length = 0;

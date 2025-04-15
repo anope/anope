@@ -155,15 +155,14 @@ private:
 		if (mod)
 		{
 			// We are reading the name of a module database.
-			filename = Config->GetModule(this)
-				.Get<Anope::string>("module_database", "{name}.module.json")
-				.replace_all_cs("{name}", mod->name);
+			filename = Anope::Template(Config->GetModule(this).Get<Anope::string>("module_database", "{name}.module.json"), {
+				{ "name", mod->name },
+			});
 		}
 		else
 		{
 			// We are reading a the name of the core database.
-			filename = Config->GetModule(this)
-				.Get<Anope::string>("database", "anope.json");
+			filename = Config->GetModule(this).Get<Anope::string>("database", "anope.json");
 		}
 
 		return Anope::ExpandData(filename);

@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thanks for taking the time to fill out this bug report! Please make sure to answer the questions properly and don't just enter the same text into every field as this will make it harder for us to fix your bug.
 
         If you're looking for help with setting up your services please post on [our support forum](https://github.com/orgs/anope/discussions/categories/support) instead.
 

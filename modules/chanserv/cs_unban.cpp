@@ -23,7 +23,8 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByName("BAN");
+		const auto &mode = Config->GetCommand(source).Get<Anope::string>("mode", "BAN");
+		auto *cm = ModeManager::FindChannelModeByName(mode);
 		if (!cm)
 			return;
 

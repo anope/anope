@@ -10,6 +10,7 @@
  */
 
 #include <filesystem>
+namespace fs = std::filesystem;
 
 #include "yyjson/yyjson.c"
 
@@ -99,6 +100,55 @@ private:
 	// Whether OnLoadDatabase has been called yet.
 	bool loaded = false;
 
+	void CreateBackup(const Anope::string &backupdir, const fs::path &dbpath, size_t backups, const char *fmt, const char *glob)
+	{
+		if (!backups)
+			return;
+
+		char timebuf[16];
+		strftime(timebuf, sizeof(timebuf), fmt, localtime(&Anope::CurTime));
+
+		auto backupbase = Anope::Expand(backupdir, dbpath.filename().string()) + ".";
+		auto backupname = backupbase + timebuf;
+
+		std::error_code ec;
+		Anope::string dbname = dbpath.string();
+		Log(LOG_DEBUG) << "Copying " << dbname << " to " << backupname;
+		if (!fs::copy_file(dbname.str(), backupname.str(), fs::copy_options::overwrite_existing, ec))
+		{
+			Log(this) << "Failed to copy " << dbname << " to " << backupname << ": " << ec.message();
+			if (!Config->GetModule(this).Get<bool>("ignore_backup_failure"))
+			{
+				Anope::Quitting = true;
+				Anope::QuitReason = "Failed to copy " + dbname + " to " + backupname + ": " + ec.message();
+			}
+		}
+
+		// Delete older backups.
+		std::set<Anope::string> old_backups;
+		for (const auto &entry : fs::directory_iterator(backupdir.str(), ec))
+		{
+			Anope::string entryname = entry.path().string();
+			if (entryname.compare(0, backupbase.length(), backupbase) != 0)
+				continue; // Not one of our backups.
+
+			if (!Anope::Match(entryname.substr(backupbase.length()), glob))
+				continue; // Not this type of backup.
+
+			old_backups.insert(entryname);
+			if (old_backups.size() <= backups)
+				continue;
+
+			Log(LOG_DEBUG) << "Deleting expired backup " << *old_backups.begin();
+			if (!fs::remove(old_backups.begin()->str(), ec))
+			{
+				Log(this) << "Failed to delete expired backup " << *old_backups.begin() << ": " << ec.message();
+				break;
+			}
+			old_backups.erase(old_backups.begin());
+		}
+	}
+
 	Anope::string GetDatabaseFile(Module *mod)
 	{
 		Anope::string filename;
@@ -121,19 +171,16 @@ private:
 
 	void BackupDatabase(const Anope::string &dbname)
 	{
-		namespace fs = std::filesystem;
-
 		std::error_code ec;
 		fs::path dbpath(dbname.str());
 		if (!fs::exists(dbpath, ec) || ec)
 			return; // Nothing to backup.
 
 		auto &modconf = Config->GetModule(this);
-		auto backups = modconf.Get<unsigned>("backups", "14");
-		if (!backups)
-			return; // No backups
-
-		auto ignore_backup_failure = modconf.Get<bool>("ignore_backup_failure");
+		auto daily_backups = modconf.Get<size_t>("daily_backups", "7");
+		auto monthly_backups = modconf.Get<size_t>("monthly_backups", "3");
+		if (!daily_backups && !monthly_backups)
+			return; // No backups.
 
 		auto backupdir = Anope::ExpandData(modconf.Get<Anope::string>("backup_directory", "backups"));
 		if (!fs::is_directory(backupdir.str(), ec) && !ec)
@@ -142,7 +189,7 @@ private:
 			if (ec)
 			{
 				Log(this) << "Failed to create backup directory: " << ec.message();
-				if (!ignore_backup_failure)
+				if (!modconf.Get<bool>("ignore_backup_failure"))
 				{
 					Anope::Quitting = true;
 					Anope::QuitReason = "Failed to create backup directory: " + ec.message();
@@ -151,43 +198,8 @@ private:
 			}
 		}
 
-		char timebuf[16];
-		strftime(timebuf, sizeof(timebuf), "%Y-%m-%d", localtime(&Anope::CurTime));
-
-		auto backupbase = Anope::Expand(backupdir, dbpath.filename().string()) + ".";
-		auto backupname = backupbase + timebuf;
-
-		Log(LOG_DEBUG) << "Copying " << dbname << " to " << backupname;
-		if (!fs::copy_file(dbname.str(), backupname.str(), fs::copy_options::overwrite_existing, ec))
-		{
-			Log(this) << "Failed to copy " << dbname << " to " << backupname << ": " << ec.message();
-			if (!ignore_backup_failure)
-			{
-				Anope::Quitting = true;
-				Anope::QuitReason = "Failed to copy " + dbname + " to " + backupname + ": " + ec.message();
-			}
-		}
-
-		// Delete older backups.
-		std::set<Anope::string> old_backups;
-		for (const auto &entry : fs::directory_iterator(backupdir.str(), ec))
-		{
-			Anope::string entryname = entry.path().string();
-			if (entryname.compare(0, backupbase.length(), backupbase) != 0)
-				continue; // Not one of our backups.
-
-			old_backups.insert(entryname);
-			if (old_backups.size() <= backups)
-				continue;
-
-			Log(LOG_DEBUG) << "Deleting expired backup " << *old_backups.begin();
-			if (!fs::remove(old_backups.begin()->str(), ec))
-			{
-				Log(this) << "Failed to delete expired backup " << *old_backups.begin() << ": " << ec.message();
-				break;
-			}
-			old_backups.erase(old_backups.begin());
-		}
+		CreateBackup(backupdir, dbpath, daily_backups, "%Y-%m-%d", "\?\?\?\?-\?\?-\?\?");
+		CreateBackup(backupdir, dbpath, monthly_backups, "%Y-%m", "\?\?\?\?-\?\?");
 	}
 
 	DBPair ReadDatabase(const Anope::string &dbname)

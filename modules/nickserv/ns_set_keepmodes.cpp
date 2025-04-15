@@ -68,9 +68,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for your nick. If keep\n"
-				"modes is enabled, services will remember your usermodes\n"
-				"and attempt to re-set them the next time you authenticate."));
+		source.Reply(_(
+			"Enables or disables keepmodes for your nick. If keep "
+			"modes is enabled, services will remember your usermodes "
+			"and attempt to re-set them the next time you authenticate."
+		));
 		return true;
 	}
 };
@@ -95,9 +97,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for the given nick. If keep\n"
-				"modes is enabled, services will remember users' usermodes\n"
-				"and attempt to re-set them the next time they authenticate."));
+		source.Reply(_(
+			"Enables or disables keepmodes for the given nick. If keep "
+			"modes is enabled, services will remember users' usermodes "
+			"and attempt to re-set them the next time they authenticate."
+		));
 		return true;
 	}
 };

@@ -70,8 +70,12 @@ public:
 		list.Process(replies);
 
 		if (!count)
-			source.Reply(_("There are no bots available at this time.\n"
-					"Ask a Services Operator to create one!"));
+		{
+			source.Reply(_(
+				"There are no bots available at this time. "
+				"Ask a Services Operator to create one!"
+			));
+		}
 		else
 		{
 			source.Reply(_("Bot list:"));
@@ -87,15 +91,17 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists all available bots on this network.\n"
-				"\n"
-				"If the OPERONLY, UNUSED or VANITY options are given only\n"
-				"bots which, respectively, are oper-only, unused or were\n"
-				"added at runtime will be displayed. If multiple options are\n"
-				"given, all nicks matching at least one option will be\n"
-				"displayed.\n"
-				"\n"
-				"Note that these options are limited to \037Services Operators\037."));
+		source.Reply(_(
+			"Lists all available bots on this network."
+			"\n\n"
+			"If the OPERONLY, UNUSED or VANITY options are given only "
+			"bots which, respectively, are oper-only, unused or were "
+			"added at runtime will be displayed. If multiple options are "
+			"given, all nicks matching at least one option will be "
+			"displayed."
+			"\n\n"
+			"Note that these options are limited to \037Services Operators\037."
+		));
 		return true;
 	}
 };

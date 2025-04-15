@@ -135,29 +135,41 @@ public:
 
 		if (source.c)
 		{
-			source.Reply(_("\002%s\002 allows you to execute \"fantasy\" commands in the channel.\n"
-					"Fantasy commands are commands that can be executed from messaging a\n"
-					"channel, and provide a more convenient way to execute commands. Commands that\n"
-					"require a channel as a parameter will automatically have that parameter\n"
-					"given.\n"), source.service->nick.c_str());
+			source.Reply(_(
+					"\002%s\002 allows you to execute \"fantasy\" commands in the channel. "
+					"Fantasy commands are commands that can be executed from messaging a "
+					"channel, and provide a more convenient way to execute commands. Commands that "
+					"require a channel as a parameter will automatically have that parameter "
+					"given."
+				),
+				source.service->nick.c_str());
+
 			const Anope::string &fantasycharacters = Config->GetModule("fantasy").Get<const Anope::string>("fantasycharacter", "!");
 			if (!fantasycharacters.empty())
-				source.Reply(_(" \n"
-						"Fantasy commands may be prefixed with one of the following characters: %s\n"), fantasycharacters.c_str());
-			source.Reply(_(" \n"
-					"Available commands are:"));
+			{
+				source.Reply(" ");
+				source.Reply(_("Fantasy commands may be prefixed with one of the following characters: %s"),
+					fantasycharacters.c_str());
+			}
+			source.Reply(" ");
+			source.Reply(_("Available commands are:"));
 		}
 		else if (*source.service == BotServ)
 		{
-			source.Reply(_("\002%s\002 allows you to have a bot on your own channel.\n"
-				"It has been created for users that can't host or\n"
-				"configure a bot, or for use on networks that don't\n"
-				"allow user bots. Available commands are listed\n"
-				"below; to use them, type \002%s \037command\037\002. For\n"
-				"more information on a specific command, type\n"
-				"\002%s \037command\037\002.\n"),
-				BotServ->nick.c_str(), BotServ->GetQueryCommand().c_str(),
+			source.Reply(_(
+					"\002%s\002 allows you to have a bot on your own channel. "
+					"It has been created for users that can't host or "
+					"configure a bot, or for use on networks that don't "
+					"allow user bots. Available commands are listed "
+					"below; to use them, type \002%s\032\037command\037\002. For "
+					"more information on a specific command, type "
+					"\002%s\032\037command\037\002."
+				),
+				BotServ->nick.c_str(),
+				BotServ->GetQueryCommand().c_str(),
 				BotServ->GetQueryCommand({}, source.command).c_str());
+
+			source.Reply(" ");
 		}
 
 		return EVENT_CONTINUE;
@@ -168,14 +180,20 @@ public:
 		if (!params.empty() || source.c || source.service != *BotServ)
 			return;
 
-		source.Reply(_(" \n"
-			"Bot will join a channel whenever there is at least\n"
-			"\002%d\002 user(s) on it."), Config->GetModule(this).Get<unsigned>("minusers"));
+		source.Reply(" ");
+		source.Reply(_("Bot will join a channel whenever there is at least \002%d\002 user(s) on it."),
+			Config->GetModule(this).Get<unsigned>("minusers"));
+
 		const Anope::string &fantasycharacters = Config->GetModule("fantasy").Get<const Anope::string>("fantasycharacter", "!");
 		if (!fantasycharacters.empty())
-			source.Reply(_("Additionally, if fantasy is enabled fantasy commands\n"
-				"can be executed by prefixing the command name with\n"
-				"one of the following characters: %s"), fantasycharacters.c_str());
+		{
+			source.Reply(_(
+					"Additionally, if fantasy is enabled fantasy commands "
+					"can be executed by prefixing the command name with "
+					"one of the following characters: %s"
+				),
+				fantasycharacters.c_str());
+		}
 	}
 
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) override

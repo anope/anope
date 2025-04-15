@@ -722,20 +722,22 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command allows managing DNS zones used for controlling what servers users\n"
-				"are directed to when connecting. Omitting all parameters prints out the status of\n"
-				"the DNS zone.\n"
-				" \n"
-				"\002ADDZONE\002 adds a zone, eg us.yournetwork.tld. Servers can then be added to this\n"
-				"zone with the \002ADDSERVER\002 command.\n"
-				" \n"
-				"The \002ADDSERVER\002 command adds a server to the given zone. When a query is done, the\n"
-				"zone in question is served if it exists, else all servers in all zones are served.\n"
-				"A server may be in more than one zone.\n"
-				" \n"
-				"The \002ADDIP\002 command associates an IP with a server.\n"
-				" \n"
-				"The \002POOL\002 and \002DEPOOL\002 commands actually add and remove servers to their given zones."));
+		source.Reply(_(
+			"This command allows managing DNS zones used for controlling what servers users "
+			"are directed to when connecting. Omitting all parameters prints out the status of "
+			"the DNS zone."
+			"\n\n"
+			"\002ADDZONE\002 adds a zone, eg us.yournetwork.tld. Servers can then be added to this "
+			"zone with the \002ADDSERVER\002 command."
+			"\n\n"
+			"The \002ADDSERVER\002 command adds a server to the given zone. When a query is done, the "
+			"zone in question is served if it exists, else all servers in all zones are served. "
+			"A server may be in more than one zone."
+			"\n\n"
+			"The \002ADDIP\002 command associates an IP with a server."
+			"\n\n"
+			"The \002POOL\002 and \002DEPOOL\002 commands actually add and remove servers to their given zones."
+		));
 		return true;
 	}
 };

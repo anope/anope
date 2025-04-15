@@ -43,8 +43,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command loads the module named \037modname\037 from the modules\n"
-				"directory."));
+		source.Reply(_("This command loads the module named \037modname\037 from the modules directory."));
 		return true;
 	}
 };

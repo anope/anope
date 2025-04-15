@@ -47,9 +47,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Deactivates the vhost currently assigned to the nick in use.\n"
-				"When you use this command any user who performs a /whois\n"
-				"on you will see your real host/IP address."));
+		source.Reply(_(
+			"Deactivates the vhost currently assigned to the nick in use. "
+			"When you use this command any user who performs a /whois "
+			"on you will see your real host/IP address."
+		));
 		return true;
 	}
 };

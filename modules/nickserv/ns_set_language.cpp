@@ -87,10 +87,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the language services uses when sending messages to\n"
-				"you (for example, when responding to a command you send).\n"
-				"\037language\037 should be chosen from the following list of\n"
-				"supported languages:"));
+		source.Reply(_(
+			"Changes the language services uses when sending messages to "
+			"you (for example, when responding to a command you send). "
+			"\037language\037 should be chosen from the following list of "
+			"supported languages:"
+		));
 
 		for (const auto &[langcode, langname] : languages)
 			source.Reply("    %s (%s)", langcode.c_str(), langname.c_str());
@@ -119,10 +121,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the language services uses when sending messages to\n"
-				"the given user (for example, when responding to a command they send).\n"
-				"\037language\037 should be chosen from the following list of\n"
-				"supported languages:"));
+		source.Reply(_(
+			"Changes the language services uses when sending messages to "
+			"the given user (for example, when responding to a command they send). "
+			"\037language\037 should be chosen from the following list of "
+			"supported languages:"
+		));
 
 		for (const auto &[langcode, langname] : languages)
 			source.Reply("    %s (%s)", langcode.c_str(), langname.c_str());

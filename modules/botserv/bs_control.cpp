@@ -122,8 +122,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Makes the bot do the equivalent of a \"/me\" command\n"
-				"on the specified channel using the specified text."));
+		source.Reply(_(
+			"Makes the bot do the equivalent of a \"/me\" command "
+			"on the specified channel using the specified text."
+		));
 		return true;
 	}
 };

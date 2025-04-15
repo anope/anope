@@ -103,10 +103,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to ignore users by nick or host from memoing\n"
-					"you or a channel. If someone on the memo ignore list tries\n"
-					"to memo you or a channel, they will not be told that you have\n"
-					"them ignored."));
+		source.Reply(_(
+			"Allows you to ignore users by nick or host from memoing "
+			"you or a channel. If someone on the memo ignore list tries "
+			"to memo you or a channel, they will not be told that you have "
+			"them ignored."
+		));
 		return true;
 	}
 };

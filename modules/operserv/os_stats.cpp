@@ -298,25 +298,27 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Without any option, shows the current number of users online,\n"
-				"and the highest number of users online since services was\n"
-				"started, and the length of time services has been running.\n"
-				" \n"
-				"With the \002AKILL\002 option, displays the current size of the\n"
-				"AKILL list and the current default expiry time.\n"
-				" \n"
-				"The \002RESET\002 option currently resets the maximum user count\n"
-				"to the number of users currently present on the network.\n"
-				" \n"
-				"The \002PASSWORD\002 option displays the encryption algorithms used\n"
-				"for user passwords.\n"
-				" \n"
-				"The \002UPLINK\002 option displays information about the current\n"
-				"server Anope uses as an uplink to the network.\n"
-				" \n"
-				"The \002HASH\002 option displays information about the hash maps.\n"
-				" \n"
-				"The \002ALL\002 option displays all of the above statistics."));
+		source.Reply(_(
+			"Without any option, shows the current number of users online, "
+			"and the highest number of users online since services was "
+			"started, and the length of time services has been running."
+			"\n\n"
+			"With the \002AKILL\002 option, displays the current size of the "
+			"AKILL list and the current default expiry time."
+			"\n\n"
+			"The \002RESET\002 option currently resets the maximum user count "
+			"to the number of users currently present on the network."
+			"\n\n"
+			"The \002PASSWORD\002 option displays the encryption algorithms used "
+			"for user passwords. "
+			"\n\n"
+			"The \002UPLINK\002 option displays information about the current "
+			"server Anope uses as an uplink to the network."
+			"\n\n"
+			"The \002HASH\002 option displays information about the hash maps."
+			"\n\n"
+			"The \002ALL\002 option displays all of the above statistics."
+		));
 		return true;
 	}
 };

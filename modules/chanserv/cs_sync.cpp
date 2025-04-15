@@ -47,8 +47,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Syncs all modes set on users on the channel with the modes\n"
-				"they should have based on their access."));
+		source.Reply(_(
+			"Syncs all modes set on users on the channel with the modes "
+			"they should have based on their access."
+		));
 		return true;
 	}
 };

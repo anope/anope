@@ -542,59 +542,78 @@ public:
 
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002%s list\002 for a channel. Users who match an access entry\n"
-				"on the %s list receive the following privileges:\n"
-				" "), cmd.c_str(), cmd.c_str());
+		source.Reply(_(
+				"Maintains the \002%s list\002 for a channel. Users who match an access entry "
+				"on the %s list receive the following privileges:"
+			),
+			cmd.c_str(),
+			cmd.c_str());
 
+		source.Reply(" ");
 		Anope::string buf;
 		for (const auto &permission : permissions[cmd])
 		{
 			buf += ", " + permission;
 			if (buf.length() > 75)
 			{
-				source.Reply("  %s\n", buf.substr(2).c_str());
+				source.Reply("  %s", buf.substr(2).c_str());
 				buf.clear();
 			}
 		}
 		if (!buf.empty())
 		{
-			source.Reply("  %s\n", buf.substr(2).c_str());
+			source.Reply("  %s", buf.substr(2).c_str());
 			buf.clear();
 		}
 
-		source.Reply(_(" \n"
-				"The \002%s ADD\002 command adds the given nickname to the\n"
-				"%s list.\n"
-				" \n"
-				"The \002%s DEL\002 command removes the given nick from the\n"
-				"%s list. If a list of entry numbers is given, those\n"
-				"entries are deleted. (See the example for LIST below.)\n"
-				" \n"
-				"The \002%s LIST\002 command displays the %s list. If\n"
-				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed. If a list of entry numbers is given,\n"
+		source.Reply(" ");
+		source.Reply(_(
+				"The \002%s\032ADD\002 command adds the given nickname to the "
+				"%s list."
+				"\n\n"
+				"The \002%s\032DEL\002 command removes the given nick from the "
+				"%s list. If a list of entry numbers is given, those "
+				"entries are deleted. (See the example for LIST below.)"
+				"\n\n"
+				"The \002%s\032LIST\002 command displays the %s list. If "
+				"a wildcard mask is given, only those entries matching the "
+				"mask are displayed. If a list of entry numbers is given, "
 				"only those entries are shown; for example:\n"
-				"   \002%s #channel LIST 2-5,7-9\002\n"
+				"   \002%s\032#channel\032LIST\0322-5,7-9\002\n"
 				"      Lists %s entries numbered 2 through 5 and\n"
-				"      7 through 9.\n"
-				"      \n"
-				"The \002%s CLEAR\002 command clears all entries of the\n"
-				"%s list."), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(),
-				cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str());
+				"      7 through 9."
+				"\n\n"
+				"The \002%s\032CLEAR\002 command clears all entries of the "
+				"%s list."
+			),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str());
+
 		BotInfo *access_bi, *flags_bi;
 		Anope::string access_cmd, flags_cmd;
 		Command::FindCommandFromService("chanserv/access", access_bi, access_cmd);
 		Command::FindCommandFromService("chanserv/flags", flags_bi, flags_cmd);
 		if (!access_cmd.empty() || !flags_cmd.empty())
 		{
-			source.Reply(_("Alternative methods of modifying channel access lists are\n"
-					"available."));
+			source.Reply(_("Alternative methods of modifying channel access lists are available."));
 			if (!access_cmd.empty())
-				source.Reply(_("See \002%s\002 for more information\n"
-						"about the access list."), access_bi->GetQueryCommand("generic/help", access_cmd).c_str());
+			{
+				source.Reply(_("See \002%s\002 for more information about the access list."),
+					access_bi->GetQueryCommand("generic/help", access_cmd).c_str());
+			}
 			if (!flags_cmd.empty())
-				source.Reply(_("See \002%s\002 for more information\n"
-						"about the flags system."), flags_bi->GetQueryCommand("generic/help", flags_cmd).c_str());
+			{
+				source.Reply(_("See \002%s\002 for more information about the flags system."),
+					flags_bi->GetQueryCommand("generic/help", flags_cmd).c_str());
+			}
 		}
 		return true;
 	}

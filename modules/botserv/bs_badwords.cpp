@@ -435,35 +435,38 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002bad words list\002 for a channel. The bad\n"
-				"words list determines which words are to be kicked\n"
-				"when the bad words kicker is enabled. For more information,\n"
-				"type \002%s KICK %s\002.\n"
-				" \n"
-				"The \002ADD\002 command adds the given word to the\n"
-				"bad words list. If SINGLE is specified, a kick will be\n"
-				"done only if a user says the entire word. If START is\n"
-				"specified, a kick will be done if a user says a word\n"
-				"that starts with \037word\037. If END is specified, a kick\n"
-				"will be done if a user says a word that ends with\n"
-				"\037word\037. If you don't specify anything, a kick will\n"
-				"be issued every time \037word\037 is said by a user.\n"
-				" \n"), source.service->GetQueryCommand("generic/help").c_str(), source.command.c_str());
-
-		source.Reply(_("The \002DEL\002 command removes the given word from the\n"
-				"bad words list.  If a list of entry numbers is given, those\n"
-				"entries are deleted.  (See the example for LIST below.)\n"
-				" \n"
-				"The \002LIST\002 command displays the bad words list.  If\n"
-				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
+		source.Reply(_(
+				"Maintains the \002bad words list\002 for a channel. The bad "
+				"words list determines which words are to be kicked "
+				"when the bad words kicker is enabled. For more information, "
+				"type \002%s\032KICK\032%s\002."
+				"\n\n"
+				"The \002ADD\002 command adds the given word to the "
+				"bad words list. If SINGLE is specified, a kick will be "
+				"done only if a user says the entire word. If START is "
+				"specified, a kick will be done if a user says a word "
+				"that starts with \037word\037. If END is specified, a kick "
+				"will be done if a user says a word that ends with "
+				"\037word\037. If you don't specify anything, a kick will "
+				"be issued every time \037word\037 is said by a user."
+				"\n\n"
+				"The \002DEL\002 command removes the given word from the "
+				"bad words list.  If a list of entry numbers is given, those "
+				"entries are deleted.  (See the example for LIST below.)"
+				"\n\n"
+				"The \002LIST\002 command displays the bad words list.  If "
+				"a wildcard mask is given, only those entries matching the "
+				"mask are displayed.  If a list of entry numbers is given, "
 				"only those entries are shown; for example:\n"
-				"   \002#channel LIST 2-5,7-9\002\n"
+				"   \002#channel\032LIST\0322-5,7-9\002\n"
 				"      Lists bad words entries numbered 2 through 5 and\n"
-				"      7 through 9.\n"
-				" \n"
-				"The \002CLEAR\002 command clears all entries from the\n"
-				"bad words list."));
+				"      7 through 9."
+				"\n\n"
+				"The \002CLEAR\002 command clears all entries from the "
+				"bad words list."
+			),
+			source.service->GetQueryCommand("generic/help").c_str(),
+			source.command.c_str());
 		return true;
 	}
 };

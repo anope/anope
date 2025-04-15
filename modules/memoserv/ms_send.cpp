@@ -68,10 +68,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sends the named \037nick\037 or \037channel\037 a memo containing\n"
-				"\037memo-text\037. When sending to a nickname, the recipient will\n"
-				"receive a notice that they have a new memo. The target\n"
-				"nickname/channel must be registered."));
+		source.Reply(_(
+			"Sends the named \037nick\037 or \037channel\037 a memo containing "
+			"\037memo-text\037. When sending to a nickname, the recipient will "
+			"receive a notice that they have a new memo. The target "
+			"nickname/channel must be registered."
+		));
 		return true;
 	}
 };

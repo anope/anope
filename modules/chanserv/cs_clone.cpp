@@ -239,10 +239,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Copies all settings, access, akicks, etc from \002channel\002 to the\n"
-				"\002target\002 channel. If \037what\037 is \002ACCESS\002, \002AKICK\002, \002BADWORDS\002,\n"
-				"or \002LEVELS\002 then only the respective settings are cloned.\n"
-				"You must be the founder of \037channel\037 and \037target\037."));
+		source.Reply(_(
+			"Copies all settings, access, akicks, etc from \002channel\002 to the "
+			"\002target\002 channel. If \037what\037 is \002ACCESS\002, \002AKICK\002, \002BADWORDS\002, "
+			"or \002LEVELS\002 then only the respective settings are cloned. "
+			"You must be the founder of \037channel\037 and \037target\037."
+		));
 		return true;
 	}
 };

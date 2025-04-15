@@ -81,9 +81,12 @@ public:
 				}
 			}
 
-			u->SendMessage(source.service, _("This nickname has been recovered by %s. If you did not do\n"
-							"this then %s may have your password, and you should change it."),
-							source.GetNick().c_str(), source.GetNick().c_str());
+			u->SendMessage(source.service, _(
+					"This nickname has been recovered by %s. If you did not do "
+					"this then %s may have your password, and you should change it."
+				),
+				source.GetNick().c_str(),
+				source.GetNick().c_str());
 
 			Anope::string buf = source.command.upper() + " command used by " + source.GetNick();
 			u->Kill(*source.service, buf);
@@ -125,8 +128,7 @@ public:
 			}
 			else
 			{
-				source.Reply(_("The user with your nick has been removed. Use this command again\n"
-						"to release services's hold on your nick."));
+				source.Reply(_("The user with your nick has been removed. Use this command again to release services's hold on your nick."));
 			}
 		}
 	}
@@ -217,12 +219,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Recovers your nick from another user or from services.\n"
-				"If services are currently holding your nick, the hold\n"
-				"will be released. If another user is holding your nick\n"
-				"and is identified they will be killed (similar to the old\n"
-				"GHOST command). If they are not identified they will be\n"
-				"forced off of the nick."));
+		source.Reply(_(
+			"Recovers your nick from another user or from services. "
+			"If services are currently holding your nick, the hold "
+			"will be released. If another user is holding your nick "
+			"and is identified they will be killed (similar to the old "
+			"GHOST command). If they are not identified they will be "
+			"forced off of the nick."
+		));
 		return true;
 	}
 };

@@ -82,8 +82,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Cancels the last memo you sent to the given nick or channel,\n"
-				"provided it has not been read at the time you use the command."));
+		source.Reply(_(
+			"Cancels the last memo you sent to the given nick or channel, "
+			"provided it has not been read at the time you use the command."
+		));
 		return true;
 	}
 };

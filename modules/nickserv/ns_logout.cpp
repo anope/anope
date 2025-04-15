@@ -64,14 +64,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Without a parameter, reverses the effect of the \002IDENTIFY\002\n"
-				"command, i.e. make you not recognized as the real owner of the nick\n"
-				"anymore. Note, however, that you won't be asked to reidentify\n"
-				"yourself.\n"
-				" \n"
-				"With a parameter, does the same for the given nick. If you\n"
-				"specify \002REVALIDATE\002 as well, services will ask the given nick\n"
-				"to re-identify. This is limited to \002Services Operators\002."));
+		source.Reply(_(
+			"Without a parameter, reverses the effect of the \002IDENTIFY\002 "
+			"command, i.e. make you not recognized as the real owner of the nick "
+			"anymore. Note, however, that you won't be asked to reidentify "
+			"yourself."
+			"\n\n"
+			"With a parameter, does the same for the given nick. If you "
+			"specify \002REVALIDATE\002 as well, services will ask the given nick "
+			"to re-identify. This is limited to \002Services Operators\002."
+		));
 
 		return true;
 	}

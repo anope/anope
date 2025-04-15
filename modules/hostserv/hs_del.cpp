@@ -46,8 +46,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Deletes the vhost assigned to the given nick from the\n"
-				"database."));
+		source.Reply(_("Deletes the vhost assigned to the given nick from the database."));
 		return true;
 	}
 };
@@ -92,8 +91,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Deletes the vhost for all nicks in the same group as\n"
-				"that of the given nick."));
+		source.Reply(_("Deletes the vhost for all nicks in the same group as that of the given nick."));
 		return true;
 	}
 };

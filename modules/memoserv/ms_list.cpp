@@ -141,12 +141,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists any memos you currently have.  With \002NEW\002, lists only\n"
-				"new (unread) memos. Unread memos are marked with a \"*\"\n"
-				"to the left of the memo number. You can also specify a list\n"
-				"of numbers, as in the example below:\n"
-				"   \002LIST 2-5,7-9\002\n"
-				"      Lists memos numbered 2 through 5 and 7 through 9."));
+		source.Reply(_(
+			"Lists any memos you currently have.  With \002NEW\002, lists only "
+			"new (unread) memos. Unread memos are marked with a \"*\" "
+			"to the left of the memo number. You can also specify a list "
+			"of numbers, as in the example below:\n"
+			"   \002LIST 2-5,7-9\002\n"
+			"      Lists memos numbered 2 through 5 and 7 through 9."
+		));
 		return true;
 	}
 };

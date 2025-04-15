@@ -74,12 +74,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists information about the specified registered channel,\n"
-				"including its founder, time of registration, last\n"
-				"time used, and description. If the user issuing the\n"
-				"command has the appropriate access for it, then the\n"
-				"successor, last topic set, settings and expiration\n"
-				"time will also be displayed when applicable."));
+		source.Reply(_(
+			"Lists information about the specified registered channel, "
+			"including its founder, time of registration, last "
+			"time used, and description. If the user issuing the "
+			"command has the appropriate access for it, then the "
+			"successor, last topic set, settings and expiration "
+			"time will also be displayed when applicable."
+		));
 		return true;
 	}
 };

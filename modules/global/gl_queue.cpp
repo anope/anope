@@ -167,16 +167,16 @@ public:
 		this->SendSyntax(source);
 		source.Reply("");
 		source.Reply(_(
-			"Allows queueing messages to send to users on the network.\n"
-			"\n"
-			"The \002QUEUE ADD\002 command adds the given message to the message queue."
-			"\n"
-			"The \002QUEUE CLEAR\002 command clears the message queue."
-			"\n"
-			"The \002QUEUE DEL\002 command removes the specified message from the message queue. The\n"
-			"message number can be obtained from the output of the \002QUEUE LIST\002 command."
-			"\n"
-			"The \002QUEUE LIST\002 command lists all messages that are currently in the message queue."
+			"Allows queueing messages to send to users on the network."
+			"\n\n"
+			"The \002QUEUE\032ADD\002 command adds the given message to the message queue."
+			"\n\n"
+			"The \002QUEUE\032CLEAR\002 command clears the message queue."
+			"\n\n"
+			"The \002QUEUE\032DEL\002 command removes the specified message from the message queue. The "
+			"message number can be obtained from the output of the \002QUEUE\032LIST\002 command."
+			"\n\n"
+			"The \002QUEUE\032LIST\002 command lists all messages that are currently in the message queue."
 		));
 		return true;
 	}

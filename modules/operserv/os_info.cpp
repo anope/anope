@@ -254,9 +254,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Add or delete oper information for a given nick or channel.\n"
-				"This will show to opers in the respective info command for\n"
-				"the nick or channel."));
+		source.Reply(_(
+			"Add or delete oper information for a given nick or channel. "
+			"This will show to opers in the respective info command for "
+			"the nick or channel."
+		));
 		return true;
 	}
 };

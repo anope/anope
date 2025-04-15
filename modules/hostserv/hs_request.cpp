@@ -189,9 +189,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Request the given vhost to be activated for your nick by the\n"
-			"network administrators. Please be patient while your request\n"
-			"is being considered."));
+		source.Reply(_(
+			"Request the given vhost to be activated for your nick by the "
+			"network administrators. Please be patient while your request "
+			"is being considered."
+		));
 		return true;
 	}
 };

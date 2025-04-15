@@ -84,12 +84,13 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Allows sending messages to all users on a server. The message will be sent\n"
-			"from \002%s\002.\n"
-			"\n"
-			"You can either send a message by specifying it as a parameter or provide no\n"
-			"parameters to send a previously queued message.\n"
-		), GetSender(source)->nick.c_str());
+				"Allows sending messages to all users on a server. The message will be sent "
+				"from \002%s\002."
+				"\n\n"
+				"You can either send a message by specifying it as a parameter or provide no "
+				"parameters to send a previously queued message."
+			),
+			GetSender(source)->nick.c_str());
 		return true;
 	}
 };

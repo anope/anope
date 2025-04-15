@@ -204,16 +204,18 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Without a parameter, displays information on the number of\n"
-				"memos you have, how many of them are unread, and how many\n"
-				"total memos you can receive.\n"
-				" \n"
-				"With a channel parameter, displays the same information for\n"
-				"the given channel.\n"
-				" \n"
-				"With a nickname parameter, displays the same information\n"
-				"for the given nickname. This is limited to \002Services\002\n"
-				"\002Operators\002."));
+		source.Reply(_(
+			"Without a parameter, displays information on the number of "
+			"memos you have, how many of them are unread, and how many "
+			"total memos you can receive."
+			"\n\n"
+			"With a channel parameter, displays the same information for "
+			"the given channel."
+			"\n\n"
+			"With a nickname parameter, displays the same information "
+			"for the given nickname. This is limited to \002Services "
+			"Operators\002."
+		));
 
 		return true;
 	}

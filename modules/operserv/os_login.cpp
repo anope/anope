@@ -48,9 +48,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Logs you in to %s so you gain Services Operator privileges.\n"
-				"This command may be unnecessary if your oper block is\n"
-				"configured without a password."), source.service->nick.c_str());
+		source.Reply(_(
+				"Logs you in to %s so you gain Services Operator privileges. "
+				"This command may be unnecessary if your oper block is "
+				"configured without a password."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 
@@ -91,9 +94,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Logs you out from %s so you lose Services Operator privileges.\n"
-				"This command is only useful if your oper block is configured\n"
-				"with a password."), source.service->nick.c_str());
+		source.Reply(_(
+				"Logs you out from %s so you lose Services Operator privileges. "
+				"This command is only useful if your oper block is configured "
+				"with a password."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 

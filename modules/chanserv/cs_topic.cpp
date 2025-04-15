@@ -68,11 +68,15 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002topic retention\002 option for a\n"
-				"channel. When \002%s\002 is set, the topic for the\n"
-				"channel will be remembered by %s even after the\n"
-				"last user leaves the channel, and will be restored the\n"
-				"next time the channel is created."), source.command.c_str(), source.service->nick.c_str());
+		source.Reply(_(
+				"Enables or disables the \002topic retention\002 option for a "
+				"channel. When \002%s\002 is set, the topic for the "
+				"channel will be remembered by %s even after the "
+				"last user leaves the channel, and will be restored the "
+				"next time the channel is created."
+			),
+			source.command.c_str(),
+			source.service->nick.c_str());
 		return true;
 	}
 };
@@ -192,14 +196,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows manipulating the topic of the specified channel.\n"
-				"The \002SET\002 command changes the topic of the channel to the given topic\n"
-				"or unsets the topic if no topic is given. The \002APPEND\002 command appends\n"
-				"the given topic to the existing topic.\n"
-				" \n"
-				"\002LOCK\002 and \002UNLOCK\002 may be used to enable and disable topic lock. When\n"
-				"topic lock is set, the channel topic will be unchangeable by users who do not have\n"
-				"the \002TOPIC\002 privilege."));
+		source.Reply(_(
+			"Allows manipulating the topic of the specified channel. "
+			"The \002SET\002 command changes the topic of the channel to the given topic "
+			"or unsets the topic if no topic is given. The \002APPEND\002 command appends "
+			"the given topic to the existing topic. "
+			"\n\n"
+			"\002LOCK\002 and \002UNLOCK\002 may be used to enable and disable topic lock. When "
+			"topic lock is set, the channel topic will be unchangeable by users who do not have "
+			"the \002TOPIC\002 privilege."
+		));
 		return true;
 	}
 };

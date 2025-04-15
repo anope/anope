@@ -67,16 +67,18 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_(" \n"
-				"Enables or disables \002fantasy\002 mode on a channel.\n"
-				"When it is enabled, users will be able to use\n"
-				"fantasy commands on a channel when prefixed\n"
-				"with one of the following fantasy characters: \002%s\002\n"
-				" \n"
-				"Note that users wanting to use fantasy commands\n"
-				"MUST have enough access for both the FANTASY\n"
-				"privilege and the command they are executing."),
-				Config->GetModule(this->owner).Get<const Anope::string>("fantasycharacter", "!").c_str());
+		source.Reply(" ");
+		source.Reply(_(
+				"Enables or disables \002fantasy\002 mode on a channel. "
+				"When it is enabled, users will be able to use "
+				"fantasy commands on a channel when prefixed "
+				"with one of the following fantasy characters: \002%s\002"
+				"\n\n"
+				"Note that users wanting to use fantasy commands "
+				"MUST have enough access for both the FANTASY "
+				"privilege and the command they are executing."
+			),
+			Config->GetModule(this->owner).Get<const Anope::string>("fantasycharacter", "!").c_str());
 		return true;
 	}
 };

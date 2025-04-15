@@ -46,9 +46,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to kill a user from the network.\n"
-				"Parameters are the same as for the standard /KILL\n"
-				"command."));
+		source.Reply(_(
+			"Allows you to kill a user from the network. "
+			"Parameters are the same as for the standard /KILL "
+			"command."
+		));
 		return true;
 	}
 };

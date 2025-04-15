@@ -50,9 +50,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Activates the vhost currently assigned to the nick in use.\n"
-				"When you use this command any user who performs a /whois\n"
-				"on you will see the vhost instead of your real host/IP address."));
+		source.Reply(_(
+			"Activates the vhost currently assigned to the nick in use. "
+			"When you use this command any user who performs a /whois "
+			"on you will see the vhost instead of your real host/IP address."
+		));
 		return true;
 	}
 };

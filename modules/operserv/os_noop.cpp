@@ -64,10 +64,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("\002SET\002 kills all operators from the given\n"
-				"\002server\002 and prevents operators from opering\n"
-				"up on the given server. \002REVOKE\002 removes this\n"
-				"restriction."));
+		source.Reply(_(
+			"\002SET\002 kills all operators from the given "
+			"\002server\002 and prevents operators from opering "
+			"up on the given server. \002REVOKE\002 removes this "
+			"restriction."
+		));
 		return true;
 	}
 };

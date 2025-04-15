@@ -60,12 +60,15 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows staff to kick a user from any channel.\n"
-				"Parameters are the same as for the standard /KICK\n"
-				"command. The kick message will have the nickname of the\n"
-				"IRCop sending the KICK command prepended; for example:\n"
-				" \n"
-				"*** SpamMan has been kicked off channel #my_channel by %s (Alcan (Flood))"), source.service->nick.c_str());
+		source.Reply(_(
+				"Allows staff to kick a user from any channel. "
+				"Parameters are the same as for the standard /KICK "
+				"command. The kick message will have the nickname of the "
+				"IRCop sending the KICK command prepended; for example:"
+				"\n\n"
+				"*** SpamMan has been kicked off channel #my_channel by %s (Alcan (Flood))"
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 };

@@ -41,9 +41,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Updates your current status, i.e. it checks for new memos,\n"
-				"sets needed channel modes and updates your vhost and\n"
-				"your userflags (lastseentime, etc)."));
+		source.Reply(_(
+			"Updates your current status, i.e. it checks for new memos, "
+			"sets needed channel modes and updates your vhost and "
+			"your userflags (lastseentime, etc)."
+		));
 		return true;
 	}
 };

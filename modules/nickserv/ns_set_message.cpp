@@ -74,9 +74,12 @@ public:
 
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way services are communicating with\n"
-				"you. With \002%s\002 set, services will use messages, else they'll\n"
-				"use notices."), cmd.upper().c_str());
+		source.Reply(_(
+				"Allows you to choose the way services are communicating with "
+				"you. With \002%s\002 set, services will use messages, else they'll "
+				"use notices."
+			),
+			cmd.upper().c_str());
 		return true;
 	}
 };
@@ -95,9 +98,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way services are communicating with\n"
-				"the given user. With \002MSG\002 set, services will use messages,\n"
-				"else they'll use notices."));
+		source.Reply(_(
+			"Allows you to choose the way services are communicating with "
+			"the given user. With \002MSG\002 set, services will use messages, "
+			"else they'll use notices."
+		));
 		return true;
 	}
 

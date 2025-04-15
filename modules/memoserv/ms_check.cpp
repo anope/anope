@@ -67,8 +67,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Checks whether the _last_ memo you sent to \037nick\037 has been read\n"
-				"or not. Note that this only works with nicks, not with channels."));
+		source.Reply(_(
+			"Checks whether the _last_ memo you sent to \037nick\037 has been read "
+			"or not. Note that this only works with nicks, not with channels."
+		));
 		return true;
 	}
 };

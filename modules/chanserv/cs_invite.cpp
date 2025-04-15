@@ -89,11 +89,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Tells %s to invite you or an optionally specified\n"
-				"nick into the given channel.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 access and above\n"
-				"on the channel."), source.service->nick.c_str());
+		source.Reply(_(
+				"Tells %s to invite you or an optionally specified "
+				"nick into the given channel."
+				"\n\n"
+				"By default, limited to AOPs or those with level 5 access and above "
+				"on the channel."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 };

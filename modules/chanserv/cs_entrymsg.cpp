@@ -245,26 +245,28 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Controls what messages will be sent to users when they join the channel."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG ADD\002 command adds the given message to\n"
-				"the list of messages shown to users when they join\n"
-				"the channel."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG DEL\002 command removes the specified message from\n"
-				"the list of messages shown to users when they join\n"
-				"the channel. You can remove a message by specifying its number\n"
-				"which you can get by listing the messages as explained below."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG LIST\002 command displays a listing of messages\n"
-				"shown to users when they join the channel."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG CLEAR\002 command clears all entries from\n"
-				"the list of messages shown to users when they join\n"
-				"the channel, effectively disabling entry messages."));
-		source.Reply(" ");
-		source.Reply(_("Adding, deleting, or clearing entry messages requires the\n"
-				"SET permission."));
+		source.Reply(_(
+			"Controls what messages will be sent to users when they join the channel."
+			"\n\n"
+			"The \002ENTRYMSG\032ADD\002 command adds the given message to "
+			"the list of messages shown to users when they join "
+			"the channel."
+			"\n\n"
+			"The \002ENTRYMSG\032DEL\002 command removes the specified message from "
+			"the list of messages shown to users when they join "
+			"the channel. You can remove a message by specifying its number "
+			"which you can get by listing the messages as explained below."
+			"\n\n"
+			"The \002ENTRYMSG\032LIST\002 command displays a listing of messages "
+			"shown to users when they join the channel."
+			"\n\n"
+			"The \002ENTRYMSG\032CLEAR\002 command clears all entries from "
+			"the list of messages shown to users when they join "
+			"the channel, effectively disabling entry messages."
+			"\n\n"
+			"Adding, deleting, or clearing entry messages requires the "
+			"SET permission."
+		));
 		return true;
 	}
 };

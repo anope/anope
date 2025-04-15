@@ -119,11 +119,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists all channels you have access on.\n"
-				" \n"
-				"Channels that have the \037NOEXPIRE\037 option set will be\n"
-				"prefixed by an exclamation mark. The nickname parameter is\n"
-				"limited to Services Operators"));
+		source.Reply(_(
+			"Lists all channels you have access on."
+			"\n\n"
+			"Channels that have the \037NOEXPIRE\037 option set will be "
+			"prefixed by an exclamation mark. The nickname parameter is "
+			"limited to Services Operators."
+		));
 
 		return true;
 	}

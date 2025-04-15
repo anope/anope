@@ -94,10 +94,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the vhost for the given nick to that of the given\n"
-				"hostmask.  If your IRCD supports vidents, then using\n"
-				"SET <nick> <ident>@<hostmask> set idents for users as\n"
-				"well as vhosts."));
+		source.Reply(_(
+			"Sets the vhost for the given nick to that of the given "
+			"hostmask.  If your IRCD supports vidents, then using "
+			"SET <nick> <ident>@<hostmask> set idents for users as "
+			"well as vhosts."
+		));
 		return true;
 	}
 };
@@ -198,12 +200,15 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the vhost for all nicks in the same group as that\n"
-				"of the given nick.  If your IRCD supports vidents, then\n"
-				"using SETALL <nick> <ident>@<hostmask> will set idents\n"
-				"for users as well as vhosts.\n"
-				"* NOTE, this will not update the vhost for any nicks\n"
-				"added to the group after this command was used."));
+		source.Reply(_(
+			"Sets the vhost for all nicks in the same group as that "
+			"of the given nick.  If your IRCD supports vidents, then "
+			"using SETALL <nick> <ident>@<hostmask> will set idents "
+			"for users as well as vhosts."
+			"\n\n"
+			"* NOTE, this will not update the vhost for any nicks "
+			"added to the group after this command was used."
+		));
 		return true;
 	}
 };

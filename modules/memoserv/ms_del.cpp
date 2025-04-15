@@ -128,20 +128,23 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Deletes the specified memo or memos. You can supply\n"
-				"multiple memo numbers or ranges of numbers instead of a\n"
-				"single number, as in the second example below.\n"
-				" \n"
-				"If \002LAST\002 is given, the last memo will be deleted.\n"
-				"If \002ALL\002 is given, deletes all of your memos.\n"
-				" \n"
-				"Examples:\n"
-				" \n"
-				"   \002DEL 1\002\n"
-				"      Deletes your first memo.\n"
-				" \n"
-				"   \002DEL 2-5,7-9\002\n"
-				"      Deletes memos numbered 2 through 5 and 7 through 9."));
+		source.Reply(_(
+			"Deletes the specified memo or memos. You can supply "
+			"multiple memo numbers or ranges of numbers instead of a "
+			"single number, as in the second example below."
+			"\n\n"
+			"If \002LAST\002 is given, the last memo will be deleted."
+			"\n\n"
+			"If \002ALL\002 is given, deletes all of your memos."
+			"\n\n"
+			"Examples:"
+			"\n\n"
+			"   \002DEL\0321\002\n"
+			"      Deletes your first memo."
+			"\n\n"
+			"   \002DEL\0322-5,7-9\002\n"
+			"      Deletes memos numbered 2 through 5 and 7 through 9."
+		));
 		return true;
 	}
 };

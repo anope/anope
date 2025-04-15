@@ -31,9 +31,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows the channel founder to set various channel options\n"
-			"and other information.\n"
-			" \n"
+		source.Reply(_(
+			"Allows the channel founder to set various channel options "
+			"and other information."
+			"\n\n"
 			"Available options:"));
 		Anope::string this_name = source.command;
 		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
@@ -59,8 +60,7 @@ public:
 				c->OnServHelp(source);
 			}
 		}
-		source.Reply(_("Type \002%s \037option\037\002 for more information on a\n"
-				"particular option."),
+		source.Reply(_("Type \002%s\032\037option\037\002 for more information on a particular option."),
 			source.service->GetQueryCommand("generic/help", this_name).c_str());
 		return true;
 	}
@@ -122,9 +122,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables %s's autoop feature for a\n"
-			"channel. When disabled, users who join the channel will\n"
-			"not automatically gain any status from %s."), source.service->nick.c_str(),
+		source.Reply(_(
+				"Enables or disables %s's autoop feature for a "
+				"channel. When disabled, users who join the channel will "
+				"not automatically gain any status from %s."
+			),
+			source.service->nick.c_str(),
 			source.service->nick.c_str());
 		return true;
 	}
@@ -182,15 +185,17 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the ban type that will be used by services whenever\n"
-				"they need to ban someone from your channel.\n"
-				" \n"
-				"Bantype is a number between 0 and 3 that means:\n"
-				" \n"
-				"0: ban in the form *!user@host\n"
-				"1: ban in the form *!*user@host\n"
-				"2: ban in the form *!*@host\n"
-				"3: ban in the form *!*user@*.domain"));
+		source.Reply(_(
+			"Sets the ban type that will be used by services whenever "
+			"they need to ban someone from your channel."
+			"\n\n"
+			"Bantype is a number between 0 and 3 that means:"
+			"\n\n"
+			"0: ban in the form *!user@host\n"
+			"1: ban in the form *!*user@host\n"
+			"2: ban in the form *!*@host\n"
+			"3: ban in the form *!*user@*.domain"
+		));
 		return true;
 	}
 };
@@ -252,8 +257,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the description for the channel, which shows up with\n"
-				"the \002LIST\002 and \002INFO\002 commands."));
+		source.Reply(_(
+			"Sets the description for the channel, which shows up with "
+			"the \002LIST\002 and \002INFO\002 commands."
+		));
 		return true;
 	}
 };
@@ -322,8 +329,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the founder of a channel. The new nickname must\n"
-				"be a registered one."));
+		source.Reply(_(
+			"Changes the founder of a channel. The new nickname must "
+			"be a registered one."
+		));
 		return true;
 	}
 };
@@ -387,9 +396,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for the given channel. If keep\n"
-				"modes is enabled, services will remember modes set on the channel\n"
-				"and attempt to re-set them the next time the channel is created."));
+		source.Reply(_(
+			"Enables or disables keepmodes for the given channel. If keep "
+			"modes is enabled, services will remember modes set on the channel "
+			"and attempt to re-set them the next time the channel is created."
+		));
 		return true;
 	}
 };
@@ -452,10 +463,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002peace\002 option for a channel.\n"
-				"When \002peace\002 is set, a user won't be able to kick,\n"
-				"ban or remove a channel status of a user that has\n"
-				"a level superior or equal to theirs via %s commands."), source.service->nick.c_str());
+		source.Reply(_(
+				"Enables or disables the \002peace\002 option for a channel. "
+				"When \002peace\002 is set, a user won't be able to kick, "
+				"ban or remove a channel status of a user that has "
+				"a level superior or equal to theirs via %s commands."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 };
@@ -595,26 +609,30 @@ public:
 		BotInfo *ChanServ = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the persistent channel setting.\n"
-				"When persistent is set, the service bot will remain\n"
-				"in the channel when it has emptied of users.\n"
-				" \n"
-				"If your IRCd does not have a permanent (persistent) channel\n"
-				"mode you must have a service bot in your channel to\n"
-				"set persist on, and it can not be unassigned while persist\n"
-				"is on.\n"
-				" \n"
-				"If this network does not have %s enabled and does\n"
-				"not have a permanent channel mode, %s will\n"
-				"join your channel when you set persist on (and leave when\n"
-				"it has been set off).\n"
-				" \n"
-				"If your IRCd has a permanent (persistent) channel mode\n"
-				"and it is set or unset (for any reason, including MODE LOCK),\n"
-				"persist is automatically set and unset for the channel as well.\n"
-				"Additionally, services will set or unset this mode when you\n"
-				"set persist on or off."), BotServ ? BotServ->nick.c_str() : "BotServ",
-				ChanServ ? ChanServ->nick.c_str() : "ChanServ");
+		source.Reply(_(
+				"Enables or disables the persistent channel setting. "
+				"When persistent is set, the service bot will remain "
+				"in the channel when it has emptied of users. "
+				"\n\n"
+				"If your IRCd does not have a permanent (persistent) channel "
+				"mode you must have a service bot in your channel to "
+				"set persist on, and it can not be unassigned while persist "
+				"is on."
+				"\n\n"
+				"If this network does not have %s enabled and does "
+				"not have a permanent channel mode, %s will "
+				"join your channel when you set persist on (and leave when "
+				"it has been set off)."
+				"\n\n"
+				"If your IRCd has a permanent (persistent) channel mode "
+				"and it is set or unset (for any reason, including MODE LOCK), "
+				"persist is automatically set and unset for the channel as well. "
+				"Additionally, services will set or unset this mode when you "
+				"set persist on or off."
+			),
+			BotServ ? BotServ->nick.c_str() : "BotServ",
+			ChanServ ? ChanServ->nick.c_str() : "ChanServ"
+		);
 		return true;
 	}
 };
@@ -675,9 +693,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002restricted access\002 option for a\n"
-				"channel. When \002restricted access\002 is set, users not on the access list will\n"
-				"instead be kicked and banned from the channel."));
+		source.Reply(_(
+			"Enables or disables the \002restricted access\002 option for a "
+			"channel. When \002restricted access\002 is set, users not on the access list will "
+			"instead be kicked and banned from the channel."
+		));
 		return true;
 	}
 };
@@ -738,11 +758,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002secure founder\002 option for a channel.\n"
-			"When \002secure founder\002 is set, only the real founder will be\n"
-			"able to drop the channel, change its founder and its successor,\n"
-			"and not those who have founder level access through\n"
-			"the access/qop command."));
+		source.Reply(_(
+			"Enables or disables the \002secure founder\002 option for a channel. "
+			"When \002secure founder\002 is set, only the real founder will be "
+			"able to drop the channel, change its founder and its successor, "
+			"and not those who have founder level access through "
+			"the access/qop command."
+		));
 		return true;
 	}
 };
@@ -803,9 +825,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002secure ops\002 option for a channel.\n"
-				"When \002secure ops\002 is set, users who are not on the access list\n"
-				"will not be allowed channel operator status."));
+		source.Reply(_(
+			"Enables or disables the \002secure ops\002 option for a channel. "
+			"When \002secure ops\002 is set, users who are not on the access list "
+			"will not be allowed channel operator status."
+		));
 		return true;
 	}
 };
@@ -857,8 +881,8 @@ public:
 		{
 			ci->Extend<bool>("SIGNKICK_LEVEL");
 			ci->Shrink<bool>("SIGNKICK");
-			source.Reply(_("Signed kick option for %s is now \002on\002, but depends of the\n"
-				"level of the user that is using the command."), ci->name.c_str());
+			source.Reply(_("Signed kick option for %s is now \002on\002, but depends of the level of the user that is using the command."),
+				ci->name.c_str());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick level";
 		}
 		else if (params[1].equals_ci("OFF"))
@@ -876,14 +900,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables signed kicks for a\n"
-				"channel.  When \002SIGNKICK\002 is set, kicks issued with\n"
-				"the \002KICK\002 command will have the nick that used the\n"
-				"command in their reason.\n"
-				" \n"
-				"If you use \002LEVEL\002, those who have a level that is superior\n"
-				"or equal to the SIGNKICK level on the channel won't have their\n"
-				"kicks signed."));
+		source.Reply(_(
+			"Enables or disables signed kicks for a "
+			"channel.  When \002SIGNKICK\002 is set, kicks issued with "
+			"the \002KICK\002 command will have the nick that used the "
+			"command in their reason."
+			"\n\n"
+			"If you use \002LEVEL\002, those who have a level that is superior "
+			"or equal to the SIGNKICK level on the channel won't have their "
+			"kicks signed."
+		));
 		return true;
 	}
 };
@@ -962,22 +988,28 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the successor of a channel. If the founder's\n"
-				"nickname expires or is dropped while the channel is still\n"
-				"registered, the successor will become the new founder of the\n"
-				"channel. The successor's nickname must be a registered one.\n"
-				"If there's no successor set, then the first nickname on the\n"
-				"access list (with the highest access, if applicable) will\n"
-				"become the new founder, but if the access list is empty, the\n"
-				"channel will be dropped."));
+		source.Reply(_(
+			"Changes the successor of a channel. If the founder's "
+			"nickname expires or is dropped while the channel is still "
+			"registered, the successor will become the new founder of the "
+			"channel. The successor's nickname must be a registered one. "
+			"If there's no successor set, then the first nickname on the "
+			"access list (with the highest access, if applicable) will "
+			"become the new founder, but if the access list is empty, the "
+			"channel will be dropped."
+		));
+
 		unsigned max_reg = Config->GetModule("chanserv").Get<unsigned>("maxregistered");
 		if (max_reg)
 		{
 			source.Reply(" ");
-			source.Reply(_("Note, however, if the successor already has too many\n"
-				"channels registered (%d), they will not be able to\n"
-				"become the new founder and it will be as if the\n"
-				"channel had no successor set."), max_reg);
+			source.Reply(_(
+					"Note, however, if the successor already has too many "
+					"channels registered (%u), they will not be able to "
+					"become the new founder and it will be as if the "
+					"channel had no successor set."
+				),
+				max_reg);
 		}
 		return true;
 	}
@@ -1036,8 +1068,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets whether the given channel will expire.  Setting this\n"
-				"to ON prevents the channel from expiring."));
+		source.Reply(_(
+			"Sets whether the given channel will expire.  Setting this "
+			"to ON prevents the channel from expiring."
+		));
 		return true;
 	}
 };

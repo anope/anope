@@ -436,51 +436,60 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to manipulate the SNLINE list.  If\n"
-				"a user with a realname matching an SNLINE mask attempts to\n"
-				"connect, services will not allow them to pursue their IRC\n"
-				"session."));
-		source.Reply(_(" \n"
-				"\002SNLINE ADD\002 adds the given realname mask to the SNLINE\n"
-				"list for the given reason (which \002must\002 be given).\n"
-				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"
-				"\0371h30m\037) are not permitted. If a unit specifier is not\n"
-				"included, the default is days (so \037+30\037 by itself means 30\n"
-				"days). To add an SNLINE which does not expire, use \037+0\037.  If the\n"
-				"realname mask to be added starts with a \037+\037, an expiry time must\n"
-				"be given, even if it is the same as the default.  The\n"
-				"current SNLINE default expiry time can be found with the\n"
-				"\002STATS AKILL\002 command.\n"
-				" \n"
-				"\002Note\002: because the realname mask may contain spaces, the\n"
-				"separator between it and the reason is a colon."));
+		source.Reply(_(
+			"Allows Services Operators to manipulate the SNLINE list.  If "
+			"a user with a realname matching an SNLINE mask attempts to "
+			"connect, services will not allow them to pursue their IRC "
+			"session."
+			"\n\n"
+			"\002SNLINE\032ADD\002 adds the given realname mask to the SNLINE "
+			"list for the given reason (which \002must\002 be given). "
+			"\037expiry\037 is specified as an integer followed by one of \037d\037 "
+			"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as "
+			"\0371h30m\037) are not permitted. If a unit specifier is not "
+			"included, the default is days (so \037+30\037 by itself means 30 "
+			"days). To add an SNLINE which does not expire, use \037+0\037.  If the "
+			"realname mask to be added starts with a \037+\037, an expiry time must "
+			"be given, even if it is the same as the default.  The "
+			"current SNLINE default expiry time can be found with the "
+			"\002STATS\032AKILL\002 command. "
+			"\n\n"
+			"\002Note\002: because the realname mask may contain spaces, the "
+			"separator between it and the reason is a colon."
+		));
+
 		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this is desired."), regexengine.c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your mask in // if this is desired."
+				),
+				regexengine.c_str());
 		}
-		source.Reply(_(" \n"
-				"The \002SNLINE DEL\002 command removes the given mask from the\n"
-				"SNLINE list if it is present.  If a list of entry numbers is\n"
-				"given, those entries are deleted.  (See the example for LIST\n"
-				"below.)\n"
-				" \n"
-				"The \002SNLINE LIST\002 command displays the SNLINE list.\n"
-				"If a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
-				"only those entries are shown; for example:\n"
-				"   \002SNLINE LIST 2-5,7-9\002\n"
-				"      Lists SNLINE entries numbered 2 through 5 and 7\n"
-				"      through 9.\n"
-				" \n"
-				"\002SNLINE VIEW\002 is a more verbose version of \002SNLINE LIST\002, and\n"
-				"will show who added an SNLINE, the date it was added, and when\n"
-				"it expires, as well as the realname mask and reason.\n"
-				" \n"
-				"\002SNLINE CLEAR\002 clears all entries of the SNLINE list."));
+
+		source.Reply(" ");
+		source.Reply(_(
+			"The \002SNLINE\032DEL\002 command removes the given mask from the "
+			"SNLINE list if it is present.  If a list of entry numbers is "
+			"given, those entries are deleted.  (See the example for LIST "
+			"below.)"
+			"\n\n"
+			"The \002SNLINE\032LIST\002 command displays the SNLINE list. "
+			"If a wildcard mask is given, only those entries matching the "
+			"mask are displayed.  If a list of entry numbers is given, "
+			"only those entries are shown; for example:\n"
+			"   \002SNLINE\032LIST\0322-5,7-9\002\n"
+			"      Lists SNLINE entries numbered 2 through 5 and 7\n"
+			"      through 9."
+			"\n\n"
+			"\002SNLINE\032VIEW\002 is a more verbose version of \002SNLINE\032LIST\002, and "
+			"will show who added an SNLINE, the date it was added, and when "
+			"it expires, as well as the realname mask and reason."
+			"\n\n"
+			"\002SNLINE\032CLEAR\002 clears all entries of the SNLINE list."
+		));
 		return true;
 	}
 };
@@ -666,52 +675,61 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to manipulate the SQLINE list.  If\n"
-				"a user with a nick matching an SQLINE mask attempts to\n"
-				"connect, services will not allow them to pursue their IRC\n"
-				"session.\n"
-				"If the first character of the mask is #, services will\n"
-				"prevent the use of matching channels. If the mask is a\n"
-				"regular expression, the expression will be matched against\n"
-				"channels too."));
-		source.Reply(_(" \n"
-				"\002SQLINE ADD\002 adds the given (nick/channel) mask to the SQLINE\n"
-				"list for the given reason (which \002must\002 be given).\n"
-				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"
-				"\0371h30m\037) are not permitted. If a unit specifier is not\n"
-				"included, the default is days (so \037+30\037 by itself means 30\n"
-				"days). To add an SQLINE which does not expire, use \037+0\037.\n"
-				"If the mask to be added starts with a \037+\037, an expiry time\n"
-				"must be given, even if it is the same as the default. The\n"
-				"current SQLINE default expiry time can be found with the\n"
-				"\002STATS AKILL\002 command."));
+		source.Reply(_(
+			"Allows Services Operators to manipulate the SQLINE list.  If "
+			"a user with a nick matching an SQLINE mask attempts to "
+			"connect, services will not allow them to pursue their IRC "
+			"session. "
+			"If the first character of the mask is #, services will "
+			"prevent the use of matching channels. If the mask is a "
+			"regular expression, the expression will be matched against "
+			"channels too."
+			"\n\n"
+			"\002SQLINE\032ADD\002 adds the given (nick/channel) mask to the SQLINE "
+			"list for the given reason (which \002must\002 be given). "
+			"\037expiry\037 is specified as an integer followed by one of \037d\037 "
+			"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as "
+			"\0371h30m\037) are not permitted. If a unit specifier is not "
+			"included, the default is days (so \037+30\037 by itself means 30 "
+			"days). To add an SQLINE which does not expire, use \037+0\037. "
+			"If the mask to be added starts with a \037+\037, an expiry time "
+			"must be given, even if it is the same as the default. The "
+			"current SQLINE default expiry time can be found with the "
+			"\002STATS\032AKILL\002 command."
+		));
+
 		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this is desired."), regexengine.c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your mask in // if this is desired."
+				),
+				regexengine.c_str());
 		}
-		source.Reply(_(" \n"
-				"The \002SQLINE DEL\002 command removes the given mask from the\n"
-				"SQLINE list if it is present. If a list of entry numbers is\n"
-				"given, those entries are deleted. (See the example for LIST\n"
-				"below.)\n"
-				" \n"
-				"The \002SQLINE LIST\002 command displays the SQLINE list.\n"
-				"If a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed. If a list of entry numbers is given,\n"
-				"only those entries are shown; for example:\n"
-				"   \002SQLINE LIST 2-5,7-9\002\n"
-				"      Lists SQLINE entries numbered 2 through 5 and 7\n"
-				"      through 9.\n"
-				" \n"
-				"\002SQLINE VIEW\002 is a more verbose version of \002SQLINE LIST\002, and\n"
-				"will show who added an SQLINE, the date it was added, and when\n"
-				"it expires, as well as the mask and reason.\n"
-				" \n"
-				"\002SQLINE CLEAR\002 clears all entries of the SQLINE list."));
+
+		source.Reply(" ");
+		source.Reply(_(
+			"The \002SQLINE\032DEL\002 command removes the given mask from the "
+			"SQLINE list if it is present. If a list of entry numbers is "
+			"given, those entries are deleted. (See the example for LIST "
+			"below.)"
+			"\n\n"
+			"The \002SQLINE\032LIST\002 command displays the SQLINE list. "
+			"If a wildcard mask is given, only those entries matching the "
+			"mask are displayed. If a list of entry numbers is given, "
+			"only those entries are shown; for example:\n"
+			"   \002SQLINE\032LIST\0322-5,7-9\002\n"
+			"      Lists SQLINE entries numbered 2 through 5 and 7\n"
+			"      through 9."
+			"\n\n"
+			"\002SQLINE\032VIEW\002 is a more verbose version of \002SQLINE\032LIST\002, and "
+			"will show who added an SQLINE, the date it was added, and when "
+			"it expires, as well as the mask and reason."
+			"\n\n"
+			"\002SQLINE\032CLEAR\002 clears all entries of the SQLINE list."
+		));
 		return true;
 	}
 };

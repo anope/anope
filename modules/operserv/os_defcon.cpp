@@ -235,9 +235,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("The defcon system can be used to implement a pre-defined\n"
-				"set of restrictions to services useful during an attempted\n"
-				"attack on the network."));
+		source.Reply(_(
+			"The defcon system can be used to implement a pre-defined "
+			"set of restrictions to services useful during an attempted "
+			"attack on the network."
+		));
 		return true;
 	}
 };

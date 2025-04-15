@@ -111,11 +111,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Tells %s that you are really the owner of this\n"
-				"nick.  Many commands require you to authenticate yourself\n"
-				"with this command before you use them.  The password\n"
-				"should be the same one you sent with the \002REGISTER\002\n"
-				"command."), source.service->nick.c_str());
+		source.Reply(_(
+				"Tells %s that you are really the owner of this "
+				"nick.  Many commands require you to authenticate yourself "
+				"with this command before you use them.  The password "
+				"should be the same one you sent with the \002REGISTER\002 "
+				"command."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 };

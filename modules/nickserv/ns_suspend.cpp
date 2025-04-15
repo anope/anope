@@ -157,10 +157,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Suspends a registered nickname, which prevents it from being used\n"
-				"while keeping all the data for that nick. If an expiry is given\n"
-				"the nick will be unsuspended after that period of time, else the\n"
-				"default expiry from the configuration is used."));
+		source.Reply(_(
+			"Suspends a registered nickname, which prevents it from being used "
+			"while keeping all the data for that nick. If an expiry is given "
+			"the nick will be unsuspended after that period of time, else the "
+			"default expiry from the configuration is used."
+		));
 		return true;
 	}
 };

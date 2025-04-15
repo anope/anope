@@ -30,9 +30,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Configures bot options.\n"
-			" \n"
-			"Available options:"));
+		source.Reply(_(
+			"Configures bot options."
+			"\n\n"
+			"Available options:"
+		));
 		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options").Get<bool>("hideregisteredcommands");
 		Anope::string this_name = source.command;
@@ -58,8 +60,7 @@ public:
 				}
 			}
 		}
-		source.Reply(_("Type \002%s \037option\037\002 for more information on a\n"
-				"particular option."),
+		source.Reply(_("Type \002%s\032\037option\037\002 for more information on a particular option."),
 			source.service->GetQueryCommand("generic/help", this_name).c_str());
 
 		return true;
@@ -151,11 +152,13 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_(" \n"
-				"Sets the time bot bans expire in. If enabled, any bans placed by\n"
-				"bots, such as flood kicker, badwords kicker, etc. will automatically\n"
-				"be removed after the given time. Set to 0 to disable bans from\n"
-				"automatically expiring."));
+		source.Reply(" ");
+		source.Reply(_(
+			"Sets the time bot bans expire in. If enabled, any bans placed by "
+			"bots, such as flood kicker, badwords kicker, etc. will automatically "
+			"be removed after the given time. Set to 0 to disable bans from "
+			"automatically expiring."
+		));
 		return true;
 	}
 };
@@ -204,9 +207,11 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_(" \n"
-			"This option prevents a bot from being assigned to a\n"
-			"channel by users that aren't IRC Operators."));
+		source.Reply(" ");
+		source.Reply(_(
+			"This option prevents a bot from being assigned to a "
+			"channel by users that aren't IRC Operators."
+		));
 		return true;
 	}
 };

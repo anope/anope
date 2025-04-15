@@ -97,17 +97,24 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command is used by several commands as a way to confirm\n"
-				"changes made to your account.\n"
-				" \n"
-				"This is most commonly used to confirm your email address once\n"
-				"you register or change it.\n"
-				" \n"
-				"This is also used after the RESETPASS command has been used to\n"
-				"force identify you to your nick so you may change your password."));
+		source.Reply(_(
+			"This command is used by several commands as a way to confirm "
+			"changes made to your account."
+			"\n\n"
+			"This is most commonly used to confirm your email address once "
+			"you register or change it."
+			"\n\n"
+			"This is also used after the RESETPASS command has been used to "
+			"force identify you to your nick so you may change your password."
+		));
+
 		if (source.HasPriv("nickserv/confirm"))
-			source.Reply(_("Additionally, Services Operators with the \037nickserv/confirm\037 permission can\n"
-				"replace \037passcode\037 with a users nick to force validate them."));
+		{
+			source.Reply(_(
+				"Additionally, Services Operators with the \037nickserv/confirm\037 permission can "
+				"replace \037passcode\037 with a users nick to force validate them."
+			));
+		}
 		return true;
 	}
 
@@ -274,39 +281,46 @@ public:
 		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Registers your nickname in the %s database. Once\n"
-				"your nick is registered, you can use the \002SET\002 and \002ACCESS\002\n"
-				"commands to configure your nick's settings as you like\n"
-				"them. Make sure you remember the password you use when\n"
-				"registering - you'll need it to make changes to your nick\n"
-				"later. (Note that \002case matters!\002 \037ANOPE\037, \037Anope\037, and\n"
-				"\037anope\037 are all different passwords!)\n"
-				" \n"
-				"Guidelines on choosing passwords:\n"
-				" \n"
-				"Passwords should not be easily guessable. For example,\n"
-				"using your real name as a password is a bad idea. Using\n"
-				"your nickname as a password is a much worse idea ;) and,\n"
-				"in fact, %s will not allow it. Also, short\n"
-				"passwords are vulnerable to trial-and-error searches, so\n"
-				"you should choose a password at least %u characters long.\n"
-				"Finally, the space character cannot be used in passwords."),
-				source.service->nick.c_str(), source.service->nick.c_str(),
-				minpasslen);
+		source.Reply(_(
+				"Registers your nickname in the %s database. Once "
+				"your nick is registered, you can use the \002SET\002 and \002ACCESS\002 "
+				"commands to configure your nick's settings as you like "
+				"them. Make sure you remember the password you use when "
+				"registering - you'll need it to make changes to your nick "
+				"later. (Note that \002case matters!\002 \037ANOPE\037, \037Anope\037, and "
+				"\037anope\037 are all different passwords!) "
+				"\n\n"
+				"Guidelines on choosing passwords:"
+				"\n\n"
+				"Passwords should not be easily guessable. For example, "
+				"using your real name as a password is a bad idea. Using "
+				"your nickname as a password is a much worse idea ;) and, "
+				"in fact, %s will not allow it. Also, short "
+				"passwords are vulnerable to trial-and-error searches, so "
+				"you should choose a password at least %u characters long. "
+				"Finally, the space character cannot be used in passwords."
+			),
+			source.service->nick.c_str(),
+			source.service->nick.c_str(),
+			minpasslen);
 
 		if (!Config->GetModule("nickserv").Get<bool>("forceemail", "yes"))
 		{
 			source.Reply(" ");
-			source.Reply(_("The \037email\037 parameter is optional and will set the email\n"
-					"for your nick immediately. You may also wish to \002SET HIDE\002 it\n"
-					"after registering if it isn't the default setting already."));
+			source.Reply(_(
+				"The \037email\037 parameter is optional and will set the email "
+				"for your nick immediately. You may also wish to \002SET\032HIDE\002 it "
+				"after registering if it isn't the default setting already."
+			));
 		}
 
 		source.Reply(" ");
-		source.Reply(_("This command also creates a new group for your nickname,\n"
-				"that will allow you to register other nicks later sharing\n"
-				"the same configuration, the same set of memos and the\n"
-				"same channel privileges."));
+		source.Reply(_(
+			"This command also creates a new group for your nickname, "
+			"that will allow you to register other nicks later sharing "
+			"the same configuration, the same set of memos and the "
+			"same channel privileges."
+		));
 		return true;
 	}
 };

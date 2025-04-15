@@ -120,13 +120,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Tells %s to remove all bans preventing you or the given\n"
-				"user from entering the given channel. If no channel is\n"
-				"given, all bans affecting you in channels you have access\n"
-				"in are removed.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 access and above\n"
-				"on the channel."), source.service->nick.c_str());
+		source.Reply(_(
+				"Tells %s to remove all bans preventing you or the given "
+				"user from entering the given channel. If no channel is "
+				"given, all bans affecting you in channels you have access "
+				"in are removed."
+				"\n\n"
+				"By default, limited to AOPs or those with level 5 access and above "
+				"on the channel."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 };

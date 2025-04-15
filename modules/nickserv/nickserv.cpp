@@ -390,10 +390,12 @@ public:
 
 		if (block.Get<bool>("forceemail", "yes") && u->Account()->email.empty())
 		{
-			u->SendMessage(NickServ, _("You must now supply an email for your nick.\n"
-							"This email will allow you to retrieve your password in\n"
-							"case you forget it."));
-			u->SendMessage(NickServ, _("Type \002%s \037email\037\002 in order to set your email."),
+			u->SendMessage(NickServ, _(
+					"You must now supply an email for your nick. "
+					"This email will allow you to retrieve your password in "
+					"case you forget it. "
+					"Type \002%s\032\037email\037\002 in order to set your email."
+				),
 				NickServ->GetQueryCommand("nickserv/set/email").c_str());
 		}
 
@@ -497,20 +499,34 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *NickServ)
 			return EVENT_CONTINUE;
+
 		if (!Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
-			source.Reply(_("\002%s\002 allows you to register a nickname and\n"
-				"prevent others from using it. The following\n"
-				"commands allow for registration and maintenance of\n"
-				"nicknames; to use them, type \002%s \037command\037\002.\n"
-				"For more information on a specific command, type\n"
-				"\002%s \037command\037\002.\n"), NickServ->nick.c_str(), NickServ->GetQueryCommand().c_str(), NickServ->GetQueryCommand({}, source.command).c_str());
+		{
+			source.Reply(_(
+					"\002%s\002 allows you to register a nickname and "
+					"prevent others from using it. The following "
+					"commands allow for registration and maintenance of "
+					"nicknames; to use them, type \002%s\032\037command\037\002. "
+					"For more information on a specific command, type "
+					"\002%s\032\037command\037\002."
+				),
+				NickServ->nick.c_str(),
+				NickServ->GetQueryCommand().c_str(),
+				NickServ->GetQueryCommand({}, source.command).c_str());
+		}
 		else
-			source.Reply(_("\002%s\002 allows you to register an account.\n"
-				"The following commands allow for registration and maintenance of\n"
-				"accounts; to use them, type \002%s \037command\037\002.\n"
-				"For more information on a specific command, type\n"
-				"\002%s \037command\037\002.\n"),
-				NickServ->nick.c_str(), NickServ->GetQueryCommand().c_str(), NickServ->GetQueryCommand({}, source.command.c_str()).c_str());
+		{
+			source.Reply(_(
+					"\002%s\002 allows you to register an account. "
+					"The following commands allow for registration and maintenance of "
+					"accounts; to use them, type \002%s\032\037command\037\002. "
+					"For more information on a specific command, type "
+					"\002%s\032\037command\037\002."
+				),
+				NickServ->nick.c_str(),
+				NickServ->GetQueryCommand().c_str(),
+				NickServ->GetQueryCommand({}, source.command.c_str()).c_str());
+		}
 		return EVENT_CONTINUE;
 	}
 
@@ -518,17 +534,28 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *NickServ)
 			return;
+
 		if (source.IsServicesOper())
-			source.Reply(_(" \n"
-				"Services Operators can also drop any nickname without needing\n"
-				"to identify for the nick, and may view the access list for\n"
-				"any nickname."));
+		{
+			source.Reply(" ");
+			source.Reply(_(
+				"Services Operators can also drop any nickname without needing "
+				"to identify for the nick, and may view the access list for "
+				"any nickname."
+			));
+		}
+
 		time_t nickserv_expire = Config->GetModule(this).Get<time_t>("expire", "1y");
 		if (nickserv_expire >= 86400)
-			source.Reply(_(" \n"
-				"Accounts that are not used anymore are subject to\n"
-				"the automatic expiration, i.e. they will be deleted\n"
-				"after %lu days if not used."), (unsigned long)nickserv_expire / 86400);
+		{
+			source.Reply(" ");
+			source.Reply(_(
+					"Accounts that are not used anymore are subject to "
+					"the automatic expiration, i.e. they will be deleted "
+					"after %lu days if not used."
+				),
+				(unsigned long)nickserv_expire / 86400);
+		}
 	}
 
 	void OnNickCoreCreate(NickCore *nc) override

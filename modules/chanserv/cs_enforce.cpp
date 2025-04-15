@@ -240,19 +240,21 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enforce various channel modes and set options. The \037channel\037\n"
-			"option indicates what channel to enforce the modes and options\n"
-			"on. The \037what\037 option indicates what modes and options to\n"
-			"enforce, and can be any of \002SECUREOPS\002, \002RESTRICTED\002, \002REGONLY\002, \002SSLONLY\002,\n"
-			"\002BANS\002, or \002LIMIT\002.\n"
-			" \n"
-			"Use \002SECUREOPS\002 to enforce the SECUREOPS option, even if it is not\n"
-			"enabled. Use \002RESTRICTED\002 to enforce the RESTRICTED option, also\n"
-			"if it's not enabled. Use \002REGONLY\002 to kick all unregistered users\n"
-			"from the channel. Use \002SSLONLY\002 to kick all users not using a secure\n"
-			"connection from the channel. \002BANS\002 will enforce bans on the channel by\n"
-			"kicking users affected by them, and \002LIMIT\002 will kick users until the\n"
-			"user count drops below the channel limit, if one is set."));
+		source.Reply(_(
+			"Enforce various channel modes and set options. The \037channel\037 "
+			"option indicates what channel to enforce the modes and options "
+			"on. The \037what\037 option indicates what modes and options to "
+			"enforce, and can be any of \002SECUREOPS\002, \002RESTRICTED\002, \002REGONLY\002, \002SSLONLY\002, "
+			"\002BANS\002, or \002LIMIT\002."
+			"\n\n"
+			"Use \002SECUREOPS\002 to enforce the SECUREOPS option, even if it is not "
+			"enabled. Use \002RESTRICTED\002 to enforce the RESTRICTED option, also "
+			"if it's not enabled. Use \002REGONLY\002 to kick all unregistered users "
+			"from the channel. Use \002SSLONLY\002 to kick all users not using a secure "
+			"connection from the channel. \002BANS\002 will enforce bans on the channel by "
+			"kicking users affected by them, and \002LIMIT\002 will kick users until the "
+			"user count drops below the channel limit, if one is set."
+		));
 		return true;
 	}
 };

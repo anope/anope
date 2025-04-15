@@ -84,29 +84,41 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Registers a channel in the %s database.  In order\n"
-			"to use this command, you must first be a channel operator\n"
-			"on the channel you're trying to register.\n"
-			"The description, which is optional, is a\n"
-			"general description of the channel's purpose.\n"
-			" \n"
-			"When you register a channel, you are recorded as the\n"
-			"\"founder\" of the channel. The channel founder is allowed\n"
-			"to change all of the channel settings for the channel;\n"
-			"%s will also automatically give the founder\n"
-			"channel operator privileges when they enter the channel."),
-				source.service->nick.c_str(), source.service->nick.c_str());
+		source.Reply(_(
+				"Registers a channel in the %s database.  In order "
+				"to use this command, you must first be a channel operator "
+				"on the channel you're trying to register. "
+				"The description, which is optional, is a "
+				"general description of the channel's purpose. "
+				"\n\n"
+				"When you register a channel, you are recorded as the "
+				"\"founder\" of the channel. The channel founder is allowed "
+				"to change all of the channel settings for the channel; "
+				"%s will also automatically give the founder "
+				"channel operator privileges when they enter the channel."
+			),
+			source.service->nick.c_str(),
+			source.service->nick.c_str());
+
 		BotInfo *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/access", bi, cmd))
-			source.Reply(_(" \n"
-				"See the \002%s\002 command (\002%s ACCESS\002) for\n"
-				"information on giving a subset of these privileges to\n"
-				"other channel users.\n"),
-			cmd.c_str(), bi->GetQueryCommand("generic/help").c_str());
-		source.Reply(_(" \n"
-			"NOTICE: In order to register a channel, you must have\n"
+		{
+			source.Reply(" ");
+			source.Reply(_(
+					"See the \002%s\002 command (\002%s\032ACCESS\002) for "
+					"information on giving a subset of these privileges to "
+					"other channel users."
+				),
+				cmd.c_str(),
+				bi->GetQueryCommand("generic/help").c_str());
+		}
+
+		source.Reply(" ");
+		source.Reply(_(
+			"NOTICE: In order to register a channel, you must have "
 			"first registered your nickname."));
+
 		return true;
 	}
 };

@@ -131,10 +131,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Kicks a specified nick from a channel.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 access\n"
-				"and above on the channel. Channel founders can also specify masks."));
+		source.Reply(_(
+			"Kicks a specified nick from a channel."
+			"\n\n"
+			"By default, limited to AOPs or those with level 5 access "
+			"and above on the channel. Channel founders can also specify masks."
+		));
 		return true;
 	}
 };

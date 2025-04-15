@@ -240,12 +240,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Bans a given nick or mask on a channel. An optional expiry may\n"
-				"be given to cause services to remove the ban after a set amount\n"
-				"of time.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 access\n"
-				"and above on the channel. Channel founders may ban masks."));
+		source.Reply(_(
+			"Bans a given nick or mask on a channel. An optional expiry may "
+			"be given to cause services to remove the ban after a set amount "
+			"of time."
+			"\n\n"
+			"By default, limited to AOPs or those with level 5 access "
+			"and above on the channel. Channel founders may ban masks."
+		));
 		return true;
 	}
 };

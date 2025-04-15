@@ -774,29 +774,35 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Mainly controls mode locks and mode access (which is different from channel access)\n"
-			"on a channel.\n"
-			" \n"
-			"The \002%s LOCK\002 command allows you to add, delete, and view mode locks on a channel.\n"
-			"If a mode is locked on or off, services will not allow that mode to be changed. The \002SET\002\n"
-			"command will clear all existing mode locks and set the new one given, while \002ADD\002 and \002DEL\002\n"
-			"modify the existing mode lock.\n"
-			"Example:\n"
-			"     \002MODE #channel LOCK ADD +bmnt *!*@*aol*\002\n"
-			" \n"
-			"The \002%s SET\002 command allows you to set modes through services. Wildcards * and ? may\n"
-			"be given as parameters for list and status modes.\n"
-			"Example:\n"
-			"     \002MODE #channel SET +v *\002\n"
-			"       Sets voice status to all users in the channel.\n"
-			" \n"
-			"     \002MODE #channel SET -b ~c:*\n"
-			"       Clears all extended bans that start with ~c:\n"
-			" \n"
-			"The \002%s CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be\n"
-			"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If \037what\037\n"
-			"is not given then all basic modes are removed."),
-			source.command.upper().c_str(), source.command.upper().c_str(), source.command.upper().c_str());
+		source.Reply(_(
+				"Mainly controls mode locks and mode access (which is different from channel access) "
+				"on a channel."
+				"\n\n"
+				"The \002%s\032LOCK\002 command allows you to add, delete, and view mode locks on a channel. "
+				"If a mode is locked on or off, services will not allow that mode to be changed. The \002SET\002 "
+				"command will clear all existing mode locks and set the new one given, while \002ADD\002 and \002DEL\002 "
+				"modify the existing mode lock."
+				"\n\n"
+				"Example:\n"
+				"     \002MODE\032#channel\032LOCK\032ADD\032+bmnt\032*!*@*aol*\002\n"
+				"\n\n"
+				"The \002%s\032SET\002 command allows you to set modes through services. Wildcards * and ? may "
+				"be given as parameters for list and status modes."
+				"\n\n"
+				"Example:\n"
+				"     \002MODE\032#channel\032SET\032+v\032*\002\n"
+				"       Sets voice status to all users in the channel."
+				"\n\n"
+				"     \002MODE\032#channel\032SET\032-b\032~c:*\n"
+				"       Clears all extended bans that start with ~c:"
+				"\n\n"
+				"The \002%s\032CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be "
+				"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If \037what\037 "
+				"is not given then all basic modes are removed."
+			),
+			source.command.upper().c_str(),
+			source.command.upper().c_str(),
+			source.command.upper().c_str());
 		return true;
 	}
 };
@@ -924,13 +930,15 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		if (m.first)
-			source.Reply(_("Gives %s status to the selected nicks on a channel. If \037nick\037 is\n"
-					"not given, it will %s you."),
-					m.second.upper().c_str(), m.second.lower().c_str());
+		{
+			source.Reply(_("Gives %s status to the selected nicks on a channel. If \037nick\037 is not given, it will %s you."),
+				m.second.upper().c_str(), m.second.lower().c_str());
+		}
 		else
-			source.Reply(_("Removes %s status from the selected nicks on a channel. If \037nick\037 is\n"
-					"not given, it will de%s you."),
-					 m.second.upper().c_str(), m.second.lower().c_str());
+		{
+			source.Reply(_("Removes %s status from the selected nicks on a channel. If \037nick\037 is not given, it will de%s you."),
+				m.second.upper().c_str(), m.second.lower().c_str());
+		}
 		source.Reply(" ");
 		source.Reply(_("You must have the %s(ME) privilege on the channel to use this command."), m.second.upper().c_str());
 

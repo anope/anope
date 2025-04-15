@@ -67,12 +67,14 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_(" \n"
-			"Enables or disables \002greet\002 mode on a channel.\n"
-			"When it is enabled, the bot will display greet\n"
-			"messages of users joining the channel, provided\n"
-			"they have enough access to the channel."));
-			return true;
+		source.Reply(" ");
+		source.Reply(_(
+			"Enables or disables \002greet\002 mode on a channel. "
+			"When it is enabled, the bot will display greet "
+			"messages of users joining the channel, provided "
+			"they have enough access to the channel."
+		));
+		return true;
 	}
 };
 
@@ -130,10 +132,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Makes the given message the greet of your nickname, that\n"
-				"will be displayed when joining a channel that has GREET\n"
-				"option enabled, provided that you have the necessary\n"
-				"access on it."));
+		source.Reply(_(
+			"Makes the given message the greet of your nickname, that "
+			"will be displayed when joining a channel that has GREET "
+			"option enabled, provided that you have the necessary "
+			"access on it."
+		));
 		return true;
 	}
 };
@@ -157,10 +161,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Makes the given message the greet of the nickname, that\n"
-				"will be displayed when joining a channel that has GREET\n"
-				"option enabled, provided that the user has the necessary\n"
-				"access on it."));
+		source.Reply(_(
+			"Makes the given message the greet of the nickname, that "
+			"will be displayed when joining a channel that has GREET "
+			"option enabled, provided that the user has the necessary "
+			"access on it."
+		));
 		return true;
 	}
 };

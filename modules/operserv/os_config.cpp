@@ -122,13 +122,15 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to change and view configuration settings.\n"
-				"Settings changed by this command are temporary and will not be reflected\n"
-				"back into the configuration file, and will be lost if Anope is shut down,\n"
-				"restarted, or the configuration is reloaded.\n"
-				" \n"
-				"Example:\n"
-				"     \002MODIFY nickserv regdelay 15m\002"));
+		source.Reply(_(
+			"Allows you to change and view configuration settings. "
+			"Settings changed by this command are temporary and will not be reflected "
+			"back into the configuration file, and will be lost if Anope is shut down, "
+			"restarted, or the configuration is reloaded."
+			"\n\n"
+			"Example:\n"
+			"     \002MODIFY\032nickserv\032regdelay\03215m\002"
+		));
 		return true;
 	}
 };

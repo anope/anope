@@ -128,10 +128,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to change modes for any channel.\n"
-				"Parameters are the same as for the standard /MODE command.\n"
-				"Alternatively, CLEAR may be given to clear all modes on the channel.\n"
-				"If CLEAR ALL is given then all modes, including user status, is removed."));
+		source.Reply(_(
+			"Allows Services Operators to change modes for any channel. "
+			"Parameters are the same as for the standard /MODE command. "
+			"Alternatively, CLEAR may be given to clear all modes on the channel. "
+			"If CLEAR\032ALL is given then all modes, including user status, is removed."
+		));
 		return true;
 	}
 };
@@ -169,8 +171,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to change modes for any user.\n"
-				"Parameters are the same as for the standard /MODE command."));
+		source.Reply(_(
+			"Allows Services Operators to change modes for any user. "
+			"Parameters are the same as for the standard /MODE command."
+		));
 		return true;
 	}
 };

@@ -354,24 +354,26 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Modifies or displays the certificate list for your nick.\n"
-				"If you connect to IRC and provide a client certificate with a\n"
-				"matching fingerprint in the cert list, you will be\n"
-				"automatically identified to services. Services Operators\n"
-				"may provide a nick to modify other users' certificate lists.\n"
-				" \n"));
-		source.Reply(_("Examples:\n"
-				" \n"
-				"    \002CERT ADD\002\n"
-				"        Adds your current fingerprint to the certificate list and\n"
-				"        automatically identifies you when you connect to IRC\n"
-				"        using this fingerprint.\n"
-				" \n"
-				"    \002CERT DEL <fingerprint>\002\n"
-				"        Removes the fingerprint <fingerprint> from your certificate list.\n"
-				" \n"
-				"    \002CERT LIST\002\n"
-				"        Displays the current certificate list."));
+		source.Reply(_(
+			"Modifies or displays the certificate list for your nick. "
+			"If you connect to IRC and provide a client certificate with a "
+			"matching fingerprint in the cert list, you will be "
+			"automatically identified to services. Services Operators "
+			"may provide a nick to modify other users' certificate lists."
+			"\n\n"
+			"Examples:"
+			"\n\n"
+			"    \002CERT\032ADD\002\n"
+			"        Adds your current fingerprint to the certificate list and\n"
+			"        automatically identifies you when you connect to IRC\n"
+			"        using this fingerprint."
+			"\n\n"
+			"    \002CERT\032DEL\032<fingerprint>\002\n"
+			"        Removes the fingerprint <fingerprint> from your certificate list."
+			"\n\n"
+			"    \002CERT\032LIST\002\n"
+			"        Displays the current certificate list."
+		));
 		return true;
 	}
 };

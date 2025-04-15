@@ -67,9 +67,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command allows users to set the vhost of their\n"
-				"CURRENT nick to be the vhost for all nicks in the same\n"
-				"group."));
+		source.Reply(_(
+			"This command allows users to set the vhost of their "
+			"CURRENT nick to be the vhost for all nicks in the same "
+			"group."
+		));
 		return true;
 	}
 };

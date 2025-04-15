@@ -381,24 +381,29 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to make services ignore a nick or mask\n"
-				"for a certain time or until the next restart. The default\n"
-				"time format is seconds. You can specify it by using units.\n"
-				"Valid units are: \037s\037 for seconds, \037m\037 for minutes,\n"
-				"\037h\037 for hours and \037d\037 for days.\n"
-				"Combinations of these units are not permitted.\n"
-				"To make services permanently ignore the user, type 0 as time.\n"
-				"When adding a \037mask\037, it should be in the format nick!user@host,\n"
-				"everything else will be considered a nick. Wildcards are permitted.\n"
-				" \n"
-				"Ignores will not be enforced on IRC Operators."));
+		source.Reply(_(
+			"Allows Services Operators to make services ignore a nick or mask "
+			"for a certain time or until the next restart. The default "
+			"time format is seconds. You can specify it by using units. "
+			"Valid units are: \037s\037 for seconds, \037m\037 for minutes, "
+			"\037h\037 for hours and \037d\037 for days. "
+			"Combinations of these units are not permitted. "
+			"To make services permanently ignore the user, type 0 as time. "
+			"When adding a \037mask\037, it should be in the format nick!user@host, "
+			"everything else will be considered a nick. Wildcards are permitted."
+			"\n\n"
+			"Ignores will not be enforced on IRC Operators."
+		));
 
 		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), regexengine.c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your pattern in // if this is desired."
+				),
+				regexengine.c_str());
 		}
 
 		return true;

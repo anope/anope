@@ -197,57 +197,79 @@ public:
 		{
 			this->SendSyntax(source);
 			source.Reply(" ");
-			source.Reply(_("Sets various global services options.  Option names\n"
-					"currently defined are:\n"
-					"    READONLY   Set read-only or read-write mode\n"
-					"    DEBUG      Activate or deactivate debug mode\n"
-					"    NOEXPIRE   Activate or deactivate no expire mode\n"
-					"    SUPERADMIN Activate or deactivate super admin mode\n"
-					"    LIST       List the options"));
+			source.Reply(_(
+				"Sets various global services options.  Option names "
+				"currently defined are:"
+				"\n\n"
+				"    READONLY   Set read-only or read-write mode\n"
+				"    DEBUG      Activate or deactivate debug mode\n"
+				"    NOEXPIRE   Activate or deactivate no expire mode\n"
+				"    SUPERADMIN Activate or deactivate super admin mode\n"
+				"    LIST       List the options"
+			));
 		}
 		else if (subcommand.equals_ci("LIST"))
-			source.Reply(_("Syntax: \002LIST\002\n"
-					" \n"
-					"Display the various %s settings."), source.service->nick.c_str());
+		{
+			source.Reply(_(
+					"Syntax: \002LIST\002"
+					"\n\n"
+					"Display the various %s settings."
+				),
+				source.service->nick.c_str());
+		}
 		else if (subcommand.equals_ci("READONLY"))
-			source.Reply(_("Syntax: \002READONLY {ON | OFF}\002\n"
-					" \n"
-					"Sets read-only mode on or off.  In read-only mode, normal\n"
-					"users will not be allowed to modify any services data,\n"
-					"including channel access lists, etc.  Server operators\n"
-					"with sufficient services privileges will be able to modify\n"
-					"Services' AKILL, SQLINE, SNLINE and ignore lists, drop,\n"
-					"suspend or forbid nicknames and channels, and manage news,\n"
-					"oper info and DNS, but any such changes will not be saved\n"
-					"unless read-only mode is deactivated before services are\n"
-					"terminated or restarted.\n"
-					" \n"
-					"This option is equivalent to the command-line option\n"
-					"\002--readonly\002."));
+		{
+			source.Reply(_(
+				"Syntax: \002READONLY {ON | OFF}\002"
+				"\n\n"
+				"Sets read-only mode on or off.  In read-only mode, normal "
+				"users will not be allowed to modify any services data, "
+				"including channel access lists, etc.  Server operators "
+				"with sufficient services privileges will be able to modify "
+				"Services' AKILL, SQLINE, SNLINE and ignore lists, drop, "
+				"suspend or forbid nicknames and channels, and manage news, "
+				"oper info and DNS, but any such changes will not be saved "
+				"unless read-only mode is deactivated before services are "
+				"terminated or restarted."
+				"\n\n"
+				"This option is equivalent to the command-line option "
+				"\002--readonly\002."
+			));
+		}
 		else if (subcommand.equals_ci("DEBUG"))
-			source.Reply(_("Syntax: \002DEBUG {ON | OFF}\002\n"
-					" \n"
-					"Sets debug mode on or off.\n"
-					" \n"
-					"This option is equivalent to the command-line option\n"
-					"\002--debug\002."));
+		{
+			source.Reply(_(
+				"Syntax: \002DEBUG {ON | OFF}\002"
+				"\n\n"
+				"Sets debug mode on or off."
+				"\n\n"
+				"This option is equivalent to the command-line option "
+				"\002--debug\002."
+			));
+		}
 		else if (subcommand.equals_ci("NOEXPIRE"))
-			source.Reply(_("Syntax: \002NOEXPIRE {ON | OFF}\002\n"
-					" \n"
-					"Sets no expire mode on or off. In no expire mode, nicks,\n"
-					"channels, akills and exceptions won't expire until the\n"
-					"option is unset.\n"
-					" \n"
-					"This option is equivalent to the command-line option\n"
-					"\002--noexpire\002."));
+			source.Reply(_(
+				"Syntax: \002NOEXPIRE {ON | OFF}\002"
+				"\n\n"
+				"Sets no expire mode on or off. In no expire mode, nicks, "
+				"channels, akills and exceptions won't expire until the "
+				"option is unset."
+				"\n\n"
+				"This option is equivalent to the command-line option "
+				"\002--noexpire\002."
+			));
 		else if (subcommand.equals_ci("SUPERADMIN"))
-			source.Reply(_("Syntax: \002SUPERADMIN {ON | OFF}\002\n"
-					" \n"
-					"Setting this will grant you extra privileges such as the\n"
-					"ability to be \"founder\" on all channel's etc...\n"
-					" \n"
-					"This option is \002not\002 persistent, and should only be used when\n"
-					"needed, and set back to OFF when no longer needed."));
+		{
+			source.Reply(_(
+				"Syntax: \002SUPERADMIN {ON | OFF}\002"
+				"\n\n"
+				"Setting this will grant you extra privileges such as the "
+				"ability to be \"founder\" on all channels, etc..."
+				"\n\n"
+				"This option is \002not\002 persistent, and should only be used when "
+				"needed, and set back to OFF when no longer needed."
+			));
+		}
 		else
 			return false;
 		return true;

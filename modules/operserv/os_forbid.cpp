@@ -457,15 +457,20 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Forbid allows you to forbid usage of certain nicknames, channels,\n"
-				"and email addresses. Wildcards are accepted for all entries."));
+		source.Reply(_(
+			"Forbid allows you to forbid usage of certain nicknames, channels, "
+			"and email addresses. Wildcards are accepted for all entries."
+		));
 
 		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), regexengine.c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your pattern in // if this is desired."
+				),
+				regexengine.c_str());
 		}
 
 		return true;

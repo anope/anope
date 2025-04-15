@@ -96,9 +96,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Puts an AKILL for every nick on the specified channel. It\n"
-				"uses the entire real ident@host for every nick, and\n"
-				"then enforces the AKILL."));
+		source.Reply(_(
+			"Puts an AKILL for every nick on the specified channel. It "
+			"uses the entire real ident@host for every nick, and "
+			"then enforces the AKILL."
+		));
 		return true;
 	}
 };

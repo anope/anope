@@ -89,10 +89,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Drops the given nick from the database. Once your nickname\n"
-				"is dropped you may lose all of your access and channels that\n"
-				"you may own. Any other user will be able to gain control of\n"
-				"this nick."));
+		source.Reply(_(
+			"Drops the given nick from the database. Once your nickname "
+			"is dropped you may lose all of your access and channels that "
+			"you may own. Any other user will be able to gain control of "
+			"this nick."
+		));
 
 		source.Reply(" ");
 		if (!source.HasPriv("nickserv/drop"))
@@ -102,8 +104,12 @@ public:
 
 		source.Reply(" ");
 		if (source.HasPriv("nickserv/drop/override"))
-			source.Reply(_("Additionally, Services Operators with the \037nickserv/drop/override\037 permission can\n"
-				"replace \037code\037 with \002OVERRIDE\002 to drop without a confirmation code."));
+		{
+			source.Reply(_(
+				"Additionally, Services Operators with the \037nickserv/drop/override\037 permission can "
+				"replace \037code\037 with \002OVERRIDE\002 to drop without a confirmation code."
+			));
+		}
 		return true;
 	}
 };

@@ -253,9 +253,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to change and view Services Operators.\n"
-				"Note that operators removed by this command but are still set in\n"
-				"the configuration file are not permanently affected by this."));
+		source.Reply(_(
+			"Allows you to change and view Services Operators. "
+			"Note that operators removed by this command but are still set in "
+			"the configuration file are not permanently affected by this."
+		));
 		return true;
 	}
 };

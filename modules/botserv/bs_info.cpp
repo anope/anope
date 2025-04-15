@@ -104,11 +104,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to see %s information about a channel or a bot.\n"
-				"If the parameter is a channel, then you'll get information\n"
-				"such as enabled kickers. If the parameter is a nick,\n"
-				"you'll get information about a bot, such as creation\n"
-				"time or number of channels it is on."), source.service->nick.c_str());
+		source.Reply(_(
+			"Allows you to see %s information about a channel or a bot. "
+			"If the parameter is a channel, then you'll get information "
+			"such as enabled kickers. If the parameter is a nick, "
+			"you'll get information about a bot, such as creation "
+			"time or number of channels it is on."
+		), source.service->nick.c_str());
 		return true;
 	}
 

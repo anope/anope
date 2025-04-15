@@ -45,10 +45,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes services to reload the configuration file. Note that\n"
-				"some directives still need the restart of the services to\n"
-				"take effect (such as services' nicknames, activation of the\n"
-				"session limitation, etc.)."));
+		source.Reply(_(
+			"Causes services to reload the configuration file. Note that "
+			"some directives still need the restart of the services to "
+			"take effect (such as services' nicknames, activation of the "
+			"session limitation, etc.)."
+		));
 		return true;
 	}
 };

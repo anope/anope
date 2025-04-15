@@ -57,8 +57,7 @@ public:
 			}
 		}
 
-		source.Reply(_("Type \002%s \037option\037\002 for more information\n"
-			"on a specific option."),
+		source.Reply(_("Type \002%s\032\037option\037\002 for more information on a specific option."),
 			source.service->GetQueryCommand("generic/help", this_name).c_str());
 
 		return true;
@@ -101,9 +100,11 @@ public:
 			}
 		}
 
-		source.Reply(_("Type \002%s \037option\037\002 for more information\n"
-				"on a specific option. The options will be set on the given\n"
-				"\037nickname\037."),
+		source.Reply(_(
+				"Type \002%s\032\037option\037\002 for more information "
+				"on a specific option. The options will be set on the given "
+				"\037nickname\037."
+			),
 			source.service->GetQueryCommand("generic/help", this_name).c_str());
 		return true;
 	}
@@ -164,8 +165,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the password used to identify you as the nick's\n"
-			"owner."));
+		source.Reply(_("Changes the password used to identify you as the nick's owner."));
 		return true;
 	}
 };
@@ -300,10 +300,13 @@ public:
 		BotInfo *bi = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets whether you will be given your channel status modes automatically.\n"
-				"Set to \002ON\002 to allow %s to set status modes on you automatically\n"
-				"when entering channels. Note that depending on channel settings some modes\n"
-				"may not get set automatically."), bi ? bi->nick.c_str() : "ChanServ");
+		source.Reply(_(
+				"Sets whether you will be given your channel status modes automatically. "
+				"Set to \002ON\002 to allow %s to set status modes on you automatically "
+				"when entering channels. Note that depending on channel settings some modes "
+				"may not get set automatically."
+			),
+			bi ? bi->nick.c_str() : "ChanServ");
 		return true;
 	}
 };
@@ -328,11 +331,14 @@ public:
 		BotInfo *bi = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets whether the given nickname will be given its status modes\n"
-				"in channels automatically. Set to \002ON\002 to allow %s\n"
-				"to set status modes on the given nickname automatically when it\n"
-				"is entering channels. Note that depending on channel settings\n"
-				"some modes may not get set automatically."), bi ? bi->nick.c_str() : "ChanServ");
+		source.Reply(_(
+				"Sets whether the given nickname will be given its status modes "
+				"in channels automatically. Set to \002ON\002 to allow %s "
+				"to set status modes on the given nickname automatically when it "
+				"is entering channels. Note that depending on channel settings "
+				"some modes may not get set automatically."
+			),
+			bi ? bi->nick.c_str() : "ChanServ");
 		return true;
 	}
 };
@@ -486,8 +492,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the display used to refer to your nickname group in\n"
-				"services. The new display MUST be a nick of your group."));
+		source.Reply(_(
+			"Changes the display used to refer to your nickname group in "
+			"services. The new display MUST be a nick of your group."
+		));
 		return true;
 	}
 };
@@ -511,8 +519,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the display used to refer to the nickname group in\n"
-				"services. The new display MUST be a nick of the group."));
+		source.Reply(_(
+			"Changes the display used to refer to the nickname group in "
+			"services. The new display MUST be a nick of the group."
+		));
 		return true;
 	}
 };
@@ -631,9 +641,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Associates the given email address with your nickname.\n"
-				"This address will be displayed whenever someone requests\n"
-				"information on the nickname with the \002INFO\002 command."));
+		source.Reply(_(
+			"Associates the given email address with your nickname. "
+			"This address will be displayed whenever someone requests "
+			"information on the nickname with the \002INFO\002 command."
+		));
 		return true;
 	}
 };
@@ -709,8 +721,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets whether the given nickname will expire.  Setting this\n"
-				"to \002ON\002 prevents the nickname from expiring."));
+		source.Reply(_(
+			"Sets whether the given nickname will expire.  Setting this "
+			"to \002ON\002 prevents the nickname from expiring."
+		));
 		return true;
 	}
 };

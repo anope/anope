@@ -88,16 +88,28 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		if (source.IsServicesOper())
-			source.Reply(_("Unregisters the specified channel.  Only \002Services Operators\002\n"
-					"can drop a channel of which they are not the founder of."));
+		{
+			source.Reply(_(
+				"Unregisters the specified channel.  Only \002Services Operators\002 "
+				"can drop a channel of which they are not the founder of."
+			));
+		}
 		else
-			source.Reply(_("Unregisters the named channel.  Can only be used by\n"
-					"the \002channel founder\002."));
+		{
+			source.Reply(_(
+				"Unregisters the named channel.  Can only be used by "
+				"the \002channel founder\002."
+			));
+		}
 
 		source.Reply(" ");
 		if (source.HasPriv("chanserv/drop/override"))
-			source.Reply(_("Additionally, Services Operators with the \037chanserv/drop/override\037 permission can\n"
-				"replace \037code\037 with \002OVERRIDE\002 to drop without a confirmation code."));
+		{
+			source.Reply(_(
+				"Additionally, Services Operators with the \037chanserv/drop/override\037 permission can "
+				"replace \037code\037 with \002OVERRIDE\002 to drop without a confirmation code."
+			));
+		}
 		return true;
 	}
 };

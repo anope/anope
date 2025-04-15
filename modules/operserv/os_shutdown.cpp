@@ -54,10 +54,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes services to do an immediate shutdown; databases are\n"
-				"\002not\002 saved.  This command should not be used unless\n"
-				"damage to the in-memory copies of the databases is feared\n"
-				"and they should not be saved."));
+		source.Reply(_(
+			"Causes services to do an immediate shutdown; databases are "
+			"\002not\002 saved.  This command should not be used unless "
+			"damage to the in-memory copies of the databases is feared "
+			"and they should not be saved."
+		));
 		return true;
 	}
 };
@@ -88,8 +90,10 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_("Causes services to save all databases and then restart\n"
-				"(i.e. exit and immediately re-run the executable)."));
+		source.Reply(_(
+			"Causes services to save all databases and then restart "
+			"(i.e. exit and immediately re-run the executable)."
+		));
 		return true;
 	}
 };

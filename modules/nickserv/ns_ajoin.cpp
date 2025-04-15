@@ -304,10 +304,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command manages your auto join list. When you identify\n"
-				"you will automatically join the channels on your auto join list.\n"
-				"Services Operators may provide a nick to modify other users'\n"
-				"auto join lists."));
+		source.Reply(_(
+			"This command manages your auto join list. When you identify "
+			"you will automatically join the channels on your auto join list. "
+			"Services Operators may provide a nick to modify other users' "
+			"auto join lists."
+		));
 		return true;
 	}
 };

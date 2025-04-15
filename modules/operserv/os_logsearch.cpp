@@ -147,17 +147,19 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command searches the services logfiles for messages\n"
-				"that match the given pattern. The day and limit argument\n"
-				"may be used to specify how many days of logs to search\n"
-				"and the number of replies to limit to. By default this\n"
-				"command searches one week of logs, and limits replies\n"
-				"to 50.\n"
-				" \n"
-				"For example:\n"
-				"    \002LOGSEARCH +21d +500l Anope\002\n"
-				"      Searches the last 21 days worth of logs for messages\n"
-				"      containing Anope and lists the most recent 500 of them."));
+		source.Reply(_(
+			"This command searches the services logfiles for messages "
+			"that match the given pattern. The day and limit argument "
+			"may be used to specify how many days of logs to search "
+			"and the number of replies to limit to. By default this "
+			"command searches one week of logs, and limits replies "
+			"to 50."
+			"\n\n"
+			"For example:\n"
+			"    \002LOGSEARCH\032+21d\032+500l\032Anope\002\n"
+			"      Searches the last 21 days worth of logs for messages\n"
+			"      containing Anope and lists the most recent 500 of them."
+		));
 		return true;
 	}
 };

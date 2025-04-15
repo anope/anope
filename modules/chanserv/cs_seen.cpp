@@ -181,13 +181,17 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("The \002STATS\002 command prints out statistics about stored nicks and memory usage."));
-		source.Reply(_("The \002CLEAR\002 command lets you clean the database by removing all entries from the\n"
-				"database that were added within \037time\037.\n"
-				" \n"
+		source.Reply(_(
+				"The \002STATS\002 command prints out statistics about stored nicks and memory usage."
+				"\n\n"
+				"The \002CLEAR\002 command lets you clean the database by removing all entries from the "
+				"database that were added within \037time\037."
+				"\n\n"
 				"Example:\n"
-				" %s CLEAR 30m\n"
-				" Will remove all entries that were added within the last 30 minutes."), source.command.c_str());
+				" %s\032CLEAR\03230m\n"
+				" Will remove all entries that were added within the last 30 minutes."
+			),
+			source.command.c_str());
 		return true;
 	}
 };
@@ -374,9 +378,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Checks for the last time \037nick\037 was seen joining, leaving,\n"
-				"or changing nick on the network and tells you when and, depending\n"
-				"on channel or user settings, where it was."));
+		source.Reply(_(
+			"Checks for the last time \037nick\037 was seen joining, leaving, "
+			"or changing nick on the network and tells you when and, depending "
+			"on channel or user settings, where it was."
+		));
 		return true;
 	}
 };

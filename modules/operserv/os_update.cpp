@@ -32,8 +32,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes services to update all database files as soon as you\n"
-				"send the command."));
+		source.Reply(_("Causes services to update all database files as soon as you send the command."));
 		return true;
 	}
 };

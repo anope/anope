@@ -260,15 +260,19 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *ChanServ)
 			return EVENT_CONTINUE;
-		source.Reply(_("\002%s\002 allows you to register and control various\n"
-			"aspects of channels. %s can often prevent\n"
-			"malicious users from \"taking over\" channels by limiting\n"
-			"who is allowed channel operator privileges. Available\n"
-			"commands are listed below; to use them, type\n"
-			"\002%s \037command\037\002. For more information on a\n"
-			"specific command, type \002%s \037command\037\002.\n"),
-			ChanServ->nick.c_str(), ChanServ->nick.c_str(),
-			ChanServ->GetQueryCommand().c_str(), ChanServ->GetQueryCommand("generic/help").c_str());
+		source.Reply(_(
+				"\002%s\002 allows you to register and control various "
+				"aspects of channels. %s can often prevent "
+				"malicious users from \"taking over\" channels by limiting "
+				"who is allowed channel operator privileges. Available "
+				"commands are listed below; to use them, type "
+				"\002%s\032\037command\037\002. For more information on a "
+				"specific command, type \002%s\032\037command\037\002."
+			),
+			ChanServ->nick.c_str(),
+			ChanServ->nick.c_str(),
+			ChanServ->GetQueryCommand().c_str(),
+			ChanServ->GetQueryCommand("generic/help").c_str());
 		return EVENT_CONTINUE;
 	}
 
@@ -278,15 +282,24 @@ public:
 			return;
 		time_t chanserv_expire = Config->GetModule(this).Get<time_t>("expire", "30d");
 		if (chanserv_expire >= 86400)
-			source.Reply(_(" \n"
-				"Note that any channel which is not used for %lu days\n"
-				"(i.e. which no user on the channel's access list enters\n"
-				"for that period of time) will be automatically dropped."), (unsigned long)chanserv_expire / 86400);
+		{
+			source.Reply(" ");
+			source.Reply(_(
+					"Note that any channel which is not used for %lu days "
+					"(i.e. which no user on the channel's access list enters "
+					"for that period of time) will be automatically dropped."
+				),
+				(unsigned long)chanserv_expire / 86400);
+		}
 		if (source.IsServicesOper())
-			source.Reply(_(" \n"
-				"Services Operators can also, depending on their access drop\n"
-				"any channel, view (and modify) the access, levels and akick\n"
-				"lists and settings for any channel."));
+		{
+			source.Reply(" ");
+			source.Reply(_(
+				"Services Operators can also, depending on their access drop "
+				"any channel, view (and modify) the access, levels and akick "
+				"lists and settings for any channel."
+			));
+		}
 	}
 
 	void OnCheckModes(Reference<Channel> &c) override

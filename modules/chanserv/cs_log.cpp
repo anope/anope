@@ -271,26 +271,30 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("The %s command allows users to configure logging settings\n"
-				"for their channel. If no parameters are given this command\n"
-				"lists the current logging methods in place for this channel.\n"
-				" \n"
-				"Otherwise, \037command\037 must be a command name, and \037method\037\n"
-				"is one of the following logging methods:\n"
-				" \n"
-				" MESSAGE [status], NOTICE [status], MEMO\n"
-				" \n"
-				"Which are used to message, notice, and memo the channel respectively.\n"
-				"With MESSAGE or NOTICE you must have a service bot assigned to and joined\n"
-				"to your channel. Status may be a channel status such as @ or +.\n"
-				" \n"
-				"To remove a logging method use the same syntax as you would to add it.\n"
-				" \n"
+		source.Reply(_(
+				"The %s command allows users to configure logging settings "
+				"for their channel. If no parameters are given this command "
+				"lists the current logging methods in place for this channel."
+				"\n\n"
+				"Otherwise, \037command\037 must be a command name, and \037method\037 "
+				"is one of the following logging methods:"
+				"\n\n"
+				" MESSAGE\032[status], NOTICE\032[status], MEMO"
+				"\n\n"
+				"Which are used to message, notice, and memo the channel respectively. "
+				"With MESSAGE or NOTICE you must have a service bot assigned to and joined "
+				"to your channel. Status may be a channel status such as @ or +."
+				"\n\n"
+				"To remove a logging method use the same syntax as you would to add it."
+				"\n\n"
 				"Example:\n"
-				" %s #anope chanserv/access MESSAGE @\n"
-				" Would message any channel operators whenever someone used the\n"
-				" ACCESS command on ChanServ on the channel."),
-				source.command.upper().c_str(), source.command.upper().c_str());
+				" %s\032#anope\032chanserv/access\032MESSAGE\032@\n"
+				" Would message any channel operators whenever someone used the "
+				"ACCESS command on ChanServ on the channel."
+			),
+			source.command.upper().c_str(),
+			source.command.upper().c_str());
+
 		return true;
 	}
 };

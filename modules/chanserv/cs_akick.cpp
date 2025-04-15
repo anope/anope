@@ -488,40 +488,44 @@ public:
 		BotInfo *bi = Config->GetClient("NickServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002AutoKick list\002 for a channel.  If a user\n"
-				"on the AutoKick list attempts to join the channel,\n"
-				"%s will ban that user from the channel, then kick\n"
-				"the user.\n"
-				" \n"
-				"The \002AKICK ADD\002 command adds the given nick or usermask\n"
-				"to the AutoKick list.  If a \037reason\037 is given with\n"
-				"the command, that reason will be used when the user is\n"
-				"kicked; if not, the default reason is \"User has been\n"
-				"banned from the channel\".\n"
-				"When akicking a \037registered nick\037 the %s account\n"
-				"will be added to the akick list instead of the mask.\n"
-				"All users within that nickgroup will then be akicked.\n"),
-				source.service->nick.c_str(), bi ? bi->nick.c_str() : "NickServ");
 		source.Reply(_(
-				" \n"
-				"The \002AKICK DEL\002 command removes the given nick or mask\n"
-				"from the AutoKick list.  It does not, however, remove any\n"
-				"bans placed by an AutoKick; those must be removed\n"
-				"manually.\n"
-				" \n"
-				"The \002AKICK LIST\002 command displays the AutoKick list, or\n"
-				"optionally only those AutoKick entries which match the\n"
-				"given mask.\n"
-				" \n"
-				"The \002AKICK VIEW\002 command is a more verbose version of the\n"
-				"\002AKICK LIST\002 command.\n"
-				" \n"
-				"The \002AKICK ENFORCE\002 command causes %s to enforce the\n"
-				"current AKICK list by removing those users who match an\n"
-				"AKICK mask.\n"
-				" \n"
-				"The \002AKICK CLEAR\002 command clears all entries of the\n"
-				"akick list."), source.service->nick.c_str());
+				"Maintains the \002AutoKick list\002 for a channel.  If a user "
+				"on the AutoKick list attempts to join the channel, "
+				"%s will ban that user from the channel, then kick "
+				"the user."
+				"\n\n"
+				"The \002AKICK\032ADD\002 command adds the given nick or usermask "
+				"to the AutoKick list.  If a \037reason\037 is given with "
+				"the command, that reason will be used when the user is "
+				"kicked; if not, the default reason is \"User has been "
+				"banned from the channel\". "
+				"When akicking a \037registered nick\037 the %s account "
+				"will be added to the akick list instead of the mask. "
+				"All users within that nickgroup will then be akicked. "
+				"\n\n"
+				"The \002AKICK\032DEL\002 command removes the given nick or mask "
+				"from the AutoKick list.  It does not, however, remove any "
+				"bans placed by an AutoKick; those must be removed "
+				"manually."
+				"\n\n"
+				"The \002AKICK\032LIST\002 command displays the AutoKick list, or "
+				"optionally only those AutoKick entries which match the "
+				"given mask."
+				"\n\n"
+				"The \002AKICK\032VIEW\002 command is a more verbose version of the "
+				"\002AKICK\032LIST\002 command."
+				"\n\n"
+				"The \002AKICK\032ENFORCE\002 command causes %s to enforce the "
+				"current AKICK list by removing those users who match an "
+				"AKICK mask."
+				"\n\n"
+				"The \002AKICK\032CLEAR\002 command clears all entries of the "
+				"akick list."
+			),
+			source.service->nick.c_str(),
+			source.service->nick.c_str(),
+			bi ? bi->nick.c_str() : "NickServ");
+
 		return true;
 	}
 };

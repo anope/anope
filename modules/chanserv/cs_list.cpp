@@ -42,8 +42,10 @@ public:
 			if (!num1.has_value() || !num2.has_value())
 			{
 				source.Reply(LIST_INCORRECT_RANGE);
-				source.Reply(_("To search for channels starting with #, search for the channel\n"
-					"name without the #-sign prepended (\002anope\002 instead of \002#anope\002)."));
+				source.Reply(_(
+					"To search for channels starting with #, search for the channel "
+					"name without the #-sign prepended (\002anope\002 instead of \002#anope\002)."
+				));
 				return;
 			}
 
@@ -133,38 +135,43 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists all registered channels matching the given pattern.\n"
-				"Channels with the \002PRIVATE\002 option set will only be\n"
-				"displayed to Services Operators with the proper access.\n"
-				"Channels with the \002NOEXPIRE\002 option set will have\n"
-				"a \002!\002 prefixed to the channel for Services Operators to see.\n"
-				" \n"
-				"Note that a preceding '#' specifies a range, channel names\n"
-				"are to be written without '#'.\n"
-				" \n"
-				"If the SUSPENDED or NOEXPIRE options are given, only channels\n"
-				"which, respectively, are SUSPENDED or have the NOEXPIRE\n"
-				"flag set will be displayed. If multiple options are given,\n"
-				"all channels matching at least one option will be displayed.\n"
-				"Note that these options are limited to \037Services Operators\037.\n"
-				" \n"
-				"Examples:\n"
-				" \n"
-				"    \002LIST *anope*\002\n"
-				"        Lists all registered channels with \002anope\002 in their\n"
-				"        names (case insensitive).\n"
-				" \n"
-				"    \002LIST * NOEXPIRE\002\n"
-				"        Lists all registered channels which have been set to not expire.\n"
-				" \n"
-				"    \002LIST #51-100\002\n"
-				"        Lists all registered channels within the given range (51-100)."));
+		source.Reply(_(
+			"Lists all registered channels matching the given pattern. "
+			"Channels with the \002PRIVATE\002 option set will only be "
+			"displayed to Services Operators with the proper access. "
+			"Channels with the \002NOEXPIRE\002 option set will have "
+			"a \002!\002 prefixed to the channel for Services Operators to see."
+			"\n\n"
+			"Note that a preceding '#' specifies a range, channel names "
+			"are to be written without '#'."
+			"\n\n"
+			"If the SUSPENDED or NOEXPIRE options are given, only channels "
+			"which, respectively, are SUSPENDED or have the NOEXPIRE "
+			"flag set will be displayed. If multiple options are given, "
+			"all channels matching at least one option will be displayed. "
+			"Note that these options are limited to \037Services Operators\037."
+			"\n\n"
+			"Examples:"
+			"\n\n"
+			"    \002LIST\032*anope*\002\n"
+			"        Lists all registered channels with \002anope\002 in their\n"
+			"        names (case insensitive)."
+			"\n\n"
+			"    \002LIST\032*\032NOEXPIRE\002\n"
+			"        Lists all registered channels which have been set to not expire."
+			"\n\n"
+			"    \002LIST #51-100\002\n"
+			"        Lists all registered channels within the given range (51-100)."
+		));
 
 		if (!Config->GetBlock("options").Get<const Anope::string>("regexengine").empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), Config->GetBlock("options").Get<const Anope::string>("regexengine").c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your pattern in // if this is desired."
+				),
+				Config->GetBlock("options").Get<const Anope::string>("regexengine").c_str());
 		}
 
 		return true;
@@ -234,8 +241,10 @@ public:
 		BotInfo *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/list", bi, cmd))
-			source.Reply(_("When \002private\002 is set, the channel will not appear in\n"
-				"%s's %s command."), bi->nick.c_str(), cmd.c_str());
+		{
+			source.Reply(_("When \002private\002 is set, the channel will not appear in %s's %s command."),
+				bi->nick.c_str(), cmd.c_str());
+		}
 		return true;
 	}
 };

@@ -143,14 +143,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Disallows anyone from using the given channel.\n"
-				"May be cancelled by using the \002UNSUSPEND\002\n"
-				"command to preserve all previous channel data/settings.\n"
-				"If an expiry is given the channel will be unsuspended after\n"
-				"that period of time, else the default expiry from the\n"
-				"configuration is used.\n"
-				" \n"
-				"Reason may be required on certain networks."));
+		source.Reply(_(
+			"Disallows anyone from using the given channel. "
+			"May be cancelled by using the \002UNSUSPEND\002 "
+			"command to preserve all previous channel data/settings. "
+			"If an expiry is given the channel will be unsuspended after "
+			"that period of time, else the default expiry from the "
+			"configuration is used."
+			"\n\n"
+			"Reason may be required on certain networks."
+		));
 		return true;
 	}
 };
@@ -201,8 +203,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Releases a suspended channel. All data and settings\n"
-				"are preserved from before the suspension."));
+		source.Reply(_(
+			"Releases a suspended channel. All data and settings "
+			"are preserved from before the suspension."
+		));
 		return true;
 	}
 };

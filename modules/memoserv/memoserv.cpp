@@ -214,12 +214,17 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *MemoServ)
 			return EVENT_CONTINUE;
-		source.Reply(_("\002%s\002 is a utility allowing IRC users to send short\n"
-			"messages to other IRC users, whether they are online at\n"
-			"the time or not, or to channels(*). Both the sender's\n"
-			"nickname and the target nickname or channel must be\n"
-			"registered in order to send a memo.\n"
-			"%s's commands include:"), MemoServ->nick.c_str(), MemoServ->nick.c_str());
+		source.Reply(_(
+				"\002%s\002 is a utility allowing IRC users to send short "
+				"messages to other IRC users, whether they are online at "
+				"the time or not, or to channels(*). Both the sender's "
+				"nickname and the target nickname or channel must be "
+				"registered in order to send a memo."
+				"\n\n"
+				"%s's commands include:"
+			),
+			MemoServ->nick.c_str(),
+			MemoServ->nick.c_str());
 		return EVENT_CONTINUE;
 	}
 
@@ -227,9 +232,9 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *MemoServ)
 			return;
-		source.Reply(_(" \n"
-			"Type \002%s \037command\037\002 for help on any of the\n"
-			"above commands."),
+
+		source.Reply(" ");
+		source.Reply(_("Type \002%s\032\037command\037\002 for help on any of the above commands."),
 			MemoServ->GetQueryCommand("generic/help").c_str());
 	}
 };

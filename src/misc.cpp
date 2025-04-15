@@ -295,8 +295,7 @@ bool TextSplitter::GetLine(Anope::string &out)
 	// Formatting which has been seen since the last space.
 	std::vector<Anope::string> uncertain_formatting;
 
-	size_t idx = 0;
-	auto toggle_formatting = [this, &idx, &uncertain_formatting](const Anope::string &fmt)
+	auto toggle_formatting = [this, &uncertain_formatting](const Anope::string &fmt)
 	{
 		auto it = std::find_if(formatting.begin(), formatting.end(), [&fmt](const auto& f) {
 			return f[0] == fmt[0];
@@ -313,7 +312,8 @@ bool TextSplitter::GetLine(Anope::string &out)
 		}
 	};
 
-	for (idx = 0; idx < text.length(); ++idx)
+	size_t idx = 0;
+	for ( ; idx < text.length(); ++idx)
 	{
 		if (current_length >= max_length)
 		{

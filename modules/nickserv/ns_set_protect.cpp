@@ -157,11 +157,16 @@ public:
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
 	{
-		if (!show_hidden)
+		if (!protect.HasExt(na->nc))
 			return;
 
-		if (protect.HasExt(na->nc))
-			info.AddOption(_("Protection"));
+		info.AddOption(_("Protection"));
+		if (show_hidden)
+		{
+			auto protectafter = na->nc->GetExt<time_t>("PROTECT_AFTER");
+			auto protect = protectafter ? *protectafter : Config->GetModule("nickserv").Get<time_t>("defaultprotect", "1m");
+			info[_("Protection after")] = Anope::Duration(protect, source.GetAccount());
+		}
 	}
 };
 

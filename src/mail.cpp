@@ -93,7 +93,10 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 		if (!b.Get<bool>("usemail") || b.Get<const Anope::string>("sendfrom").empty())
 			u->SendMessage(service, _("Services have been configured to not send mail."));
 		else if (Anope::CurTime - u->lastmail < b.Get<time_t>("delay"))
-			u->SendMessage(service, _("Please wait \002%lu\002 seconds and retry."), (unsigned long)b.Get<time_t>("delay") - (Anope::CurTime - u->lastmail));
+		{
+			const auto delay = b.Get<time_t>("delay") - (Anope::CurTime - u->lastmail);
+			u->SendMessage(service, _("Please wait \002%s\002 and retry."), Anope::Duration(delay, u->Account()).c_str());
+		}
 		else if (nc->email.empty())
 			u->SendMessage(service, _("Email for \002%s\002 is invalid."), nc->display.c_str());
 		else

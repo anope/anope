@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-16 02:51+0100\n"
-"PO-Revision-Date: 2025-04-10 13:32+0100\n"
+"POT-Creation-Date: 2025-04-16 02:59+0100\n"
+"PO-Revision-Date: 2025-04-16 02:59+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -3997,7 +3997,7 @@ msgid "Please use the symbol of # when attempting to register."
 msgstr ""
 
 #, c-format
-msgid "Please wait %lu seconds and retry."
+msgid "Please wait %s and retry."
 msgstr ""
 
 #, c-format

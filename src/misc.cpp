@@ -277,24 +277,24 @@ void HelpWrapper::SendTo(CommandSource &source)
 	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "100") - longest - 8;
 	for (const auto &[entry_name, entry_desc] :  entries)
 	{
-		TextSplitter splitter(Language::Translate(source.nc, entry_desc.c_str()), max_length);
+		LineWrapper lw(Language::Translate(source.nc, entry_desc.c_str()), max_length);
 
 		Anope::string line;
-		if (splitter.GetLine(line))
+		if (lw.GetLine(line))
 			source.Reply("    %-*s    %s", (int)longest, entry_name.c_str(), line.c_str());
 
-		while (splitter.GetLine(line))
+		while (lw.GetLine(line))
 			source.Reply("    %-*s    %s", (int)longest, "", line.c_str());
 	}
 };
 
-TextSplitter::TextSplitter(const Anope::string &t, size_t ml)
+LineWrapper::LineWrapper(const Anope::string &t, size_t ml)
 	: max_length(ml ? ml : Config->GetBlock("options").Get<size_t>("linelength", "100"))
 	, text(t)
 {
 }
 
-bool TextSplitter::GetLine(Anope::string &out)
+bool LineWrapper::GetLine(Anope::string &out)
 {
 	out.clear();
 	if (text.empty())

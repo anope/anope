@@ -22,7 +22,7 @@ public:
 	void SendTo(CommandSource &source);
 };
 
-class CoreExport TextSplitter final
+class CoreExport LineWrapper final
 {
 private:
 	std::vector<Anope::string> formatting;
@@ -30,7 +30,7 @@ private:
 	Anope::string text;
 
 public:
-	TextSplitter(const Anope::string &t, size_t ml = 0);
+	LineWrapper(const Anope::string &t, size_t ml = 0);
 	bool GetLine(Anope::string &out);
 };
 

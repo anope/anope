@@ -347,8 +347,8 @@ namespace
 {
 	void SendMessageInternal(BotInfo *source, User *target, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 	{
-		TextSplitter ts(Language::Translate(target, msg.c_str()));
-		for (Anope::string line; ts.GetLine(line); )
+		LineWrapper lw(Language::Translate(target, msg.c_str()));
+		for (Anope::string line; lw.GetLine(line); )
 		{
 			if (target->ShouldPrivmsg())
 				IRCD->SendPrivmsg(source, target->GetUID(), line, tags);

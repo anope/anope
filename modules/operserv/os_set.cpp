@@ -203,11 +203,11 @@ public:
 			));
 
 			HelpWrapper help;
-			help.AddEntry("READONLY", "Set read-only or read-write mode");
-			help.AddEntry("DEBUG", "Activate or deactivate debug mode");
-			help.AddEntry("NOEXPIRE", "Activate or deactivate no expire mode");
-			help.AddEntry("SUPERADMIN", "Activate or deactivate super admin mode");
-			help.AddEntry("LIST", "List the options");
+			help.AddEntry("READONLY", _("Set read-only or read-write mode"));
+			help.AddEntry("DEBUG", _("Activate or deactivate debug mode"));
+			help.AddEntry("NOEXPIRE", _("Activate or deactivate no expire mode"));
+			help.AddEntry("SUPERADMIN", _("Activate or deactivate super admin mode"));
+			help.AddEntry("LIST", _("List the options"));
 
 			source.Reply(" ");
 			help.SendTo(source);

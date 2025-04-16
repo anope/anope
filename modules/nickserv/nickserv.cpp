@@ -546,15 +546,15 @@ public:
 		}
 
 		time_t nickserv_expire = Config->GetModule(this).Get<time_t>("expire", "1y");
-		if (nickserv_expire >= 86400)
+		if (nickserv_expire)
 		{
 			source.Reply(" ");
 			source.Reply(_(
 					"Accounts that are not used anymore are subject to "
 					"the automatic expiration, i.e. they will be deleted "
-					"after %lu days if not used."
+					"after %s if not used."
 				),
-				(unsigned long)nickserv_expire / 86400);
+				Anope::Duration(nickserv_expire, source.nc).c_str());
 		}
 	}
 

@@ -280,16 +280,17 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *ChanServ)
 			return;
+
 		time_t chanserv_expire = Config->GetModule(this).Get<time_t>("expire", "30d");
-		if (chanserv_expire >= 86400)
+		if (chanserv_expire)
 		{
 			source.Reply(" ");
 			source.Reply(_(
-					"Note that any channel which is not used for %lu days "
+					"Note that any channel which is not used for %s "
 					"(i.e. which no user on the channel's access list enters "
 					"for that period of time) will be automatically dropped."
 				),
-				(unsigned long)chanserv_expire / 86400);
+				Anope::Duration(chanserv_expire, source.nc).c_str());
 		}
 		if (source.IsServicesOper())
 		{

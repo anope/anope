@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-16 02:19+0100\n"
+"POT-Creation-Date: 2025-04-16 02:51+0100\n"
 "PO-Revision-Date: 2025-04-10 13:32+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -1283,7 +1283,7 @@ msgid "Accounts can not be registered right now. Please try again later."
 msgstr ""
 
 #, c-format
-msgid "Accounts that are not used anymore are subject to the automatic expiration, i.e. they will be deleted after %lu days if not used."
+msgid "Accounts that are not used anymore are subject to the automatic expiration, i.e. they will be deleted after %s if not used."
 msgstr ""
 
 msgid "Activate or deactivate debug mode"
@@ -3869,7 +3869,7 @@ msgid "None"
 msgstr ""
 
 #, c-format
-msgid "Note that any channel which is not used for %lu days (i.e. which no user on the channel's access list enters for that period of time) will be automatically dropped."
+msgid "Note that any channel which is not used for %s (i.e. which no user on the channel's access list enters for that period of time) will be automatically dropped."
 msgstr ""
 
 #, c-format

@@ -11,14 +11,26 @@
 
 #pragma once
 
-class TextSplitter final
+class CoreExport HelpWrapper final
 {
 private:
-	Anope::string text;
-	std::vector<Anope::string> formatting;
+	std::vector<std::pair<Anope::string, Anope::string>> entries;
+	size_t longest = 0;
 
 public:
-	TextSplitter(const Anope::string &t);
+	void AddEntry(const Anope::string &name, const Anope::string &desc);
+	void SendTo(CommandSource &source);
+};
+
+class CoreExport TextSplitter final
+{
+private:
+	std::vector<Anope::string> formatting;
+	const size_t max_length;
+	Anope::string text;
+
+public:
+	TextSplitter(const Anope::string &t, size_t ml = 0);
 	bool GetLine(Anope::string &out);
 };
 

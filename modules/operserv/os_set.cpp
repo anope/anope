@@ -200,13 +200,17 @@ public:
 			source.Reply(_(
 				"Sets various global services options.  Option names "
 				"currently defined are:"
-				"\n\n"
-				"    READONLY   Set read-only or read-write mode\n"
-				"    DEBUG      Activate or deactivate debug mode\n"
-				"    NOEXPIRE   Activate or deactivate no expire mode\n"
-				"    SUPERADMIN Activate or deactivate super admin mode\n"
-				"    LIST       List the options"
 			));
+
+			HelpWrapper help;
+			help.AddEntry("READONLY", "Set read-only or read-write mode");
+			help.AddEntry("DEBUG", "Activate or deactivate debug mode");
+			help.AddEntry("NOEXPIRE", "Activate or deactivate no expire mode");
+			help.AddEntry("SUPERADMIN", "Activate or deactivate super admin mode");
+			help.AddEntry("LIST", "List the options");
+
+			source.Reply(" ");
+			help.SendTo(source);
 		}
 		else if (subcommand.equals_ci("LIST"))
 		{

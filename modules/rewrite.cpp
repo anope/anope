@@ -129,13 +129,13 @@ public:
 			Log() << "rewrite: Unable to rewrite '" << source.command << (!params.empty() ? " " + params[0] : "") << "'";
 	}
 
-	void OnServHelp(CommandSource &source) override
+	void OnServHelp(CommandSource &source, HelpWrapper &help) override
 	{
 		Rewrite *r = Rewrite::Find(!source.c ? source.service->nick : "", source.command);
 		if (r != NULL && !r->desc.empty())
 		{
 			this->SetDesc(r->desc);
-			Command::OnServHelp(source);
+			Command::OnServHelp(source, help);
 		}
 	}
 

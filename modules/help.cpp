@@ -47,6 +47,7 @@ public:
 		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options").Get<bool>("hideregisteredcommands");
 
+		HelpWrapper help;
 		if (params.empty() || params[0].equals_ci("ALL"))
 		{
 			bool all = !params.empty() && params[0].equals_ci("ALL");
@@ -88,9 +89,10 @@ public:
 				}
 
 				source.command = c_name;
-				c->OnServHelp(source);
+				c->OnServHelp(source, help);
 
 			}
+			help.SendTo(source);
 
 			for (auto &[gr, cmds] : groups)
 			{

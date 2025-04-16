@@ -157,12 +157,12 @@ public:
 		}
 	}
 
-	void OnServHelp(CommandSource &source) override
+	void OnServHelp(CommandSource &source, HelpWrapper &help) override
 	{
 		if (descriptions.count(source.command))
 		{
 			this->SetDesc(descriptions[source.command]);
-			Command::OnServHelp(source);
+			Command::OnServHelp(source, help);
 		}
 	}
 

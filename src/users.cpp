@@ -21,7 +21,6 @@
 #include "opertype.h"
 #include "language.h"
 #include "sockets.h"
-#include "textproc.h"
 #include "uplink.h"
 
 user_map UserListByNick, UserListByUID;

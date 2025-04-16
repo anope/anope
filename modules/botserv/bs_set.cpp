@@ -37,6 +37,8 @@ public:
 		));
 		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options").Get<bool>("hideregisteredcommands");
+
+		HelpWrapper help;
 		Anope::string this_name = source.command;
 		for (const auto &[c_name, info] : source.service->commands)
 		{
@@ -56,10 +58,12 @@ public:
 						continue;
 
 					source.command = c_name;
-					command->OnServHelp(source);
+					command->OnServHelp(source, help);
 				}
 			}
 		}
+		help.SendTo(source);
+
 		source.Reply(_("Type \002%s\032\037option\037\002 for more information on a particular option."),
 			source.service->GetQueryCommand("generic/help", this_name).c_str());
 

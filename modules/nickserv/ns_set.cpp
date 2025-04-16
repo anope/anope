@@ -36,6 +36,8 @@ public:
 		Anope::string this_name = source.command;
 		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options").Get<bool>("hideregisteredcommands");
+
+		HelpWrapper help;
 		for (const auto &[c_name, info] : source.service->commands)
 		{
 			if (c_name.find_ci(this_name + " ") == 0)
@@ -53,9 +55,10 @@ public:
 					continue;
 
 				source.command = c_name;
-				c->OnServHelp(source);
+				c->OnServHelp(source, help);
 			}
 		}
+		help.SendTo(source);
 
 		source.Reply(_("Type \002%s\032\037option\037\002 for more information on a specific option."),
 			source.service->GetQueryCommand("generic/help", this_name).c_str());
@@ -86,6 +89,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
 
+		HelpWrapper help;
 		Anope::string this_name = source.command;
 		for (const auto &[c_name, info] : source.service->commands)
 		{
@@ -95,10 +99,11 @@ public:
 				if (command)
 				{
 					source.command = c_name;
-					command->OnServHelp(source);
+					command->OnServHelp(source, help);
 				}
 			}
 		}
+		help.SendTo(source);
 
 		source.Reply(_(
 				"Type \002%s\032\037option\037\002 for more information "

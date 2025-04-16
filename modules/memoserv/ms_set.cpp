@@ -225,18 +225,17 @@ public:
 		{
 			this->SendSyntax(source);
 			source.Reply(" ");
-			source.Reply(_(
-					"Sets various memo options.  \037option\037 can be one of:"
-					"\n\n"
-					"    NOTIFY      Changes when you will be notified about\n"
-					"                   new memos (only for nicknames)"
-					"\n\n"
-					"    LIMIT       Sets the maximum number of memos you can\n"
-					"                   receive"
-					"\n\n"
-					"Type \002%s\032\037option\037\002 for more information "
-					"on a specific option."
-				),
+			source.Reply(_("Sets various memo options.  \037option\037 can be one of:"));
+
+			HelpWrapper help;
+			help.AddEntry("NOTIFY", _("Changes when you will be notified about new memos (only for nicknames)"));
+			help.AddEntry("LIMIT",  _("Sets the maximum number of memos you can receive"));
+
+			source.Reply(" ");
+			help.SendTo(source);
+
+			source.Reply(" ");
+			source.Reply(_("Type \002%s\032\037option\037\002 for more information on a specific option."),
 				source.service->GetQueryCommand("generic/help", source.command).c_str());
 		}
 		else if (subcommand.equals_ci("NOTIFY"))
@@ -245,26 +244,21 @@ public:
 				"Syntax: \002NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002"
 				"\n\n"
 				"Changes when you will be notified about new memos:"
-				"\n\n"
-				"    ON      You will be notified of memos when you log on,\n"
-				"               when you unset /AWAY, and when they are sent\n"
-				"               to you."
-				"\n\n"
-				"    LOGON   You will only be notified of memos when you log\n"
-				"               on or when you unset /AWAY."
-				"\n\n"
-				"    NEW     You will only be notified of memos when they\n"
-				"               are sent to you."
-				"\n\n"
-				"    MAIL    You will be notified of memos by email as well as\n"
-				"               any other settings you have."
-				"\n\n"
-				"    NOMAIL  You will not be notified of memos by email."
-				"\n\n"
-				"    OFF     You will not receive any notification of memos."
-				"\n\n"
-				"\002ON\002 is essentially \002LOGON\002 and \002NEW\002 combined."
 			));
+
+			HelpWrapper help;
+			help.AddEntry("ON", _("You will be notified of memos when you log on, when you unset /AWAY, and when they are sent to you."));
+			help.AddEntry("LOGON", _("You will only be notified of memos when you log on or when you unset /AWAY."));
+			help.AddEntry("NEW", _("You will only be notified of memos when they are sent to you."));
+			help.AddEntry("MAIL", _("You will be notified of memos by email as well as any other settings you have."));
+			help.AddEntry("NOMAIL", _("You will not be notified of memos by email."));
+			help.AddEntry("OFF", _("You will not receive any notification of memos."));
+
+			source.Reply(" ");
+			help.SendTo(source);
+
+			source.Reply(" ");
+			source.Reply(_("\002ON\002 is essentially \002LOGON\002 and \002NEW\002 combined."));
 		}
 		else if (subcommand.equals_ci("LIMIT"))
 		{

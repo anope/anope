@@ -264,8 +264,33 @@ void InfoFormatter::AddOption(const Anope::string &opt)
 	*optstr += Language::Translate(nc, opt.c_str());
 }
 
-TextSplitter::TextSplitter(const Anope::string &t)
-	: text(t)
+
+void HelpWrapper::AddEntry(const Anope::string &name, const Anope::string &desc)
+{
+	entries.emplace_back(name, desc);
+	if (name.length() > longest)
+		longest = name.length();
+}
+
+void HelpWrapper::SendTo(CommandSource &source)
+{
+	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "100") - longest - 8;
+	for (const auto &[entry_name, entry_desc] :  entries)
+	{
+		TextSplitter splitter(Language::Translate(source.nc, entry_desc.c_str()), max_length);
+
+		Anope::string line;
+		if (splitter.GetLine(line))
+			source.Reply("    %-*s    %s", (int)longest, entry_name.c_str(), line.c_str());
+
+		while (splitter.GetLine(line))
+			source.Reply("    %-*s    %s", (int)longest, "", line.c_str());
+	}
+};
+
+TextSplitter::TextSplitter(const Anope::string &t, size_t ml)
+	: max_length(ml ? ml : Config->GetBlock("options").Get<size_t>("linelength", "100"))
+	, text(t)
 {
 }
 
@@ -279,9 +304,6 @@ bool TextSplitter::GetLine(Anope::string &out)
 	// onto this one.
 	for (const auto &fmt : formatting)
 		out.append(fmt);
-
-	// The maximum length of a line.
-	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "100");
 
 	// The current printable length of the output.
 	size_t current_length = 0;

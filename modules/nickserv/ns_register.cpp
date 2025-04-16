@@ -376,10 +376,10 @@ public:
 		return true;
 	}
 
-	void OnServHelp(CommandSource &source) override
+	void OnServHelp(CommandSource &source, HelpWrapper &help) override
 	{
 		if (Config->GetModule(this->owner).Get<const Anope::string>("registration").equals_ci("mail"))
-			Command::OnServHelp(source);
+			Command::OnServHelp(source, help);
 	}
 };
 

@@ -14,6 +14,7 @@
 #include "service.h"
 #include "anope.h"
 #include "channels.h"
+#include "textproc.h"
 
 struct CommandGroup final
 {
@@ -153,7 +154,7 @@ public:
 	/** Called when help is requested for the client this command is on.
 	 * @param source The source
 	 */
-	virtual void OnServHelp(CommandSource &source);
+	virtual void OnServHelp(CommandSource &source, HelpWrapper &help);
 
 	/** Requested when the user is requesting help on this command. Help on this command should be sent to the user.
 	 * @param source The source

@@ -198,9 +198,9 @@ const Anope::string Command::GetDesc(CommandSource &) const
 	return this->desc;
 }
 
-void Command::OnServHelp(CommandSource &source)
+void Command::OnServHelp(CommandSource &source, HelpWrapper &help)
 {
-	source.Reply("    %-14s %s", source.command.c_str(), Language::Translate(source.nc, this->GetDesc(source).c_str()));
+	help.AddEntry(source.command, this->GetDesc(source));
 }
 
 bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }

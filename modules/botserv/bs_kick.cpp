@@ -139,6 +139,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_("Configures bot kickers.  \037option\037 can be one of:"));
 
+		HelpWrapper help;
 		Anope::string this_name = source.command;
 		for (const auto &[c_name, info] : source.service->commands)
 		{
@@ -148,10 +149,11 @@ public:
 				if (command)
 				{
 					source.command = c_name;
-					command->OnServHelp(source);
+					command->OnServHelp(source, help);
 				}
 			}
 		}
+		help.SendTo(source);
 
 		source.Reply(_(
 				"Type \002%s\032\037option\037\002 for more information "

@@ -408,7 +408,7 @@ macro(calculate_depends SRC)
         else(FOUND_${FILENAME}_INCLUDE)
           # XXX
           if(NOT ${FILENAME} STREQUAL "libintl.h")
-            message(FATAL_ERROR "${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
+            message(WARNING "${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
           endif(NOT ${FILENAME} STREQUAL "libintl.h")
         endif(FOUND_${FILENAME}_INCLUDE)
       endif(CHECK_ANGLE_INCLUDES)

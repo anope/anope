@@ -11,11 +11,178 @@
 
 enum
 {
-	// Used by anope.channel, anope.oper, anope.server, and anope.user
+	// Used by anope.{account,channel,oper,server,user}.
 	ERR_NO_SUCH_TARGET = RPC::ERR_CUSTOM_START,
 
-	// Used by anope.listChannels, anope.listOpers, anope.listServers, and anope.listUsers
+	// Used by anope.list{Accounts,Channels,Opers,Servers,Users}.
 	ERR_NO_SUCH_DETAIL = RPC::ERR_CUSTOM_START,
+};
+
+class SaveData final
+	: public Serialize::Data
+{
+public:
+	Anope::map<std::stringstream> data;
+
+	std::iostream &operator[](const Anope::string &key) override
+	{
+		return data[key];
+	}
+
+	static void Serialize(const Extensible *e, const Serializable *s, RPC::Map &map)
+	{
+		SaveData data;
+		Extensible::ExtensibleSerialize(e, s, data);
+		for (const auto &[k, v] : data.data)
+		{
+			auto vs = v.str();
+			switch (data.GetType(k))
+			{
+				case Serialize::DataType::BOOL:
+					map.Reply(k, Anope::Convert<bool>(vs, false));
+					break;
+				case Serialize::DataType::FLOAT:
+					map.Reply(k, Anope::Convert<double>(vs, 0.0));
+					break;
+				case Serialize::DataType::INT:
+					map.Reply(k, Anope::Convert<int64_t>(vs, 0));
+					break;
+				case Serialize::DataType::TEXT:
+				{
+					if (vs.empty())
+						map.Reply(k, nullptr);
+					else
+						map.Reply(k, vs);
+					break;
+				}
+				case Serialize::DataType::UINT:
+					map.Reply(k, Anope::Convert<uint64_t>(vs, 0));
+					break;
+			}
+		}
+	}
+};
+
+class AnopeListAccountsRPCEvent final
+	: public RPC::Event
+{
+public:
+	AnopeListAccountsRPCEvent(Module *o)
+		: RPC::Event(o, "anope.listAccounts")
+	{
+	}
+
+	static void GetInfo(NickCore *nc, RPC::Map &root)
+	{
+		root
+			.Reply("display", nc->display)
+			.Reply("lastmail", nc->lastmail)
+			.Reply("registered", nc->time_registered)
+			.Reply("uniqueid", nc->GetId());
+
+		if (nc->email.empty())
+			root.Reply("email", nullptr);
+		else
+			root.Reply("email", nc->email);
+
+		SaveData::Serialize(nc, nc, root.ReplyMap("extensions"));
+
+		if (nc->language.empty())
+			root.Reply("language", nullptr);
+		else
+			root.Reply("language", nc->language);
+
+		auto &nicks = root.ReplyMap("nicks");
+		for (const auto *na : *nc->aliases)
+		{
+			auto &nick = nicks.ReplyMap(na->nick);
+			nick.Reply("lastseen", na->last_seen)
+				.Reply("registered", nc->time_registered);
+
+			SaveData::Serialize(na, na, nick.ReplyMap("extensions"));
+			if (na->HasVHost())
+			{
+				auto &vhost = nick.ReplyMap("vhost");
+				vhost
+					.Reply("created", na->GetVHostCreated())
+					.Reply("creator", na->GetVHostCreator())
+					.Reply("host", na->GetVHostHost())
+					.Reply("mask", na->GetVHostMask());
+
+				if (na->GetVHostIdent().empty())
+					vhost.Reply("ident", nullptr);
+				else
+					vhost.Reply("ident", na->GetVHostIdent());
+			}
+			else
+				nick.Reply("vhost", nullptr);
+		}
+
+		if (nc->o)
+		{
+			auto &opertype = root.ReplyMap("opertype");
+			opertype.Reply("name", nc->o->ot->GetName());
+
+			auto &commands = opertype.ReplyArray("commands");
+			for (const auto &command : nc->o->ot->GetCommands())
+				commands.Reply(command);
+
+			auto &privileges = opertype.ReplyArray("privileges");
+			for (const auto &privilege : nc->o->ot->GetPrivs())
+				privileges.Reply(privilege);
+		}
+		else
+			root.Reply("opertype", nullptr);
+
+		auto &users = root.ReplyArray("users");
+		for (const auto *u : nc->users)
+			users.Reply(u->nick);
+	}
+
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	{
+		const auto detail = request.data.empty() ? "name" : request.data[0];
+		if (detail.equals_ci("name"))
+		{
+			auto &root = request.Root<RPC::Array>();
+			for (auto &[_, nc] : *NickCoreList)
+				root.Reply(nc->display);
+		}
+		else if (detail.equals_ci("full"))
+		{
+			auto &root = request.Root<RPC::Map>();
+			for (auto &[_, nc] : *NickCoreList)
+				GetInfo(nc, root.ReplyMap(nc->display));
+		}
+		else
+		{
+			request.Error(ERR_NO_SUCH_DETAIL, "No such detail level");
+		}
+		return true;
+	}
+};
+
+class AnopeAccountRPCEvent final
+	: public RPC::Event
+{
+public:
+	AnopeAccountRPCEvent(Module *o)
+		: RPC::Event(o, "anope.account", 1)
+	{
+	}
+
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	{
+		auto *na = NickAlias::Find(request.data[0]);
+		if (!na)
+		{
+			request.Error(ERR_NO_SUCH_TARGET, "No such account");
+			return true;
+		}
+
+		AnopeListAccountsRPCEvent::GetInfo(na->nc, request.Root());
+		return true;
+	}
 };
 
 class AnopeListChannelsRPCEvent final
@@ -435,6 +602,9 @@ class ModuleRPCData final
 	: public Module
 {
 private:
+	AnopeListAccountsRPCEvent anopelistaccountsrpcevent;
+	AnopeAccountRPCEvent anopeaccountrpcevent;
+
 	AnopeListChannelsRPCEvent anopelistchannelsrpcevent;
 	AnopeChannelRPCEvent anopechannelrpcevent;
 
@@ -450,6 +620,8 @@ private:
 public:
 	ModuleRPCData(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
+		, anopelistaccountsrpcevent(this)
+		, anopeaccountrpcevent(this)
 		, anopelistchannelsrpcevent(this)
 		, anopechannelrpcevent(this)
 		, anopelistopersrpcevent(this)

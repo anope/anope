@@ -45,6 +45,30 @@ class AnopeRPC {
 	}
 
 	/**
+	 * Retrieves a list of accounts.
+	 *
+	 * Requires the rpc_data module to be loaded.
+	 *
+	 * @param {string} The level of detail to request.
+	 * @returns {array} An array of account names.
+	 */
+	listAccounts(detail = "name") {
+		return this.run("anope.listAccounts", detail);
+	}
+
+	/**
+	 * Retrieves information about the specified account.
+	 *
+	 * Requires the rpc_data module to be loaded.
+	 *
+	 * @param {string} name The name of the account.
+	 * @returns {object} An object containing information about the account.
+	 */
+	account(name) {
+		return this.run("anope.account", name);
+	}
+
+	/**
 	 * Retrieves a list of channels.
 	 *
 	 * Requires the rpc_data module to be loaded.

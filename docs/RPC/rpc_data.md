@@ -1,5 +1,130 @@
 # Anope `rpc_data` RPC interface
 
+## `anope.listAccounts`
+
+Lists all accounts that exist on the network.
+
+### Parameters
+
+Index | Description
+----- | -----------
+0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all information or "name" to just retrieve the account names. Defaults to "name".
+
+### Errors
+
+Code   | Description
+------ | -----------
+-32099 | The specified detail level does not exist.
+
+### Result
+
+If the detail level is not specified or is "name" then an array of account names.
+
+If the detail level is "full" then a mapping of account names to information about the account. See `anope.account` for more information on the data structure.
+
+#### Example
+
+```json
+["account1", "account2", "account3"]
+```
+
+## `anope.account`
+
+Retrieves information about the specified account.
+
+### Parameters
+
+Index | Description
+----- | -----------
+0     | A nickname belonging to the account.
+
+### Errors
+
+Code   | Description
+------ | -----------
+-32099 | The specified account does not exist.
+
+### Result
+
+Returns a map containing information about the account.
+
+Key                    | Type           | Description
+---                    | ----           | -----------
+display                | string         | The display nickname of the account.
+email                  | string or null | The email address associated with the account or null if one has not been specified.
+extensions             | map            | A key-value map of the extensions set on this account by modules.
+language               | string or null | The language associated with the account or null if the account uses the default language.
+lastmail               | int            | The time at which an email was last sent for this account.
+nicks                  | map            | Information about nicknames that belong to the account keyed by the nickname.
+nicks.\*.extensions    | map            | A key-value map of the extensions set on this nickname by modules.
+nicks.\*.lastseen      | int            | The time at which this nickname was last used.
+nicks.\*.registered    | int            | The time at which this nickname was registered.
+nicks.\*.vhost         | map or null    | The vhost associated with the account or null if the user has no vhost.
+nicks.\*.vhost.created | int            | The time at which the vhost was created.
+nicks.\*.vhost.creator | string         | The nickname of the creator of the vhost.
+nicks.\*.vhost.host    | string         | The host segment of the vhost.
+nicks.\*.vhost.ident   | string or null | The ident segment of the vhost or null if there is not one.
+nicks.\*.vhost.mask    | string         | The user@host or host mask of the vhost.
+opertype               | map or null    | The oper type associated with the account or null if they are not a services operator.
+opertype.commands      | array[string]  | The commands that the services operator type can use.
+opertype.name          | string         | The name of the services operator type.
+opertype.privileges    | array[string]  | The privileges that the services operator type has.
+registered             | int            | The time at which the account was registered.
+uniqueid               | uint           | The unique immutable identifier of the account.
+users                  | array[string]  | The IRC users who are currently logged in to this account.
+
+#### Example
+
+```json
+{
+	"display": "foo",
+	"email": "example@example.com",
+	"extensions": {
+		"AUTOOP": true,
+		"HIDE_EMAIL": true,
+		"HIDE_MASK": true,
+		"MEMO_RECEIVE": true,
+		"MEMO_SIGNON": true,
+		"NS_PRIVATE": true,
+		"PROTECT": true,
+		"PROTECT_AFTER": 69
+	},
+	"language": null,
+	"lastmail": 1745071858,
+	"nicks": {
+		"foo": {
+			"extensions": {
+				"NS_NO_EXPIRE": true
+			},
+			"lastseen": 1745074153,
+			"registered": 1745071857,
+			"vhost": null
+		},
+		"bar": {
+			"extensions": {},
+			"lastseen": 1745072602,
+			"registered": 1745071857,
+			"vhost": {
+				"created": 1745072653,
+				"creator": "foo",
+				"host": "bar.baz",
+				"ident": "foo",
+				"mask": "foo@bar.baz"
+			}
+		}
+	},
+	"opertype": {
+		"commands": ["hostserv/*", "operserv/session"],
+		"name": "Helper",
+		"privileges": ["chanserv/no-register-limit"]
+	},
+	"registered": 1745071857,
+	"uniqueid": 11085415958920757000,
+	"users": [
+		"foo"
+	]
+}
+```
 ## `anope.listChannels`
 
 Lists all channels that exist on the network.

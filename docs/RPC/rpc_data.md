@@ -8,7 +8,7 @@ Lists all channels that exist on the network.
 
 Index | Description
 ----- | -----------
-0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all detail or "name" to just retrieve the channel names. Defaults to "name".
+0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all information or "name" to just retrieve the channel names. Defaults to "name".
 
 ### Errors
 
@@ -18,7 +18,9 @@ Code   | Description
 
 ### Result
 
-Returns an array of channel names.
+If the detail level is not specified or is "name" then an array of channel names.
+
+If the detail level is "full" then a mapping of channel names to information about the channel. See `anope.channel` for more information on the data structure.
 
 #### Example
 
@@ -87,7 +89,7 @@ Lists all services operators that exist on the network.
 
 Index | Description
 ----- | -----------
-0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all detail or "name" to just retrieve the services operator nicknames. Defaults to "name".
+0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all information or "name" to just retrieve the services operator nicknames. Defaults to "name".
 
 ### Errors
 
@@ -97,7 +99,9 @@ Code   | Description
 
 ### Result
 
-Returns an array of services operator names.
+If the detail level is not specified or is "name" then an array of services operator names.
+
+If the detail level is "full" then a mapping of services operator names to information about the services operator. See `anope.oper` for more information on the data structure.
 
 #### Example
 
@@ -164,7 +168,7 @@ Lists all servers that exist on the network.
 
 Index | Description
 ----- | -----------
-0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all detail or "name" to just retrieve the server names. Defaults to "name".
+0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all information or "name" to just retrieve the server names. Defaults to "name".
 
 ### Errors
 
@@ -174,7 +178,9 @@ Code   | Description
 
 ### Result
 
-Returns an array of server names.
+If the detail level is not specified or is "name" then an array of server names.
+
+If the detail level is "full" then a mapping of server names to information about the server. See `anope.server` for more information on the data structure.
 
 #### Example
 
@@ -236,7 +242,7 @@ Lists all users that exist on the network.
 
 Index | Description
 ----- | -----------
-0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all detail or "name" to just retrieve the user nicknames. Defaults to "name".
+0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all information or "name" to just retrieve the user nicknames. Defaults to "name".
 
 ### Errors
 
@@ -246,8 +252,9 @@ Code   | Description
 
 ### Result
 
-Returns an array of user nicknames.
+If the detail level is not specified or is "name" then an array of user nicknames.
 
+If the detail level is "full" then a mapping of user nicknames to information about the user. See `anope.user` for more information on the data structure.
 
 #### Example
 

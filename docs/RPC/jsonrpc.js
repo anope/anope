@@ -49,10 +49,11 @@ class AnopeRPC {
 	 *
 	 * Requires the rpc_data module to be loaded.
 	 *
+	 * @param {string} The level of detail to request.
 	 * @returns {array} An array of channel names.
 	 */
-	listChannels() {
-		return this.run("anope.listChannels");
+	listChannels(detail = "name") {
+		return this.run("anope.listChannels", detail);
 	}
 
 	/**
@@ -72,10 +73,11 @@ class AnopeRPC {
 	 *
 	 * Requires the rpc_data module to be loaded.
 	 *
+	 * @param {string} The level of detail to request.
 	 * @returns {array} An array of channel names.
 	 */
-	listOpers() {
-		return this.run("anope.listOpers");
+	listOpers(detail = "name") {
+		return this.run("anope.listOpers", detail);
 	}
 
 	/**
@@ -95,10 +97,11 @@ class AnopeRPC {
 	 *
 	 * Requires the rpc_data module to be loaded.
 	 *
+	 * @param {string} The level of detail to request.
 	 * @returns {array} An array of servers names.
 	 */
-	listServers() {
-		return this.run("anope.listServers");
+	listServers(detail = "name") {
+		return this.run("anope.listServers", detail);
 	}
 
 	/**
@@ -118,10 +121,11 @@ class AnopeRPC {
 	 *
 	 * Requires the rpc_data module to be loaded.
 	 *
+	 * @param {string} The level of detail to request.
 	 * @returns {array} An array of channel names.
 	 */
-	listUsers() {
-		return this.run("anope.listUsers");
+	listUsers(detail = "name") {
+		return this.run("anope.listUsers", detail);
 	}
 
 	/**

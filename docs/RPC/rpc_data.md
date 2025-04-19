@@ -6,11 +6,15 @@ Lists all channels that exist on the network.
 
 ### Parameters
 
-*None*
+Index | Description
+----- | -----------
+0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all detail or "name" to just retrieve the channel names. Defaults to "name".
 
 ### Errors
 
-*Only standard RPC errors*
+Code   | Description
+------ | -----------
+-32099 | The specified detail level does not exist.
 
 ### Result
 
@@ -81,11 +85,15 @@ Lists all services operators that exist on the network.
 
 ### Parameters
 
-*None*
+Index | Description
+----- | -----------
+0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all detail or "name" to just retrieve the services operator nicknames. Defaults to "name".
 
 ### Errors
 
-*Only standard RPC errors*
+Code   | Description
+------ | -----------
+-32099 | The specified detail level does not exist.
 
 ### Result
 
@@ -154,11 +162,15 @@ Lists all servers that exist on the network.
 
 ### Parameters
 
-*None*
+Index | Description
+----- | -----------
+0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all detail or "name" to just retrieve the server names. Defaults to "name".
 
 ### Errors
 
-*Only standard RPC errors*
+Code   | Description
+------ | -----------
+-32099 | The specified detail level does not exist.
 
 ### Result
 
@@ -222,11 +234,15 @@ Lists all users that exist on the network.
 
 ### Parameters
 
-*None*
+Index | Description
+----- | -----------
+0     | If specified then the level of detail to retrieve. Can be set to "full" to retrieve all detail or "name" to just retrieve the user nicknames. Defaults to "name".
 
 ### Errors
 
-*Only standard RPC errors*
+Code   | Description
+------ | -----------
+-32099 | The specified detail level does not exist.
 
 ### Result
 

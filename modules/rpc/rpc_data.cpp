@@ -13,6 +13,9 @@ enum
 {
 	// Used by anope.channel, anope.oper, anope.server, and anope.user
 	ERR_NO_SUCH_TARGET = RPC::ERR_CUSTOM_START,
+
+	// Used by anope.listChannels, anope.listOpers, anope.listServers, and anope.listUsers
+	ERR_NO_SUCH_DETAIL = RPC::ERR_CUSTOM_START,
 };
 
 class AnopeListChannelsRPCEvent final
@@ -24,34 +27,8 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	static void GetInfo(Channel *c, RPC::Map &root)
 	{
-		auto &root = request.Root<RPC::Array>();
-		for (auto &[_, c] : ChannelList)
-			root.Reply(c->name);
-		return true;
-	}
-};
-
-class AnopeChannelRPCEvent final
-	: public RPC::Event
-{
-public:
-	AnopeChannelRPCEvent(Module *o)
-		: RPC::Event(o, "anope.channel", 1)
-	{
-	}
-
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
-	{
-		auto *c = Channel::Find(request.data[0]);
-		if (!c)
-		{
-			request.Error(ERR_NO_SUCH_TARGET, "No such channel");
-			return true;
-		}
-
-		auto &root = request.Root();
 		root.Reply("created", c->creation_time)
 			.Reply("name", c->name)
 			.Reply("registered", !!c->ci);
@@ -103,7 +80,50 @@ public:
 		auto &users = root.ReplyArray("users");
 		for (const auto &[_, uc] : c->users)
 			users.Reply(uc->status.BuildModePrefixList() + uc->user->nick);
+	}
 
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	{
+		const auto detail = request.data.empty() ? "name" : request.data[0];
+		if (detail.equals_ci("name"))
+		{
+			auto &root = request.Root<RPC::Array>();
+			for (auto &[_, c] : ChannelList)
+				root.Reply(c->name);
+		}
+		else if (detail.equals_ci("full"))
+		{
+			auto &root = request.Root<RPC::Map>();
+			for (auto &[_, c] : ChannelList)
+				GetInfo(c, root.ReplyMap(c->name));
+		}
+		else
+		{
+			request.Error(ERR_NO_SUCH_DETAIL, "No such detail level");
+		}
+		return true;
+	}
+};
+
+class AnopeChannelRPCEvent final
+	: public RPC::Event
+{
+public:
+	AnopeChannelRPCEvent(Module *o)
+		: RPC::Event(o, "anope.channel", 1)
+	{
+	}
+
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	{
+		auto *c = Channel::Find(request.data[0]);
+		if (!c)
+		{
+			request.Error(ERR_NO_SUCH_TARGET, "No such channel");
+			return true;
+		}
+
+		AnopeListChannelsRPCEvent::GetInfo(c, request.Root());
 		return true;
 	}
 };
@@ -117,34 +137,8 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	static void GetInfo(Oper *o, RPC::Map &root)
 	{
-		auto &root = request.Root<RPC::Array>();
-		for (auto *oper : Oper::opers)
-			root.Reply(oper->name);
-		return true;
-	}
-};
-
-class AnopeOperRPCEvent final
-	: public RPC::Event
-{
-public:
-	AnopeOperRPCEvent(Module *o)
-		: RPC::Event(o, "anope.oper", 1)
-	{
-	}
-
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
-	{
-		auto *o = Oper::Find(request.data[0]);
-		if (!o)
-		{
-			request.Error(ERR_NO_SUCH_TARGET, "No such oper");
-			return true;
-		}
-
-		auto &root = request.Root();
 		root
 			.Reply("name", o->name)
 			.Reply("operonly", o->require_oper)
@@ -184,7 +178,50 @@ public:
 			root.Reply("vhost", nullptr);
 		else
 			root.Reply("vhost", o->vhost);
+	}
 
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	{
+		const auto detail = request.data.empty() ? "name" : request.data[0];
+		if (detail.equals_ci("name"))
+		{
+			auto &root = request.Root<RPC::Array>();
+			for (auto *o : Oper::opers)
+				root.Reply(o->name);
+		}
+		else if (detail.equals_ci("full"))
+		{
+			auto &root = request.Root<RPC::Map>();
+			for (auto *o : Oper::opers)
+				GetInfo(o, root.ReplyMap(o->name));
+		}
+		else
+		{
+			request.Error(ERR_NO_SUCH_DETAIL, "No such detail level");
+		}
+		return true;
+	}
+};
+
+class AnopeOperRPCEvent final
+	: public RPC::Event
+{
+public:
+	AnopeOperRPCEvent(Module *o)
+		: RPC::Event(o, "anope.oper", 1)
+	{
+	}
+
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	{
+		auto *o = Oper::Find(request.data[0]);
+		if (!o)
+		{
+			request.Error(ERR_NO_SUCH_TARGET, "No such oper");
+			return true;
+		}
+
+		AnopeListOpersRPCEvent::GetInfo(o, request.Root());
 		return true;
 	}
 };
@@ -198,11 +235,48 @@ public:
 	{
 	}
 
+	static void GetInfo(Server *s, RPC::Map &root)
+	{
+		root.Reply("description", s->GetDescription())
+			.Reply("juped", s->IsJuped())
+			.Reply("name", s->GetName())
+			.Reply("synced", s->IsSynced())
+			.Reply("ulined", s->IsULined());
+
+		auto &downlinks = root.ReplyArray("downlinks");
+		for (const auto *s : s->GetLinks())
+			downlinks.Reply(s->GetName());
+
+		if (IRCD->RequiresID)
+			root.Reply("sid", s->GetSID());
+		else
+			root.Reply("sid", nullptr);
+
+		if (s->GetUplink())
+			root.Reply("uplink", s->GetUplink()->GetName());
+		else
+			root.Reply("uplink", nullptr);
+	}
+
 	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
 	{
-		auto &root = request.Root<RPC::Array>();
-		for (auto &[_, s] : Servers::ByName)
-			root.Reply(s->GetName());
+		const auto detail = request.data.empty() ? "name" : request.data[0];
+		if (detail.equals_ci("name"))
+		{
+			auto &root = request.Root<RPC::Array>();
+			for (auto &[_, s] : Servers::ByName)
+				root.Reply(s->GetName());
+		}
+		else if (detail.equals_ci("full"))
+		{
+			auto &root = request.Root<RPC::Map>();
+			for (auto &[_, s] : Servers::ByName)
+				GetInfo(s, root.ReplyMap(s->GetName()));
+		}
+		else
+		{
+			request.Error(ERR_NO_SUCH_DETAIL, "No such detail level");
+		}
 		return true;
 	}
 };
@@ -225,27 +299,7 @@ public:
 			return true;
 		}
 
-		auto &root = request.Root();
-		root.Reply("description", s->GetDescription())
-			.Reply("juped", s->IsJuped())
-			.Reply("name", s->GetName())
-			.Reply("synced", s->IsSynced())
-			.Reply("ulined", s->IsULined());
-
-		auto &downlinks = root.ReplyArray("downlinks");
-		for (const auto *s : s->GetLinks())
-			downlinks.Reply(s->GetName());
-
-		if (IRCD->RequiresID)
-			root.Reply("sid", s->GetSID());
-		else
-			root.Reply("sid", nullptr);
-
-		if (s->GetUplink())
-			root.Reply("uplink", s->GetUplink()->GetName());
-		else
-			root.Reply("uplink", nullptr);
-
+		AnopeListServersRPCEvent::GetInfo(s, request.Root());
 		return true;
 	}
 };
@@ -259,34 +313,8 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	static void GetInfo(User *u, RPC::Map &root)
 	{
-		auto &root = request.Root<RPC::Array>();
-		for (auto &[_, u] : UserListByNick)
-			root.Reply(u->nick);
-		return true;
-	}
-};
-
-class AnopeUserRPCEvent final
-	: public RPC::Event
-{
-public:
-	AnopeUserRPCEvent(Module *o)
-		: RPC::Event(o, "anope.user", 1)
-	{
-	}
-
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
-	{
-		auto *u = User::Find(request.data[0]);
-		if (!u)
-		{
-			request.Error(ERR_NO_SUCH_TARGET, "No such user");
-			return true;
-		}
-
-		auto &root = request.Root();
 		root.Reply("address", u->ip.addr())
 			.Reply("host", u->host)
 			.Reply("ident", u->GetIdent())
@@ -355,7 +383,50 @@ public:
 			root.Reply("vident", nullptr);
 		else
 			root.Reply("vident", u->GetIdent());
+	}
 
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	{
+		const auto detail = request.data.empty() ? "name" : request.data[0];
+		if (detail.equals_ci("name"))
+		{
+			auto &root = request.Root<RPC::Array>();
+			for (auto &[_, u] : UserListByNick)
+				root.Reply(u->nick);
+		}
+		else if (detail.equals_ci("full"))
+		{
+			auto &root = request.Root<RPC::Map>();
+			for (auto &[_, u] : UserListByNick)
+				GetInfo(u, root.ReplyMap(u->nick));
+		}
+		else
+		{
+			request.Error(ERR_NO_SUCH_DETAIL, "No such detail level");
+		}
+		return true;
+	}
+};
+
+class AnopeUserRPCEvent final
+	: public RPC::Event
+{
+public:
+	AnopeUserRPCEvent(Module *o)
+		: RPC::Event(o, "anope.user", 1)
+	{
+	}
+
+	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	{
+		auto *u = User::Find(request.data[0]);
+		if (!u)
+		{
+			request.Error(ERR_NO_SUCH_TARGET, "No such user");
+			return true;
+		}
+
+		AnopeListUsersRPCEvent::GetInfo(u, request.Root());
 		return true;
 	}
 };

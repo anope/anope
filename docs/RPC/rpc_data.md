@@ -50,13 +50,13 @@ Returns a map containing information about the channel.
 
 Key         | Type          | Description
 ---         | ----          | -----------
-created     | uint          | The UNIX time at which the channel was originally created.
+created     | int           | The UNIX time at which the channel was originally created.
 listmodes   | map           | List modes which are set on the channel keyed by the mode character.
 modes       | array[string] | Flag and parameter modes which are set on the channel.
 name        | string        | The name of the channel.
 registered  | boolean       | Whether the channel is registered.
 topic       | map or null   | The channel topic or null if no topic is set.
-topic.setat | uint          | The time at which the topic was set.
+topic.setat | int           | The time at which the topic was set.
 topic.setby | string        | The nick or nuh of the user who set the topic.
 topic.value | string        | The text of the topic.
 users       | array[string] | The users that are current in the channel prefixed by their status mode prefixes.
@@ -135,7 +135,7 @@ fingerprints        | array[string] or null | The client certificate fingerprint
 hosts               | array[string] or null | The user@ip and user@ip masks that a user must be connecting from to log in as this services operator or null if there are no host restrictions.
 name                | string                | The name of the services operator.
 operonly            | boolean               | Whether a user has to be a server operator to log in as this services operator.
-opertype            | map                   | The oper type associated with the services operator opertype.
+opertype            | map                   | The oper type associated with the services operator.
 opertype.commands   | array[string]         | The commands that the services operator type can use.
 opertype.name       | string                | The name of the services operator type.
 opertype.privileges | array[string]         | The privileges that the services operator type has.
@@ -296,10 +296,10 @@ host             | string         | The real hostname of the user.
 ident            | string         | The username (ident) of the user.
 modes            | array[string]  | Flag and parameter modes which are set on the user.
 nick             | string         | The nickname of the user.
-nickchanged      | uint           | The time at which the user last changed their nickname.
+nickchanged      | int            | The time at which the user last changed their nickname.
 real             | string         | The real name of the user.
 server           | string         | The server that the user is connected to.
-signon           | uint           | The time at which the user connected to the network.
+signon           | int            | The time at which the user connected to the network.
 uid              | string or null | The unique immutable identifier of the user or null if the IRCd does not use UIDs.
 vhost            | string or null | The virtual host of the user or null if they have no vhost.
 vident           | string or null | The virtual ident (username) of the user or null if they have no vident.

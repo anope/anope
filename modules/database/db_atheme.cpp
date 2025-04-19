@@ -1554,7 +1554,7 @@ public:
 		flags.clear();
 		for (int i = 0; i < Config->CountBlock("privilege"); ++i)
 		{
-			Configuration::Block &priv = Config->GetBlock("privilege", i);
+			const auto &priv = Config->GetBlock("privilege", i);
 			const Anope::string &name = priv.Get<const Anope::string>("name");
 			const Anope::string &value = priv.Get<const Anope::string>("flag");
 			if (!name.empty() && !value.empty())

@@ -74,7 +74,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 	if (!nc || !service || subject.empty() || message.empty())
 		return false;
 
-	Configuration::Block &b = Config->GetBlock("mail");
+	const auto &b = Config->GetBlock("mail");
 
 	if (!u)
 	{
@@ -113,7 +113,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 
 bool Mail::Send(NickCore *nc, const Anope::string &subject, const Anope::string &message)
 {
-	Configuration::Block &b = Config->GetBlock("mail");
+	const auto &b = Config->GetBlock("mail");
 	if (!b.Get<bool>("usemail") || b.Get<const Anope::string>("sendfrom").empty() || !nc || nc->email.empty() || subject.empty() || message.empty())
 		return false;
 

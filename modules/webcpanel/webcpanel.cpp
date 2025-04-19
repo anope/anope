@@ -58,7 +58,7 @@ public:
 
 		me = this;
 
-		Configuration::Block &block = Config->GetModule(this);
+		const auto &block = Config->GetModule(this);
 		provider_name = block.Get<const Anope::string>("server", "httpd/main");
 		template_base = Anope::ExpandData(block.Get<const Anope::string>("template_dir", "webcpanel/templates/default"));
 		page_title = block.Get<const Anope::string>("title", "Anope IRC Services");

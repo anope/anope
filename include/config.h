@@ -18,8 +18,6 @@
 
 namespace Configuration
 {
-	namespace Internal
-	{
 	class CoreExport Block
 	{
 		friend class Configuration::Conf;
@@ -56,10 +54,6 @@ namespace Configuration
 	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
-	} // namespace Internal
-
-	typedef const Internal::Block Block;
-	typedef Internal::Block MutableBlock;
 
 	/** Represents a configuration file
 	 */

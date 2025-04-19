@@ -33,7 +33,7 @@ public:
 				return;
 			}
 
-			Configuration::MutableBlock *block = Config->GetMutableBlock(params[1]);
+			auto *block = Config->GetMutableBlock(params[1]);
 			if (!block)
 				block = &Config->GetModule(params[1]);
 
@@ -57,7 +57,7 @@ public:
 
 			for (unsigned i = 0; !show_blocks[i].empty(); ++i)
 			{
-				Configuration::Block &block = Config->GetBlock(show_blocks[i]);
+				const auto &block = Config->GetBlock(show_blocks[i]);
 				const Configuration::Block::item_map &items = block.GetItems();
 
 				ListFormatter lflist(source.GetAccount());
@@ -87,7 +87,7 @@ public:
 
 			for (int i = 0; i < Config->CountBlock("module"); ++i)
 			{
-				Configuration::Block &block = Config->GetBlock("module", i);
+				const auto &block = Config->GetBlock("module", i);
 				const Configuration::Block::item_map &items = block.GetItems();
 
 				if (items.size() <= 1)

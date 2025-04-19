@@ -114,7 +114,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &block = conf.GetModule(this);
+		const auto &block = conf.GetModule(this);
 		this->check_on_connect = block.Get<bool>("check_on_connect");
 		this->check_on_netburst = block.Get<bool>("check_on_netburst");
 		this->add_to_akill = block.Get<bool>("add_to_akill", "yes");
@@ -122,7 +122,7 @@ public:
 		this->blacklists.clear();
 		for (int i = 0; i < block.CountBlock("blacklist"); ++i)
 		{
-			Configuration::Block &bl = block.GetBlock("blacklist", i);
+			const auto &bl = block.GetBlock("blacklist", i);
 			Blacklist blacklist;
 
 			blacklist.name = bl.Get<Anope::string>("name");
@@ -133,7 +133,7 @@ public:
 
 			for (int j = 0; j < bl.CountBlock("reply"); ++j)
 			{
-				Configuration::Block &reply = bl.GetBlock("reply", j);
+				const auto &reply = bl.GetBlock("reply", j);
 				Blacklist::Reply r;
 
 				r.code = reply.Get<int>("code");
@@ -149,7 +149,7 @@ public:
 		this->exempts.clear();
 		for (int i = 0; i < block.CountBlock("exempt"); ++i)
 		{
-			Configuration::Block &bl = block.GetBlock("exempt", i);
+			const auto &bl = block.GetBlock("exempt", i);
 			this->exempts.insert(bl.Get<Anope::string>("ip"));
 		}
 	}

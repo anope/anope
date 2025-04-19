@@ -338,7 +338,7 @@ public:
 		DefconConfig dconfig;
 
 		{
-		Configuration::Block &block = conf.GetModule(this);
+		const auto &block = conf.GetModule(this);
 		dconfig.defaultlevel = block.Get<int>("defaultlevel");
 		dconfig.defcons[4] = block.Get<const Anope::string>("level4");
 		dconfig.defcons[3] = block.Get<const Anope::string>("level3");
@@ -355,7 +355,7 @@ public:
 		}
 
 		{
-		Configuration::Block &block = conf.GetModule("os_session");
+		const auto &block = conf.GetModule("os_session");
 		dconfig.max_session_kill = block.Get<int>("maxsessionkill");
 		dconfig.session_autokill_expiry = block.Get<time_t>("sessionautokillexpiry");
 		dconfig.sle_reason = block.Get<const Anope::string>("sessionlimitexceeded");

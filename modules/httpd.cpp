@@ -362,12 +362,12 @@ public:
 
 	void OnReload(Configuration::Conf &config) override
 	{
-		Configuration::Block &conf = config.GetModule(this);
+		const auto &conf = config.GetModule(this);
 		std::set<Anope::string> existing;
 
 		for (int i = 0; i < conf.CountBlock("httpd"); ++i)
 		{
-			Configuration::Block &block = conf.GetBlock("httpd", i);
+			const auto &block = conf.GetBlock("httpd", i);
 
 
 			const Anope::string &hname = block.Get<const Anope::string>("name", "httpd/main");

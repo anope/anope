@@ -50,7 +50,7 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		Configuration::Block &block = Config->GetCommand(source);
+		const auto &block = Config->GetCommand(source);
 		const Anope::string &mode = block.Get<Anope::string>("mode", "BAN");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
 		if (cm == NULL)

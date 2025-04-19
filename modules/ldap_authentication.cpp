@@ -220,7 +220,7 @@ public:
 
 	void OnReload(Configuration::Conf &config) override
 	{
-		Configuration::Block &conf = Config->GetModule(this);
+		const auto &conf = Config->GetModule(this);
 
 		basedn = conf.Get<const Anope::string>("basedn");
 		search_filter = conf.Get<const Anope::string>("search_filter");

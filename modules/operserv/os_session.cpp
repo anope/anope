@@ -640,7 +640,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &block = Config->GetModule(this);
+		const auto &block = Config->GetModule(this);
 
 		session_limit = block.Get<int>("defaultsessionlimit");
 		max_session_kill = block.Get<int>("maxsessionkill");

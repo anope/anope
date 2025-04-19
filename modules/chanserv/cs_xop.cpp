@@ -640,7 +640,7 @@ public:
 
 		for (int i = 0; i < conf.CountBlock("privilege"); ++i)
 		{
-			Configuration::Block &block = conf.GetBlock("privilege", i);
+			const auto &block = conf.GetBlock("privilege", i);
 			const Anope::string &pname = block.Get<const Anope::string>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
@@ -656,7 +656,7 @@ public:
 
 		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block &block = conf.GetBlock("command", i);
+			const auto &block = conf.GetBlock("command", i);
 			const Anope::string &cname = block.Get<const Anope::string>("name"),
 				&cserv = block.Get<const Anope::string>("command");
 			if (cname.empty() || cserv != "chanserv/xop")

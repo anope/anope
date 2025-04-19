@@ -162,7 +162,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &block = conf.GetModule(this);
+		const auto &block = conf.GetModule(this);
 		this->sql = ServiceReference<Provider>("SQL::Provider", block.Get<const Anope::string>("engine"));
 		this->prefix = block.Get<const Anope::string>("prefix", "anope_db_");
 		this->import = block.Get<bool>("import");

@@ -109,7 +109,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &block = conf.GetModule(this);
+		const auto &block = conf.GetModule(this);
 		syncongroup = block.Get<bool>("syncongroup");
 		synconset = block.Get<bool>("synconset");
 	}

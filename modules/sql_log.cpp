@@ -22,7 +22,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &config = conf.GetModule(this);
+		const auto &config = conf.GetModule(this);
 		this->table = config.Get<const Anope::string>("table", "logs");
 	}
 

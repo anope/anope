@@ -325,12 +325,12 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &block = conf.GetModule(this);
+		const auto &block = conf.GetModule(this);
 		defaults.clear();
 
 		for (int i = 0; i < block.CountBlock("default"); ++i)
 		{
-			Configuration::Block &def = block.GetBlock("default", i);
+			const auto &def = block.GetBlock("default", i);
 
 			LogDefault ld;
 

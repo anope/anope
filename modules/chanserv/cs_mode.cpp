@@ -969,7 +969,7 @@ public:
 
 		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block &block = conf.GetBlock("command", i);
+			const auto &block = conf.GetBlock("command", i);
 
 			const Anope::string &cname = block.Get<const Anope::string>("name"),
 					&cmd = block.Get<const Anope::string>("command");

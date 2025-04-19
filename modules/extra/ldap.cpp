@@ -546,7 +546,7 @@ public:
 
 	void OnReload(Configuration::Conf &config) override
 	{
-		Configuration::Block &conf = config.GetModule(this);
+		const auto &conf = config.GetModule(this);
 
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end();)
 		{
@@ -574,7 +574,7 @@ public:
 
 		for (int i = 0; i < conf.CountBlock("ldap"); ++i)
 		{
-			Configuration::Block &ldap = conf.GetBlock("ldap", i);
+			const auto &ldap = conf.GetBlock("ldap", i);
 
 			const Anope::string &connname = ldap.Get<const Anope::string>("name", "ldap/main");
 

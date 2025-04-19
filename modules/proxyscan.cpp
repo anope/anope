@@ -262,7 +262,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &config = Config->GetModule(this);
+		const auto &config = Config->GetModule(this);
 
 		Anope::string s_target_ip = config.Get<const Anope::string>("target_ip");
 		if (s_target_ip.empty())
@@ -304,7 +304,7 @@ public:
 		this->proxyscans.clear();
 		for (int i = 0; i < config.CountBlock("proxyscan"); ++i)
 		{
-			Configuration::Block &block = config.GetBlock("proxyscan", i);
+			const auto &block = config.GetBlock("proxyscan", i);
 			ProxyCheck p;
 			Anope::string token;
 

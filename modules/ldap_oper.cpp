@@ -94,7 +94,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &config = Config->GetModule(this);
+		const auto &config = Config->GetModule(this);
 
 		this->binddn = config.Get<const Anope::string>("binddn");
 		this->password = config.Get<const Anope::string>("password");

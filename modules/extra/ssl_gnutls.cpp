@@ -329,7 +329,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &config = conf.GetModule(this);
+		const auto &config = conf.GetModule(this);
 
 		const Anope::string certfile = Anope::ExpandConfig(config.Get<const Anope::string>("cert", "fullchain.pem"));
 		const Anope::string keyfile = Anope::ExpandConfig(config.Get<const Anope::string>("key", "privkey.pem"));
@@ -365,7 +365,7 @@ public:
 
 	void OnPreServerConnect() override
 	{
-		Configuration::Block &config = Config->GetBlock("uplink", Anope::CurrentUplink);
+		const auto &config = Config->GetBlock("uplink", Anope::CurrentUplink);
 
 		if (config.Get<bool>("ssl"))
 		{

@@ -173,7 +173,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &block = conf.GetModule(this);
+		const auto &block = conf.GetModule(this);
 		this->redis = ServiceReference<Provider>("Redis::Provider", block.Get<const Anope::string>("engine", "redis/main"));
 	}
 

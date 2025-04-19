@@ -503,7 +503,7 @@ public:
 
 		for (int i = 0; i < conf.CountBlock("privilege"); ++i)
 		{
-			Configuration::Block &priv = conf.GetBlock("privilege", i);
+			const auto &priv = conf.GetBlock("privilege", i);
 
 			const Anope::string &pname = priv.Get<const Anope::string>("name");
 

@@ -1047,7 +1047,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &block = conf.GetModule(this);
+		const auto &block = conf.GetModule(this);
 
 		nameserver = block.Get<const Anope::string>("nameserver", "127.0.0.1");
 		timeout =  block.Get<time_t>("timeout", "5");
@@ -1059,7 +1059,7 @@ public:
 
 		for (int i = 0; i < block.CountBlock("notify"); ++i)
 		{
-			Configuration::Block &n = block.GetBlock("notify", i);
+			const auto &n = block.GetBlock("notify", i);
 			Anope::string nip = n.Get<Anope::string>("ip");
 			short nport = n.Get<short>("port");
 

@@ -372,7 +372,7 @@ public:
 
 	void OnNickIdentify(User *u) override
 	{
-		Configuration::Block &block = Config->GetModule(this);
+		const auto &block = Config->GetModule(this);
 
 		if (block.Get<bool>("modeonid", "yes"))
 		{

@@ -115,7 +115,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &config = conf.GetModule(this);
+		const auto &config = conf.GetModule(this);
 
 		for (std::map<Anope::string, SQLiteService *>::iterator it = this->SQLiteServices.begin(); it != this->SQLiteServices.end();)
 		{
@@ -139,7 +139,7 @@ public:
 
 		for (int i = 0; i < config.CountBlock("sqlite"); ++i)
 		{
-			Configuration::Block &block = config.GetBlock("sqlite", i);
+			const auto &block = config.GetBlock("sqlite", i);
 			Anope::string connname = block.Get<const Anope::string>("name", "sqlite/main");
 
 			if (this->SQLiteServices.find(connname) == this->SQLiteServices.end())

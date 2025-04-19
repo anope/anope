@@ -169,7 +169,7 @@ public:
 
 		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block &block = conf.GetBlock("command", i);
+			const auto &block = conf.GetBlock("command", i);
 
 			if (!block.Get<bool>("rewrite"))
 				continue;

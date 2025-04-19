@@ -537,12 +537,12 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &block = conf.GetModule(this);
+		const auto &block = conf.GetModule(this);
 		std::vector<Anope::string> new_services;
 
 		for (int i = 0; i < block.CountBlock("redis"); ++i)
 		{
-			Configuration::Block &redis = block.GetBlock("redis", i);
+			const auto &redis = block.GetBlock("redis", i);
 
 			const Anope::string &n = redis.Get<const Anope::string>("name"),
 						&ip = redis.Get<const Anope::string>("ip");

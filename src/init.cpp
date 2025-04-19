@@ -249,7 +249,7 @@ static void write_pidfile()
 static void setuidgid()
 {
 #ifndef _WIN32
-	Configuration::Block &options = Config->GetBlock("options");
+	const auto &options = Config->GetBlock("options");
 	uid_t uid = -1;
 	gid_t gid = -1;
 
@@ -500,7 +500,7 @@ bool Anope::Init(int ac, char **av)
 	}
 
 	/* Create me */
-	Configuration::Block &block = Config->GetBlock("serverinfo");
+	const auto &block = Config->GetBlock("serverinfo");
 	Me = new Server(NULL, block.Get<const Anope::string>("name"), 0, block.Get<const Anope::string>("description"), block.Get<const Anope::string>("id"));
 	for (const auto &[_, bi] : *BotListByNick)
 	{
@@ -526,7 +526,7 @@ bool Anope::Init(int ac, char **av)
 	if (!getuid() && !getgid())
 	{
 		/* If we are configured to setuid later, don't issue a warning */
-		Configuration::Block &options = Config->GetBlock("options");
+		const auto &options = Config->GetBlock("options");
 		if (options.Get<const Anope::string>("user").empty())
 		{
 			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;

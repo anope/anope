@@ -22,7 +22,7 @@
 
 using Configuration::File;
 using Configuration::Conf;
-using Configuration::Internal::Block;
+using Configuration::Block;
 using Configuration::Uplink;
 
 File ServicesConf("anope.conf", false); // Configuration file name

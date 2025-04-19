@@ -69,7 +69,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &block = conf.GetModule(this);
+		const auto &block = conf.GetModule(this);
 
 		const Anope::string syntax = block.Get<const Anope::string>("syntax", "ecmascript");
 		if (syntax == "awk")

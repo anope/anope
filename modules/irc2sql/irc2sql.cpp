@@ -19,7 +19,7 @@ void IRC2SQL::OnShutdown()
 
 void IRC2SQL::OnReload(Configuration::Conf &conf)
 {
-	Configuration::Block &block = Config->GetModule(this);
+	const auto &block = Config->GetModule(this);
 	prefix = block.Get<const Anope::string>("prefix", "anope_");
 	GeoIPDB = block.Get<const Anope::string>("geoip_database");
 	ctcpuser = block.Get<bool>("ctcpuser", "no");

@@ -262,7 +262,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &config = conf.GetModule(this);
+		const auto &config = conf.GetModule(this);
 
 		for (std::map<Anope::string, MySQLService *>::iterator it = this->MySQLServices.begin(); it != this->MySQLServices.end();)
 		{
@@ -287,7 +287,7 @@ public:
 
 		for (int i = 0; i < config.CountBlock("mysql"); ++i)
 		{
-			Configuration::Block &block = config.GetBlock("mysql", i);
+			const auto &block = config.GetBlock("mysql", i);
 			const Anope::string &connname = block.Get<const Anope::string>("name", "mysql/main");
 
 			if (this->MySQLServices.find(connname) == this->MySQLServices.end())

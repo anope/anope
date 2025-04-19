@@ -152,7 +152,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &config = conf.GetModule(this);
+		const auto &config = conf.GetModule(this);
 
 		this->engine = config.Get<const Anope::string>("engine");
 		this->query = config.Get<const Anope::string>("query");

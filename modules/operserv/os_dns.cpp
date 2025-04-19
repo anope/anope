@@ -780,7 +780,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block &block = conf.GetModule(this);
+		const auto &block = conf.GetModule(this);
 		this->ttl = block.Get<time_t>("ttl");
 		this->user_drop_mark =  block.Get<int>("user_drop_mark");
 		this->user_drop_time = block.Get<time_t>("user_drop_time");

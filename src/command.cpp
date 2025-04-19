@@ -154,23 +154,35 @@ void Command::ClearSyntax()
 	this->syntax.clear();
 }
 
-void Command::SetSyntax(const Anope::string &s)
+void Command::SetSyntax(const Anope::string &s, const std::function<bool(CommandSource&)> &p)
 {
-	this->syntax.push_back(s);
+	this->syntax.emplace_back(s, p);
 }
 
 void Command::SendSyntax(CommandSource &source)
 {
-	Anope::string s = Language::Translate(source.GetAccount(), _("Syntax"));
-	if (!this->syntax.empty())
+	auto first = true;
+	Anope::string prefix = Language::Translate(source.GetAccount(), _("Syntax"));
+	for (const auto &[syntax, predicate] : this->syntax)
 	{
-		source.Reply("%s: \002%s %s\002", s.c_str(), source.command.c_str(), Language::Translate(source.GetAccount(), this->syntax[0].c_str()));
-		Anope::string spaces(s.length(), ' ');
-		for (unsigned i = 1, j = this->syntax.size(); i < j; ++i)
-			source.Reply("%s  \002%s %s\002", spaces.c_str(), source.command.c_str(), Language::Translate(source.GetAccount(), this->syntax[i].c_str()));
+		if (predicate && !predicate(source))
+			continue; // Not for this user.
+
+		if (first)
+		{
+			first = false;
+			source.Reply("%s: \002%s %s\002", prefix.c_str(), source.command.c_str(),
+				Language::Translate(source.GetAccount(), syntax.c_str()));
+		}
+		else
+		{
+			source.Reply("%-*s  \002%s %s\002", (int)prefix.length(), "", source.command.c_str(),
+				Language::Translate(source.GetAccount(), syntax.c_str()));
+		}
 	}
-	else
-		source.Reply("%s: \002%s\002", s.c_str(), source.command.c_str());
+
+	if (first)
+		source.Reply("%s: \002%s\002", prefix.c_str(), source.command.c_str());
 }
 
 bool Command::AllowUnregistered() const

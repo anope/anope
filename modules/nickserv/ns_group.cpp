@@ -312,6 +312,7 @@ public:
 	CommandNSGList(Module *creator) : Command(creator, "nickserv/glist", 0, 1)
 	{
 		this->SetDesc(_("Lists all nicknames in your group"));
+		this->SetSyntax(_("[\037nickname\037]"), [](auto &source) { return source.IsServicesOper(); });
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -372,29 +373,22 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
+		this->SendSyntax(source);
 		if (source.IsServicesOper())
 		{
 			source.Reply(_(
-					"Syntax: \002%s [\037nickname\037]\002"
-					"\n\n"
-					"Without a parameter, lists all nicknames that are in "
-					"your group."
-					"\n\n"
-					"With a parameter, lists all nicknames that are in the "
-					"group of the given nick."
-					"\n\n"
-					"Specifying a nick is limited to \002Services Operators\002."
-				),
-				source.command.c_str());
+				"Without a parameter, lists all nicknames that are in "
+				"your group."
+				"\n\n"
+				"With a parameter, lists all nicknames that are in the "
+				"group of the given nick."
+				"\n\n"
+				"Specifying a nick is limited to \002Services Operators\002."
+			));
 		}
 		else
 		{
-			source.Reply(_(
-					"Syntax: \002%s\002"
-					"\n\n"
-					"Lists all nicks in your group."
-				),
-				source.command.c_str());
+			source.Reply(_("Lists all nicks in your group."));
 		}
 
 		return true;

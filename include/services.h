@@ -23,6 +23,7 @@
 #include <deque>
 #include <exception>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <list>
 #include <map>

@@ -97,7 +97,7 @@ class CoreExport Command
 	: public Service
 {
 	Anope::string desc;
-	std::vector<Anope::string> syntax;
+	std::vector<std::pair<Anope::string, std::function<bool(CommandSource&)>>> syntax;
 	/* Allow unregistered users to use this command */
 	bool allow_unregistered;
 	/* Command requires that a user is executing it */
@@ -129,7 +129,7 @@ protected:
 	void SetDesc(const Anope::string &d);
 
 	void ClearSyntax();
-	void SetSyntax(const Anope::string &s);
+	void SetSyntax(const Anope::string &s, const std::function<bool(CommandSource&)> &p = nullptr);
 	void SendSyntax(CommandSource &);
 
 	void AllowUnregistered(bool b);

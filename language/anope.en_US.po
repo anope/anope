@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-16 02:59+0100\n"
+"POT-Creation-Date: 2025-04-19 16:53+0100\n"
 "PO-Revision-Date: 2025-04-16 02:59+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -3198,6 +3198,9 @@ msgstr ""
 msgid "Lists all nicknames in your group"
 msgstr ""
 
+msgid "Lists all nicks in your group."
+msgstr ""
+
 msgid "Lists all registered channels matching the given pattern"
 msgstr ""
 
@@ -4321,6 +4324,9 @@ msgstr ""
 msgid "Reverses kicker"
 msgstr ""
 
+msgid "Reverses the effect of the IDENTIFY command, i.e. make you not recognized as the real owner of the nick anymore. Note, however, that you won't be asked to reidentify yourself."
+msgstr ""
+
 msgid "Reverses the effect of the IDENTIFY command"
 msgstr ""
 
@@ -4927,24 +4933,6 @@ msgid "Syncs the vhost for all nicks in a group"
 msgstr ""
 
 msgid "Syntax"
-msgstr ""
-
-#, c-format
-msgid ""
-"Syntax: %s\n"
-"\n"
-"Lists all nicks in your group."
-msgstr ""
-
-#, c-format
-msgid ""
-"Syntax: %s [nickname]\n"
-"\n"
-"Without a parameter, lists all nicknames that are in your group.\n"
-"\n"
-"With a parameter, lists all nicknames that are in the group of the given nick.\n"
-"\n"
-"Specifying a nick is limited to Services Operators."
 msgstr ""
 
 msgid ""
@@ -5779,6 +5767,14 @@ msgid ""
 "With a channel parameter, displays the same information for the given channel.\n"
 "\n"
 "With a nickname parameter, displays the same information for the given nickname. This is limited to Services Operators."
+msgstr ""
+
+msgid ""
+"Without a parameter, lists all nicknames that are in your group.\n"
+"\n"
+"With a parameter, lists all nicknames that are in the group of the given nick.\n"
+"\n"
+"Specifying a nick is limited to Services Operators."
 msgstr ""
 
 msgid ""

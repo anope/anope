@@ -80,7 +80,7 @@ void NickCore::Type::Serialize(const Serializable *obj, Serialize::Data &data) c
 	data.Store("email", nc->email);
 	data.Store("language", nc->language);
 	data.Store("lastmail", nc->lastmail);
-	data.Store("time_registered", nc->time_registered);
+	data.Store("time_registered", nc->registered);
 	data.Store("memomax", nc->memos.memomax);
 
 	std::ostringstream oss;
@@ -110,7 +110,7 @@ Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &da
 	data["email"] >> nc->email;
 	data["language"] >> nc->language;
 	data["lastmail"] >> nc->lastmail;
-	data["time_registered"] >> nc->time_registered;
+	data["time_registered"] >> nc->registered;
 	data["memomax"] >> nc->memos.memomax;
 	{
 		Anope::string buf;
@@ -259,7 +259,7 @@ uint64_t NickCore::GetId()
 	uint64_t attempt = 0;
 	while (!this->id)
 	{
-		const auto newidstr = this->display + "\0" + Anope::ToString(this->time_registered) + "\0" + Anope::ToString(attempt++);
+		const auto newidstr = this->display + "\0" + Anope::ToString(this->registered) + "\0" + Anope::ToString(attempt++);
 		const auto newid = Anope::hash_cs()(newidstr);
 		if (NickCoreIdList->emplace(newid, this).second)
 		{

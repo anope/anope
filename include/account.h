@@ -53,7 +53,7 @@ public:
 	Anope::string last_usermask;
 	/* Last uncloaked usermask, requires nickserv/auspex to see */
 	Anope::string last_realhost;
-	time_t time_registered = Anope::CurTime;
+	time_t registered = Anope::CurTime;
 	time_t last_seen = Anope::CurTime;
 
 	/* Account this nick is tied to. Multiple nicks can be tied to a single account. */
@@ -149,7 +149,7 @@ public:
 	/* Last time an email was sent to this user */
 	time_t lastmail = 0;
 	/* The time this account was registered */
-	time_t time_registered = Anope::CurTime;
+	time_t registered = Anope::CurTime;
 	MemoInfo memos;
 	std::map<Anope::string, Anope::string> last_modes;
 

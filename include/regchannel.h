@@ -79,7 +79,7 @@ public:
 	Anope::string name;                       /* Channel name */
 	Anope::string desc;
 
-	time_t time_registered;
+	time_t registered;
 	time_t last_used;
 
 	Anope::string last_topic;                 /* The last topic that was set on this channel */

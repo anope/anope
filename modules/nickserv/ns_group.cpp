@@ -51,7 +51,7 @@ public:
 		}
 
 		na = new NickAlias(nick, target->nc);
-		na->time_registered = na->last_seen = Anope::CurTime;
+		na->registered = na->last_seen = Anope::CurTime;
 
 		if (u != NULL)
 		{
@@ -351,7 +351,7 @@ public:
 			else if (!nickserv_expire || Anope::NoExpire)
 				;
 			else if (na2->nc->HasExt("UNCONFIRMED") && unconfirmed_expire)
-				expires = Anope::strftime(na2->time_registered + unconfirmed_expire, source.GetAccount());
+				expires = Anope::strftime(na2->registered + unconfirmed_expire, source.GetAccount());
 			else
 				expires = Anope::strftime(na2->last_seen + nickserv_expire, source.GetAccount());
 

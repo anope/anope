@@ -625,7 +625,7 @@ public:
 		else
 		{
 			time_t unconfirmed_expire = Config->GetModule("ns_register").Get<time_t>("unconfirmedexpire", "1d");
-			info[_("Expires")] = Anope::strftime(na->time_registered + unconfirmed_expire, source.GetAccount());
+			info[_("Expires")] = Anope::strftime(na->registered + unconfirmed_expire, source.GetAccount());
 		}
 	}
 };

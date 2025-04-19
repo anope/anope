@@ -53,7 +53,7 @@ public:
 		if (!ci->desc.empty())
 			info[_("Description")] = ci->desc;
 
-		info[_("Registered")] = Anope::strftime(ci->time_registered, source.GetAccount());
+		info[_("Registered")] = Anope::strftime(ci->registered, source.GetAccount());
 		info[_("Last used")] = Anope::strftime(ci->last_used, source.GetAccount());
 
 		if (show_all)

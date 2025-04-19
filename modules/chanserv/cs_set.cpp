@@ -1241,10 +1241,10 @@ public:
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (u->server != Me && persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->time_registered)
+		if (u->server != Me && persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->created > c->ci->registered)
 		{
-			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
-			c->creation_time = c->ci->time_registered;
+			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->created << " to " << c->ci->registered;
+			c->created = c->ci->registered;
 			IRCD->SendChannel(c);
 			c->Reset();
 		}

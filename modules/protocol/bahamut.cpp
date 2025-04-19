@@ -51,7 +51,7 @@ public:
 	void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
 		auto params = values;
-		params.insert(params.begin(), { chan->name, Anope::ToString(chan->creation_time), modes });
+		params.insert(params.begin(), { chan->name, Anope::ToString(chan->created), modes });
 		Uplink::SendInternal({}, source, "MODE", params);
 	}
 
@@ -157,7 +157,7 @@ public:
 	/* JOIN - SJOIN */
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		Uplink::Send(user, "SJOIN", c->creation_time, c->name);
+		Uplink::Send(user, "SJOIN", c->created, c->name);
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -267,7 +267,7 @@ public:
 
 	void SendChannel(Channel *c) override
 	{
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), "");
+		Uplink::Send("SJOIN", c->created, c->name, "+" + c->GetModes(true, true), "");
 	}
 
 	void SendLogin(User *u, NickAlias *) override

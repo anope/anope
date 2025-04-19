@@ -48,7 +48,7 @@ public:
 	/* Set if this channel is registered. ci->c == this. Contains information relevant to the registered channel */
 	Serialize::Reference<ChannelInfo> ci;
 	/* When the channel was created */
-	time_t creation_time;
+	time_t created;
 	/* If the channel has just been created in a netjoin */
 	bool syncing = false;
 	/* Is configured in the conf as a channel bots should be in */

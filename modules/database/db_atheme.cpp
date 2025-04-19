@@ -882,7 +882,7 @@ private:
 		auto mlock_key = row.Get(); // May not exist.
 
 		auto *ci = new ChannelInfo(channel);
-		ci->time_registered = regtime;
+		ci->registered = regtime;
 		ci->last_used = used;
 
 		// No equivalent: elnv
@@ -1322,8 +1322,8 @@ private:
 		}
 
 		na = new NickAlias(nick, nc);
-		na->time_registered = regtime;
-		na->last_seen = lastseen ? regtime : na->time_registered;
+		na->registered = regtime;
+		na->last_seen = lastseen ? regtime : na->registered;
 
 		auto *data = userdata.Get(nc);
 		if (data)
@@ -1375,7 +1375,7 @@ private:
 
 		nc = new NickCore(display);
 		nc->email = email;
-		nc->time_registered = regtime;
+		nc->registered = regtime;
 		ApplyPassword(nc, flags, pass);
 
 		// No equivalent: bglmNQrS

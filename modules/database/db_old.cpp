@@ -617,7 +617,7 @@ static void LoadNicks()
 		for (int c; (c = getc_db(f)) == 1;)
 		{
 			Anope::string nick, last_usermask, last_realname, last_quit;
-			time_t time_registered, last_seen;
+			time_t registered, last_seen;
 
 			READ(read_string(nick, f));
 			READ(read_string(last_usermask, f));
@@ -626,7 +626,7 @@ static void LoadNicks()
 
 			int32_t tmp32;
 			READ(read_int32(&tmp32, f));
-			time_registered = tmp32;
+			registered = tmp32;
 			READ(read_int32(&tmp32, f));
 			last_seen = tmp32;
 
@@ -672,7 +672,7 @@ static void LoadNicks()
 			na->last_usermask = last_usermask;
 			na->last_realname = last_realname;
 			na->last_quit = last_quit;
-			na->time_registered = time_registered;
+			na->registered = registered;
 			na->last_seen = last_seen;
 
 			if (tmpu16 & OLD_NS_NO_EXPIRE)
@@ -785,7 +785,7 @@ static void LoadChannels()
 
 			int32_t tmp32;
 			READ(read_int32(&tmp32, f));
-			ci->time_registered = tmp32;
+			ci->registered = tmp32;
 
 			READ(read_int32(&tmp32, f));
 			ci->last_used = tmp32;

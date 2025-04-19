@@ -451,7 +451,7 @@ public:
 		if (modelocks && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-			Uplink::Send("MLOCK", c->creation_time, c->ci->name, modes);
+			Uplink::Send("MLOCK", c->created, c->ci->name, modes);
 		}
 	}
 
@@ -462,7 +462,7 @@ public:
 		if (cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -475,7 +475,7 @@ public:
 		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, modes);
 		}
 
 		return EVENT_CONTINUE;

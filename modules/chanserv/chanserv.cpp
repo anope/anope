@@ -417,7 +417,7 @@ public:
 				continue;
 
 			bool c;
-			ci->c = Channel::FindOrCreate(ci->name, c, ci->time_registered);
+			ci->c = Channel::FindOrCreate(ci->name, c, ci->registered);
 			ci->c->syncing |= created;
 
 			if (perm)
@@ -452,10 +452,10 @@ public:
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (always_lower && c->ci && c->creation_time > c->ci->time_registered)
+		if (always_lower && c->ci && c->created > c->ci->registered)
 		{
-			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
-			c->creation_time = c->ci->time_registered;
+			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->created << " to " << c->ci->registered;
+			c->created = c->ci->registered;
 			IRCD->SendChannel(c);
 			c->Reset();
 		}
@@ -463,7 +463,7 @@ public:
 
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
-		if (!always_lower && Anope::CurTime == c->creation_time && c->ci && setter.GetUser() && !setter.GetUser()->server->IsULined())
+		if (!always_lower && Anope::CurTime == c->created && c->ci && setter.GetUser() && !setter.GetUser()->server->IsULined())
 		{
 			ChanUserContainer *cu = c->FindUser(setter.GetUser());
 			ChannelMode *cm = ModeManager::FindChannelModeByName("OP");

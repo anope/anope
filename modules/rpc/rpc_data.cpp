@@ -77,7 +77,7 @@ public:
 		root
 			.Reply("display", nc->display)
 			.Reply("lastmail", nc->lastmail)
-			.Reply("registered", nc->time_registered)
+			.Reply("registered", nc->registered)
 			.Reply("uniqueid", nc->GetId());
 
 		if (nc->email.empty())
@@ -97,7 +97,7 @@ public:
 		{
 			auto &nick = nicks.ReplyMap(na->nick);
 			nick.Reply("lastseen", na->last_seen)
-				.Reply("registered", nc->time_registered);
+				.Reply("registered", nc->registered);
 
 			SaveData::Serialize(na, na, nick.ReplyMap("extensions"));
 			if (na->HasVHost())
@@ -196,7 +196,7 @@ public:
 
 	static void GetInfo(Channel *c, RPC::Map &root)
 	{
-		root.Reply("created", c->creation_time)
+		root.Reply("created", c->created)
 			.Reply("name", c->name)
 			.Reply("registered", !!c->ci);
 

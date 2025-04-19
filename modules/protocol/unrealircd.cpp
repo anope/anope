@@ -183,7 +183,7 @@ private:
 	/* JOIN */
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), user->GetUID());
+		Uplink::Send("SJOIN", c->created, c->name, "+" + c->GetModes(true, true), user->GetUID());
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -383,7 +383,7 @@ private:
 
 	void SendChannel(Channel *c) override
 	{
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), "");
+		Uplink::Send("SJOIN", c->created, c->name, "+" + c->GetModes(true, true), "");
 	}
 
 	void SendSASLMessage(const SASL::Message &message) override
@@ -1489,7 +1489,7 @@ struct IRCDMessageSJoin final
 		{
 			Channel *c = Channel::Find(params[1]);
 
-			if (!c || c->creation_time != ts)
+			if (!c || c->created != ts)
 				return;
 
 			ChannelMode *ban = ModeManager::FindChannelModeByName("BAN"),
@@ -1803,7 +1803,7 @@ public:
 		if (Servers::Capab.count("MLOCK") > 0 && modelocks)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-			Uplink::Send("MLOCK", c->creation_time, c->ci->name, modes);
+			Uplink::Send("MLOCK", c->created, c->ci->name, modes);
 		}
 	}
 
@@ -1813,14 +1813,14 @@ public:
 		if (!ci->c || !modelocks || !Servers::Capab.count("MLOCK"))
 			return;
 		Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-		Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
+		Uplink::Send("MLOCK", ci->c->created, ci->name, modes);
 	}
 
 	void OnDelChan(ChannelInfo *ci) override
 	{
 		if (!ci->c || !Servers::Capab.count("MLOCK"))
 			return;
-		Uplink::Send("MLOCK", ci->c->creation_time, ci->name, "");
+		Uplink::Send("MLOCK", ci->c->created, ci->name, "");
 	}
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
@@ -1830,7 +1830,7 @@ public:
 		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -1843,7 +1843,7 @@ public:
 		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, modes);
 		}
 
 		return EVENT_CONTINUE;

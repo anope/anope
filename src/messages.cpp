@@ -110,7 +110,7 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 		users.emplace_back(ChannelStatus(), user);
 
 		Channel *chan = Channel::Find(channel);
-		SJoin(source, channel, chan ? chan->creation_time : Anope::CurTime, "", {}, users);
+		SJoin(source, channel, chan ? chan->created : Anope::CurTime, "", {}, users);
 	}
 }
 
@@ -126,13 +126,13 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	else if (!ts)
 		;
 	/* Our creation time is newer than what the server gave us, so reset the channel to the older time */
-	else if (c->creation_time > ts)
+	else if (c->created > ts)
 	{
-		c->creation_time = ts;
+		c->created = ts;
 		c->Reset();
 	}
 	/* Their TS is newer, don't accept any modes from them */
-	else if (ts > c->creation_time)
+	else if (ts > c->created)
 		keep_their_modes = false;
 
 	/* Update the modes for the channel */
@@ -144,7 +144,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 
 	for (const auto &[status, u] : users)
 	{
-		keep_their_modes = ts <= c->creation_time; // OnJoinChannel can call modules which can modify this channel's ts
+		keep_their_modes = ts <= c->created; // OnJoinChannel can call modules which can modify this channel's ts
 
 		if (c->FindUser(u))
 			continue;

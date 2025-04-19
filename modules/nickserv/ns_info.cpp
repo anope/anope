@@ -116,8 +116,8 @@ public:
 					info[_("Last seen address")] = na->last_realhost;
 			}
 
-			info[_("Account registered")] = Anope::strftime(na->nc->time_registered, source.GetAccount());
-			info[_("Nick registered")] = Anope::strftime(na->time_registered, source.GetAccount());
+			info[_("Account registered")] = Anope::strftime(na->nc->registered, source.GetAccount());
+			info[_("Nick registered")] = Anope::strftime(na->registered, source.GetAccount());
 
 			if (!nick_online)
 				info[_("Last seen")] = Anope::strftime(na->last_seen, source.GetAccount());

@@ -30,7 +30,7 @@ std::vector<Channel *> Channel::deleting;
 
 Channel::Channel(const Anope::string &nname, time_t ts)
 	: name(nname)
-	, creation_time(ts)
+	, created(ts)
 {
 	if (nname.empty())
 		throw CoreException("A channel without a name ?");
@@ -610,15 +610,15 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &modes
 {
 	if (!ts)
 		;
-	else if (ts > this->creation_time)
+	else if (ts > this->created)
 	{
-		Log(LOG_DEBUG) << "Dropping mode " << modes << " on " << this->name << ", " << ts << " > " << this->creation_time;
+		Log(LOG_DEBUG) << "Dropping mode " << modes << " on " << this->name << ", " << ts << " > " << this->created;
 		return;
 	}
-	else if (ts < this->creation_time)
+	else if (ts < this->created)
 	{
-		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << ts;
-		this->creation_time = ts;
+		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->created << " to " << ts;
+		this->created = ts;
 		this->Reset();
 	}
 

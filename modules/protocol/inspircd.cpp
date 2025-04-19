@@ -335,7 +335,7 @@ public:
 
 	void SendInvite(const MessageSource &source, const Channel *c, User *u) override
 	{
-		Uplink::Send(source, "INVITE", u->GetUID(), c->name, c->creation_time);
+		Uplink::Send(source, "INVITE", u->GetUID(), c->name, c->created);
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override
@@ -351,7 +351,7 @@ public:
 			if (c->topic_time > ts)
 				ts = Anope::CurTime;
 			/* But don't modify c->topic_ts, it should remain set to the real TS we want as ci->last_topic_time pulls from it */
-			Uplink::Send(source, "FTOPIC", c->name, c->creation_time, ts, c->topic_setter, c->topic);
+			Uplink::Send(source, "FTOPIC", c->name, c->created, ts, c->topic_setter, c->topic);
 		}
 	}
 
@@ -437,7 +437,7 @@ public:
 	void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
 		auto params = values;
-		params.insert(params.begin(), { chan->name, Anope::ToString(chan->creation_time), modes });
+		params.insert(params.begin(), { chan->name, Anope::ToString(chan->created), modes });
 		Uplink::SendInternal({}, source, "FMODE", params);
 	}
 
@@ -486,7 +486,7 @@ public:
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		Uplink::Send("FJOIN", c->name, c->creation_time, "+" + c->GetModes(true, true), "," + user->GetUID());
+		Uplink::Send("FJOIN", c->name, c->created, "+" + c->GetModes(true, true), "," + user->GetUID());
 		/* Note that we can send this with the FJOIN but choose not to
 		 * because the mode stacker will handle this and probably will
 		 * merge these modes with +nrt and other mlocked modes
@@ -631,7 +631,7 @@ public:
 
 	void SendChannel(Channel *c) override
 	{
-		Uplink::Send("FJOIN", c->name, c->creation_time, "+" + c->GetModes(true, true), "");
+		Uplink::Send("FJOIN", c->name, c->created, "+" + c->GetModes(true, true), "");
 	}
 
 	void SendSASLMessage(const SASL::Message &message) override
@@ -1952,7 +1952,7 @@ private:
 
 		// Mode lock string is not what we say it is?
 		if (!modes.equals_cs(value))
-			Uplink::Send("METADATA", c->name, c->creation_time, "mlock", modes);
+			Uplink::Send("METADATA", c->name, c->created, "mlock", modes);
 	}
 
 	static void HandleModules(Server *s, const Anope::string &value)
@@ -2070,7 +2070,7 @@ private:
 		auto localstate = c->ci->HasExt("TOPICLOCK");
 		auto remotestate = Anope::Convert<bool>(value, false);
 		if (localstate != remotestate)
-			Uplink::Send("METADATA", c->name, c->creation_time, "topiclock", !!localstate);
+			Uplink::Send("METADATA", c->name, c->created, "topiclock", !!localstate);
 	}
 
 public:
@@ -2317,7 +2317,7 @@ struct IRCDMessageLMode final
 
 		// If the TS is greater than ours, we drop the mode and don't pass it anywhere.
 		auto chants = IRCD->ExtractTimestamp(params[1]);
-		if (chants > chan->creation_time)
+		if (chants > chan->created)
 			return;
 
 		auto *cm = ModeManager::FindChannelModeByChar(params[2][0]);
@@ -2594,7 +2594,7 @@ class ProtoInspIRCd final
 
 	static void SendChannelMetadata(Channel *c, const Anope::string &metadataname, const Anope::string &value)
 	{
-		Uplink::Send("METADATA", c->name, c->creation_time, metadataname, value);
+		Uplink::Send("METADATA", c->name, c->created, metadataname, value);
 	}
 
 public:

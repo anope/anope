@@ -43,7 +43,7 @@ public:
 
 	void SendInvite(const MessageSource &source, const Channel *c, User *u) override
 	{
-		Uplink::Send(source, "INVITE", u->GetUID(), c->name, c->creation_time);
+		Uplink::Send(source, "INVITE", u->GetUID(), c->name, c->created);
 	}
 
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
@@ -98,7 +98,7 @@ public:
 
 	void SendJoin(User *u, Channel *c, const ChannelStatus *status) override
 	{
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), u->GetUID());
+		Uplink::Send("SJOIN", c->created, c->name, "+" + c->GetModes(true, true), u->GetUID());
 
 		/*
 		 * Note that we can send this with the SJOIN but choose not to
@@ -225,12 +225,12 @@ public:
 
 	void SendChannel(Channel *c) override
 	{
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), "");
+		Uplink::Send("SJOIN", c->created, c->name, "+" + c->GetModes(true, true), "");
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		Uplink::Send(source, "TBURST", c->creation_time, c->name, c->topic_ts, c->topic_setter, c->topic);
+		Uplink::Send(source, "TBURST", c->created, c->name, c->topic_ts, c->topic_setter, c->topic);
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
@@ -454,7 +454,7 @@ struct IRCDMessageMLock final
 
 			// Mode lock string is not what we say it is?
 			if (modes != params[3])
-				Uplink::Send("MLOCK", c->creation_time, c->name, Anope::CurTime, modes);
+				Uplink::Send("MLOCK", c->created, c->name, Anope::CurTime, modes);
 		}
 	}
 };
@@ -814,14 +814,14 @@ public:
 		if (modelocks && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-			Uplink::Send("MLOCK", c->creation_time, c->ci->name, Anope::CurTime, modes);
+			Uplink::Send("MLOCK", c->created, c->ci->name, Anope::CurTime, modes);
 		}
 	}
 
 	void OnDelChan(ChannelInfo *ci) override
 	{
 		if (ci->c && Servers::Capab.count("MLOCK"))
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, "");
+			Uplink::Send("MLOCK", ci->c->created, ci->name, Anope::CurTime, "");
 	}
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
@@ -831,7 +831,7 @@ public:
 		if (cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, Anope::CurTime, modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -844,7 +844,7 @@ public:
 		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, Anope::CurTime, modes);
 		}
 
 		return EVENT_CONTINUE;

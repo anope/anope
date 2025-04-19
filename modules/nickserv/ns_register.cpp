@@ -413,10 +413,10 @@ public:
 			else
 				u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."));
 			const NickAlias *this_na = u->AccountNick();
-			time_t time_registered = Anope::CurTime - this_na->time_registered;
+			time_t registered = Anope::CurTime - this_na->registered;
 			time_t unconfirmed_expire = Config->GetModule(this).Get<time_t>("unconfirmedexpire", "1d");
-			if (unconfirmed_expire > time_registered)
-				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s."), Anope::Duration(unconfirmed_expire - time_registered, u->Account()).c_str());
+			if (unconfirmed_expire > registered)
+				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s."), Anope::Duration(unconfirmed_expire - registered, u->Account()).c_str());
 		}
 	}
 
@@ -425,7 +425,7 @@ public:
 		if (unconfirmed.HasExt(na->nc))
 		{
 			time_t unconfirmed_expire = Config->GetModule(this).Get<time_t>("unconfirmedexpire", "1d");
-			if (unconfirmed_expire && Anope::CurTime - na->time_registered >= unconfirmed_expire)
+			if (unconfirmed_expire && Anope::CurTime - na->registered >= unconfirmed_expire)
 				expire = true;
 		}
 	}

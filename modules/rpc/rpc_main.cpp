@@ -98,7 +98,7 @@ public:
 
 			void SendMessage(BotInfo *source, const Anope::string &msg) override
 			{
-				str += msg + "\n";
+				str += msg.replace_all_cs("\x1A", "\x20") + "\n";
 			};
 		}
 		reply(out);

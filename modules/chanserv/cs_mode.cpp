@@ -800,9 +800,9 @@ public:
 				"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If \037what\037 "
 				"is not given then all basic modes are removed."
 			),
-			source.command.upper().c_str(),
-			source.command.upper().c_str(),
-			source.command.upper().c_str());
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };

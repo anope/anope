@@ -26,9 +26,9 @@ public:
 	~SXLineDelCallback() override
 	{
 		if (deleted)
-			source.Reply(deleted, N_("Deleted %d entry from the %s list.", "Deleted %d entries from the %s list."), deleted, source.command.c_str());
+			source.Reply(deleted, N_("Deleted %d entry from the %s list.", "Deleted %d entries from the %s list."), deleted, source.command.nobreak().c_str());
 		else
-			source.Reply(_("No matching entries on the %s list."), source.command.c_str());
+			source.Reply(_("No matching entries on the %s list."), source.command.nobreak().c_str());
 	}
 
 	void HandleNumber(unsigned number) override
@@ -66,7 +66,7 @@ private:
 
 		if (!this->xlm() || this->xlm()->GetList().empty())
 		{
-			source.Reply(_("%s list is empty."), source.command.c_str());
+			source.Reply(_("%s list is empty."), source.command.nobreak().c_str());
 			return;
 		}
 
@@ -89,14 +89,14 @@ private:
 
 			if (!x)
 			{
-				source.Reply(_("\002%s\002 not found on the %s list."), mask.c_str(), source.command.c_str());
+				source.Reply(_("\002%s\002 not found on the %s list."), mask.c_str(), source.command.nobreak().c_str());
 				return;
 			}
 
 			FOREACH_MOD(OnDelXLine, (source, x, this->xlm()));
 
 			SXLineDelCallback::DoDel(this->xlm(), source, x);
-			source.Reply(_("\002%s\002 deleted from the %s list."), mask.c_str(), source.command.c_str());
+			source.Reply(_("\002%s\002 deleted from the %s list."), mask.c_str(), source.command.nobreak().c_str());
 			Log(LOG_ADMIN, source, this) << "to remove " << mask << " from the list";
 		}
 
@@ -110,7 +110,7 @@ private:
 	{
 		if (!this->xlm() || this->xlm()->GetList().empty())
 		{
-			source.Reply(_("%s list is empty."), source.command.c_str());
+			source.Reply(_("%s list is empty."), source.command.nobreak().c_str());
 			return;
 		}
 
@@ -175,10 +175,10 @@ private:
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on the %s list."), source.command.c_str());
+			source.Reply(_("No matching entries on the %s list."), source.command.nobreak().c_str());
 		else
 		{
-			source.Reply(_("Current %s list:"), source.command.c_str());
+			source.Reply(_("Current %s list:"), source.command.nobreak().c_str());
 
 			std::vector<Anope::string> replies;
 			list.Process(replies);
@@ -218,7 +218,7 @@ private:
 		}
 
 		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
-		source.Reply(_("The %s list has been cleared."), source.command.c_str());
+		source.Reply(_("The %s list has been cleared."), source.command.nobreak().c_str());
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 
@@ -231,7 +231,7 @@ public:
 
 	const Anope::string GetDesc(CommandSource &source) const override
 	{
-		return Anope::printf(Language::Translate(source.GetAccount(), _("Manipulate the %s list")), source.command.upper().c_str());
+		return Anope::printf(Language::Translate(source.GetAccount(), _("Manipulate the %s list")), source.command.nobreak().c_str());
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -415,7 +415,7 @@ class CommandOSSNLine final
 			this->xlm()->Send(NULL, x);
 		}
 
-		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
+		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.nobreak().c_str());
 		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
@@ -654,7 +654,7 @@ class CommandOSSQLine final
 			this->xlm()->Send(NULL, x);
 		}
 
-		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
+		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.nobreak().c_str());
 		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);

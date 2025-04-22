@@ -191,7 +191,7 @@ public:
 				" %s\032CLEAR\03230m\n"
 				" Will remove all entries that were added within the last 30 minutes."
 			),
-			source.command.c_str());
+			source.command.nobreak().c_str());
 		return true;
 	}
 };

@@ -75,7 +75,7 @@ public:
 				"last user leaves the channel, and will be restored the "
 				"next time the channel is created."
 			),
-			source.command.c_str(),
+			source.command.nobreak().c_str(),
 			source.service->nick.c_str());
 		return true;
 	}

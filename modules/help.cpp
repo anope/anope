@@ -119,7 +119,7 @@ public:
 			if (!groups.empty())
 			{
 				source.Reply(" ");
-				source.Reply(_("Use the \002%s\032ALL\002 command to list all commands and their descriptions."), source_command.c_str());
+				source.Reply(_("Use the \002%s\032ALL\002 command to list all commands and their descriptions."), source.command.nobreak().c_str());
 			}
 		}
 		else

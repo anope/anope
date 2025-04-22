@@ -525,7 +525,7 @@ public:
 				),
 				NickServ->nick.c_str(),
 				NickServ->GetQueryCommand().c_str(),
-				NickServ->GetQueryCommand({}, source.command.c_str()).c_str());
+				NickServ->GetQueryCommand({}, source.command).c_str());
 		}
 		return EVENT_CONTINUE;
 	}

@@ -464,7 +464,7 @@ public:
 				"\n\n"
 				"The available flags are:"
 			),
-			source.command.c_str());
+			source.command.nobreak().c_str());
 
 		typedef std::multimap<char, Anope::string, ci::less> reverse_map;
 		reverse_map reverse;

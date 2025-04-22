@@ -292,8 +292,8 @@ public:
 				" Would message any channel operators whenever someone used the "
 				"ACCESS command on ChanServ on the channel."
 			),
-			source.command.upper().c_str(),
-			source.command.upper().c_str());
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 
 		return true;
 	}

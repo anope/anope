@@ -21,7 +21,7 @@ namespace
 		if (params.empty())
 			cmd->OnSyntaxError(source, source.command);
 		else if (!params[0].equals_cs(Config->GetBlock("networkinfo").Get<Anope::string>("networkname")))
-			source.Reply(_("The network name you specified is incorrect. Did you mean to run %s on a different network?"), source.command.c_str());
+			source.Reply(_("The network name you specified is incorrect. Did you mean to run %s on a different network?"), source.command.nobreak().c_str());
 		else
 			return true; // Name was specified correctly
 		return false; // Network name was wrong or not specified.

@@ -234,7 +234,7 @@ private:
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask;
 
 		FOREACH_MOD(OnAccessAdd, (ci, source, acc));
-		source.Reply(_("\002%s\002 added to %s %s list."), acc->Mask().c_str(), ci->name.c_str(), source.command.c_str());
+		source.Reply(_("\002%s\002 added to %s %s list."), acc->Mask().c_str(), ci->name.c_str(), source.command.nobreak().c_str());
 	}
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -256,7 +256,7 @@ private:
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.nobreak().c_str());
 			return;
 		}
 
@@ -315,11 +315,11 @@ private:
 				~XOPDelCallback() override
 				{
 					if (!deleted)
-						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
+						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.nobreak().c_str());
 					else
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << nicks;
-						source.Reply(deleted, N_("Deleted %d entry from %s %s list.", "Deleted %d entries from %s %s list."), deleted, ci->name.c_str(), source.command.c_str());
+						source.Reply(deleted, N_("Deleted %d entry from %s %s list.", "Deleted %d entries from %s %s list."), deleted, ci->name.c_str(), source.command.nobreak().c_str());
 					}
 				}
 
@@ -360,7 +360,7 @@ private:
 				{
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << a->Mask();
 
-					source.Reply(_("\002%s\002 deleted from %s %s list."), a->Mask().c_str(), ci->name.c_str(), source.command.c_str());
+					source.Reply(_("\002%s\002 deleted from %s %s list."), a->Mask().c_str(), ci->name.c_str(), source.command.nobreak().c_str());
 
 					ci->EraseAccess(i);
 					FOREACH_MOD(OnAccessDel, (ci, source, a));
@@ -370,7 +370,7 @@ private:
 				}
 			}
 
-			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), source.command.nobreak().c_str());
 		}
 	}
 
@@ -389,7 +389,7 @@ private:
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.nobreak().c_str());
 			return;
 		}
 
@@ -454,7 +454,7 @@ private:
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("%s list for %s"), source.command.c_str(), ci->name.c_str());
+			source.Reply(_("%s list for %s"), source.command.nobreak().c_str(), ci->name.c_str());
 			for (const auto &reply : replies)
 				source.Reply(reply);
 		}
@@ -470,7 +470,7 @@ private:
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.nobreak().c_str());
 			return;
 		}
 
@@ -495,7 +495,7 @@ private:
 
 		FOREACH_MOD(OnAccessClear, (ci, source));
 
-		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.c_str());
+		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.nobreak().c_str());
 	}
 
 public:
@@ -509,7 +509,7 @@ public:
 
 	const Anope::string GetDesc(CommandSource &source) const override
 	{
-		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.upper().c_str());
+		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.nobreak().c_str());
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override

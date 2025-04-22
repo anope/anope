@@ -222,6 +222,14 @@ namespace Anope
 		inline bool is_pos_number_only() const { return this->find_first_not_of("0123456789.") == npos; }
 
 		/**
+		 * In IRC messages we use a substitute (ASCII 0x1A) instead of a space
+		 * (ASCII 0x20) so it doesn't get line wrapped when put into a message.
+		 * The line wrapper will convert this to a space before it is sent to
+		 * clients.
+		 */
+		inline Anope::string nobreak() const { return this->replace_all_cs("\x20", "\x1A"); }
+
+		/**
 		 * Replace parts of the string.
 		 */
 		inline string replace(size_type pos, size_type n, const string &_str) { return string(this->_string.replace(pos, n, _str._string)); }

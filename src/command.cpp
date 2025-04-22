@@ -171,18 +171,18 @@ void Command::SendSyntax(CommandSource &source)
 		if (first)
 		{
 			first = false;
-			source.Reply("%s: \002%s %s\002", prefix.c_str(), source.command.c_str(),
+			source.Reply("%s: \002%s %s\002", prefix.c_str(), source.command.nobreak().c_str(),
 				Language::Translate(source.GetAccount(), syntax.c_str()));
 		}
 		else
 		{
-			source.Reply("%-*s  \002%s %s\002", (int)prefix.length(), "", source.command.c_str(),
+			source.Reply("%-*s  \002%s %s\002", (int)prefix.length(), "", source.command.nobreak().c_str(),
 				Language::Translate(source.GetAccount(), syntax.c_str()));
 		}
 	}
 
 	if (first)
-		source.Reply("%s: \002%s\002", prefix.c_str(), source.command.c_str());
+		source.Reply("%s: \002%s\002", prefix.c_str(), source.command.nobreak().c_str());
 }
 
 bool Command::AllowUnregistered() const

@@ -466,7 +466,7 @@ public:
 				"bad words list."
 			),
 			source.service->GetQueryCommand("generic/help").c_str(),
-			source.command.c_str());
+			source.command.nobreak().c_str());
 		return true;
 	}
 };

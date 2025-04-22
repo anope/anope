@@ -949,7 +949,15 @@ public:
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		auto can_set_successor = ci->HasExt("SECUREFOUNDER")
+			? source.IsFounder(ci)
+			: source.AccessFor(ci).HasPriv("FOUNDER");
+
+		// Special case: users can remove themselves as successor with no other privs.
+		if (param.empty() && source.GetAccount() && source.GetAccount() == ci->GetSuccessor())
+			can_set_successor = true;
+
+		if (MOD_RESULT != EVENT_ALLOW && !can_set_successor && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

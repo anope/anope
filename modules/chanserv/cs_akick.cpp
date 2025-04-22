@@ -494,7 +494,7 @@ public:
 				"%s will ban that user from the channel, then kick "
 				"the user."
 				"\n\n"
-				"The \002AKICK\032ADD\002 command adds the given nick or usermask "
+				"The \002%s\032ADD\002 command adds the given nick or usermask "
 				"to the AutoKick list.  If a \037reason\037 is given with "
 				"the command, that reason will be used when the user is "
 				"kicked; if not, the default reason is \"User has been "
@@ -503,28 +503,35 @@ public:
 				"will be added to the akick list instead of the mask. "
 				"All users within that nickgroup will then be akicked. "
 				"\n\n"
-				"The \002AKICK\032DEL\002 command removes the given nick or mask "
+				"The \002%s\032DEL\002 command removes the given nick or mask "
 				"from the AutoKick list.  It does not, however, remove any "
 				"bans placed by an AutoKick; those must be removed "
 				"manually."
 				"\n\n"
-				"The \002AKICK\032LIST\002 command displays the AutoKick list, or "
+				"The \002%s\032LIST\002 command displays the AutoKick list, or "
 				"optionally only those AutoKick entries which match the "
 				"given mask."
 				"\n\n"
-				"The \002AKICK\032VIEW\002 command is a more verbose version of the "
-				"\002AKICK\032LIST\002 command."
+				"The \002%s\032VIEW\002 command is a more verbose version of the "
+				"\002%s\032LIST\002 command."
 				"\n\n"
-				"The \002AKICK\032ENFORCE\002 command causes %s to enforce the "
-				"current AKICK list by removing those users who match an "
-				"AKICK mask."
+				"The \002%s\032ENFORCE\002 command causes %s to enforce the "
+				"current akick list by removing those users who match an "
+				"akick mask."
 				"\n\n"
-				"The \002AKICK\032CLEAR\002 command clears all entries of the "
+				"The \002%s\032CLEAR\002 command clears all entries of the "
 				"akick list."
 			),
 			source.service->nick.c_str(),
-			source.service->nick.c_str(),
-			bi ? bi->nick.c_str() : "NickServ");
+			source.command.nobreak().c_str(),
+			bi ? bi->nick.c_str() : "NickServ",
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 
 		return true;
 	}

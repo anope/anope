@@ -422,27 +422,28 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Allows Services Operators to manipulate the AKILL list. If "
-			"a user matching an AKILL mask attempts to connect, services "
-			"will issue a KILL for that user and, on supported server "
-			"types, will instruct all servers to add a ban for the mask "
-			"which the user matched."
-			"\n\n"
-			"\002AKILL\032ADD\002 adds the given mask to the AKILL "
-			"list for the given reason, which \002must\002 be given. "
-			"Mask should be in the format of nick!user@host#real\032name, "
-			"though all that is required is user@host. If a real name is specified, "
-			"the reason must be prepended with a :. "
-			"\037expiry\037 is specified as an integer followed by one of \037d\037 "
-			"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as "
-			"\0371h30m\037) are not permitted. If a unit specifier is not "
-			"included, the default is days (so \037+30\037 by itself means 30 "
-			"days). To add an AKILL which does not expire, use \037+0\037. If the "
-			"usermask to be added starts with a \037+\037, an expiry time must "
-			"be given, even if it is the same as the default. The "
-			"current AKILL default expiry time can be found with the "
-			"\002STATS\032AKILL\002 command."
-		));
+				"Allows Services Operators to manipulate the AKILL list. If "
+				"a user matching an AKILL mask attempts to connect, services "
+				"will issue a KILL for that user and, on supported server "
+				"types, will instruct all servers to add a ban for the mask "
+				"which the user matched."
+				"\n\n"
+				"\002%s\032ADD\002 adds the given mask to the AKILL "
+				"list for the given reason, which \002must\002 be given. "
+				"Mask should be in the format of nick!user@host#real\032name, "
+				"though all that is required is user@host. If a real name is specified, "
+				"the reason must be prepended with a :. "
+				"\037expiry\037 is specified as an integer followed by one of \037d\037 "
+				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as "
+				"\0371h30m\037) are not permitted. If a unit specifier is not "
+				"included, the default is days (so \037+30\037 by itself means 30 "
+				"days). To add an AKILL which does not expire, use \037+0\037. If the "
+				"usermask to be added starts with a \037+\037, an expiry time must "
+				"be given, even if it is the same as the default. The "
+				"current AKILL default expiry time can be found with the "
+				"\002STATS\032AKILL\002 command."
+			),
+			source.command.nobreak().c_str());
 
 		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
@@ -457,25 +458,31 @@ public:
 
 		source.Reply(" ");
 		source.Reply(_(
-			"The \002AKILL\032DEL\002 command removes the given mask from the "
-			"AKILL list if it is present.  If a list of entry numbers is "
-			"given, those entries are deleted.  (See the example for LIST "
-			"below.)"
-			"\n\n"
-			"The \002AKILL\032LIST\002 command displays the AKILL list. "
-			"If a wildcard mask is given, only those entries matching the "
-			"mask are displayed.  If a list of entry numbers is given, "
-			"only those entries are shown; for example:\n"
-			"   \002AKILL\032LIST\0322-5,7-9\002\n"
-			"      Lists AKILL entries numbered 2 through 5 and 7\n"
-			"      through 9."
-			"\n\n"
-			"\002AKILL\032VIEW\002 is a more verbose version of \002AKILL\032LIST\002, and "
-			"will show who added an AKILL, the date it was added, and when "
-			"it expires, as well as the user@host/ip mask and reason."
-			"\n\n"
-			"\002AKILL\032CLEAR\002 clears all entries of the AKILL list."
-		));
+				"The \002%s\032DEL\002 command removes the given mask from the "
+				"AKILL list if it is present.  If a list of entry numbers is "
+				"given, those entries are deleted.  (See the example for LIST "
+				"below.)"
+				"\n\n"
+				"The \002%s\032LIST\002 command displays the AKILL list. "
+				"If a wildcard mask is given, only those entries matching the "
+				"mask are displayed.  If a list of entry numbers is given, "
+				"only those entries are shown; for example:\n"
+				"   \002%s\032LIST\0322-5,7-9\002\n"
+				"      Lists AKILL entries numbered 2 through 5 and 7\n"
+				"      through 9."
+				"\n\n"
+				"\002%s\032VIEW\002 is a more verbose version of \002%s\032LIST\002, and "
+				"will show who added an AKILL, the date it was added, and when "
+				"it expires, as well as the user@host/ip mask and reason."
+				"\n\n"
+				"\002%s\032CLEAR\002 clears all entries of the AKILL list."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };

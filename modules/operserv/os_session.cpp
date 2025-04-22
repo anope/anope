@@ -300,21 +300,23 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Allows Services Operators to view the session list."
-			"\n\n"
-			"\002SESSION\032LIST\002 lists hosts with at least \037threshold\037 sessions. "
-			"The threshold must be a number greater than 1. This is to "
-			"prevent accidental listing of the large number of single "
-			"session hosts."
-			"\n\n"
-			"\002SESSION\032VIEW\002 displays detailed information about a specific "
-			"host - including the current session count and session limit. "
-			"The \037host\037 value may not include wildcards. "
-			"\n\n"
-			"See the \002EXCEPTION\002 help for more information about session "
-			"limiting and how to set session limits specific to certain "
-			"hosts and groups thereof."
-		));
+				"Allows Services Operators to view the session list."
+				"\n\n"
+				"\002%s\032LIST\002 lists hosts with at least \037threshold\037 sessions. "
+				"The threshold must be a number greater than 1. This is to "
+				"prevent accidental listing of the large number of single "
+				"session hosts."
+				"\n\n"
+				"\002%s\032VIEW\002 displays detailed information about a specific "
+				"host - including the current session count and session limit. "
+				"The \037host\037 value may not include wildcards. "
+				"\n\n"
+				"See the \002EXCEPTION\002 help for more information about session "
+				"limiting and how to set session limits specific to certain "
+				"hosts and groups thereof."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };
@@ -578,37 +580,42 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Allows Services Operators to manipulate the list of hosts that "
-			"have specific session limits - allowing certain machines, "
-			"such as shell servers, to carry more than the default number "
-			"of clients at a time. Once a host reaches its session limit, "
-			"all clients attempting to connect from that host will be "
-			"killed. Before the user is killed, they are notified, of a "
-			"source of help regarding session limiting. The content of "
-			"this notice is a config setting."
-			"\n\n"
-			"\002EXCEPTION\032ADD\002 adds the given host mask to the exception list. "
-			"Note that \002nick!user@host\002 and \002user@host\002 masks are invalid! "
-			"Only real host masks, such as \002box.host.dom\002 and \002*.host.dom\002, "
-			"are allowed because sessions limiting does not take nick or "
-			"user names into account. \037limit\037 must be a number greater than "
-			"or equal to zero. This determines how many sessions this host "
-			"may carry at a time. A value of zero means the host has an "
-			"unlimited session limit. See the \002AKILL\002 help for details about "
-			"the format of the optional \037expiry\037 parameter. "
-			"\n\n"
-			"\002EXCEPTION\032DEL\002 removes the given mask from the exception list."
-			"\n\n"
-			"\002EXCEPTION\032LIST\002 and \002EXCEPTION\032VIEW\002 show all current "
-			"sessions if the optional mask is given, the list is limited "
-			"to those sessions matching the mask. The difference is that "
-			"\002EXCEPTION\032VIEW\002 is more verbose, displaying the name of the "
-			"person who added the exception, its session limit, reason, "
-			"host mask and the expiry date and time. "
-			"\n\n"
-			"Note that a connecting client will \"use\" the first exception "
-			"their host matches."
-		));
+				"Allows Services Operators to manipulate the list of hosts that "
+				"have specific session limits - allowing certain machines, "
+				"such as shell servers, to carry more than the default number "
+				"of clients at a time. Once a host reaches its session limit, "
+				"all clients attempting to connect from that host will be "
+				"killed. Before the user is killed, they are notified, of a "
+				"source of help regarding session limiting. The content of "
+				"this notice is a config setting."
+				"\n\n"
+				"\002%s\032ADD\002 adds the given host mask to the exception list. "
+				"Note that \002nick!user@host\002 and \002user@host\002 masks are invalid! "
+				"Only real host masks, such as \002box.host.dom\002 and \002*.host.dom\002, "
+				"are allowed because sessions limiting does not take nick or "
+				"user names into account. \037limit\037 must be a number greater than "
+				"or equal to zero. This determines how many sessions this host "
+				"may carry at a time. A value of zero means the host has an "
+				"unlimited session limit. See the \002AKILL\002 help for details about "
+				"the format of the optional \037expiry\037 parameter. "
+				"\n\n"
+				"\002%s\032DEL\002 removes the given mask from the exception list."
+				"\n\n"
+				"\002%s\032LIST\002 and \002%s\032VIEW\002 show all current "
+				"sessions if the optional mask is given, the list is limited "
+				"to those sessions matching the mask. The difference is that "
+				"\002%s\032VIEW\002 is more verbose, displaying the name of the "
+				"person who added the exception, its session limit, reason, "
+				"host mask and the expiry date and time. "
+				"\n\n"
+				"Note that a connecting client will \"use\" the first exception "
+				"their host matches."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };

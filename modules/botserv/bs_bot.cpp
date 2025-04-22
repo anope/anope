@@ -348,24 +348,27 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Allows Services Operators to create, modify, and delete "
-			"bots that users will be able to use on their own "
-			"channels."
-			"\n\n"
-			"\002BOT\032ADD\002 adds a bot with the given nickname, username, "
-			"hostname and realname. Since no integrity checks are done "
-			"for these settings, be really careful."
-			"\n\n"
-			"\002BOT\032CHANGE\002 allows you to change the nickname, username, hostname "
-			"or realname of a bot without deleting it (and "
-			"all the data associated with it)."
-			"\n\n"
-			"\002BOT\032DEL\002 removes the given bot from the bot list."
-			"\n\n"
-			"\002Note\002: You cannot create a bot with a nick that is "
-			"currently registered. If an unregistered user is currently "
-			"using the nick, they will be killed."
-		));
+				"Allows Services Operators to create, modify, and delete "
+				"bots that users will be able to use on their own "
+				"channels."
+				"\n\n"
+				"\002%s\032ADD\002 adds a bot with the given nickname, username, "
+				"hostname and realname. Since no integrity checks are done "
+				"for these settings, be really careful."
+				"\n\n"
+				"\002%s\032CHANGE\002 allows you to change the nickname, username, hostname "
+				"or realname of a bot without deleting it (and "
+				"all the data associated with it)."
+				"\n\n"
+				"\002%s\032DEL\002 removes the given bot from the bot list."
+				"\n\n"
+				"\002Note\002: You cannot create a bot with a nick that is "
+				"currently registered. If an unregistered user is currently "
+				"using the nick, they will be killed."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };

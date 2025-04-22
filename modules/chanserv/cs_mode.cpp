@@ -784,22 +784,26 @@ public:
 				"modify the existing mode lock."
 				"\n\n"
 				"Example:\n"
-				"     \002MODE\032#channel\032LOCK\032ADD\032+bmnt\032*!*@*aol*\002\n"
+				"     \002%s\032#channel\032%s\032ADD\032+bmnt\032*!*@*aol*\002\n"
 				"\n\n"
 				"The \002%s\032SET\002 command allows you to set modes through services. Wildcards * and ? may "
 				"be given as parameters for list and status modes."
 				"\n\n"
 				"Example:\n"
-				"     \002MODE\032#channel\032SET\032+v\032*\002\n"
+				"     \002%s\032#channel\032SET\032+v\032*\002\n"
 				"       Sets voice status to all users in the channel."
 				"\n\n"
-				"     \002MODE\032#channel\032SET\032-b\032~c:*\n"
+				"     \002%s\032#channel\032SET\032-b\032~c:*\n"
 				"       Clears all extended bans that start with ~c:"
 				"\n\n"
 				"The \002%s\032CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be "
 				"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If \037what\037 "
 				"is not given then all basic modes are removed."
 			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str());

@@ -18,6 +18,7 @@ class AkillDelCallback final
 {
 	CommandSource &source;
 	unsigned deleted = 0;
+	Anope::string lastdeleted;
 	Command *cmd;
 public:
 	AkillDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), cmd(c)
@@ -26,10 +27,20 @@ public:
 
 	~AkillDelCallback() override
 	{
-		if (deleted)
-			source.Reply(deleted, N_("Deleted %d entry from the AKILL list.", "Deleted %d entries from the AKILL list."), deleted);
-		else
-			source.Reply(_("No matching entries on the AKILL list."));
+		switch (deleted)
+		{
+			case 0:
+				source.Reply(_("No matching entries on the AKILL list."));
+				break;
+
+			case 1:
+				source.Reply(_("Deleted %s from the AKILL list."), lastdeleted.c_str());
+				break;
+
+			default:
+				source.Reply(deleted, N_("Deleted %d entry from the AKILL list.", "Deleted %d entries from the AKILL list."), deleted);
+				break;
+		}
 	}
 
 	void HandleNumber(unsigned number) override
@@ -42,6 +53,7 @@ public:
 		if (!x)
 			return;
 
+		lastdeleted = x->mask;
 		Log(LOG_ADMIN, source, cmd) << "to remove " << x->mask << " from the list";
 
 		++deleted;

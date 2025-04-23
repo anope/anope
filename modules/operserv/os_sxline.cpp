@@ -18,6 +18,7 @@ class SXLineDelCallback final
 	Command *command;
 	CommandSource &source;
 	unsigned deleted = 0;
+	Anope::string lastdeleted;
 public:
 	SXLineDelCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), xlm(x), command(c), source(_source)
 	{
@@ -25,10 +26,20 @@ public:
 
 	~SXLineDelCallback() override
 	{
-		if (deleted)
-			source.Reply(deleted, N_("Deleted %d entry from the %s list.", "Deleted %d entries from the %s list."), deleted, source.command.nobreak().c_str());
-		else
-			source.Reply(_("No matching entries on the %s list."), source.command.nobreak().c_str());
+		switch (deleted)
+		{
+			case 0:
+				source.Reply(deleted, N_("Deleted %d entry from the %s list.", "Deleted %d entries from the %s list."), deleted, source.command.nobreak().c_str());
+				break;
+
+			case 1:
+				source.Reply(_("Deleted %s from the %s list."), lastdeleted.c_str(), source.command.nobreak().c_str());
+				break;
+
+			default:
+				source.Reply(_("No matching entries on the %s list."), source.command.nobreak().c_str());
+				break;
+		}
 	}
 
 	void HandleNumber(unsigned number) override
@@ -41,6 +52,7 @@ public:
 		if (!x)
 			return;
 
+		lastdeleted = x->mask;
 		Log(LOG_ADMIN, source, command) << "to remove " << x->mask << " from the list";
 
 		++deleted;

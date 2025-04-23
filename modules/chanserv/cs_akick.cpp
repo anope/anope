@@ -211,6 +211,7 @@ class CommandCSAKick final
 				ChannelInfo *ci;
 				Command *c;
 				unsigned deleted = 0;
+				Anope::string lastdeleted;
 				AccessGroup ag;
 			public:
 				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), ag(source.AccessFor(ci))
@@ -219,10 +220,20 @@ class CommandCSAKick final
 
 				~AkickDelCallback() override
 				{
-					if (deleted)
-						source.Reply(deleted, N_("Deleted %d entry from %s autokick list.", "Deleted %d entries from %s autokick list."), deleted, ci->name.c_str());
-					else
-						source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
+					switch (deleted)
+					{
+						case 0:
+							source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
+							break;
+
+						case 1:
+							source.Reply(_("Deleted %s from %s autokick list."), lastdeleted.c_str(), ci->name.c_str());
+							break;
+
+						default:
+							source.Reply(deleted, N_("Deleted %d entry from %s autokick list.", "Deleted %d entries from %s autokick list."), deleted, ci->name.c_str());
+							break;
+					}
 				}
 
 				void HandleNumber(unsigned number) override
@@ -235,7 +246,8 @@ class CommandCSAKick final
 					FOREACH_MOD(OnAkickDel, (source, ci, akick));
 
 					bool override = !ag.HasPriv("AKICK");
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << (akick->nc ? akick->nc->display : akick->mask);
+					lastdeleted = (akick->nc ? akick->nc->display : akick->mask);
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << lastdeleted;
 
 					++deleted;
 					ci->EraseAkick(number - 1);

@@ -284,7 +284,11 @@ class CommandCSAccess final
 					else
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Nicks;
-						source.Reply(deleted, N_("Deleted %d entry from %s access list.", "Deleted %d entries from %s access list."), deleted, ci->name.c_str());
+						if (deleted == 1)
+							source.Reply(_("Deleted %s from %s access list."), Nicks.c_str(), ci->name.c_str());
+
+						else
+							source.Reply(deleted, N_("Deleted %d entry from %s access list.", "Deleted %d entries from %s access list."), deleted, ci->name.c_str());
 					}
 				}
 

@@ -165,6 +165,7 @@ class BadwordsDelCallback final
 	BadWords *bw;
 	Command *c;
 	unsigned deleted = 0;
+	Anope::string lastdeleted;
 	bool override = false;
 public:
 	BadwordsDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c)
@@ -176,10 +177,20 @@ public:
 
 	~BadwordsDelCallback() override
 	{
-		if (deleted)
-			source.Reply(deleted, N_("Deleted %d entry from %s bad words list.", "Deleted %d entries from %s bad words list."), deleted, ci->name.c_str());
-		else
-			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
+		switch (deleted)
+		{
+			case 0:
+				source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
+				break;
+
+			case 1:
+				source.Reply(_("Deleted %s from %s bad words list."), lastdeleted.c_str(), ci->name.c_str());
+				break;
+
+			default:
+				source.Reply(deleted, N_("Deleted %d entry from %s bad words list.", "Deleted %d entries from %s bad words list."), deleted, ci->name.c_str());
+				break;
+		}
 	}
 
 	void HandleNumber(unsigned Number) override
@@ -187,7 +198,8 @@ public:
 		if (!bw || !Number || Number > bw->GetBadWordCount())
 			return;
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "DEL " << bw->GetBadWord(Number - 1)->word;
+		lastdeleted = bw->GetBadWord(Number - 1)->word;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "DEL " << lastdeleted;
 		++deleted;
 		bw->EraseBadWord(Number - 1);
 	}

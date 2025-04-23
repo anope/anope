@@ -174,6 +174,7 @@ class ExceptionDelCallback final
 protected:
 	CommandSource &source;
 	unsigned deleted = 0;
+	Anope::string lastdeleted;
 	Command *cmd;
 public:
 	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), cmd(c)
@@ -182,10 +183,20 @@ public:
 
 	~ExceptionDelCallback() override
 	{
-		if (deleted)
-			source.Reply(deleted, N_("Deleted %d entry from session-limit exception list.", "Deleted %d entries from session-limit exception list."), deleted);
-		else
-			source.Reply(_("No matching entries on session-limit exception list."));
+		switch (deleted)
+		{
+			case 0:
+				source.Reply(_("No matching entries on session-limit exception list."));
+				break;
+
+			case 1:
+				source.Reply(_("Deleted %s from session-limit exception list."), lastdeleted.c_str());
+				break;
+
+			default:
+				source.Reply(deleted, N_("Deleted %d entry from session-limit exception list.", "Deleted %d entries from session-limit exception list."), deleted);
+				break;
+		}
 	}
 
 	void HandleNumber(unsigned number) override
@@ -193,7 +204,8 @@ public:
 		if (!number || number > session_service->GetExceptions().size())
 			return;
 
-		Log(LOG_ADMIN, source, cmd) << "to remove the session limit exception for " << session_service->GetExceptions()[number - 1]->mask;
+		lastdeleted = session_service->GetExceptions()[number - 1]->mask;
+		Log(LOG_ADMIN, source, cmd) << "to remove the session limit exception for " << lastdeleted;
 
 		++deleted;
 		DoDel(source, number - 1);

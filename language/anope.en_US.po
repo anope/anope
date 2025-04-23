@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-22 18:32+0100\n"
-"PO-Revision-Date: 2025-04-16 02:59+0100\n"
+"POT-Creation-Date: 2025-04-23 01:56+0100\n"
+"PO-Revision-Date: 2025-04-23 01:56+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -2458,6 +2458,34 @@ msgid "Deleted %d entry from the AKILL list."
 msgid_plural "Deleted %d entries from the AKILL list."
 msgstr[0] ""
 msgstr[1] ""
+
+#, c-format
+msgid "Deleted %s from %s %s list."
+msgstr ""
+
+#, c-format
+msgid "Deleted %s from %s access list."
+msgstr ""
+
+#, c-format
+msgid "Deleted %s from %s autokick list."
+msgstr ""
+
+#, c-format
+msgid "Deleted %s from %s bad words list."
+msgstr ""
+
+#, c-format
+msgid "Deleted %s from session-limit exception list."
+msgstr ""
+
+#, c-format
+msgid "Deleted %s from the %s list."
+msgstr ""
+
+#, c-format
+msgid "Deleted %s from the AKILL list."
+msgstr ""
 
 #, c-format
 msgid "Deleted %u entry from your message queue."

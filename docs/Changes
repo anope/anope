@@ -1,15 +1,23 @@
 Anope Version 2.1.14-git
 ------------------------
+Added a detail specifier to the anope.list{Channels,Opers,Servers,Users} RPC methods.
 Added a matcher for the InspIRCd oper extban.
+Added support for local password comparison to the sql_authentication module.
 Added support for monthly backups to db_json.
 Added support for unbanning virtual modes using cs_unban.
 Added the !unmute fantasy command.
+Added the anope.account and anope.listAccounts RPC methods to the rpc_data module.
 Added the protection time to the INFO output.
+Allowed unprivileged channel successors to remove themselves from succession.
 Bumped the minimum required CMake version to 3.20.
+Changed deletion callbacks to specify the mask that was deleted if only one was.
+Changed nickserv/alist to show all permissions not just the highest ranked one.
+Fixed NEVEROP not being respected in chanserv/set/founder and chanserv/set/successor.
 Fixed stripping IRC formatting codes from messages.
 Messages are now automatically line wrapped to options:linelength.
 Redocumented the ns_sasl module.
 Removed hardcoded command names from several messages.
+Updated the Windows CI to Windows Server 2025 and Visual Studio 2022.
 
 Anope Version 2.1.13
 --------------------

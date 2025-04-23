@@ -196,7 +196,7 @@ void ChannelInfo::Type::Serialize(const Serializable *obj, Serialize::Data &data
 	if (ci->successor)
 		data.Store("successorid", ci->successor->GetId());
 	data.Store("description", ci->desc);
-	data.Store("registered", ci->registered);
+	data.Store("time_registered", ci->registered);
 	data.Store("last_used", ci->last_used);
 	data.Store("last_topic", ci->last_topic);
 	data.Store("last_topic_setter", ci->last_topic_setter);
@@ -244,7 +244,7 @@ Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data 
 	ci->SetSuccessor(ssuccessorid ? NickCore::FindId(ssuccessorid) : NickCore::Find(ssuccessor));
 
 	data["description"] >> ci->desc;
-	data["registered"] >> ci->registered;
+	data["time_registered"] >> ci->registered;
 	data["last_used"] >> ci->last_used;
 	data["last_topic"] >> ci->last_topic;
 	data["last_topic_setter"] >> ci->last_topic_setter;

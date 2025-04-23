@@ -311,6 +311,12 @@ public:
 			source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
 			return;
 		}
+		else if (na->nc->HasExt("NEVEROP"))
+		{
+			source.Reply(_("\002%s\002 does not wish to be added to channel access lists."),
+				na->nc->display.c_str());
+			return;
+		}
 
 		NickCore *nc = na->nc;
 		unsigned max_reg = Config->GetModule("chanserv").Get<unsigned>("maxregistered");
@@ -972,6 +978,12 @@ public:
 			if (!na)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, param.c_str());
+				return;
+			}
+			else if (na->nc->HasExt("NEVEROP"))
+			{
+				source.Reply(_("\002%s\002 does not wish to be added to channel access lists."),
+					na->nc->display.c_str());
 				return;
 			}
 			if (na->nc == ci->GetFounder())

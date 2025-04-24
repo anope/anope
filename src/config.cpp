@@ -994,7 +994,10 @@ Anope::string Conf::ReplaceVars(const Anope::string &str, const File &file, int 
 		}
 
 		if (++it == str.end() || *it != '{')
+		{
+			ret.push_back('$');
 			continue;
+		}
 
 		it++;
 		Anope::string var;

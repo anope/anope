@@ -10,10 +10,25 @@
  */
 
 #include "module.h"
+#include "modules/encryption.h"
 
 class CommandOSLogin final
 	: public Command
 {
+private:
+	bool ComparePassword(const Oper *o, const Anope::string &password)
+	{
+		if (o->password_hash.empty())
+			return o->password.equals_cs(password); // Plaintext password.
+
+		auto *service = Service::FindService("Encryption::Provider", o->password_hash);
+		if (!service)
+			return false; // Malformed hash.
+
+		auto *hashprov = static_cast<Encryption::Provider *>(service);
+		return hashprov->Compare(o->password, password);
+	}
+
 public:
 	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 0, 1)
 	{
@@ -31,7 +46,7 @@ public:
 			source.Reply(_("Your oper block doesn't require logging in."));
 		else if (u->HasExt("os_login"))
 			source.Reply(_("You are already identified."));
-		else if (params.empty() || o->password != params[0])
+		else if (params.empty() || !ComparePassword(o, params[0]))
 		{
 			source.Reply(PASSWORD_INCORRECT);
 			u->BadPassword();

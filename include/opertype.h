@@ -23,6 +23,7 @@ struct CoreExport Oper
 	/* Whether the user must be an IRC operator (umode +o) to be considered a services operator */
 	bool require_oper = true;
 	Anope::string password;
+	Anope::string password_hash;
 	std::vector<Anope::string> certfp;
 	/* Hosts allowed to use this operator block */
 	std::vector<Anope::string> hosts;

@@ -300,6 +300,7 @@ Conf::Conf() : Block("")
 		const Anope::string &nname = oper.Get<const Anope::string>("name"),
 					&type = oper.Get<const Anope::string>("type"),
 					&password = oper.Get<const Anope::string>("password"),
+					&password_hash = oper.Get<const Anope::string>("password_hash"),
 					&certfp = oper.Get<const Anope::string>("certfp"),
 					&host = oper.Get<const Anope::string>("host"),
 					&vhost = oper.Get<const Anope::string>("vhost");
@@ -320,6 +321,7 @@ Conf::Conf() : Block("")
 		auto *o = new Oper(nname, ot);
 		o->require_oper = require_oper;
 		o->password = password;
+		o->password_hash = password_hash;
 		spacesepstream(certfp).GetTokens(o->certfp);
 		spacesepstream(host).GetTokens(o->hosts);
 		o->vhost = vhost;

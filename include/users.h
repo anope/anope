@@ -50,7 +50,7 @@ protected:
 	Serialize::Reference<NickCore> nc;
 
 	/* # of invalid password attempts */
-	unsigned short invalid_pw_count;
+	unsigned invalid_pw_count;
 	/* Time of last invalid password */
 	time_t invalid_pw_time;
 

@@ -71,7 +71,7 @@ public:
 						continue;
 
 					ChanAccess *a = p[0];
-					privstr += access.empty() ? "" : ", ";
+					privstr += privstr.empty() ? "" : ", ";
 					privstr += a->AccessSerialize();
 				}
 			}

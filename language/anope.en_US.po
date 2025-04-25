@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-23 01:56+0100\n"
-"PO-Revision-Date: 2025-04-23 01:56+0100\n"
+"POT-Creation-Date: 2025-04-25 13:08+0100\n"
+"PO-Revision-Date: 2025-04-25 13:08+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -6293,11 +6293,23 @@ msgid "[Logon News - %s] %s"
 msgstr ""
 
 #, c-format
+msgid "[Logon News] %s"
+msgstr ""
+
+#, c-format
 msgid "[Oper News - %s] %s"
 msgstr ""
 
 #, c-format
+msgid "[Oper News] %s"
+msgstr ""
+
+#, c-format
 msgid "[Random News - %s] %s"
+msgstr ""
+
+#, c-format
+msgid "[Random News] %s"
 msgstr ""
 
 msgid "[account] password"

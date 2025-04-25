@@ -22,6 +22,8 @@
 enum
 {
 	MSG_SYNTAX,
+	MSG_NEWS_SHORT,
+	MSG_NEWS_LONG,
 	MSG_LIST_HEADER,
 	MSG_LIST_NONE,
 	MSG_ADDED,
@@ -34,6 +36,8 @@ enum
 struct NewsMessages msgarray[] = {
 	{NEWS_LOGON, "LOGON",
 	 {_("LOGONNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("[\002Logon News\002] %s"),
+	  _("[\002Logon News\002 - %s] %s"),
 	  _("Logon news items:"),
 	  _("There is no logon news."),
 	  _("Added new logon news item."),
@@ -44,6 +48,8 @@ struct NewsMessages msgarray[] = {
 	 },
 	{NEWS_OPER, "OPER",
 	 {_("OPERNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("[\002Oper News\002] %s"),
+	  _("[\002Oper News\002 - %s] %s"),
 	  _("Oper news items:"),
 	  _("There is no oper news."),
 	  _("Added new oper news item."),
@@ -54,6 +60,8 @@ struct NewsMessages msgarray[] = {
 	 },
 	{NEWS_RANDOM, "RANDOM",
 	 {_("RANDOMNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("[\002Random News\002] %s"),
+	  _("[\002Random News\002 - %s] %s"),
 	  _("Random news items:"),
 	  _("There is no random news."),
 	  _("Added new random news item."),
@@ -409,21 +417,18 @@ class OSNews final
 		if (newsList.empty())
 			return;
 
+		const auto &modconf = Config->GetModule(this);
 		BotInfo *bi = NULL;
 		if (Type == NEWS_OPER)
-			bi = BotInfo::Find(Config->GetModule(this).Get<const Anope::string>("oper_announcer", "OperServ"), true);
+			bi = BotInfo::Find(modconf.Get<const Anope::string>("oper_announcer", "OperServ"), true);
 		else
-			bi = BotInfo::Find(Config->GetModule(this).Get<const Anope::string>("announcer", "Global"), true);
+			bi = BotInfo::Find(modconf.Get<const Anope::string>("announcer", "Global"), true);
 		if (bi == NULL)
 			return;
 
-		Anope::string msg;
-		if (Type == NEWS_LOGON)
-			msg = _("[\002Logon News\002 - %s] %s");
-		else if (Type == NEWS_OPER)
-			msg = _("[\002Oper News\002 - %s] %s");
-		else if (Type == NEWS_RANDOM)
-			msg = _("[\002Random News\002 - %s] %s");
+		const auto **msgs = findmsgs(Type);
+		if (!msgs)
+			return; // BUG
 
 		int start = 0;
 
@@ -434,12 +439,17 @@ class OSNews final
 				start = 0;
 		}
 
+		const auto showdate = modconf.Get<bool>("showdate", "yes");
 		for (unsigned i = start, end = newsList.size(); i < end; ++i)
 		{
 			if (Type == NEWS_RANDOM && i != cur_rand_news)
 				continue;
 
-			u->SendMessage(bi, msg.c_str(), Anope::strftime(newsList[i]->time, u->Account(), true).c_str(), newsList[i]->text.c_str());
+			const auto *news = newsList[i];
+			if (showdate)
+				u->SendMessage(bi, msgs[MSG_NEWS_LONG], Anope::strftime(news->time, u->Account(), true).c_str(), news->text.c_str());
+			else
+				u->SendMessage(bi, msgs[MSG_NEWS_SHORT], news->text.c_str());
 
 			if (Type == NEWS_RANDOM)
 			{

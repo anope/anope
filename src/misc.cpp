@@ -375,7 +375,7 @@ bool LineWrapper::GetLine(Anope::string &out)
 					}
 				}
 
-				auto color = text.substr(start, start - idx);
+				auto color = text.substr(start, idx - start + 1);
 				toggle_formatting(color);
 				out.append(color);
 				break;
@@ -392,7 +392,7 @@ bool LineWrapper::GetLine(Anope::string &out)
 						break;
 					}
 
-					auto color = text.substr(start, start - idx);
+					auto color = text.substr(start, idx - start + 1);
 					toggle_formatting(color);
 					out.append(color);
 				}

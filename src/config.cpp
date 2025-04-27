@@ -776,7 +776,10 @@ void Conf::LoadConf(File &file)
 		return;
 
 	if (!file.Open())
-		throw ConfigException("File " + file.GetPath() + " could not be opened.");
+	{
+		throw ConfigException(Anope::printf("File %s could not be opened: %s.",
+			file.GetPath().c_str(), strerror(errno)));
+	}
 
 	Anope::string itemname, wordbuffer;
 	std::stack<Block *> block_stack;

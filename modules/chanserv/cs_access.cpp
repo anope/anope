@@ -84,6 +84,38 @@ AccessAccessProvider *AccessAccessProvider::me;
 class CommandCSAccess final
 	: public Command
 {
+private:
+	static void AddEntry(ListFormatter &list, const ChannelInfo *ci, const ChanAccess *access, unsigned number)
+	{
+		Anope::string timebuf;
+		if (ci->c)
+		{
+			for (const auto &[_, cuc] : ci->c->users)
+			{
+				ChannelInfo *p;
+				if (access->Matches(cuc->user, cuc->user->Account(), p))
+					timebuf = "Now";
+			}
+		}
+		if (timebuf.empty())
+		{
+			if (access->last_seen == 0)
+				timebuf = "Never";
+			else
+				timebuf = Anope::strftime(access->last_seen, NULL, true);
+		}
+
+		ListFormatter::ListEntry entry;
+		entry["Number"] = Anope::ToString(number);
+		entry["Level"] = access->AccessSerialize();
+		entry["Mask"] = access->Mask();
+		entry["By"] = access->creator;
+		entry["Last seen"] = timebuf;
+		entry["Description"] = access->description;
+		list.AddEntry(entry);
+	}
+
+
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params[2];
@@ -381,32 +413,7 @@ class CommandCSAccess final
 
 					const ChanAccess *access = ci->GetAccess(number - 1);
 
-					Anope::string timebuf;
-					if (ci->c)
-					{
-						for (const auto &[_, cuc] : ci->c->users)
-						{
-							ChannelInfo *p;
-							if (access->Matches(cuc->user, cuc->user->Account(), p))
-								timebuf = "Now";
-						}
-					}
-					if (timebuf.empty())
-					{
-						if (access->last_seen == 0)
-							timebuf = "Never";
-						else
-							timebuf = Anope::strftime(access->last_seen, NULL, true);
-					}
-
-					ListFormatter::ListEntry entry;
-					entry["Number"] = Anope::ToString(number);
-					entry["Level"] = access->AccessSerialize();
-					entry["Mask"] = access->Mask();
-					entry["By"] = access->creator;
-					entry["Last seen"] = timebuf;
-					entry["Description"] = access->description;
-					this->list.AddEntry(entry);
+					AddEntry(this->list, ci, access, number);
 				}
 			}
 			nl_list(list, ci, nick);
@@ -421,32 +428,7 @@ class CommandCSAccess final
 				if (!nick.empty() && !Anope::Match(access->Mask(), nick))
 					continue;
 
-				Anope::string timebuf;
-				if (ci->c)
-				{
-					for (auto &[_, cuc] : ci->c->users)
-					{
-						ChannelInfo *p;
-						if (access->Matches(cuc->user, cuc->user->Account(), p))
-							timebuf = "Now";
-					}
-				}
-				if (timebuf.empty())
-				{
-					if (access->last_seen == 0)
-						timebuf = "Never";
-					else
-						timebuf = Anope::strftime(access->last_seen, NULL, true);
-				}
-
-				ListFormatter::ListEntry entry;
-				entry["Number"] = Anope::ToString(i + 1);
-				entry["Level"] = access->AccessSerialize();
-				entry["Mask"] = access->Mask();
-				entry["By"] = access->creator;
-				entry["Last seen"] = timebuf;
-				entry["Description"] = access->description;
-				list.AddEntry(entry);
+				AddEntry(list, ci, access, i + 1);
 			}
 		}
 

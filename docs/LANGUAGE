@@ -34,6 +34,10 @@ Anope Multi Language Support
     Poedit (https://poedit.net/) is a popular po file editor, and we recommend using it or another editor designed to edit
     po files (especially on Windows).
 
+    There are several control characters within the messages. These are mostly IRC formatting codes (https://modern.ircdocs.horse/formatting)
+    but 0x1A is special to Anope and is used to prevent the automatic linewrapper from breaking messages in the middle of
+    text that should not be split (e.g. commands). Your editor may not show these so be careful you don't delete them!
+
     If you have finished a language file translation and you want others to use it, please file a pull request on GitHub
     or send it to team@anope.org (don't forget to mention clearly your (nick)name, your email and the language name).
     You'll of course get full credit for it.

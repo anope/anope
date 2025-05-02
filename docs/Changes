@@ -2,6 +2,8 @@ Anope Version 2.1.14-git
 ------------------------
 Added a detail specifier to the anope.list{Channels,Opers,Servers,Users} RPC methods.
 Added a matcher for the InspIRCd oper extban.
+Added support for hashed operator passwords.
+Added support for hiding the date news was added in os_news.
 Added support for local password comparison to the sql_authentication module.
 Added support for monthly backups to db_json.
 Added support for unbanning virtual modes using cs_unban.

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-02 11:10+0100\n"
+"POT-Creation-Date: 2025-05-02 12:23+0100\n"
 "PO-Revision-Date: 2025-04-25 13:08+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -5740,6 +5740,10 @@ msgid "VHost"
 msgstr ""
 
 #, c-format
+msgid "VHost %s has been requested by %s."
+msgstr ""
+
+#, c-format
 msgid "VHost for %s removed."
 msgstr ""
 
@@ -6260,6 +6264,16 @@ msgstr ""
 msgid "Your password reset request has expired."
 msgstr ""
 
+msgid "Your requested vhost has been approved."
+msgstr ""
+
+msgid "Your requested vhost has been rejected."
+msgstr ""
+
+#, c-format
+msgid "Your requested vhost has been rejected. Reason: %s"
+msgstr ""
+
 msgid "Your vhost has been requested."
 msgstr ""
 
@@ -6373,20 +6387,6 @@ msgid "[Suspended]"
 msgstr ""
 
 msgid "[Unconfirmed]"
-msgstr ""
-
-#, c-format
-msgid "[auto memo] VHost %s has been requested by %s."
-msgstr ""
-
-msgid "[auto memo] Your requested vhost has been approved."
-msgstr ""
-
-msgid "[auto memo] Your requested vhost has been rejected."
-msgstr ""
-
-#, c-format
-msgid "[auto memo] Your requested vhost has been rejected. Reason: %s"
 msgstr ""
 
 msgid "[{pattern | channel} [INVISIBLE]]"

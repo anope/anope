@@ -226,7 +226,7 @@ public:
 			FOREACH_MOD(OnSetVHost, (na));
 
 			if (Config->GetModule(this->owner).Get<bool>("memouser") && memoserv)
-				memoserv->Send(source.service->nick, na->nick, _("[auto memo] Your requested vhost has been approved."), true);
+				memoserv->Send(source.service->nick, na->nick, _("Your requested vhost has been approved."), true);
 
 			source.Reply(_("VHost for %s has been activated."), na->nick.c_str());
 			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
@@ -279,9 +279,9 @@ public:
 			{
 				Anope::string message;
 				if (!reason.empty())
-					message = Anope::printf(_("[auto memo] Your requested vhost has been rejected. Reason: %s"), reason.c_str());
+					message = Anope::printf(_("Your requested vhost has been rejected. Reason: %s"), reason.c_str());
 				else
-					message = _("[auto memo] Your requested vhost has been rejected.");
+					message = _("Your requested vhost has been rejected.");
 
 				memoserv->Send(source.service->nick, nick, Language::Translate(source.GetAccount(), message.c_str()), true);
 			}
@@ -404,7 +404,7 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 			if (!na)
 				continue;
 
-			Anope::string message = Anope::printf(_("[auto memo] VHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
+			Anope::string message = Anope::printf(_("VHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
 
 			memoserv->Send(source.service->nick, na->nick, message, true);
 		}

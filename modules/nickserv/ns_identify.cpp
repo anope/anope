@@ -113,8 +113,8 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 				"Tells %s that you are really the owner of this "
-				"nick.  Many commands require you to authenticate yourself "
-				"with this command before you use them.  The password "
+				"nick. Many commands require you to authenticate yourself "
+				"with this command before you use them. The password "
 				"should be the same one you sent with the \002REGISTER\002 "
 				"command."
 			),

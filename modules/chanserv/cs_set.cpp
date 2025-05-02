@@ -912,7 +912,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"Enables or disables signed kicks for a "
-			"channel.  When \002SIGNKICK\002 is set, kicks issued with "
+			"channel. When \002SIGNKICK\002 is set, kicks issued with "
 			"the \002KICK\002 command will have the nick that used the "
 			"command in their reason."
 			"\n\n"
@@ -1093,7 +1093,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Sets whether the given channel will expire.  Setting this "
+			"Sets whether the given channel will expire. Setting this "
 			"to ON prevents the channel from expiring."
 		));
 		return true;

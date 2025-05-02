@@ -96,7 +96,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"Sets the vhost for the given nick to that of the given "
-			"hostmask.  If your IRCD supports vidents, then using "
+			"hostmask. If your IRCD supports vidents, then using "
 			"SET <nick> <ident>@<hostmask> set idents for users as "
 			"well as vhosts."
 		));
@@ -202,7 +202,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"Sets the vhost for all nicks in the same group as that "
-			"of the given nick.  If your IRCD supports vidents, then "
+			"of the given nick. If your IRCD supports vidents, then "
 			"using SETALL <nick> <ident>@<hostmask> will set idents "
 			"for users as well as vhosts."
 			"\n\n"

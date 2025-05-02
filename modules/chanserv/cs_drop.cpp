@@ -90,14 +90,14 @@ public:
 		if (source.IsServicesOper())
 		{
 			source.Reply(_(
-				"Unregisters the specified channel.  Only \002Services Operators\002 "
+				"Unregisters the specified channel. Only \002Services Operators\002 "
 				"can drop a channel of which they are not the founder of."
 			));
 		}
 		else
 		{
 			source.Reply(_(
-				"Unregisters the named channel.  Can only be used by "
+				"Unregisters the named channel. Can only be used by "
 				"the \002channel founder\002."
 			));
 		}

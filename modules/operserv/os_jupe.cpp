@@ -57,7 +57,7 @@ public:
 		source.Reply(_(
 			"Tells services to jupiter a server -- that is, to create "
 			"a fake \"server\" connected to services which prevents "
-			"the real server of that name from connecting.  The jupe "
+			"the real server of that name from connecting. The jupe "
 			"may be removed using a standard \002SQUIT\002. If a reason is "
 			"given, it is placed in the server information field; "
 			"otherwise, the server information field will contain the "

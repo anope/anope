@@ -449,7 +449,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Allows Services Operators to manipulate the SNLINE list.  If "
+			"Allows Services Operators to manipulate the SNLINE list. If "
 			"a user with a realname matching an SNLINE mask attempts to "
 			"connect, services will not allow them to pursue their IRC "
 			"session."
@@ -460,9 +460,9 @@ public:
 			"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as "
 			"\0371h30m\037) are not permitted. If a unit specifier is not "
 			"included, the default is days (so \037+30\037 by itself means 30 "
-			"days). To add an SNLINE which does not expire, use \037+0\037.  If the "
+			"days). To add an SNLINE which does not expire, use \037+0\037. If the "
 			"realname mask to be added starts with a \037+\037, an expiry time must "
-			"be given, even if it is the same as the default.  The "
+			"be given, even if it is the same as the default. The "
 			"current SNLINE default expiry time can be found with the "
 			"\002STATS\032AKILL\002 command. "
 			"\n\n"
@@ -484,13 +484,13 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"The \002SNLINE\032DEL\002 command removes the given mask from the "
-			"SNLINE list if it is present.  If a list of entry numbers is "
+			"SNLINE list if it is present. If a list of entry numbers is "
 			"given, those entries are deleted.  (See the example for LIST "
 			"below.)"
 			"\n\n"
 			"The \002SNLINE\032LIST\002 command displays the SNLINE list. "
 			"If a wildcard mask is given, only those entries matching the "
-			"mask are displayed.  If a list of entry numbers is given, "
+			"mask are displayed. If a list of entry numbers is given, "
 			"only those entries are shown; for example:\n"
 			"   \002SNLINE\032LIST\0322-5,7-9\002\n"
 			"      Lists SNLINE entries numbered 2 through 5 and 7\n"
@@ -688,7 +688,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Allows Services Operators to manipulate the SQLINE list.  If "
+			"Allows Services Operators to manipulate the SQLINE list. If "
 			"a user with a nick matching an SQLINE mask attempts to "
 			"connect, services will not allow them to pursue their IRC "
 			"session. "

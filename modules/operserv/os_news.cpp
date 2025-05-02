@@ -328,10 +328,10 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-				"Edits or displays the list of logon news messages.  When a "
+				"Edits or displays the list of logon news messages. When a "
 				"user connects to the network, these messages will be sent "
-				"to them.  However, no more than \002%d\002 messages will be "
-				"sent in order to avoid flooding the user.  If there are "
+				"to them. However, no more than \002%d\002 messages will be "
+				"sent in order to avoid flooding the user. If there are "
 				"more news messages, only the most recent will be sent."
 			),
 			Config->GetModule(this->owner).Get<unsigned>("newscount", "3"));
@@ -358,10 +358,10 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-				"Edits or displays the list of oper news messages.  When a "
+				"Edits or displays the list of oper news messages. When a "
 				"user opers up (with the /OPER command), these messages will "
-				"be sent to them.  However, no more than \002%d\002 messages will "
-				"be sent in order to avoid flooding the user.  If there are "
+				"be sent to them. However, no more than \002%d\002 messages will "
+				"be sent in order to avoid flooding the user. If there are "
 				"more news messages, only the most recent will be sent."
 			),
 			Config->GetModule(this->owner).Get<unsigned>("newscount", "3"));
@@ -388,7 +388,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Edits or displays the list of random news messages.  When a "
+			"Edits or displays the list of random news messages. When a "
 			"user connects to the network, one (and only one) of the "
 			"random news will be randomly chosen and sent to them."
 		));

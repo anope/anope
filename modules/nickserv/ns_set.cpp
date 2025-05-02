@@ -727,7 +727,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Sets whether the given nickname will expire.  Setting this "
+			"Sets whether the given nickname will expire. Setting this "
 			"to \002ON\002 prevents the nickname from expiring."
 		));
 		return true;

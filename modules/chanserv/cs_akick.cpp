@@ -501,13 +501,13 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-				"Maintains the \002AutoKick list\002 for a channel.  If a user "
+				"Maintains the \002AutoKick list\002 for a channel. If a user "
 				"on the AutoKick list attempts to join the channel, "
 				"%s will ban that user from the channel, then kick "
 				"the user."
 				"\n\n"
 				"The \002%s\032ADD\002 command adds the given nick or usermask "
-				"to the AutoKick list.  If a \037reason\037 is given with "
+				"to the AutoKick list. If a \037reason\037 is given with "
 				"the command, that reason will be used when the user is "
 				"kicked; if not, the default reason is \"User has been "
 				"banned from the channel\". "
@@ -516,7 +516,7 @@ public:
 				"All users within that nickgroup will then be akicked. "
 				"\n\n"
 				"The \002%s\032DEL\002 command removes the given nick or mask "
-				"from the AutoKick list.  It does not, however, remove any "
+				"from the AutoKick list. It does not, however, remove any "
 				"bans placed by an AutoKick; those must be removed "
 				"manually."
 				"\n\n"

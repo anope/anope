@@ -142,7 +142,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Lists any memos you currently have.  With \002NEW\002, lists only "
+			"Lists any memos you currently have. With \002NEW\002, lists only "
 			"new (unread) memos. Unread memos are marked with a \"*\" "
 			"to the left of the memo number. You can also specify a list "
 			"of numbers, as in the example below:\n"

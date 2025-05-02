@@ -198,7 +198,7 @@ public:
 			this->SendSyntax(source);
 			source.Reply(" ");
 			source.Reply(_(
-				"Sets various global services options.  Option names "
+				"Sets various global services options. Option names "
 				"currently defined are:"
 			));
 
@@ -226,9 +226,9 @@ public:
 			source.Reply(_(
 				"Syntax: \002READONLY {ON | OFF}\002"
 				"\n\n"
-				"Sets read-only mode on or off.  In read-only mode, normal "
+				"Sets read-only mode on or off. In read-only mode, normal "
 				"users will not be allowed to modify any services data, "
-				"including channel access lists, etc.  Server operators "
+				"including channel access lists, etc. Server operators "
 				"with sufficient services privileges will be able to modify "
 				"Services' AKILL, SQLINE, SNLINE and ignore lists, drop, "
 				"suspend or forbid nicknames and channels, and manage news, "

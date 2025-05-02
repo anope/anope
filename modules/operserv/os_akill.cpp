@@ -471,13 +471,13 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 				"The \002%s\032DEL\002 command removes the given mask from the "
-				"AKILL list if it is present.  If a list of entry numbers is "
+				"AKILL list if it is present. If a list of entry numbers is "
 				"given, those entries are deleted.  (See the example for LIST "
 				"below.)"
 				"\n\n"
 				"The \002%s\032LIST\002 command displays the AKILL list. "
 				"If a wildcard mask is given, only those entries matching the "
-				"mask are displayed.  If a list of entry numbers is given, "
+				"mask are displayed. If a list of entry numbers is given, "
 				"only those entries are shown; for example:\n"
 				"   \002%s\032LIST\0322-5,7-9\002\n"
 				"      Lists AKILL entries numbered 2 through 5 and 7\n"

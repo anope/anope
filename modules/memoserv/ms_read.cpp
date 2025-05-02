@@ -201,7 +201,7 @@ public:
 		source.Reply(_(
 			"Sends you the text of the memos specified. If LAST is "
 			"given, sends you the memo you most recently received. If "
-			"NEW is given, sends you all of your new memos.  If ALL is "
+			"NEW is given, sends you all of your new memos. If ALL is "
 			"given, sends you all of your memos. Otherwise, sends you "
 			"memo number \037num\037. You can also give a list of numbers, "
 			"as in this example:"

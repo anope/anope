@@ -85,7 +85,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-				"Registers a channel in the %s database.  In order "
+				"Registers a channel in the %s database. In order "
 				"to use this command, you must first be a channel operator "
 				"on the channel you're trying to register. "
 				"The description, which is optional, is a "

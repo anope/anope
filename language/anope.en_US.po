@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-25 13:08+0100\n"
+"POT-Creation-Date: 2025-05-02 11:10+0100\n"
 "PO-Revision-Date: 2025-04-25 13:08+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -1528,15 +1528,15 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Allows Services Operators to manipulate the SNLINE list.  If a user with a realname matching an SNLINE mask attempts to connect, services will not allow them to pursue their IRC session.\n"
+"Allows Services Operators to manipulate the SNLINE list. If a user with a realname matching an SNLINE mask attempts to connect, services will not allow them to pursue their IRC session.\n"
 "\n"
-"SNLINEADD adds the given realname mask to the SNLINE list for the given reason (which must be given). expiry is specified as an integer followed by one of d (days), h (hours), or m (minutes). Combinations (such as 1h30m) are not permitted. If a unit specifier is not included, the default is days (so +30 by itself means 30 days). To add an SNLINE which does not expire, use +0.  If the realname mask to be added starts with a +, an expiry time must be given, even if it is the same as the default.  The current SNLINE default expiry time can be found with the STATSAKILL command. \n"
+"SNLINEADD adds the given realname mask to the SNLINE list for the given reason (which must be given). expiry is specified as an integer followed by one of d (days), h (hours), or m (minutes). Combinations (such as 1h30m) are not permitted. If a unit specifier is not included, the default is days (so +30 by itself means 30 days). To add an SNLINE which does not expire, use +0. If the realname mask to be added starts with a +, an expiry time must be given, even if it is the same as the default. The current SNLINE default expiry time can be found with the STATSAKILL command. \n"
 "\n"
 "Note: because the realname mask may contain spaces, the separator between it and the reason is a colon."
 msgstr ""
 
 msgid ""
-"Allows Services Operators to manipulate the SQLINE list.  If a user with a nick matching an SQLINE mask attempts to connect, services will not allow them to pursue their IRC session. If the first character of the mask is #, services will prevent the use of matching channels. If the mask is a regular expression, the expression will be matched against channels too.\n"
+"Allows Services Operators to manipulate the SQLINE list. If a user with a nick matching an SQLINE mask attempts to connect, services will not allow them to pursue their IRC session. If the first character of the mask is #, services will prevent the use of matching channels. If the mask is a regular expression, the expression will be matched against channels too.\n"
 "\n"
 "SQLINEADD adds the given (nick/channel) mask to the SQLINE list for the given reason (which must be given). expiry is specified as an integer followed by one of d (days), h (hours), or m (minutes). Combinations (such as 1h30m) are not permitted. If a unit specifier is not included, the default is days (so +30 by itself means 30 days). To add an SQLINE which does not expire, use +0. If the mask to be added starts with a +, an expiry time must be given, even if it is the same as the default. The current SQLINE default expiry time can be found with the STATSAKILL command."
 msgstr ""
@@ -1635,11 +1635,11 @@ msgid "Allows you to kill a user from the network. Parameters are the same as fo
 msgstr ""
 
 #, c-format
-msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on the nick.  You can hide the email address (EMAIL), last seen user@host mask (USERMASK), the services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
+msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on the nick. You can hide the email address (EMAIL), last seen user@host mask (USERMASK), the services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
 msgstr ""
 
 #, c-format
-msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on your nick.  You can hide your email address(EMAIL), last seen user@host mask (USERMASK), your services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
+msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on your nick. You can hide your email address(EMAIL), last seen user@host mask (USERMASK), your services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
 msgstr ""
 
 #, c-format
@@ -1945,7 +1945,7 @@ msgstr ""
 msgid "Caps kicker"
 msgstr ""
 
-msgid "Causes services to do an immediate shutdown; databases are not saved.  This command should not be used unless damage to the in-memory copies of the databases is feared and they should not be saved."
+msgid "Causes services to do an immediate shutdown; databases are not saved. This command should not be used unless damage to the in-memory copies of the databases is feared and they should not be saved."
 msgstr ""
 
 msgid "Causes services to reload the configuration file. Note that some directives still need the restart of the services to take effect (such as services' nicknames, activation of the session limitation, etc.)."
@@ -2621,14 +2621,14 @@ msgid "Drops the given nick from the database. Once your nickname is dropped you
 msgstr ""
 
 #, c-format
-msgid "Edits or displays the list of logon news messages.  When a user connects to the network, these messages will be sent to them.  However, no more than %d messages will be sent in order to avoid flooding the user.  If there are more news messages, only the most recent will be sent."
+msgid "Edits or displays the list of logon news messages. When a user connects to the network, these messages will be sent to them. However, no more than %d messages will be sent in order to avoid flooding the user. If there are more news messages, only the most recent will be sent."
 msgstr ""
 
 #, c-format
-msgid "Edits or displays the list of oper news messages.  When a user opers up (with the /OPER command), these messages will be sent to them.  However, no more than %d messages will be sent in order to avoid flooding the user.  If there are more news messages, only the most recent will be sent."
+msgid "Edits or displays the list of oper news messages. When a user opers up (with the /OPER command), these messages will be sent to them. However, no more than %d messages will be sent in order to avoid flooding the user. If there are more news messages, only the most recent will be sent."
 msgstr ""
 
-msgid "Edits or displays the list of random news messages.  When a user connects to the network, one (and only one) of the random news will be randomly chosen and sent to them."
+msgid "Edits or displays the list of random news messages. When a user connects to the network, one (and only one) of the random news will be randomly chosen and sent to them."
 msgstr ""
 
 msgid "Email address"
@@ -2692,7 +2692,7 @@ msgid "Enables or disables keepmodes for your nick. If keep modes is enabled, se
 msgstr ""
 
 msgid ""
-"Enables or disables signed kicks for a channel.  When SIGNKICK is set, kicks issued with the KICK command will have the nick that used the command in their reason.\n"
+"Enables or disables signed kicks for a channel. When SIGNKICK is set, kicks issued with the KICK command will have the nick that used the command in their reason.\n"
 "\n"
 "If you use LEVEL, those who have a level that is superior or equal to the SIGNKICK level on the channel won't have their kicks signed."
 msgstr ""
@@ -3259,7 +3259,7 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Lists all registered nicknames which match the given pattern, in nick!user@host format.  Nicks with the PRIVATE option set will only be displayed to Services Operators with the proper access.  Nicks with the NOEXPIRE option set will have a ! prefixed to the nickname for Services Operators to see.\n"
+"Lists all registered nicknames which match the given pattern, in nick!user@host format. Nicks with the PRIVATE option set will only be displayed to Services Operators with the proper access. Nicks with the NOEXPIRE option set will have a ! prefixed to the nickname for Services Operators to see.\n"
 "\n"
 "Note that a preceding '#' specifies a range.\n"
 "\n"
@@ -3291,7 +3291,7 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Lists any memos you currently have.  With NEW, lists only new (unread) memos. Unread memos are marked with a \"*\" to the left of the memo number. You can also specify a list of numbers, as in the example below:\n"
+"Lists any memos you currently have. With NEW, lists only new (unread) memos. Unread memos are marked with a \"*\" to the left of the memo number. You can also specify a list of numbers, as in the example below:\n"
 "   LIST 2-5,7-9\n"
 "      Lists memos numbered 2 through 5 and 7 through 9."
 msgstr ""
@@ -3395,11 +3395,11 @@ msgstr ""
 
 #, c-format
 msgid ""
-"Maintains the AutoKick list for a channel.  If a user on the AutoKick list attempts to join the channel, %s will ban that user from the channel, then kick the user.\n"
+"Maintains the AutoKick list for a channel. If a user on the AutoKick list attempts to join the channel, %s will ban that user from the channel, then kick the user.\n"
 "\n"
-"The %sADD command adds the given nick or usermask to the AutoKick list.  If a reason is given with the command, that reason will be used when the user is kicked; if not, the default reason is \"User has been banned from the channel\". When akicking a registered nick the %s account will be added to the akick list instead of the mask. All users within that nickgroup will then be akicked. \n"
+"The %sADD command adds the given nick or usermask to the AutoKick list. If a reason is given with the command, that reason will be used when the user is kicked; if not, the default reason is \"User has been banned from the channel\". When akicking a registered nick the %s account will be added to the akick list instead of the mask. All users within that nickgroup will then be akicked. \n"
 "\n"
-"The %sDEL command removes the given nick or mask from the AutoKick list.  It does not, however, remove any bans placed by an AutoKick; those must be removed manually.\n"
+"The %sDEL command removes the given nick or mask from the AutoKick list. It does not, however, remove any bans placed by an AutoKick; those must be removed manually.\n"
 "\n"
 "The %sLIST command displays the AutoKick list, or optionally only those AutoKick entries which match the given mask.\n"
 "\n"
@@ -3412,9 +3412,9 @@ msgstr ""
 
 #, c-format
 msgid ""
-"Maintains the access list for a channel.  The access list specifies which users are allowed chanop status or access to %s commands on the channel.  Different user levels allow for access to different subsets of privileges. Any registered user not on the access list has a user level of 0, and any unregistered user has a user level of -1.\n"
+"Maintains the access list for a channel. The access list specifies which users are allowed chanop status or access to %s commands on the channel. Different user levels allow for access to different subsets of privileges. Any registered user not on the access list has a user level of 0, and any unregistered user has a user level of -1.\n"
 "\n"
-"The %sADD command adds the given mask to the access list with the given user level; if the mask is already present on the list, its access level is changed to the level specified in the command.  The level specified may be a numerical level or the name of a privilege (eg AUTOOP). When a user joins the channel the access they receive is from the highest level entry in the access list."
+"The %sADD command adds the given mask to the access list with the given user level; if the mask is already present on the list, its access level is changed to the level specified in the command. The level specified may be a numerical level or the name of a privilege (eg AUTOOP). When a user joins the channel the access they receive is from the highest level entry in the access list."
 msgstr ""
 
 #, c-format
@@ -3423,9 +3423,9 @@ msgid ""
 "\n"
 "The ADD command adds the given word to the bad words list. If SINGLE is specified, a kick will be done only if a user says the entire word. If START is specified, a kick will be done if a user says a word that starts with word. If END is specified, a kick will be done if a user says a word that ends with word. If you don't specify anything, a kick will be issued every time word is said by a user.\n"
 "\n"
-"The DEL command removes the given word from the bad words list.  If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
+"The DEL command removes the given word from the bad words list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
 "\n"
-"The LIST command displays the bad words list.  If a wildcard mask is given, only those entries matching the mask are displayed.  If a list of entry numbers is given, only those entries are shown; for example:\n"
+"The LIST command displays the bad words list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
 "   #channelLIST2-5,7-9\n"
 "      Lists bad words entries numbered 2 through 5 and\n"
 "      7 through 9.\n"
@@ -4231,7 +4231,7 @@ msgstr ""
 
 #, c-format
 msgid ""
-"Registers a channel in the %s database.  In order to use this command, you must first be a channel operator on the channel you're trying to register. The description, which is optional, is a general description of the channel's purpose. \n"
+"Registers a channel in the %s database. In order to use this command, you must first be a channel operator on the channel you're trying to register. The description, which is optional, is a general description of the channel's purpose. \n"
 "\n"
 "When you register a channel, you are recorded as the \"founder\" of the channel. The channel founder is allowed to change all of the channel settings for the channel; %s will also automatically give the founder channel operator privileges when they enter the channel."
 msgstr ""
@@ -4450,7 +4450,7 @@ msgstr ""
 msgid "Sends a memo and requests a read receipt"
 msgstr ""
 
-msgid "Sends a passcode to the nickname with instructions on how to reset their password.  Email must be the email address associated to the nickname."
+msgid "Sends a passcode to the nickname with instructions on how to reset their password. Email must be the email address associated to the nickname."
 msgstr ""
 
 msgid "Sends all registered users a memo containing memo-text."
@@ -4466,7 +4466,7 @@ msgid "Sends the named nick or channel a memo containing memo-text. When s
 msgstr ""
 
 msgid ""
-"Sends you the text of the memos specified. If LAST is given, sends you the memo you most recently received. If NEW is given, sends you all of your new memos.  If ALL is given, sends you all of your memos. Otherwise, sends you memo number num. You can also give a list of numbers, as in this example:\n"
+"Sends you the text of the memos specified. If LAST is given, sends you the memo you most recently received. If NEW is given, sends you all of your new memos. If ALL is given, sends you all of your memos. Otherwise, sends you memo number num. You can also give a list of numbers, as in this example:\n"
 "\n"
 "   READ 2-5,7-9\n"
 "      Displays memos numbered 2 through 5 and 7 through 9."
@@ -4771,15 +4771,15 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Sets the vhost for all nicks in the same group as that of the given nick.  If your IRCD supports vidents, then using SETALL <nick> <ident>@<hostmask> will set idents for users as well as vhosts.\n"
+"Sets the vhost for all nicks in the same group as that of the given nick. If your IRCD supports vidents, then using SETALL <nick> <ident>@<hostmask> will set idents for users as well as vhosts.\n"
 "\n"
 "* NOTE, this will not update the vhost for any nicks added to the group after this command was used."
 msgstr ""
 
-msgid "Sets the vhost for the given nick to that of the given hostmask.  If your IRCD supports vidents, then using SET <nick> <ident>@<hostmask> set idents for users as well as vhosts."
+msgid "Sets the vhost for the given nick to that of the given hostmask. If your IRCD supports vidents, then using SET <nick> <ident>@<hostmask> set idents for users as well as vhosts."
 msgstr ""
 
-msgid "Sets various global services options.  Option names currently defined are:"
+msgid "Sets various global services options. Option names currently defined are:"
 msgstr ""
 
 msgid "Sets various memo options.  option can be one of:"
@@ -4791,7 +4791,7 @@ msgstr ""
 msgid "Sets whether services should set channel status modes on you automatically."
 msgstr ""
 
-msgid "Sets whether the given channel will expire.  Setting this to ON prevents the channel from expiring."
+msgid "Sets whether the given channel will expire. Setting this to ON prevents the channel from expiring."
 msgstr ""
 
 msgid "Sets whether the given nickname can be added to a channel access list."
@@ -4801,7 +4801,7 @@ msgstr ""
 msgid "Sets whether the given nickname will be given its status modes in channels automatically. Set to ON to allow %s to set status modes on the given nickname automatically when it is entering channels. Note that depending on channel settings some modes may not get set automatically."
 msgstr ""
 
-msgid "Sets whether the given nickname will expire.  Setting this to ON prevents the nickname from expiring."
+msgid "Sets whether the given nickname will expire. Setting this to ON prevents the nickname from expiring."
 msgstr ""
 
 msgid "Sets whether you can be added to a channel access list."
@@ -4812,7 +4812,7 @@ msgid "Sets whether you will be given your channel status modes automatically. S
 msgstr ""
 
 #, c-format
-msgid "Setting %s not known.  Type %sLEVELS for a list of valid settings."
+msgid "Setting %s not known. Type %sLEVELS for a list of valid settings."
 msgstr ""
 
 msgid "Setting for DEBUG must be ON, OFF, or a positive number."
@@ -4982,18 +4982,18 @@ msgstr ""
 msgid ""
 "Syntax: LIMIT [channel] limit\n"
 "\n"
-"Sets the maximum number of memos you (or the given channel) are allowed to have. If you set this to 0, no one will be able to send any memos to you.  However, you cannot set this any higher than %d."
+"Sets the maximum number of memos you (or the given channel) are allowed to have. If you set this to 0, no one will be able to send any memos to you. However, you cannot set this any higher than %d."
 msgstr ""
 
 #, c-format
 msgid ""
 "Syntax: LIMIT [user | channel] {limit | NONE} [HARD]\n"
 "\n"
-"Sets the maximum number of memos a user or channel is allowed to have.  Setting the limit to 0 prevents the user from receiving any memos; setting it to NONE allows the user to receive and keep as many memos as they want.  If you do not give a nickname or channel, your own limit is set.\n"
+"Sets the maximum number of memos a user or channel is allowed to have. Setting the limit to 0 prevents the user from receiving any memos; setting it to NONE allows the user to receive and keep as many memos as they want. If you do not give a nickname or channel, your own limit is set.\n"
 "\n"
-"Adding HARD prevents the user from changing the limit.  Not adding HARD has the opposite effect, allowing the user to change the limit (even if a previous limit was set with HARD).\n"
+"Adding HARD prevents the user from changing the limit. Not adding HARD has the opposite effect, allowing the user to change the limit (even if a previous limit was set with HARD).\n"
 "\n"
-"This use of the SETLIMIT command is limited to Services Operators.  Other users may only enter a limit for themselves or a channel on which they have such privileges, may not remove their limit, may not set a limit above %d, and may not set a hard limit."
+"This use of the SETLIMIT command is limited to Services Operators. Other users may only enter a limit for themselves or a channel on which they have such privileges, may not remove their limit, may not set a limit above %d, and may not set a hard limit."
 msgstr ""
 
 #, c-format
@@ -5020,7 +5020,7 @@ msgstr ""
 msgid ""
 "Syntax: READONLY {ON | OFF}\n"
 "\n"
-"Sets read-only mode on or off.  In read-only mode, normal users will not be allowed to modify any services data, including channel access lists, etc.  Server operators with sufficient services privileges will be able to modify Services' AKILL, SQLINE, SNLINE and ignore lists, drop, suspend or forbid nicknames and channels, and manage news, oper info and DNS, but any such changes will not be saved unless read-only mode is deactivated before services are terminated or restarted.\n"
+"Sets read-only mode on or off. In read-only mode, normal users will not be allowed to modify any services data, including channel access lists, etc. Server operators with sufficient services privileges will be able to modify Services' AKILL, SQLINE, SNLINE and ignore lists, drop, suspend or forbid nicknames and channels, and manage news, oper info and DNS, but any such changes will not be saved unless read-only mode is deactivated before services are terminated or restarted.\n"
 "\n"
 "This option is equivalent to the command-line option --readonly."
 msgstr ""
@@ -5034,7 +5034,7 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "Tells %s that you are really the owner of this nick.  Many commands require you to authenticate yourself with this command before you use them.  The password should be the same one you sent with the REGISTER command."
+msgid "Tells %s that you are really the owner of this nick. Many commands require you to authenticate yourself with this command before you use them. The password should be the same one you sent with the REGISTER command."
 msgstr ""
 
 #, c-format
@@ -5051,7 +5051,7 @@ msgid ""
 "By default, limited to AOPs or those with level 5 access and above on the channel."
 msgstr ""
 
-msgid "Tells services to jupiter a server -- that is, to create a fake \"server\" connected to services which prevents the real server of that name from connecting.  The jupe may be removed using a standard SQUIT. If a reason is given, it is placed in the server information field; otherwise, the server information field will contain the text \"Juped by <nick>\", showing the nickname of the person who jupitered the server."
+msgid "Tells services to jupiter a server -- that is, to create a fake \"server\" connected to services which prevents the real server of that name from connecting. The jupe may be removed using a standard SQUIT. If a reason is given, it is placed in the server information field; otherwise, the server information field will contain the text \"Juped by <nick>\", showing the nickname of the person who jupitered the server."
 msgstr ""
 
 msgid "Tells you about the last time a user was seen"
@@ -5068,7 +5068,7 @@ msgstr ""
 
 #, c-format
 msgid ""
-"The %s command allows fine control over the meaning of the numeric access levels used for channels.  With this command, you can define the access level required for most of %s's functions. (The SETFOUNDER and this command are always restricted to the channel founder).\n"
+"The %s command allows fine control over the meaning of the numeric access levels used for channels. With this command, you can define the access level required for most of %s's functions. (The SETFOUNDER and this command are always restricted to the channel founder).\n"
 "\n"
 "%sSET allows the access level for a function or group of functions to be changed. %sDISABLE (or DIS for short) disables an automatic feature or disallows access to a function by anyone, INCLUDING the founder (although, the founder can always re-enable it). Use %sSET founder to make a level founder only.\n"
 "\n"
@@ -5093,9 +5093,9 @@ msgstr ""
 
 #, c-format
 msgid ""
-"The %sDEL command removes the given mask from the AKILL list if it is present.  If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
+"The %sDEL command removes the given mask from the AKILL list if it is present. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
 "\n"
-"The %sLIST command displays the AKILL list. If a wildcard mask is given, only those entries matching the mask are displayed.  If a list of entry numbers is given, only those entries are shown; for example:\n"
+"The %sLIST command displays the AKILL list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
 "   %sLIST2-5,7-9\n"
 "      Lists AKILL entries numbered 2 through 5 and 7\n"
 "      through 9.\n"
@@ -5107,9 +5107,9 @@ msgstr ""
 
 #, c-format
 msgid ""
-"The %sDEL command removes the given nick from the access list.  If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.) You may remove yourself from an access list, even if you do not have access to modify that list otherwise.\n"
+"The %sDEL command removes the given nick from the access list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.) You may remove yourself from an access list, even if you do not have access to modify that list otherwise.\n"
 "\n"
-"The %sLIST command displays the access list.  If a wildcard mask is given, only those entries matching the mask are displayed.  If a list of entry numbers is given, only those entries are shown; for example:\n"
+"The %sLIST command displays the access list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
 "   %s#channelLIST2-5,7-9\n"
 "      Lists access entries numbered 2 through 5 and\n"
 "      7 through 9.\n"
@@ -5120,9 +5120,9 @@ msgid ""
 msgstr ""
 
 msgid ""
-"The SNLINEDEL command removes the given mask from the SNLINE list if it is present.  If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
+"The SNLINEDEL command removes the given mask from the SNLINE list if it is present. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
 "\n"
-"The SNLINELIST command displays the SNLINE list. If a wildcard mask is given, only those entries matching the mask are displayed.  If a list of entry numbers is given, only those entries are shown; for example:\n"
+"The SNLINELIST command displays the SNLINE list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
 "   SNLINELIST2-5,7-9\n"
 "      Lists SNLINE entries numbered 2 through 5 and 7\n"
 "      through 9.\n"
@@ -5656,10 +5656,10 @@ msgstr ""
 msgid "Unpooled"
 msgstr ""
 
-msgid "Unregisters the named channel.  Can only be used by the channel founder."
+msgid "Unregisters the named channel. Can only be used by the channel founder."
 msgstr ""
 
-msgid "Unregisters the specified channel.  Only Services Operators can drop a channel of which they are not the founder of."
+msgid "Unregisters the specified channel. Only Services Operators can drop a channel of which they are not the founder of."
 msgstr ""
 
 msgid "Unsuspend a given nick"

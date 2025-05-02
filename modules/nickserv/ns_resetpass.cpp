@@ -52,7 +52,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"Sends a passcode to the nickname with instructions on how to "
-			"reset their password.  Email must be the email address associated "
+			"reset their password. Email must be the email address associated "
 			"to the nickname."
 		));
 		return true;

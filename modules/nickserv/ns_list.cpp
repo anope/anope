@@ -137,9 +137,9 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"Lists all registered nicknames which match the given "
-			"pattern, in \037nick!user@host\037 format.  Nicks with the \002PRIVATE\002 "
+			"pattern, in \037nick!user@host\037 format. Nicks with the \002PRIVATE\002 "
 			"option set will only be displayed to Services Operators with the "
-			"proper access.  Nicks with the \002NOEXPIRE\002 option set will have "
+			"proper access. Nicks with the \002NOEXPIRE\002 option set will have "
 			"a \002!\002 prefixed to the nickname for Services Operators to see."
 			"\n\n"
 			"Note that a preceding '#' specifies a range."

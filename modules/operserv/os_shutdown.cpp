@@ -56,7 +56,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"Causes services to do an immediate shutdown; databases are "
-			"\002not\002 saved.  This command should not be used unless "
+			"\002not\002 saved. This command should not be used unless "
 			"damage to the in-memory copies of the databases is feared "
 			"and they should not be saved."
 		));

@@ -569,9 +569,9 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-				"Maintains the \002access list\002 for a channel.  The access "
+				"Maintains the \002access list\002 for a channel. The access "
 				"list specifies which users are allowed chanop status or "
-				"access to %s commands on the channel.  Different "
+				"access to %s commands on the channel. Different "
 				"user levels allow for access to different subsets of "
 				"privileges. Any registered user not on the access list has "
 				"a user level of 0, and any unregistered user has a user level "
@@ -580,7 +580,7 @@ public:
 				"The \002%s\032ADD\002 command adds the given mask to the "
 				"access list with the given user level; if the mask is "
 				"already present on the list, its access level is changed to "
-				"the level specified in the command.  The \037level\037 specified "
+				"the level specified in the command. The \037level\037 specified "
 				"may be a numerical level or the name of a privilege (eg AUTOOP). "
 				"When a user joins the channel the access they receive is from the "
 				"highest level entry in the access list."
@@ -599,14 +599,14 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 				"The \002%s\032DEL\002 command removes the given nick from the "
-				"access list.  If a list of entry numbers is given, those "
+				"access list. If a list of entry numbers is given, those "
 				"entries are deleted.  (See the example for LIST below.) "
 				"You may remove yourself from an access list, even if you "
 				"do not have access to modify that list otherwise."
 				"\n\n"
-				"The \002%s\032LIST\002 command displays the access list.  If "
+				"The \002%s\032LIST\002 command displays the access list. If "
 				"a wildcard mask is given, only those entries matching the "
-				"mask are displayed.  If a list of entry numbers is given, "
+				"mask are displayed. If a list of entry numbers is given, "
 				"only those entries are shown; for example:\n"
 				"   \002%s\032#channel\032LIST\0322-5,7-9\002\n"
 				"      Lists access entries numbered 2 through 5 and\n"
@@ -672,7 +672,7 @@ class CommandCSLevels final
 			Privilege *p = PrivilegeManager::FindPrivilege(what);
 			if (p == NULL)
 			{
-				source.Reply(_("Setting \002%s\002 not known.  Type \002%s\032LEVELS\002 for a list of valid settings."),
+				source.Reply(_("Setting \002%s\002 not known. Type \002%s\032LEVELS\002 for a list of valid settings."),
 					what.c_str(), source.service->GetQueryCommand("generic/help").c_str());
 			}
 			else
@@ -715,7 +715,7 @@ class CommandCSLevels final
 			return;
 		}
 
-		source.Reply(_("Setting \002%s\002 not known.  Type \002%s\032LEVELS\002 for a list of valid settings."),
+		source.Reply(_("Setting \002%s\002 not known. Type \002%s\032LEVELS\002 for a list of valid settings."),
 			what.c_str(), source.service->GetQueryCommand("generic/help").c_str());
 	}
 
@@ -847,7 +847,7 @@ public:
 			source.Reply(" ");
 			source.Reply(_(
 					"The \002%s\002 command allows fine control over the meaning of "
-					"the numeric access levels used for channels.  With this "
+					"the numeric access levels used for channels. With this "
 					"command, you can define the access level required for most "
 					"of %s's functions. (The \002SET\032FOUNDER\002 and this command "
 					"are always restricted to the channel founder)."

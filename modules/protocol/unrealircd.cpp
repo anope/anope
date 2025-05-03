@@ -373,12 +373,12 @@ private:
 	void SendLogin(User *u, NickAlias *na) override
 	{
 		if (!na->nc->HasExt("UNCONFIRMED"))
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", na->nc->display);
+			Uplink::Send(Config->GetClient("NickServ"), "SVSLOGIN", '*', u->GetUID(), na->nc->display);
 	}
 
 	void SendLogout(User *u) override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", 0);
+		Uplink::Send(Config->GetClient("NickServ"), "SVSLOGIN", '*', u->GetUID(), "0");
 	}
 
 	void SendChannel(Channel *c) override

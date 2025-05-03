@@ -230,7 +230,7 @@ public:
 
 	void OnJoinChannel(User *user, Channel *c) override
 	{
-		if (!c->ci || !user->server->IsSynced() || numerics.empty())
+		if (!c->ci || !user->server->IsSynced() || user->server == Me || numerics.empty())
 			return;
 
 		for (const auto &[name, ext] : items)

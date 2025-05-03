@@ -434,7 +434,7 @@ public:
 		Uplink::SendInternal({}, Me, "NUM", newparams);
 	}
 
-	void SendMode(const MessageSource &source, Channel *chan, const ModeManager::Change &change)
+	void SendMode(const MessageSource &source, Channel *chan, const ModeManager::Change &change) override
 	{
 		std::map<char, std::vector<Anope::string>> listchanges;
 		ModeManager::Change otherchanges;

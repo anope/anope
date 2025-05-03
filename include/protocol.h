@@ -196,18 +196,8 @@ public:
 	virtual void SendSVSKill(const MessageSource &source, User *user, const Anope::string &msg);
 
 	virtual void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values);
-	template <typename... Args>
-	void SendMode(const MessageSource &source, Channel *chan, const Anope::string &modes, Args &&...args)
-	{
-		SendModeInternal(source, chan, modes, { Anope::ToString(args)... });
-	}
 
 	virtual void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values);
-	template <typename... Args>
-	void SendMode(const MessageSource &source, User *u, const Anope::string &modes, Args &&...args)
-	{
-		SendModeInternal(source, u, modes, { Anope::ToString(args)... });
-	}
 
 	/** Introduces a client to the rest of the network
 	 * @param u The client to introduce

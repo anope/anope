@@ -1,4 +1,4 @@
-/* ircd-hybrid protocol module. Minimum supported version of ircd-hybrid is 8.2.23.
+/* ircd-hybrid protocol module. Minimum supported version of ircd-hybrid is 8.2.34.
  *
  * (C) 2003-2025 Anope Team <team@anope.org>
  * (C) 2012-2022 ircd-hybrid development team
@@ -13,7 +13,6 @@
 #include "modules/chanserv/mode.h"
 
 static Anope::string UplinkSID;
-static bool UseSVSAccount = false;  // Temporary backwards compatibility hack until old proto is deprecated
 
 class HybridProto final
 	: public IRCDProto
@@ -25,7 +24,7 @@ class HybridProto final
 	}
 
 public:
-	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.23+")
+	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.34+")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
@@ -209,18 +208,12 @@ public:
 
 	void SendLogin(User *u, NickAlias *na) override
 	{
-		if (!UseSVSAccount)
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", na->nc->display);
-		else
-			Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, na->nc->display);
+		Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, na->nc->display);
 	}
 
 	void SendLogout(User *u) override
 	{
-		if (!UseSVSAccount)
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", '*');
-		else
-			Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, '*');
+		Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, '*');
 	}
 
 	void SendChannel(Channel *c) override
@@ -511,10 +504,7 @@ struct IRCDMessageServer final
 			return;
 
 		if (params.size() == 5)
-		{
 			UplinkSID = params[2];
-			UseSVSAccount = true;
-		}
 
 		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params.back(), UplinkSID);
 

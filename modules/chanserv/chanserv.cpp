@@ -309,7 +309,7 @@ public:
 			return;
 
 		if (c->ci)
-			c->SetMode(c->ci->WhoSends(), "REGISTERED", "", false);
+			c->SetMode(c->ci->WhoSends(), "REGISTERED", {}, false);
 		else
 			c->RemoveMode(c->WhoSends(), "REGISTERED", "", false);
 
@@ -461,7 +461,7 @@ public:
 		}
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const ModeData &data) override
 	{
 		if (!always_lower && Anope::CurTime == c->created && c->ci && setter.GetUser() && !setter.GetUser()->server->IsULined())
 		{
@@ -470,7 +470,7 @@ public:
 			if (cu && cm && !cu->status.HasMode(cm->mchar))
 			{
 				/* Our -o and their mode change crossing, bounce their mode */
-				c->RemoveMode(c->ci->WhoSends(), mode, param);
+				c->RemoveMode(c->ci->WhoSends(), mode, data.value);
 				/* We don't set mlocks until after the join has finished processing, it will stack with this change,
 				 * so there isn't much for the user to remove except -nt etc which is likely locked anyway.
 				 */

@@ -84,14 +84,14 @@ public:
 	}
 };
 
-struct ModeData final
+struct ModeLockData final
 {
 	char letter;
 	Anope::string name;
 	Anope::string value;
 	bool set;
 
-	ModeData(const Anope::string &n, bool s, const Anope::string &v = "")
+	ModeLockData(const Anope::string &n, bool s, const Anope::string &v = "")
 		: letter(0)
 		, name(n)
 		, value(v)
@@ -99,7 +99,7 @@ struct ModeData final
 	{
 	}
 
-	ModeData(char l, const Anope::string &v = "")
+	ModeLockData(char l, const Anope::string &v = "")
 		: letter(l)
 		, value(v)
 		, set(true)
@@ -123,7 +123,7 @@ struct ChannelData final
 	Anope::string info_adder;
 	Anope::string info_message;
 	time_t info_ts = 0;
-	std::vector<ModeData> mlocks;
+	std::vector<ModeLockData> mlocks;
 	Anope::string suspend_by;
 	Anope::string suspend_reason;
 	time_t suspend_ts = 0;

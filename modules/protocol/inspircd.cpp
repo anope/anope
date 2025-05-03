@@ -434,6 +434,41 @@ public:
 		Uplink::SendInternal({}, Me, "NUM", newparams);
 	}
 
+	void SendMode(const MessageSource &source, Channel *chan, const ModeManager::Change &change)
+	{
+		std::map<char, std::vector<Anope::string>> listchanges;
+		ModeManager::Change otherchanges;
+
+		for (const auto &[mode, info] : change)
+		{
+			if (spanningtree_proto_ver >= 1206 && mode->type == MODE_LIST && info.first)
+			{
+				// Adding to a list mode.
+				const auto &data = info.second;
+
+				auto &listchange = listchanges[mode->mchar];
+				listchange.push_back(data.value);
+				listchange.push_back(data.set_by);
+				listchange.push_back(Anope::ToString(data.set_at));
+			}
+			else
+			{
+				// Regular mode change or mode removal.
+				otherchanges.emplace(mode, info);
+			}
+		}
+
+		for (auto &[mode, params] : listchanges)
+		{
+			// :<sid> LMODE <chan> <chants> <modechr> [<mask> <setter> <setts>]+
+			params.insert(params.begin(), { chan->name, Anope::ToString(chan->created), Anope::ToString(mode) });
+			Uplink::SendInternal({}, source, "LMODE", params);
+		}
+
+		if (!otherchanges.empty())
+			IRCDProto::SendMode(source, chan, otherchanges);
+	}
+
 	void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values) override
 	{
 		auto params = values;
@@ -2310,7 +2345,7 @@ struct IRCDMessageLMode final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		// :<sid> LMODE <chan> <chants> <modechr> [<mask> <setts> <setter>]+
+		// :<sid> LMODE <chan> <chants> <modechr> [<mask> <setter> <setts>]+
 		auto *chan = Channel::Find(params[0]);
 		if (!chan)
 			return; // Channel doesn't exist.
@@ -2327,10 +2362,14 @@ struct IRCDMessageLMode final
 		if (params.size() % 3)
 			return; // Invalid parameter count.
 
-		for (auto it = params.begin() + 3; it != params.end(); it += 3)
+		for (auto it = params.begin() + 3; it != params.end(); )
 		{
-			// TODO: Anope doesn't store set time and setter for list modes yet.
-			chan->SetModeInternal(source, cm, *it);
+			ModeData data;
+			data.value = *it++;
+			data.set_by = *it++;
+			data.set_at = Anope::Convert(*it++, 0);
+
+			chan->SetModeInternal(source, cm, data, true);
 		}
 	}
 };

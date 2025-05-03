@@ -151,7 +151,7 @@ public:
 	/* The time this account was registered */
 	time_t registered = Anope::CurTime;
 	MemoInfo memos;
-	std::map<Anope::string, Anope::string> last_modes;
+	std::map<Anope::string, ModeData> last_modes;
 
 	/* Nicknames registered that are grouped to this account.
 	 * for n in aliases, n->nc == this.

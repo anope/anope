@@ -1008,7 +1008,7 @@ public:
 				if (cm->type == MODE_REGULAR)
 				{
 					if (!c->HasMode(cm->name) && ml->set)
-						c->SetMode(NULL, cm, "", false);
+						c->SetMode(NULL, cm, {}, false);
 					else if (c->HasMode(cm->name) && !ml->set)
 						c->RemoveMode(NULL, cm, "", false);
 				}

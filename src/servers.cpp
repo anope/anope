@@ -117,12 +117,12 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 						IRCD->SendJoin(uc->user, c, &uc->status);
 				}
 
-				for (const auto &[mode, value] :  c->GetModes())
+				for (const auto &[mode, data] : c->GetModes())
 				{
 					ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
 					if (!cm || cm->type != MODE_LIST)
 						continue;
-					ModeManager::StackerAdd(c->WhoSends(), c, cm, true, value);
+					ModeManager::StackerAdd(c->WhoSends(), c, cm, true, data);
 				}
 
 				if (!c->topic.empty() && !c->topic_setter.empty())

@@ -548,12 +548,12 @@ bool User::HasMode(const Anope::string &mname) const
 	return this->modes.count(mname);
 }
 
-void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anope::string &param)
+void User::SetModeInternal(const MessageSource &source, UserMode *um, const ModeData &data)
 {
 	if (!um)
 		return;
 
-	this->modes[um->name] = param;
+	this->modes[um->name] = data;
 
 	if (um->name == "OPER")
 	{
@@ -609,18 +609,18 @@ void User::RemoveModeInternal(const MessageSource &source, UserMode *um)
 	FOREACH_MOD(OnUserModeUnset, (source, this, um->name));
 }
 
-void User::SetMode(BotInfo *bi, UserMode *um, const Anope::string &param)
+void User::SetMode(BotInfo *bi, UserMode *um, const ModeData &data)
 {
 	if (!um || HasMode(um->name))
 		return;
 
-	ModeManager::StackerAdd(bi, this, um, true, param);
-	SetModeInternal(bi, um, param);
+	ModeManager::StackerAdd(bi, this, um, true, data);
+	SetModeInternal(bi, um, data);
 }
 
-void User::SetMode(BotInfo *bi, const Anope::string &uname, const Anope::string &param)
+void User::SetMode(BotInfo *bi, const Anope::string &uname, const ModeData &data)
 {
-	SetMode(bi, ModeManager::FindUserModeByName(uname), param);
+	SetMode(bi, ModeManager::FindUserModeByName(uname), data);
 }
 
 void User::RemoveMode(BotInfo *bi, UserMode *um, const Anope::string &param)
@@ -730,7 +730,7 @@ Anope::string User::GetModes() const
 {
 	Anope::string m, params;
 
-	for (const auto &[mode, value] : this->modes)
+	for (const auto &[mode, data] : this->modes)
 	{
 		UserMode *um = ModeManager::FindUserModeByName(mode);
 		if (um == NULL)
@@ -738,8 +738,8 @@ Anope::string User::GetModes() const
 
 		m += um->mchar;
 
-		if (!value.empty())
-			params += " " + value;
+		if (!data.value.empty())
+			params += " " + data.value;
 	}
 
 	return m + params;

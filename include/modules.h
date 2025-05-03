@@ -871,10 +871,10 @@ public:
 	 * @param c The channel
 	 * @param setter The user or server that is setting the mode
 	 * @param mode The mode
-	 * @param param The mode param, if there is one
+	 * @param data Data about the mode.
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) ATTR_NOT_NULL(2, 4) { throw NotImplementedException(); }
+	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const ModeData &data) ATTR_NOT_NULL(2, 4) { throw NotImplementedException(); }
 
 	/** Called when a mode is unset on a channel
 	 * @param c The channel

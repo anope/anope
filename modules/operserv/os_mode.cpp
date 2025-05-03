@@ -36,8 +36,8 @@ public:
 		{
 			bool all = params.size() > 2 && params[2].equals_ci("ALL");
 
-			for (const auto &[mode, value] : c->GetModes())
-				c->RemoveMode(c->WhoSends(), mode, value, false);
+			for (const auto &[mode, data] : c->GetModes())
+				c->RemoveMode(c->WhoSends(), mode, data.value, false);
 
 			if (!c)
 			{

@@ -113,11 +113,72 @@ void IRCDProto::SendSVSKill(const MessageSource &source, User *user, const Anope
 	Uplink::Send(source, "KILL", user->GetUID(), buf);
 }
 
+static auto BuildModeChange(const ModeManager::Change &change)
+{
+	std::list<std::pair<Anope::string, std::vector<Anope::string>>> modes;
+
+	Anope::string modebuf;
+	size_t modecount = 0;
+	std::vector<Anope::string> parambuf;
+	size_t paramlen;
+
+	auto adding = true;
+	for (const auto &[mode, info] : change)
+	{
+		const auto reached_max_line = IRCD->MaxLine && modebuf.length() + paramlen > IRCD->MaxLine - 100; // Leave room for command, channel, etc
+		const auto reached_max_modes = IRCD->MaxModes && ++modecount > IRCD->MaxModes;
+		if (reached_max_modes || reached_max_line)
+		{
+			modes.push_back({modebuf, parambuf});
+
+			modebuf.clear();
+			modecount = 0;
+
+			parambuf.clear();
+			paramlen = 0;
+		}
+
+		// Push the mode.
+		const auto direction = info.first;
+		if (modebuf.empty() || adding != direction)
+		{
+			adding = direction;
+			modebuf += (adding ? '+' : '-');
+		}
+		modebuf += mode->mchar;
+
+		// If it has a value push that too.
+		const auto &data = info.second;
+		if (!data.value.empty())
+		{
+			parambuf.push_back(data.value);
+			paramlen += data.value.length() + 1;
+		}
+	}
+
+	if (!modebuf.empty())
+		modes.push_back({modebuf, parambuf});
+
+	return modes;
+}
+
+void IRCDProto::SendMode(const MessageSource &source, Channel *chan, const ModeManager::Change &change)
+{
+	for (const auto &[modes, params] : BuildModeChange(change))
+		IRCD->SendModeInternal(source, chan, modes, params);
+}
+
 void IRCDProto::SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values)
 {
 	auto params = values;
 	params.insert(params.begin(), { chan->name, modes });
 	Uplink::SendInternal({}, source, "MODE", params);
+}
+
+void IRCDProto::SendMode(const MessageSource &source, User *dest, const ModeManager::Change &change)
+{
+	for (const auto &[modes, params] : BuildModeChange(change))
+		IRCD->SendModeInternal(source, dest, modes, params);
 }
 
 void IRCDProto::SendModeInternal(const MessageSource &source, User *dest, const Anope::string &modes, const std::vector<Anope::string> &values)

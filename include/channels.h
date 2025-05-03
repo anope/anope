@@ -36,7 +36,7 @@ class CoreExport Channel final
 	static std::vector<Channel *> deleting;
 
 public:
-	typedef std::multimap<Anope::string, Anope::string> ModeList;
+	typedef std::multimap<Anope::string, ModeData> ModeList;
 private:
 	/** A map of channel modes with their parameters set on this channel
 	 */
@@ -148,10 +148,10 @@ public:
 	/** Set a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The setter
 	 * @param cm The mode
-	 * @param param The param
+	 * @param data Data about the mode.
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetModeInternal(MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
+	void SetModeInternal(MessageSource &source, ChannelMode *cm, const ModeData &data = {}, bool enforce_mlock = true);
 
 	/** Remove a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The Setter
@@ -164,19 +164,19 @@ public:
 	/** Set a mode on a channel
 	 * @param bi The client setting the modes
 	 * @param cm The mode
-	 * @param param Optional param arg for the mode
+	 * @param data Data about the mode
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
+	void SetMode(BotInfo *bi, ChannelMode *cm, const ModeData &data = {}, bool enforce_mlock = true);
 
 	/**
 	 * Set a mode on a channel
 	 * @param bi The client setting the modes
 	 * @param name The mode name
-	 * @param param Optional param arg for the mode
+	 * @param data Data about the mode
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "", bool enforce_mlock = true);
+	void SetMode(BotInfo *bi, const Anope::string &name, const ModeData &data = {}, bool enforce_mlock = true);
 
 	/** Remove a mode from a channel
 	 * @param bi The client setting the modes

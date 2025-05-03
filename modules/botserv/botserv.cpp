@@ -196,15 +196,15 @@ public:
 		}
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const ModeData &data) override
 	{
 		if (source.GetUser() && !source.GetBot() && Config->GetModule(this).Get<bool>("smartjoin") && mode->name == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{
 			BotInfo *bi = c->ci->bi;
 
-			Entry ban("BAN", param);
+			Entry ban("BAN", data.value);
 			if (ban.Matches(bi))
-				c->RemoveMode(bi, "BAN", param);
+				c->RemoveMode(bi, "BAN", data.value);
 		}
 
 		return EVENT_CONTINUE;

@@ -209,7 +209,7 @@ Anope::string Channel::GetModes(bool complete, bool plus)
 {
 	Anope::string res, params;
 
-	for (const auto &[mode, value] : this->modes)
+	for (const auto &[mode, data] : this->modes)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
 		if (!cm || cm->type == MODE_LIST)
@@ -217,14 +217,14 @@ Anope::string Channel::GetModes(bool complete, bool plus)
 
 		res += cm->mchar;
 
-		if (complete && !value.empty())
+		if (complete && !data.value.empty())
 		{
 			ChannelModeParam *cmp = NULL;
 			if (cm->type == MODE_PARAM)
 				cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
 
 			if (plus || !cmp || !cmp->minus_no_arg)
-				params += " " + value;
+				params += " " + data.value;
 		}
 	}
 
@@ -236,46 +236,42 @@ const Channel::ModeList &Channel::GetModes() const
 	return this->modes;
 }
 
-template<typename F, typename S>
-struct second final
-{
-	S operator()(const std::pair<F, S> &p)
-	{
-		return p.second;
-	}
-};
-
 std::vector<Anope::string> Channel::GetModeList(const Anope::string &mname)
 {
 	std::vector<Anope::string> r;
-	std::transform(modes.lower_bound(mname), modes.upper_bound(mname), std::back_inserter(r), second<Anope::string, Anope::string>());
+	std::transform(modes.lower_bound(mname), modes.upper_bound(mname), std::back_inserter(r), [](const auto &mode) {
+		return mode.second.value;
+	});
 	return r;
 }
 
-void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Anope::string &oparam, bool enforce_mlock)
+void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const ModeData &data, bool enforce_mlock)
 {
 	if (!ocm)
 		return;
 
-	Anope::string param = oparam;
-	ChannelMode *cm = ocm->Unwrap(param);
+	// We build a mode data which has more than what the caller gives us.
+	ModeData mdata;
+	mdata.set_at = data.set_at ? data.set_at : Anope::CurTime;
+	mdata.set_by = data.set_by.empty() ? setter.GetName() : data.set_by;
+	mdata.value = data.value;
+	auto *cm = ocm->Unwrap(mdata.value);
 
 	EventReturn MOD_RESULT;
 
 	/* Setting v/h/o/a/q etc */
 	if (cm->type == MODE_STATUS)
 	{
-		if (param.empty())
+		if (mdata.value.empty())
 		{
 			Log() << "Channel::SetModeInternal() mode " << cm->mchar << " with no parameter for channel " << this->name;
 			return;
 		}
 
-		User *u = User::Find(param);
-
+		auto *u = User::Find(mdata.value);
 		if (!u)
 		{
-			Log(LOG_DEBUG) << "MODE " << this->name << " +" << cm->mchar << " for nonexistent user " << param;
+			Log(LOG_DEBUG) << "MODE " << this->name << " +" << cm->mchar << " for nonexistent user " << mdata.value;
 			return;
 		}
 
@@ -286,7 +282,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Ano
 		if (cc)
 			cc->status.AddMode(cm->mchar);
 
-		FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm, param));
+		FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm, data));
 
 		/* Enforce secureops, etc */
 		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
@@ -296,12 +292,12 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Ano
 
 	if (cm->type != MODE_LIST)
 		this->modes.erase(cm->name);
-	else if (this->HasMode(cm->name, param))
+	else if (this->HasMode(cm->name, mdata.value))
 		return;
 
-	this->modes.emplace(cm->name, param);
+	this->modes.emplace(cm->name, mdata);
 
-	if (param.empty() && cm->type != MODE_REGULAR)
+	if (mdata.value.empty() && cm->type != MODE_REGULAR)
 	{
 		Log() << "Channel::SetModeInternal() mode " << cm->mchar << " for " << this->name << " with no parameter, but is a param mode";
 		return;
@@ -310,10 +306,10 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Ano
 	if (cm->type == MODE_LIST)
 	{
 		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
-		cml->OnAdd(this, param);
+		cml->OnAdd(this, mdata.value);
 	}
 
-	FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm, param));
+	FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm, data));
 
 	/* Check if we should enforce mlock */
 	if (!enforce_mlock || MOD_RESULT == EVENT_STOP)
@@ -368,7 +364,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 	if (cm->type == MODE_LIST)
 	{
 		for (Channel::ModeList::iterator it = modes.lower_bound(cm->name), it_end = modes.upper_bound(cm->name); it != it_end; ++it)
-			if (param.equals_ci(it->second))
+			if (param.equals_ci(it->second.value))
 			{
 				this->modes.erase(it);
 				break;
@@ -401,27 +397,33 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 	this->CheckModes();
 }
 
-void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
+void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const ModeData &data, bool enforce_mlock)
 {
-	Anope::string wparam = param;
 	if (!cm)
 		return;
+
+	// We build a mode data which has more than what the caller gives us.
+	ModeData mdata;
+	mdata.set_at = data.set_at ? data.set_at : Anope::CurTime;
+	mdata.set_by = data.set_by.empty() && bi ? bi->nick : data.set_by;
+	mdata.value = data.value;
+
 	/* Don't set modes already set */
 	if (cm->type == MODE_REGULAR && HasMode(cm->name))
 		return;
 	else if (cm->type == MODE_PARAM)
 	{
 		ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
-		if (!cmp->IsValid(wparam))
+		if (!cmp->IsValid(mdata.value))
 			return;
 
 		Anope::string cparam;
-		if (GetParam(cm->name, cparam) && cparam.equals_cs(wparam))
+		if (GetParam(cm->name, cparam) && cparam.equals_cs(mdata.value))
 			return;
 	}
 	else if (cm->type == MODE_STATUS)
 	{
-		User *u = User::Find(param);
+		User *u = User::Find(mdata.value);
 		if (!u || HasUserStatus(u, anope_dynamic_static_cast<ChannelModeStatus *>(cm)))
 			return;
 	}
@@ -429,10 +431,10 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	{
 		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
 
-		if (!cml->IsValid(wparam))
+		if (!cml->IsValid(mdata.value))
 			return;
 
-		if (this->HasMode(cm->name, wparam))
+		if (this->HasMode(cm->name, mdata.value))
 			return;
 	}
 
@@ -447,16 +449,16 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 		this->chanserv_modecount++;
 	}
 
-	ChannelMode *wcm = cm->Wrap(wparam);
+	ChannelMode *wcm = cm->Wrap(mdata.value);
 
-	ModeManager::StackerAdd(bi, this, wcm, true, wparam);
+	ModeManager::StackerAdd(bi, this, wcm, true, mdata);
 	MessageSource ms(bi);
-	SetModeInternal(ms, wcm, wparam, enforce_mlock);
+	SetModeInternal(ms, wcm, mdata, enforce_mlock);
 }
 
-void Channel::SetMode(BotInfo *bi, const Anope::string &mname, const Anope::string &param, bool enforce_mlock)
+void Channel::SetMode(BotInfo *bi, const Anope::string &mname, const ModeData &data, bool enforce_mlock)
 {
-	SetMode(bi, ModeManager::FindChannelModeByName(mname), param, enforce_mlock);
+	SetMode(bi, ModeManager::FindChannelModeByName(mname), data, enforce_mlock);
 }
 
 void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &wparam, bool enforce_mlock)
@@ -520,13 +522,13 @@ void Channel::RemoveMode(BotInfo *bi, const Anope::string &mname, const Anope::s
 
 bool Channel::GetParam(const Anope::string &mname, Anope::string &target) const
 {
-	std::multimap<Anope::string, Anope::string>::const_iterator it = this->modes.find(mname);
+	const auto it = this->modes.find(mname);
 
 	target.clear();
 
 	if (it != this->modes.end())
 	{
-		target = it->second;
+		target = it->second.value;
 		return true;
 	}
 
@@ -586,7 +588,7 @@ void Channel::SetModes(BotInfo *bi, bool enforce_mlock, const Anope::string &cmo
 				this->SetMode(bi, cm, sbuf, enforce_mlock);
 			}
 			else
-				this->SetMode(bi, cm, "", enforce_mlock);
+				this->SetMode(bi, cm, {}, enforce_mlock);
 		}
 		else if (!add)
 		{
@@ -659,12 +661,16 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &modes
 				modestring += cm->mchar;
 		}
 
+		ModeData data;
+		data.set_by = source.GetName();
+		data.set_at = ts ? ts : Anope::CurTime;
+
 		if (cm->type == MODE_REGULAR)
 		{
 			/* something changed if we are adding a mode we don't have, or removing one we have */
 			changed |= !!add != this->HasMode(cm->name);
 			if (add)
-				this->SetModeInternal(source, cm, "", false);
+				this->SetModeInternal(source, cm, data, false);
 			else
 				this->RemoveModeInternal(source, cm, "", false);
 			continue;
@@ -691,7 +697,10 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &modes
 			changed |= !!add != this->HasMode(cm->name, token);
 			/* CheckModes below doesn't check secureops (+ the module event) */
 			if (add)
-				this->SetModeInternal(source, cm, token, enforce_mlock);
+			{
+				data.value = token;
+				this->SetModeInternal(source, cm, data, enforce_mlock);
+			}
 			else
 				this->RemoveModeInternal(source, cm, token, enforce_mlock);
 		}

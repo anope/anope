@@ -19,6 +19,7 @@ class ChanAccess;
 class Channel;
 class ChannelInfo;
 class ChannelStatus;
+struct ModeData;
 struct ChanUserContainer;
 class ClientSocket;
 class Command;

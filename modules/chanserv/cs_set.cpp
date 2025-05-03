@@ -1121,13 +1121,19 @@ class CSSet final
 
 			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(s);
 			Anope::string modes;
-			for (const auto &[last_mode, last_value] : ci->last_modes)
+			for (const auto &[last_mode, last_data] : ci->last_modes)
 			{
 				if (!modes.empty())
 					modes += " ";
+
+				modes += '+';
 				modes += last_mode;
-				if (!last_value.empty())
-					modes += "," + last_value;
+				if (!last_data.value.empty())
+				{
+					modes += "," + Anope::ToString(last_data.set_at);
+					modes += "," + last_data.set_by;
+					modes += "," + last_data.value;
+				}
 			}
 			data.Store("last_modes", modes);
 		}
@@ -1145,11 +1151,32 @@ class CSSet final
 			ci->last_modes.clear();
 			for (spacesepstream sep(modes); sep.GetToken(modes);)
 			{
-				size_t c = modes.find(',');
-				if (c == Anope::string::npos)
-					ci->last_modes.emplace(modes, "");
+				if (modes[0] == '+')
+				{
+					commasepstream mode(modes, true);
+					mode.GetToken(modes);
+					modes.erase(0, 1);
+
+					ModeData info;
+					Anope::string set_at;
+					mode.GetToken(set_at);
+					info.set_at = Anope::Convert(set_at, 0);
+					mode.GetToken(info.set_by);
+					info.value = mode.GetRemaining();
+
+					ci->last_modes.emplace(modes, info);
+					continue;
+				}
 				else
-					ci->last_modes.emplace(modes.substr(0, c), modes.substr(c + 1));
+				{
+					// Begin 2.0 compatibility
+					size_t c = modes.find(',');
+					if (c == Anope::string::npos)
+						ci->last_modes.emplace(modes, ModeData());
+					else
+						ci->last_modes.emplace(modes.substr(0, c), ModeData(modes.substr(c + 1)));
+					// End 2.0 compatibility.
+				}
 			}
 		}
 	} keep_modes;
@@ -1207,8 +1234,8 @@ public:
 		if (c->ci && keep_modes.HasExt(c->ci))
 		{
 			Channel::ModeList ml = c->ci->last_modes;
-			for (const auto &[last_mode, last_value] : ml)
-				c->SetMode(c->ci->WhoSends(), last_mode, last_value);
+			for (const auto &[last_mode, last_data] : ml)
+				c->SetMode(c->ci->WhoSends(), last_mode, last_data);
 		}
 	}
 
@@ -1230,7 +1257,7 @@ public:
 		persist.Unset(ci);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const ModeData &data) override
 	{
 		if (c->ci)
 		{

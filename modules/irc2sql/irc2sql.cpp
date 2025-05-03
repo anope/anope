@@ -232,11 +232,11 @@ void IRC2SQL::OnJoinChannel(User *u, Channel *c)
 	this->RunQuery(query);
 }
 
-EventReturn IRC2SQL::OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param)
+EventReturn IRC2SQL::OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const ModeData &data)
 {
 	if (mode->type == MODE_STATUS)
 	{
-		User *u = User::Find(param);
+		User *u = User::Find(data.value);
 		if (u == NULL)
 			return EVENT_CONTINUE;
 

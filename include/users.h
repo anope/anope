@@ -39,7 +39,7 @@ class CoreExport User
 	static std::list<User *> quitting_users;
 
 public:
-	typedef std::map<Anope::string, Anope::string> ModeList;
+	typedef std::map<Anope::string, ModeData> ModeList;
 protected:
 	Anope::string vident;
 	Anope::string ident;
@@ -261,9 +261,9 @@ public:
 	/** Set a mode internally on the user, the IRCd is not informed
 	 * @param setter who/what is setting the mode
 	 * @param um The user mode
-	 * @param Param The param, if there is one
+	 * @param data Data about the mode.
 	 */
-	void SetModeInternal(const MessageSource &setter, UserMode *um, const Anope::string &param = "");
+	void SetModeInternal(const MessageSource &setter, UserMode *um, const  ModeData &data = {});
 
 	/** Remove a mode internally on the user, the IRCd is not informed
 	 * @param setter who/what is setting the mode
@@ -274,16 +274,16 @@ public:
 	/** Set a mode on the user
 	 * @param bi The client setting the mode
 	 * @param um The user mode
-	 * @param Param Optional param for the mode
+	 * @param data Data about the mode
 	 */
-	void SetMode(BotInfo *bi, UserMode *um, const Anope::string &param = "");
+	void SetMode(BotInfo *bi, UserMode *um, const ModeData &data = {});
 
 	/** Set a mode on the user
 	 * @param bi The client setting the mode
 	 * @param name The mode name
-	 * @param Param Optional param for the mode
+	 * @param data Data about the mode
 	 */
-	void SetMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "");
+	void SetMode(BotInfo *bi, const Anope::string &name, const ModeData &data = {});
 
 	/** Remove a mode on the user
 	 * @param bi The client setting the mode

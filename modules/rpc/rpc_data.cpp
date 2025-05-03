@@ -220,15 +220,15 @@ public:
 		}
 
 		std::vector<Anope::string> modelist = { "+" };
-		for (const auto &[mname, mvalue] : c->GetModes())
+		for (const auto &[mname, mdata] : c->GetModes())
 		{
 			auto *cm = ModeManager::FindChannelModeByName(mname);
 			if (!cm || cm->type == MODE_LIST)
 				continue;
 
 			modelist.front().push_back(cm->mchar);
-			if (!mvalue.empty())
-				modelist.push_back(mvalue);
+			if (!mdata.value.empty())
+				modelist.push_back(mdata.value);
 		}
 		auto &modes = root.ReplyArray("modes");
 		for (const auto &modeparam : modelist)
@@ -522,15 +522,15 @@ public:
 			root.Reply("fingerprint", u->fingerprint);
 
 		std::vector<Anope::string> modelist = { "+" };
-		for (const auto &[mname, mvalue] : u->GetModeList())
+		for (const auto &[mname, mdata] : u->GetModeList())
 		{
 			auto *um = ModeManager::FindUserModeByName(mname);
 			if (!um || um->type == MODE_LIST)
 				continue;
 
 			modelist.front().push_back(um->mchar);
-			if (!mvalue.empty())
-				modelist.push_back(mvalue);
+			if (!mdata.value.empty())
+				modelist.push_back(mdata.value);
 		}
 		auto &modes = root.ReplyArray("modes");
 		for (const auto &modeparam : modelist)

@@ -407,11 +407,11 @@ public:
 		this->ParseModeString();
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const ModeData &data) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOff.count(mode->name) && source.GetUser() && !source.GetBot())
 		{
-			c->RemoveMode(Config->GetClient("OperServ"), mode, param);
+			c->RemoveMode(Config->GetClient("OperServ"), mode, data.value);
 
 			return EVENT_STOP;
 		}

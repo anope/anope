@@ -16,11 +16,11 @@ public:
 	{
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelMode *mode, const ModeData &data) override
 	{
 		if (mode->name == "OP" && c && c->ci && c->name.equals_ci(Config->GetModule(this).Get<const Anope::string>("helpchannel")))
 		{
-			User *u = User::Find(param);
+			User *u = User::Find(data.value);
 
 			if (u && c->ci->AccessFor(u).HasPriv("OPME"))
 				u->SetMode(Config->GetClient("OperServ"), "HELPOP");

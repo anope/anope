@@ -286,22 +286,7 @@ private:
 			data->mlocks.emplace_back("REGISTERED", set);
 
 		// Atheme also supports per-ircd values here (ew).
-		if (IRCD->owner->name == "bahamut")
-		{
-			if (locks & 0x1000u)
-				data->mlocks.emplace_back("BLOCKCOLOR", set);
-			if (locks & 0x2000u)
-				data->mlocks.emplace_back("REGMODERATED", set);
-			if (locks & 0x4000u)
-				data->mlocks.emplace_back("REGISTEREDONLY", set);
-			if (locks & 0x8000u)
-				data->mlocks.emplace_back("OPERONLY", set);
-
-			// Anope doesn't recognise the following Bahamut modes currently:
-			// - 0x10000u ('A')
-			// - 0x20000u ('P')
-		}
-		else if (IRCD->owner->name == "inspircd")
+		if (IRCD->owner->name == "inspircd")
 		{
 			if (locks & 0x1000u)
 				data->mlocks.emplace_back("BLOCKCOLOR", set);

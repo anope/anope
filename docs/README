@@ -166,7 +166,6 @@ Table of Contents
 
     Anope currently works with:
 
-        * Bahamut 2.0 or later
         * InspIRCd 3 or later
         * ircd-hybrid 8.2.34 or later
         * ircd-ratbox 3 or later

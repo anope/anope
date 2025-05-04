@@ -120,7 +120,7 @@ static auto BuildModeChange(const ModeManager::Change &change)
 	Anope::string modebuf;
 	size_t modecount = 0;
 	std::vector<Anope::string> parambuf;
-	size_t paramlen;
+	size_t paramlen = 0;
 
 	auto adding = true;
 	for (const auto &[mode, info] : change)

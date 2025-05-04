@@ -8,7 +8,7 @@ class AnopeRPC {
 	 * Initializes a new AnopeRPC instance with the specified RPC host.
 	 *
 	 * @param {string} The RPC host base URL.
-	 * @param {token} The bearer token for authorizing with the RPC token.
+	 * @param {token} The bearer token for authorizing with the RPC interface.
 	 */
 	constructor(host, token = "") {
 		this.host = host;

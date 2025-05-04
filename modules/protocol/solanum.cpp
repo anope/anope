@@ -123,6 +123,68 @@ public:
 		Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
 	}
 
+	void SendMode(const MessageSource &source, Channel *chan, const ModeManager::Change &change) override
+	{
+		size_t listcount = 0;
+		std::map<char, std::vector<Anope::string>> listchanges;
+		ModeManager::Change otherchanges;
+
+		const auto has_ebmask = Servers::Capab.count("EBMASK");
+		for (const auto &[mode, info] : change)
+		{
+			if (mode->type == MODE_LIST && info.first)
+			{
+				// Adding to a list mode.
+				auto it = listchanges.find(mode->mchar);
+				if (it == listchanges.end())
+				{
+					// No line for this type, start a new one.
+					it = listchanges.emplace(mode->mchar, std::vector<Anope::string>()).first;
+					it->second.emplace_back(Anope::string());
+				}
+
+				const auto reached_max_line = it->second.back().length() > IRCD->MaxLine - 100; // Leave room for command, channel, etc
+				const auto reached_max_modes = ++listcount > IRCD->MaxModes;
+				if (reached_max_modes || reached_max_line)
+				{
+					// End of the line, start a new one.
+					it->second.emplace_back(Anope::string());
+					listcount = 0;
+				}
+
+				auto &listchange = listchanges[mode->mchar].back();
+				if (!listchange.empty())
+						listchange.push_back(' ');
+
+				// Both BMASK and EBMASK take a mask. EBMASK also takes a ts and setter.
+				const auto &data = info.second;
+				listchange.append(data.value);
+				if (has_ebmask)
+				{
+					listchange.push_back(' ');
+					listchange.append(Anope::ToString(data.set_at));
+					listchange.push_back(' ');
+					listchange.append(data.set_by);
+				}
+			}
+			else
+			{
+				// Regular mode change or mode removal.
+				otherchanges.emplace(mode, info);
+			}
+		}
+
+		const auto *cmd = has_ebmask ? "EBMASK" : "BMASK";
+		for (auto &[mode, changes] : listchanges)
+		{
+			for (const auto &change : changes)
+				Uplink::Send(source.GetServer(), cmd, chan->created, chan->name, mode, change);
+		}
+
+		if (!otherchanges.empty())
+			IRCDProto::SendMode(source, chan, otherchanges);
+	}
+
 	void SendClientIntroduction(User *u) override
 	{
 		Uplink::Send("EUID", u->nick, 1, u->timestamp, "+" + u->GetModes(), u->GetIdent(), u->host, 0, u->GetUID(), '*', '*', u->realname);

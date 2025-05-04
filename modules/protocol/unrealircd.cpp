@@ -164,7 +164,7 @@ private:
 		auto params = values;
 		params.insert(params.begin(), { u->GetUID(), modes });
 		Uplink::SendInternal({}, source, "SVS2MODE", params);
-}
+	}
 
 	void SendClientIntroduction(User *u) override
 	{
@@ -246,9 +246,10 @@ private:
 		// MLOCK: enable receiving the MLOCK message when a mode lock changes.
 		// MTAGS: enable receiving IRCv3 message tags.
 		// NEXTBANS: enables receiving named extended bans.
+		// SJSBY: enables receiving list mode setters and set timestamps.
 		// SID: communicates the unique identifier of the local server.
 		// VHP: enable receiving the vhost in UID.
-		Uplink::Send("PROTOCTL", "BIGLINES", "MLOCK", "MTAGS", "NEXTBANS", "VHP");
+		Uplink::Send("PROTOCTL", "BIGLINES", "MLOCK", "MTAGS", "NEXTBANS", "SJSBY", "VHP");
 		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
 		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
 
@@ -1435,30 +1436,41 @@ struct IRCDMessageSJoin final
 			modeparams = { params.begin() + 3, params.end() };
 		}
 
-		std::list<Anope::string> bans, excepts, invites;
+		std::list<ModeData> bans, excepts, invites;
 		std::list<Message::Join::SJoinUser> users;
 
 		spacesepstream sep(params[params.size() - 1]);
 		Anope::string buf;
 		while (sep.GetToken(buf))
 		{
-			/* Ban */
-			if (buf[0] == '&')
+			// <1746314826,stest!stest@Clk-E0732081>&foo!bar@baz
+
+			if (buf[0] == '<')
 			{
-				buf.erase(buf.begin());
-				bans.push_back(buf);
-			}
-			/* Except */
-			else if (buf[0] == '"')
-			{
-				buf.erase(buf.begin());
-				excepts.push_back(buf);
-			}
-			/* Invex */
-			else if (buf[0] == '\'')
-			{
-				buf.erase(buf.begin());
-				invites.push_back(buf);
+				auto csep = buf.find(',', 1);
+				if (csep == std::string::npos)
+					continue; // Malformed.
+
+				auto gtsep = buf.find('>', csep + 1);
+				if (gtsep == std::string::npos)
+					continue; // Malformed.
+
+				ModeData data;
+				data.set_at = Anope::Convert(buf.substr(1, csep - 1), 0);
+				data.set_by = buf.substr(csep + 1, gtsep - csep - 1);
+
+				std::list<ModeData> *list;
+				if (buf[gtsep + 1] == '&')
+					list = &bans;
+				else if (buf[gtsep + 1] == '"')
+					list = &excepts;
+				else if (buf[gtsep + 1] == '\'')
+					list = &invites;
+				else
+					continue;
+
+				data.value = buf.substr(gtsep + 2);
+				list->push_back(data);
 			}
 			else
 			{

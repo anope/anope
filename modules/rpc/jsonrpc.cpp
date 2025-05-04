@@ -99,7 +99,7 @@ public:
 		auto *doc = yyjson_read_opts(const_cast<char *>(message.content.c_str()), message.content.length(), flags, nullptr, &error);
 		if (!doc)
 		{
-			SendError(reply, RPC::ERR_PARSE_ERROR, Anope::printf("JSON parse error #%u: %s", error.code, 	error.msg));
+			SendError(reply, RPC::ERR_PARSE_ERROR, Anope::printf("JSON parse error #%u: %s", error.code, error.msg));
 			return true;
 		}
 
@@ -129,6 +129,16 @@ public:
 			yyjson_doc_free(doc);
 			SendError(reply, RPC::ERR_INVALID_REQUEST, "No JSON-RPC method was specified", id);
 			return true;
+		}
+
+		if (!tokens.empty())
+		{
+			auto it = message.headers.find("Authorization");
+			if (it == message.headers.end() || !CanExecute(it->second, request.name))
+			{
+				SendError(reply, RPC::ERR_METHOD_NOT_FOUND, "No authorization for method: " + request.name, id);
+				return true;
+			}
 		}
 
 		auto *params = yyjson_obj_get(root, "params");
@@ -262,9 +272,23 @@ public:
 		if (httpref)
 			httpref->UnregisterPage(&jsonrpcinterface);
 
-		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf.GetModule(this).Get<const Anope::string>("server", "httpd/main"));
+		const auto &modconf = conf.GetModule(this);
+		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", modconf.Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)
 			throw ConfigException("Unable to find http reference, is httpd loaded?");
+
+		jsonrpcinterface.tokens.clear();
+		for (int i = 0; i < modconf.CountBlock("token"); ++i)
+		{
+			const auto &block = modconf.GetBlock("token", i);
+			const auto &token = block.Get<const Anope::string>("token");
+			if (!token.empty())
+			{
+				std::vector<Anope::string> methods;
+				spacesepstream(block.Get<const Anope::string>("methods")).GetTokens(methods);
+				jsonrpcinterface.tokens.emplace(token, methods);
+			}
+		}
 
 		httpref->RegisterPage(&jsonrpcinterface);
 	}

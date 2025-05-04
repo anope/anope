@@ -193,9 +193,34 @@ class RPC::ServiceInterface
 	: public Service
 {
 public:
+	Anope::map<std::vector<Anope::string>> tokens;
+
 	ServiceInterface(Module *creator)
 		: Service(creator, "RPC::ServiceInterface", "rpc")
 	{
+	}
+
+	bool CanExecute(const Anope::string &header, const Anope::string &method) const
+	{
+		if (header.compare(0, 7, "Bearer ", 7) != 0)
+			return false; // No token provided.
+
+		Anope::string token;
+		Anope::B64Decode(header.substr(7), token);
+
+		auto it = tokens.find(token);
+		if (it == tokens.end())
+			return false; // No valid token.
+
+		for (const auto &glob : it->second)
+		{
+			if (glob[0] == '~' && Anope::Match(method, glob.substr(1)))
+				return false; // Negative match.
+
+			if (Anope::Match(method, glob))
+				return true; // Positive match.
+		}
+		return false; // No match.
 	}
 
 	virtual void Reply(Request &request) = 0;

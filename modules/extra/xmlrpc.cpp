@@ -93,6 +93,17 @@ public:
 		request.name = method;
 		delete method;
 
+		if (!tokens.empty())
+		{
+			auto it = message.headers.find("Authorization");
+			if (it == message.headers.end() || !CanExecute(it->second, request.name))
+			{
+				xmlrpc_env_set_fault(&env, RPC::ERR_METHOD_NOT_FOUND, "No authorization for method");
+				SendError(reply, env);
+				return true;
+			}
+		}
+
 		ServiceReference<RPC::Event> event(RPC_EVENT, request.name);
 		if (!event)
 		{
@@ -308,8 +319,21 @@ public:
 		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", modconf.Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)
 			throw ConfigException("Unable to find http reference, is httpd loaded?");
-		httpref->RegisterPage(&xmlrpcinterface);
 
+		xmlrpcinterface.tokens.clear();
+		for (int i = 0; i < modconf.CountBlock("token"); ++i)
+		{
+			const auto &block = modconf.GetBlock("token", i);
+			const auto &token = block.Get<const Anope::string>("token");
+			if (!token.empty())
+			{
+				std::vector<Anope::string> methods;
+				spacesepstream(block.Get<const Anope::string>("methods")).GetTokens(methods);
+				xmlrpcinterface.tokens.emplace(token, methods);
+			}
+		}
+
+		httpref->RegisterPage(&xmlrpcinterface);
 	}
 };
 

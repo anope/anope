@@ -8,9 +8,11 @@ class AnopeRPC {
 	 * Initializes a new AnopeRPC instance with the specified RPC host.
 	 *
 	 * @param {string} The RPC host base URL.
+	 * @param {token} The bearer token for authorizing with the RPC token.
 	 */
-	constructor(host) {
+	constructor(host, token = "") {
 		this.host = host;
+		this.token = token;
 	}
 
 	/**
@@ -27,8 +29,13 @@ class AnopeRPC {
 			"params": params,
 			"id": Math.random().toString(36).slice(2)
 		});
+		const headers = new Headers();
+		if (this.token) {
+			headers.append("Authorization", `Bearer ${btoa(this.token)}`);
+		}
 		const response = await fetch(this.host, {
 			method: 'POST',
+			headers: headers,
 			body: request
 		});
 		if (!response.ok) {

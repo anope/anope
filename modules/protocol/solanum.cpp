@@ -90,6 +90,7 @@ public:
 		 * BAN      - Can do BAN message
 		 * CHW      - Can do channel wall @#
 		 * CLUSTER  - Supports umode +l, can send LOCOPS (encap only)
+		 * EBMASK   - Supports extended ban bursting
 		 * ECHO     - Supports sending echoed messages
 		 * ENCAP    - Can do ENCAP message
 		 * EOPMOD   - Can do channel wall =# (for cmode +z)
@@ -107,7 +108,7 @@ public:
 		 * UNKLN    - Can do UNKLINE (encap only)
 		 * QS       - Can handle quit storm removal
 		*/
-		Uplink::Send("CAPAB", "BAN CHW CLUSTER ECHO ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN");
+		Uplink::Send("CAPAB", "BAN CHW CLUSTER EBMASK ECHO ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN");
 
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
@@ -173,6 +174,44 @@ public:
 	}
 };
 
+struct IRCDMessageEBMask final
+	: IRCDMessage
+{
+	IRCDMessageEBMask(Module *creator)
+		: IRCDMessage(creator, "EBMASK", 4)
+	{
+		SetFlag(FLAG_REQUIRE_SERVER);
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		// :42X EBMASK 1746321990 #channel b :foo!*@* 1746322038 bar!baz@localhost
+		auto *chan = Channel::Find(params[1]);
+		if (!chan)
+			return; // Channel doesn't exist.
+
+		// If the TS is greater than ours, we drop the mode and don't pass it anywhere.
+		auto chants = IRCD->ExtractTimestamp(params[0]);
+		if (chants > chan->created)
+			return;
+
+		auto *cm = ModeManager::FindChannelModeByChar(params[2][0]);
+		if (!cm || cm->type != MODE_LIST)
+			return; // Mode doesn't exist or isn't a list mode.
+
+		spacesepstream ms(params[3]);
+		while (!ms.StreamEnd())
+		{
+			ModeData data;
+			Anope::string set_at;
+			if (!ms.GetToken(data.value) || !ms.GetToken(set_at) || !ms.GetToken(data.set_by))
+				break; // Malformed token, drop it.
+
+			data.set_at = Anope::Convert(set_at, 0);
+			chan->SetModeInternal(source, cm, data);
+		}
+	}
+};
 
 struct IRCDMessageEncap final
 	: IRCDMessage
@@ -347,6 +386,7 @@ class ProtoSolanum final
 		message_tb, message_tmode, message_uid;
 
 	/* Our message handlers */
+	IRCDMessageEBMask message_ebmask;
 	IRCDMessageEncap message_encap;
 	IRCDMessageEUID message_euid;
 	IRCDMessageNotice message_notice;
@@ -379,28 +419,43 @@ class ProtoSolanum final
 	}
 
 public:
-	ProtoSolanum(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this),
-		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),
-		message_kill(this), message_mode(this), message_motd(this), message_part(this), message_ping(this),
-		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_topic(this),
-		message_version(this), message_whois(this),
-
-		message_bmask("IRCDMessage", "solanum/bmask", "ratbox/bmask"),
-		message_join("IRCDMessage", "solanum/join", "ratbox/join"),
-		message_nick("IRCDMessage", "solanum/nick", "ratbox/nick"),
-		message_pong("IRCDMessage", "solanum/pong", "ratbox/pong"),
-		message_sid("IRCDMessage", "solanum/sid", "ratbox/sid"),
-		message_sjoin("IRCDMessage", "solanum/sjoin", "ratbox/sjoin"),
-		message_tb("IRCDMessage", "solanum/tb", "ratbox/tb"),
-		message_tmode("IRCDMessage", "solanum/tmode", "ratbox/tmode"),
-		message_uid("IRCDMessage", "solanum/uid", "ratbox/uid"),
-
-		message_encap(this), message_euid(this), message_notice(this), message_pass(this),
-		message_privmsg(this), message_server(this)
+	ProtoSolanum(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, PROTOCOL | VENDOR)
+		, ircd_proto(this)
+		, message_away(this)
+		, message_capab(this)
+		, message_error(this)
+		, message_invite(this)
+		, message_kick(this)
+		, message_kill(this)
+		, message_mode(this)
+		, message_motd(this)
+		, message_part(this)
+		, message_ping(this)
+		, message_quit(this)
+		, message_squit(this)
+		, message_stats(this)
+		, message_time(this)
+		, message_topic(this)
+		, message_version(this)
+		, message_whois(this)
+		, message_bmask("IRCDMessage", "solanum/bmask", "ratbox/bmask")
+		, message_join("IRCDMessage", "solanum/join", "ratbox/join")
+		, message_nick("IRCDMessage", "solanum/nick", "ratbox/nick")
+		, message_pong("IRCDMessage", "solanum/pong", "ratbox/pong")
+		, message_sid("IRCDMessage", "solanum/sid", "ratbox/sid")
+		, message_sjoin("IRCDMessage", "solanum/sjoin", "ratbox/sjoin")
+		, message_tb("IRCDMessage", "solanum/tb", "ratbox/tb")
+		, message_tmode("IRCDMessage", "solanum/tmode", "ratbox/tmode")
+		, message_uid("IRCDMessage", "solanum/uid", "ratbox/uid")
+		, message_ebmask(this)
+		, message_encap(this)
+		, message_euid(this)
+		, message_notice(this)
+		, message_pass(this)
+		, message_privmsg(this)
+		, message_server(this)
 	{
-
-
 		if (ModuleManager::LoadModule("ratbox", User::Find(creator)) != MOD_ERR_OK)
 			throw ModuleException("Unable to load ratbox");
 		m_ratbox = ModuleManager::FindModule("ratbox");

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "encryption.h"
 #include "httpd.h"
 
 #include <variant>
@@ -19,6 +20,7 @@ namespace RPC
 	class Map;
 	class Request;
 	class ServiceInterface;
+	struct Token;
 	class Value;
 
 	/** Represents possible types of RPC value. */
@@ -189,11 +191,32 @@ public:
 	virtual bool Run(ServiceInterface *iface, HTTPClient *client, Request &request) = 0;
 };
 
+struct RPC::Token final
+{
+	std::vector<Anope::string> methods;
+	Anope::string token;
+	Anope::string token_hash;
+};
+
 class RPC::ServiceInterface
 	: public Service
 {
+private:
+	bool CompareToken(const RPC::Token &token, const Anope::string &rawtoken) const
+	{
+		if (token.token_hash.empty())
+			return token.token.equals_cs(rawtoken); // Plaintext token.
+
+		auto *service = Service::FindService("Encryption::Provider", token.token_hash);
+		if (!service)
+			return false; // Malformed hash.
+
+		auto *hashprov = static_cast<Encryption::Provider *>(service);
+		return hashprov->Compare(token.token, rawtoken);
+	}
+
 public:
-	Anope::map<std::vector<Anope::string>> tokens;
+	std::vector<Token> tokens;
 
 	ServiceInterface(Module *creator)
 		: Service(creator, "RPC::ServiceInterface", "rpc")
@@ -205,20 +228,22 @@ public:
 		if (header.compare(0, 7, "Bearer ", 7) != 0)
 			return false; // No token provided.
 
-		Anope::string token;
-		Anope::B64Decode(header.substr(7), token);
+		Anope::string rawtoken;
+		Anope::B64Decode(header.substr(7), rawtoken);
 
-		auto it = tokens.find(token);
-		if (it == tokens.end())
-			return false; // No valid token.
-
-		for (const auto &glob : it->second)
+		for (const auto &token : tokens)
 		{
-			if (glob[0] == '~' && Anope::Match(method, glob.substr(1)))
-				return false; // Negative match.
+			if (!CompareToken(token, rawtoken))
+				continue; // No valid token.
 
-			if (Anope::Match(method, glob))
-				return true; // Positive match.
+			for (const auto &glob : token.methods)
+			{
+				if (glob[0] == '~' && Anope::Match(method, glob.substr(1)))
+					return false; // Negative match.
+
+				if (Anope::Match(method, glob))
+					return true; // Positive match.
+			}
 		}
 		return false; // No match.
 	}

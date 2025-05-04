@@ -324,12 +324,14 @@ public:
 		for (int i = 0; i < modconf.CountBlock("token"); ++i)
 		{
 			const auto &block = modconf.GetBlock("token", i);
-			const auto &token = block.Get<const Anope::string>("token");
-			if (!token.empty())
+
+			RPC::Token token;
+			token.token = block.Get<const Anope::string>("token");
+			if (!token.token.empty())
 			{
-				std::vector<Anope::string> methods;
-				spacesepstream(block.Get<const Anope::string>("methods")).GetTokens(methods);
-				xmlrpcinterface.tokens.emplace(token, methods);
+				token.token_hash = block.Get<const Anope::string>("token_hash");
+				spacesepstream(block.Get<const Anope::string>("methods")).GetTokens(token.methods);
+				xmlrpcinterface.tokens.emplace_back(token);
 			}
 		}
 

@@ -83,10 +83,10 @@ struct HTTPReply final
 /* A message from someone */
 struct HTTPMessage final
 {
-	std::map<Anope::string, Anope::string> headers;
-	std::map<Anope::string, Anope::string> cookies;
-	std::map<Anope::string, Anope::string> get_data;
-	std::map<Anope::string, Anope::string> post_data;
+	std::map<Anope::string, Anope::string, ci::less> headers;
+	std::map<Anope::string, Anope::string, ci::less> cookies;
+	std::map<Anope::string, Anope::string, ci::less> get_data;
+	std::map<Anope::string, Anope::string, ci::less> post_data;
 	Anope::string content;
 };
 

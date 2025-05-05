@@ -239,8 +239,7 @@ yyjson_mut_val *JSONRPCServiceInterface::SerializeElement(yyjson_mut_doc *doc, c
 		},
 		[&doc, &elem](int64_t i)
 		{
-			auto bits =	std::floor(std::log2(abs(i))) + 1;
-			if (bits <= integer_bits)
+			if (std::abs(i) < (1LL << integer_bits))
 			{
 				// We can fit this into an integer.
 				elem = yyjson_mut_int(doc, i);
@@ -254,8 +253,7 @@ yyjson_mut_val *JSONRPCServiceInterface::SerializeElement(yyjson_mut_doc *doc, c
 		},
 		[&doc, &elem](uint64_t u)
 		{
-			auto bits =	std::floor(std::log2(u)) + 1;
-			if (bits <= integer_bits)
+			if (u < (1ULL << integer_bits))
 			{
 				// We can fit this into an integer.
 				elem = yyjson_mut_uint(doc, u);

@@ -86,6 +86,9 @@ private:
 	}
 
 public:
+	// The number of bits that can be represented using the native integer type.
+	static unsigned integer_bits;
+
 	JSONRPCServiceInterface(Module *creator)
 		: RPC::ServiceInterface(creator)
 		, HTTPPage("/jsonrpc", "application/json")
@@ -236,16 +239,39 @@ yyjson_mut_val *JSONRPCServiceInterface::SerializeElement(yyjson_mut_doc *doc, c
 		},
 		[&doc, &elem](int64_t i)
 		{
-			elem = yyjson_mut_int(doc, i);
+			auto bits =	std::floor(std::log2(abs(i))) + 1;
+			if (bits <= integer_bits)
+			{
+				// We can fit this into an integer.
+				elem = yyjson_mut_int(doc, i);
+			}
+			else
+			{
+				// We need to convert this to a string.
+				auto s = Anope::ToString(i);
+				elem = yyjson_mut_strncpy(doc, s.c_str(), s.length());
+			}
 		},
 		[&doc, &elem](uint64_t u)
 		{
-			elem = yyjson_mut_uint(doc, u);
+			auto bits =	std::floor(std::log2(u)) + 1;
+			if (bits <= integer_bits)
+			{
+				// We can fit this into an integer.
+				elem = yyjson_mut_uint(doc, u);
+			}
+			else
+			{
+				// We need to convert this to a string.
+				auto s = Anope::ToString(u);
+				elem = yyjson_mut_strncpy(doc, s.c_str(), s.length());
+			}
 		},
 	}, value.Get());
 	return elem;
 }
 
+unsigned JSONRPCServiceInterface::integer_bits = 64;
 
 class ModuleJSONRPC final
 	: public Module
@@ -273,6 +299,8 @@ public:
 			httpref->UnregisterPage(&jsonrpcinterface);
 
 		const auto &modconf = conf.GetModule(this);
+		JSONRPCServiceInterface::integer_bits = modconf.Get<unsigned>("integer_bits", "64");
+
 		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", modconf.Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)
 			throw ConfigException("Unable to find http reference, is httpd loaded?");

@@ -7,8 +7,8 @@ class AnopeRPC {
 	/**
 	 * Initializes a new AnopeRPC instance with the specified RPC host.
 	 *
-	 * @param {string} The RPC host base URL.
-	 * @param {token} The bearer token for authorizing with the RPC interface.
+	 * @param {string} host The RPC host base URL.
+	 * @param {string} token The bearer token for authorizing with the RPC interface.
 	 */
 	constructor(host, token = "") {
 		this.host = host;
@@ -23,7 +23,7 @@ class AnopeRPC {
 	 * @returns {*} The result of the RPC query.
 	 */
 	async run(method, ...params) {
-		const request = JSON.stringify({
+		const body = JSON.stringify({
 			"jsonrpc": "2.0",
 			"method": method,
 			"params": params,
@@ -36,7 +36,7 @@ class AnopeRPC {
 		const response = await fetch(this.host, {
 			method: 'POST',
 			headers: headers,
-			body: request
+			body: body
 		});
 		if (!response.ok) {
 			throw new Error(`HTTP returned ${response.status}`)
@@ -56,8 +56,8 @@ class AnopeRPC {
 	 *
 	 * Requires the rpc_data module to be loaded.
 	 *
-	 * @param {string} The level of detail to request.
-	 * @returns {array} An array of account names.
+	 * @param {string} detail The level of detail to request.
+	 * @returns {(array|object)} A list of accounts.
 	 */
 	listAccounts(detail = "name") {
 		return this.run("anope.listAccounts", detail);
@@ -80,8 +80,8 @@ class AnopeRPC {
 	 *
 	 * Requires the rpc_data module to be loaded.
 	 *
-	 * @param {string} The level of detail to request.
-	 * @returns {array} An array of channel names.
+	 * @param {string} detail The level of detail to request.
+	 * @returns {(array|object)} A list of channels.
 	 */
 	listChannels(detail = "name") {
 		return this.run("anope.listChannels", detail);
@@ -104,8 +104,8 @@ class AnopeRPC {
 	 *
 	 * Requires the rpc_data module to be loaded.
 	 *
-	 * @param {string} The level of detail to request.
-	 * @returns {array} An array of channel names.
+	 * @param {string} detail The level of detail to request.
+	 * @returns {(array|object)} A list of services operators.
 	 */
 	listOpers(detail = "name") {
 		return this.run("anope.listOpers", detail);
@@ -128,8 +128,8 @@ class AnopeRPC {
 	 *
 	 * Requires the rpc_data module to be loaded.
 	 *
-	 * @param {string} The level of detail to request.
-	 * @returns {array} An array of servers names.
+	 * @param {string} detail The level of detail to request.
+	 * @returns {(array|object)} A list of servers.
 	 */
 	listServers(detail = "name") {
 		return this.run("anope.listServers", detail);
@@ -152,8 +152,8 @@ class AnopeRPC {
 	 *
 	 * Requires the rpc_data module to be loaded.
 	 *
-	 * @param {string} The level of detail to request.
-	 * @returns {array} An array of channel names.
+	 * @param {string} detail The level of detail to request.
+	 * @returns {(array|object)} A list of users.
 	 */
 	listUsers(detail = "name") {
 		return this.run("anope.listUsers", detail);
@@ -210,7 +210,7 @@ class AnopeRPC {
 
 /*
 const arpc = new AnopeRPC("http://127.0.0.1:8080/jsonrpc");
-arpc.listServers().then(servers => {
+arpc.listServers("full").then(servers => {
 	console.log(servers);
 }).catch (error => {
 	console.log(error);

@@ -4412,7 +4412,7 @@ msgid "Last topic"
 msgstr "Dernier topic"
 
 msgid "Last used"
-msgstr "Utilisé dernièrement"
+msgstr "Dernière utilisation"
 
 msgid "Last usermask"
 msgstr "Dernier usermask"

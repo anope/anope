@@ -5352,7 +5352,7 @@ msgstr "Dernier topic"
 
 #: modules/commands/cs_info.cpp:56 modules/commands/cs_akick.cpp:380
 msgid "Last used"
-msgstr "Utilisé dernièrement"
+msgstr "Dernière utilisation"
 
 #: modules/commands/ns_list.cpp:75
 msgid "Last usermask"

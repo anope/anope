@@ -28,7 +28,7 @@ jobs:
       - name: Setup Conan
         uses: turtlebrowser/get-conan@v1.2
         with:
-          version: 1.64.0
+          version: 1.66.0
 
       - name: Try to restore libraries from the cache
         uses: actions/cache/restore@v4

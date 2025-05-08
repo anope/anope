@@ -162,7 +162,7 @@ class CommandNSGroup : public Command
 			source.Reply(_("There are too many nicks in your group."));
 		else if (source.GetNick().length() <= guestnick.length() + 7 &&
 			source.GetNick().length() >= guestnick.length() + 1 &&
-			!source.GetNick().find_ci(guestnick) && !source.GetNick().substr(guestnick.length()).find_first_not_of("1234567890"))
+			!source.GetNick().find_ci(guestnick) && source.GetNick().substr(guestnick.length()).find_first_not_of("1234567890") == Anope::string::npos)
 		{
 			source.Reply(NICK_CANNOT_BE_REGISTERED, source.GetNick().c_str());
 		}

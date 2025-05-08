@@ -273,7 +273,7 @@ namespace
 	}
 }
 
-void Command::Run(CommandSource &source, const Anope::string &message)
+bool Command::Run(CommandSource &source, const Anope::string &message)
 {
 	std::vector<Anope::string> params;
 	spacesepstream(message).GetTokens(params);
@@ -294,7 +294,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	if (it == source.service->commands.end())
 	{
 		HandleUnknownCommand(source, message);
-		return;
+		return false;
 	}
 
 	const CommandInfo &info = it->second;
@@ -303,7 +303,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	{
 		HandleUnknownCommand(source, message);
 		Log(source.service) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";
-		return;
+		return false;
 	}
 
 	for (unsigned i = 0, j = params.size() - (count - 1); i < j; ++i)
@@ -315,13 +315,13 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 		params.erase(params.begin() + c->max_params);
 	}
 
-	c->Run(source, it->first, info, params);
+	return c->Run(source, it->first, info, params);
 }
 
-void Command::Run(CommandSource &source, const Anope::string &cmdname, const CommandInfo &info, std::vector<Anope::string> &params)
+bool Command::Run(CommandSource &source, const Anope::string &cmdname, const CommandInfo &info, std::vector<Anope::string> &params)
 {
 	if (this->RequireUser() && !source.GetUser())
-		return;
+		return false;
 
 	// Command requires registered users only
 	if (!this->AllowUnregistered() && !source.nc)
@@ -329,7 +329,7 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 		source.Reply(NICK_IDENTIFY_REQUIRED);
 		if (source.GetUser())
 			Log(LOG_NORMAL, "access_denied_unreg", source.service) << "Access denied for unregistered user " << source.GetUser()->GetMask() << " with command " << cmdname;
-		return;
+		return false;
 	}
 
 	source.command = cmdname;
@@ -338,12 +338,12 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(OnPreCommand, MOD_RESULT, (source, this, params));
 	if (MOD_RESULT == EVENT_STOP)
-		return;
+		return false;
 
 	if (params.size() < this->min_params)
 	{
 		this->OnSyntaxError(source, !params.empty() ? params[params.size() - 1] : "");
-		return;
+		return false;
 	}
 
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
@@ -352,11 +352,12 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 		source.Reply(ACCESS_DENIED);
 		if (source.GetUser())
 			Log(LOG_NORMAL, "access_denied", source.service) << "Access denied for user " << source.GetUser()->GetMask() << " with command " << cmdname;
-		return;
+		return false;
 	}
 
 	this->Execute(source, params);
 	FOREACH_MOD(OnPostCommand, (source, this, params));
+	return true;
 }
 
 bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo *&bot, Anope::string &name)

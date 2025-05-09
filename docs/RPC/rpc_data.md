@@ -425,6 +425,7 @@ nickchanged      | int            | The time at which the user last changed thei
 real             | string         | The real name of the user.
 server           | string         | The server that the user is connected to.
 signon           | int            | The time at which the user connected to the network.
+tls              | bool           | Whether the user is connected using TLS (SSL).
 uid              | string or null | The unique immutable identifier of the user or null if the IRCd does not use UIDs.
 vhost            | string or null | The virtual host of the user or null if they have no vhost.
 vident           | string or null | The virtual ident (username) of the user or null if they have no vident.
@@ -451,6 +452,7 @@ vident           | string or null | The virtual ident (username) of the user or 
 	"real": "An IRC User",
 	"server": "irc.example.com",
 	"signon": 1740408296,
+	"tls": true,
 	"vhost": "staff.example.com",
 	"vident": null,
 }

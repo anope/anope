@@ -489,7 +489,8 @@ public:
 			.Reply("nickchanged", u->timestamp)
 			.Reply("real", u->realname)
 			.Reply("server", u->server->GetName())
-			.Reply("signon", u->signon);
+			.Reply("signon", u->signon)
+			.Reply("tls", u->IsSecurelyConnected());
 
 		if (u->IsIdentified())
 		{

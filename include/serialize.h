@@ -326,6 +326,18 @@ public:
 			this->ref->DelReference(this);
 	}
 
+	inline T *Get(bool update = true) const
+	{
+		if (!this->invalid)
+		{
+			if (this->ref && update)
+				this->ref->QueueUpdate(); // This can invalidate me
+			if (!this->invalid)
+				return this->ref;
+		}
+		return nullptr;
+	}
+
 	inline Reference<T>& operator=(const Reference<T> &other)
 	{
 		if (this != &other)
@@ -349,42 +361,18 @@ public:
 		return false;
 	}
 
-	inline operator T*() const
+	inline operator T *() const
 	{
-		if (!this->invalid)
-		{
-			if (this->ref)
-				// This can invalidate me
-				this->ref->QueueUpdate();
-			if (!this->invalid)
-				return this->ref;
-		}
-		return NULL;
+		return Get(true);
 	}
 
 	inline T *operator*() const
 	{
-		if (!this->invalid)
-		{
-			if (this->ref)
-				// This can invalidate me
-				this->ref->QueueUpdate();
-			if (!this->invalid)
-				return this->ref;
-		}
-		return NULL;
+		return Get(true);
 	}
 
 	inline T *operator->() const
 	{
-		if (!this->invalid)
-		{
-			if (this->ref)
-				// This can invalidate me
-				this->ref->QueueUpdate();
-			if (!this->invalid)
-				return this->ref;
-		}
-		return NULL;
+		return Get(true);
 	}
 };

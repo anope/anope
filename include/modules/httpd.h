@@ -10,8 +10,8 @@
 
 namespace HTTP
 {
-	class Reply;
-	class Message;
+	struct Reply;
+	struct Message;
 	class Page;
 	class Client;
 	class Provider;

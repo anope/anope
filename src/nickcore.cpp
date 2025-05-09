@@ -123,7 +123,7 @@ Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &da
 
 	Extensible::ExtensibleUnserialize(nc, nc, data);
 
-	/* compat */
+	// Begin 1.9 compatibility.
 	bool b;
 	b = false;
 	data["extensible:PRIVATE"] >> b;
@@ -153,7 +153,10 @@ Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &da
 	data["extensible:KILLPROTECT"] >> b;
 	if (b)
 		nc->Extend<bool>("PROTECT");
+	// End 1.9 compatibility
 
+
+	// Begin 2.0 compatibility.
 	b = false;
 	data["KILLPROTECT"] >> b;
 	if (b)
@@ -175,7 +178,7 @@ Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &da
 		nc->Extend<bool>("PROTECT");
 		nc->Extend("PROTECT_AFTER", 0);
 	}
-	/* end compat */
+	// End 2.0 compatibility.
 
 	return nc;
 }

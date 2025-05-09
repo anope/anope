@@ -176,7 +176,7 @@ private:
 				}
 				else
 				{
-					// Begin 2.0 compatibility
+					// Begin 2.0 compatibility.
 					size_t c = modes.find(',');
 					if (c == Anope::string::npos)
 						nc->last_modes.emplace(modes, ModeData());

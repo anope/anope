@@ -226,16 +226,18 @@ Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &d
 
 	Extensible::ExtensibleUnserialize(na, na, data);
 
-	/* compat */
+	// Begin 1.9 compatibility.
 	bool b;
 	b = false;
 	data["extensible:NO_EXPIRE"] >> b;
 	if (b)
 		na->Extend<bool>("NS_NO_EXPIRE");
+	// End 1.9 compatibility.
 
+	// Begin 2.0 compatibility.
 	if (na->registered < na->nc->registered)
 		na->nc->registered = na->registered;
-	/* end compat */
+	// End 2.0 compatibility.
 
 	return na;
 }

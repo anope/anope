@@ -255,10 +255,10 @@ Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data 
 		spacesepstream(slevels).GetTokens(v);
 		for (unsigned i = 0; i + 1 < v.size(); i += 2)
 		{
-			// Begin 2.0 database compatibility.
+			// Begin 2.0 compatibility.
 			if (v[i] == "FANTASIA")
 				v[i] = "FANTASY";
-			// End 2.0 database compatibility.
+			// End 2.0 compatibility.
 			if (auto level = Anope::TryConvert<int16_t>(v[i + 1]))
 				ci->levels[v[i]] = level.value();
 		}
@@ -284,7 +284,7 @@ Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data 
 
 	Extensible::ExtensibleUnserialize(ci, ci, data);
 
-	/* compat */
+	// Begin 1.9 compatibility.
 	bool b;
 	b = false;
 	data["extensible:PRIVATE"] >> b;
@@ -326,7 +326,7 @@ Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data 
 	data["extensible:SIGNKICK_LEVEL"] >> b;
 	if (b)
 		ci->Extend<bool>("SIGNKICK_LEVEL");
-	/* end compat */
+	// End 1.9 compatibility.
 
 	return ci;
 }

@@ -631,10 +631,6 @@ void MySQLService::Connect()
 	if (!connect)
 		throw SQL::Exception("Unable to connect to MySQL service " + this->name + ": " + mysql_error(this->sql));
 
-	// We force UTC so that FromUnixtime works as expected.
-	SQL::Query tzquery("SET time_zone = '+00:00'");
-	RunQuery(tzquery);
-
 	if (this->socket.empty())
 		Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->name << " at " << this->server << ":" << this->port;
 	else

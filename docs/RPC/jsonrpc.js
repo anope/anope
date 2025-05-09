@@ -26,7 +26,7 @@ class AnopeRPC {
 		const body = JSON.stringify({
 			"jsonrpc": "2.0",
 			"method": method,
-			"params": params,
+			"params": params.map((p) => p.toString()),
 			"id": Math.random().toString(36).slice(2)
 		});
 		const headers = new Headers();

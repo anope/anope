@@ -31,7 +31,7 @@ class AnopeRPC
 		body = {
 			jsonrpc: "2.0",
 			method: method,
-			params: params,
+			params: params.map(&:to_s),
 			id: rand(36**16).to_s(36)
 		}.to_json
 

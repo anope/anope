@@ -25,8 +25,8 @@
 
 user_map UserListByNick, UserListByUID;
 
-int OperCount = 0;
-unsigned MaxUserCount = 0;
+size_t OperCount = 0;
+size_t MaxUserCount = 0;
 time_t MaxUserTime = 0;
 
 std::list<User *> User::quitting_users;

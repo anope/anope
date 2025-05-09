@@ -433,7 +433,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 		{
 			long uptime = static_cast<long>(Anope::CurTime - Anope::StartTime);
 			IRCD->SendNumeric(RPL_STATSUPTIME, source.GetSource(), Anope::printf("Services up %ld day%s, %02ld:%02ld:%02ld", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60));
-			IRCD->SendNumeric(RPL_STATSCONN, source.GetSource(), Anope::printf("Current users: %zu (%d ops); maximum %u", UserListByNick.size(), OperCount, MaxUserCount));
+			IRCD->SendNumeric(RPL_STATSCONN, source.GetSource(), Anope::printf("Current users: %zu (%zu ops); maximum %zu", UserListByNick.size(), OperCount, MaxUserCount));
 			IRCD->SendNumeric(RPL_STATSLINKINFO, source.GetSource(), params[0][0], "End of /STATS report.");
 			break;
 		} /* case 'u' */

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-10 00:42+0100\n"
+"POT-Creation-Date: 2025-05-10 00:58+0100\n"
 "PO-Revision-Date: 2025-04-25 13:08+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -2272,7 +2272,7 @@ msgid "Current number of SQLINEs: %zu"
 msgstr ""
 
 #, c-format
-msgid "Current users: %zu (%d ops)"
+msgid "Current users: %zu (%zu ops)"
 msgstr ""
 
 msgid "DEL entry-num"
@@ -3499,7 +3499,7 @@ msgid "Matches for %s:"
 msgstr ""
 
 #, c-format
-msgid "Maximum users: %d (%s)"
+msgid "Maximum users: %zu (%s)"
 msgstr ""
 
 #, c-format

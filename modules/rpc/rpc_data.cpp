@@ -173,7 +173,9 @@ public:
 
 	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
-		auto *na = NickAlias::Find(request.data[0]);
+		auto *na = request.data[0].is_pos_number_only()
+			? NickAlias::FindId(Anope::Convert(request.data[0], 0))
+			: NickAlias::Find(request.data[0]);
 		if (!na)
 		{
 			request.Error(ERR_NO_SUCH_TARGET, "No such account");

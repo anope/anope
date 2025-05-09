@@ -36,7 +36,7 @@ Retrieves information about the specified account.
 
 Index | Description
 ----- | -----------
-0     | A nickname belonging to the account.
+0     | Either a nickname belonging to the account or an account identifier.
 
 ### Errors
 

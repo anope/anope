@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-02 12:23+0100\n"
+"POT-Creation-Date: 2025-05-10 00:42+0100\n"
 "PO-Revision-Date: 2025-04-25 13:08+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -4527,7 +4527,7 @@ msgid "Servers"
 msgstr ""
 
 #, c-format
-msgid "Servers found: %d"
+msgid "Servers found: %zu"
 msgstr ""
 
 msgid "Service"

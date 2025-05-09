@@ -48,27 +48,6 @@ struct StatsType final
 
 Stats *Stats::me = nullptr;
 
-/**
- * Count servers connected to server s
- * @param s The server to start counting from
- * @return Amount of servers connected to server s
- **/
-static int stats_count_servers(Server *s)
-{
-	if (!s)
-		return 0;
-
-	int count = 1;
-
-	if (!s->GetLinks().empty())
-	{
-		for (auto *link : s->GetLinks())
-			count += stats_count_servers(link);
-	}
-
-	return count;
-}
-
 class CommandOSStats final
 	: public Command
 {
@@ -168,7 +147,7 @@ private:
 
 		source.Reply(_("Uplink server: %s"), Me->GetLinks().front()->GetName().c_str());
 		source.Reply(_("Uplink capab: %s"), buf.c_str());
-		source.Reply(_("Servers found: %d"), stats_count_servers(Me->GetLinks().front()));
+		source.Reply(_("Servers found: %zu"), Servers::ByName.size() - 1);
 		return;
 	}
 

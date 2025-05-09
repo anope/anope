@@ -8,28 +8,39 @@
 
 #pragma once
 
-enum HTTPError
+namespace HTTP
 {
-	HTTP_ERROR_OK = 200,
-	HTTP_FOUND = 302,
-	HTTP_BAD_REQUEST = 400,
-	HTTP_PAGE_NOT_FOUND = 404,
-	HTTP_NOT_SUPPORTED = 505
-};
+	class Reply;
+	class Message;
+	class Page;
+	class Client;
+	class Provider;
+
+	enum Error
+	{
+		OK = 200,
+		FOUND = 302,
+		BAD_REQUEST = 400,
+		PAGE_NOT_FOUND = 404,
+		NOT_SUPPORTED = 505,
+	};
+}
 
 /* A message to someone */
-struct HTTPReply final
+struct HTTP::Reply final
 {
-	HTTPError error = HTTP_ERROR_OK;
+	HTTP::Error error = HTTP::OK;
 	Anope::string content_type;
 	std::map<Anope::string, Anope::string, ci::less> headers;
 	typedef std::list<std::pair<Anope::string, Anope::string> > cookie;
 	std::vector<cookie> cookies;
 
-	HTTPReply() = default;
-	HTTPReply &operator=(const HTTPReply &) = default;
+	Reply() = default;
+	Reply &operator=(const HTTP::Reply &) = default;
 
-	HTTPReply(const HTTPReply &other) : error(other.error), length(other.length)
+	Reply(const HTTP::Reply &other)
+		: error(other.error)
+		, length(other.length)
 	{
 		content_type = other.content_type;
 		headers = other.headers;
@@ -39,7 +50,7 @@ struct HTTPReply final
 			out.push_back(new Data(datum->buf, datum->len));
 	}
 
-	~HTTPReply()
+	~Reply()
 	{
 		for (const auto *datum : out)
 			delete datum;
@@ -81,7 +92,7 @@ struct HTTPReply final
 };
 
 /* A message from someone */
-struct HTTPMessage final
+struct HTTP::Message final
 {
 	std::map<Anope::string, Anope::string, ci::less> headers;
 	std::map<Anope::string, Anope::string, ci::less> cookies;
@@ -90,17 +101,18 @@ struct HTTPMessage final
 	Anope::string content;
 };
 
-class HTTPClient;
-class HTTPProvider;
-
-class HTTPPage
+class HTTP::Page
 	: public virtual Base
 {
 	Anope::string url;
 	Anope::string content_type;
 
 public:
-	HTTPPage(const Anope::string &u, const Anope::string &ct = "text/html") : url(u), content_type(ct) { }
+	Page(const Anope::string &u, const Anope::string &ct = "text/html")
+		: url(u)
+		, content_type(ct)
+	{
+	}
 
 	const Anope::string &GetURL() const { return this->url; }
 
@@ -113,10 +125,10 @@ public:
 	 * @param The HTTP header sent from the client to request the page
 	 * @param The HTTP header that will be sent back to the client
 	 */
-	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
+	virtual bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &) = 0;
 };
 
-class HTTPClient
+class HTTP::Client
 	: public ClientSocket
 	, public BinarySocket
 	, public Base
@@ -128,18 +140,24 @@ protected:
 	}
 
 public:
-	HTTPClient(ListenSocket *l, int f, const sockaddrs &a) : ClientSocket(l, a), BinarySocket() { }
+	Client(ListenSocket *l, int f, const sockaddrs &a)
+		: ClientSocket(l, a)
+		, BinarySocket()
+	{
+	}
 
 	virtual const Anope::string GetIP()
 	{
 		return this->clientaddr.addr();
 	}
 
-	virtual void SendError(HTTPError err, const Anope::string &msg) = 0;
-	virtual void SendReply(HTTPReply *) = 0;
+	virtual void SendError(HTTP::Error err, const Anope::string &msg) = 0;
+	virtual void SendReply(HTTP::Reply *) = 0;
 };
 
-class HTTPProvider
+#define HTTP_PROVIDER "HTTP::Provider"
+
+class HTTP::Provider
 	: public ListenSocket
 	, public Service
 {
@@ -150,7 +168,14 @@ public:
 	std::vector<Anope::string> ext_ips;
 	std::vector<Anope::string> ext_headers;
 
-	HTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, bool s) : ListenSocket(i, p, i.find(':') != Anope::string::npos), Service(c, "HTTPProvider", n), ip(i), port(p), ssl(s) { }
+	Provider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, bool s)
+		: ListenSocket(i, p, i.find(':') != Anope::string::npos)
+		, Service(c, HTTP_PROVIDER, n)
+		, ip(i)
+		, port(p)
+		, ssl(s)
+	{
+	}
 
 	const Anope::string &GetIP() const
 	{
@@ -167,12 +192,12 @@ public:
 		return this->ssl;
 	}
 
-	virtual bool RegisterPage(HTTPPage *page) = 0;
-	virtual void UnregisterPage(HTTPPage *page) = 0;
-	virtual HTTPPage *FindPage(const Anope::string &name) = 0;
+	virtual bool RegisterPage(HTTP::Page *page) = 0;
+	virtual void UnregisterPage(HTTP::Page *page) = 0;
+	virtual HTTP::Page *FindPage(const Anope::string &name) = 0;
 };
 
-namespace HTTPUtils
+namespace HTTP
 {
 	inline Anope::string URLDecode(const Anope::string &url)
 	{

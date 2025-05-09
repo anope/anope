@@ -13,7 +13,7 @@ Anope::string provider_name, template_base, page_title;
 class ModuleWebCPanel final
 	: public Module
 {
-	ServiceReference<HTTPProvider> provider;
+	ServiceReference<HTTP::Provider> provider;
 	Panel panel;
 	PrimitiveExtensibleItem<Anope::string> id, ip;
 	PrimitiveExtensibleItem<time_t> last_login;
@@ -63,7 +63,7 @@ public:
 		template_base = Anope::ExpandData(block.Get<const Anope::string>("template_dir", "webcpanel/templates/default"));
 		page_title = block.Get<const Anope::string>("title", "Anope IRC Services");
 
-		provider = ServiceReference<HTTPProvider>("HTTPProvider", provider_name);
+		provider = ServiceReference<HTTP::Provider>(HTTP_PROVIDER, provider_name);
 		if (!provider)
 			throw ModuleException("Unable to find HTTPD provider. Is httpd loaded?");
 
@@ -233,7 +233,7 @@ public:
 
 namespace WebPanel
 {
-	void RunCommand(HTTPClient *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
+	void RunCommand(HTTP::Client *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
 		ServiceReference<Command> cmd("Command", c);
 		if (!cmd)
@@ -277,7 +277,7 @@ namespace WebPanel
 		cmd->Run(source, "", info, params);
 	}
 
-	void RunCommandWithName(HTTPClient *client, NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
+	void RunCommandWithName(HTTP::Client *client, NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
 		ServiceReference<Command> cmd("Command", c);
 		if (!cmd)

@@ -7,7 +7,7 @@
 
 #include "../webcpanel.h"
 
-bool WebCPanel::Register::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
+bool WebCPanel::Register::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply)
 {
 	TemplateFileServer::Replacements replacements;
 

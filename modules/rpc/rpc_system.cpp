@@ -27,7 +27,7 @@ public:
 #endif
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		// For both the map type and array type we test that we can handle:
 		//
@@ -88,7 +88,7 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		auto &root = request.Root<RPC::Array>();
 		for (const auto &event : Service::GetServiceKeys(RPC_EVENT))

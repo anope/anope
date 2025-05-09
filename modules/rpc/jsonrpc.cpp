@@ -23,7 +23,7 @@ inline Anope::string yyjson_get_astr(yyjson_val *val, const char *key)
 
 class JSONRPCServiceInterface final
 	: public RPC::ServiceInterface
-	, public HTTPPage
+	, public HTTP::Page
 {
 private:
 	static std::pair<yyjson_mut_doc *, yyjson_mut_val *> CreateReply(const Anope::string &id)
@@ -43,7 +43,7 @@ private:
 		return { doc, root };
 	}
 
-	static void SendError(HTTPReply &reply, int64_t code, const Anope::string &message, const Anope::string &id = "")
+	static void SendError(HTTP::Reply &reply, int64_t code, const Anope::string &message, const Anope::string &id = "")
 	{
 		Log(LOG_DEBUG) << "JSON-RPC error " << code << ": " << message;
 
@@ -91,11 +91,11 @@ public:
 
 	JSONRPCServiceInterface(Module *creator)
 		: RPC::ServiceInterface(creator)
-		, HTTPPage("/jsonrpc", "application/json")
+		, HTTP::Page("/jsonrpc", "application/json")
 	{
 	}
 
-	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
+	bool OnRequest(HTTP::Provider *provider, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply) override
 	{
 		yyjson_read_err error;
 		const auto flags = YYJSON_READ_ALLOW_TRAILING_COMMAS | YYJSON_READ_ALLOW_INVALID_UNICODE;
@@ -275,7 +275,7 @@ class ModuleJSONRPC final
 	: public Module
 {
 private:
-	ServiceReference<HTTPProvider> httpref;
+	ServiceReference<HTTP::Provider> httpref;
 	JSONRPCServiceInterface jsonrpcinterface;
 
 public:
@@ -299,7 +299,7 @@ public:
 		const auto &modconf = conf.GetModule(this);
 		JSONRPCServiceInterface::integer_bits = modconf.Get<unsigned>("integer_bits", "64");
 
-		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", modconf.Get<const Anope::string>("server", "httpd/main"));
+		this->httpref = ServiceReference<HTTP::Provider>(HTTP_PROVIDER, modconf.Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)
 			throw ConfigException("Unable to find http reference, is httpd loaded?");
 

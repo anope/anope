@@ -12,7 +12,7 @@ WebCPanel::ChanServ::Drop::Drop(const Anope::string &cat, const Anope::string &u
 }
 
 
-bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Drop::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 
 	if (message.post_data.count("channel") > 0 && message.post_data.count("confChan") > 0)
@@ -20,7 +20,7 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 		if (message.post_data["channel"] == message.post_data["confChan"])
 		{
 			std::vector<Anope::string> params;
-			const Anope::string &channel = HTTPUtils::URLDecode(message.post_data["channel"]);
+			const Anope::string &channel = HTTP::URLDecode(message.post_data["channel"]);
 			params.push_back(channel);
 			params.push_back(channel);
 
@@ -37,7 +37,7 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 		if ((ci->HasExt("SECUREFOUNDER") ? ci->AccessFor(na->nc).founder : ci->AccessFor(na->nc).HasPriv("FOUNDER")) || (na->nc->IsServicesOper() && na->nc->o->ot->HasCommand("chanserv/drop")))
 		{
 			replacements["CHANNEL_NAMES"] = ci->name;
-			replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
+			replacements["ESCAPED_CHANNEL_NAMES"] = HTTP::URLEncode(ci->name);
 		}
 	}
 
@@ -46,7 +46,7 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 		const Anope::string &chname = message.get_data["channel"];
 
 		replacements["CHANNEL_DROP"] = chname;
-		replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
+		replacements["ESCAPED_CHANNEL"] = HTTP::URLEncode(chname);
 	}
 
 	TemplateFileServer page("chanserv/drop.html");

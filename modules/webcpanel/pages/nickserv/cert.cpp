@@ -12,7 +12,7 @@ WebCPanel::NickServ::Cert::Cert(const Anope::string &cat, const Anope::string &u
 {
 }
 
-bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::NickServ::Cert::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	if (message.post_data.count("certfp") > 0)
 	{

@@ -11,7 +11,7 @@ WebCPanel::MemoServ::Memos::Memos(const Anope::string &cat, const Anope::string 
 {
 }
 
-bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::MemoServ::Memos::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 	ChannelInfo *ci;
@@ -25,7 +25,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 		if (ci->AccessFor(na->nc).HasPriv("MEMO"))
 		{
 			replacements["CHANNEL_NAMES"] = ci->name;
-			replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
+			replacements["ESCAPED_CHANNEL_NAMES"] = HTTP::URLEncode(ci->name);
 		}
 	}
 
@@ -43,7 +43,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 			mi = &ci->memos;
 
 			replacements["CHANNEL_NAME"] = ci->name;
-			replacements["ESCAPED_CHANNEL_NAME"] = HTTPUtils::URLEncode(ci->name);
+			replacements["ESCAPED_CHANNEL_NAME"] = HTTP::URLEncode(ci->name);
 		}
 		else
 		{
@@ -54,8 +54,8 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 	if (message.post_data.count("receiver") > 0 && message.post_data.count("message") > 0)
 	{
 		std::vector<Anope::string> params;
-		params.push_back(HTTPUtils::URLDecode(message.post_data["receiver"]));
-		params.push_back(HTTPUtils::URLDecode(message.post_data["message"]));
+		params.push_back(HTTP::URLDecode(message.post_data["receiver"]));
+		params.push_back(HTTP::URLDecode(message.post_data["message"]));
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "MemoServ", "memoserv/send", params, replacements, "CMDR");
 	}

@@ -91,7 +91,7 @@ namespace
 			if (split == Anope::string::npos)
 				res = modmap.emplace(datapair, "");
 			else
-				res = modmap.emplace(datapair.substr(0, split), HTTPUtils::URLDecode(datapair.substr(split + 1)));
+				res = modmap.emplace(datapair.substr(0, split), HTTP::URLDecode(datapair.substr(split + 1)));
 
 			if (Anope::ProtocolDebug && res.second)
 				Log(LOG_DEBUG) << "Parsed module data: key=" << res.first->first << " value=" << res.first->second;

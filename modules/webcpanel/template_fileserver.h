@@ -25,5 +25,5 @@ public:
 
 	TemplateFileServer(const Anope::string &f_n);
 
-	void Serve(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, Replacements &);
+	void Serve(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, Replacements &);
 };

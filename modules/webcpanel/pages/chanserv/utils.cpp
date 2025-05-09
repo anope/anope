@@ -27,7 +27,7 @@ void BuildChanList(NickAlias *na, TemplateFileServer::Replacements &replacements
 			continue;
 
 		replacements["CHANNEL_NAMES"] = ci->name;
-		replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
+		replacements["ESCAPED_CHANNEL_NAMES"] = HTTP::URLEncode(ci->name);
 	}
 }
 

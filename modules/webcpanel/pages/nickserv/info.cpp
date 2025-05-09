@@ -11,7 +11,7 @@ WebCPanel::NickServ::Info::Info(const Anope::string &cat, const Anope::string &u
 {
 }
 
-bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::NickServ::Info::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	if (!message.post_data.empty())
 	{
@@ -31,7 +31,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		if (message.post_data.count("greet") > 0)
 		{
 			Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
-			const Anope::string &post_greet = HTTPUtils::URLDecode(message.post_data["greet"].replace_all_cs("+", " "));
+			const Anope::string &post_greet = HTTP::URLDecode(message.post_data["greet"].replace_all_cs("+", " "));
 
 			if (post_greet.empty())
 				na->nc->Shrink<Anope::string>("greet");

@@ -11,11 +11,11 @@
 
 /* A basic file server. Used for serving static content on disk. */
 class StaticFileServer final
-	: public HTTPPage
+	: public HTTP::Page
 {
 	Anope::string file_name;
 public:
 	StaticFileServer(const Anope::string &f_n, const Anope::string &u, const Anope::string &c_t);
 
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &) override;
 };

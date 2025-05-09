@@ -11,7 +11,7 @@ WebCPanel::OperServ::Akill::Akill(const Anope::string &cat, const Anope::string 
 {
 }
 
-bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::OperServ::Akill::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 
 	static ServiceReference<XLineManager> akills("XLineManager","xlinemanager/sgline");
@@ -30,9 +30,9 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 			std::vector<Anope::string> params;
 			std::stringstream cmdstr;
 			params.emplace_back("ADD");
-			cmdstr << "+" << HTTPUtils::URLDecode(message.post_data["expiry"]);
-			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["mask"]);
-			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["reason"]);
+			cmdstr << "+" << HTTP::URLDecode(message.post_data["expiry"]);
+			cmdstr << " " << HTTP::URLDecode(message.post_data["mask"]);
+			cmdstr << " " << HTTP::URLDecode(message.post_data["reason"]);
 			params.emplace_back(cmdstr.str());
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "OperServ", "operserv/akill", params, replacements);
 		}
@@ -41,7 +41,7 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 		{
 			std::vector<Anope::string> params;
 			params.emplace_back("DEL");
-			params.push_back(HTTPUtils::URLDecode(message.get_data["number"]));
+			params.push_back(HTTP::URLDecode(message.get_data["number"]));
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "OperServ", "operserv/akill", params, replacements);
 		}
 

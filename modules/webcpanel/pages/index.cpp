@@ -10,15 +10,15 @@
 class WebpanelRequest final
 	: public IdentifyRequest
 {
-	HTTPReply reply;
-	HTTPMessage message;
-	Reference<HTTPProvider> server;
+	HTTP::Reply reply;
+	HTTP::Message message;
+	Reference<HTTP::Provider> server;
 	Anope::string page_name;
-	Reference<HTTPClient> client;
+	Reference<HTTP::Client> client;
 	TemplateFileServer::Replacements replacements;
 
 public:
-	WebpanelRequest(Module *o, HTTPReply &r, HTTPMessage &m, HTTPProvider *s, const Anope::string &p_n, HTTPClient *c, TemplateFileServer::Replacements &re, const Anope::string &user, const Anope::string &pass)
+	WebpanelRequest(Module *o, HTTP::Reply &r, HTTP::Message &m, HTTP::Provider *s, const Anope::string &p_n, HTTP::Client *c, TemplateFileServer::Replacements &re, const Anope::string &user, const Anope::string &pass)
 		: IdentifyRequest(o, user, pass, c->GetIP())
 		, reply(r)
 		, message(m)
@@ -69,20 +69,20 @@ public:
 		na->nc->Extend<time_t>("webcpanel_last_login", Anope::CurTime);
 
 		{
-			HTTPReply::cookie c;
+			HTTP::Reply::cookie c;
 			c.emplace_back("account", na->nick);
 			c.emplace_back("Path", "/");
 			reply.cookies.push_back(c);
 		}
 
 		{
-			HTTPReply::cookie c;
+			HTTP::Reply::cookie c;
 			c.emplace_back("id", id);
 			c.emplace_back("Path", "/");
 			reply.cookies.push_back(c);
 		}
 
-		reply.error = HTTP_FOUND;
+		reply.error = HTTP::FOUND;
 		reply.headers["Location"] = Anope::string("http") + (server->IsSSL() ? "s" : "") + "://" + message.headers["Host"] + "/nickserv/info";
 
 		client->SendReply(&reply);
@@ -100,7 +100,7 @@ public:
 	}
 };
 
-bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
+bool WebCPanel::Index::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply)
 {
 	TemplateFileServer::Replacements replacements;
 	const Anope::string &user = message.post_data["username"], &pass = message.post_data["password"];

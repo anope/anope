@@ -11,7 +11,7 @@ WebCPanel::ChanServ::Access::Access(const Anope::string &cat, const Anope::strin
 {
 }
 
-bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Access::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	TemplateFileServer Page("chanserv/access.html");
 	const Anope::string &chname = message.get_data["channel"];
@@ -95,7 +95,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 	/* command might have invalidated u_access */
 	u_access = ci->AccessFor(na->nc);
 
-	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
+	replacements["ESCAPED_CHANNEL"] = HTTP::URLEncode(chname);
 	replacements["ACCESS_CHANGE"] = u_access.HasPriv("ACCESS_CHANGE") ? "YES" : "NO";
 
 	for (unsigned i = 0; i < ci->GetAccessCount(); ++i)

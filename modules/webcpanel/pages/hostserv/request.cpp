@@ -11,12 +11,12 @@ WebCPanel::HostServ::Request::Request(const Anope::string &cat, const Anope::str
 {
 }
 
-bool WebCPanel::HostServ::Request::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::HostServ::Request::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	if (message.post_data.count("req") > 0)
 	{
 		std::vector<Anope::string> params;
-		params.push_back(HTTPUtils::URLDecode(message.post_data["req"]));
+		params.push_back(HTTP::URLDecode(message.post_data["req"]));
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "HostServ", "hostserv/request", params, replacements, "CMDR");
 	}

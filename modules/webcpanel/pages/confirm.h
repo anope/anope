@@ -18,7 +18,7 @@ class Confirm final
 public:
 	Confirm(const Anope::string &u) : WebPanelPage(u) { }
 
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &) override;
 };
 
 }

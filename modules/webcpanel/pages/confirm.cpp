@@ -7,7 +7,7 @@
 
 #include "../webcpanel.h"
 
-bool WebCPanel::Confirm::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
+bool WebCPanel::Confirm::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply)
 {
 	TemplateFileServer::Replacements replacements;
 	const Anope::string &user = message.post_data["username"], &pass = message.post_data["password"], &email = message.post_data["email"];

@@ -36,7 +36,7 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		if (!global)
 		{
@@ -63,7 +63,7 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		if (!global)
 		{
@@ -94,7 +94,7 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		auto *bi = BotInfo::Find(request.data[0], true);
 		if (!bi)

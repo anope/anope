@@ -11,12 +11,12 @@ WebCPanel::ChanServ::Info::Info(const Anope::string &cat, const Anope::string &u
 {
 }
 
-bool WebCPanel::ChanServ::Info::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Info::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 
 	if (!chname.empty())
-		replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
+		replacements["ESCAPED_CHANNEL"] = HTTP::URLEncode(chname);
 
 	BuildChanList(na, replacements);
 

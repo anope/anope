@@ -148,9 +148,9 @@ public:
 	Anope::string name;
 	Anope::string id;
 	std::deque<Anope::string> data;
-	HTTPReply &reply;
+	HTTP::Reply &reply;
 
-	Request(HTTPReply &r)
+	Request(HTTP::Reply &r)
 		: reply(r)
 	{
 	}
@@ -188,7 +188,7 @@ public:
 
 	const auto &GetMinParams() const { return minparams; }
 
-	virtual bool Run(ServiceInterface *iface, HTTPClient *client, Request &request) = 0;
+	virtual bool Run(ServiceInterface *iface, HTTP::Client *client, Request &request) = 0;
 };
 
 struct RPC::Token final

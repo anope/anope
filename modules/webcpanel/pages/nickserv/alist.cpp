@@ -11,7 +11,7 @@ WebCPanel::NickServ::Alist::Alist(const Anope::string &cat, const Anope::string 
 {
 }
 
-bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::NickServ::Alist::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	std::deque<ChannelInfo *> queue;
 	na->nc->GetChannelReferences(queue);

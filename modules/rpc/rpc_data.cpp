@@ -139,7 +139,7 @@ public:
 			users.Reply(u->nick);
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		const auto detail = request.data.empty() ? "name" : request.data[0];
 		if (detail.equals_ci("name"))
@@ -171,7 +171,7 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		auto *na = NickAlias::Find(request.data[0]);
 		if (!na)
@@ -249,7 +249,7 @@ public:
 			users.Reply(uc->status.BuildModePrefixList() + uc->user->nick);
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		const auto detail = request.data.empty() ? "name" : request.data[0];
 		if (detail.equals_ci("name"))
@@ -281,7 +281,7 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		auto *c = Channel::Find(request.data[0]);
 		if (!c)
@@ -347,7 +347,7 @@ public:
 			root.Reply("vhost", o->vhost);
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		const auto detail = request.data.empty() ? "name" : request.data[0];
 		if (detail.equals_ci("name"))
@@ -379,7 +379,7 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		auto *o = Oper::Find(request.data[0]);
 		if (!o)
@@ -425,7 +425,7 @@ public:
 			root.Reply("uplink", nullptr);
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		const auto detail = request.data.empty() ? "name" : request.data[0];
 		if (detail.equals_ci("name"))
@@ -457,7 +457,7 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		auto *s = Server::Find(request.data[0]);
 		if (!s)
@@ -552,7 +552,7 @@ public:
 			root.Reply("vident", u->GetIdent());
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		const auto detail = request.data.empty() ? "name" : request.data[0];
 		if (detail.equals_ci("name"))
@@ -584,7 +584,7 @@ public:
 	{
 	}
 
-	bool Run(RPC::ServiceInterface *iface, HTTPClient *client, RPC::Request &request) override
+	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
 		auto *u = User::Find(request.data[0]);
 		if (!u)

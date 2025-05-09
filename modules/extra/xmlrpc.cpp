@@ -20,10 +20,10 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 class XMLRPCServiceInterface final
 	: public RPC::ServiceInterface
-	, public HTTPPage
+	, public HTTP::Page
 {
 private:
-	static void SendError(HTTPReply &reply, xmlrpc_env &env)
+	static void SendError(HTTP::Reply &reply, xmlrpc_env &env)
 	{
 		Log(LOG_DEBUG) << "XML-RPC error " << env.fault_code << ": " << env.fault_string;
 
@@ -69,11 +69,11 @@ public:
 
 	XMLRPCServiceInterface(Module *creator)
 		: RPC::ServiceInterface(creator)
-		, HTTPPage("/xmlrpc", "text/xml")
+		, HTTP::Page("/xmlrpc", "text/xml")
 	{
 	}
 
-	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
+	bool OnRequest(HTTP::Provider *provider, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply) override
 	{
 		xmlrpc_env env;
 		xmlrpc_env_init(&env);
@@ -276,7 +276,7 @@ class ModuleXMLRPC final
 	: public Module
 {
 private:
-	ServiceReference<HTTPProvider> httpref;
+	ServiceReference<HTTP::Provider> httpref;
 	XMLRPCServiceInterface xmlrpcinterface;
 
 public:
@@ -316,7 +316,7 @@ public:
 		XMLRPCServiceInterface::enable_i8 = modconf.Get<bool>("enable_i8", "yes");
 		XMLRPCServiceInterface::enable_nil = modconf.Get<bool>("enable_nil", "yes");
 
-		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", modconf.Get<const Anope::string>("server", "httpd/main"));
+		this->httpref = ServiceReference<HTTP::Provider>(HTTP_PROVIDER, modconf.Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)
 			throw ConfigException("Unable to find http reference, is httpd loaded?");
 

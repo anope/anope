@@ -11,7 +11,7 @@ WebCPanel::ChanServ::Modes::Modes(const Anope::string &cat, const Anope::string 
 {
 }
 
-bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Modes::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 	const Anope::string &mode = message.get_data["m"];
@@ -25,7 +25,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 		return true;
 	}
 
-	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
+	replacements["ESCAPED_CHANNEL"] = HTTP::URLEncode(chname);
 	ChannelInfo *ci = ChannelInfo::Find(chname);
 
 	if (!ci)
@@ -67,7 +67,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 		Page.Serve(server, page_name, client, message, reply, replacements);
 		return true;
 	}
-	replacements["ESCAPED_MODE"] = HTTPUtils::URLEncode(mode);
+	replacements["ESCAPED_MODE"] = HTTP::URLEncode(mode);
 
 	ChannelMode *cm = ModeManager::FindChannelModeByChar(mode[0]);
 	if (cm)

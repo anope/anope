@@ -39,7 +39,7 @@ public:
 
 	std::vector<Section> sections;
 
-	NickAlias *GetNickFromSession(HTTPClient *client, HTTPMessage &msg)
+	NickAlias *GetNickFromSession(HTTP::Client *client, HTTP::Message &msg)
 	{
 		if (!client)
 			return NULL;
@@ -66,14 +66,14 @@ public:
 };
 
 class WebPanelPage
-	: public HTTPPage
+	: public HTTP::Page
 {
 public:
-	WebPanelPage(const Anope::string &u, const Anope::string &ct = "text/html") : HTTPPage(u, ct)
+	WebPanelPage(const Anope::string &u, const Anope::string &ct = "text/html") : HTTP::Page(u, ct)
 	{
 	}
 
-	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
+	virtual bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &) = 0;
 };
 
 class WebPanelProtectedPage
@@ -86,14 +86,14 @@ public:
 	{
 	}
 
-	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override final
+	bool OnRequest(HTTP::Provider *provider, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply) override final
 	{
 		ServiceReference<Panel> panel("Panel", "webcpanel");
 		NickAlias *na;
 
 		if (!panel || !(na = panel->GetNickFromSession(client, message)))
 		{
-			reply.error = HTTP_FOUND;
+			reply.error = HTTP::FOUND;
 			reply.headers["Location"] = Anope::string("http") + (provider->IsSSL() ? "s" : "") + "://" + message.headers["Host"] + "/";
 			return true; // Access denied
 		}
@@ -112,7 +112,7 @@ public:
 		for (const auto &[key, value] : message.get_data)
 		{
 			if (this->GetData().count(key) > 0)
-				get += "&" + key + "=" + HTTPUtils::URLEncode(value);
+				get += "&" + key + "=" + HTTP::URLEncode(value);
 		}
 		if (get.empty() == false)
 			get = "?" + get.substr(1);
@@ -140,7 +140,7 @@ public:
 		return this->OnRequest(provider, page_name, client, message, reply, na, replacements);
 	}
 
-	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) = 0;
+	virtual bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) = 0;
 
 	/* What get data should be appended to links in the navbar */
 	virtual std::set<Anope::string> GetData() { return std::set<Anope::string>(); }
@@ -158,9 +158,9 @@ namespace WebPanel
 	 * @param r Replacements, reply from command goes back here into key
 	 * @param key The key to put the replies into r
 	 */
-	extern void RunCommand(HTTPClient *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
+	extern void RunCommand(HTTP::Client *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
 
-	extern void RunCommandWithName(HTTPClient *client, NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
+	extern void RunCommandWithName(HTTP::Client *client, NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
 }
 
 #include "pages/index.h"

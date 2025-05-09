@@ -1056,17 +1056,22 @@ public:
 };
 
 struct IRCDMessageAway final
-	: Message::Away
+	: IRCDMessage
 {
-	IRCDMessageAway(Module *creator) : Message::Away(creator, "AWAY") { SetFlag(FLAG_REQUIRE_USER); }
+	IRCDMessageAway(Module *creator)
+		: IRCDMessage(creator, "AWAY")
+	{
+		SetFlag(FLAG_REQUIRE_USER);
+		SetFlag(FLAG_SOFT_LIMIT);
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		std::vector<Anope::string> newparams(params);
-		if (newparams.size() > 1)
-			newparams.erase(newparams.begin());
-
-		Message::Away::Run(source, newparams, tags);
+		auto *u = source.GetUser();
+		if (params.size() == 2)
+			u->SetAway(params[1], IRCD->ExtractTimestamp(params[0]));
+		else
+			u->SetAway();
 	}
 };
 

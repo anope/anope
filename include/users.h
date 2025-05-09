@@ -79,6 +79,10 @@ public: // XXX: exposing a tiny bit too much
 	time_t timestamp;
 	/* Is the user as super admin? */
 	bool super_admin;
+	/* The away message of the user */
+	Anope::string awaymsg;
+	/* The time the user went away */
+	time_t awaytime = 0;
 
 	/* Channels the user is in */
 	typedef std::map<Channel *, ChanUserContainer *> ChanUserList;
@@ -251,6 +255,12 @@ public:
 
 	/** Update the last usermask stored for a user. */
 	void UpdateHost();
+
+	/** Update the away state for a user. */
+	void SetAway(const Anope::string &msg = "", time_t ts = 0);
+
+	/** Determines whether this user is away. */
+	auto IsAway() const { return awaymsg.empty(); }
 
 	/** Check if the user has a mode
 	 * @param name Mode name

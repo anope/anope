@@ -414,6 +414,9 @@ account.display  | string         | The display nickname of the account.
 account.opertype | string or null | The account's oper type or null if the account is not a services operator.
 account.uniqueid | uint           | The unique immutable identifier of the account.
 address          | string         | The IP address the user is connecting from.
+away             | map or null    | The user's away state or null if they are not away.
+away.message     | string         | The away message specified by the user.
+away.time        | int            | The UNIX time at which the user went away.
 channels         | array[string]  | The channels that the user is in prefixed by their status mode prefixes.
 chost            | string or null | The cloaked hostname of the user or null if they have no cloak.
 fingerprint      | string or null | The fingerprint of the user's client certificate or null if they are not using one.
@@ -439,7 +442,8 @@ vident           | string or null | The virtual ident (username) of the user or 
 		"opertype": "Services Root",
 		"uniqueid": "17183514657819486040"
 	},
-	"address":  "127.0.0.1",
+	"address": "127.0.0.1",
+	"away": null,
 	"channels": ["@#chan1", "#chan2"],
 	"chost": "localhost",
 	"fingerprint": null,

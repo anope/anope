@@ -543,6 +543,24 @@ void User::UpdateHost()
 	}
 }
 
+void User::SetAway(const Anope::string &msg, time_t ts)
+{
+	FOREACH_MOD(OnUserAway, (this, msg));
+	if (msg.empty())
+	{
+		this->awaymsg.clear();
+		this->awaytime = 0;
+		Log(this, "away") << "is no longer away";
+	}
+	else
+	{
+		this->awaymsg = msg;
+		this->awaytime = ts ? ts : Anope::CurTime;
+		Log(this, "away") << "is now away: " << msg;
+	}
+}
+
+
 bool User::HasMode(const Anope::string &mname) const
 {
 	return this->modes.count(mname);

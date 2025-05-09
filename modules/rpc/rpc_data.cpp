@@ -508,6 +508,17 @@ public:
 			root.Reply("account", nullptr);
 		}
 
+		if (u->IsAway())
+		{
+			root.ReplyMap("away")
+				.Reply("message", u->awaymsg)
+				.Reply("time", u->awaytime);
+		}
+		else
+		{
+			root.Reply("away", nullptr);
+		}
+
 		auto &channels = root.ReplyArray("channels");
 		for (const auto &[_, cc] : u->chans)
 			channels.Reply(cc->status.BuildModePrefixList() + cc->chan->name);

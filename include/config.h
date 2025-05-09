@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,11 +18,9 @@
 
 namespace Configuration
 {
-	namespace Internal
-	{
 	class CoreExport Block
 	{
-		friend struct Configuration::Conf;
+		friend class Configuration::Conf;
 
 	public:
 		typedef Anope::map<Anope::string> item_map;
@@ -41,7 +39,7 @@ namespace Configuration
 		Block(const Anope::string &);
 		const Anope::string &GetName() const;
 		int CountBlock(const Anope::string &name) const;
-		const Block *GetBlock(const Anope::string &name, int num = 0) const;
+		const Block &GetBlock(const Anope::string &name, int num = 0) const;
 		Block *GetMutableBlock(const Anope::string &name, int num = 0);
 
 		template<typename T> T Get(const Anope::string &tag, const Anope::string &def = "") const
@@ -56,10 +54,6 @@ namespace Configuration
 	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
-	} // namespace Internal
-
-	typedef const Internal::Block Block;
-	typedef Internal::Block MutableBlock;
 
 	/** Represents a configuration file
 	 */
@@ -83,26 +77,27 @@ namespace Configuration
 
 	struct Uplink;
 
-	struct CoreExport Conf final
-		: Block
+	class CoreExport Conf final
+		: public Block
 	{
+	private:
+		/** Replaces defined variables within a string. */
+		Anope::string ReplaceVars(const Anope::string &str, const File &file, int linenumber);
+
+	public:
 		/* options:readtimeout */
 		time_t ReadTimeout;
-		/* options:useprivmsg */
-		bool UsePrivmsg;
 		/* If we should default to privmsging clients */
 		bool DefPrivmsg;
 		/* Default language */
 		Anope::string DefLanguage;
 		/* options:timeoutcheck */
 		time_t TimeoutCheck;
-		/* options:usestrictprivmsg */
-		bool UseStrictPrivmsg;
+		/* options:servicealias */
+		bool ServiceAlias;
 		/* networkinfo:nickchars */
 		Anope::string NickChars;
 
-		/* either "/msg " or "/" */
-		Anope::string StrictPrivmsg;
 		/* List of uplink servers to try and connect to */
 		std::vector<Uplink> Uplinks;
 		/* A vector of our logfile options */
@@ -130,12 +125,12 @@ namespace Configuration
 		void LoadConf(File &file);
 		void Post(Conf *old);
 
-		Block *GetModule(Module *);
-		Block *GetModule(const Anope::string &name);
+		Block &GetModule(const Module *);
+		Block &GetModule(const Anope::string &name);
 
 		BotInfo *GetClient(const Anope::string &name);
 
-		const Block *GetCommand(CommandSource &);
+		const Block &GetCommand(CommandSource &);
 	};
 
 	struct Uplink final
@@ -148,6 +143,7 @@ namespace Configuration
 		Uplink(const Anope::string &_host, int _port, const Anope::string &_password, int _protocol) : host(_host), port(_port), password(_password), protocol(_protocol) { }
 		inline bool operator==(const Uplink &other) const { return host == other.host && port == other.port && password == other.password && protocol == other.protocol; }
 		inline bool operator!=(const Uplink &other) const { return !(*this == other); }
+		Anope::string str() const;
 	};
 }
 

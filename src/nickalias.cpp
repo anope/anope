@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,10 +18,10 @@
 #include "servers.h"
 #include "config.h"
 
-Serialize::Checker<nickalias_map> NickAliasList("NickAlias");
+Serialize::Checker<nickalias_map> NickAliasList(NICKALIAS_TYPE);
 
 NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
-	: Serializable("NickAlias")
+	: Serializable(NICKALIAS_TYPE)
 	, nick(nickname)
 	, nc(nickcore)
 {
@@ -139,36 +139,50 @@ NickAlias *NickAlias::Find(const Anope::string &nick)
 	return NULL;
 }
 
-void NickAlias::Serialize(Serialize::Data &data) const
+NickAlias *NickAlias::FindId(uint64_t id)
 {
-	data.Store("nick", this->nick);
-	data.Store("last_quit", this->last_quit);
-	data.Store("last_realname", this->last_realname);
-	data.Store("last_usermask", this->last_usermask);
-	data.Store("last_realhost", this->last_realhost);
-	data.Store("time_registered", this->time_registered);
-	data.Store("last_seen", this->last_seen);
-	data.Store("nc", this->nc->display);
-
-	if (this->HasVHost())
-	{
-		data.Store("vhost_ident", this->GetVHostIdent());
-		data.Store("vhost_host", this->GetVHostHost());
-		data.Store("vhost_creator", this->GetVHostCreator());
-		data.Store("vhost_time", this->GetVHostCreated());
-	}
-
-	Extensible::ExtensibleSerialize(this, this, data);
+	const auto *nc = NickCore::FindId(id);
+	return nc ? nc->na : nullptr;
 }
 
-Serializable *NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
+NickAlias::Type::Type()
+	: Serialize::Type(NICKALIAS_TYPE)
+{
+}
+
+void NickAlias::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *na = static_cast<const NickAlias *>(obj);
+	data.Store("nick", na->nick);
+	data.Store("last_quit", na->last_quit);
+	data.Store("last_realname", na->last_realname);
+	data.Store("last_usermask", na->last_usermask);
+	data.Store("last_realhost", na->last_realhost);
+	data.Store("time_registered", na->registered);
+	data.Store("last_seen", na->last_seen);
+	data.Store("ncid", na->nc->GetId());
+
+	if (na->HasVHost())
+	{
+		data.Store("vhost_ident", na->GetVHostIdent());
+		data.Store("vhost_host", na->GetVHostHost());
+		data.Store("vhost_creator", na->GetVHostCreator());
+		data.Store("vhost_time", na->GetVHostCreated());
+	}
+
+	Extensible::ExtensibleSerialize(na, na, data);
+}
+
+Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string snc, snick;
+	uint64_t sncid = 0;
 
-	data["nc"] >> snc;
+	data["nc"] >> snc; // Deprecated 2.0 field
+	data["ncid"] >> sncid;
 	data["nick"] >> snick;
 
-	NickCore *core = NickCore::Find(snc);
+	auto *core = sncid ? NickCore::FindId(sncid) : NickCore::Find(snc);
 	if (core == NULL)
 		return NULL;
 
@@ -197,7 +211,7 @@ Serializable *NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["last_realname"] >> na->last_realname;
 	data["last_usermask"] >> na->last_usermask;
 	data["last_realhost"] >> na->last_realhost;
-	data["time_registered"] >> na->time_registered;
+	data["time_registered"] >> na->registered;
 	data["last_seen"] >> na->last_seen;
 
 	Anope::string vhost_ident, vhost_host, vhost_creator;
@@ -219,8 +233,8 @@ Serializable *NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	if (b)
 		na->Extend<bool>("NS_NO_EXPIRE");
 
-	if (na->time_registered < na->nc->time_registered)
-		na->nc->time_registered = na->time_registered;
+	if (na->registered < na->nc->registered)
+		na->nc->registered = na->registered;
 	/* end compat */
 
 	return na;

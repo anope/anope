@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,7 +18,12 @@ class NSIdentifyRequest final
 	Command *cmd;
 
 public:
-	NSIdentifyRequest(Module *o, CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(o, acc, pass), source(s), cmd(c) { }
+	NSIdentifyRequest(Module *o, CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass)
+		: IdentifyRequest(o, acc, pass, s.ip)
+		, source(s)
+		, cmd(c)
+	{
+	}
 
 	void OnSuccess() override
 	{
@@ -84,13 +89,13 @@ public:
 			return;
 		}
 
-		if (u->Account() && na && u->Account() == na->nc)
+		if (u->IsIdentified() && na && u->Account() == na->nc)
 		{
 			source.Reply(_("You are already identified."));
 			return;
 		}
 
-		unsigned int maxlogins = Config->GetModule(this->owner)->Get<unsigned int>("maxlogins");
+		unsigned int maxlogins = Config->GetModule(this->owner).Get<unsigned int>("maxlogins");
 		if (na && maxlogins && na->nc->users.size() >= maxlogins)
 		{
 			source.Reply(_("Account \002%s\002 has already reached the maximum number of simultaneous logins (%u)."), na->nc->display.c_str(), maxlogins);
@@ -106,11 +111,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Tells %s that you are really the owner of this\n"
-				"nick.  Many commands require you to authenticate yourself\n"
-				"with this command before you use them.  The password\n"
-				"should be the same one you sent with the \002REGISTER\002\n"
-				"command."), source.service->nick.c_str());
+		source.Reply(_(
+				"Tells %s that you are really the owner of this "
+				"nick. Many commands require you to authenticate yourself "
+				"with this command before you use them. The password "
+				"should be the same one you sent with the \002REGISTER\002 "
+				"command."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 };

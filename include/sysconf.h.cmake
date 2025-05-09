@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -43,6 +43,9 @@
 
 // Whether the umask() function is available.
 #cmakedefine01 HAVE_UMASK
+
+// Whether Anope was built in a reproducible way.
+#cmakedefine01 REPRODUCIBLE_BUILD
 
 #ifdef _WIN32
 # define popen _popen

@@ -1,6 +1,6 @@
 /* Initialization and related routines.
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -160,6 +160,11 @@ void Anope::HandleSignal()
 			Anope::Quitting = true;
 			Anope::SaveDatabases();
 			break;
+#ifndef _WIN32
+		case SIGUSR1:
+			Anope::SaveDatabases();
+			break;
+#endif
 	}
 
 	Signal = 0;
@@ -198,8 +203,10 @@ static void InitSignals()
 
 	sa.sa_handler = SignalHandler;
 
+#ifndef _WIN32
+	sigaction(SIGUSR1, &sa, NULL);
+#endif
 	sigaction(SIGHUP, &sa, NULL);
-
 	sigaction(SIGTERM, &sa, NULL);
 	sigaction(SIGINT, &sa, NULL);
 
@@ -215,7 +222,7 @@ static void InitSignals()
 
 static void remove_pidfile()
 {
-	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
+	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo").Get<const Anope::string>("pid"));
 	if (!pidfile.empty())
 		remove(pidfile.c_str());
 }
@@ -224,7 +231,7 @@ static void remove_pidfile()
 
 static void write_pidfile()
 {
-	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
+	auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo").Get<const Anope::string>("pid"));
 	if (Anope::NoPID || pidfile.empty())
 		return;
 
@@ -242,25 +249,25 @@ static void write_pidfile()
 static void setuidgid()
 {
 #ifndef _WIN32
-	Configuration::Block *options = Config->GetBlock("options");
+	const auto &options = Config->GetBlock("options");
 	uid_t uid = -1;
 	gid_t gid = -1;
 
-	if (!options->Get<const Anope::string>("user").empty())
+	if (!options.Get<const Anope::string>("user").empty())
 	{
 		errno = 0;
-		struct passwd *u = getpwnam(options->Get<const Anope::string>("user").c_str());
+		struct passwd *u = getpwnam(options.Get<const Anope::string>("user").c_str());
 		if (u == NULL)
-			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
+			Log() << "Unable to setuid to " << options.Get<const Anope::string>("user") << ": " << Anope::LastError();
 		else
 			uid = u->pw_uid;
 	}
-	if (!options->Get<const Anope::string>("group").empty())
+	if (!options.Get<const Anope::string>("group").empty())
 	{
 		errno = 0;
-		struct group *g = getgrnam(options->Get<const Anope::string>("group").c_str());
+		struct group *g = getgrnam(options.Get<const Anope::string>("group").c_str());
 		if (g == NULL)
-			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
+			Log() << "Unable to setgid to " << options.Get<const Anope::string>("group") << ": " << Anope::LastError();
 		else
 			gid = g->gr_gid;
 	}
@@ -278,16 +285,16 @@ static void setuidgid()
 	if (static_cast<int>(gid) != -1)
 	{
 		if (setgid(gid) == -1)
-			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
+			Log() << "Unable to setgid to " << options.Get<const Anope::string>("group") << ": " << Anope::LastError();
 		else
-			Log() << "Successfully set group to " << options->Get<const Anope::string>("group");
+			Log() << "Successfully set group to " << options.Get<const Anope::string>("group");
 	}
 	if (static_cast<int>(uid) != -1)
 	{
 		if (setuid(uid) == -1)
-			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
+			Log() << "Unable to setuid to " << options.Get<const Anope::string>("user") << ": " << Anope::LastError();
 		else
-			Log() << "Successfully set user to " << options->Get<const Anope::string>("user");
+			Log() << "Successfully set user to " << options.Get<const Anope::string>("user");
 	}
 #endif
 }
@@ -337,7 +344,7 @@ bool Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "-v, --version";
 		Log(LOG_TERMINAL) << "";
 		Log(LOG_TERMINAL) << "Further support is available from https://www.anope.org/";
-		Log(LOG_TERMINAL) << "Or visit us on IRC at irc.anope.org #anope";
+		Log(LOG_TERMINAL) << "Or visit us on IRC at irc.teranova.net #anope";
 		Anope::ReturnValue = EXIT_SUCCESS;
 		return false;
 	}
@@ -427,7 +434,7 @@ bool Anope::Init(int ac, char **av)
 
 	/* Chdir to Anope data directory. */
 	Log() << "Moving to " << Anope::ServicesDir;
-	if (chdir(Anope::ServicesDir.c_str()) < 0)
+	if (chdir(Anope::ServicesDir.c_str()) != 0)
 	{
 		throw CoreException("Unable to chdir to " + Anope::ServicesDir + ": " + Anope::LastError());
 	}
@@ -488,13 +495,13 @@ bool Anope::Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "*** Support resources: Read through the anope.conf self-contained";
 		Log(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
 		Log(LOG_TERMINAL) << "*** folder. Visit our portal located at https://www.anope.org/. Join";
-		Log(LOG_TERMINAL) << "*** our support channel on /server irc.anope.org channel #anope.";
+		Log(LOG_TERMINAL) << "*** our support channel on /server irc.teranova.net channel #anope.";
 		throw CoreException("Configuration file failed to validate");
 	}
 
 	/* Create me */
-	Configuration::Block *block = Config->GetBlock("serverinfo");
-	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), block->Get<const Anope::string>("id"));
+	const auto &block = Config->GetBlock("serverinfo");
+	Me = new Server(NULL, block.Get<const Anope::string>("name"), 0, block.Get<const Anope::string>("description"), block.Get<const Anope::string>("id"));
 	for (const auto &[_, bi] : *BotListByNick)
 	{
 		bi->server = Me;
@@ -512,15 +519,15 @@ bool Anope::Init(int ac, char **av)
 	/* load modules */
 	Log() << "Loading modules...";
 	for (int i = 0; i < Config->CountBlock("module"); ++i)
-		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<const Anope::string>("name"), NULL);
+		ModuleManager::LoadModule(Config->GetBlock("module", i).Get<const Anope::string>("name"), NULL);
 
 #ifndef _WIN32
 	/* If we're root, issue a warning now */
 	if (!getuid() && !getgid())
 	{
 		/* If we are configured to setuid later, don't issue a warning */
-		Configuration::Block *options = Config->GetBlock("options");
-		if (options->Get<const Anope::string>("user").empty())
+		const auto &options = Config->GetBlock("options");
+		if (options.Get<const Anope::string>("user").empty())
 		{
 			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
 			std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
@@ -538,14 +545,13 @@ bool Anope::Init(int ac, char **av)
 	if (!encryption)
 		throw CoreException("You must load a non-deprecated encryption module!");
 
-	auto *protocol = ModuleManager::FindFirstOf(PROTOCOL);
-	if (!protocol)
+	if (!IRCD)
 		throw CoreException("You must load a protocol module!");
 
 	/* Write our PID to the PID file. */
 	write_pidfile();
 
-	Log() << "Using IRCd protocol " << protocol->name;
+	Log(LOG_TERMINAL) << "Using IRCd protocol " << IRCD->GetProtocolName() << " (" << IRCD->owner->name << ")";
 
 	/* Auto assign sid if applicable */
 	if (IRCD->RequiresID)

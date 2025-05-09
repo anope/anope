@@ -1,7 +1,7 @@
 /* Mode support
  *
  * (C) 2008-2011 Adam <Adam@anope.org>
- * (C) 2008-2024 Anope Team <team@anope.org>
+ * (C) 2008-2025 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -31,6 +31,20 @@ enum ModeClass
 {
 	MC_CHANNEL,
 	MC_USER
+};
+
+struct ModeData final
+{
+	Anope::string value;
+	Anope::string set_by;
+	time_t set_at;
+
+	ModeData(const Anope::string &v = "", const Anope::string &s = "", time_t t = 0)
+		: value(v)
+		, set_by(s)
+		, set_at(t)
+	{
+	}
 };
 
 /** This class is the basis of all modes in Anope
@@ -216,8 +230,11 @@ template<typename T>
 class CoreExport ChannelModeVirtual
 	: public T
 {
-	Anope::string base;
+private:
 	ChannelMode *basech;
+
+protected:
+	Anope::string base;
 
 public:
 	ChannelModeVirtual(const Anope::string &mname, const Anope::string &basename);
@@ -308,6 +325,7 @@ public:
 class CoreExport ModeManager final
 {
 public:
+	using Change = std::multimap<Mode *, std::pair<bool, ModeData>>;
 
 	/* Number of generic channel and user modes we are tracking */
 	static unsigned GenericChannelModes;
@@ -375,18 +393,18 @@ public:
 	 * @param c The channel
 	 * @param cm The channel mode
 	 * @param set true for setting, false for removing
-	 * @param param The param, if there is one
+	 * @param data Data about the mode.
 	 */
-	static void StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool set, const Anope::string &param = "");
+	static void StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool set, const ModeData &data = {});
 
 	/** Add a mode to the stacker to be set on a user
 	 * @param bi The client to set the modes from
 	 * @param u The user
 	 * @param um The user mode
 	 * @param set true for setting, false for removing
-	 * @param param The param, if there is one
+	 * @param data Data about the mode.
 	 */
-	static void StackerAdd(BotInfo *bi, User *u, UserMode *um, bool set, const Anope::string &param = "");
+	static void StackerAdd(BotInfo *bi, User *u, UserMode *um, bool set, const ModeData &data = {});
 
 	/** Process all of the modes in the stacker and send them to the IRCd to be set on channels/users
 	 */

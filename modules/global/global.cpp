@@ -1,6 +1,6 @@
 /* Global core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -61,9 +61,9 @@ public:
 		return q->size();
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		const auto glnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const auto glnick = conf.GetModule(this).Get<const Anope::string>("client");
 		if (glnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
 
@@ -76,21 +76,21 @@ public:
 
 	void OnRestart() override
 	{
-		const auto msg = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
+		const auto msg = Config->GetModule(this).Get<const Anope::string>("globaloncycledown");
 		if (!msg.empty())
 			this->SendSingle(msg, nullptr, nullptr, nullptr);
 	}
 
 	void OnShutdown() override
 	{
-		const auto msg = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
+		const auto msg = Config->GetModule(this).Get<const Anope::string>("globaloncycledown");
 		if (!msg.empty())
 			this->SendSingle(msg, nullptr, nullptr, nullptr);
 	}
 
 	void OnNewServer(Server *s) override
 	{
-		const auto msg = Config->GetModule(this)->Get<const Anope::string>("globaloncycleup");
+		const auto msg = Config->GetModule(this).Get<const Anope::string>("globaloncycleup");
 		if (!msg.empty() && !Me->IsSynced())
 			s->Notice(global, msg);
 	}
@@ -132,13 +132,13 @@ public:
 	bool SendSingle(const Anope::string &message, CommandSource *source, BotInfo* sender, Server* server) override
 	{
 		// We MUST have a sender.
-		if (sender)
+		if (!sender)
 			sender = global;
 		if (!sender)
 			return false;
 
 		Anope::string line;
-		if (source && !Config->GetModule(this)->Get<bool>("anonymousglobal"))
+		if (source && !Config->GetModule(this).Get<bool>("anonymousglobal"))
 		{
 			// A source is available and they're not anonymous.
 			line = Anope::printf("[%s] %s", source->GetNick().c_str(), message.c_str());

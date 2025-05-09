@@ -1,6 +1,6 @@
 /* MemoServ functions.
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -17,7 +17,8 @@
 #include "account.h"
 #include "regchannel.h"
 
-Memo::Memo() : Serializable("Memo")
+Memo::Memo()
+	: Serializable(MEMO_TYPE)
 {
 	mi = NULL;
 	unread = receipt = false;
@@ -34,17 +35,23 @@ Memo::~Memo()
 	}
 }
 
-void Memo::Serialize(Serialize::Data &data) const
+Memo::Type::Type()
+	: Serialize::Type(MEMO_TYPE)
 {
-	data.Store("owner", this->owner);
-	data.Store("time", this->time);
-	data.Store("sender", this->sender);
-	data.Store("text", this->text);
-	data.Store("unread", this->unread);
-	data.Store("receipt", this->receipt);
 }
 
-Serializable *Memo::Unserialize(Serializable *obj, Serialize::Data &data)
+void Memo::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *m = static_cast<const Memo *>(obj);
+	data.Store("owner", m->owner);
+	data.Store("time", m->time);
+	data.Store("sender", m->sender);
+	data.Store("text", m->text);
+	data.Store("unread", m->unread);
+	data.Store("receipt", m->receipt);
+}
+
+Serializable *Memo::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string owner;
 
@@ -76,7 +83,8 @@ Serializable *Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 	return m;
 }
 
-MemoInfo::MemoInfo() : memos("Memo")
+MemoInfo::MemoInfo()
+	: memos(MEMO_TYPE)
 {
 }
 
@@ -115,7 +123,7 @@ bool MemoInfo::HasIgnore(User *u)
 {
 	for (const auto &ignore : this->ignores)
 	{
-		if (u->nick.equals_ci(ignore) || (u->Account() && u->Account()->display.equals_ci(ignore)) || Anope::Match(u->GetMask(), Anope::string(ignore)))
+		if (u->nick.equals_ci(ignore) || (u->IsIdentified() && u->Account()->display.equals_ci(ignore)) || Anope::Match(u->GetMask(), Anope::string(ignore)))
 			return true;
 	}
 	return false;

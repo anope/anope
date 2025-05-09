@@ -1,6 +1,6 @@
 /* Declarations for command data.
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,6 +14,7 @@
 #include "service.h"
 #include "anope.h"
 #include "channels.h"
+#include "textproc.h"
 
 struct CommandGroup final
 {
@@ -81,6 +82,7 @@ public:
 	bool IsFounder(ChannelInfo *ci);
 
 	void Reply(const char *message, ...) ATTR_FORMAT(2, 3);
+	void Reply(int count, const char *singular, const char *plural, ...) ATTR_FORMAT(4, 5);
 	void Reply(const Anope::string &message);
 
 	bool HasCommand(const Anope::string &cmd);
@@ -95,7 +97,7 @@ class CoreExport Command
 	: public Service
 {
 	Anope::string desc;
-	std::vector<Anope::string> syntax;
+	std::vector<std::pair<Anope::string, std::function<bool(CommandSource&)>>> syntax;
 	/* Allow unregistered users to use this command */
 	bool allow_unregistered;
 	/* Command requires that a user is executing it */
@@ -127,7 +129,7 @@ protected:
 	void SetDesc(const Anope::string &d);
 
 	void ClearSyntax();
-	void SetSyntax(const Anope::string &s);
+	void SetSyntax(const Anope::string &s, const std::function<bool(CommandSource&)> &p = nullptr);
 	void SendSyntax(CommandSource &);
 
 	void AllowUnregistered(bool b);
@@ -149,10 +151,10 @@ public:
 	 */
 	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
-	/** Called when HELP is requested for the client this command is on.
+	/** Called when help is requested for the client this command is on.
 	 * @param source The source
 	 */
-	virtual void OnServHelp(CommandSource &source);
+	virtual void OnServHelp(CommandSource &source, HelpWrapper &help);
 
 	/** Requested when the user is requesting help on this command. Help on this command should be sent to the user.
 	 * @param source The source
@@ -171,9 +173,9 @@ public:
 	 * @param source The source of the command
 	 * @param message The full message to run, the command is at the beginning of the message
 	 */
-	static void Run(CommandSource &source, const Anope::string &message);
+	static bool Run(CommandSource &source, const Anope::string &message);
 
-	void Run(CommandSource &source, const Anope::string &, const CommandInfo &, std::vector<Anope::string> &params);
+	bool Run(CommandSource &source, const Anope::string &, const CommandInfo &, std::vector<Anope::string> &params);
 
 	/** Looks up a command name from the service name.
 	 * Note that if the same command exists multiple places this will return the first one encountered

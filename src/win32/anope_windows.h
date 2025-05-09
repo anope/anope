@@ -1,7 +1,7 @@
 /* POSIX emulation layer for Windows.
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2024 Anope Team <team@anope.org>
+ * (C) 2008-2025 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *
@@ -55,7 +55,7 @@
 #include "pipe/pipe.h"
 #include "sigaction/sigaction.h"
 
-typedef int ssize_t;
+typedef SSIZE_T ssize_t;
 
 namespace Anope
 {

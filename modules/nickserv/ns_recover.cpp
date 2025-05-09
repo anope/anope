@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/ns_cert.h"
+#include "modules/nickserv/cert.h"
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
@@ -31,7 +31,13 @@ class NSRecoverRequest final
 	Anope::string user;
 
 public:
-	NSRecoverRequest(Module *o, CommandSource &src, Command *c, const Anope::string &nick, const Anope::string &pass) : IdentifyRequest(o, nick, pass), source(src), cmd(c), user(nick) { }
+	NSRecoverRequest(Module *o, CommandSource &src, Command *c, const Anope::string &nick, const Anope::string &pass)
+		: IdentifyRequest(o, nick, pass, src.ip)
+		, source(src)
+		, cmd(c)
+		, user(nick)
+	{
+	}
 
 	void OnSuccess() override
 	{
@@ -65,7 +71,7 @@ public:
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->display;
 			}
 
-			if (Config->GetModule("ns_recover")->Get<bool>("restoreonrecover"))
+			if (Config->GetModule("ns_recover").Get<bool>("restoreonrecover"))
 			{
 				if (!u->chans.empty())
 				{
@@ -75,9 +81,12 @@ public:
 				}
 			}
 
-			u->SendMessage(source.service, _("This nickname has been recovered by %s. If you did not do\n"
-							"this then %s may have your password, and you should change it."),
-							source.GetNick().c_str(), source.GetNick().c_str());
+			u->SendMessage(source.service, _(
+					"This nickname has been recovered by %s. If you did not do "
+					"this then %s may have your password, and you should change it."
+				),
+				source.GetNick().c_str(),
+				source.GetNick().c_str());
 
 			Anope::string buf = source.command.upper() + " command used by " + source.GetNick();
 			u->Kill(*source.service, buf);
@@ -119,8 +128,7 @@ public:
 			}
 			else
 			{
-				source.Reply(_("The user with your nick has been removed. Use this command again\n"
-						"to release services's hold on your nick."));
+				source.Reply(_("The user with your nick has been removed. Use this command again to release services's hold on your nick."));
 			}
 		}
 	}
@@ -211,12 +219,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Recovers your nick from another user or from services.\n"
-				"If services are currently holding your nick, the hold\n"
-				"will be released. If another user is holding your nick\n"
-				"and is identified they will be killed (similar to the old\n"
-				"GHOST command). If they are not identified they will be\n"
-				"forced off of the nick."));
+		source.Reply(_(
+			"Recovers your nick from another user or from services. "
+			"If services are currently holding your nick, the hold "
+			"will be released. If another user is holding your nick "
+			"and is identified they will be killed (similar to the old "
+			"GHOST command). If they are not identified they will be "
+			"forced off of the nick."
+		));
 		return true;
 	}
 };
@@ -233,14 +243,14 @@ public:
 		commandnsrecover(this), recover(this, "recover"), svsnick(this, "svsnick")
 	{
 
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &oldnick) override
 	{
-		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
+		if (Config->GetModule(this).Get<bool>("restoreonrecover"))
 		{
 			NSRecoverInfo *ei = recover.Get(u);
 			BotInfo *NickServ = Config->GetClient("NickServ");
@@ -275,7 +285,7 @@ public:
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
+		if (Config->GetModule(this).Get<bool>("restoreonrecover"))
 		{
 			NSRecoverInfo *ei = recover.Get(u);
 

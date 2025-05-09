@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -11,7 +11,7 @@ WebCPanel::NickServ::Info::Info(const Anope::string &cat, const Anope::string &u
 {
 }
 
-bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::NickServ::Info::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	if (!message.post_data.empty())
 	{
@@ -31,7 +31,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		if (message.post_data.count("greet") > 0)
 		{
 			Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
-			const Anope::string &post_greet = HTTPUtils::URLDecode(message.post_data["greet"].replace_all_cs("+", " "));
+			const Anope::string &post_greet = HTTP::URLDecode(message.post_data["greet"].replace_all_cs("+", " "));
 
 			if (post_greet.empty())
 				na->nc->Shrink<Anope::string>("greet");
@@ -40,7 +40,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 
 			replacements["MESSAGES"] = "Greet updated";
 		}
-		if (na->nc->HasExt("AUTOOP") != message.post_data.count("autoop"))
+		if (na->nc->HasExt("AUTOOP") != !!message.post_data.count("autoop"))
 		{
 			if (!na->nc->HasExt("AUTOOP"))
 				na->nc->Extend<bool>("AUTOOP");
@@ -48,7 +48,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("AUTOOP");
 			replacements["MESSAGES"] = "Autoop updated";
 		}
-		if (na->nc->HasExt("NS_PRIVATE") != message.post_data.count("private"))
+		if (na->nc->HasExt("NS_PRIVATE") != !!message.post_data.count("private"))
 		{
 			if (!na->nc->HasExt("NS_PRIVATE"))
 				na->nc->Extend<bool>("NS_PRIVATE");
@@ -56,25 +56,42 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("NS_PRIVATE");
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (message.post_data["kill"] == "on" && !na->nc->HasExt("KILLPROTECT"))
+		if (na->nc->HasExt("PROTECT") != !!message.post_data.count("protect"))
 		{
-			na->nc->Extend<bool>("KILLPROTECT");
-			na->nc->Shrink<bool>("KILL_QUICK");
-			replacements["MESSAGES"] = "Kill updated";
+			if (na->nc->HasExt("PROTECT"))
+			{
+				na->nc->Shrink<bool>("PROTECT");
+				na->nc->Shrink<time_t>("PROTECT_AFTER");
+			}
+			else
+			{
+				na->nc->Extend<bool>("PROTECT");
+			}
+			replacements["MESSAGES"] = "Protect updated";
 		}
-		else if (message.post_data["kill"] == "quick" && !na->nc->HasExt("KILL_QUICK"))
+		if (na->nc->HasExt("PROTECT") && message.post_data.count("protect_after") > 0)
 		{
-			na->nc->Extend<bool>("KILLPROTECT");
-			na->nc->Extend<bool>("KILL_QUICK");
-			replacements["MESSAGES"] = "Kill updated";
+			auto &block = Config->GetModule("nickserv");
+			auto minprotect = block.Get<time_t>("minprotect", "10s");
+			auto maxprotect = block.Get<time_t>("maxprotect", "10m");
+
+			auto secs = Anope::TryConvert<time_t>(message.post_data["protect_after"]);
+			if (!secs)
+				replacements["ERRORS"] = "Protection delay must be a number of seconds";
+			else if (*secs < minprotect || *secs > maxprotect)
+			{
+				replacements["ERRORS"] = Anope::printf("Protection delay must be between %ld and %ld seconds.",
+					minprotect, maxprotect);
+			}
+			else if (!na->nc->HasExt("PROTECT_AFTER") || *secs != *na->nc->GetExt<time_t>("PROTECT_AFTER"))
+			{
+				na->nc->Extend<time_t>("PROTECT_AFTER", *secs);
+				replacements["MESSAGES"] = "Protect after updated";
+			}
 		}
-		else if (message.post_data["kill"] == "off" && (na->nc->HasExt("KILLPROTECT") || na->nc->HasExt("KILL_QUICK")))
-		{
-			na->nc->Shrink<bool>("KILLPROTECT");
-			na->nc->Shrink<bool>("KILL_QUICK");
-			replacements["MESSAGES"] = "Kill updated";
-		}
-		if (na->nc->HasExt("NS_KEEP_MODES") != message.post_data.count("keepmodes"))
+		else if (na->nc->HasExt("PROTECT") && !message.post_data.count("protect_after"))
+			na->nc->Shrink<time_t>("PROTECT_AFTER");
+		if (na->nc->HasExt("NS_KEEP_MODES") != !!message.post_data.count("keepmodes"))
 		{
 			if (!na->nc->HasExt("NS_KEEP_MODES"))
 				na->nc->Extend<bool>("NS_KEEP_MODES");
@@ -82,7 +99,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("NS_KEEP_MODES");
 			replacements["MESSAGES"] = "Keepmodes updated";
 		}
-		if (na->nc->HasExt("MSG") != message.post_data.count("msg"))
+		if (na->nc->HasExt("MSG") != !!message.post_data.count("msg"))
 		{
 			if (!na->nc->HasExt("MSG"))
 				na->nc->Extend<bool>("MSG");
@@ -90,7 +107,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				na->nc->Shrink<bool>("MSG");
 			replacements["MESSAGES"] = "Message updated";
 		}
-		if (na->nc->HasExt("NEVEROP") != message.post_data.count("neverop"))
+		if (na->nc->HasExt("NEVEROP") != !!message.post_data.count("neverop"))
 		{
 			if (!na->nc->HasExt("NEVEROP"))
 				na->nc->Extend<bool>("NEVEROP");
@@ -103,7 +120,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 	replacements["DISPLAY"] = na->nc->display;
 	if (!na->nc->email.empty())
 		replacements["EMAIL"] = na->nc->email;
-	replacements["TIME_REGISTERED"] = Anope::strftime(na->nc->time_registered, na->nc);
+	replacements["REGISTERED"] = Anope::strftime(na->nc->registered, na->nc);
 	if (na->HasVHost())
 		replacements["VHOST"] = na->GetVHostMask();
 	Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
@@ -113,12 +130,13 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		replacements["AUTOOP"];
 	if (na->nc->HasExt("NS_PRIVATE"))
 		replacements["PRIVATE"];
-	if (na->nc->HasExt("KILLPROTECT"))
-		replacements["KILL_ON"];
-	if (na->nc->HasExt("KILL_QUICK"))
-		replacements["KILL_QUICK"];
-	if (!na->nc->HasExt("KILLPROTECT") && !na->nc->HasExt("KILL_QUICK"))
-		replacements["KILL_OFF"];
+	if (na->nc->HasExt("PROTECT"))
+	{
+		replacements["PROTECT"];
+		auto *protectafter = na->nc->GetExt<time_t>("PROTECT_AFTER");
+		if (protectafter)
+			replacements["PROTECT_AFTER"] = Anope::ToString(*protectafter);
+	}
 	if (na->nc->HasExt("NS_KEEP_MODES"))
 		replacements["KEEPMODES"];
 	if (na->nc->HasExt("MSG"))

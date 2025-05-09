@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -37,15 +37,38 @@ struct DNSZone final
 			zones->erase(it);
 	}
 
-	void Serialize(Serialize::Data &data) const override
+	static DNSZone *Find(const Anope::string &name)
 	{
-		data.Store("name", name);
+		for (auto *zone : *zones)
+		{
+			if (zone->name.equals_ci(name))
+			{
+				zone->QueueUpdate();
+				return zone;
+			}
+		}
+		return NULL;
+	}
+};
+
+struct DNSZoneType final
+	: Serialize::Type
+{
+	DNSZoneType()
+		: Serialize::Type("DNSZone")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *zone = static_cast<const DNSZone *>(obj);
+		data.Store("name", zone->name);
 		unsigned count = 0;
-		for (const auto &server : servers)
+		for (const auto &server : zone->servers)
 			data.Store("server" + Anope::ToString(count++), server);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		DNSZone *zone;
 		Anope::string zone_name;
@@ -72,19 +95,6 @@ struct DNSZone final
 
 		return zone;
 	}
-
-	static DNSZone *Find(const Anope::string &name)
-	{
-		for (auto *zone : *zones)
-		{
-			if (zone->name.equals_ci(name))
-			{
-				zone->QueueUpdate();
-				return zone;
-			}
-		}
-		return NULL;
-	}
 };
 
 class DNSServer final
@@ -99,6 +109,8 @@ class DNSServer final
 	bool active = false;
 
 public:
+	friend struct DNSServerType;
+
 	std::set<Anope::string, ci::less> zones;
 	time_t repool = 0;
 
@@ -142,19 +154,40 @@ public:
 		}
 	}
 
-	void Serialize(Serialize::Data &data) const override
+	static DNSServer *Find(const Anope::string &s)
 	{
-		data.Store("server_name", server_name);
-		for (unsigned i = 0; i < ips.size(); ++i)
-			data.Store("ip" + Anope::ToString(i), ips[i]);
-		data.Store("limit", limit);
-		data.Store("pooled", pooled);
+		for (auto *serv : *dns_servers)
+			if (serv->GetName().equals_ci(s))
+			{
+				serv->QueueUpdate();
+				return serv;
+			}
+		return NULL;
+	}
+};
+
+struct DNSServerType final
+	: Serialize::Type
+{
+	DNSServerType()
+		: Serialize::Type("DNSServer")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *req = static_cast<const DNSServer *>(obj);
+		data.Store("server_name", req->server_name);
+		for (unsigned i = 0; i < req->ips.size(); ++i)
+			data.Store("ip" + Anope::ToString(i), req->ips[i]);
+		data.Store("limit", req->limit);
+		data.Store("pooled", req->pooled);
 		unsigned count = 0;
-		for (const auto &zone : zones)
+		for (const auto &zone : req->zones)
 			data.Store("zone" + Anope::ToString(count++), zone);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		DNSServer *req;
 		Anope::string server_name;
@@ -192,17 +225,6 @@ public:
 		}
 
 		return req;
-	}
-
-	static DNSServer *Find(const Anope::string &s)
-	{
-		for (auto *serv : *dns_servers)
-			if (serv->GetName().equals_ci(s))
-			{
-				serv->QueueUpdate();
-				return serv;
-			}
-		return NULL;
 	}
 };
 
@@ -700,20 +722,22 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command allows managing DNS zones used for controlling what servers users\n"
-				"are directed to when connecting. Omitting all parameters prints out the status of\n"
-				"the DNS zone.\n"
-				" \n"
-				"\002ADDZONE\002 adds a zone, eg us.yournetwork.tld. Servers can then be added to this\n"
-				"zone with the \002ADDSERVER\002 command.\n"
-				" \n"
-				"The \002ADDSERVER\002 command adds a server to the given zone. When a query is done, the\n"
-				"zone in question is served if it exists, else all servers in all zones are served.\n"
-				"A server may be in more than one zone.\n"
-				" \n"
-				"The \002ADDIP\002 command associates an IP with a server.\n"
-				" \n"
-				"The \002POOL\002 and \002DEPOOL\002 commands actually add and remove servers to their given zones."));
+		source.Reply(_(
+			"This command allows managing DNS zones used for controlling what servers users "
+			"are directed to when connecting. Omitting all parameters prints out the status of "
+			"the DNS zone."
+			"\n\n"
+			"\002ADDZONE\002 adds a zone, eg us.yournetwork.tld. Servers can then be added to this "
+			"zone with the \002ADDSERVER\002 command."
+			"\n\n"
+			"The \002ADDSERVER\002 command adds a server to the given zone. When a query is done, the "
+			"zone in question is served if it exists, else all servers in all zones are served. "
+			"A server may be in more than one zone."
+			"\n\n"
+			"The \002ADDIP\002 command associates an IP with a server."
+			"\n\n"
+			"The \002POOL\002 and \002DEPOOL\002 commands actually add and remove servers to their given zones."
+		));
 		return true;
 	}
 };
@@ -721,7 +745,8 @@ public:
 class ModuleDNS final
 	: public Module
 {
-	Serialize::Type zone_type, dns_type;
+	DNSZoneType zone_type;
+	DNSServerType dns_type;
 	CommandOSDNS commandosdns;
 
 	time_t ttl;
@@ -734,8 +759,9 @@ class ModuleDNS final
 	time_t last_warn = 0;
 
 public:
-	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-		zone_type("DNSZone", DNSZone::Unserialize), dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this)
+	ModuleDNS(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, EXTRA | VENDOR)
+		, commandosdns(this)
 	{
 		for (auto *s : *dns_servers)
 		{
@@ -752,15 +778,15 @@ public:
 			delete dns_servers->at(i - 1);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		this->ttl = block->Get<time_t>("ttl");
-		this->user_drop_mark =  block->Get<int>("user_drop_mark");
-		this->user_drop_time = block->Get<time_t>("user_drop_time");
-		this->user_drop_readd_time = block->Get<time_t>("user_drop_readd_time");
-		this->remove_split_servers = block->Get<bool>("remove_split_servers");
-		this->readd_connected_servers = block->Get<bool>("readd_connected_servers");
+		const auto &block = conf.GetModule(this);
+		this->ttl = block.Get<time_t>("ttl");
+		this->user_drop_mark =  block.Get<int>("user_drop_mark");
+		this->user_drop_time = block.Get<time_t>("user_drop_time");
+		this->user_drop_readd_time = block.Get<time_t>("user_drop_readd_time");
+		this->remove_split_servers = block.Get<bool>("remove_split_servers");
+		this->readd_connected_servers = block.Get<bool>("readd_connected_servers");
 	}
 
 	void OnNewServer(Server *s) override

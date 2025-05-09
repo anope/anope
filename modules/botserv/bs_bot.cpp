@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -142,7 +142,10 @@ private:
 		* And we must finally check that the nick is not already
 		* taken by another bot.
 		*/
-		if (nick.equals_cs(bi->nick) && (!user.empty() ? user.equals_cs(bi->GetIdent()) : 1) && (!host.empty() ? host.equals_cs(bi->host) : 1) && (!real.empty() ? real.equals_cs(bi->realname) : 1))
+		if (nick.equals_cs(bi->nick)
+			&& (user.empty() || user.equals_cs(bi->GetIdent()))
+			&& (host.empty() || host.equals_cs(bi->host))
+			&& (real.empty() || real.equals_cs(bi->realname)))
 		{
 			source.Reply(_("The old information is the same as the new information specified."));
 			return;
@@ -179,10 +182,7 @@ private:
 				source.Reply(_("Nick \002%s\002 is currently in use."), nick.c_str());
 				return;
 			}
-		}
 
-		if (!nick.equals_ci(bi->nick))
-		{
 			/* We check whether the nick is registered, and inform the user
 			* if so. You need to drop the nick manually before you can use
 			* it as a bot nick from now on -GD
@@ -347,23 +347,28 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to create, modify, and delete\n"
-				"bots that users will be able to use on their own\n"
-				"channels.\n"
-				" \n"
-				"\002BOT ADD\002 adds a bot with the given nickname, username,\n"
-				"hostname and realname. Since no integrity checks are done\n"
-				"for these settings, be really careful.\n"
-				" \n"
-				"\002BOT CHANGE\002 allows you to change the nickname, username, hostname\n"
-				"or realname of a bot without deleting it (and\n"
-				"all the data associated with it).\n"
-				" \n"
-				"\002BOT DEL\002 removes the given bot from the bot list.\n"
-				" \n"
-				"\002Note\002: You cannot create a bot with a nick that is\n"
-				"currently registered. If an unregistered user is currently\n"
-				"using the nick, they will be killed."));
+		source.Reply(_(
+				"Allows Services Operators to create, modify, and delete "
+				"bots that users will be able to use on their own "
+				"channels."
+				"\n\n"
+				"\002%s\032ADD\002 adds a bot with the given nickname, username, "
+				"hostname and realname. Since no integrity checks are done "
+				"for these settings, be really careful."
+				"\n\n"
+				"\002%s\032CHANGE\002 allows you to change the nickname, username, hostname "
+				"or realname of a bot without deleting it (and "
+				"all the data associated with it)."
+				"\n\n"
+				"\002%s\032DEL\002 removes the given bot from the bot list."
+				"\n\n"
+				"\002Note\002: You cannot create a bot with a nick that is "
+				"currently registered. If an unregistered user is currently "
+				"using the nick, they will be killed."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };

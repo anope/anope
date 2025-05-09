@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -46,7 +46,7 @@ class CommandCSAKick final
 		const NickAlias *na = NickAlias::Find(mask);
 		NickCore *nc = NULL;
 		const AutoKick *akick;
-		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		unsigned reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
 
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
@@ -170,9 +170,9 @@ class CommandCSAKick final
 			}
 		}
 
-		if (ci->GetAkickCount() >= Config->GetModule(this->owner)->Get<unsigned>("autokickmax"))
+		if (ci->GetAkickCount() >= Config->GetModule(this->owner).Get<unsigned>("autokickmax"))
 		{
-			source.Reply(_("Sorry, you can only have %d autokick masks on a channel."), Config->GetModule(this->owner)->Get<unsigned>("autokickmax"));
+			source.Reply(_("Sorry, you can only have %d autokick masks on a channel."), Config->GetModule(this->owner).Get<unsigned>("autokickmax"));
 			return;
 		}
 
@@ -211,6 +211,7 @@ class CommandCSAKick final
 				ChannelInfo *ci;
 				Command *c;
 				unsigned deleted = 0;
+				Anope::string lastdeleted;
 				AccessGroup ag;
 			public:
 				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), ag(source.AccessFor(ci))
@@ -219,12 +220,20 @@ class CommandCSAKick final
 
 				~AkickDelCallback() override
 				{
-					if (!deleted)
-						source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
-					else if (deleted == 1)
-						source.Reply(_("Deleted 1 entry from %s autokick list."), ci->name.c_str());
-					else
-						source.Reply(_("Deleted %d entries from %s autokick list."), deleted, ci->name.c_str());
+					switch (deleted)
+					{
+						case 0:
+							source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
+							break;
+
+						case 1:
+							source.Reply(_("Deleted %s from %s autokick list."), lastdeleted.c_str(), ci->name.c_str());
+							break;
+
+						default:
+							source.Reply(deleted, N_("Deleted %d entry from %s autokick list.", "Deleted %d entries from %s autokick list."), deleted, ci->name.c_str());
+							break;
+					}
 				}
 
 				void HandleNumber(unsigned number) override
@@ -237,7 +246,8 @@ class CommandCSAKick final
 					FOREACH_MOD(OnAkickDel, (source, ci, akick));
 
 					bool override = !ag.HasPriv("AKICK");
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << (akick->nc ? akick->nc->display : akick->mask);
+					lastdeleted = (akick->nc ? akick->nc->display : akick->mask);
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << lastdeleted;
 
 					++deleted;
 					ci->EraseAkick(number - 1);
@@ -490,40 +500,51 @@ public:
 		BotInfo *bi = Config->GetClient("NickServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002AutoKick list\002 for a channel.  If a user\n"
-				"on the AutoKick list attempts to join the channel,\n"
-				"%s will ban that user from the channel, then kick\n"
-				"the user.\n"
-				" \n"
-				"The \002AKICK ADD\002 command adds the given nick or usermask\n"
-				"to the AutoKick list.  If a \037reason\037 is given with\n"
-				"the command, that reason will be used when the user is\n"
-				"kicked; if not, the default reason is \"User has been\n"
-				"banned from the channel\".\n"
-				"When akicking a \037registered nick\037 the %s account\n"
-				"will be added to the akick list instead of the mask.\n"
-				"All users within that nickgroup will then be akicked.\n"),
-				source.service->nick.c_str(), bi ? bi->nick.c_str() : "NickServ");
 		source.Reply(_(
-				" \n"
-				"The \002AKICK DEL\002 command removes the given nick or mask\n"
-				"from the AutoKick list.  It does not, however, remove any\n"
-				"bans placed by an AutoKick; those must be removed\n"
-				"manually.\n"
-				" \n"
-				"The \002AKICK LIST\002 command displays the AutoKick list, or\n"
-				"optionally only those AutoKick entries which match the\n"
-				"given mask.\n"
-				" \n"
-				"The \002AKICK VIEW\002 command is a more verbose version of the\n"
-				"\002AKICK LIST\002 command.\n"
-				" \n"
-				"The \002AKICK ENFORCE\002 command causes %s to enforce the\n"
-				"current AKICK list by removing those users who match an\n"
-				"AKICK mask.\n"
-				" \n"
-				"The \002AKICK CLEAR\002 command clears all entries of the\n"
-				"akick list."), source.service->nick.c_str());
+				"Maintains the \002AutoKick list\002 for a channel. If a user "
+				"on the AutoKick list attempts to join the channel, "
+				"%s will ban that user from the channel, then kick "
+				"the user."
+				"\n\n"
+				"The \002%s\032ADD\002 command adds the given nick or usermask "
+				"to the AutoKick list. If a \037reason\037 is given with "
+				"the command, that reason will be used when the user is "
+				"kicked; if not, the default reason is \"User has been "
+				"banned from the channel\". "
+				"When akicking a \037registered nick\037 the %s account "
+				"will be added to the akick list instead of the mask. "
+				"All users within that nickgroup will then be akicked. "
+				"\n\n"
+				"The \002%s\032DEL\002 command removes the given nick or mask "
+				"from the AutoKick list. It does not, however, remove any "
+				"bans placed by an AutoKick; those must be removed "
+				"manually."
+				"\n\n"
+				"The \002%s\032LIST\002 command displays the AutoKick list, or "
+				"optionally only those AutoKick entries which match the "
+				"given mask."
+				"\n\n"
+				"The \002%s\032VIEW\002 command is a more verbose version of the "
+				"\002%s\032LIST\002 command."
+				"\n\n"
+				"The \002%s\032ENFORCE\002 command causes %s to enforce the "
+				"current akick list by removing those users who match an "
+				"akick mask."
+				"\n\n"
+				"The \002%s\032CLEAR\002 command clears all entries of the "
+				"akick list."
+			),
+			source.service->nick.c_str(),
+			source.command.nobreak().c_str(),
+			bi ? bi->nick.c_str() : "NickServ",
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
+
 		return true;
 	}
 };
@@ -568,9 +589,11 @@ public:
 				reason = autokick->reason;
 				if (reason.empty())
 				{
-					reason = Language::Translate(u, Config->GetModule(this)->Get<const Anope::string>("autokickreason").c_str());
-					reason = reason.replace_all_cs("%n", u->nick)
-							.replace_all_cs("%c", c->name);
+					reason = Language::Translate(u, Config->GetModule(this).Get<const Anope::string>("autokickreason").c_str());
+					reason = Anope::Template(reason, {
+						{ "channel", c->name },
+						{ "nick",    u->nick },
+					});
 				}
 				if (reason.empty())
 					reason = Language::Translate(u, _("User has been banned from the channel"));

@@ -1,6 +1,6 @@
 /* Solanum functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,8 +10,8 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
-#include "modules/sasl.h"
+#include "modules/chanserv/mode.h"
+#include "modules/nickserv/sasl.h"
 
 static Anope::string UplinkSID;
 
@@ -32,10 +32,12 @@ public:
 
 class SolanumProto final
 	: public IRCDProto
+	, public SASL::ProtocolInterface
 {
 public:
-
-	SolanumProto(Module *creator) : IRCDProto(creator, "Solanum")
+	SolanumProto(Module *creator)
+		: IRCDProto(creator, "Solanum")
+		, SASL::ProtocolInterface(creator)
 	{
 		DefaultPseudoclientModes = "+oiS";
 		CanCertFP = true;
@@ -88,6 +90,7 @@ public:
 		 * BAN      - Can do BAN message
 		 * CHW      - Can do channel wall @#
 		 * CLUSTER  - Supports umode +l, can send LOCOPS (encap only)
+		 * EBMASK   - Supports extended ban bursting
 		 * ECHO     - Supports sending echoed messages
 		 * ENCAP    - Can do ENCAP message
 		 * EOPMOD   - Can do channel wall =# (for cmode +z)
@@ -105,7 +108,7 @@ public:
 		 * UNKLN    - Can do UNKLINE (encap only)
 		 * QS       - Can handle quit storm removal
 		*/
-		Uplink::Send("CAPAB", "BAN CHW CLUSTER ECHO ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN");
+		Uplink::Send("CAPAB", "BAN CHW CLUSTER EBMASK ECHO ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN");
 
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
@@ -118,6 +121,68 @@ public:
 		 *  arg[3] = server's idea of UTC time
 		 */
 		Uplink::Send("SVINFO", 6, 6, 0, Anope::CurTime);
+	}
+
+	void SendMode(const MessageSource &source, Channel *chan, const ModeManager::Change &change) override
+	{
+		size_t listcount = 0;
+		std::map<char, std::vector<Anope::string>> listchanges;
+		ModeManager::Change otherchanges;
+
+		const auto has_ebmask = Servers::Capab.count("EBMASK");
+		for (const auto &[mode, info] : change)
+		{
+			if (mode->type == MODE_LIST && info.first)
+			{
+				// Adding to a list mode.
+				auto it = listchanges.find(mode->mchar);
+				if (it == listchanges.end())
+				{
+					// No line for this type, start a new one.
+					it = listchanges.emplace(mode->mchar, std::vector<Anope::string>()).first;
+					it->second.emplace_back(Anope::string());
+				}
+
+				const auto reached_max_line = it->second.back().length() > IRCD->MaxLine - 100; // Leave room for command, channel, etc
+				const auto reached_max_modes = ++listcount > IRCD->MaxModes;
+				if (reached_max_modes || reached_max_line)
+				{
+					// End of the line, start a new one.
+					it->second.emplace_back(Anope::string());
+					listcount = 0;
+				}
+
+				auto &listchange = listchanges[mode->mchar].back();
+				if (!listchange.empty())
+						listchange.push_back(' ');
+
+				// Both BMASK and EBMASK take a mask. EBMASK also takes a ts and setter.
+				const auto &data = info.second;
+				listchange.append(data.value);
+				if (has_ebmask)
+				{
+					listchange.push_back(' ');
+					listchange.append(Anope::ToString(data.set_at));
+					listchange.push_back(' ');
+					listchange.append(data.set_by);
+				}
+			}
+			else
+			{
+				// Regular mode change or mode removal.
+				otherchanges.emplace(mode, info);
+			}
+		}
+
+		const auto *cmd = has_ebmask ? "EBMASK" : "BMASK";
+		for (auto &[mode, changes] : listchanges)
+		{
+			for (const auto &change : changes)
+				Uplink::Send(source.GetServer(), cmd, chan->created, chan->name, mode, change);
+		}
+
+		if (!otherchanges.empty())
+			IRCDProto::SendMode(source, chan, otherchanges);
 	}
 
 	void SendClientIntroduction(User *u) override
@@ -154,10 +219,10 @@ public:
 	{
 		Server *s = Server::Find(message.target.substr(0, 3));
 		auto target = s ? s->GetName() : message.target.substr(0, 3);
-		if (message.ext.empty())
-			Uplink::Send("ENCAP", target, "SASL", message.source, message.target, message.type, message.data);
-		else
-			Uplink::Send("ENCAP", target, "SASL", message.source, message.target, message.type, message.data, message.ext);
+
+		auto newparams = message.data;
+		newparams.insert(newparams.begin(), { target, "SASL", message.source, message.target, message.type });
+		Uplink::SendInternal({}, Me, "ENCAP", newparams);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
@@ -171,6 +236,44 @@ public:
 	}
 };
 
+struct IRCDMessageEBMask final
+	: IRCDMessage
+{
+	IRCDMessageEBMask(Module *creator)
+		: IRCDMessage(creator, "EBMASK", 4)
+	{
+		SetFlag(FLAG_REQUIRE_SERVER);
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		// :42X EBMASK 1746321990 #channel b :foo!*@* 1746322038 bar!baz@localhost
+		auto *chan = Channel::Find(params[1]);
+		if (!chan)
+			return; // Channel doesn't exist.
+
+		// If the TS is greater than ours, we drop the mode and don't pass it anywhere.
+		auto chants = IRCD->ExtractTimestamp(params[0]);
+		if (chants > chan->created)
+			return;
+
+		auto *cm = ModeManager::FindChannelModeByChar(params[2][0]);
+		if (!cm || cm->type != MODE_LIST)
+			return; // Mode doesn't exist or isn't a list mode.
+
+		spacesepstream ms(params[3]);
+		while (!ms.StreamEnd())
+		{
+			ModeData data;
+			Anope::string set_at;
+			if (!ms.GetToken(data.value) || !ms.GetToken(set_at) || !ms.GetToken(data.set_by))
+				break; // Malformed token, drop it.
+
+			data.set_at = Anope::Convert(set_at, 0);
+			chan->SetModeInternal(source, cm, data);
+		}
+	}
+};
 
 struct IRCDMessageEncap final
 	: IRCDMessage
@@ -215,16 +318,14 @@ struct IRCDMessageEncap final
 		 *
 		 * Solanum only accepts messages from SASL agents; these must have umode +S
 		 */
-		else if (params[1] == "SASL" && SASL::sasl && params.size() >= 6)
+		else if (params[1] == "SASL" && SASL::service && params.size() >= 6)
 		{
 			SASL::Message m;
 			m.source = params[2];
 			m.target = params[3];
 			m.type = params[4];
-			m.data = params[5];
-			m.ext = params.size() > 6 ? params[6] : "";
-
-			SASL::sasl->ProcessMessage(m);
+			m.data.assign(params.begin() + 5, params.end());
+			SASL::service->ProcessMessage(m);
 		}
 	}
 };
@@ -347,6 +448,7 @@ class ProtoSolanum final
 		message_tb, message_tmode, message_uid;
 
 	/* Our message handlers */
+	IRCDMessageEBMask message_ebmask;
 	IRCDMessageEncap message_encap;
 	IRCDMessageEUID message_euid;
 	IRCDMessageNotice message_notice;
@@ -379,28 +481,43 @@ class ProtoSolanum final
 	}
 
 public:
-	ProtoSolanum(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this),
-		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),
-		message_kill(this), message_mode(this), message_motd(this), message_part(this), message_ping(this),
-		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_topic(this),
-		message_version(this), message_whois(this),
-
-		message_bmask("IRCDMessage", "solanum/bmask", "ratbox/bmask"),
-		message_join("IRCDMessage", "solanum/join", "ratbox/join"),
-		message_nick("IRCDMessage", "solanum/nick", "ratbox/nick"),
-		message_pong("IRCDMessage", "solanum/pong", "ratbox/pong"),
-		message_sid("IRCDMessage", "solanum/sid", "ratbox/sid"),
-		message_sjoin("IRCDMessage", "solanum/sjoin", "ratbox/sjoin"),
-		message_tb("IRCDMessage", "solanum/tb", "ratbox/tb"),
-		message_tmode("IRCDMessage", "solanum/tmode", "ratbox/tmode"),
-		message_uid("IRCDMessage", "solanum/uid", "ratbox/uid"),
-
-		message_encap(this), message_euid(this), message_notice(this), message_pass(this),
-		message_privmsg(this), message_server(this)
+	ProtoSolanum(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, PROTOCOL | VENDOR)
+		, ircd_proto(this)
+		, message_away(this)
+		, message_capab(this)
+		, message_error(this)
+		, message_invite(this)
+		, message_kick(this)
+		, message_kill(this)
+		, message_mode(this)
+		, message_motd(this)
+		, message_part(this)
+		, message_ping(this)
+		, message_quit(this)
+		, message_squit(this)
+		, message_stats(this)
+		, message_time(this)
+		, message_topic(this)
+		, message_version(this)
+		, message_whois(this)
+		, message_bmask("IRCDMessage", "solanum/bmask", "ratbox/bmask")
+		, message_join("IRCDMessage", "solanum/join", "ratbox/join")
+		, message_nick("IRCDMessage", "solanum/nick", "ratbox/nick")
+		, message_pong("IRCDMessage", "solanum/pong", "ratbox/pong")
+		, message_sid("IRCDMessage", "solanum/sid", "ratbox/sid")
+		, message_sjoin("IRCDMessage", "solanum/sjoin", "ratbox/sjoin")
+		, message_tb("IRCDMessage", "solanum/tb", "ratbox/tb")
+		, message_tmode("IRCDMessage", "solanum/tmode", "ratbox/tmode")
+		, message_uid("IRCDMessage", "solanum/uid", "ratbox/uid")
+		, message_ebmask(this)
+		, message_encap(this)
+		, message_euid(this)
+		, message_notice(this)
+		, message_pass(this)
+		, message_privmsg(this)
+		, message_server(this)
 	{
-
-
 		if (ModuleManager::LoadModule("ratbox", User::Find(creator)) != MOD_ERR_OK)
 			throw ModuleException("Unable to load ratbox");
 		m_ratbox = ModuleManager::FindModule("ratbox");
@@ -451,7 +568,7 @@ public:
 		if (modelocks && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-			Uplink::Send("MLOCK", c->creation_time, c->ci->name, modes);
+			Uplink::Send("MLOCK", c->created, c->ci->name, modes);
 		}
 	}
 
@@ -462,7 +579,7 @@ public:
 		if (cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -475,7 +592,7 @@ public:
 		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, modes);
 		}
 
 		return EVENT_CONTINUE;

@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2014 Attila Molnar <attilamolnar@hush.com>
- * (C) 2014-2024 Anope Team
+ * (C) 2014-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -51,14 +51,14 @@ public:
 	 * @param sz How much to read
 	 * @return Number of bytes received
 	 */
-	int Recv(Socket *s, char *buf, size_t sz) override;
+	ssize_t Recv(Socket *s, char *buf, size_t sz) override;
 
 	/** Write something to the socket
 	 * @param s The socket
 	 * @param buf The data to write
 	 * @param size The length of the data
 	 */
-	int Send(Socket *s, const char *buf, size_t sz) override;
+	ssize_t Send(Socket *s, const char *buf, size_t sz) override;
 
 	/** Accept a connection from a socket
 	 * @param s The socket
@@ -299,6 +299,8 @@ public:
 	{
 		me = this;
 		this->SetPermanent(true);
+
+		Log(this) << "Module was compiled against GnuTLS version " << GNUTLS_VERSION << " and is running against version " << gnutls_check_version(nullptr);
 	}
 
 	~GnuTLSModule()
@@ -318,20 +320,20 @@ public:
 
 	static void CheckFile(const Anope::string &filename)
 	{
-		if (!Anope::IsFile(filename.c_str()))
+		if (!Anope::IsFile(filename))
 		{
 			Log() << "File does not exist: " << filename;
 			throw ConfigException("Error loading certificate/private key");
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
+		const auto &config = conf.GetModule(this);
 
-		const Anope::string certfile = Anope::ExpandConfig(config->Get<const Anope::string>("cert", "fullchain.pem"));
-		const Anope::string keyfile = Anope::ExpandConfig(config->Get<const Anope::string>("key", "privkey.pem"));
-		const Anope::string dhfile = Anope::ExpandConfig(config->Get<const Anope::string>("dh", "dhparams.pem"));
+		const Anope::string certfile = Anope::ExpandConfig(config.Get<const Anope::string>("cert", "fullchain.pem"));
+		const Anope::string keyfile = Anope::ExpandConfig(config.Get<const Anope::string>("key", "privkey.pem"));
+		const Anope::string dhfile = Anope::ExpandConfig(config.Get<const Anope::string>("dh", "dhparams.pem"));
 
 		CheckFile(certfile);
 		CheckFile(keyfile);
@@ -339,7 +341,7 @@ public:
 		GnuTLS::X509CertCredentials *newcred = new GnuTLS::X509CertCredentials(certfile, keyfile);
 
 		// DH params is not mandatory
-		if (Anope::IsFile(dhfile.c_str()))
+		if (Anope::IsFile(dhfile))
 		{
 			try
 			{
@@ -363,9 +365,9 @@ public:
 
 	void OnPreServerConnect() override
 	{
-		Configuration::Block *config = Config->GetBlock("uplink", Anope::CurrentUplink);
+		const auto &config = Config->GetBlock("uplink", Anope::CurrentUplink);
 
-		if (config->Get<bool>("ssl"))
+		if (config.Get<bool>("ssl"))
 		{
 			this->service.Init(UplinkSock);
 		}
@@ -384,9 +386,9 @@ void MySSLService::Init(Socket *s)
 	s->io = new SSLSocketIO();
 }
 
-int SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
+ssize_t SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
 {
-	int ret = gnutls_record_recv(this->sess, buf, sz);
+	ssize_t ret = gnutls_record_recv(this->sess, buf, sz);
 
 	if (ret > 0)
 		TotalRead += ret;
@@ -411,9 +413,9 @@ int SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
 	return ret;
 }
 
-int SSLSocketIO::Send(Socket *s, const char *buf, size_t sz)
+ssize_t SSLSocketIO::Send(Socket *s, const char *buf, size_t sz)
 {
-	int ret = gnutls_record_send(this->sess, buf, sz);
+	ssize_t ret = gnutls_record_send(this->sess, buf, sz);
 
 	if (ret > 0)
 		TotalWritten += ret;

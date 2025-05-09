@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -145,7 +145,7 @@ public:
 		else
 		{
 			Data data;
-			obj->Serialize(data);
+			t->Serialize(obj, data);
 
 			if (obj->IsCached(data))
 				return;
@@ -171,10 +171,10 @@ public:
 		this->updated_items.clear();
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		this->redis = ServiceReference<Provider>("Redis::Provider", block->Get<const Anope::string>("engine", "redis/main"));
+		const auto &block = conf.GetModule(this);
+		this->redis = ServiceReference<Provider>("Redis::Provider", block.Get<const Anope::string>("engine", "redis/main"));
 	}
 
 	EventReturn OnLoadDatabase() override
@@ -402,7 +402,7 @@ void Updater::OnResult(const Reply &r)
 	}
 
 	Data data;
-	obj->Serialize(data);
+	st->Serialize(obj, data);
 
 	/* Transaction start */
 	me->redis->StartTransaction();
@@ -492,7 +492,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 	if (s_type == NULL)
 		return;
 
-	auto oid = Anope::TryConvert<uint64_t>(id);
+	auto oid = Anope::TryConvert<Serializable::Id>(id);
 	if (!oid.has_value())
 		return;
 
@@ -526,8 +526,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 		Log(LOG_DEBUG) << "redis: notify: deleting object id " << obj_id << " of type " << type;
 
 		Data data;
-
-		s->Serialize(data);
+		s_type->Serialize(s, data);
 
 		/* Transaction start */
 		me->redis->StartTransaction();
@@ -578,8 +577,7 @@ void ModifiedObject::OnResult(const Reply &r)
 	if (obj)
 	{
 		Data data;
-
-		obj->Serialize(data);
+		st->Serialize(obj, data);
 
 		for (auto &[key, value] : data.data)
 		{

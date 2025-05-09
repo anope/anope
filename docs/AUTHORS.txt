@@ -1,0 +1,92 @@
+Since the first commit in March 2004 88 people have submitted patches, commits,
+and other useful contributions to Anope. These people, ordered by the number of
+contributions they have made, are:
+
+  * Adam <adam@anope.org>
+  * Sadie Powell <sadie@witchery.services>
+  * Robin Burchell <w00t@inspircd.org>
+  * Naram Qashat <cyberbotx@anope.org>
+  * Pieter Bootsma <geniusdex@anope.org>
+  * Jens Voss <dukepyrolator@anope.org>
+  * David Robson <rob@anope.org>
+  * Florian Schulze <certus@anope.org>
+  * Daniel Engel <dane@zero.org>
+  * Trystan S. Lee <trystan@nomadirc.net>
+  * Robby <robby@chatbelgie.be>
+  * Charles Kingsley <chaz@anope.org>
+  * Lee Holmes <lethality@anope.org>
+  * Gabriel Acevedo H. <drstein@anope.org>
+  * Jan Milants <viper@anope.org>
+  * Adam Kramer <ribosome@anope.org>
+  * Attila Molnar <attilamolnar@hush.com>
+  * Michael Wobst <wobst.michael@web.de>
+  * Mark Summers <mark@goopler.net>
+  * Matt Schatz <genius3000@g3k.solutions>
+  * Daniel Vassdal <shutter@canternet.org>
+  * MatthewM <mcm@they-got.us>
+  * PeGaSuS <droider.pc@gmail.com>
+  * Sebastian V. <hal9000@denorastats.org>
+  * Alvaro Toledo <atoledo@keldon.org>
+  * Dragone2 <dragone2@risposteinformatiche.it>
+  * Björn Stiddien <keeper@anope.org>
+  * n0kS Phr33d0m <god@politeia.in>
+  * Hendrik Jäger <gitcommit@henk.geekmail.org>
+  * k4be <k4be@pirc.pl>
+  * Thomas Fargeix <t.fargeix@gmail.com>
+  * Bram Matthys <syzop@vulnscan.org>
+  * Federico G. Schwindt <fgsch@lodoss.net>
+  * Val Lorentz <progval+git@progval.net>
+  * Alexander Barton <alex@barton.de>
+  * CaPa CuL <capacul@gmail.com>
+  * Cronus <cronus@nite-serv.com>
+  * H7-25 <simos@simosnap.org>
+  * Jyzee <jyzee.git@gmail.com>
+  * Sebastian Barfurth <github@afreshmelon.com>
+  * Zantox <jyoerger10@msn.com>
+  * Zoddo <zoddo.ino@gmail.com>
+  * Dominic Hargreaves <dom@earth.li>
+  * Michael Hazell <michaelhazell@hotmail.com>
+  * Robert Scheck <robert@fedoraproject.org>
+  * Dennis Friis <peavey@inspircd.org>
+  * Filippo Cortigiani <simos@simosnap.org>
+  * Michał Zegan <webczat_200@poczta.onet.pl>
+  * AlphaTech <alphat3ch@icloud.com>
+  * Austin Ellis <siniStar@IRC4Fun.net>
+  * bonnedav <theD_2011@hotmail.com>
+  * Denis M. (Phr33d0m) <god@politeia.in>
+  * Harakiri <harakiri@overstack.fr>
+  * Marcin Łabanowski <marcin@6irc.net>
+  * Matt Ullman <matt@airraidsirens.com>
+  * Michael Stapelberg <michael@robustirc.net>
+  * Alexander Maassen <outsider@twingoversum.scarynet.org>
+  * artemiiav <artemiiav@gmail.com>
+  * blackbeard420 <blackbeard@blackbeard420.me>
+  * BoGu5 <bogus@onzin.org>
+  * Chris Langsenkamp <chris@langsenkamp.com>
+  * Clem Morton
+  * Daniel Oaks <danneh@danneh.net>
+  * Fabio Scotoni <cculex@gmail.com>
+  * ItsOnlyBinary
+  * Jason Foster <retsofaj@gmail.com>
+  * Jeremy <jeremy@ssnet.ca>
+  * Josh Soref
+  * KindOne <ineedalifetoday@live.com>
+  * linuxdaemon
+  * Mantas Mikulėnas <grawity@gmail.com>
+  * Matthew Beeching <jobe@mdbnet.co.uk>
+  * Michael <michaelhazell@hotmail.com>
+  * Mingjie Shen <shen497@purdue.edu>
+  * nekoswag
+  * Peter Tseng <pht24@cornell.edu>
+  * Romain Rivière <lecoyote@lecoyote.org>
+  * Sam James (sam_c) <sam@cmpct.info>
+  * ShutterQuick <shutter@canternet.org>
+  * Sketch <denverfreeburn@outlook.com>
+  * Tim Gunter <tim@vanillaforums.com>
+  * Toni Kaija <diftraku@gmail.com>
+  * Victor Coss <gtaxl@gtaxl.net>
+  * VisioN <vision@myirc.us>
+  * westor <westor7@gmail.com>
+  * Wilson Birney <wpb@360scada.com>
+  * Yann Sionneau <yann@sionneau.net>
+  * Zach Bloomquist <zrbq@live.com>

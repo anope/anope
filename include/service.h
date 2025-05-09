@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -59,11 +59,25 @@ public:
 	static std::vector<Anope::string> GetServiceKeys(const Anope::string &t)
 	{
 		std::vector<Anope::string> keys;
-		std::map<Anope::string, std::map<Anope::string, Service *> >::iterator it = Services.find(t);
+		const auto it = Services.find(t);
 		if (it != Services.end())
-			for (std::map<Anope::string, Service *>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-				keys.push_back(it2->first);
+		{
+			for (const auto &[key, _] : it->second)
+				keys.push_back(key);
+		}
 		return keys;
+	}
+
+	static std::vector<Service *> GetServices(const Anope::string &t)
+	{
+		std::vector<Service *> values;
+		const auto it = Services.find(t);
+		if (it != Services.end())
+		{
+			for (const auto &[_, value] : it->second)
+				values.push_back(value);
+		}
+		return values;
 	}
 
 	static void AddAlias(const Anope::string &t, const Anope::string &n, const Anope::string &v)
@@ -98,10 +112,8 @@ public:
 
 	void Register()
 	{
-		std::map<Anope::string, Service *> &smap = Services[this->type];
-		if (smap.find(this->name) != smap.end())
+		if (!Services[this->type].emplace(this->name, this).second)
 			throw ModuleException("Service " + this->type + " with name " + this->name + " already exists");
-		smap[this->name] = this;
 	}
 
 	void Unregister()

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2012-2024 Anope Team
+ * (C) 2012-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -48,7 +48,7 @@ public:
 	{
 		SQLOperResultDeleter d(this);
 
-		if (!user || !user->Account())
+		if (!user || !user->IsIdentified())
 			return;
 
 		if (r.Rows() == 0)
@@ -150,12 +150,12 @@ public:
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
+		const auto &config = conf.GetModule(this);
 
-		this->engine = config->Get<const Anope::string>("engine");
-		this->query = config->Get<const Anope::string>("query");
+		this->engine = config.Get<const Anope::string>("engine");
+		this->query = config.Get<const Anope::string>("query");
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}

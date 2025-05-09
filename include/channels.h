@@ -1,6 +1,6 @@
 /* Channel support
  *
- * (C) 2008-2024 Anope Team
+ * (C) 2008-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -36,7 +36,7 @@ class CoreExport Channel final
 	static std::vector<Channel *> deleting;
 
 public:
-	typedef std::multimap<Anope::string, Anope::string> ModeList;
+	typedef std::multimap<Anope::string, ModeData> ModeList;
 private:
 	/** A map of channel modes with their parameters set on this channel
 	 */
@@ -48,11 +48,11 @@ public:
 	/* Set if this channel is registered. ci->c == this. Contains information relevant to the registered channel */
 	Serialize::Reference<ChannelInfo> ci;
 	/* When the channel was created */
-	time_t creation_time;
+	time_t created;
 	/* If the channel has just been created in a netjoin */
-	bool syncing;
+	bool syncing = false;
 	/* Is configured in the conf as a channel bots should be in */
-	bool botchannel;
+	bool botchannel = false;
 
 	/* Users in the channel */
 	typedef std::map<User *, ChanUserContainer *> ChanUserList;
@@ -66,15 +66,15 @@ public:
 	 * This is the time the topic was *originally set*. When we restore the topic we want to change the TS back
 	 * to this, but we can only do this on certain IRCds.
 	 */
-	time_t topic_ts;
+	time_t topic_ts = 0;
 	/* The actual time the topic was set, probably close to Anope::CurTime */
-	time_t topic_time;
+	time_t topic_time = 0;
 
-	time_t server_modetime;		/* Time of last server MODE */
-	time_t chanserv_modetime;	/* Time of last check_modes() */
-	int16_t server_modecount;	/* Number of server MODEs this second */
-	int16_t chanserv_modecount;	/* Number of check_mode()'s this sec */
-	int16_t bouncy_modes;		/* Did we fail to set modes here? */
+	time_t server_modetime = 0;		/* Time of last server MODE */
+	time_t chanserv_modetime = 0;	/* Time of last check_modes() */
+	int16_t server_modecount = 0;	/* Number of server MODEs this second */
+	int16_t chanserv_modecount = 0;	/* Number of check_mode()'s this sec */
+	bool bouncy_modes = false;		/* Did we fail to set modes here? */
 
 private:
 	/** Constructor
@@ -148,10 +148,10 @@ public:
 	/** Set a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The setter
 	 * @param cm The mode
-	 * @param param The param
+	 * @param data Data about the mode.
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetModeInternal(MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
+	void SetModeInternal(MessageSource &source, ChannelMode *cm, const ModeData &data = {}, bool enforce_mlock = true);
 
 	/** Remove a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The Setter
@@ -164,19 +164,19 @@ public:
 	/** Set a mode on a channel
 	 * @param bi The client setting the modes
 	 * @param cm The mode
-	 * @param param Optional param arg for the mode
+	 * @param data Data about the mode
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
+	void SetMode(BotInfo *bi, ChannelMode *cm, const ModeData &data = {}, bool enforce_mlock = true);
 
 	/**
 	 * Set a mode on a channel
 	 * @param bi The client setting the modes
 	 * @param name The mode name
-	 * @param param Optional param arg for the mode
+	 * @param data Data about the mode
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "", bool enforce_mlock = true);
+	void SetMode(BotInfo *bi, const Anope::string &name, const ModeData &data = {}, bool enforce_mlock = true);
 
 	/** Remove a mode from a channel
 	 * @param bi The client setting the modes

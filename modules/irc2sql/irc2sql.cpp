@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2013-2024 Anope Team
+ * (C) 2013-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -17,21 +17,21 @@ void IRC2SQL::OnShutdown()
 	quitting = true;
 }
 
-void IRC2SQL::OnReload(Configuration::Conf *conf)
+void IRC2SQL::OnReload(Configuration::Conf &conf)
 {
-	Configuration::Block *block = Config->GetModule(this);
-	prefix = block->Get<const Anope::string>("prefix", "anope_");
-	GeoIPDB = block->Get<const Anope::string>("geoip_database");
-	ctcpuser = block->Get<bool>("ctcpuser", "no");
-	ctcpeob = block->Get<bool>("ctcpeob", "yes");
-	Anope::string engine = block->Get<const Anope::string>("engine");
+	const auto &block = Config->GetModule(this);
+	prefix = block.Get<const Anope::string>("prefix", "anope_");
+	GeoIPDB = block.Get<const Anope::string>("geoip_database");
+	ctcpuser = block.Get<bool>("ctcpuser", "no");
+	ctcpeob = block.Get<bool>("ctcpeob", "yes");
+	Anope::string engine = block.Get<const Anope::string>("engine");
 	this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 	if (sql)
 		this->CheckTables();
 	else
 		Log() << "IRC2SQL: no database connection to " << engine;
 
-	const Anope::string &snick = block->Get<const Anope::string>("client");
+	const Anope::string &snick = block.Get<const Anope::string>("client");
 	if (snick.empty())
 		throw ConfigException(Module::name + ": <client> must be defined");
 	StatServ = BotInfo::Find(snick, true);
@@ -107,7 +107,7 @@ void IRC2SQL::OnUserConnect(User *u, bool &exempt)
 	query.SetValue("ident", u->GetIdent());
 	query.SetValue("vident", u->GetVIdent());
 	query.SetValue("secure", u->IsSecurelyConnected() ? "Y" : "N");
-	query.SetValue("account", u->Account() ? u->Account()->display : "");
+	query.SetValue("account", u->IsIdentified() ? u->Account()->display : "");
 	query.SetValue("fingerprint", u->fingerprint);
 	query.SetValue("signon", u->signon);
 	query.SetValue("server", u->server->GetName());
@@ -175,7 +175,7 @@ void IRC2SQL::OnUserLogin(User *u)
 {
 	query = "UPDATE `" + prefix + "user` SET account=@account@ WHERE nick=@nick@";
 	query.SetValue("nick", u->nick);
-	query.SetValue("account", u->Account() ? u->Account()->display : "");
+	query.SetValue("account", u->IsIdentified() ? u->Account()->display : "");
 	this->RunQuery(query);
 }
 
@@ -232,11 +232,11 @@ void IRC2SQL::OnJoinChannel(User *u, Channel *c)
 	this->RunQuery(query);
 }
 
-EventReturn IRC2SQL::OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param)
+EventReturn IRC2SQL::OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const ModeData &data)
 {
 	if (mode->type == MODE_STATUS)
 	{
-		User *u = User::Find(param);
+		User *u = User::Find(data.value);
 		if (u == NULL)
 			return EVENT_CONTINUE;
 
@@ -310,7 +310,7 @@ void IRC2SQL::OnBotNotice(User *u, BotInfo *bi, Anope::string &message, const An
 		return;
 
 	u->Extend<bool>("CTCPVERSION");
-	auto versionstr = Anope::NormalizeBuffer(message.substr(9, message.length() - 10));
+	auto versionstr = Anope::NormalizeBuffer(ctcpbody);
 	if (versionstr.empty())
 		return;
 

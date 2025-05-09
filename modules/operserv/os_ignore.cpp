@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_ignore.h"
+#include "modules/operserv/ignore.h"
 
 struct IgnoreDataImpl final
 	: IgnoreData
@@ -18,8 +18,6 @@ struct IgnoreDataImpl final
 {
 	IgnoreDataImpl() : Serializable("IgnoreData") { }
 	~IgnoreDataImpl() override;
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 IgnoreDataImpl::~IgnoreDataImpl()
@@ -28,15 +26,27 @@ IgnoreDataImpl::~IgnoreDataImpl()
 		ignore_service->DelIgnore(this);
 }
 
-void IgnoreDataImpl::Serialize(Serialize::Data &data) const
+struct IgnoreDataTypeImpl final
+	: public Serialize::Type
 {
-	data.Store("mask", this->mask);
-	data.Store("creator", this->creator);
-	data.Store("reason", this->reason);
-	data.Store("time", this->time);
+	IgnoreDataTypeImpl()
+		: Serialize::Type("IgnoreData")
+	{
+	}
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+};
+
+void IgnoreDataTypeImpl::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *ign = static_cast<const IgnoreDataImpl *>(obj);
+	data.Store("mask", ign->mask);
+	data.Store("creator", ign->creator);
+	data.Store("reason", ign->reason);
+	data.Store("time", ign->time);
 }
 
-Serializable *IgnoreDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *IgnoreDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	if (!ignore_service)
 		return NULL;
@@ -371,24 +381,29 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to make services ignore a nick or mask\n"
-				"for a certain time or until the next restart. The default\n"
-				"time format is seconds. You can specify it by using units.\n"
-				"Valid units are: \037s\037 for seconds, \037m\037 for minutes,\n"
-				"\037h\037 for hours and \037d\037 for days.\n"
-				"Combinations of these units are not permitted.\n"
-				"To make services permanently ignore the user, type 0 as time.\n"
-				"When adding a \037mask\037, it should be in the format nick!user@host,\n"
-				"everything else will be considered a nick. Wildcards are permitted.\n"
-				" \n"
-				"Ignores will not be enforced on IRC Operators."));
+		source.Reply(_(
+			"Allows Services Operators to make services ignore a nick or mask "
+			"for a certain time or until the next restart. The default "
+			"time format is seconds. You can specify it by using units. "
+			"Valid units are: \037s\037 for seconds, \037m\037 for minutes, "
+			"\037h\037 for hours and \037d\037 for days. "
+			"Combinations of these units are not permitted. "
+			"To make services permanently ignore the user, type 0 as time. "
+			"When adding a \037mask\037, it should be in the format nick!user@host, "
+			"everything else will be considered a nick. Wildcards are permitted."
+			"\n\n"
+			"Ignores will not be enforced on IRC Operators."
+		));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), regexengine.c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your pattern in // if this is desired."
+				),
+				regexengine.c_str());
 		}
 
 		return true;
@@ -398,15 +413,21 @@ public:
 class OSIgnore final
 	: public Module
 {
-	Serialize::Type ignoredata_type;
+	IgnoreDataTypeImpl ignoredata_type;
 	OSIgnoreService osignoreservice;
 	CommandOSIgnore commandosignore;
 
 public:
-	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		ignoredata_type("IgnoreData", IgnoreDataImpl::Unserialize), osignoreservice(this), commandosignore(this)
+	OSIgnore(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, osignoreservice(this)
+		, commandosignore(this)
 	{
+	}
 
+	void Prioritize() override
+	{
+		ModuleManager::SetPriority(this, I_OnBotPrivmsg, PRIORITY_FIRST);
 	}
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) override

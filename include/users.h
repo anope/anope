@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2003-2024 Anope Team <team@anope.org>
+ * (C) 2003-2025 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *
@@ -39,7 +39,7 @@ class CoreExport User
 	static std::list<User *> quitting_users;
 
 public:
-	typedef std::map<Anope::string, Anope::string> ModeList;
+	typedef std::map<Anope::string, ModeData> ModeList;
 protected:
 	Anope::string vident;
 	Anope::string ident;
@@ -50,7 +50,7 @@ protected:
 	Serialize::Reference<NickCore> nc;
 
 	/* # of invalid password attempts */
-	unsigned short invalid_pw_count;
+	unsigned invalid_pw_count;
 	/* Time of last invalid password */
 	time_t invalid_pw_time;
 
@@ -79,6 +79,10 @@ public: // XXX: exposing a tiny bit too much
 	time_t timestamp;
 	/* Is the user as super admin? */
 	bool super_admin;
+	/* The away message of the user */
+	Anope::string awaymsg;
+	/* The time the user went away */
+	time_t awaytime = 0;
 
 	/* Channels the user is in */
 	typedef std::map<Channel *, ChanUserContainer *> ChanUserList;
@@ -190,6 +194,7 @@ public:
 	 * @param ... any number of parameters
 	 */
 	void SendMessage(BotInfo *source, const char *fmt, ...) ATTR_FORMAT(3, 4);
+	void SendMessage(BotInfo *source, int count, const char *singular, const char *plural, ...) ATTR_FORMAT(5, 6);
 	void SendMessage(BotInfo *source, const Anope::string &msg) override;
 	void SendMessage(CommandSource &source, const Anope::string &msg) override;
 
@@ -251,6 +256,12 @@ public:
 	/** Update the last usermask stored for a user. */
 	void UpdateHost();
 
+	/** Update the away state for a user. */
+	void SetAway(const Anope::string &msg = "", time_t ts = 0);
+
+	/** Determines whether this user is away. */
+	auto IsAway() const { return awaymsg.empty(); }
+
 	/** Check if the user has a mode
 	 * @param name Mode name
 	 * @return true or false
@@ -260,9 +271,9 @@ public:
 	/** Set a mode internally on the user, the IRCd is not informed
 	 * @param setter who/what is setting the mode
 	 * @param um The user mode
-	 * @param Param The param, if there is one
+	 * @param data Data about the mode.
 	 */
-	void SetModeInternal(const MessageSource &setter, UserMode *um, const Anope::string &param = "");
+	void SetModeInternal(const MessageSource &setter, UserMode *um, const  ModeData &data = {});
 
 	/** Remove a mode internally on the user, the IRCd is not informed
 	 * @param setter who/what is setting the mode
@@ -273,16 +284,16 @@ public:
 	/** Set a mode on the user
 	 * @param bi The client setting the mode
 	 * @param um The user mode
-	 * @param Param Optional param for the mode
+	 * @param data Data about the mode
 	 */
-	void SetMode(BotInfo *bi, UserMode *um, const Anope::string &param = "");
+	void SetMode(BotInfo *bi, UserMode *um, const ModeData &data = {});
 
 	/** Set a mode on the user
 	 * @param bi The client setting the mode
 	 * @param name The mode name
-	 * @param Param Optional param for the mode
+	 * @param data Data about the mode
 	 */
-	void SetMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "");
+	void SetMode(BotInfo *bi, const Anope::string &name, const ModeData &data = {});
 
 	/** Remove a mode on the user
 	 * @param bi The client setting the mode

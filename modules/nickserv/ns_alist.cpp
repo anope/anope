@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,11 +14,6 @@
 class CommandNSAList final
 	: public Command
 {
-	static bool ChannelSort(ChannelInfo *ci1, ChannelInfo *ci2)
-	{
-		return ci::less()(ci1->name, ci2->name);
-	}
-
 public:
 	CommandNSAList(Module *creator) : Command(creator, "nickserv/alist", 0, 2)
 	{
@@ -50,52 +45,44 @@ public:
 
 		std::deque<ChannelInfo *> queue;
 		nc->GetChannelReferences(queue);
-		std::sort(queue.begin(), queue.end(), ChannelSort);
+		std::sort(queue.begin(), queue.end(), [](auto *lhs, auto *rhs) {
+			return ci::less()(lhs->name, rhs->name);
+		});
 
 		for (auto *ci : queue)
 		{
-			ListFormatter::ListEntry entry;
-
+			Anope::string privstr;
 			if (ci->GetFounder() == nc)
 			{
-				++chan_count;
-				entry["Number"] = Anope::ToString(chan_count);
-				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
-				entry["Access"] = Language::Translate(source.GetAccount(), _("Founder"));
-				entry["Description"] = ci->desc;
-				list.AddEntry(entry);
-				continue;
+				privstr = Language::Translate(source.GetAccount(), _("Founder"));
 			}
-
-			if (ci->GetSuccessor() == nc)
+			else if (ci->GetSuccessor() == nc)
 			{
-				++chan_count;
-				entry["Number"] = Anope::ToString(chan_count);
-				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
-				entry["Access"] = Language::Translate(source.GetAccount(), _("Successor"));
-				entry["Description"] = ci->desc;
-				list.AddEntry(entry);
-				continue;
+				privstr += Language::Translate(source.GetAccount(), _("Successor"));
 			}
 
 			AccessGroup access = ci->AccessFor(nc, false);
-			if (access.empty())
-				continue;
-
-			++chan_count;
-
-			entry["Number"] = Anope::ToString(chan_count);
-			entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
-			for (auto &p : access.paths)
+			if (!access.empty())
 			{
-				// not interested in indirect access
-				if (p.size() != 1)
-					continue;
+				for (auto &p : access.paths)
+				{
+					// not interested in indirect access
+					if (p.size() != 1)
+						continue;
 
-				ChanAccess *a = p[0];
-				entry["Access"] = entry["Access"] + ", " + a->AccessSerialize();
+					ChanAccess *a = p[0];
+					privstr += privstr.empty() ? "" : ", ";
+					privstr += a->AccessSerialize();
+				}
 			}
-			entry["Access"] = entry["Access"].substr(2);
+
+			if (privstr.empty())
+				continue; // No privs for this channel???
+
+			ListFormatter::ListEntry entry;
+			entry["Number"] = Anope::ToString(++chan_count);
+			entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
+			entry["Access"] = privstr;
 			entry["Description"] = ci->desc;
 			list.AddEntry(entry);
 		}
@@ -122,11 +109,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists all channels you have access on.\n"
-				" \n"
-				"Channels that have the \037NOEXPIRE\037 option set will be\n"
-				"prefixed by an exclamation mark. The nickname parameter is\n"
-				"limited to Services Operators"));
+		source.Reply(_(
+			"Lists all channels you have access on."
+			"\n\n"
+			"Channels that have the \037NOEXPIRE\037 option set will be "
+			"prefixed by an exclamation mark. The nickname parameter is "
+			"limited to Services Operators."
+		));
 
 		return true;
 	}

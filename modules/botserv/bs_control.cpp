@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -122,8 +122,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Makes the bot do the equivalent of a \"/me\" command\n"
-				"on the specified channel using the specified text."));
+		source.Reply(_(
+			"Makes the bot do the equivalent of a \"/me\" command "
+			"on the specified channel using the specified text."
+		));
 		return true;
 	}
 };

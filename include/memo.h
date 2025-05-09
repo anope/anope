@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,14 +18,19 @@ class CoreExport Memo final
 	: public Serializable
 {
 public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
 	MemoInfo *mi;
 	bool unread;
 	bool receipt;
 	Memo();
 	~Memo();
-
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	Anope::string owner;
 	/* When it was sent */
@@ -41,7 +46,7 @@ struct CoreExport MemoInfo final
 {
 	int16_t memomax = 0;
 	Serialize::Checker<std::vector<Memo *> > memos;
-	std::vector<Anope::string> ignores;
+	std::set<Anope::string, ci::less> ignores;
 
 	MemoInfo();
 	Memo *GetMemo(unsigned index) const;

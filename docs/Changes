@@ -1,6 +1,109 @@
-Anope Version 2.1.10-git
+Anope Version 2.1.14-git
 ------------------------
-No significant changes.
+Added a detail specifier to the anope.list{Channels,Opers,Servers,Users} RPC methods.
+Added a matcher for the InspIRCd oper extban.
+Added support for hashed operator passwords.
+Added support for hiding the date news was added in os_news.
+Added support for local password comparison to the sql_authentication module.
+Added support for monthly backups to db_json.
+Added support for unbanning virtual modes using cs_unban.
+Added the !unmute fantasy command.
+Added the anope.account and anope.listAccounts RPC methods to the rpc_data module.
+Added the protection time to the INFO output.
+Allowed unprivileged channel successors to remove themselves from succession.
+Bumped the minimum required CMake version to 3.20.
+Changed deletion callbacks to specify the mask that was deleted if only one was.
+Changed nickserv/alist to show all permissions not just the highest ranked one.
+Fixed NEVEROP not being respected in chanserv/set/founder and chanserv/set/successor.
+Fixed stripping IRC formatting codes from messages.
+Messages are now automatically line wrapped to options:linelength.
+Redocumented the ns_sasl module.
+Removed hardcoded command names from several messages.
+Updated the Windows CI to Windows Server 2025 and Visual Studio 2022.
+
+Anope Version 2.1.13
+--------------------
+Added a Config check to ensure users actually want to use the development branch.
+Added a flag to the version string when Anope is compiled in reproducible mode.
+Added a warning on rehash when the max password is longer than the maximum bcrypt password length.
+Added an ALLTIME handler on InspIRCd.
+Added an opt-out for extended XML-RPC types.
+Added RPC messages for sending global messages.
+Added support for importing cs_set_misc and ns_set_misc data from Atheme.
+Added support for importing news from Atheme.
+Added support for oper-only quit messages.
+Added support for the experimental "services cloak" system from the InspIRCd development branch.
+Added support for using defines from the environment.
+Added support for using defines within the value of a variable.
+Blacklisted an old version of an UnrealIRCd module that is known to send malformed S2S messages.
+Changed RPC events to be registered as core services.
+Changed the database to refer to accounts by their account identifier instead of their display nick.
+Changed the syntax of defines from "foo" to "${foo}".
+Deduplicated JSON generation code in the jsonrpc module.
+Fixed a warning when importing an Atheme account that uses external authentication.
+Fixed counting email addresses in ns_maxemail.
+Fixed db_atheme creating duplicate accounts, bots, and nicks when importing over an existing database.
+Fixed deleting old database backups after Anope has been restarted.
+Fixed importing user metadata from Anope 1.8.
+Fixed including a port in uplink messages when connecting to a UNIX socket endpoint.
+Fixed memo ignores being erroneously case sensitive.
+Fixed modules with third-party dependencies writing generic log messages instead of module log messages.
+Fixed not performing SQL database updates in some rare circumstances.
+Fixed sending global messages with the default sender.
+Imported mkauthors from InspIRCd and used it to generate docs/AUTHORS.txt
+Moved around a bunch of module headers.
+Moved database serialization from the serializable to the serializable type.
+Moved the SASL protocol interface to its own service.
+Refactored handling S2S metadata on InspIRCd.
+Updated more messages to use gettext plural forms.
+
+Anope Version 2.1.12
+--------------------
+Added an example JavaScript library for accessing the RPC interface.
+Added an option to require specifying the server name when running destructive network commands like restart or shutdown.
+Added support for importing X-line identifiers from Atheme.
+Added support for JSON-RPC to the RPC interface.
+Added support for killing SASL users that fail to log in repeatedly.
+Added support for more RPC response types to the RPC interface.
+Added support for multiple targets in chanserv/modes.
+Added support for SSL client certificate fallback fingerprints on InspIRCd.
+Added the anope. prefix to the channel and user RPC events and moved them to the rpc_data module.
+Added the anope.listChannels, anope.listServers, anope.listUsers, and anope.server RPC events to the new rpc_data module.
+Added the OPERONLY, UNUSED and VANITY filters to botserv/botlist.
+Added the system.listMethods RPC event to the new rpc_system module.
+Deprecated support for InspIRCd v3 (scheduled to be removed in around a year).
+Fixed enc_bcrypt silently truncating passwords longer than 71 characters.
+Fixed ns_set_language being able to be loaded when Anope was built without language support.
+Fixed sql_authentication not being able to use the IP address of a RPC, SASL, or web user in SQL queries.
+Made modules that use third-party libraries log the version in use on load.
+Redesigned the RPC interface to add support for emitting multiple data types.
+Replaced the opers RPC event with rpc.listOpers and rpc.oper events in the new rpc_data module.
+Updated the Dutch translation.
+
+Anope Version 2.1.11
+--------------------
+Added support for database migrations to the mysql module.
+Added support for renicking users to their UID when enforcing nickname protection.
+Added support for sending channel URLs to joining users.
+Allowed selecting languages using a shorter version of their name.
+Changed various messages to use human-readable durations instead of seconds.
+Improved the creation of expiry and duration messages.
+Improved the translation system with support for plural forms.
+Reworked how guest nicknames are generated.
+Simplified how account identifiers are allocated.
+
+Anope Version 2.1.10
+--------------------
+Added support for NEXTBANS on UnrealIRCd.
+Changed hostmask access entries added by nick to use that nick as the default description.
+Changed modes to be handled internally in their split form.
+Changed ns_cert to notify a user that their certificate is being automatically added to their account.
+Fixed matching users against extended bans.
+Fixed parsing name-only extended bans on InspIRCd.
+Fixed respecting the preferred extended ban format on InspIRCd.
+Fixed the name of the cron script in the docs.
+Updated the list of supported IRCds.
+Updated the location of the Anope IRC channels
 
 Anope Version 2.1.9
 -------------------

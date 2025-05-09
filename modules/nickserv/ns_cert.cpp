@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/ns_cert.h"
+#include "modules/nickserv/cert.h"
 
 static Anope::unordered_map<NickCore *> certmap;
 
@@ -160,7 +160,7 @@ public:
 
 		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
-			if (s->GetSerializableType()->GetName() != "NickCore")
+			if (s->GetSerializableType()->GetName() != NICKCORE_TYPE)
 				return;
 
 			const NickCore *n = anope_dynamic_static_cast<const NickCore *>(e);
@@ -176,7 +176,7 @@ public:
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
-			if (s->GetSerializableType()->GetName() != "NickCore")
+			if (s->GetSerializableType()->GetName() != NICKCORE_TYPE)
 				return;
 
 			NickCore *n = anope_dynamic_static_cast<NickCore *>(e);
@@ -204,7 +204,7 @@ private:
 	void DoAdd(CommandSource &source, NickCore *nc, Anope::string certfp)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
-		unsigned max = Config->GetModule(this->owner)->Get<unsigned>("max", "5");
+		unsigned max = Config->GetModule(this->owner).Get<unsigned>("max", "5");
 
 		if (cl->GetCertCount() >= max)
 		{
@@ -325,7 +325,7 @@ public:
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
-			else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
+			else if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
 			{
 				source.Reply(_("You may view but not modify the certificate list of other Services Operators."));
 				return;
@@ -354,24 +354,29 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Modifies or displays the certificate list for your nick.\n"
-				"If you connect to IRC and provide a client certificate with a\n"
-				"matching fingerprint in the cert list, you will be\n"
-				"automatically identified to services. Services Operators\n"
-				"may provide a nick to modify other users' certificate lists.\n"
-				" \n"));
-		source.Reply(_("Examples:\n"
-				" \n"
-				"    \002CERT ADD\002\n"
+		source.Reply(_(
+				"Modifies or displays the certificate list for your nick. "
+				"If you connect to IRC and provide a client certificate with a "
+				"matching fingerprint in the cert list, you will be "
+				"automatically identified to services. Services Operators "
+				"may provide a nick to modify other users' certificate lists."
+				"\n\n"
+				"Examples:"
+				"\n\n"
+				"    \002%s\032ADD\002\n"
 				"        Adds your current fingerprint to the certificate list and\n"
 				"        automatically identifies you when you connect to IRC\n"
-				"        using this fingerprint.\n"
-				" \n"
-				"    \002CERT DEL <fingerprint>\002\n"
-				"        Removes the fingerprint <fingerprint> from your certificate list.\n"
-				" \n"
-				"    \002CERT LIST\002\n"
-				"        Displays the current certificate list."));
+				"        using this fingerprint."
+				"\n\n"
+				"    \002%s\032DEL\032<fingerprint>\002\n"
+				"        Removes the fingerprint <fingerprint> from your certificate list."
+				"\n\n"
+				"    \002%s\032LIST\002\n"
+				"        Displays the current certificate list."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };
@@ -383,6 +388,23 @@ class NSCert final
 	NSCertListImpl::ExtensibleItem certs;
 	CertServiceImpl cs;
 
+	bool CanLogin(User *u, NickCore *nc)
+	{
+		if (!nc || nc->HasExt("NS_SUSPENDED"))
+			return false; // Account suspended.
+
+		const auto maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
+		if (maxlogins && nc->users.size() >= maxlogins)
+		{
+			auto *nickserv = Config->GetClient("NickServ");
+			u->SendMessage(nickserv, _("Account \002%s\002 has already reached the maximum number of simultaneous logins (%u)."),
+				nc->display.c_str(), maxlogins);
+			return false;
+		}
+
+		return true;
+	}
+
 public:
 	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnscert(this), certs(this, "certificates"), cs(this)
@@ -393,20 +415,12 @@ public:
 
 	void OnFingerprint(User *u) override
 	{
-		BotInfo *NickServ = Config->GetClient("NickServ");
-		if (!NickServ || u->IsIdentified())
+		if (u->IsIdentified())
 			return;
 
 		NickCore *nc = cs.FindAccountFromCert(u->fingerprint);
-		if (!nc || nc->HasExt("NS_SUSPENDED"))
+		if (!CanLogin(u, nc))
 			return;
-
-		unsigned int maxlogins = Config->GetModule("ns_identify")->Get<unsigned int>("maxlogins");
-		if (maxlogins && nc->users.size() >= maxlogins)
-		{
-			u->SendMessage(NickServ, _("Account \002%s\002 has already reached the maximum number of simultaneous logins (%u)."), nc->display.c_str(), maxlogins);
-			return;
-		}
 
 		NickAlias *na = NickAlias::Find(u->nick);
 		if (na && na->nc == nc)
@@ -414,17 +428,21 @@ public:
 		else
 			u->Login(nc);
 
+		auto *NickServ = Config->GetClient("NickServ");
 		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified to \002%s\002."), nc->display.c_str());
 		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->display << " via SSL certificate fingerprint";
 	}
 
 	void OnNickRegister(User *u, NickAlias *na, const Anope::string &pass) override
 	{
-		if (!Config->GetModule(this)->Get<bool>("automatic", "yes") || !u || u->fingerprint.empty())
+		if (!Config->GetModule(this).Get<bool>("automatic", "yes") || !u || u->fingerprint.empty())
 			return;
 
 		auto *cl = certs.Require(na->nc);
 		cl->AddCert(u->fingerprint);
+
+		auto *NickServ = Config->GetClient("NickServ");
+		u->SendMessage(NickServ, _("Your SSL certificate fingerprint \002%s\002 has been automatically added to your certificate list."), u->fingerprint.c_str());
 	}
 
 	EventReturn OnNickValidate(User *u, NickAlias *na) override
@@ -432,17 +450,12 @@ public:
 		NSCertList *cl = certs.Get(na->nc);
 		if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))
 		{
-			BotInfo *NickServ = Config->GetClient("NickServ");
-
-			unsigned int maxlogins = Config->GetModule("ns_identify")->Get<unsigned int>("maxlogins");
-			if (maxlogins && na->nc->users.size() >= maxlogins)
-			{
-				u->SendMessage(NickServ, _("Account \002%s\002 has already reached the maximum number of simultaneous logins (%u)."), na->nc->display.c_str(), maxlogins);
+			if (!CanLogin(u, na->nc))
 				return EVENT_CONTINUE;
-			}
 
 			u->Identify(na);
 
+			auto *NickServ = Config->GetClient("NickServ");
 			u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified."));
 			Log(NickServ) << u->GetMask() << " automatically identified for account " << na->nc->display << " via SSL certificate fingerprint";
 			return EVENT_ALLOW;

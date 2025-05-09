@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2008-2024 Anope Team
+ * (C) 2008-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -25,6 +25,14 @@ class CoreExport AutoKick final
 	: public Serializable
 {
 public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
 	/* Channel this autokick is on */
 	Serialize::Reference<ChannelInfo> ci;
 
@@ -38,8 +46,6 @@ public:
 
 	AutoKick();
 	~AutoKick();
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 };
 
 /* It matters that Base is here before Extensible (it is inherited by Serializable)
@@ -48,9 +54,18 @@ class CoreExport ChannelInfo final
 	: public Serializable
 	, public Extensible
 {
+public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
+private:
 	/* channels who reference this one */
 	Anope::map<int> references;
-private:
 	Serialize::Reference<NickCore> founder;					/* Channel founder */
 	Serialize::Reference<NickCore> successor;                               /* Who gets the channel if the founder nick is dropped or expires */
 	Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
@@ -64,16 +79,16 @@ public:
 	Anope::string name;                       /* Channel name */
 	Anope::string desc;
 
-	time_t time_registered;
+	time_t registered;
 	time_t last_used;
 
 	Anope::string last_topic;                 /* The last topic that was set on this channel */
 	Anope::string last_topic_setter;          /* Setter */
-	time_t last_topic_time;	                  /* Time */
+	time_t last_topic_time = 0;               /* Time */
 
 	Channel::ModeList last_modes;             /* The last modes set on this channel */
 
-	int16_t bantype;
+	int16_t bantype = 2;
 
 	MemoInfo memos;
 
@@ -82,7 +97,7 @@ public:
 	/* For BotServ */
 	Serialize::Reference<BotInfo> bi;         /* Bot used on this channel */
 
-	time_t banexpire;                       /* Time bans expire in */
+	time_t banexpire = 0;                     /* Time bans expire in */
 
 	/** Constructor
 	 * @param chname The channel name
@@ -96,9 +111,6 @@ public:
 
 	~ChannelInfo();
 	ChannelInfo &operator=(const ChannelInfo &) = default;
-
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Change the founder of the channel
 	 * @params nc The new founder

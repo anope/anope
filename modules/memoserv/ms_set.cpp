@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -155,7 +155,7 @@ private:
 				source.Reply(_("You are not permitted to change your memo limit."));
 				return;
 			}
-			int max_memos = Config->GetModule("memoserv")->Get<int>("maxmemos");
+			int max_memos = Config->GetModule("memoserv").Get<int>("maxmemos");
 			limit = Anope::Convert<int16_t>(p1, -1);
 
 			/* The first character is a digit, but we could still go negative
@@ -225,64 +225,79 @@ public:
 		{
 			this->SendSyntax(source);
 			source.Reply(" ");
-			source.Reply(_("Sets various memo options.  \037option\037 can be one of:\n"
-					" \n"
-					"    NOTIFY      Changes when you will be notified about\n"
-					"                   new memos (only for nicknames)\n"
-					"    LIMIT       Sets the maximum number of memos you can\n"
-					"                   receive\n"
-					" \n"
-					"Type \002%s%s HELP %s \037option\037\002 for more information\n"
-					"on a specific option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
+			source.Reply(_("Sets various memo options.  \037option\037 can be one of:"));
+
+			HelpWrapper help;
+			help.AddEntry("NOTIFY", _("Changes when you will be notified about new memos (only for nicknames)"));
+			help.AddEntry("LIMIT",  _("Sets the maximum number of memos you can receive"));
+
+			source.Reply(" ");
+			help.SendTo(source);
+
+			source.Reply(" ");
+			source.Reply(_("Type \002%s\032\037option\037\002 for more information on a specific option."),
+				source.service->GetQueryCommand("generic/help", source.command).c_str());
 		}
 		else if (subcommand.equals_ci("NOTIFY"))
-			source.Reply(_("Syntax: \002NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"
-					" \n"
-					"Changes when you will be notified about new memos:\n"
-					" \n"
-					"    ON      You will be notified of memos when you log on,\n"
-					"               when you unset /AWAY, and when they are sent\n"
-					"               to you.\n"
-					"    LOGON   You will only be notified of memos when you log\n"
-					"               on or when you unset /AWAY.\n"
-					"    NEW     You will only be notified of memos when they\n"
-					"               are sent to you.\n"
-					"    MAIL    You will be notified of memos by email as well as\n"
-					"               any other settings you have.\n"
-					"    NOMAIL  You will not be notified of memos by email.\n"
-					"    OFF     You will not receive any notification of memos.\n"
-					" \n"
-					"\002ON\002 is essentially \002LOGON\002 and \002NEW\002 combined."));
+		{
+			source.Reply(_(
+				"Syntax: \002NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002"
+				"\n\n"
+				"Changes when you will be notified about new memos:"
+			));
+
+			HelpWrapper help;
+			help.AddEntry("ON", _("You will be notified of memos when you log on, when you unset /AWAY, and when they are sent to you."));
+			help.AddEntry("LOGON", _("You will only be notified of memos when you log on or when you unset /AWAY."));
+			help.AddEntry("NEW", _("You will only be notified of memos when they are sent to you."));
+			help.AddEntry("MAIL", _("You will be notified of memos by email as well as any other settings you have."));
+			help.AddEntry("NOMAIL", _("You will not be notified of memos by email."));
+			help.AddEntry("OFF", _("You will not receive any notification of memos."));
+
+			source.Reply(" ");
+			help.SendTo(source);
+
+			source.Reply(" ");
+			source.Reply(_("\002ON\002 is essentially \002LOGON\002 and \002NEW\002 combined."));
+		}
 		else if (subcommand.equals_ci("LIMIT"))
 		{
-			int max_memos = Config->GetModule("memoserv")->Get<int>("maxmemos");
+			int max_memos = Config->GetModule("memoserv").Get<int>("maxmemos");
 			if (source.IsServicesOper())
-				source.Reply(_("Syntax: \002LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]\002\n"
-						" \n"
-						"Sets the maximum number of memos a user or channel is\n"
-						"allowed to have.  Setting the limit to 0 prevents the user\n"
-						"from receiving any memos; setting it to \002NONE\002 allows the\n"
-						"user to receive and keep as many memos as they want.  If\n"
-						"you do not give a nickname or channel, your own limit is\n"
-						"set.\n"
-						" \n"
-						"Adding \002HARD\002 prevents the user from changing the limit.  Not\n"
-						"adding \002HARD\002 has the opposite effect, allowing the user to\n"
-						"change the limit (even if a previous limit was set with\n"
-						"\002HARD\002).\n"
-						" \n"
-						"This use of the \002SET LIMIT\002 command is limited to \002Services\002\n"
-						"\002Operators\002.  Other users may only enter a limit for themselves\n"
-						"or a channel on which they have such privileges, may not\n"
-						"remove their limit, may not set a limit above %d, and may\n"
-						"not set a hard limit."), max_memos);
+			{
+				source.Reply(_(
+						"Syntax: \002LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]\002"
+						"\n\n"
+						"Sets the maximum number of memos a user or channel is "
+						"allowed to have. Setting the limit to 0 prevents the user "
+						"from receiving any memos; setting it to \002NONE\002 allows the "
+						"user to receive and keep as many memos as they want. If "
+						"you do not give a nickname or channel, your own limit is "
+						"set."
+						"\n\n"
+						"Adding \002HARD\002 prevents the user from changing the limit. Not "
+						"adding \002HARD\002 has the opposite effect, allowing the user to "
+						"change the limit (even if a previous limit was set with "
+						"\002HARD\002)."
+						"\n\n"
+						"This use of the \002SET\032LIMIT\002 command is limited to \002Services "
+						"Operators\002. Other users may only enter a limit for themselves "
+						"or a channel on which they have such privileges, may not "
+						"remove their limit, may not set a limit above %d, and may "
+						"not set a hard limit."
+					),
+					max_memos);
+			}
 			else
-				source.Reply(_("Syntax: \002LIMIT [\037channel\037] \037limit\037\002\n"
-									" \n"
-									"Sets the maximum number of memos you (or the given channel)\n"
-									"are allowed to have. If you set this to 0, no one will be\n"
-									"able to send any memos to you.  However, you cannot set\n"
-									"this any higher than %d."), max_memos);
+				source.Reply(_(
+						"Syntax: \002LIMIT [\037channel\037] \037limit\037\002"
+						"\n\n"
+						"Sets the maximum number of memos you (or the given channel) "
+						"are allowed to have. If you set this to 0, no one will be "
+						"able to send any memos to you. However, you cannot set "
+						"this any higher than %d."
+					),
+					max_memos);
 		}
 		else
 			return false;

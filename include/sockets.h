@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -164,15 +164,15 @@ public:
 	 * @param sz How much to read
 	 * @return Number of bytes received
 	 */
-	virtual int Recv(Socket *s, char *buf, size_t sz);
+	virtual ssize_t Recv(Socket *s, char *buf, size_t sz);
 
 	/** Write something to the socket
 	 * @param s The socket
 	 * @param buf The data to write
 	 * @param size The length of the data
 	 */
-	virtual int Send(Socket *s, const char *buf, size_t sz);
-	int Send(Socket *s, const Anope::string &buf);
+	virtual ssize_t Send(Socket *s, const char *buf, size_t sz);
+	ssize_t Send(Socket *s, const Anope::string &buf);
 
 	/** Accept a connection from a socket
 	 * @param s The socket
@@ -503,7 +503,7 @@ public:
 	 * @param sz The size of the buffer
 	 * @return The amount of data read
 	 */
-	int Read(char *data, size_t sz);
+	ssize_t Read(char *data, size_t sz);
 
 	/** Mark the write end of this pipe (non)blocking
 	 * @param state true to enable blocking, false to disable blocking

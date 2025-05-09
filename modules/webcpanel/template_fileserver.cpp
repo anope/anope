@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -86,14 +86,14 @@ TemplateFileServer::TemplateFileServer(const Anope::string &f_n) : file_name(f_n
 {
 }
 
-void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, Replacements &r)
+void TemplateFileServer::Serve(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, Replacements &r)
 {
 	int fd = open((template_base + "/" + this->file_name).c_str(), O_RDONLY);
 	if (fd < 0)
 	{
 		Log(LOG_NORMAL, "httpd") << "Error serving file " << page_name << " (" << (template_base + "/" + this->file_name) << "): " << strerror(errno);
 
-		client->SendError(HTTP_PAGE_NOT_FOUND, "Page not found");
+		client->SendError(HTTP::PAGE_NOT_FOUND, "Page not found");
 		return;
 	}
 
@@ -237,7 +237,7 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 					Anope::string replacement = FindReplacement(r, content.substr(0, f - 1));
 
 					// htmlescape all text replaced onto the page
-					replacement = HTTPUtils::Escape(replacement);
+					replacement = HTTP::Escape(replacement);
 
 					finished += replacement;
 				}

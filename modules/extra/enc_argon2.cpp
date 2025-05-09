@@ -1,6 +1,6 @@
 /* Module for providing Argon2 hashing
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * This program is free but copyrighted software; see the file COPYING for
@@ -154,15 +154,15 @@ public:
 		});
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		const auto *block = Config->GetModule(this);
-		this->defaultprovider      = GetAlgorithm(block->Get<const Anope::string>("algorithm", "argon2id"));
-		Argon2Context::memory_cost = block->Get<uint32_t>("memory_cost", "131072");
-		Argon2Context::time_cost   = block->Get<uint32_t>("time_cost",   "3");
-		Argon2Context::parallelism = block->Get<uint32_t>("parallelism", "1");
-		Argon2Context::hash_length = block->Get<uint32_t>("hash_length", "32");
-		Argon2Context::salt_length = block->Get<uint32_t>("salt_length", "32");
+		const auto &block = Config->GetModule(this);
+		this->defaultprovider      = GetAlgorithm(block.Get<const Anope::string>("algorithm", "argon2id"));
+		Argon2Context::memory_cost = block.Get<uint32_t>("memory_cost", "131072");
+		Argon2Context::time_cost   = block.Get<uint32_t>("time_cost",   "3");
+		Argon2Context::parallelism = block.Get<uint32_t>("parallelism", "1");
+		Argon2Context::hash_length = block.Get<uint32_t>("hash_length", "32");
+		Argon2Context::salt_length = block.Get<uint32_t>("salt_length", "32");
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override

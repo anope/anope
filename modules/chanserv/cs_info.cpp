@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -53,7 +53,7 @@ public:
 		if (!ci->desc.empty())
 			info[_("Description")] = ci->desc;
 
-		info[_("Registered")] = Anope::strftime(ci->time_registered, source.GetAccount());
+		info[_("Registered")] = Anope::strftime(ci->registered, source.GetAccount());
 		info[_("Last used")] = Anope::strftime(ci->last_used, source.GetAccount());
 
 		if (show_all)
@@ -74,12 +74,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists information about the specified registered channel,\n"
-				"including its founder, time of registration, last\n"
-				"time used, and description. If the user issuing the\n"
-				"command has the appropriate access for it, then the\n"
-				"successor, last topic set, settings and expiration\n"
-				"time will also be displayed when applicable."));
+		source.Reply(_(
+			"Lists information about the specified registered channel, "
+			"including its founder, time of registration, last "
+			"time used, and description. If the user issuing the "
+			"command has the appropriate access for it, then the "
+			"successor, last topic set, settings and expiration "
+			"time will also be displayed when applicable."
+		));
 		return true;
 	}
 };

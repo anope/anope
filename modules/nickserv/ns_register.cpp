@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -12,6 +12,8 @@
 #include "module.h"
 
 static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
+
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
 class CommandNSConfirm final
 	: public Command
@@ -54,7 +56,7 @@ public:
 					NickAlias *u_na = NickAlias::Find(u->nick);
 
 					/* Set +r if they're on a nick in the group */
-					if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && u_na && *u_na->nc == *na->nc)
+					if (!Config->GetModule("nickserv").Get<bool>("nonicknameownership") && u_na && *u_na->nc == *na->nc)
 						u->SetMode(source.service, "REGISTERED");
 				}
 			}
@@ -77,7 +79,7 @@ public:
 					if (na)
 					{
 						IRCD->SendLogin(source.GetUser(), na);
-						if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->nc == source.GetAccount() && !na->nc->HasExt("UNCONFIRMED"))
+						if (!Config->GetModule("nickserv").Get<bool>("nonicknameownership") && na->nc == source.GetAccount() && !na->nc->HasExt("UNCONFIRMED"))
 							source.GetUser()->SetMode(source.service, "REGISTERED");
 					}
 				}
@@ -95,17 +97,24 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command is used by several commands as a way to confirm\n"
-				"changes made to your account.\n"
-				" \n"
-				"This is most commonly used to confirm your email address once\n"
-				"you register or change it.\n"
-				" \n"
-				"This is also used after the RESETPASS command has been used to\n"
-				"force identify you to your nick so you may change your password."));
+		source.Reply(_(
+			"This command is used by several commands as a way to confirm "
+			"changes made to your account."
+			"\n\n"
+			"This is most commonly used to confirm your email address once "
+			"you register or change it."
+			"\n\n"
+			"This is also used after the RESETPASS command has been used to "
+			"force identify you to your nick so you may change your password."
+		));
+
 		if (source.HasPriv("nickserv/confirm"))
-			source.Reply(_("Additionally, Services Operators with the \037nickserv/confirm\037 permission can\n"
-				"replace \037passcode\037 with a users nick to force validate them."));
+		{
+			source.Reply(_(
+				"Additionally, Services Operators with the \037nickserv/confirm\037 permission can "
+				"replace \037passcode\037 with a users nick to force validate them."
+			));
+		}
 		return true;
 	}
 
@@ -122,7 +131,7 @@ public:
 	CommandNSRegister(Module *creator) : Command(creator, "nickserv/register", 1, 2)
 	{
 		this->SetDesc(_("Register a nickname"));
-		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+		if (Config->GetModule("nickserv").Get<bool>("forceemail", "yes"))
 			this->SetSyntax(_("\037password\037 \037email\037"));
 		else
 			this->SetSyntax(_("\037password\037 \037[email]\037"));
@@ -133,10 +142,9 @@ public:
 	{
 		User *u = source.GetUser();
 		Anope::string u_nick = source.GetNick();
-		size_t nicklen = u_nick.length();
 		Anope::string pass = params[0];
 		Anope::string email = params.size() > 1 ? params[1] : "";
-		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<const Anope::string>("registration");
+		const Anope::string &nsregister = Config->GetModule(this->owner).Get<const Anope::string>("registration");
 
 		if (Anope::ReadOnly)
 		{
@@ -150,22 +158,17 @@ public:
 			return;
 		}
 
-		time_t nickregdelay = Config->GetModule(this->owner)->Get<time_t>("nickregdelay");
-		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
+		time_t nickregdelay = Config->GetModule(this->owner).Get<time_t>("nickregdelay");
+		time_t reg_delay = Config->GetModule("nickserv").Get<time_t>("regdelay");
 		if (u && !u->HasMode("OPER") && nickregdelay && Anope::CurTime - u->timestamp < nickregdelay)
 		{
-			source.Reply(_("You must have been using this nick for at least %lu seconds to register."),
-				(unsigned long)nickregdelay);
+			auto waitperiod = (u->timestamp + nickregdelay) -  Anope::CurTime;
+			source.Reply(_("You must wait %s before registering your nick."),
+				Anope::Duration(waitperiod, source.GetAccount()).c_str());
 			return;
 		}
 
-		/* Prevent "Guest" nicks from being registered. -TheShadow */
-
-		/* Guest nick can now have a series of between 1 and 7 digits.
-		 *   --lara
-		 */
-		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
-		if (nicklen <= guestnick.length() + 7 && nicklen >= guestnick.length() + 1 && !u_nick.find_ci(guestnick) && u_nick.substr(guestnick.length()).find_first_not_of("1234567890") == Anope::string::npos)
+		if (nickserv && nickserv->IsGuestNick(u_nick))
 		{
 			source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
 			return;
@@ -183,7 +186,7 @@ public:
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
+		if (Config->GetModule("nickserv").Get<bool>("restrictopernicks"))
 		{
 			for (auto *o : Oper::opers)
 			{
@@ -195,15 +198,16 @@ public:
 			}
 		}
 
-		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
-		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
+		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
+		unsigned int maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
 
-		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
+		if (Config->GetModule("nickserv").Get<bool>("forceemail", "yes") && email.empty())
 			this->OnSyntaxError(source, "");
 		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
 		{
-			source.Reply(_("Please wait %lu seconds before using the REGISTER command again."),
-				(unsigned long)(u->lastnickreg + reg_delay) - Anope::CurTime);
+			auto waitperiod = (unsigned long)(u->lastnickreg + reg_delay) - Anope::CurTime;
+			source.Reply(_("Please wait %s before using the REGISTER command again."),
+				Anope::Duration(waitperiod, source.GetAccount()).c_str());
 		}
 		else if (NickAlias::Find(u_nick) != NULL)
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());
@@ -274,42 +278,49 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
+		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Registers your nickname in the %s database. Once\n"
-				"your nick is registered, you can use the \002SET\002 and \002ACCESS\002\n"
-				"commands to configure your nick's settings as you like\n"
-				"them. Make sure you remember the password you use when\n"
-				"registering - you'll need it to make changes to your nick\n"
-				"later. (Note that \002case matters!\002 \037ANOPE\037, \037Anope\037, and\n"
-				"\037anope\037 are all different passwords!)\n"
-				" \n"
-				"Guidelines on choosing passwords:\n"
-				" \n"
-				"Passwords should not be easily guessable. For example,\n"
-				"using your real name as a password is a bad idea. Using\n"
-				"your nickname as a password is a much worse idea ;) and,\n"
-				"in fact, %s will not allow it. Also, short\n"
-				"passwords are vulnerable to trial-and-error searches, so\n"
-				"you should choose a password at least %u characters long.\n"
-				"Finally, the space character cannot be used in passwords."),
-				source.service->nick.c_str(), source.service->nick.c_str(),
-				minpasslen);
+		source.Reply(_(
+				"Registers your nickname in the %s database. Once "
+				"your nick is registered, you can use the \002SET\002 and \002ACCESS\002 "
+				"commands to configure your nick's settings as you like "
+				"them. Make sure you remember the password you use when "
+				"registering - you'll need it to make changes to your nick "
+				"later. (Note that \002case matters!\002 \037ANOPE\037, \037Anope\037, and "
+				"\037anope\037 are all different passwords!) "
+				"\n\n"
+				"Guidelines on choosing passwords:"
+				"\n\n"
+				"Passwords should not be easily guessable. For example, "
+				"using your real name as a password is a bad idea. Using "
+				"your nickname as a password is a much worse idea ;) and, "
+				"in fact, %s will not allow it. Also, short "
+				"passwords are vulnerable to trial-and-error searches, so "
+				"you should choose a password at least %u characters long. "
+				"Finally, the space character cannot be used in passwords."
+			),
+			source.service->nick.c_str(),
+			source.service->nick.c_str(),
+			minpasslen);
 
-		if (!Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+		if (!Config->GetModule("nickserv").Get<bool>("forceemail", "yes"))
 		{
 			source.Reply(" ");
-			source.Reply(_("The \037email\037 parameter is optional and will set the email\n"
-					"for your nick immediately. You may also wish to \002SET HIDE\002 it\n"
-					"after registering if it isn't the default setting already."));
+			source.Reply(_(
+				"The \037email\037 parameter is optional and will set the email "
+				"for your nick immediately. You may also wish to \002SET\032HIDE\002 it "
+				"after registering if it isn't the default setting already."
+			));
 		}
 
 		source.Reply(" ");
-		source.Reply(_("This command also creates a new group for your nickname,\n"
-				"that will allow you to register other nicks later sharing\n"
-				"the same configuration, the same set of memos and the\n"
-				"same channel privileges."));
+		source.Reply(_(
+			"This command also creates a new group for your nickname, "
+			"that will allow you to register other nicks later sharing "
+			"the same configuration, the same set of memos and the "
+			"same channel privileges."
+		));
 		return true;
 	}
 };
@@ -325,7 +336,7 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
+		if (!Config->GetModule(this->owner).Get<const Anope::string>("registration").equals_ci("mail"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -339,7 +350,7 @@ public:
 			source.Reply(_("Your account is already confirmed."));
 		else
 		{
-			if (Anope::CurTime < source.nc->lastmail + Config->GetModule(this->owner)->Get<time_t>("resenddelay"))
+			if (Anope::CurTime < source.nc->lastmail + Config->GetModule(this->owner).Get<time_t>("resenddelay"))
 				source.Reply(_("Cannot send mail now; please retry a little later."));
 			else if (SendRegmail(source.GetUser(), na, source.service))
 			{
@@ -356,7 +367,7 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
+		if (!Config->GetModule(this->owner).Get<const Anope::string>("registration").equals_ci("mail"))
 			return false;
 
 		this->SendSyntax(source);
@@ -365,10 +376,10 @@ public:
 		return true;
 	}
 
-	void OnServHelp(CommandSource &source) override
+	void OnServHelp(CommandSource &source, HelpWrapper &help) override
 	{
-		if (Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
-			Command::OnServHelp(source);
+		if (Config->GetModule(this->owner).Get<const Anope::string>("registration").equals_ci("mail"))
+			Command::OnServHelp(source, help);
 	}
 };
 
@@ -387,7 +398,7 @@ public:
 		commandnsregister(this), commandnsconfirm(this), commandnsrsend(this), unconfirmed(this, "UNCONFIRMED"),
 		passcode(this, "passcode")
 	{
-		if (Config->GetModule(this)->Get<const Anope::string>("registration").equals_ci("disable"))
+		if (Config->GetModule(this).Get<const Anope::string>("registration").equals_ci("disable"))
 			throw ModuleException("Module " + this->name + " will not load with registration disabled.");
 	}
 
@@ -396,16 +407,16 @@ public:
 		BotInfo *NickServ;
 		if (unconfirmed.HasExt(u->Account()) && (NickServ = Config->GetClient("NickServ")))
 		{
-			const Anope::string &nsregister = Config->GetModule(this)->Get<const Anope::string>("registration");
+			const Anope::string &nsregister = Config->GetModule(this).Get<const Anope::string>("registration");
 			if (nsregister.equals_ci("admin"))
 				u->SendMessage(NickServ, _("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
 			else
 				u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."));
 			const NickAlias *this_na = u->AccountNick();
-			time_t time_registered = Anope::CurTime - this_na->time_registered;
-			time_t unconfirmed_expire = Config->GetModule(this)->Get<time_t>("unconfirmedexpire", "1d");
-			if (unconfirmed_expire > time_registered)
-				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s."), Anope::Duration(unconfirmed_expire - time_registered, u->Account()).c_str());
+			time_t registered = Anope::CurTime - this_na->registered;
+			time_t unconfirmed_expire = Config->GetModule(this).Get<time_t>("unconfirmedexpire", "1d");
+			if (unconfirmed_expire > registered)
+				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s."), Anope::Duration(unconfirmed_expire - registered, u->Account()).c_str());
 		}
 	}
 
@@ -413,8 +424,8 @@ public:
 	{
 		if (unconfirmed.HasExt(na->nc))
 		{
-			time_t unconfirmed_expire = Config->GetModule(this)->Get<time_t>("unconfirmedexpire", "1d");
-			if (unconfirmed_expire && Anope::CurTime - na->time_registered >= unconfirmed_expire)
+			time_t unconfirmed_expire = Config->GetModule(this).Get<time_t>("unconfirmedexpire", "1d");
+			if (unconfirmed_expire && Anope::CurTime - na->registered >= unconfirmed_expire)
 				expire = true;
 		}
 	}
@@ -428,19 +439,17 @@ static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi)
 	if (code == NULL)
 	{
 		code = na->nc->Extend<Anope::string>("passcode");
-		*code = Anope::Random(15);
+		*code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
 	}
 
-	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("registration_subject").c_str()),
-		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("registration_message").c_str());
+	Anope::map<Anope::string> vars = {
+		{ "nick",    na->nick                                                                },
+		{ "network", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
+		{ "code",    *code                                                                   },
+	};
 
-	subject = subject.replace_all_cs("%n", na->nick);
-	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
-	subject = subject.replace_all_cs("%c", *code);
-
-	message = message.replace_all_cs("%n", na->nick);
-	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
-	message = message.replace_all_cs("%c", *code);
+	auto subject = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("registration_subject").c_str()), vars);
+	auto message = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("registration_message").c_str()), vars);
 
 	return Mail::Send(u, nc, bi, subject, message);
 }

@@ -2,7 +2,7 @@
 #
 # Configuration script for Anope.
 #
-# Anope (C) 2003-2024 Anope Team
+# Anope (C) 2003-2025 Anope Team
 # Contact us at team@anope.org
 #
 # This program is free but copyrighted software; see the file COPYING for
@@ -114,6 +114,7 @@ while [ $# -ge 1 ] ; do
 		exit 0
 	elif [ $1 = "-devel" ] ; then
 		DEBUG="yes"
+		DEVEL="yes"
 		INSTDIR="$SOURCE_DIR/run"
 	elif [ $1 = "-nocache" ] ; then
 		IGNORE_CACHE="1"
@@ -139,7 +140,7 @@ done
 cmake --version 2>&1 > /dev/null
 if [ $? -ne 0 ] ; then
 	clear
-	echo "Anope requires CMake 3.8 or newer, which can be downloaded at https://cmake.org/ or through your system's package manager."
+	echo "Anope requires CMake 3.20 or newer, which can be downloaded at https://cmake.org/ or through your system's package manager."
 	echo "If you have installed CMake already, ensure it is in your PATH environment variable."
 	exit 0
 fi
@@ -169,6 +170,33 @@ fi
 # Ask the user anything we need to know ahead of time.
 
 export ok INPUT
+
+####
+
+TEMP_YN="n"
+if [ "$DEVEL" = "yes" ] ; then
+	TEMP_YN="y"
+fi
+echo "You are building the 2.1 development branch. This branch is not as well tested"
+echo "as the 2.0 stable branch and may have compatibility breaks without notice. Are"
+echo "you sure you want to use this version?"
+echo -n "[$TEMP_YN] "
+read YN
+if [ "$YN" ] ; then
+	if [ "$YN" = "y" ] ; then
+		DEVEL="yes"
+	else
+		DEVEL="no"
+	fi
+fi
+echo ""
+
+if [ "$DEVEL" != "yes" ] ; then
+	echo "If you are building from Git you can run \`git checkout 2.0\` to get the latest"
+	echo "stable code. Otherwise, you can download the latest 2.0 release tarball from"
+	echo "https://github.com/anope/anope/releases/latest"
+	exit 1
+fi
 
 ####
 
@@ -338,6 +366,7 @@ INSTDIR="$INSTDIR"
 RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
 DEBUG="$DEBUG"
+DEVEL="$DEVEL"
 EXTRA_INCLUDE_DIRS="$EXTRA_INCLUDE_DIRS"
 EXTRA_LIB_DIRS="$EXTRA_LIB_DIRS"
 EXTRA_CONFIG_ARGS="$EXTRA_CONFIG_ARGS"

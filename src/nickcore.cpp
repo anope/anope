@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,15 +15,15 @@
 #include "config.h"
 #include <climits>
 
-Serialize::Checker<nickcore_map> NickCoreList("NickCore");
-nickcoreid_map NickCoreIdList;
+Serialize::Checker<nickcore_map> NickCoreList(NICKCORE_TYPE);
+Serialize::Checker<nickcoreid_map> NickCoreIdList(NICKCORE_TYPE);
 
 NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid)
-	: Serializable("NickCore")
-	, chanaccess("ChannelInfo")
+	: Serializable(NICKCORE_TYPE)
+	, chanaccess(CHANNELINFO_TYPE)
 	, id(coreid)
 	, display(coredisplay)
-	, aliases("NickAlias")
+	, aliases(NICKALIAS_TYPE)
 {
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
@@ -32,7 +32,7 @@ NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid)
 		Log(LOG_DEBUG) << "Duplicate account " << this->display << " in NickCore table";
 
 	// Upgrading users may not have an account identifier.
-	if (this->id && !NickCoreIdList.insert_or_assign(this->id, this).second)
+	if (this->id && !NickCoreIdList->insert_or_assign(this->id, this).second)
 		Log(LOG_DEBUG) << "Duplicate account id " << this->id << " in NickCore table";
 
 	FOREACH_MOD(OnNickCoreCreate, (this));
@@ -56,7 +56,7 @@ NickCore::~NickCore()
 
 	NickCoreList->erase(this->display);
 	if (this->id)
-		NickCoreIdList.erase(this->id);
+		NickCoreIdList->erase(this->id);
 
 	if (!this->memos.memos->empty())
 	{
@@ -66,26 +66,32 @@ NickCore::~NickCore()
 	}
 }
 
-void NickCore::Serialize(Serialize::Data &data) const
+NickCore::Type::Type()
+	: Serialize::Type(NICKCORE_TYPE)
 {
-	data.Store("display", this->display);
-	data.Store("uniqueid", this->id);
-	data.Store("pass", this->pass);
-	data.Store("email", this->email);
-	data.Store("language", this->language);
-	data.Store("lastmail", this->lastmail);
-	data.Store("time_registered", this->time_registered);
-	data.Store("memomax", this->memos.memomax);
+}
+
+void NickCore::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *nc = static_cast<const NickCore *>(obj);
+	data.Store("display", nc->display);
+	data.Store("uniqueid", nc->id);
+	data.Store("pass", nc->pass);
+	data.Store("email", nc->email);
+	data.Store("language", nc->language);
+	data.Store("lastmail", nc->lastmail);
+	data.Store("time_registered", nc->registered);
+	data.Store("memomax", nc->memos.memomax);
 
 	std::ostringstream oss;
-	for (const auto &ignore : this->memos.ignores)
+	for (const auto &ignore : nc->memos.ignores)
 		oss << ignore << " ";
 	data.Store("memoignores", oss.str());
 
-	Extensible::ExtensibleSerialize(this, this, data);
+	Extensible::ExtensibleSerialize(nc, nc, data);
 }
 
-Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	NickCore *nc;
 
@@ -104,7 +110,7 @@ Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["email"] >> nc->email;
 	data["language"] >> nc->language;
 	data["lastmail"] >> nc->lastmail;
-	data["time_registered"] >> nc->time_registered;
+	data["time_registered"] >> nc->registered;
 	data["memomax"] >> nc->memos.memomax;
 	{
 		Anope::string buf;
@@ -112,7 +118,7 @@ Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 		spacesepstream sep(buf);
 		nc->memos.ignores.clear();
 		while (sep.GetToken(buf))
-			nc->memos.ignores.push_back(buf);
+			nc->memos.ignores.insert(buf);
 	}
 
 	Extensible::ExtensibleUnserialize(nc, nc, data);
@@ -146,7 +152,29 @@ Serializable *NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	b = false;
 	data["extensible:KILLPROTECT"] >> b;
 	if (b)
-		nc->Extend<bool>("KILLPROTECT");
+		nc->Extend<bool>("PROTECT");
+
+	b = false;
+	data["KILLPROTECT"] >> b;
+	if (b)
+	{
+		nc->Extend<bool>("PROTECT");
+		nc->Extend("PROTECT_AFTER", Config->GetModule("nickserv").Get<time_t>("kill", "60s"));
+	}
+	b = false;
+	data["KILL_QUICK"] >> b;
+	if (b)
+	{
+		nc->Extend<bool>("PROTECT");
+		nc->Extend("PROTECT_AFTER", Config->GetModule("nickserv").Get<time_t>("killquick", "20s"));
+	}
+	b = false;
+	data["KILL_IMMED"] >> b;
+	if (b)
+	{
+		nc->Extend<bool>("PROTECT");
+		nc->Extend("PROTECT_AFTER", 0);
+	}
 	/* end compat */
 
 	return nc;
@@ -208,29 +236,34 @@ NickCore *NickCore::Find(const Anope::string &nick)
 	return NULL;
 }
 
+NickCore *NickCore::FindId(uint64_t id)
+{
+	auto it = NickCoreIdList->find(id);
+	if (it != NickCoreIdList->end())
+	{
+		it->second->QueueUpdate();
+		return it->second;
+	}
+	return nullptr;
+}
+
 uint64_t NickCore::GetId()
 {
 	if (this->id)
 		return this->id;
 
-	Anope::string secretid = this->display + "\0" + Anope::ToString(this->time_registered);
-
-	// Generate the account id. This should almost always only have one
-	// iteration but in the rare case that we generate a duplicate id we try
-	// again with a new key.
+	// We base the account identifier on the account display at registration and
+	// when the account was first registered. This should be unique enough that
+	// it never collides. In the extremely rare case that it does generate a
+	// duplicate id we try with a new suffix.
+	uint64_t attempt = 0;
 	while (!this->id)
 	{
-		// Generate a random key for SipHash.
-		char key[16];
-		for (auto &chr : key)
-			chr = Anope::RandomNumber() % CHAR_MAX;
-
-		uint64_t newid = Anope::SipHash24(secretid.c_str(), secretid.length(), key);
-		nickcoreid_map::const_iterator it = NickCoreIdList.find(newid);
-		if (it == NickCoreIdList.end())
+		const auto newidstr = this->display + "\0" + Anope::ToString(this->registered) + "\0" + Anope::ToString(attempt++);
+		const auto newid = Anope::hash_cs()(newidstr);
+		if (NickCoreIdList->emplace(newid, this).second)
 		{
 			this->id = newid;
-			NickCoreIdList[this->id] = this;
 			this->QueueUpdate();
 			break;
 		}

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -25,10 +25,10 @@ IRCDProto *IRCD = NULL;
 IRCDProto::IRCDProto(Module *creator, const Anope::string &p)
 	: Service(creator, "IRCDProto", creator->name)
 	, proto_name(p)
-	, MaxChannel(Config->GetBlock("networkinfo")->Get<unsigned>("chanlen", "32"))
-	, MaxHost(Config->GetBlock("networkinfo")->Get<unsigned>("hostlen", "64"))
-	, MaxNick(Config->GetBlock("networkinfo")->Get<unsigned>("nicklen", "31"))
-	, MaxUser(Config->GetBlock("networkinfo")->Get<unsigned>("userlen", "10"))
+	, MaxChannel(Config->GetBlock("networkinfo").Get<unsigned>("chanlen", "32"))
+	, MaxHost(Config->GetBlock("networkinfo").Get<unsigned>("hostlen", "64"))
+	, MaxNick(Config->GetBlock("networkinfo").Get<unsigned>("nicklen", "31"))
+	, MaxUser(Config->GetBlock("networkinfo").Get<unsigned>("userlen", "10"))
 {
 	if (IRCD == NULL)
 		IRCD = this;
@@ -76,7 +76,7 @@ Anope::string IRCDProto::SID_Retrieve()
 	if (!IRCD || !IRCD->RequiresID)
 		return "";
 
-	static Anope::string current_sid = Config->GetBlock("serverinfo")->Get<const Anope::string>("id");
+	static Anope::string current_sid = Config->GetBlock("serverinfo").Get<const Anope::string>("id");
 	if (current_sid.empty())
 		current_sid = "00A";
 
@@ -113,11 +113,72 @@ void IRCDProto::SendSVSKill(const MessageSource &source, User *user, const Anope
 	Uplink::Send(source, "KILL", user->GetUID(), buf);
 }
 
+static auto BuildModeChange(const ModeManager::Change &change)
+{
+	std::list<std::pair<Anope::string, std::vector<Anope::string>>> modes;
+
+	Anope::string modebuf;
+	size_t modecount = 0;
+	std::vector<Anope::string> parambuf;
+	size_t paramlen = 0;
+
+	auto adding = true;
+	for (const auto &[mode, info] : change)
+	{
+		const auto reached_max_line = IRCD->MaxLine && modebuf.length() + paramlen > IRCD->MaxLine - 100; // Leave room for command, channel, etc
+		const auto reached_max_modes = IRCD->MaxModes && ++modecount > IRCD->MaxModes;
+		if (reached_max_modes || reached_max_line)
+		{
+			modes.push_back({modebuf, parambuf});
+
+			modebuf.clear();
+			modecount = 0;
+
+			parambuf.clear();
+			paramlen = 0;
+		}
+
+		// Push the mode.
+		const auto direction = info.first;
+		if (modebuf.empty() || adding != direction)
+		{
+			adding = direction;
+			modebuf += (adding ? '+' : '-');
+		}
+		modebuf += mode->mchar;
+
+		// If it has a value push that too.
+		const auto &data = info.second;
+		if (!data.value.empty())
+		{
+			parambuf.push_back(data.value);
+			paramlen += data.value.length() + 1;
+		}
+	}
+
+	if (!modebuf.empty())
+		modes.push_back({modebuf, parambuf});
+
+	return modes;
+}
+
+void IRCDProto::SendMode(const MessageSource &source, Channel *chan, const ModeManager::Change &change)
+{
+	for (const auto &[modes, params] : BuildModeChange(change))
+		IRCD->SendModeInternal(source, chan, modes, params);
+}
+
 void IRCDProto::SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values)
 {
 	auto params = values;
 	params.insert(params.begin(), { chan->name, modes });
 	Uplink::SendInternal({}, source, "MODE", params);
+}
+
+void IRCDProto::SendMode(const MessageSource &source, User *dest, const ModeManager::Change &change)
+{
+	for (const auto &[modes, params] : BuildModeChange(change))
+		IRCD->SendModeInternal(source, dest, modes, params);
 }
 
 void IRCDProto::SendModeInternal(const MessageSource &source, User *dest, const Anope::string &modes, const std::vector<Anope::string> &values)
@@ -151,7 +212,7 @@ void IRCDProto::SendTagmsg(const MessageSource &source, const Anope::string &des
 		Uplink::Send(tags, source, "TAGMSG", dest);
 }
 
-void IRCDProto::SendQuit(User *u, const Anope::string &buf)
+void IRCDProto::SendQuit(User *u, const Anope::string &buf, const Anope::string &operbuf)
 {
 	if (!buf.empty())
 		Uplink::Send(u, "QUIT", buf);
@@ -289,8 +350,8 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 	if (host.empty() || host.length() > IRCD->MaxHost)
 		return false;
 
-	const Anope::string &vhostdisablebe = Config->GetBlock("networkinfo")->Get<const Anope::string>("disallow_start_or_end"),
-		vhostchars = Config->GetBlock("networkinfo")->Get<const Anope::string>("vhost_chars");
+	const Anope::string &vhostdisablebe = Config->GetBlock("networkinfo").Get<const Anope::string>("disallow_start_or_end"),
+		vhostchars = Config->GetBlock("networkinfo").Get<const Anope::string>("vhost_chars");
 
 	if (vhostdisablebe.find_first_of(host[0]) != Anope::string::npos)
 		return false;
@@ -306,7 +367,7 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 			return false;
 	}
 
-	return dots > 0 || Config->GetBlock("networkinfo")->Get<bool>("allow_undotted_vhosts");
+	return dots > 0 || Config->GetBlock("networkinfo").Get<bool>("allow_undotted_vhosts");
 }
 
 void IRCDProto::SendOper(User *u)
@@ -317,7 +378,7 @@ void IRCDProto::SendOper(User *u)
 
 size_t IRCDProto::GetMaxListFor(Channel *c, ChannelMode *cm)
 {
-	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<size_t>("modelistsize", "100");
+	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo").Get<size_t>("modelistsize", "100");
 }
 
 Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)

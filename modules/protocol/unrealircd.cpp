@@ -1,6 +1,6 @@
 /* UnrealIRCd functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,8 +10,8 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
-#include "modules/sasl.h"
+#include "modules/chanserv/mode.h"
+#include "modules/nickserv/sasl.h"
 
 typedef Anope::map<Anope::string> ModData;
 
@@ -22,17 +22,11 @@ namespace
 	bool IsExtBan(const Anope::string &str, Anope::string &name, Anope::string &value)
 	{
 		if (str[0] != '~')
-		{
-			Log() << "missing prefix: " << str;
 			return false;
-		}
 
 		auto endpos = str.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", 1);
 		if (endpos == Anope::string::npos || str[endpos] != ':' || endpos+1 == str.length())
-		{
-			Log() << "wrong format: " << str;
 			return false;
-		}
 
 		name = str.substr(1, endpos - 1);
 		value = str.substr(endpos + 1);
@@ -42,6 +36,7 @@ namespace
 
 class UnrealIRCdProto final
 	: public IRCDProto
+	, public SASL::ProtocolInterface
 {
 public:
 	PrimitiveExtensibleItem<ModData> ClientModData;
@@ -49,6 +44,7 @@ public:
 
 	UnrealIRCdProto(Module *creator)
 		: IRCDProto(creator, "UnrealIRCd 6+")
+		, SASL::ProtocolInterface(creator)
 		, ClientModData(creator, "ClientModData")
 		, ChannelModData(creator, "ChannelModData")
 	{
@@ -63,7 +59,7 @@ public:
 		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanSVSHold = true;
-		CanClearBans = true;
+		CanClearModes.insert("BAN");
 		CanCertFP = true;
 		CanTagMessage = true;
 		RequiresID = true;
@@ -168,7 +164,7 @@ private:
 		auto params = values;
 		params.insert(params.begin(), { u->GetUID(), modes });
 		Uplink::SendInternal({}, source, "SVS2MODE", params);
-}
+	}
 
 	void SendClientIntroduction(User *u) override
 	{
@@ -187,7 +183,7 @@ private:
 	/* JOIN */
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), user->GetUID());
+		Uplink::Send("SJOIN", c->created, c->name, "+" + c->GetModes(true, true), user->GetUID());
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -250,9 +246,10 @@ private:
 		// MLOCK: enable receiving the MLOCK message when a mode lock changes.
 		// MTAGS: enable receiving IRCv3 message tags.
 		// NEXTBANS: enables receiving named extended bans.
+		// SJSBY: enables receiving list mode setters and set timestamps.
 		// SID: communicates the unique identifier of the local server.
 		// VHP: enable receiving the vhost in UID.
-		Uplink::Send("PROTOCTL", "BIGLINES", "MLOCK", "MTAGS", "NEXTBANS", "VHP");
+		Uplink::Send("PROTOCTL", "BIGLINES", "MLOCK", "MTAGS", "NEXTBANS", "SJSBY", "VHP");
 		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
 		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
 
@@ -377,17 +374,17 @@ private:
 	void SendLogin(User *u, NickAlias *na) override
 	{
 		if (!na->nc->HasExt("UNCONFIRMED"))
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", na->nc->display);
+			Uplink::Send(Config->GetClient("NickServ"), "SVSLOGIN", '*', u->GetUID(), na->nc->display);
 	}
 
 	void SendLogout(User *u) override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", 0);
+		Uplink::Send(Config->GetClient("NickServ"), "SVSLOGIN", '*', u->GetUID(), "0");
 	}
 
 	void SendChannel(Channel *c) override
 	{
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), "");
+		Uplink::Send("SJOIN", c->created, c->name, "+" + c->GetModes(true, true), "");
 	}
 
 	void SendSASLMessage(const SASL::Message &message) override
@@ -407,10 +404,9 @@ private:
 			distmask = message.target.substr(0, p);
 		}
 
-		if (message.ext.empty())
-			Uplink::Send(BotInfo::Find(message.source), "SASL", distmask, message.target, message.type, message.data);
-		else
-			Uplink::Send(BotInfo::Find(message.source), "SASL", distmask, message.target, message.type, message.data, message.ext);
+		auto newparams = message.data;
+		newparams.insert(newparams.begin(), { distmask, message.target, message.type });
+		Uplink::SendInternal({}, BotInfo::Find(message.source), "SASL", newparams);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
@@ -461,9 +457,13 @@ private:
 		return true;
 	}
 
-	void SendClearBans(const MessageSource &user, Channel *c, User* u) override
+	void SendClearModes(const MessageSource &user, Channel *c, User* u, const Anope::string &mode) override
 	{
-		Uplink::Send(user, "SVS2MODE", c->name, "-b", u->GetUID());
+		auto *cm = ModeManager::FindChannelModeByName(mode);
+		if (!cm || !cm->mchar)
+			return;
+
+		Uplink::Send(user, "SVS2MODE", c->name, Anope::printf("-%c", cm->mchar), u->GetUID());
 	}
 
 	bool IsTagValid(const Anope::string &tname, const Anope::string &tvalue) override
@@ -561,7 +561,7 @@ namespace UnrealExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			return Entry(this->name, e->GetMask()).Matches(u);
+			return Entry(this->base, e->GetMask()).Matches(u);
 		}
 	};
 
@@ -594,7 +594,7 @@ namespace UnrealExtBan
 			if (e->GetMask() == "0" && !u->Account()) /* ~a:0 is special and matches all unauthenticated users */
 				return true;
 
-			return u->Account() && Anope::Match(u->Account()->display, e->GetMask());
+			return u->IsIdentified() && Anope::Match(u->Account()->display, e->GetMask());
 		}
 	};
 
@@ -1169,7 +1169,7 @@ struct IRCDMessageMode final
 			auto ts = final_is_ts ? IRCD->ExtractTimestamp(params.back()) : 0;
 
 			if (c)
-				c->SetModesInternal(source, params[2], { params.begin() + 3, last_param }, ts);
+				c->SetModesInternal(source, params[1], { params.begin() + 2, last_param }, ts);
 		}
 		else
 		{
@@ -1306,17 +1306,15 @@ struct IRCDMessageSASL final
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		if (!SASL::sasl)
+		if (!SASL::service)
 			return;
 
 		SASL::Message m;
 		m.source = params[1];
 		m.target = params[0];
 		m.type = params[2];
-		m.data = params[3];
-		m.ext = params.size() > 4 ? params[4] : "";
-
-		SASL::sasl->ProcessMessage(m);
+		m.data.assign(params.begin() + 3, params.end());
+		SASL::service->ProcessMessage(m);
 	}
 };
 
@@ -1438,30 +1436,41 @@ struct IRCDMessageSJoin final
 			modeparams = { params.begin() + 3, params.end() };
 		}
 
-		std::list<Anope::string> bans, excepts, invites;
+		std::list<ModeData> bans, excepts, invites;
 		std::list<Message::Join::SJoinUser> users;
 
 		spacesepstream sep(params[params.size() - 1]);
 		Anope::string buf;
 		while (sep.GetToken(buf))
 		{
-			/* Ban */
-			if (buf[0] == '&')
+			// <1746314826,stest!stest@Clk-E0732081>&foo!bar@baz
+
+			if (buf[0] == '<')
 			{
-				buf.erase(buf.begin());
-				bans.push_back(buf);
-			}
-			/* Except */
-			else if (buf[0] == '"')
-			{
-				buf.erase(buf.begin());
-				excepts.push_back(buf);
-			}
-			/* Invex */
-			else if (buf[0] == '\'')
-			{
-				buf.erase(buf.begin());
-				invites.push_back(buf);
+				auto csep = buf.find(',', 1);
+				if (csep == std::string::npos)
+					continue; // Malformed.
+
+				auto gtsep = buf.find('>', csep + 1);
+				if (gtsep == std::string::npos)
+					continue; // Malformed.
+
+				ModeData data;
+				data.set_at = Anope::Convert(buf.substr(1, csep - 1), 0);
+				data.set_by = buf.substr(csep + 1, gtsep - csep - 1);
+
+				std::list<ModeData> *list;
+				if (buf[gtsep + 1] == '&')
+					list = &bans;
+				else if (buf[gtsep + 1] == '"')
+					list = &excepts;
+				else if (buf[gtsep + 1] == '\'')
+					list = &invites;
+				else
+					continue;
+
+				data.value = buf.substr(gtsep + 2);
+				list->push_back(data);
 			}
 			else
 			{
@@ -1492,7 +1501,7 @@ struct IRCDMessageSJoin final
 		{
 			Channel *c = Channel::Find(params[1]);
 
-			if (!c || c->creation_time != ts)
+			if (!c || c->created != ts)
 				return;
 
 			ChannelMode *ban = ModeManager::FindChannelModeByName("BAN"),
@@ -1513,6 +1522,38 @@ struct IRCDMessageSJoin final
 			{
 				for (const auto &entry : invites)
 					c->SetModeInternal(source, invex, entry);
+			}
+		}
+	}
+};
+
+class IRCDMessageSMod final
+	: IRCDMessage
+{
+public:
+	IRCDMessageSMod(Module *creator)
+		: IRCDMessage(creator, "SMOD", 1)
+	{
+		SetFlag(FLAG_REQUIRE_SERVER); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		spacesepstream modules(params[0]);
+		for (Anope::string module; modules.GetToken(module); )
+		{
+			sepstream modinfo(module, ':');
+			if (!modinfo.GetToken(module) || !modinfo.GetToken(module))
+				continue; // Malformed token.
+
+			if (module.equals_ci("third/helpop"))
+			{
+				// Before version 1.5 this module sent malformed MODE messages
+				// that would break Anope and result in mysterious errors from
+				// ExtractTimestamp.
+				//
+				// https://github.com/unrealircd/unrealircd-contrib/pull/125
+				if (modinfo.GetToken(module) && Anope::Convert(module, 9.9) < 1.5)
+					throw ProtocolException("UnrealIRCd contrib module third/helpop version 1.4 or older is known to break Anope. Please unload or upgrade it.");
 			}
 		}
 	}
@@ -1678,6 +1719,9 @@ class ProtoUnreal final
 	Message::Version message_version;
 	Message::Whois message_whois;
 
+	/* Ignored message handlers. */
+	Message::Ignore message_slog;
+
 	/* Our message handlers */
 	IRCDMessageCapab message_capab;
 	IRCDMessageChgHost message_chghost;
@@ -1696,6 +1740,7 @@ class ProtoUnreal final
 	IRCDMessageServer message_server;
 	IRCDMessageSID message_sid;
 	IRCDMessageSJoin message_sjoin;
+	IRCDMessageSMod message_smod;
 	IRCDMessageSVSLogin message_svslogin;
 	IRCDMessageTopic message_topic;
 	IRCDMessageUID message_uid;
@@ -1723,6 +1768,7 @@ public:
 		, message_time(this)
 		, message_version(this)
 		, message_whois(this)
+		, message_slog(this, "SLOG")
 		, message_capab(this)
 		, message_chghost(this)
 		, message_chgident(this)
@@ -1742,6 +1788,7 @@ public:
 		, message_server(this)
 		, message_sid(this)
 		, message_sjoin(this)
+		, message_smod(this)
 		, message_svslogin(this)
 		, message_topic(this)
 		, message_uid(this)
@@ -1768,7 +1815,7 @@ public:
 		if (Servers::Capab.count("MLOCK") > 0 && modelocks)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-			Uplink::Send("MLOCK", c->creation_time, c->ci->name, modes);
+			Uplink::Send("MLOCK", c->created, c->ci->name, modes);
 		}
 	}
 
@@ -1778,14 +1825,14 @@ public:
 		if (!ci->c || !modelocks || !Servers::Capab.count("MLOCK"))
 			return;
 		Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-		Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
+		Uplink::Send("MLOCK", ci->c->created, ci->name, modes);
 	}
 
 	void OnDelChan(ChannelInfo *ci) override
 	{
 		if (!ci->c || !Servers::Capab.count("MLOCK"))
 			return;
-		Uplink::Send("MLOCK", ci->c->creation_time, ci->name, "");
+		Uplink::Send("MLOCK", ci->c->created, ci->name, "");
 	}
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
@@ -1795,7 +1842,7 @@ public:
 		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -1808,7 +1855,7 @@ public:
 		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, modes);
 		}
 
 		return EVENT_CONTINUE;

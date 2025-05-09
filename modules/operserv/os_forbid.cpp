@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_forbid.h"
+#include "modules/operserv/forbid.h"
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
@@ -19,21 +19,32 @@ struct ForbidDataImpl final
 	, Serializable
 {
 	ForbidDataImpl() : Serializable("ForbidData") { }
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-void ForbidDataImpl::Serialize(Serialize::Data &data) const
+struct ForbidDataTypeImpl final
+	: Serialize::Type
 {
-	data.Store("mask", this->mask);
-	data.Store("creator", this->creator);
-	data.Store("reason", this->reason);
-	data.Store("created", this->created);
-	data.Store("expires", this->expires);
-	data.Store("type", this->type);
+	ForbidDataTypeImpl()
+		: Serialize::Type("ForbidData")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+};
+
+void ForbidDataTypeImpl::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *fb = static_cast<const ForbidDataImpl *>(obj);
+	data.Store("mask", fb->mask);
+	data.Store("creator", fb->creator);
+	data.Store("reason", fb->reason);
+	data.Store("created", fb->created);
+	data.Store("expires", fb->expires);
+	data.Store("type", fb->type);
 }
 
-Serializable *ForbidDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ForbidDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	if (!forbid_service)
 		return NULL;
@@ -239,7 +250,7 @@ public:
 			}
 
 			NickAlias *target = NickAlias::Find(entry);
-			if (target != NULL && Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && target->nc->IsServicesOper())
+			if (target != NULL && Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && target->nc->IsServicesOper())
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -292,7 +303,7 @@ public:
 						delete na;
 					}
 
-					source.Reply(_("\002%d\002 nickname(s) dropped."), na_matches);
+					source.Reply(na_matches, N_("\002%d\002 nickname dropped.", "\002%d\002 nicknames dropped."), na_matches);
 					break;
 				}
 				case FT_CHAN:
@@ -312,7 +323,7 @@ public:
 						BotInfo *OperServ = Config->GetClient("OperServ");
 						if (IRCD->CanSQLineChannel && OperServ)
 						{
-							time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "1m");
+							time_t inhabit = Config->GetModule("chanserv").Get<time_t>("inhabit", "1m");
 							XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
 							IRCD->SendSQLine(NULL, &x);
 						}
@@ -446,15 +457,20 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Forbid allows you to forbid usage of certain nicknames, channels,\n"
-				"and email addresses. Wildcards are accepted for all entries."));
+		source.Reply(_(
+			"Forbid allows you to forbid usage of certain nicknames, channels, "
+			"and email addresses. Wildcards are accepted for all entries."
+		));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), regexengine.c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your pattern in // if this is desired."
+				),
+				regexengine.c_str());
 		}
 
 		return true;
@@ -465,14 +481,15 @@ class OSForbid final
 	: public Module
 {
 	MyForbidService forbidService;
-	Serialize::Type forbiddata_type;
+	ForbidDataTypeImpl forbiddata_type;
 	CommandOSForbid commandosforbid;
 
 public:
-	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		forbidService(this), forbiddata_type("ForbidData", ForbidDataImpl::Unserialize), commandosforbid(this)
+	OSForbid(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, forbidService(this)
+		, commandosforbid(this)
 	{
-
 	}
 
 	void OnUserConnect(User *u, bool &exempt) override
@@ -513,7 +530,7 @@ public:
 			ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 			if (IRCD->CanSQLineChannel)
 			{
-				time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "1m");
+				time_t inhabit = Config->GetModule("chanserv").Get<time_t>("inhabit", "1m");
 				XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
 				IRCD->SendSQLine(NULL, &x);
 			}

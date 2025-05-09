@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -51,13 +51,13 @@ public:
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
+		if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
 		{
 			source.Reply(_("You may not drop other Services Operators' nicknames."));
 			return;
 		}
 
-		if (na->nc->na == na && na->nc->aliases->size() > 1 && Config->GetModule("nickserv")->Get<bool>("preservedisplay") && !source.HasPriv("nickserv/drop/display"))
+		if (na->nc->na == na && na->nc->aliases->size() > 1 && Config->GetModule("nickserv").Get<bool>("preservedisplay") && !source.HasPriv("nickserv/drop/display"))
 		{
 			source.Reply(_("You may not drop \002%s\002 as it is the display nick for the account."), na->nick.c_str());
 			return;
@@ -69,11 +69,11 @@ public:
 			if (!code)
 			{
 				code = na->Extend<Anope::string>("nickname-dropcode");
-				*code = Anope::Random(15);
+				*code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
 			}
 
-			source.Reply(CONFIRM_DROP, na->nick.c_str(), Config->StrictPrivmsg.c_str(),
-				source.service->nick.c_str(), na->nick.c_str(), code->c_str());
+			source.Reply(CONFIRM_DROP, na->nick.c_str(), source.service->GetQueryCommand("nickserv/drop").c_str(),
+				na->nick.c_str(), code->c_str());
 			return;
 		}
 
@@ -89,10 +89,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Drops the given nick from the database. Once your nickname\n"
-				"is dropped you may lose all of your access and channels that\n"
-				"you may own. Any other user will be able to gain control of\n"
-				"this nick."));
+		source.Reply(_(
+			"Drops the given nick from the database. Once your nickname "
+			"is dropped you may lose all of your access and channels that "
+			"you may own. Any other user will be able to gain control of "
+			"this nick."
+		));
 
 		source.Reply(" ");
 		if (!source.HasPriv("nickserv/drop"))
@@ -102,8 +104,12 @@ public:
 
 		source.Reply(" ");
 		if (source.HasPriv("nickserv/drop/override"))
-			source.Reply(_("Additionally, Services Operators with the \037nickserv/drop/override\037 permission can\n"
-				"replace \037code\037 with \002OVERRIDE\002 to drop without a confirmation code."));
+		{
+			source.Reply(_(
+				"Additionally, Services Operators with the \037nickserv/drop/override\037 permission can "
+				"replace \037code\037 with \002OVERRIDE\002 to drop without a confirmation code."
+			));
+		}
 		return true;
 	}
 };

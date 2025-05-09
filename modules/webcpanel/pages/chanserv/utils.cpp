@@ -1,19 +1,11 @@
 /*
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
 #include "../../webcpanel.h"
-
-namespace
-{
-	bool ChannelSort(ChannelInfo *ci1, ChannelInfo *ci2)
-	{
-		return ci::less()(ci1->name, ci2->name);
-	}
-}
 
 namespace WebCPanel
 {
@@ -25,7 +17,9 @@ void BuildChanList(NickAlias *na, TemplateFileServer::Replacements &replacements
 {
 	std::deque<ChannelInfo *> queue;
 	na->nc->GetChannelReferences(queue);
-	std::sort(queue.begin(), queue.end(), ChannelSort);
+	std::sort(queue.begin(), queue.end(), [](auto *lhs, auto *rhs) {
+		return ci::less()(lhs->name, rhs->name);
+	});
 
 	for (auto *ci : queue)
 	{
@@ -33,7 +27,7 @@ void BuildChanList(NickAlias *na, TemplateFileServer::Replacements &replacements
 			continue;
 
 		replacements["CHANNEL_NAMES"] = ci->name;
-		replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
+		replacements["ESCAPED_CHANNEL_NAMES"] = HTTP::URLEncode(ci->name);
 	}
 }
 

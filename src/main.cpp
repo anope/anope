@@ -1,6 +1,6 @@
 /* Anope -- main source file.
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -162,13 +162,13 @@ int main(int ac, char **av, char **envp)
 	}
 	catch (const SocketException &ex)
 	{
-		Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << "): " << ex.GetReason();
+		Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].str() << "): " << ex.GetReason();
 	}
 
 	/* Set up timers */
 	time_t last_check = Anope::CurTime;
-	UpdateTimer updateTimer(Config->GetBlock("options")->Get<time_t>("updatetimeout", "2m"));
-	ExpireTimer expireTimer(Config->GetBlock("options")->Get<time_t>("expiretimeout", "30m"));
+	UpdateTimer updateTimer(Config->GetBlock("options").Get<time_t>("updatetimeout", "2m"));
+	ExpireTimer expireTimer(Config->GetBlock("options").Get<time_t>("expiretimeout", "30m"));
 
 	/*** Main loop. ***/
 	while (!Anope::Quitting)
@@ -217,11 +217,13 @@ int main(int ac, char **av, char **envp)
 
 	if (Anope::Restarting)
 	{
-		chdir(BinaryDir.c_str());
-		Anope::string sbin = "./" + Anope::ServicesBin;
-		av[0] = const_cast<char *>(sbin.c_str());
-		execve(Anope::ServicesBin.c_str(), av, envp);
-		Log() << "Restart failed";
+		if (chdir(BinaryDir.c_str()) == 0)
+		{
+			Anope::string sbin = "./" + Anope::ServicesBin;
+			av[0] = const_cast<char *>(sbin.c_str());
+			execve(Anope::ServicesBin.c_str(), av, envp);
+		}
+		Log() << "Restart failed: " << strerror(errno);
 		Anope::ReturnValue = -1;
 	}
 

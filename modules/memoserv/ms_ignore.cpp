@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -51,29 +51,21 @@ public:
 			source.Reply(ACCESS_DENIED);
 		else if (command.equals_ci("ADD") && !param.empty())
 		{
-			if (mi->ignores.size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "50"))
+			if (mi->ignores.size() >= Config->GetModule(this->owner).Get<unsigned>("max", "50"))
 			{
 				source.Reply(_("Sorry, the memo ignore list for \002%s\002 is full."), channel.c_str());
 				return;
 			}
 
-			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
-			{
-				mi->ignores.emplace_back(param.ci_str());
+			if (mi->ignores.insert(param).second)
 				source.Reply(_("\002%s\002 added to ignore list."), param.c_str());
-			}
 			else
 				source.Reply(_("\002%s\002 is already on the ignore list."), param.c_str());
 		}
 		else if (command.equals_ci("DEL") && !param.empty())
 		{
-			std::vector<Anope::string>::iterator it = std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str());
-
-			if (it != mi->ignores.end())
-			{
-				mi->ignores.erase(it);
+			if (mi->ignores.erase(param))
 				source.Reply(_("\002%s\002 removed from the ignore list."), param.c_str());
-			}
 			else
 				source.Reply(_("\002%s\002 is not on the ignore list."), param.c_str());
 		}
@@ -92,7 +84,7 @@ public:
 					list.AddEntry(entry);
 				}
 
-				source.Reply(_("Ignore list:"));
+				source.Reply(_("Memo ignore list:"));
 
 				std::vector<Anope::string> replies;
 				list.Process(replies);
@@ -111,10 +103,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to ignore users by nick or host from memoing\n"
-					"you or a channel. If someone on the memo ignore list tries\n"
-					"to memo you or a channel, they will not be told that you have\n"
-					"them ignored."));
+		source.Reply(_(
+			"Allows you to ignore users by nick or host from memoing "
+			"you or a channel. If someone on the memo ignore list tries "
+			"to memo you or a channel, they will not be told that you have "
+			"them ignored."
+		));
 		return true;
 	}
 };

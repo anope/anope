@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_session.h"
+#include "modules/operserv/session.h"
 
 struct Stats final
 	: Serializable
@@ -21,18 +21,27 @@ struct Stats final
 	{
 		me = this;
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct StatsType final
+	: Serialize::Type
+{
+	StatsType()
+		: Serialize::Type("Stats")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
 	{
 		data.Store("maxusercnt", MaxUserCount);
 		data.Store("maxusertime", MaxUserTime);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		data["maxusercnt"] >> MaxUserCount;
 		data["maxusertime"] >> MaxUserTime;
-		return me;
+		return obj;
 	}
 };
 
@@ -71,7 +80,7 @@ private:
 		{
 			/* AKILLs */
 			source.Reply(_("Current number of AKILLs: \002%zu\002"), akills->GetCount());
-			timeout = Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d") + 59;
+			timeout = Config->GetModule("operserv").Get<time_t>("autokillexpiry", "30d") + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default AKILL expiry time: \002%d days\002"), timeout / 86400);
 			else if (timeout >= 86400)
@@ -91,7 +100,7 @@ private:
 		{
 			/* SNLINEs */
 			source.Reply(_("Current number of SNLINEs: \002%zu\002"), snlines->GetCount());
-			timeout = Config->GetModule("operserv")->Get<time_t>("snlineexpiry", "30d") + 59;
+			timeout = Config->GetModule("operserv").Get<time_t>("snlineexpiry", "30d") + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default SNLINE expiry time: \002%d days\002"), timeout / 86400);
 			else if (timeout >= 86400)
@@ -111,7 +120,7 @@ private:
 		{
 			/* SQLINEs */
 			source.Reply(_("Current number of SQLINEs: \002%zu\002"), sqlines->GetCount());
-			timeout = Config->GetModule("operserv")->Get<time_t>("sglineexpiry", "30d") + 59;
+			timeout = Config->GetModule("operserv").Get<time_t>("sglineexpiry", "30d") + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default SQLINE expiry time: \002%d days\002"), timeout / 86400);
 			else if (timeout >= 86400)
@@ -132,6 +141,8 @@ private:
 	static void DoStatsReset(CommandSource &source)
 	{
 		MaxUserCount = UserListByNick.size();
+		MaxUserTime = Anope::CurTime;
+		Stats::me->QueueUpdate();
 		source.Reply(_("Statistics reset."));
 		return;
 	}
@@ -287,25 +298,27 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Without any option, shows the current number of users online,\n"
-				"and the highest number of users online since services was\n"
-				"started, and the length of time services has been running.\n"
-				" \n"
-				"With the \002AKILL\002 option, displays the current size of the\n"
-				"AKILL list and the current default expiry time.\n"
-				" \n"
-				"The \002RESET\002 option currently resets the maximum user count\n"
-				"to the number of users currently present on the network.\n"
-				" \n"
-				"The \002PASSWORD\002 option displays the encryption algorithms used\n"
-				"for user passwords.\n"
-				" \n"
-				"The \002UPLINK\002 option displays information about the current\n"
-				"server Anope uses as an uplink to the network.\n"
-				" \n"
-				"The \002HASH\002 option displays information about the hash maps.\n"
-				" \n"
-				"The \002ALL\002 option displays all of the above statistics."));
+		source.Reply(_(
+			"Without any option, shows the current number of users online, "
+			"and the highest number of users online since services was "
+			"started, and the length of time services has been running."
+			"\n\n"
+			"With the \002AKILL\002 option, displays the current size of the "
+			"AKILL list and the current default expiry time."
+			"\n\n"
+			"The \002RESET\002 option currently resets the maximum user count "
+			"to the number of users currently present on the network."
+			"\n\n"
+			"The \002PASSWORD\002 option displays the encryption algorithms used "
+			"for user passwords. "
+			"\n\n"
+			"The \002UPLINK\002 option displays information about the current "
+			"server Anope uses as an uplink to the network."
+			"\n\n"
+			"The \002HASH\002 option displays information about the hash maps."
+			"\n\n"
+			"The \002ALL\002 option displays all of the above statistics."
+		));
 		return true;
 	}
 };
@@ -314,14 +327,14 @@ class OSStats final
 	: public Module
 {
 	CommandOSStats commandosstats;
-	Serialize::Type stats_type;
+	StatsType stats_type;
 	Stats stats_saver;
 
 public:
-	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosstats(this), stats_type("Stats", Stats::Unserialize)
+	OSStats(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandosstats(this)
 	{
-
 	}
 
 	void OnUserConnect(User *u, bool &exempt) override

@@ -1,6 +1,6 @@
 /* HostServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -67,9 +67,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command allows users to set the vhost of their\n"
-				"CURRENT nick to be the vhost for all nicks in the same\n"
-				"group."));
+		source.Reply(_(
+			"This command allows users to set the vhost of their "
+			"CURRENT nick to be the vhost for all nicks in the same "
+			"group."
+		));
 		return true;
 	}
 };
@@ -105,11 +107,11 @@ public:
 		commandhsgroup.Sync(na);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		syncongroup = block->Get<bool>("syncongroup");
-		synconset = block->Get<bool>("synconset");
+		const auto &block = conf.GetModule(this);
+		syncongroup = block.Get<bool>("syncongroup");
+		synconset = block.Get<bool>("synconset");
 	}
 };
 

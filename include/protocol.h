@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -107,8 +107,8 @@ public:
 	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */
 	bool AmbiguousID = false;
 
-	/** Can we ask the server to unban a user? */
-	bool CanClearBans = false;
+	/** Can we ask the server to remove list modes matching a user? */
+	std::set<Anope::string> CanClearModes;
 
 	/** Can we send tag messages? */
 	bool CanTagMessage = false;
@@ -195,19 +195,11 @@ public:
 	 */
 	virtual void SendSVSKill(const MessageSource &source, User *user, const Anope::string &msg);
 
+	virtual void SendMode(const MessageSource &source, Channel *chan, const ModeManager::Change &change);
 	virtual void SendModeInternal(const MessageSource &source, Channel *chan, const Anope::string &modes, const std::vector<Anope::string> &values);
-	template <typename... Args>
-	void SendMode(const MessageSource &source, Channel *chan, const Anope::string &modes, Args &&...args)
-	{
-		SendModeInternal(source, chan, modes, { Anope::ToString(args)... });
-	}
 
+	virtual void SendMode(const MessageSource &source, User *u, const ModeManager::Change &change);
 	virtual void SendModeInternal(const MessageSource &source, User *u, const Anope::string &modes, const std::vector<Anope::string> &values);
-	template <typename... Args>
-	void SendMode(const MessageSource &source, User *u, const Anope::string &modes, Args &&...args)
-	{
-		SendModeInternal(source, u, modes, { Anope::ToString(args)... });
-	}
 
 	/** Introduces a client to the rest of the network
 	 * @param u The client to introduce
@@ -222,7 +214,7 @@ public:
 	virtual void SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg);
 	virtual void SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg);
 
-	virtual void SendQuit(User *u, const Anope::string &msg);
+	virtual void SendQuit(User *u, const Anope::string &msg = "", const Anope::string &opermsg = "");
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
 
@@ -304,11 +296,7 @@ public:
 	 */
 	virtual void SendOper(User *u);
 
-	virtual void SendClearBans(const MessageSource &user, Channel *c, User* u) { }
-
-	virtual void SendSASLMechanisms(std::vector<Anope::string> &) { }
-	virtual void SendSASLMessage(const SASL::Message &) { }
-	virtual void SendSVSLogin(const Anope::string &uid, NickAlias *na) { }
+	virtual void SendClearModes(const MessageSource &user, Channel *c, User* u, const Anope::string &mode) { }
 
 	virtual bool IsNickValid(const Anope::string &);
 	virtual bool IsChannelValid(const Anope::string &);
@@ -366,7 +354,7 @@ public:
 		FLAG_MAX,
 	};
 
-private:
+protected:
 	/** The name of the message (e.g. PRIVMSG). */
 	const Anope::string name;
 

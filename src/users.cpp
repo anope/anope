@@ -1,6 +1,6 @@
 /* Routines to maintain a list of online users.
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -328,19 +328,32 @@ void User::SendMessage(BotInfo *source, const char *fmt, ...)
 	va_end(args);
 }
 
+void User::SendMessage(BotInfo *source, int count, const char *singular, const char *plural, ...)
+{
+	va_list args;
+	char buf[BUFSIZE] = "";
+
+	const char *translated_message = Language::Translate(this, count, singular, plural);
+
+	va_start(args, plural);
+	vsnprintf(buf, BUFSIZE - 1, translated_message, args);
+
+	this->SendMessage(source, Anope::string(buf));
+
+	va_end(args);
+}
+
 namespace
 {
 	void SendMessageInternal(BotInfo *source, User *target, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 	{
-		const char *translated_message = Language::Translate(target, msg.c_str());
-
-		sepstream sep(translated_message, '\n', true);
-		for (Anope::string tok; sep.GetToken(tok);)
+		LineWrapper lw(Language::Translate(target, msg.c_str()));
+		for (Anope::string line; lw.GetLine(line); )
 		{
 			if (target->ShouldPrivmsg())
-				IRCD->SendPrivmsg(source, target->GetUID(), tok, tags);
+				IRCD->SendPrivmsg(source, target->GetUID(), line, tags);
 			else
-				IRCD->SendNotice(source, target->GetUID(), tok, tags);
+				IRCD->SendNotice(source, target->GetUID(), line, tags);
 		}
 	}
 }
@@ -530,17 +543,35 @@ void User::UpdateHost()
 	}
 }
 
+void User::SetAway(const Anope::string &msg, time_t ts)
+{
+	FOREACH_MOD(OnUserAway, (this, msg));
+	if (msg.empty())
+	{
+		this->awaymsg.clear();
+		this->awaytime = 0;
+		Log(this, "away") << "is no longer away";
+	}
+	else
+	{
+		this->awaymsg = msg;
+		this->awaytime = ts ? ts : Anope::CurTime;
+		Log(this, "away") << "is now away: " << msg;
+	}
+}
+
+
 bool User::HasMode(const Anope::string &mname) const
 {
 	return this->modes.count(mname);
 }
 
-void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anope::string &param)
+void User::SetModeInternal(const MessageSource &source, UserMode *um, const ModeData &data)
 {
 	if (!um)
 		return;
 
-	this->modes[um->name] = param;
+	this->modes[um->name] = data;
 
 	if (um->name == "OPER")
 	{
@@ -596,18 +627,18 @@ void User::RemoveModeInternal(const MessageSource &source, UserMode *um)
 	FOREACH_MOD(OnUserModeUnset, (source, this, um->name));
 }
 
-void User::SetMode(BotInfo *bi, UserMode *um, const Anope::string &param)
+void User::SetMode(BotInfo *bi, UserMode *um, const ModeData &data)
 {
 	if (!um || HasMode(um->name))
 		return;
 
-	ModeManager::StackerAdd(bi, this, um, true, param);
-	SetModeInternal(bi, um, param);
+	ModeManager::StackerAdd(bi, this, um, true, data);
+	SetModeInternal(bi, um, data);
 }
 
-void User::SetMode(BotInfo *bi, const Anope::string &uname, const Anope::string &param)
+void User::SetMode(BotInfo *bi, const Anope::string &uname, const ModeData &data)
 {
-	SetMode(bi, ModeManager::FindUserModeByName(uname), param);
+	SetMode(bi, ModeManager::FindUserModeByName(uname), data);
 }
 
 void User::RemoveMode(BotInfo *bi, UserMode *um, const Anope::string &param)
@@ -717,7 +748,7 @@ Anope::string User::GetModes() const
 {
 	Anope::string m, params;
 
-	for (const auto &[mode, value] : this->modes)
+	for (const auto &[mode, data] : this->modes)
 	{
 		UserMode *um = ModeManager::FindUserModeByName(mode);
 		if (um == NULL)
@@ -725,8 +756,8 @@ Anope::string User::GetModes() const
 
 		m += um->mchar;
 
-		if (!value.empty())
-			params += " " + value;
+		if (!data.value.empty())
+			params += " " + data.value;
 	}
 
 	return m + params;
@@ -820,14 +851,17 @@ Anope::string User::Mask() const
 
 bool User::BadPassword()
 {
-	if (!Config->GetBlock("options")->Get<unsigned int>("badpasslimit"))
+	const auto badpasslimit = Config->GetBlock("options").Get<unsigned>("badpasslimit");
+	if (!badpasslimit)
 		return false;
 
-	if (Config->GetBlock("options")->Get<time_t>("badpasstimeout") > 0 && this->invalid_pw_time > 0 && this->invalid_pw_time < Anope::CurTime - Config->GetBlock("options")->Get<time_t>("badpasstimeout"))
+	const auto badpasstimeout = Config->GetBlock("options").Get<time_t>("badpasstimeout");
+	if (badpasstimeout > 0 && this->invalid_pw_time > 0 && this->invalid_pw_time < Anope::CurTime - badpasstimeout)
 		this->invalid_pw_count = 0;
+
 	++this->invalid_pw_count;
 	this->invalid_pw_time = Anope::CurTime;
-	if (this->invalid_pw_count >= Config->GetBlock("options")->Get<unsigned int>("badpasslimit"))
+	if (this->invalid_pw_count >= badpasslimit)
 	{
 		this->Kill(Me, "Too many invalid passwords");
 		return true;
@@ -839,10 +873,10 @@ bool User::BadPassword()
 bool User::ShouldPrivmsg() const
 {
 	// Send a PRIVMSG instead of a NOTICE if:
-	// 1. options:useprivmsg is enabled.
-	// 2. The user is not registered and msg is in nickserv:defaults.
-	// 3. The user is registered and has set /ns set message on.
-	return Config->UsePrivmsg && ((!nc && Config->DefPrivmsg) || (nc && nc->HasExt("MSG")));
+	// 1. The user is not registered and msg is in nickserv:defaults.
+	// 2. The user is registered and has set /ns set message on.
+	static ExtensibleRef<bool> msg("MSG");
+	return (!nc && Config->DefPrivmsg) || (nc && msg && msg->HasExt(nc));
 }
 
 User *User::Find(const Anope::string &name, bool nick_only)

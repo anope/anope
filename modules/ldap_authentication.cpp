@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2011-2024 Anope Team
+ * (C) 2011-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -85,7 +85,10 @@ public:
 			{
 				if (ii->admin_bind)
 				{
-					Anope::string sf = search_filter.replace_all_cs("%account", ii->req->GetAccount()).replace_all_cs("%object_class", object_class);
+					auto sf = Anope::Template(search_filter, {
+						{ "account",      ii->req->GetAccount() },
+						{ "object_class", object_class          },
+					});
 					try
 					{
 						Log(LOG_DEBUG) << "ldap_authentication: searching for " << sf;
@@ -145,7 +148,7 @@ public:
 	{
 		User *u = User::Find(uid);
 
-		if (!u || !u->Account() || r.empty())
+		if (!u || !u->IsIdentified() || r.empty())
 			return;
 
 		try
@@ -215,23 +218,23 @@ public:
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnReload(Configuration::Conf *config) override
+	void OnReload(Configuration::Conf &config) override
 	{
-		Configuration::Block *conf = Config->GetModule(this);
+		const auto &conf = Config->GetModule(this);
 
-		basedn = conf->Get<const Anope::string>("basedn");
-		search_filter = conf->Get<const Anope::string>("search_filter");
-		object_class = conf->Get<const Anope::string>("object_class");
-		username_attribute = conf->Get<const Anope::string>("username_attribute");
-		this->password_attribute = conf->Get<const Anope::string>("password_attribute");
-		email_attribute = conf->Get<const Anope::string>("email_attribute");
-		this->disable_register_reason = conf->Get<const Anope::string>("disable_register_reason");
-		this->disable_email_reason = conf->Get<const Anope::string>("disable_email_reason");
+		basedn = conf.Get<const Anope::string>("basedn");
+		search_filter = conf.Get<const Anope::string>("search_filter");
+		object_class = conf.Get<const Anope::string>("object_class");
+		username_attribute = conf.Get<const Anope::string>("username_attribute");
+		this->password_attribute = conf.Get<const Anope::string>("password_attribute");
+		email_attribute = conf.Get<const Anope::string>("email_attribute");
+		this->disable_register_reason = conf.Get<const Anope::string>("disable_register_reason");
+		this->disable_email_reason = conf.Get<const Anope::string>("disable_email_reason");
 
 		if (!email_attribute.empty())
 		{
 			/* Don't complain to users about how they need to update their email, we will do it for them */
-			config->GetModule("nickserv")->Set("forceemail", "no");
+			config.GetModule("nickserv").Set("forceemail", "no");
 		}
 	}
 

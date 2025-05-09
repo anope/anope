@@ -1,6 +1,6 @@
 /* Fantasy functionality
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -67,16 +67,18 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_(" \n"
-				"Enables or disables \002fantasy\002 mode on a channel.\n"
-				"When it is enabled, users will be able to use\n"
-				"fantasy commands on a channel when prefixed\n"
-				"with one of the following fantasy characters: \002%s\002\n"
-				" \n"
-				"Note that users wanting to use fantasy commands\n"
-				"MUST have enough access for both the FANTASY\n"
-				"privilege and the command they are executing."),
-				Config->GetModule(this->owner)->Get<const Anope::string>("fantasycharacter", "!").c_str());
+		source.Reply(" ");
+		source.Reply(_(
+				"Enables or disables \002fantasy\002 mode on a channel. "
+				"When it is enabled, users will be able to use "
+				"fantasy commands on a channel when prefixed "
+				"with one of the following fantasy characters: \002%s\002"
+				"\n\n"
+				"Note that users wanting to use fantasy commands "
+				"MUST have enough access for both the FANTASY "
+				"privilege and the command they are executing."
+			),
+			Config->GetModule(this->owner).Get<const Anope::string>("fantasycharacter", "!").c_str());
 		return true;
 	}
 };
@@ -109,7 +111,7 @@ public:
 			return;
 
 		Anope::string normalized_param0 = Anope::NormalizeBuffer(params[0]);
-		Anope::string fantasy_chars = Config->GetModule(this)->Get<Anope::string>("fantasycharacter", "!");
+		Anope::string fantasy_chars = Config->GetModule(this).Get<Anope::string>("fantasycharacter", "!");
 
 		if (!normalized_param0.find(c->ci->bi->nick))
 		{
@@ -169,7 +171,7 @@ public:
 		}
 
 		// Command requires registered users only
-		if (!cmd->AllowUnregistered() && !u->Account())
+		if (!cmd->AllowUnregistered() && !u->IsIdentified())
 			return;
 
 		if (params.size() < cmd->min_params)

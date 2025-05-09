@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -79,7 +79,7 @@ FlagsAccessProvider *FlagsAccessProvider::ap;
 class CommandCSFlags final
 	: public Command
 {
-	void DoModify(CommandSource &source, ChannelInfo *ci, Anope::string mask, const Anope::string &flags, const Anope::string &description)
+	void DoModify(CommandSource &source, ChannelInfo *ci, Anope::string mask, const Anope::string &flags, Anope::string description)
 	{
 		if (flags.empty())
 		{
@@ -93,7 +93,7 @@ class CommandCSFlags final
 
 		if (IRCD->IsChannelValid(mask))
 		{
-			if (Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
+			if (Config->GetModule("chanserv").Get<bool>("disallow_channel_access"))
 			{
 				source.Reply(_("Channels may not be on access lists."));
 				return;
@@ -116,7 +116,7 @@ class CommandCSFlags final
 		else
 		{
 			na = NickAlias::Find(mask);
-			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+			if (!na && Config->GetModule("chanserv").Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
@@ -131,7 +131,11 @@ class CommandCSFlags final
 			{
 				User *targ = User::Find(mask, true);
 				if (targ != NULL)
+				{
 					mask = "*!*@" + targ->GetDisplayedHost();
+					if (description.empty())
+						description = targ->nick;
+				}
 				else
 				{
 					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
@@ -175,7 +179,7 @@ class CommandCSFlags final
 			}
 		}
 
-		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1000");
+		unsigned access_max = Config->GetModule("chanserv").Get<unsigned>("accessmax", "1000");
 		if (access_max && ci->GetDeepAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
@@ -440,24 +444,27 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("%s is another way to modify the channel access list, similar to\n"
-				"the XOP and ACCESS methods."), source.command.c_str());
-		source.Reply(" ");
-		source.Reply(_("The \002MODIFY\002 command allows you to modify the access list. If the mask is\n"
-				"not already on the access list it is added, then the changes are applied.\n"
-				"If the mask has no more flags, then the mask is removed from the access list.\n"
-				"Additionally, you may use +* or -* to add or remove all flags, respectively. You are\n"
-				"only able to modify the access list if you have the proper permission on the channel,\n"
-				"and even then you can only give other people access to the equivalent of what your access is."));
-		source.Reply(" ");
-		source.Reply(_("The \002LIST\002 command allows you to list existing entries on the channel access list.\n"
-				"If a mask is given, the mask is wildcard matched against all existing entries on the\n"
-				"access list, and only those entries are returned. If a set of flags is given, only those\n"
-				"on the access list with the specified flags are returned."));
-		source.Reply(" ");
-		source.Reply(_("The \002CLEAR\002 command clears the channel access list. This requires channel founder access."));
-		source.Reply(" ");
-		source.Reply(_("The available flags are:"));
+		source.Reply(_(
+				"%s is another way to modify the channel access list, similar to "
+				"the XOP and ACCESS methods."
+				"\n\n"
+				"The \002MODIFY\002 command allows you to modify the access list. If the mask is "
+				"not already on the access list it is added, then the changes are applied. "
+				"If the mask has no more flags, then the mask is removed from the access list. "
+				"Additionally, you may use +* or -* to add or remove all flags, respectively. You are "
+				"only able to modify the access list if you have the proper permission on the channel, "
+				"and even then you can only give other people access to the equivalent of what your access is."
+				"\n\n"
+				"The \002LIST\002 command allows you to list existing entries on the channel access list. "
+				"If a mask is given, the mask is wildcard matched against all existing entries on the "
+				"access list, and only those entries are returned. If a set of flags is given, only those "
+				"on the access list with the specified flags are returned."
+				"\n\n"
+				"The \002CLEAR\002 command clears the channel access list. This requires channel founder access."
+				"\n\n"
+				"The available flags are:"
+			),
+			source.command.nobreak().c_str());
 
 		typedef std::multimap<char, Anope::string, ci::less> reverse_map;
 		reverse_map reverse;
@@ -490,21 +497,21 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		defaultFlags.clear();
 
-		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
+		for (int i = 0; i < conf.CountBlock("privilege"); ++i)
 		{
-			Configuration::Block *priv = conf->GetBlock("privilege", i);
+			const auto &priv = conf.GetBlock("privilege", i);
 
-			const Anope::string &pname = priv->Get<const Anope::string>("name");
+			const Anope::string &pname = priv.Get<const Anope::string>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &value = priv->Get<const Anope::string>("flag");
+			const Anope::string &value = priv.Get<const Anope::string>("flag");
 			if (value.empty())
 				continue;
 

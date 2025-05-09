@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,6 +16,16 @@
 #include "anope.h"
 #include "base.h"
 
+/** Names of serialization types implemented in the core. */
+#define AUTOKICK_TYPE    "AutoKick"
+#define BOTINFO_TYPE     "BotInfo"
+#define CHANACCESS_TYPE  "ChanAccess"
+#define CHANNELINFO_TYPE "ChannelInfo"
+#define MEMO_TYPE        "Memo"
+#define NICKALIAS_TYPE   "NickAlias"
+#define NICKCORE_TYPE    "NickCore"
+#define XLINE_TYPE       "XLine"
+
 namespace Serialize
 {
 	enum class DataType
@@ -28,8 +38,11 @@ namespace Serialize
 		UINT,
 	};
 
-	class Data
+	class CoreExport Data
 	{
+	protected:
+		std::map<Anope::string, Serialize::DataType> types;
+
 	public:
 		virtual ~Data() = default;
 
@@ -54,8 +67,8 @@ namespace Serialize
 
 		virtual size_t Hash() const { throw CoreException("Not supported"); }
 
-		virtual void SetType(const Anope::string &key, DataType dt) { }
-		virtual DataType GetType(const Anope::string &key) const { return DataType::TEXT; }
+		Serialize::DataType GetType(const Anope::string &key) const;
+		void SetType(const Anope::string &key, Serialize::DataType dt);
 	};
 
 	extern void RegisterTypes();
@@ -97,10 +110,11 @@ protected:
 	Serializable &operator=(const Serializable &);
 
 public:
+	using Id = uint64_t;
 	virtual ~Serializable();
 
 	/* Unique ID (per type, not globally) for this object */
-	uint64_t id = 0;
+	Id id = 0;
 
 	/* Only used by redis, to ignore updates */
 	unsigned short redis_ignore = 0;
@@ -120,82 +134,104 @@ public:
 	 */
 	Serialize::Type *GetSerializableType() const { return this->s_type; }
 
-	virtual void Serialize(Serialize::Data &data) const = 0;
-
 	static const std::list<Serializable *> &GetItems();
 };
 
-/* A serializable type. There should be one of these classes for each type
- * of class that inherits from Serializable. Used for unserializing objects
- * of this type, as it requires a function pointer to a static member function.
+/* A serializable type. There should be a single instance of a subclass of this
+ * for each subclass of Serializable as this is what is used to serialize and
+ * deserialize data from the database.
  */
-class CoreExport Serialize::Type final
+class CoreExport Serialize::Type
 	: public Base
 {
-	typedef Serializable *(*unserialize_func)(Serializable *obj, Serialize::Data &);
-
-	static std::vector<Anope::string> TypeOrder;
-	static std::map<Anope::string, Serialize::Type *> Types;
-
-	/* The name of this type, should be a class name */
+private:
+	/** The name of this type in the database (e.g. NickAlias). */
 	Anope::string name;
-	unserialize_func unserialize;
-	/* Owner of this type. Used for placing objects of this type in separate databases
-	 * based on what module, if any, owns it.
+
+	/** The module which owns this type, or nullptr if it belongs to the core.
+	 * Some database backends use this to put third-party module data into their
+	 * own database.
 	 */
 	Module *owner;
 
-	/* The timestamp for this type. All objects of this type are as up to date as
-	 * this timestamp. if curtime == timestamp then we have the most up to date
-	 * version of every object of this type.
+	/** The time at which this type was last synchronised with the database.
+	 * Only used by live database backends like db_sql_live.
 	 */
 	time_t timestamp = 0;
 
-public:
-	/* Map of Serializable::id to Serializable objects */
-	std::map<uint64_t, Serializable *> objects;
+	/* The names of currently registered types in order of registration. */
+	static std::vector<Anope::string> TypeOrder;
 
-	/** Creates a new serializable type
-	 * @param n Type name
-	 * @param f Func to unserialize objects
-	 * @param owner Owner of this type. Leave NULL for the core.
+	/** The currently registered types. */
+	static std::map<Anope::string, Serialize::Type *> Types;
+
+protected:
+	/** Creates a new serializable type.
+	 * @param n The name of the type . This should match the value passed in the
+	 *          constructor of the equivalent Serializable type.
+	 * @param o The module which owns this type, or nullptr if it belongs to the
+	 *          core.
 	 */
-	Type(const Anope::string &n, unserialize_func f, Module *owner = NULL);
+	Type(const Anope::string &n, Module *o = nullptr);
+
+public:
+	/* Map of Serializable objects of this type keyed by their object id. */
+	std::map<Serializable::Id, Serializable *> objects;
+
+	/** Destroys a serializable type. */
 	~Type();
 
-	/** Gets the name for this type
-	 * @return The name, eg "NickAlias"
-	 */
-	const Anope::string &GetName() { return this->name; }
-
-	/** Unserialized an object.
-	 * @param obj NULL if this object doesn't yet exist. If this isn't NULL, instead
-	 * update the contents of this object.
-	 * @param data The data to unserialize
-	 * @return The unserialized object. If obj != NULL this should be obj.
-	 */
-	Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
-
-	/** Check if this object type has any pending changes and update them.
-	 */
+	/** Checks for and applies any pending object updates for this type. */
 	void Check();
 
-	/** Gets the timestamp for the object type. That is, the time we know
-	 * all objects of this type are updated at least to.
+	/** Attempts to find a serializable type with the specified name.
+	 * @param n The name of the serializable type to find.
 	 */
-	time_t GetTimestamp() const;
+	static Serialize::Type *Find(const Anope::string &n);
 
-	/** Bumps object type timestamp to current time
+	/** Retrieves the name of this type in the database (e.g. NickAlias). */
+	inline const auto &GetName() const { return this->name; }
+
+	/** Retrieves the module which owns this type, or nullptr if it belongs to
+	 * the core. Some database backends use this to put third-party module data
+	 * into their own database.
+	 */
+	inline auto *GetOwner() const { return this->owner; }
+
+	/** Retrieves the time at which this type was last synchronised with the
+	 * database. Only used by live database backends like db_sql_live.
+	 */
+	inline auto GetTimestamp() const { return this->timestamp; };
+
+	/** Retrieves the names of currently registered types in order of
+	 * registration.
+	 */
+	inline static const auto &GetTypeOrder() { return TypeOrder; }
+
+	/** Retrieves the currently registered types. */
+	inline static const auto &GetTypes() { return Types; }
+
+	/** Serializes the specified object to the database.
+	 * @param obj The object to serialise. This is guaranteed to be the correct
+	 *            type so you can cast it without any checks.
+	 * @param data The database to serialize to.
+	 */
+	virtual void Serialize(const Serializable *obj, Serialize::Data &data) const = 0;
+
+	/** Unserializes the specified object from the database.
+	 * @param obj The object to unserialize into. If the object has not been
+	 *            unserialized yet this will be nullptr. This is guaranteed to
+	 *            be the correct type so you can cast it without any checks.
+	 * @param data The database to unserialize from.
+	 * @return The object specified in obj or a new object it if was nullptr.
+	 */
+	virtual Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const = 0;
+
+	/** Updates the time at which this type was last synchronised with the
+	 * database to the current time. Only used by live database backends like
+	 * db_sql_live.
 	 */
 	void UpdateTimestamp();
-
-	Module *GetOwner() const { return this->owner; }
-
-	static Serialize::Type *Find(const Anope::string &name);
-
-	static const std::vector<Anope::string> &GetTypeOrder();
-
-	static const std::map<Anope::string, Serialize::Type *>& GetTypes();
 };
 
 /** Should be used to hold lists and other objects of a specific type,

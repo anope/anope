@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_news.h"
+#include "modules/operserv/news.h"
 
 // TODO: msgarray breaks the format string checking
 #ifdef __GNUC__
@@ -22,6 +22,8 @@
 enum
 {
 	MSG_SYNTAX,
+	MSG_NEWS_SHORT,
+	MSG_NEWS_LONG,
 	MSG_LIST_HEADER,
 	MSG_LIST_NONE,
 	MSG_ADDED,
@@ -34,6 +36,8 @@ enum
 struct NewsMessages msgarray[] = {
 	{NEWS_LOGON, "LOGON",
 	 {_("LOGONNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("[\002Logon News\002] %s"),
+	  _("[\002Logon News\002 - %s] %s"),
 	  _("Logon news items:"),
 	  _("There is no logon news."),
 	  _("Added new logon news item."),
@@ -44,6 +48,8 @@ struct NewsMessages msgarray[] = {
 	 },
 	{NEWS_OPER, "OPER",
 	 {_("OPERNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("[\002Oper News\002] %s"),
+	  _("[\002Oper News\002 - %s] %s"),
 	  _("Oper news items:"),
 	  _("There is no oper news."),
 	  _("Added new oper news item."),
@@ -54,6 +60,8 @@ struct NewsMessages msgarray[] = {
 	 },
 	{NEWS_RANDOM, "RANDOM",
 	 {_("RANDOMNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("[\002Random News\002] %s"),
+	  _("[\002Random News\002 - %s] %s"),
 	  _("Random news items:"),
 	  _("There is no random news."),
 	  _("Added new random news item."),
@@ -64,18 +72,24 @@ struct NewsMessages msgarray[] = {
 	 }
 };
 
-struct MyNewsItem final
-	: NewsItem
+struct NewsItemType final
+	: Serialize::Type
 {
-	void Serialize(Serialize::Data &data) const override
+	NewsItemType()
+		: Serialize::Type("NewsItem")
 	{
-		data.Store("type", this->type);
-		data.Store("text", this->text);
-		data.Store("who", this->who);
-		data.Store("time", this->time);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *ni = static_cast<const NewsItem *>(obj);
+		data.Store("type", ni->type);
+		data.Store("text", ni->text);
+		data.Store("who", ni->who);
+		data.Store("time", ni->time);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		if (!news_service)
 			return NULL;
@@ -84,7 +98,7 @@ struct MyNewsItem final
 		if (obj)
 			ni = anope_dynamic_static_cast<NewsItem *>(obj);
 		else
-			ni = new MyNewsItem();
+			ni = new NewsItem();
 
 		unsigned int t;
 		data["type"] >> t;
@@ -117,7 +131,7 @@ public:
 
 	NewsItem *CreateNewsItem() override
 	{
-		return new MyNewsItem();
+		return new NewsItem();
 	}
 
 	void AddNewsItem(NewsItem *n) override
@@ -200,7 +214,7 @@ protected:
 			if (Anope::ReadOnly)
 				source.Reply(READ_ONLY_MODE);
 
-			NewsItem *news = new MyNewsItem();
+			NewsItem *news = new NewsItem();
 			news->type = ntype;
 			news->text = text;
 			news->time = Anope::CurTime;
@@ -313,12 +327,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Edits or displays the list of logon news messages.  When a\n"
-				"user connects to the network, these messages will be sent\n"
-				"to them.  However, no more than \002%d\002 messages will be\n"
-				"sent in order to avoid flooding the user.  If there are\n"
-				"more news messages, only the most recent will be sent."),
-				Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
+		source.Reply(_(
+				"Edits or displays the list of logon news messages. When a "
+				"user connects to the network, these messages will be sent "
+				"to them. However, no more than \002%d\002 messages will be "
+				"sent in order to avoid flooding the user. If there are "
+				"more news messages, only the most recent will be sent."
+			),
+			Config->GetModule(this->owner).Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };
@@ -341,12 +357,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Edits or displays the list of oper news messages.  When a\n"
-				"user opers up (with the /OPER command), these messages will\n"
-				"be sent to them.  However, no more than \002%d\002 messages will\n"
-				"be sent in order to avoid flooding the user.  If there are\n"
-				"more news messages, only the most recent will be sent."),
-				Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
+		source.Reply(_(
+				"Edits or displays the list of oper news messages. When a "
+				"user opers up (with the /OPER command), these messages will "
+				"be sent to them. However, no more than \002%d\002 messages will "
+				"be sent in order to avoid flooding the user. If there are "
+				"more news messages, only the most recent will be sent."
+			),
+			Config->GetModule(this->owner).Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };
@@ -369,9 +387,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Edits or displays the list of random news messages.  When a\n"
-				"user connects to the network, one (and only one) of the\n"
-				"random news will be randomly chosen and sent to them."));
+		source.Reply(_(
+			"Edits or displays the list of random news messages. When a "
+			"user connects to the network, one (and only one) of the "
+			"random news will be randomly chosen and sent to them."
+		));
 		return true;
 	}
 };
@@ -382,7 +402,7 @@ class OSNews final
 	: public Module
 {
 	MyNewsService newsservice;
-	Serialize::Type newsitem_type;
+	NewsItemType newsitem_type;
 
 	CommandOSLogonNews commandoslogonnews;
 	CommandOSOperNews commandosopernews;
@@ -397,21 +417,18 @@ class OSNews final
 		if (newsList.empty())
 			return;
 
+		const auto &modconf = Config->GetModule(this);
 		BotInfo *bi = NULL;
 		if (Type == NEWS_OPER)
-			bi = BotInfo::Find(Config->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ"), true);
+			bi = BotInfo::Find(modconf.Get<const Anope::string>("oper_announcer", "OperServ"), true);
 		else
-			bi = BotInfo::Find(Config->GetModule(this)->Get<const Anope::string>("announcer", "Global"), true);
+			bi = BotInfo::Find(modconf.Get<const Anope::string>("announcer", "Global"), true);
 		if (bi == NULL)
 			return;
 
-		Anope::string msg;
-		if (Type == NEWS_LOGON)
-			msg = _("[\002Logon News\002 - %s] %s");
-		else if (Type == NEWS_OPER)
-			msg = _("[\002Oper News\002 - %s] %s");
-		else if (Type == NEWS_RANDOM)
-			msg = _("[\002Random News\002 - %s] %s");
+		const auto **msgs = findmsgs(Type);
+		if (!msgs)
+			return; // BUG
 
 		int start = 0;
 
@@ -422,12 +439,17 @@ class OSNews final
 				start = 0;
 		}
 
+		const auto showdate = modconf.Get<bool>("showdate", "yes");
 		for (unsigned i = start, end = newsList.size(); i < end; ++i)
 		{
 			if (Type == NEWS_RANDOM && i != cur_rand_news)
 				continue;
 
-			u->SendMessage(bi, msg.c_str(), Anope::strftime(newsList[i]->time, u->Account(), true).c_str(), newsList[i]->text.c_str());
+			const auto *news = newsList[i];
+			if (showdate)
+				u->SendMessage(bi, msgs[MSG_NEWS_LONG], Anope::strftime(news->time, u->Account(), true).c_str(), news->text.c_str());
+			else
+				u->SendMessage(bi, msgs[MSG_NEWS_SHORT], news->text.c_str());
 
 			if (Type == NEWS_RANDOM)
 			{
@@ -442,17 +464,20 @@ class OSNews final
 	}
 
 public:
-	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		newsservice(this), newsitem_type("NewsItem", MyNewsItem::Unserialize),
-		commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
+	OSNews(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, newsservice(this)
+		, commandoslogonnews(this)
+		, commandosopernews(this)
+		, commandosrandomnews(this)
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		oper_announcer = conf->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ");
-		announcer = conf->GetModule(this)->Get<const Anope::string>("announcer", "Global");
-		news_count = conf->GetModule(this)->Get<unsigned>("newscount", "3");
+		oper_announcer = conf.GetModule(this).Get<const Anope::string>("oper_announcer", "OperServ");
+		announcer = conf.GetModule(this).Get<const Anope::string>("announcer", "Global");
+		news_count = conf.GetModule(this).Get<unsigned>("newscount", "3");
 	}
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override

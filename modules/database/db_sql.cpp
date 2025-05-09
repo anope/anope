@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -72,6 +72,11 @@ class DBSQL final
 	bool loaded = false;
 	bool imported = false;
 
+	Anope::string GetTableName(Serialize::Type *s_type)
+	{
+		return this->prefix + s_type->GetName();
+	}
+
 	void RunBackground(const Query &q, Interface *iface = NULL)
 	{
 		if (!this->sql)
@@ -104,12 +109,19 @@ public:
 
 	void OnNotify() override
 	{
-		for (auto *obj : this->updated_items)
+		std::set<Serializable *> items;
+		std::swap(this->updated_items, items);
+
+		for (auto *obj : items)
 		{
 			if (this->sql)
 			{
+				Serialize::Type *s_type = obj->GetSerializableType();
+				if (!s_type)
+					continue;
+
 				Data data;
-				obj->Serialize(data);
+				s_type->Serialize(obj, data);
 
 				if (obj->IsCached(data))
 					continue;
@@ -120,12 +132,8 @@ public:
 				if (!this->loaded && !this->imported && !this->import)
 					continue;
 
-				Serialize::Type *s_type = obj->GetSerializableType();
-				if (!s_type)
-					continue;
-
-				std::vector<Query> create = this->sql->CreateTable(this->prefix + s_type->GetName(), data);
-				Query insert = this->sql->BuildInsert(this->prefix + s_type->GetName(), obj->id, data);
+				auto create = this->sql->CreateTable(GetTableName(s_type), data);
+				auto insert = this->sql->BuildInsert(GetTableName(s_type), obj->id, data);
 
 				if (this->imported)
 				{
@@ -149,16 +157,23 @@ public:
 			}
 		}
 
-		this->updated_items.clear();
 		this->imported = true;
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		this->sql = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
-		this->prefix = block->Get<const Anope::string>("prefix", "anope_db_");
-		this->import = block->Get<bool>("import");
+		const auto &block = conf.GetModule(this);
+		this->sql = ServiceReference<Provider>("SQL::Provider", block.Get<const Anope::string>("engine"));
+		this->prefix = block.Get<const Anope::string>("prefix", "anope_db_");
+		this->import = block.Get<bool>("import");
+	}
+
+	void OnPostInit() override
+	{
+		// If we are importing from flatfile we need to force a socket engine
+		// flush to ensure it actually gets written to the database before we
+		// connect to the uplink.
+		SocketEngine::Process();
 	}
 
 	void OnShutdown() override
@@ -209,7 +224,7 @@ public:
 			return;
 		Serialize::Type *s_type = obj->GetSerializableType();
 		if (s_type && obj->id > 0)
-			this->RunBackground("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + Anope::ToString(obj->id));
+			this->RunBackground("DELETE FROM `" + GetTableName(s_type) + "` WHERE `id` = " + Anope::ToString(obj->id));
 		this->updated_items.erase(obj);
 	}
 
@@ -229,7 +244,7 @@ public:
 		if (!this->loading_databases && !this->loaded)
 			return;
 
-		Query query("SELECT * FROM `" + this->prefix + sb->GetName() + "`");
+		Query query("SELECT * FROM `" + GetTableName(sb) + "`");
 		Result res = this->sql->RunQuery(query);
 
 		for (int j = 0; j < res.Rows(); ++j)
@@ -242,7 +257,7 @@ public:
 			Serializable *obj = sb->Unserialize(NULL, data);
 			if (obj)
 			{
-				auto oid = Anope::TryConvert<unsigned int>(res.Get(j, "id"));
+				auto oid = Anope::TryConvert<Serializable::Id>(res.Get(j, "id"));
 				if (oid.has_value())
 					obj->id = oid.value();
 				else
@@ -254,7 +269,7 @@ public:
 				 */
 
 				Data data2;
-				obj->Serialize(data2);
+				sb->Serialize(obj, data2);
 				obj->UpdateCache(data2); /* We know this is the most up to date copy */
 			}
 		}

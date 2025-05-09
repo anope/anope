@@ -1,5 +1,5 @@
-# This usage of CMake requires at least version 3.8
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+# This usage of CMake requires at least version 3.20
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)
@@ -141,11 +141,6 @@ include_directories(
   ${Anope_SOURCE_DIR}/include
   ${Anope_SOURCE_DIR}/vendor
 )
-
-# Pass on REPRODUCIBLE_BUILD
-if(REPRODUCIBLE_BUILD)
-  add_definitions(-DREPRODUCIBLE_BUILD)
-endif()
 
 if(WIN32)
   # If using Windows, include the windows specific folder for anope_windows.h
@@ -321,14 +316,6 @@ if(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
   endif()
 endif()
 
-# Go into the following directories and run their CMakeLists.txt as well
-add_subdirectory(data)
-add_subdirectory(docs)
-add_subdirectory(language)
-add_subdirectory(src)
-add_subdirectory(modules)
-add_subdirectory(include)
-
 # Get the filename of the Anope binary, to use later
 set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
@@ -401,3 +388,11 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   set(CPACK_MONOLITHIC_INSTALL TRUE)
   include(CPack)
 endif()
+
+# Go into the following directories and run their CMakeLists.txt as well
+add_subdirectory(data)
+add_subdirectory(docs)
+add_subdirectory(language)
+add_subdirectory(src)
+add_subdirectory(modules)
+add_subdirectory(include)

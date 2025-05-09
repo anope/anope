@@ -29,15 +29,17 @@ Anope Multi Language Support
     install gettext and run `msginit -l language -o anope.language.po -i anope.pot`. For example if I was translating to
     Spanish I could run `msginit -l es_ES -o anope.es_ES.po -i anope.pot`. Open the newly generating .po file and start
     translating. Once you are done simply rerun ./Config; make && make install and add the language to your anope.conf.
-    Note that on Windows it is not quite this simple, windows.cpp must be edited and Anope recompiled and restarted.
 
     Poedit (https://poedit.net/) is a popular po file editor, and we recommend using it or another editor designed to edit
     po files (especially on Windows).
 
-    If you have finished a language file translation and you want others to use it, please send it to team@anope.org
-    (don't forget to mention clearly your (nick)name, your email and the language name). You'll of course get full credit for it.
+    There are several control characters within the messages. These are mostly IRC formatting codes (https://modern.ircdocs.horse/formatting)
+    but 0x1A is special to Anope and is used to prevent the automatic linewrapper from breaking messages in the middle of
+    text that should not be split (e.g. commands). Your editor may not show these so be careful you don't delete them!
 
-    NOTE: There is no guarantee we will use your work so please do not be offended if we say no thanks.
+    If you have finished a language file translation and you want others to use it, please file a pull request on GitHub
+    or send it to team@anope.org (don't forget to mention clearly your (nick)name, your email and the language name).
+    You'll of course get full credit for it.
 
 3) Using languages with modules
 

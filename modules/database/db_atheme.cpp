@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,19 +9,20 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#include <functional>
 
 #include "module.h"
-#include "modules/bs_badwords.h"
-#include "modules/bs_kick.h"
-#include "modules/cs_entrymsg.h"
-#include "modules/cs_mode.h"
-#include "modules/hs_request.h"
+#include "modules/botserv/badwords.h"
+#include "modules/botserv/kick.h"
+#include "modules/chanserv/entrymsg.h"
+#include "modules/chanserv/mode.h"
+#include "modules/hostserv/request.h"
 #include "modules/info.h"
-#include "modules/ns_cert.h"
-#include "modules/os_forbid.h"
-#include "modules/os_oper.h"
-#include "modules/os_session.h"
+#include "modules/nickserv/cert.h"
+#include "modules/operserv/forbid.h"
+#include "modules/operserv/news.h"
+#include "modules/operserv/oper.h"
+#include "modules/operserv/session.h"
+#include "modules/set_misc.h"
 #include "modules/suspend.h"
 
 // Handles reading from an Atheme database row.
@@ -83,14 +84,14 @@ public:
 	}
 };
 
-struct ModeData final
+struct ModeLockData final
 {
 	char letter;
 	Anope::string name;
 	Anope::string value;
 	bool set;
 
-	ModeData(const Anope::string &n, bool s, const Anope::string &v = "")
+	ModeLockData(const Anope::string &n, bool s, const Anope::string &v = "")
 		: letter(0)
 		, name(n)
 		, value(v)
@@ -98,7 +99,7 @@ struct ModeData final
 	{
 	}
 
-	ModeData(char l, const Anope::string &v = "")
+	ModeLockData(char l, const Anope::string &v = "")
 		: letter(l)
 		, value(v)
 		, set(true)
@@ -122,7 +123,7 @@ struct ChannelData final
 	Anope::string info_adder;
 	Anope::string info_message;
 	time_t info_ts = 0;
-	std::vector<ModeData> mlocks;
+	std::vector<ModeLockData> mlocks;
 	Anope::string suspend_by;
 	Anope::string suspend_reason;
 	time_t suspend_ts = 0;
@@ -130,7 +131,6 @@ struct ChannelData final
 
 struct UserData final
 {
-	bool kill = false;
 	Anope::string info_adder;
 	Anope::string info_message;
 	time_t info_ts = 0;
@@ -138,6 +138,8 @@ struct UserData final
 	Anope::string last_quit;
 	Anope::string last_real_mask;
 	bool noexpire = false;
+	bool protect = false;
+	std::optional<time_t> protectafter;
 	Anope::string suspend_by;
 	Anope::string suspend_reason;
 	time_t suspend_ts = 0;
@@ -199,6 +201,8 @@ private:
 		{ "JM",         &DBAtheme::HandleIgnore    },
 		{ "KID",        &DBAtheme::HandleIgnore    },
 		{ "KL",         &DBAtheme::HandleKL        },
+		{ "LI",         &DBAtheme::HandleLI        },
+		{ "LIO",        &DBAtheme::HandleLIO       },
 		{ "LUID",       &DBAtheme::HandleIgnore    },
 		{ "MC",         &DBAtheme::HandleMC        },
 		{ "MCFP",       &DBAtheme::HandleMCFP      },
@@ -282,22 +286,7 @@ private:
 			data->mlocks.emplace_back("REGISTERED", set);
 
 		// Atheme also supports per-ircd values here (ew).
-		if (IRCD->owner->name == "bahamut")
-		{
-			if (locks & 0x1000u)
-				data->mlocks.emplace_back("BLOCKCOLOR", set);
-			if (locks & 0x2000u)
-				data->mlocks.emplace_back("REGMODERATED", set);
-			if (locks & 0x4000u)
-				data->mlocks.emplace_back("REGISTEREDONLY", set);
-			if (locks & 0x8000u)
-				data->mlocks.emplace_back("OPERONLY", set);
-
-			// Anope doesn't recognise the following Bahamut modes currently:
-			// - 0x10000u ('A')
-			// - 0x20000u ('P')
-		}
-		else if (IRCD->owner->name == "inspircd")
+		if (IRCD->owner->name == "inspircd")
 		{
 			if (locks & 0x1000u)
 				data->mlocks.emplace_back("BLOCKCOLOR", set);
@@ -500,9 +489,12 @@ private:
 		else
 		{
 			// Generate a new password as we can't use the old one.
-			auto maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
+			auto maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
 			Anope::Encrypt(Anope::Random(maxpasslen), nc->pass);
-			Log(this) << "Unable to convert the password for " << nc->display << " as Anope does not support the format!";
+
+			// If the password is set to * then an external service is being used for authentication.
+			if (pass != "*")
+				Log(this) << "Unable to convert the password for " << nc->display << " as Anope does not support the format!";
 		}
 
 	}
@@ -547,7 +539,14 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		auto *bi = new BotInfo(nick, user, host, real);
+		auto *bi = BotInfo::Find(nick);
+		if (bi)
+		{
+			Log(this) << "Refusing to import duplicate bot: " << nick;
+			return true;
+		}
+
+		bi = new BotInfo(nick, user, host, real);
 		bi->oper_only = operonly;
 		bi->created = created;
 		return true;
@@ -764,7 +763,7 @@ private:
 	bool HandleKL(AthemeRow &row)
 	{
 		// KL <id> <user> <host> <duration> <settime> <setby> <reason>
-		/* auto id = */ row.GetNum<unsigned>();
+		auto id = row.Get();
 		auto user = row.Get();
 		auto host = row.Get();
 		auto duration = row.GetNum<unsigned>();
@@ -782,7 +781,60 @@ private:
 		}
 
 		auto *xl = new XLine(user + "@" + host, setby, settime + duration, reason);
+		xl->id = id;
 		sglinemgr->AddXLine(xl);
+		return true;
+	}
+
+	bool HandleLI(AthemeRow &row)
+	{
+		// LI <setter> <subject> <ts> <body>
+		auto setter = row.Get();
+		auto subject = row.Get();
+		auto ts = row.GetNum<time_t>();
+		auto body = row.GetRemaining();
+
+		if (!row)
+			return row.LogError(this);
+
+		if (!news_service)
+		{
+			Log(this) << "Unable to convert logon news as os_news is not loaded";
+			return true;
+		}
+
+		auto *ni = news_service->CreateNewsItem();
+		ni->type = NEWS_LOGON;
+		ni->text = Anope::printf("[%s] %s", subject.c_str(), body.c_str());
+		ni->who = setter;
+		ni->time = ts;
+		news_service->AddNewsItem(ni);
+		return true;
+	}
+
+	bool HandleLIO(AthemeRow &row)
+	{
+		// LIO <setter> <subject> <ts> <body>
+		auto setter = row.Get();
+		auto subject = row.Get();
+		auto ts = row.GetNum<time_t>();
+		auto body = row.GetRemaining();
+
+		if (!row)
+			return row.LogError(this);
+
+		if (!news_service)
+		{
+			Log(this) << "Unable to convert oper news as os_news is not loaded";
+			return true;
+		}
+
+		auto *ni = news_service->CreateNewsItem();
+		ni->type = NEWS_OPER;
+		ni->text = Anope::printf("[%s] %s", subject.c_str(), body.c_str());
+		ni->who = setter;
+		ni->time = ts;
+		news_service->AddNewsItem(ni);
 		return true;
 	}
 
@@ -803,7 +855,7 @@ private:
 		// MC <channel> <regtime> <used> <flags> <mlock-on> <mlock-off> <mlock-limit> [<mlock-key>]
 		auto channel = row.Get();
 		auto regtime = row.GetNum<time_t>();
-		/* auto used = */ row.GetNum<time_t>();
+		auto used = row.GetNum<time_t>();
 		auto flags = row.Get();
 		auto mlock_on = row.GetNum<unsigned>();
 		auto mlock_off = row.GetNum<unsigned>();
@@ -815,7 +867,8 @@ private:
 		auto mlock_key = row.Get(); // May not exist.
 
 		auto *ci = new ChannelInfo(channel);
-		ci->time_registered = regtime;
+		ci->registered = regtime;
+		ci->last_used = used;
 
 		// No equivalent: elnv
 		ApplyFlags(ci, flags, 'h', "CS_NO_EXPIRE");
@@ -1006,6 +1059,20 @@ private:
 			ci->last_topic_time = Anope::Convert<time_t>(value, 0);
 		else if (key.compare(0, 14, "private:stats:", 14) == 0)
 			return HandleIgnoreMetadata(ci->name, key, value);
+		else if (key.find(':') == Anope::string::npos)
+		{
+			ExtensibleRef<MiscData> extref("cs_set_misc:" + key.upper());
+			if (!extref)
+			{
+				Log(this) << "Unknown public channel metadata for " << ci->name << ": " << key << " = " << value;
+				return true;
+			}
+
+			auto *data = extref->Set(ci);
+			data->object = ci->name;
+			data->name = key;
+			data->data = value;
+		}
 		else
 			Log(this) << "Unknown channel metadata for " << ci->name << ": " << key << " = " << value;
 
@@ -1068,22 +1135,9 @@ private:
 		if (key == "private:autojoin")
 			return true; // TODO
 		else if (key == "private:doenforce")
-			data->kill = true;
+			data->protect = true;
 		else if (key == "private:enforcetime")
-		{
-			if (!data->kill)
-				return true; // Don't apply this.
-
-			auto kill = Config->GetModule("nickserv")->Get<time_t>("kill", "60s");
-			auto killquick = Config->GetModule("nickserv")->Get<time_t>("killquick", "20s");
-			auto secs = Anope::Convert<time_t>(value, kill);
-			if (secs >= kill)
-				nc->Extend<bool>("KILLPROTECT");
-			else if (secs >= killquick)
-				nc->Shrink<bool>("KILL_QUICK");
-			else
-				nc->Shrink<bool>("KILL_IMMED");
-		}
+			data->protectafter = Anope::TryConvert<time_t>(value);
 		else if (key == "private:freeze:freezer")
 			data->suspend_by = value;
 		else if (key == "private:freeze:reason")
@@ -1118,6 +1172,20 @@ private:
 			data->vhost_ts = Anope::Convert<time_t>(value, 0);
 		else if (key.compare(0, 18, "private:usercloak:", 18) == 0)
 			data->vhost_nick[key.substr(18)] = value;
+		else if (key.find(':') == Anope::string::npos)
+		{
+			ExtensibleRef<MiscData> extref("ns_set_misc:" + key.upper());
+			if (!extref)
+			{
+				Log(this) << "Unknown public account metadata for " << nc->display << ": " << key << " = " << value;
+				return true;
+			}
+
+			auto *data = extref->Set(nc);
+			data->object = nc->display;
+			data->name = key;
+			data->data = value;
+		}
 		else
 			Log(this) << "Unknown account metadata for " << nc->display << ": " << key << " = " << value;
 
@@ -1170,7 +1238,7 @@ private:
 			return false;
 		}
 
-		nc->memos.ignores.push_back(ignored);
+		nc->memos.ignores.insert(ignored);
 		return true;
 	}
 
@@ -1231,9 +1299,16 @@ private:
 			return false;
 		}
 
-		auto *na = new NickAlias(nick, nc);
-		na->time_registered = regtime;
-		na->last_seen = lastseen ? regtime : na->time_registered;
+		auto *na = NickAlias::Find(nick);
+		if (na)
+		{
+			Log(this) << "Refusing to import duplicate nick: " << nick;
+			return true;
+		}
+
+		na = new NickAlias(nick, nc);
+		na->registered = regtime;
+		na->last_seen = lastseen ? regtime : na->registered;
 
 		auto *data = userdata.Get(nc);
 		if (data)
@@ -1276,13 +1351,20 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		auto *nc = new NickCore(display);
+		auto *nc = NickCore::Find(display);
+		if (nc)
+		{
+			Log(this) << "Refusing to import duplicate account: " << display;
+			return true;
+		}
+
+		nc = new NickCore(display);
 		nc->email = email;
-		nc->time_registered = regtime;
+		nc->registered = regtime;
 		ApplyPassword(nc, flags, pass);
 
 		// No equivalent: bglmNQrS
-		ApplyFlags(nc, flags, 'E', "KILLPROTECT");
+		ApplyFlags(nc, flags, 'E', "PROTECT");
 		ApplyFlags(nc, flags, 'e', "MEMO_MAIL");
 		ApplyFlags(nc, flags, 'n', "NEVEROP");
 		ApplyFlags(nc, flags, 'o', "AUTOOP", false);
@@ -1293,7 +1375,7 @@ private:
 
 		// If an Atheme account was awaiting confirmation but Anope is not
 		// configured to use confirmation then autoconfirm it.
-		const auto &nsregister = Config->GetModule("ns_register")->Get<const Anope::string>("registration");
+		const auto &nsregister = Config->GetModule("ns_register").Get<const Anope::string>("registration");
 		if (nsregister.equals_ci("none"))
 			nc->Shrink<bool>("UNCONFIRMED");
 
@@ -1355,7 +1437,7 @@ private:
 	bool HandleQL(AthemeRow &row)
 	{
 		// QL <nick> <host> <duration> <settime> <setby> <reason>
-		/* auto id = */ row.GetNum<unsigned>();
+		auto id = row.Get();
 		auto nick = row.Get();
 		auto duration = row.GetNum<unsigned>();
 		auto settime = row.GetNum<time_t>();
@@ -1372,6 +1454,7 @@ private:
 		}
 
 		auto *xl = new XLine(nick, setby, settime + duration, reason);
+		xl->id = id;
 		sqlinemgr->AddXLine(xl);
 		return true;
 	}
@@ -1416,7 +1499,7 @@ private:
 	bool HandleXL(AthemeRow &row)
 	{
 		// XL <id> <real> <duration> <settime> <setby> <reason>
-		/* auto id = */ row.GetNum<unsigned>();
+		auto id = row.Get();
 		auto real = row.Get();
 		auto duration = row.GetNum<unsigned>();
 		auto settime = row.GetNum<time_t>();
@@ -1433,6 +1516,7 @@ private:
 		}
 
 		auto *xl = new XLine(real, setby, settime + duration, reason);
+		xl->id = id;
 		snlinemgr->AddXLine(xl);
 		return true;
 	}
@@ -1449,14 +1533,14 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		flags.clear();
 		for (int i = 0; i < Config->CountBlock("privilege"); ++i)
 		{
-			Configuration::Block *priv = Config->GetBlock("privilege", i);
-			const Anope::string &name = priv->Get<const Anope::string>("name");
-			const Anope::string &value = priv->Get<const Anope::string>("flag");
+			const auto &priv = Config->GetBlock("privilege", i);
+			const Anope::string &name = priv.Get<const Anope::string>("name");
+			const Anope::string &value = priv.Get<const Anope::string>("flag");
 			if (!name.empty() && !value.empty())
 				flags[name] = value[0];
 		}
@@ -1464,7 +1548,7 @@ public:
 
 	EventReturn OnLoadDatabase() override
 	{
-		const auto dbname = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "atheme.db"));
+		const auto dbname = Anope::ExpandData(Config->GetModule(this).Get<const Anope::string>("database", "atheme.db"));
 		std::ifstream fd(dbname.str());
 		if (!fd.is_open())
 		{
@@ -1556,6 +1640,13 @@ public:
 				{
 					Log(this) << "Unable to convert oper info for " << nc->display << " as os_info is not loaded";
 				}
+			}
+
+			if (data->protect)
+			{
+				nc->Extend<bool>("PROTECT");
+				if (data->protectafter)
+					nc->Extend("PROTECT_AFTER", data->protectafter.value());
 			}
 
 			if (!data->suspend_reason.empty())

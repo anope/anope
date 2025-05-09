@@ -1,6 +1,6 @@
 /* HostServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -51,7 +51,7 @@ public:
 			}
 		}
 
-		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
+		unsigned display_counter = 0, listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("VHost")).AddColumn(_("Creator")).AddColumn(_("Created"));
 
@@ -123,13 +123,15 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command lists registered vhosts to the operator.\n"
-				"If a \037key\037 is specified, only entries whose nick or vhost match\n"
-				"the pattern given in \037key\037 are displayed e.g. Rob* for all\n"
-				"entries beginning with \"Rob\"\n"
-				"If a \037#X-Y\037 style is used, only entries between the range of \002X\002\n"
-				"and \002Y\002 will be displayed, e.g. \002#1-3\002 will display the first 3\n"
-				"nick/vhost entries."));
+		source.Reply(_(
+			"This command lists registered vhosts to the operator. "
+			"If a \037key\037 is specified, only entries whose nick or vhost match "
+			"the pattern given in \037key\037 are displayed e.g. Rob* for all "
+			"entries beginning with \"Rob\". "
+			"If a \037#X-Y\037 style is used, only entries between the range of \002X\002 "
+			"and \002Y\002 will be displayed, e.g. \002#1-3\002 will display the first 3 "
+			"nick/vhost entries."
+		));
 		return true;
 	}
 };

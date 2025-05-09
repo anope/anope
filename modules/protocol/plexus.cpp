@@ -1,6 +1,6 @@
 /* Plexus 3+ IRCD functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/sasl.h"
+#include "modules/nickserv/sasl.h"
 
 static Anope::string UplinkSID;
 
@@ -18,9 +18,12 @@ static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
 
 class PlexusProto final
 	: public IRCDProto
+	, SASL::ProtocolInterface
 {
 public:
-	PlexusProto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
+	PlexusProto(Module *creator)
+		: IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
+		, SASL::ProtocolInterface(creator)
 	{
 		DefaultPseudoclientModes = "+iU";
 		CanSVSNick = true;
@@ -58,7 +61,7 @@ public:
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), user->GetUID());
+		Uplink::Send("SJOIN", c->created, c->name, "+" + c->GetModes(true, true), user->GetUID());
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -178,10 +181,10 @@ public:
 	{
 		Server *s = Server::Find(message.target.substr(0, 3));
 		auto target = s ? s->GetName() : message.target.substr(0, 3);
-		if (message.ext.empty())
-			Uplink::Send("ENCAP", target, "SASL", message.source, message.target, message.type, message.data);
-		else
-			Uplink::Send("ENCAP", target, "SASL", message.source, message.target, message.type, message.data, message.ext);
+
+		auto newparams = message.data;
+		newparams.insert(newparams.begin(), { target, "SASL", message.source, message.target, message.type });
+		Uplink::SendInternal({}, Me, "ENCAP", newparams);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, NickAlias *na) override
@@ -245,16 +248,14 @@ struct IRCDMessageEncap final
 			}
 		}
 
-		else if (params[1] == "SASL" && SASL::sasl && params.size() >= 6)
+		else if (params[1] == "SASL" && SASL::service && params.size() >= 6)
 		{
 			SASL::Message m;
 			m.source = params[2];
 			m.target = params[3];
 			m.type = params[4];
-			m.data = params[5];
-			m.ext = params.size() > 6 ? params[6] : "";
-
-			SASL::sasl->ProcessMessage(m);
+			m.data.assign(params.begin() + 5, params.end());
+			SASL::service->ProcessMessage(m);
 		}
 
 		return;

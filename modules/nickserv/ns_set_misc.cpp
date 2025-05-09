@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -43,15 +43,25 @@ struct NSMiscData final
 		name = n;
 		data = d;
 	}
+};
 
-	void Serialize(Serialize::Data &sdata) const override
+struct NSMiscDataType final
+	: Serialize::Type
+{
+	NSMiscDataType()
+		: Serialize::Type("NSMiscData")
 	{
-		sdata.Store("nc", this->object);
-		sdata.Store("name", this->name);
-		sdata.Store("data", this->data);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &sdata) const override
+	{
+		const auto *d = static_cast<const NSMiscData *>(obj);
+		sdata.Store("nc", d->object);
+		sdata.Store("name", d->name);
+		sdata.Store("data", d->data);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string snc, sname, sdata;
 
@@ -143,12 +153,12 @@ public:
 		this->Run(source, source.nc->display, !params.empty() ? params[0] : "");
 	}
 
-	void OnServHelp(CommandSource &source) override
+	void OnServHelp(CommandSource &source, HelpWrapper &help) override
 	{
 		if (descriptions.count(source.command))
 		{
 			this->SetDesc(descriptions[source.command]);
-			Command::OnServHelp(source);
+			Command::OnServHelp(source, help);
 		}
 	}
 
@@ -185,11 +195,13 @@ class NSSetMisc final
 {
 	CommandNSSetMisc commandnssetmisc;
 	CommandNSSASetMisc commandnssasetmisc;
-	Serialize::Type nsmiscdata_type;
+	NSMiscDataType nsmiscdata_type;
 
 public:
-	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnssetmisc(this), commandnssasetmisc(this), nsmiscdata_type("NSMiscData", NSMiscData::Unserialize)
+	NSSetMisc(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnssetmisc(this)
+		, commandnssasetmisc(this)
 	{
 		me = this;
 	}
@@ -200,26 +212,29 @@ public:
 			delete data;
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		descriptions.clear();
 
-		for (int i = 0; i < conf->CountBlock("command"); ++i)
+		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("command", i);
+			const auto &block = conf.GetBlock("command", i);
 
-			const Anope::string &cmd = block->Get<const Anope::string>("command");
+			const Anope::string &cmd = block.Get<const Anope::string>("command");
 
 			if (cmd != "nickserv/set/misc" && cmd != "nickserv/saset/misc")
 				continue;
 
-			Anope::string cname = block->Get<const Anope::string>("name");
-			Anope::string desc = block->Get<const Anope::string>("misc_description");
+			Anope::string cname = block.Get<const Anope::string>("name");
+			Anope::string desc = block.Get<const Anope::string>("misc_description");
 
 			if (cname.empty() || desc.empty())
 				continue;
 
 			descriptions[cname] = desc;
+
+			// Force creation of the extension item.
+			GetItem("ns_set_misc:" + GetAttribute(cname));
 		}
 	}
 

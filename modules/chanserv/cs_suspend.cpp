@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -17,17 +17,27 @@ struct CSSuspendInfo final
 	, Serializable
 {
 	CSSuspendInfo(Extensible *) : Serializable("CSSuspendInfo") { }
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct CSSuspendInfoType final
+	: Serialize::Type
+{
+	CSSuspendInfoType()
+		: Serialize::Type("CSSuspendInfo")
 	{
-		data.Store("chan", what);
-		data.Store("by", by);
-		data.Store("reason", reason);
-		data.Store("time", when);
-		data.Store("expires", expires);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *si = static_cast<const CSSuspendInfo *>(obj);
+		data.Store("chan", si->what);
+		data.Store("by", si->by);
+		data.Store("reason", si->reason);
+		data.Store("time", si->when);
+		data.Store("expires", si->expires);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string schan;
 		data["chan"] >> schan;
@@ -67,7 +77,7 @@ public:
 		const Anope::string &chan = params[0];
 		Anope::string expiry = params[1];
 		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("suspendexpire");
+		time_t expiry_secs = Config->GetModule(this->owner).Get<time_t>("suspendexpire");
 
 		if (!expiry.empty() && expiry[0] != '+')
 		{
@@ -133,14 +143,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Disallows anyone from using the given channel.\n"
-				"May be cancelled by using the \002UNSUSPEND\002\n"
-				"command to preserve all previous channel data/settings.\n"
-				"If an expiry is given the channel will be unsuspended after\n"
-				"that period of time, else the default expiry from the\n"
-				"configuration is used.\n"
-				" \n"
-				"Reason may be required on certain networks."));
+		source.Reply(_(
+			"Disallows anyone from using the given channel. "
+			"May be cancelled by using the \002UNSUSPEND\002 "
+			"command to preserve all previous channel data/settings. "
+			"If an expiry is given the channel will be unsuspended after "
+			"that period of time, else the default expiry from the "
+			"configuration is used."
+			"\n\n"
+			"Reason may be required on certain networks."
+		));
 		return true;
 	}
 };
@@ -191,8 +203,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Releases a suspended channel. All data and settings\n"
-				"are preserved from before the suspension."));
+		source.Reply(_(
+			"Releases a suspended channel. All data and settings "
+			"are preserved from before the suspension."
+		));
 		return true;
 	}
 };
@@ -203,7 +217,7 @@ class CSSuspend final
 	CommandCSSuspend commandcssuspend;
 	CommandCSUnSuspend commandcsunsuspend;
 	ExtensibleItem<CSSuspendInfo> suspend;
-	Serialize::Type suspend_type;
+	CSSuspendInfoType suspend_type;
 	std::vector<Anope::string> show;
 
 	struct trim final
@@ -227,15 +241,17 @@ class CSSuspend final
 	}
 
 public:
-	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcssuspend(this), commandcsunsuspend(this), suspend(this, "CS_SUSPENDED"),
-		suspend_type("CSSuspendInfo", CSSuspendInfo::Unserialize)
+	CSSuspend(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandcssuspend(this)
+		, commandcsunsuspend(this)
+		, suspend(this, "CS_SUSPENDED")
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Anope::string s = conf->GetModule(this)->Get<Anope::string>("show");
+		Anope::string s = conf.GetModule(this).Get<Anope::string>("show");
 		commasepstream(s).GetTokens(show);
 		std::transform(show.begin(), show.end(), show.begin(), trim());
 	}

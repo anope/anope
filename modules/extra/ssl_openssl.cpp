@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2010-2024 Anope Team
+ * (C) 2010-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -52,14 +52,14 @@ public:
 	 * @param sz How much to read
 	 * @return Number of bytes received
 	 */
-	int Recv(Socket *s, char *buf, size_t sz) override;
+	ssize_t Recv(Socket *s, char *buf, size_t sz) override;
 
 	/** Write something to the socket
 	 * @param s The socket
 	 * @param buf The data to write
 	 * @param size The length of the data
 	 */
-	int Send(Socket *s, const char *buf, size_t sz) override;
+	ssize_t Send(Socket *s, const char *buf, size_t sz) override;
 
 	/** Accept a connection from a socket
 	 * @param s The socket
@@ -125,6 +125,8 @@ public:
 		Anope::string context_name = "Anope";
 		SSL_CTX_set_session_id_context(client_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());
 		SSL_CTX_set_session_id_context(server_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());
+
+		Log(this) << "Module was compiled against OpenSSL version " << OPENSSL_VERSION_STR << " and is running against version " << OpenSSL_version(OPENSSL_VERSION_STRING);
 	}
 
 	~SSLModule()
@@ -142,14 +144,14 @@ public:
 		SSL_CTX_free(server_ctx);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
+		const auto &config = conf.GetModule(this);
 
-		this->certfile = Anope::ExpandConfig(config->Get<const Anope::string>("cert", "fullchain.pem"));
-		this->keyfile = Anope::ExpandConfig(config->Get<const Anope::string>("key", "privkey.pem"));
+		this->certfile = Anope::ExpandConfig(config.Get<const Anope::string>("cert", "fullchain.pem"));
+		this->keyfile = Anope::ExpandConfig(config.Get<const Anope::string>("key", "privkey.pem"));
 
-		if (Anope::IsFile(this->certfile.c_str()))
+		if (Anope::IsFile(this->certfile))
 		{
 			if (!SSL_CTX_use_certificate_chain_file(client_ctx, this->certfile.c_str()) || !SSL_CTX_use_certificate_chain_file(server_ctx, this->certfile.c_str()))
 				throw ConfigException("Error loading certificate");
@@ -159,7 +161,7 @@ public:
 		else
 			Log() << "Unable to open certificate " << this->certfile;
 
-		if (Anope::IsFile(this->keyfile.c_str()))
+		if (Anope::IsFile(this->keyfile))
 		{
 			if (!SSL_CTX_use_PrivateKey_file(client_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_PrivateKey_file(server_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM))
 				throw ConfigException("Error loading private key");
@@ -168,14 +170,14 @@ public:
 		}
 		else
 		{
-			if (Anope::IsFile(this->certfile.c_str()))
+			if (Anope::IsFile(this->certfile))
 				throw ConfigException("Error loading private key " + this->keyfile + " - file not found");
 			else
 				Log() << "Unable to open private key " << this->keyfile;
 		}
 
 		// Allow disabling old versions of TLS
-		if (config->Get<bool>("tlsv10", "false"))
+		if (config.Get<bool>("tlsv10", "false"))
 		{
 			SSL_CTX_clear_options(client_ctx, SSL_OP_NO_TLSv1);
 			SSL_CTX_clear_options(server_ctx, SSL_OP_NO_TLSv1);
@@ -186,7 +188,7 @@ public:
 			SSL_CTX_set_options(server_ctx, SSL_OP_NO_TLSv1);
 		}
 
-		if (config->Get<bool>("tlsv11", "true"))
+		if (config.Get<bool>("tlsv11", "true"))
 		{
 			SSL_CTX_clear_options(client_ctx, SSL_OP_NO_TLSv1_1);
 			SSL_CTX_clear_options(server_ctx, SSL_OP_NO_TLSv1_1);
@@ -197,7 +199,7 @@ public:
 			SSL_CTX_set_options(server_ctx, SSL_OP_NO_TLSv1_1);
 		}
 
-		if (config->Get<bool>("tlsv12", "true"))
+		if (config.Get<bool>("tlsv12", "true"))
 		{
 			SSL_CTX_clear_options(client_ctx, SSL_OP_NO_TLSv1_2);
 			SSL_CTX_clear_options(server_ctx, SSL_OP_NO_TLSv1_2);
@@ -211,9 +213,9 @@ public:
 
 	void OnPreServerConnect() override
 	{
-		Configuration::Block *config = Config->GetBlock("uplink", Anope::CurrentUplink);
+		const auto &config = Config->GetBlock("uplink", Anope::CurrentUplink);
 
-		if (config->Get<bool>("ssl"))
+		if (config.Get<bool>("ssl"))
 		{
 			this->service.Init(UplinkSock);
 		}
@@ -237,7 +239,7 @@ SSLSocketIO::SSLSocketIO()
 	this->sslsock = NULL;
 }
 
-int SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
+ssize_t SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
 {
 	int i = SSL_read(this->sslsock, buf, sz);
 	if (i > 0)
@@ -256,7 +258,7 @@ int SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
 	return i;
 }
 
-int SSLSocketIO::Send(Socket *s, const char *buf, size_t sz)
+ssize_t SSLSocketIO::Send(Socket *s, const char *buf, size_t sz)
 {
 	int i = SSL_write(this->sslsock, buf, sz);
 	if (i > 0)

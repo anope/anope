@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,12 +10,27 @@
  */
 
 #include "module.h"
+#include "modules/encryption.h"
 
 class CommandOSLogin final
 	: public Command
 {
+private:
+	bool ComparePassword(const Oper *o, const Anope::string &password)
+	{
+		if (o->password_hash.empty())
+			return o->password.equals_cs(password); // Plaintext password.
+
+		auto *service = Service::FindService("Encryption::Provider", o->password_hash);
+		if (!service)
+			return false; // Malformed hash.
+
+		auto *hashprov = static_cast<Encryption::Provider *>(service);
+		return hashprov->Compare(o->password, password);
+	}
+
 public:
-	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 1, 1)
+	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 0, 1)
 	{
 		this->SetSyntax(_("\037password\037"));
 		this->RequireUser(true);
@@ -23,8 +38,6 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const Anope::string &password = params[0];
-
 		User *u = source.GetUser();
 		Oper *o = source.nc->o;
 		if (o == NULL)
@@ -33,7 +46,7 @@ public:
 			source.Reply(_("Your oper block doesn't require logging in."));
 		else if (u->HasExt("os_login"))
 			source.Reply(_("You are already identified."));
-		else if (o->password != password)
+		else if (params.empty() || !ComparePassword(o, params[0]))
 		{
 			source.Reply(PASSWORD_INCORRECT);
 			u->BadPassword();
@@ -50,9 +63,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Logs you in to %s so you gain Services Operator privileges.\n"
-				"This command may be unnecessary if your oper block is\n"
-				"configured without a password."), source.service->nick.c_str());
+		source.Reply(_(
+				"Logs you in to %s so you gain Services Operator privileges. "
+				"This command may be unnecessary if your oper block is "
+				"configured without a password."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 
@@ -93,9 +109,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Logs you out from %s so you lose Services Operator privileges.\n"
-				"This command is only useful if your oper block is configured\n"
-				"with a password."), source.service->nick.c_str());
+		source.Reply(_(
+				"Logs you out from %s so you lose Services Operator privileges. "
+				"This command is only useful if your oper block is configured "
+				"with a password."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 

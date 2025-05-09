@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -91,7 +91,9 @@ const std::list<AccessProvider *>& AccessProvider::GetProviders()
 	return Providers;
 }
 
-ChanAccess::ChanAccess(AccessProvider *p) : Serializable("ChanAccess"), provider(p)
+ChanAccess::ChanAccess(AccessProvider *p)
+	: Serializable(CHANACCESS_TYPE)
+	, provider(p)
 {
 }
 
@@ -158,19 +160,26 @@ NickCore *ChanAccess::GetAccount() const
 	return nc;
 }
 
-void ChanAccess::Serialize(Serialize::Data &data) const
+
+ChanAccess::Type::Type()
+	: Serialize::Type(CHANACCESS_TYPE)
 {
-	data.Store("provider", this->provider->name);
-	data.Store("ci", this->ci->name);
-	data.Store("mask", this->Mask());
-	data.Store("creator", this->creator);
-	data.Store("description", this->description);
-	data.Store("last_seen", this->last_seen);
-	data.Store("created", this->created);
-	data.Store("data", this->AccessSerialize());
 }
 
-Serializable *ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
+void ChanAccess::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *access = static_cast<const ChanAccess *>(obj);
+	data.Store("provider", access->provider->name);
+	data.Store("ci", access->ci->name);
+	data.Store("mask", access->Mask());
+	data.Store("creator", access->creator);
+	data.Store("description", access->description);
+	data.Store("last_seen", access->last_seen);
+	data.Store("created", access->created);
+	data.Store("data", access->AccessSerialize());
+}
+
+Serializable *ChanAccess::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string provider, chan;
 

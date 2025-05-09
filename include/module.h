@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -45,7 +45,7 @@
 #include "users.h"
 #include "xline.h"
 
-#include "modules/pseudoclients/chanserv.h"
-#include "modules/pseudoclients/global.h"
-#include "modules/pseudoclients/memoserv.h"
-#include "modules/pseudoclients/nickserv.h"
+#include "modules/chanserv/service.h"
+#include "modules/global/service.h"
+#include "modules/memoserv/service.h"
+#include "modules/nickserv/service.h"

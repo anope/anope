@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -109,20 +109,25 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists all channels currently in use on the IRC network, whether they\n"
-				"are registered or not.\n"
-				" \n"
-				"If \002pattern\002 is given, lists only channels that match it. If a nickname\n"
-				"is given, lists only the channels the user using it is on. If SECRET is\n"
-				"specified, lists only channels matching \002pattern\002 that have the +s or\n"
-				"+p mode."));
+		source.Reply(_(
+			"Lists all channels currently in use on the IRC network, whether they "
+			"are registered or not."
+			"\n\n"
+			"If \002pattern\002 is given, lists only channels that match it. If a nickname "
+			"is given, lists only the channels the user using it is on. If SECRET is "
+			"specified, lists only channels matching \002pattern\002 that have the +s or "
+			"+p mode."
+		));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), regexengine.c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your pattern in // if this is desired."
+				),
+				regexengine.c_str());
 		}
 
 		return true;
@@ -252,20 +257,25 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists all users currently online on the IRC network, whether their\n"
-				"nick is registered or not.\n"
-				" \n"
-				"If \002pattern\002 is given, lists only users that match it (it must be in\n"
-				"the format nick!user@host[#realname]). If \002channel\002 is given, lists\n"
-				"only users that are on the given channel. If INVISIBLE is specified, only users\n"
-				"with the +i flag will be listed."));
+		source.Reply(_(
+			"Lists all users currently online on the IRC network, whether their "
+			"nick is registered or not."
+			"\n\n"
+			"If \002pattern\002 is given, lists only users that match it (it must be in "
+			"the format nick!user@host[#realname]). If \002channel\002 is given, lists "
+			"only users that are on the given channel. If INVISIBLE is specified, only users "
+			"with the +i flag will be listed."
+		));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), regexengine.c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your pattern in // if this is desired."
+				),
+				regexengine.c_str());
 		}
 
 		return true;

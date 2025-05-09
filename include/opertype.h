@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2024 Anope Team <team@anope.org>
+ * (C) 2008-2025 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -23,6 +23,7 @@ struct CoreExport Oper
 	/* Whether the user must be an IRC operator (umode +o) to be considered a services operator */
 	bool require_oper = true;
 	Anope::string password;
+	Anope::string password_hash;
 	std::vector<Anope::string> certfp;
 	/* Hosts allowed to use this operator block */
 	std::vector<Anope::string> hosts;

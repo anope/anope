@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -50,8 +50,8 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		Configuration::Block *block = Config->GetCommand(source);
-		const Anope::string &mode = block->Get<Anope::string>("mode", "BAN");
+		const auto &block = Config->GetCommand(source);
+		const Anope::string &mode = block.Get<Anope::string>("mode", "BAN");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
 		if (cm == NULL)
 			return;
@@ -107,12 +107,11 @@ public:
 				reason += " " + params[3];
 		}
 
-		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		unsigned reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 
-		Anope::string signkickformat = Config->GetModule("chanserv")->Get<Anope::string>("signkickformat", "%m (%n)");
-		signkickformat = signkickformat.replace_all_cs("%n", source.GetNick());
+		auto signkickformat = Config->GetModule("chanserv").Get<Anope::string>("signkickformat", "{message} ({nick})");
 
 		User *u = source.GetUser();
 		User *u2 = User::Find(target, true);
@@ -156,11 +155,14 @@ public:
 				if (!c->FindUser(u2))
 					return;
 
-				if (block->Get<bool>("kick", "yes"))
+				if (block.Get<bool>("kick", "yes"))
 				{
 					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
 					{
-						signkickformat = signkickformat.replace_all_cs("%m", reason);
+						signkickformat = Anope::Template(signkickformat, {
+							{ "message", reason           },
+							{ "nick",    source.GetNick() },
+						});
 						c->Kick(ci->WhoSends(), u2, signkickformat);
 					}
 					else
@@ -209,13 +211,16 @@ public:
 					else if (uc->user->IsProtected())
 						continue;
 
-					if (block->Get<bool>("kick", "yes"))
+					if (block.Get<bool>("kick", "yes"))
 					{
 						++kicked;
 						if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
 						{
 							reason += " (Matches " + mask + ")";
-							signkickformat = signkickformat.replace_all_cs("%m", reason);
+							signkickformat = Anope::Template(signkickformat, {
+								{ "message", reason           },
+								{ "nick",    source.GetNick() },
+							});
 							c->Kick(ci->WhoSends(), uc->user, signkickformat);
 						}
 						else
@@ -235,12 +240,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Bans a given nick or mask on a channel. An optional expiry may\n"
-				"be given to cause services to remove the ban after a set amount\n"
-				"of time.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 access\n"
-				"and above on the channel. Channel founders may ban masks."));
+		source.Reply(_(
+			"Bans a given nick or mask on a channel. An optional expiry may "
+			"be given to cause services to remove the ban after a set amount "
+			"of time."
+			"\n\n"
+			"By default, limited to AOPs or those with level 5 access "
+			"and above on the channel. Channel founders may ban masks."
+		));
 		return true;
 	}
 };

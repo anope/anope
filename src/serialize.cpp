@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -27,9 +27,14 @@ std::list<Serializable *> *Serializable::SerializableItems;
 
 void Serialize::RegisterTypes()
 {
-	static Type nc("NickCore", NickCore::Unserialize), na("NickAlias", NickAlias::Unserialize), bi("BotInfo", BotInfo::Unserialize),
-		ci("ChannelInfo", ChannelInfo::Unserialize), access("ChanAccess", ChanAccess::Unserialize),
-		akick("AutoKick", AutoKick::Unserialize), memo("Memo", Memo::Unserialize), xline("XLine", XLine::Unserialize);
+	static NickCore::Type nc;
+	static NickAlias::Type na;
+	static BotInfo::Type bi;
+	static ChannelInfo::Type ci;
+	static ChanAccess::Type access;
+	static AutoKick::Type akick;
+	static Memo::Type memo;
+	static XLine::Type xline;
 }
 
 void Serialize::CheckTypes()
@@ -111,7 +116,22 @@ const std::list<Serializable *> &Serializable::GetItems()
 	return *SerializableItems;
 }
 
-Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o)
+Serialize::DataType Serialize::Data::GetType(const Anope::string &key) const
+{
+	auto it = this->types.find(key);
+	if (it != this->types.end())
+		return it->second;
+	return Serialize::DataType::TEXT;
+}
+
+void Serialize::Data::SetType(const Anope::string &key, Serialize::DataType dt)
+{
+	this->types[key] = dt;
+}
+
+Type::Type(const Anope::string &n, Module *o)
+	: name(n)
+	, owner(o)
 {
 	TypeOrder.push_back(this->name);
 	Types[this->name] = this;
@@ -137,19 +157,9 @@ Type::~Type()
 	Types.erase(this->name);
 }
 
-Serializable *Type::Unserialize(Serializable *obj, Serialize::Data &data)
-{
-	return this->unserialize(obj, data);
-}
-
 void Type::Check()
 {
 	FOREACH_MOD(OnSerializeCheck, (this));
-}
-
-time_t Type::GetTimestamp() const
-{
-	return this->timestamp;
 }
 
 void Type::UpdateTimestamp()
@@ -163,14 +173,4 @@ Type *Serialize::Type::Find(const Anope::string &name)
 	if (it != Types.end())
 		return it->second;
 	return NULL;
-}
-
-const std::vector<Anope::string> &Type::GetTypeOrder()
-{
-	return TypeOrder;
-}
-
-const std::map<Anope::string, Serialize::Type *>& Type::GetTypes()
-{
-	return Types;
 }

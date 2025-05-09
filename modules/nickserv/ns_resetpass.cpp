@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -50,9 +50,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sends a passcode to the nickname with instructions on how to\n"
-				"reset their password.  Email must be the email address associated\n"
-				"to the nickname."));
+		source.Reply(_(
+			"Sends a passcode to the nickname with instructions on how to "
+			"reset their password. Email must be the email address associated "
+			"to the nickname."
+		));
 		return true;
 	}
 };
@@ -73,7 +75,7 @@ public:
 	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsresetpass(this), reset(this, "reset")
 	{
-		if (!Config->GetBlock("mail")->Get<bool>("usemail"))
+		if (!Config->GetBlock("mail").Get<bool>("usemail"))
 			throw ModuleException("Not using mail.");
 	}
 
@@ -132,21 +134,18 @@ public:
 
 static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi)
 {
-	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("reset_subject").c_str()),
-		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("reset_message").c_str()),
-		passcode = Anope::Random(20);
-
-	subject = subject.replace_all_cs("%n", na->nick);
-	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
-	subject = subject.replace_all_cs("%c", passcode);
-
-	message = message.replace_all_cs("%n", na->nick);
-	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
-	message = message.replace_all_cs("%c", passcode);
-
-	ResetInfo *ri = na->nc->Extend<ResetInfo>("reset");
-	ri->code = passcode;
+	auto *ri = na->nc->Extend<ResetInfo>("reset");
+	ri->code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
 	ri->time = Anope::CurTime;
+
+	Anope::map<Anope::string> vars = {
+		{ "nick",    na->nick                                                                },
+		{ "network", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
+		{ "code",    ri->code                                                                },
+	};
+
+	auto subject = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("reset_subject").c_str()), vars);
+	auto message = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("reset_message").c_str()), vars);
 
 	return Mail::Send(u, na->nc, bi, subject, message);
 }

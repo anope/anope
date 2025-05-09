@@ -1,6 +1,6 @@
 /* Modular support
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -242,7 +242,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	/* Initialize config */
 	try
 	{
-		m->OnReload(Config);
+		m->OnReload(*Config);
 	}
 	catch (const ModuleException &ex)
 	{

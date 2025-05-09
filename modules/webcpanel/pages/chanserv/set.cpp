@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -11,7 +11,7 @@ WebCPanel::ChanServ::Set::Set(const Anope::string &cat, const Anope::string &u) 
 {
 }
 
-bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Set::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 	bool can_set = false;
@@ -94,14 +94,14 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 	}
 
 	replacements["CHANNEL"] = ci->name;
-	replacements["CHANNEL_ESCAPED"] = HTTPUtils::URLEncode(ci->name);
+	replacements["CHANNEL_ESCAPED"] = HTTP::URLEncode(ci->name);
 	if (ci->GetFounder())
 		replacements["FOUNDER"] = ci->GetFounder()->display;
 	if (ci->GetSuccessor())
 		replacements["SUCCESSOR"] = ci->GetSuccessor()->display;
-	replacements["TIME_REGISTERED"] = Anope::strftime(ci->time_registered, na->nc);
+	replacements["REGISTERED"] = Anope::strftime(ci->registered, na->nc);
 	replacements["LAST_USED"] = Anope::strftime(ci->last_used, na->nc);
-	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
+	replacements["ESCAPED_CHANNEL"] = HTTP::URLEncode(chname);
 
 	if (!ci->last_topic.empty())
 	{

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2012-2024 Anope Team
+ * (C) 2012-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -62,6 +62,8 @@ public:
 		tre_regex_provider(this)
 	{
 		this->SetPermanent(true);
+
+		Log(this) << "Module was compiled against TRE version " << TRE_VERSION << " and is running against version " << tre_version();
 	}
 
 	~ModuleRegexTRE()

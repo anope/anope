@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2024 Anope Team <team@anope.org>
+ * (C) 2008-2025 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -23,6 +23,16 @@ class CoreExport BotInfo final
 	: public User
 	, public Serializable
 {
+public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
+private:
 	/* Channels this bot is assigned to */
 	Serialize::Checker<std::set<ChannelInfo *> > channels;
 public:
@@ -31,6 +41,8 @@ public:
 	time_t lastmsg;
 	/* Map of actual command names -> service name/permission required */
 	CommandInfo::map commands;
+	/* The server-side alias used to message this bot. */
+	Anope::string alias;
 	/* Modes the bot should have as configured in service:modes */
 	Anope::string botmodes;
 	/* Channels the bot should be in as configured in service:channels */
@@ -125,6 +137,9 @@ public:
 	 * @return A struct containing service name and permission
 	 */
 	CommandInfo *GetCommand(const Anope::string &cname);
+
+	/** Get the command that users can use to send a message to this bot. */
+	Anope::string GetQueryCommand(const Anope::string &command = "", const Anope::string &extra = "") const;
 
 	/** Find a bot by nick
 	 * @param nick The nick

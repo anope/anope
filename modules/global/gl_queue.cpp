@@ -1,6 +1,6 @@
 /* Global core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -31,18 +31,10 @@ public:
 
 	~QueueDelCallback() override
 	{
-		switch (deleted)
-		{
-			case 0:
-				source.Reply(_("No matching entries in your message queue."));
-				break;
-			case 1:
-				source.Reply(_("Deleted one entry from your message queue."));
-				break;
-			default:
-				source.Reply(_("Deleted %u entries from your message queue."), deleted);
-				break;
-		}
+		if (deleted)
+			source.Reply(deleted, N_("Deleted %u entry from your message queue.", "Deleted %u entries from your message queue."), deleted);
+		else
+			source.Reply(_("No matching entries in your message queue."));
 	}
 
 	void HandleNumber(unsigned number) override
@@ -69,7 +61,7 @@ private:
 			return;
 		}
 
-		auto maxqueue = Config->GetModule(this->module)->Get<size_t>("maxqueue", "10");
+		auto maxqueue = Config->GetModule(this->module).Get<size_t>("maxqueue", "10");
 		if (global->CountQueue(source.nc) >= maxqueue)
 		{
 			source.Reply(_("You can not queue any more messages."));
@@ -91,7 +83,7 @@ private:
 
 		global->ClearQueue(source.nc);
 		source.Reply(_("Your message queue has been cleared."));
-		Log(LOG_ADMIN, source, this);
+		Log(LOG_ADMIN, source, this) << "to clear their queue.";
 	}
 
 	void DoDel(CommandSource &source, const Anope::string &what)
@@ -175,17 +167,22 @@ public:
 		this->SendSyntax(source);
 		source.Reply("");
 		source.Reply(_(
-			"Allows queueing messages to send to users on the network.\n"
-			"\n"
-			"The \002QUEUE ADD\002 command adds the given message to the message queue."
-			"\n"
-			"The \002QUEUE CLEAR\002 command clears the message queue."
-			"\n"
-			"The \002QUEUE DEL\002 command removes the specified message from the message queue. The\n"
-			"message number can be obtained from the output of the \002QUEUE LIST\002 command."
-			"\n"
-			"The \002QUEUE LIST\002 command lists all messages that are currently in the message queue."
-		));
+				"Allows queueing messages to send to users on the network."
+				"\n\n"
+				"The \002%s\032ADD\002 command adds the given message to the message queue."
+				"\n\n"
+				"The \002%s\032CLEAR\002 command clears the message queue."
+				"\n\n"
+				"The \002%s\032DEL\002 command removes the specified message from the message queue. The "
+				"message number can be obtained from the output of the \002%s\032LIST\002 command."
+				"\n\n"
+				"The \002%s\032LIST\002 command lists all messages that are currently in the message queue."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };

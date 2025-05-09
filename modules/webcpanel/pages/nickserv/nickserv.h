@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -20,7 +20,7 @@ class WebCPanel::NickServ::Alist final
 {
 public:
 	Alist(const Anope::string &cat, const Anope::string &u);
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) override;
 };
 
 class WebCPanel::NickServ::Cert final
@@ -28,7 +28,7 @@ class WebCPanel::NickServ::Cert final
 {
 public:
 	Cert(const Anope::string &cat, const Anope::string &u);
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) override;
 };
 
 class WebCPanel::NickServ::Confirm final
@@ -36,7 +36,7 @@ class WebCPanel::NickServ::Confirm final
 {
 public:
 	Confirm(const Anope::string &cat, const Anope::string &u);
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) override;
 };
 
 class WebCPanel::NickServ::Info final
@@ -44,5 +44,5 @@ class WebCPanel::NickServ::Info final
 {
 public:
 	Info(const Anope::string &cat, const Anope::string &u);
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) override;
 };

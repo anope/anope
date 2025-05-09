@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
+#include "modules/chanserv/mode.h"
 
 class CommandCSSet final
 	: public Command
@@ -31,13 +31,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows the channel founder to set various channel options\n"
-			"and other information.\n"
-			" \n"
+		source.Reply(_(
+			"Allows the channel founder to set various channel options "
+			"and other information."
+			"\n\n"
 			"Available options:"));
 		Anope::string this_name = source.command;
-		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
-		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
+		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options").Get<bool>("hideregisteredcommands");
+
+		HelpWrapper help;
 		for (const auto &[c_name, info] : source.service->commands)
 		{
 			if (c_name.find_ci(this_name + " ") == 0)
@@ -56,11 +59,13 @@ public:
 					continue;
 
 				source.command = c_name;
-				c->OnServHelp(source);
+				c->OnServHelp(source, help);
 			}
 		}
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information on a\n"
-				"particular option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
+		help.SendTo(source);
+
+		source.Reply(_("Type \002%s\032\037option\037\002 for more information on a particular option."),
+			source.service->GetQueryCommand("generic/help", this_name).c_str());
 		return true;
 	}
 };
@@ -121,9 +126,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables %s's autoop feature for a\n"
-			"channel. When disabled, users who join the channel will\n"
-			"not automatically gain any status from %s."), source.service->nick.c_str(),
+		source.Reply(_(
+				"Enables or disables %s's autoop feature for a "
+				"channel. When disabled, users who join the channel will "
+				"not automatically gain any status from %s."
+			),
+			source.service->nick.c_str(),
 			source.service->nick.c_str());
 		return true;
 	}
@@ -181,15 +189,17 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the ban type that will be used by services whenever\n"
-				"they need to ban someone from your channel.\n"
-				" \n"
-				"Bantype is a number between 0 and 3 that means:\n"
-				" \n"
-				"0: ban in the form *!user@host\n"
-				"1: ban in the form *!*user@host\n"
-				"2: ban in the form *!*@host\n"
-				"3: ban in the form *!*user@*.domain"));
+		source.Reply(_(
+			"Sets the ban type that will be used by services whenever "
+			"they need to ban someone from your channel."
+			"\n\n"
+			"Bantype is a number between 0 and 3 that means:"
+			"\n\n"
+			"0: ban in the form *!user@host\n"
+			"1: ban in the form *!*user@host\n"
+			"2: ban in the form *!*@host\n"
+			"3: ban in the form *!*user@*.domain"
+		));
 		return true;
 	}
 };
@@ -251,8 +261,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the description for the channel, which shows up with\n"
-				"the \002LIST\002 and \002INFO\002 commands."));
+		source.Reply(_(
+			"Sets the description for the channel, which shows up with "
+			"the \002LIST\002 and \002INFO\002 commands."
+		));
 		return true;
 	}
 };
@@ -299,9 +311,15 @@ public:
 			source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
 			return;
 		}
+		else if (na->nc->HasExt("NEVEROP"))
+		{
+			source.Reply(_("\002%s\002 does not wish to be added to channel access lists."),
+				na->nc->display.c_str());
+			return;
+		}
 
 		NickCore *nc = na->nc;
-		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
+		unsigned max_reg = Config->GetModule("chanserv").Get<unsigned>("maxregistered");
 		if (max_reg && nc->channelcount >= max_reg && !source.HasPriv("chanserv/no-register-limit"))
 		{
 			source.Reply(_("\002%s\002 has too many channels registered."), na->nick.c_str());
@@ -321,8 +339,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the founder of a channel. The new nickname must\n"
-				"be a registered one."));
+		source.Reply(_(
+			"Changes the founder of a channel. The new nickname must "
+			"be a registered one."
+		));
 		return true;
 	}
 };
@@ -386,9 +406,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for the given channel. If keep\n"
-				"modes is enabled, services will remember modes set on the channel\n"
-				"and attempt to re-set them the next time the channel is created."));
+		source.Reply(_(
+			"Enables or disables keepmodes for the given channel. If keep "
+			"modes is enabled, services will remember modes set on the channel "
+			"and attempt to re-set them the next time the channel is created."
+		));
 		return true;
 	}
 };
@@ -451,18 +473,21 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002peace\002 option for a channel.\n"
-				"When \002peace\002 is set, a user won't be able to kick,\n"
-				"ban or remove a channel status of a user that has\n"
-				"a level superior or equal to theirs via %s commands."), source.service->nick.c_str());
+		source.Reply(_(
+				"Enables or disables the \002peace\002 option for a channel. "
+				"When \002peace\002 is set, a user won't be able to kick, "
+				"ban or remove a channel status of a user that has "
+				"a level superior or equal to theirs via %s commands."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 };
 
 inline static Anope::string BotModes()
 {
-	return Config->GetModule("botserv")->Get<Anope::string>("botmodes",
-		Config->GetModule("chanserv")->Get<Anope::string>("botmodes", "o")
+	return Config->GetModule("botserv").Get<Anope::string>("botmodes",
+		Config->GetModule("chanserv").Get<Anope::string>("botmodes", "o")
 	);
 }
 
@@ -513,12 +538,13 @@ public:
 				/* Set the perm mode */
 				if (cm)
 				{
-					if (ci->c && !ci->c->HasMode("PERM"))
-						ci->c->SetMode(NULL, cm);
 					/* Add it to the channels mlock */
 					ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
 					if (ml)
 						ml->SetMLock(cm, true, "", source.GetNick());
+
+					if (ci->c && !ci->c->HasMode("PERM"))
+						ci->c->SetMode(NULL, cm);
 				}
 				/* No botserv bot, no channel mode, give them ChanServ.
 				 * Yes, this works fine with no BotServ.
@@ -556,12 +582,13 @@ public:
 				/* Unset perm mode */
 				if (cm)
 				{
-					if (ci->c && ci->c->HasMode("PERM"))
-						ci->c->RemoveMode(NULL, cm);
 					/* Remove from mlock */
 					ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
 					if (ml)
 						ml->RemoveMLock(cm, true);
+
+					if (ci->c && ci->c->HasMode("PERM"))
+						ci->c->RemoveMode(NULL, cm);
 				}
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on
@@ -592,26 +619,30 @@ public:
 		BotInfo *ChanServ = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the persistent channel setting.\n"
-				"When persistent is set, the service bot will remain\n"
-				"in the channel when it has emptied of users.\n"
-				" \n"
-				"If your IRCd does not have a permanent (persistent) channel\n"
-				"mode you must have a service bot in your channel to\n"
-				"set persist on, and it can not be unassigned while persist\n"
-				"is on.\n"
-				" \n"
-				"If this network does not have %s enabled and does\n"
-				"not have a permanent channel mode, %s will\n"
-				"join your channel when you set persist on (and leave when\n"
-				"it has been set off).\n"
-				" \n"
-				"If your IRCd has a permanent (persistent) channel mode\n"
-				"and it is set or unset (for any reason, including MODE LOCK),\n"
-				"persist is automatically set and unset for the channel as well.\n"
-				"Additionally, services will set or unset this mode when you\n"
-				"set persist on or off."), BotServ ? BotServ->nick.c_str() : "BotServ",
-				ChanServ ? ChanServ->nick.c_str() : "ChanServ");
+		source.Reply(_(
+				"Enables or disables the persistent channel setting. "
+				"When persistent is set, the service bot will remain "
+				"in the channel when it has emptied of users. "
+				"\n\n"
+				"If your IRCd does not have a permanent (persistent) channel "
+				"mode you must have a service bot in your channel to "
+				"set persist on, and it can not be unassigned while persist "
+				"is on."
+				"\n\n"
+				"If this network does not have %s enabled and does "
+				"not have a permanent channel mode, %s will "
+				"join your channel when you set persist on (and leave when "
+				"it has been set off)."
+				"\n\n"
+				"If your IRCd has a permanent (persistent) channel mode "
+				"and it is set or unset (for any reason, including MODE LOCK), "
+				"persist is automatically set and unset for the channel as well. "
+				"Additionally, services will set or unset this mode when you "
+				"set persist on or off."
+			),
+			BotServ ? BotServ->nick.c_str() : "BotServ",
+			ChanServ ? ChanServ->nick.c_str() : "ChanServ"
+		);
 		return true;
 	}
 };
@@ -672,9 +703,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002restricted access\002 option for a\n"
-				"channel. When \002restricted access\002 is set, users not on the access list will\n"
-				"instead be kicked and banned from the channel."));
+		source.Reply(_(
+			"Enables or disables the \002restricted access\002 option for a "
+			"channel. When \002restricted access\002 is set, users not on the access list will "
+			"instead be kicked and banned from the channel."
+		));
 		return true;
 	}
 };
@@ -735,11 +768,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002secure founder\002 option for a channel.\n"
-			"When \002secure founder\002 is set, only the real founder will be\n"
-			"able to drop the channel, change its founder and its successor,\n"
-			"and not those who have founder level access through\n"
-			"the access/qop command."));
+		source.Reply(_(
+			"Enables or disables the \002secure founder\002 option for a channel. "
+			"When \002secure founder\002 is set, only the real founder will be "
+			"able to drop the channel, change its founder and its successor, "
+			"and not those who have founder level access through "
+			"the access/qop command."
+		));
 		return true;
 	}
 };
@@ -800,9 +835,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002secure ops\002 option for a channel.\n"
-				"When \002secure ops\002 is set, users who are not on the access list\n"
-				"will not be allowed channel operator status."));
+		source.Reply(_(
+			"Enables or disables the \002secure ops\002 option for a channel. "
+			"When \002secure ops\002 is set, users who are not on the access list "
+			"will not be allowed channel operator status."
+		));
 		return true;
 	}
 };
@@ -854,8 +891,8 @@ public:
 		{
 			ci->Extend<bool>("SIGNKICK_LEVEL");
 			ci->Shrink<bool>("SIGNKICK");
-			source.Reply(_("Signed kick option for %s is now \002on\002, but depends of the\n"
-				"level of the user that is using the command."), ci->name.c_str());
+			source.Reply(_("Signed kick option for %s is now \002on\002, but depends of the level of the user that is using the command."),
+				ci->name.c_str());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick level";
 		}
 		else if (params[1].equals_ci("OFF"))
@@ -873,14 +910,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables signed kicks for a\n"
-				"channel.  When \002SIGNKICK\002 is set, kicks issued with\n"
-				"the \002KICK\002 command will have the nick that used the\n"
-				"command in their reason.\n"
-				" \n"
-				"If you use \002LEVEL\002, those who have a level that is superior\n"
-				"or equal to the SIGNKICK level on the channel won't have their\n"
-				"kicks signed."));
+		source.Reply(_(
+			"Enables or disables signed kicks for a "
+			"channel. When \002SIGNKICK\002 is set, kicks issued with "
+			"the \002KICK\002 command will have the nick that used the "
+			"command in their reason."
+			"\n\n"
+			"If you use \002LEVEL\002, those who have a level that is superior "
+			"or equal to the SIGNKICK level on the channel won't have their "
+			"kicks signed."
+		));
 		return true;
 	}
 };
@@ -916,7 +955,15 @@ public:
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		auto can_set_successor = ci->HasExt("SECUREFOUNDER")
+			? source.IsFounder(ci)
+			: source.AccessFor(ci).HasPriv("FOUNDER");
+
+		// Special case: users can remove themselves as successor with no other privs.
+		if (param.empty() && source.GetAccount() && source.GetAccount() == ci->GetSuccessor())
+			can_set_successor = true;
+
+		if (MOD_RESULT != EVENT_ALLOW && !can_set_successor && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -931,6 +978,12 @@ public:
 			if (!na)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, param.c_str());
+				return;
+			}
+			else if (na->nc->HasExt("NEVEROP"))
+			{
+				source.Reply(_("\002%s\002 does not wish to be added to channel access lists."),
+					na->nc->display.c_str());
 				return;
 			}
 			if (na->nc == ci->GetFounder())
@@ -959,22 +1012,28 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the successor of a channel. If the founder's\n"
-				"nickname expires or is dropped while the channel is still\n"
-				"registered, the successor will become the new founder of the\n"
-				"channel. The successor's nickname must be a registered one.\n"
-				"If there's no successor set, then the first nickname on the\n"
-				"access list (with the highest access, if applicable) will\n"
-				"become the new founder, but if the access list is empty, the\n"
-				"channel will be dropped."));
-		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
+		source.Reply(_(
+			"Changes the successor of a channel. If the founder's "
+			"nickname expires or is dropped while the channel is still "
+			"registered, the successor will become the new founder of the "
+			"channel. The successor's nickname must be a registered one. "
+			"If there's no successor set, then the first nickname on the "
+			"access list (with the highest access, if applicable) will "
+			"become the new founder, but if the access list is empty, the "
+			"channel will be dropped."
+		));
+
+		unsigned max_reg = Config->GetModule("chanserv").Get<unsigned>("maxregistered");
 		if (max_reg)
 		{
 			source.Reply(" ");
-			source.Reply(_("Note, however, if the successor already has too many\n"
-				"channels registered (%d), they will not be able to\n"
-				"become the new founder and it will be as if the\n"
-				"channel had no successor set."), max_reg);
+			source.Reply(_(
+					"Note, however, if the successor already has too many "
+					"channels registered (%u), they will not be able to "
+					"become the new founder and it will be as if the "
+					"channel had no successor set."
+				),
+				max_reg);
 		}
 		return true;
 	}
@@ -1033,8 +1092,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets whether the given channel will expire.  Setting this\n"
-				"to ON prevents the channel from expiring."));
+		source.Reply(_(
+			"Sets whether the given channel will expire. Setting this "
+			"to ON prevents the channel from expiring."
+		));
 		return true;
 	}
 };
@@ -1055,18 +1116,24 @@ class CSSet final
 		{
 			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
 			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(s);
 			Anope::string modes;
-			for (const auto &[last_mode, last_value] : ci->last_modes)
+			for (const auto &[last_mode, last_data] : ci->last_modes)
 			{
 				if (!modes.empty())
 					modes += " ";
+
+				modes += '+';
 				modes += last_mode;
-				if (!last_value.empty())
-					modes += "," + last_value;
+				if (!last_data.value.empty())
+				{
+					modes += "," + Anope::ToString(last_data.set_at);
+					modes += "," + last_data.set_by;
+					modes += "," + last_data.value;
+				}
 			}
 			data.Store("last_modes", modes);
 		}
@@ -1075,7 +1142,7 @@ class CSSet final
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
 			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(s);
@@ -1084,11 +1151,32 @@ class CSSet final
 			ci->last_modes.clear();
 			for (spacesepstream sep(modes); sep.GetToken(modes);)
 			{
-				size_t c = modes.find(',');
-				if (c == Anope::string::npos)
-					ci->last_modes.emplace(modes, "");
+				if (modes[0] == '+')
+				{
+					commasepstream mode(modes, true);
+					mode.GetToken(modes);
+					modes.erase(0, 1);
+
+					ModeData info;
+					Anope::string set_at;
+					mode.GetToken(set_at);
+					info.set_at = Anope::Convert(set_at, 0);
+					mode.GetToken(info.set_by);
+					info.value = mode.GetRemaining();
+
+					ci->last_modes.emplace(modes, info);
+					continue;
+				}
 				else
-					ci->last_modes.emplace(modes.substr(0, c), modes.substr(c + 1));
+				{
+					// Begin 2.0 compatibility
+					size_t c = modes.find(',');
+					if (c == Anope::string::npos)
+						ci->last_modes.emplace(modes, ModeData());
+					else
+						ci->last_modes.emplace(modes.substr(0, c), ModeData(modes.substr(c + 1)));
+					// End 2.0 compatibility.
+				}
 			}
 		}
 	} keep_modes;
@@ -1131,14 +1219,14 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		persist_lower_ts = conf->GetModule(this)->Get<bool>("persist_lower_ts");
+		persist_lower_ts = conf.GetModule(this).Get<bool>("persist_lower_ts");
 	}
 
 	void OnCreateChan(ChannelInfo *ci) override
 	{
-		ci->bantype = Config->GetModule(this)->Get<int>("defbantype", "2");
+		ci->bantype = Config->GetModule(this).Get<int>("defbantype", "2");
 	}
 
 	void OnChannelSync(Channel *c) override
@@ -1146,8 +1234,8 @@ public:
 		if (c->ci && keep_modes.HasExt(c->ci))
 		{
 			Channel::ModeList ml = c->ci->last_modes;
-			for (const auto &[last_mode, last_value] : ml)
-				c->SetMode(c->ci->WhoSends(), last_mode, last_value);
+			for (const auto &[last_mode, last_data] : ml)
+				c->SetMode(c->ci->WhoSends(), last_mode, last_data);
 		}
 	}
 
@@ -1169,7 +1257,7 @@ public:
 		persist.Unset(ci);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const ModeData &data) override
 	{
 		if (c->ci)
 		{
@@ -1200,10 +1288,10 @@ public:
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (u->server != Me && persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->time_registered)
+		if (u->server != Me && persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->created > c->ci->registered)
 		{
-			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
-			c->creation_time = c->ci->time_registered;
+			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->created << " to " << c->ci->registered;
+			c->created = c->ci->registered;
 			IRCD->SendChannel(c);
 			c->Reset();
 		}

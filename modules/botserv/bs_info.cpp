@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -55,7 +55,7 @@ public:
 			info[_("Real name")] = bi->realname;
 			info[_("Created")] = Anope::strftime(bi->created, source.GetAccount());
 			info[_("Options")] = bi->oper_only ? _("Private") : _("None");
-			info[_("Used on")] = Anope::ToString(bi->GetChannelCount()) + " channel(s)";
+			info[_("Used on")] = Anope::printf(Language::Translate(source.nc, bi->GetChannelCount(), N_("%u channel", "%u channels")), bi->GetChannelCount());
 
 			FOREACH_MOD(OnBotInfo, (source, bi, ci, info));
 
@@ -104,11 +104,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to see %s information about a channel or a bot.\n"
-				"If the parameter is a channel, then you'll get information\n"
-				"such as enabled kickers. If the parameter is a nick,\n"
-				"you'll get information about a bot, such as creation\n"
-				"time or number of channels it is on."), source.service->nick.c_str());
+		source.Reply(_(
+			"Allows you to see %s information about a channel or a bot. "
+			"If the parameter is a channel, then you'll get information "
+			"such as enabled kickers. If the parameter is a nick, "
+			"you'll get information about a bot, such as creation "
+			"time or number of channels it is on."
+		), source.service->nick.c_str());
 		return true;
 	}
 

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -15,6 +15,7 @@
 static Module *me;
 
 static Anope::map<Anope::string> descriptions;
+static Anope::map<uint16_t> numerics;
 
 struct CSMiscData;
 static Anope::map<ExtensibleItem<CSMiscData> *> items;
@@ -43,15 +44,25 @@ struct CSMiscData final
 		name = n;
 		data = d;
 	}
+};
 
-	void Serialize(Serialize::Data &sdata) const override
+struct CSMiscDataType
+	: Serialize::Type
+{
+	CSMiscDataType()
+		: Serialize::Type("CSMiscData")
 	{
-		sdata.Store("ci", this->object);
-		sdata.Store("name", this->name);
-		sdata.Store("data", this->data);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &sdata) const override
+	{
+		const auto *d = static_cast<const CSMiscData *>(obj);
+		sdata.Store("ci", d->object);
+		sdata.Store("name", d->name);
+		sdata.Store("data", d->data);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string sci, sname, sdata;
 
@@ -146,12 +157,12 @@ public:
 		}
 	}
 
-	void OnServHelp(CommandSource &source) override
+	void OnServHelp(CommandSource &source, HelpWrapper &help) override
 	{
 		if (descriptions.count(source.command))
 		{
 			this->SetDesc(descriptions[source.command]);
-			Command::OnServHelp(source);
+			Command::OnServHelp(source, help);
 		}
 	}
 
@@ -171,11 +182,12 @@ class CSSetMisc final
 	: public Module
 {
 	CommandCSSetMisc commandcssetmisc;
-	Serialize::Type csmiscdata_type;
+	CSMiscDataType csmiscdata_type;
 
 public:
-	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcssetmisc(this), csmiscdata_type("CSMiscData", CSMiscData::Unserialize)
+	CSSetMisc(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandcssetmisc(this)
 	{
 		me = this;
 	}
@@ -186,26 +198,53 @@ public:
 			delete item;
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		descriptions.clear();
+		numerics.clear();
 
-		for (int i = 0; i < conf->CountBlock("command"); ++i)
+		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("command", i);
+			const auto &block = conf.GetBlock("command", i);
 
-			if (block->Get<const Anope::string>("command") != "chanserv/set/misc")
+			if (block.Get<const Anope::string>("command") != "chanserv/set/misc")
 				continue;
 
-			Anope::string cname = block->Get<const Anope::string>("name");
-			Anope::string desc = block->Get<const Anope::string>("misc_description");
+			Anope::string cname = block.Get<const Anope::string>("name");
+			Anope::string desc = block.Get<const Anope::string>("misc_description");
 
 			if (cname.empty() || desc.empty())
 				continue;
 
 			descriptions[cname] = desc;
+
+			// Force creation of the extension item.
+			const auto extname = "cs_set_misc:" + GetAttribute(cname);
+			GetItem(extname);
+
+			auto numeric = block.Get<unsigned>("misc_numeric");
+			if (numeric >= 1 && numeric <= 999)
+				numerics[extname] = numeric;
 		}
 	}
+
+	void OnJoinChannel(User *user, Channel *c) override
+	{
+		if (!c->ci || !user->server->IsSynced() || user->server == Me || numerics.empty())
+			return;
+
+		for (const auto &[name, ext] : items)
+		{
+			auto *data = ext->Get(c->ci);
+			if (!data)
+				continue;
+
+			auto numeric = numerics.find(name);
+			if (numeric != numerics.end())
+				IRCD->SendNumeric(numeric->second, user->GetUID(), c->ci->name, data->data);
+		}
+	}
+
 
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool) override
 	{

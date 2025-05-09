@@ -1,6 +1,6 @@
 /* HostServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -46,8 +46,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Deletes the vhost assigned to the given nick from the\n"
-				"database."));
+		source.Reply(_("Deletes the vhost assigned to the given nick from the database."));
 		return true;
 	}
 };
@@ -92,8 +91,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Deletes the vhost for all nicks in the same group as\n"
-				"that of the given nick."));
+		source.Reply(_("Deletes the vhost for all nicks in the same group as that of the given nick."));
 		return true;
 	}
 };

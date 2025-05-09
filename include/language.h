@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2008-2024 Anope Team
+ * (C) 2008-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -55,28 +55,63 @@ namespace Language
 	 */
 	extern CoreExport const char *Translate(const NickCore *nc, const char *string);
 
-	/** Translatesa string to the given language.
+	/** Translates a string to the given language.
 	 * @param lang The language to translate to
 	 * @param string The string to translate
 	 * @return The translated string if found, else the original string.
 	 */
 	extern CoreExport const char *Translate(const char *lang, const char *string);
 
+	/** Translates a plural string to the default language.
+	 * @param count The number of items the string is counting.
+	 * @param singular The string to translate if there is one of \p count
+	 * @param plural The string to translate if there is multiple of \p count
+	 * @return The translated string if found, else the original string.
+	 */
+	extern CoreExport const char *Translate(int count, const char *singular, const char *plural);
+
+	/** Translates a plural string to the language of the given user.
+	 * @param u The user to translate the string for
+	 * @param count The number of items the string is counting.
+	 * @param singular The string to translate if there is one of \p count
+	 * @param plural The string to translate if there is multiple of \p count
+	 * @return The translated string if found, else the original string.
+	 */
+	extern CoreExport const char *Translate(User *u, int count, const char *singular, const char *plural);
+
+	/** Translates a plural string to the language of the given account.
+	 * @param nc The account to translate the string for
+	 * @param count The number of items the string is counting.
+	 * @param singular The string to translate if there is one of \p count
+	 * @param plural The string to translate if there is multiple of \p count
+	 * @return The translated string if count, else the original string
+	 */
+	extern CoreExport const char *Translate(const NickCore *nc, int count, const char *singular, const char *plural);
+
+	/** Translates a plural string to the given language.
+	 * @param lang The language to translate to
+	 * @param count The number of items the string is counting.
+	 * @param singular The string to translate if there is one of \p count
+	 * @param plural The string to translate if there is multiple of \p count
+	 * @return The translated string if found, else the original string.
+	 */
+	extern CoreExport const char *Translate(const char *lang, int count, const char *singular, const char *plural);
+
 } // namespace Language
 
 /* Commonly used language strings */
-#define CONFIRM_DROP			_("Please confirm that you want to drop \002%s\002 with \002%s%s DROP %s %s\002")
+#define CONFIRM_DROP			_("Please confirm that you want to drop \002%s\002 with \002%s\032%s\032%s\002")
 #define SERVICE_UNAVAILABLE		_("Sorry, %s is temporarily unavailable.")
-#define MORE_INFO			_("\002%s%s HELP %s\002 for more information.")
+#define MORE_INFO			_("\002%s\002 for more information.")
 #define BAD_USERHOST_MASK		_("Mask must be in the form \037user\037@\037host\037.")
 #define BAD_EXPIRY_TIME			_("Invalid expiry time.")
 #define USERHOST_MASK_TOO_WIDE		_("%s coverage is too wide; Please use a more specific mask.")
 #define READ_ONLY_MODE			_("Services are temporarily in read-only mode.")
 #define PASSWORD_INCORRECT		_("Password incorrect.")
 #define ACCESS_DENIED			_("Access denied.")
-#define MORE_OBSCURE_PASSWORD		_("Please try again with a more obscure password. Passwords should not be\n" \
-						"something that could be easily guessed (e.g. your real name or your nick) and\n" \
-						"cannot contain the space or tab characters.\n")
+#define MORE_OBSCURE_PASSWORD		_("Please try again with a more obscure password. Passwords should not be " \
+						"something that could be easily guessed (e.g. your real name or your nick) and " \
+						"cannot contain the space or tab characters.")
 #define PASSWORD_TOO_SHORT		_("Your password is too short. It must be longer than %u characters.")
 #define PASSWORD_TOO_LONG		_("Your password is too long. It must be shorter than %u characters.")
 #define NICK_NOT_REGISTERED		_("Your nick isn't registered.")
@@ -92,8 +127,8 @@ namespace Language
 #define UNKNOWN				_("<unknown>")
 #define NO_EXPIRE			_("does not expire")
 #define LIST_INCORRECT_RANGE		_("Incorrect range specified. The correct syntax is \002#\037from\037-\037to\037\002.")
-#define NICK_IS_SECURE			_("This nickname is registered and protected.  If it is your\n" \
-						"nick, type \002%s%s IDENTIFY \037password\037\002.  Otherwise,\n" \
+#define NICK_IS_SECURE			_("This nickname is registered and protected.  If it is your " \
+						"nick, type \002%s\032\037password\037\002.  Otherwise, " \
 						"please choose a different nick.")
 #define FORCENICKCHANGE_NOW		_("This nickname has been registered; you may not use it.")
 #define NICK_CANNOT_BE_REGISTERED	_("Nickname \002%s\002 may not be registered.")
@@ -110,10 +145,10 @@ namespace Language
 #define CHAN_ACCESS_LEVEL_RANGE		_("Access level must be between %d and %d inclusive.")
 #define CHAN_INFO_HEADER		_("Information about channel \002%s\002:")
 #define CHAN_EXCEPTED			_("\002%s\002 matches an except on %s and cannot be banned until the except has been removed.")
-#define MEMO_NEW_X_MEMO_ARRIVED		_("There is a new memo on channel %s.\n" \
-						"Type \002%s%s READ %s %zu\002 to read it.")
-#define MEMO_NEW_MEMO_ARRIVED		_("You have a new memo from %s.\n" \
-						"Type \002%s%s READ %zu\002 to read it.")
+#define MEMO_NEW_X_MEMO_ARRIVED		_("There is a new memo on channel %s. " \
+						"Type \002%s\032%s\032%zu\002 to read it.")
+#define MEMO_NEW_MEMO_ARRIVED		_("You have a new memo from %s. " \
+						"Type \002%s\032%zu\002 to read it.")
 #define MEMO_HAVE_NO_MEMOS		_("You have no memos.")
 #define MEMO_X_HAS_NO_MEMOS		_("%s has no memos.")
 #define MEMO_HAVE_NO_NEW_MEMOS		_("You have no new memos.")

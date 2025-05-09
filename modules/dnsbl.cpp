@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -67,17 +67,19 @@ public:
 		if (!blacklist.replies.empty() && !reply)
 			return;
 
-		if (reply && reply->allow_account && user->Account())
+		if (reply && reply->allow_account && user->IsIdentified())
 			return;
 
-		Anope::string reason = this->blacklist.reason, addr = user->ip.addr();
-		reason = reason.replace_all_cs("%n", user->nick);
-		reason = reason.replace_all_cs("%u", user->GetIdent());
-		reason = reason.replace_all_cs("%g", user->realname);
-		reason = reason.replace_all_cs("%h", user->host);
-		reason = reason.replace_all_cs("%i", addr);
-		reason = reason.replace_all_cs("%r", reply ? reply->reason : "");
-		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		auto addr = user->ip.addr();
+		auto reason = Anope::Template(this->blacklist.reason, {
+			{ "nick",    user->nick                                                              },
+			{ "user",    user->GetIdent()                                                        },
+			{ "real",    user->realname                                                          },
+			{ "host",    user->host                                                              },
+			{ "ip",      addr                                                                    },
+			{ "reply",   reply ? reply->reason : ""                                              },
+			{ "network", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
+		});
 
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		Log(creator, "dnsbl", OperServ) << user->GetMask() << " (" << addr << ") appears in " << this->blacklist.name;
@@ -110,33 +112,33 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		this->check_on_connect = block->Get<bool>("check_on_connect");
-		this->check_on_netburst = block->Get<bool>("check_on_netburst");
-		this->add_to_akill = block->Get<bool>("add_to_akill", "yes");
+		const auto &block = conf.GetModule(this);
+		this->check_on_connect = block.Get<bool>("check_on_connect");
+		this->check_on_netburst = block.Get<bool>("check_on_netburst");
+		this->add_to_akill = block.Get<bool>("add_to_akill", "yes");
 
 		this->blacklists.clear();
-		for (int i = 0; i < block->CountBlock("blacklist"); ++i)
+		for (int i = 0; i < block.CountBlock("blacklist"); ++i)
 		{
-			Configuration::Block *bl = block->GetBlock("blacklist", i);
+			const auto &bl = block.GetBlock("blacklist", i);
 			Blacklist blacklist;
 
-			blacklist.name = bl->Get<Anope::string>("name");
+			blacklist.name = bl.Get<Anope::string>("name");
 			if (blacklist.name.empty())
 				continue;
-			blacklist.bantime = bl->Get<time_t>("time", "4h");
-			blacklist.reason = bl->Get<Anope::string>("reason");
+			blacklist.bantime = bl.Get<time_t>("time", "4h");
+			blacklist.reason = bl.Get<Anope::string>("reason");
 
-			for (int j = 0; j < bl->CountBlock("reply"); ++j)
+			for (int j = 0; j < bl.CountBlock("reply"); ++j)
 			{
-				Configuration::Block *reply = bl->GetBlock("reply", j);
+				const auto &reply = bl.GetBlock("reply", j);
 				Blacklist::Reply r;
 
-				r.code = reply->Get<int>("code");
-				r.reason = reply->Get<Anope::string>("reason");
-				r.allow_account = reply->Get<bool>("allow_account");
+				r.code = reply.Get<int>("code");
+				r.reason = reply.Get<Anope::string>("reason");
+				r.allow_account = reply.Get<bool>("allow_account");
 
 				blacklist.replies.push_back(r);
 			}
@@ -145,10 +147,10 @@ public:
 		}
 
 		this->exempts.clear();
-		for (int i = 0; i < block->CountBlock("exempt"); ++i)
+		for (int i = 0; i < block.CountBlock("exempt"); ++i)
 		{
-			Configuration::Block *bl = block->GetBlock("exempt", i);
-			this->exempts.insert(bl->Get<Anope::string>("ip"));
+			const auto &bl = block.GetBlock("exempt", i);
+			this->exempts.insert(bl.Get<Anope::string>("ip"));
 		}
 	}
 

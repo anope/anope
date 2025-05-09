@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -222,6 +222,14 @@ namespace Anope
 		inline bool is_pos_number_only() const { return this->find_first_not_of("0123456789.") == npos; }
 
 		/**
+		 * In IRC messages we use a substitute (ASCII 0x1A) instead of a space
+		 * (ASCII 0x20) so it doesn't get line wrapped when put into a message.
+		 * The line wrapper will convert this to a space before it is sent to
+		 * clients.
+		 */
+		inline Anope::string nobreak() const { return this->replace_all_cs("\x20", "\x1A"); }
+
+		/**
 		 * Replace parts of the string.
 		 */
 		inline string replace(size_type pos, size_type n, const string &_str) { return string(this->_string.replace(pos, n, _str._string)); }
@@ -346,7 +354,7 @@ namespace Anope
 	template<typename T>
 	using unordered_map = std::unordered_map<string, T, hash_ci, compare>;
 
-#ifndef REPRODUCIBLE_BUILD
+#if !REPRODUCIBLE_BUILD
 	static const char *const compiled = __TIME__ " " __DATE__;
 #endif
 
@@ -472,13 +480,6 @@ namespace Anope
 	 * @param dest The destination where the encrypted string is placed
 	 */
 	extern CoreExport bool Encrypt(const Anope::string &src, Anope::string &dest);
-
-	/** Hashes a buffer with SipHash-2-4
-	 * @param src The start of the buffer to hash
-	 * @param src_sz The total number of bytes in the buffer
-	 * @param key A 16 byte key to hash the buffer with.
-	 */
-	extern CoreExport uint64_t SipHash24(const void *src, unsigned long src_sz, const char key[16]);
 
 	/** Returns a sequence of data formatted as the format argument specifies.
 	 ** After the format parameter, the function expects at least as many
@@ -615,6 +616,13 @@ namespace Anope
 	 * @return True if the message was a well formed CTCP; otherwise, false.
 	 */
 	extern CoreExport bool ParseCTCP(const Anope::string &text, Anope::string &name, Anope::string &body);
+
+	/** Replaces template variables within a string with values from a map.
+	 * @param str The string to template from.
+	 * @param vars The variables to replace within the string.
+	 * @return The specified string with all variables replaced within it.
+	 */
+	extern CoreExport Anope::string Template(const Anope::string &str, const Anope::map<Anope::string> &vars);
 }
 
 /** sepstream allows for splitting token separated lists.

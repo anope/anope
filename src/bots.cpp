@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2024 Anope Team <team@anope.org>
+ * (C) 2008-2025 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -18,12 +18,12 @@
 #include "language.h"
 #include "serialize.h"
 
-Serialize::Checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
+Serialize::Checker<botinfo_map> BotListByNick(BOTINFO_TYPE), BotListByUID(BOTINFO_TYPE);
 
 BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes)
 	: User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", {}, IRCD ? IRCD->UID_Retrieve() : "", NULL)
-	, Serializable("BotInfo")
-	, channels("ChannelInfo")
+	, Serializable(BOTINFO_TYPE)
+	, channels(CHANNELINFO_TYPE)
 	, botmodes(bmodes)
 {
 	this->lastmsg = this->created = Anope::CurTime;
@@ -66,7 +66,7 @@ BotInfo::~BotInfo()
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{
-		IRCD->SendQuit(this, "");
+		IRCD->SendQuit(this);
 		FOREACH_MOD(OnUserQuit, (this, ""));
 		this->introduced = false;
 		XLine x(this->nick);
@@ -84,19 +84,25 @@ BotInfo::~BotInfo()
 		BotListByUID->erase(this->uid);
 }
 
-void BotInfo::Serialize(Serialize::Data &data) const
+BotInfo::Type::Type()
+	: Serialize::Type(BOTINFO_TYPE)
 {
-	data.Store("nick", this->nick);
-	data.Store("user", this->ident);
-	data.Store("host", this->host);
-	data.Store("realname", this->realname);
-	data.Store("created", this->created);
-	data.Store("oper_only", this->oper_only);
-
-	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable *BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
+void BotInfo::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *bi = static_cast<const BotInfo *>(obj);
+	data.Store("nick", bi->nick);
+	data.Store("user", bi->ident);
+	data.Store("host", bi->host);
+	data.Store("realname", bi->realname);
+	data.Store("created", bi->created);
+	data.Store("oper_only", bi->oper_only);
+
+	Extensible::ExtensibleSerialize(bi, bi, data);
+}
+
+Serializable *BotInfo::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string nick, user, host, realname, flags;
 
@@ -263,6 +269,37 @@ CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
 	if (it != this->commands.end())
 		return &it->second;
 	return NULL;
+}
+
+Anope::string BotInfo::GetQueryCommand(const Anope::string &command, const Anope::string &extra) const
+{
+	Anope::string buf;
+	if (Config->ServiceAlias && !this->alias.empty())
+		buf.append("/").append(this->alias);
+	else
+		buf.append("/msg ").append(this->nick);
+
+	if (!command.empty())
+	{
+		Anope::string actual_command = "\036(MISSING)\036";
+		for (const auto &[c_name, info] : this->commands)
+		{
+			if (info.name != command)
+				continue; // Wrong command.
+
+			actual_command = c_name;
+			if (!info.hide)
+				break; // Keep going to find a non-hidden alternative.
+		}
+
+		if (!actual_command.empty())
+			buf.append(" ").append(actual_command);
+	}
+
+	if (!extra.empty())
+		buf.append(" ").append(extra);
+
+	return buf.nobreak();
 }
 
 BotInfo *BotInfo::Find(const Anope::string &nick, bool nick_only)

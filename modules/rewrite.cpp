@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -129,13 +129,13 @@ public:
 			Log() << "rewrite: Unable to rewrite '" << source.command << (!params.empty() ? " " + params[0] : "") << "'";
 	}
 
-	void OnServHelp(CommandSource &source) override
+	void OnServHelp(CommandSource &source, HelpWrapper &help) override
 	{
 		Rewrite *r = Rewrite::Find(!source.c ? source.service->nick : "", source.command);
 		if (r != NULL && !r->desc.empty())
 		{
 			this->SetDesc(r->desc);
-			Command::OnServHelp(source);
+			Command::OnServHelp(source, help);
 		}
 	}
 
@@ -163,23 +163,23 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		Rewrite::rewrites.clear();
 
-		for (int i = 0; i < conf->CountBlock("command"); ++i)
+		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("command", i);
+			const auto &block = conf.GetBlock("command", i);
 
-			if (!block->Get<bool>("rewrite"))
+			if (!block.Get<bool>("rewrite"))
 				continue;
 
 			Rewrite rw;
 
-			rw.client = block->Get<const Anope::string>("service");
-			rw.source_message = block->Get<const Anope::string>("rewrite_source");
-			rw.target_message = block->Get<const Anope::string>("rewrite_target");
-			rw.desc = block->Get<const Anope::string>("rewrite_description");
+			rw.client = block.Get<const Anope::string>("service");
+			rw.source_message = block.Get<const Anope::string>("rewrite_source");
+			rw.target_message = block.Get<const Anope::string>("rewrite_target");
+			rw.desc = block.Get<const Anope::string>("rewrite_description");
 
 			if (rw.client.empty() || rw.source_message.empty() || rw.target_message.empty())
 				continue;

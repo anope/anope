@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_log.h"
+#include "modules/chanserv/log.h"
 
 struct LogSettingImpl final
 	: LogSetting
@@ -34,20 +34,30 @@ struct LogSettingImpl final
 			}
 		}
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct LogSettingTypeImpl final
+	: Serialize::Type
+{
+	LogSettingTypeImpl()
+		: Serialize::Type("LogSetting")
 	{
-		data.Store("ci", chan);
-		data.Store("service_name", service_name);
-		data.Store("command_service", command_service);
-		data.Store("command_name", command_name);
-		data.Store("method", method);
-		data.Store("extra", extra);
-		data.Store("creator", creator);
-		data.Store("created", created);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *ls = static_cast<const LogSettingImpl *>(obj);
+		data.Store("ci", ls->chan);
+		data.Store("service_name", ls->service_name);
+		data.Store("command_service", ls->command_service);
+		data.Store("command_name", ls->command_name);
+		data.Store("method", ls->method);
+		data.Store("extra", ls->extra);
+		data.Store("creator", ls->creator);
+		data.Store("created", ls->created);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string sci;
 		data["ci"] >> sci;
@@ -261,26 +271,30 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("The %s command allows users to configure logging settings\n"
-				"for their channel. If no parameters are given this command\n"
-				"lists the current logging methods in place for this channel.\n"
-				" \n"
-				"Otherwise, \037command\037 must be a command name, and \037method\037\n"
-				"is one of the following logging methods:\n"
-				" \n"
-				" MESSAGE [status], NOTICE [status], MEMO\n"
-				" \n"
-				"Which are used to message, notice, and memo the channel respectively.\n"
-				"With MESSAGE or NOTICE you must have a service bot assigned to and joined\n"
-				"to your channel. Status may be a channel status such as @ or +.\n"
-				" \n"
-				"To remove a logging method use the same syntax as you would to add it.\n"
-				" \n"
+		source.Reply(_(
+				"The %s command allows users to configure logging settings "
+				"for their channel. If no parameters are given this command "
+				"lists the current logging methods in place for this channel."
+				"\n\n"
+				"Otherwise, \037command\037 must be a command name, and \037method\037 "
+				"is one of the following logging methods:"
+				"\n\n"
+				" MESSAGE\032[status], NOTICE\032[status], MEMO"
+				"\n\n"
+				"Which are used to message, notice, and memo the channel respectively. "
+				"With MESSAGE or NOTICE you must have a service bot assigned to and joined "
+				"to your channel. Status may be a channel status such as @ or +."
+				"\n\n"
+				"To remove a logging method use the same syntax as you would to add it."
+				"\n\n"
 				"Example:\n"
-				" %s #anope chanserv/access MESSAGE @\n"
-				" Would message any channel operators whenever someone used the\n"
-				" ACCESS command on ChanServ on the channel."),
-				source.command.upper().c_str(), source.command.upper().c_str());
+				" %s\032#anope\032chanserv/access\032MESSAGE\032@\n"
+				" Would message any channel operators whenever someone used the "
+				"ACCESS command on ChanServ on the channel."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
+
 		return true;
 	}
 };
@@ -291,7 +305,7 @@ class CSLog final
 	ServiceReference<MemoServService> MSService;
 	CommandCSLog commandcslog;
 	ExtensibleItem<LogSettingsImpl> logsettings;
-	Serialize::Type logsetting_type;
+	LogSettingTypeImpl logsetting_type;
 
 	struct LogDefault final
 	{
@@ -301,27 +315,28 @@ class CSLog final
 	std::vector<LogDefault> defaults;
 
 public:
-	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		MSService("MemoServService", "MemoServ"), commandcslog(this),
-		logsettings(this, "logsettings"), logsetting_type("LogSetting", LogSettingImpl::Unserialize)
+	CSLog(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, MSService("MemoServService", "MemoServ")
+		, commandcslog(this)
+		, logsettings(this, "logsettings")
 	{
-
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
+		const auto &block = conf.GetModule(this);
 		defaults.clear();
 
-		for (int i = 0; i < block->CountBlock("default"); ++i)
+		for (int i = 0; i < block.CountBlock("default"); ++i)
 		{
-			Configuration::Block *def = block->GetBlock("default", i);
+			const auto &def = block.GetBlock("default", i);
 
 			LogDefault ld;
 
-			ld.service = def->Get<const Anope::string>("service");
-			ld.command = def->Get<const Anope::string>("command");
-			ld.method = def->Get<const Anope::string>("method");
+			ld.service = def.Get<const Anope::string>("service");
+			ld.command = def.Get<const Anope::string>("command");
+			ld.method = def.Get<const Anope::string>("method");
 
 			defaults.push_back(ld);
 		}

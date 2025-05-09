@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2010-2024 Anope Team
+ * (C) 2010-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -159,27 +159,51 @@ public:
 
 	Anope::string FromUnixtime(time_t) override;
 
-	Anope::string GetColumnType(Serialize::DataType dt)
+	const char* GetColumnDefault(Serialize::DataType dt)
 	{
 		switch (dt)
 		{
 			case Serialize::DataType::BOOL:
-				return "TINYINT NOT NULL";
-
-			case Serialize::DataType::FLOAT:
-				return "DOUBLE PRECISION NOT NULL";
-
 			case Serialize::DataType::INT:
-				return "BIGINT NOT NULL";
+			case Serialize::DataType::UINT:
+				return "0";
+			case Serialize::DataType::FLOAT:
+				return "0.0";
+			case Serialize::DataType::TEXT:
+				return "NULL";
+		}
+		return "NULL"; // Should never be reached
+	}
 
+	bool GetColumnNull(Serialize::DataType dt)
+	{
+		return dt == Serialize::DataType::TEXT;
+	}
+
+	const char* GetColumnType(Serialize::DataType dt)
+	{
+		switch (dt)
+		{
+			case Serialize::DataType::BOOL:
+				return "TINYINT";
+			case Serialize::DataType::FLOAT:
+				return "DOUBLE";
+			case Serialize::DataType::INT:
+				return "BIGINT";
 			case Serialize::DataType::TEXT:
 				return "TEXT";
-
 			case Serialize::DataType::UINT:
-				return "BIGINT UNSIGNED NOT NULL";
+				return "BIGINT UNSIGNED";
 		}
-
 		return "TEXT"; // Should never be reached
+	}
+
+	Anope::string GetColumn(Serialize::DataType dt)
+	{
+		return Anope::printf("%s %s DEFAULT %s",
+				GetColumnType(dt),
+				GetColumnNull(dt) ? "NULL" : "NOT NULL",
+				GetColumnDefault(dt));
 	}
 };
 
@@ -218,9 +242,10 @@ public:
 	{
 		me = this;
 
-
 		DThread = new DispatcherThread();
 		DThread->Start();
+
+		Log(this) << "Module was compiled against MySQL version " << (MYSQL_VERSION_ID / 10000) << "." << (MYSQL_VERSION_ID / 100 % 100) << "." << (MYSQL_VERSION_ID % 100) << " and is running against version " << mysql_get_client_info();
 	}
 
 	~ModuleSQL()
@@ -235,9 +260,9 @@ public:
 		delete DThread;
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
+		const auto &config = conf.GetModule(this);
 
 		for (std::map<Anope::string, MySQLService *>::iterator it = this->MySQLServices.begin(); it != this->MySQLServices.end();)
 		{
@@ -247,11 +272,11 @@ public:
 
 			++it;
 
-			for (i = 0; i < config->CountBlock("mysql"); ++i)
-				if (config->GetBlock("mysql", i)->Get<const Anope::string>("name", "mysql/main") == cname)
+			for (i = 0; i < config.CountBlock("mysql"); ++i)
+				if (config.GetBlock("mysql", i).Get<const Anope::string>("name", "mysql/main") == cname)
 					break;
 
-			if (i == config->CountBlock("mysql"))
+			if (i == config.CountBlock("mysql"))
 			{
 				Log(LOG_NORMAL, "mysql") << "MySQL: Removing server connection " << cname;
 
@@ -260,19 +285,19 @@ public:
 			}
 		}
 
-		for (int i = 0; i < config->CountBlock("mysql"); ++i)
+		for (int i = 0; i < config.CountBlock("mysql"); ++i)
 		{
-			Configuration::Block *block = config->GetBlock("mysql", i);
-			const Anope::string &connname = block->Get<const Anope::string>("name", "mysql/main");
+			const auto &block = config.GetBlock("mysql", i);
+			const Anope::string &connname = block.Get<const Anope::string>("name", "mysql/main");
 
 			if (this->MySQLServices.find(connname) == this->MySQLServices.end())
 			{
-				const Anope::string &database = block->Get<const Anope::string>("database", "anope");
-				const Anope::string &server = block->Get<const Anope::string>("server", "127.0.0.1");
-				const Anope::string &user = block->Get<const Anope::string>("username", "anope");
-				const Anope::string &password = block->Get<const Anope::string>("password");
-				unsigned int port = block->Get<unsigned int>("port", "3306");
-				const Anope::string &socket = block->Get<const Anope::string>("socket");
+				const Anope::string &database = block.Get<const Anope::string>("database", "anope");
+				const Anope::string &server = block.Get<const Anope::string>("server", "127.0.0.1");
+				const Anope::string &user = block.Get<const Anope::string>("username", "anope");
+				const Anope::string &password = block.Get<const Anope::string>("password");
+				unsigned int port = block.Get<unsigned int>("port", "3306");
+				const Anope::string &socket = block.Get<const Anope::string>("socket");
 
 				try
 				{
@@ -424,10 +449,79 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 		Result columns = this->RunQuery("SHOW COLUMNS FROM `" + table + "`");
 		for (int i = 0; i < columns.Rows(); ++i)
 		{
-			const Anope::string &column = columns.Get(i, "Field");
 
+			const auto column = columns.Get(i, "Field");
 			Log(LOG_DEBUG) << "mysql: Column #" << i << " for " << table << ": " << column;
+
+			if (column == "id" || column == "timestamp")
+				continue; // These columns are special and aren't part of the data.
+
 			known_cols.insert(column);
+			if (data.data.count(column) == 0)
+			{
+				Log(LOG_DEBUG) << "mysql: Column has been removed from the data set: " << column;
+				continue;
+			}
+
+			// We know the column exists but is the type correct?
+			auto update = false;
+			const auto stype = data.GetType(column);
+
+			auto coldef = columns.Get(i, "Default");
+			if (coldef.empty())
+				coldef = "NULL";
+
+			const auto *newcoldef = GetColumnDefault(stype);
+			if (!coldef.equals_ci(newcoldef))
+			{
+				Log(LOG_DEBUG) << "mysql: Updating the default of " << column << " from " << coldef << " to " << newcoldef;
+				update = true;
+			}
+
+			const auto colnull = columns.Get(i, "Null");
+			const auto newcolnull = GetColumnNull(stype) ? "YES" : "NO";
+			if (!colnull.equals_ci(newcolnull))
+			{
+				Log(LOG_DEBUG) << "mysql: Updating the nullability of " << column << " from " << colnull << " to " << newcolnull;
+				update = true;
+			}
+
+			const auto coltype = columns.Get(i, "Type");
+			const auto *newcoltype = GetColumnType(stype);
+			if (!coltype.equals_ci(newcoltype))
+			{
+				Log(LOG_DEBUG) << "mysql: Updating the type of " << column << " from " << coltype << " to " << newcoltype;
+				update = true;
+			}
+
+			if (update)
+			{
+				// We can't just use MODIFY COLUMN here because the value may not
+				// be valid and we may need to replace with the default.
+				auto res = this->RunQuery(Anope::printf("ALTER TABLE `%s` ADD COLUMN `%s_new` %s; ",
+					table.c_str(), column.c_str(), GetColumn(stype).c_str()));
+
+				if (res)
+				{
+					res = this->RunQuery(Anope::printf("UPDATE IGNORE `%s` SET `%s_new` = %s; ",
+						table.c_str(), column.c_str(), column.c_str()));
+				}
+
+				if (res)
+				{
+					res = this->RunQuery(Anope::printf("ALTER TABLE `%s` DROP COLUMN `%s`; ",
+						table.c_str(), column.c_str()));
+				}
+
+				if (res)
+				{
+					res = this->RunQuery(Anope::printf("ALTER TABLE `%s` RENAME COLUMN `%s_new` TO `%s`; ",
+						table.c_str(), column.c_str(), column.c_str()));
+				}
+
+				if (!res)
+					Log(LOG_DEBUG) << "Failed to migrate the " << column << " column: " << res.GetError();
+			}
 		}
 	}
 
@@ -439,7 +533,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 		{
 			known_cols.insert(column);
 
-			query_text += ", `" + column + "` " + GetColumnType(data.GetType(column));
+			query_text += ", `" + column + "` " + GetColumn(data.GetType(column));
 		}
 		query_text += ", PRIMARY KEY (`id`), KEY `timestamp_idx` (`timestamp`)) ROW_FORMAT=DYNAMIC";
 		queries.push_back(query_text);
@@ -453,7 +547,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 
 			known_cols.insert(column);
 
-			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` " + GetColumnType(data.GetType(column));
+			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + column + "` " + GetColumn(data.GetType(column));
 
 			queries.push_back(query_text);
 		}
@@ -467,7 +561,7 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 	/* Empty columns not present in the data set */
 	for (const auto &known_col : this->active_schema[table])
 	{
-		if (known_col != "id" && known_col != "timestamp" && data.data.count(known_col) == 0)
+		if (data.data.count(known_col) == 0)
 			data[known_col] << "";
 	}
 
@@ -498,7 +592,7 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 			case Serialize::DataType::UINT:
 			{
 				if (buf.empty())
-					buf = "0";
+					buf = "DEFAULT";
 				escape = false;
 				break;
 			}
@@ -507,7 +601,7 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 			{
 				if (buf.empty())
 				{
-					buf = "NULL";
+					buf = "DEFAULT";
 					escape = false;
 				}
 				break;

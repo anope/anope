@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/bs_badwords.h"
+#include "modules/botserv/badwords.h"
 
 class CommandCSClone final
 	: public Command
@@ -24,7 +24,7 @@ class CommandCSClone final
 	static void CopyAccess(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
 	{
 		std::set<Anope::string> masks;
-		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1000");
+		unsigned access_max = Config->GetModule("chanserv").Get<unsigned>("accessmax", "1000");
 		unsigned count = 0;
 
 		for (unsigned i = 0; i < target_ci->GetAccessCount(); ++i)
@@ -169,7 +169,7 @@ public:
 			delete target_ci;
 			target_ci = new ChannelInfo(*ci);
 			target_ci->name = target;
-			target_ci->time_registered = Anope::CurTime;
+			target_ci->registered = Anope::CurTime;
 			(*RegisteredChannelList)[target_ci->name] = target_ci;
 			target_ci->c = Channel::Find(target_ci->name);
 
@@ -239,10 +239,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Copies all settings, access, akicks, etc from \002channel\002 to the\n"
-				"\002target\002 channel. If \037what\037 is \002ACCESS\002, \002AKICK\002, \002BADWORDS\002,\n"
-				"or \002LEVELS\002 then only the respective settings are cloned.\n"
-				"You must be the founder of \037channel\037 and \037target\037."));
+		source.Reply(_(
+			"Copies all settings, access, akicks, etc from \002channel\002 to the "
+			"\002target\002 channel. If \037what\037 is \002ACCESS\002, \002AKICK\002, \002BADWORDS\002, "
+			"or \002LEVELS\002 then only the respective settings are cloned. "
+			"You must be the founder of \037channel\037 and \037target\037."
+		));
 		return true;
 	}
 };

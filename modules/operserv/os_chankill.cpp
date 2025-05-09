@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -40,7 +40,7 @@ public:
 			last_param = 2;
 		}
 
-		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d");
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv").Get<time_t>("autokillexpiry", "30d");
 		if (!expiry.empty() && isdigit(expiry[expiry.length() - 1]))
 			expires *= 86400;
 		if (expires && expires < 60)
@@ -63,7 +63,7 @@ public:
 		if (!reason.empty())
 		{
 			Anope::string realreason;
-			if (Config->GetModule("operserv")->Get<bool>("addakiller") && !source.GetNick().empty())
+			if (Config->GetModule("operserv").Get<bool>("addakiller") && !source.GetNick().empty())
 				realreason = "[" + source.GetNick() + "] " + reason;
 			else
 				realreason = reason;
@@ -96,9 +96,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Puts an AKILL for every nick on the specified channel. It\n"
-				"uses the entire real ident@host for every nick, and\n"
-				"then enforces the AKILL."));
+		source.Reply(_(
+			"Puts an AKILL for every nick on the specified channel. It "
+			"uses the entire real ident@host for every nick, and "
+			"then enforces the AKILL."
+		));
 		return true;
 	}
 };

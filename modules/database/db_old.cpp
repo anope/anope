@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,14 +10,15 @@
  */
 
 #include "module.h"
-#include "modules/os_session.h"
-#include "modules/bs_kick.h"
-#include "modules/cs_mode.h"
-#include "modules/bs_badwords.h"
-#include "modules/os_news.h"
+#include "modules/botserv/badwords.h"
+#include "modules/botserv/kick.h"
+#include "modules/chanserv/entrymsg.h"
+#include "modules/chanserv/mode.h"
+#include "modules/operserv/forbid.h"
+#include "modules/operserv/news.h"
+#include "modules/operserv/session.h"
+#include "modules/set_misc.h"
 #include "modules/suspend.h"
-#include "modules/os_forbid.h"
-#include "modules/cs_entrymsg.h"
 
 #define READ(x) \
 if (true) \
@@ -473,14 +474,31 @@ static void LoadNicks()
 
 			uint32_t u32;
 			READ(read_uint32(&u32, f));
-			//nc->icq = u32;
+			ExtensibleRef<MiscData> icqref("ns_set_misc:ICQ");
+			if (icqref && u32 > 0)
+			{
+				MiscData *data = icqref->Set(nc);
+				data->object = nc->display;
+				data->name = "ns_set_misc:ICQ";
+				data->data = Anope::ToString(u32);
+			}
 
 			READ(read_string(buffer, f));
-			//nc->url = buffer;
+			ExtensibleRef<MiscData> urlref("ns_set_misc:URL");
+			if (urlref && !buffer.empty())
+			{
+				MiscData *data = icqref->Set(nc);
+				data->object = nc->display;
+				data->name = "ns_set_misc:URL";
+				data->data = buffer;
+			}
 
 			READ(read_uint32(&u32, f));
 			if (u32 & OLD_NI_KILLPROTECT)
-				nc->Extend<bool>("KILLPROTECT");
+			{
+				nc->Extend<bool>("PROTECT");
+				nc->Extend("PROTECT_AFTER", 60);
+			}
 			if (u32 & OLD_NI_MSG)
 				nc->Extend<bool>("MSG");
 			if (u32 & OLD_NI_MEMO_HARDMAX)
@@ -498,9 +516,15 @@ static void LoadNicks()
 			if (u32 & OLD_NI_HIDE_QUIT)
 				nc->Extend<bool>("HIDE_QUIT");
 			if (u32 & OLD_NI_KILL_QUICK)
-				nc->Extend<bool>("KILL_QUICK");
+			{
+				nc->Extend<bool>("PROTECT");
+				nc->Extend("PROTECT_AFTER", 20);
+			}
 			if (u32 & OLD_NI_KILL_IMMED)
-				nc->Extend<bool>("KILL_IMMED");
+			{
+				nc->Extend<bool>("PROTECT");
+				nc->Extend<time_t>("PROTECT_AFTER", 0);
+			}
 			if (u32 & OLD_NI_MEMO_MAIL)
 				nc->Extend<bool>("MEMO_MAIL");
 			if (u32 & OLD_NI_HIDE_STATUS)
@@ -593,7 +617,7 @@ static void LoadNicks()
 		for (int c; (c = getc_db(f)) == 1;)
 		{
 			Anope::string nick, last_usermask, last_realname, last_quit;
-			time_t time_registered, last_seen;
+			time_t registered, last_seen;
 
 			READ(read_string(nick, f));
 			READ(read_string(last_usermask, f));
@@ -602,7 +626,7 @@ static void LoadNicks()
 
 			int32_t tmp32;
 			READ(read_int32(&tmp32, f));
-			time_registered = tmp32;
+			registered = tmp32;
 			READ(read_int32(&tmp32, f));
 			last_seen = tmp32;
 
@@ -648,7 +672,7 @@ static void LoadNicks()
 			na->last_usermask = last_usermask;
 			na->last_realname = last_realname;
 			na->last_quit = last_quit;
-			na->time_registered = time_registered;
+			na->registered = registered;
 			na->last_seen = last_seen;
 
 			if (tmpu16 & OLD_NS_NO_EXPIRE)
@@ -761,7 +785,7 @@ static void LoadChannels()
 
 			int32_t tmp32;
 			READ(read_int32(&tmp32, f));
-			ci->time_registered = tmp32;
+			ci->registered = tmp32;
 
 			READ(read_int32(&tmp32, f));
 			ci->last_used = tmp32;
@@ -1296,7 +1320,7 @@ public:
 	{
 
 
-		hashm = Config->GetModule(this)->Get<const Anope::string>("hash");
+		hashm = Config->GetModule(this).Get<const Anope::string>("hash");
 
 		if (hashm != "md5" && hashm != "oldmd5" && hashm != "sha1" && hashm != "plain" && hashm != "sha256")
 			throw ModuleException("Invalid hash method");

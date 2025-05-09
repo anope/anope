@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2013-2024 Anope Team
+ * (C) 2013-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -61,7 +61,7 @@ public:
 	}
 
 	void OnShutdown() override;
-	void OnReload(Configuration::Conf *config) override;
+	void OnReload(Configuration::Conf &config) override;
 	void OnNewServer(Server *server) override;
 	void OnServerQuit(Server *server) override;
 	void OnUserConnect(User *u, bool &exempt) override;
@@ -79,7 +79,7 @@ public:
 	void OnChannelDelete(Channel *c) override;
 	void OnLeaveChannel(User *u, Channel *c) override;
 	void OnJoinChannel(User *u, Channel *c) override;
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override;
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const ModeData &data) override;
 	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override;
 
 	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) override;

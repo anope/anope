@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -11,7 +11,7 @@ WebCPanel::ChanServ::Akick::Akick(const Anope::string &cat, const Anope::string 
 {
 }
 
-bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Akick::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 	TemplateFileServer Page("chanserv/akick.html");
@@ -66,7 +66,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/akick", params, replacements);
 	}
 
-	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
+	replacements["ESCAPED_CHANNEL"] = HTTP::URLEncode(chname);
 
 	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 	{

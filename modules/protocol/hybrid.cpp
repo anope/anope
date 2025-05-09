@@ -1,6 +1,6 @@
-/* ircd-hybrid protocol module. Minimum supported version of ircd-hybrid is 8.2.23.
+/* ircd-hybrid protocol module. Minimum supported version of ircd-hybrid is 8.2.34.
  *
- * (C) 2003-2024 Anope Team <team@anope.org>
+ * (C) 2003-2025 Anope Team <team@anope.org>
  * (C) 2012-2022 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
@@ -10,10 +10,9 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
+#include "modules/chanserv/mode.h"
 
 static Anope::string UplinkSID;
-static bool UseSVSAccount = false;  // Temporary backwards compatibility hack until old proto is deprecated
 
 class HybridProto final
 	: public IRCDProto
@@ -25,7 +24,7 @@ class HybridProto final
 	}
 
 public:
-	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.23+")
+	HybridProto(Module *creator) : IRCDProto(creator, "ircd-hybrid 8.2.34+")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
@@ -43,7 +42,7 @@ public:
 
 	void SendInvite(const MessageSource &source, const Channel *c, User *u) override
 	{
-		Uplink::Send(source, "INVITE", u->GetUID(), c->name, c->creation_time);
+		Uplink::Send(source, "INVITE", u->GetUID(), c->name, c->created);
 	}
 
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
@@ -98,7 +97,7 @@ public:
 
 	void SendJoin(User *u, Channel *c, const ChannelStatus *status) override
 	{
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), u->GetUID());
+		Uplink::Send("SJOIN", c->created, c->name, "+" + c->GetModes(true, true), u->GetUID());
 
 		/*
 		 * Note that we can send this with the SJOIN but choose not to
@@ -209,28 +208,22 @@ public:
 
 	void SendLogin(User *u, NickAlias *na) override
 	{
-		if (!UseSVSAccount)
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", na->nc->display);
-		else
-			Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, na->nc->display);
+		Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, na->nc->display);
 	}
 
 	void SendLogout(User *u) override
 	{
-		if (!UseSVSAccount)
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d", '*');
-		else
-			Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, '*');
+		Uplink::Send("SVSACCOUNT", u->GetUID(), u->timestamp, '*');
 	}
 
 	void SendChannel(Channel *c) override
 	{
-		Uplink::Send("SJOIN", c->creation_time, c->name, "+" + c->GetModes(true, true), "");
+		Uplink::Send("SJOIN", c->created, c->name, "+" + c->GetModes(true, true), "");
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		Uplink::Send(source, "TBURST", c->creation_time, c->name, c->topic_ts, c->topic_setter, c->topic);
+		Uplink::Send(source, "TBURST", c->created, c->name, c->topic_ts, c->topic_setter, c->topic);
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
@@ -454,7 +447,7 @@ struct IRCDMessageMLock final
 
 			// Mode lock string is not what we say it is?
 			if (modes != params[3])
-				Uplink::Send("MLOCK", c->creation_time, c->name, Anope::CurTime, modes);
+				Uplink::Send("MLOCK", c->created, c->name, Anope::CurTime, modes);
 		}
 	}
 };
@@ -511,10 +504,7 @@ struct IRCDMessageServer final
 			return;
 
 		if (params.size() == 5)
-		{
 			UplinkSID = params[2];
-			UseSVSAccount = true;
-		}
 
 		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params.back(), UplinkSID);
 
@@ -796,7 +786,7 @@ public:
 		message_tmode(this),
 		message_uid(this)
 	{
-		if (Config->GetModule(this))
+		if (IRCD == &ircd_proto)
 			this->AddModes();
 	}
 
@@ -814,14 +804,14 @@ public:
 		if (modelocks && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-			Uplink::Send("MLOCK", c->creation_time, c->ci->name, Anope::CurTime, modes);
+			Uplink::Send("MLOCK", c->created, c->ci->name, Anope::CurTime, modes);
 		}
 	}
 
 	void OnDelChan(ChannelInfo *ci) override
 	{
 		if (ci->c && Servers::Capab.count("MLOCK"))
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, "");
+			Uplink::Send("MLOCK", ci->c->created, ci->name, Anope::CurTime, "");
 	}
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
@@ -831,7 +821,7 @@ public:
 		if (cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, Anope::CurTime, modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -844,7 +834,7 @@ public:
 		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK"))
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			Uplink::Send("MLOCK", ci->c->creation_time, ci->name, Anope::CurTime, modes);
+			Uplink::Send("MLOCK", ci->c->created, ci->name, Anope::CurTime, modes);
 		}
 
 		return EVENT_CONTINUE;

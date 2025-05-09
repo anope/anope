@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -33,9 +33,9 @@ public:
 				return;
 			}
 
-			Configuration::MutableBlock *block = Config->GetMutableBlock(params[1]);
+			auto *block = Config->GetMutableBlock(params[1]);
 			if (!block)
-				block = Config->GetModule(params[1]);
+				block = &Config->GetModule(params[1]);
 
 			if (!block)
 			{
@@ -57,8 +57,8 @@ public:
 
 			for (unsigned i = 0; !show_blocks[i].empty(); ++i)
 			{
-				Configuration::Block *block = Config->GetBlock(show_blocks[i]);
-				const Configuration::Block::item_map &items = block->GetItems();
+				const auto &block = Config->GetBlock(show_blocks[i]);
+				const Configuration::Block::item_map &items = block.GetItems();
 
 				ListFormatter lflist(source.GetAccount());
 				lflist.AddColumn(_("Name")).AddColumn(_("Value"));
@@ -74,7 +74,7 @@ public:
 				std::vector<Anope::string> replies;
 				lflist.Process(replies);
 
-				source.Reply(_("%s settings:"), block->GetName().c_str());
+				source.Reply(_("%s settings:"), block.GetName().c_str());
 
 				for (const auto &reply : replies)
 					source.Reply(reply);
@@ -87,14 +87,14 @@ public:
 
 			for (int i = 0; i < Config->CountBlock("module"); ++i)
 			{
-				Configuration::Block *block = Config->GetBlock("module", i);
-				const Configuration::Block::item_map &items = block->GetItems();
+				const auto &block = Config->GetBlock("module", i);
+				const Configuration::Block::item_map &items = block.GetItems();
 
 				if (items.size() <= 1)
 					continue;
 
 				ListFormatter::ListEntry entry;
-				entry["Module Name"] = block->Get<Anope::string>("name");
+				entry["Module Name"] = block.Get<Anope::string>("name");
 
 				for (const auto &[name, value] : items)
 				{
@@ -122,13 +122,15 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to change and view configuration settings.\n"
-				"Settings changed by this command are temporary and will not be reflected\n"
-				"back into the configuration file, and will be lost if Anope is shut down,\n"
-				"restarted, or the configuration is reloaded.\n"
-				" \n"
-				"Example:\n"
-				"     \002MODIFY nickserv forcemail no\002"));
+		source.Reply(_(
+			"Allows you to change and view configuration settings. "
+			"Settings changed by this command are temporary and will not be reflected "
+			"back into the configuration file, and will be lost if Anope is shut down, "
+			"restarted, or the configuration is reloaded."
+			"\n\n"
+			"Example:\n"
+			"     \002MODIFY\032nickserv\032regdelay\03215m\002"
+		));
 		return true;
 	}
 };

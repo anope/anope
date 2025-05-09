@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -82,8 +82,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Cancels the last memo you sent to the given nick or channel,\n"
-				"provided it has not been read at the time you use the command."));
+		source.Reply(_(
+			"Cancels the last memo you sent to the given nick or channel, "
+			"provided it has not been read at the time you use the command."
+		));
 		return true;
 	}
 };

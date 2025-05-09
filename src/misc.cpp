@@ -1,6 +1,6 @@
 /* Miscellaneous routines.
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,6 +18,7 @@
 #include "language.h"
 #include "regexpr.h"
 #include "sockets.h"
+#include "textproc.h"
 
 #include <cerrno>
 #include <climits>
@@ -159,11 +160,12 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 				lengths[column] = entry[column].length();
 		}
 	}
+	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "100");
 	unsigned total_length = 0;
 	for (const auto &[column, length] : lengths)
 	{
-		/* Break lines at 80 chars */
-		if (total_length > 80)
+		// Break lines that are getting too long.
+		if (total_length > max_length)
 		{
 			breaks.insert(column);
 			total_length = 0;
@@ -262,6 +264,207 @@ void InfoFormatter::AddOption(const Anope::string &opt)
 	*optstr += Language::Translate(nc, opt.c_str());
 }
 
+
+void HelpWrapper::AddEntry(const Anope::string &name, const Anope::string &desc)
+{
+	entries.emplace_back(name, desc);
+	if (name.length() > longest)
+		longest = name.length();
+}
+
+void HelpWrapper::SendTo(CommandSource &source)
+{
+	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "100") - longest - 8;
+	for (const auto &[entry_name, entry_desc] :  entries)
+	{
+		LineWrapper lw(Language::Translate(source.nc, entry_desc.c_str()), max_length);
+
+		Anope::string line;
+		if (lw.GetLine(line))
+			source.Reply("    %-*s    %s", (int)longest, entry_name.c_str(), line.c_str());
+
+		while (lw.GetLine(line))
+			source.Reply("    %-*s    %s", (int)longest, "", line.c_str());
+	}
+};
+
+LineWrapper::LineWrapper(const Anope::string &t, size_t ml)
+	: max_length(ml ? ml : Config->GetBlock("options").Get<size_t>("linelength", "100"))
+	, text(t)
+{
+}
+
+bool LineWrapper::GetLine(Anope::string &out)
+{
+	out.clear();
+	if (text.empty())
+		return false;
+
+	// Start by copying all of the formatting from the previous line
+	// onto this one.
+	for (const auto &fmt : formatting)
+		out.append(fmt);
+
+	// The current printable length of the output.
+	size_t current_length = 0;
+
+	// Whether a newline was encountered or we hit the max line length.
+	bool forced_linebreak = false;
+
+	// The index of the last space we can split on.
+	size_t last_space = 0;
+
+	// Formatting which has been seen since the last space.
+	std::vector<Anope::string> uncertain_formatting;
+
+	auto toggle_formatting = [this, &uncertain_formatting](const Anope::string &fmt)
+	{
+		auto it = std::find_if(formatting.begin(), formatting.end(), [&fmt](const auto& f) {
+			return f[0] == fmt[0];
+		});
+		if (it == formatting.end())
+		{
+			formatting.push_back(fmt);
+			uncertain_formatting.push_back(fmt);
+		}
+		else
+		{
+			formatting.erase(it);
+			uncertain_formatting.push_back(*it);
+		}
+	};
+
+	size_t idx = 0;
+	for ( ; idx < text.length(); ++idx)
+	{
+		if (current_length >= max_length)
+		{
+			for (const auto &uf : uncertain_formatting)
+				toggle_formatting(uf);
+
+			forced_linebreak = true;
+			break; // Max length reached.
+		}
+
+		auto chr = text[idx];
+		switch (chr)
+		{
+			case '\x02': // IRC bold
+			case '\x1D': // IRC italic
+			case '\x11': // IRC monospace
+			case '\x16': // IRC reverse
+			case '\x1E': // IRC strikethrough
+			case '\x1F': // IRC underline
+			{
+				// These formatting characters are a simple toggle.
+				toggle_formatting(chr);
+				out.push_back(chr);
+				break;
+			}
+
+			case '\x03': // Color
+			{
+				const auto start = idx;
+				while (++idx < text.length() && idx - start < 6)
+				{
+					chr = text[idx];
+					if (chr != ',' && (chr < '0' || chr > '9'))
+					{
+						idx--;
+						break;
+					}
+				}
+
+				auto color = text.substr(start, idx - start + 1);
+				toggle_formatting(color);
+				out.append(color);
+				break;
+			}
+			case '\x04': // Hex color
+			{
+				const auto start = idx;
+				while (++idx < text.length() && idx - start < 14)
+				{
+					chr = text[idx];
+					if (chr != ',' && (chr < '0' || chr > '9') && (chr < 'A' || chr > 'F') && (chr < 'a' || chr > 'f'))
+					{
+						idx--;
+						break;
+					}
+
+					auto color = text.substr(start, idx - start + 1);
+					toggle_formatting(color);
+					out.append(color);
+				}
+
+				break;
+			}
+
+			case '\x0A': // Forced newline (line feed)
+			case '\x0D': // Forced newline (carriage return)
+			{
+				formatting.clear();
+				last_space = idx;
+				forced_linebreak = true;
+				break;
+			}
+
+			case '\x0F': // IRC reset.
+			{
+				formatting.clear();
+				out.push_back(chr);
+				break;
+			}
+
+			case '\x1A': // Non-breaking space
+			{
+				// There aren't any single byte non-breaking spaces so we use
+				// a substitute for that purpose.
+				current_length++;
+				out.push_back(' ');
+				break;
+			}
+
+			case '\x20': // Breaking space.
+			{
+
+				// Unlike above we can split on this.
+				last_space = idx;
+				uncertain_formatting.clear();
+				current_length++;
+				out.push_back(' ');
+				break;
+			}
+
+			default: // Non-formatting character.
+				current_length++;
+				out.push_back(chr);
+				break;
+		}
+
+		if (forced_linebreak)
+			break;
+	}
+
+	if (forced_linebreak)
+	{
+		if (!last_space)
+			last_space = idx;
+
+		text.erase(0, last_space + 1);
+		out.erase(last_space);
+	}
+	else
+	{
+		// We either reached to the end of the text without needing to line wrap or
+		// we encountered a word so big that it couldn't be linewrapped.
+		text.clear();
+	}
+
+	return true;
+}
+
+
 bool Anope::IsFile(const Anope::string &filename)
 {
 	struct stat fileinfo;
@@ -308,36 +511,32 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc)
 	time_t minutes = (t / 60) % 60;
 	time_t seconds = (t) % 60;
 
-	if (!years && !days && !hours && !minutes)
-		return Anope::ToString(seconds) + " " + (seconds != 1 ? Language::Translate(nc, _("seconds")) : Language::Translate(nc, _("second")));
-	else
+	Anope::string buffer;
+	if (years)
 	{
-		bool need_comma = false;
-		Anope::string buffer;
-		if (years)
-		{
-			buffer = Anope::ToString(years) + " " + (years != 1 ? Language::Translate(nc, _("years")) : Language::Translate(nc, _("year")));
-			need_comma = true;
-		}
-		if (days)
-		{
-			buffer += need_comma ? ", " : "";
-			buffer += Anope::ToString(days) + " " + (days != 1 ? Language::Translate(nc, _("days")) : Language::Translate(nc, _("day")));
-			need_comma = true;
-		}
-		if (hours)
-		{
-			buffer += need_comma ? ", " : "";
-			buffer += Anope::ToString(hours) + " " + (hours != 1 ? Language::Translate(nc, _("hours")) : Language::Translate(nc, _("hour")));
-			need_comma = true;
-		}
-		if (minutes)
-		{
-			buffer += need_comma ? ", " : "";
-			buffer += Anope::ToString(minutes) + " " + (minutes != 1 ? Language::Translate(nc, _("minutes")) : Language::Translate(nc, _("minute")));
-		}
-		return buffer;
+		buffer = Anope::printf(Language::Translate(nc, years, N_("%lld year", "%lld years")), (long long)years);
 	}
+	if (days)
+	{
+		buffer += buffer.empty() ? "" : ", ";
+		buffer += Anope::printf(Language::Translate(nc, days, N_("%lld day", "%lld days")), (long long)days);
+	}
+	if (hours)
+	{
+		buffer += buffer.empty() ? "" : ", ";
+		buffer += Anope::printf(Language::Translate(nc, hours, N_("%lld hour", "%lld hours")), (long long)hours);
+	}
+	if (minutes)
+	{
+		buffer += buffer.empty() ? "" : ", ";
+		buffer += Anope::printf(Language::Translate(nc, minutes, N_("%lld minute", "%lld minutes")), (long long)minutes);
+	}
+	if (seconds || buffer.empty())
+	{
+		buffer += buffer.empty() ? "" : ", ";
+		buffer += Anope::printf(Language::Translate(nc, seconds, N_("%lld second", "%lld seconds")), (long long)seconds);
+	}
+	return buffer;
 }
 
 Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
@@ -359,36 +558,28 @@ Anope::string Anope::Expires(time_t expires, const NickCore *nc)
 {
 	if (!expires)
 		return Language::Translate(nc, NO_EXPIRE);
-	else if (expires <= Anope::CurTime)
+
+	if (expires <= Anope::CurTime)
 		return Language::Translate(nc, _("expires momentarily"));
-	else
-	{
-		char buf[256];
-		time_t diff = expires - Anope::CurTime + 59;
 
-		if (diff >= 86400)
-		{
-			int days = diff / 86400;
-			snprintf(buf, sizeof(buf), Language::Translate(nc, days == 1 ? _("expires in %d day") : _("expires in %d days")), days);
-		}
-		else
-		{
-			if (diff <= 3600)
-			{
-				int minutes = diff / 60;
-				snprintf(buf, sizeof(buf), Language::Translate(nc, minutes == 1 ? _("expires in %d minute") : _("expires in %d minutes")), minutes);
-			}
-			else
-			{
-				int hours = diff / 3600, minutes;
-				diff -= hours * 3600;
-				minutes = diff / 60;
-				snprintf(buf, sizeof(buf), Language::Translate(nc, hours == 1 && minutes == 1 ? _("expires in %d hour, %d minute") : (hours == 1 && minutes != 1 ? _("expires in %d hour, %d minutes") : (hours != 1 && minutes == 1 ? _("expires in %d hours, %d minute") : _("expires in %d hours, %d minutes")))), hours, minutes);
-			}
-		}
+	// This will get inlined when compiled with optimisations.
+	auto nearest = [](auto timeleft, auto roundto) {
+		if ((timeleft % roundto) <= (roundto / 2))
+			return timeleft - (timeleft % roundto);
+		return timeleft - (timeleft % roundto) + roundto;
+	};
 
-		return buf;
-	}
+	// In order to get a shorter result we round to the nearest period.
+	auto timeleft = expires - Anope::CurTime;
+	if (timeleft >= 31536000)
+		timeleft = nearest(timeleft, 86400); // Nearest day if its more than a year
+	else if (timeleft >= 86400)
+		timeleft = nearest(timeleft, 3600); // Nearest hour if its more than a day
+	else if (timeleft >= 3600)
+		timeleft = nearest(timeleft, 60); // Nearest minute if its more than an hour
+
+	auto duration = Anope::Duration(timeleft, nc);
+	return Anope::printf(Language::Translate(nc, _("expires in %s")), duration.c_str());
 }
 
 bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive, bool use_regex)
@@ -403,7 +594,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 
 		if (r == NULL || r->GetExpression() != stripped_mask)
 		{
-			ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string>("regexengine"));
+			ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options").Get<const Anope::string>("regexengine"));
 			if (provider)
 			{
 				try
@@ -602,7 +793,7 @@ Anope::string Anope::VersionShort()
 
 Anope::string Anope::VersionBuildString()
 {
-#ifdef REPRODUCIBLE_BUILD
+#if REPRODUCIBLE_BUILD
 	Anope::string s = "build #" + Anope::ToString(BUILD);
 #else
 	Anope::string s = "build #" + Anope::ToString(BUILD) + ", compiled " + Anope::compiled;
@@ -614,6 +805,9 @@ Anope::string Anope::VersionBuildString()
 #endif
 #ifdef VERSION_GIT
 	flags += "G";
+#endif
+#if REPRODUCIBLE_BUILD
+	flags += "R"
 #endif
 #ifdef _WIN32
 	flags += "W";
@@ -632,66 +826,48 @@ int Anope::VersionPatch() { return VERSION_PATCH; }
 Anope::string Anope::NormalizeBuffer(const Anope::string &buf)
 {
 	Anope::string newbuf;
-
-	for (unsigned i = 0, end = buf.length(); i < end; ++i)
+	for (size_t idx = 0; idx < buf.length(); )
 	{
-		switch (buf[i])
+		switch (buf[idx])
 		{
-			/* ctrl char */
-			case 1:
-			/* Bold ctrl char */
-			case 2:
+			case '\x02': // Bold
+			case '\x1D': // Italic
+			case '\x11': // Monospace
+			case '\x16': // Reverse
+			case '\x1E': // Strikethrough
+			case '\x1F': // Underline
+			case '\x0F': // Reset
+				idx++;
 				break;
-			/* Color ctrl char */
-			case 3:
-				/* If the next character is a digit, its also removed */
-				if (isdigit(buf[i + 1]))
+
+			case '\x03': // Color
+			{
+				const auto start = idx;
+				while (++idx < buf.length() && idx - start < 6)
 				{
-					++i;
-
-					/* not the best way to remove colors
-					 * which are two digit but no worse then
-					 * how the Unreal does with +S - TSL
-					 */
-					if (isdigit(buf[i + 1]))
-						++i;
-
-					/* Check for background color code
-					 * and remove it as well
-					 */
-					if (buf[i + 1] == ',')
-					{
-						++i;
-
-						if (isdigit(buf[i + 1]))
-							++i;
-						/* not the best way to remove colors
-						 * which are two digit but no worse then
-						 * how the Unreal does with +S - TSL
-						 */
-						if (isdigit(buf[i + 1]))
-							++i;
-					}
+					const auto chr = buf[idx];
+					if (chr != ',' && (chr < '0' || chr > '9'))
+						break;
 				}
+				break;
+			}
+			case '\x04': // Hex Color
+			{
+				const auto start = idx;
+				while (++idx < buf.length() && idx - start < 14)
+				{
+					const auto chr = buf[idx];
+					if (chr != ',' && (chr < '0' || chr > '9') && (chr < 'A' || chr > 'F') && (chr < 'a' || chr > 'f'))
+						break;
+				}
+				break;
+			}
 
+			default: // Non-formatting character.
+				newbuf.push_back(buf[idx++]);
 				break;
-			/* line feed char */
-			case 10:
-			/* carriage returns char */
-			case 13:
-			/* Reverse ctrl char */
-			case 22:
-			/* Italic ctrl char */
-			case 29:
-			/* Underline ctrl char */
-			case 31:
-				break;
-			/* A valid char gets copied into the new buffer */
-			default:
-				newbuf += buf[i];
 		}
 	}
-
 	return newbuf;
 }
 
@@ -881,4 +1057,42 @@ bool Anope::ParseCTCP(const Anope::string &text, Anope::string &name, Anope::str
 	// The CTCP body provided was non-empty.
 	body = text.substr(start_of_body, text.length() - start_of_body - end_of_ctcp);
 	return true;
+}
+
+Anope::string Anope::Template(const Anope::string &str, const Anope::map<Anope::string> &vars)
+{
+	Anope::string out;
+	for (size_t idx = 0; idx < str.length(); ++idx)
+	{
+		if (str[idx] != '{')
+		{
+			out.push_back(str[idx]);
+			continue;
+		}
+
+		for (size_t endidx = idx + 1; endidx < str.length(); ++endidx)
+		{
+			if (str[endidx] == '}')
+			{
+				if (endidx - idx == 1)
+				{
+					// foo{{bar is an escape of foo{bar
+					out.push_back('{');
+					idx = endidx;
+					break;
+				}
+
+				auto var = vars.find(str.substr(idx + 1, endidx - idx - 1));
+				if (var != vars.end())
+				{
+					// We have a variable, replace it in the string.
+					out.append(var->second);
+				}
+
+				idx = endidx;
+				break;
+			}
+		}
+	}
+	return out;
 }

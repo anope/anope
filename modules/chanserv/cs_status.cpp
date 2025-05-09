@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -102,11 +102,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command tells you what a users access is on a channel\n"
-				"and what access entries, if any, they match. Additionally it\n"
-				"will tell you of any auto kick entries they match. Usage of\n"
-				"this command is limited to users who have the ability to modify\n"
-				"access entries on the channel."));
+		source.Reply(_(
+			"This command tells you what a users access is on a channel "
+			"and what access entries, if any, they match. Additionally it "
+			"will tell you of any auto kick entries they match. Usage of "
+			"this command is limited to users who have the ability to modify "
+			"access entries on the channel."
+		));
 		return true;
 	}
 };

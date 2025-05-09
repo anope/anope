@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
+#include "modules/chanserv/mode.h"
 
 struct ModeLockImpl final
 	: ModeLock
@@ -30,9 +30,17 @@ struct ModeLockImpl final
 				ml->RemoveMLock(this);
 		}
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
+struct ModeLockTypeImpl final
+	: Serialize::Type
+{
+	ModeLockTypeImpl()
+		: Serialize::Type("ModeLock")
+	{
+	}
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
 };
 
 struct ModeLocksImpl final
@@ -203,17 +211,18 @@ struct ModeLocksImpl final
 	}
 };
 
-void ModeLockImpl::Serialize(Serialize::Data &data) const
+void ModeLockTypeImpl::Serialize(const Serializable *obj, Serialize::Data &data) const
 {
-	data.Store("ci", this->ci);
-	data.Store("set", this->set);
-	data.Store("name", this->name);
-	data.Store("param", this->param);
-	data.Store("setter", this->setter);
-	data.Store("created", this->created);
+	const auto *ml = static_cast<const ModeLockImpl *>(obj);
+	data.Store("ci", ml->ci);
+	data.Store("set", ml->set);
+	data.Store("name", ml->name);
+	data.Store("param", ml->param);
+	data.Store("setter", ml->setter);
+	data.Store("created", ml->created);
 }
 
-Serializable *ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ModeLockTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string sci;
 
@@ -336,7 +345,7 @@ class CommandCSMode final
 							continue;
 						}
 
-						if (modelocks->GetMLock().size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "50"))
+						if (modelocks->GetMLock().size() >= Config->GetModule(this->owner).Get<unsigned>("max", "50"))
 						{
 							source.Reply(_("The mode lock list of \002%s\002 is full."), ci->name.c_str());
 							continue;
@@ -765,29 +774,39 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Mainly controls mode locks and mode access (which is different from channel access)\n"
-			"on a channel.\n"
-			" \n"
-			"The \002%s LOCK\002 command allows you to add, delete, and view mode locks on a channel.\n"
-			"If a mode is locked on or off, services will not allow that mode to be changed. The \002SET\002\n"
-			"command will clear all existing mode locks and set the new one given, while \002ADD\002 and \002DEL\002\n"
-			"modify the existing mode lock.\n"
-			"Example:\n"
-			"     \002MODE #channel LOCK ADD +bmnt *!*@*aol*\002\n"
-			" \n"
-			"The \002%s SET\002 command allows you to set modes through services. Wildcards * and ? may\n"
-			"be given as parameters for list and status modes.\n"
-			"Example:\n"
-			"     \002MODE #channel SET +v *\002\n"
-			"       Sets voice status to all users in the channel.\n"
-			" \n"
-			"     \002MODE #channel SET -b ~c:*\n"
-			"       Clears all extended bans that start with ~c:\n"
-			" \n"
-			"The \002%s CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be\n"
-			"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If \037what\037\n"
-			"is not given then all basic modes are removed."),
-			source.command.upper().c_str(), source.command.upper().c_str(), source.command.upper().c_str());
+		source.Reply(_(
+				"Mainly controls mode locks and mode access (which is different from channel access) "
+				"on a channel."
+				"\n\n"
+				"The \002%s\032LOCK\002 command allows you to add, delete, and view mode locks on a channel. "
+				"If a mode is locked on or off, services will not allow that mode to be changed. The \002SET\002 "
+				"command will clear all existing mode locks and set the new one given, while \002ADD\002 and \002DEL\002 "
+				"modify the existing mode lock."
+				"\n\n"
+				"Example:\n"
+				"     \002%s\032#channel\032%s\032ADD\032+bmnt\032*!*@*aol*\002\n"
+				"\n\n"
+				"The \002%s\032SET\002 command allows you to set modes through services. Wildcards * and ? may "
+				"be given as parameters for list and status modes."
+				"\n\n"
+				"Example:\n"
+				"     \002%s\032#channel\032SET\032+v\032*\002\n"
+				"       Sets voice status to all users in the channel."
+				"\n\n"
+				"     \002%s\032#channel\032SET\032-b\032~c:*\n"
+				"       Clears all extended bans that start with ~c:"
+				"\n\n"
+				"The \002%s\032CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be "
+				"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If \037what\037 "
+				"is not given then all basic modes are removed."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };
@@ -797,35 +816,10 @@ static Anope::map<std::pair<bool, Anope::string> > modes;
 class CommandCSModes final
 	: public Command
 {
-public:
-	CommandCSModes(Module *creator) : Command(creator, "chanserv/modes", 1, 2)
+private:
+	void DoMode(CommandSource &source, ChannelInfo *ci, User *targ)
 	{
-		this->SetSyntax(_("\037channel\037 [\037user\037]"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = source.GetUser(),
-			*targ = params.size() > 1 ? User::Find(params[1], true) : u;
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
-
-		if (!targ)
-		{
-			if (params.size() > 1)
-				source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
-			return;
-		}
-
-		if (!ci)
-		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-			return;
-		}
-		else if (!ci->c)
-		{
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
-			return;
-		}
+		auto *u = source.GetUser();
 
 		AccessGroup u_access = source.AccessFor(ci), targ_access = ci->AccessFor(targ);
 		const std::pair<bool, Anope::string> &m = modes[source.command];
@@ -875,6 +869,48 @@ public:
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "on " << targ->nick;
 	}
 
+public:
+	CommandCSModes(Module *creator) : Command(creator, "chanserv/modes", 1)
+	{
+		this->SetSyntax(_("\037channel\037 [\037user\037]+"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		auto *ci = ChannelInfo::Find(params[0]);
+		if (!ci)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+		if (!ci->c)
+		{
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			return;
+		}
+
+		if (params.size() == 1)
+		{
+			// The source is executing the command on themself.
+			if (source.GetUser())
+				DoMode(source, ci, source.GetUser());
+			return;
+		}
+
+		// The source has provided list of nicks.
+		for (size_t i = 1; i < params.size(); ++i)
+		{
+			auto &nick = params[i];
+			auto *targ = User::Find(nick, true);
+			if (!targ)
+			{
+				source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+				continue;
+			}
+			DoMode(source, ci, targ);
+		}
+	}
+
 	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		const std::pair<bool, Anope::string> &m = modes[source.command];
@@ -898,13 +934,15 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		if (m.first)
-			source.Reply(_("Gives %s status to the selected nick on a channel. If \037nick\037 is\n"
-					"not given, it will %s you."),
-					m.second.upper().c_str(), m.second.lower().c_str());
+		{
+			source.Reply(_("Gives %s status to the selected nicks on a channel. If \037nick\037 is not given, it will %s you."),
+				m.second.upper().c_str(), m.second.lower().c_str());
+		}
 		else
-			source.Reply(_("Removes %s status from the selected nick on a channel. If \037nick\037 is\n"
-					"not given, it will de%s you."),
-					 m.second.upper().c_str(), m.second.lower().c_str());
+		{
+			source.Reply(_("Removes %s status from the selected nicks on a channel. If \037nick\037 is not given, it will de%s you."),
+				m.second.upper().c_str(), m.second.lower().c_str());
+		}
 		source.Reply(" ");
 		source.Reply(_("You must have the %s(ME) privilege on the channel to use this command."), m.second.upper().c_str());
 
@@ -918,33 +956,33 @@ class CSMode final
 	CommandCSMode commandcsmode;
 	CommandCSModes commandcsmodes;
 	ExtensibleItem<ModeLocksImpl> modelocks;
-	Serialize::Type modelocks_type;
+	ModeLockTypeImpl modelocks_type;
 
 public:
-	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsmode(this), commandcsmodes(this),
-		modelocks(this, "modelocks"),
-		modelocks_type("ModeLock", ModeLockImpl::Unserialize)
+	CSMode(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandcsmode(this)
+		, commandcsmodes(this)
+		, modelocks(this, "modelocks")
 	{
-
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		modes.clear();
 
-		for (int i = 0; i < conf->CountBlock("command"); ++i)
+		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("command", i);
+			const auto &block = conf.GetBlock("command", i);
 
-			const Anope::string &cname = block->Get<const Anope::string>("name"),
-					&cmd = block->Get<const Anope::string>("command");
+			const Anope::string &cname = block.Get<const Anope::string>("name"),
+					&cmd = block.Get<const Anope::string>("command");
 
 			if (cname.empty() || cmd != "chanserv/modes")
 				continue;
 
-			const Anope::string &set = block->Get<const Anope::string>("set"),
-					&unset = block->Get<const Anope::string>("unset");
+			const Anope::string &set = block.Get<const Anope::string>("set"),
+					&unset = block.Get<const Anope::string>("unset");
 
 			if (set.empty() && unset.empty())
 				continue;
@@ -970,7 +1008,7 @@ public:
 				if (cm->type == MODE_REGULAR)
 				{
 					if (!c->HasMode(cm->name) && ml->set)
-						c->SetMode(NULL, cm, "", false);
+						c->SetMode(NULL, cm, {}, false);
 					else if (c->HasMode(cm->name) && !ml->set)
 						c->RemoveMode(NULL, cm, "", false);
 				}
@@ -1007,7 +1045,7 @@ public:
 	{
 		ModeLocks *ml = modelocks.Require(ci);
 		Anope::string mlock;
-		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("mlock", "+nt"));
+		spacesepstream sep(Config->GetModule(this).Get<const Anope::string>("mlock", "+nt"));
 		if (sep.GetToken(mlock))
 		{
 			bool add = true;

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2012-2024 Anope Team
+ * (C) 2012-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -37,7 +37,7 @@ private:
 		}
 		else
 		{
-			if (Anope::CurTime - Config->GetBlock("options")->Get<time_t>("updatetimeout", "2m") > lastwarn)
+			if (Anope::CurTime - Config->GetBlock("options").Get<time_t>("updatetimeout", "2m") > lastwarn)
 			{
 				Log() << "Unable to locate SQL reference, going to readonly...";
 				Anope::ReadOnly = this->ro = true;
@@ -53,13 +53,12 @@ private:
 		return init && SQL;
 	}
 
-	void RunQuery(const Query &query)
+	Anope::string GetTableName(Serialize::Type *s_type)
 	{
-		/* Can this be threaded? */
-		this->RunQueryResult(query);
+		return this->prefix + s_type->GetName();
 	}
 
-	Result RunQueryResult(const Query &query)
+	Result RunQuery(const Query &query)
 	{
 		if (this->CheckSQL())
 		{
@@ -90,27 +89,30 @@ public:
 		if (!this->CheckInit())
 			return;
 
-		for (auto *obj : this->updated_items)
+		std::set<Serializable *> items;
+		std::swap(this->updated_items, items);
+
+		for (auto *obj : items)
 		{
 			if (obj && this->SQL)
 			{
+				Serialize::Type *s_type = obj->GetSerializableType();
+				if (!s_type)
+					continue;
+
 				Data data;
-				obj->Serialize(data);
+				s_type->Serialize(obj, data);
 
 				if (obj->IsCached(data))
 					continue;
 
 				obj->UpdateCache(data);
 
-				Serialize::Type *s_type = obj->GetSerializableType();
-				if (!s_type)
-					continue;
-
-				std::vector<Query> create = this->SQL->CreateTable(this->prefix + s_type->GetName(), data);
+				auto create = this->SQL->CreateTable(GetTableName(s_type), data);
 				for (const auto &query : create)
-					this->RunQueryResult(query);
+					this->RunQuery(query);
 
-				Result res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + s_type->GetName(), obj->id, data));
+				auto res = this->RunQuery(this->SQL->BuildInsert(GetTableName(s_type), obj->id, data));
 				if (res.GetID() && obj->id != res.GetID())
 				{
 					/* In this case obj is new, so place it into the object map */
@@ -119,8 +121,6 @@ public:
 				}
 			}
 		}
-
-		this->updated_items.clear();
 	}
 
 	EventReturn OnLoadDatabase() override
@@ -139,11 +139,11 @@ public:
 		init = false;
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		this->SQL = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
-		this->prefix = block->Get<const Anope::string>("prefix", "anope_db_");
+		const auto &block = conf.GetModule(this);
+		this->SQL = ServiceReference<Provider>("SQL::Provider", block.Get<const Anope::string>("engine"));
+		this->prefix = block.Get<const Anope::string>("prefix", "anope_db_");
 	}
 
 	void OnSerializableConstruct(Serializable *obj) override
@@ -163,7 +163,7 @@ public:
 		if (s_type)
 		{
 			if (obj->id > 0)
-				this->RunQuery("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + Anope::ToString(obj->id));
+				this->RunQuery("DELETE FROM `" + GetTableName(s_type) + "` WHERE `id` = " + Anope::ToString(obj->id));
 			s_type->objects.erase(obj->id);
 		}
 		this->updated_items.erase(obj);
@@ -174,11 +174,15 @@ public:
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
 
-		Query query("SELECT * FROM `" + this->prefix + obj->GetName() + "` WHERE (`timestamp` >= " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " OR `timestamp` IS NULL)");
+		Anope::string sql = Anope::printf("SELECT * from `%s`", GetTableName(obj).c_str());
+		if (obj->GetTimestamp())
+			sql += Anope::printf(" WHERE (`timestamp` >= %s OR `timestamp` IS NULL)", this->SQL->FromUnixtime(obj->GetTimestamp()).c_str());
+
+		Query query(sql);
 
 		obj->UpdateTimestamp();
 
-		Result res = this->RunQueryResult(query);
+		Result res = this->RunQuery(query);
 
 		bool clear_null = false;
 		for (int i = 0; i < res.Rows(); ++i)
@@ -187,7 +191,7 @@ public:
 
 
 
-			auto oid = Anope::TryConvert<unsigned int>(res.Get(i, "id"));
+			auto oid = Anope::TryConvert<Serializable::Id>(res.Get(i, "id"));
 			if (!oid.has_value())
 			{
 				Log(LOG_DEBUG) << "Unable to convert id from " << obj->GetName();
@@ -198,7 +202,7 @@ public:
 			if (res.Get(i, "timestamp").empty())
 			{
 				clear_null = true;
-				std::map<uint64_t, Serializable *>::iterator it = obj->objects.find(id);
+				auto it = obj->objects.find(id);
 				if (it != obj->objects.end())
 					delete it->second; // This also removes this object from the map
 			}
@@ -210,7 +214,7 @@ public:
 					data[key] << value;
 
 				Serializable *s = NULL;
-				std::map<uint64_t, Serializable *>::iterator it = obj->objects.find(id);
+				auto it = obj->objects.find(id);
 				if (it != obj->objects.end())
 					s = it->second;
 
@@ -229,14 +233,14 @@ public:
 						 */
 
 						Data data2;
-						new_s->Serialize(data2);
+						obj->Serialize(new_s, data2);
 						new_s->UpdateCache(data2); /* We know this is the most up to date copy */
 					}
 				}
 				else
 				{
 					if (!s)
-						this->RunQuery("UPDATE `" + prefix + obj->GetName() + "` SET `timestamp` = " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " WHERE `id` = " + Anope::ToString(id));
+						this->RunQuery("UPDATE `" + GetTableName(obj) + "` SET `timestamp` = " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " WHERE `id` = " + Anope::ToString(id));
 					else
 						delete s;
 				}
@@ -245,7 +249,7 @@ public:
 
 		if (clear_null)
 		{
-			query = "DELETE FROM `" + this->prefix + obj->GetName() + "` WHERE `timestamp` IS NULL";
+			query = "DELETE FROM `" + GetTableName(obj) + "` WHERE `timestamp` IS NULL";
 			this->RunQuery(query);
 		}
 	}

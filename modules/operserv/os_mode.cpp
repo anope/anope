@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -36,8 +36,8 @@ public:
 		{
 			bool all = params.size() > 2 && params[2].equals_ci("ALL");
 
-			for (const auto &[mode, value] : c->GetModes())
-				c->RemoveMode(c->WhoSends(), mode, value, false);
+			for (const auto &[mode, data] : c->GetModes())
+				c->RemoveMode(c->WhoSends(), mode, data.value, false);
 
 			if (!c)
 			{
@@ -128,10 +128,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to change modes for any channel.\n"
-				"Parameters are the same as for the standard /MODE command.\n"
-				"Alternatively, CLEAR may be given to clear all modes on the channel.\n"
-				"If CLEAR ALL is given then all modes, including user status, is removed."));
+		source.Reply(_(
+			"Allows Services Operators to change modes for any channel. "
+			"Parameters are the same as for the standard /MODE command. "
+			"Alternatively, CLEAR may be given to clear all modes on the channel. "
+			"If CLEAR\032ALL is given then all modes, including user status, is removed."
+		));
 		return true;
 	}
 };
@@ -169,8 +171,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to change modes for any user.\n"
-				"Parameters are the same as for the standard /MODE command."));
+		source.Reply(_(
+			"Allows Services Operators to change modes for any user. "
+			"Parameters are the same as for the standard /MODE command."
+		));
 		return true;
 	}
 };

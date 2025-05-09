@@ -1,6 +1,6 @@
 /* Routines to maintain a list of connected servers
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -117,12 +117,12 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 						IRCD->SendJoin(uc->user, c, &uc->status);
 				}
 
-				for (const auto &[mode, value] :  c->GetModes())
+				for (const auto &[mode, data] : c->GetModes())
 				{
 					ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
 					if (!cm || cm->type != MODE_LIST)
 						continue;
-					ModeManager::StackerAdd(c->WhoSends(), c, cm, true, value);
+					ModeManager::StackerAdd(c->WhoSends(), c, cm, true, data);
 				}
 
 				if (!c->topic.empty() && !c->topic_setter.empty())
@@ -328,7 +328,7 @@ bool Server::IsQuitting() const
 
 void Server::Notice(BotInfo *source, const Anope::string &message)
 {
-	if (Config->UsePrivmsg && Config->DefPrivmsg)
+	if (Config->DefPrivmsg)
 		IRCD->SendGlobalPrivmsg(source, this, message);
 	else
 		IRCD->SendGlobalNotice(source, this, message);

@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,6 +18,7 @@ class AkillDelCallback final
 {
 	CommandSource &source;
 	unsigned deleted = 0;
+	Anope::string lastdeleted;
 	Command *cmd;
 public:
 	AkillDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), cmd(c)
@@ -26,12 +27,20 @@ public:
 
 	~AkillDelCallback() override
 	{
-		if (!deleted)
-			source.Reply(_("No matching entries on the AKILL list."));
-		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from the AKILL list."));
-		else
-			source.Reply(_("Deleted %d entries from the AKILL list."), deleted);
+		switch (deleted)
+		{
+			case 0:
+				source.Reply(_("No matching entries on the AKILL list."));
+				break;
+
+			case 1:
+				source.Reply(_("Deleted %s from the AKILL list."), lastdeleted.c_str());
+				break;
+
+			default:
+				source.Reply(deleted, N_("Deleted %d entry from the AKILL list.", "Deleted %d entries from the AKILL list."), deleted);
+				break;
+		}
 	}
 
 	void HandleNumber(unsigned number) override
@@ -44,6 +53,7 @@ public:
 		if (!x)
 			return;
 
+		lastdeleted = x->mask;
 		Log(LOG_ADMIN, source, cmd) << "to remove " << x->mask << " from the list";
 
 		++deleted;
@@ -79,7 +89,7 @@ private:
 			sep.GetToken(mask);
 		}
 
-		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d");
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv").Get<time_t>("autokillexpiry", "30d");
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -124,7 +134,7 @@ private:
 
 		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
 		{
-			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+			const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 
 			if (regexengine.empty())
 			{
@@ -155,7 +165,7 @@ private:
 		if (targ)
 			mask = "*@" + targ->host;
 
-		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+		if (Config->GetModule("operserv").Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
 		if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
@@ -170,7 +180,7 @@ private:
 		}
 
 		auto *x = new XLine(mask, source.GetNick(), expires, reason);
-		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+		if (Config->GetModule("operserv").Get<bool>("akillids"))
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
@@ -202,7 +212,7 @@ private:
 		}
 
 		akills->AddXLine(x);
-		if (Config->GetModule("operserv")->Get<bool>("akillonadd"))
+		if (Config->GetModule("operserv").Get<bool>("akillonadd"))
 			akills->Send(NULL, x);
 
 		source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
@@ -362,7 +372,7 @@ private:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Expires"));
-		if (Config->GetModule("operserv")->Get<bool>("akillids"))
+		if (Config->GetModule("operserv").Get<bool>("akillids"))
 			list.AddColumn(_("ID"));
 		list.AddColumn(_("Reason"));
 
@@ -423,53 +433,68 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to manipulate the AKILL list. If\n"
-				"a user matching an AKILL mask attempts to connect, services\n"
-				"will issue a KILL for that user and, on supported server\n"
-				"types, will instruct all servers to add a ban for the mask\n"
-				"which the user matched.\n"
-				" \n"
-				"\002AKILL ADD\002 adds the given mask to the AKILL\n"
-				"list for the given reason, which \002must\002 be given.\n"
-				"Mask should be in the format of nick!user@host#real name,\n"
-				"though all that is required is user@host. If a real name is specified,\n"
-				"the reason must be prepended with a :.\n"
-				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"
-				"\0371h30m\037) are not permitted. If a unit specifier is not\n"
-				"included, the default is days (so \037+30\037 by itself means 30\n"
-				"days). To add an AKILL which does not expire, use \037+0\037. If the\n"
-				"usermask to be added starts with a \037+\037, an expiry time must\n"
-				"be given, even if it is the same as the default. The\n"
-				"current AKILL default expiry time can be found with the\n"
-				"\002STATS AKILL\002 command."));
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		source.Reply(_(
+				"Allows Services Operators to manipulate the AKILL list. If "
+				"a user matching an AKILL mask attempts to connect, services "
+				"will issue a KILL for that user and, on supported server "
+				"types, will instruct all servers to add a ban for the mask "
+				"which the user matched."
+				"\n\n"
+				"\002%s\032ADD\002 adds the given mask to the AKILL "
+				"list for the given reason, which \002must\002 be given. "
+				"Mask should be in the format of nick!user@host#real\032name, "
+				"though all that is required is user@host. If a real name is specified, "
+				"the reason must be prepended with a :. "
+				"\037expiry\037 is specified as an integer followed by one of \037d\037 "
+				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as "
+				"\0371h30m\037) are not permitted. If a unit specifier is not "
+				"included, the default is days (so \037+30\037 by itself means 30 "
+				"days). To add an AKILL which does not expire, use \037+0\037. If the "
+				"usermask to be added starts with a \037+\037, an expiry time must "
+				"be given, even if it is the same as the default. The "
+				"current AKILL default expiry time can be found with the "
+				"\002STATS\032AKILL\002 command."
+			),
+			source.command.nobreak().c_str());
+
+		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this is desired."), regexengine.c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your mask in // if this is desired."
+				),
+				regexengine.c_str());
 		}
+
+		source.Reply(" ");
 		source.Reply(_(
-				" \n"
-				"The \002AKILL DEL\002 command removes the given mask from the\n"
-				"AKILL list if it is present.  If a list of entry numbers is\n"
-				"given, those entries are deleted.  (See the example for LIST\n"
-				"below.)\n"
-				" \n"
-				"The \002AKILL LIST\002 command displays the AKILL list.\n"
-				"If a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
+				"The \002%s\032DEL\002 command removes the given mask from the "
+				"AKILL list if it is present. If a list of entry numbers is "
+				"given, those entries are deleted.  (See the example for LIST "
+				"below.)"
+				"\n\n"
+				"The \002%s\032LIST\002 command displays the AKILL list. "
+				"If a wildcard mask is given, only those entries matching the "
+				"mask are displayed. If a list of entry numbers is given, "
 				"only those entries are shown; for example:\n"
-				"   \002AKILL LIST 2-5,7-9\002\n"
+				"   \002%s\032LIST\0322-5,7-9\002\n"
 				"      Lists AKILL entries numbered 2 through 5 and 7\n"
-				"      through 9.\n"
-				"      \n"
-				"\002AKILL VIEW\002 is a more verbose version of \002AKILL LIST\002, and\n"
-				"will show who added an AKILL, the date it was added, and when\n"
-				"it expires, as well as the user@host/ip mask and reason.\n"
-				" \n"
-				"\002AKILL CLEAR\002 clears all entries of the AKILL list."));
+				"      through 9."
+				"\n\n"
+				"\002%s\032VIEW\002 is a more verbose version of \002%s\032LIST\002, and "
+				"will show who added an AKILL, the date it was added, and when "
+				"it expires, as well as the user@host/ip mask and reason."
+				"\n\n"
+				"\002%s\032CLEAR\002 clears all entries of the AKILL list."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };

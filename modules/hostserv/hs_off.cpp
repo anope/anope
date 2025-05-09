@@ -1,6 +1,6 @@
 /* HostServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -47,9 +47,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Deactivates the vhost currently assigned to the nick in use.\n"
-				"When you use this command any user who performs a /whois\n"
-				"on you will see your real host/IP address."));
+		source.Reply(_(
+			"Deactivates the vhost currently assigned to the nick in use. "
+			"When you use this command any user who performs a /whois "
+			"on you will see your real host/IP address."
+		));
 		return true;
 	}
 };

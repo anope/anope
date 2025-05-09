@@ -1,6 +1,6 @@
 /* XLine functions.
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -21,15 +21,15 @@
 
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
-Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLineManager::XLinesByUID("XLine");
+Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLineManager::XLinesByUID(XLINE_TYPE);
 
 void XLine::Init()
 {
-	if (this->mask.length() >= 2 && this->mask[0] == '/' && this->mask[this->mask.length() - 1] == '/' && !Config->GetBlock("options")->Get<const Anope::string>("regexengine").empty())
+	if (this->mask.length() >= 2 && this->mask[0] == '/' && this->mask[this->mask.length() - 1] == '/' && !Config->GetBlock("options").Get<const Anope::string>("regexengine").empty())
 	{
 		Anope::string stripped_mask = this->mask.substr(1, this->mask.length() - 2);
 
-		ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string>("regexengine"));
+		ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options").Get<const Anope::string>("regexengine"));
 		if (provider)
 		{
 			try
@@ -86,7 +86,12 @@ void XLine::Init()
 	}
 }
 
-XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(Me->GetName()), reason(r), id(uid)
+XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid)
+	: Serializable(XLINE_TYPE)
+	, mask(ma)
+	, by(Me->GetName())
+	, reason(r)
+	, id(uid)
 {
 	regex = NULL;
 	manager = NULL;
@@ -95,7 +100,14 @@ XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::strin
 	this->Init();
 }
 
-XLine::XLine(const Anope::string &ma, const Anope::string &b, const time_t ex, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(b), created(Anope::CurTime), expires(ex), reason(r), id(uid)
+XLine::XLine(const Anope::string &ma, const Anope::string &b, const time_t ex, const Anope::string &r, const Anope::string &uid)
+	: Serializable(XLINE_TYPE)
+	, mask(ma)
+	, by(b)
+	, created(Anope::CurTime)
+	, expires(ex)
+	, reason(r)
+	, id(uid)
 {
 	regex = NULL;
 	manager = NULL;
@@ -151,19 +163,26 @@ bool XLine::IsRegex() const
 	return !this->mask.empty() && this->mask[0] == '/' && this->mask[this->mask.length() - 1] == '/';
 }
 
-void XLine::Serialize(Serialize::Data &data) const
+XLine::Type::Type()
+	: Serialize::Type(XLINE_TYPE)
 {
-	data.Store("mask", this->mask);
-	data.Store("by", this->by);
-	data.Store("created", this->created);
-	data.Store("expires", this->expires);
-	data.Store("reason", this->reason);
-	data.Store("uid", this->id);
-	if (this->manager)
-		data.Store("manager", this->manager->name);
 }
 
-Serializable *XLine::Unserialize(Serializable *obj, Serialize::Data &data)
+void XLine::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *xl = static_cast<const XLine *>(obj);
+
+	data.Store("mask", xl->mask);
+	data.Store("by", xl->by);
+	data.Store("created", xl->created);
+	data.Store("expires", xl->expires);
+	data.Store("reason", xl->reason);
+	data.Store("uid", xl->id);
+	if (xl->manager)
+		data.Store("manager", xl->manager->name);
+}
+
+Serializable *XLine::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string smanager;
 
@@ -259,7 +278,10 @@ Anope::string XLineManager::GenerateUID()
 	return id;
 }
 
-XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service(creator, "XLineManager", xname), type(t), xlines("XLine")
+XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t)
+	: Service(creator, "XLineManager", xname)
+	, type(t)
+	, xlines(XLINE_TYPE)
 {
 }
 

@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -39,8 +39,8 @@ static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Ano
 
 		/* Notify recipient of the memo that a notification has
 		   been sent to the sender */
-		source.Reply(_("A notification memo has been sent to %s informing them you have\n"
-				"read their memo."), nc->display.c_str());
+		source.Reply(_("A notification memo has been sent to %s informing them you have read their memo."),
+			nc->display.c_str());
 	}
 
 	/* Remove receipt flag from the original memo */
@@ -91,9 +91,9 @@ public:
 		if (Command::FindCommandFromService("memoserv/del", bi, cmd))
 		{
 			if (ci)
-				source.Reply(_("To delete, type: \002%s%s %s %s %d\002"), Config->StrictPrivmsg.c_str(), bi->nick.c_str(), cmd.c_str(), ci->name.c_str(), index + 1);
+				source.Reply(_("To delete, type: \002%s %s %d\002"), bi->GetQueryCommand({}, cmd).c_str(), ci->name.c_str(), index + 1);
 			else
-				source.Reply(_("To delete, type: \002%s%s %s %d\002"), Config->StrictPrivmsg.c_str(), bi->nick.c_str(), cmd.c_str(), index + 1);
+				source.Reply(_("To delete, type: \002%s %d\002"), bi->GetQueryCommand({}, cmd).c_str(), index + 1);
 		}
 
 		source.Reply("%s", m->text.c_str());
@@ -198,15 +198,17 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sends you the text of the memos specified. If LAST is\n"
-				"given, sends you the memo you most recently received. If\n"
-				"NEW is given, sends you all of your new memos.  If ALL is\n"
-				"given, sends you all of your memos. Otherwise, sends you\n"
-				"memo number \037num\037. You can also give a list of numbers,\n"
-				"as in this example:\n"
-				" \n"
-				"   \002READ 2-5,7-9\002\n"
-				"      Displays memos numbered 2 through 5 and 7 through 9."));
+		source.Reply(_(
+			"Sends you the text of the memos specified. If LAST is "
+			"given, sends you the memo you most recently received. If "
+			"NEW is given, sends you all of your new memos. If ALL is "
+			"given, sends you all of your memos. Otherwise, sends you "
+			"memo number \037num\037. You can also give a list of numbers, "
+			"as in this example:"
+			"\n\n"
+			"   \002READ 2-5,7-9\002\n"
+			"      Displays memos numbered 2 through 5 and 7 through 9."
+		));
 		return true;
 	}
 };

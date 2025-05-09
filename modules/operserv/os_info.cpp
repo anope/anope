@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -25,16 +25,26 @@ struct OperInfoImpl final
 	}
 
 	~OperInfoImpl() override;
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct OperInfoTypeImpl
+	: Serialize::Type
+{
+	OperInfoTypeImpl()
+		: Serialize::Type("OperInfo")
 	{
-		data.Store("target", target);
-		data.Store("info", info);
-		data.Store("adder", adder);
-		data.Store("created", created);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *oi = static_cast<const OperInfoImpl *>(obj);
+		data.Store("target", oi->target);
+		data.Store("info", oi->info);
+		data.Store("adder", oi->adder);
+		data.Store("created", oi->created);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
 };
 
 struct OperInfos final
@@ -71,7 +81,7 @@ OperInfoImpl::~OperInfoImpl()
 	}
 }
 
-Serializable *OperInfoImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *OperInfoTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string starget;
 	data["target"] >> starget;
@@ -148,7 +158,7 @@ public:
 
 			OperInfos *oi = e->Require<OperInfos>("operinfo");
 
-			if ((*oi)->size() >= Config->GetModule(this->module)->Get<unsigned>("max", "10"))
+			if ((*oi)->size() >= Config->GetModule(this->module).Get<unsigned>("max", "10"))
 			{
 				source.Reply(_("The oper info list for \002%s\002 is full."), target.c_str());
 				return;
@@ -244,9 +254,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Add or delete oper information for a given nick or channel.\n"
-				"This will show to opers in the respective info command for\n"
-				"the nick or channel."));
+		source.Reply(_(
+			"Add or delete oper information for a given nick or channel. "
+			"This will show to opers in the respective info command for "
+			"the nick or channel."
+		));
 		return true;
 	}
 };
@@ -256,7 +268,7 @@ class OSInfo final
 {
 	CommandOSInfo commandosinfo;
 	ExtensibleItem<OperInfos> oinfo;
-	Serialize::Type oinfo_type;
+	OperInfoTypeImpl oinfo_type;
 
 	void OnInfo(CommandSource &source, Extensible *e, InfoFormatter &info)
 	{
@@ -274,10 +286,11 @@ class OSInfo final
 	}
 
 public:
-	OSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosinfo(this), oinfo(this, "operinfo"), oinfo_type("OperInfo", OperInfoImpl::Unserialize)
+	OSInfo(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandosinfo(this)
+		, oinfo(this, "operinfo")
 	{
-
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override

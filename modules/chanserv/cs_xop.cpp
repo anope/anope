@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -141,7 +141,7 @@ private:
 
 		if (IRCD->IsChannelValid(mask))
 		{
-			if (Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
+			if (Config->GetModule("chanserv").Get<bool>("disallow_channel_access"))
 			{
 				source.Reply(_("Channels may not be on access lists."));
 				return;
@@ -164,7 +164,7 @@ private:
 		else
 		{
 			na = NickAlias::Find(mask);
-			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+			if (!na && Config->GetModule("chanserv").Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
@@ -179,7 +179,11 @@ private:
 			{
 				User *targ = User::Find(mask, true);
 				if (targ != NULL)
+				{
 					mask = "*!*@" + targ->GetDisplayedHost();
+					if (description.empty())
+						description = targ->nick;
+				}
 				else
 				{
 					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
@@ -208,7 +212,7 @@ private:
 			}
 		}
 
-		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1000");
+		unsigned access_max = Config->GetModule("chanserv").Get<unsigned>("accessmax", "1000");
 		if (access_max && ci->GetDeepAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
@@ -230,7 +234,7 @@ private:
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask;
 
 		FOREACH_MOD(OnAccessAdd, (ci, source, acc));
-		source.Reply(_("\002%s\002 added to %s %s list."), acc->Mask().c_str(), ci->name.c_str(), source.command.c_str());
+		source.Reply(_("\002%s\002 added to %s %s list."), acc->Mask().c_str(), ci->name.c_str(), source.command.nobreak().c_str());
 	}
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -252,7 +256,7 @@ private:
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.nobreak().c_str());
 			return;
 		}
 
@@ -311,15 +315,14 @@ private:
 				~XOPDelCallback() override
 				{
 					if (!deleted)
-						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
+						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.nobreak().c_str());
 					else
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << nicks;
-
 						if (deleted == 1)
-							source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
+							source.Reply(_("Deleted %s from %s %s list."), nicks.c_str(), ci->name.c_str(), source.command.nobreak().c_str());
 						else
-							source.Reply(_("Deleted %d entries from %s %s list."), deleted, ci->name.c_str(), source.command.c_str());
+							source.Reply(deleted, N_("Deleted %d entry from %s %s list.", "Deleted %d entries from %s %s list."), deleted, ci->name.c_str(), source.command.nobreak().c_str());
 					}
 				}
 
@@ -360,7 +363,7 @@ private:
 				{
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << a->Mask();
 
-					source.Reply(_("\002%s\002 deleted from %s %s list."), a->Mask().c_str(), ci->name.c_str(), source.command.c_str());
+					source.Reply(_("\002%s\002 deleted from %s %s list."), a->Mask().c_str(), ci->name.c_str(), source.command.nobreak().c_str());
 
 					ci->EraseAccess(i);
 					FOREACH_MOD(OnAccessDel, (ci, source, a));
@@ -370,7 +373,7 @@ private:
 				}
 			}
 
-			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), source.command.nobreak().c_str());
 		}
 	}
 
@@ -389,7 +392,7 @@ private:
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.nobreak().c_str());
 			return;
 		}
 
@@ -454,7 +457,7 @@ private:
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("%s list for %s"), source.command.c_str(), ci->name.c_str());
+			source.Reply(_("%s list for %s"), source.command.nobreak().c_str(), ci->name.c_str());
 			for (const auto &reply : replies)
 				source.Reply(reply);
 		}
@@ -470,7 +473,7 @@ private:
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.nobreak().c_str());
 			return;
 		}
 
@@ -495,7 +498,7 @@ private:
 
 		FOREACH_MOD(OnAccessClear, (ci, source));
 
-		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.c_str());
+		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.nobreak().c_str());
 	}
 
 public:
@@ -509,7 +512,7 @@ public:
 
 	const Anope::string GetDesc(CommandSource &source) const override
 	{
-		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.upper().c_str());
+		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.nobreak().c_str());
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -542,59 +545,78 @@ public:
 
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002%s list\002 for a channel. Users who match an access entry\n"
-				"on the %s list receive the following privileges:\n"
-				" "), cmd.c_str(), cmd.c_str());
+		source.Reply(_(
+				"Maintains the \002%s list\002 for a channel. Users who match an access entry "
+				"on the %s list receive the following privileges:"
+			),
+			cmd.c_str(),
+			cmd.c_str());
 
+		source.Reply(" ");
 		Anope::string buf;
 		for (const auto &permission : permissions[cmd])
 		{
 			buf += ", " + permission;
 			if (buf.length() > 75)
 			{
-				source.Reply("  %s\n", buf.substr(2).c_str());
+				source.Reply("  %s", buf.substr(2).c_str());
 				buf.clear();
 			}
 		}
 		if (!buf.empty())
 		{
-			source.Reply("  %s\n", buf.substr(2).c_str());
+			source.Reply("  %s", buf.substr(2).c_str());
 			buf.clear();
 		}
 
-		source.Reply(_(" \n"
-				"The \002%s ADD\002 command adds the given nickname to the\n"
-				"%s list.\n"
-				" \n"
-				"The \002%s DEL\002 command removes the given nick from the\n"
-				"%s list. If a list of entry numbers is given, those\n"
-				"entries are deleted. (See the example for LIST below.)\n"
-				" \n"
-				"The \002%s LIST\002 command displays the %s list. If\n"
-				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed. If a list of entry numbers is given,\n"
+		source.Reply(" ");
+		source.Reply(_(
+				"The \002%s\032ADD\002 command adds the given nickname to the "
+				"%s list."
+				"\n\n"
+				"The \002%s\032DEL\002 command removes the given nick from the "
+				"%s list. If a list of entry numbers is given, those "
+				"entries are deleted. (See the example for LIST below.)"
+				"\n\n"
+				"The \002%s\032LIST\002 command displays the %s list. If "
+				"a wildcard mask is given, only those entries matching the "
+				"mask are displayed. If a list of entry numbers is given, "
 				"only those entries are shown; for example:\n"
-				"   \002%s #channel LIST 2-5,7-9\002\n"
+				"   \002%s\032#channel\032LIST\0322-5,7-9\002\n"
 				"      Lists %s entries numbered 2 through 5 and\n"
-				"      7 through 9.\n"
-				"      \n"
-				"The \002%s CLEAR\002 command clears all entries of the\n"
-				"%s list."), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(),
-				cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str());
+				"      7 through 9."
+				"\n\n"
+				"The \002%s\032CLEAR\002 command clears all entries of the "
+				"%s list."
+			),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str(),
+			cmd.c_str());
+
 		BotInfo *access_bi, *flags_bi;
 		Anope::string access_cmd, flags_cmd;
 		Command::FindCommandFromService("chanserv/access", access_bi, access_cmd);
 		Command::FindCommandFromService("chanserv/flags", flags_bi, flags_cmd);
 		if (!access_cmd.empty() || !flags_cmd.empty())
 		{
-			source.Reply(_("Alternative methods of modifying channel access lists are\n"
-					"available."));
+			source.Reply(_("Alternative methods of modifying channel access lists are available."));
 			if (!access_cmd.empty())
-				source.Reply(_("See \002%s%s HELP %s\002 for more information\n"
-						"about the access list."), Config->StrictPrivmsg.c_str(), access_bi->nick.c_str(), access_cmd.c_str());
+			{
+				source.Reply(_("See \002%s\002 for more information about the access list."),
+					access_bi->GetQueryCommand("generic/help", access_cmd).c_str());
+			}
 			if (!flags_cmd.empty())
-				source.Reply(_("See \002%s%s HELP %s\002 for more information\n"
-						"about the flags system."), Config->StrictPrivmsg.c_str(), flags_bi->nick.c_str(), flags_cmd.c_str());
+			{
+				source.Reply(_("See \002%s\002 for more information about the flags system."),
+					flags_bi->GetQueryCommand("generic/help", flags_cmd).c_str());
+			}
 		}
 		return true;
 	}
@@ -614,32 +636,32 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		order.clear();
 		permissions.clear();
 
-		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
+		for (int i = 0; i < conf.CountBlock("privilege"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("privilege", i);
-			const Anope::string &pname = block->Get<const Anope::string>("name");
+			const auto &block = conf.GetBlock("privilege", i);
+			const Anope::string &pname = block.Get<const Anope::string>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &xop = block->Get<const Anope::string>("xop");
+			const Anope::string &xop = block.Get<const Anope::string>("xop");
 			if (pname.empty() || xop.empty())
 				continue;
 
 			permissions[xop].push_back(pname);
 		}
 
-		for (int i = 0; i < conf->CountBlock("command"); ++i)
+		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("command", i);
-			const Anope::string &cname = block->Get<const Anope::string>("name"),
-				&cserv = block->Get<const Anope::string>("command");
+			const auto &block = conf.GetBlock("command", i);
+			const Anope::string &cname = block.Get<const Anope::string>("name"),
+				&cserv = block.Get<const Anope::string>("command");
 			if (cname.empty() || cserv != "chanserv/xop")
 				continue;
 

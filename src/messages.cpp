@@ -1,6 +1,6 @@
 /* Common message handlers
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -25,13 +25,7 @@ using namespace Message;
 
 void Away::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
-	const Anope::string &msg = !params.empty() ? params[0] : "";
-
-	FOREACH_MOD(OnUserAway, (source.GetUser(), msg));
-	if (!msg.empty())
-		Log(source.GetUser(), "away") << "is now away: " << msg;
-	else
-		Log(source.GetUser(), "away") << "is no longer away";
+	source.GetUser()->SetAway(params.empty() ? "" : params[0]);
 }
 
 void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
@@ -56,6 +50,18 @@ void Error::Run(MessageSource &source, const std::vector<Anope::string> &params,
 	Anope::QuitReason = "Received ERROR from uplink: " + params[0];
 	Anope::Quitting = true;
 }
+
+Ignore::Ignore(Module *creator, const Anope::string &mname)
+	: IRCDMessage(creator, mname, 0)
+{
+	SetFlag(FLAG_SOFT_LIMIT);
+}
+
+void Ignore::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+{
+	Log(LOG_DEBUG_3) << "Intentionally ignoring " << name << " message";
+}
+
 
 void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
@@ -98,7 +104,7 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 		users.emplace_back(ChannelStatus(), user);
 
 		Channel *chan = Channel::Find(channel);
-		SJoin(source, channel, chan ? chan->creation_time : Anope::CurTime, "", {}, users);
+		SJoin(source, channel, chan ? chan->created : Anope::CurTime, "", {}, users);
 	}
 }
 
@@ -114,13 +120,13 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	else if (!ts)
 		;
 	/* Our creation time is newer than what the server gave us, so reset the channel to the older time */
-	else if (c->creation_time > ts)
+	else if (c->created > ts)
 	{
-		c->creation_time = ts;
+		c->created = ts;
 		c->Reset();
 	}
 	/* Their TS is newer, don't accept any modes from them */
-	else if (ts > c->creation_time)
+	else if (ts > c->created)
 		keep_their_modes = false;
 
 	/* Update the modes for the channel */
@@ -132,7 +138,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 
 	for (const auto &[status, u] : users)
 	{
-		keep_their_modes = ts <= c->creation_time; // OnJoinChannel can call modules which can modify this channel's ts
+		keep_their_modes = ts <= c->created; // OnJoinChannel can call modules which can modify this channel's ts
 
 		if (c->FindUser(u))
 			continue;
@@ -237,7 +243,7 @@ void MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 	if (s != Me)
 		return;
 
-	auto motdfile = Anope::ExpandConfig(Config->GetBlock("serverinfo")->Get<const Anope::string>("motd"));
+	auto motdfile = Anope::ExpandConfig(Config->GetBlock("serverinfo").Get<const Anope::string>("motd"));
 	std::ifstream stream(motdfile.str());
 	if (!stream.is_open())
 	{
@@ -322,20 +328,13 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			botname = botname.substr(0, s);
 			nick_only = true;
 			if (!servername.equals_ci(Me->GetName()))
+			{
+				Log(LOG_DEBUG) << "Received a " << name << " message for " << servername << " which is not " << Me->GetName() << ", ignoring.";
 				return;
-		}
-		else if (!IRCD->RequiresID && Config->UseStrictPrivmsg)
-		{
-			BotInfo *bi = BotInfo::Find(receiver);
-			if (!bi)
-				return;
-			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << u->nick;
-			u->SendMessage(bi, _("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."), bi->nick.c_str(), bi->nick.c_str(), Me->GetName().c_str(), bi->nick.c_str());
-			return;
+			}
 		}
 
 		BotInfo *bi = BotInfo::Find(botname, nick_only);
-
 		if (bi)
 		{
 			Anope::string ctcpname, ctcpbody;
@@ -415,7 +414,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 		case 'o':
 		case 'O':
 			/* Check whether the user is an operator */
-			if (!u->HasMode("OPER") && Config->GetBlock("options")->Get<bool>("hidestatso"))
+			if (!u->HasMode("OPER") && Config->GetBlock("options").Get<bool>("hidestatso"))
 				IRCD->SendNumeric(RPL_STATSLINKINFO, source.GetSource(), params[0][0], "End of /STATS report.");
 			else
 			{
@@ -448,13 +447,11 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 
 void Time::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
-	time_t t;
-	time(&t);
-	struct tm *tm = localtime(&t);
-	char buf[64];
-	strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
-	IRCD->SendNumeric(RPL_TIME, source.GetSource(), Me->GetName(), buf);
-	return;
+	const auto *tm = localtime(&Anope::CurTime);
+	char timebuf[64];
+	strftime(timebuf, sizeof(timebuf), "%A, %d %B %Y @ %H:%M:%S %Z", tm);
+	const auto timestr = Anope::printf("%s (%lu)", timebuf, Anope::CurTime);
+	IRCD->SendNumeric(RPL_TIME, source.GetSource(), Me->GetName(), timestr);
 }
 
 void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
@@ -483,7 +480,7 @@ void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params,
 		IRCD->SendNumeric(RPL_WHOISUSER, source.GetSource(), u->nick, u->GetIdent(), u->host, '*', u->realname);
 		if (bi)
 			IRCD->SendNumeric(RPL_WHOISREGNICK, source.GetSource(), bi->nick, "is a registered nick");
-		IRCD->SendNumeric(RPL_WHOISSERVER, source.GetSource(), u->nick, Me->GetName(), Config->GetBlock("serverinfo")->Get<const Anope::string>("description"));
+		IRCD->SendNumeric(RPL_WHOISSERVER, source.GetSource(), u->nick, Me->GetName(), Config->GetBlock("serverinfo").Get<const Anope::string>("description"));
 		if (bi)
 			IRCD->SendNumeric(RPL_WHOISIDLE, source.GetSource(), bi->nick, Anope::CurTime - bi->lastmsg, bi->signon, "seconds idle, signon time");
 		IRCD->SendNumeric(RPL_WHOISOPERATOR, source.GetSource(), u->nick, "is a Network Service");

@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_entrymsg.h"
+#include "modules/chanserv/entrymsg.h"
 
 struct EntryMsgImpl final
 	: EntryMsg
@@ -29,16 +29,26 @@ struct EntryMsgImpl final
 	}
 
 	~EntryMsgImpl() override;
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct EntryMsgTypeImpl final
+	: Serialize::Type
+{
+	EntryMsgTypeImpl()
+		: Serialize::Type("EntryMsg")
 	{
-		data.Store("ci", this->chan);
-		data.Store("creator", this->creator);
-		data.Store("message", this->message);
-		data.Store("when", this->when);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *msg = static_cast<const EntryMsgImpl *>(obj);
+		data.Store("ci", msg->chan);
+		data.Store("creator", msg->creator);
+		data.Store("message", msg->message);
+		data.Store("when", msg->when);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
 };
 
 struct EntryMessageListImpl final
@@ -68,7 +78,7 @@ EntryMsgImpl::~EntryMsgImpl()
 }
 
 
-Serializable *EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *EntryMsgTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string sci, screator, smessage;
 	time_t swhen;
@@ -142,7 +152,7 @@ private:
 	{
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
-		if ((*messages)->size() >= Config->GetModule(this->owner)->Get<unsigned>("maxentries"))
+		if ((*messages)->size() >= Config->GetModule(this->owner).Get<unsigned>("maxentries"))
 			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
 		else
 		{
@@ -235,26 +245,32 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Controls what messages will be sent to users when they join the channel."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG ADD\002 command adds the given message to\n"
-				"the list of messages shown to users when they join\n"
-				"the channel."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG DEL\002 command removes the specified message from\n"
-				"the list of messages shown to users when they join\n"
-				"the channel. You can remove a message by specifying its number\n"
-				"which you can get by listing the messages as explained below."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG LIST\002 command displays a listing of messages\n"
-				"shown to users when they join the channel."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG CLEAR\002 command clears all entries from\n"
-				"the list of messages shown to users when they join\n"
-				"the channel, effectively disabling entry messages."));
-		source.Reply(" ");
-		source.Reply(_("Adding, deleting, or clearing entry messages requires the\n"
-				"SET permission."));
+		source.Reply(_(
+				"Controls what messages will be sent to users when they join the channel."
+				"\n\n"
+				"The \002%s\032ADD\002 command adds the given message to "
+				"the list of messages shown to users when they join "
+				"the channel."
+				"\n\n"
+				"The \002%s\032DEL\002 command removes the specified message from "
+				"the list of messages shown to users when they join "
+				"the channel. You can remove a message by specifying its number "
+				"which you can get by listing the messages as explained below."
+				"\n\n"
+				"The \002%s\032LIST\002 command displays a listing of messages "
+				"shown to users when they join the channel."
+				"\n\n"
+				"The \002%s\032CLEAR\002 command clears all entries from "
+				"the list of messages shown to users when they join "
+				"the channel, effectively disabling entry messages."
+				"\n\n"
+				"Adding, deleting, or clearing entry messages requires the "
+				"SET permission."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };
@@ -264,12 +280,13 @@ class CSEntryMessage final
 {
 	CommandEntryMessage commandentrymsg;
 	ExtensibleItem<EntryMessageListImpl> eml;
-	Serialize::Type entrymsg_type;
+	EntryMsgTypeImpl entrymsg_type;
 
 public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-	commandentrymsg(this),
-	eml(this, "entrymsg"), entrymsg_type("EntryMsg", EntryMsgImpl::Unserialize)
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandentrymsg(this)
+		, eml(this, "entrymsg")
 	{
 	}
 

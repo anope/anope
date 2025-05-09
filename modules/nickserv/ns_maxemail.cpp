@@ -1,7 +1,7 @@
 /* ns_maxemail.cpp - Limit the amount of times an email address
  *                   can be used for a NickServ account.
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Included in the Anope module pack since Anope 1.7.9
@@ -36,27 +36,22 @@ class NSMaxEmail final
 		return cleaned;
 	}
 
-	bool CheckLimitReached(CommandSource &source, const Anope::string &email)
+	bool CheckLimitReached(CommandSource &source, const Anope::string &email, bool ignoreself)
 	{
-		int NSEmailMax = Config->GetModule(this)->Get<int>("maxemails");
-
+		const auto NSEmailMax = Config->GetModule(this).Get<unsigned>("maxemails");
 		if (NSEmailMax < 1 || email.empty())
 			return false;
 
-		if (this->CountEmail(email, source.nc) < NSEmailMax)
+		if (this->CountEmail(email, ignoreself ? source.GetAccount() : NULL) < NSEmailMax)
 			return false;
 
-		if (NSEmailMax == 1)
-			source.Reply(_("The email address \002%s\002 has reached its usage limit of 1 user."), email.c_str());
-		else
-			source.Reply(_("The email address \002%s\002 has reached its usage limit of %d users."), email.c_str(), NSEmailMax);
-
+		source.Reply(NSEmailMax, N_("The email address \002%s\002 has reached its usage limit of %u user.", "The email address \002%s\002 has reached its usage limit of %u users."), email.c_str(), NSEmailMax);
 		return true;
 	}
 
-	int CountEmail(const Anope::string &email, NickCore *unc)
+	unsigned CountEmail(const Anope::string &email, NickCore *unc)
 	{
-		int count = 0;
+		unsigned count = 0;
 
 		if (email.empty())
 			return 0;
@@ -79,9 +74,9 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		clean = conf->GetModule(this)->Get<bool>("remove_aliases", "true");
+		clean = conf.GetModule(this).Get<bool>("remove_aliases", "true");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
@@ -91,17 +86,17 @@ public:
 
 		if (command->name == "nickserv/register")
 		{
-			if (this->CheckLimitReached(source, params.size() > 1 ? params[1] : ""))
+			if (this->CheckLimitReached(source, params.size() > 1 ? params[1] : "", false))
 				return EVENT_STOP;
 		}
 		else if (command->name == "nickserv/set/email")
 		{
-			if (this->CheckLimitReached(source, params.size() > 0 ? params[0] : ""))
+			if (this->CheckLimitReached(source, params.size() > 0 ? params[0] : "", true))
 				return EVENT_STOP;
 		}
 		else if (command->name == "nickserv/ungroup" && source.GetAccount())
 		{
-			if (this->CheckLimitReached(source, source.GetAccount()->email))
+			if (this->CheckLimitReached(source, source.GetAccount()->email, false))
 				return EVENT_STOP;
 		}
 

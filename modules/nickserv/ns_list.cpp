@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -30,7 +30,7 @@ public:
 		bool is_servadmin = source.HasCommand("nickserv/list");
 		int count = 0, from = 0, to = 0;
 		bool suspended, nsnoexpire, unconfirmed;
-		unsigned listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
+		unsigned listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
 
 		suspended = nsnoexpire = unconfirmed = false;
 
@@ -135,41 +135,46 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists all registered nicknames which match the given\n"
-				"pattern, in \037nick!user@host\037 format.  Nicks with the \002PRIVATE\002\n"
-				"option set will only be displayed to Services Operators with the\n"
-				"proper access.  Nicks with the \002NOEXPIRE\002 option set will have\n"
-				"a \002!\002 prefixed to the nickname for Services Operators to see.\n"
-				" \n"
-				"Note that a preceding '#' specifies a range.\n"
-				" \n"
-				"If the SUSPENDED, UNCONFIRMED or NOEXPIRE options are given, only\n"
-				"nicks which, respectively, are SUSPENDED, UNCONFIRMED or have the\n"
-				"NOEXPIRE flag set will be displayed. If multiple options are\n"
-				"given, all nicks matching at least one option will be displayed.\n"
-				"Note that these options are limited to \037Services Operators\037.\n"
-				" \n"
-				"Examples:\n"
-				" \n"
-				"    \002LIST *!joeuser@foo.com\002\n"
-				"        Lists all registered nicks owned by joeuser@foo.com.\n"
-				" \n"
-				"    \002LIST *Bot*!*@*\002\n"
-				"        Lists all registered nicks with \002Bot\002 in their\n"
-				"        names (case insensitive).\n"
-				" \n"
-				"    \002LIST * NOEXPIRE\002\n"
-				"        Lists all registered nicks which have been set to not expire.\n"
-				" \n"
-				"    \002LIST #51-100\002\n"
-				"        Lists all registered nicks within the given range (51-100)."));
+		source.Reply(_(
+			"Lists all registered nicknames which match the given "
+			"pattern, in \037nick!user@host\037 format. Nicks with the \002PRIVATE\002 "
+			"option set will only be displayed to Services Operators with the "
+			"proper access. Nicks with the \002NOEXPIRE\002 option set will have "
+			"a \002!\002 prefixed to the nickname for Services Operators to see."
+			"\n\n"
+			"Note that a preceding '#' specifies a range."
+			"\n\n"
+			"If the SUSPENDED, UNCONFIRMED or NOEXPIRE options are given, only "
+			"nicks which, respectively, are SUSPENDED, UNCONFIRMED or have the "
+			"NOEXPIRE flag set will be displayed. If multiple options are "
+			"given, all nicks matching at least one option will be displayed. "
+			"Note that these options are limited to \037Services Operators\037."
+			"\n\n"
+			"Examples:"
+			"\n\n"
+			"    \002LIST *!joeuser@foo.com\002\n"
+			"        Lists all registered nicks owned by joeuser@foo.com."
+			"\n\n"
+			"    \002LIST *Bot*!*@*\002\n"
+			"        Lists all registered nicks with \002Bot\002 in their\n"
+			"        names (case insensitive)."
+			"\n\n"
+			"    \002LIST * NOEXPIRE\002\n"
+			"        Lists all registered nicks which have been set to not expire."
+			"\n\n"
+			"    \002LIST #51-100\002\n"
+			"        Lists all registered nicks within the given range (51-100)."
+		));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), regexengine.c_str());
+			source.Reply(_(
+					"Regex matches are also supported using the %s engine. "
+					"Enclose your pattern in // if this is desired."
+				),
+				regexengine.c_str());
 		}
 
 		return true;
@@ -233,12 +238,15 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Turns %s's privacy option on or off for your nick.\n"
-				"With \002PRIVATE\002 set, your nickname will not appear in\n"
-				"nickname lists generated with %s's \002LIST\002 command.\n"
-				"(However, anyone who knows your nickname can still get\n"
-				"information on it using the \002INFO\002 command.)"),
-				source.service->nick.c_str(), source.service->nick.c_str());
+		source.Reply(_(
+				"Turns %s's privacy option on or off for your nick. "
+				"With \002PRIVATE\002 set, your nickname will not appear in "
+				"nickname lists generated with %s's \002LIST\002 command. "
+				"(However, anyone who knows your nickname can still get "
+				"information on it using the \002INFO\002 command.)"
+			),
+			source.service->nick.c_str(),
+			source.service->nick.c_str());
 		return true;
 	}
 };
@@ -262,12 +270,15 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Turns %s's privacy option on or off for the nick.\n"
-				"With \002PRIVATE\002 set, the nickname will not appear in\n"
-				"nickname lists generated with %s's \002LIST\002 command.\n"
-				"(However, anyone who knows the nickname can still get\n"
-				"information on it using the \002INFO\002 command.)"),
-				source.service->nick.c_str(), source.service->nick.c_str());
+		source.Reply(_(
+				"Turns %s's privacy option on or off for the nick. "
+				"With \002PRIVATE\002 set, the nickname will not appear in "
+				"nickname lists generated with %s's \002LIST\002 command. "
+				"(However, anyone who knows the nickname can still get "
+				"information on it using the \002INFO\002 command.)"
+			),
+			source.service->nick.c_str(),
+			source.service->nick.c_str());
 		return true;
 	}
 };

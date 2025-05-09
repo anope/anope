@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,20 +9,22 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#include <cerrno>
+
 #include "services.h"
 #include "mail.h"
 #include "config.h"
 
 Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m)
 	: Thread()
-	, sendmail_path(Config->GetBlock("mail")->Get<const Anope::string>("sendmailpath", "/usr/sbin/sendmail -it"))
+	, sendmail_path(Config->GetBlock("mail").Get<const Anope::string>("sendmailpath", "/usr/sbin/sendmail -it"))
 	, send_from(sf)
 	, mail_to(mailto)
 	, addr(a)
 	, subject(s)
 	, message(m)
-	, content_type(Config->GetBlock("mail")->Get<const Anope::string>("content_type", "text/plain; charset=UTF-8"))
-	, dont_quote_addresses(Config->GetBlock("mail")->Get<bool>("dontquoteaddresses"))
+	, content_type(Config->GetBlock("mail").Get<const Anope::string>("content_type", "text/plain; charset=UTF-8"))
+	, dont_quote_addresses(Config->GetBlock("mail").Get<bool>("dontquoteaddresses"))
 {
 }
 
@@ -36,6 +38,7 @@ Mail::Message::~Message()
 
 void Mail::Message::Run()
 {
+	errno = 0;
 	auto *pipe = popen(sendmail_path.c_str(), "w");
 	if (!pipe)
 	{
@@ -71,32 +74,35 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 	if (!nc || !service || subject.empty() || message.empty())
 		return false;
 
-	Configuration::Block *b = Config->GetBlock("mail");
+	const auto &b = Config->GetBlock("mail");
 
 	if (!u)
 	{
-		if (!b->Get<bool>("usemail") || b->Get<const Anope::string>("sendfrom").empty())
+		if (!b.Get<bool>("usemail") || b.Get<const Anope::string>("sendfrom").empty())
 			return false;
 		else if (nc->email.empty())
 			return false;
 
 		nc->lastmail = Anope::CurTime;
-		Thread *t = new Mail::Message(b->Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+		Thread *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
 		t->Start();
 		return true;
 	}
 	else
 	{
-		if (!b->Get<bool>("usemail") || b->Get<const Anope::string>("sendfrom").empty())
+		if (!b.Get<bool>("usemail") || b.Get<const Anope::string>("sendfrom").empty())
 			u->SendMessage(service, _("Services have been configured to not send mail."));
-		else if (Anope::CurTime - u->lastmail < b->Get<time_t>("delay"))
-			u->SendMessage(service, _("Please wait \002%lu\002 seconds and retry."), (unsigned long)b->Get<time_t>("delay") - (Anope::CurTime - u->lastmail));
+		else if (Anope::CurTime - u->lastmail < b.Get<time_t>("delay"))
+		{
+			const auto delay = b.Get<time_t>("delay") - (Anope::CurTime - u->lastmail);
+			u->SendMessage(service, _("Please wait \002%s\002 and retry."), Anope::Duration(delay, u->Account()).c_str());
+		}
 		else if (nc->email.empty())
 			u->SendMessage(service, _("Email for \002%s\002 is invalid."), nc->display.c_str());
 		else
 		{
 			u->lastmail = nc->lastmail = Anope::CurTime;
-			Thread *t = new Mail::Message(b->Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+			Thread *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
 			t->Start();
 			return true;
 		}
@@ -107,12 +113,12 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 
 bool Mail::Send(NickCore *nc, const Anope::string &subject, const Anope::string &message)
 {
-	Configuration::Block *b = Config->GetBlock("mail");
-	if (!b->Get<bool>("usemail") || b->Get<const Anope::string>("sendfrom").empty() || !nc || nc->email.empty() || subject.empty() || message.empty())
+	const auto &b = Config->GetBlock("mail");
+	if (!b.Get<bool>("usemail") || b.Get<const Anope::string>("sendfrom").empty() || !nc || nc->email.empty() || subject.empty() || message.empty())
 		return false;
 
 	nc->lastmail = Anope::CurTime;
-	Thread *t = new Mail::Message(b->Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+	Thread *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
 	t->Start();
 
 	return true;

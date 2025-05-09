@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,8 +10,8 @@
  */
 
 #include "module.h"
-#include "modules/bs_kick.h"
-#include "modules/bs_badwords.h"
+#include "modules/botserv/kick.h"
+#include "modules/botserv/badwords.h"
 
 static Module *me;
 
@@ -45,7 +45,7 @@ struct KickerDataImpl final
 
 		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
 			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(e);
@@ -79,7 +79,7 @@ struct KickerDataImpl final
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
 			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(e);
@@ -139,6 +139,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_("Configures bot kickers.  \037option\037 can be one of:"));
 
+		HelpWrapper help;
 		Anope::string this_name = source.command;
 		for (const auto &[c_name, info] : source.service->commands)
 		{
@@ -148,17 +149,20 @@ public:
 				if (command)
 				{
 					source.command = c_name;
-					command->OnServHelp(source);
+					command->OnServHelp(source, help);
 				}
 			}
 		}
+		help.SendTo(source);
 
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
-				"on a specific option.\n"
-				" \n"
-				"Note: access to this command is controlled by the\n"
-				"level SET."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
-
+		source.Reply(_(
+				"Type \002%s\032\037option\037\002 for more information "
+				"on a specific option."
+				"\n\n"
+				"Note: access to this command is controlled by the "
+				"level SET."
+			),
+			source.service->GetQueryCommand("generic/help", this_name).c_str());
 		return true;
 	}
 };
@@ -220,8 +224,10 @@ protected:
 
 			val = true;
 			if (kd->ttb[ttb_idx])
-				source.Reply(_("Bot will now kick for \002%s\002, and will place a ban\n"
-						"after %d kicks for the same user."), optname.c_str(), kd->ttb[ttb_idx]);
+			{
+				source.Reply(_("Bot will now kick for \002%s\002, and will place a ban after %d kicks for the same user."),
+					optname.c_str(), kd->ttb[ttb_idx]);
+			}
 			else
 				source.Reply(_("Bot will now kick for \002%s\002."), optname.c_str());
 
@@ -267,13 +273,16 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		BotInfo *bi = Config->GetClient("BotServ");
-		source.Reply(_("Sets the AMSG kicker on or off. When enabled, the bot will\n"
-				"kick users who send the same message to multiple channels\n"
-				"where %s bots are.\n"
-				" \n"
-				"\037ttb\037 is the number of times a user can be kicked\n"
-				"before they get banned. Don't give ttb to disable\n"
-				"the ban system once activated."), bi ? bi->nick.c_str() : "BotServ");
+		source.Reply(_(
+				"Sets the AMSG kicker on or off. When enabled, the bot will "
+				"kick users who send the same message to multiple channels "
+				"where %s bots are."
+				"\n\n"
+				"\037ttb\037 is the number of times a user can be kicked "
+				"before they get banned. Don't give ttb to disable "
+				"the ban system once activated."
+			),
+			bi ? bi->nick.c_str() : "BotServ");
 		return true;
 	}
 };
@@ -304,16 +313,20 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the bad words kicker on or off. When enabled, this\n"
-				"option tells the bot to kick users who say certain words\n"
-				"on the channels.\n"
-				"You can define bad words for your channel using the\n"
-				"\002BADWORDS\002 command. Type \002%s%s HELP BADWORDS\002 for\n"
-				"more information.\n"
-				" \n"
-				"\037ttb\037 is the number of times a user can be kicked\n"
-				"before it gets banned. Don't give ttb to disable\n"
-				"the ban system once activated."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		source.Reply(_(
+				"Sets the bad words kicker on or off. When enabled, this "
+				"option tells the bot to kick users who say certain words "
+				"on the channels."
+				"\n\n"
+				"You can define bad words for your channel using the "
+				"\002BADWORDS\002 command. Type \002%s\032BADWORDS\002 for "
+				"more information."
+				"\n\n"
+				"\037ttb\037 is the number of times a user can be kicked "
+				"before it gets banned. Don't give ttb to disable "
+				"the ban system once activated."
+			),
+			source.service->GetQueryCommand("generic/help").c_str());
 		return true;
 	}
 };
@@ -343,12 +356,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the bolds kicker on or off. When enabled, this\n"
-				"option tells the bot to kick users who use bolds.\n"
-				" \n"
-				"\037ttb\037 is the number of times a user can be kicked\n"
-				"before it gets banned. Don't give ttb to disable\n"
-				"the ban system once activated."));
+		source.Reply(_(
+			"Sets the bolds kicker on or off. When enabled, this "
+			"option tells the bot to kick users who use bolds."
+			"\n\n"
+			"\037ttb\037 is the number of times a user can be kicked "
+			"before it gets banned. Don't give ttb to disable "
+			"the ban system once activated."
+		));
 		return true;
 	}
 };
@@ -400,12 +415,23 @@ public:
 
 			kd->caps = true;
 			if (kd->ttb[TTB_CAPS])
-				source.Reply(_("Bot will now kick for \002caps\002 (they must constitute at least\n"
-						"%d characters and %d%% of the entire message), and will\n"
-						"place a ban after %d kicks for the same user."), kd->capsmin, kd->capspercent, kd->ttb[TTB_CAPS]);
+			{
+				source.Reply(_(
+						"Bot will now kick for \002caps\002 (they must constitute at least "
+						"%d characters and %d%% of the entire message), and will "
+						"place a ban after %d kicks for the same user."
+					),
+					kd->capsmin,
+					kd->capspercent,
+					kd->ttb[TTB_CAPS]);
+			}
 			else
-				source.Reply(_("Bot will now kick for \002caps\002 (they must constitute at least\n"
-						"%d characters and %d%% of the entire message)."), kd->capsmin, kd->capspercent);
+				source.Reply(_(
+						"Bot will now kick for \002caps\002 (they must constitute at least "
+						"%d characters and %d%% of the entire message)."
+					),
+					kd->capsmin,
+					kd->capspercent);
 		}
 		else
 		{
@@ -420,17 +446,20 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the caps kicker on or off. When enabled, this\n"
-				"option tells the bot to kick users who are talking in\n"
-				"CAPS.\n"
-				"The bot kicks only if there are at least \002min\002 caps\n"
-				"and they constitute at least \002percent\002%% of the total\n"
-				"text line (if not given, it defaults to 10 characters\n"
-				"and 25%%).\n"
-				" \n"
-				"\037ttb\037 is the number of times a user can be kicked\n"
-				"before it gets banned. Don't give ttb to disable\n"
-				"the ban system once activated."));
+		source.Reply(_(
+			"Sets the caps kicker on or off. When enabled, this "
+			"option tells the bot to kick users who are talking in "
+			"CAPS."
+			"\n\n"
+			"The bot kicks only if there are at least \002min\002 caps "
+			"and they constitute at least \002percent\002%% of the total "
+			"text line (if not given, it defaults to 10 characters "
+			"and 25%%)."
+			"\n\n"
+			"\037ttb\037 is the number of times a user can be kicked "
+			"before it gets banned. Don't give ttb to disable "
+			"the ban system once activated."
+		));
 		return true;
 	}
 };
@@ -460,12 +489,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the colors kicker on or off. When enabled, this\n"
-				"option tells the bot to kick users who use colors.\n"
-				" \n"
-				"\037ttb\037 is the number of times a user can be kicked\n"
-				"before it gets banned. Don't give ttb to disable\n"
-				"the ban system once activated."));
+		source.Reply(_(
+			"Sets the colors kicker on or off. When enabled, this "
+			"option tells the bot to kick users who use colors."
+			"\n\n"
+			"\037ttb\037 is the number of times a user can be kicked "
+			"before it gets banned. Don't give ttb to disable "
+			"the ban system once activated."
+		));
 		return true;
 	}
 };
@@ -515,13 +546,20 @@ public:
 			if (kd->floodsecs < 1)
 				kd->floodsecs = 10;
 
-			if (kd->floodsecs > Config->GetModule(me)->Get<time_t>("keepdata"))
-				kd->floodsecs = Config->GetModule(me)->Get<time_t>("keepdata");
+			if (kd->floodsecs > Config->GetModule(me).Get<time_t>("keepdata"))
+				kd->floodsecs = Config->GetModule(me).Get<time_t>("keepdata");
 
 			kd->flood = true;
 			if (kd->ttb[TTB_FLOOD])
-				source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds\n"
-						"and will place a ban after %d kicks for the same user."), kd->floodlines, kd->floodsecs, kd->ttb[TTB_FLOOD]);
+			{
+				source.Reply(_(
+						"Bot will now kick for \002flood\002 (%d lines in %d seconds "
+						"and will place a ban after %d kicks for the same user."
+					),
+					kd->floodlines,
+					kd->floodsecs,
+					kd->ttb[TTB_FLOOD]);
+			}
 			else
 				source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds)."), kd->floodlines, kd->floodsecs);
 		}
@@ -540,14 +578,15 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the flood kicker on or off. When enabled, this\n"
-				"option tells the bot to kick users who are flooding\n"
-				"the channel using at least \002ln\002 lines in \002secs\002 seconds\n"
-				"(if not given, it defaults to 6 lines in 10 seconds).\n"
-				" \n"
-				"\037ttb\037 is the number of times a user can be kicked\n"
-				"before it gets banned. Don't give ttb to disable\n"
-				"the ban system once activated."));
+		source.Reply(_(
+			"Sets the flood kicker on or off. When enabled, this "
+			"option tells the bot to kick users who are flooding "
+			"the channel using at least \002ln\002 lines in \002secs\002 seconds "
+			"(if not given, it defaults to 6 lines in 10 seconds). "
+			"\n\n"
+			"\037ttb\037 is the number of times a user can be kicked "
+			"before it gets banned. Don't give ttb to disable "
+			"the ban system once activated."));
 		return true;
 	}
 };
@@ -577,12 +616,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the italics kicker on or off. When enabled, this\n"
-				"option tells the bot to kick users who use italics.\n"
-				" \n"
-				"\037ttb\037 is the number of times a user can be kicked\n"
-				"before it gets banned. Don't give ttb to disable\n"
-				"the ban system once activated."));
+		source.Reply(_(
+			"Sets the italics kicker on or off. When enabled, this "
+			"option tells the bot to kick users who use italics. "
+			"\n\n"
+			"\037ttb\037 is the number of times a user can be kicked "
+			"before it gets banned. Don't give ttb to disable "
+			"the ban system once activated."
+		));
 		return true;
 	}
 };
@@ -631,22 +672,42 @@ public:
 			if (kd->ttb[TTB_REPEAT])
 			{
 				if (kd->repeattimes != 1)
-					source.Reply(_("Bot will now kick for \002repeats\002 (users that repeat the\n"
-							"same message %d times), and will place a ban after %d\n"
-							"kicks for the same user."), kd->repeattimes, kd->ttb[TTB_REPEAT]);
+				{
+					source.Reply(_(
+							"Bot will now kick for \002repeats\002 (users that repeat the "
+							"same message %d times), and will place a ban after %d "
+							"kicks for the same user."
+						),
+						kd->repeattimes,
+						kd->ttb[TTB_REPEAT]);
+				}
 				else
-					source.Reply(_("Bot will now kick for \002repeats\002 (users that repeat the\n"
-							"same message %d time), and will place a ban after %d\n"
-							"kicks for the same user."), kd->repeattimes, kd->ttb[TTB_REPEAT]);
+					source.Reply(_(
+							"Bot will now kick for \002repeats\002 (users that repeat the "
+							"same message %d time), and will place a ban after %d "
+							"kicks for the same user."
+						),
+						kd->repeattimes,
+						kd->ttb[TTB_REPEAT]);
 			}
 			else
 			{
 				if (kd->repeattimes != 1)
-					source.Reply(_("Bot will now kick for \002repeats\002 (users that repeat the\n"
-						"same message %d times)."), kd->repeattimes);
+				{
+					source.Reply(_(
+							"Bot will now kick for \002repeats\002 (users that repeat the "
+							"same message %d times)."
+						),
+						kd->repeattimes);
+				}
 				else
-					source.Reply(_("Bot will now kick for \002repeats\002 (users that repeat the\n"
-						"same message %d time)."), kd->repeattimes);
+				{
+					source.Reply(_(
+							"Bot will now kick for \002repeats\002 (users that repeat the "
+							"same message %d time)."
+						),
+						kd->repeattimes);
+				}
 			}
 		}
 		else if (params[1].equals_ci("OFF"))
@@ -664,14 +725,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the repeat kicker on or off. When enabled, this\n"
-				"option tells the bot to kick users who are repeating\n"
-				"themselves \002num\002 times (if num is not given, it\n"
-				"defaults to 3).\n"
-				" \n"
-				"\037ttb\037 is the number of times a user can be kicked\n"
-				"before it gets banned. Don't give ttb to disable\n"
-				"the ban system once activated."));
+		source.Reply(_(
+			"Sets the repeat kicker on or off. When enabled, this "
+			"option tells the bot to kick users who are repeating "
+			"themselves \002num\002 times (if num is not given, it "
+			"defaults to 3)."
+			"\n\n"
+			"\037ttb\037 is the number of times a user can be kicked "
+			"before it gets banned. Don't give ttb to disable "
+			"the ban system once activated."
+		));
 		return true;
 	}
 };
@@ -701,12 +764,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the reverses kicker on or off. When enabled, this\n"
-				"option tells the bot to kick users who use reverses.\n"
-				" \n"
-				"\037ttb\037 is the number of times a user can be kicked\n"
-				"before it gets banned. Don't give ttb to disable\n"
-				"the ban system once activated."));
+		source.Reply(_(
+			"Sets the reverses kicker on or off. When enabled, this "
+			"option tells the bot to kick users who use reverses. "
+			"\n\n"
+			"\037ttb\037 is the number of times a user can be kicked "
+			"before it gets banned. Don't give ttb to disable "
+			"the ban system once activated."
+		));
 		return true;
 	}
 };
@@ -736,12 +801,14 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets the underlines kicker on or off. When enabled, this\n"
-			"option tells the bot to kick users who use underlines.\n"
-			" \n"
-			"\037ttb\037 is the number of times a user can be kicked\n"
-			"before it gets banned. Don't give ttb to disable\n"
-			"the ban system once activated."));
+		source.Reply(_(
+			"Sets the underlines kicker on or off. When enabled, this "
+			"option tells the bot to kick users who use underlines. "
+			"\n\n"
+			"\037ttb\037 is the number of times a user can be kicked "
+			"before it gets banned. Don't give ttb to disable "
+			"the ban system once activated."
+		));
 		return true;
 	}
 };
@@ -804,10 +871,12 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_(" \n"
-				"Enables or disables \002ops protection\002 mode on a channel.\n"
-				"When it is enabled, ops won't be kicked by the bot\n"
-				"even if they don't match the NOKICK level."));
+		source.Reply(" ");
+		source.Reply(_(
+			"Enables or disables \002ops protection\002 mode on a channel. "
+			"When it is enabled, ops won't be kicked by the bot "
+			"even if they don't match the NOKICK level."
+			));
 		return true;
 	}
 };
@@ -870,10 +939,12 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_(" \n"
-				"Enables or disables \002voices protection\002 mode on a channel.\n"
-				"When it is enabled, voices won't be kicked by the bot\n"
-				"even if they don't match the NOKICK level."));
+		source.Reply(" ");
+		source.Reply(_(
+			"Enables or disables \002voices protection\002 mode on a channel. "
+			"When it is enabled, voices won't be kicked by the bot "
+			"even if they don't match the NOKICK level."
+		));
 		return true;
 	}
 };
@@ -913,7 +984,7 @@ public:
 
 	void purge()
 	{
-		time_t keepdata = Config->GetModule(me)->Get<time_t>("keepdata");
+		time_t keepdata = Config->GetModule(me).Get<time_t>("keepdata");
 		for (data_type::iterator it = data_map.begin(), it_end = data_map.end(); it != it_end;)
 		{
 			const Anope::string &user = it->first;
@@ -1299,7 +1370,7 @@ public:
 
 			/* Normalize the buffer */
 			Anope::string nbuf = Anope::NormalizeBuffer(realbuf);
-			bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
+			bool casesensitive = Config->GetModule("botserv").Get<bool>("casesensitive");
 
 			/* Normalize can return an empty string if this only contains control codes etc */
 			if (badwords && !nbuf.empty())
@@ -1368,7 +1439,7 @@ public:
 					if (mustkick)
 					{
 						check_ban(ci, u, kd, TTB_BADWORDS);
-						if (Config->GetModule(me)->Get<bool>("gentlebadwordreason"))
+						if (Config->GetModule(me).Get<bool>("gentlebadwordreason"))
 							bot_kick(ci, u, _("Watch your language!"));
 						else
 							bot_kick(ci, u, _("Don't use the word \"%s\" on this channel!"), bw->word.c_str());

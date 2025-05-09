@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -76,9 +76,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Assigns the specified bot to a channel. You\n"
-				"can then configure the bot for the channel so it fits\n"
-				"your needs."));
+		source.Reply(_(
+			"Assigns the specified bot to a channel. You "
+			"can then configure the bot for the channel so it fits "
+			"your needs."
+		));
 		return true;
 	}
 };
@@ -138,11 +140,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Unassigns a bot from a channel. When you use this command,\n"
-				"the bot won't join the channel anymore. However, bot\n"
-				"configuration for the channel is kept, so you will always\n"
-				"be able to reassign a bot later without having to reconfigure\n"
-				"it entirely."));
+		source.Reply(_(
+			"Unassigns a bot from a channel. When you use this command, "
+			"the bot won't join the channel anymore. However, bot "
+			"configuration for the channel is kept, so you will always "
+			"be able to reassign a bot later without having to reconfigure "
+			"it entirely."
+		));
 		return true;
 	}
 };
@@ -197,10 +201,12 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_(" \n"
-				"This option makes a channel unassignable. If a bot\n"
-				"is already assigned to the channel, it is unassigned\n"
-				"automatically when you enable it."));
+		source.Reply(" ");
+		source.Reply(_(
+			"This option makes a channel unassignable. If a bot "
+			"is already assigned to the channel, it is unassigned "
+			"automatically when you enable it."
+		));
 		return true;
 	}
 };

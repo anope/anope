@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -84,11 +84,11 @@ public:
 protected:
 	void Ban()
 	{
-		Anope::string reason = this->proxy.reason;
-
-		reason = reason.replace_all_cs("%t", this->GetType());
-		reason = reason.replace_all_cs("%i", this->conaddr.addr());
-		reason = reason.replace_all_cs("%p", Anope::ToString(this->conaddr.port()));
+		auto reason = Anope::Template(this->proxy.reason, {
+			{ "ip",    this->conaddr.addr()                  },
+			{ "port",  Anope::ToString(this->conaddr.port()) },
+			{ "type",  this->GetType()                       },
+		});
 
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		Log(OperServ) << "PROXYSCAN: Open " << this->GetType() << " proxy found on " << this->conaddr.str() << " (" << reason << ")";
@@ -260,23 +260,23 @@ public:
 		delete this->listener;
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = Config->GetModule(this);
+		const auto &config = Config->GetModule(this);
 
-		Anope::string s_target_ip = config->Get<const Anope::string>("target_ip");
+		Anope::string s_target_ip = config.Get<const Anope::string>("target_ip");
 		if (s_target_ip.empty())
 			throw ConfigException(this->name + " target_ip may not be empty");
 
-		int s_target_port = config->Get<int>("target_port", "-1");
+		int s_target_port = config.Get<int>("target_port", "-1");
 		if (s_target_port <= 0)
 			throw ConfigException(this->name + " target_port may not be empty and must be a positive number");
 
-		Anope::string s_listen_ip = config->Get<const Anope::string>("listen_ip");
+		Anope::string s_listen_ip = config.Get<const Anope::string>("listen_ip");
 		if (s_listen_ip.empty())
 			throw ConfigException(this->name + " listen_ip may not be empty");
 
-		int s_listen_port = config->Get<int>("listen_port", "-1");
+		int s_listen_port = config.Get<int>("listen_port", "-1");
 		if (s_listen_port <= 0)
 			throw ConfigException(this->name + " listen_port may not be empty and must be a positive number");
 
@@ -284,12 +284,12 @@ public:
 		target_port = s_target_port;
 		this->listen_ip = s_listen_ip;
 		this->listen_port = s_listen_port;
-		this->con_notice = config->Get<const Anope::string>("connect_notice");
-		this->con_source = config->Get<const Anope::string>("connect_source");
-		add_to_akill = config->Get<bool>("add_to_akill", "true");
-		this->connectionTimeout.SetSecs(config->Get<time_t>("timeout", "5s"));
+		this->con_notice = config.Get<const Anope::string>("connect_notice");
+		this->con_source = config.Get<const Anope::string>("connect_source");
+		add_to_akill = config.Get<bool>("add_to_akill", "true");
+		this->connectionTimeout.SetSecs(config.Get<time_t>("timeout", "5s"));
 
-		ProxyCheckString = Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname") + " proxy check";
+		ProxyCheckString = Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") + " proxy check";
 		delete this->listener;
 		this->listener = NULL;
 		try
@@ -302,13 +302,13 @@ public:
 		}
 
 		this->proxyscans.clear();
-		for (int i = 0; i < config->CountBlock("proxyscan"); ++i)
+		for (int i = 0; i < config.CountBlock("proxyscan"); ++i)
 		{
-			Configuration::Block *block = config->GetBlock("proxyscan", i);
+			const auto &block = config.GetBlock("proxyscan", i);
 			ProxyCheck p;
 			Anope::string token;
 
-			commasepstream sep(block->Get<const Anope::string>("type"));
+			commasepstream sep(block.Get<const Anope::string>("type"));
 			while (sep.GetToken(token))
 			{
 				if (!token.equals_ci("HTTP") && !token.equals_ci("SOCKS5"))
@@ -318,7 +318,7 @@ public:
 			if (p.types.empty())
 				continue;
 
-			commasepstream sep2(block->Get<const Anope::string>("port"));
+			commasepstream sep2(block.Get<const Anope::string>("port"));
 			while (sep2.GetToken(token))
 			{
 				if (auto port = Anope::TryConvert<unsigned short>(token))
@@ -327,8 +327,8 @@ public:
 			if (p.ports.empty())
 				continue;
 
-			p.duration = block->Get<time_t>("time", "4h");
-			p.reason = block->Get<const Anope::string>("reason");
+			p.duration = block.Get<time_t>("time", "4h");
+			p.reason = block.Get<const Anope::string>("reason");
 			if (p.reason.empty())
 				continue;
 

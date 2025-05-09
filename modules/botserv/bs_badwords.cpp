@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/bs_badwords.h"
+#include "modules/botserv/badwords.h"
 
 struct BadWordImpl final
 	: BadWord
@@ -18,15 +18,25 @@ struct BadWordImpl final
 {
 	BadWordImpl() : Serializable("BadWord") { }
 	~BadWordImpl() override;
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct BadWordTypeImpl final
+	: Serialize::Type
+{
+	BadWordTypeImpl()
+		: Serialize::Type("BadWord")
 	{
-		data.Store("ci", this->chan);
-		data.Store("word", this->word);
-		data.Store("type", this->type);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *bw = static_cast<const BadWordImpl *>(obj);
+		data.Store("ci", bw->chan);
+		data.Store("word", bw->word);
+		data.Store("type", bw->type);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &) const override;
 };
 
 struct BadWordsImpl final
@@ -117,7 +127,7 @@ BadWordImpl::~BadWordImpl()
 	}
 }
 
-Serializable *BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *BadWordTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string sci, sword;
 
@@ -155,6 +165,7 @@ class BadwordsDelCallback final
 	BadWords *bw;
 	Command *c;
 	unsigned deleted = 0;
+	Anope::string lastdeleted;
 	bool override = false;
 public:
 	BadwordsDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c)
@@ -166,12 +177,20 @@ public:
 
 	~BadwordsDelCallback() override
 	{
-		if (!deleted)
-			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
-		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from %s bad words list."), ci->name.c_str());
-		else
-			source.Reply(_("Deleted %d entries from %s bad words list."), deleted, ci->name.c_str());
+		switch (deleted)
+		{
+			case 0:
+				source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
+				break;
+
+			case 1:
+				source.Reply(_("Deleted %s from %s bad words list."), lastdeleted.c_str(), ci->name.c_str());
+				break;
+
+			default:
+				source.Reply(deleted, N_("Deleted %d entry from %s bad words list.", "Deleted %d entries from %s bad words list."), deleted, ci->name.c_str());
+				break;
+		}
 	}
 
 	void HandleNumber(unsigned Number) override
@@ -179,7 +198,8 @@ public:
 		if (!bw || !Number || Number > bw->GetBadWordCount())
 			return;
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "DEL " << bw->GetBadWord(Number - 1)->word;
+		lastdeleted = bw->GetBadWord(Number - 1)->word;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "DEL " << lastdeleted;
 		++deleted;
 		bw->EraseBadWord(Number - 1);
 	}
@@ -286,14 +306,14 @@ private:
 			realword = word.substr(0, pos);
 		}
 
-		unsigned badwordsmax = Config->GetModule(this->module)->Get<unsigned>("badwordsmax");
+		unsigned badwordsmax = Config->GetModule(this->module).Get<unsigned>("badwordsmax");
 		if (badwords->GetBadWordCount() >= badwordsmax)
 		{
 			source.Reply(_("Sorry, you can only have %d bad words entries on a channel."), badwordsmax);
 			return;
 		}
 
-		bool casesensitive = Config->GetModule(this->module)->Get<bool>("casesensitive");
+		bool casesensitive = Config->GetModule(this->module).Get<bool>("casesensitive");
 
 		for (unsigned i = 0, end = badwords->GetBadWordCount(); i < end; ++i)
 		{
@@ -427,34 +447,38 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002bad words list\002 for a channel. The bad\n"
-				"words list determines which words are to be kicked\n"
-				"when the bad words kicker is enabled. For more information,\n"
-				"type \002%s%s HELP KICK %s\002.\n"
-				" \n"
-				"The \002ADD\002 command adds the given word to the\n"
-				"bad words list. If SINGLE is specified, a kick will be\n"
-				"done only if a user says the entire word. If START is\n"
-				"specified, a kick will be done if a user says a word\n"
-				"that starts with \037word\037. If END is specified, a kick\n"
-				"will be done if a user says a word that ends with\n"
-				"\037word\037. If you don't specify anything, a kick will\n"
-				"be issued every time \037word\037 is said by a user.\n"
-				" \n"), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
-		source.Reply(_("The \002DEL\002 command removes the given word from the\n"
-				"bad words list.  If a list of entry numbers is given, those\n"
-				"entries are deleted.  (See the example for LIST below.)\n"
-				" \n"
-				"The \002LIST\002 command displays the bad words list.  If\n"
-				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
+		source.Reply(_(
+				"Maintains the \002bad words list\002 for a channel. The bad "
+				"words list determines which words are to be kicked "
+				"when the bad words kicker is enabled. For more information, "
+				"type \002%s\032KICK\032%s\002."
+				"\n\n"
+				"The \002ADD\002 command adds the given word to the "
+				"bad words list. If SINGLE is specified, a kick will be "
+				"done only if a user says the entire word. If START is "
+				"specified, a kick will be done if a user says a word "
+				"that starts with \037word\037. If END is specified, a kick "
+				"will be done if a user says a word that ends with "
+				"\037word\037. If you don't specify anything, a kick will "
+				"be issued every time \037word\037 is said by a user."
+				"\n\n"
+				"The \002DEL\002 command removes the given word from the "
+				"bad words list. If a list of entry numbers is given, those "
+				"entries are deleted.  (See the example for LIST below.)"
+				"\n\n"
+				"The \002LIST\002 command displays the bad words list. If "
+				"a wildcard mask is given, only those entries matching the "
+				"mask are displayed. If a list of entry numbers is given, "
 				"only those entries are shown; for example:\n"
-				"   \002#channel LIST 2-5,7-9\002\n"
+				"   \002#channel\032LIST\0322-5,7-9\002\n"
 				"      Lists bad words entries numbered 2 through 5 and\n"
-				"      7 through 9.\n"
-				" \n"
-				"The \002CLEAR\002 command clears all entries from the\n"
-				"bad words list."));
+				"      7 through 9."
+				"\n\n"
+				"The \002CLEAR\002 command clears all entries from the "
+				"bad words list."
+			),
+			source.service->GetQueryCommand("generic/help").c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };
@@ -464,11 +488,13 @@ class BSBadwords final
 {
 	CommandBSBadwords commandbsbadwords;
 	ExtensibleItem<BadWordsImpl> badwords;
-	Serialize::Type badword_type;
+	BadWordTypeImpl badword_type;
 
 public:
-	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandbsbadwords(this), badwords(this, "badwords"), badword_type("BadWord", BadWordImpl::Unserialize)
+	BSBadwords(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandbsbadwords(this)
+		, badwords(this, "badwords")
 	{
 	}
 };

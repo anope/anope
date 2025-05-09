@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_session.h"
+#include "modules/operserv/session.h"
 
 namespace
 {
@@ -34,6 +34,47 @@ namespace
 	unsigned ipv4_cidr;
 	unsigned ipv6_cidr;
 }
+
+struct ExceptionType final
+	: public Serialize::Type
+{
+	ExceptionType()
+		: Serialize::Type("Exception")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *ex = static_cast<const Exception *>(obj);
+		data.Store("mask", ex->mask);
+		data.Store("limit", ex->limit);
+		data.Store("who", ex->who);
+		data.Store("reason", ex->reason);
+		data.Store("time", ex->time);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
+	{
+		if (!session_service)
+			return NULL;
+
+		Exception *ex;
+		if (obj)
+			ex = anope_dynamic_static_cast<Exception *>(obj);
+		else
+			ex = new Exception;
+		data["mask"] >> ex->mask;
+		data["limit"] >> ex->limit;
+		data["who"] >> ex->who;
+		data["reason"] >> ex->reason;
+		data["time"] >> ex->time;
+		data["expires"] >> ex->expires;
+
+		if (!obj)
+			session_service->AddException(ex);
+		return ex;
+	}
+};
 
 class MySessionService final
 	: public SessionService
@@ -133,6 +174,7 @@ class ExceptionDelCallback final
 protected:
 	CommandSource &source;
 	unsigned deleted = 0;
+	Anope::string lastdeleted;
 	Command *cmd;
 public:
 	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), cmd(c)
@@ -141,12 +183,20 @@ public:
 
 	~ExceptionDelCallback() override
 	{
-		if (!deleted)
-			source.Reply(_("No matching entries on session-limit exception list."));
-		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from session-limit exception list."));
-		else
-			source.Reply(_("Deleted %d entries from session-limit exception list."), deleted);
+		switch (deleted)
+		{
+			case 0:
+				source.Reply(_("No matching entries on session-limit exception list."));
+				break;
+
+			case 1:
+				source.Reply(_("Deleted %s from session-limit exception list."), lastdeleted.c_str());
+				break;
+
+			default:
+				source.Reply(deleted, N_("Deleted %d entry from session-limit exception list.", "Deleted %d entries from session-limit exception list."), deleted);
+				break;
+		}
 	}
 
 	void HandleNumber(unsigned number) override
@@ -154,7 +204,8 @@ public:
 		if (!number || number > session_service->GetExceptions().size())
 			return;
 
-		Log(LOG_ADMIN, source, cmd) << "to remove the session limit exception for " << session_service->GetExceptions()[number - 1]->mask;
+		lastdeleted = session_service->GetExceptions()[number - 1]->mask;
+		Log(LOG_ADMIN, source, cmd) << "to remove the session limit exception for " << lastdeleted;
 
 		++deleted;
 		DoDel(source, number - 1);
@@ -260,20 +311,24 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to view the session list.\n"
-				" \n"
-				"\002SESSION LIST\002 lists hosts with at least \037threshold\037 sessions.\n"
-				"The threshold must be a number greater than 1. This is to\n"
-				"prevent accidental listing of the large number of single\n"
-				"session hosts.\n"
-				" \n"
-				"\002SESSION VIEW\002 displays detailed information about a specific\n"
-				"host - including the current session count and session limit.\n"
-				"The \037host\037 value may not include wildcards.\n"
-				" \n"
-				"See the \002EXCEPTION\002 help for more information about session\n"
-				"limiting and how to set session limits specific to certain\n"
-				"hosts and groups thereof."));
+		source.Reply(_(
+				"Allows Services Operators to view the session list."
+				"\n\n"
+				"\002%s\032LIST\002 lists hosts with at least \037threshold\037 sessions. "
+				"The threshold must be a number greater than 1. This is to "
+				"prevent accidental listing of the large number of single "
+				"session hosts."
+				"\n\n"
+				"\002%s\032VIEW\002 displays detailed information about a specific "
+				"host - including the current session count and session limit. "
+				"The \037host\037 value may not include wildcards. "
+				"\n\n"
+				"See the \002EXCEPTION\002 help for more information about session "
+				"limiting and how to set session limits specific to certain "
+				"hosts and groups thereof."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };
@@ -536,36 +591,43 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to manipulate the list of hosts that\n"
-				"have specific session limits - allowing certain machines,\n"
-				"such as shell servers, to carry more than the default number\n"
-				"of clients at a time. Once a host reaches its session limit,\n"
-				"all clients attempting to connect from that host will be\n"
-				"killed. Before the user is killed, they are notified, of a\n"
-				"source of help regarding session limiting. The content of\n"
-				"this notice is a config setting."));
-		source.Reply(" ");
-		source.Reply(_("\002EXCEPTION ADD\002 adds the given host mask to the exception list.\n"
-				"Note that \002nick!user@host\002 and \002user@host\002 masks are invalid!\n"
-				"Only real host masks, such as \002box.host.dom\002 and \002*.host.dom\002,\n"
-				"are allowed because sessions limiting does not take nick or\n"
-				"user names into account. \037limit\037 must be a number greater than\n"
-				"or equal to zero. This determines how many sessions this host\n"
-				"may carry at a time. A value of zero means the host has an\n"
-				"unlimited session limit. See the \002AKILL\002 help for details about\n"
-				"the format of the optional \037expiry\037 parameter.\n"
-				" \n"
-				"\002EXCEPTION DEL\002 removes the given mask from the exception list.\n"
-				" \n"
-				"\002EXCEPTION LIST\002 and \002EXCEPTION VIEW\002 show all current\n"
-				"sessions if the optional mask is given, the list is limited\n"
-				"to those sessions matching the mask. The difference is that\n"
-				"\002EXCEPTION VIEW\002 is more verbose, displaying the name of the\n"
-				"person who added the exception, its session limit, reason,\n"
-				"host mask and the expiry date and time.\n"
-				" \n"
-				"Note that a connecting client will \"use\" the first exception\n"
-				"their host matches."));
+		source.Reply(_(
+				"Allows Services Operators to manipulate the list of hosts that "
+				"have specific session limits - allowing certain machines, "
+				"such as shell servers, to carry more than the default number "
+				"of clients at a time. Once a host reaches its session limit, "
+				"all clients attempting to connect from that host will be "
+				"killed. Before the user is killed, they are notified, of a "
+				"source of help regarding session limiting. The content of "
+				"this notice is a config setting."
+				"\n\n"
+				"\002%s\032ADD\002 adds the given host mask to the exception list. "
+				"Note that \002nick!user@host\002 and \002user@host\002 masks are invalid! "
+				"Only real host masks, such as \002box.host.dom\002 and \002*.host.dom\002, "
+				"are allowed because sessions limiting does not take nick or "
+				"user names into account. \037limit\037 must be a number greater than "
+				"or equal to zero. This determines how many sessions this host "
+				"may carry at a time. A value of zero means the host has an "
+				"unlimited session limit. See the \002AKILL\002 help for details about "
+				"the format of the optional \037expiry\037 parameter. "
+				"\n\n"
+				"\002%s\032DEL\002 removes the given mask from the exception list."
+				"\n\n"
+				"\002%s\032LIST\002 and \002%s\032VIEW\002 show all current "
+				"sessions if the optional mask is given, the list is limited "
+				"to those sessions matching the mask. The difference is that "
+				"\002%s\032VIEW\002 is more verbose, displaying the name of the "
+				"person who added the exception, its session limit, reason, "
+				"host mask and the expiry date and time. "
+				"\n\n"
+				"Note that a connecting client will \"use\" the first exception "
+				"their host matches."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };
@@ -573,15 +635,19 @@ public:
 class OSSession final
 	: public Module
 {
-	Serialize::Type exception_type;
+	ExceptionType exception_type;
 	MySessionService ss;
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
 	ServiceReference<XLineManager> akills;
 
 public:
-	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		exception_type("Exception", Exception::Unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
+	OSSession(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, ss(this)
+		, commandossession(this)
+		, commandosexception(this)
+		, akills("XLineManager", "xlinemanager/sgline")
 	{
 		this->SetPermanent(true);
 	}
@@ -591,21 +657,21 @@ public:
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = Config->GetModule(this);
+		const auto &block = Config->GetModule(this);
 
-		session_limit = block->Get<int>("defaultsessionlimit");
-		max_session_kill = block->Get<int>("maxsessionkill");
-		session_autokill_expiry = block->Get<time_t>("sessionautokillexpiry");
-		sle_reason = block->Get<const Anope::string>("sessionlimitexceeded");
-		sle_detailsloc = block->Get<const Anope::string>("sessionlimitdetailsloc");
+		session_limit = block.Get<int>("defaultsessionlimit");
+		max_session_kill = block.Get<int>("maxsessionkill");
+		session_autokill_expiry = block.Get<time_t>("sessionautokillexpiry");
+		sle_reason = block.Get<const Anope::string>("sessionlimitexceeded");
+		sle_detailsloc = block.Get<const Anope::string>("sessionlimitdetailsloc");
 
-		max_exception_limit = block->Get<int>("maxsessionlimit");
-		exception_expiry = block->Get<time_t>("exceptionexpiry");
+		max_exception_limit = block.Get<int>("maxsessionlimit");
+		exception_expiry = block.Get<time_t>("exceptionexpiry");
 
-		ipv4_cidr = block->Get<unsigned>("session_ipv4_cidr", "32");
-		ipv6_cidr = block->Get<unsigned>("session_ipv6_cidr", "128");
+		ipv4_cidr = block.Get<unsigned>("session_ipv4_cidr", "32");
+		ipv6_cidr = block.Get<unsigned>("session_ipv6_cidr", "128");
 
 		if (ipv4_cidr > 32 || ipv6_cidr > 128)
 			throw ConfigException(this->name + ": session CIDR value out of range");
@@ -653,7 +719,9 @@ public:
 				{
 					if (!sle_reason.empty())
 					{
-						Anope::string message = sle_reason.replace_all_cs("%IP%", u->ip.addr());
+						auto message = Anope::Template(sle_reason, {
+							{ "ip", u->ip.addr() },
+						});
 						u->SendMessage(OperServ, message);
 					}
 					if (!sle_detailsloc.empty())

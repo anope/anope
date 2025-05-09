@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2012-2024 Anope Team
+ * (C) 2012-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -212,7 +212,7 @@ class MChanstats final
 
 	Anope::string GetDisplay(User *u)
 	{
-		if (u && u->Account() && ns_stats.HasExt(u->Account()))
+		if (u && u->IsIdentified() && ns_stats.HasExt(u->Account()))
 			return u->Account()->display;
 		else
 			return "";
@@ -278,45 +278,45 @@ class MChanstats final
 		if (!this->HasTable(prefix +"chanstats"))
 		{
 			query = "CREATE TABLE `" + prefix + "chanstats` ("
-				"`id` int(11) NOT NULL AUTO_INCREMENT,"
+				"`id` int NOT NULL AUTO_INCREMENT,"
 				"`chan` varchar(64) NOT NULL DEFAULT '',"
 				"`nick` varchar(64) NOT NULL DEFAULT '',"
 				"`type` ENUM('total', 'monthly', 'weekly', 'daily') NOT NULL,"
-				"`letters` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`words` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`line` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`actions` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`smileys_happy` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`smileys_sad` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`smileys_other` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`kicks` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`kicked` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`modes` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`topics` int(10) unsigned NOT NULL DEFAULT '0',"
-				"`time0` int(10) unsigned NOT NULL default '0',"
-				"`time1` int(10) unsigned NOT NULL default '0',"
-				"`time2` int(10) unsigned NOT NULL default '0',"
-				"`time3` int(10) unsigned NOT NULL default '0',"
-				"`time4` int(10) unsigned NOT NULL default '0',"
-				"`time5` int(10) unsigned NOT NULL default '0',"
-				"`time6` int(10) unsigned NOT NULL default '0',"
-				"`time7` int(10) unsigned NOT NULL default '0',"
-				"`time8` int(10) unsigned NOT NULL default '0',"
-				"`time9` int(10) unsigned NOT NULL default '0',"
-				"`time10` int(10) unsigned NOT NULL default '0',"
-				"`time11` int(10) unsigned NOT NULL default '0',"
-				"`time12` int(10) unsigned NOT NULL default '0',"
-				"`time13` int(10) unsigned NOT NULL default '0',"
-				"`time14` int(10) unsigned NOT NULL default '0',"
-				"`time15` int(10) unsigned NOT NULL default '0',"
-				"`time16` int(10) unsigned NOT NULL default '0',"
-				"`time17` int(10) unsigned NOT NULL default '0',"
-				"`time18` int(10) unsigned NOT NULL default '0',"
-				"`time19` int(10) unsigned NOT NULL default '0',"
-				"`time20` int(10) unsigned NOT NULL default '0',"
-				"`time21` int(10) unsigned NOT NULL default '0',"
-				"`time22` int(10) unsigned NOT NULL default '0',"
-				"`time23` int(10) unsigned NOT NULL default '0',"
+				"`letters` bigint unsigned NOT NULL DEFAULT '0',"
+				"`words` bigint unsigned NOT NULL DEFAULT '0',"
+				"`line` int unsigned NOT NULL DEFAULT '0',"
+				"`actions` int unsigned NOT NULL DEFAULT '0',"
+				"`smileys_happy` int unsigned NOT NULL DEFAULT '0',"
+				"`smileys_sad` int unsigned NOT NULL DEFAULT '0',"
+				"`smileys_other` int unsigned NOT NULL DEFAULT '0',"
+				"`kicks` int unsigned NOT NULL DEFAULT '0',"
+				"`kicked` int unsigned NOT NULL DEFAULT '0',"
+				"`modes` int unsigned NOT NULL DEFAULT '0',"
+				"`topics` int unsigned NOT NULL DEFAULT '0',"
+				"`time0` int unsigned NOT NULL default '0',"
+				"`time1` int unsigned NOT NULL default '0',"
+				"`time2` int unsigned NOT NULL default '0',"
+				"`time3` int unsigned NOT NULL default '0',"
+				"`time4` int unsigned NOT NULL default '0',"
+				"`time5` int unsigned NOT NULL default '0',"
+				"`time6` int unsigned NOT NULL default '0',"
+				"`time7` int unsigned NOT NULL default '0',"
+				"`time8` int unsigned NOT NULL default '0',"
+				"`time9` int unsigned NOT NULL default '0',"
+				"`time10` int unsigned NOT NULL default '0',"
+				"`time11` int unsigned NOT NULL default '0',"
+				"`time12` int unsigned NOT NULL default '0',"
+				"`time13` int unsigned NOT NULL default '0',"
+				"`time14` int unsigned NOT NULL default '0',"
+				"`time15` int unsigned NOT NULL default '0',"
+				"`time16` int unsigned NOT NULL default '0',"
+				"`time17` int unsigned NOT NULL default '0',"
+				"`time18` int unsigned NOT NULL default '0',"
+				"`time19` int unsigned NOT NULL default '0',"
+				"`time20` int unsigned NOT NULL default '0',"
+				"`time21` int unsigned NOT NULL default '0',"
+				"`time22` int unsigned NOT NULL default '0',"
+				"`time23` int unsigned NOT NULL default '0',"
 				"PRIMARY KEY (`id`),"
 				"UNIQUE KEY `chan` (`chan`,`nick`,`type`),"
 				"KEY `nick` (`nick`),"
@@ -332,9 +332,9 @@ class MChanstats final
 			this->RunQuery(query);
 		}
 		query = "CREATE PROCEDURE `" + prefix + "chanstats_proc_update`"
-			"(chan_ VARCHAR(255), nick_ VARCHAR(255), line_ INT(10), letters_ INT(10),"
-			"words_ INT(10), actions_ INT(10), sm_h_ INT(10), sm_s_ INT(10), sm_o_ INT(10),"
-			"kicks_ INT(10), kicked_ INT(10), modes_ INT(10), topics_ INT(10))"
+			"(chan_ VARCHAR(255), nick_ VARCHAR(255), line_ int, letters_ int,"
+			"words_ int, actions_ int, sm_h_ int, sm_s_ int, sm_o_ int,"
+			"kicks_ int, kicked_ int, modes_ int, topics_ int)"
 			"BEGIN "
 				"DECLARE time_ VARCHAR(20);"
 				"SET time_ = CONCAT('time', hour(now()));"
@@ -368,7 +368,7 @@ class MChanstats final
 		query = "CREATE PROCEDURE `" + prefix + "chanstats_proc_chgdisplay`"
 			"(old_nick varchar(255), new_nick varchar(255))"
 			"BEGIN "
-			"DECLARE res_count int(10) unsigned;"
+			"DECLARE res_count int unsigned;"
 			"SELECT COUNT(nick) INTO res_count FROM `" + prefix + "chanstats` WHERE nick = new_nick;"
 			"IF res_count = 0 THEN "
 				"UPDATE `" + prefix + "chanstats` SET `nick` = new_nick WHERE `nick` = old_nick;"
@@ -381,7 +381,7 @@ class MChanstats final
 					"smileys_sad_, smileys_other_, kicks_, kicked_, modes_, topics_,"
 					"time0_, time1_, time2_, time3_, time4_, time5_, time6_, time7_, time8_, time9_,"
 					"time10_, time11_, time12_, time13_, time14_, time15_, time16_, time17_, time18_,"
-					"time19_, time20_, time21_, time22_, time23_ INT(10) unsigned;"
+					"time19_, time20_, time21_, time22_, time23_ int unsigned;"
 				"DECLARE stats_cursor CURSOR FOR "
 					"SELECT chan, type, letters, words, line, actions, smileys_happy,"
 						"smileys_sad, smileys_other, kicks, kicked, modes, topics, time0, time1,"
@@ -497,16 +497,16 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
-		prefix = block->Get<const Anope::string>("prefix", "anope_");
-		SmileysHappy = block->Get<const Anope::string>("SmileysHappy");
-		SmileysSad = block->Get<const Anope::string>("SmileysSad");
-		SmileysOther = block->Get<const Anope::string>("SmileysOther");
-		NSDefChanstats = block->Get<bool>("ns_def_chanstats");
-		CSDefChanstats = block->Get<bool>("cs_def_chanstats");
-		Anope::string engine = block->Get<const Anope::string>("engine");
+		const auto &block = conf.GetModule(this);
+		prefix = block.Get<const Anope::string>("prefix", "anope_");
+		SmileysHappy = block.Get<const Anope::string>("SmileysHappy");
+		SmileysSad = block.Get<const Anope::string>("SmileysSad");
+		SmileysOther = block.Get<const Anope::string>("SmileysOther");
+		NSDefChanstats = block.Get<bool>("ns_def_chanstats");
+		CSDefChanstats = block.Get<bool>("cs_def_chanstats");
+		Anope::string engine = block.Get<const Anope::string>("engine");
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 		if (sql)
 			this->CheckTables();
@@ -532,7 +532,7 @@ public:
 
 	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) override
 	{
-		if (!source || !source->Account() || !c->ci || !cs_stats.HasExt(c->ci))
+		if (!source || !source->IsIdentified() || !c->ci || !cs_stats.HasExt(c->ci))
 			return;
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);";
 		query.SetValue("channel", c->name);
@@ -540,7 +540,7 @@ public:
 		this->RunQuery(query);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const ModeData &data) override
 	{
 		this->OnModeChange(c, setter.GetUser());
 		return EVENT_CONTINUE;
@@ -555,7 +555,7 @@ public:
 private:
 	void OnModeChange(Channel *c, User *u)
 	{
-		if (!u || !u->Account() || !c->ci || !cs_stats.HasExt(c->ci))
+		if (!u || !u->IsIdentified() || !c->ci || !cs_stats.HasExt(c->ci))
 			return;
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);";

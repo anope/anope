@@ -1,7 +1,7 @@
 /* Mode support
  *
  * (C) 2008-2011 Adam <Adam@anope.org>
- * (C) 2008-2024 Anope Team <team@anope.org>
+ * (C) 2008-2025 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -41,19 +41,20 @@ unsigned ModeManager::GenericChannelModes = 0, ModeManager::GenericUserModes = 0
 
 struct StackerInfo final
 {
+	using ModeList = std::list<std::pair<Mode *, ModeData>>;
 	/* Modes to be added */
-	std::list<std::pair<Mode *, Anope::string> > AddModes;
+	ModeList AddModes;
 	/* Modes to be deleted */
-	std::list<std::pair<Mode *, Anope::string> > DelModes;
+	ModeList DelModes;
 	/* Bot this is sent from */
 	BotInfo *bi = nullptr;
 
 	/** Add a mode to this object
 	 * @param mode The mode
 	 * @param set true if setting, false if unsetting
-	 * @param param The param for the mode
+	 * @param data Data about the mode.
 	 */
-	void AddMode(Mode *mode, bool set, const Anope::string &param);
+	void AddMode(Mode *mode, bool set, const ModeData &data);
 };
 
 ChannelStatus::ChannelStatus(const Anope::string &m) : modes(m)
@@ -246,11 +247,11 @@ bool ChannelModeNoone::CanSet(User *u) const
 	return false;
 }
 
-void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
+void StackerInfo::AddMode(Mode *mode, bool set, const ModeData &data)
 {
 	bool is_param = mode->type == MODE_PARAM;
 
-	std::list<std::pair<Mode *, Anope::string> > *list, *otherlist;
+	ModeList *list, *otherlist;
 	if (set)
 	{
 		list = &AddModes;
@@ -263,13 +264,13 @@ void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 	}
 
 	/* Loop through the list and find if this mode is already on here */
-	std::list<std::pair<Mode *, Anope::string > >::iterator it, it_end;
+	StackerInfo::ModeList::iterator it, it_end;
 	for (it = list->begin(), it_end = list->end(); it != it_end; ++it)
 	{
 		/* The param must match too (can have multiple status or list modes), but
 		 * if it is a param mode it can match no matter what the param is
 		 */
-		if (it->first == mode && (is_param || param.equals_cs(it->second)))
+		if (it->first == mode && (is_param || data.value.equals_cs(it->second.value)))
 		{
 			list->erase(it);
 			/* It can only be on this list once */
@@ -282,7 +283,7 @@ void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 		/* The param must match too (can have multiple status or list modes), but
 		 * if it is a param mode it can match no matter what the param is
 		 */
-		if (it->first == mode && (is_param || param.equals_cs(it->second)))
+		if (it->first == mode && (is_param || data.value.equals_cs(it->second.value)))
 		{
 			otherlist->erase(it);
 			return;
@@ -294,7 +295,7 @@ void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 	}
 
 	/* Add this mode and its param to our list */
-	list->emplace_back(mode, param);
+	list->emplace_back(mode, data);
 }
 
 static class ModePipe final
@@ -321,72 +322,6 @@ static StackerInfo *GetInfo(List &l, Object *o)
 	auto *s = new StackerInfo();
 	l[o] = s;
 	return s;
-}
-
-/** Build a list of mode strings to send to the IRCd from the mode stacker
- * @param info The stacker info for a channel or user
- * @return a list of strings
- */
-static auto BuildModeStrings(StackerInfo *info)
-{
-	std::list<std::pair<Anope::string, std::vector<Anope::string>>> ret;
-	std::list<std::pair<Mode *, Anope::string> >::iterator it, it_end;
-	Anope::string buf = "+";
-	std::vector<Anope::string> parambuf;
-	unsigned NModes = 0;
-	size_t paramlen = 0;
-
-	for (it = info->AddModes.begin(), it_end = info->AddModes.end(); it != it_end; ++it)
-	{
-		if ((IRCD->MaxModes && ++NModes > IRCD->MaxModes) || (IRCD->MaxLine && buf.length() + paramlen > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
-		{
-			ret.push_back({buf, parambuf});
-			buf = "+";
-			parambuf.clear();
-			paramlen = 0;
-			NModes = 1;
-		}
-
-		buf += it->first->mchar;
-
-		if (!it->second.empty())
-		{
-			parambuf.push_back(it->second);
-			paramlen += it->second.length() + 1;
-		}
-	}
-
-	if (buf[buf.length() - 1] == '+')
-		buf.erase(buf.length() - 1);
-
-	buf += "-";
-	for (it = info->DelModes.begin(), it_end = info->DelModes.end(); it != it_end; ++it)
-	{
-		if ((IRCD->MaxModes && ++NModes > IRCD->MaxModes) || (IRCD->MaxLine && buf.length() + paramlen > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
-		{
-			ret.push_back({buf, parambuf});
-			buf = "-";
-			parambuf.clear();
-			paramlen = 0;
-			NModes = 1;
-		}
-
-		buf += it->first->mchar;
-
-		if (!it->second.empty())
-		{
-			parambuf.push_back(it->second);
-			paramlen += it->second.length() + 1;
-		}
-	}
-
-	if (buf[buf.length() - 1] == '-')
-		buf.erase(buf.length() - 1);
-
-	if (!buf.empty())
-		ret.push_back({buf, parambuf});
-
-	return ret;
 }
 
 bool ModeManager::AddUserMode(UserMode *um)
@@ -606,10 +541,10 @@ void ModeManager::RebuildStatusModes()
 	std::sort(ChannelModesByStatus.begin(), ChannelModesByStatus.end(), statuscmp);
 }
 
-void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
+void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const ModeData &data)
 {
 	StackerInfo *s = GetInfo(ChannelStackerObjects, c);
-	s->AddMode(cm, Set, Param);
+	s->AddMode(cm, Set, data);
 	if (bi)
 		s->bi = bi;
 	else
@@ -620,10 +555,10 @@ void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set,
 	modePipe->Notify();
 }
 
-void ModeManager::StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
+void ModeManager::StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const ModeData &data)
 {
 	StackerInfo *s = GetInfo(UserStackerObjects, u);
-	s->AddMode(um, Set, Param);
+	s->AddMode(um, Set, data);
 	if (bi)
 		s->bi = bi;
 
@@ -632,14 +567,24 @@ void ModeManager::StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const
 	modePipe->Notify();
 }
 
+static auto BuildModeMap(StackerInfo *info)
+{
+	// TODO: make the stacker store this so we don't need to build it.
+	ModeManager::Change change;
+	for (const auto &[mode, data] : info->AddModes)
+		change.emplace(mode, std::make_pair(true, data));
+	for (const auto &[mode, data] : info->DelModes)
+		change.emplace(mode, std::make_pair(false, data));
+	return change;
+}
+
 void ModeManager::ProcessModes()
 {
 	if (!UserStackerObjects.empty())
 	{
 		for (const auto &[u, s] : UserStackerObjects)
 		{
-			for (const auto &modestr : BuildModeStrings(s))
-				IRCD->SendModeInternal(s->bi, u, modestr.first, modestr.second);
+			IRCD->SendMode(s->bi, u, BuildModeMap(s));
 			delete s;
 		}
 		UserStackerObjects.clear();
@@ -649,8 +594,7 @@ void ModeManager::ProcessModes()
 	{
 		for (const auto &[c, s] : ChannelStackerObjects)
 		{
-			for (const auto &modestr : BuildModeStrings(s))
-				IRCD->SendModeInternal(s->bi, c, modestr.first, modestr.second);
+			IRCD->SendMode(s->bi, c, BuildModeMap(s));
 			delete s;
 		}
 		ChannelStackerObjects.clear();
@@ -664,9 +608,7 @@ static void StackerDel(std::map<T *, StackerInfo *> &map, T *obj)
 	if (it != map.end())
 	{
 		StackerInfo *si = it->second;
-		for (const auto &modestr : BuildModeStrings(si))
-			IRCD->SendModeInternal(si->bi, obj, modestr.first, modestr.second);
-
+		IRCD->SendMode(si->bi, obj, BuildModeMap(si));
 		delete si;
 		map.erase(it);
 	}
@@ -689,7 +631,7 @@ void ModeManager::StackerDel(Mode *m)
 		StackerInfo *si = it->second;
 		++it;
 
-		for (std::list<std::pair<Mode *, Anope::string> >::iterator it2 = si->AddModes.begin(), it2_end = si->AddModes.end(); it2 != it2_end;)
+		for (StackerInfo::ModeList::iterator it2 = si->AddModes.begin(), it2_end = si->AddModes.end(); it2 != it2_end;)
 		{
 			if (it2->first == m)
 				it2 = si->AddModes.erase(it2);
@@ -697,7 +639,7 @@ void ModeManager::StackerDel(Mode *m)
 				++it2;
 		}
 
-		for (std::list<std::pair<Mode *, Anope::string> >::iterator it2 = si->DelModes.begin(), it2_end = si->DelModes.end(); it2 != it2_end;)
+		for (StackerInfo::ModeList::iterator it2 = si->DelModes.begin(), it2_end = si->DelModes.end(); it2 != it2_end;)
 		{
 			if (it2->first == m)
 				it2 = si->DelModes.erase(it2);
@@ -711,7 +653,7 @@ void ModeManager::StackerDel(Mode *m)
 		StackerInfo *si = it->second;
 		++it;
 
-		for (std::list<std::pair<Mode *, Anope::string> >::iterator it2 = si->AddModes.begin(), it2_end = si->AddModes.end(); it2 != it2_end;)
+		for (StackerInfo::ModeList::iterator it2 = si->AddModes.begin(), it2_end = si->AddModes.end(); it2 != it2_end;)
 		{
 			if (it2->first == m)
 				it2 = si->AddModes.erase(it2);
@@ -719,7 +661,7 @@ void ModeManager::StackerDel(Mode *m)
 				++it2;
 		}
 
-		for (std::list<std::pair<Mode *, Anope::string> >::iterator it2 = si->DelModes.begin(), it2_end = si->DelModes.end(); it2 != it2_end;)
+		for (StackerInfo::ModeList::iterator it2 = si->DelModes.begin(), it2_end = si->DelModes.end(); it2 != it2_end;)
 		{
 			if (it2->first == m)
 				it2 = si->DelModes.erase(it2);

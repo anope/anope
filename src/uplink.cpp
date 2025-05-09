@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -34,7 +34,7 @@ public:
 		}
 		catch (const SocketException &ex)
 		{
-			Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << "): " << ex.GetReason();
+			Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].str() << "): " << ex.GetReason();
 		}
 	}
 };
@@ -53,11 +53,11 @@ void Uplink::Connect()
 	Configuration::Uplink &u = Config->Uplinks[Anope::CurrentUplink];
 
 	new UplinkSocket();
-	if (!Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost").empty())
-		UplinkSock->Bind(Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost"));
+	if (!Config->GetBlock("serverinfo").Get<const Anope::string>("localhost").empty())
+		UplinkSock->Bind(Config->GetBlock("serverinfo").Get<const Anope::string>("localhost"));
 	FOREACH_MOD(OnPreServerConnect, ());
 	Anope::string ip = Anope::Resolve(u.host, u.protocol);
-	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u.host << " (" << ip << '/' << u.port << ") with protocol " << IRCD->GetProtocolName();
+	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << ip << " (" << u.str() << ")";
 	UplinkSock->Connect(ip, u.port);
 }
 
@@ -130,7 +130,8 @@ UplinkSocket::~UplinkSocket()
 			if (u->server == Me)
 			{
 				/* Don't use quitmsg here, it may contain information you don't want people to see */
-				IRCD->SendQuit(u, "Shutting down");
+				const auto *reason = Anope::Restarting ? "Restarting" : "Shutting down";
+				IRCD->SendQuit(u, reason, Anope::QuitReason);
 				BotInfo *bi = BotInfo::Find(u->GetUID());
 				if (bi != NULL)
 					bi->introduced = false;
@@ -164,7 +165,7 @@ UplinkSocket::~UplinkSocket()
 	}
 	else if (!Anope::Quitting)
 	{
-		time_t retry = Config->GetBlock("options")->Get<time_t>("retrywait");
+		time_t retry = Config->GetBlock("options").Get<time_t>("retrywait");
 
 		Log() << "Disconnected, retrying in " << retry << " seconds";
 		new ReconnectTimer(retry);
@@ -185,7 +186,7 @@ bool UplinkSocket::ProcessRead()
 
 void UplinkSocket::OnConnect()
 {
-	Log(LOG_TERMINAL) << "Successfully connected to uplink #" << (Anope::CurrentUplink + 1) << " " << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port;
+	Log(LOG_TERMINAL) << "Successfully connected to uplink #" << (Anope::CurrentUplink + 1) << " " << Config->Uplinks[Anope::CurrentUplink].str();
 	IRCD->SendConnect();
 	FOREACH_MOD(OnServerConnect, ());
 }
@@ -193,6 +194,6 @@ void UplinkSocket::OnConnect()
 void UplinkSocket::OnError(const Anope::string &err)
 {
 	Anope::string what = !this->flags[SF_CONNECTED] ? "Unable to connect to" : "Lost connection from";
-	Log(LOG_TERMINAL) << what << " uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << ")" << (!err.empty() ? (": " + err) : "");
+	Log(LOG_TERMINAL) << what << " uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].str() << ")" << (!err.empty() ? (": " + err) : "");
 	error |= !err.empty();
 }

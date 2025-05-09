@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -23,7 +23,8 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByName("BAN");
+		const auto &mode = Config->GetCommand(source).Get<Anope::string>("mode", "BAN");
+		auto *cm = ModeManager::FindChannelModeByName(mode);
 		if (!cm)
 			return;
 
@@ -44,16 +45,18 @@ public:
 				if (!ci->c || !(source.AccessFor(ci).HasPriv("UNBAN") || source.AccessFor(ci).HasPriv("UNBANME")))
 					continue;
 
-				if (IRCD->CanClearBans)
-				{
-					IRCD->SendClearBans(ci->WhoSends(), ci->c, source.GetUser());
-					count++;
-					continue;
-				}
-
 				for (const auto *mode : modes)
+				{
+					if (IRCD->CanClearModes.count(mode->name))
+					{
+						IRCD->SendClearModes(ci->WhoSends(), ci->c, source.GetUser(), mode->name);
+						count++;
+						continue;
+					}
+
 					if (ci->c->Unban(source.GetUser(), mode->name, true))
 						++count;
+				}
 			}
 
 			Log(LOG_COMMAND, source, this, NULL) << "on all channels";
@@ -96,13 +99,15 @@ public:
 		bool override = !source.AccessFor(ci).HasPriv("UNBAN") && source.HasPriv("chanserv/kick");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unban " << u2->nick;
 
-
-		if (IRCD->CanClearBans)
-			IRCD->SendClearBans(ci->WhoSends(), ci->c, source.GetUser());
-		else
+		for (const auto *mode : modes)
 		{
-			for (const auto *mode : modes)
-				ci->c->Unban(u2, mode->name, source.GetUser() == u2);
+			if (IRCD->CanClearModes.count(mode->name))
+			{
+				IRCD->SendClearModes(ci->WhoSends(), ci->c, u2, mode->name);
+				continue;
+			}
+
+			ci->c->Unban(u2, mode->name, source.GetUser() == u2);
 		}
 
 		if (u2 == source.GetUser())
@@ -115,13 +120,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Tells %s to remove all bans preventing you or the given\n"
-				"user from entering the given channel. If no channel is\n"
-				"given, all bans affecting you in channels you have access\n"
-				"in are removed.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 access and above\n"
-				"on the channel."), source.service->nick.c_str());
+		source.Reply(_(
+				"Tells %s to remove all bans preventing you or the given "
+				"user from entering the given channel. If no channel is "
+				"given, all bans affecting you in channels you have access "
+				"in are removed."
+				"\n\n"
+				"By default, limited to AOPs or those with level 5 access and above "
+				"on the channel."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 };

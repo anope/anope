@@ -1,5 +1,5 @@
 /*
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -24,7 +24,7 @@ class WebCPanel::ChanServ::Access final
 {
 public:
 	Access(const Anope::string &cat, const Anope::string &u);
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) override;
 	std::set<Anope::string> GetData() override;
 };
 
@@ -33,7 +33,7 @@ class WebCPanel::ChanServ::Akick final
 {
 public:
 	Akick(const Anope::string &cat, const Anope::string &u);
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) override;
 	std::set<Anope::string> GetData() override;
 };
 
@@ -42,7 +42,7 @@ class WebCPanel::ChanServ::Drop final
 {
 public:
 	Drop(const Anope::string &cat, const Anope::string &u);
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) override;
 };
 
 class WebCPanel::ChanServ::Info final
@@ -50,7 +50,7 @@ class WebCPanel::ChanServ::Info final
 {
 public:
 	Info(const Anope::string &cat, const Anope::string &u);
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) override;
 };
 
 class WebCPanel::ChanServ::Modes final
@@ -58,7 +58,7 @@ class WebCPanel::ChanServ::Modes final
 {
 public:
 	Modes(const Anope::string &cat, const Anope::string &u);
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) override;
 	std::set<Anope::string> GetData() override;
 };
 
@@ -67,6 +67,6 @@ class WebCPanel::ChanServ::Set final
 {
 public:
 	Set(const Anope::string &cat, const Anope::string &u);
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTP::Provider *, const Anope::string &, HTTP::Client *, HTTP::Message &, HTTP::Reply &, NickAlias *, TemplateFileServer::Replacements &) override;
 	std::set<Anope::string> GetData() override;
 };

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -20,10 +20,10 @@ public:
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
-		this->table = config->Get<const Anope::string>("table", "logs");
+		const auto &config = conf.GetModule(this);
+		this->table = config.Get<const Anope::string>("table", "logs");
 	}
 
 	void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) override

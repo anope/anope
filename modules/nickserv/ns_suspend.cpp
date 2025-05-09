@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -19,17 +19,27 @@ struct NSSuspendInfo final
 	, Serializable
 {
 	NSSuspendInfo(Extensible *) : Serializable("NSSuspendInfo") { }
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct NSSuspendInfoType final
+	: Serialize::Type
+{
+	NSSuspendInfoType()
+		: Serialize::Type("NSSuspendInfo")
 	{
-		data.Store("nick", what);
-		data.Store("by", by);
-		data.Store("reason", reason);
-		data.Store("time", when);
-		data.Store("expires", expires);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *si = static_cast<const NSSuspendInfo *>(obj);
+		data.Store("nick", si->what);
+		data.Store("by", si->by);
+		data.Store("reason", si->reason);
+		data.Store("time", si->when);
+		data.Store("expires", si->expires);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string snick;
 		data["nick"] >> snick;
@@ -70,7 +80,7 @@ public:
 		const Anope::string &nick = params[0];
 		Anope::string expiry = params[1];
 		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("suspendexpire");
+		time_t expiry_secs = Config->GetModule(this->owner).Get<time_t>("suspendexpire");
 
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
@@ -98,7 +108,7 @@ public:
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && na->nc->IsServicesOper())
+		if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && na->nc->IsServicesOper())
 		{
 			source.Reply(_("You may not suspend other Services Operators' nicknames."));
 			return;
@@ -147,10 +157,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Suspends a registered nickname, which prevents it from being used\n"
-				"while keeping all the data for that nick. If an expiry is given\n"
-				"the nick will be unsuspended after that period of time, else the\n"
-				"default expiry from the configuration is used."));
+		source.Reply(_(
+			"Suspends a registered nickname, which prevents it from being used "
+			"while keeping all the data for that nick. If an expiry is given "
+			"the nick will be unsuspended after that period of time, else the "
+			"default expiry from the configuration is used."
+		));
 		return true;
 	}
 };
@@ -211,7 +223,7 @@ class NSSuspend final
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;
 	ExtensibleItem<NSSuspendInfo> suspend;
-	Serialize::Type suspend_type;
+	NSSuspendInfoType suspend_type;
 	std::vector<Anope::string> show;
 
 	struct trim final
@@ -234,15 +246,17 @@ class NSSuspend final
 	}
 
 public:
-	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnssuspend(this), commandnsunsuspend(this), suspend(this, "NS_SUSPENDED"),
-		suspend_type("NSSuspendInfo", NSSuspendInfo::Unserialize)
+	NSSuspend(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnssuspend(this)
+		, commandnsunsuspend(this)
+		, suspend(this, "NS_SUSPENDED")
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Anope::string s = conf->GetModule(this)->Get<Anope::string>("show");
+		Anope::string s = conf.GetModule(this).Get<Anope::string>("show");
 		commasepstream(s).GetTokens(show);
 		std::transform(show.begin(), show.end(), show.begin(), trim());
 	}

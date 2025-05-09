@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,12 +10,12 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
+#include "modules/chanserv/mode.h"
 
 inline static Anope::string BotModes()
 {
-	return Config->GetModule("botserv")->Get<Anope::string>("botmodes",
-		Config->GetModule("chanserv")->Get<Anope::string>("botmodes", "o")
+	return Config->GetModule("botserv").Get<Anope::string>("botmodes",
+		Config->GetModule("chanserv").Get<Anope::string>("botmodes", "o")
 	);
 }
 
@@ -52,7 +52,7 @@ public:
 			 * @param chan The channel
 			 */
 			ChanServTimer(Reference<BotInfo> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan)
-				: Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "1m"))
+				: Timer(m, Config->GetModule(m).Get<time_t>("inhabit", "1m"))
 				, ChanServ(cs)
 				, inhabit(i)
 				, c(chan)
@@ -103,9 +103,9 @@ public:
 		new ChanServTimer(ChanServ, inhabit, this->owner, c);
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		const Anope::string &channick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &channick = conf.GetModule(this).Get<const Anope::string>("client");
 
 		if (channick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
@@ -116,18 +116,21 @@ public:
 
 		ChanServ = bi;
 
-		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "keeptopic peace securefounder signkick")).GetTokens(defaults);
+		spacesepstream(conf.GetModule(this).Get<const Anope::string>("defaults")).GetTokens(defaults);
 		if (defaults.empty())
 		{
-			defaults.emplace_back("KEEPTOPIC");
-			defaults.emplace_back("PEACE");
-			defaults.emplace_back("SECUREFOUNDER");
-			defaults.emplace_back("SIGNKICK");
+			defaults = {
+				"CS_KEEP_MODES",
+				"KEEPTOPIC",
+				"PEACE",
+				"SECUREFOUNDER",
+				"SIGNKICK",
+			};
 		}
 		else if (defaults[0].equals_ci("none"))
 			defaults.clear();
 
-		always_lower = conf->GetModule(this)->Get<bool>("always_lower_ts");
+		always_lower = conf.GetModule(this).Get<bool>("always_lower_ts");
 	}
 
 	void OnBotDelete(BotInfo *bi) override
@@ -138,7 +141,7 @@ public:
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message, const Anope::map<Anope::string> &tags) override
 	{
-		if (bi == ChanServ && Config->GetModule(this)->Get<bool>("opersonly") && !u->HasMode("OPER"))
+		if (bi == ChanServ && Config->GetModule(this).Get<bool>("opersonly") && !u->HasMode("OPER"))
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
 			return EVENT_STOP;
@@ -151,7 +154,7 @@ public:
 	{
 		std::deque<ChannelInfo *> chans;
 		nc->GetChannelReferences(chans);
-		int max_reg = Config->GetModule(this)->Get<int>("maxregistered");
+		int max_reg = Config->GetModule(this).Get<int>("maxregistered");
 
 		for (auto *ci : chans)
 		{
@@ -247,7 +250,7 @@ public:
 		{
 			ci->c->RemoveMode(ci->WhoSends(), "REGISTERED", "", false);
 
-			const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require");
+			const Anope::string &require = Config->GetModule(this).Get<const Anope::string>("require");
 			if (!require.empty())
 				ci->c->SetModes(ci->WhoSends(), false, "-%s", require.c_str());
 		}
@@ -257,14 +260,19 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *ChanServ)
 			return EVENT_CONTINUE;
-		source.Reply(_("\002%s\002 allows you to register and control various\n"
-			"aspects of channels. %s can often prevent\n"
-			"malicious users from \"taking over\" channels by limiting\n"
-			"who is allowed channel operator privileges. Available\n"
-			"commands are listed below; to use them, type\n"
-			"\002%s%s \037command\037\002. For more information on a\n"
-			"specific command, type \002%s%s HELP \037command\037\002.\n"),
-			ChanServ->nick.c_str(), ChanServ->nick.c_str(),  Config->StrictPrivmsg.c_str(), ChanServ->nick.c_str(), Config->StrictPrivmsg.c_str(), ChanServ->nick.c_str());
+		source.Reply(_(
+				"\002%s\002 allows you to register and control various "
+				"aspects of channels. %s can often prevent "
+				"malicious users from \"taking over\" channels by limiting "
+				"who is allowed channel operator privileges. Available "
+				"commands are listed below; to use them, type "
+				"\002%s\032\037command\037\002. For more information on a "
+				"specific command, type \002%s\032\037command\037\002."
+			),
+			ChanServ->nick.c_str(),
+			ChanServ->nick.c_str(),
+			ChanServ->GetQueryCommand().c_str(),
+			ChanServ->GetQueryCommand("generic/help").c_str());
 		return EVENT_CONTINUE;
 	}
 
@@ -272,17 +280,27 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *ChanServ)
 			return;
-		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "30d");
-		if (chanserv_expire >= 86400)
-			source.Reply(_(" \n"
-				"Note that any channel which is not used for %lu days\n"
-				"(i.e. which no user on the channel's access list enters\n"
-				"for that period of time) will be automatically dropped."), (unsigned long)chanserv_expire / 86400);
+
+		time_t chanserv_expire = Config->GetModule(this).Get<time_t>("expire", "30d");
+		if (chanserv_expire)
+		{
+			source.Reply(" ");
+			source.Reply(_(
+					"Note that any channel which is not used for %s "
+					"(i.e. which no user on the channel's access list enters "
+					"for that period of time) will be automatically dropped."
+				),
+				Anope::Duration(chanserv_expire, source.nc).c_str());
+		}
 		if (source.IsServicesOper())
-			source.Reply(_(" \n"
-				"Services Operators can also, depending on their access drop\n"
-				"any channel, view (and modify) the access, levels and akick\n"
-				"lists and settings for any channel."));
+		{
+			source.Reply(" ");
+			source.Reply(_(
+				"Services Operators can also, depending on their access drop "
+				"any channel, view (and modify) the access, levels and akick "
+				"lists and settings for any channel."
+			));
+		}
 	}
 
 	void OnCheckModes(Reference<Channel> &c) override
@@ -291,11 +309,11 @@ public:
 			return;
 
 		if (c->ci)
-			c->SetMode(c->ci->WhoSends(), "REGISTERED", "", false);
+			c->SetMode(c->ci->WhoSends(), "REGISTERED", {}, false);
 		else
 			c->RemoveMode(c->WhoSends(), "REGISTERED", "", false);
 
-		const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require");
+		const Anope::string &require = Config->GetModule(this).Get<const Anope::string>("require");
 		if (!require.empty())
 		{
 			if (c->ci)
@@ -314,8 +332,8 @@ public:
 
 	EventReturn OnCanSet(User *u, const ChannelMode *cm) override
 	{
-		if (Config->GetModule(this)->Get<const Anope::string>("nomlock").find(cm->mchar) != Anope::string::npos
-			|| Config->GetModule(this)->Get<const Anope::string>("require").find(cm->mchar) != Anope::string::npos)
+		if (Config->GetModule(this).Get<const Anope::string>("nomlock").find(cm->mchar) != Anope::string::npos
+			|| Config->GetModule(this).Get<const Anope::string>("require").find(cm->mchar) != Anope::string::npos)
 			return EVENT_STOP;
 		return EVENT_CONTINUE;
 	}
@@ -337,7 +355,7 @@ public:
 
 	void OnExpireTick() override
 	{
-		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "30d");
+		time_t chanserv_expire = Config->GetModule(this).Get<time_t>("expire", "30d");
 
 		if (!chanserv_expire || Anope::NoExpire || Anope::ReadOnly)
 			return;
@@ -382,8 +400,11 @@ public:
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostInit() override
+	void OnUplinkSync(Server* s) override
 	{
+		// We need to do this when the uplink is synced as we may not know if
+		// the mode exists before then on some IRCds (e.g. InspIRCd).
+
 		if (!persist)
 			return;
 
@@ -396,7 +417,7 @@ public:
 				continue;
 
 			bool c;
-			ci->c = Channel::FindOrCreate(ci->name, c, ci->time_registered);
+			ci->c = Channel::FindOrCreate(ci->name, c, ci->registered);
 			ci->c->syncing |= created;
 
 			if (perm)
@@ -431,25 +452,25 @@ public:
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (always_lower && c->ci && c->creation_time > c->ci->time_registered)
+		if (always_lower && c->ci && c->created > c->ci->registered)
 		{
-			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
-			c->creation_time = c->ci->time_registered;
+			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->created << " to " << c->ci->registered;
+			c->created = c->ci->registered;
 			IRCD->SendChannel(c);
 			c->Reset();
 		}
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const ModeData &data) override
 	{
-		if (!always_lower && Anope::CurTime == c->creation_time && c->ci && setter.GetUser() && !setter.GetUser()->server->IsULined())
+		if (!always_lower && Anope::CurTime == c->created && c->ci && setter.GetUser() && !setter.GetUser()->server->IsULined())
 		{
 			ChanUserContainer *cu = c->FindUser(setter.GetUser());
 			ChannelMode *cm = ModeManager::FindChannelModeByName("OP");
 			if (cu && cm && !cu->status.HasMode(cm->mchar))
 			{
 				/* Our -o and their mode change crossing, bounce their mode */
-				c->RemoveMode(c->ci->WhoSends(), mode, param);
+				c->RemoveMode(c->ci->WhoSends(), mode, data.value);
 				/* We don't set mlocks until after the join has finished processing, it will stack with this change,
 				 * so there isn't much for the user to remove except -nt etc which is likely locked anyway.
 				 */
@@ -464,7 +485,7 @@ public:
 		if (!show_all)
 			return;
 
-		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "30d");
+		time_t chanserv_expire = Config->GetModule(this).Get<time_t>("expire", "30d");
 		if (!ci->HasExt("CS_NO_EXPIRE") && chanserv_expire && !Anope::NoExpire && ci->last_used != Anope::CurTime)
 			info[_("Expires")] = Anope::strftime(ci->last_used + chanserv_expire, source.GetAccount());
 	}

@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -84,9 +84,42 @@ AccessAccessProvider *AccessAccessProvider::me;
 class CommandCSAccess final
 	: public Command
 {
+private:
+	static void AddEntry(ListFormatter &list, const ChannelInfo *ci, const ChanAccess *access, unsigned number)
+	{
+		Anope::string timebuf;
+		if (ci->c)
+		{
+			for (const auto &[_, cuc] : ci->c->users)
+			{
+				ChannelInfo *p;
+				if (access->Matches(cuc->user, cuc->user->Account(), p))
+					timebuf = "Now";
+			}
+		}
+		if (timebuf.empty())
+		{
+			if (access->last_seen == 0)
+				timebuf = "Never";
+			else
+				timebuf = Anope::strftime(access->last_seen, NULL, true);
+		}
+
+		ListFormatter::ListEntry entry;
+		entry["Number"] = Anope::ToString(number);
+		entry["Level"] = access->AccessSerialize();
+		entry["Mask"] = access->Mask();
+		entry["By"] = access->creator;
+		entry["Last seen"] = timebuf;
+		entry["Description"] = access->description;
+		list.AddEntry(entry);
+	}
+
+
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params[2];
+		Anope::string description = params.size() > 4 ? params[4] : "";
 		Privilege *p = NULL;
 		int level = ACCESS_INVALID;
 
@@ -133,7 +166,7 @@ class CommandCSAccess final
 
 		if (IRCD->IsChannelValid(mask))
 		{
-			if (Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
+			if (Config->GetModule("chanserv").Get<bool>("disallow_channel_access"))
 			{
 				source.Reply(_("Channels may not be on access lists."));
 				return;
@@ -157,7 +190,7 @@ class CommandCSAccess final
 		{
 			na = NickAlias::Find(mask);
 
-			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+			if (!na && Config->GetModule("chanserv").Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
@@ -172,7 +205,11 @@ class CommandCSAccess final
 			{
 				User *targ = User::Find(mask, true);
 				if (targ != NULL)
+				{
 					mask = "*!*@" + targ->GetDisplayedHost();
+					if (description.empty())
+						description = targ->nick;
+				}
 				else
 				{
 					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
@@ -200,7 +237,7 @@ class CommandCSAccess final
 			}
 		}
 
-		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1000");
+		unsigned access_max = Config->GetModule("chanserv").Get<unsigned>("accessmax", "1000");
 		if (access_max && ci->GetDeepAccessCount() >= access_max)
 		{
 			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
@@ -216,7 +253,7 @@ class CommandCSAccess final
 		access->level = level;
 		access->last_seen = 0;
 		access->created = Anope::CurTime;
-		access->description = params.size() > 4 ? params[4] : "";
+		access->description = description;
 		ci->AddAccess(access);
 
 		FOREACH_MOD(OnAccessAdd, (ci, source, access));
@@ -279,11 +316,11 @@ class CommandCSAccess final
 					else
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Nicks;
-
 						if (deleted == 1)
-							source.Reply(_("Deleted 1 entry from %s access list."), ci->name.c_str());
+							source.Reply(_("Deleted %s from %s access list."), Nicks.c_str(), ci->name.c_str());
+
 						else
-							source.Reply(_("Deleted %d entries from %s access list."), deleted, ci->name.c_str());
+							source.Reply(deleted, N_("Deleted %d entry from %s access list.", "Deleted %d entries from %s access list."), deleted, ci->name.c_str());
 					}
 				}
 
@@ -376,32 +413,7 @@ class CommandCSAccess final
 
 					const ChanAccess *access = ci->GetAccess(number - 1);
 
-					Anope::string timebuf;
-					if (ci->c)
-					{
-						for (const auto &[_, cuc] : ci->c->users)
-						{
-							ChannelInfo *p;
-							if (access->Matches(cuc->user, cuc->user->Account(), p))
-								timebuf = "Now";
-						}
-					}
-					if (timebuf.empty())
-					{
-						if (access->last_seen == 0)
-							timebuf = "Never";
-						else
-							timebuf = Anope::strftime(access->last_seen, NULL, true);
-					}
-
-					ListFormatter::ListEntry entry;
-					entry["Number"] = Anope::ToString(number);
-					entry["Level"] = access->AccessSerialize();
-					entry["Mask"] = access->Mask();
-					entry["By"] = access->creator;
-					entry["Last seen"] = timebuf;
-					entry["Description"] = access->description;
-					this->list.AddEntry(entry);
+					AddEntry(this->list, ci, access, number);
 				}
 			}
 			nl_list(list, ci, nick);
@@ -416,32 +428,7 @@ class CommandCSAccess final
 				if (!nick.empty() && !Anope::Match(access->Mask(), nick))
 					continue;
 
-				Anope::string timebuf;
-				if (ci->c)
-				{
-					for (auto &[_, cuc] : ci->c->users)
-					{
-						ChannelInfo *p;
-						if (access->Matches(cuc->user, cuc->user->Account(), p))
-							timebuf = "Now";
-					}
-				}
-				if (timebuf.empty())
-				{
-					if (access->last_seen == 0)
-						timebuf = "Never";
-					else
-						timebuf = Anope::strftime(access->last_seen, NULL, true);
-				}
-
-				ListFormatter::ListEntry entry;
-				entry["Number"] = Anope::ToString(i + 1);
-				entry["Level"] = access->AccessSerialize();
-				entry["Mask"] = access->Mask();
-				entry["By"] = access->creator;
-				entry["Last seen"] = timebuf;
-				entry["Description"] = access->description;
-				list.AddEntry(entry);
+				AddEntry(list, ci, access, i + 1);
 			}
 		}
 
@@ -581,52 +568,76 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002access list\002 for a channel.  The access\n"
-				"list specifies which users are allowed chanop status or\n"
-				"access to %s commands on the channel.  Different\n"
-				"user levels allow for access to different subsets of\n"
-				"privileges. Any registered user not on the access list has\n"
-				"a user level of 0, and any unregistered user has a user level\n"
-				"of -1."), source.service->nick.c_str());
+		source.Reply(_(
+				"Maintains the \002access list\002 for a channel. The access "
+				"list specifies which users are allowed chanop status or "
+				"access to %s commands on the channel. Different "
+				"user levels allow for access to different subsets of "
+				"privileges. Any registered user not on the access list has "
+				"a user level of 0, and any unregistered user has a user level "
+				"of -1."
+				"\n\n"
+				"The \002%s\032ADD\002 command adds the given mask to the "
+				"access list with the given user level; if the mask is "
+				"already present on the list, its access level is changed to "
+				"the level specified in the command. The \037level\037 specified "
+				"may be a numerical level or the name of a privilege (eg AUTOOP). "
+				"When a user joins the channel the access they receive is from the "
+				"highest level entry in the access list."
+			),
+			source.service->nick.c_str(),
+			source.command.nobreak().c_str());
+
+		if (!Config->GetModule("chanserv").Get<bool>("disallow_channel_access"))
+		{
+			source.Reply(_(
+				"The given mask may also be a channel, which will use the "
+				"access list from the other channel up to the given \037level\037."
+			));
+		}
+
 		source.Reply(" ");
-		source.Reply(_("The \002ACCESS ADD\002 command adds the given mask to the\n"
-				"access list with the given user level; if the mask is\n"
-				"already present on the list, its access level is changed to\n"
-				"the level specified in the command.  The \037level\037 specified\n"
-				"may be a numerical level or the name of a privilege (eg AUTOOP).\n"
-				"When a user joins the channel the access they receive is from the\n"
-				"highest level entry in the access list."));
-		if (!Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
-			source.Reply(_("The given mask may also be a channel, which will use the\n"
-					"access list from the other channel up to the given \037level\037."));
-		source.Reply(" ");
-		source.Reply(_("The \002ACCESS DEL\002 command removes the given nick from the\n"
-				"access list.  If a list of entry numbers is given, those\n"
-				"entries are deleted.  (See the example for LIST below.)\n"
-				"You may remove yourself from an access list, even if you\n"
-				"do not have access to modify that list otherwise."));
-		source.Reply(" ");
-		source.Reply(_("The \002ACCESS LIST\002 command displays the access list.  If\n"
-				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
+		source.Reply(_(
+				"The \002%s\032DEL\002 command removes the given nick from the "
+				"access list. If a list of entry numbers is given, those "
+				"entries are deleted.  (See the example for LIST below.) "
+				"You may remove yourself from an access list, even if you "
+				"do not have access to modify that list otherwise."
+				"\n\n"
+				"The \002%s\032LIST\002 command displays the access list. If "
+				"a wildcard mask is given, only those entries matching the "
+				"mask are displayed. If a list of entry numbers is given, "
 				"only those entries are shown; for example:\n"
-				"   \002ACCESS #channel LIST 2-5,7-9\002\n"
+				"   \002%s\032#channel\032LIST\0322-5,7-9\002\n"
 				"      Lists access entries numbered 2 through 5 and\n"
-				"      7 through 9.\n"
-				" \n"
-				"The \002ACCESS VIEW\002 command displays the access list similar\n"
-				"to \002ACCESS LIST\002 but shows the creator and last used time.\n"
-				" \n"
-				"The \002ACCESS CLEAR\002 command clears all entries of the\n"
-				"access list."));
-		source.Reply(" ");
+				"      7 through 9."
+				"\n\n"
+				"The \002%s\032VIEW\002 command displays the access list similar "
+				"to \002%s\032LIST\002 but shows the creator and last used time."
+				"\n\n"
+				"The \002%s\032CLEAR\002 command clears all entries of the "
+				"access list."
+			),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str(),
+			source.command.nobreak().c_str());
 
 		BotInfo *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/levels", bi, cmd))
-			source.Reply(_("\002User access levels\002 can be seen by using the\n"
-					"\002%s\002 command; type \002%s%s HELP LEVELS\002 for\n"
-					"information."), cmd.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str());
+		{
+			source.Reply(" ");
+			source.Reply(_(
+					"\002User access levels\002 can be seen by using the "
+					"\002%s\002 command; type \002%s\032LEVELS\002 for "
+					"information."
+				),
+				cmd.c_str(),
+				bi->GetQueryCommand("generic/help").c_str());
+		}
 		return true;
 	}
 };
@@ -660,7 +671,10 @@ class CommandCSLevels final
 		{
 			Privilege *p = PrivilegeManager::FindPrivilege(what);
 			if (p == NULL)
-				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			{
+				source.Reply(_("Setting \002%s\002 not known. Type \002%s\032LEVELS\002 for a list of valid settings."),
+					what.c_str(), source.service->GetQueryCommand("generic/help").c_str());
+			}
 			else
 			{
 				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
@@ -701,7 +715,8 @@ class CommandCSLevels final
 			return;
 		}
 
-		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		source.Reply(_("Setting \002%s\002 not known. Type \002%s\032LEVELS\002 for a list of valid settings."),
+			what.c_str(), source.service->GetQueryCommand("generic/help").c_str());
 	}
 
 	static void DoList(CommandSource &source, ChannelInfo *ci)
@@ -830,25 +845,35 @@ public:
 		{
 			this->SendSyntax(source);
 			source.Reply(" ");
-			source.Reply(_("The \002LEVELS\002 command allows fine control over the meaning of\n"
-					"the numeric access levels used for channels.  With this\n"
-					"command, you can define the access level required for most\n"
-					"of %s's functions. (The \002SET FOUNDER\002 and this command\n"
-					"are always restricted to the channel founder.)\n"
-					" \n"
-					"\002LEVELS SET\002 allows the access level for a function or group of\n"
-					"functions to be changed. \002LEVELS DISABLE\002 (or \002DIS\002 for short)\n"
-					"disables an automatic feature or disallows access to a\n"
-					"function by anyone, INCLUDING the founder (although, the founder\n"
-					"can always re-enable it). Use \002LEVELS SET founder\002 to make a level\n"
-					"founder only.\n"
-					" \n"
-					"\002LEVELS LIST\002 shows the current levels for each function or\n"
-					"group of functions. \002LEVELS RESET\002 resets the levels to the\n"
-					"default levels of a newly-created channel.\n"
-					" \n"
-					"For a list of the features and functions whose levels can be\n"
-					"set, see \002HELP LEVELS DESC\002."), source.service->nick.c_str());
+			source.Reply(_(
+					"The \002%s\002 command allows fine control over the meaning of "
+					"the numeric access levels used for channels. With this "
+					"command, you can define the access level required for most "
+					"of %s's functions. (The \002SET\032FOUNDER\002 and this command "
+					"are always restricted to the channel founder)."
+					"\n\n"
+					"\002%s\032SET\002 allows the access level for a function or group of "
+					"functions to be changed. \002%s\032DISABLE\002 (or \002DIS\002 for short) "
+					"disables an automatic feature or disallows access to a "
+					"function by anyone, INCLUDING the founder (although, the founder "
+					"can always re-enable it). Use \002%s\032SET founder\002 to make a level "
+					"founder only."
+					"\n\n"
+					"\002%s\032LIST\002 shows the current levels for each function or "
+					"group of functions. \002%s\032RESET\002 resets the levels to the "
+					"default levels of a newly-created channel."
+					"\n\n"
+					"For a list of the features and functions whose levels can be "
+					"set, see \002HELP\032%s\032DESC\002."
+				),
+				source.service->nick.c_str(),
+				source.command.nobreak().c_str(),
+				source.command.nobreak().c_str(),
+				source.command.nobreak().c_str(),
+				source.command.nobreak().c_str(),
+				source.command.nobreak().c_str(),
+				source.command.nobreak().c_str(),
+				source.command.nobreak().c_str());
 		}
 		return true;
 	}
@@ -869,21 +894,21 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
 		defaultLevels.clear();
 
-		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
+		for (int i = 0; i < conf.CountBlock("privilege"); ++i)
 		{
-			Configuration::Block *priv = conf->GetBlock("privilege", i);
+			const auto &priv = conf.GetBlock("privilege", i);
 
-			const Anope::string &pname = priv->Get<const Anope::string>("name");
+			const Anope::string &pname = priv.Get<const Anope::string>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &value = priv->Get<const Anope::string>("level");
+			const Anope::string &value = priv.Get<const Anope::string>("level");
 			if (value.empty())
 				continue;
 			else if (value.equals_ci("founder"))
@@ -891,7 +916,7 @@ public:
 			else if (value.equals_ci("disabled"))
 				defaultLevels[p->name] = ACCESS_INVALID;
 			else
-				defaultLevels[p->name] = priv->Get<int16_t>("level");
+				defaultLevels[p->name] = priv.Get<int16_t>("level");
 		}
 	}
 

@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -32,8 +32,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes services to update all database files as soon as you\n"
-				"send the command."));
+		source.Reply(_("Causes services to update all database files as soon as you send the command."));
 		return true;
 	}
 };

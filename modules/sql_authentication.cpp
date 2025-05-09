@@ -1,21 +1,34 @@
 /*
  *
- * (C) 2012-2024 Anope Team
+ * (C) 2012-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  */
 
 #include "module.h"
+#include "modules/encryption.h"
 #include "modules/sql.h"
 
-static Module *me;
+namespace
+{
+	Module *me;
 
+	ServiceReference<Encryption::Provider> encryption;
+	Anope::string password_hash, password_field;
+}
 class SQLAuthenticationResult final
 	: public SQL::Interface
 {
 	Reference<User> user;
 	IdentifyRequest *req;
+
+	void OnFail(const Anope::string &reason)
+	{
+		Log(LOG_DEBUG) << "sql_authentication: Unsuccessful authentication for " << req->GetAccount() << ": " << reason;
+		delete this;
+		return;
+	}
 
 public:
 	SQLAuthenticationResult(User *u, IdentifyRequest *r) : SQL::Interface(me), user(u), req(r)
@@ -31,10 +44,25 @@ public:
 	void OnResult(const SQL::Result &r) override
 	{
 		if (r.Rows() == 0)
+			return OnFail("no rows");
+
+		if (!password_hash.empty())
 		{
-			Log(LOG_DEBUG) << "sql_authentication: Unsuccessful authentication for " << req->GetAccount();
-			delete this;
-			return;
+			if (!encryption)
+				return OnFail("encryption provider not loaded");
+
+			auto success = false;
+			for (auto i = 0; i < r.Rows(); ++i)
+			{
+				if (encryption->Compare(r.Get(i, password_field), req->GetPassword()))
+				{
+					success = true;
+					break;
+				}
+			}
+
+			if (!success)
+				return OnFail("no matching passwords");
 		}
 
 		Log(LOG_DEBUG) << "sql_authentication: Successful authentication for " << req->GetAccount();
@@ -90,15 +118,22 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
-		this->engine = config->Get<const Anope::string>("engine");
-		this->query =  config->Get<const Anope::string>("query");
-		this->disable_reason = config->Get<const Anope::string>("disable_reason");
-		this->disable_email_reason = config->Get<Anope::string>("disable_email_reason");
+		const auto &config = conf.GetModule(this);
+		this->engine = config.Get<const Anope::string>("engine");
+		this->query =  config.Get<const Anope::string>("query");
+		this->disable_reason = config.Get<const Anope::string>("disable_reason");
+		this->disable_email_reason = config.Get<Anope::string>("disable_email_reason");
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
+
+		password_hash = config.Get<const Anope::string>("password_hash");
+		if (!password_hash.empty())
+		{
+			password_field = config.Get<const Anope::string>("password_field", "password");
+			encryption = ServiceReference<Encryption::Provider>("Encryption::Provider", password_hash);
+		}
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
@@ -128,18 +163,9 @@ public:
 
 		SQL::Query q(this->query);
 		q.SetValue("a", req->GetAccount());
+		q.SetValue("i", req->GetAddress().str());
+		q.SetValue("n", u ? u->nick : "");
 		q.SetValue("p", req->GetPassword());
-		if (u)
-		{
-			q.SetValue("n", u->nick);
-			q.SetValue("i", u->ip.addr());
-		}
-		else
-		{
-			q.SetValue("n", "");
-			q.SetValue("i", "");
-		}
-
 
 		this->SQL->Run(new SQLAuthenticationResult(u, req), q);
 

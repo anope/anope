@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -60,7 +60,7 @@ void Pipe::Write(const char *data, size_t sz)
 	write(this->write_pipe, data, sz);
 }
 
-int Pipe::Read(char *data, size_t sz)
+ssize_t Pipe::Read(char *data, size_t sz)
 {
 	return read(this->GetFD(), data, sz);
 }

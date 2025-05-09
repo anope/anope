@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -44,12 +44,11 @@ public:
 			return;
 		}
 
-		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		unsigned reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 
-		Anope::string signkickformat = Config->GetModule("chanserv")->Get<Anope::string>("signkickformat", "%m (%n)");
-		signkickformat = signkickformat.replace_all_cs("%n", source.GetNick());
+		auto signkickformat = Config->GetModule("chanserv").Get<Anope::string>("signkickformat", "{message} ({nick})");
 
 		AccessGroup u_access = source.AccessFor(ci);
 
@@ -71,7 +70,10 @@ public:
 
 				if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
 				{
-					signkickformat = signkickformat.replace_all_cs("%m", reason);
+					signkickformat = Anope::Template(signkickformat, {
+						{ "message", reason           },
+						{ "nick",    source.GetNick() },
+					});
 					c->Kick(ci->WhoSends(), u2, signkickformat);
 				}
 				else
@@ -105,7 +107,10 @@ public:
 					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
 					{
 						reason += " (Matches " + mask + ")";
-						signkickformat = signkickformat.replace_all_cs("%m", reason);
+						signkickformat = Anope::Template(signkickformat, {
+							{ "message", reason           },
+							{ "nick",    source.GetNick() },
+						});
 						c->Kick(ci->WhoSends(), uc->user, signkickformat);
 					}
 					else
@@ -126,10 +131,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Kicks a specified nick from a channel.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 access\n"
-				"and above on the channel. Channel founders can also specify masks."));
+		source.Reply(_(
+			"Kicks a specified nick from a channel."
+			"\n\n"
+			"By default, limited to AOPs or those with level 5 access "
+			"and above on the channel. Channel founders can also specify masks."
+		));
 		return true;
 	}
 };

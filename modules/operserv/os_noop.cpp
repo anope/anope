@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -64,10 +64,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("\002SET\002 kills all operators from the given\n"
-				"\002server\002 and prevents operators from opering\n"
-				"up on the given server. \002REVOKE\002 removes this\n"
-				"restriction."));
+		source.Reply(_(
+			"\002SET\002 kills all operators from the given "
+			"\002server\002 and prevents operators from opering "
+			"up on the given server. \002REVOKE\002 removes this "
+			"restriction."
+		));
 		return true;
 	}
 };

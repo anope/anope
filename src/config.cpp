@@ -1,6 +1,6 @@
 /* Configuration file handling.
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -22,7 +22,8 @@
 
 using Configuration::File;
 using Configuration::Conf;
-using Configuration::Internal::Block;
+using Configuration::Block;
+using Configuration::Uplink;
 
 File ServicesConf("anope.conf", false); // Configuration file name
 Conf *Config = NULL;
@@ -43,14 +44,14 @@ int Block::CountBlock(const Anope::string &bname) const
 	return blocks.count(bname);
 }
 
-const Block *Block::GetBlock(const Anope::string &bname, int num) const
+const Block &Block::GetBlock(const Anope::string &bname, int num) const
 {
 	std::pair<block_map::const_iterator, block_map::const_iterator> it = blocks.equal_range(bname);
 
 	for (int i = 0; it.first != it.second; ++it.first, ++i)
 		if (i == num)
-			return &it.first->second;
-	return &EmptyBlock;
+			return it.first->second;
+	return EmptyBlock;
 }
 
 Block *Block::GetMutableBlock(const Anope::string &bname, int num)
@@ -121,22 +122,22 @@ template<typename T> static void ValidateNotZero(const Anope::string &block, con
 Conf::Conf() : Block("")
 {
 	ReadTimeout = 0;
-	UsePrivmsg = DefPrivmsg = false;
+	DefPrivmsg = false;
 
 	this->LoadConf(ServicesConf);
 
 	for (int i = 0; i < this->CountBlock("include"); ++i)
 	{
-		const Block *include = this->GetBlock("include", i);
+		const Block &include = this->GetBlock("include", i);
 
-		const Anope::string &type = include->Get<const Anope::string>("type"),
-					&file = include->Get<const Anope::string>("name");
+		const Anope::string &type = include.Get<const Anope::string>("type"),
+					&file = include.Get<const Anope::string>("name");
 
 		File f(file, type == "executable");
 		this->LoadConf(f);
 	}
 
-	FOREACH_MOD(OnReload, (this));
+	FOREACH_MOD(OnReload, (*this));
 
 	/* Check for modified values that aren't allowed to be modified */
 	if (Config)
@@ -159,60 +160,58 @@ Conf::Conf() : Block("")
 
 		for (const auto &tag : noreload)
 		{
-			if (this->GetBlock(tag.block)->Get<const Anope::string>(tag.name) != Config->GetBlock(tag.block)->Get<const Anope::string>(tag.name))
+			if (this->GetBlock(tag.block).Get<const Anope::string>(tag.name) != Config->GetBlock(tag.block).Get<const Anope::string>(tag.name))
 				throw ConfigException("<" + tag.block + ":" + tag.name + "> can not be modified once set");
 		}
 	}
 
-	const Block *serverinfo = this->GetBlock("serverinfo"), *options = this->GetBlock("options"),
-		*mail = this->GetBlock("mail"), *networkinfo = this->GetBlock("networkinfo");
+	const Block &serverinfo = this->GetBlock("serverinfo"), &options = this->GetBlock("options"),
+		&mail = this->GetBlock("mail"), &networkinfo = this->GetBlock("networkinfo");
 
-	const Anope::string &servername = serverinfo->Get<Anope::string>("name");
+	const Anope::string &servername = serverinfo.Get<Anope::string>("name");
 
 	ValidateNotEmptyOrSpaces("serverinfo", "name", servername);
 
 	if (servername.find(' ') != Anope::string::npos || servername.find('.') == Anope::string::npos)
 		throw ConfigException("serverinfo:name is not a valid server name");
 
-	ValidateNotEmpty("serverinfo", "description", serverinfo->Get<const Anope::string>("description"));
-	ValidateNotEmpty("serverinfo", "pid", serverinfo->Get<const Anope::string>("pid"));
-	ValidateNotEmpty("serverinfo", "motd", serverinfo->Get<const Anope::string>("motd"));
+	ValidateNotEmpty("serverinfo", "description", serverinfo.Get<const Anope::string>("description"));
+	ValidateNotEmpty("serverinfo", "pid", serverinfo.Get<const Anope::string>("pid"));
+	ValidateNotEmpty("serverinfo", "motd", serverinfo.Get<const Anope::string>("motd"));
 
-	ValidateNotZero("options", "readtimeout", options->Get<time_t>("readtimeout"));
+	ValidateNotZero("options", "readtimeout", options.Get<time_t>("readtimeout"));
 
-	ValidateNotZero("networkinfo", "nicklen", networkinfo->Get<unsigned>("nicklen", "1"));
-	ValidateNotZero("networkinfo", "userlen", networkinfo->Get<unsigned>("userlen", "1"));
-	ValidateNotZero("networkinfo", "hostlen", networkinfo->Get<unsigned>("hostlen", "1"));
-	ValidateNotZero("networkinfo", "chanlen", networkinfo->Get<unsigned>("chanlen", "1"));
+	ValidateNotZero("networkinfo", "nicklen", networkinfo.Get<unsigned>("nicklen", "1"));
+	ValidateNotZero("networkinfo", "userlen", networkinfo.Get<unsigned>("userlen", "1"));
+	ValidateNotZero("networkinfo", "hostlen", networkinfo.Get<unsigned>("hostlen", "1"));
+	ValidateNotZero("networkinfo", "chanlen", networkinfo.Get<unsigned>("chanlen", "1"));
 
-	spacesepstream(options->Get<const Anope::string>("ulineservers")).GetTokens(this->Ulines);
+	spacesepstream(options.Get<const Anope::string>("ulineservers")).GetTokens(this->Ulines);
 
-	if (mail->Get<bool>("usemail"))
+	if (mail.Get<bool>("usemail"))
 	{
 		Anope::string check[] = { "sendfrom", "registration_subject", "registration_message", "emailchange_subject", "emailchange_message", "memo_subject", "memo_message" };
 		for (const auto &field : check)
-			ValidateNotEmpty("mail", field, mail->Get<const Anope::string>(field));
+			ValidateNotEmpty("mail", field, mail.Get<const Anope::string>(field));
 	}
 
-	this->ReadTimeout = options->Get<time_t>("readtimeout");
-	this->UsePrivmsg = options->Get<bool>("useprivmsg");
-	this->UseStrictPrivmsg = options->Get<bool>("usestrictprivmsg");
-	this->StrictPrivmsg = !UseStrictPrivmsg ? "/msg " : "/";
+	this->ReadTimeout = options.Get<time_t>("readtimeout");
+	this->ServiceAlias = options.Get<bool>("servicealias");
 	{
 		std::vector<Anope::string> defaults;
-		spacesepstream(this->GetModule("nickserv")->Get<const Anope::string>("defaults")).GetTokens(defaults);
+		spacesepstream(this->GetModule("nickserv").Get<const Anope::string>("defaults")).GetTokens(defaults);
 		this->DefPrivmsg = std::find(defaults.begin(), defaults.end(), "msg") != defaults.end();
 	}
-	this->DefLanguage = options->Get<const Anope::string>("defaultlanguage");
-	this->TimeoutCheck = options->Get<time_t>("timeoutcheck");
-	this->NickChars = networkinfo->Get<Anope::string>("nick_chars");
+	this->DefLanguage = options.Get<const Anope::string>("defaultlanguage");
+	this->TimeoutCheck = options.Get<time_t>("timeoutcheck");
+	this->NickChars = networkinfo.Get<Anope::string>("nick_chars");
 
 	for (int i = 0; i < this->CountBlock("uplink"); ++i)
 	{
-		const Block *uplink = this->GetBlock("uplink", i);
+		const Block &uplink = this->GetBlock("uplink", i);
 
 		int protocol;
-		const Anope::string &protocolstr = uplink->Get<const Anope::string>("protocol", "ipv4");
+		const Anope::string &protocolstr = uplink.Get<const Anope::string>("protocol", "ipv4");
 		if (protocolstr == "ipv4")
 			protocol = AF_INET;
 		else if (protocolstr == "ipv6")
@@ -222,17 +221,17 @@ Conf::Conf() : Block("")
 		else
 			throw ConfigException("uplink:protocol must be set to ipv4, ipv6, or unix");
 
-		const Anope::string &host = uplink->Get<const Anope::string>("host");
+		const Anope::string &host = uplink.Get<const Anope::string>("host");
 		ValidateNotEmptyOrSpaces("uplink", "host", host);
 
 		int port = 0;
 		if (protocol != AF_UNIX)
 		{
-			port = uplink->Get<int>("port");
+			port = uplink.Get<int>("port");
 			ValidateNotZero("uplink", "port", port);
 		}
 
-		const Anope::string &password = uplink->Get<const Anope::string>("password");
+		const Anope::string &password = uplink.Get<const Anope::string>("password");
 		ValidateNotEmptyOrSpaces("uplink", "password", password);
 		if (password[0] == ':')
 			throw ConfigException("uplink:password is not valid");
@@ -242,9 +241,9 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("module"); ++i)
 	{
-		const Block *module = this->GetBlock("module", i);
+		const Block &module = this->GetBlock("module", i);
 
-		const Anope::string &modname = module->Get<const Anope::string>("name");
+		const Anope::string &modname = module.Get<const Anope::string>("name");
 
 		ValidateNotEmptyOrSpaces("module", "name", modname);
 
@@ -253,13 +252,13 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("opertype"); ++i)
 	{
-		const Block *opertype = this->GetBlock("opertype", i);
+		const Block &opertype = this->GetBlock("opertype", i);
 
-		const Anope::string &oname = opertype->Get<const Anope::string>("name"),
-				&modes = opertype->Get<const Anope::string>("modes"),
-				&inherits = opertype->Get<const Anope::string>("inherits"),
-				&commands = opertype->Get<const Anope::string>("commands"),
-				&privs = opertype->Get<const Anope::string>("privs");
+		const Anope::string &oname = opertype.Get<const Anope::string>("name"),
+				&modes = opertype.Get<const Anope::string>("modes"),
+				&inherits = opertype.Get<const Anope::string>("inherits"),
+				&commands = opertype.Get<const Anope::string>("commands"),
+				&privs = opertype.Get<const Anope::string>("privs");
 
 		ValidateNotEmpty("opertype", "name", oname);
 
@@ -296,15 +295,16 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("oper"); ++i)
 	{
-		const Block *oper = this->GetBlock("oper", i);
+		const Block &oper = this->GetBlock("oper", i);
 
-		const Anope::string &nname = oper->Get<const Anope::string>("name"),
-					&type = oper->Get<const Anope::string>("type"),
-					&password = oper->Get<const Anope::string>("password"),
-					&certfp = oper->Get<const Anope::string>("certfp"),
-					&host = oper->Get<const Anope::string>("host"),
-					&vhost = oper->Get<const Anope::string>("vhost");
-		bool require_oper = oper->Get<bool>("require_oper");
+		const Anope::string &nname = oper.Get<const Anope::string>("name"),
+					&type = oper.Get<const Anope::string>("type"),
+					&password = oper.Get<const Anope::string>("password"),
+					&password_hash = oper.Get<const Anope::string>("password_hash"),
+					&certfp = oper.Get<const Anope::string>("certfp"),
+					&host = oper.Get<const Anope::string>("host"),
+					&vhost = oper.Get<const Anope::string>("vhost");
+		bool require_oper = oper.Get<bool>("require_oper");
 
 		ValidateNotEmptyOrSpaces("oper", "name", nname);
 		ValidateNotEmpty("oper", "type", type);
@@ -321,6 +321,7 @@ Conf::Conf() : Block("")
 		auto *o = new Oper(nname, ot);
 		o->require_oper = require_oper;
 		o->password = password;
+		o->password_hash = password_hash;
 		spacesepstream(certfp).GetTokens(o->certfp);
 		spacesepstream(host).GetTokens(o->hosts);
 		o->vhost = vhost;
@@ -332,14 +333,15 @@ Conf::Conf() : Block("")
 		bi->conf = false;
 	for (int i = 0; i < this->CountBlock("service"); ++i)
 	{
-		const Block *service = this->GetBlock("service", i);
+		const Block &service = this->GetBlock("service", i);
 
-		const Anope::string &nick = service->Get<const Anope::string>("nick"),
-					&user = service->Get<const Anope::string>("user"),
-					&host = service->Get<const Anope::string>("host"),
-					&gecos = service->Get<const Anope::string>("gecos"),
-					&modes = service->Get<const Anope::string>("modes"),
-					&channels = service->Get<const Anope::string>("channels");
+		const Anope::string &nick = service.Get<const Anope::string>("nick"),
+					&user = service.Get<const Anope::string>("user"),
+					&host = service.Get<const Anope::string>("host"),
+					&gecos = service.Get<const Anope::string>("gecos"),
+					&modes = service.Get<const Anope::string>("modes"),
+					&channels = service.Get<const Anope::string>("channels"),
+					&alias = service.Get<const Anope::string>("alias", nick.upper());
 
 		ValidateNotEmptyOrSpaces("service", "nick", nick);
 		ValidateNotEmptyOrSpaces("service", "user", user);
@@ -350,6 +352,8 @@ Conf::Conf() : Block("")
 		BotInfo *bi = BotInfo::Find(nick, true);
 		if (!bi)
 			bi = new BotInfo(nick, user, host, gecos, modes);
+
+		bi->alias = alias;
 		bi->conf = true;
 
 		std::vector<Anope::string> oldchannels = bi->botchannels;
@@ -395,7 +399,6 @@ Conf::Conf() : Block("")
 		{
 			size_t ch = oldchannel.find('#');
 			Anope::string chname = oldchannel.substr(ch != Anope::string::npos ? ch : 0);
-
 			bool found = false;
 			for (const auto &botchannel : bi->botchannels)
 			{
@@ -420,24 +423,24 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("log"); ++i)
 	{
-		const Block *log = this->GetBlock("log", i);
+		const Block &log = this->GetBlock("log", i);
 
-		int logage = log->Get<int>("logage");
-		bool rawio = log->Get<bool>("rawio");
-		bool debug = log->Get<bool>("debug");
+		int logage = log.Get<int>("logage");
+		bool rawio = log.Get<bool>("rawio");
+		bool debug = log.Get<bool>("debug");
 
 		LogInfo l(logage, rawio, debug);
 
-		l.bot = BotInfo::Find(log->Get<const Anope::string>("bot", "Global"), true);
-		spacesepstream(log->Get<const Anope::string>("target")).GetTokens(l.targets);
-		spacesepstream(log->Get<const Anope::string>("source")).GetTokens(l.sources);
-		spacesepstream(log->Get<const Anope::string>("admin")).GetTokens(l.admin);
-		spacesepstream(log->Get<const Anope::string>("override")).GetTokens(l.override);
-		spacesepstream(log->Get<const Anope::string>("commands")).GetTokens(l.commands);
-		spacesepstream(log->Get<const Anope::string>("servers")).GetTokens(l.servers);
-		spacesepstream(log->Get<const Anope::string>("channels")).GetTokens(l.channels);
-		spacesepstream(log->Get<const Anope::string>("users")).GetTokens(l.users);
-		spacesepstream(log->Get<const Anope::string>("other")).GetTokens(l.normal);
+		l.bot = BotInfo::Find(log.Get<const Anope::string>("bot", "Global"), true);
+		spacesepstream(log.Get<const Anope::string>("target")).GetTokens(l.targets);
+		spacesepstream(log.Get<const Anope::string>("source")).GetTokens(l.sources);
+		spacesepstream(log.Get<const Anope::string>("admin")).GetTokens(l.admin);
+		spacesepstream(log.Get<const Anope::string>("override")).GetTokens(l.override);
+		spacesepstream(log.Get<const Anope::string>("commands")).GetTokens(l.commands);
+		spacesepstream(log.Get<const Anope::string>("servers")).GetTokens(l.servers);
+		spacesepstream(log.Get<const Anope::string>("channels")).GetTokens(l.channels);
+		spacesepstream(log.Get<const Anope::string>("users")).GetTokens(l.users);
+		spacesepstream(log.Get<const Anope::string>("other")).GetTokens(l.normal);
 
 		this->LogInfos.push_back(l);
 	}
@@ -446,14 +449,14 @@ Conf::Conf() : Block("")
 		bi->commands.clear();
 	for (int i = 0; i < this->CountBlock("command"); ++i)
 	{
-		const Block *command = this->GetBlock("command", i);
+		const Block &command = this->GetBlock("command", i);
 
-		const Anope::string &service = command->Get<const Anope::string>("service"),
-					&nname = command->Get<const Anope::string>("name"),
-					&cmd = command->Get<const Anope::string>("command"),
-					&permission = command->Get<const Anope::string>("permission"),
-					&group = command->Get<const Anope::string>("group");
-		bool hide = command->Get<bool>("hide");
+		const Anope::string &service = command.Get<const Anope::string>("service"),
+					&nname = command.Get<const Anope::string>("name"),
+					&cmd = command.Get<const Anope::string>("command"),
+					&permission = command.Get<const Anope::string>("permission"),
+					&group = command.Get<const Anope::string>("group");
+		bool hide = command.Get<bool>("hide");
 
 		ValidateNotEmptyOrSpaces("command", "service", service);
 		ValidateNotEmpty("command", "name", nname);
@@ -471,25 +474,25 @@ Conf::Conf() : Block("")
 	PrivilegeManager::ClearPrivileges();
 	for (int i = 0; i < this->CountBlock("privilege"); ++i)
 	{
-		const Block *privilege = this->GetBlock("privilege", i);
+		const Block &privilege = this->GetBlock("privilege", i);
 
-		const Anope::string &nname = privilege->Get<const Anope::string>("name"),
-					&desc = privilege->Get<const Anope::string>("desc");
-		int rank = privilege->Get<int>("rank");
+		const Anope::string &nname = privilege.Get<const Anope::string>("name"),
+					&desc = privilege.Get<const Anope::string>("desc");
+		int rank = privilege.Get<int>("rank");
 
 		PrivilegeManager::AddPrivilege(Privilege(nname, desc, rank));
 	}
 
 	for (int i = 0; i < this->CountBlock("fantasy"); ++i)
 	{
-		const Block *fantasy = this->GetBlock("fantasy", i);
+		const Block &fantasy = this->GetBlock("fantasy", i);
 
-		const Anope::string &nname = fantasy->Get<const Anope::string>("name"),
-					&service = fantasy->Get<const Anope::string>("command"),
-					&permission = fantasy->Get<const Anope::string>("permission"),
-					&group = fantasy->Get<const Anope::string>("group");
-		bool hide = fantasy->Get<bool>("hide"),
-			prepend_channel = fantasy->Get<bool>("prepend_channel", "yes");
+		const Anope::string &nname = fantasy.Get<const Anope::string>("name"),
+					&service = fantasy.Get<const Anope::string>("command"),
+					&permission = fantasy.Get<const Anope::string>("permission"),
+					&group = fantasy.Get<const Anope::string>("group");
+		bool hide = fantasy.Get<bool>("hide"),
+			prepend_channel = fantasy.Get<bool>("prepend_channel", "yes");
 
 		ValidateNotEmpty("fantasy", "name", nname);
 		ValidateNotEmptyOrSpaces("fantasy", "command", service);
@@ -504,10 +507,10 @@ Conf::Conf() : Block("")
 
 	for (int i = 0; i < this->CountBlock("command_group"); ++i)
 	{
-		const Block *command_group = this->GetBlock("command_group", i);
+		const Block &command_group = this->GetBlock("command_group", i);
 
-		const Anope::string &nname = command_group->Get<const Anope::string>("name"),
-					&description = command_group->Get<const Anope::string>("description");
+		const Anope::string &nname = command_group.Get<const Anope::string>("name"),
+					&description = command_group.Get<const Anope::string>("description");
 
 		CommandGroup gr;
 		gr.name = nname;
@@ -543,19 +546,19 @@ Conf::Conf() : Block("")
 		Log() << "Tied oper " << na->nc->display << " to type " << o->ot->GetName();
 	}
 
-	if (options->Get<const Anope::string>("casemap", "ascii") == "ascii")
+	if (options.Get<const Anope::string>("casemap", "ascii") == "ascii")
 		Anope::casemap = std::locale(std::locale(), new Anope::ascii_ctype<char>());
-	else if (options->Get<const Anope::string>("casemap") == "rfc1459")
+	else if (options.Get<const Anope::string>("casemap") == "rfc1459")
 		Anope::casemap = std::locale(std::locale(), new Anope::rfc1459_ctype<char>());
 	else
 	{
 		try
 		{
-			Anope::casemap = std::locale(options->Get<const Anope::string>("casemap").c_str());
+			Anope::casemap = std::locale(options.Get<const Anope::string>("casemap").c_str());
 		}
 		catch (const std::runtime_error &)
 		{
-			Log() << "Unknown casemap " << options->Get<const Anope::string>("casemap") << " - casemap not changed";
+			Log() << "Unknown casemap " << options.Get<const Anope::string>("casemap") << " - casemap not changed";
 		}
 	}
 	Anope::CaseMapRebuild();
@@ -619,30 +622,47 @@ void Conf::Post(Conf *old)
 	}
 }
 
-Block *Conf::GetModule(Module *m)
+Anope::string Uplink::str() const
+{
+	switch (protocol)
+	{
+	case AF_INET:
+		return Anope::printf("%s:%u", this->host.c_str(), this->port);
+	case AF_INET6:
+		return Anope::printf("[%s]:%u", this->host.c_str(), this->port);
+	case AF_UNIX:
+		return this->host;
+	}
+
+	// Should never be reached.
+	return "";
+}
+
+
+Block &Conf::GetModule(const Module *m)
 {
 	if (!m)
-		return NULL;
+		return Block::EmptyBlock;
 
 	return GetModule(m->name);
 }
 
-Block *Conf::GetModule(const Anope::string &mname)
+Block &Conf::GetModule(const Anope::string &mname)
 {
 	std::map<Anope::string, Block *>::iterator it = modules.find(mname);
 	if (it != modules.end())
-		return it->second;
+		return *it->second;
 
 	Block *&block = modules[mname];
 
 	/* Search for the block */
 	for (std::pair<block_map::iterator, block_map::iterator> iters = blocks.equal_range("module"); iters.first != iters.second; ++iters.first)
 	{
-		Block *b = &iters.first->second;
+		Block &b = iters.first->second;
 
-		if (b->Get<const Anope::string>("name") == mname)
+		if (b.Get<const Anope::string>("name") == mname)
 		{
-			block = b;
+			block = &b;
 			break;
 		}
 	}
@@ -659,25 +679,25 @@ BotInfo *Conf::GetClient(const Anope::string &cname)
 	if (it != bots.end())
 		return BotInfo::Find(!it->second.empty() ? it->second : cname, true);
 
-	Block *block = GetModule(cname.lower());
-	const Anope::string &client = block->Get<const Anope::string>("client");
+	Block &block = GetModule(cname.lower());
+	const Anope::string &client = block.Get<const Anope::string>("client");
 	bots[cname] = client;
 	return GetClient(cname);
 }
 
-const Block *Conf::GetCommand(CommandSource &source)
+const Block &Conf::GetCommand(CommandSource &source)
 {
 	const Anope::string &block_name = source.c ? "fantasy" : "command";
 
 	for (std::pair<block_map::iterator, block_map::iterator> iters = blocks.equal_range(block_name); iters.first != iters.second; ++iters.first)
 	{
-		Block *b = &iters.first->second;
+		Block &b = iters.first->second;
 
-		if (b->Get<Anope::string>("name") == source.command)
+		if (b.Get<Anope::string>("name") == source.command)
 			return b;
 	}
 
-	return &Block::EmptyBlock;
+	return Block::EmptyBlock;
 }
 
 File::File(const Anope::string &n, bool e) : name(n), executable(e)
@@ -756,7 +776,10 @@ void Conf::LoadConf(File &file)
 		return;
 
 	if (!file.Open())
-		throw ConfigException("File " + file.GetPath() + " could not be opened.");
+	{
+		throw ConfigException(Anope::printf("File %s could not be opened: %s.",
+			file.GetPath().c_str(), strerror(errno)));
+	}
 
 	Anope::string itemname, wordbuffer;
 	std::stack<Block *> block_stack;
@@ -921,23 +944,11 @@ void Conf::LoadConf(File &file)
 					}
 
 					Block *b = block_stack.top();
-
 					if (b)
-						Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << b->name << "' '" << itemname << "' set to '" << wordbuffer << "'";
-
-					/* Check defines */
-					for (int i = 0; i < this->CountBlock("define"); ++i)
 					{
-						const Block *define = this->GetBlock("define", i);
-
-						const Anope::string &dname = define->Get<const Anope::string>("name");
-
-						if (dname == wordbuffer && define != b)
-							wordbuffer = define->Get<const Anope::string>("value");
+						Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << b->name << "' '" << itemname << "' set to '" << wordbuffer << "'";
+						b->items[itemname] = ReplaceVars(wordbuffer, file, linenumber);
 					}
-
-					if (b)
-						b->items[itemname] = wordbuffer;
 
 					wordbuffer.clear();
 					itemname.clear();
@@ -972,4 +983,56 @@ void Conf::LoadConf(File &file)
 		else
 			throw ConfigException("Unterminated commented block at end of file: " + file.GetName());
 	}
+}
+
+Anope::string Conf::ReplaceVars(const Anope::string &str, const File &file, int linenumber)
+{
+	Anope::string ret;
+	for (auto it = str.begin(); it != str.end(); )
+	{
+		if (*it != '$')
+		{
+			ret.push_back(*it++);
+			continue;
+		}
+
+		if (++it == str.end() || *it != '{')
+		{
+			ret.push_back('$');
+			continue;
+		}
+
+		it++;
+		Anope::string var;
+		while (it != str.end() && *it != '}')
+			var.push_back(*it++);
+
+		if (it == str.end())
+			throw ConfigException("Unterminated variable: " + file.GetName() + ":" + Anope::ToString(linenumber));
+
+		it++;
+		if (var.compare(0, 4, "env.", 4) == 0)
+		{
+			// This is an environment variable rather than a defined variable
+			const char* envstr = getenv(var.c_str() + 4);
+			if (envstr && envstr)
+				ret.append(envstr);
+			continue;
+		}
+
+		for (int i = 0; i < this->CountBlock("define"); ++i)
+		{
+			const auto &define = this->GetBlock("define", i);
+			const auto defname = define.Get<const Anope::string>("name");
+			if (defname == var)
+			{
+				ret.append(define.Get<const Anope::string>("value"));
+				break;
+			}
+		}
+	}
+
+	if (!str.equals_cs(ret))
+		Log(LOG_DEBUG) << "Expanded \"" << str << "\" to \"" << ret << "\"";
+	return ret;
 }

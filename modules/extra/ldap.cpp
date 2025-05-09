@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2011-2024 Anope Team
+ * (C) 2011-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -26,6 +26,9 @@
 # define LDAP_STR(X) const_cast<PSTR>((X).c_str())
 # define LDAP_SASL_SIMPLE static_cast<PSTR>(0)
 # define LDAP_TIME(X) reinterpret_cast<PLDAP_TIMEVAL>(&(X))
+# define LDAP_VENDOR_VERSION_MAJOR (LDAP_VERSION / 100)
+# define LDAP_VENDOR_VERSION_MINOR (LDAP_VERSION / 10 % 10)
+# define LDAP_VENDOR_VERSION_PATCH (LDAP_VERSION / 10)
 # define ldap_first_message ldap_first_entry
 # define ldap_next_message ldap_next_entry
 # define ldap_unbind_ext(LDAP, UNUSED1, UNUSED2) ldap_unbind(LDAP)
@@ -525,6 +528,8 @@ public:
 	ModuleLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 		me = this;
+
+		Log(this) << "Module was compiled against LDAP (" << LDAP_VENDOR_NAME << ") version " << LDAP_VENDOR_VERSION_MAJOR << "." << LDAP_VENDOR_VERSION_MINOR << "." << LDAP_VENDOR_VERSION_PATCH;
 	}
 
 	~ModuleLDAP()
@@ -539,9 +544,9 @@ public:
 		LDAPServices.clear();
 	}
 
-	void OnReload(Configuration::Conf *config) override
+	void OnReload(Configuration::Conf &config) override
 	{
-		Configuration::Block *conf = config->GetModule(this);
+		const auto &conf = config.GetModule(this);
 
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end();)
 		{
@@ -551,11 +556,11 @@ public:
 
 			++it;
 
-			for (i = 0; i < conf->CountBlock("ldap"); ++i)
-				if (conf->GetBlock("ldap", i)->Get<const Anope::string>("name", "ldap/main") == cname)
+			for (i = 0; i < conf.CountBlock("ldap"); ++i)
+				if (conf.GetBlock("ldap", i).Get<const Anope::string>("name", "ldap/main") == cname)
 					break;
 
-			if (i == conf->CountBlock("ldap"))
+			if (i == conf.CountBlock("ldap"))
 			{
 				Log(LOG_NORMAL, "ldap") << "LDAP: Removing server connection " << cname;
 
@@ -567,17 +572,17 @@ public:
 			}
 		}
 
-		for (int i = 0; i < conf->CountBlock("ldap"); ++i)
+		for (int i = 0; i < conf.CountBlock("ldap"); ++i)
 		{
-			Configuration::Block *ldap = conf->GetBlock("ldap", i);
+			const auto &ldap = conf.GetBlock("ldap", i);
 
-			const Anope::string &connname = ldap->Get<const Anope::string>("name", "ldap/main");
+			const Anope::string &connname = ldap.Get<const Anope::string>("name", "ldap/main");
 
 			if (this->LDAPServices.find(connname) == this->LDAPServices.end())
 			{
-				const Anope::string &server = ldap->Get<const Anope::string>("server", "127.0.0.1");
-				const Anope::string &admin_binddn = ldap->Get<const Anope::string>("admin_binddn");
-				const Anope::string &admin_password = ldap->Get<const Anope::string>("admin_password");
+				const Anope::string &server = ldap.Get<const Anope::string>("server", "127.0.0.1");
+				const Anope::string &admin_binddn = ldap.Get<const Anope::string>("admin_binddn");
+				const Anope::string &admin_password = ldap.Get<const Anope::string>("admin_password");
 
 				try
 				{

@@ -1,6 +1,6 @@
 /* Registered channel functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -19,9 +19,10 @@
 #include "bots.h"
 #include "servers.h"
 
-Serialize::Checker<registered_channel_map> RegisteredChannelList("ChannelInfo");
+Serialize::Checker<registered_channel_map> RegisteredChannelList(CHANNELINFO_TYPE);
 
-AutoKick::AutoKick() : Serializable("AutoKick")
+AutoKick::AutoKick()
+	: Serializable(AUTOKICK_TYPE)
 {
 }
 
@@ -38,32 +39,40 @@ AutoKick::~AutoKick()
 	}
 }
 
-void AutoKick::Serialize(Serialize::Data &data) const
+AutoKick::Type::Type()
+	: Serialize::Type(AUTOKICK_TYPE)
 {
-	data.Store("ci", this->ci->name);
-	if (this->nc)
-		data.Store("nc", this->nc->display);
-	else
-		data.Store("mask", this->mask);
-	data.Store("reason", this->reason);
-	data.Store("creator", this->creator);
-	data.Store("addtime", this->addtime);
-	data.Store("last_used", this->last_used);
 }
 
-Serializable *AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
+void AutoKick::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *ak = static_cast<const AutoKick *>(obj);
+	data.Store("ci", ak->ci->name);
+	if (ak->nc)
+		data.Store("ncid", ak->nc->GetId());
+	else
+		data.Store("mask", ak->mask);
+	data.Store("reason", ak->reason);
+	data.Store("creator", ak->creator);
+	data.Store("addtime", ak->addtime);
+	data.Store("last_used", ak->last_used);
+}
+
+Serializable *AutoKick::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string sci, snc;
+	uint64_t sncid = 0;
 
 	data["ci"] >> sci;
-	data["nc"] >> snc;
+	data["nc"] >> snc; // Deprecated 2.0 field
+	data["ncid"] >> sncid;
 
 	ChannelInfo *ci = ChannelInfo::Find(sci);
 	if (!ci)
 		return NULL;
 
 	AutoKick *ak;
-	NickCore *nc = NickCore::Find(snc);
+	auto *nc = sncid ? NickCore::FindId(sncid) : NickCore::Find(snc);
 	if (obj)
 	{
 		ak = anope_dynamic_static_cast<AutoKick *>(obj);
@@ -95,37 +104,31 @@ Serializable *AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
 	return ak;
 }
 
-ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInfo"),
-	access("ChanAccess"), akick("AutoKick")
+ChannelInfo::ChannelInfo(const Anope::string &chname)
+	: Serializable(CHANNELINFO_TYPE)
+	, access(CHANACCESS_TYPE)
+	, akick(AUTOKICK_TYPE)
+	, name(chname)
+	, registered(Anope::CurTime)
+	, last_used(Anope::CurTime)
 {
 	if (chname.empty())
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
 
-	this->founder = NULL;
-	this->successor = NULL;
 	this->c = Channel::Find(chname);
 	if (this->c)
 		this->c->ci = this;
-	this->banexpire = 0;
-	this->bi = NULL;
-	this->last_topic_time = 0;
 
-	this->name = chname;
-
-	this->bantype = 2;
-	this->memos.memomax = 0;
-	this->last_used = this->time_registered = Anope::CurTime;
-
-	size_t old = RegisteredChannelList->size();
-	(*RegisteredChannelList)[this->name] = this;
-	if (old == RegisteredChannelList->size())
+	if (!RegisteredChannelList->insert_or_assign(this->name, this).second)
 		Log(LOG_DEBUG) << "Duplicate channel " << this->name << " in registered channel table?";
 
 	FOREACH_MOD(OnCreateChan, (this));
 }
 
-ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
-	access("ChanAccess"), akick("AutoKick")
+ChannelInfo::ChannelInfo(const ChannelInfo &ci)
+	: Serializable(CHANNELINFO_TYPE)
+	, access(CHANACCESS_TYPE)
+	, akick(AUTOKICK_TYPE)
 {
 	*this = ci;
 
@@ -178,46 +181,56 @@ ChannelInfo::~ChannelInfo()
 	}
 }
 
-void ChannelInfo::Serialize(Serialize::Data &data) const
+ChannelInfo::Type::Type()
+	: Serialize::Type(CHANNELINFO_TYPE)
 {
-	data.Store("name", this->name);
-	if (this->founder)
-		data.Store("founder", this->founder->display);
-	if (this->successor)
-		data.Store("successor", this->successor->display);
-	data.Store("description", this->desc);
-	data.Store("time_registered", this->time_registered);
-	data.Store("last_used", this->last_used);
-	data.Store("last_topic", this->last_topic);
-	data.Store("last_topic_setter", this->last_topic_setter);
-	data.Store("last_topic_time", this->last_topic_time);
-	data.Store("bantype", this->bantype);
+}
+
+void ChannelInfo::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+{
+	const auto *ci = static_cast<const ChannelInfo *>(obj);
+
+	data.Store("name", ci->name);
+	if (ci->founder)
+		data.Store("founderid", ci->founder->GetId());
+	if (ci->successor)
+		data.Store("successorid", ci->successor->GetId());
+	data.Store("description", ci->desc);
+	data.Store("time_registered", ci->registered);
+	data.Store("last_used", ci->last_used);
+	data.Store("last_topic", ci->last_topic);
+	data.Store("last_topic_setter", ci->last_topic_setter);
+	data.Store("last_topic_time", ci->last_topic_time);
+	data.Store("bantype", ci->bantype);
 	{
 		Anope::string levels_buffer;
-		for (const auto &[name, level] : this->levels)
+		for (const auto &[name, level] : ci->levels)
 			levels_buffer += name + " " + Anope::ToString(level) + " ";
 		data.Store("levels", levels_buffer);
 	}
-	if (this->bi)
-		data.Store("bi", this->bi->nick);
-	data.Store("banexpire", this->banexpire);
-	data.Store("memomax", this->memos.memomax);
+	if (ci->bi)
+		data.Store("bi", ci->bi->nick);
+	data.Store("banexpire", ci->banexpire);
+	data.Store("memomax", ci->memos.memomax);
 
 	std::ostringstream oss;
-	for (const auto &ignore : this->memos.ignores)
+	for (const auto &ignore : ci->memos.ignores)
 		oss << ignore << " ";
 	data.Store("memoignores", oss.str());
 
-	Extensible::ExtensibleSerialize(this, this, data);
+	Extensible::ExtensibleSerialize(ci, ci, data);
 }
 
-Serializable *ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	Anope::string sname, sfounder, ssuccessor, slevels, sbi;
+	uint64_t sfounderid = 0, ssuccessorid = 0;
 
 	data["name"] >> sname;
-	data["founder"] >> sfounder;
-	data["successor"] >> ssuccessor;
+	data["founder"] >> sfounder; // Deprecated 2.0 field
+	data["founderid"] >> sfounderid;
+	data["successor"] >> ssuccessor; // Deprecated 2.0 field
+	data["successorid"] >> ssuccessorid;
 	data["levels"] >> slevels;
 	data["bi"] >> sbi;
 
@@ -227,11 +240,11 @@ Serializable *ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	else
 		ci = new ChannelInfo(sname);
 
-	ci->SetFounder(NickCore::Find(sfounder));
-	ci->SetSuccessor(NickCore::Find(ssuccessor));
+	ci->SetFounder(sfounderid ? NickCore::FindId(sfounderid) : NickCore::Find(sfounder));
+	ci->SetSuccessor(ssuccessorid ? NickCore::FindId(ssuccessorid) : NickCore::Find(ssuccessor));
 
 	data["description"] >> ci->desc;
-	data["time_registered"] >> ci->time_registered;
+	data["time_registered"] >> ci->registered;
 	data["last_used"] >> ci->last_used;
 	data["last_topic"] >> ci->last_topic;
 	data["last_topic_setter"] >> ci->last_topic_setter;
@@ -266,7 +279,7 @@ Serializable *ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		spacesepstream sep(buf);
 		ci->memos.ignores.clear();
 		while (sep.GetToken(buf))
-			ci->memos.ignores.push_back(buf);
+			ci->memos.ignores.insert(buf);
 	}
 
 	Extensible::ExtensibleUnserialize(ci, ci, data);

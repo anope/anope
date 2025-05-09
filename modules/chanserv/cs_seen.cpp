@@ -1,6 +1,6 @@
 /* cs_seen: provides a seen command by tracking all users
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -43,19 +43,29 @@ struct SeenInfo final
 		if (iter != database.end() && iter->second == this)
 			database.erase(iter);
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct SeenInfoType final
+	: Serialize::Type
+{
+	SeenInfoType()
+		: Serialize::Type("SeenInfo")
 	{
-		data.Store("nick", nick);
-		data.Store("vhost", vhost);
-		data.Store("type", type);
-		data.Store("nick2", nick2);
-		data.Store("channel", channel);
-		data.Store("message", message);
-		data.Store("last", last);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *s = static_cast<const SeenInfo *>(obj);
+		data.Store("nick", s->nick);
+		data.Store("vhost", s->vhost);
+		data.Store("type", s->type);
+		data.Store("nick2", s->nick2);
+		data.Store("channel", s->channel);
+		data.Store("message", s->message);
+		data.Store("last", s->last);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		Anope::string snick;
 
@@ -171,13 +181,17 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("The \002STATS\002 command prints out statistics about stored nicks and memory usage."));
-		source.Reply(_("The \002CLEAR\002 command lets you clean the database by removing all entries from the\n"
-				"database that were added within \037time\037.\n"
-				" \n"
+		source.Reply(_(
+				"The \002STATS\002 command prints out statistics about stored nicks and memory usage."
+				"\n\n"
+				"The \002CLEAR\002 command lets you clean the database by removing all entries from the "
+				"database that were added within \037time\037."
+				"\n\n"
 				"Example:\n"
-				" %s CLEAR 30m\n"
-				" Will remove all entries that were added within the last 30 minutes."), source.command.c_str());
+				" %s\032CLEAR\03230m\n"
+				" Will remove all entries that were added within the last 30 minutes."
+			),
+			source.command.nobreak().c_str());
 		return true;
 	}
 };
@@ -364,9 +378,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Checks for the last time \037nick\037 was seen joining, leaving,\n"
-				"or changing nick on the network and tells you when and, depending\n"
-				"on channel or user settings, where it was."));
+		source.Reply(_(
+			"Checks for the last time \037nick\037 was seen joining, leaving, "
+			"or changing nick on the network and tells you when and, depending "
+			"on channel or user settings, where it was."
+		));
 		return true;
 	}
 };
@@ -374,23 +390,26 @@ public:
 class CSSeen final
 	: public Module
 {
-	Serialize::Type seeninfo_type;
+	SeenInfoType seeninfo_type;
 	CommandSeen commandseen;
 	CommandOSSeen commandosseen;
 public:
-	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this)
+	CSSeen(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandseen(this)
+		, commandosseen(this)
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		simple = conf->GetModule(this)->Get<bool>("simple");
+		simple = conf.GetModule(this).Get<bool>("simple");
 	}
 
 	void OnExpireTick() override
 	{
 		size_t previous_size = database.size();
-		time_t purgetime = Config->GetModule(this)->Get<time_t>("purgetime");
+		time_t purgetime = Config->GetModule(this).Get<time_t>("purgetime");
 		if (!purgetime)
 			purgetime = Anope::DoTime("30d");
 		for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end;)

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -18,19 +18,19 @@ static Anope::string BuildDate()
 	return timebuf;
 }
 
-static Anope::string GetStatusFromCode(HTTPError err)
+static Anope::string GetStatusFromCode(HTTP::Error err)
 {
 	switch (err)
 	{
-		case HTTP_ERROR_OK:
+		case HTTP::OK:
 			return "200 OK";
-		case HTTP_FOUND:
+		case HTTP::FOUND:
 			return "302 Found";
-		case HTTP_BAD_REQUEST:
+		case HTTP::BAD_REQUEST:
 			return "400 Bad Request";
-		case HTTP_PAGE_NOT_FOUND:
+		case HTTP::PAGE_NOT_FOUND:
 			return "404 Not Found";
-		case HTTP_NOT_SUPPORTED:
+		case HTTP::NOT_SUPPORTED:
 			return "505 HTTP Version Not Supported";
 	}
 
@@ -38,13 +38,13 @@ static Anope::string GetStatusFromCode(HTTPError err)
 }
 
 class MyHTTPClient final
-	: public HTTPClient
+	: public HTTP::Client
 {
-	HTTPProvider *provider;
-	HTTPMessage message;
+	HTTP::Provider *provider;
+	HTTP::Message message;
 	bool header_done = false, served = false;
 	Anope::string page_name;
-	Reference<HTTPPage> page;
+	Reference<HTTP::Page> page;
 	Anope::string ip;
 
 	unsigned content_length = 0;
@@ -64,7 +64,7 @@ class MyHTTPClient final
 
 		if (!this->page)
 		{
-			this->SendError(HTTP_PAGE_NOT_FOUND, "Page not found");
+			this->SendError(HTTP::PAGE_NOT_FOUND, "Page not found");
 			return;
 		}
 
@@ -83,7 +83,7 @@ class MyHTTPClient final
 
 		Log(LOG_DEBUG, "httpd") << "httpd: Serving page " << this->page_name << " to " << this->ip;
 
-		HTTPReply reply;
+		HTTP::Reply reply;
 		reply.content_type = this->page->GetContentType();
 
 		if (this->page->OnRequest(this->provider, this->page_name, this, this->message, reply))
@@ -93,7 +93,7 @@ class MyHTTPClient final
 public:
 	time_t created;
 
-	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->GetFamily()), HTTPClient(l, f, a), provider(l), ip(a.addr()), created(Anope::CurTime)
+	MyHTTPClient(HTTP::Provider *l, int f, const sockaddrs &a) : Socket(f, l->GetFamily()), HTTP::Client(l, f, a), provider(l), ip(a.addr()), created(Anope::CurTime)
 	{
 		Log(LOG_DEBUG, "httpd") << "Accepted connection " << f << " from " << a.addr();
 	}
@@ -142,7 +142,7 @@ public:
 				size_t sz = token.find('=');
 				if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
 					continue;
-				this->message.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
+				this->message.post_data[token.substr(0, sz)] = HTTP::URLDecode(token.substr(sz + 1));
 				Log(LOG_DEBUG_2) << "HTTP POST from " << this->clientaddr.addr() << ": " << token.substr(0, sz) << ": " << this->message.post_data[token.substr(0, sz)];
 			}
 
@@ -163,13 +163,13 @@ public:
 
 			if (params.empty() || (params[0] != "GET" && params[0] != "POST"))
 			{
-				this->SendError(HTTP_BAD_REQUEST, "Unknown operation");
+				this->SendError(HTTP::BAD_REQUEST, "Unknown operation");
 				return true;
 			}
 
 			if (params.size() != 3)
 			{
-				this->SendError(HTTP_BAD_REQUEST, "Invalid parameters");
+				this->SendError(HTTP::BAD_REQUEST, "Invalid parameters");
 				return true;
 			}
 
@@ -191,7 +191,7 @@ public:
 					size_t sz = token.find('=');
 					if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
 						continue;
-					this->message.get_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
+					this->message.get_data[token.substr(0, sz)] = HTTP::URLDecode(token.substr(sz + 1));
 				}
 			}
 
@@ -229,9 +229,9 @@ public:
 		return true;
 	}
 
-	void SendError(HTTPError err, const Anope::string &msg) override
+	void SendError(HTTP::Error err, const Anope::string &msg) override
 	{
-		HTTPReply h;
+		HTTP::Reply h;
 
 		h.error = err;
 
@@ -240,7 +240,7 @@ public:
 		this->SendReply(&h);
 	}
 
-	void SendReply(HTTPReply *msg) override
+	void SendReply(HTTP::Reply *msg) override
 	{
 		this->WriteClient("HTTP/1.1 " + GetStatusFromCode(msg->error));
 		this->WriteClient("Date: " + BuildDate());
@@ -281,17 +281,17 @@ public:
 };
 
 class MyHTTPProvider final
-	: public HTTPProvider
+	: public HTTP::Provider
 	, public Timer
 {
 	int timeout;
-	std::map<Anope::string, HTTPPage *> pages;
+	std::map<Anope::string, HTTP::Page *> pages;
 	std::list<Reference<MyHTTPClient> > clients;
 
 public:
 	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t, bool s)
 		: Socket(-1, i.find(':') == Anope::string::npos ? AF_INET : AF_INET6)
-		, HTTPProvider(c, n, i, p, s)
+		, HTTP::Provider(c, n, i, p, s)
 		, Timer(c, 10, true)
 		, timeout(t)
 	{
@@ -317,17 +317,17 @@ public:
 		return c;
 	}
 
-	bool RegisterPage(HTTPPage *page) override
+	bool RegisterPage(HTTP::Page *page) override
 	{
 		return this->pages.emplace(page->GetURL(), page).second;
 	}
 
-	void UnregisterPage(HTTPPage *page) override
+	void UnregisterPage(HTTP::Page *page) override
 	{
 		this->pages.erase(page->GetURL());
 	}
 
-	HTTPPage *FindPage(const Anope::string &pname) override
+	HTTP::Page *FindPage(const Anope::string &pname) override
 	{
 		if (this->pages.count(pname) == 0)
 			return NULL;
@@ -360,25 +360,25 @@ public:
 		this->providers.clear();
 	}
 
-	void OnReload(Configuration::Conf *config) override
+	void OnReload(Configuration::Conf &config) override
 	{
-		Configuration::Block *conf = config->GetModule(this);
+		const auto &conf = config.GetModule(this);
 		std::set<Anope::string> existing;
 
-		for (int i = 0; i < conf->CountBlock("httpd"); ++i)
+		for (int i = 0; i < conf.CountBlock("httpd"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("httpd", i);
+			const auto &block = conf.GetBlock("httpd", i);
 
 
-			const Anope::string &hname = block->Get<const Anope::string>("name", "httpd/main");
+			const Anope::string &hname = block.Get<const Anope::string>("name", "httpd/main");
 			existing.insert(hname);
 
-			Anope::string ip = block->Get<const Anope::string>("ip");
-			int port = block->Get<int>("port", "8080");
-			int timeout = block->Get<int>("timeout", "30");
-			bool ssl = block->Get<bool>("ssl", "no");
-			Anope::string ext_ip = block->Get<const Anope::string>("extforward_ip");
-			Anope::string ext_header = block->Get<const Anope::string>("extforward_header");
+			Anope::string ip = block.Get<const Anope::string>("ip");
+			int port = block.Get<int>("port", "8080");
+			int timeout = block.Get<int>("timeout", "30");
+			bool ssl = block.Get<bool>("ssl", "no");
+			Anope::string ext_ip = block.Get<const Anope::string>("extforward_ip");
+			Anope::string ext_header = block.Get<const Anope::string>("extforward_header");
 
 			if (ip.empty())
 			{
@@ -443,7 +443,7 @@ public:
 
 		for (std::map<Anope::string, MyHTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end;)
 		{
-			HTTPProvider *p = it->second;
+			HTTP::Provider *p = it->second;
 			++it;
 
 			if (existing.count(p->name) == 0)

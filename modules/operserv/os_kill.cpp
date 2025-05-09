@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -35,7 +35,7 @@ public:
 		{
 			if (reason.empty())
 				reason = "No reason specified";
-			if (Config->GetModule("operserv")->Get<bool>("addakiller"))
+			if (Config->GetModule("operserv").Get<bool>("addakiller"))
 				reason = "(" + source.GetNick() + ") " + reason;
 			Log(LOG_ADMIN, source, this) << "on " << u2->nick << " for " << reason;
 			u2->Kill(*source.service, reason);
@@ -46,9 +46,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to kill a user from the network.\n"
-				"Parameters are the same as for the standard /KILL\n"
-				"command."));
+		source.Reply(_(
+			"Allows you to kill a user from the network. "
+			"Parameters are the same as for the standard /KILL "
+			"command."
+		));
 		return true;
 	}
 };

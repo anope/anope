@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,9 @@
  */
 
 #include "module.h"
-#include "modules/ns_cert.h"
+#include "modules/nickserv/cert.h"
+
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
 class NSGroupRequest final
 	: public IdentifyRequest
@@ -21,7 +23,14 @@ class NSGroupRequest final
 	Reference<NickAlias> target;
 
 public:
-	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(o, targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
+	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass)
+		: IdentifyRequest(o, targ->nc->display, pass, src.ip)
+		, source(src)
+		, cmd(c)
+		, nick(n)
+		, target(targ)
+	{
+	}
 
 	void OnSuccess() override
 	{
@@ -42,7 +51,7 @@ public:
 		}
 
 		na = new NickAlias(nick, target->nc);
-		na->time_registered = na->last_seen = Anope::CurTime;
+		na->registered = na->last_seen = Anope::CurTime;
 
 		if (u != NULL)
 		{
@@ -129,7 +138,7 @@ public:
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
+		if (Config->GetModule("nickserv").Get<bool>("restrictopernicks"))
 		{
 			for (auto *o : Oper::opers)
 			{
@@ -142,19 +151,21 @@ public:
 		}
 
 		NickAlias *target, *na = NickAlias::Find(source.GetNick());
-		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
-		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
-		unsigned maxaliases = Config->GetModule(this->owner)->Get<unsigned>("maxaliases");
+		time_t reg_delay = Config->GetModule("nickserv").Get<time_t>("regdelay");
+		unsigned maxaliases = Config->GetModule(this->owner).Get<unsigned>("maxaliases");
 		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (user && Anope::CurTime < user->lastnickreg + reg_delay)
-			source.Reply(_("Please wait %lu seconds before using the GROUP command again."), (unsigned long)(reg_delay + user->lastnickreg) - Anope::CurTime);
+		{
+			auto waitperiod = (unsigned long)(reg_delay + user->lastnickreg) - Anope::CurTime;
+			source.Reply(_("Please wait %s before using the GROUP command again."), Anope::Duration(waitperiod, source.GetAccount()).c_str());
+		}
 		else if (target->nc->HasExt("NS_SUSPENDED"))
 		{
 			Log(LOG_COMMAND, source, this) << "and tried to group to SUSPENDED nick " << target->nick;
 			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
 		}
-		else if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
+		else if (na && Config->GetModule(this->owner).Get<bool>("nogroupchange"))
 			source.Reply(_("Your nick is already registered."));
 		else if (na && *target->nc == *na->nc)
 			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
@@ -162,12 +173,8 @@ public:
 			source.Reply(NICK_IDENTIFY_REQUIRED);
 		else if (maxaliases && target->nc->aliases->size() >= maxaliases && !target->nc->IsServicesOper())
 			source.Reply(_("There are too many nicks in your group."));
-		else if (source.GetNick().length() <= guestnick.length() + 7 &&
-			source.GetNick().length() >= guestnick.length() + 1 &&
-			!source.GetNick().find_ci(guestnick) && !source.GetNick().substr(guestnick.length()).find_first_not_of("1234567890"))
-		{
+		else if (nickserv && nickserv->IsGuestNick(source.GetNick()))
 			source.Reply(NICK_CANNOT_BE_REGISTERED, source.GetNick().c_str());
-		}
 		else
 		{
 			bool ok = false;
@@ -200,32 +207,34 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command makes your nickname join the \037target\037 nickname's\n"
-				"group. \037password\037 is the password of the target nickname.\n"
-				" \n"
-				"Joining a group will allow you to share your configuration,\n"
-				"memos, and channel privileges with all the nicknames in the\n"
-				"group, and much more!\n"
-				" \n"
-				"A group exists as long as it is useful. This means that even\n"
-				"if a nick of the group is dropped, you won't lose the\n"
-				"shared things described above, as long as there is at\n"
-				"least one nick remaining in the group.\n"
-				" \n"
-				"You may be able to use this command even if you have not registered\n"
-				"your nick yet. If your nick is already registered, you'll\n"
-				"need to identify yourself before using this command.\n"
-				" \n"
-				"It is recommended to use this command with a non-registered\n"
-				"nick because it will be registered automatically when\n"
-				"using this command. You may use it with a registered nick (to\n"
-				"change your group) only if your network administrators allowed\n"
-				"it.\n"
-				" \n"
-				"You can only be in one group at a time. Group merging is\n"
-				"not possible.\n"
-				" \n"
-				"\037Note\037: all the nicknames of a group have the same password."));
+		source.Reply(_(
+			"This command makes your nickname join the \037target\037 nickname's "
+			"group. \037password\037 is the password of the target nickname. "
+			"\n\n"
+			"Joining a group will allow you to share your configuration, "
+			"memos, and channel privileges with all the nicknames in the "
+			"group, and much more!"
+			"\n\n"
+			"A group exists as long as it is useful. This means that even "
+			"if a nick of the group is dropped, you won't lose the "
+			"shared things described above, as long as there is at "
+			"least one nick remaining in the group."
+			"\n\n"
+			"You may be able to use this command even if you have not registered "
+			"your nick yet. If your nick is already registered, you'll "
+			"need to identify yourself before using this command. "
+			"\n\n"
+			"It is recommended to use this command with a non-registered "
+			"nick because it will be registered automatically when "
+			"using this command. You may use it with a registered nick (to "
+			"change your group) only if your network administrators allowed "
+			"it."
+			"\n\n"
+			"You can only be in one group at a time. Group merging is "
+			"not possible. "
+			"\n\n"
+			"\037Note\037: all the nicknames of a group have the same password."
+		));
 		return true;
 	}
 };
@@ -285,11 +294,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command ungroups your nick, or if given, the specified nick,\n"
-				"from the group it is in. The ungrouped nick keeps its registration\n"
-				"time, password, email, greet, language, and url. Everything else\n"
-				"is reset. You may not ungroup yourself if there is only one nick in\n"
-				"your group."));
+		source.Reply(_(
+			"This command ungroups your nick, or if given, the specified nick, "
+			"from the group it is in. The ungrouped nick keeps its registration "
+			"time, password, email, greet, language, and url. Everything else "
+			"is reset. You may not ungroup yourself if there is only one nick in "
+			"your group."
+		));
 		return true;
 	}
 };
@@ -301,6 +312,7 @@ public:
 	CommandNSGList(Module *creator) : Command(creator, "nickserv/glist", 0, 1)
 	{
 		this->SetDesc(_("Lists all nicknames in your group"));
+		this->SetSyntax(_("[\037nickname\037]"), [](auto &source) { return source.IsServicesOper(); });
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -329,8 +341,8 @@ public:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
-		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire", "90d"),
-		       unconfirmed_expire = Config->GetModule("ns_register")->Get<time_t>("unconfirmedexpire", "1d");
+		time_t nickserv_expire = Config->GetModule("nickserv").Get<time_t>("expire", "90d"),
+		       unconfirmed_expire = Config->GetModule("ns_register").Get<time_t>("unconfirmedexpire", "1d");
 		for (auto *na2 : *nc->aliases)
 		{
 			Anope::string expires;
@@ -339,7 +351,7 @@ public:
 			else if (!nickserv_expire || Anope::NoExpire)
 				;
 			else if (na2->nc->HasExt("UNCONFIRMED") && unconfirmed_expire)
-				expires = Anope::strftime(na2->time_registered + unconfirmed_expire, source.GetAccount());
+				expires = Anope::strftime(na2->registered + unconfirmed_expire, source.GetAccount());
 			else
 				expires = Anope::strftime(na2->last_seen + nickserv_expire, source.GetAccount());
 
@@ -356,25 +368,28 @@ public:
 		for (const auto &reply : replies)
 			source.Reply(reply);
 
-		source.Reply(_("%zu nickname(s) in the group."), nc->aliases->size());
+		source.Reply(nc->aliases->size(), N_("%zu nickname in the group.", "%zu nicknames in the group."), nc->aliases->size());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
+		this->SendSyntax(source);
 		if (source.IsServicesOper())
-			source.Reply(_("Syntax: \002%s [\037nickname\037]\002\n"
-					" \n"
-					"Without a parameter, lists all nicknames that are in\n"
-					"your group.\n"
-					" \n"
-					"With a parameter, lists all nicknames that are in the\n"
-					"group of the given nick.\n"
-					"Specifying a nick is limited to \002Services Operators\002."),
-					source.command.c_str());
+		{
+			source.Reply(_(
+				"Without a parameter, lists all nicknames that are in "
+				"your group."
+				"\n\n"
+				"With a parameter, lists all nicknames that are in the "
+				"group of the given nick."
+				"\n\n"
+				"Specifying a nick is limited to \002Services Operators\002."
+			));
+		}
 		else
-			source.Reply(_("Syntax: \002%s\002\n"
-					" \n"
-					"Lists all nicks in your group."), source.command.c_str());
+		{
+			source.Reply(_("Lists all nicks in your group."));
+		}
 
 		return true;
 	}
@@ -391,7 +406,7 @@ public:
 	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsgroup(this), commandnsungroup(this), commandnsglist(this)
 	{
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 	}
 };

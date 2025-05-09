@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -30,11 +30,15 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Configures bot options.\n"
-			" \n"
-			"Available options:"));
-		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
-		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
+		source.Reply(_(
+			"Configures bot options."
+			"\n\n"
+			"Available options:"
+		));
+		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options").Get<bool>("hideregisteredcommands");
+
+		HelpWrapper help;
 		Anope::string this_name = source.command;
 		for (const auto &[c_name, info] : source.service->commands)
 		{
@@ -54,12 +58,14 @@ public:
 						continue;
 
 					source.command = c_name;
-					command->OnServHelp(source);
+					command->OnServHelp(source, help);
 				}
 			}
 		}
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information on a\n"
-				"particular option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
+		help.SendTo(source);
+
+		source.Reply(_("Type \002%s\032\037option\037\002 for more information on a particular option."),
+			source.service->GetQueryCommand("generic/help", this_name).c_str());
 
 		return true;
 	}
@@ -150,11 +156,13 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_(" \n"
-				"Sets the time bot bans expire in. If enabled, any bans placed by\n"
-				"bots, such as flood kicker, badwords kicker, etc. will automatically\n"
-				"be removed after the given time. Set to 0 to disable bans from\n"
-				"automatically expiring."));
+		source.Reply(" ");
+		source.Reply(_(
+			"Sets the time bot bans expire in. If enabled, any bans placed by "
+			"bots, such as flood kicker, badwords kicker, etc. will automatically "
+			"be removed after the given time. Set to 0 to disable bans from "
+			"automatically expiring."
+		));
 		return true;
 	}
 };
@@ -203,9 +211,11 @@ public:
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
-		source.Reply(_(" \n"
-			"This option prevents a bot from being assigned to a\n"
-			"channel by users that aren't IRC Operators."));
+		source.Reply(" ");
+		source.Reply(_(
+			"This option prevents a bot from being assigned to a "
+			"channel by users that aren't IRC Operators."
+		));
 		return true;
 	}
 };

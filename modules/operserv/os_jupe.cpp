@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -54,14 +54,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Tells services to jupiter a server -- that is, to create\n"
-				"a fake \"server\" connected to services which prevents\n"
-				"the real server of that name from connecting.  The jupe\n"
-				"may be removed using a standard \002SQUIT\002. If a reason is\n"
-				"given, it is placed in the server information field;\n"
-				"otherwise, the server information field will contain the\n"
-				"text \"Juped by <nick>\", showing the nickname of the\n"
-				"person who jupitered the server."));
+		source.Reply(_(
+			"Tells services to jupiter a server -- that is, to create "
+			"a fake \"server\" connected to services which prevents "
+			"the real server of that name from connecting. The jupe "
+			"may be removed using a standard \002SQUIT\002. If a reason is "
+			"given, it is placed in the server information field; "
+			"otherwise, the server information field will contain the "
+			"text \"Juped by <nick>\", showing the nickname of the "
+			"person who jupitered the server."
+		));
 		return true;
 	}
 };

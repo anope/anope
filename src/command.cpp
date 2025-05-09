@@ -1,7 +1,7 @@
 /*
  *
  * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * (C) 2008-2024 Anope Team <team@anope.org>
+ * (C) 2008-2025 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */
@@ -26,7 +26,7 @@ CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core,
 	: nick(n)
 	, u(user)
 	, nc(core)
-	, ip(user ? user->ip.str() : "")
+	, ip(user ? user->ip.addr() : "")
 	, reply(r)
 	, service(bi)
 	, msgid(m)
@@ -113,7 +113,22 @@ void CommandSource::Reply(const char *message, ...)
 	va_start(args, message);
 	vsnprintf(buf, sizeof(buf), translated_message, args);
 
-	this->Reply(Anope::string(buf));
+	this->reply->SendMessage(*this, buf);
+
+	va_end(args);
+}
+
+void CommandSource::Reply(int count, const char *single, const char *plural, ...)
+{
+	va_list args;
+	char buf[4096]; // Messages can be really big.
+
+	const char *translated_message = Language::Translate(this->nc, count, single, plural);
+
+	va_start(args, plural);
+	vsnprintf(buf, sizeof(buf), translated_message, args);
+
+	this->reply->SendMessage(*this, buf);
 
 	va_end(args);
 }
@@ -121,11 +136,7 @@ void CommandSource::Reply(const char *message, ...)
 void CommandSource::Reply(const Anope::string &message)
 {
 	const char *translated_message = Language::Translate(this->nc, message.c_str());
-
-	sepstream sep(translated_message, '\n', true);
-	Anope::string tok;
-	while (sep.GetToken(tok))
-		this->reply->SendMessage(*this, tok);
+	this->reply->SendMessage(*this, translated_message);
 }
 
 Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(o)
@@ -143,23 +154,35 @@ void Command::ClearSyntax()
 	this->syntax.clear();
 }
 
-void Command::SetSyntax(const Anope::string &s)
+void Command::SetSyntax(const Anope::string &s, const std::function<bool(CommandSource&)> &p)
 {
-	this->syntax.push_back(s);
+	this->syntax.emplace_back(s, p);
 }
 
 void Command::SendSyntax(CommandSource &source)
 {
-	Anope::string s = Language::Translate(source.GetAccount(), _("Syntax"));
-	if (!this->syntax.empty())
+	auto first = true;
+	Anope::string prefix = Language::Translate(source.GetAccount(), _("Syntax"));
+	for (const auto &[syntax, predicate] : this->syntax)
 	{
-		source.Reply("%s: \002%s %s\002", s.c_str(), source.command.c_str(), Language::Translate(source.GetAccount(), this->syntax[0].c_str()));
-		Anope::string spaces(s.length(), ' ');
-		for (unsigned i = 1, j = this->syntax.size(); i < j; ++i)
-			source.Reply("%s  \002%s %s\002", spaces.c_str(), source.command.c_str(), Language::Translate(source.GetAccount(), this->syntax[i].c_str()));
+		if (predicate && !predicate(source))
+			continue; // Not for this user.
+
+		if (first)
+		{
+			first = false;
+			source.Reply("%s: \002%s %s\002", prefix.c_str(), source.command.nobreak().c_str(),
+				Language::Translate(source.GetAccount(), syntax.c_str()));
+		}
+		else
+		{
+			source.Reply("%-*s  \002%s %s\002", (int)prefix.length(), "", source.command.nobreak().c_str(),
+				Language::Translate(source.GetAccount(), syntax.c_str()));
+		}
 	}
-	else
-		source.Reply("%s: \002%s\002", s.c_str(), source.command.c_str());
+
+	if (first)
+		source.Reply("%s: \002%s\002", prefix.c_str(), source.command.nobreak().c_str());
 }
 
 bool Command::AllowUnregistered() const
@@ -187,9 +210,9 @@ const Anope::string Command::GetDesc(CommandSource &) const
 	return this->desc;
 }
 
-void Command::OnServHelp(CommandSource &source)
+void Command::OnServHelp(CommandSource &source, HelpWrapper &help)
 {
-	source.Reply("    %-14s %s", source.command.c_str(), Language::Translate(source.nc, this->GetDesc(source).c_str()));
+	help.AddEntry(source.command, this->GetDesc(source));
 }
 
 bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }
@@ -197,9 +220,14 @@ bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { r
 void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 {
 	this->SendSyntax(source);
-	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
-	if (has_help)
-		source.Reply(MORE_INFO, Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
+
+	auto it = std::find_if(source.service->commands.begin(), source.service->commands.end(), [](const auto &cmd)
+	{
+		// The help command may not be called HELP.
+		return cmd.second.name == "generic/help";
+	});
+	if (it == source.service->commands.end())
+		source.Reply(MORE_INFO, source.service->GetQueryCommand("generic/help", source.command).c_str());
 }
 
 namespace
@@ -207,7 +235,7 @@ namespace
 	void HandleUnknownCommand(CommandSource& source, const Anope::string &message)
 	{
 		// Try to find a similar command.
-		size_t distance = Config->GetBlock("options")->Get<size_t>("didyoumeandifference", "4");
+		size_t distance = Config->GetBlock("options").Get<size_t>("didyoumeandifference", "4");
 		Anope::string similar;
 		auto umessage = message.upper();
 		for (const auto &[command, info] : source.service->commands)
@@ -226,13 +254,13 @@ namespace
 		bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 		if (has_help && similar.empty())
 		{
-			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(),
-				Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			source.Reply(_("Unknown command \002%s\002. \"%s\" for help."), message.c_str(),
+				source.service->GetQueryCommand("generic/help").c_str());
 		}
 		else if (has_help)
 		{
-			source.Reply(_("Unknown command \002%s\002. Did you mean \002%s\002? \"%s%s HELP\" for help."),
-				message.c_str(), similar.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			source.Reply(_("Unknown command \002%s\002. Did you mean \002%s\002? \"%s\" for help."),
+				message.c_str(), similar.c_str(), source.service->GetQueryCommand("generic/help").c_str());
 		}
 		else if (similar.empty())
 		{
@@ -245,7 +273,7 @@ namespace
 	}
 }
 
-void Command::Run(CommandSource &source, const Anope::string &message)
+bool Command::Run(CommandSource &source, const Anope::string &message)
 {
 	std::vector<Anope::string> params;
 	spacesepstream(message).GetTokens(params);
@@ -266,7 +294,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	if (it == source.service->commands.end())
 	{
 		HandleUnknownCommand(source, message);
-		return;
+		return false;
 	}
 
 	const CommandInfo &info = it->second;
@@ -275,7 +303,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	{
 		HandleUnknownCommand(source, message);
 		Log(source.service) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";
-		return;
+		return false;
 	}
 
 	for (unsigned i = 0, j = params.size() - (count - 1); i < j; ++i)
@@ -287,13 +315,13 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 		params.erase(params.begin() + c->max_params);
 	}
 
-	c->Run(source, it->first, info, params);
+	return c->Run(source, it->first, info, params);
 }
 
-void Command::Run(CommandSource &source, const Anope::string &cmdname, const CommandInfo &info, std::vector<Anope::string> &params)
+bool Command::Run(CommandSource &source, const Anope::string &cmdname, const CommandInfo &info, std::vector<Anope::string> &params)
 {
 	if (this->RequireUser() && !source.GetUser())
-		return;
+		return false;
 
 	// Command requires registered users only
 	if (!this->AllowUnregistered() && !source.nc)
@@ -301,7 +329,7 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 		source.Reply(NICK_IDENTIFY_REQUIRED);
 		if (source.GetUser())
 			Log(LOG_NORMAL, "access_denied_unreg", source.service) << "Access denied for unregistered user " << source.GetUser()->GetMask() << " with command " << cmdname;
-		return;
+		return false;
 	}
 
 	source.command = cmdname;
@@ -310,12 +338,12 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(OnPreCommand, MOD_RESULT, (source, this, params));
 	if (MOD_RESULT == EVENT_STOP)
-		return;
+		return false;
 
 	if (params.size() < this->min_params)
 	{
 		this->OnSyntaxError(source, !params.empty() ? params[params.size() - 1] : "");
-		return;
+		return false;
 	}
 
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
@@ -324,11 +352,12 @@ void Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 		source.Reply(ACCESS_DENIED);
 		if (source.GetUser())
 			Log(LOG_NORMAL, "access_denied", source.service) << "Access denied for user " << source.GetUser()->GetMask() << " with command " << cmdname;
-		return;
+		return false;
 	}
 
 	this->Execute(source, params);
 	FOREACH_MOD(OnPostCommand, (source, this, params));
+	return true;
 }
 
 bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo *&bot, Anope::string &name)

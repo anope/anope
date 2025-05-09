@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -23,7 +23,7 @@ typedef std::unordered_map<uint64_t, NickCore *> nickcoreid_map;
 
 extern CoreExport Serialize::Checker<nickalias_map> NickAliasList;
 extern CoreExport Serialize::Checker<nickcore_map> NickCoreList;
-extern CoreExport nickcoreid_map NickCoreIdList;
+extern CoreExport Serialize::Checker<nickcoreid_map> NickCoreIdList;
 
 /* A registered nickname.
  * It matters that Base is here before Extensible (it is inherited by Serializable)
@@ -32,6 +32,16 @@ class CoreExport NickAlias final
 	: public Serializable
 	, public Extensible
 {
+public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
+private:
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_created = 0;
 
@@ -43,7 +53,7 @@ public:
 	Anope::string last_usermask;
 	/* Last uncloaked usermask, requires nickserv/auspex to see */
 	Anope::string last_realhost;
-	time_t time_registered = Anope::CurTime;
+	time_t registered = Anope::CurTime;
 	time_t last_seen = Anope::CurTime;
 
 	/* Account this nick is tied to. Multiple nicks can be tied to a single account. */
@@ -55,9 +65,6 @@ public:
 	 */
 	NickAlias(const Anope::string &nickname, NickCore *nickcore);
 	~NickAlias();
-
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Set a vhost for the user
 	 * @param ident The ident
@@ -106,6 +113,7 @@ public:
 	 * @return the nick, if found
 	 */
 	static NickAlias *Find(const Anope::string &nick);
+	static NickAlias *FindId(uint64_t id);
 };
 
 /* A registered account. Each account must have a NickAlias with the same nick as the
@@ -116,6 +124,16 @@ class CoreExport NickCore final
 	: public Serializable
 	, public Extensible
 {
+public:
+	struct Type final
+		: public Serialize::Type
+	{
+		Type();
+		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
+	};
+
+private:
 	/* Channels which reference this core in some way (this is on their access list, akick list, is founder, successor, etc) */
 	Serialize::Checker<std::map<ChannelInfo *, int> > chanaccess;
 	/* Unique identifier for the account. */
@@ -131,9 +149,9 @@ public:
 	/* Last time an email was sent to this user */
 	time_t lastmail = 0;
 	/* The time this account was registered */
-	time_t time_registered = Anope::CurTime;
+	time_t registered = Anope::CurTime;
 	MemoInfo memos;
-	std::map<Anope::string, Anope::string> last_modes;
+	std::map<Anope::string, ModeData> last_modes;
 
 	/* Nicknames registered that are grouped to this account.
 	 * for n in aliases, n->nc == this.
@@ -159,9 +177,6 @@ public:
 	NickCore(const Anope::string &nickdisplay, uint64_t nickid = 0);
 	~NickCore();
 
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &);
-
 	/** Changes the display for this account
 	 * @param na The new display, must be grouped to this account.
 	 */
@@ -180,6 +195,7 @@ public:
 	 * @return The account, if it exists
 	 */
 	static NickCore *Find(const Anope::string &nick);
+	static NickCore *FindId(uint64_t id);
 
 	void AddChannelReference(ChannelInfo *ci);
 	void RemoveChannelReference(ChannelInfo *ci);
@@ -196,6 +212,7 @@ class CoreExport IdentifyRequest
 	Module *owner;
 	Anope::string account;
 	Anope::string password;
+	Anope::string address;
 
 	std::set<Module *> holds;
 	bool dispatched = false;
@@ -204,7 +221,7 @@ class CoreExport IdentifyRequest
 	static std::set<IdentifyRequest *> Requests;
 
 protected:
-	IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass);
+	IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass, const Anope::string &ip);
 	virtual ~IdentifyRequest();
 
 public:
@@ -215,6 +232,7 @@ public:
 	Module *GetOwner() const { return owner; }
 	const Anope::string &GetAccount() const { return account; }
 	const Anope::string &GetPassword() const { return password; }
+	const Anope::string &GetAddress() const { return address; }
 
 	/* Holds this request. When a request is held it must be Released later
 	 * for the request to complete. Multiple modules may hold a request at any time,

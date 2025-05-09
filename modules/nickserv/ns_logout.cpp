@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -20,7 +20,7 @@ public:
 	CommandNSLogout(Module *creator) : Command(creator, "nickserv/logout", 0, 2)
 	{
 		this->SetDesc(_("Reverses the effect of the IDENTIFY command"));
-		this->SetSyntax(_("[\037nickname\037 [REVALIDATE]]"));
+		this->SetSyntax(_("[\037nickname\037 [REVALIDATE]]"), [](auto &source) { return source.IsServicesOper(); });
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -64,15 +64,28 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Without a parameter, reverses the effect of the \002IDENTIFY\002\n"
-				"command, i.e. make you not recognized as the real owner of the nick\n"
-				"anymore. Note, however, that you won't be asked to reidentify\n"
-				"yourself.\n"
-				" \n"
-				"With a parameter, does the same for the given nick. If you\n"
-				"specify \002REVALIDATE\002 as well, services will ask the given nick\n"
-				"to re-identify. This is limited to \002Services Operators\002."));
 
+		if (source.IsServicesOper())
+		{
+			source.Reply(_(
+				"Without a parameter, reverses the effect of the \002IDENTIFY\002 "
+				"command, i.e. make you not recognized as the real owner of the nick "
+				"anymore. Note, however, that you won't be asked to reidentify "
+				"yourself."
+				"\n\n"
+				"With a parameter, does the same for the given nick. If you "
+				"specify \002REVALIDATE\002 as well, services will ask the given nick "
+				"to re-identify. This is limited to \002Services Operators\002."
+			));
+		}
+		else
+		{
+			source.Reply(_(
+				"Reverses the effect of the \002IDENTIFY\002 command, i.e. make you not "
+				"recognized as the real owner of the nick anymore. Note, however, that "
+				"you won't be asked to reidentify yourself."
+			));
+		}
 		return true;
 	}
 };

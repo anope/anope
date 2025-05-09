@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -194,7 +194,7 @@ public:
 
 	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 	{
-		data.Store(this->name, true);
+		data.Store(this->name, this->HasExt(e));
 	}
 
 	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override

@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_session.h"
+#include "modules/operserv/session.h"
 
 enum DefconLevel
 {
@@ -235,9 +235,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("The defcon system can be used to implement a pre-defined\n"
-				"set of restrictions to services useful during an attempted\n"
-				"attack on the network."));
+		source.Reply(_(
+			"The defcon system can be used to implement a pre-defined "
+			"set of restrictions to services useful during an attempted "
+			"attack on the network."
+		));
 		return true;
 	}
 };
@@ -331,31 +333,34 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *block = conf->GetModule(this);
 		DefconConfig dconfig;
 
-		dconfig.defaultlevel = block->Get<int>("defaultlevel");
-		dconfig.defcons[4] = block->Get<const Anope::string>("level4");
-		dconfig.defcons[3] = block->Get<const Anope::string>("level3");
-		dconfig.defcons[2] = block->Get<const Anope::string>("level2");
-		dconfig.defcons[1] = block->Get<const Anope::string>("level1");
-		dconfig.sessionlimit = block->Get<int>("sessionlimit");
-		dconfig.akillreason = block->Get<const Anope::string>("akillreason");
-		dconfig.akillexpire = block->Get<time_t>("akillexpire");
-		dconfig.chanmodes = block->Get<const Anope::string>("chanmodes");
-		dconfig.timeout = block->Get<time_t>("timeout");
-		dconfig.globalondefcon = block->Get<bool>("globalondefcon");
-		dconfig.message = block->Get<const Anope::string>("message");
-		dconfig.offmessage = block->Get<const Anope::string>("offmessage");
+		{
+		const auto &block = conf.GetModule(this);
+		dconfig.defaultlevel = block.Get<int>("defaultlevel");
+		dconfig.defcons[4] = block.Get<const Anope::string>("level4");
+		dconfig.defcons[3] = block.Get<const Anope::string>("level3");
+		dconfig.defcons[2] = block.Get<const Anope::string>("level2");
+		dconfig.defcons[1] = block.Get<const Anope::string>("level1");
+		dconfig.sessionlimit = block.Get<int>("sessionlimit");
+		dconfig.akillreason = block.Get<const Anope::string>("akillreason");
+		dconfig.akillexpire = block.Get<time_t>("akillexpire");
+		dconfig.chanmodes = block.Get<const Anope::string>("chanmodes");
+		dconfig.timeout = block.Get<time_t>("timeout");
+		dconfig.globalondefcon = block.Get<bool>("globalondefcon");
+		dconfig.message = block.Get<const Anope::string>("message");
+		dconfig.offmessage = block.Get<const Anope::string>("offmessage");
+		}
 
-		block = conf->GetModule("os_session");
-
-		dconfig.max_session_kill = block->Get<int>("maxsessionkill");
-		dconfig.session_autokill_expiry = block->Get<time_t>("sessionautokillexpiry");
-		dconfig.sle_reason = block->Get<const Anope::string>("sessionlimitexceeded");
-		dconfig.sle_detailsloc = block->Get<const Anope::string>("sessionlimitdetailsloc");
+		{
+		const auto &block = conf.GetModule("os_session");
+		dconfig.max_session_kill = block.Get<int>("maxsessionkill");
+		dconfig.session_autokill_expiry = block.Get<time_t>("sessionautokillexpiry");
+		dconfig.sle_reason = block.Get<const Anope::string>("sessionlimitexceeded");
+		dconfig.sle_detailsloc = block.Get<const Anope::string>("sessionlimitdetailsloc");
+		}
 
 		if (dconfig.defaultlevel < 1 || dconfig.defaultlevel > 5)
 			throw ConfigException("The value for <defcon:defaultlevel> must be between 1 and 5");
@@ -402,11 +407,11 @@ public:
 		this->ParseModeString();
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const ModeData &data) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOff.count(mode->name) && source.GetUser() && !source.GetBot())
 		{
-			c->RemoveMode(Config->GetClient("OperServ"), mode, param);
+			c->RemoveMode(Config->GetClient("OperServ"), mode, data.value);
 
 			return EVENT_STOP;
 		}
@@ -510,7 +515,9 @@ public:
 			{
 				if (!DConfig.sle_reason.empty())
 				{
-					Anope::string message = DConfig.sle_reason.replace_all_cs("%IP%", u->ip.addr());
+					auto message = Anope::Template(DConfig.sle_reason, {
+						{ "ip", u->ip.addr() },
+					});
 					u->SendMessage(OperServ, message);
 				}
 				if (!DConfig.sle_detailsloc.empty())

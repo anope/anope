@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -98,7 +98,7 @@ class NickServRelease final
 
 public:
 	NickServRelease(Module *me, NickAlias *na, time_t delay)
-		: User(na->nick, Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser", "user"), Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost", Me->GetName()), "", "", Me, "Services Enforcer", Anope::CurTime, "", {}, IRCD->UID_Retrieve(), NULL)
+		: User(na->nick, Config->GetModule(me).Get<const Anope::string>("enforceruser", "user"), Config->GetModule(me).Get<const Anope::string>("enforcerhost", Me->GetName()), "", "", Me, "Services Enforcer", Anope::CurTime, "", {}, IRCD->UID_Retrieve(), NULL)
 		, Timer(me, delay)
 		, nick(na->nick)
 	{
@@ -106,7 +106,7 @@ public:
 		Anope::map<NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
 		if (nit != NickServReleases.end())
 		{
-			IRCD->SendQuit(nit->second, "");
+			IRCD->SendQuit(nit->second);
 			delete nit->second;
 		}
 
@@ -117,7 +117,7 @@ public:
 
 	~NickServRelease() override
 	{
-		IRCD->SendQuit(this, "");
+		IRCD->SendQuit(this);
 		NickServReleases.erase(this->nick);
 	}
 
@@ -140,12 +140,12 @@ class NickServCore final
 		{
 			collided.Unset(na);
 
-			new NickServHeld(this, na, Config->GetModule("nickserv")->Get<time_t>("releasetimeout", "1m"));
+			new NickServHeld(this, na, Config->GetModule(this).Get<time_t>("releasetimeout", "1m"));
 
 			if (IRCD->CanSVSHold)
-				IRCD->SendSVSHold(na->nick, Config->GetModule("nickserv")->Get<time_t>("releasetimeout", "1m"));
+				IRCD->SendSVSHold(na->nick, Config->GetModule(this).Get<time_t>("releasetimeout", "1m"));
 			else
-				new NickServRelease(this, na, Config->GetModule("nickserv")->Get<time_t>("releasetimeout", "1m"));
+				new NickServRelease(this, na, Config->GetModule(this).Get<time_t>("releasetimeout", "1m"));
 		}
 	}
 
@@ -174,6 +174,24 @@ public:
 		OnShutdown();
 	}
 
+	bool IsGuestNick(const Anope::string &nick) const override
+	{
+		const auto guestnick = Config->GetModule(this).Get<Anope::string>("guestnick", "Guest####");
+		if (guestnick.empty())
+			return false; // No guest nick.
+
+		const auto minlen = std::min(nick.length(), guestnick.length());
+		for (size_t idx = 0; idx < minlen; ++idx)
+		{
+			if (guestnick[idx] == '#' && !isdigit(nick[idx]))
+				return false;
+
+			if (Anope::tolower(guestnick[idx]) != Anope::tolower(nick[idx]))
+				return false;
+		}
+		return true;
+	}
+
 	void Validate(User *u) override
 	{
 		NickAlias *na = NickAlias::Find(u->nick);
@@ -190,43 +208,39 @@ public:
 		else if (MOD_RESULT == EVENT_ALLOW)
 			return;
 
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 			return;
 
-		if (!na->nc->HasExt("KILL_IMMED"))
+		if (na->nc->HasExt("PROTECT"))
 		{
-			u->SendMessage(NickServ, NICK_IS_SECURE, Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
-		}
-		if (na->nc->HasExt("KILLPROTECT"))
-		{
-			if (na->nc->HasExt("KILL_IMMED"))
+			auto &block = Config->GetModule(this);
+			auto protectafter = na->nc->GetExt<time_t>("PROTECT_AFTER");
+
+			auto protect = protectafter ? *protectafter : block.Get<time_t>("defaultprotect", "1m");
+			protect = std::clamp(protect, block.Get<time_t>("minprotect", "10s"), block.Get<time_t>("maxprotect", "10m"));
+
+			if (protect)
+			{
+				u->SendMessage(NickServ, NICK_IS_SECURE, NickServ->GetQueryCommand("nickserv/identify").c_str());
+				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."),
+					Anope::Duration(protect, u->Account()).c_str());
+				new NickServCollide(this, this, u, na, protect);
+			}
+			else
 			{
 				u->SendMessage(NickServ, FORCENICKCHANGE_NOW);
 				this->Collide(u, na);
 			}
-			else if (na->nc->HasExt("KILL_QUICK"))
-			{
-				time_t killquick = Config->GetModule("nickserv")->Get<time_t>("killquick", "20s");
-				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(killquick, u->Account()).c_str());
-				new NickServCollide(this, this, u, na, killquick);
-			}
-			else
-			{
-				time_t kill = Config->GetModule("nickserv")->Get<time_t>("kill", "60s");
-				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(kill, u->Account()).c_str());
-				new NickServCollide(this, this, u, na, kill);
-			}
 		}
-
 	}
 
 	void OnUserLogin(User *u) override
 	{
 		NickAlias *na = NickAlias::Find(u->nick);
-		if (na && *na->nc == u->Account() && !Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && !na->nc->HasExt("UNCONFIRMED"))
+		if (na && *na->nc == u->Account() && !Config->GetModule("nickserv").Get<bool>("nonicknameownership") && !na->nc->HasExt("UNCONFIRMED"))
 			u->SetMode(NickServ, "REGISTERED");
 
-		const Anope::string &modesonid = Config->GetModule(this)->Get<Anope::string>("modesonid");
+		const Anope::string &modesonid = Config->GetModule(this).Get<Anope::string>("modesonid");
 		if (!modesonid.empty())
 			u->SetModes(NickServ, modesonid);
 	}
@@ -238,30 +252,47 @@ public:
 
 		if (IRCD->CanSVSNick)
 		{
-			unsigned nicklen = IRCD->MaxNick;
-			const Anope::string &guestprefix = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
-
+			auto guestnickok = false;
 			Anope::string guestnick;
-
-			int i = 0;
-			do
+			for (auto i = 0; i < 10; ++i)
 			{
-				guestnick = guestprefix + Anope::ToString(static_cast<uint16_t>(Anope::RandomNumber()));
-				if (guestnick.length() > nicklen)
-					guestnick = guestnick.substr(0, nicklen);
-			}
-			while (User::Find(guestnick) && i++ < 10);
+				guestnick.clear();
+				for (auto guestnickchr : Config->GetModule(this).Get<Anope::string>("guestnick", "Guest####").substr(0, IRCD->MaxNick))
+				{
+					if (guestnickchr == '#')
+						guestnick.append(Anope::ToString(abs(Anope::RandomNumber()) % 10));
+					else
+						guestnick.push_back(guestnickchr);
+				}
 
-			if (i == 11)
-				u->Kill(*NickServ, "Services nickname-enforcer kill");
-			else
+				// A guest nick is valid if it is non-empty and is not in use.
+				if (!guestnick.empty() && !User::Find(guestnick, true))
+				{
+					guestnickok = true;
+					break;
+				}
+			}
+
+			// If we can't find a guest nick and the IRCd supports
+			// uids then we should use that as the backup guest
+			// nickname.
+			if (!guestnickok && IRCD->RequiresID)
+			{
+				guestnickok = true;
+				guestnick = u->GetUID();
+			}
+
+			if (guestnickok)
 			{
 				u->SendMessage(*NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
 				IRCD->SendForceNickChange(u, guestnick, Anope::CurTime);
+				return;
 			}
 		}
-		else
-			u->Kill(*NickServ, "Services nickname-enforcer kill");
+
+		// We can't change the user's nickname or we can't find an
+		// acceptable guest nick, give them the boot.
+		u->Kill(*NickServ, "Enforcement of services protected nickname");
 	}
 
 	void Release(NickAlias *na) override
@@ -284,9 +315,9 @@ public:
 		collided.Unset(na); /* clear pending collide */
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		const Anope::string &nsnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &nsnick = conf.GetModule(this).Get<const Anope::string>("client");
 
 		if (nsnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
@@ -297,7 +328,7 @@ public:
 
 		NickServ = bi;
 
-		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "memo_signon memo_receive")).GetTokens(defaults);
+		spacesepstream(conf.GetModule(this).Get<const Anope::string>("defaults", "memo_signon memo_receive")).GetTokens(defaults);
 		if (defaults.empty())
 		{
 			defaults.emplace_back("MEMO_SIGNON");
@@ -341,9 +372,9 @@ public:
 
 	void OnNickIdentify(User *u) override
 	{
-		Configuration::Block *block = Config->GetModule(this);
+		const auto &block = Config->GetModule(this);
 
-		if (block->Get<bool>("modeonid", "yes"))
+		if (block.Get<bool>("modeonid", "yes"))
 		{
 			for (const auto &[_, cc] : u->chans)
 			{
@@ -353,17 +384,19 @@ public:
 			}
 		}
 
-		const Anope::string &modesonid = block->Get<const Anope::string>("modesonid");
+		const Anope::string &modesonid = block.Get<const Anope::string>("modesonid");
 		if (!modesonid.empty())
 			u->SetModes(NickServ, modesonid);
 
-		if (block->Get<bool>("forceemail", "yes") && u->Account()->email.empty())
+		if (block.Get<bool>("forceemail", "yes") && u->Account()->email.empty())
 		{
-			u->SendMessage(NickServ, _("You must now supply an email for your nick.\n"
-							"This email will allow you to retrieve your password in\n"
-							"case you forget it."));
-			u->SendMessage(NickServ, _("Type \002%s%s SET EMAIL \037email\037\002 in order to set your email."),
-				Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
+			u->SendMessage(NickServ, _(
+					"You must now supply an email for your nick. "
+					"This email will allow you to retrieve your password in "
+					"case you forget it. "
+					"Type \002%s\032\037email\037\002 in order to set your email."
+				),
+				NickServ->GetQueryCommand("nickserv/set/email").c_str());
 		}
 
 		for (auto *c : collides)
@@ -399,9 +432,14 @@ public:
 
 		const NickAlias *na = NickAlias::Find(u->nick);
 
-		const Anope::string &unregistered_notice = Config->GetModule(this)->Get<const Anope::string>("unregistered_notice");
-		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na && !u->Account())
-			u->SendMessage(NickServ, unregistered_notice.replace_all_cs("%n", u->nick));
+		const Anope::string &unregistered_notice = Config->GetModule(this).Get<const Anope::string>("unregistered_notice");
+		if (!Config->GetModule("nickserv").Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na && !u->IsIdentified())
+		{
+			auto msg = Anope::Template(unregistered_notice, {
+				{ "nick", u->nick },
+			});
+			u->SendMessage(NickServ, msg);
+		}
 		else if (na && !u->IsIdentified(true))
 			this->Validate(u);
 	}
@@ -442,7 +480,7 @@ public:
 		{
 			/* Reset +r and re-send account (even though it really should be set at this point) */
 			IRCD->SendLogin(u, na);
-			if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->nc == u->Account() && !na->nc->HasExt("UNCONFIRMED"))
+			if (!Config->GetModule("nickserv").Get<bool>("nonicknameownership") && na->nc == u->Account() && !na->nc->HasExt("UNCONFIRMED"))
 				u->SetMode(NickServ, "REGISTERED");
 			Log(u, "", NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;
 		}
@@ -461,19 +499,34 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *NickServ)
 			return EVENT_CONTINUE;
-		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
-			source.Reply(_("\002%s\002 allows you to register a nickname and\n"
-				"prevent others from using it. The following\n"
-				"commands allow for registration and maintenance of\n"
-				"nicknames; to use them, type \002%s%s \037command\037\002.\n"
-				"For more information on a specific command, type\n"
-				"\002%s%s %s \037command\037\002.\n"), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), source.command.c_str());
+
+		if (!Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
+		{
+			source.Reply(_(
+					"\002%s\002 allows you to register a nickname and "
+					"prevent others from using it. The following "
+					"commands allow for registration and maintenance of "
+					"nicknames; to use them, type \002%s\032\037command\037\002. "
+					"For more information on a specific command, type "
+					"\002%s\032\037command\037\002."
+				),
+				NickServ->nick.c_str(),
+				NickServ->GetQueryCommand().c_str(),
+				NickServ->GetQueryCommand({}, source.command).c_str());
+		}
 		else
-			source.Reply(_("\002%s\002 allows you to register an account.\n"
-				"The following commands allow for registration and maintenance of\n"
-				"accounts; to use them, type \002%s%s \037command\037\002.\n"
-				"For more information on a specific command, type\n"
-				"\002%s%s %s \037command\037\002.\n"), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), source.command.c_str());
+		{
+			source.Reply(_(
+					"\002%s\002 allows you to register an account. "
+					"The following commands allow for registration and maintenance of "
+					"accounts; to use them, type \002%s\032\037command\037\002. "
+					"For more information on a specific command, type "
+					"\002%s\032\037command\037\002."
+				),
+				NickServ->nick.c_str(),
+				NickServ->GetQueryCommand().c_str(),
+				NickServ->GetQueryCommand({}, source.command).c_str());
+		}
 		return EVENT_CONTINUE;
 	}
 
@@ -481,17 +534,28 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *NickServ)
 			return;
+
 		if (source.IsServicesOper())
-			source.Reply(_(" \n"
-				"Services Operators can also drop any nickname without needing\n"
-				"to identify for the nick, and may view the access list for\n"
-				"any nickname."));
-		time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire", "1y");
-		if (nickserv_expire >= 86400)
-			source.Reply(_(" \n"
-				"Accounts that are not used anymore are subject to\n"
-				"the automatic expiration, i.e. they will be deleted\n"
-				"after %lu days if not used."), (unsigned long)nickserv_expire / 86400);
+		{
+			source.Reply(" ");
+			source.Reply(_(
+				"Services Operators can also drop any nickname without needing "
+				"to identify for the nick, and may view the access list for "
+				"any nickname."
+			));
+		}
+
+		time_t nickserv_expire = Config->GetModule(this).Get<time_t>("expire", "1y");
+		if (nickserv_expire)
+		{
+			source.Reply(" ");
+			source.Reply(_(
+					"Accounts that are not used anymore are subject to "
+					"the automatic expiration, i.e. they will be deleted "
+					"after %s if not used."
+				),
+				Anope::Duration(nickserv_expire, source.nc).c_str());
+		}
 	}
 
 	void OnNickCoreCreate(NickCore *nc) override
@@ -503,7 +567,7 @@ public:
 
 	void OnUserQuit(User *u, const Anope::string &msg) override
 	{
-		if (u->server && !u->server->GetQuitReason().empty() && Config->GetModule(this)->Get<bool>("hidenetsplitquit"))
+		if (u->server && !u->server->GetQuitReason().empty() && Config->GetModule(this).Get<bool>("hidenetsplitquit"))
 			return;
 
 		/* Update last quit and last seen for the user */
@@ -520,7 +584,7 @@ public:
 		if (Anope::NoExpire || Anope::ReadOnly)
 			return;
 
-		time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire", "90d");
+		time_t nickserv_expire = Config->GetModule(this).Get<time_t>("expire", "90d");
 
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; )
 		{
@@ -536,7 +600,7 @@ public:
 			if (nickserv_expire && Anope::CurTime - na->last_seen >= nickserv_expire)
 				expire = true;
 
-			if (na->nc->na == na && na->nc->aliases->size() > 1 && Config->GetModule("nickserv")->Get<bool>("preservedisplay"))
+			if (na->nc->na == na && na->nc->aliases->size() > 1 && Config->GetModule("nickserv").Get<bool>("preservedisplay"))
 				expire = false;
 
 			FOREACH_MOD(OnPreNickExpire, (na, expire));
@@ -554,14 +618,14 @@ public:
 	{
 		if (!na->nc->HasExt("UNCONFIRMED"))
 		{
-			time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire", "1y");
+			time_t nickserv_expire = Config->GetModule(this).Get<time_t>("expire", "1y");
 			if (!na->HasExt("NS_NO_EXPIRE") && nickserv_expire && !Anope::NoExpire && (source.HasPriv("nickserv/auspex") || na->last_seen != Anope::CurTime))
 				info[_("Expires")] = Anope::strftime(na->last_seen + nickserv_expire, source.GetAccount());
 		}
 		else
 		{
-			time_t unconfirmed_expire = Config->GetModule("ns_register")->Get<time_t>("unconfirmedexpire", "1d");
-			info[_("Expires")] = Anope::strftime(na->time_registered + unconfirmed_expire, source.GetAccount());
+			time_t unconfirmed_expire = Config->GetModule("ns_register").Get<time_t>("unconfirmedexpire", "1d");
+			info[_("Expires")] = Anope::strftime(na->registered + unconfirmed_expire, source.GetAccount());
 		}
 	}
 };

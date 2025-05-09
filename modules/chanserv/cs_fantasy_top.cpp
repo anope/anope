@@ -1,6 +1,6 @@
 /* Chanstats core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -104,10 +104,10 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		prefix = conf->GetModule("chanstats")->Get<const Anope::string>("prefix", "anope_");
-		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("chanstats")->Get<const Anope::string>("engine"));
+		prefix = conf.GetModule("chanstats").Get<const Anope::string>("prefix", "anope_");
+		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf.GetModule("chanstats").Get<const Anope::string>("engine"));
 	}
 
 	SQL::Result RunQuery(const SQL::Query &query)

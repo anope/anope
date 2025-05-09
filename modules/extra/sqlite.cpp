@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2011-2024 Anope Team
+ * (C) 2011-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -103,6 +103,7 @@ class ModuleSQLite final
 public:
 	ModuleSQLite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
+		Log(this) << "Module was compiled against SQLite version " << SQLITE_VERSION << " and is running against version " << sqlite3_libversion();
 	}
 
 	~ModuleSQLite()
@@ -112,9 +113,9 @@ public:
 		SQLiteServices.clear();
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = conf->GetModule(this);
+		const auto &config = conf.GetModule(this);
 
 		for (std::map<Anope::string, SQLiteService *>::iterator it = this->SQLiteServices.begin(); it != this->SQLiteServices.end();)
 		{
@@ -123,8 +124,8 @@ public:
 			int i, num;
 			++it;
 
-			for (i = 0, num = config->CountBlock("sqlite"); i < num; ++i)
-				if (config->GetBlock("sqlite", i)->Get<const Anope::string>("name", "sqlite/main") == cname)
+			for (i = 0, num = config.CountBlock("sqlite"); i < num; ++i)
+				if (config.GetBlock("sqlite", i).Get<const Anope::string>("name", "sqlite/main") == cname)
 					break;
 
 			if (i == num)
@@ -136,14 +137,14 @@ public:
 			}
 		}
 
-		for (int i = 0; i < config->CountBlock("sqlite"); ++i)
+		for (int i = 0; i < config.CountBlock("sqlite"); ++i)
 		{
-			Configuration::Block *block = config->GetBlock("sqlite", i);
-			Anope::string connname = block->Get<const Anope::string>("name", "sqlite/main");
+			const auto &block = config.GetBlock("sqlite", i);
+			Anope::string connname = block.Get<const Anope::string>("name", "sqlite/main");
 
 			if (this->SQLiteServices.find(connname) == this->SQLiteServices.end())
 			{
-				auto database = Anope::ExpandData(block->Get<const Anope::string>("database", "anope"));
+				auto database = Anope::ExpandData(block.Get<const Anope::string>("database", "anope"));
 				try
 				{
 					auto *ss = new SQLiteService(this, connname, database);

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,6 +14,8 @@
 #ifndef _WIN32
 #include <sys/wait.h>
 #endif
+
+#include <filesystem>
 
 class SaveData final
 	: public Serialize::Data
@@ -38,11 +40,16 @@ class LoadData final
 	: public Serialize::Data
 {
 public:
-	std::fstream *fs = nullptr;
-	unsigned int id = 0;
+	std::fstream *fs;
+	Serializable::Id id = 0;
 	std::map<Anope::string, Anope::string> data;
 	std::stringstream ss;
 	bool read = false;
+
+	LoadData(std::fstream &fsref)
+		: fs(&fsref)
+	{
+	}
 
 	std::iostream &operator[](const Anope::string &key) override
 	{
@@ -52,7 +59,7 @@ public:
 			{
 				if (token.find("ID ") == 0)
 				{
-					this->id = Anope::Convert(token.substr(3), 0);
+					this->id = Anope::Convert<Serializable::Id>(token.substr(3), 0);
 					continue;
 				}
 				else if (token.find("DATA ") != 0)
@@ -94,8 +101,6 @@ class DBFlatFile final
 {
 	/* Day the last backup was on */
 	int last_day = 0;
-	/* Backup file names */
-	std::map<Anope::string, std::list<Anope::string> > backups;
 	bool loaded = false;
 
 	int child_pid = -1;
@@ -109,7 +114,7 @@ class DBFlatFile final
 			last_day = tm->tm_mday;
 
 			std::set<Anope::string> dbs;
-			dbs.insert(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+			dbs.insert(Config->GetModule(this).Get<const Anope::string>("database", "anope.db"));
 
 			for (const auto &type_order : Serialize::Type::GetTypeOrder())
 			{
@@ -119,11 +124,12 @@ class DBFlatFile final
 					dbs.insert("module_" + stype->GetOwner()->name + ".db");
 			}
 
-
+			const auto backupdir = Anope::ExpandData("backups");
 			for (const auto &db : dbs)
 			{
 				const auto oldname = Anope::ExpandData(db);
-				const auto newname = Anope::ExpandData("backups/" + db + "-" + Anope::ToString(tm->tm_year + 1900) + Anope::printf("-%02i-", tm->tm_mon + 1) + Anope::printf("%02i", tm->tm_mday));
+				const auto basename = Anope::Expand(backupdir, db + "-");
+				const auto newname = Anope::printf("%s%04i-%02i-%02i", basename.c_str(), tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 
 				/* Backup already exists or no database to backup */
 				if (Anope::IsFile(newname) || !Anope::IsFile(oldname))
@@ -135,7 +141,7 @@ class DBFlatFile final
 					Anope::string err = Anope::LastError();
 					Log(this) << "Unable to back up database " << db << " (" << err << ")!";
 
-					if (!Config->GetModule(this)->Get<bool>("nobackupokay"))
+					if (!Config->GetModule(this).Get<bool>("nobackupokay"))
 					{
 						Anope::Quitting = true;
 						Anope::QuitReason = "Unable to back up database " + db + " (" + err + ")";
@@ -144,13 +150,29 @@ class DBFlatFile final
 					continue;
 				}
 
-				backups[db].push_back(newname);
+				const auto keepbackups = Config->GetModule(this).Get<unsigned>("keepbackups", "7");
+				if (!keepbackups)
+					continue;
 
-				unsigned keepbackups = Config->GetModule(this)->Get<unsigned>("keepbackups");
-				if (keepbackups > 0 && backups[db].size() > keepbackups)
+				std::error_code ec;
+				std::set<Anope::string> old_backups;
+				for (const auto &entry : std::filesystem::directory_iterator(backupdir.str(), ec))
 				{
-					unlink(backups[db].front().c_str());
-					backups[db].pop_front();
+					Anope::string entryname = entry.path().string();
+					if (entryname.compare(0, basename.length(), basename) != 0)
+						continue;
+
+					old_backups.insert(entryname);
+					if (old_backups.size() <= keepbackups)
+						continue;
+
+					Log(LOG_DEBUG) << "Deleting expired backup " << *old_backups.begin();
+					if (!std::filesystem::remove(old_backups.begin()->str(), ec))
+					{
+						Log(this) << "Failed to delete expired backup " << *old_backups.begin() << ": " << ec.message();
+						continue;
+					}
+					old_backups.erase(old_backups.begin());
 				}
 			}
 		}
@@ -200,7 +222,7 @@ public:
 
 		Log(this) << "Error saving databases: " << buf;
 
-		if (!Config->GetModule(this)->Get<bool>("nobackupokay"))
+		if (!Config->GetModule(this).Get<bool>("nobackupokay"))
 			Anope::Quitting = true;
 	}
 
@@ -208,7 +230,7 @@ public:
 	{
 		std::set<Anope::string> tried_dbs;
 
-		const auto db_name = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+		const auto db_name = Anope::ExpandData(Config->GetModule(this).Get<const Anope::string>("database", "anope.db"));
 
 		std::fstream fd(db_name.c_str(), std::ios_base::in | std::ios_base::binary);
 		if (!fd.is_open())
@@ -223,9 +245,7 @@ public:
 			if (buf.find("OBJECT ") == 0)
 				positions[buf.substr(7)].push_back(fd.tellg());
 
-		LoadData ld;
-		ld.fs = &fd;
-
+		LoadData ld(fd);
 		for (const auto &type_order : Serialize::Type::GetTypeOrder())
 		{
 			Serialize::Type *stype = Serialize::Type::Find(type_order);
@@ -263,7 +283,7 @@ public:
 
 		int i = -1;
 #ifndef _WIN32
-		if (!Anope::Quitting && Config->GetModule(this)->Get<bool>("fork"))
+		if (!Anope::Quitting && Config->GetModule(this).Get<bool>("fork"))
 		{
 			i = fork();
 			if (i > 0)
@@ -290,7 +310,7 @@ public:
 				if (s_type->GetOwner())
 					db_name = Anope::ExpandData("module_" + s_type->GetOwner()->name + ".db");
 				else
-					db_name = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+					db_name = Anope::ExpandData(Config->GetModule(this).Get<const Anope::string>("database", "anope.db"));
 
 				std::fstream *fs = databases[s_type->GetOwner()] = new std::fstream((db_name + ".tmp").c_str(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
 
@@ -313,13 +333,13 @@ public:
 				*data.fs << "OBJECT " << s_type->GetName();
 				if (base->id)
 					*data.fs << "\nID " << base->id;
-				base->Serialize(data);
+				s_type->Serialize(base, data);
 				*data.fs << "\nEND\n";
 			}
 
 			for (auto &[mod, f] : databases)
 			{
-				const auto db_name = Anope::ExpandData((mod ? (mod->name + ".db") : Config->GetModule(this)->Get<const Anope::string>("database", "anope.db")));
+				const auto db_name = Anope::ExpandData((mod ? (mod->name + ".db") : Config->GetModule(this).Get<const Anope::string>("database", "anope.db")));
 
 				if (!f->is_open() || !f->good())
 				{
@@ -363,7 +383,7 @@ public:
 		if (stype->GetOwner())
 			db_name = Anope::ExpandData("module_" + stype->GetOwner()->name + ".db");
 		else
-			db_name = Anope::ExpandData(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+			db_name = Anope::ExpandData(Config->GetModule(this).Get<const Anope::string>("database", "anope.db"));
 
 		std::fstream fd(db_name.c_str(), std::ios_base::in | std::ios_base::binary);
 		if (!fd.is_open())
@@ -372,9 +392,7 @@ public:
 			return;
 		}
 
-		LoadData ld;
-		ld.fs = &fd;
-
+		LoadData ld(fd);
 		for (Anope::string buf; std::getline(fd, buf.str());)
 		{
 			if (buf == "OBJECT " + stype->GetName())

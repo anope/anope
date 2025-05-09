@@ -1,6 +1,6 @@
 /* MemoServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -19,20 +19,16 @@ class MemoServCore final
 
 	static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 	{
-		Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<const Anope::string>("memo_subject").c_str()),
-			message = Language::Translate(nc, Config->GetBlock("mail")->Get<const Anope::string>("memo_message").c_str());
+		Anope::map<Anope::string> vars = {
+			{ "receiver", nc->display                                                             },
+			{ "sender",   m->sender                                                               },
+			{ "number",   Anope::ToString(mi->GetIndex(m) + 1)                                    },
+			{ "text",     m->text                                                                 },
+			{ "network",  Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
+		};
 
-		subject = subject.replace_all_cs("%n", nc->display);
-		subject = subject.replace_all_cs("%s", m->sender);
-		subject = subject.replace_all_cs("%d", Anope::ToString(mi->GetIndex(m) + 1));
-		subject = subject.replace_all_cs("%t", m->text);
-		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
-
-		message = message.replace_all_cs("%n", nc->display);
-		message = message.replace_all_cs("%s", m->sender);
-		message = message.replace_all_cs("%d", Anope::ToString(mi->GetIndex(m) + 1));
-		message = message.replace_all_cs("%t", m->text);
-		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		auto subject = Anope::Template(Language::Translate(nc, Config->GetBlock("mail").Get<const Anope::string>("memo_subject").c_str()), vars);
+		auto message = Anope::Template(Language::Translate(nc, Config->GetBlock("mail").Get<const Anope::string>("memo_message").c_str()), vars);
 
 		return Mail::Send(nc, subject, message);
 	}
@@ -58,7 +54,7 @@ public:
 		{
 			if (!sender->HasPriv("memoserv/no-limit") && !force)
 			{
-				time_t send_delay = Config->GetModule("memoserv")->Get<time_t>("senddelay");
+				time_t send_delay = Config->GetModule("memoserv").Get<time_t>("senddelay");
 				if (send_delay > 0 && sender->lastmemosend + send_delay > Anope::CurTime)
 					return MEMO_TOO_FAST;
 				else if (!mi->memomax)
@@ -100,8 +96,11 @@ public:
 				{
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
-						if (cu->user->Account() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
-							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), ci->name.c_str(), mi->memos->size());
+						if (cu->user->IsIdentified() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
+						{
+							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), MemoServ->GetQueryCommand("memoserv/read").c_str(),
+								ci->name.c_str(), mi->memos->size());
+						}
 					}
 				}
 			}
@@ -116,7 +115,7 @@ public:
 				{
 					User *user = User::Find(na->nick, true);
 					if (user && user->IsIdentified())
-						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), mi->memos->size());
+						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), MemoServ->GetQueryCommand("memoserv/read").c_str(), mi->memos->size());
 				}
 			}
 
@@ -139,7 +138,7 @@ public:
 			if (nc->memos.GetMemo(i)->unread)
 				++newcnt;
 		if (newcnt > 0)
-			u->SendMessage(MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
+			u->SendMessage(MemoServ, newcnt, N_("You have %d new memo.", "You have %d new memos."), newcnt);
 		if (nc->memos.memomax > 0 && nc->memos.memos->size() >= static_cast<unsigned>(nc->memos.memomax))
 		{
 			if (nc->memos.memos->size() > static_cast<unsigned>(nc->memos.memomax))
@@ -149,9 +148,9 @@ public:
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		const Anope::string &msnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &msnick = conf.GetModule(this).Get<const Anope::string>("client");
 
 		if (msnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
@@ -165,12 +164,12 @@ public:
 
 	void OnNickCoreCreate(NickCore *nc) override
 	{
-		nc->memos.memomax = Config->GetModule(this)->Get<int>("maxmemos");
+		nc->memos.memomax = Config->GetModule(this).Get<int>("maxmemos");
 	}
 
 	void OnCreateChan(ChannelInfo *ci) override
 	{
-		ci->memos.memomax = Config->GetModule(this)->Get<int>("maxmemos");
+		ci->memos.memomax = Config->GetModule(this).Get<int>("maxmemos");
 	}
 
 	void OnBotDelete(BotInfo *bi) override
@@ -215,12 +214,17 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *MemoServ)
 			return EVENT_CONTINUE;
-		source.Reply(_("\002%s\002 is a utility allowing IRC users to send short\n"
-			"messages to other IRC users, whether they are online at\n"
-			"the time or not, or to channels(*). Both the sender's\n"
-			"nickname and the target nickname or channel must be\n"
-			"registered in order to send a memo.\n"
-			"%s's commands include:"), MemoServ->nick.c_str(), MemoServ->nick.c_str());
+		source.Reply(_(
+				"\002%s\002 is a utility allowing IRC users to send short "
+				"messages to other IRC users, whether they are online at "
+				"the time or not, or to channels(*). Both the sender's "
+				"nickname and the target nickname or channel must be "
+				"registered in order to send a memo."
+				"\n\n"
+				"%s's commands include:"
+			),
+			MemoServ->nick.c_str(),
+			MemoServ->nick.c_str());
 		return EVENT_CONTINUE;
 	}
 
@@ -228,9 +232,10 @@ public:
 	{
 		if (!params.empty() || source.c || source.service != *MemoServ)
 			return;
-		source.Reply(_(" \n"
-			"Type \002%s%s HELP \037command\037\002 for help on any of the\n"
-			"above commands."), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str());
+
+		source.Reply(" ");
+		source.Reply(_("Type \002%s\032\037command\037\002 for help on any of the above commands."),
+			MemoServ->GetQueryCommand("generic/help").c_str());
 	}
 };
 

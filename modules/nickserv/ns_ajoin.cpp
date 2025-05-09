@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -39,24 +39,36 @@ struct AJoinEntry final
 				(*channels)->erase(it);
 		}
 	}
+};
 
-	void Serialize(Serialize::Data &data) const override
+struct AJoinEntryType final
+	: public Serialize::Type
+{
+	AJoinEntryType()
+		: Serialize::Type("AJoinEntry")
 	{
-		if (!this->owner)
-			return;
-
-		data.Store("owner", this->owner->display);
-		data.Store("channel", this->channel);
-		data.Store("key", this->key);
 	}
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &sd)
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *aj = static_cast<const AJoinEntry *>(obj);
+		if (!aj->owner)
+			return;
+
+		data.Store("ownerid", aj->owner->GetId());
+		data.Store("channel", aj->channel);
+		data.Store("key", aj->key);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &sd) const override
 	{
 		Anope::string sowner;
+		uint64_t sownerid = 0;
 
-		sd["owner"] >> sowner;
+		sd["owner"] >> sowner; // Deprecated 2.0 field
+		sd["ownerid"] >> sownerid;
 
-		NickCore *nc = NickCore::Find(sowner);
+		auto *nc = sownerid ? NickCore::FindId(sownerid) : NickCore::Find(sowner);
 		if (nc == NULL)
 			return NULL;
 
@@ -139,9 +151,9 @@ class CommandNSAJoin final
 				if ((*channels)->at(i)->channel.equals_ci(chan))
 					break;
 
-			if ((*channels)->size() >= Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"))
+			if ((*channels)->size() >= Config->GetModule(this->owner).Get<unsigned>("ajoinmax"))
 			{
-				source.Reply(_("Sorry, the maximum of %d auto join entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"));
+				source.Reply(_("Sorry, the maximum of %d auto join entries has been reached."), Config->GetModule(this->owner).Get<unsigned>("ajoinmax"));
 				return;
 			}
 			else if (i != (*channels)->size())
@@ -292,10 +304,12 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command manages your auto join list. When you identify\n"
-				"you will automatically join the channels on your auto join list.\n"
-				"Services Operators may provide a nick to modify other users'\n"
-				"auto join lists."));
+		source.Reply(_(
+			"This command manages your auto join list. When you identify "
+			"you will automatically join the channels on your auto join list. "
+			"Services Operators may provide a nick to modify other users' "
+			"auto join lists."
+		));
 		return true;
 	}
 };
@@ -305,17 +319,16 @@ class NSAJoin final
 {
 	CommandNSAJoin commandnsajoin;
 	ExtensibleItem<AJoinList> ajoinlist;
-	Serialize::Type ajoinentry_type;
+	AJoinEntryType ajoinentry_type;
 
 public:
-	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsajoin(this), ajoinlist(this, "ajoinlist"),
-		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize)
+	NSAJoin(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnsajoin(this)
+		, ajoinlist(this, "ajoinlist")
 	{
-
 		if (!IRCD || !IRCD->CanSVSJoin)
 			throw ModuleException("Your IRCd does not support SVSJOIN");
-
 	}
 
 	void OnUserLogin(User *u) override

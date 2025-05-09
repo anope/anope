@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -17,7 +17,7 @@ class CommandNSSet final
 public:
 	CommandNSSet(Module *creator) : Command(creator, "nickserv/set", 1, 3)
 	{
-		this->SetDesc(_("Set options, including kill protection"));
+		this->SetDesc(_("Set nickname options and information"));
 		this->SetSyntax(_("\037option\037 \037parameters\037"));
 	}
 
@@ -34,8 +34,10 @@ public:
 		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
 
 		Anope::string this_name = source.command;
-		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
-		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
+		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options").Get<bool>("hideregisteredcommands");
+
+		HelpWrapper help;
 		for (const auto &[c_name, info] : source.service->commands)
 		{
 			if (c_name.find_ci(this_name + " ") == 0)
@@ -53,12 +55,13 @@ public:
 					continue;
 
 				source.command = c_name;
-				c->OnServHelp(source);
+				c->OnServHelp(source, help);
 			}
 		}
+		help.SendTo(source);
 
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
-			"on a specific option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
+		source.Reply(_("Type \002%s\032\037option\037\002 for more information on a specific option."),
+			source.service->GetQueryCommand("generic/help", this_name).c_str());
 
 		return true;
 	}
@@ -86,6 +89,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
 
+		HelpWrapper help;
 		Anope::string this_name = source.command;
 		for (const auto &[c_name, info] : source.service->commands)
 		{
@@ -95,14 +99,18 @@ public:
 				if (command)
 				{
 					source.command = c_name;
-					command->OnServHelp(source);
+					command->OnServHelp(source, help);
 				}
 			}
 		}
+		help.SendTo(source);
 
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
-				"on a specific option. The options will be set on the given\n"
-				"\037nickname\037."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
+		source.Reply(_(
+				"Type \002%s\032\037option\037\002 for more information "
+				"on a specific option. The options will be set on the given "
+				"\037nickname\037."
+			),
+			source.service->GetQueryCommand("generic/help", this_name).c_str());
 		return true;
 	}
 };
@@ -134,14 +142,14 @@ public:
 			return;
 		}
 
-		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
+		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
 		if (len < minpasslen)
 		{
 			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
 			return;
 		}
 
-		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
+		unsigned int maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
 		if (len > maxpasslen)
 		{
 			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
@@ -162,8 +170,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the password used to identify you as the nick's\n"
-			"owner."));
+		source.Reply(_("Changes the password used to identify you as the nick's owner."));
 		return true;
 	}
 };
@@ -196,7 +203,7 @@ public:
 
 		size_t len = params[1].length();
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
+		if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the password of other Services Operators."));
 			return;
@@ -208,14 +215,14 @@ public:
 			return;
 		}
 
-		unsigned int minpasslen = Config->GetModule("nickserv")->Get<unsigned>("minpasslen", "10");
+		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
 		if (len < minpasslen)
 		{
 			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
 			return;
 		}
 
-		unsigned int maxpasslen = Config->GetModule("nickserv")->Get<unsigned>("maxpasslen", "50");
+		unsigned int maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
 		if (len > maxpasslen)
 		{
 			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
@@ -298,10 +305,13 @@ public:
 		BotInfo *bi = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets whether you will be given your channel status modes automatically.\n"
-				"Set to \002ON\002 to allow %s to set status modes on you automatically\n"
-				"when entering channels. Note that depending on channel settings some modes\n"
-				"may not get set automatically."), bi ? bi->nick.c_str() : "ChanServ");
+		source.Reply(_(
+				"Sets whether you will be given your channel status modes automatically. "
+				"Set to \002ON\002 to allow %s to set status modes on you automatically "
+				"when entering channels. Note that depending on channel settings some modes "
+				"may not get set automatically."
+			),
+			bi ? bi->nick.c_str() : "ChanServ");
 		return true;
 	}
 };
@@ -326,11 +336,14 @@ public:
 		BotInfo *bi = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets whether the given nickname will be given its status modes\n"
-				"in channels automatically. Set to \002ON\002 to allow %s\n"
-				"to set status modes on the given nickname automatically when it\n"
-				"is entering channels. Note that depending on channel settings\n"
-				"some modes may not get set automatically."), bi ? bi->nick.c_str() : "ChanServ");
+		source.Reply(_(
+				"Sets whether the given nickname will be given its status modes "
+				"in channels automatically. Set to \002ON\002 to allow %s "
+				"to set status modes on the given nickname automatically when it "
+				"is entering channels. Note that depending on channel settings "
+				"some modes may not get set automatically."
+			),
+			bi ? bi->nick.c_str() : "ChanServ");
 		return true;
 	}
 };
@@ -440,7 +453,7 @@ public:
 
 		NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
 
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;
@@ -484,8 +497,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the display used to refer to your nickname group in\n"
-				"services. The new display MUST be a nick of your group."));
+		source.Reply(_(
+			"Changes the display used to refer to your nickname group in "
+			"services. The new display MUST be a nick of your group."
+		));
 		return true;
 	}
 };
@@ -509,8 +524,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the display used to refer to the nickname group in\n"
-				"services. The new display MUST be a nick of the group."));
+		source.Reply(_(
+			"Changes the display used to refer to the nickname group in "
+			"services. The new display MUST be a nick of the group."
+		));
 		return true;
 	}
 };
@@ -520,26 +537,22 @@ class CommandNSSetEmail
 {
 	static bool SendConfirmMail(User *u, NickCore *nc, BotInfo *bi, const Anope::string &new_email)
 	{
-		Anope::string code = Anope::Random(15);
+		Anope::string code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
 
 		std::pair<Anope::string, Anope::string> *n = nc->Extend<std::pair<Anope::string, Anope::string> >("ns_set_email");
 		n->first = new_email;
 		n->second = code;
 
-		Anope::string subject = Config->GetBlock("mail")->Get<const Anope::string>("emailchange_subject"),
-			message = Config->GetBlock("mail")->Get<const Anope::string>("emailchange_message");
+		Anope::map<Anope::string> vars = {
+			{ "old_email", nc->email                                                               },
+			{ "new_email", new_email                                                               },
+			{ "account",   nc->display                                                             },
+			{ "network",   Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
+			{ "code",      code                                                                    },
+		};
 
-		subject = subject.replace_all_cs("%e", nc->email);
-		subject = subject.replace_all_cs("%E", new_email);
-		subject = subject.replace_all_cs("%n", nc->display);
-		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
-		subject = subject.replace_all_cs("%c", code);
-
-		message = message.replace_all_cs("%e", nc->email);
-		message = message.replace_all_cs("%E", new_email);
-		message = message.replace_all_cs("%n", nc->display);
-		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
-		message = message.replace_all_cs("%c", code);
+		auto subject = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_subject"), vars);
+		auto message = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_message"), vars);
 
 		Anope::string old = nc->email;
 		nc->email = new_email;
@@ -577,12 +590,12 @@ public:
 			return;
 		}
 
-		if (param.empty() && Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
+		if (param.empty() && Config->GetModule("nickserv").Get<bool>("forceemail", "yes"))
 		{
 			source.Reply(_("You cannot unset the email on this network."));
 			return;
 		}
-		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
+		else if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the email of other Services Operators."));
 			return;
@@ -598,7 +611,8 @@ public:
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
+		const auto nsmailreg = Config->GetModule("ns_register").Get<const Anope::string>("registration").equals_ci("mail");
+		if (!param.empty() && Config->GetModule("nickserv").Get<bool>("confirmemailchanges", nsmailreg ? "yes" : "no") && !source.IsServicesOper())
 		{
 			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
 			{
@@ -632,9 +646,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Associates the given email address with your nickname.\n"
-				"This address will be displayed whenever someone requests\n"
-				"information on the nickname with the \002INFO\002 command."));
+		source.Reply(_(
+			"Associates the given email address with your nickname. "
+			"This address will be displayed whenever someone requests "
+			"information on the nickname with the \002INFO\002 command."
+		));
 		return true;
 	}
 };
@@ -660,341 +676,6 @@ public:
 		source.Reply(" ");
 		source.Reply(_("Associates the given email address with the nickname."));
 		return true;
-	}
-};
-
-class CommandNSSetKeepModes
-	: public Command
-{
-public:
-	CommandNSSetKeepModes(Module *creator, const Anope::string &sname = "nickserv/set/keepmodes", size_t min = 1) : Command(creator, sname, min, min + 1)
-	{
-		this->SetDesc(_("Enable or disable keep modes"));
-		this->SetSyntax("{ON | OFF}");
-	}
-
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
-	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
-			return;
-		}
-
-		const NickAlias *na = NickAlias::Find(user);
-		if (!na)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
-			return;
-		}
-		NickCore *nc = na->nc;
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (param.equals_ci("ON"))
-		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable keepmodes for " << nc->display;
-			nc->Extend<bool>("NS_KEEP_MODES");
-			source.Reply(_("Keep modes for %s is now \002on\002."), nc->display.c_str());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable keepmodes for " << nc->display;
-			nc->Shrink<bool>("NS_KEEP_MODES");
-			source.Reply(_("Keep modes for %s is now \002off\002."), nc->display.c_str());
-		}
-		else
-			this->OnSyntaxError(source, "");
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, source.nc->display, params[0]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for your nick. If keep\n"
-				"modes is enabled, services will remember your usermodes\n"
-				"and attempt to re-set them the next time you authenticate."));
-		return true;
-	}
-};
-
-class CommandNSSASetKeepModes final
-	: public CommandNSSetKeepModes
-{
-public:
-	CommandNSSASetKeepModes(Module *creator) : CommandNSSetKeepModes(creator, "nickserv/saset/keepmodes", 2)
-	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, params[0], params[1]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for the given nick. If keep\n"
-				"modes is enabled, services will remember users' usermodes\n"
-				"and attempt to re-set them the next time they authenticate."));
-		return true;
-	}
-};
-
-class CommandNSSetKill
-	: public Command
-{
-public:
-	CommandNSSetKill(Module *creator, const Anope::string &sname = "nickserv/set/kill", size_t min = 1) : Command(creator, sname, min, min + 1)
-	{
-		this->SetDesc(_("Turn protection on or off"));
-		this->SetSyntax("{ON | QUICK | IMMED | OFF}");
-	}
-
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
-	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
-			return;
-		}
-
-		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
-		{
-			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
-			return;
-		}
-
-		const NickAlias *na = NickAlias::Find(user);
-		if (!na)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
-			return;
-		}
-		NickCore *nc = na->nc;
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (param.equals_ci("ON"))
-		{
-			nc->Extend<bool>("KILLPROTECT");
-			nc->Shrink<bool>("KILL_QUICK");
-			nc->Shrink<bool>("KILL_IMMED");
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill on for " << nc->display;
-			source.Reply(_("Protection is now \002on\002 for \002%s\002."), nc->display.c_str());
-		}
-		else if (param.equals_ci("QUICK"))
-		{
-			nc->Extend<bool>("KILLPROTECT");
-			nc->Extend<bool>("KILL_QUICK");
-			nc->Shrink<bool>("KILL_IMMED");
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill quick for " << nc->display;
-			source.Reply(_("Protection is now \002on\002 for \002%s\002, with a reduced delay."), nc->display.c_str());
-		}
-		else if (param.equals_ci("IMMED"))
-		{
-			if (Config->GetModule(this->owner)->Get<bool>("allowkillimmed"))
-			{
-				nc->Extend<bool>("KILLPROTECT");
-				nc->Shrink<bool>("KILL_QUICK");
-				nc->Extend<bool>("KILL_IMMED");
-				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill immed for " << nc->display;
-				source.Reply(_("Protection is now \002on\002 for \002%s\002, with no delay."), nc->display.c_str());
-			}
-			else
-				source.Reply(_("The \002IMMED\002 option is not available on this network."));
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			nc->Shrink<bool>("KILLPROTECT");
-			nc->Shrink<bool>("KILL_QUICK");
-			nc->Shrink<bool>("KILL_IMMED");
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable kill for " << nc->display;
-			source.Reply(_("Protection is now \002off\002 for \002%s\002."), nc->display.c_str());
-		}
-		else
-			this->OnSyntaxError(source, "KILL");
-
-		return;
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, source.nc->display, params[0]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns the automatic protection option for your nick\n"
-				"on or off. With protection on, if another user\n"
-				"tries to take your nick, they will be given one minute to\n"
-				"change to another nick, after which %s will forcibly change\n"
-				"their nick.\n"
-				" \n"
-				"If you select \002QUICK\002, the user will be given only 20 seconds\n"
-				"to change nicks instead of the usual 60. If you select\n"
-				"\002IMMED\002, the user's nick will be changed immediately \037without\037 being\n"
-				"warned first or given a chance to change their nick; please\n"
-				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), source.service->nick.c_str());
-		return true;
-	}
-};
-
-class CommandNSSASetKill final
-	: public CommandNSSetKill
-{
-public:
-	CommandNSSASetKill(Module *creator) : CommandNSSetKill(creator, "nickserv/saset/kill", 2)
-	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | QUICK | IMMED | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, params[0], params[1]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns the automatic protection option for the nick\n"
-				"on or off. With protection on, if another user\n"
-				"tries to take the nick, they will be given one minute to\n"
-				"change to another nick, after which %s will forcibly change\n"
-				"their nick.\n"
-				" \n"
-				"If you select \002QUICK\002, the user will be given only 20 seconds\n"
-				"to change nicks instead of the usual 60. If you select\n"
-				"\002IMMED\002, the user's nick will be changed immediately \037without\037 being\n"
-				"warned first or given a chance to change their nick; please\n"
-				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), source.service->nick.c_str());
-		return true;
-	}
-};
-
-class CommandNSSetMessage
-	: public Command
-{
-public:
-	CommandNSSetMessage(Module *creator, const Anope::string &sname = "nickserv/set/message", size_t min = 1) : Command(creator, sname, min, min + 1)
-	{
-		this->SetDesc(_("Change the communication method of services"));
-		this->SetSyntax("{ON | OFF}");
-	}
-
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
-	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
-			return;
-		}
-
-		const NickAlias *na = NickAlias::Find(user);
-		if (!na)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
-			return;
-		}
-		NickCore *nc = na->nc;
-
-		if (!Config->GetBlock("options")->Get<bool>("useprivmsg"))
-		{
-			source.Reply(_("You cannot %s on this network."), source.command.c_str());
-			return;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (param.equals_ci("ON"))
-		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable " << source.command << " for " << nc->display;
-			nc->Extend<bool>("MSG");
-			source.Reply(_("Services will now reply to \002%s\002 with \002messages\002."), nc->display.c_str());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable " << source.command << " for " << nc->display;
-			nc->Shrink<bool>("MSG");
-			source.Reply(_("Services will now reply to \002%s\002 with \002notices\002."), nc->display.c_str());
-		}
-		else
-			this->OnSyntaxError(source, "MSG");
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, source.nc->display, params[0]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		Anope::string cmd = source.command;
-		size_t i = cmd.find_last_of(' ');
-		if (i != Anope::string::npos)
-			cmd = cmd.substr(i + 1);
-
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way services are communicating with\n"
-				"you. With \002%s\002 set, services will use messages, else they'll\n"
-				"use notices."), cmd.upper().c_str());
-		return true;
-	}
-
-	void OnServHelp(CommandSource &source) override
-	{
-		if (Config->GetBlock("options")->Get<bool>("useprivmsg"))
-			Command::OnServHelp(source);
-	}
-};
-
-class CommandNSSASetMessage final
-	: public CommandNSSetMessage
-{
-public:
-	CommandNSSASetMessage(Module *creator) : CommandNSSetMessage(creator, "nickserv/saset/message", 2)
-	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way services are communicating with\n"
-				"the given user. With \002MSG\002 set, services will use messages,\n"
-				"else they'll use notices."));
-		return true;
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, params[0], params[1]);
 	}
 };
 
@@ -1045,8 +726,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets whether the given nickname will expire.  Setting this\n"
-				"to \002ON\002 prevents the nickname from expiring."));
+		source.Reply(_(
+			"Sets whether the given nickname will expire. Setting this "
+			"to \002ON\002 prevents the nickname from expiring."
+		));
 		return true;
 	}
 };
@@ -1069,69 +752,12 @@ class NSSet final
 	CommandNSSetEmail commandnssetemail;
 	CommandNSSASetEmail commandnssasetemail;
 
-	CommandNSSetKeepModes commandnssetkeepmodes;
-	CommandNSSASetKeepModes commandnssasetkeepmodes;
-
-	CommandNSSetKill commandnssetkill;
-	CommandNSSASetKill commandnssasetkill;
-
-	CommandNSSetMessage commandnssetmessage;
-	CommandNSSASetMessage commandnssasetmessage;
-
 	CommandNSSetPassword commandnssetpassword;
 	CommandNSSASetPassword commandnssasetpassword;
 
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
-	SerializableExtensibleItem<bool> autoop, neverop, killprotect, kill_quick, kill_immed,
-		message, noexpire;
-
-	struct KeepModes final
-		: SerializableExtensibleItem<bool>
-	{
-		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
-
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
-		{
-			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
-
-			if (s->GetSerializableType()->GetName() != "NickCore")
-				return;
-
-			const NickCore *nc = anope_dynamic_static_cast<const NickCore *>(s);
-			Anope::string modes;
-			for (const auto &[last_mode, last_value] : nc->last_modes)
-			{
-				if (!modes.empty())
-					modes += " ";
-				modes += last_mode;
-				if (!last_value.empty())
-					modes += "," + last_value;
-			}
-			data.Store("last_modes", modes);
-		}
-
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
-		{
-			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
-
-			if (s->GetSerializableType()->GetName() != "NickCore")
-				return;
-
-			NickCore *nc = anope_dynamic_static_cast<NickCore *>(s);
-			Anope::string modes;
-			data["last_modes"] >> modes;
-			nc->last_modes.clear();
-			for (spacesepstream sep(modes); sep.GetToken(modes);)
-			{
-				size_t c = modes.find(',');
-				if (c == Anope::string::npos)
-					nc->last_modes.emplace(modes, "");
-				else
-					nc->last_modes.emplace(modes.substr(0, c), modes.substr(c + 1));
-			}
-		}
-	} keep_modes;
+	SerializableExtensibleItem<bool> autoop, neverop, noexpire;
 
 	/* email, passcode */
 	PrimitiveExtensibleItem<std::pair<Anope::string, Anope::string > > ns_set_email;
@@ -1143,20 +769,13 @@ public:
 		commandnssetneverop(this), commandnssasetneverop(this),
 		commandnssetdisplay(this), commandnssasetdisplay(this),
 		commandnssetemail(this), commandnssasetemail(this),
-		commandnssetkeepmodes(this), commandnssasetkeepmodes(this),
-		commandnssetkill(this), commandnssasetkill(this),
-		commandnssetmessage(this), commandnssasetmessage(this),
 		commandnssetpassword(this), commandnssasetpassword(this),
 		commandnssasetnoexpire(this),
 
 		autoop(this, "AUTOOP"), neverop(this, "NEVEROP"),
-		killprotect(this, "KILLPROTECT"), kill_quick(this, "KILL_QUICK"),
-		kill_immed(this, "KILL_IMMED"), message(this, "MSG"),
 		noexpire(this, "NS_NO_EXPIRE"),
-
-		keep_modes(this, "NS_KEEP_MODES"), ns_set_email(this, "ns_set_email")
+		ns_set_email(this, "ns_set_email")
 	{
-
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
@@ -1187,7 +806,7 @@ public:
 		if (chan->ci)
 		{
 			/* Only give modes if autoop is set */
-			give_modes &= !user->Account() || autoop.HasExt(user->Account());
+			give_modes &= !user->IsIdentified() || autoop.HasExt(user->Account());
 		}
 	}
 
@@ -1202,49 +821,24 @@ public:
 		if (!show_hidden)
 			return;
 
-		if (kill_immed.HasExt(na->nc))
-			info.AddOption(_("Immediate protection"));
-		else if (kill_quick.HasExt(na->nc))
-			info.AddOption(_("Quick protection"));
-		else if (killprotect.HasExt(na->nc))
-			info.AddOption(_("Protection"));
-		if (message.HasExt(na->nc))
-			info.AddOption(_("Message mode"));
 		if (autoop.HasExt(na->nc))
 			info.AddOption(_("Auto-op"));
 		if (neverop.HasExt(na->nc))
 			info.AddOption(_("Never-op"));
 		if (noexpire.HasExt(na))
 			info.AddOption(_("No expire"));
-		if (keep_modes.HasExt(na->nc))
-			info.AddOption(_("Keep modes"));
 	}
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
-		if (u->Account() && setter.GetUser() == u)
+		if (u->IsIdentified() && setter.GetUser() == u)
 			u->Account()->last_modes = u->GetModeList();
 	}
 
 	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
-		if (u->Account() && setter.GetUser() == u)
+		if (u->IsIdentified() && setter.GetUser() == u)
 			u->Account()->last_modes = u->GetModeList();
-	}
-
-	void OnUserLogin(User *u) override
-	{
-		if (keep_modes.HasExt(u->Account()))
-		{
-			User::ModeList modes = u->Account()->last_modes;
-			for (const auto &[last_mode, last_value] : modes)
-			{
-				UserMode *um = ModeManager::FindUserModeByName(last_mode);
-				/* if the null user can set the mode, then it's probably safe */
-				if (um && um->CanSet(NULL))
-					u->SetMode(NULL, last_mode, last_value);
-			}
-		}
 	}
 };
 

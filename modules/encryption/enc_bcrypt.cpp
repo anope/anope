@@ -1,6 +1,6 @@
 /* Module for providing bcrypt hashing
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * This program is free but copyrighted software; see the file COPYING for
@@ -104,6 +104,7 @@ class EBCrypt final
 {
 private:
 	BCryptProvider bcryptprovider;
+	static const size_t BCRYPT_MAX_LEN = 72;
 
 public:
 	EBCrypt(const Anope::string &modname, const Anope::string &creator)
@@ -118,6 +119,9 @@ public:
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
+		if (src.length() > BCRYPT_MAX_LEN)
+			return EVENT_CONTINUE;
+
 		dest = "bcrypt:" + bcryptprovider.Encrypt(src);
 		Log(LOG_DEBUG_2) << "(enc_bcrypt) hashed password from [" << src << "] to [" << dest << "]";
 		return EVENT_ALLOW;
@@ -161,11 +165,15 @@ public:
 		}
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		auto *block = conf->GetModule(this);
+		const auto maxpasslen = conf.GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
+		if (maxpasslen > BCRYPT_MAX_LEN && ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			Log(this) << "Warning: {nickserv}:maxpasslen is set to " << maxpasslen << " which is longer than the bcrypt maximum length of " << BCRYPT_MAX_LEN;
 
-		auto rounds = block->Get<unsigned long>("rounds", "10");
+		auto &block = conf.GetModule(this);
+
+		auto rounds = block.Get<unsigned long>("rounds", "10");
 		if (rounds < 10 || rounds > 32)
 		{
 			Log(this) << "Bcrypt rounds MUST be between 10 and 32 inclusive; using 10 instead of " << rounds << '.';

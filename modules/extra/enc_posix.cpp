@@ -1,6 +1,6 @@
 /* Module for providing POSIX crypt() hashing
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * This program is free but copyrighted software; see the file COPYING for

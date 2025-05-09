@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -19,11 +19,12 @@ class ChanAccess;
 class Channel;
 class ChannelInfo;
 class ChannelStatus;
+struct ModeData;
 struct ChanUserContainer;
 class ClientSocket;
 class Command;
 class CommandSource;
-namespace Configuration { struct Conf; }
+namespace Configuration { class Conf; }
 class ConnectionSocket;
 namespace DNS { struct Query; }
 class Entry;

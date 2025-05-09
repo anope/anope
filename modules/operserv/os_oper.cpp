@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -10,7 +10,48 @@
  */
 
 #include "module.h"
-#include "modules/os_oper.h"
+#include "modules/operserv/oper.h"
+
+struct OSOperType
+	: Serialize::Type
+{
+	OSOperType()
+		: Serialize::Type("Oper")
+	{
+	}
+
+	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *myo = static_cast<const MyOper *>(obj);
+		data.Store("name", myo->name);
+		data.Store("type", myo->ot->GetName());
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
+	{
+		Anope::string stype, sname;
+
+		data["type"] >> stype;
+		data["name"] >> sname;
+
+		OperType *ot = OperType::Find(stype);
+		if (ot == NULL)
+			return NULL;
+		NickCore *nc = NickCore::Find(sname);
+		if (nc == NULL)
+			return NULL;
+
+		MyOper *myo;
+		if (obj)
+			myo = anope_dynamic_static_cast<MyOper *>(obj);
+		else
+			myo = new MyOper(nc->display, ot);
+		nc->o = myo;
+		Log(LOG_NORMAL, "operserv/oper") << "Tied oper " << nc->display << " to type " << ot->GetName();
+		return myo;
+	}
+};
+
 
 class CommandOSOper final
 	: public Command
@@ -212,9 +253,11 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to change and view Services Operators.\n"
-				"Note that operators removed by this command but are still set in\n"
-				"the configuration file are not permanently affected by this."));
+		source.Reply(_(
+			"Allows you to change and view Services Operators. "
+			"Note that operators removed by this command but are still set in "
+			"the configuration file are not permanently affected by this."
+		));
 		return true;
 	}
 };
@@ -222,12 +265,13 @@ public:
 class OSOper final
 	: public Module
 {
-	Serialize::Type myoper_type;
+	OSOperType myoper_type;
 	CommandOSOper commandosoper;
 
 public:
-	OSOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		myoper_type("Oper", MyOper::Unserialize), commandosoper(this)
+	OSOper(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandosoper(this)
 	{
 	}
 

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2011-2024 Anope Team
+ * (C) 2011-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -24,7 +24,7 @@ public:
 
 	void OnResult(const LDAPResult &r) override
 	{
-		if (!u || !u->Account())
+		if (!u || !u->IsIdentified())
 			return;
 
 		NickCore *nc = u->Account();
@@ -92,15 +92,15 @@ public:
 
 	}
 
-	void OnReload(Configuration::Conf *conf) override
+	void OnReload(Configuration::Conf &conf) override
 	{
-		Configuration::Block *config = Config->GetModule(this);
+		const auto &config = Config->GetModule(this);
 
-		this->binddn = config->Get<const Anope::string>("binddn");
-		this->password = config->Get<const Anope::string>("password");
-		this->basedn = config->Get<const Anope::string>("basedn");
-		this->filter = config->Get<const Anope::string>("filter");
-		opertype_attribute = config->Get<const Anope::string>("opertype_attribute");
+		this->binddn = config.Get<const Anope::string>("binddn");
+		this->password = config.Get<const Anope::string>("password");
+		this->basedn = config.Get<const Anope::string>("basedn");
+		this->filter = config.Get<const Anope::string>("filter");
+		opertype_attribute = config.Get<const Anope::string>("opertype_attribute");
 
 		for (const auto *oper : my_opers)
 			delete oper;
@@ -117,8 +117,17 @@ public:
 				throw LDAPException("Could not search LDAP for opertype settings, invalid configuration.");
 
 			if (!this->binddn.empty())
-				this->ldap->Bind(NULL, this->binddn.replace_all_cs("%a", u->Account()->display), this->password.c_str());
-			this->ldap->Search(new IdentifyInterface(this, u), this->basedn, this->filter.replace_all_cs("%a", u->Account()->display));
+			{
+				auto bdn = Anope::Template(this->binddn, {
+					{ "account", u->Account()->display },
+				});
+				this->ldap->Bind(NULL, bdn, this->password.c_str());
+			}
+
+			auto af = Anope::Template(this->filter, {
+				{ "account", u->Account()->display },
+			});
+			this->ldap->Search(new IdentifyInterface(this, u), this->basedn, af);
 		}
 		catch (const LDAPException &ex)
 		{

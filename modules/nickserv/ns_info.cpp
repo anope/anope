@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -116,8 +116,8 @@ public:
 					info[_("Last seen address")] = na->last_realhost;
 			}
 
-			info[_("Account registered")] = Anope::strftime(na->nc->time_registered, source.GetAccount());
-			info[_("Nick registered")] = Anope::strftime(na->time_registered, source.GetAccount());
+			info[_("Account registered")] = Anope::strftime(na->nc->registered, source.GetAccount());
+			info[_("Nick registered")] = Anope::strftime(na->registered, source.GetAccount());
 
 			if (!nick_online)
 				info[_("Last seen")] = Anope::strftime(na->last_seen, source.GetAccount());
@@ -148,12 +148,13 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Displays information about the given nickname, such as\n"
-				"the nick's owner, last seen address and time, and nick\n"
-				"options. If no nick is given, and you are identified,\n"
-				"your account name is used, else your current nickname is\n"
-				"used."));
-
+		source.Reply(_(
+			"Displays information about the given nickname, such as "
+			"the nick's owner, last seen address and time, and nick "
+			"options. If no nick is given, and you are identified, "
+			"your account name is used, else your current nickname is "
+			"used."
+		));
 		return true;
 	}
 };
@@ -247,13 +248,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to prevent certain pieces of information from\n"
-				"being displayed when someone does a %s \002INFO\002 on your\n"
-				"nick.  You can hide your email address (\002EMAIL\002), last seen\n"
-				"user@host mask (\002USERMASK\002), your services access status\n"
-				"(\002STATUS\002) and last quit message (\002QUIT\002).\n"
-				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick.c_str());
+		source.Reply(_(
+				"Allows you to prevent certain pieces of information from "
+				"being displayed when someone does a %s\032\002INFO\002 on your "
+				"nick. You can hide your email address\032(\002EMAIL\002), last seen "
+				"user@host mask (\002USERMASK\002), your services access status "
+				"(\002STATUS\002) and last quit message (\002QUIT\002). "
+				"The second parameter specifies whether the information should "
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 };
@@ -277,13 +281,16 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to prevent certain pieces of information from\n"
-				"being displayed when someone does a %s \002INFO\002 on the\n"
-				"nick.  You can hide the email address (\002EMAIL\002), last seen\n"
-				"user@host mask (\002USERMASK\002), the services access status\n"
-				"(\002STATUS\002) and last quit message (\002QUIT\002).\n"
-				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick.c_str());
+		source.Reply(_(
+				"Allows you to prevent certain pieces of information from "
+				"being displayed when someone does a %s\032\002INFO\002 on the "
+				"nick. You can hide the email address (\002EMAIL\002), last seen "
+				"user@host mask (\002USERMASK\002), the services access status "
+				"(\002STATUS\002) and last quit message (\002QUIT\002). "
+				"The second parameter specifies whether the information should "
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."
+			),
+			source.service->nick.c_str());
 		return true;
 	}
 };

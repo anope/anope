@@ -1,6 +1,6 @@
 /* Core functions
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -44,9 +44,10 @@ public:
 		Anope::string source_command = source.command;
 		const BotInfo *bi = source.service;
 		const CommandInfo::map &map = source.c ? Config->Fantasy : bi->commands;
-		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
-		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
+		bool hide_privileged_commands = Config->GetBlock("options").Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options").Get<bool>("hideregisteredcommands");
 
+		HelpWrapper help;
 		if (params.empty() || params[0].equals_ci("ALL"))
 		{
 			bool all = !params.empty() && params[0].equals_ci("ALL");
@@ -88,9 +89,10 @@ public:
 				}
 
 				source.command = c_name;
-				c->OnServHelp(source);
+				c->OnServHelp(source, help);
 
 			}
+			help.SendTo(source);
 
 			for (auto &[gr, cmds] : groups)
 			{
@@ -117,7 +119,7 @@ public:
 			if (!groups.empty())
 			{
 				source.Reply(" ");
-				source.Reply(_("Use the \002%s ALL\002 command to list all commands and their descriptions."), source_command.c_str());
+				source.Reply(_("Use the \002%s\032ALL\002 command to list all commands and their descriptions."), source.command.nobreak().c_str());
 			}
 		}
 		else

@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2024 Anope Team
+ * (C) 2003-2025 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -47,8 +47,10 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Syncs all modes set on users on the channel with the modes\n"
-				"they should have based on their access."));
+		source.Reply(_(
+			"Syncs all modes set on users on the channel with the modes "
+			"they should have based on their access."
+		));
 		return true;
 	}
 };

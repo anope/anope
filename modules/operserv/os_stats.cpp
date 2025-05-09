@@ -19,7 +19,8 @@ struct Stats final
 
 	Stats() : Serializable("Stats")
 	{
-		me = this;
+		if (!me)
+			me = this;
 	}
 };
 
@@ -45,7 +46,7 @@ struct StatsType final
 	}
 };
 
-Stats *Stats::me;
+Stats *Stats::me = nullptr;
 
 /**
  * Count servers connected to server s
@@ -340,7 +341,7 @@ public:
 	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (UserListByNick.size() == MaxUserCount && Anope::CurTime == MaxUserTime)
-			stats_saver.QueueUpdate();
+			Stats::me->QueueUpdate();
 	}
 };
 

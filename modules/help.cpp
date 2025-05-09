@@ -102,17 +102,19 @@ public:
 				Anope::string buf;
 				for (const auto &c_name : cmds)
 				{
-					buf += ", " + c_name;
+					if (!buf.empty())
+						buf += ", ";
+					buf += c_name;
 
 					if (buf.length() > help_wrap_len)
 					{
-						source.Reply("  %s", buf.substr(2).c_str());
+						source.Reply("  %s", buf.c_str());
 						buf.clear();
 					}
 				}
 				if (buf.length() > 2)
 				{
-					source.Reply("  %s", buf.substr(2).c_str());
+					source.Reply("  %s", buf.c_str());
 					buf.clear();
 				}
 			}

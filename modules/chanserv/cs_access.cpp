@@ -297,7 +297,7 @@ private:
 				ChannelInfo *ci;
 				Command *c;
 				unsigned deleted = 0;
-				Anope::string Nicks;
+				Anope::string nicks;
 				bool denied = false;
 				bool override = false;
 			public:
@@ -315,9 +315,9 @@ private:
 						source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 					else
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Nicks;
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << nicks;
 						if (deleted == 1)
-							source.Reply(_("Deleted %s from %s access list."), Nicks.c_str(), ci->name.c_str());
+							source.Reply(_("Deleted %s from %s access list."), nicks.c_str(), ci->name.c_str());
 
 						else
 							source.Reply(deleted, N_("Deleted %d entry from %s access list.", "Deleted %d entries from %s access list."), deleted, ci->name.c_str());
@@ -341,10 +341,9 @@ private:
 					}
 
 					++deleted;
-					if (!Nicks.empty())
-						Nicks += ", " + access->Mask();
-					else
-						Nicks = access->Mask();
+					if (!nicks.empty())
+						nicks += ", ";
+					nicks += access->Mask();
 
 					ci->EraseAccess(Number - 1);
 

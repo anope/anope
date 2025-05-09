@@ -338,9 +338,8 @@ private:
 
 					++deleted;
 					if (!nicks.empty())
-						nicks += ", " + caccess->Mask();
-					else
-						nicks = caccess->Mask();
+						nicks += ", ";
+					nicks += caccess->Mask();
 
 					ci->EraseAccess(number - 1);
 					FOREACH_MOD(OnAccessDel, (ci, source, caccess));
@@ -556,16 +555,18 @@ public:
 		Anope::string buf;
 		for (const auto &permission : permissions[cmd])
 		{
-			buf += ", " + permission;
+			if (!buf.empty())
+				buf += ", ";
+			buf += permission;
 			if (buf.length() > 75)
 			{
-				source.Reply("  %s", buf.substr(2).c_str());
+				source.Reply("  %s", buf.c_str());
 				buf.clear();
 			}
 		}
 		if (!buf.empty())
 		{
-			source.Reply("  %s", buf.substr(2).c_str());
+			source.Reply("  %s", buf.c_str());
 			buf.clear();
 		}
 

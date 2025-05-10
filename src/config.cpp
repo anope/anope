@@ -336,9 +336,9 @@ Conf::Conf() : Block("")
 		const Block &service = this->GetBlock("service", i);
 
 		const Anope::string &nick = service.Get<const Anope::string>("nick"),
-					&user = service.Get<const Anope::string>("user"),
-					&host = service.Get<const Anope::string>("host"),
-					&gecos = service.Get<const Anope::string>("gecos"),
+					&user = service.Get<const Anope::string>("user", nick.lower()),
+					&host = service.Get<const Anope::string>("host", servername),
+					&gecos = service.Get<const Anope::string>("gecos", nick),
 					&modes = service.Get<const Anope::string>("modes"),
 					&channels = service.Get<const Anope::string>("channels"),
 					&alias = service.Get<const Anope::string>("alias", nick.upper());

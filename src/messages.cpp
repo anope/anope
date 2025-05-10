@@ -340,16 +340,9 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			Anope::string ctcpname, ctcpbody;
 			if (Anope::ParseCTCP(message, ctcpname, ctcpbody))
 			{
-				if (ctcpname.equals_ci("PING"))
-				{
-					IRCD->SendNotice(bi, u->nick, Anope::FormatCTCP("PING", ctcpbody));
-				}
-				else if (ctcpname.equals_ci("VERSION"))
-				{
-					Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-					IRCD->SendNotice(bi, u->nick, Anope::FormatCTCP("VERSION", Anope::printf("Anope-%s %s -- %s -- %s", Anope::Version().c_str(),
-						Anope::VersionBuildString().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)")));
-				}
+				auto ctcpit = bi->ctcps.find(ctcpname);
+				if (ctcpit != bi->ctcps.end())
+					ctcpit->second(bi, u, ctcpbody);
 				return;
 			}
 

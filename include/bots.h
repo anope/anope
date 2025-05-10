@@ -41,6 +41,8 @@ public:
 	time_t lastmsg;
 	/* Map of actual command names -> service name/permission required */
 	CommandInfo::map commands;
+	/** CTCP responses this bot can send. */
+	Anope::map<std::function<void(BotInfo *, User *, const Anope::string &)>> ctcps;
 	/* The server-side alias used to message this bot. */
 	Anope::string alias;
 	/* Modes the bot should have as configured in service:modes */

@@ -547,11 +547,11 @@ Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 		return buf;
 
 	if (t < Anope::CurTime)
-		return Anope::string(buf) + " " + Anope::printf(Language::Translate(nc, _("(%s ago)")), Duration(Anope::CurTime - t, nc).c_str(), nc);
+		return Anope::printf(Language::Translate(nc, _("%s (%s ago)")), buf, Duration(Anope::CurTime - t, nc).c_str());
 	else if (t > Anope::CurTime)
-		return Anope::string(buf) + " " + Anope::printf(Language::Translate(nc, _("(%s from now)")), Duration(t - Anope::CurTime, nc).c_str(), nc);
+		return Anope::printf(Language::Translate(nc, _("%s (%s from now)")), buf, Duration(t - Anope::CurTime, nc).c_str(), nc);
 	else
-		return Anope::string(buf) + " " + Language::Translate(nc, _("(now)"));
+		return Anope::printf(Language::Translate(nc, _("%s (now)")), buf);
 }
 
 Anope::string Anope::Expires(time_t expires, const NickCore *nc)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-10 00:58+0100\n"
+"POT-Creation-Date: 2025-05-10 14:34+0100\n"
 "PO-Revision-Date: 2025-04-25 13:08+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -776,6 +776,14 @@ msgid "%s (%d times)"
 msgstr ""
 
 #, c-format
+msgid "%s (%s ago)"
+msgstr ""
+
+#, c-format
+msgid "%s (%s from now)"
+msgstr ""
+
+#, c-format
 msgid "%s (%s) was kicked from %s (\"%s\") %s ago%s"
 msgstr ""
 
@@ -817,6 +825,10 @@ msgstr ""
 
 #, c-format
 msgid "%s (minimum %d/%d%%)"
+msgstr ""
+
+#, c-format
+msgid "%s (now)"
 msgstr ""
 
 #, c-format
@@ -1088,14 +1100,6 @@ msgid_plural "%zu nicknames in the group."
 msgstr[0] ""
 msgstr[1] ""
 
-#, c-format
-msgid "(%s ago)"
-msgstr ""
-
-#, c-format
-msgid "(%s from now)"
-msgstr ""
-
 msgid "(Split)"
 msgstr ""
 
@@ -1107,9 +1111,6 @@ msgid "(disabled)"
 msgstr ""
 
 msgid "(founder only)"
-msgstr ""
-
-msgid "(now)"
 msgstr ""
 
 msgid "* AKILL any new clients connecting"

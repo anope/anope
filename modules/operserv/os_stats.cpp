@@ -42,7 +42,7 @@ struct StatsType final
 	{
 		data["maxusercnt"] >> MaxUserCount;
 		data["maxusertime"] >> MaxUserTime;
-		return obj;
+		return Stats::me;
 	}
 };
 

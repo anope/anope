@@ -160,7 +160,7 @@ Table of Contents
           they log on, to set modes and to kick users from any channel, to
           send notices quickly to the entire network, and much more!
 
-        * HostServ, a neat service that allows users to show custom vHosts
+        * HostServ, a neat service that allows users to show custom vhosts
           (virtual hosts) instead of their real IP address; this only works
           on daemons supporting ip cloaking, such as UnrealIRCd.
 

@@ -105,7 +105,7 @@ protected:
 	 * @param svhost The vhost of the user
 	 * @param sip The ip of the user
 	 * @param sserver The server of the user
-	 * @param srealname The realname/gecos of the user
+	 * @param srealname The realname of the user
 	 * @param ts User's timestamp
 	 * @param smodes User's modes
 	 * @param suid The unique identifier of the user.

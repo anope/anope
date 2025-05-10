@@ -83,7 +83,7 @@ public:
 	/* Can we set vidents on users? */
 	bool CanSetVIdent = false;
 
-	/* Can we ban specific gecos from being used? */
+	/* Can we ban specific realname from being used? */
 	bool CanSNLine = false;
 
 	/* Can we ban specific nicknames from being used? */

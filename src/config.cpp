@@ -338,7 +338,7 @@ Conf::Conf() : Block("")
 		const Anope::string &nick = service.Get<const Anope::string>("nick"),
 					&user = service.Get<const Anope::string>("user", nick.lower()),
 					&host = service.Get<const Anope::string>("host", servername),
-					&gecos = service.Get<const Anope::string>("gecos", nick),
+					&real = service.Get<const Anope::string>("real", nick),
 					&modes = service.Get<const Anope::string>("modes"),
 					&channels = service.Get<const Anope::string>("channels"),
 					&alias = service.Get<const Anope::string>("alias", nick.upper());
@@ -346,12 +346,12 @@ Conf::Conf() : Block("")
 		ValidateNotEmptyOrSpaces("service", "nick", nick);
 		ValidateNotEmptyOrSpaces("service", "user", user);
 		ValidateNotEmptyOrSpaces("service", "host", host);
-		ValidateNotEmpty("service", "gecos", gecos);
+		ValidateNotEmpty("service", "real", real);
 		ValidateNoSpaces("service", "channels", channels);
 
 		BotInfo *bi = BotInfo::Find(nick, true);
 		if (!bi)
-			bi = new BotInfo(nick, user, host, gecos, modes);
+			bi = new BotInfo(nick, user, host, real, modes);
 
 		bi->alias = alias;
 		bi->conf = true;

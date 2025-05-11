@@ -98,8 +98,6 @@ private:
 	Serialize::Type *s_type;
 	/* Iterator into serializable_items */
 	std::list<Serializable *>::iterator s_iter;
-	/** The time at which this object was first committed to the database. */
-	time_t first_commit = 0;
 	/* The hash of the last serialized form of this object committed to the database */
 	size_t last_commit = 0;
 	/* The last time this object was committed to the database */

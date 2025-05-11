@@ -612,7 +612,7 @@ public:
 			return;
 
 		const auto nsmailreg = Config->GetModule("ns_register").Get<const Anope::string>("registration").equals_ci("mail");
-		if (!param.empty() && Config->GetModule("nickserv").Get<bool>("confirmemailchanges", nsmailreg ? "yes" : "no") && !source.IsServicesOper())
+		if (!param.empty() && Config->GetModule("nickserv").Get<bool>("confirmemailchanges", nsmailreg ? "yes" : "no") && source.GetAccount() == nc)
 		{
 			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
 			{

@@ -61,7 +61,7 @@ public:
 				continue;
 
 			Anope::string akey(yyjson_mut_get_str(key));
-			if (akey.equals_ci("id"))
+			if (akey.equals_ci("@id"))
 			{
 				this->id = yyjson_mut_get_uint(value);
 				continue;
@@ -354,7 +354,7 @@ public:
 
 			auto *elem = yyjson_mut_arr_add_obj(doc, type);
 			if (item->id)
-				yyjson_mut_obj_add_uint(doc, elem, "id", item->id);
+				yyjson_mut_obj_add_uint(doc, elem, "@id", item->id);
 
 			Data sd;
 			s_type->Serialize(item, sd);

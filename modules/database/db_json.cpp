@@ -262,7 +262,7 @@ private:
 
 	static void UpdateMetadata(yyjson_mut_doc *doc, yyjson_mut_val *obj)
 	{
-		const auto generator = "Anope " + Anope::Version();
+		const auto generator = "Anope " + Anope::Version() + " " + Anope::VersionBuildString();
 		yyjson_mut_obj_upsert(doc, obj, "generator", yyjson_mut_strncpy(doc, generator.c_str(), generator.length()));
 		yyjson_mut_obj_upsert(doc, obj, "version", yyjson_mut_uint(doc, ANOPE_DATABASE_VERSION));
 		yyjson_mut_obj_upsert(doc, obj, "updated", yyjson_mut_int(doc, Anope::CurTime));

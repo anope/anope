@@ -532,153 +532,6 @@ public:
 	}
 };
 
-class CommandNSSetEmail
-	: public Command
-{
-	static bool SendConfirmMail(User *u, NickCore *nc, BotInfo *bi, const Anope::string &new_email)
-	{
-		Anope::string code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
-
-		std::pair<Anope::string, Anope::string> *n = nc->Extend<std::pair<Anope::string, Anope::string> >("ns_set_email");
-		n->first = new_email;
-		n->second = code;
-
-		Anope::map<Anope::string> vars = {
-			{ "old_email", nc->email                                                               },
-			{ "new_email", new_email                                                               },
-			{ "account",   nc->display                                                             },
-			{ "network",   Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
-			{ "code",      code                                                                    },
-		};
-
-		auto subject = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_subject"), vars);
-		auto message = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_message"), vars);
-
-		Anope::string old = nc->email;
-		nc->email = new_email;
-		bool b = Mail::Send(u, nc, bi, subject, message);
-		nc->email = old;
-		return b;
-	}
-
-public:
-	CommandNSSetEmail(Module *creator, const Anope::string &cname = "nickserv/set/email", size_t min = 0) : Command(creator, cname, min, min + 1)
-	{
-		this->SetDesc(_("Associate an email address with your nickname"));
-		this->SetSyntax(_("\037address\037"));
-	}
-
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
-	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
-			return;
-		}
-
-		const NickAlias *na = NickAlias::Find(user);
-		if (!na)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
-			return;
-		}
-		NickCore *nc = na->nc;
-
-		if (nc->HasExt("UNCONFIRMED"))
-		{
-			source.Reply(_("You may not change the email of an unconfirmed account."));
-			return;
-		}
-
-		if (param.empty() && Config->GetModule("nickserv").Get<bool>("forceemail", "yes"))
-		{
-			source.Reply(_("You cannot unset the email on this network."));
-			return;
-		}
-		else if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
-		{
-			source.Reply(_("You may not change the email of other Services Operators."));
-			return;
-		}
-		else if (!param.empty() && !Mail::Validate(param))
-		{
-			source.Reply(MAIL_X_INVALID, param.c_str());
-			return;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		const auto nsmailreg = Config->GetModule("ns_register").Get<const Anope::string>("registration").equals_ci("mail");
-		if (!param.empty() && Config->GetModule("nickserv").Get<bool>("confirmemailchanges", nsmailreg ? "yes" : "no") && source.GetAccount() == nc)
-		{
-			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
-			{
-				Log(LOG_COMMAND, source, this) << "to request changing the email of " << nc->display << " to " << param;
-				source.Reply(_("A confirmation email has been sent to \002%s\002. Follow the instructions in it to change your email address."), param.c_str());
-			}
-		}
-		else
-		{
-			if (!param.empty())
-			{
-				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email of " << nc->display << " to " << param;
-				nc->email = param;
-				source.Reply(_("Email address for \002%s\002 changed to \002%s\002."), nc->display.c_str(), param.c_str());
-			}
-			else
-			{
-				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the email of " << nc->display;
-				nc->email.clear();
-				source.Reply(_("Email address for \002%s\002 unset."), nc->display.c_str());
-			}
-		}
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, source.nc->display, params.size() ? params[0] : "");
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_(
-			"Associates the given email address with your nickname. "
-			"This address will be displayed whenever someone requests "
-			"information on the nickname with the \002INFO\002 command."
-		));
-		return true;
-	}
-};
-
-class CommandNSSASetEmail final
-	: public CommandNSSetEmail
-{
-public:
-	CommandNSSASetEmail(Module *creator) : CommandNSSetEmail(creator, "nickserv/saset/email", 2)
-	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 \037address\037"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Associates the given email address with the nickname."));
-		return true;
-	}
-};
-
 class CommandNSSASetNoexpire final
 	: public Command
 {
@@ -749,9 +602,6 @@ class NSSet final
 	CommandNSSetDisplay commandnssetdisplay;
 	CommandNSSASetDisplay commandnssasetdisplay;
 
-	CommandNSSetEmail commandnssetemail;
-	CommandNSSASetEmail commandnssasetemail;
-
 	CommandNSSetPassword commandnssetpassword;
 	CommandNSSASetPassword commandnssasetpassword;
 
@@ -759,46 +609,18 @@ class NSSet final
 
 	SerializableExtensibleItem<bool> autoop, neverop, noexpire;
 
-	/* email, passcode */
-	PrimitiveExtensibleItem<std::pair<Anope::string, Anope::string > > ns_set_email;
-
 public:
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsset(this), commandnssaset(this),
 		commandnssetautoop(this), commandnssasetautoop(this),
 		commandnssetneverop(this), commandnssasetneverop(this),
 		commandnssetdisplay(this), commandnssasetdisplay(this),
-		commandnssetemail(this), commandnssasetemail(this),
 		commandnssetpassword(this), commandnssasetpassword(this),
 		commandnssasetnoexpire(this),
 
 		autoop(this, "AUTOOP"), neverop(this, "NEVEROP"),
-		noexpire(this, "NS_NO_EXPIRE"),
-		ns_set_email(this, "ns_set_email")
+		noexpire(this, "NS_NO_EXPIRE")
 	{
-	}
-
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
-	{
-		NickCore *uac = source.nc;
-
-		if (command->name == "nickserv/confirm" && !params.empty() && uac)
-		{
-			std::pair<Anope::string, Anope::string> *n = ns_set_email.Get(uac);
-			if (n)
-			{
-				if (params[0] == n->second)
-				{
-					uac->email = n->first;
-					Log(LOG_COMMAND, source, command) << "to confirm their email address change to " << uac->email;
-					source.Reply(_("Your email address has been changed to \002%s\002."), uac->email.c_str());
-					ns_set_email.Unset(uac);
-					return EVENT_STOP;
-				}
-			}
-		}
-
-		return EVENT_CONTINUE;
 	}
 
 	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) override

@@ -1917,6 +1917,7 @@ class IRCDMessageMetadata final
 private:
 	ServiceReference<CertService> certs;
 	PrimitiveExtensibleItem<ListLimits> &maxlist;
+	ExtensibleItem<bool> ssl;
 
 	static void HandleAccountName(User *u, const Anope::string &value)
 	{
@@ -2081,7 +2082,7 @@ private:
 	{
 		// :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
 		// :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
-		u->Extend<bool>("ssl");
+		ssl.Set(u);
 
 		Anope::string data;
 		spacesepstream tokens(value);
@@ -2118,6 +2119,7 @@ public:
 		: IRCDMessage(creator, "METADATA", 2)
 		, certs("CertService", "certs")
 		, maxlist(listlimits)
+		, ssl(creator, "ssl")
 	{
 		SetFlag(FLAG_REQUIRE_SERVER);
 		SetFlag(FLAG_SOFT_LIMIT);
@@ -2587,7 +2589,6 @@ class ProtoInspIRCd final
 	: public Module
 {
 	InspIRCdProto ircd_proto;
-	ExtensibleItem<bool> ssl;
 
 	/* Core message handlers */
 	Message::Time message_alltime;
@@ -2644,7 +2645,7 @@ class ProtoInspIRCd final
 public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, PROTOCOL | VENDOR)
-		, ircd_proto(this), ssl(this, "ssl")
+		, ircd_proto(this)
 		, message_alltime(this, "ALLTIME")
 		, message_error(this)
 		, message_invite(this)

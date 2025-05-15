@@ -118,7 +118,7 @@ class CommandNSSetEmail
 {
 	static bool SendConfirmMail(User *u, NickCore *nc, BotInfo *bi, const Anope::string &new_email)
 	{
-		Anope::string code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
+		Anope::string code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
 
 		std::pair<Anope::string, Anope::string> *n = nc->Extend<std::pair<Anope::string, Anope::string> >("ns_set_email");
 		n->first = new_email;

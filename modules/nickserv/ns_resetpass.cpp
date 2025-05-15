@@ -135,7 +135,7 @@ public:
 static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi)
 {
 	auto *ri = na->nc->Extend<ResetInfo>("reset");
-	ri->code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
+	ri->code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
 	ri->time = Anope::CurTime;
 
 	Anope::map<Anope::string> vars = {

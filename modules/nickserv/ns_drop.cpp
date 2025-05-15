@@ -69,7 +69,7 @@ public:
 			if (!code)
 			{
 				code = na->Extend<Anope::string>("nickname-dropcode");
-				*code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
+				*code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
 			}
 
 			source.Reply(CONFIRM_DROP, na->nick.c_str(), source.service->GetQueryCommand("nickserv/drop").c_str(),

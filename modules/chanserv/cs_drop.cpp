@@ -55,7 +55,7 @@ public:
 			if (!code)
 			{
 				code = ci->Extend<Anope::string>("channel-dropcode");
-				*code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", 15));
+				*code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
 			}
 
 			source.Reply(CONFIRM_DROP, ci->name.c_str(), source.service->GetQueryCommand("chanserv/drop").c_str(),

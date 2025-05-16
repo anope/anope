@@ -1,5 +1,21 @@
-Anope Version 2.1.14-git
+Anope Version 2.1.15-git
 ------------------------
+Added a workaround to the jsonrpc module for JavaScript truncating big integers.
+Added an example Ruby library for accessing the RPC interface.
+Added away state and tls usage to the anope.user RPC event.
+Added support for looking up accounts by identifier in the anope.account RPC event.
+Added support for storing the setter and set time and setter of list modes and restoring them on InspIRCd and Solanum.
+Added support for token authentication to the RPC modules.
+Bumped the minimum supported version of ircd-hybrid to 8.2.34.
+Deprecated irc2sql in favour of rpc_data.
+Dropped support for Bahamut as it has no known users.
+Fixed creating duplicate Stats rows on some servers.
+Fixed loading databases in db_json.
+Fixed sometimes writing accounts to the database without a unique identifier.
+Fixed various documentation issues with the example JavaScript JSON-RPC client.
+
+Anope Version 2.1.14
+--------------------
 Added a detail specifier to the anope.list{Channels,Opers,Servers,Users} RPC methods.
 Added a matcher for the InspIRCd oper extban.
 Added support for hashed operator passwords.

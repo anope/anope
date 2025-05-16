@@ -235,6 +235,18 @@ static void write_pidfile()
 	if (Anope::NoPID || pidfile.empty())
 		return;
 
+#ifndef _WIN32
+	std::ifstream oldstream(pidfile.str());
+	if (oldstream.is_open())
+	{
+		pid_t oldpid = 0;
+		oldstream >> oldpid;
+		if (oldpid && kill(oldpid, 0) == 0)
+			throw CoreException("Anope is already running with process id " + Anope::ToString(oldpid));
+	}
+	oldstream.close();
+#endif
+
 	std::ofstream stream(pidfile.str());
 	if (!stream.is_open())
 		throw CoreException("Can not write to PID file " + pidfile);

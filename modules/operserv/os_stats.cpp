@@ -32,7 +32,7 @@ struct StatsType final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		data.Store("maxusercnt", MaxUserCount);
 		data.Store("maxusertime", MaxUserTime);

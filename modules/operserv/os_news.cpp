@@ -80,7 +80,7 @@ struct NewsItemType final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *ni = static_cast<const NewsItem *>(obj);
 		data.Store("type", ni->type);

@@ -20,7 +20,7 @@ struct OSOperType
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *myo = static_cast<const MyOper *>(obj);
 		data.Store("name", myo->name);

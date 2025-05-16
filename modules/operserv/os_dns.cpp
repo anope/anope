@@ -59,7 +59,7 @@ struct DNSZoneType final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *zone = static_cast<const DNSZone *>(obj);
 		data.Store("name", zone->name);
@@ -174,7 +174,7 @@ struct DNSServerType final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *req = static_cast<const DNSServer *>(obj);
 		data.Store("server_name", req->server_name);

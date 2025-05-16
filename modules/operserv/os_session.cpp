@@ -43,7 +43,7 @@ struct ExceptionType final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *ex = static_cast<const Exception *>(obj);
 		data.Store("mask", ex->mask);

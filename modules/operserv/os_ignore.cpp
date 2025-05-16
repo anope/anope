@@ -33,11 +33,11 @@ struct IgnoreDataTypeImpl final
 		: Serialize::Type("IgnoreData")
 	{
 	}
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+	void Serialize(Serializable *obj, Serialize::Data &data) const override;
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
 };
 
-void IgnoreDataTypeImpl::Serialize(const Serializable *obj, Serialize::Data &data) const
+void IgnoreDataTypeImpl::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *ign = static_cast<const IgnoreDataImpl *>(obj);
 	data.Store("mask", ign->mask);

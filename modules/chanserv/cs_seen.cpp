@@ -53,7 +53,7 @@ struct SeenInfoType final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *s = static_cast<const SeenInfo *>(obj);
 		data.Store("nick", s->nick);

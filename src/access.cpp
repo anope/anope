@@ -166,7 +166,7 @@ ChanAccess::Type::Type()
 {
 }
 
-void ChanAccess::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+void ChanAccess::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *access = static_cast<const ChanAccess *>(obj);
 	data.Store("provider", access->provider->name);

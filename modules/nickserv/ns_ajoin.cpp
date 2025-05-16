@@ -49,7 +49,7 @@ struct AJoinEntryType final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *aj = static_cast<const AJoinEntry *>(obj);
 		if (!aj->owner)

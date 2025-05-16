@@ -39,7 +39,7 @@ struct ModeLockTypeImpl final
 		: Serialize::Type("ModeLock")
 	{
 	}
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+	void Serialize(Serializable *obj, Serialize::Data &data) const override;
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
 };
 
@@ -211,7 +211,7 @@ struct ModeLocksImpl final
 	}
 };
 
-void ModeLockTypeImpl::Serialize(const Serializable *obj, Serialize::Data &data) const
+void ModeLockTypeImpl::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *ml = static_cast<const ModeLockImpl *>(obj);
 	data.Store("ci", ml->ci);

@@ -39,7 +39,7 @@ struct HostRequestTypeImpl final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *req = static_cast<const HostRequestImpl *>(obj);
 		data.Store("nick", req->nick);

@@ -29,7 +29,7 @@ public:
 		: public Serialize::Type
 	{
 		Type();
-		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		void Serialize(Serializable *obj, Serialize::Data &data) const override;
 		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
 	};
 
@@ -59,7 +59,7 @@ public:
 		: public Serialize::Type
 	{
 		Type();
-		void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+		void Serialize(Serializable *obj, Serialize::Data &data) const override;
 		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
 	};
 

@@ -35,7 +35,7 @@ struct OperInfoTypeImpl
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *oi = static_cast<const OperInfoImpl *>(obj);
 		data.Store("target", oi->target);

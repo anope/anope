@@ -29,11 +29,11 @@ struct ForbidDataTypeImpl final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override;
+	void Serialize(Serializable *obj, Serialize::Data &data) const override;
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
 };
 
-void ForbidDataTypeImpl::Serialize(const Serializable *obj, Serialize::Data &data) const
+void ForbidDataTypeImpl::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *fb = static_cast<const ForbidDataImpl *>(obj);
 	data.Store("mask", fb->mask);

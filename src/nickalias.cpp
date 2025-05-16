@@ -150,7 +150,7 @@ NickAlias::Type::Type()
 {
 }
 
-void NickAlias::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+void NickAlias::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *na = static_cast<const NickAlias *>(obj);
 	data.Store("nick", na->nick);

@@ -29,7 +29,7 @@ struct NSSuspendInfoType final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *si = static_cast<const NSSuspendInfo *>(obj);
 		data.Store("nick", si->what);

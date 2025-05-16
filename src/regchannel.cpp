@@ -44,7 +44,7 @@ AutoKick::Type::Type()
 {
 }
 
-void AutoKick::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+void AutoKick::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *ak = static_cast<const AutoKick *>(obj);
 	data.Store("ci", ak->ci->name);
@@ -186,7 +186,7 @@ ChannelInfo::Type::Type()
 {
 }
 
-void ChannelInfo::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+void ChannelInfo::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *ci = static_cast<const ChannelInfo *>(obj);
 

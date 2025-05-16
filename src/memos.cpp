@@ -40,7 +40,7 @@ Memo::Type::Type()
 {
 }
 
-void Memo::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+void Memo::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *m = static_cast<const Memo *>(obj);
 	data.Store("owner", m->owner);

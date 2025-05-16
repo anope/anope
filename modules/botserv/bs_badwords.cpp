@@ -28,7 +28,7 @@ struct BadWordTypeImpl final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *bw = static_cast<const BadWordImpl *>(obj);
 		data.Store("ci", bw->chan);

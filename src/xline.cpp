@@ -168,7 +168,7 @@ XLine::Type::Type()
 {
 }
 
-void XLine::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+void XLine::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *xl = static_cast<const XLine *>(obj);
 

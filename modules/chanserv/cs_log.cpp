@@ -44,7 +44,7 @@ struct LogSettingTypeImpl final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *ls = static_cast<const LogSettingImpl *>(obj);
 		data.Store("ci", ls->chan);

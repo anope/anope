@@ -39,7 +39,7 @@ struct EntryMsgTypeImpl final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &data) const override
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *msg = static_cast<const EntryMsgImpl *>(obj);
 		data.Store("ci", msg->chan);

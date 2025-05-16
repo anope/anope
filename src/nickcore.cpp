@@ -71,7 +71,7 @@ NickCore::Type::Type()
 {
 }
 
-void NickCore::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+void NickCore::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *nc = static_cast<const NickCore *>(obj);
 	data.Store("display", nc->display);

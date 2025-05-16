@@ -54,7 +54,7 @@ struct CSMiscDataType
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &sdata) const override
+	void Serialize(Serializable *obj, Serialize::Data &sdata) const override
 	{
 		const auto *d = static_cast<const CSMiscData *>(obj);
 		sdata.Store("ci", d->object);

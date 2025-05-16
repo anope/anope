@@ -216,7 +216,7 @@ public:
 	 *            type so you can cast it without any checks.
 	 * @param data The database to serialize to.
 	 */
-	virtual void Serialize(const Serializable *obj, Serialize::Data &data) const = 0;
+	virtual void Serialize(Serializable *obj, Serialize::Data &data) const = 0;
 
 	/** Unserializes the specified object from the database.
 	 * @param obj The object to unserialize into. If the object has not been

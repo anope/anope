@@ -53,7 +53,7 @@ struct NSMiscDataType final
 	{
 	}
 
-	void Serialize(const Serializable *obj, Serialize::Data &sdata) const override
+	void Serialize(Serializable *obj, Serialize::Data &sdata) const override
 	{
 		const auto *d = static_cast<const NSMiscData *>(obj);
 		sdata.Store("nc", d->object);

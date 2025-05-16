@@ -89,7 +89,7 @@ BotInfo::Type::Type()
 {
 }
 
-void BotInfo::Type::Serialize(const Serializable *obj, Serialize::Data &data) const
+void BotInfo::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 {
 	const auto *bi = static_cast<const BotInfo *>(obj);
 	data.Store("nick", bi->nick);

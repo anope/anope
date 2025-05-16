@@ -152,7 +152,7 @@ int main(int ac, char **av, char **envp)
 	}
 	catch (const CoreException &ex)
 	{
-		Log() << ex.GetReason();
+		Log(LOG_TERMINAL) << "Error: " << ex.GetReason();
 		return EXIT_FAILURE;
 	}
 

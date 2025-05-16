@@ -137,7 +137,7 @@ private:
 	/* Channels which reference this core in some way (this is on their access list, akick list, is founder, successor, etc) */
 	Serialize::Checker<std::map<ChannelInfo *, int> > chanaccess;
 	/* Unique identifier for the account. */
-	uint64_t id;
+	uint64_t uniqueid;
 public:
 	/* Name of the account. Find(display)->nc == this. */
 	Anope::string display;

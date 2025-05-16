@@ -21,7 +21,7 @@ Serialize::Checker<nickcoreid_map> NickCoreIdList(NICKCORE_TYPE);
 NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid)
 	: Serializable(NICKCORE_TYPE)
 	, chanaccess(CHANNELINFO_TYPE)
-	, id(coreid)
+	, uniqueid(coreid)
 	, display(coredisplay)
 	, aliases(NICKALIAS_TYPE)
 {
@@ -252,25 +252,25 @@ NickCore *NickCore::FindId(uint64_t id)
 
 uint64_t NickCore::GetId()
 {
-	if (this->id)
-		return this->id;
+	if (this->uniqueid)
+		return this->uniqueid;
 
 	// We base the account identifier on the account display at registration and
 	// when the account was first registered. This should be unique enough that
 	// it never collides. In the extremely rare case that it does generate a
 	// duplicate id we try with a new suffix.
 	uint64_t attempt = 0;
-	while (!this->id)
+	while (!this->uniqueid)
 	{
 		const auto newidstr = this->display + "\0" + Anope::ToString(this->registered) + "\0" + Anope::ToString(attempt++);
 		const auto newid = Anope::hash_cs()(newidstr);
 		if (NickCoreIdList->emplace(newid, this).second)
 		{
-			this->id = newid;
+			this->uniqueid = newid;
 			this->QueueUpdate();
 			break;
 		}
 	}
 
-	return this->id;
+	return this->uniqueid;
 }

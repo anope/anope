@@ -73,9 +73,9 @@ NickCore::Type::Type()
 
 void NickCore::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 {
-	const auto *nc = static_cast<const NickCore *>(obj);
+	auto *nc = static_cast<NickCore *>(obj);
 	data.Store("display", nc->display);
-	data.Store("uniqueid", nc->id);
+	data.Store("uniqueid", nc->GetId());
 	data.Store("pass", nc->pass);
 	data.Store("email", nc->email);
 	data.Store("language", nc->language);

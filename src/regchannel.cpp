@@ -78,7 +78,7 @@ Serializable *AutoKick::Type::Unserialize(Serializable *obj, Serialize::Data &da
 		ak = anope_dynamic_static_cast<AutoKick *>(obj);
 		data["creator"] >> ak->creator;
 		data["reason"] >> ak->reason;
-		ak->nc = NickCore::Find(snc);
+		ak->nc = nc;
 		data["mask"] >> ak->mask;
 		data["addtime"] >> ak->addtime;
 		data["last_used"] >> ak->last_used;

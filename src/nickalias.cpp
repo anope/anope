@@ -139,9 +139,9 @@ NickAlias *NickAlias::Find(const Anope::string &nick)
 	return NULL;
 }
 
-NickAlias *NickAlias::FindId(uint64_t id)
+NickAlias *NickAlias::FindId(uint64_t uid)
 {
-	const auto *nc = NickCore::FindId(id);
+	const auto *nc = NickCore::FindId(uid);
 	return nc ? nc->na : nullptr;
 }
 

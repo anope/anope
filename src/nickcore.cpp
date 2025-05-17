@@ -32,8 +32,8 @@ NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid)
 		Log(LOG_DEBUG) << "Duplicate account " << this->display << " in NickCore table";
 
 	// Upgrading users may not have an account identifier.
-	if (this->id && !NickCoreIdList->insert_or_assign(this->id, this).second)
-		Log(LOG_DEBUG) << "Duplicate account id " << this->id << " in NickCore table";
+	if (this->uniqueid && !NickCoreIdList->insert_or_assign(this->uniqueid, this).second)
+		Log(LOG_DEBUG) << "Duplicate account id " << this->uniqueid << " in NickCore table";
 
 	FOREACH_MOD(OnNickCoreCreate, (this));
 }
@@ -55,8 +55,8 @@ NickCore::~NickCore()
 	this->users.clear();
 
 	NickCoreList->erase(this->display);
-	if (this->id)
-		NickCoreIdList->erase(this->id);
+	if (this->uniqueid)
+		NickCoreIdList->erase(this->uniqueid);
 
 	if (!this->memos.memos->empty())
 	{
@@ -244,9 +244,9 @@ NickCore *NickCore::Find(const Anope::string &nick)
 	return NULL;
 }
 
-NickCore *NickCore::FindId(uint64_t id)
+NickCore *NickCore::FindId(uint64_t uid)
 {
-	auto it = NickCoreIdList->find(id);
+	auto it = NickCoreIdList->find(uid);
 	if (it != NickCoreIdList->end())
 	{
 		it->second->QueueUpdate();

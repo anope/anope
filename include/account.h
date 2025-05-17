@@ -113,7 +113,7 @@ public:
 	 * @return the nick, if found
 	 */
 	static NickAlias *Find(const Anope::string &nick);
-	static NickAlias *FindId(uint64_t id);
+	static NickAlias *FindId(uint64_t uid);
 };
 
 /* A registered account. Each account must have a NickAlias with the same nick as the
@@ -195,7 +195,7 @@ public:
 	 * @return The account, if it exists
 	 */
 	static NickCore *Find(const Anope::string &nick);
-	static NickCore *FindId(uint64_t id);
+	static NickCore *FindId(uint64_t uid);
 
 	void AddChannelReference(ChannelInfo *ci);
 	void RemoveChannelReference(ChannelInfo *ci);

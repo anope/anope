@@ -217,6 +217,10 @@ int main(int ac, char **av, char **envp)
 
 	if (Anope::Restarting)
 	{
+		auto pidfile = Anope::ExpandData(Config->GetBlock("serverinfo").Get<const Anope::string>("pid"));
+		if (!pidfile.empty())
+			remove(pidfile.c_str());
+
 		if (chdir(BinaryDir.c_str()) == 0)
 		{
 			Anope::string sbin = "./" + Anope::ServicesBin;

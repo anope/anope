@@ -80,7 +80,7 @@ void NickCore::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 	data.Store("email", nc->email);
 	data.Store("language", nc->language);
 	data.Store("lastmail", nc->lastmail);
-	data.Store("time_registered", nc->registered);
+	data.Store("registered", nc->registered);
 	data.Store("memomax", nc->memos.memomax);
 
 	std::ostringstream oss;
@@ -110,7 +110,7 @@ Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &da
 	data["email"] >> nc->email;
 	data["language"] >> nc->language;
 	data["lastmail"] >> nc->lastmail;
-	data["time_registered"] >> nc->registered;
+	data["registered"] >> nc->registered;
 	data["memomax"] >> nc->memos.memomax;
 	{
 		Anope::string buf;
@@ -179,6 +179,11 @@ Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &da
 		nc->Extend("PROTECT_AFTER", 0);
 	}
 	// End 2.0 compatibility.
+
+	// Begin 2.1 compatibility.
+	if (!nc->registered)
+		data["time_registered"] >> nc->registered;
+	// End 2.1 compatibility.
 
 	return nc;
 }

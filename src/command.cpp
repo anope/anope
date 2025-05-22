@@ -141,7 +141,6 @@ void CommandSource::Reply(const Anope::string &message)
 
 Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(o)
 {
-	allow_unregistered = require_user = false;
 }
 
 void Command::SetDesc(const Anope::string &d)
@@ -185,19 +184,9 @@ void Command::SendSyntax(CommandSource &source)
 		source.Reply("%s: \002%s\002", prefix.c_str(), source.command.nobreak().c_str());
 }
 
-bool Command::AllowUnregistered() const
-{
-	return this->allow_unregistered;
-}
-
 void Command::AllowUnregistered(bool b)
 {
 	this->allow_unregistered = b;
-}
-
-bool Command::RequireUser() const
-{
-	return this->require_user;
 }
 
 void Command::RequireUser(bool b)

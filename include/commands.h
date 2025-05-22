@@ -99,9 +99,9 @@ class CoreExport Command
 	Anope::string desc;
 	std::vector<std::pair<Anope::string, std::function<bool(CommandSource&)>>> syntax;
 	/* Allow unregistered users to use this command */
-	bool allow_unregistered;
+	bool allow_unregistered = false;
 	/* Command requires that a user is executing it */
-	bool require_user;
+	bool require_user = false;
 
 public:
 	/* Maximum parameters accepted by this command */
@@ -136,8 +136,8 @@ protected:
 	void RequireUser(bool b);
 
 public:
-	bool AllowUnregistered() const;
-	bool RequireUser() const;
+	inline bool AllowUnregistered() const { return this->allow_unregistered; }
+	inline bool RequireUser() const { return this->require_user; }
 
 	/** Get the command description
 	 * @param source The source wanting the command description

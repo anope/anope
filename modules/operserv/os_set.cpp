@@ -122,12 +122,12 @@ private:
 		}
 		else
 		{
-			auto debug = Anope::TryConvert<int>(setting);
+			auto debug = Anope::TryConvert<unsigned>(setting);
 			if (debug.has_value())
 			{
 				Anope::Debug = debug.value();
 				Log(LOG_ADMIN, source, this) << "DEBUG " << Anope::Debug;
-				source.Reply(_("Services are now in \002debug\002 mode (level %d)."), Anope::Debug);
+				source.Reply(_("Services are now in \002debug\002 mode (level %u)."), Anope::Debug);
 				return;
 			}
 

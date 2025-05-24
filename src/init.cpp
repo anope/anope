@@ -390,11 +390,10 @@ bool Anope::Init(int ac, char **av)
 	{
 		if (!arg.empty())
 		{
-			auto level = Anope::Convert<int>(arg, -1);
-			if (level > 0)
-				Anope::Debug = level;
-			else
+			auto level = Anope::TryConvert<unsigned>(arg);
+			if (!level.has_value())
 				throw CoreException("Invalid option given to --debug");
+			Anope::Debug = level.value();
 		}
 		else
 			++Anope::Debug;

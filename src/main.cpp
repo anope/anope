@@ -23,7 +23,7 @@
 #endif
 
 /* Command-line options: */
-int Anope::Debug = 0;
+unsigned Anope::Debug = 0;
 bool Anope::ReadOnly = false, Anope::NoFork = false, Anope::NoThird = false, Anope::NoPID = false, Anope::NoExpire = false, Anope::ProtocolDebug = false;
 Anope::string Anope::ServicesDir;
 Anope::string Anope::ServicesBin;

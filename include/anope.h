@@ -379,7 +379,7 @@ namespace Anope
 
 	/** The debug level we are running at.
 	 */
-	extern CoreExport int Debug;
+	extern CoreExport unsigned Debug;
 
 	/** Other command line options.
 	 */

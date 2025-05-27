@@ -661,13 +661,13 @@ public:
 	{
 		const auto &block = Config->GetModule(this);
 
-		session_limit = block.Get<int>("defaultsessionlimit");
-		max_session_kill = block.Get<int>("maxsessionkill");
+		session_limit = block.Get<unsigned>("defaultsessionlimit");
+		max_session_kill = block.Get<unsigned>("maxsessionkill");
 		session_autokill_expiry = block.Get<time_t>("sessionautokillexpiry");
 		sle_reason = block.Get<const Anope::string>("sessionlimitexceeded");
 		sle_detailsloc = block.Get<const Anope::string>("sessionlimitdetailsloc");
 
-		max_exception_limit = block.Get<int>("maxsessionlimit");
+		max_exception_limit = block.Get<unsigned>("maxsessionlimit");
 		exception_expiry = block.Get<time_t>("exceptionexpiry");
 
 		ipv4_cidr = block.Get<unsigned>("session_ipv4_cidr", "32");

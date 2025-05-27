@@ -405,7 +405,7 @@ public:
 			return;
 		}
 
-		const auto badpasslimit = Config->GetBlock("options").Get<int>("badpasslimit");
+		const auto badpasslimit = Config->GetBlock("options").Get<unsigned>("badpasslimit");
 		if (!badpasslimit)
 			return;
 

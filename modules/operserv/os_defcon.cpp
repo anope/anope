@@ -356,7 +356,7 @@ public:
 
 		{
 		const auto &block = conf.GetModule("os_session");
-		dconfig.max_session_kill = block.Get<int>("maxsessionkill");
+		dconfig.max_session_kill = block.Get<unsigned>("maxsessionkill");
 		dconfig.session_autokill_expiry = block.Get<time_t>("sessionautokillexpiry");
 		dconfig.sle_reason = block.Get<const Anope::string>("sessionlimitexceeded");
 		dconfig.sle_detailsloc = block.Get<const Anope::string>("sessionlimitdetailsloc");

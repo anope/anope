@@ -154,7 +154,7 @@ public:
 	{
 		std::deque<ChannelInfo *> chans;
 		nc->GetChannelReferences(chans);
-		int max_reg = Config->GetModule(this).Get<int>("maxregistered");
+		auto max_reg = Config->GetModule(this).Get<uint16_t>("maxregistered");
 
 		for (auto *ci : chans)
 		{

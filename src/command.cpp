@@ -243,12 +243,12 @@ namespace
 		bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 		if (has_help && similar.empty())
 		{
-			source.Reply(_("Unknown command \002%s\002. \"%s\" for help."), message.c_str(),
+			source.Reply(_("Unknown command \002%s\002. Type \"%s\" for help."), message.c_str(),
 				source.service->GetQueryCommand("generic/help").c_str());
 		}
 		else if (has_help)
 		{
-			source.Reply(_("Unknown command \002%s\002. Did you mean \002%s\002? \"%s\" for help."),
+			source.Reply(_("Unknown command \002%s\002. Did you mean \002%s\002? Type \"%s\" for help."),
 				message.c_str(), similar.c_str(), source.service->GetQueryCommand("generic/help").c_str());
 		}
 		else if (similar.empty())

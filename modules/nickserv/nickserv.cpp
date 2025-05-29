@@ -11,6 +11,11 @@
 
 #include "module.h"
 
+namespace
+{
+	Anope::string enforcer_user, enforcer_host, enforcer_real;
+}
+
 class NickServCollide;
 static std::set<NickServCollide *> collides;
 
@@ -98,7 +103,7 @@ class NickServRelease final
 
 public:
 	NickServRelease(Module *me, NickAlias *na, time_t delay)
-		: User(na->nick, Config->GetModule(me).Get<const Anope::string>("enforceruser", "user"), Config->GetModule(me).Get<const Anope::string>("enforcerhost", Me->GetName()), "", "", Me, "Services Enforcer", Anope::CurTime, "", {}, IRCD->UID_Retrieve(), NULL)
+		: User(na->nick, enforcer_user, enforcer_host, "", "", Me, enforcer_real, Anope::CurTime, "", {}, IRCD->UID_Retrieve(), nullptr)
 		, Timer(me, delay)
 		, nick(na->nick)
 	{
@@ -317,7 +322,8 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		const Anope::string &nsnick = conf.GetModule(this).Get<const Anope::string>("client");
+		const auto &modconf = conf.GetModule(this);
+		const Anope::string &nsnick = modconf.Get<const Anope::string>("client");
 
 		if (nsnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
@@ -328,7 +334,7 @@ public:
 
 		NickServ = bi;
 
-		spacesepstream(conf.GetModule(this).Get<const Anope::string>("defaults", "memo_signon memo_receive")).GetTokens(defaults);
+		spacesepstream(modconf.Get<const Anope::string>("defaults", "memo_signon memo_receive")).GetTokens(defaults);
 		if (defaults.empty())
 		{
 			defaults.emplace_back("MEMO_SIGNON");
@@ -336,6 +342,10 @@ public:
 		}
 		else if (defaults[0].equals_ci("none"))
 			defaults.clear();
+
+		enforcer_user = modconf.Get<const Anope::string>("enforceruser", "enforcer");
+		enforcer_host = modconf.Get<const Anope::string>("enforcerhost", Me->GetName());
+		enforcer_real = modconf.Get<const Anope::string>("enforcerreal", "Services Enforcer");
 	}
 
 	void OnDelNick(NickAlias *na) override

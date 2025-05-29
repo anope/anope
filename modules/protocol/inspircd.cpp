@@ -364,7 +364,7 @@ public:
 			u->SetMode(NULL, um);
 		else
 			// Try to restore cloaked host
-			this->SendChgHostInternal(u->nick, u->chost);
+			this->SendChgHostInternal(u->GetUID(), u->chost);
 	}
 
 	void SendAkill(User *u, XLine *x) override

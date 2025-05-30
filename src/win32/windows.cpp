@@ -84,9 +84,4 @@ int mkstemp(char *input)
 	return fd;
 }
 
-void getcwd(char *buf, size_t sz)
-{
-	GetCurrentDirectory(sz, buf);
-}
-
 #endif

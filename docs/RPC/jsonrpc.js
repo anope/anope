@@ -206,6 +206,58 @@ class AnopeRPC {
 	messageUser(source, target, ...messages) {
 		return this.run("anope.messageUser", source, target, ...messages);
 	}
+
+	/**
+	 * Checks whether the specified credentials are valid.
+	 *
+	 * Requires the rpc_user module to be loaded.
+	 *
+	 * @param {string} account A nickname belonging to the account to check.
+	 * @param {string} password  The password for the specified account.
+	 * @returns {object} An object containing basic information about the account.
+	 */
+	checkCredentials(account, password) {
+		return this.run("anope.checkCredentials", account, password);
+	}
+
+	/**
+	 * Identifies an IRC user to the specified account.
+	 *
+	 * Requires the rpc_user module to be loaded.
+	 *
+	 * @param {string} account Either an account identifier or nickname belonging to the account to
+	 *                         identify to.
+	 * @param {string} password The nickname of the IRC user to identify to the account.
+	 */
+	identify(account, user) {
+		return this.run("anope.identify", account, user);
+	}
+
+	/**
+	 * Lists all commands that exist on the network.
+	 *
+	 * Requires the rpc_user module to be loaded.
+	 *
+	 * @param {...*} services The nicknames of the services to list commands for.
+	 * @returns {object} An object containing information about the available commands.
+	 */
+	listCommands(...services) {
+		return this.run("anope.listCommands", ...services);
+	}
+
+	/**
+	 * Lists all commands that exist on the network.
+	 *
+	 * Requires the rpc_user module to be loaded.
+	 *
+	 * @param {string} account If non-empty then the account to execute the command as.
+	 * @param {string} service The service which the command exists on.
+	 * @param {...*} command The the command to execute and any parameters to pass to it.
+	 * @returns {object} An object containing information about the available commands.
+	 */
+	command(account, service, ...command) {
+		return this.run("anope.command", account, service, ...command);
+	}
 }
 
 /*

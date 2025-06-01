@@ -186,6 +186,50 @@ class AnopeRPC
 	def message_user(source, target, *messages)
 		self.run("anope.messageUser", source, target, *messages)
 	end
+
+	# Checks whether the specified credentials are valid.
+	#
+	# Requires the rpc_user module to be loaded.
+	#
+	# @param account [String] A nickname belonging to the account to check.
+	# @param password [String] The password for the specified account.
+	# @return [Hash] A hash containing basic information about the account.
+	def check_credentials(account, password)
+		self.run("anope.checkCredentials", account, password)
+	end
+
+	# Identifies an IRC user to the specified account.
+	#
+	# Requires the rpc_user module to be loaded.
+	#
+	# @param account [String] Either an account identifier or nickname belonging to the account to
+	#                         identify to.
+	# @param password [String] The nickname of the IRC user to identify to the account.
+	def identify(account, user)
+		self.run("anope.identify", account, user)
+	end
+
+	# Lists all commands that exist on the network.
+	#
+	# Requires the rpc_user module to be loaded.
+	#
+	# @param services [Array<String>] The nicknames of the services to list commands for.
+	# @return [Hash] A hash containing information about the available commands.
+	def list_commands(*services)
+		self.run("anope.listCommands", *services)
+	end
+
+	# Lists all commands that exist on the network.
+	#
+	# Requires the rpc_user module to be loaded.
+	#
+	# @param account [String] If non-empty then the account to execute the command as.
+	# @param service [String] The service which the command exists on.
+	# @param command [Array<String>] The the command to execute and any parameters to pass to it.
+	# @return [Hash] A hash containing information about the available commands.
+	def command(account, service, *command)
+		self.run("anope.command", account, service, *command)
+	end
 end
 
 =begin

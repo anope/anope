@@ -33,9 +33,9 @@ contributions they have made, are:
   * Hendrik Jäger <gitcommit@henk.geekmail.org>
   * k4be <k4be@pirc.pl>
   * Thomas Fargeix <t.fargeix@gmail.com>
+  * Val Lorentz <progval+git@progval.net>
   * Bram Matthys <syzop@vulnscan.org>
   * Federico G. Schwindt <fgsch@lodoss.net>
-  * Val Lorentz <progval+git@progval.net>
   * Alexander Barton <alex@barton.de>
   * CaPa CuL <capacul@gmail.com>
   * Cronus <cronus@nite-serv.com>

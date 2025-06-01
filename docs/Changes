@@ -6,13 +6,17 @@ Added away state and tls usage to the anope.user RPC event.
 Added support for looking up accounts by identifier in the anope.account RPC event.
 Added support for storing the setter and set time and setter of list modes and restoring them on InspIRCd and Solanum.
 Added support for token authentication to the RPC modules.
+Added the anope.checkCredentials, anope.identify, anope.listCommands, and anope.command RPC events to the new rpc_user module.
 Bumped the minimum supported version of ircd-hybrid to 8.2.34.
 Deprecated irc2sql in favour of rpc_data.
 Dropped support for Bahamut as it has no known users.
 Fixed creating duplicate Stats rows on some servers.
 Fixed loading databases in db_json.
+Fixed restoring cloaked hosts on InspIRCd when the cloak module is not loaded.
+Fixed some variable shadowing that potentially caused issues with the SQL database backends.
 Fixed sometimes writing accounts to the database without a unique identifier.
 Fixed various documentation issues with the example JavaScript JSON-RPC client.
+Improved CTCP handling and added support for more CTCP types.
 
 Anope Version 2.1.14
 --------------------

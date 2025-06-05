@@ -20,21 +20,11 @@ namespace fs = std::filesystem;
 
 // TODO:
 // * forking into background
-// * stable key order
 
-inline Anope::string yyjson_mut_get_astr(yyjson_mut_val *val)
+inline Anope::string yyjson_get_astr(yyjson_val *val)
 {
-	const auto *str = yyjson_mut_get_str(val);
+	const auto *str = yyjson_get_str(val);
 	return str ? str : "";
-}
-
-inline void yyjson_mut_obj_upsert(yyjson_mut_doc *doc, yyjson_mut_val *obj, const char *key, yyjson_mut_val *val)
-{
-	auto *oldval = yyjson_mut_obj_get(obj, key);
-	if (oldval)
-		yyjson_mut_obj_replace(obj, yyjson_mut_str(doc, key), val);
-	else
-		yyjson_mut_obj_add_val(doc, obj, key, val);
 }
 
 class Data final
@@ -48,37 +38,42 @@ public:
 	Anope::map<std::stringstream> data;
 
 	// Used when writing data.
-	Data() = default;
+	Data(Serialize::Type *s_type, Serializable *obj)
+	{
+		if (obj->id)
+			this->id = obj->id;
+		s_type->Serialize(obj, *this);
+	}
 
 	// Used when reading data.
-	Data(yyjson_mut_val *elem)
+	Data(yyjson_val *elem)
 	{
 		size_t idx, max;
-		yyjson_mut_val *key, *value;
-		yyjson_mut_obj_foreach(elem, idx, max, key, value)
+		yyjson_val *key, *value;
+		yyjson_obj_foreach(elem, idx, max, key, value)
 		{
-			if (yyjson_mut_get_type(key) != YYJSON_TYPE_STR)
+			if (yyjson_get_type(key) != YYJSON_TYPE_STR)
 				continue;
 
-			Anope::string akey(yyjson_mut_get_str(key));
+			auto akey = yyjson_get_astr(key);
 			if (akey.equals_ci("@id"))
 			{
-				this->id = yyjson_mut_get_uint(value);
+				this->id = yyjson_get_uint(value);
 				continue;
 			}
 
-			if (yyjson_mut_is_bool(value))
-				data[akey] << yyjson_mut_get_bool(value);
-			else if (yyjson_mut_is_int(value))
-				data[akey] << yyjson_mut_get_int(value);
-			else if (yyjson_mut_is_null(value))
+			if (yyjson_is_bool(value))
+				data[akey] << yyjson_get_bool(value);
+			else if (yyjson_is_int(value))
+				data[akey] << yyjson_get_int(value);
+			else if (yyjson_is_null(value))
 				data[akey];
-			else if (yyjson_mut_is_real(value))
-				data[akey] << yyjson_mut_get_real(value);
-			else if (yyjson_mut_is_str(value))
-				data[akey] << yyjson_mut_get_str(value);
-			else if (yyjson_mut_is_uint(value))
-				data[akey] << yyjson_mut_get_uint(value);
+			else if (yyjson_is_real(value))
+				data[akey] << yyjson_get_real(value);
+			else if (yyjson_is_str(value))
+				data[akey] << yyjson_get_astr(value);
+			else if (yyjson_is_uint(value))
+				data[akey] << yyjson_get_uint(value);
 		}
 	}
 
@@ -92,10 +87,11 @@ class DBJSON final
 	: public Module
 {
 private:
-	using DBPair = std::pair<yyjson_mut_doc *, yyjson_mut_val *>;
+	// Multimap from serializable type to serializable data.
+	using DBData = Anope::multimap<Data>;
 
 	// The databases which have already been loaded from disk.
-	std::unordered_map<Module *, DBPair> databases;
+	std::unordered_map<Module *, DBData> databases;
 
 	// Whether OnLoadDatabase has been called yet.
 	bool loaded = false;
@@ -201,71 +197,131 @@ private:
 		CreateBackup(backupdir, dbpath, monthly_backups, "%Y-%m", "\?\?\?\?-\?\?");
 	}
 
-	void LoadType(Serialize::Type *s_type, yyjson_mut_val *data)
+	void LoadType(Serialize::Type *s_type, DBData &data)
 	{
-		auto *entries = yyjson_mut_obj_get(data, s_type->GetName().c_str());
-		if (!entries || !yyjson_mut_is_arr(entries))
+		auto entries = data.equal_range(s_type->GetName());
+		if (entries.first == entries.second)
 			return;
 
-		Log(LOG_DEBUG) << "Loading " << yyjson_mut_arr_size(entries) << " " << s_type->GetName() << " records";
-		size_t idx, max;
-		yyjson_mut_val *elem;
-		yyjson_mut_arr_foreach(entries, idx, max, elem)
-		{
-			Data ld(elem);
-			s_type->Unserialize(nullptr, ld);
-		}
+		for (auto it = entries.first; it != entries.second; ++it)
+			s_type->Unserialize(nullptr, it->second);
 	}
 
-	DBPair ReadDatabase(const Anope::string &dbname)
+	std::optional<DBData> ReadDatabase(const Anope::string &dbname)
 	{
 		yyjson_read_err errmsg;
 		const auto flags = YYJSON_READ_ALLOW_TRAILING_COMMAS | YYJSON_READ_ALLOW_INVALID_UNICODE;
-		auto *idoc = yyjson_read_file(dbname.c_str(), flags, nullptr, &errmsg);
-		if (!idoc)
+		auto *doc = yyjson_read_file(dbname.c_str(), flags, nullptr, &errmsg);
+		if (!doc)
 		{
 			Log(this) << "Unable to read " << dbname << ": error #" << errmsg.code << ": " << errmsg.msg;
-			return { nullptr, nullptr };
+			return std::nullopt;
 		}
 
-		// We operate on a mutable document because we need to write to it later.
-		auto *doc = yyjson_doc_mut_copy(idoc, nullptr);
-		yyjson_doc_free(idoc);
-
-		auto *root = yyjson_mut_doc_get_root(doc);
-		if (!yyjson_mut_is_obj(root))
+		auto *root = yyjson_doc_get_root(doc);
+		if (!yyjson_is_obj(root))
 		{
 			Log(this) << "Unable to read " << dbname << ": root element is not an object";
-			return { nullptr, nullptr };
+			return std::nullopt;
 		}
 
-		auto version = yyjson_mut_get_uint(yyjson_mut_obj_get(root, "version"));
+		auto version = yyjson_get_uint(yyjson_obj_get(root, "version"));
 		if (version && version != ANOPE_DATABASE_VERSION)
 		{
 			Log(this) << "Refusing to load an unsupported database version: " << version;
-			return { nullptr, nullptr };
+			return std::nullopt;
 		}
 
-		auto generator = yyjson_mut_get_astr(yyjson_mut_obj_get(root, "generator"));
-		auto updated = yyjson_mut_get_uint(yyjson_mut_obj_get(root, "updated"));
+		auto generator = yyjson_get_astr(yyjson_obj_get(root, "generator"));
+		auto updated = yyjson_get_uint(yyjson_obj_get(root, "updated"));
 		Log(LOG_DEBUG) << "Database " << dbname << " was generated on " << Anope::strftime(updated) << " by " << generator;
 
-		auto *data = yyjson_mut_obj_get(root, "data");
-		if (!data || !yyjson_mut_is_obj(data))
+		auto *data = yyjson_obj_get(root, "data");
+		if (!data || !yyjson_is_obj(data))
 		{
 			Log(this) << "Unable to read " << dbname << ": data element is missing or not an object";
-			return { nullptr, nullptr };
+			return std::nullopt;
 		}
 
-		return { doc, data };
+		DBData ret;
+
+		size_t idx, max;
+		yyjson_val *key, *val;
+		yyjson_obj_foreach(data, idx, max, key, val)
+		{
+			if (!yyjson_is_str(key))
+			{
+				Log(this) << "Unable to read part of " << dbname << ": key of data element #" << idx << " is not a string";
+				continue;
+			}
+
+			auto keystr = yyjson_get_astr(key);
+			if (!yyjson_is_arr(val))
+			{
+				Log(this) << "Unable to read part of " << dbname << ": " << keystr << " value of data element #" << idx << " is not an array";
+				continue;
+			}
+
+			Log(LOG_DEBUG) << "Loading " << yyjson_arr_size(val) << " " << keystr << " records";
+
+			size_t idx, max;
+			yyjson_val *elem;
+			yyjson_arr_foreach(val, idx, max, elem)
+			{
+				Data ld(elem);
+				ret.emplace(keystr, std::move(ld));
+			}
+		}
+
+		yyjson_doc_free(doc);
+
+		return ret;
 	}
 
-	static void UpdateMetadata(yyjson_mut_doc *doc, yyjson_mut_val *obj)
+	void SaveType(yyjson_mut_doc *doc, yyjson_mut_val *obj, const Anope::string &typestr, const Data &data)
 	{
-		const auto generator = "Anope " + Anope::Version() + " " + Anope::VersionBuildString();
-		yyjson_mut_obj_upsert(doc, obj, "generator", yyjson_mut_strncpy(doc, generator.c_str(), generator.length()));
-		yyjson_mut_obj_upsert(doc, obj, "version", yyjson_mut_uint(doc, ANOPE_DATABASE_VERSION));
-		yyjson_mut_obj_upsert(doc, obj, "updated", yyjson_mut_int(doc, Anope::CurTime));
+		auto *type = yyjson_mut_obj_getn(obj, typestr.c_str(), typestr.length());
+		if (!type || !yyjson_mut_is_arr(type))
+		{
+			// We haven't seen this element before.
+			type = yyjson_mut_arr(doc);
+			yyjson_mut_obj_add_val(doc, obj, typestr.c_str(), type);
+		}
+
+		auto *elem = yyjson_mut_obj(doc);
+		if (data.id)
+			yyjson_mut_obj_add_uint(doc, elem, "@id", data.id);
+
+		for (const auto &[key, value] : data.data)
+		{
+			yyjson_mut_val *v;
+			switch (data.GetType(key))
+			{
+				case Serialize::DataType::BOOL:
+					v = yyjson_mut_bool(doc, Anope::Convert<bool>(value.str(), false));
+					break;
+				case Serialize::DataType::FLOAT:
+					v = yyjson_mut_real(doc, Anope::Convert<double>(value.str(), 0.0));
+					break;
+				case Serialize::DataType::INT:
+					v = yyjson_mut_int(doc, Anope::Convert<int64_t>(value.str(), 0));
+					break;
+				case Serialize::DataType::TEXT:
+				{
+					auto str = value.str();
+					v = str.empty() ? yyjson_mut_null(doc) : yyjson_mut_strncpy(doc, str.c_str(), str.length());
+					break;
+				}
+				case Serialize::DataType::UINT:
+					v = yyjson_mut_uint(doc, Anope::Convert<uint64_t>(value.str(), 0));
+					break;
+			}
+
+			auto *k = yyjson_mut_strncpy(doc, key.c_str(), key.length());
+			yyjson_mut_obj_add(elem, k, v);
+		}
+
+		yyjson_mut_arr_add_val(type, elem);
 	}
 
 public:
@@ -278,15 +334,15 @@ public:
 	{
 		auto dbname = GetDatabaseFile(nullptr);
 
-		auto [doc, data] = ReadDatabase(dbname);
-		if (!data)
+		auto db = ReadDatabase(dbname);
+		if (!db)
 			return EVENT_STOP;
 
 		for (const auto &type : Serialize::Type::GetTypeOrder())
 		{
 			auto *s_type = Serialize::Type::Find(type);
 			if (s_type && !s_type->GetOwner())
-				LoadType(s_type, data);
+				LoadType(s_type, db.value());
 		}
 
 		loaded = true;
@@ -295,111 +351,73 @@ public:
 
 	void OnSaveDatabase() override
 	{
-		std::set<Module *> updated;
-		for (const auto &[_, s_type] : Serialize::Type::GetTypes())
+		// Step 1: clear the old data.
+		for (const auto &type : Serialize::Type::GetTypeOrder())
 		{
+			auto *s_type = Serialize::Type::Find(type);
+			if (!s_type)
+				continue; // Provider has been unloaded.
+
 			auto it = databases.find(s_type->GetOwner());
 			if (it == databases.end())
 			{
-				auto *doc = yyjson_mut_doc_new(nullptr);
-
-				auto *root = yyjson_mut_obj(doc);
-				yyjson_mut_doc_set_root(doc, root);
-
-				UpdateMetadata(doc, root);
-
-				auto *data = yyjson_mut_obj(doc);
-				yyjson_mut_obj_add_val(doc, root, "data", data);
-
-				databases[s_type->GetOwner()] = { doc, data };
+				databases.emplace(s_type->GetOwner(), DBData());
+				continue; // We just need to create for this type.
 			}
-			else if (updated.find(s_type->GetOwner()) == updated.end())
-			{
-				auto *doc = it->second.first;
-				auto *root = yyjson_mut_doc_get_root(doc);
 
-				UpdateMetadata(doc, root);
-				updated.insert(s_type->GetOwner());
-			}
+			// As this type has been written before we need to clear the entries
+			// from the previous writes so we can update it in the next loop. We
+			// have to do it this way so we don't purge any entries for unloaded
+			// modules.
+			it->second.erase(s_type->GetName());
 		}
 
-		std::set<Serialize::Type *> seen;
+		// Step 2: store the new data.
 		for (auto *item : Serializable::GetItems())
 		{
 			auto *s_type = item->GetSerializableType();
 			if (!s_type)
 				continue; // Provider has been unloaded.
 
+			// This should always be found because we create it in the previous step.
 			auto it = databases.find(s_type->GetOwner());
-			if (it == databases.end())
-				continue; // Type has not been registered?
-
-			auto &[doc, data] = it->second;
-
-			// If the type object doesn't exist then create it. Otherwise, clear.
-			// all of the previous objects stored in it.
-			auto *type = yyjson_mut_obj_getn(data, s_type->GetName().c_str(), s_type->GetName().length());
-			if (!type || yyjson_mut_get_type(type) != YYJSON_TYPE_ARR)
-			{
-				// We haven't seen this element before.
-				type = yyjson_mut_arr(doc);
-				yyjson_mut_obj_add_val(doc, data, s_type->GetName().c_str(), type);
-			}
-			else if (seen.find(s_type) == seen.end())
-			{
-				// We are reusing an existing element, clear it.
-				yyjson_mut_arr_clear(type);
-				seen.insert(s_type);
-			}
-
-			auto *elem = yyjson_mut_arr_add_obj(doc, type);
-			if (item->id)
-				yyjson_mut_obj_add_uint(doc, elem, "@id", item->id);
-
-			Data sd;
-			s_type->Serialize(item, sd);
-			for (const auto &[key, value] : sd.data)
-			{
-				yyjson_mut_val *v;
-				switch (sd.GetType(key))
-				{
-					case Serialize::DataType::BOOL:
-						v = yyjson_mut_bool(doc, Anope::Convert<bool>(value.str(), false));
-						break;
-					case Serialize::DataType::FLOAT:
-						v = yyjson_mut_real(doc, Anope::Convert<double>(value.str(), 0.0));
-						break;
-					case Serialize::DataType::INT:
-						v = yyjson_mut_int(doc, Anope::Convert<int64_t>(value.str(), 0));
-						break;
-					case Serialize::DataType::TEXT:
-					{
-						auto str = value.str();
-						v = str.empty() ? yyjson_mut_null(doc) : yyjson_mut_strncpy(doc, str.c_str(), str.length());
-						break;
-					}
-					case Serialize::DataType::UINT:
-						v = yyjson_mut_uint(doc, Anope::Convert<uint64_t>(value.str(), 0));
-						break;
-				}
-
-				auto *k = yyjson_mut_strncpy(doc, key.c_str(), key.length());
-				yyjson_mut_obj_add(elem, k, v);
-			}
+			if (it != databases.end())
+				it->second.emplace(s_type->GetName(), Data(s_type, item));
 		}
 
+		// Step 3: serialize to JSON.
 		for (auto &[mod, database] : databases)
 		{
 			auto dbname = GetDatabaseFile(mod);
 			BackupDatabase(dbname);
 
+			auto *doc = yyjson_mut_doc_new(nullptr);
+
+			auto *root = yyjson_mut_obj(doc);
+			yyjson_mut_doc_set_root(doc, root);
+
+			const auto generator = "Anope " + Anope::Version() + " " + Anope::VersionBuildString();
+			yyjson_mut_obj_add_strncpy(doc, root, "generator", generator.c_str(), generator.length());
+			yyjson_mut_obj_add_uint(doc, root, "version", ANOPE_DATABASE_VERSION);
+			yyjson_mut_obj_add_int(doc, root, "updated", Anope::CurTime);
+
+			auto *data = yyjson_mut_obj(doc);
+			yyjson_mut_obj_add_val(doc, root, "data", data);
+
+			for (const auto &[name, items] : database)
+				SaveType(doc, data, name, items);
+
+			Log(LOG_DEBUG) << "Writing " << dbname;
+
 			yyjson_write_err errmsg;
 			const auto flags = YYJSON_WRITE_ALLOW_INVALID_UNICODE | YYJSON_WRITE_NEWLINE_AT_END | YYJSON_WRITE_PRETTY;
-			if (!yyjson_mut_write_file(dbname.c_str(), database.first, flags, nullptr, &errmsg))
+			if (!yyjson_mut_write_file(dbname.c_str(), doc, flags, nullptr, &errmsg))
 			{
 				Log(this) << "Unable to write " << dbname << ": error #" << errmsg.code << ": " << errmsg.msg;
 				// TODO: exit??? retry???
 			}
+
+			yyjson_mut_doc_free(doc);
 		}
 	}
 
@@ -415,14 +433,13 @@ public:
 			const auto dbname = GetDatabaseFile(s_type->GetOwner());
 
 			auto db = ReadDatabase(dbname);
-			if (!db.second)
+			if (!db)
 				return; // Not much we can do here.
 
-			it = databases.emplace(s_type->GetOwner(), db).first;
+			it = databases.emplace(s_type->GetOwner(), std::move(db.value())).first;
 		}
 
-		auto &[_, data] = it->second;
-		LoadType(s_type, data);
+		LoadType(s_type, it->second);
 	}
 };
 

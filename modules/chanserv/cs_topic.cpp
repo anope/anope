@@ -132,14 +132,18 @@ class CommandCSTopic final
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
 	}
 
-	void Append(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void Combine(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, bool append)
 	{
 		const Anope::string &topic = params[2];
 
 		Anope::string new_topic;
 		if (!ci->c->topic.empty())
 		{
-			new_topic = ci->c->topic + " " + topic;
+			if (append)
+				new_topic = ci->c->topic + " " + topic;
+			else
+				new_topic = topic + " " + ci->c->topic;
+
 			ci->last_topic.clear();
 		}
 		else
@@ -155,6 +159,7 @@ public:
 		this->SetDesc(_("Manipulate the topic of the specified channel"));
 		this->SetSyntax(_("\037channel\037 [SET] [\037topic\037]"));
 		this->SetSyntax(_("\037channel\037 APPEND \037topic\037"));
+		this->SetSyntax(_("\037channel\037 PREPEND \037topic\037"));
 		this->SetSyntax(_("\037channel\037 [UNLOCK|LOCK]"));
 	}
 
@@ -174,7 +179,9 @@ public:
 		else if (!ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
 		else if (subcmd.equals_ci("APPEND") && params.size() > 2)
-			this->Append(source, ci, params);
+			this->Combine(source, ci, params, true);
+		else if (subcmd.equals_ci("PREPEND") && params.size() > 2)
+			this->Combine(source, ci, params, false);
 		else
 		{
 			Anope::string topic;

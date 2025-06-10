@@ -188,7 +188,7 @@ public:
 		source.permission = info.permission;
 
 		AccessGroup ag = c->ci->AccessFor(u);
-		bool has_fantasy = ag.HasPriv("FANTASY") || source.HasPriv("botserv/fantasy");
+		bool has_fantasy = !info.require_privilege || ag.HasPriv("FANTASY") || source.HasPriv("botserv/fantasy");
 
 		EventReturn MOD_RESULT;
 		if (has_fantasy)

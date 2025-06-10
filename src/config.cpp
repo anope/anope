@@ -491,8 +491,6 @@ Conf::Conf() : Block("")
 					&service = fantasy.Get<const Anope::string>("command"),
 					&permission = fantasy.Get<const Anope::string>("permission"),
 					&group = fantasy.Get<const Anope::string>("group");
-		bool hide = fantasy.Get<bool>("hide"),
-			prepend_channel = fantasy.Get<bool>("prepend_channel", "yes");
 
 		ValidateNotEmpty("fantasy", "name", nname);
 		ValidateNotEmptyOrSpaces("fantasy", "command", service);
@@ -501,8 +499,9 @@ Conf::Conf() : Block("")
 		c.name = service;
 		c.permission = permission;
 		c.group = group;
-		c.hide = hide;
-		c.prepend_channel = prepend_channel;
+		c.hide = fantasy.Get<bool>("hide");
+		c.prepend_channel = fantasy.Get<bool>("prepend_channel", "yes");
+		c.require_privilege = fantasy.Get<bool>("require_privilege", "no");
 	}
 
 	for (int i = 0; i < this->CountBlock("command_group"); ++i)

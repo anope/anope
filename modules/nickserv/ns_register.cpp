@@ -11,6 +11,20 @@
 
 #include "module.h"
 
+namespace
+{
+	Anope::string *GetCode(NickCore *nc)
+	{
+		auto *code = nc->GetExt<Anope::string>("passcode");
+		if (!code)
+		{
+			code = nc->Extend<Anope::string>("passcode");
+			*code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
+		}
+		return code;
+	}
+}
+
 static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
@@ -245,7 +259,7 @@ public:
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 
 			source.Reply(_("Nickname \002%s\002 registered."), u_nick.c_str());
-			if (nsregister.equals_ci("admin"))
+			if (nsregister.equals_ci("admin") || nsregister.equals_ci("code"))
 			{
 				nc->Extend<bool>("UNCONFIRMED");
 			}
@@ -270,8 +284,14 @@ public:
 			{
 				if (nsregister.equals_ci("admin"))
 					source.Reply(_("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
+				else if (nsregister.equals_ci("code"))
+				{
+					const auto *code = GetCode(na->nc);
+					source.Reply(_("Your account is not confirmed. To confirm it, type \002%s\002."),
+						source.service->GetQueryCommand("nickserv/confirm", *code).c_str());
+				}
 				else if (nsregister.equals_ci("mail"))
-					source.Reply(_("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."));
+					source.Reply(_("Your account is not confirmed. To confirm it, follow the instructions that were emailed to you."));
 			}
 		}
 	}
@@ -410,8 +430,15 @@ public:
 			const Anope::string &nsregister = Config->GetModule(this).Get<const Anope::string>("registration");
 			if (nsregister.equals_ci("admin"))
 				u->SendMessage(NickServ, _("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
-			else
-				u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."));
+			else if (nsregister.equals_ci("code"))
+			{
+				const auto *code = GetCode(u->Account()	);
+				u->SendMessage(NickServ, _("Your account is not confirmed. To confirm it, type \002%s\002."),
+					NickServ->GetQueryCommand("nickserv/confirm", *code).c_str());
+			}
+			else if (nsregister.equals_ci("mail"))
+				u->SendMessage(NickServ, _("Your account is not confirmed. To confirm it, follow the instructions that were emailed to you."));
+
 			const NickAlias *this_na = u->AccountNick();
 			time_t registered = Anope::CurTime - this_na->registered;
 			time_t unconfirmed_expire = Config->GetModule(this).Get<time_t>("unconfirmedexpire", "1d");
@@ -434,13 +461,7 @@ public:
 static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi)
 {
 	NickCore *nc = na->nc;
-
-	Anope::string *code = na->nc->GetExt<Anope::string>("passcode");
-	if (code == NULL)
-	{
-		code = na->nc->Extend<Anope::string>("passcode");
-		*code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
-	}
+	auto *code = GetCode(na->nc);
 
 	Anope::map<Anope::string> vars = {
 		{ "nick",    na->nick                                                                },

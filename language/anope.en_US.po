@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-10 12:05+0100\n"
-"PO-Revision-Date: 2025-06-10 12:05+0100\n"
+"POT-Creation-Date: 2025-06-10 17:31+0100\n"
+"PO-Revision-Date: 2025-06-10 17:31+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -6181,6 +6181,13 @@ msgstr ""
 msgid "Your account is already confirmed."
 msgstr ""
 
+msgid "Your account is not confirmed. To confirm it, follow the instructions that were emailed to you."
+msgstr ""
+
+#, c-format
+msgid "Your account is not confirmed. To confirm it, type %s."
+msgstr ""
+
 #, c-format
 msgid "Your account will expire, if not confirmed, in %s."
 msgstr ""
@@ -6190,9 +6197,6 @@ msgid "Your email address has been changed to %s."
 msgstr ""
 
 msgid "Your email address is not allowed, choose a different one."
-msgstr ""
-
-msgid "Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."
 msgstr ""
 
 #, c-format

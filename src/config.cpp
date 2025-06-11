@@ -501,7 +501,7 @@ Conf::Conf() : Block("")
 		c.group = group;
 		c.hide = fantasy.Get<bool>("hide");
 		c.prepend_channel = fantasy.Get<bool>("prepend_channel", "yes");
-		c.require_privilege = fantasy.Get<bool>("require_privilege", "no");
+		c.require_privilege = fantasy.Get<bool>("require_privilege", "yes");
 	}
 
 	for (int i = 0; i < this->CountBlock("command_group"); ++i)

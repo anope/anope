@@ -68,6 +68,133 @@ namespace
 	}
 }
 
+struct EmailChange final
+{
+	Anope::string code;
+	Anope::string email;
+	time_t requested = Anope::CurTime;
+};
+
+class CommandNSConfirmEmail final
+	: public Command
+{
+private:
+	PrimitiveExtensibleItem<EmailChange> &ns_set_email;
+
+public:
+	CommandNSConfirmEmail(Module *creator, PrimitiveExtensibleItem<EmailChange> &nse)
+		: Command(creator, "nickserv/confirm/email", 1, 2)
+		, ns_set_email(nse)
+	{
+		this->SetDesc(_("Confirm a previous change of email address"));
+		this->SetSyntax(_("\037code\037"));
+		this->SetSyntax(_("@\037nickname\037"), [](auto &source) { return source.HasPriv("nickserv/confirm/email"); });
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		auto has_priv = source.HasPriv("nickserv/confirm/email");
+
+		Anope::string code;
+		NickAlias *na;
+		if (params[0] == '@')
+		{
+			if (!has_priv)
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+
+			auto nick = params[0].substr(0);
+			na = NickAlias::Find(nick);
+			if (!na)
+			{
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				return;
+			}
+		}
+		else
+		{
+			code = params[0];
+			na = source.GetAccount()->na;
+		}
+
+		NickCore *nc = na->nc;
+		if (nc->HasExt("NS_SUSPENDED"))
+		{
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
+			return;
+		}
+
+		auto *nse = ns_set_email.Get(nc);
+		if (!nse)
+		{
+			source.Reply(_("There is no email address change confirmation pending for %s."),
+				na->nick.c_str());
+			return;
+		}
+
+		if (!has_priv)
+		{
+			if (!code.equals_cs(nse->code))
+			{
+				source.Reply(_("The email address change confirmation code you specified for %s is incorrect."),
+					na->nick.c_str());
+				return;
+			}
+
+			auto changeexpire = Config->GetModule(owner).Get<time_t>("changeexpire", "1d");
+			if (nse->requested < Anope::CurTime - changeexpire)
+			{
+				ns_set_email.Unset(nc);
+				source.Reply(_("The email address change request for %s has expired."),
+					na->nick.c_str());
+				return;
+			}
+
+		}
+		if (!CheckLimitReached(source, nse->email, true))
+		{
+			ns_set_email.Unset(nc);
+			return;
+		}
+
+		auto old_email = nc->email;
+		nc->email = nse->email;
+		ns_set_email.Unset(nc);
+
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to confirm the email change of "
+			<< nc->display << " from " << old_email << " to " << nc->email;
+
+		source.Reply(_("The email address of %s has been changed from \002%s\002 to \002%s\002."),
+			na->nick.c_str(), old_email.c_str(), nc->email.c_str());
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) override
+	{
+		auto changeexpire = Config->GetModule(owner).Get<time_t>("changeexpire", "1d");
+
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_(
+				"Confirms an change of email address. You have %s after requesting an email "
+				"change to do this before your request expires."
+			),
+			Anope::Duration(changeexpire, source.GetAccount()).c_str());
+
+		if (source.HasPriv("nickserv/confirm/email"))
+		{
+			source.Reply(" ");
+			source.Reply(_(
+				"Additionally, Services Operators with the \037nickserv/confirm/email\037 "
+				"permission can specify @\037nickname\037 instead of \037code\037 to force "
+				"confirm another user's change of email address."
+			));
+		}
+		return true;
+	}
+};
+
 class CommandNSGetEmail final
 	: public Command
 {
@@ -118,18 +245,16 @@ class CommandNSSetEmail
 {
 	static bool SendConfirmMail(User *u, NickCore *nc, BotInfo *bi, const Anope::string &new_email)
 	{
-		Anope::string code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
-
-		std::pair<Anope::string, Anope::string> *n = nc->Extend<std::pair<Anope::string, Anope::string> >("ns_set_email");
-		n->first = new_email;
-		n->second = code;
+		auto *nse = nc->Extend<EmailChange>("ns_set_email");
+		nse->code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
+		nse->email = new_email;
 
 		Anope::map<Anope::string> vars = {
 			{ "old_email", nc->email                                                               },
 			{ "new_email", new_email                                                               },
 			{ "account",   nc->display                                                             },
 			{ "network",   Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
-			{ "code",      code                                                                    },
+			{ "code",      nse->code                                                               },
 		};
 
 		auto subject = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_subject"), vars);
@@ -266,16 +391,18 @@ class NSEmail final
 	: public Module
 {
 private:
+	CommandNSConfirmEmail commandnsconfirmemail;
 	CommandNSGetEmail commandnsgetemail;
 	CommandNSSetEmail commandnssetemail;
 	CommandNSSASetEmail commandnssasetemail;
 
 	/* email, passcode */
-	PrimitiveExtensibleItem<std::pair<Anope::string, Anope::string>> ns_set_email;
+	PrimitiveExtensibleItem<EmailChange> ns_set_email;
 
 public:
 	NSEmail(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, VENDOR)
+		, commandnsconfirmemail(this, ns_set_email)
 		, commandnsgetemail(this)
 		, commandnssetemail(this)
 		, commandnssasetemail(this)
@@ -292,23 +419,6 @@ public:
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
-		NickCore *uac = source.nc;
-
-		if (command->name == "nickserv/confirm" && !params.empty() && uac)
-		{
-			std::pair<Anope::string, Anope::string> *n = ns_set_email.Get(uac);
-			if (n)
-			{
-				if (params[0] == n->second)
-				{
-					uac->email = n->first;
-					Log(LOG_COMMAND, source, command) << "to confirm their email address change to " << uac->email;
-					source.Reply(_("Your email address has been changed to \002%s\002."), uac->email.c_str());
-					ns_set_email.Unset(uac);
-					return EVENT_STOP;
-				}
-			}
-		}
 		if (!source.IsOper() && command->name == "nickserv/register")
 		{
 			if (CheckLimitReached(source, params.size() > 1 ? params[1] : "", false))

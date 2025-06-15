@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-15 11:49+0100\n"
-"PO-Revision-Date: 2025-06-10 17:31+0100\n"
+"POT-Creation-Date: 2025-06-16 10:00+0100\n"
+"PO-Revision-Date: 2025-06-16 10:00+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -519,6 +519,9 @@ msgstr ""
 msgid "channel {ON | OFF}"
 msgstr ""
 
+msgid "code"
+msgstr ""
+
 msgid "email"
 msgstr ""
 
@@ -621,9 +624,6 @@ msgstr ""
 msgid "option setting"
 msgstr ""
 
-msgid "passcode"
-msgstr ""
-
 msgid "password"
 msgstr ""
 
@@ -643,6 +643,9 @@ msgid "server [message]"
 msgstr ""
 
 msgid "server [reason]"
+msgstr ""
+
+msgid "type parameters"
 msgstr ""
 
 msgid "user modes"
@@ -1155,6 +1158,9 @@ msgstr ""
 msgid "<unknown>"
 msgstr ""
 
+msgid "@nickname"
+msgstr ""
+
 #, c-format
 msgid "A confirmation email has been sent to %s. Follow the instructions in it to change your email address."
 msgstr ""
@@ -1339,7 +1345,10 @@ msgstr ""
 msgid "Additionally, Services Operators with the chanserv/drop/override permission can replace code with OVERRIDE to drop without a confirmation code."
 msgstr ""
 
-msgid "Additionally, Services Operators with the nickserv/confirm permission can replace passcode with a users nick to force validate them."
+msgid "Additionally, Services Operators with the nickserv/confirm/email permission can specify @nickname instead of code to force confirm another user's change of email address."
+msgstr ""
+
+msgid "Additionally, Services Operators with the nickserv/confirm/register permission can specify @nickname instead of code to force confirm another user's account registration."
 msgstr ""
 
 msgid "Additionally, Services Operators with the nickserv/drop/override permission can replace code with OVERRIDE to drop without a confirmation code."
@@ -2213,7 +2222,28 @@ msgstr ""
 msgid "Configures underlines kicker"
 msgstr ""
 
-msgid "Confirm a passcode"
+msgid "Confirm a previous account registration"
+msgstr ""
+
+msgid "Confirm a previous action"
+msgstr ""
+
+msgid "Confirm a previous change of email address"
+msgstr ""
+
+msgid "Confirm a previous password reset"
+msgstr ""
+
+#, c-format
+msgid "Confirms a password reset and identifies you to the specified account. You have %s after requesting a reset to do this before your request expires. Once you have done this you can set the password using %s."
+msgstr ""
+
+#, c-format
+msgid "Confirms an account registration. You have %s after registration to do this before your registration expires."
+msgstr ""
+
+#, c-format
+msgid "Confirms an change of email address. You have %s after requesting an email change to do this before your request expires."
 msgstr ""
 
 msgid "Control modes and mode locks on a channel"
@@ -3047,9 +3077,6 @@ msgstr ""
 msgid "Invalid passcode has been entered, please check the email again, and retry."
 msgstr ""
 
-msgid "Invalid passcode."
-msgstr ""
-
 #, c-format
 msgid "Invalid session limit. It must be a valid integer greater than or equal to zero and less than %d."
 msgstr ""
@@ -3682,10 +3709,6 @@ msgstr ""
 
 #, c-format
 msgid "Nick %s is already an operator."
-msgstr ""
-
-#, c-format
-msgid "Nick %s is already confirmed."
 msgstr ""
 
 #, c-format
@@ -5201,11 +5224,23 @@ msgstr[0] ""
 msgstr[1] ""
 
 #, c-format
+msgid "The email address change confirmation code you specified for %s is incorrect."
+msgstr ""
+
+#, c-format
+msgid "The email address change request for %s has expired."
+msgstr ""
+
+#, c-format
 msgid "The email address of %s will now be hidden from %s INFO displays."
 msgstr ""
 
 #, c-format
 msgid "The email address of %s will now be shown in %s INFO displays."
+msgstr ""
+
+#, c-format
+msgid "The email address of %s has been changed from %s to %s."
 msgstr ""
 
 #, c-format
@@ -5289,6 +5324,18 @@ msgid "The oper info list for %s is full."
 msgstr ""
 
 #, c-format
+msgid "The password reset code you specified for %s is incorrect."
+msgstr ""
+
+#, c-format
+msgid "The password reset request for %s has expired."
+msgstr ""
+
+#, c-format
+msgid "The registration confirmation code you specified for %s is incorrect."
+msgstr ""
+
+#, c-format
 msgid "The services access status of %s will now be hidden from %s INFO displays."
 msgstr ""
 
@@ -5335,13 +5382,25 @@ msgstr ""
 msgid "There is no bot assigned to %s anymore."
 msgstr ""
 
+#, c-format
+msgid "There is no email address change confirmation pending for %s."
+msgstr ""
+
 msgid "There is no logon news."
 msgstr ""
 
 msgid "There is no oper news."
 msgstr ""
 
+#, c-format
+msgid "There is no password reset confirmation pending for %s."
+msgstr ""
+
 msgid "There is no random news."
+msgstr ""
+
+#, c-format
+msgid "There is no registration confirmation pending for %s."
 msgstr ""
 
 #, c-format
@@ -5390,12 +5449,7 @@ msgstr ""
 msgid "This command is an alias to the command %s."
 msgstr ""
 
-msgid ""
-"This command is used by several commands as a way to confirm changes made to your account.\n"
-"\n"
-"This is most commonly used to confirm your email address once you register or change it.\n"
-"\n"
-"This is also used after the RESETPASS command has been used to force identify you to your nick so you may change your password."
+msgid "This command is used by several commands as a way to actions changes made to your account. type can be one of:"
 msgstr ""
 
 msgid "This command lists information about the specified loaded module."
@@ -5876,7 +5930,8 @@ msgstr ""
 msgid "You are now a super admin."
 msgstr ""
 
-msgid "You are now identified for your nick. Change your password now."
+#, c-format
+msgid "You are now identified as %s. Change your password now using %s."
 msgstr ""
 
 #, c-format
@@ -6192,15 +6247,7 @@ msgstr ""
 msgid "Your account will expire, if not confirmed, in %s."
 msgstr ""
 
-#, c-format
-msgid "Your email address has been changed to %s."
-msgstr ""
-
 msgid "Your email address is not allowed, choose a different one."
-msgstr ""
-
-#, c-format
-msgid "Your email address of %s has been confirmed."
 msgstr ""
 
 #, c-format
@@ -6267,9 +6314,6 @@ msgstr ""
 
 #, c-format
 msgid "Your password is too short. It must be longer than %u characters."
-msgstr ""
-
-msgid "Your password reset request has expired."
 msgstr ""
 
 msgid "Your requested vhost has been approved."
@@ -6377,6 +6421,9 @@ msgid "[nickname [REVALIDATE]]"
 msgstr ""
 
 msgid "[nickname]"
+msgstr ""
+
+msgid "[nickname] code"
 msgstr ""
 
 msgid "[parameter]"

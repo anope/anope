@@ -65,70 +65,118 @@ struct ResetInfo final
 	time_t time;
 };
 
+class CommandNSConfirmResetPass final
+	: public Command
+{
+private:
+	PrimitiveExtensibleItem<ResetInfo> &reset;
+
+public:
+	CommandNSConfirmResetPass(Module *creator, PrimitiveExtensibleItem<ResetInfo> &r)
+		: Command(creator, "nickserv/confirm/resetpass", 1, 2)
+		, reset(r)
+	{
+		this->AllowUnregistered(true);
+		this->SetDesc(_("Confirm a previous password reset"));
+		this->SetSyntax(_("[\037nickname\037] \037code\037"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		Anope::string code, nick;
+		if (params.size() > 1)
+		{
+			nick = params[0];
+			code = params[1];
+		}
+		else
+		{
+			code = params[0];
+			nick = source.GetNick();
+		}
+
+		auto *na = NickAlias::Find(nick);
+		if (!na)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			return;
+		}
+
+		NickCore *nc = na->nc;
+		if (nc->HasExt("NS_SUSPENDED"))
+		{
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
+			return;
+		}
+
+		auto *ri = reset.Get(nc);
+		if (!ri)
+		{
+			source.Reply(_("There is no password reset confirmation pending for %s."),
+				na->nick.c_str());
+			return;
+		}
+		if (!code.equals_cs(ri->code))
+		{
+			source.Reply(_("The password reset code you specified for %s is incorrect."),
+				na->nick.c_str());
+			return;
+		}
+
+		auto resetexpire = Config->GetModule(owner).Get<time_t>("resetexpire", "1d");
+		if (ri->time < Anope::CurTime - resetexpire)
+		{
+			reset.Unset(nc);
+			source.Reply(_("The password reset request for %s has expired."),
+				na->nick.c_str());
+			return;
+		}
+
+		reset.Unset(nc);
+		nc->Shrink<bool>("UNCONFIRMED");
+		if (source.GetUser())
+			source.GetUser()->Identify(na);
+
+		Log(LOG_COMMAND, source, this) << "to reset their password and forcibly identify as " << na->nick;
+		source.Reply(_("You are now identified as %s. Change your password now using %s."),
+			na->nick.c_str(), source.service->GetQueryCommand("nickserv/set/password").c_str());
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) override
+	{
+		auto resetexpire = Config->GetModule(owner).Get<time_t>("resetexpire", "1d");
+
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_(
+				"Confirms a password reset and identifies you to the specified account. You have "
+				"%s after requesting a reset to do this before your request expires. Once you "
+				"have done this you can set the password using %s."
+			),
+			Anope::Duration(resetexpire, source.GetAccount()).c_str(),
+			source.service->GetQueryCommand("nickserv/set/password").c_str()
+		);
+		return true;
+	}
+};
+
 class NSResetPass final
 	: public Module
 {
+private:
+	CommandNSConfirmResetPass commandnsconfirmpassword;
 	CommandNSResetPass commandnsresetpass;
 	PrimitiveExtensibleItem<ResetInfo> reset;
 
 public:
-	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsresetpass(this), reset(this, "reset")
+	NSResetPass(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnsconfirmpassword(this, reset)
+		, commandnsresetpass(this)
+		, reset(this, "reset")
 	{
 		if (!Config->GetBlock("mail").Get<bool>("usemail"))
 			throw ModuleException("Not using mail.");
-	}
-
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
-	{
-		if (command->name == "nickserv/confirm" && params.size() > 1)
-		{
-			if (Anope::ReadOnly)
-			{
-				source.Reply(READ_ONLY_MODE);
-				return EVENT_STOP;
-			}
-
-			NickAlias *na = NickAlias::Find(params[0]);
-
-			ResetInfo *ri = na ? reset.Get(na->nc) : NULL;
-			if (na && ri)
-			{
-				NickCore *nc = na->nc;
-				if (nc->HasExt("NS_SUSPENDED"))
-				{
-					source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
-					return EVENT_STOP;
-				}
-
-				const Anope::string &passcode = params[1];
-				if (ri->time < Anope::CurTime - 3600)
-				{
-					reset.Unset(nc);
-					source.Reply(_("Your password reset request has expired."));
-				}
-				else if (passcode.equals_cs(ri->code))
-				{
-					reset.Unset(nc);
-					nc->Shrink<bool>("UNCONFIRMED");
-
-					Log(LOG_COMMAND, source, &commandnsresetpass) << "to confirm RESETPASS and forcefully identify as " << na->nick;
-
-					if (source.GetUser())
-					{
-						source.GetUser()->Identify(na);
-					}
-
-					source.Reply(_("You are now identified for your nick. Change your password now."));
-				}
-				else
-					return EVENT_CONTINUE;
-
-				return EVENT_STOP;
-			}
-		}
-
-		return EVENT_CONTINUE;
 	}
 };
 

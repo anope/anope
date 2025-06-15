@@ -215,7 +215,7 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 		// The help command may not be called HELP.
 		return cmd.second.name == "generic/help";
 	});
-	if (it == source.service->commands.end())
+	if (it != source.service->commands.end())
 		source.Reply(MORE_INFO, source.service->GetQueryCommand("generic/help", source.command).c_str());
 }
 

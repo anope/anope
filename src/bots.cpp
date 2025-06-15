@@ -311,7 +311,7 @@ Anope::string BotInfo::GetQueryCommand(const Anope::string &command, const Anope
 
 	if (!command.empty())
 	{
-		Anope::string actual_command = "\036(MISSING)\036";
+		Anope::string actual_command;
 		for (const auto &[c_name, info] : this->commands)
 		{
 			if (info.name != command)
@@ -322,8 +322,9 @@ Anope::string BotInfo::GetQueryCommand(const Anope::string &command, const Anope
 				break; // Keep going to find a non-hidden alternative.
 		}
 
-		if (!actual_command.empty())
-			buf.append(" ").append(actual_command);
+		if (actual_command.empty())
+			return "\036(MISSING)\036";
+		buf.append(" ").append(actual_command);
 	}
 
 	if (!extra.empty())

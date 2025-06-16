@@ -164,7 +164,7 @@ public:
 	/* Unsaved data */
 
 	/** The display nick for this account. */
-	NickAlias *na = nullptr;
+	Serialize::Reference<NickAlias> na;
 	/* Number of channels registered by this account */
 	uint16_t channelcount = 0;
 	/* Users online now logged into this account */

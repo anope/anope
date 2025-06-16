@@ -195,10 +195,6 @@ void NickCore::SetDisplay(NickAlias *na)
 
 	FOREACH_MOD(OnChangeCoreDisplay, (this, na->nick));
 
-	/* this affects the serialized aliases */
-	for (auto *alias : *aliases)
-		alias->QueueUpdate();
-
 	/* Remove the core from the list */
 	NickCoreList->erase(this->display);
 

@@ -163,7 +163,7 @@ public:
 		nc->email = nse->email;
 		ns_set_email.Unset(nc);
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to confirm the email change of "
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to confirm the email address change of "
 			<< nc->display << " from " << old_email << " to " << nc->email;
 
 		source.Reply(_("The email address of %s has been changed from \002%s\002 to \002%s\002."),
@@ -178,7 +178,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 				"Confirms an change of email address. You have %s after requesting an email "
-				"change to do this before your request expires."
+				"address change to do this before your request expires."
 			),
 			Anope::Duration(changeexpire, source.GetAccount()).c_str());
 
@@ -202,7 +202,7 @@ public:
 	CommandNSGetEmail(Module *creator)
 		: Command(creator, "nickserv/getemail", 1, 1)
 	{
-		this->SetDesc(_("Matches and returns all users that registered using given email"));
+		this->SetDesc(_("Matches and returns all users that registered using given email address"));
 		this->SetSyntax(_("\037email\037"));
 	}
 
@@ -292,18 +292,18 @@ public:
 
 		if (nc->HasExt("UNCONFIRMED"))
 		{
-			source.Reply(_("You may not change the email of an unconfirmed account."));
+			source.Reply(_("You may not change the email address of an unconfirmed account."));
 			return;
 		}
 
 		if (param.empty() && Config->GetModule("nickserv").Get<bool>("forceemail", "yes"))
 		{
-			source.Reply(_("You cannot unset the email on this network."));
+			source.Reply(_("You cannot unset the email address on this network."));
 			return;
 		}
 		else if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
-			source.Reply(_("You may not change the email of other Services Operators."));
+			source.Reply(_("You may not change the email address of other Services Operators."));
 			return;
 		}
 		else if (!param.empty() && !Mail::Validate(param))
@@ -324,7 +324,7 @@ public:
 		{
 			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
 			{
-				Log(LOG_COMMAND, source, this) << "to request changing the email of " << nc->display << " to " << param;
+				Log(LOG_COMMAND, source, this) << "to request changing the email address of " << nc->display << " to " << param;
 				source.Reply(_("A confirmation email has been sent to \002%s\002. Follow the instructions in it to change your email address."), param.c_str());
 			}
 		}
@@ -332,13 +332,13 @@ public:
 		{
 			if (!param.empty())
 			{
-				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email of " << nc->display << " to " << param;
+				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email address of " << nc->display << " to " << param;
 				nc->email = param;
 				source.Reply(_("Email address for \002%s\002 changed to \002%s\002."), nc->display.c_str(), param.c_str());
 			}
 			else
 			{
-				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the email of " << nc->display;
+				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the email address of " << nc->display;
 				nc->email.clear();
 				source.Reply(_("Email address for \002%s\002 unset."), nc->display.c_str());
 			}

@@ -134,7 +134,6 @@ namespace Language
 #define NICK_CANNOT_BE_REGISTERED	_("Nickname \002%s\002 may not be registered.")
 #define NICK_ALREADY_REGISTERED		_("Nickname \002%s\002 is already registered!")
 #define NICK_SET_DISPLAY_CHANGED	_("The new display is now \002%s\002.")
-#define NICK_CONFIRM_INVALID		_("Invalid passcode has been entered, please check the email again, and retry.")
 #define CHAN_NOT_ALLOWED_TO_JOIN	_("You are not permitted to be on this channel.")
 #define CHAN_X_INVALID			_("Channel %s is not a valid channel.")
 #define CHAN_REACHED_CHANNEL_LIMIT	_("Sorry, you have already reached your limit of \002%d\002 channels.")

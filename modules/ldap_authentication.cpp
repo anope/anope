@@ -161,7 +161,7 @@ public:
 				u->Account()->email = email;
 				BotInfo *NickServ = Config->GetClient("NickServ");
 				if (NickServ)
-					u->SendMessage(NickServ, _("Your email has been updated to \002%s\002"), email.c_str());
+					u->SendMessage(NickServ, _("Your email address has been updated to \002%s\002"), email.c_str());
 				Log(this->owner) << "Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
 			}
 		}

@@ -512,7 +512,7 @@ private:
 
 		if (!forbid_service)
 		{
-			Log(this) << "Unable to convert forbidden email " << email << " as os_forbid is not loaded";
+			Log(this) << "Unable to convert forbidden email address " << email << " as os_forbid is not loaded";
 			return true;
 		}
 

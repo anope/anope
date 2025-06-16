@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-16 10:00+0100\n"
-"PO-Revision-Date: 2025-06-16 10:00+0100\n"
+"POT-Creation-Date: 2025-06-16 12:30+0100\n"
+"PO-Revision-Date: 2025-06-16 12:30+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -2243,7 +2243,7 @@ msgid "Confirms an account registration. You have %s after registration to do th
 msgstr ""
 
 #, c-format
-msgid "Confirms an change of email address. You have %s after requesting an email change to do this before your request expires."
+msgid "Confirms an change of email address. You have %s after requesting an email address change to do this before your request expires."
 msgstr ""
 
 msgid "Control modes and mode locks on a channel"
@@ -3074,9 +3074,6 @@ msgstr ""
 msgid "Invalid limit %s, using %d."
 msgstr ""
 
-msgid "Invalid passcode has been entered, please check the email again, and retry."
-msgstr ""
-
 #, c-format
 msgid "Invalid session limit. It must be a valid integer greater than or equal to zero and less than %d."
 msgstr ""
@@ -3518,7 +3515,7 @@ msgstr ""
 msgid "Masks and unregistered users may not be on access lists."
 msgstr ""
 
-msgid "Matches and returns all users that registered using given email"
+msgid "Matches and returns all users that registered using given email address"
 msgstr ""
 
 #, c-format
@@ -4470,10 +4467,10 @@ msgstr ""
 msgid "Sender"
 msgstr ""
 
-msgid "Sends a memo and requests a read receipt"
+msgid "Sends a confirmation code to the nickname's email address with instructions on how to reset their password. email must be the email address associated with the account."
 msgstr ""
 
-msgid "Sends a passcode to the nickname with instructions on how to reset their password. Email must be the email address associated to the nickname."
+msgid "Sends a memo and requests a read receipt"
 msgstr ""
 
 msgid "Sends all registered users a memo containing memo-text."
@@ -5179,7 +5176,7 @@ msgid ""
 " Will remove all entries that were added within the last 30 minutes."
 msgstr ""
 
-msgid "The email parameter is optional and will set the email for your nick immediately. You may also wish to SETHIDE it after registering if it isn't the default setting already."
+msgid "The email parameter is optional and will set the email address for your nick immediately. You may also wish to SETHIDE it after registering if it isn't the default setting already."
 msgstr ""
 
 #, c-format
@@ -5993,7 +5990,7 @@ msgstr ""
 msgid "You cannot unassign bots while persist is set on the channel."
 msgstr ""
 
-msgid "You cannot unset the email on this network."
+msgid "You cannot unset the email address on this network."
 msgstr ""
 
 msgid "You cannot use this command."
@@ -6102,10 +6099,10 @@ msgstr ""
 msgid "You may not (un)lock mode %c."
 msgstr ""
 
-msgid "You may not change the email of an unconfirmed account."
+msgid "You may not change the email address of an unconfirmed account."
 msgstr ""
 
-msgid "You may not change the email of other Services Operators."
+msgid "You may not change the email address of other Services Operators."
 msgstr ""
 
 msgid "You may not change the password of other Services Operators."
@@ -6155,7 +6152,7 @@ msgid "You must have the %s(ME) privilege on the channel to use this command."
 msgstr ""
 
 #, c-format
-msgid "You must now supply an email for your nick. This email will allow you to retrieve your password in case you forget it. Type %semail in order to set your email."
+msgid "You must now supply an email address for your nick. This email address will allow you to recover your account in case you forget your password. Type %semail in order to set your email address."
 msgstr ""
 
 #, c-format
@@ -6247,15 +6244,19 @@ msgstr ""
 msgid "Your account will expire, if not confirmed, in %s."
 msgstr ""
 
+#, c-format
+msgid "Your confirmation code has been re-sent to %s."
+msgstr ""
+
+#, c-format
+msgid "Your email address has been updated to %s"
+msgstr ""
+
+#, c-format
+msgid "Your email address has been updated to %s."
+msgstr ""
+
 msgid "Your email address is not allowed, choose a different one."
-msgstr ""
-
-#, c-format
-msgid "Your email has been updated to %s"
-msgstr ""
-
-#, c-format
-msgid "Your email has been updated to %s."
 msgstr ""
 
 msgid "Your memo limit has been disabled."
@@ -6302,10 +6303,6 @@ msgid "Your nickname is now being changed to %s"
 msgstr ""
 
 msgid "Your oper block doesn't require logging in."
-msgstr ""
-
-#, c-format
-msgid "Your passcode has been re-sent to %s."
 msgstr ""
 
 #, c-format

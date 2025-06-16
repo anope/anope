@@ -219,9 +219,9 @@ public:
 		{
 			source.Reply(" ");
 			source.Reply(_(
-				"The \037email\037 parameter is optional and will set the email "
-				"for your nick immediately. You may also wish to \002SET\032HIDE\002 it "
-				"after registering if it isn't the default setting already."
+				"The \037email\037 parameter is optional and will set the email address for your "
+				"nick immediately. You may also wish to \002SET\032HIDE\002 it after registering "
+				"if it isn't the default setting already."
 			));
 		}
 
@@ -375,11 +375,11 @@ public:
 			else if (SendRegmail(source.GetUser(), na, source.service))
 			{
 				na->nc->lastmail = Anope::CurTime;
-				source.Reply(_("Your passcode has been re-sent to %s."), na->nc->email.c_str());
-				Log(LOG_COMMAND, source, this) << "to resend registration verification code";
+				source.Reply(_("Your confirmation code has been re-sent to %s."), na->nc->email.c_str());
+				Log(LOG_COMMAND, source, this) << "to resend registration confirmation code";
 			}
 			else
-				Log(this->owner) << "Unable to resend registration verification code for " << source.GetNick();
+				Log(this->owner) << "Unable to resend registration confirmation code for " << source.GetNick();
 		}
 
 		return;

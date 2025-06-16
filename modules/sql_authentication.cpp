@@ -88,7 +88,7 @@ public:
 		{
 			na->nc->email = email;
 			if (user && NickServ)
-				user->SendMessage(NickServ, _("Your email has been updated to \002%s\002."), email.c_str());
+				user->SendMessage(NickServ, _("Your email address has been updated to \002%s\002."), email.c_str());
 		}
 
 		req->Success(me);

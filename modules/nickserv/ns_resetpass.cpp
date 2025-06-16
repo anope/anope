@@ -51,9 +51,9 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Sends a passcode to the nickname with instructions on how to "
-			"reset their password. Email must be the email address associated "
-			"to the nickname."
+			"Sends a confirmation code to the nickname's email address with instructions on "
+			"how to reset their password. \037email\037 must be the email address associated "
+			"with the account."
 		));
 		return true;
 	}

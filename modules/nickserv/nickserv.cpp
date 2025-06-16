@@ -401,10 +401,9 @@ public:
 		if (block.Get<bool>("forceemail", "yes") && u->Account()->email.empty())
 		{
 			u->SendMessage(NickServ, _(
-					"You must now supply an email for your nick. "
-					"This email will allow you to retrieve your password in "
-					"case you forget it. "
-					"Type \002%s\032\037email\037\002 in order to set your email."
+					"You must now supply an email address for your nick. This email address will "
+					"allow you to recover your account in case you forget your password. Type "
+					"\002%s\032\037email\037\002 in order to set your email address."
 				),
 				NickServ->GetQueryCommand("nickserv/set/email").c_str());
 		}

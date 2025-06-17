@@ -625,6 +625,7 @@ private:
 			return true;
 		}
 
+		auto originalflags = flags;
 		Anope::string accessflags;
 		ApplyAccess(flags, 'A', accessflags, { "ACCESS_LIST" });
 		ApplyAccess(flags, 'a', accessflags, { "AUTOPROTECT", "PROTECT", "PROTECTME" });
@@ -647,7 +648,7 @@ private:
 			auto *access = accessprov->Create();
 			access->SetMask(mask, ci);
 			access->creator = setter;
-			access->description = "Imported from Atheme";
+			access->description = "Imported from Atheme: " + flags;
 			access->last_seen = modifiedtime;
 			access->created = modifiedtime;
 			access->AccessUnserialize(accessflags);

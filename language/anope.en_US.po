@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-16 12:30+0100\n"
-"PO-Revision-Date: 2025-06-16 12:30+0100\n"
+"POT-Creation-Date: 2025-06-18 18:26+0100\n"
+"PO-Revision-Date: 2025-06-18 18:26+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -5346,10 +5346,6 @@ msgstr ""
 msgid "The user with your nick has been removed. Use this command again to release services's hold on your nick."
 msgstr ""
 
-#, c-format
-msgid "There are %zu memos on channel %s."
-msgstr ""
-
 msgid "There are no bots available at this time. Ask a Services Operator to create one!"
 msgstr ""
 
@@ -5369,7 +5365,9 @@ msgstr ""
 
 #, c-format
 msgid "There is %zu memo on channel %s."
-msgstr ""
+msgid_plural "There are %zu memos on channel %s."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
 msgid "There is a new memo on channel %s. Type %s%s%zu to read it."

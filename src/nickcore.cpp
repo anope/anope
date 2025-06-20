@@ -190,7 +190,17 @@ Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &da
 
 void NickCore::SetDisplay(NickAlias *na)
 {
-	if (na->nc != this || na->nick == this->display)
+	// If no nick is specified then pick the oldest one.
+	if (!na)
+	{
+		for (auto *alias : *this->aliases)
+		{
+			if (!na || alias->registered < na->registered)
+				na = alias;
+		}
+	}
+
+	if (!na || na->nc != this || na->nick == this->display)
 		return;
 
 	FOREACH_MOD(OnChangeCoreDisplay, (this, na->nick));

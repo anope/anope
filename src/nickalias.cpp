@@ -69,8 +69,8 @@ NickAlias::~NickAlias()
 		else
 		{
 			/* Display updating stuff */
-			if (this->nick.equals_ci(this->nc->display))
-				this->nc->SetDisplay(this->nc->aliases->front());
+			if (this->nc->na == this)
+				this->nc->SetDisplay(nullptr);
 		}
 	}
 
@@ -200,8 +200,8 @@ Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &d
 
 		if (na->nc->aliases->empty())
 			delete na->nc;
-		else if (na->nick.equals_ci(na->nc->display))
-			na->nc->SetDisplay(na->nc->aliases->front());
+		if (na->nc->na == na)
+			na->nc->SetDisplay(nullptr);
 
 		na->nc = core;
 		core->aliases->push_back(na);

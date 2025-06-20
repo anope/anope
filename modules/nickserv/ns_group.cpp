@@ -268,8 +268,8 @@ public:
 			if (it != oldcore->aliases->end())
 				oldcore->aliases->erase(it);
 
-			if (na->nick.equals_ci(oldcore->display))
-				oldcore->SetDisplay(oldcore->aliases->front());
+			if (oldcore->na == na)
+				oldcore->SetDisplay(nullptr);
 
 			auto *nc = new NickCore(na->nick);
 			na->nc = nc;

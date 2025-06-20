@@ -81,6 +81,18 @@ public:
 	{
 		return data[key];
 	}
+
+	size_t Hash() const override
+	{
+		size_t hash = 0;
+		for (const auto &[_, value] : this->data)
+		{
+			auto valuestr = value.str();
+			if (!valuestr.empty())
+				hash ^= Anope::hash_cs()(valuestr);
+		}
+		return hash;
+	}
 };
 
 class DBJSON final

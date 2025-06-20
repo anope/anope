@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-20 17:05+0100\n"
-"PO-Revision-Date: 2025-06-20 17:05+0100\n"
+"POT-Creation-Date: 2025-06-20 20:30+0100\n"
+"PO-Revision-Date: 2025-06-20 20:30+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1097,8 +1097,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #, c-format
-msgid "%zu nickname in the group."
-msgid_plural "%zu nicknames in the group."
+msgid "%zu nickname in the account."
+msgid_plural "%zu nicknames in the account."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1310,6 +1310,9 @@ msgstr ""
 msgid "Activates your assigned vhost"
 msgstr ""
 
+msgid "Add a nick to an account"
+msgstr ""
+
 msgid "Add or delete oper information for a given nick or channel. This will show to opers in the respective info command for the nick or channel."
 msgstr ""
 
@@ -1414,7 +1417,7 @@ msgid "All user modes on %s have been synced."
 msgstr ""
 
 #, c-format
-msgid "All vhosts in the group %s have been set to %s."
+msgid "All vhosts for the account %s have been set to %s."
 msgstr ""
 
 msgid "Allowed to (de)halfop themself"
@@ -1989,10 +1992,10 @@ msgstr ""
 msgid "Changed usermodes of %s to %s."
 msgstr ""
 
-msgid "Changes the display used to refer to the nickname group in services. The new display MUST be a nick of the group."
+msgid "Changes the display nickname used to refer to the account. The new displaynickname must already be associated with the account."
 msgstr ""
 
-msgid "Changes the display used to refer to your nickname group in services. The new display MUST be a nick of your group."
+msgid "Changes the display nickname used to refer to your account. The new display nickname must already be associated with your account."
 msgstr ""
 
 msgid "Changes the founder of a channel. The new nickname must be a registered one."
@@ -2546,10 +2549,10 @@ msgstr ""
 msgid "Deletes the vhost assigned to the given nick from the database."
 msgstr ""
 
-msgid "Deletes the vhost for all nicks in a group"
+msgid "Deletes the vhost for all nicks in an account"
 msgstr ""
 
-msgid "Deletes the vhost for all nicks in the same group as that of the given nick."
+msgid "Deletes the vhost for all nicks in the same account as that of the given nick."
 msgstr ""
 
 #, c-format
@@ -3090,9 +3093,6 @@ msgstr ""
 msgid "Italics kicker"
 msgstr ""
 
-msgid "Join a group"
-msgstr ""
-
 msgid "Keep modes"
 msgstr ""
 
@@ -3218,10 +3218,10 @@ msgid "List of entries matching %s:"
 msgstr ""
 
 #, c-format
-msgid "List of nicknames in the group of %s:"
+msgid "List of nicknames belonging to %s:"
 msgstr ""
 
-msgid "List of nicknames in your group:"
+msgid "List of nicknames belonging to your account:"
 msgstr ""
 
 msgid "List the options"
@@ -3253,10 +3253,10 @@ msgid ""
 "Channels that have the NOEXPIRE option set will be prefixed by an exclamation mark. The nickname parameter is limited to Services Operators."
 msgstr ""
 
-msgid "Lists all nicknames in your group"
+msgid "Lists all nicknames in your account"
 msgstr ""
 
-msgid "Lists all nicks in your group."
+msgid "Lists all nicknames that belong to your account."
 msgstr ""
 
 msgid "Lists all registered channels matching the given pattern"
@@ -3753,6 +3753,10 @@ msgid "Nick %s will not expire."
 msgstr ""
 
 #, c-format
+msgid "Nick %s does not belong to your account."
+msgstr ""
+
+#, c-format
 msgid "Nick %s doesn't have a memo from you."
 msgstr ""
 
@@ -3766,10 +3770,6 @@ msgstr ""
 
 #, c-format
 msgid "Nick %s is currently suspended."
-msgstr ""
-
-#, c-format
-msgid "Nick %s is not in your group."
 msgstr ""
 
 #, c-format
@@ -4234,11 +4234,11 @@ msgid "Registered"
 msgstr ""
 
 #, c-format
-msgid "Registered channels: %zu entries, %zu buckets, longest chain is %zu"
+msgid "Registered accounts: %zu entries, %zu buckets, longest chain is %zu"
 msgstr ""
 
 #, c-format
-msgid "Registered nick groups: %zu entries, %zu buckets, longest chain is %zu"
+msgid "Registered channels: %zu entries, %zu buckets, longest chain is %zu"
 msgstr ""
 
 #, c-format
@@ -4289,7 +4289,7 @@ msgstr ""
 msgid "Reload services' configuration file"
 msgstr ""
 
-msgid "Remove a nick from a group"
+msgid "Remove a nick from an account"
 msgstr ""
 
 msgid "Remove all bans preventing a user from entering a channel"
@@ -4676,7 +4676,7 @@ msgstr ""
 msgid "Set the channel description"
 msgstr ""
 
-msgid "Set the display of your group in services"
+msgid "Set the display nickname for your account"
 msgstr ""
 
 msgid "Set the founder of a channel"
@@ -4691,7 +4691,7 @@ msgstr ""
 msgid "Set the successor for a channel"
 msgstr ""
 
-msgid "Set the vhost for all nicks in a group"
+msgid "Set the vhost for all nicks in an account"
 msgstr ""
 
 msgid "Set the vhost of another user"
@@ -4791,9 +4791,9 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Sets the vhost for all nicks in the same group as that of the given nick. If your IRCD supports vidents, then using SETALL <nick> <ident>@<hostmask> will set idents for users as well as vhosts.\n"
+"Sets the vhost for all nicks in the same account as that of the given nick. If your IRCD supports vidents, then using SETALL <nick> <ident>@<hostmask> will set idents for users as well as vhosts.\n"
 "\n"
-"* NOTE, this will not update the vhost for any nicks added to the group after this command was used."
+"* NOTE, this will not update the vhost for any nicks added to the account after this command was used."
 msgstr ""
 
 msgid "Sets the vhost for the given nick to that of the given hostmask. If your IRCD supports vidents, then using SET <nick> <ident>@<hostmask> set idents for users as well as vhosts."
@@ -4984,7 +4984,7 @@ msgstr ""
 msgid "Syncs all modes set on users on the channel with the modes they should have based on their access."
 msgstr ""
 
-msgid "Syncs the vhost for all nicks in a group"
+msgid "Syncs the vhost for all nicks in an account"
 msgstr ""
 
 msgid "Syntax"
@@ -5298,11 +5298,11 @@ msgid "The network name you specified is incorrect. Did you mean to run %s on a 
 msgstr ""
 
 #, c-format
-msgid "The new display MUST be a nickname of the nickname group %s."
+msgid "The new display is now %s."
 msgstr ""
 
 #, c-format
-msgid "The new display is now %s."
+msgid "The new display nickname must belong to the %s account."
 msgstr ""
 
 #, c-format
@@ -5356,7 +5356,7 @@ msgstr ""
 msgid "There are no forbids of type %s."
 msgstr ""
 
-msgid "There are too many nicks in your group."
+msgid "There are too many nicks in your account."
 msgstr ""
 
 #, c-format
@@ -5437,9 +5437,6 @@ msgstr ""
 msgid "This command allows users to set the vhost of their CURRENT nick to be the vhost for all nicks in the same group."
 msgstr ""
 
-msgid "This command also creates a new group for your nickname, that will allow you to register other nicks later sharing the same configuration, the same set of memos and the same channel privileges."
-msgstr ""
-
 #, c-format
 msgid "This command is an alias to the command %s."
 msgstr ""
@@ -5457,19 +5454,19 @@ msgid "This command loads the module named modname from the modules directory.
 msgstr ""
 
 msgid ""
-"This command makes your nickname join the target nickname's group. password is the password of the target nickname. \n"
+"This command makes your nickname join the target nickname's account. password is the password of the target nickname. \n"
 "\n"
-"Joining a group will allow you to share your configuration, memos, and channel privileges with all the nicknames in the group, and much more!\n"
+"Joining an account will allow you to share your configuration, memos, and channel privileges with all the nicknames in the account, and much more!\n"
 "\n"
-"A group exists as long as it is useful. This means that even if a nick of the group is dropped, you won't lose the shared things described above, as long as there is at least one nick remaining in the group.\n"
+"An account exists as long as it is useful. This means that even if a nick of the account is dropped, you won't lose the shared things described above, as long as there is at least one nick remaining in the account.\n"
 "\n"
 "You may be able to use this command even if you have not registered your nick yet. If your nick is already registered, you'll need to identify yourself before using this command. \n"
 "\n"
-"It is recommended to use this command with a non-registered nick because it will be registered automatically when using this command. You may use it with a registered nick (to change your group) only if your network administrators allowed it.\n"
+"It is recommended to use this command with a non-registered nick because it will be registered automatically when using this command. You may use it with a registered nick (to change your account) only if your network administrators allowed it.\n"
 "\n"
-"You can only be in one group at a time. Group merging is not possible. \n"
+"You can only be in one account at a time. Group merging is not possible. \n"
 "\n"
-"Note: all the nicknames of a group have the same password."
+"Note: all the nicknames of an account have the same password."
 msgstr ""
 
 msgid "This command manages your auto join list. When you identify you will automatically join the channels on your auto join list. Services Operators may provide a nick to modify other users' auto join lists."
@@ -5496,7 +5493,7 @@ msgstr ""
 msgid "This command tells you what a users access is on a channel and what access entries, if any, they match. Additionally it will tell you of any auto kick entries they match. Usage of this command is limited to users who have the ability to modify access entries on the channel."
 msgstr ""
 
-msgid "This command ungroups your nick, or if given, the specified nick, from the group it is in. The ungrouped nick keeps its registration time, password, email, greet, language, and url. Everything else is reset. You may not ungroup yourself if there is only one nick in your group."
+msgid "This command ungroups your nick, or if given, the specified nick, from the account it is in. The ungrouped nick keeps its registration time, password, email, greet, language, and url. Everything else is reset. You may not ungroup yourself if there is only one nick in your account."
 msgstr ""
 
 msgid "This command unloads the module named modname."
@@ -5604,11 +5601,11 @@ msgid "Turns %s's privacy option on or off for your nick. With PRIVATE set, yo
 msgstr ""
 
 #, c-format
-msgid "Turns automatic protection for the nick on or off. With protection on if a user tries to use a nickname from the nick's group they will be given some time to change their nick after which %s will forcibly change their nick."
+msgid "Turns automatic protection for the nick on or off. With protection on if a user tries to use a nickname from the nick's account they will be given some time to change their nick after which %s will forcibly change their nick."
 msgstr ""
 
 #, c-format
-msgid "Turns automatic protection for your account on or off. With protection on if another user tries to use a nickname from your group they will be given some time to change their nick after which %s will forcibly change their nick."
+msgid "Turns automatic protection for your account on or off. With protection on if another user tries to use a nickname from your account they will be given some time to change their nick after which %s will forcibly change their nick."
 msgstr ""
 
 msgid "Turns chanstats channel statistics ON or OFF for this user."
@@ -5813,11 +5810,11 @@ msgid "VHost for %s has been rejected."
 msgstr ""
 
 #, c-format
-msgid "VHost for group %s set to %s."
+msgid "VHost for account %s set to %s."
 msgstr ""
 
 #, c-format
-msgid "VHosts for group %s have been removed."
+msgid "VHosts for account %s have been removed."
 msgstr ""
 
 msgid "VIEW host"
@@ -5864,9 +5861,9 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Without a parameter, lists all nicknames that are in your group.\n"
+"Without a parameter, lists all nicknames that belong to your account.\n"
 "\n"
-"With a parameter, lists all nicknames that are in the group of the given nick.\n"
+"With a parameter, lists all nicknames that belong to the account of the given nick.\n"
 "\n"
 "Specifying a nick is limited to Services Operators."
 msgstr ""
@@ -5897,7 +5894,7 @@ msgid "Word"
 msgstr ""
 
 #, c-format
-msgid "You are already a member of the group of %s."
+msgid "You are already a member of the account of %s."
 msgstr ""
 
 msgid "You are already identified."
@@ -5930,11 +5927,10 @@ msgid "You are now identified as %s. Change your password now using %s."
 msgstr ""
 
 #, c-format
-msgid "You are now in the group of %s."
+msgid "You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."
 msgstr ""
 
-#, c-format
-msgid "You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."
+msgid "You can associate multiple nicknames with your account. All nicknames will share the same configuration, set of memos, and channel privileges."
 msgstr ""
 
 msgid "You can not NOOP services."
@@ -6090,7 +6086,7 @@ msgstr ""
 msgid "You have regained control of %s."
 msgstr ""
 
-msgid "You may drop any nick within your group."
+msgid "You may drop any nick within your account."
 msgstr ""
 
 #, c-format
@@ -6284,13 +6280,13 @@ msgstr ""
 msgid "Your message queue has been cleared."
 msgstr ""
 
+msgid "Your nick does not belong to an account, you can't ungroup it."
+msgstr ""
+
 msgid "Your nick has been logged out."
 msgstr ""
 
 msgid "Your nick is already registered."
-msgstr ""
-
-msgid "Your nick is not grouped to anything, you can't ungroup it."
 msgstr ""
 
 msgid "Your nick isn't registered."
@@ -6298,6 +6294,10 @@ msgstr ""
 
 #, c-format
 msgid "Your nickname is now being changed to %s"
+msgstr ""
+
+#, c-format
+msgid "Your nickname now belongs to the account %s."
 msgstr ""
 
 msgid "Your oper block doesn't require logging in."

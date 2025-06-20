@@ -361,7 +361,7 @@ public:
 
 	void OnDelCore(NickCore *nc) override
 	{
-		Log(NickServ, "nick") << "Deleting nickname group " << nc->display;
+		Log(NickServ, "nick") << "Deleting account " << nc->display;
 
 		/* Clean up this nick core from any users online */
 		for (std::list<User *>::iterator it = nc->users.begin(); it != nc->users.end();)
@@ -377,7 +377,7 @@ public:
 
 	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) override
 	{
-		Log(LOG_NORMAL, "nick", NickServ) << "Changing " << nc->display << " nickname group display to " << newdisplay;
+		Log(LOG_NORMAL, "nick", NickServ) << "Changing " << nc->display << " account display nickname to " << newdisplay;
 	}
 
 	void OnNickIdentify(User *u) override
@@ -491,7 +491,7 @@ public:
 			IRCD->SendLogin(u, na);
 			if (!Config->GetModule("nickserv").Get<bool>("nonicknameownership") && na->nc == u->Account() && !na->nc->HasExt("UNCONFIRMED"))
 				u->SetMode(NickServ, "REGISTERED");
-			Log(u, "", NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;
+			Log(u, "", NickServ) << u->GetMask() << " automatically identified for account " << u->Account()->display;
 		}
 
 		if (!u->nick.equals_ci(oldnick) && old_na)
@@ -616,7 +616,7 @@ public:
 
 			if (expire)
 			{
-				Log(LOG_NORMAL, "nickserv/expire", NickServ) << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
+				Log(LOG_NORMAL, "nickserv/expire", NickServ) << "Expiring nickname " << na->nick << " (account: " << na->nc->display << ") (email: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
 				FOREACH_MOD(OnNickExpire, (na));
 				delete na;
 			}

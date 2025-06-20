@@ -122,7 +122,7 @@ class CommandHSSetAll final
 public:
 	CommandHSSetAll(Module *creator) : Command(creator, "hostserv/setall", 2, 2)
 	{
-		this->SetDesc(_("Set the vhost for all nicks in a group"));
+		this->SetDesc(_("Set the vhost for all nicks in an account"));
 		this->SetSyntax(_("\037nick\037 \037hostmask\037"));
 	}
 
@@ -193,7 +193,7 @@ public:
 		na->SetVHost(user, host, source.GetNick());
 		this->Sync(na);
 		FOREACH_MOD(OnSetVHost, (na));
-		source.Reply(_("VHost for group \002%s\002 set to \002%s\002."), nick.c_str(), na->GetVHostMask().c_str());
+		source.Reply(_("VHost for account \002%s\002 set to \002%s\002."), nick.c_str(), na->GetVHostMask().c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -201,13 +201,13 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Sets the vhost for all nicks in the same group as that "
+			"Sets the vhost for all nicks in the same account as that "
 			"of the given nick. If your IRCD supports vidents, then "
 			"using SETALL <nick> <ident>@<hostmask> will set idents "
 			"for users as well as vhosts."
 			"\n\n"
 			"* NOTE, this will not update the vhost for any nicks "
-			"added to the group after this command was used."
+			"added to the account after this command was used."
 		));
 		return true;
 	}

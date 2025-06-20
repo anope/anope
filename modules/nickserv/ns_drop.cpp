@@ -79,7 +79,7 @@ public:
 
 		FOREACH_MOD(OnNickDrop, (source, na));
 
-		Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
+		Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (account: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 		delete na;
 
 		source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
@@ -98,7 +98,7 @@ public:
 
 		source.Reply(" ");
 		if (!source.HasPriv("nickserv/drop"))
-			source.Reply(_("You may drop any nick within your group."));
+			source.Reply(_("You may drop any nick within your account."));
 		else
 			source.Reply(_("As a Services Operator, you may drop any nick."));
 

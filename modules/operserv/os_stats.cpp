@@ -182,7 +182,7 @@ private:
 		source.Reply(_("Registered nicknames: %zu entries, %zu buckets, longest chain is %zu"), entries, buckets, max_chain);
 
 		GetHashStats(*NickCoreList, entries, buckets, max_chain);
-		source.Reply(_("Registered nick groups: %zu entries, %zu buckets, longest chain is %zu"), entries, buckets, max_chain);
+		source.Reply(_("Registered accounts: %zu entries, %zu buckets, longest chain is %zu"), entries, buckets, max_chain);
 
 		if (session_service)
 		{

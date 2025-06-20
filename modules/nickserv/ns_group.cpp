@@ -70,8 +70,8 @@ public:
 			FOREACH_MOD(OnNickGroup, (u, target));
 		}
 
-		Log(LOG_COMMAND, source, cmd) << "to make " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
-		source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
+		Log(LOG_COMMAND, source, cmd) << "to make " << nick << " join account of of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
+		source.Reply(_("Your nickname now belongs to the account \002%s\002."), target->nick.c_str());
 
 		if (u)
 			u->lastnickreg = Anope::CurTime;
@@ -99,7 +99,7 @@ class CommandNSGroup final
 public:
 	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 0, 2)
 	{
-		this->SetDesc(_("Join a group"));
+		this->SetDesc(_("Add a nick to an account"));
 		this->SetSyntax(_("\037[target]\037 \037[password]\037"));
 		this->AllowUnregistered(true);
 	}
@@ -162,17 +162,17 @@ public:
 		}
 		else if (target->nc->HasExt("NS_SUSPENDED"))
 		{
-			Log(LOG_COMMAND, source, this) << "and tried to group to SUSPENDED nick " << target->nick;
+			Log(LOG_COMMAND, source, this) << "and tried to group to SUSPENDED account " << target->nick;
 			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
 		}
 		else if (na && Config->GetModule(this->owner).Get<bool>("nogroupchange"))
 			source.Reply(_("Your nick is already registered."));
 		else if (na && *target->nc == *na->nc)
-			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
+			source.Reply(_("You are already a member of the account of \002%s\002."), target->nick.c_str());
 		else if (na && na->nc != source.GetAccount())
 			source.Reply(NICK_IDENTIFY_REQUIRED);
 		else if (maxaliases && target->nc->aliases->size() >= maxaliases && !target->nc->IsServicesOper())
-			source.Reply(_("There are too many nicks in your group."));
+			source.Reply(_("There are too many nicks in your account."));
 		else if (nickserv && nickserv->IsGuestNick(source.GetNick()))
 			source.Reply(NICK_CANNOT_BE_REGISTERED, source.GetNick().c_str());
 		else
@@ -209,16 +209,16 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"This command makes your nickname join the \037target\037 nickname's "
-			"group. \037password\037 is the password of the target nickname. "
+			"account. \037password\037 is the password of the target nickname. "
 			"\n\n"
-			"Joining a group will allow you to share your configuration, "
+			"Joining an account will allow you to share your configuration, "
 			"memos, and channel privileges with all the nicknames in the "
-			"group, and much more!"
+			"account, and much more!"
 			"\n\n"
-			"A group exists as long as it is useful. This means that even "
-			"if a nick of the group is dropped, you won't lose the "
+			"An account exists as long as it is useful. This means that even "
+			"if a nick of the account is dropped, you won't lose the "
 			"shared things described above, as long as there is at "
-			"least one nick remaining in the group."
+			"least one nick remaining in the account."
 			"\n\n"
 			"You may be able to use this command even if you have not registered "
 			"your nick yet. If your nick is already registered, you'll "
@@ -227,13 +227,13 @@ public:
 			"It is recommended to use this command with a non-registered "
 			"nick because it will be registered automatically when "
 			"using this command. You may use it with a registered nick (to "
-			"change your group) only if your network administrators allowed "
+			"change your account) only if your network administrators allowed "
 			"it."
 			"\n\n"
-			"You can only be in one group at a time. Group merging is "
+			"You can only be in one account at a time. Group merging is "
 			"not possible. "
 			"\n\n"
-			"\037Note\037: all the nicknames of a group have the same password."
+			"\037Note\037: all the nicknames of an account have the same password."
 		));
 		return true;
 	}
@@ -245,7 +245,7 @@ class CommandNSUngroup final
 public:
 	CommandNSUngroup(Module *creator) : Command(creator, "nickserv/ungroup", 0, 1)
 	{
-		this->SetDesc(_("Remove a nick from a group"));
+		this->SetDesc(_("Remove a nick from an account"));
 		this->SetSyntax(_("[\037nick\037]"));
 	}
 
@@ -255,11 +255,11 @@ public:
 		NickAlias *na = NickAlias::Find(!nick.empty() ? nick : source.GetNick());
 
 		if (source.GetAccount()->aliases->size() == 1)
-			source.Reply(_("Your nick is not grouped to anything, you can't ungroup it."));
+			source.Reply(_("Your nick does not belong to an account, you can't ungroup it."));
 		else if (!na)
 			source.Reply(NICK_X_NOT_REGISTERED, !nick.empty() ? nick.c_str() : source.GetNick().c_str());
 		else if (na->nc != source.GetAccount())
-			source.Reply(_("Nick %s is not in your group."), na->nick.c_str());
+			source.Reply(_("Nick %s does not belong to your account."), na->nick.c_str());
 		else
 		{
 			NickCore *oldcore = na->nc;
@@ -280,7 +280,7 @@ public:
 				nc->email = oldcore->email;
 			nc->language = oldcore->language;
 
-			Log(LOG_COMMAND, source, this) << "to make " << na->nick << " leave group of " << oldcore->display << " (email: " << (!oldcore->email.empty() ? oldcore->email : "none") << ")";
+			Log(LOG_COMMAND, source, this) << "to make " << na->nick << " leave account of " << oldcore->display << " (email: " << (!oldcore->email.empty() ? oldcore->email : "none") << ")";
 			source.Reply(_("Nick %s has been ungrouped from %s."), na->nick.c_str(), oldcore->display.c_str());
 
 			User *user = User::Find(na->nick, true);
@@ -296,10 +296,10 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"This command ungroups your nick, or if given, the specified nick, "
-			"from the group it is in. The ungrouped nick keeps its registration "
+			"from the account it is in. The ungrouped nick keeps its registration "
 			"time, password, email, greet, language, and url. Everything else "
 			"is reset. You may not ungroup yourself if there is only one nick in "
-			"your group."
+			"your account."
 		));
 		return true;
 	}
@@ -311,7 +311,7 @@ class CommandNSGList final
 public:
 	CommandNSGList(Module *creator) : Command(creator, "nickserv/glist", 0, 1)
 	{
-		this->SetDesc(_("Lists all nicknames in your group"));
+		this->SetDesc(_("Lists all nicknames in your account"));
 		this->SetSyntax(_("[\037nickname\037]"), [](auto &source) { return source.IsServicesOper(); });
 	}
 
@@ -361,14 +361,14 @@ public:
 			list.AddEntry(entry);
 		}
 
-		source.Reply(!nick.empty() ? _("List of nicknames in the group of \002%s\002:") : _("List of nicknames in your group:"), nc->display.c_str());
+		source.Reply(!nick.empty() ? _("List of nicknames belonging to \002%s\002:") : _("List of nicknames belonging to your account:"), nc->display.c_str());
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
 		for (const auto &reply : replies)
 			source.Reply(reply);
 
-		source.Reply(nc->aliases->size(), N_("%zu nickname in the group.", "%zu nicknames in the group."), nc->aliases->size());
+		source.Reply(nc->aliases->size(), N_("%zu nickname in the account.", "%zu nicknames in the account."), nc->aliases->size());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -377,18 +377,16 @@ public:
 		if (source.IsServicesOper())
 		{
 			source.Reply(_(
-				"Without a parameter, lists all nicknames that are in "
-				"your group."
+				"Without a parameter, lists all nicknames that belong to your account."
 				"\n\n"
-				"With a parameter, lists all nicknames that are in the "
-				"group of the given nick."
+				"With a parameter, lists all nicknames that belong to the account of the given nick."
 				"\n\n"
 				"Specifying a nick is limited to \002Services Operators\002."
 			));
 		}
 		else
 		{
-			source.Reply(_("Lists all nicks in your group."));
+			source.Reply(_("Lists all nicknames that belong to your account."));
 		}
 
 		return true;

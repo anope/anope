@@ -225,13 +225,15 @@ public:
 			));
 		}
 
-		source.Reply(" ");
-		source.Reply(_(
-			"This command also creates a new group for your nickname, "
-			"that will allow you to register other nicks later sharing "
-			"the same configuration, the same set of memos and the "
-			"same channel privileges."
-		));
+		if (!Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
+		{
+			source.Reply(" ");
+			source.Reply(_(
+				"You can associate multiple nicknames with your account. All nicknames will "
+				"share the same configuration, set of memos, and channel privileges."
+			));
+		}
+
 		return true;
 	}
 };

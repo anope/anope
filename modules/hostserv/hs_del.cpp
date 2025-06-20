@@ -57,7 +57,7 @@ class CommandHSDelAll final
 public:
 	CommandHSDelAll(Module *creator) : Command(creator, "hostserv/delall", 1, 1)
 	{
-		this->SetDesc(_("Deletes the vhost for all nicks in a group"));
+		this->SetDesc(_("Deletes the vhost for all nicks in an account"));
 		this->SetSyntax(_("\037nick\037"));
 	}
 
@@ -80,8 +80,8 @@ public:
 				na = alias;
 				na->RemoveVHost();
 			}
-			Log(LOG_ADMIN, source, this) << "for all nicks in group " << nc->display;
-			source.Reply(_("VHosts for group \002%s\002 have been removed."), nc->display.c_str());
+			Log(LOG_ADMIN, source, this) << "for all nicks in account " << nc->display;
+			source.Reply(_("VHosts for account \002%s\002 have been removed."), nc->display.c_str());
 		}
 		else
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -91,7 +91,7 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Deletes the vhost for all nicks in the same group as that of the given nick."));
+		source.Reply(_("Deletes the vhost for all nicks in the same account as that of the given nick."));
 		return true;
 	}
 };

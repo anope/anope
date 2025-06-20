@@ -38,7 +38,7 @@ public:
 		{
 			if (SendResetEmail(source.GetUser(), na, source.service))
 			{
-				Log(LOG_COMMAND, source, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
+				Log(LOG_COMMAND, source, this) << "for " << na->nick << " (account: " << na->nc->display << ")";
 				source.Reply(_("Password reset email for \002%s\002 has been sent."), na->nick.c_str());
 			}
 		}

@@ -100,10 +100,9 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-				"Turns automatic protection for your account on or off. With "
-				"protection on if another user tries to use a nickname from "
-				"your group they will be given some time to change their nick "
-				"after which %s will forcibly change their nick."
+				"Turns automatic protection for your account on or off. With protection on if "
+				"another user tries to use a nickname from your account they will be given some "
+				"time to change their nick after which %s will forcibly change their nick."
 			),
 			source.service->nick.c_str());
 		return true;
@@ -133,7 +132,7 @@ public:
 		source.Reply(_(
 				"Turns automatic protection for the nick on or off. With "
 				"protection on if a user tries to use a nickname from the "
-				"nick's group they will be given some time to change their "
+				"nick's account they will be given some time to change their "
 				"nick after which %s will forcibly change their nick."
 			),
 			source.service->nick.c_str());

@@ -39,7 +39,7 @@ public:
 
 	CommandHSGroup(Module *creator) : Command(creator, "hostserv/group", 0, 0)
 	{
-		this->SetDesc(_("Syncs the vhost for all nicks in a group"));
+		this->SetDesc(_("Syncs the vhost for all nicks in an account"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -54,7 +54,7 @@ public:
 		if (na && source.GetAccount() == na->nc && na->HasVHost())
 		{
 			this->Sync(na);
-			source.Reply(_("All vhosts in the group \002%s\002 have been set to \002%s\002."),
+			source.Reply(_("All vhosts for the account \002%s\002 have been set to \002%s\002."),
 				source.nc->display.c_str(), na->GetVHostMask().c_str());
 		}
 		else

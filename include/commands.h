@@ -32,7 +32,7 @@ struct CommandInfo final
 	Anope::string permission;
 	/* Group this command is in */
 	Anope::string group;
-	/* whether or not to hide this command in help output */
+	/* Whether to hide this command in help and suggestions */
 	bool hide = false;
 	/* Whether to prepend the channel name (only used with fantasy) */
 	bool prepend_channel = false;

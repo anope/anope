@@ -34,7 +34,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"This command is used by several other commands as a way to action changes made "
+			"This command is used by several other commands as a way to confirm changes made "
 			"to your account. \037type\037 can be one of:"
 		));
 

@@ -229,12 +229,16 @@ namespace
 		auto umessage = message.upper();
 		for (const auto &[command, info] : source.service->commands)
 		{
-			if (info.hide || command == message)
-				continue; // Don't suggest a hidden alias or a missing command.
+			if (info.hide)
+				continue; // Don't suggest a hidden alias.
 
 			size_t dist = Anope::Distance(umessage, command);
 			if (dist < distance)
 			{
+				ServiceReference<Command> cmd("Command", info.name);
+				if (!cmd)
+					continue; // Don't suggest an unloaded command.
+
 				distance = dist;
 				similar = command;
 			}

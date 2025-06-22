@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-21 09:47+0100\n"
-"PO-Revision-Date: 2025-06-21 09:47+0100\n"
+"POT-Creation-Date: 2025-06-22 15:21+0100\n"
+"PO-Revision-Date: 2025-06-22 15:21+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -3149,9 +3149,6 @@ msgstr ""
 msgid "LIST [nickname]"
 msgstr ""
 
-msgid "LOGONNEWS {ADD|DEL|LIST} [text|num]"
-msgstr ""
-
 #, c-format
 msgid "Language changed to %s."
 msgstr ""
@@ -3359,11 +3356,11 @@ msgid "Login to %s"
 msgstr ""
 
 #, c-format
-msgid "Logon news item #%d deleted."
+msgid "Logon news item #%s not found!"
 msgstr ""
 
 #, c-format
-msgid "Logon news item #%s not found!"
+msgid "Logon news item #%u deleted."
 msgstr ""
 
 msgid "Logon news items:"
@@ -3828,9 +3825,6 @@ msgstr ""
 msgid "No limit is set on %s."
 msgstr ""
 
-msgid "No logon news items to delete!"
-msgstr ""
-
 #, c-format
 msgid "No matches for %s found."
 msgstr ""
@@ -3877,12 +3871,6 @@ msgid "No one is using your nick, and services are not holding it."
 msgstr ""
 
 msgid "No oper block for your nick."
-msgstr ""
-
-msgid "No oper news items to delete!"
-msgstr ""
-
-msgid "No random news items to delete!"
 msgstr ""
 
 msgid "No records to display."
@@ -3940,9 +3928,6 @@ msgstr ""
 msgid "Number"
 msgstr ""
 
-msgid "OPERNEWS {ADD|DEL|LIST} [text|num]"
-msgstr ""
-
 msgid "Online from"
 msgstr ""
 
@@ -3958,11 +3943,11 @@ msgid "Oper info list for %s is empty."
 msgstr ""
 
 #, c-format
-msgid "Oper news item #%d deleted."
+msgid "Oper news item #%s not found!"
 msgstr ""
 
 #, c-format
-msgid "Oper news item #%s not found!"
+msgid "Oper news item #%u deleted."
 msgstr ""
 
 msgid "Oper news items:"
@@ -4165,9 +4150,6 @@ msgstr ""
 msgid "Puts an AKILL for every nick on the specified channel. It uses the entire real ident@host for every nick, and then enforces the AKILL."
 msgstr ""
 
-msgid "RANDOMNEWS {ADD|DEL|LIST} [text|num]"
-msgstr ""
-
 msgid "REGONLY enforced by "
 msgstr ""
 
@@ -4178,11 +4160,11 @@ msgid "REVOKE server"
 msgstr ""
 
 #, c-format
-msgid "Random news item #%d deleted."
+msgid "Random news item #%s not found!"
 msgstr ""
 
 #, c-format
-msgid "Random news item #%s not found!"
+msgid "Random news item #%u deleted."
 msgstr ""
 
 msgid "Random news items:"

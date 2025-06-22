@@ -15,13 +15,6 @@ enum NewsType
 	NEWS_OPER
 };
 
-struct NewsMessages final
-{
-	NewsType type;
-	Anope::string name;
-	const char *msgs[10];
-};
-
 struct NewsItem
 	: Serializable
 {

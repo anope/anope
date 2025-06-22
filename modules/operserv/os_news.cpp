@@ -46,11 +46,8 @@ namespace
 	}
 }
 
-/* List of messages for each news type.  This simplifies message sending. */
-
 enum
 {
-	MSG_SYNTAX,
 	MSG_NEWS_SHORT,
 	MSG_NEWS_LONG,
 	MSG_LIST_HEADER,
@@ -58,45 +55,46 @@ enum
 	MSG_ADDED,
 	MSG_DEL_NOT_FOUND,
 	MSG_DELETED,
-	MSG_DEL_NONE,
-	MSG_DELETED_ALL
+	MSG_DELETED_ALL,
+	MSG_END,
+};
+
+struct NewsMessages final
+{
+	NewsType type;
+	Anope::string name;
+	const char *msgs[MSG_END];
 };
 
 struct NewsMessages msgarray[] = {
 	{NEWS_LOGON, "LOGON",
-	 {_("LOGONNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
-	  _("[\002Logon News\002] %s"),
+	 {_("[\002Logon News\002] %s"),
 	  _("[\002Logon News\002 - %s] %s"),
 	  _("Logon news items:"),
 	  _("There is no logon news."),
 	  _("Added new logon news item."),
 	  _("Logon news item #%s not found!"),
-	  _("Logon news item #%d deleted."),
-	  _("No logon news items to delete!"),
+	  _("Logon news item #%u deleted."),
 	  _("All logon news items deleted.")}
 	 },
 	{NEWS_OPER, "OPER",
-	 {_("OPERNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
-	  _("[\002Oper News\002] %s"),
+	 {_("[\002Oper News\002] %s"),
 	  _("[\002Oper News\002 - %s] %s"),
 	  _("Oper news items:"),
 	  _("There is no oper news."),
 	  _("Added new oper news item."),
 	  _("Oper news item #%s not found!"),
-	  _("Oper news item #%d deleted."),
-	  _("No oper news items to delete!"),
+	  _("Oper news item #%u deleted."),
 	  _("All oper news items deleted.")}
 	 },
 	{NEWS_RANDOM, "RANDOM",
-	 {_("RANDOMNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
-	  _("[\002Random News\002] %s"),
+	 {_("[\002Random News\002] %s"),
 	  _("[\002Random News\002 - %s] %s"),
 	  _("Random news items:"),
 	  _("There is no random news."),
 	  _("Added new random news item."),
 	  _("Random news item #%s not found!"),
-	  _("Random news item #%d deleted."),
-	  _("No random news items to delete!"),
+	  _("Random news item #%u deleted."),
 	  _("All random news items deleted.")}
 	 }
 };

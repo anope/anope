@@ -12,6 +12,39 @@
 #include "module.h"
 #include "modules/botserv/badwords.h"
 
+namespace
+{
+	Anope::string TypeToString(BadWordType bw)
+	{
+		switch (bw)
+		{
+			case BW_ANY:
+				return "ANY";
+			case BW_SINGLE:
+				return "SINGLE";
+			case BW_START:
+				return "START";
+			case BW_END:
+				return "END";
+		}
+		return ""; // Should never happen.
+	}
+
+	BadWordType StringToType(const Anope::string &bw)
+	{
+		if (bw.equals_ci("ANY") || bw.equals_ci("0"))
+			return BW_ANY;
+		if (bw.equals_ci("SINGLE") || bw.equals_ci("1"))
+			return BW_SINGLE;
+		if (bw.equals_ci("START") || bw.equals_ci("2"))
+			return BW_START;
+		if (bw.equals_ci("END") || bw.equals_ci("3"))
+			return BW_END;
+
+		return BW_ANY; // Should never happen.
+	}
+}
+
 struct BadWordImpl final
 	: BadWord
 	, Serializable
@@ -33,7 +66,7 @@ struct BadWordTypeImpl final
 		const auto *bw = static_cast<const BadWordImpl *>(obj);
 		data.Store("ci", bw->chan);
 		data.Store("word", bw->word);
-		data.Store("type", bw->type);
+		data.Store("type", TypeToString(bw->type));
 	}
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &) const override;
@@ -138,7 +171,7 @@ Serializable *BadWordTypeImpl::Unserialize(Serializable *obj, Serialize::Data &d
 	if (!ci)
 		return NULL;
 
-	unsigned int n;
+	Anope::string n;
 	data["type"] >> n;
 
 	BadWordImpl *bw;
@@ -148,7 +181,7 @@ Serializable *BadWordTypeImpl::Unserialize(Serializable *obj, Serialize::Data &d
 		bw = new BadWordImpl();
 	bw->chan = sci;
 	bw->word = sword;
-	bw->type = static_cast<BadWordType>(n);
+	bw->type = StringToType(n);
 
 	BadWordsImpl *bws = ci->Require<BadWordsImpl>("badwords");
 	if (!obj)
@@ -244,7 +277,7 @@ private:
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(Number);
 					entry["Word"] = b->word;
-					entry["Type"] = b->type == BW_SINGLE ? "(SINGLE)" : (b->type == BW_START ? "(START)" : (b->type == BW_END ? "(END)" : ""));
+					entry["Type"] = TypeToString(b->type);
 					this->list.AddEntry(entry);
 				}
 			}
@@ -263,7 +296,7 @@ private:
 				ListFormatter::ListEntry entry;
 				entry["Number"] = Anope::ToString(i + 1);
 				entry["Word"] = b->word;
-				entry["Type"] = b->type == BW_SINGLE ? "(SINGLE)" : (b->type == BW_START ? "(START)" : (b->type == BW_END ? "(END)" : ""));
+				entry["Type"] =  TypeToString(b->type);
 				list.AddEntry(entry);
 			}
 		}
@@ -295,14 +328,7 @@ private:
 		{
 			Anope::string opt = word.substr(pos + 1);
 			if (!opt.empty())
-			{
-				if (opt.equals_ci("SINGLE"))
-					bwtype = BW_SINGLE;
-				else if (opt.equals_ci("START"))
-					bwtype = BW_START;
-				else if (opt.equals_ci("END"))
-					bwtype = BW_END;
-			}
+				bwtype = StringToType(opt);
 			realword = word.substr(0, pos);
 		}
 

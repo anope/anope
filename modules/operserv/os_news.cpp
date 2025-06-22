@@ -17,6 +17,35 @@
 # pragma GCC diagnostic ignored "-Wformat-security"
 #endif
 
+namespace
+{
+	Anope::string TypeToString(NewsType nt)
+	{
+		switch (nt)
+		{
+			case NEWS_LOGON:
+				return "LOGON";
+			case NEWS_RANDOM:
+				return "RANDOM";
+			case NEWS_OPER:
+				return "OPER";
+		}
+		return ""; // Should never happen.
+	}
+
+	NewsType StringToType(const Anope::string &nt)
+	{
+		if (nt.equals_ci("LOGON") || nt.equals_ci("0"))
+			return NEWS_LOGON;
+		if (nt.equals_ci("RANDOM") || nt.equals_ci("1"))
+			return NEWS_RANDOM;
+		if (nt.equals_ci("OPER") || nt.equals_ci("2"))
+			return NEWS_OPER;
+
+		return NEWS_LOGON; // Should never happen.
+	}
+}
+
 /* List of messages for each news type.  This simplifies message sending. */
 
 enum
@@ -83,7 +112,7 @@ struct NewsItemType final
 	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *ni = static_cast<const NewsItem *>(obj);
-		data.Store("type", ni->type);
+		data.Store("type", TypeToString(ni->type));
 		data.Store("text", ni->text);
 		data.Store("who", ni->who);
 		data.Store("time", ni->time);
@@ -100,9 +129,9 @@ struct NewsItemType final
 		else
 			ni = new NewsItem();
 
-		unsigned int t;
+		Anope::string t;
 		data["type"] >> t;
-		ni->type = static_cast<NewsType>(t);
+		ni->type = StringToType(t);
 		data["text"] >> ni->text;
 		data["who"] >> ni->who;
 		data["time"] >> ni->time;

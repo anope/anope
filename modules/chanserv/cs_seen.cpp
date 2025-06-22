@@ -53,12 +53,54 @@ struct SeenInfoType final
 	{
 	}
 
+	static Anope::string TypeToString(TypeInfo ti)
+	{
+		switch (ti)
+		{
+			case NEW:
+				return "NEW";
+			case NICK_TO:
+				return "NICK_TO";
+			case NICK_FROM:
+				return "NICK_FROM";
+			case JOIN:
+				return "JOIN";
+			case PART:
+				return "PART";
+			case QUIT:
+				return "QUIT";
+			case KICK:
+				return "KICK";
+		}
+		return ""; // Should never happen.
+	}
+
+	static TypeInfo StringToType(const Anope::string &ti)
+	{
+		if (ti.equals_ci("NEW") || ti.equals_ci("0"))
+			return NEW;
+		if (ti.equals_ci("NICK_TO") || ti.equals_ci("1"))
+			return NICK_TO;
+		if (ti.equals_ci("NICK_FROM") || ti.equals_ci("2"))
+			return NICK_FROM;
+		if (ti.equals_ci("JOIN") || ti.equals_ci("3"))
+			return JOIN;
+		if (ti.equals_ci("PART") || ti.equals_ci("4"))
+			return PART;
+		if (ti.equals_ci("QUIT") || ti.equals_ci("5"))
+			return QUIT;
+		if (ti.equals_ci("KICK") || ti.equals_ci("6"))
+			return KICK;
+
+		return NEW; // Should never happen.
+	}
+
 	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *s = static_cast<const SeenInfo *>(obj);
 		data.Store("nick", s->nick);
 		data.Store("vhost", s->vhost);
-		data.Store("type", s->type);
+		data.Store("type", TypeToString(s->type));
 		data.Store("nick2", s->nick2);
 		data.Store("channel", s->channel);
 		data.Store("message", s->message);
@@ -84,9 +126,9 @@ struct SeenInfoType final
 
 		s->nick = snick;
 		data["vhost"] >> s->vhost;
-		unsigned int n;
+		Anope::string n;
 		data["type"] >> n;
-		s->type = static_cast<TypeInfo>(n);
+		s->type = StringToType(n);
 		data["nick2"] >> s->nick2;
 		data["channel"] >> s->channel;
 		data["message"] >> s->message;

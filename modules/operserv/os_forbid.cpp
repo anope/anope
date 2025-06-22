@@ -12,6 +12,40 @@
 #include "module.h"
 #include "modules/operserv/forbid.h"
 
+namespace
+{
+	Anope::string TypeToString(ForbidType ft)
+	{
+		switch (ft)
+		{
+			case FT_NICK:
+				return "NICK";
+			case FT_CHAN:
+				return "CHAN";
+			case FT_EMAIL:
+				return "EMAIL";
+			case FT_REGISTER:
+				return "REGISTER";
+			default:
+				return "UNKNOWN"; // Should never happen.
+		}
+	}
+
+	ForbidType StringToType(const Anope::string &ft)
+	{
+		if (ft.equals_ci("NICK") || ft.equals_ci("1"))
+			return FT_NICK;
+		if (ft.equals_ci("CHAN") || ft.equals_ci("2"))
+			return FT_CHAN;
+		if (ft.equals_ci("EMAIL") || ft.equals_ci("3"))
+			return FT_EMAIL;
+		if (ft.equals_ci("REGISTER") || ft.equals_ci("4"))
+			return FT_REGISTER;
+
+		return FT_SIZE; // Should never happen.
+	}
+}
+
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
 struct ForbidDataImpl final
@@ -41,7 +75,7 @@ void ForbidDataTypeImpl::Serialize(Serializable *obj, Serialize::Data &data) con
 	data.Store("reason", fb->reason);
 	data.Store("created", fb->created);
 	data.Store("expires", fb->expires);
-	data.Store("type", fb->type);
+	data.Store("type", TypeToString(fb->type));
 }
 
 Serializable *ForbidDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
@@ -60,11 +94,11 @@ Serializable *ForbidDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data
 	data["reason"] >> fb->reason;
 	data["created"] >> fb->created;
 	data["expires"] >> fb->expires;
-	unsigned int t;
+	Anope::string t;
 	data["type"] >> t;
-	fb->type = static_cast<ForbidType>(t);
+	fb->type = StringToType(t);
 
-	if (t > FT_SIZE - 1)
+	if (fb->type == FT_SIZE)
 		return NULL;
 
 	if (!obj)
@@ -81,27 +115,7 @@ class MyForbidService final
 
 	void Expire(ForbidData *fd, unsigned ft, size_t idx)
 	{
-		Anope::string typestr;
-		switch (ft)
-		{
-			case FT_NICK:
-				typestr = "nick";
-				break;
-			case FT_CHAN:
-				typestr = "chan";
-				break;
-			case FT_EMAIL:
-				typestr = "email";
-				break;
-			case FT_REGISTER:
-				typestr = "register";
-				break;
-			default:
-				typestr = "unknown";
-				break;
-		}
-
-		Log(LOG_NORMAL, "expire/forbid", Config->GetClient("OperServ")) << "Expiring forbid for " << fd->mask << " type " << typestr;
+		Log(LOG_NORMAL, "expire/forbid", Config->GetClient("OperServ")) << "Expiring forbid for " << fd->mask << " type " << TypeToString(static_cast<ForbidType>(ft));
 		this->forbids(ft).erase(this->forbids(ft).begin() + idx);
 		delete fd;
 	}
@@ -208,16 +222,7 @@ public:
 		const Anope::string &command = params[0];
 		const Anope::string &subcommand = params.size() > 1 ? params[1] : "";
 
-		ForbidType ftype = FT_SIZE;
-		if (subcommand.equals_ci("NICK"))
-			ftype = FT_NICK;
-		else if (subcommand.equals_ci("CHAN"))
-			ftype = FT_CHAN;
-		else if (subcommand.equals_ci("EMAIL"))
-			ftype = FT_EMAIL;
-		else if (subcommand.equals_ci("REGISTER"))
-			ftype = FT_REGISTER;
-
+		auto ftype = StringToType(subcommand);
 		if (command.equals_ci("ADD") && params.size() > 3 && ftype != FT_SIZE)
 		{
 			const Anope::string &expiry = params[2][0] == '+' ? params[2] : "";
@@ -404,16 +409,8 @@ public:
 					if (ftype != FT_SIZE && ftype != forbid->type)
 						continue;
 
-					Anope::string stype;
-					if (forbid->type == FT_NICK)
-						stype = "NICK";
-					else if (forbid->type == FT_CHAN)
-						stype = "CHAN";
-					else if (forbid->type == FT_EMAIL)
-						stype = "EMAIL";
-					else if (forbid->type == FT_REGISTER)
-						stype = "REGISTER";
-					else
+					auto stype = TypeToString(forbid->type);
+					if (stype == FT_SIZE)
 						continue;
 
 					ListFormatter::ListEntry entry;

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-22 15:21+0100\n"
-"PO-Revision-Date: 2025-06-22 15:21+0100\n"
+"POT-Creation-Date: 2025-06-24 13:55+0100\n"
+"PO-Revision-Date: 2025-06-24 13:55+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -4069,7 +4069,7 @@ msgstr ""
 msgid "Pooled/Not Active"
 msgstr ""
 
-msgid "Prevent a bot from being assigned by non IRC operators"
+msgid "Prevent a bot from being assigned by non Services Operators"
 msgstr ""
 
 msgid "Prevent a bot from being assigned to a channel"
@@ -5509,7 +5509,7 @@ msgstr ""
 msgid "This option makes a channel unassignable. If a bot is already assigned to the channel, it is unassigned automatically when you enable it."
 msgstr ""
 
-msgid "This option prevents a bot from being assigned to a channel by users that aren't IRC Operators."
+msgid "This option prevents a bot from being assigned to a channel by users that aren't Services Operators."
 msgstr ""
 
 #, c-format

@@ -173,7 +173,7 @@ class CommandBSSetPrivate final
 public:
 	CommandBSSetPrivate(Module *creator, const Anope::string &sname = "botserv/set/private") : Command(creator, sname, 2, 2)
 	{
-		this->SetDesc(_("Prevent a bot from being assigned by non IRC operators"));
+		this->SetDesc(_("Prevent a bot from being assigned by non Services Operators"));
 		this->SetSyntax(_("\037botname\037 {\037ON|OFF\037}"));
 	}
 
@@ -214,7 +214,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"This option prevents a bot from being assigned to a "
-			"channel by users that aren't IRC Operators."
+			"channel by users that aren't Services Operators."
 		));
 		return true;
 	}

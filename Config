@@ -13,14 +13,6 @@
 #
 ###########################################################################
 
-exists () { # because some shells don't have test -e
-	if [ -f $1 -o -d $1 -o -p $1 -o -c $1 -o -b $1 ] ; then
-		return 0
-	else
-		return 1
-	fi
-}
-
 Load_Cache () {
 	if [ -f $SOURCE_DIR/config.cache -a -r $SOURCE_DIR/config.cache -a ! "$IGNORE_CACHE" ] ; then
 		echo "Using defaults from config.cache. To ignore, $SOURCE_DIR/Config -nocache"
@@ -208,7 +200,7 @@ while [ $ok -eq 0 ] ; do
 		INPUT=$INSTDIR
 	fi
 	if [ ! -d "$INPUT" ] ; then
-		if exists "$INPUT" ; then
+		if [ -e "$INPUT" ]; then
 			echo "$INPUT exists, but is not a directory!"
 		else
 			echo "$INPUT does not exist.  Create it?"
@@ -220,7 +212,7 @@ while [ $ok -eq 0 ] ; do
 				fi
 			fi
 		fi
-	elif exists "$INPUT/include/services.h" ; then
+	elif [ -e "$INPUT/include/services.h" ]; then
 		echo "You cannot use the Anope source directory as a target directory."
 	else
 		ok=1

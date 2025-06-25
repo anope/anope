@@ -6130,8 +6130,8 @@ msgid "Service"
 msgstr "Service"
 
 #, c-format
-msgid "Service's hold on %s has been released."
-msgstr "Service's hold on %s has been released."
+msgid "Services' hold on %s has been released."
+msgstr "Services' hold on %s has been released."
 
 msgid "Services Operator commands"
 msgstr "Services Operator commands"

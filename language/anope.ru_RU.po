@@ -6954,7 +6954,7 @@ msgid "Service"
 msgstr "Текущее кол-во серверов: %d"
 
 #, fuzzy, c-format
-msgid "Service's hold on %s has been released."
+msgid "Services' hold on %s has been released."
 msgstr "Ваш ник освобожден от удержания сервисами."
 
 #, fuzzy

@@ -6172,7 +6172,7 @@ msgid "Service"
 msgstr "Servizio"
 
 #, c-format
-msgid "Service's hold on %s has been released."
+msgid "Services' hold on %s has been released."
 msgstr "Il blocco dei servizi sul nick %s è stato rilasciato."
 
 msgid "Services Operator commands"

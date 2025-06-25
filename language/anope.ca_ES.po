@@ -6901,7 +6901,7 @@ msgid "Service"
 msgstr "Servers found: %d"
 
 #, fuzzy, c-format
-msgid "Service's hold on %s has been released."
+msgid "Services' hold on %s has been released."
 msgstr "El teu nick ha estat alliberat pels serveis."
 
 #, fuzzy

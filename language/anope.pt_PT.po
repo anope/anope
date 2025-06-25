@@ -6794,7 +6794,7 @@ msgid "Service"
 msgstr "Servers found: %d"
 
 #, fuzzy, c-format
-msgid "Service's hold on %s has been released."
+msgid "Services' hold on %s has been released."
 msgstr "Seu nick foi derrubado e pode ser usado."
 
 #, fuzzy

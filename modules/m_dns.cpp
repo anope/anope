@@ -627,7 +627,7 @@ class NotifySocket : public Socket
 		if (!packet)
 			return false;
 
-		Log(LOG_DEBUG_2) << "Resolver: Notifying slave " << packet->addr.addr();
+		Log(LOG_DEBUG_2) << "Resolver: Notifying secondary " << packet->addr.addr();
 
 		try
 		{
@@ -927,7 +927,7 @@ class MyManager : public Manager, public Timer
 
 	void Notify(const Anope::string &zone) anope_override
 	{
-		/* notify slaves of the update */
+		/* notify secondaries of the update */
 		for (unsigned i = 0; i < notify.size(); ++i)
 		{
 			const Anope::string &ip = notify[i].first;

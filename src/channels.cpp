@@ -405,7 +405,7 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const ModeData &data, bool e
 	// We build a mode data which has more than what the caller gives us.
 	ModeData mdata;
 	mdata.set_at = data.set_at ? data.set_at : Anope::CurTime;
-	mdata.set_by = data.set_by.empty() && bi ? bi->nick : data.set_by;
+	mdata.set_by = data.set_by.empty() ? (bi ? bi->nick : Me->GetName()) : data.set_by;
 	mdata.value = data.value;
 
 	/* Don't set modes already set */

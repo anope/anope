@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-24 13:55+0100\n"
-"PO-Revision-Date: 2025-06-24 13:55+0100\n"
+"POT-Creation-Date: 2025-06-25 15:33+0100\n"
+"PO-Revision-Date: 2025-06-25 15:33+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -942,10 +942,6 @@ msgid "%s is a client on services."
 msgstr ""
 
 #, c-format
-msgid "%s is a network service."
-msgstr ""
-
-#, c-format
 msgid "%s is already covered by %s."
 msgstr ""
 
@@ -1011,14 +1007,6 @@ msgid "%s is notified when new memos arrive."
 msgstr ""
 
 #, c-format
-msgid "%s is on the channel right now (as %s)!"
-msgstr ""
-
-#, c-format
-msgid "%s is on the channel right now!"
-msgstr ""
-
-#, c-format
 msgid "%s list for %s"
 msgstr ""
 
@@ -1036,10 +1024,6 @@ msgstr ""
 
 #, c-format
 msgid "%s settings:"
-msgstr ""
-
-#, c-format
-msgid "%s was last seen here %s ago."
 msgstr ""
 
 #, c-format
@@ -3008,14 +2992,6 @@ msgstr ""
 msgid "Hosts with at least %d sessions:"
 msgstr ""
 
-#, c-format
-msgid "I don't know who %s is."
-msgstr ""
-
-#, c-format
-msgid "I've never seen %s on this channel."
-msgstr ""
-
 msgid "ID"
 msgstr ""
 
@@ -3376,10 +3352,6 @@ msgstr ""
 
 #, c-format
 msgid "Logs you out from %s so you lose Services Operator privileges. This command is only useful if your oper block is configured with a password."
-msgstr ""
-
-#, c-format
-msgid "Looking for yourself, eh %s?"
 msgstr ""
 
 #, c-format
@@ -6009,10 +5981,6 @@ msgstr ""
 
 #, c-format
 msgid "You do not have the access to change %s's modes."
-msgstr ""
-
-#, c-format
-msgid "You found me, %s!"
 msgstr ""
 
 #, c-format

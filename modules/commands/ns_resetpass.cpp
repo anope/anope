@@ -106,7 +106,9 @@ class NSResetPass : public Module
 				else if (passcode.equals_cs(ri->code))
 				{
 					reset.Unset(nc);
-					nc->Shrink<bool>("UNCONFIRMED");
+
+					if (Config->GetModule("nickserv")->Get<const Anope::string>("registration").equals_ci("mail"))
+						nc->Shrink<bool>("UNCONFIRMED");
 
 					Log(LOG_COMMAND, source, &commandnsresetpass) << "to confirm RESETPASS and forcefully identify as " << na->nick;
 

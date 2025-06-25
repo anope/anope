@@ -133,7 +133,10 @@ public:
 		}
 
 		reset.Unset(nc);
-		nc->Shrink<bool>("UNCONFIRMED");
+
+		if (Config->GetModule("nickserv").Get<const Anope::string>("registration").equals_ci("mail"))
+			nc->Shrink<bool>("UNCONFIRMED");
+
 		if (source.GetUser())
 			source.GetUser()->Identify(na);
 

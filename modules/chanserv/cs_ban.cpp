@@ -13,6 +13,9 @@
 
 static Module *me;
 
+class TempBan;
+static std::vector<TempBan *> tempbans;
+
 class TempBan final
 	: public Timer
 {
@@ -28,6 +31,21 @@ public:
 		, mask(banmask)
 		, mode(mod)
 	{
+		tempbans.push_back(this);
+	}
+
+	~TempBan()
+	{
+		auto it = std::find(tempbans.begin(), tempbans.end(), this);
+		if (it != tempbans.end())
+			tempbans.erase(it);
+	}
+
+	bool Matches(Channel *chan, ChannelMode *cmode, const Anope::string &bmask) const
+	{
+		return chan->name.equals_ci(this->channel)
+			&& cmode->name == this->mode
+			&& bmask == this->mask;
 	}
 
 	void Tick() override
@@ -258,9 +276,24 @@ class CSBan final
 	CommandCSBan commandcsban;
 
 public:
-	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsban(this)
+	CSBan(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandcsban(this)
 	{
 		me = this;
+	}
+
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *cmode, const Anope::string &param) override
+	{
+		for (const auto *tempban : tempbans)
+		{
+			if (tempban->Matches(c, cmode, param))
+			{
+				delete tempban;
+				break;
+			}
+		}
+		return EVENT_CONTINUE;
 	}
 };
 

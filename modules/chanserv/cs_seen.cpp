@@ -371,10 +371,11 @@ public:
 
 	void OnExpireTick() override
 	{
-		size_t previous_size = database.size();
-		time_t purgetime = Config->GetModule(this).Get<time_t>("purgetime");
+		auto purgetime = Config->GetModule(this).Get<time_t>("purgetime", "90d");
 		if (!purgetime)
-			purgetime = Anope::DoTime("30d");
+			return;
+
+		auto previous_size = database.size();
 		for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end;)
 		{
 			database_map::iterator cur = it;

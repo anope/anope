@@ -6123,7 +6123,7 @@ msgid "Service"
 msgstr "Usługa"
 
 #, c-format
-msgid "Service's hold on %s has been released."
+msgid "Services' hold on %s has been released."
 msgstr "Serwisy właśnie zwolniły nicka %s."
 
 msgid "Services Operator commands"

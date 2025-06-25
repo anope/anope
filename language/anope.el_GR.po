@@ -6832,7 +6832,7 @@ msgid "Service"
 msgstr "Τα services είναι ενεργά για %s"
 
 #, fuzzy, c-format
-msgid "Service's hold on %s has been released."
+msgid "Services' hold on %s has been released."
 msgstr "Οι υπηρεσίες απελευθέρωααν το ψευδώνυμό σου."
 
 #, fuzzy

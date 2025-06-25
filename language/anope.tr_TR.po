@@ -6067,7 +6067,7 @@ msgid "Service"
 msgstr "Servis"
 
 #, c-format
-msgid "Service's hold on %s has been released."
+msgid "Services' hold on %s has been released."
 msgstr "Servisin %s üzerindeki bekletmesi kaldırıldı."
 
 msgid "Services Operator commands"

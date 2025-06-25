@@ -638,7 +638,7 @@ public:
 		if (!packet)
 			return false;
 
-		Log(LOG_DEBUG_2) << "Resolver: Notifying slave " << packet->addr.addr();
+		Log(LOG_DEBUG_2) << "Resolver: Notifying secondary " << packet->addr.addr();
 
 		try
 		{
@@ -939,7 +939,7 @@ public:
 
 	void Notify(const Anope::string &zone) override
 	{
-		/* notify slaves of the update */
+		/* notify secondaries of the update */
 		for (const auto &[ip, port] : notify)
 		{
 			sockaddrs addr;

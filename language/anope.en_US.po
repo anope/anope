@@ -4535,10 +4535,6 @@ msgstr ""
 msgid "Service"
 msgstr ""
 
-#, c-format
-msgid "Service's hold on %s has been released."
-msgstr ""
-
 msgid "Services Operator commands"
 msgstr ""
 
@@ -4618,6 +4614,10 @@ msgid "Services will now reply to %s with notices."
 msgstr ""
 
 msgid "Services' configuration has been reloaded."
+msgstr ""
+
+#, c-format
+msgid "Services' hold on %s has been released."
 msgstr ""
 
 msgid "Session"

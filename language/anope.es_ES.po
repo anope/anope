@@ -6273,7 +6273,7 @@ msgid "Service"
 msgstr "Servicio"
 
 #, c-format
-msgid "Service's hold on %s has been released."
+msgid "Services' hold on %s has been released."
 msgstr "El nick %s retenido por los servicios ha sido liberado."
 
 #, fuzzy

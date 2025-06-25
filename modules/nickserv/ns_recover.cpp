@@ -55,7 +55,7 @@ public:
 		if (na->HasExt("HELD"))
 		{
 			nickserv->Release(na);
-			source.Reply(_("Service's hold on \002%s\002 has been released."), na->nick.c_str());
+			source.Reply(_("Services' hold on \002%s\002 has been released."), na->nick.c_str());
 		}
 		else if (!u)
 		{

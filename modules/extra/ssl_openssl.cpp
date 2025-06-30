@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/ssl.h"
 
-#define OPENSSL_API_COMPAT 0x10100000L
+#define OPENSSL_API_COMPAT 0x10101000L
 #define OPENSSL_NO_DEPRECATED
 
 #include <openssl/bio.h>
@@ -126,7 +126,9 @@ public:
 		SSL_CTX_set_session_id_context(client_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());
 		SSL_CTX_set_session_id_context(server_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());
 
+#ifdef OPENSSL_VERSION_STR
 		Log(this) << "Module was compiled against OpenSSL version " << OPENSSL_VERSION_STR << " and is running against version " << OpenSSL_version(OPENSSL_VERSION_STRING);
+#endif
 	}
 
 	~SSLModule()

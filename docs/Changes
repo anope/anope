@@ -1,6 +1,21 @@
 Anope Version 2.1.16
 --------------------
-No significant changes.
+Added support for on-IRC code confirmation.
+Added the ability for fantasy commands to be executable without the FANTASY privilege.
+Added the ability to prepend to topics as well as appending to them.
+Changed various fields to serialize to the database as a string not an integer.
+Disabled db_flatfile by default in preparation for becoming import-only.
+Fixed a memory leak in the db_json module.
+Fixed building on OpenSSL 1.1.1 (for now).
+Fixed removed and later re-added temporary bans being removed automatically.
+Fixed sometimes sending malformed LMODE messages on InspIRCd.
+Fixed the "did you mean" message suggesting unloaded commands.
+Fixed various issues with the example config files.
+Marked db_json as the recommended database module.
+Moved the BAN, UNBAN, and KICK commands to the chanserv/management group.
+Removed support for the 1.8-style seen command.
+Reworked confirmation to allow confirmation of multiple account actions.
+When dropping a display nickname the new display will now be the oldest in the group.
 
 Anope Version 2.1.15
 --------------------

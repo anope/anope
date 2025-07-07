@@ -112,7 +112,7 @@ public:
 					else if (na->nc->HasExt("UNCONFIRMED"))
 						entry["Last mask"] = Language::Translate(source.GetAccount(), _("[Unconfirmed]"));
 					else
-						entry["Last mask"] = na->last_userhost;
+						entry["Last mask"] = is_servadmin ? na->last_userhost_real : na->last_userhost;
 					list.AddEntry(entry);
 				}
 				++count;

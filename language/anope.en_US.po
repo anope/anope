@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-02 14:07+0100\n"
-"PO-Revision-Date: 2025-07-02 14:07+0100\n"
+"POT-Creation-Date: 2025-07-07 11:46+0100\n"
+"PO-Revision-Date: 2025-07-07 11:46+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -597,7 +597,7 @@ msgstr ""
 msgid "nickname [+expiry] [reason]"
 msgstr ""
 
-msgid "nickname {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"
+msgid "nickname {EMAIL | STATUS | MASK | QUIT} {ON | OFF}"
 msgstr ""
 
 msgid "nickname {ON | delay | OFF}"
@@ -1520,7 +1520,7 @@ msgstr ""
 msgid ""
 "Allows Services Operators to manipulate the AKILL list. If a user matching an AKILL mask attempts to connect, services will issue a KILL for that user and, on supported server types, will instruct all servers to add a ban for the mask which the user matched.\n"
 "\n"
-"%sADD adds the given mask to the AKILL list for the given reason, which must be given. Mask should be in the format of nick!user@host#realname, though all that is required is user@host. If a real name is specified, the reason must be prepended with a :. expiry is specified as an integer followed by one of d (days), h (hours), or m (minutes). Combinations (such as 1h30m) are not permitted. If a unit specifier is not included, the default is days (so +30 by itself means 30 days). To add an AKILL which does not expire, use +0. If the usermask to be added starts with a +, an expiry time must be given, even if it is the same as the default. The current AKILL default expiry time can be found with the STATSAKILL command."
+"%sADD adds the given mask to the AKILL list for the given reason, which must be given. Mask should be in the format of nick!user@host#realname, though all that is required is user@host. If a real name is specified, the reason must be prepended with a :. expiry is specified as an integer followed by one of d (days), h (hours), or m (minutes). Combinations (such as 1h30m) are not permitted. If a unit specifier is not included, the default is days (so +30 by itself means 30 days). To add an AKILL which does not expire, use +0. If the mask to be added starts with a +, an expiry time must be given, even if it is the same as the default. The current AKILL default expiry time can be found with the STATSAKILL command."
 msgstr ""
 
 msgid ""
@@ -1631,11 +1631,11 @@ msgid "Allows you to kill a user from the network. Parameters are the same as fo
 msgstr ""
 
 #, c-format
-msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on the nick. You can hide the email address (EMAIL), last seen user@host mask (USERMASK), the services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
+msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on the nick. You can hide the email address (EMAIL), last seen user@host mask (MASK), the services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
 msgstr ""
 
 #, c-format
-msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on your nick. You can hide your email address(EMAIL), last seen user@host mask (USERMASK), your services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
+msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on your nick. You can hide your email address(EMAIL), last seen user@host mask (MASK), your services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
 msgstr ""
 
 #, c-format
@@ -3133,6 +3133,9 @@ msgstr ""
 msgid "Language for %s changed to %s."
 msgstr ""
 
+msgid "Last mask"
+msgstr ""
+
 #, c-format
 msgid "Last memo to %s has been cancelled."
 msgstr ""
@@ -3143,16 +3146,13 @@ msgstr ""
 msgid "Last seen"
 msgstr ""
 
-msgid "Last seen address"
+msgid "Last seen mask"
 msgstr ""
 
 msgid "Last topic"
 msgstr ""
 
 msgid "Last used"
-msgstr ""
-
-msgid "Last usermask"
 msgstr ""
 
 msgid "Level"
@@ -3390,7 +3390,7 @@ msgstr ""
 msgid ""
 "Maintains the AutoKick list for a channel. If a user on the AutoKick list attempts to join the channel, %s will ban that user from the channel, then kick the user.\n"
 "\n"
-"The %sADD command adds the given nick or usermask to the AutoKick list. If a reason is given with the command, that reason will be used when the user is kicked; if not, the default reason is \"User has been banned from the channel\". When akicking a registered nick the %s account will be added to the akick list instead of the mask. All users within that nickgroup will then be akicked. \n"
+"The %sADD command adds the given nick or mask to the AutoKick list. If a reason is given with the command, that reason will be used when the user is kicked; if not, the default reason is \"User has been banned from the channel\". When akicking a registered nick the %s account will be added to the akick list instead of the mask. All users within that nickgroup will then be akicked. \n"
 "\n"
 "The %sDEL command removes the given nick or mask from the AutoKick list. It does not, however, remove any bans placed by an AutoKick; those must be removed manually.\n"
 "\n"

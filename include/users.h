@@ -253,7 +253,7 @@ public:
 	  */
 	bool HasPriv(const Anope::string &privstr);
 
-	/** Update the last usermask stored for a user. */
+	/** Update the last mask stored for a user. */
 	void UpdateHost();
 
 	/** Update the away state for a user. */

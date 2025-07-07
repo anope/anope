@@ -616,11 +616,11 @@ static void LoadNicks()
 	for (int i = 0; i < 1024; ++i)
 		for (int c; (c = getc_db(f)) == 1;)
 		{
-			Anope::string nick, last_usermask, last_realname, last_quit;
+			Anope::string nick, last_userhost, last_realname, last_quit;
 			time_t registered, last_seen;
 
 			READ(read_string(nick, f));
-			READ(read_string(last_usermask, f));
+			READ(read_string(last_userhost, f));
 			READ(read_string(last_realname, f));
 			READ(read_string(last_quit, f));
 
@@ -658,7 +658,7 @@ static void LoadNicks()
 
 				ForbidData *d = forbid->CreateForbid();
 				d->mask = nc->display;
-				d->creator = last_usermask;
+				d->creator = last_userhost;
 				d->reason = last_realname;
 				d->expires = 0;
 				d->created = 0;
@@ -669,7 +669,7 @@ static void LoadNicks()
 			}
 
 			auto *na = new NickAlias(nick, nc);
-			na->last_usermask = last_usermask;
+			na->last_userhost = last_userhost;
 			na->last_realname = last_realname;
 			na->last_quit = last_quit;
 			na->registered = registered;

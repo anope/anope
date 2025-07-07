@@ -156,8 +156,8 @@ void NickAlias::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 	data.Store("nick", na->nick);
 	data.Store("last_quit", na->last_quit);
 	data.Store("last_realname", na->last_realname);
-	data.Store("last_usermask", na->last_usermask);
-	data.Store("last_realhost", na->last_realhost);
+	data.Store("last_userhost", na->last_userhost);
+	data.Store("last_userhost_real", na->last_userhost_real);
 	data.Store("registered", na->registered);
 	data.Store("last_seen", na->last_seen);
 	data.Store("ncid", na->nc->GetId());
@@ -209,8 +209,8 @@ Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &d
 
 	data["last_quit"] >> na->last_quit;
 	data["last_realname"] >> na->last_realname;
-	data["last_usermask"] >> na->last_usermask;
-	data["last_realhost"] >> na->last_realhost;
+	data["last_userhost"] >> na->last_userhost;
+	data["last_userhost_real"] >> na->last_userhost_real;
 	data["registered"] >> na->registered;
 	data["last_seen"] >> na->last_seen;
 
@@ -235,6 +235,11 @@ Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &d
 	// End 1.9 compatibility.
 
 	// Begin 2.0 compatibility.
+	if (na->last_userhost.empty())
+		data["last_usermask"] >> na->last_userhost;
+	if (na->last_userhost_real.empty())
+		data["last_realhost"] >> na->last_userhost_real;
+
 	if (!na->registered)
 		data["time_registered"] >> na->registered;
 	if (na->registered < na->nc->registered)

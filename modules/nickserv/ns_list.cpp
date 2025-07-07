@@ -73,7 +73,7 @@ public:
 		mync = source.nc;
 		ListFormatter list(source.GetAccount());
 
-		list.AddColumn(_("Nick")).AddColumn(_("Last usermask"));
+		list.AddColumn(_("Nick")).AddColumn(_("Last mask"));
 
 		Anope::map<NickAlias *> ordered_map;
 		for (const auto &[nick, na] : *NickAliasList)
@@ -94,7 +94,7 @@ public:
 			/* We no longer compare the pattern against the output buffer.
 			 * Instead we build a nice nick!user@host buffer to compare.
 			 * The output is then generated separately. -TheShadow */
-			Anope::string buf = Anope::printf("%s!%s", na->nick.c_str(), !na->last_usermask.empty() ? na->last_usermask.c_str() : "*@*");
+			Anope::string buf = Anope::printf("%s!%s", na->nick.c_str(), !na->last_userhost.empty() ? na->last_userhost.c_str() : "*@*");
 			if (na->nick.equals_ci(pattern) || Anope::Match(buf, pattern, false, true))
 			{
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= listmax)
@@ -106,13 +106,13 @@ public:
 					ListFormatter::ListEntry entry;
 					entry["Nick"] = (isnoexpire ? "!" : "") + na->nick;
 					if (na->nc->HasExt("HIDE_MASK") && !is_servadmin && na->nc != mync)
-						entry["Last usermask"] = Language::Translate(source.GetAccount(), _("[Hostname hidden]"));
+						entry["Last mask"] = Language::Translate(source.GetAccount(), _("[Hostname hidden]"));
 					else if (na->nc->HasExt("NS_SUSPENDED"))
-						entry["Last usermask"] = Language::Translate(source.GetAccount(), _("[Suspended]"));
+						entry["Last mask"] = Language::Translate(source.GetAccount(), _("[Suspended]"));
 					else if (na->nc->HasExt("UNCONFIRMED"))
-						entry["Last usermask"] = Language::Translate(source.GetAccount(), _("[Unconfirmed]"));
+						entry["Last mask"] = Language::Translate(source.GetAccount(), _("[Unconfirmed]"));
 					else
-						entry["Last usermask"] = na->last_usermask;
+						entry["Last mask"] = na->last_userhost;
 					list.AddEntry(entry);
 				}
 				++count;

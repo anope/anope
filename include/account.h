@@ -49,10 +49,10 @@ public:
 	Anope::string nick;
 	Anope::string last_quit;
 	Anope::string last_realname;
-	/* Last usermask this nick was seen on, eg user@host */
-	Anope::string last_usermask;
-	/* Last uncloaked usermask, requires nickserv/auspex to see */
-	Anope::string last_realhost;
+	/* Last cloaked user@host this nick was seen using. */
+	Anope::string last_userhost;
+	/* Last real user@host this nick was seen using. */
+	Anope::string last_userhost_real;
 	time_t registered = Anope::CurTime;
 	time_t last_seen = Anope::CurTime;
 

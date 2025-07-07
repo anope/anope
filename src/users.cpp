@@ -376,8 +376,8 @@ void User::Identify(NickAlias *na)
 {
 	if (this->nick.equals_ci(na->nick))
 	{
-		na->last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
-		na->last_realhost = this->GetIdent() + "@" + this->host;
+		na->last_userhost = this->GetIdent() + "@" + this->GetDisplayedHost();
+		na->last_userhost_real = this->GetIdent() + "@" + this->host;
 		na->last_realname = this->realname;
 		na->last_seen = Anope::CurTime;
 	}
@@ -534,10 +534,8 @@ void User::UpdateHost()
 	NickAlias *na = NickAlias::Find(this->nick);
 	if (na && this->IsIdentified(true))
 	{
-		Anope::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
-		Anope::string last_realhost = this->GetIdent() + "@" + this->host;
-		na->last_usermask = last_usermask;
-		na->last_realhost = last_realhost;
+		na->last_userhost = this->GetIdent() + "@" + this->GetDisplayedHost();
+		na->last_userhost_real = this->GetIdent() + "@" + this->host;
 		// This is called on signon, and if users are introduced with an account it won't update
 		na->last_realname = this->realname;
 	}

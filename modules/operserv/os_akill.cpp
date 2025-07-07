@@ -450,7 +450,7 @@ public:
 				"\0371h30m\037) are not permitted. If a unit specifier is not "
 				"included, the default is days (so \037+30\037 by itself means 30 "
 				"days). To add an AKILL which does not expire, use \037+0\037. If the "
-				"usermask to be added starts with a \037+\037, an expiry time must "
+				"mask to be added starts with a \037+\037, an expiry time must "
 				"be given, even if it is the same as the default. The "
 				"current AKILL default expiry time can be found with the "
 				"\002STATS\032AKILL\002 command."

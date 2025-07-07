@@ -93,13 +93,13 @@ public:
 			if (nick_online)
 			{
 				bool shown = false;
-				if (show_hidden && !na->last_realhost.empty())
+				if (show_hidden && !na->last_userhost_real.empty())
 				{
-					info[_("Online from")] = na->last_realhost;
+					info[_("Online from")] = na->last_userhost_real;
 					shown = true;
 				}
-				if ((show_hidden || !na->nc->HasExt("HIDE_MASK")) && (!shown || na->last_usermask != na->last_realhost))
-					info[_("Online from")] = na->last_usermask;
+				if ((show_hidden || !na->nc->HasExt("HIDE_MASK")) && (!shown || na->last_userhost != na->last_userhost_real))
+					info[_("Online from")] = na->last_userhost;
 				else
 					source.Reply(_("%s is currently online."), na->nick.c_str());
 			}
@@ -108,12 +108,12 @@ public:
 				Anope::string shown;
 				if (show_hidden || !na->nc->HasExt("HIDE_MASK"))
 				{
-					info[_("Last seen address")] = na->last_usermask;
-					shown = na->last_usermask;
+					info[_("Last seen mask")] = na->last_userhost;
+					shown = na->last_userhost;
 				}
 
-				if (show_hidden && !na->last_realhost.empty() && na->last_realhost != shown)
-					info[_("Last seen address")] = na->last_realhost;
+				if (show_hidden && !na->last_userhost_real.empty() && na->last_userhost_real != shown)
+					info[_("Last seen mask")] = na->last_userhost_real;
 			}
 
 			info[_("Account registered")] = Anope::strftime(na->nc->registered, source.GetAccount());
@@ -167,7 +167,7 @@ public:
 	CommandNSSetHide(Module *creator, const Anope::string &sname = "nickserv/set/hide", size_t min = 2) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Hide certain pieces of nickname information"));
-		this->SetSyntax("{EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}");
+		this->SetSyntax("{EMAIL | STATUS | MASK | QUIT} {ON | OFF}");
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param, const Anope::string &arg)
@@ -199,7 +199,7 @@ public:
 			onmsg = _("The email address of \002%s\002 will now be hidden from %s INFO displays.");
 			offmsg = _("The email address of \002%s\002 will now be shown in %s INFO displays.");
 		}
-		else if (param.equals_ci("USERMASK"))
+		else if (param.equals_ci("MASK"))
 		{
 			flag = "HIDE_MASK";
 			onmsg = _("The last seen user@host mask of \002%s\002 will now be hidden from %s INFO displays.");
@@ -252,7 +252,7 @@ public:
 				"Allows you to prevent certain pieces of information from "
 				"being displayed when someone does a %s\032\002INFO\002 on your "
 				"nick. You can hide your email address\032(\002EMAIL\002), last seen "
-				"user@host mask (\002USERMASK\002), your services access status "
+				"user@host mask (\002MASK\002), your services access status "
 				"(\002STATUS\002) and last quit message (\002QUIT\002). "
 				"The second parameter specifies whether the information should "
 				"be displayed (\002OFF\002) or hidden (\002ON\002)."
@@ -268,7 +268,7 @@ class CommandNSSASetHide final
 public:
 	CommandNSSASetHide(Module *creator) : CommandNSSetHide(creator, "nickserv/saset/hide", 3)
 	{
-		this->SetSyntax(_("\037nickname\037 {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
+		this->SetSyntax(_("\037nickname\037 {EMAIL | STATUS | MASK | QUIT} {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -285,7 +285,7 @@ public:
 				"Allows you to prevent certain pieces of information from "
 				"being displayed when someone does a %s\032\002INFO\002 on the "
 				"nick. You can hide the email address (\002EMAIL\002), last seen "
-				"user@host mask (\002USERMASK\002), the services access status "
+				"user@host mask (\002MASK\002), the services access status "
 				"(\002STATUS\002) and last quit message (\002QUIT\002). "
 				"The second parameter specifies whether the information should "
 				"be displayed (\002OFF\002) or hidden (\002ON\002)."
@@ -303,13 +303,18 @@ class NSInfo final
 	CommandNSSetHide commandnssethide;
 	CommandNSSASetHide commandnssasethide;
 
-	SerializableExtensibleItem<bool> hide_email, hide_usermask, hide_status, hide_quit;
+	SerializableExtensibleItem<bool> hide_email, hide_mask, hide_status, hide_quit;
 
 public:
-	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsinfo(this), commandnssethide(this), commandnssasethide(this),
-		 hide_email(this, "HIDE_EMAIL"), hide_usermask(this, "HIDE_MASK"), hide_status(this, "HIDE_STATUS"),
-		 hide_quit(this, "HIDE_QUIT")
+	NSInfo(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnsinfo(this)
+		, commandnssethide(this)
+		, commandnssasethide(this)
+		, hide_email(this, "HIDE_EMAIL")
+		, hide_mask(this, "HIDE_MASK")
+		, hide_status(this, "HIDE_STATUS")
+		, hide_quit(this, "HIDE_QUIT")
 	{
 
 	}

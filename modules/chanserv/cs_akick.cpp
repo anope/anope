@@ -141,7 +141,7 @@ class CommandCSAKick final
 				}
 			}
 
-			/* Match against the lastusermask of all nickalias's with equal
+			/* Match against the last mask of all nickalias's with equal
 			 * or higher access. - Viper */
 			for (const auto &[_, na2] : *NickAliasList)
 			{
@@ -150,7 +150,7 @@ class CommandCSAKick final
 				AccessGroup nc_access = ci->AccessFor(na->nc), u_access = source.AccessFor(ci);
 				if (na->nc && (na->nc == ci->GetFounder() || nc_access >= u_access))
 				{
-					Anope::string buf = na->nick + "!" + na->last_usermask;
+					Anope::string buf = na->nick + "!" + na->last_userhost;
 					if (Anope::Match(buf, mask))
 					{
 						source.Reply(ACCESS_DENIED);
@@ -506,7 +506,7 @@ public:
 				"%s will ban that user from the channel, then kick "
 				"the user."
 				"\n\n"
-				"The \002%s\032ADD\002 command adds the given nick or usermask "
+				"The \002%s\032ADD\002 command adds the given nick or mask "
 				"to the AutoKick list. If a \037reason\037 is given with "
 				"the command, that reason will be used when the user is "
 				"kicked; if not, the default reason is \"User has been "

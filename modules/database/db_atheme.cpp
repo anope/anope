@@ -134,9 +134,9 @@ struct UserData final
 	Anope::string info_adder;
 	Anope::string info_message;
 	time_t info_ts = 0;
-	Anope::string last_mask;
 	Anope::string last_quit;
-	Anope::string last_real_mask;
+	Anope::string last_userhost;
+	Anope::string last_userhost_real;
 	bool noexpire = false;
 	bool protect = false;
 	std::optional<time_t> protectafter;
@@ -1146,9 +1146,9 @@ private:
 		else if (key == "private:freeze:timestamp")
 			data->suspend_ts = Anope::Convert<time_t>(value, 0);
 		else if (key == "private:host:actual")
-			data->last_real_mask = value;
+			data->last_userhost_real = value;
 		else if (key == "private:host:vhost")
-			data->last_mask = value;
+			data->last_userhost = value;
 		else if (key == "private:lastquit:message")
 			data->last_quit = value;
 		else if (key == "private:loginfail:failnum")
@@ -1314,14 +1314,14 @@ private:
 		auto *data = userdata.Get(nc);
 		if (data)
 		{
-			if (!data->last_mask.empty())
-				na->last_usermask = data->last_mask;
+			if (!data->last_userhost.empty())
+				na->last_userhost = data->last_userhost;
 
 			if (!data->last_quit.empty())
 				na->last_quit = data->last_quit;
 
-			if (!data->last_real_mask.empty())
-				na->last_realhost = data->last_real_mask;
+			if (!data->last_userhost_real.empty())
+				na->last_userhost_real = data->last_userhost_real;
 
 			if (data->noexpire)
 				na->Extend<bool>("NS_NO_EXPIRE");

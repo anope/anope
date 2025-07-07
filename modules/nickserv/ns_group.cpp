@@ -55,7 +55,7 @@ public:
 
 		if (u != NULL)
 		{
-			na->last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+			na->last_userhost = u->GetIdent() + "@" + u->GetDisplayedHost();
 			na->last_realname = u->realname;
 		}
 		else

@@ -127,10 +127,6 @@ namespace Language
 #define UNKNOWN				_("<unknown>")
 #define NO_EXPIRE			_("does not expire")
 #define LIST_INCORRECT_RANGE		_("Incorrect range specified. The correct syntax is \002#\037from\037-\037to\037\002.")
-#define NICK_IS_SECURE			_("This nickname is registered and protected.  If it is your " \
-						"nick, type \002%s\032\037password\037\002.  Otherwise, " \
-						"please choose a different nick.")
-#define FORCENICKCHANGE_NOW		_("This nickname has been registered; you may not use it.")
 #define NICK_CANNOT_BE_REGISTERED	_("Nickname \002%s\002 may not be registered.")
 #define NICK_ALREADY_REGISTERED		_("Nickname \002%s\002 is already registered!")
 #define NICK_SET_DISPLAY_CHANGED	_("The new display is now \002%s\002.")

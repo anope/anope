@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-08 16:23+0100\n"
-"PO-Revision-Date: 2025-07-08 16:23+0100\n"
+"POT-Creation-Date: 2025-07-12 16:32+0100\n"
+"PO-Revision-Date: 2025-07-12 16:32+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -6230,9 +6230,6 @@ msgid "Your nick has been logged out."
 msgstr ""
 
 msgid "Your nick is already registered."
-msgstr ""
-
-msgid "Your nick isn't registered."
 msgstr ""
 
 #, c-format

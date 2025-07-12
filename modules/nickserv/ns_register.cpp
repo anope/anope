@@ -367,7 +367,7 @@ public:
 		const NickAlias *na = NickAlias::Find(source.GetNick());
 
 		if (na == NULL)
-			source.Reply(NICK_NOT_REGISTERED);
+			source.Reply(NICK_X_NOT_REGISTERED, source.GetNick().c_str());
 		else if (na->nc != source.GetAccount() || !source.nc->HasExt("UNCONFIRMED"))
 			source.Reply(_("Your account is already confirmed."));
 		else

@@ -77,11 +77,6 @@ struct HostRequestTypeImpl final
 class CommandHSRequest final
 	: public Command
 {
-	static bool isvalidchar(char c)
-	{
-		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-';
-	}
-
 public:
 	CommandHSRequest(Module *creator) : Command(creator, "hostserv/request", 1, 1)
 	{
@@ -142,13 +137,11 @@ public:
 				source.Reply(HOST_NO_VIDENT);
 				return;
 			}
-			for (const auto &chr : user)
+
+			if (!IRCD->IsIdentValid(user))
 			{
-				if (!isvalidchar(chr))
-				{
-					source.Reply(HOST_SET_IDENT_ERROR);
-					return;
-				}
+				source.Reply(HOST_SET_IDENT_ERROR);
+				return;
 			}
 		}
 

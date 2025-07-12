@@ -120,10 +120,12 @@ public:
 			info[_("Nick registered")] = Anope::strftime(na->registered, source.GetAccount());
 
 			if (!nick_online)
+			{
 				info[_("Last seen")] = Anope::strftime(na->last_seen, source.GetAccount());
 
-			if (!na->last_quit.empty() && (show_hidden || !na->nc->HasExt("HIDE_QUIT")))
-				info[_("Last quit message")] = na->last_quit;
+				if (!na->last_quit.empty() && (show_hidden || !na->nc->HasExt("HIDE_QUIT")))
+					info[_("Last quit message")] = na->last_quit;
+			}
 
 			if (!na->nc->email.empty() && (show_hidden || !na->nc->HasExt("HIDE_EMAIL")))
 				info[_("Email address")] = na->nc->email;

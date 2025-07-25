@@ -23,7 +23,7 @@ class ChannelModeLargeBan final
 public:
 	ChannelModeLargeBan(const Anope::string &mname, char modeChar) : ChannelMode(mname, modeChar) { }
 
-	bool CanSet(User *u) const override
+	bool CanSet(User *u, Channel *c) const override
 	{
 		return u && u->HasMode("OPER");
 	}

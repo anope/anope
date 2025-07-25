@@ -288,7 +288,7 @@ class CommandCSMode final
 				for (auto *ml : mlocks)
 				{
 					ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
-					if (cm && cm->CanSet(source.GetUser()))
+					if (cm && cm->CanSet(source.GetUser(), ci->c))
 						modelocks->RemoveMLock(cm, ml->set, ml->param);
 				}
 			}
@@ -320,7 +320,7 @@ class CommandCSMode final
 							source.Reply(_("Unknown mode character %c ignored."), mode);
 							break;
 						}
-						else if (u && !cm->CanSet(u))
+						else if (u && !cm->CanSet(u, ci->c))
 						{
 							source.Reply(_("You may not (un)lock mode %c."), mode);
 							break;
@@ -412,7 +412,7 @@ class CommandCSMode final
 							source.Reply(_("Unknown mode character %c ignored."), mode);
 							break;
 						}
-						else if (u && !cm->CanSet(u))
+						else if (u && !cm->CanSet(u, ci->c))
 						{
 							source.Reply(_("You may not (un)lock mode %c."), mode);
 							break;
@@ -508,7 +508,7 @@ class CommandCSMode final
 					{
 						ChannelMode *cm = ModeManager::GetChannelModes()[j];
 
-						if (!u || cm->CanSet(u) || can_override)
+						if (!u || cm->CanSet(u, ci->c) || can_override)
 						{
 							if (cm->type == MODE_REGULAR || (!adding && cm->type == MODE_PARAM))
 							{
@@ -524,7 +524,7 @@ class CommandCSMode final
 					if (adding == -1)
 						break;
 					ChannelMode *cm = ModeManager::FindChannelModeByChar(mode);
-					if (!cm || (u && !cm->CanSet(u) && !can_override))
+					if (!cm || (u && !cm->CanSet(u, ci->c) && !can_override))
 						continue;
 					switch (cm->type)
 					{

@@ -70,11 +70,6 @@ public:
 	 */
 	Mode(const Anope::string &mname, ModeClass mclass, char mc, ModeType type);
 	virtual ~Mode() = default;
-
-	/** Can a user set this mode, used for mlock
-	 * @param u The user
-	 */
-	virtual bool CanSet(User *u) const;
 };
 
 /** This class is a user mode, all user modes use this/inherit from this
@@ -88,6 +83,12 @@ public:
 	 * @param mc The mode char
 	 */
 	UserMode(const Anope::string &name, char mc);
+
+	/** Can a user set this mode, used for mlock
+	 * @param source The user who is setting the mode.
+	 * @param target The user the mode is being set on.
+	 */
+	virtual bool CanSet(User *source, User *target) const { return true; }
 };
 
 class CoreExport UserModeParam
@@ -122,7 +123,11 @@ public:
 	 */
 	ChannelMode(const Anope::string &name, char mc);
 
-	bool CanSet(User *u) const override;
+	/** Can a user set this mode, used for mlock
+	 * @param u The user who is setting the mode.
+	 * @param c The channel the mode is being set on.
+	 */
+	virtual bool CanSet(User *u, Channel *c) const;
 
 	virtual void Check() { }
 
@@ -270,7 +275,7 @@ class CoreExport UserModeOperOnly
 public:
 	UserModeOperOnly(const Anope::string &mname, char um) : UserMode(mname, um) { }
 
-	bool CanSet(User *u) const override;
+	bool CanSet(User *source, User *target) const override;
 };
 
 class CoreExport UserModeNoone
@@ -279,7 +284,7 @@ class CoreExport UserModeNoone
 public:
 	UserModeNoone(const Anope::string &mname, char um) : UserMode(mname, um) { }
 
-	bool CanSet(User *u) const override;
+	bool CanSet(User *source, User *target) const override;
 };
 
 /** Channel mode +k (key)
@@ -302,7 +307,7 @@ public:
 	ChannelModeOperOnly(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
 
 	/* Opers only */
-	bool CanSet(User *u) const override;
+	bool CanSet(User *u, Channel *c) const override;
 };
 
 /** This class is used for channel modes only servers may set
@@ -313,7 +318,7 @@ class CoreExport ChannelModeNoone
 public:
 	ChannelModeNoone(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
 
-	bool CanSet(User *u) const override;
+	bool CanSet(User *u, Channel *c) const override;
 };
 
 /** This is the mode manager

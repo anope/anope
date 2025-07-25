@@ -749,7 +749,7 @@ public:
 	{
 	}
 
-	bool CanSet(User *u) const override
+	bool CanSet(User *u, Channel *c) const override
 	{
 		return false;
 	}

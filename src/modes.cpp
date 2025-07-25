@@ -113,11 +113,6 @@ Mode::Mode(const Anope::string &mname, ModeClass mcl, char mch, ModeType mt) : n
 {
 }
 
-bool Mode::CanSet(User *u) const
-{
-	return true;
-}
-
 UserMode::UserMode(const Anope::string &un, char mch) : Mode(un, MC_USER, mch, MODE_REGULAR)
 {
 }
@@ -131,10 +126,10 @@ ChannelMode::ChannelMode(const Anope::string &cm, char mch) : Mode(cm, MC_CHANNE
 {
 }
 
-bool ChannelMode::CanSet(User *u) const
+bool ChannelMode::CanSet(User *u, Channel *c) const
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnCanSet, MOD_RESULT, (u, this));
+	FOREACH_RESULT(OnCanSet, MOD_RESULT, (u, c, this));
 	return MOD_RESULT != EVENT_STOP;
 }
 
@@ -222,12 +217,12 @@ ChannelMode *ChannelModeVirtual<T>::Wrap(Anope::string &param)
 template class ChannelModeVirtual<ChannelMode>;
 template class ChannelModeVirtual<ChannelModeList>;
 
-bool UserModeOperOnly::CanSet(User *u) const
+bool UserModeOperOnly::CanSet(User *source, User *target) const
 {
-	return u && u->HasMode("OPER");
+	return source && source->HasMode("OPER");
 }
 
-bool UserModeNoone::CanSet(User *u) const
+bool UserModeNoone::CanSet(User *source, User *target) const
 {
 	return false;
 }
@@ -237,12 +232,12 @@ bool ChannelModeKey::IsValid(Anope::string &value) const
 	return !value.empty() && value.find(':') == Anope::string::npos && value.find(',') == Anope::string::npos;
 }
 
-bool ChannelModeOperOnly::CanSet(User *u) const
+bool ChannelModeOperOnly::CanSet(User *u, Channel *c) const
 {
 	return u && u->HasMode("OPER");
 }
 
-bool ChannelModeNoone::CanSet(User *u) const
+bool ChannelModeNoone::CanSet(User *u, Channel *c) const
 {
 	return false;
 }

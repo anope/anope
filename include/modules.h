@@ -1046,9 +1046,10 @@ public:
 
 	/** Called to determine if a channel mode can be set by a user
 	 * @param u The user
+	 * @param c The channel
 	 * @param cm The mode
 	 */
-	virtual EventReturn OnCanSet(User *u, const ChannelMode *cm) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
+	virtual EventReturn OnCanSet(User *u, Channel *c, const ChannelMode *cm) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	virtual EventReturn OnCheckDelete(Channel *c)  ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 

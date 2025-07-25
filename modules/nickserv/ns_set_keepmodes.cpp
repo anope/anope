@@ -227,7 +227,7 @@ public:
 			for (const auto &[last_mode, last_data] : modes)
 			{
 				auto *um = ModeManager::FindUserModeByName(last_mode);
-				if (um && um->CanSet(nullptr) && norestore.find(um->mchar) == Anope::string::npos)
+				if (um && um->CanSet(nullptr, u) && norestore.find(um->mchar) == Anope::string::npos)
 					u->SetMode(nullptr, last_mode, last_data);
 			}
 		}

@@ -71,17 +71,4 @@ int unsetenv(const char *name)
 	return SetEnvironmentVariable(name, NULL);
 }
 
-int mkstemp(char *input)
-{
-	input = _mktemp(input);
-	if (input == NULL)
-	{
-		errno = EEXIST;
-		return -1;
-	}
-
-	int fd = open(input, O_WRONLY | O_CREAT, S_IREAD | S_IWRITE);
-	return fd;
-}
-
 #endif

@@ -20,6 +20,7 @@
 #endif
 
 #include <filesystem>
+namespace fs = std::filesystem;
 
 std::list<Module *> ModuleManager::Modules;
 std::vector<Module *> ModuleManager::EventHandlers[I_SIZE];
@@ -32,76 +33,16 @@ void ModuleManager::CleanupRuntimeDirectory()
 	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment, please wait";
 	try
 	{
-		for (const auto &entry : std::filesystem::directory_iterator(dirbuf.str()))
+		for (const auto &entry : fs::directory_iterator(dirbuf.str()))
 		{
 			if (entry.is_regular_file())
-				std::filesystem::remove(entry);
+				fs::remove(entry);
 		}
 	}
-	catch (const std::filesystem::filesystem_error &err)
+	catch (const fs::filesystem_error &err)
 	{
 		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << "): " << err.what();
 	}
-}
-
-/**
- * Copy the module from the modules folder to the runtime folder.
- * This will prevent module updates while the modules is loaded from
- * triggering a segfault, as the actual file in use will be in the
- * runtime folder.
- * @param name the name of the module to copy
- * @param output the destination to copy the module to
- * @return MOD_ERR_OK on success
- */
-static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
-{
-	const auto input = Anope::ExpandModule(name + DLL_EXT);
-
-	struct stat s;
-	if (stat(input.c_str(), &s) == -1)
-		return MOD_ERR_NOEXIST;
-	else if (!S_ISREG(s.st_mode))
-		return MOD_ERR_NOEXIST;
-
-	std::ifstream source(input.c_str(), std::ios_base::in | std::ios_base::binary);
-	if (!source.is_open())
-		return MOD_ERR_NOEXIST;
-
-	char *tmp_output = strdup(output.c_str());
-	int target_fd = mkstemp(tmp_output);
-	if (target_fd == -1 || close(target_fd) == -1)
-	{
-		free(tmp_output);
-		source.close();
-		return MOD_ERR_FILE_IO;
-	}
-	output = tmp_output;
-	free(tmp_output);
-
-	Log(LOG_DEBUG_2) << "Runtime module location: " << output;
-
-	std::ofstream target(output.c_str(), std::ios_base::in | std::ios_base::binary);
-	if (!target.is_open())
-	{
-		source.close();
-		return MOD_ERR_FILE_IO;
-	}
-
-	int want = s.st_size;
-	char buffer[1024];
-	while (want > 0 && !source.fail() && !target.fail())
-	{
-		source.read(buffer, std::min(want, static_cast<int>(sizeof(buffer))));
-		int read_len = source.gcount();
-
-		target.write(buffer, read_len);
-		want -= read_len;
-	}
-
-	source.close();
-	target.close();
-
-	return !source.fail() && !target.fail() ? MOD_ERR_OK : MOD_ERR_FILE_IO;
 }
 #endif
 
@@ -131,22 +72,24 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 	Log(LOG_DEBUG) << "Trying to load module: " << modname;
 
+	const auto modpath = Anope::ExpandModule(modname + DLL_EXT);
+	std::error_code ec;
+	if (!fs::exists(modpath.str()) || ec)
+	{
+		Log(LOG_TERMINAL) << "Error while loading " << modname << ": file does not exist";
+		return MOD_ERR_NOEXIST;
+	}
+
 #ifdef _WIN32
 	/* Generate the filename for the temporary copy of the module */
 	auto pbuf = Anope::ExpandData("runtime/" + modname + DLL_EXT ".XXXXXX");
-
-	/* Don't skip return value checking! -GD */
-	ModuleReturn ret = moduleCopyFile(modname, pbuf);
-	if (ret != MOD_ERR_OK)
+	if (!fs::copy_file(modpath.str(), pbuf.str(), fs::copy_options::overwrite_existing, ec) || ec)
 	{
-		if (ret == MOD_ERR_NOEXIST)
-			Log(LOG_TERMINAL) << "Error while loading " << modname << " (file does not exist)";
-		else if (ret == MOD_ERR_FILE_IO)
-			Log(LOG_TERMINAL) << "Error while loading " << modname << " (file IO error, check file permissions and diskspace)";
-		return ret;
+		Log(LOG_TERMINAL) << "Error while loading " << modname << ": " << ec.message();
+		return MOD_ERR_FILE_IO;
 	}
 #else
-	const auto pbuf = Anope::ExpandModule(modname + DLL_EXT);
+	const auto pbuf = modpath;
 #endif
 
 	dlerror();

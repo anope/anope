@@ -67,7 +67,6 @@ extern CoreExport void OnShutdown();
 extern CoreExport USHORT WindowsGetLanguage(const Anope::string &lang);
 extern int setenv(const char *name, const char *value, int overwrite);
 extern int unsetenv(const char *name);
-extern int mkstemp(char *input);
 
 #endif // _WIN32
 #endif // WINDOWS_H

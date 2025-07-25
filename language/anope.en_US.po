@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-12 16:32+0100\n"
+"POT-Creation-Date: 2025-07-25 12:27+0100\n"
 "PO-Revision-Date: 2025-07-12 16:32+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
@@ -1339,6 +1339,9 @@ msgid "Additionally, Services Operators with the nickserv/confirm/register per
 msgstr ""
 
 msgid "Additionally, Services Operators with the nickserv/drop/override permission can replace code with OVERRIDE to drop without a confirmation code."
+msgstr ""
+
+msgid "Additionally, Services Operators with the nickserv/resend permission can specify a nickname to resend a confirmation email for another account."
 msgstr ""
 
 #, c-format
@@ -3674,6 +3677,10 @@ msgid "Nick %s is already an operator."
 msgstr ""
 
 #, c-format
+msgid "Nick %s is already confirmed."
+msgstr ""
+
+#, c-format
 msgid "Nick %s is an illegal nickname and cannot be used."
 msgstr ""
 
@@ -5161,6 +5168,10 @@ msgstr ""
 msgid "The Defcon level is now at: %d"
 msgstr ""
 
+#, c-format
+msgid "The confirmation code for %s has been re-sent to %s."
+msgstr ""
+
 msgid "The defcon system can be used to implement a pre-defined set of restrictions to services useful during an attempted attack on the network."
 msgstr ""
 
@@ -5449,7 +5460,7 @@ msgstr ""
 msgid "This command unloads the module named modname."
 msgstr ""
 
-msgid "This command will resend you the registration confirmation email."
+msgid "This command will resend a registration confirmation email."
 msgstr ""
 
 #, c-format
@@ -6167,9 +6178,6 @@ msgstr ""
 msgid "Your account %s has been successfully created."
 msgstr ""
 
-msgid "Your account is already confirmed."
-msgstr ""
-
 msgid "Your account is not confirmed. To confirm it, follow the instructions that were emailed to you."
 msgstr ""
 
@@ -6179,10 +6187,6 @@ msgstr ""
 
 #, c-format
 msgid "Your account will expire, if not confirmed, in %s."
-msgstr ""
-
-#, c-format
-msgid "Your confirmation code has been re-sent to %s."
 msgstr ""
 
 #, c-format

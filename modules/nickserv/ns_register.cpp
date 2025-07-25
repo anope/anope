@@ -351,9 +351,12 @@ class CommandNSResend final
 	: public Command
 {
 public:
-	CommandNSResend(Module *creator) : Command(creator, "nickserv/resend", 0, 0)
+	CommandNSResend(Module *creator)
+		: Command(creator, "nickserv/resend", 0, 1)
 	{
 		this->SetDesc(_("Resend registration confirmation email"));
+		this->SetSyntax(_("[\037nickname\037]"), [](auto &source) { return source.HasCommand("nickserv/resend"); });
+		this->AllowUnregistered(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -364,27 +367,49 @@ public:
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(source.GetNick());
-
-		if (na == NULL)
-			source.Reply(NICK_X_NOT_REGISTERED, source.GetNick().c_str());
-		else if (na->nc != source.GetAccount() || !source.nc->HasExt("UNCONFIRMED"))
-			source.Reply(_("Your account is already confirmed."));
-		else
+		auto is_oper = false;
+		Anope::string nick;
+		if (!params.empty() && source.HasCommand("nickserv/resend"))
 		{
-			if (Anope::CurTime < source.nc->lastmail + Config->GetModule(this->owner).Get<time_t>("resenddelay"))
-				source.Reply(_("Cannot send mail now; please retry a little later."));
-			else if (SendRegmail(source.GetUser(), na, source.service))
-			{
-				na->nc->lastmail = Anope::CurTime;
-				source.Reply(_("Your confirmation code has been re-sent to %s."), na->nc->email.c_str());
-				Log(LOG_COMMAND, source, this) << "to resend registration confirmation code";
-			}
-			else
-				Log(this->owner) << "Unable to resend registration confirmation code for " << source.GetNick();
+			nick = params[0];
+			is_oper = true;
+		}
+		else if (source.nc)
+			nick = source.GetAccount()->display;
+		else
+			nick = source.GetNick();
+
+		const auto *na = NickAlias::Find(nick);
+		if (!na)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			return;
 		}
 
-		return;
+		NickCore *nc = na->nc;
+		if (!nc->HasExt("UNCONFIRMED"))
+		{
+			source.Reply(_("Nick \002%s\002 is already confirmed."), na->nick.c_str());
+			return;
+		}
+
+		if (!is_oper && Anope::CurTime < nc->lastmail + Config->GetModule(this->owner).Get<time_t>("resenddelay"))
+		{
+			source.Reply(_("Cannot send mail now; please retry a little later."));
+			return;
+		}
+
+		if (!SendRegmail(source.GetUser(), na, source.service))
+		{
+			Log(this->owner) << "Unable to resend registration confirmation code for " << na->nick;
+			return;
+		}
+
+		nc->lastmail = Anope::CurTime;
+		source.Reply(_("The confirmation code for \002%s\002 has been re-sent to %s."),
+			na->nick.c_str(), nc->email.c_str());
+
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to resend the registration confirmation code for " << na->nick;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -394,7 +419,16 @@ public:
 
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command will resend you the registration confirmation email."));
+		source.Reply(_("This command will resend a registration confirmation email."));
+
+		if (source.HasCommand("nickserv/resend"))
+		{
+			source.Reply(" ");
+			source.Reply(_(
+				"Additionally, Services Operators with the \037nickserv/resend\037 permission "
+				"can specify a nickname to resend a confirmation email for another account."
+			));
+		}
 		return true;
 	}
 

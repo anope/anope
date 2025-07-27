@@ -240,7 +240,7 @@ Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &d
 	if (na->last_userhost_real.empty())
 		data["last_realhost"] >> na->last_userhost_real;
 
-	if (!na->registered)
+	if (na->registered == Anope::CurTime)
 		data["time_registered"] >> na->registered;
 	if (na->registered < na->nc->registered)
 		na->nc->registered = na->registered;

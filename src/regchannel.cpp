@@ -329,7 +329,7 @@ Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data 
 	// End 1.9 compatibility.
 
 	// Begin 2.0 compatibility.
-	if (!ci->registered)
+	if (ci->registered == Anope::CurTime)
 		data["time_registered"] >> ci->registered;
 	// End 2.0 compatibility.
 

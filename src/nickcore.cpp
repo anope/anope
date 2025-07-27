@@ -181,7 +181,7 @@ Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &da
 	// End 2.0 compatibility.
 
 	// Begin 2.1 compatibility.
-	if (!nc->registered)
+	if (nc->registered == Anope::CurTime)
 		data["time_registered"] >> nc->registered;
 	// End 2.1 compatibility.
 

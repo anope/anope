@@ -1,6 +1,10 @@
 Anope Version 2.1.17-git
 --------------------
-No significant changes.
+Allowed opers to resend passwords for users in nickserv/resend.
+Fixed HostServ using a different valid username character set to the protocol module.
+Fixed losing the channel and nickname registration time when upgrading from an earlier 2.1 release.
+Improved the messages sent when a user is forced off a protected nickname.
+Simplified copying modules to the runtime directory on Windows.
 
 Anope Version 2.1.16
 --------------------

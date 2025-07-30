@@ -648,7 +648,7 @@ public:
 		if (neverop.HasExt(na->nc))
 			info.AddOption(_("Never-op"));
 		if (noexpire.HasExt(na))
-			info.AddOption(_("No expire"));
+			info.AddOption(_("No expiry"));
 	}
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override

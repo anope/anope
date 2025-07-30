@@ -1333,7 +1333,7 @@ public:
 		if (persist.HasExt(ci))
 			info.AddOption(_("Persistent"));
 		if (noexpire.HasExt(ci))
-			info.AddOption(_("No expire"));
+			info.AddOption(_("No expiry"));
 		if (keep_modes.HasExt(ci))
 			info.AddOption(_("Keep modes"));
 		if (noautoop.HasExt(ci))

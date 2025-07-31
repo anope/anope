@@ -432,7 +432,7 @@ private:
 		// crypt3-md5        Converted to enc_posix
 		// crypt3-sha2-256   Converted to enc_posix
 		// crypt3-sha2-512   Converted to enc_posix
-		// ircservices       Converted to enc_old
+		// ircservices       NO
 		// pbkdf2            NO
 		// pbkdf2v2          NO
 		// rawmd5            Converted to enc_md5
@@ -464,9 +464,6 @@ private:
 			Anope::B64Decode(pass.substr(8), rawpass);
 			Anope::Encrypt(rawpass, nc->pass);
 		}
-
-		else if (pass.compare(0, 13, "$ircservices$", 13) == 0)
-			nc->pass = "oldmd5:" + pass.substr(13);
 
 		else if (pass.compare(0, 8, "$rawmd5$", 8) == 0)
 			nc->pass = "md5:" + pass.substr(8);

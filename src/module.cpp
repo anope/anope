@@ -34,6 +34,9 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 	if (ModuleManager::FindModule(this->name))
 		throw CoreException("Module already exists!");
 
+	if (Anope::NoDB && type & DATABASE)
+		throw ModuleException("Database modules may not be loaded");
+
 	if (Anope::NoThird && type & THIRD)
 		throw ModuleException("Third party modules may not be loaded");
 

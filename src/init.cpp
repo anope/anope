@@ -382,6 +382,9 @@ bool Anope::Init(int ac, char **av)
 	if (GetCommandLineArgument("noexpire", 'e'))
 		Anope::NoExpire = true;
 
+	if (GetCommandLineArgument("nodb", 'b'))
+		Anope::NoDB = true;
+
 	if (GetCommandLineArgument("protocoldebug"))
 		Anope::ProtocolDebug = true;
 
@@ -552,11 +555,14 @@ bool Anope::Init(int ac, char **av)
 		setuidgid();
 #endif
 
-	if (!ModuleManager::FindFirstOf(DATABASE))
-		throw CoreException("You must load a non-deprecated database module!");
+	if (!Anope::NoDB)
+	{
+		if (!ModuleManager::FindFirstOf(DATABASE))
+			throw CoreException("You must load a non-deprecated database module!");
 
-	if (!ModuleManager::FindFirstOf(ENCRYPTION))
-		throw CoreException("You must load a non-deprecated encryption module!");
+		if (!ModuleManager::FindFirstOf(ENCRYPTION))
+			throw CoreException("You must load a non-deprecated encryption module!");
+	}
 
 	if (!IRCD)
 		throw CoreException("You must load a protocol module!");

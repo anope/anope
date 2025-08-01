@@ -262,11 +262,11 @@ Module *ModuleManager::FindModule(const Anope::string &name)
 	return NULL;
 }
 
-Module *ModuleManager::FindFirstOf(ModType type)
+Module *ModuleManager::FindFirstOf(ModType type, Module *ignore)
 {
 	for (auto *m : Modules)
 	{
-		if (m->type & type)
+		if (m->type & type && m != ignore)
 			return m;
 	}
 

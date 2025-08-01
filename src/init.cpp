@@ -552,8 +552,10 @@ bool Anope::Init(int ac, char **av)
 		setuidgid();
 #endif
 
-	auto *encryption = ModuleManager::FindFirstOf(ENCRYPTION);
-	if (!encryption)
+	if (!ModuleManager::FindFirstOf(DATABASE))
+		throw CoreException("You must load a non-deprecated database module!");
+
+	if (!ModuleManager::FindFirstOf(ENCRYPTION))
 		throw CoreException("You must load a non-deprecated encryption module!");
 
 	if (!IRCD)

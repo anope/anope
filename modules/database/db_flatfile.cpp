@@ -78,7 +78,7 @@ private:
 
 public:
 	DBFlatFile(const Anope::string &modname, const Anope::string &creator)
-		: Module(modname, creator, DATABASE | VENDOR)
+		: Module(modname, creator, DATABASE | DEPRECATED | VENDOR)
 	{
 	}
 

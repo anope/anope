@@ -173,7 +173,7 @@ private:
 
 public:
 	ESHA1(const Anope::string &modname, const Anope::string &creator)
-		: Module(modname, creator, ENCRYPTION | VENDOR)
+		: Module(modname, creator, DEPRECATED | ENCRYPTION | VENDOR)
 		, sha1provider(this, "sha1", 20, 64)
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)

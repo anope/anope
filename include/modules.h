@@ -158,7 +158,9 @@ enum
 	PSEUDOCLIENT = 1 << 5,
 	/* Module provides IRCd protocol support */
 	PROTOCOL = 1 << 6,
-	MT_END = 1 << 7
+	/* Module is deprecated */
+	DEPRECATED = 1 << 7,
+	MT_END = DEPRECATED,
 };
 typedef unsigned short ModType;
 

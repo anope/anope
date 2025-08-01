@@ -49,7 +49,7 @@ private:
 
 public:
 	EMD5(const Anope::string &modname, const Anope::string &creator)
-		: Module(modname, creator, ENCRYPTION | VENDOR)
+		: Module(modname, creator, DEPRECATED | ENCRYPTION | VENDOR)
 		, md5provider(this, "md5", 16, 64)
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)

@@ -182,6 +182,9 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	m->filename = pbuf;
 	m->handle = handle;
 
+	if (m->type & DEPRECATED)
+		Log(LOG_TERMINAL) << "Warning: " << modname << " is deprecated and will be removed in a future release";
+
 	/* Initialize config */
 	try
 	{

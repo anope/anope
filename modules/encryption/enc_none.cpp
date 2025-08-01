@@ -14,7 +14,7 @@ class ENone final
 {
 public:
 	ENone(const Anope::string &modname, const Anope::string &creator)
-		: Module(modname, creator, ENCRYPTION | VENDOR)
+		: Module(modname, creator, DEPRECATED | ENCRYPTION | VENDOR)
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
 			throw ModuleException("enc_none is deprecated and can not be used as a primary encryption method");

@@ -69,7 +69,7 @@ private:
 
 public:
 	ESHA256(const Anope::string &modname, const Anope::string &creator)
-		: Module(modname, creator, ENCRYPTION | VENDOR)
+		: Module(modname, creator, DEPRECATED | ENCRYPTION | VENDOR)
 	{
 		use_iv = false;
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)

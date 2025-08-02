@@ -151,7 +151,7 @@ struct SASL::Session
 		if (u)
 			return u->GetMask();
 		if (!hostname.empty() && !ip.empty())
-			return Anope::printf("%s (%s)", hostname.c_str(), ip.c_str());
+			return Anope::Format("%s (%s)", hostname.c_str(), ip.c_str());
 		return "A user";
 	};
 };

@@ -272,7 +272,7 @@ public:
 			{
 				Anope::string message;
 				if (!reason.empty())
-					message = Anope::printf(_("Your requested vhost has been rejected. Reason: %s"), reason.c_str());
+					message = Anope::Format(_("Your requested vhost has been rejected. Reason: %s"), reason.c_str());
 				else
 					message = _("Your requested vhost has been rejected.");
 
@@ -397,7 +397,7 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 			if (!na)
 				continue;
 
-			Anope::string message = Anope::printf(_("VHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
+			Anope::string message = Anope::Format(_("VHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
 
 			memoserv->Send(source.service->nick, na->nick, message, true);
 		}

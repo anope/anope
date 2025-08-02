@@ -347,7 +347,7 @@ public:
 							if (u->server == Me || u->HasMode("OPER"))
 								continue;
 
-							reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
+							reason = Anope::Format(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
 
 							c->Kick(source.service, u, reason);
 						}
@@ -536,7 +536,7 @@ public:
 				chanserv->Hold(c);
 			}
 
-			reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
+			reason = Anope::Format(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
 
 			return EVENT_STOP;
 		}

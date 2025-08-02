@@ -12,6 +12,7 @@
 #include "services.h"
 #include "sockets.h"
 #include "socketengine.h"
+#include "textproc.h"
 
 bool BufferedSocket::ProcessRead()
 {
@@ -66,17 +67,12 @@ void BufferedSocket::Write(const char *buffer, size_t l)
 
 void BufferedSocket::Write(const char *message, ...)
 {
-	va_list vi;
-	char tbuffer[BUFSIZE];
-
 	if (!message)
 		return;
 
-	va_start(vi, message);
-	int len = vsnprintf(tbuffer, sizeof(tbuffer), message, vi);
-	va_end(vi);
-
-	this->Write(tbuffer, std::min(len, static_cast<int>(sizeof(tbuffer))));
+	Anope::string tbuffer;
+	ANOPE_FORMAT(message, message, tbuffer);
+	this->Write(tbuffer.c_str(), tbuffer.length());
 }
 
 void BufferedSocket::Write(const Anope::string &message)
@@ -158,17 +154,12 @@ void BinarySocket::Write(const char *buffer, size_t l)
 
 void BinarySocket::Write(const char *message, ...)
 {
-	va_list vi;
-	char tbuffer[BUFSIZE];
-
 	if (!message)
 		return;
 
-	va_start(vi, message);
-	int len = vsnprintf(tbuffer, sizeof(tbuffer), message, vi);
-	va_end(vi);
-
-	this->Write(tbuffer, std::min(len, static_cast<int>(sizeof(tbuffer))));
+	Anope::string tbuffer;
+	ANOPE_FORMAT(message, message, tbuffer);
+	this->Write(tbuffer.c_str(), tbuffer.length());
 }
 
 void BinarySocket::Write(const Anope::string &message)

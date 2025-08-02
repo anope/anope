@@ -80,7 +80,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTP::Provider *server, const Anope::s
 				replacements["ERRORS"] = "Protection delay must be a number of seconds";
 			else if (*secs < minprotect || *secs > maxprotect)
 			{
-				replacements["ERRORS"] = Anope::printf("Protection delay must be between %ld and %ld seconds.",
+				replacements["ERRORS"] = Anope::Format("Protection delay must be between %ld and %ld seconds.",
 					minprotect, maxprotect);
 			}
 			else if (!na->nc->HasExt("PROTECT_AFTER") || *secs != *na->nc->GetExt<time_t>("PROTECT_AFTER"))

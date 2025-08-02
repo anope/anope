@@ -105,32 +105,20 @@ bool CommandSource::IsOper()
 
 void CommandSource::Reply(const char *message, ...)
 {
-	va_list args;
-	char buf[4096]; // Messages can be really big.
-
 	const char *translated_message = Language::Translate(this->nc, message);
 
-	va_start(args, message);
-	vsnprintf(buf, sizeof(buf), translated_message, args);
-
+	Anope::string buf;
+	ANOPE_FORMAT(message, translated_message, buf);
 	this->reply->SendMessage(*this, buf);
-
-	va_end(args);
 }
 
 void CommandSource::Reply(int count, const char *single, const char *plural, ...)
 {
-	va_list args;
-	char buf[4096]; // Messages can be really big.
-
 	const char *translated_message = Language::Translate(this->nc, count, single, plural);
 
-	va_start(args, plural);
-	vsnprintf(buf, sizeof(buf), translated_message, args);
-
+	Anope::string buf;
+	ANOPE_FORMAT(plural, translated_message, buf);
 	this->reply->SendMessage(*this, buf);
-
-	va_end(args);
 }
 
 void CommandSource::Reply(const Anope::string &message)

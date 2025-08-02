@@ -36,10 +36,6 @@
 # undef printf
 #endif
 
-#define snprintf _snprintf
-/* VS2008 hates having this define before its own */
-#define vsnprintf _vsnprintf
-
 #define anope_close windows_close
 
 #define stat _stat

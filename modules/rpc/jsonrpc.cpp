@@ -102,7 +102,7 @@ public:
 		auto *doc = yyjson_read_opts(const_cast<char *>(message.content.c_str()), message.content.length(), flags, nullptr, &error);
 		if (!doc)
 		{
-			SendError(reply, RPC::ERR_PARSE_ERROR, Anope::printf("JSON parse error #%u: %s", error.code, error.msg));
+			SendError(reply, RPC::ERR_PARSE_ERROR, Anope::Format("JSON parse error #%u: %s", error.code, error.msg));
 			return true;
 		}
 
@@ -164,7 +164,7 @@ public:
 
 		if (request.data.size() < event->GetMinParams())
 		{
-			auto error = Anope::printf("Not enough parameters for %s (given %zu, expected %zu)",
+			auto error = Anope::Format("Not enough parameters for %s (given %zu, expected %zu)",
 				request.name.c_str(), request.data.size(), event->GetMinParams());
 			SendError(reply, RPC::ERR_INVALID_PARAMS, error, id);
 			return true;

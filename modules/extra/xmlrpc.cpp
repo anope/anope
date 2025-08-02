@@ -148,7 +148,7 @@ public:
 
 		if (request.data.size() < event->GetMinParams())
 		{
-			auto error = Anope::printf("Not enough parameters (given %zu, expected %zu)",
+			auto error = Anope::Format("Not enough parameters (given %zu, expected %zu)",
 				request.data.size(), event->GetMinParams());
 			xmlrpc_env_set_fault(&env, RPC::ERR_INVALID_PARAMS, error.c_str());
 			SendError(reply, env);

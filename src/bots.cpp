@@ -60,7 +60,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	ctcps.emplace("VERSION", [](auto *bi, auto *u, const auto &)
 	{
 		auto *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		IRCD->SendNotice(bi, u->GetUID(), Anope::FormatCTCP("VERSION", Anope::printf("Anope-%s %s -- %s -- %s", Anope::Version().c_str(),
+		IRCD->SendNotice(bi, u->GetUID(), Anope::FormatCTCP("VERSION", Anope::Format("Anope-%s %s -- %s -- %s", Anope::Version().c_str(),
 			Anope::VersionBuildString().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)")));
 	});
 

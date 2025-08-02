@@ -200,7 +200,7 @@ public:
 
 	Anope::string GetColumn(Serialize::DataType dt)
 	{
-		return Anope::printf("%s %s DEFAULT %s",
+		return Anope::Format("%s %s DEFAULT %s",
 				GetColumnType(dt),
 				GetColumnNull(dt) ? "NULL" : "NOT NULL",
 				GetColumnDefault(dt));
@@ -498,24 +498,24 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 			{
 				// We can't just use MODIFY COLUMN here because the value may not
 				// be valid and we may need to replace with the default.
-				auto res = this->RunQuery(Anope::printf("ALTER TABLE `%s` ADD COLUMN `%s_new` %s; ",
+				auto res = this->RunQuery(Anope::Format("ALTER TABLE `%s` ADD COLUMN `%s_new` %s; ",
 					table.c_str(), column.c_str(), GetColumn(stype).c_str()));
 
 				if (res)
 				{
-					res = this->RunQuery(Anope::printf("UPDATE IGNORE `%s` SET `%s_new` = %s; ",
+					res = this->RunQuery(Anope::Format("UPDATE IGNORE `%s` SET `%s_new` = %s; ",
 						table.c_str(), column.c_str(), column.c_str()));
 				}
 
 				if (res)
 				{
-					res = this->RunQuery(Anope::printf("ALTER TABLE `%s` DROP COLUMN `%s`; ",
+					res = this->RunQuery(Anope::Format("ALTER TABLE `%s` DROP COLUMN `%s`; ",
 						table.c_str(), column.c_str()));
 				}
 
 				if (res)
 				{
-					res = this->RunQuery(Anope::printf("ALTER TABLE `%s` RENAME COLUMN `%s_new` TO `%s`; ",
+					res = this->RunQuery(Anope::Format("ALTER TABLE `%s` RENAME COLUMN `%s_new` TO `%s`; ",
 						table.c_str(), column.c_str(), column.c_str()));
 				}
 

@@ -38,7 +38,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTP::Provider *server, const Anope::
 
 	if (!c)
 	{
-		replacements["MESSAGES"] = Anope::printf(CHAN_X_NOT_IN_USE, chname.c_str());
+		replacements["MESSAGES"] = Anope::Format(CHAN_X_NOT_IN_USE, chname.c_str());
 		Page.Serve(server, page_name, client, message, reply, replacements);
 		return true;
 	}

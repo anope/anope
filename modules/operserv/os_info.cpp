@@ -281,7 +281,7 @@ class OSInfo final
 
 		for (auto *o : *(*oi))
 		{
-			info[_("Oper Info")] = Anope::printf(_("(by %s on %s) %s"), o->adder.c_str(), Anope::strftime(o->created, source.GetAccount(), true).c_str(), o->info.c_str());
+			info[_("Oper Info")] = Anope::Format(_("(by %s on %s) %s"), o->adder.c_str(), Anope::strftime(o->created, source.GetAccount(), true).c_str(), o->info.c_str());
 		}
 	}
 

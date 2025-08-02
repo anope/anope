@@ -803,7 +803,7 @@ private:
 
 		auto *ni = news_service->CreateNewsItem();
 		ni->type = NEWS_LOGON;
-		ni->text = Anope::printf("[%s] %s", subject.c_str(), body.c_str());
+		ni->text = Anope::Format("[%s] %s", subject.c_str(), body.c_str());
 		ni->who = setter;
 		ni->time = ts;
 		news_service->AddNewsItem(ni);
@@ -829,7 +829,7 @@ private:
 
 		auto *ni = news_service->CreateNewsItem();
 		ni->type = NEWS_OPER;
-		ni->text = Anope::printf("[%s] %s", subject.c_str(), body.c_str());
+		ni->text = Anope::Format("[%s] %s", subject.c_str(), body.c_str());
 		ni->who = setter;
 		ni->time = ts;
 		news_service->AddNewsItem(ni);

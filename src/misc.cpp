@@ -513,27 +513,27 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc)
 	Anope::string buffer;
 	if (years)
 	{
-		buffer = Anope::printf(Language::Translate(nc, years, N_("%lld year", "%lld years")), (long long)years);
+		buffer = Anope::Format(Language::Translate(nc, years, N_("%lld year", "%lld years")), (long long)years);
 	}
 	if (days)
 	{
 		buffer += buffer.empty() ? "" : ", ";
-		buffer += Anope::printf(Language::Translate(nc, days, N_("%lld day", "%lld days")), (long long)days);
+		buffer += Anope::Format(Language::Translate(nc, days, N_("%lld day", "%lld days")), (long long)days);
 	}
 	if (hours)
 	{
 		buffer += buffer.empty() ? "" : ", ";
-		buffer += Anope::printf(Language::Translate(nc, hours, N_("%lld hour", "%lld hours")), (long long)hours);
+		buffer += Anope::Format(Language::Translate(nc, hours, N_("%lld hour", "%lld hours")), (long long)hours);
 	}
 	if (minutes)
 	{
 		buffer += buffer.empty() ? "" : ", ";
-		buffer += Anope::printf(Language::Translate(nc, minutes, N_("%lld minute", "%lld minutes")), (long long)minutes);
+		buffer += Anope::Format(Language::Translate(nc, minutes, N_("%lld minute", "%lld minutes")), (long long)minutes);
 	}
 	if (seconds || buffer.empty())
 	{
 		buffer += buffer.empty() ? "" : ", ";
-		buffer += Anope::printf(Language::Translate(nc, seconds, N_("%lld second", "%lld seconds")), (long long)seconds);
+		buffer += Anope::Format(Language::Translate(nc, seconds, N_("%lld second", "%lld seconds")), (long long)seconds);
 	}
 	return buffer;
 }
@@ -546,11 +546,11 @@ Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 		return buf;
 
 	if (t < Anope::CurTime)
-		return Anope::printf(Language::Translate(nc, _("%s (%s ago)")), buf, Duration(Anope::CurTime - t, nc).c_str());
+		return Anope::Format(Language::Translate(nc, _("%s (%s ago)")), buf, Duration(Anope::CurTime - t, nc).c_str());
 	else if (t > Anope::CurTime)
-		return Anope::printf(Language::Translate(nc, _("%s (%s from now)")), buf, Duration(t - Anope::CurTime, nc).c_str(), nc);
+		return Anope::Format(Language::Translate(nc, _("%s (%s from now)")), buf, Duration(t - Anope::CurTime, nc).c_str(), nc);
 	else
-		return Anope::printf(Language::Translate(nc, _("%s (now)")), buf);
+		return Anope::Format(Language::Translate(nc, _("%s (now)")), buf);
 }
 
 Anope::string Anope::Expires(time_t expires, const NickCore *nc)
@@ -578,7 +578,7 @@ Anope::string Anope::Expires(time_t expires, const NickCore *nc)
 		timeleft = nearest(timeleft, 60); // Nearest minute if its more than an hour
 
 	auto duration = Anope::Duration(timeleft, nc);
-	return Anope::printf(Language::Translate(nc, _("expires in %s")), duration.c_str());
+	return Anope::Format(Language::Translate(nc, _("expires in %s")), duration.c_str());
 }
 
 bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive, bool use_regex)
@@ -692,14 +692,30 @@ bool Anope::Encrypt(const Anope::string &src, Anope::string &dest)
 	return MOD_RESULT == EVENT_ALLOW &&!dest.empty();
 }
 
-Anope::string Anope::printf(const char *fmt, ...)
+Anope::string Anope::Format(const char *fmt, ...)
 {
-	va_list args;
-	char buf[1024];
-	va_start(args, fmt);
-	vsnprintf(buf, sizeof(buf), fmt, args);
-	va_end(args);
+	Anope::string buf;
+	ANOPE_FORMAT(fmt, fmt, buf);
 	return buf;
+}
+
+Anope::string Anope::Format(va_list &valist, const char *fmt)
+{
+	static std::vector<char> buffer(512);
+	while (true)
+	{
+		va_list newvalist;
+		va_copy(newvalist, valist);
+		auto vsnret = vsnprintf(&buffer[0], buffer.size(), fmt, newvalist);
+		va_end(newvalist);
+
+		if (vsnret > 0 && static_cast<size_t>(vsnret) < buffer.size())
+			break;
+
+		buffer.resize(buffer.size() * 2);
+	}
+
+	return Anope::string(&buffer[0]);
 }
 
 Anope::string Anope::Hex(const Anope::string &data)
@@ -1005,18 +1021,18 @@ Anope::string Anope::Expand(const Anope::string &base, const Anope::string &frag
 	{
 		const auto *homedir = getenv("HOME");
 		if (homedir && *homedir)
-			return Anope::printf("%s%c%s", homedir, separator, fragment.c_str() + 2);
+			return Anope::Format("%s%c%s", homedir, separator, fragment.c_str() + 2);
 	}
 
-	return Anope::printf("%s%c%s", base.c_str(), separator, fragment.c_str());
+	return Anope::Format("%s%c%s", base.c_str(), separator, fragment.c_str());
 }
 
 Anope::string Anope::FormatCTCP(const Anope::string &name, const Anope::string &value)
 {
 	if (value.empty())
-		return Anope::printf("\1%s\1", name.c_str());
+		return Anope::Format("\1%s\1", name.c_str());
 
-	return Anope::printf("\1%s %s\1", name.c_str(), value.c_str());
+	return Anope::Format("\1%s %s\1", name.c_str(), value.c_str());
 }
 
 bool Anope::ParseCTCP(const Anope::string &text, Anope::string &name, Anope::string &body)

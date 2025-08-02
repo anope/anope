@@ -83,7 +83,7 @@ public:
 			{
 				ChannelMode *cm = ModeManager::FindChannelModeByName("OP");
 				char symbol = cm ? anope_dynamic_static_cast<ChannelModeStatus *>(cm)->symbol : 0;
-				const auto message = Anope::printf("%s invited %s into the channel.", user->nick.c_str(), user->nick.c_str());
+				const auto message = Anope::Format("%s invited %s into the channel.", user->nick.c_str(), user->nick.c_str());
 				IRCD->SendNotice(bi, (symbol ? Anope::string(symbol) : "") + c->name, message);
 			}
 

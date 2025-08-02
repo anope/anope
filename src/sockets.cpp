@@ -13,6 +13,7 @@
 #include "sockets.h"
 #include "socketengine.h"
 #include "logger.h"
+#include "textproc.h"
 
 #ifndef _WIN32
 #include <arpa/inet.h>
@@ -114,14 +115,14 @@ Anope::string sockaddrs::str() const
 			char v4address[INET_ADDRSTRLEN];
 			if (!inet_ntop(AF_INET, &sa4.sin_addr, v4address, sizeof(v4address)))
 				strcpy(v4address, "0.0.0.0");
-			return Anope::printf("%s:%u", v4address, sa4.sin_port);
+			return Anope::Format("%s:%u", v4address, sa4.sin_port);
 		}
 		case AF_INET6:
 		{
 			char v6address[INET6_ADDRSTRLEN];
 			if (!inet_ntop(AF_INET6, &sa6.sin6_addr, v6address, sizeof(v6address)))
 				strcpy(v6address, "0:0:0:0:0:0:0:0");
-			return Anope::printf("[%s]:%u", v6address, sa6.sin6_port);
+			return Anope::Format("[%s]:%u", v6address, sa6.sin6_port);
 		}
 		case AF_UNIX:
 			return saun.sun_path;
@@ -306,7 +307,7 @@ Anope::string cidr::mask() const
 	if ((this->addr.ipv6() && this->cidr_len == 128) || (!this->addr.ipv6() && this->cidr_len == 32))
 		return this->cidr_ip;
 	else
-		return Anope::printf("%s/%d", this->cidr_ip.c_str(), this->cidr_len);
+		return Anope::Format("%s/%d", this->cidr_ip.c_str(), this->cidr_len);
 }
 
 bool cidr::match(const sockaddrs &other)

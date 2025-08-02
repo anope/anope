@@ -481,15 +481,6 @@ namespace Anope
 	 */
 	extern CoreExport bool Encrypt(const Anope::string &src, Anope::string &dest);
 
-	/** Returns a sequence of data formatted as the format argument specifies.
-	 ** After the format parameter, the function expects at least as many
-	 ** additional arguments as specified in format.
-	 * @param fmt Format of the Message
-	 * @param ... any number of parameters
-	 * @return a Anope::string
-	 */
-	extern CoreExport string printf(const char *fmt, ...) ATTR_FORMAT(1, 2);
-
 	/** Return the last error code
 	 * @return The error code
 	 */

@@ -204,7 +204,7 @@ public:
 		Anope::string *greet = ns_greet.Get(user->Account());
 		if (bs_greet.HasExt(c->ci) && greet != NULL && !greet->empty() && c->FindUser(c->ci->bi) && c->ci->AccessFor(user).HasPriv("GREET"))
 		{
-			const auto message = Anope::printf("[%s] %s", user->Account()->display.c_str(), greet->c_str());
+			const auto message = Anope::Format("[%s] %s", user->Account()->display.c_str(), greet->c_str());
 			IRCD->SendPrivmsg(*c->ci->bi, c->name, message);
 			c->ci->bi->lastmsg = Anope::CurTime;
 		}

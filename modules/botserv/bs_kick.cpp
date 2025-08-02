@@ -1112,18 +1112,14 @@ class BSKick final
 
 	static void bot_kick(ChannelInfo *ci, User *u, const char *message, ...) ATTR_FORMAT(3, 4)
 	{
-		va_list args;
-		char buf[1024];
-
 		if (!ci || !ci->bi || !ci->c || !u || u->IsProtected() || !ci->c->FindUser(u))
 			return;
 
-		Anope::string fmt = Language::Translate(u, message);
-		va_start(args, message);
-		vsnprintf(buf, sizeof(buf), fmt.c_str(), args);
-		va_end(args);
+		const auto *fmt = Language::Translate(u, message);
 
-		ci->c->Kick(ci->bi, u, Anope::string(buf));
+		Anope::string buf;
+		ANOPE_FORMAT(message, fmt, buf);
+		ci->c->Kick(ci->bi, u, buf);
 	}
 
 public:
@@ -1157,7 +1153,7 @@ public:
 		if (kd && kd->badwords)
 		{
 			if (kd->ttb[TTB_BADWORDS])
-				info[_("Bad words kicker")] = Anope::printf("%s (%d kick(s) to ban)", enabled.c_str(), kd->ttb[TTB_BADWORDS]);
+				info[_("Bad words kicker")] = Anope::Format("%s (%d kick(s) to ban)", enabled.c_str(), kd->ttb[TTB_BADWORDS]);
 			else
 				info[_("Bad words kicker")] = enabled;
 		}
@@ -1167,7 +1163,7 @@ public:
 		if (kd && kd->bolds)
 		{
 			if (kd->ttb[TTB_BOLDS])
-				info[_("Bolds kicker")] = Anope::printf("%s (%d kick(s) to ban)", enabled.c_str(), kd->ttb[TTB_BOLDS]);
+				info[_("Bolds kicker")] = Anope::Format("%s (%d kick(s) to ban)", enabled.c_str(), kd->ttb[TTB_BOLDS]);
 			else
 				info[_("Bolds kicker")] = enabled;
 		}
@@ -1177,9 +1173,9 @@ public:
 		if (kd && kd->caps)
 		{
 			if (kd->ttb[TTB_CAPS])
-				info[_("Caps kicker")] = Anope::printf(_("%s (%d kick(s) to ban; minimum %d/%d%%)"), enabled.c_str(), kd->ttb[TTB_CAPS], kd->capsmin, kd->capspercent);
+				info[_("Caps kicker")] = Anope::Format(_("%s (%d kick(s) to ban; minimum %d/%d%%)"), enabled.c_str(), kd->ttb[TTB_CAPS], kd->capsmin, kd->capspercent);
 			else
-				info[_("Caps kicker")] = Anope::printf(_("%s (minimum %d/%d%%)"), enabled.c_str(), kd->capsmin, kd->capspercent);
+				info[_("Caps kicker")] = Anope::Format(_("%s (minimum %d/%d%%)"), enabled.c_str(), kd->capsmin, kd->capspercent);
 		}
 		else
 			info[_("Caps kicker")] = disabled;
@@ -1187,7 +1183,7 @@ public:
 		if (kd && kd->colors)
 		{
 			if (kd->ttb[TTB_COLORS])
-				info[_("Colors kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_COLORS]);
+				info[_("Colors kicker")] = Anope::Format(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_COLORS]);
 			else
 				info[_("Colors kicker")] = enabled;
 		}
@@ -1197,9 +1193,9 @@ public:
 		if (kd && kd->flood)
 		{
 			if (kd->ttb[TTB_FLOOD])
-				info[_("Flood kicker")] = Anope::printf(_("%s (%d kick(s) to ban; %d lines in %ds)"), enabled.c_str(), kd->ttb[TTB_FLOOD], kd->floodlines, kd->floodsecs);
+				info[_("Flood kicker")] = Anope::Format(_("%s (%d kick(s) to ban; %d lines in %ds)"), enabled.c_str(), kd->ttb[TTB_FLOOD], kd->floodlines, kd->floodsecs);
 			else
-				info[_("Flood kicker")] = Anope::printf(_("%s (%d lines in %ds)"), enabled.c_str(), kd->floodlines, kd->floodsecs);
+				info[_("Flood kicker")] = Anope::Format(_("%s (%d lines in %ds)"), enabled.c_str(), kd->floodlines, kd->floodsecs);
 		}
 		else
 			info[_("Flood kicker")] = disabled;
@@ -1207,9 +1203,9 @@ public:
 		if (kd && kd->repeat)
 		{
 			if (kd->ttb[TTB_REPEAT])
-				info[_("Repeat kicker")] = Anope::printf(_("%s (%d kick(s) to ban; %d times)"), enabled.c_str(), kd->ttb[TTB_REPEAT], kd->repeattimes);
+				info[_("Repeat kicker")] = Anope::Format(_("%s (%d kick(s) to ban; %d times)"), enabled.c_str(), kd->ttb[TTB_REPEAT], kd->repeattimes);
 			else
-				info[_("Repeat kicker")] = Anope::printf(_("%s (%d times)"), enabled.c_str(), kd->repeattimes);
+				info[_("Repeat kicker")] = Anope::Format(_("%s (%d times)"), enabled.c_str(), kd->repeattimes);
 		}
 		else
 			info[_("Repeat kicker")] = disabled;
@@ -1217,7 +1213,7 @@ public:
 		if (kd && kd->reverses)
 		{
 			if (kd->ttb[TTB_REVERSES])
-				info[_("Reverses kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_REVERSES]);
+				info[_("Reverses kicker")] = Anope::Format(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_REVERSES]);
 			else
 				info[_("Reverses kicker")] = enabled;
 		}
@@ -1227,7 +1223,7 @@ public:
 		if (kd && kd->underlines)
 		{
 			if (kd->ttb[TTB_UNDERLINES])
-				info[_("Underlines kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_UNDERLINES]);
+				info[_("Underlines kicker")] = Anope::Format(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_UNDERLINES]);
 			else
 				info[_("Underlines kicker")] = enabled;
 		}
@@ -1237,7 +1233,7 @@ public:
 		if (kd && kd->italics)
 		{
 			if (kd->ttb[TTB_ITALICS])
-				info[_("Italics kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_ITALICS]);
+				info[_("Italics kicker")] = Anope::Format(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_ITALICS]);
 			else
 				info[_("Italics kicker")] = enabled;
 		}
@@ -1247,7 +1243,7 @@ public:
 		if (kd && kd->amsgs)
 		{
 			if (kd->ttb[TTB_AMSGS])
-				info[_("AMSG kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_AMSGS]);
+				info[_("AMSG kicker")] = Anope::Format(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_AMSGS]);
 			else
 				info[_("AMSG kicker")] = enabled;
 		}

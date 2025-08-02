@@ -141,7 +141,7 @@ public:
 		if (source && !Config->GetModule(this).Get<bool>("anonymousglobal"))
 		{
 			// A source is available and they're not anonymous.
-			line = Anope::printf("[%s] %s", source->GetNick().c_str(), message.c_str());
+			line = Anope::Format("[%s] %s", source->GetNick().c_str(), message.c_str());
 		}
 		else
 		{

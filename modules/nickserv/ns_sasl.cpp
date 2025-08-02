@@ -23,7 +23,7 @@ private:
 		if (u)
 			return u->GetMask();
 		if (!hostname.empty() && !GetAddress().empty())
-			return Anope::printf("%s (%s)", hostname.c_str(), GetAddress().c_str());
+			return Anope::Format("%s (%s)", hostname.c_str(), GetAddress().c_str());
 		return "A user";
 	};
 

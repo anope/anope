@@ -94,7 +94,7 @@ public:
 			/* We no longer compare the pattern against the output buffer.
 			 * Instead we build a nice nick!user@host buffer to compare.
 			 * The output is then generated separately. -TheShadow */
-			Anope::string buf = Anope::printf("%s!%s", na->nick.c_str(), !na->last_userhost.empty() ? na->last_userhost.c_str() : "*@*");
+			Anope::string buf = Anope::Format("%s!%s", na->nick.c_str(), !na->last_userhost.empty() ? na->last_userhost.c_str() : "*@*");
 			if (na->nick.equals_ci(pattern) || Anope::Match(buf, pattern, false, true))
 			{
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= listmax)

@@ -511,7 +511,7 @@ public:
 
 	const Anope::string GetDesc(CommandSource &source) const override
 	{
-		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.nobreak().c_str());
+		return Anope::Format(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.nobreak().c_str());
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override

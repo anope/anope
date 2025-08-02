@@ -390,14 +390,14 @@ Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 
 void IRCDProto::SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg)
 {
-	IRCD->SendNotice(bi, target->GetUID(), Anope::printf("[%s] %s", context->name.c_str(), msg.c_str()), {
+	IRCD->SendNotice(bi, target->GetUID(), Anope::Format("[%s] %s", context->name.c_str(), msg.c_str()), {
 		{ "+draft/channel-context", context->name },
 	});
 }
 
 void IRCDProto::SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg)
 {
-	IRCD->SendPrivmsg(bi, target->GetUID(), Anope::printf("[%s] %s", context->name.c_str(), msg.c_str()), {
+	IRCD->SendPrivmsg(bi, target->GetUID(), Anope::Format("[%s] %s", context->name.c_str(), msg.c_str()), {
 		{ "+draft/channel-context", context->name },
 	});
 }

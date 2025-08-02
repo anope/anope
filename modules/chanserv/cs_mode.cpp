@@ -458,7 +458,7 @@ class CommandCSMode final
 						continue;
 
 					ListFormatter::ListEntry entry;
-					entry["Mode"] = Anope::printf("%c%c", ml->set ? '+' : '-', cm->mchar);
+					entry["Mode"] = Anope::Format("%c%c", ml->set ? '+' : '-', cm->mchar);
 					entry["Param"] = ml->param;
 					entry["Creator"] = ml->setter;
 					entry["Created"] = Anope::strftime(ml->created, NULL, true);
@@ -917,9 +917,9 @@ public:
 		if (!m.second.empty())
 		{
 			if (m.first)
-				return Anope::printf(Language::Translate(source.GetAccount(), _("Gives you or the specified nick %s status on a channel")), m.second.c_str());
+				return Anope::Format(Language::Translate(source.GetAccount(), _("Gives you or the specified nick %s status on a channel")), m.second.c_str());
 			else
-				return Anope::printf(Language::Translate(source.GetAccount(), _("Removes %s status from you or the specified nick on a channel")), m.second.c_str());
+				return Anope::Format(Language::Translate(source.GetAccount(), _("Removes %s status from you or the specified nick on a channel")), m.second.c_str());
 		}
 		else
 			return "";

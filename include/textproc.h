@@ -11,6 +11,14 @@
 
 #pragma once
 
+#define ANOPE_FORMAT(LAST, FORMAT, BUFFER) \
+	do { \
+		va_list _valist; \
+		va_start(_valist, (LAST)); \
+		(BUFFER) = Anope::Format(_valist, (FORMAT)); \
+		va_end(_valist); \
+	} while (false);
+
 namespace Anope
 {
 	/** Expands a path fragment that is relative to the base directory.
@@ -33,6 +41,17 @@ namespace Anope
 
 	/** Expands a module path. */
 	inline auto ExpandModule(const Anope::string &path) { return Expand(ModuleDir, path); }
+
+	/** Formats a string using one or more values. This uses snprintf internally but with a flexible buffer.
+	 * @param fmt The message to format.
+	 */
+	extern CoreExport Anope::string Format(const char *fmt, ...) ATTR_FORMAT(1, 2);
+
+	/** Formats a string using a list of values. This uses snprintf internally but with a flexible buffer.
+	 * @param valist A list of values to format the message with.
+	 * @param fmt The message to format.
+	 */
+	extern CoreExport Anope::string Format(va_list &valist, const char *fmt) ATTR_FORMAT(2, 0);
 
 	/** Formats a CTCP message for sending to a client.
 	 * @param name The name of the CTCP.

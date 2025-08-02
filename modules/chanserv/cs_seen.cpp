@@ -282,7 +282,7 @@ public:
 		if (u2)
 			onlinestatus = ".";
 		else
-			onlinestatus = Anope::printf(Language::Translate(source.nc, _(" but %s mysteriously dematerialized.")), target.c_str());
+			onlinestatus = Anope::Format(Language::Translate(source.nc, _(" but %s mysteriously dematerialized.")), target.c_str());
 
 		Anope::string timebuf = Anope::Duration(Anope::CurTime - info->last, source.nc);
 		Anope::string timebuf2 = Anope::strftime(info->last, source.nc, true);
@@ -296,9 +296,9 @@ public:
 		{
 			u2 = User::Find(info->nick2, true);
 			if (u2)
-				onlinestatus = Anope::printf(Language::Translate(source.nc, _(". %s is still online.")), u2->nick.c_str());
+				onlinestatus = Anope::Format(Language::Translate(source.nc, _(". %s is still online.")), u2->nick.c_str());
 			else
-				onlinestatus = Anope::printf(Language::Translate(source.nc, _(", but %s mysteriously dematerialized.")), info->nick2.c_str());
+				onlinestatus = Anope::Format(Language::Translate(source.nc, _(", but %s mysteriously dematerialized.")), info->nick2.c_str());
 
 			source.Reply(_("%s (%s) was last seen changing nick to %s %s ago%s"),
 				target.c_str(), info->vhost.c_str(), info->nick2.c_str(), timebuf.c_str(), onlinestatus.c_str());

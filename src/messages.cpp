@@ -253,7 +253,7 @@ void MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 
 	IRCD->SendNumeric(RPL_MOTDSTART, source.GetSource(), "- " + s->GetName() + " Message of the Day");
 	for (Anope::string line; std::getline(stream, line.str()); )
-		IRCD->SendNumeric(RPL_MOTD, source.GetSource(), Anope::printf("- %s", line.c_str()));
+		IRCD->SendNumeric(RPL_MOTD, source.GetSource(), Anope::Format("- %s", line.c_str()));
 	IRCD->SendNumeric(RPL_ENDOFMOTD, source.GetSource(), "End of /MOTD command.");
 }
 
@@ -425,8 +425,8 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 		case 'u':
 		{
 			long uptime = static_cast<long>(Anope::CurTime - Anope::StartTime);
-			IRCD->SendNumeric(RPL_STATSUPTIME, source.GetSource(), Anope::printf("Services up %ld day%s, %02ld:%02ld:%02ld", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60));
-			IRCD->SendNumeric(RPL_STATSCONN, source.GetSource(), Anope::printf("Current users: %zu (%zu ops); maximum %zu", UserListByNick.size(), OperCount, MaxUserCount));
+			IRCD->SendNumeric(RPL_STATSUPTIME, source.GetSource(), Anope::Format("Services up %ld day%s, %02ld:%02ld:%02ld", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60));
+			IRCD->SendNumeric(RPL_STATSCONN, source.GetSource(), Anope::Format("Current users: %zu (%zu ops); maximum %zu", UserListByNick.size(), OperCount, MaxUserCount));
 			IRCD->SendNumeric(RPL_STATSLINKINFO, source.GetSource(), params[0][0], "End of /STATS report.");
 			break;
 		} /* case 'u' */
@@ -443,7 +443,7 @@ void Time::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 	const auto *tm = localtime(&Anope::CurTime);
 	char timebuf[64];
 	strftime(timebuf, sizeof(timebuf), "%A, %d %B %Y @ %H:%M:%S %Z", tm);
-	const auto timestr = Anope::printf("%s (%lu)", timebuf, Anope::CurTime);
+	const auto timestr = Anope::Format("%s (%lu)", timebuf, Anope::CurTime);
 	IRCD->SendNumeric(RPL_TIME, source.GetSource(), Me->GetName(), timestr);
 }
 
@@ -459,7 +459,7 @@ void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params,
 void Version::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-	IRCD->SendNumeric(RPL_VERSION, source.GetSource(), "Anope-" + Anope::Version(), Me->GetName(), Anope::printf("%s -(%s) -- %s",
+	IRCD->SendNumeric(RPL_VERSION, source.GetSource(), "Anope-" + Anope::Version(), Me->GetName(), Anope::Format("%s -(%s) -- %s",
 		IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str()));
 }
 

@@ -537,13 +537,9 @@ bool Channel::GetParam(const Anope::string &mname, Anope::string &target) const
 
 void Channel::SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...)
 {
-	char buf[BUFSIZE] = "";
-	va_list args;
-	va_start(args, cmodes);
-	vsnprintf(buf, BUFSIZE - 1, cmodes, args);
-	va_end(args);
-
-	SetModes(bi, enforce_mlock, Anope::string(buf));
+	Anope::string buf;
+	ANOPE_FORMAT(cmodes, cmodes, buf);
+	SetModes(bi, enforce_mlock, buf);
 }
 
 
@@ -779,13 +775,9 @@ void Channel::KickInternal(const MessageSource &source, const Anope::string &nic
 
 bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 {
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, reason);
-	vsnprintf(buf, BUFSIZE - 1, reason, args);
-	va_end(args);
-
-	return Kick(bi, u, Anope::string(buf));
+	Anope::string buf;
+	ANOPE_FORMAT(reason, reason, buf);
+	return Kick(bi, u, buf);
 }
 
 bool Channel::Kick(BotInfo *bi, User *u, const Anope::string &reason)

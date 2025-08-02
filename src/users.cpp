@@ -315,32 +315,20 @@ User::~User()
 
 void User::SendMessage(BotInfo *source, const char *fmt, ...)
 {
-	va_list args;
-	char buf[BUFSIZE] = "";
-
 	const char *translated_message = Language::Translate(this, fmt);
 
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, translated_message, args);
-
-	this->SendMessage(source, Anope::string(buf));
-
-	va_end(args);
+	Anope::string buf;
+	ANOPE_FORMAT(fmt, translated_message, buf);
+	this->SendMessage(source, buf);
 }
 
 void User::SendMessage(BotInfo *source, int count, const char *singular, const char *plural, ...)
 {
-	va_list args;
-	char buf[BUFSIZE] = "";
-
 	const char *translated_message = Language::Translate(this, count, singular, plural);
 
-	va_start(args, plural);
-	vsnprintf(buf, BUFSIZE - 1, translated_message, args);
-
-	this->SendMessage(source, Anope::string(buf));
-
-	va_end(args);
+	Anope::string buf;
+	ANOPE_FORMAT(plural, translated_message, buf);
+	this->SendMessage(source, buf);
 }
 
 namespace
@@ -655,13 +643,9 @@ void User::RemoveMode(BotInfo *bi, const Anope::string &name, const Anope::strin
 
 void User::SetModes(BotInfo *bi, const char *umodes, ...)
 {
-	char buf[BUFSIZE] = "";
-	va_list args;
-	va_start(args, umodes);
-	vsnprintf(buf, BUFSIZE - 1, umodes, args);
-	va_end(args);
-
-	SetModes(bi, Anope::string(buf));
+	Anope::string buf;
+	ANOPE_FORMAT(umodes, umodes, buf);
+	SetModes(bi, buf);
 }
 
 void User::SetModes(BotInfo *bi, const Anope::string &umodes)

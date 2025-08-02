@@ -174,9 +174,9 @@ public:
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
 
-		Anope::string sql = Anope::printf("SELECT * from `%s`", GetTableName(obj).c_str());
+		Anope::string sql = Anope::Format("SELECT * from `%s`", GetTableName(obj).c_str());
 		if (obj->GetTimestamp())
-			sql += Anope::printf(" WHERE (`timestamp` >= %s OR `timestamp` IS NULL)", this->SQL->FromUnixtime(obj->GetTimestamp()).c_str());
+			sql += Anope::Format(" WHERE (`timestamp` >= %s OR `timestamp` IS NULL)", this->SQL->FromUnixtime(obj->GetTimestamp()).c_str());
 
 		Query query(sql);
 

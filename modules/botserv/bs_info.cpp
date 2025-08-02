@@ -55,7 +55,7 @@ public:
 			info[_("Real name")] = bi->realname;
 			info[_("Created")] = Anope::strftime(bi->created, source.GetAccount());
 			info[_("Options")] = bi->oper_only ? _("Private") : _("None");
-			info[_("Used on")] = Anope::printf(Language::Translate(source.nc, bi->GetChannelCount(), N_("%u channel", "%u channels")), bi->GetChannelCount());
+			info[_("Used on")] = Anope::Format(Language::Translate(source.nc, bi->GetChannelCount(), N_("%u channel", "%u channels")), bi->GetChannelCount());
 
 			FOREACH_MOD(OnBotInfo, (source, bi, ci, info));
 
@@ -116,7 +116,7 @@ public:
 
 	const Anope::string GetDesc(CommandSource &source) const override
 	{
-		return Anope::printf(Language::Translate(source.GetAccount(), _("Allows you to see %s information about a channel or a bot")), source.service->nick.c_str());
+		return Anope::Format(Language::Translate(source.GetAccount(), _("Allows you to see %s information about a channel or a bot")), source.service->nick.c_str());
 	}
 };
 

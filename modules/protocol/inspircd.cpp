@@ -622,13 +622,13 @@ public:
 
 		if (spanningtree_proto_ver >= 1206)
 		{
-			Uplink::Send("SINFO", "customversion", Anope::printf("%s -- (%s) -- %s", IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
+			Uplink::Send("SINFO", "customversion", Anope::Format("%s -- (%s) -- %s", IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
 			Uplink::Send("SINFO", "rawbranch", "Anope-" + Anope::VersionShort());
 		}
 		else
 		{
-			Uplink::Send("SINFO", "version", Anope::printf("Anope-%s %s :%s -- (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
-			Uplink::Send("SINFO", "fullversion", Anope::printf("Anope-%s %s :[%s] %s -- (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), Me->GetSID().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
+			Uplink::Send("SINFO", "version", Anope::Format("Anope-%s %s :%s -- (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
+			Uplink::Send("SINFO", "fullversion", Anope::Format("Anope-%s %s :[%s] %s -- (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), Me->GetSID().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "none", Anope::VersionBuildString().c_str()));
 		}
 		Uplink::Send("SINFO", "rawversion", "Anope-" + Anope::VersionShort());
 	}

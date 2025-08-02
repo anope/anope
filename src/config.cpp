@@ -626,9 +626,9 @@ Anope::string Uplink::str() const
 	switch (protocol)
 	{
 	case AF_INET:
-		return Anope::printf("%s:%u", this->host.c_str(), this->port);
+		return Anope::Format("%s:%u", this->host.c_str(), this->port);
 	case AF_INET6:
-		return Anope::printf("[%s]:%u", this->host.c_str(), this->port);
+		return Anope::Format("[%s]:%u", this->host.c_str(), this->port);
 	case AF_UNIX:
 		return this->host;
 	}
@@ -776,7 +776,7 @@ void Conf::LoadConf(File &file)
 
 	if (!file.Open())
 	{
-		throw ConfigException(Anope::printf("File %s could not be opened: %s.",
+		throw ConfigException(Anope::Format("File %s could not be opened: %s.",
 			file.GetPath().c_str(), strerror(errno)));
 	}
 

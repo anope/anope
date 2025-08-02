@@ -463,7 +463,7 @@ private:
 		if (!cm || !cm->mchar)
 			return;
 
-		Uplink::Send(user, "SVS2MODE", c->name, Anope::printf("-%c", cm->mchar), u->GetUID());
+		Uplink::Send(user, "SVS2MODE", c->name, Anope::Format("-%c", cm->mchar), u->GetUID());
 	}
 
 	bool IsTagValid(const Anope::string &tname, const Anope::string &tvalue) override
@@ -492,7 +492,7 @@ namespace UnrealExtBan
 		ChannelMode *Wrap(Anope::string &param) override
 		{
 			auto prefix = Servers::Capab.count("NEXTBANS") ? xbname : Anope::string(xbchar);
-			param = Anope::printf("~%s:%s", prefix.c_str(), param.c_str());
+			param = Anope::Format("~%s:%s", prefix.c_str(), param.c_str());
 			return ChannelModeVirtual<ChannelModeList>::Wrap(param);
 		}
 

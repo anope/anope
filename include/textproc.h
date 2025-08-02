@@ -49,6 +49,12 @@ namespace Anope
 	 */
 	extern CoreExport bool ParseCTCP(const Anope::string &text, Anope::string &name, Anope::string &body);
 
+	/** Remove all formatting characters from a string.
+	 * @param text A string containing formatting characters.
+	 * @return A copy of \p text with all formatting characters removed.
+	 */
+	extern CoreExport Anope::string RemoveFormatting(const Anope::string &text);
+
 	/** Replaces template variables within a string with values from a map.
 	 * @param str The string to template from.
 	 * @param vars The variables to replace within the string.

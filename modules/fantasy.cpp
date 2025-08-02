@@ -110,7 +110,7 @@ public:
 		if (params.empty())
 			return;
 
-		Anope::string normalized_param0 = Anope::NormalizeBuffer(params[0]);
+		Anope::string normalized_param0 = Anope::RemoveFormatting(params[0]);
 		Anope::string fantasy_chars = Config->GetModule(this).Get<Anope::string>("fantasycharacter", "!");
 
 		if (!normalized_param0.find(c->ci->bi->nick))
@@ -143,7 +143,7 @@ public:
 			full_command.erase(full_command.begin());
 
 			++count;
-			it = Config->Fantasy.find(Anope::NormalizeBuffer(full_command));
+			it = Config->Fantasy.find(Anope::RemoveFormatting(full_command));
 		}
 
 		if (it == Config->Fantasy.end())

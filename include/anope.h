@@ -531,12 +531,6 @@ namespace Anope
 	 */
 	extern CoreExport Anope::string strftime(time_t t, const NickCore *nc = NULL, bool short_output = false);
 
-	/** Normalize buffer, stripping control characters and colors
-	 * @param A string to be parsed for control and color codes
-	 * @return A string stripped of control and color codes
-	 */
-	extern CoreExport Anope::string NormalizeBuffer(const Anope::string &);
-
 	/** Parses a raw message from the uplink and calls its command handler.
 	 * @param message Raw message from the uplink
 	 */

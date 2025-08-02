@@ -1369,7 +1369,7 @@ public:
 			BadWords *badwords = ci->GetExt<BadWords>("badwords");
 
 			/* Normalize the buffer */
-			Anope::string nbuf = Anope::NormalizeBuffer(realbuf);
+			Anope::string nbuf = Anope::RemoveFormatting(realbuf);
 			bool casesensitive = Config->GetModule("botserv").Get<bool>("casesensitive");
 
 			/* Normalize can return an empty string if this only contains control codes etc */

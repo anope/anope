@@ -822,7 +822,7 @@ int Anope::VersionMajor() { return VERSION_MAJOR; }
 int Anope::VersionMinor() { return VERSION_MINOR; }
 int Anope::VersionPatch() { return VERSION_PATCH; }
 
-Anope::string Anope::NormalizeBuffer(const Anope::string &buf)
+Anope::string Anope::RemoveFormatting(const Anope::string &buf)
 {
 	Anope::string newbuf;
 	for (size_t idx = 0; idx < buf.length(); )

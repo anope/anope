@@ -18,7 +18,6 @@
 #include "language.h"
 #include "regexpr.h"
 #include "sockets.h"
-#include "textproc.h"
 
 #include <cerrno>
 #include <climits>

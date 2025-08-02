@@ -10,6 +10,7 @@
 #include "modules.h"
 #include "language.h"
 #include "account.h"
+#include "textproc.h"
 
 #if HAVE_LOCALIZATION
 # include <libintl.h>

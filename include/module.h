@@ -39,6 +39,7 @@
 #include "services.h"
 #include "socketengine.h"
 #include "sockets.h"
+#include "textproc.h"
 #include "threadengine.h"
 #include "timers.h"
 #include "uplink.h"

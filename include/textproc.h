@@ -11,6 +11,52 @@
 
 #pragma once
 
+namespace Anope
+{
+	/** Expands a path fragment that is relative to the base directory.
+	 * @param base The base directory that it is relative to.
+	 * @param fragment The fragment to expand.
+	 */
+	extern CoreExport Anope::string Expand(const Anope::string &base, const Anope::string &fragment);
+
+	/** Expands a config path. */
+	inline auto ExpandConfig(const Anope::string &path) { return Expand(ConfigDir, path); }
+
+	/** Expands a data path. */
+	inline auto ExpandData(const Anope::string &path) { return Expand(DataDir, path); }
+
+	/** Expands a locale path. */
+	inline auto ExpandLocale(const Anope::string &path) { return Expand(LocaleDir, path); }
+
+	/** Expands a log path. */
+	inline auto ExpandLog(const Anope::string &path) { return Expand(LogDir, path); }
+
+	/** Expands a module path. */
+	inline auto ExpandModule(const Anope::string &path) { return Expand(ModuleDir, path); }
+
+	/** Formats a CTCP message for sending to a client.
+	 * @param name The name of the CTCP.
+	 * @param body If present then the body of the CTCP.
+	 * @return A formatted CTCP ready to send to a client.
+	 */
+	extern CoreExport Anope::string FormatCTCP(const Anope::string &name, const Anope::string &body = "");
+
+	/** Parses a CTCP message received from a client.
+	 * @param text The raw message to parse.
+	 * @param name The location to store the name of the CTCP.
+	 * @param body The location to store body of the CTCP if one is present.
+	 * @return True if the message was a well formed CTCP; otherwise, false.
+	 */
+	extern CoreExport bool ParseCTCP(const Anope::string &text, Anope::string &name, Anope::string &body);
+
+	/** Replaces template variables within a string with values from a map.
+	 * @param str The string to template from.
+	 * @param vars The variables to replace within the string.
+	 * @return The specified string with all variables replaced within it.
+	 */
+	extern CoreExport Anope::string Template(const Anope::string &str, const Anope::map<Anope::string> &vars);
+}
+
 class CoreExport HelpWrapper final
 {
 private:

@@ -131,10 +131,14 @@ public:
 	/* The maximum length of a username. */
 	size_t MaxUser = 0;
 
-
 	/* Retrieves the next free UID or SID */
 	virtual Anope::string UID_Retrieve();
 	virtual Anope::string SID_Retrieve();
+
+	/** Retrieves advice on what might be the problem when a link fails.
+	 * @param advice The location to store the advice.
+	 */
+	virtual void GetLinkAdvice(std::vector<Anope::string> &advice) { }
 
 	/** Extracts a timestamp from a string. */
 	virtual time_t ExtractTimestamp(const Anope::string &str);

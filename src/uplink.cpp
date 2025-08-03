@@ -114,11 +114,20 @@ UplinkSocket::~UplinkSocket()
 	if (!error && !Anope::Quitting)
 	{
 		this->OnError("");
-		Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
-		if (protocol && !protocol->name.find("inspircd"))
-			Log(LOG_TERMINAL) << "Check that you have loaded m_spanningtree.so on InspIRCd, and are not connecting Anope to an SSL enabled port without configuring SSL in Anope (or vice versa)";
-		else
-			Log(LOG_TERMINAL) << "Check that you are not connecting Anope to an SSL enabled port without configuring SSL in Anope (or vice versa)";
+
+		std::vector<Anope::string> advice = {
+			"You are connecting Anope to an SSL-only port without configuring SSL (or vice versa).",
+		};
+		if (IRCD)
+		{
+			advice.push_back(Anope::Format("You are using the wrong protocol module (currently %s for %s).",
+				IRCD->owner->name.c_str(), IRCD->GetProtocolName().c_str()));
+			IRCD->GetLinkAdvice(advice);
+		}
+
+		Log(LOG_TERMINAL) << "Potential causes include:";
+		for (const auto &line : advice)
+			Log(LOG_TERMINAL) << "* " << line;
 	}
 
 	if (IRCD && Servers::GetUplink() && Servers::GetUplink()->IsSynced())

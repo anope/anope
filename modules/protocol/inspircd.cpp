@@ -192,6 +192,11 @@ public:
 		MaxLine = 0;
 	}
 
+	void GetLinkAdvice(std::vector<Anope::string> &advice) override
+	{
+		advice.push_back("You do not have the account, hidechans, services, and spanningtree modules loaded on InspIRCd.");
+	}
+
 	size_t GetMaxListFor(Channel *c, ChannelMode *cm) override
 	{
 		ListLimits *limits = maxlist.Get(c);

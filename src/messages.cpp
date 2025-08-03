@@ -46,9 +46,9 @@ void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params,
 
 void Error::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
-	Log(LOG_TERMINAL) << "ERROR: " << params[0];
-	Anope::QuitReason = "Received ERROR from uplink: " + params[0];
+	Anope::QuitReason = "Received an error from the uplink: " + params.back();
 	Anope::Quitting = true;
+	Log(LOG_TERMINAL) << Anope::QuitReason;
 }
 
 Ignore::Ignore(Module *creator, const Anope::string &mname)

@@ -35,6 +35,9 @@ bool BufferedSocket::ProcessRead()
 
 bool BufferedSocket::ProcessWrite()
 {
+	if (this->write_buffer.empty())
+		return true;
+
 	int count = this->io->Send(this, this->write_buffer);
 	if (count == 0)
 		return false;

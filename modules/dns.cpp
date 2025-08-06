@@ -142,7 +142,7 @@ class Packet final
 		record.ttl = (input[pos] << 24) | (input[pos + 1] << 16) | (input[pos + 2] << 8) | input[pos + 3];
 		pos += 4;
 
-		//record.rdlength = input[pos] << 8 | input[pos + 1];
+		auto rdlength = input[pos] << 8 | input[pos + 1];
 		pos += 2;
 
 		switch (record.type)
@@ -190,6 +190,40 @@ class Packet final
 				if (!IsValidName(record.rdata))
 					throw SocketException("Invalid cname/ptr record data");
 
+				break;
+			}
+			case DNS::QUERY_TXT:
+			{
+				if (pos + rdlength > input_size)
+					throw SocketException("Unable to unpack TXT resource record");
+
+				record.rdata = std::string(reinterpret_cast<const char* >(input + pos), rdlength);
+				pos += rdlength;
+				break;
+			}
+			case DNS::QUERY_SRV:
+			{
+				if (rdlength < 6 || pos + rdlength > input_size)
+					throw SocketException("Unable to unpack SRV resource record");
+
+				auto srv = std::make_shared<DNS::Record::SRV>();
+
+				srv->priority = input[pos] << 8 | input[pos + 1];
+				pos += 2;
+
+				srv->weight = input[pos] << 8 | input[pos + 1];
+				pos += 2;
+
+				srv->port = input[pos] << 8 | input[pos + 1];
+				pos += 2;
+
+				srv->host = this->UnpackName(input, input_size, pos);
+				if (!IsValidName(srv->host))
+					throw SocketException("Invalid name in SRV resource record");
+
+				record.rdata = Anope::Format("%hu %hu %hu %s", srv->priority,
+					srv->weight, srv->port, srv->host.c_str());
+				record.rdataobj = srv;
 				break;
 			}
 			default:

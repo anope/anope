@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <memory>
+
 namespace DNS
 {
 	/** Valid query types
@@ -29,8 +31,12 @@ namespace DNS
 		QUERY_SOA = 6,
 		/* Reverse DNS lookup */
 		QUERY_PTR = 12,
+		/* TXT lookup */
+		QUERY_TXT = 16,
 		/* IPv6 AAAA lookup */
 		QUERY_AAAA = 28,
+		/** SRV lookup */
+		QUERY_SRV = 33,
 		/* Zone transfer */
 		QUERY_AXFR = 252,
 		/* A lookup for any record */
@@ -88,11 +94,23 @@ namespace DNS
 		};
 	};
 
+	namespace Record
+	{
+		struct SRV final
+		{
+			uint16_t priority = UINT16_MAX;
+			uint16_t weight = 0;
+			uint16_t port = 0;
+			Anope::string host;
+		};
+	}
+
 	struct ResourceRecord final
 		: Question
 	{
 		unsigned int ttl = 0;
 		Anope::string rdata;
+		std::shared_ptr<void> rdataobj;
 		time_t created;
 
 		ResourceRecord(const Anope::string &n, QueryType t, unsigned short c = 1) : Question(n, t, c), created(Anope::CurTime) { }

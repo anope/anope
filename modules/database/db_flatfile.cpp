@@ -80,8 +80,6 @@ public:
 	DBFlatFile(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, DATABASE | DEPRECATED | VENDOR)
 	{
-		if (!ModuleManager::FindFirstOf(DATABASE, this))
-			throw ModuleException("db_flatfile is deprecated and can only import old databases.");
 	}
 
 	EventReturn OnLoadDatabase() override

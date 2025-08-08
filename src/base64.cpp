@@ -11,6 +11,7 @@
 
 #include "services.h"
 #include "anope.h"
+#include "textproc.h"
 
 static const Anope::string Base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const char Pad64 = '=';
@@ -78,12 +79,12 @@ static const char Pad64 = '=';
 	   characters followed by one "=" padding character.
    */
 
-void Anope::B64Encode(const Anope::string &src, Anope::string &target)
+Anope::string Anope::B64Encode(const Anope::string &src)
 {
 	size_t src_pos = 0, src_len = src.length();
 	unsigned char input[3] = { '\0', '\0', '\0' };
 
-	target.clear();
+	Anope::string target;
 
 	while (src_len - src_pos > 2)
 	{
@@ -112,6 +113,7 @@ void Anope::B64Encode(const Anope::string &src, Anope::string &target)
 			target += Base64[((input[1] & 0x0f) << 2) + (input[2] >> 6)];
 		target += Pad64;
 	}
+	return target;
 }
 
 /* skips all whitespace anywhere.
@@ -119,9 +121,9 @@ void Anope::B64Encode(const Anope::string &src, Anope::string &target)
    src from base - 64 numbers into three 8 bit bytes in the target area.
  */
 
-void Anope::B64Decode(const Anope::string &src, Anope::string &target)
+Anope::string Anope::B64Decode(const Anope::string &src)
 {
-	target.clear();
+	Anope::string target;
 
 	unsigned state = 0;
 	Anope::string::const_iterator ch = src.begin(), end = src.end();
@@ -135,7 +137,7 @@ void Anope::B64Decode(const Anope::string &src, Anope::string &target)
 
 		size_t pos = Base64.find(*ch);
 		if (pos == Anope::string::npos) /* A non-base64 character */
-			return;
+			return {};
 
 		switch (state)
 		{
@@ -160,4 +162,5 @@ void Anope::B64Decode(const Anope::string &src, Anope::string &target)
 	}
 	if (!target.empty() && !target[target.length() - 1])
 		target.erase(target.length() - 1);
+	return target;
 }

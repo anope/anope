@@ -35,9 +35,7 @@ public:
 		if (!hash_method.equals_cs("plain"))
 			return;
 
-		Anope::string b64pass;
-		Anope::B64Encode(req->GetPassword(), b64pass);
-		auto enc = "plain:" + b64pass;
+		auto enc = "plain:" + Anope::B64Encode(req->GetPassword());
 		if (nc->pass.equals_cs(enc))
 		{
 			// If we are NOT the first encryption module we want to re-encrypt

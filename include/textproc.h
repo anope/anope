@@ -21,6 +21,16 @@
 
 namespace Anope
 {
+	/** Encode a string as base-64.
+	 * @param str The string to encode as base-64 .
+	 */
+	extern CoreExport Anope::string B64Encode(const Anope::string &str);
+
+	/** Decode a string from base-64.
+	 * @param str The string to decode from base-64.
+	 */
+	extern CoreExport Anope::string B64Decode(const Anope::string &str);
+
 	/** Calculates the levenshtein distance between two strings.
 	 * @param s1 The first string.
 	 * @param s2 The second string.

@@ -1233,8 +1233,7 @@ struct IRCDMessageNick final
 			Anope::string ip;
 			if (params[9] != "*")
 			{
-				Anope::string decoded_ip;
-				Anope::B64Decode(params[9], decoded_ip);
+				auto decoded_ip = Anope::B64Decode(params[9]);
 
 				sockaddrs ip_addr;
 				ip_addr.ntop(params[9].length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
@@ -1646,8 +1645,7 @@ struct IRCDMessageUID final
 
 		if (ip != "*")
 		{
-			Anope::string decoded_ip;
-			Anope::B64Decode(ip, decoded_ip);
+			auto decoded_ip = Anope::B64Decode(ip);
 
 			sockaddrs ip_addr;
 			ip_addr.ntop(ip.length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());

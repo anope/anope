@@ -1121,8 +1121,7 @@ struct IRCDMessageCapab final
 		if (challenge.empty() || !sha256)
 			return Config->Uplinks[Anope::CurrentUplink].password;
 
-		Anope::string b64challenge;
-		Anope::B64Encode(sha256->HMAC(Config->Uplinks[Anope::CurrentUplink].password, challenge), b64challenge);
+		auto b64challenge = Anope::B64Encode(sha256->HMAC(Config->Uplinks[Anope::CurrentUplink].password, challenge));
 		challenge.clear();
 
 		return "AUTH:" + b64challenge.rtrim('=');

@@ -100,8 +100,7 @@ public:
 		else if (m.type == "C")
 		{
 			// message = [authzid] UTF8NUL authcid UTF8NUL passwd
-			Anope::string message;
-			Anope::B64Decode(m.data[0], message);
+			auto message = Anope::B64Decode(m.data[0]);
 
 			size_t zcsep = message.find('\0');
 			if (zcsep == Anope::string::npos)
@@ -218,8 +217,7 @@ public:
 		}
 		else if (m.type == "C")
 		{
-			Anope::string decoded;
-			Anope::B64Decode(m.data[0], decoded);
+			auto decoded = Anope::B64Decode(m.data[0]);
 
 			auto user = sess->GetUserInfo();
 			if (!decoded.empty())

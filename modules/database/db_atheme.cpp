@@ -443,10 +443,9 @@ private:
 		if (pass.compare(0, 18, "$anope$enc_sha256$", 18) == 0)
 		{
 			auto sep = pass.find('$', 18);
-			Anope::string iv, pass;
-			Anope::B64Decode(pass.substr(18, sep - 18), iv);
-			Anope::B64Decode(pass.substr(sep + 1), pass);
-			nc->pass = "sha256:" + Anope::Hex(pass) + ":" + Anope::Hex(iv);
+			auto iv = Anope::B64Decode(pass.substr(18, sep - 18));
+			auto pw = Anope::B64Decode(pass.substr(sep + 1));
+			nc->pass = "sha256:" + Anope::Hex(pw) + ":" + Anope::Hex(iv);
 		}
 
 		else if (pass.compare(0, 9, "$argon2d$", 9) == 0)
@@ -460,8 +459,7 @@ private:
 
 		else if (pass.compare(0, 8, "$base64$", 8) == 0)
 		{
-			Anope::string rawpass;
-			Anope::B64Decode(pass.substr(8), rawpass);
+			auto rawpass = Anope::B64Decode(pass.substr(8));
 			Anope::Encrypt(rawpass, nc->pass);
 		}
 

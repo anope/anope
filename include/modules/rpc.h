@@ -228,9 +228,7 @@ public:
 		if (header.compare(0, 7, "Bearer ", 7) != 0)
 			return false; // No token provided.
 
-		Anope::string rawtoken;
-		Anope::B64Decode(header.substr(7), rawtoken);
-
+		auto rawtoken = Anope::B64Decode(header.substr(7));
 		for (const auto &token : tokens)
 		{
 			if (!CompareToken(token, rawtoken))

@@ -14,7 +14,7 @@
 #define ANOPE_FORMAT(LAST, FORMAT, BUFFER) \
 	do { \
 		va_list _valist; \
-		va_start(_valist, (LAST)); \
+		va_start(_valist, LAST); \
 		(BUFFER) = Anope::Format(_valist, (FORMAT)); \
 		va_end(_valist); \
 	} while (false);

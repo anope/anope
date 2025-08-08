@@ -17,14 +17,6 @@ class ESHA256 final
 {
 private:
 	unsigned iv[8];
-	bool use_iv;
-
-	/* initializes the IV with a new random value */
-	void NewRandomIV()
-	{
-		for (auto &ivsegment : iv)
-			ivsegment = static_cast<uint32_t>(Anope::RandomNumber());
-	}
 
 	/* returns the IV as base64-encrypted string */
 	Anope::string GetIVString()
@@ -50,11 +42,6 @@ private:
 
 	Anope::string EncryptInternal(const Anope::string &src)
 	{
-		if (!use_iv)
-			NewRandomIV();
-		else
-			use_iv = false;
-
 		sha256_ctx ctx;
 		sha256_init(&ctx);
 		for (size_t i = 0; i < 8; ++i)
@@ -71,7 +58,6 @@ public:
 	ESHA256(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, DEPRECATED | ENCRYPTION | VENDOR)
 	{
-		use_iv = false;
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
 			throw ModuleException("enc_sha256 is deprecated and can not be used as a primary encryption method");
 	}
@@ -92,7 +78,6 @@ public:
 			return;
 
 		GetIVFromPass(nc->pass);
-		use_iv = true;
 		auto enc = EncryptInternal(req->GetPassword());
 		if (nc->pass.equals_cs(enc))
 		{

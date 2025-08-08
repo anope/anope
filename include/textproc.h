@@ -21,6 +21,12 @@
 
 namespace Anope
 {
+	/** Calculates the levenshtein distance between two strings.
+	 * @param s1 The first string.
+	 * @param s2 The second string.
+	 */
+	extern CoreExport size_t Distance(const Anope::string &s1, const Anope::string &s2);
+
 	/** Expands a path fragment that is relative to the base directory.
 	 * @param base The base directory that it is relative to.
 	 * @param fragment The fragment to expand.

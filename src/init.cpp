@@ -557,10 +557,10 @@ bool Anope::Init(int ac, char **av)
 
 	if (!Anope::NoDB)
 	{
-		if (!ModuleManager::FindFirstOf(DATABASE))
+		if (!ModuleManager::FindFirstOf(DATABASE, true))
 			throw CoreException("You must load a non-deprecated database module!");
 
-		if (!ModuleManager::FindFirstOf(ENCRYPTION))
+		if (!ModuleManager::FindFirstOf(ENCRYPTION, true))
 			throw CoreException("You must load a non-deprecated encryption module!");
 	}
 

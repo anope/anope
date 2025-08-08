@@ -262,11 +262,14 @@ Module *ModuleManager::FindModule(const Anope::string &name)
 	return NULL;
 }
 
-Module *ModuleManager::FindFirstOf(ModType type, Module *ignore)
+Module *ModuleManager::FindFirstOf(ModType type, bool ignoredeprecated)
 {
 	for (auto *m : Modules)
 	{
-		if (m->type & type && m != ignore)
+		if (ignoredeprecated && (m->type & DEPRECATED))
+			continue;
+
+		if (m->type & type)
 			return m;
 	}
 

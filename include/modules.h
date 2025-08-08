@@ -1248,10 +1248,10 @@ public:
 
 	/** Find the first module of a certain type
 	 * @param type The module type
-	 * @param ignore If non-nullptr then a module to ignore.
+	 * @param ignoredeprecated Whether to ignore deprecated modules.
 	 * @return The module
 	 */
-	static Module *FindFirstOf(ModType type, Module *ignore = nullptr);
+	static Module *FindFirstOf(ModType type, bool ignoredeprecated = false);
 
 	/** Checks whether this version of Anope is at least major.minor.patch.build
 	 * Throws a ModuleException if not

@@ -509,7 +509,9 @@ public:
 		if(!sasl.badpasslimit)
 			sasl.badpasslimit = options.Get<unsigned>("badpasslimit");
 
-		sasl.badpasstimeout = options.Get<time_t>("badpasstimeout");
+		sasl.badpasstimeout = modconf.Get<time_t>("badpasstimeout");
+		if (!sasl.badpasstimeout)
+			sasl.badpasstimeout = options.Get<unsigned>("badpasstimeout");
 	}
 
 	~ModuleSASL() override

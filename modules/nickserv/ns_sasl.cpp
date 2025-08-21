@@ -239,6 +239,9 @@ private:
 	Anope::map<SASL::Session *> sessions;
 
 public:
+	unsigned badpasslimit;
+	unsigned badpasstimeout;
+
 	SASLService(Module *o)
 		: SASL::Service(o)
 		, Timer(o, 60, true)
@@ -403,7 +406,6 @@ public:
 			return;
 		}
 
-		const auto badpasslimit = Config->GetBlock("options").Get<unsigned>("badpasslimit");
 		if (!badpasslimit)
 			return;
 
@@ -412,7 +414,6 @@ public:
 			it = badpasswords.emplace(session->uid, std::make_pair(0, 0)).first;
 		auto &[invalid_pw_time, invalid_pw_count] = it->second;
 
-		const auto badpasstimeout = Config->GetBlock("options").Get<time_t>("badpasstimeout");
 		if (badpasstimeout > 0 && invalid_pw_time > 0 && invalid_pw_time < Anope::CurTime - badpasstimeout)
 			invalid_pw_count = 0;
 
@@ -437,7 +438,6 @@ public:
 
 	void Tick() override
 	{
-		const auto badpasstimeout = Config->GetBlock("options").Get<time_t>("badpasstimeout");
 		for (auto it = badpasswords.begin(); it != badpasswords.end(); )
 		{
 			if (it->second.first + badpasstimeout < Anope::CurTime)
@@ -498,6 +498,18 @@ public:
 			CheckMechs();
 		}
 		catch (ModuleException &) { }
+	}
+
+	void OnReload(Configuration::Conf &conf) override
+	{
+		const auto &modconf = conf.GetModule(this);
+		const auto &options = conf.GetBlock("options");
+
+		sasl.badpasslimit = modconf.Get<unsigned>("badpasslimit");
+		if(!sasl.badpasslimit)
+			sasl.badpasslimit = options.Get<unsigned>("badpasslimit");
+
+		sasl.badpasstimeout = options.Get<time_t>("badpasstimeout");
 	}
 
 	~ModuleSASL() override

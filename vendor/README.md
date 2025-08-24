@@ -32,6 +32,16 @@ This directory contains vendored dependencies that are shipped with Anope to avo
 
 **Website** &mdash; [http://www.ouah.org/ogay/sha2/](http://www.ouah.org/ogay/sha2/)
 
+## utfcpp
+
+**Author** &mdash; Nemanja Trifunovic
+
+**License** &mdash; Boost Software License
+
+**Version** &mdash; v4.0.6
+
+**Website** &mdash; [https://github.com/nemtrif/utfcpp](https://github.com/nemtrif/utfcpp)
+
 ## yyjson
 
 **Author** &mdash; Yaoyuan Guo

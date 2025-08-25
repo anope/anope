@@ -241,7 +241,7 @@ static void write_pidfile()
 	{
 		pid_t oldpid = 0;
 		oldstream >> oldpid;
-		if (oldpid && kill(oldpid, 0) == 0)
+		if (oldpid && oldpid != getpid() && kill(oldpid, 0) == 0)
 			throw CoreException("Anope is already running with process id " + Anope::ToString(oldpid));
 	}
 	oldstream.close();

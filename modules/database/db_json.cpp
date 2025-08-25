@@ -190,7 +190,7 @@ private:
 			return; // No backups.
 
 		auto backupdir = Anope::ExpandData(modconf.Get<Anope::string>("backup_directory", "backups"));
-		if (!fs::is_directory(backupdir.str(), ec) && !ec)
+		if (!fs::is_directory(backupdir.str(), ec))
 		{
 			fs::create_directories(backupdir.str(), ec);
 			if (ec)

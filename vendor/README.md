@@ -48,6 +48,6 @@ This directory contains vendored dependencies that are shipped with Anope to avo
 
 **License** &mdash; MIT License
 
-**Version** &mdash; 0.11.1
+**Version** &mdash; 0.12.0
 
 **Website** &mdash; [https://github.com/ibireme/yyjson](https://github.com/ibireme/yyjson)

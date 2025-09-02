@@ -16,7 +16,7 @@ jobs:
       CONAN_USER_HOME: ${{ github.workspace }}/win/build
       CONAN_USER_HOME_SHORT: None
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup NSIS
         run: |-

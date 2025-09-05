@@ -198,7 +198,7 @@ void IRC2SQL::OnSetDisplayedHost(User *u)
 void IRC2SQL::OnChannelCreate(Channel *c)
 {
 	query = "INSERT INTO `" + prefix + "chan` (channel, topic, topicauthor, topictime, modes) "
-		"VALUES (@channel@,@topic@,@topicauthor@,@topictime@,@modes@) "
+		"VALUES (@channel@,@topic@,@topicauthor@,FROM_UNIXTIME(@topictime@),@modes@) "
 		"ON DUPLICATE KEY UPDATE channel=VALUES(channel), topic=VALUES(topic),"
 			"topicauthor=VALUES(topicauthor), topictime=VALUES(topictime), modes=VALUES(modes)";
 	query.SetValue("channel", c->name);

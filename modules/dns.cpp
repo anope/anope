@@ -197,8 +197,12 @@ class Packet final
 				if (pos + rdlength > input_size)
 					throw SocketException("Unable to unpack TXT resource record");
 
-				record.rdata = std::string(reinterpret_cast<const char* >(input + pos), rdlength);
-				pos += rdlength;
+				auto txtlength = input[pos++];
+				if (pos + txtlength > input_size)
+					throw SocketException("Unable to unpack TXT resource record");
+
+				record.rdata = Anope::string(reinterpret_cast<const char* >(input + pos), txtlength);
+				pos += rdlength - 1;
 				break;
 			}
 			case DNS::QUERY_SRV:

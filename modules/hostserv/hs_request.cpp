@@ -582,7 +582,7 @@ public:
 	{
 		const auto &block = conf.GetModule(this);
 		commandhsvalidate.cooldown = block.Get<time_t>("validationcooldown", "5m");
-		validation_record = block.Get<const Anope::string>("dnsrecord", "anope-dns-validation");
+		validation_record = block.Get<const Anope::string>("validationrecord", "anope-dns-validation");
 	}
 };
 

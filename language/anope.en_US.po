@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-30 15:30+0100\n"
-"PO-Revision-Date: 2025-07-30 15:30+0100\n"
+"POT-Creation-Date: 2025-09-06 17:45+0100\n"
+"PO-Revision-Date: 2025-09-06 17:45+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -5610,6 +5610,10 @@ msgid "Unable to find regex engine %s."
 msgstr ""
 
 #, c-format
+msgid "Unable to find the DNS record required to validate %s. If you have not already done this add a TXT record for %s with the value %s and re-execute this command."
+msgstr ""
+
+#, c-format
 msgid "Unable to load module %s."
 msgstr ""
 
@@ -5768,6 +5772,10 @@ msgid "VHost for %s has been rejected."
 msgstr ""
 
 #, c-format
+msgid "VHost for %s has been validated using DNS."
+msgstr ""
+
+#, c-format
 msgid "VHost for account %s set to %s."
 msgstr ""
 
@@ -5782,6 +5790,9 @@ msgid "VIEW [mask | list | id]"
 msgstr ""
 
 msgid "VIEW [mask | list]"
+msgstr ""
+
+msgid "Validates a previously requested vhost using DNS"
 msgstr ""
 
 msgid "Value"
@@ -6107,6 +6118,10 @@ msgstr ""
 msgid "You must wait %s before registering your nick."
 msgstr ""
 
+#, c-format
+msgid "You must wait for %s before trying DNS validation again."
+msgstr ""
+
 msgid "You need to be identified to use this command."
 msgstr ""
 
@@ -6269,7 +6284,15 @@ msgstr ""
 msgid "Your requested vhost has been rejected. Reason: %s"
 msgstr ""
 
-msgid "Your vhost has been requested."
+msgid "Your requested vhost has been validated via DNS."
+msgstr ""
+
+#, c-format
+msgid "Your vhost %s has been requested."
+msgstr ""
+
+#, c-format
+msgid "Your vhost %s has been requested. If the requested vhost is for a valid DNS name you can add a TXT record for %s with the value %s and automatically approve your vhost using %s."
 msgstr ""
 
 #, c-format

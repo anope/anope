@@ -15,11 +15,19 @@
  */
 
 #include "module.h"
+#include "modules/dns.h"
 #include "modules/hostserv/request.h"
 
+static ServiceReference<DNS::Manager> dnsmanager("DNS::Manager", "dns/manager");
 static ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
 
 static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vident, const Anope::string &vhost);
+
+namespace
+{
+	// The name of the DNS record used for validation.
+	Anope::string validation_record;
+}
 
 struct HostRequestImpl final
 	: HostRequest
@@ -28,6 +36,23 @@ struct HostRequestImpl final
 	HostRequestImpl(Extensible *)
 		: Serializable("HostRequest")
 	{
+	}
+
+	static HostRequestImpl *Get(NickAlias *na)
+	{
+		return na ? na->GetExt<HostRequestImpl>("hostrequest") : nullptr;
+	}
+
+	Anope::string Mask() const
+	{
+		if (ident.empty())
+			return host;
+		return ident + "@" + host;
+	}
+
+	Anope::string GetValidationRecord() const
+	{
+		return Anope::Format("%s=%s", validation_record.c_str(), this->validation_token.c_str());
 	}
 };
 
@@ -46,6 +71,8 @@ struct HostRequestTypeImpl final
 		data.Store("ident", req->ident);
 		data.Store("host", req->host);
 		data.Store("time", req->time);
+		data.Store("validation_token", req->validation_token);
+		data.Store("last_validation", req->last_validation);
 	}
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
@@ -68,9 +95,93 @@ struct HostRequestTypeImpl final
 			data["ident"] >> req->ident;
 			data["host"] >> req->host;
 			data["time"] >> req->time;
+			data["validation_token"] >> req->validation_token;
+			data["last_validation"] >> req->last_validation;
 		}
 
 		return req;
+	}
+};
+
+class DNSHostResolver final
+	: public DNS::Request
+{
+private:
+	Command *command;
+	Reference<NickAlias> nickalias;
+	CommandSource source;
+
+	void HandleError(HostRequestImpl *hr)
+	{
+		source.Reply(_(
+				"Unable to find the DNS record required to validate \002%s\002. If you have not already "
+				"done this add a TXT record for %s with the value %s and re-execute this command."
+			),
+			hr->Mask().c_str(),
+			hr->host.c_str(),
+			hr->GetValidationRecord().c_str()
+		);
+	}
+
+public:
+	DNSHostResolver(Command *cmd, HostRequest *hr, NickAlias *na, const CommandSource &src)
+		: Request(dnsmanager, cmd->module, hr->host, DNS::QUERY_TXT, false)
+		, command(cmd)
+		, nickalias(na)
+		, source(src)
+	{
+		hr->last_validation = Anope::CurTime;
+		Log(LOG_DEBUG) << "Checking " << hr->host << " for " << hr->validation_token;
+	}
+
+	void OnError(const DNS::Query *record) override
+	{
+		NickAlias *na = nickalias;
+		if (!na)
+			return; // Nick has been dropped.
+
+		auto *hr = HostRequestImpl::Get(na);
+		if (!hr)
+		{
+			source.Reply(_("No request for nick %s found."), source.GetNick().c_str());
+			return;
+		}
+
+		HandleError(hr);
+	}
+
+	void OnLookupComplete(const DNS::Query *record) override
+	{
+		NickAlias *na = nickalias;
+		if (!na)
+			return; // Nick has been dropped.
+
+		auto *hr = HostRequestImpl::Get(na);
+		if (!hr)
+		{
+			source.Reply(_("No request for nick %s found."), source.GetNick().c_str());
+			return;
+		}
+
+		for (const auto &answer : record->answers)
+		{
+			if (answer.rdata != hr->GetValidationRecord())
+				continue; // Not for us.
+
+			na->SetVHost(hr->ident, hr->host, source.GetNick(), hr->time);
+			FOREACH_MOD(OnSetVHost, (na));
+
+			if (Config->GetModule(command->module).Get<bool>("memouser") && memoserv)
+				memoserv->Send(source.service->nick, na->nick, _("Your requested vhost has been validated via DNS."), true);
+
+			source.Reply(_("VHost for %s has been validated using DNS."), na->nick.c_str());
+			Log(LOG_COMMAND, source, command) << "for " << na->nick << " for vhost " << hr->Mask();
+			na->Shrink<HostRequestImpl>("hostrequest");
+
+			return; // We're done.
+		}
+
+		HandleError(hr);
 	}
 };
 
@@ -171,9 +282,28 @@ public:
 		req.ident = user;
 		req.host = host;
 		req.time = Anope::CurTime;
+		req.validation_token = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
 		na->Extend<HostRequestImpl>("hostrequest", req);
 
-		source.Reply(_("Your vhost has been requested."));
+		BotInfo *bi;
+		Anope::string cmd;
+		if (dnsmanager && Command::FindCommandFromService("hostserv/validate", bi, cmd))
+		{
+			source.Reply(_(
+					"Your vhost \002%s\002 has been requested. If the requested vhost is for a valid "
+					"DNS name you can add a TXT record for %s with the value %s and automatically "
+					"approve your vhost using \002%s\002."
+				),
+				req.Mask().c_str(),
+				req.host.c_str(),
+				req.GetValidationRecord().c_str(),
+				bi->GetQueryCommand("hostserv/validate").c_str()
+			);
+		}
+		else
+			source.Reply(_("Your vhost \002%s\002 has been requested."), req.Mask().c_str());
+
+
 		req_send_memos(owner, source, user, host);
 		Log(LOG_COMMAND, source, this) << "to request new vhost " << (!user.empty() ? user + "@" : "") << host;
 	}
@@ -357,6 +487,72 @@ public:
 	}
 };
 
+class CommandHSValidate final
+	: public Command
+{
+public:
+	time_t cooldown;
+
+	CommandHSValidate(Module *creator)
+		: Command(creator, "hostserv/validate", 0)
+	{
+		this->SetDesc(_("Validates a previously requested vhost using DNS"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
+		auto *na = NickAlias::Find(source.GetNick());
+		if (!na || na->nc != source.GetAccount())
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
+		auto *req = HostRequestImpl::Get(na);
+		if (!req)
+		{
+			source.Reply(_("No request for nick %s found."), source.GetNick().c_str());
+			return;
+		}
+
+		auto next_validation = req->last_validation + cooldown;
+		if (req->last_validation && next_validation > Anope::CurTime)
+		{
+			source.Reply(_("You must wait for %s before trying DNS validation again."),
+				Anope::Duration(next_validation - Anope::CurTime).c_str());
+			return;
+		}
+
+		DNSHostResolver *res = nullptr;
+		try
+		{
+			if (!dnsmanager)
+				throw SocketException("DNS is not available");
+
+			res = new DNSHostResolver(this, req, na, source);
+			dnsmanager->Process(res);
+		}
+		catch (const SocketException &ex)
+		{
+			Log(this->module) << ex.GetReason();
+			source.Reply("Unable to validate vhosts right now. Please try again later.");
+			delete res;
+		}
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
+	{
+		// TODO
+		return true;
+	}
+};
+
 class HSRequest final
 	: public Module
 {
@@ -364,6 +560,7 @@ class HSRequest final
 	CommandHSActivate commandhsactive;
 	CommandHSReject commandhsreject;
 	CommandHSWaiting commandhswaiting;
+	CommandHSValidate commandhsvalidate;
 	ExtensibleItem<HostRequestImpl> hostrequest;
 	HostRequestTypeImpl request_type;
 
@@ -374,10 +571,18 @@ public:
 		, commandhsactive(this)
 		, commandhsreject(this)
 		, commandhswaiting(this)
+		, commandhsvalidate(this)
 		, hostrequest(this, "hostrequest")
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
+	}
+
+	void OnReload(Configuration::Conf &conf) override
+	{
+		const auto &block = conf.GetModule(this);
+		commandhsvalidate.cooldown = block.Get<time_t>("validationcooldown", "5m");
+		validation_record = block.Get<const Anope::string>("dnsrecord", "anope-dns-validation");
 	}
 };
 

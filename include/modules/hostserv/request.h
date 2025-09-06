@@ -18,6 +18,8 @@ public:
 	Anope::string ident;
 	Anope::string host;
 	time_t time = 0;
+	Anope::string validation_token;
+	time_t last_validation = 0;
 
 	virtual ~HostRequest() = default;
 };

@@ -7,228 +7,7 @@
  */
 
 #include "module.h"
-#include "modules/nickserv/cert.h"
 #include "modules/nickserv/sasl.h"
-
-class SASLIdentifyRequest final
-	: public IdentifyRequest
-{
-private:
-	Anope::string uid;
-	Anope::string hostname;
-
-	inline Anope::string GetUserInfo()
-	{
-		auto *u = User::Find(uid);
-		if (u)
-			return u->GetMask();
-		if (!hostname.empty() && !GetAddress().empty())
-			return Anope::Format("%s (%s)", hostname.c_str(), GetAddress().c_str());
-		return "A user";
-	};
-
-public:
-	SASLIdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass, const Anope::string &h, const Anope::string &i)
-		: IdentifyRequest(m, acc, pass, i)
-		, uid(id)
-		, hostname(h)
-	{
-	}
-
-	void OnSuccess() override
-	{
-		if (!SASL::service)
-			return;
-
-		auto *na = NickAlias::Find(GetAccount());
-		if (!na || na->nc->HasExt("NS_SUSPENDED") || na->nc->HasExt("UNCONFIRMED"))
-			return OnFail();
-
-		auto maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
-		if (maxlogins && na->nc->users.size() >= maxlogins)
-			return OnFail();
-
-		auto *s = SASL::service->GetSession(uid);
-		if (s)
-		{
-			Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << GetUserInfo() << " identified to account " << this->GetAccount() << " using SASL";
-			SASL::service->Succeed(s, na->nc);
-			delete s;
-		}
-	}
-
-	void OnFail() override
-	{
-		if (!SASL::service)
-			return;
-
-		auto *s = SASL::service->GetSession(uid);
-		if (s)
-		{
-			SASL::service->Fail(s);
-			delete s;
-		}
-
-		Anope::string accountstatus;
-		auto *na = NickAlias::Find(GetAccount());
-		if (!na)
-			accountstatus = "nonexistent ";
-		else if (na->nc->HasExt("NS_SUSPENDED"))
-			accountstatus = "suspended ";
-		else if (na->nc->HasExt("UNCONFIRMED"))
-			accountstatus = "unconfirmed ";
-
-		Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << GetUserInfo() << " failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
-	}
-};
-
-class Plain final
-	: public SASL::Mechanism
-{
-public:
-	Plain(Module *o)
-		: SASL::Mechanism(o, "PLAIN")
-	{
-	}
-
-	bool ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
-	{
-		if (m.type == "S")
-		{
-			SASL::service->SendMessage(sess, "C", "+");
-		}
-		else if (m.type == "C")
-		{
-			// message = [authzid] UTF8NUL authcid UTF8NUL passwd
-			auto message = Anope::B64Decode(m.data[0]);
-
-			size_t zcsep = message.find('\0');
-			if (zcsep == Anope::string::npos)
-				return false;
-
-			size_t cpsep = message.find('\0', zcsep + 1);
-			if (cpsep == Anope::string::npos)
-				return false;
-
-			Anope::string authzid = message.substr(0, zcsep);
-			Anope::string authcid = message.substr(zcsep + 1, cpsep - zcsep - 1);
-
-			// We don't support having an authcid that is different to the authzid.
-			if (!authzid.empty() && authzid != authcid)
-				return false;
-
-			Anope::string passwd = message.substr(cpsep + 1);
-
-			if (authcid.empty() || passwd.empty() || !IRCD->IsNickValid(authcid) || passwd.find_first_of("\r\n\0") != Anope::string::npos)
-				return false;
-
-			auto *req = new SASLIdentifyRequest(this->owner, m.source, authcid, passwd, sess->hostname, sess->ip);
-			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
-			req->Dispatch();
-		}
-		return true;
-	}
-};
-
-class External final
-	: public SASL::Mechanism
-{
-private:
-	ServiceReference<CertService> certs;
-
-	struct Session final
-		: SASL::Session
-	{
-		std::vector<Anope::string> certs;
-
-		Session(SASL::Mechanism *m, const Anope::string &u) : SASL::Session(m, u) { }
-	};
-
-public:
-	External(Module *o)
-		: SASL::Mechanism(o, "EXTERNAL")
-		, certs("CertService", "certs")
-	{
-		if (!IRCD || !IRCD->CanCertFP)
-			throw ModuleException("No CertFP");
-	}
-
-	Session *CreateSession(const Anope::string &uid) override
-	{
-		return new Session(this, uid);
-	}
-
-	bool ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
-	{
-		Session *mysess = anope_dynamic_static_cast<Session *>(sess);
-
-		if (m.type == "S")
-		{
-			mysess->certs.assign(m.data.begin() + 1, m.data.end());
-
-			SASL::service->SendMessage(sess, "C", "+");
-		}
-		else if (m.type == "C")
-		{
-			if (!certs || mysess->certs.empty())
-				return false;
-
-			for (auto it = mysess->certs.begin(); it != mysess->certs.end(); ++it)
-			{
-				auto *nc = certs->FindAccountFromCert(*it);
-				if (nc && !nc->HasExt("NS_SUSPENDED") && !nc->HasExt("UNCONFIRMED"))
-				{
-					// If we are using a fallback cert then upgrade it.
-					if (it != mysess->certs.begin())
-					{
-						auto *cl = nc->GetExt<NSCertList>("certificates");
-						if (cl)
-							cl->ReplaceCert(*it, mysess->certs[0]);
-					}
-
-					Log(this->owner, "sasl", Config->GetClient("NickServ")) << sess->GetUserInfo() << " identified to account " << nc->display << " using SASL EXTERNAL";
-					SASL::service->Succeed(sess, nc);
-					delete sess;
-					return true;
-				}
-			}
-
-			Log(this->owner, "sasl", Config->GetClient("NickServ")) << sess->GetUserInfo() << " failed to identify using certificate " << mysess->certs.front() << " using SASL EXTERNAL";
-			return false;
-		}
-		return true;
-	}
-};
-
-class Anonymous final
-	: public SASL::Mechanism
-{
-public:
-	Anonymous(Module *o)
-		: SASL::Mechanism(o, "ANONYMOUS")
-	{
-	}
-
-	bool ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
-	{
-		if (m.type == "S")
-		{
-			SASL::service->SendMessage(sess, "C", "+");
-		}
-		else if (m.type == "C")
-		{
-			auto decoded = Anope::B64Decode(m.data[0]);
-
-			auto user = sess->GetUserInfo();
-			if (!decoded.empty())
-				user += " [" + decoded + "]";
-
-			Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " unidentified using SASL ANONYMOUS";
-			SASL::service->Succeed(sess, nullptr);
-		}
-		return true;
-	}
-};
 
 class SASLService final
 	: public SASL::Service
@@ -461,12 +240,8 @@ public:
 class ModuleSASL final
 	: public Module
 {
+private:
 	SASLService sasl;
-
-	Anonymous anonymous;
-	Plain plain;
-	External *external = nullptr;
-
 	std::vector<Anope::string> mechs;
 
 	void CheckMechs()
@@ -486,18 +261,9 @@ public:
 	ModuleSASL(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, VENDOR)
 		, sasl(this)
-		, anonymous(this)
-		, plain(this)
 	{
 		if (!SASL::protocol_interface)
 			throw ModuleException("Your IRCd does not support SASL");
-
-		try
-		{
-			external = new External(this);
-			CheckMechs();
-		}
-		catch (ModuleException &) { }
 	}
 
 	void OnReload(Configuration::Conf &conf) override
@@ -512,11 +278,6 @@ public:
 		sasl.badpasstimeout = modconf.Get<time_t>("badpasstimeout");
 		if (!sasl.badpasstimeout)
 			sasl.badpasstimeout = options.Get<unsigned>("badpasstimeout");
-	}
-
-	~ModuleSASL() override
-	{
-		delete external;
 	}
 
 	void OnModuleLoad(User *, Module *) override

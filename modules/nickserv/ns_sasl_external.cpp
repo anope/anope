@@ -45,8 +45,10 @@ public:
 
 		if (m.type == "S")
 		{
-			mysess->certs.assign(m.data.begin() + 1, m.data.end());
+			if (m.data.size() < 2)
+				return false; // No client certs.
 
+			mysess->certs.assign(m.data.begin() + 1, m.data.end());
 			SASL::service->SendMessage(sess, "C", "+");
 		}
 		else if (m.type == "C")

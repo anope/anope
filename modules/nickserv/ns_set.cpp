@@ -442,18 +442,6 @@ public:
 		if (noexpire.HasExt(na))
 			info.AddOption(_("No expiry"));
 	}
-
-	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
-	{
-		if (u->IsIdentified() && setter.GetUser() == u)
-			u->Account()->last_modes = u->GetModeList();
-	}
-
-	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override
-	{
-		if (u->IsIdentified() && setter.GetUser() == u)
-			u->Account()->last_modes = u->GetModeList();
-	}
 };
 
 MODULE_INIT(NSSet)

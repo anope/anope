@@ -245,7 +245,7 @@ public:
 		DThread = new DispatcherThread();
 		DThread->Start();
 
-		Log(this) << "Module was compiled against MySQL version " << (MYSQL_VERSION_ID / 10000) << "." << (MYSQL_VERSION_ID / 100 % 100) << "." << (MYSQL_VERSION_ID % 100) << " and is running against version " << mysql_get_client_info();
+		Log(this) << "Module was compiled against MySQL version " << MYSQL_SERVER_VERSION << " and is running against version " << mysql_get_client_info();
 	}
 
 	~ModuleSQL()

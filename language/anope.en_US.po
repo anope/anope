@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-06 17:45+0100\n"
-"PO-Revision-Date: 2025-09-06 17:45+0100\n"
+"POT-Creation-Date: 2025-09-12 15:43+0100\n"
+"PO-Revision-Date: 2025-09-12 15:43+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -930,10 +930,6 @@ msgid "%s has no new memos."
 msgstr ""
 
 #, c-format
-msgid "%s is %s"
-msgstr ""
-
-#, c-format
 msgid "%s is a Services Operator of type %s."
 msgstr ""
 
@@ -1261,9 +1257,6 @@ msgstr ""
 
 #, c-format
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
-msgstr ""
-
-msgid "Account id"
 msgstr ""
 
 msgid "Account registered"
@@ -1691,7 +1684,7 @@ msgstr ""
 msgid "Associates the given email address with your nickname. This address will be displayed whenever someone requests information on the nickname with the INFO command."
 msgstr ""
 
-msgid "Auto-op"
+msgid "Auto op"
 msgstr ""
 
 #, c-format
@@ -3039,6 +3032,10 @@ msgid "Information about channel %s:"
 msgstr ""
 
 #, c-format
+msgid "Information about nick %s:"
+msgstr ""
+
+#, c-format
 msgid "Invalid duration %s, using %d days."
 msgstr ""
 
@@ -3662,7 +3659,7 @@ msgstr ""
 msgid "Never"
 msgstr ""
 
-msgid "Never-op"
+msgid "Never op"
 msgstr ""
 
 msgid "Nick"

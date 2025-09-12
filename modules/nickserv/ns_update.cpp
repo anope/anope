@@ -27,10 +27,7 @@ public:
 		NickAlias *na = NickAlias::Find(u->nick);
 
 		if (na && na->nc == source.GetAccount())
-		{
-			na->last_realname = u->realname;
 			na->last_seen = Anope::CurTime;
-		}
 
 		FOREACH_MOD(OnNickUpdate, (u));
 

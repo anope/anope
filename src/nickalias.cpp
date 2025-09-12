@@ -155,7 +155,6 @@ void NickAlias::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 	const auto *na = static_cast<const NickAlias *>(obj);
 	data.Store("nick", na->nick);
 	data.Store("last_quit", na->last_quit);
-	data.Store("last_realname", na->last_realname);
 	data.Store("last_userhost", na->last_userhost);
 	data.Store("last_userhost_real", na->last_userhost_real);
 	data.Store("registered", na->registered);
@@ -208,7 +207,6 @@ Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &d
 	}
 
 	data["last_quit"] >> na->last_quit;
-	data["last_realname"] >> na->last_realname;
 	data["last_userhost"] >> na->last_userhost;
 	data["last_userhost_real"] >> na->last_userhost_real;
 	data["registered"] >> na->registered;

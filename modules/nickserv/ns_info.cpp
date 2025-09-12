@@ -78,7 +78,7 @@ public:
 			if (has_auspex || na->nc == source.GetAccount())
 				show_hidden = true;
 
-			source.Reply(_("%s is %s"), na->nick.c_str(), na->last_realname.c_str());
+			source.Reply(_("Information about nick \002%s\002:"), na->nick.c_str());
 
 			if (na->nc->HasExt("UNCONFIRMED"))
 				source.Reply(_("%s is an unconfirmed nickname."), na->nick.c_str());

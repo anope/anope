@@ -56,15 +56,7 @@ public:
 		if (u != NULL)
 		{
 			na->last_userhost = u->GetIdent() + "@" + u->GetDisplayedHost();
-			na->last_realname = u->realname;
-		}
-		else
-		{
-			na->last_realname = source.GetNick();
-		}
 
-		if (u != NULL)
-		{
 			IRCD->SendLogin(u, na); // protocol modules prevent this on unconfirmed accounts
 			u->Login(target->nc);
 			FOREACH_MOD(OnNickGroup, (u, target));

@@ -278,9 +278,6 @@ void User::SetRealname(const Anope::string &srealname)
 	this->realname = srealname;
 	NickAlias *na = NickAlias::Find(this->nick);
 
-	if (na && this->IsIdentified(true))
-		na->last_realname = srealname;
-
 	Log(this, "realname") << "changed realname to " << srealname;
 }
 
@@ -366,7 +363,6 @@ void User::Identify(NickAlias *na)
 	{
 		na->last_userhost = this->GetIdent() + "@" + this->GetDisplayedHost();
 		na->last_userhost_real = this->GetIdent() + "@" + this->host;
-		na->last_realname = this->realname;
 		na->last_seen = Anope::CurTime;
 	}
 
@@ -524,8 +520,6 @@ void User::UpdateHost()
 	{
 		na->last_userhost = this->GetIdent() + "@" + this->GetDisplayedHost();
 		na->last_userhost_real = this->GetIdent() + "@" + this->host;
-		// This is called on signon, and if users are introduced with an account it won't update
-		na->last_realname = this->realname;
 	}
 }
 

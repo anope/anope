@@ -48,7 +48,6 @@ private:
 public:
 	Anope::string nick;
 	Anope::string last_quit;
-	Anope::string last_realname;
 	/* Last cloaked user@host this nick was seen using. */
 	Anope::string last_userhost;
 	/* Last real user@host this nick was seen using. */

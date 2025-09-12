@@ -222,23 +222,21 @@ InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc)
 void InfoFormatter::Process(std::vector<Anope::string> &buffer)
 {
 	buffer.clear();
-
 	for (const auto &[key, value] : this->replies)
 	{
-		Anope::string s;
-		for (unsigned i = key.length(); i < this->longest; ++i)
-			s += " ";
-		s += key + ": " + Language::Translate(this->nc, value.c_str());
-
-		buffer.push_back(s);
+		auto line = key;
+		line += ": ";
+		line += Anope::string(longest - key.utf8length(), ' ');
+		line += Language::Translate(this->nc, value.c_str());
+		buffer.push_back(line);
 	}
 }
 
 Anope::string &InfoFormatter::operator[](const Anope::string &key)
 {
 	Anope::string tkey = Language::Translate(this->nc, key.c_str());
-	if (tkey.length() > this->longest)
-		this->longest = tkey.length();
+	if (tkey.utf8length() > this->longest)
+		this->longest = tkey.utf8length();
 	this->replies.emplace_back(tkey, "");
 	return this->replies.back().second;
 }

@@ -17,8 +17,6 @@
 #include "regchannel.h"
 #include "channels.h"
 
-#include "utfcpp/unchecked.h"
-
 void CommandReply::SendMessage(CommandSource &source, const Anope::string &msg)
 {
 	SendMessage(source.service, msg);
@@ -152,7 +150,7 @@ void Command::SendSyntax(CommandSource &source)
 {
 	auto first = true;
 	Anope::string prefix = Language::Translate(source.GetAccount(), _("Syntax"));
-	Anope::string padding(utf8::unchecked::distance(prefix.str().begin(), prefix.str().end()), ' ');
+	Anope::string padding(prefix.utf8length(), ' ');
 	for (const auto &[syntax, predicate] : this->syntax)
 	{
 		if (predicate && !predicate(source))

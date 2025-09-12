@@ -14,6 +14,7 @@
 #include <signal.h>
 
 #include "hashcomp.h"
+#include "utfcpp/unchecked.h"
 
 namespace Anope
 {
@@ -129,6 +130,7 @@ namespace Anope
 		 * Returns the string's length.
 		 */
 		inline size_type length() const { return this->_string.length(); }
+		inline size_type utf8length() const { return utf8::unchecked::distance(str().begin(), str().end()); }
 
 		/**
 		 * Returns the size of the currently allocated storage space in the string object.

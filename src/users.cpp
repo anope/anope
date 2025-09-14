@@ -276,8 +276,6 @@ void User::SetRealname(const Anope::string &srealname)
 		throw CoreException("realname empty in SetRealname");
 
 	this->realname = srealname;
-	NickAlias *na = NickAlias::Find(this->nick);
-
 	Log(this, "realname") << "changed realname to " << srealname;
 }
 

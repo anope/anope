@@ -309,8 +309,8 @@ void InfoFormatter::AddOption(const Anope::string &opt)
 void HelpWrapper::AddEntry(const Anope::string &name, const Anope::string &desc)
 {
 	entries.emplace_back(name, desc);
-	if (name.length() > longest)
-		longest = name.length();
+	if (name.utf8length() > longest)
+		longest = name.utf8length();
 }
 
 void HelpWrapper::SendTo(CommandSource &source)
@@ -329,13 +329,15 @@ void HelpWrapper::SendTo(CommandSource &source)
 		else
 		{
 			LineWrapper lw(Language::Translate(source.nc, entry_desc.c_str()), max_length);
-
 			Anope::string line;
-			if (lw.GetLine(line))
-				source.Reply("    %-*s    %s", (int)longest, entry_name.c_str(), line.c_str());
 
+			Anope::string padding(longest - entry_name.utf8length(), ' ');
+			if (lw.GetLine(line))
+				source.Reply("    %s%s    %s", entry_name.nobreak().c_str(), padding.c_str(), line.c_str());
+
+			padding = Anope::string(longest, ' ');
 			while (lw.GetLine(line))
-				source.Reply("    %-*s    %s", (int)longest, "", line.c_str());
+				source.Reply("    %s    %s", padding.c_str(), line.c_str());
 		}
 	}
 };

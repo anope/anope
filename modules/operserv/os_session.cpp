@@ -536,8 +536,8 @@ private:
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Limit")).AddColumn(_("Mask"));
-		list.SetFlexible(_("{number}: \002{mask}\002 -- {limit} sessions"));
+		list.AddColumn(_("Number")).AddColumn(_("Limit")).AddColumn(_("Mask")).AddColumn(_("Reason"));
+		list.SetFlexible(_("{number}: \002{mask}\002 -- {limit} sessions ({reason})"));
 
 		this->ProcessList(source, params, list);
 	}

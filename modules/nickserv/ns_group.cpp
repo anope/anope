@@ -332,12 +332,12 @@ public:
 			nc = source.GetAccount();
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
+		list.AddColumn(_("Nick")).AddColumn(_("Registered")).AddColumn(_("Expires"));
 		list.SetFlexible([](ListFormatter::ListEntry &row)
 		{
 			return row["Expires"].equals_cs(NO_EXPIRE)
-				? _("\002{nick}\002")
-				: _("\002{nick}\002: expires in {expires}");
+				? _("\002{nick}\002: registered on {registered}")
+				: _("\002{nick}\002: registered on {registered}; expires in {expires}");
 		});
 
 		time_t nickserv_expire = Config->GetModule("nickserv").Get<time_t>("expire", "90d"),
@@ -356,6 +356,7 @@ public:
 
 			ListFormatter::ListEntry entry;
 			entry["Nick"] = na2->nick;
+			entry["Registered"] = Anope::strftime(na2->registered);
 			entry["Expires"] = expires;
 			list.AddEntry(entry);
 		}

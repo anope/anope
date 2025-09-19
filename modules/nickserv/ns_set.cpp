@@ -248,105 +248,6 @@ public:
 	}
 };
 
-class CommandNSSetDisplay
-	: public Command
-{
-public:
-	CommandNSSetDisplay(Module *creator, const Anope::string &sname = "nickserv/set/display", size_t min = 1) : Command(creator, sname, min, min + 1)
-	{
-		this->SetDesc(_("Set the display nickname for your account"));
-		this->SetSyntax(_("\037new-display\037"));
-	}
-
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
-	{
-		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
-			return;
-		}
-
-		NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
-
-		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
-		{
-			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
-			return;
-		}
-		if (user_na == NULL)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
-			return;
-		}
-		else if (!na || *na->nc != *user_na->nc)
-		{
-			source.Reply(_("The new display nickname must belong to the %s account."), user_na->nc->display.c_str());
-			return;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, user_na->nc, param));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		Log(user_na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the display of " << user_na->nc->display << " to " << na->nick;
-
-		user_na->nc->SetDisplay(na);
-
-		/* Send updated account name */
-		for (std::list<User *>::iterator it = user_na->nc->users.begin(); it != user_na->nc->users.end(); ++it)
-		{
-			User *u = *it;
-			IRCD->SendLogin(u, user_na);
-		}
-
-		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, source.nc->display, params[0]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_(
-			"Changes the display nickname used to refer to your account. The new display "
-			"nickname must already be associated with your account."
-		));
-		return true;
-	}
-};
-
-class CommandNSSASetDisplay final
-	: public CommandNSSetDisplay
-{
-public:
-	CommandNSSASetDisplay(Module *creator) : CommandNSSetDisplay(creator, "nickserv/saset/display", 2)
-	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 \037new-display\037"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
-	{
-		this->Run(source, params[0], params[1]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_(
-			"Changes the display nickname used to refer to the account. The new display"
-			"nickname must already be associated with the account."
-		));
-		return true;
-	}
-};
-
 class CommandNSSASetNoexpire final
 	: public Command
 {
@@ -408,9 +309,6 @@ class NSSet final
 	CommandNSSet commandnsset;
 	CommandNSSASet commandnssaset;
 
-	CommandNSSetDisplay commandnssetdisplay;
-	CommandNSSASetDisplay commandnssasetdisplay;
-
 	CommandNSSetPassword commandnssetpassword;
 	CommandNSSASetPassword commandnssasetpassword;
 
@@ -421,7 +319,6 @@ class NSSet final
 public:
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsset(this), commandnssaset(this),
-		commandnssetdisplay(this), commandnssasetdisplay(this),
 		commandnssetpassword(this), commandnssasetpassword(this),
 		commandnssasetnoexpire(this),
 		noexpire(this, "NS_NO_EXPIRE")

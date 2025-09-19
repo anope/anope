@@ -388,16 +388,118 @@ public:
 	}
 };
 
+class CommandNSSetDisplay
+	: public Command
+{
+public:
+	CommandNSSetDisplay(Module *creator, const Anope::string &sname = "nickserv/set/display", size_t min = 1)
+		: Command(creator, sname, min, min + 1)
+	{
+		this->SetDesc(_("Set the display nickname for your account"));
+		this->SetSyntax(_("\037new-display\037"));
+	}
+
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
+	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
+		auto *user_na = NickAlias::Find(user);
+		if (!user_na)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
+
+		auto *na = NickAlias::Find(param);
+		if (!na || *na->nc != *user_na->nc)
+		{
+			source.Reply(_("The new display nickname must belong to the %s account."), user_na->nc->display.c_str());
+			return;
+		}
+		NickCore *user_nc = user_na->nc;
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, user_nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
+		Log(user_nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the display of " << user_nc->display << " to " << na->nick;
+		user_nc->SetDisplay(na);
+
+		// Send updated account name to the IRCd.
+		for (auto *u : user_nc->users)
+			IRCD->SendLogin(u, user_na);
+
+		source.Reply(NICK_SET_DISPLAY_CHANGED, user_nc->display.c_str());
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		this->Run(source, source.nc->display, params[0]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_(
+			"Changes the display nickname used to refer to your account. The new display "
+			"nickname must already be associated with your account."
+		));
+		return true;
+	}
+};
+
+class CommandNSSASetDisplay final
+	: public CommandNSSetDisplay
+{
+public:
+	CommandNSSASetDisplay(Module *creator)
+		: CommandNSSetDisplay(creator, "nickserv/saset/display", 2)
+	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 \037new-display\037"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		this->Run(source, params[0], params[1]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_(
+			"Changes the display nickname used to refer to the account. The new display"
+			"nickname must already be associated with the account."
+		));
+		return true;
+	}
+};
+
 class NSGroup final
 	: public Module
 {
+private:
 	CommandNSGroup commandnsgroup;
 	CommandNSUngroup commandnsungroup;
 	CommandNSGList commandnsglist;
+	CommandNSSetDisplay commandnssetdisplay;
+	CommandNSSASetDisplay commandnssasetdisplay;
 
 public:
-	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsgroup(this), commandnsungroup(this), commandnsglist(this)
+	NSGroup(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnsgroup(this)
+		, commandnsungroup(this)
+		, commandnsglist(this)
+		, commandnssetdisplay(this)
+		, commandnssasetdisplay(this)
 	{
 		if (Config->GetModule("nickserv").Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");

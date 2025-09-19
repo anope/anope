@@ -494,9 +494,10 @@ namespace Anope
 	/** Retrieves a human readable string representing the time in seconds
 	 * @param seconds The time on seconds, eg 60
 	 * @param nc The account to use language settings for to translate this string, if applicable
+	 * @param round Whether to round the duration to produce a shorter output.
 	 * @return A human readable string, eg "1 minute"
 	 */
-	extern CoreExport Anope::string Duration(time_t seconds, const NickCore *nc = NULL);
+	extern CoreExport Anope::string Duration(time_t seconds, const NickCore *nc = nullptr, bool round = false);
 
 	/** Generates a human readable string of type "expires in ..."
 	 * @param expires time in seconds

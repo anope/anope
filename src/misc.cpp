@@ -554,8 +554,26 @@ time_t Anope::DoTime(const Anope::string &s)
 	return amount;
 }
 
-Anope::string Anope::Duration(time_t t, const NickCore *nc)
+Anope::string Anope::Duration(time_t t, const NickCore *nc, bool round)
 {
+	if (round)
+	{
+		// This will get inlined when compiled with optimisations.
+		auto nearest = [](auto timeleft, auto roundto) {
+			if ((timeleft % roundto) <= (roundto / 2))
+				return timeleft - (timeleft % roundto);
+			return timeleft - (timeleft % roundto) + roundto;
+		};
+
+		// In order to get a shorter result we round to the nearest period.
+		if (t >= 31536000)
+			t = nearest(t, 86400); // Nearest day if its more than a year
+		else if (t >= 86400)
+			t = nearest(t, 3600); // Nearest hour if its more than a day
+		else if (t >= 3600)
+			t = nearest(t, 60); // Nearest minute if its more than an hour
+	}
+
 	/* We first calculate everything */
 	time_t years = t / 31536000;
 	time_t days = (t / 86400) % 365;
@@ -599,9 +617,9 @@ Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 		return buf;
 
 	if (t < Anope::CurTime)
-		return Anope::Format(Language::Translate(nc, _("%s (%s ago)")), buf, Duration(Anope::CurTime - t, nc).c_str());
+		return Anope::Format(Language::Translate(nc, _("%s (%s ago)")), buf, Duration(Anope::CurTime - t, nc, true).c_str());
 	else if (t > Anope::CurTime)
-		return Anope::Format(Language::Translate(nc, _("%s (%s from now)")), buf, Duration(t - Anope::CurTime, nc).c_str(), nc);
+		return Anope::Format(Language::Translate(nc, _("%s (%s from now)")), buf, Duration(t - Anope::CurTime, nc, true).c_str(), nc);
 	else
 		return Anope::Format(Language::Translate(nc, _("%s (now)")), buf);
 }
@@ -614,23 +632,7 @@ Anope::string Anope::Expires(time_t expires, const NickCore *nc)
 	if (expires <= Anope::CurTime)
 		return Language::Translate(nc, _("expires momentarily"));
 
-	// This will get inlined when compiled with optimisations.
-	auto nearest = [](auto timeleft, auto roundto) {
-		if ((timeleft % roundto) <= (roundto / 2))
-			return timeleft - (timeleft % roundto);
-		return timeleft - (timeleft % roundto) + roundto;
-	};
-
-	// In order to get a shorter result we round to the nearest period.
-	auto timeleft = expires - Anope::CurTime;
-	if (timeleft >= 31536000)
-		timeleft = nearest(timeleft, 86400); // Nearest day if its more than a year
-	else if (timeleft >= 86400)
-		timeleft = nearest(timeleft, 3600); // Nearest hour if its more than a day
-	else if (timeleft >= 3600)
-		timeleft = nearest(timeleft, 60); // Nearest minute if its more than an hour
-
-	auto duration = Anope::Duration(timeleft, nc);
+	auto duration = Anope::Duration(expires - Anope::CurTime, nc, true);
 	return Anope::Format(Language::Translate(nc, _("expires in %s")), duration.c_str());
 }
 

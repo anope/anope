@@ -138,7 +138,7 @@ public:
 			else
 			{
 				ListFormatter list(source.GetAccount());
-				list.AddColumn(_("Number")).AddColumn(_("Service")).AddColumn(_("Command")).AddColumn(_("Method")).AddColumn("");
+				list.AddColumn(_("Number")).AddColumn(_("Service")).AddColumn(_("Command")).AddColumn(_("Method"));
 
 				for (unsigned i = 0; i < (*ls)->size(); ++i)
 				{
@@ -147,9 +147,8 @@ public:
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(i + 1);
 					entry["Service"] = log->command_service;
-					entry["Command"] = !log->command_name.empty() ? log->command_name : log->service_name;
-					entry["Method"] = log->method;
-					entry[""] = log->extra;
+					entry["Command"] = !log->command_name.empty() ? log->command_name.upper() : log->service_name;
+					entry["Method"] = log->method + (log->extra.empty() ? "" : " ") + log->extra;
 					list.AddEntry(entry);
 				}
 

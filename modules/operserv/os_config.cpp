@@ -71,14 +71,8 @@ public:
 					lflist.AddEntry(entry);
 				}
 
-				std::vector<Anope::string> replies;
-				lflist.Process(replies);
-
 				source.Reply(_("%s settings:"), block.GetName().c_str());
-
-				for (const auto &reply : replies)
-					source.Reply(reply);
-
+				lflist.SendTo(source);
 				source.Reply(" ");
 			}
 
@@ -103,15 +97,8 @@ public:
 					lflist.AddEntry(entry);
 				}
 			}
-
-			std::vector<Anope::string> replies;
-			lflist.Process(replies);
-
 			source.Reply(_("Module settings:"));
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
-
+			lflist.SendTo(source);
 			source.Reply(_("End of configuration."));
 		}
 		else

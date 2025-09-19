@@ -122,12 +122,7 @@ public:
 			}
 		}
 
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-
-		for (const auto &reply : replies)
-			source.Reply(reply);
-
+		list.SendTo(source);
 		source.Reply(_("End of list - %d/%d matches shown."), nchans > listmax ? listmax : nchans, nchans);
 	}
 

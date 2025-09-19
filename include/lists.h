@@ -57,35 +57,3 @@ public:
 	 */
 	virtual bool InvalidRange(const Anope::string &list);
 };
-
-/** This class handles formatting LIST/VIEW replies.
- */
-class CoreExport ListFormatter final
-{
-public:
-	typedef std::map<Anope::string, Anope::string> ListEntry;
-private:
-	NickCore *nc;
-	std::vector<Anope::string> columns;
-	std::vector<ListEntry> entries;
-public:
-	ListFormatter(NickCore *nc);
-	ListFormatter &AddColumn(const Anope::string &name);
-	void AddEntry(const ListEntry &entry);
-	bool IsEmpty() const;
-	void Process(std::vector<Anope::string> &);
-};
-
-/** This class handles formatting INFO replies
- */
-class CoreExport InfoFormatter final
-{
-	NickCore *nc;
-	std::vector<std::pair<Anope::string, Anope::string> > replies;
-	unsigned longest = 0;
-public:
-	InfoFormatter(NickCore *nc);
-	void Process(std::vector<Anope::string> &);
-	Anope::string &operator[](const Anope::string &key);
-	void AddOption(const Anope::string &opt);
-};

@@ -121,11 +121,7 @@ private:
 			entry["Message"] = (*q)[i];
 			list.AddEntry(entry);
 		}
-
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-		for (const auto &reply : replies)
-			source.Reply(reply);
+		list.SendTo(source);
 	}
 
 public:

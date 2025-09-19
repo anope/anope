@@ -109,6 +109,20 @@ public:
 	void SendTo(CommandSource &source);
 };
 
+class CoreExport InfoFormatter final
+{
+private:
+	size_t longest = 0;
+	NickCore *nc;
+	std::vector<std::pair<Anope::string, Anope::string> > replies;
+
+public:
+	InfoFormatter(NickCore *nc);
+	Anope::string &operator[](const Anope::string &key);
+	void AddOption(const Anope::string &opt);
+	void SendTo(CommandSource &source);
+};
+
 class CoreExport LineWrapper final
 {
 private:
@@ -121,3 +135,20 @@ public:
 	bool GetLine(Anope::string &out);
 };
 
+class CoreExport ListFormatter final
+{
+public:
+	using ListEntry = std::map<Anope::string, Anope::string>;
+
+private:
+	std::vector<Anope::string> columns;
+	std::vector<ListEntry> entries;
+	NickCore *nc;
+
+public:
+	ListFormatter(NickCore *nc);
+	ListFormatter &AddColumn(const Anope::string &name);
+	void AddEntry(const ListEntry &entry);
+	bool IsEmpty() const;
+	void SendTo(CommandSource &source);
+};

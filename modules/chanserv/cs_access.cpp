@@ -435,14 +435,8 @@ private:
 			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 		else
 		{
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
 			source.Reply(_("Access list for %s:"), ci->name.c_str());
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
-
+			list.SendTo(source);
 			source.Reply(_("End of access list"));
 		}
 
@@ -744,11 +738,7 @@ class CommandCSLevels final
 			list.AddEntry(entry);
 		}
 
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-
-		for (const auto &reply : replies)
-			source.Reply(reply);
+		list.SendTo(source);
 	}
 
 	void DoReset(CommandSource &source, ChannelInfo *ci)
@@ -834,11 +824,7 @@ public:
 				list.AddEntry(entry);
 			}
 
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
+			list.SendTo(source);
 		}
 		else
 		{

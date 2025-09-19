@@ -140,11 +140,7 @@ private:
 			list.AddEntry(entry);
 		}
 
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-		for (const auto &reply : replies)
-			source.Reply(reply);
-
+		list.SendTo(source);
 		source.Reply(_("End of entry message list."));
 	}
 

@@ -468,12 +468,7 @@ public:
 			++counter;
 		}
 
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-
-		for (const auto &reply : replies)
-			source.Reply(reply);
-
+		list.SendTo(source);
 		source.Reply(_("Displayed \002%d\002 records (\002%d\002 total)."), display_counter, counter);
 	}
 

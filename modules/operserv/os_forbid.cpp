@@ -430,12 +430,7 @@ public:
 				else
 				{
 					source.Reply(_("Forbid list:"));
-
-					std::vector<Anope::string> replies;
-					list.Process(replies);
-
-					for (const auto &reply : replies)
-						source.Reply(reply);
+					list.SendTo(source);
 
 					if (shown >= forbids.size())
 						source.Reply(_("End of forbid list."));

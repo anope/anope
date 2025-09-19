@@ -269,9 +269,7 @@ class CommandOSDNS final
 
 			lf.AddEntry(entry);
 		}
-
-		std::vector<Anope::string> replies;
-		lf.Process(replies);
+		lf.SendTo(source);
 
 		if (!zones->empty())
 		{
@@ -295,12 +293,8 @@ class CommandOSDNS final
 
 				lf2.AddEntry(entry);
 			}
-
-			lf2.Process(replies);
+			lf2.SendTo(source);
 		}
-
-		for (const auto &reply : replies)
-			source.Reply(reply);
 	}
 
 	void AddZone(CommandSource &source, const std::vector<Anope::string> &params)

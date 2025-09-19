@@ -66,9 +66,6 @@ public:
 			}
 		}
 
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-
 		if (!count)
 		{
 			source.Reply(_(
@@ -79,10 +76,7 @@ public:
 		else
 		{
 			source.Reply(_("Bot list:"));
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
-
+			list.SendTo(source);
 			source.Reply(_("%d bots available."), count);
 		}
 	}

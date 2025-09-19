@@ -58,12 +58,7 @@ public:
 			info[_("Used on")] = Anope::Format(Language::Translate(source.nc, bi->GetChannelCount(), N_("%u channel", "%u channels")), bi->GetChannelCount());
 
 			FOREACH_MOD(OnBotInfo, (source, bi, ci, info));
-
-			std::vector<Anope::string> replies;
-			info.Process(replies);
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
+			info.SendTo(source);
 
 			if (source.HasPriv("botserv/administration"))
 			{
@@ -89,12 +84,7 @@ public:
 			Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
 
 			FOREACH_MOD(OnBotInfo, (source, bi, ci, info));
-
-			std::vector<Anope::string> replies;
-			info.Process(replies);
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
+			info.SendTo(source);
 		}
 		else
 			source.Reply(_("\002%s\002 is not a valid bot or registered channel."), query.c_str());

@@ -292,12 +292,7 @@ private:
 			}
 
 			source.Reply(_("Services ignore list:"));
-
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
+			list.SendTo(source);
 		}
 	}
 

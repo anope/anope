@@ -453,12 +453,8 @@ private:
 			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 		else
 		{
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
 			source.Reply(_("%s list for %s"), source.command.nobreak().c_str(), ci->name.c_str());
-			for (const auto &reply : replies)
-				source.Reply(reply);
+			list.SendTo(source);
 		}
 	}
 

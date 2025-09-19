@@ -141,7 +141,7 @@ bool ListFormatter::IsEmpty() const
 	return this->entries.empty();
 }
 
-void ListFormatter::Process(std::vector<Anope::string> &buffer)
+void ListFormatter::SendTo(CommandSource &source)
 {
 	std::vector<Anope::string> tcolumns;
 	std::map<Anope::string, size_t> lengths;
@@ -181,7 +181,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 		{
 			if (breaks.count(this->columns[i]))
 			{
-				buffer.push_back(s);
+				source.Reply(s);
 				s = "  ";
 			}
 			else if (!s.empty())
@@ -191,7 +191,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 				for (unsigned j = tcolumns[i].length(); j < lengths[this->columns[i]]; ++j)
 					s += " ";
 		}
-		buffer.push_back(s);
+		source.Reply(s);
 	}
 
 	for (auto &entry : this->entries)
@@ -201,7 +201,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 		{
 			if (breaks.count(this->columns[j]))
 			{
-				buffer.push_back(s);
+				source.Reply(s);
 				s = "  ";
 			}
 			else if (!s.empty())
@@ -211,7 +211,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 				for (unsigned k = entry[this->columns[j]].length(); k < lengths[this->columns[j]]; ++k)
 					s += " ";
 		}
-		buffer.push_back(s);
+		source.Reply(s);
 	}
 }
 
@@ -219,16 +219,15 @@ InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc)
 {
 }
 
-void InfoFormatter::Process(std::vector<Anope::string> &buffer)
+void InfoFormatter::SendTo(CommandSource &source)
 {
-	buffer.clear();
 	for (const auto &[key, value] : this->replies)
 	{
 		auto line = key;
 		line += ": ";
 		line += Anope::string(longest - key.utf8length(), ' ');
 		line += Language::Translate(this->nc, value.c_str());
-		buffer.push_back(line);
+		source.Reply(line);
 	}
 }
 

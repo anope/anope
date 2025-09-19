@@ -124,12 +124,7 @@ class CommandNSAJoin final
 			}
 
 			source.Reply(_("%s's auto join list:"), nc->display.c_str());
-
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
+			list.SendTo(source);
 		}
 	}
 

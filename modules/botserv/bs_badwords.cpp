@@ -305,14 +305,8 @@ private:
 			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
 		else
 		{
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
 			source.Reply(_("Bad words list for %s:"), ci->name.c_str());
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
-
+			list.SendTo(source);
 			source.Reply(_("End of bad words list."));
 		}
 	}

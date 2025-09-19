@@ -354,12 +354,7 @@ public:
 		}
 
 		source.Reply(!nick.empty() ? _("List of nicknames belonging to \002%s\002:") : _("List of nicknames belonging to your account:"), nc->display.c_str());
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-
-		for (const auto &reply : replies)
-			source.Reply(reply);
-
+		list.SendTo(source);
 		source.Reply(nc->aliases->size(), N_("%zu nickname in the account.", "%zu nicknames in the account."), nc->aliases->size());
 	}
 

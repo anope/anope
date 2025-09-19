@@ -62,12 +62,7 @@ public:
 		}
 
 		FOREACH_MOD(OnChanInfo, (source, ci, info, show_all));
-
-		std::vector<Anope::string> replies;
-		info.Process(replies);
-
-		for (const auto &reply : replies)
-			source.Reply(reply);
+		info.SendTo(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

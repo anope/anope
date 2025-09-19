@@ -249,13 +249,7 @@ private:
 			}
 
 			source.Reply(_("Hosts with at least \002%d\002 sessions:"), mincount);
-
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
+			list.SendTo(source);
 		}
 
 		return;
@@ -534,12 +528,7 @@ private:
 		else
 		{
 			source.Reply(_("Current Session Limit Exception list:"));
-
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
+			list.SendTo(source);
 		}
 	}
 

@@ -337,13 +337,7 @@ private:
 		else
 		{
 			source.Reply(_("Current AKILL list:"));
-
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
-
+			list.SendTo(source);
 			source.Reply(_("End of AKILL list."));
 		}
 	}

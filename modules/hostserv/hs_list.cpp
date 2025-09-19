@@ -112,11 +112,7 @@ public:
 				source.Reply(_("Displayed all records (count: \002%d\002)."), display_counter);
 		}
 
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-
-		for (const auto &reply : replies)
-			source.Reply(reply);
+		list.SendTo(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

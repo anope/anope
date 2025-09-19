@@ -96,12 +96,7 @@ public:
 			}
 		}
 
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-
-		for (const auto &reply : replies)
-			source.Reply(reply);
-
+		list.SendTo(source);
 		source.Reply(_("End of channel list. \002%u\002 channels shown."), count);
 	}
 
@@ -243,12 +238,7 @@ public:
 			}
 		}
 
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-
-		for (const auto &reply : replies)
-			source.Reply(reply);
-
+		list.SendTo(source);
 		source.Reply(_("End of users list. \002%u\002 users shown."), count);
 		return;
 	}

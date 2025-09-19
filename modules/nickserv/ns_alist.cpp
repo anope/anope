@@ -87,9 +87,6 @@ public:
 			list.AddEntry(entry);
 		}
 
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-
 		if (!chan_count)
 		{
 			source.Reply(_("\002%s\002 has no access in any channels."), nc->display.c_str());
@@ -97,10 +94,7 @@ public:
 		else
 		{
 			source.Reply(_("Channels that \002%s\002 has access on:"), nc->display.c_str());
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
-
+			list.SendTo(source);
 			source.Reply(_("End of list - %d channels shown."), chan_count);
 		}
 	}

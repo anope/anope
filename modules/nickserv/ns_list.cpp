@@ -120,13 +120,7 @@ public:
 		}
 
 		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
-
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-
-		for (const auto &reply : replies)
-			source.Reply(reply);
-
+		list.SendTo(source);
 		source.Reply(_("End of list - %d/%d matches shown."), nnicks > listmax ? listmax : nnicks, nnicks);
 		return;
 	}

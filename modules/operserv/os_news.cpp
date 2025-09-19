@@ -217,13 +217,7 @@ protected:
 			}
 
 			source.Reply(msgs[MSG_LIST_HEADER]);
-
-			std::vector<Anope::string> replies;
-			lflist.Process(replies);
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
-
+			lflist.SendTo(source);
 			source.Reply(_("End of news list."));
 		}
 

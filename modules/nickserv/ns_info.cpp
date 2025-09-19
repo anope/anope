@@ -136,12 +136,7 @@ public:
 			}
 
 			FOREACH_MOD(OnNickInfo, (source, na, info, show_hidden));
-
-			std::vector<Anope::string> replies;
-			info.Process(replies);
-
-			for (const auto &reply : replies)
-				source.Reply(reply);
+			info.SendTo(source);
 		}
 	}
 
